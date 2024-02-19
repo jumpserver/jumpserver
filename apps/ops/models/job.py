@@ -554,6 +554,15 @@ class JobExecution(JMSOrgBaseModel):
         finally:
             ssh_tunnel.local_gateway_clean(runner)
 
+    def stop(self):
+        with open(os.path.join(self.private_dir, 'local.pid')) as f:
+            try:
+                pid = f.read()
+                os.kill(int(pid), 9)
+            except Exception as e:
+                print(e)
+        self.set_error('Job stop by "kill -9 {}"'.format(pid))
+
     class Meta:
         verbose_name = _("Job Execution")
         ordering = ['-date_created']
