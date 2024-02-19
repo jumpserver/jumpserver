@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-05 16:29+0800\n"
+"POT-Creation-Date: 2024-02-19 11:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -258,7 +258,7 @@ msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 #: perms/models/asset_permission.py:69 perms/serializers/permission.py:36
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
 #: terminal/notifications.py:155 terminal/serializers/command.py:17
-#: terminal/serializers/session.py:26
+#: terminal/serializers/session.py:28
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:256
@@ -402,7 +402,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:64 terminal/serializers/session.py:49
+#: ops/serializers/job.py:64 terminal/serializers/session.py:51
 msgid "Is success"
 msgstr "成功は"
 
@@ -767,7 +767,7 @@ msgstr "カテゴリ"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:21 terminal/serializers/storage.py:264
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:264
 #: terminal/serializers/storage.py:276 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
@@ -990,7 +990,7 @@ msgstr "自動タスク実行履歴"
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:46
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
-#: tickets/views/approve.py:117
+#: tickets/views/approve.py:128
 msgid "Success"
 msgstr "成功"
 
@@ -1675,7 +1675,7 @@ msgstr "ユーザーと同じユーザー名"
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:29 terminal/models/applet/applet.py:42
 #: terminal/models/virtualapp/virtualapp.py:24
-#: terminal/serializers/session.py:19 terminal/serializers/session.py:45
+#: terminal/serializers/session.py:21 terminal/serializers/session.py:47
 #: terminal/serializers/storage.py:71
 msgid "Protocol"
 msgstr "プロトコル"
@@ -2371,7 +2371,7 @@ msgstr "名前の変更"
 msgid "Symlink"
 msgstr "Symlink"
 
-#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:146
+#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:149
 msgid "Download"
 msgstr "ダウンロード"
 
@@ -2379,7 +2379,7 @@ msgstr "ダウンロード"
 msgid "Rename dir"
 msgstr "マップディレクトリ"
 
-#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:257
+#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2418,8 +2418,8 @@ msgstr "閉じる"
 
 #: audits/const.py:43 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:52
-#: terminal/serializers/session.py:66
+#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:54
+#: terminal/serializers/session.py:68
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -2704,7 +2704,7 @@ msgstr "ACL アクションはレビューです"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
-#: authentication/api/password.py:33 terminal/api/session/session.py:305
+#: authentication/api/password.py:33 terminal/api/session/session.py:325
 #: users/views/profile/reset.py:63
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
@@ -4387,7 +4387,7 @@ msgstr "保存後に実行"
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:65 terminal/serializers/session.py:53
+#: ops/serializers/job.py:65 terminal/serializers/session.py:55
 msgid "Is finished"
 msgstr "終了しました"
 
@@ -4525,7 +4525,7 @@ msgstr "グローバル組織を表示できます"
 msgid "Can view all joined org"
 msgstr "参加しているすべての組織を表示できます"
 
-#: orgs/models.py:233
+#: orgs/models.py:236
 msgid "Can not delete virtual org"
 msgstr "仮想組織を削除できませんでした"
 
@@ -4610,7 +4610,7 @@ msgid "today"
 msgstr "今日"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:117
+#: settings/serializers/feature.py:118
 msgid "day"
 msgstr "日"
 
@@ -5603,39 +5603,43 @@ msgstr "GPTモデル"
 msgid "Enable tickets"
 msgstr "チケットを有効にする"
 
-#: settings/serializers/feature.py:114
+#: settings/serializers/feature.py:112
+msgid "No login approval"
+msgstr "ログイン承認なし"
+
+#: settings/serializers/feature.py:115
 msgid "Ticket authorize default time"
 msgstr "デフォルト製造オーダ承認時間"
 
-#: settings/serializers/feature.py:117
+#: settings/serializers/feature.py:118
 msgid "hour"
 msgstr "時"
 
-#: settings/serializers/feature.py:118
+#: settings/serializers/feature.py:119
 msgid "Ticket authorize default time unit"
 msgstr "デフォルト製造オーダ承認時間単位"
 
-#: settings/serializers/feature.py:123
+#: settings/serializers/feature.py:124
 msgid "Feature"
 msgstr "機能"
 
-#: settings/serializers/feature.py:126
+#: settings/serializers/feature.py:127
 msgid "Operation center"
 msgstr "職業センター"
 
-#: settings/serializers/feature.py:127
+#: settings/serializers/feature.py:128
 msgid "Allow user run batch command or not using ansible"
 msgstr "ユーザー実行バッチコマンドを許可するか、ansibleを使用しない"
 
-#: settings/serializers/feature.py:131
+#: settings/serializers/feature.py:132
 msgid "Operation center command blacklist"
 msgstr "オペレーション センター コマンド ブラックリスト"
 
-#: settings/serializers/feature.py:132
+#: settings/serializers/feature.py:133
 msgid "Commands that are not allowed execute."
 msgstr "実行が許可されていないコマンド"
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:138
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -5643,7 +5647,7 @@ msgstr "実行が許可されていないコマンド"
 msgid "Virtual app"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:140
+#: settings/serializers/feature.py:141
 msgid "Enable virtual app"
 msgstr "仮想アプリケーションの有効化"
 
@@ -6474,20 +6478,20 @@ msgstr "テストに失敗しました：構成を確認してください"
 msgid "Have online sessions"
 msgstr "オンラインセッションを持つ"
 
-#: terminal/api/session/session.py:46
+#: terminal/api/session/session.py:48
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "ユーザー%s %sこのセッション %s の録画です"
 
-#: terminal/api/session/session.py:297
+#: terminal/api/session/session.py:317
 msgid "Session does not exist: {}"
 msgstr "セッションが存在しません: {}"
 
-#: terminal/api/session/session.py:300
+#: terminal/api/session/session.py:320
 msgid "Session is finished or the protocol not supported"
 msgstr "セッションが終了したか、プロトコルがサポートされていません"
 
-#: terminal/api/session/session.py:313
+#: terminal/api/session/session.py:333
 msgid "User does not have permission"
 msgstr "ユーザーに権限がありません"
 
@@ -6835,11 +6839,11 @@ msgstr "ログイン元"
 msgid "Replay"
 msgstr "リプレイ"
 
-#: terminal/models/session/session.py:47 terminal/serializers/session.py:65
+#: terminal/models/session/session.py:47 terminal/serializers/session.py:67
 msgid "Command amount"
 msgstr "コマンド量"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:28
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:30
 msgid "Error reason"
 msgstr "間違った理由"
 
@@ -7158,31 +7162,31 @@ msgstr ""
 msgid "Asset IP"
 msgstr "資産 IP"
 
-#: terminal/serializers/session.py:23 terminal/serializers/session.py:50
+#: terminal/serializers/session.py:25 terminal/serializers/session.py:52
 msgid "Can replay"
 msgstr "再生できます"
 
-#: terminal/serializers/session.py:24 terminal/serializers/session.py:51
+#: terminal/serializers/session.py:26 terminal/serializers/session.py:53
 msgid "Can join"
 msgstr "参加できます"
 
-#: terminal/serializers/session.py:25 terminal/serializers/session.py:54
+#: terminal/serializers/session.py:27 terminal/serializers/session.py:56
 msgid "Can terminate"
 msgstr "終了できます"
 
-#: terminal/serializers/session.py:46
+#: terminal/serializers/session.py:48
 msgid "User ID"
 msgstr "ユーザーID"
 
-#: terminal/serializers/session.py:47
+#: terminal/serializers/session.py:49
 msgid "Asset ID"
 msgstr "資産ID"
 
-#: terminal/serializers/session.py:48
+#: terminal/serializers/session.py:50
 msgid "Login from display"
 msgstr "表示からのログイン"
 
-#: terminal/serializers/session.py:55
+#: terminal/serializers/session.py:57
 msgid "Terminal display"
 msgstr "ターミナルディスプレイ"
 
@@ -7582,19 +7586,19 @@ msgstr "チケット基本情報"
 msgid "Ticket applied info"
 msgstr "チケット適用情報"
 
-#: tickets/notifications.py:111
+#: tickets/notifications.py:105
 msgid "Your has a new ticket, applicant - {}"
 msgstr "新しいチケットがあります- {}"
 
-#: tickets/notifications.py:115
+#: tickets/notifications.py:109
 msgid "{}: New Ticket - {} ({})"
 msgstr "新しいチケット- {} ({})"
 
-#: tickets/notifications.py:159
+#: tickets/notifications.py:155
 msgid "Your ticket has been processed, processor - {}"
 msgstr "チケットが処理されました。プロセッサー- {}"
 
-#: tickets/notifications.py:163
+#: tickets/notifications.py:159
 msgid "Ticket has processed - {} ({})"
 msgstr "チケットが処理済み- {} ({})"
 
@@ -7660,7 +7664,7 @@ msgid "Ticket information"
 msgstr "作業指示情報"
 
 #: tickets/templates/tickets/approve_check_password.html:28
-#: tickets/views/approve.py:40 tickets/views/approve.py:77
+#: tickets/views/approve.py:43 tickets/views/approve.py:80
 msgid "Ticket approval"
 msgstr "作業指示の承認"
 
@@ -7668,26 +7672,26 @@ msgstr "作業指示の承認"
 msgid "Approval"
 msgstr "承認"
 
-#: tickets/views/approve.py:41
+#: tickets/views/approve.py:44
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr ""
 "このワークシートが存在しないか、ワークシートが終了したか、このリンクが無効に"
 "なっています"
 
-#: tickets/views/approve.py:69
+#: tickets/views/approve.py:72
 msgid "Click the button below to approve or reject"
 msgstr "下のボタンをクリックして同意または拒否。"
 
-#: tickets/views/approve.py:78
+#: tickets/views/approve.py:81
 msgid "After successful authentication, this ticket can be approved directly"
 msgstr "認証に成功した後、作業指示書は直接承認することができる。"
 
-#: tickets/views/approve.py:95
+#: tickets/views/approve.py:105
 msgid "Illegal approval action"
 msgstr "無効な承認アクション"
 
-#: tickets/views/approve.py:108
+#: tickets/views/approve.py:119
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
@@ -8536,7 +8540,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 

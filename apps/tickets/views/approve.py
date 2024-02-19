@@ -5,11 +5,14 @@ from __future__ import unicode_literals
 
 from django.core.cache import cache
 from django.http import HttpResponse
+from django.conf import settings
 from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 
 from common.utils import get_logger, FlashMessageUtil
+from common.exceptions import JMSException
+from users.models import User
 from orgs.utils import tmp_to_root_org
 from tickets.const import TicketType
 from tickets.errors import AlreadyClosed
@@ -71,7 +74,7 @@ class TicketDirectApproveView(TemplateView):
         return super().get_context_data(**kwargs)
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
+        if not (settings.TICKETS_DIRECT_APPROVE or request.user.is_authenticated):
             direct_url = reverse('tickets:direct-approve', kwargs={'token': kwargs['token']})
             message_data = {
                 'title': _('Ticket approval'),
@@ -87,8 +90,15 @@ class TicketDirectApproveView(TemplateView):
             return self.redirect_message_response(redirect_url=self.login_url)
         return super().get(request, ticket_info=ticket_info, *args, **kwargs)
 
-    def post(self, request, **kwargs):
+    @staticmethod
+    def get_user(request, ticket_info):
         user = request.user
+        if not user.is_authenticated and settings.TICKETS_DIRECT_APPROVE:
+            user_id = ticket_info.get('approver_id')
+            user = User.objects.filter(id=user_id).first()
+        return user
+
+    def post(self, request, **kwargs):
         token = kwargs.get('token')
         action = request.POST.get('action')
         if action not in ['approve', 'reject']:
@@ -99,13 +109,14 @@ class TicketDirectApproveView(TemplateView):
         if not ticket_info:
             return self.redirect_message_response(redirect_url=self.login_url)
         try:
+            user = self.get_user(request, ticket_info)
             ticket_id = ticket_info.get('ticket_id')
             with tmp_to_root_org():
                 ticket = Ticket.all().get(id=ticket_id)
                 ticket_sub_model = self.TICKET_SUB_MODEL_MAP[ticket.type]
                 ticket = ticket_sub_model.objects.get(id=ticket_id)
             if not ticket.has_current_assignee(user):
-                raise Exception(_("This user is not authorized to approve this ticket"))
+                raise JMSException(_("This user is not authorized to approve this ticket"))
             getattr(ticket, action)(user)
         except AlreadyClosed as e:
             self.clear(token)

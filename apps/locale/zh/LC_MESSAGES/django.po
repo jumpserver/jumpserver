@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-05 16:29+0800\n"
+"POT-Creation-Date: 2024-02-19 11:14+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -257,7 +257,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: perms/models/asset_permission.py:69 perms/serializers/permission.py:36
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
 #: terminal/notifications.py:155 terminal/serializers/command.py:17
-#: terminal/serializers/session.py:26
+#: terminal/serializers/session.py:28
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:256
@@ -401,7 +401,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:64 terminal/serializers/session.py:49
+#: ops/serializers/job.py:64 terminal/serializers/session.py:51
 msgid "Is success"
 msgstr "是否成功"
 
@@ -765,7 +765,7 @@ msgstr "类别"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:21 terminal/serializers/storage.py:264
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:264
 #: terminal/serializers/storage.py:276 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
@@ -987,7 +987,7 @@ msgstr "自动化任务执行历史"
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:46
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
-#: tickets/views/approve.py:117
+#: tickets/views/approve.py:128
 msgid "Success"
 msgstr "成功"
 
@@ -1667,7 +1667,7 @@ msgstr "用户名与用户相同"
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:29 terminal/models/applet/applet.py:42
 #: terminal/models/virtualapp/virtualapp.py:24
-#: terminal/serializers/session.py:19 terminal/serializers/session.py:45
+#: terminal/serializers/session.py:21 terminal/serializers/session.py:47
 #: terminal/serializers/storage.py:71
 msgid "Protocol"
 msgstr "协议"
@@ -2354,7 +2354,7 @@ msgstr "重命名"
 msgid "Symlink"
 msgstr "建立软链接"
 
-#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:146
+#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:149
 msgid "Download"
 msgstr "下载"
 
@@ -2362,7 +2362,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:257
+#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2401,8 +2401,8 @@ msgstr "关闭"
 
 #: audits/const.py:43 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:52
-#: terminal/serializers/session.py:66
+#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:54
+#: terminal/serializers/session.py:68
 msgid "Terminal"
 msgstr "终端"
 
@@ -2685,7 +2685,7 @@ msgstr "ACL 动作是复核"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:33 terminal/api/session/session.py:305
+#: authentication/api/password.py:33 terminal/api/session/session.py:325
 #: users/views/profile/reset.py:63
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
@@ -4336,7 +4336,7 @@ msgstr "保存后执行"
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:65 terminal/serializers/session.py:53
+#: ops/serializers/job.py:65 terminal/serializers/session.py:55
 msgid "Is finished"
 msgstr "是否完成"
 
@@ -4473,7 +4473,7 @@ msgstr "可以查看全局组织"
 msgid "Can view all joined org"
 msgstr "可以查看所有加入的组织"
 
-#: orgs/models.py:233
+#: orgs/models.py:236
 msgid "Can not delete virtual org"
 msgstr "无法删除虚拟组织"
 
@@ -4558,7 +4558,7 @@ msgid "today"
 msgstr "今天"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:117
+#: settings/serializers/feature.py:118
 msgid "day"
 msgstr "天"
 
@@ -5543,39 +5543,43 @@ msgstr "GPT 模型"
 msgid "Enable tickets"
 msgstr "启用工单"
 
-#: settings/serializers/feature.py:114
+#: settings/serializers/feature.py:112
+msgid "No login approval"
+msgstr "免登录审批"
+
+#: settings/serializers/feature.py:115
 msgid "Ticket authorize default time"
 msgstr "默认工单授权时间"
 
-#: settings/serializers/feature.py:117
+#: settings/serializers/feature.py:118
 msgid "hour"
 msgstr "时"
 
-#: settings/serializers/feature.py:118
+#: settings/serializers/feature.py:119
 msgid "Ticket authorize default time unit"
 msgstr "默认工单授权时间单位"
 
-#: settings/serializers/feature.py:123
+#: settings/serializers/feature.py:124
 msgid "Feature"
 msgstr "功能"
 
-#: settings/serializers/feature.py:126
+#: settings/serializers/feature.py:127
 msgid "Operation center"
 msgstr "作业中心"
 
-#: settings/serializers/feature.py:127
+#: settings/serializers/feature.py:128
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/feature.py:131
+#: settings/serializers/feature.py:132
 msgid "Operation center command blacklist"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/feature.py:132
+#: settings/serializers/feature.py:133
 msgid "Commands that are not allowed execute."
 msgstr "不允许执行的命令"
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:138
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -5583,7 +5587,7 @@ msgstr "不允许执行的命令"
 msgid "Virtual app"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:140
+#: settings/serializers/feature.py:141
 msgid "Enable virtual app"
 msgstr "启用虚拟应用"
 
@@ -6380,20 +6384,20 @@ msgstr "测试失败：请检查配置"
 msgid "Have online sessions"
 msgstr "有在线会话"
 
-#: terminal/api/session/session.py:46
+#: terminal/api/session/session.py:48
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
 
-#: terminal/api/session/session.py:297
+#: terminal/api/session/session.py:317
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session/session.py:300
+#: terminal/api/session/session.py:320
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:313
+#: terminal/api/session/session.py:333
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -6741,11 +6745,11 @@ msgstr "登录来源"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:47 terminal/serializers/session.py:65
+#: terminal/models/session/session.py:47 terminal/serializers/session.py:67
 msgid "Command amount"
 msgstr "命令数量"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:28
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:30
 msgid "Error reason"
 msgstr "错误原因"
 
@@ -7057,31 +7061,31 @@ msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
 msgid "Asset IP"
 msgstr "资产 IP"
 
-#: terminal/serializers/session.py:23 terminal/serializers/session.py:50
+#: terminal/serializers/session.py:25 terminal/serializers/session.py:52
 msgid "Can replay"
 msgstr "是否可重放"
 
-#: terminal/serializers/session.py:24 terminal/serializers/session.py:51
+#: terminal/serializers/session.py:26 terminal/serializers/session.py:53
 msgid "Can join"
 msgstr "是否可加入"
 
-#: terminal/serializers/session.py:25 terminal/serializers/session.py:54
+#: terminal/serializers/session.py:27 terminal/serializers/session.py:56
 msgid "Can terminate"
 msgstr "是否可中断"
 
-#: terminal/serializers/session.py:46
+#: terminal/serializers/session.py:48
 msgid "User ID"
 msgstr "用户 ID"
 
-#: terminal/serializers/session.py:47
+#: terminal/serializers/session.py:49
 msgid "Asset ID"
 msgstr "资产 ID"
 
-#: terminal/serializers/session.py:48
+#: terminal/serializers/session.py:50
 msgid "Login from display"
 msgstr "登录来源名称"
 
-#: terminal/serializers/session.py:55
+#: terminal/serializers/session.py:57
 msgid "Terminal display"
 msgstr "终端显示"
 
@@ -7477,19 +7481,19 @@ msgstr "工单基本信息"
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
-#: tickets/notifications.py:111
+#: tickets/notifications.py:105
 msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:115
+#: tickets/notifications.py:109
 msgid "{}: New Ticket - {} ({})"
 msgstr "新工单 - {} ({})"
 
-#: tickets/notifications.py:159
+#: tickets/notifications.py:155
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/notifications.py:163
+#: tickets/notifications.py:159
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
@@ -7555,7 +7559,7 @@ msgid "Ticket information"
 msgstr "工单信息"
 
 #: tickets/templates/tickets/approve_check_password.html:28
-#: tickets/views/approve.py:40 tickets/views/approve.py:77
+#: tickets/views/approve.py:43 tickets/views/approve.py:80
 msgid "Ticket approval"
 msgstr "工单审批"
 
@@ -7563,24 +7567,24 @@ msgstr "工单审批"
 msgid "Approval"
 msgstr "同意"
 
-#: tickets/views/approve.py:41
+#: tickets/views/approve.py:44
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr "工单不存在，或者工单流程已经结束，或者此链接已经过期"
 
-#: tickets/views/approve.py:69
+#: tickets/views/approve.py:72
 msgid "Click the button below to approve or reject"
 msgstr "点击下方按钮同意或者拒绝"
 
-#: tickets/views/approve.py:78
+#: tickets/views/approve.py:81
 msgid "After successful authentication, this ticket can be approved directly"
 msgstr "认证成功后，工单可直接审批"
 
-#: tickets/views/approve.py:95
+#: tickets/views/approve.py:105
 msgid "Illegal approval action"
 msgstr "无效的审批动作"
 
-#: tickets/views/approve.py:108
+#: tickets/views/approve.py:119
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用户无权审批此工单"
 
@@ -8412,7 +8416,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 
