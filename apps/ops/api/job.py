@@ -16,7 +16,7 @@ from common.const.http import POST
 from common.permissions import IsValidUser
 from ops.const import Types
 from ops.models import Job, JobExecution
-from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer
+from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
@@ -186,6 +186,17 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
         return queryset
+
+    @action(methods=[POST], detail=False, serializer_class=JobTaskStopSerializer, permission_classes=[IsValidUser, ],
+            url_path='stop')
+    def stop(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': serializer.errors}, status=400)
+        task_id = serializer.validated_data['task_id']
+        instance = get_object_or_404(JobExecution, task_id=task_id, creator=request.user)
+        instance.stop()
+        return Response({'task_id': task_id}, status=200)
 
 
 class JobAssetDetail(APIView):
