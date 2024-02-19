@@ -48,7 +48,7 @@ class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
 
     def get_queryset(self):
         perms = self.get_asset_related_perms()
-        users = User.objects.filter(
+        users = User.get_queryset().filter(
             Q(assetpermissions__in=perms) | Q(groups__assetpermissions__in=perms)
         ).distinct()
         return users
