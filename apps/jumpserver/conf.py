@@ -566,6 +566,7 @@ class Config(dict):
         'PASSWORD_CHANGE_LOG_KEEP_DAYS': 999,
 
         'TICKETS_ENABLED': True,
+        'TICKETS_DIRECT_APPROVE': False,
 
         # 废弃的
         'DEFAULT_ORG_SHOW_ALL_USERS': True,

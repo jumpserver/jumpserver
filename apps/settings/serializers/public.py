@@ -51,6 +51,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     ANNOUNCEMENT = serializers.DictField()
 
     TICKETS_ENABLED = serializers.BooleanField()
+    TICKETS_DIRECT_APPROVE = serializers.BooleanField()
     CONNECTION_TOKEN_REUSABLE = serializers.BooleanField()
     CACHE_LOGIN_PASSWORD_ENABLED = serializers.BooleanField()
     VAULT_ENABLED = serializers.BooleanField()
