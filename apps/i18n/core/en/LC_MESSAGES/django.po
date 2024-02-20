@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-04 19:41+0800\n"
+"POT-Creation-Date: 2024-02-20 15:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3844,7 +3844,7 @@ msgstr ""
 msgid "Invalid choice: {}"
 msgstr ""
 
-#: common/serializers/mixin.py:397
+#: common/serializers/mixin.py:400
 msgid "Labels"
 msgstr ""
 
@@ -3937,8 +3937,10 @@ msgid "Labeled resource"
 msgstr ""
 
 #: labels/serializers.py:22
-msgid "Resource count"
-msgstr ""
+#, fuzzy
+#| msgid "Executed amount"
+msgid "Resource amount"
+msgstr "Executions"
 
 #: labels/serializers.py:28
 msgid "Cannot contain \":,\""
@@ -7925,8 +7927,8 @@ msgstr "MFA"
 
 #: users/serializers/user.py:294
 msgid ""
-"For security, only a partial list of users is displayed. You can try to "
-"search for more"
+"For security, only a partial list of users is displayed. You can search for "
+"more"
 msgstr ""
 
 #: users/serializers/user.py:327

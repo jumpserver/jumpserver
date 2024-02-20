@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-04 19:41+0800\n"
+"POT-Creation-Date: 2024-02-20 15:15+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3872,7 +3872,7 @@ msgstr "错误的数据类型，应该是列表"
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
-#: common/serializers/mixin.py:397
+#: common/serializers/mixin.py:400
 msgid "Labels"
 msgstr "标签"
 
@@ -3972,7 +3972,9 @@ msgid "Labeled resource"
 msgstr "关联的资源"
 
 #: labels/serializers.py:22
-msgid "Resource count"
+#, fuzzy
+#| msgid "Resource count"
+msgid "Resource amount"
 msgstr "资源数量"
 
 #: labels/serializers.py:28
@@ -8041,8 +8043,8 @@ msgstr "MFA"
 
 #: users/serializers/user.py:294
 msgid ""
-"For security, only a partial list of users is displayed. You can try to "
-"search for more"
+"For security, only a partial list of users is displayed. You can search for "
+"more"
 msgstr ""
 
 #: users/serializers/user.py:327

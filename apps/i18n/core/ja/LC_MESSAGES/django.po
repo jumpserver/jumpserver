@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-04 19:41+0800\n"
+"POT-Creation-Date: 2024-02-20 15:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3930,7 +3930,7 @@ msgstr "間違ったデータ タイプです。リストにする必要があ�
 msgid "Invalid choice: {}"
 msgstr "無効なオプション: {}"
 
-#: common/serializers/mixin.py:397
+#: common/serializers/mixin.py:400
 msgid "Labels"
 msgstr "ラベル"
 
@@ -4035,7 +4035,9 @@ msgid "Labeled resource"
 msgstr "関連リソース"
 
 #: labels/serializers.py:22
-msgid "Resource count"
+#, fuzzy
+#| msgid "Resource count"
+msgid "Resource amount"
 msgstr "リソース数"
 
 #: labels/serializers.py:28
@@ -8219,8 +8221,8 @@ msgstr "MFA レベル"
 
 #: users/serializers/user.py:294
 msgid ""
-"For security, only a partial list of users is displayed. You can try to "
-"search for more"
+"For security, only a partial list of users is displayed. You can search for "
+"more"
 msgstr ""
 
 #: users/serializers/user.py:327

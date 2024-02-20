@@ -291,7 +291,7 @@ class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
         queryset=User.get_nature_users(),
         many=True,
         label=_("Users"),
-        help_text=_("For security, only a partial list of users is displayed. You can try to search for more"),
+        help_text=_("For security, only a partial list of users is displayed. You can search for more"),
     )
     system_roles = None
 
