@@ -83,7 +83,7 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
             not user_session_manager.check_active(self.session.session_key)
 
     def delay_delete_session(self):
-        timeout = 3
+        timeout = 6
         check_interval = 0.5
 
         start_time = time.time()
