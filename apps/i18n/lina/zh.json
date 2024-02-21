@@ -383,6 +383,7 @@
     "DownloadUpdateTemplateMsg": "下载更新模板",
     "DragUploadFileInfo": "将文件拖到此处，或点击此处上传",
     "DuplicateFileExists": "不允许上传同名文件,请删除同名文件",
+    "Duration": "时长",
     "DynamicUsername": "动态用户名",
     "Edit": "编辑",
     "Edition": "版本",
