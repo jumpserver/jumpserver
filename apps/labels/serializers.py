@@ -19,7 +19,7 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
         ]
         read_only_fields = ('date_created', 'date_updated', 'res_count')
         extra_kwargs = {
-            'res_count': {'label': _('Resource amount')},
+            'res_count': {'label': _('Resource count')},
         }
 
     @staticmethod

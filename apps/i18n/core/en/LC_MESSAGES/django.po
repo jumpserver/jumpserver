@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-20 15:15+0800\n"
+"POT-Creation-Date: 2024-02-22 17:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -404,7 +404,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:128
 #: ops/serializers/job.py:67 terminal/serializers/session.py:49
 msgid "Is success"
-msgstr "Success"
+msgstr "Is success"
 
 #: accounts/models/automations/backup_account.py:143
 msgid "Account backup execution"
@@ -540,10 +540,8 @@ msgid "Gather account automation"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:56
-#, fuzzy
-#| msgid "Sync account"
 msgid "Is sync account"
-msgstr "Sync account"
+msgstr "Is sync account"
 
 #: accounts/models/automations/gather_account.py:75
 #: accounts/tasks/gather_accounts.py:29
@@ -974,8 +972,6 @@ msgstr ""
 #: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:117
-#, fuzzy
-#| msgid "Is success"
 msgid "Success"
 msgstr "Success"
 
@@ -2501,7 +2497,9 @@ msgid "MFA"
 msgstr ""
 
 #: audits/models.py:210
-msgid "Date login"
+#: authentication/templates/authentication/_msg_different_city.html:10
+#: tickets/models/ticket/login_confirm.py:12
+msgid "Login Date"
 msgstr ""
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
@@ -3192,10 +3190,8 @@ msgstr ""
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:43
 #: perms/serializers/permission.py:66 users/serializers/user.py:98
 #: users/serializers/user.py:174
-#, fuzzy
-#| msgid "Valid"
 msgid "Is valid"
-msgstr "Valid"
+msgstr "Is Valid"
 
 #: authentication/tasks.py:11
 msgid "Clean expired session"
@@ -3276,10 +3272,6 @@ msgstr ""
 
 #: authentication/templates/authentication/_msg_different_city.html:6
 msgid "Your account has remote login behavior, please pay attention"
-msgstr ""
-
-#: authentication/templates/authentication/_msg_different_city.html:10
-msgid "Login time"
 msgstr ""
 
 #: authentication/templates/authentication/_msg_different_city.html:16
@@ -3937,10 +3929,8 @@ msgid "Labeled resource"
 msgstr ""
 
 #: labels/serializers.py:22
-#, fuzzy
-#| msgid "Executed amount"
-msgid "Resource amount"
-msgstr "Executions"
+msgid "Resource count"
+msgstr "Resource count"
 
 #: labels/serializers.py:28
 msgid "Cannot contain \":,\""
@@ -7110,10 +7100,8 @@ msgid "Online sessions"
 msgstr ""
 
 #: terminal/serializers/terminal.py:43
-#, fuzzy
-#| msgid "Alive"
 msgid "Is alive"
-msgstr "Alive"
+msgstr "Is alive"
 
 #: terminal/serializers/terminal.py:49
 msgid "Stat"
@@ -7413,10 +7401,6 @@ msgstr ""
 msgid "Apply Login Asset Ticket"
 msgstr ""
 
-#: tickets/models/ticket/login_confirm.py:12
-msgid "Login datetime"
-msgstr ""
-
 #: tickets/models/ticket/login_confirm.py:15
 msgid "Apply Login Ticket"
 msgstr ""
@@ -7689,10 +7673,8 @@ msgid "Force enable"
 msgstr ""
 
 #: users/models/user.py:812 users/serializers/user.py:175
-#, fuzzy
-#| msgid "Service account"
 msgid "Is service account"
-msgstr "Service account"
+msgstr "Is service account"
 
 #: users/models/user.py:814
 msgid "Avatar"
@@ -8862,7 +8844,6 @@ msgid "Logo of logout page"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
 msgid "Theme"
 msgstr ""
 
@@ -8876,14 +8857,6 @@ msgstr ""
 
 #: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
-msgstr ""
-
-#: xpack/plugins/interface/serializers/interface.py:37
-msgid "Wide logo on top"
-msgstr ""
-
-#: xpack/plugins/interface/serializers/interface.py:38
-msgid "Small logo without text"
 msgstr ""
 
 #: xpack/plugins/license/api.py:52

@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                     default=True, max_length=2, verbose_name='Status')),
                 ('datetime',
                  models.DateTimeField(default=django.utils.timezone.now,
-                                      verbose_name='Date login')),
+                                      verbose_name='Login Date')),
             ],
             options={
                 'ordering': ['-datetime', 'username'],

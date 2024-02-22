@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-20 15:15+0800\n"
+"POT-Creation-Date: 2024-02-22 17:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2550,7 +2550,9 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:210
-msgid "Date login"
+#: authentication/templates/authentication/_msg_different_city.html:10
+#: tickets/models/ticket/login_confirm.py:12
+msgid "Login Date"
 msgstr "日付ログイン"
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
@@ -3345,10 +3347,6 @@ msgstr "こんにちは"
 msgid "Your account has remote login behavior, please pay attention"
 msgstr "アカウントにリモートログイン動作があります。注意してください"
 
-#: authentication/templates/authentication/_msg_different_city.html:10
-msgid "Login time"
-msgstr "ログイン時間"
-
 #: authentication/templates/authentication/_msg_different_city.html:16
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
@@ -4036,9 +4034,9 @@ msgstr "関連リソース"
 
 #: labels/serializers.py:22
 #, fuzzy
-#| msgid "Resource count"
-msgid "Resource amount"
-msgstr "リソース数"
+#| msgid "Resource type"
+msgid "Resource count"
+msgstr "リソースタイプ"
 
 #: labels/serializers.py:28
 msgid "Cannot contain \":,\""
@@ -7686,10 +7684,6 @@ msgstr "ログインアカウント"
 msgid "Apply Login Asset Ticket"
 msgstr "資産ログインレビュー製造オーダ"
 
-#: tickets/models/ticket/login_confirm.py:12
-msgid "Login datetime"
-msgstr "ログイン日時"
-
 #: tickets/models/ticket/login_confirm.py:15
 msgid "Apply Login Ticket"
 msgstr "ユーザーログインレビュー製造オーダ"
@@ -9180,7 +9174,6 @@ msgid "Logo of logout page"
 msgstr "ログアウトページのロゴ"
 
 #: xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
 msgid "Theme"
 msgstr "テーマ"
 
@@ -9195,14 +9188,6 @@ msgstr "公安網登録番号"
 #: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "インターフェイスの設定"
-
-#: xpack/plugins/interface/serializers/interface.py:37
-msgid "Wide logo on top"
-msgstr ""
-
-#: xpack/plugins/interface/serializers/interface.py:38
-msgid "Small logo without text"
-msgstr ""
 
 #: xpack/plugins/license/api.py:52
 msgid "License import successfully"
@@ -9231,6 +9216,9 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Login time"
+#~ msgstr "ログイン時間"
 
 #~ msgid "SMTP port"
 #~ msgstr "SMTPポート"

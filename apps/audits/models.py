@@ -207,7 +207,7 @@ class UserLoginLog(models.Model):
         choices=LoginStatusChoices.choices,
         verbose_name=_("Status"),
     )
-    datetime = models.DateTimeField(default=timezone.now, verbose_name=_("Date login"), db_index=True)
+    datetime = models.DateTimeField(default=timezone.now, verbose_name=_("Login Date"), db_index=True)
     backend = models.CharField(
         max_length=32, default="", verbose_name=_("Authentication backend")
     )
