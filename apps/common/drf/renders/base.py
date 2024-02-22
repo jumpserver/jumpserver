@@ -87,7 +87,7 @@ class BaseFileRenderer(BaseRenderer):
         if value is None:
             return '-'
         pk = str(value.get('id', '') or value.get('pk', ''))
-        name = value.get('name') or value.get('display_name', '')
+        name = value.get('display_name', '') or value.get('name', '')
         return '{}({})'.format(name, pk)
 
     @staticmethod
