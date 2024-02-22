@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-20 15:15+0800\n"
+"POT-Creation-Date: 2024-02-22 17:43+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2523,7 +2523,9 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:210
-msgid "Date login"
+#: authentication/templates/authentication/_msg_different_city.html:10
+#: tickets/models/ticket/login_confirm.py:12
+msgid "Login Date"
 msgstr "登录日期"
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
@@ -3301,10 +3303,6 @@ msgstr "你好"
 msgid "Your account has remote login behavior, please pay attention"
 msgstr "你的账号存在异地登录行为，请关注。"
 
-#: authentication/templates/authentication/_msg_different_city.html:10
-msgid "Login time"
-msgstr "登录日期"
-
 #: authentication/templates/authentication/_msg_different_city.html:16
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
@@ -3972,9 +3970,7 @@ msgid "Labeled resource"
 msgstr "关联的资源"
 
 #: labels/serializers.py:22
-#, fuzzy
-#| msgid "Resource count"
-msgid "Resource amount"
+msgid "Resource count"
 msgstr "资源数量"
 
 #: labels/serializers.py:28
@@ -4973,10 +4969,8 @@ msgid "Chat prompt"
 msgstr "聊天提示"
 
 #: settings/notifications.py:23
-#, fuzzy
-#| msgid "Notification of account backup route task results"
 msgid "Notification of Synchronized LDAP User Task Results"
-msgstr "账号备份任务结果通知"
+msgstr "同步 LDAP 用户任务结果的通知"
 
 #: settings/serializers/auth/base.py:10
 msgid "Authentication"
@@ -7521,10 +7515,6 @@ msgstr "登录账号"
 msgid "Apply Login Asset Ticket"
 msgstr "资产登录复核工单"
 
-#: tickets/models/ticket/login_confirm.py:12
-msgid "Login datetime"
-msgstr "登录日期"
-
 #: tickets/models/ticket/login_confirm.py:15
 msgid "Apply Login Ticket"
 msgstr "用户登录复核工单"
@@ -8986,7 +8976,6 @@ msgid "Logo of logout page"
 msgstr "退出页面 Logo"
 
 #: xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
 msgid "Theme"
 msgstr "主题"
 
@@ -9001,14 +8990,6 @@ msgstr "公安联网备案号"
 #: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "界面设置"
-
-#: xpack/plugins/interface/serializers/interface.py:37
-msgid "Wide logo on top"
-msgstr "顶部宽 Logo"
-
-#: xpack/plugins/interface/serializers/interface.py:38
-msgid "Small logo without text"
-msgstr "方形小 Logo"
 
 #: xpack/plugins/license/api.py:52
 msgid "License import successfully"
@@ -9037,6 +9018,12 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Wide logo on top"
+#~ msgstr "顶部宽 Logo"
+
+#~ msgid "Small logo without text"
+#~ msgstr "方形小 Logo"
 
 #~ msgid "Password can not contains `{{` or `}}`"
 #~ msgstr "密码不能包含 `{{` 或 `}}` 字符"
