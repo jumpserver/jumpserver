@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-22 17:43+0800\n"
+"POT-Creation-Date: 2024-02-23 17:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -298,6 +298,7 @@ msgstr ""
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:45 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -1131,7 +1132,7 @@ msgstr ""
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:182 settings/serializers/feature.py:19
-#: xpack/plugins/license/models.py:30
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr ""
 
@@ -1426,7 +1427,7 @@ msgstr ""
 
 #: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
-msgstr ""
+msgstr "Custom"
 
 #: assets/const/cloud.py:7
 msgid "Public cloud"
@@ -1791,7 +1792,7 @@ msgstr ""
 msgid "Ping asset"
 msgstr ""
 
-#: assets/models/base.py:19
+#: assets/models/base.py:19 terminal/notifications.py:225
 msgid "Connectivity"
 msgstr ""
 
@@ -2981,8 +2982,9 @@ msgstr ""
 
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:32 users/forms/profile.py:104
-#: users/forms/profile.py:109 users/templates/users/forgot_password.html:155
+#: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:32
+#: users/forms/profile.py:104 users/forms/profile.py:109
+#: users/templates/users/forgot_password.html:155
 #: users/views/profile/reset.py:100
 msgid "SMS"
 msgstr ""
@@ -3792,7 +3794,7 @@ msgstr ""
 
 #: common/sdk/sms/endpoint.py:21
 msgid "Custom type (File)"
-msgstr ""
+msgstr "Custom (File)"
 
 #: common/sdk/sms/endpoint.py:32
 msgid "SMS provider not support: {}"
@@ -4243,7 +4245,7 @@ msgstr ""
 msgid "Runas policy"
 msgstr ""
 
-#: ops/models/job.py:216
+#: ops/models/job.py:216 terminal/notifications.py:174
 msgid "Job"
 msgstr ""
 
@@ -4267,8 +4269,8 @@ msgstr ""
 msgid "VCS URL"
 msgstr ""
 
-#: ops/notifications.py:17 rbac/tree.py:57
-msgid "App ops"
+#: ops/notifications.py:17
+msgid "Components"
 msgstr ""
 
 #: ops/notifications.py:18
@@ -4784,6 +4786,10 @@ msgstr ""
 msgid "My assets"
 msgstr ""
 
+#: rbac/tree.py:57
+msgid "App ops"
+msgstr ""
+
 #: rbac/tree.py:58 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
@@ -5281,10 +5287,6 @@ msgstr ""
 msgid "Enable Slack Auth"
 msgstr ""
 
-#: settings/serializers/auth/sms.py:17
-msgid "Enable SMS"
-msgstr ""
-
 #: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
 msgstr ""
@@ -5317,19 +5319,19 @@ msgid "Signature channel number"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:73
-msgid "Enterprise code(SP id)"
+msgid "Enterprise code"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:74
-msgid "Shared secret(Shared secret)"
+msgid "Shared secret"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:75
-msgid "Original number(Src id)"
+msgid "Original number"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:76
-msgid "Business type(Service id)"
+msgid "Business type"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:80
@@ -5387,8 +5389,8 @@ msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
 msgstr ""
-"Site URL are commonly used in emails sent or as callback addresses for external systems. "
-"eg: http://dev.jumpserver.org:8080"
+"Site URL are commonly used in emails sent or as callback addresses for "
+"external systems. eg: http://dev.jumpserver.org:8080"
 
 #: settings/serializers/basic.py:18
 msgid "User guide url"
@@ -5468,7 +5470,7 @@ msgid ""
 "database, OSS will not be affected."
 msgstr ""
 
-#: settings/serializers/feature.py:18
+#: settings/serializers/feature.py:18 settings/serializers/msg.py:68
 msgid "Subject"
 msgstr ""
 
@@ -5585,7 +5587,7 @@ msgid "Tips: Some provider use token except password"
 msgstr ""
 
 #: settings/serializers/msg.py:39
-msgid "Send user"
+msgid "Sender"
 msgstr ""
 
 #: settings/serializers/msg.py:40
@@ -5625,10 +5627,6 @@ msgid ""
 "This is used by default if no email is returned during SSO authentication"
 msgstr ""
 
-#: settings/serializers/msg.py:68
-msgid "Create user email subject"
-msgstr ""
-
 #: settings/serializers/msg.py:69
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
@@ -5636,15 +5634,11 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/msg.py:73
-msgid "Create user honorific"
+msgid "Honorific"
 msgstr ""
 
 #: settings/serializers/msg.py:74
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
-msgstr ""
-
-#: settings/serializers/msg.py:78
-msgid "Create user email content"
 msgstr ""
 
 #: settings/serializers/msg.py:80
@@ -6798,7 +6792,7 @@ msgstr ""
 msgid "Command warning"
 msgstr ""
 
-#: terminal/notifications.py:130
+#: terminal/notifications.py:130 terminal/notifications.py:175
 msgid "Command reject"
 msgstr ""
 
@@ -6806,17 +6800,9 @@ msgstr ""
 msgid "Level"
 msgstr ""
 
-#: terminal/notifications.py:175
-msgid "Batch danger command alert"
-msgstr ""
-
 #: terminal/notifications.py:224
 msgid "Command and replay storage"
-msgstr ""
-
-#: terminal/notifications.py:225
-msgid "Connectivity alarm"
-msgstr ""
+msgstr "Storage"
 
 #: terminal/notifications.py:240 terminal/tasks.py:146
 msgid "Test failure: Account invalid"
@@ -6944,10 +6930,6 @@ msgstr ""
 
 #: terminal/serializers/command.py:63
 msgid "Invalid session id"
-msgstr ""
-
-#: terminal/serializers/command.py:72
-msgid "Account "
 msgstr ""
 
 #: terminal/serializers/command.py:74
