@@ -5387,6 +5387,8 @@ msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
 msgstr ""
+"Site URL are commonly used in emails sent or as callback addresses for external systems. "
+"eg: http://dev.jumpserver.org:8080"
 
 #: settings/serializers/basic.py:18
 msgid "User guide url"
@@ -5406,7 +5408,7 @@ msgstr ""
 
 #: settings/serializers/basic.py:26
 msgid "Help Docs URL"
-msgstr ""
+msgstr "Document URL"
 
 #: settings/serializers/basic.py:27
 msgid "default: http://docs.jumpserver.org"
@@ -5414,7 +5416,7 @@ msgstr ""
 
 #: settings/serializers/basic.py:30
 msgid "Help Support URL"
-msgstr ""
+msgstr "Support URL"
 
 #: settings/serializers/basic.py:31
 msgid "default: http://www.jumpserver.org/support/"
