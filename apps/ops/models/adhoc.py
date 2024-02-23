@@ -8,7 +8,7 @@ from common.utils import get_logger
 
 __all__ = ["AdHoc"]
 
-from ops.const import  AdHocModules
+from ops.const import AdHocModules
 
 from orgs.mixins.models import JMSOrgBaseModel
 

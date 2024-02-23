@@ -118,7 +118,6 @@
     "AssetBulkUpdateTips": "网络设备、云服务、web，不支持批量更新网域",
     "AssetChangeSecretCreate": "创建账号改密",
     "AssetChangeSecretUpdate": "更新账号改密",
-    "AssetCount": "资产数量",
     "AssetData": "资产数据",
     "AssetDetail": "资产详情",
     "AssetList": "资产列表",
