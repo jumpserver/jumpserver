@@ -120,8 +120,12 @@ class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
 
     @staticmethod
     def read_manifest_with_i18n(obj, lang='zh'):
-        with open(os.path.join(obj.path, 'manifest.yml'), encoding='utf8') as f:
-            manifest = yaml_load_with_i18n(f, lang)
+        path = os.path.join(obj.path, 'manifest.yml')
+        if os.path.exists(path):
+            with open(path, encoding='utf8') as f:
+                manifest = yaml_load_with_i18n(f, lang)
+        else:
+            manifest = {}
         return manifest
 
     def trans_queryset(self, queryset):
