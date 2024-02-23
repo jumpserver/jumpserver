@@ -927,7 +927,7 @@ msgstr ""
 #: tickets/models/ticket/general.py:297 users/models/user.py:836
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:110
 msgid "Comment"
-msgstr "Description"
+msgstr "Comment"
 
 #: accounts/serializers/account/virtual.py:24
 msgid ""
@@ -4310,8 +4310,8 @@ msgid "Next execution time"
 msgstr ""
 
 #: ops/serializers/job.py:15
-msgid "Run after save"
-msgstr ""
+msgid "Execute after saving"
+msgstr "Execute after saving"
 
 #: ops/serializers/job.py:52
 msgid "Average time cost"

@@ -4438,7 +4438,9 @@ msgid "Next execution time"
 msgstr "最後の実行"
 
 #: ops/serializers/job.py:15
-msgid "Run after save"
+#, fuzzy
+#| msgid "Run after save"
+msgid "Execute after saving"
 msgstr "保存後に実行"
 
 #: ops/serializers/job.py:52
