@@ -476,7 +476,7 @@
     "Goto": "Go to",
     "GrantedAssets": "Authorized Assets",
     "GreatEqualThan": "Greater than or Equal to",
-    "GroupsAmount": "User Group",
+    "GroupsAmount": "User group",
     "HandleTicket": "Handle Work Orders",
     "Hardware": "Hardware Information",
     "HardwareInfo": "Hardware Information",
@@ -1220,5 +1220,6 @@
     "Workbench": "Workspace",
     "Workspace": "Workspace",
     "Yes": "Yes",
-    "ZStack": "ZStack"
+    "ZStack": "ZStack",
+    "AssetPermsAmount": "Asset authorization"
 }
