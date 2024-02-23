@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-22 17:42+0800\n"
+"POT-Creation-Date: 2024-02-23 17:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -298,6 +298,7 @@ msgstr "ソース ID"
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:45 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -1150,7 +1151,7 @@ msgstr "正規情報"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:182 settings/serializers/feature.py:19
-#: xpack/plugins/license/models.py:30
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr "コンテンツ"
 
@@ -1831,7 +1832,7 @@ msgstr "資産情報の収集"
 msgid "Ping asset"
 msgstr "テストアセット"
 
-#: assets/models/base.py:19
+#: assets/models/base.py:19 terminal/notifications.py:225
 msgid "Connectivity"
 msgstr "接続性"
 
@@ -3052,8 +3053,9 @@ msgstr "メッセージ検証コードが無効"
 
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:32 users/forms/profile.py:104
-#: users/forms/profile.py:109 users/templates/users/forgot_password.html:155
+#: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:32
+#: users/forms/profile.py:104 users/forms/profile.py:109
+#: users/templates/users/forgot_password.html:155
 #: users/views/profile/reset.py:100
 msgid "SMS"
 msgstr "メッセージ"
@@ -4365,7 +4367,7 @@ msgstr "ユーザーとして実行"
 msgid "Runas policy"
 msgstr "ユーザー ポリシー"
 
-#: ops/models/job.py:216
+#: ops/models/job.py:216 terminal/notifications.py:174
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
@@ -4389,9 +4391,11 @@ msgstr "创建方式"
 msgid "VCS URL"
 msgstr "VCS URL"
 
-#: ops/notifications.py:17 rbac/tree.py:57
-msgid "App ops"
-msgstr "アプリ操作"
+#: ops/notifications.py:17
+#, fuzzy
+#| msgid "Component"
+msgid "Components"
+msgstr "コンポーネント"
 
 #: ops/notifications.py:18
 msgid "Server performance"
@@ -4929,6 +4933,10 @@ msgstr "タスクセンター"
 msgid "My assets"
 msgstr "私の資産"
 
+#: rbac/tree.py:57
+msgid "App ops"
+msgstr "アプリ操作"
+
 #: rbac/tree.py:58 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
@@ -5441,10 +5449,6 @@ msgstr "SP 証明書"
 msgid "Enable Slack Auth"
 msgstr "Slack 認証の有効化"
 
-#: settings/serializers/auth/sms.py:17
-msgid "Enable SMS"
-msgstr "SMSの有効化"
-
 #: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
 msgstr "SMSプロバイダ / プロトコル"
@@ -5477,19 +5481,19 @@ msgid "Signature channel number"
 msgstr "署名チャネル番号"
 
 #: settings/serializers/auth/sms.py:73
-msgid "Enterprise code(SP id)"
+msgid "Enterprise code"
 msgstr "企業コード(SP id)"
 
 #: settings/serializers/auth/sms.py:74
-msgid "Shared secret(Shared secret)"
+msgid "Shared secret"
 msgstr "パスワードを共有する(Shared secret)"
 
 #: settings/serializers/auth/sms.py:75
-msgid "Original number(Src id)"
+msgid "Original number"
 msgstr "元の番号(Src id)"
 
 #: settings/serializers/auth/sms.py:76
-msgid "Business type(Service id)"
+msgid "Business type"
 msgstr "ビジネス・タイプ(Service id)"
 
 #: settings/serializers/auth/sms.py:80
@@ -5634,7 +5638,7 @@ msgstr ""
 "この期間を超えるセッション、録音、およびコマンド レコードは削除されます (デー"
 "タベースのバックアップに影響し、OSS などには影響しません)"
 
-#: settings/serializers/feature.py:18
+#: settings/serializers/feature.py:18 settings/serializers/msg.py:68
 msgid "Subject"
 msgstr "件名"
 
@@ -5756,7 +5760,7 @@ msgid "Tips: Some provider use token except password"
 msgstr "ヒント: 一部のプロバイダーはパスワード以外のトークンを使用します"
 
 #: settings/serializers/msg.py:39
-msgid "Send user"
+msgid "Sender"
 msgstr "ユーザーを送信"
 
 #: settings/serializers/msg.py:40
@@ -5798,10 +5802,6 @@ msgid ""
 "This is used by default if no email is returned during SSO authentication"
 msgstr "これは、SSO認証中にメールが返されない場合にデフォルトで使用されます。"
 
-#: settings/serializers/msg.py:68
-msgid "Create user email subject"
-msgstr "ユーザーメール件名の作成"
-
 #: settings/serializers/msg.py:69
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
@@ -5811,17 +5811,13 @@ msgstr ""
 "正常に作成)"
 
 #: settings/serializers/msg.py:73
-msgid "Create user honorific"
+msgid "Honorific"
 msgstr "ユーザー敬語の作成"
 
 #: settings/serializers/msg.py:74
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr ""
 "ヒント: ユーザーを作成するときは、メールの敬語を送信します (例: こんにちは)"
-
-#: settings/serializers/msg.py:78
-msgid "Create user email content"
-msgstr "ユーザーのメールコンテンツを作成する"
 
 #: settings/serializers/msg.py:80
 #, python-brace-format
@@ -7040,7 +7036,7 @@ msgstr "セッション"
 msgid "Command warning"
 msgstr "コマンド警告"
 
-#: terminal/notifications.py:130
+#: terminal/notifications.py:130 terminal/notifications.py:175
 msgid "Command reject"
 msgstr "コマンド拒否"
 
@@ -7048,17 +7044,9 @@ msgstr "コマンド拒否"
 msgid "Level"
 msgstr "レベル"
 
-#: terminal/notifications.py:175
-msgid "Batch danger command alert"
-msgstr "一括危険コマンド警告"
-
 #: terminal/notifications.py:224
 msgid "Command and replay storage"
 msgstr "コマンド及び録画記憶"
-
-#: terminal/notifications.py:225
-msgid "Connectivity alarm"
-msgstr "接続性アラーム"
 
 #: terminal/notifications.py:240 terminal/tasks.py:146
 msgid "Test failure: Account invalid"
@@ -7204,10 +7192,6 @@ msgstr "無効なコマンドグループID"
 #: terminal/serializers/command.py:63
 msgid "Invalid session id"
 msgstr "無効なセッションID"
-
-#: terminal/serializers/command.py:72
-msgid "Account "
-msgstr "アカウント"
 
 #: terminal/serializers/command.py:74
 msgid "Timestamp"
@@ -8197,7 +8181,7 @@ msgstr ""
 
 #: users/serializers/user.py:169
 #, fuzzy
-#| msgid "Send user"
+#| msgid "Sender"
 msgid "Superuser"
 msgstr "ユーザーを送信"
 
@@ -9216,6 +9200,15 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Email Subject"
+#~ msgstr "ユーザーメール件名の作成"
+
+#~ msgid "Command reject (Job)"
+#~ msgstr "一括危険コマンド警告"
+
+#~ msgid "Account "
+#~ msgstr "アカウント"
 
 #~ msgid "Login time"
 #~ msgstr "ログイン時間"

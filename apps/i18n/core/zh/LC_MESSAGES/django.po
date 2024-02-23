@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-22 17:43+0800\n"
+"POT-Creation-Date: 2024-02-23 17:56+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -297,6 +297,7 @@ msgstr "来源 ID"
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:45 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -1142,7 +1143,7 @@ msgstr "正则表达式"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:182 settings/serializers/feature.py:19
-#: xpack/plugins/license/models.py:30
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr "内容"
 
@@ -1815,7 +1816,7 @@ msgstr "收集资产信息"
 msgid "Ping asset"
 msgstr "测试资产"
 
-#: assets/models/base.py:19
+#: assets/models/base.py:19 terminal/notifications.py:225
 msgid "Connectivity"
 msgstr "连接性"
 
@@ -3010,8 +3011,9 @@ msgstr "短信验证码校验失败"
 
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:32 users/forms/profile.py:104
-#: users/forms/profile.py:109 users/templates/users/forgot_password.html:155
+#: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:32
+#: users/forms/profile.py:104 users/forms/profile.py:109
+#: users/templates/users/forgot_password.html:155
 #: users/views/profile/reset.py:100
 msgid "SMS"
 msgstr "短信"
@@ -4286,7 +4288,7 @@ msgstr "运行用户"
 msgid "Runas policy"
 msgstr "用户策略"
 
-#: ops/models/job.py:216
+#: ops/models/job.py:216 terminal/notifications.py:174
 msgid "Job"
 msgstr "作业"
 
@@ -4310,9 +4312,11 @@ msgstr "创建方式"
 msgid "VCS URL"
 msgstr "VCS URL"
 
-#: ops/notifications.py:17 rbac/tree.py:57
-msgid "App ops"
-msgstr "作业中心"
+#: ops/notifications.py:17
+#, fuzzy
+#| msgid "Component"
+msgid "Components"
+msgstr "组件"
 
 #: ops/notifications.py:18
 msgid "Server performance"
@@ -4830,6 +4834,10 @@ msgstr "任务中心"
 msgid "My assets"
 msgstr "我的资产"
 
+#: rbac/tree.py:57
+msgid "App ops"
+msgstr "作业中心"
+
 #: rbac/tree.py:58 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
@@ -5333,10 +5341,6 @@ msgstr "SP 证书"
 msgid "Enable Slack Auth"
 msgstr "启用 Slack 认证"
 
-#: settings/serializers/auth/sms.py:17
-msgid "Enable SMS"
-msgstr "启用 SMS"
-
 #: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
 msgstr "短信服务商 / 协议"
@@ -5369,19 +5373,19 @@ msgid "Signature channel number"
 msgstr "签名通道号"
 
 #: settings/serializers/auth/sms.py:73
-msgid "Enterprise code(SP id)"
+msgid "Enterprise code"
 msgstr "企业代码(SP id)"
 
 #: settings/serializers/auth/sms.py:74
-msgid "Shared secret(Shared secret)"
+msgid "Shared secret"
 msgstr "共享密码(Shared secret)"
 
 #: settings/serializers/auth/sms.py:75
-msgid "Original number(Src id)"
+msgid "Original number"
 msgstr "原始号码(Src id)"
 
 #: settings/serializers/auth/sms.py:76
-msgid "Business type(Service id)"
+msgid "Business type"
 msgstr "业务类型(Service id)"
 
 #: settings/serializers/auth/sms.py:80
@@ -5523,7 +5527,7 @@ msgid ""
 msgstr ""
 "会话、录像，命令记录超过该时长将会被清除 (影响数据库存储，OSS 等不受影响)"
 
-#: settings/serializers/feature.py:18
+#: settings/serializers/feature.py:18 settings/serializers/msg.py:68
 msgid "Subject"
 msgstr "主题"
 
@@ -5642,7 +5646,7 @@ msgid "Tips: Some provider use token except password"
 msgstr "提示：一些邮件提供商需要输入的是授权码"
 
 #: settings/serializers/msg.py:39
-msgid "Send user"
+msgid "Sender"
 msgstr "发件人"
 
 #: settings/serializers/msg.py:40
@@ -5682,10 +5686,6 @@ msgid ""
 "This is used by default if no email is returned during SSO authentication"
 msgstr "SSO认证时，如果没有返回邮件地址，将使用该后缀"
 
-#: settings/serializers/msg.py:68
-msgid "Create user email subject"
-msgstr "邮件主题"
-
 #: settings/serializers/msg.py:69
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
@@ -5693,16 +5693,12 @@ msgid ""
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
 #: settings/serializers/msg.py:73
-msgid "Create user honorific"
+msgid "Honorific"
 msgstr "邮件问候语"
 
 #: settings/serializers/msg.py:74
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 你好)"
-
-#: settings/serializers/msg.py:78
-msgid "Create user email content"
-msgstr "邮件的内容"
 
 #: settings/serializers/msg.py:80
 #, python-brace-format
@@ -6890,7 +6886,7 @@ msgstr "会话"
 msgid "Command warning"
 msgstr "命令告警"
 
-#: terminal/notifications.py:130
+#: terminal/notifications.py:130 terminal/notifications.py:175
 msgid "Command reject"
 msgstr "命令拒绝"
 
@@ -6898,17 +6894,9 @@ msgstr "命令拒绝"
 msgid "Level"
 msgstr "级别"
 
-#: terminal/notifications.py:175
-msgid "Batch danger command alert"
-msgstr "批量危险命令告警"
-
 #: terminal/notifications.py:224
 msgid "Command and replay storage"
 msgstr "命令及录像存储"
-
-#: terminal/notifications.py:225
-msgid "Connectivity alarm"
-msgstr "可连接性告警"
 
 #: terminal/notifications.py:240 terminal/tasks.py:146
 msgid "Test failure: Account invalid"
@@ -7050,10 +7038,6 @@ msgstr "无效的 命令组 ID"
 #: terminal/serializers/command.py:63
 msgid "Invalid session id"
 msgstr "无效的 Session ID"
-
-#: terminal/serializers/command.py:72
-msgid "Account "
-msgstr "账号"
 
 #: terminal/serializers/command.py:74
 msgid "Timestamp"
@@ -9018,6 +9002,15 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Email Subject"
+#~ msgstr "邮件主题"
+
+#~ msgid "Command reject (Job)"
+#~ msgstr "批量危险命令告警"
+
+#~ msgid "Account "
+#~ msgstr "账号"
 
 #~ msgid "Wide logo on top"
 #~ msgstr "顶部宽 Logo"
