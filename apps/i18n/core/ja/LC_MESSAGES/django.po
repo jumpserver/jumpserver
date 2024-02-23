@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-22 17:42+0800\n"
+"POT-Creation-Date: 2024-02-23 17:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4434,7 +4434,9 @@ msgid "Next execution time"
 msgstr "最後の実行"
 
 #: ops/serializers/job.py:15
-msgid "Run after save"
+#, fuzzy
+#| msgid "Run after save"
+msgid "Execute after saving"
 msgstr "保存後に実行"
 
 #: ops/serializers/job.py:52
