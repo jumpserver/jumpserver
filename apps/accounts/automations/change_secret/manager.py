@@ -119,6 +119,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             else:
                 new_secret = self.get_secret(secret_type)
 
+            if new_secret is None:
+                print(f'new_secret is None, account: {account}')
+                continue
+
             if self.record_id is None:
                 recorder = ChangeSecretRecord(
                     asset=asset, account=account, execution=self.execution,
