@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 18:02+0800\n"
+"POT-Creation-Date: 2024-02-27 16:09+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4028,15 +4028,20 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:132
+#: ops/api/job.py:135
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
-#: ops/api/job.py:137
+#: ops/api/job.py:140
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
+
+#: ops/api/job.py:204
+msgid ""
+"The task is being created and cannot be interrupted. Please try again later."
+msgstr "正在创建任务，无法中断，请稍后重试。"
 
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"
@@ -7193,30 +7198,37 @@ msgid "Container Ports"
 msgstr "容器端口"
 
 #: terminal/session_lifecycle.py:30
+#, python-format
 msgid "Connect to asset %s success"
 msgstr "连接资产 %s 成功"
 
 #: terminal/session_lifecycle.py:38
+#, python-format
 msgid "Connect to asset %s finished: %s"
 msgstr "连接资产 %s 结束: %s"
 
 #: terminal/session_lifecycle.py:48
+#, python-format
 msgid "User %s create share link"
 msgstr "用户 %s 创建分享链接"
 
 #: terminal/session_lifecycle.py:57
+#, python-format
 msgid "User %s join session"
 msgstr "用户 %s 加入会话"
 
 #: terminal/session_lifecycle.py:69
+#, python-format
 msgid "User %s leave session"
 msgstr "用户 %s 离开会话"
 
 #: terminal/session_lifecycle.py:81
+#, python-format
 msgid "User %s join to monitor session"
 msgstr "用户 %s 监控会话"
 
 #: terminal/session_lifecycle.py:93
+#, python-format
 msgid "User %s exit to monitor session"
 msgstr "用户 %s 离开监控会话"
 
@@ -7229,6 +7241,7 @@ msgid "Replay successfully converted to MP4 format"
 msgstr "录像成功转换成 MP4 格式"
 
 #: terminal/session_lifecycle.py:121
+#, python-format
 msgid "Replay failed to convert to MP4 format: %s"
 msgstr "录像转换成 MP4 格式失败: %s"
 
@@ -7241,6 +7254,7 @@ msgid "Replay successfully uploaded"
 msgstr "录像成功上传"
 
 #: terminal/session_lifecycle.py:145
+#, python-format
 msgid "Replay failed to upload: %s"
 msgstr "录像上传失败：%s"
 
@@ -8508,7 +8522,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:56
+#: xpack/plugins/cloud/manager.py:57
 msgid "Account unavailable"
 msgstr "账号无效"
 
