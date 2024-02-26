@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 17:14+0800\n"
+"POT-Creation-Date: 2024-02-26 18:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7293,6 +7293,90 @@ msgstr "コンテナステータス"
 msgid "Container Ports"
 msgstr "コンテナポート"
 
+#: terminal/session_lifecycle.py:30
+msgid "Connect to asset %s success"
+msgstr "アセット %s への接続に成功しました"
+
+#: terminal/session_lifecycle.py:38
+msgid "Connect to asset %s finished: %s"
+msgstr "アセット %s への接続が完了しました: %s"
+
+#: terminal/session_lifecycle.py:48
+msgid "User %s create share link"
+msgstr "ユーザー %s が共有リンクを作成しました"
+
+#: terminal/session_lifecycle.py:57
+msgid "User %s join session"
+msgstr "ユーザー %s がセッションに参加しました"
+
+#: terminal/session_lifecycle.py:69
+msgid "User %s leave session"
+msgstr "ユーザー %s がセッションを離れました"
+
+#: terminal/session_lifecycle.py:81
+msgid "User %s join to monitor session"
+msgstr "ユーザー %s がモニターセッションに参加しました"
+
+#: terminal/session_lifecycle.py:93
+msgid "User %s exit to monitor session"
+msgstr "ユーザー %s がモニターセッションを離れました"
+
+#: terminal/session_lifecycle.py:105
+msgid "Replay start to convert"
+msgstr "リプレイの変換が開始されました"
+
+#: terminal/session_lifecycle.py:113
+msgid "Replay successfully converted to MP4 format"
+msgstr "リプレイが正常にMP4形式に変換されました"
+
+#: terminal/session_lifecycle.py:121
+msgid "Replay failed to convert to MP4 format: %s"
+msgstr "リプレイのMP4形式への変換に失敗しました: %s"
+
+#: terminal/session_lifecycle.py:129
+msgid "Replay start to upload"
+msgstr "リプレイのアップロードが開始されました"
+
+#: terminal/session_lifecycle.py:137
+msgid "Replay successfully uploaded"
+msgstr "リプレイが正常にアップロードされました"
+
+#: terminal/session_lifecycle.py:145
+msgid "Replay failed to upload: %s"
+msgstr "リプレイのアップロードに失敗しました: %s"
+
+#: terminal/session_lifecycle.py:152"
+msgid "connect failed"
+msgstr "接続に失敗しました"
+
+#: terminal/session_lifecycle.py:153
+msgid "connection disconnect"
+msgstr "接続が切断されました"
+
+#: terminal/session_lifecycle.py:154
+msgid "user closed"
+msgstr "ユーザーが閉じました"
+
+#: terminal/session_lifecycle.py:155
+msgid "idle disconnect"
+msgstr "アイドル状態で切断されました"
+
+#: terminal/session_lifecycle.py:156
+msgid "admin terminated"
+msgstr "管理者によって切断されました"
+
+#: terminal/session_lifecycle.py:157
+msgid "maximum session time has been reached"
+msgstr "最大セッション時間に達しました"
+
+#: terminal/session_lifecycle.py:158
+msgid "permission has expired"
+msgstr "許可が期限切れです"
+
+#: terminal/session_lifecycle.py:159
+msgid "storage is null"
+msgstr "ストレージが空です"
+
 #: terminal/tasks.py:33
 msgid "Periodic delete terminal status"
 msgstr "端末の状態を定期的にクリーンアップする"
@@ -8548,7 +8632,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 
