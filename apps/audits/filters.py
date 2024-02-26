@@ -1,11 +1,13 @@
+from django.apps import apps
+from django.utils import translation
+
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
-
 from common.drf.filters import BaseFilterSet
 from common.sessions.cache import user_session_manager
 from orgs.utils import current_org
-from .models import UserSession
+from .models import UserSession, OperateLog
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -50,3 +52,22 @@ class UserSessionFilterSet(BaseFilterSet):
     class Meta:
         model = UserSession
         fields = ['id', 'ip', 'city', 'type']
+
+
+class OperateLogFilterSet(BaseFilterSet):
+    resource_type = drf_filters.CharFilter(method='filter_resource_type')
+
+    @staticmethod
+    def filter_resource_type(queryset, name, resource_type):
+        current_lang = translation.get_language()
+        with translation.override(current_lang):
+            mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
+        tp = mapper.get(resource_type)
+        queryset = queryset.filter(resource_type=tp)
+        return queryset
+
+    class Meta:
+        model = OperateLog
+        fields = [
+            'user', 'action', 'resource', 'remote_addr'
+        ]
