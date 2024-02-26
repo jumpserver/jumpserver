@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 17:14+0800\n"
+"POT-Creation-Date: 2024-02-26 18:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -7192,6 +7192,90 @@ msgstr "容器状态"
 msgid "Container Ports"
 msgstr "容器端口"
 
+#: terminal/session_lifecycle.py:30
+msgid "Connect to asset %s success"
+msgstr "连接资产 %s 成功"
+
+#: terminal/session_lifecycle.py:38
+msgid "Connect to asset %s finished: %s"
+msgstr "连接资产 %s 结束: %s"
+
+#: terminal/session_lifecycle.py:48
+msgid "User %s create share link"
+msgstr "用户 %s 创建分享链接"
+
+#: terminal/session_lifecycle.py:57
+msgid "User %s join session"
+msgstr "用户 %s 加入会话"
+
+#: terminal/session_lifecycle.py:69
+msgid "User %s leave session"
+msgstr "用户 %s 离开会话"
+
+#: terminal/session_lifecycle.py:81
+msgid "User %s join to monitor session"
+msgstr "用户 %s 监控会话"
+
+#: terminal/session_lifecycle.py:93
+msgid "User %s exit to monitor session"
+msgstr "用户 %s 离开监控会话"
+
+#: terminal/session_lifecycle.py:105
+msgid "Replay start to convert"
+msgstr "录像开始转化"
+
+#: terminal/session_lifecycle.py:113
+msgid "Replay successfully converted to MP4 format"
+msgstr "录像成功转换成 MP4 格式"
+
+#: terminal/session_lifecycle.py:121
+msgid "Replay failed to convert to MP4 format: %s"
+msgstr "录像转换成 MP4 格式失败: %s"
+
+#: terminal/session_lifecycle.py:129
+msgid "Replay start to upload"
+msgstr "录像开始上传"
+
+#: terminal/session_lifecycle.py:137
+msgid "Replay successfully uploaded"
+msgstr "录像成功上传"
+
+#: terminal/session_lifecycle.py:145
+msgid "Replay failed to upload: %s"
+msgstr "录像上传失败：%s"
+
+#: terminal/session_lifecycle.py:152
+msgid "connect failed"
+msgstr "连接失败"
+
+#: terminal/session_lifecycle.py:153
+msgid "connection disconnect"
+msgstr "连接断开"
+
+#: terminal/session_lifecycle.py:154
+msgid "user closed"
+msgstr "用户关闭"
+
+#: terminal/session_lifecycle.py:155
+msgid "idle disconnect"
+msgstr "空闲断开"
+
+#: terminal/session_lifecycle.py:156
+msgid "admin terminated"
+msgstr "管理员终断连接"
+
+#: terminal/session_lifecycle.py:157
+msgid "maximum session time has been reached"
+msgstr "超过会话最大连接时间"
+
+#: terminal/session_lifecycle.py:158
+msgid "permission has expired"
+msgstr "授权已过期"
+
+#: terminal/session_lifecycle.py:159
+msgid "storage is null"
+msgstr "存储为空"
+
 #: terminal/tasks.py:33
 msgid "Periodic delete terminal status"
 msgstr "周期清理终端状态"
@@ -8424,7 +8508,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 
