@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 18:02+0800\n"
+"POT-Creation-Date: 2024-02-27 16:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4077,17 +4077,22 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:132
+#: ops/api/job.py:135
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:137
+#: ops/api/job.py:140
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
 "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択し"
 "てください。"
+
+#: ops/api/job.py:204
+msgid ""
+"The task is being created and cannot be interrupted. Please try again later."
+msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
 
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"
@@ -7294,30 +7299,37 @@ msgid "Container Ports"
 msgstr "コンテナポート"
 
 #: terminal/session_lifecycle.py:30
+#, python-format
 msgid "Connect to asset %s success"
 msgstr "アセット %s への接続に成功しました"
 
 #: terminal/session_lifecycle.py:38
+#, python-format
 msgid "Connect to asset %s finished: %s"
 msgstr "アセット %s への接続が完了しました: %s"
 
 #: terminal/session_lifecycle.py:48
+#, python-format
 msgid "User %s create share link"
 msgstr "ユーザー %s が共有リンクを作成しました"
 
 #: terminal/session_lifecycle.py:57
+#, python-format
 msgid "User %s join session"
 msgstr "ユーザー %s がセッションに参加しました"
 
 #: terminal/session_lifecycle.py:69
+#, python-format
 msgid "User %s leave session"
 msgstr "ユーザー %s がセッションを離れました"
 
 #: terminal/session_lifecycle.py:81
+#, python-format
 msgid "User %s join to monitor session"
 msgstr "ユーザー %s がモニターセッションに参加しました"
 
 #: terminal/session_lifecycle.py:93
+#, python-format
 msgid "User %s exit to monitor session"
 msgstr "ユーザー %s がモニターセッションを離れました"
 
@@ -7330,6 +7342,7 @@ msgid "Replay successfully converted to MP4 format"
 msgstr "リプレイが正常にMP4形式に変換されました"
 
 #: terminal/session_lifecycle.py:121
+#, python-format
 msgid "Replay failed to convert to MP4 format: %s"
 msgstr "リプレイのMP4形式への変換に失敗しました: %s"
 
@@ -7342,10 +7355,11 @@ msgid "Replay successfully uploaded"
 msgstr "リプレイが正常にアップロードされました"
 
 #: terminal/session_lifecycle.py:145
+#, python-format
 msgid "Replay failed to upload: %s"
 msgstr "リプレイのアップロードに失敗しました: %s"
 
-#: terminal/session_lifecycle.py:152"
+#: terminal/session_lifecycle.py:152
 msgid "connect failed"
 msgstr "接続に失敗しました"
 
@@ -8632,7 +8646,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:56
+#: xpack/plugins/cloud/manager.py:57
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 
