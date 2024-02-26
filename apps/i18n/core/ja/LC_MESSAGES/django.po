@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-23 17:56+0800\n"
+"POT-Creation-Date: 2024-02-26 15:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4927,8 +4927,8 @@ msgstr "資産の改ざん"
 msgid "Terminal setting"
 msgstr "ターミナル設定"
 
-#: rbac/tree.py:55
-msgid "Task Center"
+#: rbac/tree.py:55 settings/serializers/feature.py:126
+msgid "Job center"
 msgstr "タスクセンター"
 
 #: rbac/tree.py:56
@@ -4954,7 +4954,7 @@ msgid "Ticket comment"
 msgstr "チケットコメント"
 
 #: rbac/tree.py:130 settings/serializers/feature.py:109
-#: tickets/models/ticket/general.py:307
+#: settings/serializers/feature.py:111 tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "チケット"
 
@@ -5648,16 +5648,13 @@ msgstr "件名"
 msgid "More URL"
 msgstr "もっとURL"
 
-#: settings/serializers/feature.py:36 settings/serializers/feature.py:39
+#: settings/serializers/feature.py:36 settings/serializers/feature.py:38
+#: settings/serializers/feature.py:39
 msgid "Announcement"
 msgstr "発表"
 
-#: settings/serializers/feature.py:38
-msgid "Enable announcement"
-msgstr "アナウンスの有効化"
-
 #: settings/serializers/feature.py:46
-msgid "Enable Vault"
+msgid "Vault"
 msgstr "有効化 Vault"
 
 #: settings/serializers/feature.py:55
@@ -5679,13 +5676,9 @@ msgstr ""
 "所定の数を超える履歴アカウントを確認して削除します。 値が 999 以上の場合、履"
 "歴アカウントの削除は実行されません。"
 
-#: settings/serializers/feature.py:71
+#: settings/serializers/feature.py:71 settings/serializers/feature.py:75
 msgid "Chat AI"
 msgstr "チャットAI"
-
-#: settings/serializers/feature.py:75
-msgid "Enable Chat AI"
-msgstr "チャットAIを起動する"
 
 #: settings/serializers/feature.py:78
 msgid "Base URL"
@@ -5699,12 +5692,8 @@ msgstr "API Key"
 msgid "GPT Model"
 msgstr "GPTモデル"
 
-#: settings/serializers/feature.py:111
-msgid "Enable tickets"
-msgstr "チケットを有効にする"
-
 #: settings/serializers/feature.py:114
-msgid "Ticket authorize default time"
+msgid "Default period"
 msgstr "デフォルト製造オーダ承認時間"
 
 #: settings/serializers/feature.py:117
@@ -5712,40 +5701,32 @@ msgid "hour"
 msgstr "時"
 
 #: settings/serializers/feature.py:118
-msgid "Ticket authorize default time unit"
+msgid "Default unit"
 msgstr "デフォルト製造オーダ承認時間単位"
 
 #: settings/serializers/feature.py:123
 msgid "Feature"
 msgstr "機能"
 
-#: settings/serializers/feature.py:126
-msgid "Operation center"
-msgstr "職業センター"
-
 #: settings/serializers/feature.py:127
 msgid "Allow user run batch command or not using ansible"
 msgstr "ユーザー実行バッチコマンドを許可するか、ansibleを使用しない"
 
 #: settings/serializers/feature.py:131
-msgid "Operation center command blacklist"
+msgid "Command blacklist"
 msgstr "オペレーション センター コマンド ブラックリスト"
 
 #: settings/serializers/feature.py:132
 msgid "Commands that are not allowed execute."
 msgstr "実行が許可されていないコマンド"
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:137 settings/serializers/feature.py:140
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
 msgid "Virtual app"
 msgstr "仮想アプリケーション"
-
-#: settings/serializers/feature.py:140
-msgid "Enable virtual app"
-msgstr "仮想アプリケーションの有効化"
 
 #: settings/serializers/msg.py:25
 #, fuzzy

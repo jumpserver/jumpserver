@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-23 17:56+0800\n"
+"POT-Creation-Date: 2024-02-26 15:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4826,8 +4826,8 @@ msgstr "资产改密"
 msgid "Terminal setting"
 msgstr "终端设置"
 
-#: rbac/tree.py:55
-msgid "Task Center"
+#: rbac/tree.py:55 settings/serializers/feature.py:126
+msgid "Job center"
 msgstr "任务中心"
 
 #: rbac/tree.py:56
@@ -4853,7 +4853,7 @@ msgid "Ticket comment"
 msgstr "工单评论"
 
 #: rbac/tree.py:130 settings/serializers/feature.py:109
-#: tickets/models/ticket/general.py:307
+#: settings/serializers/feature.py:111 tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "工单"
 
@@ -5535,16 +5535,13 @@ msgstr "主题"
 msgid "More URL"
 msgstr "更多信息 URL"
 
-#: settings/serializers/feature.py:36 settings/serializers/feature.py:39
+#: settings/serializers/feature.py:36 settings/serializers/feature.py:38
+#: settings/serializers/feature.py:39
 msgid "Announcement"
 msgstr "公告"
 
-#: settings/serializers/feature.py:38
-msgid "Enable announcement"
-msgstr "启用公告"
-
 #: settings/serializers/feature.py:46
-msgid "Enable Vault"
+msgid "Vault"
 msgstr "启用 Vault"
 
 #: settings/serializers/feature.py:55
@@ -5565,13 +5562,9 @@ msgstr ""
 "若特定数值小于999，系统将在每日晚间自动执行任务：检查并删除超出预定数量的历史"
 "账号。如果该数值达到或超过999，则不进行任何历史账号的删除操作。"
 
-#: settings/serializers/feature.py:71
+#: settings/serializers/feature.py:71 settings/serializers/feature.py:75
 msgid "Chat AI"
 msgstr "聊天 AI"
-
-#: settings/serializers/feature.py:75
-msgid "Enable Chat AI"
-msgstr "启动聊天 AI"
 
 #: settings/serializers/feature.py:78
 msgid "Base URL"
@@ -5585,12 +5578,8 @@ msgstr "API Key"
 msgid "GPT Model"
 msgstr "GPT 模型"
 
-#: settings/serializers/feature.py:111
-msgid "Enable tickets"
-msgstr "启用工单"
-
 #: settings/serializers/feature.py:114
-msgid "Ticket authorize default time"
+msgid "Default period"
 msgstr "默认工单授权时间"
 
 #: settings/serializers/feature.py:117
@@ -5598,40 +5587,32 @@ msgid "hour"
 msgstr "时"
 
 #: settings/serializers/feature.py:118
-msgid "Ticket authorize default time unit"
+msgid "Default unit"
 msgstr "默认工单授权时间单位"
 
 #: settings/serializers/feature.py:123
 msgid "Feature"
 msgstr "功能"
 
-#: settings/serializers/feature.py:126
-msgid "Operation center"
-msgstr "作业中心"
-
 #: settings/serializers/feature.py:127
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
 #: settings/serializers/feature.py:131
-msgid "Operation center command blacklist"
+msgid "Command blacklist"
 msgstr "作业中心命令黑名单"
 
 #: settings/serializers/feature.py:132
 msgid "Commands that are not allowed execute."
 msgstr "不允许执行的命令"
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:137 settings/serializers/feature.py:140
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
 msgid "Virtual app"
 msgstr "虚拟应用"
-
-#: settings/serializers/feature.py:140
-msgid "Enable virtual app"
-msgstr "启用虚拟应用"
 
 #: settings/serializers/msg.py:25
 msgid "SMTP"

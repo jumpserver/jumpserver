@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-23 17:56+0800\n"
+"POT-Creation-Date: 2024-02-26 15:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4778,8 +4778,8 @@ msgstr ""
 msgid "Terminal setting"
 msgstr ""
 
-#: rbac/tree.py:55
-msgid "Task Center"
+#: rbac/tree.py:55 settings/serializers/feature.py:126
+msgid "Job center"
 msgstr ""
 
 #: rbac/tree.py:56
@@ -4805,7 +4805,7 @@ msgid "Ticket comment"
 msgstr ""
 
 #: rbac/tree.py:130 settings/serializers/feature.py:109
-#: tickets/models/ticket/general.py:307
+#: settings/serializers/feature.py:111 tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr ""
 
@@ -5478,16 +5478,13 @@ msgstr ""
 msgid "More URL"
 msgstr ""
 
-#: settings/serializers/feature.py:36 settings/serializers/feature.py:39
+#: settings/serializers/feature.py:36 settings/serializers/feature.py:38
+#: settings/serializers/feature.py:39
 msgid "Announcement"
 msgstr ""
 
-#: settings/serializers/feature.py:38
-msgid "Enable announcement"
-msgstr ""
-
 #: settings/serializers/feature.py:46
-msgid "Enable Vault"
+msgid "Vault"
 msgstr ""
 
 #: settings/serializers/feature.py:55
@@ -5496,7 +5493,7 @@ msgstr ""
 
 #: settings/serializers/feature.py:60
 msgid "Historical accounts retained count"
-msgstr ""
+msgstr "Retention"
 
 #: settings/serializers/feature.py:62
 msgid ""
@@ -5506,12 +5503,8 @@ msgid ""
 "account deletion will be performed."
 msgstr ""
 
-#: settings/serializers/feature.py:71
+#: settings/serializers/feature.py:71 settings/serializers/feature.py:75
 msgid "Chat AI"
-msgstr ""
-
-#: settings/serializers/feature.py:75
-msgid "Enable Chat AI"
 msgstr ""
 
 #: settings/serializers/feature.py:78
@@ -5526,12 +5519,8 @@ msgstr ""
 msgid "GPT Model"
 msgstr ""
 
-#: settings/serializers/feature.py:111
-msgid "Enable tickets"
-msgstr ""
-
 #: settings/serializers/feature.py:114
-msgid "Ticket authorize default time"
+msgid "Default period"
 msgstr ""
 
 #: settings/serializers/feature.py:117
@@ -5539,15 +5528,11 @@ msgid "hour"
 msgstr ""
 
 #: settings/serializers/feature.py:118
-msgid "Ticket authorize default time unit"
+msgid "Default unit"
 msgstr ""
 
 #: settings/serializers/feature.py:123
 msgid "Feature"
-msgstr ""
-
-#: settings/serializers/feature.py:126
-msgid "Operation center"
 msgstr ""
 
 #: settings/serializers/feature.py:127
@@ -5555,23 +5540,19 @@ msgid "Allow user run batch command or not using ansible"
 msgstr ""
 
 #: settings/serializers/feature.py:131
-msgid "Operation center command blacklist"
+msgid "Command blacklist"
 msgstr ""
 
 #: settings/serializers/feature.py:132
 msgid "Commands that are not allowed execute."
 msgstr ""
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:137 settings/serializers/feature.py:140
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
 msgid "Virtual app"
-msgstr ""
-
-#: settings/serializers/feature.py:140
-msgid "Enable virtual app"
 msgstr ""
 
 #: settings/serializers/msg.py:25

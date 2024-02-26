@@ -35,7 +35,7 @@ class AnnouncementSerializer(serializers.Serializer):
 class AnnouncementSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Announcement')
 
-    ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Enable announcement'), default=True)
+    ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Announcement'), default=True)
     ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
 
 
@@ -43,7 +43,7 @@ class VaultSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('HCP Vault')
 
     VAULT_ENABLED = serializers.BooleanField(
-        required=False, label=_('Enable Vault'), read_only=True
+        required=False, label=_('Vault'), read_only=True
     )
     VAULT_HCP_HOST = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Host')
@@ -72,7 +72,7 @@ class ChatAISettingSerializer(serializers.Serializer):
     GPT_MODEL_CHOICES = []
 
     CHAT_AI_ENABLED = serializers.BooleanField(
-        required=False, label=_('Enable Chat AI')
+        required=False, label=_('Chat AI')
     )
     GPT_BASE_URL = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Base URL')
@@ -108,14 +108,14 @@ class ChatAISettingSerializer(serializers.Serializer):
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
-    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
+    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Ticket"))
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
-        label=_("Ticket authorize default time")
+        label=_("Default period")
     )
     TICKET_AUTHORIZE_DEFAULT_TIME_UNIT = serializers.ChoiceField(
         choices=[('day', _("day")), ('hour', _("hour"))],
-        label=_("Ticket authorize default time unit"), required=False,
+        label=_("Default unit"), required=False,
     )
 
 
@@ -123,12 +123,12 @@ class OpsSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Feature')
 
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Operation center'),
+        required=False, label=_('Job center'),
         help_text=_('Allow user run batch command or not using ansible')
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(
         child=serializers.CharField(max_length=1024, ),
-        label=_('Operation center command blacklist'),
+        label=_('Command blacklist'),
         help_text=_("Commands that are not allowed execute.")
     )
 
@@ -137,5 +137,5 @@ class VirtualAppSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Virtual app')
 
     VIRTUAL_APP_ENABLED = serializers.BooleanField(
-        required=False, label=_('Enable virtual app'),
+        required=False, label=_('Virtual app'),
     )
