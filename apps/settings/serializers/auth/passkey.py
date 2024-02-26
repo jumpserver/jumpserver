@@ -8,7 +8,7 @@ class PasskeySettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Passkey')
 
     AUTH_PASSKEY = serializers.BooleanField(
-        default=False, label=_('Enable passkey Auth'),
+        default=False, label=_('Passkey'),
         help_text=_('Only SSL domain can use passkey auth')
     )
     FIDO_SERVER_ID = serializers.CharField(

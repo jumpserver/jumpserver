@@ -5146,23 +5146,15 @@ msgid "Forgot Password URL"
 msgstr "パスワードのURLを忘れた"
 
 #: settings/serializers/auth/base.py:29
-msgid "Enable login redirect msg"
+msgid "Login redirection prompt"
 msgstr "ログインリダイレクトの有効化msg"
 
 #: settings/serializers/auth/cas.py:10
 msgid "CAS"
 msgstr "CAS"
 
-#: settings/serializers/auth/cas.py:12
-msgid "Enable CAS Auth"
-msgstr "CAS 認証の有効化"
-
-#: settings/serializers/auth/cas.py:13 settings/serializers/auth/oidc.py:54
-msgid "Server url"
-msgstr "サービス側アドレス"
-
 #: settings/serializers/auth/cas.py:16
-msgid "Proxy server url"
+msgid "Proxy Server"
 msgstr "コールバックアドレス"
 
 #: settings/serializers/auth/cas.py:18 settings/serializers/auth/oauth2.py:54
@@ -5179,19 +5171,19 @@ msgid "Enable attributes map"
 msgstr "属性マップの有効化"
 
 #: settings/serializers/auth/cas.py:28 settings/serializers/auth/saml2.py:32
-msgid "Rename attr"
+msgid "User attribute"
 msgstr "マッピングのプロパティ"
 
 #: settings/serializers/auth/cas.py:29
-msgid "Create user if not"
+msgid "Create user"
 msgstr "そうでない場合はユーザーを作成"
 
 #: settings/serializers/auth/dingtalk.py:15
-msgid "Enable DingTalk Auth"
+msgid "Dingtalk"
 msgstr "ピン認証の有効化"
 
 #: settings/serializers/auth/feishu.py:16
-msgid "Enable FeiShu Auth"
+msgid "Lark"
 msgstr "飛本認証の有効化"
 
 #: settings/serializers/auth/ldap.py:39
@@ -5199,7 +5191,7 @@ msgid "LDAP"
 msgstr "LDAP"
 
 #: settings/serializers/auth/ldap.py:42
-msgid "LDAP server"
+msgid "Server"
 msgstr "LDAPサーバー"
 
 #: settings/serializers/auth/ldap.py:43
@@ -5227,11 +5219,6 @@ msgstr "ユーザー検索フィルター"
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "選択は (cnまたはuidまたはsAMAccountName)=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/oauth2.py:56
-#: settings/serializers/auth/oidc.py:37
-msgid "User attr map"
-msgstr "ユーザー属性マッピング"
-
 #: settings/serializers/auth/ldap.py:59
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
@@ -5248,17 +5235,9 @@ msgstr "接続タイムアウト (秒)"
 msgid "Search paged size (piece)"
 msgstr "ページサイズを検索 (じょう)"
 
-#: settings/serializers/auth/ldap.py:84
-msgid "Enable LDAP auth"
-msgstr "LDAP認証の有効化"
-
 #: settings/serializers/auth/oauth2.py:18
 msgid "OAuth2"
 msgstr "OAuth2"
-
-#: settings/serializers/auth/oauth2.py:21
-msgid "Enable OAuth2 Auth"
-msgstr "OAuth2認証の有効化"
 
 #: settings/serializers/auth/oauth2.py:24
 msgid "Logo"
@@ -5342,10 +5321,6 @@ msgstr "Keycloakを使用する"
 msgid "Realm name"
 msgstr "レルム名"
 
-#: settings/serializers/auth/oidc.py:63
-msgid "Enable OPENID Auth"
-msgstr "OIDC認証の有効化"
-
 #: settings/serializers/auth/oidc.py:65
 msgid "Provider endpoint"
 msgstr "プロバイダーエンドポイント"
@@ -5382,10 +5357,6 @@ msgstr "使用状態"
 msgid "Use nonce"
 msgstr "Nonceを使用"
 
-#: settings/serializers/auth/passkey.py:11
-msgid "Enable passkey Auth"
-msgstr "パスキー認証を有効にする"
-
 #: settings/serializers/auth/passkey.py:12
 msgid "Only SSL domain can use passkey auth"
 msgstr "SSLドメインのみがパスキー認証を使用できます"
@@ -5411,10 +5382,6 @@ msgstr "FIDOサーバー名"
 msgid "Radius"
 msgstr "Radius"
 
-#: settings/serializers/auth/radius.py:15
-msgid "Enable Radius Auth"
-msgstr "Radius認証の有効化"
-
 #: settings/serializers/auth/radius.py:21
 msgid "OTP in Radius"
 msgstr "Radius のOTP"
@@ -5422,10 +5389,6 @@ msgstr "Radius のOTP"
 #: settings/serializers/auth/saml2.py:10
 msgid "SAML2"
 msgstr "SAML2"
-
-#: settings/serializers/auth/saml2.py:13
-msgid "Enable SAML2 Auth"
-msgstr "SAML2認証の有効化"
 
 #: settings/serializers/auth/saml2.py:16
 msgid "IDP metadata URL"
@@ -5446,10 +5409,6 @@ msgstr "SP プライベートキー"
 #: settings/serializers/auth/saml2.py:30
 msgid "SP cert"
 msgstr "SP 証明書"
-
-#: settings/serializers/auth/slack.py:12
-msgid "Enable Slack Auth"
-msgstr "Slack 認証の有効化"
 
 #: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
@@ -5543,10 +5502,6 @@ msgstr "Token有効期間"
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Unit: second"
 msgstr "単位: 秒"
-
-#: settings/serializers/auth/wecom.py:15
-msgid "Enable WeCom Auth"
-msgstr "企業微信認証の有効化"
 
 #: settings/serializers/basic.py:11
 msgid "Site URL"

@@ -5037,23 +5037,15 @@ msgid "Forgot Password URL"
 msgstr "忘记密码 URL"
 
 #: settings/serializers/auth/base.py:29
-msgid "Enable login redirect msg"
+msgid "Login redirection prompt"
 msgstr "启用登录跳转提示"
 
 #: settings/serializers/auth/cas.py:10
 msgid "CAS"
 msgstr "CAS"
 
-#: settings/serializers/auth/cas.py:12
-msgid "Enable CAS Auth"
-msgstr "启用 CAS 认证"
-
-#: settings/serializers/auth/cas.py:13 settings/serializers/auth/oidc.py:54
-msgid "Server url"
-msgstr "服务端地址"
-
 #: settings/serializers/auth/cas.py:16
-msgid "Proxy server url"
+msgid "Proxy Server"
 msgstr "回调地址"
 
 #: settings/serializers/auth/cas.py:18 settings/serializers/auth/oauth2.py:54
@@ -5070,19 +5062,19 @@ msgid "Enable attributes map"
 msgstr "启用属性映射"
 
 #: settings/serializers/auth/cas.py:28 settings/serializers/auth/saml2.py:32
-msgid "Rename attr"
+msgid "User attribute"
 msgstr "映射属性"
 
 #: settings/serializers/auth/cas.py:29
-msgid "Create user if not"
+msgid "Create user"
 msgstr "创建用户(如果不存在)"
 
 #: settings/serializers/auth/dingtalk.py:15
-msgid "Enable DingTalk Auth"
+msgid "Dingtalk"
 msgstr "启用钉钉认证"
 
 #: settings/serializers/auth/feishu.py:16
-msgid "Enable FeiShu Auth"
+msgid "Lark"
 msgstr "启用飞书认证"
 
 #: settings/serializers/auth/ldap.py:39
@@ -5090,7 +5082,7 @@ msgid "LDAP"
 msgstr "LDAP"
 
 #: settings/serializers/auth/ldap.py:42
-msgid "LDAP server"
+msgid "Server"
 msgstr "LDAP 地址"
 
 #: settings/serializers/auth/ldap.py:43
@@ -5118,11 +5110,6 @@ msgstr "用户过滤器"
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/oauth2.py:56
-#: settings/serializers/auth/oidc.py:37
-msgid "User attr map"
-msgstr "用户属性映射"
-
 #: settings/serializers/auth/ldap.py:59
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
@@ -5139,17 +5126,9 @@ msgstr "连接超时时间 (秒)"
 msgid "Search paged size (piece)"
 msgstr "搜索分页数量 (条)"
 
-#: settings/serializers/auth/ldap.py:84
-msgid "Enable LDAP auth"
-msgstr "启用 LDAP 认证"
-
 #: settings/serializers/auth/oauth2.py:18
 msgid "OAuth2"
 msgstr "OAuth2"
-
-#: settings/serializers/auth/oauth2.py:21
-msgid "Enable OAuth2 Auth"
-msgstr "启用 OAuth2 认证"
 
 #: settings/serializers/auth/oauth2.py:24
 msgid "Logo"
@@ -5193,10 +5172,6 @@ msgstr "注销会话端点地址"
 msgid "Always update user"
 msgstr "总是更新用户信息"
 
-#: settings/serializers/auth/oidc.py:12
-msgid "OIDC"
-msgstr "OIDC"
-
 #: settings/serializers/auth/oidc.py:16
 msgid "Base site URL"
 msgstr "JumpServer 地址"
@@ -5234,7 +5209,7 @@ msgid "Realm name"
 msgstr "域"
 
 #: settings/serializers/auth/oidc.py:63
-msgid "Enable OPENID Auth"
+msgid "OIDC"
 msgstr "启用 OIDC 认证"
 
 #: settings/serializers/auth/oidc.py:65
@@ -5273,10 +5248,6 @@ msgstr "使用状态"
 msgid "Use nonce"
 msgstr "临时使用"
 
-#: settings/serializers/auth/passkey.py:11
-msgid "Enable passkey Auth"
-msgstr "启用 Passkey 认证"
-
 #: settings/serializers/auth/passkey.py:12
 msgid "Only SSL domain can use passkey auth"
 msgstr "只有 SSL 域名可以使用 Passkey(通行密钥)认证"
@@ -5301,10 +5272,6 @@ msgstr "Passkey 服务名称"
 msgid "Radius"
 msgstr "Radius"
 
-#: settings/serializers/auth/radius.py:15
-msgid "Enable Radius Auth"
-msgstr "启用 Radius 认证"
-
 #: settings/serializers/auth/radius.py:21
 msgid "OTP in Radius"
 msgstr "使用 Radius OTP"
@@ -5312,10 +5279,6 @@ msgstr "使用 Radius OTP"
 #: settings/serializers/auth/saml2.py:10
 msgid "SAML2"
 msgstr "SAML2"
-
-#: settings/serializers/auth/saml2.py:13
-msgid "Enable SAML2 Auth"
-msgstr "启用 SAML2 认证"
 
 #: settings/serializers/auth/saml2.py:16
 msgid "IDP metadata URL"
@@ -5336,10 +5299,6 @@ msgstr "SP 密钥"
 #: settings/serializers/auth/saml2.py:30
 msgid "SP cert"
 msgstr "SP 证书"
-
-#: settings/serializers/auth/slack.py:12
-msgid "Enable Slack Auth"
-msgstr "启用 Slack 认证"
 
 #: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
@@ -5431,10 +5390,6 @@ msgstr "令牌有效期"
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Unit: second"
 msgstr "单位: 秒"
-
-#: settings/serializers/auth/wecom.py:15
-msgid "Enable WeCom Auth"
-msgstr "启用企业微信认证"
 
 #: settings/serializers/basic.py:11
 msgid "Site URL"

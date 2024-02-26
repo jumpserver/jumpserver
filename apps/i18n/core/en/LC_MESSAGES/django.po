@@ -2586,7 +2586,7 @@ msgstr ""
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:751
 #: users/models/user.py:857
 msgid "FeiShu"
-msgstr ""
+msgstr "Lark"
 
 #: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:15
@@ -4989,19 +4989,11 @@ msgid "Forgot Password URL"
 msgstr ""
 
 #: settings/serializers/auth/base.py:29
-msgid "Enable login redirect msg"
+msgid "Login redirection prompt"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:10
 msgid "CAS"
-msgstr ""
-
-#: settings/serializers/auth/cas.py:12
-msgid "Enable CAS Auth"
-msgstr ""
-
-#: settings/serializers/auth/cas.py:13 settings/serializers/auth/oidc.py:54
-msgid "Server url"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:16
@@ -5022,19 +5014,19 @@ msgid "Enable attributes map"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:28 settings/serializers/auth/saml2.py:32
-msgid "Rename attr"
+msgid "User attribute"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:29
-msgid "Create user if not"
+msgid "Create user"
 msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:15
-msgid "Enable DingTalk Auth"
+msgid "Dingtalk"
 msgstr ""
 
 #: settings/serializers/auth/feishu.py:16
-msgid "Enable FeiShu Auth"
+msgid "Lark"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:39
@@ -5042,7 +5034,7 @@ msgid "LDAP"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:42
-msgid "LDAP server"
+msgid "Server"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:43
@@ -5070,11 +5062,6 @@ msgstr ""
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/oauth2.py:56
-#: settings/serializers/auth/oidc.py:37
-msgid "User attr map"
-msgstr ""
-
 #: settings/serializers/auth/ldap.py:59
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
@@ -5089,17 +5076,10 @@ msgstr ""
 msgid "Search paged size (piece)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:84
-msgid "Enable LDAP auth"
-msgstr ""
-
 #: settings/serializers/auth/oauth2.py:18
 msgid "OAuth2"
 msgstr ""
 
-#: settings/serializers/auth/oauth2.py:21
-msgid "Enable OAuth2 Auth"
-msgstr ""
 
 #: settings/serializers/auth/oauth2.py:24
 msgid "Logo"
@@ -5181,10 +5161,6 @@ msgstr ""
 msgid "Realm name"
 msgstr ""
 
-#: settings/serializers/auth/oidc.py:63
-msgid "Enable OPENID Auth"
-msgstr ""
-
 #: settings/serializers/auth/oidc.py:65
 msgid "Provider endpoint"
 msgstr ""
@@ -5221,10 +5197,6 @@ msgstr ""
 msgid "Use nonce"
 msgstr ""
 
-#: settings/serializers/auth/passkey.py:11
-msgid "Enable passkey Auth"
-msgstr ""
-
 #: settings/serializers/auth/passkey.py:12
 msgid "Only SSL domain can use passkey auth"
 msgstr ""
@@ -5247,20 +5219,12 @@ msgstr ""
 msgid "Radius"
 msgstr ""
 
-#: settings/serializers/auth/radius.py:15
-msgid "Enable Radius Auth"
-msgstr ""
-
 #: settings/serializers/auth/radius.py:21
 msgid "OTP in Radius"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:10
 msgid "SAML2"
-msgstr ""
-
-#: settings/serializers/auth/saml2.py:13
-msgid "Enable SAML2 Auth"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:16
@@ -5281,10 +5245,6 @@ msgstr ""
 
 #: settings/serializers/auth/saml2.py:30
 msgid "SP cert"
-msgstr ""
-
-#: settings/serializers/auth/slack.py:12
-msgid "Enable Slack Auth"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:19
@@ -5374,10 +5334,6 @@ msgstr ""
 #: settings/serializers/auth/sso.py:20
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Unit: second"
-msgstr ""
-
-#: settings/serializers/auth/wecom.py:15
-msgid "Enable WeCom Auth"
 msgstr ""
 
 #: settings/serializers/basic.py:11

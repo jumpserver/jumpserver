@@ -34,7 +34,7 @@ class CommonSettingSerializer(serializers.Serializer):
         required=False, label=_('Ignore ssl verification')
     )
     AUTH_OPENID_USER_ATTR_MAP = serializers.JSONField(
-        required=True, label=_('User attr map'),
+        required=True, label=_('User attribute'),
         help_text=_('User attr map present how to map OpenID user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
     )
@@ -51,7 +51,7 @@ class KeycloakSettingSerializer(CommonSettingSerializer):
         label=_("Use Keycloak"), required=False, default=False
     )
     AUTH_OPENID_SERVER_URL = serializers.CharField(
-        required=False, max_length=1024, label=_('Server url')
+        required=False, max_length=1024, label=_('Server')
     )
     AUTH_OPENID_REALM_NAME = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Realm name')
@@ -60,7 +60,7 @@ class KeycloakSettingSerializer(CommonSettingSerializer):
 
 class OIDCSettingSerializer(KeycloakSettingSerializer):
     # OpenID 新配置参数 (version >= 1.5.9)
-    AUTH_OPENID = serializers.BooleanField(required=False, label=_('Enable OPENID Auth'))
+    AUTH_OPENID = serializers.BooleanField(required=False, label=_('OIDC'))
     AUTH_OPENID_PROVIDER_ENDPOINT = serializers.CharField(
         required=False, max_length=1024, label=_('Provider endpoint')
     )

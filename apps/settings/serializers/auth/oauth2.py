@@ -18,7 +18,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('OAuth2')
 
     AUTH_OAUTH2 = serializers.BooleanField(
-        default=False, label=_('Enable OAuth2 Auth')
+        default=False, label=_('OAuth2')
     )
     AUTH_OAUTH2_LOGO_PATH = SettingImageField(
         allow_null=True, required=False, label=_('Logo')
@@ -53,7 +53,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
     )
     AUTH_OAUTH2_LOGOUT_COMPLETELY = serializers.BooleanField(required=False, label=_('Logout completely'))
     AUTH_OAUTH2_USER_ATTR_MAP = serializers.JSONField(
-        required=True, label=_('User attr map')
+        required=True, label=_('User attribute')
     )
     AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(
         default=True, label=_('Always update user')
