@@ -6075,7 +6075,7 @@ msgid "Auto"
 msgstr "自動"
 
 #: settings/serializers/terminal.py:22
-msgid "Enable terminal register"
+msgid "Terminal registration"
 msgstr "ターミナルレジスタの有効化"
 
 #: settings/serializers/terminal.py:24
@@ -6096,18 +6096,18 @@ msgstr "鍵認証"
 
 #: settings/serializers/terminal.py:30
 msgid ""
-"Tips: If use other auth method, like AD/LDAP, you should disable this to "
+"Information: If use other auth method, like AD/LDAP, you should disable this to "
 "avoid being able to log in after deleting"
 msgstr ""
 "ヒント: AD/LDAPなどの他の認証方法を使用する場合は、サードパーティ製システムの"
 "削除後にこの項目を無効にする必要があります, ログインも可能"
 
 #: settings/serializers/terminal.py:34
-msgid "List sort by"
+msgid "Asset list sorting"
 msgstr "リストの並べ替え"
 
 #: settings/serializers/terminal.py:37
-msgid "List page size"
+msgid "Asset list page size"
 msgstr "ページサイズを一覧表示"
 
 #: settings/serializers/terminal.py:39
@@ -6119,7 +6119,7 @@ msgid "Enable Razor"
 msgstr "Razor の有効化"
 
 #: settings/serializers/terminal.py:41
-msgid "Enable SSH Client"
+msgid "SSH Client"
 msgstr "SSH Clientの有効化"
 
 #: settings/tasks/ldap.py:28
@@ -6539,10 +6539,6 @@ msgstr "出力"
 #: terminal/templates/terminal/_msg_command_warning.html:10
 msgid "Risk level"
 msgstr "リスクレベル"
-
-#: terminal/connect_methods.py:29
-msgid "SSH Client"
-msgstr "SSH クライアント"
 
 #: terminal/connect_methods.py:30
 msgid "SSH Guide"
@@ -8106,7 +8102,7 @@ msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
 #: users/serializers/user.py:101
-msgid "Can public key authentication"
+msgid "Can public key auth"
 msgstr "公開鍵認証が可能"
 
 #: users/serializers/user.py:166

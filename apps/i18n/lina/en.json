@@ -261,7 +261,7 @@
     "CommentHelpText": "Note: Remarks will be displayed when hovered over in the Luna page's user authorization asset tree. Ordinary users can view, please do not fill in sensitive information.",
     "CommunityEdition": "Community Version",
     "Component": "Component",
-    "ComponentMonitor": "Component Monitoring",
+    "ComponentMonitor": "Monitoring",
     "ConceptContent": "I want you to act like a Python interpreter. I will give you Python code, and you will execute it. Do not provide any explanations. Respond with nothing except the output of the code.",
     "ConceptTitle": "🤔 Python Interpreter",
     "Config": "Settings",

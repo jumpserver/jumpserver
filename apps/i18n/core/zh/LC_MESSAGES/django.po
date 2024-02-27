@@ -5937,7 +5937,7 @@ msgid "Auto"
 msgstr "自动"
 
 #: settings/serializers/terminal.py:22
-msgid "Enable terminal register"
+msgid "Terminal registration"
 msgstr "组件注册"
 
 #: settings/serializers/terminal.py:24
@@ -5956,18 +5956,18 @@ msgstr "密钥认证"
 
 #: settings/serializers/terminal.py:30
 msgid ""
-"Tips: If use other auth method, like AD/LDAP, you should disable this to "
+"Information: If use other auth method, like AD/LDAP, you should disable this to "
 "avoid being able to log in after deleting"
 msgstr ""
 "提示：如果你使用其它认证方式，如 AD/LDAP，你应该禁用此项，以避免第三方系统删"
 "除后，还可以登录"
 
 #: settings/serializers/terminal.py:34
-msgid "List sort by"
+msgid "Asset list sorting"
 msgstr "资产列表排序"
 
 #: settings/serializers/terminal.py:37
-msgid "List page size"
+msgid "Asset list page size"
 msgstr "资产列表每页数量"
 
 #: settings/serializers/terminal.py:39
@@ -5979,7 +5979,7 @@ msgid "Enable Razor"
 msgstr "启用 Razor 服务"
 
 #: settings/serializers/terminal.py:41
-msgid "Enable SSH Client"
+msgid "SSH Client"
 msgstr "启用 SSH Client"
 
 #: settings/tasks/ldap.py:28
@@ -6387,10 +6387,6 @@ msgstr "输出"
 #: terminal/templates/terminal/_msg_command_warning.html:10
 msgid "Risk level"
 msgstr "风险等级"
-
-#: terminal/connect_methods.py:29
-msgid "SSH Client"
-msgstr "SSH 客户端"
 
 #: terminal/connect_methods.py:30
 msgid "SSH Guide"
@@ -7924,7 +7920,7 @@ msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
 #: users/serializers/user.py:101
-msgid "Can public key authentication"
+msgid "Can public key auth"
 msgstr "可以使用公钥认证"
 
 #: users/serializers/user.py:166

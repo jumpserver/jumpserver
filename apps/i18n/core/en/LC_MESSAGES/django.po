@@ -5866,7 +5866,7 @@ msgid "Auto"
 msgstr ""
 
 #: settings/serializers/terminal.py:22
-msgid "Enable terminal register"
+msgid "Terminal registration"
 msgstr ""
 
 #: settings/serializers/terminal.py:24
@@ -5885,16 +5885,16 @@ msgstr ""
 
 #: settings/serializers/terminal.py:30
 msgid ""
-"Tips: If use other auth method, like AD/LDAP, you should disable this to "
+"Information: If use other auth method, like AD/LDAP, you should disable this to "
 "avoid being able to log in after deleting"
 msgstr ""
 
 #: settings/serializers/terminal.py:34
-msgid "List sort by"
+msgid "Asset list sorting"
 msgstr ""
 
 #: settings/serializers/terminal.py:37
-msgid "List page size"
+msgid "Asset list page size"
 msgstr ""
 
 #: settings/serializers/terminal.py:39
@@ -5903,10 +5903,6 @@ msgstr ""
 
 #: settings/serializers/terminal.py:40
 msgid "Enable Razor"
-msgstr ""
-
-#: settings/serializers/terminal.py:41
-msgid "Enable SSH Client"
 msgstr ""
 
 #: settings/tasks/ldap.py:28
@@ -7801,7 +7797,7 @@ msgid "Is OTP bound"
 msgstr "OTP bound"
 
 #: users/serializers/user.py:101
-msgid "Can public key authentication"
+msgid "Can public key auth"
 msgstr "Public key auth"
 
 #: users/serializers/user.py:166
