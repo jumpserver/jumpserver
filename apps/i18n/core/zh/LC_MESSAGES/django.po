@@ -5672,7 +5672,7 @@ msgstr ""
 "期前5天内由系统 (每天)自动发送给用户"
 
 #: settings/serializers/security.py:26
-msgid "Number of repeated historical passwords"
+msgid "Recent password count"
 msgstr "不能设置近几次密码"
 
 #: settings/serializers/security.py:28
@@ -5682,27 +5682,27 @@ msgid ""
 msgstr "提示：用户重置密码时，不能为该用户前几次使用过的密码"
 
 #: settings/serializers/security.py:34
-msgid "Password minimum length"
+msgid "Minimum length (User)"
 msgstr "密码最小长度"
 
 #: settings/serializers/security.py:38
-msgid "Admin user password minimum length"
+msgid "Minimum length (Admin)"
 msgstr "管理员密码最小长度"
 
 #: settings/serializers/security.py:41
-msgid "Must contain capital"
+msgid "Uppercase"
 msgstr "必须包含大写字符"
 
 #: settings/serializers/security.py:44
-msgid "Must contain lowercase"
+msgid "Lowercase"
 msgstr "必须包含小写字符"
 
 #: settings/serializers/security.py:47
-msgid "Must contain numeric"
+msgid "Digits"
 msgstr "必须包含数字"
 
 #: settings/serializers/security.py:50
-msgid "Must contain special"
+msgid "Special characters"
 msgstr "必须包含特殊字符"
 
 #: settings/serializers/security.py:55
@@ -5712,27 +5712,19 @@ msgid ""
 msgstr "当用户登录失败次数达到限制后，那么在此间隔内禁止登录"
 
 #: settings/serializers/security.py:63
-msgid "Limit the number of user login failures"
+msgid "Login failures count"
 msgstr "限制用户登录失败次数"
 
 #: settings/serializers/security.py:67
-msgid "Block user login interval (minute)"
+msgid "Login failure period (minute)"
 msgstr "禁止用户登录间隔 (分)"
 
-#: settings/serializers/security.py:73
-msgid "Limit the number of IP login failures"
-msgstr "限制 IP 登录失败次数"
-
-#: settings/serializers/security.py:77
-msgid "Block IP login interval (minute)"
-msgstr "禁止 IP 登录间隔 (分)"
-
 #: settings/serializers/security.py:81
-msgid "Login IP White List"
+msgid "Login IP whitelist"
 msgstr "IP 登录白名单"
 
 #: settings/serializers/security.py:86
-msgid "Login IP Black List"
+msgid "Login IP blacklist"
 msgstr "IP 登录黑名单"
 
 #: settings/serializers/security.py:91
@@ -5790,7 +5782,7 @@ msgid "Global MFA auth"
 msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/security.py:124
-msgid "Third-party login users perform MFA authentication"
+msgid "Third-party login MFA"
 msgstr "第三方认证开启 MFA"
 
 #: settings/serializers/security.py:125
@@ -5832,7 +5824,7 @@ msgid "Reset password and send SMS code expiration time"
 msgstr "重置密码的验证码及发送短信的验证码过期时间"
 
 #: settings/serializers/security.py:153
-msgid "Enable Login dynamic code"
+msgid "Login dynamic code"
 msgstr "启用登录附加码"
 
 #: settings/serializers/security.py:154
@@ -5844,7 +5836,7 @@ msgstr ""
 "码+6位数字 完成认证"
 
 #: settings/serializers/security.py:158
-msgid "Enable Login captcha"
+msgid "Login captcha"
 msgstr "启用登录验证码"
 
 #: settings/serializers/security.py:159
@@ -5852,7 +5844,7 @@ msgid "Enable captcha to prevent robot authentication"
 msgstr "开启验证码，防止机器人登录"
 
 #: settings/serializers/security.py:162
-msgid "Remote Login Protection"
+msgid "Suspicious Login Verification"
 msgstr "异地登录通知"
 
 #: settings/serializers/security.py:164
@@ -5865,7 +5857,7 @@ msgstr ""
 "登录提醒"
 
 #: settings/serializers/security.py:170
-msgid "Unused user timeout (day)"
+msgid "Auto Disable Threshold (day)"
 msgstr "不活跃用户自动禁用 (天)"
 
 #: settings/serializers/security.py:171
@@ -5875,7 +5867,7 @@ msgid ""
 msgstr "每天检测一次，超过预设时间的用户自动禁用"
 
 #: settings/serializers/security.py:191
-msgid "Enable watermark"
+msgid "Watermark"
 msgstr "开启水印"
 
 #: settings/serializers/security.py:192
@@ -5883,7 +5875,7 @@ msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
 #: settings/serializers/security.py:196
-msgid "Connection max idle time (minute)"
+msgid "Max idle time (minute)"
 msgstr "连接最大空闲时间 (分)"
 
 #: settings/serializers/security.py:197
@@ -5891,7 +5883,7 @@ msgid "If idle time more than it, disconnect connection."
 msgstr "提示：如果超过该配置没有操作，连接会被断开"
 
 #: settings/serializers/security.py:201
-msgid "Session max connection time (hour)"
+msgid "Max online time (hour)"
 msgstr "会话连接最大时间 (时)"
 
 #: settings/serializers/security.py:202

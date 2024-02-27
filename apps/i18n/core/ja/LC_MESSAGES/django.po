@@ -5797,7 +5797,7 @@ msgstr ""
 "れます。"
 
 #: settings/serializers/security.py:26
-msgid "Number of repeated historical passwords"
+msgid "Recent password count"
 msgstr "繰り返された履歴パスワードの数"
 
 #: settings/serializers/security.py:28
@@ -5809,27 +5809,27 @@ msgstr ""
 "にすることはできません"
 
 #: settings/serializers/security.py:34
-msgid "Password minimum length"
+msgid "Minimum length (User)"
 msgstr "パスワードの最小長"
 
 #: settings/serializers/security.py:38
-msgid "Admin user password minimum length"
+msgid "Minimum length (Admin)"
 msgstr "管理者ユーザーパスワードの最小長"
 
 #: settings/serializers/security.py:41
-msgid "Must contain capital"
+msgid "Uppercase"
 msgstr "資本を含める必要があります"
 
 #: settings/serializers/security.py:44
-msgid "Must contain lowercase"
+msgid "Lowercase"
 msgstr "小文字を含める必要があります。"
 
 #: settings/serializers/security.py:47
-msgid "Must contain numeric"
+msgid "Digits"
 msgstr "数値を含める必要があります"
 
 #: settings/serializers/security.py:50
-msgid "Must contain special"
+msgid "Special characters"
 msgstr "特別な"
 
 #: settings/serializers/security.py:55
@@ -5841,27 +5841,19 @@ msgstr ""
 "はできません。"
 
 #: settings/serializers/security.py:63
-msgid "Limit the number of user login failures"
+msgid "Login failures count"
 msgstr "ユーザーログインの失敗数を制限する"
 
 #: settings/serializers/security.py:67
-msgid "Block user login interval (minute)"
+msgid "Login failure period (minute)"
 msgstr "ユーザーのログイン間隔をブロックする（分）"
 
-#: settings/serializers/security.py:73
-msgid "Limit the number of IP login failures"
-msgstr "IPログイン失敗の数を制限する"
-
-#: settings/serializers/security.py:77
-msgid "Block IP login interval (minute)"
-msgstr "IPログイン間隔をブロックする（分）"
-
 #: settings/serializers/security.py:81
-msgid "Login IP White List"
+msgid "Login IP whitelist"
 msgstr "ログインIPホワイトリスト"
 
 #: settings/serializers/security.py:86
-msgid "Login IP Black List"
+msgid "Login IP blacklist"
 msgstr "ログインIPブラックリスト"
 
 #: settings/serializers/security.py:91
@@ -5923,7 +5915,7 @@ msgid "Global MFA auth"
 msgstr "グローバル有効化MFA認証"
 
 #: settings/serializers/security.py:124
-msgid "Third-party login users perform MFA authentication"
+msgid "Third-party login MFA"
 msgstr "サードパーティのログインユーザーがMFA認証を実行"
 
 #: settings/serializers/security.py:125
@@ -5966,7 +5958,7 @@ msgid "Reset password and send SMS code expiration time"
 msgstr "パスワードをリセットしてSMSコードの有効期限を送信します"
 
 #: settings/serializers/security.py:153
-msgid "Enable Login dynamic code"
+msgid "Login dynamic code"
 msgstr "ログイン動的コードの有効化"
 
 #: settings/serializers/security.py:154
@@ -5978,7 +5970,7 @@ msgstr ""
 "ます"
 
 #: settings/serializers/security.py:158
-msgid "Enable Login captcha"
+msgid "Login captcha"
 msgstr "ログインcaptchaの有効化"
 
 #: settings/serializers/security.py:159
@@ -5986,7 +5978,7 @@ msgid "Enable captcha to prevent robot authentication"
 msgstr "Captchaを有効にしてロボット認証を防止する"
 
 #: settings/serializers/security.py:162
-msgid "Remote Login Protection"
+msgid "Suspicious Login Verification"
 msgstr "リモートログイン保護"
 
 #: settings/serializers/security.py:164
@@ -6000,7 +5992,7 @@ msgstr ""
 "モートログインリマインダーを送信します"
 
 #: settings/serializers/security.py:170
-msgid "Unused user timeout (day)"
+msgid "Auto Disable Threshold (day)"
 msgstr "未使用のユーザータイムアウト（日）"
 
 #: settings/serializers/security.py:171
@@ -6012,7 +6004,7 @@ msgstr ""
 "します。"
 
 #: settings/serializers/security.py:191
-msgid "Enable watermark"
+msgid "Watermark"
 msgstr "透かしの有効化"
 
 #: settings/serializers/security.py:192
@@ -6020,7 +6012,7 @@ msgid "Enabled, the web session and replay contains watermark information"
 msgstr "Webセッションとリプレイには透かし情報が含まれています。"
 
 #: settings/serializers/security.py:196
-msgid "Connection max idle time (minute)"
+msgid "Max idle time (minute)"
 msgstr "接続最大アイドル時間（分）"
 
 #: settings/serializers/security.py:197
@@ -6028,7 +6020,7 @@ msgid "If idle time more than it, disconnect connection."
 msgstr "この設定以上の操作がない場合、接続は切断されます"
 
 #: settings/serializers/security.py:201
-msgid "Session max connection time (hour)"
+msgid "Max online time (hour)"
 msgstr "セッション最大接続時間（時間）"
 
 #: settings/serializers/security.py:202

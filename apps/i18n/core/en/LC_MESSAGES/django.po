@@ -5609,7 +5609,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:26
-msgid "Number of repeated historical passwords"
+msgid "Recent password count"
 msgstr ""
 
 #: settings/serializers/security.py:28
@@ -5619,27 +5619,27 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:34
-msgid "Password minimum length"
+msgid "Minimum length (User)"
 msgstr ""
 
 #: settings/serializers/security.py:38
-msgid "Admin user password minimum length"
+msgid "Minimum length (Admin)"
 msgstr ""
 
 #: settings/serializers/security.py:41
-msgid "Must contain capital"
+msgid "Uppercase"
 msgstr ""
 
 #: settings/serializers/security.py:44
-msgid "Must contain lowercase"
+msgid "Lowercase"
 msgstr ""
 
 #: settings/serializers/security.py:47
-msgid "Must contain numeric"
+msgid "Digits"
 msgstr ""
 
 #: settings/serializers/security.py:50
-msgid "Must contain special"
+msgid "Special characters"
 msgstr ""
 
 #: settings/serializers/security.py:55
@@ -5649,27 +5649,19 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:63
-msgid "Limit the number of user login failures"
-msgstr ""
-
-#: settings/serializers/security.py:67
-msgid "Block user login interval (minute)"
-msgstr ""
-
-#: settings/serializers/security.py:73
-msgid "Limit the number of IP login failures"
+msgid "Login failures count"
 msgstr ""
 
 #: settings/serializers/security.py:77
-msgid "Block IP login interval (minute)"
+msgid "Login failure period (minute)"
 msgstr ""
 
 #: settings/serializers/security.py:81
-msgid "Login IP White List"
+msgid "Login IP whitelist"
 msgstr ""
 
 #: settings/serializers/security.py:86
-msgid "Login IP Black List"
+msgid "Login IP blacklist"
 msgstr ""
 
 #: settings/serializers/security.py:91
@@ -5723,7 +5715,7 @@ msgid "Global MFA auth"
 msgstr ""
 
 #: settings/serializers/security.py:124
-msgid "Third-party login users perform MFA authentication"
+msgid "Third-party login MFA"
 msgstr ""
 
 #: settings/serializers/security.py:125
@@ -5765,7 +5757,7 @@ msgid "Reset password and send SMS code expiration time"
 msgstr ""
 
 #: settings/serializers/security.py:153
-msgid "Enable Login dynamic code"
+msgid "Login dynamic code"
 msgstr ""
 
 #: settings/serializers/security.py:154
@@ -5775,7 +5767,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:158
-msgid "Enable Login captcha"
+msgid "Login captcha"
 msgstr ""
 
 #: settings/serializers/security.py:159
@@ -5783,7 +5775,7 @@ msgid "Enable captcha to prevent robot authentication"
 msgstr ""
 
 #: settings/serializers/security.py:162
-msgid "Remote Login Protection"
+msgid "Suspicious Login Verification"
 msgstr ""
 
 #: settings/serializers/security.py:164
@@ -5794,7 +5786,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:170
-msgid "Unused user timeout (day)"
+msgid "Auto Disable Threshold (day)"
 msgstr ""
 
 #: settings/serializers/security.py:171
@@ -5804,7 +5796,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:191
-msgid "Enable watermark"
+msgid "Watermark"
 msgstr ""
 
 #: settings/serializers/security.py:192
@@ -5812,7 +5804,7 @@ msgid "Enabled, the web session and replay contains watermark information"
 msgstr ""
 
 #: settings/serializers/security.py:196
-msgid "Connection max idle time (minute)"
+msgid "Max idle time (minute)"
 msgstr ""
 
 #: settings/serializers/security.py:197
@@ -5820,7 +5812,7 @@ msgid "If idle time more than it, disconnect connection."
 msgstr ""
 
 #: settings/serializers/security.py:201
-msgid "Session max connection time (hour)"
+msgid "Max online time (hour)"
 msgstr ""
 
 #: settings/serializers/security.py:202
