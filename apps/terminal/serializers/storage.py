@@ -30,7 +30,7 @@ class ReplayStorageTypeBaseSerializer(serializers.Serializer):
     )
     ACCESS_KEY = serializers.CharField(
         max_length=1024, required=False, allow_blank=True,
-        label=_('Access key id'), allow_null=True,
+        label=_('Access key ID'), allow_null=True,
     )
     SECRET_KEY = EncryptedField(
         max_length=1024, required=False, allow_blank=True,

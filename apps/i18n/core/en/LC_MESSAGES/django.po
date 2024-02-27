@@ -6943,7 +6943,7 @@ msgstr ""
 
 #: terminal/serializers/storage.py:33
 #: xpack/plugins/cloud/serializers/account_attrs.py:17
-msgid "Access key id"
+msgid "Access key ID"
 msgstr ""
 
 #: terminal/serializers/storage.py:37

@@ -7053,7 +7053,7 @@ msgstr "桶名称"
 
 #: terminal/serializers/storage.py:33
 #: xpack/plugins/cloud/serializers/account_attrs.py:17
-msgid "Access key id"
+msgid "Access key ID"
 msgstr "Access key ID(AK)"
 
 #: terminal/serializers/storage.py:37
