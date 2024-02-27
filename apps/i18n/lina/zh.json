@@ -501,7 +501,7 @@
     "Id": "ID",
     "IdeaContent": "我想让你充当一个 Linux 终端。我将输入命令，你将回答终端应该显示的内容。我希望你只在一个独特的代码块内回复终端输出，而不是其他。不要写解释。当我需要告诉你一些事情时，我会把文字放在大括号里{备注文本}。",
     "IdeaTitle": "🌱 Linux 终端",
-    "IdpMetadataHelpText": "IDP metadata URL 和 IDP metadata XML参数二选一即可，IDP metadata URL的优先级高",
+    "IdpMetadataHelpText": "IDP Metadata URL 和 IDP MetadataXML参数二选一即可，IDP MetadataURL的优先级高",
     "IdpMetadataUrlHelpText": "从远端地址中加载 IDP Metadata",
     "ImageName": "镜像名",
     "Images": "图片",

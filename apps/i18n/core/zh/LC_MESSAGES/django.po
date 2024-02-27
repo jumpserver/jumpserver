@@ -5148,23 +5148,23 @@ msgid "Client Secret"
 msgstr "客户端密钥"
 
 #: settings/serializers/auth/oauth2.py:39 settings/serializers/auth/oidc.py:68
-msgid "Provider auth endpoint"
+msgid "Authorization endpoint"
 msgstr "授权端点地址"
 
 #: settings/serializers/auth/oauth2.py:42 settings/serializers/auth/oidc.py:71
-msgid "Provider token endpoint"
+msgid "Token endpoint"
 msgstr "token 端点地址"
 
 #: settings/serializers/auth/oauth2.py:45 settings/serializers/auth/oidc.py:30
-msgid "Client authentication method"
+msgid "Request method"
 msgstr "客户端认证方式"
 
 #: settings/serializers/auth/oauth2.py:49 settings/serializers/auth/oidc.py:77
-msgid "Provider userinfo endpoint"
+msgid "Userinfo endpoint"
 msgstr "用户信息端点地址"
 
 #: settings/serializers/auth/oauth2.py:52 settings/serializers/auth/oidc.py:80
-msgid "Provider end session endpoint"
+msgid "End session endpoint"
 msgstr "注销会话端点地址"
 
 #: settings/serializers/auth/oauth2.py:59 settings/serializers/auth/oidc.py:98
@@ -5181,7 +5181,7 @@ msgid "Share session"
 msgstr "共享会话"
 
 #: settings/serializers/auth/oidc.py:34
-msgid "Ignore ssl verification"
+msgid "Ignore SSL verification"
 msgstr "忽略 SSL 证书验证"
 
 #: settings/serializers/auth/oidc.py:38
@@ -5217,15 +5217,15 @@ msgid "Provider endpoint"
 msgstr "端点地址"
 
 #: settings/serializers/auth/oidc.py:74
-msgid "Provider jwks endpoint"
+msgid "JWKS endpoint"
 msgstr "jwks 端点地址"
 
 #: settings/serializers/auth/oidc.py:83
-msgid "Provider sign alg"
+msgid "Signature algorithm"
 msgstr "签名算法"
 
 #: settings/serializers/auth/oidc.py:86
-msgid "Provider sign key"
+msgid "Signing key"
 msgstr "签名 Key"
 
 #: settings/serializers/auth/oidc.py:88
@@ -5233,11 +5233,11 @@ msgid "Scopes"
 msgstr "连接范围"
 
 #: settings/serializers/auth/oidc.py:90
-msgid "Id token max age (s)"
+msgid "ID Token max age (s)"
 msgstr "令牌有效时间 (秒)"
 
 #: settings/serializers/auth/oidc.py:93
-msgid "Id token include claims"
+msgid "ID Token include claims"
 msgstr "声明"
 
 #: settings/serializers/auth/oidc.py:95
@@ -5253,7 +5253,7 @@ msgid "Only SSL domain can use passkey auth"
 msgstr "只有 SSL 域名可以使用 Passkey(通行密钥)认证"
 
 #: settings/serializers/auth/passkey.py:15
-msgid "FIDO server ID"
+msgid "FIDO Server ID"
 msgstr "Passkey 服务域名"
 
 #: settings/serializers/auth/passkey.py:17
@@ -5265,7 +5265,7 @@ msgstr ""
 "DOMAINS中), 如果有多个域名，使用逗号分隔, 不需要端口号"
 
 #: settings/serializers/auth/passkey.py:22
-msgid "FIDO server name"
+msgid "FIDO Server name"
 msgstr "Passkey 服务名称"
 
 #: settings/serializers/auth/radius.py:13
@@ -5281,12 +5281,12 @@ msgid "SAML2"
 msgstr "SAML2"
 
 #: settings/serializers/auth/saml2.py:16
-msgid "IDP metadata URL"
-msgstr "IDP metadata 地址"
+msgid "IDP Metadata URL"
+msgstr "IDP Metadata 地址"
 
 #: settings/serializers/auth/saml2.py:19
 msgid "IDP metadata XML"
-msgstr "IDP metadata XML"
+msgstr "IDP Metadata XML"
 
 #: settings/serializers/auth/saml2.py:22
 msgid "SP advanced settings"
@@ -5369,10 +5369,6 @@ msgstr "模板+签名不能超过65个字"
 #: settings/serializers/auth/sms.py:101
 msgid "URL"
 msgstr "URL"
-
-#: settings/serializers/auth/sms.py:106
-msgid "Request method"
-msgstr "请求方式"
 
 #: settings/serializers/auth/sso.py:16
 msgid "Enable SSO auth"

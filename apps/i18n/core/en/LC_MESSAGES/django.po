@@ -5099,11 +5099,11 @@ msgid "Client Secret"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:39 settings/serializers/auth/oidc.py:68
-msgid "Provider auth endpoint"
+msgid "Authorization endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:42 settings/serializers/auth/oidc.py:71
-msgid "Provider token endpoint"
+msgid "Token endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:45 settings/serializers/auth/oidc.py:30
@@ -5111,11 +5111,11 @@ msgid "Client authentication method"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:49 settings/serializers/auth/oidc.py:77
-msgid "Provider userinfo endpoint"
+msgid "Userinfo endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:52 settings/serializers/auth/oidc.py:80
-msgid "Provider end session endpoint"
+msgid "End session endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:59 settings/serializers/auth/oidc.py:98
@@ -5136,7 +5136,7 @@ msgid "Share session"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:34
-msgid "Ignore ssl verification"
+msgid "Ignore SSL verification"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:38
@@ -5166,15 +5166,15 @@ msgid "Provider endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:74
-msgid "Provider jwks endpoint"
+msgid "JWKS endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:83
-msgid "Provider sign alg"
+msgid "Signature algorithm"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:86
-msgid "Provider sign key"
+msgid "Signing key"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:88
@@ -5182,11 +5182,11 @@ msgid "Scopes"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:90
-msgid "Id token max age (s)"
+msgid "ID Token max age (s)"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:93
-msgid "Id token include claims"
+msgid "ID Token include claims"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:95
@@ -5228,11 +5228,11 @@ msgid "SAML2"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:16
-msgid "IDP metadata URL"
+msgid "IDP Metadata URL"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:19
-msgid "IDP metadata XML"
+msgid "IDP Metadata XML"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:22
@@ -5313,10 +5313,6 @@ msgstr ""
 
 #: settings/serializers/auth/sms.py:101
 msgid "URL"
-msgstr ""
-
-#: settings/serializers/auth/sms.py:106
-msgid "Request method"
 msgstr ""
 
 #: settings/serializers/auth/sso.py:16

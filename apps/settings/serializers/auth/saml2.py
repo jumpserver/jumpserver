@@ -13,10 +13,10 @@ class SAML2SettingSerializer(serializers.Serializer):
         default=False, required=False, label=_('SAML2')
     )
     SAML2_IDP_METADATA_URL = serializers.URLField(
-        allow_blank=True, required=False, label=_('IDP metadata URL')
+        allow_blank=True, required=False, label=_('IDP Metadata URL')
     )
     SAML2_IDP_METADATA_XML = serializers.CharField(
-        allow_blank=True, required=False, label=_('IDP metadata XML')
+        allow_blank=True, required=False, label=_('IDP Metadata XML')
     )
     SAML2_SP_ADVANCED_SETTINGS = serializers.JSONField(
         required=False, label=_('SP advanced settings')

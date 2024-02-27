@@ -27,11 +27,11 @@ class CommonSettingSerializer(serializers.Serializer):
             ('client_secret_basic', 'Client Secret Basic'),
             ('client_secret_post', 'Client Secret Post')
         ),
-        label=_('Client authentication method')
+        label=_('Request method')
     )
     AUTH_OPENID_SHARE_SESSION = serializers.BooleanField(required=False, label=_('Share session'))
     AUTH_OPENID_IGNORE_SSL_VERIFICATION = serializers.BooleanField(
-        required=False, label=_('Ignore ssl verification')
+        required=False, label=_('Ignore SSL verification')
     )
     AUTH_OPENID_USER_ATTR_MAP = serializers.JSONField(
         required=True, label=_('User attribute'),
@@ -65,32 +65,32 @@ class OIDCSettingSerializer(KeycloakSettingSerializer):
         required=False, max_length=1024, label=_('Provider endpoint')
     )
     AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider auth endpoint')
+        required=False, max_length=1024, label=_('Authorization endpoint')
     )
     AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider token endpoint')
+        required=False, max_length=1024, label=_('Token endpoint')
     )
     AUTH_OPENID_PROVIDER_JWKS_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider jwks endpoint')
+        required=False, max_length=1024, label=_('JWKS endpoint')
     )
     AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider userinfo endpoint')
+        required=False, max_length=1024, label=_('Userinfo endpoint')
     )
     AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider end session endpoint')
+        required=False, max_length=1024, label=_('End session endpoint')
     )
     AUTH_OPENID_PROVIDER_SIGNATURE_ALG = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider sign alg')
+        required=False, max_length=1024, label=_('Signature algorithm')
     )
     AUTH_OPENID_PROVIDER_SIGNATURE_KEY = serializers.CharField(
-        required=False, max_length=1024, allow_null=True, label=_('Provider sign key')
+        required=False, max_length=1024, allow_null=True, label=_('Signing key')
     )
     AUTH_OPENID_SCOPES = serializers.CharField(required=False, max_length=1024, label=_('Scopes'))
     AUTH_OPENID_ID_TOKEN_MAX_AGE = serializers.IntegerField(
-        required=False, label=_('Id token max age (s)')
+        required=False, label=_('ID Token max age (s)')
     )
     AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS = serializers.BooleanField(
-        required=False, label=_('Id token include claims')
+        required=False, label=_('ID Token include claims')
     )
     AUTH_OPENID_USE_STATE = serializers.BooleanField(required=False, label=_('Use state'))
     AUTH_OPENID_USE_NONCE = serializers.BooleanField(required=False, label=_('Use nonce'))

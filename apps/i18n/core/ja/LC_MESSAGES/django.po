@@ -5257,23 +5257,23 @@ msgid "Client Secret"
 msgstr "クライアント秘密"
 
 #: settings/serializers/auth/oauth2.py:39 settings/serializers/auth/oidc.py:68
-msgid "Provider auth endpoint"
+msgid "Authorization endpoint"
 msgstr "認証エンドポイントアドレス"
 
 #: settings/serializers/auth/oauth2.py:42 settings/serializers/auth/oidc.py:71
-msgid "Provider token endpoint"
+msgid "Token endpoint"
 msgstr "プロバイダートークンエンドポイント"
 
 #: settings/serializers/auth/oauth2.py:45 settings/serializers/auth/oidc.py:30
-msgid "Client authentication method"
+msgid "Request method"
 msgstr "クライアント認証方式"
 
 #: settings/serializers/auth/oauth2.py:49 settings/serializers/auth/oidc.py:77
-msgid "Provider userinfo endpoint"
+msgid "Userinfo endpoint"
 msgstr "プロバイダーuserinfoエンドポイント"
 
 #: settings/serializers/auth/oauth2.py:52 settings/serializers/auth/oidc.py:80
-msgid "Provider end session endpoint"
+msgid "End session endpoint"
 msgstr "プロバイダーのセッション終了エンドポイント"
 
 #: settings/serializers/auth/oauth2.py:59 settings/serializers/auth/oidc.py:98
@@ -5294,7 +5294,7 @@ msgid "Share session"
 msgstr "セッションの共有"
 
 #: settings/serializers/auth/oidc.py:34
-msgid "Ignore ssl verification"
+msgid "Ignore SSL verification"
 msgstr "Ssl検証を無視する"
 
 #: settings/serializers/auth/oidc.py:38
@@ -5326,15 +5326,15 @@ msgid "Provider endpoint"
 msgstr "プロバイダーエンドポイント"
 
 #: settings/serializers/auth/oidc.py:74
-msgid "Provider jwks endpoint"
+msgid "JWKS endpoint"
 msgstr "プロバイダーjwksエンドポイント"
 
 #: settings/serializers/auth/oidc.py:83
-msgid "Provider sign alg"
+msgid "Signature algorithm"
 msgstr "プロビダーサインalg"
 
 #: settings/serializers/auth/oidc.py:86
-msgid "Provider sign key"
+msgid "Signing key"
 msgstr "プロバイダ署名キー"
 
 #: settings/serializers/auth/oidc.py:88
@@ -5342,11 +5342,11 @@ msgid "Scopes"
 msgstr "スコープ"
 
 #: settings/serializers/auth/oidc.py:90
-msgid "Id token max age (s)"
+msgid "ID Token max age (s)"
 msgstr "IDトークンの最大年齢 (秒)"
 
 #: settings/serializers/auth/oidc.py:93
-msgid "Id token include claims"
+msgid "ID Token include claims"
 msgstr "IDトークンにはクレームが含まれます"
 
 #: settings/serializers/auth/oidc.py:95
@@ -5362,7 +5362,7 @@ msgid "Only SSL domain can use passkey auth"
 msgstr "SSLドメインのみがパスキー認証を使用できます"
 
 #: settings/serializers/auth/passkey.py:15
-msgid "FIDO server ID"
+msgid "FIDO Server ID"
 msgstr "FIDOサーバーID"
 
 #: settings/serializers/auth/passkey.py:17
@@ -5375,7 +5375,7 @@ msgstr ""
 "ます"
 
 #: settings/serializers/auth/passkey.py:22
-msgid "FIDO server name"
+msgid "FIDO Server name"
 msgstr "FIDOサーバー名"
 
 #: settings/serializers/auth/radius.py:13
@@ -5391,12 +5391,12 @@ msgid "SAML2"
 msgstr "SAML2"
 
 #: settings/serializers/auth/saml2.py:16
-msgid "IDP metadata URL"
-msgstr "IDP metadata アドレス"
+msgid "IDP Metadata URL"
+msgstr "IDP Metadataアドレス"
 
 #: settings/serializers/auth/saml2.py:19
-msgid "IDP metadata XML"
-msgstr "IDP metadata XML"
+msgid "IDP Metadata XML"
+msgstr "IDP Metadata XML"
 
 #: settings/serializers/auth/saml2.py:22
 msgid "SP advanced settings"
@@ -5480,10 +5480,6 @@ msgstr "署名+テンプレートの長さは65文字以内"
 #: settings/serializers/auth/sms.py:101
 msgid "URL"
 msgstr "URL"
-
-#: settings/serializers/auth/sms.py:106
-msgid "Request method"
-msgstr "請求方法です"
 
 #: settings/serializers/auth/sso.py:16
 msgid "Enable SSO auth"

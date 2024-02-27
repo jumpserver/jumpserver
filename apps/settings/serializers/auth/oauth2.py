@@ -36,20 +36,20 @@ class OAuth2SettingSerializer(serializers.Serializer):
         required=True, max_length=1024, label=_('Scope'), allow_blank=True
     )
     AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT = serializers.CharField(
-        required=True, max_length=1024, label=_('Provider auth endpoint')
+        required=True, max_length=1024, label=_('Authorization endpoint')
     )
     AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT = serializers.CharField(
-        required=True, max_length=1024, label=_('Provider token endpoint')
+        required=True, max_length=1024, label=_('Token endpoint')
     )
     AUTH_OAUTH2_ACCESS_TOKEN_METHOD = serializers.ChoiceField(
-        default='GET', label=_('Client authentication method'),
+        default='GET', label=_('Request method'),
         choices=(('GET', 'GET'), ('POST', 'POST-DATA'), ('POST_JSON', 'POST-JSON'))
     )
     AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT = serializers.CharField(
-        required=True, max_length=1024, label=_('Provider userinfo endpoint')
+        required=True, max_length=1024, label=_('Userinfo endpoint')
     )
     AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT = serializers.CharField(
-        required=False, allow_blank=True, max_length=1024, label=_('Provider end session endpoint')
+        required=False, allow_blank=True, max_length=1024, label=_('End session endpoint')
     )
     AUTH_OAUTH2_LOGOUT_COMPLETELY = serializers.BooleanField(required=False, label=_('Logout completely'))
     AUTH_OAUTH2_USER_ATTR_MAP = serializers.JSONField(

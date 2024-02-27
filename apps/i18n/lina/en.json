@@ -507,7 +507,7 @@
     "Id": "ID",
     "IdeaContent": "I want you to act as a Linux terminal. I will input the commands, you will respond with what the terminal should display. I hope you to reply only in a unique code block, not others. No interpretations. When I need to tell you something, I'm gonna put the words in braces {note text}",
     "IdeaTitle": "🌱 Linux Terminal",
-    "IdpMetadataHelpText": "Either IDP metadata URL or IDP metadata XML is acceptable, with IDP metadata URL having higher priority",
+    "IdpMetadataHelpText": "Either IDP Metadata URL or IDP Metadata XML is acceptable, with IDP Metadata URL having higher priority",
     "IdpMetadataUrlHelpText": "Load IDP Metadata from Remote Address",
     "ImageName": "Image Name",
     "Images": "Image",
