@@ -1,20 +1,20 @@
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import gettext
 from django.template.loader import render_to_string
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
-from notifications.notifications import SystemMessage
-from notifications.models import SystemMsgSubscription
-from users.models import User
 from notifications.backends import BACKEND
-from terminal.models.component.status import Status
+from notifications.models import SystemMsgSubscription
+from notifications.notifications import SystemMessage
 from terminal.models import Terminal
+from terminal.models.component.status import Status
+from users.models import User
 
 __all__ = ('ServerPerformanceMessage', 'ServerPerformanceCheckUtil')
 
 
 class ServerPerformanceMessage(SystemMessage):
     category = 'Components'
-    category_label = _('Components')
+    category_label = _('Component')
     message_type_label = _('Server performance')
 
     def __init__(self, terms_with_errors):
