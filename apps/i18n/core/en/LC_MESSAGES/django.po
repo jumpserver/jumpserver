@@ -7597,7 +7597,7 @@ msgstr "First login"
 
 #: users/models/user.py:848
 msgid "Date password last updated"
-msgstr "Password last updated"
+msgstr "Password updated"
 
 #: users/models/user.py:851
 msgid "Need update password"
