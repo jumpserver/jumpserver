@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-20 15:15+0800\n"
+"POT-Creation-Date: 2024-02-26 15:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -298,6 +298,7 @@ msgstr ""
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:45 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -404,7 +405,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:128
 #: ops/serializers/job.py:67 terminal/serializers/session.py:49
 msgid "Is success"
-msgstr "Success"
+msgstr "Is success"
 
 #: accounts/models/automations/backup_account.py:143
 msgid "Account backup execution"
@@ -540,10 +541,8 @@ msgid "Gather account automation"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:56
-#, fuzzy
-#| msgid "Sync account"
 msgid "Is sync account"
-msgstr "Sync account"
+msgstr "Is sync account"
 
 #: accounts/models/automations/gather_account.py:75
 #: accounts/tasks/gather_accounts.py:29
@@ -928,7 +927,7 @@ msgstr ""
 #: tickets/models/ticket/general.py:297 users/models/user.py:836
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:110
 msgid "Comment"
-msgstr "Description"
+msgstr "Comment"
 
 #: accounts/serializers/account/virtual.py:24
 msgid ""
@@ -974,8 +973,6 @@ msgstr ""
 #: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:117
-#, fuzzy
-#| msgid "Is success"
 msgid "Success"
 msgstr "Success"
 
@@ -1135,7 +1132,7 @@ msgstr ""
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:182 settings/serializers/feature.py:19
-#: xpack/plugins/license/models.py:30
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr ""
 
@@ -1430,7 +1427,7 @@ msgstr ""
 
 #: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
-msgstr ""
+msgstr "Custom"
 
 #: assets/const/cloud.py:7
 msgid "Public cloud"
@@ -1795,7 +1792,7 @@ msgstr ""
 msgid "Ping asset"
 msgstr ""
 
-#: assets/models/base.py:19
+#: assets/models/base.py:19 terminal/notifications.py:225
 msgid "Connectivity"
 msgstr ""
 
@@ -2501,7 +2498,9 @@ msgid "MFA"
 msgstr ""
 
 #: audits/models.py:210
-msgid "Date login"
+#: authentication/templates/authentication/_msg_different_city.html:10
+#: tickets/models/ticket/login_confirm.py:12
+msgid "Login Date"
 msgstr ""
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
@@ -2587,7 +2586,7 @@ msgstr ""
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:751
 #: users/models/user.py:857
 msgid "FeiShu"
-msgstr ""
+msgstr "Lark"
 
 #: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:15
@@ -2983,8 +2982,9 @@ msgstr ""
 
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:32 users/forms/profile.py:104
-#: users/forms/profile.py:109 users/templates/users/forgot_password.html:155
+#: settings/serializers/auth/sms.py:17 settings/serializers/auth/sms.py:32
+#: users/forms/profile.py:104 users/forms/profile.py:109
+#: users/templates/users/forgot_password.html:155
 #: users/views/profile/reset.py:100
 msgid "SMS"
 msgstr ""
@@ -3192,10 +3192,8 @@ msgstr ""
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:43
 #: perms/serializers/permission.py:66 users/serializers/user.py:98
 #: users/serializers/user.py:174
-#, fuzzy
-#| msgid "Valid"
 msgid "Is valid"
-msgstr "Valid"
+msgstr "Is Valid"
 
 #: authentication/tasks.py:11
 msgid "Clean expired session"
@@ -3276,10 +3274,6 @@ msgstr ""
 
 #: authentication/templates/authentication/_msg_different_city.html:6
 msgid "Your account has remote login behavior, please pay attention"
-msgstr ""
-
-#: authentication/templates/authentication/_msg_different_city.html:10
-msgid "Login time"
 msgstr ""
 
 #: authentication/templates/authentication/_msg_different_city.html:16
@@ -3800,7 +3794,7 @@ msgstr ""
 
 #: common/sdk/sms/endpoint.py:21
 msgid "Custom type (File)"
-msgstr ""
+msgstr "Custom (File)"
 
 #: common/sdk/sms/endpoint.py:32
 msgid "SMS provider not support: {}"
@@ -3937,10 +3931,8 @@ msgid "Labeled resource"
 msgstr ""
 
 #: labels/serializers.py:22
-#, fuzzy
-#| msgid "Executed amount"
-msgid "Resource amount"
-msgstr "Executions"
+msgid "Resource count"
+msgstr "Resource count"
 
 #: labels/serializers.py:28
 msgid "Cannot contain \":,\""
@@ -4253,7 +4245,7 @@ msgstr ""
 msgid "Runas policy"
 msgstr ""
 
-#: ops/models/job.py:216
+#: ops/models/job.py:216 terminal/notifications.py:174
 msgid "Job"
 msgstr ""
 
@@ -4277,8 +4269,8 @@ msgstr ""
 msgid "VCS URL"
 msgstr ""
 
-#: ops/notifications.py:17 rbac/tree.py:57
-msgid "App ops"
+#: ops/notifications.py:17
+msgid "Components"
 msgstr ""
 
 #: ops/notifications.py:18
@@ -4318,8 +4310,8 @@ msgid "Next execution time"
 msgstr ""
 
 #: ops/serializers/job.py:15
-msgid "Run after save"
-msgstr ""
+msgid "Execute after saving"
+msgstr "Execute after saving"
 
 #: ops/serializers/job.py:52
 msgid "Average time cost"
@@ -4786,12 +4778,16 @@ msgstr ""
 msgid "Terminal setting"
 msgstr ""
 
-#: rbac/tree.py:55
-msgid "Task Center"
+#: rbac/tree.py:55 settings/serializers/feature.py:126
+msgid "Job center"
 msgstr ""
 
 #: rbac/tree.py:56
 msgid "My assets"
+msgstr ""
+
+#: rbac/tree.py:57
+msgid "App ops"
 msgstr ""
 
 #: rbac/tree.py:58 terminal/models/applet/applet.py:52
@@ -4809,7 +4805,7 @@ msgid "Ticket comment"
 msgstr ""
 
 #: rbac/tree.py:130 settings/serializers/feature.py:109
-#: tickets/models/ticket/general.py:307
+#: settings/serializers/feature.py:111 tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr ""
 
@@ -4993,19 +4989,11 @@ msgid "Forgot Password URL"
 msgstr ""
 
 #: settings/serializers/auth/base.py:29
-msgid "Enable login redirect msg"
+msgid "Login redirection prompt"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:10
 msgid "CAS"
-msgstr ""
-
-#: settings/serializers/auth/cas.py:12
-msgid "Enable CAS Auth"
-msgstr ""
-
-#: settings/serializers/auth/cas.py:13 settings/serializers/auth/oidc.py:54
-msgid "Server url"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:16
@@ -5026,19 +5014,19 @@ msgid "Enable attributes map"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:28 settings/serializers/auth/saml2.py:32
-msgid "Rename attr"
+msgid "User attribute"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:29
-msgid "Create user if not"
+msgid "Create user"
 msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:15
-msgid "Enable DingTalk Auth"
+msgid "Dingtalk"
 msgstr ""
 
 #: settings/serializers/auth/feishu.py:16
-msgid "Enable FeiShu Auth"
+msgid "Lark"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:39
@@ -5046,7 +5034,7 @@ msgid "LDAP"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:42
-msgid "LDAP server"
+msgid "Server"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:43
@@ -5074,11 +5062,6 @@ msgstr ""
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/oauth2.py:56
-#: settings/serializers/auth/oidc.py:37
-msgid "User attr map"
-msgstr ""
-
 #: settings/serializers/auth/ldap.py:59
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
@@ -5093,17 +5076,10 @@ msgstr ""
 msgid "Search paged size (piece)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:84
-msgid "Enable LDAP auth"
-msgstr ""
-
 #: settings/serializers/auth/oauth2.py:18
 msgid "OAuth2"
 msgstr ""
 
-#: settings/serializers/auth/oauth2.py:21
-msgid "Enable OAuth2 Auth"
-msgstr ""
 
 #: settings/serializers/auth/oauth2.py:24
 msgid "Logo"
@@ -5123,11 +5099,11 @@ msgid "Client Secret"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:39 settings/serializers/auth/oidc.py:68
-msgid "Provider auth endpoint"
+msgid "Authorization endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:42 settings/serializers/auth/oidc.py:71
-msgid "Provider token endpoint"
+msgid "Token endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:45 settings/serializers/auth/oidc.py:30
@@ -5135,11 +5111,11 @@ msgid "Client authentication method"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:49 settings/serializers/auth/oidc.py:77
-msgid "Provider userinfo endpoint"
+msgid "Userinfo endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:52 settings/serializers/auth/oidc.py:80
-msgid "Provider end session endpoint"
+msgid "End session endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:59 settings/serializers/auth/oidc.py:98
@@ -5160,7 +5136,7 @@ msgid "Share session"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:34
-msgid "Ignore ssl verification"
+msgid "Ignore SSL verification"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:38
@@ -5185,24 +5161,20 @@ msgstr ""
 msgid "Realm name"
 msgstr ""
 
-#: settings/serializers/auth/oidc.py:63
-msgid "Enable OPENID Auth"
-msgstr ""
-
 #: settings/serializers/auth/oidc.py:65
 msgid "Provider endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:74
-msgid "Provider jwks endpoint"
+msgid "JWKS endpoint"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:83
-msgid "Provider sign alg"
+msgid "Signature algorithm"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:86
-msgid "Provider sign key"
+msgid "Signing key"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:88
@@ -5210,11 +5182,11 @@ msgid "Scopes"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:90
-msgid "Id token max age (s)"
+msgid "ID Token max age (s)"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:93
-msgid "Id token include claims"
+msgid "ID Token include claims"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:95
@@ -5223,10 +5195,6 @@ msgstr ""
 
 #: settings/serializers/auth/oidc.py:96
 msgid "Use nonce"
-msgstr ""
-
-#: settings/serializers/auth/passkey.py:11
-msgid "Enable passkey Auth"
 msgstr ""
 
 #: settings/serializers/auth/passkey.py:12
@@ -5251,10 +5219,6 @@ msgstr ""
 msgid "Radius"
 msgstr ""
 
-#: settings/serializers/auth/radius.py:15
-msgid "Enable Radius Auth"
-msgstr ""
-
 #: settings/serializers/auth/radius.py:21
 msgid "OTP in Radius"
 msgstr ""
@@ -5263,16 +5227,12 @@ msgstr ""
 msgid "SAML2"
 msgstr ""
 
-#: settings/serializers/auth/saml2.py:13
-msgid "Enable SAML2 Auth"
-msgstr ""
-
 #: settings/serializers/auth/saml2.py:16
-msgid "IDP metadata URL"
+msgid "IDP Metadata URL"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:19
-msgid "IDP metadata XML"
+msgid "IDP Metadata XML"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:22
@@ -5285,14 +5245,6 @@ msgstr ""
 
 #: settings/serializers/auth/saml2.py:30
 msgid "SP cert"
-msgstr ""
-
-#: settings/serializers/auth/slack.py:12
-msgid "Enable Slack Auth"
-msgstr ""
-
-#: settings/serializers/auth/sms.py:17
-msgid "Enable SMS"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:19
@@ -5327,19 +5279,19 @@ msgid "Signature channel number"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:73
-msgid "Enterprise code(SP id)"
+msgid "Enterprise code"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:74
-msgid "Shared secret(Shared secret)"
+msgid "Shared secret"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:75
-msgid "Original number(Src id)"
+msgid "Original number"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:76
-msgid "Business type(Service id)"
+msgid "Business type"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:80
@@ -5363,10 +5315,6 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-#: settings/serializers/auth/sms.py:106
-msgid "Request method"
-msgstr ""
-
 #: settings/serializers/auth/sso.py:16
 msgid "Enable SSO auth"
 msgstr ""
@@ -5384,10 +5332,6 @@ msgstr ""
 msgid "Unit: second"
 msgstr ""
 
-#: settings/serializers/auth/wecom.py:15
-msgid "Enable WeCom Auth"
-msgstr ""
-
 #: settings/serializers/basic.py:11
 msgid "Site URL"
 msgstr ""
@@ -5397,6 +5341,8 @@ msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
 msgstr ""
+"Site URL are commonly used in emails sent or as callback addresses for "
+"external systems. eg: http://dev.jumpserver.org:8080"
 
 #: settings/serializers/basic.py:18
 msgid "User guide url"
@@ -5416,7 +5362,7 @@ msgstr ""
 
 #: settings/serializers/basic.py:26
 msgid "Help Docs URL"
-msgstr ""
+msgstr "Document URL"
 
 #: settings/serializers/basic.py:27
 msgid "default: http://docs.jumpserver.org"
@@ -5424,7 +5370,7 @@ msgstr ""
 
 #: settings/serializers/basic.py:30
 msgid "Help Support URL"
-msgstr ""
+msgstr "Support URL"
 
 #: settings/serializers/basic.py:31
 msgid "default: http://www.jumpserver.org/support/"
@@ -5476,7 +5422,7 @@ msgid ""
 "database, OSS will not be affected."
 msgstr ""
 
-#: settings/serializers/feature.py:18
+#: settings/serializers/feature.py:18 settings/serializers/msg.py:68
 msgid "Subject"
 msgstr ""
 
@@ -5484,16 +5430,13 @@ msgstr ""
 msgid "More URL"
 msgstr ""
 
-#: settings/serializers/feature.py:36 settings/serializers/feature.py:39
+#: settings/serializers/feature.py:36 settings/serializers/feature.py:38
+#: settings/serializers/feature.py:39
 msgid "Announcement"
 msgstr ""
 
-#: settings/serializers/feature.py:38
-msgid "Enable announcement"
-msgstr ""
-
 #: settings/serializers/feature.py:46
-msgid "Enable Vault"
+msgid "Vault"
 msgstr ""
 
 #: settings/serializers/feature.py:55
@@ -5502,7 +5445,7 @@ msgstr ""
 
 #: settings/serializers/feature.py:60
 msgid "Historical accounts retained count"
-msgstr ""
+msgstr "Retention"
 
 #: settings/serializers/feature.py:62
 msgid ""
@@ -5512,12 +5455,8 @@ msgid ""
 "account deletion will be performed."
 msgstr ""
 
-#: settings/serializers/feature.py:71
+#: settings/serializers/feature.py:71 settings/serializers/feature.py:75
 msgid "Chat AI"
-msgstr ""
-
-#: settings/serializers/feature.py:75
-msgid "Enable Chat AI"
 msgstr ""
 
 #: settings/serializers/feature.py:78
@@ -5532,12 +5471,8 @@ msgstr ""
 msgid "GPT Model"
 msgstr ""
 
-#: settings/serializers/feature.py:111
-msgid "Enable tickets"
-msgstr ""
-
 #: settings/serializers/feature.py:114
-msgid "Ticket authorize default time"
+msgid "Default period"
 msgstr ""
 
 #: settings/serializers/feature.py:117
@@ -5545,15 +5480,11 @@ msgid "hour"
 msgstr ""
 
 #: settings/serializers/feature.py:118
-msgid "Ticket authorize default time unit"
+msgid "Default unit"
 msgstr ""
 
 #: settings/serializers/feature.py:123
 msgid "Feature"
-msgstr ""
-
-#: settings/serializers/feature.py:126
-msgid "Operation center"
 msgstr ""
 
 #: settings/serializers/feature.py:127
@@ -5561,23 +5492,19 @@ msgid "Allow user run batch command or not using ansible"
 msgstr ""
 
 #: settings/serializers/feature.py:131
-msgid "Operation center command blacklist"
+msgid "Command blacklist"
 msgstr ""
 
 #: settings/serializers/feature.py:132
 msgid "Commands that are not allowed execute."
 msgstr ""
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:137 settings/serializers/feature.py:140
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
 msgid "Virtual app"
-msgstr ""
-
-#: settings/serializers/feature.py:140
-msgid "Enable virtual app"
 msgstr ""
 
 #: settings/serializers/msg.py:25
@@ -5593,7 +5520,7 @@ msgid "Tips: Some provider use token except password"
 msgstr ""
 
 #: settings/serializers/msg.py:39
-msgid "Send user"
+msgid "Sender"
 msgstr ""
 
 #: settings/serializers/msg.py:40
@@ -5633,10 +5560,6 @@ msgid ""
 "This is used by default if no email is returned during SSO authentication"
 msgstr ""
 
-#: settings/serializers/msg.py:68
-msgid "Create user email subject"
-msgstr ""
-
 #: settings/serializers/msg.py:69
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
@@ -5644,15 +5567,11 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/msg.py:73
-msgid "Create user honorific"
+msgid "Honorific"
 msgstr ""
 
 #: settings/serializers/msg.py:74
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
-msgstr ""
-
-#: settings/serializers/msg.py:78
-msgid "Create user email content"
 msgstr ""
 
 #: settings/serializers/msg.py:80
@@ -5690,7 +5609,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:26
-msgid "Number of repeated historical passwords"
+msgid "Recent password count"
 msgstr ""
 
 #: settings/serializers/security.py:28
@@ -5700,27 +5619,27 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:34
-msgid "Password minimum length"
+msgid "Minimum length (User)"
 msgstr ""
 
 #: settings/serializers/security.py:38
-msgid "Admin user password minimum length"
+msgid "Minimum length (Admin)"
 msgstr ""
 
 #: settings/serializers/security.py:41
-msgid "Must contain capital"
+msgid "Uppercase"
 msgstr ""
 
 #: settings/serializers/security.py:44
-msgid "Must contain lowercase"
+msgid "Lowercase"
 msgstr ""
 
 #: settings/serializers/security.py:47
-msgid "Must contain numeric"
+msgid "Digits"
 msgstr ""
 
 #: settings/serializers/security.py:50
-msgid "Must contain special"
+msgid "Special characters"
 msgstr ""
 
 #: settings/serializers/security.py:55
@@ -5730,27 +5649,19 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:63
-msgid "Limit the number of user login failures"
-msgstr ""
-
-#: settings/serializers/security.py:67
-msgid "Block user login interval (minute)"
-msgstr ""
-
-#: settings/serializers/security.py:73
-msgid "Limit the number of IP login failures"
+msgid "Login failures count"
 msgstr ""
 
 #: settings/serializers/security.py:77
-msgid "Block IP login interval (minute)"
+msgid "Login failure period (minute)"
 msgstr ""
 
 #: settings/serializers/security.py:81
-msgid "Login IP White List"
+msgid "Login IP whitelist"
 msgstr ""
 
 #: settings/serializers/security.py:86
-msgid "Login IP Black List"
+msgid "Login IP blacklist"
 msgstr ""
 
 #: settings/serializers/security.py:91
@@ -5804,7 +5715,7 @@ msgid "Global MFA auth"
 msgstr ""
 
 #: settings/serializers/security.py:124
-msgid "Third-party login users perform MFA authentication"
+msgid "Third-party login MFA"
 msgstr ""
 
 #: settings/serializers/security.py:125
@@ -5846,7 +5757,7 @@ msgid "Reset password and send SMS code expiration time"
 msgstr ""
 
 #: settings/serializers/security.py:153
-msgid "Enable Login dynamic code"
+msgid "Login dynamic code"
 msgstr ""
 
 #: settings/serializers/security.py:154
@@ -5856,7 +5767,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:158
-msgid "Enable Login captcha"
+msgid "Login captcha"
 msgstr ""
 
 #: settings/serializers/security.py:159
@@ -5864,7 +5775,7 @@ msgid "Enable captcha to prevent robot authentication"
 msgstr ""
 
 #: settings/serializers/security.py:162
-msgid "Remote Login Protection"
+msgid "Suspicious Login Verification"
 msgstr ""
 
 #: settings/serializers/security.py:164
@@ -5875,7 +5786,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:170
-msgid "Unused user timeout (day)"
+msgid "Auto Disable Threshold (day)"
 msgstr ""
 
 #: settings/serializers/security.py:171
@@ -5885,7 +5796,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/security.py:191
-msgid "Enable watermark"
+msgid "Watermark"
 msgstr ""
 
 #: settings/serializers/security.py:192
@@ -5893,7 +5804,7 @@ msgid "Enabled, the web session and replay contains watermark information"
 msgstr ""
 
 #: settings/serializers/security.py:196
-msgid "Connection max idle time (minute)"
+msgid "Max idle time (minute)"
 msgstr ""
 
 #: settings/serializers/security.py:197
@@ -5901,7 +5812,7 @@ msgid "If idle time more than it, disconnect connection."
 msgstr ""
 
 #: settings/serializers/security.py:201
-msgid "Session max connection time (hour)"
+msgid "Max online time (hour)"
 msgstr ""
 
 #: settings/serializers/security.py:202
@@ -5947,7 +5858,7 @@ msgid "Auto"
 msgstr ""
 
 #: settings/serializers/terminal.py:22
-msgid "Enable terminal register"
+msgid "Terminal registration"
 msgstr ""
 
 #: settings/serializers/terminal.py:24
@@ -5966,16 +5877,16 @@ msgstr ""
 
 #: settings/serializers/terminal.py:30
 msgid ""
-"Tips: If use other auth method, like AD/LDAP, you should disable this to "
+"Information: If use other auth method, like AD/LDAP, you should disable this to "
 "avoid being able to log in after deleting"
 msgstr ""
 
 #: settings/serializers/terminal.py:34
-msgid "List sort by"
+msgid "Asset list sorting"
 msgstr ""
 
 #: settings/serializers/terminal.py:37
-msgid "List page size"
+msgid "Asset list page size"
 msgstr ""
 
 #: settings/serializers/terminal.py:39
@@ -5984,10 +5895,6 @@ msgstr ""
 
 #: settings/serializers/terminal.py:40
 msgid "Enable Razor"
-msgstr ""
-
-#: settings/serializers/terminal.py:41
-msgid "Enable SSH Client"
 msgstr ""
 
 #: settings/tasks/ldap.py:28
@@ -6806,7 +6713,7 @@ msgstr ""
 msgid "Command warning"
 msgstr ""
 
-#: terminal/notifications.py:130
+#: terminal/notifications.py:130 terminal/notifications.py:175
 msgid "Command reject"
 msgstr ""
 
@@ -6814,17 +6721,9 @@ msgstr ""
 msgid "Level"
 msgstr ""
 
-#: terminal/notifications.py:175
-msgid "Batch danger command alert"
-msgstr ""
-
 #: terminal/notifications.py:224
 msgid "Command and replay storage"
-msgstr ""
-
-#: terminal/notifications.py:225
-msgid "Connectivity alarm"
-msgstr ""
+msgstr "Storage"
 
 #: terminal/notifications.py:240 terminal/tasks.py:146
 msgid "Test failure: Account invalid"
@@ -6954,10 +6853,6 @@ msgstr ""
 msgid "Invalid session id"
 msgstr ""
 
-#: terminal/serializers/command.py:72
-msgid "Account "
-msgstr ""
-
 #: terminal/serializers/command.py:74
 msgid "Timestamp"
 msgstr ""
@@ -7036,7 +6931,7 @@ msgstr ""
 
 #: terminal/serializers/storage.py:33
 #: xpack/plugins/cloud/serializers/account_attrs.py:17
-msgid "Access key id"
+msgid "Access key ID"
 msgstr ""
 
 #: terminal/serializers/storage.py:37
@@ -7110,10 +7005,8 @@ msgid "Online sessions"
 msgstr ""
 
 #: terminal/serializers/terminal.py:43
-#, fuzzy
-#| msgid "Alive"
 msgid "Is alive"
-msgstr "Alive"
+msgstr "Is alive"
 
 #: terminal/serializers/terminal.py:49
 msgid "Stat"
@@ -7413,10 +7306,6 @@ msgstr ""
 msgid "Apply Login Asset Ticket"
 msgstr ""
 
-#: tickets/models/ticket/login_confirm.py:12
-msgid "Login datetime"
-msgstr ""
-
 #: tickets/models/ticket/login_confirm.py:15
 msgid "Apply Login Ticket"
 msgstr ""
@@ -7689,10 +7578,8 @@ msgid "Force enable"
 msgstr ""
 
 #: users/models/user.py:812 users/serializers/user.py:175
-#, fuzzy
-#| msgid "Service account"
 msgid "Is service account"
-msgstr "Service account"
+msgstr "Is service account"
 
 #: users/models/user.py:814
 msgid "Avatar"
@@ -7902,7 +7789,7 @@ msgid "Is OTP bound"
 msgstr "OTP bound"
 
 #: users/serializers/user.py:101
-msgid "Can public key authentication"
+msgid "Can public key auth"
 msgstr "Public key auth"
 
 #: users/serializers/user.py:166
@@ -8862,7 +8749,6 @@ msgid "Logo of logout page"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
 msgid "Theme"
 msgstr ""
 
@@ -8876,14 +8762,6 @@ msgstr ""
 
 #: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
-msgstr ""
-
-#: xpack/plugins/interface/serializers/interface.py:37
-msgid "Wide logo on top"
-msgstr ""
-
-#: xpack/plugins/interface/serializers/interface.py:38
-msgid "Small logo without text"
 msgstr ""
 
 #: xpack/plugins/license/api.py:52

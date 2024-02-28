@@ -50,7 +50,7 @@ class PrepareRequestMixin:
             if idp_metadata_xml.strip():
                 xml_idp_settings = IdPMetadataParse.parse(idp_metadata_xml)
         except Exception as err:
-            logger.warning('Failed to get IDP metadata XML settings, error: %s', str(err))
+            logger.warning('Failed to get IDP Metadata XML settings, error: %s', str(err))
 
         url_idp_settings = None
         try:
@@ -59,7 +59,7 @@ class PrepareRequestMixin:
                     idp_metadata_url, timeout=20
                 )
         except Exception as err:
-            logger.warning('Failed to get IDP metadata URL settings, error: %s', str(err))
+            logger.warning('Failed to get IDP Metadata URL settings, error: %s', str(err))
 
         idp_settings = url_idp_settings or xml_idp_settings
 

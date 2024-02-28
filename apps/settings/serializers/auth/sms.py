@@ -14,7 +14,7 @@ __all__ = [
 
 
 class SMSSettingSerializer(serializers.Serializer):
-    SMS_ENABLED = serializers.BooleanField(default=False, label=_('Enable SMS'))
+    SMS_ENABLED = serializers.BooleanField(default=False, label=_('SMS'))
     SMS_BACKEND = serializers.ChoiceField(
         choices=BACKENDS.choices, default=BACKENDS.ALIBABA, label=_('SMS provider / Protocol')
     )
@@ -70,10 +70,10 @@ class HuaweiSMSSettingSerializer(BaseSMSSettingSerializer):
 class CMPP2SMSSettingSerializer(BaseSMSSettingSerializer):
     CMPP2_HOST = serializers.CharField(max_length=256, required=True, label=_('Host'))
     CMPP2_PORT = serializers.IntegerField(default=7890, label=_('Port'))
-    CMPP2_SP_ID = serializers.CharField(max_length=128, required=True, label=_('Enterprise code(SP id)'))
-    CMPP2_SP_SECRET = EncryptedField(max_length=256, required=False, label=_('Shared secret(Shared secret)'))
-    CMPP2_SRC_ID = serializers.CharField(max_length=256, required=False, label=_('Original number(Src id)'))
-    CMPP2_SERVICE_ID = serializers.CharField(max_length=256, required=True, label=_('Business type(Service id)'))
+    CMPP2_SP_ID = serializers.CharField(max_length=128, required=True, label=_('Enterprise code'))
+    CMPP2_SP_SECRET = EncryptedField(max_length=256, required=False, label=_('Shared secret'))
+    CMPP2_SRC_ID = serializers.CharField(max_length=256, required=False, label=_('Original number'))
+    CMPP2_SERVICE_ID = serializers.CharField(max_length=256, required=True, label=_('Business type'))
     CMPP2_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     CMPP2_VERIFY_TEMPLATE_CODE = serializers.CharField(
         max_length=69, required=True, label=_('Template'),

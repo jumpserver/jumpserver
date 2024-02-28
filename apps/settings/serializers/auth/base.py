@@ -26,5 +26,5 @@ class AuthSettingSerializer(serializers.Serializer):
         label=_("Forgot Password URL")
     )
     LOGIN_REDIRECT_MSG_ENABLED = serializers.BooleanField(
-        required=False, label=_("Enable login redirect msg")
+        required=False, label=_("Login redirection prompt")
     )
