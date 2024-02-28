@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 15:45+0800\n"
+"POT-Creation-Date: 2024-02-28 17:25+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -613,7 +613,8 @@ msgstr "密码规则"
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:33 settings/models.py:181 settings/serializers/msg.py:89
-#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
+#: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:33
+#: terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84
@@ -891,10 +892,12 @@ msgid "Password length"
 msgstr "密码长度"
 
 #: accounts/serializers/account/template.py:14
+#: settings/serializers/security.py:44
 msgid "Lowercase"
 msgstr "小写字母"
 
 #: accounts/serializers/account/template.py:15
+#: settings/serializers/security.py:41
 msgid "Uppercase"
 msgstr "大写字母"
 
@@ -1258,7 +1261,6 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10
 msgid "IP"
 msgstr "IP"
 
@@ -1723,6 +1725,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr "地址"
 
@@ -2601,8 +2604,8 @@ msgstr "认证令牌"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:77 notifications/backends/__init__.py:11
-#: settings/serializers/auth/wecom.py:10 users/models/user.py:749
-#: users/models/user.py:855
+#: settings/serializers/auth/wecom.py:10 settings/serializers/auth/wecom.py:15
+#: users/models/user.py:749 users/models/user.py:855
 msgid "WeCom"
 msgstr "企业微信"
 
@@ -2616,8 +2619,8 @@ msgstr "飞书"
 
 #: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:15
-#: settings/serializers/auth/slack.py:10 users/models/user.py:752
-#: users/models/user.py:858
+#: settings/serializers/auth/slack.py:10 settings/serializers/auth/slack.py:12
+#: users/models/user.py:752 users/models/user.py:858
 msgid "Slack"
 msgstr ""
 
@@ -2635,6 +2638,7 @@ msgstr "临时密码"
 
 #: audits/signal_handlers/login_log.py:42 authentication/views/login.py:101
 #: settings/serializers/auth/passkey.py:8
+#: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Passkey"
 
@@ -3165,6 +3169,7 @@ msgid "Options"
 msgstr "选项"
 
 #: authentication/serializers/connect_token_secret.py:127
+#: ops/notifications.py:17
 msgid "Component"
 msgstr "组件"
 
@@ -4312,12 +4317,6 @@ msgstr "创建方式"
 msgid "VCS URL"
 msgstr "VCS URL"
 
-#: ops/notifications.py:17
-#, fuzzy
-#| msgid "Component"
-msgid "Components"
-msgstr "组件"
-
 #: ops/notifications.py:18
 msgid "Server performance"
 msgstr "监控告警"
@@ -5040,9 +5039,14 @@ msgstr "忘记密码 URL"
 msgid "Login redirection prompt"
 msgstr "启用登录跳转提示"
 
-#: settings/serializers/auth/cas.py:10
+#: settings/serializers/auth/cas.py:10 settings/serializers/auth/cas.py:12
 msgid "CAS"
 msgstr "CAS"
+
+#: settings/serializers/auth/cas.py:13 settings/serializers/auth/ldap.py:42
+#: settings/serializers/auth/oidc.py:54
+msgid "Server"
+msgstr "LDAP 地址"
 
 #: settings/serializers/auth/cas.py:16
 msgid "Proxy Server"
@@ -5061,13 +5065,19 @@ msgstr "用户名属性"
 msgid "Enable attributes map"
 msgstr "启用属性映射"
 
-#: settings/serializers/auth/cas.py:28 settings/serializers/auth/saml2.py:32
+#: settings/serializers/auth/cas.py:28 settings/serializers/auth/ldap.py:58
+#: settings/serializers/auth/oauth2.py:56 settings/serializers/auth/oidc.py:37
+#: settings/serializers/auth/saml2.py:32
 msgid "User attribute"
 msgstr "映射属性"
 
-#: settings/serializers/auth/cas.py:29
+#: settings/serializers/auth/cas.py:30
 msgid "Create user"
 msgstr "创建用户(如果不存在)"
+
+#: settings/serializers/auth/cas.py:31
+msgid "Automatically create a new user if not found."
+msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:15
 msgid "Dingtalk"
@@ -5077,13 +5087,9 @@ msgstr "启用钉钉认证"
 msgid "Lark"
 msgstr "启用飞书认证"
 
-#: settings/serializers/auth/ldap.py:39
+#: settings/serializers/auth/ldap.py:39 settings/serializers/auth/ldap.py:84
 msgid "LDAP"
 msgstr "LDAP"
-
-#: settings/serializers/auth/ldap.py:42
-msgid "Server"
-msgstr "LDAP 地址"
 
 #: settings/serializers/auth/ldap.py:43
 msgid "eg: ldap://localhost:389"
@@ -5127,6 +5133,7 @@ msgid "Search paged size (piece)"
 msgstr "搜索分页数量 (条)"
 
 #: settings/serializers/auth/oauth2.py:18
+#: settings/serializers/auth/oauth2.py:21
 msgid "OAuth2"
 msgstr "OAuth2"
 
@@ -5156,6 +5163,7 @@ msgid "Token endpoint"
 msgstr "token 端点地址"
 
 #: settings/serializers/auth/oauth2.py:45 settings/serializers/auth/oidc.py:30
+#: settings/serializers/auth/sms.py:106
 msgid "Request method"
 msgstr "客户端认证方式"
 
@@ -5171,6 +5179,10 @@ msgstr "注销会话端点地址"
 #: settings/serializers/auth/saml2.py:34
 msgid "Always update user"
 msgstr "总是更新用户信息"
+
+#: settings/serializers/auth/oidc.py:12 settings/serializers/auth/oidc.py:63
+msgid "OIDC"
+msgstr "启用 OIDC 认证"
 
 #: settings/serializers/auth/oidc.py:16
 msgid "Base site URL"
@@ -5207,10 +5219,6 @@ msgstr "使用 Keycloak"
 #: settings/serializers/auth/oidc.py:57
 msgid "Realm name"
 msgstr "域"
-
-#: settings/serializers/auth/oidc.py:63
-msgid "OIDC"
-msgstr "启用 OIDC 认证"
 
 #: settings/serializers/auth/oidc.py:65
 msgid "Provider endpoint"
@@ -5269,6 +5277,7 @@ msgid "FIDO Server name"
 msgstr "Passkey 服务名称"
 
 #: settings/serializers/auth/radius.py:13
+#: settings/serializers/auth/radius.py:15
 msgid "Radius"
 msgstr "Radius"
 
@@ -5276,7 +5285,7 @@ msgstr "Radius"
 msgid "OTP in Radius"
 msgstr "使用 Radius OTP"
 
-#: settings/serializers/auth/saml2.py:10
+#: settings/serializers/auth/saml2.py:10 settings/serializers/auth/saml2.py:13
 msgid "SAML2"
 msgstr "SAML2"
 
@@ -5285,7 +5294,7 @@ msgid "IDP Metadata URL"
 msgstr "IDP Metadata 地址"
 
 #: settings/serializers/auth/saml2.py:19
-msgid "IDP metadata XML"
+msgid "IDP Metadata XML"
 msgstr "IDP Metadata XML"
 
 #: settings/serializers/auth/saml2.py:22
@@ -5689,14 +5698,6 @@ msgstr "密码最小长度"
 msgid "Minimum length (Admin)"
 msgstr "管理员密码最小长度"
 
-#: settings/serializers/security.py:41
-msgid "Uppercase"
-msgstr "必须包含大写字符"
-
-#: settings/serializers/security.py:44
-msgid "Lowercase"
-msgstr "必须包含小写字符"
-
 #: settings/serializers/security.py:47
 msgid "Digits"
 msgstr "必须包含数字"
@@ -5711,11 +5712,11 @@ msgid ""
 "allowed during this time interval."
 msgstr "当用户登录失败次数达到限制后，那么在此间隔内禁止登录"
 
-#: settings/serializers/security.py:63
+#: settings/serializers/security.py:63 settings/serializers/security.py:73
 msgid "Login failures count"
 msgstr "限制用户登录失败次数"
 
-#: settings/serializers/security.py:67
+#: settings/serializers/security.py:67 settings/serializers/security.py:77
 msgid "Login failure period (minute)"
 msgstr "禁止用户登录间隔 (分)"
 
@@ -5920,10 +5921,6 @@ msgstr "多个用户，使用 , 分割"
 msgid "[%s] %s"
 msgstr "[%s] %s"
 
-#: settings/serializers/terminal.py:9 terminal/models/virtualapp/provider.py:11
-msgid "Hostname"
-msgstr "主机名"
-
 #: settings/serializers/terminal.py:15
 msgid "Auto"
 msgstr "自动"
@@ -5944,12 +5941,12 @@ msgstr "密码认证"
 
 #: settings/serializers/terminal.py:29
 msgid "Public key auth"
-msgstr "密钥认证"
+msgstr "公钥授权"
 
 #: settings/serializers/terminal.py:30
 msgid ""
-"Information: If use other auth method, like AD/LDAP, you should disable this to "
-"avoid being able to log in after deleting"
+"Information: If use other auth method, like AD/LDAP, you should disable this "
+"to avoid being able to log in after deleting"
 msgstr ""
 "提示：如果你使用其它认证方式，如 AD/LDAP，你应该禁用此项，以避免第三方系统删"
 "除后，还可以登录"
@@ -5961,18 +5958,6 @@ msgstr "资产列表排序"
 #: settings/serializers/terminal.py:37
 msgid "Asset list page size"
 msgstr "资产列表每页数量"
-
-#: settings/serializers/terminal.py:39
-msgid "Enable database proxy"
-msgstr "启用数据库组件"
-
-#: settings/serializers/terminal.py:40
-msgid "Enable Razor"
-msgstr "启用 Razor 服务"
-
-#: settings/serializers/terminal.py:41
-msgid "SSH Client"
-msgstr "启用 SSH Client"
 
 #: settings/tasks/ldap.py:28
 msgid "Periodic import ldap user"
@@ -6380,6 +6365,10 @@ msgstr "输出"
 msgid "Risk level"
 msgstr "风险等级"
 
+#: terminal/connect_methods.py:29
+msgid "SSH Client"
+msgstr "启用 SSH Client"
+
 #: terminal/connect_methods.py:30
 msgid "SSH Guide"
 msgstr "SSH 向导"
@@ -6785,6 +6774,10 @@ msgstr "验证码不正确"
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
+#: terminal/models/virtualapp/provider.py:11
+msgid "Hostname"
+msgstr "主机名"
+
 #: terminal/models/virtualapp/virtualapp.py:32
 msgid "Providers"
 msgstr "提供商"
@@ -7040,7 +7033,6 @@ msgid "Bucket"
 msgstr "桶名称"
 
 #: terminal/serializers/storage.py:33
-#: xpack/plugins/cloud/serializers/account_attrs.py:17
 msgid "Access key ID"
 msgstr "Access key ID(AK)"
 
@@ -7912,8 +7904,8 @@ msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
 #: users/serializers/user.py:101
-msgid "Can public key auth"
-msgstr "可以使用公钥认证"
+msgid "Can public key authentication"
+msgstr "可以公钥认证吗"
 
 #: users/serializers/user.py:166
 msgid "Groups"
@@ -8738,6 +8730,10 @@ msgstr "有效性显示"
 msgid "Provider display"
 msgstr "服务商显示"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:17
+msgid "Access key id"
+msgstr "Access key id"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:35
 msgid "Client ID"
 msgstr "客户端 ID"
@@ -8922,6 +8918,12 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Enable database proxy"
+#~ msgstr "启用数据库组件"
+
+#~ msgid "Enable Razor"
+#~ msgstr "启用 Razor 服务"
 
 #~ msgid "Email Subject"
 #~ msgstr "邮件主题"
