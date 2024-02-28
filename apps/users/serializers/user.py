@@ -6,7 +6,7 @@ from functools import partial
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers import CommonBulkSerializerMixin, ResourceLabelsMixin
+from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
 from common.serializers.fields import (
     EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField
 )
@@ -81,7 +81,7 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
-class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLabelsMixin, serializers.ModelSerializer):
+class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelSerializer):
     password_strategy = LabeledChoiceField(
         choices=PasswordStrategy.choices,
         default=PasswordStrategy.email,
