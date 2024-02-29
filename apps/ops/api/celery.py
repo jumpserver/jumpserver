@@ -2,6 +2,7 @@
 #
 import os
 import re
+from collections import defaultdict
 
 from celery.result import AsyncResult
 from django.shortcuts import get_object_or_404
@@ -166,16 +167,58 @@ class CeleryTaskViewSet(
             i.next_exec_time = now + next_run_at
         return queryset
 
+    def generate_summary_state(self, execution_qs):
+        model = self.get_queryset().model
+        executions = execution_qs.order_by('-date_published').values('name', 'state')
+        summary_state_dict = defaultdict(
+            lambda: {
+                'states': [], 'state': 'green',
+                'summary': {'total': 0, 'success': 0}
+            }
+        )
+        for execution in executions:
+            name = execution['name']
+            state = execution['state']
+
+            summary = summary_state_dict[name]['summary']
+
+            summary['total'] += 1
+            summary['success'] += 1 if state == 'SUCCESS' else 0
+
+            states = summary_state_dict[name].get('states')
+            if states is not None and len(states) >= 5:
+                color = model.compute_state_color(states)
+                summary_state_dict[name]['state'] = color
+                summary_state_dict[name].pop('states', None)
+            elif isinstance(states, list):
+                states.append(state)
+
+        return summary_state_dict
+
+    def loading_summary_state(self, queryset):
+        if isinstance(queryset, list):
+            names = [i.name for i in queryset]
+            execution_qs = CeleryTaskExecution.objects.filter(name__in=names)
+        else:
+            execution_qs = CeleryTaskExecution.objects.all()
+        summary_state_dict = self.generate_summary_state(execution_qs)
+        for i in queryset:
+            i.summary = summary_state_dict.get(i.name, {}).get('summary', {})
+            i.state = summary_state_dict.get(i.name, {}).get('state', 'green')
+        return queryset
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
         page = self.paginate_queryset(queryset)
         if page is not None:
             page = self.generate_execute_time(page)
+            page = self.loading_summary_state(page)
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         queryset = self.generate_execute_time(queryset)
+        queryset = self.loading_summary_state(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

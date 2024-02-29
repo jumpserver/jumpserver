@@ -13,6 +13,7 @@ from django.views.generic import FormView, RedirectView
 
 from authentication.errors import IntervalTooShort
 from authentication.utils import check_user_property_is_correct
+from common.const.choices import COUNTRY_CALLING_CODES
 from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from users.notifications import ResetPasswordSuccessMsg
@@ -108,7 +109,7 @@ class UserForgotPasswordView(FormView):
         for k, v in cleaned_data.items():
             if v:
                 context[k] = v
-
+        context['countries'] = COUNTRY_CALLING_CODES
         context['form_type'] = 'email'
         context['XPACK_ENABLED'] = settings.XPACK_ENABLED
         validate_backends = self.get_validate_backends_context(has_phone)

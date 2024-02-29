@@ -1,9 +1,11 @@
 import json
 import os
 
+from celery.result import AsyncResult
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
@@ -14,9 +16,10 @@ from rest_framework.views import APIView
 from assets.models import Asset
 from common.const.http import POST
 from common.permissions import IsValidUser
+from ops.celery import app
 from ops.const import Types
 from ops.models import Job, JobExecution
-from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer
+from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
@@ -186,6 +189,33 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
         return queryset
+
+    @action(methods=[POST], detail=False, serializer_class=JobTaskStopSerializer, permission_classes=[IsValidUser, ],
+            url_path='stop')
+    def stop(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': serializer.errors}, status=400)
+        task_id = serializer.validated_data['task_id']
+        try:
+            instance = get_object_or_404(JobExecution, task_id=task_id, creator=request.user)
+        except Http404:
+            return Response(
+                {'error': _('The task is being created and cannot be interrupted. Please try again later.')},
+                status=400
+            )
+
+        task = AsyncResult(task_id, app=app)
+        inspect = app.control.inspect()
+        for worker in inspect.registered().keys():
+            if task_id not in [at['id'] for at in inspect.active().get(worker, [])]:
+                # 在队列中未执行使用revoke执行
+                task.revoke(terminate=True)
+                instance.set_error('Job stop by "revoke task {}"'.format(task_id))
+                return Response({'task_id': task_id}, status=200)
+
+        instance.stop()
+        return Response({'task_id': task_id}, status=200)
 
 
 class JobAssetDetail(APIView):

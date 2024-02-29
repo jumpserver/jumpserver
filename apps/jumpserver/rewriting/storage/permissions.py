@@ -3,6 +3,7 @@
 path_perms_map = {
     'xpack': '*',
     'settings': '*',
+    'img': '*',
     'replay': 'default',
     'applets': 'terminal.view_applet',
     'virtual_apps': 'terminal.view_virtualapp',

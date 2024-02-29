@@ -5,6 +5,7 @@ method: change_secret
 category: host
 type:
   - windows
+priority: 49
 params:
   - name: groups
     type: str

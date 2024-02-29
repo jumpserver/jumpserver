@@ -142,23 +142,7 @@ class SessionCookieMiddleware(MiddlewareMixin):
             return response
         response.set_cookie(key, value)
 
-    @staticmethod
-    def set_cookie_session_expire(request, response):
-        if not request.session.get('auth_session_expiration_required'):
-            return
-        value = 'age'
-        if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE or \
-                not request.session.get('auto_login', False):
-            value = 'close'
-
-        age = request.session.get_expiry_age()
-        expire_timestamp = request.session.get_expiry_date().timestamp()
-        response.set_cookie('jms_session_expire_timestamp', expire_timestamp)
-        response.set_cookie('jms_session_expire', value, max_age=age)
-        request.session.pop('auth_session_expiration_required', None)
-
     def process_response(self, request, response: HttpResponse):
         self.set_cookie_session_prefix(request, response)
         self.set_cookie_public_key(request, response)
-        self.set_cookie_session_expire(request, response)
         return response

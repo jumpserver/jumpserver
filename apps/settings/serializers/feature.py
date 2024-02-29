@@ -109,6 +109,7 @@ class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
     TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
+    TICKETS_DIRECT_APPROVE = serializers.BooleanField(required=False, default=False, label=_("No login approval"))
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
         label=_("Ticket authorize default time")

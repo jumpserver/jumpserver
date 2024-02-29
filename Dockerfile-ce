@@ -19,11 +19,11 @@ ARG BUILD_DEPENDENCIES="              \
 
 ARG DEPENDENCIES="                    \
         freetds-dev                   \
-        libpq-dev                     \
         libffi-dev                    \
         libjpeg-dev                   \
         libkrb5-dev                   \
         libldap2-dev                  \
+        libpq-dev                     \
         libsasl2-dev                  \
         libssl-dev                    \
         libxml2-dev                   \
@@ -75,6 +75,7 @@ ENV LANG=zh_CN.UTF-8 \
 
 ARG DEPENDENCIES="                    \
         libjpeg-dev                   \
+        libpq-dev                     \
         libx11-dev                    \
         freerdp2-dev                  \
         libxmlsec1-openssl"

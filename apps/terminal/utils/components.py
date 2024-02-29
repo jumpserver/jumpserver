@@ -3,7 +3,7 @@
 from itertools import groupby
 
 from common.utils import get_logger
-from terminal.const import ComponentLoad
+from terminal.const import ComponentLoad, TerminalType
 
 logger = get_logger(__name__)
 
@@ -38,9 +38,13 @@ class ComputeLoadUtil:
         return system_status
 
     @classmethod
-    def compute_load(cls, stat):
+    def compute_load(cls, stat, terminal_type=None):
         if not stat:
-            return ComponentLoad.offline
+            # TODO The core component and celery component will return true for the time being.
+            if terminal_type in [TerminalType.core, TerminalType.celery]:
+                return ComponentLoad.normal
+            else:
+                return ComponentLoad.offline
         system_status_values = cls._compute_system_stat_status(stat).values()
         if ComponentLoad.critical in system_status_values:
             return ComponentLoad.critical

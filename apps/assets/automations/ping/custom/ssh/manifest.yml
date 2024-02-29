@@ -7,6 +7,7 @@ type:
   - all
 method: ping
 protocol: ssh
+priority: 50
 
 i18n:
   Ping by paramiko:

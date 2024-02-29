@@ -7,6 +7,7 @@ type:
   - windows
 method: ping
 protocol: rdp
+priority: 1
 
 i18n:
   Ping by pyfreerdp:

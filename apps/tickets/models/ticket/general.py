@@ -57,7 +57,7 @@ class TicketStep(JMSBaseModel):
             assignees.update(state=state)
         self.status = StepStatus.closed
         self.state = state
-        self.save(update_fields=['state', 'status'])
+        self.save(update_fields=['state', 'status', 'date_updated'])
 
     def set_active(self):
         self.status = StepStatus.active
