@@ -230,9 +230,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         for user in recipients:
             attachments = []
             if user.secret_key:
-                password = user.secret_key.encode('utf8')
                 attachment = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.zip')
-                encrypt_and_compress_zip_file(attachment, password, [filename])
+                encrypt_and_compress_zip_file(attachment, user.secret_key, [filename])
                 attachments = [attachment]
             ChangeSecretExecutionTaskMsg(name, user, summary).publish(attachments)
         os.remove(filename)
