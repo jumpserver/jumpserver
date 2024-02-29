@@ -168,9 +168,8 @@ class AccountBackupHandler:
             if not user.secret_key:
                 attachment_list = []
             else:
-                password = user.secret_key.encode('utf8')
                 attachment = os.path.join(PATH, f'{plan_name}-{local_now_filename()}-{time.time()}.zip')
-                encrypt_and_compress_zip_file(attachment, password, files)
+                encrypt_and_compress_zip_file(attachment, user.secret_key, files)
                 attachment_list = [attachment, ]
             AccountBackupExecutionTaskMsg(plan_name, user).publish(attachment_list)
             print('邮件已发送至{}({})'.format(user, user.email))
@@ -191,7 +190,6 @@ class AccountBackupHandler:
             attachment = os.path.join(PATH, f'{plan_name}-{local_now_filename()}-{time.time()}.zip')
             if password:
                 print('\033[32m>>> 使用加密密码对文件进行加密中\033[0m')
-                password = password.encode('utf8')
                 encrypt_and_compress_zip_file(attachment, password, files)
             else:
                 zip_files(attachment, files)
