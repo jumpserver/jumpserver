@@ -348,7 +348,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset")
-        ordering = ["name", ]
+        ordering = []
         permissions = [
             ('refresh_assethardwareinfo', _('Can refresh asset hardware info')),
             ('test_assetconnectivity', _('Can test asset connectivity')),

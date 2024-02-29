@@ -6,6 +6,7 @@ import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.cache import cache
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
@@ -13,9 +14,12 @@ from settings.serializers import (
     LDAPTestConfigSerializer,
     LDAPTestLoginSerializer
 )
+from orgs.models import Organization
+from orgs.utils import current_org
 from settings.tasks import sync_ldap_user
 from settings.utils import (
-    LDAPSyncUtil, LDAPTestUtil
+    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
 from .tools import (
     verbose_ping, verbose_telnet, verbose_nmap,
@@ -27,9 +31,11 @@ logger = get_logger(__name__)
 CACHE_KEY_LDAP_TEST_CONFIG_MSG = 'CACHE_KEY_LDAP_TEST_CONFIG_MSG'
 CACHE_KEY_LDAP_TEST_LOGIN_MSG = 'CACHE_KEY_LDAP_TEST_LOGIN_MSG'
 CACHE_KEY_LDAP_SYNC_USER_MSG = 'CACHE_KEY_LDAP_SYNC_USER_MSG'
+CACHE_KEY_LDAP_IMPORT_USER_MSG = 'CACHE_KEY_LDAP_IMPORT_USER_MSG'
 CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS'
 CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS'
 CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS = 'CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS'
+CACHE_KEY_LDAP_IMPORT_USER_TASK_STATUS = 'CACHE_KEY_LDAP_IMPORT_USER_TASK_STATUS'
 TASK_STATUS_IS_RUNNING = 'RUNNING'
 TASK_STATUS_IS_OVER = 'OVER'
 
@@ -117,6 +123,8 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
                 ok, msg = cache.get(CACHE_KEY_LDAP_TEST_CONFIG_MSG)
             elif msg_type == 'sync_user':
                 ok, msg = cache.get(CACHE_KEY_LDAP_SYNC_USER_MSG)
+            elif msg_type == 'import_user':
+                ok, msg = cache.get(CACHE_KEY_LDAP_IMPORT_USER_MSG)
             else:
                 ok, msg = cache.get(CACHE_KEY_LDAP_TEST_LOGIN_MSG)
             await self.send_msg(ok, msg)
@@ -165,8 +173,8 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         cache.set(task_key, TASK_STATUS_IS_OVER, ttl)
 
     @staticmethod
-    def set_task_msg(task_key, ok, msg):
-        cache.set(task_key, (ok, msg), 120)
+    def set_task_msg(task_key, ok, msg, ttl=120):
+        cache.set(task_key, (ok, msg), ttl)
 
     def run_testing_config(self, data):
         while True:
@@ -207,3 +215,53 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
                 ok = False if msg else True
                 self.set_task_status_over(CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS)
             self.set_task_msg(CACHE_KEY_LDAP_SYNC_USER_MSG, ok, msg)
+
+    def run_import_user(self, data):
+        while True:
+            if self.task_is_over(CACHE_KEY_LDAP_IMPORT_USER_TASK_STATUS):
+                break
+            else:
+                ok, msg = self.import_user(data)
+                self.set_task_status_over(CACHE_KEY_LDAP_IMPORT_USER_TASK_STATUS, 3)
+            self.set_task_msg(CACHE_KEY_LDAP_IMPORT_USER_MSG, ok, msg, 3)
+
+    def import_user(self, data):
+        ok = False
+        org_ids = data.get('org_ids')
+        username_list = data.get('username_list', [])
+        cache_police = data.get('cache_police', True)
+        try:
+            users = self.get_ldap_users(username_list, cache_police)
+            if users is None:
+                msg = _('Get ldap users is None')
+
+            orgs = self.get_orgs(org_ids)
+            new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
+            if error_msg:
+                msg = error_msg
+
+            count = users if users is None else len(users)
+            orgs_name = ', '.join([str(org) for org in orgs])
+            ok = True
+            msg = _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
+        except Exception as e:
+            msg = str(e)
+        return ok, msg
+
+    @staticmethod
+    def get_orgs(org_ids):
+        if org_ids:
+            orgs = list(Organization.objects.filter(id__in=org_ids))
+        else:
+            orgs = [current_org]
+        return orgs
+
+    @staticmethod
+    def get_ldap_users(username_list, cache_police):
+        if '*' in username_list:
+            users = LDAPServerUtil().search()
+        elif cache_police in LDAP_USE_CACHE_FLAGS:
+            users = LDAPCacheUtil().search(search_users=username_list)
+        else:
+            users = LDAPServerUtil().search(search_users=username_list)
+        return users

@@ -173,6 +173,9 @@ class Organization(OrgRoleMixin, JMSBaseModel):
     def is_default(self):
         return str(self.id) == self.DEFAULT_ID
 
+    def is_system(self):
+        return str(self.id) == self.SYSTEM_ID
+
     @property
     def internal(self):
         return str(self.id) in self.INTERNAL_IDS

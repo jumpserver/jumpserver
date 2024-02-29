@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
 from authentication.permissions import IsValidUserOrConnectionToken
+from common.const.choices import COUNTRY_CALLING_CODES
 from common.utils import get_logger, lazyproperty
 from common.utils.timezone import local_now
 from .. import serializers
@@ -24,7 +25,8 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
     def get_object(self):
         return {
             "XPACK_ENABLED": settings.XPACK_ENABLED,
-            "INTERFACE": self.interface_setting
+            "INTERFACE": self.interface_setting,
+            "COUNTRY_CALLING_CODES": COUNTRY_CALLING_CODES
         }
 
 

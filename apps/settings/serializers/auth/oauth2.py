@@ -43,7 +43,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
     )
     AUTH_OAUTH2_ACCESS_TOKEN_METHOD = serializers.ChoiceField(
         default='GET', label=_('Client authentication method'),
-        choices=(('GET', 'GET'), ('POST', 'POST'))
+        choices=(('GET', 'GET'), ('POST', 'POST-DATA'), ('POST_JSON', 'POST-JSON'))
     )
     AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT = serializers.CharField(
         required=True, max_length=1024, label=_('Provider userinfo endpoint')

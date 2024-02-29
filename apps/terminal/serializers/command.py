@@ -15,7 +15,7 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))
-    input = serializers.CharField(max_length=2048, label=_("Command"))
+    input = serializers.CharField(label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session ID"))
     risk_level = LabeledChoiceField(
         choices=RiskLevelChoices.choices,

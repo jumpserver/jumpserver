@@ -205,7 +205,7 @@ class RDPFileClientProtocolURLMixin:
         return data
 
     def get_smart_endpoint(self, protocol, asset=None):
-        endpoint = Endpoint.match_by_instance_label(asset, protocol)
+        endpoint = Endpoint.match_by_instance_label(asset, protocol, self.request)
         if not endpoint:
             target_ip = asset.get_target_ip() if asset else ''
             endpoint = EndpointRule.match_endpoint(
@@ -443,7 +443,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(
-                    reviewer, asset, user, self.input_username
+                    reviewer, asset, user, account, self.input_username
                 ).publish_async()
 
     def create(self, request, *args, **kwargs):

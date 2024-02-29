@@ -97,6 +97,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_otp_secret_key_bound = serializers.BooleanField(read_only=True, label=_("Is OTP bound"))
+    is_superuser = serializers.BooleanField(read_only=True, label=_("Super Administrator"))
+    is_org_admin = serializers.BooleanField(read_only=True, label=_("Organization Administrator"))
     can_public_key_auth = serializers.BooleanField(
         source="can_use_ssh_key_login", label=_("Can public key authentication"),
         read_only=True

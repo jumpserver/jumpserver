@@ -14,22 +14,24 @@
             </strong>
         </p>
         <div>
-            <img src="{% static 'img/authenticator_android.png' %}" width="128" height="128" alt="">
+            <img src="{{ authenticator_android_url }}" width="128" height="128" alt="">
             <p>{% trans 'Android downloads' %}</p>
         </div>
 
         <div>
-            <img src="{% static 'img/authenticator_iphone.png' %}" width="128" height="128" alt="">
+            <img src="{{ authenticator_iphone_url }}" width="128" height="128" alt="">
             <p>{% trans 'iPhone downloads' %}</p>
         </div>
 
-        <p style="margin: 20px auto;"><strong style="color: #000000">{% trans 'After installation, click the next step to enter the binding page (if installed, go to the next step directly).' %}</strong></p>
+        <p style="margin: 20px auto;"><strong
+                style="color: #000000">{% trans 'After installation, click the next step to enter the binding page (if installed, go to the next step directly).' %}</strong>
+        </p>
     </div>
 
     <a href="{% url 'authentication:user-otp-enable-bind' %}" class="next">{% trans 'Next' %}</a>
 
     <script>
-        $(function(){
+        $(function () {
             $('.change-color li:eq(1) i').css('color', '{{ INTERFACE.primary_color }}')
         })
     </script>

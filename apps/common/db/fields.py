@@ -362,11 +362,15 @@ class RelatedManager:
             if name is None or val is None:
                 continue
 
-            if custom_attr_filter:
+            custom_filter_q = None
+            spec_attr_filter = getattr(to_model, "get_{}_filter_attr_q".format(name), None)
+            if spec_attr_filter:
+                custom_filter_q = spec_attr_filter(val, match)
+            elif custom_attr_filter:
                 custom_filter_q = custom_attr_filter(name, val, match)
-                if custom_filter_q:
-                    filters.append(custom_filter_q)
-                    continue
+            if custom_filter_q:
+                filters.append(custom_filter_q)
+                continue
 
             if match == 'ip_in':
                 q = cls.get_ip_in_q(name, val)
@@ -464,11 +468,15 @@ class JSONManyToManyDescriptor:
             rule_value = rule.get('value', '')
             rule_match = rule.get('match', 'exact')
 
-            if custom_attr_filter:
-                q = custom_attr_filter(rule['name'], rule_value, rule_match)
-                if q:
-                    custom_q &= q
-                    continue
+            custom_filter_q = None
+            spec_attr_filter = getattr(to_model, "get_filter_{}_attr_q".format(rule['name']), None)
+            if spec_attr_filter:
+                custom_filter_q = spec_attr_filter(rule_value, rule_match)
+            elif custom_attr_filter:
+                custom_filter_q = custom_attr_filter(rule['name'], rule_value, rule_match)
+            if custom_filter_q:
+                custom_q &= custom_filter_q
+                continue
 
             if rule_match == 'in':
                 res &= value in rule_value or '*' in rule_value
@@ -517,7 +525,6 @@ class JSONManyToManyDescriptor:
                     res &= rule_value.issubset(value)
                 else:
                     res &= bool(value & rule_value)
-
             else:
                 logging.error("unknown match: {}".format(rule['match']))
                 res &= False
