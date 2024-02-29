@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 #
 import os
-import sys
 import signal
 import subprocess
+import sys
 
 import redis_lock
-
-from redis import Redis, Sentinel
+from redis import Redis, Sentinel, ConnectionPool
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APPS_DIR = os.path.join(BASE_DIR, 'apps')
@@ -20,9 +19,7 @@ os.environ.setdefault('PYTHONOPTIMIZE', '1')
 if os.getuid() == 0:
     os.environ.setdefault('C_FORCE_ROOT', '1')
 
-connection_params = {
-    'password': settings.REDIS_PASSWORD,
-}
+connection_params = {}
 
 if settings.REDIS_USE_SSL:
     connection_params['ssl'] = settings.REDIS_USE_SSL
@@ -37,6 +34,7 @@ REDIS_SENTINEL_PASSWORD = settings.REDIS_SENTINEL_PASSWORD
 REDIS_SENTINEL_SOCKET_TIMEOUT = settings.REDIS_SENTINEL_SOCKET_TIMEOUT
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     connection_params['sentinels'] = REDIS_SENTINELS
+    connection_params['password'] = settings.REDIS_PASSWORD
     sentinel_client = Sentinel(
         **connection_params, sentinel_kwargs={
             'ssl': settings.REDIS_USE_SSL,
@@ -50,9 +48,15 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     )
     redis_client = sentinel_client.master_for(REDIS_SENTINEL_SERVICE_NAME)
 else:
-    connection_params['host'] = settings.REDIS_HOST
-    connection_params['port'] = settings.REDIS_PORT
-    redis_client = Redis(**connection_params)
+    REDIS_PROTOCOL = 'rediss' if settings.REDIS_USE_SSL else 'redis'
+    REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s' % {
+        'protocol': REDIS_PROTOCOL,
+        'password': settings.REDIS_PASSWORD_QUOTE,
+        'host': settings.REDIS_HOST,
+        'port': settings.REDIS_PORT,
+    }
+    pool = ConnectionPool.from_url(REDIS_LOCATION_NO_DB, **connection_params)
+    redis_client = Redis(connection_pool=pool)
 
 scheduler = "ops.celery.beat.schedulers:DatabaseScheduler"
 processes = []

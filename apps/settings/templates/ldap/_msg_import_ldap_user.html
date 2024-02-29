@@ -14,9 +14,13 @@
 </ul>
 <b>{% trans "Synced User" %}:</b>
 <ul>
-    {% for user in users %}
-        <li>{{ user }}</li>
-    {% endfor %}
+    {% if users %}
+        {% for user in users %}
+            <li>{{ user }}</li>
+        {% endfor %}
+    {% else %}
+        <li>{% trans 'No user synchronization required' %}</li>
+    {% endif %}
 </ul>
 {% if errors %}
     <b>{% trans 'Error' %}:</b>

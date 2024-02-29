@@ -57,6 +57,13 @@ class FileSerializer(serializers.Serializer):
         ref_name = "JobFileSerializer"
 
 
+class JobTaskStopSerializer(serializers.Serializer):
+    task_id = serializers.CharField(max_length=128)
+
+    class Meta:
+        ref_name = "JobTaskStopSerializer"
+
+
 class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     job_type = serializers.ReadOnlyField(label=_("Job type"))

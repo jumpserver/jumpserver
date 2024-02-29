@@ -20,6 +20,7 @@ from common.const.http import GET, POST
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.permissions import IsServiceAccount
 from common.plugins.es import QuerySet as ESQuerySet
+from common.sessions.cache import user_session_manager
 from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import is_uuid, get_logger, lazyproperty
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
@@ -30,7 +31,7 @@ from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
-from .filters import UserSessionFilterSet
+from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession
@@ -204,10 +205,7 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = [
-        'user', 'action', 'resource_type', 'resource',
-        'remote_addr'
-    ]
+    filterset_class = OperateLogFilterSet
     search_fields = ['resource', 'user']
     ordering = ['-datetime']
 
@@ -289,8 +287,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
 
         keys = queryset.values_list('key', flat=True)
-        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
         for key in keys:
-            session_store_cls(key).delete()
+            user_session_manager.decrement_or_remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)

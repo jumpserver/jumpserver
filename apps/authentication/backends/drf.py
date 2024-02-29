@@ -10,6 +10,7 @@ from rest_framework import authentication, exceptions
 from common.auth import signature
 from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip
+from users.models import User
 from ..models import AccessKey, PrivateToken
 
 
@@ -19,22 +20,23 @@ def date_more_than(d, seconds):
 
 @merge_delay_run(ttl=60)
 def update_token_last_used(tokens=()):
-    for token in tokens:
-        token.date_last_used = timezone.now()
-        token.save(update_fields=['date_last_used'])
+    access_keys_ids = [token.id for token in tokens if isinstance(token, AccessKey)]
+    private_token_keys = [token.key for token in tokens if isinstance(token, PrivateToken)]
+    if len(access_keys_ids) > 0:
+        AccessKey.objects.filter(id__in=access_keys_ids).update(date_last_used=timezone.now())
+    if len(private_token_keys) > 0:
+        PrivateToken.objects.filter(key__in=private_token_keys).update(date_last_used=timezone.now())
 
 
 @merge_delay_run(ttl=60)
 def update_user_last_used(users=()):
-    for user in users:
-        user.date_api_key_last_used = timezone.now()
-        user.save(update_fields=['date_api_key_last_used'])
+    User.objects.filter(id__in=users).update(date_api_key_last_used=timezone.now())
 
 
 def after_authenticate_update_date(user, token=None):
-    update_user_last_used(users=(user,))
+    update_user_last_used.delay(users=(user.id,))
     if token:
-        update_token_last_used(tokens=(token,))
+        update_token_last_used.delay(tokens=(token,))
 
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):

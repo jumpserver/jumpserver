@@ -547,7 +547,6 @@ class Config(dict):
         'REFERER_CHECK_ENABLED': False,
         'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
-        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
         'SECURITY_DATA_CRYPTO_ALGO': None,
         'GMSSL_ENABLED': False,
@@ -564,8 +563,10 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 180,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 180,
         'JOB_EXECUTION_KEEP_DAYS': 180,
+        'PASSWORD_CHANGE_LOG_KEEP_DAYS': 999,
 
         'TICKETS_ENABLED': True,
+        'TICKETS_DIRECT_APPROVE': False,
 
         # 废弃的
         'DEFAULT_ORG_SHOW_ALL_USERS': True,
@@ -606,7 +607,9 @@ class Config(dict):
         'GPT_MODEL': 'gpt-3.5-turbo',
         'VIRTUAL_APP_ENABLED': False,
 
-        'FILE_UPLOAD_SIZE_LIMIT_MB': 200
+        'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
+
+        'TICKET_APPLY_ASSET_SCOPE': 'all'
     }
 
     old_config_map = {
@@ -701,7 +704,8 @@ class Config(dict):
 
     def compatible_redis(self):
         redis_config = {
-            'REDIS_PASSWORD': quote(str(self.REDIS_PASSWORD)),
+            'REDIS_PASSWORD': str(self.REDIS_PASSWORD),
+            'REDIS_PASSWORD_QUOTE': quote(str(self.REDIS_PASSWORD)),
         }
         for key, value in redis_config.items():
             self[key] = value

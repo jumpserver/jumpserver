@@ -68,6 +68,10 @@ def filter_platform_methods(category, tp_name, method=None, methods=None):
     return methods
 
 
+def sorted_methods(methods):
+    return sorted(methods, key=lambda x: x.get('priority', 10))
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 platform_automation_methods = get_platform_automation_methods(BASE_DIR)
 

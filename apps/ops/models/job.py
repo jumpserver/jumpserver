@@ -67,6 +67,7 @@ class JMSPermedInventory(JMSInventory):
             'postgresql': ['postgresql'],
             'sqlserver': ['sqlserver'],
             'ssh': ['shell', 'python', 'win_shell', 'raw'],
+            'winrm': ['win_shell', 'shell'],
         }
 
         if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
@@ -552,6 +553,15 @@ class JobExecution(JMSOrgBaseModel):
             self.set_error(e)
         finally:
             ssh_tunnel.local_gateway_clean(runner)
+
+    def stop(self):
+        with open(os.path.join(self.private_dir, 'local.pid')) as f:
+            try:
+                pid = f.read()
+                os.kill(int(pid), 9)
+            except Exception as e:
+                print(e)
+        self.set_error('Job stop by "kill -9 {}"'.format(pid))
 
     class Meta:
         verbose_name = _("Job Execution")

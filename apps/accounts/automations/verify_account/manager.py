@@ -51,6 +51,9 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             h['name'] += '(' + account.username + ')'
             self.host_account_mapper[h['name']] = account
             secret = account.secret
+            if secret is None:
+                print(f'account {account.name} secret is None')
+                continue
 
             private_key_path = None
             if account.secret_type == SecretType.SSH_KEY:
@@ -62,7 +65,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret':  account.escape_jinja2_syntax(secret),
+                'secret': account.escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,
                 'become': account.get_ansible_become_auth(),
             }

@@ -22,6 +22,10 @@ class CleaningSerializer(serializers.Serializer):
         min_value=MIN_VALUE, max_value=9999,
         label=_("Operate log keep days (day)"),
     )
+    PASSWORD_CHANGE_LOG_KEEP_DAYS = serializers.IntegerField(
+        min_value=MIN_VALUE, max_value=9999,
+        label=_("password change log keep days (day)"),
+    )
     FTP_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
         label=_("FTP log keep days (day)"),

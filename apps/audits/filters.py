@@ -1,12 +1,13 @@
-from django.core.cache import cache
+from django.apps import apps
+from django.utils import translation
+
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
-
 from common.drf.filters import BaseFilterSet
-from notifications.ws import WS_SESSION_KEY
+from common.sessions.cache import user_session_manager
 from orgs.utils import current_org
-from .models import UserSession
+from .models import UserSession, OperateLog
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -41,15 +42,32 @@ class UserSessionFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_is_active(queryset, name, is_active):
-        redis_client = cache.client.get_client()
-        members = redis_client.smembers(WS_SESSION_KEY)
-        members = [member.decode('utf-8') for member in members]
+        keys = user_session_manager.get_active_keys()
         if is_active:
-            queryset = queryset.filter(key__in=members)
+            queryset = queryset.filter(key__in=keys)
         else:
-            queryset = queryset.exclude(key__in=members)
+            queryset = queryset.exclude(key__in=keys)
         return queryset
 
     class Meta:
         model = UserSession
         fields = ['id', 'ip', 'city', 'type']
+
+
+class OperateLogFilterSet(BaseFilterSet):
+    resource_type = drf_filters.CharFilter(method='filter_resource_type')
+
+    @staticmethod
+    def filter_resource_type(queryset, name, resource_type):
+        current_lang = translation.get_language()
+        with translation.override(current_lang):
+            mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
+        tp = mapper.get(resource_type)
+        queryset = queryset.filter(resource_type=tp)
+        return queryset
+
+    class Meta:
+        model = OperateLog
+        fields = [
+            'user', 'action', 'resource', 'remote_addr'
+        ]

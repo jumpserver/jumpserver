@@ -5,6 +5,7 @@ method: push_account
 category: host
 type:
   - windows
+priority: 49
 params:
   - name: groups
     type: str

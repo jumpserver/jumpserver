@@ -429,7 +429,7 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
 
     @classmethod
     @timeit
-    def get_nodes_all_assets(cls, *nodes):
+    def get_nodes_all_assets(cls, *nodes, distinct=True):
         from .asset import Asset
         node_ids = set()
         descendant_node_query = Q()
@@ -439,7 +439,10 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         if descendant_node_query:
             _ids = Node.objects.order_by().filter(descendant_node_query).values_list('id', flat=True)
             node_ids.update(_ids)
-        return Asset.objects.order_by().filter(nodes__id__in=node_ids).distinct()
+        assets = Asset.objects.order_by().filter(nodes__id__in=node_ids)
+        if distinct:
+            assets = assets.distinct()
+        return assets
 
     def get_all_asset_ids(self):
         asset_ids = self.get_all_asset_ids_by_node_key(org_id=self.org_id, node_key=self.key)

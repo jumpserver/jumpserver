@@ -1,9 +1,11 @@
 import abc
 
+from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from assets.api.asset.asset import AssetFilterSet
 from assets.models import Asset, Node
+from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
 from perms import serializers
@@ -37,8 +39,8 @@ class UserPermedAssetRetrieveApi(SelfOrPKUserMixin, RetrieveAPIView):
             return asset
 
 
-class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
-    ordering = ('name',)
+class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPIView):
+    ordering = []
     search_fields = ('name', 'address', 'comment')
     ordering_fields = ("name", "address")
     filterset_class = AssetFilterSet
@@ -47,6 +49,8 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
+        if settings.ASSET_SIZE == 'small':
+            self.ordering = ['name']
         assets = self.get_assets()
         assets = self.serializer_class.setup_eager_loading(assets)
         return assets

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, get_language
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -19,6 +19,8 @@ from rest_framework.serializers import ValidationError
 from common.api import JMSBulkModelViewSet
 from common.serializers import FileSerializer
 from common.utils import is_uuid
+from common.utils.http import is_true
+from common.utils.yml import yaml_load_with_i18n
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
 
@@ -106,9 +108,66 @@ class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
     def get_object(self):
         pk = self.kwargs.get('pk')
         if not is_uuid(pk):
-            return get_object_or_404(Applet, name=pk)
+            obj = get_object_or_404(Applet, name=pk)
         else:
-            return get_object_or_404(Applet, pk=pk)
+            obj = get_object_or_404(Applet, pk=pk)
+        return self.trans_object(obj)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = self.trans_queryset(queryset)
+        return queryset
+
+    @staticmethod
+    def read_manifest_with_i18n(obj, lang='zh'):
+        path = os.path.join(obj.path, 'manifest.yml')
+        if os.path.exists(path):
+            with open(path, encoding='utf8') as f:
+                manifest = yaml_load_with_i18n(f, lang)
+        else:
+            manifest = {}
+        return manifest
+
+    def trans_queryset(self, queryset):
+        for obj in queryset:
+            self.trans_object(obj)
+        return queryset
+
+    @staticmethod
+    def readme(obj, lang=''):
+        lang = lang[:2]
+        readme_file = os.path.join(obj.path, f'README_{lang.upper()}.md')
+        if os.path.isfile(readme_file):
+            with open(readme_file, 'r') as f:
+                return f.read()
+        return ''
+
+    def trans_object(self, obj):
+        lang = get_language()
+        manifest = self.read_manifest_with_i18n(obj, lang)
+        obj.display_name = manifest.get('display_name', obj.display_name)
+        obj.comment = manifest.get('comment', obj.comment)
+        obj.readme = self.readme(obj, lang)
+        return obj
+
+    def is_record_found(self, obj, search):
+        combine_fields = ' '.join([getattr(obj, f, '') for f in self.search_fields])
+        return search in combine_fields
+
+    def filter_queryset(self, queryset):
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = [i for i in queryset if self.is_record_found(i, search)]
+
+        for field in self.filterset_fields:
+            field_value = self.request.query_params.get(field)
+            if not field_value:
+                continue
+            if field in ['is_active', 'builtin']:
+                field_value = is_true(field_value)
+            queryset = [i for i in queryset if getattr(i, field, '') == field_value]
+
+        return queryset
 
     def perform_destroy(self, instance):
         if not instance.name:

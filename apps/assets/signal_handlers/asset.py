@@ -63,13 +63,13 @@ def on_asset_create(sender, instance=None, created=False, **kwargs):
         return
     logger.info("Asset create signal recv: {}".format(instance))
 
-    ensure_asset_has_node(assets=(instance,))
+    ensure_asset_has_node.delay(assets=(instance,))
 
     # 获取资产硬件信息
     auto_config = instance.auto_config
     if auto_config.get('ping_enabled'):
         logger.debug('Asset {} ping enabled, test connectivity'.format(instance.name))
-        test_assets_connectivity_handler(assets=(instance,))
+        test_assets_connectivity_handler.delay(assets=(instance,))
     if auto_config.get('gather_facts_enabled'):
         logger.debug('Asset {} gather facts enabled, gather facts'.format(instance.name))
         gather_assets_facts_handler(assets=(instance,))

@@ -34,7 +34,7 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.annotate(res_count=Count('labeled_resources'))
+        queryset = queryset.annotate(res_count=Count('labeled_resources', distinct=True))
         return queryset
 
 
