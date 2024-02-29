@@ -43,6 +43,7 @@ def clean_password_change_log_period():
     days = get_log_keep_day('PASSWORD_CHANGE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
     PasswordChangeLog.objects.filter(datetime__lt=expired_day).delete()
+    logger.info("Clean password change log done")
 
 
 def clean_activity_log_period():

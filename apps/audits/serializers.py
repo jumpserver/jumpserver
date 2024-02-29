@@ -23,7 +23,7 @@ class JobLogSerializer(JobExecutionSerializer):
     class Meta:
         model = models.JobLog
         read_only_fields = [
-            "id", "material", "time_cost", 'date_start',
+            "id", "material", 'job_type', "time_cost", 'date_start',
             'date_finished', 'date_created',
             'is_finished', 'is_success',
             'task_id', 'creator_name'

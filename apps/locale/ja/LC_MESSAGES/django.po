@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 11:14+0800\n"
+"POT-Creation-Date: 2024-02-27 16:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "The parameter 'action' must be [{}]"
 msgstr "パラメータ 'action' は [{}] でなければなりません。"
 
-#: accounts/automations/change_secret/manager.py:197
+#: accounts/automations/change_secret/manager.py:201
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s、失敗: %s、合計: %s"
@@ -36,7 +36,7 @@ msgstr "成功: %s、失敗: %s、合計: %s"
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: settings/serializers/msg.py:35 terminal/serializers/storage.py:123
 #: terminal/serializers/storage.py:142 users/forms/profile.py:22
-#: users/serializers/user.py:104
+#: users/serializers/user.py:106
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -402,7 +402,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:64 terminal/serializers/session.py:51
+#: ops/serializers/job.py:71 terminal/serializers/session.py:51
 msgid "Is success"
 msgstr "成功は"
 
@@ -616,7 +616,7 @@ msgstr "パスワードルール"
 #: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
-#: terminal/models/component/terminal.py:84
+#: terminal/models/component/terminal.py:85
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:13
@@ -636,7 +636,7 @@ msgstr "特権アカウント"
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:120
-#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:167
+#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:169
 msgid "Is active"
 msgstr "アクティブです。"
 
@@ -1133,7 +1133,7 @@ msgid "Accounts"
 msgstr "アカウント"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:63 terminal/const.py:86
+#: ops/serializers/job.py:70 terminal/const.py:86
 #: terminal/models/session/session.py:42 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -1612,7 +1612,7 @@ msgstr "ボタンセレクターを確認する"
 msgid "API mode"
 msgstr "APIモード"
 
-#: assets/const/types.py:247
+#: assets/const/types.py:248
 msgid "All types"
 msgstr "いろんなタイプ"
 
@@ -2417,7 +2417,7 @@ msgid "Close"
 msgstr "閉じる"
 
 #: audits/const.py:43 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:54
 #: terminal/serializers/session.py:68
 msgid "Terminal"
@@ -2653,11 +2653,11 @@ msgstr "仮パスワード"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:108
+#: audits/tasks.py:109
 msgid "Clean audits session task log"
 msgstr "資産監査セッションタスクログのクリーンアップ"
 
-#: audits/tasks.py:122
+#: audits/tasks.py:123
 msgid "Upload FTP file to external storage"
 msgstr "外部ストレージへのFTPファイルのアップロード"
 
@@ -3234,7 +3234,7 @@ msgstr "アクション"
 
 #: authentication/serializers/connection_token.py:42
 #: perms/serializers/permission.py:40 perms/serializers/permission.py:60
-#: users/serializers/user.py:97 users/serializers/user.py:171
+#: users/serializers/user.py:97 users/serializers/user.py:173
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -3249,7 +3249,7 @@ msgstr "Access IP"
 
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:39
 #: perms/serializers/permission.py:61 users/serializers/user.py:98
-#: users/serializers/user.py:168
+#: users/serializers/user.py:170
 msgid "Is valid"
 msgstr "有効です"
 
@@ -4077,17 +4077,22 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:132
+#: ops/api/job.py:135
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:137
+#: ops/api/job.py:140
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
 "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択し"
 "てください。"
+
+#: ops/api/job.py:204
+msgid ""
+"The task is being created and cannot be interrupted. Please try again later."
+msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
 
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"
@@ -4339,7 +4344,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:558
+#: ops/models/job.py:567
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -4383,15 +4388,15 @@ msgstr "{max_threshold} を超えるCPUロード: => {value}"
 msgid "Run after save"
 msgstr "保存後に実行"
 
-#: ops/serializers/job.py:62
+#: ops/serializers/job.py:69
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:65 terminal/serializers/session.py:55
+#: ops/serializers/job.py:72 terminal/serializers/session.py:55
 msgid "Is finished"
 msgstr "終了しました"
 
-#: ops/serializers/job.py:66
+#: ops/serializers/job.py:73
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 msgid "Time cost"
 msgstr "時を過ごす"
@@ -4882,20 +4887,12 @@ msgstr "テストの成功"
 msgid "Test mail sent to {}, please check"
 msgstr "{}に送信されたテストメールを確認してください"
 
-#: settings/api/ldap.py:101
+#: settings/api/ldap.py:89
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr ""
 "ユーザーは同期されていません。「ユーザーを同期」ボタンをクリックしてくださ"
 "い。"
-
-#: settings/api/ldap.py:137
-msgid "Get ldap users is None"
-msgstr "Ldapユーザーを取得するにはNone"
-
-#: settings/api/ldap.py:147
-msgid "Imported {} users successfully (Organization: {})"
-msgstr "{} 人のユーザーを正常にインポートしました (組織: {})"
 
 #: settings/api/sms.py:142
 msgid "Invalid SMS platform"
@@ -6230,6 +6227,14 @@ msgstr "認証に失敗しました (不明): {}"
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
+#: settings/ws.py:236
+msgid "Get ldap users is None"
+msgstr "Ldapユーザーを取得するにはNone"
+
+#: settings/ws.py:246
+msgid "Imported {} users successfully (Organization: {})"
+msgstr "{} 人のユーザーを正常にインポートしました (組織: {})"
+
 #: templates/_csv_import_export.html:8
 msgid "Export"
 msgstr "エクスポート"
@@ -6786,28 +6791,28 @@ msgid "Default storage"
 msgstr "デフォルトのストレージ"
 
 #: terminal/models/component/storage.py:140
-#: terminal/models/component/terminal.py:90
+#: terminal/models/component/terminal.py:91
 msgid "Command storage"
 msgstr "コマンドストレージ"
 
 #: terminal/models/component/storage.py:204
-#: terminal/models/component/terminal.py:91
+#: terminal/models/component/terminal.py:92
 msgid "Replay storage"
 msgstr "再生ストレージ"
 
-#: terminal/models/component/terminal.py:87
+#: terminal/models/component/terminal.py:88
 msgid "type"
 msgstr "タイプ"
 
-#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:76
+#: terminal/models/component/terminal.py:90 terminal/serializers/command.py:76
 msgid "Remote Address"
 msgstr "リモートアドレス"
 
-#: terminal/models/component/terminal.py:92
+#: terminal/models/component/terminal.py:93
 msgid "Application User"
 msgstr "ユーザーの適用"
 
-#: terminal/models/component/terminal.py:176
+#: terminal/models/component/terminal.py:177
 msgid "Can view terminal config"
 msgstr "ターミナル構成を表示できます"
 
@@ -7292,6 +7297,99 @@ msgstr "コンテナステータス"
 #: terminal/serializers/virtualapp_provider.py:30
 msgid "Container Ports"
 msgstr "コンテナポート"
+
+#: terminal/session_lifecycle.py:30
+#, python-format
+msgid "Connect to asset %s success"
+msgstr "アセット %s への接続に成功しました"
+
+#: terminal/session_lifecycle.py:38
+#, python-format
+msgid "Connect to asset %s finished: %s"
+msgstr "アセット %s への接続が完了しました: %s"
+
+#: terminal/session_lifecycle.py:48
+#, python-format
+msgid "User %s create share link"
+msgstr "ユーザー %s が共有リンクを作成しました"
+
+#: terminal/session_lifecycle.py:57
+#, python-format
+msgid "User %s join session"
+msgstr "ユーザー %s がセッションに参加しました"
+
+#: terminal/session_lifecycle.py:69
+#, python-format
+msgid "User %s leave session"
+msgstr "ユーザー %s がセッションを離れました"
+
+#: terminal/session_lifecycle.py:81
+#, python-format
+msgid "User %s join to monitor session"
+msgstr "ユーザー %s がモニターセッションに参加しました"
+
+#: terminal/session_lifecycle.py:93
+#, python-format
+msgid "User %s exit to monitor session"
+msgstr "ユーザー %s がモニターセッションを離れました"
+
+#: terminal/session_lifecycle.py:105
+msgid "Replay start to convert"
+msgstr "リプレイの変換が開始されました"
+
+#: terminal/session_lifecycle.py:113
+msgid "Replay successfully converted to MP4 format"
+msgstr "リプレイが正常にMP4形式に変換されました"
+
+#: terminal/session_lifecycle.py:121
+#, python-format
+msgid "Replay failed to convert to MP4 format: %s"
+msgstr "リプレイのMP4形式への変換に失敗しました: %s"
+
+#: terminal/session_lifecycle.py:129
+msgid "Replay start to upload"
+msgstr "リプレイのアップロードが開始されました"
+
+#: terminal/session_lifecycle.py:137
+msgid "Replay successfully uploaded"
+msgstr "リプレイが正常にアップロードされました"
+
+#: terminal/session_lifecycle.py:145
+#, python-format
+msgid "Replay failed to upload: %s"
+msgstr "リプレイのアップロードに失敗しました: %s"
+
+#: terminal/session_lifecycle.py:152
+msgid "connect failed"
+msgstr "接続に失敗しました"
+
+#: terminal/session_lifecycle.py:153
+msgid "connection disconnect"
+msgstr "接続が切断されました"
+
+#: terminal/session_lifecycle.py:154
+msgid "user closed"
+msgstr "ユーザーが閉じました"
+
+#: terminal/session_lifecycle.py:155
+msgid "idle disconnect"
+msgstr "アイドル状態で切断されました"
+
+#: terminal/session_lifecycle.py:156
+msgid "admin terminated"
+msgstr "管理者によって切断されました"
+
+#: terminal/session_lifecycle.py:157
+msgid "maximum session time has been reached"
+msgstr "最大セッション時間に達しました"
+
+#: terminal/session_lifecycle.py:158
+msgid "permission has expired"
+msgstr "許可が期限切れです"
+
+#: terminal/session_lifecycle.py:159
+msgid "storage is null"
+msgstr "ストレージが空です"
 
 #: terminal/tasks.py:33
 msgid "Periodic delete terminal status"
@@ -7847,7 +7945,7 @@ msgstr "ユーザー設定"
 msgid "Force enable"
 msgstr "強制有効"
 
-#: users/models/user.py:812 users/serializers/user.py:169
+#: users/models/user.py:812 users/serializers/user.py:171
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
@@ -7859,7 +7957,7 @@ msgstr "アバター"
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:820 users/serializers/user.py:106
+#: users/models/user.py:820 users/serializers/user.py:108
 msgid "Phone"
 msgstr "電話"
 
@@ -7870,7 +7968,7 @@ msgstr "OTP 秘密"
 # msgid "Private key"
 # msgstr "ssh秘密鍵"
 #: users/models/user.py:838 users/serializers/profile.py:128
-#: users/serializers/user.py:166
+#: users/serializers/user.py:168
 msgid "Is first login"
 msgstr "最初のログインです"
 
@@ -8064,35 +8162,43 @@ msgstr "MFAフォース有効化"
 msgid "Login blocked"
 msgstr "ログインがロックされました"
 
-#: users/serializers/user.py:99 users/serializers/user.py:175
+#: users/serializers/user.py:99 users/serializers/user.py:177
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
+#: users/serializers/user.py:100
+msgid "Super Administrator"
+msgstr "スーパーアドミニストレーター"
+
 #: users/serializers/user.py:101
+msgid "Organization Administrator"
+msgstr "組織管理者"
+
+#: users/serializers/user.py:103
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:170
+#: users/serializers/user.py:172
 msgid "Is org admin"
 msgstr "組織管理者です"
 
-#: users/serializers/user.py:172
+#: users/serializers/user.py:174
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:176
+#: users/serializers/user.py:178
 msgid "MFA level"
 msgstr "MFA レベル"
 
-#: users/serializers/user.py:287
+#: users/serializers/user.py:289
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:288
+#: users/serializers/user.py:290
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:321
+#: users/serializers/user.py:323
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
@@ -8540,7 +8646,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:56
+#: xpack/plugins/cloud/manager.py:57
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 

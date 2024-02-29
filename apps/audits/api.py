@@ -31,7 +31,7 @@ from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
-from .filters import UserSessionFilterSet
+from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession
@@ -205,10 +205,7 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = [
-        'user', 'action', 'resource_type', 'resource',
-        'remote_addr'
-    ]
+    filterset_class = OperateLogFilterSet
     search_fields = ['resource', 'user']
     ordering = ['-datetime']
 
