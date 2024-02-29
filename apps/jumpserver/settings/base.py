@@ -406,7 +406,7 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
 else:
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
         'protocol': REDIS_PROTOCOL,
-        'password': CONFIG.REDIS_PASSWORD,
+        'password': CONFIG.REDIS_PASSWORD_QUOTE,
         'host': CONFIG.REDIS_HOST,
         'port': CONFIG.REDIS_PORT,
     }

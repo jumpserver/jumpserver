@@ -704,7 +704,8 @@ class Config(dict):
 
     def compatible_redis(self):
         redis_config = {
-            'REDIS_PASSWORD': quote(str(self.REDIS_PASSWORD)),
+            'REDIS_PASSWORD': str(self.REDIS_PASSWORD),
+            'REDIS_PASSWORD_QUOTE': quote(str(self.REDIS_PASSWORD)),
         }
         for key, value in redis_config.items():
             self[key] = value
