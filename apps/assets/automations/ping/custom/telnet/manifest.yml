@@ -1,0 +1,16 @@
+id: ping_by_telnet
+name: "{{ 'Ping by telnet' | trans }}"
+category:
+  - device
+  - host
+type:
+  - all
+method: ping
+protocol: telnet
+priority: 50
+
+i18n:
+  Ping by telnet:
+    zh: '使用 Python 模块 telnet 测试主机可连接性'
+    en: 'Ping by telnet module'
+    ja: 'Pythonモジュールtelnetを使用したホスト接続性のテスト'
