@@ -152,6 +152,7 @@ class JMSInventory:
             else:
                 ansible_config['ansible_winrm_scheme'] = 'http'
                 ansible_config['ansible_winrm_transport'] = 'ntlm'
+            ansible_config['ansible_winrm_connection_timeout'] = 120
         return ansible_config
 
     def asset_to_host(self, asset, account, automation, protocols, platform):
