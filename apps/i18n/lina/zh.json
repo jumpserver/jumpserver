@@ -408,7 +408,7 @@
     "ExcludeSymbol": "排除字符",
     "Execute": "执行",
     "ExecuteOnce": "执行一次",
-    "Execution": "执行历史",
+    "ExecutionHistory": "执行历史",
     "ExecutionDetail": "执行历史详情",
     "ExecutionList": "执行列表",
     "ExistError": "这个元素已经存在",
