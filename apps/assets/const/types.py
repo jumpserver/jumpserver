@@ -165,15 +165,19 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def category_types(cls):
-        return (
+        types = [
             (Category.HOST, HostTypes),
             (Category.DEVICE, DeviceTypes),
             (Category.DATABASE, DatabaseTypes),
-            # (Category.CLOUD, CloudTypes),
-            # (Category.WEB, WebTypes),
-            # (Category.GPT, GPTTypes),
-            # (Category.CUSTOM, CustomTypes),
-        )
+        ]
+        if not settings.LITE:
+            types.extend([
+                (Category.CLOUD, CloudTypes),
+                (Category.WEB, WebTypes),
+                (Category.GPT, GPTTypes),
+                (Category.CUSTOM, CustomTypes),
+            ])
+        return types
 
     @classmethod
     def get_types(cls, exclude_custom=False):

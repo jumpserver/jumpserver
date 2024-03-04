@@ -930,7 +930,7 @@ msgstr ""
 #: tickets/models/ticket/general.py:297 users/models/user.py:836
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:110
 msgid "Comment"
-msgstr "Comment"
+msgstr "Description"
 
 #: accounts/serializers/account/virtual.py:24
 msgid ""
