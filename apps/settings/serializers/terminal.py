@@ -26,7 +26,7 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False, label=_("Password auth"))
     TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(
-        required=False, label=_("public key auth"),
+        required=False, label=_("Public key auth"),
         help_text=_('Information: If use other auth method, like AD/LDAP, you should disable this to '
                     'avoid being able to log in after deleting')
     )

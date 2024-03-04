@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 15:45+0800\n"
+"POT-Creation-Date: 2024-02-28 17:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -614,7 +614,8 @@ msgstr "パスワードルール"
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:33 settings/models.py:181 settings/serializers/msg.py:89
-#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
+#: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:33
+#: terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84
@@ -895,10 +896,12 @@ msgid "Password length"
 msgstr "パスワードの長さ"
 
 #: accounts/serializers/account/template.py:14
+#: settings/serializers/security.py:44
 msgid "Lowercase"
 msgstr "小文字"
 
 #: accounts/serializers/account/template.py:15
+#: settings/serializers/security.py:41
 msgid "Uppercase"
 msgstr "大文字"
 
@@ -1267,7 +1270,6 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10
 msgid "IP"
 msgstr "IP"
 
@@ -1739,6 +1741,7 @@ msgid "Port"
 msgstr "ポート"
 
 #: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr "アドレス"
 
@@ -2628,8 +2631,8 @@ msgstr "認証トークン"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:77 notifications/backends/__init__.py:11
-#: settings/serializers/auth/wecom.py:10 users/models/user.py:749
-#: users/models/user.py:855
+#: settings/serializers/auth/wecom.py:10 settings/serializers/auth/wecom.py:15
+#: users/models/user.py:749 users/models/user.py:855
 msgid "WeCom"
 msgstr "企業微信"
 
@@ -2643,8 +2646,8 @@ msgstr "本を飛ばす"
 
 #: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:15
-#: settings/serializers/auth/slack.py:10 users/models/user.py:752
-#: users/models/user.py:858
+#: settings/serializers/auth/slack.py:10 settings/serializers/auth/slack.py:12
+#: users/models/user.py:752 users/models/user.py:858
 msgid "Slack"
 msgstr ""
 
@@ -2662,6 +2665,7 @@ msgstr "仮パスワード"
 
 #: audits/signal_handlers/login_log.py:42 authentication/views/login.py:101
 #: settings/serializers/auth/passkey.py:8
+#: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Passkey"
 
@@ -3209,6 +3213,7 @@ msgid "Options"
 msgstr "オプション"
 
 #: authentication/serializers/connect_token_secret.py:127
+#: ops/notifications.py:17
 msgid "Component"
 msgstr "コンポーネント"
 
@@ -4391,12 +4396,6 @@ msgstr "创建方式"
 msgid "VCS URL"
 msgstr "VCS URL"
 
-#: ops/notifications.py:17
-#, fuzzy
-#| msgid "Component"
-msgid "Components"
-msgstr "コンポーネント"
-
 #: ops/notifications.py:18
 msgid "Server performance"
 msgstr "サーバーのパフォーマンス"
@@ -5149,9 +5148,14 @@ msgstr "パスワードのURLを忘れた"
 msgid "Login redirection prompt"
 msgstr "ログインリダイレクトの有効化msg"
 
-#: settings/serializers/auth/cas.py:10
+#: settings/serializers/auth/cas.py:10 settings/serializers/auth/cas.py:12
 msgid "CAS"
 msgstr "CAS"
+
+#: settings/serializers/auth/cas.py:13 settings/serializers/auth/ldap.py:42
+#: settings/serializers/auth/oidc.py:54
+msgid "Server"
+msgstr "LDAPサーバー"
 
 #: settings/serializers/auth/cas.py:16
 msgid "Proxy Server"
@@ -5170,13 +5174,19 @@ msgstr "ユーザー名のプロパティ"
 msgid "Enable attributes map"
 msgstr "属性マップの有効化"
 
-#: settings/serializers/auth/cas.py:28 settings/serializers/auth/saml2.py:32
+#: settings/serializers/auth/cas.py:28 settings/serializers/auth/ldap.py:58
+#: settings/serializers/auth/oauth2.py:56 settings/serializers/auth/oidc.py:37
+#: settings/serializers/auth/saml2.py:32
 msgid "User attribute"
 msgstr "マッピングのプロパティ"
 
-#: settings/serializers/auth/cas.py:29
+#: settings/serializers/auth/cas.py:30
 msgid "Create user"
 msgstr "そうでない場合はユーザーを作成"
+
+#: settings/serializers/auth/cas.py:31
+msgid "Automatically create a new user if not found."
+msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:15
 msgid "Dingtalk"
@@ -5186,13 +5196,9 @@ msgstr "ピン認証の有効化"
 msgid "Lark"
 msgstr "飛本認証の有効化"
 
-#: settings/serializers/auth/ldap.py:39
+#: settings/serializers/auth/ldap.py:39 settings/serializers/auth/ldap.py:84
 msgid "LDAP"
 msgstr "LDAP"
-
-#: settings/serializers/auth/ldap.py:42
-msgid "Server"
-msgstr "LDAPサーバー"
 
 #: settings/serializers/auth/ldap.py:43
 msgid "eg: ldap://localhost:389"
@@ -5236,6 +5242,7 @@ msgid "Search paged size (piece)"
 msgstr "ページサイズを検索 (じょう)"
 
 #: settings/serializers/auth/oauth2.py:18
+#: settings/serializers/auth/oauth2.py:21
 msgid "OAuth2"
 msgstr "OAuth2"
 
@@ -5265,6 +5272,7 @@ msgid "Token endpoint"
 msgstr "プロバイダートークンエンドポイント"
 
 #: settings/serializers/auth/oauth2.py:45 settings/serializers/auth/oidc.py:30
+#: settings/serializers/auth/sms.py:106
 msgid "Request method"
 msgstr "クライアント認証方式"
 
@@ -5281,7 +5289,7 @@ msgstr "プロバイダーのセッション終了エンドポイント"
 msgid "Always update user"
 msgstr "常にユーザーを更新"
 
-#: settings/serializers/auth/oidc.py:12
+#: settings/serializers/auth/oidc.py:12 settings/serializers/auth/oidc.py:63
 msgid "OIDC"
 msgstr "OIDC"
 
@@ -5379,6 +5387,7 @@ msgid "FIDO Server name"
 msgstr "FIDOサーバー名"
 
 #: settings/serializers/auth/radius.py:13
+#: settings/serializers/auth/radius.py:15
 msgid "Radius"
 msgstr "Radius"
 
@@ -5386,7 +5395,7 @@ msgstr "Radius"
 msgid "OTP in Radius"
 msgstr "Radius のOTP"
 
-#: settings/serializers/auth/saml2.py:10
+#: settings/serializers/auth/saml2.py:10 settings/serializers/auth/saml2.py:13
 msgid "SAML2"
 msgstr "SAML2"
 
@@ -5816,14 +5825,6 @@ msgstr "パスワードの最小長"
 msgid "Minimum length (Admin)"
 msgstr "管理者ユーザーパスワードの最小長"
 
-#: settings/serializers/security.py:41
-msgid "Uppercase"
-msgstr "資本を含める必要があります"
-
-#: settings/serializers/security.py:44
-msgid "Lowercase"
-msgstr "小文字を含める必要があります。"
-
 #: settings/serializers/security.py:47
 msgid "Digits"
 msgstr "数値を含める必要があります"
@@ -5840,11 +5841,11 @@ msgstr ""
 "ユーザーが限られた回数だけログインできなかった場合、この時間間隔ではログイン"
 "はできません。"
 
-#: settings/serializers/security.py:63
+#: settings/serializers/security.py:63 settings/serializers/security.py:73
 msgid "Login failures count"
 msgstr "ユーザーログインの失敗数を制限する"
 
-#: settings/serializers/security.py:67
+#: settings/serializers/security.py:67 settings/serializers/security.py:77
 msgid "Login failure period (minute)"
 msgstr "ユーザーのログイン間隔をブロックする（分）"
 
@@ -6058,10 +6059,6 @@ msgstr "複数のユーザーを使用して、分割"
 msgid "[%s] %s"
 msgstr "[%s] %s"
 
-#: settings/serializers/terminal.py:9 terminal/models/virtualapp/provider.py:11
-msgid "Hostname"
-msgstr "ホスト名"
-
 #: settings/serializers/terminal.py:15
 msgid "Auto"
 msgstr "自動"
@@ -6083,13 +6080,15 @@ msgid "Password auth"
 msgstr "パスワード認証"
 
 #: settings/serializers/terminal.py:29
+#, fuzzy
+#| msgid "Public key auth"
 msgid "Public key auth"
 msgstr "鍵認証"
 
 #: settings/serializers/terminal.py:30
 msgid ""
-"Information: If use other auth method, like AD/LDAP, you should disable this to "
-"avoid being able to log in after deleting"
+"Information: If use other auth method, like AD/LDAP, you should disable this "
+"to avoid being able to log in after deleting"
 msgstr ""
 "ヒント: AD/LDAPなどの他の認証方法を使用する場合は、サードパーティ製システムの"
 "削除後にこの項目を無効にする必要があります, ログインも可能"
@@ -6101,18 +6100,6 @@ msgstr "リストの並べ替え"
 #: settings/serializers/terminal.py:37
 msgid "Asset list page size"
 msgstr "ページサイズを一覧表示"
-
-#: settings/serializers/terminal.py:39
-msgid "Enable database proxy"
-msgstr "属性マップの有効化"
-
-#: settings/serializers/terminal.py:40
-msgid "Enable Razor"
-msgstr "Razor の有効化"
-
-#: settings/serializers/terminal.py:41
-msgid "SSH Client"
-msgstr "SSH Clientの有効化"
 
 #: settings/tasks/ldap.py:28
 msgid "Periodic import ldap user"
@@ -6532,6 +6519,10 @@ msgstr "出力"
 msgid "Risk level"
 msgstr "リスクレベル"
 
+#: terminal/connect_methods.py:29
+msgid "SSH Client"
+msgstr "SSH Clientの有効化"
+
 #: terminal/connect_methods.py:30
 msgid "SSH Guide"
 msgstr "SSH ガイド人"
@@ -6937,6 +6928,10 @@ msgstr "検証コードが無効"
 msgid "You have already joined this session"
 msgstr "すでにこのセッションに参加しています"
 
+#: terminal/models/virtualapp/provider.py:11
+msgid "Hostname"
+msgstr "ホスト名"
+
 #: terminal/models/virtualapp/virtualapp.py:32
 msgid "Providers"
 msgstr "プロバイダ"
@@ -7199,7 +7194,6 @@ msgid "Bucket"
 msgstr "バケット"
 
 #: terminal/serializers/storage.py:33
-#: xpack/plugins/cloud/serializers/account_attrs.py:17
 msgid "Access key ID"
 msgstr "アクセスキー"
 
@@ -8094,7 +8088,9 @@ msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
 #: users/serializers/user.py:101
-msgid "Can public key auth"
+#, fuzzy
+#| msgid "Can public key auth"
+msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
 #: users/serializers/user.py:166
@@ -8935,6 +8931,12 @@ msgstr "有効表示"
 msgid "Provider display"
 msgstr "プロバイダ表示"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:17
+#, fuzzy
+#| msgid "Access key"
+msgid "Access key id"
+msgstr "アクセスキー"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:35
 msgid "Client ID"
 msgstr "クライアントID"
@@ -9122,6 +9124,12 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Enable database proxy"
+#~ msgstr "属性マップの有効化"
+
+#~ msgid "Enable Razor"
+#~ msgstr "Razor の有効化"
 
 #~ msgid "Email Subject"
 #~ msgstr "ユーザーメール件名の作成"
