@@ -419,7 +419,7 @@
     "ExcludeSymbol": "Exclude Char",
     "Execute": "Execute",
     "ExecuteOnce": "Execute Once",
-    "Execution": "History",
+    "ExecutionHistory": "Execution history",
     "ExecutionDetail": "Execution History Details",
     "ExecutionList": "Execute History",
     "ExistError": "This Element Already Exists",
