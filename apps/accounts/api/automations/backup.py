@@ -18,8 +18,8 @@ __all__ = [
 
 class AccountBackupPlanViewSet(OrgBulkModelViewSet):
     model = AccountBackupAutomation
-    filter_fields = ('name',)
-    search_fields = filter_fields
+    filterset_fields = ('name',)
+    search_fields = filterset_fields
     ordering = ('name',)
     serializer_class = serializers.AccountBackupSerializer
 
