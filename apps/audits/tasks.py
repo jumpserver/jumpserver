@@ -7,18 +7,19 @@ import subprocess
 from celery import shared_task
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
-from common.utils import get_log_keep_day, get_logger
 from common.storage.ftp_file import FTPFileStorageHandler
+from common.utils import get_log_keep_day, get_logger
 from ops.celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic
 )
 from ops.models import CeleryTaskExecution
-from terminal.models import Session, Command
 from terminal.backends import server_replay_storage
+from terminal.models import Session, Command
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
 
 logger = get_logger(__name__)
@@ -84,6 +85,12 @@ def clean_celery_tasks_period():
     subprocess.call(command, shell=True)
 
 
+def batch_delete(queryset, batch_size=3000):
+    with transaction.atomic():
+        for i in range(0, queryset.count(), batch_size):
+            queryset[i:i + batch_size].delete()
+
+
 def clean_expired_session_period():
     logger.info("Start clean expired session record, commands and replay")
     days = get_log_keep_day('TERMINAL_SESSION_KEEP_DURATION')
@@ -93,9 +100,9 @@ def clean_expired_session_period():
     expired_commands = Command.objects.filter(timestamp__lt=timestamp)
     replay_dir = os.path.join(default_storage.base_location, 'replay')
 
-    expired_sessions.delete()
+    batch_delete(expired_sessions)
     logger.info("Clean session item done")
-    expired_commands.delete()
+    batch_delete(expired_commands)
     logger.info("Clean session command done")
     command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
         replay_dir, days
