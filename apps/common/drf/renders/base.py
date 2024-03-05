@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 
 import pyzipper
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
@@ -77,7 +78,7 @@ class BaseFileRenderer(BaseRenderer):
             results = [results[0]] if results else results
         else:
             # 限制数据数量
-            results = results[:10000]
+            results = results[:settings.MAX_LIMIT_PER_PAGE]
         # 会将一些 UUID 字段转化为 string
         results = json.loads(json.dumps(results, cls=encoders.JSONEncoder))
         return results
