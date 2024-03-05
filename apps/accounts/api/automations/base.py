@@ -20,8 +20,8 @@ __all__ = [
 class AutomationAssetsListApi(generics.ListAPIView):
     model = BaseAutomation
     serializer_class = serializers.AutomationAssetsSerializer
-    filter_fields = ("name", "address")
-    search_fields = filter_fields
+    filterset_fields = ("name", "address")
+    search_fields = filterset_fields
 
     def get_object(self):
         pk = self.kwargs.get('pk')
