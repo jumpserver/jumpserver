@@ -34,7 +34,7 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
-            'executed_amount': {'label': _('Executed amount')},
+            'executed_amount': {'label': _('Executions')},
         }
 
     def validate_name(self, name):
