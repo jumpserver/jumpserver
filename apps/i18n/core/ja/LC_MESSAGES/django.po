@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-28 17:24+0800\n"
+"POT-Creation-Date: 2024-03-06 16:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -296,9 +296,8 @@ msgstr "ソース ID"
 #: assets/serializers/asset/common.py:128 assets/serializers/gateway.py:28
 #: audits/models.py:59 authentication/api/connection_token.py:405
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
-#: perms/serializers/permission.py:45 settings/serializers/msg.py:33
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
-#: terminal/serializers/command.py:72
+#: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
+#: terminal/models/session/session.py:33 terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -850,7 +849,7 @@ msgstr "ID"
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1004
-#: users/models/user.py:1041 users/serializers/group.py:21
+#: users/models/user.py:1041
 msgid "User"
 msgstr "ユーザー"
 
@@ -862,7 +861,7 @@ msgstr "日付"
 
 #: accounts/serializers/account/backup.py:38
 #: accounts/serializers/automations/base.py:37
-msgid "Executed amount"
+msgid "Executions"
 msgstr "実行回数"
 
 #: accounts/serializers/account/backup.py:41
@@ -1128,13 +1127,13 @@ msgid "Active"
 msgstr "アクティブ"
 
 #: acls/models/base.py:81 users/models/preference.py:16
-#: users/serializers/user.py:293
+#: users/serializers/group.py:21 users/serializers/user.py:293
 msgid "Users"
 msgstr "ユーザー"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 perms/serializers/user_permission.py:75
-#: rbac/tree.py:35
+#: assets/models/cmd_filter.py:38 perms/serializers/permission.py:45
+#: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "アカウント"
 
@@ -1621,7 +1620,7 @@ msgstr "ボタンセレクターを確認する"
 msgid "API mode"
 msgstr "APIモード"
 
-#: assets/const/types.py:247
+#: assets/const/types.py:251
 msgid "All types"
 msgstr "いろんなタイプ"
 
@@ -2591,8 +2590,9 @@ msgid "Reason display"
 msgstr "理由表示"
 
 #: audits/serializers.py:134
-#, python-format
-msgid "User %s %s this resource"
+#, fuzzy, python-format
+#| msgid "User %s %s this resource"
+msgid "%s %s this resource"
 msgstr "ユーザー %s %s が現在のリソースをサブスクライブしました。"
 
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
