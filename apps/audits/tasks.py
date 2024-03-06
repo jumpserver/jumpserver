@@ -86,9 +86,12 @@ def clean_celery_tasks_period():
 
 
 def batch_delete(queryset, batch_size=3000):
+    model = queryset.model
+    count = queryset.count()
     with transaction.atomic():
-        for i in range(0, queryset.count(), batch_size):
-            queryset[i:i + batch_size].delete()
+        for i in range(0, count, batch_size):
+            pks = queryset[i:i + batch_size].values_list('id', flat=True)
+            model.objects.filter(id__in=list(pks)).delete()
 
 
 def clean_expired_session_period():
