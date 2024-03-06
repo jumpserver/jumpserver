@@ -9062,7 +9062,7 @@ msgid "Interface settings"
 msgstr "インターフェイスの設定"
 
 #: xpack/plugins/interface/models.py:23
-msgid "Title of login page"
+msgid "Login title"
 msgstr "ログインページのタイトル"
 
 #: xpack/plugins/interface/models.py:27

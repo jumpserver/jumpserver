@@ -8725,7 +8725,7 @@ msgid "Interface settings"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:23
-msgid "Title of login page"
+msgid "Login title"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:27

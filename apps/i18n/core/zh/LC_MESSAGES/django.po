@@ -8855,7 +8855,7 @@ msgid "Interface settings"
 msgstr "界面设置"
 
 #: xpack/plugins/interface/models.py:23
-msgid "Title of login page"
+msgid "Login title"
 msgstr "登录页面标题"
 
 #: xpack/plugins/interface/models.py:27
