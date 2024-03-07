@@ -43,6 +43,8 @@ class UserLoginForm(forms.Form):
         super().__init__(*args, **kwargs)
         auto_login_field = self.fields['auto_login']
         auto_login_field.label = _("{} days auto login").format(self.days_auto_login or 1)
+        if self.disable_days_auto_login:
+            auto_login_field.widget = forms.HiddenInput()
 
     def confirm_login_allowed(self, user):
         if not user.is_staff:
