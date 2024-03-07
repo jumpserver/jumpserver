@@ -139,3 +139,12 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
             msg = _("Require interval or crontab setting")
             raise serializers.ValidationError(msg)
         return ok
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not attrs.get('is_periodic'):
+            attrs['interval'] = None
+            attrs['crontab'] = ''
+        if attrs.get('crontab'):
+            attrs['interval'] = None
+        return attrs
