@@ -240,13 +240,12 @@ def validate_email(addr):
 
 
 def construct_user_email(username, email, email_suffix=''):
-    email_suffix = email_suffix or settings.EMAIL_SUFFIX
-
     email = validate_email(email)
     if not email:
         email = validate_email(username)
 
     if not email:
+        email_suffix = email_suffix or settings.EMAIL_SUFFIX
         email = f'{username}@{email_suffix}'
     return email
 
