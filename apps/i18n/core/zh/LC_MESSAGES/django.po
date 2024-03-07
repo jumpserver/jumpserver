@@ -8859,7 +8859,7 @@ msgid "Login title"
 msgstr "登录页面标题"
 
 #: xpack/plugins/interface/models.py:27
-msgid "Image of login page"
+msgid "Login image"
 msgstr "登录页面图片"
 
 #: xpack/plugins/interface/models.py:31
@@ -8867,11 +8867,11 @@ msgid "Website icon"
 msgstr "网站图标"
 
 #: xpack/plugins/interface/models.py:35
-msgid "Logo of management page"
+msgid "Index logo"
 msgstr "管理页面 Logo"
 
 #: xpack/plugins/interface/models.py:39
-msgid "Logo of logout page"
+msgid "Logout logo"
 msgstr "退出页面 Logo"
 
 #: xpack/plugins/interface/models.py:41

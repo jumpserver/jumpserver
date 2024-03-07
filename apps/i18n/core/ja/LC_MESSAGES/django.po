@@ -9066,7 +9066,7 @@ msgid "Login title"
 msgstr "ログインページのタイトル"
 
 #: xpack/plugins/interface/models.py:27
-msgid "Image of login page"
+msgid "Login image"
 msgstr "ログインページのイメージ"
 
 #: xpack/plugins/interface/models.py:31
@@ -9074,11 +9074,11 @@ msgid "Website icon"
 msgstr "ウェブサイトのアイコン"
 
 #: xpack/plugins/interface/models.py:35
-msgid "Logo of management page"
+msgid "Index logo"
 msgstr "管理ページのロゴ"
 
 #: xpack/plugins/interface/models.py:39
-msgid "Logo of logout page"
+msgid "Logout logo"
 msgstr "ログアウトページのロゴ"
 
 #: xpack/plugins/interface/models.py:41
