@@ -5448,35 +5448,35 @@ msgid "Period clean"
 msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log keep days (day)"
+msgid "Login log retention days (day)"
 msgstr "登录日志 (天)"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log keep days (day)"
+msgid "Task log retention days (day)"
 msgstr "任务日志 (天)"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log keep days (day)"
+msgid "Operate log retention days (day)"
 msgstr "操作日志 (天)"
 
 #: settings/serializers/cleaning.py:27
-msgid "FTP log keep days (day)"
+msgid "FTP log retention days (day)"
 msgstr "上传下载 (天)"
 
 #: settings/serializers/cleaning.py:31
-msgid "Cloud sync record keep days (day)"
+msgid "Cloud sync task history retention days (day)"
 msgstr "云同步记录 (天)"
 
 #: settings/serializers/cleaning.py:35
-msgid "job execution keep days (day)"
+msgid "job execution retention days (day)"
 msgstr "作业中心执行历史 (天)"
 
 #: settings/serializers/cleaning.py:39
-msgid "Activity log keep days (day)"
+msgid "Activity log retention days (day)"
 msgstr "活动记录 (天)"
 
 #: settings/serializers/cleaning.py:42
-msgid "Session keep duration (day)"
+msgid "Session log retention days (day)"
 msgstr "会话日志 (天)"
 
 #: settings/serializers/cleaning.py:44
@@ -8855,11 +8855,11 @@ msgid "Interface settings"
 msgstr "界面设置"
 
 #: xpack/plugins/interface/models.py:23
-msgid "Title of login page"
+msgid "Login title"
 msgstr "登录页面标题"
 
 #: xpack/plugins/interface/models.py:27
-msgid "Image of login page"
+msgid "Login image"
 msgstr "登录页面图片"
 
 #: xpack/plugins/interface/models.py:31
@@ -8867,11 +8867,11 @@ msgid "Website icon"
 msgstr "网站图标"
 
 #: xpack/plugins/interface/models.py:35
-msgid "Logo of management page"
+msgid "Index logo"
 msgstr "管理页面 Logo"
 
 #: xpack/plugins/interface/models.py:39
-msgid "Logo of logout page"
+msgid "Logout logo"
 msgstr "退出页面 Logo"
 
 #: xpack/plugins/interface/models.py:41
