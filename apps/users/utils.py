@@ -230,16 +230,24 @@ class LoginIpBlockUtil(BlockGlobalIpUtilBase):
     BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
+def validate_email(addr):
+    addr = addr or ''
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.match(pattern, addr):
+        return addr
+    else:
+        return ''
+
+
 def construct_user_email(username, email, email_suffix=''):
-    if email is None:
-        email = ''
-    if '@' in email:
-        return email
-    if '@' in username:
-        return username
-    if not email_suffix:
-        email_suffix = settings.EMAIL_SUFFIX
-    email = f'{username}@{email_suffix}'
+    email_suffix = email_suffix or settings.EMAIL_SUFFIX
+
+    email = validate_email(email)
+    if not email:
+        email = validate_email(username)
+
+    if not email:
+        email = f'{username}@{email_suffix}'
     return email
 
 
