@@ -244,9 +244,9 @@ def construct_user_email(username, email, email_suffix=''):
     if not email:
         email = validate_email(username)
 
-    if not email:
-        email_suffix = email_suffix or settings.EMAIL_SUFFIX
-        email = f'{username}@{email_suffix}'
+        if not email:
+            email_suffix = email_suffix or settings.EMAIL_SUFFIX
+            email = f'{username}@{email_suffix}'
     return email
 
 
