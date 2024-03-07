@@ -5394,35 +5394,35 @@ msgid "Period clean"
 msgstr ""
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log keep days (day)"
+msgid "Login log retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log keep days (day)"
+msgid "Task log retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log keep days (day)"
+msgid "Operate log retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:27
-msgid "FTP log keep days (day)"
+msgid "FTP log retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:31
-msgid "Cloud sync record keep days (day)"
+msgid "Cloud sync task history retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:35
-msgid "job execution keep days (day)"
+msgid "job execution retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:39
-msgid "Activity log keep days (day)"
+msgid "Activity log retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:42
-msgid "Session keep duration (day)"
+msgid "Session log retention days (day)"
 msgstr ""
 
 #: settings/serializers/cleaning.py:44
