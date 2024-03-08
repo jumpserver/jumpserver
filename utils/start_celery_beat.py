@@ -58,7 +58,7 @@ else:
     pool = ConnectionPool.from_url(REDIS_LOCATION_NO_DB, **connection_params)
     redis_client = Redis(connection_pool=pool)
 
-scheduler = "ops.celery.beat.schedulers:DatabaseScheduler"
+scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 processes = []
 cmd = [
     'celery',
