@@ -33,6 +33,11 @@ class RDPClientOption(TextChoices):
     DRIVES_REDIRECT = 'drives_redirect', _('Drives redirect')
 
 
+class ConnectDefaultOpenMethod(TextChoices):
+    CURRENT = 'current', _('Current window')
+    NEW = 'new', _('New window')
+
+
 class RDPSmartSize(TextChoices):
     DISABLE = '0', _('Disable')
     ENABLE = '1', _('Enable')
