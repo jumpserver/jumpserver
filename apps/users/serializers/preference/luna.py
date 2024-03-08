@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from users.const import (
-    RDPResolution, RDPSmartSize, KeyboardLayout,
+    RDPResolution, RDPSmartSize, KeyboardLayout, ConnectDefaultOpenMethod,
     RDPClientOption, AppletConnectionMethod, RDPColorQuality,
 )
 
@@ -24,6 +24,10 @@ class MultipleChoiceField(serializers.MultipleChoiceField):
 class BasicSerializer(serializers.Serializer):
     is_async_asset_tree = serializers.BooleanField(
         required=False, default=True, label=_('Async loading of asset tree')
+    )
+    connect_default_open_method = serializers.ChoiceField(
+        choices=ConnectDefaultOpenMethod.choices, default=ConnectDefaultOpenMethod.CURRENT,
+        label=_('Connect default open method'), required=False
     )
 
 

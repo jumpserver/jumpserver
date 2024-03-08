@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-27 16:09+0800\n"
+"POT-Creation-Date: 2024-03-08 10:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1375,7 +1375,8 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr "无法连接到 {port} 上的端口 {address}"
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:93 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/backends/oauth2/views.py:60 authentication/middleware.py:93
+#: xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr "认证失败"
 
@@ -1414,7 +1415,7 @@ msgstr "禁用"
 #: assets/const/base.py:33 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
-#: users/serializers/preference/luna.py:73
+#: users/serializers/preference/luna.py:77
 msgid "Basic"
 msgstr "基本"
 
@@ -1441,7 +1442,7 @@ msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
-#: terminal/models/applet/applet.py:27 users/const.py:59
+#: terminal/models/applet/applet.py:27 users/const.py:64
 msgid "Web"
 msgstr "Web"
 
@@ -1741,7 +1742,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:549
+#: assets/models/cmd_filter.py:32 assets/models/node.py:553
 #: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
 msgid "Node"
@@ -1881,7 +1882,7 @@ msgstr "默认资产组"
 msgid "System"
 msgstr "系统"
 
-#: assets/models/label.py:19 assets/models/node.py:535
+#: assets/models/label.py:19 assets/models/node.py:539
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
@@ -1900,27 +1901,27 @@ msgstr "值"
 msgid "Label"
 msgstr "标签"
 
-#: assets/models/node.py:165
+#: assets/models/node.py:169
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:463 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:467 audits/backends/db.py:65 audits/backends/db.py:66
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:534 perms/models/perm_node.py:28
+#: assets/models/node.py:538 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:536 assets/serializers/node.py:20
+#: assets/models/node.py:540 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:540 perms/models/perm_node.py:30
+#: assets/models/node.py:544 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:552
+#: assets/models/node.py:556
 msgid "Can match node"
 msgstr "可以匹配节点"
 
@@ -2178,7 +2179,7 @@ msgstr "约束"
 msgid "Types"
 msgstr "类型"
 
-#: assets/serializers/domain.py:53 perms/serializers/permission.py:188
+#: assets/serializers/domain.py:56 perms/serializers/permission.py:188
 msgid "Assets amount"
 msgstr "资产数量"
 
@@ -2636,11 +2637,11 @@ msgstr "临时密码"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:109
+#: audits/tasks.py:119
 msgid "Clean audits session task log"
 msgstr "清理资产审计会话任务日志"
 
-#: audits/tasks.py:123
+#: audits/tasks.py:133
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
@@ -3242,13 +3243,13 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/const.py:37 users/models/user.py:644 users/serializers/profile.py:92
+#: users/const.py:42 users/models/user.py:644 users/serializers/profile.py:92
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/const.py:38 users/models/user.py:645 users/serializers/profile.py:93
+#: users/const.py:43 users/models/user.py:645 users/serializers/profile.py:93
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -3735,7 +3736,7 @@ msgstr "解析文件错误: {}"
 msgid "Invalid excel file"
 msgstr "无效的 excel 文件"
 
-#: common/drf/renders/base.py:207
+#: common/drf/renders/base.py:208
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -4008,11 +4009,11 @@ msgstr "发布站内消息"
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:264
+#: ops/ansible/inventory.py:265
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:280
+#: ops/ansible/inventory.py:281
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -6303,7 +6304,7 @@ msgid "Home page"
 msgstr "首页"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
-#: users/const.py:60
+#: users/const.py:65
 msgid "Client"
 msgstr "客户端"
 
@@ -7734,11 +7735,18 @@ msgstr "多屏显示"
 msgid "Drives redirect"
 msgstr "磁盘挂载"
 
-#: users/const.py:64
+#: users/const.py:37
+msgid "Current window"
+msgstr "当前窗口"
+
+msgid "New window"
+msgstr "新窗口"
+
+#: users/const.py:69
 msgid "Replace"
 msgstr "替换"
 
-#: users/const.py:65
+#: users/const.py:70
 msgid "Suffix"
 msgstr "加后缀"
 
@@ -7960,29 +7968,32 @@ msgstr "两次密码不一致"
 msgid "Async loading of asset tree"
 msgstr "异步加载资产树"
 
-#: users/serializers/preference/luna.py:33
+msgid "Connect default open method"
+msgstr "连接默认打开方式"
+
+#: users/serializers/preference/luna.py:37
 msgid "RDP resolution"
 msgstr "RDP 分辨率"
 
-#: users/serializers/preference/luna.py:37
+#: users/serializers/preference/luna.py:41
 msgid "Keyboard layout"
 msgstr "键盘布局"
 
-#: users/serializers/preference/luna.py:41
+#: users/serializers/preference/luna.py:45
 msgid "RDP client option"
 msgstr "RDP 客户端选项"
 
-#: users/serializers/preference/luna.py:45
+#: users/serializers/preference/luna.py:49
 msgid "RDP color quality"
 msgstr ""
 
-#: users/serializers/preference/luna.py:49
+#: users/serializers/preference/luna.py:53
 msgid "Rdp smart size"
 msgstr ""
 
 # msgid "Rdp smart size"
 # msgstr "RDP 智能大小"
-#: users/serializers/preference/luna.py:50
+#: users/serializers/preference/luna.py:54
 msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
@@ -7991,27 +8002,27 @@ msgstr ""
 "确定调整窗口大小时客户端计算机是否应缩放远程计算机上的内容以适应客户端计算机"
 "的窗口大小"
 
-#: users/serializers/preference/luna.py:55
+#: users/serializers/preference/luna.py:59
 msgid "Remote application connection method"
 msgstr "远程应用连接方式"
 
-#: users/serializers/preference/luna.py:62
+#: users/serializers/preference/luna.py:66
 msgid "Character terminal font size"
 msgstr "字符终端字体大小"
 
-#: users/serializers/preference/luna.py:65
+#: users/serializers/preference/luna.py:69
 msgid "Backspace as Ctrl+H"
 msgstr "字符终端Backspace As Ctrl+H"
 
-#: users/serializers/preference/luna.py:68
+#: users/serializers/preference/luna.py:72
 msgid "Right click quickly paste"
 msgstr "右键快速粘贴"
 
-#: users/serializers/preference/luna.py:74
+#: users/serializers/preference/luna.py:78
 msgid "Graphics"
 msgstr "图形化"
 
-#: users/serializers/preference/luna.py:75
+#: users/serializers/preference/luna.py:79
 msgid "Command line"
 msgstr "命令行"
 
@@ -8522,7 +8533,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 
