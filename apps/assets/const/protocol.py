@@ -187,6 +187,14 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 27017,
                 'required': True,
                 'secret_types': ['password'],
+                'setting': {
+                    'auth_source': {
+                        'type': 'str',
+                        'default': 'admin',
+                        'label': _('Auth source'),
+                        'help_text': _('The database to authenticate against')
+                    }
+                }
             },
             cls.redis: {
                 'port': 6379,
