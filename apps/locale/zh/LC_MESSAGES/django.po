@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 10:34+0800\n"
+"POT-Creation-Date: 2024-03-11 17:35+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -293,7 +293,7 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:128 assets/serializers/gateway.py:28
-#: audits/models.py:59 authentication/api/connection_token.py:405
+#: audits/models.py:59 authentication/api/connection_token.py:406
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:41 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
@@ -797,7 +797,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:404 ops/models/base.py:17
+#: authentication/api/connection_token.py:405 ops/models/base.py:17
 #: ops/models/job.py:147 ops/serializers/job.py:19
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1419,7 +1419,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:252
+#: assets/const/base.py:34 assets/const/protocol.py:260
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1567,39 +1567,47 @@ msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server 版本，不同版本有不同的连接驱动"
 
-#: assets/const/protocol.py:199
+#: assets/const/protocol.py:194
+msgid "Auth source"
+msgstr "认证数据库"
+
+#: assets/const/protocol.py:195
+msgid "The database to authenticate against"
+msgstr "要进行身份验证的数据库"
+
+#: assets/const/protocol.py:207
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:222
+#: assets/const/protocol.py:230
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:224
+#: assets/const/protocol.py:232
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:229 assets/models/asset/web.py:9
+#: assets/const/protocol.py:237 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:237 assets/models/asset/web.py:10
+#: assets/const/protocol.py:245 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:242 assets/models/asset/web.py:11
+#: assets/const/protocol.py:250 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:247 assets/models/asset/web.py:12
+#: assets/const/protocol.py:255 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:270
+#: assets/const/protocol.py:278
 msgid "API mode"
 msgstr "API 模式"
 
@@ -1938,7 +1946,7 @@ msgid "Public"
 msgstr "开放的"
 
 #: assets/models/platform.py:22 assets/serializers/platform.py:49
-#: settings/serializers/settings.py:66
+#: settings/serializers/settings.py:94
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
@@ -2428,11 +2436,11 @@ msgstr "任务"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:117
+#: audits/handler.py:116
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:117
+#: audits/handler.py:116
 msgid "No"
 msgstr "否"
 
@@ -2666,19 +2674,19 @@ msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:393
+#: authentication/api/connection_token.py:394
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:396
+#: authentication/api/connection_token.py:397
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:426
+#: authentication/api/connection_token.py:430
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:430
+#: authentication/api/connection_token.py:434
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2939,24 +2947,24 @@ msgstr "您的密码已过期，先修改再登录"
 msgid "{} days auto login"
 msgstr "{} 天内自动登录"
 
-#: authentication/forms.py:56
+#: authentication/forms.py:58
 msgid "MFA Code"
 msgstr "MFA 验证码"
 
-#: authentication/forms.py:57
+#: authentication/forms.py:59
 msgid "MFA type"
 msgstr "MFA 类型"
 
-#: authentication/forms.py:65
+#: authentication/forms.py:67
 #: authentication/templates/authentication/_captcha_field.html:15
 msgid "Captcha"
 msgstr "验证码"
 
-#: authentication/forms.py:70 users/forms/profile.py:28
+#: authentication/forms.py:72 users/forms/profile.py:28
 msgid "MFA code"
 msgstr "MFA 验证码"
 
-#: authentication/forms.py:72
+#: authentication/forms.py:74
 msgid "Dynamic code"
 msgstr "动态码"
 
@@ -5955,7 +5963,7 @@ msgstr "邮件收件人"
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/settings.py:70
+#: settings/serializers/settings.py:62
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
@@ -7739,6 +7747,7 @@ msgstr "磁盘挂载"
 msgid "Current window"
 msgstr "当前窗口"
 
+#: users/const.py:38
 msgid "New window"
 msgstr "新窗口"
 
@@ -7838,7 +7847,7 @@ msgstr "SSH密钥不合法"
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: users/models/preference.py:38
+#: users/models/preference.py:38 users/serializers/preference/preference.py:19
 msgid "Preference"
 msgstr "用户设置"
 
@@ -7968,6 +7977,7 @@ msgstr "两次密码不一致"
 msgid "Async loading of asset tree"
 msgstr "异步加载资产树"
 
+#: users/serializers/preference/luna.py:30
 msgid "Connect default open method"
 msgstr "连接默认打开方式"
 
@@ -9000,11 +9010,11 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/tasks.py:28
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 
-#: xpack/plugins/cloud/tasks.py:41
+#: xpack/plugins/cloud/tasks.py:42
 msgid "Period clean sync instance task execution"
 msgstr "定期清除同步实例任务执行记录"
 
@@ -9016,25 +9026,9 @@ msgstr "恢复默认成功！"
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:23
-msgid "Title of login page"
-msgstr "登录页面标题"
-
-#: xpack/plugins/interface/models.py:27
-msgid "Image of login page"
-msgstr "登录页面图片"
-
 #: xpack/plugins/interface/models.py:31
 msgid "Website icon"
 msgstr "网站图标"
-
-#: xpack/plugins/interface/models.py:35
-msgid "Logo of management page"
-msgstr "管理页面logo"
-
-#: xpack/plugins/interface/models.py:39
-msgid "Logo of logout page"
-msgstr "退出页面logo"
 
 #: xpack/plugins/interface/models.py:41
 msgid "Theme"
@@ -9079,27 +9073,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-#~ msgid "SMTP port"
-#~ msgstr "SMTP 端口"
-
-#~ msgid "SMTP account"
-#~ msgstr "SMTP 账号"
-
-#~ msgid "SMTP password"
-#~ msgstr "SMTP 密码"
-
-#~ msgid "Password can not contains `{{` or `}}`"
-#~ msgstr "密码不能包含 `{{` 或 `}}` 字符"
-
-#~ msgid "Password can not contains `{%` or `%}`"
-#~ msgstr "密码不能包含 `{%` 或 `%}` 字符"
-
-#~ msgid "FeiShu query user failed"
-#~ msgstr "飞书查询用户失败"
-
-#~ msgid "The FeiShu is already bound to another user"
-#~ msgstr "该飞书已经绑定其他用户"
-
-#~ msgid "Binding FeiShu successfully"
-#~ msgstr "绑定 飞书 成功"
