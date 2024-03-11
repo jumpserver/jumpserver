@@ -379,6 +379,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
+
         ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket
@@ -413,7 +414,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
-        acls = LoginAssetACL.filter_queryset(user=user, asset=asset, account=account)
+        kwargs = {'user': user, 'asset': asset, 'account': account}
+        if account.username == AliasAccount.INPUT:
+            kwargs['account_username'] = self.input_username
+        acls = LoginAssetACL.filter_queryset(**kwargs)
         ip = get_request_ip_or_data(self.request)
         acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
