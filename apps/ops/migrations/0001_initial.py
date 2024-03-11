@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=128, unique=True, verbose_name='Name')),
                 ('interval', models.IntegerField(blank=True, help_text='Units: seconds', null=True, verbose_name='Interval')),
                 ('crontab', models.CharField(blank=True, help_text='5 * * * *', max_length=128, null=True, verbose_name='Crontab')),
-                ('is_periodic', models.BooleanField(default=False, verbose_name='Periodic perform')),
+                ('is_periodic', models.BooleanField(default=False, verbose_name='Periodic run')),
                 ('callback', models.CharField(blank=True, max_length=128, null=True, verbose_name='Callback')),
                 ('is_deleted', models.BooleanField(default=False)),
                 ('comment', models.TextField(blank=True, verbose_name='Comment')),

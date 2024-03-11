@@ -87,7 +87,7 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         default=PasswordStrategy.email,
         allow_null=True,
         required=False,
-        label=_("Password strategy"),
+        label=_("Password option"),
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_("MFA enabled"))
     mfa_force_enabled = serializers.BooleanField(
@@ -181,6 +181,16 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
             "is_otp_secret_key_bound": {"label": _("Is OTP bound")},
             'mfa_level': {'label': _("MFA level")},
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_source_options()
+
+    def set_source_options(self):
+        field = self.fields.get("source")
+        if not field:
+            return
+        field.choices = User.get_source_choices()
 
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")

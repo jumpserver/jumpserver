@@ -22,12 +22,10 @@ class PeriodTaskModelMixin(models.Model):
     )
     is_periodic = models.BooleanField(default=False, verbose_name=_("Periodic run"))
     interval = models.IntegerField(
-        default=24, null=True, blank=True,
-        verbose_name=_("Interval"),
+        default=24, null=True, blank=True, verbose_name=_("Interval"),
     )
     crontab = models.CharField(
-        blank=True, max_length=128,
-        verbose_name=_("Crontab"),
+        blank=True, max_length=128, null=True, verbose_name=_("Crontab"),
     )
 
     @abc.abstractmethod

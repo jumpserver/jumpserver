@@ -4247,7 +4247,7 @@ msgstr "利用可能なプログラムポータルがありません"
 
 #: ops/mixin.py:23 ops/mixin.py:104 settings/serializers/auth/ldap.py:66
 #, fuzzy
-#| msgid "Periodic perform"
+#| msgid "Periodic run"
 msgid "Periodic run"
 msgstr "定期的なパフォーマンス"
 

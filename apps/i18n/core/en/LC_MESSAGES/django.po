@@ -2021,11 +2021,11 @@ msgstr ""
 
 #: assets/models/platform.py:107 assets/serializers/platform.py:166
 msgid "Su enabled"
-msgstr ""
+msgstr "Switch enabled"
 
 #: assets/models/platform.py:108 assets/serializers/platform.py:144
 msgid "Su method"
-msgstr ""
+msgstr "Switch method"
 
 #: assets/models/platform.py:109 assets/serializers/platform.py:147
 msgid "Custom fields"

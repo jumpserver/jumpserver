@@ -15,9 +15,11 @@ from authentication.backends.oidc.signals import openid_create_or_update_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.const.crontab import CRONTAB_AT_PM_TWO
 from common.decorators import on_transaction_commit
+from common.signals import django_ready
 from common.utils import get_logger
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
+from settings.signals import setting_changed
 from .models import User, UserPasswordHistory
 from .signals import post_user_create
 
@@ -173,3 +175,16 @@ def clean_expired_user_session_period():
 def user_logged_out_callback(sender, request, user, **kwargs):
     session_key = request.session.session_key
     UserSession.objects.filter(key=session_key).delete()
+
+
+@receiver(setting_changed)
+@on_transaction_commit
+def on_auth_setting_changed_clear_source_choice(sender, name='', **kwargs):
+    print("Receive setting changed signal: {}".format(name))
+    if name.startswith('AUTH_'):
+        User._source_choices = []
+
+
+@receiver(django_ready)
+def on_django_ready_refresh_source(sender, **kwargs):
+    User._source_choices = []
