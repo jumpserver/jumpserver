@@ -120,8 +120,7 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
-            "email", "wechat", "phone", "mfa_level", "source",
-            "wecom_id", "dingtalk_id", "feishu_id", "slack_id",
+            "email", "phone", "mfa_level", "source",
             "created_by", "updated_by", "comment",  # 通用字段
         ]
         fields_date = [
