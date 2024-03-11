@@ -125,7 +125,7 @@ pymysql = "1.1.0"
 django-redis = "5.3.0"
 python-redis-lock = "4.0.0"
 pyopenssl = "23.2.0"
-redis = "4.6.0"
+redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip" }
 pymongo = "4.4.1"
 pyfreerdp = "0.0.2"
 ipython = "8.14.0"
