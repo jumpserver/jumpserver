@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 10:34+0800\n"
+"POT-Creation-Date: 2024-03-12 14:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -293,7 +293,7 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:128 assets/serializers/gateway.py:28
-#: audits/models.py:59 authentication/api/connection_token.py:405
+#: audits/models.py:59 authentication/api/connection_token.py:406
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:41 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
@@ -797,7 +797,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:404 ops/models/base.py:17
+#: authentication/api/connection_token.py:405 ops/models/base.py:17
 #: ops/models/job.py:147 ops/serializers/job.py:19
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1938,7 +1938,7 @@ msgid "Public"
 msgstr "开放的"
 
 #: assets/models/platform.py:22 assets/serializers/platform.py:49
-#: settings/serializers/settings.py:66
+#: settings/serializers/settings.py:94
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
@@ -2428,11 +2428,11 @@ msgstr "任务"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:117
+#: audits/handler.py:116
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:117
+#: audits/handler.py:116
 msgid "No"
 msgstr "否"
 
@@ -2666,19 +2666,19 @@ msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:393
+#: authentication/api/connection_token.py:394
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:396
+#: authentication/api/connection_token.py:397
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:426
+#: authentication/api/connection_token.py:430
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:430
+#: authentication/api/connection_token.py:434
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2939,24 +2939,24 @@ msgstr "您的密码已过期，先修改再登录"
 msgid "{} days auto login"
 msgstr "{} 天内自动登录"
 
-#: authentication/forms.py:56
+#: authentication/forms.py:58
 msgid "MFA Code"
 msgstr "MFA 验证码"
 
-#: authentication/forms.py:57
+#: authentication/forms.py:59
 msgid "MFA type"
 msgstr "MFA 类型"
 
-#: authentication/forms.py:65
+#: authentication/forms.py:67
 #: authentication/templates/authentication/_captcha_field.html:15
 msgid "Captcha"
 msgstr "验证码"
 
-#: authentication/forms.py:70 users/forms/profile.py:28
+#: authentication/forms.py:72 users/forms/profile.py:28
 msgid "MFA code"
 msgstr "MFA 验证码"
 
-#: authentication/forms.py:72
+#: authentication/forms.py:74
 msgid "Dynamic code"
 msgstr "动态码"
 
@@ -5955,7 +5955,7 @@ msgstr "邮件收件人"
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/settings.py:70
+#: settings/serializers/settings.py:62
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
@@ -7739,6 +7739,7 @@ msgstr "磁盘挂载"
 msgid "Current window"
 msgstr "当前窗口"
 
+#: users/const.py:38
 msgid "New window"
 msgstr "新窗口"
 
@@ -7838,7 +7839,7 @@ msgstr "SSH密钥不合法"
 msgid "Public key"
 msgstr "SSH公钥"
 
-#: users/models/preference.py:38
+#: users/models/preference.py:38 users/serializers/preference/preference.py:19
 msgid "Preference"
 msgstr "用户设置"
 
@@ -7968,6 +7969,7 @@ msgstr "两次密码不一致"
 msgid "Async loading of asset tree"
 msgstr "异步加载资产树"
 
+#: users/serializers/preference/luna.py:30
 msgid "Connect default open method"
 msgstr "连接默认打开方式"
 
@@ -9041,14 +9043,10 @@ msgid "Theme"
 msgstr "主题"
 
 #: xpack/plugins/interface/models.py:42
-msgid "Beian link"
-msgstr "公安联网备案跳转链接"
+msgid "Footer content"
+msgstr "页脚内容"
 
-#: xpack/plugins/interface/models.py:43
-msgid "Beian text"
-msgstr "公安联网备案号"
-
-#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
+#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
 msgid "Interface setting"
 msgstr "界面设置"
 
