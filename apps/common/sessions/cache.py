@@ -37,6 +37,9 @@ class RedisUserSessionManager:
         if new_count <= 0:
             self.client.hdel(self.JMS_SESSION_KEY, session_key)
 
+    def remove(self, session_key):
+        self.client.hdel(self.JMS_SESSION_KEY, session_key)
+
     def check_active(self, session_key):
         count = self.client.hget(self.JMS_SESSION_KEY, session_key)
         count = 0 if count is None else int(count.decode('utf-8'))
@@ -48,6 +51,13 @@ class RedisUserSessionManager:
             count = int(v.decode('utf-8'))
             if count <= 0:
                 continue
+            key = k.decode('utf-8')
+            session_keys.append(key)
+        return session_keys
+
+    def get_keys(self):
+        session_keys = []
+        for k in self.client.hgetall(self.JMS_SESSION_KEY).keys():
             key = k.decode('utf-8')
             session_keys.append(key)
         return session_keys
