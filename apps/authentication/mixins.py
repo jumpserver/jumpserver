@@ -206,7 +206,8 @@ class MFAMixin:
 
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
-        if not active_mfa_mapper:
+        need_otp_start = self.opt_need_start(user)
+        if not active_mfa_mapper or need_otp_start:
             set_url = reverse('authentication:user-otp-enable-start')
             raise errors.MFAUnsetError(set_url, user, self.request)
 
@@ -298,6 +299,10 @@ class MFAMixin:
     def incr_mfa_failed_time(username, ip):
         util = MFABlockUtils(username, ip)
         util.incr_failed_count()
+
+    @staticmethod
+    def opt_need_start(user):
+        return (not user.otp_secret_key) and user.mfa_level == 1
 
 
 class AuthPostCheckMixin:
