@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 18:22+0800\n"
+"POT-Creation-Date: 2024-03-12 14:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9178,14 +9178,10 @@ msgid "Theme"
 msgstr "テーマ"
 
 #: xpack/plugins/interface/models.py:42
-msgid "Beian link"
-msgstr "公安オンライン申告ジャンプリンク"
+msgid "Footer content"
+msgstr "フッターの内容"
 
-#: xpack/plugins/interface/models.py:43
-msgid "Beian text"
-msgstr "公安網登録番号"
-
-#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
+#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
 msgid "Interface setting"
 msgstr "インターフェイスの設定"
 

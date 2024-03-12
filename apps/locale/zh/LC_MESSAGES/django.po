@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 18:22+0800\n"
+"POT-Creation-Date: 2024-03-12 14:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -9051,14 +9051,10 @@ msgid "Theme"
 msgstr "主题"
 
 #: xpack/plugins/interface/models.py:42
-msgid "Beian link"
-msgstr "公安联网备案跳转链接"
+msgid "Footer content"
+msgstr "页脚内容"
 
-#: xpack/plugins/interface/models.py:43
-msgid "Beian text"
-msgstr "公安联网备案号"
-
-#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
+#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
 msgid "Interface setting"
 msgstr "界面设置"
 
