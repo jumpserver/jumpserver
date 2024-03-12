@@ -1427,7 +1427,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:252
+#: assets/const/base.py:34 assets/const/protocol.py:260
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1576,15 +1576,23 @@ msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server のバージョン。バージョンによって接続ドライバが異なります"
 
-#: assets/const/protocol.py:199
+#: assets/const/protocol.py:194
+msgid "Auth source"
+msgstr "認証データベース"
+
+#: assets/const/protocol.py:195
+msgid "The database to authenticate against"
+msgstr "認証するデータベース"
+
+#: assets/const/protocol.py:207
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:222
+#: assets/const/protocol.py:230
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:224
+#: assets/const/protocol.py:232
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
@@ -1592,24 +1600,24 @@ msgstr ""
 "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへ"
 "のアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:229 assets/models/asset/web.py:9
+#: assets/const/protocol.py:237 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:237 assets/models/asset/web.py:10
+#: assets/const/protocol.py:245 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:242 assets/models/asset/web.py:11
+#: assets/const/protocol.py:250 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:247 assets/models/asset/web.py:12
+#: assets/const/protocol.py:255 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:270
+#: assets/const/protocol.py:278
 msgid "API mode"
 msgstr "APIモード"
 

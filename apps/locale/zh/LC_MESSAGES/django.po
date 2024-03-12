@@ -1419,7 +1419,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:252
+#: assets/const/base.py:34 assets/const/protocol.py:260
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1567,39 +1567,47 @@ msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server 版本，不同版本有不同的连接驱动"
 
-#: assets/const/protocol.py:199
+#: assets/const/protocol.py:194
+msgid "Auth source"
+msgstr "认证数据库"
+
+#: assets/const/protocol.py:195
+msgid "The database to authenticate against"
+msgstr "要进行身份验证的数据库"
+
+#: assets/const/protocol.py:207
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:222
+#: assets/const/protocol.py:230
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:224
+#: assets/const/protocol.py:232
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:229 assets/models/asset/web.py:9
+#: assets/const/protocol.py:237 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:237 assets/models/asset/web.py:10
+#: assets/const/protocol.py:245 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:242 assets/models/asset/web.py:11
+#: assets/const/protocol.py:250 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:247 assets/models/asset/web.py:12
+#: assets/const/protocol.py:255 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:270
+#: assets/const/protocol.py:278
 msgid "API mode"
 msgstr "API 模式"
 
