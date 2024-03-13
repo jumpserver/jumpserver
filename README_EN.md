@@ -85,7 +85,7 @@ If you find a security problem, please contact us directly：
 - 400-052-0755
 
 ### License & Copyright
-Copyright (c) 2014-2022 FIT2CLOUD Tech, Inc., All rights reserved.
+Copyright (c) 2014-2024 FIT2CLOUD Tech, Inc., All rights reserved.
 
 Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
