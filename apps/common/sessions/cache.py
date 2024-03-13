@@ -1,16 +1,19 @@
 import re
+from importlib import import_module
 
+from django.conf import settings
 from django.contrib.sessions.backends.cache import (
     SessionStore as DjangoSessionStore
 )
-from django.core.cache import cache
+from django.core.cache import cache, caches
 
 from jumpserver.utils import get_current_request
 
 
 class SessionStore(DjangoSessionStore):
     ignore_urls = [
-        r'^/api/v1/users/profile/'
+        r'^/api/v1/users/profile/',
+        r'^/api/v1/authentication/user-session/'
     ]
 
     def __init__(self, *args, **kwargs):
@@ -55,12 +58,12 @@ class RedisUserSessionManager:
             session_keys.append(key)
         return session_keys
 
-    def get_keys(self):
-        session_keys = []
-        for k in self.client.hgetall(self.JMS_SESSION_KEY).keys():
-            key = k.decode('utf-8')
-            session_keys.append(key)
-        return session_keys
+    @staticmethod
+    def get_keys():
+        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
+        cache_key_prefix = session_store_cls.cache_key_prefix
+        keys = caches[settings.SESSION_CACHE_ALIAS].iter_keys('*')
+        return [k.replace(cache_key_prefix, '') for k in keys]
 
 
 user_session_manager = RedisUserSessionManager()

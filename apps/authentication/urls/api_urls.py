@@ -32,6 +32,7 @@ urlpatterns = [
     path('password/reset-code/', api.UserResetPasswordSendCodeApi.as_view(), name='reset-password-code'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
+    path('user-session/', api.UserSessionApi.as_view(), name='user-session'),
 ]
 
 urlpatterns += router.urls + passkey_urlpatterns
