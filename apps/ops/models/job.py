@@ -555,10 +555,12 @@ class JobExecution(JMSOrgBaseModel):
             ssh_tunnel.local_gateway_clean(runner)
 
     def stop(self):
+        from ops.signal_handlers import job_execution_stop_pub_sub
+
         with open(os.path.join(self.private_dir, 'local.pid')) as f:
             try:
                 pid = f.read()
-                os.kill(int(pid), 9)
+                job_execution_stop_pub_sub.publish(int(pid))
             except Exception as e:
                 print(e)
         self.set_error('Job stop by "kill -9 {}"'.format(pid))

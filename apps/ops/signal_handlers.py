@@ -1,4 +1,6 @@
 import ast
+import psutil
+from psutil import NoSuchProcess
 import time
 
 from celery import signals
@@ -8,9 +10,11 @@ from django.db.models.signals import pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
+from django.utils.functional import LazyObject
 
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
+from common.utils.connection import RedisPubSub
 from orgs.utils import get_current_org_id, set_current_org
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
@@ -144,3 +148,39 @@ def task_sent_handler(headers=None, body=None, **kwargs):
     }
     CeleryTaskExecution.objects.create(**data)
     CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
+
+
+@receiver(django_ready)
+def subscribe_stop_job_execution(sender, **kwargs):
+    logger.info("Start subscribe for stop job execution")
+
+    def on_stop(pid):
+        logger.info(f"Stop job execution {pid} start")
+        try:
+            current_process = psutil.Process(pid)
+        except NoSuchProcess as e:
+            logger.error(e)
+            return
+
+        children = current_process.children(recursive=True)
+        logger.debug(f"Job execution process children: {children}")
+        for child in children:
+            if child.pid == 1:
+                continue
+            if child.name() != 'ssh':
+                continue
+            try:
+                child.kill()
+                logger.debug(f"Kill job execution process {pid} children process {child.pid} success")
+            except Exception as e:
+                logger.error(e)
+
+    job_execution_stop_pub_sub.subscribe(on_stop)
+
+
+class JobExecutionPubSub(LazyObject):
+    def _setup(self):
+        self._wrapped = RedisPubSub('fm.job_execution_stop')
+
+
+job_execution_stop_pub_sub = JobExecutionPubSub()
