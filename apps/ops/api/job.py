@@ -1,5 +1,6 @@
 import json
 import os
+from psutil import NoSuchProcess
 
 from celery.result import AsyncResult
 from django.conf import settings
@@ -198,7 +199,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
             return Response({'error': serializer.errors}, status=400)
         task_id = serializer.validated_data['task_id']
         try:
-            instance = get_object_or_404(JobExecution, task_id=task_id, creator=request.user)
+            instance = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
         except Http404:
             return Response(
                 {'error': _('The task is being created and cannot be interrupted. Please try again later.')},
@@ -207,7 +208,10 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
 
         task = AsyncResult(task_id, app=app)
         inspect = app.control.inspect()
+
         for worker in inspect.registered().keys():
+            if not worker.startswith('ansible'):
+                continue
             if task_id not in [at['id'] for at in inspect.active().get(worker, [])]:
                 # 在队列中未执行使用revoke执行
                 task.revoke(terminate=True)
@@ -239,7 +243,7 @@ class JobExecutionTaskDetail(APIView):
         task_id = str(kwargs.get('task_id'))
 
         with tmp_to_org(org):
-            execution = get_object_or_404(JobExecution, task_id=task_id)
+            execution = get_object_or_404(JobExecution, pk=task_id)
 
         return Response(data={
             'status': execution.status,
