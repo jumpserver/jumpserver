@@ -69,7 +69,6 @@ class PlaybookViewSet(OrgBulkModelViewSet):
 
 
 class PlaybookFileBrowserAPIView(APIView):
-    rbac_perms = ()
     permission_classes = (RBACPermission,)
     rbac_perms = {
         'GET': 'ops.change_playbook',
