@@ -268,8 +268,3 @@
       until: _result.status_code == 200
       retries: 30
       delay: 5
-
-    - name: Sync all remote applets
-      ansible.windows.win_powershell:
-        script: |
-          tinkerd install all
