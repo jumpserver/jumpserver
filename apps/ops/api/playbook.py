@@ -79,9 +79,13 @@ class PlaybookFileBrowserAPIView(APIView):
     }
     protected_files = ['root', 'main.yml']
 
+    def get_playbook(self, playbook_id):
+        playbook = get_object_or_404(Playbook, id=playbook_id, creator=self.request.user)
+        return playbook
+
     def get(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
         file_key = request.query_params.get('key', '')
         if file_key:
@@ -101,7 +105,7 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def post(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
 
         parent_key = request.data.get('key', '')
@@ -157,7 +161,7 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def patch(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
 
         file_key = request.data.get('key', '')
@@ -197,7 +201,7 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def delete(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
         file_key = request.query_params.get('key', '')
         if not file_key:
