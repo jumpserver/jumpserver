@@ -21,6 +21,7 @@ logger = get_logger(__file__)
 __all__ = [
     'ChangeSecretAutomationSerializer',
     'ChangeSecretRecordSerializer',
+    'ChangeSecretRecordViewSecretSerializer',
     'ChangeSecretRecordBackUpSerializer',
     'ChangeSecretUpdateAssetSerializer',
     'ChangeSecretUpdateNodeSerializer',
@@ -120,6 +121,15 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_is_success(obj):
         return obj.status == 'success'
+
+
+class ChangeSecretRecordViewSecretSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChangeSecretRecord
+        fields = [
+            'id', 'old_secret', 'new_secret',
+        ]
+        read_only_fields = fields
 
 
 class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
