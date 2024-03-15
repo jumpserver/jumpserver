@@ -17,10 +17,12 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class DeployAppletHostManager:
-    def __init__(self, deployment: AppletHostDeployment, applet: Applet = None):
+    def __init__(self, deployment: AppletHostDeployment, applet: Applet = None,
+                 install_applets: bool = True, **kwargs):
         self.deployment = deployment
         self.applet = applet
         self.run_dir = self.get_run_dir()
+        self.install_applets = bool(install_applets)
 
     @staticmethod
     def get_run_dir():
@@ -70,6 +72,7 @@ class DeployAppletHostManager:
                 play["vars"]["BOOTSTRAP_TOKEN"] = bootstrap_token
                 play["vars"]["HOST_ID"] = host_id
                 play["vars"]["HOST_NAME"] = hostname
+                play["vars"]["INSTALL_APPLETS"] = self.install_applets
             return plays
 
         return self._generate_playbook("playbook.yml", handler)

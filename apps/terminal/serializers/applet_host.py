@@ -134,6 +134,7 @@ class HostAppletSerializer(AppletSerializer):
 
 class AppletHostDeploymentSerializer(serializers.ModelSerializer):
     status = LabeledChoiceField(choices=Status.choices, label=_('Status'), default=Status.pending)
+    install_applets = serializers.BooleanField(default=True, label=_('Install applets'), write_only=True)
 
     class Meta:
         model = AppletHostDeployment
@@ -142,7 +143,8 @@ class AppletHostDeploymentSerializer(serializers.ModelSerializer):
             'status', 'date_created', 'date_updated',
             'date_start', 'date_finished'
         ]
-        fields = fields_mini + ['comment'] + read_only_fields
+        write_only_fields = ['install_applets',]
+        fields = fields_mini + ['comment'] + read_only_fields + write_only_fields
 
 
 class AppletHostAccountSerializer(serializers.ModelSerializer):
