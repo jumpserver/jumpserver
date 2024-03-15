@@ -7883,7 +7883,7 @@ msgid "Org roles"
 msgstr "组织角色"
 
 #: users/serializers/user.py:90
-msgid "Password option"
+msgid "Password setting"
 msgstr "密码选项"
 
 #: users/serializers/user.py:92

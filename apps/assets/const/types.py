@@ -169,11 +169,11 @@ class AllTypes(ChoicesMixin):
             (Category.HOST, HostTypes),
             (Category.DEVICE, DeviceTypes),
             (Category.DATABASE, DatabaseTypes),
+            (Category.WEB, WebTypes),
         ]
-        if not settings.LITE:
+        if settings.XPACK_ENABLED:
             types.extend([
                 (Category.CLOUD, CloudTypes),
-                (Category.WEB, WebTypes),
                 (Category.GPT, GPTTypes),
                 (Category.CUSTOM, CustomTypes),
             ])

@@ -111,21 +111,9 @@ class BaseType(TextChoices):
         return cls._get_choices_to_types()
 
     @classmethod
-    def get_lite_types(cls):
-        return []
-
-    @classmethod
     def get_choices(cls):
         if not settings.XPACK_ENABLED:
             choices = [(tp.value, tp.label) for tp in cls.get_community_types()]
         else:
             choices = cls.choices
-
-        if not settings.LITE:
-            return choices
-
-        lite_choices = cls.get_lite_types()
-        if lite_choices:
-            lite_choices = [c.value for c in lite_choices]
-            choices = [c for c in choices if c[0] in lite_choices]
         return choices

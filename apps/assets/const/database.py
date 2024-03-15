@@ -107,10 +107,3 @@ class DatabaseTypes(BaseType):
         return [
             cls.MYSQL, cls.MARIADB, cls.MONGODB, cls.REDIS
         ]
-
-    @classmethod
-    def get_lite_types(cls):
-        return [
-            cls.MYSQL, cls.MARIADB, cls.POSTGRESQL, cls.ORACLE,
-            cls.SQLSERVER, cls.DB2
-        ]

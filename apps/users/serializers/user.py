@@ -87,7 +87,7 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         default=PasswordStrategy.email,
         allow_null=True,
         required=False,
-        label=_("Password option"),
+        label=_("Password setting"),
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_("MFA enabled"))
     mfa_force_enabled = serializers.BooleanField(

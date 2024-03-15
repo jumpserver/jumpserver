@@ -8070,7 +8070,7 @@ msgstr "組織ロール"
 #: users/serializers/user.py:90
 #, fuzzy
 #| msgid "Password prompt"
-msgid "Password option"
+msgid "Password setting"
 msgstr "パスワードプロンプト"
 
 #: users/serializers/user.py:92
