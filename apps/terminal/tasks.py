@@ -91,10 +91,10 @@ def upload_session_replay_to_external_storage(session_id):
     verbose_name=_('Run applet host deployment'),
     activity_callback=lambda self, did, *args, **kwargs: ([did],)
 )
-def run_applet_host_deployment(did):
+def run_applet_host_deployment(did, install_applets):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
-        deployment.start()
+        deployment.start(install_applets=install_applets)
 
 
 @shared_task(

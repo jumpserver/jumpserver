@@ -155,8 +155,8 @@ class AppletHostDeployment(JMSBaseModel):
             self.host.save()
             terminal.delete()
         from ...automations.deploy_applet_host import DeployAppletHostManager
-        manager = DeployAppletHostManager(self)
-        manager.run(**kwargs)
+        manager = DeployAppletHostManager(self, **kwargs)
+        manager.run()
 
     def install_applet(self, applet_id, **kwargs):
         from ...automations.deploy_applet_host import DeployAppletHostManager

@@ -59,15 +59,18 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     )
 
     @staticmethod
-    def start_deploy(instance):
-        task = run_applet_host_deployment.apply_async((instance.id,), task_id=str(instance.id))
+    def start_deploy(instance, install_applets):
+        task = run_applet_host_deployment.apply_async((instance.id, install_applets,),
+                                                      task_id=str(instance.id))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        install_applets = validated_data.pop('install_applets', True)
         instance = serializer.save()
         instance.save_task(instance.id)
-        transaction.on_commit(lambda: self.start_deploy(instance))
+        transaction.on_commit(lambda: self.start_deploy(instance, install_applets))
         return Response({'task': str(instance.id)}, status=201)
 
     @action(methods=['post'], detail=False)
