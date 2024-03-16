@@ -5,10 +5,9 @@ from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 
 from common.utils import get_logger
-
+from django.contrib.auth import login as auth_login
 from .. import serializers, errors
 from ..mixins import AuthMixin
-
 
 logger = get_logger(__name__)
 
@@ -35,6 +34,7 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
             self.check_user_login_confirm_if_need(user)
             self.send_auth_signal(success=True, user=user)
             resp = super().create(request, *args, **kwargs)
+            auth_login(self.request, user)
             self.clear_auth_mark()
             return resp
         except errors.AuthFailedError as e:
