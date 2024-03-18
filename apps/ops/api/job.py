@@ -1,6 +1,5 @@
 import json
 import os
-from psutil import NoSuchProcess
 
 from celery.result import AsyncResult
 from django.conf import settings
@@ -20,7 +19,9 @@ from common.permissions import IsValidUser
 from ops.celery import app
 from ops.const import Types
 from ops.models import Job, JobExecution
-from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
+from ops.serializers.job import (
+    JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
+)
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
@@ -44,16 +45,17 @@ def set_task_to_serializer_data(serializer, task_id):
 
 
 def merge_nodes_and_assets(nodes, assets, user):
-    if nodes:
-        perm_util = UserPermAssetUtil(user=user)
-        for node_id in nodes:
-            if node_id == PermNode.FAVORITE_NODE_KEY:
-                node_assets = perm_util.get_favorite_assets()
-            elif node_id == PermNode.UNGROUPED_NODE_KEY:
-                node_assets = perm_util.get_ungroup_assets()
-            else:
-                node, node_assets = perm_util.get_node_all_assets(node_id)
-            assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
+    if not nodes:
+        return assets
+    perm_util = UserPermAssetUtil(user=user)
+    for node_id in nodes:
+        if node_id == PermNode.FAVORITE_NODE_KEY:
+            node_assets = perm_util.get_favorite_assets()
+        elif node_id == PermNode.UNGROUPED_NODE_KEY:
+            node_assets = perm_util.get_ungroup_assets()
+        else:
+            _, node_assets = perm_util.get_node_all_assets(node_id)
+        assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
     return assets
 
 
@@ -67,12 +69,13 @@ class JobViewSet(OrgBulkModelViewSet):
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
 
-    def allow_bulk_destroy(self, qs, filtered):
-        return True
-
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(creator=self.request.user).exclude(type=Types.upload_file)
+        queryset = queryset \
+            .filter(creator=self.request.user) \
+            .exclude(type=Types.upload_file)
+
+        # Job 列表不显示 adhoc, retrieve 要取状态
         if self.action != 'retrieve':
             return queryset.filter(instant=False)
         return queryset
@@ -80,10 +83,11 @@ class JobViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
         node_ids = serializer.validated_data.pop('nodes', [])
-        assets = serializer.validated_data.__getitem__('assets')
+        assets = serializer.validated_data.get('assets')
         assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
-        serializer.validated_data.__setitem__('assets', assets)
+        serializer.validated_data['assets'] = assets
         instance = serializer.save()
+
         if instance.instant or run_after_save:
             self.run_job(instance, serializer)
 
@@ -100,7 +104,10 @@ class JobViewSet(OrgBulkModelViewSet):
 
         set_task_to_serializer_data(serializer, execution.id)
         transaction.on_commit(
-            lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
+            lambda: run_ops_job_execution.apply_async(
+                (str(execution.id),), task_id=str(execution.id)
+            )
+        )
 
     @staticmethod
     def get_duplicates_files(files):
@@ -121,8 +128,8 @@ class JobViewSet(OrgBulkModelViewSet):
                 exceeds_limit_files.append(file)
         return exceeds_limit_files
 
-    @action(methods=[POST], detail=False, serializer_class=FileSerializer, permission_classes=[IsValidUser, ],
-            url_path='upload')
+    @action(methods=[POST], detail=False, serializer_class=FileSerializer,
+            permission_classes=[IsValidUser, ], url_path='upload')
     def upload(self, request, *args, **kwargs):
         uploaded_files = request.FILES.getlist('files')
         serializer = self.get_serializer(data=request.data)
