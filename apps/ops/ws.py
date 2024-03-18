@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import aiofiles
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from common.db.utils import close_old_connections
@@ -9,12 +10,17 @@ from common.utils import get_logger
 from .ansible.utils import get_ansible_task_log_path
 from .celery.utils import get_celery_task_log_path
 from .const import CELERY_LOG_MAGIC_MARK
+from .models import CeleryTaskExecution
 
 logger = get_logger(__name__)
 
 
 class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
     disconnected = False
+    user_tasks = (
+        'ops.tasks.run_ops_job',
+        'ops.tasks.run_ops_job_execution',
+    )
 
     log_types = {
         'celery': get_celery_task_log_path,
@@ -33,10 +39,27 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         if func:
             return func(task_id)
 
+    @sync_to_async
+    def get_task(self, task_id):
+        task = CeleryTaskExecution.objects.filter(id=task_id).first()
+        # task.creator 是 foreign key, 会异步去查询的，在下面的 if task.creator 会报错, 所以这里先取出来
+        if task and task.creator != ' ':
+            return task
+        else:
+            return None
+
     async def receive_json(self, content, **kwargs):
         task_id = content.get('task')
-        task_typ = content.get('type', 'celery')
-        log_path = self.get_log_path(task_id, task_typ)
+        task = await self.get_task(task_id)
+        if not task:
+            await self.send_json({'message': 'Task not found', 'task': task_id})
+            return
+        if task.name in self.user_tasks and task.creator != self.scope['user']:
+            await self.send_json({'message': 'No permission', 'task': task_id})
+            return
+
+        task_type = content.get('type', 'celery')
+        log_path = self.get_log_path(task_id, task_type)
         await self.async_handle_task(task_id, log_path)
 
     async def async_handle_task(self, task_id, log_path):
