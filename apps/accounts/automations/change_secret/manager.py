@@ -160,14 +160,18 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return
         recorder.status = 'success'
         recorder.date_finished = timezone.now()
-        recorder.save()
+
         account = recorder.account
         if not account:
             print("Account not found, deleted ?")
             return
         account.secret = recorder.new_secret
         account.date_updated = timezone.now()
-        account.save(update_fields=['secret', 'date_updated'])
+        try:
+            recorder.save()
+            account.save(update_fields=['secret', 'date_updated'])
+        except Exception as e:
+            self.on_host_error(host, str(e), result)
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -176,7 +180,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.status = 'failed'
         recorder.date_finished = timezone.now()
         recorder.error = error
-        recorder.save()
+        try:
+            recorder.save()
+        except Exception as e:
+            print(f"\033[31m Save {host} recorder error: {e} \033[0m\n")
 
     def on_runner_failed(self, runner, e):
         logger.error("Account error: ", e)

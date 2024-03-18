@@ -58,7 +58,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             result = self.filter_success_result(asset.type, info)
             self.collect_asset_account_info(asset, result)
         else:
-            logger.error(f'Not found {host} info')
+            print(f'\033[31m Not found {host} info \033[0m\n')
 
     def update_or_create_accounts(self):
         for asset, data in self.asset_account_info.items():
