@@ -143,7 +143,7 @@ class JobViewSet(OrgBulkModelViewSet):
                 status=400)
 
         job_id = request.data.get('job_id', '')
-        job = get_object_or_404(Job, pk=job_id)
+        job = get_object_or_404(Job, pk=job_id, creator=request.user)
         job_args = json.loads(job.args)
         src_path_info = []
         upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file', job_id)
@@ -229,7 +229,7 @@ class JobAssetDetail(APIView):
 
     def get(self, request, **kwargs):
         execution_id = request.query_params.get('execution_id', '')
-        execution = get_object_or_404(JobExecution, id=execution_id)
+        execution = get_object_or_404(JobExecution, id=execution_id, creator=request.user)
         return Response(data=execution.assent_result_detail)
 
 
@@ -243,7 +243,7 @@ class JobExecutionTaskDetail(APIView):
         task_id = str(kwargs.get('task_id'))
 
         with tmp_to_org(org):
-            execution = get_object_or_404(JobExecution, pk=task_id)
+            execution = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
 
         return Response(data={
             'status': execution.status,
