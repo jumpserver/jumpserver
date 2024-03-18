@@ -63,8 +63,10 @@ class JobViewSet(OrgBulkModelViewSet):
     model = Job
 
     def check_permissions(self, request):
+        # job: upload_file
         if self.action == 'upload' or request.data.get('type') == Types.upload_file:
             return super().check_permissions(request)
+        # job: adhoc, playbook
         if not settings.SECURITY_COMMAND_EXECUTION:
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
