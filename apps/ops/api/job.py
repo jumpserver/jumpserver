@@ -23,8 +23,7 @@ from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 
 __all__ = [
-    'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
-    'JobAssetDetail', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
+    'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
 ]
 
 from ops.tasks import run_ops_job_execution
@@ -224,17 +223,6 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
 
         instance.stop()
         return Response({'task_id': task_id}, status=200)
-
-
-class JobAssetDetail(APIView):
-    rbac_perms = {
-        'get': ['ops.view_jobexecution'],
-    }
-
-    def get(self, request, **kwargs):
-        execution_id = request.query_params.get('execution_id', '')
-        execution = get_object_or_404(JobExecution, id=execution_id, creator=request.user)
-        return Response(data=execution.assent_result_detail)
 
 
 class JobExecutionTaskDetail(APIView):

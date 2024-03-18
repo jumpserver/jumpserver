@@ -254,45 +254,6 @@ class JobExecution(JMSOrgBaseModel):
             return self.job.get_history(self.job_version)
         return self.job
 
-    @property
-    def assent_result_detail(self):
-        if not self.is_finished or self.summary.get('error'):
-            return None
-        result = {
-            "summary": self.summary,
-            "detail": [],
-        }
-        for asset in self.current_job.assets.all():
-            asset_detail = {
-                "name": asset.name,
-                "status": "ok",
-                "tasks": [],
-            }
-            if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
-                asset_detail.update({"status": "excludes"})
-                result["detail"].append(asset_detail)
-                break
-            if self.result["dark"].get(asset.name, None):
-                asset_detail.update({"status": "failed"})
-                for key, task in self.result["dark"][asset.name].items():
-                    task_detail = {"name": key,
-                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                    asset_detail["tasks"].append(task_detail)
-            if self.result["failures"].get(asset.name, None):
-                asset_detail.update({"status": "failed"})
-                for key, task in self.result["failures"][asset.name].items():
-                    task_detail = {"name": key,
-                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                    asset_detail["tasks"].append(task_detail)
-
-            if self.result["ok"].get(asset.name, None):
-                for key, task in self.result["ok"][asset.name].items():
-                    task_detail = {"name": key,
-                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                    asset_detail["tasks"].append(task_detail)
-            result["detail"].append(asset_detail)
-        return result
-
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
