@@ -1,6 +1,5 @@
 import json
 import os
-from psutil import NoSuchProcess
 
 from celery.result import AsyncResult
 from django.conf import settings

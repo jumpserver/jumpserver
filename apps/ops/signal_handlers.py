@@ -1,8 +1,7 @@
 import ast
-import psutil
-from psutil import NoSuchProcess
 import time
 
+import psutil
 from celery import signals
 from django.core.cache import cache
 from django.db import transaction
@@ -11,10 +10,12 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.utils.functional import LazyObject
+from psutil import NoSuchProcess
 
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
+from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
@@ -146,6 +147,9 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'args': args,
         'kwargs': kwargs
     }
+    request = get_current_request()
+    if request and request.user.is_authenticated:
+        data['creator'] = request.user
     CeleryTaskExecution.objects.create(**data)
     CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
 
