@@ -81,3 +81,8 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
         fields = read_only_fields + [
             "job", "parameters", "creator"
         ]
+
+    def validate_job(self, job_obj):
+        if job_obj.creator != self.context['request'].user:
+            raise serializers.ValidationError(_("You do not have permission for the current job."))
+        return job_obj

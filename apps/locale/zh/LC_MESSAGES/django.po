@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-27 16:09+0800\n"
+"POT-Creation-Date: 2024-03-19 11:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1741,7 +1741,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:549
+#: assets/models/cmd_filter.py:32 assets/models/node.py:553
 #: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
 msgid "Node"
@@ -1881,7 +1881,7 @@ msgstr "默认资产组"
 msgid "System"
 msgstr "系统"
 
-#: assets/models/label.py:19 assets/models/node.py:535
+#: assets/models/label.py:19 assets/models/node.py:539
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
@@ -1900,27 +1900,27 @@ msgstr "值"
 msgid "Label"
 msgstr "标签"
 
-#: assets/models/node.py:165
+#: assets/models/node.py:169
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:463 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:467 audits/backends/db.py:65 audits/backends/db.py:66
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:534 perms/models/perm_node.py:28
+#: assets/models/node.py:538 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:536 assets/serializers/node.py:20
+#: assets/models/node.py:540 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:540 perms/models/perm_node.py:30
+#: assets/models/node.py:544 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:552
+#: assets/models/node.py:556
 msgid "Can match node"
 msgstr "可以匹配节点"
 
@@ -4047,27 +4047,27 @@ msgstr "正在创建任务，无法中断，请稍后重试。"
 msgid "Currently playbook is being used in a job"
 msgstr "当前 playbook 正在作业中使用"
 
-#: ops/api/playbook.py:93
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr "不支持的文件内容"
 
-#: ops/api/playbook.py:95 ops/api/playbook.py:141 ops/api/playbook.py:189
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr "无效的文件路径"
 
-#: ops/api/playbook.py:167
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr "该文件不能重命名"
 
-#: ops/api/playbook.py:186
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr "文件已存在"
 
-#: ops/api/playbook.py:204
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr "文件密钥该字段是必填项。"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr "无法删除此文件"
 
@@ -4349,6 +4349,10 @@ msgstr "是否完成"
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 msgid "Time cost"
 msgstr "花费时间"
+
+#: ops/serializers/job.py:87
+msgid "You do not have permission for the current job."
+msgstr "你没有当前作业的权限。"
 
 #: ops/tasks.py:37
 msgid "Run ansible task"
@@ -8522,7 +8526,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 
