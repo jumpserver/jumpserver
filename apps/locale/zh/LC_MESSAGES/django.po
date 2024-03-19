@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 14:19+0800\n"
+"POT-Creation-Date: 2024-03-19 11:07+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -364,7 +364,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:86 ops/models/job.py:236
+#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:236
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -475,7 +475,7 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:87 ops/models/job.py:237
+#: ops/models/celery.py:89 ops/models/job.py:237
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
@@ -2549,17 +2549,18 @@ msgstr "用户登录日志"
 msgid "Session key"
 msgstr "会话标识"
 
-#: audits/models.py:305
+#: audits/models.py:298
 msgid "User session"
 msgstr "用户会话"
 
-#: audits/models.py:307
+#: audits/models.py:300
 msgid "Offline user session"
 msgstr "下线用户会话"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/job.py:146 ops/models/job.py:234
-#: ops/models/playbook.py:30 terminal/models/session/sharing.py:25
+#: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:146
+#: ops/models/job.py:234 ops/models/playbook.py:30
+#: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "创建者"
 
@@ -4037,17 +4038,17 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:135
+#: ops/api/job.py:146
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
-#: ops/api/job.py:140
+#: ops/api/job.py:151
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
 
-#: ops/api/job.py:204
+#: ops/api/job.py:215
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "正在创建任务，无法中断，请稍后重试。"
@@ -4056,27 +4057,27 @@ msgstr "正在创建任务，无法中断，请稍后重试。"
 msgid "Currently playbook is being used in a job"
 msgstr "当前 playbook 正在作业中使用"
 
-#: ops/api/playbook.py:93
+#: ops/api/playbook.py:96
 msgid "Unsupported file content"
 msgstr "不支持的文件内容"
 
-#: ops/api/playbook.py:95 ops/api/playbook.py:141 ops/api/playbook.py:189
+#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
 msgid "Invalid file path"
 msgstr "无效的文件路径"
 
-#: ops/api/playbook.py:167
+#: ops/api/playbook.py:170
 msgid "This file can not be rename"
 msgstr "该文件不能重命名"
 
-#: ops/api/playbook.py:186
+#: ops/api/playbook.py:189
 msgid "File already exists"
 msgstr "文件已存在"
 
-#: ops/api/playbook.py:204
+#: ops/api/playbook.py:207
 msgid "File key is required"
 msgstr "文件密钥该字段是必填项。"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:210
 msgid "This file can not be delete"
 msgstr "无法删除此文件"
 
@@ -4258,11 +4259,11 @@ msgstr "其它参数"
 msgid "Finished"
 msgstr "结束"
 
-#: ops/models/celery.py:85
+#: ops/models/celery.py:87
 msgid "Date published"
 msgstr "发布日期"
 
-#: ops/models/celery.py:110
+#: ops/models/celery.py:112
 msgid "Celery Task Execution"
 msgstr "Celery 任务执行"
 
@@ -4302,7 +4303,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:567
+#: ops/models/job.py:530
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -4359,31 +4360,35 @@ msgstr "是否完成"
 msgid "Time cost"
 msgstr "花费时间"
 
-#: ops/tasks.py:37
+#: ops/serializers/job.py:87
+msgid "You do not have permission for the current job."
+msgstr "你没有当前作业的权限。"
+
+#: ops/tasks.py:38
 msgid "Run ansible task"
 msgstr "运行 Ansible 任务"
 
-#: ops/tasks.py:71
+#: ops/tasks.py:72
 msgid "Run ansible task execution"
 msgstr "开始执行 Ansible 任务"
 
-#: ops/tasks.py:93
+#: ops/tasks.py:94
 msgid "Clear celery periodic tasks"
 msgstr "清理周期任务"
 
-#: ops/tasks.py:114
+#: ops/tasks.py:115
 msgid "Create or update periodic tasks"
 msgstr "创建或更新周期任务"
 
-#: ops/tasks.py:122
+#: ops/tasks.py:123
 msgid "Periodic check service performance"
 msgstr "周期检测服务性能"
 
-#: ops/tasks.py:128
+#: ops/tasks.py:129
 msgid "Clean up unexpected jobs"
 msgstr "清理异常作业"
 
-#: ops/tasks.py:135
+#: ops/tasks.py:136
 msgid "Clean job_execution db record"
 msgstr "清理作业中心执行历史"
 
@@ -4723,21 +4728,21 @@ msgstr "组织角色"
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:160
 msgid "All organizations"
 msgstr "所有组织"
 
-#: rbac/models/rolebinding.py:190
+#: rbac/models/rolebinding.py:192
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "用户最后一个角色，不能删除，你可以将用户从组织移除"
 
-#: rbac/models/rolebinding.py:197
+#: rbac/models/rolebinding.py:199
 msgid "Organization role binding"
 msgstr "组织角色绑定"
 
-#: rbac/models/rolebinding.py:212
+#: rbac/models/rolebinding.py:214
 msgid "System role binding"
 msgstr "系统角色绑定"
 
@@ -6152,11 +6157,11 @@ msgstr "认证失败: (未知): {}"
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
-#: settings/ws.py:236
+#: settings/ws.py:195
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/ws.py:246
+#: settings/ws.py:205
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
@@ -6297,12 +6302,12 @@ msgstr ""
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:106
+#: templates/_mfa_login_field.html:107
 #: users/templates/users/forgot_password.html:174
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:116
+#: templates/_mfa_login_field.html:117
 #: users/templates/users/forgot_password.html:190
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
@@ -6767,23 +6772,23 @@ msgstr "命令数量"
 msgid "Error reason"
 msgstr "错误原因"
 
-#: terminal/models/session/session.py:282
+#: terminal/models/session/session.py:281
 msgid "Session record"
 msgstr "会话记录"
 
-#: terminal/models/session/session.py:284
+#: terminal/models/session/session.py:283
 msgid "Can monitor session"
 msgstr "可以监控会话"
 
-#: terminal/models/session/session.py:285
+#: terminal/models/session/session.py:284
 msgid "Can share session"
 msgstr "可以分享会话"
 
-#: terminal/models/session/session.py:286
+#: terminal/models/session/session.py:285
 msgid "Can terminate session"
 msgstr "可以终断会话"
 
-#: terminal/models/session/session.py:287
+#: terminal/models/session/session.py:286
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
@@ -7002,6 +7007,10 @@ msgid ""
 msgstr ""
 "优先使用同名账号连接发布机。为了安全，需配置文件中开启配置 "
 "CACHE_LOGIN_PASSWORD_ENABLED=true， 修改后重启服务"
+
+#: terminal/serializers/applet_host.py:137
+msgid "Install applets"
+msgstr "安装应用"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"
@@ -8112,7 +8121,7 @@ msgstr "为了安全，仅列出几个用户"
 msgid "name not unique"
 msgstr "名称重复"
 
-#: users/signal_handlers.py:32
+#: users/signal_handlers.py:33
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "            and the current user is not in the user list. Please contact the "
@@ -8120,7 +8129,7 @@ msgid ""
 msgstr ""
 "管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
-#: users/signal_handlers.py:166
+#: users/signal_handlers.py:167
 msgid "Clean up expired user sessions"
 msgstr "清除过期的用户会话"
 
@@ -9085,6 +9094,7 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
 
 #~ msgid "SMTP port"
 #~ msgstr "SMTP 端口"
