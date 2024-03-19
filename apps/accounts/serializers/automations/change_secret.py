@@ -4,7 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import (
-    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
+    AutomationTypes, SecretType, SecretStrategy,
+    SSHKeyStrategy, ChangeSecretRecordStatusChoice
 )
 from accounts.models import (
     Account, ChangeSecretAutomation,
@@ -120,7 +121,7 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_success(obj):
-        return obj.status == 'success'
+        return obj.status == ChangeSecretRecordStatusChoice.success.value
 
 
 class ChangeSecretRecordViewSecretSerializer(serializers.ModelSerializer):
@@ -155,7 +156,7 @@ class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_success(obj):
-        if obj.status == 'success':
+        if obj.status == ChangeSecretRecordStatusChoice.success.value:
             return _("Success")
         return _("Failed")
 

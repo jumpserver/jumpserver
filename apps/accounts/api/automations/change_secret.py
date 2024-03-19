@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.const import AutomationTypes
+from accounts.filters import ChangeSecretRecordFilterSet
 from accounts.models import ChangeSecretAutomation, ChangeSecretRecord
 from accounts.tasks import execute_automation_record_task
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -32,7 +33,7 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
 
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
-    filterset_fields = ('asset_id', 'execution_id')
+    filterset_class = ChangeSecretRecordFilterSet
     search_fields = ('asset__address',)
     tp = AutomationTypes.change_secret
     serializer_classes = {
@@ -57,14 +58,15 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
 
     @action(methods=['post'], detail=False, url_path='execute')
     def execute(self, request, *args, **kwargs):
-        record_id = request.data.get('record_id')
-        record = self.get_queryset().filter(pk=record_id)
-        if not record:
+        record_ids = request.data.get('record_ids')
+        records = self.get_queryset().filter(id__in=record_ids)
+        execution_count = records.values_list('execution_id', flat=True).distinct().count()
+        if execution_count != 1:
             return Response(
-                {'detail': 'record not found'},
-                status=status.HTTP_404_NOT_FOUND
+                {'detail': 'Only one execution is allowed to execute'},
+                status=status.HTTP_400_BAD_REQUEST
             )
-        task = execute_automation_record_task.delay(record_id, self.tp)
+        task = execute_automation_record_task.delay(record_ids, self.tp)
         return Response({'task': task.id}, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=True, url_path='secret')

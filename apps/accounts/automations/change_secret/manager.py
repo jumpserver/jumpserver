@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from xlsxwriter import Workbook
 
-from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
+from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy, ChangeSecretRecordStatusChoice
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
@@ -27,7 +27,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.record_id = self.execution.snapshot.get('record_id')
+        self.record_map = self.execution.snapshot.get('record_map', {})
         self.secret_type = self.execution.snapshot.get('secret_type')
         self.secret_strategy = self.execution.snapshot.get(
             'secret_strategy', SecretStrategy.custom
@@ -123,14 +123,20 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 print(f'new_secret is None, account: {account}')
                 continue
 
-            if self.record_id is None:
+            asset_account_id = f'{asset.id}-{account.id}'
+            if asset_account_id not in self.record_map:
                 recorder = ChangeSecretRecord(
                     asset=asset, account=account, execution=self.execution,
                     old_secret=account.secret, new_secret=new_secret,
                 )
                 records.append(recorder)
             else:
-                recorder = ChangeSecretRecord.objects.get(id=self.record_id)
+                record_id = self.record_map[asset_account_id]
+                try:
+                    recorder = ChangeSecretRecord.objects.get(id=record_id)
+                except ChangeSecretRecord.DoesNotExist:
+                    print(f"Record {record_id} not found")
+                    continue
 
             self.name_recorder_mapper[h['name']] = recorder
 
@@ -158,7 +164,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
             return
-        recorder.status = 'success'
+        recorder.status = ChangeSecretRecordStatusChoice.success.value
         recorder.date_finished = timezone.now()
 
         account = recorder.account
@@ -177,7 +183,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
             return
-        recorder.status = 'failed'
+        recorder.status = ChangeSecretRecordStatusChoice.failed.value
         recorder.date_finished = timezone.now()
         recorder.error = error
         try:
@@ -216,7 +222,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         summary = self.get_summary(recorders)
         print(summary, end='')
 
-        if self.record_id:
+        if self.record_map:
             return
 
         self.send_recorder_mail(recorders, summary)
