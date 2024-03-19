@@ -608,7 +608,6 @@ class Config(dict):
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
-        'LITE': False
     }
 
     old_config_map = {
