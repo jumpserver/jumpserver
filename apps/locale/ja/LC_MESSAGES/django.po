@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-27 16:09+0800\n"
+"POT-Creation-Date: 2024-03-19 11:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1749,7 +1749,7 @@ msgid "Domain"
 msgstr "ドメイン"
 
 #: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:549
+#: assets/models/cmd_filter.py:32 assets/models/node.py:553
 #: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
 msgid "Node"
@@ -1889,7 +1889,7 @@ msgstr "デフォルトアセットグループ"
 msgid "System"
 msgstr "システム"
 
-#: assets/models/label.py:19 assets/models/node.py:535
+#: assets/models/label.py:19 assets/models/node.py:539
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
@@ -1908,27 +1908,27 @@ msgstr "値"
 msgid "Label"
 msgstr "ラベル"
 
-#: assets/models/node.py:165
+#: assets/models/node.py:169
 msgid "New node"
 msgstr "新しいノード"
 
-#: assets/models/node.py:463 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:467 audits/backends/db.py:65 audits/backends/db.py:66
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:534 perms/models/perm_node.py:28
+#: assets/models/node.py:538 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "キー"
 
-#: assets/models/node.py:536 assets/serializers/node.py:20
+#: assets/models/node.py:540 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "フルバリュー"
 
-#: assets/models/node.py:540 perms/models/perm_node.py:30
+#: assets/models/node.py:544 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "親キー"
 
-#: assets/models/node.py:552
+#: assets/models/node.py:556
 msgid "Can match node"
 msgstr "ノードを一致させることができます"
 
@@ -4098,27 +4098,27 @@ msgstr "タスクを作成中で、中断できません。後でもう一度お
 msgid "Currently playbook is being used in a job"
 msgstr "現在プレイブックは1つのジョブで使用されています"
 
-#: ops/api/playbook.py:93
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr "サポートされていないファイルの内容"
 
-#: ops/api/playbook.py:95 ops/api/playbook.py:141 ops/api/playbook.py:189
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr "無効なファイルパス"
 
-#: ops/api/playbook.py:167
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr "ファイル名を変更することはできません"
 
-#: ops/api/playbook.py:186
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr "ファイルは既に存在します。"
 
-#: ops/api/playbook.py:204
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr "ファイルキーこのフィールドは必須です"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr "このファイルを削除できません"
 
@@ -4400,6 +4400,10 @@ msgstr "終了しました"
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 msgid "Time cost"
 msgstr "時を過ごす"
+
+#: ops/serializers/job.py:87
+msgid "You do not have permission for the current job."
+msgstr "あなたは現在のジョブの権限を持っていません。"
 
 #: ops/tasks.py:37
 msgid "Run ansible task"
@@ -8646,7 +8650,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 
