@@ -6,6 +6,10 @@ authors = ["ibuler <ibuler@qq.com>"]
 license = "GPLv3"
 readme = "README.md"
 
+# 说明
+# poetry install (社区版)
+# poetry install --with=xpack (企业版)
+
 [tool.poetry.dependencies]
 python = "^3.11"
 cython = "3.0.0"
@@ -151,6 +155,8 @@ xmlsec = "^1.3.13"
 polib = "^1.2.0"
 tqdm = "^4.66.1"
 
+[tool.poetry.group.xpack]
+optional = true
 
 [tool.poetry.group.xpack.dependencies]
 qingcloud-sdk = "1.2.15"
