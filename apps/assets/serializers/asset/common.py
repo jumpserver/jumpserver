@@ -149,7 +149,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
-            'nodes': {'allow_empty': True},
+            'nodes': {'allow_empty': True, 'label': _("Nodes")},
         }
 
     def __init__(self, *args, **kwargs):

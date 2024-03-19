@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='applet',
             name='can_concurrent',
-            field=models.BooleanField(default=False, verbose_name='Concurrent'),
+            field=models.BooleanField(default=False, verbose_name='Can concurrent'),
         ),
     ]
