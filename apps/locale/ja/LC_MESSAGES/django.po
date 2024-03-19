@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 14:19+0800\n"
+"POT-Creation-Date: 2024-03-19 11:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -365,7 +365,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:86 ops/models/job.py:236
+#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:236
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -476,7 +476,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:87 ops/models/job.py:237
+#: ops/models/celery.py:89 ops/models/job.py:237
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "終了日"
@@ -2566,17 +2566,18 @@ msgstr "ユーザーログインログ"
 msgid "Session key"
 msgstr "セッションID"
 
-#: audits/models.py:305
+#: audits/models.py:298
 msgid "User session"
 msgstr "ユーザーセッション"
 
-#: audits/models.py:307
+#: audits/models.py:300
 msgid "Offline user session"
 msgstr "オフラインユーザセッション"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/job.py:146 ops/models/job.py:234
-#: ops/models/playbook.py:30 terminal/models/session/sharing.py:25
+#: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:146
+#: ops/models/job.py:234 ops/models/playbook.py:30
+#: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "作成者"
 
@@ -4086,11 +4087,11 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:135
+#: ops/api/job.py:146
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:140
+#: ops/api/job.py:151
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
@@ -4098,7 +4099,7 @@ msgstr ""
 "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択し"
 "てください。"
 
-#: ops/api/job.py:204
+#: ops/api/job.py:215
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
@@ -4107,27 +4108,27 @@ msgstr "タスクを作成中で、中断できません。後でもう一度お
 msgid "Currently playbook is being used in a job"
 msgstr "現在プレイブックは1つのジョブで使用されています"
 
-#: ops/api/playbook.py:93
+#: ops/api/playbook.py:96
 msgid "Unsupported file content"
 msgstr "サポートされていないファイルの内容"
 
-#: ops/api/playbook.py:95 ops/api/playbook.py:141 ops/api/playbook.py:189
+#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
 msgid "Invalid file path"
 msgstr "無効なファイルパス"
 
-#: ops/api/playbook.py:167
+#: ops/api/playbook.py:170
 msgid "This file can not be rename"
 msgstr "ファイル名を変更することはできません"
 
-#: ops/api/playbook.py:186
+#: ops/api/playbook.py:189
 msgid "File already exists"
 msgstr "ファイルは既に存在します。"
 
-#: ops/api/playbook.py:204
+#: ops/api/playbook.py:207
 msgid "File key is required"
 msgstr "ファイルキーこのフィールドは必須です"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:210
 msgid "This file can not be delete"
 msgstr "このファイルを削除できません"
 
@@ -4309,11 +4310,11 @@ msgstr "クワーグ"
 msgid "Finished"
 msgstr "終了"
 
-#: ops/models/celery.py:85
+#: ops/models/celery.py:87
 msgid "Date published"
 msgstr "発売日"
 
-#: ops/models/celery.py:110
+#: ops/models/celery.py:112
 msgid "Celery Task Execution"
 msgstr "Celery タスク実行"
 
@@ -4353,7 +4354,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:567
+#: ops/models/job.py:530
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -4410,31 +4411,35 @@ msgstr "終了しました"
 msgid "Time cost"
 msgstr "時を過ごす"
 
-#: ops/tasks.py:37
+#: ops/serializers/job.py:87
+msgid "You do not have permission for the current job."
+msgstr "あなたは現在のジョブの権限を持っていません。"
+
+#: ops/tasks.py:38
 msgid "Run ansible task"
 msgstr "Ansible タスクを実行する"
 
-#: ops/tasks.py:71
+#: ops/tasks.py:72
 msgid "Run ansible task execution"
 msgstr "Ansible タスクの実行を開始する"
 
-#: ops/tasks.py:93
+#: ops/tasks.py:94
 msgid "Clear celery periodic tasks"
 msgstr "タスクログを定期的にクリアする"
 
-#: ops/tasks.py:114
+#: ops/tasks.py:115
 msgid "Create or update periodic tasks"
 msgstr "定期的なタスクの作成または更新"
 
-#: ops/tasks.py:122
+#: ops/tasks.py:123
 msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
 
-#: ops/tasks.py:128
+#: ops/tasks.py:129
 msgid "Clean up unexpected jobs"
 msgstr "例外ジョブのクリーンアップ"
 
-#: ops/tasks.py:135
+#: ops/tasks.py:136
 msgid "Clean job_execution db record"
 msgstr "ジョブセンター実行履歴のクリーンアップ"
 
@@ -4775,22 +4780,22 @@ msgstr "組織の役割"
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:160
 msgid "All organizations"
 msgstr "全ての組織"
 
-#: rbac/models/rolebinding.py:190
+#: rbac/models/rolebinding.py:192
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:197
+#: rbac/models/rolebinding.py:199
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:212
+#: rbac/models/rolebinding.py:214
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
@@ -6236,11 +6241,11 @@ msgstr "認証に失敗しました (不明): {}"
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
-#: settings/ws.py:236
+#: settings/ws.py:195
 msgid "Get ldap users is None"
 msgstr "Ldapユーザーを取得するにはNone"
 
-#: settings/ws.py:246
+#: settings/ws.py:205
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "{} 人のユーザーを正常にインポートしました (組織: {})"
 
@@ -6386,12 +6391,12 @@ msgstr ""
 msgid "Send verification code"
 msgstr "確認コードを送信"
 
-#: templates/_mfa_login_field.html:106
+#: templates/_mfa_login_field.html:107
 #: users/templates/users/forgot_password.html:174
 msgid "Wait: "
 msgstr "待つ:"
 
-#: templates/_mfa_login_field.html:116
+#: templates/_mfa_login_field.html:117
 #: users/templates/users/forgot_password.html:190
 msgid "The verification code has been sent"
 msgstr "確認コードが送信されました"
@@ -6861,23 +6866,23 @@ msgstr "コマンド量"
 msgid "Error reason"
 msgstr "間違った理由"
 
-#: terminal/models/session/session.py:282
+#: terminal/models/session/session.py:281
 msgid "Session record"
 msgstr "セッション記録"
 
-#: terminal/models/session/session.py:284
+#: terminal/models/session/session.py:283
 msgid "Can monitor session"
 msgstr "セッションを監視できます"
 
-#: terminal/models/session/session.py:285
+#: terminal/models/session/session.py:284
 msgid "Can share session"
 msgstr "セッションを共有できます"
 
-#: terminal/models/session/session.py:286
+#: terminal/models/session/session.py:285
 msgid "Can terminate session"
 msgstr "セッションを終了できます"
 
-#: terminal/models/session/session.py:287
+#: terminal/models/session/session.py:286
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
@@ -7100,6 +7105,10 @@ msgstr ""
 "同じアカウントを使用してホストに接続します。セキュリティ上の理由から、構成項"
 "目 CACHE_LOGIN_PASSWORD_ENABLED=true を設定してサービスを再起動して有効にして"
 "ください。"
+
+#: terminal/serializers/applet_host.py:137
+msgid "Install applets"
+msgstr "アプリをインストールする"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"
@@ -8223,7 +8232,7 @@ msgstr "セキュリティのために、複数のユーザーのみをリスト
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
-#: users/signal_handlers.py:32
+#: users/signal_handlers.py:33
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "            and the current user is not in the user list. Please contact the "
@@ -8232,7 +8241,7 @@ msgstr ""
 "管理者は「既存のユーザーのみログインを許可」をオンにしており、現在のユーザー"
 "はユーザーリストにありません。管理者に連絡してください。"
 
-#: users/signal_handlers.py:166
+#: users/signal_handlers.py:167
 msgid "Clean up expired user sessions"
 msgstr "期限切れのユーザー・セッションのパージ"
 
@@ -9212,6 +9221,7 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
 
 #~ msgid "SMTP port"
 #~ msgstr "SMTPポート"
