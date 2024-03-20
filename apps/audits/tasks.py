@@ -58,9 +58,9 @@ def clean_ftp_log_period():
     now = timezone.now()
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    file_store_dir = os.path.join(default_storage.base_location, 'ftp_file')
+    file_store_dir = os.path.join(default_storage.base_location, FTPLog.upload_to)
     FTPLog.objects.filter(date_start__lt=expired_day).delete()
-    command = "find %s -mtime +%s -exec rm -f {} \\;" % (
+    command = "find %s -mtime +%s -type f -exec rm -f {} \\;" % (
         file_store_dir, days
     )
     subprocess.call(command, shell=True)
