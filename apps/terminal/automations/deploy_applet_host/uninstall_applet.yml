@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+  vars:
+    applet_name: chrome
+
+  tasks:
+    - name: uninstall applet
+      ansible.windows.win_powershell:
+        script: |
+          tinkerd uninstall --name {{ applet_name }}

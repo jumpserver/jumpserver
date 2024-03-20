@@ -109,6 +109,17 @@ def run_applet_host_deployment_install_applet(ids, applet_id):
 
 
 @shared_task(
+    verbose_name=_('Uninstall applet'),
+    activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,)
+)
+def run_applet_host_deployment_uninstall_applet(ids, applet_id):
+    with tmp_to_builtin_org(system=1):
+        for did in ids:
+            deployment = AppletHostDeployment.objects.get(id=did)
+            deployment.uninstall_applet(applet_id)
+
+
+@shared_task(
     verbose_name=_('Generate applet host accounts'),
     activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],)
 )
