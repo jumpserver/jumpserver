@@ -135,7 +135,6 @@ def clean_up_unexpected_jobs():
 
 @shared_task(verbose_name=_('Clean job_execution db record'))
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
-@after_app_shutdown_clean_periodic
 def clean_job_execution_period():
     logger.info("Start clean job_execution db record")
     now = timezone.now()
