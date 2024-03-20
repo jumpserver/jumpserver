@@ -11,9 +11,14 @@ from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppletHost, AppletHostDeployment
 from terminal.serializers import (
-    AppletHostSerializer, AppletHostDeploymentSerializer, AppletHostStartupSerializer
+    AppletHostSerializer, AppletHostDeploymentSerializer,
+    AppletHostStartupSerializer, AppletSetupSerializer
 )
-from terminal.tasks import run_applet_host_deployment, run_applet_host_deployment_install_applet
+from terminal.tasks import (
+    run_applet_host_deployment,
+    run_applet_host_deployment_install_applet,
+    run_applet_host_deployment_uninstall_applet
+)
 
 __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 
@@ -56,6 +61,7 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     filterset_fields = ['host', ]
     rbac_perms = (
         ('applets', 'terminal.view_AppletHostDeployment'),
+        ('uninstall', 'terminal.change_applethost'),
     )
 
     @staticmethod
@@ -90,7 +96,29 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         transaction.on_commit(lambda: self.start_install_applet(applet_host_deployment_ids, applet_id, task_id))
         return Response({'task': task_id}, status=201)
 
+    @action(methods=['post'], detail=False)
+    def uninstall(self, request, *args, **kwargs):
+        serializer = AppletSetupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        hosts = validated_data.pop('hosts', [])
+        applet_id = validated_data.pop('applet_id', '')
+        hosts_qs = AppletHost.objects.filter(id__in=hosts)
+        if not hosts_qs.exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        task_id = str(uuid.uuid4())
+        objs = [AppletHostDeployment(host=host, task=task_id) for host in hosts_qs]
+        applet_host_deployments = AppletHostDeployment.objects.bulk_create(objs)
+        applet_host_deployment_ids = [str(obj.id) for obj in applet_host_deployments]
+        transaction.on_commit(lambda: self.start_uninstall_applet(applet_host_deployment_ids, applet_id, task_id))
+        return Response({'task': task_id}, status=201)
+
     @staticmethod
     def start_install_applet(applet_host_deployment_ids, applet_id, task_id):
         run_applet_host_deployment_install_applet.apply_async((applet_host_deployment_ids, applet_id),
                                                               task_id=str(task_id))
+
+    @staticmethod
+    def start_uninstall_applet(applet_host_deployment_ids, applet_id, task_id):
+        run_applet_host_deployment_uninstall_applet.apply_async((applet_host_deployment_ids, applet_id),
+                                                                task_id=str(task_id))

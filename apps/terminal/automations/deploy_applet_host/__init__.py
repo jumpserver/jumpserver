@@ -36,6 +36,9 @@ class DeployAppletHostManager:
     def install_applet(self, **kwargs):
         self._run(self._run_install_applet, **kwargs)
 
+    def uninstall_applet(self, **kwargs):
+        self._run(self._run_uninstall_applet, **kwargs)
+
     def _run_initial_deploy(self, **kwargs):
         playbook = self.generate_initial_playbook
         return self._run_playbook(playbook, **kwargs)
@@ -45,6 +48,13 @@ class DeployAppletHostManager:
             generate_playbook = self.generate_install_applet_playbook
         else:
             generate_playbook = self.generate_install_all_playbook
+        return self._run_playbook(generate_playbook, **kwargs)
+
+    def _run_uninstall_applet(self, **kwargs):
+        if self.applet:
+            generate_playbook = self.generate_uninstall_applet_playbook
+        else:
+            raise ValueError("applet is required for uninstall_applet")
         return self._run_playbook(generate_playbook, **kwargs)
 
     def generate_initial_playbook(self):
@@ -91,6 +101,16 @@ class DeployAppletHostManager:
             return plays
 
         return self._generate_playbook("install_applet.yml", handler)
+
+    def generate_uninstall_applet_playbook(self):
+        applet_name = self.applet.name
+
+        def handler(plays):
+            for play in plays:
+                play["vars"]["applet_name"] = applet_name
+            return plays
+
+        return self._generate_playbook("uninstall_applet.yml", handler)
 
     def generate_inventory(self):
         inventory = JMSInventory(
