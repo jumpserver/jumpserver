@@ -94,11 +94,13 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
     queryset = PeriodicTask.objects.all()
     serializer_class = CeleryPeriodTaskSerializer
     http_method_names = ('get', 'head', 'options', 'patch')
+    lookup_field = 'name'
+    lookup_value_regex = '[\w.@]+'
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.exclude(description='')
-        return queryset
+    def get_object(self):
+        name = self.kwargs.get('name')
+        obj = get_object_or_404(PeriodicTask, name=name)
+        return obj
 
 
 class CelerySummaryAPIView(generics.RetrieveAPIView):
@@ -150,21 +152,18 @@ class CeleryTaskViewSet(
             return input_string
 
     def generate_execute_time(self, queryset):
-        names = [i.name for i in queryset]
-        periodic_tasks = PeriodicTask.objects.filter(name__in=names)
-        periodic_task_dict = {task.name: task for task in periodic_tasks}
         now = local_now()
         for i in queryset:
-            task = periodic_task_dict.get(i.name)
+            task = getattr(i, 'periodic_obj', None)
             if not task:
                 continue
             i.exec_cycle = self.extract_schedule(str(task.scheduler))
-
             last_run_at = task.last_run_at or now
             next_run_at = task.schedule.remaining_estimate(last_run_at)
             if next_run_at.total_seconds() < 0:
                 next_run_at = task.schedule.remaining_estimate(now)
             i.next_exec_time = now + next_run_at
+            i.enabled = task.enabled
         return queryset
 
     def generate_summary_state(self, execution_qs):
@@ -209,6 +208,7 @@ class CeleryTaskViewSet(
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.mark_periodic_and_sorted(queryset)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -221,6 +221,20 @@ class CeleryTaskViewSet(
         queryset = self.loading_summary_state(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @staticmethod
+    def mark_periodic_and_sorted(queryset):
+        names = queryset.values_list('name', flat=True)
+        periodic_tasks = PeriodicTask.objects.filter(name__in=names)
+        periodic_task_dict = {task.task: task for task in periodic_tasks}
+        for q in queryset:
+            if q.name in periodic_task_dict:
+                q.periodic_obj = periodic_task_dict[q.name]
+                q.is_periodic = True
+            else:
+                q.is_periodic = False
+        queryset = sorted(queryset, key=lambda x: x.is_periodic, reverse=True)
+        return queryset
 
 
 class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
