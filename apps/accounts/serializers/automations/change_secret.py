@@ -106,7 +106,10 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
 class ChangeSecretRecordSerializer(serializers.ModelSerializer):
     is_success = serializers.SerializerMethodField(label=_('Is success'))
     asset = ObjectRelatedField(queryset=Asset.objects, label=_('Asset'))
-    account = ObjectRelatedField(queryset=Account.objects, label=_('Account'))
+    account = ObjectRelatedField(
+        queryset=Account.objects, label=_('Account'),
+        attrs=("id", "name", "username")
+    )
     execution = ObjectRelatedField(
         queryset=AutomationExecution.objects, label=_('Automation task execution')
     )

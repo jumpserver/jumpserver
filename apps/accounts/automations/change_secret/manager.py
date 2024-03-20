@@ -9,7 +9,7 @@ from xlsxwriter import Workbook
 
 from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy, ChangeSecretRecordStatusChoice
 from accounts.models import ChangeSecretRecord
-from accounts.notifications import ChangeSecretExecutionTaskMsg
+from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretFailedMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
 from common.utils import get_logger
@@ -173,11 +173,22 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return
         account.secret = recorder.new_secret
         account.date_updated = timezone.now()
-        try:
-            recorder.save()
-            account.save(update_fields=['secret', 'date_updated'])
-        except Exception as e:
-            self.on_host_error(host, str(e), result)
+
+        max_retries = 3
+        retry_count = 0
+
+        while retry_count < max_retries:
+            try:
+                recorder.save()
+                account.save(update_fields=['secret', 'date_updated'])
+                break
+            except Exception as e:
+                retry_count += 1
+                if retry_count == max_retries:
+                    self.on_host_error(host, str(e), result)
+                else:
+                    print(f'retry {retry_count} times for {host} recorder save error: {e}')
+                    time.sleep(1)
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -205,7 +216,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def get_summary(recorders):
         total, succeed, failed = 0, 0, 0
         for recorder in recorders:
-            if recorder.status == 'success':
+            if recorder.status == ChangeSecretRecordStatusChoice.success.value:
                 succeed += 1
             else:
                 failed += 1
@@ -224,6 +235,22 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         if self.record_map:
             return
+
+        failed_recorders = [
+            r for r in recorders
+            if r.status == ChangeSecretRecordStatusChoice.failed.value
+        ]
+        super_users = User.get_super_admins()
+
+        if failed_recorders and super_users:
+            name = self.execution.snapshot.get('name')
+            execution_id = str(self.execution.id)
+            _ids = [r.id for r in failed_recorders]
+            asset_account_errors = ChangeSecretRecord.objects.filter(
+                id__in=_ids).values_list('asset__name', 'account__username', 'error')
+
+            for user in super_users:
+                ChangeSecretFailedMsg(name, execution_id, user, asset_account_errors).publish()
 
         self.send_recorder_mail(recorders, summary)
 
