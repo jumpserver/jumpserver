@@ -36,14 +36,14 @@ def execute_account_automation_task(pid, trigger, tp):
         instance.execute(trigger)
 
 
-def record_task_activity_callback(self, record_id, *args, **kwargs):
+def record_task_activity_callback(self, record_ids, *args, **kwargs):
     from accounts.models import ChangeSecretRecord
     with tmp_to_root_org():
-        record = get_object_or_none(ChangeSecretRecord, id=record_id)
-    if not record:
+        records = ChangeSecretRecord.objects.filter(id__in=record_ids)
+    if not records:
         return
-    resource_ids = [record.id]
-    org_id = record.execution.org_id
+    resource_ids = [str(i.id) for i in records]
+    org_id = records[0].execution.org_id
     return resource_ids, org_id
 
 
@@ -51,22 +51,26 @@ def record_task_activity_callback(self, record_id, *args, **kwargs):
     queue='ansible', verbose_name=_('Execute automation record'),
     activity_callback=record_task_activity_callback
 )
-def execute_automation_record_task(record_id, tp):
+def execute_automation_record_task(record_ids, tp):
     from accounts.models import ChangeSecretRecord
+    task_name = gettext_noop('Execute automation record')
+
     with tmp_to_root_org():
-        instance = get_object_or_none(ChangeSecretRecord, pk=record_id)
-    if not instance:
-        logger.error("No automation record found: {}".format(record_id))
+        records = ChangeSecretRecord.objects.filter(id__in=record_ids)
+
+    if not records:
+        logger.error('No automation record found: {}'.format(record_ids))
         return
 
-    task_name = gettext_noop('Execute automation record')
+    record = records[0]
+    record_map = {f'{record.asset_id}-{record.account_id}': str(record.id) for record in records}
     task_snapshot = {
-        'secret': instance.new_secret,
-        'secret_type': instance.execution.snapshot.get('secret_type'),
-        'accounts': [str(instance.account_id)],
-        'assets': [str(instance.asset_id)],
         'params': {},
-        'record_id': record_id,
+        'record_map': record_map,
+        'secret': record.new_secret,
+        'secret_type': record.execution.snapshot.get('secret_type'),
+        'assets': [str(instance.asset_id) for instance in records],
+        'accounts': [str(instance.account_id) for instance in records],
     }
-    with tmp_to_org(instance.execution.org_id):
+    with tmp_to_org(record.execution.org_id):
         quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
