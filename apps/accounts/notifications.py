@@ -126,6 +126,8 @@ class ChangeSecretFailedMsg(UserMessage):
 
     @classmethod
     def gen_test_msg(cls):
+        name = 'test'
         user = User.objects.first()
         record = ChangeSecretRecord.objects.first()
-        return cls(user, [record])
+        execution_id = str(record.execution_id)
+        return cls(name, execution_id, user, [])
