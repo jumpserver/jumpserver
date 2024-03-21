@@ -159,24 +159,21 @@ class AppletHostDeployment(JMSBaseModel):
         manager.run()
 
     def install_applet(self, applet_id, **kwargs):
-        from ...automations.deploy_applet_host import DeployAppletHostManager
-        from .applet import Applet
-        if applet_id:
-            applet = Applet.objects.get(id=applet_id)
-        else:
-            applet = None
-        manager = DeployAppletHostManager(self, applet=applet)
+        manager = self.create_deploy_manager(applet_id, **kwargs)
         manager.install_applet(**kwargs)
 
     def uninstall_applet(self, applet_id, **kwargs):
+        manager = self.create_deploy_manager(applet_id, **kwargs)
+        manager.uninstall_applet(**kwargs)
+
+    def create_deploy_manager(self, applet_id, **kwargs):
         from ...automations.deploy_applet_host import DeployAppletHostManager
         from .applet import Applet
         if applet_id:
             applet = Applet.objects.get(id=applet_id)
         else:
             applet = None
-        manager = DeployAppletHostManager(self, applet=applet)
-        manager.uninstall_applet(**kwargs)
+        return DeployAppletHostManager(self, applet=applet)
 
     def save_task(self, task):
         self.task = task
