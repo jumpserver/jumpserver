@@ -297,8 +297,7 @@
                 </h2>
                 <ul class=" nav navbar-top-links navbar-right">
                     <li class="dropdown">
-                        <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#"
-                           target="_blank">
+                        <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#" target="_blank">
                             <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
                             <span>{{ current_lang.title }}<b class="caret"></b></span>
                         </a>
@@ -378,8 +377,8 @@
                             <div class="more-login-items">
                             {% for method in auth_methods %}
                                 <a href="{{ method.url }}" class="more-login-item">
-                                    <i class="fa">
-                                        <img src="{{ method.logo }}" height="15" width="15"></i> {{ method.name }}
+                                    <i class="fa"><img src="{{ method.logo }}" height="15" width="15"/> </i>
+                                    {{ method.name }}
                                 </a>
                             {% endfor %}
                             </div>
