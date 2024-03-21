@@ -17,10 +17,6 @@ class EncryptedField(forms.CharField):
 
 
 class UserLoginForm(forms.Form):
-    days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
-    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE \
-                              or days_auto_login < 1
-
     username = forms.CharField(
         label=_('Username'), max_length=100,
         widget=forms.TextInput(attrs={
@@ -34,16 +30,14 @@ class UserLoginForm(forms.Form):
     )
     auto_login = forms.BooleanField(
         required=False, initial=False,
-        widget=forms.CheckboxInput(
-            attrs={'disabled': disable_days_auto_login}
-        )
+        widget=forms.CheckboxInput()
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         auto_login_field = self.fields['auto_login']
-        auto_login_field.label = _("{} days auto login").format(self.days_auto_login or 1)
-        if self.disable_days_auto_login:
+        auto_login_field.label = _("Auto login")
+        if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
             auto_login_field.widget = forms.HiddenInput()
 
     def confirm_login_allowed(self, user):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-21 11:15+0800\n"
+"POT-Creation-Date: 2024-03-21 16:18+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -30,7 +30,7 @@ msgstr "成功: %s, 失败: %s, 总数: %s"
 #: accounts/serializers/automations/change_secret.py:34
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:34
 #: authentication/confirm/password.py:9 authentication/confirm/password.py:24
-#: authentication/confirm/password.py:26 authentication/forms.py:32
+#: authentication/confirm/password.py:26 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:330
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: settings/serializers/msg.py:35 terminal/serializers/storage.py:123
@@ -537,7 +537,7 @@ msgstr "最后登录日期"
 #: accounts/models/automations/push_account.py:15 accounts/models/base.py:65
 #: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
 #: acls/serializers/base.py:50 assets/models/_user.py:23 audits/models.py:188
-#: authentication/forms.py:25 authentication/forms.py:27
+#: authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:9
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
@@ -755,6 +755,7 @@ msgstr ""
 msgid "Gather account change information"
 msgstr "账号变更信息"
 
+#: accounts/notifications.py:105
 msgid "Change secret or push account failed information"
 msgstr "改密或推送账号失败信息"
 
@@ -1077,6 +1078,7 @@ msgstr "删除账号"
 msgid "Task name"
 msgstr "任务名称"
 
+#: accounts/templates/accounts/change_secret_failed_info.html:4
 msgid "Task execution id"
 msgstr "任务执行 ID"
 
@@ -2973,28 +2975,28 @@ msgstr "登录完成前，请先修改密码"
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/forms.py:45
-msgid "{} days auto login"
-msgstr "{} 天内自动登录"
+#: authentication/forms.py:39
+msgid "Auto login"
+msgstr "自动登录"
 
-#: authentication/forms.py:58
+#: authentication/forms.py:52
 msgid "MFA Code"
 msgstr "MFA 验证码"
 
-#: authentication/forms.py:59
+#: authentication/forms.py:53
 msgid "MFA type"
 msgstr "MFA 类型"
 
-#: authentication/forms.py:67
+#: authentication/forms.py:61
 #: authentication/templates/authentication/_captcha_field.html:15
 msgid "Captcha"
 msgstr "验证码"
 
-#: authentication/forms.py:72 users/forms/profile.py:28
+#: authentication/forms.py:66 users/forms/profile.py:28
 msgid "MFA code"
 msgstr "MFA 验证码"
 
-#: authentication/forms.py:74
+#: authentication/forms.py:68
 msgid "Dynamic code"
 msgstr "动态码"
 
@@ -7116,6 +7118,7 @@ msgstr "是否可加入"
 msgid "Can terminate"
 msgstr "是否可中断"
 
+#: terminal/serializers/session.py:47
 msgid "Duration"
 msgstr "期间"
 
@@ -9116,27 +9119,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-#~ msgid "SMTP port"
-#~ msgstr "SMTP 端口"
-
-#~ msgid "SMTP account"
-#~ msgstr "SMTP 账号"
-
-#~ msgid "SMTP password"
-#~ msgstr "SMTP 密码"
-
-#~ msgid "Password can not contains `{{` or `}}`"
-#~ msgstr "密码不能包含 `{{` 或 `}}` 字符"
-
-#~ msgid "Password can not contains `{%` or `%}`"
-#~ msgstr "密码不能包含 `{%` 或 `%}` 字符"
-
-#~ msgid "FeiShu query user failed"
-#~ msgstr "飞书查询用户失败"
-
-#~ msgid "The FeiShu is already bound to another user"
-#~ msgstr "该飞书已经绑定其他用户"
-
-#~ msgid "Binding FeiShu successfully"
-#~ msgstr "绑定 飞书 成功"

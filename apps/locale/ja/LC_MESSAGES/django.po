@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-21 11:15+0800\n"
+"POT-Creation-Date: 2024-03-21 16:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr "成功: %s、失敗: %s、合計: %s"
 #: accounts/serializers/automations/change_secret.py:34
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:34
 #: authentication/confirm/password.py:9 authentication/confirm/password.py:24
-#: authentication/confirm/password.py:26 authentication/forms.py:32
+#: authentication/confirm/password.py:26 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:330
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: settings/serializers/msg.py:35 terminal/serializers/storage.py:123
@@ -538,7 +538,7 @@ msgstr "最終ログイン日"
 #: accounts/models/automations/push_account.py:15 accounts/models/base.py:65
 #: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
 #: acls/serializers/base.py:50 assets/models/_user.py:23 audits/models.py:188
-#: authentication/forms.py:25 authentication/forms.py:27
+#: authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:9
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
@@ -757,6 +757,7 @@ msgstr ""
 msgid "Gather account change information"
 msgstr "アカウント変更情報"
 
+#: accounts/notifications.py:105
 msgid "Change secret or push account failed information"
 msgstr "パスワード変更またはアカウントプッシュ失敗情報"
 
@@ -1080,6 +1081,7 @@ msgstr "アカウントの削除"
 msgid "Task name"
 msgstr "タスク名"
 
+#: accounts/templates/accounts/change_secret_failed_info.html:4
 msgid "Task execution id"
 msgstr "タスク実行ID"
 
@@ -1093,7 +1095,9 @@ msgstr "尊敬する"
 msgid ""
 "Hello! The following is the failure of changing the password of your assets "
 "or pushing the account. Please check and handle it in time."
-msgstr "こんにちは！ アセットの変更またはアカウントのプッシュが失敗する状況は次のとおりです。 時間内に確認して対処してください。"
+msgstr ""
+"こんにちは！ アセットの変更またはアカウントのプッシュが失敗する状況は次のとお"
+"りです。 時間内に確認して対処してください。"
 
 #: accounts/utils.py:52
 msgid ""
@@ -3002,28 +3006,28 @@ msgid "Your password has expired, please reset before logging in"
 msgstr ""
 "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
 
-#: authentication/forms.py:45
-msgid "{} days auto login"
-msgstr "{} 日自動ログイン"
+#: authentication/forms.py:39
+msgid "Auto login"
+msgstr "自動ログイン"
 
-#: authentication/forms.py:58
+#: authentication/forms.py:52
 msgid "MFA Code"
 msgstr "MFAコード"
 
-#: authentication/forms.py:59
+#: authentication/forms.py:53
 msgid "MFA type"
 msgstr "MFAタイプ"
 
-#: authentication/forms.py:67
+#: authentication/forms.py:61
 #: authentication/templates/authentication/_captcha_field.html:15
 msgid "Captcha"
 msgstr "キャプチャ"
 
-#: authentication/forms.py:72 users/forms/profile.py:28
+#: authentication/forms.py:66 users/forms/profile.py:28
 msgid "MFA code"
 msgstr "MFAコード"
 
-#: authentication/forms.py:74
+#: authentication/forms.py:68
 msgid "Dynamic code"
 msgstr "動的コード"
 
@@ -7217,6 +7221,7 @@ msgstr "参加できます"
 msgid "Can terminate"
 msgstr "終了できます"
 
+#: terminal/serializers/session.py:47
 msgid "Duration"
 msgstr "間隔"
 
@@ -9243,27 +9248,3 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
-
-#~ msgid "SMTP port"
-#~ msgstr "SMTPポート"
-
-#~ msgid "SMTP account"
-#~ msgstr "SMTPアカウント"
-
-#~ msgid "SMTP password"
-#~ msgstr "SMTPパスワード"
-
-#~ msgid "Password can not contains `{{` or `}}`"
-#~ msgstr "パスワードには `{` または `}` 文字を含めることはできません"
-
-#~ msgid "Password can not contains `{%` or `%}`"
-#~ msgstr "パスワードには `{%` または `%}` 文字を含めることはできません"
-
-#~ msgid "FeiShu query user failed"
-#~ msgstr "FeiShuクエリユーザーが失敗しました"
-
-#~ msgid "The FeiShu is already bound to another user"
-#~ msgstr "FeiShuはすでに別のユーザーにバインドされています"
-
-#~ msgid "Binding FeiShu successfully"
-#~ msgstr "本を飛ばすのバインドに成功"
