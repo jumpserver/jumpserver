@@ -11,7 +11,7 @@ python = "^3.11"
 cython = "3.0.0"
 aiofiles = "23.1.0"
 amqp = "5.1.1"
-ansible-core = { url = "https://github.com/jumpserver/ansible/releases/download/v2.14.1.2/ansible-2.14.1.2.zip" }
+ansible-core = { url = "https://github.com/jumpserver/ansible/archive/refs/tags/v2.14.1.4.zip" }
 ansible = "7.1.0"
 ansible-runner = "2.3.3"
 asn1crypto = "1.5.1"
