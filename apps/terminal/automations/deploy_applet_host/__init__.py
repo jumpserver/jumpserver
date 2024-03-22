@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger, random_string
-from ops.ansible import PlaybookRunner, JMSInventory
+from ops.ansible import SuperPlaybookRunner, JMSInventory
 from terminal.models import Applet, AppletHostDeployment
 
 logger = get_logger(__name__)
@@ -114,7 +114,7 @@ class DeployAppletHostManager:
     def _run_playbook(self, generate_playbook: callable, **kwargs):
         inventory = self.generate_inventory()
         playbook = generate_playbook()
-        runner = PlaybookRunner(
+        runner = SuperPlaybookRunner(
             inventory=inventory, playbook=playbook, project_dir=self.run_dir
         )
         return runner.run(**kwargs)
