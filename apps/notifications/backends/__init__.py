@@ -1,7 +1,7 @@
 import importlib
 
-from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 client_name_mapper = {}
 
@@ -12,7 +12,9 @@ class BACKEND(models.TextChoices):
     DINGTALK = 'dingtalk', _('DingTalk')
     SITE_MSG = 'site_msg', _('Site message')
     FEISHU = 'feishu', _('FeiShu')
+    LARK = 'lark', 'Lark'
     SLACK = 'slack', _('Slack')
+
     # SMS = 'sms', _('SMS')
 
     @property

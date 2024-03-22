@@ -123,8 +123,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             "email", "wechat", "phone", "mfa_level", "source",
-            "wecom_id", "dingtalk_id", "feishu_id", "slack_id",
-            "created_by", "updated_by", "comment",  # 通用字段
+            "wecom_id", "dingtalk_id", "feishu_id", "lark_id",
+            "slack_id", "created_by", "updated_by", "comment",  # 通用字段
         ]
         fields_date = [
             "date_expired", "date_joined", "last_login",
@@ -154,7 +154,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         read_only_fields = [
             "date_joined", "last_login", "created_by",
             "is_first_login", "wecom_id", "dingtalk_id",
-            "feishu_id", "date_api_key_last_used",
+            "feishu_id", "lark_id", "date_api_key_last_used",
         ]
         disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
         extra_kwargs = {
