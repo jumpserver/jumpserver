@@ -1,6 +1,7 @@
 import os
-import uuid
 import shutil
+import uuid
+
 import ansible_runner
 from django.conf import settings
 from django.utils._os import safe_join
@@ -43,6 +44,9 @@ class AdHocRunner:
 
         if not os.path.exists(self.project_dir):
             os.mkdir(self.project_dir, 0o755)
+        private_env = safe_join(self.project_dir, 'env')
+        if os.path.exists(private_env):
+            shutil.rmtree(private_env)
 
         ansible_runner.run(
             timeout=self.timeout if self.timeout > 0 else None,
@@ -69,9 +73,13 @@ class PlaybookRunner:
         if not callback:
             callback = DefaultCallback()
         self.cb = callback
+        self.envs = {}
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
+        private_env = safe_join(self.project_dir, 'env')
+        if os.path.exists(private_env):
+            shutil.rmtree(private_env)
 
         ansible_runner.run(
             private_data_dir=self.project_dir,
@@ -81,9 +89,16 @@ class PlaybookRunner:
             event_handler=self.cb.event_handler,
             status_handler=self.cb.status_handler,
             host_cwd=self.project_dir,
+            envvars=self.envs,
             **kwargs
         )
         return self.cb
+
+
+class SuperPlaybookRunner(PlaybookRunner):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.envs = {"LOCAL_CONNECTION_ENABLED": "1"}
 
 
 class UploadFileRunner:

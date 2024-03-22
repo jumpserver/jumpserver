@@ -12,7 +12,7 @@ from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
-from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
+from ops.ansible import JMSInventory, SuperPlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
 
@@ -269,7 +269,7 @@ class BasePlaybookManager:
                 if not playbook_path:
                     continue
 
-                runer = PlaybookRunner(
+                runer = SuperPlaybookRunner(
                     inventory_path,
                     playbook_path,
                     self.runtime_dir,
