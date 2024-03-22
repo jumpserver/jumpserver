@@ -2,24 +2,18 @@ import json
 
 from rest_framework.exceptions import APIException
 
-from django.conf import settings
-from users.utils import construct_user_email
-from common.utils.common import get_logger
-from common.sdk.im.utils import digest
 from common.sdk.im.mixin import RequestMixin, BaseRequest
+from common.sdk.im.utils import digest
+from common.utils.common import get_logger
+from users.utils import construct_user_email
 
 logger = get_logger(__name__)
 
 
 class URL:
     # https://open.feishu.cn/document/ukTMukTMukTM/uEDO4UjLxgDO14SM4gTN
-    @property
-    def host(self):
-        if settings.FEISHU_VERSION == 'feishu':
-            h = 'https://open.feishu.cn'
-        else:
-            h = 'https://open.larksuite.com'
-        return h
+
+    host = 'https://open.feishu.cn'
 
     @property
     def authen(self):
@@ -87,12 +81,13 @@ class FeiShu(RequestMixin):
     """
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """
+    requests_cls = FeishuRequests
 
     def __init__(self, app_id, app_secret, timeout=None):
         self._app_id = app_id or ''
         self._app_secret = app_secret or ''
 
-        self._requests = FeishuRequests(
+        self._requests = self.requests_cls(
             app_id=app_id,
             app_secret=app_secret,
             timeout=timeout
@@ -130,7 +125,7 @@ class FeiShu(RequestMixin):
             body['receive_id'] = user_id
 
             try:
-                logger.info(f'Feishu send text: user_ids={user_ids} msg={msg}')
+                logger.info(f'{self.__class__.__name__} send text: user_ids={user_ids} msg={msg}')
                 self._requests.post(URL().send_message, params=params, json=body)
             except APIException as e:
                 # 只处理可预知的错误

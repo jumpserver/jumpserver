@@ -22,6 +22,9 @@ urlpatterns = [
     path('feishu/event/subscription/callback/', api.FeiShuEventSubscriptionCallback.as_view(),
          name='feishu-event-subscription-callback'),
 
+    path('lark/event/subscription/callback/', api.LarkEventSubscriptionCallback.as_view(),
+         name='lark-event-subscription-callback'),
+
     path('auth/', api.TokenCreateApi.as_view(), name='user-auth'),
     path('confirm-oauth/', api.ConfirmBindORUNBindOAuth.as_view(), name='confirm-oauth'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),

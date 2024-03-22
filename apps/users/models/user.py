@@ -749,6 +749,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         wecom = 'wecom', _('WeCom')
         dingtalk = 'dingtalk', _('DingTalk')
         feishu = 'feishu', _('FeiShu')
+        lark = 'lark', _('Lark')
         slack = 'slack', _('Slack')
         custom = 'custom', 'Custom'
 
@@ -781,6 +782,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         ],
         Source.feishu: [
             settings.AUTH_BACKEND_FEISHU
+        ],
+        Source.lark: [
+            settings.AUTH_BACKEND_LARK
         ],
         Source.slack: [
             settings.AUTH_BACKEND_SLACK
@@ -855,6 +859,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
+    lark_id = models.CharField(null=True, default=None, max_length=128, verbose_name='Lark')
     slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
@@ -1006,6 +1011,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
             ('dingtalk_id',),
             ('wecom_id',),
             ('feishu_id',),
+            ('lark_id',),
             ('slack_id',),
         )
         permissions = [

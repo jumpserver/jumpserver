@@ -7,9 +7,9 @@ from common.utils import i18n_fmt
 from .auth import (
     LDAPSettingSerializer, OIDCSettingSerializer, KeycloakSettingSerializer,
     CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
-    WeComSettingSerializer, DingTalkSettingSerializer, AlibabaSMSSettingSerializer,
-    TencentSMSSettingSerializer, CMPP2SMSSettingSerializer, AuthSettingSerializer,
-    SAML2SettingSerializer, OAuth2SettingSerializer, PasskeySettingSerializer,
+    LarkSettingSerializer, WeComSettingSerializer, DingTalkSettingSerializer,
+    AlibabaSMSSettingSerializer, TencentSMSSettingSerializer, CMPP2SMSSettingSerializer,
+    AuthSettingSerializer, SAML2SettingSerializer, OAuth2SettingSerializer, PasskeySettingSerializer,
     CustomSMSSettingSerializer,
 )
 from .basic import BasicSettingSerializer
@@ -75,6 +75,7 @@ class SettingsSerializer(
     WeComSettingSerializer,
     DingTalkSettingSerializer,
     FeiShuSettingSerializer,
+    LarkSettingSerializer,
     EmailSettingSerializer,
     EmailContentSettingSerializer,
     OtherSettingSerializer,

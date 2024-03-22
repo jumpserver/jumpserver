@@ -49,6 +49,12 @@ urlpatterns = [
     path('feishu/qr/bind/callback/', views.FeiShuQRBindCallbackView.as_view(), name='feishu-qr-bind-callback'),
     path('feishu/qr/login/callback/', views.FeiShuQRLoginCallbackView.as_view(), name='feishu-qr-login-callback'),
 
+    path('lark/bind/start/', views.LarkEnableStartView.as_view(), name='lark-bind-start'),
+    path('lark/qr/bind/', views.LarkQRBindView.as_view(), name='lark-qr-bind'),
+    path('lark/qr/login/', views.LarkQRLoginView.as_view(), name='lark-qr-login'),
+    path('lark/qr/bind/callback/', views.LarkQRBindCallbackView.as_view(), name='lark-qr-bind-callback'),
+    path('lark/qr/login/callback/', views.LarkQRLoginCallbackView.as_view(), name='lark-qr-login-callback'),
+
     path('slack/bind/start/', views.SlackEnableStartView.as_view(), name='slack-bind-start'),
     path('slack/qr/bind/', views.SlackQRBindView.as_view(), name='slack-qr-bind'),
     path('slack/qr/login/', views.SlackQRLoginView.as_view(), name='slack-qr-login'),

@@ -407,7 +407,11 @@ class Config(dict):
         'AUTH_FEISHU': False,
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
-        'FEISHU_VERSION': 'feishu',
+
+        # Lark
+        'AUTH_LARK': False,
+        'LARK_APP_ID': '',
+        'LARK_APP_SECRET': '',
 
         # Slack
         'AUTH_SLACK': False,
