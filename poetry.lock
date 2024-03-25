@@ -6402,26 +6402,24 @@ reference = "tsinghua"
 
 [[package]]
 name = "redis"
-version = "4.6.0"
+version = "5.0.3"
 description = "Python client for Redis database and key-value store"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "redis-4.6.0-py3-none-any.whl", hash = "sha256:e2b03db868160ee4591de3cb90d40ebb50a90dd302138775937f6a42b7ed183c"},
-    {file = "redis-4.6.0.tar.gz", hash = "sha256:585dc516b9eb042a619ef0a39c3d7d55fe81bdb4df09a52c9cdde0d07bf1aa7d"},
+    {file = "v5.0.3.zip", hash = "sha256:2580c49b393568c11e8e14419558afd658edd9e9c74371d63613874bfe2c31c4"},
 ]
 
 [package.dependencies]
-async-timeout = {version = ">=4.0.2", markers = "python_full_version <= \"3.11.2\""}
+async-timeout = {version = ">=4.0.3", markers = "python_full_version < \"3.11.3\""}
 
 [package.extras]
 hiredis = ["hiredis (>=1.0.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
 
 [package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
+type = "url"
+url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip"
 
 [[package]]
 name = "requests"
@@ -7869,4 +7867,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fc3ea4ae8c25a1c00894e1012f229e85346c83d60f36b418c80e46572a78f196"
+content-hash = "e1a6ab7c94316ee4542c13aefb118278e28a7ca2c118ecb5715343adee0c094d"
