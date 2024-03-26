@@ -50,6 +50,10 @@ JumpServer's vision is to become a leader in the enterprise-level asset manageme
 
 _[To-do: Display a diagram of supported asset types.]_
 
+> \[!IMPORTANT]
+>
+> **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
+
 <details>
   <summary><kbd>Star History</kbd></summary>
   <picture>
