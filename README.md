@@ -12,7 +12,7 @@
 
 
 <p align="center">
-    For 9 years, dedicating wholeheartedly, crafting a high-quality Open-Source Bastion Host.
+    For 9 years, pouring heart and soul into creating a high-quality open-source bastion host.
 </p>
 
 ------------------------------
@@ -21,7 +21,7 @@ JumpServer is popular Open-Source Bastion Host, serving as a professional operat
 
 JumpServer helps enterprises securely control and access various types of assets in a more secure manner.
 
-[Todo:展示支持的资产类型图]
+_[To-do: Display a diagram of supported asset types.]_
 
 ## Table of Content
 - [About](#about)
