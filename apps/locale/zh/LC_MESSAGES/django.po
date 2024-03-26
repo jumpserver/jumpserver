@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-21 16:18+0800\n"
+"POT-Creation-Date: 2024-03-26 17:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -206,7 +206,7 @@ msgstr "仅创建"
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:22
 #: settings/serializers/msg.py:64 users/forms/profile.py:102
-#: users/forms/profile.py:109 users/models/user.py:802
+#: users/forms/profile.py:109 users/models/user.py:806
 #: users/templates/users/forgot_password.html:160
 #: users/views/profile/reset.py:94
 msgid "Email"
@@ -288,14 +288,13 @@ msgid "Su from"
 msgstr "切换自"
 
 #: accounts/models/account.py:55 assets/const/protocol.py:169
-#: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
-#: terminal/models/applet/applet.py:35
+#: settings/serializers/auth/cas.py:20 terminal/models/applet/applet.py:35
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
 msgstr "版本"
 
 #: accounts/models/account.py:57 accounts/serializers/account/account.py:215
-#: users/models/user.py:845
+#: users/models/user.py:849
 msgid "Source"
 msgstr "来源"
 
@@ -542,7 +541,7 @@ msgstr "最后登录日期"
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
-#: users/forms/profile.py:115 users/models/user.py:798
+#: users/forms/profile.py:115 users/models/user.py:802
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
@@ -637,7 +636,7 @@ msgstr "密码规则"
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:13
-#: users/models/preference.py:11 users/models/user.py:800
+#: users/models/preference.py:11 users/models/user.py:804
 #: xpack/plugins/cloud/models.py:32 xpack/plugins/cloud/models.py:272
 #: xpack/plugins/cloud/serializers/task.py:70
 msgid "Name"
@@ -862,8 +861,8 @@ msgstr "ID"
 #: terminal/notifications.py:205 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1004
-#: users/models/user.py:1041 users/serializers/group.py:21
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1009
+#: users/models/user.py:1047 users/serializers/group.py:21
 msgid "User"
 msgstr "用户"
 
@@ -959,7 +958,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:297 users/models/user.py:836
+#: tickets/models/ticket/general.py:297 users/models/user.py:840
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:106
 msgid "Comment"
 msgstr "备注"
@@ -1667,18 +1666,18 @@ msgstr "SSH公钥"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: audits/models.py:267 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:235 users/models/user.py:1042
+#: ops/models/job.py:235 users/models/user.py:1048
 msgid "Date created"
 msgstr "创建日期"
 
 #: assets/models/_user.py:29 assets/models/cmd_filter.py:42
-#: common/db/models.py:35 users/models/user.py:854
+#: common/db/models.py:35 users/models/user.py:858
 msgid "Date updated"
 msgstr "更新日期"
 
 #: assets/models/_user.py:30 assets/models/cmd_filter.py:44
 #: assets/models/cmd_filter.py:91 assets/models/group.py:18
-#: common/db/models.py:32 users/models/user.py:843
+#: common/db/models.py:32 users/models/user.py:847
 #: users/serializers/group.py:32
 msgid "Created by"
 msgstr "创建者"
@@ -1867,7 +1866,7 @@ msgstr "校验日期"
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
 #: perms/serializers/permission.py:34 users/models/group.py:25
-#: users/models/user.py:806
+#: users/models/user.py:810
 msgid "User group"
 msgstr "用户组"
 
@@ -1917,7 +1916,7 @@ msgstr "默认"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1027
+#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1033
 msgid "System"
 msgstr "系统"
 
@@ -1977,7 +1976,7 @@ msgid "Public"
 msgstr "开放的"
 
 #: assets/models/platform.py:22 assets/serializers/platform.py:49
-#: settings/serializers/settings.py:94
+#: settings/serializers/settings.py:95
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
@@ -2558,7 +2557,7 @@ msgstr "登录 IP"
 
 #: audits/models.py:200 audits/serializers.py:52
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:65 users/models/user.py:823
+#: users/forms/profile.py:65 users/models/user.py:827
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "MFA"
@@ -2607,7 +2606,7 @@ msgstr "用户 %s %s 了当前资源"
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:841
+#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:845
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2641,47 +2640,46 @@ msgstr "认证令牌"
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:77 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:10 users/models/user.py:749
-#: users/models/user.py:855
+#: users/models/user.py:859
 msgid "WeCom"
 msgstr "企业微信"
 
-#: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:87
+#: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:105
 #: authentication/views/login.py:89 notifications/backends/__init__.py:14
-#: settings/serializers/auth/feishu.py:10
-#: settings/serializers/auth/feishu.py:13 users/models/user.py:751
-#: users/models/user.py:857
+#: settings/serializers/auth/feishu.py:10 users/models/user.py:751
+#: users/models/user.py:861
 msgid "FeiShu"
 msgstr "飞书"
 
-#: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
-#: authentication/views/slack.py:87 notifications/backends/__init__.py:15
-#: settings/serializers/auth/slack.py:10 users/models/user.py:752
-#: users/models/user.py:858
+#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:101
+#: authentication/views/slack.py:87 notifications/backends/__init__.py:16
+#: settings/serializers/auth/slack.py:10 users/models/user.py:753
+#: users/models/user.py:863
 msgid "Slack"
 msgstr ""
 
-#: audits/signal_handlers/login_log.py:40 authentication/views/dingtalk.py:161
+#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:161
 #: authentication/views/login.py:83 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:750
-#: users/models/user.py:856
+#: users/models/user.py:860
 msgid "DingTalk"
 msgstr "钉钉"
 
-#: audits/signal_handlers/login_log.py:41
+#: audits/signal_handlers/login_log.py:42
 #: authentication/models/temp_token.py:16
 msgid "Temporary token"
 msgstr "临时密码"
 
-#: audits/signal_handlers/login_log.py:42 authentication/views/login.py:101
+#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:107
 #: settings/serializers/auth/passkey.py:8
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:119
+#: audits/tasks.py:117
 msgid "Clean audits session task log"
 msgstr "清理资产审计会话任务日志"
 
-#: audits/tasks.py:133
+#: audits/tasks.py:130
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
@@ -2946,19 +2944,23 @@ msgstr "没有绑定企业微信"
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/errors/mfa.py:33 authentication/views/feishu.py:128
+#: authentication/errors/mfa.py:33 authentication/views/feishu.py:138
 msgid "FeiShu is not bound"
 msgstr "没有绑定飞书"
 
-#: authentication/errors/mfa.py:38 authentication/views/slack.py:127
-msgid "Slack is not bound"
-msgstr "Slack没有绑定"
+#: authentication/errors/mfa.py:38 authentication/views/lark.py:48
+msgid "Lark is not bound"
+msgstr "Lark 没有绑定"
 
-#: authentication/errors/mfa.py:43
+#: authentication/errors/mfa.py:43 authentication/views/slack.py:127
+msgid "Slack is not bound"
+msgstr "Slack 没有绑定"
+
+#: authentication/errors/mfa.py:48
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors/mfa.py:48
+#: authentication/errors/mfa.py:53
 #, python-format
 msgid "Please wait for %s seconds before retry"
 msgstr "请在 %s 秒后重试"
@@ -3328,7 +3330,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:460
+#: jumpserver/conf.py:464
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
@@ -3521,7 +3523,7 @@ msgstr "钉钉错误，请联系系统管理员"
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
-#: authentication/views/dingtalk.py:57 authentication/views/feishu.py:47
+#: authentication/views/dingtalk.py:57 authentication/views/feishu.py:68
 #: authentication/views/slack.py:47 authentication/views/wecom.py:55
 msgid ""
 "The system configuration is incorrect. Please contact your administrator"
@@ -3555,35 +3557,47 @@ msgstr "从钉钉获取用户失败"
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
-#: authentication/views/feishu.py:35 authentication/views/feishu.py:127
+#: authentication/views/feishu.py:43 authentication/views/feishu.py:137
 msgid "FeiShu Error"
 msgstr "飞书错误"
 
-#: authentication/views/feishu.py:63
+#: authentication/views/feishu.py:44
 msgid "FeiShu is already bound"
 msgstr "飞书已经绑定"
 
-#: authentication/views/feishu.py:129
+#: authentication/views/feishu.py:139
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
-#: authentication/views/login.py:217
+#: authentication/views/lark.py:19 authentication/views/lark.py:47
+msgid "Lark Error"
+msgstr "Lark 错误"
+
+#: authentication/views/lark.py:20
+msgid "Lark is already bound"
+msgstr "Lark 已经绑定"
+
+#: authentication/views/lark.py:49
+msgid "Failed to get user from Lark"
+msgstr "从 Lark 获取用户失败"
+
+#: authentication/views/login.py:223
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:218
+#: authentication/views/login.py:224
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:241
+#: authentication/views/login.py:247
 msgid "Login timeout, please try again."
 msgstr "登录超时，请重新登录"
 
-#: authentication/views/login.py:284
+#: authentication/views/login.py:290
 msgid "User email already exists ({})"
 msgstr "用户邮箱已存在 ({})"
 
-#: authentication/views/login.py:362
+#: authentication/views/login.py:368
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -3591,15 +3605,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:367
+#: authentication/views/login.py:373
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:403
+#: authentication/views/login.py:409
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:404
+#: authentication/views/login.py:410
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -3743,7 +3757,7 @@ msgstr "忽略的"
 msgid "discard time"
 msgstr "忽略时间"
 
-#: common/db/models.py:33 users/models/user.py:844
+#: common/db/models.py:33 users/models/user.py:848
 msgid "Updated by"
 msgstr "最后更新者"
 
@@ -3923,7 +3937,7 @@ msgstr "发件邮件"
 msgid "Send email attachment"
 msgstr "发送邮件附件"
 
-#: common/tasks.py:80 terminal/tasks.py:62
+#: common/tasks.py:80 terminal/tasks.py:58
 msgid "Upload session replay to external storage"
 msgstr "上传会话录像到外部存储"
 
@@ -3952,16 +3966,16 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:454
+#: jumpserver/conf.py:458
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
-#: jumpserver/conf.py:459
+#: jumpserver/conf.py:463
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:461
+#: jumpserver/conf.py:465
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -4056,11 +4070,11 @@ msgstr "跳过以下主机: "
 msgid "Waiting task start"
 msgstr "等待任务开始"
 
-#: ops/api/celery.py:246
+#: ops/api/celery.py:260
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:251
+#: ops/api/celery.py:265
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
@@ -4734,7 +4748,7 @@ msgid "Scope"
 msgstr "范围"
 
 #: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user.py:810
+#: users/models/user.py:814
 msgid "Role"
 msgstr "角色"
 
@@ -4996,26 +5010,30 @@ msgid "FeiShu Auth"
 msgstr "飞书 认证"
 
 #: settings/serializers/auth/base.py:20
+msgid "Lark Auth"
+msgstr "Lark 认证"
+
+#: settings/serializers/auth/base.py:21
 msgid "Slack Auth"
 msgstr "Slack 认证"
 
-#: settings/serializers/auth/base.py:21
+#: settings/serializers/auth/base.py:22
 msgid "WeCom Auth"
 msgstr "企业微信 认证"
 
-#: settings/serializers/auth/base.py:22
+#: settings/serializers/auth/base.py:23
 msgid "SSO Auth"
 msgstr "SSO 令牌认证"
 
-#: settings/serializers/auth/base.py:23
+#: settings/serializers/auth/base.py:24
 msgid "Passkey Auth"
 msgstr "Passkey 认证"
 
-#: settings/serializers/auth/base.py:26
+#: settings/serializers/auth/base.py:27
 msgid "Forgot password url"
 msgstr "忘记密码 URL"
 
-#: settings/serializers/auth/base.py:29
+#: settings/serializers/auth/base.py:30
 msgid "Enable login redirect msg"
 msgstr "启用登录跳转提示"
 
@@ -5060,9 +5078,13 @@ msgstr "创建用户(如果不存在)"
 msgid "Enable DingTalk Auth"
 msgstr "启用钉钉认证"
 
-#: settings/serializers/auth/feishu.py:16
+#: settings/serializers/auth/feishu.py:12
 msgid "Enable FeiShu Auth"
 msgstr "启用飞书认证"
+
+#: settings/serializers/auth/lark.py:12
+msgid "Enable Lark Auth"
+msgstr "启用 Lark 认证"
 
 #: settings/serializers/auth/ldap.py:39
 msgid "LDAP"
@@ -6409,7 +6431,7 @@ msgstr "命令存储"
 msgid "Invalid"
 msgstr "无效"
 
-#: terminal/api/component/storage.py:129 terminal/tasks.py:142
+#: terminal/api/component/storage.py:129 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "测试失败: {}"
 
@@ -6594,7 +6616,8 @@ msgstr "可以并发"
 msgid "Tags"
 msgstr "标签"
 
-#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:197
+#: terminal/models/applet/applet.py:48 terminal/serializers/applet_host.py:167
+#: terminal/serializers/storage.py:197
 msgid "Hosts"
 msgstr "主机"
 
@@ -6913,7 +6936,7 @@ msgstr "命令及录像存储"
 msgid "Connectivity alarm"
 msgstr "可连接性告警"
 
-#: terminal/notifications.py:240 terminal/tasks.py:146
+#: terminal/notifications.py:240 terminal/tasks.py:153
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账号无效"
 
@@ -7033,6 +7056,14 @@ msgstr ""
 #: terminal/serializers/applet_host.py:137
 msgid "Install applets"
 msgstr "安装应用"
+
+#: terminal/serializers/applet_host.py:167
+msgid "Host ID"
+msgstr "主机 ID"
+
+#: terminal/serializers/applet_host.py:168
+msgid "Applet ID"
+msgstr "远程应用 ID"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"
@@ -7176,7 +7207,7 @@ msgstr "端点后缀"
 msgid "HOST"
 msgstr "主机"
 
-#: terminal/serializers/storage.py:146 users/models/user.py:830
+#: terminal/serializers/storage.py:146 users/models/user.py:834
 #: xpack/plugins/cloud/serializers/account_attrs.py:213
 msgid "Private key"
 msgstr "ssh私钥"
@@ -7334,27 +7365,31 @@ msgstr "授权已过期"
 msgid "storage is null"
 msgstr "存储为空"
 
-#: terminal/tasks.py:33
+#: terminal/tasks.py:31
 msgid "Periodic delete terminal status"
 msgstr "周期清理终端状态"
 
-#: terminal/tasks.py:42
+#: terminal/tasks.py:39
 msgid "Clean orphan session"
 msgstr "清除离线会话"
 
-#: terminal/tasks.py:91
+#: terminal/tasks.py:87
 msgid "Run applet host deployment"
 msgstr "运行应用机部署"
 
-#: terminal/tasks.py:101
+#: terminal/tasks.py:97
 msgid "Install applet"
 msgstr "安装应用"
 
-#: terminal/tasks.py:112
+#: terminal/tasks.py:108
+msgid "Uninstall applet"
+msgstr "卸载应用"
+
+#: terminal/tasks.py:119
 msgid "Generate applet host accounts"
 msgstr "收集远程应用上的账号"
 
-#: terminal/tasks.py:124
+#: terminal/tasks.py:131
 msgid "Check command replay storage connectivity"
 msgstr "检查命令及录像存储可连接性 "
 
@@ -7877,7 +7912,7 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:173 users/models/user.py:833
+#: users/forms/profile.py:173 users/models/user.py:837
 #: xpack/plugins/cloud/serializers/account_attrs.py:210
 msgid "Public key"
 msgstr "SSH公钥"
@@ -7890,70 +7925,74 @@ msgstr "用户设置"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:812 users/serializers/user.py:171
+#: users/models/user.py:752
+msgid "Lark"
+msgstr ""
+
+#: users/models/user.py:816 users/serializers/user.py:171
 msgid "Is service account"
 msgstr "服务账号"
 
-#: users/models/user.py:814
+#: users/models/user.py:818
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:817
+#: users/models/user.py:821
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:820 users/serializers/user.py:108
+#: users/models/user.py:824 users/serializers/user.py:108
 msgid "Phone"
 msgstr "手机"
 
-#: users/models/user.py:826
+#: users/models/user.py:830
 msgid "OTP secret key"
 msgstr "OTP 密钥"
 
 # msgid "Private key"
 # msgstr "ssh私钥"
-#: users/models/user.py:838 users/serializers/profile.py:128
+#: users/models/user.py:842 users/serializers/profile.py:128
 #: users/serializers/user.py:168
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/models/user.py:848
+#: users/models/user.py:852
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:851
+#: users/models/user.py:855
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user.py:853
+#: users/models/user.py:857
 msgid "Date api key used"
 msgstr "Api key 最后使用日期"
 
-#: users/models/user.py:985
+#: users/models/user.py:990
 msgid "Can not delete admin user"
 msgstr "无法删除管理员用户"
 
-#: users/models/user.py:1012
+#: users/models/user.py:1018
 msgid "Can invite user"
 msgstr "可以邀请用户"
 
-#: users/models/user.py:1013
+#: users/models/user.py:1019
 msgid "Can remove user"
 msgstr "可以移除用户"
 
-#: users/models/user.py:1014
+#: users/models/user.py:1020
 msgid "Can match user"
 msgstr "可以匹配用户"
 
-#: users/models/user.py:1023
+#: users/models/user.py:1029
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:1026
+#: users/models/user.py:1032
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/models/user.py:1051
+#: users/models/user.py:1057
 msgid "User password history"
 msgstr "用户密码历史"
 
