@@ -72,6 +72,17 @@ _[To-do: Display a diagram of supported asset types.]_
 6. **Organizational**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
 
 ## Demo
+
+_[To-do] Demo Video : About 1:30 min_
+
+```
+Demo Link: https://demo.jumpserver.org/
+
+username: demo
+
+password: jumpserver
+```
+
 ## Document
 ## Features
 ## System Architecture
