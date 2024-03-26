@@ -95,7 +95,7 @@ class UserLoginContextMixin:
                 'name': 'Lark',
                 'enabled': settings.AUTH_LARK,
                 'url': reverse('authentication:lark-qr-login'),
-                'logo': static('img/login_feishu_logo.png')
+                'logo': static('img/login_lark_logo.png')
             },
             {
                 'name': _('Slack'),
