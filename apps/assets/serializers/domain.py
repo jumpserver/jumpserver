@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from assets.models.gateway import Gateway
 from .gateway import GatewayWithAccountSecretSerializer
 from ..models import Domain
 
@@ -15,7 +16,7 @@ __all__ = ['DomainSerializer', 'DomainWithGatewaySerializer', 'DomainListSeriali
 
 class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
-        many=True, required=False, label=_('Gateway'), read_only=True,
+        many=True, required=False, label=_('Gateway'), queryset=Gateway.objects
     )
 
     class Meta:
@@ -38,12 +39,17 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         data['assets'] = [i for i in assets if str(i['id']) not in gateway_ids]
         return data
 
-    def update(self, instance, validated_data):
+    def create(self, validated_data):
         assets = validated_data.pop('assets', [])
-        assets = assets + list(instance.gateways)
-        validated_data['assets'] = assets
-        instance = super().update(instance, validated_data)
-        return instance
+        gateways = validated_data.pop('gateways', [])
+        validated_data['assets'] = assets + gateways
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        assets = validated_data.pop('assets', list(instance.assets.all()))
+        gateways = validated_data.pop('gateways', list(instance.gateways.all()))
+        validated_data['assets'] = assets + gateways
+        return super().update(instance, validated_data)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -61,7 +67,7 @@ class DomainListSerializer(DomainSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset.annotate(
-            assets_amount=Count('assets', distinct=True),
+            assets_amount=Count('assets', filter=~Q(assets__platform__name='Gateway'), distinct=True),
         )
         return queryset
 
