@@ -17,14 +17,9 @@
 
 ------------------------------
 
-JumpServer is popular Open-Source Bastion Host, serving as a professional operational security auditing system compliant with the 4A standards.
-
-JumpServer helps enterprises securely control and access various types of assets in a more secure manner.
-
-_[To-do: Display a diagram of supported asset types.]_
-
 ## Table of Content
 - [About](#about)
+- [Why Choose JumpServer](#why-choose-jumpserver)
 - [Demo](#demo)
 - [Document](#document)
 - [Key Features](#key-features)
@@ -36,8 +31,24 @@ _[To-do: Display a diagram of supported asset types.]_
 - [Security](#security)
 - [License](#license)
 
-
 ## About
+
+JumpServer is a widely acclaimed open-source bastion host, serving as a professional operational security auditing system compliant with the 4A standards. It helps businesses securely manage and access all types of assets in a more secure manner, enabling pre-authorization, real-time monitoring, and post-audit capabilities.
+
+JumpServer aims to become the industry's preferred platform, assisting businesses in securely and efficiently managing and accessing all types of assets. By offering a professional operational security auditing system compliant with 4A standards, JumpServer is committed to delivering advanced asset management and access solutions, meeting enterprises' needs for security, reliability, and efficiency.
+
+JumpServer's vision is to become a leader in the enterprise-level asset management and access control field, providing comprehensive solutions for users to securely and efficiently manage and utilize their assets. Through continuous innovation and enhancement of product features, JumpServer is committed to driving the development of the entire industry and becoming a key supporter and promoter of enterprise digital transformation.
+
+_[To-do: Display a diagram of supported asset types.]_
+
+## Why Choose JumpServer
+1. **Open Source**: JumpServer is an open-source software, meaning users can freely access, use, and modify its source code to meet individual needs, while also benefiting from community support and collaboration.
+2. **Plugin-Free**: JumpServer provides comprehensive functionality without the need for additional plugins or extensions. This simplifies deployment and management processes, reducing potential compatibility and security risks.
+3. **Distributed**: JumpServer supports a distributed architecture, allowing easy scaling across multiple nodes for high availability and fault tolerance. This makes it suitable for large-scale deployments and complex network environments.
+4. **Multi-Cloud Support**: JumpServer offers support for various cloud platforms, including AWS, Azure, Google Cloud, etc., enabling users to manage and access assets seamlessly across different cloud environments.
+5. **Cloud Storage**: JumpServer supports storing critical data such as audit logs and configuration files in the cloud, ensuring data security and reliability, as well as facilitating cross-region and cross-device access.
+6. **Organizational Structure**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
+
 ## Demo
 ## Document
 ## Key Features
