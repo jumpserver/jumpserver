@@ -9,7 +9,7 @@ from rest_framework.utils.encoders import JSONEncoder
 from assets.const import AllTypes
 from assets.models import FavoriteAsset, Asset, Node
 from common.utils.common import timeit, get_logger
-from orgs.utils import current_org, tmp_to_root_org
+from orgs.utils import current_org
 from perms.models import PermNode, UserAssetGrantedTreeNodeRelation, AssetPermission
 from .permission import AssetPermissionUtil
 
@@ -112,11 +112,10 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         favor_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
         favor_ids = set(favor_ids)
 
-        with tmp_to_root_org():
-            valid_ids = self.get_all_assets() \
-                .filter(id__in=favor_ids) \
-                .values_list('id', flat=True)
-            valid_ids = set(valid_ids)
+        valid_ids = self.get_all_assets() \
+            .filter(id__in=favor_ids) \
+            .values_list('id', flat=True)
+        valid_ids = set(valid_ids)
 
         invalid_ids = favor_ids - valid_ids
         FavoriteAsset.objects.filter(user=self.user, asset_id__in=invalid_ids).delete()
