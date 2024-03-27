@@ -29,6 +29,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
         'retrieve': serializers.AccountDetailSerializer,
     }
+    ordering = ('name',)
     rbac_perms = {
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',

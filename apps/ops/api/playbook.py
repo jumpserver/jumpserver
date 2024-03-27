@@ -33,6 +33,7 @@ class PlaybookViewSet(OrgBulkModelViewSet):
     permission_classes = (RBACPermission,)
     model = Playbook
     search_fields = ('name', 'comment')
+    ordering = ('name',)
 
     def perform_destroy(self, instance):
         if instance.job_set.exists():

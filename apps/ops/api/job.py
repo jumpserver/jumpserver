@@ -61,6 +61,7 @@ def merge_nodes_and_assets(nodes, assets, user):
 class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
     search_fields = ('name', 'comment')
+    ordering = ('name',)
     model = Job
 
     def check_permissions(self, request):

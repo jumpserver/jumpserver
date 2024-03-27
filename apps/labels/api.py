@@ -106,6 +106,7 @@ class LabelViewSet(OrgBulkModelViewSet):
         'default': serializers.LabelSerializer,
         'resource_types': ContentTypeSerializer,
     }
+    ordering = ('name',)
     rbac_perms = {
         'resource_types': 'labels.view_label',
         'keys': 'labels.view_label',

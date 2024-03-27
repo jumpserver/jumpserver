@@ -15,4 +15,5 @@ class LoginAssetACLViewSet(OrgBulkModelViewSet):
     model = models.LoginAssetACL
     filterset_class = LoginAssetACLFilter
     search_fields = ['name']
+    ordering = ('name',)
     serializer_class = serializers.LoginAssetACLSerializer

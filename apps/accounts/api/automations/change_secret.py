@@ -29,6 +29,7 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
     model = ChangeSecretAutomation
     filterset_fields = ('name', 'secret_type', 'secret_strategy')
     search_fields = filterset_fields
+    ordering = ('name',)
     serializer_class = serializers.ChangeSecretAutomationSerializer
 
 

@@ -18,9 +18,9 @@ class LoginACLViewSet(JMSBulkModelViewSet):
     queryset = LoginACL.objects.all()
     filterset_class = LoginACLFilter
     search_fields = ('name',)
+    ordering = ('name',)
     serializer_class = serializers.LoginACLSerializer
 
     def filter_queryset(self, queryset):
         with tmp_to_root_org():
             return super().filter_queryset(queryset)
-

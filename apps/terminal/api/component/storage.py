@@ -114,6 +114,7 @@ class ReplayStorageFilterSet(BaseFilterSet):
 
 class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = ('name', 'type', 'is_default')
+    ordering = ('name',)
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
     filterset_class = ReplayStorageFilterSet
