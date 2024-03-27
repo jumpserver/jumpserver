@@ -44,6 +44,7 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     serializer_classes = {
         'default': serializers.AccountTemplateSerializer,
     }
+    ordering = ('name',)
     rbac_perms = {
         'su_from_account_templates': 'accounts.view_accounttemplate',
         'sync_related_accounts': 'accounts.change_account',

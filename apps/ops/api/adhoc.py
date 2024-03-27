@@ -15,6 +15,7 @@ class AdHocViewSet(OrgBulkModelViewSet):
     serializer_class = AdHocSerializer
     permission_classes = (RBACPermission,)
     search_fields = ('name', 'comment')
+    ordering = ('name',)
     model = AdHoc
 
     def get_queryset(self):

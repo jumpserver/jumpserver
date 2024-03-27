@@ -12,6 +12,7 @@ class CommandGroupViewSet(OrgBulkModelViewSet):
     model = models.CommandGroup
     filterset_fields = ('name', 'command_filters')
     search_fields = ('name',)
+    ordering = ('name',)
     serializer_class = serializers.CommandGroupSerializer
 
 

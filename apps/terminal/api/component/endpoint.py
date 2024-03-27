@@ -86,6 +86,7 @@ class SmartEndpointViewMixin:
 class EndpointViewSet(SmartEndpointViewMixin, JMSBulkModelViewSet):
     filterset_fields = ('name', 'host')
     search_fields = filterset_fields
+    ordering = ('name',)
     serializer_class = serializers.EndpointSerializer
     queryset = Endpoint.objects.all()
 
@@ -93,5 +94,6 @@ class EndpointViewSet(SmartEndpointViewMixin, JMSBulkModelViewSet):
 class EndpointRuleViewSet(JMSBulkModelViewSet):
     filterset_fields = ('name',)
     search_fields = filterset_fields
+    ordering = ('name',)
     serializer_class = serializers.EndpointRuleSerializer
     queryset = EndpointRule.objects.all()

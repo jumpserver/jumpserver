@@ -45,6 +45,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     filterset_class = TerminalFilterSet
+    ordering = ('name',)
     custom_filter_fields = ['load']
 
     def destroy(self, request, *args, **kwargs):
@@ -88,4 +89,3 @@ class TerminalRegistrationApi(generics.CreateAPIView):
             data = {"error": "service account registration disabled"}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
-

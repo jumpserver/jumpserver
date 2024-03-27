@@ -258,6 +258,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = UserSessionSerializer
     filterset_class = UserSessionFilterSet
     search_fields = ['id', 'ip', 'city']
+    ordering = ['-user']
     rbac_perms = {
         'offline': ['audits.offline_usersession']
     }
