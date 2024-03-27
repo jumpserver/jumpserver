@@ -54,6 +54,8 @@ _[To-do: Display a diagram of supported asset types.]_
 >
 > **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
 
+[![][image-star]][github-stars-link]
+
 <details>
   <summary><kbd>Star History</kbd></summary>
   <picture>
@@ -93,3 +95,8 @@ password: jumpserver
 ## Security
 ## Contact
 ## License
+
+
+<!-- LINK GROUP -->
+[github-stars-link]: https://github.com/jumpserver/jumpserver/network/stargazers
+[image-star]: https://github.com/BaiJiangJie/jumpserver-readme/blob/2476e820d33cd70755bb0cedd3a9a44b1eee3f6c/image-stars.jpg
