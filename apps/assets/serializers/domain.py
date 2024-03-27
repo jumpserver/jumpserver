@@ -15,7 +15,7 @@ __all__ = ['DomainSerializer', 'DomainWithGatewaySerializer', 'DomainListSeriali
 
 class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
-        many=True, required=False, label=_('Gateway'), read_only=True,
+        many=True, required=False, label=_('Gateways'), read_only=True,
     )
     assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
 
