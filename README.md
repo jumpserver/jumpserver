@@ -16,8 +16,8 @@ For 9 years, pouring heart and soul into creating a high-quality open-source bas
 </div>
 
 #
-
 ![][image-dashboard]
+_[To-do]: Need to design the graphics._
 
 <details>
 <summary><kbd>Table of contents</kbd></summary>
@@ -65,6 +65,7 @@ Whether you're new to the experience or a seasoned expert, we invite you to join
 > This is a demonstration video that can quickly help you understand the page design and product features of JumpServer.
 
 <video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
+_[To-do]: Need to design the video._
 
 ## Introduction
 
