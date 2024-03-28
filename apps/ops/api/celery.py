@@ -248,6 +248,8 @@ class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         if task_id:
             task = get_object_or_404(CeleryTask, id=task_id)
             self.queryset = self.queryset.filter(name=task.name)
+        if not self.request.user.is_superuser:
+            self.queryset = self.queryset.filter(creator=self.request.user)
         return self.queryset
 
     def create(self, request, *args, **kwargs):
