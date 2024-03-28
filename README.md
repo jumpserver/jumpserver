@@ -104,9 +104,9 @@ password: jumpserver
 
 
 <!-- LINK GROUP -->
-[vercel-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=flat-square&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
+[vercel-shield-badge]: https://img.shields.io/badge/ONLINE-online?logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
 [vercel-link]: https://demo.jumpserver.org/
-[discord-shield-badge]: https://img.shields.io/badge/JOIN_US-ONLINE?logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
+[discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
 [discord-link]: https://discord.gg/DVz6Hckx
 
 [image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
