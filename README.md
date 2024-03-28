@@ -58,7 +58,7 @@ Step right into our online demonstration environment, where you can effortlessly
 
 Whether you're new to the experience or a seasoned expert, we invite you to join our Discord community right away! Here, our developers and enthusiastic users come together to offer support and assistance. No matter what challenges you encounter during your usage, we are committed to answering your questions and providing guidance.
 
-| [![][vercel-shield-badge]][vercel-link]   | No installation or registration necessary! Visit our website to experience it firsthand.                           |
+| [![][demo-shield-badge]][demo-link]       | No installation or registration necessary! Visit our website to experience it firsthand.                           |
 | :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
 | [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
 
