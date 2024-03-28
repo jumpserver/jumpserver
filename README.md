@@ -99,4 +99,4 @@ password: jumpserver
 
 <!-- LINK GROUP -->
 [github-stars-link]: https://github.com/jumpserver/jumpserver/network/stargazers
-[image-star]: https://github.com/BaiJiangJie/jumpserver-readme/blob/2476e820d33cd70755bb0cedd3a9a44b1eee3f6c/image-stars.jpg
+[image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/ee61b358-67d5-41ef-9f9c-b982ba661316
