@@ -469,7 +469,7 @@ class JSONManyToManyDescriptor:
             rule_match = rule.get('match', 'exact')
 
             custom_filter_q = None
-            spec_attr_filter = getattr(to_model, "get_filter_{}_attr_q".format(rule['name']), None)
+            spec_attr_filter = getattr(to_model, "get_{}_filter_attr_q".format(rule['name']), None)
             if spec_attr_filter:
                 custom_filter_q = spec_attr_filter(rule_value, rule_match)
             elif custom_attr_filter:
@@ -478,59 +478,61 @@ class JSONManyToManyDescriptor:
                 custom_q &= custom_filter_q
                 continue
 
-            if rule_match == 'in':
-                res &= value in rule_value or '*' in rule_value
-            elif rule_match == 'exact':
-                res &= value == rule_value or rule_value == '*'
-            elif rule_match == 'contains':
-                res &= (rule_value in value)
-            elif rule_match == 'startswith':
-                res &= str(value).startswith(str(rule_value))
-            elif rule_match == 'endswith':
-                res &= str(value).endswith(str(rule_value))
-            elif rule_match == 'regex':
-                try:
-                    matched = bool(re.search(r'{}'.format(rule_value), value))
-                except Exception as e:
-                    logging.error('Error regex match: %s', e)
-                    matched = False
-                res &= matched
-            elif rule_match == 'not':
-                res &= value != rule_value
-            elif rule['match'] == 'gte':
-                res &= value >= rule_value
-            elif rule['match'] == 'lte':
-                res &= value <= rule_value
-            elif rule['match'] == 'gt':
-                res &= value > rule_value
-            elif rule['match'] == 'lt':
-                res &= value < rule_value
-            elif rule['match'] == 'ip_in':
-                if isinstance(rule_value, str):
-                    rule_value = [rule_value]
-                res &= '*' in rule_value or contains_ip(value, rule_value)
-            elif rule['match'].startswith('m2m'):
-                if isinstance(value, Manager):
-                    value = value.values_list('id', flat=True)
-                elif isinstance(value, QuerySet):
-                    value = value.values_list('id', flat=True)
-                elif isinstance(value, models.Model):
-                    value = [value.id]
-                if isinstance(rule_value, (str, int)):
-                    rule_value = [rule_value]
-                value = set(map(str, value))
-                rule_value = set(map(str, rule_value))
+            match rule_match:
+                case 'in':
+                    res &= value in rule_value or '*' in rule_value
+                case 'exact':
+                    res &= value == rule_value or rule_value == '*'
+                case 'contains':
+                    res &= rule_value in value
+                case 'startswith':
+                    res &= str(value).startswith(str(rule_value))
+                case 'endswith':
+                    res &= str(value).endswith(str(rule_value))
+                case 'regex':
+                    try:
+                        matched = bool(re.search(r'{}'.format(rule_value), value))
+                    except Exception as e:
+                        logging.error('Error regex match: %s', e)
+                        matched = False
+                    res &= matched
+                case 'not':
+                    res &= value != rule_value
+                case 'gte' | 'lte' | 'gt' | 'lt':
+                    operations = {
+                        'gte': lambda x, y: x >= y,
+                        'lte': lambda x, y: x <= y,
+                        'gt': lambda x, y: x > y,
+                        'lt': lambda x, y: x < y
+                    }
+                    res &= operations[rule_match](value, rule_value)
+                case 'ip_in':
+                    if isinstance(rule_value, str):
+                        rule_value = [rule_value]
+                    res &= '*' in rule_value or contains_ip(value, rule_value)
+                case rule_match if rule_match.startswith('m2m'):
+                    if isinstance(value, Manager):
+                        value = value.values_list('id', flat=True)
+                    elif isinstance(value, QuerySet):
+                        value = value.values_list('id', flat=True)
+                    elif isinstance(value, models.Model):
+                        value = [value.id]
+                    if isinstance(rule_value, (str, int)):
+                        rule_value = [rule_value]
+                    value = set(map(str, value))
+                    rule_value = set(map(str, rule_value))
 
-                if rule['match'] == 'm2m_all':
-                    res &= rule_value.issubset(value)
-                else:
-                    res &= bool(value & rule_value)
-            else:
-                logging.error("unknown match: {}".format(rule['match']))
-                res &= False
+                    if rule['match'] == 'm2m_all':
+                        res &= rule_value.issubset(value)
+                    else:
+                        res &= bool(value & rule_value)
+                case __:
+                    logging.error("unknown match: {}".format(rule['match']))
+                    res &= False
 
             if not res:
                 return res
+
         if custom_q:
             res &= to_model.objects.filter(custom_q).filter(id=obj.id).exists()
         return res
