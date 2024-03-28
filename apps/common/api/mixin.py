@@ -214,3 +214,11 @@ class CommonApiMixin(
     def is_swagger_request(self):
         return getattr(self, 'swagger_fake_view', False) or \
             getattr(self, 'raw_action', '') == 'metadata'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if 'name' in self.ordering_fields:
+            self.ordering = ('name',)
+
+        return queryset
