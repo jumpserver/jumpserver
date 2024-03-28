@@ -19,8 +19,7 @@ class ContentTypeViewSet(JMSModelViewSet):
     serializer_class = ContentTypeSerializer
     http_method_names = ['get', 'head', 'options']
     rbac_perms = {
-        'default': 'labels.view_contenttype',
-        'resources': 'labels.view_contenttype',
+        'resources': 'rbac.view_contenttype',
     }
     page_default_limit = None
     can_labeled_content_type = []
