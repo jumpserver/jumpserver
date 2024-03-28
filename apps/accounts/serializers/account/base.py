@@ -22,7 +22,7 @@ class AuthValidateMixin(serializers.Serializer):
     )
     passphrase = serializers.CharField(
         allow_blank=True, allow_null=True, required=False, max_length=512,
-        write_only=True, label=_('Key password')
+        write_only=True, label=_('Passphrase')
     )
 
     @staticmethod

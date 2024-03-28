@@ -2,8 +2,8 @@
 #
 from urllib.parse import urlparse
 
-from django.db.models import TextChoices
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_ipv46_address
+from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -146,7 +146,7 @@ class ReplayStorageTypeSFTPSerializer(serializers.Serializer):
         write_only=True, label=_('Private key')
     )
     STP_PASSPHRASE = EncryptedField(
-        allow_blank=True, allow_null=True, required=False, max_length=1024, label=_('Key password')
+        allow_blank=True, allow_null=True, required=False, max_length=1024, label=_('Passphrase')
     )
     SFTP_ROOT_PATH = serializers.CharField(
         required=True, max_length=1024, label=_('SFTP Root')

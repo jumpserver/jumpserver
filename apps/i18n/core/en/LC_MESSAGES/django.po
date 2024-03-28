@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 16:58+0800\n"
+"POT-Creation-Date: 2024-03-28 11:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,7 @@ msgstr ""
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:34
 #: authentication/confirm/password.py:9 authentication/confirm/password.py:24
 #: authentication/confirm/password.py:26 authentication/forms.py:32
-#: authentication/templates/authentication/login.html:330
+#: authentication/templates/authentication/login.html:329
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: settings/serializers/msg.py:35 terminal/serializers/storage.py:123
 #: terminal/serializers/storage.py:142 users/forms/profile.py:22
@@ -253,7 +253,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:126
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: acls/serializers/base.py:123 assets/models/asset/common.py:95
-#: assets/models/asset/common.py:350 assets/models/cmd_filter.py:36
+#: assets/models/asset/common.py:349 assets/models/cmd_filter.py:36
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 perms/serializers/permission.py:36
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
@@ -293,11 +293,11 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:107
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
-#: assets/serializers/asset/common.py:128 assets/serializers/gateway.py:28
-#: audits/models.py:59 authentication/api/connection_token.py:405
-#: ops/models/base.py:18 perms/models/asset_permission.py:75
-#: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:33 terminal/serializers/command.py:72
+#: assets/serializers/gateway.py:28 audits/models.py:59
+#: authentication/api/connection_token.py:405 ops/models/base.py:18
+#: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
+#: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -513,7 +513,7 @@ msgid "Present"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:15
-msgid "Date last login"
+msgid "Date login"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:17
@@ -532,7 +532,7 @@ msgid "Username"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:18
-msgid "Address last login"
+msgid "Address login"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:44
@@ -604,7 +604,7 @@ msgstr ""
 #: assets/models/domain.py:19 assets/models/group.py:17
 #: assets/models/label.py:18 assets/models/platform.py:16
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:149
-#: assets/serializers/platform.py:118 assets/serializers/platform.py:228
+#: assets/serializers/platform.py:136 assets/serializers/platform.py:254
 #: authentication/backends/passkey/models.py:10
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:168 labels/models.py:11
@@ -631,7 +631,7 @@ msgstr ""
 msgid "Privileged"
 msgstr ""
 
-#: accounts/models/base.py:70 assets/models/asset/common.py:166
+#: accounts/models/base.py:70 assets/models/asset/common.py:165
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
@@ -744,7 +744,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:195 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:125 assets/serializers/cagegory.py:12
-#: assets/serializers/platform.py:140 assets/serializers/platform.py:229
+#: assets/serializers/platform.py:158 assets/serializers/platform.py:255
 #: perms/serializers/user_permission.py:26 settings/models.py:36
 #: tickets/models/ticket/apply_application.py:13 users/models/preference.py:12
 msgid "Category"
@@ -755,8 +755,8 @@ msgstr ""
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:97
-#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:120
-#: assets/serializers/platform.py:139 audits/serializers.py:53
+#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:138
+#: assets/serializers/platform.py:157 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:145
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
@@ -862,8 +862,8 @@ msgid "Asset type"
 msgstr ""
 
 #: accounts/serializers/account/base.py:25 terminal/serializers/storage.py:149
-msgid "Key password"
-msgstr "Passphrase"
+msgid "Passphrase"
+msgstr ""
 
 #: accounts/serializers/account/base.py:78
 #: assets/serializers/asset/common.py:384
@@ -939,6 +939,7 @@ msgid ""
 msgstr ""
 
 #: accounts/serializers/automations/base.py:23
+#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:152
 #: assets/serializers/automations/base.py:21
 msgid "Nodes"
 msgstr ""
@@ -1113,8 +1114,9 @@ msgid "Users"
 msgstr ""
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 perms/serializers/permission.py:45
-#: perms/serializers/user_permission.py:75 rbac/tree.py:35
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
+#: perms/serializers/permission.py:45 perms/serializers/user_permission.py:75
+#: rbac/tree.py:35
 msgid "Accounts"
 msgstr ""
 
@@ -1717,35 +1719,28 @@ msgstr ""
 msgid "Domain"
 msgstr ""
 
-#: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:549
-#: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
-#: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
-msgid "Node"
-msgstr ""
-
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:385
+#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:385
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr ""
 
-#: assets/models/asset/common.py:168 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:167 assets/serializers/asset/custom.py:14
 msgid "Custom info"
 msgstr ""
 
-#: assets/models/asset/common.py:353
+#: assets/models/asset/common.py:352
 msgid "Can refresh asset hardware info"
 msgstr ""
 
-#: assets/models/asset/common.py:354
+#: assets/models/asset/common.py:353
 msgid "Can test asset connectivity"
 msgstr ""
 
-#: assets/models/asset/common.py:355
+#: assets/models/asset/common.py:354
 msgid "Can match asset"
 msgstr ""
 
-#: assets/models/asset/common.py:356
+#: assets/models/asset/common.py:355
 msgid "Can change asset nodes"
 msgstr ""
 
@@ -1771,6 +1766,13 @@ msgstr ""
 
 #: assets/models/asset/gpt.py:8 settings/serializers/feature.py:84
 msgid "Proxy"
+msgstr ""
+
+#: assets/models/automations/base.py:18 assets/models/cmd_filter.py:32
+#: assets/models/node.py:549 perms/models/asset_permission.py:72
+#: perms/serializers/permission.py:37 tickets/models/ticket/apply_asset.py:14
+#: xpack/plugins/cloud/models.py:330
+msgid "Node"
 msgstr ""
 
 #: assets/models/automations/base.py:22 ops/models/job.py:231
@@ -1836,7 +1838,7 @@ msgstr ""
 msgid "Favorite asset"
 msgstr ""
 
-#: assets/models/gateway.py:34 assets/serializers/domain.py:18
+#: assets/models/gateway.py:34
 msgid "Gateway"
 msgstr ""
 
@@ -1845,7 +1847,7 @@ msgid "Asset group"
 msgstr ""
 
 #: assets/models/group.py:31 assets/models/platform.py:20
-#: assets/serializers/platform.py:121
+#: assets/serializers/platform.py:139
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr ""
@@ -1870,7 +1872,7 @@ msgstr ""
 
 #: assets/models/label.py:40 assets/serializers/cagegory.py:10
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
-#: assets/serializers/platform.py:119
+#: assets/serializers/platform.py:137
 #: authentication/serializers/connect_token_secret.py:124
 #: common/serializers/common.py:85 labels/models.py:17 labels/models.py:33
 #: labels/serializers.py:45 settings/serializers/msg.py:90
@@ -1913,7 +1915,7 @@ msgstr ""
 msgid "Public"
 msgstr ""
 
-#: assets/models/platform.py:22 assets/serializers/platform.py:49
+#: assets/models/platform.py:22 assets/serializers/platform.py:67
 #: settings/serializers/settings.py:66
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -1947,7 +1949,7 @@ msgid "Gather facts enabled"
 msgstr ""
 
 #: assets/models/platform.py:48 assets/models/platform.py:72
-#: assets/serializers/platform.py:36
+#: assets/serializers/platform.py:37
 msgid "Gather facts method"
 msgstr ""
 
@@ -1955,11 +1957,11 @@ msgstr ""
 msgid "Gather facts params"
 msgstr ""
 
-#: assets/models/platform.py:52 assets/serializers/platform.py:39
+#: assets/models/platform.py:52 assets/serializers/platform.py:45
 msgid "Change secret enabled"
 msgstr ""
 
-#: assets/models/platform.py:54 assets/serializers/platform.py:40
+#: assets/models/platform.py:54 assets/serializers/platform.py:48
 msgid "Change secret method"
 msgstr ""
 
@@ -1967,11 +1969,11 @@ msgstr ""
 msgid "Change secret params"
 msgstr ""
 
-#: assets/models/platform.py:58 assets/serializers/platform.py:41
+#: assets/models/platform.py:58 assets/serializers/platform.py:51
 msgid "Push account enabled"
 msgstr ""
 
-#: assets/models/platform.py:60 assets/serializers/platform.py:42
+#: assets/models/platform.py:60 assets/serializers/platform.py:53
 msgid "Push account method"
 msgstr ""
 
@@ -1979,11 +1981,11 @@ msgstr ""
 msgid "Push account params"
 msgstr ""
 
-#: assets/models/platform.py:64 assets/serializers/platform.py:37
+#: assets/models/platform.py:64
 msgid "Verify account enabled"
 msgstr ""
 
-#: assets/models/platform.py:66 assets/serializers/platform.py:38
+#: assets/models/platform.py:66 assets/serializers/platform.py:41
 msgid "Verify account method"
 msgstr ""
 
@@ -2011,23 +2013,23 @@ msgstr ""
 msgid "Internal"
 msgstr "Builtin"
 
-#: assets/models/platform.py:103 assets/serializers/platform.py:138
+#: assets/models/platform.py:103 assets/serializers/platform.py:156
 msgid "Charset"
 msgstr ""
 
-#: assets/models/platform.py:105 assets/serializers/platform.py:167
+#: assets/models/platform.py:105 assets/serializers/platform.py:191
 msgid "Domain enabled"
 msgstr ""
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:166
+#: assets/models/platform.py:107 assets/serializers/platform.py:184
 msgid "Su enabled"
 msgstr "Switch enabled"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:144
+#: assets/models/platform.py:108 assets/serializers/platform.py:162
 msgid "Su method"
 msgstr "Switch method"
 
-#: assets/models/platform.py:109 assets/serializers/platform.py:147
+#: assets/models/platform.py:109 assets/serializers/platform.py:165
 msgid "Custom fields"
 msgstr ""
 
@@ -2042,7 +2044,7 @@ msgid ""
 "type"
 msgstr ""
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:141
+#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:159
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:46
@@ -2153,6 +2155,10 @@ msgstr ""
 msgid "Types"
 msgstr ""
 
+#: assets/serializers/domain.py:18
+msgid "Gateways"
+msgstr ""
+
 #: assets/serializers/domain.py:20 orgs/serializers.py:13
 #: perms/serializers/permission.py:40
 msgid "Assets amount"
@@ -2170,59 +2176,94 @@ msgstr ""
 msgid "Can't contains: /"
 msgstr ""
 
-#: assets/serializers/platform.py:43
+#: assets/serializers/platform.py:34
+msgid "Enable asset detection"
+msgstr ""
+
+#: assets/serializers/platform.py:38
+msgid "Enable asset information collection"
+msgstr ""
+
+#: assets/serializers/platform.py:42
+msgid "Enable account verification"
+msgstr ""
+
+#: assets/serializers/platform.py:49
+msgid "Enable account secret auto change"
+msgstr ""
+
+#: assets/serializers/platform.py:54
+msgid "Enable account auto push"
+msgstr ""
+
+#: assets/serializers/platform.py:57
 msgid "Gather accounts enabled"
 msgstr ""
 
-#: assets/serializers/platform.py:44
+#: assets/serializers/platform.py:60
 msgid "Gather accounts method"
 msgstr ""
 
-#: assets/serializers/platform.py:50
+#: assets/serializers/platform.py:61
+msgid "Enable account collection"
+msgstr ""
+
+#: assets/serializers/platform.py:68
 msgid "Port from addr"
 msgstr ""
 
-#: assets/serializers/platform.py:62
+#: assets/serializers/platform.py:80
 msgid ""
 "This protocol is primary, and it must be set when adding assets. "
 "Additionally, there can only be one primary protocol."
 msgstr ""
 
-#: assets/serializers/platform.py:67
+#: assets/serializers/platform.py:85
 msgid "This protocol is required, and it must be set when adding assets."
 msgstr ""
 
-#: assets/serializers/platform.py:70
+#: assets/serializers/platform.py:88
 msgid ""
 "This protocol is default, when adding assets, it will be displayed by "
 "default."
 msgstr ""
 
-#: assets/serializers/platform.py:73
+#: assets/serializers/platform.py:91
 msgid "This protocol is public, asset will show this protocol to user"
 msgstr ""
 
-#: assets/serializers/platform.py:122
+#: assets/serializers/platform.py:140
 msgid "Help text"
 msgstr ""
 
-#: assets/serializers/platform.py:123
+#: assets/serializers/platform.py:141
 msgid "Choices"
 msgstr ""
 
-#: assets/serializers/platform.py:142
+#: assets/serializers/platform.py:160
 msgid "Automation"
 msgstr ""
 
-#: assets/serializers/platform.py:168
+#: assets/serializers/platform.py:186
+msgid ""
+"Login with account when accessing assets, then automatically switch to "
+"another, similar to logging in with a regular account and then switching to "
+"root"
+msgstr ""
+
+#: assets/serializers/platform.py:192
+msgid "Assets can be connected using a domain gateway"
+msgstr ""
+
+#: assets/serializers/platform.py:194
 msgid "Default Domain"
 msgstr ""
 
-#: assets/serializers/platform.py:189
+#: assets/serializers/platform.py:215
 msgid "type is required"
 msgstr ""
 
-#: assets/serializers/platform.py:204
+#: assets/serializers/platform.py:230
 msgid "Protocols is required"
 msgstr ""
 
@@ -2355,7 +2396,7 @@ msgid "Connect"
 msgstr ""
 
 #: audits/const.py:30 authentication/templates/authentication/login.html:296
-#: authentication/templates/authentication/login.html:369
+#: authentication/templates/authentication/login.html:368
 #: templates/_header_bar.html:95
 msgid "Login"
 msgstr ""
@@ -2680,7 +2721,7 @@ msgid ""
 msgstr ""
 
 #: authentication/api/password.py:65
-#: authentication/templates/authentication/login.html:361
+#: authentication/templates/authentication/login.html:360
 #: users/templates/users/forgot_password.html:41
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/forgot_password_previewing.html:13
@@ -3375,7 +3416,7 @@ msgstr ""
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 
-#: authentication/templates/authentication/login.html:376
+#: authentication/templates/authentication/login.html:375
 msgid "More login options"
 msgstr ""
 
@@ -3904,18 +3945,18 @@ msgstr ""
 msgid "<h1>Flower service unavailable, check it</h1>"
 msgstr ""
 
-#: jumpserver/views/other.py:26
+#: jumpserver/views/other.py:27
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
 
-#: jumpserver/views/other.py:70
+#: jumpserver/views/other.py:72
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr ""
 
-#: jumpserver/views/other.py:84
+#: jumpserver/views/other.py:86
 msgid ""
 "<div>Koko is a separately deployed program, you need to deploy Koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -8725,11 +8766,11 @@ msgid "Interface settings"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:23
-msgid "Title of login page"
+msgid "Login title"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:27
-msgid "Image of login page"
+msgid "Login image"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:31
@@ -8737,11 +8778,11 @@ msgid "Website icon"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:35
-msgid "Logo of management page"
+msgid "Index logo"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:39
-msgid "Logo of logout page"
+msgid "Logout logo"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:41
@@ -8796,3 +8837,6 @@ msgstr ""
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr ""
+
+#~ msgid "Key password"
+#~ msgstr "Passphrase"
