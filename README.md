@@ -31,8 +31,7 @@ _[To-do]: Need to design the graphics._
 - [Features](#features)
 - [System Architecture](#system-architecture)
 - [Installation](#installation)
-- [Contributing](#contributing)![image-stars](https://github.com/jumpserver/jumpserver/assets/32935519/5cd7682d-328e-4e69-933f-a0ff29eb10d7)
-
+- [Contributing](#contributing)
 - [Join Our Community](#join-our-community)
 - [Security](#security)
 - [Contact](#Contact)
