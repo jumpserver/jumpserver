@@ -63,6 +63,14 @@ Whether you're new to the experience or a seasoned expert, we invite you to join
 >
 > This is a demonstration video that can quickly help you understand the page design and product features of JumpServer.
 
+<details>
+  <summary><kbd>Star History</kbd></summary>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&theme=dark&type=Date">
+    <img width="100%" src="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&type=Date">
+  </picture>
+</details>
+
 <video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 _[To-do]: Need to design the video._
 
@@ -75,15 +83,6 @@ JumpServer aims to become the industry's preferred platform, assisting businesse
 JumpServer's vision is to become a leader in the enterprise-level asset management and access control field, providing comprehensive solutions for users to securely and efficiently manage and utilize their assets. Through continuous innovation and enhancement of product features, JumpServer is committed to driving the development of the entire industry and becoming a key supporter and promoter of enterprise digital transformation.
 
 _[To-do: Display a diagram of supported asset types.]_
-
-<details>
-  <summary><kbd>Star History</kbd></summary>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&theme=dark&type=Date">
-    <img width="100%" src="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&type=Date">
-  </picture>
-</details>
-
 
 ## Why JumpServer
 1. **Open Source**: JumpServer is an open-source software, meaning users can freely access, use, and modify its source code to meet individual needs, while also benefiting from community support and collaboration.
