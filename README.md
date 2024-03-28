@@ -77,6 +77,8 @@ _[To-do: Display a diagram of supported asset types.]_
 
 _[To-do] Demo Video : About 1:30 min_
 
+<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
+
 ```
 Demo Link: https://demo.jumpserver.org/
 
