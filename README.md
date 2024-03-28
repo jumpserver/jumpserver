@@ -59,8 +59,10 @@ Whether you're new to the experience or a seasoned expert, we invite you to join
 
 ![][image-star]
 
+> \[!TIP]
+>
+> This is a demonstration video that can quickly help you understand the page design and product features of JumpServer.
 
-_[To-do] Demo Video : About 1:30 min_
 <video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 
 ## Introduction
