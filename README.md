@@ -23,13 +23,13 @@
 
 - [Introduction](#Introduction)
 - [Why JumpServer](#why-jumpserver)
-- [Demo](#demo)
+- [Getting Started](#getting-started)
 - [Document](#document)
 - [Features](#features)
 - [System Architecture](#system-architecture)
-- [Quick Start](#quick-start)
 - [Installation](#installation)
-- [Contributing](#contributing)
+- [Contributing](#contributing)![image-stars](https://github.com/jumpserver/jumpserver/assets/32935519/5cd7682d-328e-4e69-933f-a0ff29eb10d7)
+
 - [Join Our Community](#join-our-community)
 - [Security](#security)
 - [Contact](#Contact)
@@ -54,6 +54,8 @@ _[To-do: Display a diagram of supported asset types.]_
 >
 > **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
 
+![][image-star]
+
 <details>
   <summary><kbd>Star History</kbd></summary>
   <picture>
@@ -71,9 +73,11 @@ _[To-do: Display a diagram of supported asset types.]_
 5. **Cloud Storage**: JumpServer supports storing critical data such as audit logs and configuration files in the cloud, ensuring data security and reliability, as well as facilitating cross-region and cross-device access.
 6. **Organizational**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
 
-## Demo
+## Getting Started
 
 _[To-do] Demo Video : About 1:30 min_
+
+<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 
 ```
 Demo Link: https://demo.jumpserver.org/
@@ -93,3 +97,7 @@ password: jumpserver
 ## Security
 ## Contact
 ## License
+
+
+<!-- LINK GROUP -->
+[image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
