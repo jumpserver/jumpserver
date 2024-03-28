@@ -16,6 +16,7 @@
 </p>
 
 ------------------------------------------------
+![][image-dashboard]
 
 <details>
 <summary><kbd>Table of contents</kbd></summary>
@@ -107,4 +108,5 @@ _[To-do: Display a diagram of supported asset types.]_
 [discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
 [discord-link]: https://discord.gg/DVz6Hckx
 
+[image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
 [image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
