@@ -75,21 +75,16 @@ _[To-do: Display a diagram of supported asset types.]_
 
 ## Getting Started
 
-_[To-do] Demo Video : About 1:30 min_
+Step right into our online demonstration environment, where you can effortlessly experience our product without the need for time-consuming software installations. With just a few clicks, you'll quickly grasp the functionality and features of our product. In the demonstration environment, you can explore the various features of our product to your heart's content and experience our innovative design and exceptional performance.
 
-<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
+Whether you're new to the experience or a seasoned expert, we invite you to join our Discord community right away! Here, our developers and enthusiastic users come together to offer support and assistance. No matter what challenges you encounter during your usage, we are committed to answering your questions and providing guidance.
 
 | [![][vercel-shield-badge]][vercel-link]   | No installation or registration necessary! Visit our website to experience it firsthand.                           |
 | :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
 | [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
 
-```
-Demo Link: https://demo.jumpserver.org/
-
-username: demo
-
-password: jumpserver
-```
+_[To-do] Demo Video : About 1:30 min_
+<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 
 ## Document
 ## Features
