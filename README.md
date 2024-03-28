@@ -24,17 +24,27 @@ _[To-do]: Need to design the graphics._
 
 #### TOC
 
-- [Introduction](#Introduction)
-- [Why JumpServer](#why-jumpserver)
 - [Getting Started](#getting-started)
-- [Document](#document)
+- [Introduction](#introduction)
+- [Why JumpServer](#why-jumpserver)
 - [Features](#features)
-- [System Architecture](#system-architecture)
+  - [`1` User Authentication Supporting Integration with Multiple Single Sign-On Systems](#1-user-authentication-supporting-integration-with-multiple-single-sign-on-systems)
+  - [`2` User Management Based on Role-based Access Control](#2-user-management-based-on-role-based-access-control)
+  - [`3` Asset Management of Everything is an Asset](#3-asset-management-of-everything-is-an-asset)
+  - [`4` Asset Account Management](#4-asset-account-management)
+  - [`5` Asset Authorization Management](#5-asset-authorization-management)
+  - [`6` Asset Permission Management Based Access Control Logic](#6-asset-permission-management-based-access-control-logic)
+  - [`7` Remote Application Management for Everything](#7-remote-application-management-for-everything)
+  - [`8` Support for Multiple Asset Connection Methods](#8-support-for-multiple-asset-connection-methods)
+  - [`9` Comprehensive and Detailed User Behavior Audit System](#9-comprehensive-and-detailed-user-behavior-audit-system)
+  - [`10` Organization Management with Resource Isolation](#10-organization-management-with-resource-isolation) [![][version-ee-shield-badge]][official-website-en-link] 
+  - [`11` Ticket Management](#11-ticket-management) [![][version-ee-shield-badge]][official-website-en-link] 
+- [System Architecture](#12-system-architecture)
 - [Installation](#installation)
 - [Contributing](#contributing)
 - [Join Our Community](#join-our-community)
 - [Security](#security)
-- [Contact](#Contact)
+- [Contact](#contact)
 - [License](#license)
 ####
 
@@ -91,10 +101,31 @@ _[To-do: Display a diagram of supported asset types.]_
 5. **Cloud Storage**: JumpServer supports storing critical data such as audit logs and configuration files in the cloud, ensuring data security and reliability, as well as facilitating cross-region and cross-device access.
 6. **Organizational**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
 
-## Document
 ## Features
+
+### `1` User Authentication Supporting Integration with Multiple Single Sign-On Systems
+
+### `2` User Management Based on Role-based Access Control
+
+### `3` Asset Management of Everything is an Asset
+
+### `4` Asset Account Management
+
+### `5` Asset Authorization Management
+
+### `6` Asset Permission Management Based Access Control Logic
+
+### `7` Remote Application Management for Everything
+
+### `8` Support for Multiple Asset Connection Methods
+
+### `9` Comprehensive and Detailed User Behavior Audit System
+
+### `10` Organization Management with Resource Isolation
+
+### `11` Ticket Management
+
 ## System Architecture
-## Quick Start
 ## Installation
 ## Contributing
 ## Join Our Community
@@ -116,10 +147,12 @@ _[To-do: Display a diagram of supported asset types.]_
 [docs]: https://docs.jumpserver.org/
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
 
-[vercel-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
-[vercel-link]: https://demo.jumpserver.org/
+[demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
+[demo-link]: https://demo.jumpserver.org/
 [discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
 [discord-link]: https://discord.gg/DVz6Hckx
+[version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
+[official-website-en-link]: https://jumpserver.org/
 
 [image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
 [image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
