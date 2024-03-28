@@ -15,7 +15,8 @@
     For 9 years, pouring heart and soul into creating a high-quality open-source bastion host.
 </p>
 
-------------------------------
+------------------------------------------------
+
 <details>
 <summary><kbd>Table of contents</kbd></summary>
 
@@ -40,6 +41,27 @@
 
 </details>
 
+## Getting Started
+
+Step right into our online demonstration environment, where you can effortlessly experience our product without the need for time-consuming software installations. With just a few clicks, you'll quickly grasp the functionality and features of our product. In the demonstration environment, you can explore the various features of our product to your heart's content and experience our innovative design and exceptional performance.
+
+Whether you're new to the experience or a seasoned expert, we invite you to join our Discord community right away! Here, our developers and enthusiastic users come together to offer support and assistance. No matter what challenges you encounter during your usage, we are committed to answering your questions and providing guidance.
+
+| [![][vercel-shield-badge]][vercel-link]   | No installation or registration necessary! Visit our website to experience it firsthand.                           |
+| :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
+
+
+> \[!IMPORTANT]
+>
+> **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
+
+![][image-star]
+
+
+_[To-do] Demo Video : About 1:30 min_
+<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
+
 ## Introduction
 
 JumpServer is a widely acclaimed open-source bastion host, serving as a professional operational security auditing system compliant with the 4A standards. It helps businesses securely manage and access all types of assets in a more secure manner, enabling pre-authorization, real-time monitoring, and post-audit capabilities.
@@ -49,12 +71,6 @@ JumpServer aims to become the industry's preferred platform, assisting businesse
 JumpServer's vision is to become a leader in the enterprise-level asset management and access control field, providing comprehensive solutions for users to securely and efficiently manage and utilize their assets. Through continuous innovation and enhancement of product features, JumpServer is committed to driving the development of the entire industry and becoming a key supporter and promoter of enterprise digital transformation.
 
 _[To-do: Display a diagram of supported asset types.]_
-
-> \[!IMPORTANT]
->
-> **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
-
-![][image-star]
 
 <details>
   <summary><kbd>Star History</kbd></summary>
@@ -72,19 +88,6 @@ _[To-do: Display a diagram of supported asset types.]_
 4. **Multi-Cloud**: JumpServer offers support for various cloud platforms, including AWS, Azure, Google Cloud, etc., enabling users to manage and access assets seamlessly across different cloud environments.
 5. **Cloud Storage**: JumpServer supports storing critical data such as audit logs and configuration files in the cloud, ensuring data security and reliability, as well as facilitating cross-region and cross-device access.
 6. **Organizational**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
-
-## Getting Started
-
-Step right into our online demonstration environment, where you can effortlessly experience our product without the need for time-consuming software installations. With just a few clicks, you'll quickly grasp the functionality and features of our product. In the demonstration environment, you can explore the various features of our product to your heart's content and experience our innovative design and exceptional performance.
-
-Whether you're new to the experience or a seasoned expert, we invite you to join our Discord community right away! Here, our developers and enthusiastic users come together to offer support and assistance. No matter what challenges you encounter during your usage, we are committed to answering your questions and providing guidance.
-
-| [![][vercel-shield-badge]][vercel-link]   | No installation or registration necessary! Visit our website to experience it firsthand.                           |
-| :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
-| [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
-
-_[To-do] Demo Video : About 1:30 min_
-<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 
 ## Document
 ## Features
