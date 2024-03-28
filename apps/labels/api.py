@@ -1,4 +1,7 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -79,12 +82,32 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
             queryset = content_type.filter_queryset(queryset, keyword)
         return queryset
 
+    @staticmethod
+    def validate_res_ids(content_type: ContentType, res_ids: list):
+        model_cls = content_type.model_class()
+        pk_field = model_cls._meta.pk
+        pk_python_type = pk_field.to_python
+        invalid_ids = []
+        for _id in res_ids:
+            try:
+                pk_python_type(_id)
+            except ValidationError:
+                invalid_ids.append(_id)
+        return invalid_ids
+
     def put(self, request, *args, **kwargs):
         label_pk = self.kwargs.get('label')
         res_type = self.kwargs.get('res_type')
         content_type = get_object_or_404(ContentType, id=res_type)
         label = get_object_or_404(Label, pk=label_pk)
         res_ids = request.data.get('res_ids', [])
+
+        invalid_ids = self.validate_res_ids(content_type, res_ids)
+        if invalid_ids:
+            error = f'{_("Invalid data")}: {", ".join(invalid_ids)}'
+            return Response({
+                "code": 'invalid_data', "detail": error,
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         LabeledResource.objects \
             .filter(res_type=content_type, label=label) \
