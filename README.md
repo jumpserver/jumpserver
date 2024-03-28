@@ -52,16 +52,11 @@ Whether you're new to the experience or a seasoned expert, we invite you to join
 | :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
 | [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
 
-
 > \[!IMPORTANT]
 >
 > **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
 
 ![][image-star]
-
-> \[!TIP]
->
-> This is a demonstration video that can quickly help you understand the page design and product features of JumpServer.
 
 <details>
   <summary><kbd>Star History</kbd></summary>
@@ -70,6 +65,10 @@ Whether you're new to the experience or a seasoned expert, we invite you to join
     <img width="100%" src="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&type=Date">
   </picture>
 </details>
+
+> \[!TIP]
+>
+> This is a demonstration video that can quickly help you understand the page design and product features of JumpServer.
 
 <video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 _[To-do]: Need to design the video._
