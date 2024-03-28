@@ -79,6 +79,10 @@ _[To-do] Demo Video : About 1:30 min_
 
 <video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
 
+| [![][vercel-shield-badge]][vercel-link]   | No installation or registration necessary! Visit our website to experience it firsthand.                           |
+| :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
+
 ```
 Demo Link: https://demo.jumpserver.org/
 
@@ -100,4 +104,9 @@ password: jumpserver
 
 
 <!-- LINK GROUP -->
+[vercel-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=flat-square&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
+[vercel-link]: https://demo.jumpserver.org/
+[discord-shield-badge]: https://img.shields.io/badge/JOIN_US-ONLINE?logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
+[discord-link]: https://discord.gg/DVz6Hckx
+
 [image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
