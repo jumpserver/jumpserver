@@ -48,7 +48,7 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     )
     redis_client = sentinel_client.master_for(REDIS_SENTINEL_SERVICE_NAME)
 else:
-    REDIS_PROTOCOL = 'rediss' if settings.REDIS_USE_SSL else 'redis'
+    REDIS_PROTOCOL = 'rediss' if connection_params.pop('ssl', False) else 'redis'
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s' % {
         'protocol': REDIS_PROTOCOL,
         'password': settings.REDIS_PASSWORD_QUOTE,
