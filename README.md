@@ -54,7 +54,7 @@ _[To-do: Display a diagram of supported asset types.]_
 >
 > **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
 
-[![][image-star]]
+![][image-star]
 
 <details>
   <summary><kbd>Star History</kbd></summary>
@@ -98,5 +98,6 @@ password: jumpserver
 ## Contact
 ## License
 
+
 <!-- LINK GROUP -->
-[image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/e8f277dd-55d1-431c-a453-be756f700213
+[image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
