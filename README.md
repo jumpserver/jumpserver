@@ -1,21 +1,22 @@
-<p align="center">
+<div align="center"><a name="readme-top"></a>
   <a href="https://jumpserver.org"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
-</p>
-<h3 align="center">Popular Open-Source Bastion Host</h3>
+  
+### Popular Open-Source Bastion Host
 
-<p align="center">
-  <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/github/license/jumpserver/jumpserver" alt="License: GPLv3"></a>
-  <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Docker pulls"></a>
-  <a href="https://github.com/jumpserver/jumpserver/releases/latest"><img src="https://img.shields.io/github/v/release/jumpserver/jumpserver" alt="Latest release"></a>
-  <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
-</p>
+<!-- SHIELD GROUP-->
+[![][license-shield]][license-link]
+[![][docker-shield]][docker-link]
+[![][github-release-shield]][github-release-link]
+[![][github-stars-shield]][github-stars-link]
 
+**English** · [简体中文](./README.zh-CN.md) · [Documents][docs] · [Report Bug][github-issues-link] · [Request Feature][github-issues-link]
 
-<p align="center">
-    For 9 years, pouring heart and soul into creating a high-quality open-source bastion host.
-</p>
+For 9 years, pouring heart and soul into creating a high-quality open-source bastion host. <br/>
 
-------------------------------------------------
+</div>
+
+#
+
 ![][image-dashboard]
 
 <details>
@@ -105,10 +106,23 @@ _[To-do: Display a diagram of supported asset types.]_
 
 
 <!-- LINK GROUP -->
+[license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
+[license-link]: https://www.gnu.org/licenses/gpl-3.0.html
+[docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
+[docker-link]: https://hub.docker.com/u/jumpserver
+[github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
+[github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
+[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
+[github-stars-link]: https://github.com/jumpserver/jumpserver
+
+[docs]: https://docs.jumpserver.org/
+[github-issues-link]: https://github.com/jumpserver/jumpserver/issues
+
 [vercel-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
 [vercel-link]: https://demo.jumpserver.org/
 [discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
 [discord-link]: https://discord.gg/DVz6Hckx
 
+[image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
 [image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
 [image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
