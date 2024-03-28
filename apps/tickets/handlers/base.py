@@ -87,7 +87,7 @@ class BaseHandler:
 
     def _create_state_change_comment(self, state):
         # 打开或关闭工单，备注显示是自己，其他是受理人
-        if state in [TicketState.reopen, TicketState.pending, TicketState.closed]:
+        if state in [TicketState.pending, TicketState.closed]:
             user = self.ticket.applicant
         else:
             user = self.ticket.processor

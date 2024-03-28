@@ -143,16 +143,13 @@ class StatusMixin:
     def reject(self, processor):
         self._change_state(StepState.rejected, processor)
 
-    def reopen(self):
-        self._change_state_by_applicant(TicketState.reopen)
-
     def close(self):
         self._change_state(TicketState.closed, self.applicant)
 
     def _change_state_by_applicant(self, state):
         if state == TicketState.closed:
             self.status = TicketStatus.closed
-        elif state in [TicketState.reopen, TicketState.pending]:
+        elif state == TicketState.pending:
             self.status = TicketStatus.open
         else:
             raise ValueError("Not supported state: {}".format(state))

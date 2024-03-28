@@ -30,8 +30,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[
                     ('pending', 'Open'), ('closed', 'Cancel'),
-                    ('reopen', 'Reopen'), ('approved', 'Approved'),
-                    ('rejected', 'Rejected')
+                    ('approved', 'Approved'), ('rejected', 'Rejected')
                 ], default='pending', max_length=16, verbose_name='State'),
         ),
         migrations.AlterField(
@@ -51,8 +50,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[
                     ('pending', 'Open'), ('closed', 'Cancel'),
-                    ('reopen', 'Reopen'), ('approved', 'Approved'),
-                    ('rejected', 'Rejected')
+                    ('approved', 'Approved'), ('rejected', 'Rejected')
                 ], default='pending', max_length=64),
         ),
         migrations.AlterField(
@@ -72,8 +70,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[
                     ('pending', 'Pending'), ('closed', 'Closed'),
-                    ('reopen', 'Reopen'), ('approved', 'Approved'),
-                    ('rejected', 'Rejected')
+                    ('approved', 'Approved'), ('rejected', 'Rejected')
                 ], default='pending', max_length=64, verbose_name='State'),
         ),
         migrations.AlterField(
