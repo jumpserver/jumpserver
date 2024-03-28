@@ -1,4 +1,4 @@
-from django.db.models import Subquery, OuterRef,  Value, F, Q
+from django.db.models import Subquery, OuterRef, Value, F, Q
 from django_filters import rest_framework as filters
 from django.db.models.functions import Concat
 
@@ -11,10 +11,9 @@ from tickets.models import (
 
 
 class TicketFilter(BaseFilterSet):
+    applicant = filters.CharFilter(field_name='applicant__username', lookup_expr='exact')
     assignees__id = filters.UUIDFilter(method='filter_assignees_id')
-    relevant_app = filters.CharFilter(method='filter_relevant_app')
     relevant_asset = filters.CharFilter(method='filter_relevant_asset')
-    relevant_system_user = filters.CharFilter(method='filter_relevant_system_user')
     relevant_command = filters.CharFilter(method='filter_relevant_command')
 
     class Meta:
