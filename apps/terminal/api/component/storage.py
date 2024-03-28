@@ -37,6 +37,7 @@ class BaseStorageViewSetMixin:
 
 class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = ('name', 'type')
+    ordering = ('name',)
     queryset = CommandStorage.objects.all()
     serializer_class = CommandStorageSerializer
     filterset_class = CommandStorageFilter
@@ -114,6 +115,7 @@ class ReplayStorageFilterSet(BaseFilterSet):
 
 class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     search_fields = ('name', 'type', 'is_default')
+    ordering = ('name',)
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
     filterset_class = ReplayStorageFilterSet
