@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-26 17:26+0800\n"
+"POT-Creation-Date: 2024-03-29 15:09+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -226,7 +226,7 @@ msgid "Success"
 msgstr "成功"
 
 #: accounts/const/automation.py:111 common/const/choices.py:16
-#: terminal/const.py:77 tickets/const.py:30 tickets/const.py:40
+#: terminal/const.py:77 tickets/const.py:29 tickets/const.py:38
 msgid "Pending"
 msgstr "待定的"
 
@@ -502,7 +502,7 @@ msgstr "结束日期"
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
-#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:283
+#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:280
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:200
 #: xpack/plugins/cloud/models.py:256
@@ -573,6 +573,7 @@ msgstr "触发方式"
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
+#: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr "动作"
 
@@ -790,7 +791,7 @@ msgstr "类别"
 #: terminal/serializers/session.py:23 terminal/serializers/storage.py:264
 #: terminal/serializers/storage.py:276 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
+#: tickets/models/ticket/general.py:272 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
 msgid "Type"
 msgstr "类型"
@@ -805,8 +806,7 @@ msgstr "已托管密码"
 
 #: accounts/serializers/account/account.py:259 ops/models/celery.py:83
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
-#: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
-#: tickets/serializers/ticket/ticket.py:21
+#: tickets/models/ticket/general.py:276 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr "状态"
 
@@ -958,7 +958,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:297 users/models/user.py:840
+#: tickets/models/ticket/general.py:294 users/models/user.py:840
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:106
 msgid "Comment"
 msgstr "备注"
@@ -1107,7 +1107,7 @@ msgstr "密钥不合法或密钥密码错误"
 msgid "Acls"
 msgstr "访问控制"
 
-#: acls/const.py:6 audits/const.py:36 terminal/const.py:11 tickets/const.py:46
+#: acls/const.py:6 audits/const.py:36 terminal/const.py:11 tickets/const.py:44
 #: tickets/templates/tickets/approve_check_password.html:47
 msgid "Reject"
 msgstr "拒绝"
@@ -1149,7 +1149,7 @@ msgstr "审批人"
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82 terminal/models/session/sharing.py:29
-#: tickets/const.py:38
+#: tickets/const.py:36
 msgid "Active"
 msgstr "激活中"
 
@@ -1354,11 +1354,11 @@ msgstr "应用程序"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: assets/api/asset/asset.py:180
+#: assets/api/asset/asset.py:181
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
-#: assets/api/domain.py:64
+#: assets/api/domain.py:68
 msgid "Number required"
 msgstr "需要为数字"
 
@@ -1898,7 +1898,7 @@ msgstr "命令过滤规则"
 msgid "Favorite asset"
 msgstr "收藏的资产"
 
-#: assets/models/gateway.py:34 assets/serializers/domain.py:18
+#: assets/models/gateway.py:34 assets/serializers/domain.py:19
 msgid "Gateway"
 msgstr "网关"
 
@@ -2065,7 +2065,7 @@ msgstr "账号移除方式"
 msgid "Remove account params"
 msgstr "账号移除参数"
 
-#: assets/models/platform.py:98 tickets/models/ticket/general.py:300
+#: assets/models/platform.py:98 tickets/models/ticket/general.py:297
 msgid "Meta"
 msgstr "元数据"
 
@@ -2168,7 +2168,7 @@ msgid "Model"
 msgstr "型号"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:299
+#: tickets/models/ticket/general.py:296
 msgid "Serial number"
 msgstr "序列号"
 
@@ -2217,7 +2217,7 @@ msgstr "约束"
 msgid "Types"
 msgstr "类型"
 
-#: assets/serializers/domain.py:56 perms/serializers/permission.py:188
+#: assets/serializers/domain.py:62 perms/serializers/permission.py:188
 msgid "Assets amount"
 msgstr "资产数量"
 
@@ -2427,14 +2427,14 @@ msgstr "登录"
 msgid "Change password"
 msgstr "改密"
 
-#: audits/const.py:37 tickets/const.py:47
+#: audits/const.py:37 tickets/const.py:45
 msgid "Approve"
 msgstr "同意"
 
 #: audits/const.py:38
 #: authentication/templates/authentication/_access_key_modal.html:155
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
-#: templates/_modal.html:22 tickets/const.py:45
+#: templates/_modal.html:22 tickets/const.py:43
 msgid "Close"
 msgstr "关闭"
 
@@ -3715,7 +3715,7 @@ msgstr "编码数据为 text"
 msgid "Encrypt field using Secret Key"
 msgstr "加密的字段"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:582
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3725,15 +3725,15 @@ msgstr ""
 "{'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': "
 "'1.1.1.1'}}"
 
-#: common/db/fields.py:587
+#: common/db/fields.py:589
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "无效类型，应为 all、ids 或 attrs"
 
-#: common/db/fields.py:590
+#: common/db/fields.py:592
 msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
-#: common/db/fields.py:592 common/db/fields.py:597
+#: common/db/fields.py:594 common/db/fields.py:599
 #: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3741,11 +3741,11 @@ msgstr "无效的ID，应为列表"
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
-#: common/db/fields.py:595 common/db/fields.py:600
+#: common/db/fields.py:597 common/db/fields.py:602
 msgid "Invalid attrs, should be a list of dict"
 msgstr "无效的属性，应为dict列表"
 
-#: common/db/fields.py:602
+#: common/db/fields.py:604
 msgid "Invalid attrs, should be has name and value"
 msgstr "无效属性，应具有名称和值"
 
@@ -4070,11 +4070,11 @@ msgstr "跳过以下主机: "
 msgid "Waiting task start"
 msgstr "等待任务开始"
 
-#: ops/api/celery.py:260
+#: ops/api/celery.py:262
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:265
+#: ops/api/celery.py:267
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
@@ -4295,7 +4295,7 @@ msgid "Kwargs"
 msgstr "其它参数"
 
 #: ops/models/celery.py:84 terminal/models/session/sharing.py:128
-#: tickets/const.py:26
+#: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
 
@@ -4495,7 +4495,7 @@ msgstr "组织管理"
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/ldap.py:63
 #: terminal/templates/terminal/_msg_command_warning.html:21
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
+#: tickets/models/ticket/general.py:299 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "组织"
 
@@ -4858,7 +4858,7 @@ msgid "Ticket comment"
 msgstr "工单评论"
 
 #: rbac/tree.py:130 settings/serializers/feature.py:109
-#: tickets/models/ticket/general.py:307
+#: tickets/models/ticket/general.py:304
 msgid "Ticket"
 msgstr "工单管理"
 
@@ -6423,23 +6423,23 @@ msgstr "不允许删除默认存储配置"
 msgid "Cannot delete storage that is being used"
 msgstr "不允许删除正在使用的存储配置"
 
-#: terminal/api/component/storage.py:74 terminal/api/component/storage.py:75
+#: terminal/api/component/storage.py:75 terminal/api/component/storage.py:76
 msgid "Command storages"
 msgstr "命令存储"
 
-#: terminal/api/component/storage.py:81
+#: terminal/api/component/storage.py:82
 msgid "Invalid"
 msgstr "无效"
 
-#: terminal/api/component/storage.py:129 terminal/tasks.py:149
+#: terminal/api/component/storage.py:131 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "测试失败: {}"
 
-#: terminal/api/component/storage.py:132
+#: terminal/api/component/storage.py:134
 msgid "Test successful"
 msgstr "测试成功"
 
-#: terminal/api/component/storage.py:134
+#: terminal/api/component/storage.py:136
 msgid "Test failure: Please check configuration"
 msgstr "测试失败：请检查配置"
 
@@ -7416,7 +7416,7 @@ msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听�
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
-#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:288
+#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:285
 msgid "Applicant"
 msgstr "申请人"
 
@@ -7428,59 +7428,55 @@ msgstr "工单管理"
 msgid "Apply for asset"
 msgstr "申请资产"
 
-#: tickets/const.py:17 tickets/const.py:25 tickets/const.py:44
+#: tickets/const.py:17 tickets/const.py:24 tickets/const.py:42
 msgid "Open"
 msgstr "打开"
 
-#: tickets/const.py:19 tickets/const.py:32
-msgid "Reopen"
-msgstr "重新打开"
-
-#: tickets/const.py:20 tickets/const.py:33
+#: tickets/const.py:19 tickets/const.py:31
 msgid "Approved"
 msgstr "已同意"
 
-#: tickets/const.py:21 tickets/const.py:34
+#: tickets/const.py:20 tickets/const.py:32
 msgid "Rejected"
 msgstr "已拒绝"
 
-#: tickets/const.py:31 tickets/const.py:39
+#: tickets/const.py:30 tickets/const.py:37
 msgid "Closed"
 msgstr "关闭的"
 
-#: tickets/const.py:51
+#: tickets/const.py:49
 msgid "One level"
 msgstr "1 级"
 
-#: tickets/const.py:52
+#: tickets/const.py:50
 msgid "Two level"
 msgstr "2 级"
 
-#: tickets/const.py:56
+#: tickets/const.py:54
 msgid "Org admin"
 msgstr "组织管理员"
 
-#: tickets/const.py:57
+#: tickets/const.py:55
 msgid "Custom user"
 msgstr "自定义用户"
 
-#: tickets/const.py:58
+#: tickets/const.py:56
 msgid "Super admin"
 msgstr "超级管理员"
 
-#: tickets/const.py:59
+#: tickets/const.py:57
 msgid "Super admin and org admin"
 msgstr "组织管理员或超级管理员"
 
-#: tickets/const.py:63
+#: tickets/const.py:61
 msgid "All assets"
 msgstr "所有资产"
 
-#: tickets/const.py:64
+#: tickets/const.py:62
 msgid "Permed assets"
 msgstr "授权的资产"
 
-#: tickets/const.py:65
+#: tickets/const.py:63
 msgid "Permed valid assets"
 msgstr "有效授权的资产"
 
@@ -7602,27 +7598,27 @@ msgstr "工单步骤"
 msgid "Ticket assignee"
 msgstr "工单受理人"
 
-#: tickets/models/ticket/general.py:272
+#: tickets/models/ticket/general.py:269
 msgid "Title"
 msgstr "标题"
 
-#: tickets/models/ticket/general.py:292
+#: tickets/models/ticket/general.py:289
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/models/ticket/general.py:295
+#: tickets/models/ticket/general.py:292
 msgid "Approval step"
 msgstr "审批步骤"
 
-#: tickets/models/ticket/general.py:298
+#: tickets/models/ticket/general.py:295
 msgid "Relation snapshot"
 msgstr "工单快照"
 
-#: tickets/models/ticket/general.py:401
+#: tickets/models/ticket/general.py:398
 msgid "Please try again"
 msgstr "请再次尝试"
 
-#: tickets/models/ticket/general.py:470
+#: tickets/models/ticket/general.py:467
 msgid "Super ticket"
 msgstr "超级工单"
 
@@ -7820,6 +7816,14 @@ msgstr "当前窗口"
 #: users/const.py:38
 msgid "New window"
 msgstr "新窗口"
+
+#: users/const.py:47
+msgid "High（32 bit）"
+msgstr "高（32 bit）"
+
+#: users/const.py:48
+msgid "Medium（16 bit）"
+msgstr "中（16 bit）"
 
 #: users/const.py:69
 msgid "Replace"
@@ -8069,11 +8073,11 @@ msgstr "RDP 客户端选项"
 
 #: users/serializers/preference/luna.py:49
 msgid "RDP color quality"
-msgstr ""
+msgstr "RDP 颜色质量"
 
 #: users/serializers/preference/luna.py:53
-msgid "Rdp smart size"
-msgstr ""
+msgid "RDP smart size"
+msgstr "RDP 智能尺寸"
 
 # msgid "Rdp smart size"
 # msgstr "RDP 智能大小"
@@ -9158,3 +9162,6 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Reopen"
+#~ msgstr "重新打开"
