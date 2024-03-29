@@ -26,13 +26,14 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     domain = ObjectRelatedField(required=False, queryset=Node.objects, label=_('Domain'))
+    view_account = serializers.CharField(read_only=True, label=_('Account'))
 
     class Meta:
         model = Asset
         only_fields = [
             'id', 'name', 'address', 'domain', 'platform',
             'comment', 'org_id', 'is_active', 'date_verified',
-            'created_by', 'date_created', 'connectivity', 'nodes', 'labels'
+            'created_by', 'date_created', 'connectivity', 'nodes', 'labels', 'view_account'
         ]
         fields = only_fields + ['category', 'type'] + ['org_name']
         read_only_fields = fields
