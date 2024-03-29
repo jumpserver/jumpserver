@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-28 11:19+0800\n"
+"POT-Creation-Date: 2024-03-29 11:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -329,12 +329,14 @@ msgid "Can remove account"
 msgstr "アカウントを削除できます"
 
 #: accounts/models/automations/backup_account.py:27
-msgid "Backup Type"
+#, fuzzy
+#| msgid "Backup Type"
+msgid "Backup type"
 msgstr "バックアップの種類"
 
 #: accounts/models/automations/backup_account.py:28
 #: accounts/models/automations/backup_account.py:29
-msgid "Is Password Divided"
+msgid "Password divided"
 msgstr "キーが 2 つの部分に分割されているかどうか"
 
 #: accounts/models/automations/backup_account.py:32
@@ -346,24 +348,29 @@ msgid "Recipient part two"
 msgstr "受信者 2"
 
 #: accounts/models/automations/backup_account.py:40
-msgid "Object Storage Recipient part one"
+#, fuzzy
+#| msgid "Object Storage Recipient part one"
+msgid "Object storage recipient part one"
 msgstr "受信サーバー 1"
 
 #: accounts/models/automations/backup_account.py:44
-msgid "Object Storage Recipient part two"
+#, fuzzy
+#| msgid "Object Storage Recipient part two"
+msgid "Object storage recipient part two"
 msgstr "受信サーバー 2"
 
 #: accounts/models/automations/backup_account.py:47
-#: accounts/serializers/account/backup.py:20
-msgid "Zip Encrypt Password"
+#, fuzzy
+#| msgid "Zip Encrypt Password"
+msgid "Zip encrypt password"
 msgstr "新しいファイルの暗号化パスワード"
 
-#: accounts/models/automations/backup_account.py:55
-#: accounts/models/automations/backup_account.py:138
+#: accounts/models/automations/backup_account.py:56
+#: accounts/models/automations/backup_account.py:139
 msgid "Account backup plan"
 msgstr "アカウントバックアップ計画"
 
-#: accounts/models/automations/backup_account.py:119
+#: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
 #: ops/models/base.py:55 ops/models/celery.py:86 ops/models/job.py:236
 #: ops/templates/ops/celery_task_log.html:75
@@ -375,18 +382,18 @@ msgstr "アカウントバックアップ計画"
 msgid "Date start"
 msgstr "開始日"
 
-#: accounts/models/automations/backup_account.py:122
+#: accounts/models/automations/backup_account.py:123
 #: authentication/templates/authentication/_msg_oauth_bind.html:11
 #: notifications/notifications.py:186
 #: settings/templates/ldap/_msg_import_ldap_user.html:3
 msgid "Time"
 msgstr "時間"
 
-#: accounts/models/automations/backup_account.py:126
+#: accounts/models/automations/backup_account.py:127
 msgid "Account backup snapshot"
 msgstr "アカウントのバックアップスナップショット"
 
-#: accounts/models/automations/backup_account.py:130
+#: accounts/models/automations/backup_account.py:131
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:55
 #: assets/models/automations/base.py:122
@@ -394,19 +401,19 @@ msgstr "アカウントのバックアップスナップショット"
 msgid "Trigger mode"
 msgstr "トリガーモード"
 
-#: accounts/models/automations/backup_account.py:133 audits/models.py:203
+#: accounts/models/automations/backup_account.py:134 audits/models.py:203
 #: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:208
 msgid "Reason"
 msgstr "理由"
 
-#: accounts/models/automations/backup_account.py:135
+#: accounts/models/automations/backup_account.py:136
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
 #: ops/serializers/job.py:67 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "成功は"
 
-#: accounts/models/automations/backup_account.py:143
+#: accounts/models/automations/backup_account.py:144
 msgid "Account backup execution"
 msgstr "アカウントバックアップの実行"
 
@@ -862,6 +869,10 @@ msgstr "ユーザー"
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
 msgstr "日付"
+
+#: accounts/serializers/account/backup.py:20
+msgid "Zip Encrypt Password"
+msgstr "新しいファイルの暗号化パスワード"
 
 #: accounts/serializers/account/backup.py:38
 #: accounts/serializers/automations/base.py:37

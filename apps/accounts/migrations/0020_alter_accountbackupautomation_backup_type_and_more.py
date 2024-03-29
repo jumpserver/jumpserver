@@ -18,11 +18,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='accountbackupautomation',
             name='is_password_divided_by_email',
-            field=models.BooleanField(default=True, verbose_name='Is Password Divided'),
+            field=models.BooleanField(default=True, verbose_name='Password divided'),
         ),
         migrations.AlterField(
             model_name='accountbackupautomation',
             name='is_password_divided_by_obj_storage',
-            field=models.BooleanField(default=True, verbose_name='Is Password Divided'),
+            field=models.BooleanField(default=True, verbose_name='Password divided'),
         ),
     ]

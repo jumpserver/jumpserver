@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-28 11:19+0800\n"
+"POT-Creation-Date: 2024-03-29 11:00+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -328,12 +328,14 @@ msgid "Can remove account"
 msgstr "可以移除账号"
 
 #: accounts/models/automations/backup_account.py:27
-msgid "Backup Type"
+#, fuzzy
+#| msgid "Backup Type"
+msgid "Backup type"
 msgstr "备份类型"
 
 #: accounts/models/automations/backup_account.py:28
 #: accounts/models/automations/backup_account.py:29
-msgid "Is Password Divided"
+msgid "Password divided"
 msgstr "密钥是否拆分成前后两部分"
 
 #: accounts/models/automations/backup_account.py:32
@@ -345,24 +347,29 @@ msgid "Recipient part two"
 msgstr "收件人部分二"
 
 #: accounts/models/automations/backup_account.py:40
-msgid "Object Storage Recipient part one"
+#, fuzzy
+#| msgid "Object Storage Recipient part one"
+msgid "Object storage recipient part one"
 msgstr "接收服务器一"
 
 #: accounts/models/automations/backup_account.py:44
-msgid "Object Storage Recipient part two"
+#, fuzzy
+#| msgid "Object Storage Recipient part two"
+msgid "Object storage recipient part two"
 msgstr "接收服务器二"
 
 #: accounts/models/automations/backup_account.py:47
-#: accounts/serializers/account/backup.py:20
-msgid "Zip Encrypt Password"
+#, fuzzy
+#| msgid "Zip Encrypt Password"
+msgid "Zip encrypt password"
 msgstr "文件加密密码"
 
-#: accounts/models/automations/backup_account.py:55
-#: accounts/models/automations/backup_account.py:138
+#: accounts/models/automations/backup_account.py:56
+#: accounts/models/automations/backup_account.py:139
 msgid "Account backup plan"
 msgstr "账号备份计划"
 
-#: accounts/models/automations/backup_account.py:119
+#: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
 #: ops/models/base.py:55 ops/models/celery.py:86 ops/models/job.py:236
 #: ops/templates/ops/celery_task_log.html:75
@@ -374,18 +381,18 @@ msgstr "账号备份计划"
 msgid "Date start"
 msgstr "开始日期"
 
-#: accounts/models/automations/backup_account.py:122
+#: accounts/models/automations/backup_account.py:123
 #: authentication/templates/authentication/_msg_oauth_bind.html:11
 #: notifications/notifications.py:186
 #: settings/templates/ldap/_msg_import_ldap_user.html:3
 msgid "Time"
 msgstr "时间"
 
-#: accounts/models/automations/backup_account.py:126
+#: accounts/models/automations/backup_account.py:127
 msgid "Account backup snapshot"
 msgstr "账号备份快照"
 
-#: accounts/models/automations/backup_account.py:130
+#: accounts/models/automations/backup_account.py:131
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:55
 #: assets/models/automations/base.py:122
@@ -393,19 +400,19 @@ msgstr "账号备份快照"
 msgid "Trigger mode"
 msgstr "触发模式"
 
-#: accounts/models/automations/backup_account.py:133 audits/models.py:203
+#: accounts/models/automations/backup_account.py:134 audits/models.py:203
 #: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:208
 msgid "Reason"
 msgstr "原因"
 
-#: accounts/models/automations/backup_account.py:135
+#: accounts/models/automations/backup_account.py:136
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
 #: ops/serializers/job.py:67 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
 
-#: accounts/models/automations/backup_account.py:143
+#: accounts/models/automations/backup_account.py:144
 msgid "Account backup execution"
 msgstr "账号备份执行"
 
@@ -858,6 +865,10 @@ msgstr "用户"
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
 msgstr "日期"
+
+#: accounts/serializers/account/backup.py:20
+msgid "Zip Encrypt Password"
+msgstr "文件加密密码"
 
 #: accounts/serializers/account/backup.py:38
 #: accounts/serializers/automations/base.py:37
