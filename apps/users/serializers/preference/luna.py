@@ -50,7 +50,7 @@ class GraphicsSerializer(serializers.Serializer):
     )
     rdp_smart_size = serializers.ChoiceField(
         RDPSmartSize.choices, default=RDPSmartSize.DISABLE,
-        required=False, label=_('Rdp smart size'),
+        required=False, label=_('RDP smart size'),
         help_text=_('Determines whether the client computer should scale the content on the remote '
                     'computer to fit the window size of the client computer when the window is resized.')
     )

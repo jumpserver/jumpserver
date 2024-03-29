@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-26 17:26+0800\n"
+"POT-Creation-Date: 2024-03-29 15:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,7 +227,7 @@ msgid "Success"
 msgstr "成功"
 
 #: accounts/const/automation.py:111 common/const/choices.py:16
-#: terminal/const.py:77 tickets/const.py:30 tickets/const.py:40
+#: terminal/const.py:77 tickets/const.py:29 tickets/const.py:38
 msgid "Pending"
 msgstr "未定"
 
@@ -503,7 +503,7 @@ msgstr "終了日"
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
-#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:283
+#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:280
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:200
 #: xpack/plugins/cloud/models.py:256
@@ -574,6 +574,7 @@ msgstr "トリガー方式"
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
+#: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr "アクション"
 
@@ -792,7 +793,7 @@ msgstr "カテゴリ"
 #: terminal/serializers/session.py:23 terminal/serializers/storage.py:264
 #: terminal/serializers/storage.py:276 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
+#: tickets/models/ticket/general.py:272 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
 msgid "Type"
 msgstr "タイプ"
@@ -807,8 +808,7 @@ msgstr "エスクローされたパスワード"
 
 #: accounts/serializers/account/account.py:259 ops/models/celery.py:83
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
-#: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
-#: tickets/serializers/ticket/ticket.py:21
+#: tickets/models/ticket/general.py:276 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr "状態"
 
@@ -960,7 +960,7 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:297 users/models/user.py:840
+#: tickets/models/ticket/general.py:294 users/models/user.py:840
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:106
 msgid "Comment"
 msgstr "コメント"
@@ -1113,7 +1113,7 @@ msgstr "秘密鍵が無効またはpassphraseエラー"
 msgid "Acls"
 msgstr "Acls"
 
-#: acls/const.py:6 audits/const.py:36 terminal/const.py:11 tickets/const.py:46
+#: acls/const.py:6 audits/const.py:36 terminal/const.py:11 tickets/const.py:44
 #: tickets/templates/tickets/approve_check_password.html:47
 msgid "Reject"
 msgstr "拒否"
@@ -1155,7 +1155,7 @@ msgstr "レビュー担当者"
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82 terminal/models/session/sharing.py:29
-#: tickets/const.py:38
+#: tickets/const.py:36
 msgid "Active"
 msgstr "アクティブ"
 
@@ -1362,13 +1362,13 @@ msgstr "アプリケーション"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: assets/api/asset/asset.py:180
+#: assets/api/asset/asset.py:181
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "資産を直接作成することはできません。ホストまたはその他を作成する必要がありま"
 "す"
 
-#: assets/api/domain.py:64
+#: assets/api/domain.py:68
 msgid "Number required"
 msgstr "必要な数"
 
@@ -1908,7 +1908,7 @@ msgstr "コマンドフィルタルール"
 msgid "Favorite asset"
 msgstr "お気に入りのアセット"
 
-#: assets/models/gateway.py:34 assets/serializers/domain.py:18
+#: assets/models/gateway.py:34 assets/serializers/domain.py:19
 msgid "Gateway"
 msgstr "ゲートウェイ"
 
@@ -2075,7 +2075,7 @@ msgstr "アカウントの削除方法"
 msgid "Remove account params"
 msgstr "アカウント削除パラメータ"
 
-#: assets/models/platform.py:98 tickets/models/ticket/general.py:300
+#: assets/models/platform.py:98 tickets/models/ticket/general.py:297
 msgid "Meta"
 msgstr "メタ"
 
@@ -2180,7 +2180,7 @@ msgid "Model"
 msgstr "モデル"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:299
+#: tickets/models/ticket/general.py:296
 msgid "Serial number"
 msgstr "シリアル番号"
 
@@ -2229,7 +2229,7 @@ msgstr "制約"
 msgid "Types"
 msgstr "タイプ"
 
-#: assets/serializers/domain.py:56 perms/serializers/permission.py:188
+#: assets/serializers/domain.py:62 perms/serializers/permission.py:188
 msgid "Assets amount"
 msgstr "資産数量"
 
@@ -2446,14 +2446,14 @@ msgstr "ログイン"
 msgid "Change password"
 msgstr "パスワードを変更する"
 
-#: audits/const.py:37 tickets/const.py:47
+#: audits/const.py:37 tickets/const.py:45
 msgid "Approve"
 msgstr "承認"
 
 #: audits/const.py:38
 #: authentication/templates/authentication/_access_key_modal.html:155
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
-#: templates/_modal.html:22 tickets/const.py:45
+#: templates/_modal.html:22 tickets/const.py:43
 msgid "Close"
 msgstr "閉じる"
 
@@ -3761,7 +3761,7 @@ msgstr "テキストフィールドへのマーシャルデータ"
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:582
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3771,15 +3771,15 @@ msgstr ""
 "｛'type'：'ids'，'ids':[]｝或 ＃タイプ：属性、属性：[＃名前：ip、照合：正確、"
 "値：1.1.1.1｝"
 
-#: common/db/fields.py:587
+#: common/db/fields.py:589
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "無効なタイプです。all、ids、またはattrsでなければなりません"
 
-#: common/db/fields.py:590
+#: common/db/fields.py:592
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
-#: common/db/fields.py:592 common/db/fields.py:597
+#: common/db/fields.py:594 common/db/fields.py:599
 #: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3787,11 +3787,11 @@ msgstr "無効なID、リストでなければなりません"
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: common/db/fields.py:595 common/db/fields.py:600
+#: common/db/fields.py:597 common/db/fields.py:602
 msgid "Invalid attrs, should be a list of dict"
 msgstr "無効な属性、dictリストでなければなりません"
 
-#: common/db/fields.py:602
+#: common/db/fields.py:604
 msgid "Invalid attrs, should be has name and value"
 msgstr "名前と値が必要な無効な属性"
 
@@ -4121,11 +4121,11 @@ msgstr "次のホストをスキップします: "
 msgid "Waiting task start"
 msgstr "タスク開始待ち"
 
-#: ops/api/celery.py:260
+#: ops/api/celery.py:262
 msgid "Task {} not found"
 msgstr "タスクは存在しません"
 
-#: ops/api/celery.py:265
+#: ops/api/celery.py:267
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
@@ -4348,7 +4348,7 @@ msgid "Kwargs"
 msgstr "クワーグ"
 
 #: ops/models/celery.py:84 terminal/models/session/sharing.py:128
-#: tickets/const.py:26
+#: tickets/const.py:25
 msgid "Finished"
 msgstr "終了"
 
@@ -4549,7 +4549,7 @@ msgstr "アプリ組織"
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/ldap.py:63
 #: terminal/templates/terminal/_msg_command_warning.html:21
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
+#: tickets/models/ticket/general.py:299 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
 
@@ -4913,7 +4913,7 @@ msgid "Ticket comment"
 msgstr "チケットコメント"
 
 #: rbac/tree.py:130 settings/serializers/feature.py:109
-#: tickets/models/ticket/general.py:307
+#: tickets/models/ticket/general.py:304
 msgid "Ticket"
 msgstr "チケット"
 
@@ -6519,23 +6519,23 @@ msgstr "デフォルトのストレージの削除は許可されていません
 msgid "Cannot delete storage that is being used"
 msgstr "使用中のストレージを削除できません"
 
-#: terminal/api/component/storage.py:74 terminal/api/component/storage.py:75
+#: terminal/api/component/storage.py:75 terminal/api/component/storage.py:76
 msgid "Command storages"
 msgstr "コマンドストア"
 
-#: terminal/api/component/storage.py:81
+#: terminal/api/component/storage.py:82
 msgid "Invalid"
 msgstr "無効"
 
-#: terminal/api/component/storage.py:129 terminal/tasks.py:149
+#: terminal/api/component/storage.py:131 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "テスト失敗: {}"
 
-#: terminal/api/component/storage.py:132
+#: terminal/api/component/storage.py:134
 msgid "Test successful"
 msgstr "テスト成功"
 
-#: terminal/api/component/storage.py:134
+#: terminal/api/component/storage.py:136
 msgid "Test failure: Please check configuration"
 msgstr "テストに失敗しました：構成を確認してください"
 
@@ -7522,7 +7522,7 @@ msgstr ""
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
-#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:288
+#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:285
 msgid "Applicant"
 msgstr "応募者"
 
@@ -7534,59 +7534,55 @@ msgstr "チケット"
 msgid "Apply for asset"
 msgstr "資産の申請"
 
-#: tickets/const.py:17 tickets/const.py:25 tickets/const.py:44
+#: tickets/const.py:17 tickets/const.py:24 tickets/const.py:42
 msgid "Open"
 msgstr "オープン"
 
-#: tickets/const.py:19 tickets/const.py:32
-msgid "Reopen"
-msgstr "再オープン"
-
-#: tickets/const.py:20 tickets/const.py:33
+#: tickets/const.py:19 tickets/const.py:31
 msgid "Approved"
 msgstr "承認済み"
 
-#: tickets/const.py:21 tickets/const.py:34
+#: tickets/const.py:20 tickets/const.py:32
 msgid "Rejected"
 msgstr "拒否"
 
-#: tickets/const.py:31 tickets/const.py:39
+#: tickets/const.py:30 tickets/const.py:37
 msgid "Closed"
 msgstr "クローズ"
 
-#: tickets/const.py:51
+#: tickets/const.py:49
 msgid "One level"
 msgstr "1つのレベル"
 
-#: tickets/const.py:52
+#: tickets/const.py:50
 msgid "Two level"
 msgstr "2つのレベル"
 
-#: tickets/const.py:56
+#: tickets/const.py:54
 msgid "Org admin"
 msgstr "Org admin"
 
-#: tickets/const.py:57
+#: tickets/const.py:55
 msgid "Custom user"
 msgstr "カスタムユーザー"
 
-#: tickets/const.py:58
+#: tickets/const.py:56
 msgid "Super admin"
 msgstr "スーパー管理者"
 
-#: tickets/const.py:59
+#: tickets/const.py:57
 msgid "Super admin and org admin"
 msgstr "スーパーadminとorg admin"
 
-#: tickets/const.py:63
+#: tickets/const.py:61
 msgid "All assets"
 msgstr "すべての資産"
 
-#: tickets/const.py:64
+#: tickets/const.py:62
 msgid "Permed assets"
 msgstr "許可された資産"
 
-#: tickets/const.py:65
+#: tickets/const.py:63
 msgid "Permed valid assets"
 msgstr "有効な許可を受けた資産"
 
@@ -7709,27 +7705,27 @@ msgstr "チケットステップ"
 msgid "Ticket assignee"
 msgstr "割り当てられたチケット"
 
-#: tickets/models/ticket/general.py:272
+#: tickets/models/ticket/general.py:269
 msgid "Title"
 msgstr "タイトル"
 
-#: tickets/models/ticket/general.py:292
+#: tickets/models/ticket/general.py:289
 msgid "TicketFlow"
 msgstr "作業指示プロセス"
 
-#: tickets/models/ticket/general.py:295
+#: tickets/models/ticket/general.py:292
 msgid "Approval step"
 msgstr "承認ステップ"
 
-#: tickets/models/ticket/general.py:298
+#: tickets/models/ticket/general.py:295
 msgid "Relation snapshot"
 msgstr "製造オーダスナップショット"
 
-#: tickets/models/ticket/general.py:401
+#: tickets/models/ticket/general.py:398
 msgid "Please try again"
 msgstr "もう一度お試しください"
 
-#: tickets/models/ticket/general.py:470
+#: tickets/models/ticket/general.py:467
 msgid "Super ticket"
 msgstr "スーパーチケット"
 
@@ -7929,6 +7925,14 @@ msgstr "現在のウィンドウ"
 #: users/const.py:38
 msgid "New window"
 msgstr "新しいウィンドウ"
+
+#: users/const.py:47
+msgid "High（32 bit）"
+msgstr "高い（32 bit）"
+
+#: users/const.py:48
+msgid "Medium（16 bit）"
+msgstr "真ん中（16 bit）"
 
 #: users/const.py:69
 msgid "Replace"
@@ -8178,11 +8182,11 @@ msgstr "RDPクライアントオプション"
 
 #: users/serializers/preference/luna.py:49
 msgid "RDP color quality"
-msgstr ""
+msgstr "RDP の色品質"
 
 #: users/serializers/preference/luna.py:53
-msgid "Rdp smart size"
-msgstr "RDPインテリジェントサイズ"
+msgid "RDP smart size"
+msgstr "RDP スマート サイズ"
 
 #: users/serializers/preference/luna.py:54
 msgid ""
@@ -9287,3 +9291,6 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Reopen"
+#~ msgstr "再オープン"

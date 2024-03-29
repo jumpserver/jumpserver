@@ -44,8 +44,8 @@ class RDPSmartSize(TextChoices):
 
 
 class RDPColorQuality(TextChoices):
-    HIGH = '32', 'High（32 bit）'
-    MEDIUM = '16', 'Medium（16 bit）'
+    HIGH = '32', _('High（32 bit）')
+    MEDIUM = '16', _('Medium（16 bit）')
 
 
 class KeyboardLayout(TextChoices):
