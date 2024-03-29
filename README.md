@@ -27,6 +27,8 @@ _[To-do]: Need to design the graphics._
 - [Getting Started](#getting-started)
 - [Introduction](#introduction)
 - [Why JumpServer](#why-jumpserver)
+- [Installation](#installation)
+- [System Architecture](#system-architecture)
 - [Features](#features)
   - [`1` User Authentication Supporting Integration with Multiple Single Sign-On Systems](#1-user-authentication-supporting-integration-with-multiple-single-sign-on-systems)
   - [`2` User Management Based on Role-based Access Control](#2-user-management-based-on-role-based-access-control)
@@ -39,10 +41,7 @@ _[To-do]: Need to design the graphics._
   - [`9` Comprehensive and Detailed User Behavior Audit System](#9-comprehensive-and-detailed-user-behavior-audit-system)
   - [`10` Organization Management with Resource Isolation](#10-organization-management-with-resource-isolation) [![][version-ee-shield-badge]][official-website-en-link] 
   - [`11` Ticket Management](#11-ticket-management) [![][version-ee-shield-badge]][official-website-en-link] 
-- [System Architecture](#12-system-architecture)
-- [Installation](#installation)
 - [Contributing](#contributing)
-- [Join Our Community](#join-our-community)
 - [Security](#security)
 - [Contact](#contact)
 - [License](#license)
@@ -101,6 +100,10 @@ _[To-do: Display a diagram of supported asset types.]_
 5. **Cloud Storage**: JumpServer supports storing critical data such as audit logs and configuration files in the cloud, ensuring data security and reliability, as well as facilitating cross-region and cross-device access.
 6. **Organizational**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
 
+## Installation
+
+## System Architecture
+
 ## Features
 
 ### `1` User Authentication Supporting Integration with Multiple Single Sign-On Systems
@@ -125,10 +128,7 @@ _[To-do: Display a diagram of supported asset types.]_
 
 ### `11` Ticket Management
 
-## System Architecture
-## Installation
 ## Contributing
-## Join Our Community
 ## Security
 ## Contact
 ## License
