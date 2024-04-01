@@ -671,20 +671,20 @@ msgstr "账号推送参数"
 
 #: accounts/models/template.py:26 xpack/plugins/cloud/models.py:329
 msgid "Account template"
-msgstr "账号模版"
+msgstr "账号模板"
 
 #: accounts/models/template.py:31
 msgid "Can view asset account template secret"
-msgstr "可以查看资产账号模版密码"
+msgstr "可以查看资产账号模板密码"
 
 #: accounts/models/template.py:32
 msgid "Can change asset account template secret"
-msgstr "可以更改资产账号模版密码"
+msgstr "可以更改资产账号模板密码"
 
 # msgid "Can view asset account template secret"
-# msgstr "可以查看资产账号模版密码"
+# msgstr "可以查看资产账号模板密码"
 # msgid "Can change asset account template secret"
-# msgstr "可以更改资产账号模版密码"
+# msgstr "可以更改资产账号模板密码"
 #: accounts/models/virtual.py:13
 msgid "Alias"
 msgstr "别名"
@@ -3887,7 +3887,7 @@ msgstr "短信服务商不支持：{}"
 
 #: common/sdk/sms/endpoint.py:54
 msgid "SMS verification code signature or template invalid"
-msgstr "短信验证码签名或模版无效"
+msgstr "短信验证码签名或模板无效"
 
 #: common/sdk/sms/exceptions.py:8
 msgid "The verification code has expired. Please resend it"
@@ -6223,7 +6223,7 @@ msgstr "下载导入的模板或使用导出的csv格式"
 
 #: templates/_csv_import_modal.html:13
 msgid "Download the import template"
-msgstr "下载导入模版"
+msgstr "下载导入模板"
 
 #: templates/_csv_import_modal.html:17 templates/_csv_update_modal.html:17
 msgid "Select the CSV file to import"
@@ -6239,7 +6239,7 @@ msgstr "下载更新的模板或使用导出的csv格式"
 
 #: templates/_csv_update_modal.html:13
 msgid "Download the update template"
-msgstr "下载更新模版"
+msgstr "下载更新模板"
 
 #: templates/_header_bar.html:12
 msgid "Help"

@@ -17,7 +17,7 @@ logger = get_logger(__file__)
 
 
 class BaseFileRenderer(BaseRenderer):
-    # 渲染模版标识, 导入、导出、更新模版: ['import', 'update', 'export']
+    # 渲染模板标识, 导入、导出、更新模板: ['import', 'update', 'export']
     template = 'export'
     serializer = None
 
