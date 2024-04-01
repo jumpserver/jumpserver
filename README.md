@@ -9,7 +9,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-**English** · [简体中文](./README.zh-CN.md) · [Documents][docs] · [Report Bug][github-issues-link] · [Request Feature][github-issues-link]
+**English** · [简体中文](./README.zh-CN.md) · [Documents][docs-link] · [Report Bug][github-issues-link] · [Request Feature][github-issues-link]
 
 For 9 years, pouring heart and soul into creating a high-quality open-source bastion host. <br/>
 
@@ -102,6 +102,40 @@ _[To-do: Display a diagram of supported asset types.]_
 
 ## Installation
 
+JumpServer supports multiple installation methods to cater to diverse user scenarios and preferences:
+
+See documentation: https://docs.jumpserver.org/zh/v3/
+
+### `1` Online
+Ideal for users with internet access, this method involves downloading installation scripts or packages directly from the internet. It ensures easy access to the latest updates and dependencies during installation.
+
+Quick installation of JumpServer in just two steps:
+
+1. Prepare a 64-bit Linux host with at least 4 cores and 8 GB of RAM, which has internet access.
+2. Execute the following command as the root user for one-click installation of JumpServer.
+
+```sh
+curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
+```
+
+### `2` Offline
+Suited for environments without internet connectivity, this method allows users to download all necessary installation files and dependencies beforehand. It ensures seamless installation even in isolated or restricted network environments.
+
+Download offline package: https://community.fit2cloud.com/#/products/jumpserver/downloads
+
+### `3` Kubernetes (K8s)
+JumpServer supports installation on Kubernetes clusters. You can deploy JumpServer as containerized applications on Kubernetes, leveraging the scalability and management features of Kubernetes for running JumpServer.
+
+### `4` All-in-One
+This method provides a simplified installation process where all components of JumpServer are installed on a single server or machine. It's suitable for small-scale deployments or testing purposes where separate component deployment is not required.
+
+### `5` Enterprise Edition Trial
+JumpServer offers a trial version of its enterprise edition, allowing users to test out the enterprise features and functionalities before committing to a full deployment. This trial version typically comes with limited duration or features to provide a glimpse of the capabilities of the enterprise edition.
+
+Each installation method caters to different use cases and deployment scenarios, offering flexibility and options for users based on their requirements and infrastructure setup.
+
+Applying for the Enterprise Edition: https://jumpserver.org/enterprise.html
+
 ## System Architecture
 
 ## Features
@@ -133,26 +167,33 @@ _[To-do: Display a diagram of supported asset types.]_
 ## Contact
 ## License
 
+<!-- JumpServer official link -->
+[official-website-en-link]: https://jumpserver.org/
+[docs-link]: https://docs.jumpserver.org/
+[community-link]: https://community.fit2cloud.com/#/products/jumpserver/downloads
+[demo-link]: https://demo.jumpserver.org/
+[discord-link]: https://discord.gg/DVz6Hckx
 
-<!-- LINK GROUP -->
-[license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
+
+<!-- JumpServer Other link-->
 [license-link]: https://www.gnu.org/licenses/gpl-3.0.html
-[docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
 [docker-link]: https://hub.docker.com/u/jumpserver
 [github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
 [github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
 [github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [github-stars-link]: https://github.com/jumpserver/jumpserver
-
-[docs]: https://docs.jumpserver.org/
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
 
+
+<!-- Shield link-->
+
+[docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
+[license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
 [demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
-[demo-link]: https://demo.jumpserver.org/
 [discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
-[discord-link]: https://discord.gg/DVz6Hckx
 [version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
-[official-website-en-link]: https://jumpserver.org/
+
+<!-- Image link -->
 
 [image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
 [image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
