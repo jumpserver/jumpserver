@@ -95,7 +95,7 @@ JumpServer supports multiple installation methods to cater to diverse user scena
 
 See Docs: https://docs.jumpserver.org/zh/v3/
 
-#### `1` Online
+#### 1. Online
 Ideal for users with internet access, this method involves downloading installation scripts or packages directly from the internet. It ensures easy access to the latest updates and dependencies during installation.
 
 Quick installation of JumpServer in just two steps:
@@ -107,18 +107,18 @@ Quick installation of JumpServer in just two steps:
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-#### `2` Offline
+#### 2. Offline
 Suited for environments without internet connectivity, this method allows users to download all necessary installation files and dependencies beforehand. It ensures seamless installation even in isolated or restricted network environments.
 
 Download offline package: https://community.fit2cloud.com/#/products/jumpserver/downloads
 
-#### `3` Kubernetes (K8s)
+#### 3. Kubernetes (K8s)
 JumpServer supports installation on Kubernetes clusters. You can deploy JumpServer as containerized applications on Kubernetes, leveraging the scalability and management features of Kubernetes for running JumpServer.
 
-#### `4` All-in-One
+#### 4. All-in-One
 This method provides a simplified installation process where all components of JumpServer are installed on a single server or machine. It's suitable for small-scale deployments or testing purposes where separate component deployment is not required.
 
-#### `5` Enterprise Edition Trial
+#### 5. Enterprise Edition Trial
 JumpServer offers a trial version of its enterprise edition, allowing users to test out the enterprise features and functionalities before committing to a full deployment. This trial version typically comes with limited duration or features to provide a glimpse of the capabilities of the enterprise edition.
 
 Each installation method caters to different use cases and deployment scenarios, offering flexibility and options for users based on their requirements and infrastructure setup.
@@ -126,12 +126,12 @@ Each installation method caters to different use cases and deployment scenarios,
 Applying for the Enterprise Edition: https://jumpserver.org/enterprise.html
 
 ## Product Architecture & Components
-#### Architecture Diagram
+#### 1. Architecture Diagram
 Below is the schematic diagram of the JumpServer system architecture, providing a more comprehensive understanding of the product features of JumpServer.
 ![][image-system-architecture]
 _[To-do]: Need to design the graphics._
 
-#### Supporting Components
+#### 2. Supporting Components
 | Project                                                | Status                                                                                                                                                                 | Description                                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                                                       |
@@ -173,8 +173,8 @@ Welcome to submit PR to contribute. Please refer to CONTRIBUTING.md for guidelin
 ## Security
 JumpServer is a secure product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
 
-Email: support@fit2cloud.com
-Phone: 400-052-0755
+- Email: support@fit2cloud.com
+- Phone: 400-052-0755
 
 ## License
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.
