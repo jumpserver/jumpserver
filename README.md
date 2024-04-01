@@ -89,7 +89,8 @@ JumpServer aims to become the industry's preferred platform, assisting businesse
 
 JumpServer's vision is to become a leader in the enterprise-level asset management and access control field, providing comprehensive solutions for users to securely and efficiently manage and utilize their assets. Through continuous innovation and enhancement of product features, JumpServer is committed to driving the development of the entire industry and becoming a key supporter and promoter of enterprise digital transformation.
 
-_[To-do: Display a diagram of supported asset types.]_
+![][image-supported-asset-type]
+_[To-do]: Need to design the graphics._
 
 ## Why JumpServer
 1. **Open Source**: JumpServer is an open-source software, meaning users can freely access, use, and modify its source code to meet individual needs, while also benefiting from community support and collaboration.
@@ -136,6 +137,26 @@ Each installation method caters to different use cases and deployment scenarios,
 Applying for the Enterprise Edition: https://jumpserver.org/enterprise.html
 
 ## System Architecture
+
+![][image-system-architecture]
+_[To-do]: Need to design the graphics._
+
+| Project                                                | Status                                                                                                                                                                 | Description                                                                             |
+|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                             
+| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal                                                            |
+| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer Character Protocol Connector                                                                 |
+| [Lion](https://github.com/jumpserver/lion-release)     | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>   | JumpServer Graphical Protocol Connector, dependent on [Apache Guacamole](https://guacamole.apache.org/) |
+| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer RDP Proxy Connector                                                    |
+| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                      |
+| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                      |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer Database Proxy Connector                                                     |
+| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB                                                 |
+| [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer GPT Assets Connector                                                         |
+| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer Inter-Project Communication Component with Core API                                            |
+| [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer Client                                                                |
+| [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer Installation Tool                                                                 |
+
 
 ## Features
 
@@ -200,7 +221,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 
 <!-- Shield link-->
-
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
 [demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
@@ -208,7 +228,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
 
 <!-- Image link -->
-
 [image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
 [image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
 [image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
+[image-supported-asset-type]: https://github.com/jumpserver/jumpserver/assets/32935519/8e769007-5449-4e86-b34b-d04e8e484257
+[image-system-architecture]: https://github.com/jumpserver/jumpserver/assets/32935519/8a720b4e-19ed-4e3c-a8aa-325d7581005a
+
+
