@@ -30,17 +30,6 @@ _[To-do]: Need to design the graphics._
 - [Installation](#installation)
 - [Product Architecture & Components](#product-architecture--components)
 - [Features](#features)
-  - [`1` User Authentication Supporting Integration with Multiple Single Sign-On Systems](#1-user-authentication-supporting-integration-with-multiple-single-sign-on-systems)
-  - [`2` User Management Based on Role-based Access Control](#2-user-management-based-on-role-based-access-control)
-  - [`3` Asset Management of Everything is an Asset](#3-asset-management-of-everything-is-an-asset)
-  - [`4` Asset Account Management](#4-asset-account-management)
-  - [`5` Asset Authorization Management](#5-asset-authorization-management)
-  - [`6` Asset Permission Management Based Access Control Logic](#6-asset-permission-management-based-access-control-logic)
-  - [`7` Remote Application Management for Everything](#7-remote-application-management-for-everything)
-  - [`8` Support for Multiple Asset Connection Methods](#8-support-for-multiple-asset-connection-methods)
-  - [`9` Comprehensive and Detailed User Behavior Audit System](#9-comprehensive-and-detailed-user-behavior-audit-system)
-  - [`10` Organization Management with Resource Isolation](#10-organization-management-with-resource-isolation) [![][version-ee-shield-badge]][official-website-en-link] 
-  - [`11` Ticket Management](#11-ticket-management) [![][version-ee-shield-badge]][official-website-en-link] 
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
@@ -143,47 +132,40 @@ Below is the schematic diagram of the JumpServer system architecture, providing 
 _[To-do]: Need to design the graphics._
 
 #### Supporting Components
-| Project                                                | Status                                                                                                                                                                 | Description                                                                             |
-|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                             
-| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal                                                            |
+| Project                                                | Status                                                                                                                                                                 | Description                                                                                             |
+|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                                                       |
+| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal                                                                                 |
 | [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer Character Protocol Connector                                                                 |
 | [Lion](https://github.com/jumpserver/lion-release)     | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>   | JumpServer Graphical Protocol Connector, dependent on [Apache Guacamole](https://guacamole.apache.org/) |
-| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer RDP Proxy Connector                                                    |
-| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                      |
-| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                      |
-| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer Database Proxy Connector                                                     |
-| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB                                                 |
-| [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer GPT Assets Connector                                                         |
-| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer Inter-Project Communication Component with Core API                                            |
-| [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer Client                                                                |
-| [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer Installation Tool                                                                 |
+| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer RDP Proxy Connector                                                                          |
+| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                       |
+| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                         |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer Database Proxy Connector                                                                     |
+| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB                                                                                       |
+| [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer GPT Assets Connector                                                                         |
+| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer Inter-Project Communication Component with Core API                                          |
+| [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer Client                                                                                       |
+| [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer Installation Tool                                                                            |
 
 JumpServer consists of multiple key components, which collectively form the functional framework of JumpServer, providing users with comprehensive capabilities for operations management and security control.
 
 ## Features
+Below are the features supported by JumpServer, covering various aspects of operations management and security control, providing you with a comprehensive solution. 
 
-### `1` User Authentication Supporting Integration with Multiple Single Sign-On Systems
+1. User Authentication Supporting Integration with Multiple Single Sign-On Systems (SSO)
+2. User Management Based on Role-based Access Control (RBAC)
+3. Asset Management of Everything is an Asset
+4. Asset Account Management
+5. Asset Authorization Management
+6. Asset Permission Management Based Access Control Logic (ACL)
+7. Remote Application Management for Everything
+8. Support for Multiple Asset Connection Methods
+9. Comprehensive and Detailed User Behavior Audit System
+10. [![][version-ee-shield-badge]][official-website-en-link] Organization Management with Resource Isolation 
+11. [![][version-ee-shield-badge]][official-website-en-link] Ticket Management
 
-### `2` User Management Based on Role-based Access Control
-
-### `3` Asset Management of Everything is an Asset
-
-### `4` Asset Account Management
-
-### `5` Asset Authorization Management
-
-### `6` Asset Permission Management Based Access Control Logic
-
-### `7` Remote Application Management for Everything
-
-### `8` Support for Multiple Asset Connection Methods
-
-### `9` Comprehensive and Detailed User Behavior Audit System
-
-### `10` Organization Management with Resource Isolation
-
-### `11` Ticket Management
+For details, [See Docs][docs-link].
 
 ## Contributing
 Welcome to submit PR to contribute. Please refer to CONTRIBUTING.md for guidelines.
