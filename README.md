@@ -168,7 +168,7 @@ Below are the features supported by JumpServer, covering various aspects of oper
 For details, [See Docs][docs-link].
 
 ## Contributing
-Welcome to submit PR to contribute. Please refer to CONTRIBUTING.md for guidelines.
+Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributing-link] for guidelines.
 
 ## Security
 JumpServer is a secure product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
@@ -193,6 +193,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [community-link]: https://community.fit2cloud.com/#/products/jumpserver/downloads
 [demo-link]: https://demo.jumpserver.org/
 [discord-link]: https://discord.gg/DVz6Hckx
+[contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
 
 
 <!-- JumpServer Other link-->
@@ -203,7 +204,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
-
 
 <!-- Shield link-->
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
