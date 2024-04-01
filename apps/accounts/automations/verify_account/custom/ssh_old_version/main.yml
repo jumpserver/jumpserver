@@ -1,0 +1,22 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_shell_type: sh
+    ansible_become: false
+
+  tasks:
+    - name: Verify account (paramiko)
+      ssh_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_secret_type: "{{ account.secret_type }}"
+        login_private_key_path: "{{ account.private_key_path }}"
+        become: "{{ account.become.ansible_become | default(False) }}"
+        become_method: "{{ account.become.ansible_become_method | default('su') }}"
+        become_user: "{{ account.become.ansible_user | default('') }}"
+        become_password: "{{ account.become.ansible_password | default('') }}"
+        become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
+        old_ssh_version: true

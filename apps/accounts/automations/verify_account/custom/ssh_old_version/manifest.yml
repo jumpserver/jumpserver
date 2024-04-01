@@ -1,0 +1,16 @@
+id: verify_account_by_old_ssh
+name: "{{ 'SSH account verify by old ssh' | trans }}"
+category:
+  - device
+  - host
+type:
+  - all
+method: verify_account
+protocol: ssh
+priority: 50
+
+i18n:
+  SSH account verify by old ssh:
+    zh: '使用 Python 模块 paramiko 验证低版本 ssh 的账号'
+    ja: 'Python モジュール paramiko を使用してアカウントを検証する'
+    en: 'Using Python module paramiko to verify account'

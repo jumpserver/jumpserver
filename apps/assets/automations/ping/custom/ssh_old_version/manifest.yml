@@ -1,0 +1,16 @@
+id: ping_by_ssh_old
+name: "{{ 'Ping by paramiko on old ssh' | trans }}"
+category:
+  - device
+  - host
+type:
+  - all
+method: ping
+protocol: ssh
+priority: 50
+
+i18n:
+  Ping by paramiko on old ssh:
+    zh: '使用 Python 模块 paramiko 测试低版本 ssh 主机可连接性'
+    en: 'Ping by paramiko module on old ssh host'
+    ja: 'Paramikoモジュールを使用して古いsshホストにpingする'

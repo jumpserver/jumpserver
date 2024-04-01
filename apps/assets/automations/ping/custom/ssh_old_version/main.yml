@@ -1,0 +1,22 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_shell_type: sh
+    ansible_become: false
+
+  tasks:
+    - name: Test asset connection (paramiko)
+      ssh_ping:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_secret_type: "{{ jms_account.secret_type }}"
+        login_private_key_path: "{{ jms_account.private_key_path }}"
+        become: "{{ custom_become | default(False) }}"
+        become_method: "{{ custom_become_method | default('su') }}"
+        become_user: "{{ custom_become_user | default('') }}"
+        become_password: "{{ custom_become_password | default('') }}"
+        become_private_key_path: "{{ custom_become_private_key_path | default(None) }}"
+        old_ssh_version: true
