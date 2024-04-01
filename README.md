@@ -104,7 +104,7 @@ _[To-do]: Need to design the graphics._
 
 JumpServer supports multiple installation methods to cater to diverse user scenarios and preferences:
 
-See documentation: https://docs.jumpserver.org/zh/v3/
+See Docs: https://docs.jumpserver.org/zh/v3/
 
 #### `1` Online
 Ideal for users with internet access, this method involves downloading installation scripts or packages directly from the internet. It ensures easy access to the latest updates and dependencies during installation.
@@ -137,10 +137,11 @@ Each installation method caters to different use cases and deployment scenarios,
 Applying for the Enterprise Edition: https://jumpserver.org/enterprise.html
 
 ## System Architecture
-
+Below is the schematic diagram of the JumpServer system architecture, providing a more comprehensive understanding of the product features of JumpServer.
 ![][image-system-architecture]
 _[To-do]: Need to design the graphics._
 
+JumpServer consists of multiple key components, which collectively form the functional framework of JumpServer, providing users with comprehensive capabilities for operations management and security control.
 | Project                                                | Status                                                                                                                                                                 | Description                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
 | [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                             
