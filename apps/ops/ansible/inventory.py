@@ -91,6 +91,15 @@ class JMSInventory:
         }
         return var
 
+    @staticmethod
+    def make_protocol_setting_vars(host, protocols):
+        # 针对 ssh 协议的特殊处理
+        for p in protocols:
+            if p.name == 'ssh':
+                if hasattr(p, 'setting'):
+                    setting = getattr(p, 'setting')
+                    host['old_ssh_version'] = setting.get('old_ssh_version', False)
+
     def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
         from accounts.const import AutomationTypes
         if not account:
@@ -185,6 +194,8 @@ class JMSInventory:
                 'secret_type': account.secret_type, 'private_key_path': account.private_key_path
             } if account else None
         }
+
+        self.make_protocol_setting_vars(host, protocols)
 
         protocols = host['jms_asset']['protocols']
         host['jms_asset'].update({f"{p['name']}_port": p['port'] for p in protocols})
