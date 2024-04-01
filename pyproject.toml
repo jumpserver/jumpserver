@@ -169,15 +169,10 @@ keystoneauth1 = "5.2.1"
 oracledb = "1.4.0"
 psycopg2-binary = "2.9.6"
 pymssql = "2.2.8"
-psycopg2 = "2.9.6"
+# psycopg2 = "2.9.6"
 ucloud-sdk-python3 = "0.11.50"
 huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
-
-[[tool.poetry.source]]
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "primary"
 
 [[tool.poetry.source]]
 name = "PyPI"
