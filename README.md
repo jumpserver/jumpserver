@@ -28,7 +28,7 @@ _[To-do]: Need to design the graphics._
 - [Introduction](#introduction)
 - [Why JumpServer](#why-jumpserver)
 - [Installation](#installation)
-- [System Architecture](#system-architecture)
+- [Product Architecture & Components](#product-architecture--components)
 - [Features](#features)
   - [`1` User Authentication Supporting Integration with Multiple Single Sign-On Systems](#1-user-authentication-supporting-integration-with-multiple-single-sign-on-systems)
   - [`2` User Management Based on Role-based Access Control](#2-user-management-based-on-role-based-access-control)
@@ -136,11 +136,13 @@ Each installation method caters to different use cases and deployment scenarios,
 
 Applying for the Enterprise Edition: https://jumpserver.org/enterprise.html
 
-## System Architecture
+## Product Architecture & Components
+#### Architecture Diagram
 Below is the schematic diagram of the JumpServer system architecture, providing a more comprehensive understanding of the product features of JumpServer.
 ![][image-system-architecture]
 _[To-do]: Need to design the graphics._
 
+#### Supporting Components
 JumpServer consists of multiple key components, which collectively form the functional framework of JumpServer, providing users with comprehensive capabilities for operations management and security control.
 | Project                                                | Status                                                                                                                                                                 | Description                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
