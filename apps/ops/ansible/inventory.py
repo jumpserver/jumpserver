@@ -115,6 +115,10 @@ class JMSInventory:
         else:
             host.update(self.make_account_ansible_vars(account))
 
+        if platform.name == 'Huawei':
+            host['ansible_connection'] = 'network_cli'
+            host['ansible_network_os'] = 'asa'
+
         if gateway:
             ansible_connection = host.get('ansible_connection', 'ssh')
             if ansible_connection in ('local', 'winrm', 'rdp'):

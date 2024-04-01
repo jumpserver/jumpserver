@@ -66,7 +66,7 @@ class JMSPermedInventory(JMSInventory):
             'mysql': ['mysql'],
             'postgresql': ['postgresql'],
             'sqlserver': ['sqlserver'],
-            'ssh': ['shell', 'python', 'win_shell', 'raw'],
+            'ssh': ['shell', 'python', 'win_shell', 'raw', 'huawei'],
             'winrm': ['win_shell', 'shell'],
         }
 
@@ -301,6 +301,11 @@ class JobExecution(JMSOrgBaseModel):
                 shell += " chdir={}".format(self.current_job.chdir)
         if self.current_job.module in ['python']:
             shell += " executable={}".format(self.current_job.module)
+
+        if module == JobModules.huawei.value:
+            module = 'ce_command'
+            shell = "commands=\"{}\" ".format(self.current_job.args)
+
         return module, shell
 
     def get_runner(self):
