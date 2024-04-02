@@ -162,8 +162,8 @@ Below are the features supported by JumpServer, covering various aspects of oper
 7. Remote Application Management for Everything
 8. Support for Multiple Asset Connection Methods
 9. Comprehensive and Detailed User Behavior Audit System
-10. [![][version-ee-shield-badge]][official-website-en-link] Organization Management with Resource Isolation 
-11. [![][version-ee-shield-badge]][official-website-en-link] Ticket Management
+10. Organization Management with Resource Isolation [![][version-ee-shield-badge]][official-website-en-link]
+11. Ticket Management [![][version-ee-shield-badge]][official-website-en-link]
 
 For details, [See Docs][docs-link].
 
