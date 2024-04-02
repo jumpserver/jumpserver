@@ -30,35 +30,42 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             # 启用资产探测
-            "ping_enabled": {"label": _("Ping enabled"), },
-            "ping_method": {"label": _("Ping method"), "help_text": _("Enable asset detection")},
-            "gather_facts_enabled": {"label": _("Gather facts enabled"), },
+            "ping_enabled": {"label": _("Ping enabled"), "help_text": _("Enable asset detection")},
+            "ping_method": {"label": _("Ping method")},
+            "gather_facts_enabled": {
+                "label": _("Gather facts enabled"),
+                "help_text": _("Enable asset information collection")
+            },
             "gather_facts_method": {
                 "label": _("Gather facts method"),
-                "help_text": _("Enable asset information collection")
+            },
+            "verify_account_enabled": {
+                "label": _("Verify account enabled"),
+                "help_text": _("Enable account verification")
             },
             "verify_account_method": {
                 "label": _("Verify account method"),
-                "help_text": _("Enable account verification")
             },
             "change_secret_enabled": {
                 "label": _("Change secret enabled"),
+                "help_text": _("Enable account secret auto change")
             },
             "change_secret_method": {
                 "label": _("Change secret method"),
-                "help_text": _("Enable account secret auto change")
             },
-            "push_account_enabled": {"label": _("Push account enabled"), },
+            "push_account_enabled": {
+                "label": _("Push account enabled"),
+                "help_text": _("Enable account auto push")
+            },
             "push_account_method": {
                 "label": _("Push account method"),
-                "help_text": _("Enable account auto push")
             },
             "gather_accounts_enabled": {
                 "label": _("Gather accounts enabled"),
+                "help_text": _("Enable account collection")
             },
             "gather_accounts_method": {
                 "label": _("Gather accounts method"),
-                "help_text": _("Enable account collection")
             },
         }
 
