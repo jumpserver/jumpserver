@@ -35,13 +35,16 @@ class RedisUserSessionManager:
     def add_or_increment(self, session_key):
         self.client.hincrby(self.JMS_SESSION_KEY, session_key, 1)
 
-    def decrement_or_remove(self, session_key):
-        new_count = self.client.hincrby(self.JMS_SESSION_KEY, session_key, -1)
-        if new_count <= 0:
-            self.client.hdel(self.JMS_SESSION_KEY, session_key)
+    def decrement(self, session_key):
+        self.client.hincrby(self.JMS_SESSION_KEY, session_key, -1)
 
     def remove(self, session_key):
         self.client.hdel(self.JMS_SESSION_KEY, session_key)
+        try:
+            session_store = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
+            session_store.delete()
+        except Exception:
+            pass
 
     def check_active(self, session_key):
         count = self.client.hget(self.JMS_SESSION_KEY, session_key)
