@@ -44,7 +44,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
     }
-    ordering = ('name',)
     rbac_perms = {
         'match': 'users.match_user',
         'invite': 'users.invite_user',
