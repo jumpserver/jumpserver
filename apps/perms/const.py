@@ -43,5 +43,9 @@ class ActionChoices(BitChoices):
         return action_value & total == action_value
 
     @classmethod
+    def contains_all(cls, total, action_values):
+        return all(cls.contains(total, action) for action in action_values)
+
+    @classmethod
     def display(cls, value):
         return ', '.join([str(c.label) for c in cls if c.value & value == c.value])
