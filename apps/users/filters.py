@@ -3,8 +3,9 @@ from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
 from common.utils import is_uuid
-from rbac.models import Role
+from rbac.models import Role, OrgRoleBinding, SystemRoleBinding
 from users.models.user import User
+from orgs.utils import current_org
 
 
 class UserFilter(BaseFilterSet):
@@ -25,7 +26,7 @@ class UserFilter(BaseFilterSet):
         )
 
     @staticmethod
-    def get_role(value):
+    def _get_role(value):
         from rbac.builtin import BuiltinRole
         roles = BuiltinRole.get_roles()
         for role in roles.values():
@@ -37,22 +38,20 @@ class UserFilter(BaseFilterSet):
         else:
             return Role.objects.filter(name=value).first()
 
-    def filter_system_roles(self, queryset, name, value):
-        role = self.get_role(value)
+    def _filter_roles(self, queryset, value, scope):
+        role = self._get_role(value)
         if not role:
             return queryset.none()
-        queryset = queryset.prefetch_related('role_bindings') \
-            .filter(role_bindings__role_id=role.id) \
-            .filter(role_bindings__role__scope='system') \
-            .distinct()
+        
+        rb_model = SystemRoleBinding if scope == Role.Scope.system.value else OrgRoleBinding
+        user_ids = rb_model.objects.filter(role_id=role.id).values_list('user_id', flat=True)
+        queryset = queryset.filter(id__in=user_ids).distinct()
+        return queryset
+
+    def filter_system_roles(self, queryset, name, value):
+        queryset = self._filter_roles(queryset=queryset, value=value, scope=Role.Scope.system.value)
         return queryset
 
     def filter_org_roles(self, queryset, name, value):
-        role = self.get_role(value)
-        if not role:
-            return queryset.none()
-        queryset = queryset.prefetch_related('role_bindings') \
-            .filter(role_bindings__role_id=role.id) \
-            .filter(role_bindings__role__scope='org') \
-            .distinct()
+        queryset = self._filter_roles(queryset=queryset, value=value, scope=Role.Scope.org.value)
         return queryset
