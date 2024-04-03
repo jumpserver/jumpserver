@@ -19,7 +19,6 @@ class DomainViewSet(OrgBulkModelViewSet):
     model = Domain
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    ordering = ('name',)
     serializer_classes = {
         'default': serializers.DomainSerializer,
         'list': serializers.DomainListSerializer,

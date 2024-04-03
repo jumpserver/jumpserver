@@ -34,7 +34,6 @@ class OrgViewSet(JMSBulkModelViewSet):
     search_fields = ('name', 'comment')
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
-    ordering = ('name',)
 
     def get_serializer_class(self):
         mapper = {

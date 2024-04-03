@@ -13,6 +13,7 @@ from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ValidationError
+from rest_framework.filters import OrderingFilter
 
 from common import const
 from common.db.fields import RelatedManager
@@ -24,6 +25,7 @@ __all__ = [
     'IDInFilterBackend', "CustomFilterBackend",
     "BaseFilterSet", 'IDNotFilterBackend',
     'NotOrRelFilterBackend', 'LabelFilterBackend',
+    'RewriteOrderingFilter'
 ]
 
 
@@ -335,3 +337,16 @@ class NotOrRelFilterBackend(filters.BaseFilterBackend):
             queryset.query.where.connector = 'OR'
         queryset._result_cache = None
         return queryset
+
+
+class RewriteOrderingFilter(OrderingFilter):
+    default_ordering_if_has = ('name', )
+
+    def get_default_ordering(self, view):
+        ordering = super().get_default_ordering(view)
+        # 如果 view.ordering = [] 表示不排序, 这样可以节约性能 (比如: 用户授权的资产)
+        if ordering is not None:
+            return ordering
+        ordering_fields = getattr(view, 'ordering_fields', self.ordering_fields)
+        ordering = tuple([f for f in ordering_fields if f in self.default_ordering_if_has])
+        return ordering

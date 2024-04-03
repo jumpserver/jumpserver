@@ -19,7 +19,6 @@ class UserGroupViewSet(OrgBulkModelViewSet):
         'default': UserGroupSerializer,
         'list': UserGroupListSerializer,
     }
-    ordering = ('name',)
     rbac_perms = (
         ("add_all_users", "users.add_usergroup"),
     )
