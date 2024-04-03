@@ -348,5 +348,6 @@ class RewriteOrderingFilter(OrderingFilter):
         if ordering is not None:
             return ordering
         ordering_fields = getattr(view, 'ordering_fields', self.ordering_fields)
-        ordering = tuple([f for f in ordering_fields if f in self.default_ordering_if_has])
+        if ordering_fields:
+            ordering = tuple([f for f in ordering_fields if f in self.default_ordering_if_has])
         return ordering
