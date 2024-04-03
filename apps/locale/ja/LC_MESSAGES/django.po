@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-29 15:09+0800\n"
+"POT-Creation-Date: 2024-04-03 16:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,7 +105,7 @@ msgstr "更新"
 #: accounts/const/account.py:33 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:164 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:75 terminal/const.py:79 xpack/plugins/cloud/const.py:46
+#: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:46
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -220,7 +220,7 @@ msgstr "SFTP"
 #: accounts/const/automation.py:110
 #: accounts/serializers/automations/change_secret.py:163 audits/const.py:61
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:46
+#: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:46
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -288,7 +288,7 @@ msgstr "資産"
 msgid "Su from"
 msgstr "から切り替え"
 
-#: accounts/models/account.py:55 assets/const/protocol.py:169
+#: accounts/models/account.py:55 assets/const/protocol.py:177
 #: settings/serializers/auth/cas.py:20 terminal/models/applet/applet.py:35
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
@@ -1459,7 +1459,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:260
+#: assets/const/base.py:34 assets/const/protocol.py:268
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1527,11 +1527,19 @@ msgstr "ChatGPT"
 msgid "Other"
 msgstr "その他"
 
-#: assets/const/protocol.py:49
+#: assets/const/protocol.py:45
+msgid "Old SSH version"
+msgstr "古いSSHバージョン"
+
+#: assets/const/protocol.py:46
+msgid "Old SSH version like openssh 5.x or 6.x"
+msgstr "openssh 5.x または 6.x などの古い SSH バージョン"
+
+#: assets/const/protocol.py:57
 msgid "SFTP root"
 msgstr "SFTPルート"
 
-#: assets/const/protocol.py:51
+#: assets/const/protocol.py:59
 #, python-brace-format
 msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
@@ -1542,89 +1550,89 @@ msgstr ""
 "ユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}"
 "ユーザーのユーザー名"
 
-#: assets/const/protocol.py:66
+#: assets/const/protocol.py:74
 msgid "Console"
 msgstr "Console"
 
-#: assets/const/protocol.py:67
+#: assets/const/protocol.py:75
 msgid "Connect to console session"
 msgstr "コンソールセッションに接続"
 
-#: assets/const/protocol.py:71
+#: assets/const/protocol.py:79
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:73 settings/serializers/security.py:228
+#: assets/const/protocol.py:81 settings/serializers/security.py:232
 msgid "Security"
 msgstr "セキュリティ"
 
-#: assets/const/protocol.py:74
+#: assets/const/protocol.py:82
 msgid "Security layer to use for the connection"
 msgstr "接続に使用するセキュリティ レイヤー"
 
-#: assets/const/protocol.py:80
+#: assets/const/protocol.py:88
 msgid "AD domain"
 msgstr "AD ドメイン"
 
-#: assets/const/protocol.py:95
+#: assets/const/protocol.py:103
 msgid "Username prompt"
 msgstr "ユーザー名プロンプト"
 
-#: assets/const/protocol.py:96
+#: assets/const/protocol.py:104
 msgid "We will send username when we see this prompt"
 msgstr "このプロンプトが表示されたらユーザー名を送信します"
 
-#: assets/const/protocol.py:101
+#: assets/const/protocol.py:109
 msgid "Password prompt"
 msgstr "パスワードプロンプト"
 
-#: assets/const/protocol.py:102
+#: assets/const/protocol.py:110
 msgid "We will send password when we see this prompt"
 msgstr "このプロンプトが表示されたらパスワードを送信します"
 
-#: assets/const/protocol.py:107
+#: assets/const/protocol.py:115
 msgid "Success prompt"
 msgstr "成功プロンプト"
 
-#: assets/const/protocol.py:108
+#: assets/const/protocol.py:116
 msgid "We will consider login success when we see this prompt"
 msgstr "このプロンプトが表示されたらログイン成功とみなします"
 
-#: assets/const/protocol.py:119 assets/models/asset/database.py:10
+#: assets/const/protocol.py:127 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:47
 msgid "Use SSL"
 msgstr "SSLの使用"
 
-#: assets/const/protocol.py:154
+#: assets/const/protocol.py:162
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:155
+#: assets/const/protocol.py:163
 msgid "Connect as SYSDBA"
 msgstr "SYSDBA として接続"
 
-#: assets/const/protocol.py:170
+#: assets/const/protocol.py:178
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server のバージョン。バージョンによって接続ドライバが異なります"
 
-#: assets/const/protocol.py:194
+#: assets/const/protocol.py:202
 msgid "Auth source"
 msgstr "認証データベース"
 
-#: assets/const/protocol.py:195
+#: assets/const/protocol.py:203
 msgid "The database to authenticate against"
 msgstr "認証するデータベース"
 
-#: assets/const/protocol.py:207
+#: assets/const/protocol.py:215
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:230
+#: assets/const/protocol.py:238
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:232
+#: assets/const/protocol.py:240
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
@@ -1632,24 +1640,24 @@ msgstr ""
 "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへ"
 "のアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:237 assets/models/asset/web.py:9
+#: assets/const/protocol.py:245 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:245 assets/models/asset/web.py:10
+#: assets/const/protocol.py:253 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:250 assets/models/asset/web.py:11
+#: assets/const/protocol.py:258 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:255 assets/models/asset/web.py:12
+#: assets/const/protocol.py:263 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:278
+#: assets/const/protocol.py:286
 msgid "API mode"
 msgstr "APIモード"
 
@@ -1725,7 +1733,7 @@ msgstr "プロトコル"
 msgid "Sudo"
 msgstr "すど"
 
-#: assets/models/_user.py:55 ops/const.py:50 ops/const.py:60
+#: assets/models/_user.py:55 ops/const.py:50 ops/const.py:61
 msgid "Shell"
 msgstr "シェル"
 
@@ -3711,7 +3719,7 @@ msgstr "タイミングトリガー"
 msgid "Ready"
 msgstr "の準備を"
 
-#: common/const/choices.py:17 ops/const.py:72
+#: common/const/choices.py:17 ops/const.py:73
 msgid "Running"
 msgstr "ランニング"
 
@@ -4105,15 +4113,15 @@ msgstr "システムメッセージ"
 msgid "Publish the station message"
 msgstr "投稿サイトニュース"
 
-#: ops/ansible/inventory.py:97 ops/models/job.py:62
+#: ops/ansible/inventory.py:106 ops/models/job.py:62
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:265
+#: ops/ansible/inventory.py:280
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:281
+#: ops/ansible/inventory.py:296
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -4230,39 +4238,43 @@ msgstr "特権アカウントのみ"
 msgid "Privileged First"
 msgstr "特権アカウント優先"
 
-#: ops/const.py:51 ops/const.py:61
+#: ops/const.py:51 ops/const.py:62
 msgid "Powershell"
 msgstr "PowerShell"
 
-#: ops/const.py:52 ops/const.py:62
+#: ops/const.py:52 ops/const.py:63
 msgid "Python"
 msgstr "Python"
 
-#: ops/const.py:53 ops/const.py:63
+#: ops/const.py:53 ops/const.py:64
 msgid "MySQL"
 msgstr "MySQL"
 
-#: ops/const.py:54 ops/const.py:65
+#: ops/const.py:54 ops/const.py:66
 msgid "PostgreSQL"
 msgstr "PostgreSQL"
 
-#: ops/const.py:55 ops/const.py:66
+#: ops/const.py:55 ops/const.py:67
 msgid "SQLServer"
 msgstr "SQLServer"
 
-#: ops/const.py:56 ops/const.py:68
+#: ops/const.py:56 ops/const.py:69
 msgid "Raw"
 msgstr ""
 
-#: ops/const.py:64
+#: ops/const.py:57
+msgid "HUAWEI"
+msgstr ""
+
+#: ops/const.py:65
 msgid "MariaDB"
 msgstr "MariaDB"
 
-#: ops/const.py:67
+#: ops/const.py:68
 msgid "Oracle"
 msgstr "Oracle"
 
-#: ops/const.py:74
+#: ops/const.py:75
 msgid "Timeout"
 msgstr "タイムアウト"
 
@@ -4396,7 +4408,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:530
+#: ops/models/job.py:535
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -6062,37 +6074,45 @@ msgstr "接続最大アイドル時間（分）"
 msgid "If idle time more than it, disconnect connection."
 msgstr "この設定以上の操作がない場合、接続は切断されます"
 
+#: settings/serializers/security.py:200
+msgid "Session expire at browser closed"
+msgstr "ブラウザを閉じるとセッションが期限切れになります"
+
 #: settings/serializers/security.py:201
+msgid "Whether to expire the session when the user closes their browser."
+msgstr "ユーザーがブラウザを閉じたときにセッションを期限切れにするかどうか。"
+
+#: settings/serializers/security.py:205
 msgid "Session max connection time (hour)"
 msgstr "セッション最大接続時間（時間）"
 
-#: settings/serializers/security.py:202
+#: settings/serializers/security.py:206
 msgid "If session connection time more than it, disconnect connection."
 msgstr "セッション接続時間がこれを超えると、接続が切断されます"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:209
 msgid "Remember manual auth"
 msgstr "手動入力パスワードの保存"
 
-#: settings/serializers/security.py:208
+#: settings/serializers/security.py:212
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "セッション共有"
 
-#: settings/serializers/security.py:209
+#: settings/serializers/security.py:213
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr ""
 "ユーザーのアクティブなセッションを他のユーザーと共有できるようにします。"
 
-#: settings/serializers/security.py:215
+#: settings/serializers/security.py:219
 msgid "Insecure command alert"
 msgstr "安全でないコマンドアラート"
 
-#: settings/serializers/security.py:218
+#: settings/serializers/security.py:222
 msgid "Email recipient"
 msgstr "メール受信者"
 
-#: settings/serializers/security.py:219
+#: settings/serializers/security.py:223
 msgid "Multiple user using , split"
 msgstr "複数のユーザーを使用して、分割"
 
