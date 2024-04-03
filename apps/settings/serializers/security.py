@@ -196,6 +196,10 @@ class SecuritySessionSerializer(serializers.Serializer):
         label=_('Connection max idle time (minute)'),
         help_text=_('If idle time more than it, disconnect connection.')
     )
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = serializers.BooleanField(
+        required=False, default=False, label=_('Session expire at browser closed'),
+        help_text=_('Whether to expire the session when the user closes their browser.')
+    )
     SECURITY_MAX_SESSION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,
         label=_('Session max connection time (hour)'),

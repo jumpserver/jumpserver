@@ -26,7 +26,7 @@ class UserSessionManager:
         user_session_manager.add_or_increment(self.session.session_key)
 
     def disconnect(self):
-        user_session_manager.decrement_or_remove(self.session.session_key)
+        user_session_manager.decrement(self.session.session_key)
         if self.should_delete_session():
             thread = Thread(target=self.delay_delete_session)
             thread.start()

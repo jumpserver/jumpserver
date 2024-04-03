@@ -1,5 +1,3 @@
-from importlib import import_module
-
 from django.conf import settings
 from django.contrib.auth import user_logged_in
 from django.core.cache import cache
@@ -8,6 +6,7 @@ from django_cas_ng.signals import cas_user_authenticated
 
 from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from audits.models import UserSession
+from common.sessions.cache import user_session_manager
 from .signals import post_auth_success, post_auth_failed, user_auth_failed, user_auth_success
 
 
@@ -32,8 +31,7 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
         lock_key = 'single_machine_login_' + str(user.id)
         session_key = cache.get(lock_key)
         if session_key and session_key != request.session.session_key:
-            session = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
-            session.delete()
+            user_session_manager.remove(session_key)
             UserSession.objects.filter(key=session_key).delete()
         cache.set(lock_key, request.session.session_key, None)
 

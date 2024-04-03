@@ -287,6 +287,6 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
         keys = queryset.values_list('key', flat=True)
         for key in keys:
-            user_session_manager.decrement_or_remove(key)
+            user_session_manager.remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)
