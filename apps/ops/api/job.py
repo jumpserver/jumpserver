@@ -32,6 +32,9 @@ from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
+from assets.const import Protocol
+from perms.const import ActionChoices
+from perms.utils.asset_perm import PermAssetDetailUtil
 from perms.models import PermNode
 from perms.utils import UserPermAssetUtil
 from jumpserver.settings import get_file_md5
@@ -73,6 +76,34 @@ class JobViewSet(OrgBulkModelViewSet):
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
 
+    def check_upload_permission(self, assets, account_name):
+        for asset in assets:
+            # 资产需要添加ssh sftp协议
+            protocols = asset.protocols.values_list("name", flat=True)
+            if not set(protocols).intersection({Protocol.ssh, Protocol.sftp, Protocol.winrm}):
+                self.permission_denied(
+                    self.request,
+                    _("Asset {asset} must have at least one of the following "
+                      "protocols added: SSH, SFTP, or WinRM").format(asset=asset.name)
+                )
+            util = PermAssetDetailUtil(self.request.user, asset)
+            perms_protocols = util.get_permed_protocols_for_user(only_name=True)
+            # 资产需要授权ssh sftp协议
+            if 'all' not in perms_protocols and not {Protocol.ssh, Protocol.sftp, Protocol.winrm}.intersection(
+                    perms_protocols):
+                self.permission_denied(
+                    self.request,
+                    _("Asset {asset} authorization is missing SSH, SFTP, or WinRM protocol").format(asset=asset.name)
+                )
+            # 资产需要授权上传权限
+            perms = util.user_asset_perms
+            action_bit_mapper, __ = util.parse_alias_action_date_expire(perms, asset)
+            if not ActionChoices.contains(action_bit_mapper.get(account_name, 0), ActionChoices.upload.value):
+                self.permission_denied(
+                    self.request,
+                    _("Asset {asset} authorization lacks upload permissions").format(asset=asset.name)
+                )
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset \
@@ -90,6 +121,9 @@ class JobViewSet(OrgBulkModelViewSet):
         assets = serializer.validated_data.get('assets')
         assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
         serializer.validated_data['assets'] = assets
+        if serializer.validated_data.get('type') == Types.upload_file:
+            account_name = serializer.validated_data.get('runas')
+            self.check_upload_permission(assets, account_name)
         instance = serializer.save()
 
         if instance.instant or run_after_save:
