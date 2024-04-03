@@ -7,6 +7,7 @@ from django.conf import settings
 from django.utils._os import safe_join
 
 from .callback import DefaultCallback
+from .receptor import receptor
 from ..utils import get_ansible_log_verbosity
 
 
@@ -135,3 +136,27 @@ class CommandRunner(AdHocRunner):
 
     def run(self, verbosity=0, **kwargs):
         return super().run(verbosity, **kwargs)
+
+
+class AdHocSandboxRunner(AdHocRunner):
+    def run(self, verbosity=0, **kwargs):
+        self.check_module()
+        verbosity = get_ansible_log_verbosity(verbosity)
+
+        if not os.path.exists(self.project_dir):
+            os.mkdir(self.project_dir, 0o755)
+
+        receptor.run(
+            timeout=self.timeout if self.timeout > 0 else None,
+            extravars=self.extra_vars,
+            host_pattern=self.pattern,
+            private_data_dir=self.project_dir,
+            inventory=self.inventory,
+            module=self.module,
+            module_args=self.module_args,
+            verbosity=verbosity,
+            event_handler=self.cb.event_handler,
+            status_handler=self.cb.status_handler,
+            **kwargs
+        )
+        return self.cb
