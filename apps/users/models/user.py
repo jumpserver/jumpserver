@@ -5,6 +5,7 @@ import base64
 import datetime
 import uuid
 from typing import Callable
+from collections import defaultdict
 
 import sshpubkeys
 from django.conf import settings
@@ -27,6 +28,7 @@ from common.utils import (
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from rbac.const import Scope
+from rbac.models import RoleBinding
 from ..signals import (
     post_user_change_password, post_user_leave_org, pre_user_leave_org
 )
@@ -925,6 +927,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     @property
     def is_local(self):
         return self.source == self.Source.local.value
+
+    @property
+    def orgs_roles(self):
+        orgs_roles = defaultdict(set)
+        rbs = RoleBinding.objects_raw.filter(user=self, scope='org').prefetch_related('role', 'org')
+        for rb in rbs:
+            orgs_roles[rb.org_name].add(str(rb.role.display_name))
+        return orgs_roles
 
     def is_password_authenticate(self):
         cas = self.Source.cas
