@@ -34,6 +34,7 @@ class NativeClient(TextChoices):
     db_client = 'db_client', _('DB Client')
     # Razor
     mstsc = 'mstsc', _('Remote Desktop')
+    rdp_guide = 'rdp_guide', _('RDP Guide')
 
     @classmethod
     def get_native_clients(cls):

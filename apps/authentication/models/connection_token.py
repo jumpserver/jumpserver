@@ -82,12 +82,15 @@ class ConnectionToken(JMSOrgBaseModel):
         self.save(update_fields=['date_expired'])
 
     def set_reusable(self, is_reusable):
+        if not settings.CONNECTION_TOKEN_REUSABLE:
+            return
         self.is_reusable = is_reusable
         if self.is_reusable:
             seconds = settings.CONNECTION_TOKEN_REUSABLE_EXPIRATION
         else:
             seconds = settings.CONNECTION_TOKEN_ONETIME_EXPIRATION
-        self.date_expired = timezone.now() + timedelta(seconds=seconds)
+
+        self.date_expired = self.date_created + timedelta(seconds=seconds)
         self.save(update_fields=['is_reusable', 'date_expired'])
 
     def renewal(self):

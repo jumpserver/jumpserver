@@ -223,12 +223,17 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     validate_exchange_token: callable
 
     @action(methods=['POST', 'GET'], detail=True, url_path='rdp-file')
-    def get_rdp_file(self, *args, **kwargs):
+    def get_rdp_file(self, request, *args, **kwargs):
         token = self.get_object()
         token.is_valid()
         filename, content = self.get_rdp_file_info(token)
-        filename = '{}.rdp'.format(filename)
         response = HttpResponse(content, content_type='application/octet-stream')
+
+        if is_true(request.query_params.get('reusable')):
+            token.set_reusable(True)
+            filename = '{}-{}'.format(filename, token.date_expired.strftime('%Y%m%d_%H%M%S'))
+
+        filename += '.rdp'
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
 
