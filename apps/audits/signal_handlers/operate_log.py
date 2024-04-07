@@ -178,7 +178,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FavoriteAsset', 'Asset'
+        'FavoriteAsset',
     }
     for i, app in enumerate(apps.get_models(), 1):
         app_name = app._meta.app_label
