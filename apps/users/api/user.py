@@ -22,8 +22,7 @@ from ..models import User
 from ..notifications import ResetMFAMsg
 from ..permissions import UserObjectPermission
 from ..serializers import (
-    UserSerializer,
-    MiniUserSerializer, InviteSerializer
+    UserSerializer, MiniUserSerializer, InviteSerializer, UserRetrieveSerializer
 )
 from ..signals import post_user_create
 
@@ -43,6 +42,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         'default': UserSerializer,
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
+        'retrieve': UserRetrieveSerializer,
     }
     rbac_perms = {
         'match': 'users.match_user',

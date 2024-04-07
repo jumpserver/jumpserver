@@ -56,6 +56,7 @@ class RoleBinding(JMSBaseModel):
         on_delete=models.CASCADE, verbose_name=_('Organization')
     )
     objects = RoleBindingManager()
+    objects_raw = models.Manager()
 
     class Meta:
         verbose_name = _('Role binding')
