@@ -51,6 +51,8 @@ class AdHocRunner:
         self.extra_vars = extra_vars
         self.dry_run = dry_run
         self.timeout = timeout
+        # enable local connection
+        self.extra_vars.update({"LOCAL_CONNECTION_ENABLED": "1"})
 
     def check_module(self):
         if self.module not in self.cmd_modules_choices:
