@@ -17,6 +17,7 @@ class Services(TextChoices):
     web = 'web', 'web'
     celery = 'celery', 'celery'
     task = 'task', 'task'
+    receptor = 'receptor', 'receptor'
     all = 'all', 'all'
 
     @classmethod
@@ -27,7 +28,8 @@ class Services(TextChoices):
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
-            cls.beat: services.BeatService
+            cls.beat: services.BeatService,
+            cls.receptor: services.ReceptorService
         }
         return services_map.get(name)
 
@@ -44,8 +46,12 @@ class Services(TextChoices):
         return cls.celery_services() + [cls.beat]
 
     @classmethod
+    def receptor_services(cls):
+        return [cls.receptor]
+
+    @classmethod
     def all_services(cls):
-        return cls.web_services() + cls.task_services()
+        return cls.web_services() + cls.task_services() + cls.receptor_services()
 
     @classmethod
     def export_services_values(cls):
