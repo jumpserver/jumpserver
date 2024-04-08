@@ -109,7 +109,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
+
+ARG RECEPTOR_VERSION=v1.4.5
+RUN set -ex \
+    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION/v/}_linux_${TARGETARCH}.tar.gz \
+    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
+    && chown root:root /usr/local/bin/receptor \
+    && chmod 755 /usr/local/bin/receptor \
+    && rm -f /opt/receptor.tar.gz
 
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver

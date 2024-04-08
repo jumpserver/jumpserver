@@ -613,7 +613,11 @@ class Config(dict):
 
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
-        'TICKET_APPLY_ASSET_SCOPE': 'all'
+        'TICKET_APPLY_ASSET_SCOPE': 'all',
+
+        # Ansible Receptor
+        'ANSIBLE_RECEPTOR_ENABLE': True,
+        'ANSIBLE_RECEPTOR_SOCK_PATH': '/opt/jumpserver/data/share/control.sock'
     }
 
     old_config_map = {

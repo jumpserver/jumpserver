@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-03 16:51+0800\n"
+"POT-Creation-Date: 2024-04-07 14:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1362,13 +1362,13 @@ msgstr "アプリケーション"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: assets/api/asset/asset.py:181
+#: assets/api/asset/asset.py:180
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "資産を直接作成することはできません。ホストまたはその他を作成する必要がありま"
 "す"
 
-#: assets/api/domain.py:68
+#: assets/api/domain.py:67
 msgid "Number required"
 msgstr "必要な数"
 
@@ -4137,11 +4137,24 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:146
+msgid ""
+"Asset ({asset}) must have at least one of the following protocols added: "
+"SSH, SFTP, or WinRM"
+msgstr ""
+"資産({asset})には、少なくともSSH、SFTP、WinRMのいずれか一つのプロトコルを追加す"
+"る必要があります"
+
+msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
+msgstr "資産({asset})の認証にはSSH、SFTP、またはWinRMプロトコルが不足しています"
+
+msgid "Asset ({asset}) authorization lacks upload permissions"
+msgstr "資産({asset})の認証にはアップロード権限が不足しています"
+
+#: ops/api/job.py:168
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:151
+#: ops/api/job.py:173
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
@@ -4149,7 +4162,7 @@ msgstr ""
 "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択し"
 "てください。"
 
-#: ops/api/job.py:215
+#: ops/api/job.py:237
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
@@ -4537,18 +4550,18 @@ msgstr "ジョブのID"
 msgid "Name of the job"
 msgstr "ジョブの名前"
 
-#: orgs/api.py:62
+#: orgs/api.py:61
 msgid "The current organization ({}) cannot be deleted"
 msgstr "現在の組織 ({}) は削除できません"
 
-#: orgs/api.py:67
+#: orgs/api.py:66
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
 msgstr ""
 "LDAP 同期は現在の組織に設定されます。削除する前に別の組織に切り替えてください"
 
-#: orgs/api.py:77
+#: orgs/api.py:76
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
@@ -6531,11 +6544,11 @@ msgstr "これはエンタープライズ版アプレットです"
 msgid "Not found protocol query params"
 msgstr "プロトコルクエリパラメータが見つかりません"
 
-#: terminal/api/component/storage.py:30
+#: terminal/api/component/storage.py:31
 msgid "Deleting the default storage is not allowed"
 msgstr "デフォルトのストレージの削除は許可されていません"
 
-#: terminal/api/component/storage.py:33
+#: terminal/api/component/storage.py:34
 msgid "Cannot delete storage that is being used"
 msgstr "使用中のストレージを削除できません"
 
@@ -6547,15 +6560,15 @@ msgstr "コマンドストア"
 msgid "Invalid"
 msgstr "無効"
 
-#: terminal/api/component/storage.py:131 terminal/tasks.py:149
+#: terminal/api/component/storage.py:130 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "テスト失敗: {}"
 
-#: terminal/api/component/storage.py:134
+#: terminal/api/component/storage.py:133
 msgid "Test successful"
 msgstr "テスト成功"
 
-#: terminal/api/component/storage.py:136
+#: terminal/api/component/storage.py:135
 msgid "Test failure: Please check configuration"
 msgstr "テストに失敗しました：構成を確認してください"
 
@@ -7890,11 +7903,11 @@ msgstr "無効な承認アクション"
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
-#: users/api/user.py:137
+#: users/api/user.py:136
 msgid "Can not invite self"
 msgstr "自分自身を招待することはできません"
 
-#: users/api/user.py:190
+#: users/api/user.py:189
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "自己otpをリセットできませんでした、代わりにプロファイルリセットを使用"
 
@@ -9311,6 +9324,3 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
-
-#~ msgid "Reopen"
-#~ msgstr "再オープン"

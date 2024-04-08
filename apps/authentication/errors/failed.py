@@ -52,6 +52,10 @@ class AuthFailedError(Exception):
         return str(self.msg)
 
 
+class SSOAuthKeyTTLError(Exception):
+    msg = 'sso_authkey_timeout'
+
+
 class BlockGlobalIpLoginError(AuthFailedError):
     error = 'block_global_ip_login'
 

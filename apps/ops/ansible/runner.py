@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import uuid
@@ -5,13 +6,33 @@ import uuid
 import ansible_runner
 from django.conf import settings
 from django.utils._os import safe_join
+from django.utils.functional import LazyObject
 
 from .callback import DefaultCallback
+from .receptor import receptor_runner
 from ..utils import get_ansible_log_verbosity
+
+logger = logging.getLogger(__file__)
 
 
 class CommandInBlackListException(Exception):
     pass
+
+
+class AnsibleWrappedRunner(LazyObject):
+    def _setup(self):
+        self._wrapped = self.get_runner()
+
+    @staticmethod
+    def get_runner():
+        if settings.ANSIBLE_RECEPTOR_ENABLE and settings.ANSIBLE_RECEPTOR_SOCK_PATH:
+            logger.info("Ansible receptor enabled, run ansible task via receptor")
+            receptor_runner.init_receptor_ctl(settings.ANSIBLE_RECEPTOR_SOCK_PATH)
+            return receptor_runner
+        return ansible_runner
+
+
+runner = AnsibleWrappedRunner()
 
 
 class AdHocRunner:
@@ -30,6 +51,8 @@ class AdHocRunner:
         self.extra_vars = extra_vars
         self.dry_run = dry_run
         self.timeout = timeout
+        # enable local connection
+        self.extra_vars.update({"LOCAL_CONNECTION_ENABLED": "1"})
 
     def check_module(self):
         if self.module not in self.cmd_modules_choices:
@@ -48,7 +71,7 @@ class AdHocRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        ansible_runner.run(
+        runner.run(
             timeout=self.timeout if self.timeout > 0 else None,
             extravars=self.extra_vars,
             host_pattern=self.pattern,
@@ -81,7 +104,7 @@ class PlaybookRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        ansible_runner.run(
+        runner.run(
             private_data_dir=self.project_dir,
             inventory=self.inventory,
             playbook=self.playbook,
@@ -112,7 +135,7 @@ class UploadFileRunner:
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
-        ansible_runner.run(
+        runner.run(
             host_pattern="*",
             inventory=self.inventory,
             module='copy',

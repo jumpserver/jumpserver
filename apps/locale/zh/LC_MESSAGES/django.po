@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-03 16:51+0800\n"
+"POT-Creation-Date: 2024-04-07 14:23+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1355,11 +1355,11 @@ msgstr "應用程式"
 msgid "Can match application"
 msgstr "匹配應用"
 
-#: assets/api/asset/asset.py:181
+#: assets/api/asset/asset.py:180
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接創建資產, 你應該創建主機或其他資產"
 
-#: assets/api/domain.py:68
+#: assets/api/domain.py:67
 msgid "Number required"
 msgstr "需要為數字"
 
@@ -4087,17 +4087,28 @@ msgstr "任務 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任務 {} 執行參數錯誤"
 
-#: ops/api/job.py:146
+msgid ""
+"Asset ({asset}) must have at least one of the following protocols added: "
+"SSH, SFTP, or WinRM"
+msgstr "资产({asset})至少要添加ssh,sftp,winrm其中一种协议"
+
+msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
+msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
+
+msgid "Asset ({asset}) authorization lacks upload permissions"
+msgstr "资产({asset})授权缺少上传权限"
+
+#: ops/api/job.py:168
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
-#: ops/api/job.py:151
+#: ops/api/job.py:173
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "檔案大小超過最大限制。請選擇小於 {limit}MB 的文件。"
 
-#: ops/api/job.py:215
+#: ops/api/job.py:237
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "正在創建任務，無法中斷，請稍後重試。"
@@ -4485,17 +4496,17 @@ msgstr "Job ID"
 msgid "Name of the job"
 msgstr "Job 名稱"
 
-#: orgs/api.py:62
+#: orgs/api.py:61
 msgid "The current organization ({}) cannot be deleted"
 msgstr "當前組織 ({}) 不能被刪除"
 
-#: orgs/api.py:67
+#: orgs/api.py:66
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
 msgstr "LDAP 同步設定組織為當前組織，請切換其他組織後再進行刪除操作"
 
-#: orgs/api.py:77
+#: orgs/api.py:76
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織存在資源 ({}) 不能被刪除"
 
@@ -6436,11 +6447,11 @@ msgstr "企業版遠程應用，在社區版中不能使用"
 msgid "Not found protocol query params"
 msgstr "未發現 protocol 查詢參數"
 
-#: terminal/api/component/storage.py:30
+#: terminal/api/component/storage.py:31
 msgid "Deleting the default storage is not allowed"
 msgstr "不允許刪除默認儲存配置"
 
-#: terminal/api/component/storage.py:33
+#: terminal/api/component/storage.py:34
 msgid "Cannot delete storage that is being used"
 msgstr "不允許刪除正在使用的儲存配置"
 
@@ -6452,15 +6463,15 @@ msgstr "命令儲存"
 msgid "Invalid"
 msgstr "無效"
 
-#: terminal/api/component/storage.py:131 terminal/tasks.py:149
+#: terminal/api/component/storage.py:130 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "測試失敗: {}"
 
-#: terminal/api/component/storage.py:134
+#: terminal/api/component/storage.py:133
 msgid "Test successful"
 msgstr "測試成功"
 
-#: terminal/api/component/storage.py:136
+#: terminal/api/component/storage.py:135
 msgid "Test failure: Please check configuration"
 msgstr "測試失敗：請檢查配置"
 
@@ -7782,11 +7793,11 @@ msgstr "無效的審批動作"
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用戶無權審批此工單"
 
-#: users/api/user.py:137
+#: users/api/user.py:136
 msgid "Can not invite self"
 msgstr "不能邀請自己"
 
-#: users/api/user.py:190
+#: users/api/user.py:189
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在該頁面重設 MFA 多因子認證, 請去個人資訊頁面重設"
 
@@ -9183,6 +9194,3 @@ msgstr "企業專業版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企業旗艦版"
-
-#~ msgid "Reopen"
-#~ msgstr "重新打開"
