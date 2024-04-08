@@ -17,7 +17,7 @@ class ReceptorService(BaseService):
             '--node', 'id=primary',
             '--control-service',
             'service=control',
-            'filename=/opt/jumpserver/share/control.sock',
+            'filename=/opt/jumpserver/data/share/control.sock',
             '--work-command',
             'worktype={}'.format(ANSIBLE_RUNNER_COMMAND),
             'command={}'.format(ANSIBLE_RUNNER_COMMAND),
