@@ -6,6 +6,7 @@ from assets.models import Asset
 from common.utils import lazyproperty
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .permission import AssetPermissionUtil
+from perms.const import ActionChoices
 
 __all__ = ['PermAssetDetailUtil']
 
@@ -137,3 +138,23 @@ class PermAssetDetailUtil:
             account.date_expired = max(cleaned_accounts_expired[account])
             accounts.append(account)
         return accounts
+
+    def check_perm_protocols(self, protocols):
+        """
+        检查用户是否有某些协议权限
+        :param protocols: set
+        """
+        perms_protocols = self.get_permed_protocols_for_user(only_name=True)
+        if "all" in perms_protocols:
+            return True
+        return protocols.intersection(perms_protocols)
+
+    def check_perm_actions(self, account_name, actions):
+        """
+        检查用户是否有某个账号的某个资产操作权限
+        :param account_name: str
+        :param actions: list
+        """
+        perms = self.user_asset_perms
+        action_bit_mapper, __ = self.parse_alias_action_date_expire(perms, self.asset)
+        return ActionChoices.contains_all(action_bit_mapper.get(account_name, 0), actions)

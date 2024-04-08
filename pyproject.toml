@@ -174,6 +174,7 @@ psycopg2 = "2.9.6"
 ucloud-sdk-python3 = "0.11.50"
 huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
+volcengine-python-sdk = "1.0.71"
 
 [[tool.poetry.source]]
 name = "tsinghua"

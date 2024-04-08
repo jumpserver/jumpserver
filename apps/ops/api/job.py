@@ -32,6 +32,9 @@ from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
+from assets.const import Protocol
+from perms.const import ActionChoices
+from perms.utils.asset_perm import PermAssetDetailUtil
 from perms.models import PermNode
 from perms.utils import UserPermAssetUtil
 from jumpserver.settings import get_file_md5
@@ -72,6 +75,22 @@ class JobViewSet(OrgBulkModelViewSet):
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
 
+    def check_upload_permission(self, assets, account_name):
+        protocols_required = {Protocol.ssh, Protocol.sftp, Protocol.winrm}
+        error_msg_missing_protocol = _(
+            "Asset ({asset}) must have at least one of the following protocols added: SSH, SFTP, or WinRM")
+        error_msg_auth_missing_protocol = _("Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol")
+        error_msg_auth_missing_upload = _("Asset ({asset}) authorization lacks upload permissions")
+        for asset in assets:
+            protocols = asset.protocols.values_list("name", flat=True)
+            if not set(protocols).intersection(protocols_required):
+                self.permission_denied(self.request, error_msg_missing_protocol.format(asset=asset.name))
+            util = PermAssetDetailUtil(self.request.user, asset)
+            if not util.check_perm_protocols(protocols_required):
+                self.permission_denied(self.request, error_msg_auth_missing_protocol.format(asset=asset.name))
+            if not util.check_perm_actions(account_name, [ActionChoices.upload.value]):
+                self.permission_denied(self.request, error_msg_auth_missing_upload.format(asset=asset.name))
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset \
@@ -89,6 +108,9 @@ class JobViewSet(OrgBulkModelViewSet):
         assets = serializer.validated_data.get('assets')
         assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
         serializer.validated_data['assets'] = assets
+        if serializer.validated_data.get('type') == Types.upload_file:
+            account_name = serializer.validated_data.get('runas')
+            self.check_upload_permission(assets, account_name)
         instance = serializer.save()
 
         if instance.instant or run_after_save:
