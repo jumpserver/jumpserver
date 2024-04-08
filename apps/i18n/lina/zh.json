@@ -364,7 +364,7 @@
     "Domain": "网域",
     "DomainCreate": "创建网域",
     "DomainEnabled": "启用网域",
-    "DomainHelpMessage": "网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。JMS => 网域网关 => 目标资产",
+    "DomainHelpMessage": "网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。<br/><br/>JMS => 网域网关 => 目标资产",
     "DomainList": "网域列表",
     "DomainUpdate": "更新网域",
     "Download": "下载",
