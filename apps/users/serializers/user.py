@@ -148,7 +148,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         # 外键的字段
         fields_fk = []
         # 多对多字段
-        fields_m2m = ["groups", "system_roles", "org_roles", "labels", "orgs_roles"]
+        fields_m2m = ["groups", "system_roles", "org_roles", "orgs_roles", "labels"]
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
