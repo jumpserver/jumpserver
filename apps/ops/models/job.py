@@ -522,13 +522,12 @@ class JobExecution(JMSOrgBaseModel):
 
     def stop(self):
         from ops.signal_handlers import job_execution_stop_pub_sub
-
-        with open(os.path.join(self.private_dir, 'local.pid')) as f:
-            try:
+        try:
+            with open(os.path.join(self.private_dir, 'local.pid')) as f:
                 pid = f.read()
                 job_execution_stop_pub_sub.publish(int(pid))
-            except Exception as e:
-                print(e)
+        except Exception as e:
+            print(e)
         self.set_error('Job stop by "kill -9 {}"'.format(pid))
 
     class Meta:
