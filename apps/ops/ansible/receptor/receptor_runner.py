@@ -1,16 +1,27 @@
 import concurrent.futures
+import os
 import queue
 import socket
-
+from django.conf import settings
 import ansible_runner
+from django.utils.functional import LazyObject
 from receptorctl import ReceptorControl
 
-receptor_ctl = ReceptorControl('control.sock')
+
+class WarpedReceptorctl(LazyObject):
+    def _setup(self):
+        self._wrapped = self.get_receptorctl()
+
+    @staticmethod
+    def get_receptorctl():
+        return ReceptorControl(settings.ANSIBLE_RECEPTOR_SOCK_PATH)
 
 
-def init_receptor_ctl(sock_path):
-    global receptor_ctl
-    receptor_ctl = ReceptorControl(sock_path)
+receptor_ctl = WarpedReceptorctl()
+
+
+def cancel(unit_id):
+    return receptor_ctl.simple_command("work cancel {}".format(unit_id))
 
 
 def nodes():
@@ -27,6 +38,14 @@ class AnsibleReceptorRunner:
         self.runner_params = kwargs
         self.unit_id = None
 
+    def write_unit_id(self):
+        if not self.unit_id:
+            return
+        private_dir = self.runner_params.get("private_data_dir", "")
+        with open(os.path.join(private_dir, "unit_id.txt"), "w") as f:
+            f.write(self.unit_id)
+            f.flush()
+
     def run(self):
         input, output = socket.socketpair()
 
@@ -38,6 +57,7 @@ class AnsibleReceptorRunner:
             output.close()
 
             self.unit_id = result['unitid']
+            self.write_unit_id()
 
         transmitter_future.result()
 
@@ -69,20 +89,29 @@ class AnsibleReceptorRunner:
 
     def processor(self, _result_file, stdout_queue):
         try:
-            original_handler = self.runner_params.pop("event_handler", None)
+            original_event_handler = self.runner_params.pop("event_handler", None)
+            original_status_handler = self.runner_params.pop("status_handler", None)
 
             def event_handler(data, **kwargs):
                 stdout = data.get('stdout', '')
                 if stdout:
                     stdout_queue.put(stdout)
-                if original_handler:
-                    original_handler(data, **kwargs)
+                if original_event_handler:
+                    original_event_handler(data, **kwargs)
+
+            def status_handler(data, **kwargs):
+                private_data_dir = self.runner_params.get("private_data_dir", None)
+                if private_data_dir:
+                    data["private_data_dir"] = private_data_dir
+                if original_status_handler:
+                    original_status_handler(data, **kwargs)
 
             return ansible_runner.interface.run(
                 quite=True,
                 streamer='process',
                 _input=_result_file,
                 event_handler=event_handler,
+                status_handler=status_handler,
                 **self.runner_params,
             )
         finally:

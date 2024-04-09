@@ -26,8 +26,6 @@ class AnsibleWrappedRunner(LazyObject):
     @staticmethod
     def get_runner():
         if settings.ANSIBLE_RECEPTOR_ENABLE and settings.ANSIBLE_RECEPTOR_SOCK_PATH:
-            logger.info("Ansible receptor enabled, run ansible task via receptor")
-            receptor_runner.init_receptor_ctl(settings.ANSIBLE_RECEPTOR_SOCK_PATH)
             return receptor_runner
         return ansible_runner
 

@@ -2,9 +2,11 @@
 # coding: utf-8
 
 import argparse
+import shutil
 import subprocess
 import os
 import signal
+import tempfile
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 DEFAULT_CONTROL_SOCK_PATH = "/opt/jumpserver/data/share/control.sock"
@@ -15,6 +17,8 @@ class ReceptorService:
         self.pid_file = "tmp/receptor.pid"
         self.receptor_command = [
             'receptor',
+            # '--log-level',
+            # 'level=Debug',
             '--local-only',
             '--node', 'id=primary',
             '--control-service',
@@ -27,7 +31,14 @@ class ReceptorService:
             'allowruntimeparams=true'
         ]
 
+    @staticmethod
+    def before_start():
+        status_dir = os.path.join(tempfile.gettempdir(), "receptor")
+        if os.path.exists(status_dir):
+            shutil.rmtree(status_dir)
+
     def start(self):
+        self.before_start()
         if os.path.exists(self.pid_file):
             with open(self.pid_file, 'r') as f:
                 pid_str = f.read()
@@ -46,6 +57,14 @@ class ReceptorService:
         with open(self.pid_file, 'w') as f:
             f.write(str(process.pid))
         print("\n- Receptor service started successfully.")
+
+        def exit_handler(signum, frame):
+            process.terminate()
+            process.kill()
+
+        signal.signal(signal.SIGINT, exit_handler)
+        signal.signal(signal.SIGTERM, exit_handler)
+        process.wait()
 
     def stop(self):
         if not os.path.exists(self.pid_file):
