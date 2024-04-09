@@ -174,7 +174,7 @@ class AllTypes(ChoicesMixin):
         if settings.XPACK_ENABLED:
             types.extend([
                 (Category.CLOUD, CloudTypes),
-                (Category.GPT, GPTTypes),
+                # (Category.GPT, GPTTypes),
                 (Category.CUSTOM, CustomTypes),
             ])
         return types

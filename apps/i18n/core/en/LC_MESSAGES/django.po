@@ -1423,7 +1423,7 @@ msgstr ""
 
 #: assets/const/category.py:13
 msgid "Cloud service"
-msgstr ""
+msgstr "Cloud"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
