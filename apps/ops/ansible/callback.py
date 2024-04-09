@@ -48,9 +48,9 @@ class DefaultCallback:
         event = data.get('event', None)
         if not event:
             return
-        pid = data.get('pid', None)
-        if pid:
-            self.write_pid(pid)
+        # pid = data.get('pid', None)
+        # if pid:
+        #     self.write_pid(pid)
         event_data = data.get('event_data', {})
         host = event_data.get('remote_addr', '')
         task = event_data.get('task', '')
@@ -160,9 +160,9 @@ class DefaultCallback:
         self.status = self.STATUS_MAPPER.get(status, 'unknown')
 
         rc = kwargs.get('runner_config', None)
-        self.private_data_dir = rc.private_data_dir if rc else '/tmp/'
+        # self.private_data_dir = rc.private_data_dir if rc else '/tmp/'
 
-    def write_pid(self, pid):
-        pid_filepath = os.path.join(self.private_data_dir, 'local.pid')
-        with open(pid_filepath, 'w') as f:
-            f.write(str(pid))
+    # def write_pid(self, pid):
+    #     pid_filepath = os.path.join(self.private_data_dir, 'local.pid')
+    #     with open(pid_filepath, 'w') as f:
+    #         f.write(str(pid))
