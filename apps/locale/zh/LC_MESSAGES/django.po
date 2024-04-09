@@ -8178,7 +8178,6 @@ msgid "Org roles"
 msgstr "组织角色"
 
 #: users/serializers/user.py:51
-#| msgid "Organization role"
 msgid "Organizations and roles"
 msgstr "组织和角色"
 
