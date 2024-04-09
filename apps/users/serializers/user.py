@@ -48,7 +48,7 @@ class RolesSerializerMixin(serializers.Serializer):
         label=_("Org roles"), many=True, required=False,
         default=default_org_roles
     )
-    orgs_roles = serializers.JSONField(read_only=True, label=_("Organization and roles relations"))
+    orgs_roles = serializers.JSONField(read_only=True, label=_("Organizations and roles"))
 
     def pop_roles_if_need(self, fields):
         request = self.context.get("request")
@@ -148,7 +148,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         # 外键的字段
         fields_fk = []
         # 多对多字段
-        fields_m2m = ["groups", "system_roles", "org_roles", "labels"]
+        fields_m2m = ["groups", "system_roles", "org_roles", "labels", "orgs_roles"]
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
@@ -288,7 +288,7 @@ class UserRetrieveSerializer(UserSerializer):
     )
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ["login_confirm_settings", "orgs_roles"]
+        fields = UserSerializer.Meta.fields + ["login_confirm_settings"]
 
 
 class MiniUserSerializer(serializers.ModelSerializer):

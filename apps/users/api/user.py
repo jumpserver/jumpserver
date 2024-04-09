@@ -63,11 +63,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             return super().match(request, *args, **kwargs)
 
     def get_serializer(self, *args, **kwargs):
-        """重写 get_serializer，用于设置用户的角色缓存
-        放到 paginate_queryset 里面会导致 导出有问题， 因为导出的时候，没有 pager
+        """重写 get_serializer, 用于设置用户的角色缓存
+        放到 paginate_queryset 里面会导致 导出有问题, 因为导出的时候，没有 pager
         """
         if len(args) == 1 and kwargs.get('many'):
             queryset = self.set_users_roles_for_cache(args[0])
+            queryset = self.set_users_orgs_roles(args[0])
             args = (queryset,)
         return super().get_serializer(*args, **kwargs)
 
@@ -97,6 +98,24 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             u.org_roles.cache_set(org_roles)
             u.system_roles.cache_set(system_roles)
         return queryset_list
+
+    @staticmethod
+    def set_users_orgs_roles(queryset):
+        user_ids = [u.id for u in queryset]
+        rbs = RoleBinding.objects_raw.filter(
+            user__in=user_ids, scope='org'
+        ).prefetch_related('user', 'role', 'org')
+        user_rbs_mapper = defaultdict(set)
+        for rb in rbs:
+            user_rbs_mapper[rb.user_id].add(rb)
+
+        for u in queryset:
+            user_rbs = user_rbs_mapper[u.id]
+            orgs_roles = defaultdict(set)
+            for rb in user_rbs:
+                orgs_roles[rb.org_name].add(rb.role.display_name)
+            setattr(u, 'orgs_roles', orgs_roles)
+        return queryset
 
     def perform_create(self, serializer):
         users = serializer.save()
