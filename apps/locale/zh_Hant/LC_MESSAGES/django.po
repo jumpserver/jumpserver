@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-09 15:47+0800\n"
+"POT-Creation-Date: 2024-04-09 19:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -470,7 +470,7 @@ msgstr "SSH 金鑰推送方式"
 #: accounts/models/automations/gather_account.py:58
 #: accounts/serializers/account/backup.py:41
 #: accounts/serializers/automations/change_secret.py:58
-#: settings/serializers/auth/ldap.py:81
+#: settings/serializers/auth/ldap.py:90
 msgid "Recipient"
 msgstr "收件人"
 
@@ -3340,7 +3340,7 @@ msgstr "代碼錯誤"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:464
+#: jumpserver/conf.py:465
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
@@ -3976,16 +3976,16 @@ msgstr "不能包含特殊字元"
 msgid "The mobile phone number format is incorrect"
 msgstr "手機號碼格式不正確"
 
-#: jumpserver/conf.py:458
+#: jumpserver/conf.py:459
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "驗證碼為: {code}"
 
-#: jumpserver/conf.py:463
+#: jumpserver/conf.py:464
 msgid "Create account successfully"
 msgstr "創建帳號成功"
 
-#: jumpserver/conf.py:465
+#: jumpserver/conf.py:466
 msgid "Your account has been created successfully"
 msgstr "你的帳號已創建成功"
 
@@ -4147,7 +4147,7 @@ msgstr "文件金鑰該欄位是必填項。"
 msgid "This file can not be delete"
 msgstr "無法刪除此文件"
 
-#: ops/apps.py:9 ops/notifications.py:17 rbac/tree.py:57
+#: ops/apps.py:9 ops/notifications.py:18 rbac/tree.py:57
 msgid "App ops"
 msgstr "作業中心"
 
@@ -4385,30 +4385,30 @@ msgstr "創建方式"
 msgid "VCS URL"
 msgstr "VCS URL"
 
-#: ops/notifications.py:18
+#: ops/notifications.py:19
 msgid "Server performance"
 msgstr "監控告警"
 
-#: ops/notifications.py:24
+#: ops/notifications.py:25
 msgid "Terminal health check warning"
 msgstr "終端健康狀況檢查警告"
 
-#: ops/notifications.py:69
+#: ops/notifications.py:70
 #, python-brace-format
 msgid "The terminal is offline: {name}"
 msgstr "終端已離線: {name}"
 
-#: ops/notifications.py:74
+#: ops/notifications.py:75
 #, python-brace-format
 msgid "Disk used more than {max_threshold}%: => {value}"
 msgstr "硬碟使用率超過 {max_threshold}%: => {value}"
 
-#: ops/notifications.py:79
+#: ops/notifications.py:80
 #, python-brace-format
 msgid "Memory used more than {max_threshold}%: => {value}"
 msgstr "記憶體使用率超過 {max_threshold}%: => {value}"
 
-#: ops/notifications.py:84
+#: ops/notifications.py:85
 #, python-brace-format
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超過 {max_threshold}: => {value}"
@@ -5166,11 +5166,21 @@ msgstr ""
 msgid "Connect timeout (s)"
 msgstr "連接超時時間 (秒)"
 
-#: settings/serializers/auth/ldap.py:79
+#: settings/serializers/auth/ldap.py:82
+msgid "User DN cache timeout (s)"
+msgstr "快取逾時時間 (秒)"
+
+#: settings/serializers/auth/ldap.py:84
+msgid ""
+"Caching the User DN obtained during user login authentication can "
+"effectivelyimprove the speed of user authentication., 0 means no cache"
+msgstr "對於使用者登錄認證時查詢的使用者 DN 進行快取，可以有效提高使用者認證的速度"
+
+#: settings/serializers/auth/ldap.py:88
 msgid "Search paged size (piece)"
 msgstr "搜索分頁數量 (條)"
 
-#: settings/serializers/auth/ldap.py:84
+#: settings/serializers/auth/ldap.py:93
 msgid "Enable LDAP auth"
 msgstr "啟用 LDAP 認證"
 
