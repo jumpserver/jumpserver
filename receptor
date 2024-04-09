@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+# coding: utf-8
+
+import argparse
+import subprocess
+import os
+import signal
+
+ANSIBLE_RUNNER_COMMAND = "ansible-runner"
+DEFAULT_CONTROL_SOCK_PATH = "/opt/jumpserver/data/share/control.sock"
+
+
+class ReceptorService:
+    def __init__(self):
+        self.pid_file = "tmp/receptor.pid"
+        self.receptor_command = [
+            'receptor',
+            '--local-only',
+            '--node', 'id=primary',
+            '--control-service',
+            'service=control',
+            'filename={}'.format(DEFAULT_CONTROL_SOCK_PATH),
+            '--work-command',
+            'worktype={}'.format(ANSIBLE_RUNNER_COMMAND),
+            'command={}'.format(ANSIBLE_RUNNER_COMMAND),
+            'params=worker',
+            'allowruntimeparams=true'
+        ]
+
+    def start(self):
+        if os.path.exists(self.pid_file):
+            with open(self.pid_file, 'r') as f:
+                pid_str = f.read()
+            try:
+                pid = int(pid_str)
+                os.kill(pid, 0)
+                print("\n- Receptor service is already running.")
+                return
+            except ProcessLookupError:
+                print("\n- PID file exists but process does not, starting Receptor...")
+            except ValueError:
+                print("\n- PID file is corrupted, starting Receptor...")
+                os.remove(self.pid_file)
+
+        process = subprocess.Popen(self.receptor_command)
+        with open(self.pid_file, 'w') as f:
+            f.write(str(process.pid))
+        print("\n- Receptor service started successfully.")
+
+    def stop(self):
+        if not os.path.exists(self.pid_file):
+            print("\n- Receptor service is not running.")
+            return
+        with open(self.pid_file, 'r') as f:
+            pid = int(f.read())
+        try:
+            os.kill(pid, signal.SIGTERM)
+            os.remove(self.pid_file)
+            print("\n- Receptor service stopped successfully.")
+        except ProcessLookupError:
+            print("\n- Failed to stop Receptor service: Process does not exist.")
+            os.remove(self.pid_file)
+
+    def restart(self):
+        self.stop()
+        self.start()
+
+    def status(self):
+        if os.path.exists(self.pid_file):
+            with open(self.pid_file, 'r') as f:
+                pid_str = f.read()
+            try:
+                pid = int(pid_str)
+                os.kill(pid, 0)
+                print("\n- Receptor service is running.")
+                return
+            except ProcessLookupError:
+                print("\n- Receptor service is not running.")
+        else:
+            print("\n- Receptor service is not running.")
+
+
+def handle_receptor_action(action):
+    srv = ReceptorService()
+    if action == "start":
+        srv.start()
+    elif action == 'stop':
+        srv.stop()
+    elif action == "restart":
+        srv.restart()
+    elif action == "status":
+        srv.status()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="""
+           Jumpserver receptor service control tools;
+           """
+    )
+    parser.add_argument(
+        'action', type=str,
+        choices=("start", "stop", "restart", "status"),
+        help="Action to run"
+    )
+
+    args = parser.parse_args()
+    handle_receptor_action(args.action)
