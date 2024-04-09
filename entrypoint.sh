@@ -9,6 +9,7 @@ function cleanup()
 
 action="${1-start}"
 service="${2-all}"
+file="${3-jms}"
 
 trap cleanup EXIT
 
@@ -20,5 +21,5 @@ elif [[ "$action" == "sleep" ]];then
     echo "Sleep 365 days"
     sleep 365d
 else
-    python jms "${action}" "${service}"
+    python "$file" "$action" "$service"
 fi
