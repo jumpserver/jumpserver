@@ -435,6 +435,14 @@ class RoleMixin:
         cache.set(key, data, 60 * 60)
         return data
 
+    @lazyproperty
+    def orgs_roles(self):
+        orgs_roles = defaultdict(set)
+        rbs = RoleBinding.objects_raw.filter(user=self, scope='org').prefetch_related('role', 'org')
+        for rb in rbs:
+            orgs_roles[rb.org_name].add(str(rb.role.display_name))
+        return orgs_roles
+
     def expire_rbac_perms_cache(self):
         key = self.PERM_CACHE_KEY.format(self.id, '*')
         cache.delete_pattern(key)
@@ -927,14 +935,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     @property
     def is_local(self):
         return self.source == self.Source.local.value
-
-    @property
-    def orgs_roles(self):
-        orgs_roles = defaultdict(set)
-        rbs = RoleBinding.objects_raw.filter(user=self, scope='org').prefetch_related('role', 'org')
-        for rb in rbs:
-            orgs_roles[rb.org_name].add(str(rb.role.display_name))
-        return orgs_roles
 
     def is_password_authenticate(self):
         cas = self.Source.cas
