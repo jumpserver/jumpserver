@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: docker/setup-qemu-action@v3
+    - uses: docker/setup-buildx-action@v3
 
-    - uses: docker/setup-qemu-action@v2
-
-    - uses: docker/setup-buildx-action@v2
-
-    - uses: docker/build-push-action@v3
+    - name: Build CE Image
+      uses: docker/build-push-action@v5
       with:
         context: .
         push: false
+        file: Dockerfile
         tags: jumpserver/core-ce:test
-        file: Dockerfile-ce
+        platforms: linux/amd64
         build-args: |
           APT_MIRROR=http://deb.debian.org
           PIP_MIRROR=https://pypi.org/simple
@@ -28,9 +28,22 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - uses: LouisBrunner/checks-action@v1.5.0
-      if: always()
+    - name: Prepare EE Image
+      run: |
+        sed -i 's@^FROM registry.fit2cloud.com@# FROM registry.fit2cloud.com@g' Dockerfile-ee
+        sed -i 's@^COPY --from=build-xpack@# COPY --from=build-xpack@g' Dockerfile-ee
+
+    - name: Build EE Image
+      uses: docker/build-push-action@v5
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Check Build
-        conclusion: ${{ job.status }}
+        context: .
+        push: false
+        file: Dockerfile-ee
+        tags: jumpserver/core-ee:test
+        platforms: linux/amd64
+        build-args: |
+          APT_MIRROR=http://deb.debian.org
+          PIP_MIRROR=https://pypi.org/simple
+          PIP_JMS_MIRROR=https://pypi.org/simple
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
