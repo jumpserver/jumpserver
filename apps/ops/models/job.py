@@ -523,7 +523,7 @@ class JobExecution(JMSOrgBaseModel):
 
     def stop(self):
 
-        unit_id_path = os.path.join(self.private_dir, "unit_id.txt")
+        unit_id_path = os.path.join(self.private_dir, "local.unitid")
         if os.path.exists(unit_id_path):
             with open(unit_id_path) as f:
                 try:
@@ -532,17 +532,6 @@ class JobExecution(JMSOrgBaseModel):
                 except Exception as e:
                     print(e)
             self.set_error('Job stop by "receptor worker cancel, unit id is {}"'.format(unit_id))
-
-        else:
-            from ops.signal_handlers import job_execution_stop_pub_sub
-
-            with open(os.path.join(self.private_dir, 'local.pid')) as f:
-                try:
-                    pid = f.read()
-                    job_execution_stop_pub_sub.publish(int(pid))
-                except Exception as e:
-                    print(e)
-            self.set_error('Job stop by "kill -9 {}"'.format(pid))
 
     class Meta:
         verbose_name = _("Job Execution")

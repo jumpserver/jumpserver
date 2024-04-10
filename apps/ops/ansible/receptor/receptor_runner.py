@@ -42,7 +42,7 @@ class AnsibleReceptorRunner:
         if not self.unit_id:
             return
         private_dir = self.runner_params.get("private_data_dir", "")
-        with open(os.path.join(private_dir, "unit_id.txt"), "w") as f:
+        with open(os.path.join(private_dir, "local.unitid"), "w") as f:
             f.write(self.unit_id)
             f.flush()
 

@@ -9,7 +9,8 @@ import signal
 import tempfile
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
-DEFAULT_CONTROL_SOCK_PATH = "/opt/jumpserver/data/share/control.sock"
+DEFAULT_SHARE_DIR = "data/share"
+DEFAULT_CONTROL_SOCK_PATH = os.path.join(DEFAULT_SHARE_DIR, "control.sock")
 
 
 class ReceptorService:
@@ -17,8 +18,6 @@ class ReceptorService:
         self.pid_file = "tmp/receptor.pid"
         self.receptor_command = [
             'receptor',
-            # '--log-level',
-            # 'level=Debug',
             '--local-only',
             '--node', 'id=primary',
             '--control-service',
@@ -33,6 +32,7 @@ class ReceptorService:
 
     @staticmethod
     def before_start():
+        os.makedirs(os.path.join(DEFAULT_SHARE_DIR), exist_ok=True)
         status_dir = os.path.join(tempfile.gettempdir(), "receptor")
         if os.path.exists(status_dir):
             shutil.rmtree(status_dir)
