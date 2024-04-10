@@ -87,6 +87,7 @@ class AdHocRunner:
 
 class PlaybookRunner:
     def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None):
+
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.playbook = playbook
@@ -96,7 +97,16 @@ class PlaybookRunner:
         self.cb = callback
         self.envs = {}
 
+    def copy_playbook(self):
+        entry = os.path.basename(self.playbook)
+        playbook_dir = os.path.dirname(self.playbook)
+        project_playbook_dir = os.path.join(self.project_dir, "project")
+        shutil.copytree(playbook_dir, project_playbook_dir)
+        self.playbook = entry
+
     def run(self, verbosity=0, **kwargs):
+        self.copy_playbook()
+
         verbosity = get_ansible_log_verbosity(verbosity)
         private_env = safe_join(self.project_dir, 'env')
         if os.path.exists(private_env):
