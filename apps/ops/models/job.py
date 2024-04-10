@@ -339,7 +339,9 @@ class JobExecution(JMSOrgBaseModel):
             )
         elif self.current_job.type == Types.playbook:
             runner = PlaybookRunner(
-                self.inventory_path, self.current_job.playbook.entry
+                self.inventory_path,
+                self.current_job.playbook.entry,
+                self.private_dir
             )
         elif self.current_job.type == Types.upload_file:
             job_id = self.current_job.id
@@ -522,7 +524,6 @@ class JobExecution(JMSOrgBaseModel):
             ssh_tunnel.local_gateway_clean(runner)
 
     def stop(self):
-
         unit_id_path = os.path.join(self.private_dir, "local.unitid")
         if os.path.exists(unit_id_path):
             with open(unit_id_path) as f:

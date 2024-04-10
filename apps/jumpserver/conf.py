@@ -618,7 +618,7 @@ class Config(dict):
 
         # Ansible Receptor
         'ANSIBLE_RECEPTOR_ENABLE': True,
-        'ANSIBLE_RECEPTOR_SOCK_PATH': 'data/share/control.sock'
+        'ANSIBLE_RECEPTOR_SOCK_PATH': '{}/data/share/control.sock'.format(PROJECT_DIR)
     }
 
     old_config_map = {
