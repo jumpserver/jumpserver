@@ -47,3 +47,5 @@ class LarkQRLoginCallbackView(BaseLarkQRMixin, FeiShuQRLoginCallbackView):
     msg_client_err = _('Lark Error')
     msg_user_not_bound_err = _('Lark is not bound')
     msg_not_found_user_from_client_err = _('Failed to get user from Lark')
+
+    auth_backend = f'AUTH_BACKEND_{auth_type}'.upper()
