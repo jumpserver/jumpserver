@@ -120,6 +120,10 @@ class UserLoginContextMixin:
                 'code': 'zh-hans'
             },
             {
+                'title': '中文(繁體)',
+                'code': 'zh-hant'
+            },
+            {
                 'title': 'English',
                 'code': 'en'
             },
