@@ -25,7 +25,9 @@ class ExcelFileRenderer(BaseFileRenderer):
             # 处理非法字符
             column_count += 1
             cell_value = ILLEGAL_CHARACTERS_RE.sub(r'', str(cell_value))
-            self.ws.cell(row=self.row_count, column=column_count, value=str(cell_value))
+            cell = self.ws.cell(row=self.row_count, column=column_count, value=str(cell_value))
+            # 设置单元格格式为纯文本, 防止执行公式
+            cell.data_type = 's'
 
     def after_render(self):
         for col in self.ws.columns:
