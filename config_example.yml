@@ -16,7 +16,7 @@ BOOTSTRAP_TOKEN:
 # LOG_LEVEL: DEBUG
 # LOG_DIR:
 
-# Session expiration setting, Default 1 hour, Also set expired on on browser close
+# Session expiration setting, Default 1 hour, Also set expired on browser close
 # 浏览器Session过期时间，默认 1 小时, 也可以设置浏览器关闭则过期
 # SESSION_COOKIE_AGE: 3600
 # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
