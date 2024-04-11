@@ -44,7 +44,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         fields_custom = ["can_replay", "can_join", "can_terminate"]
         fields = fields_small + fields_fk + fields_custom
         extra_kwargs = {
-            "Duration": {'label': _('Duration')},
+            "duration": {'label': _('Duration')},
             "protocol": {'label': _('Protocol')},
             'user_id': {'label': _('User ID')},
             'asset_id': {'label': _('Asset ID')},

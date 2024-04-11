@@ -7310,7 +7310,7 @@ msgstr "終了できます"
 
 #: terminal/serializers/session.py:47
 msgid "Duration"
-msgstr "間隔"
+msgstr "きかん"
 
 #: terminal/serializers/session.py:49
 msgid "User ID"
