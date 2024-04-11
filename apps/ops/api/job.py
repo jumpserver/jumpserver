@@ -178,7 +178,7 @@ class JobViewSet(OrgBulkModelViewSet):
         job = get_object_or_404(Job, pk=job_id, creator=request.user)
         job_args = json.loads(job.args)
         src_path_info = []
-        upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file', job_id)
+        upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file', job_id)
         for uploaded_file in uploaded_files:
             filename = uploaded_file.name
             saved_path = safe_join(upload_file_dir, f'{filename}')

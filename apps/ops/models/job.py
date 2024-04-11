@@ -58,7 +58,7 @@ class JMSPermedInventory(JMSInventory):
         self.module = module
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
 
-    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir):
         if not account:
             host['error'] = _("No account available")
             return host
@@ -90,7 +90,7 @@ class JMSPermedInventory(JMSInventory):
                 }
                 host['jms_asset']['port'] = protocol.port
             return host
-        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
+        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway, path_dir)
 
     def get_asset_sorted_accounts(self, asset):
         accounts = self.assets_accounts_mapper.get(asset.id, [])
@@ -347,7 +347,7 @@ class JobExecution(JMSOrgBaseModel):
             job_id = self.current_job.id
             args = json.loads(self.current_job.args)
             dst_path = args.get('dst_path', '/')
-            runner = UploadFileRunner(self.inventory_path, job_id, dst_path)
+            runner = UploadFileRunner(self.inventory_path, self.private_dir, job_id, dst_path)
         else:
             raise Exception("unsupported job type")
         return runner
