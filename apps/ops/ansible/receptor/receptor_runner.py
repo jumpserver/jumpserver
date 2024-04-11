@@ -31,6 +31,20 @@ def nodes():
     return receptor_ctl.simple_command("status").get("Advertisements", None)
 
 
+def kill_process(pid):
+    submit_result = receptor_ctl.submit_work(worktype="kill", node="primary", payload=str(pid))
+
+    unit_id = submit_result["unitid"]
+
+    result_socket, result_file = receptor_ctl.get_work_results(unit_id=unit_id, return_sockfile=True,
+                                                               return_socket=True)
+    while not result_socket.close():
+        buf = result_file.read()
+        if not buf:
+            break
+        print(buf.decode('utf8'))
+
+
 def run(**kwargs):
     receptor_runner = AnsibleReceptorRunner(**kwargs)
     return receptor_runner.run()

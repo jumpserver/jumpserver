@@ -1,7 +1,6 @@
 import ast
 import time
 
-import psutil
 from celery import signals
 from django.core.cache import cache
 from django.db import transaction
@@ -10,13 +9,13 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.utils.functional import LazyObject
-from psutil import NoSuchProcess
 
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
+from .ansible.receptor.receptor_runner import kill_process
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
 
@@ -160,24 +159,7 @@ def subscribe_stop_job_execution(sender, **kwargs):
 
     def on_stop(pid):
         logger.info(f"Stop job execution {pid} start")
-        try:
-            current_process = psutil.Process(pid)
-        except NoSuchProcess as e:
-            logger.error(e)
-            return
-
-        children = current_process.children(recursive=True)
-        logger.debug(f"Job execution process children: {children}")
-        for child in children:
-            if child.pid == 1:
-                continue
-            if child.name() != 'ssh':
-                continue
-            try:
-                child.kill()
-                logger.debug(f"Kill job execution process {pid} children process {child.pid} success")
-            except Exception as e:
-                logger.error(e)
+        kill_process(pid)
 
     job_execution_stop_pub_sub.subscribe(on_stop)
 
