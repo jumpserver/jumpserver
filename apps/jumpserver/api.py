@@ -250,12 +250,12 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def commands_amount(self):
-        total_amount, _ = self.command_statistics
+        total_amount, __ = self.command_statistics
         return total_amount
 
     @lazyproperty
     def commands_danger_amount(self):
-        _, danger_amount = self.command_statistics
+        __, danger_amount = self.command_statistics
         return danger_amount
 
     @lazyproperty
