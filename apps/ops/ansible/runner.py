@@ -133,17 +133,19 @@ class SuperPlaybookRunner(PlaybookRunner):
 
 
 class UploadFileRunner:
-    def __init__(self, inventory, job_id, dest_path, callback=None):
+    def __init__(self, inventory, project_dir, job_id, dest_path, callback=None):
         self.id = uuid.uuid4()
         self.inventory = inventory
+        self.project_dir = project_dir
         self.cb = DefaultCallback()
-        upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file')
+        upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file')
         self.src_paths = safe_join(upload_file_dir, str(job_id))
         self.dest_path = safe_join("/tmp", dest_path)
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
         runner.run(
+            private_data_dir=self.project_dir,
             host_pattern="*",
             inventory=self.inventory,
             module='copy',
