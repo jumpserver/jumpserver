@@ -2,15 +2,21 @@
 # coding: utf-8
 
 import argparse
+import logging
 import shutil
 import subprocess
 import os
 import signal
 import tempfile
 
+import psutil
+from psutil import NoSuchProcess
+
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 DEFAULT_SHARE_DIR = "data/share"
 DEFAULT_CONTROL_SOCK_PATH = os.path.join(DEFAULT_SHARE_DIR, "control.sock")
+
+logger = logging.getLogger(__name__)
 
 
 class ReceptorService:
@@ -19,6 +25,8 @@ class ReceptorService:
         self.receptor_command = [
             'receptor',
             '--local-only',
+            '--log-level',
+            'level=Debug',
             '--node', 'id=primary',
             '--control-service',
             'service=control',
@@ -27,6 +35,11 @@ class ReceptorService:
             'worktype={}'.format(ANSIBLE_RUNNER_COMMAND),
             'command={}'.format(ANSIBLE_RUNNER_COMMAND),
             'params=worker',
+            'allowruntimeparams=true',
+            '--work-command',
+            'worktype={}'.format("kill"),
+            'command={}'.format("python"),
+            "params=receptor kill",
             'allowruntimeparams=true'
         ]
 
@@ -52,7 +65,6 @@ class ReceptorService:
             except ValueError:
                 print("\n- PID file is corrupted, starting Receptor...")
                 os.remove(self.pid_file)
-
         process = subprocess.Popen(self.receptor_command)
         with open(self.pid_file, 'w') as f:
             f.write(str(process.pid))
@@ -99,7 +111,8 @@ class ReceptorService:
             print("\n- Receptor service is not running.")
 
 
-def handle_receptor_action(action):
+def handle_receptor_action(args):
+    action = args.action
     srv = ReceptorService()
     if action == "start":
         srv.start()
@@ -109,6 +122,37 @@ def handle_receptor_action(action):
         srv.restart()
     elif action == "status":
         srv.status()
+    elif action == "kill":
+        kill_progress_tree()
+
+
+def kill_progress_tree(pid=None):
+    if not pid:
+        try:
+            pid_input = input()
+            pid = int(pid_input)
+        except Exception as e:
+            logger.error(e)
+            return
+
+    logger.info("progress {} will be kill".format(pid))
+
+    try:
+        current_process = psutil.Process(pid)
+    except NoSuchProcess as e:
+        logger.error(e)
+        return
+
+    children = current_process.children(recursive=True)
+    for child in children:
+        if child.pid == 1:
+            continue
+        if child.name() != 'ssh':
+            continue
+        try:
+            child.kill()
+        except Exception as e:
+            logger.error(e)
 
 
 if __name__ == '__main__':
@@ -119,9 +163,11 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "stop", "restart", "status"),
+        choices=("start", "stop", "restart", "status", "kill"),
         help="Action to run"
     )
 
+    # parser.add_argument('--pid', type=int, default=42, help='what PID you want to kill')
+
     args = parser.parse_args()
-    handle_receptor_action(args.action)
+    handle_receptor_action(args)

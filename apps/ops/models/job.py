@@ -524,15 +524,16 @@ class JobExecution(JMSOrgBaseModel):
             ssh_tunnel.local_gateway_clean(runner)
 
     def stop(self):
-        unit_id_path = os.path.join(self.private_dir, "local.unitid")
-        if os.path.exists(unit_id_path):
-            with open(unit_id_path) as f:
+        from ops.signal_handlers import job_execution_stop_pub_sub
+        pid_path = os.path.join(self.private_dir, "local.pid")
+        if os.path.exists(pid_path):
+            with open(pid_path) as f:
                 try:
-                    unit_id = f.read()
-                    receptor_runner.cancel(unit_id)
+                    pid = f.read()
+                    job_execution_stop_pub_sub.publish(int(pid))
                 except Exception as e:
                     print(e)
-            self.set_error('Job stop by "receptor worker cancel, unit id is {}"'.format(unit_id))
+        self.set_error('Job stop by "user cancel"')
 
     class Meta:
         verbose_name = _("Job Execution")
