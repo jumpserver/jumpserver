@@ -2,10 +2,13 @@ import concurrent.futures
 import os
 import queue
 import socket
+
 from django.conf import settings
 import ansible_runner
 from django.utils.functional import LazyObject
 from receptorctl import ReceptorControl
+
+from ops.ansible.cleaner import WorkPostRunCleaner, cleanup_post_run
 
 
 class WarpedReceptorctl(LazyObject):
@@ -33,7 +36,7 @@ def run(**kwargs):
     return receptor_runner.run()
 
 
-class AnsibleReceptorRunner:
+class AnsibleReceptorRunner(WorkPostRunCleaner):
     def __init__(self, **kwargs):
         self.runner_params = kwargs
         self.unit_id = None
@@ -46,6 +49,11 @@ class AnsibleReceptorRunner:
             f.write(self.unit_id)
             f.flush()
 
+    @property
+    def clean_dir(self):
+        return self.runner_params.get("private_data_dir", None)
+
+    @cleanup_post_run
     def run(self):
         input, output = socket.socketpair()
 
