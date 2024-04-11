@@ -237,18 +237,21 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
                 {'error': _('The task is being created and cannot be interrupted. Please try again later.')},
                 status=400
             )
+        try:
+            task = AsyncResult(task_id, app=app)
+            inspect = app.control.inspect()
 
-        task = AsyncResult(task_id, app=app)
-        inspect = app.control.inspect()
-
-        for worker in inspect.registered().keys():
-            if not worker.startswith('ansible'):
-                continue
-            if task_id not in [at['id'] for at in inspect.active().get(worker, [])]:
-                # 在队列中未执行使用revoke执行
-                task.revoke(terminate=True)
-                instance.set_error('Job stop by "revoke task {}"'.format(task_id))
-                return Response({'task_id': task_id}, status=200)
+            for worker in inspect.registered().keys():
+                if not worker.startswith('ansible'):
+                    continue
+                if task_id not in [at['id'] for at in inspect.active().get(worker, [])]:
+                    # 在队列中未执行使用revoke执行
+                    task.revoke(terminate=True)
+                    instance.set_error('Job stop by "revoke task {}"'.format(task_id))
+                    return Response({'task_id': task_id}, status=200)
+        except Exception as e:
+            instance.set_error(str(e))
+            return Response({'error': f'Error while stopping the task {task_id}: {e}'}, status=400)
 
         instance.stop()
         return Response({'task_id': task_id}, status=200)
