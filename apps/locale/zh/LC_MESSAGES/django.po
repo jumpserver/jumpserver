@@ -7204,7 +7204,7 @@ msgstr "是否可中断"
 
 #: terminal/serializers/session.py:47
 msgid "Duration"
-msgstr "期间"
+msgstr "时长"
 
 #: terminal/serializers/session.py:49
 msgid "User ID"
