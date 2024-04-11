@@ -64,9 +64,16 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
 
     async def async_handle_task(self, task_id, log_path):
         logger.info("Task id: {}".format(task_id))
+        timeout = 0
         while not self.disconnected:
+            if timeout >= 60:
+                await self.send_json({'message': '\r\n', 'task': task_id})
+                await self.send_json({'message': 'Task log was not found, the directory may not be shared.',
+                                      'task': task_id})
+                break
             if not os.path.exists(log_path):
                 await self.send_json({'message': '.', 'task': task_id})
+                timeout += 0.5
                 await asyncio.sleep(0.5)
             else:
                 await self.send_task_log(task_id, log_path)
