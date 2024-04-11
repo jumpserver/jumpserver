@@ -38,6 +38,7 @@ BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 DATA_DIR = os.path.join(PROJECT_DIR, 'data')
+SHARE_DIR = os.path.join(DATA_DIR, 'share')
 ANSIBLE_DIR = os.path.join(DATA_DIR, 'ansible')
 CERTS_DIR = os.path.join(DATA_DIR, 'certs')
 
@@ -318,7 +319,6 @@ PRIVATE_STORAGE_ROOT = MEDIA_ROOT
 PRIVATE_STORAGE_AUTH_FUNCTION = 'jumpserver.rewriting.storage.permissions.allow_access'
 PRIVATE_STORAGE_INTERNAL_URL = '/private-media/'
 PRIVATE_STORAGE_SERVER = 'jumpserver.rewriting.storage.servers.StaticFileServer'
-
 
 # Use django-bootstrap-form to format template, input max width arg
 # BOOTSTRAP_COLUMN_COUNT = 11
