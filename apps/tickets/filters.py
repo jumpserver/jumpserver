@@ -1,10 +1,10 @@
-from django.db.models import Subquery, OuterRef, Value, F, Q
+from django.db.models import Value, F, Q
 from django.db.models.functions import Concat
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
 from tickets.models import (
-    Ticket, TicketStep, ApplyAssetTicket,
+    Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 
@@ -22,11 +22,7 @@ class TicketFilter(BaseFilterSet):
         )
 
     def filter_assignees_id(self, queryset, name, value):
-        step_qs = TicketStep.objects.filter(
-            level=OuterRef("approval_step")
-        ).values_list('id', flat=True)
         return queryset.filter(
-            ticket_steps__id__in=Subquery(step_qs),
             ticket_steps__ticket_assignees__assignee__id=value
         )
 
