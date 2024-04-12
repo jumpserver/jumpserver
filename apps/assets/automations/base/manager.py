@@ -314,7 +314,7 @@ class BasePlaybookManager:
     def delete_runtime_dir(self):
         if settings.DEBUG_DEV:
             return
-        shutil.rmtree(self.runtime_dir)
+        shutil.rmtree(self.runtime_dir, ignore_errors=True)
 
     def run(self, *args, **kwargs):
         print(">>> 任务准备阶段\n")
