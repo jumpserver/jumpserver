@@ -39,8 +39,8 @@ class RedisUserSessionManager:
         self.client.hincrby(self.JMS_SESSION_KEY, session_key, -1)
 
     def remove(self, session_key):
-        self.client.hdel(self.JMS_SESSION_KEY, session_key)
         try:
+            self.client.hdel(self.JMS_SESSION_KEY, session_key)
             session_store = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
             session_store.delete()
         except Exception:
