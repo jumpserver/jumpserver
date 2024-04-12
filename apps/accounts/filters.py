@@ -69,4 +69,4 @@ class ChangeSecretRecordFilterSet(BaseFilterSet):
 
     class Meta:
         model = ChangeSecretRecord
-        fields = ['id', 'status', 'asset_id', 'execution_id']
+        fields = ['id', 'status', 'asset_id', 'execution']
