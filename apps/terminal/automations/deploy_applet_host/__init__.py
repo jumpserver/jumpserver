@@ -145,7 +145,7 @@ class DeployAppletHostManager:
     def delete_runtime_dir(self):
         if settings.DEBUG_DEV:
             return
-        shutil.rmtree(self.run_dir)
+        shutil.rmtree(self.run_dir, ignore_errors=True)
 
     def _run(self, cb_func: callable, **kwargs):
         try:
