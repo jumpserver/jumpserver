@@ -240,27 +240,28 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             r for r in recorders
             if r.status == ChangeSecretRecordStatusChoice.failed.value
         ]
-        super_users = User.get_super_admins()
 
-        if failed_recorders and super_users:
+        recipients = self.execution.recipients
+        recipients = User.objects.filter(id__in=list(recipients.keys()))
+        if not recipients:
+            return
+
+        if failed_recorders:
             name = self.execution.snapshot.get('name')
             execution_id = str(self.execution.id)
             _ids = [r.id for r in failed_recorders]
             asset_account_errors = ChangeSecretRecord.objects.filter(
                 id__in=_ids).values_list('asset__name', 'account__username', 'error')
 
-            for user in super_users:
+            for user in recipients:
                 ChangeSecretFailedMsg(name, execution_id, user, asset_account_errors).publish()
 
-        self.send_recorder_mail(recorders, summary)
-
-    def send_recorder_mail(self, recorders, summary):
-        recipients = self.execution.recipients
-        if not recorders or not recipients:
+        if not recorders:
             return
 
-        recipients = User.objects.filter(id__in=list(recipients.keys()))
+        self.send_recorder_mail(recipients, recorders, summary)
 
+    def send_recorder_mail(self, recipients, recorders, summary):
         name = self.execution.snapshot['name']
         path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
         filename = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.xlsx')
