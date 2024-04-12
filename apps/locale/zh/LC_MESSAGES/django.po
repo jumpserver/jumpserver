@@ -8596,7 +8596,7 @@ msgstr "ucloud"
 
 #: xpack/plugins/cloud/const.py:21
 msgid "Volcengine"
-msgstr ""
+msgstr "火山引擎"
 
 #: xpack/plugins/cloud/const.py:23
 msgid "VMware"
