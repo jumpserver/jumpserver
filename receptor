@@ -65,6 +65,8 @@ class ReceptorService:
             except ValueError:
                 print("\n- PID file is corrupted, starting Receptor...")
                 os.remove(self.pid_file)
+
+        os.environ.update({'LOCAL_CONNECTION_ENABLED': '1'})
         process = subprocess.Popen(self.receptor_command)
         with open(self.pid_file, 'w') as f:
             f.write(str(process.pid))
