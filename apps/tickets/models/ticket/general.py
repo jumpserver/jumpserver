@@ -10,6 +10,7 @@ from django.db.utils import IntegrityError
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
+from accounts.const import AliasAccount
 from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import JMSBaseModel
 from common.exceptions import JMSException
@@ -409,6 +410,13 @@ class Ticket(StatusMixin, JMSBaseModel):
                 value = self.rel_snapshot[name]
             elif isinstance(self.rel_snapshot[name], list):
                 value = ','.join(self.rel_snapshot[name])
+        elif name == 'apply_accounts':
+            new_values = []
+            for account in value:
+                alias = dict(AliasAccount.choices).get(account)
+                new_value = alias if alias else account
+                new_values.append(str(new_value))
+            value = ', '.join(new_values)
         elif isinstance(value, list):
             value = ', '.join(value)
         return value
