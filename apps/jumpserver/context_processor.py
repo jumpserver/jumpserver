@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import datetime
+
 from django.conf import settings
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
@@ -15,13 +17,15 @@ default_interface = dict((
     ('footer_content', ''),
 ))
 
+current_year = datetime.datetime.now().year
+
 default_context = {
     'DEFAULT_PK': '00000000-0000-0000-0000-000000000000',
     'LOGIN_CAS_logo_logout': static('img/login_cas_logo.png'),
     'LOGIN_WECOM_logo_logout': static('img/login_wecom_logo.png'),
     'LOGIN_DINGTALK_logo_logout': static('img/login_dingtalk_logo.png'),
     'LOGIN_FEISHU_logo_logout': static('img/login_feishu_logo.png'),
-    'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2023',
+    'COPYRIGHT': f'FIT2CLOUD 飞致云 © 2014-{current_year}',
     'INTERFACE': default_interface,
 }
 
