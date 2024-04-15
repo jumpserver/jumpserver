@@ -29,14 +29,14 @@ class ActionChoicesField(BitChoicesField):
 
 
 class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
-    users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('User'))
+    users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('Users'))
     user_groups = ObjectRelatedField(
-        queryset=UserGroup.objects, many=True, required=False, label=_('User group')
+        queryset=UserGroup.objects, many=True, required=False, label=_('Groups')
     )
-    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Asset'))
-    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Node'))
+    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Assets'))
+    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Nodes'))
     users_amount = serializers.IntegerField(read_only=True, label=_("Users amount"))
-    user_groups_amount = serializers.IntegerField(read_only=True, label=_("User groups amount"))
+    user_groups_amount = serializers.IntegerField(read_only=True, label=_("Groups amount"))
     assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
     nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
     actions = ActionChoicesField(required=False, allow_null=True, label=_("Actions"))
