@@ -121,7 +121,7 @@ RUN set -ex \
 
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
-COPY --from=stage-1 /opt/jumpserver/release/jumpserver/apps/ops/ansible/ansible.cfg /etc/ansible/
+COPY --from=stage-1 /opt/jumpserver/release/jumpserver/apps/libs/ansible/ansible.cfg /etc/ansible/
 
 WORKDIR /opt/jumpserver
 
