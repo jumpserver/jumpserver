@@ -13,20 +13,26 @@ import psutil
 from psutil import NoSuchProcess
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
-DEFAULT_SHARE_DIR = "data/share"
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
+TEMP_DIR = os.path.join(PROJECT_DIR, "tmp")
+
+DEFAULT_SHARE_DIR = os.path.join(PROJECT_DIR, "data", "share")
+DEFAULT_ANSIBLE_MODULES_DIR = os.path.join(APPS_DIR, "libs", "ansible", "modules")
 DEFAULT_CONTROL_SOCK_PATH = os.path.join(DEFAULT_SHARE_DIR, "control.sock")
 
 logger = logging.getLogger(__name__)
 
+os.chdir(APPS_DIR)
+
 
 class ReceptorService:
     def __init__(self):
-        self.pid_file = "tmp/receptor.pid"
+        self.pid_file = os.path.join(TEMP_DIR, "receptor.pid")
         self.receptor_command = [
             'receptor',
             '--local-only',
-            '--log-level',
-            'level=Debug',
             '--node', 'id=primary',
             '--control-service',
             'service=control',
@@ -39,7 +45,7 @@ class ReceptorService:
             '--work-command',
             'worktype={}'.format("kill"),
             'command={}'.format("python"),
-            "params=receptor kill",
+            "params={} kill".format(os.path.join(PROJECT_DIR, "receptor")),
             'allowruntimeparams=true'
         ]
 
@@ -67,6 +73,8 @@ class ReceptorService:
                 os.remove(self.pid_file)
 
         os.environ.update({'LOCAL_CONNECTION_ENABLED': '1'})
+        os.environ.setdefault('ANSIBLE_LIBRARY', DEFAULT_ANSIBLE_MODULES_DIR)
+        os.environ.update({'PYTHONPATH': APPS_DIR})
         process = subprocess.Popen(self.receptor_command)
         with open(self.pid_file, 'w') as f:
             f.write(str(process.pid))

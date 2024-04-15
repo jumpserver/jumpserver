@@ -101,7 +101,7 @@ class PlaybookRunner:
         entry = os.path.basename(self.playbook)
         playbook_dir = os.path.dirname(self.playbook)
         project_playbook_dir = os.path.join(self.project_dir, "project")
-        shutil.copytree(playbook_dir, project_playbook_dir)
+        shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
         self.playbook = entry
 
     def run(self, verbosity=0, **kwargs):
