@@ -23,7 +23,14 @@ class CSVFileRenderer(BaseFileRenderer):
         self.writer = csv_writer
 
     def write_row(self, row):
-        self.writer.writerow(row)
+        row_escape = []
+        for d in row:
+            if isinstance(d, str) and d.strip().startswith(('=', '@')):
+                d = "'{}".format(d)
+                row_escape.append(d)
+            else:
+                row_escape.append(d)
+        self.writer.writerow(row_escape)
 
     def get_rendered_value(self):
         value = self.buffer.getvalue()
