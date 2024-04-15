@@ -65,7 +65,7 @@ class FTPLogViewSet(OrgModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'asset', 'account', 'filename']
+    filterset_fields = ['user', 'asset', 'account', 'filename', 'session']
     search_fields = filterset_fields
     ordering = ['-date_start']
     http_method_names = ['post', 'get', 'head', 'options', 'patch']
