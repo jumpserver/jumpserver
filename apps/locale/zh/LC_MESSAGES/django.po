@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-12 10:30+0800\n"
+"POT-Creation-Date: 2024-04-15 17:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -406,7 +406,7 @@ msgstr "账号备份快照"
 
 #: accounts/models/automations/backup_account.py:130
 #: accounts/serializers/account/backup.py:49
-#: accounts/serializers/automations/base.py:55
+#: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
 #: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
@@ -781,7 +781,7 @@ msgid "Category"
 msgstr "类别"
 
 #: accounts/serializers/account/account.py:194
-#: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
+#: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:97
@@ -877,14 +877,15 @@ msgid "Date"
 msgstr "日期"
 
 #: accounts/serializers/account/backup.py:38
-#: accounts/serializers/automations/base.py:36
+#: accounts/serializers/automations/base.py:24
+#: accounts/serializers/automations/base.py:37
 #: assets/serializers/automations/base.py:34 ops/mixin.py:23 ops/mixin.py:104
 #: settings/serializers/auth/ldap.py:66
 msgid "Periodic perform"
 msgstr "定时执行"
 
 #: accounts/serializers/account/backup.py:39
-#: accounts/serializers/automations/base.py:37
+#: accounts/serializers/automations/base.py:38
 msgid "Executed amount"
 msgstr "执行次数"
 
@@ -982,11 +983,11 @@ msgstr ""
 msgid "Nodes"
 msgstr "节点"
 
-#: accounts/serializers/automations/base.py:44
+#: accounts/serializers/automations/base.py:45
 msgid "Name already exists"
 msgstr "名称已存在"
 
-#: accounts/serializers/automations/base.py:53
+#: accounts/serializers/automations/base.py:54
 #: assets/models/automations/base.py:118
 #: assets/serializers/automations/base.py:39
 msgid "Automation snapshot"
@@ -3512,17 +3513,17 @@ msgstr "局域网"
 msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
-#: authentication/views/base.py:138
+#: authentication/views/base.py:146
 #, python-format
 msgid "%s query user failed"
 msgstr "%s 查询用户失败"
 
-#: authentication/views/base.py:147
+#: authentication/views/base.py:155
 #, python-format
 msgid "The %s is already bound to another user"
 msgstr "%s 已绑定到另一个用户"
 
-#: authentication/views/base.py:154
+#: authentication/views/base.py:162
 #, python-format
 msgid "Binding %s successfully"
 msgstr "绑定 %s 成功"
@@ -3991,7 +3992,7 @@ msgstr "创建账号成功"
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
-#: jumpserver/context_processor.py:12
+#: jumpserver/context_processor.py:14
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer 开源堡垒机"
 
@@ -6561,10 +6562,8 @@ msgid "Remote Desktop"
 msgstr "远程桌面客户端"
 
 #: terminal/connect_methods.py:37
-#, fuzzy
-#| msgid "DB Guide"
 msgid "RDP Guide"
-msgstr "DB 连接向导"
+msgstr "RDP 连接向导"
 
 #: terminal/const.py:12
 msgid "Review & Reject"
