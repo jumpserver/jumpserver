@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-12 10:29+0800\n"
+"POT-Creation-Date: 2024-04-15 17:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -407,7 +407,7 @@ msgstr "アカウントのバックアップスナップショット"
 
 #: accounts/models/automations/backup_account.py:130
 #: accounts/serializers/account/backup.py:49
-#: accounts/serializers/automations/base.py:55
+#: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
 #: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
@@ -783,7 +783,7 @@ msgid "Category"
 msgstr "カテゴリ"
 
 #: accounts/serializers/account/account.py:194
-#: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
+#: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:97
@@ -879,14 +879,15 @@ msgid "Date"
 msgstr "日付"
 
 #: accounts/serializers/account/backup.py:38
-#: accounts/serializers/automations/base.py:36
+#: accounts/serializers/automations/base.py:24
+#: accounts/serializers/automations/base.py:37
 #: assets/serializers/automations/base.py:34 ops/mixin.py:23 ops/mixin.py:104
 #: settings/serializers/auth/ldap.py:66
 msgid "Periodic perform"
 msgstr "定期的なパフォーマンス"
 
 #: accounts/serializers/account/backup.py:39
-#: accounts/serializers/automations/base.py:37
+#: accounts/serializers/automations/base.py:38
 msgid "Executed amount"
 msgstr "実行回数"
 
@@ -985,11 +986,11 @@ msgstr ""
 msgid "Nodes"
 msgstr "ノード"
 
-#: accounts/serializers/automations/base.py:44
+#: accounts/serializers/automations/base.py:45
 msgid "Name already exists"
 msgstr "名前は既に存在します。"
 
-#: accounts/serializers/automations/base.py:53
+#: accounts/serializers/automations/base.py:54
 #: assets/models/automations/base.py:118
 #: assets/serializers/automations/base.py:39
 msgid "Automation snapshot"
@@ -3558,17 +3559,17 @@ msgstr "ローカルエリアネットワーク"
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
-#: authentication/views/base.py:138
+#: authentication/views/base.py:146
 #, python-format
 msgid "%s query user failed"
 msgstr "%sユーザーのクエリに失敗しました"
 
-#: authentication/views/base.py:147
+#: authentication/views/base.py:155
 #, python-format
 msgid "The %s is already bound to another user"
 msgstr "%sが別のユーザーにバインドされています。"
 
-#: authentication/views/base.py:154
+#: authentication/views/base.py:162
 #, python-format
 msgid "Binding %s successfully"
 msgstr "バインド%s成功"
@@ -4037,7 +4038,7 @@ msgstr "アカウントを正常に作成"
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
-#: jumpserver/context_processor.py:12
+#: jumpserver/context_processor.py:14
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer オープンソースの要塞ホスト"
 
@@ -6662,10 +6663,8 @@ msgid "Remote Desktop"
 msgstr "リモートデスクトップ"
 
 #: terminal/connect_methods.py:37
-#, fuzzy
-#| msgid "DB Guide"
 msgid "RDP Guide"
-msgstr "DB 接続ウィザード"
+msgstr "RDP 接続ウィザード"
 
 #: terminal/const.py:12
 msgid "Review & Reject"
