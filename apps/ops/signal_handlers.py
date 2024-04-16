@@ -143,7 +143,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'name': task,
         'state': 'PENDING',
         'is_finished': False,
-        'args': args,
+        'args': ["too long params" if item is Ellipsis else item for item in args],
         'kwargs': kwargs
     }
     request = get_current_request()
