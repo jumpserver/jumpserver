@@ -20,3 +20,5 @@
         become_password: "{{ custom_become_password | default('') }}"
         become_private_key_path: "{{ custom_become_private_key_path | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+
