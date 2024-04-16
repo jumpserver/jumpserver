@@ -43,7 +43,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
         fields_small = fields_mini + [
             "user", "remote_addr", "asset", "account",
             "org_id", "operate", "filename", "date_start",
-            "is_success", "has_file",
+            "is_success", "has_file", "session"
         ]
         fields = fields_small
 
