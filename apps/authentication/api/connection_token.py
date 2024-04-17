@@ -512,20 +512,16 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token.is_valid()
         serializer = self.get_serializer(instance=token)
 
-        expire_now = request.data.get('expire_now', None)
+        expire_now = request.data.get('expire_now', True)
         asset_type = token.asset.type
         # 设置默认值
-        if expire_now is None:
-            # TODO 暂时特殊处理 k8s 不过期
-            if asset_type in ['k8s', 'kubernetes']:
-                expire_now = False
-            else:
-                expire_now = not settings.CONNECTION_TOKEN_REUSABLE
+        if asset_type in ['k8s', 'kubernetes']:
+            expire_now = False
 
-        if is_false(expire_now):
-            logger.debug('Api specified, now expire now')
-        elif token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
+        if token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
             logger.debug('Token is reusable, not expire now')
+        elif is_false(expire_now):
+            logger.debug('Api specified, now expire now')
         else:
             token.expire()
 
