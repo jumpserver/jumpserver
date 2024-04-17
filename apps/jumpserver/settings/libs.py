@@ -36,7 +36,7 @@ REST_FRAMEWORK = {
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
+        'common.drf.filters.RewriteDjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'common.drf.filters.RewriteOrderingFilter',
     ),

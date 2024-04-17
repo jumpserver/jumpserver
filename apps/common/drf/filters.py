@@ -340,7 +340,7 @@ class NotOrRelFilterBackend(filters.BaseFilterBackend):
 
 
 class RewriteOrderingFilter(OrderingFilter):
-    default_ordering_if_has = ('name', )
+    default_ordering_if_has = ('name',)
 
     def get_default_ordering(self, view):
         ordering = super().get_default_ordering(view)
@@ -351,3 +351,17 @@ class RewriteOrderingFilter(OrderingFilter):
         if ordering_fields:
             ordering = tuple([f for f in ordering_fields if f in self.default_ordering_if_has])
         return ordering
+
+
+class RewriteDjangoFilterBackend(drf_filters.DjangoFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        query_params = request.query_params.copy()
+        for key in list(query_params.keys()):
+            if isinstance(query_params.getlist(key), list):
+                query_params.setlist(key, [value.replace('\\n', '\n') for value in query_params.getlist(key)])
+            else:
+                query_params[key] = query_params[key].replace('\\n', '\n')
+
+        # 为请求对象设置修改后的query_params
+        request._request.GET = query_params
+        return super().filter_queryset(request, queryset, view)
