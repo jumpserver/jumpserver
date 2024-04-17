@@ -4,6 +4,7 @@ import base64
 import json
 import logging
 from collections import defaultdict
+from copy import deepcopy
 
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
@@ -25,11 +26,33 @@ __all__ = [
     'IDInFilterBackend', "CustomFilterBackend",
     "BaseFilterSet", 'IDNotFilterBackend',
     'NotOrRelFilterBackend', 'LabelFilterBackend',
-    'RewriteOrderingFilter'
+    'RewriteOrderingFilter', 'RewriteDjangoFilterBackend',
 ]
+
+from django_filters.filters import CharFilter
+from django.forms.fields import CharField
+
+
+class RewriteCharField(CharField):
+    def to_python(self, value):
+        value = super().to_python(value)
+        value = value.replace('\\n', '\n')
+        return value
+
+class RewriteCharFilter(CharFilter):
+    field_class = RewriteCharField
+
+
+FILTER_FOR_DBFIELD_DEFAULTS = deepcopy(drf_filters.FilterSet.FILTER_DEFAULTS)
+
+for k, v in FILTER_FOR_DBFIELD_DEFAULTS.items():
+    if v.get('filter_class') == CharFilter:
+        v['filter_class'] = RewriteCharFilter
 
 
 class BaseFilterSet(drf_filters.FilterSet):
+    FILTER_DEFAULTS = FILTER_FOR_DBFIELD_DEFAULTS
+
     def do_nothing(self, queryset, name, value):
         return queryset
 
@@ -37,6 +60,10 @@ class BaseFilterSet(drf_filters.FilterSet):
         if k in self.form.data:
             return self.form.cleaned_data[k]
         return default
+
+
+class RewriteDjangoFilterBackend(drf_filters.DjangoFilterBackend):
+    filterset_base = BaseFilterSet
 
 
 class DatetimeRangeFilterBackend(filters.BaseFilterBackend):
