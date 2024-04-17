@@ -26,6 +26,10 @@ def on_app_ready(sender=None, headers=None, **kwargs):
     logger.debug("Work ready signal recv")
     logger.debug("Start need start task: [{}]".format(", ".join(tasks)))
     for task in tasks:
+        periodic_task = PeriodicTask.objects.filter(task=task).first()
+        if periodic_task and not periodic_task.enabled:
+            logger.debug("Periodic task [{}] is disabled!".format(task))
+            continue
         subtask(task).delay()
 
 
