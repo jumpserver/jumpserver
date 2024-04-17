@@ -214,11 +214,16 @@ class JMSInventory:
         )
         return host
 
-    def get_asset_sorted_accounts(self, asset):
-        accounts = list(asset.accounts.filter(is_active=True))
+    @staticmethod
+    def sorted_accounts(accounts):
         connectivity_score = {'ok': 2, '-': 1, 'err': 0}
         sort_key = lambda x: (x.privileged, connectivity_score.get(x.connectivity, 0), x.date_updated)
         accounts_sorted = sorted(accounts, key=sort_key, reverse=True)
+        return accounts_sorted
+
+    def get_asset_sorted_accounts(self, asset):
+        accounts = list(asset.accounts.filter(is_active=True))
+        accounts_sorted = self.sorted_accounts(accounts)
         return accounts_sorted
 
     @staticmethod

@@ -94,7 +94,8 @@ class JMSPermedInventory(JMSInventory):
 
     def get_asset_sorted_accounts(self, asset):
         accounts = self.assets_accounts_mapper.get(asset.id, [])
-        return list(accounts)
+        accounts_sorted = self.sorted_accounts(accounts)
+        return list(accounts_sorted)
 
     def get_assets_accounts_mapper(self):
         mapper = defaultdict(set)
