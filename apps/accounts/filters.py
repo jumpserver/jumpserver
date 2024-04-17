@@ -66,6 +66,7 @@ class GatheredAccountFilterSet(BaseFilterSet):
 class ChangeSecretRecordFilterSet(BaseFilterSet):
     asset_name = drf_filters.CharFilter(field_name='asset__name', lookup_expr='icontains')
     account_username = drf_filters.CharFilter(field_name='account__username', lookup_expr='icontains')
+    execution_id = drf_filters.CharFilter(field_name='execution_id', lookup_expr='exact')
 
     class Meta:
         model = ChangeSecretRecord
