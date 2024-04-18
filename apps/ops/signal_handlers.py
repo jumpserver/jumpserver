@@ -130,12 +130,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         return
 
     args, kwargs, __ = body
-    try:
-        args = list(ast.literal_eval(args))
-        kwargs = ast.literal_eval(kwargs)
-    except (ValueError, SyntaxError):
-        args = []
-        kwargs = {}
+    args = list(args)
 
     data = {
         'id': i,
