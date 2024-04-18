@@ -129,7 +129,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         logger.error("Not found task id or name: {}".format(info))
         return
 
-    args, kwargs, _ = body
+    args, kwargs, __ = body
     try:
         args = list(ast.literal_eval(args))
         kwargs = ast.literal_eval(kwargs)
