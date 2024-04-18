@@ -129,8 +129,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         logger.error("Not found task id or name: {}".format(info))
         return
 
-    args = info.get('argsrepr', '()')
-    kwargs = info.get('kwargsrepr', '{}')
+    args, kwargs, _ = body
     try:
         args = list(ast.literal_eval(args))
         kwargs = ast.literal_eval(kwargs)
@@ -143,13 +142,16 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'name': task,
         'state': 'PENDING',
         'is_finished': False,
-        'args': ["too long params" if item is Ellipsis else item for item in args],
+        'args': args,
         'kwargs': kwargs
     }
     request = get_current_request()
     if request and request.user.is_authenticated:
         data['creator'] = request.user
-    CeleryTaskExecution.objects.create(**data)
+    try:
+        CeleryTaskExecution.objects.create(**data)
+    except Exception as e:
+        logger.error(e)
     CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
 
 
