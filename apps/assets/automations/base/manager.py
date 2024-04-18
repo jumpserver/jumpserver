@@ -333,6 +333,7 @@ class BasePlaybookManager:
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
             try:
+                kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
                 self.on_runner_success(runner, cb)
             except Exception as e:
