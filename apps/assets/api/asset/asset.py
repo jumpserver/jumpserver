@@ -32,6 +32,7 @@ __all__ = [
 
 class AssetFilterSet(BaseFilterSet):
     platform = django_filters.CharFilter(method='filter_platform')
+    exclude_platform = django_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
     domain = django_filters.CharFilter(method='filter_domain')
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
@@ -92,7 +93,6 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "address", "comment")
-    ordering = ('name',)
     ordering_fields = ('name', 'address', 'connectivity', 'platform', 'date_updated', 'date_created')
     serializer_classes = (
         ("default", serializers.AssetSerializer),

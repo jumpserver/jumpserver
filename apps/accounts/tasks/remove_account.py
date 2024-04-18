@@ -55,7 +55,7 @@ def clean_historical_accounts():
     history_model = Account.history.model
     history_id_mapper = defaultdict(list)
 
-    ids = history_model.objects.values('id').annotate(count=Count('id', distinct=True)) \
+    ids = history_model.objects.values('id').annotate(count=Count('id')) \
         .filter(count__gte=limit).values_list('id', flat=True)
 
     if not ids:

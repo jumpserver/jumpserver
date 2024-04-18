@@ -12,7 +12,6 @@ from common.permissions import IsValidUser, OnlySuperUser
 from common.utils import get_logger
 from users.models import User
 
-
 logger = get_logger(__file__)
 
 
@@ -24,6 +23,7 @@ class QRUnBindBase(APIView):
             'wecom': {'user_field': 'wecom_id', 'not_bind_err': errors.WeComNotBound},
             'dingtalk': {'user_field': 'dingtalk_id', 'not_bind_err': errors.DingTalkNotBound},
             'feishu': {'user_field': 'feishu_id', 'not_bind_err': errors.FeiShuNotBound},
+            'lark': {'user_field': 'lark_id', 'not_bind_err': errors.LarkNotBound},
             'slack': {'user_field': 'slack_id', 'not_bind_err': errors.SlackNotBound},
         }
         user = self.user

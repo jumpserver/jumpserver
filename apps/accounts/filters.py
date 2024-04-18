@@ -5,7 +5,7 @@ from django_filters import rest_framework as drf_filters
 
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
-from .models import Account, GatheredAccount
+from .models import Account, GatheredAccount, ChangeSecretRecord
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -61,3 +61,13 @@ class GatheredAccountFilterSet(BaseFilterSet):
     class Meta:
         model = GatheredAccount
         fields = ['id', 'username']
+
+
+class ChangeSecretRecordFilterSet(BaseFilterSet):
+    asset_name = drf_filters.CharFilter(field_name='asset__name', lookup_expr='icontains')
+    account_username = drf_filters.CharFilter(field_name='account__username', lookup_expr='icontains')
+    execution_id = drf_filters.CharFilter(field_name='execution_id', lookup_expr='exact')
+
+    class Meta:
+        model = ChangeSecretRecord
+        fields = ['id', 'status', 'asset_id', 'execution']

@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework import serializers
 from xlsxwriter import Workbook
 
-from accounts.const.automation import AccountBackupType
+from accounts.const import AccountBackupType
 from accounts.models.automations.backup_account import AccountBackupAutomation
 from accounts.notifications import AccountBackupExecutionTaskMsg, AccountBackupByObjStorageExecutionTaskMsg
 from accounts.serializers import AccountSecretSerializer

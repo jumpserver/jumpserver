@@ -73,3 +73,7 @@ class Gateway(Host):
     def private_key_path(self):
         account = self.select_account
         return account.private_key_path if account else None
+
+    def get_private_key_path(self, path):
+        account = self.select_account
+        return account.get_private_key_path(path) if account else None

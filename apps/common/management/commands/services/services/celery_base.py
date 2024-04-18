@@ -12,8 +12,8 @@ class CeleryBaseService(BaseService):
     @property
     def cmd(self):
         print('\n- Start Celery as Distributed Task Queue: {}'.format(self.queue.capitalize()))
-        ansible_config_path = os.path.join(settings.APPS_DIR, 'ops', 'ansible', 'ansible.cfg')
-        ansible_modules_path = os.path.join(settings.APPS_DIR, 'ops', 'ansible', 'modules')
+        ansible_config_path = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
+        ansible_modules_path = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'modules')
         os.environ.setdefault('LC_ALL', 'C.UTF-8')
         os.environ.setdefault('PYTHONOPTIMIZE', '1')
         os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')

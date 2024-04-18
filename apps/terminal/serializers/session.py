@@ -37,13 +37,14 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "user", "asset", "user_id", "asset_id", 'account', 'account_id',
             "protocol", 'type', "login_from", "remote_addr",
             "is_success", "is_finished", "has_replay", "has_command",
-            "date_start", "date_end", "comment", "terminal_display", "is_locked",
+            "date_start", "date_end", "duration", "comment", "terminal_display", "is_locked",
             'command_amount', 'error_reason'
         ]
         fields_fk = ["terminal", ]
         fields_custom = ["can_replay", "can_join", "can_terminate"]
         fields = fields_small + fields_fk + fields_custom
         extra_kwargs = {
+            "duration": {'label': _('Duration')},
             "protocol": {'label': _('Protocol')},
             'user_id': {'label': _('User ID')},
             'asset_id': {'label': _('Asset ID')},

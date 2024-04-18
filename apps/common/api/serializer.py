@@ -27,6 +27,8 @@ class SerializerMixin:
             return None
         serializer_classes = dict(serializer_classes)
         view_action = self.request.query_params.get('action') or self.action or 'list'
+        if self.request.query_params.get('format'):
+            view_action = 'retrieve'
         serializer_class = serializer_classes.get(view_action)
 
         if serializer_class is None:

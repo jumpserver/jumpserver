@@ -1,8 +1,8 @@
 from functools import lru_cache
 
 from django.conf import settings
-from django.db.utils import IntegrityError
 from django.contrib.auth import logout as auth_logout
+from django.db.utils import IntegrityError
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -12,8 +12,8 @@ from authentication import errors
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
 from common.utils import get_logger
-from common.utils.django import reverse, get_object_or_none
 from common.utils.common import get_request_ip
+from common.utils.django import reverse, get_object_or_none
 from users.models import User
 from users.signal_handlers import check_only_allow_exist_user_auth
 from .mixins import FlashMessageMixin
@@ -83,7 +83,15 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
         if not self.verify_state():
             return self.get_verify_state_failed_response(redirect_url)
 
-        user_id, other_info = self.client.get_user_id_by_code(code)
+        try:
+            user_id, other_info = self.client.get_user_id_by_code(code)
+        except Exception:
+            response = self.get_failed_response(
+                login_url, title=self.msg_client_err,
+                msg=self.msg_not_found_user_from_client_err
+            )
+            return response
+
         if not user_id:
             # 正常流程不会出这个错误，hack 行为
             err = self.msg_not_found_user_from_client_err

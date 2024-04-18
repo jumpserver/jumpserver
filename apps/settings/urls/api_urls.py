@@ -15,6 +15,7 @@ urlpatterns = [
     path('wecom/testing/', api.WeComTestingAPI.as_view(), name='wecom-testing'),
     path('dingtalk/testing/', api.DingTalkTestingAPI.as_view(), name='dingtalk-testing'),
     path('feishu/testing/', api.FeiShuTestingAPI.as_view(), name='feishu-testing'),
+    path('lark/testing/', api.LarkTestingAPI.as_view(), name='lark-testing'),
     path('slack/testing/', api.SlackTestingAPI.as_view(), name='slack-testing'),
     path('sms/<str:backend>/testing/', api.SMSTestingAPI.as_view(), name='sms-testing'),
     path('sms/backend/', api.SMSBackendAPI.as_view(), name='sms-backend'),

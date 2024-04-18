@@ -20,8 +20,8 @@ __all__ = [
 
 class GatherAccountsAutomationViewSet(OrgBulkModelViewSet):
     model = GatherAccountsAutomation
-    filter_fields = ('name',)
-    search_fields = filter_fields
+    filterset_fields = ('name',)
+    search_fields = filterset_fields
     serializer_class = serializers.GatherAccountAutomationSerializer
 
 

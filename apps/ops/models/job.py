@@ -23,6 +23,7 @@ from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException, UploadFileRunner
+from ops.ansible.receptor import receptor_runner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, RunasPolicies, JobStatus, JobModules
@@ -57,7 +58,7 @@ class JMSPermedInventory(JMSInventory):
         self.module = module
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
 
-    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir):
         if not account:
             host['error'] = _("No account available")
             return host
@@ -66,7 +67,7 @@ class JMSPermedInventory(JMSInventory):
             'mysql': ['mysql'],
             'postgresql': ['postgresql'],
             'sqlserver': ['sqlserver'],
-            'ssh': ['shell', 'python', 'win_shell', 'raw'],
+            'ssh': ['shell', 'python', 'win_shell', 'raw', 'huawei'],
             'winrm': ['win_shell', 'shell'],
         }
 
@@ -89,11 +90,12 @@ class JMSPermedInventory(JMSInventory):
                 }
                 host['jms_asset']['port'] = protocol.port
             return host
-        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
+        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway, path_dir)
 
     def get_asset_sorted_accounts(self, asset):
         accounts = self.assets_accounts_mapper.get(asset.id, [])
-        return list(accounts)
+        accounts_sorted = self.sorted_accounts(accounts)
+        return list(accounts_sorted)
 
     def get_assets_accounts_mapper(self):
         mapper = defaultdict(set)
@@ -254,45 +256,6 @@ class JobExecution(JMSOrgBaseModel):
             return self.job.get_history(self.job_version)
         return self.job
 
-    @property
-    def assent_result_detail(self):
-        if not self.is_finished or self.summary.get('error'):
-            return None
-        result = {
-            "summary": self.summary,
-            "detail": [],
-        }
-        for asset in self.current_job.assets.all():
-            asset_detail = {
-                "name": asset.name,
-                "status": "ok",
-                "tasks": [],
-            }
-            if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
-                asset_detail.update({"status": "excludes"})
-                result["detail"].append(asset_detail)
-                break
-            if self.result["dark"].get(asset.name, None):
-                asset_detail.update({"status": "failed"})
-                for key, task in self.result["dark"][asset.name].items():
-                    task_detail = {"name": key,
-                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                    asset_detail["tasks"].append(task_detail)
-            if self.result["failures"].get(asset.name, None):
-                asset_detail.update({"status": "failed"})
-                for key, task in self.result["failures"][asset.name].items():
-                    task_detail = {"name": key,
-                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                    asset_detail["tasks"].append(task_detail)
-
-            if self.result["ok"].get(asset.name, None):
-                for key, task in self.result["ok"][asset.name].items():
-                    task_detail = {"name": key,
-                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                    asset_detail["tasks"].append(task_detail)
-            result["detail"].append(asset_detail)
-        return result
-
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
@@ -340,6 +303,11 @@ class JobExecution(JMSOrgBaseModel):
                 shell += " chdir={}".format(self.current_job.chdir)
         if self.current_job.module in ['python']:
             shell += " executable={}".format(self.current_job.module)
+
+        if module == JobModules.huawei.value:
+            module = 'ce_command'
+            shell = "commands=\"{}\" ".format(self.current_job.args)
+
         return module, shell
 
     def get_runner(self):
@@ -372,13 +340,15 @@ class JobExecution(JMSOrgBaseModel):
             )
         elif self.current_job.type == Types.playbook:
             runner = PlaybookRunner(
-                self.inventory_path, self.current_job.playbook.entry
+                self.inventory_path,
+                self.current_job.playbook.entry,
+                self.private_dir
             )
         elif self.current_job.type == Types.upload_file:
             job_id = self.current_job.id
             args = json.loads(self.current_job.args)
             dst_path = args.get('dst_path', '/')
-            runner = UploadFileRunner(self.inventory_path, job_id, dst_path)
+            runner = UploadFileRunner(self.inventory_path, self.private_dir, job_id, dst_path)
         else:
             raise Exception("unsupported job type")
         return runner
@@ -555,13 +525,16 @@ class JobExecution(JMSOrgBaseModel):
             ssh_tunnel.local_gateway_clean(runner)
 
     def stop(self):
-        with open(os.path.join(self.private_dir, 'local.pid')) as f:
-            try:
-                pid = f.read()
-                os.kill(int(pid), 9)
-            except Exception as e:
-                print(e)
-        self.set_error('Job stop by "kill -9 {}"'.format(pid))
+        from ops.signal_handlers import job_execution_stop_pub_sub
+        pid_path = os.path.join(self.private_dir, "local.pid")
+        if os.path.exists(pid_path):
+            with open(pid_path) as f:
+                try:
+                    pid = f.read()
+                    job_execution_stop_pub_sub.publish(int(pid))
+                except Exception as e:
+                    print(e)
+        self.set_error('Job stop by "user cancel"')
 
     class Meta:
         verbose_name = _("Job Execution")

@@ -1,21 +1,19 @@
-from django.db.models import Subquery, OuterRef,  Value, F, Q
-from django_filters import rest_framework as filters
+from django.db.models import Value, F, Q
 from django.db.models.functions import Concat
+from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
-
 from tickets.models import (
-    Ticket, TicketStep, ApplyAssetTicket,
+    Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 
 
 class TicketFilter(BaseFilterSet):
     assignees__id = filters.UUIDFilter(method='filter_assignees_id')
-    relevant_app = filters.CharFilter(method='filter_relevant_app')
     relevant_asset = filters.CharFilter(method='filter_relevant_asset')
-    relevant_system_user = filters.CharFilter(method='filter_relevant_system_user')
     relevant_command = filters.CharFilter(method='filter_relevant_command')
+    applicant_username_name = filters.CharFilter(method='filter_applicant_username_name')
 
     class Meta:
         model = Ticket
@@ -24,11 +22,7 @@ class TicketFilter(BaseFilterSet):
         )
 
     def filter_assignees_id(self, queryset, name, value):
-        step_qs = TicketStep.objects.filter(
-            level=OuterRef("approval_step")
-        ).values_list('id', flat=True)
         return queryset.filter(
-            ticket_steps__id__in=Subquery(step_qs),
             ticket_steps__ticket_assignees__assignee__id=value
         )
 
@@ -63,6 +57,12 @@ class TicketFilter(BaseFilterSet):
             apply_run_command__icontains=value
         ).values_list('id', flat=True)
         return queryset.filter(id__in=list(command_ids))
+
+    def filter_applicant_username_name(self, queryset, name, value):
+        return queryset.filter(
+            Q(applicant__name__icontains=value) |
+            Q(applicant__username__icontains=value)
+        )
 
 
 class ApplyAssetTicketFilter(BaseFilterSet):

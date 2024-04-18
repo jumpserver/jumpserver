@@ -27,7 +27,7 @@ class Services(TextChoices):
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
-            cls.beat: services.BeatService
+            cls.beat: services.BeatService,
         }
         return services_map.get(name)
 

@@ -5,6 +5,7 @@ import base64
 import datetime
 import uuid
 from typing import Callable
+from collections import defaultdict
 
 import sshpubkeys
 from django.conf import settings
@@ -27,6 +28,7 @@ from common.utils import (
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from rbac.const import Scope
+from rbac.models import RoleBinding
 from ..signals import (
     post_user_change_password, post_user_leave_org, pre_user_leave_org
 )
@@ -433,6 +435,14 @@ class RoleMixin:
         cache.set(key, data, 60 * 60)
         return data
 
+    @lazyproperty
+    def orgs_roles(self):
+        orgs_roles = defaultdict(set)
+        rbs = RoleBinding.objects_raw.filter(user=self, scope='org').prefetch_related('role', 'org')
+        for rb in rbs:
+            orgs_roles[rb.org_name].add(str(rb.role.display_name))
+        return orgs_roles
+
     def expire_rbac_perms_cache(self):
         key = self.PERM_CACHE_KEY.format(self.id, '*')
         cache.delete_pattern(key)
@@ -749,6 +759,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         wecom = 'wecom', _('WeCom')
         dingtalk = 'dingtalk', _('DingTalk')
         feishu = 'feishu', _('FeiShu')
+        lark = 'lark', _('Lark')
         slack = 'slack', _('Slack')
         custom = 'custom', 'Custom'
 
@@ -781,6 +792,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         ],
         Source.feishu: [
             settings.AUTH_BACKEND_FEISHU
+        ],
+        Source.lark: [
+            settings.AUTH_BACKEND_LARK
         ],
         Source.slack: [
             settings.AUTH_BACKEND_SLACK
@@ -855,6 +869,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
+    lark_id = models.CharField(null=True, default=None, max_length=128, verbose_name='Lark')
     slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
@@ -1006,6 +1021,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
             ('dingtalk_id',),
             ('wecom_id',),
             ('feishu_id',),
+            ('lark_id',),
             ('slack_id',),
         )
         permissions = [

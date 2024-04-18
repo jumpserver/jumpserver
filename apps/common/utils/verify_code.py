@@ -30,7 +30,7 @@ class SendAndVerifyCodeUtil(object):
         self.other_args = kwargs
 
     def gen_and_send_async(self):
-        return send_async.delay(self)
+        return send_async.apply_async(kwargs={"sender": self}, priority=100)
 
     def gen_and_send(self):
         ttl = self.__ttl()

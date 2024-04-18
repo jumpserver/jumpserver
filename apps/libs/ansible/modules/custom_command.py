@@ -63,7 +63,7 @@ name:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ops.ansible.modules_utils.custom_common import (
+from libs.ansible.modules_utils.custom_common import (
     SSHClient, common_argument_spec
 )
 

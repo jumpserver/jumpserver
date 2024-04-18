@@ -1,6 +1,7 @@
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import ChangeSecretRecord
 from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
 from notifications.notifications import UserMessage
 from terminal.models.component.storage import ReplayStorage
@@ -98,3 +99,35 @@ class GatherAccountChangeMsg(UserMessage):
     def gen_test_msg(cls):
         user = User.objects.first()
         return cls(user, {})
+
+
+class ChangeSecretFailedMsg(UserMessage):
+    subject = _('Change secret or push account failed information')
+
+    def __init__(self, name, execution_id, user, asset_account_errors: list):
+        self.name = name
+        self.execution_id = execution_id
+        self.asset_account_errors = asset_account_errors
+        super().__init__(user)
+
+    def get_html_msg(self) -> dict:
+        context = {
+            'name': self.name,
+            'recipient': self.user,
+            'execution_id': self.execution_id,
+            'asset_account_errors': self.asset_account_errors
+        }
+        message = render_to_string('accounts/change_secret_failed_info.html', context)
+
+        return {
+            'subject': str(self.subject),
+            'message': message
+        }
+
+    @classmethod
+    def gen_test_msg(cls):
+        name = 'test'
+        user = User.objects.first()
+        record = ChangeSecretRecord.objects.first()
+        execution_id = str(record.execution_id)
+        return cls(name, execution_id, user, [])

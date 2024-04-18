@@ -21,24 +21,45 @@ from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
 
-FEISHU_STATE_SESSION_KEY = '_feishu_state'
+
+class FeiShuEnableStartView(UserVerifyPasswordView):
+    category = 'feishu'
+
+    def get_success_url(self):
+        referer = self.request.META.get('HTTP_REFERER')
+        redirect_url = self.request.GET.get("redirect_url")
+
+        success_url = reverse(f'authentication:{self.category}-qr-bind')
+
+        success_url += '?' + urlencode({
+            'redirect_url': redirect_url or referer
+        })
+
+        return success_url
 
 
 class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMessageMixin, View):
+    category = 'feishu'
+    error = _('FeiShu Error')
+    error_msg = _('FeiShu is already bound')
+    state_session_key = f'_{category}_state'
+
+    @property
+    def url_object(self):
+        return URL()
+
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
         except APIException as e:
             msg = str(e.detail)
             return self.get_failed_response(
-                '/',
-                _('FeiShu Error'),
-                msg
+                '/', self.error, msg
             )
 
     def verify_state(self):
         state = self.request.GET.get('state')
-        session_state = self.request.session.get(FEISHU_STATE_SESSION_KEY)
+        session_state = self.request.session.get(self.state_session_key)
         if state != session_state:
             return False
         return True
@@ -49,19 +70,18 @@ class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMe
 
     def get_qr_url(self, redirect_uri):
         state = random_string(16)
-        self.request.session[FEISHU_STATE_SESSION_KEY] = state
+        self.request.session[self.state_session_key] = state
 
         params = {
-            'app_id': settings.FEISHU_APP_ID,
+            'app_id': getattr(settings, f'{self.category}_APP_ID'.upper()),
             'state': state,
             'redirect_uri': redirect_uri,
         }
-        url = URL().authen + '?' + urlencode(params)
+        url = self.url_object.authen + '?' + urlencode(params)
         return url
 
     def get_already_bound_response(self, redirect_url):
-        msg = _('FeiShu is already bound')
-        response = self.get_failed_response(redirect_url, msg, msg)
+        response = self.get_failed_response(redirect_url, self.error_msg, self.error_msg)
         return response
 
 
@@ -71,7 +91,7 @@ class FeiShuQRBindView(FeiShuQRMixin, View):
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
 
-        redirect_uri = reverse('authentication:feishu-qr-bind-callback', external=True)
+        redirect_uri = reverse(f'authentication:{self.category}-qr-bind-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
 
         url = self.get_qr_url(redirect_uri)
@@ -81,25 +101,16 @@ class FeiShuQRBindView(FeiShuQRMixin, View):
 class FeiShuQRBindCallbackView(FeiShuQRMixin, BaseBindCallbackView):
     permission_classes = (IsAuthenticated,)
 
-    client_type_path = 'common.sdk.im.feishu.FeiShu'
-    client_auth_params = {'app_id': 'FEISHU_APP_ID', 'app_secret': 'FEISHU_APP_SECRET'}
     auth_type = 'feishu'
     auth_type_label = _('FeiShu')
+    client_type_path = f'common.sdk.im.{auth_type}.FeiShu'
 
-
-class FeiShuEnableStartView(UserVerifyPasswordView):
-
-    def get_success_url(self):
-        referer = self.request.META.get('HTTP_REFERER')
-        redirect_url = self.request.GET.get("redirect_url")
-
-        success_url = reverse('authentication:feishu-qr-bind')
-
-        success_url += '?' + urlencode({
-            'redirect_url': redirect_url or referer
-        })
-
-        return success_url
+    @property
+    def client_auth_params(self):
+        return {
+            'app_id': f'{self.auth_type}_APP_ID'.upper(),
+            'app_secret': f'{self.auth_type}_APP_SECRET'.upper()
+        }
 
 
 class FeiShuQRLoginView(FeiShuQRMixin, View):
@@ -107,7 +118,7 @@ class FeiShuQRLoginView(FeiShuQRMixin, View):
 
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
-        redirect_uri = reverse('authentication:feishu-qr-login-callback', external=True)
+        redirect_uri = reverse(f'authentication:{self.category}-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({
             'redirect_url': redirect_url,
         })
@@ -119,11 +130,19 @@ class FeiShuQRLoginView(FeiShuQRMixin, View):
 class FeiShuQRLoginCallbackView(FeiShuQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    client_type_path = 'common.sdk.im.feishu.FeiShu'
-    client_auth_params = {'app_id': 'FEISHU_APP_ID', 'app_secret': 'FEISHU_APP_SECRET'}
     user_type = 'feishu'
-    auth_backend = 'AUTH_BACKEND_FEISHU'
+    auth_type = user_type
+    client_type_path = f'common.sdk.im.{auth_type}.FeiShu'
 
     msg_client_err = _('FeiShu Error')
     msg_user_not_bound_err = _('FeiShu is not bound')
     msg_not_found_user_from_client_err = _('Failed to get user from FeiShu')
+
+    auth_backend = f'AUTH_BACKEND_{auth_type}'.upper()
+
+    @property
+    def client_auth_params(self):
+        return {
+            'app_id': f'{self.auth_type}_APP_ID'.upper(),
+            'app_secret': f'{self.auth_type}_APP_SECRET'.upper()
+        }

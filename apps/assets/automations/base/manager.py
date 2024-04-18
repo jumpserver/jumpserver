@@ -12,7 +12,7 @@ from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
-from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
+from ops.ansible import JMSInventory, SuperPlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
 
@@ -54,7 +54,7 @@ class SSHTunnelManager:
                 not_valid.append(k)
             else:
                 local_bind_port = server.local_bind_port
-                host['ansible_host'] = jms_asset['address'] = host['login_host'] = '127.0.0.1'
+                host['ansible_host'] = jms_asset['address'] = host['login_host'] = 'jms_celery'
                 host['ansible_port'] = jms_asset['port'] = host['login_port'] = local_bind_port
                 servers.append(server)
 
@@ -269,7 +269,7 @@ class BasePlaybookManager:
                 if not playbook_path:
                     continue
 
-                runer = PlaybookRunner(
+                runer = SuperPlaybookRunner(
                     inventory_path,
                     playbook_path,
                     self.runtime_dir,
@@ -314,7 +314,7 @@ class BasePlaybookManager:
     def delete_runtime_dir(self):
         if settings.DEBUG_DEV:
             return
-        shutil.rmtree(self.runtime_dir)
+        shutil.rmtree(self.runtime_dir, ignore_errors=True)
 
     def run(self, *args, **kwargs):
         print(">>> 任务准备阶段\n")
@@ -333,6 +333,7 @@ class BasePlaybookManager:
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
             try:
+                kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
                 self.on_runner_success(runner, cb)
             except Exception as e:

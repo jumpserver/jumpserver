@@ -13,7 +13,7 @@ def migrate_assets_labels(apps, schema_editor):
     new_labels = []
     old_new_label_map = {}
     for label in old_labels:
-        new_label = new_label_model(name=label.name, value=label.value, org_id=label.org_id)
+        new_label = new_label_model(name=label.name, value=label.value, org_id=label.org_id, id=label.id)
         old_new_label_map[label.id] = new_label
         new_labels.append(new_label)
     new_label_model.objects.bulk_create(new_labels, ignore_conflicts=True)

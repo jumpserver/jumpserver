@@ -29,7 +29,8 @@ def template_sync_related_accounts(template_id, user_id=None):
     name = template.name
     username = template.username
     secret_type = template.secret_type
-    print(f'\033[32m>>> 开始同步模版名称、用户名、密钥类型到相关联的账号 ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
+    print(
+        f'\033[32m>>> 开始同步模板名称、用户名、密钥类型到相关联的账号 ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
     with tmp_to_org(org_id):
         for account in accounts:
             account.name = name
