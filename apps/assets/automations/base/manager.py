@@ -54,7 +54,11 @@ class SSHTunnelManager:
                 not_valid.append(k)
             else:
                 local_bind_port = server.local_bind_port
-                host['ansible_host'] = jms_asset['address'] = host['login_host'] = 'jms_celery'
+                if settings.ANSIBLE_RECEPTOR_ENABLE:
+                    gateway_host = "jms_celery"
+                else:
+                    gateway_host = "127.0.0.1"
+                host['ansible_host'] = jms_asset['address'] = host['login_host'] = gateway_host
                 host['ansible_port'] = jms_asset['port'] = host['login_port'] = local_bind_port
                 servers.append(server)
 
@@ -333,7 +337,8 @@ class BasePlaybookManager:
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
             try:
-                kwargs.update({"clean_workspace": False})
+                if settings.ANSIBLE_RECEPTOR_ENABLE:
+                    kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
                 self.on_runner_success(runner, cb)
             except Exception as e:

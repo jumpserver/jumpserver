@@ -2,7 +2,9 @@ import ast
 import json
 import time
 
+import psutil
 from celery import signals
+from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.db.models.signals import pre_save
@@ -10,6 +12,7 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.utils.functional import LazyObject
+from psutil import NoSuchProcess
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.db.utils import close_old_connections, get_logger
@@ -167,7 +170,26 @@ def subscribe_stop_job_execution(sender, **kwargs):
 
     def on_stop(pid):
         logger.info(f"Stop job execution {pid} start")
-        receptor_ctl.kill_process(pid)
+
+        if settings.ANSIBLE_RECEPTOR_ENABLE:
+            receptor_ctl.kill_process(pid)
+        else:
+            try:
+                current_process = psutil.Process(pid)
+            except NoSuchProcess as e:
+                logger.error(e)
+                return
+
+            children = current_process.children(recursive=True)
+            for child in children:
+                if child.pid == 1:
+                    continue
+                if child.name() != 'ssh':
+                    continue
+                try:
+                    child.kill()
+                except Exception as e:
+                    logger.error(e)
 
     job_execution_stop_pub_sub.subscribe(on_stop)
 
