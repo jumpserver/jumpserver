@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-15 17:54+0800\n"
+"POT-Creation-Date: 2024-04-18 17:25+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -383,7 +383,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:237
+#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:238
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -494,14 +494,14 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:89 ops/models/job.py:238
+#: ops/models/celery.py:89 ops/models/job.py:239
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113 audits/models.py:208
-#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:229
+#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:230
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -630,7 +630,7 @@ msgstr "密码规则"
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:168 labels/models.py:11
 #: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
-#: ops/models/celery.py:80 ops/models/job.py:138 ops/models/playbook.py:28
+#: ops/models/celery.py:80 ops/models/job.py:139 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:33 settings/models.py:181 settings/serializers/msg.py:89
@@ -788,7 +788,7 @@ msgstr "类别"
 #: assets/serializers/asset/common.py:126 assets/serializers/platform.py:120
 #: assets/serializers/platform.py:139 audits/serializers.py:53
 #: audits/serializers.py:170
-#: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:146
+#: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:147
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
@@ -824,7 +824,7 @@ msgstr "已修改"
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
-#: ops/models/job.py:148 ops/serializers/job.py:19
+#: ops/models/job.py:149 ops/serializers/job.py:19
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
 msgstr "资产"
@@ -956,7 +956,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: accounts/serializers/account/virtual.py:19 assets/models/_user.py:27
 #: assets/models/cmd_filter.py:40 assets/models/cmd_filter.py:88
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
-#: ops/models/job.py:154 ops/models/playbook.py:31 rbac/models/role.py:37
+#: ops/models/job.py:155 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:45
 #: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:25
@@ -1679,7 +1679,7 @@ msgstr "SSH公钥"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: audits/models.py:267 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:236 users/models/user.py:1058
+#: ops/models/job.py:237 users/models/user.py:1058
 msgid "Date created"
 msgstr "创建日期"
 
@@ -1848,7 +1848,7 @@ msgstr "忽略证书校验"
 msgid "Proxy"
 msgstr "代理"
 
-#: assets/models/automations/base.py:22 ops/models/job.py:232
+#: assets/models/automations/base.py:22 ops/models/job.py:233
 #: settings/serializers/auth/sms.py:103
 msgid "Parameters"
 msgstr "参数"
@@ -2601,8 +2601,8 @@ msgid "Offline user session"
 msgstr "下线用户会话"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:147
-#: ops/models/job.py:235 ops/models/playbook.py:30
+#: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:148
+#: ops/models/job.py:236 ops/models/playbook.py:30
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "创建者"
@@ -3489,7 +3489,7 @@ msgstr "复制链接"
 msgid "Return"
 msgstr "返回"
 
-#: authentication/templates/authentication/login_wait_confirm.html:116
+#: authentication/templates/authentication/login_wait_confirm.html:117
 msgid "Copy success"
 msgstr "复制成功"
 
@@ -4071,11 +4071,11 @@ msgstr "发布站内消息"
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:280
+#: ops/ansible/inventory.py:285
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:296
+#: ops/ansible/inventory.py:301
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -4191,7 +4191,7 @@ msgstr "VCS"
 msgid "Adhoc"
 msgstr "命令"
 
-#: ops/const.py:39 ops/models/job.py:145
+#: ops/const.py:39 ops/models/job.py:146
 msgid "Playbook"
 msgstr "Playbook"
 
@@ -4280,11 +4280,11 @@ msgstr "需要周期或定期设置"
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:23 ops/models/job.py:142
+#: ops/models/adhoc.py:23 ops/models/job.py:143
 msgid "Module"
 msgstr "模块"
 
-#: ops/models/adhoc.py:24 ops/models/celery.py:81 ops/models/job.py:140
+#: ops/models/adhoc.py:24 ops/models/celery.py:81 ops/models/job.py:141
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "参数"
@@ -4303,12 +4303,12 @@ msgstr "最后执行"
 msgid "Date last run"
 msgstr "最后运行日期"
 
-#: ops/models/base.py:51 ops/models/job.py:233
+#: ops/models/base.py:51 ops/models/job.py:234
 #: xpack/plugins/cloud/models.py:198
 msgid "Result"
 msgstr "结果"
 
-#: ops/models/base.py:52 ops/models/job.py:234
+#: ops/models/base.py:52 ops/models/job.py:235
 msgid "Summary"
 msgstr "汇总"
 
@@ -4341,43 +4341,43 @@ msgstr "发布日期"
 msgid "Celery Task Execution"
 msgstr "Celery 任务执行"
 
-#: ops/models/job.py:143
+#: ops/models/job.py:144
 msgid "Chdir"
 msgstr "运行目录"
 
-#: ops/models/job.py:144
+#: ops/models/job.py:145
 msgid "Timeout (Seconds)"
 msgstr "超时时间 (秒)"
 
-#: ops/models/job.py:149
+#: ops/models/job.py:150
 msgid "Use Parameter Define"
 msgstr "使用参数定义"
 
-#: ops/models/job.py:150
+#: ops/models/job.py:151
 msgid "Parameters define"
 msgstr "参数定义"
 
-#: ops/models/job.py:151
+#: ops/models/job.py:152
 msgid "Runas"
 msgstr "运行用户"
 
-#: ops/models/job.py:153
+#: ops/models/job.py:154
 msgid "Runas policy"
 msgstr "用户策略"
 
-#: ops/models/job.py:217
+#: ops/models/job.py:218
 msgid "Job"
 msgstr "作业"
 
-#: ops/models/job.py:240
+#: ops/models/job.py:241
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:242
+#: ops/models/job.py:243
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:539
+#: ops/models/job.py:540
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -6232,10 +6232,6 @@ msgstr "错误 (未知): {}"
 #: settings/utils/ldap.py:644
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
-
-#: settings/utils/ldap.py:655
-msgid "Please test the connection first"
-msgstr "请先测试连接"
 
 #: settings/utils/ldap.py:677
 msgid "Authentication failed (configuration incorrect): {}"
@@ -9226,3 +9222,6 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Please test the connection first"
+#~ msgstr "请先测试连接"
