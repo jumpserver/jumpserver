@@ -87,6 +87,8 @@ class OrgResourceStatisticsRefreshUtil:
         if not cache_field_name:
             return
         org = getattr(instance, 'org', None)
+        if not org:
+            return
         cache_field_name = tuple(cache_field_name)
         cls.refresh_org_fields.delay(org_fields=((org, cache_field_name),))
 
