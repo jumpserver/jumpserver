@@ -58,6 +58,7 @@ class AnsibleReceptorRunner(WorkPostRunCleaner):
     def __init__(self, **kwargs):
         self.runner_params = kwargs
         self.unit_id = None
+        self.clean_workspace = kwargs.pop("clean_workspace", True)
 
     def write_unit_id(self):
         if not self.unit_id:
@@ -69,6 +70,8 @@ class AnsibleReceptorRunner(WorkPostRunCleaner):
 
     @property
     def clean_dir(self):
+        if not self.clean_workspace:
+            return None
         return self.runner_params.get("private_data_dir", None)
 
     @cleanup_post_run
@@ -78,7 +81,7 @@ class AnsibleReceptorRunner(WorkPostRunCleaner):
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             transmitter_future = executor.submit(self.transmit, input)
             result = receptor_ctl.submit_work(payload=output.makefile('rb'),
-                                                node='primary', worktype='ansible-runner')
+                                              node='primary', worktype='ansible-runner')
             input.close()
             output.close()
 
