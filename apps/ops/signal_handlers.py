@@ -1,4 +1,5 @@
 import ast
+import json
 import time
 
 from celery import signals
@@ -9,6 +10,7 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.utils.functional import LazyObject
+from rest_framework.utils.encoders import JSONEncoder
 
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
@@ -130,10 +132,11 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         return
 
     args, kwargs, __ = body
+
     try:
-        args = list(ast.literal_eval(args))
-        kwargs = ast.literal_eval(kwargs)
-    except (ValueError, SyntaxError):
+        args = list(args)
+        kwargs = json.loads(json.dumps(kwargs, cls=JSONEncoder))
+    except Exception as e:
         args = []
         kwargs = {}
 
