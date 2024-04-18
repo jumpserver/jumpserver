@@ -134,9 +134,10 @@ def task_sent_handler(headers=None, body=None, **kwargs):
     args, kwargs, __ = body
 
     try:
-        args = list(args)
+        args = json.loads(json.dumps(list(args), cls=JSONEncoder))
         kwargs = json.loads(json.dumps(kwargs, cls=JSONEncoder))
     except Exception as e:
+        logger.error('Parse task args or kwargs error (Need handle): {}'.format(e))
         args = []
         kwargs = {}
 
@@ -151,11 +152,13 @@ def task_sent_handler(headers=None, body=None, **kwargs):
     request = get_current_request()
     if request and request.user.is_authenticated:
         data['creator'] = request.user
-    try:
-        CeleryTaskExecution.objects.create(**data)
-    except Exception as e:
-        logger.error(e)
-    CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
+
+    with transaction.atomic():
+        try:
+            CeleryTaskExecution.objects.create(**data)
+        except Exception as e:
+            logger.error('Create celery task execution error: {}'.format(e))
+        CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
 
 
 @receiver(django_ready)
