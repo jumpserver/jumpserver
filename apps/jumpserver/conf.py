@@ -618,7 +618,8 @@ class Config(dict):
 
         # Ansible Receptor
         'ANSIBLE_RECEPTOR_ENABLE': True,
-        'ANSIBLE_RECEPTOR_SOCK_PATH': '{}/data/share/control.sock'.format(PROJECT_DIR)
+        'ANSIBLE_RECEPTOR_SOCK_PATH': '{}/data/share/control.sock'.format(PROJECT_DIR),
+        'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery'
     }
 
     old_config_map = {

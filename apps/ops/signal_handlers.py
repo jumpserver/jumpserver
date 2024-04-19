@@ -16,9 +16,8 @@ from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
 from jumpserver.utils import get_current_request
-from libs.process.ssh import kill_ssh_children
 from orgs.utils import get_current_org_id, set_current_org
-from .ansible.receptor.receptor_runner import receptor_ctl
+from .ansible import kill_ansible_process
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
 
@@ -168,11 +167,7 @@ def subscribe_stop_job_execution(sender, **kwargs):
 
     def on_stop(pid):
         logger.info(f"Stop job execution {pid} start")
-
-        if settings.ANSIBLE_RECEPTOR_ENABLE:
-            receptor_ctl.kill_process(pid)
-        else:
-            kill_ssh_children(pid)
+        kill_ansible_process(pid)
 
     job_execution_stop_pub_sub.subscribe(on_stop)
 

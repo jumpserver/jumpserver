@@ -13,6 +13,7 @@ from sshtunnel import SSHTunnelForwarder
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, SuperPlaybookRunner, DefaultCallback
+from ops.ansible.runner import get_gateway_proxy_host
 
 logger = get_logger(__name__)
 
@@ -54,11 +55,8 @@ class SSHTunnelManager:
                 not_valid.append(k)
             else:
                 local_bind_port = server.local_bind_port
-                if settings.ANSIBLE_RECEPTOR_ENABLE:
-                    gateway_host = "jms_celery"
-                else:
-                    gateway_host = "127.0.0.1"
-                host['ansible_host'] = jms_asset['address'] = host['login_host'] = gateway_host
+
+                host['ansible_host'] = jms_asset['address'] = host['login_host'] = get_gateway_proxy_host()
                 host['ansible_port'] = jms_asset['port'] = host['login_port'] = local_bind_port
                 servers.append(server)
 
@@ -337,8 +335,7 @@ class BasePlaybookManager:
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
             try:
-                if settings.ANSIBLE_RECEPTOR_ENABLE:
-                    kwargs.update({"clean_workspace": False})
+                kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
                 self.on_runner_success(runner, cb)
             except Exception as e:

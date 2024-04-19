@@ -3,13 +3,14 @@ import os
 import shutil
 import uuid
 
-import ansible_runner
 from django.conf import settings
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject
 
+from libs.process.ssh import kill_process_ssh_children
 from .callback import DefaultCallback
-from .receptor import receptor_runner
+from .receptor.receptorctl import receptor_ctl
+from .runners import receptor_runner, native_runner
 from ..utils import get_ansible_log_verbosity
 
 logger = logging.getLogger(__file__)
@@ -20,17 +21,32 @@ class CommandInBlackListException(Exception):
 
 
 class AnsibleWrappedRunner(LazyObject):
+
+    def __init__(self):
+        super().__init__()
+        self.gateway_proxy_host = "127.0.0.1"
+        self.kill_precess_func = kill_process_ssh_children
+
     def _setup(self):
         self._wrapped = self.get_runner()
 
-    @staticmethod
-    def get_runner():
+    def get_runner(self):
         if settings.ANSIBLE_RECEPTOR_ENABLE and settings.ANSIBLE_RECEPTOR_SOCK_PATH:
+            self.gateway_proxy_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST
+            self.kill_precess_func = receptor_ctl.kill_process
             return receptor_runner
-        return ansible_runner
+        return native_runner
 
 
 runner = AnsibleWrappedRunner()
+
+
+def get_gateway_proxy_host():
+    return runner.gateway_proxy_host
+
+
+def kill_ansible_process(pid):
+    return runner.kill_precess_func(pid)
 
 
 class AdHocRunner:
