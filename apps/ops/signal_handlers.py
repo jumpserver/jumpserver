@@ -1,8 +1,6 @@
-import ast
 import json
 import time
 
-import psutil
 from celery import signals
 from django.conf import settings
 from django.core.cache import cache
@@ -12,13 +10,13 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.utils.functional import LazyObject
-from psutil import NoSuchProcess
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
 from jumpserver.utils import get_current_request
+from libs.process.ssh import kill_ssh_children
 from orgs.utils import get_current_org_id, set_current_org
 from .ansible.receptor.receptor_runner import receptor_ctl
 from .celery import app
@@ -174,22 +172,7 @@ def subscribe_stop_job_execution(sender, **kwargs):
         if settings.ANSIBLE_RECEPTOR_ENABLE:
             receptor_ctl.kill_process(pid)
         else:
-            try:
-                current_process = psutil.Process(pid)
-            except NoSuchProcess as e:
-                logger.error(e)
-                return
-
-            children = current_process.children(recursive=True)
-            for child in children:
-                if child.pid == 1:
-                    continue
-                if child.name() != 'ssh':
-                    continue
-                try:
-                    child.kill()
-                except Exception as e:
-                    logger.error(e)
+            kill_ssh_children(pid)
 
     job_execution_stop_pub_sub.subscribe(on_stop)
 

@@ -9,8 +9,7 @@ import os
 import signal
 import tempfile
 
-import psutil
-from psutil import NoSuchProcess
+from libs.process.ssh import kill_ssh_children
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 
@@ -141,28 +140,11 @@ def kill_progress_tree(pid=None):
         try:
             pid_input = input()
             pid = int(pid_input)
+            logger.info("progress {} will be kill".format(pid))
+            kill_ssh_children(pid)
         except Exception as e:
             logger.error(e)
             return
-
-    logger.info("progress {} will be kill".format(pid))
-
-    try:
-        current_process = psutil.Process(pid)
-    except NoSuchProcess as e:
-        logger.error(e)
-        return
-
-    children = current_process.children(recursive=True)
-    for child in children:
-        if child.pid == 1:
-            continue
-        if child.name() != 'ssh':
-            continue
-        try:
-            child.kill()
-        except Exception as e:
-            logger.error(e)
 
 
 if __name__ == '__main__':
