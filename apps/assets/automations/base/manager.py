@@ -12,7 +12,7 @@ from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
-from ops.ansible import JMSInventory, SuperPlaybookRunner, DefaultCallback
+from ops.ansible import JMSInventory, SuperPlaybookRunner, DefaultCallback, runner_manager
 
 logger = get_logger(__name__)
 
@@ -54,7 +54,9 @@ class SSHTunnelManager:
                 not_valid.append(k)
             else:
                 local_bind_port = server.local_bind_port
-                host['ansible_host'] = jms_asset['address'] = host['login_host'] = 'jms_celery'
+
+                host['ansible_host'] = jms_asset['address'] = host[
+                    'login_host'] = runner_manager.get_gateway_proxy_host()
                 host['ansible_port'] = jms_asset['port'] = host['login_port'] = local_bind_port
                 servers.append(server)
 

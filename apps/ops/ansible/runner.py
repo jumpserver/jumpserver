@@ -3,34 +3,52 @@ import os
 import shutil
 import uuid
 
-import ansible_runner
 from django.conf import settings
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject
 
+from libs.process.ssh import stop_ansible_ssh_process
 from .callback import DefaultCallback
-from .receptor import receptor_runner
+from .receptor.receptorctl import receptor_ctl
+from .runners import receptor_runner, native_runner
 from ..utils import get_ansible_log_verbosity
 
 logger = logging.getLogger(__file__)
 
 
+class RunnerManager:
+    def __init__(self):
+        self.runner = native_runner
+        self.gateway_proxy_host = '127.0.0.1'
+        self.kill_precess_func = stop_ansible_ssh_process
+        self.setup_settings()
+
+    def setup_settings(self):
+        if settings.ANSIBLE_RECEPTOR_ENABLE:
+            self.runner = receptor_runner
+            self.kill_precess_func = receptor_ctl.kill_process
+            self.gateway_proxy_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST
+
+    def get_gateway_proxy_host(self):
+        return self.gateway_proxy_host
+
+    def kill_process(self, pid):
+        return self.kill_precess_func(pid)
+
+    def run(self, **kwargs):
+        return self.runner.run(**kwargs)
+
+
+class LazyRunnerManager(LazyObject):
+    def _setup(self):
+        self._wrapped = RunnerManager()
+
+
+runner_manager = LazyRunnerManager()
+
+
 class CommandInBlackListException(Exception):
     pass
-
-
-class AnsibleWrappedRunner(LazyObject):
-    def _setup(self):
-        self._wrapped = self.get_runner()
-
-    @staticmethod
-    def get_runner():
-        if settings.ANSIBLE_RECEPTOR_ENABLE and settings.ANSIBLE_RECEPTOR_SOCK_PATH:
-            return receptor_runner
-        return ansible_runner
-
-
-runner = AnsibleWrappedRunner()
 
 
 class AdHocRunner:
@@ -69,7 +87,7 @@ class AdHocRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        runner.run(
+        runner_manager.run(
             timeout=self.timeout if self.timeout > 0 else None,
             extravars=self.extra_vars,
             host_pattern=self.pattern,
@@ -112,7 +130,7 @@ class PlaybookRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        runner.run(
+        runner_manager.run(
             private_data_dir=self.project_dir,
             inventory=self.inventory,
             playbook=self.playbook,
@@ -144,7 +162,7 @@ class UploadFileRunner:
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
-        runner.run(
+        runner_manager.run(
             private_data_dir=self.project_dir,
             host_pattern="*",
             inventory=self.inventory,
