@@ -9,7 +9,7 @@ import os
 import signal
 import tempfile
 
-from libs.process.ssh import stop_ansible_ssh_process
+from apps.libs.process.ssh import stop_ansible_ssh_process
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 
