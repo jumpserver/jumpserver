@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject
 
-from libs.process.ssh import stop_ansible_ssh_process
+from apps.libs.process.ssh import stop_ansible_ssh_process
 from .callback import DefaultCallback
 from .receptor.receptorctl import receptor_ctl
 from .runners import receptor_runner, native_runner
