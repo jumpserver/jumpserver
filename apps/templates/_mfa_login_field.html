@@ -118,11 +118,18 @@
             })
         }
 
+        function onError (responseText, responseJson, status) {
+            setTimeout(function () {
+                toastr.error(responseJson.detail);
+            });
+        };
+
         requestApi({
             url: url,
             method: "POST",
             body: JSON.stringify(data),
             success: onSuccess,
+            error: onError,
             flash_message: false
         })
     }
