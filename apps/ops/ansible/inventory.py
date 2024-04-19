@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
+from assets.const.category import Category
 
 __all__ = ['JMSInventory']
 
@@ -124,7 +125,7 @@ class JMSInventory:
         else:
             host.update(self.make_account_ansible_vars(account, path_dir))
 
-        if platform.name == 'Huawei':
+        if "huawei" in platform.name.lower() and platform.category == Category.DEVICE.value:
             host['ansible_connection'] = 'network_cli'
             host['ansible_network_os'] = 'asa'
 
