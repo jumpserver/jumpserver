@@ -10,8 +10,8 @@ def should_kill(process):
     return process.pid != 1 and process.name() == 'ssh'
 
 
-def kill_process_ssh_children(pid):
-    """Kill all SSH child processes of a given PID."""
+def stop_ansible_ssh_process(pid):
+    """stop all ssh child processes of the given ansible process pid."""
     try:
         process = psutil.Process(pid)
     except NoSuchProcess as e:

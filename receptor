@@ -9,7 +9,7 @@ import os
 import signal
 import tempfile
 
-from libs.process.ssh import kill_ssh_children
+from libs.process.ssh import stop_ansible_ssh_process
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 
@@ -141,7 +141,7 @@ def kill_progress_tree(pid=None):
             pid_input = input()
             pid = int(pid_input)
             logger.info("progress {} will be kill".format(pid))
-            kill_ssh_children(pid)
+            stop_ansible_ssh_process(pid)
         except Exception as e:
             logger.error(e)
             return

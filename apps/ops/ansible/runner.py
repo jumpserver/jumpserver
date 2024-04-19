@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject
 
-from libs.process.ssh import kill_process_ssh_children
+from libs.process.ssh import stop_ansible_ssh_process
 from .callback import DefaultCallback
 from .receptor.receptorctl import receptor_ctl
 from .runners import receptor_runner, native_runner
@@ -25,7 +25,7 @@ class AnsibleWrappedRunner(LazyObject):
     def __init__(self):
         super().__init__()
         self.gateway_proxy_host = "127.0.0.1"
-        self.kill_precess_func = kill_process_ssh_children
+        self.kill_precess_func = stop_ansible_ssh_process
 
     def _setup(self):
         self._wrapped = self.get_runner()
