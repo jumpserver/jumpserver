@@ -20,20 +20,20 @@ class RunnerManager:
     def __init__(self):
         self.runner = native_runner
         self.gateway_proxy_host = '127.0.0.1'
-        self.kill_precess_func = stop_ansible_ssh_process
+        self.kill_process_func = stop_ansible_ssh_process
         self.setup_settings()
 
     def setup_settings(self):
         if settings.ANSIBLE_RECEPTOR_ENABLE:
             self.runner = receptor_runner
-            self.kill_precess_func = receptor_ctl.kill_process
+            self.kill_process_func = receptor_ctl.kill_process
             self.gateway_proxy_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST
 
     def get_gateway_proxy_host(self):
         return self.gateway_proxy_host
 
     def kill_process(self, pid):
-        return self.kill_precess_func(pid)
+        return self.kill_process_func(pid)
 
     def run(self, **kwargs):
         return self.runner.run(**kwargs)
