@@ -39,7 +39,8 @@ class AnsibleReceptorRunner(BaseRunner):
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             transmitter_future = executor.submit(self.transmit, input)
             result = receptor_ctl.submit_work(payload=output.makefile('rb'),
-                                              node='primary', worktype='ansible-runners')
+                                                  node='primary', worktype='ansible-runner')
+
             input.close()
             output.close()
 

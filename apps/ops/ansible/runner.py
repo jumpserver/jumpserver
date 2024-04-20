@@ -6,10 +6,9 @@ from django.conf import settings
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject
 
-from ops.ansible.runners.interface import RunnerInterface
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
-from ops.ansible.runners.native import AnsibleNativeRunner
+from .runners import AnsibleReceptorRunner, AnsibleNativeRunner, RunnerInterface
 from ..utils import get_ansible_log_verbosity
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner', 'interface']
@@ -22,7 +21,7 @@ class _LazyRunnerInterface(LazyObject):
 
     @staticmethod
     def make_interface():
-        runner_type = settings.ANSIBLE_RECEPTOR_ENABLE \
+        runner_type = AnsibleReceptorRunner \
             if settings.ANSIBLE_RECEPTOR_ENABLE else AnsibleNativeRunner
         gateway_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST \
             if settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST else '127.0.0.1'

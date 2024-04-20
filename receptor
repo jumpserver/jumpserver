@@ -11,7 +11,7 @@ import tempfile
 
 from apps.libs.process.ssh import kill_ansible_ssh_process
 
-ANSIBLE_RUNNER_COMMAND = "ansible-runners"
+ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
