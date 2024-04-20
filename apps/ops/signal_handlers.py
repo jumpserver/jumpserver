@@ -16,9 +16,9 @@ from common.signals import django_ready
 from common.utils.connection import RedisPubSub
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
-from .ansible import runner_manager
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
+from .ansible.runner import interface
 
 logger = get_logger(__name__)
 
@@ -166,7 +166,7 @@ def subscribe_stop_job_execution(sender, **kwargs):
 
     def on_stop(pid):
         logger.info(f"Stop job execution {pid} start")
-        runner_manager.kill_process(pid)
+        interface.kill_process(pid)
 
     job_execution_stop_pub_sub.subscribe(on_stop)
 

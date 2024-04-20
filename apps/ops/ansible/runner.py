@@ -1,4 +1,3 @@
-import logging
 import os
 import shutil
 import uuid
@@ -7,55 +6,39 @@ from django.conf import settings
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject
 
-from libs.process.ssh import stop_ansible_ssh_process
+from ops.ansible.runners.interface import RunnerInterface
 from .callback import DefaultCallback
-from .receptor.receptorctl import receptor_ctl
-from .runners import receptor_runner, native_runner
+from .exception import CommandInBlackListException
+from ops.ansible.runners.native import AnsibleNativeRunner
 from ..utils import get_ansible_log_verbosity
 
-logger = logging.getLogger(__file__)
+__all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner', 'interface']
 
 
-class RunnerManager:
-    def __init__(self):
-        self.runner = native_runner
-        self.gateway_proxy_host = '127.0.0.1'
-        self.kill_process_func = stop_ansible_ssh_process
-        self.setup_settings()
+class _LazyRunnerInterface(LazyObject):
 
-    def setup_settings(self):
-        if settings.ANSIBLE_RECEPTOR_ENABLE:
-            self.runner = receptor_runner
-            self.kill_process_func = receptor_ctl.kill_process
-            self.gateway_proxy_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST
-
-    def get_gateway_proxy_host(self):
-        return self.gateway_proxy_host
-
-    def kill_process(self, pid):
-        return self.kill_process_func(pid)
-
-    def run(self, **kwargs):
-        return self.runner.run(**kwargs)
-
-
-class LazyRunnerManager(LazyObject):
     def _setup(self):
-        self._wrapped = RunnerManager()
+        self._wrapped = self.make_interface()
+
+    @staticmethod
+    def make_interface():
+        runner_type = settings.ANSIBLE_RECEPTOR_ENABLE \
+            if settings.ANSIBLE_RECEPTOR_ENABLE else AnsibleNativeRunner
+        gateway_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST \
+            if settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST else '127.0.0.1'
+        return RunnerInterface(runner_type=runner_type, gateway_proxy_host=gateway_host)
 
 
-runner_manager = LazyRunnerManager()
-
-
-class CommandInBlackListException(Exception):
-    pass
+interface = _LazyRunnerInterface()
 
 
 class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
 
-    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars={},
+    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
                  dry_run=False, timeout=-1):
+        if extra_vars is None:
+            extra_vars = {}
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.pattern = pattern
@@ -87,7 +70,7 @@ class AdHocRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        runner_manager.run(
+        interface.run(
             timeout=self.timeout if self.timeout > 0 else None,
             extravars=self.extra_vars,
             host_pattern=self.pattern,
@@ -130,7 +113,7 @@ class PlaybookRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        runner_manager.run(
+        interface.run(
             private_data_dir=self.project_dir,
             inventory=self.inventory,
             playbook=self.playbook,
@@ -162,7 +145,7 @@ class UploadFileRunner:
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
-        runner_manager.run(
+        interface.run(
             private_data_dir=self.project_dir,
             host_pattern="*",
             inventory=self.inventory,
@@ -178,11 +161,3 @@ class UploadFileRunner:
         except OSError as e:
             print(f"del upload tmp dir {self.src_paths} failed! {e}")
         return self.cb
-
-
-class CommandRunner(AdHocRunner):
-    def __init__(self, inventory, command, pattern='*', project_dir='/tmp/'):
-        super().__init__(inventory, 'shell', command, pattern, project_dir)
-
-    def run(self, verbosity=0, **kwargs):
-        return super().run(verbosity, **kwargs)

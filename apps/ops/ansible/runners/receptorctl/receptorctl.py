@@ -36,6 +36,3 @@ class ReceptorCtl:
             if not buf:
                 break
             print(buf.decode('utf8'))
-
-
-receptor_ctl = ReceptorCtl()

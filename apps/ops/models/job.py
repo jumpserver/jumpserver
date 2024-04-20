@@ -22,7 +22,10 @@ from acls.models import CommandFilterACL
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
-from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException, UploadFileRunner
+from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, UploadFileRunner
+
+"""stop all ssh child processes of the given ansible process pid."""
+from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, RunasPolicies, JobStatus, JobModules

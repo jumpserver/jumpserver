@@ -2,5 +2,6 @@
 
 from .callback import *
 from .inventory import *
-from .runner import *
+from .runners import *
 from .exceptions import *
+from .runner import *

@@ -6,13 +6,12 @@ import socket
 import ansible_runner
 
 from ops.ansible.cleaner import cleanup_post_run
-from ops.ansible.receptor.receptorctl import receptor_ctl
+from ops.ansible.runners.receptorctl.receptorctl import ReceptorCtl
 from ops.ansible.runners.base import BaseRunner
 
+__all__ = ['AnsibleReceptorRunner']
 
-def run(**kwargs):
-    _runner = AnsibleReceptorRunner(**kwargs)
-    return _runner.run()
+receptor_ctl = ReceptorCtl()
 
 
 class AnsibleReceptorRunner(BaseRunner):
@@ -20,6 +19,10 @@ class AnsibleReceptorRunner(BaseRunner):
         super().__init__(**kwargs)
         self.unit_id = None
         self.stdout_queue = None
+
+    @classmethod
+    def kill_precess(cls, pid):
+        return receptor_ctl.kill_process(pid)
 
     def write_unit_id(self):
         if not self.unit_id:
@@ -36,7 +39,7 @@ class AnsibleReceptorRunner(BaseRunner):
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             transmitter_future = executor.submit(self.transmit, input)
             result = receptor_ctl.submit_work(payload=output.makefile('rb'),
-                                              node='primary', worktype='ansible-runner')
+                                              node='primary', worktype='ansible-runners')
             input.close()
             output.close()
 

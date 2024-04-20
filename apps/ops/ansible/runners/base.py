@@ -7,6 +7,10 @@ class BaseRunner(WorkPostRunCleaner):
         self.runner_params = kwargs
         self.clean_workspace = kwargs.pop("clean_workspace", True)
 
+    @classmethod
+    def kill_precess(cls, pid):
+        return NotImplementedError
+
     @property
     def clean_dir(self):
         if not self.clean_workspace:
