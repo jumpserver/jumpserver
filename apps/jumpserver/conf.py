@@ -617,8 +617,10 @@ class Config(dict):
         'TICKET_APPLY_ASSET_SCOPE': 'all',
 
         # Ansible Receptor
-        'ANSIBLE_RECEPTOR_ENABLE': True,
-        'ANSIBLE_RECEPTOR_SOCK_PATH': '{}/data/share/control.sock'.format(PROJECT_DIR)
+        'ANSIBLE_RECEPTOR_ENABLED': True,
+        'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
+        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'jms_receptor:7521'
+
     }
 
     old_config_map = {
