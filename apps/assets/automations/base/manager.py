@@ -12,7 +12,8 @@ from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
-from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner, interface
+from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
+from ops.ansible.interface import interface
 
 logger = get_logger(__name__)
 

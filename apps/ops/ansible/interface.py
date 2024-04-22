@@ -1,10 +1,10 @@
-__all__ = ['RunnerInterface','interface']
-
 from django.conf import settings
 from django.utils.functional import LazyObject
 
 from ops.ansible import AnsibleReceptorRunner, AnsibleNativeRunner
 from ops.ansible.runners.base import BaseRunner
+
+__all__ = ['interface']
 
 
 class _LazyRunnerInterface(LazyObject):

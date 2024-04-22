@@ -4,7 +4,7 @@ import uuid
 
 from django.conf import settings
 from django.utils._os import safe_join
-from . import interface
+from .interface import interface
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
 from ..utils import get_ansible_log_verbosity
