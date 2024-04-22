@@ -51,6 +51,7 @@ class ReceptorService:
             'allowruntimeparams=true'
         ]
 
+
     @staticmethod
     def before_start():
         os.makedirs(os.path.join(DEFAULT_SHARE_DIR), exist_ok=True)
