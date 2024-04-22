@@ -186,15 +186,13 @@ class DatesLoginMetricMixin:
         return self.get_date_metrics(Session.objects, 'date_start', 'id')
 
     def get_dates_login_times_assets(self):
-        assets = self.sessions_queryset.values("asset") \
-            .annotate(total=Count("asset")) \
+        assets = self.sessions_queryset.values("asset").annotate(total=Count("asset")) \
             .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
             .order_by("-total")
         return list(assets[:10])
 
     def get_dates_login_times_users(self):
-        users = self.sessions_queryset.values("user_id") \
-            .annotate(total=Count("user_id")) \
+        users = self.sessions_queryset.values("user_id").annotate(total=Count("user_id")) \
             .annotate(user=Max('user')) \
             .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
             .order_by("-total")
