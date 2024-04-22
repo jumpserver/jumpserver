@@ -1,43 +1,24 @@
-import logging
 import os
 import shutil
 import uuid
 
-import ansible_runner
 from django.conf import settings
 from django.utils._os import safe_join
-from django.utils.functional import LazyObject
-
+from .interface import interface
 from .callback import DefaultCallback
-from .receptor import receptor_runner
+from .exception import CommandInBlackListException
 from ..utils import get_ansible_log_verbosity
 
-logger = logging.getLogger(__file__)
-
-
-class CommandInBlackListException(Exception):
-    pass
-
-
-class AnsibleWrappedRunner(LazyObject):
-    def _setup(self):
-        self._wrapped = self.get_runner()
-
-    @staticmethod
-    def get_runner():
-        if settings.ANSIBLE_RECEPTOR_ENABLE and settings.ANSIBLE_RECEPTOR_SOCK_PATH:
-            return receptor_runner
-        return ansible_runner
-
-
-runner = AnsibleWrappedRunner()
+__all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
 
 class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
 
-    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars={},
+    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
                  dry_run=False, timeout=-1):
+        if extra_vars is None:
+            extra_vars = {}
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.pattern = pattern
@@ -69,7 +50,7 @@ class AdHocRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        runner.run(
+        interface.run(
             timeout=self.timeout if self.timeout > 0 else None,
             extravars=self.extra_vars,
             host_pattern=self.pattern,
@@ -112,7 +93,7 @@ class PlaybookRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        runner.run(
+        interface.run(
             private_data_dir=self.project_dir,
             inventory=self.inventory,
             playbook=self.playbook,
@@ -144,7 +125,7 @@ class UploadFileRunner:
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
-        runner.run(
+        interface.run(
             private_data_dir=self.project_dir,
             host_pattern="*",
             inventory=self.inventory,
@@ -160,11 +141,3 @@ class UploadFileRunner:
         except OSError as e:
             print(f"del upload tmp dir {self.src_paths} failed! {e}")
         return self.cb
-
-
-class CommandRunner(AdHocRunner):
-    def __init__(self, inventory, command, pattern='*', project_dir='/tmp/'):
-        super().__init__(inventory, 'shell', command, pattern, project_dir)
-
-    def run(self, verbosity=0, **kwargs):
-        return super().run(verbosity, **kwargs)

@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from common.exceptions import UnexpectError
+from common.exceptions import JMSException, UnexpectError
 from common.utils import get_logger
 from users.models.user import User
 from .. import errors
@@ -61,6 +61,8 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
 
         try:
             mfa_backend.send_challenge()
+        except JMSException:
+            raise
         except Exception as e:
             raise UnexpectError(str(e))
 

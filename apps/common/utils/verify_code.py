@@ -30,14 +30,14 @@ class SendAndVerifyCodeUtil(object):
         self.other_args = kwargs
 
     def gen_and_send_async(self):
+        ttl = self.__ttl()
+        if ttl > 0:
+            logger.warning('Send sms too frequently, delay {}'.format(ttl))
+            raise CodeSendTooFrequently(ttl)
+
         return send_async.apply_async(kwargs={"sender": self}, priority=100)
 
     def gen_and_send(self):
-        ttl = self.__ttl()
-        if ttl > 0:
-            logger.error('Send sms too frequently, delay {}'.format(ttl))
-            raise CodeSendTooFrequently(ttl)
-
         try:
             if not self.code:
                 self.code = self.__generate()

@@ -4,6 +4,20 @@ from functools import wraps
 
 from settings.api import settings
 
+__all__ = ["WorkPostRunCleaner", "cleanup_post_run"]
+
+
+class WorkPostRunCleaner:
+    @property
+    def clean_dir(self):
+        raise NotImplemented
+
+    def clean_post_run(self):
+        if settings.DEBUG_DEV:
+            return
+        if self.clean_dir and os.path.exists(self.clean_dir):
+            shutil.rmtree(self.clean_dir)
+
 
 def cleanup_post_run(func):
     def get_instance(*args):
@@ -22,15 +36,3 @@ def cleanup_post_run(func):
             instance.clean_post_run()
 
     return wrapper
-
-
-class WorkPostRunCleaner:
-    @property
-    def clean_dir(self):
-        raise NotImplemented
-
-    def clean_post_run(self):
-        if settings.DEBUG_DEV:
-            return
-        if self.clean_dir and os.path.exists(self.clean_dir):
-            shutil.rmtree(self.clean_dir)

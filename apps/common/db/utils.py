@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from django.db import connections
+from django.db import connections, transaction
 from django.utils.encoding import force_str
 
 from common.utils import get_logger, signer, crypto
@@ -56,6 +56,17 @@ def safe_db_connection():
     close_old_connections()
     yield
     close_old_connections()
+
+
+@contextmanager
+def open_db_connection(alias='default'):
+    connection = transaction.get_connection(alias)
+    try:
+        connection.connect()
+        with transaction.atomic():
+            yield connection
+    finally:
+        connection.close()
 
 
 class Encryptor:

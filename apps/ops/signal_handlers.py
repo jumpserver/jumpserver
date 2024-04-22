@@ -1,4 +1,3 @@
-import ast
 import json
 import time
 
@@ -17,9 +16,9 @@ from common.signals import django_ready
 from common.utils.connection import RedisPubSub
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
-from .ansible.receptor.receptor_runner import receptor_ctl
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
+from .ansible.runner import interface
 
 logger = get_logger(__name__)
 
@@ -134,9 +133,10 @@ def task_sent_handler(headers=None, body=None, **kwargs):
     args, kwargs, __ = body
 
     try:
-        args = list(args)
+        args = json.loads(json.dumps(list(args), cls=JSONEncoder))
         kwargs = json.loads(json.dumps(kwargs, cls=JSONEncoder))
     except Exception as e:
+        logger.error('Parse task args or kwargs error (Need handle): {}'.format(e))
         args = []
         kwargs = {}
 
@@ -151,11 +151,13 @@ def task_sent_handler(headers=None, body=None, **kwargs):
     request = get_current_request()
     if request and request.user.is_authenticated:
         data['creator'] = request.user
-    try:
-        CeleryTaskExecution.objects.create(**data)
-    except Exception as e:
-        logger.error(e)
-    CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
+
+    with transaction.atomic():
+        try:
+            CeleryTaskExecution.objects.create(**data)
+        except Exception as e:
+            logger.error('Create celery task execution error: {}'.format(e))
+        CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
 
 
 @receiver(django_ready)
@@ -164,7 +166,7 @@ def subscribe_stop_job_execution(sender, **kwargs):
 
     def on_stop(pid):
         logger.info(f"Stop job execution {pid} start")
-        receptor_ctl.kill_process(pid)
+        interface.kill_process(pid)
 
     job_execution_stop_pub_sub.subscribe(on_stop)
 

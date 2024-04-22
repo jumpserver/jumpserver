@@ -9,8 +9,7 @@ import os
 import signal
 import tempfile
 
-import psutil
-from psutil import NoSuchProcess
+from apps.libs.process.ssh import kill_ansible_ssh_process
 
 ANSIBLE_RUNNER_COMMAND = "ansible-runner"
 
@@ -21,6 +20,8 @@ TEMP_DIR = os.path.join(PROJECT_DIR, "tmp")
 DEFAULT_SHARE_DIR = os.path.join(PROJECT_DIR, "data", "share")
 DEFAULT_ANSIBLE_MODULES_DIR = os.path.join(APPS_DIR, "libs", "ansible", "modules")
 DEFAULT_CONTROL_SOCK_PATH = os.path.join(DEFAULT_SHARE_DIR, "control.sock")
+
+DEFAULT_TCP_LISTEN_ADDRESS = "0.0.0.0:7521"
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +35,10 @@ class ReceptorService:
             'receptor',
             '--local-only',
             '--node', 'id=primary',
+            '--log-level', 'level=Error',
             '--control-service',
             'service=control',
-            'filename={}'.format(DEFAULT_CONTROL_SOCK_PATH),
+            'tcplisten={}'.format(DEFAULT_TCP_LISTEN_ADDRESS),
             '--work-command',
             'worktype={}'.format(ANSIBLE_RUNNER_COMMAND),
             'command={}'.format(ANSIBLE_RUNNER_COMMAND),
@@ -48,6 +50,7 @@ class ReceptorService:
             "params={} kill".format(os.path.join(PROJECT_DIR, "receptor")),
             'allowruntimeparams=true'
         ]
+
 
     @staticmethod
     def before_start():
@@ -141,28 +144,11 @@ def kill_progress_tree(pid=None):
         try:
             pid_input = input()
             pid = int(pid_input)
+            logger.info("progress {} will be kill".format(pid))
+            kill_ansible_ssh_process(pid)
         except Exception as e:
             logger.error(e)
             return
-
-    logger.info("progress {} will be kill".format(pid))
-
-    try:
-        current_process = psutil.Process(pid)
-    except NoSuchProcess as e:
-        logger.error(e)
-        return
-
-    children = current_process.children(recursive=True)
-    for child in children:
-        if child.pid == 1:
-            continue
-        if child.name() != 'ssh':
-            continue
-        try:
-            child.kill()
-        except Exception as e:
-            logger.error(e)
 
 
 if __name__ == '__main__':

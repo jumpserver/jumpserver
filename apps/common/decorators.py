@@ -12,6 +12,7 @@ from functools import wraps
 from django.db import transaction
 
 from .utils import logger
+from .db.utils import open_db_connection
 
 
 def on_transaction_commit(func):
@@ -146,7 +147,9 @@ ignore_err_exceptions = (
 def _run_func_with_org(key, org, func, *args, **kwargs):
     from orgs.utils import set_current_org
     try:
-        with transaction.atomic():
+        with open_db_connection() as conn:
+            # 保证执行时使用的是新的 connection 数据库连接
+            # 避免出现 MySQL server has gone away 的情况
             set_current_org(org)
             func(*args, **kwargs)
     except Exception as e:
