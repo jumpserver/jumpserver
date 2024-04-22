@@ -125,7 +125,7 @@ class JMSInventory:
         else:
             host.update(self.make_account_ansible_vars(account, path_dir))
 
-        if "huawei" in platform.name.lower() and platform.category == Category.DEVICE.value:
+        if platform.is_huawei():
             host['ansible_connection'] = 'network_cli'
             host['ansible_network_os'] = 'asa'
 
