@@ -120,7 +120,7 @@
 
         function onError (responseText, responseJson, status) {
             setTimeout(function () {
-                toastr.error(responseJson.detail);
+                toastr.error(responseJson.detail || responseJson.error);
             });
         };
 
