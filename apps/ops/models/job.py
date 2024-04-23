@@ -334,6 +334,7 @@ class JobExecution(JMSOrgBaseModel):
 
             runner = AdHocRunner(
                 self.inventory_path,
+                self.job.module,
                 module,
                 timeout=self.current_job.timeout,
                 module_args=args,
