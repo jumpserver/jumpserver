@@ -67,6 +67,7 @@ class JMSPermedInventory(JMSInventory):
 
         protocol_supported_modules_mapping = {
             'mysql': ['mysql'],
+            'mariadb': ['mysql'],
             'postgresql': ['postgresql'],
             'sqlserver': ['sqlserver'],
             'ssh': ['shell', 'python', 'win_shell', 'raw', 'huawei'],
@@ -77,7 +78,7 @@ class JMSPermedInventory(JMSInventory):
             host['error'] = "Module {} is not suitable for this asset".format(self.module)
             return host
 
-        if protocol.name in ('mysql', 'postgresql', 'sqlserver'):
+        if protocol.name in ('mariadb', 'mysql', 'postgresql', 'sqlserver'):
             host['login_host'] = asset.address
             host['login_port'] = protocol.port
             host['login_user'] = account.username
