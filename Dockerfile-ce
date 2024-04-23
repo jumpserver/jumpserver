@@ -87,6 +87,7 @@ ARG TOOLS="                           \
         default-mysql-client          \
         iputils-ping                  \
         locales                       \
+        netcat-openbsd                \
         nmap                          \
         openssh-client                \
         patch                         \
