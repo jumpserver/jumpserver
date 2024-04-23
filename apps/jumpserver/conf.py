@@ -619,7 +619,7 @@ class Config(dict):
         # Ansible Receptor
         'ANSIBLE_RECEPTOR_ENABLED': True,
         'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
-        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'jms_receptor:7521'
+        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521'
 
     }
 
