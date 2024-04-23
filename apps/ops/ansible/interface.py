@@ -15,7 +15,7 @@ class _LazyRunnerInterface(LazyObject):
     @staticmethod
     def make_interface():
         runner_type = AnsibleReceptorRunner \
-            if settings.ANSIBLE_RECEPTOR_ENABLED else AnsibleNativeRunner
+            if settings.RECEPTOR_ENABLED else AnsibleNativeRunner
         gateway_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST \
             if settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST else '127.0.0.1'
         return RunnerInterface(runner_type=runner_type, gateway_proxy_host=gateway_host)

@@ -617,7 +617,7 @@ class Config(dict):
         'TICKET_APPLY_ASSET_SCOPE': 'all',
 
         # Ansible Receptor
-        'ANSIBLE_RECEPTOR_ENABLED': True,
+        'RECEPTOR_ENABLED': True,
         'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
         'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521'
 
