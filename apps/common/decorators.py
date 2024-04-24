@@ -204,6 +204,8 @@ def merge_delay_run(ttl=5, key=None):
 
     def delay(func, *args, **kwargs):
         from orgs.utils import get_current_org
+        # 每次调用 delay 时可以指定本次调用的 ttl
+        current_ttl = kwargs.pop('ttl', ttl)
         suffix_key_func = key if key else default_suffix_key
         org = get_current_org()
         func_name = f'{func.__module__}_{func.__name__}'
@@ -220,7 +222,7 @@ def merge_delay_run(ttl=5, key=None):
             else:
                 cache_kwargs[k] = cache_kwargs[k].union(v)
         _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
-        run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
+        run_debouncer_func(cache_key, org, current_ttl, func, *args, **cache_kwargs)
 
     def apply(func, sync=False, *args, **kwargs):
         if sync:
