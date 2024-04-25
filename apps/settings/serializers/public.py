@@ -41,6 +41,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     AUTH_DINGTALK = serializers.BooleanField()
     AUTH_FEISHU = serializers.BooleanField()
     AUTH_LARK = serializers.BooleanField()
+    AUTH_SLACK = serializers.BooleanField()
     AUTH_TEMP_TOKEN = serializers.BooleanField()
 
     TERMINAL_RAZOR_ENABLED = serializers.BooleanField()
