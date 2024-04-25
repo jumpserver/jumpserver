@@ -3,6 +3,7 @@
 
 from functools import partial
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -181,7 +182,11 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
             "is_otp_secret_key_bound": {"label": _("Is OTP bound")},
             'mfa_level': {'label': _("MFA level")},
         }
-    
+        if not settings.XPACK_LICENSE_IS_VALID:
+            # 社区版去掉企业微信、钉钉、飞书、Lark、Slack
+            fields = [f for f in fields if f not in ["wecom_id", "dingtalk_id",
+                                                     "feishu_id", "lark_id", "slack_id"]]
+
     def get_fields(self):
         fields = super().get_fields()
         self.pop_fields_if_need(fields)
@@ -192,7 +197,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         if not current_org.is_root():
             for f in self.Meta.fields_only_root_org:
                 fields.pop(f, None)
-    
+
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")
         if self.instance is None and password_strategy != PasswordStrategy.custom:
