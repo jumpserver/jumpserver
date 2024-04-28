@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.conf import settings
 from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 
@@ -25,6 +24,3 @@ urlpatterns = [
     path('super-tickets/<uuid:pk>/status/', api.SuperTicketStatusAPI.as_view(), name='super-ticket-status'),
 ]
 urlpatterns += router.urls
-
-if not settings.TICKETS_ENABLED:
-    urlpatterns = []

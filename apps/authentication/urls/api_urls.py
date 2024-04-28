@@ -1,6 +1,5 @@
 # coding:utf-8
 #
-from django.conf import settings
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
@@ -32,13 +31,7 @@ urlpatterns = [
     path('mfa/send-code/', api.MFASendCodeApi.as_view(), name='mfa-send-code'),
     path('password/reset-code/', api.UserResetPasswordSendCodeApi.as_view(), name='reset-password-code'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
-]
-
-ticket_urlpatterns = [
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
 ]
-
-if settings.TICKETS_ENABLED:
-    urlpatterns.extend(ticket_urlpatterns)
 
 urlpatterns += router.urls + passkey_urlpatterns
