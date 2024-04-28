@@ -108,7 +108,7 @@ class ChatAISettingSerializer(serializers.Serializer):
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
-    # TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Ticket"))
+    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Ticket"))
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
         label=_("Default period")
