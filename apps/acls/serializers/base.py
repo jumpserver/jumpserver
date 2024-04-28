@@ -68,7 +68,7 @@ class ActionAclSerializer(serializers.Serializer):
         field_action = self.fields.get("action")
         if not field_action:
             return
-        if not settings.XPACK_LICENSE_IS_VALID:
+        if not (settings.XPACK_LICENSE_IS_VALID and settings.TICKETS_ENABLED):
             field_action._choices.pop(ActionChoices.review, None)
         for choice in self.Meta.action_choices_exclude:
             field_action._choices.pop(choice, None)
