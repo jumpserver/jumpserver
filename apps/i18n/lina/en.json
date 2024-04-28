@@ -913,6 +913,7 @@
     "Resume": "Recovery",
     "ResumeTaskSendSuccessMsg": "Recovery Task Issued, Please Refresh Later",
     "Retry": "Retry",
+    "ConnectAssets": "Connect",
     "Reviewer": "Approvers",
     "Role": "Role",
     "RoleCreate": "Create a role",

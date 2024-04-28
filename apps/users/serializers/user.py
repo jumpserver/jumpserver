@@ -181,16 +181,6 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
             'mfa_level': {'label': _("MFA level")},
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_source_options()
-
-    def set_source_options(self):
-        field = self.fields.get("source")
-        if not field:
-            return
-        field.choices = User.get_source_choices()
-
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")
         if self.instance is None and password_strategy != PasswordStrategy.custom:
