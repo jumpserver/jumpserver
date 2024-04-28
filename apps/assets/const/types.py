@@ -174,7 +174,6 @@ class AllTypes(ChoicesMixin):
         if settings.XPACK_ENABLED:
             types.extend([
                 (Category.CLOUD, CloudTypes),
-                # (Category.GPT, GPTTypes),
                 (Category.CUSTOM, CustomTypes),
             ])
         return types
@@ -184,8 +183,8 @@ class AllTypes(ChoicesMixin):
         choices = []
 
         for name, tp in dict(cls.category_types()).items():
-            if name == Category.CUSTOM and exclude_custom:
-                continue
+            # if name == Category.CUSTOM and exclude_custom:
+            #     continue
             choices.extend(tp.get_types())
         return choices
 
