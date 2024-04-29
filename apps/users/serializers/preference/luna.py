@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from users.const import (
-    RDPResolution, RDPSmartSize, KeyboardLayout,
+    RDPResolution, RDPSmartSize, KeyboardLayout, ConnectDefaultOpenMethod,
     RDPClientOption, AppletConnectionMethod, RDPColorQuality,
 )
 
@@ -24,6 +24,10 @@ class MultipleChoiceField(serializers.MultipleChoiceField):
 class BasicSerializer(serializers.Serializer):
     is_async_asset_tree = serializers.BooleanField(
         required=False, default=True, label=_('Async loading of asset tree')
+    )
+    connect_default_open_method = serializers.ChoiceField(
+        choices=ConnectDefaultOpenMethod.choices, default=ConnectDefaultOpenMethod.CURRENT,
+        label=_('Connect default open method'), required=False
     )
 
 
@@ -46,7 +50,7 @@ class GraphicsSerializer(serializers.Serializer):
     )
     rdp_smart_size = serializers.ChoiceField(
         RDPSmartSize.choices, default=RDPSmartSize.DISABLE,
-        required=False, label=_('Rdp smart size'),
+        required=False, label=_('RDP smart size'),
         help_text=_('Determines whether the client computer should scale the content on the remote '
                     'computer to fit the window size of the client computer when the window is resized.')
     )

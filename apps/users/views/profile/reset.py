@@ -146,10 +146,12 @@ class UserForgotPasswordView(FormView):
         form_type = form.cleaned_data['form_type']
         target = form.cleaned_data[form_type]
         code = form.cleaned_data['code']
+        country_code = form.cleaned_data.get('country_code', '')
 
         query_key = form_type
         if form_type == 'sms':
             query_key = 'phone'
+            target = '{}{}'.format(country_code, target)
 
         try:
             self.safe_verify_code(token, target, form_type, code)

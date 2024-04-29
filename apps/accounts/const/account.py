@@ -15,6 +15,7 @@ class AliasAccount(TextChoices):
     INPUT = '@INPUT', _('Manual input')
     USER = '@USER', _('Dynamic user')
     ANON = '@ANON', _('Anonymous account')
+    SPEC = '@SPEC', _('Specified account')
 
     @classmethod
     def virtual_choices(cls):

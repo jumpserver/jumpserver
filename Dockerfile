@@ -39,6 +39,23 @@ ARG BUILD_DEPENDENCIES="              \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
+        freetds-dev                   \
+        libffi-dev                    \
+        libjpeg-dev                   \
+        libkrb5-dev                   \
+        libldap2-dev                  \
+        libpq-dev                     \
+        libsasl2-dev                  \
+        libssl-dev                    \
+        libxml2-dev                   \
+        libxmlsec1-dev                \
+        libxmlsec1-openssl            \
+        freerdp2-dev                  \
+        libaio-dev"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
         libldap2-dev                  \
@@ -77,6 +94,7 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
+        libjpeg-dev                   \
         libldap2-dev                  \
         libpq-dev                     \
         libx11-dev                    \
@@ -85,6 +103,11 @@ ARG DEPENDENCIES="                    \
 ARG TOOLS="                           \
         ca-certificates               \
         default-libmysqlclient-dev    \
+        default-mysql-client          \
+        iputils-ping                  \
+        locales                       \
+        netcat-openbsd                \
+        nmap                          \
         openssh-client                \
         sshpass"
 
@@ -103,9 +126,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc
 
+ARG RECEPTOR_VERSION=v1.4.5
+RUN set -ex \
+    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION/v/}_linux_${TARGETARCH}.tar.gz \
+    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
+    && chown root:root /usr/local/bin/receptor \
+    && chmod 755 /usr/local/bin/receptor \
+    && rm -f /opt/receptor.tar.gz
+
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /usr/local/bin /usr/local/bin
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
+COPY --from=stage-1 /opt/jumpserver/release/jumpserver/apps/libs/ansible/ansible.cfg /etc/ansible/
 
 WORKDIR /opt/jumpserver
 

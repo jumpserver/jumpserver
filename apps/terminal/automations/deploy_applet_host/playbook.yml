@@ -15,6 +15,7 @@
     RDS_MaxDisconnectionTime: 60000
     RDS_RemoteAppLogoffTimeLimit: 0
     TinkerInstaller: Tinker_Installer.exe
+    INSTALL_APPLETS: true
 
   tasks:
     - block:
@@ -265,6 +266,7 @@
             script: |
               tinkerd install all
           register: sync_remote_applets
+          when: INSTALL_APPLETS
 
       rescue:
         - debug:

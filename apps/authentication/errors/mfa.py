@@ -33,6 +33,11 @@ class FeiShuNotBound(JMSException):
     default_detail = _('FeiShu is not bound')
 
 
+class LarkNotBound(JMSException):
+    default_code = 'lark_not_bound'
+    default_detail = _('Lark is not bound')
+
+
 class SlackNotBound(JMSException):
     default_code = 'slack_not_bound'
     default_detail = _('Slack is not bound')

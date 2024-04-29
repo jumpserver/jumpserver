@@ -9,6 +9,28 @@
 <script src="{% static "js/jumpserver.js" %}?v=9"></script>
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 <script src="{% static 'js/plugins/select2/i18n/zh-CN.js' %}"></script>
+<script src="{% static 'js/plugins/markdown-it.min.js' %}"></script>
+
+{% if INTERFACE.footer_content %}
+    <style>
+        .markdown-footer a {
+            color: inherit;
+        }
+
+        .markdown-footer {
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            @media (min-width: 768px) {
+                top: 97%;
+            }
+        }
+    </style>
+    <div id="markdown-output" class="markdown-footer"></div>
+{% endif %}
+
+
+<script type="text/markdown"> {{ INTERFACE.footer_content }} </script>
 <script>
     activeNav("{{ FORCE_SCRIPT_NAME }}");
     $(document).ready(function () {
@@ -18,34 +40,15 @@
             $('.tooltip').tooltip();
         }
         $.fn.select2.defaults.set('language', getUserLang())
+        const md = window.markdownit();
+        const markdownContent = document.querySelector('script[type="text/markdown"]').textContent;
+        const markdownRef = document.getElementById('markdown-output')
+        if (markdownRef) {
+            markdownRef.innerHTML = md.render(markdownContent);
+        }
     });
 </script>
-{% if INTERFACE.beian_text %}
-    <style>
-        .footer_beian a {
-            color: #737373;
-        }
 
-        .footer_beian {
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            @media (min-width: 768px) {
-                top: 97%;
-            }
-        }
 
-        .footer_beian img {
-            width: 16px;
-            height: 16px;
-            object-fit: contain;
-        }
-    </style>
-    <div class="footer_beian">
-        <img alt="beian" src="{% static "img/beian.png" %}"/>
-        <a target="_blank" rel="noopener noreferrer"
-           href={{ INTERFACE.beian_link }}>
-            {{ INTERFACE.beian_text }}
-        </a>
-    </div>
-{% endif %}
+
+

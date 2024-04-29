@@ -6,6 +6,7 @@ from typing import Callable
 
 from django.db import models
 from django.db.models.signals import m2m_changed
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
@@ -19,7 +20,7 @@ from .serializer import SerializerMixin
 
 __all__ = [
     'CommonApiMixin', 'PaginatedResponseMixin', 'RelationMixin',
-    'ExtraFilterFieldsMixin',
+    'ExtraFilterFieldsMixin'
 ]
 
 logger = get_logger(__name__)
@@ -89,6 +90,7 @@ class RelationMixin:
 
 class QuerySetMixin:
     action: str
+    request: Request
     get_serializer_class: Callable
     get_queryset: Callable
 
@@ -98,7 +100,17 @@ class QuerySetMixin:
             return queryset
         if self.action == 'metadata':
             queryset = queryset.none()
+        queryset = self.setup_eager_loading(queryset)
         return queryset
+
+    # Todo: 未来考虑自定义 pagination
+    def setup_eager_loading(self, queryset):
+        if self.request.query_params.get('format') not in ['csv', 'xlsx']:
+            return queryset
+        serializer_class = self.get_serializer_class()
+        if not serializer_class or not hasattr(serializer_class, 'setup_eager_loading'):
+            return queryset
+        return serializer_class.setup_eager_loading(queryset)
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
@@ -186,10 +198,7 @@ class OrderingFielderFieldsMixin:
             model = self.queryset.model
         else:
             queryset = self.get_queryset()
-            if isinstance(queryset, list):
-                model = None
-            else:
-                model = queryset.model
+            model = None if isinstance(queryset, list) else queryset.model
 
         if not model:
             return []

@@ -1,9 +1,11 @@
 import json
 import os
 
+from celery.result import AsyncResult
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
@@ -14,13 +16,15 @@ from rest_framework.views import APIView
 from assets.models import Asset
 from common.const.http import POST
 from common.permissions import IsValidUser
+from ops.celery import app
 from ops.const import Types
 from ops.models import Job, JobExecution
-from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer
+from ops.serializers.job import (
+    JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
+)
 
 __all__ = [
-    'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
-    'JobAssetDetail', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
+    'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
 ]
 
 from ops.tasks import run_ops_job_execution
@@ -28,6 +32,9 @@ from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
+from assets.const import Protocol
+from perms.const import ActionChoices
+from perms.utils.asset_perm import PermAssetDetailUtil
 from perms.models import PermNode
 from perms.utils import UserPermAssetUtil
 from jumpserver.settings import get_file_md5
@@ -40,16 +47,17 @@ def set_task_to_serializer_data(serializer, task_id):
 
 
 def merge_nodes_and_assets(nodes, assets, user):
-    if nodes:
-        perm_util = UserPermAssetUtil(user=user)
-        for node_id in nodes:
-            if node_id == PermNode.FAVORITE_NODE_KEY:
-                node_assets = perm_util.get_favorite_assets()
-            elif node_id == PermNode.UNGROUPED_NODE_KEY:
-                node_assets = perm_util.get_ungroup_assets()
-            else:
-                node, node_assets = perm_util.get_node_all_assets(node_id)
-            assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
+    if not nodes:
+        return assets
+    perm_util = UserPermAssetUtil(user=user)
+    for node_id in nodes:
+        if node_id == PermNode.FAVORITE_NODE_KEY:
+            node_assets = perm_util.get_favorite_assets()
+        elif node_id == PermNode.UNGROUPED_NODE_KEY:
+            node_assets = perm_util.get_ungroup_assets()
+        else:
+            _, node_assets = perm_util.get_node_all_assets(node_id)
+        assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
     return assets
 
 
@@ -59,16 +67,37 @@ class JobViewSet(OrgBulkModelViewSet):
     model = Job
 
     def check_permissions(self, request):
+        # job: upload_file
+        if self.action == 'upload' or request.data.get('type') == Types.upload_file:
+            return super().check_permissions(request)
+        # job: adhoc, playbook
         if not settings.SECURITY_COMMAND_EXECUTION:
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
 
-    def allow_bulk_destroy(self, qs, filtered):
-        return True
+    def check_upload_permission(self, assets, account_name):
+        protocols_required = {Protocol.ssh, Protocol.sftp, Protocol.winrm}
+        error_msg_missing_protocol = _(
+            "Asset ({asset}) must have at least one of the following protocols added: SSH, SFTP, or WinRM")
+        error_msg_auth_missing_protocol = _("Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol")
+        error_msg_auth_missing_upload = _("Asset ({asset}) authorization lacks upload permissions")
+        for asset in assets:
+            protocols = asset.protocols.values_list("name", flat=True)
+            if not set(protocols).intersection(protocols_required):
+                self.permission_denied(self.request, error_msg_missing_protocol.format(asset=asset.name))
+            util = PermAssetDetailUtil(self.request.user, asset)
+            if not util.check_perm_protocols(protocols_required):
+                self.permission_denied(self.request, error_msg_auth_missing_protocol.format(asset=asset.name))
+            if not util.check_perm_actions(account_name, [ActionChoices.upload.value]):
+                self.permission_denied(self.request, error_msg_auth_missing_upload.format(asset=asset.name))
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(creator=self.request.user).exclude(type=Types.upload_file)
+        queryset = queryset \
+            .filter(creator=self.request.user) \
+            .exclude(type=Types.upload_file)
+
+        # Job 列表不显示 adhoc, retrieve 要取状态
         if self.action != 'retrieve':
             return queryset.filter(instant=False)
         return queryset
@@ -76,10 +105,14 @@ class JobViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
         node_ids = serializer.validated_data.pop('nodes', [])
-        assets = serializer.validated_data.__getitem__('assets')
+        assets = serializer.validated_data.get('assets')
         assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
-        serializer.validated_data.__setitem__('assets', assets)
+        serializer.validated_data['assets'] = assets
+        if serializer.validated_data.get('type') == Types.upload_file:
+            account_name = serializer.validated_data.get('runas')
+            self.check_upload_permission(assets, account_name)
         instance = serializer.save()
+
         if instance.instant or run_after_save:
             self.run_job(instance, serializer)
 
@@ -96,7 +129,10 @@ class JobViewSet(OrgBulkModelViewSet):
 
         set_task_to_serializer_data(serializer, execution.id)
         transaction.on_commit(
-            lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
+            lambda: run_ops_job_execution.apply_async(
+                (str(execution.id),), task_id=str(execution.id)
+            )
+        )
 
     @staticmethod
     def get_duplicates_files(files):
@@ -117,8 +153,8 @@ class JobViewSet(OrgBulkModelViewSet):
                 exceeds_limit_files.append(file)
         return exceeds_limit_files
 
-    @action(methods=[POST], detail=False, serializer_class=FileSerializer, permission_classes=[IsValidUser, ],
-            url_path='upload')
+    @action(methods=[POST], detail=False, serializer_class=FileSerializer,
+            permission_classes=[IsValidUser, ], url_path='upload')
     def upload(self, request, *args, **kwargs):
         uploaded_files = request.FILES.getlist('files')
         serializer = self.get_serializer(data=request.data)
@@ -139,10 +175,10 @@ class JobViewSet(OrgBulkModelViewSet):
                 status=400)
 
         job_id = request.data.get('job_id', '')
-        job = get_object_or_404(Job, pk=job_id)
+        job = get_object_or_404(Job, pk=job_id, creator=request.user)
         job_args = json.loads(job.args)
         src_path_info = []
-        upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file', job_id)
+        upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file', job_id)
         for uploaded_file in uploaded_files:
             filename = uploaded_file.name
             saved_path = safe_join(upload_file_dir, f'{filename}')
@@ -187,16 +223,38 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         queryset = queryset.filter(creator=self.request.user)
         return queryset
 
+    @action(methods=[POST], detail=False, serializer_class=JobTaskStopSerializer, permission_classes=[IsValidUser, ],
+            url_path='stop')
+    def stop(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': serializer.errors}, status=400)
+        task_id = serializer.validated_data['task_id']
+        try:
+            instance = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
+        except Http404:
+            return Response(
+                {'error': _('The task is being created and cannot be interrupted. Please try again later.')},
+                status=400
+            )
+        try:
+            task = AsyncResult(task_id, app=app)
+            inspect = app.control.inspect()
 
-class JobAssetDetail(APIView):
-    rbac_perms = {
-        'get': ['ops.view_jobexecution'],
-    }
+            for worker in inspect.registered().keys():
+                if not worker.startswith('ansible'):
+                    continue
+                if task_id not in [at['id'] for at in inspect.active().get(worker, [])]:
+                    # 在队列中未执行使用revoke执行
+                    task.revoke(terminate=True)
+                    instance.set_error('Job stop by "revoke task {}"'.format(task_id))
+                    return Response({'task_id': task_id}, status=200)
+        except Exception as e:
+            instance.set_error(str(e))
+            return Response({'error': f'Error while stopping the task {task_id}: {e}'}, status=400)
 
-    def get(self, request, **kwargs):
-        execution_id = request.query_params.get('execution_id', '')
-        execution = get_object_or_404(JobExecution, id=execution_id)
-        return Response(data=execution.assent_result_detail)
+        instance.stop()
+        return Response({'task_id': task_id}, status=200)
 
 
 class JobExecutionTaskDetail(APIView):
@@ -209,7 +267,7 @@ class JobExecutionTaskDetail(APIView):
         task_id = str(kwargs.get('task_id'))
 
         with tmp_to_org(org):
-            execution = get_object_or_404(JobExecution, task_id=task_id)
+            execution = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
 
         return Response(data={
             'status': execution.status,
@@ -246,6 +304,6 @@ class UsernameHintsAPI(APIView):
                            .filter(username__icontains=query) \
                            .filter(asset__in=assets) \
                            .values('username') \
-                           .annotate(total=Count('username', distinct=True)) \
-                           .order_by('total', '-username')[:10]
+                           .annotate(total=Count('username')) \
+                           .order_by('-total', '-username')[:10]
         return Response(data=top_accounts)

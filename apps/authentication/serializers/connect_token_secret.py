@@ -161,6 +161,7 @@ class ConnectTokenAppletOptionSerializer(serializers.Serializer):
     host = _ConnectionTokenAssetSerializer(read_only=True)
     account = _ConnectionTokenAccountSerializer(read_only=True)
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
+    platform = _ConnectionTokenPlatformSerializer(read_only=True)
     remote_app_option = serializers.JSONField(read_only=True)
 
 

@@ -6,6 +6,7 @@ type:
   - windows
 method: verify_account
 protocol: rdp
+priority: 1
 
 i18n:
   Windows rdp account verify:

@@ -4,7 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import (
-    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
+    AutomationTypes, SecretType, SecretStrategy,
+    SSHKeyStrategy, ChangeSecretRecordStatusChoice
 )
 from accounts.models import (
     Account, ChangeSecretAutomation,
@@ -21,6 +22,7 @@ logger = get_logger(__file__)
 __all__ = [
     'ChangeSecretAutomationSerializer',
     'ChangeSecretRecordSerializer',
+    'ChangeSecretRecordViewSecretSerializer',
     'ChangeSecretRecordBackUpSerializer',
     'ChangeSecretUpdateAssetSerializer',
     'ChangeSecretUpdateNodeSerializer',
@@ -104,7 +106,10 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
 class ChangeSecretRecordSerializer(serializers.ModelSerializer):
     is_success = serializers.SerializerMethodField(label=_('Is success'))
     asset = ObjectRelatedField(queryset=Asset.objects, label=_('Asset'))
-    account = ObjectRelatedField(queryset=Account.objects, label=_('Account'))
+    account = ObjectRelatedField(
+        queryset=Account.objects, label=_('Account'),
+        attrs=("id", "name", "username")
+    )
     execution = ObjectRelatedField(
         queryset=AutomationExecution.objects, label=_('Automation task execution')
     )
@@ -119,7 +124,16 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_success(obj):
-        return obj.status == 'success'
+        return obj.status == ChangeSecretRecordStatusChoice.success.value
+
+
+class ChangeSecretRecordViewSecretSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChangeSecretRecord
+        fields = [
+            'id', 'old_secret', 'new_secret',
+        ]
+        read_only_fields = fields
 
 
 class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
@@ -145,7 +159,7 @@ class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_success(obj):
-        if obj.status == 'success':
+        if obj.status == ChangeSecretRecordStatusChoice.success.value:
             return _("Success")
         return _("Failed")
 

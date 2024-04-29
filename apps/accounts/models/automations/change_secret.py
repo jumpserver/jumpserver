@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
-    AutomationTypes
+    AutomationTypes, ChangeSecretRecordStatusChoice
 )
 from common.db import fields
 from common.db.models import JMSBaseModel
@@ -40,7 +40,10 @@ class ChangeSecretRecord(JMSBaseModel):
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
     date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'))
-    status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
+    status = models.CharField(
+        max_length=16, verbose_name=_('Status'),
+        default=ChangeSecretRecordStatusChoice.pending.value
+    )
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
     class Meta:

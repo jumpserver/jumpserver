@@ -189,8 +189,9 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
 
 class AssetPermissionListSerializer(AssetPermissionSerializer):
     class Meta(AssetPermissionSerializer.Meta):
-        remove_fields = {"users", "assets", "nodes", "user_groups"}
-        fields = list(set(AssetPermissionSerializer.Meta.fields) - remove_fields)
+        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
+        fields = [item for item in (AssetPermissionSerializer.Meta.fields + amount_fields) if
+                  item not in ["users", "assets", "nodes", "user_groups"]]
 
     @classmethod
     def setup_eager_loading(cls, queryset):

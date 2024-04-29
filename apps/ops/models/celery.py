@@ -82,6 +82,8 @@ class CeleryTaskExecution(models.Model):
     kwargs = models.JSONField(verbose_name=_("Kwargs"))
     state = models.CharField(max_length=16, verbose_name=_("State"))
     is_finished = models.BooleanField(default=False, verbose_name=_("Finished"))
+    creator = models.ForeignKey('users.User', on_delete=models.SET_NULL, default=None, null=True,
+                                verbose_name=_('Creator'), db_constraint=False)
     date_published = models.DateTimeField(auto_now_add=True, verbose_name=_('Date published'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'))
     date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))

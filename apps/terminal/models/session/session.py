@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import uuid
+from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
@@ -130,12 +131,11 @@ class Session(OrgModelMixin):
     def can_join(self):
         if self.is_finished:
             return False
-        if self.login_from == self.LOGIN_FROM.RT:
-            return False
         if self.type != SessionType.normal:
             # 会话监控仅支持 normal，不支持 tunnel 和 command
             return False
-        if self.terminal.type in [TerminalType.lion, TerminalType.koko]:
+        support_types = [TerminalType.lion, TerminalType.koko, TerminalType.razor]
+        if self.terminal.type in support_types:
             return True
         else:
             return False
@@ -233,6 +233,14 @@ class Session(OrgModelMixin):
         instance = self.get_asset()
         target_ip = instance.get_target_ip() if instance else ''
         return target_ip
+
+    @property
+    def duration(self):
+        date_end = self.date_end or timezone.now()
+        delta = date_end - self.date_start
+        # 去掉毫秒的显示
+        delta = timedelta(seconds=int(delta.total_seconds()))
+        return str(delta)
 
     @classmethod
     def generate_fake(cls, count=100, is_finished=True):

@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from common.exceptions import UnexpectError
+from common.exceptions import JMSException, UnexpectError
 from common.utils import get_logger
 from users.models.user import User
 from .. import errors
@@ -50,7 +50,10 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         mfa_type = serializer.validated_data['type']
 
         if not username:
-            user = self.get_user_from_session()
+            try:
+                user = self.get_user_from_session()
+            except errors.SessionEmptyError as e:
+                raise ValidationError({'error': e})
         else:
             user = self.get_user_from_db(username)
 
@@ -61,6 +64,8 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
 
         try:
             mfa_backend.send_challenge()
+        except JMSException:
+            raise
         except Exception as e:
             raise UnexpectError(str(e))
 

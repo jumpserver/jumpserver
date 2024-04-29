@@ -19,6 +19,7 @@ logger = get_logger(__file__)
 
 class TerminalStatusMixin:
     id: str
+    type: str
     ALIVE_KEY = 'TERMINAL_ALIVE_{}'
     status_set: models.Manager
 
@@ -29,7 +30,7 @@ class TerminalStatusMixin:
     @lazyproperty
     def load(self):
         from ...utils import ComputeLoadUtil
-        return ComputeLoadUtil.compute_load(self.last_stat)
+        return ComputeLoadUtil.compute_load(self.last_stat, self.type)
 
     @property
     def is_alive(self):

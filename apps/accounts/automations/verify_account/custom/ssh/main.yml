@@ -19,3 +19,5 @@
         become_user: "{{ account.become.ansible_user | default('') }}"
         become_password: "{{ account.become.ansible_password | default('') }}"
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
+        old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"

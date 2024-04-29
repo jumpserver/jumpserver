@@ -19,9 +19,7 @@ os.environ.setdefault('PYTHONOPTIMIZE', '1')
 if os.getuid() == 0:
     os.environ.setdefault('C_FORCE_ROOT', '1')
 
-connection_params = {
-    'password': settings.REDIS_PASSWORD,
-}
+connection_params = {}
 
 if settings.REDIS_USE_SSL:
     connection_params['ssl'] = settings.REDIS_USE_SSL
@@ -36,6 +34,7 @@ REDIS_SENTINEL_PASSWORD = settings.REDIS_SENTINEL_PASSWORD
 REDIS_SENTINEL_SOCKET_TIMEOUT = settings.REDIS_SENTINEL_SOCKET_TIMEOUT
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     connection_params['sentinels'] = REDIS_SENTINELS
+    connection_params['password'] = settings.REDIS_PASSWORD
     sentinel_client = Sentinel(
         **connection_params, sentinel_kwargs={
             'ssl': settings.REDIS_USE_SSL,
@@ -49,17 +48,17 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     )
     redis_client = sentinel_client.master_for(REDIS_SENTINEL_SERVICE_NAME)
 else:
-    REDIS_PROTOCOL = 'rediss' if settings.REDIS_USE_SSL else 'redis'
+    REDIS_PROTOCOL = 'rediss' if connection_params.pop('ssl', False) else 'redis'
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s' % {
         'protocol': REDIS_PROTOCOL,
-        'password': settings.REDIS_PASSWORD,
+        'password': settings.REDIS_PASSWORD_QUOTE,
         'host': settings.REDIS_HOST,
         'port': settings.REDIS_PORT,
     }
     pool = ConnectionPool.from_url(REDIS_LOCATION_NO_DB, **connection_params)
     redis_client = Redis(connection_pool=pool)
 
-scheduler = "ops.celery.beat.schedulers:DatabaseScheduler"
+scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 processes = []
 cmd = [
     'celery',

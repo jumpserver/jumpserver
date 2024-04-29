@@ -2,10 +2,10 @@
 import datetime
 
 from django.db import transaction
-from django.utils import timezone
 from django.db.utils import OperationalError
-from common.utils.common import pretty_string
+from django.utils import timezone
 
+from common.utils.common import pretty_string
 from .base import CommandBase
 
 
@@ -19,9 +19,10 @@ class CommandStore(CommandBase):
         """
         保存命令到数据库
         """
+        cmd_input = pretty_string(command['input'])
         self.model.objects.create(
             user=command["user"], asset=command["asset"],
-            account=command["account"], input=command["input"],
+            account=command["account"], input=cmd_input,
             output=command["output"], session=command["session"],
             risk_level=command.get("risk_level", 0), org_id=command["org_id"],
             timestamp=command["timestamp"]

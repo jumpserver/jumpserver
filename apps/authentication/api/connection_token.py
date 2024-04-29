@@ -223,12 +223,17 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     validate_exchange_token: callable
 
     @action(methods=['POST', 'GET'], detail=True, url_path='rdp-file')
-    def get_rdp_file(self, *args, **kwargs):
+    def get_rdp_file(self, request, *args, **kwargs):
         token = self.get_object()
         token.is_valid()
         filename, content = self.get_rdp_file_info(token)
-        filename = '{}.rdp'.format(filename)
         response = HttpResponse(content, content_type='application/octet-stream')
+
+        if is_true(request.query_params.get('reusable')):
+            token.set_reusable(True)
+            filename = '{}-{}'.format(filename, token.date_expired.strftime('%Y%m%d_%H%M%S'))
+
+        filename += '.rdp'
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
 
@@ -379,6 +384,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
+
         ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket
@@ -413,7 +419,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
-        acls = LoginAssetACL.filter_queryset(user=user, asset=asset, account=account)
+        kwargs = {'user': user, 'asset': asset, 'account': account}
+        if account.username == AliasAccount.INPUT:
+            kwargs['account_username'] = self.input_username
+        acls = LoginAssetACL.filter_queryset(**kwargs)
         ip = get_request_ip_or_data(self.request)
         acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
@@ -443,7 +452,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(
-                    reviewer, asset, user, self.input_username
+                    reviewer, asset, user, account, self.input_username
                 ).publish_async()
 
     def create(self, request, *args, **kwargs):
@@ -503,20 +512,16 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token.is_valid()
         serializer = self.get_serializer(instance=token)
 
-        expire_now = request.data.get('expire_now', None)
+        expire_now = request.data.get('expire_now', True)
         asset_type = token.asset.type
         # 设置默认值
-        if expire_now is None:
-            # TODO 暂时特殊处理 k8s 不过期
-            if asset_type in ['k8s', 'kubernetes']:
-                expire_now = False
-            else:
-                expire_now = not settings.CONNECTION_TOKEN_REUSABLE
+        if asset_type in ['k8s', 'kubernetes']:
+            expire_now = False
 
-        if is_false(expire_now):
-            logger.debug('Api specified, now expire now')
-        elif token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
+        if token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
             logger.debug('Token is reusable, not expire now')
+        elif is_false(expire_now):
+            logger.debug('Api specified, now expire now')
         else:
             token.expire()
 

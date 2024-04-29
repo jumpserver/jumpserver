@@ -22,6 +22,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     AUTH_LDAP_SYNC_ORG_IDS = serializers.ListField()
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField()
     SECURITY_VIEW_AUTH_NEED_MFA = serializers.BooleanField()
+    SECURITY_MFA_AUTH = serializers.IntegerField()
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField()
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField()
     SECURITY_COMMAND_BLACKLIST = serializers.ListField()
@@ -40,6 +41,8 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     AUTH_WECOM = serializers.BooleanField()
     AUTH_DINGTALK = serializers.BooleanField()
     AUTH_FEISHU = serializers.BooleanField()
+    AUTH_LARK = serializers.BooleanField()
+    AUTH_SLACK = serializers.BooleanField()
     AUTH_TEMP_TOKEN = serializers.BooleanField()
 
     TERMINAL_RAZOR_ENABLED = serializers.BooleanField()
@@ -51,6 +54,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     ANNOUNCEMENT = serializers.DictField()
 
     TICKETS_ENABLED = serializers.BooleanField()
+    TICKETS_DIRECT_APPROVE = serializers.BooleanField()
     CONNECTION_TOKEN_REUSABLE = serializers.BooleanField()
     CACHE_LOGIN_PASSWORD_ENABLED = serializers.BooleanField()
     VAULT_ENABLED = serializers.BooleanField()

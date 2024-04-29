@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from assets.api.asset.asset import AssetFilterSet
 from assets.models import Asset, Node
+from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
 from perms import serializers
@@ -38,10 +39,10 @@ class UserPermedAssetRetrieveApi(SelfOrPKUserMixin, RetrieveAPIView):
             return asset
 
 
-class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
+class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPIView):
     ordering = []
     search_fields = ('name', 'address', 'comment')
-    ordering_fields = ("name", "address")
+    ordering_fields = ("name", "address", "connectivity")
     filterset_class = AssetFilterSet
     serializer_class = serializers.AssetPermedSerializer
 

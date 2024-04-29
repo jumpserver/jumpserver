@@ -52,36 +52,39 @@ class PlaybookViewSet(OrgBulkModelViewSet):
         if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = safe_join(settings.MEDIA_ROOT, instance.path.name)
             dest_path = safe_join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
+
             try:
                 unzip_playbook(src_path, dest_path)
-            except RuntimeError as e:
+            except RuntimeError:
                 raise JMSException(code='invalid_playbook_file', detail={"msg": "Unzip failed"})
 
             if 'main.yml' not in os.listdir(dest_path):
                 raise PlaybookNoValidEntry
 
-        else:
-            if instance.create_method == 'blank':
-                dest_path = safe_join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
-                os.makedirs(dest_path)
-                with open(safe_join(dest_path, 'main.yml'), 'w') as f:
-                    f.write('## write your playbook here')
+        elif instance.create_method == 'blank':
+            dest_path = safe_join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
+            os.makedirs(dest_path)
+            with open(safe_join(dest_path, 'main.yml'), 'w') as f:
+                f.write('## write your playbook here')
 
 
 class PlaybookFileBrowserAPIView(APIView):
-    rbac_perms = ()
     permission_classes = (RBACPermission,)
     rbac_perms = {
-        'GET': 'ops.change_playbook',
+        'GET': 'ops.view_playbook',
         'POST': 'ops.change_playbook',
         'DELETE': 'ops.change_playbook',
         'PATCH': 'ops.change_playbook',
     }
     protected_files = ['root', 'main.yml']
 
+    def get_playbook(self, playbook_id):
+        playbook = get_object_or_404(Playbook, id=playbook_id, creator=self.request.user)
+        return playbook
+
     def get(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
         file_key = request.query_params.get('key', '')
         if file_key:
@@ -101,7 +104,7 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def post(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
 
         parent_key = request.data.get('key', '')
@@ -157,7 +160,7 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def patch(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
 
         file_key = request.data.get('key', '')
@@ -197,7 +200,7 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def delete(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = get_object_or_404(Playbook, id=playbook_id)
+        playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
         file_key = request.query_params.get('key', '')
         if not file_key:

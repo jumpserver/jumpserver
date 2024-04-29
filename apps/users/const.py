@@ -33,14 +33,19 @@ class RDPClientOption(TextChoices):
     DRIVES_REDIRECT = 'drives_redirect', _('Drives redirect')
 
 
+class ConnectDefaultOpenMethod(TextChoices):
+    CURRENT = 'current', _('Current window')
+    NEW = 'new', _('New window')
+
+
 class RDPSmartSize(TextChoices):
     DISABLE = '0', _('Disable')
     ENABLE = '1', _('Enable')
 
 
 class RDPColorQuality(TextChoices):
-    HIGH = '32', 'High（32 bit）'
-    MEDIUM = '16', 'Medium（16 bit）'
+    HIGH = '32', _('High（32 bit）')
+    MEDIUM = '16', _('Medium（16 bit）')
 
 
 class KeyboardLayout(TextChoices):

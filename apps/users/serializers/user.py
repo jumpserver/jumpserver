@@ -3,6 +3,7 @@
 
 from functools import partial
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -12,6 +13,7 @@ from common.serializers.fields import (
 )
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
+from orgs.utils import current_org
 from rbac.builtin import BuiltinRole
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from rbac.permissions import RBACPermission
@@ -23,6 +25,7 @@ __all__ = [
     "MiniUserSerializer",
     "InviteSerializer",
     "ServiceAccountSerializer",
+    "UserRetrieveSerializer",
 ]
 
 logger = get_logger(__file__)
@@ -46,6 +49,7 @@ class RolesSerializerMixin(serializers.Serializer):
         label=_("Org roles"), many=True, required=False,
         default=default_org_roles
     )
+    orgs_roles = serializers.JSONField(read_only=True, label=_("Organizations and roles"))
 
     def pop_roles_if_need(self, fields):
         request = self.context.get("request")
@@ -58,7 +62,7 @@ class RolesSerializerMixin(serializers.Serializer):
 
         model_cls_field_mapper = {
             SystemRoleBinding: ["system_roles"],
-            OrgRoleBinding: ["org_roles"],
+            OrgRoleBinding: ["org_roles", "orgs_roles"],
         }
 
         update_actions = ("partial_bulk_update", "bulk_update", "partial_update", "update")
@@ -97,6 +101,8 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_otp_secret_key_bound = serializers.BooleanField(read_only=True, label=_("Is OTP bound"))
+    is_superuser = serializers.BooleanField(read_only=True, label=_("Super Administrator"))
+    is_org_admin = serializers.BooleanField(read_only=True, label=_("Organization Administrator"))
     can_public_key_auth = serializers.BooleanField(
         source="can_use_ssh_key_login", label=_("Can public key authentication"),
         read_only=True
@@ -118,10 +124,12 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         fields_write_only = [
             "password", "public_key",
         ]
+        # xpack 包含的字段
+        fields_xpack = ["wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id"]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
-            "email", "phone", "mfa_level", "source",
-            "created_by", "updated_by", "comment",  # 通用字段
+            "email", "wechat", "phone", "mfa_level", "source",
+            *fields_xpack, "created_by", "updated_by", "comment",  # 通用字段
         ]
         fields_date = [
             "date_expired", "date_joined", "last_login",
@@ -142,7 +150,7 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         # 外键的字段
         fields_fk = []
         # 多对多字段
-        fields_m2m = ["groups", "system_roles", "org_roles", "labels"]
+        fields_m2m = ["groups", "system_roles", "org_roles", "orgs_roles", "labels"]
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
@@ -150,9 +158,9 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
 
         read_only_fields = [
             "date_joined", "last_login", "created_by",
-            "is_first_login", "wecom_id", "dingtalk_id",
-            "feishu_id", "date_api_key_last_used",
+            "is_first_login", *fields_xpack, "date_api_key_last_used",
         ]
+        fields_only_root_org = ["orgs_roles"]
         disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
         extra_kwargs = {
             "password": {
@@ -180,6 +188,17 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
             "is_otp_secret_key_bound": {"label": _("Is OTP bound")},
             'mfa_level': {'label': _("MFA level")},
         }
+
+    def get_fields(self):
+        fields = super().get_fields()
+        self.pop_fields_if_need(fields)
+        return fields
+
+    def pop_fields_if_need(self, fields):
+        # pop only root org fields
+        if not current_org.is_root():
+            for f in self.Meta.fields_only_root_org:
+                fields.pop(f, None)
 
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")

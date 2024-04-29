@@ -12,7 +12,10 @@ from common.utils.timezone import as_current_tz
 from jumpserver.utils import current_request
 from orgs.models import Organization
 from orgs.utils import get_current_org_id
+from settings.models import Setting
 from settings.serializers import SettingsSerializer
+from users.models import Preference
+from users.serializers import PreferenceSerializer
 from .backends import get_operate_log_storage
 
 logger = get_logger(__name__)
@@ -87,19 +90,15 @@ class OperatorLogHandler(metaclass=Singleton):
         return log_id, before, after
 
     @staticmethod
-    def get_resource_display_from_setting(resource):
-        resource_display = None
-        setting_serializer = SettingsSerializer()
-        label = setting_serializer.get_field_label(resource)
-        if label is not None:
-            resource_display = label
-        return resource_display
-
-    def get_resource_display(self, resource):
-        resource_display = str(resource)
-        return_value = self.get_resource_display_from_setting(resource_display)
-        if return_value is not None:
-            resource_display = return_value
+    def get_resource_display(resource):
+        if isinstance(resource, Setting):
+            serializer = SettingsSerializer()
+            resource_display = serializer.get_field_label(resource.name)
+        elif isinstance(resource, Preference):
+            serializer = PreferenceSerializer()
+            resource_display = serializer.get_field_label(resource.name)
+        else:
+            resource_display = str(resource)
         return resource_display
 
     @staticmethod

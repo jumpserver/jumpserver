@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from importlib import import_module
 
 from django.conf import settings
@@ -31,7 +30,7 @@ from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
-from .filters import UserSessionFilterSet
+from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession
@@ -66,7 +65,7 @@ class FTPLogViewSet(OrgModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'asset', 'account', 'filename']
+    filterset_fields = ['user', 'asset', 'account', 'filename', 'session']
     search_fields = filterset_fields
     ordering = ['-date_start']
     http_method_names = ['post', 'get', 'head', 'options', 'patch']
@@ -205,10 +204,7 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = [
-        'user', 'action', 'resource_type', 'resource',
-        'remote_addr'
-    ]
+    filterset_class = OperateLogFilterSet
     search_fields = ['resource', 'user']
     ordering = ['-datetime']
 
@@ -272,7 +268,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return user_ids
 
     def get_queryset(self):
-        keys = UserSession.get_keys()
+        keys = user_session_manager.get_keys()
         queryset = UserSession.objects.filter(key__in=keys)
         if current_org.is_root():
             return queryset
@@ -291,6 +287,6 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
         keys = queryset.values_list('key', flat=True)
         for key in keys:
-            user_session_manager.decrement_or_remove(key)
+            user_session_manager.remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)

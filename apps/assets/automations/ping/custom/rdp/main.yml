@@ -3,6 +3,7 @@
   vars:
     ansible_shell_type: sh
     ansible_connection: local
+    ansible_python_interpreter: /opt/py3/bin/python
 
   tasks:
     - name: Test asset connection (pyfreerdp)

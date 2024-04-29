@@ -7,19 +7,18 @@ import subprocess
 from celery import shared_task
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
-from common.utils import get_log_keep_day, get_logger
 from common.storage.ftp_file import FTPFileStorageHandler
-from ops.celery.decorator import (
-    register_as_period_task, after_app_shutdown_clean_periodic
-)
+from common.utils import get_log_keep_day, get_logger
+from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
-from terminal.models import Session, Command
 from terminal.backends import server_replay_storage
-from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog
+from terminal.models import Session, Command
+from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
 
 logger = get_logger(__name__)
 
@@ -38,6 +37,14 @@ def clean_operation_log_period():
     OperateLog.objects.filter(datetime__lt=expired_day).delete()
 
 
+def clean_password_change_log_period():
+    now = timezone.now()
+    days = get_log_keep_day('PASSWORD_CHANGE_LOG_KEEP_DAYS')
+    expired_day = now - datetime.timedelta(days=days)
+    PasswordChangeLog.objects.filter(datetime__lt=expired_day).delete()
+    logger.info("Clean password change log done")
+
+
 def clean_activity_log_period():
     now = timezone.now()
     days = get_log_keep_day('ACTIVITY_LOG_KEEP_DAYS')
@@ -49,9 +56,9 @@ def clean_ftp_log_period():
     now = timezone.now()
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    file_store_dir = os.path.join(default_storage.base_location, 'ftp_file')
+    file_store_dir = os.path.join(default_storage.base_location, FTPLog.upload_to)
     FTPLog.objects.filter(date_start__lt=expired_day).delete()
-    command = "find %s -mtime +%s -exec rm -f {} \\;" % (
+    command = "find %s -mtime +%s -type f -exec rm -f {} \\;" % (
         file_store_dir, days
     )
     subprocess.call(command, shell=True)
@@ -76,6 +83,15 @@ def clean_celery_tasks_period():
     subprocess.call(command, shell=True)
 
 
+def batch_delete(queryset, batch_size=3000):
+    model = queryset.model
+    count = queryset.count()
+    with transaction.atomic():
+        for i in range(0, count, batch_size):
+            pks = queryset[i:i + batch_size].values_list('id', flat=True)
+            model.objects.filter(id__in=list(pks)).delete()
+
+
 def clean_expired_session_period():
     logger.info("Start clean expired session record, commands and replay")
     days = get_log_keep_day('TERMINAL_SESSION_KEEP_DURATION')
@@ -85,9 +101,9 @@ def clean_expired_session_period():
     expired_commands = Command.objects.filter(timestamp__lt=timestamp)
     replay_dir = os.path.join(default_storage.base_location, 'replay')
 
-    expired_sessions.delete()
+    batch_delete(expired_sessions)
     logger.info("Clean session item done")
-    expired_commands.delete()
+    batch_delete(expired_commands)
     logger.info("Clean session command done")
     command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
         replay_dir, days
@@ -100,7 +116,6 @@ def clean_expired_session_period():
 
 @shared_task(verbose_name=_('Clean audits session task log'))
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
-@after_app_shutdown_clean_periodic
 def clean_audits_log_period():
     print("Start clean audit session task log")
     clean_login_log_period()
@@ -109,6 +124,7 @@ def clean_audits_log_period():
     clean_activity_log_period()
     clean_celery_tasks_period()
     clean_expired_session_period()
+    clean_password_change_log_period()
 
 
 @shared_task(verbose_name=_('Upload FTP file to external storage'))

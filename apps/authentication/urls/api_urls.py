@@ -22,6 +22,9 @@ urlpatterns = [
     path('feishu/event/subscription/callback/', api.FeiShuEventSubscriptionCallback.as_view(),
          name='feishu-event-subscription-callback'),
 
+    path('lark/event/subscription/callback/', api.LarkEventSubscriptionCallback.as_view(),
+         name='lark-event-subscription-callback'),
+
     path('auth/', api.TokenCreateApi.as_view(), name='user-auth'),
     path('confirm-oauth/', api.ConfirmBindORUNBindOAuth.as_view(), name='confirm-oauth'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),
@@ -32,6 +35,7 @@ urlpatterns = [
     path('password/reset-code/', api.UserResetPasswordSendCodeApi.as_view(), name='reset-password-code'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
+    path('user-session/', api.UserSessionApi.as_view(), name='user-session'),
 ]
 
 urlpatterns += router.urls + passkey_urlpatterns

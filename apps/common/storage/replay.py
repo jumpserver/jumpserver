@@ -12,7 +12,7 @@ class ReplayStorageHandler(BaseStorageHandler):
         # 获取外部存储路径名
         session_path = self.obj.find_ok_relative_path_in_storage(storage)
         if not session_path:
-            return None
+            return None, None
 
         # 通过外部存储路径名后缀，构造真实的本地存储路径
         return session_path, self.obj.get_local_path_by_relative_path(session_path)

@@ -15,7 +15,7 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))
-    input = serializers.CharField(max_length=2048, label=_("Command"))
+    input = serializers.CharField(label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session ID"))
     risk_level = LabeledChoiceField(
         choices=RiskLevelChoices.choices,
@@ -70,7 +70,7 @@ class SessionCommandSerializerMixin(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     # 限制 64 字符，不能直接迁移成 128 字符，命令表数据量会比较大
     account = serializers.CharField(label=_("Account"))
-    output = serializers.CharField(max_length=2048, allow_blank=True, label=_("Output"))
+    output = serializers.CharField(allow_blank=True, label=_("Output"))
     timestamp = serializers.IntegerField(label=_('Timestamp'))
     timestamp_display = serializers.DateTimeField(read_only=True, label=_('Datetime'))
     remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))

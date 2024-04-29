@@ -60,6 +60,16 @@ class Command(AbstractSessionCommand):
             commands.append(command)
         return commands
 
+    @staticmethod
+    def get_all_type_queryset_tuple():
+        from terminal.models import CommandStorage
+        storage_qs = CommandStorage.objects.exclude(name='null')
+        return (
+            (storage.type, storage.get_command_queryset())
+            for storage in storage_qs
+            if storage.is_valid()
+        )
+
     class Meta:
         db_table = "terminal_command"
         ordering = ('-timestamp',)

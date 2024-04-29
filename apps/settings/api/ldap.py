@@ -1,28 +1,16 @@
 # -*- coding: utf-8 -*-
-#
 
-import threading
-
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import generics
-from rest_framework.generics import CreateAPIView
-from rest_framework.views import Response, APIView
+from rest_framework.views import Response
 
-from common.api import AsyncApiMixin
 from common.utils import get_logger
-from orgs.models import Organization
-from orgs.utils import current_org
 from users.models import User
 from ..models import Setting
-from ..serializers import (
-    LDAPTestConfigSerializer, LDAPUserSerializer,
-    LDAPTestLoginSerializer
-)
-from ..tasks import sync_ldap_user
+from ..serializers import LDAPUserSerializer
 from ..utils import (
-    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
+    LDAPServerUtil, LDAPCacheUtil,
+    LDAP_USE_CACHE_FLAGS
 )
 
 logger = get_logger(__file__)
@@ -100,49 +88,3 @@ class LDAPUserListApi(generics.ListAPIView):
         else:
             data = {'msg': _('Users are not synchronized, please click the user synchronization button')}
             return Response(data=data, status=400)
-
-
-class LDAPUserImportAPI(APIView):
-    perm_model = Setting
-    rbac_perms = {
-        'POST': 'settings.change_auth'
-    }
-
-    def get_orgs(self):
-        org_ids = self.request.data.get('org_ids')
-        if org_ids:
-            orgs = list(Organization.objects.filter(id__in=org_ids))
-        else:
-            orgs = [current_org]
-        return orgs
-
-    def get_ldap_users(self):
-        username_list = self.request.data.get('username_list', [])
-        cache_police = self.request.query_params.get('cache_police', True)
-        if '*' in username_list:
-            users = LDAPServerUtil().search()
-        elif cache_police in LDAP_USE_CACHE_FLAGS:
-            users = LDAPCacheUtil().search(search_users=username_list)
-        else:
-            users = LDAPServerUtil().search(search_users=username_list)
-        return users
-
-    def post(self, request):
-        try:
-            users = self.get_ldap_users()
-        except Exception as e:
-            return Response({'error': str(e)}, status=400)
-
-        if users is None:
-            return Response({'msg': _('Get ldap users is None')}, status=400)
-
-        orgs = self.get_orgs()
-        new_users, errors = LDAPImportUtil().perform_import(users, orgs)
-        if errors:
-            return Response({'errors': errors}, status=400)
-
-        count = users if users is None else len(users)
-        orgs_name = ', '.join([str(org) for org in orgs])
-        return Response({
-            'msg': _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
-        })
