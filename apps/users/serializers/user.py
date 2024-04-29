@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers import CommonBulkSerializerMixin, ResourceLabelsMixin
+from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
 from common.serializers.fields import (
     EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField
 )
@@ -85,13 +85,13 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
-class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLabelsMixin, serializers.ModelSerializer):
+class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelSerializer):
     password_strategy = LabeledChoiceField(
         choices=PasswordStrategy.choices,
         default=PasswordStrategy.email,
         allow_null=True,
         required=False,
-        label=_("Password strategy"),
+        label=_("Password setting"),
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_("MFA enabled"))
     mfa_force_enabled = serializers.BooleanField(
@@ -168,6 +168,12 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
                 "required": False,
                 "allow_null": True,
                 "allow_blank": True,
+            },
+            "groups": {
+                "label": _("Groups"),
+            },
+            "is_superuser": {
+                "label": _("Superuser")
             },
             "public_key": {"write_only": True},
             "is_first_login": {"label": _("Is first login"), "read_only": True},
@@ -302,8 +308,8 @@ class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
     users = serializers.PrimaryKeyRelatedField(
         queryset=User.get_nature_users(),
         many=True,
-        label=_("Select users"),
-        help_text=_("For security, only list several users"),
+        label=_("Users"),
+        help_text=_("For security, only a partial of users is displayed. You can search for more"),
     )
     system_roles = None
 

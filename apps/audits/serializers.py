@@ -131,7 +131,7 @@ class ActivityUnionLogSerializer(serializers.Serializer):
     def get_content(obj):
         if not obj['r_detail']:
             action = obj['r_action'].replace('_', ' ').capitalize()
-            ctn = _('User %s %s this resource') % (obj['r_user'], _(action))
+            ctn = _('%s %s this resource') % (obj['r_user'], _(action).lower())
         else:
             ctn = i18n_trans(obj['r_detail'])
         return ctn

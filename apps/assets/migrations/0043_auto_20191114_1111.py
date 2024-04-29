@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='gathereduser',
             name='date_last_login',
-            field=models.DateTimeField(null=True, verbose_name='Date last login'),
+            field=models.DateTimeField(null=True, verbose_name='Date login'),
         ),
         migrations.AddField(
             model_name='gathereduser',
             name='ip_last_login',
-            field=models.CharField(default='', max_length=39, verbose_name='IP last login'),
+            field=models.CharField(default='', max_length=39, verbose_name='IP login'),
         ),
     ]

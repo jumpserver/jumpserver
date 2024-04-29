@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 class ApplicationsConfig(AppConfig):
     name = 'applications'
-    verbose_name = _('Applications')
+    verbose_name = _('App Applications')
 
     def ready(self):
         super().ready()

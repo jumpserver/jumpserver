@@ -356,6 +356,7 @@ class SomeFieldsMixin:
     def order_fields(fields):
         bool_fields = []
         datetime_fields = []
+        common_fields = []
         other_fields = []
 
         for name, field in fields.items():
@@ -364,9 +365,11 @@ class SomeFieldsMixin:
                 bool_fields.append(to_add)
             elif isinstance(field, serializers.DateTimeField):
                 datetime_fields.append(to_add)
+            elif name in ('comment', 'created_by', 'updated_by'):
+                common_fields.append(to_add)
             else:
                 other_fields.append(to_add)
-        _fields = [*other_fields, *bool_fields, *datetime_fields]
+        _fields = [*other_fields, *bool_fields, *datetime_fields, *common_fields]
         fields = OrderedDict()
         for name, field in _fields:
             fields[name] = field

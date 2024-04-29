@@ -203,6 +203,9 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
         if self.request.GET.get("admin", 0):
             return None
 
+        if not settings.XPACK_ENABLED:
+            return None
+
         auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]
         if not auth_types:
             return None

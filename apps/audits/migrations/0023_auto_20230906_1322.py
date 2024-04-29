@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='userloginlog',
             name='datetime',
-            field=models.DateTimeField(db_index=True, default=django.utils.timezone.now, verbose_name='Date login'),
+            field=models.DateTimeField(db_index=True, default=django.utils.timezone.now, verbose_name='Login Date'),
         ),
     ]

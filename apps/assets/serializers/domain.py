@@ -18,12 +18,13 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
         many=True, required=False, label=_('Gateway'), queryset=Gateway.objects
     )
+    assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
 
     class Meta:
         model = Domain
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
-        fields_m2m = ['assets', 'gateways']
+        fields_m2m = ['assets', 'gateways', 'assets_amount']
         read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {
@@ -54,13 +55,12 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset \
+            .annotate(assets_amount=Count('assets')) \
             .prefetch_related('labels', 'labels__label')
         return queryset
 
 
 class DomainListSerializer(DomainSerializer):
-    assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
-
     class Meta(DomainSerializer.Meta):
         fields = list(set(DomainSerializer.Meta.fields + ['assets_amount']) - {'assets'})
 

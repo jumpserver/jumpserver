@@ -12,7 +12,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
-    run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
+    run_after_save = serializers.BooleanField(label=_("Execute after saving"), default=False, required=False)
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
@@ -48,6 +48,9 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "is_periodic", "interval", "crontab", "nodes",
             "run_after_save"
         ]
+        extra_kwargs = {
+            'average_time_cost': {'label': _('Average time cost')},
+        }
 
 
 class FileSerializer(serializers.Serializer):

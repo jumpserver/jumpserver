@@ -39,7 +39,7 @@ class LDAPSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('LDAP')
 
     AUTH_LDAP_SERVER_URI = serializers.CharField(
-        required=True, max_length=1024, label=_('LDAP server'),
+        required=True, max_length=1024, label=_('Server'),
         help_text=_('eg: ldap://localhost:389')
     )
     AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
@@ -55,7 +55,7 @@ class LDAPSettingSerializer(serializers.Serializer):
         help_text=_('Choice may be (cn|uid|sAMAccountName)=%(user)s)')
     )
     AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField(
-        required=True, label=_('User attr map'),
+        required=True, label=_('User attribute'),
         help_text=_('User attr map present how to map LDAP user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
     )
@@ -63,14 +63,14 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
-        required=False, label=_('Periodic perform')
+        required=False, label=_('Periodic run')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
         required=False, max_length=128, allow_null=True, allow_blank=True,
-        label=_('Regularly perform')
+        label=_('Crontab')
     )
     AUTH_LDAP_SYNC_INTERVAL = serializers.IntegerField(
-        required=False, default=24, allow_null=True, label=_('Cycle perform')
+        required=False, default=24, allow_null=True, label=_('Interval')
     )
     AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(
         min_value=1, max_value=300,
@@ -90,7 +90,7 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=False, label=_('Recipient'), max_length=36
     )
 
-    AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
+    AUTH_LDAP = serializers.BooleanField(required=False, label=_('LDAP'))
 
     @staticmethod
     def post_save():

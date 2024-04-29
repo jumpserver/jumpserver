@@ -52,7 +52,7 @@ extra_nodes_data = [
     {"id": "push_account_node", "name": _("Push account"), "pId": "accounts"},
     {"id": "asset_change_plan_node", "name": _("Asset change auth"), "pId": "accounts"},
     {"id": "terminal_node", "name": _("Terminal setting"), "pId": "view_setting"},
-    {'id': "task_center", "name": _("Task Center"), "pId": "view_console"},
+    {'id': "task_center", "name": _("Job center"), "pId": "view_console"},
     {'id': "my_assets", "name": _("My assets"), "pId": "view_workbench"},
     {'id': "operation_center", "name": _('App ops'), "pId": "view_workbench"},
     {'id': "remote_application", "name": _("Applet"), "pId": "view_setting"},

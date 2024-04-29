@@ -1,6 +1,28 @@
 FROM python:3.11-slim-bullseye as stage-1
 ARG TARGETARCH
 
+ARG DEPENDENCIES="                    \
+        ca-certificates               \
+        wget"
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+
+ARG CHECK_VERSION=v1.0.2
+RUN set -ex \
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && mv check /usr/local/bin/ \
+    && chown root:root /usr/local/bin/check \
+    && chmod 755 /usr/local/bin/check \
+    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
+
 ARG VERSION
 ENV VERSION=$VERSION
 
@@ -14,7 +36,6 @@ ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
         g++                           \
-        make                          \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
@@ -37,11 +58,11 @@ ARG TOOLS="                           \
         curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
-        git                           \
-        git-lfs                       \
-        unzip                         \
-        xz-utils                      \
-        wget"
+        libldap2-dev                  \
+        libsasl2-dev                  \
+        libxml2-dev                   \
+        libxmlsec1-dev                \
+        libxmlsec1-openssl"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
@@ -52,7 +73,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
     && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt/jumpserver
@@ -66,23 +86,22 @@ RUN --mount=type=cache,target=/root/.cache \
     && pip install poetry -i ${PIP_MIRROR} \
     && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
-    && poetry install
+    && poetry install --only=main
 
 FROM python:3.11-slim-bullseye
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8 \
+ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
         libjpeg-dev                   \
+        libldap2-dev                  \
         libpq-dev                     \
         libx11-dev                    \
-        freerdp2-dev                  \
         libxmlsec1-openssl"
 
 ARG TOOLS="                           \
         ca-certificates               \
-        curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
         iputils-ping                  \
@@ -90,11 +109,7 @@ ARG TOOLS="                           \
         netcat-openbsd                \
         nmap                          \
         openssh-client                \
-        patch                         \
-        sshpass                       \
-        telnet                        \
-        vim                           \
-        wget"
+        sshpass"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
@@ -108,7 +123,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc
 
@@ -121,6 +135,7 @@ RUN set -ex \
     && rm -f /opt/receptor.tar.gz
 
 COPY --from=stage-2 /opt/py3 /opt/py3
+COPY --from=stage-1 /usr/local/bin /usr/local/bin
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver/apps/libs/ansible/ansible.cfg /etc/ansible/
 

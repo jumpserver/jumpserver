@@ -33,7 +33,7 @@ from ..signals import (
     post_user_change_password, post_user_leave_org, pre_user_leave_org
 )
 
-__all__ = ['User', 'UserPasswordHistory']
+__all__ = ['User', 'UserPasswordHistory', ]
 
 logger = get_logger(__file__)
 
@@ -69,7 +69,7 @@ class AuthMixin:
             if self.username:
                 self.date_password_last_updated = timezone.now()
                 post_user_change_password.send(self.__class__, user=self)
-            super().set_password(raw_password) # noqa
+            super().set_password(raw_password)  # noqa
 
     def set_public_key(self, public_key):
         if self.can_update_ssh_key():
@@ -383,15 +383,15 @@ class RoleMixin:
 
     @lazyproperty
     def console_orgs(self):
-        return self.cached_orgs['console_orgs']
+        return self.cached_orgs.get('console_orgs', [])
 
     @lazyproperty
     def audit_orgs(self):
-        return self.cached_orgs['audit_orgs']
+        return self.cached_orgs.get('audit_orgs', [])
 
     @lazyproperty
     def workbench_orgs(self):
-        return self.cached_orgs['workbench_orgs']
+        return self.cached_orgs.get('workbench_orgs', [])
 
     @lazyproperty
     def joined_orgs(self):
@@ -747,21 +747,26 @@ class JSONFilterMixin:
         return models.Q(id__in=user_id)
 
 
-class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterMixin, AbstractUser):
-    class Source(models.TextChoices):
-        local = 'local', _('Local')
-        ldap = 'ldap', 'LDAP/AD'
-        openid = 'openid', 'OpenID'
-        radius = 'radius', 'Radius'
-        cas = 'cas', 'CAS'
-        saml2 = 'saml2', 'SAML2'
-        oauth2 = 'oauth2', 'OAuth2'
-        wecom = 'wecom', _('WeCom')
-        dingtalk = 'dingtalk', _('DingTalk')
-        feishu = 'feishu', _('FeiShu')
-        lark = 'lark', _('Lark')
-        slack = 'slack', _('Slack')
-        custom = 'custom', 'Custom'
+class Source(models.TextChoices):
+    local = 'local', _('Local')
+    ldap = 'ldap', 'LDAP/AD'
+    openid = 'openid', 'OpenID'
+    radius = 'radius', 'Radius'
+    cas = 'cas', 'CAS'
+    saml2 = 'saml2', 'SAML2'
+    oauth2 = 'oauth2', 'OAuth2'
+    wecom = 'wecom', _('WeCom')
+    dingtalk = 'dingtalk', _('DingTalk')
+    feishu = 'feishu', _('FeiShu')
+    lark = 'lark', _('Lark')
+    slack = 'slack', _('Slack')
+    custom = 'custom', 'Custom'
+
+
+class SourceMixin:
+    source: str
+    _source_choices = []
+    Source = Source
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
@@ -807,6 +812,61 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         ]
     }
 
+    @classmethod
+    def get_sources_enabled(cls):
+        mapper = {
+            cls.Source.local: True,
+            cls.Source.ldap: settings.AUTH_LDAP,
+            cls.Source.openid: settings.AUTH_OPENID,
+            cls.Source.radius: settings.AUTH_RADIUS,
+            cls.Source.cas: settings.AUTH_CAS,
+            cls.Source.saml2: settings.AUTH_SAML2,
+            cls.Source.oauth2: settings.AUTH_OAUTH2,
+            cls.Source.wecom: settings.AUTH_WECOM,
+            cls.Source.feishu: settings.AUTH_FEISHU,
+            cls.Source.slack: settings.AUTH_SLACK,
+            cls.Source.dingtalk: settings.AUTH_DINGTALK,
+            cls.Source.custom: settings.AUTH_CUSTOM
+        }
+        return [str(k) for k, v in mapper.items() if v]
+
+    @property
+    def source_display(self):
+        return self.get_source_display()
+
+    @property
+    def is_local(self):
+        return self.source == self.Source.local.value
+
+    @classmethod
+    def get_source_choices(cls):
+        if cls._source_choices:
+            return cls._source_choices
+        used = cls.objects.values_list('source', flat=True).order_by('source').distinct()
+        enabled_sources = cls.get_sources_enabled()
+        _choices = []
+        for k, v in cls.Source.choices:
+            if k in enabled_sources or k in used:
+                _choices.append((k, v))
+        cls._source_choices = _choices
+        return cls._source_choices
+
+    @classmethod
+    def get_user_allowed_auth_backend_paths(cls, username):
+        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
+            return None
+        user = cls.objects.filter(username=username).first()
+        if not user:
+            return None
+        return user.get_allowed_auth_backend_paths()
+
+    def get_allowed_auth_backend_paths(self):
+        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
+            return None
+        return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
+
+
+class User(AuthMixin, SourceMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterMixin, AbstractUser):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
         max_length=128, unique=True, verbose_name=_('Username')
@@ -856,7 +916,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     )
     created_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Created by'))
     updated_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Updated by'))
-    source = models.CharField(max_length=30, default=Source.local, choices=Source.choices, verbose_name=_('Source'))
     date_password_last_updated = models.DateTimeField(
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
@@ -864,14 +923,17 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
-    date_api_key_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date api key used'))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
+    source = models.CharField(
+        max_length=30, default=Source.local,
+        choices=Source.choices, verbose_name=_('Source')
+    )
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
     lark_id = models.CharField(null=True, default=None, max_length=128, verbose_name='Lark')
     slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
-
+    date_api_key_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date api key used'))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
     DATE_EXPIRED_WARNING_DAYS = 5
 
     def __str__(self):
@@ -904,15 +966,17 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         return reverse('users:user-detail', args=(self.id,))
 
     @property
-    def source_display(self):
-        return self.get_source_display()
-
-    @property
     def is_expired(self):
         if self.date_expired and self.date_expired < timezone.now():
             return True
         else:
             return False
+
+    def is_password_authenticate(self):
+        cas = self.Source.cas
+        saml2 = self.Source.saml2
+        oauth2 = self.Source.oauth2
+        return self.source not in [cas, saml2, oauth2]
 
     @property
     def expired_remain_days(self):
@@ -931,16 +995,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         if self.is_active and not self.is_expired:
             return True
         return False
-
-    @property
-    def is_local(self):
-        return self.source == self.Source.local.value
-
-    def is_password_authenticate(self):
-        cas = self.Source.cas
-        saml2 = self.Source.saml2
-        oauth2 = self.Source.oauth2
-        return self.source not in [cas, saml2, oauth2]
 
     def set_required_attr_if_need(self):
         if not self.name:
@@ -999,20 +1053,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         if self.pk == 1 or self.username == 'admin':
             raise PermissionDenied(_('Can not delete admin user'))
         return super(User, self).delete(using=using, keep_parents=keep_parents)
-
-    @classmethod
-    def get_user_allowed_auth_backend_paths(cls, username):
-        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
-            return None
-        user = cls.objects.filter(username=username).first()
-        if not user:
-            return None
-        return user.get_allowed_auth_backend_paths()
-
-    def get_allowed_auth_backend_paths(self):
-        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
-            return None
-        return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
 
     class Meta:
         ordering = ['username']

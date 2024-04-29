@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                                       primary_key=True, serialize=False, to='tickets.ticket')),
                 ('apply_login_ip', models.GenericIPAddressField(null=True, verbose_name='Login IP')),
                 ('apply_login_city', models.CharField(max_length=64, null=True, verbose_name='Login city')),
-                ('apply_login_datetime', models.DateTimeField(null=True, verbose_name='Login datetime')),
+                ('apply_login_datetime', models.DateTimeField(null=True, verbose_name='Login Date')),
             ],
             options={
                 'abstract': False,

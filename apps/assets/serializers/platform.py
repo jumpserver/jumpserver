@@ -30,18 +30,43 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             # 启用资产探测
-            "ping_enabled": {"label": _("Ping enabled")},
+            "ping_enabled": {"label": _("Ping enabled"), "help_text": _("Enable asset detection")},
             "ping_method": {"label": _("Ping method")},
-            "gather_facts_enabled": {"label": _("Gather facts enabled")},
-            "gather_facts_method": {"label": _("Gather facts method")},
-            "verify_account_enabled": {"label": _("Verify account enabled")},
-            "verify_account_method": {"label": _("Verify account method")},
-            "change_secret_enabled": {"label": _("Change secret enabled")},
-            "change_secret_method": {"label": _("Change secret method")},
-            "push_account_enabled": {"label": _("Push account enabled")},
-            "push_account_method": {"label": _("Push account method")},
-            "gather_accounts_enabled": {"label": _("Gather accounts enabled")},
-            "gather_accounts_method": {"label": _("Gather accounts method")},
+            "gather_facts_enabled": {
+                "label": _("Gather facts enabled"),
+                "help_text": _("Enable asset information collection")
+            },
+            "gather_facts_method": {
+                "label": _("Gather facts method"),
+            },
+            "verify_account_enabled": {
+                "label": _("Verify account enabled"),
+                "help_text": _("Enable account verification")
+            },
+            "verify_account_method": {
+                "label": _("Verify account method"),
+            },
+            "change_secret_enabled": {
+                "label": _("Change secret enabled"),
+                "help_text": _("Enable account secret auto change")
+            },
+            "change_secret_method": {
+                "label": _("Change secret method"),
+            },
+            "push_account_enabled": {
+                "label": _("Push account enabled"),
+                "help_text": _("Enable account auto push")
+            },
+            "push_account_method": {
+                "label": _("Push account method"),
+            },
+            "gather_accounts_enabled": {
+                "label": _("Gather accounts enabled"),
+                "help_text": _("Enable account collection")
+            },
+            "gather_accounts_method": {
+                "label": _("Gather accounts method"),
+            },
         }
 
 
@@ -158,13 +183,21 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
             'created_by', 'updated_by'
         ]
         fields = fields_small + [
-            "protocols", "domain_enabled", "su_enabled",
-            "su_method", "automation", "comment", "custom_fields",
-            "labels"
+            "protocols", "domain_enabled", "su_enabled", "su_method",
+            "automation", "comment", "custom_fields", "labels"
         ] + read_only_fields
         extra_kwargs = {
-            "su_enabled": {"label": _('Su enabled')},
-            "domain_enabled": {"label": _('Domain enabled')},
+            "su_enabled": {
+                "label": _('Su enabled'),
+                "help_text": _(
+                    "Login with account when accessing assets, then automatically switch to another, "
+                    "similar to logging in with a regular account and then switching to root"
+                )
+            },
+            "domain_enabled": {
+                "label": _('Domain enabled'),
+                "help_text": _("Assets can be connected using a domain gateway")
+            },
             "domain_default": {"label": _('Default Domain')},
         }
 

@@ -18,7 +18,7 @@ __all__ = [
 class UserGroupSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     users = ObjectRelatedField(
         required=False, many=True, queryset=User.objects,
-        attrs=("id", "name", "is_service_account"), label=_('User'),
+        attrs=("id", "name", "is_service_account"), label=_('Users'),
     )
 
     class Meta:
@@ -57,5 +57,4 @@ class UserGroupListSerializer(UserGroupSerializer):
         fields = list(set(UserGroupSerializer.Meta.fields + ['users_amount']) - {'users'})
         extra_kwargs = {
             **UserGroupSerializer.Meta.extra_kwargs,
-            'users_amount': {'label': _('Users amount')},
         }
