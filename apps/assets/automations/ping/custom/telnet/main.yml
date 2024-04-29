@@ -1,0 +1,11 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_shell_type: sh
+
+  tasks:
+    - name: Test asset connection (telnet)
+      telnet_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"

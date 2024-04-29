@@ -73,6 +73,10 @@ class FamilyMixin:
     @classmethod
     def get_nodes_all_children(cls, nodes, with_self=True):
         pattern = cls.get_nodes_children_key_pattern(nodes, with_self=with_self)
+        if not pattern:
+            # 如果 pattern = ''
+            # key__iregex 报错 (1139, "Got error 'empty (sub)expression' from regexp")
+            return cls.objects.none()
         return Node.objects.filter(key__iregex=pattern)
 
     @classmethod

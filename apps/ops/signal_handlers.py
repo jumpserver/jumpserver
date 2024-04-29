@@ -1,4 +1,4 @@
-import ast
+import json
 import time
 
 from celery import signals
@@ -8,12 +8,17 @@ from django.db.models.signals import pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import translation, timezone
+from django.utils.functional import LazyObject
+from rest_framework.utils.encoders import JSONEncoder
 
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
+from common.utils.connection import RedisPubSub
+from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
+from .ansible.runner import interface
 
 logger = get_logger(__name__)
 
@@ -125,12 +130,13 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         logger.error("Not found task id or name: {}".format(info))
         return
 
-    args = info.get('argsrepr', '()')
-    kwargs = info.get('kwargsrepr', '{}')
+    args, kwargs, __ = body
+
     try:
-        args = list(ast.literal_eval(args))
-        kwargs = ast.literal_eval(kwargs)
-    except (ValueError, SyntaxError):
+        args = json.loads(json.dumps(list(args), cls=JSONEncoder))
+        kwargs = json.loads(json.dumps(kwargs, cls=JSONEncoder))
+    except Exception as e:
+        logger.error('Parse task args or kwargs error (Need handle): {}'.format(e))
         args = []
         kwargs = {}
 
@@ -142,5 +148,32 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'args': args,
         'kwargs': kwargs
     }
-    CeleryTaskExecution.objects.create(**data)
-    CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
+    request = get_current_request()
+    if request and request.user.is_authenticated:
+        data['creator'] = request.user
+
+    with transaction.atomic():
+        try:
+            CeleryTaskExecution.objects.create(**data)
+        except Exception as e:
+            logger.error('Create celery task execution error: {}'.format(e))
+        CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())
+
+
+@receiver(django_ready)
+def subscribe_stop_job_execution(sender, **kwargs):
+    logger.info("Start subscribe for stop job execution")
+
+    def on_stop(pid):
+        logger.info(f"Stop job execution {pid} start")
+        interface.kill_process(pid)
+
+    job_execution_stop_pub_sub.subscribe(on_stop)
+
+
+class JobExecutionPubSub(LazyObject):
+    def _setup(self):
+        self._wrapped = RedisPubSub('fm.job_execution_stop')
+
+
+job_execution_stop_pub_sub = JobExecutionPubSub()

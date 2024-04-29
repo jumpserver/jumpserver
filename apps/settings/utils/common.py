@@ -20,7 +20,8 @@ def get_login_title():
 def generate_ips(address_string):
     def transform(_ip):
         real_ip, err_msg = lookup_domain(_ip)
-        return _ip if err_msg else real_ip
+        return _ip if err_msg or real_ip == '0.0.0.0' else real_ip
+
     # 支持的格式
     # 192.168.1.1,192.168.1.2
     # 192.168.1.1-12 | 192.168.1.1-192.168.1.12 | 192.168.1.0/30 | 192.168.1.1

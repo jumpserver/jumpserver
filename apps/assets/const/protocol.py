@@ -38,6 +38,14 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.ssh: {
                 'port': 22,
                 'secret_types': ['password', 'ssh_key'],
+                'setting': {
+                    'old_ssh_version': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Old SSH version'),
+                        'help_text': _('Old SSH version like openssh 5.x or 6.x')
+                    }
+                }
             },
             cls.sftp: {
                 'port': 22,
@@ -187,6 +195,14 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 27017,
                 'required': True,
                 'secret_types': ['password'],
+                'setting': {
+                    'auth_source': {
+                        'type': 'str',
+                        'default': 'admin',
+                        'label': _('Auth source'),
+                        'help_text': _('The database to authenticate against')
+                    }
+                }
             },
             cls.redis: {
                 'port': 6379,

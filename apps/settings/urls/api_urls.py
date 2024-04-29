@@ -12,10 +12,10 @@ router.register(r'chatai-prompts', api.ChatPromptViewSet, 'chatai-prompt')
 urlpatterns = [
     path('mail/testing/', api.MailTestingAPI.as_view(), name='mail-testing'),
     path('ldap/users/', api.LDAPUserListApi.as_view(), name='ldap-user-list'),
-    path('ldap/users/import/', api.LDAPUserImportAPI.as_view(), name='ldap-user-import'),
     path('wecom/testing/', api.WeComTestingAPI.as_view(), name='wecom-testing'),
     path('dingtalk/testing/', api.DingTalkTestingAPI.as_view(), name='dingtalk-testing'),
     path('feishu/testing/', api.FeiShuTestingAPI.as_view(), name='feishu-testing'),
+    path('lark/testing/', api.LarkTestingAPI.as_view(), name='lark-testing'),
     path('slack/testing/', api.SlackTestingAPI.as_view(), name='slack-testing'),
     path('sms/<str:backend>/testing/', api.SMSTestingAPI.as_view(), name='sms-testing'),
     path('sms/backend/', api.SMSBackendAPI.as_view(), name='sms-backend'),

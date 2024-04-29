@@ -6,6 +6,7 @@ import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.cache import cache
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
@@ -13,9 +14,12 @@ from settings.serializers import (
     LDAPTestConfigSerializer,
     LDAPTestLoginSerializer
 )
+from orgs.models import Organization
+from orgs.utils import current_org
 from settings.tasks import sync_ldap_user
 from settings.utils import (
-    LDAPSyncUtil, LDAPTestUtil
+    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
 from .tools import (
     verbose_ping, verbose_telnet, verbose_nmap,
@@ -24,13 +28,7 @@ from .tools import (
 
 logger = get_logger(__name__)
 
-CACHE_KEY_LDAP_TEST_CONFIG_MSG = 'CACHE_KEY_LDAP_TEST_CONFIG_MSG'
-CACHE_KEY_LDAP_TEST_LOGIN_MSG = 'CACHE_KEY_LDAP_TEST_LOGIN_MSG'
-CACHE_KEY_LDAP_SYNC_USER_MSG = 'CACHE_KEY_LDAP_SYNC_USER_MSG'
 CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS'
-CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS'
-CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS = 'CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS'
-TASK_STATUS_IS_RUNNING = 'RUNNING'
 TASK_STATUS_IS_OVER = 'OVER'
 
 
@@ -112,13 +110,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         msg_type = data.pop('msg_type', 'testing_config')
         try:
             tool_func = getattr(self, f'run_{msg_type.lower()}')
-            await asyncio.to_thread(tool_func, data)
-            if msg_type == 'testing_config':
-                ok, msg = cache.get(CACHE_KEY_LDAP_TEST_CONFIG_MSG)
-            elif msg_type == 'sync_user':
-                ok, msg = cache.get(CACHE_KEY_LDAP_SYNC_USER_MSG)
-            else:
-                ok, msg = cache.get(CACHE_KEY_LDAP_TEST_LOGIN_MSG)
+            ok, msg = await asyncio.to_thread(tool_func, data)
             await self.send_msg(ok, msg)
         except Exception as error:
             await self.send_msg(msg='Exception: %s' % error)
@@ -164,46 +156,71 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
     def set_task_status_over(task_key, ttl=120):
         cache.set(task_key, TASK_STATUS_IS_OVER, ttl)
 
-    @staticmethod
-    def set_task_msg(task_key, ok, msg):
-        cache.set(task_key, (ok, msg), 120)
-
     def run_testing_config(self, data):
-        while True:
-            if self.task_is_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS):
-                break
-            else:
-                serializer = LDAPTestConfigSerializer(data=data)
-                if not serializer.is_valid():
-                    self.send_msg(msg=f'error: {str(serializer.errors)}')
-                config = self.get_ldap_config(serializer)
-                ok, msg = LDAPTestUtil(config).test_config()
-                self.set_task_status_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS)
-            self.set_task_msg(CACHE_KEY_LDAP_TEST_CONFIG_MSG, ok, msg)
+        serializer = LDAPTestConfigSerializer(data=data)
+        if not serializer.is_valid():
+            self.send_msg(msg=f'error: {str(serializer.errors)}')
+        config = self.get_ldap_config(serializer)
+        ok, msg = LDAPTestUtil(config).test_config()
+        if ok:
+            self.set_task_status_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS)
+        return ok, msg
 
     def run_testing_login(self, data):
-        while True:
-            if self.task_is_over(CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS):
-                break
-            else:
-                serializer = LDAPTestLoginSerializer(data=data)
-                if not serializer.is_valid():
-                    self.send_msg(msg=f'error: {str(serializer.errors)}')
-                username = serializer.validated_data['username']
-                password = serializer.validated_data['password']
-                ok, msg = LDAPTestUtil().test_login(username, password)
-                self.set_task_status_over(CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS, 3)
-            self.set_task_msg(CACHE_KEY_LDAP_TEST_LOGIN_MSG, ok, msg)
+        serializer = LDAPTestLoginSerializer(data=data)
+        if not serializer.is_valid():
+            self.send_msg(msg=f'error: {str(serializer.errors)}')
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        ok, msg = LDAPTestUtil().test_login(username, password)
+        return ok, msg
 
-    def run_sync_user(self, data):
-        while True:
-            if self.task_is_over(CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS):
-                break
-            else:
-                sync_util = LDAPSyncUtil()
-                sync_util.clear_cache()
-                sync_ldap_user()
-                msg = sync_util.get_task_error_msg()
-                ok = False if msg else True
-                self.set_task_status_over(CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS)
-            self.set_task_msg(CACHE_KEY_LDAP_SYNC_USER_MSG, ok, msg)
+    @staticmethod
+    def run_sync_user(data):
+        sync_util = LDAPSyncUtil()
+        sync_util.clear_cache()
+        sync_ldap_user()
+        msg = sync_util.get_task_error_msg()
+        ok = False if msg else True
+        return ok, msg
+
+    def run_import_user(self, data):
+        ok = False
+        org_ids = data.get('org_ids')
+        username_list = data.get('username_list', [])
+        cache_police = data.get('cache_police', True)
+        try:
+            users = self.get_ldap_users(username_list, cache_police)
+            if users is None:
+                msg = _('Get ldap users is None')
+
+            orgs = self.get_orgs(org_ids)
+            new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
+            if error_msg:
+                msg = error_msg
+
+            count = users if users is None else len(users)
+            orgs_name = ', '.join([str(org) for org in orgs])
+            ok = True
+            msg = _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
+        except Exception as e:
+            msg = str(e)
+        return ok, msg
+
+    @staticmethod
+    def get_orgs(org_ids):
+        if org_ids:
+            orgs = list(Organization.objects.filter(id__in=org_ids))
+        else:
+            orgs = [current_org]
+        return orgs
+
+    @staticmethod
+    def get_ldap_users(username_list, cache_police):
+        if '*' in username_list:
+            users = LDAPServerUtil().search()
+        elif cache_police in LDAP_USE_CACHE_FLAGS:
+            users = LDAPCacheUtil().search(search_users=username_list)
+        else:
+            users = LDAPServerUtil().search(search_users=username_list)
+        return users

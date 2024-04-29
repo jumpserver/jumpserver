@@ -90,7 +90,7 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def set_automation_methods(cls, category, tp_name, constraints):
-        from assets.automations import filter_platform_methods
+        from assets.automations import filter_platform_methods, sorted_methods
         automation = constraints.get('automation', {})
         automation_methods = {}
         platform_automation_methods = cls.get_automation_methods()
@@ -101,6 +101,7 @@ class AllTypes(ChoicesMixin):
             methods = filter_platform_methods(
                 category, tp_name, item_name, methods=platform_automation_methods
             )
+            methods = sorted_methods(methods)
             methods = [{'name': m['name'], 'id': m['id']} for m in methods]
             automation_methods[item_name + '_methods'] = methods
         automation.update(automation_methods)
@@ -174,7 +175,6 @@ class AllTypes(ChoicesMixin):
         if settings.XPACK_ENABLED:
             types.extend([
                 (Category.CLOUD, CloudTypes),
-                # (Category.GPT, GPTTypes),
                 (Category.CUSTOM, CustomTypes),
             ])
         return types
@@ -184,8 +184,8 @@ class AllTypes(ChoicesMixin):
         choices = []
 
         for name, tp in dict(cls.category_types()).items():
-            if name == Category.CUSTOM and exclude_custom:
-                continue
+            # if name == Category.CUSTOM and exclude_custom:
+            #     continue
             choices.extend(tp.get_types())
         return choices
 

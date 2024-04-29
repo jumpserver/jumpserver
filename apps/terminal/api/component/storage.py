@@ -2,8 +2,8 @@
 #
 
 from django.utils.translation import gettext_lazy as _
-from django_filters import utils
 from django_filters import rest_framework as drf_filters
+from django_filters import utils
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from common.const.http import GET
 from common.drf.filters import BaseFilterSet
+from common.api.mixin import CommonApiMixin
 from terminal import const
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
 from terminal.models import CommandStorage, ReplayStorage
@@ -22,7 +23,7 @@ __all__ = [
 ]
 
 
-class BaseStorageViewSetMixin:
+class BaseStorageViewSetMixin(CommonApiMixin):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -82,7 +83,7 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
         nodes = [
                     {
                         'id': storage.id,
-                        'name': f'{storage.name}({storage.type})({command_count})',
+                        'name': f'{storage.name}({storage.type}) ({command_count})',
                         'title': f'{storage.name}({storage.type})',
                         'pId': 'root',
                         'isParent': False,

@@ -96,15 +96,9 @@ class BaseTicketMessage(UserMessage):
 
 class TicketAppliedToAssigneeMessage(BaseTicketMessage):
     def __init__(self, user, ticket):
-        self._token = None
+        self.token = random_string(32)
         self.ticket = ticket
         super().__init__(user)
-
-    @property
-    def token(self):
-        if self._token is None:
-            self._token = random_string(32)
-        return self._token
 
     @property
     def content_title(self):
@@ -133,10 +127,12 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         ticket_approval_url = self.get_ticket_approval_url()
         context.update({'ticket_approval_url': ticket_approval_url})
         message = render_to_string('tickets/_msg_ticket.html', context)
-        cache.set(self.token, {'ticket_id': self.ticket.id, 'content': self.content}, 3600)
+        cache.set(self.token, {
+            'ticket_id': self.ticket.id, 'approver_id': self.user.id,
+            'content': self.content,
+        }, 3600)
         return {
-            'subject': self.subject,
-            'message': message
+            'subject': self.subject, 'message': message
         }
 
     @classmethod

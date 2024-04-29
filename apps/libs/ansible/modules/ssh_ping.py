@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: custom_ssh_ping
+module: ssh_ping
 short_description: Use ssh to probe whether an asset is connectable
 description:
     - Use ssh to probe whether an asset is connectable
@@ -16,7 +16,7 @@ description:
 EXAMPLES = '''
 - name: >
     Ping asset server.
-  custom_ssh_ping:
+  ssh_ping:
     login_host: 127.0.0.1
     login_port: 22
     login_user: jms
@@ -25,21 +25,16 @@ EXAMPLES = '''
 
 RETURN = '''
 is_available:
-  description: MongoDB server availability.
+  description: Ping server availability.
   returned: always
   type: bool
   sample: true
-conn_err_msg:
-  description: Connection error message.
-  returned: always
-  type: str
-  sample: ''
 '''
 
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ops.ansible.modules_utils.custom_common import (
+from libs.ansible.modules_utils.custom_common import (
     SSHClient, common_argument_spec
 )
 

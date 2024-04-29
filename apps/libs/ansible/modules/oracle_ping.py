@@ -46,7 +46,7 @@ conn_err_msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ops.ansible.modules_utils.oracle_common import (
+from libs.ansible.modules_utils.oracle_common import (
     OracleClient, oracle_common_argument_spec
 )
 

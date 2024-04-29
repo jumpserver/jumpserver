@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 from functools import reduce
 
@@ -29,6 +30,8 @@ class DefaultCallback:
         )
         self.status = 'running'
         self.finished = False
+        self.local_pid = 0
+        self.private_data_dir = None
 
     @property
     def host_results(self):
@@ -45,6 +48,11 @@ class DefaultCallback:
         event = data.get('event', None)
         if not event:
             return
+
+        pid = data.get('pid', None)
+        if pid:
+            self.write_pid(pid)
+
         event_data = data.get('event_data', {})
         host = event_data.get('remote_addr', '')
         task = event_data.get('task', '')
@@ -152,3 +160,9 @@ class DefaultCallback:
     def status_handler(self, data, **kwargs):
         status = data.get('status', '')
         self.status = self.STATUS_MAPPER.get(status, 'unknown')
+        self.private_data_dir = data.get("private_data_dir", None)
+
+    def write_pid(self, pid):
+        pid_filepath = os.path.join(self.private_data_dir, 'local.pid')
+        with open(pid_filepath, 'w') as f:
+            f.write(str(pid))

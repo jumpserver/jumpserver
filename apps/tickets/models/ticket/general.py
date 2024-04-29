@@ -10,6 +10,7 @@ from django.db.utils import IntegrityError
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
+from accounts.const import AliasAccount
 from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import JMSBaseModel
 from common.exceptions import JMSException
@@ -143,16 +144,13 @@ class StatusMixin:
     def reject(self, processor):
         self._change_state(StepState.rejected, processor)
 
-    def reopen(self):
-        self._change_state_by_applicant(TicketState.reopen)
-
     def close(self):
         self._change_state(TicketState.closed, self.applicant)
 
     def _change_state_by_applicant(self, state):
         if state == TicketState.closed:
             self.status = TicketStatus.closed
-        elif state in [TicketState.reopen, TicketState.pending]:
+        elif state == TicketState.pending:
             self.status = TicketStatus.open
         else:
             raise ValueError("Not supported state: {}".format(state))
@@ -412,6 +410,13 @@ class Ticket(StatusMixin, JMSBaseModel):
                 value = self.rel_snapshot[name]
             elif isinstance(self.rel_snapshot[name], list):
                 value = ','.join(self.rel_snapshot[name])
+        elif name == 'apply_accounts':
+            new_values = []
+            for account in value:
+                alias = dict(AliasAccount.choices).get(account)
+                new_value = alias if alias else account
+                new_values.append(str(new_value))
+            value = ', '.join(new_values)
         elif isinstance(value, list):
             value = ', '.join(value)
         return value

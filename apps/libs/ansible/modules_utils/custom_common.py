@@ -4,9 +4,8 @@ import time
 import paramiko
 from sshtunnel import SSHTunnelForwarder
 
-from packaging import version
 
-if version.parse(paramiko.__version__) > version.parse("2.8.1"):
+class OldSSHTransport(paramiko.transport.Transport):
     _preferred_pubkeys = (
         "ssh-ed25519",
         "ecdsa-sha2-nistp256",
@@ -17,7 +16,6 @@ if version.parse(paramiko.__version__) > version.parse("2.8.1"):
         "rsa-sha2-512",
         "ssh-dss",
     )
-    paramiko.transport.Transport._preferred_pubkeys = _preferred_pubkeys
 
 
 def common_argument_spec():
@@ -36,6 +34,8 @@ def common_argument_spec():
         become_user=dict(type='str', required=False),
         become_password=dict(type='str', required=False, no_log=True),
         become_private_key_path=dict(type='str', required=False, no_log=True),
+
+        old_ssh_version=dict(type='bool', default=False, required=False),
     )
     return options
 
@@ -69,6 +69,8 @@ class SSHClient:
             params['username'] = self.module.params['login_user']
             params['password'] = self.module.params['login_password']
             params['key_filename'] = self.module.params['login_private_key_path'] or None
+        if self.module.params['old_ssh_version']:
+            params['transport_factory'] = OldSSHTransport
         return params
 
     def _get_channel(self):

@@ -363,7 +363,6 @@ class AuthACLMixin:
         if acl.is_action(acl.ActionChoices.notice):
             self.request.session['auth_notice_required'] = '1'
             self.request.session['auth_acl_id'] = str(acl.id)
-            return
 
     def _check_third_party_login_acl(self):
         request = self.request

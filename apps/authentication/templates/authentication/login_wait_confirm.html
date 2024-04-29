@@ -95,6 +95,7 @@ function doRequestAuth() {
                 }
                 clearInterval(interval);
                 clearInterval(checkInterval);
+                cancelTicket();
                 $(".copy-btn").attr('disabled', 'disabled');
                 errorMsgRef.html(data.msg)
             }

@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage
+from terminal.const import TerminalType
 from terminal.models import Terminal
 from terminal.models.component.status import Status
 from users.models import User
@@ -133,7 +134,9 @@ class ServerPerformanceCheckUtil(object):
 
     def initial_terminals(self):
         terminals = []
-        for terminal in Terminal.objects.filter(is_deleted=False):
+        for terminal in Terminal.objects.filter(is_deleted=False).exclude(
+                type__in=[TerminalType.core, TerminalType.celery]
+        ):
             if not terminal.is_active:
                 continue
             terminal.stat = Status.get_terminal_latest_stat(terminal)

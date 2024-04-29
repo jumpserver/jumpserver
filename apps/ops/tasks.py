@@ -1,10 +1,11 @@
 # coding: utf-8
 import datetime
+import time
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
@@ -134,7 +135,6 @@ def clean_up_unexpected_jobs():
 
 @shared_task(verbose_name=_('Clean job_execution db record'))
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
-@after_app_shutdown_clean_periodic
 def clean_job_execution_period():
     logger.info("Start clean job_execution db record")
     now = timezone.now()
@@ -143,3 +143,11 @@ def clean_job_execution_period():
     with tmp_to_root_org():
         del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
         logger.info(f"clean job_execution db record success! delete {days} days {del_res[0]} records")
+
+
+@shared_task
+def longtime_add(x, y):
+    print('long time task begins')
+    time.sleep(50)
+    print('long time task finished')
+    return x + y

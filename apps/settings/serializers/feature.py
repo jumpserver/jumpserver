@@ -75,13 +75,13 @@ class ChatAISettingSerializer(serializers.Serializer):
         required=False, label=_('Chat AI')
     )
     GPT_BASE_URL = serializers.CharField(
-        max_length=256, allow_blank=True, required=False, label=_('Base URL')
+        allow_blank=True, required=False, label=_('Base Url')
     )
     GPT_API_KEY = EncryptedField(
-        max_length=256, allow_blank=True, required=False, label=_('API Key'),
+        allow_blank=True, required=False, label=_('API Key'),
     )
     GPT_PROXY = serializers.CharField(
-        max_length=256, allow_blank=True, required=False, label=_('Proxy')
+        allow_blank=True, required=False, label=_('Proxy')
     )
     GPT_MODEL = serializers.ChoiceField(
         default='', choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
@@ -108,7 +108,8 @@ class ChatAISettingSerializer(serializers.Serializer):
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
-    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Ticket"))
+    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
+    TICKETS_DIRECT_APPROVE = serializers.BooleanField(required=False, default=False, label=_("No login approval"))
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
         label=_("Default period")

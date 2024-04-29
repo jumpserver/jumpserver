@@ -23,13 +23,13 @@ class CeleryResultSerializer(serializers.Serializer):
 class CeleryPeriodTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = PeriodicTask
-        fields = [
-            'name', 'task', 'enabled', 'description',
-            'last_run_at', 'total_run_count'
-        ]
+        read_only_fields = ['name', 'task', 'description',
+                            'last_run_at', 'total_run_count']
+        fields = ['enabled'] + read_only_fields
 
 
 class CeleryTaskSerializer(serializers.ModelSerializer):
+    enabled = serializers.BooleanField(required=False)
     exec_cycle = serializers.CharField(read_only=True, label=_('Execution cycle'))
     next_exec_time = serializers.DateTimeField(
         format="%Y/%m/%d %H:%M:%S", read_only=True, label=_('Next execution time')
@@ -39,7 +39,7 @@ class CeleryTaskSerializer(serializers.ModelSerializer):
         model = CeleryTask
         read_only_fields = [
             'id', 'name', 'meta', 'summary', 'state',
-            'date_last_publish', 'exec_cycle', 'next_exec_time'
+            'date_last_publish', 'exec_cycle', 'next_exec_time', 'enabled'
         ]
         fields = read_only_fields
 

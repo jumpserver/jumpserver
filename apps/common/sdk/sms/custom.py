@@ -43,6 +43,7 @@ class CustomSMS(BaseSMSClient):
                 raise JMSException(detail=response.text, code=response.status_code)
         except Exception as exc:
             logger.error('Custom sms error: {}'.format(exc))
+            raise JMSException(exc)
 
 
 client = CustomSMS

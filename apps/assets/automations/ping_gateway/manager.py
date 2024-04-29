@@ -92,18 +92,26 @@ class PingGatewayManager:
     @staticmethod
     def on_host_success(gateway, account):
         print('\033[32m {} -> {}\033[0m\n'.format(gateway, account))
-        gateway.set_connectivity(Connectivity.OK)
-        if not account:
-            return
-        account.set_connectivity(Connectivity.OK)
+        try:
+            gateway.set_connectivity(Connectivity.OK)
+            if not account:
+                return
+            account.set_connectivity(Connectivity.OK)
+        except Exception as e:
+            print(f'\033[31m Update account {account.name} or '
+                  f'update asset {gateway.name} connectivity failed: {e} \033[0m\n')
 
     @staticmethod
     def on_host_error(gateway, account, error):
         print('\033[31m {} -> {} 原因: {} \033[0m\n'.format(gateway, account, error))
-        gateway.set_connectivity(Connectivity.ERR)
-        if not account:
-            return
-        account.set_connectivity(Connectivity.ERR)
+        try:
+            gateway.set_connectivity(Connectivity.ERR)
+            if not account:
+                return
+            account.set_connectivity(Connectivity.ERR)
+        except Exception as e:
+            print(f'\033[31m Update account {account.name} or '
+                  f'update asset {gateway.name} connectivity failed: {e} \033[0m\n')
 
     @staticmethod
     def before_runner_start():

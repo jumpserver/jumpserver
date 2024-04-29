@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const.automation import AccountBackupType
+from accounts.const import AccountBackupType
 from common.const.choices import Trigger
 from common.db import fields
 from common.db.encoder import ModelJSONFieldEncoder

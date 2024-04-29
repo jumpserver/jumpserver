@@ -92,6 +92,12 @@ class UserLoginContextMixin:
                 'logo': static('img/login_feishu_logo.png')
             },
             {
+                'name': 'Lark',
+                'enabled': settings.AUTH_LARK,
+                'url': reverse('authentication:lark-qr-login'),
+                'logo': static('img/login_lark_logo.png')
+            },
+            {
                 'name': _('Slack'),
                 'enabled': settings.AUTH_SLACK,
                 'url': reverse('authentication:slack-qr-login'),
@@ -112,6 +118,10 @@ class UserLoginContextMixin:
             {
                 'title': '中文(简体)',
                 'code': 'zh-hans'
+            },
+            {
+                'title': '中文(繁體)',
+                'code': 'zh-hant'
             },
             {
                 'title': 'English',
@@ -191,6 +201,9 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
     def redirect_third_party_auth_if_need(self, request):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
         if self.request.GET.get("admin", 0):
+            return None
+
+        if not settings.XPACK_ENABLED:
             return None
 
         auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]

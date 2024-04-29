@@ -84,7 +84,8 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
         logger.info("Delay refresh user orgs: {} {}".format(self.user, [o.name for o in to_refresh_orgs]))
         sync = True if settings.ASSET_SIZE == 'small' else False
         refresh_user_orgs_perm_tree.apply(sync=sync, user_orgs=((self.user, tuple(to_refresh_orgs)),))
-        refresh_user_favorite_assets.apply(sync=sync, users=(self.user,))
+        with tmp_to_root_org():
+            refresh_user_favorite_assets.apply(sync=sync, users=(self.user,))
 
     @timeit
     def refresh_tree_manual(self):
@@ -194,6 +195,7 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
 
     @on_transaction_commit
     def expire_perm_tree_for_users_orgs(self, user_ids, org_ids):
+        user_ids = list(user_ids)
         org_ids = [str(oid) for oid in org_ids]
         with self.client.pipeline() as p:
             for uid in user_ids:

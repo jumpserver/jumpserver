@@ -406,6 +406,15 @@
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
         $('#login-form').submit(); //post提交
     }
+    function checkHealth() {
+        let url =  "{% url 'health' %}";
+        requestApi({
+            url: url,
+            method: "GET",
+            flash_message: false,
+        })
+    }
+    setInterval(checkHealth, 30 * 1000);
 </script>
 </html>
 

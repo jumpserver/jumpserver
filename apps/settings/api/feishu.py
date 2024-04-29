@@ -1,16 +1,16 @@
-from rest_framework.views import Response
-from rest_framework.generics import GenericAPIView
-from rest_framework.exceptions import APIException
-from rest_framework import status
 from django.utils.translation import gettext_lazy as _
+from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.generics import GenericAPIView
+from rest_framework.views import Response
 
-from settings.models import Setting
 from common.sdk.im.feishu import FeiShu
-
+from settings.models import Setting
 from .. import serializers
 
 
 class FeiShuTestingAPI(GenericAPIView):
+    category = 'FEISHU'
     serializer_class = serializers.FeiShuSettingSerializer
     rbac_perms = {
         'POST': 'settings.change_auth'
@@ -20,11 +20,11 @@ class FeiShuTestingAPI(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        app_id = serializer.validated_data['FEISHU_APP_ID']
-        app_secret = serializer.validated_data.get('FEISHU_APP_SECRET')
+        app_id = serializer.validated_data[f'{self.category}_APP_ID']
+        app_secret = serializer.validated_data.get(f'{self.category}_APP_SECRET')
 
         if not app_secret:
-            secret = Setting.objects.filter(name='FEISHU_APP_SECRET').first()
+            secret = Setting.objects.filter(name=f'{self.category}_APP_SECRET').first()
             if secret:
                 app_secret = secret.cleaned_value
 
@@ -40,3 +40,8 @@ class FeiShuTestingAPI(GenericAPIView):
             except:
                 error = e.detail
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': error})
+
+
+class LarkTestingAPI(FeiShuTestingAPI):
+    category = 'LARK'
+    serializer_class = serializers.LarkSettingSerializer
