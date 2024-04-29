@@ -1022,14 +1022,6 @@ msgstr "* 密码长度范围 6-30 位"
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
-#: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:48
-#: terminal/const.py:78 terminal/models/session/sharing.py:121
-#: tickets/views/approve.py:117
-msgid "Success"
-msgstr "成功"
-
 #: accounts/signal_handlers.py:47
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
@@ -3721,18 +3713,9 @@ msgstr "定时触发"
 msgid "Ready"
 msgstr "准备"
 
-#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:30
-#: tickets/const.py:40
-msgid "Pending"
-msgstr "待定的"
-
 #: common/const/choices.py:17 ops/const.py:72
 msgid "Running"
 msgstr "运行中"
-
-#: common/const/choices.py:21
-msgid "Canceled"
-msgstr "取消"
 
 #: common/const/common.py:5
 #, python-format
