@@ -26,11 +26,18 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
+ARG RECEPTOR_VERSION=v1.4.5
+RUN set -ex \
+    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION/v/}_linux_${TARGETARCH}.tar.gz \
+    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
+    && chown root:root /usr/local/bin/receptor \
+    && chmod 755 /usr/local/bin/receptor \
+    && rm -f /opt/receptor.tar.gz
+
 ARG VERSION
 ENV VERSION=$VERSION
 
 WORKDIR /opt/jumpserver
-
 ADD . .
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
@@ -42,16 +49,34 @@ ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
         g++                           \
+        make                          \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
-        default-libmysqlclient-dev    \
-        default-mysql-client          \
+        freetds-dev                   \
+        libffi-dev                    \
+        libjpeg-dev                   \
+        libkrb5-dev                   \
         libldap2-dev                  \
+        libpq-dev                     \
         libsasl2-dev                  \
+        libssl-dev                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
-        libxmlsec1-openssl"
+        libxmlsec1-openssl            \
+        freerdp2-dev                  \
+        libaio-dev"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
+        default-libmysqlclient-dev    \
+        default-mysql-client          \
+        git                           \
+        git-lfs                       \
+        unzip                         \
+        xz-utils                      \
+        wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
@@ -62,6 +87,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
     && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt/jumpserver
@@ -84,6 +110,7 @@ ENV LANG=zh_CN.UTF-8 \
 
 ARG DEPENDENCIES="                    \
         libldap2-dev                  \
+        libpq-dev                     \
         libx11-dev                    \
         libxmlsec1-openssl"
 
@@ -94,6 +121,7 @@ ARG TOOLS="                           \
         default-mysql-client          \
         iputils-ping                  \
         locales                       \
+        netcat-openbsd                \
         nmap                          \
         openssh-client                \
         patch                         \
@@ -121,6 +149,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /usr/local/bin /usr/local/bin
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
+COPY --from=stage-1 /opt/jumpserver/release/jumpserver/apps/libs/ansible/ansible.cfg /etc/ansible/
 
 WORKDIR /opt/jumpserver
 

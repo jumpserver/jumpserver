@@ -23,6 +23,14 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
+ARG RECEPTOR_VERSION=v1.4.5
+RUN set -ex \
+    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION/v/}_linux_${TARGETARCH}.tar.gz \
+    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
+    && chown root:root /usr/local/bin/receptor \
+    && chmod 755 /usr/local/bin/receptor \
+    && rm -f /opt/receptor.tar.gz
+
 ARG VERSION
 ENV VERSION=$VERSION
 
@@ -36,6 +44,7 @@ ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
         g++                           \
+        make                          \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
@@ -58,27 +67,28 @@ ARG TOOLS="                           \
         curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
-        libldap2-dev                  \
-        libsasl2-dev                  \
-        libxml2-dev                   \
-        libxmlsec1-dev                \
-        libxmlsec1-openssl"
+        git                           \
+        git-lfs                       \
+        unzip                         \
+        xz-utils                      \
+        wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core-apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
     sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
     && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
-RUN --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,target=/root/.cache,sharing=locked,id=core \
     --mount=type=bind,source=poetry.lock,target=/opt/jumpserver/poetry.lock \
     --mount=type=bind,source=pyproject.toml,target=/opt/jumpserver/pyproject.toml \
     set -ex \
@@ -94,7 +104,6 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
-        libjpeg-dev                   \
         libldap2-dev                  \
         libpq-dev                     \
         libx11-dev                    \
@@ -103,17 +112,12 @@ ARG DEPENDENCIES="                    \
 ARG TOOLS="                           \
         ca-certificates               \
         default-libmysqlclient-dev    \
-        default-mysql-client          \
-        iputils-ping                  \
-        locales                       \
-        netcat-openbsd                \
-        nmap                          \
         openssh-client                \
         sshpass"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core-apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
     sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -125,14 +129,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
     && echo "no" | dpkg-reconfigure dash \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc
-
-ARG RECEPTOR_VERSION=v1.4.5
-RUN set -ex \
-    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION/v/}_linux_${TARGETARCH}.tar.gz \
-    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
-    && chown root:root /usr/local/bin/receptor \
-    && chmod 755 /usr/local/bin/receptor \
-    && rm -f /opt/receptor.tar.gz
 
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /usr/local/bin /usr/local/bin
