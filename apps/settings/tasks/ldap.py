@@ -69,7 +69,6 @@ def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:
         return
     task_name = 'import_ldap_user_periodic'
-    disable_celery_periodic_task(task_name)
     if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
         return
 
