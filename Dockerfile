@@ -102,7 +102,8 @@ RUN --mount=type=cache,target=/root/.cache,sharing=locked \
     && pip install poetry -i ${PIP_MIRROR} \
     && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
-    && poetry install --only=main
+    && poetry install --only=main \
+    && pip install xmlsec --force-reinstall --no-cache-dir -i ${PIP_MIRROR}
 
 FROM python:3.11-slim-bullseye
 ARG TARGETARCH
