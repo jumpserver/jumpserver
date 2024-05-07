@@ -16,7 +16,7 @@ def migrate_system_user_to_accounts(apps, schema_editor):
         count += len(asset_permissions)
         updated = []
         for asset_permission in asset_permissions:
-            asset_permission.accounts = [s.username for s in asset_permission.system_users.all()]
+            asset_permission.accounts = [s.username for s in asset_permission.system_users.all() if s.username.strip()]
             updated.append(asset_permission)
         asset_permission_model.objects.bulk_update(updated, ['accounts'])
 
