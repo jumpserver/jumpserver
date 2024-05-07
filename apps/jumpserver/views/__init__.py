@@ -5,3 +5,4 @@ from .other import *
 from .celery_flower import *
 from .swagger import *
 from .error_views import *
+from .nginx_auth import *
