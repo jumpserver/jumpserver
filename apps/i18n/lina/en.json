@@ -1308,5 +1308,6 @@
     "ZoneEnabled": "Enable zone",
     "ZoneHelpMessage": "The zone is the location where assets are located, which can be a data center, public cloud, or VPC. Gateways can be set up within the region. When the network cannot be directly accessed, users can utilize gateways to log in to the assets.",
     "ZoneList": "Zones",
-    "ZoneUpdate": "Update the zone"
+    "ZoneUpdate": "Update the zone",
+    "TailLog": "Tail Log"
 }
