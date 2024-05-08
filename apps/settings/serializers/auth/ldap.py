@@ -82,7 +82,8 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=False, label=_('User DN cache timeout (s)'),
         help_text=_(
             'Caching the User DN obtained during user login authentication can effectively'
-            'improve the speed of user authentication., 0 means no cache'
+            'improve the speed of user authentication., 0 means no cache<br>'
+            'If the user OU structure has been adjusted, click Submit to clear the user DN cache'
         )
     )
     AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(required=False, label=_('Search paged size (piece)'))
