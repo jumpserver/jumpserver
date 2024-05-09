@@ -19,7 +19,7 @@ class Domain(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
 
     class Meta:
-        verbose_name = _("Domain")
+        verbose_name = _("Zone")
         unique_together = [('org_id', 'name')]
         ordering = ('name',)
 

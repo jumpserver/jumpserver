@@ -2632,7 +2632,7 @@ msgstr ""
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:750
 #: users/models/user.py:918
 msgid "FeiShu"
-msgstr "Lark"
+msgstr ""
 
 #: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:15
@@ -4521,7 +4521,7 @@ msgstr ""
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
-msgstr ""
+msgstr "Zones amount"
 
 #: orgs/serializers.py:16
 msgid "Gateways amount"
