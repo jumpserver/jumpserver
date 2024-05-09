@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('audits', '0010_auto_20200811_1122'),
     ]
@@ -13,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userloginlog',
             name='backend',
-            field=models.CharField(default='', max_length=32, verbose_name='Authentication backend'),
+            field=models.CharField(default='', max_length=32, verbose_name='Auth backend'),
         ),
     ]
