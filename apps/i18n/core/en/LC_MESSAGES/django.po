@@ -2632,7 +2632,7 @@ msgstr ""
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:750
 #: users/models/user.py:918
 msgid "FeiShu"
-msgstr "Lark"
+msgstr ""
 
 #: audits/signal_handlers/login_log.py:39 authentication/views/login.py:95
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:15
@@ -4671,11 +4671,11 @@ msgstr ""
 
 #: rbac/builtin.py:115
 msgid "SystemAdmin"
-msgstr ""
+msgstr "System Admin"
 
 #: rbac/builtin.py:118
 msgid "SystemAuditor"
-msgstr ""
+msgstr "System Auditor"
 
 #: rbac/builtin.py:121
 msgid "SystemComponent"
@@ -4683,15 +4683,15 @@ msgstr ""
 
 #: rbac/builtin.py:127
 msgid "OrgAdmin"
-msgstr "Org Admin"
+msgstr "Organizational Admin"
 
 #: rbac/builtin.py:130
 msgid "OrgAuditor"
-msgstr "Org Auditor"
+msgstr "Organizational Auditor"
 
 #: rbac/builtin.py:133
 msgid "OrgUser"
-msgstr "Org User"
+msgstr "Organizational user"
 
 #: rbac/models/menu.py:13
 msgid "Menu permission"
