@@ -131,7 +131,6 @@ INSTALLED_APPS = [
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
     'authentication.apps.AuthenticationConfig',  # authentication
-    'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
     'notifications.apps.NotificationsConfig',
