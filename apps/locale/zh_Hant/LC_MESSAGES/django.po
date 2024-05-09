@@ -2583,7 +2583,7 @@ msgstr "登錄日期"
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
 #: audits/serializers.py:184
-msgid "Authentication backend"
+msgid "Auth backend"
 msgstr "認證方式"
 
 #: audits/models.py:256
@@ -6852,7 +6852,7 @@ msgid "Can download session replay"
 msgstr "可以下載會話錄影"
 
 #: terminal/models/session/session.py:35
-msgid "Account id"
+msgid "Account ID"
 msgstr "帳號 ID"
 
 #: terminal/models/session/session.py:37 terminal/models/session/sharing.py:118
