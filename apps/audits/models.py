@@ -209,7 +209,7 @@ class UserLoginLog(models.Model):
     )
     datetime = models.DateTimeField(default=timezone.now, verbose_name=_("Login Date"), db_index=True)
     backend = models.CharField(
-        max_length=32, default="", verbose_name=_("Authentication backend")
+        max_length=32, default="", verbose_name=_("Auth backend")
     )
 
     def __str__(self):
@@ -263,7 +263,7 @@ class UserSession(models.Model):
     city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_("Login city"))
     user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_("User agent"))
     type = models.CharField(choices=LoginTypeChoices.choices, max_length=2, verbose_name=_("Login type"))
-    backend = models.CharField(max_length=32, default="", verbose_name=_("Authentication backend"))
+    backend = models.CharField(max_length=32, default="", verbose_name=_("Auth backend"))
     date_created = models.DateTimeField(null=True, blank=True, verbose_name=_('Date created'))
     user = models.ForeignKey(
         'users.User', verbose_name=_('User'), related_name='sessions', on_delete=models.CASCADE
