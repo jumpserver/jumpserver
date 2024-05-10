@@ -5,14 +5,16 @@
     <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
+    <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}"/>
     <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
     <script src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static "js/jumpserver.js" %}?_=9"></script>
     <style>
         body {
-            background-color: black;
             margin: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
         .xterm-rows {
@@ -22,63 +24,82 @@
 
         .terminal .xterm-viewport {
             background-color: #1f1b1b;
-            overflow: auto;
+            overflow: hidden;
         }
 
-        body ::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
-            background-color: #272323;
-            border-radius: 6px;
-        }
-
-        body ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        body ::-webkit-scrollbar-thumb {
-            background-color: #494141;
-            border-radius: 6px;
-        }
         #term {
+            background-color: black;
+            margin: 12px;
             padding: 0 8px;
+            height: calc(100% - 108px);
+            border-radius: 4px 0 0 0;
         }
+
+        .header {
+            margin: 12px;
+        }
+
         .info {
             display: flex;
             flex-wrap: wrap;
-            width: 100%;
             padding: 6px 8px 6px 24px;
             margin: 0;
-            background-color: #F3F3F5;
         }
+
+        .task-type {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 24px;
+            text-align: left;
+            color: #1F2329;
+            padding-bottom: 8px;
+        }
+
         .info .item {
             flex: auto;
-            list-style-type: square;
             font-size: 14px;
-            color: #585757;
+            list-style: none;
         }
+
+        .info .item .label {
+            font-weight: 400;
+            line-height: 22px;
+            font-size: 14px;
+            text-align: left;
+            color: #646A73;
+            padding-bottom: 12px;
+        }
+
         .info .item .value {
-            color: black;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+            text-align: left;
+            color: #1F2329;
         }
     </style>
 </head>
-<ul class="info">
-    <li class="item">
-        <span>ID:</span>
-        <span class="value task-id"></span>
-    </li>
-    <li class="item">
-        <span>{% trans 'Task name' %}:</span>
-        <span class="value task-type"></span>
-    </li>
-    <li class="item">
-        <span>{% trans 'Date start' %}:</span>
-        <span class="value date-start"></span>
-    </li>
-</ul>
-<div id="term" style="height: 100%;width: 100%">
+<div class="content">
+    <div class="header">
+        <ul class="info">
+            <li class="item">
+                <span class="value task-type"></span>
+            </li>
+        </ul>
+        <ul class="info">
+            <li class="item">
+                <span class="label">ID:</span>
+                <span class="value task-id"></span>
+            </li>
+            <li class="item">
+                <span class="label">{% trans 'Date start' %}:</span>
+                <span class="value date-start"></span>
+            </li>
+        </ul>
+    </div>
+    <div id="term">
+    </div>
 </div>
-
 <script>
     var scheme = document.location.protocol === "https:" ? "wss" : "ws";
     var port = document.location.port ? ":" + document.location.port : "";
@@ -105,17 +126,17 @@
         window.fit.fit(term);
 
         ws = new WebSocket(wsURL);
-        ws.onmessage = function(e) {
+        ws.onmessage = function (e) {
             var data = JSON.parse(e.data);
             term.write(data.message);
         };
-        ws.onopen = function() {
+        ws.onopen = function () {
             var msg = {"task": taskId};
             ws.send(JSON.stringify(msg))
         };
         ws.onerror = function (e) {
             ws = new WebSocket(failOverWsURL);
-            ws.onmessage = function(e) {
+            ws.onmessage = function (e) {
                 var data = JSON.parse(e.data);
                 term.write(data.message);
             };
@@ -127,8 +148,9 @@
     }).on('resize', window, function () {
         window.fit.fit(term);
     });
+
     function getAutomationExecutionInfo() {
-        let url =  "{% url 'api-ops:task-executions-detail' pk=task_id %}";
+        let url = "{% url 'api-ops:task-executions-detail' pk=task_id %}";
 
         requestApi({
             url: url,
