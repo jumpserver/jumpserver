@@ -67,5 +67,5 @@ def set_assets_size_to_setting(sender, **kwargs):
 
     if amount > 20000:
         settings.ASSET_SIZE = 'large'
-    elif amount > 2000:
+    elif amount > 5000:
         settings.ASSET_SIZE = 'medium'
