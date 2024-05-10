@@ -67,7 +67,7 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "user_agent": {"label": _("User agent")},
             "reason_display": {"label": _("Reason display")},
-            "backend_display": {"label": _("Authentication backend")},
+            "backend_display": {"label": _("Auth backend display")},
         }
 
 
@@ -181,7 +181,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
         ]
         fields = fields_small
         extra_kwargs = {
-            "backend_display": {"label": _("Authentication backend")},
+            "backend_display": {"label": _("Auth backend display")},
         }
 
     def get_is_current_user_session(self, obj):

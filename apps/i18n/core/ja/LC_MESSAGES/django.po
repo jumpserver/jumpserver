@@ -2676,7 +2676,7 @@ msgstr "日付ログイン"
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
 #: audits/serializers.py:184
-msgid "Authentication backend"
+msgid "Auth backend"
 msgstr "認証バックエンド"
 
 #: audits/models.py:256
@@ -7027,7 +7027,7 @@ msgid "Can download session replay"
 msgstr "セッション再生をダウンロードできます"
 
 #: terminal/models/session/session.py:35
-msgid "Account id"
+msgid "Account ID"
 msgstr "アカウント ID"
 
 #: terminal/models/session/session.py:37 terminal/models/session/sharing.py:118

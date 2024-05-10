@@ -32,7 +32,7 @@ class Session(OrgModelMixin):
     asset = models.CharField(max_length=128, verbose_name=_("Asset"), db_index=True)
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
-    account_id = models.CharField(max_length=128, verbose_name=_("Account id"), db_index=True)
+    account_id = models.CharField(max_length=128, verbose_name=_("Account ID"), db_index=True)
     protocol = models.CharField(default='ssh', max_length=16, db_index=True)
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM.choices, default="ST", verbose_name=_("Login from"))
     type = models.CharField(max_length=16, default='normal', db_index=True)
