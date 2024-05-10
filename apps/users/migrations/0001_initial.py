@@ -2,6 +2,7 @@
 
 import common.db.fields
 import common.db.models
+from django.contrib.auth.hashers import make_password
 import common.utils.django
 from django.conf import settings
 import django.contrib.auth.models
@@ -10,6 +11,28 @@ import django.db.models.deletion
 import django.utils.timezone
 import users.models.user
 import uuid
+
+
+
+def add_default_group(apps, schema_editor):
+    group_model = apps.get_model("users", "UserGroup")
+    db_alias = schema_editor.connection.alias
+    group_model.objects.using(db_alias).create(
+        name="Default"
+    )
+
+
+def add_default_admin(apps, schema_editor):
+    user_model = apps.get_model("users", "User")
+    db_alias = schema_editor.connection.alias
+    admin = user_model.objects.using(db_alias).create(
+        username="admin", name="Administrator",
+        email="admin@mycomany.com", role="Admin",
+        password=make_password("admin"),
+    )
+    group_model = apps.get_model("users", "UserGroup")
+    default_group = group_model.objects.using(db_alias).get(name="Default")
+    admin.groups.add(default_group)
 
 
 class Migration(migrations.Migration):
@@ -129,4 +152,6 @@ class Migration(migrations.Migration):
             name='user',
             unique_together={('dingtalk_id',), ('feishu_id',), ('wecom_id',), ('lark_id',), ('slack_id',)},
         ),
+        migrations.RunPython(add_default_group),
+        migrations.RunPython(add_default_admin),
     ]

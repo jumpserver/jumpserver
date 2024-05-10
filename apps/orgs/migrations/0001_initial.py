@@ -4,6 +4,26 @@ from django.db import migrations, models
 import orgs.models
 import uuid
 
+default_id = '00000000-0000-0000-0000-000000000002'
+
+
+def add_default_org(apps, schema_editor):
+    org_cls = apps.get_model('orgs', 'Organization')
+    defaults = {'name': 'Default', 'id': default_id}
+    org_cls.objects.get_or_create(defaults=defaults, id=default_id)
+
+
+def update_builtin_org(apps, schema_editor):
+    org_model = apps.get_model('orgs', 'Organization')
+    org_model.objects.create(
+        id='00000000-0000-0000-0000-000000000004',
+        name='SYSTEM', builtin=True
+    )
+
+    # 更新 Default
+    org_model.objects.filter(name='DEFAULT').update(builtin=True)
+
+
 
 class Migration(migrations.Migration):
 
@@ -31,4 +51,6 @@ class Migration(migrations.Migration):
             },
             bases=(orgs.models.OrgRoleMixin, models.Model),
         ),
+        migrations.RunPython(add_default_org),
+        migrations.RunPython(update_builtin_org),
     ]
