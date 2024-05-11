@@ -35,6 +35,7 @@ class AccountTemplateSerializer(BaseAccountSerializer):
             'su_from'
         ]
         extra_kwargs = {
+            **BaseAccountSerializer.Meta.extra_kwargs,
             'secret_strategy': {'help_text': _('Secret generation strategy for account creation')},
             'auto_push': {'help_text': _('Whether to automatically push the account to the asset')},
             'platforms': {
@@ -64,6 +65,9 @@ class AccountTemplateSerializer(BaseAccountSerializer):
 
 class AccountTemplateSecretSerializer(SecretReadableMixin, AccountTemplateSerializer):
     class Meta(AccountTemplateSerializer.Meta):
+        fields = AccountTemplateSerializer.Meta.fields + ['spec_info']
         extra_kwargs = {
+            **AccountTemplateSerializer.Meta.extra_kwargs,
             'secret': {'write_only': False},
+            'spec_info': {'label': _('Spec info')},
         }

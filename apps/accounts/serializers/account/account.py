@@ -431,8 +431,11 @@ class AssetAccountBulkSerializer(
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
+        fields = AccountSerializer.Meta.fields + ['spec_info']
         extra_kwargs = {
+            **AccountSerializer.Meta.extra_kwargs,
             'secret': {'write_only': False},
+            'spec_info': {'label': _('Spec info')},
         }
 
 
