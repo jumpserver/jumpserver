@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-10 15:26+0800\n"
+"POT-Creation-Date: 2024-05-11 11:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1814,7 +1814,7 @@ msgstr "地址"
 msgid "Platform"
 msgstr "平台"
 
-#: assets/models/asset/common.py:163 assets/models/domain.py:22
+#: assets/models/asset/common.py:163
 #: authentication/serializers/connect_token_secret.py:136
 #: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:327
 msgid "Domain"
@@ -2656,8 +2656,7 @@ msgstr "MFA"
 msgid "Login Date"
 msgstr "登录日期"
 
-#: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
-#: audits/serializers.py:184
+#: audits/models.py:212 audits/models.py:266
 msgid "Auth backend"
 msgstr "认证方式"
 
@@ -8742,19 +8741,15 @@ msgstr "或"
 msgid "Task \"%s\" starts executing"
 msgstr "任务 \"%s\" 开始执行"
 
-#: xpack/plugins/cloud/manager.py:45
-msgid "Account is valid"
-msgstr "账号有效"
-
-#: xpack/plugins/cloud/manager.py:55 xpack/plugins/cloud/manager.py:57
-#: xpack/plugins/cloud/providers/gcp.py:64
+#: xpack/plugins/cloud/manager.py:45 xpack/plugins/cloud/manager.py:55
+#: xpack/plugins/cloud/manager.py:57 xpack/plugins/cloud/providers/gcp.py:64
 #: xpack/plugins/cloud/providers/huaweicloud.py:34
 msgid "Account unavailable"
 msgstr "账号无效"
 
 #: xpack/plugins/cloud/manager.py:71
 msgid "View the task details path: "
-msgstr "查看任务详情路径"
+msgstr "查看任务详情路径："
 
 #: xpack/plugins/cloud/manager.py:74
 msgid "Account Details"
@@ -9315,7 +9310,8 @@ msgstr "定期清除同步实例任务执行记录"
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
-#: xpack/plugins/interface/meta.py:9
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:45
+#: xpack/plugins/interface/models.py:86
 msgid "Interface settings"
 msgstr "界面设置"
 
@@ -9350,10 +9346,6 @@ msgstr "主题"
 msgid "Footer content"
 msgstr "页脚内容"
 
-#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
-msgid "Interface setting"
-msgstr "界面设置"
-
 #: xpack/plugins/interface/serializers/interface.py:37
 msgid "Wide logo on top"
 msgstr "顶部宽 Logo"
@@ -9367,7 +9359,7 @@ msgid "License import successfully"
 msgstr "许可证导入成功"
 
 #: xpack/plugins/license/api.py:53
-msgid "License is invalid"
+msgid "Invalid license"
 msgstr "无效的许可证"
 
 #: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
@@ -9389,6 +9381,15 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Account is valid"
+#~ msgstr "账号有效"
+
+#~ msgid "Interface setting"
+#~ msgstr "界面设置"
+
+#~ msgid "License is invalid"
+#~ msgstr "无效的许可证"
 
 #~ msgid "Key password"
 #~ msgstr "密钥密码"
