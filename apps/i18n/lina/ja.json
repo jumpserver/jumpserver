@@ -120,7 +120,7 @@
     "AppletHelpText": "アップロード プロセス中に、アプリケーションが存在しない場合はアプリケーションが作成され、すでに存在する場合はアプリケーションが更新されます。",
     "AppletHostCreate": "リモート アプリケーション発行者を追加する",
     "AppletHostDetail": "リモート アプリケーション パブリッシャの詳細",
-    "AppletHostDomainHelpText": "これらのドメインはシステム組織にあります",
+    "AppletHostZoneHelpText": "これらのドメインはシステム組織にあります",
     "AppletHostSelectHelpMessage": "アセットを接続する際、アプリケーションのデプロイホストの選択はランダムです。特定のアセットに固定のデプロイホストを割り当てたい場合は、AppletHost: <ホスト名>」というラベルを指定してください。",
     "AppletHostUpdate": "リモート アプリケーション パブリッシャの更新",
     "AppletHosts": "アプリケーションパブリッシャ",
