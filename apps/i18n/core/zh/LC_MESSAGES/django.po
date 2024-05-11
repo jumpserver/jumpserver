@@ -2658,7 +2658,7 @@ msgstr "登录日期"
 
 #: audits/models.py:212 audits/models.py:266 audits/serializers.py:70
 #: audits/serializers.py:184
-msgid "Authentication backend"
+msgid "Auth backend"
 msgstr "认证方式"
 
 #: audits/models.py:256
@@ -6896,7 +6896,7 @@ msgid "Can download session replay"
 msgstr "可以下载会话录像"
 
 #: terminal/models/session/session.py:35
-msgid "Account id"
+msgid "Account ID"
 msgstr "账号 ID"
 
 #: terminal/models/session/session.py:37 terminal/models/session/sharing.py:118

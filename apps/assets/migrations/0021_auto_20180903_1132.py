@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='domain',
-            options={'verbose_name': 'Domain'},
+            options={'verbose_name': 'Zone'},
         ),
         migrations.AlterModelOptions(
             name='gateway',
