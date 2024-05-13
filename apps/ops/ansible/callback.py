@@ -35,10 +35,10 @@ class DefaultCallback:
 
     @property
     def host_results(self):
-        results = {}
+        results = defaultdict(dict)
         for state, hosts in self.result.items():
             for host, items in hosts.items():
-                results[host] = items
+                results[host][state] = items
         return results
 
     def is_success(self):
