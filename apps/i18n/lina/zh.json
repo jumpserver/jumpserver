@@ -250,6 +250,7 @@
     "CommandStorage": "命令存储",
     "CommandStorageUpdate": "更新命令存储",
     "Commands": "命令记录",
+    "CommandsTotal": "命令记录总数",
     "Comment": "备注",
     "CommentHelpText": "注意：备注信息会在 Luna 页面的用户授权资产树中进行悬停显示，普通用户可以查看，请不要填写敏感信息。",
     "CommunityEdition": "社区版",
@@ -300,6 +301,7 @@
     "CronExpression": "crontab完整表达式",
     "CrontabOfCreateUpdatePage": "例如：每周日 03:05 执行 <5 3 * * 0> <br/> 使用5位 Linux crontab 表达式 <分 时 日 月 星期> （<a href=\"https://tool.lu/crontab/\" target=\"_blank\">在线工具</a>） <br/> 如果同时设置了定期执行和周期执行，优先使用定期执行",
     "CurrentConnections": "当前连接数",
+    "CurrentConnectionUsers": "当前会话用户数",
     "CurrentUserVerify": "验证当前用户",
     "Custom": "自定义",
     "CustomCol": "自定义列表字段",
@@ -584,7 +586,7 @@
     "LockedIP": "已锁定 IP {count} 个",
     "Log": "日志",
     "LogData": "日志数据",
-    "LogOfLoginSuccessNum": "登录成功日志数",
+    "LoginLogTotal": "登录成功日志数",
     "Logging": "日志记录",
     "LoginAssetConfirm": "资产登录复核",
     "LoginAssetToday": "今日活跃资产数",
@@ -953,6 +955,7 @@
     "ServerTime": "服务器时间",
     "Session": "会话",
     "SessionCommands": "会话命令",
+    "SessionConnectTrend": "会话连接趋势",
     "SessionData": "会话数据",
     "SessionDetail": "会话详情",
     "SessionID": "会话ID",
@@ -1231,5 +1234,4 @@
     "AccessKeys": "访问密钥",
     "InformationModification": "信息更改",
     "Phone": "手机"
-
 }
