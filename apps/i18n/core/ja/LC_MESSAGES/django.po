@@ -2130,7 +2130,7 @@ msgid "Charset"
 msgstr "シャーセット"
 
 #: assets/models/platform.py:105 assets/serializers/platform.py:191
-msgid "Domain enabled"
+msgid "Gateway enabled"
 msgstr "ドメインを有効にする"
 
 #: assets/models/platform.py:107 assets/serializers/platform.py:184
@@ -2376,7 +2376,7 @@ msgid ""
 msgstr ""
 
 #: assets/serializers/platform.py:192
-msgid "Assets can be connected using a domain gateway"
+msgid "Assets can be connected using a zone gateway"
 msgstr ""
 
 #: assets/serializers/platform.py:194

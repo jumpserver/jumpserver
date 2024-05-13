@@ -138,7 +138,7 @@ class Migration(migrations.Migration):
                 ('meta', common.db.fields.JsonDictTextField(blank=True, null=True, verbose_name='Meta')),
                 ('internal', models.BooleanField(default=False, verbose_name='Internal')),
                 ('charset', models.CharField(choices=[('utf-8', 'UTF-8'), ('gbk', 'GBK')], default='utf-8', max_length=8, verbose_name='Charset')),
-                ('domain_enabled', models.BooleanField(default=True, verbose_name='Domain enabled')),
+                ('domain_enabled', models.BooleanField(default=True, verbose_name='Gateway enabled')),
                 ('su_enabled', models.BooleanField(default=False, verbose_name='Su enabled')),
                 ('su_method', models.CharField(blank=True, max_length=32, null=True, verbose_name='Su method')),
                 ('custom_fields', models.JSONField(default=list, null=True, verbose_name='Custom fields')),

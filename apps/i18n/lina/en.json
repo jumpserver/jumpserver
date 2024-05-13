@@ -1267,7 +1267,7 @@
     "Zone": "Zone",
     "ZoneCreate": "Create zone",
     "ZoneEnabled": "Enable zone",
-    "ZoneHelpMessage": "Zone function is designed to solve the problem that some environments (such as: hybrid cloud) cannot be directly connected, and a new function is added. the principle is to log in through the gateway server.<br/><br/>server -> zone gateway -> target assets",
+    "ZoneHelpMessage": "The zone is the location where assets are located, which can be a data center, public cloud, or VPC. Gateways can be set up within the region. When the network cannot be directly accessed, users can utilize gateways to log in to the assets.",
     "ZoneList": "Zones",
     "ZoneUpdate": "Update the zone"
 }
