@@ -195,8 +195,8 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
                 )
             },
             "domain_enabled": {
-                "label": _('Domain enabled'),
-                "help_text": _("Assets can be connected using a domain gateway")
+                "label": _('Gateway enabled'),
+                "help_text": _("Assets can be connected using a zone gateway")
             },
             "domain_default": {"label": _('Default Domain')},
         }

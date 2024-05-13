@@ -334,11 +334,13 @@ class AllTypes(ChoicesMixin):
         return data
 
     @classmethod
-    def create_or_update_by_platform_data(cls, platform_data, platform_cls=None):
+    def create_or_update_by_platform_data(cls, platform_data, platform_cls=None, automation_cls=None):
         # 不直接用 Platform 是因为可能在 migrations 中使用
-        from assets.models import Platform
+        from assets.models import Platform, PlatformAutomation
         if platform_cls is None:
             platform_cls = Platform
+        if automation_cls is None:
+            automation_cls = PlatformAutomation
 
         automation_data = platform_data.pop('automation', {})
         protocols_data = platform_data.pop('protocols', [])
@@ -347,12 +349,18 @@ class AllTypes(ChoicesMixin):
         platform, created = platform_cls.objects.update_or_create(
             defaults=platform_data, name=name
         )
-        if not platform.automation:
-            automation = platform_cls.automation.field.related_model.objects.create()
+
+        try:
+            automation = platform.automation
+        except:
+            automation = None
+
+        if not automation:
+            automation = automation_cls.objects.create()
             platform.automation = automation
             platform.save()
         else:
-            automation = platform.automation
+            automation = automation
         for k, v in automation_data.items():
             setattr(automation, k, v)
         automation.save()

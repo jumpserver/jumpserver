@@ -4,8 +4,8 @@
 import base64
 import datetime
 import uuid
-from typing import Callable
 from collections import defaultdict
+from typing import Callable
 
 import sshpubkeys
 from django.conf import settings
@@ -956,7 +956,10 @@ class User(AuthMixin, SourceMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin
 
     @property
     def receive_backends(self):
-        return self.user_msg_subscription.receive_backends
+        try:
+            return self.user_msg_subscription.receive_backends
+        except:
+            return []
 
     @property
     def is_otp_secret_key_bound(self):

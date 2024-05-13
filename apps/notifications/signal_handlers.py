@@ -70,9 +70,14 @@ def create_system_messages(app_config: AppConfig, **kwargs):
 
             message_type = obj.get_message_type()
             sub, created = SystemMsgSubscription.objects.get_or_create(message_type=message_type)
-            if created:
+            if not created:
+                return
+
+            try:
                 obj.post_insert_to_db(sub)
                 logger.info(f'Create MsgSubscription: package={app_config.module.__package__} type={message_type}')
+            except:
+                pass
     except ModuleNotFoundError:
         pass
 
