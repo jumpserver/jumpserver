@@ -57,7 +57,7 @@ class LabeledMixin(models.Model):
         resources = resources.filter(label_id__in=label_ids) \
             .values('res_id') \
             .order_by('res_id') \
-            .annotate(count=Count('res_id', distinct=True)) \
+            .annotate(count=Count('res_id')) \
             .values('res_id', 'count') \
             .filter(count=len(label_ids))
         return resources
