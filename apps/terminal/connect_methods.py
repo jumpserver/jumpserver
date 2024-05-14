@@ -166,7 +166,8 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
-                    Protocol.mariadb, Protocol.db2
+                    Protocol.mariadb, Protocol.db2,
+                    Protocol.dameng
                 ],
                 'match': 'm2m'
             },
