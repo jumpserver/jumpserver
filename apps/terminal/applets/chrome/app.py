@@ -247,8 +247,7 @@ class AppletApplication(BaseApplication):
         if protocol_setting and protocol_setting.safe_mode:
             # 加载 extensions
             extension_paths = load_extensions()
-            for extension_path in extension_paths:
-                self._chrome_options.add_argument('--load-extension={}'.format(extension_path))
+            self._chrome_options.add_argument('--load-extension={}'.format(','.join(extension_paths)))
 
     @wrapper_progress_bar
     def run(self):
