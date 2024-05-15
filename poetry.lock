@@ -3559,12 +3559,12 @@ reference = "tsinghua"
 
 [[package]]
 name = "jms-storage"
-version = "0.0.57"
+version = "0.0.58"
 description = "Jumpserver storage python sdk tools"
 optional = false
 python-versions = "*"
 files = [
-    {file = "jms-storage-0.0.57.tar.gz", hash = "sha256:765fdd0ebfa0965eb37d820b0bce2d26254126523c3f263eb7aab6a7d45253ff"},
+    {file = "jms-storage-0.0.58.tar.gz", hash = "sha256:9508864c5b65b2628291c39e3eeccedffd77448545a0359a4cb12c6435592e62"},
 ]
 
 [package.dependencies]
@@ -3586,11 +3586,6 @@ pytz = "2023.3"
 requests = "2.31.0"
 s3transfer = "0.6.1"
 six = "1.16.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "jsonfield2"
@@ -7864,4 +7859,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "25198f7f73c8e7dd2ac39ccc4ae94a321c41f47b9d89cbda5b7191ff26676827"
+content-hash = "cc3c3bd359d6db63a6dac6967e7af8efaac73d98a4896a399dd2005185d774ad"
