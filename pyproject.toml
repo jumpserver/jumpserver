@@ -154,6 +154,8 @@ pydantic = "^2.7.1"
 pydantic-core = "^2.18.2"
 annotated-types = "^0.6.0"
 httpx = "^0.27.0"
+distro = "1.9.0"
+tqdm = "4.66.4"
 
 
 [tool.poetry.group.xpack.dependencies]
