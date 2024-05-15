@@ -49,8 +49,14 @@ def _get_instance_field_value(
                 continue
 
             value = getattr(instance, f.name, None) or getattr(instance, f.attname, None)
-            if not isinstance(value, bool) and not value:
+            if not isinstance(value, (bool, int)) and not value:
                 continue
+
+            choices = getattr(f, 'choices', []) or []
+            for c_value, c_label in choices:
+                if c_value == value:
+                    value = c_label
+                    break
 
             if getattr(f, 'primary_key', False):
                 f.verbose_name = 'id'
