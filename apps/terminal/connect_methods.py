@@ -253,8 +253,9 @@ class ConnectMethodUtil:
     def _filter_disable_protocols_connect_methods(cls, methods):
         # 过滤一些特殊的协议方式
         if not getattr(settings, 'TERMINAL_KOKO_SSH_ENABLED'):
-            protocol = Protocol.ssh
-            methods[protocol] = [m for m in methods[protocol] if m['type'] != 'native']
+            disable_ssh_client_protocols = [Protocol.ssh, Protocol.sftp, Protocol.telnet]
+            for protocol in disable_ssh_client_protocols:
+                methods[protocol] = [m for m in methods[protocol] if m['type'] != 'native']
         return methods
 
     @classmethod
