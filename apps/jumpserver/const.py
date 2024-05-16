@@ -8,7 +8,7 @@ __all__ = ['BASE_DIR', 'PROJECT_DIR', 'VERSION', 'CONFIG']
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
-VERSION = '2.0.0'
+VERSION = 'v3.10.10'
 CONFIG = ConfigManager.load_user_config()
 
 
