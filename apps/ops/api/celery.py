@@ -262,6 +262,8 @@ class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             msg = _("Task {} not found").format(execution.name)
             raise JMSException(code='task_not_found_error', detail=msg)
         try:
+            execution.kwargs.pop('__current_lang', None)
+            execution.kwargs.pop('__current_org_id', None)
             t = task.delay(*execution.args, **execution.kwargs)
         except TypeError:
             msg = _("Task {} args or kwargs error").format(execution.name)
