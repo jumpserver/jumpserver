@@ -127,7 +127,7 @@ class JMSInventory:
 
         if platform.is_huawei():
             host['ansible_connection'] = 'network_cli'
-            host['ansible_network_os'] = 'asa'
+            host['ansible_network_os'] = 'ce'
 
         if gateway:
             ansible_connection = host.get('ansible_connection', 'ssh')

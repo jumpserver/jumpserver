@@ -136,6 +136,12 @@ LOGGING = {
     }
 }
 
+if CONFIG.DEBUG_DEV:
+    LOGGING['loggers']['django.db'] = {
+       'handlers': ['console', 'file'],
+       'level': 'DEBUG'
+    }
+
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
 if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:

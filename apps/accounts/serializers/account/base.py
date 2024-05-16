@@ -67,15 +67,14 @@ class BaseAccountSerializer(AuthValidateMixin, ResourceLabelsMixin, BulkOrgResou
         fields_mini = ['id', 'name', 'username']
         fields_small = fields_mini + [
             'secret_type', 'secret', 'passphrase',
-            'privileged', 'is_active', 'spec_info',
+            'privileged', 'is_active',
         ]
         fields_other = ['created_by', 'date_created', 'date_updated', 'comment']
         fields = fields_small + fields_other + ['labels']
         read_only_fields = [
-            'spec_info', 'date_verified', 'created_by', 'date_created',
+            'date_verified', 'created_by', 'date_created',
         ]
         extra_kwargs = {
-            'spec_info': {'label': _('Spec info')},
             'username': {'help_text': _(
                 "Tip: If no username is required for authentication, fill in `null`, "
                 "If AD account, like `username@domain`"

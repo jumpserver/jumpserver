@@ -286,7 +286,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'label': _('API mode'),
                         'choices': [
                             ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
-                            ('gpt-3.5-turbo-16k', 'GPT-3.5 Turbo 16K'),
+                            ('gpt-3.5-turbo-1106', 'GPT-3.5 Turbo 1106'),
                         ]
                     }
                 }
@@ -296,7 +296,8 @@ class Protocol(ChoicesMixin, models.TextChoices):
             choices = protocols[cls.chatgpt]['setting']['api_mode']['choices']
             choices.extend([
                 ('gpt-4', 'GPT-4'),
-                ('gpt-4-32k', 'GPT-4 32K'),
+                ('gpt-4-turbo', 'GPT-4 Turbo'),
+                ('gpt-4o', 'GPT-4o'),
             ])
         return protocols
 
