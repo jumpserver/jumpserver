@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-13 18:52+0800\n"
+"POT-Creation-Date: 2024-05-17 16:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -997,10 +997,8 @@ msgid "Nodes"
 msgstr "节点"
 
 #: accounts/serializers/automations/base.py:24
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Periodic perform"
-msgstr "周期执行"
+msgstr "定期执行"
 
 #: accounts/serializers/automations/base.py:45
 msgid "Name already exists"
@@ -4432,7 +4430,7 @@ msgid "Execute after saving"
 msgstr "保存后执行"
 
 #: ops/serializers/job.py:52
-msgid "Average time cost"
+msgid "Average time taken"
 msgstr "平均耗时"
 
 #: ops/serializers/job.py:72

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-13 18:52+0800\n"
+"POT-Creation-Date: 2024-05-17 16:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -974,8 +974,6 @@ msgid "Nodes"
 msgstr ""
 
 #: accounts/serializers/automations/base.py:24
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Periodic perform"
 msgstr "Periodic"
 
@@ -4367,8 +4365,8 @@ msgid "Execute after saving"
 msgstr "Execute after saving"
 
 #: ops/serializers/job.py:52
-msgid "Average time cost"
-msgstr ""
+msgid "Average time taken"
+msgstr "Average time taken"
 
 #: ops/serializers/job.py:72
 msgid "Job type"
