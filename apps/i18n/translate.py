@@ -47,6 +47,8 @@ class Translate:
             return
 
         for dir_name in dir_names:
+            if dir_name != 'lina':
+                continue
             if dir_name.startswith('_'):
                 continue
             if hasattr(self, f'{dir_name}_trans'):
