@@ -10,8 +10,8 @@ class BaseTranslateManager:
     bulk_size = 15
     SEPARATOR = "<SEP>"
     LANG_MAPPER = {
-        # 'ja': 'Japanese',
-        'en': 'English',
+        'ja': 'Japanese',
+        # 'en': 'English',
     }
 
     def __init__(self, dir_path, oai_trans_instance):
