@@ -1188,7 +1188,7 @@ msgid "Content"
 msgstr ""
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-msgid "One line one command"
+msgid "One command per line"
 msgstr ""
 
 #: acls/models/command_acl.py:27 assets/models/cmd_filter.py:80
