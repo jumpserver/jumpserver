@@ -367,6 +367,7 @@
     "Download": "下载",
     "DownloadCenter": "下载中心",
     "DownloadFTPFileTip": "当前动作不记录文件，或者文件大小超过阈值（默认100M），或者还未保存到对应存储中",
+    "MinLengthError": "密码最少有 {0} 位",
     "DownloadImportTemplateMsg": "下载创建模板",
     "DownloadReplay": "下载录像",
     "DownloadUpdateTemplateMsg": "下载更新模板",
@@ -1228,5 +1229,4 @@
     "AccessKeys": "访问密钥",
     "InformationModification": "信息更改",
     "Phone": "手机"
-
 }

@@ -9,7 +9,7 @@ default_id = '00000000-0000-0000-0000-000000000002'
 
 def add_default_org(apps, schema_editor):
     org_cls = apps.get_model('orgs', 'Organization')
-    defaults = {'name': 'Default', 'id': default_id}
+    defaults = {'name': 'DEFAULT', 'id': default_id, 'builtin': True}
     org_cls.objects.get_or_create(defaults=defaults, id=default_id)
 
 
@@ -19,10 +19,6 @@ def update_builtin_org(apps, schema_editor):
         id='00000000-0000-0000-0000-000000000004',
         name='SYSTEM', builtin=True
     )
-
-    # 更新 Default
-    org_model.objects.filter(name='DEFAULT').update(builtin=True)
-
 
 
 class Migration(migrations.Migration):

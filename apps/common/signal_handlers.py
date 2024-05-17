@@ -63,21 +63,21 @@ def digest_sql_query():
         path = current_request.get_full_path()
 
     print(">>>. [{}] {}".format(method, path))
-    for table_name, queries in table_queries.items():
-        if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
-            continue
-
-        for query in queries:
-            sql = query['sql']
-            print(" # {}: {}".format(query['time'], sql[:1000]))
-        if len(queries) < 3:
-            continue
-        print("- Table: {}".format(table_name))
-        for i, query in enumerate(queries, 1):
-            sql = query['sql']
-            if not sql or not sql.startswith('SELECT'):
-                continue
-            print('\t{}.[{}s] {}'.format(i, round(float(query['time']), 2), sql[:1000]))
+    # for table_name, queries in table_queries.items():
+    #     if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
+    #         continue
+    #
+    #     for query in queries:
+    #         sql = query['sql']
+    #         print(" # {}: {}".format(query['time'], sql[:1000]))
+    #     if len(queries) < 3:
+    #         continue
+    # print("- Table: {}".format(table_name))
+    # for i, query in enumerate(queries, 1):
+    #     sql = query['sql']
+    #     if not sql or not sql.startswith('SELECT'):
+    #         continue
+    #     print('\t{}.[{}s] {}'.format(i, round(float(query['time']), 2), sql[:1000]))
 
     # logger.debug(">>> [{}] {}".format(method, path))
     for name, counter in counters:

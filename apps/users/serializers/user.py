@@ -3,7 +3,6 @@
 
 from functools import partial
 
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -42,12 +41,15 @@ def default_org_roles():
 class RolesSerializerMixin(serializers.Serializer):
     system_roles = ObjectRelatedField(
         queryset=Role.system_roles, attrs=('id', 'display_name'),
-        label=_("System roles"), many=True, default=default_system_roles
+        label=_("System roles"), many=True, default=default_system_roles,
+        help_text=_("System roles are roles at the system level, and they will take effect across all organizations")
     )
     org_roles = ObjectRelatedField(
         queryset=Role.org_roles, attrs=('id', 'display_name', 'name'),
         label=_("Org roles"), many=True, required=False,
-        default=default_org_roles
+        default=default_org_roles,
+        help_text=_(
+            "Org roles are roles at the organization level, and they will only take effect within current organization")
     )
     orgs_roles = serializers.JSONField(read_only=True, label=_("Organizations and roles"))
 
@@ -189,6 +191,10 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
             'mfa_level': {'label': _("MFA level")},
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.update_source_choices()
+
     def get_fields(self):
         fields = super().get_fields()
         self.pop_fields_if_need(fields)
@@ -199,6 +205,15 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         if not current_org.is_root():
             for f in self.Meta.fields_only_root_org:
                 fields.pop(f, None)
+
+    def update_source_choices(self):
+        source = self.fields.get("source")
+        if not source:
+            return
+        open_source = ['local', 'ldap', 'cas']
+        # if not settings.XPACK_ENABLED:
+        choices = {k: v for k, v in source.choices.items() if k in open_source}
+        source.choices = list(choices.items())
 
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")
