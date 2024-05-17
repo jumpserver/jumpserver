@@ -4525,7 +4525,7 @@ msgstr "保存後に実行"
 #: ops/serializers/job.py:52
 #, fuzzy
 #| msgid "Time cost"
-msgid "Average time cost"
+msgid "Average time taken"
 msgstr "時を過ごす"
 
 #: ops/serializers/job.py:72
