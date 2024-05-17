@@ -5,6 +5,10 @@ description = "广受欢迎的开源堡垒机"
 authors = ["ibuler <ibuler@qq.com>"]
 license = "GPLv3"
 readme = "README.md"
+package-mode = false
+repository = "https://github.com/jumpserver/jumpserver"
+homepage = "https://www.jumpserver.org"
+documentation = "https://docs.jumpserver.org"
 
 # 说明
 # poetry install (社区版)

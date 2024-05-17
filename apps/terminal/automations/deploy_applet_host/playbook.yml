@@ -19,6 +19,18 @@
 
   tasks:
     - block:
+        - name: Check if CORE_HOST is redirects
+          ansible.windows.win_uri:
+            url: "{{ CORE_HOST }}"
+            method: GET
+            follow_redirects: none
+            status_code: [200, 301, 302, 303, 307, 308]
+          register: core_host_redirects
+
+        - fail:
+            msg: "CORE_HOST {{ CORE_HOST }} is redirecting to {{ core_host_redirects.location }}, please use the final url"
+          when: core_host_redirects.status_code >= 300 and core_host_redirects.status_code < 400
+
         - name: Install RDS-RD-Server (RDS)
           ansible.windows.win_feature:
             name: RDS-RD-Server
