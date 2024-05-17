@@ -1207,7 +1207,7 @@ msgid "Content"
 msgstr "内容"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-msgid "One line one command"
+msgid "One command per line"
 msgstr "每行一个命令"
 
 #: acls/models/command_acl.py:27 assets/models/cmd_filter.py:80
