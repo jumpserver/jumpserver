@@ -51,6 +51,7 @@
     "AccountPolicyHelpText": "创建时对于不符合要求的账号，如：密钥类型不合规，唯一键约束，可选择以上策略。",
     "AccountPushCreate": "创建账号推送",
     "AccountPushList": "账号推送",
+    "MenuAccountTemplates": "账号模版",
     "AccountPushUpdate": "更新账号推送",
     "AccountStorage": "账号存储",
     "AccountTemplate": "账号模版",
