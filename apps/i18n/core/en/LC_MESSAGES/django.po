@@ -1108,7 +1108,7 @@ msgstr ""
 
 #: acls/apps.py:7
 msgid "App Acls"
-msgstr ""
+msgstr "ACLs"
 
 #: acls/const.py:6 audits/const.py:36 terminal/const.py:11 tickets/const.py:44
 #: tickets/templates/tickets/approve_check_password.html:47
@@ -1358,7 +1358,7 @@ msgstr ""
 
 #: assets/apps.py:9
 msgid "App Assets"
-msgstr ""
+msgstr "Assets"
 
 #: assets/automations/base/manager.py:191
 msgid "{} disabled"
@@ -2282,7 +2282,7 @@ msgstr ""
 
 #: audits/apps.py:9
 msgid "App Audits"
-msgstr ""
+msgstr "Activities"
 
 #: audits/backends/db.py:16
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
@@ -2687,7 +2687,7 @@ msgstr ""
 
 #: authentication/apps.py:7
 msgid "App Authentication"
-msgstr ""
+msgstr "Authentication"
 
 #: authentication/backends/custom.py:59
 #: authentication/backends/oauth2/backends.py:173
@@ -3946,7 +3946,7 @@ msgstr ""
 
 #: labels/apps.py:8
 msgid "App Labels"
-msgstr ""
+msgstr "Labels"
 
 #: labels/models.py:36
 msgid "Resource ID"
@@ -4546,7 +4546,7 @@ msgstr ""
 
 #: perms/apps.py:9
 msgid "App Permissions"
-msgstr ""
+msgstr "Policies"
 
 #: perms/const.py:12
 msgid "Connect (All protocols)"
@@ -4684,7 +4684,7 @@ msgstr ""
 
 #: rbac/apps.py:7
 msgid "App RBAC"
-msgstr ""
+msgstr "RBAC"
 
 #: rbac/builtin.py:115
 msgid "SystemAdmin"
@@ -4801,15 +4801,15 @@ msgstr ""
 
 #: rbac/tree.py:24
 msgid "Console view"
-msgstr ""
+msgstr "Console"
 
 #: rbac/tree.py:25
 msgid "Workbench view"
-msgstr ""
+msgstr "Workbench"
 
 #: rbac/tree.py:26
 msgid "Audit view"
-msgstr ""
+msgstr "Audits"
 
 #: rbac/tree.py:27 settings/models.py:161
 msgid "System setting"
@@ -4817,7 +4817,7 @@ msgstr ""
 
 #: rbac/tree.py:37
 msgid "Session audits"
-msgstr ""
+msgstr "Session"
 
 #: rbac/tree.py:49 xpack/plugins/cloud/manager.py:74
 msgid "Cloud import"
@@ -4837,7 +4837,7 @@ msgstr ""
 
 #: rbac/tree.py:54
 msgid "Terminal setting"
-msgstr ""
+msgstr "Terminal"
 
 #: rbac/tree.py:55 settings/serializers/feature.py:127
 msgid "Job center"
@@ -4849,7 +4849,7 @@ msgstr ""
 
 #: rbac/tree.py:57
 msgid "App ops"
-msgstr ""
+msgstr "Ops"
 
 #: rbac/tree.py:58 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
@@ -4859,7 +4859,7 @@ msgstr ""
 
 #: rbac/tree.py:128
 msgid "App organizations"
-msgstr ""
+msgstr "Organizations"
 
 #: rbac/tree.py:129
 msgid "Ticket comment"
@@ -4907,7 +4907,7 @@ msgstr ""
 
 #: settings/apps.py:7
 msgid "App Settings"
-msgstr ""
+msgstr "Settings"
 
 #: settings/models.py:37 users/models/preference.py:14
 msgid "Encrypted"
@@ -6352,7 +6352,7 @@ msgstr ""
 
 #: terminal/apps.py:9
 msgid "App Terminals"
-msgstr ""
+msgstr "Terminals"
 
 #: terminal/backends/command/models.py:19
 msgid "Input"
@@ -7301,7 +7301,7 @@ msgstr ""
 
 #: tickets/apps.py:7
 msgid "App Tickets"
-msgstr ""
+msgstr "Tickets"
 
 #: tickets/const.py:10
 msgid "Apply for asset"
@@ -7645,7 +7645,7 @@ msgstr ""
 
 #: users/apps.py:9
 msgid "App Users"
-msgstr ""
+msgstr "Users"
 
 #: users/const.py:10
 msgid "System administrator"

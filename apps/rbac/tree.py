@@ -234,10 +234,10 @@ class CounterTree(Tree):
 class PermissionTreeUtil:
     get_permissions: Callable
     action_mapper = {
-        'add': _('Create'),
-        'view': _('View'),
-        'change': _('Update'),
-        'delete': _('Delete')
+        'add': _('create'),
+        'view': _('view'),
+        'change': _('update'),
+        'delete': _('delete')
     }
     action_icon = {
         'add': 'add',
@@ -408,8 +408,6 @@ class PermissionTreeUtil:
         node = TreeNode(**node_data)
         if settings.DEBUG_DEV:
             node.name += ('[' + node.id + ']')
-        if settings.DEBUG_DEV:
-            node.name += ('-' + node.id)
         return node
 
     def _create_root_tree_node(self):
@@ -459,7 +457,8 @@ class PermissionTreeUtil:
             checked_count, total_count = counter
             if total_count == 0:
                 continue
-            node.name += '({}/{})'.format(checked_count, total_count)
+            if node.isParent:
+                node.name += ' ({}/{})'.format(checked_count, total_count)
             if checked_count != 0:
                 node.checked = True
             nodes.append(node)
