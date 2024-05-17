@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-13 17:25+0800\n"
+"POT-Creation-Date: 2024-05-13 18:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -389,7 +389,7 @@ msgstr "账号备份计划"
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
 #: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:241
-#: ops/templates/ops/celery_task_log.html:75
+#: ops/templates/ops/celery_task_log.html:95
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:45
@@ -418,7 +418,8 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:134 audits/models.py:203
-#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:204
+#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/manager.py:165
+#: xpack/plugins/cloud/models.py:204
 msgid "Reason"
 msgstr "原因"
 
@@ -651,7 +652,7 @@ msgstr "密码规则"
 #: users/forms/profile.py:32 users/models/group.py:13
 #: users/models/preference.py:11 users/models/user.py:874
 #: xpack/plugins/cloud/models.py:32 xpack/plugins/cloud/models.py:272
-#: xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/serializers/task.py:71
 msgid "Name"
 msgstr "名称"
 
@@ -838,6 +839,7 @@ msgstr "已修改"
 #: ops/models/job.py:152 ops/serializers/job.py:19
 #: perms/serializers/permission.py:36
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
+#: xpack/plugins/cloud/manager.py:73
 msgid "Assets"
 msgstr "资产"
 
@@ -851,6 +853,7 @@ msgid "Asset does not support this secret type: %s"
 msgstr "资产不支持账号类型: %s"
 
 #: accounts/serializers/account/account.py:410
+#: xpack/plugins/cloud/serializers/account.py:111
 msgid "Account has exist"
 msgstr "账号已存在"
 
@@ -1094,7 +1097,7 @@ msgid "Deleted account"
 msgstr "删除账号"
 
 #: accounts/templates/accounts/change_secret_failed_info.html:3
-#: ops/templates/ops/celery_task_log.html:71 terminal/serializers/task.py:10
+#: terminal/serializers/task.py:10
 msgid "Task name"
 msgstr "任务名称"
 
@@ -1142,8 +1145,6 @@ msgid "Review"
 msgstr "审批"
 
 #: acls/const.py:9
-#, fuzzy
-#| msgid "Warning"
 msgid "Warn"
 msgstr "告警"
 
@@ -1302,7 +1303,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:145
+#: xpack/plugins/cloud/serializers/task.py:146
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
@@ -1464,6 +1465,7 @@ msgstr "脚本"
 #: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:71
 #: settings/serializers/feature.py:49 settings/serializers/msg.py:31
 #: terminal/models/component/endpoint.py:13 terminal/serializers/applet.py:17
+#: xpack/plugins/cloud/manager.py:73
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "主机"
@@ -2032,7 +2034,7 @@ msgstr "资产中批量更新平台，不符合平台类型跳过的资产"
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:46
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:328
-#: xpack/plugins/cloud/serializers/task.py:33
+#: xpack/plugins/cloud/serializers/task.py:34
 msgid "Protocols"
 msgstr "协议组"
 
@@ -2371,6 +2373,7 @@ msgstr "映射目录"
 #: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
+#: xpack/plugins/cloud/manager.py:74
 msgid "View"
 msgstr "查看"
 
@@ -2430,6 +2433,7 @@ msgstr "登录日志"
 
 #: audits/const.py:51 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
+#: xpack/plugins/cloud/serializers/account.py:55
 msgid "Task"
 msgstr "任务"
 
@@ -3666,7 +3670,7 @@ msgstr "运行中"
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/common.py:5
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:380
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 创建成功"
@@ -4306,6 +4310,7 @@ msgid "Result"
 msgstr "结果"
 
 #: ops/models/base.py:52 ops/models/job.py:238
+#: xpack/plugins/cloud/manager.py:77
 msgid "Summary"
 msgstr "汇总"
 
@@ -4884,7 +4889,7 @@ msgstr "系统设置"
 msgid "Session audits"
 msgstr "会话审计"
 
-#: rbac/tree.py:49
+#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:74
 msgid "Cloud import"
 msgstr "云同步"
 
@@ -7191,7 +7196,8 @@ msgstr "Access key ID(AK)"
 msgid "Access key secret"
 msgstr "Access key secret(SK)"
 
-#: terminal/serializers/storage.py:68 xpack/plugins/cloud/models.py:249
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:90
+#: xpack/plugins/cloud/models.py:249
 msgid "Region"
 msgstr "地域"
 
@@ -8522,9 +8528,10 @@ msgstr "重置密码成功，返回到登录页面"
 msgid "XPACK"
 msgstr "XPack"
 
-#: xpack/exceptions.py:7
+#: xpack/exceptions.py:8
 msgid ""
-"The current task is not synchronized with unmatched policy assets, skipping"
+"Based on the current task configuration, assets that do not match the "
+"strategy will skipped."
 msgstr ""
 
 #: xpack/plugins/cloud/api.py:60
@@ -8647,19 +8654,19 @@ msgstr "实例名称和部分IP"
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:52
+#: xpack/plugins/cloud/const.py:52 xpack/plugins/cloud/manager.py:80
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:53
+#: xpack/plugins/cloud/const.py:53 xpack/plugins/cloud/manager.py:79
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:54
+#: xpack/plugins/cloud/const.py:54 xpack/plugins/cloud/manager.py:79
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:55
+#: xpack/plugins/cloud/const.py:55 xpack/plugins/cloud/manager.py:80
 msgid "Released"
 msgstr "已释放"
 
@@ -8671,10 +8678,97 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:55 xpack/plugins/cloud/providers/gcp.py:64
+#: xpack/plugins/cloud/manager.py:41
+#, python-format
+msgid "Task \"%s\" starts executing"
+msgstr "任务 \"%s\" 开始执行"
+
+#: xpack/plugins/cloud/manager.py:45 xpack/plugins/cloud/manager.py:55
+#: xpack/plugins/cloud/manager.py:57 xpack/plugins/cloud/providers/gcp.py:64
 #: xpack/plugins/cloud/providers/huaweicloud.py:34
 msgid "Account unavailable"
 msgstr "账号无效"
+
+#: xpack/plugins/cloud/manager.py:71
+msgid "View the task details path: "
+msgstr "查看任务详情路径："
+
+#: xpack/plugins/cloud/manager.py:74
+msgid "Account Details"
+msgstr "账号详情"
+
+#: xpack/plugins/cloud/manager.py:75
+msgid "Synchronization History List"
+msgstr "同步历史列表"
+
+#: xpack/plugins/cloud/manager.py:75
+msgid "Synchronization Instance List"
+msgstr "同步实例列表"
+
+#: xpack/plugins/cloud/manager.py:83
+msgid "Task execution completed"
+msgstr "任务执行完成"
+
+#: xpack/plugins/cloud/manager.py:87
+msgid "Synchronization regions"
+msgstr "同步地域"
+
+#: xpack/plugins/cloud/manager.py:110
+#, python-format
+msgid "Get instances of region \"%s\" error, error: %s"
+msgstr "获取地域 \"%s\" 下的实例失败，错误：%s"
+
+#: xpack/plugins/cloud/manager.py:128
+#, python-format
+msgid "The instance IP \"%s\" is not in network segment \"%s\""
+msgstr "实例的IP \"%s\" 不在网段 \"%s\" 中"
+
+#: xpack/plugins/cloud/manager.py:164
+#, python-format
+msgid "Failed to synchronize the instance \"%s\""
+msgstr "同步实例 \"%s\" 失败"
+
+#: xpack/plugins/cloud/manager.py:316
+#, python-format
+msgid ""
+"The updated platform of asset \"%s\" is inconsistent with the original "
+"platform type. Skip platform and protocol updates"
+msgstr "更新的资产 \"%s\" 的平台类型和原类型不一致。跳过平台和协议更新"
+
+#: xpack/plugins/cloud/manager.py:358
+#, python-format
+msgid "The asset \"%s\" already exists"
+msgstr "资产 \"%s\" 已存在"
+
+#: xpack/plugins/cloud/manager.py:362
+#, python-format
+msgid "Update asset \"%s\""
+msgstr "更新资产 \"%s\""
+
+#: xpack/plugins/cloud/manager.py:365
+#, python-format
+msgid "Asset \"%s\" has been updated"
+msgstr "资产 \"%s\" 已更新"
+
+#: xpack/plugins/cloud/manager.py:376
+#, python-format
+msgid "Prepare to create asset \"%s\""
+msgstr "准备创建资产 \"%s\""
+
+#: xpack/plugins/cloud/manager.py:388
+#, python-format
+msgid "Set nodes \"%s\""
+msgstr "设置节点 \"%s\""
+
+#: xpack/plugins/cloud/manager.py:414
+#, python-format
+msgid "Set accounts \"%s\""
+msgstr "设置账号 \"%s\""
+
+#: xpack/plugins/cloud/manager.py:430
+#, python-format
+msgid "Set protocols \"%s\""
+msgstr "设置协议 \"%s\""
 
 #: xpack/plugins/cloud/meta.py:9
 msgid "Cloud center"
@@ -8685,7 +8779,7 @@ msgid "Provider"
 msgstr "云服务商"
 
 #: xpack/plugins/cloud/models.py:37
-#: xpack/plugins/cloud/serializers/account.py:68
+#: xpack/plugins/cloud/serializers/account.py:69
 msgid "Attrs"
 msgstr "属性"
 
@@ -8701,7 +8795,7 @@ msgstr "云账号"
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:159
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:160
 msgid "Regions"
 msgstr "地域"
 
@@ -8709,16 +8803,16 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:162
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:163
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:167
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:168
 msgid "Sync IP type"
 msgstr "同步IP类型"
 
 #: xpack/plugins/cloud/models.py:102
-#: xpack/plugins/cloud/serializers/task.py:185
+#: xpack/plugins/cloud/serializers/task.py:186
 msgid "Always update"
 msgstr "总是更新"
 
@@ -8767,7 +8861,7 @@ msgstr "实例"
 msgid "Sync instance detail"
 msgstr "同步实例详情"
 
-#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/serializers/task.py:73
 msgid "Rule relation"
 msgstr "条件关系"
 
@@ -8823,7 +8917,7 @@ msgstr "规则匹配"
 msgid "Rule value"
 msgstr "规则值"
 
-#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:75
+#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:76
 msgid "Strategy rule"
 msgstr "条件"
 
@@ -8835,7 +8929,7 @@ msgstr "动作属性"
 msgid "Action value"
 msgstr "动作值"
 
-#: xpack/plugins/cloud/models.py:345 xpack/plugins/cloud/serializers/task.py:78
+#: xpack/plugins/cloud/models.py:345 xpack/plugins/cloud/serializers/task.py:79
 msgid "Strategy action"
 msgstr "动作"
 
@@ -9029,11 +9123,16 @@ msgstr "TR-Istanbul"
 msgid "CN East-Suqian"
 msgstr "华东-宿迁"
 
-#: xpack/plugins/cloud/serializers/account.py:69
+#: xpack/plugins/cloud/providers/lan.py:79
+#, python-format
+msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
+msgstr "实例 IP \"%(ip)s\" 的端口 \"%(port)s\" 不可连接"
+
+#: xpack/plugins/cloud/serializers/account.py:70
 msgid "Validity display"
 msgstr "有效性显示"
 
-#: xpack/plugins/cloud/serializers/account.py:70
+#: xpack/plugins/cloud/serializers/account.py:71
 msgid "Provider display"
 msgstr "服务商显示"
 
@@ -9126,7 +9225,7 @@ msgstr "测试超时时间"
 msgid "Project"
 msgstr "project"
 
-#: xpack/plugins/cloud/serializers/task.py:151
+#: xpack/plugins/cloud/serializers/task.py:152
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -9138,11 +9237,11 @@ msgstr ""
 "到的 IP 地址将被用作创建的资产的 IP。<br>默认值 * 表示同步所有实例和随机匹配 "
 "IP 地址。<br> 例如: 192.168.1.0/24,10.1.1.1-10.1.1.20。"
 
-#: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers/task.py:158
+#: xpack/plugins/cloud/serializers/task.py:159
 msgid "Instance count"
 msgstr "实例个数"
 
@@ -9158,7 +9257,8 @@ msgstr "定期清除同步实例任务执行记录"
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
-#: xpack/plugins/interface/meta.py:9
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:45
+#: xpack/plugins/interface/models.py:86
 msgid "Interface settings"
 msgstr "界面设置"
 
@@ -9193,10 +9293,6 @@ msgstr "主题"
 msgid "Footer content"
 msgstr "页脚内容"
 
-#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
-msgid "Interface setting"
-msgstr "界面设置"
-
 #: xpack/plugins/interface/serializers/interface.py:37
 msgid "Wide logo on top"
 msgstr "顶部宽 Logo"
@@ -9210,7 +9306,7 @@ msgid "License import successfully"
 msgstr "许可证导入成功"
 
 #: xpack/plugins/license/api.py:53
-msgid "License is invalid"
+msgid "Invalid license"
 msgstr "无效的许可证"
 
 #: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
@@ -9232,6 +9328,29 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#, fuzzy
+#~| msgid "permed assets"
+#~ msgid "Release assets"
+#~ msgstr "授权的资产"
+
+#~ msgid "Title of login page"
+#~ msgstr "登录页标题"
+
+#~ msgid "Image of login page"
+#~ msgstr "登录页图片"
+
+#~ msgid "Logo of management page"
+#~ msgstr "管理页面 Logo"
+
+#~ msgid "Logo of logout page"
+#~ msgstr "退出页面小 Logo"
+
+#~ msgid "Interface setting"
+#~ msgstr "界面设置"
+
+#~ msgid "License is invalid"
+#~ msgstr "无效的许可证"
 
 #~ msgid "App Applications"
 #~ msgstr "应用管理"
@@ -9304,18 +9423,6 @@ msgstr "企业旗舰版"
 
 #~ msgid "Key password"
 #~ msgstr "密钥密码"
-
-#~ msgid "Title of login page"
-#~ msgstr "登录页标题"
-
-#~ msgid "Image of login page"
-#~ msgstr "登录页图片"
-
-#~ msgid "Logo of management page"
-#~ msgstr "管理页面 Logo"
-
-#~ msgid "Logo of logout page"
-#~ msgstr "退出页面小 Logo"
 
 #~ msgid "Organization ID"
 #~ msgstr "组织 ID"

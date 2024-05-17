@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-13 17:25+0800\n"
+"POT-Creation-Date: 2024-05-13 18:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,7 +384,7 @@ msgstr ""
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
 #: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:241
-#: ops/templates/ops/celery_task_log.html:75
+#: ops/templates/ops/celery_task_log.html:95
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:45
@@ -413,7 +413,8 @@ msgid "Trigger mode"
 msgstr ""
 
 #: accounts/models/automations/backup_account.py:134 audits/models.py:203
-#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:204
+#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/manager.py:165
+#: xpack/plugins/cloud/models.py:204
 msgid "Reason"
 msgstr ""
 
@@ -642,7 +643,7 @@ msgstr ""
 #: users/forms/profile.py:32 users/models/group.py:13
 #: users/models/preference.py:11 users/models/user.py:874
 #: xpack/plugins/cloud/models.py:32 xpack/plugins/cloud/models.py:272
-#: xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/serializers/task.py:71
 msgid "Name"
 msgstr ""
 
@@ -820,6 +821,7 @@ msgstr ""
 #: ops/models/job.py:152 ops/serializers/job.py:19
 #: perms/serializers/permission.py:36
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
+#: xpack/plugins/cloud/manager.py:73
 msgid "Assets"
 msgstr ""
 
@@ -833,6 +835,7 @@ msgid "Asset does not support this secret type: %s"
 msgstr ""
 
 #: accounts/serializers/account/account.py:410
+#: xpack/plugins/cloud/serializers/account.py:111
 msgid "Account has exist"
 msgstr ""
 
@@ -1073,7 +1076,7 @@ msgid "Deleted account"
 msgstr ""
 
 #: accounts/templates/accounts/change_secret_failed_info.html:3
-#: ops/templates/ops/celery_task_log.html:71 terminal/serializers/task.py:10
+#: terminal/serializers/task.py:10
 msgid "Task name"
 msgstr ""
 
@@ -1277,7 +1280,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr ""
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:145
+#: xpack/plugins/cloud/serializers/task.py:146
 msgid "IP address invalid: `{}`"
 msgstr ""
 
@@ -1433,6 +1436,7 @@ msgstr ""
 #: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:71
 #: settings/serializers/feature.py:49 settings/serializers/msg.py:31
 #: terminal/models/component/endpoint.py:13 terminal/serializers/applet.py:17
+#: xpack/plugins/cloud/manager.py:73
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr ""
@@ -1996,7 +2000,7 @@ msgstr ""
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:46
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:328
-#: xpack/plugins/cloud/serializers/task.py:33
+#: xpack/plugins/cloud/serializers/task.py:34
 msgid "Protocols"
 msgstr ""
 
@@ -2325,6 +2329,7 @@ msgstr ""
 #: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
+#: xpack/plugins/cloud/manager.py:74
 msgid "View"
 msgstr ""
 
@@ -2384,6 +2389,7 @@ msgstr ""
 
 #: audits/const.py:51 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
+#: xpack/plugins/cloud/serializers/account.py:55
 msgid "Task"
 msgstr ""
 
@@ -3611,7 +3617,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: common/const/common.py:5
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:380
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -4239,6 +4245,7 @@ msgid "Result"
 msgstr ""
 
 #: ops/models/base.py:52 ops/models/job.py:238
+#: xpack/plugins/cloud/manager.py:77
 msgid "Summary"
 msgstr ""
 
@@ -4812,7 +4819,7 @@ msgstr ""
 msgid "Session audits"
 msgstr ""
 
-#: rbac/tree.py:49
+#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:74
 msgid "Cloud import"
 msgstr ""
 
@@ -7044,7 +7051,8 @@ msgstr ""
 msgid "Access key secret"
 msgstr ""
 
-#: terminal/serializers/storage.py:68 xpack/plugins/cloud/models.py:249
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:90
+#: xpack/plugins/cloud/models.py:249
 msgid "Region"
 msgstr ""
 
@@ -8351,9 +8359,10 @@ msgstr ""
 msgid "XPACK"
 msgstr ""
 
-#: xpack/exceptions.py:7
+#: xpack/exceptions.py:8
 msgid ""
-"The current task is not synchronized with unmatched policy assets, skipping"
+"Based on the current task configuration, assets that do not match the "
+"strategy will skipped."
 msgstr ""
 
 #: xpack/plugins/cloud/api.py:60
@@ -8476,19 +8485,19 @@ msgstr ""
 msgid "Succeed"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:52
+#: xpack/plugins/cloud/const.py:52 xpack/plugins/cloud/manager.py:80
 msgid "Unsync"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:53
+#: xpack/plugins/cloud/const.py:53 xpack/plugins/cloud/manager.py:79
 msgid "New Sync"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:54
+#: xpack/plugins/cloud/const.py:54 xpack/plugins/cloud/manager.py:79
 msgid "Synced"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:55
+#: xpack/plugins/cloud/const.py:55 xpack/plugins/cloud/manager.py:80
 msgid "Released"
 msgstr ""
 
@@ -8500,9 +8509,96 @@ msgstr ""
 msgid "Or"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:55 xpack/plugins/cloud/providers/gcp.py:64
+#: xpack/plugins/cloud/manager.py:41
+#, python-format
+msgid "Task \"%s\" starts executing"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:45 xpack/plugins/cloud/manager.py:55
+#: xpack/plugins/cloud/manager.py:57 xpack/plugins/cloud/providers/gcp.py:64
 #: xpack/plugins/cloud/providers/huaweicloud.py:34
 msgid "Account unavailable"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:71
+msgid "View the task details path: "
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:74
+msgid "Account Details"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:75
+msgid "Synchronization History List"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:75
+msgid "Synchronization Instance List"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:83
+msgid "Task execution completed"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:87
+msgid "Synchronization regions"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:110
+#, python-format
+msgid "Get instances of region \"%s\" error, error: %s"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:128
+#, python-format
+msgid "The instance IP \"%s\" is not in network segment \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:164
+#, python-format
+msgid "Failed to synchronize the instance \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:316
+#, python-format
+msgid ""
+"The updated platform of asset \"%s\" is inconsistent with the original "
+"platform type. Skip platform and protocol updates"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:358
+#, python-format
+msgid "The asset \"%s\" already exists"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:362
+#, python-format
+msgid "Update asset \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:365
+#, python-format
+msgid "Asset \"%s\" has been updated"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:376
+#, python-format
+msgid "Prepare to create asset \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:388
+#, python-format
+msgid "Set nodes \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:414
+#, python-format
+msgid "Set accounts \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:430
+#, python-format
+msgid "Set protocols \"%s\""
 msgstr ""
 
 #: xpack/plugins/cloud/meta.py:9
@@ -8514,7 +8610,7 @@ msgid "Provider"
 msgstr ""
 
 #: xpack/plugins/cloud/models.py:37
-#: xpack/plugins/cloud/serializers/account.py:68
+#: xpack/plugins/cloud/serializers/account.py:69
 msgid "Attrs"
 msgstr ""
 
@@ -8530,7 +8626,7 @@ msgstr ""
 msgid "Test cloud account"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:159
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:160
 msgid "Regions"
 msgstr ""
 
@@ -8538,16 +8634,16 @@ msgstr ""
 msgid "Hostname strategy"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:162
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:163
 msgid "IP network segment group"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:167
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:168
 msgid "Sync IP type"
 msgstr ""
 
 #: xpack/plugins/cloud/models.py:102
-#: xpack/plugins/cloud/serializers/task.py:185
+#: xpack/plugins/cloud/serializers/task.py:186
 msgid "Always update"
 msgstr ""
 
@@ -8596,7 +8692,7 @@ msgstr ""
 msgid "Sync instance detail"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/serializers/task.py:73
 msgid "Rule relation"
 msgstr ""
 
@@ -8652,7 +8748,7 @@ msgstr ""
 msgid "Rule value"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:75
+#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:76
 msgid "Strategy rule"
 msgstr ""
 
@@ -8664,7 +8760,7 @@ msgstr ""
 msgid "Action value"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:345 xpack/plugins/cloud/serializers/task.py:78
+#: xpack/plugins/cloud/models.py:345 xpack/plugins/cloud/serializers/task.py:79
 msgid "Strategy action"
 msgstr ""
 
@@ -8858,11 +8954,16 @@ msgstr ""
 msgid "CN East-Suqian"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account.py:69
-msgid "Validity display"
+#: xpack/plugins/cloud/providers/lan.py:79
+#, python-format
+msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account.py:70
+msgid "Validity display"
+msgstr ""
+
+#: xpack/plugins/cloud/serializers/account.py:71
 msgid "Provider display"
 msgstr ""
 
@@ -8953,7 +9054,7 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:151
+#: xpack/plugins/cloud/serializers/task.py:152
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -8962,11 +9063,11 @@ msgid ""
 "10.1.1.1-10.1.1.20"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "History count"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:158
+#: xpack/plugins/cloud/serializers/task.py:159
 msgid "Instance count"
 msgstr ""
 
@@ -8982,7 +9083,8 @@ msgstr ""
 msgid "Restore default successfully."
 msgstr ""
 
-#: xpack/plugins/interface/meta.py:9
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:45
+#: xpack/plugins/interface/models.py:86
 msgid "Interface settings"
 msgstr ""
 
@@ -9015,10 +9117,6 @@ msgstr ""
 msgid "Footer content"
 msgstr ""
 
-#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
-msgid "Interface setting"
-msgstr ""
-
 #: xpack/plugins/interface/serializers/interface.py:37
 msgid "Wide logo on top"
 msgstr ""
@@ -9032,7 +9130,7 @@ msgid "License import successfully"
 msgstr ""
 
 #: xpack/plugins/license/api.py:53
-msgid "License is invalid"
+msgid "Invalid license"
 msgstr ""
 
 #: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
