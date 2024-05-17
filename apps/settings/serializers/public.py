@@ -23,6 +23,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField()
     SECURITY_VIEW_AUTH_NEED_MFA = serializers.BooleanField()
     SECURITY_MFA_AUTH = serializers.IntegerField()
+    SECURITY_OTP_IN_USBKEY = serializers.BooleanField()
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField()
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField()
     SECURITY_COMMAND_BLACKLIST = serializers.ListField()

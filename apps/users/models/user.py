@@ -872,6 +872,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     lark_id = models.CharField(null=True, default=None, max_length=128, verbose_name='Lark')
     slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
 
+    usbkey_sn = fields.EncryptCharField(
+        max_length=128, blank=True, null=True, verbose_name=_('USBKey serial number')
+    )
     DATE_EXPIRED_WARNING_DAYS = 5
 
     def __str__(self):

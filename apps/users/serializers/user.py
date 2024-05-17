@@ -122,7 +122,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         fields_mini = ["id", "name", "username"]
         # 只能写的字段, 这个虽然无法在框架上生效，但是更多对我们是提醒
         fields_write_only = [
-            "password", "public_key",
+            "password", "public_key", "usbkey_sn"
         ]
         # xpack 包含的字段
         fields_xpack = ["wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id"]
@@ -170,6 +170,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
                 "allow_blank": True,
             },
             "public_key": {"write_only": True},
+            "usbkey_sn": {"write_only": True},
             "is_first_login": {"label": _("Is first login"), "read_only": True},
             "is_active": {"label": _("Is active")},
             "is_valid": {"label": _("Is valid")},

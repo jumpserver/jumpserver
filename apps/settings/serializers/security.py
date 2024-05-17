@@ -124,6 +124,10 @@ class SecurityAuthSerializer(serializers.Serializer):
         label=_('Third-party login users perform MFA authentication'),
         help_text=_('The third-party login modes include OIDC, CAS, and SAML2'),
     )
+    SECURITY_OTP_IN_USBKEY = serializers.BooleanField(
+        required=False, default=False,
+        label=_('OTP in USBkey')
+    )
     OTP_ISSUER_NAME = serializers.CharField(
         required=False, max_length=16, label=_('OTP issuer name'),
     )
