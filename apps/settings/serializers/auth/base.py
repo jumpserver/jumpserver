@@ -22,6 +22,10 @@ class AuthSettingSerializer(serializers.Serializer):
     AUTH_SLACK = serializers.BooleanField(default=False, label=_('WeCom Auth'))
     AUTH_SSO = serializers.BooleanField(default=False, label=_("SSO Auth"))
     AUTH_PASSKEY = serializers.BooleanField(default=False, label=_("Passkey Auth"))
+    EMAIL_SUFFIX = serializers.CharField(
+        required=False, max_length=1024, label=_("Email suffix"),
+        help_text=_('This is used by default if no email is returned during SSO authentication')
+    )
     FORGOT_PASSWORD_URL = serializers.CharField(
         required=False, allow_blank=True, max_length=1024,
         label=_("Forgot Password URL")

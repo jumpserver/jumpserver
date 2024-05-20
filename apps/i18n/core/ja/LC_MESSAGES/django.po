@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-13 18:52+0800\n"
+"POT-Creation-Date: 2024-05-15 11:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5620,45 +5620,43 @@ msgstr "サイトURL"
 
 #: settings/serializers/basic.py:13
 msgid ""
-"External URL, email links or other system callbacks are used to access it, "
-"eg: http://dev.jumpserver.org:8080"
+"Site URL is the externally accessible address of the current product service "
+"and is usually used in links in system emails"
 msgstr ""
-"外部URL、メールリンクまたは他のシステムコールバックにアクセスするには、"
-"http://dev.jumpserver.org:8080などを使用します"
 
-#: settings/serializers/basic.py:18
+#: settings/serializers/basic.py:19
 msgid "User guide url"
 msgstr "ユーザーガイドurl"
 
-#: settings/serializers/basic.py:19
+#: settings/serializers/basic.py:20
 msgid "User first login update profile done redirect to it"
 msgstr "ユーザーの最初のログイン更新プロファイルがリダイレクトされました"
 
-#: settings/serializers/basic.py:22
+#: settings/serializers/basic.py:23
 msgid "Global organization"
 msgstr "グローバル組織名"
 
-#: settings/serializers/basic.py:23
+#: settings/serializers/basic.py:24
 msgid "The name of global organization to display"
 msgstr "表示するグローバル組織の名前"
 
-#: settings/serializers/basic.py:26
+#: settings/serializers/basic.py:27
 msgid "Help Docs URL"
 msgstr "ドキュメントリンク"
 
-#: settings/serializers/basic.py:27
+#: settings/serializers/basic.py:28
 msgid "default: http://docs.jumpserver.org"
 msgstr "デフォルト: http://docs.jumpserver.org"
 
-#: settings/serializers/basic.py:30
+#: settings/serializers/basic.py:31
 msgid "Help Support URL"
 msgstr "サポートリンク"
 
-#: settings/serializers/basic.py:31
+#: settings/serializers/basic.py:32
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
 
-#: settings/serializers/basic.py:44
+#: settings/serializers/basic.py:45
 msgid "Organization name already exists"
 msgstr "組織名はすでに存在します。"
 
@@ -8950,7 +8948,9 @@ msgstr "インスタンス \"%s\" の同期に失敗しました"
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
-msgstr "更新された資産 \"%s\" のプラットフォームタイプと元のタイプは一致しません。プラットフォームとプロトコルの更新をスキップ"
+msgstr ""
+"更新された資産 \"%s\" のプラットフォームタイプと元のタイプは一致しません。プ"
+"ラットフォームとプロトコルの更新をスキップ"
 
 #: xpack/plugins/cloud/manager.py:358
 #, python-format
@@ -9550,6 +9550,13 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid ""
+#~ "External URL, email links or other system callbacks are used to access "
+#~ "it, eg: http://dev.jumpserver.org:8080"
+#~ msgstr ""
+#~ "外部URL、メールリンクまたは他のシステムコールバックにアクセスするには、"
+#~ "http://dev.jumpserver.org:8080などを使用します"
 
 #, fuzzy
 #~| msgid "permed assets"

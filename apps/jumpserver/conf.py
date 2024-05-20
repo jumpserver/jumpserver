@@ -587,7 +587,7 @@ class Config(dict):
 
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
-        'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
+        'HELP_SUPPORT_URL': 'https://www.jumpserver.org/support/',
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
