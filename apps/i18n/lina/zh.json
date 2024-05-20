@@ -1287,5 +1287,6 @@
     "YourProfile": "个人信息",
     "InformationModification": "信息更改",
     "Phone": "手机",
-    "TailLog": "追踪日志"
+    "TailLog": "追踪日志",
+    "NoLog": "无日志"
 }
