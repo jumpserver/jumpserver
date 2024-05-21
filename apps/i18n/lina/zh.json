@@ -214,6 +214,13 @@
     "BindSuccess": "绑定成功",
     "BlockedIPS": "已锁定的 IP",
     "BuiltinVariable": "内置变量",
+    "BulkClearErrorMsg": "批量清除失败：",
+    "BulkDeleteErrorMsg": "批量删除失败：",
+    "BulkDeleteSuccessMsg": "批量删除成功",
+    "BulkDeploy": "批量部署",
+    "BulkRemoveErrorMsg": "批量移除失败：",
+    "BulkRemoveSuccessMsg": "批量移除成功",
+    "BulkSyncErrorMsg": "批量同步失败：",
     "CACertificate": "CA 证书",
     "CAS": "CAS",
     "CMPP2": "CMPP v2.0",
@@ -1287,5 +1294,6 @@
     "YourProfile": "个人信息",
     "InformationModification": "信息更改",
     "Phone": "手机",
-    "TailLog": "追踪日志"
+    "TailLog": "追踪日志",
+    "NoLog": "无日志"
 }
