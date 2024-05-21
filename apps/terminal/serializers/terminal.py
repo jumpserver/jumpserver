@@ -147,3 +147,8 @@ class ConnectMethodSerializer(serializers.Serializer):
     type = serializers.CharField(max_length=128)
     endpoint_protocol = serializers.CharField(max_length=128)
     component = serializers.CharField(max_length=128)
+
+
+class EncryptedConfigSerializer(serializers.Serializer):
+    secret_encrypt_key = serializers.CharField(max_length=128)
+    encrypted_value = serializers.CharField(max_length=128)
