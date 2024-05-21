@@ -5723,7 +5723,7 @@ msgid "Subject"
 msgstr "件名"
 
 #: settings/serializers/feature.py:22
-msgid "More URL"
+msgid "More Link"
 msgstr "もっとURL"
 
 #: settings/serializers/feature.py:36 settings/serializers/feature.py:38

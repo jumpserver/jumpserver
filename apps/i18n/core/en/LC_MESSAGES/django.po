@@ -5505,7 +5505,7 @@ msgid "Subject"
 msgstr ""
 
 #: settings/serializers/feature.py:22
-msgid "More URL"
+msgid "More Link"
 msgstr ""
 
 #: settings/serializers/feature.py:36 settings/serializers/feature.py:38
