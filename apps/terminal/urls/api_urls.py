@@ -54,7 +54,7 @@ urlpatterns = [
     # components
     path('components/metrics/', api.ComponentsMetricsAPIView.as_view(), name='components-metrics'),
     path('components/connect-methods/', api.ConnectMethodListApi.as_view(), name='connect-methods'),
-    path('encrypted_config/', api.EncryptedTerminalConfig.as_view(), name='encrypted-terminal-config'),
+    path('encrypted-config/', api.EncryptedTerminalConfig.as_view(), name='encrypted-terminal-config'),
 ]
 
 urlpatterns += router.urls
