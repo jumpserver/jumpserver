@@ -146,7 +146,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         fields_unexport = ['auto_config']
         extra_kwargs = {
             'auto_config': {'label': _('Auto info')},
-            'name': {'label': _("Name")},
+            'name': {'label': _("Name"), 'initial': 'Asset name'},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
             'nodes': {'allow_empty': True, 'label': _("Nodes")},

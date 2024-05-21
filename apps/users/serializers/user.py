@@ -165,6 +165,12 @@ class UserSerializer(RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelS
         fields_only_root_org = ["orgs_roles"]
         disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
         extra_kwargs = {
+            "name": {
+                "help_text": _("Fullname of user"),
+            },
+            "username": {
+                "help_text": _("Login username"),
+            },
             "password": {
                 "write_only": True,
                 "required": False,
