@@ -159,31 +159,48 @@ class DatesLoginMetricMixin:
         query = {f'{field_name}__range': self.date_start_end}
         return queryset.filter(**query)
 
-    def get_date_metrics(self, queryset, field_name, count_field):
+    def get_date_metrics(self, queryset, field_name, count_fields):
         queryset = self.filter_date_start_end(queryset, field_name)
-        queryset = queryset.values_list(field_name, count_field)
 
-        date_group_map = defaultdict(set)
-        for datetime, count_field in queryset:
+        if not isinstance(count_fields, (list, tuple)):
+            count_fields = [count_fields]
+
+        values_list = [field_name] + list(count_fields)
+        queryset = queryset.values_list(*values_list)
+
+        date_group_map = defaultdict(lambda: defaultdict(set))
+
+        for row in queryset:
+            datetime = row[0]
             date_str = str(datetime.date())
-            date_group_map[date_str].add(count_field)
+            for idx, count_field in enumerate(count_fields):
+                date_group_map[date_str][count_field].add(row[idx + 1])
 
-        return [
-            len(date_group_map.get(str(d), set()))
-            for d in self.dates_list
-        ]
+        date_metrics_dict = defaultdict(list)
+        for field in count_fields:
+            for date_str in self.dates_list:
+                count = len(date_group_map.get(str(date_str), {}).get(field, set()))
+                date_metrics_dict[field].append(count)
+
+        return date_metrics_dict
+
+    def get_dates_metrics_total_count_active_users_and_assets(self):
+        date_metrics_dict = self.get_date_metrics(
+            Session.objects, 'date_start', ('user_id', 'asset_id')
+        )
+        return date_metrics_dict.get('user_id', []), date_metrics_dict.get('asset_id', [])
 
     def get_dates_metrics_total_count_login(self):
-        return self.get_date_metrics(UserLoginLog.objects, 'datetime', 'id')
-
-    def get_dates_metrics_total_count_active_users(self):
-        return self.get_date_metrics(Session.objects, 'date_start', 'user_id')
-
-    def get_dates_metrics_total_count_active_assets(self):
-        return self.get_date_metrics(Session.objects, 'date_start', 'asset_id')
+        date_metrics_dict = self.get_date_metrics(
+            UserLoginLog.objects, 'datetime', 'id'
+        )
+        return date_metrics_dict.get('id', [])
 
     def get_dates_metrics_total_count_sessions(self):
-        return self.get_date_metrics(Session.objects, 'date_start', 'id')
+        date_metrics_dict = self.get_date_metrics(
+            Session.objects, 'date_start', 'id'
+        )
+        return date_metrics_dict.get('id', [])
 
     def get_dates_login_times_assets(self):
         assets = self.sessions_queryset.values("asset") \
@@ -412,11 +429,13 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
             })
 
         if _all or query_params.get('dates_metrics'):
+            user_data, asset_data = self.get_dates_metrics_total_count_active_users_and_assets()
+            login_data = self.get_dates_metrics_total_count_login()
             data.update({
                 'dates_metrics_date': self.get_dates_metrics_date(),
-                'dates_metrics_total_count_login': self.get_dates_metrics_total_count_login(),
-                'dates_metrics_total_count_active_users': self.get_dates_metrics_total_count_active_users(),
-                'dates_metrics_total_count_active_assets': self.get_dates_metrics_total_count_active_assets(),
+                'dates_metrics_total_count_login': login_data,
+                'dates_metrics_total_count_active_users': user_data,
+                'dates_metrics_total_count_active_assets': asset_data,
             })
 
         if _all or query_params.get('dates_login_times_top10_assets'):
