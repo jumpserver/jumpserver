@@ -22,10 +22,23 @@ class AuthSettingSerializer(serializers.Serializer):
     AUTH_SLACK = serializers.BooleanField(default=False, label=_('WeCom Auth'))
     AUTH_SSO = serializers.BooleanField(default=False, label=_("SSO Auth"))
     AUTH_PASSKEY = serializers.BooleanField(default=False, label=_("Passkey Auth"))
+    EMAIL_SUFFIX = serializers.CharField(
+        required=False, max_length=1024, label=_("Email suffix"),
+        help_text=_(
+            "After third-party user authentication is successful, "
+            "if the third-party authentication service platform does not return the user's email "
+            "information, the system will automatically create the user using this email suffix"
+        )
+    )
     FORGOT_PASSWORD_URL = serializers.CharField(
         required=False, allow_blank=True, max_length=1024,
-        label=_("Forgot Password URL")
+        label=_("Forgot Password"), 
+        help_text=_("The URL for Forgotten Password on the user login page")
     )
     LOGIN_REDIRECT_MSG_ENABLED = serializers.BooleanField(
-        required=False, label=_("Login redirection prompt")
+        required=False, label=_("Login redirection"),
+        help_text=_(
+            "Should an flash page be displayed before the user is redirected to third-party "
+            "authentication when the administrator enables third-party redirect authentication"
+        )
     )
