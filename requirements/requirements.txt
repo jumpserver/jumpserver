@@ -135,7 +135,7 @@ django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
 pyOpenSSL==22.0.0
-redis==4.3.3
+redis@https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v4.3.3.zip
 pymongo==4.2.0
 # Debug
 ipython==8.4.0
