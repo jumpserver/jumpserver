@@ -14,12 +14,16 @@ __all__ = [
 
 
 class SMSSettingSerializer(serializers.Serializer):
-    SMS_ENABLED = serializers.BooleanField(default=False, label=_('SMS'))
+    SMS_ENABLED = serializers.BooleanField(
+        default=False, label=_('SMS'), help_text=_('Enable Short Message Service (SMS)')
+    )
     SMS_BACKEND = serializers.ChoiceField(
-        choices=BACKENDS.choices, default=BACKENDS.ALIBABA, label=_('SMS provider / Protocol')
+        choices=BACKENDS.choices, default=BACKENDS.ALIBABA, label=_('Provider'),
+        help_text=_('Short Message Service (SMS) provider or protocol')
     )
     SMS_CODE_LENGTH = serializers.IntegerField(
-        default=4, min_value=4, max_value=16, label=_('SMS code length')
+        default=4, min_value=4, max_value=16, label=_('Code length'),
+        help_text=_('Length of the sent verification code')
     )
 
 
@@ -32,7 +36,8 @@ class BaseSMSSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('SMS')
 
     SMS_TEST_PHONE = PhoneField(
-        validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_('Test phone')
+        validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, 
+        label=_('Phone')
     )
 
     def to_representation(self, instance):

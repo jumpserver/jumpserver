@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 16:45+0800\n"
+"POT-Creation-Date: 2024-05-15 11:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,10 +80,8 @@ msgid "Anonymous account"
 msgstr ""
 
 #: accounts/const/account.py:18
-#, fuzzy
-#| msgid "Is service account"
 msgid "Specified account"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/const/account.py:26 users/models/user.py:751
 msgid "Local"
@@ -5416,45 +5414,43 @@ msgstr ""
 
 #: settings/serializers/basic.py:13
 msgid ""
-"External URL, email links or other system callbacks are used to access it, "
-"eg: http://dev.jumpserver.org:8080"
-msgstr ""
-"Site URL are commonly used in emails sent or as callback addresses for "
-"external systems. eg: http://dev.jumpserver.org:8080"
-
-#: settings/serializers/basic.py:18
-msgid "User guide url"
+"Site URL is the externally accessible address of the current product service "
+"and is usually used in links in system emails"
 msgstr ""
 
 #: settings/serializers/basic.py:19
+msgid "User guide url"
+msgstr ""
+
+#: settings/serializers/basic.py:20
 msgid "User first login update profile done redirect to it"
 msgstr ""
 
-#: settings/serializers/basic.py:22
+#: settings/serializers/basic.py:23
 msgid "Global organization"
 msgstr ""
 
-#: settings/serializers/basic.py:23
+#: settings/serializers/basic.py:24
 msgid "The name of global organization to display"
 msgstr ""
 
-#: settings/serializers/basic.py:26
+#: settings/serializers/basic.py:27
 msgid "Help Docs URL"
 msgstr "Document URL"
 
-#: settings/serializers/basic.py:27
+#: settings/serializers/basic.py:28
 msgid "default: http://docs.jumpserver.org"
 msgstr ""
 
-#: settings/serializers/basic.py:30
+#: settings/serializers/basic.py:31
 msgid "Help Support URL"
 msgstr "Support URL"
 
-#: settings/serializers/basic.py:31
+#: settings/serializers/basic.py:32
 msgid "default: http://www.jumpserver.org/support/"
 msgstr ""
 
-#: settings/serializers/basic.py:44
+#: settings/serializers/basic.py:45
 msgid "Organization name already exists"
 msgstr ""
 
@@ -5509,7 +5505,7 @@ msgid "Subject"
 msgstr ""
 
 #: settings/serializers/feature.py:22
-msgid "More URL"
+msgid "More Link"
 msgstr ""
 
 #: settings/serializers/feature.py:36 settings/serializers/feature.py:38
@@ -8000,10 +7996,8 @@ msgid "On"
 msgstr ""
 
 #: users/serializers/profile.py:94
-#, fuzzy
-#| msgid "Su enabled"
 msgid "Forced enabled"
-msgstr "Switch enabled"
+msgstr ""
 
 #: users/serializers/user.py:45
 msgid "System roles"
@@ -9150,3 +9144,10 @@ msgstr ""
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr ""
+
+#~ msgid ""
+#~ "External URL, email links or other system callbacks are used to access "
+#~ "it, eg: http://dev.jumpserver.org:8080"
+#~ msgstr ""
+#~ "Site URL are commonly used in emails sent or as callback addresses for "
+#~ "external systems. eg: http://dev.jumpserver.org:8080"
