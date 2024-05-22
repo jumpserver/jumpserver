@@ -13,7 +13,8 @@ class CommonSettingSerializer(serializers.Serializer):
     # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
     BASE_SITE_URL = serializers.CharField(
         required=False, allow_null=True, allow_blank=True,
-        max_length=1024, label=_('Base site URL')
+        max_length=1024, label=_('Base site URL'), 
+        help_text=_("The current site's URL is used to construct the callback address")
     )
     AUTH_OPENID_CLIENT_ID = serializers.CharField(
         required=False, max_length=1024, label=_('Client Id')
@@ -35,8 +36,10 @@ class CommonSettingSerializer(serializers.Serializer):
     )
     AUTH_OPENID_USER_ATTR_MAP = serializers.JSONField(
         required=True, label=_('User attribute'),
-        help_text=_('User attr map present how to map OpenID user attr to '
-                    'jumpserver, username,name,email is jumpserver attr')
+        help_text=_(
+            "User attribute mapping, where the `key` is the JumpServer user attribute name "
+            "and the `value` is the OIDC service user attribute name"
+        )
     )
     AUTH_OPENID_PKCE = serializers.BooleanField(required=False, label=_('Enable PKCE'))
     AUTH_OPENID_CODE_CHALLENGE_METHOD = serializers.ChoiceField(
@@ -48,7 +51,10 @@ class CommonSettingSerializer(serializers.Serializer):
 class KeycloakSettingSerializer(CommonSettingSerializer):
     # OpenID 旧配置参数 (version <= 1.5.8 (discarded))
     AUTH_OPENID_KEYCLOAK = serializers.BooleanField(
-        label=_("Use Keycloak"), required=False, default=False
+        label=_("Use Keycloak"), required=False, default=False,
+        help_text=_(
+            "Use Keycloak as the OpenID Connect server, or use standard OpenID Connect Protocol"
+        )
     )
     AUTH_OPENID_SERVER_URL = serializers.CharField(
         required=False, max_length=1024, label=_('Server')
@@ -60,7 +66,9 @@ class KeycloakSettingSerializer(CommonSettingSerializer):
 
 class OIDCSettingSerializer(KeycloakSettingSerializer):
     # OpenID 新配置参数 (version >= 1.5.9)
-    AUTH_OPENID = serializers.BooleanField(required=False, label=_('OIDC'))
+    AUTH_OPENID = serializers.BooleanField(
+        required=False, label=_('OIDC'), help_text=_('OpenID Connect')
+    )
     AUTH_OPENID_PROVIDER_ENDPOINT = serializers.CharField(
         required=False, max_length=1024, label=_('Provider endpoint')
     )
@@ -85,15 +93,21 @@ class OIDCSettingSerializer(KeycloakSettingSerializer):
     AUTH_OPENID_PROVIDER_SIGNATURE_KEY = serializers.CharField(
         required=False, max_length=1024, allow_null=True, label=_('Signing key')
     )
-    AUTH_OPENID_SCOPES = serializers.CharField(required=False, max_length=1024, label=_('Scopes'))
+    AUTH_OPENID_SCOPES = serializers.CharField(
+        required=False, max_length=1024, label=_('Scopes')
+    )
     AUTH_OPENID_ID_TOKEN_MAX_AGE = serializers.IntegerField(
         required=False, label=_('ID Token max age (s)')
     )
     AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS = serializers.BooleanField(
         required=False, label=_('ID Token include claims')
     )
-    AUTH_OPENID_USE_STATE = serializers.BooleanField(required=False, label=_('Use state'))
-    AUTH_OPENID_USE_NONCE = serializers.BooleanField(required=False, label=_('Use nonce'))
+    AUTH_OPENID_USE_STATE = serializers.BooleanField(
+        required=False, label=_('Use state')
+    )
+    AUTH_OPENID_USE_NONCE = serializers.BooleanField(
+        required=False, label=_('Use nonce')
+        )
     AUTH_OPENID_ALWAYS_UPDATE_USER = serializers.BooleanField(
         required=False, label=_('Always update user')
     )
