@@ -9,7 +9,9 @@ def init_user_msg_subscription(apps, schema_editor):
 
     receive_backends = ['site_msg', 'email']
     user = User.objects.get(username='admin')
-    UserMsgSubscription.objects.create(user=user, receive_backends=receive_backends)
+    UserMsgSubscription.objects.update_or_create(
+        defaults={'receive_backends': receive_backends}, user=user
+    )
 
 
 class Migration(migrations.Migration):
