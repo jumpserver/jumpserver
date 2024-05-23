@@ -920,8 +920,8 @@ msgstr "特殊信息"
 
 #: accounts/serializers/account/base.py:80
 msgid ""
-"Tip: If no username is required for authentication, fill in `null`, If AD "
-"account, like `username@domain`"
+"* If no username is required for authentication, enter null.  "
+"For AD accounts, use the format username@domain."
 msgstr ""
 "提示: 如果认证时不需要用户名，可填写为 null, 如果是 AD 账号，格式为 "
 "username@domain"
