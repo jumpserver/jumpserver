@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
                 ('reason', models.CharField(blank=True, default='', max_length=128, verbose_name='Reason')),
                 ('status', models.BooleanField(choices=[(1, 'Success'), (0, 'Failed')], default=1, verbose_name='Status')),
                 ('datetime', models.DateTimeField(db_index=True, default=django.utils.timezone.now, verbose_name='Login Date')),
-                ('backend', models.CharField(default='', max_length=32, verbose_name='Authentication backend')),
+                ('backend', models.CharField(default='', max_length=32, verbose_name='Auth backend')),
             ],
             options={
                 'verbose_name': 'User login log',
@@ -111,7 +111,7 @@ class Migration(migrations.Migration):
                 ('city', models.CharField(blank=True, max_length=254, null=True, verbose_name='Login city')),
                 ('user_agent', models.CharField(blank=True, max_length=254, null=True, verbose_name='User agent')),
                 ('type', models.CharField(choices=[('W', 'Web'), ('T', 'Terminal'), ('U', 'Unknown')], max_length=2, verbose_name='Login type')),
-                ('backend', models.CharField(default='', max_length=32, verbose_name='Authentication backend')),
+                ('backend', models.CharField(default='', max_length=32, verbose_name='Auth backend')),
                 ('date_created', models.DateTimeField(blank=True, null=True, verbose_name='Date created')),
             ],
             options={
