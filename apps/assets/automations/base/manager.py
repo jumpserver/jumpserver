@@ -320,19 +320,19 @@ class BasePlaybookManager:
         shutil.rmtree(self.runtime_dir, ignore_errors=True)
 
     def run(self, *args, **kwargs):
-        print(">>> 任务准备阶段\n")
+        print(_(">>> Task preparation phase"), end="\n")
         runners = self.get_runners()
         if len(runners) > 1:
-            print("### 分次执行任务, 总共 {}\n".format(len(runners)))
+            print(_(">>> Executing tasks in batches, total {runner_count}").format(runner_count=len(runners)))
         elif len(runners) == 1:
-            print(">>> 开始执行任务\n")
+            print(_(">>> Start executing tasks"))
         else:
-            print("### 没有需要执行的任务\n")
+            print(_(">>> No tasks need to be executed"), end="\n")
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
             if len(runners) > 1:
-                print(">>> 开始执行第 {} 批任务".format(i))
+                print(_(">>> Begin executing batch {index} of tasks").format(index=i))
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
             try:

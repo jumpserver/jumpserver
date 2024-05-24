@@ -700,11 +700,13 @@ class MFAMixin:
     @property
     def mfa_force_enabled(self):
         force_level = settings.SECURITY_MFA_AUTH
+        # 1 All users
         if force_level in [True, 1]:
             return True
-        # 2 管理员强制开启
+        # 2 仅管理员强制开启
         if force_level == 2 and self.is_org_admin:
             return True
+        # 3 仅用户开启
         return self.mfa_level == 2
 
     def enable_mfa(self):

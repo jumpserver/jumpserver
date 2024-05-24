@@ -38,4 +38,4 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label="Magnus")
     TERMINAL_RAZOR_ENABLED = serializers.BooleanField(label="Razor")
-    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label="Koko")
+    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label="SSH Client")
