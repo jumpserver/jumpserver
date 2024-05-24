@@ -17,7 +17,7 @@ class CASSettingSerializer(serializers.Serializer):
     )
     CAS_LOGOUT_COMPLETELY = serializers.BooleanField(
         required=False, label=_('Logout completely'), 
-        help_text=_('When the user signs out, they also be logged out from the CAS Server')
+        help_text=_('When the user signs out, they also be logged out from the CAS server')
     )
     CAS_VERSION = serializers.IntegerField(
         required=False, label=_('Version'), min_value=1, max_value=3
