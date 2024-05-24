@@ -18,4 +18,7 @@ class RadiusSettingSerializer(serializers.Serializer):
     RADIUS_SECRET = EncryptedField(
         required=False, max_length=1024, allow_null=True, label=_('Secret'),
     )
-    OTP_IN_RADIUS = serializers.BooleanField(required=False, label=_('OTP in Radius'))
+    OTP_IN_RADIUS = serializers.BooleanField(
+        required=False, label=_('OTP in RADIUS'), 
+        help_text=_('* Using OTP in RADIUS means users can employ RADIUS as a method for MFA')
+    )

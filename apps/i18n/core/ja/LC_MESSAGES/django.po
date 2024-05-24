@@ -5819,7 +5819,7 @@ msgstr "実行が許可されていないコマンド"
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
-msgid "Virtual app"
+msgid "Virtual App"
 msgstr "仮想アプリケーション"
 
 #: settings/serializers/msg.py:25
@@ -6046,7 +6046,7 @@ msgid "Only admin users"
 msgstr "管理者のみ"
 
 #: settings/serializers/security.py:120
-msgid "Global MFA auth"
+msgid "Global MFA"
 msgstr "グローバル有効化MFA認証"
 
 #: settings/serializers/security.py:124
@@ -6133,10 +6133,10 @@ msgstr "未使用のユーザータイムアウト（日）"
 #: settings/serializers/security.py:171
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
-"predetermined time limit."
+"predetermined time limit"
 msgstr ""
 "毎日、頻度の低いユーザーを検出し、予め決められた時間制限を超えた場合は無効に"
-"します。"
+"します"
 
 #: settings/serializers/security.py:191
 msgid "Watermark"
@@ -7099,7 +7099,7 @@ msgid "App Provider"
 msgstr "アプリケーションプロバイダ"
 
 #: terminal/models/virtualapp/virtualapp.py:102
-msgid "Virtual app publication"
+msgid "Virtual App publication"
 msgstr "仮想アプリケーションの公開"
 
 #: terminal/notifications.py:25

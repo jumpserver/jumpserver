@@ -27,7 +27,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
         required=True, max_length=16, label=_('Service provider')
     )
     AUTH_OAUTH2_CLIENT_ID = serializers.CharField(
-        required=True, max_length=1024, label=_('Client Id')
+        required=True, max_length=1024, label=_('Client ID')
     )
     AUTH_OAUTH2_CLIENT_SECRET = EncryptedField(
         required=False, max_length=1024, label=_('Client Secret')
@@ -51,9 +51,16 @@ class OAuth2SettingSerializer(serializers.Serializer):
     AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT = serializers.CharField(
         required=False, allow_blank=True, max_length=1024, label=_('End session endpoint')
     )
-    AUTH_OAUTH2_LOGOUT_COMPLETELY = serializers.BooleanField(required=False, label=_('Logout completely'))
+    AUTH_OAUTH2_LOGOUT_COMPLETELY = serializers.BooleanField(
+        required=False, label=_('Logout completely'),
+        help_text=_('When the user signs out, they also be logged out from the OAuth2 server')
+    )
     AUTH_OAUTH2_USER_ATTR_MAP = serializers.JSONField(
-        required=True, label=_('User attribute')
+        required=True, label=_('User attribute'),
+        help_text=_(
+            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            '`value` is the OAuth2 service user attribute name'
+        )
     )
     AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(
         default=True, label=_('Always update user')

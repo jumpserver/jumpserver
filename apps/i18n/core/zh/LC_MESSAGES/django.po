@@ -5773,7 +5773,7 @@ msgstr "不允许执行的命令"
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
-msgid "Virtual app"
+msgid "Virtual App"
 msgstr "虚拟应用"
 
 #: settings/serializers/msg.py:25
@@ -5981,7 +5981,7 @@ msgid "Only admin users"
 msgstr "仅管理员"
 
 #: settings/serializers/security.py:120
-msgid "Global MFA auth"
+msgid "Global MFA"
 msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/security.py:124
@@ -6066,7 +6066,7 @@ msgstr "不活跃用户自动禁用 (天)"
 #: settings/serializers/security.py:171
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
-"predetermined time limit."
+"predetermined time limit"
 msgstr "每天检测一次，超过预设时间的用户自动禁用"
 
 #: settings/serializers/security.py:191
@@ -7011,7 +7011,7 @@ msgid "App Provider"
 msgstr "应用提供商"
 
 #: terminal/models/virtualapp/virtualapp.py:102
-msgid "Virtual app publication"
+msgid "Virtual App publication"
 msgstr "虚拟应用发布"
 
 #: terminal/notifications.py:25
