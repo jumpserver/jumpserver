@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 18:27+0800\n"
+"POT-Creation-Date: 2024-05-24 11:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -314,7 +314,7 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:110
 #: accounts/serializers/automations/change_secret.py:141
 #: accounts/templates/accounts/change_secret_failed_info.html:12
-#: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
+#: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:9
 #: assets/serializers/gateway.py:28 audits/models.py:59
 #: authentication/api/connection_token.py:411 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 terminal/backends/command/models.py:18
@@ -836,7 +836,7 @@ msgstr "已修改"
 
 #: accounts/serializers/account/account.py:273
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
-#: acls/templates/acls/asset_login_reminder.html:6
+#: acls/templates/acls/asset_login_reminder.html:8
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
@@ -867,8 +867,8 @@ msgid "ID"
 msgstr "ID"
 
 #: accounts/serializers/account/account.py:453 acls/serializers/base.py:116
-#: acls/templates/acls/asset_login_reminder.html:5
-#: acls/templates/acls/user_login_reminder.html:5
+#: acls/templates/acls/asset_login_reminder.html:7
+#: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:269
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -1106,8 +1106,6 @@ msgid "Task execution id"
 msgstr "任务执行 ID"
 
 #: accounts/templates/accounts/change_secret_failed_info.html:5
-#: acls/templates/acls/asset_login_reminder.html:3
-#: acls/templates/acls/user_login_reminder.html:3
 msgid "Respectful"
 msgstr "尊敬的"
 
@@ -1272,7 +1270,7 @@ msgid "User login reminder"
 msgstr "用户登录提醒"
 
 #: acls/notifications.py:42
-msgid "Asset login reminder"
+msgid "User login alert for asset"
 msgstr "资产登录提醒"
 
 #: acls/serializers/base.py:11 acls/serializers/login_acl.py:11
@@ -1328,40 +1326,55 @@ msgstr "IP"
 msgid "Time Period"
 msgstr "时段"
 
-#: acls/templates/acls/asset_login_reminder.html:10
+#: acls/templates/acls/asset_login_reminder.html:3
+#: acls/templates/acls/user_login_reminder.html:3
+msgid "Dear"
+msgstr "尊敬的"
+
+#: acls/templates/acls/asset_login_reminder.html:5
 msgid ""
-"The user has just logged in to the asset. Please ensure that this is an "
-"authorized operation. If you suspect that this is an unauthorized access, "
-"please take appropriate measures immediately."
-msgstr ""
-"用户刚刚在登录资产。请确保这是授权的操作。如果您怀疑这是一个未经授权的访问，"
-"请立即采取适当的措施。"
+"We would like to inform you that a user has recently logged into the "
+"following asset:"
+msgstr "我们想通知您，以下资产最近有用户登录："
+
+#: acls/templates/acls/asset_login_reminder.html:6
+msgid "Asset details"
+msgstr "资产详情"
 
 #: acls/templates/acls/asset_login_reminder.html:12
-#: acls/templates/acls/user_login_reminder.html:13
-msgid "Thank you"
-msgstr "谢谢"
+#: acls/templates/acls/user_login_reminder.html:15
+msgid ""
+"Please review the login activity to ensure the security and proper usage of "
+"the asset. If you did not authorize this login or if you notice any "
+"suspicious activity, please take the necessary actions immediately."
+msgstr ""
+"请您审核此登录活动，以确保资产的安全和正确使用。如果您未授权此次登录或发现任"
+"何可疑活动，请立即采取必要的措施。"
 
-#: acls/templates/acls/user_login_reminder.html:7 audits/models.py:194
+#: acls/templates/acls/asset_login_reminder.html:14
+#: acls/templates/acls/user_login_reminder.html:16
+msgid "Thank you for your attention to this matter"
+msgstr "感谢您对此事的关注。"
+
+#: acls/templates/acls/user_login_reminder.html:5
+msgid "We would like to inform you that a user has recently logged:"
+msgstr "我们想通知您，最近有用户登录："
+
+#: acls/templates/acls/user_login_reminder.html:6
+msgid "User details"
+msgstr "用户详情"
+
+#: acls/templates/acls/user_login_reminder.html:10 audits/models.py:194
 #: audits/models.py:263
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:11
 msgid "Login city"
 msgstr "登录城市"
 
-#: acls/templates/acls/user_login_reminder.html:8 audits/models.py:197
+#: acls/templates/acls/user_login_reminder.html:11 audits/models.py:197
 #: audits/models.py:264 audits/serializers.py:68
 msgid "User agent"
 msgstr "用户代理"
-
-#: acls/templates/acls/user_login_reminder.html:11
-msgid ""
-"The user has just successfully logged into the system. Please ensure that "
-"this is an authorized operation. If you suspect that this is an unauthorized "
-"access, please take appropriate measures immediately."
-msgstr ""
-"用户刚刚成功登录到系统。请确保这是授权的操作。如果您怀疑这是一个未经授权的访"
-"问，请立即采取适当的措施。"
 
 #: assets/api/asset/asset.py:180
 msgid "Cannot create asset directly, you should create a host or other"
@@ -4420,13 +4433,13 @@ msgid "Server performance"
 msgstr "监控告警"
 
 #: ops/notifications.py:25
-msgid "Terminal health check warning"
-msgstr "终端健康状况检查警告"
+msgid "Component health check warning"
+msgstr "组件健康状况检查警告"
 
 #: ops/notifications.py:70
 #, python-brace-format
-msgid "The terminal is offline: {name}"
-msgstr "终端已离线: {name}"
+msgid "The component is offline: {name}"
+msgstr "组件已离线: {name}"
 
 #: ops/notifications.py:75
 #, python-brace-format
@@ -4715,7 +4728,7 @@ msgid "day"
 msgstr "天"
 
 #: perms/notifications.py:15
-msgid "You permed assets is about to expire"
+msgid "The asset you authorized is about to expire"
 msgstr "你授权的资产即将到期"
 
 #: perms/notifications.py:20
@@ -5291,6 +5304,7 @@ msgid "Search filter"
 msgstr "用户过滤器"
 
 #: settings/serializers/auth/ldap.py:61
+#, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
@@ -6230,7 +6244,7 @@ msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
-msgid "Sync task Finish"
+msgid "Sync task finish"
 msgstr "同步任务完成"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:6

@@ -739,7 +739,7 @@
     "NewPublicKey": "新 SSH 公钥",
     "OneAssignee": "一级受理人",
     "OneAssigneeType": "一级受理人类型",
-    "OneClickReadMsg": "你确定要将当前信息标记为已读吗?",
+    "OneClickReadMsg": "你确定全部标记为已读吗?",
     "OnlineSession": "在线用户",
     "OnlineSessionHelpMsg": "无法下线当前会话，因为该会话是当前用户的在线会话。当前只记录以 Web 方式登录的用户。",
     "OnlineSessions": "在线会话数",

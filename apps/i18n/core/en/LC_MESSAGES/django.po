@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 18:28+0800\n"
+"POT-Creation-Date: 2024-05-24 10:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -848,7 +848,7 @@ msgstr ""
 
 #: accounts/serializers/account/account.py:453 acls/serializers/base.py:116
 #: acls/templates/acls/asset_login_reminder.html:5
-#: acls/templates/acls/user_login_reminder.html:5
+#: acls/templates/acls/user_login_reminder.html:7
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:269
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -1084,7 +1084,6 @@ msgstr ""
 
 #: accounts/templates/accounts/change_secret_failed_info.html:5
 #: acls/templates/acls/asset_login_reminder.html:3
-#: acls/templates/acls/user_login_reminder.html:3
 msgid "Respectful"
 msgstr ""
 
@@ -1247,7 +1246,7 @@ msgid "User login reminder"
 msgstr ""
 
 #: acls/notifications.py:42
-msgid "Asset login reminder"
+msgid "User login alert for asset"
 msgstr ""
 
 #: acls/serializers/base.py:11 acls/serializers/login_acl.py:11
@@ -1307,27 +1306,44 @@ msgid ""
 msgstr ""
 
 #: acls/templates/acls/asset_login_reminder.html:12
-#: acls/templates/acls/user_login_reminder.html:13
 msgid "Thank you"
 msgstr ""
 
-#: acls/templates/acls/user_login_reminder.html:7 audits/models.py:194
+#: acls/templates/acls/user_login_reminder.html:3
+msgid "Dear"
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:5
+msgid ""
+"We would like to inform you that a user has recently logged into the "
+"following asset:"
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:6
+msgid "Asset details"
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:9 audits/models.py:194
 #: audits/models.py:263
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:11
 msgid "Login city"
 msgstr ""
 
-#: acls/templates/acls/user_login_reminder.html:8 audits/models.py:197
+#: acls/templates/acls/user_login_reminder.html:10 audits/models.py:197
 #: audits/models.py:264 audits/serializers.py:68
 msgid "User agent"
 msgstr ""
 
-#: acls/templates/acls/user_login_reminder.html:11
+#: acls/templates/acls/user_login_reminder.html:13
 msgid ""
-"The user has just successfully logged into the system. Please ensure that "
-"this is an authorized operation. If you suspect that this is an unauthorized "
-"access, please take appropriate measures immediately."
+"Please review the login activity to ensure the security and proper usage of "
+"the asset. If you did not authorize this login or if you notice any "
+"suspicious activity, please take the necessary actions immediately."
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:15
+msgid "Thank you for your attention to this matter"
 msgstr ""
 
 #: assets/api/asset/asset.py:180
@@ -4351,12 +4367,12 @@ msgid "Server performance"
 msgstr ""
 
 #: ops/notifications.py:25
-msgid "Terminal health check warning"
+msgid "Component health check warning"
 msgstr ""
 
 #: ops/notifications.py:70
 #, python-brace-format
-msgid "The terminal is offline: {name}"
+msgid "The component is offline: {name}"
 msgstr ""
 
 #: ops/notifications.py:75
@@ -4646,7 +4662,7 @@ msgid "day"
 msgstr ""
 
 #: perms/notifications.py:15
-msgid "You permed assets is about to expire"
+msgid "The asset you authorized is about to expire"
 msgstr ""
 
 #: perms/notifications.py:20
@@ -6125,7 +6141,7 @@ msgid "Registration periodic import ldap user task"
 msgstr ""
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
-msgid "Sync task Finish"
+msgid "Sync task finish"
 msgstr ""
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
