@@ -183,7 +183,7 @@ class Migration(migrations.Migration):
                 ('ip_group', models.JSONField(default=list, verbose_name='IP group')),
                 ('priority', models.IntegerField(help_text='1-100, the lower the value will be match first', unique=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)], verbose_name='Priority')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
-                ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
+                ('is_active', models.BooleanField(default=True, verbose_name='Active')),
             ],
             options={
                 'verbose_name': 'Endpoint rule',
@@ -218,7 +218,7 @@ class Migration(migrations.Migration):
                 ('asset', models.CharField(db_index=True, max_length=128, verbose_name='Asset')),
                 ('asset_id', models.CharField(blank=True, db_index=True, default='', max_length=36)),
                 ('account', models.CharField(db_index=True, max_length=128, verbose_name='Account')),
-                ('account_id', models.CharField(db_index=True, max_length=128, verbose_name='Account id')),
+                ('account_id', models.CharField(db_index=True, max_length=128, verbose_name='Account ID')),
                 ('protocol', models.CharField(db_index=True, default='ssh', max_length=16)),
                 ('login_from', models.CharField(choices=[('ST', 'SSH Terminal'), ('RT', 'RDP Terminal'), ('WT', 'Web Terminal'), ('DT', 'DB Terminal')], default='ST', max_length=2, verbose_name='Login from')),
                 ('type', models.CharField(db_index=True, default='normal', max_length=16)),

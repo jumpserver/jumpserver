@@ -29,6 +29,15 @@ class SAML2SettingSerializer(serializers.Serializer):
         allow_blank=True, required=False,
         write_only=True, label=_('SP cert')
     )
-    SAML2_RENAME_ATTRIBUTES = serializers.JSONField(required=False, label=_('User attribute'))
-    SAML2_LOGOUT_COMPLETELY = serializers.BooleanField(required=False, label=_('Logout completely'))
+    SAML2_RENAME_ATTRIBUTES = serializers.JSONField(
+        required=False, label=_('User attribute'),
+        help_text=_(
+            "User attribute mapping, where the `key` is the SAML2 service user attribute name "
+            "and the `value` is the JumpServer user attribute name"
+        )
+    )
+    SAML2_LOGOUT_COMPLETELY = serializers.BooleanField(
+        required=False, label=_('Logout completely'),
+        help_text=_('When the user signs out, they also be logged out from the SAML2 server')
+    )
     AUTH_SAML2_ALWAYS_UPDATE_USER = serializers.BooleanField(required=False, label=_('Always update user'))

@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('date_verified', models.DateTimeField(null=True, verbose_name='Date verified')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('address', models.CharField(db_index=True, max_length=767, verbose_name='Address')),
-                ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
+                ('is_active', models.BooleanField(default=True, verbose_name='Active')),
                 ('gathered_info', models.JSONField(blank=True, default=dict, verbose_name='Gathered info')),
                 ('custom_info', models.JSONField(default=dict, verbose_name='Custom info')),
             ],

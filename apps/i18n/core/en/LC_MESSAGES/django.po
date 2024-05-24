@@ -5731,7 +5731,7 @@ msgstr ""
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
-msgid "Virtual app"
+msgid "Virtual App"
 msgstr ""
 
 #: settings/serializers/feature.py:148
@@ -5938,7 +5938,7 @@ msgid "Only admin users"
 msgstr ""
 
 #: settings/serializers/security.py:120
-msgid "Global MFA auth"
+msgid "Global MFA"
 msgstr ""
 
 #: settings/serializers/security.py:124
@@ -6019,7 +6019,7 @@ msgstr ""
 #: settings/serializers/security.py:171
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
-"predetermined time limit."
+"predetermined time limit"
 msgstr ""
 
 #: settings/serializers/security.py:191
@@ -6942,7 +6942,7 @@ msgid "App Provider"
 msgstr ""
 
 #: terminal/models/virtualapp/virtualapp.py:102
-msgid "Virtual app publication"
+msgid "Virtual App publication"
 msgstr ""
 
 #: terminal/notifications.py:25

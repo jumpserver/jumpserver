@@ -117,7 +117,7 @@ class SecurityAuthSerializer(serializers.Serializer):
             [1, _('All users')],
             [2, _('Only admin users')],
         ),
-        required=False, label=_("Global MFA auth")
+        required=False, label=_("Global MFA")
     )
     SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY = serializers.BooleanField(
         required=False, default=True,
@@ -168,7 +168,7 @@ class SecurityAuthSerializer(serializers.Serializer):
     SECURITY_UNCOMMON_USERS_TTL = serializers.IntegerField(
         min_value=30, max_value=99999, required=False,
         label=_('Auto Disable Threshold (day)'),
-        help_text=_("Detect infrequent users daily and disable them if they exceed the predetermined time limit.")
+        help_text=_("Detect infrequent users daily and disable them if they exceed the predetermined time limit")
     )
 
     def validate(self, attrs):
