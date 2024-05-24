@@ -12,7 +12,7 @@ class PermedAssetsWillExpireUserMsg(UserMessage):
         self.day_count = _('today') if day_count == 0 else str(day_count) + _('day')
 
     def get_html_msg(self) -> dict:
-        subject = _("You permed assets is about to expire")
+        subject = _("The asset you authorized is about to expire")
         context = {
             'name': self.user.name,
             'count': self.day_count,
