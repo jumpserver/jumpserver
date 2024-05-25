@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 16:00+0800\n"
+"POT-Creation-Date: 2024-05-23 18:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4151,7 +4151,7 @@ msgstr "タスク開始待ち"
 msgid "Task {} not found"
 msgstr "タスクは存在しません"
 
-#: ops/api/celery.py:267
+#: ops/api/celery.py:269
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
@@ -6031,8 +6031,8 @@ msgid "The third-party login modes include OIDC, CAS, and SAML2"
 msgstr "サードパーティのログインモードには、OIDC、CAS、SAML2"
 
 #: settings/serializers/security.py:129
-msgid "OTP in USBkey"
-msgstr "USBkey のOTP"
+msgid "OTP in USBKey"
+msgstr "USBKey のOTP"
 
 #: settings/serializers/security.py:132
 msgid "OTP issuer name"
@@ -6506,16 +6506,20 @@ msgstr ""
 "href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
-#: templates/_mfa_login_field.html:28
+#: templates/_mfa_login_field.html:25
+msgid "Click to detect USBKey device"
+msgstr "USBKeyデバイスの検出"
+
+#: templates/_mfa_login_field.html:35
 msgid "Send verification code"
 msgstr "確認コードを送信"
 
-#: templates/_mfa_login_field.html:107
+#: templates/_mfa_login_field.html:132
 #: users/templates/users/forgot_password.html:176
 msgid "Wait: "
 msgstr "待つ:"
 
-#: templates/_mfa_login_field.html:117
+#: templates/_mfa_login_field.html:142
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "確認コードが送信されました"

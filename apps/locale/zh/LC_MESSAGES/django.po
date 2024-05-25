@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 16:00+0800\n"
+"POT-Creation-Date: 2024-05-23 18:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4100,7 +4100,7 @@ msgstr "等待任务开始"
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:267
+#: ops/api/celery.py:269
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
@@ -5948,8 +5948,8 @@ msgid "The third-party login modes include OIDC, CAS, and SAML2"
 msgstr "第三方登录方式包括: OIDC、CAS、SAML2"
 
 #: settings/serializers/security.py:129
-msgid "OTP in USBkey"
-msgstr "使用 USBkey OTP"
+msgid "OTP in USBKey"
+msgstr "使用 USBKey OTP"
 
 #: settings/serializers/security.py:132
 msgid "OTP issuer name"
@@ -6411,16 +6411,20 @@ msgstr ""
 "href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-#: templates/_mfa_login_field.html:28
+#: templates/_mfa_login_field.html:25
+msgid "Click to detect USBKey device"
+msgstr "检测USBKey设备"
+
+#: templates/_mfa_login_field.html:35
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:107
+#: templates/_mfa_login_field.html:132
 #: users/templates/users/forgot_password.html:176
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:117
+#: templates/_mfa_login_field.html:142
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "验证码已发送"

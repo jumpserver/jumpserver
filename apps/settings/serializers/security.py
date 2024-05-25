@@ -126,7 +126,7 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_OTP_IN_USBKEY = serializers.BooleanField(
         required=False, default=False,
-        label=_('OTP in USBkey')
+        label=_('OTP in USBKey')
     )
     OTP_ISSUER_NAME = serializers.CharField(
         required=False, max_length=16, label=_('OTP issuer name'),

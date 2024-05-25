@@ -18,15 +18,24 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
              style="display: none"
         >
-            <input type="text" class="form-control input-style"
-                   placeholder="{{ backend.placeholder }}"
-            >
-            {% if backend.challenge_required %}
-                <button class="btn btn-primary full-width btn-challenge"
-                        type='button' onclick="sendChallengeCode(this)"
+            {% if backend.name == 'usbkey' %}
+                <button class="btn btn-primary full-width"
+                        type='button' onclick="detectUSBKey()"
                 >
-                    {% trans 'Send verification code' %}
+                    {% trans 'Click to detect USBKey device' %}
                 </button>
+                 <input type="hidden" class="form-control input-style">
+            {% else %}
+                <input type="text" class="form-control input-style"
+	                   placeholder="{{ backend.placeholder }}"
+	            >
+	            {% if backend.challenge_required %}
+	                <button class="btn btn-primary full-width btn-challenge"
+	                        type='button' onclick="sendChallengeCode(this)"
+	                >
+	                    {% trans 'Send verification code' %}
+	                </button>
+	            {% endif %}
             {% endif %}
         </div>
     {% endfor %}
@@ -51,6 +60,38 @@
     }
 </style>
 <script>
+	function detectUSBKey() {
+        let name = $("#mfa-select").val()
+        $('.input-style').each(function (i, ele) {
+            $(ele).attr('name', 'code-test')
+        })
+        const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
+        currentMFAInputRef.attr('name', 'code')
+
+	    let ret = false
+
+	    const data = {'devname': 'devName'}
+	    $.ajax({
+	        url: 'http://127.0.0.1:9630' + '/onecertx/',
+	         contentType:"application/json",
+            dataType: "json",
+	        type: 'POST', async: false,
+	        data: JSON.stringify(data),
+	        success: function (data) {
+	            if (data['applist'].length >= 1) {
+	                ret = data['applist'][0]
+	            }
+		        setTimeout(function () {
+		            toastr.success("{% trans 'The verification code has been sent' %}");
+		        });
+	        }
+
+	    })
+
+	    currentMFAInputRef.attr('value','123456')
+	    return ret
+	}
+
     const preferMFAKey = 'mfaPrefer'
     $(document).ready(function () {
         const mfaSelectRef = document.getElementById('mfa-select');
@@ -61,7 +102,6 @@
         if (preferMFA && !preferMFADisabled) {
             mfaSelectRef.value = preferMFA;
         }
-
         const mfaSelect = mfaSelectRef.value;
         if (mfaSelect !== null) {
             selectChange(mfaSelect, true);
