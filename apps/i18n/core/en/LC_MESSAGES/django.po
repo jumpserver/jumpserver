@@ -3974,7 +3974,7 @@ msgid "Resource ID"
 msgstr ""
 
 #: labels/models.py:41
-msgid "Labeled resource"
+msgid "Tagged resource"
 msgstr ""
 
 #: labels/serializers.py:22
