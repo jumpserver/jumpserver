@@ -176,7 +176,7 @@ class Applet(JMSBaseModel):
             label_value = spec_label.label.value
             matched = [host for host in hosts if host.name == label_value]
             if matched:
-                return matched[0]
+                return random.choice(matched)
 
         hosts = [h for h in hosts if h.auto_create_accounts]
         prefer_key = self.host_prefer_key_tpl.format(user.id)
