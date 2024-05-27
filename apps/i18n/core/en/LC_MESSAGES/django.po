@@ -3941,7 +3941,7 @@ msgstr ""
 
 #: jumpserver/context_processor.py:14
 msgid "JumpServer Open Source Bastion Host"
-msgstr ""
+msgstr "JumpServer"
 
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
@@ -5734,10 +5734,6 @@ msgstr ""
 msgid "Virtual App"
 msgstr ""
 
-#: settings/serializers/feature.py:148
-msgid "vApp"
-msgstr ""
-
 #: settings/serializers/feature.py:150
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
@@ -6385,7 +6381,7 @@ msgstr ""
 
 #: templates/_without_nav_base.html:26
 msgid "Home page"
-msgstr ""
+msgstr "Home"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
 #: users/const.py:65

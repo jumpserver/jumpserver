@@ -5824,10 +5824,6 @@ msgstr "作业中心命令黑名单"
 msgid "Virtual App"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:148
-msgid "vApp"
-msgstr ""
-
 #: settings/serializers/feature.py:150
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "

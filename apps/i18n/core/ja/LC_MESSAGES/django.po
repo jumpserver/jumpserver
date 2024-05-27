@@ -5954,10 +5954,6 @@ msgstr "コマンドフィルタリング"
 msgid "Virtual App"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:148
-msgid "vApp"
-msgstr ""
-
 #: settings/serializers/feature.py:150
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "

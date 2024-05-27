@@ -624,6 +624,7 @@ class Config(dict):
         'LOKI_LOG_ENABLED': False,
         'LOKI_BASE_URL': 'http://loki:3100',
 
+        'TOOL_USER_ENABLED': False,
     }
 
     old_config_map = {
