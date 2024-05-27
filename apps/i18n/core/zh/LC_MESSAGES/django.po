@@ -1419,7 +1419,7 @@ msgstr ">>> 没有需要执行的任务"
 #: assets/automations/base/manager.py:335
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
-msgstr ">>> 开始执行第 {} 批任务"
+msgstr ">>> 开始执行第 {index} 批任务"
 
 #: assets/automations/ping_gateway/manager.py:33
 #: authentication/models/connection_token.py:131
