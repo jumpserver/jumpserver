@@ -1,14 +1,16 @@
 {% load i18n %}
 
-<h3>{% trans 'Respectful' %}: {{ recipient.name }}[{{ recipient.username }}]</h3>
+<h3>{% trans 'Dear' %}: {{ recipient.name }}[{{ recipient.username }}]</h3>
 <hr>
-<p><strong>{% trans 'User' %}:</strong> [{{ username }}]</p>
-<p><strong>IP:</strong> [{{ ip }}]</p>
-<p><strong>{% trans 'Login city' %}:</strong> [{{ city }}]</p>
-<p><strong>{% trans 'User agent' %}:</strong> [{{ user_agent }}]</p>
+<p>{% trans 'We would like to inform you that a user has recently logged:' %}<p>
+<p><strong>{% trans 'User details' %}:</strong></p>
+<ul>
+    <li><strong>{% trans 'User' %}:</strong> [{{ username }}]</li>
+    <li><strong>IP:</strong> [{{ ip }}]</li>
+    <li><strong>{% trans 'Login city' %}:</strong> [{{ city }}]</li>
+    <li><strong>{% trans 'User agent' %}:</strong> [{{ user_agent }}]</li>
+</ul>
 <hr>
 
-<p>{% trans 'The user has just successfully logged into the system. Please ensure that this is an authorized operation. If you suspect that this is an unauthorized access, please take appropriate measures immediately.' %}</p>
-
-<p>{% trans 'Thank you' %}！</p>
-
+<p>{% trans 'Please review the login activity to ensure the security and proper usage of the asset. If you did not authorize this login or if you notice any suspicious activity, please take the necessary actions immediately.' %}</p>
+<p>{% trans 'Thank you for your attention to this matter' %}！</p>

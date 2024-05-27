@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-27 16:41+0800\n"
+"POT-Creation-Date: 2024-05-22 18:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -318,7 +318,7 @@ msgstr "ソース ID"
 #: accounts/serializers/automations/change_secret.py:110
 #: accounts/serializers/automations/change_secret.py:141
 #: accounts/templates/accounts/change_secret_failed_info.html:12
-#: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
+#: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:9
 #: assets/serializers/gateway.py:28 audits/models.py:59
 #: authentication/api/connection_token.py:411 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 terminal/backends/command/models.py:18
@@ -848,7 +848,7 @@ msgstr "編集済み"
 
 #: accounts/serializers/account/account.py:273
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
-#: acls/templates/acls/asset_login_reminder.html:6
+#: acls/templates/acls/asset_login_reminder.html:8
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
@@ -881,8 +881,8 @@ msgid "ID"
 msgstr "ID"
 
 #: accounts/serializers/account/account.py:453 acls/serializers/base.py:116
-#: acls/templates/acls/asset_login_reminder.html:5
-#: acls/templates/acls/user_login_reminder.html:5
+#: acls/templates/acls/asset_login_reminder.html:7
+#: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:269
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -1126,8 +1126,6 @@ msgid "Task execution id"
 msgstr "タスク実行ID"
 
 #: accounts/templates/accounts/change_secret_failed_info.html:5
-#: acls/templates/acls/asset_login_reminder.html:3
-#: acls/templates/acls/user_login_reminder.html:3
 msgid "Respectful"
 msgstr "尊敬する"
 
@@ -1302,7 +1300,7 @@ msgid "User login reminder"
 msgstr "ユーザーログインのリマインダ"
 
 #: acls/notifications.py:42
-msgid "Asset login reminder"
+msgid "User login alert for asset"
 msgstr "資産ログインのリマインダ"
 
 #: acls/serializers/base.py:11 acls/serializers/login_acl.py:11
@@ -1360,41 +1358,56 @@ msgstr "IP"
 msgid "Time Period"
 msgstr "期間"
 
-#: acls/templates/acls/asset_login_reminder.html:10
+#: acls/templates/acls/asset_login_reminder.html:3
+#: acls/templates/acls/user_login_reminder.html:3
+msgid "Dear"
+msgstr "尊敬する"
+
+#: acls/templates/acls/asset_login_reminder.html:5
 msgid ""
-"The user has just logged in to the asset. Please ensure that this is an "
-"authorized operation. If you suspect that this is an unauthorized access, "
-"please take appropriate measures immediately."
-msgstr ""
-"ユーザーは資産にログインしています。許可されたアクションであることを確認して"
-"ください。不正アクセスが疑われる場合は、すぐに適切な措置を取ってください。"
+"We would like to inform you that a user has recently logged into the "
+"following asset:"
+msgstr "以下の資産にユーザーが最近ログインしたことをお知らせいたします。"
+
+#: acls/templates/acls/asset_login_reminder.html:6
+msgid "Asset details"
+msgstr "資産詳細"
 
 #: acls/templates/acls/asset_login_reminder.html:12
-#: acls/templates/acls/user_login_reminder.html:13
-msgid "Thank you"
-msgstr "ありがとうございます。"
+#: acls/templates/acls/user_login_reminder.html:15
+msgid ""
+"Please review the login activity to ensure the security and proper usage of "
+"the asset. If you did not authorize this login or if you notice any "
+"suspicious activity, please take the necessary actions immediately."
+msgstr ""
+"資産のセキュリティと適切な使用を確保するために、ログイン活動を確認してくださ"
+"い。このログインを承認していない場合や、不審な活動に気付いた場合は、直ちに必"
+"要な措置を講じてください。"
 
-#: acls/templates/acls/user_login_reminder.html:7 audits/models.py:194
+#: acls/templates/acls/asset_login_reminder.html:14
+#: acls/templates/acls/user_login_reminder.html:16
+msgid "Thank you for your attention to this matter"
+msgstr "この件についてのご注意をお願いいたします。"
+
+#: acls/templates/acls/user_login_reminder.html:5
+msgid "We would like to inform you that a user has recently logged:"
+msgstr "ユーザーが最近ログインしたことをお知らせいたします:"
+
+#: acls/templates/acls/user_login_reminder.html:6
+msgid "User details"
+msgstr "ユーザー詳細"
+
+#: acls/templates/acls/user_login_reminder.html:10 audits/models.py:194
 #: audits/models.py:263
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:11
 msgid "Login city"
 msgstr "ログイン都市"
 
-#: acls/templates/acls/user_login_reminder.html:8 audits/models.py:197
+#: acls/templates/acls/user_login_reminder.html:11 audits/models.py:197
 #: audits/models.py:264 audits/serializers.py:68
 msgid "User agent"
 msgstr "ユーザーエージェント"
-
-#: acls/templates/acls/user_login_reminder.html:11
-msgid ""
-"The user has just successfully logged into the system. Please ensure that "
-"this is an authorized operation. If you suspect that this is an unauthorized "
-"access, please take appropriate measures immediately."
-msgstr ""
-"ユーザーはシステムに正常にログインしたばかりです。許可されたアクションである"
-"ことを確認してください。不正アクセスが疑われる場合は、すぐに適切な措置を取っ"
-"てください。"
 
 #: assets/api/asset/asset.py:180
 msgid "Cannot create asset directly, you should create a host or other"
@@ -4546,13 +4559,13 @@ msgid "Server performance"
 msgstr "サーバーのパフォーマンス"
 
 #: ops/notifications.py:25
-msgid "Terminal health check warning"
-msgstr "ターミナルヘルスチェックの警告"
+msgid "Component health check warning"
+msgstr "コンポーネントのヘルスチェック警告"
 
 #: ops/notifications.py:70
 #, python-brace-format
-msgid "The terminal is offline: {name}"
-msgstr "ターミナルはオフラインです: {name}"
+msgid "The component is offline: {name}"
+msgstr "コンポーネントがオフラインです: {name}"
 
 #: ops/notifications.py:75
 #, python-brace-format
@@ -4860,7 +4873,7 @@ msgid "day"
 msgstr "日"
 
 #: perms/notifications.py:15
-msgid "You permed assets is about to expire"
+msgid "The asset you authorized is about to expire"
 msgstr "パーマ資産の有効期限が近づいています"
 
 #: perms/notifications.py:20
@@ -6029,10 +6042,6 @@ msgstr "コマンドフィルタリング"
 msgid "Virtual app"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:148
-msgid "vApp"
-msgstr ""
-
 #: settings/serializers/feature.py:150
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
@@ -6499,7 +6508,7 @@ msgid "Registration periodic import ldap user task"
 msgstr "登録サイクルLDAPユーザータスクのインポート"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
-msgid "Sync task Finish"
+msgid "Sync task finish"
 msgstr "同期タスクが完了しました"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
