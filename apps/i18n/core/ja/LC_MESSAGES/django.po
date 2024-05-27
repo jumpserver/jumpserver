@@ -1439,7 +1439,7 @@ msgstr ">>> 実行する必要があるタスクはありません"
 #: assets/automations/base/manager.py:335
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
-msgstr ">>> 第 {} バッチのタスクの実行を開始"
+msgstr ">>> 第 {index} バッチのタスクの実行を開始"
 
 #: assets/automations/ping_gateway/manager.py:33
 #: authentication/models/connection_token.py:131
