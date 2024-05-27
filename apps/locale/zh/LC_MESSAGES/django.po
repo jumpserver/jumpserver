@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 18:02+0800\n"
+"POT-Creation-Date: 2024-05-27 16:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3085,8 +3085,9 @@ msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
 #: authentication/mfa/usbkey.py:8
-msgid "USBKey Serial Number verify invalid"
-msgstr "USBKey序列号校验失败"
+msgid ""
+"USBKey Serial Number verify invalid, Please first conduct a device check"
+msgstr "USBKey序列号校验失败，请先进行设备检测"
 
 #: authentication/mfa/usbkey.py:14
 msgid "USBKey verification"
@@ -6415,19 +6416,19 @@ msgstr ""
 msgid "Click to detect USBKey device"
 msgstr "检测USBKey设备"
 
-#: templates/_mfa_login_field.html:35
+#: templates/_mfa_login_field.html:36
 msgid "Send verification code"
 msgstr "发送验证码"
 
-#: templates/_mfa_login_field.html:132
-#: users/templates/users/forgot_password.html:176
-msgid "Wait: "
-msgstr "等待："
-
-#: templates/_mfa_login_field.html:142
+#: templates/_mfa_login_field.html:85 templates/_mfa_login_field.html:157
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
+
+#: templates/_mfa_login_field.html:147
+#: users/templates/users/forgot_password.html:176
+msgid "Wait: "
+msgstr "等待："
 
 #: templates/_without_nav_base.html:26
 msgid "Home page"

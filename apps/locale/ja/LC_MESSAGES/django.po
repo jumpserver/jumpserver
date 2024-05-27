@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 18:02+0800\n"
+"POT-Creation-Date: 2024-05-27 16:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3117,8 +3117,9 @@ msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
 
 #: authentication/mfa/usbkey.py:8
-msgid "USBKey Serial Number verify invalid"
-msgstr "USBKey シリアル番号の検証に失敗しました"
+msgid ""
+"USBKey Serial Number verify invalid, Please first conduct a device check"
+msgstr "USBKey シリアル番号の検証に失敗しました。最初にデバイスの検出を実行してください。"
 
 #: authentication/mfa/usbkey.py:14
 msgid "USBKey verification"
@@ -6510,19 +6511,19 @@ msgstr ""
 msgid "Click to detect USBKey device"
 msgstr "USBKeyデバイスの検出"
 
-#: templates/_mfa_login_field.html:35
+#: templates/_mfa_login_field.html:36
 msgid "Send verification code"
 msgstr "確認コードを送信"
 
-#: templates/_mfa_login_field.html:132
-#: users/templates/users/forgot_password.html:176
-msgid "Wait: "
-msgstr "待つ:"
-
-#: templates/_mfa_login_field.html:142
+#: templates/_mfa_login_field.html:85 templates/_mfa_login_field.html:157
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "確認コードが送信されました"
+
+#: templates/_mfa_login_field.html:147
+#: users/templates/users/forgot_password.html:176
+msgid "Wait: "
+msgstr "待つ:"
 
 #: templates/_without_nav_base.html:26
 msgid "Home page"

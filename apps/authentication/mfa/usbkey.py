@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .base import BaseMFA
 
-usbkey_failed_msg = _("USBKey Serial Number verify invalid,")
+usbkey_failed_msg = _("USBKey Serial Number verify invalid, Please first conduct a device check")
 
 
 class MFAUSBKey(BaseMFA):
