@@ -3,6 +3,7 @@ from channels.db import database_sync_to_async
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
+from django.conf import settings
 
 from authentication.backends.drf import (
     SignatureAuthentication,
@@ -19,6 +20,10 @@ urlpatterns = ops_urlpatterns + \
               notifications_urlpatterns + \
               setting_urlpatterns + \
               terminal_urlpatterns
+
+if settings.XPACK_ENABLED:
+    from xpack.plugins.cloud.urls.ws_urls import urlpatterns as xcloud_urlpatterns
+    urlpatterns += xcloud_urlpatterns
 
 
 @database_sync_to_async
