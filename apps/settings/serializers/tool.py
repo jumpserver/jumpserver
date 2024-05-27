@@ -10,6 +10,9 @@ class ToolSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Tool')
 
     TOOL_USER_ENABLED = serializers.BooleanField(
-        label=_('User tool'), default=True,
-        help_text=_("If enabled, users can utilize all tools in the workspace")
+        label=_('Tools in the Workbench'), default=True,
+        help_text=_(
+            "*! If enabled, users with RBAC permissions will be able to utilize all "
+            "tools in the workbench"
+        )
     )
