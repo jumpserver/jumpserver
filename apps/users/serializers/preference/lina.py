@@ -8,7 +8,7 @@ from ...models import Preference
 class BasicSerializer(serializers.Serializer):
     has_secret_key = serializers.SerializerMethodField(
         help_text=_(
-            'The password for file encryption, '
+            '*! The password for file encryption, '
             'used for decryption when the system sends emails containing file attachments. '
             '<br>'
             'Such as: account backup files, account password change results files'
@@ -43,4 +43,4 @@ class BasicSerializer(serializers.Serializer):
 
 
 class LinaSerializer(serializers.Serializer):
-    basic = BasicSerializer(required=False, label=_('Basic'))
+    basic = BasicSerializer(required=False, label=_('File Encryption'))

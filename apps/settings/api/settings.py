@@ -63,6 +63,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ticket': serializers.TicketSettingSerializer,
         'ops': serializers.OpsSettingSerializer,
         'virtualapp': serializers.VirtualAppSerializer,
+        'tool': serializers.ToolSerializer,
     }
 
     rbac_category_permissions = {

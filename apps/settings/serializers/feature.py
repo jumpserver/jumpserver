@@ -145,7 +145,7 @@ class VirtualAppSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Virtual app')
 
     VIRTUAL_APP_ENABLED = serializers.BooleanField(
-        required=False, label=_('vApp'), 
+        required=False, label=_('Virtual App'), 
         help_text=_(
             'Virtual applications, you can use the Linux operating system as an application server '
             'in remote applications.'
