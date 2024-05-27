@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('type', models.CharField(choices=[('command', 'Command'), ('regex', 'Regex')], default='command', max_length=16, verbose_name='Type')),
-                ('content', models.TextField(help_text='One line one command', verbose_name='Content')),
+                ('content', models.TextField(help_text='One command per line', verbose_name='Content')),
                 ('ignore_case', models.BooleanField(default=True, verbose_name='Ignore case')),
             ],
             options={

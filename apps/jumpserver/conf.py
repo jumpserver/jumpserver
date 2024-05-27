@@ -587,7 +587,7 @@ class Config(dict):
 
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
-        'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
+        'HELP_SUPPORT_URL': 'https://www.jumpserver.org/support/',
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
@@ -619,7 +619,10 @@ class Config(dict):
         # Ansible Receptor
         'RECEPTOR_ENABLED': False,
         'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
-        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521'
+        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521',
+
+        'LOKI_LOG_ENABLED': False,
+        'LOKI_BASE_URL': 'http://loki:3100',
 
     }
 

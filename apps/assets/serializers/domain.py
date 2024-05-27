@@ -4,10 +4,10 @@ from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from assets.models.gateway import Gateway
 from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from assets.models.gateway import Gateway
 from .gateway import GatewayWithAccountSecretSerializer
 from ..models import Domain
 
@@ -16,7 +16,10 @@ __all__ = ['DomainSerializer', 'DomainWithGatewaySerializer', 'DomainListSeriali
 
 class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
-        many=True, required=False, label=_('Gateway'), queryset=Gateway.objects
+        many=True, required=False, label=_('Gateway'), queryset=Gateway.objects,
+        help_text=_(
+            "A gateway is a network proxy for a zone, and when connecting assets within the zone, "
+            "the connection is routed through the gateway.")
     )
     assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
 

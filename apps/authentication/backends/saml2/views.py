@@ -231,7 +231,7 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
 
             if settings.SAML2_LOGOUT_COMPLETELY:
                 saml_instance = self.init_saml_auth(request)
-                logger.debug(log_prompt.format('Log out IDP user session synchronously'))
+                logger.debug(log_prompt.format('Logout IDP user session synchronously'))
                 return HttpResponseRedirect(saml_instance.logout())
 
         logger.debug(log_prompt.format('Redirect logout url'))

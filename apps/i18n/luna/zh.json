@@ -1,5 +1,6 @@
 {
     "ACL reject login asset": "本次登录已拒绝，原因是访问控制策略的限制",
+    "MenuAccountTemplates": "账号模版",
     "Account info": "账号信息",
     "Account not found": "账号未找到",
     "Account: ": "账号: {{value}}",

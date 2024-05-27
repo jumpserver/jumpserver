@@ -259,6 +259,13 @@ class BaseStorageSerializer(serializers.ModelSerializer):
         return instance
 
 
+meta_is_default = {
+    'help_text': _(
+        'set as the default storage, will make new Component use the current '
+        'storage by default, without affecting existing Component'
+    )
+}
+
 # CommandStorageSerializer
 class CommandStorageSerializer(BaseStorageSerializer):
     type = LabeledChoiceField(choices=const.CommandStorageType.choices, label=_('Type'))
@@ -267,7 +274,8 @@ class CommandStorageSerializer(BaseStorageSerializer):
     class Meta(BaseStorageSerializer.Meta):
         model = CommandStorage
         extra_kwargs = {
-            'name': {'validators': [UniqueValidator(queryset=CommandStorage.objects.all())]}
+            'name': {'validators': [UniqueValidator(queryset=CommandStorage.objects.all())]},
+            'is_default': meta_is_default
         }
 
 
@@ -278,8 +286,9 @@ class ReplayStorageSerializer(BaseStorageSerializer):
 
     class Meta(BaseStorageSerializer.Meta):
         model = ReplayStorage
-        extra_kwargs = {
-            'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]}
+        extra_kwargs ={
+            'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]},
+            'is_default': meta_is_default
         }
 
     def validate_is_default(self, value):
