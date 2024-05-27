@@ -989,7 +989,7 @@
     "SearchAncestorNodePerm": "Search for authorizations simultaneously on the current node and ancestor nodes",
     "Secret": "Password",
     "SecretKey": "Key",
-    "SubscriptionID": "Subscription authorization ID",
+    "SubscriptionID": "ID",
     "SecretKeyStrategy": "Password policy",
     "Secure": "Security",
     "Security": "Security",
