@@ -138,7 +138,6 @@ INSTALLED_APPS = [
     'rbac.apps.RBACConfig',
     'labels.apps.LabelsConfig',
     'rest_framework',
-    'rest_framework_swagger',
     'drf_yasg',
     'django_cas_ng',
     'channels',
