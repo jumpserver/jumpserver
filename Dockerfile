@@ -1,3 +1,6 @@
+ARG VERSION
+ARG BASE_IMAGE=jumpserver/core
+
 FROM python:3.11-slim-bullseye as stage-1
 ARG TARGETARCH
 
@@ -36,7 +39,6 @@ RUN set -ex \
     && rm -f /opt/receptor.tar.gz
 
 ARG VERSION
-ENV VERSION=$VERSION
 
 WORKDIR /opt/jumpserver
 ADD . .
@@ -46,67 +48,17 @@ RUN echo > /opt/jumpserver/config.yml \
         sed -i "s@VERSION = .*@VERSION = '${VERSION}'@g" apps/jumpserver/const.py; \
     fi
 
-FROM python:3.11-slim-bullseye as stage-2
+FROM ${BASE_IMAGE}:${VERSION}-base as stage-2
 ARG TARGETARCH
-
-ARG BUILD_DEPENDENCIES="              \
-        g++                           \
-        make                          \
-        pkg-config"
-
-ARG DEPENDENCIES="                    \
-        freetds-dev                   \
-        gettext                       \
-        libffi-dev                    \
-        libjpeg-dev                   \
-        libkrb5-dev                   \
-        libldap2-dev                  \
-        libpq-dev                     \
-        libsasl2-dev                  \
-        libssl-dev                    \
-        libxml2-dev                   \
-        libxmlsec1-dev                \
-        libxmlsec1-openssl            \
-        freerdp2-dev                  \
-        libaio-dev"
-
-ARG TOOLS="                           \
-        ca-certificates               \
-        curl                          \
-        default-libmysqlclient-dev    \
-        default-mysql-client          \
-        git                           \
-        git-lfs                       \
-        unzip                         \
-        xz-utils                      \
-        wget"
-
-ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
-    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apt-get update \
-    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt/jumpserver
 
-ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
 RUN --mount=type=cache,target=/root/.cache,sharing=locked \
     --mount=type=bind,source=poetry.lock,target=/opt/jumpserver/poetry.lock \
     --mount=type=bind,source=pyproject.toml,target=/opt/jumpserver/pyproject.toml \
     set -ex \
-    && python3 -m venv /opt/py3 \
-    && pip install poetry -i ${PIP_MIRROR} \
-    && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
-    && poetry install --without xpack
+    && poetry install --only main
 
 COPY --from=stage-1 /opt/jumpserver /opt/jumpserver
 
@@ -161,6 +113,10 @@ ENV VERSION=$VERSION
 
 VOLUME /opt/jumpserver/data
 
+ENTRYPOINT ["./entrypoint.sh"]
+
 EXPOSE 8080
 
-ENTRYPOINT ["./entrypoint.sh"]
+STOPSIGNAL SIGQUIT
+
+CMD ["start", "all"]
