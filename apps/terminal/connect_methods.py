@@ -101,7 +101,7 @@ class AppletMethod:
         from .models import Applet, AppletHost
 
         methods = defaultdict(list)
-        has_applet_hosts = AppletHost.objects.all().exists()
+        has_applet_hosts = AppletHost.objects.filter(is_active=True).exists()
         applets = Applet.objects.filter(is_active=True)
         for applet in applets:
             for protocol in applet.protocols:
