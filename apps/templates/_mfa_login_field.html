@@ -25,7 +25,7 @@
                 <button class="btn btn-primary full-width btn-challenge"
                         type='button' onclick="sendChallengeCode(this)"
                 >
-                    {% trans 'Send verification code' %}
+                    {% trans 'Send' %}
                 </button>
             {% endif %}
         </div>
@@ -39,15 +39,14 @@
     }
 
     .challenge-required .input-style {
-        width: calc(100% - 160px);
+        width: calc(100% - 104px);
         display: inline-block;
     }
 
     .btn-challenge {
-        width: 156px !important;
+        width: 100px !important;
         height: 100%;
         vertical-align: top;
-        padding: 8px 12px;
     }
 </style>
 <script>
