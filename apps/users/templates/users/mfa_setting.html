@@ -4,114 +4,221 @@
 
 {% block body %}
     <style>
-    .help-inline {
-        color: #7d8293;
-        font-size: 12px;
-        padding-right: 10px;
-    }
+        .help-inline {
+            color: #7d8293;
+            font-size: 12px;
+            padding-right: 10px;
+        }
 
-    .btn-xs {
-        width: 54px;
-    }
+        .btn-xs {
+            width: 54px;
+        }
 
-    .onoffswitch-switch {
-        height: 20px;
-    }
+        .onoffswitch-switch {
+            height: 20px;
+        }
+
+        .container {
+            max-width: 72%;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            margin-top: 0;
+            margin-bottom: -5px;
+        }
+
+        .section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section .title {
+            flex: 2;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .section .description {
+            flex: 10;
+            color: #666;
+        }
+
+        .section .summarize {
+            flex: 12;
+            color: #666;
+        }
+
+        .section .action {
+            flex: 3;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .section .status {
+            display: flex;
+            align-items: center;
+        }
+
+        .section .status .status-text {
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        .section .action-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .section .action-buttons .divider {
+            margin: 0 10px;
+            color: #ddd;
+        }
+
+        .section .action-buttons a {
+            color: #1e88e5;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .status-warning {
+            color: #ff9800;
+        }
+
+        .status-set {
+            color: #4caf50;
+        }
+
+        .status-icon {
+            font-size: 18px;
+        }
     </style>
-    <article>
-        <div>
-{#            // Todoi:#}
-            <h3>{% trans 'Enable MFA' %}</h3>
-            <div class="row" style="padding-top: 10px">
-                <li class="col-sm-6" style="font-size: 14px">{% trans 'Enable' %} MFA</li>
-                <div class="switch col-sm-6">
+    <div class="container">
+        <div class="header">
+            <h2>MFA</h2>
+        </div>
+        <hr>
+        <div class="row" style="padding-top: 10px">
+            <li class="col-sm-6" style="font-size: 14px">{% trans 'Enable' %} MFA</li>
+            <div class="switch col-sm-6">
                     <span class="help-inline">
                         {% if user.mfa_force_enabled %}
                             {% trans 'MFA force enable, cannot disable' %}
                         {% endif %}
                     </span>
-                    <div class="onoffswitch" style="float: right">
-                        <input type="checkbox" class="onoffswitch-checkbox"
-                                id="mfa-switch" onchange="switchMFA()"
-                                {% if user.mfa_force_enabled %} disabled {% endif %}
-                                {% if user.mfa_enabled %} checked {% endif %}
-                        >
-                        <label class="onoffswitch-label" for="mfa-switch">
-                            <span class="onoffswitch-inner"></span>
-                            <span class="onoffswitch-switch"></span>
-                        </label>
-                    </div>
+                <div class="onoffswitch" style="float: right">
+                    <input type="checkbox" class="onoffswitch-checkbox"
+                           id="mfa-switch" onchange="switchMFA()"
+                            {% if user.mfa_force_enabled %} disabled {% endif %}
+                            {% if user.mfa_enabled %} checked {% endif %}
+                    >
+                    <label class="onoffswitch-label" for="mfa-switch">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
                 </div>
             </div>
         </div>
-        <div id="mfa-setting" style="display: none; padding-top: 30px">
-            <h3>{% trans 'MFA setting' %}</h3>
-            <div style="height: 100%; width: 100%;">
-                {% for b in mfa_backends %}
-                    <div class="row" style="padding-top: 10px">
-                        <li class="col-sm-6" style="font-size: 14px">
-                            {{ b.display_name }}
-                        </li>
-                        <span class="col-sm-6">
+    </div>
+    <div id="mfa-setting" class="container">
+        <div class="header">
+            <h2>{% trans 'MFA setting' %}</h2>
+        </div>
+        <hr>
+        {% for b in mfa_backends %}
+            <div class="section">
+                <div class="title">{{ b.display_name }}</div>
+                {% if b.is_active %}
+                    <div class="description">{{ b.help_text_of_disable }}</div>
+                {% else %}
+                    <div class="description">{{ b.help_text_of_enable }}</div>
+                {% endif %}
+                <div class="action">
+                    <div class="status {% if b.is_active %}status-set{% else %}status-warning{% endif %}">
+                        <span class="status-icon">{% if b.is_active %}✔{% else %}⚠️{% endif %}</span>
+                        <span class="status-text">
+                            {% if b.is_active %}{% trans 'Enable' %}
+                            {% else %}
+                                {% trans 'Not enabled' %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="action-buttons">
+                        <span class="divider">|</span>
                         {% if b.is_active %}
-                            <button class="btn btn-warning btn-xs" style="float: right"
+                            <button class="btn btn-warning btn-xs"
                                     {% if not b.can_disable %} disabled {% endif %}
                                     onclick="goTo('{{ b.get_disable_url }}')"
                             >
                                 {% trans 'Reset' %}
                             </button>
-                            <span class="help-inline">{{ b.help_text_of_disable }}</span>
                         {% else %}
-                            <button class="btn btn-primary btn-xs" style="float: right"
+                            <button class="btn btn-primary btn-xs"
                                     onclick="goTo('{{ b.get_enable_url }}')"
                             >
                                 {% trans 'Enable' %}
                             </button>
-                            <span class="help-inline">{{ b.help_text_of_enable }}</span>
                         {% endif %}
-                    </span>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        </div>
-    </article>
+        {% endfor %}
+    </div>
     <script src="{% static 'js/jumpserver.js' %}"></script>
     <script>
-    function goTo(url) {
-        window.open(url, '_self')
-    }
-
-    function switchMFA() {
-        const switchRef = $('#mfa-switch')
-        const enabled = switchRef.is(":checked")
-        requestApi({
-            url: '/api/v1/users/profile/',
-            data: {
-                mfa_level: enabled ? 1 : 0
-            },
-            method: 'PATCH',
-            success() {
-                showSettingOrNot()
-            },
-            error() {
-                switchRef.prop('checked', !enabled)
-            }
-        })
-        showSettingOrNot()
-    }
-
-    function showSettingOrNot() {
-        const enabled = $('#mfa-switch').is(":checked")
-        const settingRef = $('#mfa-setting')
-        if (enabled) {
-            settingRef.show()
-        } else {
-            settingRef.hide()
+        function goTo(url) {
+            window.open(url, '_self')
         }
-    }
 
-    window.onload = function () {
-        showSettingOrNot()
-    }
+        function switchMFA() {
+            const switchRef = $('#mfa-switch')
+            const enabled = switchRef.is(":checked")
+            requestApi({
+                url: '/api/v1/users/profile/',
+                data: {
+                    mfa_level: enabled ? 1 : 0
+                },
+                method: 'PATCH',
+                success() {
+                    showSettingOrNot()
+                },
+                error() {
+                    switchRef.prop('checked', !enabled)
+                }
+            })
+            showSettingOrNot()
+        }
+
+        function showSettingOrNot() {
+            const enabled = $('#mfa-switch').is(":checked")
+            const settingRef = $('#mfa-setting')
+            if (enabled) {
+                settingRef.show()
+            } else {
+                settingRef.hide()
+            }
+        }
+
+        window.onload = function () {
+            showSettingOrNot()
+        }
     </script>
 {% endblock %}
