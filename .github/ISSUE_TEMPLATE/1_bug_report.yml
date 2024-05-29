@@ -1,5 +1,5 @@
 name: '🐛 Bug Report'
-description: 'Report an bug'
+description: 'Report an Bug'
 title: '[Bug] '
 labels: ['🐛 Bug']
 assignees: 
@@ -7,14 +7,14 @@ assignees:
 body:
   - type: input
     attributes:
-      label: 'Version'
-      description: Versions prior to v2.28 are no longer supported.
+      label: 'Product Version'
+      description: The versions prior to v2.28 (inclusive) are no longer supported.
     validations:
       required: true
 
   - type: checkboxes
     attributes:
-      label: 'Edition'
+      label: 'Product Edition'
       options:
         - label: 'Community Edition'
         - label: 'Enterprise Edition'
@@ -24,10 +24,10 @@ body:
     
   - type: checkboxes
     attributes:
-      label: 'Installation'
+      label: 'Installation Method'
       options:
-        - label: 'Online (Install using the curl command to download script quick_start.sh)'
-        - label: 'Offline package'
+        - label: 'Online Installation (One-click command installation)'
+        - label: 'Offline Package Installation'
         - label: 'All-in-One'
         - label: '1Panel'
         - label: 'Kubernetes'
@@ -35,8 +35,8 @@ body:
 
   - type: textarea
     attributes:
-      label: 'Environment'
-      description: Describe your environment information in detail here, such as, operating system, browser, and deployment architecture, etc.
+      label: 'Environment Information'
+      description: Please provide a clear and concise description outlining your environment information.
     validations:
       required: true
 
@@ -44,19 +44,29 @@ body:
     attributes:
       label: '🐛 Bug Description'
       description:
-        Please provide a detailed description of the bug.<br/>
-        Simple bug descriptions will not be considered. Please ensure to provide enough details and information to support the reproduction and fixing of the bug.
+        Please provide a clear and concise description of the defect. If the issue is complex, please provide detailed explanations. <br/>
+        Unclear descriptions will not be processed. Please ensure you provide enough detail and information to support replicating and fixing the defect.
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: 'Recurrence Steps'
-      description: Please provide detailed reproduction steps.
+      description: Please provide a clear and concise description outlining how to reproduce the issue.
     validations:
       required: true
 
   - type: textarea
     attributes:
+      label: 'Expected Behavior'
+      description: Please provide a clear and concise description of what you expect to happen.
+
+  - type: textarea
+    attributes:
+      label: 'Additional Information'
+      description: Please add any additional background information about the issue here.
+
+  - type: textarea
+    attributes:
       label: 'Attempted Solutions'
-      description: If you have already tried to solve the problem, list the solutions you have tried here.
+      description: If you have already attempted to solve the issue, please list the solutions you have tried here.
