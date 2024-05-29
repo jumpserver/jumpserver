@@ -14,7 +14,7 @@ body:
 
   - type: checkboxes
     attributes:
-      label: 'Product Edition'
+      label: 'Edition'
       options:
         - label: 'Community Edition'
         - label: 'Enterprise Edition'
@@ -51,12 +51,12 @@ body:
 
   - type: textarea
     attributes:
-      label: 'Attempted Solutions'
-      description: If you have already tried to solve the problem, list the solutions you have tried here  
-
-  - type: textarea
-    attributes:
       label: 'Recurrence Steps'
       description: A clear and concise description of how to recurrence.
     validations:
       required: true
+
+  - type: textarea
+    attributes:
+      label: 'Attempted Solutions'
+      description: If you have already tried to solve the problem, list the solutions you have tried here
