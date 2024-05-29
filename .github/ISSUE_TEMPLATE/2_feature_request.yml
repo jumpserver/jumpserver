@@ -49,5 +49,5 @@ body:
 
   - type: textarea
     attributes:
-      label: '📝 Additional Information'
+      label: 'Additional Information'
       description: Add any other context about the problem here.
