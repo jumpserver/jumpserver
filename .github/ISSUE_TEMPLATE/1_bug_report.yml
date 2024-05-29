@@ -1,37 +1,62 @@
----
-name: "🐛 Bug Report"
-about: "Submitting product defects helps us improve"
-title: "[Question] Briefly describe the issue"
-labels: "🐛 Bug"
+name: '🐛 Bug Report'
+description: 'Report an bug'
+title: '[Bug] '
+labels: ['🐛 Bug']
 assignees: 
   - baijiangjie
----
+body:
+  - type: input
+    attributes:
+      label: 'Version'
+      description: Versions prior to v2.28 are no longer supported
+    validations:
+      required: true
 
-## Note
-_Simple bug descriptions will not be considered. Please ensure to provide enough details and information to support the reproduction and fixing of the bug._
+  - type: checkboxes
+    attributes:
+      label: 'Product Edition'
+      options:
+        - label: 'Community Edition'
+        - label: 'Enterprise Edition'
+        - label: 'Enterprise Trial Edition'
+    validations:
+      required: true
+    
+  - type: checkboxes
+    attributes:
+      label: 'Installation'
+      options:
+        - label: 'Online (quick_start.sh)'
+        - label: 'Offline (Download offline package)'
+        - label: 'All-in-One'
+        - label: '1Panel'
+        - label: 'Kubernetes'
+        - label: 'Source Code'
 
-## Product Version (Required)
-**JumpServer Version (Versions prior to v2.28 are no longer supported)** <br>
-[Enter the version number of JumpServer you are currently using here]
+  - type: textarea
+    attributes:
+      label: 'Environment'
+      description: Describe your environment information in detail here, such as, operating system, browser, and deployment architecture, etc.
+    validations:
+      required: true
 
-## Product Edition (Required)
-- [ ] Community Edition
-- [ ] Enterprise Edition
-- [ ] Enterprise Trial Edition
+  - type: textarea
+    attributes:
+      label: '🐛 Bug Description'
+      description:
+        Please provide a detailed description of the bug.
+        Simple bug descriptions will not be considered. Please ensure to provide enough details and information to support the reproduction and fixing of the bug
+    validations:
+      required: true
 
-## Installation (Required)
-- [ ] Online Installation (One-click command)
-- [ ] Offline Installation (Download offline package)
-- [ ] All-in-One
-- [ ] 1Panel Installation
-- [ ] Kubernetes Installation
-- [ ] Source Code Installation
+  - type: textarea
+    attributes:
+      label: 'Attempted Solutions'
+      description: If you have already tried to solve the problem, list the solutions you have tried here  
 
-## Environment (Required)
-[Describe your environment information in detail here, such as: operating system, browser, and deployment architecture, etc.]
-
-## Problem Description (Required)
-[Describe the problem you encountered in detail here]
-
-## Attempted Solutions (Optional)
-[If you have already tried to solve the problem, list the solutions you have tried here]
+  - type: textarea
+    attributes:
+      label: 'Recurrence Steps'
+      description: A clear and concise description of how to recurrence.
+    validations:
+      required: true
