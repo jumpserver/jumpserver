@@ -1,0 +1,53 @@
+name: '⭐️ Feature Request'
+description: 'Suggest an idea'
+title: '[Feature] '
+labels: ['⭐️ Feature Request']
+assignees: 
+  - baijiangjie
+body:
+  - type: input
+    attributes:
+      label: 'Version'
+      description: Versions prior to v2.28 are no longer supported
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: 'Edition'
+      options:
+        - label: 'Community Edition'
+        - label: 'Enterprise Edition'
+        - label: 'Enterprise Trial Edition'
+    validations:
+      required: true
+    
+  - type: checkboxes
+    attributes:
+      label: 'Installation'
+      options:
+        - label: 'Online (Install using the curl command to download script quick_start.sh)'
+        - label: 'Offline package'
+        - label: 'All-in-One'
+        - label: '1Panel'
+        - label: 'Kubernetes'
+        - label: 'Source Code'
+
+  - type: textarea
+    attributes:
+      label: 'Feature Description'
+      description: Describe your environment information in detail here, such as, operating system, browser, and deployment architecture, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 'Proposed Solution'
+      description: "Describe the solution you'd like in a clear and concise manner."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: '📝 Additional Information'
+      description: Add any other context about the problem here.
