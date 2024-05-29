@@ -44,7 +44,7 @@ body:
     attributes:
       label: '🐛 Bug Description'
       description:
-        Please provide a detailed description of the bug.
+        Please provide a detailed description of the bug.<br/>
         Simple bug descriptions will not be considered. Please ensure to provide enough details and information to support the reproduction and fixing of the bug
     validations:
       required: true
