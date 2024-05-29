@@ -25,7 +25,7 @@ logger = get_logger(__file__)
 class CommonStorageModelMixin(models.Model):
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     meta = EncryptJsonDictTextField(default={})
-    is_default = models.BooleanField(default=False, verbose_name=_('Default storage'))
+    is_default = models.BooleanField(default=False, verbose_name=_("Default"))
 
     class Meta:
         abstract = True
@@ -35,17 +35,16 @@ class CommonStorageModelMixin(models.Model):
 
     def set_to_default(self):
         self.is_default = True
-        self.save(update_fields=['is_default'])
-        self.__class__.objects.select_for_update() \
-            .filter(is_default=True) \
-            .exclude(id=self.id) \
-            .update(is_default=False)
+        self.save(update_fields=["is_default"])
+        self.__class__.objects.select_for_update().filter(is_default=True).exclude(
+            id=self.id
+        ).update(is_default=False)
 
     @classmethod
     def default(cls):
         objs = cls.objects.filter(is_default=True)
         if not objs:
-            objs = cls.objects.filter(name='default', type='server')
+            objs = cls.objects.filter(name="default", type="server")
         if not objs:
             objs = cls.objects.all()
         return objs.first()
@@ -53,8 +52,10 @@ class CommonStorageModelMixin(models.Model):
 
 class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
     type = models.CharField(
-        max_length=16, choices=const.CommandStorageType.choices,
-        default=const.CommandStorageType.server.value, verbose_name=_('Type'),
+        max_length=16,
+        choices=const.CommandStorageType.choices,
+        default=const.CommandStorageType.server.value,
+        verbose_name=_("Type"),
     )
 
     @property
@@ -76,20 +77,20 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
     @property
     def config(self):
         config = copy.deepcopy(self.meta)
-        config.update({'TYPE': self.type})
+        config.update({"TYPE": self.type})
         return config
 
     @property
     def valid_config(self):
         config = self.config
-        if self.type_es and config.get('INDEX_BY_DATE'):
+        if self.type_es and config.get("INDEX_BY_DATE"):
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
             # 这里使用一个全新的 config, 防止修改当前的 config
             store = engine_mod.CommandStore(self.config)
             store._ensure_index_exists()
-            index_prefix = config.get('INDEX') or 'jumpserver'
+            index_prefix = config.get("INDEX") or "jumpserver"
             date = local_now_date_display()
-            config['INDEX'] = '%s-%s' % (index_prefix, date)
+            config["INDEX"] = "%s-%s" % (index_prefix, date)
         return config
 
     def is_valid(self):
@@ -97,7 +98,7 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
             return True
 
         if self.type not in TYPE_ENGINE_MAPPING:
-            logger.error(f'Command storage `{self.type}` not support')
+            logger.error(f"Command storage `{self.type}` not support")
             return False
 
         engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
@@ -105,7 +106,9 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
         return store.ping(timeout=3)
 
     def is_use(self):
-        return Terminal.objects.filter(command_storage=self.name, is_deleted=False).exists()
+        return Terminal.objects.filter(
+            command_storage=self.name, is_deleted=False
+        ).exists()
 
     def get_command_queryset(self):
         if self.type_null:
@@ -121,14 +124,17 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
             qs.model = Command
             return qs
 
-        logger.error(f'Command storage `{self.type}` not support')
+        logger.error(f"Command storage `{self.type}` not support")
         return Command.objects.none()
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         super().save(
-            force_insert=force_insert, force_update=force_update,
-            using=using, update_fields=update_fields
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
         )
 
         if self.type in TYPE_ENGINE_MAPPING:
@@ -142,8 +148,10 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
 
 class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
     type = models.CharField(
-        max_length=16, choices=const.ReplayStorageType.choices,
-        default=const.ReplayStorageType.server.value, verbose_name=_('Type')
+        max_length=16,
+        choices=const.ReplayStorageType.choices,
+        default=const.ReplayStorageType.server.value,
+        verbose_name=_("Type"),
     )
 
     @property
@@ -179,11 +187,11 @@ class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
             _type = const.ReplayStorageType.s3.value
         else:
             _type = self.type
-        _config.update({'TYPE': _type})
+        _config.update({"TYPE": _type})
 
         # add special config
         if self.type_swift:
-            _config.update({'signer': 'S3SignerType'})
+            _config.update({"signer": "S3SignerType"})
 
         # add meta config
         _config.update(self.meta)
@@ -193,12 +201,14 @@ class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
         if self.type_null_or_server:
             return True
         storage = jms_storage.get_object_storage(self.config)
-        target = 'tests.py'
-        src = os.path.join(settings.BASE_DIR, 'common', target)
+        target = "tests.py"
+        src = os.path.join(settings.BASE_DIR, "common", target)
         return storage.is_valid(src, target)
 
     def is_use(self):
-        return Terminal.objects.filter(replay_storage=self.name, is_deleted=False).exists()
+        return Terminal.objects.filter(
+            replay_storage=self.name, is_deleted=False
+        ).exists()
 
     class Meta:
         verbose_name = _("Replay storage")

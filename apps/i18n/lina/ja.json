@@ -763,7 +763,7 @@
     "OldPublicKey": "旧 SSH 公開鍵",
     "OneAssignee": "一次審査員",
     "OneAssigneeType": "一次受理者タイプ",
-    "OneClickReadMsg": "現在の情報をすべて既読にしますか?",
+    "OneClickReadMsg": "すべてを既読にしますか？",
     "OnlineSession": "オンラインユーザー",
     "OnlineSessionHelpMsg": "現在のセッションをオフラインにすることはできません。そのため、現在のユーザーがオンラインセッションです。現在、Webでログインするユーザーだけが記録されます。",
     "OnlineSessions": "オンラインセッション数",

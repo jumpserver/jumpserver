@@ -543,7 +543,7 @@ class Config(dict):
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
-        'LANGUAGE_CODE': 'zh',
+        'LANGUAGE_CODE': 'en',
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
@@ -624,6 +624,7 @@ class Config(dict):
         'LOKI_LOG_ENABLED': False,
         'LOKI_BASE_URL': 'http://loki:3100',
 
+        'TOOL_USER_ENABLED': False,
     }
 
     old_config_map = {

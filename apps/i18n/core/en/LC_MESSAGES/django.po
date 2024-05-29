@@ -40,11 +40,12 @@ msgstr ""
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:329
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:50
-#: settings/serializers/msg.py:37 terminal/serializers/storage.py:123
-#: terminal/serializers/storage.py:142 users/forms/profile.py:21
-#: users/serializers/user.py:112
+#: settings/serializers/msg.py:37 settings/serializers/terminal.py:28
+#: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
+#: users/forms/profile.py:21 users/serializers/user.py:142
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:28
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
 msgid "Password"
 msgstr ""
@@ -89,7 +90,7 @@ msgstr ""
 msgid "Specified account"
 msgstr ""
 
-#: accounts/const/account.py:26 users/models/user.py:753
+#: accounts/const/account.py:26 users/models/user.py:789
 msgid "Local"
 msgstr ""
 
@@ -114,7 +115,8 @@ msgstr ""
 #: accounts/const/account.py:34 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:164 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:47
+#: ops/const.py:76 terminal/const.py:79 xpack.bak/plugins/cloud/const.py:47
+#: xpack/plugins/cloud/const.py:47
 msgid "Failed"
 msgstr ""
 
@@ -216,7 +218,7 @@ msgstr ""
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:22
 #: settings/serializers/msg.py:59 users/forms/profile.py:100
-#: users/forms/profile.py:108 users/models/user.py:878
+#: users/forms/profile.py:108 users/models/user.py:900
 #: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
@@ -284,7 +286,8 @@ msgstr ""
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:28
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
-#: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:252
+#: tickets/models/ticket/apply_asset.py:16
+#: xpack.bak/plugins/cloud/models.py:252 xpack/plugins/cloud/models.py:252
 msgid "Asset"
 msgstr ""
 
@@ -303,7 +306,7 @@ msgid "Version"
 msgstr ""
 
 #: accounts/models/account.py:57 accounts/serializers/account/account.py:217
-#: users/models/user.py:930
+#: users/models/user.py:961
 msgid "Source"
 msgstr ""
 
@@ -322,7 +325,8 @@ msgstr ""
 #: terminal/models/session/session.py:34 terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
-#: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:85
+#: tickets/models/ticket/command_confirm.py:13
+#: xpack.bak/plugins/cloud/models.py:85 xpack/plugins/cloud/models.py:85
 msgid "Account"
 msgstr ""
 
@@ -416,7 +420,8 @@ msgid "Trigger mode"
 msgstr ""
 
 #: accounts/models/automations/backup_account.py:134 audits/models.py:203
-#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:204
+#: terminal/models/session/sharing.py:125 xpack.bak/plugins/cloud/models.py:204
+#: xpack/plugins/cloud/manager.py:165 xpack/plugins/cloud/models.py:204
 msgid "Reason"
 msgstr ""
 
@@ -511,8 +516,9 @@ msgstr ""
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:281
 #: tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:200
-#: xpack/plugins/cloud/models.py:256
+#: tickets/serializers/ticket/ticket.py:20
+#: xpack.bak/plugins/cloud/models.py:200 xpack.bak/plugins/cloud/models.py:256
+#: xpack/plugins/cloud/models.py:200 xpack/plugins/cloud/models.py:256
 msgid "Status"
 msgstr ""
 
@@ -547,8 +553,9 @@ msgstr ""
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: terminal/serializers/storage.py:136 users/forms/profile.py:31
-#: users/forms/profile.py:114 users/models/user.py:874
+#: users/forms/profile.py:114 users/models/user.py:898
 #: users/templates/users/_msg_user_created.html:12
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:26
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
 msgstr ""
@@ -643,9 +650,11 @@ msgstr ""
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:32 users/models/group.py:13
-#: users/models/preference.py:11 users/models/user.py:876
+#: users/models/preference.py:11 users/models/user.py:899
+#: xpack.bak/plugins/cloud/models.py:32 xpack.bak/plugins/cloud/models.py:272
+#: xpack.bak/plugins/cloud/serializers/task.py:70
 #: xpack/plugins/cloud/models.py:32 xpack/plugins/cloud/models.py:272
-#: xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/serializers/task.py:71
 msgid "Name"
 msgstr ""
 
@@ -653,13 +662,11 @@ msgstr ""
 msgid "Privileged"
 msgstr ""
 
-#: accounts/models/base.py:70 assets/models/asset/common.py:165
-#: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
-#: assets/models/label.py:22
+#: accounts/models/base.py:70 assets/models/automations/base.py:21
+#: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:40
-#: terminal/models/component/endpoint.py:120
-#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:188
+#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:266
 msgid "Is active"
 msgstr "Active"
 
@@ -675,7 +682,8 @@ msgstr ""
 msgid "Push params"
 msgstr ""
 
-#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:329
+#: accounts/models/template.py:26 xpack.bak/plugins/cloud/models.py:329
+#: xpack/plugins/cloud/models.py:329
 msgid "Account template"
 msgstr ""
 
@@ -786,10 +794,10 @@ msgstr ""
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
-#: terminal/models/component/storage.py:57
-#: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:264
-#: terminal/serializers/storage.py:276 tickets/models/comment.py:26
+#: terminal/models/component/storage.py:58
+#: terminal/models/component/storage.py:154 terminal/serializers/applet.py:29
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:271
+#: terminal/serializers/storage.py:284 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:273 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
@@ -823,6 +831,7 @@ msgstr ""
 #: ops/models/job.py:152 ops/serializers/job.py:19
 #: perms/serializers/permission.py:36
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
+#: xpack/plugins/cloud/manager.py:73
 msgid "Assets"
 msgstr ""
 
@@ -836,6 +845,7 @@ msgid "Asset does not support this secret type: %s"
 msgstr ""
 
 #: accounts/serializers/account/account.py:410
+#: xpack/plugins/cloud/serializers/account.py:111
 msgid "Account has exist"
 msgstr ""
 
@@ -848,7 +858,7 @@ msgstr ""
 
 #: accounts/serializers/account/account.py:453 acls/serializers/base.py:116
 #: acls/templates/acls/asset_login_reminder.html:5
-#: acls/templates/acls/user_login_reminder.html:5
+#: acls/templates/acls/user_login_reminder.html:7
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:269
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -862,8 +872,8 @@ msgstr ""
 #: terminal/notifications.py:205 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1064
-#: users/models/user.py:1102
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1109
+#: users/models/user.py:1153
 msgid "User"
 msgstr ""
 
@@ -891,19 +901,19 @@ msgstr ""
 msgid "Asset type"
 msgstr ""
 
-#: accounts/serializers/account/base.py:25 terminal/serializers/storage.py:149
+#: accounts/serializers/account/base.py:33 terminal/serializers/storage.py:149
 msgid "Passphrase"
 msgstr ""
 
-#: accounts/serializers/account/base.py:78
+#: accounts/serializers/account/base.py:93
 #: assets/serializers/asset/common.py:384
 msgid "Spec info"
 msgstr ""
 
-#: accounts/serializers/account/base.py:80
+#: accounts/serializers/account/base.py:96
 msgid ""
-"* If no username is required for authentication, enter null.  "
-"For AD accounts, use the format username@domain."
+"* If no username is required for authentication, enter null.  For AD "
+"accounts, use the format username@domain."
 msgstr ""
 
 #: accounts/serializers/account/template.py:13
@@ -955,7 +965,8 @@ msgstr ""
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:295 users/models/user.py:912
+#: tickets/models/ticket/general.py:295 users/models/user.py:933
+#: xpack.bak/plugins/cloud/models.py:39 xpack.bak/plugins/cloud/models.py:106
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:106
 msgid "Comment"
 msgstr "Description"
@@ -1084,7 +1095,6 @@ msgstr ""
 
 #: accounts/templates/accounts/change_secret_failed_info.html:5
 #: acls/templates/acls/asset_login_reminder.html:3
-#: acls/templates/acls/user_login_reminder.html:3
 msgid "Respectful"
 msgstr ""
 
@@ -1130,12 +1140,14 @@ msgid "Notify"
 msgstr ""
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:112 xpack/plugins/cloud/models.py:278
+#: terminal/models/component/endpoint.py:112
+#: xpack.bak/plugins/cloud/models.py:278 xpack/plugins/cloud/models.py:278
 msgid "Priority"
 msgstr ""
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:113 xpack/plugins/cloud/models.py:279
+#: terminal/models/component/endpoint.py:113
+#: xpack.bak/plugins/cloud/models.py:279 xpack/plugins/cloud/models.py:279
 msgid "1-100, the lower the value will be match first"
 msgstr ""
 
@@ -1144,17 +1156,19 @@ msgstr ""
 msgid "Reviewers"
 msgstr ""
 
-#: acls/models/base.py:43 authentication/models/access_key.py:25
+#: acls/models/base.py:43 assets/models/asset/common.py:165
+#: authentication/models/access_key.py:25
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:82 terminal/models/session/sharing.py:29
-#: tickets/const.py:36
+#: perms/models/asset_permission.py:82
+#: terminal/models/component/endpoint.py:120
+#: terminal/models/session/sharing.py:29 tickets/const.py:36
 msgid "Active"
 msgstr "Active"
 
 #: acls/models/base.py:81 perms/serializers/permission.py:32
 #: users/models/preference.py:16 users/serializers/group.py:21
-#: users/serializers/user.py:332
+#: users/serializers/user.py:414
 msgid "Users"
 msgstr ""
 
@@ -1175,13 +1189,14 @@ msgid "Command"
 msgstr ""
 
 #: acls/models/command_acl.py:17 assets/models/cmd_filter.py:59
-#: xpack/plugins/cloud/models.py:295
+#: xpack.bak/plugins/cloud/models.py:295 xpack/plugins/cloud/models.py:295
 msgid "Regex"
 msgstr ""
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:184 settings/serializers/feature.py:19
-#: settings/serializers/msg.py:76 xpack/plugins/license/models.py:30
+#: settings/serializers/msg.py:76 xpack.bak/plugins/license/models.py:30
+#: xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr ""
 
@@ -1247,7 +1262,7 @@ msgid "User login reminder"
 msgstr ""
 
 #: acls/notifications.py:42
-msgid "Asset login reminder"
+msgid "User login alert for asset"
 msgstr ""
 
 #: acls/serializers/base.py:11 acls/serializers/login_acl.py:11
@@ -1278,7 +1293,8 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr ""
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:145
+#: xpack.bak/plugins/cloud/serializers/task.py:145
+#: xpack/plugins/cloud/serializers/task.py:146
 msgid "IP address invalid: `{}`"
 msgstr ""
 
@@ -1307,27 +1323,44 @@ msgid ""
 msgstr ""
 
 #: acls/templates/acls/asset_login_reminder.html:12
-#: acls/templates/acls/user_login_reminder.html:13
 msgid "Thank you"
 msgstr ""
 
-#: acls/templates/acls/user_login_reminder.html:7 audits/models.py:194
+#: acls/templates/acls/user_login_reminder.html:3
+msgid "Dear"
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:5
+msgid ""
+"We would like to inform you that a user has recently logged into the "
+"following asset:"
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:6
+msgid "Asset details"
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:9 audits/models.py:194
 #: audits/models.py:263
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:11
 msgid "Login city"
 msgstr ""
 
-#: acls/templates/acls/user_login_reminder.html:8 audits/models.py:197
+#: acls/templates/acls/user_login_reminder.html:10 audits/models.py:197
 #: audits/models.py:264 audits/serializers.py:68
 msgid "User agent"
 msgstr ""
 
-#: acls/templates/acls/user_login_reminder.html:11
+#: acls/templates/acls/user_login_reminder.html:13
 msgid ""
-"The user has just successfully logged into the system. Please ensure that "
-"this is an authorized operation. If you suspect that this is an unauthorized "
-"access, please take appropriate measures immediately."
+"Please review the login activity to ensure the security and proper usage of "
+"the asset. If you did not authorize this login or if you notice any "
+"suspicious activity, please take the necessary actions immediately."
+msgstr ""
+
+#: acls/templates/acls/user_login_reminder.html:15
+msgid "Thank you for your attention to this matter"
 msgstr ""
 
 #: assets/api/asset/asset.py:180
@@ -1404,6 +1437,7 @@ msgstr ""
 
 #: assets/automations/ping_gateway/manager.py:58
 #: authentication/backends/oauth2/views.py:60 authentication/middleware.py:93
+#: xpack.bak/plugins/cloud/providers/fc.py:47
 #: xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr ""
@@ -1436,7 +1470,7 @@ msgid "Gather facts"
 msgstr ""
 
 #: assets/const/base.py:32 audits/const.py:55
-#: terminal/serializers/applet_host.py:32
+#: terminal/serializers/applet_host.py:32 users/models/user.py:686
 msgid "Disabled"
 msgstr ""
 
@@ -1456,6 +1490,8 @@ msgstr ""
 #: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:49 settings/serializers/msg.py:31
 #: terminal/models/component/endpoint.py:13 terminal/serializers/applet.py:17
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:72
+#: xpack/plugins/cloud/manager.py:73
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr ""
@@ -1663,6 +1699,7 @@ msgstr ""
 #: assets/models/asset/common.py:94 assets/models/platform.py:16
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:77
 #: settings/serializers/msg.py:32 terminal/serializers/storage.py:133
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:73
 #: xpack/plugins/cloud/serializers/account_attrs.py:73
 msgid "Port"
 msgstr ""
@@ -1675,7 +1712,8 @@ msgstr ""
 #: assets/models/asset/common.py:161 assets/models/platform.py:134
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
-#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:325
+#: perms/serializers/user_permission.py:25
+#: xpack.bak/plugins/cloud/models.py:325 xpack/plugins/cloud/models.py:325
 msgid "Platform"
 msgstr ""
 
@@ -1734,7 +1772,8 @@ msgstr ""
 
 #: assets/models/automations/base.py:18 assets/models/cmd_filter.py:32
 #: assets/models/node.py:553 perms/models/asset_permission.py:72
-#: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:326
+#: tickets/models/ticket/apply_asset.py:14
+#: xpack.bak/plugins/cloud/models.py:326 xpack/plugins/cloud/models.py:326
 msgid "Node"
 msgstr ""
 
@@ -1753,7 +1792,7 @@ msgstr ""
 
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
 #: audits/models.py:267 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:240 users/models/user.py:1103
+#: ops/models/job.py:240 users/models/user.py:1156
 msgid "Date created"
 msgstr ""
 
@@ -1774,17 +1813,17 @@ msgid "Date verified"
 msgstr ""
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
-#: users/models/group.py:25 users/models/user.py:882
+#: users/models/group.py:25 users/models/user.py:905
 msgid "User group"
 msgstr ""
 
 #: assets/models/cmd_filter.py:42 common/db/models.py:35
-#: users/models/user.py:938
+#: users/models/user.py:981
 msgid "Date updated"
 msgstr ""
 
 #: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:91
-#: common/db/models.py:32 users/models/user.py:919
+#: common/db/models.py:32 users/models/user.py:943
 #: users/serializers/group.py:32
 msgid "Created by"
 msgstr ""
@@ -1821,7 +1860,7 @@ msgstr ""
 msgid "Gateway"
 msgstr ""
 
-#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1088
+#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1135
 msgid "System"
 msgstr ""
 
@@ -1839,8 +1878,8 @@ msgstr ""
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
 #: assets/serializers/platform.py:144
 #: authentication/serializers/connect_token_secret.py:124
-#: common/serializers/common.py:85 labels/models.py:17 labels/models.py:33
-#: labels/serializers.py:45 settings/serializers/msg.py:88
+#: common/serializers/common.py:85 labels/serializers.py:45
+#: settings/serializers/msg.py:88
 msgid "Label"
 msgstr ""
 
@@ -1877,6 +1916,8 @@ msgid "Required"
 msgstr ""
 
 #: assets/models/platform.py:19 assets/serializers/platform.py:146
+#: terminal/models/component/storage.py:28
+#: xpack.bak/plugins/cloud/providers/nutanix.py:30
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr ""
@@ -1893,7 +1934,7 @@ msgstr ""
 
 #: assets/models/platform.py:38 audits/const.py:56
 #: authentication/backends/passkey/models.py:11 settings/models.py:38
-#: terminal/serializers/applet_host.py:33
+#: terminal/serializers/applet_host.py:33 users/models/user.py:687
 msgid "Enabled"
 msgstr ""
 
@@ -2018,8 +2059,10 @@ msgstr ""
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:46
-#: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:328
-#: xpack/plugins/cloud/serializers/task.py:33
+#: perms/serializers/user_permission.py:74
+#: xpack.bak/plugins/cloud/models.py:328
+#: xpack.bak/plugins/cloud/serializers/task.py:33
+#: xpack/plugins/cloud/models.py:328 xpack/plugins/cloud/serializers/task.py:34
 msgid "Protocols"
 msgstr ""
 
@@ -2353,6 +2396,7 @@ msgstr ""
 #: audits/const.py:23 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
+#: xpack/plugins/cloud/manager.py:74
 msgid "View"
 msgstr ""
 
@@ -2411,6 +2455,7 @@ msgstr ""
 
 #: audits/const.py:51 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
+#: xpack/plugins/cloud/serializers/account.py:55
 msgid "Task"
 msgstr ""
 
@@ -2509,7 +2554,7 @@ msgstr ""
 
 #: audits/models.py:200 audits/serializers.py:52
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:63 users/models/user.py:899
+#: users/forms/profile.py:63 users/models/user.py:921
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr ""
@@ -2563,7 +2608,7 @@ msgstr ""
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:917
+#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:940
 msgid "Date expired"
 msgstr ""
 
@@ -2597,28 +2642,29 @@ msgstr ""
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:77 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:10 settings/serializers/auth/wecom.py:15
-#: users/models/user.py:760 users/models/user.py:932
+#: users/models/user.py:796 users/models/user.py:964
 msgid "WeCom"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:105
 #: authentication/views/login.py:89 notifications/backends/__init__.py:14
-#: settings/serializers/auth/feishu.py:10 users/models/user.py:762
-#: users/models/user.py:934
+#: settings/serializers/auth/feishu.py:10
+#: settings/serializers/auth/feishu.py:12 users/models/user.py:798
+#: users/models/user.py:970
 msgid "FeiShu"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:40 authentication/views/login.py:101
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:10 settings/serializers/auth/slack.py:12
-#: users/models/user.py:764 users/models/user.py:936
+#: users/models/user.py:800 users/models/user.py:976
 msgid "Slack"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:161
 #: authentication/views/login.py:83 notifications/backends/__init__.py:12
-#: settings/serializers/auth/dingtalk.py:10 users/models/user.py:761
-#: users/models/user.py:933
+#: settings/serializers/auth/dingtalk.py:10 users/models/user.py:797
+#: users/models/user.py:967
 msgid "DingTalk"
 msgstr ""
 
@@ -3175,7 +3221,8 @@ msgid "Component"
 msgstr ""
 
 #: authentication/serializers/connect_token_secret.py:136
-#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:327
+#: perms/serializers/user_permission.py:28
+#: xpack.bak/plugins/cloud/models.py:327 xpack/plugins/cloud/models.py:327
 msgid "Domain"
 msgstr ""
 
@@ -3216,7 +3263,7 @@ msgstr ""
 
 #: authentication/serializers/connection_token.py:42
 #: perms/serializers/permission.py:44 perms/serializers/permission.py:65
-#: users/serializers/user.py:103 users/serializers/user.py:192
+#: users/serializers/user.py:125 users/serializers/user.py:270
 msgid "Is expired"
 msgstr "Expired"
 
@@ -3230,8 +3277,8 @@ msgid "Access IP"
 msgstr ""
 
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:43
-#: perms/serializers/permission.py:66 users/serializers/user.py:104
-#: users/serializers/user.py:189
+#: perms/serializers/permission.py:66 users/serializers/user.py:126
+#: users/serializers/user.py:267
 msgid "Is valid"
 msgstr "Is Valid"
 
@@ -3256,14 +3303,12 @@ msgid "Show"
 msgstr ""
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/const.py:42 users/models/user.py:654
-#: users/templates/users/user_verify_mfa.html:36
+#: users/const.py:42 users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr ""
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/const.py:43 users/models/user.py:655
-#: users/templates/users/mfa_setting.html:26
+#: users/const.py:43 users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
 msgstr ""
@@ -3458,7 +3503,7 @@ msgid "Do you want to retry ?"
 msgstr ""
 
 #: authentication/utils.py:24 common/utils/ip/geoip/utils.py:24
-#: xpack/plugins/cloud/const.py:33
+#: xpack.bak/plugins/cloud/const.py:33 xpack/plugins/cloud/const.py:33
 msgid "LAN"
 msgstr ""
 
@@ -3638,7 +3683,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: common/const/common.py:5
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:380
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -3697,6 +3742,9 @@ msgstr ""
 
 #: common/db/fields.py:594 common/db/fields.py:599
 #: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:56
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:79
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:150
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -3719,7 +3767,7 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: common/db/models.py:33 users/models/user.py:920
+#: common/db/models.py:33 users/models/user.py:946
 msgid "Updated by"
 msgstr ""
 
@@ -3831,7 +3879,8 @@ msgstr ""
 msgid "Tencent cloud"
 msgstr ""
 
-#: common/sdk/sms/endpoint.py:18 xpack/plugins/cloud/const.py:13
+#: common/sdk/sms/endpoint.py:18 xpack.bak/plugins/cloud/const.py:13
+#: xpack/plugins/cloud/const.py:13
 msgid "Huawei Cloud"
 msgstr ""
 
@@ -3885,8 +3934,9 @@ msgstr ""
 msgid "Invalid choice: {}"
 msgstr ""
 
-#: common/serializers/mixin.py:409
-msgid "Labels"
+#: common/serializers/mixin.py:441 terminal/models/applet/applet.py:44
+#: terminal/models/virtualapp/virtualapp.py:29
+msgid "Tags"
 msgstr ""
 
 #: common/tasks.py:31 common/utils/verify_code.py:16
@@ -3941,7 +3991,7 @@ msgstr ""
 
 #: jumpserver/context_processor.py:14
 msgid "JumpServer Open Source Bastion Host"
-msgstr ""
+msgstr "JumpServer"
 
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
@@ -3969,12 +4019,16 @@ msgstr ""
 msgid "App Labels"
 msgstr "Labels"
 
-#: labels/models.py:36
+#: labels/models.py:17 labels/models.py:36
+msgid "Tag"
+msgstr ""
+
+#: labels/models.py:40
 msgid "Resource ID"
 msgstr ""
 
-#: labels/models.py:41
-msgid "Labeled resource"
+#: labels/models.py:46
+msgid "Tagged resource"
 msgstr ""
 
 #: labels/serializers.py:22
@@ -4261,11 +4315,12 @@ msgid "Date last run"
 msgstr ""
 
 #: ops/models/base.py:51 ops/models/job.py:237
-#: xpack/plugins/cloud/models.py:198
+#: xpack.bak/plugins/cloud/models.py:198 xpack/plugins/cloud/models.py:198
 msgid "Result"
 msgstr ""
 
 #: ops/models/base.py:52 ops/models/job.py:238
+#: xpack/plugins/cloud/manager.py:77
 msgid "Summary"
 msgstr ""
 
@@ -4351,12 +4406,12 @@ msgid "Server performance"
 msgstr ""
 
 #: ops/notifications.py:25
-msgid "Terminal health check warning"
+msgid "Component health check warning"
 msgstr ""
 
 #: ops/notifications.py:70
 #, python-brace-format
-msgid "The terminal is offline: {name}"
+msgid "The component is offline: {name}"
 msgstr ""
 
 #: ops/notifications.py:75
@@ -4646,7 +4701,7 @@ msgid "day"
 msgstr ""
 
 #: perms/notifications.py:15
-msgid "You permed assets is about to expire"
+msgid "The asset you authorized is about to expire"
 msgstr ""
 
 #: perms/notifications.py:20
@@ -4661,7 +4716,7 @@ msgstr ""
 msgid "asset permissions of organization {}"
 msgstr ""
 
-#: perms/serializers/permission.py:34 users/serializers/user.py:181
+#: perms/serializers/permission.py:34 users/serializers/user.py:254
 msgid "Groups"
 msgstr ""
 
@@ -4768,7 +4823,7 @@ msgid "Scope"
 msgstr ""
 
 #: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user.py:886
+#: users/models/user.py:908
 msgid "Role"
 msgstr ""
 
@@ -4839,7 +4894,7 @@ msgstr ""
 msgid "Session audits"
 msgstr "Session"
 
-#: rbac/tree.py:49
+#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:74
 msgid "Cloud import"
 msgstr ""
 
@@ -5121,13 +5176,13 @@ msgstr ""
 msgid "Proxy Server"
 msgstr ""
 
-#: settings/serializers/auth/cas.py:19 settings/serializers/auth/oauth2.py:54
-#: settings/serializers/auth/saml2.py:33
+#: settings/serializers/auth/cas.py:19 settings/serializers/auth/oauth2.py:55
+#: settings/serializers/auth/saml2.py:40
 msgid "Logout completely"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:20
-msgid "When the user signs out, they also be logged out from the CAS Server"
+msgid "When the user signs out, they also be logged out from the CAS server"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:26
@@ -5139,8 +5194,8 @@ msgid "Enable attributes map"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:32 settings/serializers/auth/ldap.py:64
-#: settings/serializers/auth/oauth2.py:56 settings/serializers/auth/oidc.py:38
-#: settings/serializers/auth/saml2.py:32
+#: settings/serializers/auth/oauth2.py:59 settings/serializers/auth/oidc.py:38
+#: settings/serializers/auth/saml2.py:33
 msgid "User attribute"
 msgstr ""
 
@@ -5164,12 +5219,8 @@ msgstr ""
 msgid "Dingtalk"
 msgstr ""
 
-#: settings/serializers/auth/feishu.py:12
-msgid "Enable FeiShu Auth"
-msgstr ""
-
-#: settings/serializers/auth/lark.py:12
-msgid "Enable Lark Auth"
+#: settings/serializers/auth/lark.py:12 users/models/user.py:799
+msgid "Lark"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:39 settings/serializers/auth/ldap.py:103
@@ -5250,11 +5301,14 @@ msgstr ""
 msgid "Service provider"
 msgstr ""
 
-#: settings/serializers/auth/oauth2.py:30 settings/serializers/auth/oidc.py:20
-msgid "Client Id"
+#: settings/serializers/auth/oauth2.py:30
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:35
+#: xpack/plugins/cloud/serializers/account_attrs.py:35
+msgid "Client ID"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:33 settings/serializers/auth/oidc.py:23
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:38
 #: xpack/plugins/cloud/serializers/account_attrs.py:38
 msgid "Client Secret"
 msgstr ""
@@ -5280,8 +5334,18 @@ msgstr ""
 msgid "End session endpoint"
 msgstr ""
 
-#: settings/serializers/auth/oauth2.py:59 settings/serializers/auth/oidc.py:112
-#: settings/serializers/auth/saml2.py:34
+#: settings/serializers/auth/oauth2.py:56
+msgid "When the user signs out, they also be logged out from the OAuth2 server"
+msgstr ""
+
+#: settings/serializers/auth/oauth2.py:61
+msgid ""
+"User attribute mapping, where the `key` is the JumpServer user attribute "
+"name and the `value` is the OAuth2 service user attribute name"
+msgstr ""
+
+#: settings/serializers/auth/oauth2.py:66 settings/serializers/auth/oidc.py:112
+#: settings/serializers/auth/saml2.py:43
 msgid "Always update user"
 msgstr ""
 
@@ -5295,6 +5359,10 @@ msgstr ""
 
 #: settings/serializers/auth/oidc.py:17
 msgid "The current site's URL is used to construct the callback address"
+msgstr ""
+
+#: settings/serializers/auth/oidc.py:20
+msgid "Client Id"
 msgstr ""
 
 #: settings/serializers/auth/oidc.py:33
@@ -5396,8 +5464,12 @@ msgstr ""
 msgid "Radius"
 msgstr ""
 
-#: settings/serializers/auth/radius.py:21
-msgid "OTP in Radius"
+#: settings/serializers/auth/radius.py:22
+msgid "OTP in RADIUS"
+msgstr ""
+
+#: settings/serializers/auth/radius.py:23
+msgid "* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
 msgstr ""
 
 #: settings/serializers/auth/saml2.py:10 settings/serializers/auth/saml2.py:13
@@ -5424,11 +5496,22 @@ msgstr ""
 msgid "SP cert"
 msgstr ""
 
+#: settings/serializers/auth/saml2.py:35
+msgid ""
+"User attribute mapping, where the `key` is the SAML2 service user attribute "
+"name and the `value` is the JumpServer user attribute name"
+msgstr ""
+
+#: settings/serializers/auth/saml2.py:41
+msgid "When the user signs out, they also be logged out from the SAML2 server"
+msgstr ""
+
 #: settings/serializers/auth/sms.py:18
 msgid "Enable Short Message Service (SMS)"
 msgstr ""
 
-#: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:34
+#: settings/serializers/auth/sms.py:21 xpack.bak/plugins/cloud/models.py:34
+#: xpack/plugins/cloud/models.py:34
 msgid "Provider"
 msgstr ""
 
@@ -5455,8 +5538,8 @@ msgstr ""
 msgid "Template code"
 msgstr ""
 
-#: settings/serializers/auth/sms.py:40 users/models/user.py:896
-#: users/serializers/user.py:114
+#: settings/serializers/auth/sms.py:40 users/models/user.py:918
+#: users/serializers/user.py:153
 msgid "Phone"
 msgstr ""
 
@@ -5518,6 +5601,7 @@ msgid "SSO auth key TTL"
 msgstr ""
 
 #: settings/serializers/auth/sso.py:20
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:200
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Unit: second"
 msgstr ""
@@ -5731,11 +5815,7 @@ msgstr ""
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
 #: terminal/serializers/virtualapp.py:32
-msgid "Virtual App"
-msgstr ""
-
-#: settings/serializers/feature.py:148
-msgid "vApp"
+msgid "Virtual app"
 msgstr ""
 
 #: settings/serializers/feature.py:150
@@ -6089,35 +6169,61 @@ msgid "Auto"
 msgstr ""
 
 #: settings/serializers/terminal.py:22
-msgid "Terminal registration"
+msgid "Registration"
 msgstr ""
 
 #: settings/serializers/terminal.py:24
 msgid ""
-"Allow terminal register, after all terminal setup, you should disable this "
+"Allow component register, after all component setup, you should disable this "
 "for security"
 msgstr ""
 
-#: settings/serializers/terminal.py:27
-msgid "Password auth"
-msgstr ""
-
-#: settings/serializers/terminal.py:29
-msgid "Public key auth"
-msgstr "Public key auth"
-
 #: settings/serializers/terminal.py:30
 msgid ""
-"Information: If use other auth method, like AD/LDAP, you should disable this "
-"to avoid being able to log in after deleting"
+"* Allow users to log in to the KoKo component via password authentication"
 msgstr ""
 
-#: settings/serializers/terminal.py:34
-msgid "Asset list sorting"
+#: settings/serializers/terminal.py:34 users/forms/profile.py:172
+#: users/models/user.py:931
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:210
+#: xpack/plugins/cloud/serializers/account_attrs.py:210
+msgid "Public key"
 msgstr ""
 
-#: settings/serializers/terminal.py:37
-msgid "Asset list page size"
+#: settings/serializers/terminal.py:36
+msgid ""
+"* Allow users to log in to the KoKo component via Public key "
+"authentication<br/>If third-party authentication services, such as AD/LDAP, "
+"are enabled, you should disable this option to prevent users from logging in "
+"after being deleted from the AD/LDAP server"
+msgstr ""
+
+#: settings/serializers/terminal.py:43
+msgid "Asset sorting"
+msgstr ""
+
+#: settings/serializers/terminal.py:46
+msgid "Asset page size"
+msgstr ""
+
+#: settings/serializers/terminal.py:51
+msgid ""
+"* You can individually configure the service address and port in the service "
+"endpoint<br/>If enabled, the Luna page will display the DB client launch "
+"method when connecting to assets"
+msgstr ""
+
+#: settings/serializers/terminal.py:59
+msgid ""
+"* You can individually configure the service address and port in the service "
+"endpoint<br/>If enabled, the Luna page will display the download rdp file "
+"button and RDP Client launch method when connecting to assets"
+msgstr ""
+
+#: settings/serializers/terminal.py:68
+msgid ""
+"* Allow connecting to the KoKo component via SSH client<br/>If enabled, the "
+"Luna page will display the SSH client launch method when connecting to assets"
 msgstr ""
 
 #: settings/tasks/ldap.py:28
@@ -6129,7 +6235,7 @@ msgid "Registration periodic import ldap user task"
 msgstr ""
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
-msgid "Sync task Finish"
+msgid "Sync task finish"
 msgstr ""
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
@@ -6385,7 +6491,7 @@ msgstr ""
 
 #: templates/_without_nav_base.html:26
 msgid "Home page"
-msgstr ""
+msgstr "Home"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
 #: users/const.py:65
@@ -6623,7 +6729,8 @@ msgstr ""
 msgid "Storage is invalid"
 msgstr ""
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+#: terminal/models/applet/applet.py:30 xpack.bak/plugins/license/models.py:88
+#: xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr ""
 
@@ -6642,11 +6749,6 @@ msgstr ""
 
 #: terminal/models/applet/applet.py:43
 msgid "Can concurrent"
-msgstr ""
-
-#: terminal/models/applet/applet.py:44
-#: terminal/models/virtualapp/virtualapp.py:29
-msgid "Tags"
 msgstr ""
 
 #: terminal/models/applet/applet.py:48 terminal/serializers/applet_host.py:167
@@ -6784,16 +6886,12 @@ msgstr ""
 msgid "Boot Time"
 msgstr ""
 
-#: terminal/models/component/storage.py:28
-msgid "Default storage"
-msgstr ""
-
-#: terminal/models/component/storage.py:140
+#: terminal/models/component/storage.py:146
 #: terminal/models/component/terminal.py:91
 msgid "Command storage"
 msgstr ""
 
-#: terminal/models/component/storage.py:204
+#: terminal/models/component/storage.py:214
 #: terminal/models/component/terminal.py:92
 msgid "Replay storage"
 msgstr ""
@@ -6942,7 +7040,7 @@ msgid "App Provider"
 msgstr ""
 
 #: terminal/models/virtualapp/virtualapp.py:102
-msgid "Virtual App publication"
+msgid "Virtual app publication"
 msgstr ""
 
 #: terminal/notifications.py:25
@@ -7190,11 +7288,13 @@ msgid "Access key ID"
 msgstr ""
 
 #: terminal/serializers/storage.py:37
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:20
 #: xpack/plugins/cloud/serializers/account_attrs.py:20
 msgid "Access key secret"
 msgstr ""
 
-#: terminal/serializers/storage.py:68 xpack/plugins/cloud/models.py:249
+#: terminal/serializers/storage.py:68 xpack.bak/plugins/cloud/models.py:249
+#: xpack/plugins/cloud/manager.py:90 xpack/plugins/cloud/models.py:249
 msgid "Region"
 msgstr ""
 
@@ -7214,7 +7314,8 @@ msgstr ""
 msgid "HOST"
 msgstr ""
 
-#: terminal/serializers/storage.py:146 users/models/user.py:906
+#: terminal/serializers/storage.py:146 users/models/user.py:928
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:213
 #: xpack/plugins/cloud/serializers/account_attrs.py:213
 msgid "Private key"
 msgstr ""
@@ -7253,6 +7354,12 @@ msgstr ""
 
 #: terminal/serializers/storage.py:206
 msgid "Doc type"
+msgstr ""
+
+#: terminal/serializers/storage.py:264
+msgid ""
+"set as the default storage, will make new Component use the current storage "
+"by default, without affecting existing Component"
 msgstr ""
 
 #: terminal/serializers/task.py:9
@@ -7928,81 +8035,74 @@ msgstr ""
 msgid "Not a valid ssh public key"
 msgstr ""
 
-#: users/forms/profile.py:172 users/models/user.py:909
-#: xpack/plugins/cloud/serializers/account_attrs.py:210
-msgid "Public key"
-msgstr ""
-
 #: users/models/preference.py:38 users/serializers/preference/preference.py:19
 msgid "Preference"
 msgstr ""
 
-#: users/models/user.py:656
-msgid "Force enable"
-msgstr ""
+#: users/models/user.py:688
+#, fuzzy
+#| msgid "Su enabled"
+msgid "Force enabled"
+msgstr "Switch account enabled"
 
-#: users/models/user.py:763
-msgid "Lark"
-msgstr ""
-
-#: users/models/user.py:888 users/serializers/user.py:190
+#: users/models/user.py:911 users/serializers/user.py:268
 msgid "Is service account"
 msgstr "Is service account"
 
-#: users/models/user.py:890
+#: users/models/user.py:913
 msgid "Avatar"
 msgstr ""
 
-#: users/models/user.py:893
+#: users/models/user.py:915
 msgid "Wechat"
 msgstr ""
 
-#: users/models/user.py:902
+#: users/models/user.py:924
 msgid "OTP secret key"
 msgstr ""
 
-#: users/models/user.py:914 users/serializers/profile.py:129
-#: users/serializers/user.py:187
+#: users/models/user.py:934 users/serializers/profile.py:129
+#: users/serializers/user.py:265
 msgid "Is first login"
 msgstr "First login"
 
-#: users/models/user.py:923
+#: users/models/user.py:952
 msgid "Date password last updated"
 msgstr "Password updated"
 
-#: users/models/user.py:926
+#: users/models/user.py:955
 msgid "Need update password"
 msgstr ""
 
-#: users/models/user.py:937
+#: users/models/user.py:979
 msgid "Date api key used"
 msgstr ""
 
-#: users/models/user.py:1059
+#: users/models/user.py:1104
 msgid "Can not delete admin user"
 msgstr ""
 
-#: users/models/user.py:1073
+#: users/models/user.py:1118
 msgid "Can invite user"
 msgstr ""
 
-#: users/models/user.py:1074
+#: users/models/user.py:1119
 msgid "Can remove user"
 msgstr ""
 
-#: users/models/user.py:1075
+#: users/models/user.py:1120
 msgid "Can match user"
 msgstr ""
 
-#: users/models/user.py:1084
+#: users/models/user.py:1131
 msgid "Administrator"
 msgstr ""
 
-#: users/models/user.py:1087
+#: users/models/user.py:1134
 msgid "Administrator is the super user of system"
 msgstr ""
 
-#: users/models/user.py:1112
+#: users/models/user.py:1166
 msgid "User password history"
 msgstr ""
 
@@ -8139,92 +8239,113 @@ msgstr ""
 msgid "Forced enabled"
 msgstr ""
 
-#: users/serializers/user.py:44
+#: users/serializers/user.py:49
 msgid "System roles"
 msgstr ""
 
-#: users/serializers/user.py:45
+#: users/serializers/user.py:53
 msgid ""
 "System roles are roles at the system level, and they will take effect across "
 "all organizations"
 msgstr ""
 
-#: users/serializers/user.py:49
+#: users/serializers/user.py:59
 msgid "Org roles"
 msgstr ""
 
-#: users/serializers/user.py:52
+#: users/serializers/user.py:64
 msgid ""
 "Org roles are roles at the organization level, and they will only take "
 "effect within current organization"
 msgstr ""
 
-#: users/serializers/user.py:54
+#: users/serializers/user.py:68
 msgid "Organizations and roles"
 msgstr ""
 
-#: users/serializers/user.py:96
+#: users/serializers/user.py:118
 msgid "Password setting"
 msgstr ""
 
-#: users/serializers/user.py:98
+#: users/serializers/user.py:120
 msgid "MFA enabled"
 msgstr ""
 
-#: users/serializers/user.py:100
+#: users/serializers/user.py:122
 msgid "MFA force enabled"
 msgstr ""
 
-#: users/serializers/user.py:102
+#: users/serializers/user.py:124
 msgid "Login blocked"
 msgstr ""
 
-#: users/serializers/user.py:105 users/serializers/user.py:196
+#: users/serializers/user.py:128 users/serializers/user.py:274
 msgid "Is OTP bound"
 msgstr "OTP bound"
 
-#: users/serializers/user.py:106
+#: users/serializers/user.py:131
 msgid "Super Administrator"
 msgstr ""
 
-#: users/serializers/user.py:107
+#: users/serializers/user.py:134
 msgid "Organization Administrator"
 msgstr ""
 
-#: users/serializers/user.py:109
+#: users/serializers/user.py:138
 msgid "Can public key authentication"
 msgstr "Can public key authentication"
 
-#: users/serializers/user.py:169
-msgid "Fullname of user"
+#: users/serializers/user.py:239
+msgid "Full name"
 msgstr ""
 
-#: users/serializers/user.py:172
+#: users/serializers/user.py:242
 msgid "Login username"
 msgstr ""
 
-#: users/serializers/user.py:184
+#: users/serializers/user.py:245
+msgid "Email address"
+msgstr ""
+
+#: users/serializers/user.py:255
+msgid "User groups to join"
+msgstr ""
+
+#: users/serializers/user.py:259
+msgid ""
+"User source identifies where the user was created, which could be AD or "
+"other sources.There are security settings that can restrict users to log in "
+"to the system only from the sources."
+msgstr ""
+
+#: users/serializers/user.py:263
 msgid "Superuser"
 msgstr ""
 
-#: users/serializers/user.py:191
+#: users/serializers/user.py:269
 msgid "Is org admin"
 msgstr "Org admin"
 
-#: users/serializers/user.py:193
+#: users/serializers/user.py:271
 msgid "Avatar url"
 msgstr ""
 
-#: users/serializers/user.py:197
+#: users/serializers/user.py:276
 msgid "MFA level"
 msgstr "MFA"
 
-#: users/serializers/user.py:333
+#: users/serializers/user.py:277
+#, fuzzy
+#| msgid "App Authentication"
+msgid "Multi-Factor Authentication"
+msgstr "Authentication"
+
+#: users/serializers/user.py:416
 msgid ""
-"For security, only a partial of users is displayed. You can search for more"
+"* For security, only a partial of users is displayed. You can search for more"
 msgstr ""
 
-#: users/serializers/user.py:366
+#: users/serializers/user.py:451
 msgid "name not unique"
 msgstr ""
 
@@ -8507,537 +8628,627 @@ msgstr ""
 msgid "Reset password success, return to login page"
 msgstr ""
 
-#: xpack/apps.py:8
+#: xpack.bak/apps.py:8 xpack/apps.py:8
 msgid "XPACK"
 msgstr ""
 
-#: xpack/exceptions.py:7
+#: xpack.bak/exceptions.py:7
 msgid ""
 "The current task is not synchronized with unmatched policy assets, skipping"
 msgstr ""
 
-#: xpack/plugins/cloud/api.py:60
+#: xpack.bak/plugins/cloud/api.py:60 xpack/plugins/cloud/api.py:60
 msgid "Test connection successful"
 msgstr ""
 
-#: xpack/plugins/cloud/api.py:62
+#: xpack.bak/plugins/cloud/api.py:62 xpack/plugins/cloud/api.py:62
 msgid "Test connection failed: {}"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:8
+#: xpack.bak/plugins/cloud/const.py:8 xpack/plugins/cloud/const.py:8
 msgid "Alibaba Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:9
+#: xpack.bak/plugins/cloud/const.py:9 xpack/plugins/cloud/const.py:9
 msgid "AWS (International)"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:10
+#: xpack.bak/plugins/cloud/const.py:10 xpack/plugins/cloud/const.py:10
 msgid "AWS (China)"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:11
+#: xpack.bak/plugins/cloud/const.py:11 xpack/plugins/cloud/const.py:11
 msgid "Azure (China)"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:12
+#: xpack.bak/plugins/cloud/const.py:12 xpack/plugins/cloud/const.py:12
 msgid "Azure (International)"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:14
+#: xpack.bak/plugins/cloud/const.py:14 xpack/plugins/cloud/const.py:14
 msgid "Baidu Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:15
+#: xpack.bak/plugins/cloud/const.py:15 xpack/plugins/cloud/const.py:15
 msgid "JD Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:16
+#: xpack.bak/plugins/cloud/const.py:16 xpack/plugins/cloud/const.py:16
 msgid "KingSoft Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:17
+#: xpack.bak/plugins/cloud/const.py:17 xpack/plugins/cloud/const.py:17
 msgid "Tencent Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:18
+#: xpack.bak/plugins/cloud/const.py:18 xpack/plugins/cloud/const.py:18
 msgid "Tencent Cloud (Lighthouse)"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:19
+#: xpack.bak/plugins/cloud/const.py:19 xpack/plugins/cloud/const.py:19
 msgid "Google Cloud Platform"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:20
+#: xpack.bak/plugins/cloud/const.py:20 xpack/plugins/cloud/const.py:20
 msgid "UCloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:21
+#: xpack.bak/plugins/cloud/const.py:21 xpack/plugins/cloud/const.py:21
 msgid "Volcengine"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:23
+#: xpack.bak/plugins/cloud/const.py:23 xpack/plugins/cloud/const.py:23
 msgid "VMware"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/const.py:24
+#: xpack.bak/plugins/cloud/providers/nutanix.py:15
 #: xpack/plugins/cloud/const.py:24 xpack/plugins/cloud/providers/nutanix.py:15
 msgid "Nutanix"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:25
+#: xpack.bak/plugins/cloud/const.py:25 xpack/plugins/cloud/const.py:25
 msgid "Huawei Private Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:26
+#: xpack.bak/plugins/cloud/const.py:26 xpack/plugins/cloud/const.py:26
 msgid "Qingyun Private Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:27
+#: xpack.bak/plugins/cloud/const.py:27 xpack/plugins/cloud/const.py:27
 msgid "CTYun Private Cloud"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:28
+#: xpack.bak/plugins/cloud/const.py:28 xpack/plugins/cloud/const.py:28
 msgid "OpenStack"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/const.py:29
+#: xpack.bak/plugins/cloud/providers/zstack.py:21
 #: xpack/plugins/cloud/const.py:29 xpack/plugins/cloud/providers/zstack.py:21
 msgid "ZStack"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:30
+#: xpack.bak/plugins/cloud/const.py:30 xpack/plugins/cloud/const.py:30
 msgid "Fusion Compute"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack.bak/plugins/cloud/const.py:31 xpack/plugins/cloud/const.py:31
 msgid "SCP"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack.bak/plugins/cloud/const.py:32 xpack/plugins/cloud/const.py:32
 msgid "Apsara Stack"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack.bak/plugins/cloud/const.py:37 xpack/plugins/cloud/const.py:37
 msgid "Private IP"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:38
+#: xpack.bak/plugins/cloud/const.py:38 xpack/plugins/cloud/const.py:38
 msgid "Public IP"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/const.py:42 xpack.bak/plugins/cloud/models.py:299
 #: xpack/plugins/cloud/const.py:42 xpack/plugins/cloud/models.py:299
 msgid "Instance name"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:43
+#: xpack.bak/plugins/cloud/const.py:43 xpack/plugins/cloud/const.py:43
 msgid "Instance name and Partial IP"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:48
+#: xpack.bak/plugins/cloud/const.py:48 xpack/plugins/cloud/const.py:48
 msgid "Succeed"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:52
+#: xpack.bak/plugins/cloud/const.py:52 xpack/plugins/cloud/const.py:52
+#: xpack/plugins/cloud/manager.py:80
 msgid "Unsync"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:53
+#: xpack.bak/plugins/cloud/const.py:53 xpack/plugins/cloud/const.py:53
+#: xpack/plugins/cloud/manager.py:79
 msgid "New Sync"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:54
+#: xpack.bak/plugins/cloud/const.py:54 xpack/plugins/cloud/const.py:54
+#: xpack/plugins/cloud/manager.py:79
 msgid "Synced"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:55
+#: xpack.bak/plugins/cloud/const.py:55 xpack/plugins/cloud/const.py:55
+#: xpack/plugins/cloud/manager.py:80
 msgid "Released"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:59
+#: xpack.bak/plugins/cloud/const.py:59 xpack/plugins/cloud/const.py:59
 msgid "And"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:60
+#: xpack.bak/plugins/cloud/const.py:60 xpack/plugins/cloud/const.py:60
 msgid "Or"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:55 xpack/plugins/cloud/providers/gcp.py:64
+#: xpack.bak/plugins/cloud/manager.py:55
+#: xpack.bak/plugins/cloud/providers/gcp.py:64
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:34
+#: xpack/plugins/cloud/manager.py:45 xpack/plugins/cloud/manager.py:55
+#: xpack/plugins/cloud/manager.py:57 xpack/plugins/cloud/providers/gcp.py:64
 #: xpack/plugins/cloud/providers/huaweicloud.py:34
 msgid "Account unavailable"
 msgstr ""
 
-#: xpack/plugins/cloud/meta.py:9
+#: xpack.bak/plugins/cloud/meta.py:9 xpack/plugins/cloud/meta.py:9
 msgid "Cloud center"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/models.py:37
+#: xpack.bak/plugins/cloud/serializers/account.py:68
 #: xpack/plugins/cloud/models.py:37
-#: xpack/plugins/cloud/serializers/account.py:68
+#: xpack/plugins/cloud/serializers/account.py:69
 msgid "Attrs"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:38
+#: xpack.bak/plugins/cloud/models.py:38 xpack/plugins/cloud/models.py:38
 msgid "Validity"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:43
+#: xpack.bak/plugins/cloud/models.py:43 xpack/plugins/cloud/models.py:43
 msgid "Cloud account"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:45
+#: xpack.bak/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:45
 msgid "Test cloud account"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:159
+#: xpack.bak/plugins/cloud/models.py:88
+#: xpack.bak/plugins/cloud/serializers/task.py:159
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:160
 msgid "Regions"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:91
+#: xpack.bak/plugins/cloud/models.py:91 xpack/plugins/cloud/models.py:91
 msgid "Hostname strategy"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:162
+#: xpack.bak/plugins/cloud/models.py:96
+#: xpack.bak/plugins/cloud/serializers/task.py:162
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:163
 msgid "IP network segment group"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:167
+#: xpack.bak/plugins/cloud/models.py:99
+#: xpack.bak/plugins/cloud/serializers/task.py:167
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:168
 msgid "Sync IP type"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/models.py:102
+#: xpack.bak/plugins/cloud/serializers/task.py:185
 #: xpack/plugins/cloud/models.py:102
-#: xpack/plugins/cloud/serializers/task.py:185
+#: xpack/plugins/cloud/serializers/task.py:186
 msgid "Always update"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:104
+#: xpack.bak/plugins/cloud/models.py:104 xpack/plugins/cloud/models.py:104
 msgid "Fully synchronous"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:109
+#: xpack.bak/plugins/cloud/models.py:109 xpack/plugins/cloud/models.py:109
 msgid "Date last sync"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:112 xpack/plugins/cloud/models.py:317
-#: xpack/plugins/cloud/models.py:341
+#: xpack.bak/plugins/cloud/models.py:112 xpack.bak/plugins/cloud/models.py:317
+#: xpack.bak/plugins/cloud/models.py:341 xpack/plugins/cloud/models.py:112
+#: xpack/plugins/cloud/models.py:317 xpack/plugins/cloud/models.py:341
 msgid "Strategy"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/models.py:117 xpack.bak/plugins/cloud/models.py:196
 #: xpack/plugins/cloud/models.py:117 xpack/plugins/cloud/models.py:196
 msgid "Sync instance task"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/models.py:207 xpack.bak/plugins/cloud/models.py:259
 #: xpack/plugins/cloud/models.py:207 xpack/plugins/cloud/models.py:259
 msgid "Date sync"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:211
+#: xpack.bak/plugins/cloud/models.py:211 xpack/plugins/cloud/models.py:211
 msgid "Sync instance snapshot"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:215
+#: xpack.bak/plugins/cloud/models.py:215 xpack/plugins/cloud/models.py:215
 msgid "Sync instance task execution"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:239
+#: xpack.bak/plugins/cloud/models.py:239 xpack/plugins/cloud/models.py:239
 msgid "Sync task"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:243
+#: xpack.bak/plugins/cloud/models.py:243 xpack/plugins/cloud/models.py:243
 msgid "Sync instance task history"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:246
+#: xpack.bak/plugins/cloud/models.py:246 xpack/plugins/cloud/models.py:246
 msgid "Instance"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:263
+#: xpack.bak/plugins/cloud/models.py:263 xpack/plugins/cloud/models.py:263
 msgid "Sync instance detail"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/serializers/task.py:72
+#: xpack.bak/plugins/cloud/models.py:275
+#: xpack.bak/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/serializers/task.py:73
 msgid "Rule relation"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:284
+#: xpack.bak/plugins/cloud/models.py:284 xpack/plugins/cloud/models.py:284
 msgid "Task strategy"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:288
+#: xpack.bak/plugins/cloud/models.py:288 xpack/plugins/cloud/models.py:288
 msgid "Equal"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:289
+#: xpack.bak/plugins/cloud/models.py:289 xpack/plugins/cloud/models.py:289
 msgid "Not Equal"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:290
+#: xpack.bak/plugins/cloud/models.py:290 xpack/plugins/cloud/models.py:290
 msgid "In"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:291
+#: xpack.bak/plugins/cloud/models.py:291 xpack/plugins/cloud/models.py:291
 msgid "Contains"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:292
+#: xpack.bak/plugins/cloud/models.py:292 xpack/plugins/cloud/models.py:292
 msgid "Exclude"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:293
+#: xpack.bak/plugins/cloud/models.py:293 xpack/plugins/cloud/models.py:293
 msgid "Startswith"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:294
+#: xpack.bak/plugins/cloud/models.py:294 xpack/plugins/cloud/models.py:294
 msgid "Endswith"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:300
+#: xpack.bak/plugins/cloud/models.py:300 xpack/plugins/cloud/models.py:300
 msgid "Instance platform"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:301
+#: xpack.bak/plugins/cloud/models.py:301 xpack/plugins/cloud/models.py:301
 msgid "Instance address"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:308
+#: xpack.bak/plugins/cloud/models.py:308 xpack/plugins/cloud/models.py:308
 msgid "Rule attr"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:312
+#: xpack.bak/plugins/cloud/models.py:312 xpack/plugins/cloud/models.py:312
 msgid "Rule match"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:314
+#: xpack.bak/plugins/cloud/models.py:314 xpack/plugins/cloud/models.py:314
 msgid "Rule value"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:75
+#: xpack.bak/plugins/cloud/models.py:321
+#: xpack.bak/plugins/cloud/serializers/task.py:75
+#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:76
 msgid "Strategy rule"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:336
+#: xpack.bak/plugins/cloud/models.py:336 xpack/plugins/cloud/models.py:336
 msgid "Action attr"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:338
+#: xpack.bak/plugins/cloud/models.py:338 xpack/plugins/cloud/models.py:338
 msgid "Action value"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:345 xpack/plugins/cloud/serializers/task.py:78
+#: xpack.bak/plugins/cloud/models.py:345
+#: xpack.bak/plugins/cloud/serializers/task.py:78
+#: xpack/plugins/cloud/models.py:345 xpack/plugins/cloud/serializers/task.py:79
 msgid "Strategy action"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:18
 #: xpack/plugins/cloud/providers/aws_international.py:18
 msgid "China (Beijing)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:19
 #: xpack/plugins/cloud/providers/aws_international.py:19
 msgid "China (Ningxia)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:22
 #: xpack/plugins/cloud/providers/aws_international.py:22
 msgid "US East (Ohio)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:23
 #: xpack/plugins/cloud/providers/aws_international.py:23
 msgid "US East (N. Virginia)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:24
 #: xpack/plugins/cloud/providers/aws_international.py:24
 msgid "US West (N. California)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:25
 #: xpack/plugins/cloud/providers/aws_international.py:25
 msgid "US West (Oregon)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:26
 #: xpack/plugins/cloud/providers/aws_international.py:26
 msgid "Africa (Cape Town)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:27
 #: xpack/plugins/cloud/providers/aws_international.py:27
 msgid "Asia Pacific (Hong Kong)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:28
 #: xpack/plugins/cloud/providers/aws_international.py:28
 msgid "Asia Pacific (Mumbai)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:29
 #: xpack/plugins/cloud/providers/aws_international.py:29
 msgid "Asia Pacific (Osaka-Local)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:30
 #: xpack/plugins/cloud/providers/aws_international.py:30
 msgid "Asia Pacific (Seoul)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:31
 #: xpack/plugins/cloud/providers/aws_international.py:31
 msgid "Asia Pacific (Singapore)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:32
 #: xpack/plugins/cloud/providers/aws_international.py:32
 msgid "Asia Pacific (Sydney)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:33
 #: xpack/plugins/cloud/providers/aws_international.py:33
 msgid "Asia Pacific (Tokyo)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:34
 #: xpack/plugins/cloud/providers/aws_international.py:34
 msgid "Canada (Central)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:35
 #: xpack/plugins/cloud/providers/aws_international.py:35
 msgid "Europe (Frankfurt)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:36
 #: xpack/plugins/cloud/providers/aws_international.py:36
 msgid "Europe (Ireland)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:37
 #: xpack/plugins/cloud/providers/aws_international.py:37
 msgid "Europe (London)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:38
 #: xpack/plugins/cloud/providers/aws_international.py:38
 msgid "Europe (Milan)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:39
 #: xpack/plugins/cloud/providers/aws_international.py:39
 msgid "Europe (Paris)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:40
 #: xpack/plugins/cloud/providers/aws_international.py:40
 msgid "Europe (Stockholm)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:41
 #: xpack/plugins/cloud/providers/aws_international.py:41
 msgid "Middle East (Bahrain)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/aws_international.py:42
 #: xpack/plugins/cloud/providers/aws_international.py:42
 msgid "South America (São Paulo)"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:56
+#: xpack.bak/plugins/cloud/providers/jdcloud.py:125
 #: xpack/plugins/cloud/providers/baiducloud.py:56
 #: xpack/plugins/cloud/providers/jdcloud.py:125
 msgid "CN North-Beijing"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:57
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:47
+#: xpack.bak/plugins/cloud/providers/jdcloud.py:128
 #: xpack/plugins/cloud/providers/baiducloud.py:57
 #: xpack/plugins/cloud/providers/huaweicloud.py:47
 #: xpack/plugins/cloud/providers/jdcloud.py:128
 msgid "CN South-Guangzhou"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:58
 #: xpack/plugins/cloud/providers/baiducloud.py:58
 msgid "CN East-Suzhou"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:59
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:54
 #: xpack/plugins/cloud/providers/baiducloud.py:59
 #: xpack/plugins/cloud/providers/huaweicloud.py:54
 msgid "CN-Hong Kong"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:60
 #: xpack/plugins/cloud/providers/baiducloud.py:60
 msgid "CN Center-Wuhan"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:61
 #: xpack/plugins/cloud/providers/baiducloud.py:61
 msgid "CN North-Baoding"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:62
+#: xpack.bak/plugins/cloud/providers/jdcloud.py:127
 #: xpack/plugins/cloud/providers/baiducloud.py:62
 #: xpack/plugins/cloud/providers/jdcloud.py:127
 msgid "CN East-Shanghai"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/baiducloud.py:63
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:56
 #: xpack/plugins/cloud/providers/baiducloud.py:63
 #: xpack/plugins/cloud/providers/huaweicloud.py:56
 msgid "AP-Singapore"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:44
 #: xpack/plugins/cloud/providers/huaweicloud.py:44
 msgid "CN North-Beijing1"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:45
 #: xpack/plugins/cloud/providers/huaweicloud.py:45
 msgid "CN North-Beijing4"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:46
 #: xpack/plugins/cloud/providers/huaweicloud.py:46
 msgid "CN North-Ulanqab1"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:48
 #: xpack/plugins/cloud/providers/huaweicloud.py:48
 msgid "CN South-Shenzhen"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:49
 #: xpack/plugins/cloud/providers/huaweicloud.py:49
 msgid "CN South-Guangzhou-InvitationOnly"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:50
 #: xpack/plugins/cloud/providers/huaweicloud.py:50
 msgid "CN East-Shanghai2"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:51
 #: xpack/plugins/cloud/providers/huaweicloud.py:51
 msgid "CN East-Shanghai1"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:53
 #: xpack/plugins/cloud/providers/huaweicloud.py:53
 msgid "CN Southwest-Guiyang1"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:55
 #: xpack/plugins/cloud/providers/huaweicloud.py:55
 msgid "AP-Bangkok"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:58
 #: xpack/plugins/cloud/providers/huaweicloud.py:58
 msgid "AF-Johannesburg"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:59
 #: xpack/plugins/cloud/providers/huaweicloud.py:59
 msgid "LA-Mexico City1"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:60
 #: xpack/plugins/cloud/providers/huaweicloud.py:60
 msgid "LA-Santiago"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:61
 #: xpack/plugins/cloud/providers/huaweicloud.py:61
 msgid "LA-Sao Paulo1"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/huaweicloud.py:63
 #: xpack/plugins/cloud/providers/huaweicloud.py:63
 msgid "TR-Istanbul"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/providers/jdcloud.py:126
 #: xpack/plugins/cloud/providers/jdcloud.py:126
 msgid "CN East-Suqian"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account.py:69
+#: xpack.bak/plugins/cloud/serializers/account.py:69
+#: xpack/plugins/cloud/serializers/account.py:70
 msgid "Validity display"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account.py:70
+#: xpack.bak/plugins/cloud/serializers/account.py:70
+#: xpack/plugins/cloud/serializers/account.py:71
 msgid "Provider display"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:17
 #: xpack/plugins/cloud/serializers/account_attrs.py:17
 msgid "Access key id"
 msgstr "Access key id"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:35
-msgid "Client ID"
-msgstr ""
-
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:41
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
 msgid "Tenant ID"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:44
 #: xpack/plugins/cloud/serializers/account_attrs.py:44
 msgid "Subscription ID"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:98
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:102
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:126
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:156
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:206
 #: xpack/plugins/cloud/serializers/account_attrs.py:98
 #: xpack/plugins/cloud/serializers/account_attrs.py:102
 #: xpack/plugins/cloud/serializers/account_attrs.py:126
@@ -9046,42 +9257,52 @@ msgstr ""
 msgid "API Endpoint"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:108
 #: xpack/plugins/cloud/serializers/account_attrs.py:108
 msgid "Auth url"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:109
 #: xpack/plugins/cloud/serializers/account_attrs.py:109
 msgid "eg: http://openstack.example.com:5000/v3"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:112
 #: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "User domain"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:127
 #: xpack/plugins/cloud/serializers/account_attrs.py:127
 msgid "Cert File"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:128
 #: xpack/plugins/cloud/serializers/account_attrs.py:128
 msgid "Key File"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:144
 #: xpack/plugins/cloud/serializers/account_attrs.py:144
 msgid "Service account key"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:145
 #: xpack/plugins/cloud/serializers/account_attrs.py:145
 msgid "The file is in JSON format"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:163
 #: xpack/plugins/cloud/serializers/account_attrs.py:163
 msgid "IP address invalid `{}`, {}"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:179
 #: xpack/plugins/cloud/serializers/account_attrs.py:179
 msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:182
 #: xpack/plugins/cloud/serializers/account_attrs.py:182
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
@@ -9089,27 +9310,33 @@ msgid ""
 "synchronized. <br>If the port is 0, all IP addresses are valid."
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:190
 #: xpack/plugins/cloud/serializers/account_attrs.py:190
 msgid "Hostname prefix"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:193
 #: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "IP segment"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:197
 #: xpack/plugins/cloud/serializers/account_attrs.py:197
 msgid "Test port"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:200
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Test timeout"
 msgstr ""
 
+#: xpack.bak/plugins/cloud/serializers/account_attrs.py:216
 #: xpack/plugins/cloud/serializers/account_attrs.py:216
 msgid "Project"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:151
+#: xpack.bak/plugins/cloud/serializers/task.py:151
+#: xpack/plugins/cloud/serializers/task.py:152
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -9118,28 +9345,196 @@ msgid ""
 "10.1.1.1-10.1.1.20"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:157
+#: xpack.bak/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "History count"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:158
+#: xpack.bak/plugins/cloud/serializers/task.py:158
+#: xpack/plugins/cloud/serializers/task.py:159
 msgid "Instance count"
 msgstr ""
 
-#: xpack/plugins/cloud/tasks.py:27
+#: xpack.bak/plugins/cloud/tasks.py:27 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr ""
 
-#: xpack/plugins/cloud/tasks.py:41
+#: xpack.bak/plugins/cloud/tasks.py:41 xpack/plugins/cloud/tasks.py:41
 msgid "Period clean sync instance task execution"
 msgstr ""
 
-#: xpack/plugins/interface/api.py:52
+#: xpack.bak/plugins/interface/api.py:52 xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr ""
 
-#: xpack/plugins/interface/meta.py:9
+#: xpack.bak/plugins/interface/meta.py:9 xpack/plugins/interface/meta.py:9
+#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
 msgid "Interface settings"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:23
+msgid "Title of login page"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:27
+msgid "Image of login page"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:31
+#: xpack/plugins/interface/models.py:31
+msgid "Website icon"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:35
+msgid "Logo of management page"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:39
+msgid "Logo of logout page"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:41
+#: xpack/plugins/interface/models.py:41
+#: xpack/plugins/interface/serializers/interface.py:26
+msgid "Theme"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:42
+#: xpack/plugins/interface/models.py:42
+msgid "Footer content"
+msgstr ""
+
+#: xpack.bak/plugins/interface/models.py:45
+#: xpack.bak/plugins/interface/models.py:86
+#, fuzzy
+#| msgid "Terminal setting"
+msgid "Interface setting"
+msgstr "Terminal"
+
+#: xpack.bak/plugins/license/api.py:52 xpack/plugins/license/api.py:52
+msgid "License import successfully"
+msgstr ""
+
+#: xpack.bak/plugins/license/api.py:53
+msgid "License is invalid"
+msgstr ""
+
+#: xpack.bak/plugins/license/meta.py:10 xpack.bak/plugins/license/models.py:144
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
+msgid "License"
+msgstr ""
+
+#: xpack.bak/plugins/license/models.py:80 xpack/plugins/license/models.py:80
+msgid "Basic edition"
+msgstr ""
+
+#: xpack.bak/plugins/license/models.py:82 xpack/plugins/license/models.py:82
+msgid "Standard edition"
+msgstr ""
+
+#: xpack.bak/plugins/license/models.py:84 xpack/plugins/license/models.py:84
+msgid "Professional edition"
+msgstr ""
+
+#: xpack.bak/plugins/license/models.py:86 xpack/plugins/license/models.py:86
+msgid "Ultimate edition"
+msgstr ""
+
+#: xpack/exceptions.py:8
+msgid ""
+"Based on the current task configuration, assets that do not match the "
+"strategy will skipped."
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:41
+#, python-format
+msgid "Task \"%s\" starts executing"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:71
+msgid "View the task details path: "
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:74
+msgid "Account Details"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:75
+msgid "Synchronization History List"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:75
+msgid "Synchronization Instance List"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:83
+msgid "Task execution completed"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:87
+msgid "Synchronization regions"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:110
+#, python-format
+msgid "Get instances of region \"%s\" error, error: %s"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:128
+#, python-format
+msgid "The instance IP \"%s\" is not in network segment \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:164
+#, python-format
+msgid "Failed to synchronize the instance \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:316
+#, python-format
+msgid ""
+"The updated platform of asset \"%s\" is inconsistent with the original "
+"platform type. Skip platform and protocol updates"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:358
+#, python-format
+msgid "The asset \"%s\" already exists"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:362
+#, python-format
+msgid "Update asset \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:365
+#, python-format
+msgid "Asset \"%s\" has been updated"
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:376
+#, python-format
+msgid "Prepare to create asset \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:388
+#, python-format
+msgid "Set nodes \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:414
+#, python-format
+msgid "Set accounts \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/manager.py:430
+#, python-format
+msgid "Set protocols \"%s\""
+msgstr ""
+
+#: xpack/plugins/cloud/providers/lan.py:79
+#, python-format
+msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
 msgstr ""
 
 #: xpack/plugins/interface/models.py:23
@@ -9150,10 +9545,6 @@ msgstr ""
 msgid "Login image"
 msgstr ""
 
-#: xpack/plugins/interface/models.py:31
-msgid "Website icon"
-msgstr ""
-
 #: xpack/plugins/interface/models.py:35
 msgid "Index logo"
 msgstr ""
@@ -9161,21 +9552,6 @@ msgstr ""
 #: xpack/plugins/interface/models.py:39
 msgid "Logout logo"
 msgstr ""
-
-#: xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
-msgid "Theme"
-msgstr ""
-
-#: xpack/plugins/interface/models.py:42
-msgid "Footer content"
-msgstr ""
-
-#: xpack/plugins/interface/models.py:45 xpack/plugins/interface/models.py:86
-#, fuzzy
-#| msgid "Terminal setting"
-msgid "Interface setting"
-msgstr "Terminal"
 
 #: xpack/plugins/interface/serializers/interface.py:37
 msgid "Wide logo on top"
@@ -9185,33 +9561,12 @@ msgstr ""
 msgid "Small logo without text"
 msgstr ""
 
-#: xpack/plugins/license/api.py:52
-msgid "License import successfully"
-msgstr ""
-
 #: xpack/plugins/license/api.py:53
-msgid "License is invalid"
+msgid "Invalid license"
 msgstr ""
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
-msgid "License"
-msgstr ""
-
-#: xpack/plugins/license/models.py:80
-msgid "Basic edition"
-msgstr ""
-
-#: xpack/plugins/license/models.py:82
-msgid "Standard edition"
-msgstr ""
-
-#: xpack/plugins/license/models.py:84
-msgid "Professional edition"
-msgstr ""
-
-#: xpack/plugins/license/models.py:86
-msgid "Ultimate edition"
-msgstr ""
+#~ msgid "Public key auth"
+#~ msgstr "Public key auth"
 
 #~ msgid "Help Docs URL"
 #~ msgstr "Document URL"

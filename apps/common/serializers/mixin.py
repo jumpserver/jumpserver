@@ -16,22 +16,31 @@ from rest_framework.settings import api_settings
 from rest_framework.utils import html
 
 from common.db.fields import EncryptMixin
-from common.serializers.fields import EncryptedField, LabeledChoiceField, ObjectRelatedField, LabelRelatedField
+from common.serializers.fields import (
+    EncryptedField,
+    LabeledChoiceField,
+    ObjectRelatedField,
+    LabelRelatedField,
+)
 
 __all__ = [
-    'BulkSerializerMixin', 'BulkListSerializerMixin',
-    'CommonSerializerMixin', 'CommonBulkSerializerMixin',
-    'SecretReadableMixin', 'CommonModelSerializer',
-    'CommonBulkModelSerializer', 'ResourceLabelsMixin',
+    "BulkSerializerMixin",
+    "BulkListSerializerMixin",
+    "CommonSerializerMixin",
+    "CommonBulkSerializerMixin",
+    "SecretReadableMixin",
+    "CommonModelSerializer",
+    "CommonBulkModelSerializer",
+    "ResourceLabelsMixin",
 ]
 
 
 class SecretReadableMixin(serializers.Serializer):
-    """ 加密字段 (EncryptedField) 可读性 """
+    """加密字段 (EncryptedField) 可读性"""
 
     def __init__(self, *args, **kwargs):
         super(SecretReadableMixin, self).__init__(*args, **kwargs)
-        if not hasattr(self, 'Meta') or not hasattr(self.Meta, 'extra_kwargs'):
+        if not hasattr(self, "Meta") or not hasattr(self.Meta, "extra_kwargs"):
             return
         extra_kwargs = self.Meta.extra_kwargs
         for field_name, serializer_field in self.fields.items():
@@ -40,9 +49,9 @@ class SecretReadableMixin(serializers.Serializer):
             if field_name not in extra_kwargs:
                 continue
             field_extra_kwargs = extra_kwargs[field_name]
-            if 'write_only' not in field_extra_kwargs:
+            if "write_only" not in field_extra_kwargs:
                 continue
-            serializer_field.write_only = field_extra_kwargs['write_only']
+            serializer_field.write_only = field_extra_kwargs["write_only"]
 
 
 class BulkSerializerMixin(object):
@@ -53,20 +62,25 @@ class BulkSerializerMixin(object):
 
     def to_internal_value(self, data):
         from rest_framework_bulk import BulkListSerializer
+
         ret = super(BulkSerializerMixin, self).to_internal_value(data)
 
-        id_attr = getattr(self.Meta, 'update_lookup_field', 'id')
-        if self.context.get('view'):
-            request_method = getattr(getattr(self.context.get('view'), 'request'), 'method', '')
+        id_attr = getattr(self.Meta, "update_lookup_field", "id")
+        if self.context.get("view"):
+            request_method = getattr(
+                getattr(self.context.get("view"), "request"), "method", ""
+            )
             # add update_lookup_field field back to validated data
             # since super by default strips out read-only fields
             # hence id will no longer be present in validated_data
-            if all([
-                isinstance(self.root, BulkListSerializer),
-                id_attr,
-                request_method in ('PUT', 'PATCH')
-            ]):
-                id_field = self.fields.get("id") or self.fields.get('pk')
+            if all(
+                [
+                    isinstance(self.root, BulkListSerializer),
+                    id_attr,
+                    request_method in ("PUT", "PATCH"),
+                ]
+            ):
+                id_field = self.fields.get("id") or self.fields.get("pk")
                 if data.get("id"):
                     id_value = id_field.to_internal_value(data.get("id"))
                 else:
@@ -89,9 +103,10 @@ class BulkSerializerMixin(object):
     @classmethod
     def many_init(cls, *args, **kwargs):
         from .common import AdaptedBulkListSerializer
-        meta = getattr(cls, 'Meta', None)
-        assert meta is not None, 'Must have `Meta`'
-        if not hasattr(meta, 'list_serializer_class'):
+
+        meta = getattr(cls, "Meta", None)
+        assert meta is not None, "Must have `Meta`"
+        if not hasattr(meta, "list_serializer_class"):
             meta.list_serializer_class = AdaptedBulkListSerializer
         return super(BulkSerializerMixin, cls).many_init(*args, **kwargs)
 
@@ -115,21 +130,21 @@ class BulkListSerializerMixin:
             data = html.parse_html_list(data)
 
         if not isinstance(data, list):
-            message = self.error_messages['not_a_list'].format(
+            message = self.error_messages["not_a_list"].format(
                 input_type=type(data).__name__
             )
-            raise ValidationError({
-                api_settings.NON_FIELD_ERRORS_KEY: [message]
-            }, code='not_a_list')
+            raise ValidationError(
+                {api_settings.NON_FIELD_ERRORS_KEY: [message]}, code="not_a_list"
+            )
 
         if not self.allow_empty and len(data) == 0:
             if self.parent and self.partial:
                 raise SkipField()
 
-            message = self.error_messages['empty']
-            raise ValidationError({
-                api_settings.NON_FIELD_ERRORS_KEY: [message]
-            }, code='empty')
+            message = self.error_messages["empty"]
+            raise ValidationError(
+                {api_settings.NON_FIELD_ERRORS_KEY: [message]}, code="empty"
+            )
 
         ret = []
         errors = []
@@ -137,9 +152,9 @@ class BulkListSerializerMixin:
         for item in data:
             try:
                 # prepare child serializer to only handle one instance
-                if 'id' in item:
+                if "id" in item:
                     pk = item["id"]
-                elif 'pk' in item:
+                elif "pk" in item:
                     pk = item["pk"]
                 else:
                     raise ValidationError("id or pk not in data")
@@ -163,13 +178,13 @@ class BulkListSerializerMixin:
 
     def create(self, validated_data):
         ModelClass = self.child.Meta.model
-        use_model_bulk_create = getattr(self.child.Meta, 'use_model_bulk_create', False)
-        model_bulk_create_kwargs = getattr(self.child.Meta, 'model_bulk_create_kwargs', {})
+        use_model_bulk_create = getattr(self.child.Meta, "use_model_bulk_create", False)
+        model_bulk_create_kwargs = getattr(
+            self.child.Meta, "model_bulk_create_kwargs", {}
+        )
 
         if use_model_bulk_create:
-            to_create = [
-                ModelClass(**attrs) for attrs in validated_data
-            ]
+            to_create = [ModelClass(**attrs) for attrs in validated_data]
             objs = ModelClass._default_manager.bulk_create(
                 to_create, **model_bulk_create_kwargs
             )
@@ -184,18 +199,18 @@ class BaseDynamicFieldsPlugin:
 
     def can_dynamic(self):
         try:
-            request = self.serializer.context['request']
+            request = self.serializer.context["request"]
             method = request.method
         except (AttributeError, TypeError, KeyError):
             # The serializer was not initialized with request context.
             return False
 
-        if method != 'GET':
+        if method != "GET":
             return False
         return True
 
     def get_request(self):
-        return self.serializer.context['request']
+        return self.serializer.context["request"]
 
     def get_query_params(self):
         request = self.get_request()
@@ -203,7 +218,7 @@ class BaseDynamicFieldsPlugin:
             query_params = request.query_params
         except AttributeError:
             # DRF 2
-            query_params = getattr(request, 'QUERY_PARAMS', request.GET)
+            query_params = getattr(request, "QUERY_PARAMS", request.GET)
         return query_params
 
     def get_exclude_field_names(self):
@@ -214,20 +229,24 @@ class QueryFieldsMixin(BaseDynamicFieldsPlugin):
     # https://github.com/wimglenn/djangorestframework-queryfields/
 
     # If using Django filters in the API, these labels mustn't conflict with any model field names.
-    include_arg_name = 'fields'
-    exclude_arg_name = 'fields!'
+    include_arg_name = "fields"
+    exclude_arg_name = "fields!"
 
     # Split field names by this string.  It doesn't necessarily have to be a single character.
     # Avoid RFC 1738 reserved characters i.e. ';', '/', '?', ':', '@', '=' and '&'
-    delimiter = ','
+    delimiter = ","
 
     def get_exclude_field_names(self):
         query_params = self.get_query_params()
         includes = query_params.getlist(self.include_arg_name)
-        include_field_names = {name for names in includes for name in names.split(self.delimiter) if name}
+        include_field_names = {
+            name for names in includes for name in names.split(self.delimiter) if name
+        }
 
         excludes = query_params.getlist(self.exclude_arg_name)
-        exclude_field_names = {name for names in excludes for name in names.split(self.delimiter) if name}
+        exclude_field_names = {
+            name for names in excludes for name in names.split(self.delimiter) if name
+        }
 
         if not include_field_names and not exclude_field_names:
             # No user fields filtering was requested, we have nothing to do here.
@@ -242,10 +261,10 @@ class QueryFieldsMixin(BaseDynamicFieldsPlugin):
 
 
 class SizedModelFieldsMixin(BaseDynamicFieldsPlugin):
-    arg_name = 'fields_size'
+    arg_name = "fields_size"
 
     def can_dynamic(self):
-        if not hasattr(self.serializer, 'Meta'):
+        if not hasattr(self.serializer, "Meta"):
             return False
         can = super().can_dynamic()
         return can
@@ -255,9 +274,9 @@ class SizedModelFieldsMixin(BaseDynamicFieldsPlugin):
         size = query_params.get(self.arg_name)
         if not size:
             return []
-        if size not in ['mini', 'small']:
+        if size not in ["mini", "small"]:
             return []
-        size_fields = getattr(self.serializer.Meta, 'fields_{}'.format(size), None)
+        size_fields = getattr(self.serializer.Meta, "fields_{}".format(size), None)
         if not size_fields or not isinstance(size_fields, Iterable):
             return []
         serializer_field_names = set(self.serializer.fields)
@@ -269,7 +288,7 @@ class XPACKModelFieldsMixin(BaseDynamicFieldsPlugin):
     def get_exclude_field_names(self):
         if settings.XPACK_LICENSE_IS_VALID:
             return set()
-        fields_xpack = set(getattr(self.serializer.Meta, 'fields_xpack', set()))
+        fields_xpack = set(getattr(self.serializer.Meta, "fields_xpack", set()))
         return fields_xpack
 
 
@@ -279,9 +298,9 @@ class DefaultValueFieldsMixin:
         self.set_fields_default_value()
 
     def set_fields_default_value(self):
-        if not hasattr(self, 'Meta'):
+        if not hasattr(self, "Meta"):
             return
-        if not hasattr(self.Meta, 'model'):
+        if not hasattr(self.Meta, "model"):
             return
         model = self.Meta.model
 
@@ -291,17 +310,19 @@ class DefaultValueFieldsMixin:
             model_field = getattr(model, name, None)
             if model_field is None:
                 continue
-            if not hasattr(model_field, 'field') \
-                    or not hasattr(model_field.field, 'default') \
-                    or model_field.field.default == NOT_PROVIDED:
+            if (
+                not hasattr(model_field, "field")
+                or not hasattr(model_field.field, "default")
+                or model_field.field.default == NOT_PROVIDED
+            ):
                 continue
-            if name == 'id':
+            if name == "id":
                 continue
             default = model_field.field.default
 
             if callable(default):
                 default = default()
-            if default == '':
+            if default == "":
                 continue
             # print(f"Set default value: {name}: {default}")
             serializer_field.default = default
@@ -311,7 +332,12 @@ class DynamicFieldsMixin:
     """
     可以控制显示不同的字段，mini 最少，small 不包含关系
     """
-    dynamic_fields_plugins = [QueryFieldsMixin, SizedModelFieldsMixin, XPACKModelFieldsMixin]
+
+    dynamic_fields_plugins = [
+        QueryFieldsMixin,
+        SizedModelFieldsMixin,
+        XPACKModelFieldsMixin,
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -336,12 +362,13 @@ class SomeFieldsMixin:
     instance: None
     initial_data: dict
     common_fields = (
-        'comment', 'created_by', 'updated_by',
-        'date_created', 'date_updated',
+        "comment",
+        "created_by",
+        "updated_by",
+        "date_created",
+        "date_updated",
     )
-    secret_fields = (
-        'password', 'token', 'secret', 'key', 'private_key'
-    )
+    secret_fields = ("password", "token", "secret", "key", "private_key")
 
     def get_initial_value(self, attr, default=None):
         value = self.initial_data.get(attr)
@@ -365,7 +392,7 @@ class SomeFieldsMixin:
                 bool_fields.append(to_add)
             elif isinstance(field, serializers.DateTimeField):
                 datetime_fields.append(to_add)
-            elif name in ('comment', 'created_by', 'updated_by'):
+            elif name in ("comment", "created_by", "updated_by"):
                 common_fields.append(to_add)
             else:
                 other_fields.append(to_add)
@@ -381,15 +408,19 @@ class SomeFieldsMixin:
         secret_readable = isinstance(self, SecretReadableMixin)
 
         for name, field in fields.items():
-            if name == 'id':
-                field.label = 'ID'
+            if name == "id":
+                field.label = "ID"
             elif isinstance(field, EncryptMixin) and not secret_readable:
                 field.write_only = True
         return fields
 
 
-class CommonSerializerMixin(DynamicFieldsMixin, RelatedModelSerializerMixin,
-                            SomeFieldsMixin, DefaultValueFieldsMixin):
+class CommonSerializerMixin(
+    DynamicFieldsMixin,
+    RelatedModelSerializerMixin,
+    SomeFieldsMixin,
+    DefaultValueFieldsMixin,
+):
     pass
 
 
@@ -406,17 +437,19 @@ class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSeri
 
 
 class ResourceLabelsMixin(serializers.Serializer):
-    labels = LabelRelatedField(many=True, label=_('Labels'), required=False, allow_null=True, source='res_labels')
+    labels = LabelRelatedField(
+        many=True, label=_("Tags"), required=False, allow_null=True, source="res_labels"
+    )
 
     def update(self, instance, validated_data):
-        labels = validated_data.pop('res_labels', None)
+        labels = validated_data.pop("res_labels", None)
         res = super().update(instance, validated_data)
         if labels is not None:
             instance.res_labels.set(labels, bulk=False)
         return res
 
     def create(self, validated_data):
-        labels = validated_data.pop('res_labels', None)
+        labels = validated_data.pop("res_labels", None)
         instance = super().create(validated_data)
         if labels is not None:
             instance.res_labels.set(labels, bulk=False)
@@ -424,4 +457,4 @@ class ResourceLabelsMixin(serializers.Serializer):
 
     @classmethod
     def setup_eager_loading(cls, queryset):
-        return queryset.prefetch_related('labels')
+        return queryset.prefetch_related("labels")

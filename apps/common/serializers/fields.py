@@ -251,21 +251,21 @@ class PhoneField(serializers.CharField):
                 data = '+{}{}'.format(code, phone)
             else:
                 data = phone
-        try:
-            phone = phonenumbers.parse(data, 'CN')
-            data = '+{}{}'.format(phone.country_code, phone.national_number)
-        except phonenumbers.NumberParseException:
-            data = '+86{}'.format(data)
+        if data:
+            try:
+                phone = phonenumbers.parse(data, 'CN')
+                data = '+{}{}'.format(phone.country_code, phone.national_number)
+            except phonenumbers.NumberParseException:
+                data = '+86{}'.format(data)
 
         return super().to_internal_value(data)
 
     def to_representation(self, value):
-        if value:
-            try:
-                phone = phonenumbers.parse(value, 'CN')
-                value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
-            except phonenumbers.NumberParseException:
-                value = {'code': '+86', 'phone': value}
+        try:
+            phone = phonenumbers.parse(value, 'CN')
+            value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
+        except phonenumbers.NumberParseException:
+            value = {'code': '+86', 'phone': value}
         return value
 
 

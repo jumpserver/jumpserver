@@ -13,8 +13,8 @@ class Label(JMSOrgBaseModel):
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
 
     class Meta:
-        unique_together = [('name', 'value', 'org_id')]
-        verbose_name = _('Label')
+        unique_together = [("name", "value", "org_id")]
+        verbose_name = _("Tag")
 
     @lazyproperty
     def res_count(self):
@@ -22,23 +22,28 @@ class Label(JMSOrgBaseModel):
 
     @lazyproperty
     def display_name(self):
-        return '{}:{}'.format(self.name, self.value)
+        return "{}:{}".format(self.name, self.value)
 
     def __str__(self):
-        return '{}:{}'.format(self.name, self.value)
+        return "{}:{}".format(self.name, self.value)
 
 
 class LabeledResource(JMSOrgBaseModel):
     label = models.ForeignKey(
-        Label, on_delete=models.CASCADE, related_name='labeled_resources', verbose_name=_("Label")
+        Label,
+        on_delete=models.CASCADE,
+        related_name="labeled_resources",
+        verbose_name=_("Tag"),
     )
     res_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    res_id = models.CharField(max_length=36, verbose_name=_("Resource ID"), db_index=True)
-    resource = GenericForeignKey('res_type', 'res_id')
+    res_id = models.CharField(
+        max_length=36, verbose_name=_("Resource ID"), db_index=True
+    )
+    resource = GenericForeignKey("res_type", "res_id")
 
     class Meta:
-        unique_together = [('label', 'res_type', 'res_id', 'org_id')]
-        verbose_name = _('Labeled resource')
+        unique_together = [("label", "res_type", "res_id", "org_id")]
+        verbose_name = _("Tagged resource")
 
     def __str__(self):
-        return '{} => {}'.format(self.label, self.resource)
+        return "{} => {}".format(self.label, self.resource)
