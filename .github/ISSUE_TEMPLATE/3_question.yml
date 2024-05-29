@@ -8,7 +8,7 @@ body:
   - type: input
     attributes:
       label: 'Version'
-      description: Versions prior to v2.28 are no longer supported
+      description: Versions prior to v2.28 are no longer supported.
     validations:
       required: true
 
@@ -42,4 +42,4 @@ body:
   - type: textarea
     attributes:
       label: 'Attempted Solutions'
-      description: If you have already tried to solve the problem, list the solutions you have tried here
+      description: If you have already tried to solve the problem, list the solutions you have tried here.
