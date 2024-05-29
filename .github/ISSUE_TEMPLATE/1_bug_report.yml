@@ -8,7 +8,7 @@ body:
   - type: input
     attributes:
       label: 'Version'
-      description: Versions prior to v2.28 are no longer supported
+      description: Versions prior to v2.28 are no longer supported.
     validations:
       required: true
 
@@ -45,7 +45,7 @@ body:
       label: '🐛 Bug Description'
       description:
         Please provide a detailed description of the bug.<br/>
-        Simple bug descriptions will not be considered. Please ensure to provide enough details and information to support the reproduction and fixing of the bug
+        Simple bug descriptions will not be considered. Please ensure to provide enough details and information to support the reproduction and fixing of the bug.
     validations:
       required: true
 
@@ -59,4 +59,4 @@ body:
   - type: textarea
     attributes:
       label: 'Attempted Solutions'
-      description: If you have already tried to solve the problem, list the solutions you have tried here
+      description: If you have already tried to solve the problem, list the solutions you have tried here.
