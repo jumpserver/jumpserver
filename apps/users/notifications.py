@@ -143,7 +143,7 @@ class PasswordExpirationReminderMsg(UserMessage):
         subject = _('Password is about expire')
 
         date_password_expired_local = timezone.localtime(user.date_password_expired)
-        update_password_url = urljoin(settings.SITE_URL, '/ui/#/profile/setting/?activeTab=PasswordUpdate')
+        update_password_url = urljoin(settings.SITE_URL, '/ui/#/profile/index')
         date_password_expired = date_password_expired_local.strftime('%Y-%m-%d %H:%M:%S')
         context = {
             'name': user.name,

@@ -23,8 +23,8 @@ button{
 /*header样式*/
 header{
 	overflow:hidden ;
-	background: #dedede;
-	padding:15px 200px;
+	background: #ffffff;
+	padding:15px 10%;
 }
 header .logo a{
 	float:left;

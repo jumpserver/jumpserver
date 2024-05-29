@@ -12,6 +12,7 @@ def _find(attr):
 
 
 def add_encrypted_field_set(label):
+    return
     if label:
         with translation.override('en'):
             encrypted_field_set.add(str(label))

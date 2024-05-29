@@ -867,7 +867,7 @@
     "OneAssignee": "一級受理人",
     "OneAssigneeType": "一級受理人類型",
     "OneClickRead": "當前已讀",
-    "OneClickReadMsg": "你確定要將當前資訊標記為已讀嗎?",
+    "OneClickReadMsg": "你確定要全部標記為已讀嗎?",
     "OnlineSession": "在線用戶",
     "OnlineSessionHelpMsg": "無法下線當前會話，因為該會話是當前用戶的在線會話。當前只記錄以 Web 方式登入的用戶。",
     "OnlineSessions": "在線會話數",

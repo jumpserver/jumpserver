@@ -13,3 +13,4 @@ from .public import *
 from .security import *
 from .settings import *
 from .terminal import *
+from .tool import *

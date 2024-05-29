@@ -1,0 +1,55 @@
+FROM python:3.11-slim-bullseye
+ARG TARGETARCH
+
+ARG BUILD_DEPENDENCIES="              \
+        g++                           \
+        make                          \
+        pkg-config"
+
+ARG DEPENDENCIES="                    \
+        freetds-dev                   \
+        gettext                       \
+        libffi-dev                    \
+        libjpeg-dev                   \
+        libkrb5-dev                   \
+        libldap2-dev                  \
+        libpq-dev                     \
+        libsasl2-dev                  \
+        libssl-dev                    \
+        libxml2-dev                   \
+        libxmlsec1-dev                \
+        libxmlsec1-openssl            \
+        freerdp2-dev                  \
+        libaio-dev"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
+        default-libmysqlclient-dev    \
+        default-mysql-client          \
+        git                           \
+        git-lfs                       \
+        unzip                         \
+        xz-utils                      \
+        wget"
+
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
+    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash
+
+ARG PIP_MIRROR=https://pypi.org/simple
+RUN --mount=type=cache,target=/root/.cache,sharing=locked \
+    set -ex \
+    && python3 -m venv /opt/py3 \
+    && pip install poetry -i ${PIP_MIRROR} \
+    && poetry config virtualenvs.create false
