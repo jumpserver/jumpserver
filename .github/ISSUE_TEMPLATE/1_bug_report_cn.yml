@@ -8,7 +8,7 @@ body:
   - type: input
     attributes:
       label: '产品版本'
-      description: 不再支持 v2.28 之前的版本
+      description: 不再支持 v2.28 之前的版本。
     validations:
       required: true
 
