@@ -8,7 +8,7 @@ body:
   - type: input
     attributes:
       label: '产品版本'
-      description: 不再支持 v2.28 之前的版本。
+      description: 不再支持 v2.28（含）之前的版本。
     validations:
       required: true
 
@@ -53,3 +53,9 @@ body:
     attributes:
       label: '期望结果'
       description: 请提供一个清晰且简洁的描述，说明你期望发生什么。
+
+  - type: textarea
+    attributes:
+      label: '补充信息'
+      description: 在这里添加关于问题的任何其他背景信息。
+
