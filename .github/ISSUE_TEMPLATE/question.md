@@ -2,7 +2,7 @@
 name: 问题咨询
 about: 提出针对本项目安装部署、使用及其他方面的相关问题
 title: "[Question] 问题标题"
-labels: 类型:提问
+labels: "🤔 Question"
 assignees: 
   - baijiangjie
 ---
