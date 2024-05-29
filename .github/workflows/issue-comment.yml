@@ -13,13 +13,13 @@ jobs:
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
-          labels: '状态:待处理'
+          labels: '🔔 Pending processing'
 
       - name: Remove require reply label
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'remove-labels'
-          labels: '状态:待反馈'
+          labels: '⏳ Pending feedback'
 
   add-label-if-is-member:
     runs-on: ubuntu-latest
@@ -55,11 +55,11 @@ jobs:
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
-          labels: '状态:待反馈'
+          labels: '⏳ Pending feedback'
 
       - name: Remove require handle label
         if: contains(steps.member_names.outputs.data, github.event.comment.user.login)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'remove-labels'
-          labels: '状态:待处理'
+          labels: '🔔 Pending processing'

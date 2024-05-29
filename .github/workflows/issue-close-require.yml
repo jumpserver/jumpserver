@@ -12,7 +12,9 @@ jobs:
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'close-issues'
-          labels: '状态:待反馈'
+          labels: '⏳ Pending feedback'
           inactive-day: 30
           body: |
+            You haven't provided feedback for over 30 days. 
+            We will close this issue. If you have any further needs, you can reopen it or submit a new issue.
             您超过 30 天未反馈信息，我们将关闭该 issue，如有需求您可以重新打开或者提交新的 issue。
