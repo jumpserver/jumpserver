@@ -26,8 +26,8 @@ body:
     attributes:
       label: 'Installation'
       options:
-        - label: 'Online (quick_start.sh)'
-        - label: 'Offline (Download offline package)'
+        - label: 'Online (Install using the curl command to download script quick_start.sh)'
+        - label: 'Offline package'
         - label: 'All-in-One'
         - label: '1Panel'
         - label: 'Kubernetes'
