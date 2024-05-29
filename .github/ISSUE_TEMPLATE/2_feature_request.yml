@@ -4,17 +4,18 @@ title: '[Feature] '
 labels: ['⭐️ Feature Request']
 assignees: 
   - baijiangjie
+  - ibuler
 body:
   - type: input
     attributes:
-      label: 'Version'
-      description: Versions prior to v2.28 are no longer supported.
+      label: 'Product Version'
+      description: The versions prior to v2.28 (inclusive) are no longer supported.
     validations:
       required: true
 
   - type: checkboxes
     attributes:
-      label: 'Edition'
+      label: 'Product Edition'
       options:
         - label: 'Community Edition'
         - label: 'Enterprise Edition'
@@ -24,10 +25,10 @@ body:
     
   - type: checkboxes
     attributes:
-      label: 'Installation'
+      label: 'Installation Method'
       options:
-        - label: 'Online (Install using the curl command to download script quick_start.sh)'
-        - label: 'Offline package'
+        - label: 'Online Installation (One-click command installation)'
+        - label: 'Offline Package Installation'
         - label: 'All-in-One'
         - label: '1Panel'
         - label: 'Kubernetes'
@@ -35,19 +36,21 @@ body:
 
   - type: textarea
     attributes:
-      label: 'Feature Description'
-      description: Describe your environment information in detail here, such as, operating system, browser, and deployment architecture, etc.
+      label: '⭐️ Feature Description'
+      description: |
+        Please add a clear and concise description of the problem you aim to solve with this feature request.<br/>
+        Unclear descriptions will not be processed.      
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: 'Proposed Solution'
-      description: "Describe the solution you'd like in a clear and concise manner."
+      description: Please provide a clear and concise description of the solution you desire.
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: 'Additional Information'
-      description: Add any other context about the problem here.
+      description: Please add any additional background information about the issue here.
