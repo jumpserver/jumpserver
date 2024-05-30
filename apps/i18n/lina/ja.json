@@ -1009,7 +1009,7 @@
     "Select": "選択",
     "SelectAdhoc": "コマンドの選択",
     "SelectAll": "全選択",
-    "SelectCreateMethod": "作り方を選ぶ", ,
+    "SelectCreateMethod": "作り方を選ぶ",
     "SelectProviderMsg": "クラウドプラットフォームを選択してください",
     "SelectAtLeastOneAssetOrNodeErrMsg": "アセットまたはノードは少なくとも一つ選択してください",
     "SelectAttrs": "属性の選択",
