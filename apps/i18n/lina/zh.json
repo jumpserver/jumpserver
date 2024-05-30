@@ -1309,7 +1309,7 @@
     "ZoneEnabled": "启用网关",
     "ZoneHelpMessage": "区域是资产所在的位置，可以是机房，公有云 或者 VPC。区域中可以设置网关，当网络不能直达的时候，可以使用网关跳转登录到资产",
     "ZoneList": "区域列表",
-    "ZoneUpdate": "更新区域"
+    "ZoneUpdate": "更新区域",
     "ZoneUpdate": "更新区域",
     "YourProfile": "个人信息",
     "InformationModification": "信息更改",
