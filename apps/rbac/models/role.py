@@ -150,3 +150,4 @@ class OrgRole(Role):
     class Meta:
         proxy = True
         verbose_name = _('Organization role')
+
