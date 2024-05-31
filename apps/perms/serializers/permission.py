@@ -39,7 +39,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     user_groups_amount = serializers.IntegerField(read_only=True, label=_("Groups amount"))
     assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
     nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
-    actions = ActionChoicesField(required=False, allow_null=True, label=_("Actions"))
+    actions = ActionChoicesField(required=False, allow_null=True, label=_("Action"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     accounts = serializers.ListField(label=_("Accounts"), required=False)
@@ -61,7 +61,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
-            "actions": {"label": _("Actions")},
+            "actions": {"label": _("Action")},
             "is_expired": {"label": _("Is expired")},
             "is_valid": {"label": _("Is valid")},
         }
