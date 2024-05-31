@@ -75,6 +75,7 @@ class AuthMixin:
         if self.can_update_ssh_key():
             self.public_key = public_key
             self.save()
+            post_user_change_password.send(self.__class__, user=self)
 
     def can_update_password(self):
         return self.is_local
