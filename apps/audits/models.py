@@ -264,7 +264,7 @@ class UserSession(models.Model):
     user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_("User agent"))
     type = models.CharField(choices=LoginTypeChoices.choices, max_length=2, verbose_name=_("Login type"))
     backend = models.CharField(max_length=32, default="", verbose_name=_("Auth backend"))
-    date_created = models.DateTimeField(null=True, blank=True, verbose_name=_('Date created'))
+    date_created = models.DateTimeField(null=True, blank=True, verbose_name=_('Login date'))
     user = models.ForeignKey(
         'users.User', verbose_name=_('User'), related_name='sessions', on_delete=models.CASCADE
     )
