@@ -55,7 +55,9 @@ ARG BUILD_DEPENDENCIES="              \
 
 ARG DEPENDENCIES="                    \
         default-libmysqlclient-dev    \
+        freetds-dev                   \
         gettext                       \
+        libkrb5-dev                   \
         libldap2-dev                  \
         libsasl2-dev"
 
