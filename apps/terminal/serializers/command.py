@@ -16,7 +16,7 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))
     input = serializers.CharField(label=_("Command"))
-    session = serializers.CharField(max_length=36, label=_("Session ID"))
+    session = serializers.CharField(max_length=36, label=_("Session"))
     risk_level = LabeledChoiceField(
         choices=RiskLevelChoices.choices,
         required=False, label=_("Risk level"),
