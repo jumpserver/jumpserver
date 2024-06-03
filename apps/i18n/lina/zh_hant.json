@@ -1716,7 +1716,7 @@
     "ip_group": "IP 組",
     "ips": "請輸入逗號分割的IP位址組",
     "isEffective": "已生效的",
-    "isFinished": "是否完成",
+    "IsFinished": "完成",
     "isSuccess": "成功",
     "isValid": "有效",
     "is_locked": "是否暫停",

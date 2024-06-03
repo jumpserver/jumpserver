@@ -595,7 +595,7 @@
     "IsActive": "Activate",
     "IsAlwaysUpdate": "最新の資産を保持",
     "IsAlwaysUpdateHelpTip": "同期タスクを実行するたびに、資産情報（ホスト名、ip、プラットフォーム、ドメイン、ノードなど）を同期更新するかどうか",
-    "IsFinished": "完了したか",
+    "IsFinished": "完了",
     "IsLocked": "一時停止しますか",
     "IsSuccess": "成功",
     "IsSyncAccountHelpText": "収集が完了すると、収集したアカウントが資産に同期されます",
