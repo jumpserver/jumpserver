@@ -54,9 +54,12 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             'ssh_key_change_strategy', 'passphrase', 'recipients', 'params'
         ]
         extra_kwargs = {**BaseAutomationSerializer.Meta.extra_kwargs, **{
-            'accounts': {'required': True},
+            'accounts': {'required': True, 'help_text': _('Please enter your account username')},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 "Currently only mail sending is supported"
+            )},
+            'params': {'help_text': _(
+                "Secret parameter settings, currently only effective for assets of the host type."
             )},
         }}
 

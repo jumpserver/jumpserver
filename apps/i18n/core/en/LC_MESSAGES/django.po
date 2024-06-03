@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-31 11:28+0800\n"
+"POT-Creation-Date: 2024-06-03 10:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,7 +112,7 @@ msgid "Update"
 msgstr ""
 
 #: accounts/const/account.py:34 accounts/const/automation.py:109
-#: accounts/serializers/automations/change_secret.py:164 audits/const.py:62
+#: accounts/serializers/automations/change_secret.py:167 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:47
 msgid "Failed"
@@ -227,7 +227,7 @@ msgid "SFTP"
 msgstr ""
 
 #: accounts/const/automation.py:110
-#: accounts/serializers/automations/change_secret.py:163 audits/const.py:61
+#: accounts/serializers/automations/change_secret.py:166 audits/const.py:61
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
@@ -272,8 +272,8 @@ msgstr ""
 #: accounts/serializers/account/account.py:215
 #: accounts/serializers/account/account.py:260
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:108
-#: accounts/serializers/automations/change_secret.py:140
+#: accounts/serializers/automations/change_secret.py:111
+#: accounts/serializers/automations/change_secret.py:143
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: acls/serializers/base.py:123 assets/models/asset/common.py:95
@@ -312,8 +312,8 @@ msgid "Source ID"
 msgstr ""
 
 #: accounts/models/account.py:61
-#: accounts/serializers/automations/change_secret.py:110
-#: accounts/serializers/automations/change_secret.py:141
+#: accounts/serializers/automations/change_secret.py:113
+#: accounts/serializers/automations/change_secret.py:144
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:124
 #: acls/templates/acls/asset_login_reminder.html:10
@@ -424,8 +424,8 @@ msgid "Reason"
 msgstr ""
 
 #: accounts/models/automations/backup_account.py:136
-#: accounts/serializers/automations/change_secret.py:107
-#: accounts/serializers/automations/change_secret.py:142
+#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:145
 #: ops/serializers/job.py:74 terminal/serializers/session.py:52
 msgid "Is success"
 msgstr "Is success"
@@ -480,7 +480,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:58
 #: settings/serializers/auth/ldap.py:100 settings/serializers/msg.py:45
 msgid "Recipient"
-msgstr ""
+msgstr "Recipients"
 
 #: accounts/models/automations/change_secret.py:22
 msgid "Change secret automation"
@@ -582,6 +582,7 @@ msgstr ""
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
+#: perms/serializers/permission.py:42 perms/serializers/permission.py:64
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr ""
@@ -993,15 +994,25 @@ msgstr ""
 msgid "SSH Key strategy"
 msgstr ""
 
-#: accounts/serializers/automations/change_secret.py:81
+#: accounts/serializers/automations/change_secret.py:57
+msgid "Please enter your account username"
+msgstr ""
+
+#: accounts/serializers/automations/change_secret.py:62
+msgid ""
+"Secret parameter settings, currently only effective for assets of the host "
+"type."
+msgstr ""
+
+#: accounts/serializers/automations/change_secret.py:84
 msgid "* Please enter the correct password length"
 msgstr ""
 
-#: accounts/serializers/automations/change_secret.py:85
+#: accounts/serializers/automations/change_secret.py:88
 msgid "* Password length range 6-30 bits"
 msgstr ""
 
-#: accounts/serializers/automations/change_secret.py:114
+#: accounts/serializers/automations/change_secret.py:117
 #: assets/models/automations/base.py:127
 msgid "Automation task execution"
 msgstr ""
@@ -3239,8 +3250,7 @@ msgid "Ticket info"
 msgstr ""
 
 #: authentication/serializers/connection_token.py:21
-#: perms/models/asset_permission.py:77 perms/serializers/permission.py:42
-#: perms/serializers/permission.py:64
+#: perms/models/asset_permission.py:77
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
