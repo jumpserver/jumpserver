@@ -68,7 +68,7 @@ class NativeClient(TextChoices):
 
     @classmethod
     def xpack_methods(cls):
-        return [cls.mstsc]
+        return [cls.mstsc, cls.db_client]
 
     @classmethod
     def get_methods(cls, os='windows'):
