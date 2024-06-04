@@ -1,7 +1,4 @@
-ARG VERSION
-ARG BASE_IMAGE=jumpserver/core
-
-FROM python:3.11-slim-bullseye as stage-1
+FROM debian:bullseye-slim as stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
@@ -9,8 +6,8 @@ ARG DEPENDENCIES="                    \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
@@ -48,15 +45,44 @@ RUN echo > /opt/jumpserver/config.yml \
         sed -i "s@VERSION = .*@VERSION = '${VERSION}'@g" apps/jumpserver/const.py; \
     fi
 
-FROM ${BASE_IMAGE}:${VERSION}-base as stage-2
+FROM python:3.11-slim-bullseye as stage-2
 ARG TARGETARCH
+
+ARG BUILD_DEPENDENCIES="              \
+        g++                           \
+        make                          \
+        pkg-config"
+
+ARG DEPENDENCIES="                    \
+        default-libmysqlclient-dev    \
+        freetds-dev                   \
+        gettext                       \
+        libkrb5-dev                   \
+        libldap2-dev                  \
+        libsasl2-dev"
+
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
+    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt/jumpserver
 
-RUN --mount=type=cache,target=/root/.cache,sharing=locked \
-    --mount=type=bind,source=poetry.lock,target=/opt/jumpserver/poetry.lock \
-    --mount=type=bind,source=pyproject.toml,target=/opt/jumpserver/pyproject.toml \
+ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
+RUN --mount=type=cache,target=/root/.cache,sharing=locked,id=core \
+    --mount=type=bind,source=poetry.lock,target=poetry.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     set -ex \
+    && python3 -m venv /opt/py3 \
+    && pip install poetry -i ${PIP_MIRROR} \
+    && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
     && poetry install --only main
 
@@ -75,9 +101,7 @@ ENV LANG=en_US.UTF-8 \
 
 ARG DEPENDENCIES="                    \
         libldap2-dev                  \
-        libpq-dev                     \
-        libx11-dev                    \
-        libxmlsec1-openssl"
+        libx11-dev"
 
 ARG TOOLS="                           \
         ca-certificates               \
@@ -86,8 +110,8 @@ ARG TOOLS="                           \
         sshpass"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
