@@ -113,7 +113,10 @@ class LabelRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         if value is None:
             return value
-        return str(value.label)
+        label = value.label
+        if not label:
+            return None
+        return {'id': label.id, 'name': label.name, 'value': label.value, 'color': label.color}
 
     def to_internal_value(self, data):
         from labels.models import LabeledResource, Label
