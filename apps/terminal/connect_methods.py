@@ -151,6 +151,7 @@ class ConnectMethodUtil:
 
                     Protocol.mysql, Protocol.mariadb,
                     Protocol.sqlserver, Protocol.postgresql,
+                    Protocol.oracle
                 ],
                 # 限制客户端的协议，比如 koko 虽然也支持 数据库的 ssh 连接，但是不再这里拉起
                 # Listen协议: [Asset协议]
