@@ -105,6 +105,22 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
             return True
         return False
 
+    @property
+    def real_accounts(self):
+        return [a for a in self.accounts if not a.startswith('@') or a == '@ALL']
+
+    @real_accounts.setter
+    def real_accounts(self, value):
+        self.accounts += value
+
+    @property
+    def virtual_accounts(self):
+        return [a for a in self.accounts if a.startswith('@') and a != '@ALL']
+
+    @virtual_accounts.setter
+    def virtual_accounts(self, value):
+        self.accounts += value
+
     @lazyproperty
     def users_amount(self):
         return self.users.count()

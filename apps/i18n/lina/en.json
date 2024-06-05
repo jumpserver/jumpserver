@@ -226,7 +226,7 @@
     "ChangeSecretParams": "Change secret parameters",
     "ChangeViewHelpText": "Click to switch different views",
     "Chat": "Chat",
-    "ChatHello": "Hello! Can i help you?",
+    "ChatHello": "Hello, can I help you?",
     "ChatAI": "Chat AI",
     "ChdirHelpText": "By default, the execution directory is the user's home directory",
     "CheckAssetsAmount": "Check asset quantity",
