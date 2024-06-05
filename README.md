@@ -13,6 +13,8 @@
 
 For 9 years, pouring heart and soul into creating a high-quality open-source bastion host. <br/>
 
+[![][github-trending-shield]][github-trending-link]
+
 </div>
 
 #
@@ -204,6 +206,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
+[github-trending-link]: https://trendshift.io/repositories/5071
 
 <!-- Shield link-->
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
@@ -211,6 +214,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
 [discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
 [version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
+[github-trending-shield]: https://trendshift.io/api/badge/repositories/5071
 
 <!-- Image link -->
 [image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
