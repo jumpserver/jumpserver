@@ -21,10 +21,8 @@ For 9 years, pouring heart and soul into creating a high-quality open-source bas
 ![][image-dashboard]
 _[To-do]: Need to design the graphics._
 
-<details>
-<summary><kbd>Table of contents</kbd></summary>
 
-#### TOC
+## Table of contents
 
 - [Getting Started](#getting-started)
 - [Introduction](#introduction)
@@ -35,7 +33,7 @@ _[To-do]: Need to design the graphics._
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
-####
+
 
 <br/>
 
