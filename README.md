@@ -176,6 +176,13 @@ JumpServer is a secure product. Please refer to the Basic Security Recommendatio
 - Email: support@fit2cloud.com
 - Phone: 400-052-0755
 
+## Acknowledgements
+
+#### Icons by Icons8
+The icons used in this project are provided by [Icons8](https://icons8.com/). <br/>
+Icons8 is an excellent platform that offers free icon resources, providing a diverse selection of icons for projects. <br/>
+We are grateful to Icons8 for providing us with such high-quality resources!
+
 ## License
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.
 
@@ -184,7 +191,6 @@ Licensed under The GNU General Public License version 3 (GPLv3) (the "License");
 https://www.gnu.org/licenses/gpl-3.0.html
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
 
 
 <!-- JumpServer official link -->
