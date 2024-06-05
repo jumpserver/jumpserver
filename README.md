@@ -13,16 +13,16 @@
 
 For 9 years, pouring heart and soul into creating a high-quality open-source bastion host. <br/>
 
+<!-- [![][github-trending-shield]][github-trending-link] -->
+
 </div>
 
 #
 ![][image-dashboard]
 _[To-do]: Need to design the graphics._
 
-<details>
-<summary><kbd>Table of contents</kbd></summary>
 
-#### TOC
+## Table of contents
 
 - [Getting Started](#getting-started)
 - [Introduction](#introduction)
@@ -30,10 +30,11 @@ _[To-do]: Need to design the graphics._
 - [Installation](#installation)
 - [Product Architecture & Components](#product-architecture--components)
 - [Features](#features)
+- [Acknowledgements](#acknowledgements)
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
-####
+
 
 <br/>
 
@@ -167,6 +168,9 @@ Below are the features supported by JumpServer, covering various aspects of oper
 
 For details, [See Docs][docs-link].
 
+## Acknowledgements
+- [Icons8](https://icons8.com/) is an excellent platform that offers free icon resources, providing a diverse selection of icons for projects. We are grateful to Icons8 for providing us with such high-quality resources!
+
 ## Contributing
 Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributing-link] for guidelines.
 
@@ -186,7 +190,6 @@ https://www.gnu.org/licenses/gpl-3.0.html
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 
-
 <!-- JumpServer official link -->
 [official-website-en-link]: https://jumpserver.org/
 [docs-link]: https://docs.jumpserver.org/
@@ -204,6 +207,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
+[github-trending-link]: https://trendshift.io/repositories/5071
 
 <!-- Shield link-->
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
@@ -211,6 +215,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
 [discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
 [version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
+[github-trending-shield]: https://trendshift.io/api/badge/repositories/5071
 
 <!-- Image link -->
 [image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
