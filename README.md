@@ -30,6 +30,7 @@ _[To-do]: Need to design the graphics._
 - [Installation](#installation)
 - [Product Architecture & Components](#product-architecture--components)
 - [Features](#features)
+- [Acknowledgements](#acknowledgements)
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
@@ -167,6 +168,9 @@ Below are the features supported by JumpServer, covering various aspects of oper
 
 For details, [See Docs][docs-link].
 
+## Acknowledgements
+- [Icons8](https://icons8.com/) is an excellent platform that offers free icon resources, providing a diverse selection of icons for projects. We are grateful to Icons8 for providing us with such high-quality resources!
+
 ## Contributing
 Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributing-link] for guidelines.
 
@@ -175,13 +179,6 @@ JumpServer is a secure product. Please refer to the Basic Security Recommendatio
 
 - Email: support@fit2cloud.com
 - Phone: 400-052-0755
-
-## Acknowledgements
-
-#### Icons by Icons8
-The icons used in this project are provided by [Icons8](https://icons8.com/). <br/>
-Icons8 is an excellent platform that offers free icon resources, providing a diverse selection of icons for projects. <br/>
-We are grateful to Icons8 for providing us with such high-quality resources!
 
 ## License
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.
