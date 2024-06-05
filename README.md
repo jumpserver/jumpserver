@@ -13,7 +13,7 @@
 
 For 9 years, pouring heart and soul into creating a high-quality open-source bastion host. <br/>
 
-# [![][github-trending-shield]][github-trending-link]
+<!-- [![][github-trending-shield]][github-trending-link] -->
 
 </div>
 
