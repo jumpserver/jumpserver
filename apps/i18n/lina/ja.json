@@ -337,6 +337,7 @@
     "CriticalLoad": "重大",
     "CronExpression": "crontab完全表現",
     "Crontab": "定時実行タスク",
+    "CrontabDiffError": "定期実行の間隔が10分以上であることをご確認ください！",
     "CrontabHelpText": "同時にintervalとcrontabを設定した場合、crontabが優先されます",
     "CrontabHelpTip": "例えば：日曜日の03:05に実行 <5 3 * * 0> <br/> 5桁のlinux crontab表現を使用<min hour day Month weekday> (<a href=\\\"https://tool.lu /crontab/\\\" target=\\\"_blank\\\">オンラインツール</a>) <br/>",
     "CrontabOfCreateUpdatePage": "例：毎週日曜日の03:05に実行 <5 3 * * 0> <br/> 5桁のLinux crontab表現を使用してください <分  時 日 月 星期> (<a href=\"https://tool.lu/crontab/\" target=\"_blank\">オンラインツール</a>) <br/> 定期的な実行と周期的な実行が設定されている場合、定期的な実行が優先されます",
