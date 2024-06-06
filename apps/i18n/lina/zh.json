@@ -346,6 +346,7 @@
     "Interval": "间隔",
     "CriticalLoad": "严重",
     "CronExpression": "crontab完整表达式",
+    "CrontabDiffError": "请确保定期执行的时间间隔不少于十分钟！",
     "CrontabOfCreateUpdatePage": "例如：每周日 03:05 执行 <5 3 * * 0> <br/> 使用5位 Linux crontab 表达式 <分 时 日 月 星期> （<a href=\"https://tool.lu/crontab/\" target=\"_blank\">在线工具</a>） <br/> 如果同时设置了定期执行和周期执行，优先使用定期执行",
     "CurrentConnectionUsers": "当前会话用户数",
     "CurrentConnections": "当前连接数",

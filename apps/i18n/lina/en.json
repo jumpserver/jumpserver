@@ -332,6 +332,7 @@
     "CreatedBy": "Creator",
     "CriticalLoad": "Serious",
     "CronExpression": "Complete crontab expression",
+    "CrontabDiffError": "Please ensure that the interval for scheduled execution is no less than ten minutes!",
     "CrontabHelpText": "If both interval and crontab are set, crontab is prioritized",
     "CrontabHelpTip": "For example: perform every sunday at 03:05 <5 3 * * 0> <br/> use 5-digit linux crontab expressions <min hour day month weekday> (<a href=\"https://tool.lu/crontab/\" target=\"_blank\">online tool</a>) <br/> ",
     "CrontabOfCreateUpdatePage": "",
