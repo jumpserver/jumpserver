@@ -43,8 +43,6 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     accounts = serializers.ListField(label=_("Accounts"), required=False)
-    real_accounts = serializers.ListField(label=_("General accounts"), required=False)
-    virtual_accounts = serializers.ListField(label=_("Virtual accounts"), required=False)
     protocols = serializers.ListField(label=_("Protocols"), required=False)
 
     template_accounts = AccountTemplate.objects.none()
@@ -54,7 +52,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         fields_mini = ["id", "name"]
         amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
         fields_generic = [
-            "accounts", "real_accounts", "virtual_accounts", "protocols", "actions",
+            "accounts", "protocols", "actions",
             "created_by", "date_created", "date_start", "date_expired", "is_active",
             "is_expired", "is_valid", "comment", "from_ticket",
         ]
@@ -136,9 +134,6 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         self.template_accounts = AccountTemplate.objects.filter(id__in=template_ids)
         template_usernames = list(self.template_accounts.values_list('username', flat=True))
         return list(set(account_usernames + template_usernames))
-
-    def validate_real_accounts(self, usernames):
-        return self.validate_accounts(usernames)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
