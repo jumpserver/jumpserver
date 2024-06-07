@@ -9,7 +9,7 @@ from common.utils import get_logger
 from common.utils.timezone import local_now_display
 from ops.celery.decorator import after_app_ready_start
 from ops.celery.utils import (
-    create_or_update_celery_periodic_tasks, delete_celery_periodic_task
+    create_or_update_celery_periodic_tasks, disable_celery_periodic_task
 )
 from orgs.models import Organization
 from settings.notifications import LDAPImportMessage
@@ -65,20 +65,15 @@ def import_ldap_user():
 
 @shared_task(verbose_name=_('Registration periodic import ldap user task'))
 @after_app_ready_start
-def import_ldap_user_periodic():
-    if not settings.AUTH_LDAP:
-        return
+def import_ldap_user_periodic(**kwargs):
     task_name = 'import_ldap_user_periodic'
-    delete_celery_periodic_task(task_name)
-    if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
-        return
-
-    interval = settings.AUTH_LDAP_SYNC_INTERVAL
+    interval = kwargs.get('AUTH_LDAP_SYNC_INTERVAL', settings.AUTH_LDAP_SYNC_INTERVAL)
+    enabled = kwargs.get('AUTH_LDAP_SYNC_IS_PERIODIC', settings.AUTH_LDAP_SYNC_IS_PERIODIC)
+    crontab = kwargs.get('AUTH_LDAP_SYNC_CRONTAB', settings.AUTH_LDAP_SYNC_CRONTAB)
     if isinstance(interval, int):
         interval = interval * 3600
     else:
         interval = None
-    crontab = settings.AUTH_LDAP_SYNC_CRONTAB
     if crontab:
         # 优先使用 crontab
         interval = None
@@ -86,7 +81,8 @@ def import_ldap_user_periodic():
         task_name: {
             'task': import_ldap_user.name,
             'interval': interval,
-            'crontab': crontab
+            'crontab': crontab,
+            'enabled': enabled
         }
     }
     create_or_update_celery_periodic_tasks(tasks)
