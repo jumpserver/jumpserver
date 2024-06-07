@@ -50,7 +50,7 @@ class PeriodTaskModelMixin(models.Model):
         name, task, args, kwargs = self.get_register_task()
         is_active = self.is_active if hasattr(self, 'is_active') else True
         if not self.is_periodic or not is_active:
-            disable_celery_periodic_task(name)
+            delete_celery_periodic_task(name)
             return
 
         crontab = interval = None
