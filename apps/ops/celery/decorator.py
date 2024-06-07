@@ -57,21 +57,22 @@ def register_as_period_task(
         task = '{func.__module__}.{func.__name__}'.format(func=func)
         _name = name if name else task
         add_register_period_task({
-           _name: {
-               'task': task,
-               'interval': interval,
-               'crontab': crontab,
-               'args': args,
-               'kwargs': kwargs if kwargs else {},
-               'enabled': True,
-               'description': description
-           }
+            _name: {
+                'task': task,
+                'interval': interval,
+                'crontab': crontab,
+                'args': args,
+                'kwargs': kwargs if kwargs else {},
+                'description': description
+            }
         })
 
         @wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorate
 
 
@@ -85,6 +86,7 @@ def after_app_ready_start(func):
     @wraps(func)
     def decorate(*args, **kwargs):
         return func(*args, **kwargs)
+
     return decorate
 
 
@@ -98,4 +100,5 @@ def after_app_shutdown_clean_periodic(func):
     @wraps(func)
     def decorate(*args, **kwargs):
         return func(*args, **kwargs)
+
     return decorate
