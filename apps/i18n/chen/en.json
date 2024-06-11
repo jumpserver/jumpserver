@@ -1,77 +1,49 @@
 {
-  "action": {
-    "refresh": "Refresh",
-    "new": "New",
-    "new_query": "New Query",
-    "view_data": "View Data",
-    "show_properties": "Show Properties",
-    "label": {
-      "name": "Name",
-      "type": "Type",
-      "version": "Version",
-      "user": "User",
-      "jdbc_url": "JDBC URL",
-      "driver_class": "Driver Class",
-      "driver_version": "Driver Version"
-    }
-  },
-  "title": {
-    "query": "Query",
-    "properties": "Properties",
-    "datasource_properties": "Datasource Properties"
-  },
-  "state": {
-    "connected": "Connected"
-  },
-  "msg": {
-    "error": {
-      "fetch_error": "Error while fetching data",
-      "connect_error": "Error while connecting",
-      "change_context_error": "Error while changing context",
-      "parse_error": "Error while parsing",
-      "execute_error": "Error while executing",
-      "already_first_page": "It's already the first page",
-      "already_last_page": "It's already the last page",
-      "perms_expired": "Permissions associated with this session expired on %s",
-      "over_max_idle_time": "Since this sessioon has been idle for more than %d minutes, it has been closed",
-      "over_max_session_time": "Since this session has been active for more than %d hours, it has been closed",
-      "command_review_timeout": "Command review request has timed out",
-      "command_review_reject": "Command review request has been rejected by %s",
-      "session_closed_by": "This session has been closed by %s.",
-      "user_cancel_command_review": "The user has cancelled the command review.",
-      "session_locked": "This session has been paused and cannot continue executing commands",
-      "no_permission": " You do not have permission to perform this action",
-      "acl_reject": " Command rejected by ACL"
-    },
-    "success": {
-      "execute_success": "Executed successfully",
-      "connect_success": "Connected successfully"
-    },
-    "info": {
-      "affected_rows": "Affected rows"
-    },
-    "dialog": {
-      "session_locked": "This session is locked by %s, please wait for the session to be unlocked.",
-      "session_unlocked": "This session has been unlocked by %s.",
-      "title": {
-        "init_datasource": "Initialize Datasource",
-        "init_datasource_failed": "Initialize Datasource Failed",
-        "error_message": "Error Message",
-        "session_finished": "Session Finished",
-        "command_review": "Command Review"
-      },
-      "message": {
-        "init_datasource": "Initializing data source, please wait...",
-        "init_datasource_failed": "Connection failed, please check if the database connection configuration is correct",
-        "command_review": "The command you entered requires verification before it can be executed. Would you like to initiate a review request?",
-        "wait_command_review": "The review request has been initiated, please wait for the review results"
-      }
-    }
-  },
-  "btn": {
-    "label": {
-      "submit": "Submit",
-      "cancel": "Cancel"
-    }
-  }
+  "Refresh": "Refresh",
+  "NewQuery": "New query",
+  "ViewData": "View data",
+  "ShowProperties": "Show properties",
+  "Name": "Name",
+  "Type": "Type",
+  "Version": "Version",
+  "User": "User",
+  "JDBCURL": "JDBC URL",
+  "DriverClass": "Driver class",
+  "DriverVersion": "Driver version",
+  "Properties": "Properties",
+  "DatabaseProperties": "Datasource properties",
+  "Connected": "Connected",
+  "FetchError": "Error while fetching data",
+  "ConnectError": "Error while fetching data",
+  "ChangeContextError": "Error while changing context",
+  "ParseError": "Error while parsing",
+  "ExecuteError": "Error while executing",
+  "AlreadyFirstPageError": "It's already the first page",
+  "AlreadyLastPageError": "It's already the last page",
+  "CommandReviewRejectBy": "Command review request has been rejected by %s",
+  "SessionClosedBy": "This session has been closed by %s.",
+  "PermissionsExpiredOn": "Permissions associated with this session expired on %s",
+  "OverMaxIdleTimeError": "Since this sessioon has been idle for more than %d minutes, it has been closed",
+  "OverMaxSessionTimeError": "Since this session has been active for more than %d hours, it has been closed",
+  "CommandReviewTimeoutError": "Command review request has timed out",
+  "UserCancelCommandReviewError": "The user has cancelled the command review.",
+  "SessionLockedError": "This session has been paused and cannot continue executing commands",
+  "NoPermissionError": " You do not have permission to perform this action",
+  "ACLRejectError": " Command rejected by ACL",
+  "ExecuteSuccess": "Executed successfully",
+  "ConnectSuccess": "Connected successfully",
+  "AffectedRows": "Affected rows",
+  "SessionLockedMessage": "This session is locked by %s, please wait for the session to be unlocked.",
+  "SessionUnlockedMessage": "This session has been unlocked by %s.",
+  "InitializeDatasource": "Initialize datasource",
+  "InitializeDatasourceFailed": "Initialize datasource failed",
+  "ErrorMessage": "Error message",
+  "SessionFinished": "Session finished",
+  "CommandReview": "Command review",
+  "InitializingDatasourceMessage": "Initializing data source, please wait...",
+  "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct",
+  "CommandReviewMessage": "The command you entered requires verification before it can be executed. Would you like to initiate a review request?",
+  "WaitCommandReviewMessage": "The review request has been initiated, please wait for the review results",
+  "Submit": "Submit",
+  "Cancel": "Cancel"
 }

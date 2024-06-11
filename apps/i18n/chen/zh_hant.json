@@ -1,77 +1,49 @@
 {
-  "action": {
-    "refresh": "刷新",
-    "new": "新建",
-    "new_query": "新建查詢",
-    "view_data": "查看數據",
-    "show_properties": "屬性",
-    "label": {
-      "name": "名稱",
-      "type": "類型",
-      "version": "版本",
-      "user": "用戶",
-      "jdbc_url": "JDBC 連結",
-      "driver_class": "驅動類",
-      "driver_version": "驅動版本"
-    }
-  },
-  "title": {
-    "query": "查詢",
-    "properties": "屬性",
-    "datasource_properties": "數據源屬性"
-  },
-  "state": {
-    "connected": "已連接"
-  },
-  "msg": {
-    "error": {
-      "fetch_data": "獲取數據失敗",
-      "connect_error": "連接失敗",
-      "change_context_error": "切換上下文錯誤",
-      "parse_error": "解析錯誤",
-      "execute_error": "執行錯誤",
-      "already_first_page": "已經是第一頁",
-      "already_last_page": "已經是最後一頁",
-      "user_cancel_command_review": "用戶取消命令覆核",
-      "command_review_timeout": "命令覆核超時",
-      "command_review_reject": "命令覆核被 %s 拒絕",
-      "perms_expired": "此會話關聯的權限已於 %s 過期",
-      "over_max_idle_time": "由於此會話空閒時間大於 %d 分鐘，已經被關閉",
-      "over_max_session_time": "由於此會話時間大於 %d 小時，已經被關閉",
-      "session_closed_by": "當前會話被管理員 %s 關閉",
-      "session_locked": "當前會話已被鎖定，無法繼續執行命令",
-      "no_permission": " 沒有執行此操作的權限",
-      "acl_reject": " 此命令禁止被執行"
-    },
-    "success": {
-      "execute_success": "執行成功",
-      "connect_success": "連接成功"
-    },
-    "info": {
-      "affected_rows": "受影響行數"
-    },
-    "dialog": {
-      "session_locked": "此會話已被 %s 鎖定，無法繼續執行命令",
-      "session_unlocked": "此會話已被 %s 解鎖，可以繼續執行命令",
-      "title": {
-        "init_datasource": "初始化數據源",
-        "init_datasource_failed": "初始化數據源失敗",
-        "error_message": "錯誤消息",
-        "session_finished": "會話已結束",
-        "command_review": "命令覆核"
-      },
-      "message": {
-        "init_datasource": "正在初始化數據源，請稍候...",
-        "init_datasource_failed": "連接失敗，請檢查資料庫連接配置是否正確",
-        "command_review": "您輸入的命令需要覆核後才可以執行, 是否發起覆核請求?",
-        "wait_command_review": "覆核請求已發起, 請等待覆核結果"
-      }
-    }
-  },
-  "btn": {
-    "label": {
-      "submit": "提交",
-      "cancel": "取消"
-    }
-  }
+  "Refresh": "刷新",
+  "NewQuery": "新建查詢",
+  "ViewData": "查看資料",
+  "ShowProperties": "屬性",
+  "Name": "名稱",
+  "Type": "類型",
+  "Version": "版本",
+  "User": "用戶",
+  "JDBCURL": "JDBC URL",
+  "DriverClass": "驅動類",
+  "DriverVersion": "驅動版本",
+  "Properties": "屬性",
+  "DatabaseProperties": "資料源屬性",
+  "Connected": "已連接",
+  "FetchError": "獲取資料失敗",
+  "ConnectError": "連接失敗",
+  "ChangeContextError": "切換上下文失敗",
+  "ParseError": "解析失敗",
+  "ExecuteError": "執行失敗",
+  "AlreadyFirstPageError": "已經是第一頁",
+  "AlreadyLastPageError": "已經是最後一頁",
+  "CommandReviewRejectBy": "命令覆核被 %s 拒絕",
+  "SessionClosedBy": "會話被 %s 關閉",
+  "PermissionsExpiredOn": "此會話關聯的權限已於 %s 過期",
+  "OverMaxIdleTimeError": "由於此會話閒置時間大於 %d 分鐘，已經被關閉",
+  "OverMaxSessionTimeError": "由於此會話時間大於 %d 小時，已經被關閉",
+  "CommandReviewTimeoutError": "命令覆核超時",
+  "UserCancelCommandReviewError": "用戶取消命令覆核",
+  "SessionLockedError": "當前會話已被鎖定，無法繼續執行命令",
+  "NoPermissionError": "沒有執行此操作的權限",
+  "ACLRejectError": "此命令禁止被執行",
+  "ExecuteSuccess": "執行成功",
+  "ConnectSuccess": "連接成功",
+  "AffectedRows": "受影響行數",
+  "SessionLockedMessage": "此會話已被 %s 鎖定，無法繼續執行命令",
+  "SessionUnlockedMessage": "此會話已被 %s 解鎖，可以繼續執行命令",
+  "InitializeDatasource": "初始化資料源",
+  "InitializeDatasourceFailed": "初始化資料源失敗",
+  "ErrorMessage": "錯誤消息",
+  "SessionFinished": "會話已結束",
+  "CommandReview": "命令覆核",
+  "InitializingDatasourceMessage": "正在初始化資料源，請稍候...",
+  "initializingDatasourceFailedMessage": "連接失敗，請檢查資料庫連接配置是否正確",
+  "CommandReviewMessage": "您輸入的命令需要覆核後才可以執行，是否發起覆核請求?",
+  "WaitCommandReviewMessage": "覆核請求已發起，請等待覆核結果",
+  "Submit": "提交",
+  "Cancel": "取消"
 }
