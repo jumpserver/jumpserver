@@ -94,8 +94,13 @@ class ESClientV8(ESClientBase):
         return {field: {'order': direction}}
 
 
-def get_es_client_version(**kwargs):
-    es = kwargs.get('es')
+def get_es_client_version(hosts):
+    es = Elasticsearch(hosts=hosts)
+    try:
+        if not es.ping(request_timeout=3):
+            raise InvalidElasticsearch
+    except Exception:
+        pass
     info = es.info()
     version = int(info['version']['number'].split('.')[0])
     return version
@@ -104,7 +109,6 @@ def get_es_client_version(**kwargs):
 class ES(object):
 
     def __init__(self, config, properties, keyword_fields, exact_fields=None, match_fields=None):
-        self.version = 7
         self.config = config
         hosts = self.config.get('HOSTS')
         kwargs = self.config.get('OTHER', {})
@@ -113,7 +117,7 @@ class ES(object):
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
-        self.version = get_es_client_version(es=self.es)
+        self.version = self.config.get('VERSION')
         self.client = ESClient(version=self.version, hosts=hosts, max_retries=0, **kwargs)
         self.es = self.client.es
         self.index_prefix = self.config.get('INDEX') or 'jumpserver'

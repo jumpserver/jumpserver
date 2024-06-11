@@ -8,10 +8,11 @@ import jms_storage
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from elasticsearch7 import Elasticsearch
 
 from common.db.fields import EncryptJsonDictTextField
 from common.db.models import JMSBaseModel
-from common.plugins.es import QuerySet as ESQuerySet
+from common.plugins.es import QuerySet as ESQuerySet, get_es_client_version, InvalidElasticsearch
 from common.utils import get_logger
 from common.utils.timezone import local_now_date_display
 from terminal import const
@@ -77,19 +78,29 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
     def config(self):
         config = copy.deepcopy(self.meta)
         config.update({'TYPE': self.type})
+        if self.type_es:
+            if not config.get('VERSION'):
+                hosts = config.get('HOSTS')
+                self.meta.update({'VERSION': get_es_client_version(hosts)})
+                self.save(update_fields=['meta'])
+                config.update({'VERSION': self.meta['VERSION']})
         return config
 
     @property
     def valid_config(self):
         config = self.config
-        if self.type_es and config.get('INDEX_BY_DATE'):
-            engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
-            # 这里使用一个全新的 config, 防止修改当前的 config
-            store = engine_mod.CommandStore(self.config)
-            store._ensure_index_exists()
-            index_prefix = config.get('INDEX') or 'jumpserver'
-            date = local_now_date_display()
-            config['INDEX'] = '%s-%s' % (index_prefix, date)
+        if self.type_es:
+            if config.get('INDEX_BY_DATE'):
+                engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
+                # 这里使用一个全新的 config, 防止修改当前的 config
+                store = engine_mod.CommandStore(self.config)
+                store._ensure_index_exists()
+                index_prefix = config.get('INDEX') or 'jumpserver'
+                date = local_now_date_display()
+                config['INDEX'] = '%s-%s' % (index_prefix, date)
+            if not config.get('VERSION'):
+                hosts = self.config.get('HOSTS')
+                config['VERSION'] = get_es_client_version(hosts)
         return config
 
     def is_valid(self):
