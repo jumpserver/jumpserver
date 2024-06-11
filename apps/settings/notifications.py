@@ -11,13 +11,13 @@ logger = get_logger(__file__)
 class LDAPImportMessage(UserMessage):
     def __init__(self, user, extra_kwargs):
         super().__init__(user)
-        self.orgs = extra_kwargs.pop('orgs', [])
-        self.end_time = extra_kwargs.pop('end_time', '')
-        self.start_time = extra_kwargs.pop('start_time', '')
-        self.time_start_display = extra_kwargs.pop('time_start_display', '')
-        self.new_users = extra_kwargs.pop('new_users', [])
-        self.errors = extra_kwargs.pop('errors', [])
-        self.cost_time = extra_kwargs.pop('cost_time', '')
+        self.orgs = extra_kwargs.get('orgs', [])
+        self.end_time = extra_kwargs.get('end_time', '')
+        self.start_time = extra_kwargs.get('start_time', '')
+        self.time_start_display = extra_kwargs.get('time_start_display', '')
+        self.new_users = extra_kwargs.get('new_users', [])
+        self.errors = extra_kwargs.get('errors', [])
+        self.cost_time = extra_kwargs.get('cost_time', '')
 
     def get_html_msg(self) -> dict:
         subject = _('Notification of Synchronized LDAP User Task Results')
