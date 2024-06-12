@@ -43,7 +43,8 @@ class NotSupportElasticsearch8(JMSException):
 class ESClient(object):
 
     def __new__(cls, *args, **kwargs):
-        version = kwargs.pop('version')
+        hosts = kwargs.get('hosts', [])
+        version = get_es_client_version(hosts=hosts)
         if version == 6:
             return ESClientV6(*args, **kwargs)
         if version == 7:
@@ -94,8 +95,8 @@ class ESClientV8(ESClientBase):
         return {field: {'order': direction}}
 
 
-def get_es_client_version(**kwargs):
-    es = kwargs.get('es')
+def get_es_client_version(hosts, **kwargs):
+    es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
     info = es.info()
     version = int(info['version']['number'].split('.')[0])
     return version
@@ -112,9 +113,7 @@ class ES(object):
         ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
-        self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
-        self.version = get_es_client_version(es=self.es)
-        self.client = ESClient(version=self.version, hosts=hosts, max_retries=0, **kwargs)
+        self.client = ESClient(hosts=hosts, max_retries=0, **kwargs)
         self.es = self.client.es
         self.index_prefix = self.config.get('INDEX') or 'jumpserver'
         self.is_index_by_date = bool(self.config.get('INDEX_BY_DATE', False))
@@ -227,11 +226,15 @@ class ES(object):
 
     def _filter(self, query: dict, from_=None, size=None, sort=None):
         body = self.get_query_body(**query)
-
-        data = self.es.search(
-            index=self.query_index, body=body,
-            from_=from_, size=size, sort=sort
-        )
+        search_params = {
+            'index': self.query_index,
+            'body': body,
+            'from_': from_,
+            'size': size
+        }
+        if sort is not None:
+            search_params['sort'] = sort
+        data = self.es.search(**search_params)
 
         source_data = []
         for item in data['hits']['hits']:
