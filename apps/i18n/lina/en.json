@@ -408,7 +408,7 @@
     "Disable": "Disable",
     "DisableSelected": "Disable selected",
     "DisplayName": "Name",
-    "Docs": "Document",
+    "Docs": "Docs",
     "Download": "Download",
     "DownloadCenter": "Download",
     "DownloadFTPFileTip": "The current action does not record files, or the file size exceeds the threshold (default 100m), or it has not yet been saved to the corresponding storage",

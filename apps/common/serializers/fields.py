@@ -122,11 +122,17 @@ class LabelRelatedField(serializers.RelatedField):
         from labels.models import LabeledResource, Label
         if data is None:
             return data
-        if isinstance(data, dict):
+        if isinstance(data, dict) and data.get("id"):
             pk = data.get("id") or data.get("pk")
             label = Label.objects.get(pk=pk)
         else:
-            k, v = data.split(":", 1)
+            if isinstance(data, dict):
+                k = data.get("name")
+                v = data.get("value")
+            elif isinstance(data, str) and ":" in data:
+                k, v = data.split(":", 1)
+            else:
+                raise serializers.ValidationError(_("Invalid data type"))
             label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
         return LabeledResource(label=label)
 
