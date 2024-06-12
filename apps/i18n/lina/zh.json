@@ -200,7 +200,7 @@
     "BasicSettings": "基本设置",
     "BatchConsent": "批量同意",
     "BatchDeployment": "批量部署",
-    "BatchProcessing": "批量处理(选中 {Number} 项)",
+    "BatchProcessing": "批量处理(选中 {number} 项)",
     "BatchReject": "批量拒绝",
     "BatchTest": "批量测试",
     "BeforeChange": "变更前",
