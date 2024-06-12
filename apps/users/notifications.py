@@ -191,7 +191,7 @@ class UserExpirationReminderMsg(UserMessage):
 class ResetSSHKeyMsg(UserMessage):
     def get_html_msg(self) -> dict:
         subject = _('Reset SSH Key')
-        update_url = urljoin(settings.SITE_URL, '/ui/#/profile/setting/?activeTab=SSHUpdate')
+        update_url = urljoin(settings.SITE_URL, '/ui/#/profile/password-and-ssh-key/?tab=SSHKey')
         context = {
             'name': self.user.name,
             'url': update_url,

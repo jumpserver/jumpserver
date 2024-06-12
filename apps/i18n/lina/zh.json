@@ -36,7 +36,7 @@
     "AccountGatherTaskList": "账号收集任务",
     "AccountGatherTaskCreate": "创建账号收集任务",
     "AccountGatherTaskUpdate": "更新账号收集任务",
-    "AccountList": "云账号",
+    "AccountList": "账号",
     "ChangeCredentials": "改密",
     "CrontabHelpText": "如果同时设置了 interval 和 crontab，则优先考虑 crontab",
     "LoginConfirmUser": "确认方式",

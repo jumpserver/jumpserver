@@ -2,9 +2,10 @@
 
 import json
 from functools import reduce
+
+from django.db import migrations
 from django.db.models import F
-from django.conf import settings
-from django.db import migrations, models
+
 from assets.const import AllTypes
 
 platforms_data_json = '''[
@@ -664,7 +665,8 @@ platforms_data_json = '''[
         "internal": true,
         "charset": "utf-8",
         "domain_enabled": true,
-        "su_enabled": false,
+        "su_enabled": true,
+        "su_method: "enable“，
         "name": "Cisco",
         "automation": {
             "ansible_enabled": false,
@@ -705,7 +707,8 @@ platforms_data_json = '''[
         "internal": true,
         "charset": "utf-8",
         "domain_enabled": true,
-        "su_enabled": false,
+        "su_enabled": true,
+        "su_method: "super“，
         "name": "Huawei",
         "automation": {
             "ansible_enabled": false,
@@ -746,7 +749,8 @@ platforms_data_json = '''[
         "internal": true,
         "charset": "utf-8",
         "domain_enabled": true,
-        "su_enabled": false,
+        "su_enabled": true,
+        "su_method: "super_level“，
         "name": "H3C",
         "automation": {
             "ansible_enabled": false,
@@ -1094,6 +1098,28 @@ platforms_data_json = '''[
         ]
     },
     {
+        "name": "DB2",
+        "category": "database",
+        "internal": true,
+        "type": "db2",
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "comment": "DB2",
+        "created_by": "System",
+        "updated_by": "System",
+        "protocols": [
+            {
+                "name": "db2",
+                "port": 50000,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "setting": {}
+            }
+        ]
+    },
+    {
         "category": "web",
         "type": "website",
         "internal": true,
@@ -1184,6 +1210,29 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
+    },
+    {
+        "name": "ChatGPT",
+        "internal": true,
+        "category": "gpt",
+        "type": "chatgpt",
+        "domain_enabled": false,
+        "su_enabled": false,
+        "comment": "ChatGPT",
+        "created_by": "System",
+        "updated_by": "System",
+        "protocols": [
+            {
+                "name": "chatgpt",
+                "port": 443,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "setting": {
+                    "api_mode": "gpt-3.5-turbo"
+                }
+            }
+        ]
     }
 ]'''
 
@@ -1197,36 +1246,6 @@ def create_internal_platforms(apps, *args):
         protocols = platform_data.pop('protocols', [])
         platform_data['protocols'] = [p for p in protocols if p.pop('primary', True) is not None]
         AllTypes.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls, automation_cls=automation_cls)
-
-
-def add_chatgpt_platform(apps, schema_editor):
-    platform_cls = apps.get_model('assets', 'Platform')
-    automation_cls = apps.get_model('assets', 'PlatformAutomation')
-    platform = platform_cls.objects.create(
-        name='ChatGPT', internal=True, category='gpt', type='chatgpt',
-        domain_enabled=False, su_enabled=False, comment='ChatGPT',
-        created_by='System', updated_by='System',
-    )
-    platform.protocols.create(name='chatgpt', port=443, primary=True, setting={'api_mode': 'gpt-3.5-turbo'})
-    automation_cls.objects.create(ansible_enabled=False, platform=platform)
-
-
-def add_db2_platform(apps, schema_editor):
-    platform_cls = apps.get_model('assets', 'Platform')
-    automation_cls = apps.get_model('assets', 'PlatformAutomation')
-    platform, _ = platform_cls.objects.update_or_create(
-        name='DB2', defaults={
-            'name': 'DB2', 'category': 'database',
-            'internal': True, 'type': 'db2',
-            'domain_enabled': True, 'su_enabled': False,
-            'su_method': None, 'comment': 'DB2', 'created_by': 'System',
-            'updated_by': 'System', 'custom_fields': []
-        }
-    )
-    platform.protocols.update_or_create(name='db2', defaults={
-        'name': 'db2', 'port': 50000, 'primary': True, 'setting': {}
-    })
-    automation_cls.objects.update_or_create(platform=platform, defaults={'ansible_enabled': False})
 
 
 def migrate_automation_ansible_remove_account(apps, *args):
@@ -1262,8 +1281,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(create_internal_platforms),
-        migrations.RunPython(add_chatgpt_platform),
-        migrations.RunPython(add_db2_platform),
         migrations.RunPython(migrate_automation_ansible_remove_account),
     ]
 

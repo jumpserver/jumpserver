@@ -2274,7 +2274,7 @@ msgstr "端口来自地址"
 msgid ""
 "This protocol is primary, and it must be set when adding assets. "
 "Additionally, there can only be one primary protocol."
-msgstr "该协议是主要的，添加资产时必须设置。并且只能有一个主要协议"
+msgstr "该协议是主要的，添加资产时必须设置，并且只能有一个主要协议"
 
 #: assets/serializers/platform.py:92
 msgid "This protocol is required, and it must be set when adding assets."
