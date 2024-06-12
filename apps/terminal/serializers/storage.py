@@ -188,13 +188,12 @@ def command_storage_es_host_format_validator(host):
 
 
 class CommandStorageTypeESSerializer(serializers.Serializer):
-    hosts_help_text = '''
-        Tip: If there are multiple hosts, use a comma (,) to separate them. <br>
-        (eg: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)
-    '''
     HOSTS = serializers.ListField(
         child=serializers.CharField(validators=[command_storage_es_host_format_validator]),
-        label=_('Hosts'), help_text=_(hosts_help_text), allow_null=True
+        label=_('Hosts'), help_text=_(
+            'If there are multiple hosts, use a comma (,) to separate them. <br>'
+            '(For example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)'),
+        allow_null=True
     )
     INDEX_BY_DATE = serializers.BooleanField(
         default=False, label=_('Index by date'),
@@ -266,6 +265,7 @@ meta_is_default = {
     )
 }
 
+
 # CommandStorageSerializer
 class CommandStorageSerializer(BaseStorageSerializer):
     type = LabeledChoiceField(choices=const.CommandStorageType.choices, label=_('Type'))
@@ -286,7 +286,7 @@ class ReplayStorageSerializer(BaseStorageSerializer):
 
     class Meta(BaseStorageSerializer.Meta):
         model = ReplayStorage
-        extra_kwargs ={
+        extra_kwargs = {
             'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]},
             'is_default': meta_is_default
         }
