@@ -1316,5 +1316,9 @@
     "SiteURLTip": "例如：https://demo.jumpserver.org",
     "Settings...": "设置...",
     "EmailTemplate": "邮件模版",
-    "EmailTemplateHelpTip": "邮件模版是用于发送邮件的模版，包括邮件标题前缀和邮件内容"
+    "EmailTemplateHelpTip": "邮件模版是用于发送邮件的模版，包括邮件标题前缀和邮件内容",
+    "ObjectStorage": "对象存储",
+    "ApplyLoginAsset": "登录资产",
+    "ApplyLoginUser": "登录用户",
+    "ApplyLoginAccount": "登录账号"
 }

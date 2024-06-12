@@ -1,77 +1,67 @@
 {
-  "action": {
-    "refresh": "刷新",
-    "new": "新建",
-    "new_query": "新建查询",
-    "view_data": "查看数据",
-    "show_properties": "属性",
-    "label": {
-      "name": "名称",
-      "type": "类型",
-      "version": "版本",
-      "user": "用户",
-      "jdbc_url": "JDBC 链接",
-      "driver_class": "驱动类",
-      "driver_version": "驱动版本"
-    }
-  },
-  "title": {
-    "query": "查询",
-    "properties": "属性",
-    "datasource_properties": "数据源属性"
-  },
-  "state": {
-    "connected": "已连接"
-  },
-  "msg": {
-    "error": {
-      "fetch_data": "获取数据失败",
-      "connect_error": "连接失败",
-      "change_context_error": "切换上下文错误",
-      "parse_error": "解析错误",
-      "execute_error": "执行错误",
-      "already_first_page": "已经是第一页",
-      "already_last_page": "已经是最后一页",
-      "user_cancel_command_review": "用户取消命令复核",
-      "command_review_timeout": "命令复核超时",
-      "command_review_reject": "命令复核被 %s 拒绝",
-      "perms_expired": "此会话关联的权限已于 %s 过期",
-      "over_max_idle_time": "由于此会话空闲时间大于 %d 分钟，已经被关闭",
-      "over_max_session_time": "由于此会话时间大于 %d 小时，已经被关闭",
-      "session_closed_by": "当前会话被管理员 %s 关闭",
-      "session_locked": "当前会话已被锁定，无法继续执行命令",
-      "no_permission": " 没有执行此操作的权限",
-      "acl_reject": " 此命令禁止被执行"
-    },
-    "success": {
-      "execute_success": "执行成功",
-      "connect_success": "连接成功"
-    },
-    "info": {
-      "affected_rows": "受影响行数"
-    },
-    "dialog": {
-      "session_locked": "此会话已被 %s 锁定，无法继续执行命令",
-      "session_unlocked": "此会话已被 %s 解锁，可以继续执行命令",
-      "title": {
-        "init_datasource": "初始化数据源",
-        "init_datasource_failed": "初始化数据源失败",
-        "error_message": "错误消息",
-        "session_finished": "会话已结束",
-        "command_review": "命令复核"
-      },
-      "message": {
-        "init_datasource": "正在初始化数据源，请稍候...",
-        "init_datasource_failed": "连接失败，请检查数据库连接配置是否正确",
-        "command_review": "您输入的命令需要复核后才可以执行, 是否发起复核请求?",
-        "wait_command_review": "复核请求已发起, 请等待复核结果"
-      }
-    }
-  },
-  "btn": {
-    "label": {
-      "submit": "提交",
-      "cancel": "取消"
-    }
-  }
+  "Refresh": "刷新",
+  "NewQuery": "新建查询",
+  "ViewData": "查看数据",
+  "ShowProperties": "属性",
+  "Name": "名称",
+  "Type": "类型",
+  "Version": "版本",
+  "User": "用户",
+  "JDBCURL": "JDBC URL",
+  "DriverClass": "驱动类",
+  "DriverVersion": "驱动版本",
+  "Properties": "属性",
+  "DatabaseProperties": "数据源属性",
+  "Connected": "已连接",
+  "FetchError": "获取数据失败",
+  "ConnectError": "连接失败",
+  "ChangeContextError": "切换上下文失败",
+  "ParseError": "解析失败",
+  "ExecuteError": "执行失败",
+  "AlreadyFirstPageError": "已经是第一页",
+  "AlreadyLastPageError": "已经是最后一页",
+  "CommandReviewRejectBy": "命令复核被 %s 拒绝",
+  "SessionClosedBy": "会话被 %s 关闭",
+  "PermissionsExpiredOn": "此会话关联的权限已于 %s 过期",
+  "OverMaxIdleTimeError": "由于此会话空闲时间大于 %d 分钟，已经被关闭",
+  "OverMaxSessionTimeError": "由于此会话时间大于 %d 小时，已经被关闭",
+  "CommandReviewTimeoutError": "命令复核超时",
+  "UserCancelCommandReviewError": "用户取消命令复核",
+  "SessionLockedError": "当前会话已被锁定，无法继续执行命令",
+  "NoPermissionError": "没有执行此操作的权限",
+  "ACLRejectError": " 此命令禁止被执行",
+  "ExecuteSuccess": "执行成功",
+  "ConnectSuccess": "连接成功",
+  "AffectedRows": "受影响行数",
+  "SessionLockedMessage": "此会话已被 %s 锁定，无法继续执行命令",
+  "SessionUnlockedMessage": "此会话已被 %s 解锁，可以继续执行命令",
+  "InitializeDatasource": "初始化数据源",
+  "InitializeDatasourceFailed": "初始化数据源失败",
+  "ErrorMessage": "错误消息",
+  "SessionFinished": "会员已结束",
+  "CommandReview": "命令复核",
+  "InitializingDatasourceMessage": "正在初始化数据源，请稍候...",
+  "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确",
+  "CommandReviewMessage": "您输入的命令需要复核后才可以执行, 是否发起复核请求?",
+  "WaitCommandReviewMessage": "复核请求已发起, 请等待复核结果",
+  "Submit": "提交",
+  "Cancel": "取消",
+  "DatabaseExplorer": "数据库浏览器",
+  "SaveSQL": "保存 SQL",
+  "SelectSQL": "选择 SQL",
+  "ExportData": "导出数据",
+  "Run": "运行",
+  "RunSelected": "运行选中",
+  "Total": "总计",
+  "NumRow": "{num} 行",
+  "LogOutput": "日志输出",
+  "Current": "当前",
+  "Confirm": "确认",
+  "RunHotKey": "运行 (Ctrl + Enter)",
+  "StopHotKey": "停止 (Ctrl + C)",
+  "FormatHotKey": "格式化 (Ctrl + L)",
+  "ExportALL": "导出所有数据",
+  "ExportCurrent": "导出当前页面",
+  "CopyNotAllowed": "不允许复制，请联系管理员开启权限！",
+  "PasteNotAllowed": "不允许粘贴，请联系管理员开启权限！"
 }

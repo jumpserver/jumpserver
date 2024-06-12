@@ -1333,5 +1333,9 @@
     "ZoneEnabled": "ゲートウェイを有効にする",
     "ZoneHelpMessage": "エリアとはアセットの位置で、データセンターやパブリッククラウド、あるいはVPCが該当します。エリアにはゲートウェイを設定でき、ネットワークが直接接続できない場合、ゲートウェイを経由してアセットにログインすることができます",
     "ZoneList": "地域リスト",
-    "ZoneUpdate": "更新エリア"
+    "ZoneUpdate": "更新エリア",
+    "ObjectStorage": "オブジェクトストレージ",
+    "ApplyLoginAsset": "登録資産の申請",
+    "ApplyLoginUser": "ログインユーザーの申請",
+    "ApplyLoginAccount": "ログインアカウントの申請"
 }

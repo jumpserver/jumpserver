@@ -359,7 +359,7 @@
     "DatabasePort": "Database protocol port",
     "DatabaseUpdate": "Update the asset-database",
     "Date": "Date",
-    "DateCreated": "Creation time",
+    "DateCreated": "Date created",
     "DateEnd": "End date",
     "DateExpired": "Expiration date",
     "DateFinished": "Completion date",
@@ -516,7 +516,7 @@
     "GrantedAssets": "Authorized assets",
     "GreatEqualThan": "Greater than or equal to",
     "GroupsAmount": "User group",
-    "HandleTicket": "Handle tickets",
+    "HandleTicket": "Handle ticket",
     "Hardware": "Hardware information",
     "HardwareInfo": "Hardware information",
     "HasImportErrorItemMsg": "There are import failures, click on the left x to view the failure reasons, after editing the table, you can continue to import failures.",
@@ -769,7 +769,7 @@
     "Options": "Options",
     "OrgAdmin": "Organization admin",
     "OrgAuditor": "Organizational auditors",
-    "OrgName": "Authorized organization name",
+    "OrgName": "Authorized organization",
     "OrgRole": "Organizational roles",
     "OrgRoleHelpMsg": "Organization roles are roles tailored to individual organizations within the platform. these roles are assigned when inviting users to join a particular organization and dictate their permissions and access levels within that organization. unlike system roles, organization roles are customizable and apply only within the scope of the organization they are assigned to.",
     "OrgRoleHelpText": "The org role is the user's role within the current organization",
@@ -1323,5 +1323,8 @@
     "EmailTemplate": "Template",
     "EmailTemplateHelpTip": "Email template is used for sending emails and includes the email subject prefix and email content",
     "ForgotPasswordURL": "Forgot password URL",
-    "ObjectStorage": "Object Storage"
+    "ObjectStorage": "Object Storage",
+    "ApplyLoginAsset": "Login asset",
+    "ApplyLoginUser": "Login user",
+    "ApplyLoginAccount": "Login account"
 }

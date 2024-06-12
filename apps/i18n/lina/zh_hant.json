@@ -1959,5 +1959,8 @@
     "weComTest": "測試",
     "week": "周",
     "weekOf": "周的星期",
-    "wildcardsAllowed": "允許的通配符"
+    "wildcardsAllowed": "允許的通配符",
+    "ApplyLoginAsset": "登入資產",
+    "ApplyLoginUser": "登入用戶",
+    "ApplyLoginAccount": "登入帳號"
 }

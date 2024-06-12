@@ -1,77 +1,67 @@
 {
-  "action": {
-    "refresh": "更新",
-    "new": "新規",
-    "new_query": "新規クエリ",
-    "view_data": "データ表示",
-    "show_properties": "プロパティ表示",
-    "label": {
-      "name": "名前",
-      "type": "タイプ",
-      "version": "バージョン",
-      "user": "ユーザー",
-      "jdbc_url": "JDBC URL",
-      "driver_class": "ドライバクラス",
-      "driver_version": "ドライババージョン"
-    }
-  },
-  "title": {
-    "query": "クエリ",
-    "properties": "プロパティ",
-    "datasource_properties": "データソースのプロパティ"
-  },
-  "state": {
-    "connected": "接続済み"
-  },
-  "msg": {
-    "error": {
-      "fetch_error": "データ取得エラー",
-      "connect_error": "接続エラー",
-      "change_context_error": "コンテキスト変更エラー",
-      "parse_error": "解析エラー",
-      "execute_error": "実行エラー",
-      "already_first_page": "すでに最初のページです",
-      "already_last_page": "すでに最後のページです",
-      "perms_expired": "このセッションの権限が%sに失効しました",
-      "over_max_idle_time": "このセッションは%d分以上アイドル状態が続いたため、閉じられました",
-      "over_max_session_time": "このセッションは%d时以上継続したため、閉じられました",
-      "command_review_timeout": "コマンドレビューリクエストがタイムアウトしました",
-      "command_review_reject": "コマンドレビューリクエストは%sによって拒否されました",
-      "session_closed_by": "このセッションは%sによって閉じられました。",
-      "user_cancel_command_review": "ユーザーがコマンドレビューをキャンセルしました。",
-      "session_locked": "このセッションは一時停止されており、コマンドを続行できません",
-      "no_permission": "  この操作を行う権限がありません",
-      "acl_reject": " この操作はACLによって拒否されました"
-    },
-    "success": {
-      "execute_success": "正常に実行されました",
-      "connect_success": "正常に接続されました"
-    },
-    "info": {
-      "affected_rows": "影響を受けた行数"
-    },
-    "dialog": {
-      "session_locked": "このセッションは%sロックされており、コマンドを実行できません",
-      "session_unlocked": "このセッションは%sロック解除されており、コマンドを実行できます",
-      "title": {
-        "init_datasource": "データソースの初期化",
-        "init_datasource_failed": "データソースの初期化失敗",
-        "error_message": "エラーメッセージ",
-        "session_finished": "セッション終了",
-        "command_review": "コマンドレビュー"
-      },
-      "message": {
-        "init_datasource": "データソースを初期化しています、お待ちください...",
-        "init_datasource_failed": "接続に失敗しました、データベース接続設定が正しいことを確認してください",
-        "command_review": "入力したコマンドは、実行前に検証が必要です。レビューリクエストを開始しますか？",
-        "wait_command_review": "レビューリクエストが開始されました、レビュー結果をお待ちください"
-      }
-    }
-  },
-  "btn": {
-    "label": {
-      "submit": "送信",
-      "cancel": "キャンセル"
-    }
-  }
+  "Refresh": "リフレッシュ",
+  "NewQuery": "新規クエリ",
+  "ViewData": "データを見る",
+  "ShowProperties": "プロパティ",
+  "Name": "名前",
+  "Type": "タイプ",
+  "Version": "バージョン",
+  "User": "ユーザー",
+  "JDBCURL": "JDBC URL",
+  "DriverClass": "ドライバークラス",
+  "DriverVersion": "ドライバーバージョン",
+  "Properties": "プロパティ",
+  "DatabaseProperties": "データソースプロパティ",
+  "Connected": "接続済み",
+  "FetchError": "データの取得に失敗しました",
+  "ConnectError": "接続に失敗しました",
+  "ChangeContextError": "コンテキストの切り替えに失敗しました",
+  "ParseError": "解析に失敗しました",
+  "ExecuteError": "実行に失敗しました",
+  "AlreadyFirstPageError": "既に最初のページです",
+  "AlreadyLastPageError": "既に最後のページです",
+  "CommandReviewRejectBy": "コマンドレビューが%sに拒否されました",
+  "SessionClosedBy": "セッションが%sによって閉じられました",
+  "PermissionsExpiredOn": "このセッションに関連する権限は%sに期限切れです",
+  "OverMaxIdleTimeError": "このセッションのアイドル時間が%d分を超えたため、閉じられました",
+  "OverMaxSessionTimeError": "このセッションの時間が%d時間を超えたため、閉じられました",
+  "CommandReviewTimeoutError": "コマンドレビューがタイムアウトしました",
+  "UserCancelCommandReviewError": "ユーザーがコマンドレビューをキャンセルしました",
+  "SessionLockedError": "現在のセッションはロックされており、コマンドを続行できません",
+  "NoPermissionError": "この操作を実行する権限がありません",
+  "ACLRejectError": "このコマンドの実行は禁止されています",
+  "ExecuteSuccess": "実行に成功しました",
+  "ConnectSuccess": "接続に成功しました",
+  "AffectedRows": "影響を受けた行数",
+  "SessionLockedMessage": "このセッションは%sにロックされており、コマンドを続行できません",
+  "SessionUnlockedMessage": "このセッションは%sにアンロックされ、コマンドを続行できます",
+  "InitializeDatasource": "データソースを初期化",
+  "InitializeDatasourceFailed": "データソースの初期化に失敗しました",
+  "ErrorMessage": "エラーメッセージ",
+  "SessionFinished": "セッションが終了しました",
+  "CommandReview": "コマンドレビュー",
+  "InitializingDatasourceMessage": "データソースを初期化中、しばらくお待ちください...",
+  "initializingDatasourceFailedMessage": "接続に失敗しました。データベース接続設定が正しいか確認してください",
+  "CommandReviewMessage": "入力されたコマンドはレビュー後に実行されます。レビューリクエストを送信しますか?",
+  "WaitCommandReviewMessage": "レビューリクエストが送信されました。レビュー結果をお待ちください",
+  "Submit": "提出",
+  "Cancel": "キャンセル",
+  "DatabaseExplorer": "データベースエクスプローラー",
+  "SaveSQL": "SQLを保存",
+  "SelectSQL": "SQLを選択",
+  "ExportData": "データをエクスポート",
+  "Run": "実行",
+  "RunSelected": "選択を実行",
+  "Total": "合計",
+  "NumRow": "{num} 行",
+  "LogOutput": "ログ出力",
+  "Current": "現在",
+  "Confirm": "確認",
+  "RunHotKey": "実行 (Ctrl + Enter)",
+  "StopHotKey": "停止 (Ctrl + C)",
+  "FormatHotKey": "フォーマット (Ctrl + L)",
+  "ExportALL": "すべてのデータをエクスポート",
+  "ExportCurrent": "現在のページをエクスポート",
+  "CopyNotAllowed": "コピーは許可されていません。管理者に連絡して権限を開いてください！",
+  "PasteNotAllowed": "貼り付けは許可されていません。管理者に連絡して権限を開いてください！"
 }
