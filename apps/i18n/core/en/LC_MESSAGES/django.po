@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-03 10:21+0800\n"
+"POT-Creation-Date: 2024-06-12 18:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Skip"
 msgstr ""
 
-#: accounts/const/account.py:33 audits/const.py:24
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:239
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr ""
@@ -1679,7 +1679,7 @@ msgstr ""
 msgid "API mode"
 msgstr ""
 
-#: assets/const/types.py:251
+#: assets/const/types.py:254
 msgid "All types"
 msgstr ""
 
@@ -2363,6 +2363,7 @@ msgstr ""
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
+#: rbac/tree.py:240
 msgid "Delete"
 msgstr ""
 
@@ -2386,7 +2387,7 @@ msgstr ""
 msgid "Rename dir"
 msgstr ""
 
-#: audits/const.py:23 terminal/api/session/session.py:277
+#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:84
@@ -2395,6 +2396,7 @@ msgstr ""
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
+#: rbac/tree.py:237
 msgid "Create"
 msgstr ""
 
@@ -3733,7 +3735,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr ""
 
 #: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:142 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -3904,21 +3906,25 @@ msgstr ""
 msgid "Children"
 msgstr ""
 
-#: common/serializers/fields.py:134
+#: common/serializers/fields.py:135
+msgid "Invalid data type"
+msgstr ""
+
+#: common/serializers/fields.py:143
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr ""
 
-#: common/serializers/fields.py:135
+#: common/serializers/fields.py:144
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr ""
 
-#: common/serializers/fields.py:209
+#: common/serializers/fields.py:218
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/serializers/fields.py:224
+#: common/serializers/fields.py:233
 msgid "Invalid choice: {}"
 msgstr ""
 
@@ -4007,15 +4013,19 @@ msgstr ""
 msgid "App Labels"
 msgstr "Labels"
 
-#: labels/models.py:17 labels/models.py:36
+#: labels/models.py:15
+msgid "Color"
+msgstr ""
+
+#: labels/models.py:20 labels/models.py:39
 msgid "Tag"
 msgstr ""
 
-#: labels/models.py:40
+#: labels/models.py:43
 msgid "Resource ID"
 msgstr ""
 
-#: labels/models.py:46
+#: labels/models.py:49
 msgid "Tagged resource"
 msgstr ""
 
@@ -4939,22 +4949,6 @@ msgstr ""
 
 #: rbac/tree.py:132
 msgid "View permission tree"
-msgstr ""
-
-#: rbac/tree.py:237
-msgid "create"
-msgstr ""
-
-#: rbac/tree.py:238 terminal/templates/terminal/_msg_command_alert.html:10
-msgid "view"
-msgstr ""
-
-#: rbac/tree.py:239
-msgid "update"
-msgstr ""
-
-#: rbac/tree.py:240
-msgid "delete"
 msgstr ""
 
 #: settings/api/chat.py:40
@@ -6755,7 +6749,7 @@ msgid "Can concurrent"
 msgstr ""
 
 #: terminal/models/applet/applet.py:48 terminal/serializers/applet_host.py:167
-#: terminal/serializers/storage.py:197
+#: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr ""
 
@@ -7107,7 +7101,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:208
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr ""
 
@@ -7339,23 +7333,29 @@ msgstr ""
 msgid "Port invalid"
 msgstr ""
 
-#: terminal/serializers/storage.py:200
+#: terminal/serializers/storage.py:194
+msgid ""
+"If there are multiple hosts, use a comma (,) to separate them. <br>(For "
+"example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)"
+msgstr ""
+
+#: terminal/serializers/storage.py:199
 msgid "Index by date"
 msgstr ""
 
-#: terminal/serializers/storage.py:201
+#: terminal/serializers/storage.py:200
 msgid "Whether to create an index by date"
 msgstr ""
 
-#: terminal/serializers/storage.py:204
+#: terminal/serializers/storage.py:203
 msgid "Index"
 msgstr ""
 
-#: terminal/serializers/storage.py:206
+#: terminal/serializers/storage.py:205
 msgid "Doc type"
 msgstr ""
 
-#: terminal/serializers/storage.py:264
+#: terminal/serializers/storage.py:263
 msgid ""
 "set as the default storage, will make new Component use the current storage "
 "by default, without affecting existing Component"
@@ -7520,6 +7520,10 @@ msgstr ""
 
 #: terminal/tasks.py:131
 msgid "Check command replay storage connectivity"
+msgstr ""
+
+#: terminal/templates/terminal/_msg_command_alert.html:10
+msgid "view"
 msgstr ""
 
 #: terminal/utils/db_port_mapper.py:85

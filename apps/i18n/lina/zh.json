@@ -1320,5 +1320,7 @@
     "ObjectStorage": "对象存储",
     "ApplyLoginAsset": "登录资产",
     "ApplyLoginUser": "登录用户",
-    "ApplyLoginAccount": "登录账号"
+    "ApplyLoginAccount": "登录账号",
+    "IsSyncAccountLabel": "同步到资产",
+    "Navigation": "导航"
 }
