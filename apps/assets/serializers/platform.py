@@ -27,6 +27,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "change_secret_enabled", "change_secret_method", "change_secret_params",
             "verify_account_enabled", "verify_account_method", "verify_account_params",
             "gather_accounts_enabled", "gather_accounts_method", "gather_accounts_params",
+            "remove_account_enabled", "remove_account_method", "remove_account_params",
         ]
         extra_kwargs = {
             # 启用资产探测
@@ -67,6 +68,14 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "gather_accounts_method": {
                 "label": _("Gather accounts method"),
             },
+            "remove_account_method": {
+                "label": _("Remove account method"),
+            },
+            "remove_account_enabled": {
+                "label": _("Remove accounts enabled"),
+                "help_text": _("Enable account remove"),
+            },
+
         }
 
 
