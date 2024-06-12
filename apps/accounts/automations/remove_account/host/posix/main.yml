@@ -12,11 +12,13 @@
         path: "{{ user_home_dir.stdout }}"
       register: home_dir
       when: user_home_dir.stdout != ""
+      ignore_errors: yes
 
     - name: "Rename user home directory if it exists"
       ansible.builtin.command:
         cmd: "mv {{ user_home_dir.stdout }} {{ user_home_dir.stdout }}.bak"
       when: home_dir.stat | default(false) and user_home_dir.stdout != ""
+      ignore_errors: yes
 
     - name: "Remove account"
       ansible.builtin.user:
