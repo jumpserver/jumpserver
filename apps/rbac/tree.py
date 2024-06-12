@@ -234,10 +234,10 @@ class CounterTree(Tree):
 class PermissionTreeUtil:
     get_permissions: Callable
     action_mapper = {
-        'add': _('create'),
-        'view': _('view'),
-        'change': _('update'),
-        'delete': _('delete')
+        'add': _('Create'),
+        'view': _('View'),
+        'change': _('Update'),
+        'delete': _('Delete')
     }
     action_icon = {
         'add': 'add',
