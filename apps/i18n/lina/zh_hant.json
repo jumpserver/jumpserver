@@ -225,7 +225,7 @@
     "BatchConsent": "批次同意",
     "BatchDelete": "批次刪除",
     "BatchDisable": "批次禁用",
-    "BatchProcessing": "批次處理(選中 {Number} 項)",
+    "BatchProcessing": "批次處理(選中 {number} 項)",
     "BatchReject": "批次拒絕",
     "BatchRemoval": "批次移除",
     "BatchRetry": "批次重試",
