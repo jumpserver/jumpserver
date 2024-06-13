@@ -4263,11 +4263,11 @@ msgid "Upload File"
 msgstr "上传"
 
 #: ops/const.py:44
-msgid "Privileged Only"
+msgid "Privileged only"
 msgstr "仅限特权账号"
 
 #: ops/const.py:45
-msgid "Privileged First"
+msgid "Privileged first"
 msgstr "特权账号优先"
 
 #: ops/const.py:50 ops/const.py:61
@@ -4364,7 +4364,7 @@ msgstr "参数"
 # msgid "Creator"
 # msgstr "创建者"
 #: ops/models/base.py:19
-msgid "Account policy"
+msgid "Run as policy"
 msgstr "账号策略"
 
 #: ops/models/base.py:20
@@ -4415,7 +4415,7 @@ msgid "Celery Task Execution"
 msgstr "Celery 任务执行"
 
 #: ops/models/job.py:147
-msgid "Chdir"
+msgid "Run dir"
 msgstr "运行目录"
 
 #: ops/models/job.py:148
@@ -4431,11 +4431,11 @@ msgid "Parameters define"
 msgstr "参数定义"
 
 #: ops/models/job.py:155
-msgid "Runas"
+msgid "Run as"
 msgstr "运行用户"
 
 #: ops/models/job.py:157
-msgid "Runas policy"
+msgid "Run as policy"
 msgstr "用户策略"
 
 #: ops/models/job.py:221 terminal/notifications.py:174

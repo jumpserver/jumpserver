@@ -144,7 +144,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
                               verbose_name=_('Module'), null=True)
-    chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
+    chdir = models.CharField(default="", max_length=1024, verbose_name=_('Run dir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
@@ -152,9 +152,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
     use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
     parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
-    runas = models.CharField(max_length=128, default='root', verbose_name=_('Runas'))
+    runas = models.CharField(max_length=128, default='root', verbose_name=_('Run as'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
-                                    verbose_name=_('Runas policy'))
+                                    verbose_name=_('Run as policy'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
     version = models.IntegerField(default=0)
     history = HistoricalRecords()

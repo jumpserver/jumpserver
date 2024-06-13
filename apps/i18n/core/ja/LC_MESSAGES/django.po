@@ -4340,11 +4340,11 @@ msgid "Upload File"
 msgstr "ファイルのアップロード"
 
 #: ops/const.py:44
-msgid "Privileged Only"
+msgid "Privileged only"
 msgstr "特権アカウントのみ"
 
 #: ops/const.py:45
-msgid "Privileged First"
+msgid "Privileged first"
 msgstr "特権アカウント優先"
 
 #: ops/const.py:50 ops/const.py:61
@@ -4449,7 +4449,7 @@ msgstr "アルグ"
 # msgid "Creator"
 # msgstr "作成者"
 #: ops/models/base.py:19
-msgid "Account policy"
+msgid "Run as policy"
 msgstr "アカウント ポリシー"
 
 #: ops/models/base.py:20
@@ -4500,7 +4500,7 @@ msgid "Celery Task Execution"
 msgstr "Celery タスク実行"
 
 #: ops/models/job.py:147
-msgid "Chdir"
+msgid "Run dir"
 msgstr "実行ディレクトリ"
 
 #: ops/models/job.py:148
@@ -4516,11 +4516,11 @@ msgid "Parameters define"
 msgstr "パラメータ定義"
 
 #: ops/models/job.py:155
-msgid "Runas"
+msgid "Run as"
 msgstr "ユーザーとして実行"
 
 #: ops/models/job.py:157
-msgid "Runas policy"
+msgid "Run as policy"
 msgstr "ユーザー ポリシー"
 
 #: ops/models/job.py:221 terminal/notifications.py:174
