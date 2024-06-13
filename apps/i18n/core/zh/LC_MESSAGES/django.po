@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-03 10:21+0800\n"
+"POT-Creation-Date: 2024-06-12 18:25+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -105,7 +105,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳过"
 
-#: accounts/const/account.py:33 audits/const.py:24
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:239
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -1715,7 +1715,7 @@ msgstr "确认按钮选择器"
 msgid "API mode"
 msgstr "API 模式"
 
-#: assets/const/types.py:251
+#: assets/const/types.py:254
 msgid "All types"
 msgstr "所有类型"
 
@@ -2413,6 +2413,7 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
+#: rbac/tree.py:240
 msgid "Delete"
 msgstr "删除"
 
@@ -2436,7 +2437,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 terminal/api/session/session.py:277
+#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:277
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:84
@@ -2445,6 +2446,7 @@ msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
+#: rbac/tree.py:237
 msgid "Create"
 msgstr "创建"
 
@@ -3795,7 +3797,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
 #: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:142 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -3966,21 +3968,27 @@ msgstr "请在 {} 秒后发送"
 msgid "Children"
 msgstr "节点"
 
-#: common/serializers/fields.py:134
+#: common/serializers/fields.py:135
+#, fuzzy
+#| msgid "Invalid data"
+msgid "Invalid data type"
+msgstr "无效的数据"
+
+#: common/serializers/fields.py:143
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "错误的 pk \"{pk_value}\" - 对象不存在"
 
-#: common/serializers/fields.py:135
+#: common/serializers/fields.py:144
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "错误类型。期望 pk 值，收到 {data_type}。"
 
-#: common/serializers/fields.py:209
+#: common/serializers/fields.py:218
 msgid "Invalid data type, should be list"
 msgstr "错误的数据类型，应该是列表"
 
-#: common/serializers/fields.py:224
+#: common/serializers/fields.py:233
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
@@ -4076,17 +4084,21 @@ msgstr ""
 msgid "App Labels"
 msgstr "标签管理"
 
-#: labels/models.py:17 labels/models.py:36
+#: labels/models.py:15
+msgid "Color"
+msgstr ""
+
+#: labels/models.py:20 labels/models.py:39
 #, fuzzy
 #| msgid "Tags"
 msgid "Tag"
 msgstr "标签"
 
-#: labels/models.py:40
+#: labels/models.py:43
 msgid "Resource ID"
 msgstr "资源 ID"
 
-#: labels/models.py:46
+#: labels/models.py:49
 msgid "Tagged resource"
 msgstr "关联的资源"
 
@@ -5019,28 +5031,6 @@ msgstr "一般设置"
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: rbac/tree.py:237
-#, fuzzy
-#| msgid "Create"
-msgid "create"
-msgstr "创建"
-
-#: rbac/tree.py:238 terminal/templates/terminal/_msg_command_alert.html:10
-msgid "view"
-msgstr "查看"
-
-#: rbac/tree.py:239
-#, fuzzy
-#| msgid "Update"
-msgid "update"
-msgstr "更新"
-
-#: rbac/tree.py:240
-#, fuzzy
-#| msgid "Delete"
-msgid "delete"
-msgstr "删除"
-
 #: settings/api/chat.py:40
 msgid "Chat AI is not enabled"
 msgstr "聊天 AI 没有开启"
@@ -5686,7 +5676,7 @@ msgstr "当前站点 URL"
 msgid ""
 "Site URL is the externally accessible address of the current product service "
 "and is usually used in links in system emails"
-msgstr ""
+msgstr "站点 URL 是当前产品服务的外部可访问地址，通常在系统邮件中的链接中使用"
 
 #: settings/serializers/basic.py:18
 msgid "User guide url"
@@ -5706,23 +5696,21 @@ msgstr "全局组织的显示名称，默认为 全局组织"
 
 #: settings/serializers/basic.py:26
 msgid "Document URL"
-msgstr ""
+msgstr "文档链接"
 
 #: settings/serializers/basic.py:27
 msgid ""
 "Document URL refers to the address in the top navigation bar Help - Document"
-msgstr ""
+msgstr "文档 URL 指的是顶级导航栏中的地址，帮助 - 文档"
 
 #: settings/serializers/basic.py:30
-#, fuzzy
-#| msgid "Help Support URL"
 msgid "Support URL"
 msgstr "支持链接"
 
 #: settings/serializers/basic.py:31
 msgid ""
 "Support URL refers to the address in the top navigation bar Help - Support"
-msgstr ""
+msgstr "支持 URL 指的是顶级导航栏中的地址，帮助 - 支持"
 
 #: settings/serializers/basic.py:44
 msgid "Organization name already exists"
@@ -5841,11 +5829,11 @@ msgstr "GPT 模型"
 
 #: settings/serializers/feature.py:116
 msgid "Approval without login"
-msgstr ""
+msgstr "免登录审批"
 
 #: settings/serializers/feature.py:117
 msgid "Allow direct approval ticket without login"
-msgstr ""
+msgstr "允许无需登录直接批准工单"
 
 #: settings/serializers/feature.py:121
 msgid "Period"
@@ -5875,7 +5863,7 @@ msgstr "功能"
 #: settings/serializers/feature.py:135
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
-msgstr ""
+msgstr "允许用户在工作台 - 作业中心 - Adhoc 中执行批量命令"
 
 #: settings/serializers/feature.py:139
 msgid "Command blacklist"
@@ -6895,7 +6883,7 @@ msgid "Can concurrent"
 msgstr "可以并发"
 
 #: terminal/models/applet/applet.py:48 terminal/serializers/applet_host.py:167
-#: terminal/serializers/storage.py:197
+#: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "主机"
 
@@ -7254,7 +7242,7 @@ msgstr ""
 "建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
 "https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:208
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -7500,27 +7488,33 @@ msgstr "主机无效"
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:200
+#: terminal/serializers/storage.py:194
+msgid ""
+"If there are multiple hosts, use a comma (,) to separate them. <br>(For "
+"example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)"
+msgstr "如果有多个主机，请用逗号 (,) 分隔它们。<br>（例如：http://www.jumpserver.a.com:9100，http://www.jumpserver.b.com:9100）"
+
+#: terminal/serializers/storage.py:199
 msgid "Index by date"
 msgstr "按日期建索引"
 
-#: terminal/serializers/storage.py:201
+#: terminal/serializers/storage.py:200
 msgid "Whether to create an index by date"
 msgstr "是否根据日期动态建立索引"
 
-#: terminal/serializers/storage.py:204
+#: terminal/serializers/storage.py:203
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:206
+#: terminal/serializers/storage.py:205
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:264
+#: terminal/serializers/storage.py:263
 msgid ""
 "set as the default storage, will make new Component use the current storage "
 "by default, without affecting existing Component"
-msgstr ""
+msgstr "设置为默认存储后，新组件将默认使用当前存储，而不会影响现有组件"
 
 #: terminal/serializers/task.py:9
 msgid "Session id"
@@ -7682,6 +7676,10 @@ msgstr "收集远程应用上的账号"
 #: terminal/tasks.py:131
 msgid "Check command replay storage connectivity"
 msgstr "检查命令及录像存储可连接性 "
+
+#: terminal/templates/terminal/_msg_command_alert.html:10
+msgid "view"
+msgstr "查看"
 
 #: terminal/utils/db_port_mapper.py:85
 msgid ""
@@ -9639,6 +9637,21 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#, fuzzy
+#~| msgid "Create"
+#~ msgid "create"
+#~ msgstr "创建"
+
+#, fuzzy
+#~| msgid "Update"
+#~ msgid "update"
+#~ msgstr "更新"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "delete"
+#~ msgstr "删除"
 
 #~ msgid "Send verification code"
 #~ msgstr "发送验证码"
