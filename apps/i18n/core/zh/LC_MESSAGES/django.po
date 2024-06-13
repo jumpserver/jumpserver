@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-13 17:20+0800\n"
+"POT-Creation-Date: 2024-06-13 18:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -6859,6 +6859,10 @@ msgstr "在 platform.yml 中缺少类型"
 msgid "Hosting"
 msgstr "宿主机"
 
+#: terminal/models/applet/applet.py:325
+msgid "Applet Publication"
+msgstr "应用发布"
+
 #: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:69
 msgid "Deploy options"
 msgstr "部署参数"
@@ -6890,6 +6894,10 @@ msgstr "使用同名账号"
 #: terminal/models/applet/host.py:139
 msgid "Initial"
 msgstr "初始化"
+
+#: terminal/models/applet/host.py:148
+msgid "Applet host deployment"
+msgstr "应用部署"
 
 #: terminal/models/component/endpoint.py:15
 msgid "HTTPS port"

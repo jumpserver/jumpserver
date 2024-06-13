@@ -145,6 +145,7 @@ class AppletHostDeployment(JMSBaseModel):
 
     class Meta:
         ordering = ('-date_start',)
+        verbose_name = _("Applet host deployment")
 
     def start(self, **kwargs):
         # 重新初始化部署，applet host 关联的终端需要删除
