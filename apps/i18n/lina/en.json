@@ -1326,5 +1326,6 @@
     "ObjectStorage": "Object Storage",
     "ApplyLoginAsset": "Login asset",
     "ApplyLoginUser": "Login user",
-    "ApplyLoginAccount": "Login account"
+    "ApplyLoginAccount": "Login account",
+    "General": "General"
 }
