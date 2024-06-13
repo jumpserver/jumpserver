@@ -155,10 +155,7 @@ class AllTypes(ChoicesMixin):
         choices = cls.serialize_to_objs(Category.choices)
         mapper = dict(cls.grouped_choices())
         for choice in choices:
-            choices = mapper.get(choice['value'])
-            if not choices:
-                continue
-            children = cls.serialize_to_objs(choices)
+            children = cls.serialize_to_objs(mapper[choice['value']])
             choice['children'] = children
         return choices
 
