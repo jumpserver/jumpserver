@@ -1338,5 +1338,6 @@
     "ApplyLoginAsset": "登録資産の申請",
     "ApplyLoginUser": "ログインユーザーの申請",
     "ApplyLoginAccount": "ログインアカウントの申請",
-    "Navigation": "ナビゲーション"
+    "Navigation": "ナビゲーション",
+    "General": "基本"
 }

@@ -1962,5 +1962,6 @@
     "wildcardsAllowed": "允許的通配符",
     "ApplyLoginAsset": "登入資產",
     "ApplyLoginUser": "登入用戶",
-    "ApplyLoginAccount": "登入帳號"
+    "ApplyLoginAccount": "登入帳號",
+    "General": "基本"
 }

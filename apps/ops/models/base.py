@@ -16,7 +16,7 @@ class BaseAnsibleJob(PeriodTaskModelMixin, JMSOrgBaseModel):
     owner = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
     account = models.CharField(max_length=128, default='root', verbose_name=_('Account'))
-    account_policy = models.CharField(max_length=128, default='root', verbose_name=_('Run as policy'))
+    account_policy = models.CharField(max_length=128, default='root', verbose_name=_('Account policy'))
     last_execution = models.ForeignKey('BaseAnsibleExecution', verbose_name=_("Last execution"),
                                        on_delete=models.SET_NULL, null=True)
     date_last_run = models.DateTimeField(null=True, verbose_name=_('Date last run'))
