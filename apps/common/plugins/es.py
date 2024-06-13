@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import QuerySet as DJQuerySet
 from elasticsearch7 import Elasticsearch
 from elasticsearch7.helpers import bulk
-from elasticsearch7.exceptions import RequestError
+from elasticsearch7.exceptions import RequestError, SSLError
 from elasticsearch7.exceptions import NotFoundError as NotFoundError7
 
 from elasticsearch8.exceptions import NotFoundError as NotFoundError8
@@ -40,11 +40,16 @@ class NotSupportElasticsearch8(JMSException):
     default_detail = _('Not Support Elasticsearch8')
 
 
+class InvalidElasticsearchSSL(JMSException):
+    default_code = 'invalid_elasticsearch_SSL'
+    default_detail = _(
+        'Connection failed: Self-signed certificate used. Please check server certificate configuration')
+
+
 class ESClient(object):
 
     def __new__(cls, *args, **kwargs):
-        hosts = kwargs.get('hosts', [])
-        version = get_es_client_version(hosts=hosts)
+        version = get_es_client_version(**kwargs)
         if version == 6:
             return ESClientV6(*args, **kwargs)
         if version == 7:
@@ -95,11 +100,16 @@ class ESClientV8(ESClientBase):
         return {field: {'order': direction}}
 
 
-def get_es_client_version(hosts, **kwargs):
-    es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
-    info = es.info()
-    version = int(info['version']['number'].split('.')[0])
-    return version
+def get_es_client_version(**kwargs):
+    try:
+        es = Elasticsearch(**kwargs)
+        info = es.info()
+        version = int(info['version']['number'].split('.')[0])
+        return version
+    except SSLError:
+        raise InvalidElasticsearchSSL
+    except Exception:
+        raise InvalidElasticsearch
 
 
 class ES(object):
