@@ -37,7 +37,7 @@ class SSHTunnelManager:
         info = self.file_to_json(runner.inventory)
         servers, not_valid = [], []
         for k, host in info['all']['hosts'].items():
-            jms_asset, jms_gateway = host.get('jms_asset'), host.get('gateway')
+            jms_asset, jms_gateway = host.get('jms_asset'), host.get('jms_gateway')
             if not jms_gateway:
                 continue
             try:
