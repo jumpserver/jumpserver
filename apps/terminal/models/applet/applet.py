@@ -322,3 +322,4 @@ class AppletPublication(JMSBaseModel):
 
     class Meta:
         unique_together = ('applet', 'host')
+        verbose_name = _("Applet Publication")

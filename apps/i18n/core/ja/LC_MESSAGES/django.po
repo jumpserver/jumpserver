@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-13 17:20+0800\n"
+"POT-Creation-Date: 2024-06-13 18:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6966,6 +6966,10 @@ msgstr "platform.ymlにタイプがありません"
 msgid "Hosting"
 msgstr "ホスト マシン"
 
+#: terminal/models/applet/applet.py:325
+msgid "Applet Publication"
+msgstr "アプリケーションのリリース"
+
 #: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:69
 msgid "Deploy options"
 msgstr "展開パラメーター"
@@ -6997,6 +7001,10 @@ msgstr "同じアカウントを使用する"
 #: terminal/models/applet/host.py:139
 msgid "Initial"
 msgstr "初期化"
+
+#: terminal/models/applet/host.py:148
+msgid "Applet host deployment"
+msgstr "アプリケーション配備"
 
 #: terminal/models/component/endpoint.py:15
 msgid "HTTPS port"

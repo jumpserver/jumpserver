@@ -24,11 +24,12 @@ class OperateLogStore(object):
     @classmethod
     def split_value(cls, value):
         """
-        尝试使用新的分隔符分割字符串，如果失败则尝试旧的分隔符。
-        如果两者都失败，则返回原字符串和空字符串。
+        Attempt to split the string using the new separator.
+        If it fails, attempt to split using the old separator.
+        If both fail, return the original string and an empty string.
 
-        :param value: 要分割的字符串
-        :return: 分割后的两部分 (before, after)
+        :param value: The string to split
+        :return: The split parts (before, after)
         """
         for sep in (cls.SEP, cls.OLD_SEP):
             parts = value.split(sep, 1)
@@ -75,12 +76,11 @@ class OperateLogStore(object):
         diff_list = list()
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
-            print(k, v)
-            before, after = cls.split_value(v)
+            before_value, after_value = cls.split_value(v)
             diff_list.append({
                 'field': _(k),
-                'before': handler(k, before) if before else _('empty'),
-                'after': handler(k, after) if after else _('empty'),
+                'before': handler(k, before_value) if before_value else _('empty'),
+                'after': handler(k, after_value) if after_value else _('empty'),
             })
         return diff_list
 
