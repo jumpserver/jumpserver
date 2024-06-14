@@ -4371,10 +4371,6 @@ msgstr ""
 msgid "Run as"
 msgstr ""
 
-#: ops/models/job.py:157
-msgid "Run as policy"
-msgstr ""
-
 #: ops/models/job.py:221 terminal/notifications.py:174
 msgid "Job"
 msgstr ""
