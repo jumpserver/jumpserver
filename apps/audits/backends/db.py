@@ -1,4 +1,5 @@
 # ~*~ coding: utf-8 ~*~
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from audits.models import OperateLog
@@ -6,8 +7,22 @@ from perms.const import ActionChoices
 
 
 class OperateLogStore(object):
-    # 用不可见字符分割前后数据，节省存储-> diff: {'key': 'before\0after'}
-    SEP = '\0'
+
+    @staticmethod
+    def get_separator():
+        """
+        用不可见字符分割前后数据
+        根据数据库引擎类型返回适当的分隔符。
+        PostgreSQL 数据库使用 Unicode 单元分隔符 '\u001f'，
+        其他数据库使用空字符 '\0' 作为分隔符。
+        """
+        db_engine = settings.DB_ENGINE
+        if db_engine == 'postgresql':
+            return '\u001f'
+        else:
+            return '\0'
+
+    SEP = get_separator()
 
     def __init__(self, config):
         self.model = OperateLog
