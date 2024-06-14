@@ -1155,7 +1155,7 @@ msgstr "警告"
 
 #: acls/const.py:10
 msgid "Notify"
-msgstr ""
+msgstr "通知する"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
 #: terminal/models/component/endpoint.py:112 xpack/plugins/cloud/models.py:295
