@@ -6,8 +6,9 @@ from perms.const import ActionChoices
 
 
 class OperateLogStore(object):
-    # 用不可见字符分割前后数据，节省存储-> diff: {'key': 'before\0after'}
-    SEP = '\0'
+    # 使用 Unicode 单元分隔符\u001f，替代旧的分隔符\0 PostgreSQL 数据库不支持\0
+    SEP = '\u001f'
+    OLD_SEP = '\0'
 
     def __init__(self, config):
         self.model = OperateLog
@@ -19,6 +20,21 @@ class OperateLogStore(object):
     @staticmethod
     def ping(timeout=None):
         return True
+
+    @classmethod
+    def split_value(cls, value):
+        """
+        尝试使用新的分隔符分割字符串，如果失败则尝试旧的分隔符。
+        如果两者都失败，则返回原字符串和空字符串。
+
+        :param value: 要分割的字符串
+        :return: 分割后的两部分 (before, after)
+        """
+        for sep in (cls.SEP, cls.OLD_SEP):
+            parts = value.split(sep, 1)
+            if len(parts) == 2:
+                return parts[0], parts[1]
+        return value, ''
 
     @classmethod
     def convert_before_after_to_diff(cls, before, after):
@@ -42,7 +58,7 @@ class OperateLogStore(object):
             return before, after
 
         for k, v in diff.items():
-            before_value, after_value = v.split(cls.SEP, 1)
+            before_value, after_value = cls.split_value(v)
             before[k], after[k] = before_value, after_value
         return before, after
 
@@ -59,7 +75,8 @@ class OperateLogStore(object):
         diff_list = list()
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
-            before, after = v.split(cls.SEP, 1)
+            print(k, v)
+            before, after = cls.split_value(v)
             diff_list.append({
                 'field': _(k),
                 'before': handler(k, before) if before else _('empty'),
