@@ -666,7 +666,7 @@ platforms_data_json = '''[
         "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
-        "su_method: "enable“，
+        "su_method": "enable",
         "name": "Cisco",
         "automation": {
             "ansible_enabled": false,
@@ -708,7 +708,7 @@ platforms_data_json = '''[
         "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
-        "su_method: "super“，
+        "su_method": "super",
         "name": "Huawei",
         "automation": {
             "ansible_enabled": false,
@@ -750,7 +750,7 @@ platforms_data_json = '''[
         "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
-        "su_method: "super_level“，
+        "su_method": "super_level",
         "name": "H3C",
         "automation": {
             "ansible_enabled": false,
