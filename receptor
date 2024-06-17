@@ -3,10 +3,10 @@
 
 import argparse
 import logging
-import shutil
-import subprocess
 import os
+import shutil
 import signal
+import subprocess
 import tempfile
 
 from apps.libs.process.ssh import kill_ansible_ssh_process
@@ -75,7 +75,6 @@ class ReceptorService:
                 print("\n- PID file is corrupted, starting Receptor...")
                 os.remove(self.pid_file)
 
-        os.environ.update({'LOCAL_CONNECTION_ENABLED': '1'})
         os.environ.setdefault('ANSIBLE_LIBRARY', DEFAULT_ANSIBLE_MODULES_DIR)
         os.environ.update({'PYTHONPATH': APPS_DIR})
         process = subprocess.Popen(self.receptor_command)

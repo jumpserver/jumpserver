@@ -5,7 +5,6 @@ import re
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
-from assets.const.category import Category
 
 __all__ = ['JMSInventory']
 

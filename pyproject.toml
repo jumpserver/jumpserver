@@ -11,9 +11,9 @@ python = "^3.11"
 cython = "3.0.0"
 aiofiles = "23.1.0"
 amqp = "5.1.1"
-ansible-core = { url = "https://github.com/jumpserver/ansible/archive/refs/tags/v2.14.1.4.zip" }
+ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.6.zip" }
 ansible = "7.1.0"
-ansible-runner = "2.3.3"
+ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/2.4.0.1.zip" }
 asn1crypto = "1.5.1"
 bcrypt = "4.0.1"
 billiard = "4.1.0"
