@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-13 10:19+0800\n"
+"POT-Creation-Date: 2024-06-17 17:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4588,6 +4588,10 @@ msgstr "組織のリソース ({}) は削除できません"
 #: orgs/apps.py:7 rbac/tree.py:128
 msgid "App organizations"
 msgstr "アプリ組織"
+
+#: orgs/mixins/models.py:48
+msgid "Please save in a org"
+msgstr "組織を選択してから保存してください"
 
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:56

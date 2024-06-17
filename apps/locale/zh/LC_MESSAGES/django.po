@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-13 10:19+0800\n"
+"POT-Creation-Date: 2024-06-17 17:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4529,6 +4529,10 @@ msgstr "组织存在资源 ({}) 不能被删除"
 #: orgs/apps.py:7 rbac/tree.py:128
 msgid "App organizations"
 msgstr "组织管理"
+
+#: orgs/mixins/models.py:48 orgs/mixins/models.py:73
+msgid "Please save in a org"
+msgstr "请选择一个组织后再保存"
 
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
