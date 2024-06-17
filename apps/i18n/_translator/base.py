@@ -11,6 +11,7 @@ class BaseTranslateManager:
     SEPARATOR = "<SEP>"
     LANG_MAPPER = {
         'ja': 'Japanese',
+        # 'zh_hant': 'Taiwan',
         # 'en': 'English',
     }
 

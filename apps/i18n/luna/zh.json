@@ -1,6 +1,5 @@
 {
     "ACL reject login asset": "本次登录已拒绝，原因是访问控制策略的限制",
-    "MenuAccountTemplates": "账号模版",
     "Account info": "账号信息",
     "Account not found": "账号未找到",
     "Account: ": "账号: {{value}}",
@@ -102,6 +101,7 @@
     "Login review approved": "登录审核已通过, 正在连接资产...",
     "LoginExpireMsg": "登录已过期，请重新登录",
     "Manual accounts": "手动账号",
+    "MenuAccountTemplates": "账号模版",
     "Module": "模块",
     "Multi Screen": "多屏显示",
     "My applications": "我的应用",
