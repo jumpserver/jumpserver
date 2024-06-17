@@ -122,6 +122,7 @@ exclude_permissions = (
     ('terminal', 'session', 'delete,share', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
     ('applications', '*', '*', '*'),
+    ('settings', 'chatprompt', 'add,delete,change', 'chatprompt'),
 )
 
 only_system_permissions = (
