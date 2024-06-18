@@ -49,7 +49,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "run_after_save"
         ]
         extra_kwargs = {
-            'average_time_cost': {'label': _('Average time taken')},
+            'average_time_cost': {'label': _('Duration')},
         }
 
 
