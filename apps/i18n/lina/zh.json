@@ -1101,6 +1101,7 @@
     "StrategyList": "策略列表",
     "StrategyUpdate": "更新策略",
     "SuEnabled": "启用开关",
+    "EnableDomain": "启用网域",
     "SuFrom": "切换自",
     "Submit": "提交",
     "SubscriptionID": "订阅授权 ID",
@@ -1334,5 +1335,8 @@
     "ZoneEnabled": "启用网关",
     "ZoneHelpMessage": "网域是资产所在的位置，可以是机房，公有云 或者 VPC。网域中可以设置网关，当网络不能直达的时候，可以使用网关跳转登录到资产",
     "ZoneList": "网域列表",
-    "ZoneUpdate": "更新网域"
+    "ZoneUpdate": "更新网域",
+    "IpType": "IP 类型",
+    "PublicIp": "公有 IP",
+    "PrivateIp": "私有 IP"
 }

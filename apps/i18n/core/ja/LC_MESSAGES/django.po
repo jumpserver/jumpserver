@@ -5889,7 +5889,7 @@ msgstr "時"
 
 #: settings/serializers/feature.py:126
 msgid "Unit"
-msgstr ""
+msgstr "単位"
 
 #: settings/serializers/feature.py:126
 msgid "The unit of period"
