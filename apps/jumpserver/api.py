@@ -74,9 +74,13 @@ class DateTimeMixin:
         query = {f'{query_field}__gte': t}
         return qs.filter(**query)
 
+    @lazyproperty
+    def users(self):
+        return self.org.get_members()
+
     def get_logs_queryset(self, queryset, query_params):
         query = {}
-        users = self.org.get_members()
+        users = self.users
         if not self.org.is_root():
             if query_params == 'username':
                 query = {
@@ -98,6 +102,13 @@ class DateTimeMixin:
         qs = UserLoginLog.objects.all()
         qs = self.get_logs_queryset_filter(qs, 'datetime')
         queryset = self.get_logs_queryset(qs, 'username')
+        return queryset
+
+    @lazyproperty
+    def user_login_logs_on_the_system_queryset(self):
+        qs = UserLoginLog.objects.all()
+        qs = self.get_logs_queryset_filter(qs, 'datetime')
+        queryset = qs.filter(username__in=construct_userlogin_usernames(self.users))
         return queryset
 
     @lazyproperty
@@ -141,6 +152,7 @@ class DatesLoginMetricMixin:
     ftp_logs_queryset: FTPLog.objects
     job_logs_queryset: JobLog.objects
     login_logs_queryset: UserLoginLog.objects
+    user_login_logs_on_the_system_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
 
@@ -241,7 +253,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def user_login_amount(self):
-        return self.login_logs_queryset.values('username').distinct().count()
+        return self.user_login_logs_on_the_system_queryset.values('username').distinct().count()
 
     @lazyproperty
     def operate_logs_amount(self):
