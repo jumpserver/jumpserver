@@ -1100,7 +1100,7 @@
     "StrategyHelpTip": "Identify the unique attributes of assets (such as platforms) based on priority of strategies; when an asset's attribute (like nodes) can be configured to multiple, all actions of the strategies will be executed.",
     "StrategyList": "Policy",
     "StrategyUpdate": "Update the policy",
-    "SuEnabled": "Enable switch",
+    "EnableDomain": "Gateway enabled",
     "SuFrom": "Switch from",
     "Submit": "Submit",
     "SubscriptionID": "ID",
@@ -1334,5 +1334,8 @@
     "ZoneEnabled": "Enable zone",
     "ZoneHelpMessage": "The zone is the location where assets are located, which can be a data center, public cloud, or VPC. Gateways can be set up within the region. When the network cannot be directly accessed, users can utilize gateways to login to the assets.",
     "ZoneList": "Zones",
-    "ZoneUpdate": "Update the zone"
+    "ZoneUpdate": "Update the zone",
+    "IpType": "IP type",
+    "PublicIp": "Public Ip",
+    "PrivateIp": "Private Ip"
 }

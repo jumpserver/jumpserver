@@ -5816,7 +5816,7 @@ msgstr "时"
 
 #: settings/serializers/feature.py:126
 msgid "Unit"
-msgstr ""
+msgstr "单位"
 
 #: settings/serializers/feature.py:126
 msgid "The unit of period"
