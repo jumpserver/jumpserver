@@ -30,7 +30,6 @@ def extract_object_name(exc, index=0):
 
 
 def common_exception_handler(exc, context):
-    # logger.exception('')
     if settings.DEBUG_DEV:
         logger.exception('Print traceback exception for Debug')
         traceback.print_exc()
