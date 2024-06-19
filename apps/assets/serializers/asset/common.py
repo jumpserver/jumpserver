@@ -381,6 +381,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
 
 class DetailMixin(serializers.Serializer):
+    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     spec_info = MethodSerializer(label=_('Spec info'), read_only=True)
     gathered_info = MethodSerializer(label=_('Gathered info'), read_only=True)
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
@@ -395,7 +396,7 @@ class DetailMixin(serializers.Serializer):
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         names.extend([
-            'gathered_info', 'spec_info', 'auto_config',
+            'accounts', 'gathered_info', 'spec_info', 'auto_config',
         ])
         return names
 
