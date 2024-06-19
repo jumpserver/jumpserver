@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 10:43+0800\n"
+"POT-Creation-Date: 2024-06-19 17:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1765,7 +1765,7 @@ msgstr ""
 msgid "Allow invalid cert"
 msgstr ""
 
-#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:88
+#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:87
 msgid "Proxy"
 msgstr ""
 
@@ -4199,7 +4199,7 @@ msgstr ""
 msgid "VCS"
 msgstr ""
 
-#: ops/const.py:38 ops/models/adhoc.py:44 settings/serializers/feature.py:136
+#: ops/const.py:38 ops/models/adhoc.py:44 settings/serializers/feature.py:135
 msgid "Adhoc"
 msgstr ""
 
@@ -4704,7 +4704,7 @@ msgid "today"
 msgstr ""
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:127
+#: settings/serializers/feature.py:126
 msgid "day"
 msgstr ""
 
@@ -4975,8 +4975,8 @@ msgstr "Organizations"
 msgid "Ticket comment"
 msgstr ""
 
-#: rbac/tree.py:159 settings/serializers/feature.py:114
-#: settings/serializers/feature.py:116 tickets/models/ticket/general.py:305
+#: rbac/tree.py:159 settings/serializers/feature.py:113
+#: settings/serializers/feature.py:115 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr ""
 
@@ -5734,12 +5734,11 @@ msgstr ""
 msgid "Mount Point"
 msgstr ""
 
-
-#: settings/serializers/feature.py:62
+#: settings/serializers/feature.py:61
 msgid "Record limit"
 msgstr ""
 
-#: settings/serializers/feature.py:64
+#: settings/serializers/feature.py:63
 msgid ""
 "If the specific value is less than 999 (default), the system will "
 "automatically perform a task every night: check and delete historical "
@@ -5747,82 +5746,82 @@ msgid ""
 "exceeds 999 (default), no historical account deletion will be performed"
 msgstr ""
 
-#: settings/serializers/feature.py:74 settings/serializers/feature.py:78
+#: settings/serializers/feature.py:73 settings/serializers/feature.py:77
 msgid "Chat AI"
 msgstr ""
 
-#: settings/serializers/feature.py:81
+#: settings/serializers/feature.py:80
 msgid "Base URL"
 msgstr ""
 
-#: settings/serializers/feature.py:82
+#: settings/serializers/feature.py:81
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
 msgstr ""
 
-#: settings/serializers/feature.py:85 templates/_header_bar.html:96
+#: settings/serializers/feature.py:84 templates/_header_bar.html:96
 msgid "API Key"
 msgstr ""
 
-#: settings/serializers/feature.py:89
+#: settings/serializers/feature.py:88
 msgid ""
 "The proxy server address of the GPT service. For example: http://ip:port"
 msgstr ""
 
-#: settings/serializers/feature.py:92
+#: settings/serializers/feature.py:91
 msgid "GPT Model"
 msgstr ""
 
-#: settings/serializers/feature.py:118
+#: settings/serializers/feature.py:117
 msgid "Approval without login"
 msgstr ""
 
-#: settings/serializers/feature.py:119
+#: settings/serializers/feature.py:118
 msgid "Allow direct approval ticket without login"
 msgstr ""
 
-#: settings/serializers/feature.py:123
+#: settings/serializers/feature.py:122
 #, fuzzy
 #| msgid "Periodic run"
 msgid "Period"
 msgstr "Periodic"
 
-#: settings/serializers/feature.py:124
+#: settings/serializers/feature.py:123
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr ""
 
-#: settings/serializers/feature.py:127
+#: settings/serializers/feature.py:126
 msgid "hour"
 msgstr ""
 
-#: settings/serializers/feature.py:128
+#: settings/serializers/feature.py:127
 msgid "Unit"
 msgstr ""
 
-#: settings/serializers/feature.py:128
+#: settings/serializers/feature.py:127
 #, fuzzy
 #| msgid "Run period"
 msgid "The unit of period"
 msgstr "Period"
 
-#: settings/serializers/feature.py:133
+#: settings/serializers/feature.py:132
 msgid "Feature"
 msgstr ""
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:136
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr ""
 
-#: settings/serializers/feature.py:141
+#: settings/serializers/feature.py:140
 msgid "Command blacklist"
 msgstr ""
 
-#: settings/serializers/feature.py:142
+#: settings/serializers/feature.py:141
 msgid "Command blacklist in Adhoc"
 msgstr ""
 
-#: settings/serializers/feature.py:147
+#: settings/serializers/feature.py:146
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -5830,11 +5829,11 @@ msgstr ""
 msgid "Virtual app"
 msgstr ""
 
-#: settings/serializers/feature.py:150
+#: settings/serializers/feature.py:149
 msgid "Virtual App"
 msgstr ""
 
-#: settings/serializers/feature.py:152
+#: settings/serializers/feature.py:151
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -7652,7 +7651,7 @@ msgstr ""
 msgid "Ticket already closed"
 msgstr ""
 
-#: tickets/handlers/apply_asset.py:36
+#: tickets/handlers/apply_asset.py:39
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
