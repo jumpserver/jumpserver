@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-13 18:19+0800\n"
+"POT-Creation-Date: 2024-06-19 10:43+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -105,7 +105,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳过"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:239
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:267
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -417,7 +417,7 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:134 audits/models.py:203
-#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/manager.py:157
+#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/manager.py:158
 #: xpack/plugins/cloud/models.py:221
 msgid "Reason"
 msgstr "原因"
@@ -828,12 +828,12 @@ msgstr "已修改"
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:9
 #: assets/models/automations/base.py:19
-#: assets/serializers/automations/base.py:20
+#: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
 #: perms/serializers/permission.py:36
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
-#: xpack/plugins/cloud/manager.py:82
+#: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
 msgstr "资产"
 
@@ -1507,7 +1507,7 @@ msgstr "脚本"
 #: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:49 settings/serializers/msg.py:31
 #: terminal/models/component/endpoint.py:13 terminal/serializers/applet.py:17
-#: xpack/plugins/cloud/manager.py:82
+#: xpack/plugins/cloud/manager.py:83
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "主机"
@@ -1526,7 +1526,7 @@ msgstr "云服务"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:15 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "自定义"
 
@@ -1563,7 +1563,8 @@ msgstr "防火墙"
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
-#: assets/const/host.py:12 rbac/tree.py:28 xpack/plugins/cloud/const.py:69
+#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:67
+#: xpack/plugins/cloud/const.py:69
 msgid "Other"
 msgstr "其它"
 
@@ -1601,7 +1602,8 @@ msgstr "连接到控制台会话"
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:81 settings/serializers/security.py:232
+#: assets/const/protocol.py:81 rbac/tree.py:63
+#: settings/serializers/security.py:232
 msgid "Security"
 msgstr "安全"
 
@@ -1699,7 +1701,7 @@ msgstr "确认按钮选择器"
 msgid "API mode"
 msgstr "API 模式"
 
-#: assets/const/types.py:254
+#: assets/const/types.py:251
 msgid "All types"
 msgstr "所有类型"
 
@@ -1783,7 +1785,7 @@ msgstr "客户端密钥"
 msgid "Allow invalid cert"
 msgstr "忽略证书校验"
 
-#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:86
+#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:88
 msgid "Proxy"
 msgstr "代理"
 
@@ -1905,7 +1907,7 @@ msgstr "标签"
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:467 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:467 audits/backends/db.py:82 audits/backends/db.py:83
 msgid "empty"
 msgstr "空"
 
@@ -2379,11 +2381,11 @@ msgstr "没有匹配到资产，结束任务"
 msgid "App Audits"
 msgstr "日志审计"
 
-#: audits/backends/db.py:16
+#: audits/backends/db.py:17
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文字内容太长。请使用 Elasticsearch 存储操作日志"
 
-#: audits/backends/db.py:91
+#: audits/backends/db.py:108
 msgid "Tips"
 msgstr "提示"
 
@@ -2397,7 +2399,7 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:240
+#: rbac/tree.py:268
 msgid "Delete"
 msgstr "删除"
 
@@ -2421,16 +2423,16 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:238 terminal/api/session/session.py:274
+#: audits/const.py:23 rbac/tree.py:266 terminal/api/session/session.py:274
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
-#: xpack/plugins/cloud/manager.py:83
+#: xpack/plugins/cloud/manager.py:84
 msgid "View"
 msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:237
+#: rbac/tree.py:265
 msgid "Create"
 msgstr "创建"
 
@@ -2448,7 +2450,7 @@ msgstr "登录"
 msgid "Change password"
 msgstr "改密"
 
-#: audits/const.py:35
+#: audits/const.py:35 rbac/tree.py:57
 msgid "Notifications"
 msgstr "通知"
 
@@ -3716,7 +3718,7 @@ msgstr "运行中"
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:407
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:408
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 创建成功"
@@ -3808,7 +3810,7 @@ msgstr "最后更新者"
 msgid "Invalid port range, should be like and within {}-{}"
 msgstr "无效的端口范围，应该在 {}-{} 之内"
 
-#: common/drf/exc_handlers.py:26
+#: common/drf/exc_handlers.py:28
 msgid "Object"
 msgstr "对象"
 
@@ -4238,7 +4240,7 @@ msgstr "空白"
 msgid "VCS"
 msgstr "VCS"
 
-#: ops/const.py:38 ops/models/adhoc.py:44 settings/serializers/feature.py:134
+#: ops/const.py:38 ops/models/adhoc.py:44 settings/serializers/feature.py:136
 msgid "Adhoc"
 msgstr "命令"
 
@@ -4367,7 +4369,7 @@ msgid "Result"
 msgstr "结果"
 
 #: ops/models/base.py:52 ops/models/job.py:238
-#: xpack/plugins/cloud/manager.py:86
+#: xpack/plugins/cloud/manager.py:87
 msgid "Summary"
 msgstr "汇总"
 
@@ -4488,9 +4490,9 @@ msgstr "下次执行时间"
 msgid "Execute after saving"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:52
-msgid "Average time taken"
-msgstr "平均耗时"
+#: ops/serializers/job.py:52 terminal/serializers/session.py:47
+msgid "Duration"
+msgstr "时长"
 
 #: ops/serializers/job.py:72
 msgid "Job type"
@@ -4743,7 +4745,7 @@ msgid "today"
 msgstr "今天"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:125
+#: settings/serializers/feature.py:127
 msgid "day"
 msgstr "天"
 
@@ -4944,7 +4946,7 @@ msgstr "系统设置"
 msgid "Session audits"
 msgstr "会话审计"
 
-#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:83
+#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:84
 msgid "Cloud import"
 msgstr "云同步"
 
@@ -4961,45 +4963,76 @@ msgid "Asset change auth"
 msgstr "资产改密"
 
 #: rbac/tree.py:54
-msgid "Terminal setting"
-msgstr "终端设置"
-
-#: rbac/tree.py:55
 msgid "Job center"
 msgstr "任务中心"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:55
 msgid "My assets"
 msgstr "我的资产"
 
-#: rbac/tree.py:57
+#: rbac/tree.py:56
 msgid "App ops"
 msgstr "作业中心"
 
-#: rbac/tree.py:58 terminal/models/applet/applet.py:52
+#: rbac/tree.py:58
+#, fuzzy
+#| msgid "Feature"
+msgid "Features"
+msgstr "功能"
+
+#: rbac/tree.py:59 settings/serializers/auth/base.py:10
+msgid "Authentication"
+msgstr "认证"
+
+#: rbac/tree.py:60
+msgid "Storage"
+msgstr ""
+
+#: rbac/tree.py:61
+#, fuzzy
+#| msgid "Component"
+msgid "Components"
+msgstr "组件"
+
+#: rbac/tree.py:62 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
 
-#: rbac/tree.py:128
+#: rbac/tree.py:64
+msgid "Appearance"
+msgstr ""
+
+#: rbac/tree.py:65
+#, fuzzy
+#| msgid "Task"
+msgid "Tasks"
+msgstr "任务"
+
+#: rbac/tree.py:66 xpack/plugins/license/meta.py:10
+#: xpack/plugins/license/models.py:144
+msgid "License"
+msgstr "许可证"
+
+#: rbac/tree.py:157
 msgid "App organizations"
 msgstr "组织管理"
 
-#: rbac/tree.py:129
+#: rbac/tree.py:158
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:130 settings/serializers/feature.py:112
-#: settings/serializers/feature.py:114 tickets/models/ticket/general.py:305
+#: rbac/tree.py:159 settings/serializers/feature.py:114
+#: settings/serializers/feature.py:116 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr "工单"
 
-#: rbac/tree.py:131
+#: rbac/tree.py:160
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:132
+#: rbac/tree.py:161
 msgid "View permission tree"
 msgstr "查看授权树"
 
@@ -5109,10 +5142,6 @@ msgstr "聊天提示"
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "同步 LDAP 用户任务结果的通知"
-
-#: settings/serializers/auth/base.py:10
-msgid "Authentication"
-msgstr "认证"
 
 #: settings/serializers/auth/base.py:12
 msgid "LDAP Auth"
@@ -5754,11 +5783,11 @@ msgstr "启用 Vault"
 msgid "Mount Point"
 msgstr "挂载点"
 
-#: settings/serializers/feature.py:60
+#: settings/serializers/feature.py:62
 msgid "Record limit"
 msgstr ""
 
-#: settings/serializers/feature.py:62
+#: settings/serializers/feature.py:64
 msgid ""
 "If the specific value is less than 999 (default), the system will "
 "automatically perform a task every night: check and delete historical "
@@ -5768,78 +5797,78 @@ msgstr ""
 "若特定数值小于999，系统将在每日晚间自动执行任务：检查并删除超出预定数量的历史"
 "账号。如果该数值达到或超过999，则不进行任何历史账号的删除操作。"
 
-#: settings/serializers/feature.py:72 settings/serializers/feature.py:76
+#: settings/serializers/feature.py:74 settings/serializers/feature.py:78
 msgid "Chat AI"
 msgstr "聊天 AI"
 
-#: settings/serializers/feature.py:79
+#: settings/serializers/feature.py:81
 msgid "Base URL"
 msgstr "JumpServer 地址"
 
-#: settings/serializers/feature.py:80
+#: settings/serializers/feature.py:82
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
 msgstr ""
 
-#: settings/serializers/feature.py:83 templates/_header_bar.html:96
+#: settings/serializers/feature.py:85 templates/_header_bar.html:96
 msgid "API Key"
 msgstr "API Key"
 
-#: settings/serializers/feature.py:87
+#: settings/serializers/feature.py:89
 msgid ""
 "The proxy server address of the GPT service. For example: http://ip:port"
 msgstr ""
 
-#: settings/serializers/feature.py:90
+#: settings/serializers/feature.py:92
 msgid "GPT Model"
 msgstr "GPT 模型"
 
-#: settings/serializers/feature.py:116
+#: settings/serializers/feature.py:118
 msgid "Approval without login"
 msgstr "免登录审批"
 
-#: settings/serializers/feature.py:117
+#: settings/serializers/feature.py:119
 msgid "Allow direct approval ticket without login"
 msgstr "允许无需登录直接批准工单"
 
-#: settings/serializers/feature.py:121
+#: settings/serializers/feature.py:123
 msgid "Period"
 msgstr "时段"
 
-#: settings/serializers/feature.py:122
+#: settings/serializers/feature.py:124
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr ""
 
-#: settings/serializers/feature.py:125
+#: settings/serializers/feature.py:127
 msgid "hour"
 msgstr "时"
 
-#: settings/serializers/feature.py:126
+#: settings/serializers/feature.py:128
 msgid "Unit"
 msgstr "单位"
 
-#: settings/serializers/feature.py:126
+#: settings/serializers/feature.py:128
 msgid "The unit of period"
 msgstr "执行周期"
 
-#: settings/serializers/feature.py:131
+#: settings/serializers/feature.py:133
 msgid "Feature"
 msgstr "功能"
 
-#: settings/serializers/feature.py:135
+#: settings/serializers/feature.py:137
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr "允许用户在工作台 - 作业中心 - Adhoc 中执行批量命令"
 
-#: settings/serializers/feature.py:139
+#: settings/serializers/feature.py:141
 msgid "Command blacklist"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/feature.py:140
+#: settings/serializers/feature.py:142
 msgid "Command blacklist in Adhoc"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/feature.py:145
+#: settings/serializers/feature.py:147
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -5847,11 +5876,11 @@ msgstr "作业中心命令黑名单"
 msgid "Virtual app"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:148
+#: settings/serializers/feature.py:150
 msgid "Virtual App"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:150
+#: settings/serializers/feature.py:152
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -7360,10 +7389,6 @@ msgstr "是否可加入"
 msgid "Can terminate"
 msgstr "是否可中断"
 
-#: terminal/serializers/session.py:47
-msgid "Duration"
-msgstr "时长"
-
 #: terminal/serializers/session.py:49
 msgid "User ID"
 msgstr "用户 ID"
@@ -7397,7 +7422,7 @@ msgstr "Access key ID(AK)"
 msgid "Access key secret"
 msgstr "Access key secret(SK)"
 
-#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:99
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:100
 #: xpack/plugins/cloud/models.py:266
 msgid "Region"
 msgstr "地域"
@@ -8883,19 +8908,19 @@ msgstr "实例名称和部分IP"
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:52 xpack/plugins/cloud/manager.py:89
+#: xpack/plugins/cloud/const.py:52 xpack/plugins/cloud/manager.py:90
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:53 xpack/plugins/cloud/manager.py:88
+#: xpack/plugins/cloud/const.py:53 xpack/plugins/cloud/manager.py:89
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:54 xpack/plugins/cloud/manager.py:88
+#: xpack/plugins/cloud/const.py:54 xpack/plugins/cloud/manager.py:89
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:55 xpack/plugins/cloud/manager.py:89
+#: xpack/plugins/cloud/const.py:55 xpack/plugins/cloud/manager.py:90
 msgid "Released"
 msgstr "已释放"
 
@@ -8915,93 +8940,93 @@ msgstr "已同步组织"
 msgid "Imported"
 msgstr "导入"
 
-#: xpack/plugins/cloud/manager.py:46
+#: xpack/plugins/cloud/manager.py:47
 #, fuzzy, python-format
 #| msgid "Task \"%s\" starts executing"
 msgid "Task \"%s\" starts executing"
 msgstr "任务执行 ID"
 
-#: xpack/plugins/cloud/manager.py:80
+#: xpack/plugins/cloud/manager.py:81
 msgid "View the task details path: "
 msgstr "查看详情"
 
-#: xpack/plugins/cloud/manager.py:83
+#: xpack/plugins/cloud/manager.py:84
 msgid "Account Details"
 msgstr "账号"
 
-#: xpack/plugins/cloud/manager.py:84
+#: xpack/plugins/cloud/manager.py:85
 msgid "Synchronization History List"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:84
+#: xpack/plugins/cloud/manager.py:85
 msgid "Synchronization Instance List"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:92
+#: xpack/plugins/cloud/manager.py:93
 msgid "Task execution completed"
 msgstr "任务执行 ID"
 
-#: xpack/plugins/cloud/manager.py:96
+#: xpack/plugins/cloud/manager.py:97
 msgid "Synchronization regions"
 msgstr "没有用户需要同步"
 
-#: xpack/plugins/cloud/manager.py:114
+#: xpack/plugins/cloud/manager.py:115
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:156
+#: xpack/plugins/cloud/manager.py:157
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:332
+#: xpack/plugins/cloud/manager.py:333
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:388
+#: xpack/plugins/cloud/manager.py:389
 #, fuzzy, python-format
 #| msgid "The asset \"%s\" already exists"
 msgid "The asset \"%s\" already exists"
 msgstr "名称已存在"
 
-#: xpack/plugins/cloud/manager.py:390
+#: xpack/plugins/cloud/manager.py:391
 #, fuzzy, python-format
 #| msgid "Update asset \"%s\""
 msgid "Update asset \"%s\""
 msgstr "收集资产信息"
 
-#: xpack/plugins/cloud/manager.py:393
+#: xpack/plugins/cloud/manager.py:394
 #, fuzzy, python-format
 #| msgid "Asset \"%s\" has been updated"
 msgid "Asset \"%s\" has been updated"
 msgstr "资产已经被禁用, 跳过: {}"
 
-#: xpack/plugins/cloud/manager.py:403
+#: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:424
+#: xpack/plugins/cloud/manager.py:425
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:450
+#: xpack/plugins/cloud/manager.py:451
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "删除账号: %s"
 
-#: xpack/plugins/cloud/manager.py:466
+#: xpack/plugins/cloud/manager.py:467
 #, fuzzy, python-format
 #| msgid "Set protocols \"%s\""
 msgid "Set protocols \"%s\""
 msgstr "镜像协议"
 
-#: xpack/plugins/cloud/manager.py:480 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:481 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 
@@ -9535,10 +9560,6 @@ msgstr "许可证导入成功"
 msgid "Invalid license"
 msgstr "无效 IP"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
-msgid "License"
-msgstr "许可证"
-
 #: xpack/plugins/license/models.py:80
 msgid "Basic edition"
 msgstr "企业基础版"
@@ -9554,3 +9575,9 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Average time taken"
+#~ msgstr "平均耗时"
+
+#~ msgid "Terminal setting"
+#~ msgstr "终端设置"
