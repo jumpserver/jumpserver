@@ -905,7 +905,7 @@
     "RemoteAddr": "远端地址",
     "Remove": "移除",
     "RemoveAssetFromNode": "从节点移除资产",
-    "RemoveSelected": "删除所选",
+    "RemoveSelected": "移除所选",
     "RemoveSuccessMsg": "移除成功",
     "Rename": "重命名",
     "RenameNode": "重命名节点",
@@ -1100,7 +1100,7 @@
     "StrategyHelpTip": "根据策略优先级识别资产（例如平台）的独特属性； 当资产的属性（如节点）可以配置为多个时，策略的所有动作都会被执行。",
     "StrategyList": "策略列表",
     "StrategyUpdate": "更新策略",
-    "SuEnabled": "启用开关",
+    "SuEnabled": "启用账号切换",
     "EnableDomain": "启用网域",
     "SuFrom": "切换自",
     "Submit": "提交",
@@ -1339,5 +1339,5 @@
     "IpType": "IP 类型",
     "PublicIp": "公有 IP",
     "PrivateIp": "私有 IP",
-    "VaultHCPMountPoint": "Vault 服务器的挂载点，默认为 jumpserver"
+    "WeChat": "微信"
 }

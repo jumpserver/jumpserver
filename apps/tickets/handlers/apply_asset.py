@@ -1,9 +1,12 @@
 from django.utils.translation import gettext as _
 
+from common.utils import get_logger
 from orgs.utils import tmp_to_org
 from perms.models import AssetPermission
 from tickets.models import ApplyAssetTicket
 from .base import BaseHandler
+
+logger = get_logger(__file__)
 
 
 class Handler(BaseHandler):
@@ -60,6 +63,10 @@ class Handler(BaseHandler):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.nodes.set(apply_nodes)
             asset_permission.assets.set(apply_assets)
-            asset_permission.users.add(self.ticket.applicant)
+
+            try:
+                asset_permission.users.add(self.ticket.applicant)
+            except Exception as e:
+                logger.error('Add user to asset permission failed: %s', e)
 
         return asset_permission
