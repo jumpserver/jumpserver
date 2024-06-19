@@ -53,7 +53,6 @@ class VaultSettingSerializer(serializers.Serializer):
     )
     VAULT_HCP_MOUNT_POINT = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Mount Point'),
-        help_text=_('The mount point of the Vault server, default is jumpserver'),
         default='jumpserver'
     )
 

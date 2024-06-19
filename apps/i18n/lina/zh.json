@@ -1338,5 +1338,6 @@
     "ZoneUpdate": "更新网域",
     "IpType": "IP 类型",
     "PublicIp": "公有 IP",
-    "PrivateIp": "私有 IP"
+    "PrivateIp": "私有 IP",
+    "VaultHCPMountPoint": "Vault 服务器的挂载点，默认为 jumpserver"
 }
