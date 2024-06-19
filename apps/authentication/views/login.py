@@ -249,6 +249,8 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             form.add_error(None, _("Login timeout, please try again."))
+            # 当 session 过期后，刷新浏览器重新提交依旧会报错，所以需要重新设置 test_cookie
+            self.request.session.set_test_cookie()
             return self.form_invalid(form)
 
         # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies

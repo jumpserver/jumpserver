@@ -1,0 +1,56 @@
+name: '⭐️ Feature Request'
+description: 'Suggest an idea'
+title: '[Feature] '
+labels: ['⭐️ Feature Request']
+assignees: 
+  - baijiangjie
+  - ibuler
+body:
+  - type: input
+    attributes:
+      label: 'Product Version'
+      description: The versions prior to v2.28 (inclusive) are no longer supported.
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: 'Product Edition'
+      options:
+        - label: 'Community Edition'
+        - label: 'Enterprise Edition'
+        - label: 'Enterprise Trial Edition'
+    validations:
+      required: true
+    
+  - type: checkboxes
+    attributes:
+      label: 'Installation Method'
+      options:
+        - label: 'Online Installation (One-click command installation)'
+        - label: 'Offline Package Installation'
+        - label: 'All-in-One'
+        - label: '1Panel'
+        - label: 'Kubernetes'
+        - label: 'Source Code'
+
+  - type: textarea
+    attributes:
+      label: '⭐️ Feature Description'
+      description: |
+        Please add a clear and concise description of the problem you aim to solve with this feature request.<br/>
+        Unclear descriptions will not be processed.      
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 'Proposed Solution'
+      description: Please provide a clear and concise description of the solution you desire.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 'Additional Information'
+      description: Please add any additional background information about the issue here.

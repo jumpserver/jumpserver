@@ -93,7 +93,10 @@ class LDAPSettingSerializer(serializers.Serializer):
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
 
-    @staticmethod
-    def post_save():
+    def post_save(self):
+        keys = ['AUTH_LDAP_SYNC_IS_PERIODIC', 'AUTH_LDAP_SYNC_INTERVAL', 'AUTH_LDAP_SYNC_CRONTAB']
+        kwargs = {k: self.validated_data[k] for k in keys if k in self.validated_data}
+        if not kwargs:
+            return
         from settings.tasks import import_ldap_user_periodic
-        import_ldap_user_periodic()
+        import_ldap_user_periodic(**kwargs)

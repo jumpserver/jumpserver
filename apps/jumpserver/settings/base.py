@@ -138,7 +138,6 @@ INSTALLED_APPS = [
     'rbac.apps.RBACConfig',
     'labels.apps.LabelsConfig',
     'rest_framework',
-    'rest_framework_swagger',
     'drf_yasg',
     'django_cas_ng',
     'channels',
@@ -319,6 +318,8 @@ PRIVATE_STORAGE_ROOT = MEDIA_ROOT
 PRIVATE_STORAGE_AUTH_FUNCTION = 'jumpserver.rewriting.storage.permissions.allow_access'
 PRIVATE_STORAGE_INTERNAL_URL = '/private-media/'
 PRIVATE_STORAGE_SERVER = 'jumpserver.rewriting.storage.servers.StaticFileServer'
+
+FILE_UPLOAD_TEMP_DIR = CONFIG.FILE_UPLOAD_TEMP_DIR
 
 # Use django-bootstrap-form to format template, input max width arg
 # BOOTSTRAP_COLUMN_COUNT = 11

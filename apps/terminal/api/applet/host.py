@@ -60,7 +60,7 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     queryset = AppletHostDeployment.objects.all()
     filterset_fields = ['host', ]
     rbac_perms = (
-        ('applets', 'terminal.view_AppletHostDeployment'),
+        ('applets', 'terminal.view_applethostdeployment'),
         ('uninstall', 'terminal.change_applethost'),
     )
 

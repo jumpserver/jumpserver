@@ -23,6 +23,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     postgresql = 'postgresql', 'PostgreSQL'
     sqlserver = 'sqlserver', 'SQLServer'
     db2 = 'db2', 'DB2'
+    dameng = 'dameng', 'Dameng'
     clickhouse = 'clickhouse', 'ClickHouse'
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
@@ -181,6 +182,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
             },
             cls.db2: {
                 'port': 5000,
+                'required': True,
+                'secret_types': ['password'],
+                'xpack': True,
+            },
+            cls.dameng: {
+                'port': 5236,
                 'required': True,
                 'secret_types': ['password'],
                 'xpack': True,

@@ -10,3 +10,4 @@ jobs:
       - uses: jumpserver/action-generic-handler@master
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
+          I18N_TOKEN: ${{ secrets.I18N_TOKEN }}

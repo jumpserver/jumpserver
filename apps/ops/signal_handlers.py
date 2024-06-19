@@ -140,6 +140,9 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         args = []
         kwargs = {}
 
+    # 不要保存__current_lang和__current_org_id参数,防止系统任务中点击再次执行报错
+    kwargs.pop('__current_lang', None)
+    kwargs.pop('__current_org_id', None)
     data = {
         'id': i,
         'name': task,

@@ -1,0 +1,60 @@
+name: '🤔 Question'
+description: 'Pose a question'
+title: '[Question] '
+labels: ['🤔 Question']
+assignees: 
+  - baijiangjie
+body:
+  - type: input
+    attributes:
+      label: 'Product Version'
+      description: The versions prior to v2.28 (inclusive) are no longer supported.
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: 'Product Edition'
+      options:
+        - label: 'Community Edition'
+        - label: 'Enterprise Edition'
+        - label: 'Enterprise Trial Edition'
+    validations:
+      required: true
+    
+  - type: checkboxes
+    attributes:
+      label: 'Installation Method'
+      options:
+        - label: 'Online Installation (One-click command installation)'
+        - label: 'Offline Package Installation'
+        - label: 'All-in-One'
+        - label: '1Panel'
+        - label: 'Kubernetes'
+        - label: 'Source Code'
+
+  - type: textarea
+    attributes:
+      label: 'Environment Information'
+      description: Please provide a clear and concise description outlining your environment information.
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: '🤔 Question Description'
+      description: |
+        Please provide a clear and concise description of the defect. If the issue is complex, please provide detailed explanations. <br/>
+        Unclear descriptions will not be processed. 
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: 'Expected Behavior'
+      description: Please provide a clear and concise description of what you expect to happen.
+
+  - type: textarea
+    attributes:
+      label: 'Additional Information'
+      description: Please add any additional background information about the issue here.

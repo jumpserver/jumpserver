@@ -1,0 +1,56 @@
+name: '⭐️ 功能需求'
+description: '提出需求或建议'
+title: '[Feature] '
+labels: ['⭐️ Feature Request']
+assignees: 
+  - baijiangjie
+  - ibuler
+body:
+  - type: input
+    attributes:
+      label: '产品版本'
+      description: 不再支持 v2.28（含）之前的版本。
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: '版本类型'
+      options:
+        - label: '社区版'
+        - label: '企业版'
+        - label: '企业试用版'
+    validations:
+      required: true
+    
+  - type: checkboxes
+    attributes:
+      label: '安装方式'
+      options:
+        - label: '在线安装 (一键命令安装)'
+        - label: '离线包安装'
+        - label: 'All-in-One'
+        - label: '1Panel'
+        - label: 'Kubernetes'
+        - label: '源码安装'
+
+  - type: textarea
+    attributes:
+      label: '⭐️ 需求描述'
+      description: |
+        请添加一个清晰且简洁的问题描述，阐述你希望通过这个功能需求解决的问题。<br/>
+        针对不清晰的描述信息将不予处理。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: '解决方案'
+      description: 请清晰且简洁地描述你想要的解决方案。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: '补充信息'
+      description: 在这里添加关于问题的任何其他背景信息。

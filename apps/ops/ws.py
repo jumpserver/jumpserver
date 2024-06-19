@@ -7,6 +7,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
+from rbac.builtin import BuiltinRole
 from .ansible.utils import get_ansible_task_log_path
 from .celery.utils import get_celery_task_log_path
 from .const import CELERY_LOG_MAGIC_MARK
@@ -48,13 +49,30 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         else:
             return None
 
+    @sync_to_async
+    def get_current_user_role_ids(self, user):
+        roles = user.system_roles.all() | user.org_roles.all()
+        user_role_ids = set(map(str, roles.values_list('id', flat=True)))
+        return user_role_ids
+
     async def receive_json(self, content, **kwargs):
         task_id = content.get('task')
         task = await self.get_task(task_id)
         if not task:
             await self.send_json({'message': 'Task not found', 'task': task_id})
             return
-        if task.name in self.user_tasks and task.creator != self.scope['user']:
+
+        admin_auditor_role_ids = {
+            BuiltinRole.system_admin.id,
+            BuiltinRole.system_auditor.id,
+            BuiltinRole.org_admin.id,
+            BuiltinRole.org_auditor.id
+        }
+        user = self.scope['user']
+        user_role_ids = await self.get_current_user_role_ids(user)
+        has_admin_auditor_role = bool(admin_auditor_role_ids & user_role_ids)
+
+        if not has_admin_auditor_role and task.name in self.user_tasks and task.creator != user:
             await self.send_json({'message': 'No permission', 'task': task_id})
             return
 

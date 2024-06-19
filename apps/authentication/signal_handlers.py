@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth import user_logged_in
+from django.contrib.auth import user_logged_in, BACKEND_SESSION_KEY
 from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
@@ -20,8 +20,9 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             and user.mfa_enabled \
             and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
+    auth_backend = request.session.get('auth_backend', request.session.get(BACKEND_SESSION_KEY))
     if not request.session.get("auth_third_party_done") and \
-            request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
+            auth_backend in AUTHENTICATION_BACKENDS_THIRD_PARTY:
         request.session['auth_third_party_required'] = 1
 
     user_session_id = request.session.get('user_session_id')

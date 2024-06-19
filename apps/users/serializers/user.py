@@ -17,6 +17,7 @@ from orgs.utils import current_org
 from rbac.builtin import BuiltinRole
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from rbac.permissions import RBACPermission
+from users.signals import post_user_change_password
 from ..const import PasswordStrategy
 from ..models import User
 
@@ -268,6 +269,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         instance = self.save_and_set_custom_m2m_fields(
             validated_data, save_handler, created=False
         )
+        if validated_data.get('public_key'):
+            post_user_change_password.send(instance.__class__, user=instance)
         return instance
 
     def create(self, validated_data):
@@ -275,6 +278,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         instance = self.save_and_set_custom_m2m_fields(
             validated_data, save_handler, created=True
         )
+        if validated_data.get('public_key'):
+            post_user_change_password.send(instance.__class__, user=instance)
         return instance
 
     @classmethod
