@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 17:36+0800\n"
+"POT-Creation-Date: 2024-06-20 16:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -388,7 +388,7 @@ msgstr "账号备份计划"
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
 #: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:241
-#: ops/templates/ops/celery_task_log.html:95
+#: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:45
@@ -904,7 +904,7 @@ msgstr "资产类型"
 
 #: accounts/serializers/account/base.py:33 terminal/serializers/storage.py:149
 msgid "Passphrase"
-msgstr ""
+msgstr "密码"
 
 #: accounts/serializers/account/base.py:93
 #: assets/serializers/asset/common.py:384
@@ -1015,7 +1015,7 @@ msgstr "请输入 MFA 验证码"
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
-msgstr ""
+msgstr "秘文参数设置，目前只对宿主类型的资产有效。"
 
 #: accounts/serializers/automations/change_secret.py:84
 msgid "* Please enter the correct password length"
@@ -2191,7 +2191,7 @@ msgstr "类型"
 msgid ""
 "A gateway is a network proxy for a zone, and when connecting assets within "
 "the zone, the connection is routed through the gateway."
-msgstr ""
+msgstr "网关是网域的网络代理，当连接网域内的资产时，连接将通过网关进行路由。"
 
 #: assets/serializers/domain.py:24 orgs/serializers.py:13
 #: perms/serializers/permission.py:40
@@ -2415,7 +2415,9 @@ msgstr "重命名"
 msgid "Symlink"
 msgstr "建立软链接"
 
-#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:149
+#: audits/const.py:18 audits/const.py:28
+#: ops/templates/ops/celery_task_log.html:86
+#: terminal/api/session/session.py:149
 msgid "Download"
 msgstr "下载"
 
@@ -2694,7 +2696,7 @@ msgstr "飞书"
 #: settings/serializers/auth/slack.py:10 settings/serializers/auth/slack.py:12
 #: users/models/user.py:800 users/models/user.py:976
 msgid "Slack"
-msgstr ""
+msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:161
 #: authentication/views/login.py:83 notifications/backends/__init__.py:12
@@ -3016,8 +3018,10 @@ msgstr "登录完成前，请先修改密码"
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
-#: authentication/forms.py:39
-msgid "Auto login"
+#: authentication/forms.py:34
+#, fuzzy
+#| msgid "Auto login"
+msgid "Auto login next"
 msgstr "自动登录"
 
 #: authentication/forms.py:52
@@ -3684,7 +3688,7 @@ msgstr "企业微信错误"
 
 #: authentication/views/wecom.py:118
 msgid "Wecom"
-msgstr ""
+msgstr "企业微信"
 
 #: authentication/views/wecom.py:160 authentication/views/wecom.py:195
 msgid "Failed to get user from WeCom"
@@ -4066,7 +4070,7 @@ msgstr "标签管理"
 
 #: labels/models.py:15
 msgid "Color"
-msgstr ""
+msgstr "颜色"
 
 #: labels/models.py:20 labels/models.py:39
 msgid "Tag"
@@ -4290,7 +4294,7 @@ msgstr "Raw"
 
 #: ops/const.py:57
 msgid "HUAWEI"
-msgstr ""
+msgstr "华为"
 
 #: ops/const.py:65
 msgid "MariaDB"
@@ -4712,31 +4716,31 @@ msgstr "剪贴板"
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/perm_node.py:68
+#: perms/models/perm_node.py:74
 msgid "Ungrouped"
 msgstr "未分组"
 
-#: perms/models/perm_node.py:70
+#: perms/models/perm_node.py:76
 msgid "Favorite"
 msgstr "收藏夹"
 
-#: perms/models/perm_node.py:121
+#: perms/models/perm_node.py:128
 msgid "Permed asset"
 msgstr "授权的资产"
 
-#: perms/models/perm_node.py:123
+#: perms/models/perm_node.py:130
 msgid "Can view my assets"
 msgstr "可以查看我的资产"
 
-#: perms/models/perm_node.py:124
+#: perms/models/perm_node.py:131
 msgid "Can view user assets"
 msgstr "可以查看用户授权的资产"
 
-#: perms/models/perm_node.py:125
+#: perms/models/perm_node.py:132
 msgid "Can view usergroup assets"
 msgstr "可以查看用户组授权的资产"
 
-#: perms/models/perm_node.py:136
+#: perms/models/perm_node.py:143
 msgid "Permed account"
 msgstr "授权账号"
 
@@ -4986,7 +4990,7 @@ msgstr "认证"
 
 #: rbac/tree.py:60
 msgid "Storage"
-msgstr ""
+msgstr "存储"
 
 #: rbac/tree.py:61
 #, fuzzy
@@ -5002,7 +5006,7 @@ msgstr "远程应用"
 
 #: rbac/tree.py:64
 msgid "Appearance"
-msgstr ""
+msgstr "外貌"
 
 #: rbac/tree.py:65
 #, fuzzy
@@ -5206,6 +5210,8 @@ msgid ""
 "information, the system will automatically create the user using this email "
 "suffix"
 msgstr ""
+"第三方用户认证成功后，若第三方认证服务平台未返回该用户的邮箱信息，系统将自动"
+"以此邮箱后缀创建用户"
 
 #: settings/serializers/auth/base.py:35
 msgid "Forgot Password"
@@ -5213,7 +5219,7 @@ msgstr "忘记密码"
 
 #: settings/serializers/auth/base.py:36
 msgid "The URL for Forgotten Password on the user login page"
-msgstr ""
+msgstr "用户登录页面忘记密码的 URL"
 
 #: settings/serializers/auth/base.py:39
 msgid "Login redirection"
@@ -5225,6 +5231,8 @@ msgid ""
 "party authentication when the administrator enables third-party redirect "
 "authentication"
 msgstr ""
+"当管理员启用第三方重定向身份验证时，在用户重定向到第三方身份验证之前是否显示 "
+"Flash 页面"
 
 #: settings/serializers/auth/cas.py:10 settings/serializers/auth/cas.py:12
 msgid "CAS"
@@ -5246,7 +5254,7 @@ msgstr "同步注销"
 
 #: settings/serializers/auth/cas.py:20
 msgid "When the user signs out, they also be logged out from the CAS server"
-msgstr ""
+msgstr "当用户退出时，他们也会从 CAS 服务器注销"
 
 #: settings/serializers/auth/cas.py:26
 msgid "Username attr"
@@ -5267,6 +5275,8 @@ msgid ""
 "User attribute mapping, where the `key` is the CAS service user attribute "
 "name and the `value` is the JumpServer user attribute name"
 msgstr ""
+"用户属性映射，其中 `key` 是 CAS 服务用户属性名称，`value` 是 JumpServer 用户"
+"属性名称"
 
 #: settings/serializers/auth/cas.py:39
 msgid "Create user"
@@ -5276,7 +5286,7 @@ msgstr "创建用户(如果不存在)"
 msgid ""
 "After successful user authentication, if the user does not exist, "
 "automatically create the user"
-msgstr ""
+msgstr "用户认证成功后，若用户不存在，则自动创建用户"
 
 #: settings/serializers/auth/dingtalk.py:15
 msgid "Dingtalk"
@@ -5300,7 +5310,7 @@ msgstr "绑定 DN"
 
 #: settings/serializers/auth/ldap.py:47
 msgid "Binding Distinguished Name"
-msgstr ""
+msgstr "绑定专有名称"
 
 #: settings/serializers/auth/ldap.py:51
 msgid "Binding password"
@@ -5314,7 +5324,7 @@ msgstr "系统架构"
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
-msgstr ""
+msgstr "用户搜索库，如果有多个OU，可以用`|`符号分隔"
 
 #: settings/serializers/auth/ldap.py:60
 msgid "Search filter"
@@ -5330,6 +5340,8 @@ msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the LDAP service user attribute name"
 msgstr ""
+"用户属性映射，其中 `key` 是 JumpServer 用户属性名称，`value` 是 LDAP 服务用户"
+"属性名称"
 
 #: settings/serializers/auth/ldap.py:85
 msgid "Connect timeout (s)"
@@ -5395,13 +5407,15 @@ msgstr "注销会话端点地址"
 
 #: settings/serializers/auth/oauth2.py:56
 msgid "When the user signs out, they also be logged out from the OAuth2 server"
-msgstr ""
+msgstr "当用户退出时，他们也会从 OAuth2 服务器退出"
 
 #: settings/serializers/auth/oauth2.py:61
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the OAuth2 service user attribute name"
 msgstr ""
+"用户属性映射，其中 `key` 是 JumpServer 用户属性名称，`value` 是 OAuth2 服务用"
+"户属性名称"
 
 #: settings/serializers/auth/oauth2.py:66 settings/serializers/auth/oidc.py:112
 #: settings/serializers/auth/saml2.py:43
@@ -5418,7 +5432,7 @@ msgstr "JumpServer 地址"
 
 #: settings/serializers/auth/oidc.py:17
 msgid "The current site's URL is used to construct the callback address"
-msgstr ""
+msgstr "当前站点的URL用于构造回调地址"
 
 #: settings/serializers/auth/oidc.py:20
 msgid "Client Id"
@@ -5437,6 +5451,8 @@ msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the OIDC service user attribute name"
 msgstr ""
+"用户属性映射，其中 `key` 是 JumpServer 用户属性名称，`value` 是 OIDC 服务用户"
+"属性名称"
 
 #: settings/serializers/auth/oidc.py:44
 msgid "Enable PKCE"
@@ -5455,6 +5471,7 @@ msgid ""
 "Use Keycloak as the OpenID Connect server, or use standard OpenID Connect "
 "Protocol"
 msgstr ""
+"使用 Keycloak 作为 OpenID Connect 服务器，或者使用标准 OpenID Connect 协议"
 
 #: settings/serializers/auth/oidc.py:63
 msgid "Realm name"
@@ -5531,7 +5548,7 @@ msgstr "使用 Radius OTP"
 
 #: settings/serializers/auth/radius.py:23
 msgid "* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
-msgstr ""
+msgstr "* 在 RADIUS 中使用 OTP 意味着用户可以使用 RADIUS 作为 MFA 的方法"
 
 #: settings/serializers/auth/saml2.py:10 settings/serializers/auth/saml2.py:13
 msgid "SAML2"
@@ -5562,14 +5579,16 @@ msgid ""
 "User attribute mapping, where the `key` is the SAML2 service user attribute "
 "name and the `value` is the JumpServer user attribute name"
 msgstr ""
+"用户属性映射，其中 `key` 是 SAML2 服务用户属性名称，`value` 是 JumpServer 用"
+"户属性名称"
 
 #: settings/serializers/auth/saml2.py:41
 msgid "When the user signs out, they also be logged out from the SAML2 server"
-msgstr ""
+msgstr "当用户退出时，他们也会从 SAML2 服务器注销"
 
 #: settings/serializers/auth/sms.py:18
 msgid "Enable Short Message Service (SMS)"
-msgstr ""
+msgstr "启用短信服务 (SMS)"
 
 #: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:35
 msgid "Provider"
@@ -5577,7 +5596,7 @@ msgstr "云服务商"
 
 #: settings/serializers/auth/sms.py:22
 msgid "Short Message Service (SMS) provider or protocol"
-msgstr ""
+msgstr "短信服务 (SMS) 提供商或协议"
 
 #: settings/serializers/auth/sms.py:25
 msgid "Code length"
@@ -5785,7 +5804,7 @@ msgstr "挂载点"
 
 #: settings/serializers/feature.py:61
 msgid "Record limit"
-msgstr ""
+msgstr "记录限制"
 
 #: settings/serializers/feature.py:63
 msgid ""
@@ -5807,7 +5826,7 @@ msgstr "JumpServer 地址"
 
 #: settings/serializers/feature.py:81
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
-msgstr ""
+msgstr "GPT 服务的基本 URL。例如：https://api.openai.com/v1"
 
 #: settings/serializers/feature.py:84 templates/_header_bar.html:96
 msgid "API Key"
@@ -5816,7 +5835,7 @@ msgstr "API Key"
 #: settings/serializers/feature.py:88
 msgid ""
 "The proxy server address of the GPT service. For example: http://ip:port"
-msgstr ""
+msgstr "GPT 服务的代理服务器地址。例如：http://ip:port"
 
 #: settings/serializers/feature.py:91
 msgid "GPT Model"
@@ -5837,7 +5856,7 @@ msgstr "时段"
 #: settings/serializers/feature.py:123
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
-msgstr ""
+msgstr "工单申请资产的默认授权时间段"
 
 #: settings/serializers/feature.py:126
 msgid "hour"
@@ -5884,7 +5903,7 @@ msgstr "虚拟应用"
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
-msgstr ""
+msgstr "虚拟应用，可以使用Linux操作系统作为远程应用中的应用服务器。"
 
 #: settings/serializers/msg.py:25
 msgid "SMTP"
@@ -5892,7 +5911,7 @@ msgstr "SMTP"
 
 #: settings/serializers/msg.py:26
 msgid "EXCHANGE"
-msgstr ""
+msgstr "交换"
 
 #: settings/serializers/msg.py:34
 msgid "The user to be used for email server authentication"
@@ -5903,18 +5922,19 @@ msgid ""
 "Password to use for the email server. It is used in conjunction with `User` "
 "when authenticating to the email server"
 msgstr ""
+"用于电子邮件服务器的密码。在向电子邮件服务器进行身份验证时，它与用户一起使用"
 
 #: settings/serializers/msg.py:41
 msgid "From"
-msgstr ""
+msgstr "表单"
 
 #: settings/serializers/msg.py:42
 msgid "Sender email address (default to using the `User`)"
-msgstr ""
+msgstr "发件人电子邮件地址（默认使用“用户”）"
 
 #: settings/serializers/msg.py:46
 msgid "The recipient is used for testing the email server's connectivity"
-msgstr ""
+msgstr "收件人用于测试电子邮件服务器的连通性"
 
 #: settings/serializers/msg.py:50
 msgid ""
@@ -5922,6 +5942,8 @@ msgid ""
 "server. In most email documentation this type of TLS connection is referred "
 "to as SSL. It is generally used on port 465"
 msgstr ""
+"与 SMTP 服务器通信时是否使用隐式 TLS（安全）连接。在大多数电子邮件文档中，这"
+"种类型的 TLS 连接称为 SSL。它通常在端口 465 上使用"
 
 #: settings/serializers/msg.py:53
 msgid "Use TLS"
@@ -5932,6 +5954,8 @@ msgid ""
 "Whether to use a TLS (secure) connection when talking to the SMTP server. "
 "This is used for explicit TLS connections, generally on port 587"
 msgstr ""
+"与 SMTP 服务器通信时是否使用 TLS（安全）连接。这用于显式 TLS 连接，通常在端"
+"口 587 上"
 
 #: settings/serializers/msg.py:62
 msgid "Subject prefix"
@@ -6200,7 +6224,7 @@ msgstr "会话在浏览器关闭时过期"
 
 #: settings/serializers/security.py:201
 msgid "Whether to expire the session when the user closes their browser."
-msgstr ""
+msgstr "当用户关闭浏览器时是否使会话过期。"
 
 #: settings/serializers/security.py:205
 msgid "Max online time (hour)"
@@ -6257,7 +6281,7 @@ msgstr "是否允许组件注册，当所有终端启动后，为了安全应该
 #: settings/serializers/terminal.py:30
 msgid ""
 "* Allow users to log in to the KoKo component via password authentication"
-msgstr ""
+msgstr "* 允许用户通过密码验证登录KoKo组件"
 
 #: settings/serializers/terminal.py:34 users/forms/profile.py:172
 #: users/models/user.py:931
@@ -6272,6 +6296,8 @@ msgid ""
 "are enabled, you should disable this option to prevent users from logging in "
 "after being deleted from the AD/LDAP server"
 msgstr ""
+"* 允许用户通过公钥认证方式登录 KoKo 组件<br/>如果第三方认证服务（如 AD/LDAP）"
+"已启用，则应禁用此选项，以防止用户从 AD/LDAP 服务器中删除后再次登录"
 
 #: settings/serializers/terminal.py:43
 msgid "Asset sorting"
@@ -6287,6 +6313,8 @@ msgid ""
 "endpoint<br/>If enabled, the Luna page will display the DB client launch "
 "method when connecting to assets"
 msgstr ""
+"* 您可以在服务端点中单独配置服务地址和端口<br/>如果启用，Luna 页面将在连接资"
+"产时显示 DB 客户端启动方法"
 
 #: settings/serializers/terminal.py:59
 msgid ""
@@ -6294,26 +6322,30 @@ msgid ""
 "endpoint<br/>If enabled, the Luna page will display the download rdp file "
 "button and RDP Client launch method when connecting to assets"
 msgstr ""
+"* 您可以在服务端点中单独配置服务地址和端口<br/>如果启用，Luna 页面将在连接资"
+"产时显示下载 rdp 文件按钮和 RDP 客户端启动方法"
 
 #: settings/serializers/terminal.py:68
 msgid ""
 "* Allow connecting to the KoKo component via SSH client<br/>If enabled, the "
 "Luna page will display the SSH client launch method when connecting to assets"
 msgstr ""
+"* 允许通过 SSH 客户端连接到 KoKo 组件<br/>如果启用，则在连接到资产时，Luna 页"
+"面将显示 SSH 客户端启动方法"
 
 #: settings/serializers/tool.py:10
 msgid "Tool"
-msgstr ""
+msgstr "工具"
 
 #: settings/serializers/tool.py:13
 msgid "Tools in the Workbench"
-msgstr ""
+msgstr "工作台中的工具"
 
 #: settings/serializers/tool.py:15
 msgid ""
 "*! If enabled, users with RBAC permissions will be able to utilize all tools "
 "in the workbench"
-msgstr ""
+msgstr "*! 如果启用，具有 RBAC 权限的用户将能够使用工作台中的所有工具"
 
 #: settings/tasks/ldap.py:28
 msgid "Periodic import ldap user"
@@ -8404,7 +8436,7 @@ msgstr "系统角色"
 msgid ""
 "System roles are roles at the system level, and they will take effect across "
 "all organizations"
-msgstr ""
+msgstr "系统角色是系统级别的角色，将在所有组织中生效"
 
 #: users/serializers/user.py:59
 msgid "Org roles"
@@ -8414,7 +8446,7 @@ msgstr "组织角色"
 msgid ""
 "Org roles are roles at the organization level, and they will only take "
 "effect within current organization"
-msgstr ""
+msgstr "组织角色是组织级别的角色，仅在当前组织内有效"
 
 #: users/serializers/user.py:68
 msgid "Organizations and roles"
@@ -8474,6 +8506,8 @@ msgid ""
 "other sources.There are security settings that can restrict users to log in "
 "to the system only from the sources."
 msgstr ""
+"用户来源标识用户的创建位置，可以是 AD 或其他来源。安全设置可以限制用户只能从"
+"指定来源登录系统。"
 
 #: users/serializers/user.py:263
 msgid "Superuser"
@@ -8498,7 +8532,7 @@ msgstr "认证"
 #: users/serializers/user.py:416
 msgid ""
 "* For security, only a partial of users is displayed. You can search for more"
-msgstr ""
+msgstr "* 为安全起见，只显示部分用户。您可以搜索更多"
 
 #: users/serializers/user.py:451
 msgid "name not unique"
@@ -8786,7 +8820,7 @@ msgstr "XPack"
 msgid ""
 "Based on the current task configuration, assets that do not match the "
 "strategy will skipped."
-msgstr ""
+msgstr "根据当前任务配置，不符合“”策略的资产将被跳过。"
 
 #: xpack/plugins/cloud/api.py:64
 msgid "Test connection successful"
@@ -8942,9 +8976,8 @@ msgstr "导入"
 
 #: xpack/plugins/cloud/manager.py:47
 #, fuzzy, python-format
-#| msgid "Task \"%s\" starts executing"
 msgid "Task \"%s\" starts executing"
-msgstr "任务执行 ID"
+msgstr "任务 %s 开始执行"
 
 #: xpack/plugins/cloud/manager.py:81
 msgid "View the task details path: "
@@ -8956,11 +8989,11 @@ msgstr "账号"
 
 #: xpack/plugins/cloud/manager.py:85
 msgid "Synchronization History List"
-msgstr ""
+msgstr "同步历史列表"
 
 #: xpack/plugins/cloud/manager.py:85
 msgid "Synchronization Instance List"
-msgstr ""
+msgstr "同步实例列表"
 
 #: xpack/plugins/cloud/manager.py:93
 msgid "Task execution completed"
@@ -8973,47 +9006,45 @@ msgstr "没有用户需要同步"
 #: xpack/plugins/cloud/manager.py:115
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
-msgstr ""
+msgstr "获取区域 \"%s\" 的实例错误，错误：%s"
 
 #: xpack/plugins/cloud/manager.py:157
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
-msgstr ""
+msgstr "无法同步实例 %s"
 
 #: xpack/plugins/cloud/manager.py:333
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
-msgstr ""
+msgstr "资产“%s”的更新平台与原平台类型不一致。跳过平台和协议更新"
 
 #: xpack/plugins/cloud/manager.py:389
 #, fuzzy, python-format
-#| msgid "The asset \"%s\" already exists"
 msgid "The asset \"%s\" already exists"
-msgstr "名称已存在"
+msgstr "资产 %s 已存在"
 
 #: xpack/plugins/cloud/manager.py:391
 #, fuzzy, python-format
 #| msgid "Update asset \"%s\""
 msgid "Update asset \"%s\""
-msgstr "收集资产信息"
+msgstr "更新资产 %s"
 
 #: xpack/plugins/cloud/manager.py:394
 #, fuzzy, python-format
-#| msgid "Asset \"%s\" has been updated"
 msgid "Asset \"%s\" has been updated"
-msgstr "资产已经被禁用, 跳过: {}"
+msgstr "资产 %s 已更新"
 
 #: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid "Prepare to create asset \"%s\""
-msgstr ""
+msgstr "准备创建资产 %s"
 
 #: xpack/plugins/cloud/manager.py:425
-#, python-format
+#, fuzzy, python-format
 msgid "Set nodes \"%s\""
-msgstr ""
+msgstr "删除节点: %s"
 
 #: xpack/plugins/cloud/manager.py:451
 #, python-format
@@ -9022,9 +9053,8 @@ msgstr "删除账号: %s"
 
 #: xpack/plugins/cloud/manager.py:467
 #, fuzzy, python-format
-#| msgid "Set protocols \"%s\""
 msgid "Set protocols \"%s\""
-msgstr "镜像协议"
+msgstr "设置协议 %s"
 
 #: xpack/plugins/cloud/manager.py:481 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
@@ -9399,7 +9429,7 @@ msgstr "华东-宿迁"
 #: xpack/plugins/cloud/providers/lan.py:79
 #, python-format
 msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
-msgstr ""
+msgstr "实例 IP %(ip)s 的端口%(port)s 无法访问"
 
 #: xpack/plugins/cloud/serializers/account.py:95
 msgid "Validity display"
