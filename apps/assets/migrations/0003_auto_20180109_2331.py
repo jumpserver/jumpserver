@@ -448,6 +448,17 @@ platforms_data_json = '''[
                 "required": false,
                 "default": false,
                 "setting": {}
+            },
+            {
+                "name": "winrm",
+                "port": 5985,
+                "primary": false,
+                "public": false,
+                "required": false,
+                "default": false,
+                "setting": {
+                    "use_ssl": false
+                }
             }
         ]
     },
@@ -506,6 +517,17 @@ platforms_data_json = '''[
                 "required": false,
                 "default": false,
                 "setting": {}
+            },
+            {
+                "name": "winrm",
+                "port": 5985,
+                "primary": false,
+                "public": false,
+                "required": false,
+                "default": false,
+                "setting": {
+                    "use_ssl": false
+                }
             }
         ]
     },
@@ -564,6 +586,17 @@ platforms_data_json = '''[
                 "required": false,
                 "default": false,
                 "setting": {}
+            },
+            {
+                "name": "winrm",
+                "port": 5985,
+                "primary": false,
+                "public": false,
+                "required": false,
+                "default": false,
+                "setting": {
+                    "use_ssl": false
+                }
             }
         ]
     },
@@ -615,6 +648,17 @@ platforms_data_json = '''[
                 },
                 "required": true,
                 "default": false
+            },
+            {
+                "name": "winrm",
+                "port": 5985,
+                "primary": false,
+                "public": false,
+                "required": false,
+                "default": false,
+                "setting": {
+                    "use_ssl": false
+                }
             }
         ]
     },
