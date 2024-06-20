@@ -1337,5 +1337,8 @@
     "ZoneUpdate": "Update the zone",
     "IpType": "IP type",
     "PublicIp": "Public Ip",
-    "PrivateIp": "Private Ip"
+    "PrivateIp": "Private Ip",
+    "VaultHCPMountPoint": "The mount point of the Vault server, default is jumpserver",
+    "WeChat": "WeChat",
+    "SuEnabled": "Enabled su"
 }

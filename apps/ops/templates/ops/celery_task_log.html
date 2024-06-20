@@ -80,6 +80,12 @@
     </style>
 </head>
 <div class="container">
+    <div style="position: absolute; top: 10px; right: 12px;">
+        <button id="download-log-btn"
+                style="background-color: #1ab394; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">
+            {% trans 'Download' %}
+        </button>
+    </div>
     <div class="header">
         <ul class="info">
             <li class="item">
@@ -111,7 +117,6 @@
     var term;
     var ws;
     var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
-
     $(document).ready(function () {
         term = new Terminal({
             cursorBlink: false,
@@ -164,4 +169,20 @@
             }
         })
     }
+
+    function downloadLog() {
+        term.selectAll()
+        let logData = term.getSelection()
+        const blob = new Blob([logData], {type: 'text/plain'});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `log_${taskId}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('download-log-btn').addEventListener('click', downloadLog);
 </script>
