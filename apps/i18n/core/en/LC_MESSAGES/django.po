@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-20 16:39+0800\n"
+"POT-Creation-Date: 2024-06-21 18:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Skip"
 msgstr ""
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:267
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:264
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr ""
@@ -561,7 +561,8 @@ msgid "Address login"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:44
-msgid "Gather account automation"
+#: accounts/tasks/gather_accounts.py:29
+msgid "Gather asset accounts"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:56
@@ -569,8 +570,7 @@ msgid "Is sync account"
 msgstr "Is sync account"
 
 #: accounts/models/automations/gather_account.py:75
-#: accounts/tasks/gather_accounts.py:29
-msgid "Gather asset accounts"
+msgid "Gather account automation"
 msgstr ""
 
 #: accounts/models/automations/push_account.py:14
@@ -1546,7 +1546,7 @@ msgstr ""
 msgid "ChatGPT"
 msgstr ""
 
-#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:67
+#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:66
 #: xpack/plugins/cloud/const.py:69
 msgid "Other"
 msgstr ""
@@ -1583,7 +1583,7 @@ msgstr ""
 msgid "Any"
 msgstr ""
 
-#: assets/const/protocol.py:81 rbac/tree.py:63
+#: assets/const/protocol.py:81 rbac/tree.py:62
 #: settings/serializers/security.py:232
 msgid "Security"
 msgstr ""
@@ -2373,7 +2373,7 @@ msgstr ""
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:268
+#: rbac/tree.py:265
 msgid "Delete"
 msgstr ""
 
@@ -2399,7 +2399,7 @@ msgstr ""
 msgid "Rename dir"
 msgstr ""
 
-#: audits/const.py:23 rbac/tree.py:266 terminal/api/session/session.py:274
+#: audits/const.py:23 rbac/tree.py:263 terminal/api/session/session.py:274
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:84
@@ -2408,7 +2408,7 @@ msgstr ""
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:265
+#: rbac/tree.py:262
 msgid "Create"
 msgstr ""
 
@@ -2426,7 +2426,7 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
-#: audits/const.py:35 rbac/tree.py:57
+#: audits/const.py:35 rbac/tree.py:56
 msgid "Notifications"
 msgstr ""
 
@@ -2460,7 +2460,7 @@ msgstr ""
 msgid "Login log"
 msgstr ""
 
-#: audits/const.py:51 terminal/models/applet/host.py:144
+#: audits/const.py:51 rbac/tree.py:64 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
 #: xpack/plugins/cloud/serializers/account.py:77
 msgid "Task"
@@ -4921,72 +4921,64 @@ msgid "Asset change auth"
 msgstr ""
 
 #: rbac/tree.py:54
-msgid "Job center"
-msgstr ""
-
-#: rbac/tree.py:55
 msgid "My assets"
 msgstr ""
 
-#: rbac/tree.py:56
+#: rbac/tree.py:55
 msgid "App ops"
 msgstr "Ops"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:57
 msgid "Features"
 msgstr ""
 
-#: rbac/tree.py:59 settings/serializers/auth/base.py:10
+#: rbac/tree.py:58 settings/serializers/auth/base.py:10
 msgid "Authentication"
 msgstr ""
 
-#: rbac/tree.py:60
+#: rbac/tree.py:59
 msgid "Storage"
 msgstr ""
 
-#: rbac/tree.py:61
+#: rbac/tree.py:60
 #, fuzzy
 #| msgid "SystemComponent"
 msgid "Components"
 msgstr "System Component"
 
-#: rbac/tree.py:62 terminal/models/applet/applet.py:52
+#: rbac/tree.py:61 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr ""
 
-#: rbac/tree.py:64
+#: rbac/tree.py:63
 msgid "Appearance"
 msgstr ""
 
-#: rbac/tree.py:65
-msgid "Tasks"
-msgstr ""
-
-#: rbac/tree.py:66 xpack/plugins/license/meta.py:10
+#: rbac/tree.py:65 xpack/plugins/license/meta.py:10
 #: xpack/plugins/license/models.py:144
 msgid "License"
 msgstr ""
 
-#: rbac/tree.py:157
+#: rbac/tree.py:154
 msgid "App organizations"
 msgstr "Organizations"
 
-#: rbac/tree.py:158
+#: rbac/tree.py:155
 msgid "Ticket comment"
 msgstr ""
 
-#: rbac/tree.py:159 settings/serializers/feature.py:113
+#: rbac/tree.py:156 settings/serializers/feature.py:113
 #: settings/serializers/feature.py:115 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr ""
 
-#: rbac/tree.py:160
+#: rbac/tree.py:157
 msgid "Common setting"
 msgstr ""
 
-#: rbac/tree.py:161
+#: rbac/tree.py:158
 msgid "View permission tree"
 msgstr ""
 
@@ -5002,6 +4994,10 @@ msgstr ""
 
 #: settings/api/email.py:22
 msgid "Test mail sent to {}, please check"
+msgstr ""
+
+#: settings/api/email.py:47
+msgid "Test smtp setting"
 msgstr ""
 
 #: settings/api/ldap.py:89
@@ -9460,9 +9456,6 @@ msgstr ""
 
 #~ msgid "Average time taken"
 #~ msgstr "Average time taken"
-
-#~ msgid "Terminal setting"
-#~ msgstr "Terminal"
 
 #, fuzzy
 #~| msgid "Terminal setting"

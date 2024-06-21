@@ -98,7 +98,6 @@ special_pid_mapper = {
     "accounts.view_changesecretrecord": "asset_change_plan_node",
     'audits.ftplog': 'terminal',
     'perms.view_myassets': 'my_assets',
-
     'ops.job': 'operation_center',
     'ops.adhoc': 'operation_center',
     'ops.playbook': 'operation_center',
@@ -133,7 +132,6 @@ special_setting_pid_mapper = {
     'terminal.applethostdeployment': 'remote_app',
     "settings.change_terminal": "components",
     "terminal.terminal": "components",
-    "terminal.view_terminal": "components",
     "terminal.endpoint": "components",
     "terminal.endpointrule": "components",
     "terminal.status": "components",

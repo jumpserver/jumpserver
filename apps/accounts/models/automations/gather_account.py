@@ -41,7 +41,7 @@ class GatheredAccount(JMSOrgBaseModel):
         Account.objects.bulk_create(account_objs)
 
     class Meta:
-        verbose_name = _('Gather account automation')
+        verbose_name = _("Gather asset accounts")
         unique_together = [
             ('username', 'asset'),
         ]
@@ -72,4 +72,4 @@ class GatherAccountsAutomation(AccountBaseAutomation):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = _("Gather asset accounts")
+        verbose_name = _('Gather account automation')

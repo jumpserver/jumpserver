@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-20 16:39+0800\n"
+"POT-Creation-Date: 2024-06-21 18:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,7 @@ msgstr "テンプレート"
 msgid "Skip"
 msgstr "スキップ"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:267
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:264
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -561,17 +561,17 @@ msgid "Address login"
 msgstr "最終ログインアドレス"
 
 #: accounts/models/automations/gather_account.py:44
-msgid "Gather account automation"
-msgstr "自動収集アカウント"
+#: accounts/tasks/gather_accounts.py:29
+msgid "Gather asset accounts"
+msgstr "アカウントのコレクション"
 
 #: accounts/models/automations/gather_account.py:56
 msgid "Is sync account"
 msgstr "アカウントを同期するかどうか"
 
 #: accounts/models/automations/gather_account.py:75
-#: accounts/tasks/gather_accounts.py:29
-msgid "Gather asset accounts"
-msgstr "アカウントのコレクション"
+msgid "Gather account automation"
+msgstr "自動収集アカウント"
 
 #: accounts/models/automations/push_account.py:14
 msgid "Triggers"
@@ -1573,7 +1573,7 @@ msgstr "ファイアウォール"
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
-#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:67
+#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:66
 #: xpack/plugins/cloud/const.py:69
 msgid "Other"
 msgstr "その他"
@@ -1613,7 +1613,7 @@ msgstr "コンソールセッションに接続"
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:81 rbac/tree.py:63
+#: assets/const/protocol.py:81 rbac/tree.py:62
 #: settings/serializers/security.py:232
 msgid "Security"
 msgstr "セキュリティ"
@@ -2419,7 +2419,7 @@ msgstr "Rmdir"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:268
+#: rbac/tree.py:265
 msgid "Delete"
 msgstr "削除"
 
@@ -2445,7 +2445,7 @@ msgstr "ダウンロード"
 msgid "Rename dir"
 msgstr "マップディレクトリ"
 
-#: audits/const.py:23 rbac/tree.py:266 terminal/api/session/session.py:274
+#: audits/const.py:23 rbac/tree.py:263 terminal/api/session/session.py:274
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:84
@@ -2454,7 +2454,7 @@ msgstr "表示"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:265
+#: rbac/tree.py:262
 msgid "Create"
 msgstr "作成"
 
@@ -2472,7 +2472,7 @@ msgstr "ログイン"
 msgid "Change password"
 msgstr "パスワードを変更する"
 
-#: audits/const.py:35 rbac/tree.py:57
+#: audits/const.py:35 rbac/tree.py:56
 msgid "Notifications"
 msgstr "通知"
 
@@ -2506,7 +2506,7 @@ msgstr "セッションログ"
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:51 terminal/models/applet/host.py:144
+#: audits/const.py:51 rbac/tree.py:64 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
 #: xpack/plugins/cloud/serializers/account.py:77
 msgid "Task"
@@ -5026,76 +5026,66 @@ msgid "Asset change auth"
 msgstr "資産の改ざん"
 
 #: rbac/tree.py:54
-msgid "Job center"
-msgstr "タスクセンター"
-
-#: rbac/tree.py:55
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:55
 msgid "App ops"
 msgstr "アプリ操作"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:57
 #, fuzzy
 #| msgid "Feature"
 msgid "Features"
 msgstr "機能"
 
-#: rbac/tree.py:59 settings/serializers/auth/base.py:10
+#: rbac/tree.py:58 settings/serializers/auth/base.py:10
 msgid "Authentication"
 msgstr "認証"
 
-#: rbac/tree.py:60
+#: rbac/tree.py:59
 msgid "Storage"
 msgstr ""
 
-#: rbac/tree.py:61
+#: rbac/tree.py:60
 #, fuzzy
 #| msgid "Component"
 msgid "Components"
 msgstr "コンポーネント"
 
-#: rbac/tree.py:62 terminal/models/applet/applet.py:52
+#: rbac/tree.py:61 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
 
-#: rbac/tree.py:64
+#: rbac/tree.py:63
 msgid "Appearance"
 msgstr ""
 
-#: rbac/tree.py:65
-#, fuzzy
-#| msgid "Task"
-msgid "Tasks"
-msgstr "タスク"
-
-#: rbac/tree.py:66 xpack/plugins/license/meta.py:10
+#: rbac/tree.py:65 xpack/plugins/license/meta.py:10
 #: xpack/plugins/license/models.py:144
 msgid "License"
 msgstr "ライセンス"
 
-#: rbac/tree.py:157
+#: rbac/tree.py:154
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: rbac/tree.py:158
+#: rbac/tree.py:155
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:159 settings/serializers/feature.py:113
+#: rbac/tree.py:156 settings/serializers/feature.py:113
 #: settings/serializers/feature.py:115 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:160
+#: rbac/tree.py:157
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:161
+#: rbac/tree.py:158
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
@@ -5112,6 +5102,10 @@ msgstr "テストの成功"
 #: settings/api/email.py:22
 msgid "Test mail sent to {}, please check"
 msgstr "{}に送信されたテストメールを確認してください"
+
+#: settings/api/email.py:47
+msgid "Test smtp setting"
+msgstr "SMTP設定のテスト"
 
 #: settings/api/ldap.py:89
 msgid ""
@@ -9718,6 +9712,14 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Job center"
+#~ msgstr "タスクセンター"
+
+#, fuzzy
+#~| msgid "Task"
+#~ msgid "Tasks"
+#~ msgstr "タスク"
 
 #~ msgid "Average time taken"
 #~ msgstr "時を過ごす"

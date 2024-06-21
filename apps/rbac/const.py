@@ -66,6 +66,7 @@ exclude_permissions = (
     ('accounts', 'account', 'change', 'accountsecret'),
     ('accounts', 'account', 'view', 'historyaccount'),
     ('accounts', 'account', 'view', 'historyaccountsecret'),
+    ('accounts', 'accounttemplate', 'change_accounttemplatesecret', 'accounttemplate'),
 
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'permedaccount', '*', '*'),
