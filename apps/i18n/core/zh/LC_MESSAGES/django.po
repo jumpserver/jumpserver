@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-20 16:51+0800\n"
+"POT-Creation-Date: 2024-06-21 18:35+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -105,7 +105,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳过"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:267
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:264
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -560,17 +560,17 @@ msgid "Address login"
 msgstr "最后登录地址"
 
 #: accounts/models/automations/gather_account.py:44
-msgid "Gather account automation"
-msgstr "自动化收集账号"
+#: accounts/tasks/gather_accounts.py:29
+msgid "Gather asset accounts"
+msgstr "收集账号"
 
 #: accounts/models/automations/gather_account.py:56
 msgid "Is sync account"
 msgstr "是否同步账号"
 
 #: accounts/models/automations/gather_account.py:75
-#: accounts/tasks/gather_accounts.py:29
-msgid "Gather asset accounts"
-msgstr "收集账号"
+msgid "Gather account automation"
+msgstr "自动化收集账号"
 
 #: accounts/models/automations/push_account.py:14
 msgid "Triggers"
@@ -1563,7 +1563,7 @@ msgstr "防火墙"
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
-#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:67
+#: assets/const/host.py:12 rbac/tree.py:28 rbac/tree.py:66
 #: xpack/plugins/cloud/const.py:69
 msgid "Other"
 msgstr "其它"
@@ -1602,7 +1602,7 @@ msgstr "连接到控制台会话"
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:81 rbac/tree.py:63
+#: assets/const/protocol.py:81 rbac/tree.py:62
 #: settings/serializers/security.py:232
 msgid "Security"
 msgstr "安全"
@@ -2399,7 +2399,7 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:268
+#: rbac/tree.py:265
 msgid "Delete"
 msgstr "删除"
 
@@ -2425,7 +2425,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:266 terminal/api/session/session.py:274
+#: audits/const.py:23 rbac/tree.py:263 terminal/api/session/session.py:274
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:84
@@ -2434,7 +2434,7 @@ msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:265
+#: rbac/tree.py:262
 msgid "Create"
 msgstr "创建"
 
@@ -2452,7 +2452,7 @@ msgstr "登录"
 msgid "Change password"
 msgstr "改密"
 
-#: audits/const.py:35 rbac/tree.py:57
+#: audits/const.py:35 rbac/tree.py:56
 msgid "Notifications"
 msgstr "通知"
 
@@ -2486,7 +2486,7 @@ msgstr "会话日志"
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/const.py:51 terminal/models/applet/host.py:144
+#: audits/const.py:51 rbac/tree.py:64 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
 #: xpack/plugins/cloud/serializers/account.py:77
 msgid "Task"
@@ -4967,76 +4967,66 @@ msgid "Asset change auth"
 msgstr "资产改密"
 
 #: rbac/tree.py:54
-msgid "Job center"
-msgstr "任务中心"
-
-#: rbac/tree.py:55
 msgid "My assets"
 msgstr "我的资产"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:55
 msgid "App ops"
 msgstr "作业中心"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:57
 #, fuzzy
 #| msgid "Feature"
 msgid "Features"
 msgstr "功能"
 
-#: rbac/tree.py:59 settings/serializers/auth/base.py:10
+#: rbac/tree.py:58 settings/serializers/auth/base.py:10
 msgid "Authentication"
 msgstr "认证"
 
-#: rbac/tree.py:60
+#: rbac/tree.py:59
 msgid "Storage"
 msgstr "存储"
 
-#: rbac/tree.py:61
+#: rbac/tree.py:60
 #, fuzzy
 #| msgid "Component"
 msgid "Components"
 msgstr "组件"
 
-#: rbac/tree.py:62 terminal/models/applet/applet.py:52
+#: rbac/tree.py:61 terminal/models/applet/applet.py:52
 #: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
 
-#: rbac/tree.py:64
+#: rbac/tree.py:63
 msgid "Appearance"
 msgstr "外貌"
 
-#: rbac/tree.py:65
-#, fuzzy
-#| msgid "Task"
-msgid "Tasks"
-msgstr "任务"
-
-#: rbac/tree.py:66 xpack/plugins/license/meta.py:10
+#: rbac/tree.py:65 xpack/plugins/license/meta.py:10
 #: xpack/plugins/license/models.py:144
 msgid "License"
 msgstr "许可证"
 
-#: rbac/tree.py:157
+#: rbac/tree.py:154
 msgid "App organizations"
 msgstr "组织管理"
 
-#: rbac/tree.py:158
+#: rbac/tree.py:155
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:159 settings/serializers/feature.py:113
+#: rbac/tree.py:156 settings/serializers/feature.py:113
 #: settings/serializers/feature.py:115 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr "工单"
 
-#: rbac/tree.py:160
+#: rbac/tree.py:157
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:161
+#: rbac/tree.py:158
 msgid "View permission tree"
 msgstr "查看授权树"
 
@@ -5053,6 +5043,10 @@ msgstr "测试成功"
 #: settings/api/email.py:22
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
+
+#: settings/api/email.py:47
+msgid "Test smtp setting"
+msgstr "测试 smtp 设置"
 
 #: settings/api/ldap.py:89
 msgid ""
@@ -9605,6 +9599,14 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Job center"
+#~ msgstr "任务中心"
+
+#, fuzzy
+#~| msgid "Task"
+#~ msgid "Tasks"
+#~ msgstr "任务"
 
 #~ msgid "Average time taken"
 #~ msgstr "平均耗时"

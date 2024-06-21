@@ -1340,5 +1340,6 @@
     "PrivateIp": "Private Ip",
     "VaultHCPMountPoint": "The mount point of the Vault server, default is jumpserver",
     "WeChat": "WeChat",
-    "SuEnabled": "Enabled su"
+    "SuEnabled": "Enabled su",
+    "Gateway": "Gateway"
 }

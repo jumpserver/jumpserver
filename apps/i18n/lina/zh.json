@@ -1339,5 +1339,6 @@
     "IpType": "IP 类型",
     "PublicIp": "公有 IP",
     "PrivateIp": "私有 IP",
-    "WeChat": "微信"
+    "WeChat": "微信",
+    "Gateway": "网关"
 }
