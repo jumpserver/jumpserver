@@ -15,13 +15,20 @@
 
 ## What is JumpServer?
 
-JumpServer is a popular PAM tool, serving as a bastion host with the 4A standards. It helps businesses securely manage and access all types of assets in a more secure manner.
+JumpServer is an open source Privileged Access Management (PAM) tool that provides DevOps and IT teams with instant and secure access to SSH, RDP, K8s, Database endpoints through a web browser.
 
 TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审计)
 
 ## Quick Start
+<!-- 只提供环境要求信息、一键安装脚本及登录信息 -->
 
-只提供环境要求信息、一键安装脚本及登录信息
+Prepare a clean Linux Server ( 64bit, >= 4c8g )
+
+```
+curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
+```
+
+Access JumpServer in your browser at `http://your-ip/`, `admin`/`admin`
 
 ## Components
 
@@ -49,9 +56,9 @@ Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributi
 
 ## Security
 
-JumpServer is a secure product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
+JumpServer is a mission critical product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
 
-- Email: ibuler@fit2cloud.com
+- Email: support@fit2cloud.com
 
 ## License
 
