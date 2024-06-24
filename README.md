@@ -15,7 +15,7 @@
 
 ## What is JumpServer?
 
-JumpServer is an open source privileged access management (PAM) solution that provides DevOps and IT teams with instant access to RDP, SSH, K8s, database endpoints through a web browser.
+JumpServer is an open source Privileged Access Management (PAM) tool that provides DevOps and IT teams with instant and secure access to SSH, RDP, K8s, Database endpoints through a web browser.
 
 TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审计)
 
