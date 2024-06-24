@@ -15,17 +15,13 @@
 
 ## What is JumpServer?
 
-JumpServer is a popular PAM tool, serving as a bastion host with the 4A standards. It helps businesses securely manage and access all types of assets in a more secure manner, enabling pre-authorization, real-time monitoring, and post-audit capabilities.
+JumpServer is a popular PAM tool, serving as a bastion host with the 4A standards. It helps businesses securely manage and access all types of assets in a more secure manner.
 
 TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审计)
 
 ## Quick Start
 
 只提供环境要求信息、一键安装脚本及登录信息
-
-更多资料：
- - 在线文档
- - 演示视频
 
 ## Components
 
