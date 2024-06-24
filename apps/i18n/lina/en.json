@@ -1347,5 +1347,6 @@
     "OnlyInitialDeploy": "Only initial deployment",
     "Uninstall": "Uninstall",
     "Summary": "Summary",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "UnFavoriteSucceed": "Unfavorite Successful"
 }

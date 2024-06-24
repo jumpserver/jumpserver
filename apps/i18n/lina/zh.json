@@ -1346,5 +1346,6 @@
     "OnlyInitialDeploy": "仅初始化配置",
     "Uninstall": "卸载",
     "Summary": "汇总",
-    "removeWarningMsg": "你确定要移除"
+    "removeWarningMsg": "你确定要移除",
+    "UnFavoriteSucceed": "取消收藏成功"
 }

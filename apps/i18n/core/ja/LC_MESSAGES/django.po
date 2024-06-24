@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-24 16:42+0800\n"
+"POT-Creation-Date: 2024-06-24 19:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2548,9 +2548,9 @@ msgstr "操作"
 msgid "Filename"
 msgstr "ファイル名"
 
-#: audits/models.py:66 common/serializers/common.py:98
-msgid "File"
-msgstr "書類"
+#: audits/models.py:66
+msgid "Can Download"
+msgstr "ダウンロード"
 
 #: audits/models.py:67 terminal/backends/command/models.py:21
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:20
@@ -4017,6 +4017,10 @@ msgstr "{} 秒待ってから送信してください"
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "ノード"
+
+#: common/serializers/common.py:98
+msgid "File"
+msgstr "書類"
 
 #: common/serializers/fields.py:135
 msgid "Invalid data type"
