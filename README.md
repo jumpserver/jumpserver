@@ -21,6 +21,16 @@ TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审
 
 ## Quick Start
 
+```
+CPU >= 4 Core
+RAM >= 8 GB
+
+curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
+
+# Username: admin
+# Password: admin
+```
+
 只提供环境要求信息、一键安装脚本及登录信息
 
 ## Components
