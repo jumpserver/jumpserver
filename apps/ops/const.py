@@ -41,8 +41,8 @@ class Types(models.TextChoices):
 
 
 class RunasPolicies(models.TextChoices):
-    privileged_only = 'privileged_only', _('Privileged Only')
-    privileged_first = 'privileged_first', _('Privileged First')
+    privileged_only = 'privileged_only', _('Privileged only')
+    privileged_first = 'privileged_first', _('Privileged first')
     skip = 'skip', _('Skip')
 
 

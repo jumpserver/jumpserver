@@ -2,8 +2,8 @@
 #
 from urllib.parse import urlparse
 
-from django.db.models import TextChoices
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_ipv46_address
+from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -30,7 +30,7 @@ class ReplayStorageTypeBaseSerializer(serializers.Serializer):
     )
     ACCESS_KEY = serializers.CharField(
         max_length=1024, required=False, allow_blank=True,
-        label=_('Access key id'), allow_null=True,
+        label=_('Access key ID'), allow_null=True,
     )
     SECRET_KEY = EncryptedField(
         max_length=1024, required=False, allow_blank=True,
@@ -146,7 +146,7 @@ class ReplayStorageTypeSFTPSerializer(serializers.Serializer):
         write_only=True, label=_('Private key')
     )
     STP_PASSPHRASE = EncryptedField(
-        allow_blank=True, allow_null=True, required=False, max_length=1024, label=_('Key password')
+        allow_blank=True, allow_null=True, required=False, max_length=1024, label=_('Passphrase')
     )
     SFTP_ROOT_PATH = serializers.CharField(
         required=True, max_length=1024, label=_('SFTP Root')
@@ -188,13 +188,12 @@ def command_storage_es_host_format_validator(host):
 
 
 class CommandStorageTypeESSerializer(serializers.Serializer):
-    hosts_help_text = '''
-        Tip: If there are multiple hosts, use a comma (,) to separate them. <br>
-        (eg: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)
-    '''
     HOSTS = serializers.ListField(
         child=serializers.CharField(validators=[command_storage_es_host_format_validator]),
-        label=_('Hosts'), help_text=_(hosts_help_text), allow_null=True
+        label=_('Hosts'), help_text=_(
+            'If there are multiple hosts, use a comma (,) to separate them. <br>'
+            '(For example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)'),
+        allow_null=True
     )
     INDEX_BY_DATE = serializers.BooleanField(
         default=False, label=_('Index by date'),
@@ -259,6 +258,14 @@ class BaseStorageSerializer(serializers.ModelSerializer):
         return instance
 
 
+meta_is_default = {
+    'help_text': _(
+        'set as the default storage, will make new Component use the current '
+        'storage by default, without affecting existing Component'
+    )
+}
+
+
 # CommandStorageSerializer
 class CommandStorageSerializer(BaseStorageSerializer):
     type = LabeledChoiceField(choices=const.CommandStorageType.choices, label=_('Type'))
@@ -267,7 +274,8 @@ class CommandStorageSerializer(BaseStorageSerializer):
     class Meta(BaseStorageSerializer.Meta):
         model = CommandStorage
         extra_kwargs = {
-            'name': {'validators': [UniqueValidator(queryset=CommandStorage.objects.all())]}
+            'name': {'validators': [UniqueValidator(queryset=CommandStorage.objects.all())]},
+            'is_default': meta_is_default
         }
 
 
@@ -279,7 +287,8 @@ class ReplayStorageSerializer(BaseStorageSerializer):
     class Meta(BaseStorageSerializer.Meta):
         model = ReplayStorage
         extra_kwargs = {
-            'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]}
+            'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]},
+            'is_default': meta_is_default
         }
 
     def validate_is_default(self, value):

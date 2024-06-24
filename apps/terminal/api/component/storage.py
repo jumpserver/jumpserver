@@ -2,8 +2,8 @@
 #
 
 from django.utils.translation import gettext_lazy as _
-from django_filters import utils
 from django_filters import rest_framework as drf_filters
+from django_filters import utils
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -83,7 +83,7 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
         nodes = [
                     {
                         'id': storage.id,
-                        'name': f'{storage.name}({storage.type})({command_count})',
+                        'name': f'{storage.name}({storage.type}) ({command_count})',
                         'title': f'{storage.name}({storage.type})',
                         'pId': 'root',
                         'isParent': False,

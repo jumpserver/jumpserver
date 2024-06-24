@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from common.utils import signer, get_logger
+from .signals import setting_changed
 
 logger = get_logger(__name__)
 
@@ -84,6 +85,7 @@ class Setting(models.Model):
         if not item:
             return
         item.refresh_setting()
+        setting_changed.send(sender=cls, name=name, item=item)
 
     def refresh_setting(self):
         setattr(settings, self.name, self.cleaned_value)

@@ -30,52 +30,50 @@ class EmailSettingSerializer(serializers.Serializer):
     )
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("Host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("Port"))
-    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True, label=_("Account"))
+    EMAIL_HOST_USER = serializers.CharField(
+        max_length=128, required=True, label=_("User"), help_text=_("The user to be used for email server authentication")
+    )
     EMAIL_HOST_PASSWORD = EncryptedField(
         max_length=1024, required=False, label=_("Password"),
-        help_text=_("Tips: Some provider use token except password")
+        help_text=_("Password to use for the email server. It is used in conjunction with `User` when authenticating to the email server")
     )
     EMAIL_FROM = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, label=_('Send user'),
-        help_text=_('Tips: Send mail account, default SMTP account as the send account')
+        max_length=128, allow_blank=True, required=False, label=_('From'),
+        help_text=_('Sender email address (default to using the `User`)')
     )
     EMAIL_RECIPIENT = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, label=_('Test recipient'),
-        help_text=_('Tips: Used only as a test mail recipient')
+        max_length=128, allow_blank=True, required=False, label=_('Recipient'),
+        help_text=_("The recipient is used for testing the email server's connectivity")
     )
     EMAIL_USE_SSL = serializers.BooleanField(
         required=False, label=_('Use SSL'),
-        help_text=_('If SMTP port is 465, may be select')
+        help_text=_('Whether to use an implicit TLS (secure) connection when talking to the SMTP server. In most email documentation this type of TLS connection is referred to as SSL. It is generally used on port 465')
     )
     EMAIL_USE_TLS = serializers.BooleanField(
         required=False, label=_("Use TLS"),
-        help_text=_('If SMTP port is 587, may be select')
-    )
-    EMAIL_SUBJECT_PREFIX = serializers.CharField(
-        max_length=1024, required=True, label=_('Subject prefix')
-    )
-    EMAIL_SUFFIX = serializers.CharField(
-        required=False, max_length=1024, label=_("Email suffix"),
-        help_text=_('This is used by default if no email is returned during SSO authentication')
+        help_text=_('Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for explicit TLS connections, generally on port 587')
     )
 
 
 class EmailContentSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Email')
 
+    EMAIL_SUBJECT_PREFIX = serializers.CharField(
+        max_length=1024, required=True, label=_('Subject prefix')
+    )
     EMAIL_CUSTOM_USER_CREATED_SUBJECT = serializers.CharField(
         max_length=1024, allow_blank=True, required=False,
-        label=_('Create user email subject'),
+        label=_('Subject'),
         help_text=_('Tips: When creating a user, send the subject of the email (eg:Create account successfully)')
     )
     EMAIL_CUSTOM_USER_CREATED_HONORIFIC = serializers.CharField(
         max_length=1024, allow_blank=True, required=False,
-        label=_('Create user honorific'),
+        label=_('Honorific'),
         help_text=_('Tips: When creating a user, send the honorific of the email (eg:Hello)')
     )
     EMAIL_CUSTOM_USER_CREATED_BODY = serializers.CharField(
         max_length=4096, allow_blank=True, required=False,
-        label=_('Create user email content'),
+        label=_('Content'),
         help_text=_(
             'Tips: When creating a user, send the content of the email, support {username} {name} {email} label')
     )

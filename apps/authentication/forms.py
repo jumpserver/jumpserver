@@ -30,13 +30,13 @@ class UserLoginForm(forms.Form):
     )
     auto_login = forms.BooleanField(
         required=False, initial=False,
-        widget=forms.CheckboxInput()
+        widget=forms.CheckboxInput(),
+        label=_('Auto login next')
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         auto_login_field = self.fields['auto_login']
-        auto_login_field.label = _("Auto login")
         if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
             auto_login_field.widget = forms.HiddenInput()
 

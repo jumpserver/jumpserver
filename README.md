@@ -1,125 +1,227 @@
-<p align="center">
+<div align="center"><a name="readme-top"></a>
   <a href="https://jumpserver.org"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
-</p>
-<h3 align="center">广受欢迎的开源堡垒机</h3>
+  
+### Popular Open-Source Bastion Host
 
-<p align="center">
-  <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/github/license/jumpserver/jumpserver" alt="License: GPLv3"></a>
-  <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Docker pulls"></a>
-  <a href="https://github.com/jumpserver/jumpserver/releases/latest"><img src="https://img.shields.io/github/v/release/jumpserver/jumpserver" alt="Latest release"></a>
-  <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
-</p>
+<!-- SHIELD GROUP-->
+[![][license-shield]][license-link]
+[![][docker-shield]][docker-link]
+[![][github-release-shield]][github-release-link]
+[![][github-stars-shield]][github-stars-link]
+
+**English** · [简体中文](./README.zh-CN.md) · [Documents][docs-link] · [Report Bug][github-issues-link] · [Request Feature][github-issues-link]
+
+For 9 years, pouring heart and soul into creating a high-quality open-source bastion host. <br/>
+
+<!-- [![][github-trending-shield]][github-trending-link] -->
+
+</div>
+
+#
+![][image-dashboard]
+_[To-do]: Need to design the graphics._
 
 
-<p align="center">
-    9 年时间，倾情投入，用心做好一款开源堡垒机。
-</p>
+## Table of contents
 
-------------------------------
-JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。
+- [Getting Started](#getting-started)
+- [Introduction](#introduction)
+- [Why JumpServer](#why-jumpserver)
+- [Installation](#installation)
+- [Product Architecture & Components](#product-architecture--components)
+- [Features](#features)
+- [Acknowledgements](#acknowledgements)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
 
-JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型的资产，包括：
 
-- **SSH**: Linux / Unix / 网络设备 等；
-- **Windows**: Web 方式连接 / 原生 RDP 连接；
-- **数据库**: MySQL / MariaDB / PostgreSQL / Oracle / SQLServer / ClickHouse 等；
-- **NoSQL**: Redis / MongoDB 等；
-- **GPT**: ChatGPT 等;
-- **云服务**: Kubernetes / VMware vSphere 等;
-- **Web 站点**: 各类系统的 Web 管理后台；
-- **应用**: 通过 Remote App 连接各类应用。
+<br/>
 
-## 产品特色
+</details>
 
-- **开源**: 零门槛，线上快速获取和安装；
-- **无插件**: 仅需浏览器，极致的 Web Terminal 使用体验；
-- **分布式**: 支持分布式部署和横向扩展，轻松支持大规模并发访问；
-- **多云支持**: 一套系统，同时管理不同云上面的资产；
-- **多租户**: 一套系统，多个子公司或部门同时使用；
-- **云端存储**: 审计录像云端存储，永不丢失；
+## Getting Started
 
-## UI 展示
+Step right into our online demonstration environment, where you can effortlessly experience our product without the need for time-consuming software installations. With just a few clicks, you'll quickly grasp the functionality and features of our product. In the demonstration environment, you can explore the various features of our product to your heart's content and experience our innovative design and exceptional performance.
 
-![UI展示](https://docs.jumpserver.org/zh/v3/img/dashboard.png)
+Whether you're new to the experience or a seasoned expert, we invite you to join our Discord community right away! Here, our developers and enthusiastic users come together to offer support and assistance. No matter what challenges you encounter during your usage, we are committed to answering your questions and providing guidance.
 
-## 在线体验
+| [![][demo-shield-badge]][demo-link]       | No installation or registration necessary! Visit our website to experience it firsthand.                           |
+| :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [![][discord-shield-badge]][discord-link] | Join our Discord community! This is where you can connect with developers and other enthusiastic users of JumpServer. |
 
-- 环境地址：<https://demo.jumpserver.org/>
+> \[!IMPORTANT]
+>
+> **Star Us**, You will receive all release notifications from GitHub without any delay \~ ⭐️
 
-| :warning: 注意                 |
-|:-----------------------------|
-| 该环境仅作体验目的使用，我们会定时清理、重置数据！    |
-| 请勿修改体验环境用户的密码！               |
-| 请勿在环境中添加业务生产环境地址、用户名密码等敏感信息！ |
+![][image-star]
 
-## 快速开始
+<details>
+  <summary><kbd>Star History</kbd></summary>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&theme=dark&type=Date">
+    <img width="100%" src="https://api.star-history.com/svg?repos=jumpserver%2Fjumpserver&type=Date">
+  </picture>
+</details>
 
-- [快速入门](https://docs.jumpserver.org/zh/v3/quick_start/)
-- [产品文档](https://docs.jumpserver.org)
-- [在线学习](https://edu.fit2cloud.com/page/2635362)
-- [知识库](https://kb.fit2cloud.com/categories/jumpserver)
+> \[!TIP]
+>
+> This is a demonstration video that can quickly help you understand the page design and product features of JumpServer.
 
-## 案例研究
+<video controls src="https://github.com/jumpserver/jumpserver/assets/32935519/6f984266-24a1-4d1f-9745-4a8e0122f49c" muted="false"></video>
+_[To-do]: Need to design the video._
 
-- [腾讯音乐娱乐集团：基于JumpServer的安全运维审计解决方案](https://blog.fit2cloud.com/?p=a04cdf0d-6704-4d18-9b40-9180baecd0e2)
-- [腾讯海外游戏：基于JumpServer构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)
-- [万华化学：通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504)
-- [雪花啤酒：JumpServer堡垒机使用体会](https://blog.fit2cloud.com/?p=3412)
-- [顺丰科技：JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)
-- [沐瞳游戏：通过JumpServer管控多项目分布式资产](https://blog.fit2cloud.com/?p=3213)
-- [携程：JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)
-- [大智慧：JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)
-- [小红书：JumpServer 堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)
-- [中手游：JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)
-- [中通快递：JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)
-- [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)
-- [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)
+## Introduction
 
-## 社区交流
+JumpServer is a widely acclaimed open-source bastion host, serving as a professional operational security auditing system compliant with the 4A standards. It helps businesses securely manage and access all types of assets in a more secure manner, enabling pre-authorization, real-time monitoring, and post-audit capabilities.
 
-如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose)。
+JumpServer aims to become the industry's preferred platform, assisting businesses in securely and efficiently managing and accessing all types of assets. By offering a professional operational security auditing system compliant with 4A standards, JumpServer is committed to delivering advanced asset management and access solutions, meeting enterprises' needs for security, reliability, and efficiency.
 
-您也可以到我们的 [社区论坛](https://bbs.fit2cloud.com/c/js/5) 当中进行交流沟通。
+JumpServer's vision is to become a leader in the enterprise-level asset management and access control field, providing comprehensive solutions for users to securely and efficiently manage and utilize their assets. Through continuous innovation and enhancement of product features, JumpServer is committed to driving the development of the entire industry and becoming a key supporter and promoter of enterprise digital transformation.
 
-### 参与贡献
+![][image-supported-asset-type]
+_[To-do]: Need to design the graphics._
 
-欢迎提交 PR 参与贡献。 参考 [CONTRIBUTING.md](https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md)
+## Why JumpServer
+1. **Open Source**: JumpServer is an open-source software, meaning users can freely access, use, and modify its source code to meet individual needs, while also benefiting from community support and collaboration.
+2. **Plugin-Free**: JumpServer provides comprehensive functionality without the need for additional plugins or extensions. This simplifies deployment and management processes, reducing potential compatibility and security risks.
+3. **Distributed**: JumpServer supports a distributed architecture, allowing easy scaling across multiple nodes for high availability and fault tolerance. This makes it suitable for large-scale deployments and complex network environments.
+4. **Multi-Cloud**: JumpServer offers support for various cloud platforms, including AWS, Azure, Google Cloud, etc., enabling users to manage and access assets seamlessly across different cloud environments.
+5. **Cloud Storage**: JumpServer supports storing critical data such as audit logs and configuration files in the cloud, ensuring data security and reliability, as well as facilitating cross-region and cross-device access.
+6. **Organizational**: JumpServer provides a flexible organizational structure, supporting multi-level organizational hierarchies and permission management. This allows administrators to finely control user access permissions, ensuring asset security and compliance.
 
-## 组件项目
+## Installation
 
-| 项目                                                     | 状态                                                                                                                                                                     | 描述                                                                                |
-|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI 项目                                                              |
-| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal 项目                                                        |
-| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer 字符协议 Connector 项目                                                      |
-| [Lion](https://github.com/jumpserver/lion-release)     | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>   | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/) |
-| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-私有发布-red" />                                                                                                 | JumpServer RDP 代理 Connector 项目                                                    |
-| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-私有发布-red" />                                                                                               | JumpServer 远程应用 Connector 项目 (Windows)                                                      |
-| [Panda](https://github.com/jumpserver/Panda)         | <img alt="Panda" src="https://img.shields.io/badge/release-私有发布-red" />                                                                                               | JumpServer 远程应用 Connector 项目 (Linux)                                                      |
-| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库代理 Connector 项目                                                     |
-| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB 项目，替代原来的 OmniDB                                                 |
-| [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer 连接 GPT 资产的组件项目                                                         |
-| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer 各系统终端组件和 Core API 通信的组件项目                                              |
-| [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer 客户端 项目                                                                 |
-| [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer 安装包 项目                                                                 |
+JumpServer supports multiple installation methods to cater to diverse user scenarios and preferences:
 
-## 安全说明
+See Docs: https://docs.jumpserver.org/zh/v3/
 
-JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.jumpserver.org/zh/master/install/install_security/)
-进行安装部署。如果您发现安全相关问题，请直接联系我们：
+#### 1. Online
+Ideal for users with internet access, this method involves downloading installation scripts or packages directly from the internet. It ensures easy access to the latest updates and dependencies during installation.
 
-- 邮箱：support@fit2cloud.com
-- 电话：400-052-0755
+Quick installation of JumpServer in just two steps:
 
-## License & Copyright
+1. Prepare a 64-bit Linux host with at least 4 cores and 8 GB of RAM, which has internet access.
+2. Execute the following command as the root user for one-click installation of JumpServer.
 
+```sh
+curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
+```
+
+#### 2. Offline
+Suited for environments without internet connectivity, this method allows users to download all necessary installation files and dependencies beforehand. It ensures seamless installation even in isolated or restricted network environments.
+
+Download offline package: https://community.fit2cloud.com/#/products/jumpserver/downloads
+
+#### 3. Kubernetes (K8s)
+JumpServer supports installation on Kubernetes clusters. You can deploy JumpServer as containerized applications on Kubernetes, leveraging the scalability and management features of Kubernetes for running JumpServer.
+
+#### 4. All-in-One
+This method provides a simplified installation process where all components of JumpServer are installed on a single server or machine. It's suitable for small-scale deployments or testing purposes where separate component deployment is not required.
+
+#### 5. Enterprise Edition Trial
+JumpServer offers a trial version of its enterprise edition, allowing users to test out the enterprise features and functionalities before committing to a full deployment. This trial version typically comes with limited duration or features to provide a glimpse of the capabilities of the enterprise edition.
+
+Each installation method caters to different use cases and deployment scenarios, offering flexibility and options for users based on their requirements and infrastructure setup.
+
+Applying for the Enterprise Edition: https://jumpserver.org/enterprise.html
+
+## Product Architecture & Components
+#### 1. Architecture Diagram
+Below is the schematic diagram of the JumpServer system architecture, providing a more comprehensive understanding of the product features of JumpServer.
+![][image-system-architecture]
+_[To-do]: Need to design the graphics._
+
+#### 2. Supporting Components
+| Project                                                | Status                                                                                                                                                                 | Description                                                                                             |
+|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                                                       |
+| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal                                                                                 |
+| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer Character Protocol Connector                                                                 |
+| [Lion](https://github.com/jumpserver/lion-release)     | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>   | JumpServer Graphical Protocol Connector, dependent on [Apache Guacamole](https://guacamole.apache.org/) |
+| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer RDP Proxy Connector                                                                          |
+| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                       |
+| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                         |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer Database Proxy Connector                                                                     |
+| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB                                                                                       |
+| [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer GPT Assets Connector                                                                         |
+| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer Inter-Project Communication Component with Core API                                          |
+| [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer Client                                                                                       |
+| [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer Installation Tool                                                                            |
+
+JumpServer consists of multiple key components, which collectively form the functional framework of JumpServer, providing users with comprehensive capabilities for operations management and security control.
+
+## Features
+Below are the features supported by JumpServer, covering various aspects of operations management and security control, providing you with a comprehensive solution. 
+
+1. User Authentication Supporting Integration with Multiple Single Sign-On Systems (SSO)
+2. User Management Based on Role-based Access Control (RBAC)
+3. Asset Management of Everything is an Asset
+4. Asset Account Management
+5. Asset Authorization Management
+6. Asset Permission Management Based Access Control Logic (ACL)
+7. Remote Application Management for Everything
+8. Support for Multiple Asset Connection Methods
+9. Comprehensive and Detailed User Behavior Audit System
+10. Organization Management with Resource Isolation [![][version-ee-shield-badge]][official-website-en-link]
+11. Ticket Management [![][version-ee-shield-badge]][official-website-en-link]
+
+For details, [See Docs][docs-link].
+
+## Acknowledgements
+- [Icons8](https://icons8.com/) is an excellent platform that offers free icon resources, providing a diverse selection of icons for projects. We are grateful to Icons8 for providing us with such high-quality resources!
+
+## Contributing
+Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributing-link] for guidelines.
+
+## Security
+JumpServer is a secure product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
+
+- Email: support@fit2cloud.com
+- Phone: 400-052-0755
+
+## License
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.
 
-Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in
-compliance with the License. You may obtain a copy of the License at
+Licensed under The GNU General Public License version 3 (GPLv3) (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
 https://www.gnu.org/licenses/gpl-3.0.html
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "
-AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
-language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+
+<!-- JumpServer official link -->
+[official-website-en-link]: https://jumpserver.org/
+[docs-link]: https://docs.jumpserver.org/
+[community-link]: https://community.fit2cloud.com/#/products/jumpserver/downloads
+[demo-link]: https://demo.jumpserver.org/
+[discord-link]: https://discord.gg/DVz6Hckx
+[contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
+
+
+<!-- JumpServer Other link-->
+[license-link]: https://www.gnu.org/licenses/gpl-3.0.html
+[docker-link]: https://hub.docker.com/u/jumpserver
+[github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
+[github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
+[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
+[github-stars-link]: https://github.com/jumpserver/jumpserver
+[github-issues-link]: https://github.com/jumpserver/jumpserver/issues
+[github-trending-link]: https://trendshift.io/repositories/5071
+
+<!-- Shield link-->
+[docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
+[license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
+[demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
+[discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
+[version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
+[github-trending-shield]: https://trendshift.io/api/badge/repositories/5071
+
+<!-- Image link -->
+[image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
+[image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
+[image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
+[image-supported-asset-type]: https://github.com/jumpserver/jumpserver/assets/32935519/8e769007-5449-4e86-b34b-d04e8e484257
+[image-system-architecture]: https://github.com/jumpserver/jumpserver/assets/32935519/8a720b4e-19ed-4e3c-a8aa-325d7581005a
+
+

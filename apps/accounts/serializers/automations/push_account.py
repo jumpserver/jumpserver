@@ -7,7 +7,6 @@ from .change_secret import (
 
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
-
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
         fields = [

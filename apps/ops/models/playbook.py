@@ -85,4 +85,5 @@ class Playbook(JMSOrgBaseModel):
 
     class Meta:
         unique_together = [('name', 'org_id', 'creator')]
+        verbose_name = _("Playbook")
         ordering = ['date_created']

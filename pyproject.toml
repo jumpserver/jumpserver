@@ -1,14 +1,22 @@
 [tool.poetry]
 name = "jumpserver"
-version = "v3.9"
+version = "v4.0"
 description = "广受欢迎的开源堡垒机"
 authors = ["ibuler <ibuler@qq.com>"]
 license = "GPLv3"
 readme = "README.md"
+package-mode = false
+repository = "https://github.com/jumpserver/jumpserver"
+homepage = "https://www.jumpserver.org"
+documentation = "https://docs.jumpserver.org"
+
+# 说明
+# poetry install (社区版)
+# poetry install --with=xpack (企业版)
 
 [tool.poetry.dependencies]
 python = "^3.11"
-cython = "3.0.0"
+# cython = "3.0.0"
 aiofiles = "23.1.0"
 amqp = "5.1.1"
 ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.6.zip" }
@@ -17,8 +25,8 @@ ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archi
 asn1crypto = "1.5.1"
 bcrypt = "4.0.1"
 billiard = "4.1.0"
-certifi = "2023.7.22"
-cffi = "1.15.1"
+# certifi = "2023.7.22"
+# cffi = "1.15.1"
 chardet = "5.1.0"
 configparser = "6.0.0"
 decorator = "5.1.1"
@@ -27,7 +35,7 @@ ecdsa = "0.18.0"
 enum-compat = "0.0.3"
 ephem = "4.1.4"
 future = "0.18.3"
-idna = "3.4"
+# idna = "3.4"
 itypes = "1.2.0"
 jinja2 = "3.1.2"
 markupsafe = "2.1.3"
@@ -36,7 +44,7 @@ paramiko = "3.2.0"
 passlib = "1.7.4"
 pyasn1 = "0.5.0"
 pycparser = "2.21"
-cryptography = "41.0.2"
+# cryptography = "41.0.2"
 pycryptodome = "3.18.0"
 pycryptodomex = "3.18.0"
 phonenumbers = "8.13.17"
@@ -53,7 +61,7 @@ six = "1.16.0"
 sshtunnel = "0.4.0"
 sshpubkeys = "3.3.1"
 uritemplate = "4.1.1"
-urllib3 = "1.26.16"
+# urllib3 = "1.26.16"
 vine = "5.0.0"
 werkzeug = "2.3.6"
 unicodecsv = "0.14.1"
@@ -120,7 +128,7 @@ botocore = "1.31.9"
 s3transfer = "0.6.1"
 kubernetes = "27.2.0"
 mysqlclient = "2.2.0"
-pymysql = "1.1.0"
+pymssql = "2.2.8"
 django-redis = "5.3.0"
 python-redis-lock = "4.0.0"
 pyopenssl = "23.2.0"
@@ -147,7 +155,7 @@ openai = "^1.29.0"
 xlsxwriter = "^3.1.9"
 exchangelib = "^5.1.0"
 xmlsec = "^1.3.13"
-lxml = "4.9.3"
+lxml = "5.2.1"
 receptorctl = "^1.4.5"
 pydantic = "^2.7.4"
 annotated-types = "^0.6.0"
@@ -156,8 +164,12 @@ distro = "1.9.0"
 tqdm = "4.66.4"
 elasticsearch7 = "7.17.9"
 elasticsearch8 = "8.13.2"
+polib = "^1.2.0"
+# psycopg2 = "2.9.6"
+psycopg2-binary = "2.9.6"
 
-
+[tool.poetry.group.xpack]
+optional = true
 
 [tool.poetry.group.xpack.dependencies]
 qingcloud-sdk = "1.2.15"
@@ -175,18 +187,10 @@ aliyun-python-sdk-core-v3 = "2.13.33"
 aliyun-python-sdk-ecs = "4.24.64"
 keystoneauth1 = "5.2.1"
 oracledb = "1.4.0"
-psycopg2-binary = "2.9.6"
-pymssql = "2.2.8"
-psycopg2 = "2.9.6"
 ucloud-sdk-python3 = "0.11.50"
 huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
 volcengine-python-sdk = "1.0.71"
-
-[[tool.poetry.source]]
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "primary"
 
 [[tool.poetry.source]]
 name = "PyPI"

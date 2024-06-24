@@ -39,14 +39,14 @@ class TerminalSmallSerializer(serializers.ModelSerializer):
 
 
 class TerminalSerializer(BulkModelSerializer):
-    session_online = serializers.ReadOnlyField(source='get_online_session_count')
-    is_alive = serializers.BooleanField(read_only=True)
+    session_online = serializers.ReadOnlyField(source='get_online_session_count', label=_('Online sessions'))
+    is_alive = serializers.BooleanField(read_only=True, label=_('Is alive'))
     is_active = serializers.BooleanField(read_only=True, label='Is active')
     load = LabeledChoiceField(
         read_only=True, choices=const.ComponentLoad.choices,
         label=_('Load status')
     )
-    stat = StatSerializer(read_only=True, source='last_stat')
+    stat = StatSerializer(read_only=True, source='last_stat', label=_('Stat'))
 
     class Meta:
         model = Terminal

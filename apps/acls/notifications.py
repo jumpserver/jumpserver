@@ -39,7 +39,7 @@ class UserLoginReminderMsg(UserMessage):
 
 
 class AssetLoginReminderMsg(UserMessage):
-    subject = _('Asset login reminder')
+    subject = _('User login alert for asset')
 
     def __init__(self, user, asset: Asset, login_user: User, account: Account, input_username):
         self.asset = asset

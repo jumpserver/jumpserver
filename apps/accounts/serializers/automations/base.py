@@ -25,7 +25,8 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
     class Meta:
         read_only_fields = [
-            'date_created', 'date_updated', 'created_by', 'periodic_display', 'executed_amount'
+            'date_created', 'date_updated', 'created_by',
+            'periodic_display', 'executed_amount'
         ]
         fields = read_only_fields + [
             'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
@@ -34,8 +35,7 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
-            'periodic_display': {'label': _('Periodic perform')},
-            'executed_amount': {'label': _('Executed amount')},
+            'executed_amount': {'label': _('Executions')},
         }
 
     def validate_name(self, name):

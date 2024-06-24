@@ -101,7 +101,7 @@ class Platform(LabeledMixin, JMSBaseModel):
         default=CharsetChoices.utf8, choices=CharsetChoices.choices,
         max_length=8, verbose_name=_("Charset")
     )
-    domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
+    domain_enabled = models.BooleanField(default=True, verbose_name=_("Gateway enabled"))
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
