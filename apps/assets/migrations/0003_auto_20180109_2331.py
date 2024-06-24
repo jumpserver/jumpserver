@@ -1142,6 +1142,37 @@ platforms_data_json = '''[
         ]
     },
     {
+        "category": "database",
+        "type": "dameng",
+        "internal": true,
+        "charset": "utf-8",
+        "domain_enabled": true,
+        "su_enabled": false,
+        "name": "Dameng",
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {
+                "ansible_connection": "local"
+            },
+            "ping_enabled": false,
+            "gather_facts_enabled": false,
+            "gather_accounts_enabled": false,
+            "verify_account_enabled": false,
+            "change_secret_enabled": false,
+            "push_account_enabled": false
+        },
+        "protocols": [
+            {
+                "name": "dameng",
+                "port": 5236,
+                "required": false,
+                "setting": {},
+                "primary": True,
+                "default": false
+            }
+        ]
+    },
+    {
         "name": "DB2",
         "category": "database",
         "internal": true,
