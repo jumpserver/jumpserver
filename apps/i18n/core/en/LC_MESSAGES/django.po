@@ -6360,7 +6360,7 @@ msgid "Error (Unknown): {}"
 msgstr ""
 
 #: settings/utils/ldap.py:644
-msgid "Succeed: Match {} s user"
+msgid "Succeed: Match {} users"
 msgstr ""
 
 #: settings/utils/ldap.py:677
