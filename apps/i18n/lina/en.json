@@ -526,6 +526,7 @@
     "HasImportErrorItemMsg": "There are import failures, click on the left x to view the failure reasons, after editing the table, you can continue to import failures.",
     "Help": "Help",
     "HighLoad": "Higher",
+    "HTTPSRequiredForSupport": "HTTPS is required for support",
     "HistoricalSessionNum": "Total historical sessions",
     "History": "History",
     "HistoryDate": "Date",

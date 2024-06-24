@@ -468,6 +468,7 @@
     "ExportRange": "导出范围",
     "FC": "Fusion Compute",
     "Failed": "失败",
+    "HTTPSRequiredForSupport": "需要 HTTPS 支持，才能开启",
     "FailedAsset": "失败的资产",
     "FaviconTip": "提示：网站图标（建议图片大小为: 16px*16px）",
     "Features": "功能设置",
