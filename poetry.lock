@@ -350,13 +350,13 @@ vine = ">=5.0.0"
 
 [[package]]
 name = "annotated-types"
-version = "0.7.0"
+version = "0.6.0"
 description = "Reusable constraint types to use with typing.Annotated"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
-    {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
+    {file = "annotated_types-0.6.0-py3-none-any.whl", hash = "sha256:0641064de18ba7a25dee8f96403ebc39113d0cb953a01429249d5c7564666a43"},
+    {file = "annotated_types-0.6.0.tar.gz", hash = "sha256:563339e807e53ffd9c267e99fc6d9ea23eb8443c08f112651963e24e22f84a5d"},
 ]
 
 [[package]]
@@ -380,7 +380,7 @@ description = "Radically simple IT automation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "v2.14.1.5.zip", hash = "sha256:3f05961f2902bc5228ebd44875aadc18cff02f3190791f214a40b2adb07735e1"},
+    {file = "v2.14.1.6.zip", hash = "sha256:e4a4e831c9707dc423ff484b6c2fe99a4766ec01b255ed4ae9419a560d33a82d"},
 ]
 
 [package.dependencies]
@@ -392,16 +392,16 @@ resolvelib = ">=0.5.3,<0.9.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/jumpserver/ansible/archive/refs/tags/v2.14.1.5.zip"
+url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.6.zip"
 
 [[package]]
 name = "ansible-runner"
-version = "2.4.0.2"
+version = "2.4.0.1"
 description = "\"Consistent Ansible Python API and CLI with container and process isolation runtime capabilities\""
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "2.4.0.2.zip", hash = "sha256:e8c995ab977a8cb354b64ac84c238699dbfcd28f7157bd169572a05d2edffe6c"},
+    {file = "2.4.0.1.zip", hash = "sha256:91df951047fae004f30f7a8b6b776940f44832a7646ecc5ff2cc15e4a887c47e"},
 ]
 
 [package.dependencies]
@@ -409,6 +409,10 @@ packaging = "*"
 pexpect = ">=4.5"
 python-daemon = "*"
 pyyaml = "*"
+
+[package.source]
+type = "url"
+url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/2.4.0.1.zip"
 
 [[package]]
 name = "anyio"
@@ -1356,7 +1360,7 @@ tests = ["django", "hypothesis", "pytest", "pytest-asyncio"]
 [[package]]
 name = "data-tree"
 version = "0.0.1"
-description = "UNKNOWN"
+description = ""
 optional = false
 python-versions = "*"
 files = [
@@ -1628,23 +1632,6 @@ redis = ">=3,<4.0.0 || >4.0.0,<4.0.1 || >4.0.1"
 hiredis = ["redis[hiredis] (>=3,!=4.0.0,!=4.0.1)"]
 
 [[package]]
-name = "django-rest-swagger"
-version = "2.2.0"
-description = "Swagger UI for Django REST Framework 3.5+"
-optional = false
-python-versions = "*"
-files = [
-    {file = "django-rest-swagger-2.2.0.tar.gz", hash = "sha256:48f6aded9937e90ae7cbe9e6c932b9744b8af80cc4e010088b3278c700e0685b"},
-    {file = "django_rest_swagger-2.2.0-py2.py3-none-any.whl", hash = "sha256:b039b0288bab4665cd45dc5d16f94b13911bc4ad0ed55f74ad3b90aa31c87c17"},
-]
-
-[package.dependencies]
-coreapi = ">=2.3.0"
-djangorestframework = ">=3.5.4"
-openapi-codec = ">=1.3.1"
-simplejson = "*"
-
-[[package]]
 name = "django-simple-captcha"
 version = "0.5.18"
 description = "A very simple, yet powerful, Django captcha application"
@@ -1835,11 +1822,6 @@ urllib3 = ">=1.26.2,<3"
 [package.extras]
 develop = ["aiohttp", "furo", "httpx", "mock", "opentelemetry-api", "opentelemetry-sdk", "orjson", "pytest", "pytest-asyncio", "pytest-cov", "pytest-httpserver", "pytest-mock", "requests", "respx", "sphinx (>2)", "sphinx-autodoc-typehints", "trustme"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "elasticsearch7"
 version = "7.17.9"
@@ -1880,11 +1862,6 @@ async = ["aiohttp (>=3,<4)"]
 orjson = ["orjson (>=3)"]
 requests = ["requests (>=2.4.0,!=2.32.2,<3.0.0)"]
 vectorstore-mmr = ["numpy (>=1)", "simsimd (>=3)"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "enum-compat"
@@ -3091,6 +3068,7 @@ files = [
     {file = "lxml-5.2.1-cp37-cp37m-musllinux_1_2_x86_64.whl", hash = "sha256:9e2addd2d1866fe112bc6f80117bcc6bc25191c5ed1bfbcf9f1386a884252ae8"},
     {file = "lxml-5.2.1-cp37-cp37m-win32.whl", hash = "sha256:f51969bac61441fd31f028d7b3b45962f3ecebf691a510495e5d2cd8c8092dbd"},
     {file = "lxml-5.2.1-cp37-cp37m-win_amd64.whl", hash = "sha256:b0b58fbfa1bf7367dde8a557994e3b1637294be6cf2169810375caf8571a085c"},
+    {file = "lxml-5.2.1-cp38-cp38-macosx_10_9_universal2.whl", hash = "sha256:3e183c6e3298a2ed5af9d7a356ea823bccaab4ec2349dc9ed83999fd289d14d5"},
     {file = "lxml-5.2.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:804f74efe22b6a227306dd890eecc4f8c59ff25ca35f1f14e7482bbce96ef10b"},
     {file = "lxml-5.2.1-cp38-cp38-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:08802f0c56ed150cc6885ae0788a321b73505d2263ee56dad84d200cab11c07a"},
     {file = "lxml-5.2.1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0f8c09ed18ecb4ebf23e02b8e7a22a05d6411911e6fabef3a36e4f371f4f2585"},
@@ -6531,3 +6509,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
+content-hash = "33b664e269dc4698c129aa504837f75c350054bb6237f66fc2057d2afb3332e4"

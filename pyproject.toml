@@ -165,7 +165,6 @@ tqdm = "4.66.4"
 elasticsearch7 = "7.17.9"
 elasticsearch8 = "8.13.2"
 polib = "^1.2.0"
-tqdm = "^4.66.1"
 # psycopg2 = "2.9.6"
 psycopg2-binary = "2.9.6"
 
