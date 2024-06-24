@@ -319,7 +319,7 @@ class AuthPostCheckMixin:
 
     @classmethod
     def _check_passwd_is_too_simple(cls, user: User, password):
-        if user.is_superuser and password == 'admin':
+        if password == 'admin' or password == 'ChangeMe':
             message = _('Your password is too simple, please change it for security')
             url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
             raise errors.PasswordTooSimple(url)
