@@ -58,7 +58,7 @@ Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributi
 
 JumpServer is a mission critical product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
 
-- Email: ibuler@fit2cloud.com
+- Email: support@fit2cloud.com
 
 ## License
 
