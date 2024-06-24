@@ -1342,5 +1342,8 @@
     "PrivateIp": "私有 IP",
     "WeChat": "微信",
     "Gateway": "网关",
-    "StopLogOutput": "Task Canceled：当前任务(currentTaskId)已手动停止，由于每个任务的执行进度不一样，下面是任务最终的执行结果，执行失败表示已成功停止任务执行。"
+    "StopLogOutput": "Task Canceled：当前任务(currentTaskId)已手动停止，由于每个任务的执行进度不一样，下面是任务最终的执行结果，执行失败表示已成功停止任务执行。",
+    "OnlyInitialDeploy": "仅初始化配置",
+    "Uninstall": "卸载",
+    "Summary": "汇总"
 }
