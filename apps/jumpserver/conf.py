@@ -543,7 +543,7 @@ class Config(dict):
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
-        'LANGUAGE_CODE': 'zh',
+        'LANGUAGE_CODE': 'en',
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
@@ -587,7 +587,7 @@ class Config(dict):
 
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
-        'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
+        'HELP_SUPPORT_URL': 'https://www.jumpserver.org/support/',
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
@@ -621,8 +621,12 @@ class Config(dict):
         'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
         'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521',
 
-        'FILE_UPLOAD_TEMP_DIR': None
+        'FILE_UPLOAD_TEMP_DIR': None,
 
+        'LOKI_LOG_ENABLED': False,
+        'LOKI_BASE_URL': 'http://loki:3100',
+
+        'TOOL_USER_ENABLED': False,
     }
 
     old_config_map = {

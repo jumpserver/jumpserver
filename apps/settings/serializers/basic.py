@@ -8,10 +8,10 @@ class BasicSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Basic')
 
     SITE_URL = serializers.URLField(
-        required=True, label=_("Site url"),
+        required=True, label=_("Site URL"),
         help_text=_(
-            'External URL, email links or other system callbacks are used to access it, '
-            'eg: http://dev.jumpserver.org:8080'
+            'Site URL is the externally accessible address of the current product '
+            'service and is usually used in links in system emails'
         )
     )
     USER_GUIDE_URL = serializers.URLField(
@@ -19,16 +19,16 @@ class BasicSettingSerializer(serializers.Serializer):
         help_text=_('User first login update profile done redirect to it')
     )
     GLOBAL_ORG_DISPLAY_NAME = serializers.CharField(
-        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization name"),
+        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization"),
         help_text=_('The name of global organization to display')
     )
     HELP_DOCUMENT_URL = serializers.URLField(
-        required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
-        help_text=_('default: http://docs.jumpserver.org')
+        required=False, allow_blank=True, allow_null=True, label=_("Document URL"),
+        help_text=_('Document URL refers to the address in the top navigation bar Help - Document')
     )
     HELP_SUPPORT_URL = serializers.URLField(
-        required=False, allow_blank=True, allow_null=True, label=_("Help Support URL"),
-        help_text=_('default: http://www.jumpserver.org/support/')
+        required=False, allow_blank=True, allow_null=True, label=_("Support URL"),
+        help_text=_('Support URL refers to the address in the top navigation bar Help - Support')
     )
 
     @staticmethod

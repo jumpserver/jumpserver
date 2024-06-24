@@ -31,7 +31,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         default=False, label=_("Push now"), write_only=True
     )
     params = serializers.JSONField(
-        decoder=None, encoder=None, required=False, style={'base_template': 'textarea.html'}
+        decoder=None, encoder=None, required=False,
+        style={'base_template': 'textarea.html'},
+        label=_('Params'),
     )
     on_invalid = LabeledChoiceField(
         choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,

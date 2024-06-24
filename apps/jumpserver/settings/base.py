@@ -131,7 +131,6 @@ INSTALLED_APPS = [
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
     'authentication.apps.AuthenticationConfig',  # authentication
-    'applications.apps.ApplicationsConfig',
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
     'notifications.apps.NotificationsConfig',
@@ -243,9 +242,10 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DB_OPTIONS = {}
+DB_ENGINE = CONFIG.DB_ENGINE.lower()
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE.lower()),
+        'ENGINE': 'django.db.backends.{}'.format(DB_ENGINE),
         'NAME': CONFIG.DB_NAME,
         'HOST': CONFIG.DB_HOST,
         'PORT': CONFIG.DB_PORT,
@@ -257,7 +257,7 @@ DATABASES = {
 }
 
 DB_USE_SSL = CONFIG.DB_USE_SSL
-if CONFIG.DB_ENGINE.lower() == 'mysql':
+if DB_ENGINE == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
     if DB_USE_SSL:
         DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
@@ -296,7 +296,7 @@ USE_TZ = True
 
 # I18N translation
 LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale'),
+    os.path.join(BASE_DIR, 'i18n', 'core'),
 ]
 
 # Static files (CSS, JavaScript, Images)

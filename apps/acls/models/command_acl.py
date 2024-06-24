@@ -23,7 +23,7 @@ class CommandGroup(JMSOrgBaseModel):
         max_length=16, default=TypeChoices.command, choices=TypeChoices.choices,
         verbose_name=_("Type")
     )
-    content = models.TextField(verbose_name=_("Content"), help_text=_("One line one command"))
+    content = models.TextField(verbose_name=_("Content"), help_text=_("One command per line"))
     ignore_case = models.BooleanField(default=True, verbose_name=_('Ignore case'))
 
     TypeChoices = TypeChoices

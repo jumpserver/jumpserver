@@ -274,7 +274,7 @@ class UserPermTreeBuildUtil(object):
             nodekey_assetid_mapper[key].update(asset_ids)
 
         for asset_id, node_id in self.direct_asset_id_node_id_pairs:
-            node_key = self.perm_nodes_id_key_mapper.get(node_id)
+            node_key = self.perm_nodes_id_key_mapper.get(str(node_id))
             if not node_key:
                 continue
             nodekey_assetid_mapper[node_key].add(asset_id)
@@ -345,7 +345,7 @@ class UserPermTreeBuildUtil(object):
     @lazyproperty
     def perm_nodes_id_key_mapper(self):
         mapper = {
-            node.id.hex: node.key
+            str(node.id): node.key
             for key, node in self._perm_nodes_key_node_mapper.items()
         }
         return mapper

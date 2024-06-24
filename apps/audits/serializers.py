@@ -67,7 +67,7 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "user_agent": {"label": _("User agent")},
             "reason_display": {"label": _("Reason display")},
-            "backend_display": {"label": _("Authentication backend")},
+            "backend_display": {"label": _("Auth backend display")},
         }
 
 
@@ -131,7 +131,7 @@ class ActivityUnionLogSerializer(serializers.Serializer):
     def get_content(obj):
         if not obj['r_detail']:
             action = obj['r_action'].replace('_', ' ').capitalize()
-            ctn = _('User %s %s this resource') % (obj['r_user'], _(action))
+            ctn = _('%s %s this resource') % (obj['r_user'], _(action).lower())
         else:
             ctn = i18n_trans(obj['r_detail'])
         return ctn
@@ -181,7 +181,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
         ]
         fields = fields_small
         extra_kwargs = {
-            "backend_display": {"label": _("Authentication backend")},
+            "backend_display": {"label": _("Auth backend display")},
         }
 
     def get_is_current_user_session(self, obj):

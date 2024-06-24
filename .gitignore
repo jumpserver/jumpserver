@@ -44,3 +44,4 @@ data/*
 test.py
 .history/
 .test/
+*.mo

@@ -47,6 +47,9 @@ class PhoneValidator:
     message = _('The mobile phone number format is incorrect')
 
     def __call__(self, value):
+        if not value:
+            return
+
         try:
             phone = phonenumbers.parse(value, 'CN')
             valid = phonenumbers.is_valid_number(phone)
