@@ -28,7 +28,7 @@ Prepare a Linux Server ( >4c8g )
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Access JumpServer in your browser at `http://your-ip:80/`, `admin`/`admin`
+Access JumpServer in your browser at `http://your-ip/`, `admin`/`admin`
 
 ## Components
 
