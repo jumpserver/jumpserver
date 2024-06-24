@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.contrib.auth import get_user_model
-from rest_framework.exceptions import ValidationError
+from django.db.models import Q
 from rest_framework.request import Request
 
 from common.utils import lazyproperty
@@ -14,14 +14,32 @@ class AllowBulkDestroyMixin:
         """
         我们规定，批量删除的情况必须用 `id` 指定要删除的数据。
         """
-        query = str(filtered.query)
-        can = (
-            '`id` IN (' in query or '`id` =' in query or
-            'ptr_id` IN (' in query or
-            '."id" IN' in query  # for postgresql
-        )
-        if not can:
-            raise ValidationError('Bulk destroy all is not allowed')
+        where = filtered.query.where
+
+        def has_id_condition(node):
+            # 检查是否有 `id` 或 `ptr_id` 的条件
+            if isinstance(node, Q):
+                return any(
+                    lookup in str(node)
+                    for lookup in ['id', 'ptr_id']
+                )
+            if hasattr(node, 'lhs') and hasattr(node, 'rhs'):
+                return any(
+                    lookup in str(node.lhs)
+                    for lookup in ['id', 'ptr_id']
+                )
+            return False
+
+        def check_conditions(where):
+            if hasattr(where, 'children'):
+                for child in where.children:
+                    if has_id_condition(child):
+                        return True
+                    if hasattr(child, 'children') and check_conditions(child):
+                        return True
+            return False
+
+        can = check_conditions(where)
         return can
 
 
