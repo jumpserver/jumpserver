@@ -94,6 +94,7 @@ ARG TOOLS="                           \
         sshpass                       \
         telnet                        \
         vim                           \
+        bubblewrap                    \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
