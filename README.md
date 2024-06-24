@@ -22,7 +22,7 @@ TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审
 ## Quick Start
 <!-- 只提供环境要求信息、一键安装脚本及登录信息 -->
 
-Prepare a Linux Server ( 64bit, >=4c8g)
+Prepare a Linux Server ( 64bit, >= 4c8g)
 
 ```
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
