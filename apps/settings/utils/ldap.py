@@ -641,7 +641,7 @@ class LDAPTestUtil(object):
             msg = _('Error (Unknown): {}').format(e)
         else:
             status = True
-            msg = _('Succeed: Match {} s user').format(len(self.user_entries))
+            msg = _('Succeed: Match {} users').format(len(self.user_entries))
 
         if not status:
             logger.error(msg, exc_info=True)
