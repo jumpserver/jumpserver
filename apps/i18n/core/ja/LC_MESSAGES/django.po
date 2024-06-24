@@ -4432,7 +4432,7 @@ msgstr "結果"
 #: ops/models/base.py:52 ops/models/job.py:238
 #: xpack/plugins/cloud/manager.py:87
 msgid "Summary"
-msgstr "概要"
+msgstr "Summary"
 
 #: ops/models/celery.py:16
 msgid "Date last publish"
