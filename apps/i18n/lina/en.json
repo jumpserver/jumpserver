@@ -1346,5 +1346,6 @@
     "StopLogOutput": "Task Canceled: The current task (currentTaskId) has been manually stopped. Since the progress of each task varies, the following is the final execution result of the task. A failed execution indicates that the task has been successfully stopped.",
     "OnlyInitialDeploy": "Only initial deployment",
     "Uninstall": "Uninstall",
-    "Summary": "Summary"
+    "Summary": "Summary",
+    "removeWarningMsg": "Are you sure you want to remove"
 }
