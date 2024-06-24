@@ -6517,7 +6517,7 @@ msgid "Error (Unknown): {}"
 msgstr "エラー (不明): {}"
 
 #: settings/utils/ldap.py:644
-msgid "Succeed: Match {} s user"
+msgid "Succeed: Match {} users"
 msgstr "成功: {} 人のユーザーに一致"
 
 #: settings/utils/ldap.py:677
