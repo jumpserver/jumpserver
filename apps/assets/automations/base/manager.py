@@ -37,7 +37,7 @@ class SSHTunnelManager:
         info = self.file_to_json(runner.inventory)
         servers, not_valid = [], []
         for k, host in info['all']['hosts'].items():
-            jms_asset, jms_gateway = host.get('jms_asset'), host.get('gateway')
+            jms_asset, jms_gateway = host.get('jms_asset'), host.get('jms_gateway')
             if not jms_gateway:
                 continue
             try:
@@ -300,12 +300,16 @@ class BasePlaybookManager:
             for host in hosts:
                 result = cb.host_results.get(host)
                 if state == 'ok':
-                    self.on_host_success(host, result)
+                    self.on_host_success(host, result.get('ok', ''))
                 elif state == 'skipped':
                     pass
                 else:
                     error = hosts.get(host)
-                    self.on_host_error(host, error, result)
+                    self.on_host_error(
+                        host, error,
+                        result.get('failures', '')
+                        or result.get('dark', '')
+                    )
 
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))

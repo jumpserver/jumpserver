@@ -80,6 +80,9 @@ def create_or_update_celery_periodic_tasks(tasks):
             description=detail.get('description') or '',
             last_run_at=last_run_at,
         )
+        enabled = detail.get('enabled')
+        if enabled is not None:
+            defaults["enabled"] = enabled
         task = PeriodicTask.objects.update_or_create(
             defaults=defaults, name=name,
         )

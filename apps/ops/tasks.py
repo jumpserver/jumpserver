@@ -144,10 +144,10 @@ def clean_job_execution_period():
         del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
         logger.info(f"clean job_execution db record success! delete {days} days {del_res[0]} records")
 
-
-@shared_task
-def longtime_add(x, y):
-    print('long time task begins')
-    time.sleep(50)
-    print('long time task finished')
-    return x + y
+# 测试使用，注释隐藏
+# @shared_task
+# def longtime_add(x, y):
+#     print('long time task begins')
+#     time.sleep(50)
+#     print('long time task finished')
+#     return x + y

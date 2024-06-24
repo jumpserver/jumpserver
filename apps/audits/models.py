@@ -257,6 +257,8 @@ class UserLoginLog(models.Model):
 
 
 class UserSession(models.Model):
+    _OPERATE_LOG_ACTION = {'delete': ActionChoices.finished}
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(verbose_name=_("Login IP"))
     key = models.CharField(max_length=128, verbose_name=_("Session key"))

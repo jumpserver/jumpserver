@@ -225,7 +225,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'version',
             'source', 'source_id', 'connectivity',
-        ] + AccountCreateUpdateSerializerMixin.Meta.fields
+        ] + list(set(AccountCreateUpdateSerializerMixin.Meta.fields) - {'params'})
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + [
             'connectivity'
         ]
@@ -431,8 +431,11 @@ class AssetAccountBulkSerializer(
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
+        fields = AccountSerializer.Meta.fields + ['spec_info']
         extra_kwargs = {
+            **AccountSerializer.Meta.extra_kwargs,
             'secret': {'write_only': False},
+            'spec_info': {'label': _('Spec info')},
         }
 
 

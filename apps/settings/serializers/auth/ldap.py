@@ -82,7 +82,8 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=False, label=_('User DN cache timeout (s)'),
         help_text=_(
             'Caching the User DN obtained during user login authentication can effectively'
-            'improve the speed of user authentication., 0 means no cache'
+            'improve the speed of user authentication., 0 means no cache<br>'
+            'If the user OU structure has been adjusted, click Submit to clear the user DN cache'
         )
     )
     AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(required=False, label=_('Search paged size (piece)'))
@@ -92,7 +93,10 @@ class LDAPSettingSerializer(serializers.Serializer):
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
 
-    @staticmethod
-    def post_save():
+    def post_save(self):
+        keys = ['AUTH_LDAP_SYNC_IS_PERIODIC', 'AUTH_LDAP_SYNC_INTERVAL', 'AUTH_LDAP_SYNC_CRONTAB']
+        kwargs = {k: self.validated_data[k] for k in keys if k in self.validated_data}
+        if not kwargs:
+            return
         from settings.tasks import import_ldap_user_periodic
-        import_ldap_user_periodic()
+        import_ldap_user_periodic(**kwargs)

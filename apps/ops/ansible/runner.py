@@ -15,8 +15,10 @@ __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRu
 
 class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
+    need_local_connection_modules_choices = ("mysql", "postgresql", "sqlserver", "huawei")
 
-    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
+    def __init__(self, inventory, job_module, module, module_args='', pattern='*', project_dir='/tmp/',
+                 extra_vars=None,
                  dry_run=False, timeout=-1):
         if extra_vars is None:
             extra_vars = {}
@@ -24,6 +26,7 @@ class AdHocRunner:
         self.inventory = inventory
         self.pattern = pattern
         self.module = module
+        self.job_module = job_module
         self.module_args = module_args
         self.project_dir = project_dir
         self.cb = DefaultCallback()
@@ -31,8 +34,7 @@ class AdHocRunner:
         self.extra_vars = extra_vars
         self.dry_run = dry_run
         self.timeout = timeout
-        # enable local connection
-        self.extra_vars.update({"ANSIBLE_SUPER_MODE": "1"})
+        self.envs = {}
 
     def check_module(self):
         if self.module not in self.cmd_modules_choices:
@@ -41,8 +43,13 @@ class AdHocRunner:
             raise CommandInBlackListException(
                 "Command is rejected by black list: {}".format(self.module_args.split()[0]))
 
+    def set_local_connection(self):
+        if self.job_module in self.need_local_connection_modules_choices:
+            self.envs.update({"ANSIBLE_SUPER_MODE": "1"})
+
     def run(self, verbosity=0, **kwargs):
         self.check_module()
+        self.set_local_connection()
         verbosity = get_ansible_log_verbosity(verbosity)
 
         if not os.path.exists(self.project_dir):
@@ -54,6 +61,7 @@ class AdHocRunner:
         interface.run(
             timeout=self.timeout if self.timeout > 0 else None,
             extravars=self.extra_vars,
+            envvars=self.envs,
             host_pattern=self.pattern,
             private_data_dir=self.project_dir,
             inventory=self.inventory,

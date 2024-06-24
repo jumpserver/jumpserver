@@ -5,6 +5,7 @@ if sys.version_info.major >= 3 and sys.version_info.minor >= 10:
     from collections.abc import Iterable
 else:
     from collections import Iterable
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import NOT_PROVIDED
 from django.utils.translation import gettext_lazy as _
@@ -42,6 +43,17 @@ class SecretReadableMixin(serializers.Serializer):
             if 'write_only' not in field_extra_kwargs:
                 continue
             serializer_field.write_only = field_extra_kwargs['write_only']
+        self.remove_spec_info_field()
+
+    def remove_spec_info_field(self):
+        request = self.context.get('request')
+        if not request:
+            return
+
+        _format = request.query_params.get('format')
+        if _format not in ['csv', 'xlsx']:
+            return
+        self.fields.pop('spec_info', None)
 
 
 class BulkSerializerMixin(object):
@@ -264,6 +276,14 @@ class SizedModelFieldsMixin(BaseDynamicFieldsPlugin):
         return fields_to_drop
 
 
+class XPACKModelFieldsMixin(BaseDynamicFieldsPlugin):
+    def get_exclude_field_names(self):
+        if settings.XPACK_LICENSE_IS_VALID:
+            return set()
+        fields_xpack = set(getattr(self.serializer.Meta, 'fields_xpack', set()))
+        return fields_xpack
+
+
 class DefaultValueFieldsMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -302,7 +322,7 @@ class DynamicFieldsMixin:
     """
     可以控制显示不同的字段，mini 最少，small 不包含关系
     """
-    dynamic_fields_plugins = [QueryFieldsMixin, SizedModelFieldsMixin]
+    dynamic_fields_plugins = [QueryFieldsMixin, SizedModelFieldsMixin, XPACKModelFieldsMixin]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

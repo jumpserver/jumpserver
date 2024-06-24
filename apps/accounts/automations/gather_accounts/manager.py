@@ -51,8 +51,16 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         data = self.generate_data(asset, result)
         self.asset_account_info[asset] = data
 
+    @staticmethod
+    def get_nested_info(data, *keys):
+        for key in keys:
+            data = data.get(key, {})
+            if not data:
+                break
+        return data
+
     def on_host_success(self, host, result):
-        info = result.get('debug', {}).get('res', {}).get('info', {})
+        info = self.get_nested_info(result, 'debug', 'res', 'info')
         asset = self.host_asset_mapper.get(host)
         if asset and info:
             result = self.filter_success_result(asset.type, info)

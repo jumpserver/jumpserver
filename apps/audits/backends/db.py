@@ -52,7 +52,7 @@ class OperateLogStore(object):
         resource_map = {
             'Asset permission': lambda k, v: ActionChoices.display(int(v)) if k == 'Actions' else v
         }
-        return resource_map.get(resource_type, lambda k, v: v)
+        return resource_map.get(resource_type, lambda k, v: _(v))
 
     @classmethod
     def convert_diff_friendly(cls, op_log):

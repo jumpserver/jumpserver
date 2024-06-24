@@ -3,6 +3,7 @@
 
 from functools import partial
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -16,6 +17,7 @@ from orgs.utils import current_org
 from rbac.builtin import BuiltinRole
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from rbac.permissions import RBACPermission
+from users.signals import post_user_change_password
 from ..const import PasswordStrategy
 from ..models import User
 
@@ -123,11 +125,12 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         fields_write_only = [
             "password", "public_key",
         ]
+        # xpack 包含的字段
+        fields_xpack = ["wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id"]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             "email", "wechat", "phone", "mfa_level", "source",
-            "wecom_id", "dingtalk_id", "feishu_id", "lark_id",
-            "slack_id", "created_by", "updated_by", "comment",  # 通用字段
+            *fields_xpack, "created_by", "updated_by", "comment",  # 通用字段
         ]
         fields_date = [
             "date_expired", "date_joined", "last_login",
@@ -156,8 +159,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
 
         read_only_fields = [
             "date_joined", "last_login", "created_by",
-            "is_first_login", "wecom_id", "dingtalk_id",
-            "feishu_id", "lark_id", "date_api_key_last_used",
+            "is_first_login", *fields_xpack, "date_api_key_last_used",
         ]
         fields_only_root_org = ["orgs_roles"]
         disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
@@ -181,7 +183,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
             "is_otp_secret_key_bound": {"label": _("Is OTP bound")},
             'mfa_level': {'label': _("MFA level")},
         }
-    
+
     def get_fields(self):
         fields = super().get_fields()
         self.pop_fields_if_need(fields)
@@ -192,7 +194,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         if not current_org.is_root():
             for f in self.Meta.fields_only_root_org:
                 fields.pop(f, None)
-    
+
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")
         if self.instance is None and password_strategy != PasswordStrategy.custom:
@@ -267,6 +269,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         instance = self.save_and_set_custom_m2m_fields(
             validated_data, save_handler, created=False
         )
+        if validated_data.get('public_key'):
+            post_user_change_password.send(instance.__class__, user=instance)
         return instance
 
     def create(self, validated_data):
@@ -274,6 +278,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         instance = self.save_and_set_custom_m2m_fields(
             validated_data, save_handler, created=True
         )
+        if validated_data.get('public_key'):
+            post_user_change_password.send(instance.__class__, user=instance)
         return instance
 
     @classmethod
