@@ -2421,7 +2421,7 @@ msgstr ""
 #: authentication/templates/authentication/login.html:368
 #: templates/_header_bar.html:101
 msgid "Login"
-msgstr ""
+msgstr "Sign in"
 
 #: audits/const.py:31 ops/const.py:9
 msgid "Change password"
@@ -3471,7 +3471,7 @@ msgstr ""
 
 #: authentication/templates/authentication/login.html:375
 msgid "More login options"
-msgstr ""
+msgstr "Or"
 
 #: authentication/templates/authentication/login_mfa.html:6
 msgid "MFA Auth"
