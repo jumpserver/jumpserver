@@ -32,26 +32,26 @@ JumpServer is an open source Privileged Access Management (PAM) tool that provid
 8. 系统设置 - 远程应用页面 
 -->
 
-<!-- <table style="border-collapse: collapse; border: 1px solid black;">
+<table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Console"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Audits"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/dad0d3b4-d054-4a87-a027-4b993b97515f" alt="JumpServer Console"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/082b63ca-e4e8-41c1-91bb-3d0e09027411" alt="JumpServer Audits"   /></td>
   </tr>
 
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Workbench"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Settings"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/e9b4578f-8d26-4780-bd6c-bce1192ad089" alt="JumpServer Workbench"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/ac1d88c2-b458-4a8f-bf6e-59212b6e5994" alt="JumpServer Settings"   /></td>
   </tr>
 
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Linux"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Windows"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a042db25-4860-449f-a692-5f28250d97ef" alt="JumpServer SSH"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/96c69540-24f8-4a16-a4d9-3652370e4a33" alt="JumpServer RDP"   /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer K8s"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Database"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/46af0e8b-592b-4a05-9611-4b45f762ba48" alt="JumpServer K8s"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a38fce45-0cee-4710-8e0e-152adde27d00" alt="JumpServer DB"   /></td>
   </tr>
-</table> -->
+</table>
 
 ## Quick Start
 <!-- 只提供环境要求信息、一键安装脚本及登录信息 -->
@@ -128,8 +128,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-trending-shield]: https://trendshift.io/api/badge/repositories/5071
 
 <!-- Image link -->
-[image-jumpserver]: https://download.jumpserver.org/images/jumpserver-logo.svg
-[image-dashboard]: https://github.com/jumpserver/jumpserver/assets/32935519/014c2230-82d3-4b53-b907-8149ce44bbd0
-[image-star]: https://github.com/jumpserver/jumpserver/assets/32935519/76158e65-783d-4f11-81cd-45556a388e63
-[image-supported-asset-type]: https://github.com/jumpserver/jumpserver/assets/32935519/8e769007-5449-4e86-b34b-d04e8e484257
-[image-system-architecture]: https://github.com/jumpserver/jumpserver/assets/32935519/8a720b4e-19ed-4e3c-a8aa-325d7581005a
+[image-console-assets]: https://github.com/jumpserver/jumpserver/assets/32935519/dad0d3b4-d054-4a87-a027-4b993b97515f
