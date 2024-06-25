@@ -86,30 +86,22 @@ https://www.gnu.org/licenses/gpl-3.0.html
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 <!-- JumpServer official link -->
-[official-website-en-link]: https://jumpserver.org/
 [docs-link]: https://en-docs.jumpserver.org/
-[community-link]: https://community.fit2cloud.com/#/products/jumpserver/downloads
-[demo-link]: https://demo.jumpserver.org/
 [discord-link]: https://discord.gg/DVz6Hckx
 [contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
 
 <!-- JumpServer Other link-->
 [license-link]: https://www.gnu.org/licenses/gpl-3.0.html
 [docker-link]: https://hub.docker.com/u/jumpserver
-[github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
 [github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
-[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
-[github-trending-link]: https://trendshift.io/repositories/5071
 
 <!-- Shield link-->
+[github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
+[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
-[demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
-[version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
-[github-trending-shield]: https://trendshift.io/api/badge/repositories/5071
 [discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb
-
 
 <!-- Image link -->
