@@ -1,16 +1,8 @@
 import os
-import platform
 import re
 
-from redis.sentinel import SentinelManagedSSLConnection
-
-if platform.system() == 'Darwin' and platform.machine() == 'arm64':
-    import pymysql
-
-    # pymysql.version_info = (1, 4, 2, "final", 0)
-    pymysql.install_as_MySQLdb()
-
 from django.urls import reverse_lazy
+from redis.sentinel import SentinelManagedSSLConnection
 
 from .. import const
 from ..const import CONFIG

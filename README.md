@@ -17,6 +17,7 @@
 
 JumpServer is an open source Privileged Access Management (PAM) tool that provides DevOps and IT teams with instant and secure access to SSH, RDP, K8s and Database endpoints through a web browser.
 
+
 <!-- TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审计) -->
 <!-- 16:9 3200:1800 -->
 
@@ -53,7 +54,6 @@ JumpServer is an open source Privileged Access Management (PAM) tool that provid
   </tr>
 </table>
 
-
 ## Quick Start
 <!-- 只提供环境要求信息、一键安装脚本及登录信息 -->
 
@@ -79,11 +79,8 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                       |
 | [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                         |
 | [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer Database Proxy Connector                                                                     |
-| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB                                                                                       |
-| [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer GPT Assets Connector                                                                         |
-| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer Inter-Project Communication Component with Core API                                          |
-| [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer Client                                                                                       |
-| [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer Installation Tool                                                                            |
+| [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB                                                                                       |  
+
 
 ## Contributing
 
