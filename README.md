@@ -2,7 +2,7 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## An open-source PAM tool（Bastion Host）
+## An open-source PAM tool (Bastion Host)
 
 [![][license-shield]][license-link]
 [![][discord-shield]][discord-link]
