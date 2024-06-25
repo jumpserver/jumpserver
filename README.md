@@ -2,9 +2,10 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## An open-source PAM tool（Bastion Host）
+## An open-source PAM tool (Bastion Host)
 
 [![][license-shield]][license-link]
+[![][discord-shield]][discord-link]
 [![][docker-shield]][docker-link]
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
@@ -16,21 +17,6 @@
 ## What is JumpServer?
 
 JumpServer is an open-source Privileged Access Management (PAM) tool that provides DevOps and IT teams with on-demand and secure access to SSH, RDP, K8s, Remote Apps and Database endpoints through a web browser.
-
-<!-- TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审计) -->
-<!-- 16:9 3200:1800 -->
-
-<!-- 
-1. SSH 
-2. RDP 
-3. K8s 
-4. Database
-
-5. 控制台 - 资产页面
-6. 审计台 - 仪表盘
-7. 工作台 - 我的资产页面
-8. 系统设置 - 远程应用页面 
--->
 
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
@@ -54,8 +40,6 @@ JumpServer is an open-source Privileged Access Management (PAM) tool that provid
 </table>
 
 ## Quick Start
-<!-- 只提供环境要求信息、一键安装脚本及登录信息 -->
-
 Prepare a clean Linux Server ( 64bit, >= 4c8g )
 
 ```
@@ -102,30 +86,22 @@ https://www.gnu.org/licenses/gpl-3.0.html
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 <!-- JumpServer official link -->
-[official-website-en-link]: https://jumpserver.org/
 [docs-link]: https://en-docs.jumpserver.org/
-[community-link]: https://community.fit2cloud.com/#/products/jumpserver/downloads
-[demo-link]: https://demo.jumpserver.org/
 [discord-link]: https://discord.gg/DVz6Hckx
 [contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
 
 <!-- JumpServer Other link-->
 [license-link]: https://www.gnu.org/licenses/gpl-3.0.html
 [docker-link]: https://hub.docker.com/u/jumpserver
-[github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
 [github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
-[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
-[github-trending-link]: https://trendshift.io/repositories/5071
 
 <!-- Shield link-->
+[github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
+[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
-[demo-shield-badge]: https://img.shields.io/badge/ONLINE-online?style=plastic&logo=jameson&logoColor=white&label=TRY%20JUMPSERVER&labelColor=black&color=%23148f76
-[discord-shield-badge]: https://img.shields.io/badge/JOIN_US_NOW-ONLINE?style=plastic&logo=discord&logoColor=white&label=DISCORD&labelColor=black&color=%23404eed
-[version-ee-shield-badge]: https://img.shields.io/badge/Enterprise-black?style=flat-square&logo=vagrant
-[github-trending-shield]: https://trendshift.io/api/badge/repositories/5071
+[discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb
 
 <!-- Image link -->
-[image-console-assets]: https://github.com/jumpserver/jumpserver/assets/32935519/dad0d3b4-d054-4a87-a027-4b993b97515f
