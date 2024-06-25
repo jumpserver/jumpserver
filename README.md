@@ -87,7 +87,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 <!-- JumpServer official link -->
 [docs-link]: https://en-docs.jumpserver.org/
-[discord-link]: https://discord.gg/DVz6Hckx
+[discord-link]: https://discord.com/invite/jcM5tKWJ
 [contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
 
 <!-- JumpServer Other link-->
