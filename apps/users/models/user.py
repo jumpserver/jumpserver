@@ -776,7 +776,7 @@ class JSONFilterMixin:
         if match == "m2m_all":
             user_id = (
                 bindings.values("user_id")
-                .annotate(count=Count("user_id", distinct=True))
+                .annotate(count=Count("user_id")) # 这里不能有 distinct 会导致 count 不准确, acls 中过滤用户时会出现问题
                 .filter(count=len(value))
                 .values_list("user_id", flat=True)
             )
