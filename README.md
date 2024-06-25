@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.org"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## An open-source PAM tool（Bastion Host）
 
@@ -15,8 +15,7 @@
 
 ## What is JumpServer?
 
-JumpServer is an open source Privileged Access Management (PAM) tool that provides DevOps and IT teams with instant and secure access to SSH, RDP, K8s and Database endpoints through a web browser.
-
+JumpServer is an open source Privileged Access Management (PAM) tool that provides DevOps and IT teams with on-demand and secure access to SSH, RDP, K8s, Remote Apps and Database endpoints through a web browser.
 
 <!-- TBD: 6 sceenshots(登录、首页、Linux、Windows、Database、K8s、录像审计) -->
 <!-- 16:9 3200:1800 -->
@@ -33,7 +32,7 @@ JumpServer is an open source Privileged Access Management (PAM) tool that provid
 8. 系统设置 - 远程应用页面 
 -->
 
-<table style="border-collapse: collapse; border: 1px solid black;">
+<!-- <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
     <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Console"   /></td>
     <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Audits"   /></td>
@@ -52,7 +51,7 @@ JumpServer is an open source Privileged Access Management (PAM) tool that provid
     <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer K8s"   /></td>
     <td style="padding: 5px;background-color:#fff;"><img src= "" alt="JumpServer Database"   /></td>
   </tr>
-</table>
+</table> -->
 
 ## Quick Start
 <!-- 只提供环境要求信息、一键安装脚本及登录信息 -->
