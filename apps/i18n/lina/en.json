@@ -984,7 +984,7 @@
     "SMTP": "Server",
     "SPECIAL_CHAR_REQUIRED": "Must contain special characters",
     "SSHKey": "SSH key",
-    "SSHKeyOfProfileSSHUpdatePage": "You can reset and download the SSH public key by clicking the button below, or copy your SSH public key and submit it.",
+    "SSHKeyOfProfileSSHUpdatePage": "You can click the button below to reset and download your key, or copy your SSH public key and submit it.",
     "SSHPort": "SSH Port",
     "SSHSecretKey": "SSH secret key",
     "SafeCommand": "Secure command",
@@ -1348,5 +1348,7 @@
     "Uninstall": "Uninstall",
     "Summary": "Summary",
     "removeWarningMsg": "Are you sure you want to remove",
-    "UnFavoriteSucceed": "Unfavorite Successful"
+    "UnFavoriteSucceed": "Unfavorite Successful",
+    "TriggerMode": "Trigger mode",
+    "CreateUserContent": "Creating User Content"
 }
