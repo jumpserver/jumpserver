@@ -263,7 +263,7 @@
     "CASSetting": "CAS 配置",
     "CMPP2": "CMPP v2.0",
     "CTYunPrivate": "天翼私有雲",
-    "CanDragSelect": "可拖動滑鼠選擇時間段",
+    "CanDragSelect": "可拖動滑鼠選擇時間段；未選擇等同全選",
     "Cancel": "取消",
     "CancelCollection": "取消收藏",
     "CannotAccess": "無法訪問當前頁面",

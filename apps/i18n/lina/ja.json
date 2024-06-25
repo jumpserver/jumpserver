@@ -222,7 +222,7 @@
     "CMPP2": "CMPP v2.0",
     "CTYunPrivate": "天翼プライベートクラウド",
     "CalculationResults": "cron 式のエラー",
-    "CanDragSelect": "マウスドラッグで時間帯を選択可能",
+    "CanDragSelect": "マウスドラッグで時間帯を選択可能；未選択は全選択と同じです",
     "Cancel": "キャンセル",
     "CancelCollection": "お気に入りキャンセル",
     "CannotAccess": "現在のページへのアクセスができません",
