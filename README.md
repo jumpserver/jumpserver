@@ -35,7 +35,7 @@ JumpServer is an open source Privileged Access Management (PAM) tool that provid
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/dad0d3b4-d054-4a87-a027-4b993b97515f" alt="JumpServer Console"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/082b63ca-e4e8-41c1-91bb-3d0e09027411" alt="JumpServer Audits"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a516493b-1f5b-42b4-a5f2-178cde613839" alt="JumpServer Audits"   /></td>
   </tr>
 
   <tr>
