@@ -292,7 +292,7 @@
     "Confirm": "Confirm",
     "ConfirmPassword": "Confirm password",
     "Connect": "Connect",
-    "ConnectAssets": "Connect assets",
+    "ConnectAssets": "Access assets",
     "ConnectMethod": "Connect method",
     "ConnectMethodACLHelpMsg": "Connect methods can be filtered to control whether users can use a certain connect method to login to the asset. according to your set rules, some connect methods can be allowed, while others can be prohibited (globally effective).",
     "ConnectMethodACLHelpText": "Connect methods can be filtered to control whether users can use a certain connect method to login to the asset. according to your set rules, some connect methods can be allowed, while others can be prohibited.",
