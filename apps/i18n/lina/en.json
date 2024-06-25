@@ -209,7 +209,7 @@
     "CAS": "CAS",
     "CMPP2": "Cmpp v2.0",
     "CalculationResults": "Error in cron expression",
-    "CanDragSelect": "Select time period by dragging mouse",
+    "CanDragSelect": "Select time period by dragging mouse;No selection means all selected",
     "Cancel": "Cancel",
     "CancelCollection": "Cancel favorite",
     "CannotAccess": "Can't access the current page",

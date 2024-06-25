@@ -209,7 +209,7 @@
     "CAS": "CAS",
     "CMPP2": "CMPP v2.0",
     "CalculationResults": "cron 表达式错误",
-    "CanDragSelect": "可拖动鼠标选择时间段",
+    "CanDragSelect": "可拖动鼠标选择时间段；未选择等同全选",
     "Cancel": "取消",
     "CancelCollection": "取消收藏",
     "CannotAccess": "无法访问当前页面",
