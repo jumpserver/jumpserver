@@ -34,22 +34,22 @@ JumpServer is an open source Privileged Access Management (PAM) tool that provid
 
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/dad0d3b4-d054-4a87-a027-4b993b97515f" alt="JumpServer Console"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a516493b-1f5b-42b4-a5f2-178cde613839" alt="JumpServer Audits"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/18c22918-d6d5-422c-a4ae-48977b792538" alt="JumpServer Console"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/b4b44fa0-8cc4-4d44-bb41-acc5db5a9629" alt="JumpServer Audits"   /></td>
   </tr>
 
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/e9b4578f-8d26-4780-bd6c-bce1192ad089" alt="JumpServer Workbench"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/ac1d88c2-b458-4a8f-bf6e-59212b6e5994" alt="JumpServer Settings"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/43dc1ca9-202d-4312-b345-8cbcfe727c41" alt="JumpServer Workbench"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/2f1760b2-4f92-4921-a506-325a6bda545f" alt="JumpServer Settings"   /></td>
   </tr>
 
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a042db25-4860-449f-a692-5f28250d97ef" alt="JumpServer SSH"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/96c69540-24f8-4a16-a4d9-3652370e4a33" alt="JumpServer RDP"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/8c7b07f1-871d-4b31-b3d2-faf99d3697bb" alt="JumpServer SSH"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/9dc11f89-6188-4e8b-9b75-4b5670e527ec" alt="JumpServer RDP"   /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/46af0e8b-592b-4a05-9611-4b45f762ba48" alt="JumpServer K8s"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a38fce45-0cee-4710-8e0e-152adde27d00" alt="JumpServer DB"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/509ebb26-0295-44f4-8185-6557cb9a07e7" alt="JumpServer K8s"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/1ec7d43a-e2ea-4072-a110-6cef6894322a" alt="JumpServer DB"   /></td>
   </tr>
 </table>
 
