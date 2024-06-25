@@ -6,7 +6,6 @@ from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
 
-
 __all__ = [
     'MailTestSerializer', 'EmailSettingSerializer',
     'EmailContentSettingSerializer', 'SMSBackendSerializer',
@@ -31,14 +30,14 @@ class EmailSettingSerializer(serializers.Serializer):
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("Host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("Port"))
     EMAIL_HOST_USER = serializers.CharField(
-        max_length=128, required=True, label=_("User"), help_text=_("The user to be used for email server authentication")
+        max_length=128, required=True, label=_("Account"), help_text=_("The user to be used for email server authentication")
     )
     EMAIL_HOST_PASSWORD = EncryptedField(
         max_length=1024, required=False, label=_("Password"),
         help_text=_("Password to use for the email server. It is used in conjunction with `User` when authenticating to the email server")
     )
     EMAIL_FROM = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, label=_('From'),
+        max_length=128, allow_blank=True, required=False, label=_('Sender'),
         help_text=_('Sender email address (default to using the `User`)')
     )
     EMAIL_RECIPIENT = serializers.CharField(

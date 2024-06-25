@@ -984,7 +984,7 @@
     "SMTP": "邮件服务器",
     "SPECIAL_CHAR_REQUIRED": "必须包含特殊字符",
     "SSHKey": "SSH公钥",
-    "SSHKeyOfProfileSSHUpdatePage": "你可以点击下面的按钮重置并下载 SSH 公钥，或者复制你的 SSH 公钥并提交。",
+    "SSHKeyOfProfileSSHUpdatePage": "你可以点击下面的按钮重置并下载密钥，或者复制你的 SSH 公钥并提交。",
     "SSHPort": "SSH 端口",
     "SSHSecretKey": "SSH 密钥",
     "SafeCommand": "安全命令",
@@ -1347,5 +1347,7 @@
     "Uninstall": "卸载",
     "Summary": "汇总",
     "removeWarningMsg": "你确定要移除",
-    "UnFavoriteSucceed": "取消收藏成功"
+    "UnFavoriteSucceed": "取消收藏成功",
+    "TriggerMode": "触发方式",
+    "CreateUserContent": "创建用户内容"
 }
