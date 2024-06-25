@@ -104,7 +104,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 <!-- JumpServer official link -->
 [official-website-en-link]: https://jumpserver.org/
-[docs-link]: https://docs.jumpserver.org/
+[docs-link]: https://en-docs.jumpserver.org/
 [community-link]: https://community.fit2cloud.com/#/products/jumpserver/downloads
 [demo-link]: https://demo.jumpserver.org/
 [discord-link]: https://discord.gg/DVz6Hckx
