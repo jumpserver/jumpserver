@@ -105,8 +105,9 @@ def clean_expired_session_period():
     logger.info("Clean session item done")
     batch_delete(expired_commands)
     logger.info("Clean session command done")
-    command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
-        replay_dir, days
+    file_types = "-name '*.json' -o -name '*.tar' -o -name '*.gz' -o -name '*.mp4'"
+    command = "find %s -mtime +%s \\( %s \\) -exec rm -f {} \\;" % (
+        replay_dir, days, file_types
     )
     subprocess.call(command, shell=True)
     command = "find %s -type d -empty -delete;" % replay_dir
