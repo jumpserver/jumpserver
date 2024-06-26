@@ -5297,7 +5297,7 @@ msgstr "启用钉钉认证"
 
 #: settings/serializers/auth/lark.py:12 users/models/user.py:801
 msgid "Lark"
-msgstr "启用飞书认证"
+msgstr "启用Lark认证"
 
 #: settings/serializers/auth/ldap.py:39 settings/serializers/auth/ldap.py:104
 msgid "LDAP"
