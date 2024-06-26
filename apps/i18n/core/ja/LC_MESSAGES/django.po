@@ -5354,7 +5354,7 @@ msgstr "ピン認証の有効化"
 
 #: settings/serializers/auth/lark.py:12 users/models/user.py:801
 msgid "Lark"
-msgstr ""
+msgstr "Lark認証を有効にする"
 
 #: settings/serializers/auth/ldap.py:39 settings/serializers/auth/ldap.py:104
 msgid "LDAP"
