@@ -1363,7 +1363,7 @@
     "BaseAssetPermission": "资产授权",
     "BaseUserLoginAclList": "用户登录",
     "BaseCmdACL": "命令授权",
-    "BaseLoginAssetAcls": "登录授权",
+    "BaseAssetAclList": "登录授权",
     "BaseCmdGroups": "命令组",
     "BaseConnectMethodACL": "连接方式授权",
     "BaseTags": "标签",
@@ -1371,11 +1371,12 @@
     "BaseLoginLog": "登录日志",
     "BaseOperateLog": "操作日志",
     "BaseMyAssets": "我的资产",
-    "BaseJob": "作业",
+    "BaseJobManagement": "作业管理",
     "BaseFlowSetUp": "流程设置",
     "BaseStorage": "存储",
     "BaseTerminal": "终端",
     "BaseApplets": "应用",
     "BaseSystemTasks": "任务",
-    "Open": "打开"
+    "Open": "打开",
+    "BaseTickets": "工单列表"
 }

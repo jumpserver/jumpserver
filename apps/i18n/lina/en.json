@@ -1363,7 +1363,7 @@
     "BaseAssetPermission": "Asset Permission",
     "BaseUserLoginAclList": "User Login ACL List",
     "BaseCmdACL": "Cmd ACL",
-    "BaseLoginAssetAcls": "Login Asset ACLs",
+    "BaseAssetAclList": "Login Asset ACLs",
     "BaseCmdGroups": "Cmd Groups",
     "BaseConnectMethodACL": "Connect Method ACL",
     "BaseTags": "Tags",
@@ -1371,11 +1371,12 @@
     "BaseLoginLog": "Login Log",
     "BaseOperateLog": "Operate Log",
     "BaseMyAssets": "My Assets",
-    "BaseJob": "Job",
+    "BaseJobManagement": "Job Management",
     "BaseFlowSetUp": "Flow Set Up",
     "BaseStorage": "Storage",
     "BaseTerminal": "Terminal",
     "BaseApplets": "Applets",
     "BaseSystemTasks": "System Tasks",
-    "Open": "Open"
+    "Open": "Open",
+    "BaseTickets": "Tickets"
 }
