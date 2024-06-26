@@ -31,7 +31,7 @@ class UserLoginForm(forms.Form):
     auto_login = forms.BooleanField(
         required=False, initial=False,
         widget=forms.CheckboxInput(),
-        label=_('Auto login next')
+        label=_('Auto-login')
     )
 
     def __init__(self, *args, **kwargs):

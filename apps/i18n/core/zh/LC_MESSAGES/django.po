@@ -3027,9 +3027,7 @@ msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
 #: authentication/forms.py:34
-#, fuzzy
-#| msgid "Auto login"
-msgid "Auto login next"
+msgid "Auto-login"
 msgstr "自动登录"
 
 #: authentication/forms.py:52
@@ -8396,11 +8394,11 @@ msgstr ""
 "的窗口大小"
 
 #: users/serializers/preference/luna.py:59
-msgid "Remote application connection method"
+msgid "Remote app connect method"
 msgstr "远程应用连接方式"
 
 #: users/serializers/preference/luna.py:66
-msgid "Character terminal font size"
+msgid "Terminal font size"
 msgstr "字符终端字体大小"
 
 #: users/serializers/preference/luna.py:69

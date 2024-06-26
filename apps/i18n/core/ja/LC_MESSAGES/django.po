@@ -3059,9 +3059,7 @@ msgstr ""
 "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
 
 #: authentication/forms.py:34
-#, fuzzy
-#| msgid "Auto login"
-msgid "Auto login next"
+msgid "Auto-login"
 msgstr "自動ログイン"
 
 #: authentication/forms.py:52
@@ -8497,11 +8495,11 @@ msgstr ""
 # "ピュータのウィンドウサイズに合わせるためにリモートコンピュータ上のコンテンツ"
 # "をスケーリングすべきかどうかを判断する"
 #: users/serializers/preference/luna.py:59
-msgid "Remote application connection method"
+msgid "Remote app connect method"
 msgstr "リモートアプリケーション接続方式"
 
 #: users/serializers/preference/luna.py:66
-msgid "Character terminal font size"
+msgid "Terminal font size"
 msgstr "文字終端フォントサイズ"
 
 #: users/serializers/preference/luna.py:69

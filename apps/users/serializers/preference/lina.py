@@ -1,18 +1,19 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.const import Language
 from common.serializers.fields import EncryptedField
 from ...models import Preference
 
 
-class BasicSerializer(serializers.Serializer):
+class FileEncryptSerializer(serializers.Serializer):
     has_secret_key = serializers.SerializerMethodField(
         help_text=_(
             '*! The password for file encryption, '
             'used for decryption when the system sends emails containing file attachments. '
             '<br>'
             'Such as: account backup files, account password change results files'
-        )
+        ),
     )
     secret_key = EncryptedField(
         required=False, max_length=1024,
@@ -42,5 +43,10 @@ class BasicSerializer(serializers.Serializer):
         return attrs
 
 
+class BasicSerializer(serializers.Serializer):
+    lang = serializers.ChoiceField(required=False, choices=Language.choices, label=_('Language'), default=Language.auto)
+
+
 class LinaSerializer(serializers.Serializer):
-    basic = BasicSerializer(required=False, label=_('File Encryption'))
+    # basic = BasicSerializer(required=False, label=_('Basic'))
+    file = FileEncryptSerializer(required=False, label=_('File Encryption'))
