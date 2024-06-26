@@ -1,7 +1,7 @@
 name: dbeaver
 display_name: "{{ 'DBeaver Community' | trans }}"
 comment: "{{ 'Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.' | trans }}"
-version: 0.2
+version: 0.3
 exec_type: python
 author: JumpServer Team
 type: general
