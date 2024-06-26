@@ -890,7 +890,6 @@
     "OnlyLatestVersion": "僅最新版本",
     "OnlyMailSend": "當前只支持郵件發送",
     "OnlySearchCurrentNodePerm": "僅搜索當前節點的授權",
-    "Open": "待處理",
     "OpenCommand": "打開命令",
     "OpenId": "OpenID設置",
     "OpenStack": "OpenStack",
@@ -1964,5 +1963,6 @@
     "week": "周",
     "weekOf": "周的星期",
     "wildcardsAllowed": "允許的通配符",
-    "UnFavoriteSucceed": "取消收藏成功"
+    "UnFavoriteSucceed": "取消收藏成功",
+    "Open": "打開"
 }

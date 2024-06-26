@@ -1349,5 +1349,6 @@
     "removeWarningMsg": "你确定要移除",
     "UnFavoriteSucceed": "取消收藏成功",
     "TriggerMode": "触发方式",
-    "CreateUserContent": "创建用户内容"
+    "CreateUserContent": "创建用户内容",
+    "Open": "打开"
 }
