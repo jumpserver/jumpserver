@@ -20,6 +20,7 @@ class AppProvider(JMSBaseModel):
 
     class Meta:
         ordering = ('-date_created',)
+        verbose_name = _('App Provider')
 
     @property
     def load(self):
