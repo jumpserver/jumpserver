@@ -356,7 +356,7 @@ class NodeAllAssetsMappingMixin:
             node_ids_key = Node.objects.annotate(
                 char_id=output_as_string('id')
             ).values_list('char_id', 'key')
-
+            node_ids_key = [(str(uuid.UUID(node_id)), node_key) for node_id, node_key in node_ids_key]
             node_id_ancestor_keys_mapping = {
                 node_id: cls.get_node_ancestor_keys(node_key, with_self=True)
                 for node_id, node_key in node_ids_key
@@ -370,6 +370,7 @@ class NodeAllAssetsMappingMixin:
 
             nodeid_assetsid_mapping = defaultdict(set)
             for node_id, asset_id in nodes_asset_ids:
+                node_id, asset_id = str(uuid.UUID(node_id)), str(uuid.UUID(asset_id))
                 nodeid_assetsid_mapping[node_id].add(asset_id)
 
         t2 = time.time()
