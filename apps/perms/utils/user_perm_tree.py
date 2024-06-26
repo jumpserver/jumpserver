@@ -1,5 +1,6 @@
 import time
 from collections import defaultdict
+from uuid import UUID
 
 from django.conf import settings
 from django.core.cache import cache
@@ -8,7 +9,8 @@ from django.db import transaction
 from assets.models import Asset
 from assets.utils import NodeAssetsUtil
 from common.db.models import output_as_string
-from common.decorators import on_transaction_commit, merge_delay_run
+from common.decorators import merge_delay_run
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from common.utils.common import lazyproperty, timeit
 from orgs.models import Organization
@@ -272,13 +274,11 @@ class UserPermTreeBuildUtil(object):
         for key in self.perm_node_keys_for_granted:
             asset_ids = PermNode.get_all_asset_ids_by_node_key(org_id, key)
             nodekey_assetid_mapper[key].update(asset_ids)
-
         for asset_id, node_id in self.direct_asset_id_node_id_pairs:
             node_key = self.perm_nodes_id_key_mapper.get(str(node_id))
             if not node_key:
                 continue
             nodekey_assetid_mapper[node_key].add(asset_id)
-
         util = NodeAssetsUtil(self.perm_nodes, nodekey_assetid_mapper)
         util.generate()
 
@@ -400,7 +400,10 @@ class UserPermTreeBuildUtil(object):
             str_asset_id=output_as_string('asset_id'),
             str_node_id=output_as_string('node_id')
         ).values_list('str_asset_id', 'str_node_id')
-        asset_node_pairs = list(asset_node_pairs)
+        asset_node_pairs = [
+            (str(UUID(asset_id)), str(UUID(node_id)))
+            for asset_id, node_id in asset_node_pairs
+        ]
         return asset_node_pairs
 
     @lazyproperty

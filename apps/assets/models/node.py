@@ -370,6 +370,7 @@ class NodeAllAssetsMappingMixin:
 
             nodeid_assetsid_mapping = defaultdict(set)
             for node_id, asset_id in nodes_asset_ids:
+                node_id, asset_id = str(uuid.UUID(node_id)), str(uuid.UUID(asset_id))
                 nodeid_assetsid_mapping[node_id].add(asset_id)
 
         t2 = time.time()
