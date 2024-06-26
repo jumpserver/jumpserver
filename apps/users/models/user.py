@@ -37,6 +37,7 @@ from ..signals import post_user_change_password, post_user_leave_org, pre_user_l
 __all__ = [
     "User",
     "UserPasswordHistory",
+    "MFAMixin"
 ]
 
 logger = get_logger(__file__)
