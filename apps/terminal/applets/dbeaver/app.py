@@ -26,7 +26,7 @@ class AppletApplication(BaseApplication):
             self.port = self.tinker_forward.port
 
         self.db = self.asset.spec_info.db_name
-        self.name = '%s-%s-%s' % (self.host, self.db, int(time.time()))
+        self.name = '%s-%s-%s' % (self.asset.address, self.db, int(time.time()))
         self.app_work_path = self.get_app_work_path()
         self.pid = None
         self.app = None
