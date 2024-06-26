@@ -1376,5 +1376,6 @@
     "BaseStorage": "存储",
     "BaseTerminal": "终端",
     "BaseApplets": "应用",
-    "BaseSystemTasks": "任务"
+    "BaseSystemTasks": "任务",
+    "Open": "打开"
 }

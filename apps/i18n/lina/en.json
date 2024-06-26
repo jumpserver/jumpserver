@@ -1376,5 +1376,6 @@
     "BaseStorage": "Storage",
     "BaseTerminal": "Terminal",
     "BaseApplets": "Applets",
-    "BaseSystemTasks": "System Tasks"
+    "BaseSystemTasks": "System Tasks",
+    "Open": "Open"
 }
