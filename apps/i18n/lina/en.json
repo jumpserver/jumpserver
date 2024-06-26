@@ -1349,5 +1349,6 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "UnFavoriteSucceed": "Unfavorite Successful",
     "TriggerMode": "Trigger mode",
-    "CreateUserContent": "Creating User Content"
+    "CreateUserContent": "Creating User Content",
+    "Open": "Open"
 }
