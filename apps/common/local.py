@@ -4,7 +4,7 @@ from django.utils import translation
 
 
 thread_local = Local()
-encrypted_field_set = {'password', 'secret'}
+encrypted_field_set = {'password', 'secret', 'AccessKeySecret'}
 
 
 def _find(attr):
