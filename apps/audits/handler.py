@@ -111,17 +111,20 @@ class OperatorLogHandler(metaclass=Singleton):
 
     def __data_processing(self, dict_item, loop=True):
         encrypt_value = '******'
-        for key, value in dict_item.items():
+        new_data = {}
+        for key, item in dict_item.items():
+            value = item.get('value', '')
+            field_name = item.get('name', '')
             if isinstance(value, bool):
                 value = _('Yes') if value else _('No')
             elif isinstance(value, (list, tuple)):
                 value = self.serialized_value(value)
             elif isinstance(value, dict) and loop:
                 self.__data_processing(value, loop=False)
-            if key in encrypted_field_set:
+            if key in encrypted_field_set or field_name in encrypted_field_set:
                 value = encrypt_value
-            dict_item[key] = value
-        return dict_item
+            new_data[key] = value
+        return new_data
 
     def data_processing(self, before, after):
         if before:
