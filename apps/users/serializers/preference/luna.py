@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from users.const import (
     RDPResolution, RDPSmartSize, KeyboardLayout, ConnectDefaultOpenMethod,
-    RDPClientOption, AppletConnectionMethod, RDPColorQuality,
+    RDPClientOption, AppletConnectionMethod, RDPColorQuality, FileNameConflictResolution
 )
 
 
@@ -56,20 +56,28 @@ class GraphicsSerializer(serializers.Serializer):
     )
     applet_connection_method = serializers.ChoiceField(
         AppletConnectionMethod.choices, default=AppletConnectionMethod.WEB,
-        required=False, label=_('Remote application connection method')
+        required=False, label=_('Remote app connect method')
+    )
+    file_name_conflict_resolution = serializers.ChoiceField(
+        FileNameConflictResolution.choices, default=FileNameConflictResolution.REPLACE,
+        required=False, label=_('File name conflict resolution')
     )
 
 
 class CommandLineSerializer(serializers.Serializer):
     character_terminal_font_size = serializers.IntegerField(
         default=14, min_value=1, max_value=9999, required=False,
-        label=_('Character terminal font size'),
+        label=_('Terminal font size'),
     )
     is_backspace_as_ctrl_h = serializers.BooleanField(
         required=False, default=False, label=_('Backspace as Ctrl+H')
     )
     is_right_click_quickly_paste = serializers.BooleanField(
         required=False, default=False, label=_('Right click quickly paste')
+    )
+    terminal_theme_name = serializers.CharField(
+        max_length=128, required=False, default='Default',
+        label=_('Terminal theme name'),
     )
 
 

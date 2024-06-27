@@ -21,6 +21,14 @@ class Status(models.TextChoices):
     canceled = 'canceled', _("Canceled")
 
 
+class Language(models.TextChoices):
+    auto = 'auto', _('Auto')
+    en = 'en', 'English'
+    zh_hans = 'zh-hans', '中文(简体)'
+    zh_hant = 'zh-hant', '中文(繁體)'
+    jp = 'ja', '日本語',
+
+
 COUNTRY_CALLING_CODES = [
     {'name': 'China(中国)', 'value': '+86'},
     {'name': 'HongKong(中国香港)', 'value': '+852'},

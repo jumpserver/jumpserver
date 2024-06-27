@@ -17,6 +17,7 @@ __all__ = ['AppProviderViewSet', ]
 class AppProviderViewSet(JMSBulkModelViewSet):
     serializer_class = AppProviderSerializer
     queryset = AppProvider.objects.all()
+    filterset_fields = ['name', 'hostname']
     search_fields = ['name', 'hostname', ]
     rbac_perms = {
         'containers': 'terminal.view_appprovider',

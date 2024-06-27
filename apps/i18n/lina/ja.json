@@ -1372,5 +1372,6 @@
     "ZoneList": "地域リスト",
     "ZoneUpdate": "更新エリア",
     "StopLogOutput": "ask Canceled：現在のタスク（currentTaskId）は手動で停止されました。各タスクの進行状況が異なるため、以下はタスクの最終実行結果です。実行が失敗した場合は、タスクが正常に停止されました。",
-    "UnFavoriteSucceed": "取消收藏成功"
+    "UnFavoriteSucceed": "取消收藏成功",
+    "Open": "開く"
 }

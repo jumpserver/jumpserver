@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /opt/py3/bin/python
+    check_ssl: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
 
   tasks:
     - name: "Remove account"

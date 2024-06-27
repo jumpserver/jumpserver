@@ -1167,7 +1167,7 @@ platforms_data_json = '''[
                 "port": 5236,
                 "required": false,
                 "setting": {},
-                "primary": True,
+                "primary": true,
                 "default": false
             }
         ]
