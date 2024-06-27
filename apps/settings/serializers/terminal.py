@@ -63,7 +63,7 @@ class TerminalSettingSerializer(serializers.Serializer):
         )
     )
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(
-        label="Client connection",
+        label=_("Client connection"),
         help_text=_(
             '* Allow connecting to the KoKo component via SSH client'
             '<br/>'
