@@ -4099,7 +4099,7 @@ msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
 #: jumpserver/context_processor.py:14
-msgid "JumpServer Open Source Bastion Host"
+msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer オープンソースの要塞ホスト"
 
 #: jumpserver/views/celery_flower.py:22

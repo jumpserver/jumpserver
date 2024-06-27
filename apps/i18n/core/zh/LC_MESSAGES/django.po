@@ -4050,7 +4050,7 @@ msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
 #: jumpserver/context_processor.py:14
-msgid "JumpServer Open Source Bastion Host"
+msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 开源堡垒机"
 
 #: jumpserver/views/celery_flower.py:22
