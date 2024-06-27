@@ -274,11 +274,13 @@ class UserPermTreeBuildUtil(object):
         for key in self.perm_node_keys_for_granted:
             asset_ids = PermNode.get_all_asset_ids_by_node_key(org_id, key)
             nodekey_assetid_mapper[key].update(asset_ids)
+
         for asset_id, node_id in self.direct_asset_id_node_id_pairs:
             node_key = self.perm_nodes_id_key_mapper.get(str(node_id))
             if not node_key:
                 continue
             nodekey_assetid_mapper[node_key].add(asset_id)
+
         util = NodeAssetsUtil(self.perm_nodes, nodekey_assetid_mapper)
         util.generate()
 

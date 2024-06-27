@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 from collections import defaultdict
+from uuid import UUID
 
 from common.db.models import output_as_string
 from common.struct import Stack
@@ -133,6 +134,7 @@ class NodeAssetsUtil:
 
         mapping = defaultdict(set)
         for key, asset_id in nodes_assets:
+            asset_id = str(UUID(asset_id))
             mapping[key].add(asset_id)
 
         util = cls(nodes, mapping)
