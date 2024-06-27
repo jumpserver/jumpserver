@@ -128,7 +128,6 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     request.session['login_time'] = data['datetime'].strftime('%Y-%m-%d %H:%M:%S')
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     instance = write_login_log(**data)
-
     create_user_session(request, user.id, instance)
     request.session['user_log_id'] = str(instance.id)
     request.session['can_send_notifications'] = True

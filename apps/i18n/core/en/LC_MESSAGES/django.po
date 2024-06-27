@@ -2998,8 +2998,8 @@ msgid "Your password has expired, please reset before logging in"
 msgstr ""
 
 #: authentication/forms.py:34
-msgid "Auto login next"
-msgstr ""
+msgid "Auto-login"
+msgstr "Remember me"
 
 #: authentication/forms.py:52
 msgid "MFA Code"
@@ -4014,7 +4014,7 @@ msgid "Your account has been created successfully"
 msgstr ""
 
 #: jumpserver/context_processor.py:14
-msgid "JumpServer Open Source Bastion Host"
+msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer"
 
 #: jumpserver/views/celery_flower.py:22
@@ -8246,11 +8246,11 @@ msgid ""
 msgstr ""
 
 #: users/serializers/preference/luna.py:59
-msgid "Remote application connection method"
+msgid "Remote app connect method"
 msgstr ""
 
 #: users/serializers/preference/luna.py:66
-msgid "Character terminal font size"
+msgid "Terminal font size"
 msgstr ""
 
 #: users/serializers/preference/luna.py:69

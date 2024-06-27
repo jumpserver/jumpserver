@@ -653,7 +653,7 @@
     "LoginRequiredMsg": "The account has logged out, please login again.",
     "LoginSSHKeySetting": "Login SSH key",
     "LoginSucceeded": "Login successful",
-    "LoginTitleTip": "Note: it will be displayed on the enterprise edition user ssh login koko login page (e.g.: welcome to use jumpserver open source bastion)",
+    "LoginTitleTip": "Note: it will be displayed on the enterprise edition user ssh login koko login page (e.g.: welcome to use jumpserver open source PAM)",
     "LoginUserRanking": "Login user ranking",
     "LoginUserToday": "Users logged today",
     "LoginUsers": "Active account",
