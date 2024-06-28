@@ -69,16 +69,21 @@
         }
 
         .login-content {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
             height: 500px;
             width: 1000px;
-            margin-right: auto;
-            margin-left: auto;
-            margin-top: calc((100vh - 470px) / 3);
         }
 
+
         body {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
             background-color: #f3f3f3;
-            height: calc(100vh - (100vh - 470px) / 3);
+            {#height: calc(100vh - (100vh - 470px) / 3);#}
         }
 
         .captcha {
@@ -99,6 +104,27 @@
             border-right: 1px solid #EFF0F1;
         }
 
+        .left-form-box .form-panel {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .left-form-box .form-panel {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .left-form-box .form-panel .form-mobile {
+            padding: 15px 60px;
+            text-align: left
+        }
+
+        .left-form-box .form-panel .form-mobile h2 {
+            display: inline
+        }
+
         .red-fonts {
             color: red;
         }
@@ -112,11 +138,11 @@
         }
 
         .jms-title {
-            padding: 22px 10px 10px;
+            {#padding: 22px 10px 10px;#}
         }
 
         .more-login-items {
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .more-login-item {
@@ -153,6 +179,9 @@
         }
 
         .jms-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 21px;
             font-weight: 400;
             color: #151515;
@@ -252,13 +281,22 @@
 
             .mobile-logo {
                 display: block;
-                padding: 0 30px;
+                padding: 0 45px;
                 text-align: left;
             }
 
             .right-image {
                 height: revert;
                 width: revert;
+            }
+
+            .left-form-box .form-panel {
+                transform: translateY(-65%);
+            }
+
+            .left-form-box .form-panel .form-mobile h2 {
+                padding: 0;
+                margin: 0;
             }
         }
     </style>
@@ -279,14 +317,14 @@
         </a>
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
-        <div class="mobile-logo">
+        <div class="mobile-logo" style="padding-bottom: 45px; box-sizing: border-box">
 	        <div class="jms-title">
-		        <span style="">{{ INTERFACE.login_title }}</span>
+                 <img src="{{ INTERFACE.logo }}" alt="Logo"/>
             </div>
         </div>
-        <div style="position: relative;top: 50%;transform: translateY(-50%);">
-            <div style='padding: 15px 60px; text-align: left'>
-                <h2 style='font-weight: 400;display: inline'>
+        <div class="form-panel">
+            <div class="form-mobile">
+                <h2 style='font-weight: 400;'>
                     {% trans 'Login' %}
                 </h2>
                 <ul class=" nav navbar-top-links navbar-right">

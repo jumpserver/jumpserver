@@ -11,6 +11,7 @@ default_interface = dict((
     ('logo_index', static('img/logo_text_white.png')),
     ('login_image', static('img/login_image.png')),
     ('favicon', static('img/facio.ico')),
+    ('logo', static('img/jump_server.svg')),
     ('login_title', _('JumpServer - An open-source PAM')),
     ('theme', 'classic_green'),
     ('theme_info', {}),
