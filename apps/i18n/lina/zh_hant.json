@@ -328,7 +328,7 @@
     "CommandFilterACLHelpMsg": "通過命令過濾，您可以控制命令是否可以發送到資產上。根據您設定的規則，某些命令可以被放行，而另一些命令則被禁止。",
     "CommandFilterAclCreate": "創建命令過濾規則",
     "CommandFilterAclDetail": "命令過濾規則詳情",
-    "CommandFilterAclList": "命令過濾",
+    "BaseCommandFilterAclList": "命令過濾",
     "CommandFilterAclUpdate": "更新命令過濾規則",
     "CommandFilterCreate": "創建命令過濾器",
     "CommandFilterDetail": "命令過濾器詳情",
