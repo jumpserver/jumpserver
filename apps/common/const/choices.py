@@ -22,7 +22,6 @@ class Status(models.TextChoices):
 
 
 class Language(models.TextChoices):
-    auto = 'auto', _('Auto')
     en = 'en', 'English'
     zh_hans = 'zh-hans', '中文(简体)'
     zh_hant = 'zh-hant', '中文(繁體)'

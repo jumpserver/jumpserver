@@ -44,7 +44,7 @@ class FileEncryptSerializer(serializers.Serializer):
 
 
 class BasicSerializer(serializers.Serializer):
-    lang = serializers.ChoiceField(required=False, choices=Language.choices, label=_('Language'), default=Language.auto)
+    lang = serializers.ChoiceField(required=False, choices=Language.choices, label=_('Language'), default=Language.en)
 
 
 class LinaSerializer(serializers.Serializer):

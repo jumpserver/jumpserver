@@ -126,7 +126,8 @@ class UserLoginContextMixin:
 
     def get_current_lang(self):
         langs = self.get_support_langs()
-        matched_lang = filter(lambda x: x['code'] == get_language(), langs)
+        lang = get_language()
+        matched_lang = filter(lambda x: x['code'] == lang, langs)
         return next(matched_lang, langs[0])
 
     @staticmethod

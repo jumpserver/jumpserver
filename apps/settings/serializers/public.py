@@ -12,6 +12,7 @@ class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
     INTERFACE = serializers.DictField()
     COUNTRY_CALLING_CODES = serializers.ListField()
+    LANGUAGES = serializers.ListField()
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):
