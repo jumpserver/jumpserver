@@ -182,7 +182,6 @@ def user_logged_out_callback(sender, request, user, **kwargs):
 @receiver(setting_changed)
 @on_transaction_commit
 def on_auth_setting_changed_clear_source_choice(sender, name='', **kwargs):
-    print("Receive setting changed signal: {}".format(name))
     if name.startswith('AUTH_'):
         User._source_choices = []
 

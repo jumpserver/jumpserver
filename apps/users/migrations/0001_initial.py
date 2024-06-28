@@ -138,7 +138,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('category', models.CharField(max_length=128, verbose_name='Category')),
-                ('value', models.TextField(blank=True, null=True, verbose_name='Value')),
+                ('value', models.TextField(blank=True, default='', verbose_name='Value')),
                 ('encrypted', models.BooleanField(default=False, verbose_name='Encrypted')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='preferences', to=settings.AUTH_USER_MODEL, verbose_name='Users')),
             ],

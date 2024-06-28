@@ -1041,6 +1041,19 @@ class User(
             return False
 
     @property
+    def lang(self):
+        return self.preference.get_value("lang")
+
+    @lang.setter
+    def lang(self, value):
+        return self.preference.set_value('lang', value)
+
+    @property
+    def preference(self):
+        from .preference import PreferenceManager
+        return PreferenceManager(self)
+
+    @property
     def is_valid(self):
         if self.is_active and not self.is_expired:
             return True
