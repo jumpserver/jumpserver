@@ -49,6 +49,7 @@ class JMSBaseModel(BaseCreateUpdateModel):
         return str(self.id)
 
 
+# Mysql PostgreSQL incompatible (ce6e5038a6134fad83aba220e6204cf9 ce6e5038-a613-4fad-83ab-a220e6204cf9)
 def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=models.CharField())
 
