@@ -78,6 +78,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ('-date_start',),
+                'verbose_name': 'Applet host deployment'
             },
         ),
         migrations.CreateModel(
@@ -91,6 +92,9 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(default='pending', max_length=16, verbose_name='Status')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
             ],
+            options={
+                'verbose_name': 'Applet Publication'
+            },
         ),
         migrations.CreateModel(
             name='AppProvider',
@@ -106,6 +110,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ('-date_created',),
+                'verbose_name': 'App Provider'
             },
         ),
         migrations.CreateModel(

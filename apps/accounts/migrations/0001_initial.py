@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
-                ('connectivity', models.CharField(choices=[('-', 'Unknown'), ('ok', 'Ok'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity')),
+                ('connectivity', models.CharField(choices=[('-', 'Unknown'), ('ok', 'OK'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity')),
                 ('date_verified', models.DateTimeField(null=True, verbose_name='Date verified')),
                 ('_secret', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Secret')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
@@ -109,7 +109,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Account template',
-                'permissions': [('view_accounttemplatesecret', 'Can view asset account template secret'), ('change_accounttemplatesecret', 'Can change asset account template secret')],
+                'permissions': [('view_accounttemplatesecret', 'Can view asset account template secret')],
             },
         ),
         migrations.CreateModel(
