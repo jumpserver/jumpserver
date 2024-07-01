@@ -142,11 +142,11 @@ class ACLError(AuthFailedNeedLogMixin, AuthFailedError):
         }
 
 
-class LoginACLIPAndTimePeriodNotAllowed(ACLError):
+class LoginACLNotAllowed(ACLError):
     def __init__(self, username, request, **kwargs):
         self.username = username
         self.request = request
-        super().__init__(_("Current IP and Time period is not allowed"), **kwargs)
+        super().__init__(_("Current login is prohibited by ACL rules"), **kwargs)
 
 
 class MFACodeRequiredError(AuthFailedError):
