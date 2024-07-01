@@ -8,7 +8,6 @@ from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
 
 from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
-from common.local import add_encrypted_field_set
 from common.utils import decrypt_password
 
 __all__ = [
@@ -47,9 +46,7 @@ class EncryptedField(serializers.CharField):
         if write_only is None:
             write_only = True
         kwargs["write_only"] = write_only
-        encrypted_key = kwargs.pop('encrypted_key', None)
         super().__init__(**kwargs)
-        add_encrypted_field_set(encrypted_key or self.label)
 
     def to_internal_value(self, value):
         value = super().to_internal_value(value)

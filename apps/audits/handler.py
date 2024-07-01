@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from common.local import encrypted_field_set
+from common.local import similar_encrypted_pattern, exclude_encrypted_fields
 from common.utils import get_request_ip, get_logger
 from common.utils.encode import Singleton
 from common.utils.timezone import as_current_tz
@@ -109,10 +109,17 @@ class OperatorLogHandler(metaclass=Singleton):
             return ','.join(value)
         return json.dumps(value)
 
+    @staticmethod
+    def __similar_check(key):
+        if not key or key in exclude_encrypted_fields:
+            return False
+
+        return bool(similar_encrypted_pattern.search(key))
+
     def __data_processing(self, dict_item, loop=True):
         encrypt_value = '******'
         new_data = {}
-        for key, item in dict_item.items():
+        for label, item in dict_item.items():
             value = item.get('value', '')
             field_name = item.get('name', '')
             if isinstance(value, bool):
@@ -121,9 +128,9 @@ class OperatorLogHandler(metaclass=Singleton):
                 value = self.serialized_value(value)
             elif isinstance(value, dict) and loop:
                 self.__data_processing(value, loop=False)
-            if key in encrypted_field_set or field_name in encrypted_field_set:
+            if self.__similar_check(field_name):
                 value = encrypt_value
-            new_data[key] = value
+            new_data[label] = value
         return new_data
 
     def data_processing(self, before, after):
