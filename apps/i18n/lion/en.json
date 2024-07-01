@@ -74,5 +74,10 @@
     "Username": "Username",
     "VerifyCode": "Verify Code",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "JMSErrRemoveShareUser": "You have been removed from the shared session.",
+    "RemoveShareUserConfirm": "Are you sure to remove the user from the shared session?",
+    "CopyShareURLSuccess": "Copy Share URL Success",
+    "JoinShare": "Join Session",
+    "LeaveShare": "Leave Session"
 }
