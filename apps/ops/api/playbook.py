@@ -94,7 +94,7 @@ class PlaybookFileBrowserAPIView(APIView):
                     content = f.read()
             except UnicodeDecodeError:
                 content = _('Unsupported file content')
-            except SuspiciousFileOperation:
+            except (SuspiciousFileOperation, FileNotFoundError):
                 raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
             return Response({'content': content})
         else:
