@@ -353,7 +353,7 @@ class AuthACLMixin:
             return
 
         if acl.is_action(LoginACL.ActionChoices.reject):
-            raise errors.LoginACLIPAndTimePeriodNotAllowed(user.username, request=self.request)
+            raise errors.LoginACLNotAllowed(user.username, request=self.request)
 
         if acl.is_action(acl.ActionChoices.review):
             self.request.session['auth_confirm_required'] = '1'

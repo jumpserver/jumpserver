@@ -3073,8 +3073,8 @@ msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
 
 #: authentication/errors/failed.py:149
-msgid "Current IP and Time period is not allowed"
-msgstr "現在の IP と期間はログインを許可されていません"
+msgid "Current login is prohibited by ACL rules"
+msgstr "現在のログインはACLルールによって禁止されています"
 
 #: authentication/errors/failed.py:154
 msgid "Please enter MFA code"

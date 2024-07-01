@@ -2997,7 +2997,7 @@ msgid "Login confirm ticket was {}"
 msgstr ""
 
 #: authentication/errors/failed.py:149
-msgid "Current IP and Time period is not allowed"
+msgid "Current login is prohibited by ACL rules"
 msgstr ""
 
 #: authentication/errors/failed.py:154
