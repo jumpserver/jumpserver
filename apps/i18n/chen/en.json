@@ -47,6 +47,7 @@
     "RunHotKey": "Run (Ctrl + Enter)",
     "RunSelected": "Run selected",
     "SaveSQL": "Save SQL",
+    "SaveSucceed": "Save succeed",
     "SelectSQL": "Select SQL",
     "SessionClosedBy": "This session has been closed by %s.",
     "SessionFinished": "Session finished",
