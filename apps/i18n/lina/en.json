@@ -391,6 +391,7 @@
     "DeleteSuccess": "Successfully deleted",
     "DeleteSuccessMsg": "Successfully deleted",
     "DeleteWarningMsg": "Are you sure you want to delete",
+    "RemoveWarningMsg": "Are you sure you want to remove",
     "Deploy": "Deployment",
     "Description": "Description",
     "DestinationIP": "Destination address",

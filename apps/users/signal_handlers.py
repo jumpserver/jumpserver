@@ -110,7 +110,9 @@ def on_user_create(sender, user=None, **kwargs):
     logger.debug("Receive user `{}` create signal".format(user.name))
     from .utils import send_user_created_mail
     logger.info("   - Sending welcome mail ...".format(user.name))
-    if user.can_send_created_mail():
+    request = get_current_request()
+    password_strategy = getattr(request, 'password_strategy', '')
+    if user.can_send_created_mail() and password_strategy == 'email':
         send_user_created_mail(user)
 
 
