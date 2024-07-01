@@ -2,7 +2,8 @@
 #
 from collections import defaultdict
 
-from common.db.models import output_as_string
+from django.db.models import F
+
 from common.struct import Stack
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none, timeit
 from common.utils.http import is_true
@@ -128,11 +129,12 @@ class NodeAssetsUtil:
 
         nodes = list(Node.objects.all())
         nodes_assets = Asset.nodes.through.objects.all() \
-            .annotate(aid=output_as_string('asset_id')) \
+            .annotate(aid=F('asset_id')) \
             .values_list('node__key', 'aid')
 
         mapping = defaultdict(set)
         for key, asset_id in nodes_assets:
+            asset_id = str(asset_id)
             mapping[key].add(asset_id)
 
         util = cls(nodes, mapping)

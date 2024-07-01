@@ -16,6 +16,7 @@ from common.serializers.fields import (
 )
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
+from jumpserver.utils import get_current_request
 from orgs.utils import current_org
 from rbac.builtin import BuiltinRole
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
@@ -168,7 +169,8 @@ class UserSerializer(
             "public_key",
         ]
         # xpack 包含的字段
-        fields_xpack = ["wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id"]
+        fields_xpack = ["wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id", "is_org_admin", "orgs_roles",
+                        "org_roles"]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = (
             fields_mini
@@ -352,7 +354,10 @@ class UserSerializer(
         attrs = self.check_disallow_self_update_fields(attrs)
         attrs = self.change_password_to_raw(attrs)
         attrs = self.clean_auth_fields(attrs)
-        attrs.pop("password_strategy", None)
+        password_strategy = attrs.pop("password_strategy", None)
+        request = get_current_request()
+        if request:
+            request.password_strategy = password_strategy
         return attrs
 
     def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):

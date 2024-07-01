@@ -36,6 +36,10 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             UserSession.objects.filter(key=session_key).delete()
         cache.set(lock_key, request.session.session_key, None)
 
+    lang = request.COOKIES.get('django_language')
+    if lang:
+        user.lang = lang
+
 
 @receiver(cas_user_authenticated)
 def on_cas_user_login_success(sender, request, user, **kwargs):

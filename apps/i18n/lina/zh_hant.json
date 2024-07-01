@@ -215,6 +215,7 @@
     "BadRequestErrorMsg": "請求錯誤，請檢查填寫內容",
     "BadRoleErrorMsg": "請求錯誤，無該操作權限",
     "BaiduCloud": "百度雲",
+    "BaseCommandFilterAclList": "命令過濾",
     "BasePlatform": "基礎平台",
     "BasePort": "監聽埠",
     "Basic": "基本設置",
@@ -328,7 +329,6 @@
     "CommandFilterACLHelpMsg": "通過命令過濾，您可以控制命令是否可以發送到資產上。根據您設定的規則，某些命令可以被放行，而另一些命令則被禁止。",
     "CommandFilterAclCreate": "創建命令過濾規則",
     "CommandFilterAclDetail": "命令過濾規則詳情",
-    "CommandFilterAclList": "命令過濾",
     "CommandFilterAclUpdate": "更新命令過濾規則",
     "CommandFilterCreate": "創建命令過濾器",
     "CommandFilterDetail": "命令過濾器詳情",
@@ -890,6 +890,7 @@
     "OnlyLatestVersion": "僅最新版本",
     "OnlyMailSend": "當前只支持郵件發送",
     "OnlySearchCurrentNodePerm": "僅搜索當前節點的授權",
+    "Open": "打開",
     "OpenCommand": "打開命令",
     "OpenId": "OpenID設置",
     "OpenStack": "OpenStack",
@@ -1401,6 +1402,7 @@
     "Types": "類型",
     "UCloud": "UCloud優刻得",
     "UPPER_CASE_REQUIRED": "須包含大寫字母",
+    "UnFavoriteSucceed": "取消收藏成功",
     "UnSyncCount": "未同步",
     "UnbindHelpText": "本地用戶為此認證來源用戶，無法解綁",
     "Unblock": "解鎖",
@@ -1963,6 +1965,5 @@
     "week": "周",
     "weekOf": "周的星期",
     "wildcardsAllowed": "允許的通配符",
-    "UnFavoriteSucceed": "取消收藏成功",
-    "Open": "打開"
+    "Periodic": "定期執行"
 }

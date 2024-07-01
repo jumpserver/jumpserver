@@ -92,6 +92,22 @@ def batch_delete(queryset, batch_size=3000):
             model.objects.filter(id__in=list(pks)).delete()
 
 
+def remove_files_by_days(root_path, days, file_types=None):
+    if file_types is None:
+        file_types = ['.json', '.tar', '.gz', '.mp4']
+    need_rm_files = []
+    expire_date = timezone.now() - timezone.timedelta(days=days)
+    timestamp = expire_date.timestamp()
+    for root, dirs, files in os.walk(root_path):
+        for file in files:
+            if any(file.endswith(file_type) for file_type in file_types):
+                file_path = os.path.join(root, file)
+                if os.path.getmtime(file_path) <= timestamp:
+                    need_rm_files.append(file_path)
+    for file in need_rm_files:
+        os.remove(file)
+
+
 def clean_expired_session_period():
     logger.info("Start clean expired session record, commands and replay")
     days = get_log_keep_day('TERMINAL_SESSION_KEEP_DURATION')
@@ -105,10 +121,7 @@ def clean_expired_session_period():
     logger.info("Clean session item done")
     batch_delete(expired_commands)
     logger.info("Clean session command done")
-    command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
-        replay_dir, days
-    )
-    subprocess.call(command, shell=True)
+    remove_files_by_days(replay_dir, days)
     command = "find %s -type d -empty -delete;" % replay_dir
     subprocess.call(command, shell=True)
     logger.info("Clean session replay done")
