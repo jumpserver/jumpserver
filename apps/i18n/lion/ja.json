@@ -74,5 +74,10 @@
     "Username": "ユーザー名",
     "VerifyCode": "検証コード",
     "WebSocketError": "WebSocketの接続に失敗しました、ネットワークを確認してください",
-    "Writable": "読み書き"
+    "Writable": "読み書き",
+    "JMSErrRemoveShareUser": "あなたはすでに共有セッションから削除されました」という意味です",
+    "RemoveShareUserConfirm": "共有セッションから削除してもよろしいですか？",
+    "CopyShareURLSuccess": "レプリケーション共有住所成功",
+    "JoinShare": "共有セッションに参加",
+    "LeaveShare": "共有セッションから退出"
 }

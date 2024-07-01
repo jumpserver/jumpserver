@@ -74,5 +74,10 @@
     "Username": "用户名",
     "VerifyCode": "验证码",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
-    "Writable": "读写"
+    "Writable": "读写",
+    "JMSErrRemoveShareUser": "你已经被移除共享会话",
+    "RemoveShareUserConfirm": "确定要移除该用户吗？",
+    "CopyShareURLSuccess": "复制分享地址成功",
+    "JoinShare": "加入共享",
+    "LeaveShare": "离开共享"
 }
