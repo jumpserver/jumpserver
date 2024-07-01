@@ -47,6 +47,7 @@
     "RunHotKey": "実行 (Ctrl + Enter)",
     "RunSelected": "選択を実行",
     "SaveSQL": "SQLを保存",
+    "SaveSucceed": "保存に成功しました",
     "SelectSQL": "SQLを選択",
     "SessionClosedBy": "セッションが%sによって閉じられました",
     "SessionFinished": "セッションが終了しました",

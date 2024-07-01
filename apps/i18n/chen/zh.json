@@ -47,6 +47,7 @@
     "RunHotKey": "运行 (Ctrl + Enter)",
     "RunSelected": "运行选中",
     "SaveSQL": "保存 SQL",
+    "SaveSucceed": "保存成功",
     "SelectSQL": "选择 SQL",
     "SessionClosedBy": "会话被 %s 关闭",
     "SessionFinished": "会员已结束",

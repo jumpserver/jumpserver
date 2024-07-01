@@ -47,6 +47,7 @@
     "RunHotKey": "執行 (Ctrl + Enter)",
     "RunSelected": "執行選擇",
     "SaveSQL": "儲存 SQL",
+    "SaveSucceed":"儲存成功",
     "SelectSQL": "選擇 SQL",
     "SessionClosedBy": "會話被 %s 關閉",
     "SessionFinished": "會話已結束",
