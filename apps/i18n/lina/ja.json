@@ -1417,5 +1417,7 @@
     "ZoneHelpMessage": "エリアとはアセットの位置で、データセンターやパブリッククラウド、あるいはVPCが該当します。エリアにはゲートウェイを設定でき、ネットワークが直接接続できない場合、ゲートウェイを経由してアセットにログインすることができます",
     "ZoneList": "地域リスト",
     "ZoneUpdate": "更新エリア",
-    "removeWarningMsg": "削除してもよろしいですか"
+    "removeWarningMsg": "削除してもよろしいですか",
+    "PleaseSelect": "選択してくださ",
+    "Periodic": "定期的にAction"
 }
