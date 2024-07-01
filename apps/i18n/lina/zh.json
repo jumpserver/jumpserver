@@ -1380,6 +1380,7 @@
     "ZoneList": "网域列表",
     "ZoneUpdate": "更新网域",
     "removeWarningMsg": "你确定要移除",
+    "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "PleaseSelect": "请选择",
     "Periodic": "定期执行"
 }
