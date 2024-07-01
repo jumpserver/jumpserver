@@ -1379,5 +1379,6 @@
     "ZoneHelpMessage": "网域是资产所在的位置，可以是机房，公有云 或者 VPC。网域中可以设置网关，当网络不能直达的时候，可以使用网关跳转登录到资产",
     "ZoneList": "网域列表",
     "ZoneUpdate": "更新网域",
-    "removeWarningMsg": "你确定要移除"
+    "removeWarningMsg": "你确定要移除",
+    "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用"
 }

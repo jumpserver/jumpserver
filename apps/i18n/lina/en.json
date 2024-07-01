@@ -1379,5 +1379,6 @@
     "ZoneHelpMessage": "The zone is the location where assets are located, which can be a data center, public cloud, or VPC. Gateways can be set up within the region. When the network cannot be directly accessed, users can utilize gateways to login to the assets.",
     "ZoneList": "Zones",
     "ZoneUpdate": "Update the zone",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "forceEnableMFAHelpText": "If force enable, user can not disable by themselves"
 }

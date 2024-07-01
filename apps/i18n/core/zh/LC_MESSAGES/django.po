@@ -8551,7 +8551,7 @@ msgstr "登录用户"
 
 #: users/serializers/user.py:248
 msgid "Email address"
-msgstr "无效地址"
+msgstr "邮件地址"
 
 #: users/serializers/user.py:258
 msgid "User groups to join"
