@@ -151,11 +151,9 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
             user.dingtalk_id = userid
             user.save()
         except IntegrityError as e:
-            if e.args[0] == 1062:
-                msg = _('The DingTalk is already bound to another user')
-                response = self.get_failed_response(redirect_url, msg, msg)
-                return response
-            raise e
+            msg = _('The DingTalk is already bound to another user')
+            response = self.get_failed_response(redirect_url, msg, msg)
+            return response
 
         ip = get_request_ip(request)
         OAuthBindMessage(user, ip, _('DingTalk'), user_id).publish_async()
