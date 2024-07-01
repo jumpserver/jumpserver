@@ -39,8 +39,7 @@ ARG TOOLS="                           \
         nmap                          \
         telnet                        \
         vim                           \
-        wget                          \
-        bubblewrap"
+        wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
