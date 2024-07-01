@@ -391,6 +391,7 @@
     "DeleteSuccess": "删除成功",
     "DeleteSuccessMsg": "删除成功",
     "DeleteWarningMsg": "你确定要删除",
+    "RemoveWarningMsg": "你确定要移除",
     "Deploy": "部署",
     "Description": "描述",
     "DestinationIP": "目的地址",
