@@ -107,7 +107,8 @@ ARG TOOLS="                           \
         ca-certificates               \
         default-libmysqlclient-dev    \
         openssh-client                \
-        sshpass"
+        sshpass                       \
+        bubblewrap"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
