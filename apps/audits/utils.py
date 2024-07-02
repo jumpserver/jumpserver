@@ -82,7 +82,9 @@ def _get_instance_field_value(
             elif isinstance(f, GenericForeignKey):
                 continue
             try:
-                data.setdefault(str(f.verbose_name), value)
+                data.setdefault(
+                    str(f.verbose_name), {'name': getattr(f, 'column', ''), 'value': value}
+                )
             except Exception as e:
                 print(f.__dict__)
                 raise e
@@ -106,7 +108,9 @@ def model_to_dict_for_operate_log(
             return
         try:
             field_key = getattr(f, 'verbose_name', None) or f.related_model._meta.verbose_name
-            data.setdefault(str(field_key), value)
+            data.setdefault(
+                str(field_key), {'name': getattr(f, 'column', ''), 'value': value}
+            )
         except:
             pass
 
