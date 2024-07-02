@@ -7,7 +7,10 @@ from django.contrib.sessions.backends.cache import (
 )
 from django.core.cache import cache, caches
 
+from common.utils import get_logger
 from jumpserver.utils import get_current_request
+
+logger = get_logger(__file__)
 
 
 class SessionStore(DjangoSessionStore):
@@ -23,7 +26,10 @@ class SessionStore(DjangoSessionStore):
     def save(self, *args, **kwargs):
         request = get_current_request()
         if request is None or not self.ignore_pattern.match(request.path):
-            super().save(*args, **kwargs)
+            try:
+                super().save(*args, **kwargs)
+            except Exception as e:
+                logger.info(f'SessionStore save error: {e}')
 
 
 class RedisUserSessionManager:
