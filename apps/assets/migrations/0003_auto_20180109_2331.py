@@ -646,7 +646,7 @@ platforms_data_json = '''[
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
                 },
-                "required": true,
+                "required": false,
                 "default": false
             },
             {

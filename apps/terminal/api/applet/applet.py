@@ -87,6 +87,8 @@ class DownloadUploadMixin:
             path = os.path.join(settings.APPS_DIR, 'terminal', 'applets', instance.name)
         else:
             path = default_storage.path('applets/{}'.format(instance.name))
+        if not os.path.exists(path):
+            raise ValidationError({'error': _('Applet not found in path: {}').format(path)})
         zip_path = shutil.make_archive(path, 'zip', path)
         with open(zip_path, 'rb') as f:
             response = HttpResponse(f.read(), status=200, content_type='application/octet-stream')
