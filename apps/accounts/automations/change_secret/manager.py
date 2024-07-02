@@ -97,12 +97,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return host
 
         accounts = self.get_accounts(account)
+        error_msg = _("No pending accounts found")
         if not accounts:
-            print(
-                _("No pending accounts found: {name} User ID: {account_ids} Type: {secret_type}").format(
-                    name=asset.name,
-                    account_ids=self.account_ids,
-                    secret_type=self.secret_type))
+            print(f'{asset}: {error_msg}')
             return []
 
         records = []
