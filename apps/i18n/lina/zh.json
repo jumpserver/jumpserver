@@ -680,7 +680,7 @@
     "LoginFrom": "登录来源",
     "LoginImageTip": "提示：将会显示在企业版用户登录页面（建议图片大小为: 492*472px）",
     "LoginLog": "登录日志",
-    "LoginLogTotal": "登录成功日志数",
+    "LoginLogTotal": "登录日志数",
     "LoginNum": "登录数",
     "LoginPasswordSetting": "登录密码",
     "LoginRequiredMsg": "账号已退出，请重新登录",
