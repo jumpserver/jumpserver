@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 11:30+0800\n"
+"POT-Creation-Date: 2024-07-02 14:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,40 +97,30 @@ msgid "The backup task has no assigned recipient"
 msgstr ""
 
 #: accounts/automations/backup_account/handlers.py:293
-#, fuzzy
-#| msgid "Date start"
 msgid "Plan start"
-msgstr "開始日"
+msgstr "計画開始"
 
 #: accounts/automations/backup_account/handlers.py:294
-#, fuzzy
-#| msgid "Date end"
 msgid "Plan end"
-msgstr "終了日"
+msgstr "計画終了"
 
 #: accounts/automations/backup_account/handlers.py:296
 msgid "An exception occurred during task execution"
-msgstr ""
+msgstr "タスク実行中に例外が発生しました"
 
 #: accounts/automations/backup_account/manager.py:23
-#, fuzzy
-#| msgid "Execute account backup plan"
 msgid "The account backup plan is being executed"
-msgstr "アカウントのバックアップ計画を実施する"
+msgstr "アカウントのバックアップ計画を実行中です"
 
 #: accounts/automations/backup_account/manager.py:37
-#, fuzzy
-#| msgid "Task execution id"
 msgid "Plan execution end"
-msgstr "タスク実行ID"
+msgstr "計画実行終了"
 
-#: accounts/automations/change_secret/manager.py:102
-#, python-brace-format
-msgid ""
-"No pending accounts found: {name} User ID: {account_ids} Type: {secret_type}"
-msgstr ""
+#: accounts/automations/change_secret/manager.py:100
+msgid "No pending accounts found"
+msgstr "保留中のアカウントが見つかりません"
 
-#: accounts/automations/change_secret/manager.py:227
+#: accounts/automations/change_secret/manager.py:224
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s、失敗: %s、合計: %s"
@@ -2808,7 +2798,7 @@ msgstr "本を飛ばす"
 msgid "Slack"
 msgstr ""
 
-#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:161
+#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:159
 #: authentication/views/login.py:84 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:799
 #: users/models/user.py:969
@@ -3101,8 +3091,8 @@ msgstr "企業の微信はすでにバインドされています"
 msgid "WeCom is not bound"
 msgstr "企業の微信をバインドしていません"
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:213
-#: authentication/views/dingtalk.py:255
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:211
+#: authentication/views/dingtalk.py:253
 msgid "DingTalk is not bound"
 msgstr "DingTalkはバインドされていません"
 
@@ -3703,7 +3693,7 @@ msgstr "バインド%s成功"
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "DingTalkエラー、システム管理者に連絡してください"
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:212
+#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:210
 msgid "DingTalk Error"
 msgstr "DingTalkエラー"
 
@@ -3725,19 +3715,19 @@ msgstr "無効なuser_id"
 msgid "DingTalk query user failed"
 msgstr "DingTalkクエリユーザーが失敗しました"
 
-#: authentication/views/dingtalk.py:155
+#: authentication/views/dingtalk.py:154
 msgid "The DingTalk is already bound to another user"
 msgstr "DingTalkはすでに別のユーザーにバインドされています"
 
-#: authentication/views/dingtalk.py:162
+#: authentication/views/dingtalk.py:160
 msgid "Binding DingTalk successfully"
 msgstr "DingTalkのバインドに成功"
 
-#: authentication/views/dingtalk.py:214 authentication/views/dingtalk.py:249
+#: authentication/views/dingtalk.py:212 authentication/views/dingtalk.py:247
 msgid "Failed to get user from DingTalk"
 msgstr "DingTalkからユーザーを取得できませんでした"
 
-#: authentication/views/dingtalk.py:256
+#: authentication/views/dingtalk.py:254
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "パスワードでログインし、DingTalkをバインドしてください"
 
