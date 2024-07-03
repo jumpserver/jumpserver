@@ -39,38 +39,46 @@ class LDAPSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('LDAP')
 
     AUTH_LDAP_SERVER_URI = serializers.CharField(
-        required=True, max_length=1024, label=_('LDAP server'),
-        help_text=_('eg: ldap://localhost:389')
+        required=True, max_length=1024, label=_('Server'),
+        help_text=_('LDAP server URI')
     )
-    AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
+    AUTH_LDAP_BIND_DN = serializers.CharField(
+        required=False, max_length=1024, label=_('Bind DN'),
+        help_text=_('Binding Distinguished Name')
+    )
     AUTH_LDAP_BIND_PASSWORD = EncryptedField(
-        max_length=1024, required=False, label=_('Password')
+        max_length=1024, required=False, label=_('Password'),
+        help_text=_('Binding password')
     )
     AUTH_LDAP_SEARCH_OU = serializers.CharField(
-        max_length=1024, allow_blank=True, required=False, label=_('User OU'),
-        help_text=_('Use | split multi OUs')
+        max_length=1024, allow_blank=True, required=False, label=_('Search OU'),
+        help_text=_(
+            'User Search Base, if there are multiple OUs, you can separate them with the `|` symbol'
+        )
     )
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField(
-        max_length=1024, required=True, label=_('User search filter'),
-        help_text=_('Choice may be (cn|uid|sAMAccountName)=%(user)s)')
+        max_length=1024, required=True, label=_('Search filter'),
+        help_text=_('Selection could include (cn|uid|sAMAccountName=%(user)s)')
     )
     AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField(
-        required=True, label=_('User attr map'),
-        help_text=_('User attr map present how to map LDAP user attr to '
-                    'jumpserver, username,name,email is jumpserver attr')
+        required=True, label=_('User attribute'),
+        help_text=_(
+            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            '`value` is the LDAP service user attribute name'
+        )
     )
     AUTH_LDAP_SYNC_ORG_IDS = serializers.ListField(
         required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
-        required=False, label=_('Periodic perform')
+        required=False, label=_('Periodic run')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
         required=False, max_length=128, allow_null=True, allow_blank=True,
-        label=_('Regularly perform')
+        label=_('Crontab')
     )
     AUTH_LDAP_SYNC_INTERVAL = serializers.IntegerField(
-        required=False, default=24, allow_null=True, label=_('Cycle perform')
+        required=False, default=24, allow_null=True, label=_('Interval')
     )
     AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(
         min_value=1, max_value=300,
@@ -86,12 +94,14 @@ class LDAPSettingSerializer(serializers.Serializer):
             'If the user OU structure has been adjusted, click Submit to clear the user DN cache'
         )
     )
-    AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(required=False, label=_('Search paged size (piece)'))
+    AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(
+        required=False, label=_('Search paged size (piece)')
+    )
     AUTH_LDAP_SYNC_RECEIVERS = serializers.ListField(
         required=False, label=_('Recipient'), max_length=36
     )
 
-    AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
+    AUTH_LDAP = serializers.BooleanField(required=False, label=_('LDAP'))
 
     def post_save(self):
         keys = ['AUTH_LDAP_SYNC_IS_PERIODIC', 'AUTH_LDAP_SYNC_INTERVAL', 'AUTH_LDAP_SYNC_CRONTAB']

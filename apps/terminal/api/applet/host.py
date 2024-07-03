@@ -26,7 +26,8 @@ __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 class AppletHostViewSet(JMSBulkModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
-    search_fields = ['asset_ptr__name', 'asset_ptr__address', ]
+    filterset_fields = ['name', 'address']
+    search_fields = ['name', 'address']
     rbac_perms = {
         'generate_accounts': 'terminal.change_applethost',
     }

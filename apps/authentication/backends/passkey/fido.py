@@ -109,7 +109,10 @@ def register_complete(request):
     data = request.data
     server = get_server(request)
     state = request.session.pop("fido2_state")
-    auth_data = server.register_complete(state, response=data)
+    try:
+        auth_data = server.register_complete(state, response=data)
+    except ValueError as e:
+        raise ValidationError({'error': str(e)})
     encoded = websafe_encode(auth_data.credential_data)
     platform = get_current_platform(request)
     name = data.pop("key_name", '') or platform

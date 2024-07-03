@@ -6,8 +6,9 @@ from perms.const import ActionChoices
 
 
 class OperateLogStore(object):
-    # 用不可见字符分割前后数据，节省存储-> diff: {'key': 'before\0after'}
-    SEP = '\0'
+    # 使用 Unicode 单元分隔符\u001f，替代旧的分隔符\0 PostgreSQL 数据库不支持\0
+    SEP = '\u001f'
+    OLD_SEP = '\0'
 
     def __init__(self, config):
         self.model = OperateLog
@@ -19,6 +20,22 @@ class OperateLogStore(object):
     @staticmethod
     def ping(timeout=None):
         return True
+
+    @classmethod
+    def split_value(cls, value):
+        """
+        Attempt to split the string using the new separator.
+        If it fails, attempt to split using the old separator.
+        If both fail, return the original string and an empty string.
+
+        :param value: The string to split
+        :return: The split parts (before, after)
+        """
+        for sep in (cls.SEP, cls.OLD_SEP):
+            parts = value.split(sep, 1)
+            if len(parts) == 2:
+                return parts[0], parts[1]
+        return value, ''
 
     @classmethod
     def convert_before_after_to_diff(cls, before, after):
@@ -42,7 +59,7 @@ class OperateLogStore(object):
             return before, after
 
         for k, v in diff.items():
-            before_value, after_value = v.split(cls.SEP, 1)
+            before_value, after_value = cls.split_value(v)
             before[k], after[k] = before_value, after_value
         return before, after
 
@@ -59,11 +76,11 @@ class OperateLogStore(object):
         diff_list = list()
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
-            before, after = v.split(cls.SEP, 1)
+            before_value, after_value = cls.split_value(v)
             diff_list.append({
                 'field': _(k),
-                'before': handler(k, before) if before else _('empty'),
-                'after': handler(k, after) if after else _('empty'),
+                'before': handler(k, before_value) if before_value else _('empty'),
+                'after': handler(k, after_value) if after_value else _('empty'),
             })
         return diff_list
 

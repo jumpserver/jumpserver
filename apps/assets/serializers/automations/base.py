@@ -1,4 +1,4 @@
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Asset, Node, BaseAutomation, AutomationExecution
@@ -31,7 +31,6 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
-            'periodic_display': {'label': _('Periodic perform')},
         }
 
 

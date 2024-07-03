@@ -1,11 +1,11 @@
+import logging
 import os.path
 import uuid
-import logging
 
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 from django.conf import settings
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from orgs.mixins.models import JMSOrgBaseModel
 from ..ansible.inventory import JMSInventory

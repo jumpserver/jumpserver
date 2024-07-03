@@ -5,7 +5,7 @@ import random
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from labels.mixins import LabeledMixin
 from orgs.mixins.models import JMSOrgBaseModel
 from .gateway import Gateway
@@ -19,7 +19,7 @@ class Domain(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
 
     class Meta:
-        verbose_name = _("Domain")
+        verbose_name = _("Zone")
         unique_together = [('org_id', 'name')]
         ordering = ('name',)
 
@@ -28,6 +28,10 @@ class Domain(LabeledMixin, JMSOrgBaseModel):
 
     def select_gateway(self):
         return self.random_gateway()
+
+    @lazyproperty
+    def assets_amount(self):
+        return self.assets.count()
 
     def random_gateway(self):
         gateways = [gw for gw in self.active_gateways if gw.is_connective]

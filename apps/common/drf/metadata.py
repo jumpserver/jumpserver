@@ -124,7 +124,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         if field.field_name == 'id':
             field_info['label'] = 'ID'
         if field.field_name == 'org_id':
-            field_info['label'] = _('Organization ID')
+            field_info['label'] = _('Org ID')
 
         return field_info
 

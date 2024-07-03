@@ -1,5 +1,52 @@
 ARG VERSION
-FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} as build-xpack
-FROM registry.fit2cloud.com/jumpserver/core-ce:${VERSION}
 
+FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} as build-xpack
+FROM python:3.11-slim-bullseye as build-core
+ARG BUILD_DEPENDENCIES="              \
+        g++"
+
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
+    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash
+
+WORKDIR /opt/jumpserver
+
+ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
+RUN --mount=type=cache,target=/root/.cache,sharing=locked,id=core \
+    --mount=type=bind,source=poetry.lock,target=/opt/jumpserver/poetry.lock \
+    --mount=type=bind,source=pyproject.toml,target=/opt/jumpserver/pyproject.toml \
+    set -ex \
+    && python3 -m venv /opt/py3 \
+    && pip install poetry -i ${PIP_MIRROR} \
+    && poetry config virtualenvs.create false \
+    && . /opt/py3/bin/activate \
+    && poetry install --only xpack
+
+FROM registry.fit2cloud.com/jumpserver/core:${VERSION}-ce
+ARG TARGETARCH
+
+ARG TOOLS="                           \
+        curl                          \
+        iputils-ping                  \
+        netcat-openbsd                \
+        nmap                          \
+        telnet                        \
+        vim                           \
+        wget"
+
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${TOOLS}
+
+COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack

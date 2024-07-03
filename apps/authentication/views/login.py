@@ -25,6 +25,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
 from common.utils import FlashMessageUtil, static_or_direct, safe_next_url
+from common.const import Language
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -116,27 +117,17 @@ class UserLoginContextMixin:
     def get_support_langs():
         langs = [
             {
-                'title': '中文(简体)',
-                'code': 'zh-hans'
-            },
-            {
-                'title': '中文(繁體)',
-                'code': 'zh-hant'
-            },
-            {
-                'title': 'English',
-                'code': 'en'
-            },
-            {
-                'title': '日本語',
-                'code': 'ja'
+                'title': title,
+                'code': code
             }
+            for code, title in Language.choices
         ]
         return langs
 
     def get_current_lang(self):
         langs = self.get_support_langs()
-        matched_lang = filter(lambda x: x['code'] == get_language(), langs)
+        lang = get_language()
+        matched_lang = filter(lambda x: x['code'] == lang, langs)
         return next(matched_lang, langs[0])
 
     @staticmethod
@@ -201,6 +192,9 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
     def redirect_third_party_auth_if_need(self, request):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
         if self.request.GET.get("admin", 0):
+            return None
+
+        if not settings.XPACK_ENABLED:
             return None
 
         auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]
@@ -335,7 +329,6 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
-            print("Error: ", e)
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
             return self.format_redirect_url(self.login_mfa_url)

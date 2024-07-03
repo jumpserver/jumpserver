@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import redirect
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, TemplateView
@@ -32,7 +33,11 @@ class I18NView(View):
     def get(self, request, lang):
         referer_url = request.META.get('HTTP_REFERER', '/')
         response = HttpResponseRedirect(referer_url)
-        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
+        expires = timezone.now() + timezone.timedelta(days=365)
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)
+
+        if request.user.is_authenticated:
+            request.user.lang = lang
         return response
 
 

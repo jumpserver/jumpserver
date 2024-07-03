@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 class TerminalConfig(AppConfig):
     name = 'terminal'
-    verbose_name = _('Terminals')
+    verbose_name = _('App Terminals')
 
     def ready(self):
         from . import signal_handlers  # noqa

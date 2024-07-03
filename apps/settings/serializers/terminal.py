@@ -6,8 +6,8 @@ class TerminalSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Terminal')
 
     SORT_BY_CHOICES = (
-        ('name', _('Hostname')),
-        ('ip', _('IP'))
+        ('name', _('Name')),
+        ('ip', _('Address'))
     )
 
     PAGE_SIZE_CHOICES = (
@@ -19,23 +19,54 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('50', '50'),
     )
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
-        required=True, label=_('Enable terminal register'),
+        required=True, label=_('Registration'),
         help_text=_(
-            "Allow terminal register, after all terminal setup, you should disable this for security"
+            "Allow component register, after all component setup, you should disable this for security"
         )
     )
-    TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False, label=_('Password auth'))
+    TERMINAL_PASSWORD_AUTH = serializers.BooleanField(
+        required=False, label=_("Password"), 
+        help_text=_(
+            '* Allow users to log in to the KoKo component via password authentication'
+        )
+    )
     TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(
-        required=False, label=_('Public key auth'),
-        help_text=_('Tips: If use other auth method, like AD/LDAP, you should disable this to '
-                    'avoid being able to log in after deleting')
+        required=False, label=_("Public key"),
+        help_text=_(
+            '* Allow users to log in to the KoKo component via Public key authentication'
+            '<br/>'
+            'If third-party authentication services, such as AD/LDAP, are enabled, you should '
+            'disable this option to prevent users from logging in after being deleted from the AD/LDAP server'
+        )
     )
     TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(
-        SORT_BY_CHOICES, required=False, label=_('List sort by')
+        SORT_BY_CHOICES, required=False, label=_('Asset sorting')
     )
     TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(
-        PAGE_SIZE_CHOICES, required=False, label=_('List page size')
+        PAGE_SIZE_CHOICES, required=False, label=_('Asset page size')
     )
-    TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
-    TERMINAL_RAZOR_ENABLED = serializers.BooleanField(label=_("Enable Razor"))
-    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable SSH Client"))
+    TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(
+        label="Magnus", 
+        help_text=_(
+            '* You can individually configure the service address and port in the service endpoint'
+            '<br/>'
+            'If enabled, the Luna page will display the DB client launch method when connecting to assets'
+        )
+    )
+    TERMINAL_RAZOR_ENABLED = serializers.BooleanField(
+        label="Razor",
+        help_text=_(
+            '* You can individually configure the service address and port in the service endpoint'
+            '<br/>'
+            'If enabled, the Luna page will display the download rdp file button '
+            'and RDP Client launch method when connecting to assets'
+        )
+    )
+    TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(
+        label=_("Client connection"),
+        help_text=_(
+            '* Allow connecting to the KoKo component via SSH client'
+            '<br/>'
+            'If enabled, the Luna page will display the SSH client launch method when connecting to assets'
+        )
+    )

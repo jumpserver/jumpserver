@@ -37,6 +37,7 @@ class DatabaseTypes(BaseType):
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
                 'push_account_enabled': True,
+                'remove_account_enabled': True,
             },
             cls.REDIS: {
                 'ansible_enabled': False,

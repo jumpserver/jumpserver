@@ -29,16 +29,20 @@ class ActionChoicesField(BitChoicesField):
 
 
 class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
-    users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('User'))
+    users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('Users'))
     user_groups = ObjectRelatedField(
-        queryset=UserGroup.objects, many=True, required=False, label=_('User group')
+        queryset=UserGroup.objects, many=True, required=False, label=_('Groups')
     )
-    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Asset'))
-    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Node'))
-    actions = ActionChoicesField(required=False, allow_null=True, label=_("Actions"))
+    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Assets'))
+    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Nodes'))
+    users_amount = serializers.IntegerField(read_only=True, label=_("Users amount"))
+    user_groups_amount = serializers.IntegerField(read_only=True, label=_("Groups amount"))
+    assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
+    nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
+    actions = ActionChoicesField(required=False, allow_null=True, label=_("Action"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
-    accounts = serializers.ListField(label=_("Account"), required=False)
+    accounts = serializers.ListField(label=_("Accounts"), required=False)
     protocols = serializers.ListField(label=_("Protocols"), required=False)
 
     template_accounts = AccountTemplate.objects.none()
@@ -46,17 +50,18 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     class Meta:
         model = AssetPermission
         fields_mini = ["id", "name"]
+        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
         fields_generic = [
-            "accounts", "protocols", "actions", "created_by", "date_created",
-            "date_start", "date_expired", "is_active", "is_expired",
-            "is_valid", "comment", "from_ticket",
+            "accounts", "protocols", "actions",
+            "created_by", "date_created", "date_start", "date_expired", "is_active",
+            "is_expired", "is_valid", "comment", "from_ticket",
         ]
         fields_small = fields_mini + fields_generic
-        fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"]
+        fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"] + amount_fields
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
-            "actions": {"label": _("Actions")},
+            "actions": {"label": _("Action")},
             "is_expired": {"label": _("Is expired")},
             "is_valid": {"label": _("Is valid")},
         }
@@ -183,11 +188,6 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
 
 
 class AssetPermissionListSerializer(AssetPermissionSerializer):
-    users_amount = serializers.IntegerField(read_only=True, label=_("Users amount"))
-    user_groups_amount = serializers.IntegerField(read_only=True, label=_("User groups amount"))
-    assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
-    nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
-
     class Meta(AssetPermissionSerializer.Meta):
         amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
         fields = [item for item in (AssetPermissionSerializer.Meta.fields + amount_fields) if

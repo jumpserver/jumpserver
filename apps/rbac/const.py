@@ -60,12 +60,14 @@ exclude_permissions = (
     ('accounts', 'historicalaccount', '*', '*'),
     ('accounts', 'accountbaseautomation', '*', '*'),
     ('accounts', 'verifyaccountautomation', '*', '*'),
+    ('accounts', 'gatheredaccount', 'add,change', '*'),
     ('accounts', 'automationexecution', '*', 'automationexecution'),
     ('accounts', 'accountbackupexecution', 'delete,change', 'accountbackupexecution'),
     ('accounts', 'changesecretrecord', 'add,delete,change', 'changesecretrecord'),
     ('accounts', 'account', 'change', 'accountsecret'),
     ('accounts', 'account', 'view', 'historyaccount'),
     ('accounts', 'account', 'view', 'historyaccountsecret'),
+    ('accounts', 'accounttemplate', 'change_accounttemplatesecret', 'accounttemplate'),
 
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'permedaccount', '*', '*'),
@@ -122,6 +124,7 @@ exclude_permissions = (
     ('terminal', 'session', 'delete,share', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
     ('applications', '*', '*', '*'),
+    ('settings', 'chatprompt', 'add,delete,change', 'chatprompt'),
 )
 
 only_system_permissions = (

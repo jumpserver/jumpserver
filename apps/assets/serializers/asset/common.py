@@ -125,7 +125,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
     _accounts = None
 
@@ -140,16 +140,16 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         ]
         read_only_fields = [
             'category', 'type', 'connectivity', 'auto_config',
-            'date_verified', 'created_by', 'date_created',
+            'date_verified', 'created_by', 'date_created', 'date_updated',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         fields_unexport = ['auto_config']
         extra_kwargs = {
             'auto_config': {'label': _('Auto info')},
-            'name': {'label': _("Name")},
+            'name': {'label': _("Name"), 'initial': 'Asset name'},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
-            'nodes': {'allow_empty': True},
+            'nodes': {'allow_empty': True, 'label': _("Nodes")},
         }
 
     def __init__(self, *args, **kwargs):
@@ -323,7 +323,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             template_id = data.get('template', None)
             if template_id:
                 template = AccountTemplate.objects.get(id=template_id)
-                if template and template.su_from:
+                template.push_params = data.pop('push_params', {})
+                data['params'] = template.push_params
+                if template.su_from:
                     su_from_name_username_secret_type_map[template.name] = (
                         template.su_from.username, template.su_from.secret_type
                     )

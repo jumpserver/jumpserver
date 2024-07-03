@@ -24,7 +24,7 @@ class RoleViewSet(JMSModelViewSet):
     }
     ordering = ('-builtin', 'name')
     filterset_class = RoleFilter
-    search_fields = ('name', 'scope', 'builtin')
+    search_fields = ('name', 'builtin')
     rbac_perms = {
         'users': 'rbac.view_rolebinding'
     }

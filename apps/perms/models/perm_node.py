@@ -46,9 +46,15 @@ class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
 
     @classmethod
     def get_node_from_with_node(cls, user, key):
+        """ 获取用户授权的节点的来源
+        这种情况就是因为 父节点被授权了, 找到是因为那个节点授权， 自己才会出现在授权树中
+        """
         ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
+        # 被授权的祖先节点
+        # Todo 每个节点都过滤速度不慢吗 ?
         ancestor_nodes = cls.objects.filter(user=user, node_key__in=ancestor_keys)
         for node in ancestor_nodes:
+            # 如果是直接授权的节点
             if node.key == key:
                 return node.node_from, node
             if node.node_from == cls.NodeFrom.granted:
@@ -107,6 +113,7 @@ class PermNode(Node):
             user, self.key
         )
         self.node_from = node_from
+        #
         if node:
             self.granted_assets_amount = node.node_assets_amount
 

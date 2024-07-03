@@ -63,7 +63,7 @@ class FTPLog(OrgModelMixin):
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_("Date start"), db_index=True)
-    has_file = models.BooleanField(default=False, verbose_name=_("File"))
+    has_file = models.BooleanField(default=False, verbose_name=_("Can Download"))
     session = models.CharField(max_length=36, verbose_name=_("Session"), default=uuid.uuid4)
 
     class Meta:
@@ -207,9 +207,9 @@ class UserLoginLog(models.Model):
         choices=LoginStatusChoices.choices,
         verbose_name=_("Status"),
     )
-    datetime = models.DateTimeField(default=timezone.now, verbose_name=_("Date login"), db_index=True)
+    datetime = models.DateTimeField(default=timezone.now, verbose_name=_("Login Date"), db_index=True)
     backend = models.CharField(
-        max_length=32, default="", verbose_name=_("Authentication backend")
+        max_length=32, default="", verbose_name=_("Auth backend")
     )
 
     def __str__(self):
@@ -265,8 +265,8 @@ class UserSession(models.Model):
     city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_("Login city"))
     user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_("User agent"))
     type = models.CharField(choices=LoginTypeChoices.choices, max_length=2, verbose_name=_("Login type"))
-    backend = models.CharField(max_length=32, default="", verbose_name=_("Authentication backend"))
-    date_created = models.DateTimeField(null=True, blank=True, verbose_name=_('Date created'))
+    backend = models.CharField(max_length=32, default="", verbose_name=_("Auth backend"))
+    date_created = models.DateTimeField(null=True, blank=True, verbose_name=_('Login date'))
     user = models.ForeignKey(
         'users.User', verbose_name=_('User'), related_name='sessions', on_delete=models.CASCADE
     )

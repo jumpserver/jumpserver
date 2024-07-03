@@ -3,6 +3,7 @@
 from collections import defaultdict
 
 import django_filters
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import status
@@ -179,6 +180,11 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
         if request.path.find('/api/v1/assets/assets/') > -1:
             error = _('Cannot create asset directly, you should create a host or other')
             return Response({'error': error}, status=400)
+
+        if not settings.XPACK_LICENSE_IS_VALID and self.model.objects.order_by().count() >= 5000:
+            error = _('The number of assets exceeds the limit of 5000')
+            return Response({'error': error}, status=400)
+
         return super().create(request, *args, **kwargs)
 
     def filter_bulk_update_data(self):

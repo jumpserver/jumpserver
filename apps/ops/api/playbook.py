@@ -40,7 +40,8 @@ class PlaybookViewSet(OrgBulkModelViewSet):
         instance_id = instance.id
         super().perform_destroy(instance)
         dest_path = safe_join(settings.DATA_DIR, "ops", "playbook", instance_id.__str__())
-        shutil.rmtree(dest_path)
+        if os.path.exists(dest_path):
+            shutil.rmtree(dest_path)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -94,7 +95,7 @@ class PlaybookFileBrowserAPIView(APIView):
                     content = f.read()
             except UnicodeDecodeError:
                 content = _('Unsupported file content')
-            except SuspiciousFileOperation:
+            except (SuspiciousFileOperation, FileNotFoundError):
                 raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
             return Response({'content': content})
         else:

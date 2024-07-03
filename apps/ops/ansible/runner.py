@@ -4,9 +4,11 @@ import uuid
 
 from django.conf import settings
 from django.utils._os import safe_join
-from .interface import interface
+
+from common.utils import is_macos
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
+from .interface import interface
 from ..utils import get_ansible_log_verbosity
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
@@ -44,7 +46,7 @@ class AdHocRunner:
 
     def set_local_connection(self):
         if self.job_module in self.need_local_connection_modules_choices:
-            self.envs.update({"LOCAL_CONNECTION_ENABLED": "1"})
+            self.envs.update({"ANSIBLE_SUPER_MODE": "1"})
 
     def run(self, verbosity=0, **kwargs):
         self.check_module()
@@ -84,6 +86,7 @@ class PlaybookRunner:
         if not callback:
             callback = DefaultCallback()
         self.cb = callback
+        self.isolate = True
         self.envs = {}
 
     def copy_playbook(self):
@@ -100,6 +103,11 @@ class PlaybookRunner:
         private_env = safe_join(self.project_dir, 'env')
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
+
+        kwargs = dict(kwargs)
+        if self.isolate and not is_macos:
+            kwargs['process_isolation'] = True
+            kwargs['process_isolation_executable'] = 'bwrap'
 
         interface.run(
             private_data_dir=self.project_dir,
@@ -118,7 +126,8 @@ class PlaybookRunner:
 class SuperPlaybookRunner(PlaybookRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.envs = {"LOCAL_CONNECTION_ENABLED": "1"}
+        self.envs = {"ANSIBLE_SUPER_MODE": "1"}
+        self.isolate = False
 
 
 class UploadFileRunner:

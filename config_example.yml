@@ -30,10 +30,10 @@ BOOTSTRAP_TOKEN:
 # DB_ENGINE: sqlite3
 # DB_NAME:
 # MySQL or postgres setting like:
-# 使用Mysql作为数据库
-DB_ENGINE: mysql
+# 使用 PostgreSQL 作为数据库
+DB_ENGINE: postgresql
 DB_HOST: 127.0.0.1
-DB_PORT: 3306
+DB_PORT: 5432
 DB_USER: jumpserver
 DB_PASSWORD:
 DB_NAME: jumpserver

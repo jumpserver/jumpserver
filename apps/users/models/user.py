@@ -4,8 +4,8 @@
 import base64
 import datetime
 import uuid
-from typing import Callable
 from collections import defaultdict
+from typing import Callable
 
 import sshpubkeys
 from django.conf import settings
@@ -22,18 +22,23 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    date_expired_default, get_logger, lazyproperty,
-    random_string, bulk_create_with_signal
+    date_expired_default,
+    get_logger,
+    lazyproperty,
+    random_string,
+    bulk_create_with_signal,
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from rbac.const import Scope
 from rbac.models import RoleBinding
-from ..signals import (
-    post_user_change_password, post_user_leave_org, pre_user_leave_org
-)
+from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
-__all__ = ['User', 'UserPasswordHistory']
+__all__ = [
+    "User",
+    "UserPasswordHistory",
+    "MFAMixin"
+]
 
 logger = get_logger(__file__)
 
@@ -48,12 +53,12 @@ class AuthMixin:
     set_password: Callable
     save: Callable
     history_passwords: models.Manager
-    sect_cache_tpl = 'user_sect_{}'
+    sect_cache_tpl = "user_sect_{}"
     id: str
 
     @property
     def password_raw(self):
-        raise AttributeError('Password raw is not a readable attribute')
+        raise AttributeError("Password raw is not a readable attribute")
 
     #: Use this attr to set user object password, example
     #: user = User(username='example', password_raw='password', ...)
@@ -69,7 +74,7 @@ class AuthMixin:
             if self.username:
                 self.date_password_last_updated = timezone.now()
                 post_user_change_password.send(self.__class__, user=self)
-            super().set_password(raw_password) # noqa
+            super().set_password(raw_password)  # noqa
 
     def set_public_key(self, public_key):
         if self.can_update_ssh_key():
@@ -89,8 +94,9 @@ class AuthMixin:
 
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
-        history_passwords = self.history_passwords.all() \
-                                .order_by('-date_created')[:int(allow_history_password_count)]
+        history_passwords = self.history_passwords.all().order_by("-date_created")[
+            : int(allow_history_password_count)
+        ]
 
         for history_password in history_passwords:
             if check_password(password, history_password.password):
@@ -100,8 +106,8 @@ class AuthMixin:
 
     def is_public_key_valid(self):
         """
-            Check if the user's ssh public key is valid.
-            This function is used in base.html.
+        Check if the user's ssh public key is valid.
+        This function is used in base.html.
         """
         if self.public_key:
             return True
@@ -111,7 +117,7 @@ class AuthMixin:
     def public_key_obj(self):
         class PubKey(object):
             def __getattr__(self, item):
-                return ''
+                return ""
 
         if self.public_key:
             try:
@@ -125,11 +131,11 @@ class AuthMixin:
 
     def get_public_key_hash_md5(self):
         if not callable(self.public_key_obj.hash_md5):
-            return ''
+            return ""
         try:
             return self.public_key_obj.hash_md5()
         except:
-            return ''
+            return ""
 
     def reset_password(self, new_password):
         self.set_password(new_password)
@@ -140,7 +146,8 @@ class AuthMixin:
     def date_password_expired(self):
         interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
         date_expired = self.date_password_last_updated + timezone.timedelta(
-            days=int(interval))
+            days=int(interval)
+        )
         return date_expired
 
     @property
@@ -166,7 +173,7 @@ class AuthMixin:
             key_obj = sshpubkeys.SSHKey(key)
             return key_obj.hash_md5()
         except Exception as e:
-            return ''
+            return ""
 
     def check_public_key(self, key):
         if not self.public_key:
@@ -179,10 +186,11 @@ class AuthMixin:
 
     def cache_login_password_if_need(self, password):
         from common.utils import signer
+
         if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
             return
-        backend = getattr(self, 'backend', '')
-        if backend.lower().find('ldap') < 0:
+        backend = getattr(self, "backend", "")
+        if backend.lower().find("ldap") < 0:
             return
         if not password:
             return
@@ -195,12 +203,13 @@ class AuthMixin:
 
     def get_cached_password_if_has(self):
         from common.utils import signer
+
         if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
-            return ''
+            return ""
         key = self.sect_cache_tpl.format(self.id)
         secret = cache.get(key)
         if not secret:
-            return ''
+            return ""
         password = signer.unsign(secret)
         return password
 
@@ -216,6 +225,7 @@ class RoleManager(models.Manager):
     @lazyproperty
     def role_binding_cls(self):
         from rbac.models import SystemRoleBinding, OrgRoleBinding
+
         if self.scope == Scope.org:
             return OrgRoleBinding
         else:
@@ -224,6 +234,7 @@ class RoleManager(models.Manager):
     @lazyproperty
     def role_cls(self):
         from rbac.models import SystemRole, OrgRole
+
         if self.scope == Scope.org:
             return OrgRole
         else:
@@ -233,7 +244,7 @@ class RoleManager(models.Manager):
     def display(self):
         roles = sorted(list(self.all()), key=lambda r: r.scope)
         roles_display = [role.display_name for role in roles]
-        return ', '.join(roles_display)
+        return ", ".join(roles_display)
 
     @property
     def role_bindings(self):
@@ -274,25 +285,27 @@ class RoleManager(models.Manager):
             return
 
         roles = self._clean_roles(roles)
-        old_ids = self.role_bindings.values_list('role', flat=True)
+        old_ids = self.role_bindings.values_list("role", flat=True)
         need_adds = [r for r in roles if r.id not in old_ids]
 
         items = []
         for role in need_adds:
-            kwargs = {'role': role, 'user': self.user, 'scope': self.scope}
+            kwargs = {"role": role, "user": self.user, "scope": self.scope}
             if self.scope == Scope.org:
                 if current_org.is_root():
                     continue
                 else:
-                    kwargs['org_id'] = current_org.id
+                    kwargs["org_id"] = current_org.id
             items.append(self.role_binding_cls(**kwargs))
 
         try:
-            result = bulk_create_with_signal(self.role_binding_cls, items, ignore_conflicts=True)
+            result = bulk_create_with_signal(
+                self.role_binding_cls, items, ignore_conflicts=True
+            )
             self.user.expire_users_rbac_perms_cache()
             return result
         except Exception as e:
-            logger.error('\tCreate role binding error: {}'.format(e))
+            logger.error("\tCreate role binding error: {}".format(e))
 
     def set(self, roles, clear=False):
         if clear:
@@ -301,7 +314,7 @@ class RoleManager(models.Manager):
             return
 
         role_ids = set([r.id for r in roles])
-        old_ids = self.role_bindings.values_list('role', flat=True)
+        old_ids = self.role_bindings.values_list("role", flat=True)
         old_ids = set(old_ids)
 
         del_ids = old_ids - role_ids
@@ -325,12 +338,14 @@ class RoleManager(models.Manager):
     @property
     def builtin_role(self):
         from rbac.builtin import BuiltinRole
+
         return BuiltinRole
 
 
 class OrgRoleManager(RoleManager):
     def __init__(self, *args, **kwargs):
         from rbac.const import Scope
+
         self.scope = Scope.org
         super().__init__(*args, **kwargs)
 
@@ -338,6 +353,7 @@ class OrgRoleManager(RoleManager):
 class SystemRoleManager(RoleManager):
     def __init__(self, *args, **kwargs):
         from rbac.const import Scope
+
         self.scope = Scope.system
         super().__init__(*args, **kwargs)
 
@@ -365,8 +381,8 @@ class RoleMixin:
     id: str
     _org_roles = None
     _system_roles = None
-    PERM_CACHE_KEY = 'USER_PERMS_ROLES_{}_{}'
-    PERM_ORG_KEY = 'USER_PERMS_ORG_{}'
+    PERM_CACHE_KEY = "USER_PERMS_ROLES_{}_{}"
+    PERM_ORG_KEY = "USER_PERMS_ORG_{}"
     _is_superuser = None
     _update_superuser = False
 
@@ -384,39 +400,43 @@ class RoleMixin:
 
     @lazyproperty
     def console_orgs(self):
-        return self.cached_orgs['console_orgs']
+        return self.cached_orgs.get("console_orgs", [])
 
     @lazyproperty
     def audit_orgs(self):
-        return self.cached_orgs['audit_orgs']
+        return self.cached_orgs.get("audit_orgs", [])
 
     @lazyproperty
     def workbench_orgs(self):
-        return self.cached_orgs['workbench_orgs']
+        return self.cached_orgs.get("workbench_orgs", [])
 
     @lazyproperty
     def joined_orgs(self):
         from rbac.models import RoleBinding
+
         return RoleBinding.get_user_joined_orgs(self)
 
     @lazyproperty
     def cached_orgs(self):
         from rbac.models import RoleBinding
+
         key = self.PERM_ORG_KEY.format(self.id)
         data = cache.get(key)
         if data:
             return data
-        console_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self)
-        audit_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self)
-        workbench_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self)
+        console_orgs = RoleBinding.get_user_has_the_perm_orgs("rbac.view_console", self)
+        audit_orgs = RoleBinding.get_user_has_the_perm_orgs("rbac.view_audit", self)
+        workbench_orgs = RoleBinding.get_user_has_the_perm_orgs(
+            "rbac.view_workbench", self
+        )
 
         if settings.LIMIT_SUPER_PRIV:
             audit_orgs = list(set(audit_orgs) - set(console_orgs))
 
         data = {
-            'console_orgs': console_orgs,
-            'audit_orgs': audit_orgs,
-            'workbench_orgs': workbench_orgs,
+            "console_orgs": console_orgs,
+            "audit_orgs": audit_orgs,
+            "workbench_orgs": workbench_orgs,
         }
         cache.set(key, data, 60 * 60)
         return data
@@ -429,9 +449,9 @@ class RoleMixin:
             return data
 
         data = {
-            'org_roles': self.org_roles.all(),
-            'system_roles': self.system_roles.all(),
-            'perms': self.get_all_permissions(),
+            "org_roles": self.org_roles.all(),
+            "system_roles": self.system_roles.all(),
+            "perms": self.get_all_permissions(),
         }
         cache.set(key, data, 60 * 60)
         return data
@@ -439,27 +459,29 @@ class RoleMixin:
     @lazyproperty
     def orgs_roles(self):
         orgs_roles = defaultdict(set)
-        rbs = RoleBinding.objects_raw.filter(user=self, scope='org').prefetch_related('role', 'org')
+        rbs = RoleBinding.objects_raw.filter(user=self, scope="org").prefetch_related(
+            "role", "org"
+        )
         for rb in rbs:
             orgs_roles[rb.org_name].add(str(rb.role.display_name))
         return orgs_roles
 
     def expire_rbac_perms_cache(self):
-        key = self.PERM_CACHE_KEY.format(self.id, '*')
+        key = self.PERM_CACHE_KEY.format(self.id, "*")
         cache.delete_pattern(key)
         key = self.PERM_ORG_KEY.format(self.id)
         cache.delete(key)
 
     @classmethod
     def expire_users_rbac_perms_cache(cls):
-        key = cls.PERM_CACHE_KEY.format('*', '*')
+        key = cls.PERM_CACHE_KEY.format("*", "*")
         cache.delete_pattern(key)
-        key = cls.PERM_ORG_KEY.format('*')
+        key = cls.PERM_ORG_KEY.format("*")
         cache.delete_pattern(key)
 
     @lazyproperty
     def perms(self):
-        return self.cached_role_and_perms['perms']
+        return self.cached_role_and_perms["perms"]
 
     @property
     def is_superuser(self):
@@ -470,6 +492,7 @@ class RoleMixin:
             return self._is_superuser
 
         from rbac.builtin import BuiltinRole
+
         ids = [str(r.id) for r in self.system_roles.all()]
         yes = BuiltinRole.system_admin.id in ids
         self._is_superuser = yes
@@ -487,6 +510,7 @@ class RoleMixin:
     @lazyproperty
     def is_org_admin(self):
         from rbac.builtin import BuiltinRole
+
         if self.is_superuser:
             return True
         ids = [str(r.id) for r in self.org_roles.all()]
@@ -501,14 +525,18 @@ class RoleMixin:
     def is_staff(self, value):
         pass
 
-    service_account_email_suffix = '@local.domain'
+    service_account_email_suffix = "@local.domain"
 
     @classmethod
     def create_service_account(cls, name, email, comment):
         app = cls.objects.create(
-            username=name, name=name, email=email,
-            comment=comment, is_first_login=False,
-            created_by='System', is_service_account=True,
+            username=name,
+            name=name,
+            email=email,
+            comment=comment,
+            is_first_login=False,
+            created_by="System",
+            is_service_account=True,
         )
         access_key = app.create_access_key()
         return app, access_key
@@ -524,12 +552,14 @@ class RoleMixin:
     @classmethod
     def get_super_admins(cls):
         from rbac.models import Role, RoleBinding
+
         system_admin = Role.BuiltinRole.system_admin.get_role()
         return RoleBinding.get_role_users(system_admin)
 
     @classmethod
     def get_org_admins(cls):
         from rbac.models import Role, RoleBinding
+
         org_admin = Role.BuiltinRole.org_admin.get_role()
         return RoleBinding.get_role_users(org_admin)
 
@@ -561,16 +591,17 @@ class RoleMixin:
 
     def get_all_permissions(self):
         from rbac.models import RoleBinding
+
         perms = RoleBinding.get_user_perms(self)
 
-        if settings.LIMIT_SUPER_PRIV and 'view_console' in perms:
+        if settings.LIMIT_SUPER_PRIV and "view_console" in perms:
             perms = [p for p in perms if p != "view_audit"]
         return perms
 
 
 class TokenMixin:
     CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"
-    email = ''
+    email = ""
     id = None
 
     @property
@@ -579,11 +610,13 @@ class TokenMixin:
 
     def create_private_token(self):
         from authentication.models import PrivateToken
+
         token, created = PrivateToken.objects.get_or_create(user=self)
         return token
 
     def delete_private_token(self):
         from authentication.models import PrivateToken
+
         PrivateToken.objects.filter(user=self).delete()
 
     def refresh_private_token(self):
@@ -593,18 +626,18 @@ class TokenMixin:
     def create_bearer_token(self, request=None):
         expiration = settings.TOKEN_EXPIRATION or 3600
         if request:
-            remote_addr = request.META.get('REMOTE_ADDR', '')
+            remote_addr = request.META.get("REMOTE_ADDR", "")
         else:
-            remote_addr = '0.0.0.0'
+            remote_addr = "0.0.0.0"
         if not isinstance(remote_addr, bytes):
             remote_addr = remote_addr.encode("utf-8")
         remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
-        cache_key = '%s_%s' % (self.id, remote_addr)
+        cache_key = "%s_%s" % (self.id, remote_addr)
         token = cache.get(cache_key)
         if not token:
             token = random_string(36)
         cache.set(token, self.id, expiration)
-        cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
+        cache.set("%s_%s" % (self.id, remote_addr), token, expiration)
         date_expired = timezone.now() + timezone.timedelta(seconds=expiration)
         return token, date_expired
 
@@ -622,7 +655,7 @@ class TokenMixin:
     def generate_reset_token(self):
         token = random_string(50)
         key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
+        cache.set(key, {"id": self.id, "email": self.email}, 3600)
         return token
 
     @classmethod
@@ -634,8 +667,8 @@ class TokenMixin:
         if not value:
             return None
         try:
-            user_id = value.get('id', '')
-            email = value.get('email', '')
+            user_id = value.get("id", "")
+            email = value.get("email", "")
             user = cls.objects.get(id=user_id, email=email)
             return user
         except (AttributeError, cls.DoesNotExist) as e:
@@ -650,11 +683,11 @@ class TokenMixin:
 
 class MFAMixin:
     mfa_level = 0
-    otp_secret_key = ''
+    otp_secret_key = ""
     MFA_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
-        (2, _("Force enable")),
+        (0, _("Disabled")),
+        (1, _("Enabled")),
+        (2, _("Force enabled")),
     )
     is_org_admin: bool
     username: str
@@ -669,11 +702,13 @@ class MFAMixin:
     @property
     def mfa_force_enabled(self):
         force_level = settings.SECURITY_MFA_AUTH
+        # 1 All users
         if force_level in [True, 1]:
             return True
-        # 2 管理员强制开启
+        # 2 仅管理员强制开启
         if force_level == 2 and self.is_org_admin:
             return True
+        # 3 仅用户开启
         return self.mfa_level == 2
 
     def enable_mfa(self):
@@ -729,154 +764,227 @@ class JSONFilterMixin:
         from orgs.utils import current_org
 
         kwargs = {}
-        if name == 'system_roles':
-            kwargs['scope'] = 'system'
-        elif name == 'org_roles':
-            kwargs['scope'] = 'org'
+        if name == "system_roles":
+            kwargs["scope"] = "system"
+        elif name == "org_roles":
+            kwargs["scope"] = "org"
             if not current_org.is_root():
-                kwargs['org_id'] = current_org.id
+                kwargs["org_id"] = current_org.id
         else:
             return None
 
         bindings = RoleBinding.objects.filter(**kwargs, role__in=value)
-        if match == 'm2m_all':
-            user_id = bindings.values('user_id').annotate(count=Count('user_id', distinct=True)) \
-                .filter(count=len(value)).values_list('user_id', flat=True)
+        if match == "m2m_all":
+            user_id = (
+                bindings.values("user_id")
+                .annotate(count=Count("user_id")) # 这里不能有 distinct 会导致 count 不准确, acls 中过滤用户时会出现问题
+                .filter(count=len(value))
+                .values_list("user_id", flat=True)
+            )
         else:
-            user_id = bindings.values_list('user_id', flat=True)
+            user_id = bindings.values_list("user_id", flat=True)
 
         return models.Q(id__in=user_id)
 
 
-class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterMixin, AbstractUser):
-    class Source(models.TextChoices):
-        local = 'local', _('Local')
-        ldap = 'ldap', 'LDAP/AD'
-        openid = 'openid', 'OpenID'
-        radius = 'radius', 'Radius'
-        cas = 'cas', 'CAS'
-        saml2 = 'saml2', 'SAML2'
-        oauth2 = 'oauth2', 'OAuth2'
-        wecom = 'wecom', _('WeCom')
-        dingtalk = 'dingtalk', _('DingTalk')
-        feishu = 'feishu', _('FeiShu')
-        lark = 'lark', _('Lark')
-        slack = 'slack', _('Slack')
-        custom = 'custom', 'Custom'
+class Source(models.TextChoices):
+    local = "local", _("Local")
+    ldap = "ldap", "LDAP/AD"
+    openid = "openid", "OpenID"
+    radius = "radius", "Radius"
+    cas = "cas", "CAS"
+    saml2 = "saml2", "SAML2"
+    oauth2 = "oauth2", "OAuth2"
+    wecom = "wecom", _("WeCom")
+    dingtalk = "dingtalk", _("DingTalk")
+    feishu = "feishu", _("FeiShu")
+    lark = "lark", _("Lark")
+    slack = "slack", _("Slack")
+    custom = "custom", "Custom"
+
+
+class SourceMixin:
+    source: str
+    _source_choices = []
+    Source = Source
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
             settings.AUTH_BACKEND_MODEL,
             settings.AUTH_BACKEND_PUBKEY,
         ],
-        Source.ldap: [
-            settings.AUTH_BACKEND_LDAP
-        ],
+        Source.ldap: [settings.AUTH_BACKEND_LDAP],
         Source.openid: [
             settings.AUTH_BACKEND_OIDC_PASSWORD,
-            settings.AUTH_BACKEND_OIDC_CODE
+            settings.AUTH_BACKEND_OIDC_CODE,
         ],
-        Source.radius: [
-            settings.AUTH_BACKEND_RADIUS
-        ],
-        Source.cas: [
-            settings.AUTH_BACKEND_CAS
-        ],
-        Source.saml2: [
-            settings.AUTH_BACKEND_SAML2
-        ],
-        Source.oauth2: [
-            settings.AUTH_BACKEND_OAUTH2
-        ],
-        Source.wecom: [
-            settings.AUTH_BACKEND_WECOM
-        ],
-        Source.feishu: [
-            settings.AUTH_BACKEND_FEISHU
-        ],
-        Source.lark: [
-            settings.AUTH_BACKEND_LARK
-        ],
-        Source.slack: [
-            settings.AUTH_BACKEND_SLACK
-        ],
-        Source.dingtalk: [
-            settings.AUTH_BACKEND_DINGTALK
-        ],
-        Source.custom: [
-            settings.AUTH_BACKEND_CUSTOM
-        ]
+        Source.radius: [settings.AUTH_BACKEND_RADIUS],
+        Source.cas: [settings.AUTH_BACKEND_CAS],
+        Source.saml2: [settings.AUTH_BACKEND_SAML2],
+        Source.oauth2: [settings.AUTH_BACKEND_OAUTH2],
+        Source.wecom: [settings.AUTH_BACKEND_WECOM],
+        Source.feishu: [settings.AUTH_BACKEND_FEISHU],
+        Source.lark: [settings.AUTH_BACKEND_LARK],
+        Source.slack: [settings.AUTH_BACKEND_SLACK],
+        Source.dingtalk: [settings.AUTH_BACKEND_DINGTALK],
+        Source.custom: [settings.AUTH_BACKEND_CUSTOM],
     }
 
+    @classmethod
+    def get_sources_enabled(cls):
+        mapper = {
+            cls.Source.local: True,
+            cls.Source.ldap: settings.AUTH_LDAP,
+            cls.Source.openid: settings.AUTH_OPENID,
+            cls.Source.radius: settings.AUTH_RADIUS,
+            cls.Source.cas: settings.AUTH_CAS,
+            cls.Source.saml2: settings.AUTH_SAML2,
+            cls.Source.oauth2: settings.AUTH_OAUTH2,
+            cls.Source.wecom: settings.AUTH_WECOM,
+            cls.Source.feishu: settings.AUTH_FEISHU,
+            cls.Source.slack: settings.AUTH_SLACK,
+            cls.Source.dingtalk: settings.AUTH_DINGTALK,
+            cls.Source.custom: settings.AUTH_CUSTOM,
+        }
+        return [str(k) for k, v in mapper.items() if v]
+
+    @property
+    def source_display(self):
+        return self.get_source_display()
+
+    @property
+    def is_local(self):
+        return self.source == self.Source.local.value
+
+    @classmethod
+    def get_source_choices(cls):
+        if cls._source_choices:
+            return cls._source_choices
+        used = (
+            cls.objects.values_list("source", flat=True).order_by("source").distinct()
+        )
+        enabled_sources = cls.get_sources_enabled()
+        _choices = []
+        for k, v in cls.Source.choices:
+            if k in enabled_sources or k in used:
+                _choices.append((k, v))
+        cls._source_choices = _choices
+        return cls._source_choices
+
+    @classmethod
+    def get_user_allowed_auth_backend_paths(cls, username):
+        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
+            return None
+        user = cls.objects.filter(username=username).first()
+        if not user:
+            return None
+        return user.get_allowed_auth_backend_paths()
+
+    def get_allowed_auth_backend_paths(self):
+        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
+            return None
+        return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
+
+
+class User(
+    AuthMixin,
+    SourceMixin,
+    TokenMixin,
+    RoleMixin,
+    MFAMixin,
+    LabeledMixin,
+    JSONFilterMixin,
+    AbstractUser,
+):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    username = models.CharField(
-        max_length=128, unique=True, verbose_name=_('Username')
-    )
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    email = models.EmailField(
-        max_length=128, unique=True, verbose_name=_('Email')
-    )
+    username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
+    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    email = models.EmailField(max_length=128, unique=True, verbose_name=_("Email"))
     groups = models.ManyToManyField(
-        'users.UserGroup', related_name='users',
-        blank=True, verbose_name=_('User group')
+        "users.UserGroup",
+        related_name="users",
+        blank=True,
+        verbose_name=_("User group"),
     )
     role = models.CharField(
-        default='User', max_length=10,
-        blank=True, verbose_name=_('Role')
+        default="User", max_length=10, blank=True, verbose_name=_("Role")
     )
-    is_service_account = models.BooleanField(default=False, verbose_name=_("Is service account"))
-    avatar = models.ImageField(
-        upload_to="avatar", null=True, verbose_name=_('Avatar')
+    is_service_account = models.BooleanField(
+        default=False, verbose_name=_("Is service account")
     )
+    avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_("Avatar"))
     wechat = fields.EncryptCharField(
-        max_length=128, blank=True, verbose_name=_('Wechat')
+        max_length=128, blank=True, verbose_name=_("Wechat")
     )
     phone = fields.EncryptCharField(
-        max_length=128, blank=True, null=True, verbose_name=_('Phone')
+        max_length=128, blank=True, null=True, verbose_name=_("Phone")
     )
     mfa_level = models.SmallIntegerField(
-        default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_('MFA')
+        default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_("MFA")
     )
     otp_secret_key = fields.EncryptCharField(
-        max_length=128, blank=True, null=True, verbose_name=_('OTP secret key')
+        max_length=128, blank=True, null=True, verbose_name=_("OTP secret key")
     )
     # Todo: Auto generate key, let user download
     private_key = fields.EncryptTextField(
-        blank=True, null=True, verbose_name=_('Private key')
+        blank=True, null=True, verbose_name=_("Private key")
     )
     public_key = fields.EncryptTextField(
-        blank=True, null=True, verbose_name=_('Public key')
+        blank=True, null=True, verbose_name=_("Public key")
     )
-    comment = models.TextField(
-        blank=True, null=True, verbose_name=_('Comment')
-    )
-    is_first_login = models.BooleanField(default=True, verbose_name=_('Is first login'))
+    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
+    is_first_login = models.BooleanField(default=True, verbose_name=_("Is first login"))
     date_expired = models.DateTimeField(
-        default=date_expired_default, blank=True, null=True,
-        db_index=True, verbose_name=_('Date expired')
+        default=date_expired_default,
+        blank=True,
+        null=True,
+        db_index=True,
+        verbose_name=_("Date expired"),
     )
-    created_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Created by'))
-    updated_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Updated by'))
-    source = models.CharField(max_length=30, default=Source.local, choices=Source.choices, verbose_name=_('Source'))
+    created_by = models.CharField(
+        max_length=30, default="", blank=True, verbose_name=_("Created by")
+    )
+    updated_by = models.CharField(
+        max_length=30, default="", blank=True, verbose_name=_("Updated by")
+    )
     date_password_last_updated = models.DateTimeField(
-        auto_now_add=True, blank=True, null=True,
-        verbose_name=_('Date password last updated')
+        auto_now_add=True,
+        blank=True,
+        null=True,
+        verbose_name=_("Date password last updated"),
     )
     need_update_password = models.BooleanField(
-        default=False, verbose_name=_('Need update password')
+        default=False, verbose_name=_("Need update password")
     )
-    date_api_key_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date api key used'))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
-    wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
-    dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
-    feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
-    lark_id = models.CharField(null=True, default=None, max_length=128, verbose_name='Lark')
-    slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
-
+    source = models.CharField(
+        max_length=30,
+        default=Source.local,
+        choices=Source.choices,
+        verbose_name=_("Source"),
+    )
+    wecom_id = models.CharField(
+        null=True, default=None, max_length=128, verbose_name=_("WeCom")
+    )
+    dingtalk_id = models.CharField(
+        null=True, default=None, max_length=128, verbose_name=_("DingTalk")
+    )
+    feishu_id = models.CharField(
+        null=True, default=None, max_length=128, verbose_name=_("FeiShu")
+    )
+    lark_id = models.CharField(
+        null=True, default=None, max_length=128, verbose_name="Lark"
+    )
+    slack_id = models.CharField(
+        null=True, default=None, max_length=128, verbose_name=_("Slack")
+    )
+    date_api_key_last_used = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Date api key used")
+    )
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     DATE_EXPIRED_WARNING_DAYS = 5
 
     def __str__(self):
-        return '{0.name}({0.username})'.format(self)
+        return "{0.name}({0.username})".format(self)
 
     @classmethod
     def get_queryset(cls):
@@ -888,25 +996,24 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
 
     @property
     def secret_key(self):
-        instance = self.preferences.filter(name='secret_key').first()
+        instance = self.preferences.filter(name="secret_key").first()
         if not instance:
             return
         return instance.decrypt_value
 
     @property
     def receive_backends(self):
-        return self.user_msg_subscription.receive_backends
+        try:
+            return self.user_msg_subscription.receive_backends
+        except:
+            return []
 
     @property
     def is_otp_secret_key_bound(self):
         return bool(self.otp_secret_key)
 
     def get_absolute_url(self):
-        return reverse('users:user-detail', args=(self.id,))
-
-    @property
-    def source_display(self):
-        return self.get_source_display()
+        return reverse("users:user-detail", args=(self.id,))
 
     @property
     def is_expired(self):
@@ -914,6 +1021,12 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
             return True
         else:
             return False
+
+    def is_password_authenticate(self):
+        cas = self.Source.cas
+        saml2 = self.Source.saml2
+        oauth2 = self.Source.oauth2
+        return self.source not in [cas, saml2, oauth2]
 
     @property
     def expired_remain_days(self):
@@ -928,34 +1041,37 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
             return False
 
     @property
+    def lang(self):
+        return self.preference.get_value("lang")
+
+    @lang.setter
+    def lang(self, value):
+        return self.preference.set_value('lang', value)
+
+    @property
+    def preference(self):
+        from .preference import PreferenceManager
+        return PreferenceManager(self)
+
+    @property
     def is_valid(self):
         if self.is_active and not self.is_expired:
             return True
         return False
 
-    @property
-    def is_local(self):
-        return self.source == self.Source.local.value
-
-    def is_password_authenticate(self):
-        cas = self.Source.cas
-        saml2 = self.Source.saml2
-        oauth2 = self.Source.oauth2
-        return self.source not in [cas, saml2, oauth2]
-
     def set_required_attr_if_need(self):
         if not self.name:
             self.name = self.username
-        if not self.email or '@' not in self.email:
-            email = '{}@{}'.format(self.username, settings.EMAIL_SUFFIX)
-            if '@' in self.username:
+        if not self.email or "@" not in self.email:
+            email = "{}@{}".format(self.username, settings.EMAIL_SUFFIX)
+            if "@" in self.username:
                 email = self.username
             self.email = email
 
     def save(self, *args, **kwargs):
         self.set_required_attr_if_need()
-        if self.username == 'admin':
-            self.role = 'Admin'
+        if self.username == "admin":
+            self.role = "Admin"
             self.is_active = True
         return super().save(*args, **kwargs)
 
@@ -984,12 +1100,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
 
     def unblock_login(self):
         from users.utils import LoginBlockUtil, MFABlockUtils
+
         LoginBlockUtil.unblock_user(self.username)
         MFABlockUtils.unblock_user(self.username)
 
     @property
     def login_blocked(self):
         from users.utils import LoginBlockUtil, MFABlockUtils
+
         if LoginBlockUtil.is_user_block(self.username):
             return True
         if MFABlockUtils.is_user_block(self.username):
@@ -997,51 +1115,40 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         return False
 
     def delete(self, using=None, keep_parents=False):
-        if self.pk == 1 or self.username == 'admin':
-            raise PermissionDenied(_('Can not delete admin user'))
+        if self.pk == 1 or self.username == "admin":
+            raise PermissionDenied(_("Can not delete admin user"))
         return super(User, self).delete(using=using, keep_parents=keep_parents)
 
-    @classmethod
-    def get_user_allowed_auth_backend_paths(cls, username):
-        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE or not username:
-            return None
-        user = cls.objects.filter(username=username).first()
-        if not user:
-            return None
-        return user.get_allowed_auth_backend_paths()
-
-    def get_allowed_auth_backend_paths(self):
-        if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
-            return None
-        return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
-
     class Meta:
-        ordering = ['username']
+        ordering = ["username"]
         verbose_name = _("User")
         unique_together = (
-            ('dingtalk_id',),
-            ('wecom_id',),
-            ('feishu_id',),
-            ('lark_id',),
-            ('slack_id',),
+            ("dingtalk_id",),
+            ("wecom_id",),
+            ("feishu_id",),
+            ("lark_id",),
+            ("slack_id",),
         )
         permissions = [
-            ('invite_user', _('Can invite user')),
-            ('remove_user', _('Can remove user')),
-            ('match_user', _('Can match user')),
+            ("invite_user", _("Can invite user")),
+            ("remove_user", _("Can remove user")),
+            ("match_user", _("Can match user")),
         ]
 
     #: Use this method initial user
     @classmethod
     def initial(cls):
         from .group import UserGroup
-        user = cls(username='admin',
-                   email='admin@jumpserver.org',
-                   name=_('Administrator'),
-                   password_raw='admin',
-                   role='Admin',
-                   comment=_('Administrator is the super user of system'),
-                   created_by=_('System'))
+
+        user = cls(
+            username="admin",
+            email="admin@jumpserver.org",
+            name=_("Administrator"),
+            password_raw="admin",
+            role="Admin",
+            comment=_("Administrator is the super user of system"),
+            created_by=_("System"),
+        )
         user.save()
         user.groups.add(UserGroup.initial())
 
@@ -1054,12 +1161,18 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
 class UserPasswordHistory(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     password = models.CharField(max_length=128)
-    user = models.ForeignKey("users.User", related_name='history_passwords',
-                             on_delete=jms_models.CASCADE_SIGNAL_SKIP, verbose_name=_('User'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    user = models.ForeignKey(
+        "users.User",
+        related_name="history_passwords",
+        on_delete=jms_models.CASCADE_SIGNAL_SKIP,
+        verbose_name=_("User"),
+    )
+    date_created = models.DateTimeField(
+        auto_now_add=True, verbose_name=_("Date created")
+    )
 
     def __str__(self):
-        return f'{self.user} set at {self.date_created}'
+        return f"{self.user} set at {self.date_created}"
 
     def __repr__(self):
         return self.__str__()

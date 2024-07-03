@@ -4,11 +4,12 @@ from collections import defaultdict
 from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
+from django.db.models import F
 
 from assets.models import Asset
 from assets.utils import NodeAssetsUtil
-from common.db.models import output_as_string
-from common.decorators import on_transaction_commit, merge_delay_run
+from common.decorators import merge_delay_run
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from common.utils.common import lazyproperty, timeit
 from orgs.models import Organization
@@ -274,7 +275,7 @@ class UserPermTreeBuildUtil(object):
             nodekey_assetid_mapper[key].update(asset_ids)
 
         for asset_id, node_id in self.direct_asset_id_node_id_pairs:
-            node_key = self.perm_nodes_id_key_mapper.get(node_id)
+            node_key = self.perm_nodes_id_key_mapper.get(str(node_id))
             if not node_key:
                 continue
             nodekey_assetid_mapper[node_key].add(asset_id)
@@ -345,7 +346,7 @@ class UserPermTreeBuildUtil(object):
     @lazyproperty
     def perm_nodes_id_key_mapper(self):
         mapper = {
-            node.id.hex: node.key
+            str(node.id): node.key
             for key, node in self._perm_nodes_key_node_mapper.items()
         }
         return mapper
@@ -397,10 +398,13 @@ class UserPermTreeBuildUtil(object):
         asset_node_pairs = Asset.nodes.through.objects \
             .filter(asset_id__in=self.direct_asset_ids) \
             .annotate(
-            str_asset_id=output_as_string('asset_id'),
-            str_node_id=output_as_string('node_id')
+            str_asset_id=F('asset_id'),
+            str_node_id=F('node_id')
         ).values_list('str_asset_id', 'str_node_id')
-        asset_node_pairs = list(asset_node_pairs)
+        asset_node_pairs = [
+            (str(asset_id), str(node_id))
+            for asset_id, node_id in asset_node_pairs
+        ]
         return asset_node_pairs
 
     @lazyproperty

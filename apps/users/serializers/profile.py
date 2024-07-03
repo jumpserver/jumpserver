@@ -5,7 +5,7 @@ from rest_framework import serializers
 from common.serializers.fields import EncryptedField, LabeledChoiceField
 from common.utils import validate_ssh_public_key
 from .user import UserSerializer
-from ..models import User
+from ..models import User, MFAMixin
 
 
 class UserOrgSerializer(serializers.Serializer):
@@ -88,18 +88,13 @@ class UserRoleSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(UserSerializer):
-    MFA_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
-        (2, _("Force enable")),
-    )
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
     )
     public_key_hash_md5 = serializers.CharField(
         source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
     )
-    mfa_level = LabeledChoiceField(choices=MFA_LEVEL_CHOICES, label=_("MFA"), required=False)
+    mfa_level = LabeledChoiceField(choices=MFAMixin.MFA_LEVEL_CHOICES, label=_("MFA"), required=False)
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
     console_orgs = UserOrgSerializer(many=True, read_only=True)
@@ -118,6 +113,7 @@ class UserProfileSerializer(UserSerializer):
         ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'guide_url',
+            "wecom_id", "dingtalk_id", "feishu_id", "slack_id",
         ] + read_only_fields
 
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)

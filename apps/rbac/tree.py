@@ -50,12 +50,20 @@ extra_nodes_data = [
     {"id": "backup_account_node", "name": _("Backup account"), "pId": "accounts"},
     {"id": "gather_account_node", "name": _("Gather account"), "pId": "accounts"},
     {"id": "push_account_node", "name": _("Push account"), "pId": "accounts"},
-    {"id": "asset_change_plan_node", "name": _("Asset change auth"), "pId": "accounts"},
-    {"id": "terminal_node", "name": _("Terminal setting"), "pId": "view_setting"},
-    {'id': "task_center", "name": _("Task Center"), "pId": "view_console"},
+    {"id": "asset_change_plan_node", "name": _("Account change secret"), "pId": "accounts"},
     {'id': "my_assets", "name": _("My assets"), "pId": "view_workbench"},
     {'id': "operation_center", "name": _('App ops'), "pId": "view_workbench"},
-    {'id': "remote_application", "name": _("Applet"), "pId": "view_setting"},
+    {'id': "notifications", "name": _("Notifications"), "pId": "view_setting"},
+    {'id': "features", "name": _("Feature"), "pId": "view_setting"},
+    {'id': "authentication_setting", "name": _("Authentication"), "pId": "view_setting"},
+    {'id': "storage", "name": _("Storage"), "pId": "view_setting"},
+    {'id': "components", "name": _("Component"), "pId": "view_setting"},
+    {'id': "remote_app", "name": _("Applet"), "pId": "view_setting"},
+    {'id': "security", "name": _("Security"), "pId": "view_setting"},
+    {'id': "appearance", "name": _("Appearance"), "pId": "view_setting"},
+    {'id': "tasks", "name": _("Task"), "pId": "view_setting"},
+    {'id': "license", "name": _("License"), "pId": "view_setting"},
+    {'id': "other", "name": _("Other"), "pId": "view_setting"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -75,10 +83,6 @@ special_pid_mapper = {
     'xpack.strategy': 'cloud_import',
     'xpack.strategyaction': 'cloud_import',
     'xpack.strategyrule': 'cloud_import',
-    'terminal.applet': 'remote_application',
-    'terminal.applethost': 'remote_application',
-    'terminal.appletpublication': 'remote_application',
-    'terminal.applethostdeployment': 'remote_application',
     'accounts.accountbackupautomation': "backup_account_node",
     'accounts.accountbackupexecution': "backup_account_node",
     "accounts.pushaccountautomation": "push_account_node",
@@ -92,28 +96,12 @@ special_pid_mapper = {
     "accounts.view_changesecretexecution": "asset_change_plan_node",
     "accounts.add_changesecretexecution": "asset_change_plan_node",
     "accounts.view_changesecretrecord": "asset_change_plan_node",
-    'orgs.organization': 'view_setting',
-    'settings.setting': 'view_setting',
-    'terminal.terminal': 'terminal_node',
-    'terminal.commandstorage': 'terminal_node',
-    'terminal.replaystorage': 'terminal_node',
-    'terminal.status': 'terminal_node',
-    'terminal.task': 'terminal_node',
-    'terminal.endpoint': 'terminal_node',
-    'terminal.endpointrule': 'terminal_node',
     'audits.ftplog': 'terminal',
     'perms.view_myassets': 'my_assets',
-    'ops.celerytask': 'task_center',
-    'ops.view_celerytaskexecution': 'task_center',
-    'ops.view_taskmonitor': 'task_center',
-    'ops.adhocexecution': 'task_center',
     'ops.job': 'operation_center',
     'ops.adhoc': 'operation_center',
     'ops.playbook': 'operation_center',
     'ops.jobexecution': 'operation_center',
-    "xpack.interface": "view_setting",
-    "settings.change_terminal": "terminal_node",
-    "settings.view_setting": "view_setting",
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
     'audits.usersession': 'view_audit',
@@ -123,6 +111,47 @@ special_pid_mapper = {
     "rbac.view_systemtools": "view_workbench",
     'tickets.view_ticket': 'tickets'
 }
+
+special_setting_pid_mapper = {
+    "settings.change_email": "notifications",
+    "settings.change_sms": "notifications",
+    "settings.change_systemmsgsubscription": "notifications",
+    "settings.change_announcement": "features",
+    "settings.change_ticket": "features",
+    "settings.change_ops": "features",
+    "settings.change_vault": "features",
+    "settings.change_chatai": "features",
+    "settings.view_chatprompt": "features",
+    "settings.change_virtualapp": "features",
+    "settings.change_auth": "authentication_setting",
+    "terminal.replaystorage": "storage",
+    "terminal.commandstorage": "storage",
+    'terminal.applet': 'remote_app',
+    'terminal.applethost': 'remote_app',
+    'terminal.appletpublication': 'remote_app',
+    'terminal.applethostdeployment': 'remote_app',
+    "terminal.virtualapp": "remote_app",
+    "terminal.virtualapppublication": "remote_app",
+    "terminal.appprovider": "remote_app",
+    "settings.change_terminal": "components",
+    "terminal.terminal": "components",
+    "terminal.endpoint": "components",
+    "terminal.endpointrule": "components",
+    "terminal.status": "components",
+    "settings.change_security": "security",
+    "settings.change_interface": "appearance",
+    "terminal.task": "tasks",
+    'ops.celerytask': 'tasks',
+    'ops.view_celerytaskexecution': 'tasks',
+    'ops.view_taskmonitor': 'tasks',
+    "settings.change_clean": "tasks",
+    "settings.change_license": "license",
+    'orgs.organization': 'view_setting',
+    "settings.view_setting": "view_setting",
+    "settings.change_other": "other",
+}
+
+special_pid_mapper.update(special_setting_pid_mapper)
 
 verbose_name_mapper = {
     'orgs.organization': _("App organizations"),
@@ -138,7 +167,6 @@ xpack_nodes = [
     "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
     'assets.gathereduser',
-
     'settings.change_interface', 'settings.change_sms',
     'users.invite_user', 'users.remove_user',
 ]
@@ -408,8 +436,6 @@ class PermissionTreeUtil:
         node = TreeNode(**node_data)
         if settings.DEBUG_DEV:
             node.name += ('[' + node.id + ']')
-        if settings.DEBUG_DEV:
-            node.name += ('-' + node.id)
         return node
 
     def _create_root_tree_node(self):
@@ -459,7 +485,8 @@ class PermissionTreeUtil:
             checked_count, total_count = counter
             if total_count == 0:
                 continue
-            node.name += '({}/{})'.format(checked_count, total_count)
+            if node.isParent:
+                node.name += ' ({}/{})'.format(checked_count, total_count)
             if checked_count != 0:
                 node.checked = True
             nodes.append(node)

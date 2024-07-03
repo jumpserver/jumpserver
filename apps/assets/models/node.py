@@ -8,11 +8,10 @@ from collections import defaultdict
 
 from django.core.cache import cache
 from django.db import models, transaction
-from django.db.models import Q, Manager
+from django.db.models import F, Q, Manager
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _, gettext
 
-from common.db.models import output_as_string
 from common.utils import get_logger, timeit
 from common.utils.lock import DistributedLock
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
@@ -354,9 +353,9 @@ class NodeAllAssetsMappingMixin:
         t1 = time.time()
         with tmp_to_org(org_id):
             node_ids_key = Node.objects.annotate(
-                char_id=output_as_string('id')
+                char_id=F('id')
             ).values_list('char_id', 'key')
-
+            node_ids_key = [(str(node_id), node_key) for node_id, node_key in node_ids_key]
             node_id_ancestor_keys_mapping = {
                 node_id: cls.get_node_ancestor_keys(node_key, with_self=True)
                 for node_id, node_key in node_ids_key
@@ -364,12 +363,13 @@ class NodeAllAssetsMappingMixin:
 
             # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
             nodes_asset_ids = cls.assets.through.objects.all() \
-                .annotate(char_node_id=output_as_string('node_id')) \
-                .annotate(char_asset_id=output_as_string('asset_id')) \
+                .annotate(char_node_id=F('node_id')) \
+                .annotate(char_asset_id=F('asset_id')) \
                 .values_list('char_node_id', 'char_asset_id')
 
             nodeid_assetsid_mapping = defaultdict(set)
             for node_id, asset_id in nodes_asset_ids:
+                node_id, asset_id = str(node_id), str(asset_id)
                 nodeid_assetsid_mapping[node_id].add(asset_id)
 
         t2 = time.time()

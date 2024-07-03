@@ -117,7 +117,7 @@ class EndpointRule(JMSBaseModel):
         on_delete=models.SET_NULL, verbose_name=_("Endpoint"),
     )
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     class Meta:
         verbose_name = _('Endpoint rule')
