@@ -205,5 +205,13 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "Tabs": "窗口",
+    "NoTabs": "没有窗口",
+    "Theme": "主体",
+    "Default": "默认",
+    "DarkBlue": "深蓝",
+    "SplitVertical": "垂直分割",
+    "CommandBar": "命令栏",
+    "ShareSession": "会话分享"
 }

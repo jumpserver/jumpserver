@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-02 18:12+0800\n"
+"POT-Creation-Date: 2024-07-03 16:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -157,7 +157,7 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: accounts/const/account.py:15 accounts/models/virtual.py:26
+#: accounts/const/account.py:15 accounts/models/virtual.py:27
 msgid "Manual input"
 msgstr ""
 
@@ -762,19 +762,23 @@ msgstr ""
 msgid "Secret from login"
 msgstr ""
 
-#: accounts/models/virtual.py:27
+#: accounts/models/virtual.py:18
+msgid "Virtual account"
+msgstr ""
+
+#: accounts/models/virtual.py:28
 msgid "Same with user"
 msgstr ""
 
-#: accounts/models/virtual.py:36
+#: accounts/models/virtual.py:37
 msgid "Non-asset account, Input username/password on connect"
 msgstr ""
 
-#: accounts/models/virtual.py:37
+#: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
 msgstr ""
 
-#: accounts/models/virtual.py:38
+#: accounts/models/virtual.py:39
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"
@@ -1432,8 +1436,12 @@ msgstr ""
 msgid "User agent"
 msgstr ""
 
-#: assets/api/asset/asset.py:180
+#: assets/api/asset/asset.py:181
 msgid "Cannot create asset directly, you should create a host or other"
+msgstr ""
+
+#: assets/api/asset/asset.py:185
+msgid "The number of assets exceeds the limit of 5000"
 msgstr ""
 
 #: assets/api/domain.py:67
@@ -3761,7 +3769,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:408
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:409
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -3819,7 +3827,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr ""
 
 #: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:142 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:147 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -4000,25 +4008,25 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: common/serializers/fields.py:135
+#: common/serializers/fields.py:140
 msgid "Invalid data type"
 msgstr ""
 
-#: common/serializers/fields.py:143
+#: common/serializers/fields.py:148
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr ""
 
-#: common/serializers/fields.py:144
+#: common/serializers/fields.py:149
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr ""
 
-#: common/serializers/fields.py:218
+#: common/serializers/fields.py:223
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/serializers/fields.py:233
+#: common/serializers/fields.py:238
 msgid "Invalid choice: {}"
 msgstr ""
 
@@ -4899,7 +4907,11 @@ msgstr ""
 msgid "Can view System Tools"
 msgstr ""
 
-#: rbac/models/permission.py:78 rbac/models/role.py:34
+#: rbac/models/permission.py:18
+msgid "ContentType"
+msgstr ""
+
+#: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr ""
 
@@ -5323,10 +5335,8 @@ msgid "Binding Distinguished Name"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:51
-#, fuzzy
-#| msgid "Zip encrypt password"
 msgid "Binding password"
-msgstr "Passphrase"
+msgstr ""
 
 #: settings/serializers/auth/ldap.py:54
 msgid "Search OU"
@@ -5723,10 +5733,8 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/basic.py:30
-#, fuzzy
-#| msgid "Help Support URL"
 msgid "Support URL"
-msgstr "Support URL"
+msgstr ""
 
 #: settings/serializers/basic.py:31
 msgid ""
@@ -5850,10 +5858,8 @@ msgid "Allow direct approval ticket without login"
 msgstr ""
 
 #: settings/serializers/feature.py:122
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Period"
-msgstr "Periodic"
+msgstr ""
 
 #: settings/serializers/feature.py:123
 msgid ""
@@ -5869,10 +5875,8 @@ msgid "Unit"
 msgstr ""
 
 #: settings/serializers/feature.py:127
-#, fuzzy
-#| msgid "Run period"
 msgid "The unit of period"
-msgstr "Period"
+msgstr ""
 
 #: settings/serializers/feature.py:136
 msgid ""
@@ -6883,10 +6887,8 @@ msgid "Hosting"
 msgstr ""
 
 #: terminal/models/applet/applet.py:325
-#, fuzzy
-#| msgid "App Authentication"
 msgid "Applet Publication"
-msgstr "Authentication"
+msgstr ""
 
 #: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:69
 msgid "Deploy options"
@@ -8154,10 +8156,8 @@ msgid "Preference"
 msgstr ""
 
 #: users/models/user.py:690
-#, fuzzy
-#| msgid "Su enabled"
 msgid "Force enabled"
-msgstr "Switch account enabled"
+msgstr ""
 
 #: users/models/user.py:913 users/serializers/user.py:271
 msgid "Is service account"
@@ -8447,10 +8447,8 @@ msgid "MFA level"
 msgstr "MFA"
 
 #: users/serializers/user.py:280
-#, fuzzy
-#| msgid "App Authentication"
 msgid "Multi-Factor Authentication"
-msgstr "Authentication"
+msgstr ""
 
 #: users/serializers/user.py:426
 msgid ""
@@ -8937,49 +8935,49 @@ msgstr ""
 msgid "Failed to synchronize the instance \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:333
+#: xpack/plugins/cloud/manager.py:334
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:389
+#: xpack/plugins/cloud/manager.py:390
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:391
+#: xpack/plugins/cloud/manager.py:392
 #, python-format
 msgid "Update asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:394
+#: xpack/plugins/cloud/manager.py:395
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:404
+#: xpack/plugins/cloud/manager.py:405
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:425
+#: xpack/plugins/cloud/manager.py:426
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:451
+#: xpack/plugins/cloud/manager.py:452
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:467
+#: xpack/plugins/cloud/manager.py:468
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:481 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:482 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr ""
 
