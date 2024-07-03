@@ -76,7 +76,7 @@
     "Force refresh": "Force refresh",
     "Found": "Found",
     "French keyboard layout": "French (Azerty)",
-    "Full Screen": "Full Screen",
+    "Full Screen": "Full screen",
     "Full screen": "Full screen",
     "GUI": "GUI",
     "General": "General",
@@ -207,5 +207,13 @@
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user"
+    "user": "user",
+    "Tabs": "Tabs",
+    "NoTabs": "No tabs",
+    "Theme": "Theme",
+    "Default": "Default",
+    "DarkBlue": "Dark blue",
+    "SplitVertical": "Split vertical",
+    "CommandBar": "Command bar",
+    "ShareSession": "Share session"
 }

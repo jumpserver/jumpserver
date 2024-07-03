@@ -62,7 +62,7 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer RDP Proxy Connector                                                                          |
 | [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                       |
 | [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                         |
-| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer Database Proxy Connector                                                                     |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" /> | JumpServer Database Proxy Connector                                                                     |
 
 
 
