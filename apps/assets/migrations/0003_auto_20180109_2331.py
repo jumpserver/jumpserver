@@ -10,397 +10,389 @@ from assets.const import AllTypes
 
 platforms_data_json = '''[
     {
-        "category": "host",
-        "type": "linux",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": true,
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "Linux",
-        "automation": {
-            "ansible_enabled": true,
-            "ansible_config": {
-                "ansible_connection": "smart"
-            },
-            "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
-            "ping_method": "posix_ping",
-            "gather_facts_method": "gather_facts_posix",
-            "gather_accounts_method": "gather_accounts_posix",
-            "verify_account_method": "verify_account_posix",
-            "change_secret_method": "change_secret_posix",
-            "push_account_method": "push_account_posix"
-        },
-        "protocols": [
-            {
-                "name": "ssh",
-                "port": 22,
-                "setting": {
-                    "sftp_enabled": true,
-                    "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
-            },
-            {
-                "name": "telnet",
-                "port": 23,
-                "required": false,
-                "default": false,
-                "setting": {}
-            },
-            {
-                "name": "vnc",
-                "port": 5900,
-                "required": false,
-                "default": false,
-                "setting": {}
-            },
-            {
-                "name": "rdp",
-                "port": 3389,
-                "setting": {
-                    "console": false,
-                    "security": "any"
-                },
-                "required": false,
-                "default": false
-            }
-        ]
-    },
-    {
         "category": "host",
         "type": "linux",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
-        "name": "Gateway",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "smart"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "posix_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_posix",
-            "gather_accounts_method": "gather_accounts_posix",
-            "verify_account_method": "verify_account_posix",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_posix",
-            "push_account_method": "push_account_posix"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_posix",
+            "push_account_params": {
+                "sudo": "/bin/whoami",
+                "shell": "/bin/bash",
+                "home": "",
+                "groups": ""
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_posix",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_posix",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_posix",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "console": false,
                     "security": "any"
-                },
+                }
+            },
+            {
+                "name": "sftp",
+                "port": 22,
+                "primary": false,
                 "required": false,
-                "default": false
+                "default": true,
+                "public": true,
+                "setting": {
+                    "sftp_home": "/tmp"
+                }
             }
         ]
     },
     {
-        "category": "host",
-        "type": "unix",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": true,
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "Unix",
+        "category": "host",
+        "type": "unix",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": true,
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "smart"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "posix_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_posix",
-            "gather_accounts_method": "gather_accounts_posix",
-            "verify_account_method": "verify_account_posix",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_posix",
-            "push_account_method": "push_account_posix"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_posix",
+            "push_account_params": {
+                "sudo": "/bin/whoami",
+                "shell": "/bin/bash",
+                "home": "",
+                "groups": ""
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_posix",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_posix",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_posix",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "console": false,
                     "security": "any"
-                },
-                "required": false,
-                "default": false
+                }
             }
         ]
     },
     {
-        "category": "host",
-        "type": "unix",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": true,
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "macOS",
+        "category": "host",
+        "type": "unix",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": true,
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "smart"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "posix_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_posix",
-            "gather_accounts_method": "gather_accounts_posix",
-            "verify_account_method": "verify_account_posix",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_posix",
-            "push_account_method": "push_account_posix"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_posix",
+            "push_account_params": {
+                "sudo": "/bin/whoami",
+                "shell": "/bin/bash",
+                "home": "",
+                "groups": ""
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_posix",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_posix",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_posix",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "console": false,
                     "security": "any"
-                },
-                "required": false,
-                "default": false
+                }
             }
         ]
     },
     {
-        "category": "host",
-        "type": "unix",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": true,
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "BSD",
-        "automation": {
-            "ansible_enabled": true,
-            "ansible_config": {
-                "ansible_connection": "smart"
-            },
-            "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
-            "ping_method": "posix_ping",
-            "gather_facts_method": "gather_facts_posix",
-            "gather_accounts_method": "gather_accounts_posix",
-            "verify_account_method": "verify_account_posix",
-            "change_secret_method": "change_secret_posix",
-            "push_account_method": "push_account_posix"
-        },
-        "protocols": [
-            {
-                "name": "ssh",
-                "port": 22,
-                "setting": {
-                    "sftp_enabled": true,
-                    "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
-            },
-            {
-                "name": "telnet",
-                "port": 23,
-                "required": false,
-                "default": false,
-                "setting": {}
-            },
-            {
-                "name": "vnc",
-                "port": 5900,
-                "required": false,
-                "default": false,
-                "setting": {}
-            },
-            {
-                "name": "rdp",
-                "port": 3389,
-                "setting": {
-                    "console": false,
-                    "security": "any"
-                },
-                "required": false,
-                "default": false
-            }
-        ]
-    },
-    {
         "category": "host",
         "type": "unix",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
-        "name": "AIX",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "smart"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "posix_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_posix",
-            "gather_accounts_method": "gather_accounts_posix",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_posix",
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_posix",
+            "push_account_params": {
+                "sudo": "/bin/whoami",
+                "shell": "/bin/bash",
+                "home": "",
+                "groups": ""
+            },
+            "verify_account_enabled": true,
             "verify_account_method": "verify_account_posix",
-            "change_secret_method": "change_secret_aix",
-            "push_account_method": "push_account_aix"
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_posix",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_posix",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "console": false,
                     "security": "any"
-                },
-                "required": false,
-                "default": false
+                }
             }
         ]
     },
     {
-        "category": "host",
-        "type": "windows",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": false,
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "Windows",
+        "category": "host",
+        "type": "windows",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
@@ -408,54 +400,70 @@ platforms_data_json = '''[
                 "ansible_connection": "ssh"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "ping_by_rdp",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_windows",
-            "gather_accounts_method": "gather_accounts_windows",
-            "verify_account_method": "verify_account_by_rdp",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_local_windows",
-            "push_account_method": "push_account_local_windows"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_local_windows",
+            "push_account_params": {
+                "groups": "Users,Remote Desktop Users"
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_by_rdp",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_windows",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_windows",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "console": false,
                     "security": "any"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "winrm",
                 "port": 5985,
                 "primary": false,
-                "public": false,
                 "required": false,
                 "default": false,
+                "public": false,
                 "setting": {
                     "use_ssl": false
                 }
@@ -463,68 +471,102 @@ platforms_data_json = '''[
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Windows2016",
         "category": "host",
         "type": "windows",
-        "internal": true,
-        "charset": "utf-8",
+        "meta": {
+            "security": "any"
+        },
+        "internal": false,
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "Windows-TLS",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_shell_type": "cmd",
-                "ansible_connection": "ssh"
+                "ansible_connection": "smart"
             },
             "ping_enabled": true,
+            "ping_method": "ping_by_rdp",
+            "ping_params": {},
             "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
-            "ping_method": "win_ping",
             "gather_facts_method": "gather_facts_windows",
-            "gather_accounts_method": "gather_accounts_windows",
-            "verify_account_method": "verify_account_windows",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_local_windows",
-            "push_account_method": "push_account_local_windows"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_local_windows",
+            "push_account_params": {
+                "groups": "Users,Remote Desktop Users"
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_by_rdp",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_windows",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_windows",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": true,
+                "required": false,
+                "default": true,
+                "public": true,
                 "setting": {
                     "console": false,
-                    "security": "tls"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                    "security": "any",
+                    "ad_domain": ""
+                }
             },
             {
                 "name": "ssh",
                 "port": 22,
-                "setting": {
-                    "sftp_enabled": true,
-                    "sftp_home": "/tmp"
-                },
+                "primary": false,
                 "required": false,
-                "default": false
+                "default": true,
+                "public": true,
+                "setting": {
+                    "old_ssh_version": false
+                }
+            },
+            {
+                "name": "sftp",
+                "port": 22,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "sftp_home": "/tmp"
+                }
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
-                "default": false,
+                "default": true,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "winrm",
                 "port": 5985,
                 "primary": false,
-                "public": false,
                 "required": false,
-                "default": false,
+                "default": true,
+                "public": true,
                 "setting": {
                     "use_ssl": false
                 }
@@ -532,13 +574,120 @@ platforms_data_json = '''[
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Other",
         "category": "host",
-        "type": "windows",
-        "internal": true,
-        "charset": "utf-8",
+        "type": "other",
+        "meta": {},
+        "internal": false,
         "domain_enabled": true,
         "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {
+                "ansible_connection": "smart"
+            },
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "ssh",
+                "port": 22,
+                "primary": true,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "old_ssh_version": false
+                }
+            },
+            {
+                "name": "sftp",
+                "port": 22,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "sftp_home": "/tmp"
+                }
+            },
+            {
+                "name": "telnet",
+                "port": 23,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "username_prompt": "username:|login:",
+                    "password_prompt": "password:",
+                    "success_prompt": "success|成功|#|>"
+                }
+            },
+            {
+                "name": "vnc",
+                "port": 5900,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {}
+            },
+            {
+                "name": "rdp",
+                "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "console": false,
+                    "security": "any",
+                    "ad_domain": ""
+                }
+            }
+        ]
+    },
+    {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "Windows-RDP",
+        "category": "host",
+        "type": "windows",
+        "meta": {
+            "security": "rdp"
+        },
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
@@ -546,54 +695,70 @@ platforms_data_json = '''[
                 "ansible_connection": "ssh"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "win_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_windows",
-            "gather_accounts_method": "gather_accounts_windows",
-            "verify_account_method": "verify_account_windows",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_local_windows",
-            "push_account_method": "push_account_local_windows"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_local_windows",
+            "push_account_params": {
+                "groups": "Users,Remote Desktop Users"
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_windows",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_windows",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_windows",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "rdp",
                 "port": 3389,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "console": false,
                     "security": "rdp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "vnc",
                 "port": 5900,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             },
             {
                 "name": "winrm",
                 "port": 5985,
                 "primary": false,
-                "public": false,
                 "required": false,
                 "default": false,
+                "public": false,
                 "setting": {
                     "use_ssl": false
                 }
@@ -601,13 +766,20 @@ platforms_data_json = '''[
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Windows-TLS",
         "category": "host",
         "type": "windows",
+        "meta": {
+            "security": "tls"
+        },
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "RemoteAppHost",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
@@ -615,47 +787,70 @@ platforms_data_json = '''[
                 "ansible_connection": "ssh"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": true,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "win_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
             "gather_facts_method": "gather_facts_windows",
-            "gather_accounts_method": "gather_accounts_windows",
-            "verify_account_method": "verify_account_windows",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_local_windows",
-            "push_account_method": "push_account_local_windows"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_local_windows",
+            "push_account_params": {
+                "groups": "Users,Remote Desktop Users"
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_windows",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_windows",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_windows",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "rdp",
                 "port": 3389,
-                "setting": {
-                    "console": false,
-                    "security": "any"
-                },
                 "primary": true,
                 "required": false,
-                "default": false
+                "default": false,
+                "public": true,
+                "setting": {
+                    "console": false,
+                    "security": "tls"
+                }
             },
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
+                }
+            },
+            {
+                "name": "vnc",
+                "port": 5900,
+                "primary": false,
                 "required": false,
-                "default": false
+                "default": false,
+                "public": true,
+                "setting": {}
             },
             {
                 "name": "winrm",
                 "port": 5985,
                 "primary": false,
-                "public": false,
                 "required": false,
                 "default": false,
+                "public": false,
                 "setting": {
                     "use_ssl": false
                 }
@@ -663,639 +858,1206 @@ platforms_data_json = '''[
         ]
     },
     {
-        "category": "device",
-        "type": "general",
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "AIX",
+        "category": "host",
+        "type": "unix",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
-        "su_enabled": false,
-        "name": "General",
+        "su_enabled": true,
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
-            "ansible_enabled": false,
+            "ansible_enabled": true,
             "ansible_config": {
-                "ansible_connection": "local"
+                "ansible_connection": "smart"
             },
-            "ping_enabled": false,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
+            "ping_enabled": true,
+            "ping_method": "posix_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
+            "gather_facts_method": "gather_facts_posix",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_aix",
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_aix",
+            "push_account_params": {
+                "sudo": "/bin/whoami",
+                "shell": "/bin/bash",
+                "home": "",
+                "groups": ""
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_posix",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_posix",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_posix",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
+                "setting": {}
+            },
+            {
+                "name": "vnc",
+                "port": 5900,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
+            },
+            {
+                "name": "rdp",
+                "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {
+                    "console": false,
+                    "security": "any"
+                }
+            }
+        ]
+    },
+    {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Gateway",
+        "category": "host",
+        "type": "linux",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": true,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": true,
+            "ansible_config": {
+                "ansible_connection": "smart"
+            },
+            "ping_enabled": true,
+            "ping_method": "posix_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
+            "gather_facts_method": "gather_facts_posix",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_posix",
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_posix",
+            "push_account_params": {
+                "sudo": "/bin/whoami",
+                "shell": "/bin/bash",
+                "home": "",
+                "groups": ""
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_posix",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_posix",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_posix",
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "ssh",
+                "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {
+                    "sftp_enabled": true,
+                    "sftp_home": "/tmp"
+                }
+            },
+            {
+                "name": "telnet",
+                "port": 23,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
+            },
+            {
+                "name": "vnc",
+                "port": 5900,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
+            },
+            {
+                "name": "rdp",
+                "port": 3389,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {
+                    "console": false,
+                    "security": "any"
+                }
+            },
+            {
+                "name": "sftp",
+                "port": 22,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "sftp_home": "/tmp"
+                }
+            }
+        ]
+    },
+    {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "RemoteAppHost",
+        "category": "host",
+        "type": "windows",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": true,
+            "ansible_config": {
+                "ansible_shell_type": "cmd",
+                "ansible_connection": "ssh"
+            },
+            "ping_enabled": true,
+            "ping_method": "win_ping",
+            "ping_params": {},
+            "gather_facts_enabled": true,
+            "gather_facts_method": "gather_facts_windows",
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_local_windows",
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_local_windows",
+            "push_account_params": {
+                "groups": "Users,Remote Desktop Users"
+            },
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_windows",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_windows",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_windows",
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "rdp",
+                "port": 3389,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {
+                    "console": false,
+                    "security": "any"
+                }
+            },
+            {
+                "name": "ssh",
+                "port": 22,
+                "primary": false,
+                "required": false,
+                "default": true,
+                "public": true,
+                "setting": {
+                    "sftp_enabled": true,
+                    "sftp_home": "/tmp"
+                }
+            },
+            {
+                "name": "winrm",
+                "port": 5985,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": false,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "General",
         "category": "device",
         "type": "general",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": true,
+            "ansible_config": {
+                "ansible_connection": "local",
+                "first_connect_delay": 0.5
+            },
+            "ping_enabled": true,
+            "ping_method": "ping_by_ssh",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_by_ssh",
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_by_ssh",
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "ssh",
+                "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {
+                    "sftp_enabled": true,
+                    "sftp_home": "/tmp"
+                }
+            },
+            {
+                "name": "telnet",
+                "port": 23,
+                "primary": false,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
+            }
+        ]
+    },
+    {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Cisco",
+        "category": "device",
+        "type": "general",
+        "meta": {},
+        "internal": true,
         "domain_enabled": true,
         "su_enabled": true,
         "su_method": "enable",
-        "name": "Cisco",
+        "custom_fields": [],
         "automation": {
-            "ansible_enabled": false,
+            "ansible_enabled": true,
             "ansible_config": {
-                "ansible_connection": "local"
+                "ansible_connection": "local",
+                "first_connect_delay": 0.5
             },
-            "ping_enabled": false,
+            "ping_enabled": true,
+            "ping_method": "ping_by_ssh",
+            "ping_params": {},
             "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_by_ssh",
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_by_ssh",
+            "verify_account_params": {},
             "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Huawei",
         "category": "device",
         "type": "general",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
         "su_method": "super",
-        "name": "Huawei",
+        "custom_fields": [],
         "automation": {
-            "ansible_enabled": false,
+            "ansible_enabled": true,
             "ansible_config": {
-                "ansible_connection": "local"
+                "ansible_connection": "network_cli",
+                "first_connect_delay": 0.5,
+                "ansible_network_os":"ce"
             },
-            "ping_enabled": false,
+            "ping_enabled": true,
+            "ping_method": "ping_by_ssh",
+            "ping_params": {},
             "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_by_ssh",
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_by_ssh",
+            "verify_account_params": {},
             "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "H3C",
         "category": "device",
         "type": "general",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": true,
         "su_method": "super_level",
-        "name": "H3C",
+        "custom_fields": [],
         "automation": {
-            "ansible_enabled": false,
+            "ansible_enabled": true,
             "ansible_config": {
-                "ansible_connection": "local"
+                "ansible_connection": "local",
+                "first_connect_delay": 0.5
             },
-            "ping_enabled": false,
+            "ping_enabled": true,
+            "ping_method": "ping_by_ssh",
+            "ping_params": {},
             "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
+            "change_secret_method": "change_secret_by_ssh",
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_by_ssh",
+            "verify_account_params": {},
             "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "ssh",
                 "port": 22,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "sftp_enabled": true,
                     "sftp_home": "/tmp"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                }
             },
             {
                 "name": "telnet",
                 "port": 23,
+                "primary": false,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "MySQL",
         "category": "database",
         "type": "mysql",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "MySQL",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "mysql_ping",
-            "gather_accounts_method": "gather_accounts_mysql",
-            "verify_account_method": "verify_account_mysql",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_mysql",
-            "push_account_method": "push_account_mysql"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_mysql",
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_mysql",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_mysql",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_mysql",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "mysql",
                 "port": 3306,
-                "setting": {},
-                "required": false,
                 "primary": true,
-                "default": false
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "MariaDB",
         "category": "database",
         "type": "mariadb",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "MariaDB",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "mysql_ping",
-            "gather_accounts_method": "gather_accounts_mysql",
-            "verify_account_method": "verify_account_mysql",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_mysql",
-            "push_account_method": "push_account_mysql"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_mysql",
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_mysql",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_mysql",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_mysql",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "mariadb",
                 "port": 3306,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "PostgreSQL",
         "category": "database",
         "type": "postgresql",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "PostgreSQL",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "ping_postgresql",
-            "gather_accounts_method": "gather_accounts_postgresql",
-            "verify_account_method": "verify_account_postgresql",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_postgresql",
-            "push_account_method": "push_account_postgresql"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_postgresql",
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_postgresql",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_postgresql",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_postgresql",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "postgresql",
                 "port": 5432,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Oracle",
         "category": "database",
         "type": "oracle",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "Oracle",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "oracle_ping",
-            "gather_accounts_method": "gather_accounts_oracle",
-            "verify_account_method": "verify_account_oracle",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_oracle",
-            "push_account_method": "push_account_oracle"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_oracle",
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_oracle",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_oracle",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_oracle",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "oracle",
                 "port": 1521,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "SQLServer",
         "category": "database",
         "type": "sqlserver",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "SQLServer",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "sqlserver_ping",
-            "verify_account_method": "verify_account_sqlserver",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_sqlserver",
-            "push_account_method": "push_account_sqlserver"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_sqlserver",
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_sqlserver",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_sqlserver",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "sqlserver",
                 "port": 1433,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "ClickHouse",
         "category": "database",
         "type": "clickhouse",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "ClickHouse",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": false,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
             "gather_facts_enabled": false,
-            "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
             "change_secret_enabled": false,
-            "push_account_enabled": false
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "clickhouse",
                 "port": 9000,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "MongoDB",
         "category": "database",
         "type": "mongodb",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": true,
         "su_enabled": false,
-        "name": "MongoDB",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
             "ansible_config": {
                 "ansible_connection": "local"
             },
             "ping_enabled": true,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": true,
-            "verify_account_enabled": true,
-            "change_secret_enabled": true,
-            "push_account_enabled": true,
             "ping_method": "mongodb_ping",
-            "gather_accounts_method": "gather_accounts_mongodb",
-            "verify_account_method": "verify_account_mongodb",
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": true,
             "change_secret_method": "change_secret_mongodb",
-            "push_account_method": "push_account_mongodb"
+            "change_secret_params": {},
+            "push_account_enabled": true,
+            "push_account_method": "push_account_mongodb",
+            "push_account_params": {},
+            "verify_account_enabled": true,
+            "verify_account_method": "verify_account_mongodb",
+            "verify_account_params": {},
+            "gather_accounts_enabled": true,
+            "gather_accounts_method": "gather_accounts_mongodb",
+            "gather_accounts_params": {},
+            "remove_account_enabled": true,
+            "remove_account_method": "remove_account_mongodb",
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "mongodb",
                 "port": 27017,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
-        "category": "database",
-        "type": "redis",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": false,
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
         "name": "Redis",
-        "automation": {
-            "ansible_enabled": false,
-            "ansible_config": {
-                "ansible_connection": "local"
-            },
-            "ping_enabled": false,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
-        },
-        "protocols": [
-            {
-                "name": "redis",
-                "port": 6379,
-                "required": false,
-                "setting": {
-                    "auth_username": false
-                },
-                "primary": true,
-                "default": false
-            }
-        ]
-    },
-    {
         "category": "database",
         "type": "redis",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": false,
-        "name": "Redis6+",
-        "automation": {
-            "ansible_enabled": false,
-            "ansible_config": {
-                "ansible_connection": "local"
-            },
-            "ping_enabled": false,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
-        },
-        "protocols": [
-            {
-                "name": "redis",
-                "port": 6379,
-                "required": false,
-                "setting": {
-                    "auth_username": true
-                },
-                "primary": true,
-                "default": false
-            }
-        ]
-    },
-    {
-        "category": "database",
-        "type": "dameng",
-        "internal": true,
-        "charset": "utf-8",
-        "domain_enabled": true,
-        "su_enabled": false,
-        "name": "Dameng",
-        "automation": {
-            "ansible_enabled": false,
-            "ansible_config": {
-                "ansible_connection": "local"
-            },
-            "ping_enabled": false,
-            "gather_facts_enabled": false,
-            "gather_accounts_enabled": false,
-            "verify_account_enabled": false,
-            "change_secret_enabled": false,
-            "push_account_enabled": false
-        },
-        "protocols": [
-            {
-                "name": "dameng",
-                "port": 5236,
-                "required": false,
-                "setting": {},
-                "primary": true,
-                "default": false
-            }
-        ]
-    },
-    {
-        "name": "DB2",
-        "category": "database",
-        "internal": true,
-        "type": "db2",
         "domain_enabled": true,
         "su_enabled": false,
         "su_method": null,
-        "comment": "DB2",
-        "created_by": "System",
-        "updated_by": "System",
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {
+                "ansible_connection": "local"
+            },
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
         "protocols": [
             {
-                "name": "db2",
-                "port": 50000,
+                "name": "redis",
+                "port": 6379,
                 "primary": true,
                 "required": false,
                 "default": false,
-                "setting": {}
+                "public": true,
+                "setting": {
+                    "auth_username": false
+                }
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Redis6+",
+        "category": "database",
+        "type": "redis",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {
+                "ansible_connection": "local"
+            },
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "redis",
+                "port": 6379,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {
+                    "auth_username": true
+                }
+            }
+        ]
+    },
+    {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Website",
         "category": "web",
         "type": "website",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": false,
         "su_enabled": false,
-        "name": "Website",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": false,
+            "ansible_config": {},
             "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
             "gather_facts_enabled": false,
-            "verify_account_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
             "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
             "push_account_enabled": false,
-            "gather_accounts_enabled": false
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "http",
                 "port": 80,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "username_selector": "name=username",
                     "password_selector": "name=password",
-                    "submit_selector": "id=longin_button"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                    "submit_selector": "id=login_button",
+                    "safe_mode": false
+                }
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Vmware-vSphere",
         "category": "cloud",
         "type": "private",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": false,
         "su_enabled": false,
-        "name": "Vmware-vSphere",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": false,
             "ansible_config": {},
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
             "gather_facts_enabled": false,
-            "verify_account_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
             "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
             "push_account_enabled": false,
-            "gather_accounts_enabled": false
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "http",
                 "port": 80,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
                 "setting": {
                     "username_selector": "name=username",
                     "password_selector": "name=password",
-                    "submit_selector": "id=longin_button"
-                },
-                "primary": true,
-                "required": false,
-                "default": false
+                    "submit_selector": "id=login_button",
+                    "safe_mode": false
+                }
             }
         ]
     },
     {
+        "created_by": null,
+        "updated_by": null,
+        "comment": "",
+        "name": "Kubernetes",
         "category": "cloud",
         "type": "k8s",
+        "meta": {},
         "internal": true,
-        "charset": "utf-8",
         "domain_enabled": false,
         "su_enabled": false,
-        "name": "Kubernetes",
+        "su_method": null,
+        "custom_fields": [],
         "automation": {
             "ansible_enabled": false,
             "ansible_config": {},
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
             "gather_facts_enabled": false,
-            "verify_account_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
             "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
             "push_account_enabled": false,
-            "gather_accounts_enabled": false
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
         },
         "protocols": [
             {
                 "name": "k8s",
                 "port": 443,
-                "required": false,
                 "primary": true,
+                "required": false,
                 "default": false,
+                "public": true,
                 "setting": {}
             }
         ]
     },
     {
-        "name": "ChatGPT",
-        "internal": true,
-        "category": "gpt",
-        "type": "chatgpt",
-        "domain_enabled": false,
-        "su_enabled": false,
-        "comment": "ChatGPT",
         "created_by": "System",
         "updated_by": "System",
+        "comment": "ChatGPT",
+        "name": "ChatGPT",
+        "category": "gpt",
+        "type": "chatgpt",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": false,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {},
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
         "protocols": [
             {
                 "name": "chatgpt",
@@ -1303,9 +2065,110 @@ platforms_data_json = '''[
                 "primary": true,
                 "required": false,
                 "default": false,
+                "public": true,
                 "setting": {
                     "api_mode": "gpt-3.5-turbo"
                 }
+            }
+        ]
+    },
+    {
+        "created_by": "System",
+        "updated_by": "System",
+        "comment": "DB2",
+        "name": "DB2",
+        "category": "database",
+        "type": "db2",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {},
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "db2",
+                "port": 50000,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
+            }
+        ]
+    },
+    {
+        "created_by": "System",
+        "updated_by": "System",
+        "comment": "Dameng",
+        "name": "Dameng",
+        "category": "database",
+        "type": "dameng",
+        "meta": {},
+        "internal": true,
+        "domain_enabled": true,
+        "su_enabled": false,
+        "su_method": null,
+        "custom_fields": [],
+        "automation": {
+            "ansible_enabled": false,
+            "ansible_config": {},
+            "ping_enabled": false,
+            "ping_method": null,
+            "ping_params": {},
+            "gather_facts_enabled": false,
+            "gather_facts_method": null,
+            "gather_facts_params": {},
+            "change_secret_enabled": false,
+            "change_secret_method": null,
+            "change_secret_params": {},
+            "push_account_enabled": false,
+            "push_account_method": null,
+            "push_account_params": {},
+            "verify_account_enabled": false,
+            "verify_account_method": null,
+            "verify_account_params": {},
+            "gather_accounts_enabled": false,
+            "gather_accounts_method": null,
+            "gather_accounts_params": {},
+            "remove_account_enabled": false,
+            "remove_account_method": null,
+            "remove_account_params": {}
+        },
+        "protocols": [
+            {
+                "name": "dameng",
+                "port": 5236,
+                "primary": true,
+                "required": false,
+                "default": false,
+                "public": true,
+                "setting": {}
             }
         ]
     }
@@ -1320,7 +2183,8 @@ def create_internal_platforms(apps, *args):
     for platform_data in platforms_data:
         protocols = platform_data.pop('protocols', [])
         platform_data['protocols'] = [p for p in protocols if p.pop('primary', True) is not None]
-        AllTypes.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls, automation_cls=automation_cls)
+        AllTypes.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls,
+                                                   automation_cls=automation_cls)
 
 
 def migrate_automation_ansible_remove_account(apps, *args):
@@ -1349,7 +2213,6 @@ def migrate_automation_ansible_remove_account(apps, *args):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('assets', '0002_auto_20180105_1807'),
     ]
@@ -1358,4 +2221,3 @@ class Migration(migrations.Migration):
         migrations.RunPython(create_internal_platforms),
         migrations.RunPython(migrate_automation_ansible_remove_account),
     ]
-
