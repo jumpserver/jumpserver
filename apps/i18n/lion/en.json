@@ -8,6 +8,7 @@
     "ConfirmBtn": "Confirm",
     "Connecting": "Connecting",
     "CopyLink": "Copy Link Address and Code",
+    "CopyShareURLSuccess": "Copy Share URL Success",
     "CreateLink": "Create Share Link",
     "CreateSuccess": "Success",
     "Display": "Display",
@@ -51,7 +52,10 @@
     "JMSErrNoSession": "Not found session",
     "JMSErrPermission": "Permission deny",
     "JMSErrPermissionExpired": "Terminated by permission expired",
+    "JMSErrRemoveShareUser": "You have been removed from the shared session.",
     "JMSErrTerminatedByAdmin": "Terminated by Admin",
+    "JoinShare": "Join Session",
+    "LeaveShare": "Leave Session",
     "LinkAddr": "Link",
     "Minute": "Minute",
     "Minutes": "Minutes",
@@ -59,6 +63,7 @@
     "Password": "Password",
     "PauseSession": "Pause Session",
     "ReadOnly": "Read-Only",
+    "RemoveShareUserConfirm": "Are you sure to remove the user from the shared session?",
     "RequireParams": "Require Params",
     "ResumeSession": "Resume Session",
     "SelectAction": "Select",
@@ -74,10 +79,5 @@
     "Username": "Username",
     "VerifyCode": "Verify Code",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable",
-    "JMSErrRemoveShareUser": "You have been removed from the shared session.",
-    "RemoveShareUserConfirm": "Are you sure to remove the user from the shared session?",
-    "CopyShareURLSuccess": "Copy Share URL Success",
-    "JoinShare": "Join Session",
-    "LeaveShare": "Leave Session"
+    "Writable": "Writable"
 }
