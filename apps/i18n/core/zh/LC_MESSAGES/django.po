@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 11:35+0800\n"
+"POT-Creation-Date: 2024-07-02 18:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -107,13 +107,11 @@ msgstr "账号备份计划正在执行"
 msgid "Plan execution end"
 msgstr "计划执行结束"
 
-#: accounts/automations/change_secret/manager.py:102
-#, python-brace-format
-msgid ""
-"No pending accounts found: {name} User ID: {account_ids} Type: {secret_type}"
-msgstr "没有发现待处理的账号: {name} 用户ID: {account_ids} 类型: {secret_type}"
+#: accounts/automations/change_secret/manager.py:100
+msgid "No pending accounts found"
+msgstr "未找到待处理帐户"
 
-#: accounts/automations/change_secret/manager.py:227
+#: accounts/automations/change_secret/manager.py:224
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s, 失败: %s, 总数: %s"
@@ -338,8 +336,8 @@ msgstr "用户 %s 查看/导出 了密码"
 
 #: accounts/models/account.py:49
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:215
-#: accounts/serializers/account/account.py:260
+#: accounts/serializers/account/account.py:218
+#: accounts/serializers/account/account.py:263
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:143
@@ -358,8 +356,8 @@ msgid "Asset"
 msgstr "资产"
 
 #: accounts/models/account.py:53 accounts/models/template.py:16
-#: accounts/serializers/account/account.py:222
-#: accounts/serializers/account/account.py:270
+#: accounts/serializers/account/account.py:225
+#: accounts/serializers/account/account.py:273
 #: accounts/serializers/account/template.py:27
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
@@ -371,7 +369,7 @@ msgstr "切换自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:217
+#: accounts/models/account.py:57 accounts/serializers/account/account.py:220
 #: users/models/user.py:963
 msgid "Source"
 msgstr "来源"
@@ -590,7 +588,7 @@ msgid "Status"
 msgstr "状态"
 
 #: accounts/models/automations/change_secret.py:47
-#: accounts/serializers/account/account.py:262
+#: accounts/serializers/account/account.py:265
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
@@ -666,7 +664,7 @@ msgid "Verify asset account"
 msgstr "账号验证"
 
 #: accounts/models/base.py:37 accounts/models/base.py:67
-#: accounts/serializers/account/account.py:445
+#: accounts/serializers/account/account.py:448
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:47
 #: authentication/serializers/connect_token_secret.py:42
@@ -845,7 +843,7 @@ msgstr "参数"
 msgid "Exist policy"
 msgstr "账号存在策略"
 
-#: accounts/serializers/account/account.py:195 assets/models/label.py:21
+#: accounts/serializers/account/account.py:198 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:125
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:174
 #: assets/serializers/platform.py:271 perms/serializers/user_permission.py:26
@@ -854,7 +852,7 @@ msgstr "账号存在策略"
 msgid "Category"
 msgstr "类别"
 
-#: accounts/serializers/account/account.py:196
+#: accounts/serializers/account/account.py:199
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
@@ -873,25 +871,25 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/serializers/account/account.py:211
+#: accounts/serializers/account/account.py:214
 msgid "Asset not found"
 msgstr "资产不存在"
 
-#: accounts/serializers/account/account.py:251
+#: accounts/serializers/account/account.py:254
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:261 ops/models/celery.py:83
+#: accounts/serializers/account/account.py:264 ops/models/celery.py:83
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:46
 #: tickets/models/ticket/general.py:277 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr "状态"
 
-#: accounts/serializers/account/account.py:263
+#: accounts/serializers/account/account.py:266
 msgid "Changed"
 msgstr "已修改"
 
-#: accounts/serializers/account/account.py:273
+#: accounts/serializers/account/account.py:276
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:9
 #: assets/models/automations/base.py:19
@@ -904,34 +902,34 @@ msgstr "已修改"
 msgid "Assets"
 msgstr "资产"
 
-#: accounts/serializers/account/account.py:328
+#: accounts/serializers/account/account.py:331
 msgid "Account already exists"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:378
+#: accounts/serializers/account/account.py:381
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "资产不支持账号类型: %s"
 
-#: accounts/serializers/account/account.py:410
+#: accounts/serializers/account/account.py:413
 msgid "Account has exist"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:440
+#: accounts/serializers/account/account.py:443
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:385
+#: assets/serializers/asset/common.py:387
 msgid "Spec info"
 msgstr "特殊信息"
 
-#: accounts/serializers/account/account.py:446
+#: accounts/serializers/account/account.py:449
 #: authentication/serializers/connect_token_secret.py:159
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:456 acls/serializers/base.py:116
+#: accounts/serializers/account/account.py:459 acls/serializers/base.py:116
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
@@ -952,7 +950,7 @@ msgstr "ID"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:457
+#: accounts/serializers/account/account.py:460
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
@@ -1253,7 +1251,7 @@ msgstr "用户"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
 #: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
-#: assets/serializers/asset/common.py:384 perms/serializers/permission.py:45
+#: assets/serializers/asset/common.py:386 perms/serializers/permission.py:45
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号"
@@ -1808,7 +1806,7 @@ msgstr "平台"
 msgid "Zone"
 msgstr "网域"
 
-#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:386
+#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集资产硬件信息"
@@ -2157,7 +2155,7 @@ msgid "Node path"
 msgstr "节点路径"
 
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:389
 msgid "Auto info"
 msgstr "自动化信息"
 
@@ -2772,7 +2770,7 @@ msgstr "飞书"
 msgid "Slack"
 msgstr "Slack"
 
-#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:161
+#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:159
 #: authentication/views/login.py:84 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:799
 #: users/models/user.py:969
@@ -3054,8 +3052,8 @@ msgstr "企业微信已经绑定"
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:213
-#: authentication/views/dingtalk.py:255
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:211
+#: authentication/views/dingtalk.py:253
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
@@ -3640,7 +3638,7 @@ msgstr "绑定 %s 成功"
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "钉钉错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:212
+#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:210
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
@@ -3662,19 +3660,19 @@ msgstr "无效的 user_id"
 msgid "DingTalk query user failed"
 msgstr "钉钉查询用户失败"
 
-#: authentication/views/dingtalk.py:155
+#: authentication/views/dingtalk.py:154
 msgid "The DingTalk is already bound to another user"
 msgstr "该钉钉已经绑定其他用户"
 
-#: authentication/views/dingtalk.py:162
+#: authentication/views/dingtalk.py:160
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:214 authentication/views/dingtalk.py:249
+#: authentication/views/dingtalk.py:212 authentication/views/dingtalk.py:247
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:256
+#: authentication/views/dingtalk.py:254
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
@@ -6751,6 +6749,12 @@ msgstr "无效的 zip 文件"
 msgid "This is enterprise edition applet"
 msgstr "企业版远程应用，在社区版中不能使用"
 
+#: terminal/api/applet/applet.py:91
+#, fuzzy
+#| msgid "Asset not found"
+msgid "Applet not found in path: {}"
+msgstr "资产不存在"
+
 #: terminal/api/component/endpoint.py:32
 msgid "Not found protocol query params"
 msgstr "未发现 protocol 查询参数"
@@ -7281,7 +7285,7 @@ msgid "Command and replay storage"
 msgstr "命令及录像存储"
 
 #: terminal/notifications.py:240 terminal/tasks.py:153
-#: xpack/plugins/cloud/api.py:152
+#: xpack/plugins/cloud/api.py:154
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
 msgid "Test failure: Account invalid"
@@ -8879,13 +8883,17 @@ msgid ""
 "strategy will skipped."
 msgstr "根据当前任务配置，不符合“”策略的资产将被跳过。"
 
-#: xpack/plugins/cloud/api.py:64
+#: xpack/plugins/cloud/api.py:66
 msgid "Test connection successful"
 msgstr "测试成功"
 
-#: xpack/plugins/cloud/api.py:66
+#: xpack/plugins/cloud/api.py:68
 msgid "Test connection failed: {}"
 msgstr "测试连接失败：{}"
+
+#: xpack/plugins/cloud/api.py:165
+msgid "User {} deleted the current resource and released the assets"
+msgstr "用户 {} 删除了当前资源已释放的资产"
 
 #: xpack/plugins/cloud/const.py:8
 msgid "Alibaba Cloud"

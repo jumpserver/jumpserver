@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from common.const.http import POST
+from common.const.http import POST, PUT
 
 __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
 
@@ -36,7 +36,7 @@ class SuggestionMixin:
 
 
 class RenderToJsonMixin:
-    @action(methods=[POST], detail=False, url_path='render-to-json')
+    @action(methods=[POST, PUT], detail=False, url_path='render-to-json')
     def render_to_json(self, request: Request, *args, **kwargs):
         data = {
             'title': (),
