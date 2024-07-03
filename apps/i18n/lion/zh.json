@@ -8,6 +8,7 @@
     "ConfirmBtn": "确定",
     "Connecting": "连接中",
     "CopyLink": "复制链接及验证码",
+    "CopyShareURLSuccess": "复制分享地址成功",
     "CreateLink": "创建分享链接",
     "CreateSuccess": "创建成功",
     "Display": "显示",
@@ -51,7 +52,10 @@
     "JMSErrNoSession": "未能找到会话",
     "JMSErrPermission": "无连接权限",
     "JMSErrPermissionExpired": "授权已过期，断开连接",
+    "JMSErrRemoveShareUser": "你已经被移除共享会话",
     "JMSErrTerminatedByAdmin": "管理员终断会话",
+    "JoinShare": "加入共享",
+    "LeaveShare": "离开共享",
     "LinkAddr": "链接地址",
     "Minute": "分钟",
     "Minutes": "分钟",
@@ -59,6 +63,7 @@
     "Password": "密码",
     "PauseSession": "暂停会话",
     "ReadOnly": "只读",
+    "RemoveShareUserConfirm": "确定要移除该用户吗？",
     "RequireParams": "必填参数",
     "ResumeSession": "恢复会话",
     "SelectAction": "请选择",
@@ -74,10 +79,5 @@
     "Username": "用户名",
     "VerifyCode": "验证码",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
-    "Writable": "读写",
-    "JMSErrRemoveShareUser": "你已经被移除共享会话",
-    "RemoveShareUserConfirm": "确定要移除该用户吗？",
-    "CopyShareURLSuccess": "复制分享地址成功",
-    "JoinShare": "加入共享",
-    "LeaveShare": "离开共享"
+    "Writable": "读写"
 }

@@ -8,6 +8,7 @@
     "ConfirmBtn": "確定",
     "Connecting": "接続中",
     "CopyLink": "リンクと認証コードをコピー",
+    "CopyShareURLSuccess": "レプリケーション共有住所成功",
     "CreateLink": "共有リンクを作成",
     "CreateSuccess": "作成に成功しました",
     "Display": "表示",
@@ -51,7 +52,10 @@
     "JMSErrNoSession": "セッションが見つかりませんでした",
     "JMSErrPermission": "接続権限がありません",
     "JMSErrPermissionExpired": "認証が期限切れ、接続が切断されました",
+    "JMSErrRemoveShareUser": "あなたはすでに共有セッションから削除されました」という意味です",
     "JMSErrTerminatedByAdmin": "管理者がセッションを終了",
+    "JoinShare": "共有セッションに参加",
+    "LeaveShare": "共有セッションから退出",
     "LinkAddr": "リンクアドレス",
     "Minute": "分",
     "Minutes": "分",
@@ -59,6 +63,7 @@
     "Password": "パスワード",
     "PauseSession": "セッションを一時停止",
     "ReadOnly": "読み取り専用",
+    "RemoveShareUserConfirm": "共有セッションから削除してもよろしいですか？",
     "RequireParams": "必須パラメータ",
     "ResumeSession": "セッションの回復",
     "SelectAction": "選択してください",
@@ -74,10 +79,5 @@
     "Username": "ユーザー名",
     "VerifyCode": "検証コード",
     "WebSocketError": "WebSocketの接続に失敗しました、ネットワークを確認してください",
-    "Writable": "読み書き",
-    "JMSErrRemoveShareUser": "あなたはすでに共有セッションから削除されました」という意味です",
-    "RemoveShareUserConfirm": "共有セッションから削除してもよろしいですか？",
-    "CopyShareURLSuccess": "レプリケーション共有住所成功",
-    "JoinShare": "共有セッションに参加",
-    "LeaveShare": "共有セッションから退出"
+    "Writable": "読み書き"
 }
