@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jumpserver"
-version = "v4.0"
+version = "v4.0.0"
 description = "广受欢迎的开源堡垒机"
 authors = ["ibuler <ibuler@qq.com>"]
 license = "GPLv3"
