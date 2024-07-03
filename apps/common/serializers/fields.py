@@ -110,6 +110,11 @@ class LabelRelatedField(serializers.RelatedField):
             kwargs["queryset"] = queryset
         super().__init__(**kwargs)
 
+    def to_file_representation(self, value):
+        if value is None:
+            return value
+        return "{}:{}".format(value.get('name'), value.get('value'))
+
     def to_representation(self, value):
         if value is None:
             return value

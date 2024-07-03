@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:18+0800\n"
+"POT-Creation-Date: 2024-07-03 16:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,7 @@ msgstr "バックアップアカウントの数"
 
 #: accounts/automations/backup_account/handlers.py:131
 msgid "Generating asset or application related backup information files"
-msgstr ""
+msgstr "アセットまたはアプリケーション関連のバックアップ情報ファイルを生成中"
 
 #: accounts/automations/backup_account/handlers.py:156
 #: accounts/automations/backup_account/handlers.py:295
@@ -157,7 +157,7 @@ msgstr "API key"
 msgid "All"
 msgstr "すべて"
 
-#: accounts/const/account.py:15 accounts/models/virtual.py:26
+#: accounts/const/account.py:15 accounts/models/virtual.py:27
 msgid "Manual input"
 msgstr "手動入力"
 
@@ -762,20 +762,24 @@ msgstr "別名"
 msgid "Secret from login"
 msgstr "ログインからのパスワード"
 
-#: accounts/models/virtual.py:27
+#: accounts/models/virtual.py:18
+msgid "Virtual account"
+msgstr "バーチャルアカウント"
+
+#: accounts/models/virtual.py:28
 msgid "Same with user"
 msgstr "ユーザーと同じユーザー名"
 
-#: accounts/models/virtual.py:36
+#: accounts/models/virtual.py:37
 msgid "Non-asset account, Input username/password on connect"
 msgstr ""
 "アセットアカウントではない場合、接続時にユーザー名/パスワードを入力します"
 
-#: accounts/models/virtual.py:37
+#: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
 msgstr "接続時にユーザー名と同じユーザー名を使用します"
 
-#: accounts/models/virtual.py:38
+#: accounts/models/virtual.py:39
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"
@@ -1465,7 +1469,7 @@ msgstr ""
 
 #: assets/api/asset/asset.py:185
 msgid "The number of assets exceeds the limit of 5000"
-msgstr ""
+msgstr "資産の数が5000の制限を超えています"
 
 #: assets/api/domain.py:67
 msgid "Number required"
@@ -3906,7 +3910,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
 #: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:142 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:147 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -4091,25 +4095,25 @@ msgstr "ノード"
 msgid "File"
 msgstr "書類"
 
-#: common/serializers/fields.py:135
+#: common/serializers/fields.py:140
 msgid "Invalid data type"
 msgstr "無効なデータ"
 
-#: common/serializers/fields.py:143
+#: common/serializers/fields.py:148
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "無効な pk \"{pk_value}\" - オブジェクトが存在しません"
 
-#: common/serializers/fields.py:144
+#: common/serializers/fields.py:149
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "エラータイプ。 予想される pk 値、受信 {data_type}。"
 
-#: common/serializers/fields.py:218
+#: common/serializers/fields.py:223
 msgid "Invalid data type, should be list"
 msgstr "間違ったデータ タイプです。リストにする必要があります"
 
-#: common/serializers/fields.py:233
+#: common/serializers/fields.py:238
 msgid "Invalid choice: {}"
 msgstr "無効なオプション: {}"
 
@@ -5009,7 +5013,11 @@ msgstr "ファイルマネージャを表示できます"
 msgid "Can view System Tools"
 msgstr "システムツールを表示できます"
 
-#: rbac/models/permission.py:78 rbac/models/role.py:34
+#: rbac/models/permission.py:18
+msgid "ContentType"
+msgstr "コンテンツタイプ"
+
+#: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "権限"
 
@@ -8557,7 +8565,7 @@ msgstr "新しく設定されたパスワードが一致しない"
 
 #: users/serializers/preference/lina.py:47
 msgid "Language"
-msgstr ""
+msgstr "言語"
 
 #: users/serializers/preference/lina.py:52
 msgid "File Encryption"

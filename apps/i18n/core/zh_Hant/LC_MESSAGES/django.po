@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:27+0800\n"
+"POT-Creation-Date: 2024-07-03 16:39+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -33,7 +33,7 @@ msgstr "備份帳號數量"
 
 #: accounts/automations/backup_account/handlers.py:131
 msgid "Generating asset or application related backup information files"
-msgstr ""
+msgstr "生成與資產或應用程序相關的備份信息文件"
 
 #: accounts/automations/backup_account/handlers.py:156
 #: accounts/automations/backup_account/handlers.py:295
@@ -158,7 +158,7 @@ msgstr "API key"
 msgid "All"
 msgstr "全部"
 
-#: accounts/const/account.py:15 accounts/models/virtual.py:26
+#: accounts/const/account.py:15 accounts/models/virtual.py:27
 msgid "Manual input"
 msgstr "手動輸入"
 
@@ -767,19 +767,25 @@ msgstr "別名"
 msgid "Secret from login"
 msgstr "與用戶登錄時相同"
 
-#: accounts/models/virtual.py:27
+#: accounts/models/virtual.py:18
+#, fuzzy
+#| msgid "Email account"
+msgid "Virtual account"
+msgstr "信箱帳號"
+
+#: accounts/models/virtual.py:28
 msgid "Same with user"
 msgstr "使用者名稱與用戶相同"
 
-#: accounts/models/virtual.py:36
+#: accounts/models/virtual.py:37
 msgid "Non-asset account, Input username/password on connect"
 msgstr "登錄時手動輸入 使用者名稱/密碼 來連接的帳號"
 
-#: accounts/models/virtual.py:37
+#: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
 msgstr "登錄資產時，帳號使用者名稱與使用者使用者名稱相同的帳號"
 
-#: accounts/models/virtual.py:38
+#: accounts/models/virtual.py:39
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"
@@ -1457,7 +1463,7 @@ msgstr "不能直接創建資產, 你應該創建主機或其他資產"
 
 #: assets/api/asset/asset.py:185
 msgid "The number of assets exceeds the limit of 5000"
-msgstr ""
+msgstr "資產數量超過 5000 的限制"
 
 #: assets/api/domain.py:67
 msgid "Number required"
@@ -3859,7 +3865,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr "無效的ID，應為列表"
 
 #: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:142 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:147 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -4040,25 +4046,25 @@ msgstr "節點"
 msgid "File"
 msgstr "文件"
 
-#: common/serializers/fields.py:135
+#: common/serializers/fields.py:140
 msgid "Invalid data type"
 msgstr "无效的数据"
 
-#: common/serializers/fields.py:143
+#: common/serializers/fields.py:148
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "錯誤的 pk \"{pk_value}\" - 對象不存在"
 
-#: common/serializers/fields.py:144
+#: common/serializers/fields.py:149
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "錯誤類型。期望 pk 值，收到 {data_type}。"
 
-#: common/serializers/fields.py:218
+#: common/serializers/fields.py:223
 msgid "Invalid data type, should be list"
 msgstr "錯誤的數據類型，應該是列表"
 
-#: common/serializers/fields.py:233
+#: common/serializers/fields.py:238
 msgid "Invalid choice: {}"
 msgstr "無效選項: {}"
 
@@ -4950,7 +4956,13 @@ msgstr "文件管理"
 msgid "Can view System Tools"
 msgstr "可以查看系統工具"
 
-#: rbac/models/permission.py:78 rbac/models/role.py:34
+#: rbac/models/permission.py:18
+#, fuzzy
+#| msgid "Content"
+msgid "ContentType"
+msgstr "內容"
+
+#: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "授權"
 
@@ -8415,7 +8427,7 @@ msgstr "兩次密碼不一致"
 
 #: users/serializers/preference/lina.py:47
 msgid "Language"
-msgstr ""
+msgstr "語言"
 
 #: users/serializers/preference/lina.py:52
 msgid "File Encryption"

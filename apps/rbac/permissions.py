@@ -16,7 +16,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
         ('bulk_update', '%(app_label)s.change_%(model_name)s'),
         ('partial_bulk_update', '%(app_label)s.change_%(model_name)s'),
         ('bulk_destroy', '%(app_label)s.delete_%(model_name)s'),
-        ('render_to_json', '%(app_label)s.add_%(model_name)s'),
+        ('render_to_json', '*'),
         ('metadata', '*'),
         ('GET', '%(app_label)s.view_%(model_name)s'),
         ('OPTIONS', '*'),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:18+0800\n"
+"POT-Creation-Date: 2024-07-03 16:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -157,7 +157,7 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: accounts/const/account.py:15 accounts/models/virtual.py:26
+#: accounts/const/account.py:15 accounts/models/virtual.py:27
 msgid "Manual input"
 msgstr ""
 
@@ -762,19 +762,23 @@ msgstr ""
 msgid "Secret from login"
 msgstr ""
 
-#: accounts/models/virtual.py:27
+#: accounts/models/virtual.py:18
+msgid "Virtual account"
+msgstr ""
+
+#: accounts/models/virtual.py:28
 msgid "Same with user"
 msgstr ""
 
-#: accounts/models/virtual.py:36
+#: accounts/models/virtual.py:37
 msgid "Non-asset account, Input username/password on connect"
 msgstr ""
 
-#: accounts/models/virtual.py:37
+#: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
 msgstr ""
 
-#: accounts/models/virtual.py:38
+#: accounts/models/virtual.py:39
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"
@@ -3823,7 +3827,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr ""
 
 #: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:142 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:147 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -4004,25 +4008,25 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: common/serializers/fields.py:135
+#: common/serializers/fields.py:140
 msgid "Invalid data type"
 msgstr ""
 
-#: common/serializers/fields.py:143
+#: common/serializers/fields.py:148
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr ""
 
-#: common/serializers/fields.py:144
+#: common/serializers/fields.py:149
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr ""
 
-#: common/serializers/fields.py:218
+#: common/serializers/fields.py:223
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/serializers/fields.py:233
+#: common/serializers/fields.py:238
 msgid "Invalid choice: {}"
 msgstr ""
 
@@ -4903,7 +4907,11 @@ msgstr ""
 msgid "Can view System Tools"
 msgstr ""
 
-#: rbac/models/permission.py:78 rbac/models/role.py:34
+#: rbac/models/permission.py:18
+msgid "ContentType"
+msgstr ""
+
+#: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr ""
 
