@@ -1088,7 +1088,7 @@
     "SelectFile": "ファイル選択",
     "SelectKeyOrCreateNew": "タグキーを選択するか、新しいものを作成します",
     "SelectLabelFilter": "タグを選択して検索",
-    "SelectPlatforms": "プラットフォームの選択",
+    "SelectProvider": "プラットフォームの選択",
     "SelectProperties": "属性を選択",
     "SelectProviderMsg": "クラウドプラットフォームを選択してください",
     "SelectResource": "リソースを選択",

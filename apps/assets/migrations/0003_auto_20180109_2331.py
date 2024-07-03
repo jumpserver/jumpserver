@@ -1607,7 +1607,7 @@ platforms_data_json = '''[
         "internal": true,
         "domain_enabled": true,
         "su_enabled": false,
-        "su_method": null,
+        "su_method": null, 
         "custom_fields": [],
         "automation": {
             "ansible_enabled": true,
