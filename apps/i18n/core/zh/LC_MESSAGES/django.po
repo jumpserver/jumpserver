@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-02 18:12+0800\n"
+"POT-Creation-Date: 2024-07-03 15:09+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -156,7 +156,7 @@ msgstr "API key"
 msgid "All"
 msgstr "全部"
 
-#: accounts/const/account.py:15 accounts/models/virtual.py:26
+#: accounts/const/account.py:15 accounts/models/virtual.py:27
 msgid "Manual input"
 msgstr "手动输入"
 
@@ -765,19 +765,23 @@ msgstr "别名"
 msgid "Secret from login"
 msgstr "与用户登录时相同"
 
-#: accounts/models/virtual.py:27
+#: accounts/models/virtual.py:18
+msgid "Virtual account"
+msgstr "虚拟账号"
+
+#: accounts/models/virtual.py:28
 msgid "Same with user"
 msgstr "用户名与用户相同"
 
-#: accounts/models/virtual.py:36
+#: accounts/models/virtual.py:37
 msgid "Non-asset account, Input username/password on connect"
 msgstr "登录时手动输入 用户名/密码 来连接的账号"
 
-#: accounts/models/virtual.py:37
+#: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
 msgstr "登录资产时，账号用户名与使用者用户名相同的账号"
 
-#: accounts/models/virtual.py:38
+#: accounts/models/virtual.py:39
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"
@@ -3792,7 +3796,7 @@ msgstr "运行中"
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:408
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:409
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 创建成功"
@@ -4943,7 +4947,11 @@ msgstr "可以查看文件管理"
 msgid "Can view System Tools"
 msgstr "可以查看系统工具"
 
-#: rbac/models/permission.py:78 rbac/models/role.py:34
+#: rbac/models/permission.py:18
+msgid "ContentType"
+msgstr "内容类型"
+
+#: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "授权"
 
@@ -5068,7 +5076,7 @@ msgstr "远程应用"
 
 #: rbac/tree.py:63
 msgid "Appearance"
-msgstr "外貌"
+msgstr "界面"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
 #: xpack/plugins/license/models.py:144
@@ -9078,50 +9086,50 @@ msgstr "获取区域 \"%s\" 的实例错误，错误：%s"
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "无法同步实例 %s"
 
-#: xpack/plugins/cloud/manager.py:333
+#: xpack/plugins/cloud/manager.py:334
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr "资产“%s”的更新平台与原平台类型不一致。跳过平台和协议更新"
 
-#: xpack/plugins/cloud/manager.py:389
+#: xpack/plugins/cloud/manager.py:390
 #, fuzzy, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "资产 %s 已存在"
 
-#: xpack/plugins/cloud/manager.py:391
+#: xpack/plugins/cloud/manager.py:392
 #, fuzzy, python-format
 #| msgid "Update asset \"%s\""
 msgid "Update asset \"%s\""
 msgstr "更新资产 %s"
 
-#: xpack/plugins/cloud/manager.py:394
+#: xpack/plugins/cloud/manager.py:395
 #, fuzzy, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "资产 %s 已更新"
 
-#: xpack/plugins/cloud/manager.py:404
+#: xpack/plugins/cloud/manager.py:405
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "准备创建资产 %s"
 
-#: xpack/plugins/cloud/manager.py:425
+#: xpack/plugins/cloud/manager.py:426
 #, fuzzy, python-format
 msgid "Set nodes \"%s\""
 msgstr "删除节点: %s"
 
-#: xpack/plugins/cloud/manager.py:451
+#: xpack/plugins/cloud/manager.py:452
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "删除账号: %s"
 
-#: xpack/plugins/cloud/manager.py:467
+#: xpack/plugins/cloud/manager.py:468
 #, fuzzy, python-format
 msgid "Set protocols \"%s\""
 msgstr "设置协议 %s"
 
-#: xpack/plugins/cloud/manager.py:481 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:482 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 

@@ -15,6 +15,7 @@ __all__ = ['Permission', 'ContentType']
 class ContentType(DjangoContentType):
     class Meta:
         proxy = True
+        verbose_name = _('ContentType')
 
     _apps_map = {}
 
