@@ -10,7 +10,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-**English** · [简体中文](./README.zh-CN.md) · [Documents][docs-link] · [Report Bug][github-issues-link] · [Request Feature][github-issues-link]
+**English** · [简体中文](./README.zh-CN.md)
 </div>
 <br/>
 
@@ -18,7 +18,7 @@
 
 JumpServer is an open-source Privileged Access Management (PAM) tool that provides DevOps and IT teams with on-demand and secure access to SSH, RDP, Kubernetes, Database and Remote App endpoints through a web browser.
 
-![JumpServer Overview](https://github.com/jumpserver/jumpserver/assets/41712985/eb9e6f39-3911-4d4a-bca9-aa50cc3b761d)
+![JumpServer Overview](https://github.com/jumpserver/jumpserver/assets/41712985/4f981076-ce03-41db-a64e-e79d633c8831)
 
 ## Screenshots
 
@@ -67,8 +67,6 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                       |
 | [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer Remote Application Connector (Linux)                                                         |
 | [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Database Proxy Connector                                                                     |
-
-
 
 ## Contributing
 
