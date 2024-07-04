@@ -117,7 +117,7 @@ django-celery-beat = "2.6.0"
 kombu = "5.3.1"
 uvicorn = "0.22.0"
 websockets = "11.0.3"
-python-ldap = "3.4.3"
+python-ldap = "3.4.4"
 ldap3 = "2.9.1"
 django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
