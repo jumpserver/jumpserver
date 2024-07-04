@@ -1103,7 +1103,6 @@
     "Setting": "设置",
     "SettingInEndpointHelpText": "在 系统设置 / 组件设置 / 服务端点 中配置服务地址和端口",
     "Settings": "系统设置",
-    "Settings...": "设置...",
     "Show": "显示",
     "ShowAssetAllChildrenNode": "显示所有子节点资产",
     "ShowAssetOnlyCurrentNode": "仅显示当前节点资产",
@@ -1385,5 +1384,6 @@
     "ZoneList": "网域列表",
     "ZoneUpdate": "更新网域",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
-    "removeWarningMsg": "你确定要移除"
+    "removeWarningMsg": "你确定要移除",
+    "VaultHCPMountPoint": "Vault 服务器的挂载点，默认为 jumpserver"
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:39+0800\n"
+"POT-Creation-Date: 2024-07-04 18:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1249,7 +1249,8 @@ msgstr "レビュー担当者"
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
 #: terminal/models/component/endpoint.py:120
-#: terminal/models/session/sharing.py:29 tickets/const.py:36
+#: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
+#: tickets/const.py:36
 msgid "Active"
 msgstr "アクティブ"
 
@@ -2737,7 +2738,7 @@ msgstr "理由表示"
 
 #: audits/serializers.py:70 audits/serializers.py:184
 msgid "Auth backend display"
-msgstr "認証バックエンド"
+msgstr "検証方法"
 
 #: audits/serializers.py:134
 #, python-format
@@ -4292,7 +4293,7 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:81
+#: ops/api/job.py:82
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
@@ -4301,22 +4302,22 @@ msgstr ""
 "資産({asset})には、少なくともSSH、SFTP、WinRMのいずれか一つのプロトコルを追加"
 "する必要があります"
 
-#: ops/api/job.py:82
+#: ops/api/job.py:83
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr ""
 "資産({asset})の認証にはSSH、SFTP、またはWinRMプロトコルが不足しています"
 
-#: ops/api/job.py:83
+#: ops/api/job.py:84
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "資産({asset})の認証にはアップロード権限が不足しています"
 
-#: ops/api/job.py:168
+#: ops/api/job.py:169
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:173
+#: ops/api/job.py:174
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
@@ -4324,7 +4325,7 @@ msgstr ""
 "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択し"
 "てください。"
 
-#: ops/api/job.py:237
+#: ops/api/job.py:238
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
@@ -4333,27 +4334,27 @@ msgstr "タスクを作成中で、中断できません。後でもう一度お
 msgid "Currently playbook is being used in a job"
 msgstr "現在プレイブックは1つのジョブで使用されています"
 
-#: ops/api/playbook.py:96
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr "サポートされていないファイルの内容"
 
-#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr "無効なファイルパス"
 
-#: ops/api/playbook.py:170
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr "ファイル名を変更することはできません"
 
-#: ops/api/playbook.py:189
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr "ファイルは既に存在します。"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr "ファイルキーこのフィールドは必須です"
 
-#: ops/api/playbook.py:210
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr "このファイルを削除できません"
 
@@ -4395,7 +4396,7 @@ msgstr "VCS"
 
 #: ops/const.py:38 ops/models/adhoc.py:44 settings/serializers/feature.py:135
 msgid "Adhoc"
-msgstr "コマンド＃コマンド＃"
+msgstr "コマンド"
 
 #: ops/const.py:39 ops/models/job.py:149 ops/models/playbook.py:88
 msgid "Playbook"
@@ -5450,7 +5451,7 @@ msgstr "DN のバインド"
 
 #: settings/serializers/auth/ldap.py:47
 msgid "Binding Distinguished Name"
-msgstr "専有名のバインド"
+msgstr "バインドディレクトリ管理者"
 
 #: settings/serializers/auth/ldap.py:51
 msgid "Binding password"
