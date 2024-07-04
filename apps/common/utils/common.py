@@ -9,6 +9,8 @@ import re
 import socket
 import time
 import uuid
+import json
+
 from collections import OrderedDict
 from functools import wraps
 from itertools import chain
@@ -421,3 +423,30 @@ def distinct(seq, key=None):
 
 def is_macos():
     return platform.system() == 'Darwin'
+
+
+def load_country_calling_codes_from_file():
+    default = [
+        {'name': 'China(中国)', 'value': '+86'},
+        {'name': 'HongKong(中国香港)', 'value': '+852'},
+        {'name': 'Macao(中国澳门)', 'value': '+853'},
+        {'name': 'Taiwan(中国台湾)', 'value': '+886'},
+        {'name': 'America(America)', 'value': '+1'},
+        {'name': 'Russia(Россия)', 'value': '+7'},
+        {'name': 'France(français)', 'value': '+33'},
+        {'name': 'Britain(Britain)', 'value': '+44'},
+        {'name': 'Germany(Deutschland)', 'value': '+49'},
+        {'name': 'Japan(日本)', 'value': '+81'},
+        {'name': 'Korea(한국)', 'value': '+82'},
+        {'name': 'India(भारत)', 'value': '+91'}
+    ]
+    filepath = os.path.join(settings.DATA_DIR, 'sms', 'codes.json')
+    try:
+        with open(filepath, 'r') as f:
+            codes = json.load(f)
+    except Exception:  # noqa
+        codes = {}
+    for item in codes:
+        if all([item.get('name'), item.get('value')]):
+            default.append({'name': item['name'], 'value': item['value']})
+    return default
