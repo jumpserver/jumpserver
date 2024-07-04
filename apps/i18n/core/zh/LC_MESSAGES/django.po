@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:39+0800\n"
+"POT-Creation-Date: 2024-07-04 18:09+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -145,7 +145,7 @@ msgstr "Access key"
 #: accounts/const/account.py:9 authentication/backends/passkey/models.py:16
 #: authentication/models/sso_token.py:14 settings/serializers/feature.py:52
 msgid "Token"
-msgstr "Token"
+msgstr "令牌"
 
 #: accounts/const/account.py:10
 msgid "API key"
@@ -1243,7 +1243,8 @@ msgstr "审批人"
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
 #: terminal/models/component/endpoint.py:120
-#: terminal/models/session/sharing.py:29 tickets/const.py:36
+#: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
+#: tickets/const.py:36
 msgid "Active"
 msgstr "激活中"
 
@@ -2715,7 +2716,7 @@ msgstr "原因描述"
 
 #: audits/serializers.py:70 audits/serializers.py:184
 msgid "Auth backend display"
-msgstr "没有匹配到认证后端"
+msgstr "认证方式"
 
 #: audits/serializers.py:134
 #, python-format
@@ -4236,34 +4237,34 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:81
+#: ops/api/job.py:82
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr "资产({asset})至少要添加ssh,sftp,winrm其中一种协议"
 
-#: ops/api/job.py:82
+#: ops/api/job.py:83
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
 
-#: ops/api/job.py:83
+#: ops/api/job.py:84
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "资产({asset})授权缺少上传权限"
 
-#: ops/api/job.py:168
+#: ops/api/job.py:169
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
-#: ops/api/job.py:173
+#: ops/api/job.py:174
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
 
-#: ops/api/job.py:237
+#: ops/api/job.py:238
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "正在创建任务，无法中断，请稍后重试。"
@@ -4272,27 +4273,27 @@ msgstr "正在创建任务，无法中断，请稍后重试。"
 msgid "Currently playbook is being used in a job"
 msgstr "当前 playbook 正在作业中使用"
 
-#: ops/api/playbook.py:96
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr "不支持的文件内容"
 
-#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr "无效的文件路径"
 
-#: ops/api/playbook.py:170
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr "该文件不能重命名"
 
-#: ops/api/playbook.py:189
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr "文件已存在"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr "文件密钥该字段是必填项。"
 
-#: ops/api/playbook.py:210
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr "无法删除此文件"
 
@@ -5382,15 +5383,15 @@ msgstr "绑定 DN"
 
 #: settings/serializers/auth/ldap.py:47
 msgid "Binding Distinguished Name"
-msgstr "绑定专有名称"
+msgstr "绑定目录管理员"
 
 #: settings/serializers/auth/ldap.py:51
 msgid "Binding password"
-msgstr "原来密码"
+msgstr "绑定密码"
 
 #: settings/serializers/auth/ldap.py:54
 msgid "Search OU"
-msgstr "系统架构"
+msgstr "用户 OU"
 
 #: settings/serializers/auth/ldap.py:56
 msgid ""

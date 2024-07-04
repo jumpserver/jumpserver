@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:39+0800\n"
+"POT-Creation-Date: 2024-07-04 18:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1232,7 +1232,8 @@ msgstr ""
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
 #: terminal/models/component/endpoint.py:120
-#: terminal/models/session/sharing.py:29 tickets/const.py:36
+#: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
+#: tickets/const.py:36
 msgid "Active"
 msgstr "Active"
 
@@ -4195,34 +4196,34 @@ msgstr ""
 msgid "Task {} args or kwargs error"
 msgstr ""
 
-#: ops/api/job.py:81
+#: ops/api/job.py:82
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr ""
 
-#: ops/api/job.py:82
+#: ops/api/job.py:83
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr ""
 
-#: ops/api/job.py:83
+#: ops/api/job.py:84
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr ""
 
-#: ops/api/job.py:168
+#: ops/api/job.py:169
 msgid "Duplicate file exists"
 msgstr ""
 
-#: ops/api/job.py:173
+#: ops/api/job.py:174
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
 
-#: ops/api/job.py:237
+#: ops/api/job.py:238
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr ""
@@ -4231,27 +4232,27 @@ msgstr ""
 msgid "Currently playbook is being used in a job"
 msgstr ""
 
-#: ops/api/playbook.py:96
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr ""
 
-#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr ""
 
-#: ops/api/playbook.py:170
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr ""
 
-#: ops/api/playbook.py:189
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr ""
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr ""
 
-#: ops/api/playbook.py:210
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr ""
 
