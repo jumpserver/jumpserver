@@ -20,6 +20,16 @@ JumpServer is an open-source Privileged Access Management (PAM) tool that provid
 
 ![JumpServer Overview](https://github.com/jumpserver/jumpserver/assets/41712985/4f981076-ce03-41db-a64e-e79d633c8831)
 
+## Quick Start
+
+Prepare a clean Linux Server ( 64 bit, >= 4c8g )
+
+```
+curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
+```
+
+Access JumpServer in your browser at `http://your-ip/`, `admin`/`ChangeMe`
+
 ## Screenshots
 
 <table style="border-collapse: collapse; border: 1px solid black;">
@@ -42,15 +52,6 @@ JumpServer is an open-source Privileged Access Management (PAM) tool that provid
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/b80ad654-548f-42bc-ba3d-c1cfdf1b46d6" alt="JumpServer DB"   /></td>
   </tr>
 </table>
-
-## Quick Start
-Prepare a clean Linux Server ( 64bit, >= 4c8g )
-
-```
-curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
-```
-
-Access JumpServer in your browser at `http://your-ip/`, `admin`/`admin`
 
 ## Components
 
