@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 18:09+0800\n"
+"POT-Creation-Date: 2024-07-05 16:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3357,6 +3357,11 @@ msgstr ""
 msgid "Is expired"
 msgstr "Expired"
 
+#: authentication/serializers/connection_token.py:43
+#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
+msgid "Org name"
+msgstr "Organization"
+
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:153
 msgid "The {} cannot be empty"
@@ -4473,7 +4478,8 @@ msgstr ""
 msgid "Run as policy"
 msgstr ""
 
-#: ops/models/job.py:222 terminal/notifications.py:174
+#: ops/models/job.py:222 ops/serializers/job.py:92
+#: terminal/notifications.py:174
 msgid "Job"
 msgstr ""
 
@@ -4485,7 +4491,7 @@ msgstr ""
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:545
+#: ops/models/job.py:547
 msgid "Job Execution"
 msgstr ""
 
@@ -4549,7 +4555,11 @@ msgstr ""
 msgid "Is finished"
 msgstr "Finished"
 
-#: ops/serializers/job.py:90
+#: ops/serializers/job.py:89
+msgid "Task id"
+msgstr ""
+
+#: ops/serializers/job.py:98
 msgid "You do not have permission for the current job."
 msgstr ""
 
@@ -4651,10 +4661,6 @@ msgstr "請選擇一個組織後再保存"
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr ""
-
-#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
-msgid "Org name"
-msgstr "Organization"
 
 #: orgs/models.py:14
 msgid "GLOBAL"

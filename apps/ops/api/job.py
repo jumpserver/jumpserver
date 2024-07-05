@@ -271,7 +271,10 @@ class JobExecutionTaskDetail(APIView):
             execution = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
 
         return Response(data={
-            'status': execution.status,
+            'status': {
+                'value': execution.status,
+                'label': execution.get_status_display()
+            },
             'is_finished': execution.is_finished,
             'is_success': execution.is_success,
             'time_cost': execution.time_cost,

@@ -40,6 +40,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
             'from_ticket': {'read_only': True},
             'value': {'read_only': True},
             'is_expired': {'read_only': True, 'label': _('Is expired')},
+            'org_name': {'label': _("Org name")},
         }
 
     def get_request_user(self):

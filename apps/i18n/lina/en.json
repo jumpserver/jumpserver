@@ -1383,5 +1383,8 @@
     "ZoneList": "Zones",
     "ZoneUpdate": "Update the zone",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "RetrySelected": "Retry selected",
+    "ApproveSelected": "Approve selected",
+    "Running": "Running"
 }

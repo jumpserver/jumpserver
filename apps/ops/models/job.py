@@ -247,6 +247,8 @@ class JobExecution(JMSOrgBaseModel):
                                 verbose_name=_("Material Type"))
 
     # clean up zombie execution
+    def get_status_display(self):
+        return dict(JobStatus.choices).get(self.status, self.status)
 
     @classmethod
     def clean_unexpected_execution(cls):
