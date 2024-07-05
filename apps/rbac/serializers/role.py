@@ -25,7 +25,7 @@ class RoleSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'permissions': {'write_only': True},
             'users_amount': {'label': _('Users amount')},
-            'display_name': {'label': _('Display name')}
+            'display_name': {'label': _('Name')}
         }
 
 

@@ -903,7 +903,7 @@
     "LoginCity": "登入城市",
     "LoginConfig": "登入配置",
     "LoginConfirm": "登入覆核",
-    "LoginConfirmUser": "確認方式",
+    "LoginConfirmUser": "登錄複核 受理人",
     "LoginCount": "登入次數",
     "LoginDate": "登入日期",
     "LoginFailed": "登入失敗",
