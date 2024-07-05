@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 16:34+0800\n"
+"POT-Creation-Date: 2024-07-05 18:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,7 +64,8 @@ msgstr "仕上げ"
 
 #: accounts/automations/backup_account/handlers.py:219
 #: accounts/const/automation.py:110
-#: accounts/serializers/automations/change_secret.py:166 audits/const.py:64
+#: accounts/serializers/automations/change_secret.py:166
+#: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
@@ -303,8 +304,9 @@ msgstr "メール"
 msgid "SFTP"
 msgstr "SFTP"
 
-#: accounts/const/automation.py:111 common/const/choices.py:16
-#: terminal/const.py:77 tickets/const.py:29 tickets/const.py:38
+#: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
+#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:29
+#: tickets/const.py:38
 msgid "Pending"
 msgstr "未定"
 
@@ -482,7 +484,7 @@ msgstr "アカウントのバックアップスナップショット"
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
-#: assets/serializers/automations/base.py:39
+#: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
 msgstr "トリガーモード"
 
@@ -575,7 +577,8 @@ msgid "Date finished"
 msgstr "終了日"
 
 #: accounts/models/automations/change_secret.py:44
-#: assets/models/automations/base.py:113 audits/models.py:208
+#: assets/models/automations/base.py:113
+#: assets/serializers/automations/base.py:39 audits/models.py:208
 #: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
@@ -707,9 +710,9 @@ msgstr "パスワードルール"
 #: ops/models/celery.py:80 ops/models/job.py:142 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: settings/models.py:34 settings/models.py:183 settings/serializers/msg.py:86
-#: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:33
-#: terminal/models/component/endpoint.py:12
+#: rbac/serializers/role.py:28 settings/models.py:34 settings/models.py:183
+#: settings/serializers/msg.py:86 settings/serializers/terminal.py:9
+#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
@@ -5073,11 +5076,6 @@ msgstr "システムロールバインディング"
 msgid "Perms"
 msgstr "パーマ"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
-#: terminal/models/virtualapp/virtualapp.py:20
-msgid "Display name"
-msgstr "表示名"
-
 #: rbac/serializers/rolebinding.py:60
 msgid "Has bound this role"
 msgstr "この役割をバインドしました"
@@ -7096,6 +7094,11 @@ msgstr "コミュニティ版"
 #: terminal/models/applet/applet.py:31
 msgid "Enterprise"
 msgstr "エンタープライズ版"
+
+#: terminal/models/applet/applet.py:34
+#: terminal/models/virtualapp/virtualapp.py:20
+msgid "Display name"
+msgstr "表示名"
 
 #: terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:22

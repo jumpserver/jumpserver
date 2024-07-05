@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 16:34+0800\n"
+"POT-Creation-Date: 2024-07-05 18:00+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -63,7 +63,8 @@ msgstr "完成"
 
 #: accounts/automations/backup_account/handlers.py:219
 #: accounts/const/automation.py:110
-#: accounts/serializers/automations/change_secret.py:166 audits/const.py:64
+#: accounts/serializers/automations/change_secret.py:166
+#: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
@@ -302,8 +303,9 @@ msgstr "邮箱"
 msgid "SFTP"
 msgstr "SFTP"
 
-#: accounts/const/automation.py:111 common/const/choices.py:16
-#: terminal/const.py:77 tickets/const.py:29 tickets/const.py:38
+#: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
+#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:29
+#: tickets/const.py:38
 msgid "Pending"
 msgstr "待定的"
 
@@ -481,7 +483,7 @@ msgstr "账号备份快照"
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
-#: assets/serializers/automations/base.py:39
+#: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
 msgstr "触发模式"
 
@@ -574,7 +576,8 @@ msgid "Date finished"
 msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
-#: assets/models/automations/base.py:113 audits/models.py:208
+#: assets/models/automations/base.py:113
+#: assets/serializers/automations/base.py:39 audits/models.py:208
 #: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
@@ -706,9 +709,9 @@ msgstr "密码规则"
 #: ops/models/celery.py:80 ops/models/job.py:142 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: settings/models.py:34 settings/models.py:183 settings/serializers/msg.py:86
-#: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:33
-#: terminal/models/component/endpoint.py:12
+#: rbac/serializers/role.py:28 settings/models.py:34 settings/models.py:183
+#: settings/serializers/msg.py:86 settings/serializers/terminal.py:9
+#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
@@ -5010,11 +5013,6 @@ msgstr "系统角色绑定"
 msgid "Perms"
 msgstr "权限"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
-#: terminal/models/virtualapp/virtualapp.py:20
-msgid "Display name"
-msgstr "显示名称"
-
 #: rbac/serializers/rolebinding.py:60
 msgid "Has bound this role"
 msgstr "已经绑定"
@@ -6967,6 +6965,11 @@ msgstr "社区版"
 msgid "Enterprise"
 msgstr "企业版"
 
+#: terminal/models/applet/applet.py:34
+#: terminal/models/virtualapp/virtualapp.py:20
+msgid "Display name"
+msgstr "显示名称"
+
 #: terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:22
 msgid "Author"
@@ -8560,7 +8563,7 @@ msgstr "组织管理员"
 
 #: users/serializers/user.py:140
 msgid "Can public key authentication"
-msgstr "可以公钥认证吗"
+msgstr "可以使用公钥认证"
 
 #: users/serializers/user.py:242
 msgid "Full name"
