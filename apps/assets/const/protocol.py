@@ -208,6 +208,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': 'admin',
                         'label': _('Auth source'),
                         'help_text': _('The database to authenticate against')
+                    },
+                    'connection_options': {
+                        'type': 'str',
+                        'default': '',
+                        'label': _('Connection options'),
+                        'help_text': _('The connection specific options eg. retryWrites=false&retryReads=false')
                     }
                 }
             },
