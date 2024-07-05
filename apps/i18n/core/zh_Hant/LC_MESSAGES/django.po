@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 18:09+0800\n"
+"POT-Creation-Date: 2024-07-05 16:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -3388,6 +3388,11 @@ msgstr "動作"
 msgid "Is expired"
 msgstr "已過期"
 
+#: authentication/serializers/connection_token.py:43
+#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
+msgid "Org name"
+msgstr "組織名稱"
+
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:153
 msgid "The {} cannot be empty"
@@ -4517,7 +4522,8 @@ msgstr "執行使用者"
 msgid "Run as policy"
 msgstr "使用者策略"
 
-#: ops/models/job.py:222 terminal/notifications.py:174
+#: ops/models/job.py:222 ops/serializers/job.py:92
+#: terminal/notifications.py:174
 msgid "Job"
 msgstr "作業"
 
@@ -4529,7 +4535,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 類型"
 
-#: ops/models/job.py:545
+#: ops/models/job.py:547
 msgid "Job Execution"
 msgstr "作業執行"
 
@@ -4593,7 +4599,11 @@ msgstr "任務類型"
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:90
+#: ops/serializers/job.py:89
+msgid "Task id"
+msgstr "任務 ID"
+
+#: ops/serializers/job.py:98
 msgid "You do not have permission for the current job."
 msgstr "你沒有當前作業的權限。"
 
@@ -4695,10 +4705,6 @@ msgstr "請選擇一個組織後再保存"
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
-
-#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
-msgid "Org name"
-msgstr "組織名稱"
 
 #: orgs/models.py:14
 msgid "GLOBAL"
