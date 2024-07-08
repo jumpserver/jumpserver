@@ -480,7 +480,7 @@ description = "Radically simple IT automation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "v2.14.1.6.zip", hash = "sha256:e4a4e831c9707dc423ff484b6c2fe99a4766ec01b255ed4ae9419a560d33a82d"},
+    {file = "v2.14.1.7.zip", hash = "sha256:0946c5b9ab490eb3d0649fb5a2caa2b91395c208e37c57f7203b386861dd1e52"},
 ]
 
 [package.dependencies]
@@ -492,7 +492,7 @@ resolvelib = ">=0.5.3,<0.9.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.6.zip"
+url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.7.zip"
 
 [[package]]
 name = "ansible-runner"
@@ -7974,4 +7974,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "cb1841823d894e330d7d693adf5f56900d7d0ee7775888d40fd011382c325848"
+content-hash = "ccb73351631ea0a9453b3b260f4d618e5244ee167ff31d30a18705a7554519b9"
