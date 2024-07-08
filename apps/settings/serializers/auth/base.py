@@ -32,7 +32,7 @@ class AuthSettingSerializer(serializers.Serializer):
     )
     FORGOT_PASSWORD_URL = serializers.CharField(
         required=False, allow_blank=True, max_length=1024,
-        label=_("Forgot Password"), 
+        label=_("Forgot Password URL"),
         help_text=_("The URL for Forgotten Password on the user login page")
     )
     LOGIN_REDIRECT_MSG_ENABLED = serializers.BooleanField(

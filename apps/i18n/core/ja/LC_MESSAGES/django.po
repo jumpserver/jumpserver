@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 18:00+0800\n"
+"POT-Creation-Date: 2024-07-08 15:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1086,13 +1086,14 @@ msgstr "SSHキー戦略"
 
 #: accounts/serializers/automations/change_secret.py:57
 msgid "Please enter your account username"
-msgstr "MFAコードを入力してください"
+msgstr "アカウントのユーザー名を入力してください"
 
 #: accounts/serializers/automations/change_secret.py:62
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
-msgstr "暗号化パラメータの設定は現在、ホストタイプのリソースにのみ有効です。"
+msgstr ""
+"パラメータ設定は現在、AIX LINUX UNIX タイプの資産に対してのみ有効です。"
 
 #: accounts/serializers/automations/change_secret.py:84
 msgid "* Please enter the correct password length"
@@ -5357,8 +5358,8 @@ msgstr ""
 "スでユーザーを作成します"
 
 #: settings/serializers/auth/base.py:35
-msgid "Forgot Password"
-msgstr "パスワードを忘れた"
+msgid "Forgot Password URL"
+msgstr "パスワードを忘れた場合のリンク"
 
 #: settings/serializers/auth/base.py:36
 msgid "The URL for Forgotten Password on the user login page"
@@ -5631,7 +5632,7 @@ msgstr "レルム名"
 
 #: settings/serializers/auth/oidc.py:70
 msgid "OpenID Connect"
-msgstr "接続"
+msgstr "OpenID 接続する"
 
 #: settings/serializers/auth/oidc.py:73
 msgid "Provider endpoint"
@@ -5759,7 +5760,7 @@ msgstr "認証コード長"
 
 #: settings/serializers/auth/sms.py:26
 msgid "Length of the sent verification code"
-msgstr "確認コードを送信"
+msgstr "送信された認証コードの長さ"
 
 #: settings/serializers/auth/sms.py:31 settings/serializers/auth/sms.py:54
 #: settings/serializers/auth/sms.py:62 settings/serializers/auth/sms.py:71
@@ -5985,8 +5986,8 @@ msgid "Chat AI"
 msgstr "チャットAI"
 
 #: settings/serializers/feature.py:80
-msgid "Base URL"
-msgstr "ベースサイトのアドレス"
+msgid "GPT Base URL"
+msgstr "GPTアドレス"
 
 #: settings/serializers/feature.py:81
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
@@ -6079,15 +6080,15 @@ msgstr ""
 
 #: settings/serializers/msg.py:33
 msgid "The user to be used for email server authentication"
-msgstr "これは、SSO認証中にメールが返されない場合にデフォルトで使用されます。"
+msgstr ""
+"メールサーバーにログインするためのユーザー名。通常、これはあなたのメールアド"
+"レスです"
 
 #: settings/serializers/msg.py:37
 msgid ""
 "Password to use for the email server. It is used in conjunction with `User` "
 "when authenticating to the email server"
-msgstr ""
-"メールサーバーに対するパスワード。メールサーバーに対する認証時に、これがユー"
-"ザーとともに使用されます"
+msgstr "メールサーバーにログインするためのパスワード"
 
 #: settings/serializers/msg.py:40
 msgid "Sender"

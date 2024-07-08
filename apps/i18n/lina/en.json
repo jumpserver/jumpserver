@@ -924,7 +924,7 @@
     "RecentSession": "Recent sessions",
     "RecentlyUsed": "Recently",
     "Recipient": "Recipient",
-    "RecipientHelpText": "If both recipient a and b are set, the account's key will be split into two parts",
+    "RecipientHelpText": "If both recipients A and B are set, the account's ciphertext will be split into two parts; if only one recipient is set, the key will not be split.",
     "RecipientServer": "Receiving server",
     "Reconnect": "Reconnect",
     "Refresh": "Refresh",

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 18:00+0800\n"
+"POT-Creation-Date: 2024-07-08 15:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1085,13 +1085,13 @@ msgstr "SSH 金鑰更改方式"
 
 #: accounts/serializers/automations/change_secret.py:57
 msgid "Please enter your account username"
-msgstr "請輸入 MFA 驗證碼"
+msgstr "請輸入您的帳戶使用者名稱"
 
 #: accounts/serializers/automations/change_secret.py:62
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
-msgstr "密文參數設定, 目前只對宿主型的資產有效。"
+msgstr "參數設置，目前只對 AIX LINUX UNIX 類型的資產有效。"
 
 #: accounts/serializers/automations/change_secret.py:84
 msgid "* Please enter the correct password length"
@@ -5296,8 +5296,8 @@ msgstr ""
 "統將自動以此電子信箱後綴建立使用者"
 
 #: settings/serializers/auth/base.py:35
-msgid "Forgot Password"
-msgstr "忘記密碼"
+msgid "Forgot Password URL"
+msgstr "忘記密碼連結"
 
 #: settings/serializers/auth/base.py:36
 msgid "The URL for Forgotten Password on the user login page"
@@ -5565,7 +5565,7 @@ msgstr "域"
 
 #: settings/serializers/auth/oidc.py:70
 msgid "OpenID Connect"
-msgstr "Connect"
+msgstr "OpenID 連接"
 
 #: settings/serializers/auth/oidc.py:73
 msgid "Provider endpoint"
@@ -5690,7 +5690,7 @@ msgstr "驗證碼長度"
 
 #: settings/serializers/auth/sms.py:26
 msgid "Length of the sent verification code"
-msgstr "發送驗證碼"
+msgstr "發送的驗證碼長度"
 
 #: settings/serializers/auth/sms.py:31 settings/serializers/auth/sms.py:54
 #: settings/serializers/auth/sms.py:62 settings/serializers/auth/sms.py:71
@@ -5907,8 +5907,8 @@ msgid "Chat AI"
 msgstr "聊天 AI"
 
 #: settings/serializers/feature.py:80
-msgid "Base URL"
-msgstr "JumpServer 地址"
+msgid "GPT Base URL"
+msgstr "GPT 地址"
 
 #: settings/serializers/feature.py:81
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
@@ -5997,15 +5997,13 @@ msgstr ""
 
 #: settings/serializers/msg.py:33
 msgid "The user to be used for email server authentication"
-msgstr "SSO認證時，如果沒有返回郵件地址，將使用該後綴"
+msgstr "登入郵件伺服器的使用者名稱。這通常是你的郵件地址"
 
 #: settings/serializers/msg.py:37
 msgid ""
 "Password to use for the email server. It is used in conjunction with `User` "
 "when authenticating to the email server"
-msgstr ""
-"用於電子郵件伺服器的密碼。在向電子郵件伺服器進行身份驗證時，它與使用者一起使"
-"用"
+msgstr "登入郵件伺服器的密碼"
 
 #: settings/serializers/msg.py:40
 msgid "Sender"
