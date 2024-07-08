@@ -926,7 +926,7 @@
     "RecentSession": "最近会话",
     "RecentlyUsed": "最近使用",
     "Recipient": "接收人",
-    "RecipientHelpText": "若收件人 A B 都设置，账号的密钥将被拆分成前后两部分",
+    "RecipientHelpText": "如果同时设置了收件人A和B，账号的密文将被拆分为两部分；如果只设置了一个收件人，密钥则不会被拆分。",
     "RecipientServer": "接收服务器",
     "Reconnect": "重新连接",
     "Refresh": "刷新",

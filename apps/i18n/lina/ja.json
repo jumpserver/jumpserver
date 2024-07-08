@@ -957,7 +957,7 @@
     "RecentSession": "最近の会話",
     "RecentlyUsed": "最近使用",
     "Recipient": "受取人",
-    "RecipientHelpText": "A B受信者が設定されている場合、アカウントの鍵は前後二つに分割されます",
+    "RecipientHelpText": "受信者 A と B が同時に設定されている場合、アカウントの暗号文は 2 つの部分に分割されます。受信者が 1 つだけ設定されている場合、キーは分割されません。",
     "RecipientServer": "受信サーバー",
     "Reconnect": "再接続",
     "Refresh": "更新",

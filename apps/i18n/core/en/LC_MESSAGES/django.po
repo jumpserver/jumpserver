@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 18:00+0800\n"
+"POT-Creation-Date: 2024-07-08 15:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5245,7 +5245,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/auth/base.py:35
-msgid "Forgot Password"
+msgid "Forgot Password URL"
 msgstr ""
 
 #: settings/serializers/auth/base.py:36
@@ -5834,7 +5834,7 @@ msgid "Chat AI"
 msgstr ""
 
 #: settings/serializers/feature.py:80
-msgid "Base URL"
+msgid "GPT Base URL"
 msgstr ""
 
 #: settings/serializers/feature.py:81
