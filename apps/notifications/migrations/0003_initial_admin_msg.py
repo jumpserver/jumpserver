@@ -8,7 +8,10 @@ def init_user_msg_subscription(apps, schema_editor):
     UserMsgSubscription = apps.get_model('notifications', 'UserMsgSubscription')
 
     receive_backends = ['site_msg', 'email']
-    user = User.objects.get(username='admin')
+    user = User.objects.filter(username='admin').first()
+    if not user:
+        return
+
     UserMsgSubscription.objects.update_or_create(
         defaults={'receive_backends': receive_backends}, user=user
     )

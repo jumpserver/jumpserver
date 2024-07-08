@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 18:00+0800\n"
+"POT-Creation-Date: 2024-07-08 14:07+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1551,7 +1551,7 @@ msgstr "未知"
 
 #: assets/const/automation.py:7
 msgid "OK"
-msgstr ""
+msgstr "成功"
 
 #: assets/const/automation.py:12
 msgid "Ping"
@@ -3809,7 +3809,7 @@ msgstr "运行中"
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:409
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:408
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 创建成功"
@@ -7305,7 +7305,7 @@ msgid "Command and replay storage"
 msgstr "命令及录像存储"
 
 #: terminal/notifications.py:240 terminal/tasks.py:153
-#: xpack/plugins/cloud/api.py:154
+#: xpack/plugins/cloud/api.py:152
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
 msgid "Test failure: Account invalid"
@@ -8903,17 +8903,13 @@ msgid ""
 "strategy will skipped."
 msgstr "根据当前任务配置，不符合“”策略的资产将被跳过。"
 
-#: xpack/plugins/cloud/api.py:66
+#: xpack/plugins/cloud/api.py:64
 msgid "Test connection successful"
 msgstr "测试成功"
 
-#: xpack/plugins/cloud/api.py:68
+#: xpack/plugins/cloud/api.py:66
 msgid "Test connection failed: {}"
 msgstr "测试连接失败：{}"
-
-#: xpack/plugins/cloud/api.py:165
-msgid "User {} deleted the current resource and released the assets"
-msgstr "用户 {} 删除了当前资源已释放的资产"
 
 #: xpack/plugins/cloud/const.py:8
 msgid "Alibaba Cloud"
@@ -9098,49 +9094,49 @@ msgstr "获取区域 \"%s\" 的实例错误，错误：%s"
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "无法同步实例 %s"
 
-#: xpack/plugins/cloud/manager.py:334
+#: xpack/plugins/cloud/manager.py:333
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr "资产“%s”的更新平台与原平台类型不一致。跳过平台和协议更新"
 
-#: xpack/plugins/cloud/manager.py:390
+#: xpack/plugins/cloud/manager.py:389
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "资产 \"%s\" 已存在"
 
-#: xpack/plugins/cloud/manager.py:392
+#: xpack/plugins/cloud/manager.py:391
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "更新资产 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:394
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "资产 \"%s\" 已更新"
 
-#: xpack/plugins/cloud/manager.py:405
+#: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "准备创建资产 %s"
 
-#: xpack/plugins/cloud/manager.py:426
+#: xpack/plugins/cloud/manager.py:425
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "删除节点: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:452
+#: xpack/plugins/cloud/manager.py:451
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "删除账号: %s"
 
-#: xpack/plugins/cloud/manager.py:468
+#: xpack/plugins/cloud/manager.py:467
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "设置协议 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:482 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:481 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 
@@ -9687,3 +9683,6 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "User {} deleted the current resource and released the assets"
+#~ msgstr "用户 {} 删除了当前资源已释放的资产"

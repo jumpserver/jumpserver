@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-05 18:00+0800\n"
+"POT-Creation-Date: 2024-07-08 14:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3778,7 +3778,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:409
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:408
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -7191,7 +7191,7 @@ msgid "Command and replay storage"
 msgstr "Storage"
 
 #: terminal/notifications.py:240 terminal/tasks.py:153
-#: xpack/plugins/cloud/api.py:154
+#: xpack/plugins/cloud/api.py:152
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
 msgid "Test failure: Account invalid"
@@ -8750,16 +8750,12 @@ msgid ""
 "strategy will skipped."
 msgstr ""
 
-#: xpack/plugins/cloud/api.py:66
+#: xpack/plugins/cloud/api.py:64
 msgid "Test connection successful"
 msgstr ""
 
-#: xpack/plugins/cloud/api.py:68
+#: xpack/plugins/cloud/api.py:66
 msgid "Test connection failed: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/api.py:165
-msgid "User {} deleted the current resource and released the assets"
 msgstr ""
 
 #: xpack/plugins/cloud/const.py:8
@@ -8945,49 +8941,49 @@ msgstr ""
 msgid "Failed to synchronize the instance \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:334
+#: xpack/plugins/cloud/manager.py:333
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:390
+#: xpack/plugins/cloud/manager.py:389
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:392
+#: xpack/plugins/cloud/manager.py:391
 #, python-format
 msgid "Update asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:394
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:405
+#: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:426
+#: xpack/plugins/cloud/manager.py:425
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:452
+#: xpack/plugins/cloud/manager.py:451
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:468
+#: xpack/plugins/cloud/manager.py:467
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:482 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:481 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr ""
 
