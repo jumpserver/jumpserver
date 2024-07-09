@@ -81,7 +81,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def get_template_attr_for_account(template):
         # Set initial data from template
         field_names = [
-            'name', 'username', 'secret',
+            'name', 'username', 'secret', 'push_params',
             'secret_type', 'privileged', 'is_active'
         ]
 
@@ -90,7 +90,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             value = getattr(template, name, None)
             if value is None:
                 continue
-            attrs[name] = value
+            if name == 'push_params':
+                attrs['params'] = value
+            else:
+                attrs[name] = value
         attrs['secret'] = template.get_secret()
         return attrs
 
@@ -225,7 +228,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'version',
             'source', 'source_id', 'connectivity',
-        ] + list(set(AccountCreateUpdateSerializerMixin.Meta.fields) - {'params'})
+        ] + AccountCreateUpdateSerializerMixin.Meta.fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + [
             'connectivity'
         ]

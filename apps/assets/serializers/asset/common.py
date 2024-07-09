@@ -323,7 +323,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             template_id = data.get('template', None)
             if template_id:
                 template = AccountTemplate.objects.get(id=template_id)
-                if template and template.su_from:
+                template.push_params = data.pop('push_params', {})
+                data['params'] = template.push_params
+                if template.su_from:
                     su_from_name_username_secret_type_map[template.name] = (
                         template.su_from.username, template.su_from.secret_type
                     )
