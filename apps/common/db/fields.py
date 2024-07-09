@@ -14,7 +14,6 @@ from django.db.models import Q, Manager, QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
-from common.local import add_encrypted_field_set
 from common.utils import contains_ip
 from .utils import Encryptor
 from .validators import PortRangeValidator
@@ -168,7 +167,6 @@ class EncryptTextField(EncryptMixin, models.TextField):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        add_encrypted_field_set(self.verbose_name)
 
 
 class EncryptCharField(EncryptMixin, models.CharField):
@@ -184,7 +182,6 @@ class EncryptCharField(EncryptMixin, models.CharField):
     def __init__(self, *args, **kwargs):
         self.change_max_length(kwargs)
         super().__init__(*args, **kwargs)
-        add_encrypted_field_set(self.verbose_name)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -198,13 +195,11 @@ class EncryptCharField(EncryptMixin, models.CharField):
 class EncryptJsonDictTextField(EncryptMixin, JsonDictTextField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        add_encrypted_field_set(self.verbose_name)
 
 
 class EncryptJsonDictCharField(EncryptMixin, JsonDictCharField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        add_encrypted_field_set(self.verbose_name)
 
 
 class PortField(models.IntegerField):
