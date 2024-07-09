@@ -163,9 +163,9 @@ $(document).ready(function () {
 }).on('click', '.btn-return', function () {
     cancelTicket();
     cancelCloseConfirm();
-    setTimeout(() => {
-        window.location = "{% url 'authentication:login' %}"
-    }, 1000);
+    clearInterval(interval);
+    clearInterval(checkInterval);
+    window.location = "{% url 'authentication:logout' %}"
 })
 
 </script>

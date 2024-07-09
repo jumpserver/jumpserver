@@ -16,6 +16,7 @@ from common.serializers.fields import (
 )
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
+from jumpserver.utils import get_current_request
 from orgs.utils import current_org
 from rbac.builtin import BuiltinRole
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
@@ -353,7 +354,10 @@ class UserSerializer(
         attrs = self.check_disallow_self_update_fields(attrs)
         attrs = self.change_password_to_raw(attrs)
         attrs = self.clean_auth_fields(attrs)
-        attrs.pop("password_strategy", None)
+        password_strategy = attrs.pop("password_strategy", None)
+        request = get_current_request()
+        if request:
+            request.password_strategy = password_strategy
         return attrs
 
     def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):

@@ -110,6 +110,11 @@ class LabelRelatedField(serializers.RelatedField):
             kwargs["queryset"] = queryset
         super().__init__(**kwargs)
 
+    def to_file_representation(self, value):
+        if value is None:
+            return value
+        return "{}:{}".format(value.get('name'), value.get('value'))
+
     def to_representation(self, value):
         if value is None:
             return value
@@ -122,7 +127,7 @@ class LabelRelatedField(serializers.RelatedField):
         from labels.models import LabeledResource, Label
         if data is None:
             return data
-        if isinstance(data, dict) and data.get("id") or data.get("pk"):
+        if isinstance(data, dict) and (data.get("id") or data.get("pk")):
             pk = data.get("id") or data.get("pk")
             label = Label.objects.get(pk=pk)
         else:

@@ -23,7 +23,6 @@ class Translate:
         return dir_names
 
     async def core_trans(self, dir_name):
-        return
         _dir = os.path.join(LOCALE_DIR, dir_name)
         zh_file = os.path.join(_dir, 'zh', 'LC_MESSAGES', 'django.po')
         if not os.path.exists(zh_file):

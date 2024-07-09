@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim as stage-1
+FROM debian:bullseye-slim AS stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
@@ -45,7 +45,7 @@ RUN echo > /opt/jumpserver/config.yml \
         sed -i "s@VERSION = .*@VERSION = '${VERSION}'@g" apps/jumpserver/const.py; \
     fi
 
-FROM python:3.11-slim-bullseye as stage-2
+FROM python:3.11-slim-bullseye AS stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -107,7 +107,8 @@ ARG TOOLS="                           \
         ca-certificates               \
         default-libmysqlclient-dev    \
         openssh-client                \
-        sshpass"
+        sshpass                       \
+        bubblewrap"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \

@@ -5,6 +5,7 @@ import uuid
 from django.conf import settings
 from django.utils._os import safe_join
 
+from common.utils import is_macos
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
 from .interface import interface
@@ -104,7 +105,7 @@ class PlaybookRunner:
             shutil.rmtree(private_env)
 
         kwargs = dict(kwargs)
-        if self.isolate:
+        if self.isolate and not is_macos:
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 

@@ -97,12 +97,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return host
 
         accounts = self.get_accounts(account)
+        error_msg = _("No pending accounts found")
         if not accounts:
-            print(
-                _("No pending accounts found: {name} User ID: {account_ids} Type: {secret_type}").format(
-                    name=asset.name,
-                    account_ids=self.account_ids,
-                    secret_type=self.secret_type))
+            print(f'{asset}: {error_msg}')
             return []
 
         records = []
@@ -229,6 +226,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
     def run(self, *args, **kwargs):
         if self.secret_type and not self.check_secret():
+            self.execution.status = 'success'
+            self.execution.date_finished = timezone.now()
+            self.execution.save()
             return
         super().run(*args, **kwargs)
         recorders = list(self.name_recorder_mapper.values())

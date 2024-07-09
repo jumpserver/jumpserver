@@ -417,3 +417,7 @@ def distinct(seq, key=None):
             seen.add(k)
             result.append(item)
     return result
+
+
+def is_macos():
+    return platform.system() == 'Darwin'

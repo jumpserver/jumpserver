@@ -84,6 +84,14 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
         fields = read_only_fields + [
             "job", "parameters", "creator"
         ]
+        extra_kwargs = {
+            "task_id": {
+                "label": _("Task id"),
+            },
+            "job": {
+                "label": _("Job"),
+            }
+        }
 
     def validate_job(self, job_obj):
         if job_obj.creator != self.context['request'].user:

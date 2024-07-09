@@ -15,6 +15,7 @@ class VirtualAccount(JMSOrgBaseModel):
 
     class Meta:
         unique_together = [('alias', 'org_id')]
+        verbose_name = _('Virtual account')
 
     @property
     def name(self):
