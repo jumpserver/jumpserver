@@ -6,6 +6,20 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def init_user_msg_subscription(apps, schema_editor):
+    User = apps.get_model('users', 'User')
+    UserMsgSubscription = apps.get_model('notifications', 'UserMsgSubscription')
+
+    receive_backends = ['site_msg', 'email']
+    user = User.objects.filter(username='admin').first()
+    if not user:
+        return
+    UserMsgSubscription.objects.update_or_create(
+        defaults={'receive_backends': receive_backends}, user=user
+    )
+
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -57,4 +71,5 @@ class Migration(migrations.Migration):
             name='users',
             field=models.ManyToManyField(related_name='recv_site_messages', through='notifications.SiteMessage', to=settings.AUTH_USER_MODEL),
         ),
+        migrations.RunPython(init_user_msg_subscription)
     ]
