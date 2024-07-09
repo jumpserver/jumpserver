@@ -1551,7 +1551,7 @@ msgstr "未知"
 
 #: assets/const/automation.py:7
 msgid "OK"
-msgstr ""
+msgstr "成功"
 
 #: assets/const/automation.py:12
 msgid "Ping"
