@@ -319,7 +319,8 @@
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
         <div class="mobile-logo" style="padding-bottom: 45px; box-sizing: border-box">
 	        <div class="jms-title">
-                 <img src="{{ INTERFACE.logo }}" alt="Logo"/>
+                <img style="width: 60px; height: 60px" src="{{ INTERFACE.logo_logout }}" alt="Logo"/>
+                <span style="padding-left: 10px">{{ INTERFACE.login_title }}</span>
             </div>
         </div>
         <div class="form-panel">
