@@ -8,7 +8,6 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -25,7 +24,11 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Menu permission',
-                'permissions': [('view_console', 'Can view console view'), ('view_audit', 'Can view audit view'), ('view_workbench', 'Can view workbench view'), ('view_webterminal', 'Can view web terminal'), ('view_filemanager', 'Can view file manager'), ('view_systemtools', 'Can view System Tools')],
+                'permissions': [('view_console', 'Can view console view'), ('view_audit', 'Can view audit view'),
+                                ('view_workbench', 'Can view workbench view'),
+                                ('view_webterminal', 'Can view web terminal'),
+                                ('view_filemanager', 'Can view file manager'),
+                                ('view_systemtools', 'Can view System Tools')],
                 'default_permissions': [],
             },
         ),
@@ -38,7 +41,8 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('scope', models.CharField(choices=[('system', 'System'), ('org', 'Organization')], default='system', max_length=128, verbose_name='Scope')),
+                ('scope', models.CharField(choices=[('system', 'System'), ('org', 'Organization')], default='system',
+                                           max_length=128, verbose_name='Scope')),
                 ('builtin', models.BooleanField(default=False, verbose_name='Builtin')),
                 ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
             ],
@@ -54,6 +58,7 @@ class Migration(migrations.Migration):
                 'proxy': True,
                 'indexes': [],
                 'constraints': [],
+                'verbose_name': 'ContentType'
             },
             bases=('contenttypes.contenttype',),
             managers=[
@@ -84,9 +89,13 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('scope', models.CharField(choices=[('system', 'System'), ('org', 'Organization')], default='system', max_length=128, verbose_name='Scope')),
-                ('org', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='role_bindings', to='orgs.organization', verbose_name='Organization')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='role_bindings', to='rbac.role', verbose_name='Role')),
+                ('scope', models.CharField(choices=[('system', 'System'), ('org', 'Organization')], default='system',
+                                           max_length=128, verbose_name='Scope')),
+                ('org', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                          related_name='role_bindings', to='orgs.organization',
+                                          verbose_name='Organization')),
+                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='role_bindings',
+                                           to='rbac.role', verbose_name='Role')),
             ],
             options={
                 'verbose_name': 'Role binding',
