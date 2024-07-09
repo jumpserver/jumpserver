@@ -167,6 +167,7 @@ elasticsearch8 = "8.13.2"
 polib = "^1.2.0"
 # psycopg2 = "2.9.6"
 psycopg2-binary = "2.9.6"
+pycountry = "^24.6.1"
 
 [tool.poetry.group.xpack]
 optional = true
