@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-17 17:50+0800\n"
+"POT-Creation-Date: 2024-07-09 14:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,7 +384,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:241
+#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:242
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -495,14 +495,14 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:89 ops/models/job.py:242
+#: ops/models/celery.py:89 ops/models/job.py:243
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "終了日"
 
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113 audits/models.py:208
-#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:233
+#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -846,7 +846,7 @@ msgstr "アカウントはすでに存在しています"
 
 #: accounts/serializers/account/account.py:438
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:384
+#: assets/serializers/asset/common.py:385
 msgid "Spec info"
 msgstr "特別情報"
 
@@ -1170,8 +1170,8 @@ msgid "Users"
 msgstr "ユーザー"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 perms/serializers/user_permission.py:75
-#: rbac/tree.py:35
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:384
+#: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "アカウント"
 
@@ -1464,7 +1464,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:275
+#: assets/const/base.py:34 assets/const/protocol.py:281
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1629,15 +1629,23 @@ msgstr "認証データベース"
 msgid "The database to authenticate against"
 msgstr "認証するデータベース"
 
-#: assets/const/protocol.py:222
+#: assets/const/protocol.py:215
+msgid "Connection options"
+msgstr "接続オプション"
+
+#: assets/const/protocol.py:216
+msgid "The connection specific options eg. retryWrites=false&retryReads=false"
+msgstr "接続固有のオプション、例：retryWrites=false&retryReads=false"
+
+#: assets/const/protocol.py:228
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:245
+#: assets/const/protocol.py:251
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:247
+#: assets/const/protocol.py:253
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
@@ -1645,24 +1653,24 @@ msgstr ""
 "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへ"
 "のアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:252 assets/models/asset/web.py:9
+#: assets/const/protocol.py:258 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:260 assets/models/asset/web.py:10
+#: assets/const/protocol.py:266 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:265 assets/models/asset/web.py:11
+#: assets/const/protocol.py:271 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:270 assets/models/asset/web.py:12
+#: assets/const/protocol.py:276 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:293
+#: assets/const/protocol.py:299
 msgid "API mode"
 msgstr "APIモード"
 
@@ -1689,7 +1697,7 @@ msgstr "SSHパブリックキー"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: audits/models.py:269 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:240 users/models/user.py:1059
+#: ops/models/job.py:241 users/models/user.py:1059
 msgid "Date created"
 msgstr "作成された日付"
 
@@ -1809,7 +1817,7 @@ msgstr "ドメイン"
 msgid "Node"
 msgstr "ノード"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:385
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:386
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
@@ -1858,7 +1866,7 @@ msgstr "証明書チェックを無視"
 msgid "Proxy"
 msgstr "プロキシー"
 
-#: assets/models/automations/base.py:22 ops/models/job.py:236
+#: assets/models/automations/base.py:22 ops/models/job.py:237
 #: settings/serializers/auth/sms.py:103
 msgid "Parameters"
 msgstr "パラメータ"
@@ -2144,7 +2152,7 @@ msgid "Node path"
 msgstr "ノードパスです"
 
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:386
+#: assets/serializers/asset/common.py:387
 msgid "Auto info"
 msgstr "自動情報"
 
@@ -2626,7 +2634,7 @@ msgstr "オフラインユーザセッション"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:151
-#: ops/models/job.py:239 ops/models/playbook.py:30
+#: ops/models/job.py:240 ops/models/playbook.py:30
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "作成者"
@@ -2712,11 +2720,11 @@ msgstr "仮パスワード"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:117
+#: audits/tasks.py:118
 msgid "Clean audits session task log"
 msgstr "資産監査セッションタスクログのクリーンアップ"
 
-#: audits/tasks.py:130
+#: audits/tasks.py:131
 msgid "Upload FTP file to external storage"
 msgstr "外部ストレージへのFTPファイルのアップロード"
 
@@ -4131,15 +4139,15 @@ msgstr "システムメッセージ"
 msgid "Publish the station message"
 msgstr "投稿サイトニュース"
 
-#: ops/ansible/inventory.py:107 ops/models/job.py:65
+#: ops/ansible/inventory.py:106 ops/models/job.py:65
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:286
+#: ops/ansible/inventory.py:285
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:302
+#: ops/ansible/inventory.py:301
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -4372,12 +4380,12 @@ msgstr "最後の実行"
 msgid "Date last run"
 msgstr "最終実行日"
 
-#: ops/models/base.py:51 ops/models/job.py:237
+#: ops/models/base.py:51 ops/models/job.py:238
 #: xpack/plugins/cloud/models.py:207
 msgid "Result"
 msgstr "結果"
 
-#: ops/models/base.py:52 ops/models/job.py:238
+#: ops/models/base.py:52 ops/models/job.py:239
 msgid "Summary"
 msgstr "概要"
 
@@ -4429,19 +4437,19 @@ msgstr "ユーザーとして実行"
 msgid "Runas policy"
 msgstr "ユーザー ポリシー"
 
-#: ops/models/job.py:221
+#: ops/models/job.py:222
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
-#: ops/models/job.py:244
+#: ops/models/job.py:245
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:246
+#: ops/models/job.py:247
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:544
+#: ops/models/job.py:545
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -4589,7 +4597,7 @@ msgstr "組織のリソース ({}) は削除できません"
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: orgs/mixins/models.py:48
+#: orgs/mixins/models.py:48 orgs/mixins/models.py:73
 msgid "Please save in a org"
 msgstr "組織を選択してから保存してください"
 
@@ -6698,7 +6706,7 @@ msgid "High"
 msgstr "高い"
 
 #: terminal/const.py:47 terminal/const.py:84
-#: users/templates/users/reset_password.html:50
+#: users/templates/users/reset_password.html:53
 msgid "Normal"
 msgstr "正常"
 
@@ -8524,23 +8532,23 @@ msgstr "パスワードを満たす必要があります"
 msgid "Password strength"
 msgstr "パスワードの強さ"
 
-#: users/templates/users/reset_password.html:48
+#: users/templates/users/reset_password.html:51
 msgid "Very weak"
 msgstr "非常に弱い"
 
-#: users/templates/users/reset_password.html:49
+#: users/templates/users/reset_password.html:52
 msgid "Weak"
 msgstr "弱い"
 
-#: users/templates/users/reset_password.html:51
+#: users/templates/users/reset_password.html:54
 msgid "Medium"
 msgstr "中"
 
-#: users/templates/users/reset_password.html:52
+#: users/templates/users/reset_password.html:55
 msgid "Strong"
 msgstr "強い"
 
-#: users/templates/users/reset_password.html:53
+#: users/templates/users/reset_password.html:56
 msgid "Very strong"
 msgstr "非常に強い"
 
