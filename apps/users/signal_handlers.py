@@ -67,11 +67,17 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
+    if instance.source != User.Source.local.value:
+        return
+
     passwords = UserPasswordHistory.objects \
         .filter(user=instance) \
         .order_by('-date_created') \
         .values_list('password', flat=True)
     passwords = passwords[:int(settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT)]
+
+    if not passwords:
+        return
 
     for p in passwords:
         if instance.password == p:
