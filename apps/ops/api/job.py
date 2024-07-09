@@ -29,6 +29,7 @@ __all__ = [
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
+from ops.const import COMMAND_EXECUTION_DISABLED
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
@@ -73,7 +74,7 @@ class JobViewSet(OrgBulkModelViewSet):
             return super().check_permissions(request)
         # job: adhoc, playbook
         if not settings.SECURITY_COMMAND_EXECUTION:
-            return self.permission_denied(request, "Command execution disabled")
+            return self.permission_denied(request, COMMAND_EXECUTION_DISABLED)
         return super().check_permissions(request)
 
     def check_upload_permission(self, assets, account_name):
@@ -201,6 +202,11 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     model = JobExecution
     search_fields = ('material',)
     filterset_fields = ['status', 'job_id']
+
+    def check_permissions(self, request):
+        if not settings.SECURITY_COMMAND_EXECUTION:
+            return self.permission_denied(request, COMMAND_EXECUTION_DISABLED)
+        return super().check_permissions(request)
 
     @staticmethod
     def start_deploy(instance, serializer):
