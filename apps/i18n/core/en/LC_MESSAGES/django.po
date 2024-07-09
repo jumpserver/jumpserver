@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-08 15:32+0800\n"
+"POT-Creation-Date: 2024-07-09 16:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -123,7 +123,7 @@ msgstr ""
 #: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:9
 #: authentication/confirm/password.py:24 authentication/confirm/password.py:26
 #: authentication/forms.py:28
-#: authentication/templates/authentication/login.html:323
+#: authentication/templates/authentication/login.html:362
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:50
 #: settings/serializers/msg.py:36 settings/serializers/terminal.py:28
 #: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
@@ -153,7 +153,7 @@ msgstr ""
 msgid "API key"
 msgstr ""
 
-#: accounts/const/account.py:14 common/db/fields.py:235
+#: accounts/const/account.py:14 common/db/fields.py:230
 #: settings/serializers/terminal.py:14
 msgid "All"
 msgstr ""
@@ -174,7 +174,7 @@ msgstr ""
 msgid "Specified account"
 msgstr ""
 
-#: accounts/const/account.py:26 users/models/user.py:791
+#: accounts/const/account.py:26 users/models/user.py:792
 msgid "Local"
 msgstr ""
 
@@ -294,7 +294,7 @@ msgstr ""
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:58 users/forms/profile.py:100
-#: users/forms/profile.py:108 users/models/user.py:902
+#: users/forms/profile.py:108 users/models/user.py:903
 #: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
@@ -373,7 +373,7 @@ msgid "Version"
 msgstr ""
 
 #: accounts/models/account.py:57 accounts/serializers/account/account.py:220
-#: users/models/user.py:963
+#: users/models/user.py:964
 msgid "Source"
 msgstr ""
 
@@ -622,7 +622,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: terminal/serializers/storage.py:136 users/forms/profile.py:31
-#: users/forms/profile.py:114 users/models/user.py:900
+#: users/forms/profile.py:114 users/models/user.py:901
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
@@ -719,7 +719,7 @@ msgstr ""
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:32 users/models/group.py:13
-#: users/models/preference.py:11 users/models/user.py:901
+#: users/models/preference.py:11 users/models/user.py:902
 #: xpack/plugins/cloud/models.py:33 xpack/plugins/cloud/models.py:296
 #: xpack/plugins/cloud/serializers/task.py:74
 msgid "Name"
@@ -944,8 +944,8 @@ msgstr ""
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1124
-#: users/models/user.py:1168
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1125
+#: users/models/user.py:1169
 msgid "User"
 msgstr ""
 
@@ -1032,7 +1032,7 @@ msgstr ""
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:295 users/models/user.py:935
+#: tickets/models/ticket/general.py:295 users/models/user.py:936
 #: xpack/plugins/cloud/models.py:40 xpack/plugins/cloud/models.py:121
 msgid "Comment"
 msgstr "Description"
@@ -1464,7 +1464,7 @@ msgstr ""
 msgid "Deletion failed and the node contains assets"
 msgstr ""
 
-#: assets/api/tree.py:49 assets/serializers/node.py:42
+#: assets/api/tree.py:48 assets/serializers/node.py:42
 msgid "The same level node name cannot be the same"
 msgstr ""
 
@@ -1549,7 +1549,7 @@ msgid "Gather facts"
 msgstr ""
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:32 users/models/user.py:688
+#: terminal/serializers/applet_host.py:32 users/models/user.py:689
 msgid "Disabled"
 msgstr ""
 
@@ -1559,7 +1559,7 @@ msgstr ""
 msgid "Basic"
 msgstr ""
 
-#: assets/const/base.py:34 assets/const/protocol.py:275
+#: assets/const/base.py:34 assets/const/protocol.py:281
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr ""
@@ -1724,38 +1724,48 @@ msgstr ""
 msgid "The database to authenticate against"
 msgstr ""
 
-#: assets/const/protocol.py:222
+#: assets/const/protocol.py:215
+#, fuzzy
+#| msgid "More login options"
+msgid "Connection options"
+msgstr "Or"
+
+#: assets/const/protocol.py:216
+msgid "The connection specific options eg. retryWrites=false&retryReads=false"
+msgstr ""
+
+#: assets/const/protocol.py:228
 msgid "Auth username"
 msgstr ""
 
-#: assets/const/protocol.py:245
+#: assets/const/protocol.py:251
 msgid "Safe mode"
 msgstr ""
 
-#: assets/const/protocol.py:247
+#: assets/const/protocol.py:253
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 
-#: assets/const/protocol.py:252 assets/models/asset/web.py:9
+#: assets/const/protocol.py:258 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr ""
 
-#: assets/const/protocol.py:260 assets/models/asset/web.py:10
+#: assets/const/protocol.py:266 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr ""
 
-#: assets/const/protocol.py:265 assets/models/asset/web.py:11
+#: assets/const/protocol.py:271 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr ""
 
-#: assets/const/protocol.py:270 assets/models/asset/web.py:12
+#: assets/const/protocol.py:276 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr ""
 
-#: assets/const/protocol.py:293
+#: assets/const/protocol.py:299
 msgid "API mode"
 msgstr ""
 
@@ -1868,7 +1878,7 @@ msgstr ""
 
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:241
-#: users/models/user.py:1171
+#: users/models/user.py:1172
 msgid "Date created"
 msgstr ""
 
@@ -1889,17 +1899,17 @@ msgid "Date verified"
 msgstr ""
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
-#: users/models/group.py:25 users/models/user.py:907
+#: users/models/group.py:25 users/models/user.py:908
 msgid "User group"
 msgstr ""
 
 #: assets/models/cmd_filter.py:42 common/db/models.py:35
-#: users/models/user.py:983
+#: users/models/user.py:984
 msgid "Date updated"
 msgstr ""
 
 #: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:91
-#: common/db/models.py:32 users/models/user.py:945
+#: common/db/models.py:32 users/models/user.py:946
 #: users/serializers/group.py:32
 msgid "Created by"
 msgstr ""
@@ -1936,7 +1946,7 @@ msgstr ""
 msgid "Gateway"
 msgstr ""
 
-#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1150
+#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1151
 msgid "System"
 msgstr ""
 
@@ -2009,7 +2019,7 @@ msgstr ""
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:38
-#: terminal/serializers/applet_host.py:33 users/models/user.py:689
+#: terminal/serializers/applet_host.py:33 users/models/user.py:690
 msgid "Enabled"
 msgstr ""
 
@@ -2494,8 +2504,8 @@ msgstr ""
 msgid "Connect"
 msgstr ""
 
-#: audits/const.py:30 authentication/templates/authentication/login.html:290
-#: authentication/templates/authentication/login.html:362
+#: audits/const.py:30 authentication/templates/authentication/login.html:329
+#: authentication/templates/authentication/login.html:401
 #: templates/_header_bar.html:101
 msgid "Login"
 msgstr "Sign in"
@@ -2554,11 +2564,11 @@ msgstr ""
 msgid "-"
 msgstr ""
 
-#: audits/handler.py:116
+#: audits/handler.py:126
 msgid "Yes"
 msgstr ""
 
-#: audits/handler.py:116
+#: audits/handler.py:126
 msgid "No"
 msgstr ""
 
@@ -2645,7 +2655,7 @@ msgstr ""
 
 #: audits/models.py:200 audits/serializers.py:52
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:63 users/models/user.py:923
+#: users/forms/profile.py:63 users/models/user.py:924
 #: users/serializers/profile.py:97
 msgid "MFA"
 msgstr ""
@@ -2703,7 +2713,7 @@ msgstr ""
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:942
+#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:943
 msgid "Date expired"
 msgstr ""
 
@@ -2737,29 +2747,29 @@ msgstr ""
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:78 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:10 settings/serializers/auth/wecom.py:15
-#: users/models/user.py:798 users/models/user.py:966
+#: users/models/user.py:799 users/models/user.py:967
 msgid "WeCom"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:105
 #: authentication/views/login.py:90 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:10
-#: settings/serializers/auth/feishu.py:12 users/models/user.py:800
-#: users/models/user.py:972
+#: settings/serializers/auth/feishu.py:12 users/models/user.py:801
+#: users/models/user.py:973
 msgid "FeiShu"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:40 authentication/views/login.py:102
 #: authentication/views/slack.py:87 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:10 settings/serializers/auth/slack.py:12
-#: users/models/user.py:802 users/models/user.py:978
+#: users/models/user.py:803 users/models/user.py:979
 msgid "Slack"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:159
 #: authentication/views/login.py:84 notifications/backends/__init__.py:12
-#: settings/serializers/auth/dingtalk.py:10 users/models/user.py:799
-#: users/models/user.py:969
+#: settings/serializers/auth/dingtalk.py:10 users/models/user.py:800
+#: users/models/user.py:970
 msgid "DingTalk"
 msgstr ""
 
@@ -2839,7 +2849,7 @@ msgid ""
 msgstr ""
 
 #: authentication/api/password.py:65
-#: authentication/templates/authentication/login.html:354
+#: authentication/templates/authentication/login.html:393
 #: users/templates/users/forgot_password.html:41
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/forgot_password_previewing.html:13
@@ -3541,17 +3551,17 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: authentication/templates/authentication/login.html:270
+#: authentication/templates/authentication/login.html:308
 msgid ""
 "Configuration file has problems and cannot be logged in. Please contact the "
 "administrator or view latest docs"
 msgstr ""
 
-#: authentication/templates/authentication/login.html:271
+#: authentication/templates/authentication/login.html:309
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 
-#: authentication/templates/authentication/login.html:369
+#: authentication/templates/authentication/login.html:408
 msgid "More login options"
 msgstr "Or"
 
@@ -3792,62 +3802,62 @@ msgstr ""
 msgid "gettext_lazy"
 msgstr ""
 
-#: common/db/fields.py:106
+#: common/db/fields.py:105
 msgid "Marshal dict data to char field"
 msgstr ""
 
-#: common/db/fields.py:110
+#: common/db/fields.py:109
 msgid "Marshal dict data to text field"
 msgstr ""
 
-#: common/db/fields.py:122
+#: common/db/fields.py:121
 msgid "Marshal list data to char field"
 msgstr ""
 
-#: common/db/fields.py:126
+#: common/db/fields.py:125
 msgid "Marshal list data to text field"
 msgstr ""
 
-#: common/db/fields.py:130
+#: common/db/fields.py:129
 msgid "Marshal data to char field"
 msgstr ""
 
-#: common/db/fields.py:134
+#: common/db/fields.py:133
 msgid "Marshal data to text field"
 msgstr ""
 
-#: common/db/fields.py:167
+#: common/db/fields.py:166
 msgid "Encrypt field using Secret Key"
 msgstr ""
 
-#: common/db/fields.py:582
+#: common/db/fields.py:577
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
 "'match': 'exact', 'value': '1.1.1.1'}}"
 msgstr ""
 
-#: common/db/fields.py:589
+#: common/db/fields.py:584
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr ""
 
-#: common/db/fields.py:592
+#: common/db/fields.py:587
 msgid "Invalid ids for ids, should be a list"
 msgstr ""
 
-#: common/db/fields.py:594 common/db/fields.py:599
-#: common/serializers/fields.py:147 tickets/serializers/ticket/common.py:58
+#: common/db/fields.py:589 common/db/fields.py:594
+#: common/serializers/fields.py:144 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
 msgid "This field is required."
 msgstr ""
 
-#: common/db/fields.py:597 common/db/fields.py:602
+#: common/db/fields.py:592 common/db/fields.py:597
 msgid "Invalid attrs, should be a list of dict"
 msgstr ""
 
-#: common/db/fields.py:604
+#: common/db/fields.py:599
 msgid "Invalid attrs, should be has name and value"
 msgstr ""
 
@@ -3859,7 +3869,7 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: common/db/models.py:33 users/models/user.py:948
+#: common/db/models.py:33 users/models/user.py:949
 msgid "Updated by"
 msgstr ""
 
@@ -4017,25 +4027,25 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: common/serializers/fields.py:140
+#: common/serializers/fields.py:137
 msgid "Invalid data type"
 msgstr ""
 
-#: common/serializers/fields.py:148
+#: common/serializers/fields.py:145
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr ""
 
-#: common/serializers/fields.py:149
+#: common/serializers/fields.py:146
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr ""
 
-#: common/serializers/fields.py:223
+#: common/serializers/fields.py:220
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/serializers/fields.py:238
+#: common/serializers/fields.py:235
 msgid "Invalid choice: {}"
 msgstr ""
 
@@ -4204,34 +4214,34 @@ msgstr ""
 msgid "Task {} args or kwargs error"
 msgstr ""
 
-#: ops/api/job.py:82
+#: ops/api/job.py:83
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr ""
 
-#: ops/api/job.py:83
+#: ops/api/job.py:84
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr ""
 
-#: ops/api/job.py:84
+#: ops/api/job.py:85
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr ""
 
-#: ops/api/job.py:169
+#: ops/api/job.py:170
 msgid "Duplicate file exists"
 msgstr ""
 
-#: ops/api/job.py:174
+#: ops/api/job.py:175
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
 
-#: ops/api/job.py:238
+#: ops/api/job.py:244
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr ""
@@ -4362,6 +4372,10 @@ msgstr ""
 
 #: ops/const.py:75
 msgid "Timeout"
+msgstr ""
+
+#: ops/const.py:82
+msgid "Command execution disabled"
 msgstr ""
 
 #: ops/exception.py:6
@@ -4931,7 +4945,7 @@ msgid "Scope"
 msgstr ""
 
 #: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user.py:910
+#: users/models/user.py:911
 msgid "Role"
 msgstr ""
 
@@ -5319,7 +5333,7 @@ msgstr ""
 msgid "Dingtalk"
 msgstr ""
 
-#: settings/serializers/auth/lark.py:12 users/models/user.py:801
+#: settings/serializers/auth/lark.py:12 users/models/user.py:802
 msgid "Lark"
 msgstr ""
 
@@ -5635,7 +5649,7 @@ msgstr ""
 msgid "Template code"
 msgstr ""
 
-#: settings/serializers/auth/sms.py:40 users/models/user.py:920
+#: settings/serializers/auth/sms.py:40 users/models/user.py:921
 #: users/serializers/user.py:155
 msgid "Phone"
 msgstr ""
@@ -6275,7 +6289,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/terminal.py:34 users/forms/profile.py:172
-#: users/models/user.py:933
+#: users/models/user.py:934
 #: xpack/plugins/cloud/serializers/account_attrs.py:210
 msgid "Public key"
 msgstr ""
@@ -7435,7 +7449,7 @@ msgstr ""
 msgid "HOST"
 msgstr ""
 
-#: terminal/serializers/storage.py:146 users/models/user.py:930
+#: terminal/serializers/storage.py:146 users/models/user.py:931
 #: xpack/plugins/cloud/serializers/account_attrs.py:213
 msgid "Private key"
 msgstr ""
@@ -8165,68 +8179,68 @@ msgstr ""
 msgid "Preference"
 msgstr ""
 
-#: users/models/user.py:690
+#: users/models/user.py:691
 msgid "Force enabled"
 msgstr ""
 
-#: users/models/user.py:913 users/serializers/user.py:271
+#: users/models/user.py:914 users/serializers/user.py:271
 msgid "Is service account"
 msgstr "Is service account"
 
-#: users/models/user.py:915
+#: users/models/user.py:916
 msgid "Avatar"
 msgstr ""
 
-#: users/models/user.py:917
+#: users/models/user.py:918
 msgid "Wechat"
 msgstr ""
 
-#: users/models/user.py:926
+#: users/models/user.py:927
 msgid "OTP secret key"
 msgstr ""
 
-#: users/models/user.py:936 users/serializers/profile.py:124
+#: users/models/user.py:937 users/serializers/profile.py:124
 #: users/serializers/user.py:268
 msgid "Is first login"
 msgstr "First login"
 
-#: users/models/user.py:954
+#: users/models/user.py:955
 msgid "Date password last updated"
 msgstr "Password updated"
 
-#: users/models/user.py:957
+#: users/models/user.py:958
 msgid "Need update password"
 msgstr ""
 
-#: users/models/user.py:981
+#: users/models/user.py:982
 msgid "Date api key used"
 msgstr ""
 
-#: users/models/user.py:1119
+#: users/models/user.py:1120
 msgid "Can not delete admin user"
 msgstr ""
 
-#: users/models/user.py:1133
+#: users/models/user.py:1134
 msgid "Can invite user"
 msgstr ""
 
-#: users/models/user.py:1134
+#: users/models/user.py:1135
 msgid "Can remove user"
 msgstr ""
 
-#: users/models/user.py:1135
+#: users/models/user.py:1136
 msgid "Can match user"
 msgstr ""
 
-#: users/models/user.py:1146
+#: users/models/user.py:1147
 msgid "Administrator"
 msgstr ""
 
-#: users/models/user.py:1149
+#: users/models/user.py:1150
 msgid "Administrator is the super user of system"
 msgstr ""
 
-#: users/models/user.py:1181
+#: users/models/user.py:1182
 msgid "User password history"
 msgstr ""
 
