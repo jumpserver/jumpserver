@@ -1,7 +1,7 @@
 ARG VERSION
 
-FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} as build-xpack
-FROM python:3.11-slim-bullseye as build-core
+FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} AS build-xpack
+FROM python:3.11-slim-bullseye AS build-core
 ARG BUILD_DEPENDENCIES="              \
         g++"
 
