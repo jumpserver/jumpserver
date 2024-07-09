@@ -25,6 +25,7 @@
     "PauseSession": "Pause Session",
     "ReadOnly": "Read-Only",
     "Remove": "Remove",
+    "Confirm": "Confirm",
     "RemoveShareUser": "You have been removed from the shared session.",
     "RemoveShareUserConfirm": "Are you sure to remove the user from the shared session?",
     "ResumeSession": "Resume Session",
