@@ -321,6 +321,7 @@ class RoleManager(models.Manager):
         add_ids = role_ids - old_ids
         self.remove(*del_ids)
         self.add(*add_ids)
+        self.user.save(update_fields=['date_updated'])
 
     def remove(self, *roles):
         if not roles:
