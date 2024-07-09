@@ -2181,6 +2181,8 @@ def create_internal_platforms(apps, *args):
     platforms_data = json.loads(platforms_data_json)
 
     for platform_data in platforms_data:
+        protocols = platform_data.pop('protocols', [])
+        platform_data['protocols'] = [p for p in protocols if p.pop('primary', True) is not None]
         AllTypes.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls,
                                                    automation_cls=automation_cls)
 
