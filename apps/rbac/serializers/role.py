@@ -27,6 +27,7 @@ class RoleSerializer(serializers.ModelSerializer):
             'users_amount': {'label': _('Users amount')},
             'display_name': {'label': _('Name')}
         }
+        fields_unexport = ['permissions']
 
 
 class RoleUserSerializer(serializers.ModelSerializer):
