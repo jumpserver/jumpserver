@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-17 17:52+0800\n"
+"POT-Creation-Date: 2024-07-09 14:15+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -383,7 +383,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:241
+#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:242
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -494,14 +494,14 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:89 ops/models/job.py:242
+#: ops/models/celery.py:89 ops/models/job.py:243
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113 audits/models.py:208
-#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:233
+#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -844,7 +844,7 @@ msgstr "账号已存在"
 
 #: accounts/serializers/account/account.py:438
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:384
+#: assets/serializers/asset/common.py:385
 msgid "Spec info"
 msgstr "特殊信息"
 
@@ -1164,8 +1164,8 @@ msgid "Users"
 msgstr "用户管理"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 perms/serializers/user_permission.py:75
-#: rbac/tree.py:35
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:384
+#: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号管理"
 
@@ -1454,7 +1454,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:275
+#: assets/const/base.py:34 assets/const/protocol.py:281
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1618,39 +1618,47 @@ msgstr "认证数据库"
 msgid "The database to authenticate against"
 msgstr "要进行身份验证的数据库"
 
-#: assets/const/protocol.py:222
+#: assets/const/protocol.py:215
+msgid "Connection options"
+msgstr "连接选项"
+
+#: assets/const/protocol.py:216
+msgid "The connection specific options eg. retryWrites=false&retryReads=false"
+msgstr "连接选项，例如 retryWrites=false&retryReads=false"
+
+#: assets/const/protocol.py:228
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:245
+#: assets/const/protocol.py:251
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:247
+#: assets/const/protocol.py:253
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:252 assets/models/asset/web.py:9
+#: assets/const/protocol.py:258 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:260 assets/models/asset/web.py:10
+#: assets/const/protocol.py:266 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:265 assets/models/asset/web.py:11
+#: assets/const/protocol.py:271 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:270 assets/models/asset/web.py:12
+#: assets/const/protocol.py:276 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:293
+#: assets/const/protocol.py:299
 msgid "API mode"
 msgstr "API 模式"
 
@@ -1679,7 +1687,7 @@ msgstr "SSH公钥"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: audits/models.py:269 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:240 users/models/user.py:1059
+#: ops/models/job.py:241 users/models/user.py:1059
 msgid "Date created"
 msgstr "创建日期"
 
@@ -1799,7 +1807,7 @@ msgstr "网域"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:385
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:386
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集资产硬件信息"
@@ -1848,7 +1856,7 @@ msgstr "忽略证书校验"
 msgid "Proxy"
 msgstr "代理"
 
-#: assets/models/automations/base.py:22 ops/models/job.py:236
+#: assets/models/automations/base.py:22 ops/models/job.py:237
 #: settings/serializers/auth/sms.py:103
 msgid "Parameters"
 msgstr "参数"
@@ -2132,7 +2140,7 @@ msgid "Node path"
 msgstr "节点路径"
 
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:386
+#: assets/serializers/asset/common.py:387
 msgid "Auto info"
 msgstr "自动化信息"
 
@@ -2607,7 +2615,7 @@ msgstr "下线用户会话"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:151
-#: ops/models/job.py:239 ops/models/playbook.py:30
+#: ops/models/job.py:240 ops/models/playbook.py:30
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "创建者"
@@ -2693,11 +2701,11 @@ msgstr "临时密码"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:117
+#: audits/tasks.py:118
 msgid "Clean audits session task log"
 msgstr "清理资产审计会话任务日志"
 
-#: audits/tasks.py:130
+#: audits/tasks.py:131
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
@@ -4078,15 +4086,15 @@ msgstr "系统信息"
 msgid "Publish the station message"
 msgstr "发布站内消息"
 
-#: ops/ansible/inventory.py:107 ops/models/job.py:65
+#: ops/ansible/inventory.py:106 ops/models/job.py:65
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:286
+#: ops/ansible/inventory.py:285
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:302
+#: ops/ansible/inventory.py:301
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -4314,12 +4322,12 @@ msgstr "最后执行"
 msgid "Date last run"
 msgstr "最后运行日期"
 
-#: ops/models/base.py:51 ops/models/job.py:237
+#: ops/models/base.py:51 ops/models/job.py:238
 #: xpack/plugins/cloud/models.py:207
 msgid "Result"
 msgstr "结果"
 
-#: ops/models/base.py:52 ops/models/job.py:238
+#: ops/models/base.py:52 ops/models/job.py:239
 msgid "Summary"
 msgstr "汇总"
 
@@ -4371,19 +4379,19 @@ msgstr "运行用户"
 msgid "Runas policy"
 msgstr "用户策略"
 
-#: ops/models/job.py:221
+#: ops/models/job.py:222
 msgid "Job"
 msgstr "作业"
 
-#: ops/models/job.py:244
+#: ops/models/job.py:245
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:246
+#: ops/models/job.py:247
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:544
+#: ops/models/job.py:545
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -6596,7 +6604,7 @@ msgid "High"
 msgstr "较高"
 
 #: terminal/const.py:47 terminal/const.py:84
-#: users/templates/users/reset_password.html:50
+#: users/templates/users/reset_password.html:53
 msgid "Normal"
 msgstr "正常"
 
@@ -8402,23 +8410,23 @@ msgstr "您的密码必须满足："
 msgid "Password strength"
 msgstr "密码强度："
 
-#: users/templates/users/reset_password.html:48
+#: users/templates/users/reset_password.html:51
 msgid "Very weak"
 msgstr "很弱"
 
-#: users/templates/users/reset_password.html:49
+#: users/templates/users/reset_password.html:52
 msgid "Weak"
 msgstr "弱"
 
-#: users/templates/users/reset_password.html:51
+#: users/templates/users/reset_password.html:54
 msgid "Medium"
 msgstr "一般"
 
-#: users/templates/users/reset_password.html:52
+#: users/templates/users/reset_password.html:55
 msgid "Strong"
 msgstr "强"
 
-#: users/templates/users/reset_password.html:53
+#: users/templates/users/reset_password.html:56
 msgid "Very strong"
 msgstr "很强"
 
