@@ -120,6 +120,8 @@ class OperatorLogHandler(metaclass=Singleton):
         encrypt_value = '******'
         new_data = {}
         for label, item in dict_item.items():
+            if not isinstance(item, (dict,)):
+                continue
             value = item.get('value', '')
             field_name = item.get('name', '')
             if isinstance(value, bool):
