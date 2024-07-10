@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 16:23+0800\n"
+"POT-Creation-Date: 2024-07-10 18:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -68,7 +68,7 @@ msgstr "完成"
 #: accounts/serializers/automations/change_secret.py:166
 #: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
+#: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -77,7 +77,7 @@ msgstr "成功"
 #: accounts/automations/backup_account/handlers.py:221
 #: accounts/const/account.py:34 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:167 audits/const.py:65
-#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
+#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:66
 #: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:47
 msgid "Failed"
 msgstr "失敗"
@@ -306,7 +306,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
-#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:29
+#: common/const/choices.py:63 terminal/const.py:77 tickets/const.py:29
 #: tickets/const.py:38
 msgid "Pending"
 msgstr "待定的"
@@ -598,7 +598,7 @@ msgstr "狀態"
 #: assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
-#: authentication/views/base.py:44 common/const/choices.py:20
+#: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr "錯誤"
@@ -2592,11 +2592,11 @@ msgstr "任務"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:126
+#: audits/handler.py:128
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:126
+#: audits/handler.py:128
 msgid "No"
 msgstr "否"
 
@@ -2812,11 +2812,11 @@ msgstr "臨時密碼"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:130
+#: audits/tasks.py:131
 msgid "Clean audits session task log"
 msgstr "清理資產審計會話任務日誌"
 
-#: audits/tasks.py:143
+#: audits/tasks.py:145
 msgid "Upload FTP file to external storage"
 msgstr "上傳 FTP 文件到外部儲存"
 
@@ -3801,23 +3801,27 @@ msgstr "請使用密碼登錄，然後綁定企業微信"
 msgid "Request file format may be wrong"
 msgstr "上傳的檔案格式錯誤 或 其它類型資源的文件"
 
-#: common/const/choices.py:10
+#: common/const/choices.py:40
+msgid "China"
+msgstr "中國"
+
+#: common/const/choices.py:57
 msgid "Manual trigger"
 msgstr "手動觸發"
 
-#: common/const/choices.py:11
+#: common/const/choices.py:58
 msgid "Timing trigger"
 msgstr "定時觸發"
 
-#: common/const/choices.py:15
+#: common/const/choices.py:62
 msgid "Ready"
 msgstr "準備"
 
-#: common/const/choices.py:17 ops/const.py:73
+#: common/const/choices.py:64 ops/const.py:73
 msgid "Running"
 msgstr "運行中"
 
-#: common/const/choices.py:21
+#: common/const/choices.py:68
 msgid "Canceled"
 msgstr "取消"
 
@@ -8652,7 +8656,7 @@ msgid ""
 msgstr ""
 "管理員已開啟'僅允許已存在用戶登錄'，當前用戶不在用戶列表中，請聯絡管理員。"
 
-#: users/signal_handlers.py:171
+#: users/signal_handlers.py:170
 msgid "Clean up expired user sessions"
 msgstr "清除過期的用戶會話"
 

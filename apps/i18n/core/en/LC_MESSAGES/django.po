@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 16:23+0800\n"
+"POT-Creation-Date: 2024-07-10 18:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,7 +67,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:166
 #: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
+#: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -76,7 +76,7 @@ msgstr "Success"
 #: accounts/automations/backup_account/handlers.py:221
 #: accounts/const/account.py:34 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:167 audits/const.py:65
-#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
+#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:66
 #: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:47
 msgid "Failed"
 msgstr ""
@@ -305,7 +305,7 @@ msgid "SFTP"
 msgstr ""
 
 #: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
-#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:29
+#: common/const/choices.py:63 terminal/const.py:77 tickets/const.py:29
 #: tickets/const.py:38
 msgid "Pending"
 msgstr ""
@@ -597,7 +597,7 @@ msgstr ""
 #: assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
-#: authentication/views/base.py:44 common/const/choices.py:20
+#: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr ""
@@ -2533,7 +2533,7 @@ msgstr ""
 #: terminal/models/session/sharing.py:128 tickets/const.py:25
 #: xpack/plugins/cloud/const.py:67
 msgid "Finished"
-msgstr "結束"
+msgstr ""
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
@@ -2564,11 +2564,11 @@ msgstr ""
 msgid "-"
 msgstr ""
 
-#: audits/handler.py:126
+#: audits/handler.py:128
 msgid "Yes"
 msgstr ""
 
-#: audits/handler.py:126
+#: audits/handler.py:128
 msgid "No"
 msgstr ""
 
@@ -2784,11 +2784,11 @@ msgstr ""
 msgid "Passkey"
 msgstr ""
 
-#: audits/tasks.py:130
+#: audits/tasks.py:131
 msgid "Clean audits session task log"
 msgstr ""
 
-#: audits/tasks.py:143
+#: audits/tasks.py:145
 msgid "Upload FTP file to external storage"
 msgstr ""
 
@@ -3768,23 +3768,27 @@ msgstr ""
 msgid "Request file format may be wrong"
 msgstr ""
 
-#: common/const/choices.py:10
+#: common/const/choices.py:40
+msgid "China"
+msgstr ""
+
+#: common/const/choices.py:57
 msgid "Manual trigger"
 msgstr ""
 
-#: common/const/choices.py:11
+#: common/const/choices.py:58
 msgid "Timing trigger"
 msgstr ""
 
-#: common/const/choices.py:15
+#: common/const/choices.py:62
 msgid "Ready"
 msgstr ""
 
-#: common/const/choices.py:17 ops/const.py:73
+#: common/const/choices.py:64 ops/const.py:73
 msgid "Running"
 msgstr ""
 
-#: common/const/choices.py:21
+#: common/const/choices.py:68
 msgid "Canceled"
 msgstr ""
 
@@ -8490,7 +8494,7 @@ msgid ""
 "administrator."
 msgstr ""
 
-#: users/signal_handlers.py:171
+#: users/signal_handlers.py:170
 msgid "Clean up expired user sessions"
 msgstr ""
 
