@@ -28,7 +28,9 @@ Prepare a clean Linux Server ( 64 bit, >= 4c8g )
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Access JumpServer in your browser at `http://your-ip/`, `admin`/`ChangeMe`
+Access JumpServer in your browser at `http://your-jumpserverip/`
+- Username: `admin`
+- Password: `ChangeMe`
 
 ## Screenshots
 
