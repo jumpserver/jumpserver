@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 14:15+0800\n"
+"POT-Creation-Date: 2024-07-10 18:14+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -265,8 +265,8 @@ msgstr "用戶 %s 查看/匯出 了密碼"
 
 #: accounts/models/account.py:49
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:213
-#: accounts/serializers/account/account.py:258
+#: accounts/serializers/account/account.py:216
+#: accounts/serializers/account/account.py:261
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:108
 #: accounts/serializers/automations/change_secret.py:140
@@ -286,8 +286,8 @@ msgid "Asset"
 msgstr "資產"
 
 #: accounts/models/account.py:53 accounts/models/template.py:16
-#: accounts/serializers/account/account.py:220
-#: accounts/serializers/account/account.py:268
+#: accounts/serializers/account/account.py:223
+#: accounts/serializers/account/account.py:271
 #: accounts/serializers/account/template.py:27
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
@@ -299,7 +299,7 @@ msgstr "切換自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:215
+#: accounts/models/account.py:57 accounts/serializers/account/account.py:218
 #: users/models/user.py:860
 msgid "Source"
 msgstr "來源"
@@ -516,7 +516,7 @@ msgid "Status"
 msgstr "狀態"
 
 #: accounts/models/automations/change_secret.py:47
-#: accounts/serializers/account/account.py:260
+#: accounts/serializers/account/account.py:263
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
@@ -592,7 +592,7 @@ msgid "Verify asset account"
 msgstr "帳號驗證"
 
 #: accounts/models/base.py:37 accounts/models/base.py:67
-#: accounts/serializers/account/account.py:443
+#: accounts/serializers/account/account.py:446
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:47
 #: authentication/serializers/connect_token_secret.py:42
@@ -773,7 +773,7 @@ msgstr "立即推送"
 msgid "Exist policy"
 msgstr "帳號存在策略"
 
-#: accounts/serializers/account/account.py:193 applications/models.py:11
+#: accounts/serializers/account/account.py:196 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:95
 #: assets/serializers/asset/common.py:125 assets/serializers/cagegory.py:12
 #: assets/serializers/platform.py:140 assets/serializers/platform.py:229
@@ -782,7 +782,7 @@ msgstr "帳號存在策略"
 msgid "Category"
 msgstr "類別"
 
-#: accounts/serializers/account/account.py:194
+#: accounts/serializers/account/account.py:197
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -802,25 +802,25 @@ msgstr "類別"
 msgid "Type"
 msgstr "類型"
 
-#: accounts/serializers/account/account.py:209
+#: accounts/serializers/account/account.py:212
 msgid "Asset not found"
 msgstr "資產不存在"
 
-#: accounts/serializers/account/account.py:249
+#: accounts/serializers/account/account.py:252
 msgid "Has secret"
 msgstr "已託管密碼"
 
-#: accounts/serializers/account/account.py:259 ops/models/celery.py:83
+#: accounts/serializers/account/account.py:262 ops/models/celery.py:83
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:46
 #: tickets/models/ticket/general.py:277 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr "狀態"
 
-#: accounts/serializers/account/account.py:261
+#: accounts/serializers/account/account.py:264
 msgid "Changed"
 msgstr "已修改"
 
-#: accounts/serializers/account/account.py:271
+#: accounts/serializers/account/account.py:274
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
@@ -831,33 +831,33 @@ msgstr "已修改"
 msgid "Assets"
 msgstr "資產"
 
-#: accounts/serializers/account/account.py:326
+#: accounts/serializers/account/account.py:329
 msgid "Account already exists"
 msgstr "帳號已存在"
 
-#: accounts/serializers/account/account.py:376
+#: accounts/serializers/account/account.py:379
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "資產不支持帳號類型: %s"
 
-#: accounts/serializers/account/account.py:408
+#: accounts/serializers/account/account.py:411
 msgid "Account has exist"
 msgstr "帳號已存在"
 
-#: accounts/serializers/account/account.py:438
+#: accounts/serializers/account/account.py:441
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:385
+#: assets/serializers/asset/common.py:387
 msgid "Spec info"
 msgstr "特殊資訊"
 
-#: accounts/serializers/account/account.py:444
+#: accounts/serializers/account/account.py:447
 #: authentication/serializers/connect_token_secret.py:159
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:454 acls/serializers/base.py:116
+#: accounts/serializers/account/account.py:457 acls/serializers/base.py:116
 #: acls/templates/acls/asset_login_reminder.html:5
 #: acls/templates/acls/user_login_reminder.html:5
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
@@ -878,7 +878,7 @@ msgstr "ID"
 msgid "User"
 msgstr "用戶"
 
-#: accounts/serializers/account/account.py:455
+#: accounts/serializers/account/account.py:458
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
@@ -1166,7 +1166,7 @@ msgid "Users"
 msgstr "用戶管理"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:384
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:386
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "帳號管理"
@@ -1382,7 +1382,7 @@ msgstr "不能刪除根節點 ({})"
 msgid "Deletion failed and the node contains assets"
 msgstr "刪除失敗，節點包含資產"
 
-#: assets/api/tree.py:49 assets/serializers/node.py:42
+#: assets/api/tree.py:48 assets/serializers/node.py:42
 msgid "The same level node name cannot be the same"
 msgstr "同級別節點名字不能重複"
 
@@ -1809,7 +1809,7 @@ msgstr "網域"
 msgid "Node"
 msgstr "節點"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:386
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集資產硬體資訊"
@@ -2142,7 +2142,7 @@ msgid "Node path"
 msgstr "節點路徑"
 
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:389
 msgid "Auto info"
 msgstr "自動化資訊"
 
@@ -2703,11 +2703,11 @@ msgstr "臨時密碼"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:118
+#: audits/tasks.py:119
 msgid "Clean audits session task log"
 msgstr "清理資產審計會話任務日誌"
 
-#: audits/tasks.py:131
+#: audits/tasks.py:133
 msgid "Upload FTP file to external storage"
 msgstr "上傳 FTP 文件到外部儲存"
 
@@ -8277,7 +8277,7 @@ msgid ""
 msgstr ""
 "管理員已開啟'僅允許已存在用戶登錄'，當前用戶不在用戶列表中，請聯絡管理員。"
 
-#: users/signal_handlers.py:167
+#: users/signal_handlers.py:166
 msgid "Clean up expired user sessions"
 msgstr "清除過期的用戶會話"
 
