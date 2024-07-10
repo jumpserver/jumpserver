@@ -16,6 +16,7 @@ from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import get_log_keep_day, get_logger
 from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
+from orgs.utils import tmp_to_root_org
 from terminal.backends import server_replay_storage
 from terminal.models import Session, Command
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
@@ -119,13 +120,14 @@ def clean_expired_session_period():
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_audits_log_period():
     print("Start clean audit session task log")
-    clean_login_log_period()
-    clean_operation_log_period()
-    clean_ftp_log_period()
-    clean_activity_log_period()
-    clean_celery_tasks_period()
-    clean_expired_session_period()
-    clean_password_change_log_period()
+    with tmp_to_root_org():
+        clean_login_log_period()
+        clean_operation_log_period()
+        clean_ftp_log_period()
+        clean_activity_log_period()
+        clean_celery_tasks_period()
+        clean_expired_session_period()
+        clean_password_change_log_period()
 
 
 @shared_task(verbose_name=_('Upload FTP file to external storage'))
