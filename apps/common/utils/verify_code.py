@@ -13,9 +13,9 @@ from common.utils.random import random_string
 logger = get_logger(__file__)
 
 
-@shared_task(verbose_name=_('Send email'))
-def send_async(sender):
-    sender.gen_and_send()
+@shared_task(verbose_name=_('Send SMS code'))
+def send_sms_async(target, code):
+    SMS().send_verify_code(target, code)
 
 
 class SendAndVerifyCodeUtil(object):
@@ -35,7 +35,7 @@ class SendAndVerifyCodeUtil(object):
             logger.warning('Send sms too frequently, delay {}'.format(ttl))
             raise CodeSendTooFrequently(ttl)
 
-        return send_async.apply_async(kwargs={"sender": self}, priority=100)
+        return self.gen_and_send()
 
     def gen_and_send(self):
         try:
@@ -72,13 +72,15 @@ class SendAndVerifyCodeUtil(object):
         return code
 
     def __send_with_sms(self):
-        sms = SMS()
-        sms.send_verify_code(self.target, self.code)
+        send_sms_async.apply_async(args=(self.target, self.code), priority=100)
 
     def __send_with_email(self):
-        subject = self.other_args.get('subject')
-        message = self.other_args.get('message')
-        send_mail_async(subject, message, [self.target], html_message=message)
+        subject = self.other_args.get('subject', '')
+        message = self.other_args.get('message', '')
+        send_mail_async.apply_async(
+            args=(subject, message, [self.target]),
+            kwargs={'html_message': message}, priority=100
+        )
 
     def __send(self, code):
         """
