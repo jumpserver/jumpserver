@@ -27,14 +27,6 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-ARG RECEPTOR_VERSION=v1.4.5
-RUN set -ex \
-    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION/v/}_linux_${TARGETARCH}.tar.gz \
-    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
-    && chown root:root /usr/local/bin/receptor \
-    && chmod 755 /usr/local/bin/receptor \
-    && rm -f /opt/receptor.tar.gz
-
 ARG VERSION
 
 WORKDIR /opt/jumpserver
