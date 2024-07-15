@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from rest_framework.exceptions import APIException
 
 from common.sdk.im.mixin import RequestMixin, BaseRequest
@@ -53,6 +54,7 @@ class FeishuRequests(BaseRequest):
     )
     code_key = 'code'
     msg_key = 'msg'
+    url_instance = URL()
 
     def __init__(self, app_id, app_secret, timeout=None):
         self._app_id = app_id
@@ -65,7 +67,7 @@ class FeishuRequests(BaseRequest):
 
     def request_access_token(self):
         data = {'app_id': self._app_id, 'app_secret': self._app_secret}
-        response = self.raw_request('post', url=URL().get_token, data=data)
+        response = self.raw_request('post', url=self.url_instance.get_token, data=data)
         self.check_errcode_is_0(response)
 
         access_token = response['tenant_access_token']
@@ -82,6 +84,7 @@ class FeiShu(RequestMixin):
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """
     requests_cls = FeishuRequests
+    attributes = settings.LARK_RENAME_ATTRIBUTES
 
     def __init__(self, app_id, app_secret, timeout=None):
         self._app_id = app_id or ''
@@ -92,6 +95,7 @@ class FeiShu(RequestMixin):
             app_secret=app_secret,
             timeout=timeout
         )
+        self.url_instance = self._requests.url_instance
 
     def get_user_id_by_code(self, code):
         # https://open.feishu.cn/document/ukTMukTMukTM/uEDO4UjLxgDO14SM4gTN
@@ -101,7 +105,7 @@ class FeiShu(RequestMixin):
             'code': code
         }
 
-        data = self._requests.post(URL().get_user_info_by_code, json=body, check_errcode_is_0=False)
+        data = self._requests.post(self.url_instance.get_user_info_by_code, json=body, check_errcode_is_0=False)
 
         self._requests.check_errcode_is_0(data)
         return data['data']['user_id'], data['data']
@@ -126,7 +130,7 @@ class FeiShu(RequestMixin):
 
             try:
                 logger.info(f'{self.__class__.__name__} send text: user_ids={user_ids} msg={msg}')
-                self._requests.post(URL().send_message, params=params, json=body)
+                self._requests.post(self.url_instance.send_message, params=params, json=body)
             except APIException as e:
                 # 只处理可预知的错误
                 logger.exception(e)
@@ -134,13 +138,24 @@ class FeiShu(RequestMixin):
         return invalid_users
 
     @staticmethod
-    def get_user_detail(user_id, **kwargs):
-        # get_user_id_by_code 已经返回个人信息，这里直接解析
-        data = kwargs['other_info']
-        username = user_id
+    def default_user_detail(data):
+        username = data['user_id']
         name = data.get('name', username)
         email = data.get('email') or data.get('enterprise_email')
         email = construct_user_email(username, email)
         return {
             'username': username, 'name': name, 'email': email
         }
+
+    def get_user_detail(self, user_id, **kwargs):
+        # get_user_id_by_code 已经返回个人信息，这里直接解析
+        data = kwargs['other_info']
+        data['user_id'] = user_id
+        detail = self.default_user_detail(data)
+
+        for local_name, remote_name in self.attributes.items():
+            value = data.get(remote_name)
+            if not value:
+                continue
+            detail[local_name] = value
+        return detail
