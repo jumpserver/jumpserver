@@ -37,6 +37,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {
+            'org_name': {'label': _('Org name')},
             'from_ticket': {'read_only': True},
             'value': {'read_only': True},
             'is_expired': {'read_only': True, 'label': _('Is expired')},
