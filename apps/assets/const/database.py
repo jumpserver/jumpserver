@@ -117,5 +117,6 @@ class DatabaseTypes(BaseType):
     @classmethod
     def get_community_types(cls):
         return [
-            cls.MYSQL, cls.MARIADB, cls.MONGODB, cls.REDIS
+            cls.MYSQL, cls.MARIADB, cls.POSTGRESQL,
+            cls.MONGODB, cls.REDIS,
         ]
