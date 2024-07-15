@@ -20,7 +20,7 @@ from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from ._auth import AuthMixin, MFAMixin
 from ._json import JSONFilterMixin
-from ._role import RoleMixin
+from ._role import RoleMixin, SystemRoleManager, OrgRoleManager
 from ._source import SourceMixin, Source
 from ._token import TokenMixin
 
