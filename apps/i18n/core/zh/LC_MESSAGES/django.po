@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:39+0800\n"
+"POT-Creation-Date: 2024-07-15 16:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -63,7 +63,8 @@ msgstr "完成"
 
 #: accounts/automations/backup_account/handlers.py:219
 #: accounts/const/automation.py:110
-#: accounts/serializers/automations/change_secret.py:166 audits/const.py:64
+#: accounts/serializers/automations/change_secret.py:166
+#: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
@@ -302,8 +303,9 @@ msgstr "邮箱"
 msgid "SFTP"
 msgstr "SFTP"
 
-#: accounts/const/automation.py:111 common/const/choices.py:16
-#: terminal/const.py:77 tickets/const.py:29 tickets/const.py:38
+#: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
+#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:29
+#: tickets/const.py:38
 msgid "Pending"
 msgstr "待定的"
 
@@ -481,7 +483,7 @@ msgstr "账号备份快照"
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
-#: assets/serializers/automations/base.py:39
+#: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
 msgstr "触发模式"
 
@@ -574,7 +576,8 @@ msgid "Date finished"
 msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
-#: assets/models/automations/base.py:113 audits/models.py:208
+#: assets/models/automations/base.py:113
+#: assets/serializers/automations/base.py:39 audits/models.py:208
 #: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
@@ -706,9 +709,9 @@ msgstr "密码规则"
 #: ops/models/celery.py:80 ops/models/job.py:142 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: settings/models.py:34 settings/models.py:183 settings/serializers/msg.py:86
-#: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:33
-#: terminal/models/component/endpoint.py:12
+#: rbac/serializers/role.py:28 settings/models.py:34 settings/models.py:183
+#: settings/serializers/msg.py:86 settings/serializers/terminal.py:9
+#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
@@ -1080,13 +1083,13 @@ msgstr "SSH 密钥更改方式"
 
 #: accounts/serializers/automations/change_secret.py:57
 msgid "Please enter your account username"
-msgstr "请输入 MFA 验证码"
+msgstr "请输入您的账户用户名"
 
 #: accounts/serializers/automations/change_secret.py:62
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
-msgstr "秘文参数设置，目前只对宿主类型的资产有效。"
+msgstr "参数设置当前仅对 AIX LINUX UNIX 类型资产有效"
 
 #: accounts/serializers/automations/change_secret.py:84
 msgid "* Please enter the correct password length"
@@ -2715,7 +2718,7 @@ msgstr "原因描述"
 
 #: audits/serializers.py:70 audits/serializers.py:184
 msgid "Auth backend display"
-msgstr "没有匹配到认证后端"
+msgstr "认证方式"
 
 #: audits/serializers.py:134
 #, python-format
@@ -3379,7 +3382,12 @@ msgstr "工单信息"
 msgid "Actions"
 msgstr "动作"
 
-#: authentication/serializers/connection_token.py:42
+#: authentication/serializers/connection_token.py:40
+#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
+msgid "Org name"
+msgstr "组织名称"
+
+#: authentication/serializers/connection_token.py:43
 #: perms/serializers/permission.py:44 perms/serializers/permission.py:65
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
@@ -4272,27 +4280,27 @@ msgstr "正在创建任务，无法中断，请稍后重试。"
 msgid "Currently playbook is being used in a job"
 msgstr "当前 playbook 正在作业中使用"
 
-#: ops/api/playbook.py:96
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr "不支持的文件内容"
 
-#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr "无效的文件路径"
 
-#: ops/api/playbook.py:170
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr "该文件不能重命名"
 
-#: ops/api/playbook.py:189
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr "文件已存在"
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr "文件密钥该字段是必填项。"
 
-#: ops/api/playbook.py:210
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr "无法删除此文件"
 
@@ -4513,7 +4521,8 @@ msgstr "运行用户"
 msgid "Run as policy"
 msgstr "用户策略"
 
-#: ops/models/job.py:222 terminal/notifications.py:174
+#: ops/models/job.py:222 ops/serializers/job.py:92
+#: terminal/notifications.py:174
 msgid "Job"
 msgstr "作业"
 
@@ -4525,7 +4534,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:545
+#: ops/models/job.py:548
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -4589,7 +4598,11 @@ msgstr "任务类型"
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:90
+#: ops/serializers/job.py:89
+msgid "Task id"
+msgstr "任务 ID"
+
+#: ops/serializers/job.py:98
 msgid "You do not have permission for the current job."
 msgstr "你没有当前作业的权限。"
 
@@ -4691,10 +4704,6 @@ msgstr "请选择一个组织后再保存"
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "组织"
-
-#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
-msgid "Org name"
-msgstr "组织名称"
 
 #: orgs/models.py:14
 msgid "GLOBAL"
@@ -5003,11 +5012,6 @@ msgstr "系统角色绑定"
 msgid "Perms"
 msgstr "权限"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
-#: terminal/models/virtualapp/virtualapp.py:20
-msgid "Display name"
-msgstr "显示名称"
-
 #: rbac/serializers/rolebinding.py:60
 msgid "Has bound this role"
 msgstr "已经绑定"
@@ -5286,8 +5290,8 @@ msgstr ""
 "以此邮箱后缀创建用户"
 
 #: settings/serializers/auth/base.py:35
-msgid "Forgot Password"
-msgstr "忘记密码"
+msgid "Forgot Password URL"
+msgstr "忘记密码的 URL"
 
 #: settings/serializers/auth/base.py:36
 msgid "The URL for Forgotten Password on the user login page"
@@ -5382,15 +5386,15 @@ msgstr "绑定 DN"
 
 #: settings/serializers/auth/ldap.py:47
 msgid "Binding Distinguished Name"
-msgstr "绑定专有名称"
+msgstr "绑定目录管理员"
 
 #: settings/serializers/auth/ldap.py:51
 msgid "Binding password"
-msgstr "原来密码"
+msgstr "绑定密码"
 
 #: settings/serializers/auth/ldap.py:54
 msgid "Search OU"
-msgstr "系统架构"
+msgstr "用户 OU"
 
 #: settings/serializers/auth/ldap.py:56
 msgid ""
@@ -5555,7 +5559,7 @@ msgstr "域"
 
 #: settings/serializers/auth/oidc.py:70
 msgid "OpenID Connect"
-msgstr "连接"
+msgstr "OpenID 连接"
 
 #: settings/serializers/auth/oidc.py:73
 msgid "Provider endpoint"
@@ -5680,7 +5684,7 @@ msgstr "验证码长度"
 
 #: settings/serializers/auth/sms.py:26
 msgid "Length of the sent verification code"
-msgstr "发送验证码"
+msgstr "发送验证码的长度"
 
 #: settings/serializers/auth/sms.py:31 settings/serializers/auth/sms.py:54
 #: settings/serializers/auth/sms.py:62 settings/serializers/auth/sms.py:71
@@ -5897,7 +5901,9 @@ msgid "Chat AI"
 msgstr "聊天 AI"
 
 #: settings/serializers/feature.py:80
-msgid "Base URL"
+#, fuzzy
+#| msgid "Base URL"
+msgid "GPT Base URL"
 msgstr "JumpServer 地址"
 
 #: settings/serializers/feature.py:81
@@ -5987,7 +5993,7 @@ msgstr ""
 
 #: settings/serializers/msg.py:33
 msgid "The user to be used for email server authentication"
-msgstr "SSO认证时，如果没有返回邮件地址，将使用该后缀"
+msgstr "登录到邮件服务器的用户名。这通常是你的邮件地址"
 
 #: settings/serializers/msg.py:37
 msgid ""
@@ -6959,6 +6965,11 @@ msgstr "社区版"
 #: terminal/models/applet/applet.py:31
 msgid "Enterprise"
 msgstr "企业版"
+
+#: terminal/models/applet/applet.py:34
+#: terminal/models/virtualapp/virtualapp.py:20
+msgid "Display name"
+msgstr "显示名称"
 
 #: terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:22
@@ -8553,7 +8564,7 @@ msgstr "组织管理员"
 
 #: users/serializers/user.py:140
 msgid "Can public key authentication"
-msgstr "可以公钥认证吗"
+msgstr "可以使用公钥认证"
 
 #: users/serializers/user.py:242
 msgid "Full name"

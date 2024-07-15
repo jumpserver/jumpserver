@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-03 16:39+0800\n"
+"POT-Creation-Date: 2024-07-15 16:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,7 +64,8 @@ msgstr ""
 
 #: accounts/automations/backup_account/handlers.py:219
 #: accounts/const/automation.py:110
-#: accounts/serializers/automations/change_secret.py:166 audits/const.py:64
+#: accounts/serializers/automations/change_secret.py:166
+#: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
@@ -303,8 +304,9 @@ msgstr ""
 msgid "SFTP"
 msgstr ""
 
-#: accounts/const/automation.py:111 common/const/choices.py:16
-#: terminal/const.py:77 tickets/const.py:29 tickets/const.py:38
+#: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
+#: common/const/choices.py:16 terminal/const.py:77 tickets/const.py:29
+#: tickets/const.py:38
 msgid "Pending"
 msgstr ""
 
@@ -482,7 +484,7 @@ msgstr ""
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
-#: assets/serializers/automations/base.py:39
+#: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
 msgstr ""
 
@@ -575,7 +577,8 @@ msgid "Date finished"
 msgstr ""
 
 #: accounts/models/automations/change_secret.py:44
-#: assets/models/automations/base.py:113 audits/models.py:208
+#: assets/models/automations/base.py:113
+#: assets/serializers/automations/base.py:39 audits/models.py:208
 #: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
 #: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
@@ -707,9 +710,9 @@ msgstr ""
 #: ops/models/celery.py:80 ops/models/job.py:142 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: settings/models.py:34 settings/models.py:183 settings/serializers/msg.py:86
-#: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:33
-#: terminal/models/component/endpoint.py:12
+#: rbac/serializers/role.py:28 settings/models.py:34 settings/models.py:183
+#: settings/serializers/msg.py:86 settings/serializers/terminal.py:9
+#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
@@ -3350,7 +3353,12 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: authentication/serializers/connection_token.py:42
+#: authentication/serializers/connection_token.py:40
+#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
+msgid "Org name"
+msgstr "Organization"
+
+#: authentication/serializers/connection_token.py:43
 #: perms/serializers/permission.py:44 perms/serializers/permission.py:65
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
@@ -4231,27 +4239,27 @@ msgstr ""
 msgid "Currently playbook is being used in a job"
 msgstr ""
 
-#: ops/api/playbook.py:96
+#: ops/api/playbook.py:97
 msgid "Unsupported file content"
 msgstr ""
 
-#: ops/api/playbook.py:98 ops/api/playbook.py:144 ops/api/playbook.py:192
+#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
 msgid "Invalid file path"
 msgstr ""
 
-#: ops/api/playbook.py:170
+#: ops/api/playbook.py:171
 msgid "This file can not be rename"
 msgstr ""
 
-#: ops/api/playbook.py:189
+#: ops/api/playbook.py:190
 msgid "File already exists"
 msgstr ""
 
-#: ops/api/playbook.py:207
+#: ops/api/playbook.py:208
 msgid "File key is required"
 msgstr ""
 
-#: ops/api/playbook.py:210
+#: ops/api/playbook.py:211
 msgid "This file can not be delete"
 msgstr ""
 
@@ -4472,7 +4480,8 @@ msgstr ""
 msgid "Run as policy"
 msgstr ""
 
-#: ops/models/job.py:222 terminal/notifications.py:174
+#: ops/models/job.py:222 ops/serializers/job.py:92
+#: terminal/notifications.py:174
 msgid "Job"
 msgstr ""
 
@@ -4484,7 +4493,7 @@ msgstr ""
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:545
+#: ops/models/job.py:548
 msgid "Job Execution"
 msgstr ""
 
@@ -4548,7 +4557,11 @@ msgstr ""
 msgid "Is finished"
 msgstr "Finished"
 
-#: ops/serializers/job.py:90
+#: ops/serializers/job.py:89
+msgid "Task id"
+msgstr ""
+
+#: ops/serializers/job.py:98
 msgid "You do not have permission for the current job."
 msgstr ""
 
@@ -4650,10 +4663,6 @@ msgstr "請選擇一個組織後再保存"
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr ""
-
-#: orgs/mixins/serializers.py:26 rbac/serializers/rolebinding.py:27
-msgid "Org name"
-msgstr "Organization"
 
 #: orgs/models.py:14
 msgid "GLOBAL"
@@ -4959,11 +4968,6 @@ msgstr ""
 msgid "Perms"
 msgstr ""
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
-#: terminal/models/virtualapp/virtualapp.py:20
-msgid "Display name"
-msgstr ""
-
 #: rbac/serializers/rolebinding.py:60
 msgid "Has bound this role"
 msgstr ""
@@ -5240,7 +5244,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/auth/base.py:35
-msgid "Forgot Password"
+msgid "Forgot Password URL"
 msgstr ""
 
 #: settings/serializers/auth/base.py:36
@@ -5829,7 +5833,7 @@ msgid "Chat AI"
 msgstr ""
 
 #: settings/serializers/feature.py:80
-msgid "Base URL"
+msgid "GPT Base URL"
 msgstr ""
 
 #: settings/serializers/feature.py:81
@@ -6844,6 +6848,11 @@ msgstr ""
 
 #: terminal/models/applet/applet.py:31
 msgid "Enterprise"
+msgstr ""
+
+#: terminal/models/applet/applet.py:34
+#: terminal/models/virtualapp/virtualapp.py:20
+msgid "Display name"
 msgstr ""
 
 #: terminal/models/applet/applet.py:36
