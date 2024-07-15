@@ -171,12 +171,9 @@ class AllTypes(ChoicesMixin):
             (Category.DEVICE, DeviceTypes),
             (Category.DATABASE, DatabaseTypes),
             (Category.WEB, WebTypes),
+            (Category.CLOUD, CloudTypes),
+            (Category.CUSTOM, CustomTypes),
         ]
-        if settings.XPACK_ENABLED:
-            types.extend([
-                (Category.CLOUD, CloudTypes),
-                (Category.CUSTOM, CustomTypes),
-            ])
         return types
 
     @classmethod
