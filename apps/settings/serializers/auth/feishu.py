@@ -12,3 +12,10 @@ class FeiShuSettingSerializer(serializers.Serializer):
     AUTH_FEISHU = serializers.BooleanField(default=False, label=_('FeiShu'))
     FEISHU_APP_ID = serializers.CharField(max_length=256, required=True, label='App ID')
     FEISHU_APP_SECRET = EncryptedField(max_length=256, required=False, label='App Secret')
+    FEISHU_RENAME_ATTRIBUTES = serializers.JSONField(
+        required=False, label=_('User attribute'),
+        help_text=_(
+            "User attribute mapping, where the `key` is the CAS service user attribute name "
+            "and the `value` is the JumpServer user attribute name"
+        )
+    )
