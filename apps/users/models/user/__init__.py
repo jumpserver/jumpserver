@@ -4,7 +4,7 @@
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager as _UserManager
 from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -30,6 +30,15 @@ __all__ = [
     "UserPasswordHistory",
     "MFAMixin"
 ]
+
+
+class UserManager(_UserManager):
+    def get_by_natural_key(self, username_or_mail):
+        q = models.Q(username=username_or_mail) | models.Q(email=username_or_mail)
+        user = self.filter(q).first()
+        if not user:
+            raise self.model.DoesNotExist
+        return user
 
 
 class User(
@@ -127,6 +136,7 @@ class User(
         null=True, blank=True, verbose_name=_("Date api key used")
     )
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+    objects = UserManager()
     DATE_EXPIRED_WARNING_DAYS = 5
 
     def __str__(self):
