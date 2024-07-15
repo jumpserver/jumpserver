@@ -248,6 +248,9 @@ class JobExecution(JMSOrgBaseModel):
 
     # clean up zombie execution
 
+    def get_status_display(self):
+        return dict(JobStatus.choices).get(self.status, self.status)
+
     @classmethod
     def clean_unexpected_execution(cls):
         for execution in cls.objects.filter(status__in=[JobStatus.running]).all():

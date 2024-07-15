@@ -924,7 +924,7 @@
     "RecentSession": "Recent sessions",
     "RecentlyUsed": "Recently",
     "Recipient": "Recipient",
-    "RecipientHelpText": "If both recipient a and b are set, the account's key will be split into two parts",
+    "RecipientHelpText": "If both recipients A and B are set, the account's ciphertext will be split into two parts; if only one recipient is set, the key will not be split.",
     "RecipientServer": "Receiving server",
     "Reconnect": "Reconnect",
     "Refresh": "Refresh",
@@ -1101,7 +1101,6 @@
     "Setting": "Setting",
     "SettingInEndpointHelpText": "Configure service address and port in system settings / component settings / server endpoints",
     "Settings": "System settings",
-    "Settings...": "Settings...",
     "Show": "Display",
     "ShowAssetAllChildrenNode": "Show all sub-nodes assets",
     "ShowAssetOnlyCurrentNode": "Only show current node assets",
@@ -1384,5 +1383,8 @@
     "ZoneList": "Zones",
     "ZoneUpdate": "Update the zone",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "RetrySelected": "Retry selected",
+    "ApproveSelected": "Approve selected",
+    "Running": "Running"
 }

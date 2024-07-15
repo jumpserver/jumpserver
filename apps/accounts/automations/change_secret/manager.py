@@ -226,6 +226,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
     def run(self, *args, **kwargs):
         if self.secret_type and not self.check_secret():
+            self.execution.status = 'success'
+            self.execution.date_finished = timezone.now()
+            self.execution.save()
             return
         super().run(*args, **kwargs)
         recorders = list(self.name_recorder_mapper.values())

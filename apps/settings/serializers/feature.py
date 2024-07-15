@@ -77,7 +77,7 @@ class ChatAISettingSerializer(serializers.Serializer):
         required=False, label=_('Chat AI')
     )
     GPT_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Base URL'),
+        allow_blank=True, required=False, label=_('GPT Base URL'),
         help_text=_('The base URL of the GPT service. For example: https://api.openai.com/v1')
     )
     GPT_API_KEY = EncryptedField(
