@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -134,9 +135,10 @@ class ServerPerformanceCheckUtil(object):
 
     def initial_terminals(self):
         terminals = []
-        for terminal in Terminal.objects.filter(is_deleted=False).exclude(
-                type__in=[TerminalType.core, TerminalType.celery]
-        ):
+        exclude_types = [TerminalType.core, TerminalType.celery, TerminalType.kael]
+        if not settings.XPACK_LICENSE_IS_VALID:
+            exclude_types.append(TerminalType.magnus)
+        for terminal in Terminal.objects.filter(is_deleted=False).exclude(type__in=exclude_types):
             if not terminal.is_active:
                 continue
             terminal.stat = Status.get_terminal_latest_stat(terminal)
