@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-15 16:28+0800\n"
+"POT-Creation-Date: 2024-07-16 18:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -395,7 +395,7 @@ msgstr "ソース ID"
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/ws.py:38
+#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/ws.py:37
 msgid "Account"
 msgstr "アカウント"
 
@@ -683,7 +683,7 @@ msgstr "鍵の種類"
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:19
 msgid "Secret"
-msgstr "ひみつ"
+msgstr "秘文"
 
 #: accounts/models/base.py:42
 #: accounts/serializers/automations/change_secret.py:41
@@ -985,7 +985,7 @@ msgstr "資産タイプ"
 
 #: accounts/serializers/account/base.py:33 terminal/serializers/storage.py:149
 msgid "Passphrase"
-msgstr "パスワード"
+msgstr "キーパスワード"
 
 #: accounts/serializers/account/base.py:96
 msgid ""
@@ -1253,7 +1253,8 @@ msgstr "レビュー担当者"
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
 #: terminal/models/component/endpoint.py:120
-#: terminal/models/session/sharing.py:29 tickets/const.py:36
+#: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
+#: tickets/const.py:36
 msgid "Active"
 msgstr "アクティブ"
 
@@ -1791,7 +1792,7 @@ msgstr "ボタンセレクターを確認する"
 msgid "API mode"
 msgstr "APIモード"
 
-#: assets/const/types.py:251
+#: assets/const/types.py:248
 msgid "All types"
 msgstr "いろんなタイプ"
 
@@ -3858,7 +3859,7 @@ msgstr "ランニング"
 msgid "Canceled"
 msgstr "キャンセル"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:409
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:412
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s が正常に作成されました"
@@ -3978,7 +3979,7 @@ msgstr ""
 "{} - 暗号化パスワードが設定されていません-個人情報->ファイル暗号化パスワード"
 "に暗号化パスワードを設定してください"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:38
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s オブジェクトは存在しません。"
@@ -9269,7 +9270,7 @@ msgstr "地域 \"%s\" のインスタンスを取得できませんでした、�
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "インスタンス \"%s\" の同期に失敗しました"
 
-#: xpack/plugins/cloud/manager.py:334
+#: xpack/plugins/cloud/manager.py:337
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
@@ -9278,42 +9279,42 @@ msgstr ""
 "更新された資産 \"%s\" のプラットフォームタイプと元のタイプは一致しません。プ"
 "ラットフォームとプロトコルの更新をスキップ"
 
-#: xpack/plugins/cloud/manager.py:390
+#: xpack/plugins/cloud/manager.py:393
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "資産 \"%s\" はすでに存在します"
 
-#: xpack/plugins/cloud/manager.py:392
+#: xpack/plugins/cloud/manager.py:395
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "資産の更新 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:398
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "資産 \"%s\" が更新されました"
 
-#: xpack/plugins/cloud/manager.py:405
+#: xpack/plugins/cloud/manager.py:408
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "資産 \"%s\" の作成準備"
 
-#: xpack/plugins/cloud/manager.py:426
+#: xpack/plugins/cloud/manager.py:429
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "ノード \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:452
+#: xpack/plugins/cloud/manager.py:455
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "アカウント \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:468
+#: xpack/plugins/cloud/manager.py:471
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "プロトコル \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:482 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr "同期インスタンス タスクを実行する"
 

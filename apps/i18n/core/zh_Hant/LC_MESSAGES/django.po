@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-15 16:28+0800\n"
+"POT-Creation-Date: 2024-07-16 18:58+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -396,7 +396,7 @@ msgstr "來源 ID"
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/ws.py:38
+#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/ws.py:37
 msgid "Account"
 msgstr "帳號"
 
@@ -684,7 +684,7 @@ msgstr "密文類型"
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:19
 msgid "Secret"
-msgstr "金鑰"
+msgstr "飛文"
 
 #: accounts/models/base.py:42
 #: accounts/serializers/automations/change_secret.py:41
@@ -985,7 +985,7 @@ msgstr "資產類型"
 
 #: accounts/serializers/account/base.py:33 terminal/serializers/storage.py:149
 msgid "Passphrase"
-msgstr "密碼"
+msgstr "密鑰密碼"
 
 #: accounts/serializers/account/base.py:96
 msgid ""
@@ -1248,7 +1248,8 @@ msgstr "審批人"
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
 #: terminal/models/component/endpoint.py:120
-#: terminal/models/session/sharing.py:29 tickets/const.py:36
+#: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
+#: tickets/const.py:36
 msgid "Active"
 msgstr "啟用中"
 
@@ -1780,7 +1781,7 @@ msgstr "確認按鈕選擇器"
 msgid "API mode"
 msgstr "API 模式"
 
-#: assets/const/types.py:251
+#: assets/const/types.py:248
 msgid "All types"
 msgstr "所有類型"
 
@@ -3810,7 +3811,7 @@ msgstr "運行中"
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:409
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:412
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 創建成功"
@@ -3928,7 +3929,7 @@ msgid ""
 "information -> file encryption password to set the encryption password"
 msgstr "{} - 未設置加密密碼 - 請前往個人資訊 -> 文件加密密碼中設置加密密碼"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:38
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s對象不存在"
@@ -9112,7 +9113,7 @@ msgstr ""
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "Unable to synchronize instance %s"
 
-#: xpack/plugins/cloud/manager.py:334
+#: xpack/plugins/cloud/manager.py:337
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
@@ -9121,42 +9122,42 @@ msgstr ""
 "The update platform of asset \"%s\" is not consistent with the original "
 "platform type. Skip platform and protocol updates"
 
-#: xpack/plugins/cloud/manager.py:390
+#: xpack/plugins/cloud/manager.py:393
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "\"資產 \"%s\" 已存在"
 
-#: xpack/plugins/cloud/manager.py:392
+#: xpack/plugins/cloud/manager.py:395
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "更新資產 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:398
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "資產 \"%s\" 已更新"
 
-#: xpack/plugins/cloud/manager.py:405
+#: xpack/plugins/cloud/manager.py:408
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "Preparing to create asset %s"
 
-#: xpack/plugins/cloud/manager.py:426
+#: xpack/plugins/cloud/manager.py:429
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "Delete Node: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:452
+#: xpack/plugins/cloud/manager.py:455
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "刪除帳號: %s"
 
-#: xpack/plugins/cloud/manager.py:468
+#: xpack/plugins/cloud/manager.py:471
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "設定協議 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:482 xpack/plugins/cloud/tasks.py:27
+#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr "執行同步實例任務"
 
