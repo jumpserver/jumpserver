@@ -14,8 +14,11 @@
     RDS_fSingleSessionPerUser: 1
     RDS_MaxDisconnectionTime: 60000
     RDS_RemoteAppLogoffTimeLimit: 0
-    TinkerInstaller: Tinker_Installer.exe
     INSTALL_APPLETS: true
+    PYTHON_VERSION: 3.11.6
+    CHROME_VERSION: 118.0.5993.118
+    CHROME_DRIVER_VERSION: 118.0.5993.70
+    TINKER_VERSION: v0.1.6
 
   tasks:
     - block:
@@ -27,7 +30,8 @@
             status_code: [200, 301, 302, 303, 307, 308]
           register: core_host_redirects
 
-        - fail:
+        - name: Check failed
+          fail:
             msg: "CORE_HOST {{ CORE_HOST }} is redirecting to {{ core_host_redirects.location }}, please use the final url"
           when: core_host_redirects.status_code >= 300 and core_host_redirects.status_code < 400
 
@@ -38,7 +42,7 @@
             include_management_tools: yes
           register: rds_install
 
-        - name: Stop Tinker before install (jumpserver)
+        - name: Stop Tinker before install
           ansible.windows.win_powershell:
             script: |
               if (Get-Process -Name 'tinker' -ErrorAction SilentlyContinue) {
@@ -48,36 +52,36 @@
                $Ansible.Changed = $false
               }
 
-        - name: Download JumpServer Tinker installer (jumpserver)
+        - name: Download JumpServer Tinker installer
           ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/{{ TinkerInstaller }}"
-            dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe"
+            dest: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
-        - name: Install JumpServer Tinker (jumpserver)
+        - name: Install JumpServer Tinker
           ansible.windows.win_package:
-            path: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
+            path: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
             arguments:
               - /VERYSILENT
               - /SUPPRESSMSGBOXES
               - /NORESTART
             state: present
 
-        - name: Set Tinkerd on the global system path (jumpserver)
+        - name: Set Tinkerd on the global system path
           ansible.windows.win_path:
             elements:
               - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
             scope: user
 
-        - name: Download python-3.11.6
+        - name: Download python-{{ PYTHON_VERSION }}
           ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.11.6-amd64.exe"
-            dest: "{{ ansible_env.TEMP }}\\python-3.11.6-amd64.exe"
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-{{ PYTHON_VERSION }}-amd64.exe"
+            dest: "{{ ansible_env.TEMP }}\\python-{{ PYTHON_VERSION }}-amd64.exe"
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
-        - name: Install the python-3.11.6
+        - name: Install the python-{{ PYTHON_VERSION }}
           ansible.windows.win_package:
-            path: "{{ ansible_env.TEMP }}\\python-3.11.6-amd64.exe"
+            path: "{{ ansible_env.TEMP }}\\python-{{ PYTHON_VERSION }}-amd64.exe"
             arguments:
               - /quiet
               - InstallAllUsers=1
@@ -160,7 +164,7 @@
             script: |
               pip install -r '{{ ansible_env.TEMP }}\pip_packages\pip_packages\requirements.txt' --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages\pip_packages'
 
-        - name: Stop chromedriver before install (jumpserver)
+        - name: Stop chromedriver before install
           ansible.windows.win_powershell:
             script: |
               if (Get-Process -Name 'chromedriver' -ErrorAction SilentlyContinue) {
@@ -169,12 +173,6 @@
               else {
                $Ansible.Changed = $false
               }
-
-        - name: Download chromedriver (Chrome)
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver-win64.zip"
-            dest: "{{ ansible_env.TEMP }}\\chromedriver-win64.zip"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
         - name: Remove old chromedriver (Chrome)
           ansible.windows.win_file:
@@ -186,12 +184,24 @@
             - C:\Program Files\JumpServer\drivers\chromedriver-win64
             - C:\Program Files\JumpServer\drivers\chromedriver_win64
 
+        - name: Download chromedriver (Chrome)
+          ansible.windows.win_get_url:
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
+            dest: "{{ ansible_env.TEMP }}\\chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
+            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+
         - name: Unzip chromedriver (Chrome)
           community.windows.win_unzip:
-            src: "{{ ansible_env.TEMP }}\\chromedriver-win64.zip"
+            src: "{{ ansible_env.TEMP }}\\chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
             dest: C:\Program Files\JumpServer\drivers
 
-        - name: Stop Chrome before install (jumpserver)
+        - name: Download Chrome zip package (Chrome)
+          ansible.windows.win_get_url:
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-{{ CHROME_VERSION }}-win.zip"
+            dest: "{{ ansible_env.TEMP }}\\chrome-{{ CHROME_VERSION }}-win.zip"
+            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+
+        - name: Stop Chrome before install
           ansible.windows.win_powershell:
             script: |
               if (Get-Process -Name 'chrome' -ErrorAction SilentlyContinue) {
@@ -200,12 +210,6 @@
               else {
                $Ansible.Changed = $false
               }
-
-        - name: Download Chrome zip package (Chrome)
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-win.zip"
-            dest: "{{ ansible_env.TEMP }}\\chrome-win.zip"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
         - name: Remove old Chrome (Chrome)
           ansible.windows.win_file:
@@ -219,7 +223,7 @@
 
         - name: Unzip Chrome (Chrome)
           community.windows.win_unzip:
-            src: "{{ ansible_env.TEMP }}\\chrome-win.zip"
+            src: "{{ ansible_env.TEMP }}\\chrome-{{ CHROME_VERSION }}-win.zip"
             dest: C:\Program Files\JumpServer\applications
 
         - name: Check and Clean global system path (Chrome)
