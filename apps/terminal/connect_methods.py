@@ -242,7 +242,8 @@ class ConnectMethodUtil:
             'razor': 'TERMINAL_RAZOR_ENABLED',
             'magnus': 'TERMINAL_MAGNUS_ENABLED',
         }
-        disabled_component = [comp for comp, attr in component_setting.items() if not getattr(settings, attr)]
+        disabled_component = [comp for comp, attr in component_setting.items() if
+                              not (getattr(settings, attr) and settings.XPACK_LICENSE_IS_VALID)]
         if not disabled_component:
             return methods
 
