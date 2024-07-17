@@ -2,7 +2,6 @@
 
 import uuid
 
-import django.contrib.auth.models
 import django.utils.timezone
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -89,7 +88,7 @@ class Migration(migrations.Migration):
             },
             bases=(users.models.user.AuthMixin, users.models.user.SourceMixin, users.models.user.TokenMixin, users.models.user.RoleMixin, users.models.user.MFAMixin, users.models.user.JSONFilterMixin, models.Model),
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ('objects', users.models.user.UserManager()),
             ],
         ),
         migrations.CreateModel(
