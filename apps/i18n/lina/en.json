@@ -1386,5 +1386,7 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "RetrySelected": "Retry selected",
     "ApproveSelected": "Approve selected",
-    "Running": "Running"
+    "Running": "Running",
+    "AdhocCreate": "Create the command",
+    "UploadHelpText": "Please upload a .zip file containing the following sample directory structure"
 }
