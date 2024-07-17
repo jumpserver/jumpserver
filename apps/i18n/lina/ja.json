@@ -996,7 +996,7 @@
     "RequiredAssetOrNode": "少なくとも一つの資産またはノードを選択してください",
     "RequiredContent": "コマンドを入力してください",
     "RequiredEntryFile": "このファイルは実行のエントリポイントとして存在する必要があります",
-    "RequiredRunas": "実行ユーザーを入力してください",
+    "RequiredRunas": "実行ユーザーを入力",
     "RequiredSystemUserErrMsg": "アカウントを選択してください",
     "RequiredUploadFile": "ファイルをアップロードしてください！",
     "Reset": "復元",
