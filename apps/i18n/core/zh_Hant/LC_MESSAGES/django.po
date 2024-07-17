@@ -9117,7 +9117,7 @@ msgstr "Action 執行 ID"
 
 #: xpack/plugins/cloud/manager.py:97
 msgid "Synchronization regions"
-msgstr "沒有需要同步的使用者"
+msgstr "同步地區"
 
 #: xpack/plugins/cloud/manager.py:115
 #, python-format
