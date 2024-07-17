@@ -55,14 +55,14 @@ class UserSessionApi(generics.RetrieveDestroyAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         if isinstance(request.user, AnonymousUser):
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         UserSessionManager(request).connect()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK, data={'ok': True})
 
     def destroy(self, request, *args, **kwargs):
         if isinstance(request.user, AnonymousUser):
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         UserSessionManager(request).disconnect()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK, data={'ok': True})
