@@ -185,5 +185,6 @@ class Migration(migrations.Migration):
                 ('alias', models.CharField(choices=[('@INPUT', 'Manual input'), ('@USER', 'Dynamic user'), ('@ANON', 'Anonymous account'), ('@SPEC', 'Specified account')], max_length=128, verbose_name='Alias')),
                 ('secret_from_login', models.BooleanField(default=None, null=True, verbose_name='Secret from login')),
             ],
+            options={'verbose_name': 'Virtual account'},
         ),
     ]
