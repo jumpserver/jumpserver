@@ -1908,7 +1908,7 @@
     "consult": "諮詢",
     "containerName": "容器名稱",
     "contents": "內容",
-    "createAdhoc": "創建命令",
+    "AdhocCreate": "創建命令",
     "createBy": "創建者",
     "createErrorMsg": "創建失敗",
     "createSuccessMsg": "導入創建成功，總共：{count}",
@@ -2267,5 +2267,6 @@
     "weComTest": "測試",
     "week": "周",
     "weekOf": "周的星期",
-    "wildcardsAllowed": "允許的通配符"
+    "wildcardsAllowed": "允許的通配符",
+    "UploadHelpText": "請上傳包含以下範例結構目錄的 .zip 壓縮文件"
 }
