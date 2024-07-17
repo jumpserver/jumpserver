@@ -97,7 +97,7 @@ class ResourcesIDCacheApi(APIView):
 
 
 class CountryListApi(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
         return Response(COUNTRY_CALLING_CODES)

@@ -34,6 +34,10 @@ def parse_to_url(url):
     url = url.replace('(?P<format>[a-z0-9]+)', '')
     url = url.replace('((?P<terminal>[/.]{36})/)?', uid + '/')
     url = url.replace('(?P<pk>[/.]+)', uid)
+    url = url.replace('(?P<label>.*)', uid)
+    url = url.replace('(?P<res_type>.*)', '1')
+    url = url.replace('(?P<name>[\\w.@]+)', '')
+    url = url.replace('<str:name>', 'zh-hans')
     url = url.replace('\.', '')
     url = url.replace('//', '/')
     url = url.strip('$')
@@ -70,7 +74,9 @@ known_unauth_urls = [
     "/api/v1/authentication/login-confirm-ticket/status/",
     "/api/v1/authentication/mfa/select/",
     "/api/v1/authentication/mfa/send-code/",
-    "/api/v1/authentication/sso/login/"
+    "/api/v1/authentication/sso/login/",
+    "/api/v1/authentication/user-session/",
+    "/api/v1/settings/i18n/zh-hans/"
 ]
 
 known_error_urls = [
