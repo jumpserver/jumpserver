@@ -53,7 +53,7 @@
     "SaveSucceed": "保存成功",
     "SelectSQL": "选择 SQL",
     "SessionClosedBy": "会话被 %s 关闭",
-    "SessionFinished": "会员已结束",
+    "SessionFinished": "会话已结束",
     "SessionLockedError": "当前会话已被锁定，无法继续执行命令",
     "SessionLockedMessage": "此会话已被 %s 锁定，无法继续执行命令",
     "SessionUnlockedMessage": "此会话已被 %s 解锁，可以继续执行命令",
