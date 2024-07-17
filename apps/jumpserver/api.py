@@ -106,7 +106,7 @@ class DateTimeMixin:
 
     @lazyproperty
     def user_login_logs_on_the_system_queryset(self):
-        qs = UserLoginLog.objects.all()
+        qs = UserLoginLog.objects.filter(status=LoginStatusChoices.success)
         qs = self.get_logs_queryset_filter(qs, 'datetime')
         queryset = qs.filter(username__in=construct_userlogin_usernames(self.users))
         return queryset
