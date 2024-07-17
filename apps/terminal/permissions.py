@@ -9,7 +9,14 @@ __all__ = ['IsSessionAssignee']
 
 class IsSessionAssignee(permissions.IsAuthenticated):
     def has_permission(self, request, view):
-        return True
+        if not request.user:
+            return False
+        if request.user.is_anonymous:
+            return False
+        if view.action == 'retrieve':
+            # Why return True? please refer to the issue: #11678
+            return True
+        return False
 
     def has_object_permission(self, request, view, obj):
         try:
