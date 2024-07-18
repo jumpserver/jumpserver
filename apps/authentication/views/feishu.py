@@ -58,15 +58,7 @@ class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMe
             )
 
     def verify_state(self):
-        state = self.request.GET.get('state')
-        session_state = self.request.session.get(self.state_session_key)
-        if state != session_state:
-            return False
-        return True
-
-    def get_verify_state_failed_response(self, redirect_uri):
-        msg = _("The system configuration is incorrect. Please contact your administrator")
-        return self.get_failed_response(redirect_uri, msg, msg)
+        return self.verify_state_with_session_key(self.state_session_key)
 
     def get_qr_url(self, redirect_uri):
         state = random_string(16)

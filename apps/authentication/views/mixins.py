@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext_lazy as _
 from common.utils import FlashMessageUtil
 
 
@@ -32,3 +33,12 @@ class FlashMessageMixin:
 
     def get_failed_response(self, redirect_url, title, msg, interval=10):
         return self.get_response(redirect_url, title, msg, 'error', interval)
+
+    def get_verify_state_failed_response(self, redirect_uri):
+        msg = _(
+            "For your safety, automatic redirection login is not supported on the client."
+            " If you need to open it in the client, please log in again")
+        return self.get_failed_response(redirect_uri, msg, msg)
+
+    def verify_state_with_session_key(self, session_key):
+        return self.request.GET.get('state') == self.request.session.get(session_key)
