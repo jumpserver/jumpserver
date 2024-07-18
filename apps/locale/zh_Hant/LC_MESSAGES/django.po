@@ -3551,11 +3551,12 @@ msgstr "釘釘錯誤，請聯絡系統管理員"
 msgid "DingTalk Error"
 msgstr "釘釘錯誤"
 
-#: authentication/views/dingtalk.py:57 authentication/views/feishu.py:68
-#: authentication/views/slack.py:47 authentication/views/wecom.py:55
+#: authentication/views/mixins.py:39
 msgid ""
-"The system configuration is incorrect. Please contact your administrator"
-msgstr "企業配置錯誤，請聯絡系統管理員"
+"For your safety, automatic redirection login is not supported on the client. "
+"If you need to open it in the client, please log in again"
+msgstr ""
+"為了您的安全，客戶端不支持自動跳轉登錄。如果需要在客戶端中打開，請重新登錄"
 
 #: authentication/views/dingtalk.py:61
 msgid "DingTalk is already bound"
