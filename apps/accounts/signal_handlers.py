@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_noop
 
 from accounts.backends import vault_client
+from accounts.const import Source
 from audits.const import ActivityChoices
 from audits.signal_handlers import create_activities
 from common.decorators import merge_delay_run
@@ -32,7 +33,7 @@ def push_accounts_if_need(accounts=()):
     template_accounts = defaultdict(list)
     for ac in accounts:
         # 再强调一次吧
-        if ac.source != 'template':
+        if ac.source != Source.TEMPLATE:
             continue
         template_accounts[ac.source_id].append(ac)
 
@@ -61,7 +62,7 @@ def create_accounts_activities(account, action='create'):
 
 @receiver(post_save, sender=Account)
 def on_account_create_by_template(sender, instance, created=False, **kwargs):
-    if not created or instance.source != 'template':
+    if not created or instance.source != Source.TEMPLATE:
         return
     push_accounts_if_need.delay(accounts=(instance,))
     create_accounts_activities(instance, action='create')
