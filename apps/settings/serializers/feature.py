@@ -69,7 +69,9 @@ class VaultSettingSerializer(serializers.Serializer):
 
 class ChatAISettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Chat AI')
-    GPT_MODEL_CHOICES = []
+    API_MODEL = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
+    GPT_MODEL_CHOICES = API_MODEL['choices']
+    GPT_MODEL_DEFAULT = API_MODEL['default']
 
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Enable Chat AI')
@@ -84,25 +86,8 @@ class ChatAISettingSerializer(serializers.Serializer):
         allow_blank=True, required=False, label=_('Proxy')
     )
     GPT_MODEL = serializers.ChoiceField(
-        default='', choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
+        default=GPT_MODEL_DEFAULT, choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_GPT_MODEL_choices()
-
-    def set_GPT_MODEL_choices(self):
-        field_gpt_model = self.fields.get("GPT_MODEL")
-        if not field_gpt_model:
-            return
-        gpt_api_model = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
-        choices = gpt_api_model['choices']
-        field_gpt_model.choices = choices
-        field_gpt_model.default = gpt_api_model['default']
-        cls = self.__class__
-        if cls.GPT_MODEL_CHOICES:
-            return
-        cls.GPT_MODEL_CHOICES.extend(choices)
 
 
 class TicketSettingSerializer(serializers.Serializer):
