@@ -121,7 +121,7 @@ class SSHClient:
 
     def local_gateway_prepare(self):
         gateway_args = self.module.params['gateway_args'] or ''
-        pattern = r"(?:sshpass -p ([\w@]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+([\w@]+)@([" \
+        pattern = r"(?:sshpass -p ([^ ]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+([\w@]+)@([" \
                   r"\d.]+)\s+-W %h:%p -q(?: -i (.+))?'"
         match = re.search(pattern, gateway_args)
 
