@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 
 WORKDIR /opt
 
-ARG CHECK_VERSION=v1.0.2
+ARG CHECK_VERSION=v1.0.3
 RUN set -ex \
     && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
