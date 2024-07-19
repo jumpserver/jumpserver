@@ -71,7 +71,9 @@ class VaultSettingSerializer(serializers.Serializer):
 
 class ChatAISettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Chat AI')
-    GPT_MODEL_CHOICES = []
+    API_MODEL = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
+    GPT_MODEL_CHOICES = API_MODEL['choices']
+    GPT_MODEL_DEFAULT = API_MODEL['default']
 
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
@@ -88,25 +90,8 @@ class ChatAISettingSerializer(serializers.Serializer):
         help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
     )
     GPT_MODEL = serializers.ChoiceField(
-        default='', choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
+        default=GPT_MODEL_DEFAULT, choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_GPT_MODEL_choices()
-
-    def set_GPT_MODEL_choices(self):
-        field_gpt_model = self.fields.get("GPT_MODEL")
-        if not field_gpt_model:
-            return
-        gpt_api_model = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
-        choices = gpt_api_model['choices']
-        field_gpt_model.choices = choices
-        field_gpt_model.default = gpt_api_model['default']
-        cls = self.__class__
-        if cls.GPT_MODEL_CHOICES:
-            return
-        cls.GPT_MODEL_CHOICES.extend(choices)
 
 
 class TicketSettingSerializer(serializers.Serializer):
@@ -114,12 +99,12 @@ class TicketSettingSerializer(serializers.Serializer):
 
     TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Ticket"))
     TICKETS_DIRECT_APPROVE = serializers.BooleanField(
-        required=False, default=False, label=_("Approval without login"), 
+        required=False, default=False, label=_("Approval without login"),
         help_text=_('Allow direct approval ticket without login')
     )
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
-        label=_("Period"), 
+        label=_("Period"),
         help_text=_("The default authorization time period when applying for assets via a ticket")
     )
     TICKET_AUTHORIZE_DEFAULT_TIME_UNIT = serializers.ChoiceField(
@@ -146,7 +131,7 @@ class VirtualAppSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Virtual app')
 
     VIRTUAL_APP_ENABLED = serializers.BooleanField(
-        required=False, label=_('Virtual App'), 
+        required=False, label=_('Virtual App'),
         help_text=_(
             'Virtual applications, you can use the Linux operating system as an application server '
             'in remote applications.'
