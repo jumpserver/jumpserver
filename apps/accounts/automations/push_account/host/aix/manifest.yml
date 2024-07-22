@@ -5,6 +5,12 @@ type:
   - AIX
 method: push_account
 params:
+  - name: modify_sudo
+    type: bool
+    label: 'Modify Sudo'
+    default: False
+    help_text: "{{ 'Modify params sudo help text' | trans }}"
+
   - name: sudo
     type: str
     label: 'Sudo'
@@ -33,6 +39,11 @@ i18n:
     zh: '使用 Ansible 模块 user 执行 Aix 账号推送 (DES)'
     ja: 'Ansible user モジュールを使用して Aix アカウントをプッシュする (DES)'
     en: 'Using Ansible module user to push account (DES)'
+
+  Modify params sudo help text:
+    zh: '如果用户存在，可以修改sudo权限'
+    ja: 'ユーザーが存在する場合、sudo権限を変更できます'
+    en: 'If the user exists, sudo permissions can be modified'
 
   Params sudo help text:
     zh: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
