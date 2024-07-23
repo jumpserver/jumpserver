@@ -216,5 +216,7 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "Viewer": "查看人",
+    "Operator": "操作人"
 }

@@ -218,5 +218,7 @@
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user"
+    "user": "user",
+    "Viewer": "Viewer",
+    "Operator": "Operator"
 }
