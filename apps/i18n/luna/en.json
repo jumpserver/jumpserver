@@ -209,11 +209,16 @@
     "asset": "asset",
     "cols": "cols",
     "confirm": "confirm",
+    "connectDisabledTipsNoAccount": "Tips: No valid authorization account found, current resource cannot be connected. Please contact the administrator for assistance",
+    "connectDisabledTipsNoConnectMethod": "Tips: No valid connection method found, current resource cannot be connected. Please contact the administrator for assistance",
+    "connectDisabledTipsMethodDisabled": "Tips: No valid remote application deployment machine found, current resource cannot be connected. Please contact the administrator for assistance",
     "connect info": "connect info",
     "download": "download",
     "rows": "rows",
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user"
+    "user": "user",
+    "Viewer": "Viewer",
+    "Operator": "Operator"
 }

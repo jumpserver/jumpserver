@@ -408,11 +408,21 @@ class Config(dict):
         'AUTH_FEISHU': False,
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
+        'FEISHU_RENAME_ATTRIBUTES': {
+            'name': 'name',
+            'username': 'user_id',
+            'email': 'enterprise_email'
+        },
 
         # Lark
         'AUTH_LARK': False,
         'LARK_APP_ID': '',
         'LARK_APP_SECRET': '',
+        'LARK_RENAME_ATTRIBUTES': {
+            'name': 'en_name',
+            'username': 'user_id',
+            'email': 'enterprise_email'
+        },
 
         # Slack
         'AUTH_SLACK': False,

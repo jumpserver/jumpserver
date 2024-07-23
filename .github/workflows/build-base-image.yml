@@ -2,6 +2,8 @@ name: Build and Push Base Image
 
 on:
   push:
+    branches:
+      - 'pr*'
     paths:
       - 'poetry.lock'
       - 'pyproject.toml'

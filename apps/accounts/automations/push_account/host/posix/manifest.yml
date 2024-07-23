@@ -6,6 +6,12 @@ type:
   - linux
 method: push_account
 params:
+  - name: modify_sudo
+    type: bool
+    label: "{{ 'Modify sudo label' | trans }}"
+    default: False
+    help_text: "{{ 'Modify params sudo help text' | trans }}"
+
   - name: sudo
     type: str
     label: 'Sudo'
@@ -36,6 +42,11 @@ i18n:
     ja: 'Ansible user モジュールを使用してアカウントをプッシュする (sha512)'
     en: 'Using Ansible module user to push account (sha512)'
 
+  Modify params sudo help text:
+    zh: '如果用户存在，可以修改sudo权限'
+    ja: 'ユーザーが存在する場合、sudo権限を変更できます'
+    en: 'If the user exists, sudo permissions can be modified'
+
   Params sudo help text:
     zh: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
     ja: 'コンマで区切って複数のコマンドを入力してください。例: /bin/whoami,/sbin/ifconfig'
@@ -50,6 +61,11 @@ i18n:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
     en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
+
+  Modify sudo label:
+    zh: '修改 sudo 权限'
+    ja: 'sudo 権限を変更'
+    en: 'Modify sudo'
 
   Params home label:
     zh: '家目录'

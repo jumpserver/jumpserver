@@ -113,11 +113,7 @@ class BasePlaybookManager:
         if not data:
             data = automation_params.get(method_id, {})
         params = serializer(data).data
-        return {
-            field_name: automation_params.get(field_name, '')
-            if not params[field_name] else params[field_name]
-            for field_name in params
-        }
+        return params
 
     @property
     def platform_automation_methods(self):

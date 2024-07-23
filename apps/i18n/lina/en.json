@@ -963,7 +963,7 @@
     "RequiredAssetOrNode": "Please select at least one asset or node",
     "RequiredContent": "Please input command",
     "RequiredEntryFile": "This file acts as the entry point for running and must be present",
-    "RequiredRunas": "Please enter the execution user",
+    "RequiredRunas": "Enter exec user",
     "RequiredSystemUserErrMsg": "Please select account",
     "RequiredUploadFile": "Please upload the file!",
     "Reset": "Reset",
@@ -1386,5 +1386,7 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "RetrySelected": "Retry selected",
     "ApproveSelected": "Approve selected",
-    "Running": "Running"
+    "Running": "Running",
+    "AdhocCreate": "Create the command",
+    "UploadHelpText": "Please upload a .zip file containing the following sample directory structure"
 }

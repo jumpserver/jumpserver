@@ -508,7 +508,7 @@
     "FeiShuOAuth": "飞书认证",
     "FeiShuTest": "测试",
     "FieldRequiredError": "此字段是必填项",
-    "FileExplorer": "文件浏览",
+    "FileExplorer": "文件管理",
     "FileManagement": "文件管理",
     "FileNameTooLong": "文件名太长",
     "FileSizeExceedsLimit": "文件大小超出限制",
@@ -1388,5 +1388,7 @@
     "VaultHCPMountPoint": "Vault 服务器的挂载点，默认为 jumpserver",
     "RetrySelected": "重试所选",
     "ApproveSelected": "审批所选",
-    "Running": "运行中"
+    "Running": "运行中",
+    "AdhocCreate": "创建命令",
+    "UploadHelpText": "请上传包含以下示例结构目录的 .zip 压缩文件"
 }
