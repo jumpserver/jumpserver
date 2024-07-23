@@ -222,5 +222,7 @@
     "start time": "開始時間",
     "success": "成功",
     "system user": "システムユーザー",
-    "user": "ユーザー"
+    "user": "ユーザー",
+    "Viewer": "ビューア",
+    "Operator": "オペレーター"
 }
