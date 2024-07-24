@@ -111,6 +111,10 @@ class Platform(LabeledMixin, JMSBaseModel):
     def type_constraints(self):
         return AllTypes.get_constraints(self.category, self.type)
 
+    @lazyproperty
+    def assets_amount(self):
+        return self.assets.count()
+
     @classmethod
     def default(cls):
         linux, created = cls.objects.get_or_create(
