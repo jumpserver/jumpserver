@@ -24,6 +24,7 @@ class GunicornService(BaseService):
             '-w', str(self.worker),
             '--max-requests', '10240',
             '--max-requests-jitter', '2048',
+            '--graceful-timeout', '30',
             '--access-logformat', log_format,
             '--access-logfile', '-'
         ]
