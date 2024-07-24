@@ -3659,11 +3659,12 @@ msgstr "钉钉错误，请联系系统管理员"
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
-#: authentication/views/dingtalk.py:57 authentication/views/feishu.py:68
-#: authentication/views/slack.py:47 authentication/views/wecom.py:55
+#: authentication/views/mixins.py:39
 msgid ""
-"The system configuration is incorrect. Please contact your administrator"
-msgstr "企业配置错误，请联系系统管理员"
+"For your safety, automatic redirection login is not supported on the client. "
+"If you need to open it in the client, please log in again"
+msgstr ""
+"为了您的安全，客户端不支持自动跳转登录。如果需要在客户端中打开，请重新登录"
 
 #: authentication/views/dingtalk.py:61
 msgid "DingTalk is already bound"

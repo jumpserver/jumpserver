@@ -151,11 +151,9 @@ class BaseBindCallbackView(FlashMessageMixin, IMClientMixin, View):
             setattr(user, f'{self.auth_type}_id', auth_user_id)
             user.save()
         except IntegrityError as e:
-            if e.args[0] == 1062:
-                msg = _('The %s is already bound to another user') % self.auth_type_label
-                response = self.get_failed_response(redirect_url, msg, msg)
-                return response
-            raise e
+            msg = _('The %s is already bound to another user') % self.auth_type_label
+            response = self.get_failed_response(redirect_url, msg, msg)
+            return response
 
         ip = get_request_ip(request)
         OAuthBindMessage(user, ip, self.auth_type_label, auth_user_id).publish_async()
