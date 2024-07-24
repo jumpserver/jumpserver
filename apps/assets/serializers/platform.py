@@ -1,18 +1,19 @@
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from assets.models import Asset
 from common.serializers import (
     WritableNestedModelSerializer, type_field_map, MethodSerializer,
     DictSerializer, create_serializer_class, ResourceLabelsMixin
 )
-from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import lazyproperty
 from ..const import Category, AllTypes, Protocol
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer"]
+__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer", "PlatformListSerializer"]
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -179,6 +180,8 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
         required=False, default="sudo", allow_null=True
     )
     custom_fields = PlatformCustomField(label=_("Custom fields"), many=True, required=False)
+    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Assets'))
+    assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
 
     class Meta:
         model = Platform
@@ -191,7 +194,8 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
             'internal', 'date_created', 'date_updated',
             'created_by', 'updated_by'
         ]
-        fields = fields_small + [
+        fields_m2m = ['assets', 'assets_amount']
+        fields = fields_small + fields_m2m + [
             "protocols", "domain_enabled", "su_enabled", "su_method",
             "automation", "comment", "custom_fields", "labels"
         ] + read_only_fields
@@ -208,6 +212,7 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
                 "help_text": _("Assets can be connected using a zone gateway")
             },
             "domain_default": {"label": _('Default Domain')},
+            'assets': {'required': False, 'label': _('Assets')},
         }
 
     def __init__(self, *args, **kwargs):
@@ -263,6 +268,11 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
                           and self.constraints['automation'].get('ansible_enabled', False)
         automation['ansible_enable'] = ansible_enabled
         return automation
+
+
+class PlatformListSerializer(PlatformSerializer):
+    class Meta(PlatformSerializer.Meta):
+        fields = list(set(PlatformSerializer.Meta.fields + ['assets_amount']) - {'assets'})
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):
