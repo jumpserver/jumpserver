@@ -3709,11 +3709,14 @@ msgstr "DingTalkエラー、システム管理者に連絡してください"
 msgid "DingTalk Error"
 msgstr "DingTalkエラー"
 
-#: authentication/views/dingtalk.py:57 authentication/views/feishu.py:68
-#: authentication/views/slack.py:47 authentication/views/wecom.py:55
+#: authentication/views/mixins.py:39
 msgid ""
-"The system configuration is incorrect. Please contact your administrator"
-msgstr "システム設定が正しくありません。管理者に連絡してください"
+"For your safety, automatic redirection login is not supported on the client. "
+"If you need to open it in the client, please log in again"
+msgstr ""
+"安全のため、クライアントでの自動リダイレクトログインはサポートされていませ"
+"ん。クライアントで開く必要がある場合は、再度ログインしてください"
+
 
 #: authentication/views/dingtalk.py:61
 msgid "DingTalk is already bound"
