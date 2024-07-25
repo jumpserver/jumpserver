@@ -30,7 +30,7 @@ class EmailSettingSerializer(serializers.Serializer):
     )
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("Host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("Port"))
-    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True, label=_("Account"))
+    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=False, allow_null=True,label=_("Account"))
     EMAIL_HOST_PASSWORD = EncryptedField(
         max_length=1024, required=False, label=_("Password"),
         help_text=_("Tips: Some provider use token except password")
