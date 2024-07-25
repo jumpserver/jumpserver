@@ -173,7 +173,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     def get_labels(self):
         from labels.models import Label, LabeledResource
-        res_type = ContentType.objects.get_for_model(self.__class__)
+        res_type = ContentType.objects.get_for_model(self.__class__.label_model())
         label_ids = LabeledResource.objects.filter(res_type=res_type, res_id=self.id) \
             .values_list('label_id', flat=True)
         return Label.objects.filter(id__in=label_ids)
