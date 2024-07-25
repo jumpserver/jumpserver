@@ -171,12 +171,13 @@ class Applet(JMSBaseModel):
         if not hosts:
             return None
 
-        spec_label = asset.labels.filter(label__name__in=['AppletHost', '发布机']).first()
-        if spec_label and spec_label.label:
-            label_value = spec_label.label.value
-            matched = [host for host in hosts if host.name == label_value]
-            if matched:
-                return random.choice(matched)
+        spec_label_values = asset.get_labels().filter(
+            name__in=['AppletHost', '发布机']
+        ).values_list('value', flat=True)
+        host_matched = [host for host in hosts if host.name in spec_label_values]
+        if host_matched:
+            return random.choice(host_matched)
+
 
         hosts = [h for h in hosts if h.auto_create_accounts]
         prefer_key = self.host_prefer_key_tpl.format(user.id)
