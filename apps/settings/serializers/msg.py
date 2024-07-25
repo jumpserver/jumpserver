@@ -21,7 +21,7 @@ class EmailSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Email')
 
     class EmailProtocol(models.TextChoices):
-        smtp = 'smtp',  _('SMTP')
+        smtp = 'smtp', _('SMTP')
         exchange = 'exchange', _('EXCHANGE')
 
     EMAIL_PROTOCOL = serializers.ChoiceField(
@@ -30,7 +30,8 @@ class EmailSettingSerializer(serializers.Serializer):
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("Host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("Port"))
     EMAIL_HOST_USER = serializers.CharField(
-        max_length=128, required=True, label=_("Account"), help_text=_("The user to be used for email server authentication")
+        max_length=128, required=False, allow_blank=True, label=_("Account"),
+        help_text=_("The user to be used for email server authentication")
     )
     EMAIL_HOST_PASSWORD = EncryptedField(
         max_length=1024, required=False, label=_("Password"),
@@ -46,11 +47,13 @@ class EmailSettingSerializer(serializers.Serializer):
     )
     EMAIL_USE_SSL = serializers.BooleanField(
         required=False, label=_('Use SSL'),
-        help_text=_('Whether to use an implicit TLS (secure) connection when talking to the SMTP server. In most email documentation this type of TLS connection is referred to as SSL. It is generally used on port 465')
+        help_text=_(
+            'Whether to use an implicit TLS (secure) connection when talking to the SMTP server. In most email documentation this type of TLS connection is referred to as SSL. It is generally used on port 465')
     )
     EMAIL_USE_TLS = serializers.BooleanField(
         required=False, label=_("Use TLS"),
-        help_text=_('Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for explicit TLS connections, generally on port 587')
+        help_text=_(
+            'Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for explicit TLS connections, generally on port 587')
     )
 
 
