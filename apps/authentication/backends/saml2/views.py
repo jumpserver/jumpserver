@@ -1,14 +1,12 @@
 import copy
-
 from urllib import parse
 
-from django.views import View
-from django.contrib import auth
-from django.urls import reverse
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib import auth
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError
-
+from django.urls import reverse
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 from onelogin.saml2.idp_metadata_parser import (
@@ -16,23 +14,29 @@ from onelogin.saml2.idp_metadata_parser import (
     dict_deep_merge
 )
 
-from .settings import JmsSaml2Settings
-
 from common.utils import get_logger
+from .settings import JmsSaml2Settings
 
 logger = get_logger(__file__)
 
 
 class PrepareRequestMixin:
-    @staticmethod
-    def is_secure():
-        url_result = parse.urlparse(settings.SITE_URL)
-        return 'on' if url_result.scheme == 'https' else 'off'
+
+    @property
+    def parsed_url(self):
+        return parse.urlparse(settings.SITE_URL)
+
+    def is_secure(self):
+        return 'on' if self.parsed_url.scheme == 'https' else 'off'
+
+    def http_host(self):
+        return f"{self.parsed_url.hostname}:{self.parsed_url.port}" \
+            if self.parsed_url.port else self.parsed_url.hostname
 
     def prepare_django_request(self, request):
         result = {
             'https': self.is_secure(),
-            'http_host': request.META['HTTP_HOST'],
+            'http_host': self.http_host(),
             'script_name': request.META['PATH_INFO'],
             'get_data': request.GET.copy(),
             'post_data': request.POST.copy()
@@ -275,7 +279,7 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
         logger.debug(log_prompt.format('Redirect'))
         redir = post_data.get('RelayState')
         if not redir or len(redir) == 0:
-          redir = "/"
+            redir = "/"
         next_url = saml_instance.redirect_to(redir)
         return HttpResponseRedirect(next_url)
 
