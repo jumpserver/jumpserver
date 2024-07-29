@@ -62,7 +62,6 @@ urlpatterns = [
     path('slack/qr/login/callback/', views.SlackQRLoginCallbackView.as_view(), name='slack-qr-login-callback'),
 
     # Profile
-    path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
     path('profile/mfa/', users_view.MFASettingView.as_view(), name='user-mfa-setting'),
 
     # OTP Setting

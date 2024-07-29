@@ -21,7 +21,6 @@ from users.signals import post_user_change_password
 
 logger = get_logger(__file__)
 
-
 __all__ = ['MFAMixin', 'AuthMixin']
 
 
@@ -134,12 +133,6 @@ class AuthMixin:
                 post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)  # noqa
 
-    def set_public_key(self, public_key):
-        if self.can_update_ssh_key():
-            self.public_key = public_key
-            self.save()
-            post_user_change_password.send(self.__class__, user=self)
-
     def can_update_password(self):
         return self.is_local
 
@@ -167,7 +160,7 @@ class AuthMixin:
         Check if the user's ssh public key is valid.
         This function is used in base.html.
         """
-        if self.public_key:
+        if self.user_ssh_keys:
             return True
         return False
 
@@ -233,14 +226,21 @@ class AuthMixin:
         except Exception as e:
             return ""
 
+    @property
+    def user_ssh_keys(self):
+        return self.ssh_keys.filter(is_active=True).all()
+
     def check_public_key(self, key):
-        if not self.public_key:
-            return False
         key_md5 = self.get_public_key_md5(key)
         if not key_md5:
             return False
-        self_key_md5 = self.get_public_key_md5(self.public_key)
-        return key_md5 == self_key_md5
+        for ssh_key in self.user_ssh_keys:
+            self_key_md5 = self.get_public_key_md5(ssh_key.public_key)
+            if key_md5 == self_key_md5:
+                ssh_key.date_last_used = timezone.now()
+                ssh_key.save(update_fields=['date_last_used'])
+                return True
+        return False
 
     def cache_login_password_if_need(self, password):
         from common.utils import signer
@@ -270,4 +270,3 @@ class AuthMixin:
             return ""
         password = signer.unsign(secret)
         return password
-

@@ -28,7 +28,8 @@ logger = get_logger(__file__)
 __all__ = [
     "User",
     "UserPasswordHistory",
-    "MFAMixin"
+    "MFAMixin",
+    "AuthMixin"
 ]
 
 
