@@ -14,6 +14,7 @@ router.register('temp-tokens', api.TempTokenViewSet, 'temp-token')
 router.register('connection-token', api.ConnectionTokenViewSet, 'connection-token')
 router.register('super-connection-token', api.SuperConnectionTokenViewSet, 'super-connection-token')
 router.register('confirm', api.UserConfirmationViewSet, 'confirm')
+router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 
 urlpatterns = [
     path('<str:backend>/qr/unbind/', api.QRUnBindForUserApi.as_view(), name='qr-unbind'),
