@@ -105,7 +105,7 @@ class PlaybookRunner:
             shutil.rmtree(private_env)
 
         kwargs = dict(kwargs)
-        if self.isolate and not is_macos:
+        if self.isolate and not is_macos():
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
