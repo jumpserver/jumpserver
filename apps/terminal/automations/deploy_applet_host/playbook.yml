@@ -29,6 +29,7 @@
             follow_redirects: none
             status_code: [200, 301, 302, 303, 307, 308]
           register: core_host_redirects
+          validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
         - name: Check failed
           fail:
