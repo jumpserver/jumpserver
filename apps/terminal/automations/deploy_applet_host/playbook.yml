@@ -28,6 +28,7 @@
             method: GET
             follow_redirects: none
             status_code: [200, 301, 302, 303, 307, 308]
+            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
           register: core_host_redirects
 
         - name: Check failed
