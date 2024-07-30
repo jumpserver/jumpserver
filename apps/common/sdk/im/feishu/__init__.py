@@ -6,7 +6,7 @@ from rest_framework.exceptions import APIException
 from common.sdk.im.mixin import RequestMixin, BaseRequest
 from common.sdk.im.utils import digest
 from common.utils.common import get_logger
-from users.utils import construct_user_email
+from users.utils import construct_user_email, flatten_dict, map_attributes
 
 logger = get_logger(__name__)
 
@@ -84,7 +84,7 @@ class FeiShu(RequestMixin):
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """
     requests_cls = FeishuRequests
-    attributes = settings.LARK_RENAME_ATTRIBUTES
+    attributes = settings.FEISHU_RENAME_ATTRIBUTES
 
     def __init__(self, app_id, app_secret, timeout=None):
         self._app_id = app_id or ''
@@ -151,11 +151,7 @@ class FeiShu(RequestMixin):
         # get_user_id_by_code 已经返回个人信息，这里直接解析
         data = kwargs['other_info']
         data['user_id'] = user_id
-        detail = self.default_user_detail(data)
-
-        for local_name, remote_name in self.attributes.items():
-            value = data.get(remote_name)
-            if not value:
-                continue
-            detail[local_name] = value
+        info = flatten_dict(data)
+        default_detail = self.default_user_detail(data)
+        detail = map_attributes(default_detail, info, self.attributes)
         return detail

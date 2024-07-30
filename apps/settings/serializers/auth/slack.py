@@ -13,3 +13,10 @@ class SlackSettingSerializer(serializers.Serializer):
     SLACK_CLIENT_ID = serializers.CharField(max_length=256, required=True, label='Client ID')
     SLACK_CLIENT_SECRET = EncryptedField(max_length=256, required=False, label='Client Secret')
     SLACK_BOT_TOKEN = EncryptedField(max_length=256, required=False, label='Client bot Token')
+    SLACK_RENAME_ATTRIBUTES = serializers.JSONField(
+        required=False, label=_('User attribute'),
+        help_text=_(
+            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            '`value` is the Slack service user attribute name'
+        )
+    )

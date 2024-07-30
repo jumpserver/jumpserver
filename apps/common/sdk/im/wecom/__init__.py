@@ -1,12 +1,13 @@
 from typing import Iterable, AnyStr
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import APIException
 
 from common.sdk.im.mixin import RequestMixin, BaseRequest
 from common.sdk.im.utils import digest, update_values
 from common.utils.common import get_logger
-from users.utils import construct_user_email
+from users.utils import construct_user_email, flatten_dict, map_attributes
 
 logger = get_logger(__name__)
 
@@ -79,6 +80,7 @@ class WeCom(RequestMixin):
     """
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """
+    attributes = settings.WECOM_RENAME_ATTRIBUTES
 
     def __init__(self, corpid, corpsecret, agentid, timeout=None):
         self._corpid = corpid or ''
@@ -173,10 +175,8 @@ class WeCom(RequestMixin):
             logger.error(f'WeCom response 200 but get field from json error: fields=UserId|OpenId')
             raise WeComError
 
-    def get_user_detail(self, user_id, **kwargs):
-        # https://open.work.weixin.qq.com/api/doc/90000/90135/90196
-        params = {'userid': user_id}
-        data = self._requests.get(URL.GET_USER_DETAIL, params)
+    @staticmethod
+    def default_user_detail(data):
         username = data.get('userid')
         name = data.get('name', username)
         email = data.get('email') or data.get('biz_mail')
@@ -184,3 +184,11 @@ class WeCom(RequestMixin):
         return {
             'username': username, 'name': name, 'email': email
         }
+
+    def get_user_detail(self, user_id, **kwargs):
+        # https://open.work.weixin.qq.com/api/doc/90000/90135/90196
+        data = self._requests.get(URL.GET_USER_DETAIL, {'userid': user_id})
+        info = flatten_dict(data)
+        default_detail = self.default_user_detail(data)
+        detail = map_attributes(default_detail, info, self.attributes)
+        return detail

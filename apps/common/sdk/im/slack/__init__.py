@@ -1,11 +1,12 @@
 import mistune
 import requests
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import APIException
 
 from common.utils.common import get_logger
 from jumpserver.utils import get_current_request
-from users.utils import construct_user_email
+from users.utils import construct_user_email, flatten_dict, map_attributes
 
 logger = get_logger(__name__)
 
@@ -93,6 +94,8 @@ class SlackRequests:
 
 
 class Slack:
+    attributes = settings.SLACK_RENAME_ATTRIBUTES
+
     def __init__(self, client_id=None, client_secret=None, bot_token=None, **kwargs):
         self._client = SlackRequests(
             client_id=client_id, client_secret=client_secret, bot_token=bot_token
@@ -138,13 +141,22 @@ class Slack:
                 logger.exception(e)
 
     @staticmethod
-    def get_user_detail(user_id, **kwargs):
-        # get_user_id_by_code 已经返回个人信息，这里直接解析
-        user_info = kwargs['other_info']
-        username = user_info.get('name') or user_id
-        name = user_info.get('real_name', username)
-        email = user_info.get('profile', {}).get('email')
+    def default_user_detail(data):
+        username = data['user_id']
+        username = data.get('name', username)
+        name = data.get('real_name', username)
+        email = data.get('profile.email')
         email = construct_user_email(username, email)
         return {
             'username': username, 'name': name, 'email': email
         }
+
+    def get_user_detail(self, user_id, **kwargs):
+        # https://api.slack.com/methods/users.info
+        # get_user_id_by_code 已经返回个人信息，这里直接解析
+        data = kwargs['other_info']
+        data['user_id'] = user_id
+        info = flatten_dict(data)
+        default_detail = self.default_user_detail(data)
+        detail = map_attributes(default_detail, info, self.attributes)
+        return detail
