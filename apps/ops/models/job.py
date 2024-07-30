@@ -423,6 +423,7 @@ class JobExecution(JMSOrgBaseModel):
             this.result.update(cb.result)
         else:
             this.result = cb.result
+        this.result = json.loads(json.dumps(this.result).replace('\\u0000', ''))
         this.finish_task()
 
     def finish_task(self):
