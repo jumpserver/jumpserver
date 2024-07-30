@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, TemplateView
 from rest_framework.views import APIView
 
+from common.utils import lazyproperty
 from common.views.http import HttpResponseTemporaryRedirect
 
 __all__ = [
@@ -93,6 +94,34 @@ class KokoView(View):
 
 class ResourceDownload(TemplateView):
     template_name = 'resource_download.html'
+
+    @lazyproperty
+    def versions_content(self):
+        return """
+        MRD_VERSION=10.6.7
+        OPENSSH_VERSION=v9.4.0.0
+        TINKER_VERSION=v0.1.6
+        VIDEO_PLAYER_VERSION=0.1.9
+        CLIENT_VERSION=v2.1.3
+        """
+
+    def get_meta_json(self):
+        content = self.versions_content
+        lines = content.splitlines()
+        meta = {}
+        for line in lines:
+            line = line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+            key, value = line.split('=')
+            meta[key] = value
+        return meta
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        meta = self.get_meta_json()
+        context.update(meta)
+        return context
 
 
 def csrf_failure(request, reason=""):
