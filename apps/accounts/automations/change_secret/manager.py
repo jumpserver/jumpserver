@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from xlsxwriter import Workbook
 
 from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy, ChangeSecretRecordStatusChoice
-from accounts.models import ChangeSecretRecord
+from accounts.models import ChangeSecretRecord, BaseAccountQuerySet
 from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretFailedMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
@@ -68,10 +68,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         else:
             return self.secret_generator(secret_type).get_secret()
 
-    def get_accounts(self, privilege_account):
+    def get_accounts(self, privilege_account) -> BaseAccountQuerySet | None:
         if not privilege_account:
-            print(f'not privilege account')
-            return []
+            print('Not privilege account')
+            return
 
         asset = privilege_account.asset
         accounts = asset.accounts.all()
@@ -107,6 +107,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
             print(f'Windows {asset} does not support ssh key push')
             return inventory_hosts
+
+        if asset.type == HostTypes.WINDOWS:
+            accounts = accounts.filter(secret_type=SecretType.PASSWORD)
 
         host['ssh_params'] = {}
         for account in accounts:
