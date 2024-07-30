@@ -19,7 +19,7 @@ def kill_ansible_ssh_process(pid):
 
     for child in process.children(recursive=True):
         if not _should_kill(child):
-            return
+            continue
         try:
             child.kill()
         except Exception as e:
