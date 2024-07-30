@@ -397,12 +397,22 @@ class Config(dict):
         'WECOM_CORPID': '',
         'WECOM_AGENTID': '',
         'WECOM_SECRET': '',
+        'WECOM_RENAME_ATTRIBUTES': {
+            'name': 'name',
+            'username': 'userid',
+            'email': 'email'
+        },
 
         # 钉钉
         'AUTH_DINGTALK': False,
         'DINGTALK_AGENTID': '',
         'DINGTALK_APPKEY': '',
         'DINGTALK_APPSECRET': '',
+        'DINGTALK_RENAME_ATTRIBUTES': {
+            'name': 'name',
+            'username': 'user_id',
+            'email': 'email'
+        },
 
         # 飞书
         'AUTH_FEISHU': False,
@@ -429,6 +439,11 @@ class Config(dict):
         'SLACK_CLIENT_ID': '',
         'SLACK_CLIENT_SECRET': '',
         'SLACK_BOT_TOKEN': '',
+        'SLACK_RENAME_ATTRIBUTES': {
+            'name': 'real_name',
+            'username': 'name',
+            'email': 'profile.email'
+        },
 
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,

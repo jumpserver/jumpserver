@@ -13,3 +13,10 @@ class DingTalkSettingSerializer(serializers.Serializer):
     DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label='App Key')
     DINGTALK_APPSECRET = EncryptedField(max_length=256, required=False, label='App Secret')
     AUTH_DINGTALK = serializers.BooleanField(default=False, label=_('Dingtalk'))
+    DINGTALK_RENAME_ATTRIBUTES = serializers.JSONField(
+        required=False, label=_('User attribute'),
+        help_text=_(
+            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            '`value` is the DingTalk service user attribute name'
+        )
+    )
