@@ -83,9 +83,9 @@ if DEBUG:
 DEBUG_HOST_PORTS = ['{}:{}'.format(host, port) for host in DEBUG_HOSTS for port in DEBUG_PORT]
 ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 
-print("ALLOWED_HOSTS: ", )
-for host in ALLOWED_DOMAINS:
-    print('  - ' + host.lstrip('.'))
+# print("ALLOWED_HOSTS: ", )
+# for host in ALLOWED_DOMAINS:
+#     print('  - ' + host.lstrip('.'))
 
 ALLOWED_HOSTS = ['*']
 
