@@ -2,12 +2,15 @@ from terminal.utils.loki_client import get_loki_client
 
 __all__ = ['LokiMixin', ]
 
+
 class LokiMixin:
 
-    def get_loki_client(self):
+    @staticmethod
+    def get_loki_client():
         return get_loki_client()
 
-    def create_loki_query(self, components, search):
+    @staticmethod
+    def create_loki_query(components, search):
         stream_selector = '{component!=""}'
         if components:
             stream_selector = '{component=~"%s"}' % components
