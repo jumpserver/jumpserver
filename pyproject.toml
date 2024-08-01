@@ -193,6 +193,15 @@ huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
 volcengine-python-sdk = "1.0.71"
 
+[[tool.poetry.source]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple"
+priority = "primary"
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "supplemental"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
