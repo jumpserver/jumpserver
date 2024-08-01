@@ -15,7 +15,7 @@ from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import reverse, get_object_or_none
 from users.models import User
-from users.signal_handlers import check_only_allow_exist_user_auth
+from users.signal_handlers import check_only_allow_exist_user_auth, bind_user_to_org_role
 from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
@@ -64,6 +64,7 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
             setattr(user, f'{self.user_type}_id', user_id)
             if create:
                 setattr(user, 'source', self.user_type)
+                bind_user_to_org_role(user)
             user.save()
         except IntegrityError as err:
             logger.error(f'{self.msg_client_err}: create user error: {err}')

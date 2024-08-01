@@ -28,6 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
 HAS_XPACK = os.path.isdir(XPACK_DIR)
+DEFAULT_ID = '00000000-0000-0000-0000-000000000002'
 
 logger = logging.getLogger('jumpserver.conf')
 
@@ -282,7 +283,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
-        'AUTH_LDAP_SYNC_ORG_IDS': ['00000000-0000-0000-0000-000000000002'],
+        'AUTH_LDAP_SYNC_ORG_IDS': [DEFAULT_ID],
         'AUTH_LDAP_SYNC_RECEIVERS': [],
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
@@ -323,6 +324,7 @@ class Config(dict):
         'AUTH_OPENID_KEYCLOAK': True,
         'AUTH_OPENID_SERVER_URL': 'https://keycloak.example.com',
         'AUTH_OPENID_REALM_NAME': None,
+        'OPENID_ORG_IDS': [DEFAULT_ID],
 
         # Raidus 认证
         'AUTH_RADIUS': False,
@@ -332,6 +334,7 @@ class Config(dict):
         'RADIUS_ATTRIBUTES': {},
         'RADIUS_ENCRYPT_PASSWORD': True,
         'OTP_IN_RADIUS': False,
+        'RADIUS_ORG_IDS': [DEFAULT_ID],
 
         # Cas 认证
         'AUTH_CAS': False,
@@ -343,6 +346,7 @@ class Config(dict):
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
         'CAS_RENAME_ATTRIBUTES': {'cas:user': 'username'},
         'CAS_CREATE_USER': True,
+        'CAS_ORG_IDS': [DEFAULT_ID],
 
         'AUTH_SSO': False,
         'AUTH_SSO_AUTHKEY_TTL': 60 * 15,
@@ -370,6 +374,7 @@ class Config(dict):
         'SAML2_SP_CERT_CONTENT': '',
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
         'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
+        'SAML2_ORG_IDS': [DEFAULT_ID],
 
         # OAuth2 认证
         'AUTH_OAUTH2': False,
@@ -388,6 +393,8 @@ class Config(dict):
         'AUTH_OAUTH2_USER_ATTR_MAP': {
             'name': 'name', 'username': 'username', 'email': 'email'
         },
+        'OAUTH2_ORG_IDS': [DEFAULT_ID],
+
         'AUTH_PASSKEY': False,
         'FIDO_SERVER_ID': '',
         'FIDO_SERVER_NAME': 'JumpServer',
@@ -402,6 +409,7 @@ class Config(dict):
             'username': 'userid',
             'email': 'email'
         },
+        'WECOM_ORG_IDS': [DEFAULT_ID],
 
         # 钉钉
         'AUTH_DINGTALK': False,
@@ -413,6 +421,7 @@ class Config(dict):
             'username': 'user_id',
             'email': 'email'
         },
+        'DINGTALK_ORG_IDS': [DEFAULT_ID],
 
         # 飞书
         'AUTH_FEISHU': False,
@@ -423,6 +432,7 @@ class Config(dict):
             'username': 'user_id',
             'email': 'enterprise_email'
         },
+        'FEISHU_ORG_IDS': [DEFAULT_ID],
 
         # Lark
         'AUTH_LARK': False,
@@ -433,6 +443,7 @@ class Config(dict):
             'username': 'user_id',
             'email': 'enterprise_email'
         },
+        'LARK_ORG_IDS': [DEFAULT_ID],
 
         # Slack
         'AUTH_SLACK': False,
@@ -444,6 +455,7 @@ class Config(dict):
             'username': 'name',
             'email': 'profile.email'
         },
+        'SLACK_ORG_IDS': [DEFAULT_ID],
 
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,

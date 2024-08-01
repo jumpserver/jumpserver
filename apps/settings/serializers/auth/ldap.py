@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from .base import OrgListField
 
 __all__ = [
     'LDAPTestConfigSerializer', 'LDAPUserSerializer', 'LDAPTestLoginSerializer',
@@ -67,9 +68,6 @@ class LDAPSettingSerializer(serializers.Serializer):
             '`value` is the LDAP service user attribute name'
         )
     )
-    AUTH_LDAP_SYNC_ORG_IDS = serializers.ListField(
-        required=False, label=_('Organization'), max_length=36
-    )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
         required=False, label=_('Periodic run')
     )
@@ -102,6 +100,7 @@ class LDAPSettingSerializer(serializers.Serializer):
     )
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('LDAP'))
+    AUTH_LDAP_SYNC_ORG_IDS = OrgListField()
 
     def post_save(self):
         keys = ['AUTH_LDAP_SYNC_IS_PERIODIC', 'AUTH_LDAP_SYNC_INTERVAL', 'AUTH_LDAP_SYNC_CRONTAB']

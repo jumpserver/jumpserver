@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from .base import OrgListField
+
 __all__ = [
     'SAML2SettingSerializer',
 ]
@@ -41,3 +43,4 @@ class SAML2SettingSerializer(serializers.Serializer):
         help_text=_('When the user signs out, they also be logged out from the SAML2 server')
     )
     AUTH_SAML2_ALWAYS_UPDATE_USER = serializers.BooleanField(required=False, label=_('Always update user'))
+    SAML2_ORG_IDS = OrgListField()

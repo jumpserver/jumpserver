@@ -12,6 +12,7 @@ from django_cas_ng.signals import cas_user_authenticated
 from audits.models import UserSession
 from authentication.backends.oauth2.signals import oauth2_create_or_update_user
 from authentication.backends.oidc.signals import openid_create_or_update_user
+from authentication.backends.radius.signals import radius_create_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.decorators import on_transaction_commit
@@ -20,6 +21,9 @@ from common.signals import django_ready
 from common.utils import get_logger
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
+from rbac.builtin import BuiltinRole
+from rbac.const import Scope
+from rbac.models import RoleBinding
 from settings.signals import setting_changed
 from .models import User, UserPasswordHistory
 from .signals import post_user_create
@@ -40,12 +44,13 @@ def check_only_allow_exist_user_auth(created):
 
 
 def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
+    if not check_only_allow_exist_user_auth(created):
+        return
+
     if created:
         user.source = source
         user.save()
-
-    if not check_only_allow_exist_user_auth(created):
-        return
+        bind_user_to_org_role(user)
 
     if not attrs:
         return
@@ -71,9 +76,9 @@ def save_passwd_change(sender, instance: User, **kwargs):
         return
 
     passwords = UserPasswordHistory.objects \
-        .filter(user=instance) \
-        .order_by('-date_created') \
-        .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
+                    .filter(user=instance) \
+                    .order_by('-date_created') \
+                    .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
 
     if instance.password not in list(passwords):
         UserPasswordHistory.objects.create(
@@ -133,17 +138,18 @@ def on_oauth2_create_or_update_user(sender, user, created, attrs, **kwargs):
     user_authenticated_handle(user, created, source, attrs, **kwargs)
 
 
-@receiver(populate_user)
-def on_ldap_create_user(sender, user, ldap_user, **kwargs):
-    if user and user.username not in ['admin']:
-        exists = User.objects.filter(username=user.username).exists()
-        if not exists:
-            user.source = user.Source.ldap.value
-            user.save()
+@receiver(radius_create_user)
+def radius_create_user(sender, user, **kwargs):
+    user.source = user.Source.radius.value
+    user.save()
+    bind_user_to_org_role(user)
 
 
 @receiver(openid_create_or_update_user)
 def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
+    if not check_only_allow_exist_user_auth(created):
+        return
+
     if created:
         logger.debug(
             "Receive OpenID user created signal: {}, "
@@ -151,9 +157,7 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
         )
         user.source = User.Source.openid.value
         user.save()
-
-    if not check_only_allow_exist_user_auth(created):
-        return
+        bind_user_to_org_role(user)
 
     if not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
         logger.debug(
@@ -165,6 +169,15 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
         user.username = username
         user.email = email
         user.save()
+
+
+@receiver(populate_user)
+def on_ldap_create_user(sender, user, ldap_user, **kwargs):
+    if user and user.username not in ['admin']:
+        exists = User.objects.filter(username=user.username).exists()
+        if not exists:
+            user.source = user.Source.ldap.value
+            user.save()
 
 
 @shared_task(verbose_name=_('Clean up expired user sessions'))
@@ -190,3 +203,25 @@ def on_auth_setting_changed_clear_source_choice(sender, name='', **kwargs):
 @receiver(django_ready)
 def on_django_ready_refresh_source(sender, **kwargs):
     User._source_choices = []
+
+
+def bind_user_to_org_role(user):
+    source = user.source.upper()
+    org_ids = getattr(settings, f"{source}_ORG_IDS", None)
+
+    if not org_ids:
+        logger.error(f"User {user} has no {source} orgs")
+        return
+
+    org_role_ids = [BuiltinRole.org_user.id]
+
+    bindings = [
+        RoleBinding(
+            user=user, org_id=org_id, scope=Scope.org,
+            role_id=role_id,
+        )
+        for role_id in org_role_ids
+        for org_id in org_ids
+    ]
+
+    RoleBinding.objects.bulk_create(bindings, ignore_conflicts=True)

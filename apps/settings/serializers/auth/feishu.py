@@ -5,6 +5,8 @@ from common.serializers.fields import EncryptedField
 
 __all__ = ['FeiShuSettingSerializer']
 
+from .base import OrgListField
+
 
 class FeiShuSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('FeiShu')
@@ -19,3 +21,4 @@ class FeiShuSettingSerializer(serializers.Serializer):
             '`value` is the FeiShu service user attribute name'
         )
     )
+    FEISHU_ORG_IDS = OrgListField()
