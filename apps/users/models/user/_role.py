@@ -183,6 +183,7 @@ class RoleMixin:
     is_authenticated: bool
     is_valid: bool
     id: str
+    source: str
     _org_roles = None
     _system_roles = None
     PERM_CACHE_KEY = "USER_PERMS_ROLES_{}_{}"

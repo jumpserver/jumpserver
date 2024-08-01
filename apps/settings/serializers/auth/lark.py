@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from .base import OrgListField
 
 __all__ = ['LarkSettingSerializer']
 
@@ -19,3 +20,4 @@ class LarkSettingSerializer(serializers.Serializer):
             '`value` is the Lark service user attribute name'
         )
     )
+    LARK_ORG_IDS = OrgListField()

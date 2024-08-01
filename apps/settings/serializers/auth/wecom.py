@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from .base import OrgListField
 
 __all__ = ['WeComSettingSerializer']
 
@@ -20,3 +21,4 @@ class WeComSettingSerializer(serializers.Serializer):
             '`value` is the WeCom service user attribute name'
         )
     )
+    WECOM_ORG_IDS = OrgListField()

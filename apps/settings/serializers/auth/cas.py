@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from .base import OrgListField
+
 __all__ = [
     'CASSettingSerializer',
 ]
@@ -16,7 +18,7 @@ class CASSettingSerializer(serializers.Serializer):
         max_length=1024, label=_('Proxy Server')
     )
     CAS_LOGOUT_COMPLETELY = serializers.BooleanField(
-        required=False, label=_('Logout completely'), 
+        required=False, label=_('Logout completely'),
         help_text=_('When the user signs out, they also be logged out from the CAS server')
     )
     CAS_VERSION = serializers.IntegerField(
@@ -36,9 +38,10 @@ class CASSettingSerializer(serializers.Serializer):
         )
     )
     CAS_CREATE_USER = serializers.BooleanField(
-        required=False, label=_('Create user'), 
+        required=False, label=_('Create user'),
         help_text=_(
             'After successful user authentication, if the user does not exist, '
             'automatically create the user'
         )
     )
+    CAS_ORG_IDS = OrgListField()

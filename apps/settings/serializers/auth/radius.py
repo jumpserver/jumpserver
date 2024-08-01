@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from .base import OrgListField
 
 __all__ = ['RadiusSettingSerializer']
 
@@ -19,6 +20,7 @@ class RadiusSettingSerializer(serializers.Serializer):
         required=False, max_length=1024, allow_null=True, label=_('Secret'),
     )
     OTP_IN_RADIUS = serializers.BooleanField(
-        required=False, label=_('OTP in RADIUS'), 
+        required=False, label=_('OTP in RADIUS'),
         help_text=_('* Using OTP in RADIUS means users can employ RADIUS as a method for MFA')
     )
+    RADIUS_ORG_IDS = OrgListField()

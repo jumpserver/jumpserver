@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 __all__ = [
     'AuthSettingSerializer',
+    'OrgListField'
 ]
 
 
@@ -42,3 +43,17 @@ class AuthSettingSerializer(serializers.Serializer):
             "authentication when the administrator enables third-party redirect authentication"
         )
     )
+
+
+class OrgListField(serializers.ListField):
+    def __init__(self, **kwargs):
+        defaults = {
+            'required': False,
+            'label': _('Organization'),
+            'help_text': _(
+                'When you create a user, you associate the user to the organization of your choice. '
+                'Users always belong to the Default organization.'
+            )
+        }
+        defaults.update(kwargs)
+        super().__init__(**defaults)
