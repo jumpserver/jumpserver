@@ -193,10 +193,6 @@ huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
 volcengine-python-sdk = "1.0.71"
 
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
