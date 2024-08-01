@@ -35,9 +35,7 @@ ARG TOOLS="                           \
         bubblewrap"
 
 ARG APT_MIRROR=http://deb.debian.org
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
-    set -ex \
+RUN set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
