@@ -28,12 +28,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 
 
 ARG PIP_MIRROR=https://pypi.org/simple
-ENV POETRY_REPOSITORIES=${PIP_MIRROR}
 RUN --mount=type=bind,source=poetry.lock,target=/opt/jumpserver/poetry.lock \
     --mount=type=bind,source=pyproject.toml,target=/opt/jumpserver/pyproject.toml \
     set -ex \
     . /opt/py3/bin/activate \
     && pip install poetry -i ${PIP_MIRROR} \
-    && poetry config repositories.pypi ${PIP_MIRROR} \
+    && poetry config repositories.mirror ${PIP_MIRROR} \
     && poetry install --only xpack
 
