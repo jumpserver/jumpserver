@@ -2,7 +2,7 @@ from typing import List
 
 from rest_framework.request import Request
 
-from assets.models import Node, Platform, Protocol
+from assets.models import Node, Platform, Protocol, MyAsset
 from assets.utils import get_node_from_request, is_query_node_all_assets
 from common.utils import lazyproperty, timeit
 
@@ -82,6 +82,7 @@ class SerializeToTreeNodeMixin:
 
         data = []
         root_assets_count = 0
+        MyAsset.set_asset_custom_value(assets, self.request.user)
         for asset in assets:
             platform = platform_map.get(asset.platform_id)
             if not platform:
