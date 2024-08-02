@@ -7,3 +7,4 @@ from .domain import *
 from .node import *
 from .favorite_asset import *
 from .automations import *
+from .my_asset import *

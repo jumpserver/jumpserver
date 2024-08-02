@@ -7,3 +7,4 @@ from .node import *
 from .platform import *
 from .protocol import *
 from .tree import *
+from .my_asset import *
