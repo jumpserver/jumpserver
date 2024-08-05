@@ -200,7 +200,7 @@ class ConnectionToken(JMSOrgBaseModel):
 
         host_account = applet.select_host_account(self.user, self.asset)
         if not host_account:
-            raise JMSException({'error': 'No host account available'})
+            raise JMSException({'error': 'No host account available, please check the applet, host and account'})
 
         host, account, lock_key = bulk_get(host_account, ('host', 'account', 'lock_key'))
         gateway = host.domain.select_gateway() if host.domain else None
