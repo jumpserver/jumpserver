@@ -178,7 +178,6 @@ class Applet(JMSBaseModel):
         if host_matched:
             return random.choice(host_matched)
 
-
         hosts = [h for h in hosts if h.auto_create_accounts]
         prefer_key = self.host_prefer_key_tpl.format(user.id)
         prefer_host_id = cache.get(prefer_key, None)
