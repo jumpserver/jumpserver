@@ -212,7 +212,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     'connection_options': {
                         'type': 'str',
                         'default': '',
-                        'label': _('Connection options'),
+                        'label': _('Connect options'),
                         'help_text': _('The connection specific options eg. retryWrites=false&retryReads=false')
                     }
                 }
