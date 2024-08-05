@@ -14,7 +14,8 @@ from accounts.const import AliasAccount
 from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import JMSBaseModel
 from common.exceptions import JMSException
-from common.utils import reverse
+from common.utils import reverse, get_logger
+from common.utils.lock import DistributedLock
 from common.utils.timezone import as_current_tz
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
@@ -25,6 +26,8 @@ from tickets.const import (
 from tickets.errors import AlreadyClosed
 from tickets.handlers import get_ticket_handler
 from ..flow import TicketFlow
+
+logger = get_logger(__file__)
 
 __all__ = [
     'Ticket', 'TicketStep', 'TicketAssignee',
@@ -374,30 +377,33 @@ class Ticket(StatusMixin, JMSBaseModel):
         date_created = as_current_tz(self.date_created)
         date_prefix = date_created.strftime('%Y%m%d')
 
-        ticket = Ticket.objects.all().select_for_update().filter(
+        ticket = Ticket.objects.filter(
             serial_num__startswith=date_prefix
-        ).order_by('-date_created').first()
+        ).order_by('-serial_num').first()
 
         last_num = 0
         if ticket:
             last_num = ticket.serial_num[8:]
             last_num = int(last_num)
         num = '%04d' % (last_num + 1)
-        return '{}{}'.format(date_prefix, num)
+        return f'{date_prefix}{num}'
 
     def set_serial_num(self):
         if self.serial_num:
             return
 
-        try:
-            self.serial_num = self.get_next_serial_num()
-            self.save(update_fields=('serial_num',))
-        except IntegrityError as e:
-            if e.args[0] == 1062:
-                # 虽然做了 `select_for_update` 但是每天的第一条工单仍可能造成冲突
-                # 但概率小，这里只报错，用户重新提交即可
-                raise JMSException(detail=_('Please try again'), code='please_try_again')
-            raise e
+        lock_key = 'TICKET_LOCK_SET_SERIAL_NUM'
+        with DistributedLock(lock_key):
+            try:
+                self.serial_num = self.get_next_serial_num()
+                self.save(update_fields=('serial_num',))
+            except IntegrityError as e:
+                logger.error(f'Set ticket serial number error: {e}')
+                if e.args[0] == 1062:
+                    # 虽然做了 `select_for_update` 但是每天的第一条工单仍可能造成冲突
+                    # 但概率小，这里只报错，用户重新提交即可
+                    raise JMSException(detail=_('Please try again'), code='please_try_again')
+                raise e
 
     def get_field_display(self, name, field, data: dict):
         value = data.get(name)
