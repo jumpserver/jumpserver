@@ -15,6 +15,7 @@ from assets.models import Platform
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
 from common.utils.yml import yaml_load_with_i18n
+from terminal.const import PublishStatus
 
 logger = get_logger(__name__)
 
@@ -278,7 +279,9 @@ class Applet(JMSBaseModel):
         if not host:
             return None
         logger.info('Select applet host: {}'.format(host.name))
-
+        if not self.is_available_on_host(host):
+            logger.debug('No available applet {} for applet host: {}'.format(self.name, host.name))
+            return None
         valid_accounts = host.accounts.all().filter(is_active=True, privileged=False)
         account = self.try_to_use_same_account(user, host)
         if not account:
@@ -310,6 +313,14 @@ class Applet(JMSBaseModel):
         if platform and platform.assets.count() == 0:
             platform.delete()
         return super().delete(using, keep_parents)
+
+    def is_available_on_host(self, host):
+        publication = AppletPublication.objects.filter(applet=self, host=host).first()
+        if not publication:
+            return False
+        if publication.status in [PublishStatus.pending, PublishStatus.failed]:
+            return False
+        return True
 
 
 class AppletPublication(JMSBaseModel):
