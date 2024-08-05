@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-05 14:30+0800\n"
+"POT-Creation-Date: 2024-08-05 14:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -366,7 +366,7 @@ msgstr "資産"
 msgid "Su from"
 msgstr "から切り替え"
 
-#: accounts/models/account.py:55 assets/const/protocol.py:178
+#: accounts/models/account.py:55 assets/const/protocol.py:189
 #: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:35
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
@@ -1590,7 +1590,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:281
+#: assets/const/base.py:34 assets/const/protocol.py:292
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1701,80 +1701,97 @@ msgid "Security"
 msgstr "セキュリティ"
 
 #: assets/const/protocol.py:83
-msgid "Security layer to use for the connection"
-msgstr "接続に使用するセキュリティ レイヤー"
+msgid ""
+"Security layer to use for the connection:<br>Any<br>Automatically select the "
+"security mode based on the security protocols supported by both the client "
+"and the server<br>RDP<br>Legacy RDP encryption. This mode is generally only "
+"used for older Windows servers or in cases where a standard Windows login "
+"screen is desired<br>TLS<br>RDP authentication and encryption implemented "
+"via TLS.<br>NLA<br>This mode uses TLS encryption and requires the username "
+"and password to be given in advance"
+msgstr ""
+"接続のセキュリティ層：<br>"
+"Any<br>"
+"クライアントとサーバーの両方でサポートされている"
+"セキュリティプロトコルに基づいて、セキュリティモードを自動的に選択します<br>"
+"RDP<br>"
+"レガシーRDP暗号化。このモードは、通常、古い Windowsサーバーや標準のWindowsログイン画面が必要な場合に使用されます<br>"
+"TLS<br>"
+"TLSによって実装されたRDP認証と暗号化<br>"
+"NLA<br>"
+"このモードはTLS暗号化を使用し、事前にユーザー名とパスワードを提供する必要があります<br>"
 
-#: assets/const/protocol.py:89
+#: assets/const/protocol.py:100
 msgid "AD domain"
 msgstr "AD ドメイン"
 
-#: assets/const/protocol.py:104
+#: assets/const/protocol.py:115
 msgid "Username prompt"
 msgstr "ユーザー名プロンプト"
 
-#: assets/const/protocol.py:105
+#: assets/const/protocol.py:116
 msgid "We will send username when we see this prompt"
 msgstr "このプロンプトが表示されたらユーザー名を送信します"
 
-#: assets/const/protocol.py:110
+#: assets/const/protocol.py:121
 msgid "Password prompt"
 msgstr "パスワードプロンプト"
 
-#: assets/const/protocol.py:111
+#: assets/const/protocol.py:122
 msgid "We will send password when we see this prompt"
 msgstr "このプロンプトが表示されたらパスワードを送信します"
 
-#: assets/const/protocol.py:116
+#: assets/const/protocol.py:127
 msgid "Success prompt"
 msgstr "成功プロンプト"
 
-#: assets/const/protocol.py:117
+#: assets/const/protocol.py:128
 msgid "We will consider login success when we see this prompt"
 msgstr "このプロンプトが表示されたらログイン成功とみなします"
 
-#: assets/const/protocol.py:128 assets/models/asset/database.py:10
+#: assets/const/protocol.py:139 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:49
 msgid "Use SSL"
 msgstr "SSLの使用"
 
-#: assets/const/protocol.py:163
+#: assets/const/protocol.py:174
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:164
+#: assets/const/protocol.py:175
 msgid "Connect as SYSDBA"
 msgstr "SYSDBA として接続"
 
-#: assets/const/protocol.py:179
+#: assets/const/protocol.py:190
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server のバージョン。バージョンによって接続ドライバが異なります"
 
-#: assets/const/protocol.py:209
+#: assets/const/protocol.py:220
 msgid "Auth source"
 msgstr "認証データベース"
 
-#: assets/const/protocol.py:210
+#: assets/const/protocol.py:221
 msgid "The database to authenticate against"
 msgstr "認証するデータベース"
 
-#: assets/const/protocol.py:215 authentication/models/connection_token.py:43
+#: assets/const/protocol.py:226 authentication/models/connection_token.py:43
 msgid "Connect options"
 msgstr "接続アイテム"
 
-#: assets/const/protocol.py:216
+#: assets/const/protocol.py:227
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
 msgstr ""
 
-#: assets/const/protocol.py:228
+#: assets/const/protocol.py:239
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:251
+#: assets/const/protocol.py:262
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:253
+#: assets/const/protocol.py:264
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
@@ -1782,24 +1799,24 @@ msgstr ""
 "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへ"
 "のアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:258 assets/models/asset/web.py:9
+#: assets/const/protocol.py:269 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:266 assets/models/asset/web.py:10
+#: assets/const/protocol.py:277 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:271 assets/models/asset/web.py:11
+#: assets/const/protocol.py:282 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:276 assets/models/asset/web.py:12
+#: assets/const/protocol.py:287 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:299
+#: assets/const/protocol.py:310
 msgid "API mode"
 msgstr "APIモード"
 
