@@ -9256,3 +9256,9 @@ msgstr "企業旗艦版"
 
 #~ msgid "Please test the connection first"
 #~ msgstr "請先測試連接"
+
+msgid "Store locally"
+msgstr "本地儲存"
+
+msgid "Do not save"
+msgstr "不儲存"

@@ -9392,3 +9392,9 @@ msgstr "エンタープライズ・フラッグシップ・エディション"
 
 #~ msgid "Please test the connection first"
 #~ msgstr "まず接続をテストしてください"
+
+msgid "Store locally"
+msgstr "ローカルに保存する"
+
+msgid "Do not save"
+msgstr "保存しない"
