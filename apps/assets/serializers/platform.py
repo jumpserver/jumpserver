@@ -1,4 +1,4 @@
-from django.db.models import QuerySet, Count
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -162,6 +162,8 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
     SU_METHOD_CHOICES = [
         ("sudo", "sudo su -"),
         ("su", "su - "),
+        ("only_sudo", "sudo su"),
+        ("only_su", "su"),
         ("enable", "enable"),
         ("super", "super 15"),
         ("super_level", "super level 15")
