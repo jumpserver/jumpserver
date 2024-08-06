@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-05 14:40+0800\n"
+"POT-Creation-Date: 2024-08-06 10:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -136,7 +136,7 @@ msgstr "パスワード"
 
 #: accounts/const/account.py:7
 #: accounts/serializers/automations/change_secret.py:35
-#: terminal/serializers/storage.py:124
+#: authentication/models/ssh_key.py:27 terminal/serializers/storage.py:124
 msgid "SSH key"
 msgstr "SSH キー"
 
@@ -294,7 +294,7 @@ msgstr "作成のみ"
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:61 users/forms/profile.py:100
-#: users/forms/profile.py:108 users/models/user/__init__.py:57
+#: users/forms/profile.py:108 users/models/user/__init__.py:58
 #: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
@@ -367,13 +367,13 @@ msgid "Su from"
 msgstr "から切り替え"
 
 #: accounts/models/account.py:55 assets/const/protocol.py:189
-#: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:35
+#: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
 msgstr "バージョン"
 
 #: accounts/models/account.py:57 accounts/serializers/account/account.py:228
-#: users/models/user/__init__.py:118
+#: users/models/user/__init__.py:119
 msgid "Source"
 msgstr "ソース"
 
@@ -581,11 +581,11 @@ msgstr "終了日"
 #: assets/models/automations/base.py:113
 #: assets/serializers/automations/base.py:39 audits/models.py:208
 #: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
-#: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:140
+#: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
-#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:281
+#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:225
 #: xpack/plugins/cloud/models.py:292
@@ -623,7 +623,7 @@ msgstr "最終ログイン日"
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: terminal/serializers/storage.py:136 users/forms/profile.py:31
-#: users/forms/profile.py:114 users/models/user/__init__.py:55
+#: users/forms/profile.py:114 users/models/user/__init__.py:56
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
@@ -705,6 +705,7 @@ msgstr "パスワードルール"
 #: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
 #: assets/serializers/platform.py:280
 #: authentication/backends/passkey/models.py:10
+#: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:169 labels/models.py:11
 #: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
@@ -713,14 +714,14 @@ msgstr "パスワードルール"
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 settings/models.py:34 settings/models.py:183
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
-#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:32 users/models/group.py:13
-#: users/models/preference.py:11 users/models/user/__init__.py:56
+#: users/models/preference.py:11 users/models/user/__init__.py:57
 #: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:308
 #: xpack/plugins/cloud/serializers/task.py:75
 msgid "Name"
@@ -733,7 +734,7 @@ msgstr "特権アカウント"
 #: accounts/models/base.py:70 assets/models/automations/base.py:21
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
-#: terminal/models/applet/applet.py:40
+#: terminal/models/applet/applet.py:41
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:269
 msgid "Is active"
 msgstr "アクティブです。"
@@ -870,13 +871,13 @@ msgstr "カテゴリ"
 #: assets/serializers/platform.py:174 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
-#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:154 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:271
-#: terminal/serializers/storage.py:284 tickets/models/comment.py:26
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:277
+#: terminal/serializers/storage.py:290 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:273 tickets/serializers/flow.py:25
+#: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
 #: tickets/serializers/ticket/ticket.py:19
 msgid "Type"
 msgstr "タイプ"
@@ -890,8 +891,8 @@ msgid "Has secret"
 msgstr "エスクローされたパスワード"
 
 #: accounts/serializers/account/account.py:272 ops/models/celery.py:83
-#: tickets/models/comment.py:13 tickets/models/ticket/general.py:46
-#: tickets/models/ticket/general.py:277 tickets/serializers/super_ticket.py:14
+#: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
+#: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr "状態"
 
@@ -946,7 +947,7 @@ msgstr "ID"
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:271
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
-#: authentication/models/sso_token.py:16
+#: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
 #: rbac/builtin.py:124 rbac/models/rolebinding.py:49
@@ -957,8 +958,8 @@ msgstr "ID"
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
-#: users/const.py:14 users/models/user/__init__.py:280
-#: users/models/user/__init__.py:307
+#: users/const.py:14 users/models/user/__init__.py:281
+#: users/models/user/__init__.py:308
 msgid "User"
 msgstr "ユーザー"
 
@@ -1041,13 +1042,13 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:158 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:39 terminal/models/applet/applet.py:45
-#: terminal/models/applet/applet.py:322 terminal/models/applet/host.py:143
+#: settings/models.py:39 terminal/models/applet/applet.py:46
+#: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:25
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:295 users/models/user/__init__.py:90
+#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:91
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:122
 msgid "Comment"
 msgstr "コメント"
@@ -1253,6 +1254,7 @@ msgstr "レビュー担当者"
 #: acls/models/base.py:43 assets/models/asset/common.py:165
 #: authentication/models/access_key.py:25
 #: authentication/models/connection_token.py:53
+#: authentication/models/ssh_key.py:13
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
 #: terminal/models/component/endpoint.py:120
@@ -1580,7 +1582,7 @@ msgid "Gather facts"
 msgstr "資産情報の収集"
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
+#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:31
 msgid "Disabled"
 msgstr "無効"
 
@@ -1614,7 +1616,7 @@ msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:45
-#: terminal/models/applet/applet.py:27 users/const.py:64
+#: terminal/models/applet/applet.py:28 users/const.py:64
 msgid "Web"
 msgstr "Web"
 
@@ -1634,7 +1636,7 @@ msgstr "私有雲"
 msgid "Kubernetes"
 msgstr "Kubernetes"
 
-#: assets/const/device.py:7 terminal/models/applet/applet.py:26
+#: assets/const/device.py:7 terminal/models/applet/applet.py:27
 #: tickets/const.py:9
 msgid "General"
 msgstr "一般"
@@ -1710,16 +1712,12 @@ msgid ""
 "via TLS.<br>NLA<br>This mode uses TLS encryption and requires the username "
 "and password to be given in advance"
 msgstr ""
-"接続のセキュリティ層：<br>"
-"Any<br>"
-"クライアントとサーバーの両方でサポートされている"
-"セキュリティプロトコルに基づいて、セキュリティモードを自動的に選択します<br>"
-"RDP<br>"
-"レガシーRDP暗号化。このモードは、通常、古い Windowsサーバーや標準のWindowsログイン画面が必要な場合に使用されます<br>"
-"TLS<br>"
-"TLSによって実装されたRDP認証と暗号化<br>"
-"NLA<br>"
-"このモードはTLS暗号化を使用し、事前にユーザー名とパスワードを提供する必要があります<br>"
+"接続のセキュリティ層：<br>Any<br>クライアントとサーバーの両方でサポートされて"
+"いるセキュリティプロトコルに基づいて、セキュリティモードを自動的に選択します"
+"<br>RDP<br>レガシーRDP暗号化。このモードは、通常、古い Windowsサーバーや標準"
+"のWindowsログイン画面が必要な場合に使用されます<br>TLS<br>TLSによって実装され"
+"たRDP認証と暗号化<br>NLA<br>このモードはTLS暗号化を使用し、事前にユーザー名と"
+"パスワードを提供する必要があります<br>"
 
 #: assets/const/protocol.py:100
 msgid "AD domain"
@@ -1929,7 +1927,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:241
-#: users/models/user/__init__.py:310
+#: users/models/user/__init__.py:311
 msgid "Date created"
 msgstr "作成された日付"
 
@@ -1950,17 +1948,17 @@ msgid "Date verified"
 msgstr "確認済みの日付"
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
-#: users/models/group.py:25 users/models/user/__init__.py:62
+#: users/models/group.py:25 users/models/user/__init__.py:63
 msgid "User group"
 msgstr "ユーザーグループ"
 
 #: assets/models/cmd_filter.py:42 common/db/models.py:35
-#: users/models/user/__init__.py:138
+#: users/models/user/__init__.py:139
 msgid "Date updated"
 msgstr "更新日"
 
 #: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:91
-#: common/db/models.py:32 users/models/user/__init__.py:100
+#: common/db/models.py:32 users/models/user/__init__.py:101
 #: users/serializers/group.py:32
 msgid "Created by"
 msgstr "によって作成された"
@@ -2070,7 +2068,7 @@ msgstr "設定"
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:38
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
+#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:32
 msgid "Enabled"
 msgstr "有効化"
 
@@ -2152,7 +2150,7 @@ msgstr "アカウントの削除方法"
 msgid "Remove account params"
 msgstr "アカウント削除パラメータ"
 
-#: assets/models/platform.py:97 tickets/models/ticket/general.py:298
+#: assets/models/platform.py:97 tickets/models/ticket/general.py:301
 msgid "Meta"
 msgstr "メタ"
 
@@ -2257,7 +2255,7 @@ msgid "Model"
 msgstr "モデル"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:297
+#: tickets/models/ticket/general.py:300
 msgid "Serial number"
 msgstr "シリアル番号"
 
@@ -2722,8 +2720,8 @@ msgstr "ログインIP"
 
 #: audits/models.py:200 audits/serializers.py:52
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:63 users/models/user/__init__.py:78
-#: users/serializers/profile.py:97
+#: users/forms/profile.py:63 users/models/user/__init__.py:79
+#: users/serializers/profile.py:70
 msgid "MFA"
 msgstr "MFA"
 
@@ -2780,7 +2778,7 @@ msgstr "ユーザー %s %s が現在のリソースをサブスクライブし�
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:97
+#: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:98
 msgid "Date expired"
 msgstr "期限切れの日付"
 
@@ -2814,14 +2812,14 @@ msgstr "認証トークン"
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:78 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
-#: users/models/user/__init__.py:121 users/models/user/_source.py:18
+#: users/models/user/__init__.py:122 users/models/user/_source.py:18
 msgid "WeCom"
 msgstr "企業微信"
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
 #: authentication/views/login.py:90 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
-#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:127
+#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:128
 #: users/models/user/_source.py:20
 msgid "FeiShu"
 msgstr "本を飛ばす"
@@ -2829,13 +2827,13 @@ msgstr "本を飛ばす"
 #: audits/signal_handlers/login_log.py:40 authentication/views/login.py:102
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
-#: users/models/user/__init__.py:133 users/models/user/_source.py:22
+#: users/models/user/__init__.py:134 users/models/user/_source.py:22
 msgid "Slack"
 msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
 #: authentication/views/login.py:84 notifications/backends/__init__.py:12
-#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:124
+#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:125
 #: users/models/user/_source.py:19
 msgid "DingTalk"
 msgstr "DingTalk"
@@ -2973,7 +2971,7 @@ msgstr "に追加"
 
 #: authentication/backends/passkey/models.py:14
 #: authentication/models/access_key.py:26
-#: authentication/models/private_token.py:8
+#: authentication/models/private_token.py:8 authentication/models/ssh_key.py:20
 msgid "Date last used"
 msgstr "最後に使用した日付"
 
@@ -3305,7 +3303,7 @@ msgstr "カスタムパスワード"
 
 #: authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:114
-#: settings/serializers/msg.py:28 terminal/models/applet/applet.py:42
+#: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:21 terminal/serializers/session.py:48
 #: terminal/serializers/storage.py:71
@@ -3372,6 +3370,18 @@ msgstr "スーパー接続トークン"
 #: authentication/models/private_token.py:11
 msgid "Private Token"
 msgstr "プライベートトークン"
+
+#: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
+#: users/models/user/__init__.py:86
+#: xpack/plugins/cloud/serializers/account_attrs.py:213
+msgid "Private key"
+msgstr "ssh秘密鍵"
+
+#: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:34
+#: users/forms/profile.py:172 users/models/user/__init__.py:89
+#: xpack/plugins/cloud/serializers/account_attrs.py:210
+msgid "Public key"
+msgstr "公開キー"
 
 #: authentication/models/sso_token.py:15
 msgid "Expired"
@@ -3460,6 +3470,11 @@ msgstr "組織名"
 #: users/templates/users/forgot_password.html:153
 msgid "The {} cannot be empty"
 msgstr "{} 空にしてはならない"
+
+#: authentication/serializers/ssh_key.py:43 users/forms/profile.py:161
+#: users/serializers/profile.py:133 users/serializers/profile.py:160
+msgid "Not a valid ssh public key"
+msgstr "有効なssh公開鍵ではありません"
 
 #: authentication/serializers/token.py:22
 msgid "Access IP"
@@ -3973,7 +3988,7 @@ msgstr "は破棄されます"
 msgid "discard time"
 msgstr "時間を捨てる"
 
-#: common/db/models.py:33 users/models/user/__init__.py:103
+#: common/db/models.py:33 users/models/user/__init__.py:104
 msgid "Updated by"
 msgstr "によって更新"
 
@@ -4157,7 +4172,7 @@ msgstr "間違ったデータ タイプです。リストにする必要があ�
 msgid "Invalid choice: {}"
 msgstr "無効なオプション: {}"
 
-#: common/serializers/mixin.py:452 terminal/models/applet/applet.py:44
+#: common/serializers/mixin.py:452 terminal/models/applet/applet.py:45
 #: terminal/models/virtualapp/virtualapp.py:29
 msgid "Tags"
 msgstr "ラベル"
@@ -4803,7 +4818,7 @@ msgstr "組織を選択してから保存してください"
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:52
 #: terminal/templates/terminal/_msg_command_warning.html:21
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:60
+#: tickets/models/ticket/general.py:303 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
 
@@ -4820,7 +4835,7 @@ msgid "SYSTEM"
 msgstr "システム組織"
 
 #: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:185
-#: terminal/models/applet/applet.py:41
+#: terminal/models/applet/applet.py:42
 msgid "Builtin"
 msgstr "ビルトイン"
 
@@ -5076,7 +5091,7 @@ msgid "Scope"
 msgstr "スコープ"
 
 #: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user/__init__.py:65
+#: users/models/user/__init__.py:66
 msgid "Role"
 msgstr "ロール"
 
@@ -5111,7 +5126,7 @@ msgstr "組織の役割バインディング"
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
-#: rbac/serializers/permission.py:25 users/serializers/profile.py:103
+#: rbac/serializers/permission.py:25 users/serializers/profile.py:76
 msgid "Perms"
 msgstr "パーマ"
 
@@ -5179,8 +5194,8 @@ msgstr "認証"
 msgid "Storage"
 msgstr "ストレージ"
 
-#: rbac/tree.py:61 terminal/models/applet/applet.py:52
-#: terminal/models/applet/applet.py:318 terminal/models/applet/host.py:30
+#: rbac/tree.py:61 terminal/models/applet/applet.py:53
+#: terminal/models/applet/applet.py:328 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -5203,7 +5218,7 @@ msgid "Ticket comment"
 msgstr "チケットコメント"
 
 #: rbac/tree.py:159 settings/serializers/feature.py:98
-#: settings/serializers/feature.py:100 tickets/models/ticket/general.py:305
+#: settings/serializers/feature.py:100 tickets/models/ticket/general.py:308
 msgid "Ticket"
 msgstr "チケット"
 
@@ -5853,7 +5868,7 @@ msgstr "署名"
 msgid "Template code"
 msgstr "テンプレートコード"
 
-#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:75
+#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:76
 #: users/serializers/user.py:155
 msgid "Phone"
 msgstr "電話"
@@ -6562,12 +6577,6 @@ msgstr ""
 "* パスワード認証を通じてユーザがKoKoコンポーネントにログインできるように許可"
 "する"
 
-#: settings/serializers/terminal.py:34 users/forms/profile.py:172
-#: users/models/user/__init__.py:88
-#: xpack/plugins/cloud/serializers/account_attrs.py:210
-msgid "Public key"
-msgstr "公開キー"
-
 #: settings/serializers/terminal.py:36
 msgid ""
 "* Allow users to log in to the KoKo component via Public key "
@@ -7176,60 +7185,60 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+#: terminal/models/applet/applet.py:31 xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "コミュニティ版"
 
-#: terminal/models/applet/applet.py:31
+#: terminal/models/applet/applet.py:32
 msgid "Enterprise"
 msgstr "エンタープライズ版"
 
-#: terminal/models/applet/applet.py:34
+#: terminal/models/applet/applet.py:35
 #: terminal/models/virtualapp/virtualapp.py:20
 msgid "Display name"
 msgstr "表示名"
 
-#: terminal/models/applet/applet.py:36
+#: terminal/models/applet/applet.py:37
 #: terminal/models/virtualapp/virtualapp.py:22
 msgid "Author"
 msgstr "著者"
 
-#: terminal/models/applet/applet.py:38 terminal/serializers/applet.py:31
+#: terminal/models/applet/applet.py:39 terminal/serializers/applet.py:31
 msgid "Edition"
 msgstr "バージョン"
 
-#: terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:44
 msgid "Can concurrent"
 msgstr "同時実行可能"
 
-#: terminal/models/applet/applet.py:48 terminal/serializers/applet_host.py:167
+#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:167
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "ホスト"
 
-#: terminal/models/applet/applet.py:93
+#: terminal/models/applet/applet.py:94
 #: terminal/models/virtualapp/virtualapp.py:66
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "無効なアプレット パッケージ、ファイル {} がありません"
 
-#: terminal/models/applet/applet.py:112
+#: terminal/models/applet/applet.py:113
 msgid "Load platform.yml failed: {}"
 msgstr "platform.ymlのロードに失敗しました:{}"
 
-#: terminal/models/applet/applet.py:115
+#: terminal/models/applet/applet.py:116
 msgid "Only support custom platform"
 msgstr "カスタムプラットフォームのみをサポート"
 
-#: terminal/models/applet/applet.py:120
+#: terminal/models/applet/applet.py:121
 msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
-#: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:330 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "ホスト マシン"
 
-#: terminal/models/applet/applet.py:326
+#: terminal/models/applet/applet.py:336
 msgid "Applet Publication"
 msgstr "アプリケーションのリリース"
 
@@ -7792,11 +7801,6 @@ msgstr "エンドポイントサフィックス"
 msgid "HOST"
 msgstr "ホスト"
 
-#: terminal/serializers/storage.py:146 users/models/user/__init__.py:85
-#: xpack/plugins/cloud/serializers/account_attrs.py:213
-msgid "Private key"
-msgstr "ssh秘密鍵"
-
 #: terminal/serializers/storage.py:152
 msgid "SFTP Root"
 msgstr "SFTPルート"
@@ -7841,7 +7845,7 @@ msgstr "インデックス"
 msgid "Doc type"
 msgstr "Docタイプ"
 
-#: terminal/serializers/storage.py:263
+#: terminal/serializers/storage.py:269
 msgid ""
 "set as the default storage, will make new Component use the current storage "
 "by default, without affecting existing Component"
@@ -8037,7 +8041,7 @@ msgstr ""
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
-#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:286
+#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
 msgstr "応募者"
 
@@ -8126,7 +8130,7 @@ msgid "Body"
 msgstr "ボディ"
 
 #: tickets/models/flow.py:21 tickets/models/flow.py:47
-#: tickets/models/ticket/general.py:42
+#: tickets/models/ticket/general.py:45
 msgid "Approve level"
 msgstr "レベルを承認する"
 
@@ -8188,35 +8192,35 @@ msgstr "コマンド フィルタ"
 msgid "Apply Command Ticket"
 msgstr "製造オーダの検討を命令"
 
-#: tickets/models/ticket/general.py:77
+#: tickets/models/ticket/general.py:80
 msgid "Ticket step"
 msgstr "チケットステップ"
 
-#: tickets/models/ticket/general.py:95
+#: tickets/models/ticket/general.py:98
 msgid "Ticket assignee"
 msgstr "割り当てられたチケット"
 
-#: tickets/models/ticket/general.py:270
+#: tickets/models/ticket/general.py:273
 msgid "Title"
 msgstr "タイトル"
 
-#: tickets/models/ticket/general.py:290
+#: tickets/models/ticket/general.py:293
 msgid "TicketFlow"
 msgstr "作業指示プロセス"
 
-#: tickets/models/ticket/general.py:293
+#: tickets/models/ticket/general.py:296
 msgid "Approval step"
 msgstr "承認ステップ"
 
-#: tickets/models/ticket/general.py:296
+#: tickets/models/ticket/general.py:299
 msgid "Relation snapshot"
 msgstr "製造オーダスナップショット"
 
-#: tickets/models/ticket/general.py:399
+#: tickets/models/ticket/general.py:405
 msgid "Please try again"
 msgstr "もう一度お試しください"
 
-#: tickets/models/ticket/general.py:475
+#: tickets/models/ticket/general.py:481
 msgid "Super ticket"
 msgstr "スーパーチケット"
 
@@ -8499,71 +8503,66 @@ msgstr "ここにid_rsa.pubを貼り付けます。"
 msgid "Public key should not be the same as your old one."
 msgstr "公開鍵は古いものと同じであってはなりません。"
 
-#: users/forms/profile.py:161 users/serializers/profile.py:76
-#: users/serializers/profile.py:160 users/serializers/profile.py:187
-msgid "Not a valid ssh public key"
-msgstr "有効なssh公開鍵ではありません"
-
 #: users/models/preference.py:38 users/serializers/preference/preference.py:19
 msgid "Preference"
 msgstr "ユーザー設定"
 
-#: users/models/user/__init__.py:68 users/serializers/user.py:271
+#: users/models/user/__init__.py:69 users/serializers/user.py:271
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
-#: users/models/user/__init__.py:70
+#: users/models/user/__init__.py:71
 msgid "Avatar"
 msgstr "アバター"
 
-#: users/models/user/__init__.py:72
+#: users/models/user/__init__.py:73
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user/__init__.py:81
+#: users/models/user/__init__.py:82
 msgid "OTP secret key"
 msgstr "OTP 秘密"
 
 # msgid "Private key"
 # msgstr "ssh秘密鍵"
-#: users/models/user/__init__.py:91 users/serializers/profile.py:124
+#: users/models/user/__init__.py:92 users/serializers/profile.py:97
 #: users/serializers/user.py:268
 msgid "Is first login"
 msgstr "最初のログインです"
 
-#: users/models/user/__init__.py:109
+#: users/models/user/__init__.py:110
 msgid "Date password last updated"
 msgstr "最終更新日パスワード"
 
-#: users/models/user/__init__.py:112
+#: users/models/user/__init__.py:113
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user/__init__.py:136
+#: users/models/user/__init__.py:137
 msgid "Date api key used"
 msgstr "API key 最後に使用した日付"
 
-#: users/models/user/__init__.py:275
+#: users/models/user/__init__.py:276
 msgid "Can not delete admin user"
 msgstr "管理者ユーザーを削除できませんでした"
 
-#: users/models/user/__init__.py:289
+#: users/models/user/__init__.py:290
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user/__init__.py:290
+#: users/models/user/__init__.py:291
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user/__init__.py:291
+#: users/models/user/__init__.py:292
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user/__init__.py:320
+#: users/models/user/__init__.py:321
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
-#: users/models/user/_auth.py:34
+#: users/models/user/_auth.py:33
 msgid "Force enabled"
 msgstr "強制有効"
 
@@ -8704,7 +8703,7 @@ msgstr "コマンドライン"
 msgid "The old password is incorrect"
 msgstr "古いパスワードが正しくありません"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:174
+#: users/serializers/profile.py:36 users/serializers/profile.py:147
 msgid "Password does not match security rules"
 msgstr "パスワードがセキュリティルールと一致しない"
 
@@ -9910,3 +9909,9 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+msgid "Store locally"
+msgstr "ローカルに保存する"
+
+msgid "Do not save"
+msgstr "保存しない"
