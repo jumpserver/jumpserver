@@ -127,6 +127,8 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
     SU_METHOD_CHOICES = [
         ("sudo", "sudo su -"),
         ("su", "su - "),
+        ("only_sudo", "sudo su"),
+        ("only_su", "su"),
         ("enable", "enable"),
         ("super", "super 15"),
         ("super_level", "super level 15")
