@@ -12,6 +12,8 @@ from users.notifications import ResetPublicKeySuccessMsg
 class SSHkeyViewSet(JMSModelViewSet):
     serializer_class = SSHKeySerializer
     permission_classes = [IsValidUser]
+    filterset_fields = ('name', 'is_active')
+    search_fields = ('name',)
 
     def get_queryset(self):
         return self.request.user.ssh_keys.all()
