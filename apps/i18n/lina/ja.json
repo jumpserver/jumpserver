@@ -1424,5 +1424,6 @@
     "forceEnableMFAHelpText": "強制的に有効化すると、ユーザーは自分で無効化することができません。",
     "removeWarningMsg": "削除してもよろしいですか",
     "AdhocCreate": "アドホックコマンドを作成",
-    "UploadHelpText": "次のサンプル構造ディレクトリを含む .zip ファイルをアップロードしてください。"
+    "UploadHelpText": "次のサンプル構造ディレクトリを含む .zip ファイルをアップロードしてください。",
+    "SessionJoinRecords": "協力記録"
 }

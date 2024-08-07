@@ -1388,5 +1388,6 @@
     "ApproveSelected": "Approve selected",
     "Running": "Running",
     "AdhocCreate": "Create the command",
-    "UploadHelpText": "Please upload a .zip file containing the following sample directory structure"
+    "UploadHelpText": "Please upload a .zip file containing the following sample directory structure",
+    "SessionJoinRecords": "collaboration records"
 }
