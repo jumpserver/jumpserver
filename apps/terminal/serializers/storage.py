@@ -253,9 +253,10 @@ class BaseStorageSerializer(serializers.ModelSerializer):
         return serializer
 
     def get_comment(self, obj):
-        need_translate_comments = ['Store locally', 'Do not save']
+
+        need_translate_comments = {'Store locally': _('Store locally'), 'Do not save': _('Do not save')}
         comment = obj.comment
-        return _(comment) if comment in need_translate_comments else comment
+        return need_translate_comments.get(comment, comment)
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)

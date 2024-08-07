@@ -196,13 +196,11 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
 
             orgs = self.get_orgs(org_ids)
             new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
-            if error_msg:
-                msg = error_msg
-
-            count = users if users is None else len(users)
             orgs_name = ', '.join([str(org) for org in orgs])
             ok = True
-            msg = _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
+            msg = _('Imported total: {} new: {}, failed: {} Organization: {}').format(
+                len(users), len(new_users), len(error_msg), orgs_name
+            )
         except Exception as e:
             msg = str(e)
         return ok, msg
