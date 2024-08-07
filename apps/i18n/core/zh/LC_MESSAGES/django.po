@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-06 10:19+0800\n"
+"POT-Creation-Date: 2024-08-07 19:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -872,8 +872,8 @@ msgstr "类别"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:154 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:277
-#: terminal/serializers/storage.py:290 tickets/models/comment.py:26
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:278
+#: terminal/serializers/storage.py:291 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
 #: tickets/serializers/ticket/ticket.py:19
@@ -6650,9 +6650,9 @@ msgstr "认证成功: {}"
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/ws.py:205
-msgid "Imported {} users successfully (Organization: {})"
-msgstr "成功导入 {} 个用户 ( 组织: {} )"
+#: settings/ws.py:201
+msgid "Imported total: {} new: {}, failed: {} Organization: {}"
+msgstr "导入总计: {}，新增: {}，失败: {}，组织: {}"
 
 #: templates/_csv_import_export.html:8
 msgid "Export"
@@ -7702,7 +7702,15 @@ msgstr "索引"
 msgid "Doc type"
 msgstr "文档类型"
 
-#: terminal/serializers/storage.py:269
+#: terminal/serializers/storage.py:257
+msgid "Store locally"
+msgstr "本地存储"
+
+#: terminal/serializers/storage.py:257
+msgid "Do not save"
+msgstr "不保存"
+
+#: terminal/serializers/storage.py:270
 msgid ""
 "set as the default storage, will make new Component use the current storage "
 "by default, without affecting existing Component"
@@ -9729,9 +9737,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-msgid "Store locally"
-msgstr "本地存储"
-
-msgid "Do not save"
-msgstr "不保存"
