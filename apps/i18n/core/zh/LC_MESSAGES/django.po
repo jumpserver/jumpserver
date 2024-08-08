@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-07 19:04+0800\n"
+"POT-Creation-Date: 2024-08-08 19:14+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -702,7 +702,7 @@ msgstr "密码规则"
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
 #: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
-#: assets/serializers/platform.py:280
+#: assets/serializers/platform.py:282
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
@@ -854,8 +854,8 @@ msgstr "账号存在策略"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:125
-#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:175
-#: assets/serializers/platform.py:281 perms/serializers/user_permission.py:26
+#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:177
+#: assets/serializers/platform.py:283 perms/serializers/user_permission.py:26
 #: settings/models.py:36 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12
 msgid "Category"
@@ -866,7 +866,7 @@ msgstr "类别"
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
-#: assets/serializers/platform.py:174 audits/serializers.py:53
+#: assets/serializers/platform.py:176 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
@@ -903,7 +903,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:9
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
-#: assets/serializers/platform.py:183 assets/serializers/platform.py:215
+#: assets/serializers/platform.py:185 assets/serializers/platform.py:217
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
 #: perms/serializers/permission.py:35
@@ -1765,7 +1765,7 @@ msgstr "连接项"
 
 #: assets/const/protocol.py:227
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
-msgstr ""
+msgstr "连接特定选项，例如 retryWrites=false&retryReads=false"
 
 #: assets/const/protocol.py:239
 msgid "Auth username"
@@ -2005,6 +2005,18 @@ msgstr "值"
 msgid "Label"
 msgstr "标签"
 
+#: assets/models/my_asset.py:12 assets/serializers/my_asset.py:16
+msgid "Custom Name"
+msgstr "自定义名称"
+
+#: assets/models/my_asset.py:13 assets/serializers/my_asset.py:17
+msgid "Custom Comment"
+msgstr "自定义备注"
+
+#: assets/models/my_asset.py:18 rbac/tree.py:54
+msgid "My assets"
+msgstr "我的资产"
+
 #: assets/models/node.py:168
 msgid "New node"
 msgstr "新节点"
@@ -2145,23 +2157,23 @@ msgstr "元数据"
 msgid "Internal"
 msgstr "内置"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:173
+#: assets/models/platform.py:102 assets/serializers/platform.py:175
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/platform.py:104 assets/serializers/platform.py:211
+#: assets/models/platform.py:104 assets/serializers/platform.py:213
 msgid "Gateway enabled"
 msgstr "启用网域"
 
-#: assets/models/platform.py:106 assets/serializers/platform.py:204
+#: assets/models/platform.py:106 assets/serializers/platform.py:206
 msgid "Su enabled"
 msgstr "启用账号切换"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:179
+#: assets/models/platform.py:107 assets/serializers/platform.py:181
 msgid "Su method"
 msgstr "账号切换方式"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:182
+#: assets/models/platform.py:108 assets/serializers/platform.py:184
 msgid "Custom fields"
 msgstr "自定义属性"
 
@@ -2176,7 +2188,7 @@ msgid ""
 "type"
 msgstr "资产中批量更新平台，不符合平台类型跳过的资产"
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:176
+#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:178
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
@@ -2295,7 +2307,7 @@ msgid ""
 "the zone, the connection is routed through the gateway."
 msgstr "网关是网域的网络代理，当连接网域内的资产时，连接将通过网关进行路由。"
 
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:184
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:186
 #: orgs/serializers.py:13 perms/serializers/permission.py:39
 msgid "Assets amount"
 msgstr "资产数量"
@@ -2384,11 +2396,11 @@ msgstr "帮助"
 msgid "Choices"
 msgstr "选择"
 
-#: assets/serializers/platform.py:177
+#: assets/serializers/platform.py:179
 msgid "Automation"
 msgstr "自动化"
 
-#: assets/serializers/platform.py:206
+#: assets/serializers/platform.py:208
 msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
@@ -2397,19 +2409,19 @@ msgstr ""
 "在访问资产时使用账户登录，然后自动切换到另一个账户，就像用普通账户登录然后切"
 "换到 root 一样"
 
-#: assets/serializers/platform.py:212
+#: assets/serializers/platform.py:214
 msgid "Assets can be connected using a zone gateway"
 msgstr "资产可以使用区域网关进行连接"
 
-#: assets/serializers/platform.py:214
+#: assets/serializers/platform.py:216
 msgid "Default Domain"
 msgstr "默认网域"
 
-#: assets/serializers/platform.py:236
+#: assets/serializers/platform.py:238
 msgid "type is required"
 msgstr "类型 该字段是必填项。"
 
-#: assets/serializers/platform.py:251
+#: assets/serializers/platform.py:253
 msgid "Protocols is required"
 msgstr "协议是必填的"
 
@@ -4142,7 +4154,7 @@ msgstr "无效 IP"
 msgid "Invalid address"
 msgstr "无效地址"
 
-#: common/utils/translate.py:45
+#: common/utils/translate.py:46
 #, python-format
 msgid "Hello %s"
 msgstr "你好 %s"
@@ -5106,10 +5118,6 @@ msgstr "收集账号"
 #: rbac/tree.py:53
 msgid "Account change secret"
 msgstr "账号改密"
-
-#: rbac/tree.py:54
-msgid "My assets"
-msgstr "我的资产"
 
 #: rbac/tree.py:55
 msgid "App ops"

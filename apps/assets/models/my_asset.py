@@ -15,7 +15,7 @@ class MyAsset(JMSBaseModel):
 
     class Meta:
         unique_together = ('user', 'asset')
-        verbose_name = _("My asset")
+        verbose_name = _("My assets")
 
     def custom_to_dict(self):
         data = {}
