@@ -1,4 +1,4 @@
-ARG VERSION
+ARG VERSION=dev
 
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} AS build-xpack
 FROM jumpserver/core:${VERSION}-ce
