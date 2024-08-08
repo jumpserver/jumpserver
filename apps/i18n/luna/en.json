@@ -104,7 +104,7 @@
     "Log out": "Log out",
     "Login reminder": "Login reminder",
     "Login review approved": "Login review has been approved, connecting assets...",
-    "LoginExpireMsg": "Login session expired, please re-login",
+    "LoginExpireMsg": "The current login has timed out, please do not close the window. Log in in a new window to restore the current page. If not, please refresh the page.",
     "Manual accounts": "Manual accounts",
     "Module": "Module",
     "Multi Screen": "Multi Screen",
