@@ -21,6 +21,7 @@ def i18n_fmt(tpl, *args):
         return tpl
 
     args = [str(arg) for arg in args]
+    args = [arg.replace(', ', ' ') for arg in args]
 
     try:
         tpl % tuple(args)
