@@ -94,13 +94,16 @@ class SlackRequests:
 
 
 class Slack:
-    attributes = settings.SLACK_RENAME_ATTRIBUTES
 
     def __init__(self, client_id=None, client_secret=None, bot_token=None, **kwargs):
         self._client = SlackRequests(
             client_id=client_id, client_secret=client_secret, bot_token=bot_token
         )
         self.markdown = mistune.Markdown(renderer=SlackRenderer())
+
+    @property
+    def attributes(self):
+        return settings.SLACK_RENAME_ATTRIBUTES
 
     def get_user_id_by_code(self, code):
         self._client.request_access_token(code)
@@ -141,8 +144,8 @@ class Slack:
                 logger.exception(e)
 
     @staticmethod
-    def default_user_detail(data):
-        username = data['user_id']
+    def default_user_detail(data, user_id):
+        username = data.get('id', user_id)
         username = data.get('name', username)
         name = data.get('real_name', username)
         email = data.get('profile.email')
@@ -157,6 +160,6 @@ class Slack:
         data = kwargs['other_info']
         data['user_id'] = user_id
         info = flatten_dict(data)
-        default_detail = self.default_user_detail(data)
+        default_detail = self.default_user_detail(data, user_id)
         detail = map_attributes(default_detail, info, self.attributes)
         return detail

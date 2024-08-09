@@ -116,7 +116,6 @@ class DingTalkRequests(BaseRequest):
 
 
 class DingTalk:
-    attributes = settings.DINGTALK_RENAME_ATTRIBUTES
 
     def __init__(self, appid, appsecret, agentid, timeout=None):
         self._appid = appid or ''
@@ -127,6 +126,10 @@ class DingTalk:
             appid=appid, appsecret=appsecret, agentid=agentid,
             timeout=timeout
         )
+
+    @property
+    def attributes(self):
+        return settings.DINGTALK_RENAME_ATTRIBUTES
 
     def get_userinfo_bycode(self, code):
         body = {
@@ -210,8 +213,8 @@ class DingTalk:
         return data
 
     @staticmethod
-    def default_user_detail(data):
-        username = data['user_id']
+    def default_user_detail(data, user_id):
+        username = data.get('userid', user_id)
         name = data.get('name', username)
         email = data.get('email') or data.get('org_email')
         email = construct_user_email(username, email)
@@ -227,6 +230,6 @@ class DingTalk:
         data = data['result']
         data['user_id'] = user_id
         info = flatten_dict(data)
-        default_detail = self.default_user_detail(data)
+        default_detail = self.default_user_detail(data, user_id)
         detail = map_attributes(default_detail, info, self.attributes)
         return detail
