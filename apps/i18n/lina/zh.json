@@ -581,6 +581,7 @@
     "IPLoginLimit": "IP 登录限制",
     "IPMatch": "IP 匹配",
     "IPNetworkSegment": "IP网段",
+    "IPType": "IP 类型",
     "Id": "ID",
     "IdeaContent": "我想让你充当一个 Linux 终端。我将输入命令，你将回答终端应该显示的内容。我希望你只在一个独特的代码块内回复终端输出，而不是其他。不要写解释。当我需要告诉你一些事情时，我会把文字放在大括号里{备注文本}。",
     "IdeaTitle": "🌱 Linux 终端",

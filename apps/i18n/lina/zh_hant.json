@@ -766,6 +766,7 @@
     "IPMatch": "IP 匹配",
     "IPNetworkSegment": "IP網段",
     "Icon": "圖示",
+    "IPType": "IP 類型",
     "Id": "ID",
     "IdeaContent": "我想讓你充當一個 Linux 終端。我將輸入命令，你將回答終端應該顯示的內容。我希望你只在一個獨特的代碼塊內回復終端輸出，而不是其他。不要寫解釋。當我需要告訴你一些事情時，我會把文字放在大括號裡{備註文本}。",
     "IdeaTitle": "🌱 Linux 終端",
