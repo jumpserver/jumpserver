@@ -80,7 +80,6 @@ class WeCom(RequestMixin):
     """
     非业务数据导致的错误直接抛异常，说明是系统配置错误，业务代码不用理会
     """
-    attributes = settings.WECOM_RENAME_ATTRIBUTES
 
     def __init__(self, corpid, corpsecret, agentid, timeout=None):
         self._corpid = corpid or ''
@@ -93,6 +92,10 @@ class WeCom(RequestMixin):
             agentid=agentid,
             timeout=timeout
         )
+
+    @property
+    def attributes(self):
+        return settings.WECOM_RENAME_ATTRIBUTES
 
     def send_markdown(self, users: Iterable, msg: AnyStr, **kwargs):
         pass
@@ -176,8 +179,8 @@ class WeCom(RequestMixin):
             raise WeComError
 
     @staticmethod
-    def default_user_detail(data):
-        username = data.get('userid')
+    def default_user_detail(data, user_id):
+        username = data.get('userid', user_id)
         name = data.get('name', username)
         email = data.get('email') or data.get('biz_mail')
         email = construct_user_email(username, email)
@@ -189,6 +192,6 @@ class WeCom(RequestMixin):
         # https://open.work.weixin.qq.com/api/doc/90000/90135/90196
         data = self._requests.get(URL.GET_USER_DETAIL, {'userid': user_id})
         info = flatten_dict(data)
-        default_detail = self.default_user_detail(data)
+        default_detail = self.default_user_detail(data, user_id)
         detail = map_attributes(default_detail, info, self.attributes)
         return detail

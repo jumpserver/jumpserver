@@ -16,4 +16,7 @@ class LarkRequests(FeishuRequests):
 
 class Lark(FeiShu):
     requests_cls = LarkRequests
-    attributes = settings.LARK_RENAME_ATTRIBUTES
+
+    @property
+    def attributes(self):
+        return settings.LARK_RENAME_ATTRIBUTES
