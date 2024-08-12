@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-08 19:14+0800\n"
+"POT-Creation-Date: 2024-08-12 18:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -484,7 +484,7 @@ msgstr "账号备份快照"
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
 #: assets/serializers/automations/base.py:40 xpack/plugins/cloud/models.py:240
-#: xpack/plugins/cloud/serializers/task.py:231
+#: xpack/plugins/cloud/serializers/task.py:237
 msgid "Trigger mode"
 msgstr "触发模式"
 
@@ -5454,7 +5454,7 @@ msgstr ""
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:21
 msgid "Lark"
-msgstr "启用 Lark 认证"
+msgstr ""
 
 #: settings/serializers/auth/lark.py:19
 msgid ""
@@ -5596,7 +5596,7 @@ msgstr "总是更新用户信息"
 
 #: settings/serializers/auth/oidc.py:13 settings/serializers/auth/oidc.py:71
 msgid "OIDC"
-msgstr "启用 OIDC 认证"
+msgstr ""
 
 #: settings/serializers/auth/oidc.py:17
 msgid "Base site URL"
@@ -9226,6 +9226,7 @@ msgstr "测试云账号"
 #: xpack/plugins/cloud/models.py:104
 #: xpack/plugins/cloud/serializers/account.py:76
 #: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "Regions"
 msgstr "地域"
 
@@ -9238,7 +9239,7 @@ msgid "IP network segment group"
 msgstr "IP网段组"
 
 #: xpack/plugins/cloud/models.py:115
-#: xpack/plugins/cloud/serializers/task.py:160
+#: xpack/plugins/cloud/serializers/task.py:161
 msgid "Sync IP type"
 msgstr "同步IP类型"
 

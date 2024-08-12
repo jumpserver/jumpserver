@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-08 19:14+0800\n"
+"POT-Creation-Date: 2024-08-12 18:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -486,7 +486,7 @@ msgstr "帳號備份快照"
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
 #: assets/serializers/automations/base.py:40 xpack/plugins/cloud/models.py:240
-#: xpack/plugins/cloud/serializers/task.py:231
+#: xpack/plugins/cloud/serializers/task.py:237
 msgid "Trigger mode"
 msgstr "觸發模式"
 
@@ -5457,7 +5457,7 @@ msgstr ""
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:21
 msgid "Lark"
-msgstr "啟用Lark認證"
+msgstr ""
 
 #: settings/serializers/auth/lark.py:19
 msgid ""
@@ -9242,6 +9242,7 @@ msgstr "測試雲帳號"
 #: xpack/plugins/cloud/models.py:104
 #: xpack/plugins/cloud/serializers/account.py:76
 #: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "Regions"
 msgstr "地域"
 
@@ -9254,7 +9255,7 @@ msgid "IP network segment group"
 msgstr "IP網段組"
 
 #: xpack/plugins/cloud/models.py:115
-#: xpack/plugins/cloud/serializers/task.py:160
+#: xpack/plugins/cloud/serializers/task.py:161
 msgid "Sync IP type"
 msgstr "同步IP類型"
 
