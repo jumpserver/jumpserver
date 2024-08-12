@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-08 19:14+0800\n"
+"POT-Creation-Date: 2024-08-12 18:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -485,7 +485,7 @@ msgstr "アカウントのバックアップスナップショット"
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
 #: assets/serializers/automations/base.py:40 xpack/plugins/cloud/models.py:240
-#: xpack/plugins/cloud/serializers/task.py:231
+#: xpack/plugins/cloud/serializers/task.py:237
 msgid "Trigger mode"
 msgstr "トリガーモード"
 
@@ -5527,7 +5527,7 @@ msgstr ""
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:21
 msgid "Lark"
-msgstr "Lark認証を有効にする"
+msgstr ""
 
 #: settings/serializers/auth/lark.py:19
 msgid ""
@@ -5671,7 +5671,7 @@ msgstr "常にユーザーを更新"
 
 #: settings/serializers/auth/oidc.py:13 settings/serializers/auth/oidc.py:71
 msgid "OIDC"
-msgstr "OIDC"
+msgstr ""
 
 #: settings/serializers/auth/oidc.py:17
 msgid "Base site URL"
@@ -9405,6 +9405,7 @@ msgstr "クラウドアカウントのテスト"
 #: xpack/plugins/cloud/models.py:104
 #: xpack/plugins/cloud/serializers/account.py:76
 #: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "Regions"
 msgstr "リージョン"
 
@@ -9417,7 +9418,7 @@ msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
 #: xpack/plugins/cloud/models.py:115
-#: xpack/plugins/cloud/serializers/task.py:160
+#: xpack/plugins/cloud/serializers/task.py:161
 msgid "Sync IP type"
 msgstr "同期IPタイプ"
 
