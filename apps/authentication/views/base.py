@@ -46,9 +46,6 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
     def verify_state(self):
         raise NotImplementedError
 
-    def get_verify_state_failed_response(self, redirect_uri):
-        raise NotImplementedError
-
     def create_user_if_not_exist(self, user_id, **kwargs):
         user = None
         user_attr = self.client.get_user_detail(user_id, **kwargs)
@@ -121,9 +118,6 @@ class BaseBindCallbackView(FlashMessageMixin, IMClientMixin, View):
     auth_type_label = ''
 
     def verify_state(self):
-        raise NotImplementedError
-
-    def get_verify_state_failed_response(self, redirect_uri):
         raise NotImplementedError
 
     def get_already_bound_response(self, redirect_uri):
