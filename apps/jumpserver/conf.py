@@ -509,6 +509,7 @@ class Config(dict):
         # Terminal配置
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
+        'TERMINAL_SSH_KEY_LIMIT_COUNT': 10,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
         'TERMINAL_ASSET_LIST_SORT_BY': 'name',
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',

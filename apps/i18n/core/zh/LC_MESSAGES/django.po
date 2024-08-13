@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-12 18:34+0800\n"
+"POT-Creation-Date: 2024-08-13 16:47+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1571,7 +1571,7 @@ msgid "Gather facts"
 msgstr "收集资产信息"
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:31
+#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr "禁用"
 
@@ -2067,7 +2067,7 @@ msgstr "设置"
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:38
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:32
+#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "启用"
 
@@ -3083,7 +3083,7 @@ msgstr "请输入 MFA 验证码"
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors/failed.py:164 users/exceptions.py:15
+#: authentication/errors/failed.py:164 users/exceptions.py:14
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -3443,7 +3443,25 @@ msgstr "组织名称"
 msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
-#: authentication/serializers/ssh_key.py:43 users/forms/profile.py:161
+#: authentication/serializers/ssh_key.py:17
+msgid "Automatically Generate Key Pair"
+msgstr "自动创建密钥对"
+
+#: authentication/serializers/ssh_key.py:19
+msgid "Import Existing Key Pair"
+msgstr "导入已有密钥对"
+
+#: authentication/serializers/ssh_key.py:31
+msgid "Create Type"
+msgstr "创建类型"
+
+#: authentication/serializers/ssh_key.py:33
+msgid ""
+"Please download the private key after creation. Each private key can only be "
+"downloaded once"
+msgstr "创建完成后请下载私钥，每个私钥只有一次下载机会"
+
+#: authentication/serializers/ssh_key.py:57 users/forms/profile.py:161
 #: users/serializers/profile.py:133 users/serializers/profile.py:160
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
@@ -8293,13 +8311,17 @@ msgstr "替换"
 msgid "Suffix"
 msgstr "加后缀"
 
-#: users/exceptions.py:10
+#: users/exceptions.py:9
 msgid "MFA not enabled"
 msgstr "MFA 多因子认证没有开启"
 
-#: users/exceptions.py:20
+#: users/exceptions.py:19
 msgid "Unable to delete all users"
 msgstr "无法删除全部用户"
+
+#: users/exceptions.py:24
+msgid "Create failed. The number of SSH keys has reached the limit"
+msgstr "创建失败，SSH密钥数量已达到上限"
 
 #: users/forms/profile.py:48
 msgid ""
@@ -8426,7 +8448,7 @@ msgstr "可以匹配用户"
 msgid "User password history"
 msgstr "用户密码历史"
 
-#: users/models/user/_auth.py:33
+#: users/models/user/_auth.py:34
 msgid "Force enabled"
 msgstr "强制启用"
 

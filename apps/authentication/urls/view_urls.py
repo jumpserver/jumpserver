@@ -63,6 +63,7 @@ urlpatterns = [
 
     # Profile
     path('profile/mfa/', users_view.MFASettingView.as_view(), name='user-mfa-setting'),
+    path('profile/pubkey/generate/', users_view.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
 
     # OTP Setting
     path('profile/otp/enable/start/', users_view.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),

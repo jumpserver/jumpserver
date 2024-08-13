@@ -18,6 +18,7 @@ from common.utils import (
     lazyproperty,
 )
 from users.signals import post_user_change_password
+from users.exceptions import CreateSSHKeyExceedLimit
 
 logger = get_logger(__file__)
 
@@ -132,6 +133,15 @@ class AuthMixin:
                 self.date_password_last_updated = timezone.now()
                 post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)  # noqa
+
+    def set_ssh_key(self, name, public_key, private_key):
+        if self.can_update_ssh_key():
+            from authentication.models import SSHKey
+            SSHKey.objects.create(name=name, public_key=public_key, private_key=private_key, user=self)
+            post_user_change_password.send(self.__class__, user=self)
+
+    def can_create_ssh_key(self):
+        return self.ssh_keys.count() < settings.TERMINAL_SSH_KEY_LIMIT_COUNT
 
     def can_update_password(self):
         return self.is_local
