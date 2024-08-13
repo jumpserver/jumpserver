@@ -219,7 +219,7 @@ command_storage_type_serializer_classes_mapping = {
 class BaseStorageSerializer(serializers.ModelSerializer):
     storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
-    comment = serializers.SerializerMethodField()
+    comment = serializers.SerializerMethodField(label=_('Comment'))
 
     class Meta:
         model = None
@@ -252,7 +252,8 @@ class BaseStorageSerializer(serializers.ModelSerializer):
             serializer = serializer_class
         return serializer
 
-    def get_comment(self, obj):
+    @staticmethod
+    def get_comment(obj):
 
         need_translate_comments = {'Store locally': _('Store locally'), 'Do not save': _('Do not save')}
         comment = obj.comment
