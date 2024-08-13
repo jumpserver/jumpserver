@@ -1,8 +1,3 @@
-from django.utils import timezone
-from rest_framework.response import Response
-from rest_framework.decorators import action
-
-from rbac.permissions import RBACPermission
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from ..serializers import SSHKeySerializer
@@ -14,6 +9,7 @@ class SSHkeyViewSet(JMSModelViewSet):
     permission_classes = [IsValidUser]
     filterset_fields = ('name', 'is_active')
     search_fields = ('name',)
+    ordering = ('-date_last_used', '-date_created')
 
     def get_queryset(self):
         return self.request.user.ssh_keys.all()
