@@ -151,9 +151,17 @@ class FeiShu(RequestMixin):
         }
 
     def get_user_detail(self, user_id, **kwargs):
-        # get_user_id_by_code 已经返回个人信息，这里直接解析
-        data = kwargs['other_info']
-        data['user_id'] = user_id
+        # https://open.feishu.cn/document/server-docs/contact-v3/user/get
+        data = {}
+        try:
+            data = self._requests.get(
+                self.url_instance.get_user_detail(user_id),
+                {'user_id_type': 'user_id'}
+            )
+            data = data['data']['user']
+        except Exception as e:
+            logger.error(f'Get user detail error: {e} data={data}')
+
         info = flatten_dict(data)
         default_detail = self.default_user_detail(data, user_id)
         detail = map_attributes(default_detail, info, self.attributes)
