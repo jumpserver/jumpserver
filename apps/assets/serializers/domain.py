@@ -57,9 +57,7 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
 
     @classmethod
     def setup_eager_loading(cls, queryset):
-        queryset = queryset \
-            .annotate(assets_amount=Count('assets')) \
-            .prefetch_related('labels', 'labels__label')
+        queryset = queryset.prefetch_related('labels', 'labels__label')
         return queryset
 
 
