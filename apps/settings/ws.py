@@ -3,10 +3,11 @@
 import json
 import asyncio
 
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.cache import cache
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, activate
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
@@ -196,10 +197,10 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
 
             orgs = self.get_orgs(org_ids)
             new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
-            orgs_name = ', '.join([str(org) for org in orgs])
             ok = True
-            msg = _('Imported total: {} new: {}, failed: {} Organization: {}').format(
-                len(users), len(new_users), len(error_msg), orgs_name
+            success_count = len(users) - len(error_msg)
+            msg = _('Total {}, success {}, failure {}').format(
+                len(users), success_count, len(error_msg)
             )
         except Exception as e:
             msg = str(e)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-13 16:47+0800\n"
+"POT-Creation-Date: 2024-08-15 14:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -485,7 +485,7 @@ msgstr "アカウントのバックアップスナップショット"
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
 #: assets/serializers/automations/base.py:40 xpack/plugins/cloud/models.py:240
-#: xpack/plugins/cloud/serializers/task.py:237
+#: xpack/plugins/cloud/serializers/task.py:243
 msgid "Trigger mode"
 msgstr "トリガーモード"
 
@@ -703,7 +703,7 @@ msgstr "パスワードルール"
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
 #: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
-#: assets/serializers/platform.py:282
+#: assets/serializers/platform.py:273
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
@@ -856,8 +856,8 @@ msgstr "アカウントの存在ポリシー"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:125
-#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:177
-#: assets/serializers/platform.py:283 perms/serializers/user_permission.py:26
+#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
+#: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
 #: settings/models.py:36 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12
 msgid "Category"
@@ -868,14 +868,14 @@ msgstr "カテゴリ"
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
-#: assets/serializers/platform.py:176 audits/serializers.py:53
+#: assets/serializers/platform.py:167 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:154 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:278
-#: terminal/serializers/storage.py:291 tickets/models/comment.py:26
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:281
+#: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
 #: tickets/serializers/ticket/ticket.py:19
@@ -905,7 +905,7 @@ msgstr "編集済み"
 #: acls/templates/acls/asset_login_reminder.html:9
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
-#: assets/serializers/platform.py:185 assets/serializers/platform.py:217
+#: assets/serializers/platform.py:176 assets/serializers/platform.py:208
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
 #: perms/serializers/permission.py:35
@@ -1846,7 +1846,7 @@ msgstr "ポート"
 msgid "Address"
 msgstr "アドレス"
 
-#: assets/models/asset/common.py:161 assets/models/platform.py:138
+#: assets/models/asset/common.py:161 assets/models/platform.py:149
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:385
@@ -2170,23 +2170,23 @@ msgstr "メタ"
 msgid "Internal"
 msgstr "ビルトイン"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:175
+#: assets/models/platform.py:102 assets/serializers/platform.py:166
 msgid "Charset"
 msgstr "シャーセット"
 
-#: assets/models/platform.py:104 assets/serializers/platform.py:213
+#: assets/models/platform.py:104 assets/serializers/platform.py:204
 msgid "Gateway enabled"
 msgstr "ゲートウェイが有効になりました"
 
-#: assets/models/platform.py:106 assets/serializers/platform.py:206
+#: assets/models/platform.py:106 assets/serializers/platform.py:197
 msgid "Su enabled"
 msgstr "アカウントの切り替えを有効にする"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:181
+#: assets/models/platform.py:107 assets/serializers/platform.py:172
 msgid "Su method"
 msgstr "アカウントの切り替え方法"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:184
+#: assets/models/platform.py:108 assets/serializers/platform.py:175
 msgid "Custom fields"
 msgstr "カスタムフィールド"
 
@@ -2203,7 +2203,7 @@ msgstr ""
 "プラットフォームタイプがスキップされた資産に合致しない、資産内の一括更新プ"
 "ラットフォーム"
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:178
+#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:169
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
@@ -2324,7 +2324,7 @@ msgstr ""
 "ゲートウェイはドメインのネットワーク代理であり、ドメイン内のリソースに接続す"
 "る際には、接続はゲートウェイを通してルーティングされます。"
 
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:186
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:177
 #: orgs/serializers.py:13 perms/serializers/permission.py:39
 msgid "Assets amount"
 msgstr "資産数量"
@@ -2418,11 +2418,11 @@ msgstr "ヘルプ"
 msgid "Choices"
 msgstr "せんたく"
 
-#: assets/serializers/platform.py:179
+#: assets/serializers/platform.py:170
 msgid "Automation"
 msgstr "オートメーション"
 
-#: assets/serializers/platform.py:208
+#: assets/serializers/platform.py:199
 msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
@@ -2432,19 +2432,19 @@ msgstr ""
 "切り替えます。これは、通常のアカウントでログインした後に root に切り替えるの"
 "と似ています"
 
-#: assets/serializers/platform.py:214
+#: assets/serializers/platform.py:205
 msgid "Assets can be connected using a zone gateway"
 msgstr "資産はゾーンゲートウェイを使用して接続できます"
 
-#: assets/serializers/platform.py:216
+#: assets/serializers/platform.py:207
 msgid "Default Domain"
 msgstr "デフォルト ドメイン"
 
-#: assets/serializers/platform.py:238
+#: assets/serializers/platform.py:229
 msgid "type is required"
 msgstr "タイプ このフィールドは必須です."
 
-#: assets/serializers/platform.py:253
+#: assets/serializers/platform.py:244
 msgid "Protocols is required"
 msgstr "同意が必要です"
 
@@ -3499,7 +3499,9 @@ msgstr "タイプを作成"
 msgid ""
 "Please download the private key after creation. Each private key can only be "
 "downloaded once"
-msgstr "作成完了後、秘密鍵をダウンロードしてください。各秘密鍵のダウンロードは一度きりです"
+msgstr ""
+"作成完了後、秘密鍵をダウンロードしてください。各秘密鍵のダウンロードは一度き"
+"りです"
 
 #: authentication/serializers/ssh_key.py:57 users/forms/profile.py:161
 #: users/serializers/profile.py:133 users/serializers/profile.py:160
@@ -3750,22 +3752,22 @@ msgstr "再試行しますか？"
 msgid "LAN"
 msgstr "ローカルエリアネットワーク"
 
-#: authentication/views/base.py:74
+#: authentication/views/base.py:71
 #: perms/templates/perms/_msg_permed_items_expire.html:21
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
-#: authentication/views/base.py:147
+#: authentication/views/base.py:141
 #, python-format
 msgid "%s query user failed"
 msgstr "%sユーザーのクエリに失敗しました"
 
-#: authentication/views/base.py:155
+#: authentication/views/base.py:149
 #, python-format
 msgid "The %s is already bound to another user"
 msgstr "%sが別のユーザーにバインドされています。"
 
-#: authentication/views/base.py:161
+#: authentication/views/base.py:155
 #, python-format
 msgid "Binding %s successfully"
 msgstr "バインド%s成功"
@@ -6798,13 +6800,13 @@ msgstr "認証に失敗しました (不明): {}"
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
-#: settings/ws.py:195
+#: settings/ws.py:198
 msgid "Get ldap users is None"
 msgstr "Ldapユーザーを取得するにはNone"
 
-#: settings/ws.py:201
-msgid "Imported total: {} new: {}, failed: {} Organization: {}"
-msgstr "インポートされた合計: {}、新規: {}、失敗: {}、組織: {}"
+#: settings/ws.py:204
+msgid "Total {}, success {}, failure {}"
+msgstr "合計 {}，成功 {}，失敗 {}"
 
 #: templates/_csv_import_export.html:8
 msgid "Export"
@@ -7559,7 +7561,7 @@ msgid "Command and replay storage"
 msgstr "コマンド及び録画記憶"
 
 #: terminal/notifications.py:240 terminal/tasks.py:153
-#: xpack/plugins/cloud/api.py:154
+#: xpack/plugins/cloud/api.py:160
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
 msgid "Test failure: Account invalid"
@@ -7875,11 +7877,11 @@ msgstr "Docタイプ"
 msgid "Store locally"
 msgstr "ローカルに保存する"
 
-#: terminal/serializers/storage.py:257
+#: terminal/serializers/storage.py:258
 msgid "Do not save"
 msgstr "保存しない"
 
-#: terminal/serializers/storage.py:270
+#: terminal/serializers/storage.py:273
 msgid ""
 "set as the default storage, will make new Component use the current storage "
 "by default, without affecting existing Component"
@@ -9160,15 +9162,15 @@ msgid ""
 "strategy will skipped."
 msgstr "現在のタスク構成に基づいて、未一致ポリシーの資産はスキップされます"
 
-#: xpack/plugins/cloud/api.py:66
+#: xpack/plugins/cloud/api.py:72
 msgid "Test connection successful"
 msgstr "テスト接続成功"
 
-#: xpack/plugins/cloud/api.py:68
+#: xpack/plugins/cloud/api.py:74
 msgid "Test connection failed: {}"
 msgstr "テスト接続に失敗しました: {}"
 
-#: xpack/plugins/cloud/api.py:165
+#: xpack/plugins/cloud/api.py:171
 msgid "User {} deleted the current resource and released the assets"
 msgstr "ユーザー {} が現在のリソースを削除し、アセットを解放しました"
 
@@ -9399,7 +9401,7 @@ msgstr "アカウント \"%s\" の設定"
 msgid "Set protocols \"%s\""
 msgstr "プロトコル \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:28
+#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:30
 msgid "Run sync instance task"
 msgstr "同期インスタンス タスクを実行する"
 
@@ -9875,7 +9877,7 @@ msgstr "実行回数"
 msgid "Instance count"
 msgstr "インスタンス数"
 
-#: xpack/plugins/cloud/tasks.py:42
+#: xpack/plugins/cloud/tasks.py:44
 msgid "Period clean sync instance task execution"
 msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"
 
