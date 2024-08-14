@@ -1428,5 +1428,6 @@
     "removeWarningMsg": "削除してもよろしいですか",
     "AdhocCreate": "アドホックコマンドを作成",
     "UploadHelpText": "次のサンプル構造ディレクトリを含む .zip ファイルをアップロードしてください。",
-    "SessionJoinRecords": "協力記録"
+    "SessionJoinRecords": "協力記録",
+    "ApprovalSelected": "大量承認です"
 }

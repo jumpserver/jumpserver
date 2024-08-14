@@ -1390,9 +1390,9 @@
     "removeWarningMsg": "你确定要移除",
     "VaultHCPMountPoint": "Vault 服务器的挂载点，默认为 jumpserver",
     "RetrySelected": "重试所选",
-    "ApproveSelected": "审批所选",
     "Running": "运行中",
     "AdhocCreate": "创建命令",
     "UploadHelpText": "请上传包含以下示例结构目录的 .zip 压缩文件",
-    "SessionJoinRecords": "协作记录"
+    "SessionJoinRecords": "协作记录",
+    "ApprovalSelected": "批量审批"
 }
