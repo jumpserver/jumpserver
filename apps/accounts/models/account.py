@@ -119,12 +119,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
             return auth
 
         auth.update(self.make_account_ansible_vars(su_from))
-        become_method = platform.su_method if platform.su_method else 'sudo'
-        if become_method == 'only_su':
-            become_method = 'su'
-        elif become_method == 'only_sudo':
-            become_method = 'sudo'
 
+        become_method = platform.ansible_become_method
         password = su_from.secret if become_method == 'sudo' else self.secret
         auth['ansible_become'] = True
         auth['ansible_become_method'] = become_method

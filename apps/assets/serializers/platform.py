@@ -9,7 +9,7 @@ from common.serializers import (
 )
 from common.serializers.fields import LabeledChoiceField
 from common.utils import lazyproperty
-from ..const import Category, AllTypes, Protocol
+from ..const import Category, AllTypes, Protocol, SuMethodChoices
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
 __all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer"]
@@ -124,15 +124,6 @@ class PlatformCustomField(serializers.Serializer):
 
 
 class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
-    SU_METHOD_CHOICES = [
-        ("sudo", "sudo su -"),
-        ("su", "su - "),
-        ("only_sudo", "sudo su"),
-        ("only_su", "su"),
-        ("enable", "enable"),
-        ("super", "super 15"),
-        ("super_level", "super level 15")
-    ]
     id = serializers.IntegerField(
         label='ID', required=False,
         validators=[UniqueValidator(queryset=Platform.objects.all())]
@@ -143,8 +134,8 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
     protocols = PlatformProtocolSerializer(label=_("Protocols"), many=True, required=False)
     automation = PlatformAutomationSerializer(label=_("Automation"), required=False, default=dict)
     su_method = LabeledChoiceField(
-        choices=SU_METHOD_CHOICES, label=_("Su method"),
-        required=False, default="sudo", allow_null=True
+        choices=SuMethodChoices.choices, label=_("Su method"),
+        required=False, default=SuMethodChoices.sudo, allow_null=True
     )
     custom_fields = PlatformCustomField(label=_("Custom fields"), many=True, required=False)
 
