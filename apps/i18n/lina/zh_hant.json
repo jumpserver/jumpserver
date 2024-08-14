@@ -2271,5 +2271,6 @@
     "weekOf": "周的星期",
     "wildcardsAllowed": "允許的通配符",
     "UploadHelpText": "請上傳包含以下範例結構目錄的 .zip 壓縮文件",
-    "SessionJoinRecords": "協作記錄"
+    "SessionJoinRecords": "協作記錄",
+    "ApprovalSelected": "批次審批"
 }
