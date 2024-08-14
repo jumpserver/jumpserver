@@ -8,6 +8,8 @@ class Email(BackendBase):
 
     def send_msg(self, users, message, subject):
         accounts, __, __ = self.get_accounts(users)
+        if not accounts:
+            return
         send_mail_async(subject, message, accounts, html_message=message)
 
 

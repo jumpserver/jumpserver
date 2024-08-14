@@ -11,6 +11,8 @@ class SMS(BackendBase):
 
     def send_msg(self, users, sign_name: str, template_code: str, template_param: dict):
         accounts, __, __ = self.get_accounts(users)
+        if not accounts:
+            return
         return self.client.send_sms(accounts, sign_name, template_code, template_param)
 
 
