@@ -6676,8 +6676,8 @@ msgid "Authentication success: {}"
 msgstr "認證成功: {}"
 
 #: settings/ws.py:198
-msgid "Get ldap users is None"
-msgstr "獲取 LDAP 用戶為 None"
+msgid "No LDAP user was found"
+msgstr "沒有取得到 LDAP 用戶"
 
 #: settings/ws.py:204
 msgid "Total {}, success {}, failure {}"

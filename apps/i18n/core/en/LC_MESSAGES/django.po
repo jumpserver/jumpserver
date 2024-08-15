@@ -6546,7 +6546,7 @@ msgid "Authentication success: {}"
 msgstr ""
 
 #: settings/ws.py:195
-msgid "Get ldap users is None"
+msgid "No LDAP user was found"
 msgstr ""
 
 #: settings/ws.py:201
