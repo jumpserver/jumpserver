@@ -34,6 +34,18 @@ def job_task_activity_callback(self, job_id, *args, **kwargs):
     return resource_ids, org_id
 
 
+def _run_ops_job_execution(execution):
+    try:
+        with tmp_to_org(execution.org):
+            execution.start()
+    except SoftTimeLimitExceeded:
+        execution.set_error('Run timeout')
+        logger.error("Run adhoc timeout")
+    except Exception as e:
+        execution.set_error(e)
+        logger.error("Start adhoc execution error: {}".format(e))
+
+
 @shared_task(
     soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"),
     activity_callback=job_task_activity_callback
@@ -48,15 +60,7 @@ def run_ops_job(job_id):
     with tmp_to_org(job.org):
         execution = job.create_execution()
         execution.creator = job.creator
-        run_ops_job_execution(execution.id)
-        try:
-            execution.start()
-        except SoftTimeLimitExceeded:
-            execution.set_error('Run timeout')
-            logger.error("Run adhoc timeout")
-        except Exception as e:
-            execution.set_error(e)
-            logger.error("Start adhoc execution error: {}".format(e))
+        _run_ops_job_execution(execution)
 
 
 def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
@@ -79,16 +83,7 @@ def run_ops_job_execution(execution_id, **kwargs):
     if not execution:
         logger.error("Did not get the execution: {}".format(execution_id))
         return
-
-    try:
-        with tmp_to_org(execution.org):
-            execution.start()
-    except SoftTimeLimitExceeded:
-        execution.set_error('Run timeout')
-        logger.error("Run adhoc timeout")
-    except Exception as e:
-        execution.set_error(e)
-        logger.error("Start adhoc execution error: {}".format(e))
+    _run_ops_job_execution(execution)
 
 
 @shared_task(verbose_name=_('Clear celery periodic tasks'))
