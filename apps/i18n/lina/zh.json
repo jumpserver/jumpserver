@@ -242,6 +242,7 @@
     "CanDragSelect": "可拖动鼠标选择时间段；未选择等同全选",
     "Cancel": "取消",
     "CancelCollection": "取消收藏",
+    "CancelTicket": "取消工单",
     "CannotAccess": "无法访问当前页面",
     "Category": "类别",
     "CeleryTaskLog": "Celery任务日志",

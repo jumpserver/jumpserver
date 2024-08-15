@@ -242,6 +242,7 @@
     "CanDragSelect": "Select time period by dragging mouse;No selection means all selected",
     "Cancel": "Cancel",
     "CancelCollection": "Cancel favorite",
+    "CancelTicket": "Cancel Ticket",
     "CannotAccess": "Can't access the current page",
     "Category": "Category",
     "CeleryTaskLog": "Celery task log",
