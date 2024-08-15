@@ -255,6 +255,7 @@
     "CanDragSelect": "マウスドラッグで時間帯を選択可能；未選択は全選択と同じです",
     "Cancel": "キャンセル",
     "CancelCollection": "お気に入りキャンセル",
+    "CancelTicket": "作業指示をキャンセルする",
     "CannotAccess": "現在のページへのアクセスができません",
     "Category": "カテゴリ",
     "CeleryTaskLog": "セロリタスクノログ",
