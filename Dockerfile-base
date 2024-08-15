@@ -46,9 +46,11 @@ ARG PIP_MIRROR=https://pypi.org/simple
 RUN --mount=type=cache,target=/root/.cache,sharing=locked,id=core \
     --mount=type=bind,source=poetry.lock,target=poetry.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=utils/clean_site_packages.sh,target=clean_site_packages.sh \
     set -ex \
     && python3 -m venv /opt/py3 \
     && pip install poetry -i ${PIP_MIRROR} \
     && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
-    && poetry install --only main
+    && poetry install --only main \
+    && bash clean_site_packages.sh
