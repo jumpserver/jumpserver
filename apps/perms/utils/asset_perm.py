@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from accounts.const import AliasAccount
 from accounts.models import VirtualAccount
-from assets.models import Asset
+from assets.models import Asset, MyAsset
 from common.utils import lazyproperty
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .permission import AssetPermissionUtil
@@ -26,7 +26,9 @@ class PermAssetDetailUtil:
     @lazyproperty
     def asset(self):
         if self.user_asset_perms:
-            return self._asset
+            asset = self._asset
+            MyAsset.set_asset_custom_value([asset], self.user)
+            return asset
         raise Asset.DoesNotExist()
 
     @lazyproperty
