@@ -190,7 +190,8 @@ class ES(object):
                 mappings['aliases'] = {
                     self.query_index: {}
                 }
-
+            if self.es.indices.exists(index=self.index):
+                return
             try:
                 self.es.indices.create(index=self.index, body=mappings)
             except (RequestError, BadRequestError) as e:
