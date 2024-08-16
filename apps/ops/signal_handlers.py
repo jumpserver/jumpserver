@@ -60,7 +60,7 @@ def check_registered_tasks(*args, **kwargs):
         'perms.tasks.check_asset_permission_will_expired',
         'ops.tasks.create_or_update_registered_periodic_tasks', 'perms.tasks.check_asset_permission_expired',
         'settings.tasks.ldap.import_ldap_user_periodic', 'users.tasks.check_password_expired_periodic',
-        'common.utils.verify_code.send_async', 'assets.tasks.nodes_amount.check_node_assets_amount_period_task',
+        'common.utils.verify_code.send_sms_async', 'assets.tasks.nodes_amount.check_node_assets_amount_period_task',
         'users.tasks.check_user_expired', 'orgs.tasks.refresh_org_cache_task',
         'terminal.tasks.upload_session_replay_to_external_storage', 'terminal.tasks.clean_orphan_session',
         'audits.tasks.clean_audits_log_period', 'authentication.tasks.clean_django_sessions'
@@ -136,6 +136,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         args = json.loads(json.dumps(list(args), cls=JSONEncoder))
         kwargs = json.loads(json.dumps(kwargs, cls=JSONEncoder))
     except Exception as e:
+        logger.warn('Parse task args or kwargs error (Need handle): {}'.format(e))
         args = []
         kwargs = {}
 

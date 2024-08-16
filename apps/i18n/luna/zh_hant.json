@@ -103,7 +103,7 @@
     "Log out": "退出登入",
     "Login reminder": "登入提醒",
     "Login review approved": "登入審核已通過, 正在連接資產...",
-    "LoginExpireMsg": "登入已過期，請重新登入",
+    "LoginExpireMsg": "目前登入已逾時，請不要關閉視窗。在新的視窗登入後即可恢復目前頁面，如未恢復請重新整理頁面。",
     "Manual accounts": "手動帳號",
     "MenuAccountTemplates": "帳號範本",
     "Module": "模組",
@@ -220,5 +220,7 @@
     "start time": "開始時間",
     "success": "成功",
     "system user": "系統用戶",
-    "user": "用戶"
+    "user": "用戶",
+    "Viewer": "查看人",
+    "Operator": "操作人"
 }

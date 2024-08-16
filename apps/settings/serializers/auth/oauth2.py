@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
 from common.utils import static_or_direct
+from .base import OrgListField
 
 __all__ = [
     'OAuth2SettingSerializer',
@@ -65,3 +66,4 @@ class OAuth2SettingSerializer(serializers.Serializer):
     AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(
         default=True, label=_('Always update user')
     )
+    OAUTH2_ORG_IDS = OrgListField()

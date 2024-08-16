@@ -75,7 +75,7 @@ REDIS_PORT: 6379
 # OTP settings
 # OTP/MFA 配置
 # OTP_VALID_WINDOW: 0
-# OTP_ISSUER_NAME: Jumpserver
+# OTP_ISSUER_NAME: JumpServer
 
 # 启用定时任务
 # PERIOD_TASK_ENABLED: True
@@ -87,7 +87,7 @@ REDIS_PORT: 6379
 # 浏览器关闭页面后，会话过期
 # SESSION_EXPIRE_AT_BROWSER_CLOSE: False
 
-# 每次api请求，session续期
+# 每次 api 请求，session 续期
 # SESSION_SAVE_EVERY_REQUEST: True
 
 # 仅允许用户从来源处登录
@@ -96,6 +96,4 @@ REDIS_PORT: 6379
 # 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
 # ONLY_ALLOW_EXIST_USER_AUTH: False
 
-# 开启 Vault 账号存储
-# VAULT_ENABLED: False
 

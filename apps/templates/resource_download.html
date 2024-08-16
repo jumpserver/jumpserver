@@ -1,31 +1,33 @@
 {% extends '_without_nav_base.html' %}
 {% load i18n %}
 {% block body %}
-<style>
+    <style>
 li {
     list-style: disc;
 }
+
 ul {
     padding-left: 30px;
     padding-top: 10px;
 }
+
 p {
     padding-top: 10px;
 }
 </style>
-<div style="margin: 0 200px">
+    <div style="margin: 0 200px">
     <div class="group">
-        <h2>JumpServer {% trans 'Client' %} v2.1.3</h2>
+        <h2>JumpServer {% trans 'Client' %} {{ CLIENT_VERSION }}</h2>
         <p>
             {% trans 'JumpServer Client, currently used to launch the client, now only support launch RDP SSH client, The Telnet client will next' %}
         </p>
         <ul>
-            <li> <a href="/download/public/JumpServer-Client-Installer-x86_64.msi">jumpserver-client-windows-x86_64.msi</a></li>
-            <li> <a href="/download/public/JumpServer-Client-Installer-x86_64.exe">jumpserver-client-windows-x86_64.exe</a></li>
-            <li> <a href="/download/public/JumpServer-Client-Installer-amd64.dmg">jumpserver-client-darwin.dmg(Intel)</a></li>
-            <li> <a href="/download/public/JumpServer-Client-Installer-arm64.dmg">jumpserver-client-darwin.dmg(Apple Silicon)</a></li>
-            <li> <a href="/download/public/JumpServer-Client-Installer-amd64.deb">jumpserver-client-linux-amd64.deb</a></li>
-            <li> <a href="/download/public/JumpServer-Client-Installer-arm64.deb">jumpserver-client-linux-arm64.deb</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-win-{{ CLIENT_VERSION }}-x64.msi">jumpserver-client-windows-x86_64.msi</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-win-{{ CLIENT_VERSION }}-x64.exe">jumpserver-client-windows-x86_64.exe</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-mac-{{ CLIENT_VERSION }}-x64.dmg">jumpserver-client-darwin.dmg(Intel)</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-mac-{{ CLIENT_VERSION }}-arm64.dmg">jumpserver-client-darwin.dmg(Apple Silicon)</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-linux-{{ CLIENT_VERSION }}-amd64.deb">jumpserver-client-linux-amd64.deb</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-linux-{{ CLIENT_VERSION }}-arm64.deb">jumpserver-client-linux-arm64.deb</a></li>
         </ul>
     </div>
 
@@ -35,33 +37,32 @@ p {
             {% trans 'macOS needs to download the client to connect RDP asset, which comes with Windows' %}
         </p>
         <ul>
-            <li><a href="/download/public/Microsoft_Remote_Desktop_10.6.7_installer.pkg">microsoft-remote-desktop-installer.pkg</a></li>
+            <li><a href="/download/public/Microsoft_Remote_Desktop_{{ MRD_VERSION }}_installer.pkg">microsoft-remote-desktop-installer.pkg</a></li>
         </ul>
     </div>
 
-
-        <div class="group">
-            <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
-                <p>{% trans 'OpenSSH is a program used to connect remote applications in the Windows Remote Application Publisher' %}</p>
-                <ul>
-                    <li><a href="/download/public/OpenSSH-Win64.msi">openSSH-win64.msi</a></li>
-                </ul>
-        </div>
-
+    <div class="group">
+        <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
+            <p>{% trans 'OpenSSH is a program used to connect remote applications in the Windows Remote Application Publisher' %}</p>
+            <ul>
+                <li><a href="/download/public/OpenSSH-Win64-{{ OPENSSH_VERSION }}.msi">openSSH-win64.msi</a></li>
+            </ul>
+    </div>
 
     <div class="group">
         <h2>JumpServer {% trans 'Offline video player' %} v0.1.9</h2>
         <ul>
-            <li><a href="/download/public/JumpServer-Video-Player.dmg">jumpserver-video-player.dmg</a></li>
-            <li><a href="/download/public/JumpServer-Video-Player.exe">jumpserver-video-player.exe</a></li>
+            <li><a href="/download/public/JumpServer-Video-Player-{{ VIDEO_PLAYER_VERSION }}.dmg">jumpserver-video-player.dmg</a></li>
+            <li><a href="/download/public/JumpServer-Video-Player.Setup.{{ VIDEO_PLAYER_VERSION }}.exe">jumpserver-video-player.exe</a></li>
         </ul>
     </div>
 
 </div>
-<style>
+    <style>
 ul {
     list-style-type: disc;
 }
+
 li a {
     color: blue;
 }

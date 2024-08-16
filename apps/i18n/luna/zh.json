@@ -102,7 +102,7 @@
     "Log out": "退出登录",
     "Login reminder": "登录提醒",
     "Login review approved": "登录审核已通过, 正在连接资产...",
-    "LoginExpireMsg": "登录已过期，请重新登录",
+    "LoginExpireMsg": "当前登录已超时，请不要关闭窗口。在新的窗口登录后即可恢复当前页面，如未恢复请刷新页面。",
     "Manual accounts": "手动账号",
     "MenuAccountTemplates": "账号模版",
     "Module": "模块",
@@ -207,11 +207,16 @@
     "asset": "资产",
     "cols": "列数",
     "confirm": "确认",
+    "connectDisabledTipsNoAccount": "提示：未找到有效的授权账号，当前资源无法连接，请联系管理员进行处理",
+    "connectDisabledTipsNoConnectMethod": "提示：未找到有效的连接方式，当前资源无法连接，请联系管理员进行处理",
+    "connectDisabledTipsMethodDisabled": "提示：未找到有效的远程应用发布机，当前资源无法连接，请联系管理员进行处理",
     "connect info": "连接信息",
     "download": "下载",
     "rows": "行数",
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "Viewer": "查看人",
+    "Operator": "操作人"
 }

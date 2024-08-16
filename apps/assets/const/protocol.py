@@ -80,7 +80,18 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'choices': [('any', _('Any')), ('rdp', 'RDP'), ('tls', 'TLS'), ('nla', 'NLA')],
                         'default': 'any',
                         'label': _('Security'),
-                        'help_text': _("Security layer to use for the connection")
+                        'help_text': _("Security layer to use for the connection:<br>"
+                                       "Any<br>"
+                                       "Automatically select the security mode based on the security protocols "
+                                       "supported by both the client and the server<br>"
+                                       "RDP<br>"
+                                       "Legacy RDP encryption. This mode is generally only used for older Windows "
+                                       "servers or in cases where a standard Windows login screen is desired<br>"
+                                       "TLS<br>"
+                                       "RDP authentication and encryption implemented via TLS.<br>"
+                                       "NLA<br>"
+                                       "This mode uses TLS encryption and requires the username and password "
+                                       "to be given in advance")
                     },
                     'ad_domain': {
                         'type': 'str',
@@ -208,6 +219,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': 'admin',
                         'label': _('Auth source'),
                         'help_text': _('The database to authenticate against')
+                    },
+                    'connection_options': {
+                        'type': 'str',
+                        'default': '',
+                        'label': _('Connect options'),
+                        'help_text': _('The connection specific options eg. retryWrites=false&retryReads=false')
                     }
                 }
             },
@@ -289,23 +306,17 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'setting': {
                     'api_mode': {
                         'type': 'choice',
-                        'default': 'gpt-3.5-turbo',
+                        'default': 'gpt-4o-mini',
                         'label': _('API mode'),
                         'choices': [
-                            ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
-                            ('gpt-3.5-turbo-1106', 'GPT-3.5 Turbo 1106'),
+                            ('gpt-4o-mini', 'GPT-4o-mini'),
+                            ('gpt-4o', 'GPT-4o'),
+                            ('gpt-4-turbo', 'GPT-4 Turbo'),
                         ]
                     }
                 }
             }
         }
-        if settings.XPACK_LICENSE_IS_VALID:
-            choices = protocols[cls.chatgpt]['setting']['api_mode']['choices']
-            choices.extend([
-                ('gpt-4', 'GPT-4'),
-                ('gpt-4-turbo', 'GPT-4 Turbo'),
-                ('gpt-4o', 'GPT-4o'),
-            ])
         return protocols
 
     @classmethod

@@ -10,7 +10,7 @@
                 {% for item in child.content %}
                     <p class="field-group">
                         <span class="field-name"><strong>{{ item.title }}:</strong></span>
-                        <span class="field-value">{{ item.value }}</span>
+                        <span class="field-value">{{ item.value | truncatechars:512 }}</span>
                     </p>
                 {% endfor %}
             </div>

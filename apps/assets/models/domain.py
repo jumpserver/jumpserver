@@ -31,7 +31,7 @@ class Domain(LabeledMixin, JMSOrgBaseModel):
 
     @lazyproperty
     def assets_amount(self):
-        return self.assets.count()
+        return self.assets.exclude(platform__name='Gateway').count()
 
     def random_gateway(self):
         gateways = [gw for gw in self.active_gateways if gw.is_connective]

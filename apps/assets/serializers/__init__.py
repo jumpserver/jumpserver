@@ -9,3 +9,4 @@ from .favorite_asset import *
 from .gateway import *
 from .node import *
 from .platform import *
+from .my_asset import *

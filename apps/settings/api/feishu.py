@@ -5,6 +5,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.views import Response
 
 from common.sdk.im.feishu import FeiShu
+from common.sdk.im.lark import Lark
 from settings.models import Setting
 from .. import serializers
 
@@ -30,8 +31,10 @@ class FeiShuTestingAPI(GenericAPIView):
 
         app_secret = app_secret or ''
 
+        auth_cls = FeiShu if self.category == 'FEISHU' else Lark
+
         try:
-            feishu = FeiShu(app_id=app_id, app_secret=app_secret)
+            feishu = auth_cls(app_id=app_id, app_secret=app_secret)
             feishu.send_text(['test'], 'test')
             return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
         except APIException as e:
@@ -40,8 +43,3 @@ class FeiShuTestingAPI(GenericAPIView):
             except:
                 error = e.detail
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': error})
-
-
-class LarkTestingAPI(FeiShuTestingAPI):
-    category = 'LARK'
-    serializer_class = serializers.LarkSettingSerializer

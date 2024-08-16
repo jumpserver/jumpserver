@@ -35,6 +35,17 @@
         - user_info.failed
         - params.groups
 
+    - name: "Set {{ account.username }} sudo setting"
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^{{ account.username }} ALL="
+        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
+        validate: visudo -cf %s
+      when:
+        - user_info.failed or params.modify_sudo
+        - params.sudo
+
     - name: "Change {{ account.username }} password"
       ansible.builtin.user:
         name: "{{ account.username }}"
@@ -58,17 +69,6 @@
         key: "{{ account.secret }}"
         exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
-
-    - name: "Set {{ account.username }} sudo setting"
-      ansible.builtin.lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: "^{{ account.username }} ALL="
-        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
-        validate: visudo -cf %s
-      when:
-        - user_info.failed
-        - params.sudo
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection

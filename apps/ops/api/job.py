@@ -29,6 +29,7 @@ __all__ = [
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
+from ops.const import COMMAND_EXECUTION_DISABLED
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
@@ -63,6 +64,7 @@ def merge_nodes_and_assets(nodes, assets, user):
 
 class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
+    filterset_fields = ('name', 'type')
     search_fields = ('name', 'comment')
     model = Job
 
@@ -72,7 +74,7 @@ class JobViewSet(OrgBulkModelViewSet):
             return super().check_permissions(request)
         # job: adhoc, playbook
         if not settings.SECURITY_COMMAND_EXECUTION:
-            return self.permission_denied(request, "Command execution disabled")
+            return self.permission_denied(request, COMMAND_EXECUTION_DISABLED)
         return super().check_permissions(request)
 
     def check_upload_permission(self, assets, account_name):
@@ -201,6 +203,11 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     search_fields = ('material',)
     filterset_fields = ['status', 'job_id']
 
+    def check_permissions(self, request):
+        if not settings.SECURITY_COMMAND_EXECUTION:
+            return self.permission_denied(request, COMMAND_EXECUTION_DISABLED)
+        return super().check_permissions(request)
+
     @staticmethod
     def start_deploy(instance, serializer):
         run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id))
@@ -270,7 +277,10 @@ class JobExecutionTaskDetail(APIView):
             execution = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
 
         return Response(data={
-            'status': execution.status,
+            'status': {
+                'value': execution.status,
+                'label': execution.get_status_display()
+            },
             'is_finished': execution.is_finished,
             'is_success': execution.is_success,
             'time_cost': execution.time_cost,

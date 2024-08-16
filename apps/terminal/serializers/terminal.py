@@ -41,7 +41,7 @@ class TerminalSmallSerializer(serializers.ModelSerializer):
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.ReadOnlyField(source='get_online_session_count', label=_('Online sessions'))
     is_alive = serializers.BooleanField(read_only=True, label=_('Is alive'))
-    is_active = serializers.BooleanField(read_only=True, label='Is active')
+    is_active = serializers.BooleanField(read_only=True, label=_('Active'))
     load = LabeledChoiceField(
         read_only=True, choices=const.ComponentLoad.choices,
         label=_('Load status')

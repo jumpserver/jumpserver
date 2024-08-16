@@ -6,7 +6,6 @@ from rest_framework import serializers
 
 from accounts.const import Source
 from accounts.models import AccountTemplate, Account
-from accounts.tasks import push_accounts_to_assets_task
 from assets.models import Asset, Node
 from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import BitChoicesField, ObjectRelatedField
@@ -84,44 +83,35 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         return Asset.objects.filter(id__in=asset_ids)
 
     def create_accounts(self, assets):
-        need_create_accounts = []
+        account_objs = []
         account_attribute = [
             'name', 'username', 'secret_type', 'secret',
             'privileged', 'is_active', 'org_id'
         ]
         for asset in assets:
-            asset_exist_accounts = Account.objects.none()
-            asset_exist_account_names = asset.accounts.values_list('name', flat=True)
+            asset_exist_account_names = set(asset.accounts.values_list('name', flat=True))
+
+            asset_exist_accounts = asset.accounts.values('username', 'secret_type')
+            username_secret_type_set = {(acc['username'], acc['secret_type']) for acc in asset_exist_accounts}
             for template in self.template_accounts:
-                asset_exist_accounts |= asset.accounts.filter(
-                    username=template.username,
-                    secret_type=template.secret_type,
-                )
-            username_secret_type_dict = asset_exist_accounts.values('username', 'secret_type')
-            for template in self.template_accounts:
-                condition = {
-                    'username': template.username,
-                    'secret_type': template.secret_type
-                }
-                if condition in username_secret_type_dict or \
-                        template.name in asset_exist_account_names:
+                condition = (template.username, template.secret_type)
+                if condition in username_secret_type_set or template.name in asset_exist_account_names:
                     continue
+
                 account_data = {key: getattr(template, key) for key in account_attribute}
                 account_data['su_from'] = template.get_su_from_account(asset)
                 account_data['source'] = Source.TEMPLATE
                 account_data['source_id'] = str(template.id)
-                need_create_accounts.append(Account(**{'asset_id': asset.id, **account_data}))
-        return Account.objects.bulk_create(need_create_accounts)
+                account_objs.append(Account(asset=asset, **account_data))
 
-    def create_and_push_account(self, nodes, assets):
+        if account_objs:
+            Account.objects.bulk_create(account_objs)
+
+    def create_account_through_template(self, nodes, assets):
         if not self.template_accounts:
             return
         assets = self.get_all_assets(nodes, assets)
-        accounts = self.create_accounts(assets)
-        account_ids = [str(account.id) for account in accounts]
-        slice_count = 20
-        for i in range(0, len(account_ids), slice_count):
-            push_accounts_to_assets_task.delay(account_ids[i:i + slice_count])
+        self.create_accounts(assets)
 
     def validate_accounts(self, usernames):
         template_ids = []
@@ -169,7 +159,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         instance.nodes.add(*nodes_to_set)
 
     def validate(self, attrs):
-        self.create_and_push_account(
+        self.create_account_through_template(
             attrs.get("nodes", []),
             attrs.get("assets", [])
         )

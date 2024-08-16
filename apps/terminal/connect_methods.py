@@ -102,6 +102,8 @@ class AppletMethod:
 
         methods = defaultdict(list)
         has_applet_hosts = AppletHost.objects.filter(is_active=True).exists()
+        if not has_applet_hosts:
+            return methods
         applets = Applet.objects.filter(is_active=True)
         for applet in applets:
             for protocol in applet.protocols:
@@ -110,7 +112,7 @@ class AppletMethod:
                     'label': applet.display_name,
                     'type': 'applet',
                     'icon': applet.icon,
-                    'disabled': not applet.is_active or not has_applet_hosts,
+                    'disabled': not applet.is_active,
                 })
         return methods
 
@@ -242,7 +244,8 @@ class ConnectMethodUtil:
             'razor': 'TERMINAL_RAZOR_ENABLED',
             'magnus': 'TERMINAL_MAGNUS_ENABLED',
         }
-        disabled_component = [comp for comp, attr in component_setting.items() if not getattr(settings, attr)]
+        disabled_component = [comp for comp, attr in component_setting.items() if
+                              not (getattr(settings, attr) and settings.XPACK_LICENSE_IS_VALID)]
         if not disabled_component:
             return methods
 

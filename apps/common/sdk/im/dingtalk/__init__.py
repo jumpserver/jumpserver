@@ -2,16 +2,17 @@ import base64
 import hmac
 import time
 
+from django.conf import settings
+
 from common.sdk.im.mixin import BaseRequest
 from common.sdk.im.utils import digest, as_request
 from common.utils import get_logger
-from users.utils import construct_user_email
+from users.utils import construct_user_email, flatten_dict, map_attributes
 
 logger = get_logger(__file__)
 
 
 def sign(secret, data):
-
     digest = hmac.HMAC(
         key=secret.encode('utf8'),
         msg=data.encode('utf8'),
@@ -115,6 +116,7 @@ class DingTalkRequests(BaseRequest):
 
 
 class DingTalk:
+
     def __init__(self, appid, appsecret, agentid, timeout=None):
         self._appid = appid or ''
         self._appsecret = appsecret or ''
@@ -124,6 +126,10 @@ class DingTalk:
             appid=appid, appsecret=appsecret, agentid=agentid,
             timeout=timeout
         )
+
+    @property
+    def attributes(self):
+        return settings.DINGTALK_RENAME_ATTRIBUTES
 
     def get_userinfo_bycode(self, code):
         body = {
@@ -206,17 +212,24 @@ class DingTalk:
         data = self._request.post(URL.GET_SEND_MSG_PROGRESS, json=body, with_token=True)
         return data
 
-    def get_user_detail(self, user_id, **kwargs):
-        # https://open.dingtalk.com/document/orgapp/query-user-details
-        body = {'userid': user_id}
-        data = self._request.post(
-            URL.GET_USER_INFO_BY_USER_ID, json=body, with_token=True
-        )
-        data = data['result']
-        username = user_id
+    @staticmethod
+    def default_user_detail(data, user_id):
+        username = data.get('userid', user_id)
         name = data.get('name', username)
         email = data.get('email') or data.get('org_email')
         email = construct_user_email(username, email)
         return {
             'username': username, 'name': name, 'email': email
         }
+
+    def get_user_detail(self, user_id, **kwargs):
+        # https://open.dingtalk.com/document/orgapp/query-user-details
+        data = self._request.post(
+            URL.GET_USER_INFO_BY_USER_ID, json={'userid': user_id}, with_token=True
+        )
+        data = data['result']
+        data['user_id'] = user_id
+        info = flatten_dict(data)
+        default_detail = self.default_user_detail(data, user_id)
+        detail = map_attributes(default_detail, info, self.attributes)
+        return detail

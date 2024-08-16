@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from .base import OrgListField
 
 __all__ = [
     'OIDCSettingSerializer', 'KeycloakSettingSerializer',
@@ -13,7 +14,7 @@ class CommonSettingSerializer(serializers.Serializer):
     # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
     BASE_SITE_URL = serializers.CharField(
         required=False, allow_null=True, allow_blank=True,
-        max_length=1024, label=_('Base site URL'), 
+        max_length=1024, label=_('Base site URL'),
         help_text=_("The current site's URL is used to construct the callback address")
     )
     AUTH_OPENID_CLIENT_ID = serializers.CharField(
@@ -107,7 +108,8 @@ class OIDCSettingSerializer(KeycloakSettingSerializer):
     )
     AUTH_OPENID_USE_NONCE = serializers.BooleanField(
         required=False, label=_('Use nonce')
-        )
+    )
     AUTH_OPENID_ALWAYS_UPDATE_USER = serializers.BooleanField(
         required=False, label=_('Always update user')
     )
+    OPENID_ORG_IDS = OrgListField()

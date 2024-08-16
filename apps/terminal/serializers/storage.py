@@ -251,6 +251,16 @@ class BaseStorageSerializer(serializers.ModelSerializer):
             serializer = serializer_class
         return serializer
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        need_translate_comments = {
+            'Store locally': _('Store locally'),
+            'Do not save': _('Do not save')
+        }
+        comment = instance.comment
+        data['comment'] = need_translate_comments.get(comment, comment)
+        return data
+
     def save(self, **kwargs):
         instance = super().save(**kwargs)
         if self.validated_data.get('is_default', False):

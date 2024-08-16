@@ -227,7 +227,7 @@ class MFABlockUtils(BlockUtilBase):
 
 class LoginIpBlockUtil(BlockGlobalIpUtilBase):
     LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}"
-    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
+    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_IP_{}"
 
 
 def validate_emails(emails):
@@ -243,6 +243,32 @@ def construct_user_email(username, email, email_suffix=''):
     emails = [email, username]
     email = validate_emails(emails)
     return email or default
+
+
+def flatten_dict(d, parent_key='', sep='.'):
+    items = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.update(flatten_dict(v, new_key, sep=sep))
+        elif isinstance(v, list):
+            for i, item in enumerate(v):
+                if isinstance(item, dict):
+                    items.update(flatten_dict(item, f"{new_key}[{i}]", sep=sep))
+                else:
+                    items[f"{new_key}[{i}]"] = item
+        else:
+            items[new_key] = v
+    return items
+
+
+def map_attributes(default_profile, profile, attributes):
+    detail = default_profile
+    for local_name, remote_name in attributes.items():
+        value = profile.get(remote_name)
+        if value:
+            detail[local_name] = value
+    return detail
 
 
 def get_current_org_members():

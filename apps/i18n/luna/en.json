@@ -104,7 +104,7 @@
     "Log out": "Log out",
     "Login reminder": "Login reminder",
     "Login review approved": "Login review has been approved, connecting assets...",
-    "LoginExpireMsg": "Login session expired, please re-login",
+    "LoginExpireMsg": "Your session has timed out. Please log in through a new window and return to this page to continue your operations.",
     "Manual accounts": "Manual accounts",
     "Module": "Module",
     "Multi Screen": "Multi Screen",
@@ -209,11 +209,16 @@
     "asset": "asset",
     "cols": "cols",
     "confirm": "confirm",
+    "connectDisabledTipsNoAccount": "Tips: No valid authorization account found, current resource cannot be connected. Please contact the administrator for assistance",
+    "connectDisabledTipsNoConnectMethod": "Tips: No valid connection method found, current resource cannot be connected. Please contact the administrator for assistance",
+    "connectDisabledTipsMethodDisabled": "Tips: No valid remote application deployment machine found, current resource cannot be connected. Please contact the administrator for assistance",
     "connect info": "connect info",
     "download": "download",
     "rows": "rows",
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user"
+    "user": "user",
+    "Viewer": "Viewer",
+    "Operator": "Operator"
 }

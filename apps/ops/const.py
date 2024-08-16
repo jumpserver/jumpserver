@@ -78,3 +78,5 @@ class JobStatus(models.TextChoices):
 
 # celery 日志完成之后，写入的魔法字符，作为结束标记
 CELERY_LOG_MAGIC_MARK = b'\x00\x00\x00\x00\x00'
+
+COMMAND_EXECUTION_DISABLED = _('Command execution disabled')

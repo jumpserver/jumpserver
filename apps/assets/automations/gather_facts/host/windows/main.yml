@@ -11,8 +11,10 @@
           vendor: "{{ ansible_system_vendor }}"
           model: "{{ ansible_product_name }}"
           sn: "{{ ansible_product_serial }}"
+          cpu_count: "{{ ansible_processor_count }}"
+          cpu_cores: "{{ ansible_processor_cores }}"
           cpu_vcpus: "{{ ansible_processor_vcpus }}"
-          memory: "{{ ansible_memtotal_mb }}"
+          memory: "{{ (ansible_memtotal_mb / 1024) | round(2) }}"
 
     - debug:
         var: info

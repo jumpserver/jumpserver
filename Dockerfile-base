@@ -1,0 +1,54 @@
+FROM python:3.11-slim-bullseye
+ARG TARGETARCH
+
+# Install APT dependencies
+ARG DEPENDENCIES="                    \
+        ca-certificates               \
+        wget                          \
+        g++                           \
+        make                          \
+        pkg-config                    \
+        default-libmysqlclient-dev    \
+        freetds-dev                   \
+        gettext                       \
+        libkrb5-dev                   \
+        libldap2-dev                  \
+        libsasl2-dev"
+
+
+ARG APT_MIRROR=http://deb.debian.org
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
+    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && apt-get update > /dev/null \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash
+
+
+# Install bin tools
+ARG CHECK_VERSION=v1.0.3
+RUN set -ex \
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && mv check /usr/local/bin/ \
+    && chown root:root /usr/local/bin/check \
+    && chmod 755 /usr/local/bin/check \
+    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
+
+
+# Install Python dependencies
+WORKDIR /opt/jumpserver
+
+ARG PIP_MIRROR=https://pypi.org/simple
+RUN --mount=type=cache,target=/root/.cache,sharing=locked,id=core \
+    --mount=type=bind,source=poetry.lock,target=poetry.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    set -ex \
+    && python3 -m venv /opt/py3 \
+    && pip install poetry -i ${PIP_MIRROR} \
+    && poetry config virtualenvs.create false \
+    && . /opt/py3/bin/activate \
+    && poetry install --only main

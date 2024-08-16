@@ -167,6 +167,7 @@ elasticsearch8 = "8.13.2"
 polib = "^1.2.0"
 # psycopg2 = "2.9.6"
 psycopg2-binary = "2.9.6"
+pycountry = "^24.6.1"
 
 [tool.poetry.group.xpack]
 optional = true
@@ -193,8 +194,13 @@ huaweicloudsdkcore = "3.1.52"
 volcengine-python-sdk = "1.0.71"
 
 [[tool.poetry.source]]
-name = "PyPI"
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple"
 priority = "primary"
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "supplemental"
 
 [build-system]
 requires = ["poetry-core"]

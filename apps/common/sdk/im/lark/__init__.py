@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from common.utils.common import get_logger
 from ..feishu import URL as FeiShuURL, FeishuRequests, FeiShu
 
@@ -9,8 +11,12 @@ class URL(FeiShuURL):
 
 
 class LarkRequests(FeishuRequests):
-    pass
+    url_instance = URL()
 
 
 class Lark(FeiShu):
     requests_cls = LarkRequests
+
+    @property
+    def attributes(self):
+        return settings.LARK_RENAME_ATTRIBUTES

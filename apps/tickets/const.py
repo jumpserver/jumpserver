@@ -50,13 +50,6 @@ class TicketLevel(IntegerChoices):
     two = 2, _("Two level")
 
 
-class TicketApprovalStrategy(TextChoices):
-    org_admin = 'org_admin', _("Org admin")
-    custom_user = 'custom_user', _("Custom user")
-    super_admin = 'super_admin', _("Super admin")
-    super_org_admin = 'super_org_admin', _("Super admin and org admin")
-
-
 class TicketApplyAssetScope(TextChoices):
     all = 'all', _("All assets")
     permed = 'permed', _("Permed assets")

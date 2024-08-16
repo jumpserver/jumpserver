@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from assets.api.asset.asset import AssetFilterSet
-from assets.models import Asset, Node
+from assets.models import Asset, Node, MyAsset
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
@@ -54,6 +54,11 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
         assets = self.get_assets()
         assets = self.serializer_class.setup_eager_loading(assets)
         return assets
+
+    def get_serializer(self, *args, **kwargs):
+        if len(args) == 1 and kwargs.get('many', False) and self.request_user_is_self():
+            MyAsset.set_asset_custom_value(args[0], self.request.user)
+        return super().get_serializer(*args, **kwargs)
 
     @abc.abstractmethod
     def get_assets(self):

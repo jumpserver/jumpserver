@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import generics
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -5,7 +6,7 @@ from rest_framework.response import Response
 
 from assets.const import AllTypes
 from assets.models import Platform, Node, Asset, PlatformProtocol
-from assets.serializers import PlatformSerializer, PlatformProtocolSerializer
+from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer
@@ -17,6 +18,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
     queryset = Platform.objects.all()
     serializer_classes = {
         'default': PlatformSerializer,
+        'list': PlatformListSerializer,
         'categories': GroupedChoiceSerializer,
     }
     filterset_fields = ['name', 'category', 'type']
@@ -31,8 +33,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         # 因为没有走分页逻辑，所以需要这里 prefetch
-        queryset = super().get_queryset().prefetch_related(
-            'protocols', 'automation', 'labels', 'labels__label',
+        queryset = super().get_queryset().annotate(assets_amount=Count('assets')).prefetch_related(
+            'protocols', 'automation', 'labels', 'labels__label'
         )
         queryset = queryset.filter(type__in=AllTypes.get_types_values())
         return queryset

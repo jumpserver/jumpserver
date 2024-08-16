@@ -3,10 +3,12 @@
 import json
 import asyncio
 
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.cache import cache
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, activate
+from django.utils import translation
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
@@ -185,6 +187,11 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         return ok, msg
 
     def run_import_user(self, data):
+        lang = getattr(self.scope['user'], 'lang', settings.LANGUAGE_CODE)
+        with translation.override(lang):
+            return self._run_import_user(data)
+
+    def _run_import_user(self, data):
         ok = False
         org_ids = data.get('org_ids')
         username_list = data.get('username_list', [])
@@ -192,17 +199,15 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         try:
             users = self.get_ldap_users(username_list, cache_police)
             if users is None:
-                msg = _('Get ldap users is None')
-
-            orgs = self.get_orgs(org_ids)
-            new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
-            if error_msg:
-                msg = error_msg
-
-            count = users if users is None else len(users)
-            orgs_name = ', '.join([str(org) for org in orgs])
-            ok = True
-            msg = _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
+                msg = _('No LDAP user was found')
+            else:
+                orgs = self.get_orgs(org_ids)
+                new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
+                ok = True
+                success_count = len(users) - len(error_msg)
+                msg = _('Total {}, success {}, failure {}').format(
+                    len(users), success_count, len(error_msg)
+                )
         except Exception as e:
             msg = str(e)
         return ok, msg
