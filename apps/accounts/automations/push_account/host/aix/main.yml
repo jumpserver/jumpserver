@@ -79,7 +79,7 @@
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         become: "{{ account.become.ansible_become | default(False) }}"
         become_method: su
         become_user: "{{ account.become.ansible_user | default('') }}"
@@ -95,7 +95,7 @@
         login_port: "{{ jms_asset.port }}"
         login_user: "{{ account.username }}"
         login_private_key_path: "{{ account.private_key_path  }}"
-        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
       when: account.secret_type == "ssh_key"
       delegate_to: localhost
