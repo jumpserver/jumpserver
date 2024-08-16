@@ -13,10 +13,12 @@ def create_builtin_roles(apps, schema_editor):
 
 def set_admin_roles(apps, schema_editor):
     User = apps.get_model('users', 'User')
+    user = User.objects.filter(username='admin').first()
+    if not user:
+        return
     Role = apps.get_model('rbac', 'Role')
     Org = apps.get_model('orgs', 'Organization')
     RoleBinding = apps.get_model('rbac', 'RoleBinding')
-    user = User.objects.get(username='admin')
     system_role = Role.objects.get(name='SystemAdmin')
     org_role = Role.objects.get(name='OrgAdmin')
     org = Org.objects.get(id='00000000-0000-0000-0000-000000000002')
