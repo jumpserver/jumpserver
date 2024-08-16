@@ -151,10 +151,8 @@ class SSHClient:
         gateway_server = self.gateway_server
         if not gateway_server:
             return
-        try:
-            gateway_server.stop()
-        except Exception:
-            pass
+
+        gateway_server.stop()
 
     def before_runner_start(self):
         self.local_gateway_prepare()

@@ -13,4 +13,3 @@
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
-        login_private_key_path: "{{ account.private_key_path }}"
