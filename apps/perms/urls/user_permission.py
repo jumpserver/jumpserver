@@ -47,9 +47,6 @@ user_permission_urlpatterns = [
     path('<str:user>/nodes/all-with-assets/tree/',
          api.UserPermedNodesWithAssetsAsTreeApi.as_view(),
          name='user-nodes-with-assets-as-tree'),
-    path('<str:user>/nodes/children-with-k8s/tree/',
-         api.UserGrantedK8sAsTreeApi.as_view(),
-         name='user-nodes-children-with-k8s-as-tree'),
 ]
 
 user_group_permission_urlpatterns = [
