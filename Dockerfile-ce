@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bullseye as stage-1
+FROM python:3.11-slim-bullseye AS stage-1
 ARG TARGETARCH
 
 ARG VERSION
