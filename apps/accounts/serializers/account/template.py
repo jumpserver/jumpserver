@@ -16,7 +16,10 @@ class PasswordRulesSerializer(serializers.Serializer):
     digit = serializers.BooleanField(default=True, label=_('Digit'))
     symbol = serializers.BooleanField(default=True, label=_('Special symbol'))
     exclude_symbols = serializers.CharField(
-        default='', allow_blank=True, max_length=16, label=_('Exclude symbol')
+        default='', allow_blank=True, max_length=86, label=_('Exclude symbol')
+    )
+    include_symbols = serializers.CharField(
+        default='', allow_blank=True, max_length=86, label=_('Include symbol')
     )
 
 
