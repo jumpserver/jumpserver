@@ -553,7 +553,7 @@
     "DeleteErrorMsg": "刪除失敗",
     "DeleteFile": "刪除文件",
     "DeleteNode": "刪除節點",
-    "DeleteOrgMsg": "用戶列表、用戶組、資產列表、網域列表、管理用戶、系統用戶、標籤管理、資產授權規則",
+    "DeleteOrgMsg": "用戶，用戶組，資產，節點，標籤，網域，資產授權",
     "DeleteOrgTitle": "請確保組織內的以下資訊已刪除",
     "DeleteReleasedAssets": "刪除已釋放資產",
     "DeleteSelected": "刪除所選",

@@ -431,7 +431,7 @@
     "DeleteConfirmMessage": "一度削除すると復元はできません、続けますか？",
     "DeleteErrorMsg": "削除に失敗",
     "DeleteNode": "ノードを削除",
-    "DeleteOrgMsg": "ユーザーリスト、ユーザーグループ、資産リスト、ネットワークリスト、ユーザー管理、システムユーザー、タグ管理、資産承認ルール",
+    "DeleteOrgMsg": "ユーザー、ユーザーグループ、アセット、ノード、ラベル、ドメイン、アセットの認可",
     "DeleteOrgTitle": "以下の組織内の情報が削除されたことを確認してください",
     "DeleteReleasedAssets": "リリースされたアセットの削除",
     "DeleteSelected": "選択した項目を削除する",
