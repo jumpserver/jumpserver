@@ -187,6 +187,7 @@ class JMSInventory:
                 'protocol': protocol.name, 'port': protocol.port,
                 'spec_info': asset.spec_info, 'secret_info': secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
+                'origin_address': asset.address
             },
             'jms_account': {
                 'id': str(account.id), 'username': account.username,

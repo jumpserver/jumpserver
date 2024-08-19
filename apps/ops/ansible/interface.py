@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.functional import LazyObject
 
-from ops.ansible import AnsibleReceptorRunner, AnsibleNativeRunner
+from ops.ansible import AnsibleNativeRunner
 from ops.ansible.runners.base import BaseRunner
 
 __all__ = ['interface']
@@ -14,8 +14,7 @@ class _LazyRunnerInterface(LazyObject):
 
     @staticmethod
     def make_interface():
-        runner_type = AnsibleReceptorRunner \
-            if settings.RECEPTOR_ENABLED else AnsibleNativeRunner
+        runner_type = AnsibleNativeRunner
         gateway_host = settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST \
             if settings.ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST else '127.0.0.1'
         return RunnerInterface(runner_type=runner_type, gateway_proxy_host=gateway_host)

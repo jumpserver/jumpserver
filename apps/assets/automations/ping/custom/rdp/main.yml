@@ -13,4 +13,3 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_secret_type: "{{ jms_account.secret_type }}"
-        login_private_key_path: "{{ jms_account.private_key_path }}"
