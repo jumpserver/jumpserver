@@ -32,7 +32,7 @@ class SecretGenerator:
             'digit': rules['digit'],
             'special_char': rules['symbol'],
             'exclude_chars': rules.get('exclude_symbols', ''),
-            'include_chars': rules.get('include_symbols', ''),
+            'allow_include_chars': rules.get('allow_include_symbols', ''),
         }
         return random_string(**rules)
 

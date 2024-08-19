@@ -18,8 +18,8 @@ class PasswordRulesSerializer(serializers.Serializer):
     exclude_symbols = serializers.CharField(
         default='', allow_blank=True, max_length=86, label=_('Exclude symbol')
     )
-    include_symbols = serializers.CharField(
-        default='', allow_blank=True, max_length=86, label=_('Include symbol')
+    allow_include_symbols = serializers.CharField(
+        default='', allow_blank=True, max_length=86, label=_('Allowed include symbol')
     )
 
 

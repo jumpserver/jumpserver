@@ -40,10 +40,10 @@ def remove_exclude_char(s, exclude_chars):
 
 def random_string(
         length: int, lower=True, upper=True, digit=True,
-        special_char=False, exclude_chars='', include_chars='', symbols=string_punctuation
+        special_char=False, exclude_chars='', allow_include_chars='', symbols=string_punctuation
 ):
-    if not any([lower, upper, digit]):
-        raise ValueError('At least one of `lower`, `upper`, `digit`, or `include_chars` must be provided')
+    if not any([lower, upper, digit]) and not allow_include_chars:
+        raise ValueError('At least one of `lower`, `upper`, `digit`, or `allow_include_chars` must be provided')
     if length < 4:
         raise ValueError('The length of the string must be greater than 3')
 
@@ -53,7 +53,7 @@ def random_string(
         (digit, string.digits),
     )
     chars = ''.join([i[1] for i in chars_map if i[0]])
-    chars += include_chars
+    chars += allow_include_chars # 允许包含的字符，结果可能包含，优先级低于排除字符，特殊字符数量将不受控制，同一字符重复将提升权重，其它选项为空则可视为待选字符组
     chars = remove_exclude_char(chars, exclude_chars)
     texts = list(secrets.choice(chars) for __ in range(length))
     texts = ''.join(texts)
