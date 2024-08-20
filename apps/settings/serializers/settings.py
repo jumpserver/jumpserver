@@ -14,6 +14,10 @@ from .auth import (
 )
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
+from .feature import (
+    AnnouncementSettingSerializer, OpsSettingSerializer, VaultSettingSerializer,
+    TicketSettingSerializer, ChatAISettingSerializer, VirtualAppSerializer
+)
 from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
@@ -90,7 +94,13 @@ class SettingsSerializer(
     TencentSMSSettingSerializer,
     CMPP2SMSSettingSerializer,
     CustomSMSSettingSerializer,
-    PasskeySettingSerializer
+    PasskeySettingSerializer,
+    ChatAISettingSerializer,
+    AnnouncementSettingSerializer,
+    OpsSettingSerializer,
+    VaultSettingSerializer,
+    TicketSettingSerializer,
+    VirtualAppSerializer,
 ):
     PREFIX_TITLE = _('Setting')
     CACHE_KEY = 'SETTING_FIELDS_MAPPING'
