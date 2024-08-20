@@ -446,6 +446,7 @@
     "DownloadReplay": "Download recording",
     "DownloadUpdateTemplateMsg": "Download update template",
     "DragUploadFileInfo": "Drag files here, or click to upload",
+    "DropConfirmMsg": "Do you want to move node: {src} to {dst}?",
     "Duplicate": "Duplicate",
     "DuplicateFileExists": "Uploading a file with the same name is not allowed, please delete the file with the same name",
     "Duration": "Duration",

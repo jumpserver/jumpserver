@@ -461,6 +461,7 @@
     "DownloadReplay": "ビデオのダウンロード",
     "DownloadUpdateTemplateMsg": "更新テンプレートをダウンロード",
     "DragUploadFileInfo": "ここにファイルをドラッグするか、ここをクリックしてアップロードしてください",
+    "DropConfirmMsg": "ノード: {src} を {dst} に移動しますか?",
     "Duplicate": "ダブリケート",
     "DuplicateFileExists": "同名のファイルのアップロードは許可されていません、同名のファイルを削除してください",
     "Duration": "時間",

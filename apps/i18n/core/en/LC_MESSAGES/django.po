@@ -3983,7 +3983,7 @@ msgstr ""
 msgid ""
 "Connection failed: Self-signed certificate used. Please check server "
 "certificate configuration"
-msgstr "連接失敗：使用了自簽名證書，請檢查伺服器證書配置"
+msgstr ""
 
 #: common/sdk/im/exceptions.py:23
 msgid "Network error, please contact system administrator"
