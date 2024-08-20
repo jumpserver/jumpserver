@@ -70,6 +70,7 @@ class Migration(migrations.Migration):
                                            to='terminal.applethost', verbose_name='Host')),
             ],
             options={
+                'verbose_name': 'Applet publication',
                 'unique_together': {('applet', 'host')},
             },
         ),
@@ -91,6 +92,7 @@ class Migration(migrations.Migration):
                                            verbose_name='Hosting')),
             ],
             options={
+                'verbose_name': 'Applet host deployment',
                 'ordering': ('-date_start',),
             },
         ),
@@ -115,11 +117,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='appletpublication',
             name='applet',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications', to='terminal.applet', verbose_name='Applet'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications',
+                                    to='terminal.applet', verbose_name='Applet'),
         ),
         migrations.AlterField(
             model_name='appletpublication',
             name='host',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications', to='terminal.applethost', verbose_name='Host'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications',
+                                    to='terminal.applethost', verbose_name='Host'),
         ),
     ]
