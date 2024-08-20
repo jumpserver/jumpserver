@@ -595,7 +595,7 @@
     "DownloadImportTemplateMsg": "下載創建模板",
     "DownloadReplay": "下載錄影",
     "DownloadUpdateTemplateMsg": "下載更新範本",
-    "DragUploadFileInfo": " Drag files here, or click here to upload",
+    "DragUploadFileInfo": " 將檔案拖曳至此處，或點擊此處上傳",
     "DropConfirmMsg": "你想移動節點: {src} 到 {dst} 下嗎?",
     "DryRun": "測試運行",
     "Duplicate": "Copy",
