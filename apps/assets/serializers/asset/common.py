@@ -131,9 +131,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     class Meta:
         model = Asset
-        fields_mini = ['id', 'name', 'address']
-        fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform']
+        fields_mini = ['id', 'name', 'address'] + fields_fk
+        fields_small = fields_mini + ['is_active', 'comment']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',
