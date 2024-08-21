@@ -54,14 +54,40 @@
       ignore_errors: true
       when: account.secret_type == "password"
 
-    - name: remove jumpserver ssh key
+    - name: "Get home directory for {{ account.username }}"
+      ansible.builtin.shell: "getent passwd {{ account.username }} | cut -d: -f6"
+      register: home_dir
+      when: account.secret_type == "ssh_key"
+      ignore_errors: yes
+
+    - name: "Check if home directory exists for {{ account.username }}"
+      ansible.builtin.stat:
+        path: "{{ home_dir.stdout.strip() }}"
+      register: home_dir_stat
+      when: account.secret_type == "ssh_key"
+      ignore_errors: yes
+
+    - name: "Ensure {{ account.username }} home directory exists"
+      ansible.builtin.file:
+        path: "{{ home_dir.stdout.strip() }}"
+        state: directory
+        owner: "{{ account.username }}"
+        group: "{{ account.username }}"
+        mode: '0750'
+      when:
+        - account.secret_type == "ssh_key"
+        - home_dir_stat.stat.exists == false
+      ignore_errors: yes
+
+    - name: Remove jumpserver ssh key
       ansible.builtin.lineinfile:
-        dest: "{{ ssh_params.dest }}"
+        dest: "{{ home_dir.stdout.strip() }}/.ssh/authorized_keys"
         regexp: "{{ ssh_params.regexp }}"
         state: absent
       when:
         - account.secret_type == "ssh_key"
         - ssh_params.strategy == "set_jms"
+      ignore_errors: yes
 
     - name: "Change {{ account.username }} SSH key"
       ansible.builtin.authorized_key:
