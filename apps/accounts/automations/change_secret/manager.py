@@ -127,6 +127,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 recorder = ChangeSecretRecord(
                     asset=asset, account=account, execution=self.execution,
                     old_secret=account.secret, new_secret=new_secret,
+                    comment=f'{account.username}@{asset.address}'
                 )
                 records.append(recorder)
             else:
