@@ -33,6 +33,7 @@ class LDAPUserSerializer(serializers.Serializer):
     email = serializers.CharField()
     groups = serializers.ListField(child=serializers.CharField(), default=[])
     existing = serializers.BooleanField(read_only=True)
+    status = serializers.JSONField(read_only=True)
 
 
 class LDAPSettingSerializer(serializers.Serializer):
