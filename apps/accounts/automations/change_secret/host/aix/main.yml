@@ -14,26 +14,14 @@
     - name: "Add {{ account.username }} user"
       ansible.builtin.user:
         name: "{{ account.username }}"
-        shell: "{{ params.shell }}"
-        home: "{{ params.home | default('/home/' + account.username, true) }}"
-        groups: "{{ params.groups }}"
+        uid: "{{ params.uid | int if params.uid | length > 0 else omit }}"
+        shell: "{{ params.shell if params.shell | length > 0 else omit }}"
+        home: "{{ params.home if params.home | length > 0 else '/home/' + account.username }}"
+        groups: "{{ params.groups if params.groups | length > 0 else omit }}"
+        append: yes
         expires: -1
         state: present
       when: user_info.failed
-
-    - name: "Add {{ account.username }} group"
-      ansible.builtin.group:
-        name: "{{ account.username }}"
-        state: present
-      when: user_info.failed
-
-    - name: "Add {{ account.username }} user to group"
-      ansible.builtin.user:
-        name: "{{ account.username }}"
-        groups: "{{ params.groups }}"
-      when:
-        - user_info.failed
-        - params.groups
 
     - name: "Set {{ account.username }} sudo setting"
       ansible.builtin.lineinfile:
