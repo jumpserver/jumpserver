@@ -48,5 +48,8 @@
     "User": "用戶",
     "VerifyCode": "驗證碼",
     "WaitFileTransfer": "等待文件傳輸結束",
-    "Writable": "讀寫"
+    "Writable": "讀寫",
+    "JoinedWithSuccess": "已成功加入",
+    "KubernetesManagement": "Kubernetes 管理",
+    "WebSocketClosed": "WebSocket 已關閉"
 }
