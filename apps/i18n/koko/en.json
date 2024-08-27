@@ -49,5 +49,8 @@
     "User": "User",
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "JoinedWithSuccess": "Successfully joined",
+    "KubernetesManagement": "Kubernetes management",
+    "WebSocketClosed": "WebSocket closed"
 }
