@@ -13,6 +13,7 @@ from collections import OrderedDict
 from functools import wraps
 from itertools import chain
 
+import html2text
 import psutil
 from django.conf import settings
 from django.templatetags.static import static
@@ -421,3 +422,14 @@ def distinct(seq, key=None):
 
 def is_macos():
     return platform.system() == 'Darwin'
+
+
+def convert_html_to_markdown(html_str):
+    h = html2text.HTML2Text()
+    h.body_width = 0
+    h.ignore_links = True
+
+    markdown = h.handle(html_str)
+    markdown = markdown.replace('\n\n', '\n')
+    markdown = markdown.replace('\n ', '\n')
+    return markdown
