@@ -319,14 +319,14 @@ class AuthPostCheckMixin:
 
     @classmethod
     def _check_passwd_is_too_simple(cls, user: User, password):
-        if password == 'admin' or password == 'ChangeMe':
+        if user.check_passwd_too_simple(password):
             message = _('Your password is too simple, please change it for security')
             url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
             raise errors.PasswordTooSimple(url)
 
     @classmethod
     def _check_passwd_need_update(cls, user: User):
-        if user.need_update_password:
+        if user.check_need_update_password():
             message = _('You should to change your password before login')
             url = cls.generate_reset_password_url_with_flash_msg(user, message)
             raise errors.PasswordNeedUpdate(url)
