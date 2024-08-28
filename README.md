@@ -32,7 +32,7 @@ Access JumpServer in your browser at `http://your-jumpserver-ip/`
 - Username: `admin`
 - Password: `ChangeMe`
 
-[![JumpServer Quickstart](https://github.com/user-attachments/assets/a00adeca-f675-459c-8e86-d0491fe9e0b0)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
+[![JumpServer Quickstart](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
 
 ## Screenshots
 
