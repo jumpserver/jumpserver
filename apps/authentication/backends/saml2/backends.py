@@ -27,9 +27,13 @@ class SAML2Backend(JMSModelBackend):
         log_prompt = "Get or Create user [SAML2Backend]: {}"
         logger.debug(log_prompt.format('start'))
 
+        groups = saml_user_data.pop('groups', None)
+
         user, created = get_user_model().objects.get_or_create(
             username=saml_user_data['username'], defaults=saml_user_data
         )
+
+        saml_user_data['groups'] = groups
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
 
         logger.debug(log_prompt.format("Send signal => saml2 create or update user"))
