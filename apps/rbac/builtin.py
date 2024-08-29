@@ -30,6 +30,7 @@ system_user_perms = (
     ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
     ('authentication', 'accesskey', '*', '*'),
     ('authentication', 'passkey', '*', '*'),
+    ('authentication', 'sshkey', '*', '*'),
     ('tickets', 'ticket', 'view', 'ticket'),
 )
 system_user_perms += (user_perms + _view_all_joined_org_perms)
