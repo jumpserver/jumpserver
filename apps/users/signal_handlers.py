@@ -21,11 +21,13 @@ from common.signals import django_ready
 from common.utils import get_logger
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
+from orgs.models import Organization
+from orgs.utils import tmp_to_root_org
 from rbac.builtin import BuiltinRole
 from rbac.const import Scope
 from rbac.models import RoleBinding
 from settings.signals import setting_changed
-from .models import User, UserPasswordHistory
+from .models import User, UserPasswordHistory, UserGroup
 from .signals import post_user_create
 
 logger = get_logger(__file__)
@@ -50,7 +52,9 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
     if created:
         user.source = source
         user.save()
-        bind_user_to_org_role(user)
+        org_ids = bind_user_to_org_role(user)
+        group_names = attrs.get('groups')
+        bind_user_to_group(org_ids, group_names, user)
 
     if not attrs:
         return
@@ -146,7 +150,7 @@ def radius_create_user(sender, user, **kwargs):
 
 
 @receiver(openid_create_or_update_user)
-def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
+def on_openid_create_or_update_user(sender, request, user, created, attrs, **kwargs):
     if not check_only_allow_exist_user_auth(created):
         return
 
@@ -157,7 +161,13 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
         )
         user.source = User.Source.openid.value
         user.save()
-        bind_user_to_org_role(user)
+        org_ids = bind_user_to_org_role(user)
+        group_names = attrs.get('groups')
+        bind_user_to_group(org_ids, group_names, user)
+
+    name = attrs.get('name')
+    username = attrs.get('username')
+    email = attrs.get('email')
 
     if not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
         logger.debug(
@@ -225,3 +235,37 @@ def bind_user_to_org_role(user):
     ]
 
     RoleBinding.objects.bulk_create(bindings, ignore_conflicts=True)
+    return org_ids
+
+
+def bind_user_to_group(org_ids, group_names, user):
+    if not isinstance(group_names, list):
+        return
+
+    org_ids = org_ids or [Organization.DEFAULT_ID]
+
+    with tmp_to_root_org():
+        existing_groups = UserGroup.objects.filter(org_id__in=org_ids).values_list('org_id', 'name')
+
+        org_groups_map = {}
+        for org_id, group_name in existing_groups:
+            org_groups_map.setdefault(org_id, []).append(group_name)
+
+        groups_to_create = []
+        for org_id in org_ids:
+            existing_group_names = set(org_groups_map.get(org_id, []))
+            new_group_names = set(group_names) - existing_group_names
+            groups_to_create.extend(
+                UserGroup(org_id=org_id, name=name) for name in new_group_names
+            )
+
+        UserGroup.objects.bulk_create(groups_to_create)
+
+        user_groups = UserGroup.objects.filter(org_id__in=org_ids, name__in=group_names)
+
+        user_group_links = [
+            User.groups.through(user_id=user.id, usergroup_id=group.id)
+            for group in user_groups
+        ]
+        if user_group_links:
+            User.groups.through.objects.bulk_create(user_group_links)
