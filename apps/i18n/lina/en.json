@@ -1394,5 +1394,6 @@
     "AdhocCreate": "Create the command",
     "UploadHelpText": "Please upload a .zip file containing the following sample directory structure",
     "SessionJoinRecords": "collaboration records",
-    "ApprovalSelected": "Batch approval"
+    "ApprovalSelected": "Batch approval",
+    "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself"
 }
