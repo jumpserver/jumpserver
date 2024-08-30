@@ -1397,5 +1397,6 @@
     "AdhocCreate": "创建命令",
     "UploadHelpText": "请上传包含以下示例结构目录的 .zip 压缩文件",
     "SessionJoinRecords": "协作记录",
-    "ApprovalSelected": "批量审批"
+    "ApprovalSelected": "批量审批",
+    "disallowSelfUpdateFields": "不允许自己修改当前字段"
 }
