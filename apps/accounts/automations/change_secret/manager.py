@@ -50,9 +50,6 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
 
         if kwargs['strategy'] == SSHKeyStrategy.set_jms:
-            username = account.username
-            path = f'/{username}' if username == "root" else f'/home/{username}'
-            kwargs['dest'] = f'{path}/.ssh/authorized_keys'
             kwargs['regexp'] = '.*{}$'.format(secret.split()[2].strip())
         return kwargs
 
@@ -130,6 +127,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 recorder = ChangeSecretRecord(
                     asset=asset, account=account, execution=self.execution,
                     old_secret=account.secret, new_secret=new_secret,
+                    comment=f'{account.username}@{asset.address}'
                 )
                 records.append(recorder)
             else:

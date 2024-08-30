@@ -36,6 +36,12 @@ params:
     default: ''
     help_text: "{{ 'Params groups help text' | trans }}"
 
+  - name: uid
+    type: str
+    label: "{{ 'Params uid label' | trans }}"
+    default: ''
+    help_text: "{{ 'Params uid help text' | trans }}"
+
 i18n:
   Posix account change secret:
     zh: '使用 Ansible 模块 user 执行账号改密 (SHA512)'
@@ -62,6 +68,11 @@ i18n:
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
     en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
 
+  Params uid help text:
+    zh: '请输入用户ID'
+    ja: 'ユーザーIDを入力してください'
+    en: 'Please enter the user ID'
+
   Modify sudo label:
     zh: '修改 sudo 权限'
     ja: 'sudo 権限を変更'
@@ -77,3 +88,7 @@ i18n:
     ja: 'グループ'
     en: 'Groups'
 
+  Params uid label:
+    zh: '用户ID'
+    ja: 'ユーザーID'
+    en: 'User ID'
