@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-30 15:08+0800\n"
+"POT-Creation-Date: 2024-09-02 10:59+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1136,7 +1136,12 @@ msgstr "周期清理改密记录和推送记录"
 
 #: accounts/tasks/automation.py:87
 msgid "Clean change secret and push record period description"
-msgstr "系统会定期清理不再需要的改密记录和推送记录，包括那些关联的改密任务、执行记录、资产和账号。当这些关联项中的任意一个被删除时，对应的改密和推送记录将变为无效。因此，为了保持数据库的整洁和高效运行，系统默认每180天自动清理这些无效记录。这种定期清理机制不仅有助于释放存储空间，还能提高数据管理的安全性和整体性能。"
+msgstr ""
+"系统会定期清理不再需要的改密记录和推送记录，包括那些关联的改密任务、执行记"
+"录、资产和账号。当这些关联项中的任意一个被删除时，对应的改密和推送记录将变为"
+"无效。因此，为了保持数据库的整洁和高效运行，系统默认每180天自动清理这些无效记"
+"录。这种定期清理机制不仅有助于释放存储空间，还能提高数据管理的安全性和整体性"
+"能。"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -2941,6 +2946,14 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 #: authentication/backends/drf.py:74
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
+
+#: authentication/backends/oidc/views.py:174
+msgid "OpenID Error"
+msgstr "OpenID 错误"
+
+#: authentication/backends/oidc/views.py:175
+msgid "Username or email already exists, Please check"
+msgstr "用户名或者邮箱已经存在，请检查"
 
 #: authentication/backends/passkey/api.py:37
 msgid "Only register passkey for local user"
