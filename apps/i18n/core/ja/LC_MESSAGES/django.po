@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-15 14:04+0800\n"
+"POT-Creation-Date: 2024-08-30 15:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,11 +109,11 @@ msgstr "アカウントのバックアップ計画を実行中です"
 msgid "Plan execution end"
 msgstr "計画実行終了"
 
-#: accounts/automations/change_secret/manager.py:100
+#: accounts/automations/change_secret/manager.py:97
 msgid "No pending accounts found"
 msgstr "保留中のアカウントが見つかりません"
 
-#: accounts/automations/change_secret/manager.py:227
+#: accounts/automations/change_secret/manager.py:225
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s、失敗: %s、合計: %s"
@@ -124,7 +124,7 @@ msgstr "成功: %s、失敗: %s、合計: %s"
 #: authentication/confirm/password.py:24 authentication/confirm/password.py:26
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
-#: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:51
+#: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:52
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:28
 #: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
 #: users/forms/profile.py:21 users/serializers/user.py:144
@@ -347,7 +347,7 @@ msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: acls/serializers/base.py:123 assets/models/asset/common.py:95
-#: assets/models/asset/common.py:349 assets/models/cmd_filter.py:36
+#: assets/models/asset/common.py:355 assets/models/cmd_filter.py:36
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:32 terminal/notifications.py:155
@@ -550,7 +550,7 @@ msgstr "SSHキープッシュ方式"
 #: accounts/models/automations/gather_account.py:58
 #: accounts/serializers/account/backup.py:40
 #: accounts/serializers/automations/change_secret.py:58
-#: settings/serializers/auth/ldap.py:99 settings/serializers/msg.py:45
+#: settings/serializers/auth/ldap.py:100 settings/serializers/msg.py:45
 msgid "Recipient"
 msgstr "受信者"
 
@@ -592,7 +592,7 @@ msgstr "終了日"
 msgid "Status"
 msgstr "ステータス"
 
-#: accounts/models/automations/change_secret.py:47
+#: accounts/models/automations/change_secret.py:46
 #: accounts/serializers/account/account.py:273
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:8
@@ -603,7 +603,7 @@ msgstr "ステータス"
 msgid "Error"
 msgstr "間違い"
 
-#: accounts/models/automations/change_secret.py:51
+#: accounts/models/automations/change_secret.py:50
 msgid "Change secret record"
 msgstr "パスワード レコードの変更"
 
@@ -834,7 +834,6 @@ msgstr ""
 "情報にアクセスしてください-> 環境設定で暗号化パスワードを設定する"
 
 #: accounts/notifications.py:83
-#: accounts/templates/accounts/asset_account_change_info.html:3
 msgid "Gather account change information"
 msgstr "アカウント変更情報"
 
@@ -950,7 +949,7 @@ msgstr "ID"
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
-#: rbac/builtin.py:124 rbac/models/rolebinding.py:49
+#: rbac/builtin.py:125 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:30 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:156 terminal/notifications.py:205
@@ -1065,7 +1064,7 @@ msgstr ""
 "ください。 "
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:152
+#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:152
 #: assets/serializers/automations/base.py:21 perms/serializers/permission.py:36
 msgid "Nodes"
 msgstr "ノード"
@@ -1127,13 +1126,21 @@ msgstr "アカウントを追加: %s"
 msgid "Delete account: %s"
 msgstr "アカウントを削除: %s"
 
-#: accounts/tasks/automation.py:25
+#: accounts/tasks/automation.py:31
 msgid "Account execute automation"
 msgstr "アカウント実行の自動化"
 
-#: accounts/tasks/automation.py:51 accounts/tasks/automation.py:56
+#: accounts/tasks/automation.py:57 accounts/tasks/automation.py:62
 msgid "Execute automation record"
 msgstr "自動化レコードを実行する"
+
+#: accounts/tasks/automation.py:86
+msgid "Clean change secret and push record period"
+msgstr "パスワード変更記録とプッシュ記録を定期的にクリアする"
+
+#: accounts/tasks/automation.py:87
+msgid "Clean change secret and push record period description"
+msgstr "システムは、変更タスク、実行レコード、資産、アカウントに関連するものを含め、不要な変更シークレット レコードとプッシュ レコードを定期的にクリーンアップします。これらの関連項目のいずれかが削除されると、対応する変更シークレット レコードとプッシュ レコードは無効になります。したがって、整然とした効率的なデータベースを維持するために、システムはデフォルトでこれらの無効なレコードを 180 日ごとに自動的にクリーンアップします。この定期的なクリーンアップ プロセスにより、ストレージ領域が解放され、データ管理のセキュリティと全体的なパフォーマンスが向上します。"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -1171,11 +1178,11 @@ msgstr "アセット アカウントの可用性を確認する"
 msgid "Verify accounts connectivity"
 msgstr "アカウント接続のテスト"
 
-#: accounts/templates/accounts/asset_account_change_info.html:8
+#: accounts/templates/accounts/asset_account_change_info.html:10
 msgid "Added account"
 msgstr "新規アカウント"
 
-#: accounts/templates/accounts/asset_account_change_info.html:9
+#: accounts/templates/accounts/asset_account_change_info.html:13
 msgid "Deleted account"
 msgstr "アカウントの削除"
 
@@ -1251,7 +1258,7 @@ msgstr "1-100、低い値は最初に一致します"
 msgid "Reviewers"
 msgstr "レビュー担当者"
 
-#: acls/models/base.py:43 assets/models/asset/common.py:165
+#: acls/models/base.py:43 assets/models/asset/common.py:171
 #: authentication/models/access_key.py:25
 #: authentication/models/connection_token.py:53
 #: authentication/models/ssh_key.py:13
@@ -1846,39 +1853,39 @@ msgstr "ポート"
 msgid "Address"
 msgstr "アドレス"
 
-#: assets/models/asset/common.py:161 assets/models/platform.py:149
+#: assets/models/asset/common.py:162 assets/models/platform.py:149
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:385
 msgid "Platform"
 msgstr "プラットフォーム"
 
-#: assets/models/asset/common.py:163 assets/models/domain.py:22
+#: assets/models/asset/common.py:166 assets/models/domain.py:22
 msgid "Zone"
 msgstr "ゾーン"
 
-#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:388
+#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:173 assets/serializers/asset/custom.py:14
 msgid "Custom info"
 msgstr "カスタム属性"
 
-#: assets/models/asset/common.py:352
+#: assets/models/asset/common.py:358
 msgid "Can refresh asset hardware info"
 msgstr "資産ハードウェア情報を更新できます"
 
-#: assets/models/asset/common.py:353
+#: assets/models/asset/common.py:359
 msgid "Can test asset connectivity"
 msgstr "資産接続をテストできます"
 
-#: assets/models/asset/common.py:354
+#: assets/models/asset/common.py:360
 msgid "Can match asset"
 msgstr "アセットを一致させることができます"
 
-#: assets/models/asset/common.py:355
+#: assets/models/asset/common.py:361
 msgid "Can change asset nodes"
 msgstr "資産ノードを変更できます"
 
@@ -3270,7 +3277,7 @@ msgstr "電話番号を設定して有効にする"
 msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:94 settings/utils/ldap.py:681
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
@@ -4363,11 +4370,11 @@ msgstr "投稿サイトニュース"
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:285
+#: ops/ansible/inventory.py:286
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:301
+#: ops/ansible/inventory.py:302
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -4556,17 +4563,17 @@ msgstr "コマンド実行が無効"
 msgid "no valid program entry found."
 msgstr "利用可能なプログラムポータルがありません"
 
-#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:72
+#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:73
 msgid "Periodic run"
 msgstr "定期的なパフォーマンス"
 
 #: ops/mixin.py:25 ops/mixin.py:88 ops/mixin.py:108
-#: settings/serializers/auth/ldap.py:79
+#: settings/serializers/auth/ldap.py:80
 msgid "Interval"
 msgstr "間隔"
 
 #: ops/mixin.py:28 ops/mixin.py:86 ops/mixin.py:105
-#: settings/serializers/auth/ldap.py:76
+#: settings/serializers/auth/ldap.py:77
 msgid "Crontab"
 msgstr "含む"
 
@@ -4754,31 +4761,31 @@ msgstr "タスク ID"
 msgid "You do not have permission for the current job."
 msgstr "あなたは現在のジョブの権限を持っていません。"
 
-#: ops/tasks.py:38
+#: ops/tasks.py:50
 msgid "Run ansible task"
 msgstr "Ansible タスクを実行する"
 
-#: ops/tasks.py:72
+#: ops/tasks.py:76
 msgid "Run ansible task execution"
 msgstr "Ansible タスクの実行を開始する"
 
-#: ops/tasks.py:94
+#: ops/tasks.py:89
 msgid "Clear celery periodic tasks"
 msgstr "タスクログを定期的にクリアする"
 
-#: ops/tasks.py:115
+#: ops/tasks.py:110
 msgid "Create or update periodic tasks"
 msgstr "定期的なタスクの作成または更新"
 
-#: ops/tasks.py:123
+#: ops/tasks.py:118
 msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
 
-#: ops/tasks.py:129
+#: ops/tasks.py:124
 msgid "Clean up unexpected jobs"
 msgstr "例外ジョブのクリーンアップ"
 
-#: ops/tasks.py:136
+#: ops/tasks.py:131
 msgid "Clean job_execution db record"
 msgstr "ジョブセンター実行履歴のクリーンアップ"
 
@@ -4822,18 +4829,18 @@ msgstr "ジョブのID"
 msgid "Name of the job"
 msgstr "ジョブの名前"
 
-#: orgs/api.py:61
+#: orgs/api.py:60
 msgid "The current organization ({}) cannot be deleted"
 msgstr "現在の組織 ({}) は削除できません"
 
-#: orgs/api.py:66
+#: orgs/api.py:65
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
 msgstr ""
 "LDAP 同期は現在の組織に設定されます。削除する前に別の組織に切り替えてください"
 
-#: orgs/api.py:76
+#: orgs/api.py:75
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
@@ -5057,27 +5064,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "App RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:115
+#: rbac/builtin.py:116
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:118
+#: rbac/builtin.py:119
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:121
+#: rbac/builtin.py:122
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:127
+#: rbac/builtin.py:128
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:130
+#: rbac/builtin.py:131
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:133
+#: rbac/builtin.py:134
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -5276,7 +5283,7 @@ msgstr "{}に送信されたテストメールを確認してください"
 msgid "Test smtp setting"
 msgstr "SMTP設定のテスト"
 
-#: settings/api/ldap.py:89
+#: settings/api/ldap.py:90
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr ""
@@ -5471,7 +5478,7 @@ msgstr ""
 msgid "CAS"
 msgstr "CAS"
 
-#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:43
+#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:44
 #: settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr "LDAPサーバー"
@@ -5499,7 +5506,7 @@ msgstr "属性マップの有効化"
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:65 settings/serializers/auth/oauth2.py:60
+#: settings/serializers/auth/ldap.py:66 settings/serializers/auth/oauth2.py:60
 #: settings/serializers/auth/oidc.py:39 settings/serializers/auth/saml2.py:35
 #: settings/serializers/auth/slack.py:18 settings/serializers/auth/wecom.py:18
 msgid "User attribute"
@@ -5557,47 +5564,47 @@ msgstr ""
 "ユーザー属性のマッピング、ここで `key` は JumpServer のユーザー属性名で、"
 "`value` は Lark サービスのユーザー属性名です"
 
-#: settings/serializers/auth/ldap.py:40 settings/serializers/auth/ldap.py:102
+#: settings/serializers/auth/ldap.py:41 settings/serializers/auth/ldap.py:103
 msgid "LDAP"
 msgstr "LDAP"
 
-#: settings/serializers/auth/ldap.py:44
+#: settings/serializers/auth/ldap.py:45
 msgid "LDAP server URI"
 msgstr "FIDOサーバーID"
 
-#: settings/serializers/auth/ldap.py:47
+#: settings/serializers/auth/ldap.py:48
 msgid "Bind DN"
 msgstr "DN のバインド"
 
-#: settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap.py:49
 msgid "Binding Distinguished Name"
 msgstr "バインドディレクトリ管理者"
 
-#: settings/serializers/auth/ldap.py:52
+#: settings/serializers/auth/ldap.py:53
 msgid "Binding password"
 msgstr "古いパスワード"
 
-#: settings/serializers/auth/ldap.py:55
+#: settings/serializers/auth/ldap.py:56
 msgid "Search OU"
 msgstr "システムアーキテクチャ"
 
-#: settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap.py:58
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
 msgstr ""
 "ユーザー検索ライブラリ、複数のOUがある場合は`|`の記号で分けることができます"
 
-#: settings/serializers/auth/ldap.py:61
+#: settings/serializers/auth/ldap.py:62
 msgid "Search filter"
 msgstr "ユーザー検索フィルター"
 
-#: settings/serializers/auth/ldap.py:62
+#: settings/serializers/auth/ldap.py:63
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr "選択は (cnまたはuidまたはsAMAccountName)=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:67
+#: settings/serializers/auth/ldap.py:68
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the LDAP service user attribute name"
@@ -5605,15 +5612,15 @@ msgstr ""
 "ユーザー属性のマッピング、ここで `key` は JumpServer のユーザー属性名で、"
 "`value` は LDAP サービスのユーザー属性名です"
 
-#: settings/serializers/auth/ldap.py:83
+#: settings/serializers/auth/ldap.py:84
 msgid "Connect timeout (s)"
 msgstr "接続タイムアウト (秒)"
 
-#: settings/serializers/auth/ldap.py:88
+#: settings/serializers/auth/ldap.py:89
 msgid "User DN cache timeout (s)"
 msgstr "User DN キャッシュの有効期限 (秒)"
 
-#: settings/serializers/auth/ldap.py:90
+#: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
 "effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
@@ -5624,7 +5631,7 @@ msgstr ""
 "認証の速度を効果的に向上させることができます<br>ユーザー OU 構造が調整された"
 "場合、送信をクリックしてユーザー DN キャッシュをクリアします"
 
-#: settings/serializers/auth/ldap.py:96
+#: settings/serializers/auth/ldap.py:97
 msgid "Search paged size (piece)"
 msgstr "ページサイズを検索 (じょう)"
 
@@ -6075,6 +6082,10 @@ msgid ""
 msgstr ""
 "この期間を超えるセッション、録音、およびコマンド レコードは削除されます (デー"
 "タベースのバックアップに影響し、OSS などには影響しません)"
+
+#: settings/serializers/cleaning.py:53
+msgid "Change secret and push record retention days (day)"
+msgstr "パスワード変更プッシュ記録を保持する日数 (日)"
 
 #: settings/serializers/feature.py:18 settings/serializers/msg.py:68
 msgid "Subject"
@@ -6703,108 +6714,108 @@ msgstr "同期されたユーザー"
 msgid "No user synchronization required"
 msgstr "ユーザーの同期は必要ありません"
 
-#: settings/utils/ldap.py:494
+#: settings/utils/ldap.py:496
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "ldap:// または ldaps:// プロトコルが使用されます。"
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:507
 msgid "Host or port is disconnected: {}"
 msgstr "ホストまたはポートが切断されました: {}"
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:509
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "ポートはLDAPサービスのポートではありません: {}"
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:511
 msgid "Please add certificate: {}"
 msgstr "証明書を追加してください: {}"
 
-#: settings/utils/ldap.py:513 settings/utils/ldap.py:540
-#: settings/utils/ldap.py:570 settings/utils/ldap.py:598
+#: settings/utils/ldap.py:515 settings/utils/ldap.py:542
+#: settings/utils/ldap.py:572 settings/utils/ldap.py:600
 msgid "Unknown error: {}"
 msgstr "不明なエラー: {}"
 
-#: settings/utils/ldap.py:527
+#: settings/utils/ldap.py:529
 msgid "Bind DN or Password incorrect"
 msgstr "DNまたはパスワードのバインドが正しくありません"
 
-#: settings/utils/ldap.py:534
+#: settings/utils/ldap.py:536
 msgid "Please enter Bind DN: {}"
 msgstr "バインドDN: {} を入力してください"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:538
 msgid "Please enter Password: {}"
 msgstr "パスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:540
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "正しいバインドDNとパスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:558
 msgid "Invalid User OU or User search filter: {}"
 msgstr "無効なユーザー OU またはユーザー検索フィルター: {}"
 
-#: settings/utils/ldap.py:587
+#: settings/utils/ldap.py:589
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP ユーザーattrマップは含まれません: {}"
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:596
 msgid "LDAP User attr map is not dict"
 msgstr "LDAPユーザーattrマップはdictではありません"
 
-#: settings/utils/ldap.py:613
+#: settings/utils/ldap.py:615
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP 認証が有効になっていない"
 
-#: settings/utils/ldap.py:631
+#: settings/utils/ldap.py:633
 msgid "Error (Invalid LDAP server): {}"
 msgstr "エラー (LDAPサーバーが無効): {}"
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:635
 msgid "Error (Invalid Bind DN): {}"
 msgstr "エラー (DNのバインドが無効): {}"
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:637
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "エラー (LDAPユーザーattrマップが無効): {}"
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:639
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "エラー (ユーザーOUまたはユーザー検索フィルターが無効): {}"
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:641
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "エラー (LDAP認証が有効化されていません): {}"
 
-#: settings/utils/ldap.py:641
+#: settings/utils/ldap.py:643
 msgid "Error (Unknown): {}"
 msgstr "エラー (不明): {}"
 
-#: settings/utils/ldap.py:644
+#: settings/utils/ldap.py:646
 msgid "Succeed: Match {} users"
 msgstr "成功: {} 人のユーザーに一致"
 
-#: settings/utils/ldap.py:677
+#: settings/utils/ldap.py:679
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認証に失敗しました (設定が正しくありません): {}"
 
-#: settings/utils/ldap.py:681
+#: settings/utils/ldap.py:683
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:685
 msgid "Authentication failed (Unknown): {}"
 msgstr "認証に失敗しました (不明): {}"
 
-#: settings/utils/ldap.py:686
+#: settings/utils/ldap.py:688
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
-#: settings/ws.py:198
+#: settings/ws.py:203
 msgid "No LDAP user was found"
 msgstr "LDAPユーザーが取得されませんでした"
 
-#: settings/ws.py:204
+#: settings/ws.py:209
 msgid "Total {}, success {}, failure {}"
 msgstr "合計 {}，成功 {}，失敗 {}"
 
@@ -8055,7 +8066,7 @@ msgstr "チェックコマンドと録画ストレージの接続性"
 msgid "view"
 msgstr "表示"
 
-#: terminal/utils/db_port_mapper.py:85
+#: terminal/utils/db_port_mapper.py:88
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -8065,7 +8076,7 @@ msgstr ""
 "サービスによって開かれたポートの数を超えた可能性があります。さらにポートを開"
 "くには、管理者に連絡してください。"
 
-#: terminal/utils/db_port_mapper.py:113
+#: terminal/utils/db_port_mapper.py:116
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
@@ -8073,7 +8084,7 @@ msgstr ""
 "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
 "制限を確認して変更してください. "
 
-#: terminal/utils/db_port_mapper.py:115
+#: terminal/utils/db_port_mapper.py:118
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
@@ -8137,19 +8148,19 @@ msgstr ""
 "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
 "{}"
 
-#: tickets/handlers/base.py:85
+#: tickets/handlers/base.py:84
 msgid "Change field"
 msgstr "フィールドを変更"
 
-#: tickets/handlers/base.py:85
+#: tickets/handlers/base.py:84
 msgid "Before change"
 msgstr "変更前"
 
-#: tickets/handlers/base.py:85
+#: tickets/handlers/base.py:84
 msgid "After change"
 msgstr "変更後"
 
-#: tickets/handlers/base.py:97
+#: tickets/handlers/base.py:96
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
