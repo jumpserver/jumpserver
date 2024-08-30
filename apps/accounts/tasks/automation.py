@@ -84,7 +84,7 @@ def execute_automation_record_task(record_ids, tp):
 
 @shared_task(
     verbose_name=_('Clean change secret and push record period'),
-    description=_('Clean change secret and push record period')
+    description=_('Clean change secret and push record period description')
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
 def clean_change_secret_and_push_record_period():
