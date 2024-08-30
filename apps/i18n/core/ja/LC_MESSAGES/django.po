@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-30 15:08+0800\n"
+"POT-Creation-Date: 2024-09-02 10:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1140,7 +1140,15 @@ msgstr "パスワード変更記録とプッシュ記録を定期的にクリア
 
 #: accounts/tasks/automation.py:87
 msgid "Clean change secret and push record period description"
-msgstr "システムは、変更タスク、実行レコード、資産、アカウントに関連するものを含め、不要な変更シークレット レコードとプッシュ レコードを定期的にクリーンアップします。これらの関連項目のいずれかが削除されると、対応する変更シークレット レコードとプッシュ レコードは無効になります。したがって、整然とした効率的なデータベースを維持するために、システムはデフォルトでこれらの無効なレコードを 180 日ごとに自動的にクリーンアップします。この定期的なクリーンアップ プロセスにより、ストレージ領域が解放され、データ管理のセキュリティと全体的なパフォーマンスが向上します。"
+msgstr ""
+"システムは、変更タスク、実行レコード、資産、アカウントに関連するものを含め、"
+"不要な変更シークレット レコードとプッシュ レコードを定期的にクリーンアップし"
+"ます。これらの関連項目のいずれかが削除されると、対応する変更シークレット レ"
+"コードとプッシュ レコードは無効になります。したがって、整然とした効率的なデー"
+"タベースを維持するために、システムはデフォルトでこれらの無効なレコードを 180 "
+"日ごとに自動的にクリーンアップします。この定期的なクリーンアップ プロセスによ"
+"り、ストレージ領域が解放され、データ管理のセキュリティと全体的なパフォーマン"
+"スが向上します。"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -2971,6 +2979,14 @@ msgstr ""
 #: authentication/backends/drf.py:74
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
+
+#: authentication/backends/oidc/views.py:174
+msgid "OpenID Error"
+msgstr "OpenID エラー"
+
+#: authentication/backends/oidc/views.py:175
+msgid "Username or email already exists, Please check"
+msgstr "ユーザー名またはメールアドレスが既に存在しています。ご確認ください"
 
 #: authentication/backends/passkey/api.py:37
 msgid "Only register passkey for local user"
