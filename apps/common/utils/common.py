@@ -158,7 +158,7 @@ def is_uuid(seq):
 def get_request_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
     if x_forwarded_for and x_forwarded_for[0]:
-        login_ip = x_forwarded_for[0]
+        login_ip = x_forwarded_for[0].split(":")[0]
         return login_ip
 
     login_ip = request.META.get('REMOTE_ADDR', '')
@@ -293,7 +293,7 @@ def get_docker_mem_usage_if_limit():
             inactive_file = int(inactive_file)
         return ((usage_in_bytes - inactive_file) / limit_in_bytes) * 100
 
-    except Exception as e:
+    except Exception:
         return None
 
 

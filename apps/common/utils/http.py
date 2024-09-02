@@ -39,10 +39,6 @@ def iso8601_to_unixtime(time_string):
     return to_unixtime(time_string, _ISO8601_FORMAT)
 
 
-def get_remote_addr(request):
-    return request.META.get("HTTP_X_FORWARDED_HOST") or request.META.get("REMOTE_ADDR")
-
-
 def is_true(value):
     return value in BooleanField.TRUE_VALUES
 
