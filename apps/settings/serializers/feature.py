@@ -1,10 +1,11 @@
 import uuid
-
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import Protocol
 from common.serializers.fields import EncryptedField
+from common.utils import date_expired_default
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer',
@@ -21,6 +22,8 @@ class AnnouncementSerializer(serializers.Serializer):
         required=False, allow_null=True, allow_blank=True,
         label=_("More Link"), default='',
     )
+    DATE_START = serializers.DateTimeField(default=timezone.now, label=_("Date start"))
+    DATE_END = serializers.DateTimeField(default=date_expired_default, label=_("Date end"))
 
     def to_representation(self, instance):
         defaults = {'ID': '', 'SUBJECT': '', 'CONTENT': '', 'LINK': '', 'ENABLED': False}
