@@ -18,11 +18,13 @@ __all__ = [
     'AppletHostStartupSerializer', 'AppletSetupSerializer'
 ]
 
+RDS_LICENSE_DOC_URL = 'https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-access-license'
+
 
 class DeployOptionsSerializer(serializers.Serializer):
     LICENSE_MODE_CHOICES = (
-        (4, _('Per Session')),
-        (2, _('Per Device')),
+        (2, _('Per Device (Device number limit)')),
+        (4, _('Per User (User number limit)')),
     )
 
     # 单用户单会话，
@@ -44,11 +46,20 @@ class DeployOptionsSerializer(serializers.Serializer):
         """)
     )
     IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
-    RDS_Licensing = serializers.BooleanField(default=False, label=_("Existing RDS license"))
+    RDS_Licensing = serializers.BooleanField(
+        default=False, label=_("Existing RDS license"),
+        help_text=_('If not exist, the RDS will be in trial mode, and the trial period is 120 days. '
+                    '<a href={}>Detail</a>').format(RDS_LICENSE_DOC_URL)
+    )
     RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
-    RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'))
-    RDS_fSingleSessionPerUser = serializers.ChoiceField(choices=SESSION_PER_USER, default=1,
-                                                        label=_("RDS Single Session Per User"))
+    RDS_LicensingMode = serializers.ChoiceField(
+        choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'),
+    )
+    RDS_fSingleSessionPerUser = serializers.ChoiceField(
+        choices=SESSION_PER_USER, default=1, label=_("RDS Single Session Per User"),
+        help_text=_('Tips: A RDS user can have only one session at a time. If set, when next login connected, '
+                    'previous session will be disconnected.')
+    )
     RDS_MaxDisconnectionTime = serializers.IntegerField(
         default=60000, label=_("RDS Max Disconnection Time (ms)"),
         help_text=_(
