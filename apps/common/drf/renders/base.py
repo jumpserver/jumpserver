@@ -139,8 +139,8 @@ class BaseFileRenderer(BaseRenderer):
             else:
                 text = _("Long text, no length limit")
         elif isinstance(field, serializers.IntegerField):
-            text = _('Number, min {} max {}'.format(field.min_value, field.max_value))
-            text = text.replace('None', _('None'))
+            text = _('Number, min {} max {}').format(field.min_value, field.max_value)
+            text = text.replace('min None', '').replace('max None', '')
         elif isinstance(field, serializers.DateTimeField):
             text = _('Datetime')
         elif isinstance(field, serializers.IPAddressField):
@@ -186,14 +186,14 @@ class BaseFileRenderer(BaseRenderer):
             yield row
 
     def write_help_text_if_need(self):
-        if self.template != "import":
+        if self.template == 'export':
             return
         fields = self.get_rendered_fields()
         row = []
         for f in fields:
             text = self.get_field_help_text(f)
             row.append(text)
-        row[0] = '#Help: ' + str(row[0])
+        row[0] = '#Help ' + str(row[0])
         self.write_row(row)
 
     @abc.abstractmethod
