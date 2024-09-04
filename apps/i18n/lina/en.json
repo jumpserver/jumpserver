@@ -543,6 +543,7 @@
     "GatewayCreate": "Create gateway",
     "GatewayList": "Gateways",
     "GatewayUpdate": "Update the gateway",
+    "GatewayPlatformHelpText": "Only platforms with names starting with ‘Gateway’ can be used as gateways.",
     "GatherAccounts": "Gather accounts",
     "GatherAccountsHelpText": "Collect account information on assets. the collected account information can be imported into the system for centralized management.",
     "GatheredAccountList": "Gathered accounts",
