@@ -16,9 +16,9 @@ from common.signals import django_ready
 from common.utils.connection import RedisPubSub
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
+from .ansible.runner import interface
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
-from .ansible.runner import interface
 
 logger = get_logger(__name__)
 
@@ -63,6 +63,7 @@ def check_registered_tasks(*args, **kwargs):
         'common.utils.verify_code.send_sms_async', 'assets.tasks.nodes_amount.check_node_assets_amount_period_task',
         'users.tasks.check_user_expired', 'orgs.tasks.refresh_org_cache_task',
         'terminal.tasks.upload_session_replay_to_external_storage', 'terminal.tasks.clean_orphan_session',
+        'terminal.tasks.upload_session_replay_file_to_external_storage',
         'audits.tasks.clean_audits_log_period', 'authentication.tasks.clean_django_sessions'
     ]
 

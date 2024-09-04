@@ -99,6 +99,27 @@ def upload_session_replay_to_external_storage(session_id):
 
 
 @shared_task(
+    verbose_name=_('Upload session replay part file to external storage'),
+    description=_(
+        """If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and 
+        recordings will be uploaded to external storage"""
+    ))
+def upload_session_replay_file_to_external_storage(session_id, local_path, remote_path):
+    abs_path = default_storage.path(local_path)
+    ok, err = server_replay_storage.upload(abs_path, remote_path)
+    if not ok:
+        logger.error(f'Session replay file {local_path} upload to external error: {err}')
+        return
+
+    try:
+        default_storage.delete(local_path)
+    except:
+        pass
+    return
+
+
+
+@shared_task(
     verbose_name=_('Run applet host deployment'),
     activity_callback=lambda self, did, *args, **kwargs: ([did],),
     description=_(
