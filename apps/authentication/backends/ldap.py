@@ -1,6 +1,6 @@
 # coding:utf-8
 #
-
+import abc
 import ldap
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
@@ -15,13 +15,16 @@ from .base import JMSBaseAuthBackend
 logger = _LDAPConfig.get_logger()
 
 
-class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
-    """
-    Override this class to override _LDAPUser to LDAPUser
-    """
-    @staticmethod
-    def is_enabled():
-        return settings.AUTH_LDAP
+class LDAPBaseBackend(LDAPBackend):
+
+    @abc.abstractmethod
+    def is_enabled(self):
+        raise NotImplementedError('is_enabled')
+
+    @property
+    @abc.abstractmethod
+    def is_user_login_only_in_users(self):
+        raise NotImplementedError('is_authenticated')
 
     def get_or_build_user(self, username, ldap_user):
         """
@@ -56,38 +59,6 @@ class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
 
         return user, built
 
-    def pre_check(self, username, password):
-        if not settings.AUTH_LDAP:
-            error = 'Not enabled auth ldap'
-            return False, error
-        if not username:
-            error = 'Username is None'
-            return False, error
-        if not password:
-            error = 'Password is None'
-            return False, error
-        if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
-            user_model = self.get_user_model()
-            exist = user_model.objects.filter(username=username).exists()
-            if not exist:
-                error = 'user ({}) is not in the user list'.format(username)
-                return False, error
-        return True, ''
-
-    def authenticate(self, request=None, username=None, password=None, **kwargs):
-        logger.info('Authentication LDAP backend')
-        if username is None or password is None:
-            logger.info('No username or password')
-            return None
-        match, msg = self.pre_check(username, password)
-        if not match:
-            logger.info('Authenticate failed: {}'.format(msg))
-            return None
-        ldap_user = LDAPUser(self, username=username.strip(), request=request)
-        user = self.authenticate_ldap_user(ldap_user, password)
-        logger.info('Authenticate user: {}'.format(user))
-        return user if self.user_can_authenticate(user) else None
-
     def get_user(self, user_id):
         user = None
         try:
@@ -111,6 +82,67 @@ class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBackend):
         user = ldap_user.populate_user()
         return user
 
+    def authenticate(self, request=None, username=None, password=None, **kwargs):
+        logger.info('Authentication LDAP backend')
+        if username is None or password is None:
+            logger.info('No username or password')
+            return None
+        match, msg = self.pre_check(username, password)
+        if not match:
+            logger.info('Authenticate failed: {}'.format(msg))
+            return None
+        ldap_user = LDAPUser(self, username=username.strip(), request=request)
+        user = self.authenticate_ldap_user(ldap_user, password)
+        logger.info('Authenticate user: {}'.format(user))
+        return user if self.user_can_authenticate(user) else None
+
+    def pre_check(self, username, password):
+        if not self.is_enabled():
+            error = 'Not enabled auth ldap'
+            return False, error
+        if not username:
+            error = 'Username is None'
+            return False, error
+        if not password:
+            error = 'Password is None'
+            return False, error
+        if self.is_user_login_only_in_users:
+            user_model = self.get_user_model()
+            exist = user_model.objects.filter(username=username).exists()
+            if not exist:
+                error = 'user ({}) is not in the user list'.format(username)
+                return False, error
+        return True, ''
+
+
+class LDAPAuthorizationBackend(JMSBaseAuthBackend, LDAPBaseBackend):
+    """
+    Override this class to override _LDAPUser to LDAPUser
+    """
+
+    @staticmethod
+    def is_enabled():
+        return settings.AUTH_LDAP
+
+    @property
+    def is_user_login_only_in_users(self):
+        return settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS
+
+
+class LDAPHAAuthorizationBackend(JMSBaseAuthBackend, LDAPBaseBackend):
+    """
+    Override this class to override _LDAPUser to LDAPUser
+    """
+    settings_prefix = "AUTH_LDAP_HA_"
+
+    @staticmethod
+    def is_enabled():
+        return settings.AUTH_LDAP_HA
+
+    @property
+    def is_user_login_only_in_users(self):
+        return settings.AUTH_LDAP_HA_USER_LOGIN_ONLY_IN_USERS
+
 
 class LDAPUser(_LDAPUser):
 
@@ -126,13 +158,18 @@ class LDAPUser(_LDAPUser):
         configuration in the settings.py file
         is configured with a `lambda` problem value
         """
-
+        if isinstance(self.backend, LDAPAuthorizationBackend):
+            search_filter = settings.AUTH_LDAP_SEARCH_FILTER
+            search_ou = settings.AUTH_LDAP_SEARCH_OU
+        else:
+            search_filter = settings.AUTH_LDAP_HA_SEARCH_FILTER
+            search_ou = settings.AUTH_LDAP_HA_SEARCH_OU
         user_search_union = [
             LDAPSearch(
                 USER_SEARCH, ldap.SCOPE_SUBTREE,
-                settings.AUTH_LDAP_SEARCH_FILTER
+                search_filter
             )
-            for USER_SEARCH in str(settings.AUTH_LDAP_SEARCH_OU).split("|")
+            for USER_SEARCH in str(search_ou).split("|")
         ]
 
         search = LDAPSearchUnion(*user_search_union)
@@ -169,7 +206,8 @@ class LDAPUser(_LDAPUser):
                     else:
                         value = is_true(value)
             except LookupError:
-                logger.warning("{} does not have a value for the attribute {}".format(self.dn, attr))
+                logger.warning(
+                    "{} does not have a value for the attribute {}".format(self.dn, attr))
             else:
                 if not hasattr(self._user, field):
                     continue

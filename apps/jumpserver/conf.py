@@ -288,6 +288,26 @@ class Config(dict):
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
+        # Auth LDAP HA settings
+        'AUTH_LDAP_HA': False,
+        'AUTH_LDAP_HA_SERVER_URI': 'ldap://localhost:389',
+        'AUTH_LDAP_HA_BIND_DN': 'cn=admin,dc=jumpserver,dc=org',
+        'AUTH_LDAP_HA_BIND_PASSWORD': '',
+        'AUTH_LDAP_HA_SEARCH_OU': 'ou=tech,dc=jumpserver,dc=org',
+        'AUTH_LDAP_HA_SEARCH_FILTER': '(cn=%(user)s)',
+        'AUTH_LDAP_HA_START_TLS': False,
+        'AUTH_LDAP_HA_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
+        'AUTH_LDAP_HA_CONNECT_TIMEOUT': 10,
+        'AUTH_LDAP_HA_CACHE_TIMEOUT': 3600 * 24 * 30,
+        'AUTH_LDAP_HA_SEARCH_PAGED_SIZE': 1000,
+        'AUTH_LDAP_HA_SYNC_IS_PERIODIC': False,
+        'AUTH_LDAP_HA_SYNC_INTERVAL': None,
+        'AUTH_LDAP_HA_SYNC_CRONTAB': None,
+        'AUTH_LDAP_HA_SYNC_ORG_IDS': [DEFAULT_ID],
+        'AUTH_LDAP_HA_SYNC_RECEIVERS': [],
+        'AUTH_LDAP_HA_USER_LOGIN_ONLY_IN_USERS': False,
+        'AUTH_LDAP_HA_OPTIONS_OPT_REFERRALS': -1,
+
         # OpenID 配置参数
         # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
         'AUTH_OPENID': False,

@@ -26,12 +26,14 @@ class LDAPUserListApi(generics.ListAPIView):
 
     def get_queryset_from_cache(self):
         search_value = self.request.query_params.get('search')
-        users = LDAPCacheUtil().search(search_value=search_value)
+        category = self.request.query_params.get('category')
+        users = LDAPCacheUtil(category=category).search(search_value=search_value)
         return users
 
     def get_queryset_from_server(self):
         search_value = self.request.query_params.get('search')
-        users = LDAPServerUtil().search(search_value=search_value)
+        category = self.request.query_params.get('category')
+        users = LDAPServerUtil(category=category).search(search_value=search_value)
         return users
 
     def get_queryset(self):
