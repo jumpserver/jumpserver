@@ -36,6 +36,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'security_password': serializers.SecurityPasswordRuleSerializer,
         'security_login_limit': serializers.SecurityLoginLimitSerializer,
         'ldap': serializers.LDAPSettingSerializer,
+        'ldap_ha': serializers.LDAPHASettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
         'wecom': serializers.WeComSettingSerializer,
