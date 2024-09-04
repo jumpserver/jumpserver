@@ -84,7 +84,7 @@ class SessionDisplaySerializer(SessionSerializer):
 
 class ReplaySerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
-    version = serializers.IntegerField(write_only=True, required=False, min_value=2, max_value=4)
+    version = serializers.IntegerField(write_only=True, required=False, min_value=2, max_value=5)
 
 
 class SessionJoinValidateSerializer(serializers.Serializer):
