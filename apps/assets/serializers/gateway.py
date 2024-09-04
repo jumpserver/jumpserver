@@ -14,6 +14,11 @@ class GatewaySerializer(HostSerializer):
     class Meta(HostSerializer.Meta):
         model = Gateway
 
+    def validate_platform(self, p):
+        if not p.name.startswith('Gateway'):
+            raise serializers.ValidationError(_('The platform must start with Gateway'))
+        return p
+
     def validate_name(self, value):
         queryset = Asset.objects.filter(name=value)
         if self.instance:

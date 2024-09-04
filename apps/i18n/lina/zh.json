@@ -543,6 +543,7 @@
     "GatewayCreate": "创建网关",
     "GatewayList": "网关列表",
     "GatewayUpdate": "更新网关",
+    "GatewayPlatformHelpText": "网关平台只能选择以 Gateway 开头的平台",
     "GatherAccounts": "账号收集",
     "GatherAccountsHelpText": "收集资产上的账号信息。收集后的账号信息可以导入到系统中，方便统一管理",
     "GatheredAccountList": "收集的账号",
