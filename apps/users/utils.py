@@ -227,7 +227,7 @@ class MFABlockUtils(BlockUtilBase):
 
 class LoginIpBlockUtil(BlockGlobalIpUtilBase):
     LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}"
-    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
+    BLOCK_KEY_TMPL = "_LOGIN_BLOCK_IP_{}"
 
 
 def validate_emails(emails):
