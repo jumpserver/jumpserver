@@ -4,6 +4,7 @@ from collections import defaultdict
 from django.utils.translation import gettext as _
 from rest_framework import generics
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
@@ -56,6 +57,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         if not is_valid:
             raise UnableToDeleteAllUsers()
         return True
+
+    def perform_destroy(self, instance):
+        if instance.username == 'admin':
+            raise PermissionDenied(_("Cannot delete the admin user. Please disable it instead."))
+        super().perform_destroy(instance)
 
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
