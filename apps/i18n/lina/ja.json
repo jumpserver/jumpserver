@@ -1432,5 +1432,6 @@
     "AdhocCreate": "アドホックコマンドを作成",
     "UploadHelpText": "次のサンプル構造ディレクトリを含む .zip ファイルをアップロードしてください。",
     "SessionJoinRecords": "協力記録",
-    "ApprovalSelected": "大量承認です"
+    "ApprovalSelected": "大量承認です",
+    "disallowSelfUpdateFields": "現在のフィールドを自分で変更することは許可されていません"
 }

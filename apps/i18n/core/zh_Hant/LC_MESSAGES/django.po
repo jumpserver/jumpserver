@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-03 15:26+0800\n"
+"POT-Creation-Date: 2024-08-15 14:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -110,11 +110,11 @@ msgstr "帳號備份計劃正在執行"
 msgid "Plan execution end"
 msgstr "計劃執行結束"
 
-#: accounts/automations/change_secret/manager.py:100
+#: accounts/automations/change_secret/manager.py:97
 msgid "No pending accounts found"
 msgstr "未找到待處理帳戶"
 
-#: accounts/automations/change_secret/manager.py:227
+#: accounts/automations/change_secret/manager.py:225
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s, 失敗: %s, 總數: %s"
@@ -125,7 +125,7 @@ msgstr "成功: %s, 失敗: %s, 總數: %s"
 #: authentication/confirm/password.py:24 authentication/confirm/password.py:26
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
-#: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:51
+#: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:52
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:28
 #: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
 #: users/forms/profile.py:21 users/serializers/user.py:144
@@ -348,7 +348,7 @@ msgstr "用戶 %s 查看/匯出 了密碼"
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: acls/serializers/base.py:123 assets/models/asset/common.py:95
-#: assets/models/asset/common.py:349 assets/models/cmd_filter.py:36
+#: assets/models/asset/common.py:355 assets/models/cmd_filter.py:36
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:32 terminal/notifications.py:155
@@ -551,7 +551,7 @@ msgstr "SSH 金鑰推送方式"
 #: accounts/models/automations/gather_account.py:58
 #: accounts/serializers/account/backup.py:40
 #: accounts/serializers/automations/change_secret.py:58
-#: settings/serializers/auth/ldap.py:99 settings/serializers/msg.py:45
+#: settings/serializers/auth/ldap.py:100 settings/serializers/msg.py:45
 msgid "Recipient"
 msgstr "收件人"
 
@@ -593,7 +593,7 @@ msgstr "結束日期"
 msgid "Status"
 msgstr "狀態"
 
-#: accounts/models/automations/change_secret.py:47
+#: accounts/models/automations/change_secret.py:46
 #: accounts/serializers/account/account.py:273
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:8
@@ -604,7 +604,7 @@ msgstr "狀態"
 msgid "Error"
 msgstr "錯誤"
 
-#: accounts/models/automations/change_secret.py:51
+#: accounts/models/automations/change_secret.py:50
 msgid "Change secret record"
 msgstr "改密記錄"
 
@@ -1063,8 +1063,8 @@ msgstr ""
 "CACHE_LOGIN_PASSWORD_ENABLED=true，重啟服務才能開啟"
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:172
-#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:47
+#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:152
+#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:36
 msgid "Nodes"
 msgstr "節點"
 
@@ -1124,13 +1124,25 @@ msgstr "添加帳號: %s"
 msgid "Delete account: %s"
 msgstr "刪除帳號: %s"
 
-#: accounts/tasks/automation.py:25
+#: accounts/tasks/automation.py:31
 msgid "Account execute automation"
 msgstr "帳號執行自動化"
 
-#: accounts/tasks/automation.py:51 accounts/tasks/automation.py:56
+#: accounts/tasks/automation.py:57 accounts/tasks/automation.py:62
 msgid "Execute automation record"
 msgstr "自動化執行記錄"
+
+#: accounts/tasks/automation.py:86
+msgid "Clean change secret and push record period"
+msgstr "週期清理改密記錄和推送記錄"
+
+#: accounts/tasks/automation.py:87
+msgid "Clean change secret and push record period description"
+msgstr ""
+"系統會定期清理不必要的變更密文記錄和推播記錄，包括與變更任務、執行記錄、資"
+"產、帳戶相關的記錄。當任何這些關聯項被刪除時，相應的變更秘密和推送記錄將變得"
+"無效。因此，為了保持資料庫整潔、高效，系統預設每180天自動清理一次這些無效記"
+"錄。這種定期清理過程有助於釋放儲存空間並提高資料管理的安全性和整體效能。"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -1245,7 +1257,7 @@ msgstr "優先度可選範圍為 1-100 (數值越小越優先)"
 msgid "Reviewers"
 msgstr "審批人"
 
-#: acls/models/base.py:43 assets/models/asset/common.py:165
+#: acls/models/base.py:43 assets/models/asset/common.py:171
 #: authentication/models/access_key.py:25
 #: authentication/models/connection_token.py:53
 #: authentication/models/ssh_key.py:13
@@ -1832,39 +1844,39 @@ msgstr "埠"
 msgid "Address"
 msgstr "地址"
 
-#: assets/models/asset/common.py:161 assets/models/platform.py:149
+#: assets/models/asset/common.py:162 assets/models/platform.py:149
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:385
 msgid "Platform"
 msgstr "系統平台"
 
-#: assets/models/asset/common.py:163 assets/models/domain.py:22
+#: assets/models/asset/common.py:166 assets/models/domain.py:22
 msgid "Zone"
 msgstr "網域"
 
-#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:408
+#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集資產硬體資訊"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:173 assets/serializers/asset/custom.py:14
 msgid "Custom info"
 msgstr "自訂屬性"
 
-#: assets/models/asset/common.py:352
+#: assets/models/asset/common.py:358
 msgid "Can refresh asset hardware info"
 msgstr "可以更新資產硬體資訊"
 
-#: assets/models/asset/common.py:353
+#: assets/models/asset/common.py:359
 msgid "Can test asset connectivity"
 msgstr "可以測試資產連接性"
 
-#: assets/models/asset/common.py:354
+#: assets/models/asset/common.py:360
 msgid "Can match asset"
 msgstr "可以匹配資產"
 
-#: assets/models/asset/common.py:355
+#: assets/models/asset/common.py:361
 msgid "Can change asset nodes"
 msgstr "可以修改資產節點"
 
@@ -2956,6 +2968,14 @@ msgstr "無效的令牌頭。符號字串不應包含無效字元。"
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或快取無效。"
 
+#: authentication/backends/oidc/views.py:174
+msgid "OpenID Error"
+msgstr "OpenID 錯誤"
+
+#: authentication/backends/oidc/views.py:175
+msgid "Username or email already exists, Please check"
+msgstr "使用者名稱或者電子郵件已經存在，請檢查"
+
 #: authentication/backends/passkey/api.py:37
 msgid "Only register passkey for local user"
 msgstr "僅為本地用戶註冊金鑰"
@@ -3253,7 +3273,7 @@ msgstr "設置手機號碼啟用"
 msgid "Clear phone number to disable"
 msgstr "清空手機號碼禁用"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:94 settings/utils/ldap.py:681
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認證失敗 (登錄前檢查失敗): {}"
 
@@ -4569,17 +4589,17 @@ msgstr "命令執行禁用"
 msgid "no valid program entry found."
 msgstr "沒有可用程序入口"
 
-#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:72
+#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:73
 msgid "Periodic run"
 msgstr "週期性執行"
 
 #: ops/mixin.py:25 ops/mixin.py:88 ops/mixin.py:108
-#: settings/serializers/auth/ldap.py:79
+#: settings/serializers/auth/ldap.py:80
 msgid "Interval"
 msgstr "間隔"
 
 #: ops/mixin.py:28 ops/mixin.py:86 ops/mixin.py:105
-#: settings/serializers/auth/ldap.py:76
+#: settings/serializers/auth/ldap.py:77
 msgid "Crontab"
 msgstr "Crontab"
 
@@ -5299,7 +5319,7 @@ msgstr "郵件已經發送{}, 請檢查"
 msgid "Test smtp setting"
 msgstr "測試 smtp 設定"
 
-#: settings/api/ldap.py:89
+#: settings/api/ldap.py:90
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr "用戶未同步，請點擊同步用戶按鈕"
@@ -5490,7 +5510,7 @@ msgstr ""
 msgid "CAS"
 msgstr "CAS"
 
-#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:43
+#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:44
 #: settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr "服務端地址"
@@ -5518,7 +5538,7 @@ msgstr "啟用屬性映射"
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:65 settings/serializers/auth/oauth2.py:60
+#: settings/serializers/auth/ldap.py:66 settings/serializers/auth/oauth2.py:60
 #: settings/serializers/auth/oidc.py:39 settings/serializers/auth/saml2.py:35
 #: settings/serializers/auth/slack.py:18 settings/serializers/auth/wecom.py:18
 msgid "User attribute"
@@ -5574,46 +5594,46 @@ msgstr ""
 "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 Lark 服務"
 "使用者屬性名稱"
 
-#: settings/serializers/auth/ldap.py:40 settings/serializers/auth/ldap.py:102
+#: settings/serializers/auth/ldap.py:41 settings/serializers/auth/ldap.py:103
 msgid "LDAP"
 msgstr "LDAP"
 
-#: settings/serializers/auth/ldap.py:44
+#: settings/serializers/auth/ldap.py:45
 msgid "LDAP server URI"
 msgstr "LDAP 服務域名"
 
-#: settings/serializers/auth/ldap.py:47
+#: settings/serializers/auth/ldap.py:48
 msgid "Bind DN"
 msgstr "綁定 DN"
 
-#: settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap.py:49
 msgid "Binding Distinguished Name"
 msgstr "綁定的 DN"
 
-#: settings/serializers/auth/ldap.py:52
+#: settings/serializers/auth/ldap.py:53
 msgid "Binding password"
 msgstr "原來的密碼"
 
-#: settings/serializers/auth/ldap.py:55
+#: settings/serializers/auth/ldap.py:56
 msgid "Search OU"
 msgstr "系統架構"
 
-#: settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap.py:58
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
 msgstr "使用者搜尋庫，如果有多個OU，可以用`|`符號分隔"
 
-#: settings/serializers/auth/ldap.py:61
+#: settings/serializers/auth/ldap.py:62
 msgid "Search filter"
 msgstr "用戶過濾器"
 
-#: settings/serializers/auth/ldap.py:62
+#: settings/serializers/auth/ldap.py:63
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr "可能的選項是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:67
+#: settings/serializers/auth/ldap.py:68
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the LDAP service user attribute name"
@@ -5621,15 +5641,15 @@ msgstr ""
 "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 LDAP 服務"
 "使用者屬性名稱"
 
-#: settings/serializers/auth/ldap.py:83
+#: settings/serializers/auth/ldap.py:84
 msgid "Connect timeout (s)"
 msgstr "連接超時時間 (秒)"
 
-#: settings/serializers/auth/ldap.py:88
+#: settings/serializers/auth/ldap.py:89
 msgid "User DN cache timeout (s)"
 msgstr "快取逾時時間 (秒)"
 
-#: settings/serializers/auth/ldap.py:90
+#: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
 "effectively improve the speed of user authentication., 0 means no "
@@ -5639,7 +5659,7 @@ msgstr ""
 "對於使用者登錄認證時查詢的使用者 DN 進行快取，可以有效提高使用者認證的速度"
 "<br>如果使用者 OU 架構已調整，請點擊提交以清除使用者 DN 快取"
 
-#: settings/serializers/auth/ldap.py:96
+#: settings/serializers/auth/ldap.py:97
 msgid "Search paged size (piece)"
 msgstr "搜索分頁數量 (條)"
 
@@ -6078,6 +6098,10 @@ msgid ""
 "database, OSS will not be affected."
 msgstr ""
 "會話、錄影，命令記錄超過該時長將會被清除 (影響資料庫儲存，OSS 等不受影響)"
+
+#: settings/serializers/cleaning.py:53
+msgid "Change secret and push record retention days (day)"
+msgstr "改密推送記錄保留天數 (天)"
 
 #: settings/serializers/feature.py:18 settings/serializers/msg.py:68
 msgid "Subject"
@@ -6667,108 +6691,108 @@ msgstr "已同步用戶"
 msgid "No user synchronization required"
 msgstr "沒有用戶需要同步"
 
-#: settings/utils/ldap.py:494
+#: settings/utils/ldap.py:496
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 協議"
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:507
 msgid "Host or port is disconnected: {}"
 msgstr "主機或埠不可連接: {}"
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:509
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "埠不是LDAP服務埠: {}"
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:511
 msgid "Please add certificate: {}"
 msgstr "請添加證書"
 
-#: settings/utils/ldap.py:513 settings/utils/ldap.py:540
-#: settings/utils/ldap.py:570 settings/utils/ldap.py:598
+#: settings/utils/ldap.py:515 settings/utils/ldap.py:542
+#: settings/utils/ldap.py:572 settings/utils/ldap.py:600
 msgid "Unknown error: {}"
 msgstr "未知錯誤: {}"
 
-#: settings/utils/ldap.py:527
+#: settings/utils/ldap.py:529
 msgid "Bind DN or Password incorrect"
 msgstr "綁定DN或密碼錯誤"
 
-#: settings/utils/ldap.py:534
+#: settings/utils/ldap.py:536
 msgid "Please enter Bind DN: {}"
 msgstr "請輸入綁定DN: {}"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:538
 msgid "Please enter Password: {}"
 msgstr "請輸入密碼: {}"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:540
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "請輸入正確的綁定DN和密碼: {}"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:558
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用戶OU或用戶過濾器: {}"
 
-#: settings/utils/ldap.py:587
+#: settings/utils/ldap.py:589
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP屬性映射沒有包含: {}"
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:596
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP屬性映射不合法"
 
-#: settings/utils/ldap.py:613
+#: settings/utils/ldap.py:615
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP認證沒有啟用"
 
-#: settings/utils/ldap.py:631
+#: settings/utils/ldap.py:633
 msgid "Error (Invalid LDAP server): {}"
 msgstr "錯誤  (不合法的LDAP伺服器地址): {}"
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:635
 msgid "Error (Invalid Bind DN): {}"
 msgstr "錯誤 (不合法的綁定DN): {}"
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:637
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "錯誤 (不合法的LDAP屬性映射): {}"
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:639
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "錯誤 (不合法的用戶OU或用戶過濾器): {}"
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:641
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "錯誤 (沒有啟用LDAP認證): {}"
 
-#: settings/utils/ldap.py:641
+#: settings/utils/ldap.py:643
 msgid "Error (Unknown): {}"
 msgstr "錯誤 (未知): {}"
 
-#: settings/utils/ldap.py:644
+#: settings/utils/ldap.py:646
 msgid "Succeed: Match {} users"
 msgstr "成功配對 {} 個用戶"
 
-#: settings/utils/ldap.py:677
+#: settings/utils/ldap.py:679
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認證失敗 (配置錯誤): {}"
 
-#: settings/utils/ldap.py:681
+#: settings/utils/ldap.py:683
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認證失敗 (使用者名稱或密碼不正確): {}"
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:685
 msgid "Authentication failed (Unknown): {}"
 msgstr "認證失敗: (未知): {}"
 
-#: settings/utils/ldap.py:686
+#: settings/utils/ldap.py:688
 msgid "Authentication success: {}"
 msgstr "認證成功: {}"
 
-#: settings/ws.py:202
+#: settings/ws.py:198
 msgid "No LDAP user was found"
 msgstr "沒有取得到 LDAP 用戶"
 
-#: settings/ws.py:208
+#: settings/ws.py:204
 msgid "Total {}, success {}, failure {}"
 msgstr "總共 {}，成功 {}，失敗 {}"
 
@@ -7999,7 +8023,7 @@ msgstr "檢查命令及錄影儲存可連接性 "
 msgid "view"
 msgstr "查看"
 
-#: terminal/utils/db_port_mapper.py:85
+#: terminal/utils/db_port_mapper.py:88
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -8008,13 +8032,13 @@ msgstr ""
 "未匹配到可用埠，資料庫的數量可能已經超過資料庫代理服務開放的埠數量，請聯系管"
 "理員開放更多埠。"
 
-#: terminal/utils/db_port_mapper.py:113
+#: terminal/utils/db_port_mapper.py:116
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr "沒有埠可以使用，檢查並修改配置文件中 Magnus 監聽的埠數量限制。"
 
-#: terminal/utils/db_port_mapper.py:115
+#: terminal/utils/db_port_mapper.py:118
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用埠數量：{}，已使用埠數量：{}"
 

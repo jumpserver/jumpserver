@@ -33,16 +33,15 @@ class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
 
 class ChangeSecretRecord(JMSBaseModel):
-    execution = models.ForeignKey('accounts.AutomationExecution', on_delete=models.CASCADE)
-    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, null=True)
-    account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, null=True)
+    execution = models.ForeignKey('accounts.AutomationExecution', on_delete=models.SET_NULL, null=True)
+    asset = models.ForeignKey('assets.Asset', on_delete=models.SET_NULL, null=True)
+    account = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True)
     old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
     date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'))
     status = models.CharField(
-        max_length=16, verbose_name=_('Status'),
-        default=ChangeSecretRecordStatusChoice.pending.value
+        max_length=16, verbose_name=_('Status'), default=ChangeSecretRecordStatusChoice.pending.value
     )
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
@@ -51,4 +50,4 @@ class ChangeSecretRecord(JMSBaseModel):
         verbose_name = _("Change secret record")
 
     def __str__(self):
-        return self.account.__str__()
+        return f'{self.account.username}@{self.asset}'

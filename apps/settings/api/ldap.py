@@ -6,6 +6,7 @@ from rest_framework.views import Response
 
 from common.utils import get_logger
 from users.models import User
+from ..const import ImportStatus
 from ..models import Setting
 from ..serializers import LDAPUserSerializer
 from ..utils import (

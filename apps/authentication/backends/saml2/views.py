@@ -87,6 +87,7 @@ class PrepareRequestMixin:
             ('name', 'name', False),
             ('phone', 'phone', False),
             ('comment', 'comment', False),
+            ('groups', 'groups', False),
         )
         attr_list = []
         for name, friend_name, is_required in need_attrs:
@@ -185,7 +186,7 @@ class PrepareRequestMixin:
         user_attrs = {}
         attr_mapping = settings.SAML2_RENAME_ATTRIBUTES
         attrs = saml_instance.get_attributes()
-        valid_attrs = ['username', 'name', 'email', 'comment', 'phone']
+        valid_attrs = ['username', 'name', 'email', 'comment', 'phone', 'groups']
 
         for attr, value in attrs.items():
             attr = attr.rsplit('/', 1)[-1]

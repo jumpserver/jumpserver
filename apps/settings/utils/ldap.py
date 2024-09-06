@@ -30,6 +30,7 @@ from common.db.utils import close_old_connections
 from common.utils import timeit, get_logger
 from common.utils.http import is_true
 from orgs.utils import tmp_to_org
+from settings.const import ImportStatus
 from users.models import User, UserGroup
 from users.utils import construct_user_email
 
@@ -199,6 +200,7 @@ class LDAPServerUtil(object):
                 if not isinstance(value, list):
                     value = []
             user[attr] = value.strip() if isinstance(value, str) else value
+            user['status'] = ImportStatus.pending
         return user
 
     def user_entries_to_dict(self, user_entries):

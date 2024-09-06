@@ -23,6 +23,7 @@ from settings.utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
+from .const import ImportStatus
 from .tools import (
     verbose_ping, verbose_telnet, verbose_nmap,
     verbose_tcpdump, verbose_traceroute
@@ -208,9 +209,23 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
                 msg = _('Total {}, success {}, failure {}').format(
                     len(users), success_count, len(error_msg)
                 )
+                self.set_users_status(users, error_msg)
         except Exception as e:
             msg = str(e)
         return ok, msg
+
+    def set_users_status(self, import_users, errors):
+        util = LDAPCacheUtil()
+        all_users = util.get_users()
+        import_usernames = [u['username'] for u in import_users]
+        errors_mapper = {k: v for err in errors for k, v in err.items()}
+        for user in all_users:
+            username = user['username']
+            if username in errors_mapper:
+                user['status'] = {'error': errors_mapper[username]}
+            elif username in import_usernames:
+                user['status'] = ImportStatus.ok
+        LDAPCacheUtil().set_users(all_users)
 
     @staticmethod
     def get_orgs(org_ids):

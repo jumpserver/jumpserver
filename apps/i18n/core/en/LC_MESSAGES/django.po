@@ -109,11 +109,11 @@ msgstr ""
 msgid "Plan execution end"
 msgstr ""
 
-#: accounts/automations/change_secret/manager.py:100
+#: accounts/automations/change_secret/manager.py:97
 msgid "No pending accounts found"
 msgstr ""
 
-#: accounts/automations/change_secret/manager.py:227
+#: accounts/automations/change_secret/manager.py:225
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr ""
@@ -124,7 +124,7 @@ msgstr ""
 #: authentication/confirm/password.py:24 authentication/confirm/password.py:26
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
-#: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:51
+#: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:52
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:28
 #: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
 #: users/forms/profile.py:21 users/serializers/user.py:144
@@ -347,7 +347,7 @@ msgstr ""
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: acls/serializers/base.py:123 assets/models/asset/common.py:95
-#: assets/models/asset/common.py:349 assets/models/cmd_filter.py:36
+#: assets/models/asset/common.py:355 assets/models/cmd_filter.py:36
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:32 terminal/notifications.py:155
@@ -550,7 +550,7 @@ msgstr ""
 #: accounts/models/automations/gather_account.py:58
 #: accounts/serializers/account/backup.py:40
 #: accounts/serializers/automations/change_secret.py:58
-#: settings/serializers/auth/ldap.py:99 settings/serializers/msg.py:45
+#: settings/serializers/auth/ldap.py:100 settings/serializers/msg.py:45
 msgid "Recipient"
 msgstr "Recipients"
 
@@ -592,7 +592,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: accounts/models/automations/change_secret.py:47
+#: accounts/models/automations/change_secret.py:46
 #: accounts/serializers/account/account.py:273
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:8
@@ -603,7 +603,7 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: accounts/models/automations/change_secret.py:51
+#: accounts/models/automations/change_secret.py:50
 msgid "Change secret record"
 msgstr ""
 
@@ -702,8 +702,8 @@ msgstr ""
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:169 assets/serializers/platform.py:153
-#: assets/serializers/platform.py:273
+#: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
+#: assets/serializers/platform.py:282
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
@@ -844,9 +844,9 @@ msgid "Exist policy"
 msgstr ""
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:145
-#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
-#: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:125
+#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:177
+#: assets/serializers/platform.py:283 perms/serializers/user_permission.py:26
 #: settings/models.py:36 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12
 msgid "Category"
@@ -856,8 +856,8 @@ msgstr ""
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
-#: assets/serializers/asset/common.py:146 assets/serializers/platform.py:155
-#: assets/serializers/platform.py:167 audits/serializers.py:53
+#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
+#: assets/serializers/platform.py:176 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
@@ -1048,8 +1048,8 @@ msgid ""
 msgstr ""
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:172
-#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:47
+#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:152
+#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:36
 msgid "Nodes"
 msgstr ""
 
@@ -1111,13 +1111,21 @@ msgstr ""
 msgid "Delete account: %s"
 msgstr ""
 
-#: accounts/tasks/automation.py:25
+#: accounts/tasks/automation.py:31
 msgid "Account execute automation"
 msgstr ""
 
-#: accounts/tasks/automation.py:51 accounts/tasks/automation.py:56
+#: accounts/tasks/automation.py:57 accounts/tasks/automation.py:62
 msgid "Execute automation record"
 msgstr ""
+
+#: accounts/tasks/automation.py:86
+msgid "Clean change secret and push record period"
+msgstr ""
+
+#: accounts/tasks/automation.py:87
+msgid "Clean change secret and push record period description"
+msgstr "The system will periodically clean up unnecessary change secret records and push records, including those associated with change tasks, execution records, assets, and accounts. When any of these associated items are deleted, the corresponding change secret and push records become invalid. Therefore, to maintain a tidy and efficient database, the system automatically cleans up these invalid records every 180 days by default. This regular cleanup process helps free up storage space and improves the security and overall performance of data management."
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -1232,7 +1240,7 @@ msgstr ""
 msgid "Reviewers"
 msgstr ""
 
-#: acls/models/base.py:43 assets/models/asset/common.py:165
+#: acls/models/base.py:43 assets/models/asset/common.py:171
 #: authentication/models/access_key.py:25
 #: authentication/models/connection_token.py:53
 #: authentication/models/ssh_key.py:13
@@ -1806,39 +1814,39 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: assets/models/asset/common.py:161 assets/models/platform.py:149
+#: assets/models/asset/common.py:161 assets/models/platform.py:138
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:385
 msgid "Platform"
 msgstr ""
 
-#: assets/models/asset/common.py:163 assets/models/domain.py:22
+#: assets/models/asset/common.py:166 assets/models/domain.py:22
 msgid "Zone"
 msgstr ""
 
-#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:408
+#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr ""
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:173 assets/serializers/asset/custom.py:14
 msgid "Custom info"
 msgstr ""
 
-#: assets/models/asset/common.py:352
+#: assets/models/asset/common.py:358
 msgid "Can refresh asset hardware info"
 msgstr ""
 
-#: assets/models/asset/common.py:353
+#: assets/models/asset/common.py:359
 msgid "Can test asset connectivity"
 msgstr ""
 
-#: assets/models/asset/common.py:354
+#: assets/models/asset/common.py:360
 msgid "Can match asset"
 msgstr ""
 
-#: assets/models/asset/common.py:355
+#: assets/models/asset/common.py:361
 msgid "Can change asset nodes"
 msgstr ""
 
@@ -2298,8 +2306,8 @@ msgid ""
 "the zone, the connection is routed through the gateway."
 msgstr ""
 
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:177
-#: orgs/serializers.py:13 perms/serializers/permission.py:50
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:186
+#: orgs/serializers.py:13 perms/serializers/permission.py:39
 msgid "Assets amount"
 msgstr ""
 
@@ -3218,7 +3226,7 @@ msgstr ""
 msgid "Clear phone number to disable"
 msgstr ""
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:94 settings/utils/ldap.py:681
 msgid "Authentication failed (before login check failed): {}"
 msgstr ""
 
@@ -4520,17 +4528,17 @@ msgstr ""
 msgid "no valid program entry found."
 msgstr ""
 
-#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:72
+#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:73
 msgid "Periodic run"
 msgstr "Periodic"
 
 #: ops/mixin.py:25 ops/mixin.py:88 ops/mixin.py:108
-#: settings/serializers/auth/ldap.py:79
+#: settings/serializers/auth/ldap.py:80
 msgid "Interval"
 msgstr ""
 
 #: ops/mixin.py:28 ops/mixin.py:86 ops/mixin.py:105
-#: settings/serializers/auth/ldap.py:76
+#: settings/serializers/auth/ldap.py:77
 msgid "Crontab"
 msgstr ""
 
@@ -5245,7 +5253,7 @@ msgstr ""
 msgid "Test smtp setting"
 msgstr ""
 
-#: settings/api/ldap.py:89
+#: settings/api/ldap.py:90
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr ""
@@ -5431,7 +5439,7 @@ msgstr ""
 msgid "CAS"
 msgstr ""
 
-#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:43
+#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:44
 #: settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr ""
@@ -5459,7 +5467,7 @@ msgstr ""
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:65 settings/serializers/auth/oauth2.py:60
+#: settings/serializers/auth/ldap.py:66 settings/serializers/auth/oauth2.py:60
 #: settings/serializers/auth/oidc.py:39 settings/serializers/auth/saml2.py:35
 #: settings/serializers/auth/slack.py:18 settings/serializers/auth/wecom.py:18
 msgid "User attribute"
@@ -5507,60 +5515,60 @@ msgid ""
 "name and the `value` is the Lark service user attribute name"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:40 settings/serializers/auth/ldap.py:102
+#: settings/serializers/auth/ldap.py:41 settings/serializers/auth/ldap.py:103
 msgid "LDAP"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:44
+#: settings/serializers/auth/ldap.py:45
 msgid "LDAP server URI"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:47
+#: settings/serializers/auth/ldap.py:48
 msgid "Bind DN"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap.py:49
 msgid "Binding Distinguished Name"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:52
+#: settings/serializers/auth/ldap.py:53
 msgid "Binding password"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:55
+#: settings/serializers/auth/ldap.py:56
 msgid "Search OU"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap.py:58
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:61
+#: settings/serializers/auth/ldap.py:62
 msgid "Search filter"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:62
+#: settings/serializers/auth/ldap.py:63
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:67
+#: settings/serializers/auth/ldap.py:68
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the LDAP service user attribute name"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:83
+#: settings/serializers/auth/ldap.py:84
 msgid "Connect timeout (s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:88
+#: settings/serializers/auth/ldap.py:89
 msgid "User DN cache timeout (s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:90
+#: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
 "effectively improve the speed of user authentication., 0 means no "
@@ -5568,7 +5576,7 @@ msgid ""
 "the user DN cache"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:96
+#: settings/serializers/auth/ldap.py:97
 msgid "Search paged size (piece)"
 msgstr ""
 
@@ -5990,6 +5998,10 @@ msgstr ""
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
+msgstr ""
+
+#: settings/serializers/cleaning.py:53
+msgid "Change secret and push record retention days (day)"
 msgstr ""
 
 #: settings/serializers/feature.py:18 settings/serializers/msg.py:68
@@ -6553,109 +6565,109 @@ msgstr ""
 msgid "No user synchronization required"
 msgstr ""
 
-#: settings/utils/ldap.py:494
+#: settings/utils/ldap.py:496
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr ""
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:507
 msgid "Host or port is disconnected: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:509
 msgid "The port is not the port of the LDAP service: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:511
 msgid "Please add certificate: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:513 settings/utils/ldap.py:540
-#: settings/utils/ldap.py:570 settings/utils/ldap.py:598
+#: settings/utils/ldap.py:515 settings/utils/ldap.py:542
+#: settings/utils/ldap.py:572 settings/utils/ldap.py:600
 msgid "Unknown error: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:527
+#: settings/utils/ldap.py:529
 msgid "Bind DN or Password incorrect"
 msgstr ""
 
-#: settings/utils/ldap.py:534
+#: settings/utils/ldap.py:536
 msgid "Please enter Bind DN: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:538
 msgid "Please enter Password: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:540
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:558
 msgid "Invalid User OU or User search filter: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:587
+#: settings/utils/ldap.py:589
 msgid "LDAP User attr map not include: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:596
 msgid "LDAP User attr map is not dict"
 msgstr ""
 
-#: settings/utils/ldap.py:613
+#: settings/utils/ldap.py:615
 msgid "LDAP authentication is not enabled"
 msgstr ""
 
-#: settings/utils/ldap.py:631
+#: settings/utils/ldap.py:633
 msgid "Error (Invalid LDAP server): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:635
 msgid "Error (Invalid Bind DN): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:637
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:639
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:641
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:641
+#: settings/utils/ldap.py:643
 msgid "Error (Unknown): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:644
+#: settings/utils/ldap.py:646
 msgid "Succeed: Match {} users"
 msgstr ""
 
-#: settings/utils/ldap.py:677
+#: settings/utils/ldap.py:679
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:681
+#: settings/utils/ldap.py:683
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:685
 msgid "Authentication failed (Unknown): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:686
+#: settings/utils/ldap.py:688
 msgid "Authentication success: {}"
 msgstr ""
 
-#: settings/ws.py:202
+#: settings/ws.py:195
 msgid "No LDAP user was found"
 msgstr ""
 
-#: settings/ws.py:208
-msgid "Total {}, success {}, failure {}"
+#: settings/ws.py:201
+msgid "Imported total: {} new: {}, failed: {} Organization: {}"
 msgstr ""
 
 #: templates/_csv_import_export.html:8
@@ -7846,20 +7858,20 @@ msgstr ""
 msgid "view"
 msgstr ""
 
-#: terminal/utils/db_port_mapper.py:85
+#: terminal/utils/db_port_mapper.py:88
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
 "administrator to open more ports."
 msgstr ""
 
-#: terminal/utils/db_port_mapper.py:113
+#: terminal/utils/db_port_mapper.py:116
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr ""
 
-#: terminal/utils/db_port_mapper.py:115
+#: terminal/utils/db_port_mapper.py:118
 msgid "All available port count: {}, Already use port count: {}"
 msgstr ""
 
