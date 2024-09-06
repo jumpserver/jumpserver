@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 
 class StrategyChoice(models.TextChoices):
@@ -80,3 +80,8 @@ class JobStatus(models.TextChoices):
 CELERY_LOG_MAGIC_MARK = b'\x00\x00\x00\x00\x00'
 
 COMMAND_EXECUTION_DISABLED = _('Command execution disabled')
+
+
+class Scope(models.TextChoices):
+    public = 'public', pgettext_lazy("scope", 'Public')
+    private = 'private', _('Private')
