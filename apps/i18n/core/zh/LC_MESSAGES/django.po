@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-02 10:59+0800\n"
+"POT-Creation-Date: 2024-09-06 10:29+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2602,7 +2602,7 @@ msgstr "结束"
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:69
+#: terminal/serializers/session.py:78
 msgid "Terminal"
 msgstr "终端"
 
@@ -2952,8 +2952,8 @@ msgid "OpenID Error"
 msgstr "OpenID 错误"
 
 #: authentication/backends/oidc/views.py:175
-msgid "Username or email already exists, Please check"
-msgstr "用户名或者邮箱已经存在，请检查"
+msgid "Please check if a user with the same username or email already exists"
+msgstr "请检查是否已经存在相同用户名或邮箱的用户"
 
 #: authentication/backends/passkey/api.py:37
 msgid "Only register passkey for local user"
@@ -7322,7 +7322,7 @@ msgstr "登录来源"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:68
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:77
 msgid "Command amount"
 msgstr "命令数量"
 
@@ -8723,7 +8723,7 @@ msgstr "* 为安全起见，只显示部分用户。您可以搜索更多"
 msgid "name not unique"
 msgstr "名称重复"
 
-#: users/signal_handlers.py:39
+#: users/signal_handlers.py:41
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "            and the current user is not in the user list. Please contact the "
@@ -8731,7 +8731,7 @@ msgid ""
 msgstr ""
 "管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
-#: users/signal_handlers.py:183
+#: users/signal_handlers.py:193
 msgid "Clean up expired user sessions"
 msgstr "清除过期的用户会话"
 

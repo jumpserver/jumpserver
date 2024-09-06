@@ -172,7 +172,7 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
                 user = auth.authenticate(nonce=nonce, request=request, code_verifier=code_verifier)
             except IntegrityError:
                 title = _("OpenID Error")
-                msg = _('Username or email already exists, Please check')
+                msg = _('Please check if a user with the same username or email already exists')
                 response = self.get_failed_response('/', title, msg)
                 return response
             if user:
