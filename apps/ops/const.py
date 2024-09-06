@@ -80,3 +80,9 @@ class JobStatus(models.TextChoices):
 CELERY_LOG_MAGIC_MARK = b'\x00\x00\x00\x00\x00'
 
 COMMAND_EXECUTION_DISABLED = _('Command execution disabled')
+
+
+class Scope(models.TextChoices):
+    public = 'public', _('Public')
+    private = 'private', _('Private')
+    spec = 'spec', _('Spec')

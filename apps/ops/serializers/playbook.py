@@ -1,10 +1,12 @@
 import os
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import ReadableHiddenField
+from common.serializers.fields import ReadableHiddenField, LabeledChoiceField
+from common.serializers.mixin import CommonBulkModelSerializer
 from ops.models import Playbook
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from ..const import Scope
 
 
 def parse_playbook_name(path):
@@ -12,9 +14,13 @@ def parse_playbook_name(path):
     return file_name.split(".")[-2]
 
 
-class PlaybookSerializer(BulkOrgResourceModelSerializer):
+class PlaybookSerializer(CommonBulkModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
+    scope = LabeledChoiceField(
+        choices=Scope.choices, default=Scope.public, label=_("Scope")
+    )
+    disable_edit = serializers.SerializerMethodField()
 
     def to_internal_value(self, data):
         name = data.get('name', False)
@@ -22,10 +28,13 @@ class PlaybookSerializer(BulkOrgResourceModelSerializer):
             data['name'] = parse_playbook_name(data['path'].name)
         return super().to_internal_value(data)
 
+    def get_disable_edit(self, obj):
+        return obj.creator != self.context['request'].user
+
     class Meta:
         model = Playbook
-        read_only_fields = ["id", "date_created", "date_updated"]
+        read_only_fields = ["id", "date_created", "date_updated", "disable_edit"]
         fields = read_only_fields + [
-            "id", 'path', "name", "comment", "creator",
+            "id", 'path', 'scope', 'participants', "name", "comment", "creator",
             'create_method', 'vcs_url',
         ]
