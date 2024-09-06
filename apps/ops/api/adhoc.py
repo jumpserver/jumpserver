@@ -1,22 +1,37 @@
 # -*- coding: utf-8 -*-
-from orgs.mixins.api import OrgBulkModelViewSet
+from django.db.models import Q
+
+from common.api.generic import JMSBulkModelViewSet
+from common.utils.http import is_true
 from rbac.permissions import RBACPermission
+from ..const import Scope
 from ..models import AdHoc
-from ..serializers import (
-    AdHocSerializer
-)
+from ..serializers import AdHocSerializer
 
 __all__ = [
     'AdHocViewSet'
 ]
 
 
-class AdHocViewSet(OrgBulkModelViewSet):
+class AdHocViewSet(JMSBulkModelViewSet):
+    queryset = AdHoc.objects.all()
     serializer_class = AdHocSerializer
     permission_classes = (RBACPermission,)
     search_fields = ('name', 'comment')
-    model = AdHoc
+    filterset_fields = ['scope', 'creator']
+
+    def check_object_permissions(self, request, obj):
+        if request.method != 'GET' and obj.creator != request.user:
+            self.permission_denied(
+                request, message={"detail": "Deleting other people's script is not allowed"}
+            )
+        return super().check_object_permissions(request, obj)
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(creator=self.request.user)
+        user = self.request.user
+        if is_true(self.request.query_params.get('only_myself')):
+            queryset = queryset.filter(creator=user)
+        else:
+            queryset = queryset.filter(Q(creator=user) | Q(scope=Scope.public))
+        return queryset
