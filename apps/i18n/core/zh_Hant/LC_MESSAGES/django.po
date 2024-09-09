@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-06 10:29+0800\n"
+"POT-Creation-Date: 2024-08-15 14:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -656,7 +656,7 @@ msgstr "觸發方式"
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:41 perms/serializers/permission.py:63
+#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr "動作"
@@ -703,7 +703,7 @@ msgstr "密碼規則"
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
+#: assets/serializers/asset/common.py:169 assets/serializers/platform.py:153
 #: assets/serializers/platform.py:273
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
@@ -854,7 +854,7 @@ msgid "Exist policy"
 msgstr "帳號存在策略"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:125
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
 #: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
 #: settings/models.py:36 tickets/models/ticket/apply_application.py:13
@@ -866,7 +866,7 @@ msgstr "類別"
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
-#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
+#: assets/serializers/asset/common.py:146 assets/serializers/platform.py:155
 #: assets/serializers/platform.py:167 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
@@ -907,7 +907,7 @@ msgstr "已修改"
 #: assets/serializers/platform.py:176 assets/serializers/platform.py:208
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
-#: perms/serializers/permission.py:35
+#: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
@@ -929,7 +929,7 @@ msgstr "帳號已存在"
 #: accounts/serializers/account/account.py:458
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:407
 msgid "Spec info"
 msgstr "特殊資訊"
 
@@ -1063,7 +1063,7 @@ msgstr ""
 "CACHE_LOGIN_PASSWORD_ENABLED=true，重啟服務才能開啟"
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:152
+#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:152
 #: assets/serializers/automations/base.py:21 perms/serializers/permission.py:36
 msgid "Nodes"
 msgstr "節點"
@@ -1269,15 +1269,15 @@ msgstr "審批人"
 msgid "Active"
 msgstr "啟用中"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:31
+#: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
 msgstr "用戶管理"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
-#: assets/serializers/asset/common.py:386 perms/serializers/permission.py:44
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
+#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "帳號管理"
@@ -1413,7 +1413,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: xpack/plugins/cloud/models.py:390
+#: common/drf/renders/base.py:147 xpack/plugins/cloud/models.py:390
 msgid "IP"
 msgstr "IP"
 
@@ -1839,7 +1839,7 @@ msgstr "雲服務"
 msgid "Port"
 msgstr "埠"
 
-#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:170
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr "地址"
@@ -1855,7 +1855,7 @@ msgstr "系統平台"
 msgid "Zone"
 msgstr "網域"
 
-#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:388
+#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集資產硬體資訊"
@@ -2201,38 +2201,58 @@ msgid ""
 "type"
 msgstr "資產中批次更新平台，不符合平台類型跳過的資產"
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:169
+#: assets/serializers/asset/common.py:36
+msgid "Protocols, format is [\"protocol/port\"]"
+msgstr ""
+
+#: assets/serializers/asset/common.py:38
+msgid "Protocol, format is name/port"
+msgstr ""
+
+#: assets/serializers/asset/common.py:107
+msgid ""
+"Accounts, format [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
+"\"secret_type\": \"password\"}]"
+msgstr ""
+
+#: assets/serializers/asset/common.py:135
+msgid ""
+"Node path, format [\"/org_name/node_name\"], if node not exist, will create "
+"it"
+msgstr ""
+
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:169
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:388
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr "協議組"
 
-#: assets/serializers/asset/common.py:129
-#: assets/serializers/asset/common.py:151
+#: assets/serializers/asset/common.py:149
+#: assets/serializers/asset/common.py:171
 msgid "Node path"
 msgstr "節點路徑"
 
-#: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:389
+#: assets/serializers/asset/common.py:168
+#: assets/serializers/asset/common.py:409
 msgid "Auto info"
 msgstr "自動化資訊"
 
-#: assets/serializers/asset/common.py:245
+#: assets/serializers/asset/common.py:265
 msgid "Platform not exist"
 msgstr "平台不存在"
 
-#: assets/serializers/asset/common.py:281
+#: assets/serializers/asset/common.py:301
 msgid "port out of range (0-65535)"
 msgstr "埠超出範圍 (0-65535)"
 
-#: assets/serializers/asset/common.py:288
+#: assets/serializers/asset/common.py:308
 msgid "Protocol is required: {}"
 msgstr "協議是必填的: {}"
 
-#: assets/serializers/asset/common.py:316
+#: assets/serializers/asset/common.py:336
 msgid "Invalid data"
 msgstr "無效的數據"
 
@@ -2321,7 +2341,7 @@ msgid ""
 msgstr "網關是網域的網路代理，當連接網域內的資產時，連接將由網關進行路由。"
 
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:177
-#: orgs/serializers.py:13 perms/serializers/permission.py:39
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
 msgid "Assets amount"
 msgstr "資產數量"
 
@@ -2681,7 +2701,7 @@ msgid "Resource"
 msgstr "資源"
 
 #: audits/models.py:101 audits/models.py:147 audits/models.py:177
-#: terminal/serializers/command.py:75
+#: common/drf/renders/base.py:145 terminal/serializers/command.py:75
 msgid "Datetime"
 msgstr "日期"
 
@@ -3449,7 +3469,7 @@ msgid "Actions"
 msgstr "動作"
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:43 perms/serializers/permission.py:64
+#: perms/serializers/permission.py:54 perms/serializers/permission.py:75
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
 msgstr "已過期"
@@ -3491,8 +3511,8 @@ msgstr "SSH金鑰不合法"
 msgid "Access IP"
 msgstr "IP 白名單"
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:42
-#: perms/serializers/permission.py:65 users/serializers/user.py:128
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:53
+#: perms/serializers/permission.py:76 users/serializers/user.py:128
 #: users/serializers/user.py:270
 msgid "Is valid"
 msgstr "是否有效"
@@ -4006,7 +4026,7 @@ msgstr "組織 ID"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件內容太大 (最大長度 `{}` 位元組)"
 
-#: common/drf/parsers/base.py:199
+#: common/drf/parsers/base.py:207
 msgid "Parse file error: {}"
 msgstr "解析文件錯誤: {}"
 
@@ -4014,7 +4034,67 @@ msgstr "解析文件錯誤: {}"
 msgid "Invalid excel file"
 msgstr "無效的 excel 文件"
 
-#: common/drf/renders/base.py:208
+#: common/drf/renders/base.py:135
+msgid "Yes/No"
+msgstr ""
+
+#: common/drf/renders/base.py:138
+msgid "Text, max length {}"
+msgstr ""
+
+#: common/drf/renders/base.py:140
+msgid "Long text, no length limit"
+msgstr ""
+
+#: common/drf/renders/base.py:142
+msgid "Number, min {} max {}"
+msgstr ""
+
+#: common/drf/renders/base.py:153
+msgid ""
+"Choices, format name(value), name is optional for human read, value is "
+"requisite, options {}"
+msgstr ""
+
+#: common/drf/renders/base.py:156
+#, fuzzy
+#| msgid "Connect options"
+msgid "Choices, options {}"
+msgstr "連接項"
+
+#: common/drf/renders/base.py:158
+msgid "Phone number, format +8612345678901"
+msgstr ""
+
+#: common/drf/renders/base.py:160
+msgid "Label, format [\"key:value\"]"
+msgstr ""
+
+#: common/drf/renders/base.py:162
+msgid ""
+"Object, format name(id), name is optional for human read, id is requisite"
+msgstr ""
+
+#: common/drf/renders/base.py:164
+msgid "Object, format id"
+msgstr ""
+
+#: common/drf/renders/base.py:168
+msgid ""
+"Objects, format [\"name(id)\", ...], name is optional for human read, id is "
+"requisite"
+msgstr ""
+
+#: common/drf/renders/base.py:170
+msgid ""
+"Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgstr ""
+
+#: common/drf/renders/base.py:172
+msgid "Objects, format [\"id\", ...]"
+msgstr ""
+
+#: common/drf/renders/base.py:270
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -4837,7 +4917,7 @@ msgstr "可以查看所有加入的組織"
 msgid "Can not delete virtual org"
 msgstr "無法刪除虛擬組織"
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:37
+#: orgs/serializers.py:10 perms/serializers/permission.py:48
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr "用戶數量"
@@ -4846,7 +4926,7 @@ msgstr "用戶數量"
 msgid "User groups amount"
 msgstr "用戶組數量"
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:40
+#: orgs/serializers.py:14 perms/serializers/permission.py:51
 msgid "Nodes amount"
 msgstr "節點數量"
 
@@ -4963,11 +5043,21 @@ msgstr "資產授權規則將要過期"
 msgid "asset permissions of organization {}"
 msgstr "組織 ({}) 的資產授權"
 
-#: perms/serializers/permission.py:33 users/serializers/user.py:257
+#: perms/serializers/permission.py:32
+msgid ""
+"Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
+"choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
+msgstr ""
+
+#: perms/serializers/permission.py:38
+msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
+msgstr ""
+
+#: perms/serializers/permission.py:44 users/serializers/user.py:257
 msgid "Groups"
 msgstr "使用者群組"
 
-#: perms/serializers/permission.py:38
+#: perms/serializers/permission.py:49
 msgid "Groups amount"
 msgstr "使用者組數量"
 
@@ -5562,9 +5652,9 @@ msgstr "快取逾時時間 (秒)"
 #: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
-"the user OU structure has been adjusted, click Submit to clear the user DN "
-"cache"
+"effectively improve the speed of user authentication., 0 means no "
+"cache<br>If the user OU structure has been adjusted, click Submit to clear "
+"the user DN cache"
 msgstr ""
 "對於使用者登錄認證時查詢的使用者 DN 進行快取，可以有效提高使用者認證的速度"
 "<br>如果使用者 OU 架構已調整，請點擊提交以清除使用者 DN 快取"
@@ -6698,11 +6788,11 @@ msgstr "認證失敗: (未知): {}"
 msgid "Authentication success: {}"
 msgstr "認證成功: {}"
 
-#: settings/ws.py:203
+#: settings/ws.py:198
 msgid "No LDAP user was found"
 msgstr "沒有取得到 LDAP 用戶"
 
-#: settings/ws.py:209
+#: settings/ws.py:204
 msgid "Total {}, success {}, failure {}"
 msgstr "總共 {}，成功 {}，失敗 {}"
 
@@ -9807,3 +9897,8 @@ msgstr "企業專業版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企業旗艦版"
+
+#, fuzzy
+#~| msgid "Help text"
+#~ msgid "#Help: "
+#~ msgstr "幫助"

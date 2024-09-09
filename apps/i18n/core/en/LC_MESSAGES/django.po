@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-30 15:08+0800\n"
+"POT-Creation-Date: 2024-09-03 15:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -655,7 +655,7 @@ msgstr ""
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:41 perms/serializers/permission.py:63
+#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr ""
@@ -703,7 +703,7 @@ msgstr ""
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
 #: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
-#: assets/serializers/platform.py:273
+#: assets/serializers/platform.py:282
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
@@ -845,8 +845,8 @@ msgstr ""
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:125
-#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
-#: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
+#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:177
+#: assets/serializers/platform.py:283 perms/serializers/user_permission.py:26
 #: settings/models.py:36 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12
 msgid "Category"
@@ -857,7 +857,7 @@ msgstr ""
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
-#: assets/serializers/platform.py:167 audits/serializers.py:53
+#: assets/serializers/platform.py:176 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
@@ -897,7 +897,7 @@ msgstr ""
 #: assets/serializers/platform.py:176 assets/serializers/platform.py:208
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
-#: perms/serializers/permission.py:35
+#: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
@@ -919,7 +919,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:458
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:407
 msgid "Spec info"
 msgstr ""
 
@@ -1048,7 +1048,7 @@ msgid ""
 msgstr ""
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:152
+#: assets/models/asset/common.py:164 assets/serializers/asset/common.py:152
 #: assets/serializers/automations/base.py:21 perms/serializers/permission.py:36
 msgid "Nodes"
 msgstr ""
@@ -1252,15 +1252,15 @@ msgstr ""
 msgid "Active"
 msgstr "Active"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:31
+#: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
 msgstr ""
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
-#: assets/serializers/asset/common.py:386 perms/serializers/permission.py:44
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
+#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr ""
@@ -1392,7 +1392,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: xpack/plugins/cloud/models.py:390
+#: common/drf/renders/base.py:147 xpack/plugins/cloud/models.py:390
 msgid "IP"
 msgstr ""
 
@@ -1809,12 +1809,12 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:170
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr ""
 
-#: assets/models/asset/common.py:162 assets/models/platform.py:149
+#: assets/models/asset/common.py:161 assets/models/platform.py:138
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:385
@@ -1825,7 +1825,7 @@ msgstr ""
 msgid "Zone"
 msgstr ""
 
-#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:388
+#: assets/models/asset/common.py:166 assets/serializers/asset/common.py:388
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr ""
@@ -2169,38 +2169,58 @@ msgid ""
 "type"
 msgstr ""
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:169
+#: assets/serializers/asset/common.py:36
+msgid "Protocols, format is [\"protocol/port\"]"
+msgstr ""
+
+#: assets/serializers/asset/common.py:38
+msgid "Protocol, format is name/port"
+msgstr ""
+
+#: assets/serializers/asset/common.py:107
+msgid ""
+"Accounts, format [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
+"\"secret_type\": \"password\"}]"
+msgstr ""
+
+#: assets/serializers/asset/common.py:135
+msgid ""
+"Node path, format [\"/org_name/node_name\"], if node not exist, will create "
+"it"
+msgstr ""
+
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:169
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:388
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr ""
 
-#: assets/serializers/asset/common.py:129
-#: assets/serializers/asset/common.py:151
+#: assets/serializers/asset/common.py:149
+#: assets/serializers/asset/common.py:171
 msgid "Node path"
 msgstr ""
 
-#: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:389
+#: assets/serializers/asset/common.py:168
+#: assets/serializers/asset/common.py:409
 msgid "Auto info"
 msgstr ""
 
-#: assets/serializers/asset/common.py:245
+#: assets/serializers/asset/common.py:265
 msgid "Platform not exist"
 msgstr ""
 
-#: assets/serializers/asset/common.py:281
+#: assets/serializers/asset/common.py:301
 msgid "port out of range (0-65535)"
 msgstr ""
 
-#: assets/serializers/asset/common.py:288
+#: assets/serializers/asset/common.py:308
 msgid "Protocol is required: {}"
 msgstr ""
 
-#: assets/serializers/asset/common.py:316
+#: assets/serializers/asset/common.py:336
 msgid "Invalid data"
 msgstr ""
 
@@ -2286,7 +2306,7 @@ msgid ""
 "the zone, the connection is routed through the gateway."
 msgstr ""
 
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:177
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:186
 #: orgs/serializers.py:13 perms/serializers/permission.py:39
 msgid "Assets amount"
 msgstr ""
@@ -2645,7 +2665,7 @@ msgid "Resource"
 msgstr ""
 
 #: audits/models.py:101 audits/models.py:147 audits/models.py:177
-#: terminal/serializers/command.py:75
+#: common/drf/renders/base.py:145 terminal/serializers/command.py:75
 msgid "Datetime"
 msgstr ""
 
@@ -3402,7 +3422,7 @@ msgid "Actions"
 msgstr ""
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:43 perms/serializers/permission.py:64
+#: perms/serializers/permission.py:54 perms/serializers/permission.py:75
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
 msgstr "Expired"
@@ -3444,8 +3464,8 @@ msgstr ""
 msgid "Access IP"
 msgstr ""
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:42
-#: perms/serializers/permission.py:65 users/serializers/user.py:128
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:53
+#: perms/serializers/permission.py:76 users/serializers/user.py:128
 #: users/serializers/user.py:270
 msgid "Is valid"
 msgstr "Is Valid"
@@ -3953,7 +3973,7 @@ msgstr "Organization ID"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr ""
 
-#: common/drf/parsers/base.py:199
+#: common/drf/parsers/base.py:207
 msgid "Parse file error: {}"
 msgstr ""
 
@@ -3961,7 +3981,65 @@ msgstr ""
 msgid "Invalid excel file"
 msgstr ""
 
-#: common/drf/renders/base.py:208
+#: common/drf/renders/base.py:135
+msgid "Yes/No"
+msgstr ""
+
+#: common/drf/renders/base.py:138
+msgid "Text, max length {}"
+msgstr ""
+
+#: common/drf/renders/base.py:140
+msgid "Long text, no length limit"
+msgstr ""
+
+#: common/drf/renders/base.py:142
+msgid "Number, min {} max {}"
+msgstr ""
+
+#: common/drf/renders/base.py:153
+msgid ""
+"Choices, format name(value), name is optional for human read, value is "
+"requisite, options {}"
+msgstr ""
+
+#: common/drf/renders/base.py:156
+msgid "Choices, options {}"
+msgstr ""
+
+#: common/drf/renders/base.py:158
+msgid "Phone number, format +8612345678901"
+msgstr ""
+
+#: common/drf/renders/base.py:160
+msgid "Label, format [\"key:value\"]"
+msgstr ""
+
+#: common/drf/renders/base.py:162
+msgid ""
+"Object, format name(id), name is optional for human read, id is requisite"
+msgstr ""
+
+#: common/drf/renders/base.py:164
+msgid "Object, format id"
+msgstr ""
+
+#: common/drf/renders/base.py:168
+msgid ""
+"Objects, format [\"name(id)\", ...], name is optional for human read, id is "
+"requisite"
+msgstr ""
+
+#: common/drf/renders/base.py:170
+msgid ""
+"Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgstr ""
+
+#: common/drf/renders/base.py:172
+msgid "Objects, format [\"id\", ...]"
+msgstr ""
+
+#: common/drf/renders/base.py:270
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -4776,7 +4854,7 @@ msgstr ""
 msgid "Can not delete virtual org"
 msgstr ""
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:37
+#: orgs/serializers.py:10 perms/serializers/permission.py:48
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr ""
@@ -4785,7 +4863,7 @@ msgstr ""
 msgid "User groups amount"
 msgstr ""
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:40
+#: orgs/serializers.py:14 perms/serializers/permission.py:51
 msgid "Nodes amount"
 msgstr ""
 
@@ -4902,11 +4980,21 @@ msgstr ""
 msgid "asset permissions of organization {}"
 msgstr ""
 
-#: perms/serializers/permission.py:33 users/serializers/user.py:257
-msgid "Groups"
+#: perms/serializers/permission.py:32
+msgid ""
+"Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
+"choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
 msgstr ""
 
 #: perms/serializers/permission.py:38
+msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
+msgstr ""
+
+#: perms/serializers/permission.py:44 users/serializers/user.py:257
+msgid "Groups"
+msgstr ""
+
+#: perms/serializers/permission.py:49
 msgid "Groups amount"
 msgstr ""
 
@@ -5483,9 +5571,9 @@ msgstr ""
 #: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
-"the user OU structure has been adjusted, click Submit to clear the user DN "
-"cache"
+"effectively improve the speed of user authentication., 0 means no "
+"cache<br>If the user OU structure has been adjusted, click Submit to clear "
+"the user DN cache"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:97
@@ -6574,12 +6662,12 @@ msgstr ""
 msgid "Authentication success: {}"
 msgstr ""
 
-#: settings/ws.py:203
+#: settings/ws.py:195
 msgid "No LDAP user was found"
 msgstr ""
 
-#: settings/ws.py:209
-msgid "Total {}, success {}, failure {}"
+#: settings/ws.py:201
+msgid "Imported total: {} new: {}, failed: {} Organization: {}"
 msgstr ""
 
 #: templates/_csv_import_export.html:8

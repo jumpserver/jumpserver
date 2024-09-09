@@ -27,6 +27,17 @@ class ActionChoicesField(BitChoicesField):
         return data
 
 
+class PermAccountsSerializer(serializers.ListField):
+    def get_render_help_text(self):
+        return _('Accounts, format ["@virtual", "root", "%template_id"], '
+                'virtual choices: @ALL, @SPEC, @USER, @ANON, @INPUT')
+
+
+class PermProtocolsSerializer(serializers.ListField):
+    def get_render_help_text(self):
+        return _('Protocols, format ["ssh", "rdp", "vnc"] or ["all"]')
+
+
 class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('Users'))
     user_groups = ObjectRelatedField(
@@ -41,8 +52,8 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     actions = ActionChoicesField(required=False, allow_null=True, label=_("Action"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
-    accounts = serializers.ListField(label=_("Accounts"), required=False)
-    protocols = serializers.ListField(label=_("Protocols"), required=False)
+    accounts = PermAccountsSerializer(label=_("Accounts"), required=False)
+    protocols = PermProtocolsSerializer(label=_("Protocols"), required=False)
 
     template_accounts = AccountTemplate.objects.none()
 
