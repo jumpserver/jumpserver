@@ -2623,7 +2623,7 @@ msgstr "結束"
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:69
+#: terminal/serializers/session.py:78
 msgid "Terminal"
 msgstr "終端"
 
@@ -2973,8 +2973,8 @@ msgid "OpenID Error"
 msgstr "OpenID 錯誤"
 
 #: authentication/backends/oidc/views.py:175
-msgid "Username or email already exists, Please check"
-msgstr "使用者名稱或者電子郵件已經存在，請檢查"
+msgid "Please check if a user with the same username or email already exists"
+msgstr "請檢查是否已經存在相同用戶名或電子郵箱的用戶"
 
 #: authentication/backends/passkey/api.py:37
 msgid "Only register passkey for local user"
@@ -7414,7 +7414,7 @@ msgstr "登錄來源"
 msgid "Replay"
 msgstr "重播"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:68
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:77
 msgid "Command amount"
 msgstr "命令數量"
 
@@ -8822,7 +8822,7 @@ msgstr ""
 msgid "name not unique"
 msgstr "名稱重複"
 
-#: users/signal_handlers.py:39
+#: users/signal_handlers.py:41
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "            and the current user is not in the user list. Please contact the "
@@ -8830,7 +8830,7 @@ msgid ""
 msgstr ""
 "管理員已開啟'僅允許已存在用戶登錄'，當前用戶不在用戶列表中，請聯絡管理員。"
 
-#: users/signal_handlers.py:183
+#: users/signal_handlers.py:193
 msgid "Clean up expired user sessions"
 msgstr "清除過期的用戶會話"
 
