@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 14:22+0800\n"
+"POT-Creation-Date: 2024-09-09 16:05+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -365,7 +365,7 @@ msgstr "资产"
 msgid "Su from"
 msgstr "切换自"
 
-#: accounts/models/account.py:55 assets/const/protocol.py:189
+#: accounts/models/account.py:55 assets/const/protocol.py:195
 #: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
@@ -1597,7 +1597,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:292
+#: assets/const/base.py:34 assets/const/protocol.py:298
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1669,17 +1669,21 @@ msgstr "其它"
 
 #: assets/const/protocol.py:46
 msgid "Old SSH version"
-msgstr "Old SSH version"
+msgstr "旧 SSH 版本"
 
 #: assets/const/protocol.py:47
 msgid "Old SSH version like openssh 5.x or 6.x"
 msgstr "旧的 SSH 版本，例如 openssh 5.x 或 6.x"
 
-#: assets/const/protocol.py:58
+#: assets/const/protocol.py:53
+msgid "Netcat help text"
+msgstr "使用 netcat (nc) 作为代理工具，将连接从代理服务器转发到目标主机。适用于不支持 SSH 原生代理选项 (-W) 的环境，或需要更多灵活性和超时控制的场景。"
+
+#: assets/const/protocol.py:64
 msgid "SFTP root"
 msgstr "SFTP 根路径"
 
-#: assets/const/protocol.py:60
+#: assets/const/protocol.py:66
 #, python-brace-format
 msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
@@ -1689,24 +1693,24 @@ msgstr ""
 "SFTP根目录，支持变量：<br>-${ACCOUNT}已连接帐户用户名<br>-${HOME}连接帐户的主"
 "目录<br>-${USER}用户的用户名"
 
-#: assets/const/protocol.py:75
+#: assets/const/protocol.py:81
 msgid "Console"
 msgstr "控制台"
 
-#: assets/const/protocol.py:76
+#: assets/const/protocol.py:82
 msgid "Connect to console session"
 msgstr "连接到控制台会话"
 
-#: assets/const/protocol.py:80
+#: assets/const/protocol.py:86
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:82 rbac/tree.py:62
+#: assets/const/protocol.py:88 rbac/tree.py:62
 #: settings/serializers/security.py:232
 msgid "Security"
 msgstr "安全"
 
-#: assets/const/protocol.py:83
+#: assets/const/protocol.py:89
 msgid ""
 "Security layer to use for the connection:<br>Any<br>Automatically select the "
 "security mode based on the security protocols supported by both the client "
@@ -1721,101 +1725,101 @@ msgstr ""
 "Windows 登录屏幕的情况<br>TLS<br>通过 TLS 实现的 RDP 认证和加密<br>NLA<br>该"
 "模式使用 TLS 加密，并要求提前提供用户名和密码"
 
-#: assets/const/protocol.py:100
+#: assets/const/protocol.py:106
 msgid "AD domain"
 msgstr "AD 网域"
 
-#: assets/const/protocol.py:115
+#: assets/const/protocol.py:121
 msgid "Username prompt"
 msgstr "用户名提示"
 
-#: assets/const/protocol.py:116
+#: assets/const/protocol.py:122
 msgid "We will send username when we see this prompt"
 msgstr "当我们看到这个提示时，我们将发送用户名"
 
-#: assets/const/protocol.py:121
+#: assets/const/protocol.py:127
 msgid "Password prompt"
 msgstr "密码提示"
 
-#: assets/const/protocol.py:122
+#: assets/const/protocol.py:128
 msgid "We will send password when we see this prompt"
 msgstr "当我们看到这个提示时，我们将发送密码"
 
-#: assets/const/protocol.py:127
+#: assets/const/protocol.py:133
 msgid "Success prompt"
 msgstr "成功提示"
 
-#: assets/const/protocol.py:128
+#: assets/const/protocol.py:134
 msgid "We will consider login success when we see this prompt"
 msgstr "当我们看到这个提示时，我们将认为登录成功"
 
-#: assets/const/protocol.py:139 assets/models/asset/database.py:10
+#: assets/const/protocol.py:145 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:49
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: assets/const/protocol.py:174
+#: assets/const/protocol.py:180
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:175
+#: assets/const/protocol.py:181
 msgid "Connect as SYSDBA"
 msgstr "以 SYSDBA 角色连接"
 
-#: assets/const/protocol.py:190
+#: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server 版本，不同版本有不同的连接驱动"
 
-#: assets/const/protocol.py:220
+#: assets/const/protocol.py:226
 msgid "Auth source"
 msgstr "认证数据库"
 
-#: assets/const/protocol.py:221
+#: assets/const/protocol.py:227
 msgid "The database to authenticate against"
 msgstr "要进行身份验证的数据库"
 
-#: assets/const/protocol.py:226 authentication/models/connection_token.py:43
+#: assets/const/protocol.py:232 authentication/models/connection_token.py:43
 msgid "Connect options"
 msgstr "连接项"
 
-#: assets/const/protocol.py:227
+#: assets/const/protocol.py:233
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
 msgstr "连接特定选项，例如 retryWrites=false&retryReads=false"
 
-#: assets/const/protocol.py:239
+#: assets/const/protocol.py:245
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:262
+#: assets/const/protocol.py:268
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:264
+#: assets/const/protocol.py:270
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:269 assets/models/asset/web.py:9
+#: assets/const/protocol.py:275 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:277 assets/models/asset/web.py:10
+#: assets/const/protocol.py:283 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:282 assets/models/asset/web.py:11
+#: assets/const/protocol.py:288 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:287 assets/models/asset/web.py:12
+#: assets/const/protocol.py:293 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:310
+#: assets/const/protocol.py:316
 msgid "API mode"
 msgstr "API 模式"
 

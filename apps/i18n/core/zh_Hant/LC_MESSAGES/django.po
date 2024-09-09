@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 14:22+0800\n"
+"POT-Creation-Date: 2024-09-09 16:05+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -16,7 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.3\n"
-"X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://zhconvert.org\n"
+"X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://"
+"zhconvert.org\n"
 
 #: accounts/api/automations/base.py:79 tickets/api/ticket.py:132
 msgid "The parameter 'action' must be [{}]"
@@ -187,8 +188,7 @@ msgstr "收集"
 msgid "Template"
 msgstr "模板"
 
-#: accounts/const/account.py:32 ops/const.py:46
-#: xpack/plugins/cloud/const.py:68
+#: accounts/const/account.py:32 ops/const.py:46 xpack/plugins/cloud/const.py:68
 msgid "Skip"
 msgstr "跳過"
 
@@ -367,7 +367,7 @@ msgstr "資產"
 msgid "Su from"
 msgstr "切換自"
 
-#: accounts/models/account.py:55 assets/const/protocol.py:189
+#: accounts/models/account.py:55 assets/const/protocol.py:195
 #: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
@@ -391,8 +391,8 @@ msgstr "來源 ID"
 #: assets/serializers/gateway.py:33 audits/models.py:59
 #: authentication/api/connection_token.py:411 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
-#: terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:34 terminal/serializers/command.py:72
+#: terminal/backends/command/models.py:18 terminal/models/session/session.py:34
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13
@@ -715,11 +715,9 @@ msgstr "密碼規則"
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 settings/models.py:35 settings/models.py:184
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
-#: terminal/models/applet/applet.py:34
-#: terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:109
-#: terminal/models/component/storage.py:26
-#: terminal/models/component/task.py:13
+#: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
@@ -794,7 +792,8 @@ msgstr "登錄資產時，帳號使用者名稱與使用者使用者名稱相同
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"
-msgstr "連接資產時不使用使用者名稱和密碼的帳號，僅支持 web類型 和 自訂類型 的資產"
+msgstr ""
+"連接資產時不使用使用者名稱和密碼的帳號，僅支持 web類型 和 自訂類型 的資產"
 
 #: accounts/notifications.py:12 accounts/notifications.py:37
 msgid "Notification of account backup route task results"
@@ -811,7 +810,9 @@ msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
 "encryption password for preference settings"
-msgstr "{} - 帳號備份任務已完成: 未設置加密密碼 - 請前往個人資訊 -> 偏好設置的基本中設置文件加密密碼"
+msgstr ""
+"{} - 帳號備份任務已完成: 未設置加密密碼 - 請前往個人資訊 -> 偏好設置的基本中"
+"設置文件加密密碼"
 
 #: accounts/notifications.py:56
 msgid "Notification of implementation result of encryption change plan"
@@ -828,7 +829,9 @@ msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
 "password in preferences"
-msgstr "{} - 改密任務已完成: 未設置加密密碼 - 請前往個人資訊 -> 偏好設置中設置加密密碼"
+msgstr ""
+"{} - 改密任務已完成: 未設置加密密碼 - 請前往個人資訊 -> 偏好設置中設置加密密"
+"碼"
 
 #: accounts/notifications.py:83
 msgid "Gather account change information"
@@ -866,9 +869,9 @@ msgstr "類別"
 #: assets/serializers/asset/common.py:146 assets/serializers/platform.py:155
 #: assets/serializers/platform.py:167 audits/serializers.py:53
 #: audits/serializers.py:170
-#: authentication/serializers/connect_token_secret.py:126
-#: ops/models/job.py:150 perms/serializers/user_permission.py:27
-#: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
+#: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
+#: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:154 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:23 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
@@ -940,10 +943,9 @@ msgstr "ID"
 #: accounts/serializers/account/account.py:474 acls/serializers/base.py:116
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
-#: assets/models/cmd_filter.py:24 assets/models/label.py:16
-#: audits/models.py:54 audits/models.py:90 audits/models.py:172
-#: audits/models.py:271 audits/serializers.py:171
-#: authentication/models/connection_token.py:32
+#: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
+#: audits/models.py:90 audits/models.py:172 audits/models.py:271
+#: audits/serializers.py:171 authentication/models/connection_token.py:32
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
@@ -992,7 +994,9 @@ msgstr "密鑰密碼"
 msgid ""
 "* If no username is required for authentication, enter null.  For AD "
 "accounts, use the format username@domain."
-msgstr "提示：如果認證時不需要使用者名稱，可填寫為 null，如果是 AD 帳號，格式為 username@domain"
+msgstr ""
+"提示：如果認證時不需要使用者名稱，可填寫為 null，如果是 AD 帳號，格式為 "
+"username@domain"
 
 #: accounts/serializers/account/template.py:13
 msgid "Password length"
@@ -1035,11 +1039,11 @@ msgid ""
 msgstr "關聯平台，可配置推送參數，如果不關聯，將使用默認參數"
 
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
-#: assets/models/cmd_filter.py:88 common/db/models.py:36
-#: ops/models/adhoc.py:26 ops/models/job.py:158 ops/models/playbook.py:31
-#: rbac/models/role.py:37 settings/models.py:40
-#: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:332
-#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:25
+#: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:26
+#: ops/models/job.py:158 ops/models/playbook.py:31 rbac/models/role.py:37
+#: settings/models.py:40 terminal/models/applet/applet.py:46
+#: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
+#: terminal/models/component/endpoint.py:25
 #: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
@@ -1054,13 +1058,13 @@ msgid ""
 "asset secret > Login secret > Manual input. <br/ >For security, please set "
 "config CACHE_LOGIN_PASSWORD_ENABLED to true"
 msgstr ""
-"當前僅支持 AD/LDAP 登錄方式用戶。 同名帳號密碼生效順序: 資產上存在的同名帳號密碼 > 登錄密碼 > 手動輸入 <br/> "
-"為了安全起見，請設置配置項 CACHE_LOGIN_PASSWORD_ENABLED=true，重啟服務才能開啟"
+"當前僅支持 AD/LDAP 登錄方式用戶。 同名帳號密碼生效順序: 資產上存在的同名帳號"
+"密碼 > 登錄密碼 > 手動輸入 <br/> 為了安全起見，請設置配置項 "
+"CACHE_LOGIN_PASSWORD_ENABLED=true，重啟服務才能開啟"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:169 assets/serializers/asset/common.py:172
-#: assets/serializers/automations/base.py:21
-#: perms/serializers/permission.py:47
+#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:47
 msgid "Nodes"
 msgstr "節點"
 
@@ -1135,7 +1139,10 @@ msgstr "週期清理改密記錄和推送記錄"
 #: accounts/tasks/automation.py:87
 msgid "Clean change secret and push record period description"
 msgstr ""
-"系統會定期清理不必要的變更密文記錄和推播記錄，包括與變更任務、執行記錄、資產、帳戶相關的記錄。當任何這些關聯項被刪除時，相應的變更秘密和推送記錄將變得無效。因此，為了保持資料庫整潔、高效，系統預設每180天自動清理一次這些無效記錄。這種定期清理過程有助於釋放儲存空間並提高資料管理的安全性和整體效能。"
+"系統會定期清理不必要的變更密文記錄和推播記錄，包括與變更任務、執行記錄、資"
+"產、帳戶相關的記錄。當任何這些關聯項被刪除時，相應的變更秘密和推送記錄將變得"
+"無效。因此，為了保持資料庫整潔、高效，系統預設每180天自動清理一次這些無效記"
+"錄。這種定期清理過程有助於釋放儲存空間並提高資料管理的安全性和整體效能。"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -1202,8 +1209,8 @@ msgstr "你好！ 以下是資產改密或推送帳戶失敗的情況。 請及�
 
 #: accounts/utils.py:52
 msgid ""
-"If the password starts with {{` and ends with }} `, then the password is not"
-" allowed."
+"If the password starts with {{` and ends with }} `, then the password is not "
+"allowed."
 msgstr "如果密碼以 `{{` 開始，並且以 `}}` 結束，則該密碼是不允許的。"
 
 #: accounts/utils.py:59
@@ -1374,8 +1381,8 @@ msgid ""
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
 "support)"
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
-"2001:db8:2de::e13, 2001:db8:1a:1110::/64  (支持網域)"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64  (支持網域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -1403,8 +1410,8 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
-"2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:33
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -1443,7 +1450,9 @@ msgid ""
 "Please review the login activity to ensure the security and proper usage of "
 "the asset. If you did not authorize this login or if you notice any "
 "suspicious activity, please take the necessary actions immediately."
-msgstr "請您稽核此登入行為，以確保資產的安全和正確使用。如果您未授權此次登入或發現任何可疑行為，請立即採取必要的行動。"
+msgstr ""
+"請您稽核此登入行為，以確保資產的安全和正確使用。如果您未授權此次登入或發現任"
+"何可疑行為，請立即採取必要的行動。"
 
 #: acls/templates/acls/asset_login_reminder.html:16
 #: acls/templates/acls/user_login_reminder.html:16
@@ -1589,7 +1598,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:292
+#: assets/const/base.py:34 assets/const/protocol.py:298
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "腳本"
@@ -1661,150 +1670,157 @@ msgstr "其它"
 
 #: assets/const/protocol.py:46
 msgid "Old SSH version"
-msgstr "Old SSH version"
+msgstr "舊的 SSH 版本"
 
 #: assets/const/protocol.py:47
 msgid "Old SSH version like openssh 5.x or 6.x"
 msgstr "舊的 SSH 版本，例如 openssh 5.x 或 6.x"
 
-#: assets/const/protocol.py:58
+#: assets/const/protocol.py:53
+msgid "Netcat help text"
+msgstr "使用 netcat (nc) 作為代理工具，將連線從代理伺服器轉送到目標主機。適用於不支援 SSH 原生代理選項 (-W) 的環境，或需要更多靈活性和逾時控制的場景。"
+
+#: assets/const/protocol.py:64
 msgid "SFTP root"
 msgstr "SFTP 根路徑"
 
-#: assets/const/protocol.py:60
+#: assets/const/protocol.py:66
 #, python-brace-format
 msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
 "account username <br>- ${HOME} The home directory of the connected account "
 "<br>- ${USER} The username of the user"
 msgstr ""
-"SFTP根目錄，支持變數：<br>-${ACCOUNT}已連接帳戶使用者名稱<br>-${HOME}連接帳戶的主目錄<br>-${USER}用戶的使用者名稱"
+"SFTP根目錄，支持變數：<br>-${ACCOUNT}已連接帳戶使用者名稱<br>-${HOME}連接帳戶"
+"的主目錄<br>-${USER}用戶的使用者名稱"
 
-#: assets/const/protocol.py:75
+#: assets/const/protocol.py:81
 msgid "Console"
 msgstr "控制台"
 
-#: assets/const/protocol.py:76
+#: assets/const/protocol.py:82
 msgid "Connect to console session"
 msgstr "連接到控制台會話"
 
-#: assets/const/protocol.py:80
+#: assets/const/protocol.py:86
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:82 rbac/tree.py:62
+#: assets/const/protocol.py:88 rbac/tree.py:62
 #: settings/serializers/security.py:232
 msgid "Security"
 msgstr "安全"
 
-#: assets/const/protocol.py:83
+#: assets/const/protocol.py:89
 msgid ""
-"Security layer to use for the connection:<br>Any<br>Automatically select the"
-" security mode based on the security protocols supported by both the client "
+"Security layer to use for the connection:<br>Any<br>Automatically select the "
+"security mode based on the security protocols supported by both the client "
 "and the server<br>RDP<br>Legacy RDP encryption. This mode is generally only "
 "used for older Windows servers or in cases where a standard Windows login "
 "screen is desired<br>TLS<br>RDP authentication and encryption implemented "
 "via TLS.<br>NLA<br>This mode uses TLS encryption and requires the username "
 "and password to be given in advance"
 msgstr ""
-"連接的安全層：<br>Any<br>根據客戶端和伺服器支援的安全協議自動選擇安全模式<br>RDP<br>傳統的 RDP 加密模式。通常僅用於較舊的 "
-"Windows 伺服器或需要標準 Windows 登入螢幕的情況<br>TLS<br>通過 TLS 實現的 RDP "
-"認證和加密<br>NLA<br>此模式使用 TLS 加密，並要求提前提供用戶名和密碼<br>"
+"連接的安全層：<br>Any<br>根據客戶端和伺服器支援的安全協議自動選擇安全模式"
+"<br>RDP<br>傳統的 RDP 加密模式。通常僅用於較舊的 Windows 伺服器或需要標準 "
+"Windows 登入螢幕的情況<br>TLS<br>通過 TLS 實現的 RDP 認證和加密<br>NLA<br>此"
+"模式使用 TLS 加密，並要求提前提供用戶名和密碼<br>"
 
-#: assets/const/protocol.py:100
+#: assets/const/protocol.py:106
 msgid "AD domain"
 msgstr "AD 網域"
 
-#: assets/const/protocol.py:115
+#: assets/const/protocol.py:121
 msgid "Username prompt"
 msgstr "使用者名稱提示"
 
-#: assets/const/protocol.py:116
+#: assets/const/protocol.py:122
 msgid "We will send username when we see this prompt"
 msgstr "當我們看到這個提示時，我們將發送使用者名稱"
 
-#: assets/const/protocol.py:121
+#: assets/const/protocol.py:127
 msgid "Password prompt"
 msgstr "密碼提示"
 
-#: assets/const/protocol.py:122
+#: assets/const/protocol.py:128
 msgid "We will send password when we see this prompt"
 msgstr "當我們看到這個提示時，我們將發送密碼"
 
-#: assets/const/protocol.py:127
+#: assets/const/protocol.py:133
 msgid "Success prompt"
 msgstr "成功提示"
 
-#: assets/const/protocol.py:128
+#: assets/const/protocol.py:134
 msgid "We will consider login success when we see this prompt"
 msgstr "當我們看到這個提示時，我們將認為登錄成功"
 
-#: assets/const/protocol.py:139 assets/models/asset/database.py:10
+#: assets/const/protocol.py:145 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:49
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: assets/const/protocol.py:174
+#: assets/const/protocol.py:180
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:175
+#: assets/const/protocol.py:181
 msgid "Connect as SYSDBA"
 msgstr "以 SYSDBA 角色連接"
 
-#: assets/const/protocol.py:190
+#: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server 版本，不同版本有不同的連接驅動"
 
-#: assets/const/protocol.py:220
+#: assets/const/protocol.py:226
 msgid "Auth source"
 msgstr "認證資料庫"
 
-#: assets/const/protocol.py:221
+#: assets/const/protocol.py:227
 msgid "The database to authenticate against"
 msgstr "要進行身份驗證的資料庫"
 
-#: assets/const/protocol.py:226 authentication/models/connection_token.py:43
+#: assets/const/protocol.py:232 authentication/models/connection_token.py:43
 msgid "Connect options"
 msgstr "連接項"
 
-#: assets/const/protocol.py:227
+#: assets/const/protocol.py:233
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
 msgstr "連接特定選項，例如。重試寫入=假&重試讀取=假"
 
-#: assets/const/protocol.py:239
+#: assets/const/protocol.py:245
 msgid "Auth username"
 msgstr "使用使用者名稱認證"
 
-#: assets/const/protocol.py:262
+#: assets/const/protocol.py:268
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:264
+#: assets/const/protocol.py:270
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
-msgstr "當安全模式啟用時，一些操作將被禁用，例如：新建標籤頁、右鍵、訪問其它網站 等"
+msgstr ""
+"當安全模式啟用時，一些操作將被禁用，例如：新建標籤頁、右鍵、訪問其它網站 等"
 
-#: assets/const/protocol.py:269 assets/models/asset/web.py:9
+#: assets/const/protocol.py:275 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動代填"
 
-#: assets/const/protocol.py:277 assets/models/asset/web.py:10
+#: assets/const/protocol.py:283 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "使用者名稱選擇器"
 
-#: assets/const/protocol.py:282 assets/models/asset/web.py:11
+#: assets/const/protocol.py:288 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密碼選擇器"
 
-#: assets/const/protocol.py:287 assets/models/asset/web.py:12
+#: assets/const/protocol.py:293 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "確認按鈕選擇器"
 
-#: assets/const/protocol.py:310
+#: assets/const/protocol.py:316
 msgid "API mode"
 msgstr "API 模式"
 
@@ -2205,7 +2221,9 @@ msgstr "協定，格式為 名稱/連接埠"
 msgid ""
 "Accounts, format [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
 "\"secret_type\": \"password\"}]"
-msgstr "帳號，格式為 [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", \"secret_type\": \"password\"}]"
+msgstr ""
+"帳號，格式為 [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
+"\"secret_type\": \"password\"}]"
 
 #: assets/serializers/asset/common.py:135
 msgid ""
@@ -2254,9 +2272,11 @@ msgstr "默認資料庫"
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
-"If the server cannot directly connect to the API address, you need set up an"
-" HTTP proxy. e.g. http(s)://host:port"
-msgstr "如果伺服器不能直接訪問 api 地址，你需要設置一個 HTTP 代理。例如 http(s)://host:port"
+"If the server cannot directly connect to the API address, you need set up an "
+"HTTP proxy. e.g. http(s)://host:port"
+msgstr ""
+"如果伺服器不能直接訪問 api 地址，你需要設置一個 HTTP 代理。例如 http(s)://"
+"host:port"
 
 #: assets/serializers/asset/gpt.py:24
 msgid "HTTP proxy"
@@ -2432,7 +2452,9 @@ msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
 "root"
-msgstr "在訪問資產時使用帳戶登入，然後自動切換到另一個帳戶，就像用普通帳戶登入然後切換到 root 一樣"
+msgstr ""
+"在訪問資產時使用帳戶登入，然後自動切換到另一個帳戶，就像用普通帳戶登入然後切"
+"換到 root 一樣"
 
 #: assets/serializers/platform.py:205
 msgid "Assets can be connected using a zone gateway"
@@ -2480,8 +2502,7 @@ msgstr "檢查節點下資產數量"
 
 #: assets/tasks/nodes_amount.py:28
 msgid ""
-"The task of self-checking is already running and cannot be started "
-"repeatedly"
+"The task of self-checking is already running and cannot be started repeatedly"
 msgstr "自檢程序已經在運行，不能重複啟動"
 
 #: assets/tasks/nodes_amount.py:33
@@ -2522,8 +2543,7 @@ msgid "App Audits"
 msgstr "日志审计"
 
 #: audits/backends/db.py:17
-msgid ""
-"The text content is too long. Use Elasticsearch to store operation logs"
+msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文字內容太長。請使用 Elasticsearch 儲存操作日誌"
 
 #: audits/backends/db.py:108
@@ -2616,8 +2636,8 @@ msgstr "結束"
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
-#: terminal/models/virtualapp/provider.py:14
-#: terminal/serializers/session.py:55 terminal/serializers/session.py:78
+#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
+#: terminal/serializers/session.py:78
 msgid "Terminal"
 msgstr "終端"
 
@@ -2656,8 +2676,7 @@ msgid "Job audit log"
 msgstr "作業審計日誌"
 
 #: audits/models.py:56 audits/models.py:100 audits/models.py:175
-#: terminal/models/session/session.py:39
-#: terminal/models/session/sharing.py:113
+#: terminal/models/session/session.py:39 terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr "遠端地址"
 
@@ -2989,8 +3008,7 @@ msgstr "附加"
 
 #: authentication/backends/passkey/models.py:14
 #: authentication/models/access_key.py:26
-#: authentication/models/private_token.py:8
-#: authentication/models/ssh_key.py:20
+#: authentication/models/private_token.py:8 authentication/models/ssh_key.py:20
 msgid "Date last used"
 msgstr "最後使用日期"
 
@@ -3065,7 +3083,8 @@ msgid ""
 "You can also try {times_try} times (The account will be temporarily locked "
 "for {block_time} minutes)"
 msgstr ""
-"您輸入的使用者名稱或密碼不正確，請重新輸入。 您還可以嘗試 {times_try} 次 (帳號將被臨時 鎖定 {block_time} 分鐘)"
+"您輸入的使用者名稱或密碼不正確，請重新輸入。 您還可以嘗試 {times_try} 次 (帳"
+"號將被臨時 鎖定 {block_time} 分鐘)"
 
 #: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
@@ -3082,9 +3101,10 @@ msgstr "IP 已被鎖定 (請聯絡管理員解鎖或 {} 分鐘後重試)"
 #: authentication/errors/const.py:59
 #, python-brace-format
 msgid ""
-"{error}, You can also try {times_try} times (The account will be temporarily"
-" locked for {block_time} minutes)"
-msgstr "{error}，您還可以嘗試 {times_try} 次 (帳號將被臨時鎖定 {block_time} 分鐘)"
+"{error}, You can also try {times_try} times (The account will be temporarily "
+"locked for {block_time} minutes)"
+msgstr ""
+"{error}，您還可以嘗試 {times_try} 次 (帳號將被臨時鎖定 {block_time} 分鐘)"
 
 #: authentication/errors/const.py:63
 msgid "MFA required"
@@ -3492,8 +3512,8 @@ msgstr "創建類型"
 
 #: authentication/serializers/ssh_key.py:33
 msgid ""
-"Please download the private key after creation. Each private key can only be"
-" downloaded once"
+"Please download the private key after creation. Each private key can only be "
+"downloaded once"
 msgstr "創建完成後請下載私鑰，每個私鑰僅有一次下載機會"
 
 #: authentication/serializers/ssh_key.py:57 users/forms/profile.py:161
@@ -3851,9 +3871,10 @@ msgstr "退出登錄成功，返回到登入頁面"
 
 #: authentication/views/mixins.py:39
 msgid ""
-"For your safety, automatic redirection login is not supported on the client."
-" If you need to open it in the client, please log in again"
-msgstr "為了您的安全，客戶端不支持自動跳轉登錄。如果需要在客戶端中打開，請重新登錄"
+"For your safety, automatic redirection login is not supported on the client. "
+"If you need to open it in the client, please log in again"
+msgstr ""
+"為了您的安全，客戶端不支持自動跳轉登錄。如果需要在客戶端中打開，請重新登錄"
 
 #: authentication/views/slack.py:35 authentication/views/slack.py:118
 msgid "Slack Error"
@@ -3959,12 +3980,13 @@ msgstr "加密的欄位"
 
 #: common/db/fields.py:577
 msgid ""
-"Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or"
-" {'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
+"Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
+"{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
 "'match': 'exact', 'value': '1.1.1.1'}}"
 msgstr ""
-"JSON 多對多欄位無效，應為 {'type': 'all'} 或 {'type': 'ids', 'ids': []} 或 {'type': "
-"'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': '1.1.1.1'}}"
+"JSON 多對多欄位無效，應為 {'type': 'all'} 或 {'type': 'ids', 'ids': []} 或 "
+"{'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': "
+"'1.1.1.1'}}"
 
 #: common/db/fields.py:584
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
@@ -4077,10 +4099,12 @@ msgstr "關聯項，格式是 id"
 msgid ""
 "Objects, format [\"name(id)\", ...], name is optional for human read, id is "
 "requisite"
-msgstr "多關聯項，格式: [\"名稱(id)\", ...], 名稱是可選的，方便閱讀，id 是必填的"
+msgstr ""
+"多關聯項，格式: [\"名稱(id)\", ...], 名稱是可選的，方便閱讀，id 是必填的"
 
 #: common/drf/renders/base.py:170
-msgid "Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgid ""
+"Labels, format [\"key:value\", ...], if label not exists, will create it"
 msgstr "標籤，格式: [\"鍵:值\", ...], 如果標籤不存在，將創建它"
 
 #: common/drf/renders/base.py:172
@@ -4314,8 +4338,8 @@ msgid ""
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
-"<div>Luna是單獨部署的一個程序，你需要部署luna，koko, "
-"</div><div>如果你看到了這個頁面，證明你訪問的不是nginx監聽的埠，祝你好運</div>"
+"<div>Luna是單獨部署的一個程序，你需要部署luna，koko, </div><div>如果你看到了"
+"這個頁面，證明你訪問的不是nginx監聽的埠，祝你好運</div>"
 
 #: jumpserver/views/other.py:76
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
@@ -4327,8 +4351,8 @@ msgid ""
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
-"<div>Koko是單獨部署的一個程序，你需要部署Koko, 並確保nginx配置轉發, "
-"</div><div>如果你看到了這個頁面，證明你訪問的不是nginx監聽的埠，祝你好運</div>"
+"<div>Koko是單獨部署的一個程序，你需要部署Koko, 並確保nginx配置轉發, </"
+"div><div>如果你看到了這個頁面，證明你訪問的不是nginx監聽的埠，祝你好運</div>"
 
 #: labels/apps.py:8
 msgid "App Labels"
@@ -4877,8 +4901,7 @@ msgstr "請選擇一個組織後再保存"
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:52
 #: terminal/templates/terminal/_msg_command_warning.html:21
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:303
-#: tickets/serializers/ticket/ticket.py:60
+#: tickets/models/ticket/general.py:303 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
 
@@ -5041,7 +5064,9 @@ msgstr "組織 ({}) 的資產授權"
 msgid ""
 "Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
 "choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
-msgstr "帳號，格式為 [\"@虛擬帳號\", \"root\", \"%模板id\"], 虛擬選項: @ALL, @SPEC, @USER, @ANON, @INPUT"
+msgstr ""
+"帳號，格式為 [\"@虛擬帳號\", \"root\", \"%模板id\"], 虛擬選項: @ALL, @SPEC, "
+"@USER, @ANON, @INPUT"
 
 #: perms/serializers/permission.py:38
 msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
@@ -5468,7 +5493,9 @@ msgid ""
 "authentication service platform does not return the user's email "
 "information, the system will automatically create the user using this email "
 "suffix"
-msgstr "第三方使用者認證成功後，若第三方認證服務平台未回傳該使用者的電子信箱資訊，系統將自動以此電子信箱後綴建立使用者"
+msgstr ""
+"第三方使用者認證成功後，若第三方認證服務平台未回傳該使用者的電子信箱資訊，系"
+"統將自動以此電子信箱後綴建立使用者"
 
 #: settings/serializers/auth/base.py:36
 msgid "Forgot Password URL"
@@ -5487,13 +5514,16 @@ msgid ""
 "Should an flash page be displayed before the user is redirected to third-"
 "party authentication when the administrator enables third-party redirect "
 "authentication"
-msgstr "Action管理員啟用第三方重新定向身份驗證時，在使用者重定向到第三方身份驗證之前是否顯示 Flash 頁面"
+msgstr ""
+"Action管理員啟用第三方重新定向身份驗證時，在使用者重定向到第三方身份驗證之前"
+"是否顯示 Flash 頁面"
 
 #: settings/serializers/auth/base.py:54
 msgid ""
 "When you create a user, you associate the user to the organization of your "
 "choice. Users always belong to the Default organization."
-msgstr "建立使用者時，您會將該使用者與您選擇的組織關聯。使用者始終屬於 Default 組織。"
+msgstr ""
+"建立使用者時，您會將該使用者與您選擇的組織關聯。使用者始終屬於 Default 組織。"
 
 #: settings/serializers/auth/cas.py:12 settings/serializers/auth/cas.py:14
 msgid "CAS"
@@ -5525,8 +5555,7 @@ msgstr "使用者名稱屬性"
 msgid "Enable attributes map"
 msgstr "啟用屬性映射"
 
-#: settings/serializers/auth/cas.py:34
-#: settings/serializers/auth/dingtalk.py:18
+#: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
 #: settings/serializers/auth/ldap.py:66 settings/serializers/auth/oauth2.py:60
 #: settings/serializers/auth/oidc.py:39 settings/serializers/auth/saml2.py:35
@@ -5538,7 +5567,9 @@ msgstr "映射屬性"
 msgid ""
 "User attribute mapping, where the `key` is the CAS service user attribute "
 "name and the `value` is the JumpServer user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 CAS 服務使用者屬性名稱，`value` 是 JumpServer 使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 CAS 服務使用者屬性名稱，`value` 是 JumpServer "
+"使用者屬性名稱"
 
 #: settings/serializers/auth/cas.py:41
 msgid "Create user"
@@ -5558,13 +5589,17 @@ msgstr "啟用釘釘認證"
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the DingTalk service user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是釘釘服務使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是釘釘服務使"
+"用者屬性名稱"
 
 #: settings/serializers/auth/feishu.py:20
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the FeiShu service user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是飛書服務使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是飛書服務使"
+"用者屬性名稱"
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:21
 msgid "Lark"
@@ -5574,7 +5609,9 @@ msgstr ""
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the Lark service user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 Lark 服務使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 Lark 服務"
+"使用者屬性名稱"
 
 #: settings/serializers/auth/ldap.py:41 settings/serializers/auth/ldap.py:103
 msgid "LDAP"
@@ -5619,7 +5656,9 @@ msgstr "可能的選項是(cn或uid或sAMAccountName=%(user)s)"
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the LDAP service user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 LDAP 服務使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 LDAP 服務"
+"使用者屬性名稱"
 
 #: settings/serializers/auth/ldap.py:84
 msgid "Connect timeout (s)"
@@ -5636,7 +5675,8 @@ msgid ""
 "cache<br>If the user OU structure has been adjusted, click Submit to clear "
 "the user DN cache"
 msgstr ""
-"對用戶登入驗證時查詢出的 User DN 進行緩存，可以有效提升用戶認證的速度<br>如果用戶 OU 架構有调整，點擊提交即可清除用戶 DN 緩存"
+"對用戶登入驗證時查詢出的 User DN 進行緩存，可以有效提升用戶認證的速度<br>如果"
+"用戶 OU 架構有调整，點擊提交即可清除用戶 DN 緩存"
 
 #: settings/serializers/auth/ldap.py:97
 msgid "Search paged size (piece)"
@@ -5687,18 +5727,19 @@ msgid "End session endpoint"
 msgstr "Logout session endpoint address"
 
 #: settings/serializers/auth/oauth2.py:57
-msgid ""
-"When the user signs out, they also be logged out from the OAuth2 server"
+msgid "When the user signs out, they also be logged out from the OAuth2 server"
 msgstr "當使用者退出時，他們也會從 OAuth2 伺服器退出"
 
 #: settings/serializers/auth/oauth2.py:62
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the OAuth2 service user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 OAuth2 服務使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 OAuth2 服"
+"務使用者屬性名稱"
 
-#: settings/serializers/auth/oauth2.py:67
-#: settings/serializers/auth/oidc.py:113 settings/serializers/auth/saml2.py:45
+#: settings/serializers/auth/oauth2.py:67 settings/serializers/auth/oidc.py:113
+#: settings/serializers/auth/saml2.py:45
 msgid "Always update user"
 msgstr "總是更新用戶資訊"
 
@@ -5730,7 +5771,9 @@ msgstr "Ignore SSL certificate verification"
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the OIDC service user attribute name"
-msgstr "使用者屬性映射，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 OIDC 服務使用者屬性名稱"
+msgstr ""
+"使用者屬性映射，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 OIDC 服務"
+"使用者屬性名稱"
 
 #: settings/serializers/auth/oidc.py:45
 msgid "Enable PKCE"
@@ -5748,7 +5791,8 @@ msgstr "使用 Keycloak"
 msgid ""
 "Use Keycloak as the OpenID Connect server, or use standard OpenID Connect "
 "Protocol"
-msgstr "使用 Keycloak 作為 OpenID Connect 伺服器，或者使用標準 OpenID Connect 協議"
+msgstr ""
+"使用 Keycloak 作為 OpenID Connect 伺服器，或者使用標準 OpenID Connect 協議"
 
 #: settings/serializers/auth/oidc.py:64
 msgid "Realm name"
@@ -5807,7 +5851,8 @@ msgid ""
 "The hostname can using passkey auth, If not set, will use request host and "
 "the request host in DOMAINS, If multiple domains, use comma to separate"
 msgstr ""
-"可以使用 Passkey 認證的域名，如果不設置，將使用請求主機(主機名在可信域 DOMAINS中), 如果有多個域名，使用逗號分隔, 不需要埠號"
+"可以使用 Passkey 認證的域名，如果不設置，將使用請求主機(主機名在可信域 "
+"DOMAINS中), 如果有多個域名，使用逗號分隔, 不需要埠號"
 
 #: settings/serializers/auth/passkey.py:22
 msgid "FIDO Server name"
@@ -5823,8 +5868,7 @@ msgid "OTP in RADIUS"
 msgstr "Use Radius OTP"
 
 #: settings/serializers/auth/radius.py:24
-msgid ""
-"* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
+msgid "* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
 msgstr "* 在 RADIUS 中使用 OTP 意味著使用者可以利用 RADIUS 作為 MFA 的方法 "
 
 #: settings/serializers/auth/saml2.py:12 settings/serializers/auth/saml2.py:15
@@ -5855,7 +5899,9 @@ msgstr "SP 證書"
 msgid ""
 "User attribute mapping, where the `key` is the SAML2 service user attribute "
 "name and the `value` is the JumpServer user attribute name"
-msgstr " 使用者屬性映射，其中 `key` 是 SAML2 服務使用者屬性名稱，`value` 是 JumpServer 使用者屬性名稱"
+msgstr ""
+" 使用者屬性映射，其中 `key` 是 SAML2 服務使用者屬性名稱，`value` 是 "
+"JumpServer 使用者屬性名稱"
 
 #: settings/serializers/auth/saml2.py:43
 msgid "When the user signs out, they also be logged out from the SAML2 server"
@@ -5865,7 +5911,9 @@ msgstr "當使用者登出時，他們也會從 SAML2 伺服器登出"
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the Slack service user attribute name"
-msgstr "使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 Slack 服務使用者屬性名稱"
+msgstr ""
+"使用者屬性對照，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是 Slack 服"
+"務使用者屬性名稱"
 
 #: settings/serializers/auth/sms.py:18
 msgid "Enable Short Message Service (SMS)"
@@ -5930,10 +5978,12 @@ msgstr "業務型態(Service id)"
 #: settings/serializers/auth/sms.py:85
 #, python-brace-format
 msgid ""
-"Template need contain {code} and Signature + template length does not exceed"
-" 67 words. For example, your verification code is {code}, which is valid for"
-" 5 minutes. Please do not disclose it to others."
-msgstr "模板需要包含 {code}，並且模板+簽名長度不能超過67個字。例如, 您的驗證碼是 {code}, 有效期為5分鐘。請不要洩露給其他人。"
+"Template need contain {code} and Signature + template length does not exceed "
+"67 words. For example, your verification code is {code}, which is valid for "
+"5 minutes. Please do not disclose it to others."
+msgstr ""
+"模板需要包含 {code}，並且模板+簽名長度不能超過67個字。例如, 您的驗證碼是 "
+"{code}, 有效期為5分鐘。請不要洩露給其他人。"
 
 #: settings/serializers/auth/sms.py:94
 #, python-brace-format
@@ -5969,7 +6019,9 @@ msgstr "單位: 秒"
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the WeCom service user attribute name"
-msgstr "使用者屬性映射，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是企業微信服務使用者屬性名稱"
+msgstr ""
+"使用者屬性映射，其中 `key` 是 JumpServer 使用者屬性名稱，`value` 是企業微信服"
+"務使用者屬性名稱"
 
 #: settings/serializers/basic.py:11
 msgid "Site URL"
@@ -5977,8 +6029,8 @@ msgstr "目前網站 URL"
 
 #: settings/serializers/basic.py:13
 msgid ""
-"Site URL is the externally accessible address of the current product service"
-" and is usually used in links in system emails"
+"Site URL is the externally accessible address of the current product service "
+"and is usually used in links in system emails"
 msgstr "站點 URL 是目前產品服務的外部可訪問地址，通常在系統郵件的連結中使用"
 
 #: settings/serializers/basic.py:18
@@ -6063,7 +6115,8 @@ msgstr "會話日誌 (天)"
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
-msgstr "會話、錄影，命令記錄超過該時長將會被清除 (影響資料庫儲存，OSS 等不受影響)"
+msgstr ""
+"會話、錄影，命令記錄超過該時長將會被清除 (影響資料庫儲存，OSS 等不受影響)"
 
 #: settings/serializers/cleaning.py:53
 msgid "Change secret and push record retention days (day)"
@@ -6107,7 +6160,8 @@ msgid ""
 "accounts that exceed the predetermined number. If the value reaches or "
 "exceeds 999 (default), no historical account deletion will be performed"
 msgstr ""
-"如果特定數值小於999，系統將在每日晚間自動執行任務：檢查並刪除超出預定數量的歷史帳號。如果該數值達到或超過999，則不進行任何歷史帳號的刪除操作。"
+"如果特定數值小於999，系統將在每日晚間自動執行任務：檢查並刪除超出預定數量的歷"
+"史帳號。如果該數值達到或超過999，則不進行任何歷史帳號的刪除操作。"
 
 #: settings/serializers/feature.py:76 settings/serializers/feature.py:82
 msgid "Chat AI"
@@ -6118,8 +6172,7 @@ msgid "GPT Base URL"
 msgstr "GPT 地址"
 
 #: settings/serializers/feature.py:86
-msgid ""
-"The base URL of the GPT service. For example: https://api.openai.com/v1"
+msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
 msgstr "GPT 服務的基礎 URL。例如：https://api.openai.com/v1"
 
 #: settings/serializers/feature.py:89 templates/_header_bar.html:96
@@ -6231,7 +6284,8 @@ msgid ""
 "server. In most email documentation this type of TLS connection is referred "
 "to as SSL. It is generally used on port 465"
 msgstr ""
-"與 SMTP 伺服器通信時是否使用隱式 TLS（安全）連接。在大多數電子郵件文檔中，這種類型的 TLS 連接稱為 SSL。它通常在埠 465 上使用"
+"與 SMTP 伺服器通信時是否使用隱式 TLS（安全）連接。在大多數電子郵件文檔中，這"
+"種類型的 TLS 連接稱為 SSL。它通常在埠 465 上使用"
 
 #: settings/serializers/msg.py:54
 msgid "Use TLS"
@@ -6241,7 +6295,9 @@ msgstr "使用 TLS"
 msgid ""
 "Whether to use a TLS (secure) connection when talking to the SMTP server. "
 "This is used for explicit TLS connections, generally on port 587"
-msgstr "與 SMTP 伺服器通信時是否使用 TLS（安全）連接。這用於顯式 TLS 連接，通常在埠 587 上"
+msgstr ""
+"與 SMTP 伺服器通信時是否使用 TLS（安全）連接。這用於顯式 TLS 連接，通常在埠 "
+"587 上"
 
 #: settings/serializers/msg.py:64
 msgid "Subject prefix"
@@ -6249,8 +6305,8 @@ msgstr "主題前綴"
 
 #: settings/serializers/msg.py:69
 msgid ""
-"Tips: When creating a user, send the subject of the email (eg:Create account"
-" successfully)"
+"Tips: When creating a user, send the subject of the email (eg:Create account "
+"successfully)"
 msgstr "提示: 創建用戶時，發送設置密碼郵件的主題 (例如: 創建用戶成功)"
 
 #: settings/serializers/msg.py:73
@@ -6266,7 +6322,8 @@ msgstr "提示: 創建用戶時，發送設置密碼郵件的敬語 (例如: 你
 msgid ""
 "Tips: When creating a user, send the content of the email, support "
 "{username} {name} {email} label"
-msgstr "提示: 創建用戶時，發送設置密碼郵件的內容, 支持 {username} {name} {email} 標籤"
+msgstr ""
+"提示: 創建用戶時，發送設置密碼郵件的內容, 支持 {username} {name} {email} 標籤"
 
 #: settings/serializers/msg.py:84
 msgid "Tips: Email signature (eg:jumpserver)"
@@ -6282,7 +6339,9 @@ msgstr "顯示未分組節點"
 
 #: settings/serializers/other.py:12
 msgid "Perm single to ungroup node"
-msgstr "放置單獨授權的資產到未分組節點, 避免能看到資產所在節點，但該節點未被授權的問題"
+msgstr ""
+"放置單獨授權的資產到未分組節點, 避免能看到資產所在節點，但該節點未被授權的問"
+"題"
 
 #: settings/serializers/security.py:17
 msgid "User password expiration (day)"
@@ -6293,7 +6352,9 @@ msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
 "sent to the user by system within 5 days (daily) before the password expires"
-msgstr "如果用戶在此期間沒有更新密碼，用戶密碼將過期失效； 密碼過期提醒郵件將在密碼過期前5天內由系統 (每天)自動發送給用戶"
+msgstr ""
+"如果用戶在此期間沒有更新密碼，用戶密碼將過期失效； 密碼過期提醒郵件將在密碼過"
+"期前5天內由系統 (每天)自動發送給用戶"
 
 #: settings/serializers/security.py:26
 msgid "Recent password count"
@@ -6363,7 +6424,9 @@ msgid ""
 "users of other authentication methods except local authentication methods "
 "are allowed to log in and automatically create users (if the user does not "
 "exist)"
-msgstr "如果開啟，不存在的用戶將不被允許登錄；如果關閉，除本地認證方式外，其他認證方式的用戶都允許登錄並自動創建用戶 (如果用戶不存在)"
+msgstr ""
+"如果開啟，不存在的用戶將不被允許登錄；如果關閉，除本地認證方式外，其他認證方"
+"式的用戶都允許登錄並自動創建用戶 (如果用戶不存在)"
 
 #: settings/serializers/security.py:103
 msgid "Only from source login"
@@ -6371,12 +6434,13 @@ msgstr "僅從用戶來源登錄"
 
 #: settings/serializers/security.py:105
 msgid ""
-"If it is enabled, the user will only authenticate to the source when logging"
-" in; if it is disabled, the user will authenticate all the enabled "
+"If it is enabled, the user will only authenticate to the source when logging "
+"in; if it is disabled, the user will authenticate all the enabled "
 "authentication methods in a certain order when logging in, and as long as "
 "one of the authentication methods is successful, they can log in directly"
 msgstr ""
-"如果開啟，用戶登錄時僅會向來源端進行認證；如果關閉，用戶登錄時會按照一定的順序對所有已開啟的認證方式進行順序認證，只要有一個認證成功就可以直接登錄"
+"如果開啟，用戶登錄時僅會向來源端進行認證；如果關閉，用戶登錄時會按照一定的順"
+"序對所有已開啟的認證方式進行順序認證，只要有一個認證成功就可以直接登錄"
 
 #: settings/serializers/security.py:116
 #: users/templates/users/mfa_setting.html:160
@@ -6445,7 +6509,9 @@ msgstr "啟用登入附加碼"
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
-msgstr "密碼和附加碼一併發送給第三方認證系統進行校驗, 如：有的第三方認證系統，需要 密碼+6位數字 完成認證"
+msgstr ""
+"密碼和附加碼一併發送給第三方認證系統進行校驗, 如：有的第三方認證系統，需要 密"
+"碼+6位數字 完成認證"
 
 #: settings/serializers/security.py:158
 msgid "Login captcha"
@@ -6461,10 +6527,12 @@ msgstr "異地登入通知"
 
 #: settings/serializers/security.py:164
 msgid ""
-"The system determines whether the login IP address belongs to a common login"
-" city. If the account is logged in from a common login city, the system "
-"sends a remote login reminder"
-msgstr "根據登錄 IP 是否所屬常用登錄城市進行判斷，若帳號在非常用城市登錄，會發送異地登錄提醒"
+"The system determines whether the login IP address belongs to a common login "
+"city. If the account is logged in from a common login city, the system sends "
+"a remote login reminder"
+msgstr ""
+"根據登錄 IP 是否所屬常用登錄城市進行判斷，若帳號在非常用城市登錄，會發送異地"
+"登錄提醒"
 
 #: settings/serializers/security.py:170
 msgid "Auto Disable Threshold (day)"
@@ -6548,8 +6616,8 @@ msgstr "元件註冊"
 
 #: settings/serializers/terminal.py:24
 msgid ""
-"Allow component register, after all component setup, you should disable this"
-" for security"
+"Allow component register, after all component setup, you should disable this "
+"for security"
 msgstr "是否允許元件註冊，當所有終端啟動後，為了安全應該關閉"
 
 #: settings/serializers/terminal.py:30
@@ -6561,11 +6629,11 @@ msgstr "* 允許用戶透過密碼驗證登入KoKo元件"
 msgid ""
 "* Allow users to log in to the KoKo component via Public key "
 "authentication<br/>If third-party authentication services, such as AD/LDAP, "
-"are enabled, you should disable this option to prevent users from logging in"
-" after being deleted from the AD/LDAP server"
+"are enabled, you should disable this option to prevent users from logging in "
+"after being deleted from the AD/LDAP server"
 msgstr ""
-"* 允許用戶透過公鑰驗證方式登入 KoKo 元件<br/>如果第三方認證服務（如 AD/LDAP）已啟用，則應禁用此選項，以防止用戶從 AD/LDAP "
-"伺服器中刪除後再次登入"
+"* 允許用戶透過公鑰驗證方式登入 KoKo 元件<br/>如果第三方認證服務（如 AD/LDAP）"
+"已啟用，則應禁用此選項，以防止用戶從 AD/LDAP 伺服器中刪除後再次登入"
 
 #: settings/serializers/terminal.py:43
 msgid "Asset sorting"
@@ -6577,18 +6645,21 @@ msgstr "資產列表每頁數量"
 
 #: settings/serializers/terminal.py:51
 msgid ""
-"* You can individually configure the service address and port in the service"
-" endpoint<br/>If enabled, the Luna page will display the DB client launch "
+"* You can individually configure the service address and port in the service "
+"endpoint<br/>If enabled, the Luna page will display the DB client launch "
 "method when connecting to assets"
-msgstr "* 您可以在服務端點中單獨配置服務地址和端口<br/>如果啟用，Luna 界面將在連接資產時顯示 DB 客戶端啟動方法"
+msgstr ""
+"* 您可以在服務端點中單獨配置服務地址和端口<br/>如果啟用，Luna 界面將在連接資"
+"產時顯示 DB 客戶端啟動方法"
 
 #: settings/serializers/terminal.py:59
 msgid ""
-"* You can individually configure the service address and port in the service"
-" endpoint<br/>If enabled, the Luna page will display the download rdp file "
+"* You can individually configure the service address and port in the service "
+"endpoint<br/>If enabled, the Luna page will display the download rdp file "
 "button and RDP Client launch method when connecting to assets"
 msgstr ""
-"* 您可以在服務端點中單獨配置服務地址和端口<br/>如果啟用，Luna 界面將在連接資產時顯示下載 rdp 文件按鈕和 RDP 客戶端啟動方法"
+"* 您可以在服務端點中單獨配置服務地址和端口<br/>如果啟用，Luna 界面將在連接資"
+"產時顯示下載 rdp 文件按鈕和 RDP 客戶端啟動方法"
 
 #: settings/serializers/terminal.py:66
 msgid "Client connection"
@@ -6597,9 +6668,10 @@ msgstr "客戶端連接"
 #: settings/serializers/terminal.py:68
 msgid ""
 "* Allow connecting to the KoKo component via SSH client<br/>If enabled, the "
-"Luna page will display the SSH client launch method when connecting to "
-"assets"
-msgstr "* 允許透過 SSH 客戶端連接到 KoKo 元件<br/>如果啟用，則在連接到資產時，Luna 界面將顯示 SSH 客戶端啟動方法"
+"Luna page will display the SSH client launch method when connecting to assets"
+msgstr ""
+"* 允許透過 SSH 客戶端連接到 KoKo 元件<br/>如果啟用，則在連接到資產時，Luna 界"
+"面將顯示 SSH 客戶端啟動方法"
 
 #: settings/serializers/tool.py:10
 msgid "Tool"
@@ -6611,8 +6683,8 @@ msgstr "工作台中的工具"
 
 #: settings/serializers/tool.py:15
 msgid ""
-"*! If enabled, users with RBAC permissions will be able to utilize all tools"
-" in the workbench"
+"*! If enabled, users with RBAC permissions will be able to utilize all tools "
+"in the workbench"
 msgstr "*! 如果啟用，具有 RBAC 權限的用戶將能夠使用工作台中的所有工具"
 
 #: settings/tasks/ldap.py:28
@@ -6826,11 +6898,13 @@ msgstr "過期。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
-"                您的密碼已經過期，請點擊 <a href=\"%(user_password_update_url)s\"> 連結 </a> 更新密碼\n"
+"                您的密碼已經過期，請點擊 <a "
+"href=\"%(user_password_update_url)s\"> 連結 </a> 更新密碼\n"
 "        "
 
 #: templates/_message.html:30
@@ -6841,33 +6915,39 @@ msgstr "您的密碼將於"
 #, python-format
 msgid ""
 "\n"
-"                please click <a href=\"%(user_password_update_url)s\"> this link </a> to update your password.\n"
+"                please click <a href=\"%(user_password_update_url)s\"> this "
+"link </a> to update your password.\n"
 "            "
 msgstr ""
 "\n"
-"                請點擊 <a href=\"%(user_password_update_url)s\"> 連結 </a> 更新密碼\n"
+"                請點擊 <a href=\"%(user_password_update_url)s\"> 連結 </a> 更"
+"新密碼\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                你的資訊不完整,請點擊 <a href=\"%(first_login_url)s\"> 連結 </a> 補充完整\n"
+"                你的資訊不完整,請點擊 <a href=\"%(first_login_url)s\"> 連結 "
+"</a> 補充完整\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                您的SSH金鑰沒有設置或已失效，請點擊 <a href=\"%(user_pubkey_update)s\"> 連結 </a> 更新\n"
+"                您的SSH金鑰沒有設置或已失效，請點擊 <a "
+"href=\"%(user_pubkey_update)s\"> 連結 </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -6898,7 +6978,9 @@ msgstr "用戶端"
 msgid ""
 "JumpServer Client, currently used to launch the client, now only support "
 "launch RDP SSH client, The Telnet client will next"
-msgstr "JumpServer 用戶端，目前用來喚起 特定用戶端程序 連接資產, 目前僅支持 RDP SSH 用戶端，Telnet 會在未來支持"
+msgstr ""
+"JumpServer 用戶端，目前用來喚起 特定用戶端程序 連接資產, 目前僅支持 RDP SSH "
+"用戶端，Telnet 會在未來支持"
 
 #: templates/resource_download.html:35
 msgid "Microsoft"
@@ -7344,8 +7426,7 @@ msgstr "可以下載會話錄影"
 msgid "Account ID"
 msgstr "帳號"
 
-#: terminal/models/session/session.py:37
-#: terminal/models/session/sharing.py:118
+#: terminal/models/session/session.py:37 terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr "登錄來源"
 
@@ -7394,8 +7475,8 @@ msgstr "操作權限"
 msgid "Origin"
 msgstr "來源"
 
-#: terminal/models/session/sharing.py:42
-#: terminal/models/session/sharing.py:100 terminal/notifications.py:261
+#: terminal/models/session/sharing.py:42 terminal/models/session/sharing.py:100
+#: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "會話分享"
 
@@ -7508,15 +7589,19 @@ msgstr "Core 服務地址"
 #: terminal/serializers/applet_host.py:40
 msgid ""
 " \n"
-"        Tips: The application release machine communicates with the Core service. \n"
-"        If the release machine and the Core service are on the same network segment, \n"
-"        it is recommended to fill in the intranet address, otherwise fill in the current site URL \n"
+"        Tips: The application release machine communicates with the Core "
+"service. \n"
+"        If the release machine and the Core service are on the same network "
+"segment, \n"
+"        it is recommended to fill in the intranet address, otherwise fill in "
+"the current site URL \n"
 "        <br> \n"
 "        eg: https://172.16.10.110 or https://dev.jumpserver.com\n"
 "        "
 msgstr ""
-"提示：應用發布機和 Core 服務進行通信使用，如果發布機和 Core 服務在同一網段，建議填寫內網地址，否則填寫當前站點 "
-"URL<br>例如：https://172.16.10.110 or https://dev.jumpserver.com"
+"提示：應用發布機和 Core 服務進行通信使用，如果發布機和 Core 服務在同一網段，"
+"建議填寫內網地址，否則填寫當前站點 URL<br>例如：https://172.16.10.110 or "
+"https://dev.jumpserver.com"
 
 #: terminal/serializers/applet_host.py:48 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
@@ -7558,7 +7643,9 @@ msgstr "RDS 最大斷開時間（毫秒）"
 msgid ""
 "Tips: Set the maximum duration for keeping a disconnected session active on "
 "the server (log off the session after 60000 milliseconds)."
-msgstr "提示：設置某個已斷開連接的會話在伺服器上能保持活動狀態的最長時間（60000 毫秒後註銷會話）"
+msgstr ""
+"提示：設置某個已斷開連接的會話在伺服器上能保持活動狀態的最長時間（60000 毫秒"
+"後註銷會話）"
 
 #: terminal/serializers/applet_host.py:71
 msgid "RDS Remote App Logoff Time Limit (ms)"
@@ -7566,9 +7653,11 @@ msgstr "RDS 遠程應用註銷時間限制（毫秒）"
 
 #: terminal/serializers/applet_host.py:73
 msgid ""
-"Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp"
-" programs (0 milliseconds, log off the session immediately)."
-msgstr "提示：關閉所有 RemoteApp 程序之後設置 RemoteAPP 會話的註銷時間（0 毫秒，立即註銷會話）"
+"Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp "
+"programs (0 milliseconds, log off the session immediately)."
+msgstr ""
+"提示：關閉所有 RemoteApp 程序之後設置 RemoteAPP 會話的註銷時間（0 毫秒，立即"
+"註銷會話）"
 
 #: terminal/serializers/applet_host.py:82 terminal/serializers/terminal.py:47
 #: terminal/serializers/virtualapp_provider.py:13
@@ -7577,15 +7666,16 @@ msgstr "負載狀態"
 
 #: terminal/serializers/applet_host.py:96
 msgid ""
-"These accounts are used to connect to the published application, the account"
-" is now divided into two types, one is dedicated to each account, each user "
+"These accounts are used to connect to the published application, the account "
+"is now divided into two types, one is dedicated to each account, each user "
 "has a private account, the other is public, when the application does not "
-"support multiple open and the special has been used, the public account will"
-" be used to connect"
+"support multiple open and the special has been used, the public account will "
+"be used to connect"
 msgstr ""
-"這些帳號用於連接髮布的應用，帳號現在分為兩種類型: <br/ >一種是專用的，每個用戶都有一個專用帳號。 "
-"另一種是公共的，當應用不支持多開且專用的已經被使用時，會使用公共帳號連接; <br />注意: 如果不開啟自動創建帳號, "
-"當前發布機僅能被指定標簽的資產調度到，默認不會放到調度池中，且需要手動維護帳號"
+"這些帳號用於連接髮布的應用，帳號現在分為兩種類型: <br/ >一種是專用的，每個用"
+"戶都有一個專用帳號。 另一種是公共的，當應用不支持多開且專用的已經被使用時，會"
+"使用公共帳號連接; <br />注意: 如果不開啟自動創建帳號, 當前發布機僅能被指定標"
+"簽的資產調度到，默認不會放到調度池中，且需要手動維護帳號"
 
 #: terminal/serializers/applet_host.py:103
 msgid "The number of public accounts created automatically"
@@ -7597,7 +7687,8 @@ msgid ""
 "please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
 "restart the service to enable it."
 msgstr ""
-"優先使用同名帳號連接髮布機。為了安全，需配置文件中開啟配置 CACHE_LOGIN_PASSWORD_ENABLED=true， 修改後重啟服務"
+"優先使用同名帳號連接髮布機。為了安全，需配置文件中開啟配置 "
+"CACHE_LOGIN_PASSWORD_ENABLED=true， 修改後重啟服務"
 
 #: terminal/serializers/applet_host.py:148
 msgid "Install applets"
@@ -7647,19 +7738,23 @@ msgstr "Oracle 埠範圍"
 msgid ""
 "Oracle proxy server listen port is dynamic, Each additional Oracle database "
 "instance adds a port listener"
-msgstr "Oracle 代理伺服器監聽埠是動態的，每增加一個 Oracle 資料庫實例，就會增加一個埠監聽"
+msgstr ""
+"Oracle 代理伺服器監聽埠是動態的，每增加一個 Oracle 資料庫實例，就會增加一個埠"
+"監聽"
 
 #: terminal/serializers/endpoint.py:38
 msgid ""
 "The host address accessed when connecting to assets, if it is empty, the "
 "access address of the current browser will be used (the default endpoint "
 "does not allow modification of the host)"
-msgstr "連接資產時訪問的主機地址，如果為空則使用當前瀏覽器的訪問地址 (默認端點不允許修改主機)"
+msgstr ""
+"連接資產時訪問的主機地址，如果為空則使用當前瀏覽器的訪問地址 (默認端點不允許"
+"修改主機)"
 
 #: terminal/serializers/endpoint.py:64
 msgid ""
-"The assets within this IP range, the following endpoint will be used for the"
-" connection"
+"The assets within this IP range, the following endpoint will be used for the "
+"connection"
 msgstr "該 IP 範圍內的資產，將使用下面的端點進行連接"
 
 #: terminal/serializers/endpoint.py:65
@@ -7762,8 +7857,8 @@ msgid ""
 "If there are multiple hosts, use a comma (,) to separate them. <br>(For "
 "example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)"
 msgstr ""
-"如果有多個主機，請用逗號 (,) "
-"分隔它們。<br>（例如：http://www.jumpserver.a.com:9100，http://www.jumpserver.b.com:9100）"
+"如果有多個主機，請用逗號 (,) 分隔它們。<br>（例如：http://www.jumpserver.a."
+"com:9100，http://www.jumpserver.b.com:9100）"
 
 #: terminal/serializers/storage.py:199
 msgid "Index by date"
@@ -7965,12 +8060,14 @@ msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
 "administrator to open more ports."
-msgstr "未匹配到可用埠，資料庫的數量可能已經超過資料庫代理服務開放的埠數量，請聯系管理員開放更多埠。"
+msgstr ""
+"未匹配到可用埠，資料庫的數量可能已經超過資料庫代理服務開放的埠數量，請聯系管"
+"理員開放更多埠。"
 
 #: terminal/utils/db_port_mapper.py:116
 msgid ""
-"No ports can be used, check and modify the limit on the number of ports that"
-" Magnus listens on in the configuration file."
+"No ports can be used, check and modify the limit on the number of ports that "
+"Magnus listens on in the configuration file."
 msgstr "沒有埠可以使用，檢查並修改配置文件中 Magnus 監聽的埠數量限制。"
 
 #: terminal/utils/db_port_mapper.py:118
@@ -8033,7 +8130,8 @@ msgstr "工單已經關閉"
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
-msgstr "通過工單創建, 工單標題: {}, 工單申請人: {}, 工單處理人: {}, 工單 ID: {}"
+msgstr ""
+"通過工單創建, 工單標題: {}, 工單申請人: {}, 工單處理人: {}, 工單 ID: {}"
 
 #: tickets/handlers/base.py:84
 msgid "Change field"
@@ -8382,7 +8480,9 @@ msgid ""
 "When enabled, you will enter the MFA binding process the next time you log "
 "in. you can also directly bind in \"personal information -> quick "
 "modification -> change MFA Settings\"!"
-msgstr "啟用之後您將會在下次登錄時進入多因子認證綁定流程；您也可以在 (個人資訊->快速修改->設置 MFA 多因子認證)中直接綁定！"
+msgstr ""
+"啟用之後您將會在下次登錄時進入多因子認證綁定流程；您也可以在 (個人資訊->快速"
+"修改->設置 MFA 多因子認證)中直接綁定！"
 
 #: users/forms/profile.py:59
 msgid "* Enable MFA to make the account more secure."
@@ -8390,10 +8490,12 @@ msgstr "* 啟用 MFA 多因子認證，使帳號更加安全。"
 
 #: users/forms/profile.py:68
 msgid ""
-"In order to protect you and your company, please keep your account, password"
-" and key sensitive information properly. (for example: setting complex "
+"In order to protect you and your company, please keep your account, password "
+"and key sensitive information properly. (for example: setting complex "
 "password, enabling MFA)"
-msgstr "為了保護您和公司的安全，請妥善保管您的帳號、密碼和金鑰等重要敏感資訊； (如：設置複雜密碼，並啟用 MFA 多因子認證)"
+msgstr ""
+"為了保護您和公司的安全，請妥善保管您的帳號、密碼和金鑰等重要敏感資訊； (如："
+"設置複雜密碼，並啟用 MFA 多因子認證)"
 
 #: users/forms/profile.py:82 users/serializers/preference/lina.py:21
 msgid "New password"
@@ -8546,8 +8648,8 @@ msgstr "終端主題名稱"
 #: users/serializers/preference/lina.py:12
 msgid ""
 "*! The password for file encryption, used for decryption when the system "
-"sends emails containing file attachments. <br>Such as: account backup files,"
-" account password change results files"
+"sends emails containing file attachments. <br>Such as: account backup files, "
+"account password change results files"
 msgstr ""
 "File Encryption Password, when the system sends mails containing file "
 "attachments, use this password for decryption.<br>For example: Account "
@@ -8600,7 +8702,9 @@ msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
 "window is resized."
-msgstr "確定調整窗口大小時用戶端計算機是否應縮放遠程計算機上的內容以適應用戶端計算機的窗口大小"
+msgstr ""
+"確定調整窗口大小時用戶端計算機是否應縮放遠程計算機上的內容以適應用戶端計算機"
+"的窗口大小"
 
 #: users/serializers/preference/luna.py:59
 msgid "Remote app connect method"
@@ -8644,11 +8748,10 @@ msgstr "系統角色"
 
 #: users/serializers/user.py:55
 msgid ""
-"System roles are roles at the system level, and they will take effect across"
-" all organizations"
+"System roles are roles at the system level, and they will take effect across "
+"all organizations"
 msgstr ""
-"System role is a system-level role, it will be effective in all "
-"organizations"
+"System role is a system-level role, it will be effective in all organizations"
 
 #: users/serializers/user.py:61
 msgid "Org roles"
@@ -8659,8 +8762,8 @@ msgid ""
 "Org roles are roles at the organization level, and they will only take "
 "effect within current organization"
 msgstr ""
-"Organization role is an organization-level role, it is only effective within"
-" the current organization"
+"Organization role is an organization-level role, it is only effective within "
+"the current organization"
 
 #: users/serializers/user.py:70
 msgid "Organizations and roles"
@@ -8720,8 +8823,8 @@ msgid ""
 "other sources.There are security settings that can restrict users to log in "
 "to the system only from the sources."
 msgstr ""
-"User origin identifies the location where the user was created. It can be AD"
-" or other sources. Security settings can restrict users to log in to the "
+"User origin identifies the location where the user was created. It can be AD "
+"or other sources. Security settings can restrict users to log in to the "
 "system only from designated sources."
 
 #: users/serializers/user.py:266
@@ -8746,8 +8849,7 @@ msgstr "認證"
 
 #: users/serializers/user.py:426
 msgid ""
-"* For security, only a partial of users is displayed. You can search for "
-"more"
+"* For security, only a partial of users is displayed. You can search for more"
 msgstr ""
 "*For security reasons, only a portion of users is displayed. You can search "
 "for more"
@@ -8759,8 +8861,10 @@ msgstr "名稱重複"
 #: users/signal_handlers.py:41
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
-"            and the current user is not in the user list. Please contact the administrator."
-msgstr "管理員已開啟'僅允許已存在用戶登錄'，當前用戶不在用戶列表中，請聯絡管理員。"
+"            and the current user is not in the user list. Please contact the "
+"administrator."
+msgstr ""
+"管理員已開啟'僅允許已存在用戶登錄'，當前用戶不在用戶列表中，請聯絡管理員。"
 
 #: users/signal_handlers.py:193
 msgid "Clean up expired user sessions"
@@ -8918,8 +9022,8 @@ msgstr "綁定MFA驗證器"
 
 #: users/templates/users/user_otp_enable_bind.html:13
 msgid ""
-"Use the MFA Authenticator application to scan the following qr code for a "
-"6-bit verification code"
+"Use the MFA Authenticator application to scan the following qr code for a 6-"
+"bit verification code"
 msgstr "使用 MFA 驗證器應用掃描以下二維碼，獲取6位驗證碼"
 
 #: users/templates/users/user_otp_enable_bind.html:22
@@ -9004,8 +9108,8 @@ msgstr "使用者名稱或密碼無效"
 
 #: users/views/profile/reset.py:66
 msgid ""
-"Non-local users can log in only from third-party platforms and cannot change"
-" their passwords: {}"
+"Non-local users can log in only from third-party platforms and cannot change "
+"their passwords: {}"
 msgstr "非本地用戶僅允許從第三方平台登錄，不支持修改密碼: {}"
 
 #: users/views/profile/reset.py:188 users/views/profile/reset.py:199
@@ -9229,7 +9333,8 @@ msgstr "同步地區"
 #: xpack/plugins/cloud/manager.py:115
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
-msgstr "An error occurred while getting the instances of Region \"%s\", Error: %s"
+msgstr ""
+"An error occurred while getting the instances of Region \"%s\", Error: %s"
 
 #: xpack/plugins/cloud/manager.py:157
 #, python-format
@@ -9374,8 +9479,7 @@ msgstr "實例"
 msgid "Sync instance detail"
 msgstr "同步實例詳情"
 
-#: xpack/plugins/cloud/models.py:311
-#: xpack/plugins/cloud/serializers/task.py:77
+#: xpack/plugins/cloud/models.py:311 xpack/plugins/cloud/serializers/task.py:77
 msgid "Rule relation"
 msgstr "條件關係"
 
@@ -9431,8 +9535,7 @@ msgstr "規則匹配"
 msgid "Rule value"
 msgstr "規則值"
 
-#: xpack/plugins/cloud/models.py:381
-#: xpack/plugins/cloud/serializers/task.py:80
+#: xpack/plugins/cloud/models.py:381 xpack/plugins/cloud/serializers/task.py:80
 msgid "Strategy rule"
 msgstr "條件"
 
@@ -9448,8 +9551,7 @@ msgstr "動作屬性"
 msgid "Action value"
 msgstr "動作值"
 
-#: xpack/plugins/cloud/models.py:407
-#: xpack/plugins/cloud/serializers/task.py:83
+#: xpack/plugins/cloud/models.py:407 xpack/plugins/cloud/serializers/task.py:83
 msgid "Strategy action"
 msgstr "動作"
 
@@ -9726,7 +9828,9 @@ msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
 "synchronized. <br>If the port is 0, all IP addresses are valid."
-msgstr "埠用來檢測 IP 地址的有效性，在同步任務執行時，只會同步有效的 IP 地址。 <br>如果埠為 0，則表示所有 IP 地址均有效。"
+msgstr ""
+"埠用來檢測 IP 地址的有效性，在同步任務執行時，只會同步有效的 IP 地址。 <br>如"
+"果埠為 0，則表示所有 IP 地址均有效。"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:190
 msgid "Hostname prefix"

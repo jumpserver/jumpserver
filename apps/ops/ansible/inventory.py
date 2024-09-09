@@ -45,24 +45,34 @@ class JMSInventory:
         return groups
 
     @staticmethod
-    def make_proxy_command(gateway, path_dir):
+    def get_gateway_ssh_settings(gateway):
+        platform = gateway.platform
+        try:
+            protocol = platform.protocols.get(name='ssh')
+        except platform.protocols.model.DoesNotExist:
+            return {}
+        return protocol.setting
+
+    def make_proxy_command(self, gateway, path_dir):
         proxy_command_list = [
             "ssh", "-o", "Port={}".format(gateway.port),
             "-o", "StrictHostKeyChecking=no",
-            "{}@{}".format(gateway.username, gateway.address),
-            "-W", "%h:%p", "-q",
+            f"{gateway.username}@{gateway.address}"
         ]
 
-        if gateway.password:
-            proxy_command_list.insert(
-                0, "sshpass -p {}".format(gateway.password)
-            )
-        if gateway.private_key:
-            proxy_command_list.append("-i {}".format(gateway.get_private_key_path(path_dir)))
+        setting = self.get_gateway_ssh_settings(gateway)
+        if setting.get('nc', False):
+            proxy_command_list.extend(["nc", "-w", "10", "%h", "%p"])
+        else:
+            proxy_command_list.extend(["-W", "%h:%p", "-q"])
 
-        proxy_command = "-o ProxyCommand='{}'".format(
-            " ".join(proxy_command_list)
-        )
+        if gateway.password:
+            proxy_command_list.insert(0, f"sshpass -p {gateway.password}")
+
+        if gateway.private_key:
+            proxy_command_list.append(f"-i {gateway.get_private_key_path(path_dir)}")
+
+        proxy_command = f"-o ProxyCommand='{' '.join(proxy_command_list)}'"
         return {"ansible_ssh_common_args": proxy_command}
 
     @staticmethod
