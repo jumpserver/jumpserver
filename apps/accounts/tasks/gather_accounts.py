@@ -26,8 +26,10 @@ def gather_asset_accounts_util(nodes, task_name):
 
 
 @shared_task(
-    queue="ansible", verbose_name=_('Gather asset accounts'),
-    activity_callback=lambda self, node_ids, task_name=None, *args, **kwargs: (node_ids, None)
+    queue="ansible",
+    verbose_name=_('Gather asset accounts'),
+    activity_callback=lambda self, node_ids, task_name=None, *args, **kwargs: (node_ids, None),
+    description=_("Unused")
 )
 def gather_asset_accounts_task(node_ids, task_name=None):
     if task_name is None:

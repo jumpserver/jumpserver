@@ -18,8 +18,15 @@ __all__ = [
 
 
 @shared_task(
-    queue="ansible", verbose_name=_('Gather assets facts'),
-    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id)
+    queue="ansible",
+    verbose_name=_('Gather assets facts'),
+    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
+    description=_(
+        """
+        When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' this task 
+        will be executed
+        """
+    )
 )
 def gather_assets_facts_task(asset_ids, org_id, task_name=None):
     from assets.models import GatherFactsAutomation

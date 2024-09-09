@@ -1396,5 +1396,6 @@
     "ZoneUpdate": "Update the zone",
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "TaskPath": "Task path"
 }

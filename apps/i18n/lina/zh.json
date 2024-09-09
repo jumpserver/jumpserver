@@ -1399,5 +1399,6 @@
     "ZoneUpdate": "更新网域",
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
-    "removeWarningMsg": "你确定要移除"
+    "removeWarningMsg": "你确定要移除",
+    "TaskPath": "任务路径"
 }

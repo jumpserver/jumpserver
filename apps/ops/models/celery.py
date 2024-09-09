@@ -23,6 +23,7 @@ class CeleryTask(models.Model):
         task = app.tasks.get(self.name, None)
         return {
             "comment": getattr(task, 'verbose_name', None),
+            "description": getattr(task, 'description', None),
             "queue": getattr(task, 'queue', 'default')
         }
 

@@ -22,7 +22,15 @@ def task_activity_callback(self, pid, trigger, *args, **kwargs):
     return resource_ids, org_id
 
 
-@shared_task(verbose_name=_('Execute account backup plan'), activity_callback=task_activity_callback)
+@shared_task(
+    verbose_name=_('Execute account backup plan'),
+    activity_callback=task_activity_callback,
+    description=_(
+        """
+        When performing scheduled or manual account backups, this task is used
+        """
+    )
+)
 def execute_account_backup_task(pid, trigger, **kwargs):
     from accounts.models import AccountBackupAutomation
     with tmp_to_root_org():
