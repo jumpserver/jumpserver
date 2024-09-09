@@ -559,6 +559,7 @@
     "Gateway": "ゲートウェイ",
     "GatewayCreate": "ゲートウェイの作成",
     "GatewayList": "ゲートウェイリスト",
+    "GatewayPlatformHelpText": "ゲートウェイプラットフォームは、Gatewayで始まるプラットフォームのみ選択可能です。",
     "GatewayUpdate": "ゲートウェイの更新",
     "GatherAccounts": "アカウント収集",
     "GatherAccountsHelpText": "資産上のアカウント情報を収集します。収集したアカウント情報は、システムにインポートして一元管理が可能です",

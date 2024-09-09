@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 14:08+0800\n"
+"POT-Creation-Date: 2024-09-09 14:22+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -388,7 +388,7 @@ msgstr "來源 ID"
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:124
 #: acls/templates/acls/asset_login_reminder.html:10
-#: assets/serializers/gateway.py:28 audits/models.py:59
+#: assets/serializers/gateway.py:33 audits/models.py:59
 #: authentication/api/connection_token.py:411 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18
@@ -585,7 +585,7 @@ msgstr "結束日期"
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
-#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
+#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:147
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:225
@@ -656,7 +656,7 @@ msgstr "觸發方式"
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:41 perms/serializers/permission.py:63
+#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr "動作"
@@ -703,7 +703,7 @@ msgstr "密碼規則"
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
+#: assets/serializers/asset/common.py:169 assets/serializers/platform.py:153
 #: assets/serializers/platform.py:273
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
@@ -851,7 +851,7 @@ msgid "Exist policy"
 msgstr "帳號存在策略"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:125
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
 #: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
 #: settings/models.py:37 tickets/models/ticket/apply_application.py:13
@@ -863,7 +863,7 @@ msgstr "類別"
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
-#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
+#: assets/serializers/asset/common.py:146 assets/serializers/platform.py:155
 #: assets/serializers/platform.py:167 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126
@@ -904,7 +904,7 @@ msgstr "已修改"
 #: assets/serializers/platform.py:176 assets/serializers/platform.py:208
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
-#: perms/serializers/permission.py:35
+#: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
@@ -926,7 +926,7 @@ msgstr "帳號已存在"
 #: accounts/serializers/account/account.py:458
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:407
 msgid "Spec info"
 msgstr "特殊資訊"
 
@@ -1058,9 +1058,9 @@ msgstr ""
 "為了安全起見，請設置配置項 CACHE_LOGIN_PASSWORD_ENABLED=true，重啟服務才能開啟"
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:152
+#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:172
 #: assets/serializers/automations/base.py:21
-#: perms/serializers/permission.py:36
+#: perms/serializers/permission.py:47
 msgid "Nodes"
 msgstr "節點"
 
@@ -1266,15 +1266,15 @@ msgstr "審批人"
 msgid "Active"
 msgstr "啟用中"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:31
+#: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
 msgstr "用戶管理"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
-#: assets/serializers/asset/common.py:386 perms/serializers/permission.py:44
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
+#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "帳號管理"
@@ -1410,7 +1410,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: xpack/plugins/cloud/models.py:390
+#: common/drf/renders/base.py:149 xpack/plugins/cloud/models.py:390
 msgid "IP"
 msgstr "IP"
 
@@ -1579,7 +1579,7 @@ msgid "Gather facts"
 msgstr "收集資產資訊"
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
+#: terminal/serializers/applet_host.py:34 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr "禁用"
 
@@ -1831,7 +1831,7 @@ msgstr "雲服務"
 msgid "Port"
 msgstr "埠"
 
-#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:170
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr "地址"
@@ -1847,7 +1847,7 @@ msgstr "系統平台"
 msgid "Zone"
 msgstr "網域"
 
-#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:388
+#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:408
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集資產硬體資訊"
@@ -2072,7 +2072,7 @@ msgstr "設置"
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:39
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
+#: terminal/serializers/applet_host.py:35 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "啟用"
 
@@ -2193,38 +2193,58 @@ msgid ""
 "type"
 msgstr "資產中批次更新平台，不符合平台類型跳過的資產"
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:169
+#: assets/serializers/asset/common.py:36
+msgid "Protocols, format is [\"protocol/port\"]"
+msgstr "協定，格式為 [\"協定/連接埠\"]"
+
+#: assets/serializers/asset/common.py:38
+msgid "Protocol, format is name/port"
+msgstr "協定，格式為 名稱/連接埠"
+
+#: assets/serializers/asset/common.py:107
+msgid ""
+"Accounts, format [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
+"\"secret_type\": \"password\"}]"
+msgstr "帳號，格式為 [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", \"secret_type\": \"password\"}]"
+
+#: assets/serializers/asset/common.py:135
+msgid ""
+"Node path, format [\"/org_name/node_name\"], if node not exist, will create "
+"it"
+msgstr "節點路徑，格式為 [\"/組織/節點名稱\"], 如果節點不存在，將創建它"
+
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:169
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:388
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr "協議組"
 
-#: assets/serializers/asset/common.py:129
-#: assets/serializers/asset/common.py:151
+#: assets/serializers/asset/common.py:149
+#: assets/serializers/asset/common.py:171
 msgid "Node path"
 msgstr "節點路徑"
 
-#: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:389
+#: assets/serializers/asset/common.py:168
+#: assets/serializers/asset/common.py:409
 msgid "Auto info"
 msgstr "自動化資訊"
 
-#: assets/serializers/asset/common.py:245
+#: assets/serializers/asset/common.py:265
 msgid "Platform not exist"
 msgstr "平台不存在"
 
-#: assets/serializers/asset/common.py:281
+#: assets/serializers/asset/common.py:301
 msgid "port out of range (0-65535)"
 msgstr "埠超出範圍 (0-65535)"
 
-#: assets/serializers/asset/common.py:288
+#: assets/serializers/asset/common.py:308
 msgid "Protocol is required: {}"
 msgstr "協議是必填的: {}"
 
-#: assets/serializers/asset/common.py:316
+#: assets/serializers/asset/common.py:336
 msgid "Invalid data"
 msgstr "無效的數據"
 
@@ -2311,11 +2331,15 @@ msgid ""
 msgstr "網關是網域的網路代理，當連接網域內的資產時，連接將由網關進行路由。"
 
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:177
-#: orgs/serializers.py:13 perms/serializers/permission.py:39
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
 msgid "Assets amount"
 msgstr "資產數量"
 
-#: assets/serializers/gateway.py:23 common/validators.py:34
+#: assets/serializers/gateway.py:19
+msgid "The platform must start with Gateway"
+msgstr ""
+
+#: assets/serializers/gateway.py:28 common/validators.py:34
 msgid "This field must be unique."
 msgstr "欄位必須唯一"
 
@@ -2591,7 +2615,7 @@ msgid "Finished"
 msgstr "結束"
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
 #: terminal/models/virtualapp/provider.py:14
 #: terminal/serializers/session.py:55 terminal/serializers/session.py:78
 msgid "Terminal"
@@ -3439,7 +3463,7 @@ msgid "Actions"
 msgstr "動作"
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:43 perms/serializers/permission.py:64
+#: perms/serializers/permission.py:54 perms/serializers/permission.py:75
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
 msgstr "已過期"
@@ -3481,8 +3505,8 @@ msgstr "SSH金鑰不合法"
 msgid "Access IP"
 msgstr "IP 白名單"
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:42
-#: perms/serializers/permission.py:65 users/serializers/user.py:128
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:53
+#: perms/serializers/permission.py:76 users/serializers/user.py:128
 #: users/serializers/user.py:270
 msgid "Is valid"
 msgstr "是否有效"
@@ -3863,7 +3887,7 @@ msgstr "從企業微信獲取用戶失敗"
 msgid "Please login with a password and then bind the WeCom"
 msgstr "請使用密碼登錄，然後綁定企業微信"
 
-#: common/api/action.py:51
+#: common/api/action.py:57
 msgid "Request file format may be wrong"
 msgstr "上傳的檔案格式錯誤 或 其它類型資源的文件"
 
@@ -3891,7 +3915,7 @@ msgstr "運行中"
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:412
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:411
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 創建成功"
@@ -3994,7 +4018,7 @@ msgstr "組織 ID"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件內容太大 (最大長度 `{}` 位元組)"
 
-#: common/drf/parsers/base.py:199
+#: common/drf/parsers/base.py:207
 msgid "Parse file error: {}"
 msgstr "解析文件錯誤: {}"
 
@@ -4002,7 +4026,68 @@ msgstr "解析文件錯誤: {}"
 msgid "Invalid excel file"
 msgstr "無效的 excel 文件"
 
-#: common/drf/renders/base.py:208
+#: common/drf/renders/base.py:137
+msgid "Yes/No"
+msgstr ""
+
+#: common/drf/renders/base.py:140
+msgid "Text, max length {}"
+msgstr "文字，最大長度 {}"
+
+#: common/drf/renders/base.py:142
+msgid "Long text, no length limit"
+msgstr "長文字，無長度限制"
+
+#: common/drf/renders/base.py:144
+msgid "Number, min {} max {}"
+msgstr "數字，最小 {} 最大 {}"
+
+#: common/drf/renders/base.py:147
+msgid "Datetime format {}"
+msgstr "日期時間格式 {}"
+
+#: common/drf/renders/base.py:153
+msgid ""
+"Choices, format name(value), name is optional for human read, value is "
+"requisite, options {}"
+msgstr "選項，格式: 名稱(值)，名稱是可選的，方便閱讀，值是必填的，可選項有 {}"
+
+#: common/drf/renders/base.py:156
+msgid "Choices, options {}"
+msgstr "選項，可選項有 {}"
+
+#: common/drf/renders/base.py:158
+msgid "Phone number, format +8612345678901"
+msgstr "手機號碼，格式 +8612345678901"
+
+#: common/drf/renders/base.py:160
+msgid "Label, format [\"key:value\"]"
+msgstr "標籤，格式: [\"鍵:值\"]"
+
+#: common/drf/renders/base.py:162
+msgid ""
+"Object, format name(id), name is optional for human read, id is requisite"
+msgstr "關聯項，格式: 名稱(id), 名稱是可選的，方便閱讀，id 是必填的"
+
+#: common/drf/renders/base.py:164
+msgid "Object, format id"
+msgstr "關聯項，格式是 id"
+
+#: common/drf/renders/base.py:168
+msgid ""
+"Objects, format [\"name(id)\", ...], name is optional for human read, id is "
+"requisite"
+msgstr "多關聯項，格式: [\"名稱(id)\", ...], 名稱是可選的，方便閱讀，id 是必填的"
+
+#: common/drf/renders/base.py:170
+msgid "Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgstr "標籤，格式: [\"鍵:值\", ...], 如果標籤不存在，將創建它"
+
+#: common/drf/renders/base.py:172
+msgid "Objects, format [\"id\", ...]"
+msgstr "多關聯項，格式是 [\"id\", ...]"
+
+#: common/drf/renders/base.py:270
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -4826,7 +4911,7 @@ msgstr "可以查看所有加入的組織"
 msgid "Can not delete virtual org"
 msgstr "無法刪除虛擬組織"
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:37
+#: orgs/serializers.py:10 perms/serializers/permission.py:48
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr "用戶數量"
@@ -4835,7 +4920,7 @@ msgstr "用戶數量"
 msgid "User groups amount"
 msgstr "用戶組數量"
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:40
+#: orgs/serializers.py:14 perms/serializers/permission.py:51
 msgid "Nodes amount"
 msgstr "節點數量"
 
@@ -4952,11 +5037,21 @@ msgstr "資產授權規則將要過期"
 msgid "asset permissions of organization {}"
 msgstr "組織 ({}) 的資產授權"
 
-#: perms/serializers/permission.py:33 users/serializers/user.py:257
+#: perms/serializers/permission.py:32
+msgid ""
+"Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
+"choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
+msgstr "帳號，格式為 [\"@虛擬帳號\", \"root\", \"%模板id\"], 虛擬選項: @ALL, @SPEC, @USER, @ANON, @INPUT"
+
+#: perms/serializers/permission.py:38
+msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
+msgstr "協定，格式為 [\"ssh\", \"rdp\", \"vnc\"] 或 [\"all\"]"
+
+#: perms/serializers/permission.py:44 users/serializers/user.py:257
 msgid "Groups"
 msgstr "使用者群組"
 
-#: perms/serializers/permission.py:38
+#: perms/serializers/permission.py:49
 msgid "Groups amount"
 msgstr "使用者組數量"
 
@@ -5537,11 +5632,11 @@ msgstr "快取逾時時間 (秒)"
 #: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If"
-" the user OU structure has been adjusted, click Submit to clear the user DN "
-"cache"
+"effectively improve the speed of user authentication., 0 means no "
+"cache<br>If the user OU structure has been adjusted, click Submit to clear "
+"the user DN cache"
 msgstr ""
-"對於使用者登錄認證時查詢的使用者 DN 進行快取，可以有效提高使用者認證的速度<br>如果使用者 OU 架構已調整，請點擊提交以清除使用者 DN 快取"
+"對用戶登入驗證時查詢出的 User DN 進行緩存，可以有效提升用戶認證的速度<br>如果用戶 OU 架構有调整，點擊提交即可清除用戶 DN 緩存"
 
 #: settings/serializers/auth/ldap.py:97
 msgid "Search paged size (piece)"
@@ -6855,27 +6950,27 @@ msgstr "未發現 protocol 查詢參數"
 msgid "Deleting the default storage is not allowed"
 msgstr "不允許刪除默認儲存配置"
 
-#: terminal/api/component/storage.py:34
-msgid "Cannot delete storage that is being used"
-msgstr "不允許刪除正在使用的儲存配置"
+#: terminal/api/component/storage.py:36
+msgid "Cannot delete storage that is being used: {}"
+msgstr "無法刪除正在使用的儲存: {}"
 
-#: terminal/api/component/storage.py:75 terminal/api/component/storage.py:76
+#: terminal/api/component/storage.py:77 terminal/api/component/storage.py:78
 msgid "Command storages"
 msgstr "命令儲存"
 
-#: terminal/api/component/storage.py:82
+#: terminal/api/component/storage.py:84
 msgid "Invalid"
 msgstr "無效"
 
-#: terminal/api/component/storage.py:130 terminal/tasks.py:149
+#: terminal/api/component/storage.py:132 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "測試失敗: {}"
 
-#: terminal/api/component/storage.py:133
+#: terminal/api/component/storage.py:135
 msgid "Test successful"
 msgstr "測試成功"
 
-#: terminal/api/component/storage.py:135
+#: terminal/api/component/storage.py:137
 msgid "Test failure: Please check configuration"
 msgstr "測試失敗：請檢查配置"
 
@@ -7060,7 +7155,7 @@ msgstr "版本"
 msgid "Can concurrent"
 msgstr "可以並發"
 
-#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:167
+#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:178
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "主機"
@@ -7091,7 +7186,7 @@ msgstr "宿主機"
 msgid "Applet Publication"
 msgstr "應用發布"
 
-#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:69
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:80
 msgid "Deploy options"
 msgstr "部署參數"
 
@@ -7225,7 +7320,7 @@ msgstr "遠端地址"
 msgid "Application User"
 msgstr "應用用戶"
 
-#: terminal/models/component/terminal.py:177
+#: terminal/models/component/terminal.py:176
 msgid "Can view terminal config"
 msgstr "可以查看終端配置"
 
@@ -7398,19 +7493,19 @@ msgstr "無效的儲存"
 msgid "Icon"
 msgstr "圖示"
 
-#: terminal/serializers/applet_host.py:24
-msgid "Per Session"
-msgstr "每用戶"
+#: terminal/serializers/applet_host.py:26
+msgid "Per Device (Device number limit)"
+msgstr ""
 
-#: terminal/serializers/applet_host.py:25
-msgid "Per Device"
-msgstr "每設備"
+#: terminal/serializers/applet_host.py:27
+msgid "Per User (User number limit)"
+msgstr ""
 
-#: terminal/serializers/applet_host.py:37
+#: terminal/serializers/applet_host.py:39
 msgid "Core API"
 msgstr "Core 服務地址"
 
-#: terminal/serializers/applet_host.py:38
+#: terminal/serializers/applet_host.py:40
 msgid ""
 " \n"
 "        Tips: The application release machine communicates with the Core service. \n"
@@ -7423,52 +7518,64 @@ msgstr ""
 "提示：應用發布機和 Core 服務進行通信使用，如果發布機和 Core 服務在同一網段，建議填寫內網地址，否則填寫當前站點 "
 "URL<br>例如：https://172.16.10.110 or https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
+#: terminal/serializers/applet_host.py:48 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "忽略證書認證"
 
-#: terminal/serializers/applet_host.py:47
+#: terminal/serializers/applet_host.py:50
 msgid "Existing RDS license"
 msgstr "已有 RDS 許可證"
 
-#: terminal/serializers/applet_host.py:48
+#: terminal/serializers/applet_host.py:51
+msgid ""
+"If not exist, the RDS will be in trial mode, and the trial period is 120 "
+"days. <a href={}>Detail</a>"
+msgstr ""
+
+#: terminal/serializers/applet_host.py:54
 msgid "RDS License Server"
 msgstr "RDS 許可伺服器"
 
-#: terminal/serializers/applet_host.py:49
+#: terminal/serializers/applet_host.py:56
 msgid "RDS Licensing Mode"
 msgstr "RDS 授權模式"
 
-#: terminal/serializers/applet_host.py:51
+#: terminal/serializers/applet_host.py:59
 msgid "RDS Single Session Per User"
 msgstr "RDS 單用戶單會話"
 
-#: terminal/serializers/applet_host.py:53
+#: terminal/serializers/applet_host.py:60
+msgid ""
+"Tips: A RDS user can have only one session at a time. If set, when next "
+"login connected, previous session will be disconnected."
+msgstr ""
+
+#: terminal/serializers/applet_host.py:64
 msgid "RDS Max Disconnection Time (ms)"
 msgstr "RDS 最大斷開時間（毫秒）"
 
-#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:66
 msgid ""
 "Tips: Set the maximum duration for keeping a disconnected session active on "
 "the server (log off the session after 60000 milliseconds)."
 msgstr "提示：設置某個已斷開連接的會話在伺服器上能保持活動狀態的最長時間（60000 毫秒後註銷會話）"
 
-#: terminal/serializers/applet_host.py:60
+#: terminal/serializers/applet_host.py:71
 msgid "RDS Remote App Logoff Time Limit (ms)"
 msgstr "RDS 遠程應用註銷時間限制（毫秒）"
 
-#: terminal/serializers/applet_host.py:62
+#: terminal/serializers/applet_host.py:73
 msgid ""
 "Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp"
 " programs (0 milliseconds, log off the session immediately)."
 msgstr "提示：關閉所有 RemoteApp 程序之後設置 RemoteAPP 會話的註銷時間（0 毫秒，立即註銷會話）"
 
-#: terminal/serializers/applet_host.py:71 terminal/serializers/terminal.py:47
+#: terminal/serializers/applet_host.py:82 terminal/serializers/terminal.py:47
 #: terminal/serializers/virtualapp_provider.py:13
 msgid "Load status"
 msgstr "負載狀態"
 
-#: terminal/serializers/applet_host.py:85
+#: terminal/serializers/applet_host.py:96
 msgid ""
 "These accounts are used to connect to the published application, the account"
 " is now divided into two types, one is dedicated to each account, each user "
@@ -7480,11 +7587,11 @@ msgstr ""
 "另一種是公共的，當應用不支持多開且專用的已經被使用時，會使用公共帳號連接; <br />注意: 如果不開啟自動創建帳號, "
 "當前發布機僅能被指定標簽的資產調度到，默認不會放到調度池中，且需要手動維護帳號"
 
-#: terminal/serializers/applet_host.py:92
+#: terminal/serializers/applet_host.py:103
 msgid "The number of public accounts created automatically"
 msgstr "公用帳號自動創建的數量"
 
-#: terminal/serializers/applet_host.py:95
+#: terminal/serializers/applet_host.py:106
 msgid ""
 "Connect to the host using the same account first. For security reasons, "
 "please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
@@ -7492,15 +7599,15 @@ msgid ""
 msgstr ""
 "優先使用同名帳號連接髮布機。為了安全，需配置文件中開啟配置 CACHE_LOGIN_PASSWORD_ENABLED=true， 修改後重啟服務"
 
-#: terminal/serializers/applet_host.py:137
+#: terminal/serializers/applet_host.py:148
 msgid "Install applets"
 msgstr "安裝應用"
 
-#: terminal/serializers/applet_host.py:167
+#: terminal/serializers/applet_host.py:178
 msgid "Host ID"
 msgstr "主機 ID"
 
-#: terminal/serializers/applet_host.py:168
+#: terminal/serializers/applet_host.py:179
 msgid "Applet ID"
 msgstr "遠程應用 ID"
 
@@ -8178,11 +8285,15 @@ msgstr "無效的審批動作"
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用戶無權審批此工單"
 
-#: users/api/user.py:155
+#: users/api/user.py:63
+msgid "Cannot delete the admin user. Please disable it instead."
+msgstr "無法刪除管理員用戶。請將其禁用。"
+
+#: users/api/user.py:161
 msgid "Can not invite self"
 msgstr "不能邀請自己"
 
-#: users/api/user.py:208
+#: users/api/user.py:214
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在該頁面重設 MFA 多因子認證, 請去個人資訊頁面重設"
 
@@ -9125,7 +9236,7 @@ msgstr "An error occurred while getting the instances of Region \"%s\", Error: %
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "Unable to synchronize instance %s"
 
-#: xpack/plugins/cloud/manager.py:337
+#: xpack/plugins/cloud/manager.py:336
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
@@ -9134,42 +9245,42 @@ msgstr ""
 "The update platform of asset \"%s\" is not consistent with the original "
 "platform type. Skip platform and protocol updates"
 
-#: xpack/plugins/cloud/manager.py:393
+#: xpack/plugins/cloud/manager.py:392
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "\"資產 \"%s\" 已存在"
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:394
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "更新資產 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:398
+#: xpack/plugins/cloud/manager.py:397
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "資產 \"%s\" 已更新"
 
-#: xpack/plugins/cloud/manager.py:408
+#: xpack/plugins/cloud/manager.py:407
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "Preparing to create asset %s"
 
-#: xpack/plugins/cloud/manager.py:429
+#: xpack/plugins/cloud/manager.py:428
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "Delete Node: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:455
+#: xpack/plugins/cloud/manager.py:454
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "刪除帳號: %s"
 
-#: xpack/plugins/cloud/manager.py:471
+#: xpack/plugins/cloud/manager.py:470
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "設定協議 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:30
+#: xpack/plugins/cloud/manager.py:484 xpack/plugins/cloud/tasks.py:30
 msgid "Run sync instance task"
 msgstr "執行同步實例任務"
 

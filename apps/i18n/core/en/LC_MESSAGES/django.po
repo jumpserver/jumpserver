@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 14:08+0800\n"
+"POT-Creation-Date: 2024-09-09 14:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,7 +387,7 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:124
 #: acls/templates/acls/asset_login_reminder.html:10
-#: assets/serializers/gateway.py:28 audits/models.py:59
+#: assets/serializers/gateway.py:33 audits/models.py:59
 #: authentication/api/connection_token.py:411 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:34
@@ -584,7 +584,7 @@ msgstr ""
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
-#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
+#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:147
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:225
@@ -655,7 +655,7 @@ msgstr ""
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:41 perms/serializers/permission.py:63
+#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr ""
@@ -702,7 +702,7 @@ msgstr ""
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
+#: assets/serializers/asset/common.py:169 assets/serializers/platform.py:153
 #: assets/serializers/platform.py:273
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
@@ -844,7 +844,7 @@ msgid "Exist policy"
 msgstr ""
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:125
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
 #: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
 #: settings/models.py:37 tickets/models/ticket/apply_application.py:13
@@ -856,7 +856,7 @@ msgstr ""
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
-#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
+#: assets/serializers/asset/common.py:146 assets/serializers/platform.py:155
 #: assets/serializers/platform.py:167 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
@@ -897,7 +897,7 @@ msgstr ""
 #: assets/serializers/platform.py:176 assets/serializers/platform.py:208
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
-#: perms/serializers/permission.py:35
+#: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
@@ -919,7 +919,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:458
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:407
 msgid "Spec info"
 msgstr ""
 
@@ -1048,8 +1048,8 @@ msgid ""
 msgstr ""
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:152
-#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:36
+#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:172
+#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:47
 msgid "Nodes"
 msgstr ""
 
@@ -1264,15 +1264,15 @@ msgstr ""
 msgid "Active"
 msgstr "Active"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:31
+#: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
 msgstr ""
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
-#: assets/serializers/asset/common.py:386 perms/serializers/permission.py:44
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
+#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr ""
@@ -1404,7 +1404,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: xpack/plugins/cloud/models.py:390
+#: common/drf/renders/base.py:149 xpack/plugins/cloud/models.py:390
 msgid "IP"
 msgstr ""
 
@@ -1573,7 +1573,7 @@ msgid "Gather facts"
 msgstr ""
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
+#: terminal/serializers/applet_host.py:34 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr ""
 
@@ -1821,7 +1821,7 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:170
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr ""
@@ -1837,7 +1837,7 @@ msgstr ""
 msgid "Zone"
 msgstr ""
 
-#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:388
+#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:408
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr ""
@@ -2060,7 +2060,7 @@ msgstr ""
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:39
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
+#: terminal/serializers/applet_host.py:35 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr ""
 
@@ -2181,38 +2181,58 @@ msgid ""
 "type"
 msgstr ""
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:169
+#: assets/serializers/asset/common.py:36
+msgid "Protocols, format is [\"protocol/port\"]"
+msgstr ""
+
+#: assets/serializers/asset/common.py:38
+msgid "Protocol, format is name/port"
+msgstr ""
+
+#: assets/serializers/asset/common.py:107
+msgid ""
+"Accounts, format [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
+"\"secret_type\": \"password\"}]"
+msgstr ""
+
+#: assets/serializers/asset/common.py:135
+msgid ""
+"Node path, format [\"/org_name/node_name\"], if node not exist, will create "
+"it"
+msgstr ""
+
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:169
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:388
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr ""
 
-#: assets/serializers/asset/common.py:129
-#: assets/serializers/asset/common.py:151
+#: assets/serializers/asset/common.py:149
+#: assets/serializers/asset/common.py:171
 msgid "Node path"
 msgstr ""
 
-#: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:389
+#: assets/serializers/asset/common.py:168
+#: assets/serializers/asset/common.py:409
 msgid "Auto info"
 msgstr ""
 
-#: assets/serializers/asset/common.py:245
+#: assets/serializers/asset/common.py:265
 msgid "Platform not exist"
 msgstr ""
 
-#: assets/serializers/asset/common.py:281
+#: assets/serializers/asset/common.py:301
 msgid "port out of range (0-65535)"
 msgstr ""
 
-#: assets/serializers/asset/common.py:288
+#: assets/serializers/asset/common.py:308
 msgid "Protocol is required: {}"
 msgstr ""
 
-#: assets/serializers/asset/common.py:316
+#: assets/serializers/asset/common.py:336
 msgid "Invalid data"
 msgstr ""
 
@@ -2299,11 +2319,15 @@ msgid ""
 msgstr ""
 
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:177
-#: orgs/serializers.py:13 perms/serializers/permission.py:39
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
 msgid "Assets amount"
 msgstr ""
 
-#: assets/serializers/gateway.py:23 common/validators.py:34
+#: assets/serializers/gateway.py:19
+msgid "The platform must start with Gateway"
+msgstr ""
+
+#: assets/serializers/gateway.py:28 common/validators.py:34
 msgid "This field must be unique."
 msgstr ""
 
@@ -2577,7 +2601,7 @@ msgid "Finished"
 msgstr ""
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
 #: terminal/serializers/session.py:78
 msgid "Terminal"
@@ -3422,7 +3446,7 @@ msgid "Actions"
 msgstr ""
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:43 perms/serializers/permission.py:64
+#: perms/serializers/permission.py:54 perms/serializers/permission.py:75
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
 msgstr "Expired"
@@ -3464,8 +3488,8 @@ msgstr ""
 msgid "Access IP"
 msgstr ""
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:42
-#: perms/serializers/permission.py:65 users/serializers/user.py:128
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:53
+#: perms/serializers/permission.py:76 users/serializers/user.py:128
 #: users/serializers/user.py:270
 msgid "Is valid"
 msgstr "Is Valid"
@@ -3844,7 +3868,7 @@ msgstr ""
 msgid "Please login with a password and then bind the WeCom"
 msgstr ""
 
-#: common/api/action.py:51
+#: common/api/action.py:57
 msgid "Request file format may be wrong"
 msgstr ""
 
@@ -3872,7 +3896,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:412
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:411
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -3973,7 +3997,7 @@ msgstr "Organization ID"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr ""
 
-#: common/drf/parsers/base.py:199
+#: common/drf/parsers/base.py:207
 msgid "Parse file error: {}"
 msgstr ""
 
@@ -3981,7 +4005,69 @@ msgstr ""
 msgid "Invalid excel file"
 msgstr ""
 
-#: common/drf/renders/base.py:208
+#: common/drf/renders/base.py:137
+msgid "Yes/No"
+msgstr ""
+
+#: common/drf/renders/base.py:140
+msgid "Text, max length {}"
+msgstr ""
+
+#: common/drf/renders/base.py:142
+msgid "Long text, no length limit"
+msgstr ""
+
+#: common/drf/renders/base.py:144
+msgid "Number, min {} max {}"
+msgstr ""
+
+#: common/drf/renders/base.py:147
+msgid "Datetime format {}"
+msgstr ""
+
+#: common/drf/renders/base.py:153
+msgid ""
+"Choices, format name(value), name is optional for human read, value is "
+"requisite, options {}"
+msgstr ""
+
+#: common/drf/renders/base.py:156
+msgid "Choices, options {}"
+msgstr ""
+
+#: common/drf/renders/base.py:158
+msgid "Phone number, format +8612345678901"
+msgstr ""
+
+#: common/drf/renders/base.py:160
+msgid "Label, format [\"key:value\"]"
+msgstr ""
+
+#: common/drf/renders/base.py:162
+msgid ""
+"Object, format name(id), name is optional for human read, id is requisite"
+msgstr ""
+
+#: common/drf/renders/base.py:164
+msgid "Object, format id"
+msgstr ""
+
+#: common/drf/renders/base.py:168
+msgid ""
+"Objects, format [\"name(id)\", ...], name is optional for human read, id is "
+"requisite"
+msgstr ""
+
+#: common/drf/renders/base.py:170
+msgid ""
+"Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgstr ""
+
+#: common/drf/renders/base.py:172
+msgid "Objects, format [\"id\", ...]"
+msgstr ""
+
+#: common/drf/renders/base.py:270
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -4796,7 +4882,7 @@ msgstr ""
 msgid "Can not delete virtual org"
 msgstr ""
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:37
+#: orgs/serializers.py:10 perms/serializers/permission.py:48
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr ""
@@ -4805,7 +4891,7 @@ msgstr ""
 msgid "User groups amount"
 msgstr ""
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:40
+#: orgs/serializers.py:14 perms/serializers/permission.py:51
 msgid "Nodes amount"
 msgstr ""
 
@@ -4922,11 +5008,21 @@ msgstr ""
 msgid "asset permissions of organization {}"
 msgstr ""
 
-#: perms/serializers/permission.py:33 users/serializers/user.py:257
-msgid "Groups"
+#: perms/serializers/permission.py:32
+msgid ""
+"Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
+"choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
 msgstr ""
 
 #: perms/serializers/permission.py:38
+msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
+msgstr ""
+
+#: perms/serializers/permission.py:44 users/serializers/user.py:257
+msgid "Groups"
+msgstr ""
+
+#: perms/serializers/permission.py:49
 msgid "Groups amount"
 msgstr ""
 
@@ -5503,9 +5599,9 @@ msgstr ""
 #: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
-"the user OU structure has been adjusted, click Submit to clear the user DN "
-"cache"
+"effectively improve the speed of user authentication., 0 means no "
+"cache<br>If the user OU structure has been adjusted, click Submit to clear "
+"the user DN cache"
 msgstr ""
 
 #: settings/serializers/auth/ldap.py:97
@@ -6799,27 +6895,27 @@ msgstr ""
 msgid "Deleting the default storage is not allowed"
 msgstr ""
 
-#: terminal/api/component/storage.py:34
-msgid "Cannot delete storage that is being used"
+#: terminal/api/component/storage.py:36
+msgid "Cannot delete storage that is being used: {}"
 msgstr ""
 
-#: terminal/api/component/storage.py:75 terminal/api/component/storage.py:76
+#: terminal/api/component/storage.py:77 terminal/api/component/storage.py:78
 msgid "Command storages"
 msgstr ""
 
-#: terminal/api/component/storage.py:82
+#: terminal/api/component/storage.py:84
 msgid "Invalid"
 msgstr ""
 
-#: terminal/api/component/storage.py:130 terminal/tasks.py:149
+#: terminal/api/component/storage.py:132 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr ""
 
-#: terminal/api/component/storage.py:133
+#: terminal/api/component/storage.py:135
 msgid "Test successful"
 msgstr ""
 
-#: terminal/api/component/storage.py:135
+#: terminal/api/component/storage.py:137
 msgid "Test failure: Please check configuration"
 msgstr ""
 
@@ -7004,7 +7100,7 @@ msgstr ""
 msgid "Can concurrent"
 msgstr ""
 
-#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:167
+#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:178
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr ""
@@ -7035,7 +7131,7 @@ msgstr ""
 msgid "Applet Publication"
 msgstr ""
 
-#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:69
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:80
 msgid "Deploy options"
 msgstr ""
 
@@ -7169,7 +7265,7 @@ msgstr ""
 msgid "Application User"
 msgstr ""
 
-#: terminal/models/component/terminal.py:177
+#: terminal/models/component/terminal.py:176
 msgid "Can view terminal config"
 msgstr ""
 
@@ -7341,19 +7437,19 @@ msgstr ""
 msgid "Icon"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:24
-msgid "Per Session"
+#: terminal/serializers/applet_host.py:26
+msgid "Per Device (Device number limit)"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:25
-msgid "Per Device"
+#: terminal/serializers/applet_host.py:27
+msgid "Per User (User number limit)"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:37
+#: terminal/serializers/applet_host.py:39
 msgid "Core API"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:38
+#: terminal/serializers/applet_host.py:40
 msgid ""
 " \n"
 "        Tips: The application release machine communicates with the Core "
@@ -7367,52 +7463,64 @@ msgid ""
 "        "
 msgstr ""
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
+#: terminal/serializers/applet_host.py:48 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:47
+#: terminal/serializers/applet_host.py:50
 msgid "Existing RDS license"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:48
+#: terminal/serializers/applet_host.py:51
+msgid ""
+"If not exist, the RDS will be in trial mode, and the trial period is 120 "
+"days. <a href={}>Detail</a>"
+msgstr ""
+
+#: terminal/serializers/applet_host.py:54
 msgid "RDS License Server"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:49
+#: terminal/serializers/applet_host.py:56
 msgid "RDS Licensing Mode"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:51
+#: terminal/serializers/applet_host.py:59
 msgid "RDS Single Session Per User"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:53
+#: terminal/serializers/applet_host.py:60
+msgid ""
+"Tips: A RDS user can have only one session at a time. If set, when next "
+"login connected, previous session will be disconnected."
+msgstr ""
+
+#: terminal/serializers/applet_host.py:64
 msgid "RDS Max Disconnection Time (ms)"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:66
 msgid ""
 "Tips: Set the maximum duration for keeping a disconnected session active on "
 "the server (log off the session after 60000 milliseconds)."
 msgstr ""
 
-#: terminal/serializers/applet_host.py:60
+#: terminal/serializers/applet_host.py:71
 msgid "RDS Remote App Logoff Time Limit (ms)"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:62
+#: terminal/serializers/applet_host.py:73
 msgid ""
 "Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp "
 "programs (0 milliseconds, log off the session immediately)."
 msgstr ""
 
-#: terminal/serializers/applet_host.py:71 terminal/serializers/terminal.py:47
+#: terminal/serializers/applet_host.py:82 terminal/serializers/terminal.py:47
 #: terminal/serializers/virtualapp_provider.py:13
 msgid "Load status"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:85
+#: terminal/serializers/applet_host.py:96
 msgid ""
 "These accounts are used to connect to the published application, the account "
 "is now divided into two types, one is dedicated to each account, each user "
@@ -7421,26 +7529,26 @@ msgid ""
 "be used to connect"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:92
+#: terminal/serializers/applet_host.py:103
 msgid "The number of public accounts created automatically"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:95
+#: terminal/serializers/applet_host.py:106
 msgid ""
 "Connect to the host using the same account first. For security reasons, "
 "please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
 "restart the service to enable it."
 msgstr ""
 
-#: terminal/serializers/applet_host.py:137
+#: terminal/serializers/applet_host.py:148
 msgid "Install applets"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:167
+#: terminal/serializers/applet_host.py:178
 msgid "Host ID"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:168
+#: terminal/serializers/applet_host.py:179
 msgid "Applet ID"
 msgstr ""
 
@@ -8116,11 +8224,15 @@ msgstr ""
 msgid "This user is not authorized to approve this ticket"
 msgstr ""
 
-#: users/api/user.py:155
+#: users/api/user.py:63
+msgid "Cannot delete the admin user. Please disable it instead."
+msgstr ""
+
+#: users/api/user.py:161
 msgid "Can not invite self"
 msgstr ""
 
-#: users/api/user.py:208
+#: users/api/user.py:214
 msgid "Could not reset self otp, use profile reset instead"
 msgstr ""
 
@@ -9042,49 +9154,49 @@ msgstr ""
 msgid "Failed to synchronize the instance \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:337
+#: xpack/plugins/cloud/manager.py:336
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:393
+#: xpack/plugins/cloud/manager.py:392
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:394
 #, python-format
 msgid "Update asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:398
+#: xpack/plugins/cloud/manager.py:397
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:408
+#: xpack/plugins/cloud/manager.py:407
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:429
+#: xpack/plugins/cloud/manager.py:428
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:455
+#: xpack/plugins/cloud/manager.py:454
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:471
+#: xpack/plugins/cloud/manager.py:470
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:30
+#: xpack/plugins/cloud/manager.py:484 xpack/plugins/cloud/tasks.py:30
 msgid "Run sync instance task"
 msgstr ""
 

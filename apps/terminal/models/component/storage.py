@@ -105,10 +105,10 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
         store = engine_mod.CommandStore(self.config)
         return store.ping(timeout=3)
 
-    def is_use(self):
+    def used_by(self):
         return Terminal.objects.filter(
             command_storage=self.name, is_deleted=False
-        ).exists()
+        )
 
     def get_command_queryset(self):
         if self.type_null:

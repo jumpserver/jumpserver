@@ -124,6 +124,7 @@
     "Normal accounts": "通常のログインアカウント",
     "Not quick command": "非高速コマンド",
     "Open in new window": "新しいウィンドウが開きます",
+    "Operator": "オペレーター",
     "Password": "パスワード",
     "Password is token password on the table": "パスワードは、テーブルのトークンパスワードです",
     "Password is your password login to system": "パスワードは、システムにログインするためのパスワードです",
@@ -205,6 +206,7 @@
     "Users": "ユーザー",
     "Using token": "トークンを使用する",
     "View": "ビュー",
+    "Viewer": "ビューア",
     "VirtualApp": "仮想アプリ",
     "Web Terminal": "Web端末",
     "Website": "公式サイト",
@@ -222,7 +224,5 @@
     "start time": "開始時間",
     "success": "成功",
     "system user": "システムユーザー",
-    "user": "ユーザー",
-    "Viewer": "ビューア",
-    "Operator": "オペレーター"
+    "user": "ユーザー"
 }

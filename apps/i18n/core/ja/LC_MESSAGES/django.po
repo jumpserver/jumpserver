@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 14:08+0800\n"
+"POT-Creation-Date: 2024-09-09 14:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -388,7 +388,7 @@ msgstr "ソース ID"
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:124
 #: acls/templates/acls/asset_login_reminder.html:10
-#: assets/serializers/gateway.py:28 audits/models.py:59
+#: assets/serializers/gateway.py:33 audits/models.py:59
 #: authentication/api/connection_token.py:411 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18
@@ -585,7 +585,7 @@ msgstr "終了日"
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
-#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
+#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:147
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:225
@@ -656,7 +656,7 @@ msgstr "トリガー方式"
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:41 perms/serializers/permission.py:63
+#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr "アクション"
@@ -703,7 +703,7 @@ msgstr "パスワードルール"
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:149 assets/serializers/platform.py:153
+#: assets/serializers/asset/common.py:169 assets/serializers/platform.py:153
 #: assets/serializers/platform.py:273
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
@@ -850,7 +850,7 @@ msgid "Exist policy"
 msgstr "アカウントの存在ポリシー"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:125
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:168
 #: assets/serializers/platform.py:274 perms/serializers/user_permission.py:26
 #: settings/models.py:37 tickets/models/ticket/apply_application.py:13
@@ -862,7 +862,7 @@ msgstr "カテゴリ"
 #: accounts/serializers/automations/base.py:55 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
-#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:155
+#: assets/serializers/asset/common.py:146 assets/serializers/platform.py:155
 #: assets/serializers/platform.py:167 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126
@@ -903,7 +903,7 @@ msgstr "編集済み"
 #: assets/serializers/platform.py:176 assets/serializers/platform.py:208
 #: authentication/api/connection_token.py:410 ops/models/base.py:17
 #: ops/models/job.py:152 ops/serializers/job.py:19
-#: perms/serializers/permission.py:35
+#: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
@@ -925,7 +925,7 @@ msgstr "アカウントはすでに存在しています"
 #: accounts/serializers/account/account.py:458
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:72
-#: assets/serializers/asset/common.py:387
+#: assets/serializers/asset/common.py:407
 msgid "Spec info"
 msgstr "特別情報"
 
@@ -1058,9 +1058,9 @@ msgstr ""
 "手動入力. <br/> セキュリティのために、「config CACHE_LOGIN_PASSWORD_ENABLED」をtrueに設定してください。 "
 
 #: accounts/serializers/automations/base.py:23
-#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:152
+#: assets/models/asset/common.py:169 assets/serializers/asset/common.py:172
 #: assets/serializers/automations/base.py:21
-#: perms/serializers/permission.py:36
+#: perms/serializers/permission.py:47
 msgid "Nodes"
 msgstr "ノード"
 
@@ -1270,15 +1270,15 @@ msgstr "レビュー担当者"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:31
+#: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
 msgstr "ユーザー"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:128
-#: assets/serializers/asset/common.py:386 perms/serializers/permission.py:44
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
+#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "アカウント"
@@ -1415,7 +1415,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: xpack/plugins/cloud/models.py:390
+#: common/drf/renders/base.py:149 xpack/plugins/cloud/models.py:390
 msgid "IP"
 msgstr "IP"
 
@@ -1585,7 +1585,7 @@ msgid "Gather facts"
 msgstr "資産情報の収集"
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
+#: terminal/serializers/applet_host.py:34 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr "無効"
 
@@ -1837,7 +1837,7 @@ msgstr "クラウド サービス"
 msgid "Port"
 msgstr "ポート"
 
-#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:150
+#: assets/models/asset/common.py:160 assets/serializers/asset/common.py:170
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr "アドレス"
@@ -1853,7 +1853,7 @@ msgstr "プラットフォーム"
 msgid "Zone"
 msgstr "ゾーン"
 
-#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:388
+#: assets/models/asset/common.py:172 assets/serializers/asset/common.py:408
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
@@ -2076,7 +2076,7 @@ msgstr "設定"
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:39
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
+#: terminal/serializers/applet_host.py:35 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "有効化"
 
@@ -2197,38 +2197,58 @@ msgid ""
 "type"
 msgstr "プラットフォームタイプがスキップされた資産に合致しない、資産内の一括更新プラットフォーム"
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:169
+#: assets/serializers/asset/common.py:36
+msgid "Protocols, format is [\"protocol/port\"]"
+msgstr "契約書、形式は[\"契約書/ポート\"]"
+
+#: assets/serializers/asset/common.py:38
+msgid "Protocol, format is name/port"
+msgstr "契約書、形式は 名前/ポート"
+
+#: assets/serializers/asset/common.py:107
+msgid ""
+"Accounts, format [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", "
+"\"secret_type\": \"password\"}]"
+msgstr "アカウント、形式は [{\"name\": \"x\", \"username\": \"x\", \"secret\": \"x\", \"secret_type\": \"パスワード\"}]"
+
+#: assets/serializers/asset/common.py:135
+msgid ""
+"Node path, format [\"/org_name/node_name\"], if node not exist, will create "
+"it"
+msgstr "ノードパス、形式は [\"/組織/ノード名\"]、もしノードが存在しない場合、それを作成します"
+
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:169
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:45
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:388
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr "プロトコル"
 
-#: assets/serializers/asset/common.py:129
-#: assets/serializers/asset/common.py:151
+#: assets/serializers/asset/common.py:149
+#: assets/serializers/asset/common.py:171
 msgid "Node path"
 msgstr "ノードパスです"
 
-#: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:389
+#: assets/serializers/asset/common.py:168
+#: assets/serializers/asset/common.py:409
 msgid "Auto info"
 msgstr "自動情報"
 
-#: assets/serializers/asset/common.py:245
+#: assets/serializers/asset/common.py:265
 msgid "Platform not exist"
 msgstr "プラットフォームが存在しません"
 
-#: assets/serializers/asset/common.py:281
+#: assets/serializers/asset/common.py:301
 msgid "port out of range (0-65535)"
 msgstr "ポート番号が範囲外です (0-65535)"
 
-#: assets/serializers/asset/common.py:288
+#: assets/serializers/asset/common.py:308
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
-#: assets/serializers/asset/common.py:316
+#: assets/serializers/asset/common.py:336
 msgid "Invalid data"
 msgstr "無効なデータ"
 
@@ -2316,11 +2336,15 @@ msgid ""
 msgstr "ゲートウェイはドメインのネットワーク代理であり、ドメイン内のリソースに接続する際には、接続はゲートウェイを通してルーティングされます。"
 
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:177
-#: orgs/serializers.py:13 perms/serializers/permission.py:39
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
 msgid "Assets amount"
 msgstr "資産数量"
 
-#: assets/serializers/gateway.py:23 common/validators.py:34
+#: assets/serializers/gateway.py:19
+msgid "The platform must start with Gateway"
+msgstr ""
+
+#: assets/serializers/gateway.py:28 common/validators.py:34
 msgid "This field must be unique."
 msgstr "このフィールドは一意である必要があります。"
 
@@ -2598,7 +2622,7 @@ msgid "Finished"
 msgstr "終了"
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
 #: terminal/models/virtualapp/provider.py:14
 #: terminal/serializers/session.py:55 terminal/serializers/session.py:78
 msgid "Terminal"
@@ -3447,7 +3471,7 @@ msgid "Actions"
 msgstr "アクション"
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:43 perms/serializers/permission.py:64
+#: perms/serializers/permission.py:54 perms/serializers/permission.py:75
 #: users/serializers/user.py:127 users/serializers/user.py:273
 msgid "Is expired"
 msgstr "期限切れです"
@@ -3489,8 +3513,8 @@ msgstr "有効なssh公開鍵ではありません"
 msgid "Access IP"
 msgstr "Access IP"
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:42
-#: perms/serializers/permission.py:65 users/serializers/user.py:128
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:53
+#: perms/serializers/permission.py:76 users/serializers/user.py:128
 #: users/serializers/user.py:270
 msgid "Is valid"
 msgstr "有効です"
@@ -3871,7 +3895,7 @@ msgstr "企業の微信からユーザーを取得できませんでした"
 msgid "Please login with a password and then bind the WeCom"
 msgstr "パスワードでログインしてからWeComをバインドしてください"
 
-#: common/api/action.py:51
+#: common/api/action.py:57
 msgid "Request file format may be wrong"
 msgstr "リクエストファイルの形式が間違っている可能性があります"
 
@@ -3899,7 +3923,7 @@ msgstr "ランニング"
 msgid "Canceled"
 msgstr "キャンセル"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:412
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:411
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s が正常に作成されました"
@@ -4002,7 +4026,7 @@ msgstr "組織 ID"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "ファイルの内容がオーバーフローしました (最大長 '{}' バイト)"
 
-#: common/drf/parsers/base.py:199
+#: common/drf/parsers/base.py:207
 msgid "Parse file error: {}"
 msgstr "解析ファイルエラー: {}"
 
@@ -4010,7 +4034,68 @@ msgstr "解析ファイルエラー: {}"
 msgid "Invalid excel file"
 msgstr "無効 excel 書類"
 
-#: common/drf/renders/base.py:208
+#: common/drf/renders/base.py:137
+msgid "Yes/No"
+msgstr ""
+
+#: common/drf/renders/base.py:140
+msgid "Text, max length {}"
+msgstr "テキスト、最大長 {}"
+
+#: common/drf/renders/base.py:142
+msgid "Long text, no length limit"
+msgstr "長文テキスト、長さ制限なし"
+
+#: common/drf/renders/base.py:144
+msgid "Number, min {} max {}"
+msgstr "数字、最小 {} 最大 {}"
+
+#: common/drf/renders/base.py:147
+msgid "Datetime format {}"
+msgstr "日付時刻形式 {}"
+
+#: common/drf/renders/base.py:153
+msgid ""
+"Choices, format name(value), name is optional for human read, value is "
+"requisite, options {}"
+msgstr "選択、形式: 名前(値)、名前はオプショナルで、読みやすいように、値は必須です。選択肢は {}"
+
+#: common/drf/renders/base.py:156
+msgid "Choices, options {}"
+msgstr "オプション、可能なオプションは {}"
+
+#: common/drf/renders/base.py:158
+msgid "Phone number, format +8612345678901"
+msgstr "電話番号、形式 +8612345678901"
+
+#: common/drf/renders/base.py:160
+msgid "Label, format [\"key:value\"]"
+msgstr "タグ、形式: [\"キー:値\"]"
+
+#: common/drf/renders/base.py:162
+msgid ""
+"Object, format name(id), name is optional for human read, id is requisite"
+msgstr "関連項目、形式: 名前(id)、名前はオプショナルで、読みやすいように、idは必須です"
+
+#: common/drf/renders/base.py:164
+msgid "Object, format id"
+msgstr "関連項目、形式は id"
+
+#: common/drf/renders/base.py:168
+msgid ""
+"Objects, format [\"name(id)\", ...], name is optional for human read, id is "
+"requisite"
+msgstr "多関連項目、形式: [\"名前(id)\", ...]、名前はオプショナルで、読みやすいように、idは必須です"
+
+#: common/drf/renders/base.py:170
+msgid "Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgstr "タグ、形式: [\"キー:値\", ...]、もしタグが存在しない場合、それを作成します"
+
+#: common/drf/renders/base.py:172
+msgid "Objects, format [\"id\", ...]"
+msgstr "多関連項目、形式は [\"id\", ...]"
+
+#: common/drf/renders/base.py:270
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -4831,7 +4916,7 @@ msgstr "参加しているすべての組織を表示できます"
 msgid "Can not delete virtual org"
 msgstr "仮想組織を削除できませんでした"
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:37
+#: orgs/serializers.py:10 perms/serializers/permission.py:48
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr "ユーザー数"
@@ -4840,7 +4925,7 @@ msgstr "ユーザー数"
 msgid "User groups amount"
 msgstr "ユーザーグループの数"
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:40
+#: orgs/serializers.py:14 perms/serializers/permission.py:51
 msgid "Nodes amount"
 msgstr "ノード数"
 
@@ -4957,11 +5042,23 @@ msgstr "資産権限の有効期限が近づいています"
 msgid "asset permissions of organization {}"
 msgstr "組織 {} の資産権限"
 
-#: perms/serializers/permission.py:33 users/serializers/user.py:257
+#: perms/serializers/permission.py:32
+msgid ""
+"Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
+"choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
+msgstr ""
+"アカウント、形式 [\"@バーチャルアカウント\", \"root\", \"%テンプレートid\"], バーチャルオプション: @ALL, "
+"@SPEC, @USER, @ANON, @INPUT"
+
+#: perms/serializers/permission.py:38
+msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
+msgstr "プロトコル、形式は [\"ssh\", \"rdp\", \"vnc\"] または [\"all\"]"
+
+#: perms/serializers/permission.py:44 users/serializers/user.py:257
 msgid "Groups"
 msgstr "ユーザーグループ"
 
-#: perms/serializers/permission.py:38
+#: perms/serializers/permission.py:49
 msgid "Groups amount"
 msgstr "ユーザーグループの数"
 
@@ -5549,12 +5646,12 @@ msgstr "User DN キャッシュの有効期限 (秒)"
 #: settings/serializers/auth/ldap.py:91
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If"
-" the user OU structure has been adjusted, click Submit to clear the user DN "
-"cache"
+"effectively improve the speed of user authentication., 0 means no "
+"cache<br>If the user OU structure has been adjusted, click Submit to clear "
+"the user DN cache"
 msgstr ""
-"ユーザーログイン認証時に取得したユーザー DN をキャッシュすることで、ユーザー認証の速度を効果的に向上させることができます<br>ユーザー OU "
-"構造が調整された場合、送信をクリックしてユーザー DN キャッシュをクリアします"
+"ユーザーがログイン認証時にクエリした User DN をキャッシュすると、ユーザー認証の速度を効果的に改善できます。<br>ユーザーの OU "
+"構造が調整された場合は、提出をクリックしてユーザーの DN キャッシュをクリアできます。"
 
 #: settings/serializers/auth/ldap.py:97
 msgid "Search paged size (piece)"
@@ -6891,27 +6988,27 @@ msgstr "プロトコルクエリパラメータが見つかりません"
 msgid "Deleting the default storage is not allowed"
 msgstr "デフォルトのストレージの削除は許可されていません"
 
-#: terminal/api/component/storage.py:34
-msgid "Cannot delete storage that is being used"
-msgstr "使用中のストレージを削除できません"
+#: terminal/api/component/storage.py:36
+msgid "Cannot delete storage that is being used: {}"
+msgstr "使用中のストレージは削除できません: {}"
 
-#: terminal/api/component/storage.py:75 terminal/api/component/storage.py:76
+#: terminal/api/component/storage.py:77 terminal/api/component/storage.py:78
 msgid "Command storages"
 msgstr "コマンドストア"
 
-#: terminal/api/component/storage.py:82
+#: terminal/api/component/storage.py:84
 msgid "Invalid"
 msgstr "無効"
 
-#: terminal/api/component/storage.py:130 terminal/tasks.py:149
+#: terminal/api/component/storage.py:132 terminal/tasks.py:149
 msgid "Test failure: {}"
 msgstr "テスト失敗: {}"
 
-#: terminal/api/component/storage.py:133
+#: terminal/api/component/storage.py:135
 msgid "Test successful"
 msgstr "テスト成功"
 
-#: terminal/api/component/storage.py:135
+#: terminal/api/component/storage.py:137
 msgid "Test failure: Please check configuration"
 msgstr "テストに失敗しました：構成を確認してください"
 
@@ -7096,7 +7193,7 @@ msgstr "バージョン"
 msgid "Can concurrent"
 msgstr "同時実行可能"
 
-#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:167
+#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:178
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "ホスト"
@@ -7127,7 +7224,7 @@ msgstr "ホスト マシン"
 msgid "Applet Publication"
 msgstr "アプリケーションのリリース"
 
-#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:69
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:80
 msgid "Deploy options"
 msgstr "展開パラメーター"
 
@@ -7261,7 +7358,7 @@ msgstr "リモートアドレス"
 msgid "Application User"
 msgstr "ユーザーの適用"
 
-#: terminal/models/component/terminal.py:177
+#: terminal/models/component/terminal.py:176
 msgid "Can view terminal config"
 msgstr "ターミナル構成を表示できます"
 
@@ -7434,19 +7531,19 @@ msgstr "無効なストレージ"
 msgid "Icon"
 msgstr "アイコン"
 
-#: terminal/serializers/applet_host.py:24
-msgid "Per Session"
-msgstr "セッションごと"
+#: terminal/serializers/applet_host.py:26
+msgid "Per Device (Device number limit)"
+msgstr ""
 
-#: terminal/serializers/applet_host.py:25
-msgid "Per Device"
-msgstr "デバイスごと"
+#: terminal/serializers/applet_host.py:27
+msgid "Per User (User number limit)"
+msgstr ""
 
-#: terminal/serializers/applet_host.py:37
+#: terminal/serializers/applet_host.py:39
 msgid "Core API"
 msgstr "コア サービス アドレス"
 
-#: terminal/serializers/applet_host.py:38
+#: terminal/serializers/applet_host.py:40
 msgid ""
 " \n"
 "        Tips: The application release machine communicates with the Core service. \n"
@@ -7460,53 +7557,65 @@ msgstr ""
 "セグメント上にある場合は、イントラネット アドレスを入力することをお勧めします。それ以外の場合は、現在のサイト URL を入力します。<br>例: "
 "https://172.16.10.110 または https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
+#: terminal/serializers/applet_host.py:48 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "証明書の検証を無視する"
 
-#: terminal/serializers/applet_host.py:47
+#: terminal/serializers/applet_host.py:50
 msgid "Existing RDS license"
 msgstr "既存の RDS 証明書"
 
-#: terminal/serializers/applet_host.py:48
+#: terminal/serializers/applet_host.py:51
+msgid ""
+"If not exist, the RDS will be in trial mode, and the trial period is 120 "
+"days. <a href={}>Detail</a>"
+msgstr ""
+
+#: terminal/serializers/applet_host.py:54
 msgid "RDS License Server"
 msgstr "RDS ライセンス サーバー"
 
-#: terminal/serializers/applet_host.py:49
+#: terminal/serializers/applet_host.py:56
 msgid "RDS Licensing Mode"
 msgstr "RDS 認可モード"
 
-#: terminal/serializers/applet_host.py:51
+#: terminal/serializers/applet_host.py:59
 msgid "RDS Single Session Per User"
 msgstr "RDS シングル ユーザー シングル セッション"
 
-#: terminal/serializers/applet_host.py:53
+#: terminal/serializers/applet_host.py:60
+msgid ""
+"Tips: A RDS user can have only one session at a time. If set, when next "
+"login connected, previous session will be disconnected."
+msgstr ""
+
+#: terminal/serializers/applet_host.py:64
 msgid "RDS Max Disconnection Time (ms)"
 msgstr "最大切断時間（ミリ秒）"
 
-#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:66
 msgid ""
 "Tips: Set the maximum duration for keeping a disconnected session active on "
 "the server (log off the session after 60000 milliseconds)."
 msgstr "ヒント：サーバー上で切断されたセッションがアクティブな状態で維持される最大時間を設定します（60000ミリ秒後にセッションをログオフ）。"
 
-#: terminal/serializers/applet_host.py:60
+#: terminal/serializers/applet_host.py:71
 msgid "RDS Remote App Logoff Time Limit (ms)"
 msgstr "RDSリモートアプリケーションのログアウト時間制限（ミリ秒）"
 
-#: terminal/serializers/applet_host.py:62
+#: terminal/serializers/applet_host.py:73
 msgid ""
 "Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp"
 " programs (0 milliseconds, log off the session immediately)."
 msgstr ""
 "ヒント：すべてのRemoteAppプログラムを閉じた後、RemoteAppセッションのログオフ時間を設定します（0ミリ秒、セッションを即座にログオフ）。"
 
-#: terminal/serializers/applet_host.py:71 terminal/serializers/terminal.py:47
+#: terminal/serializers/applet_host.py:82 terminal/serializers/terminal.py:47
 #: terminal/serializers/virtualapp_provider.py:13
 msgid "Load status"
 msgstr "ロードステータス"
 
-#: terminal/serializers/applet_host.py:85
+#: terminal/serializers/applet_host.py:96
 msgid ""
 "These accounts are used to connect to the published application, the account"
 " is now divided into two types, one is dedicated to each account, each user "
@@ -7516,11 +7625,11 @@ msgid ""
 msgstr ""
 "これらのアカウントは、公開されたアプリケーションに接続するために使用されます。アカウントは現在、2つのタイプに分類されています。1つは、各アカウントに専用のアカウントで、各ユーザーにはプライベートアカウントがあります。もう1つは公開されています。アプリケーションが複数のオープンをサポートしていない場合、および特別なものが使用されている場合、公開アカウントが使用されます。"
 
-#: terminal/serializers/applet_host.py:92
+#: terminal/serializers/applet_host.py:103
 msgid "The number of public accounts created automatically"
 msgstr "自動的に作成される公開アカウントの数"
 
-#: terminal/serializers/applet_host.py:95
+#: terminal/serializers/applet_host.py:106
 msgid ""
 "Connect to the host using the same account first. For security reasons, "
 "please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
@@ -7529,15 +7638,15 @@ msgstr ""
 "同じアカウントを使用してホストに接続します。セキュリティ上の理由から、構成項目 CACHE_LOGIN_PASSWORD_ENABLED=true "
 "を設定してサービスを再起動して有効にしてください。"
 
-#: terminal/serializers/applet_host.py:137
+#: terminal/serializers/applet_host.py:148
 msgid "Install applets"
 msgstr "アプリをインストールする"
 
-#: terminal/serializers/applet_host.py:167
+#: terminal/serializers/applet_host.py:178
 msgid "Host ID"
 msgstr "ホスト ID"
 
-#: terminal/serializers/applet_host.py:168
+#: terminal/serializers/applet_host.py:179
 msgid "Applet ID"
 msgstr "リモートアプリケーション ID"
 
@@ -8220,11 +8329,15 @@ msgstr "無効な承認アクション"
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
-#: users/api/user.py:155
+#: users/api/user.py:63
+msgid "Cannot delete the admin user. Please disable it instead."
+msgstr "管理ユーザーを削除することはできません。それを無効にしてください。"
+
+#: users/api/user.py:161
 msgid "Can not invite self"
 msgstr "自分自身を招待することはできません"
 
-#: users/api/user.py:208
+#: users/api/user.py:214
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "自己otpをリセットできませんでした、代わりにプロファイルリセットを使用"
 
@@ -9161,49 +9274,49 @@ msgstr "地域 \"%s\" のインスタンスを取得できませんでした、�
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "インスタンス \"%s\" の同期に失敗しました"
 
-#: xpack/plugins/cloud/manager.py:337
+#: xpack/plugins/cloud/manager.py:336
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr "更新された資産 \"%s\" のプラットフォームタイプと元のタイプは一致しません。プラットフォームとプロトコルの更新をスキップ"
 
-#: xpack/plugins/cloud/manager.py:393
+#: xpack/plugins/cloud/manager.py:392
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "資産 \"%s\" はすでに存在します"
 
-#: xpack/plugins/cloud/manager.py:395
+#: xpack/plugins/cloud/manager.py:394
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "資産の更新 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:398
+#: xpack/plugins/cloud/manager.py:397
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "資産 \"%s\" が更新されました"
 
-#: xpack/plugins/cloud/manager.py:408
+#: xpack/plugins/cloud/manager.py:407
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "資産 \"%s\" の作成準備"
 
-#: xpack/plugins/cloud/manager.py:429
+#: xpack/plugins/cloud/manager.py:428
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "ノード \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:455
+#: xpack/plugins/cloud/manager.py:454
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "アカウント \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:471
+#: xpack/plugins/cloud/manager.py:470
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "プロトコル \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:485 xpack/plugins/cloud/tasks.py:30
+#: xpack/plugins/cloud/manager.py:484 xpack/plugins/cloud/tasks.py:30
 msgid "Run sync instance task"
 msgstr "同期インスタンス タスクを実行する"
 
