@@ -45,6 +45,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': False,
                         'label': _('Old SSH version'),
                         'help_text': _('Old SSH version like openssh 5.x or 6.x')
+                    },
+                    'nc': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': 'Netcat (nc)',
+                        'help_text': _('Netcat help text')
                     }
                 }
             },
