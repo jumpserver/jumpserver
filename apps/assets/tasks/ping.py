@@ -17,8 +17,15 @@ __all__ = [
 
 
 @shared_task(
-    verbose_name=_('Test assets connectivity'), queue='ansible',
-    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id)
+    verbose_name=_('Test assets connectivity'),
+    queue='ansible',
+    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
+    description=_(
+        """
+        When clicking 'Test Asset Connectivity' in 'Asset Details - Basic Settings' this task 
+        will be executed
+        """
+    )
 )
 def test_assets_connectivity_task(asset_ids, org_id, task_name=None):
     from assets.models import PingAutomation

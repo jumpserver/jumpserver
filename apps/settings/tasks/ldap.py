@@ -25,7 +25,14 @@ def sync_ldap_user():
     LDAPSyncUtil().perform_sync()
 
 
-@shared_task(verbose_name=_('Periodic import ldap user'))
+@shared_task(
+    verbose_name=_('Periodic import ldap user'),
+    description=_(
+        """
+        When LDAP auto-sync is configured, this task will be invoked to synchronize users
+        """
+    )
+)
 def import_ldap_user():
     start_time = time.time()
     time_start_display = local_now_display()
@@ -63,7 +70,15 @@ def import_ldap_user():
             LDAPImportMessage(user, extra_kwargs).publish()
 
 
-@shared_task(verbose_name=_('Registration periodic import ldap user task'))
+@shared_task(
+    verbose_name=_('Registration periodic import ldap user task'),
+    description=_(
+        """
+        When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP sync task 
+        will be re-registered or updated, and this task will be invoked
+        """
+    )
+)
 @after_app_ready_start
 def import_ldap_user_periodic(**kwargs):
     task_name = 'import_ldap_user_periodic'

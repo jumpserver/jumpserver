@@ -28,7 +28,15 @@ def sync_instance(instance):
         return "succeeded", msg
 
 
-@shared_task(verbose_name=_('Sync secret to vault'))
+@shared_task(
+    verbose_name=_('Sync secret to vault'),
+    description=_(
+        """
+        When clicking 'Sync' in 'System Settings - Features - Account Storage' this task will 
+        be executed
+        """
+    )
+)
 def sync_secret_to_vault():
     if not vault_client.enabled:
         # 这里不能判断 settings.VAULT_ENABLED, 必须判断当前 vault_client 的类型
