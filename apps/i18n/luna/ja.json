@@ -90,7 +90,7 @@
     "Info": "ヒント",
     "InstallClientMsg": "JumpServerクライアントがインストールされていない、今ダウンロードしてインストールしますか?",
     "Japanese keyboard layout": "Japanese (Qwerty)",
-    "Keyboard keys": "Option + Left / Option + Right",
+    "Keyboard keys": "Option + Shift + Left / Right",
     "Keyboard layout": "キーボードレイアウト",
     "Keyboard switch session": "セッションの切り替え → ショートカットキー",
     "Kubernetes": "Kubernetes",

@@ -52,5 +52,15 @@
     "Writable": "读写",
     "JoinedWithSuccess": "已成功加入",
     "KubernetesManagement": "Kubernetes 管理",
-    "WebSocketClosed": "WebSocket 已关闭"
+    "WebSocketClosed": "WebSocket 已关闭",
+    "Connect": "连接",
+    "Search": "搜索",
+    "Refresh": "刷新",
+    "Hotkeys": "快捷键",
+    "Paste": "粘贴",
+    "DownArrow": "向下箭头",
+    "LeftArrow": "后退箭头",
+    "RightArrow": "前进箭头",
+    "UpArrow": "向上箭头",
+    "Expand": "展开"
 }

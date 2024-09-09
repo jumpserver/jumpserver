@@ -52,5 +52,15 @@
     "Writable": "Writable",
     "JoinedWithSuccess": "Successfully joined",
     "KubernetesManagement": "Kubernetes management",
-    "WebSocketClosed": "WebSocket closed"
+    "WebSocketClosed": "WebSocket closed",
+    "Connect": "Connect",
+    "Search": "Search",
+    "Refresh": "Refresh",
+    "Hotkeys": "Hotkeys",
+    "Paste": "Paste",
+    "DownArrow": "Down arrow",
+    "LeftArrow": "Left arrow",
+    "RightArrow": "Right arrow",
+    "UpArrow": "Up arrow",
+    "Expand": "Expand"
 }
