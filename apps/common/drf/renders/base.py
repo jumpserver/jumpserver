@@ -5,6 +5,7 @@ from datetime import datetime
 
 import pyzipper
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
@@ -129,9 +130,10 @@ class BaseFileRenderer(BaseRenderer):
         return str(value)
 
     def get_field_help_text(self, field):
-        print(field)
         text = ''
-        if isinstance(field, serializers.BooleanField):
+        if hasattr(field, 'get_render_help_text'):
+            text = field.get_render_help_text()
+        elif isinstance(field, serializers.BooleanField):
             text = _('Yes/No')
         elif isinstance(field, serializers.CharField):
             if field.max_length:
@@ -142,11 +144,9 @@ class BaseFileRenderer(BaseRenderer):
             text = _('Number, min {} max {}').format(field.min_value, field.max_value)
             text = text.replace('min None', '').replace('max None', '')
         elif isinstance(field, serializers.DateTimeField):
-            text = _('Datetime')
+            text = _('Datetime format {}').format(timezone.now().strftime(settings.REST_FRAMEWORK['DATETIME_FORMAT']))
         elif isinstance(field, serializers.IPAddressField):
             text = _('IP')
-        elif hasattr(field, 'get_render_help_text'):
-            text = field.get_render_help_text()
         elif isinstance(field, serializers.ChoiceField):
             choices = [str(v) for v in field.choices.keys()]
             if isinstance(field, common_fields.LabeledChoiceField):
