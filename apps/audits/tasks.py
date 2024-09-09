@@ -128,7 +128,21 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
-@shared_task(verbose_name=_('Clean audits session task log'))
+@shared_task(
+    verbose_name=_('Clean audits session task log'),
+    description=_(
+        """
+        Since the system generates login logs, operation logs, file upload logs, activity 
+        logs, Celery execution logs, session recordings, and command records, as well as password 
+        change logs, it will clean up these records based on the periodic cleanup configuration 
+        in "System Settings - Tasks" The system will clean up login logs, task logs, operation 
+        logs, password change logs, upload and download logs, session logs, activity records, 
+        job center execution history logs, and cloud synchronization records that exceed the set 
+        time limit every day at 2 a.m., according to the periodic cleanup configuration in 
+        'System Settings - Tasks'
+        """
+    )
+)
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_audits_log_period():
     print("Start clean audit session task log")
@@ -142,7 +156,15 @@ def clean_audits_log_period():
         clean_password_change_log_period()
 
 
-@shared_task(verbose_name=_('Upload FTP file to external storage'))
+@shared_task(
+    verbose_name=_('Upload FTP file to external storage'),
+    description=_(
+        """
+        If SERVER_REPLAY_STORAGE is configured, files uploaded through file management will be 
+        synchronized to external storage
+        """
+    )
+)
 def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
     logger.info(f'Start upload FTP file record to external storage: {ftp_log_id} - {file_name}')
     ftp_log = FTPLog.objects.filter(id=ftp_log_id).first()

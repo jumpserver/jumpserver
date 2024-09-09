@@ -21,8 +21,10 @@ def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
 
 
 @shared_task(
-    queue='ansible', verbose_name=_('Asset execute automation'),
-    activity_callback=task_activity_callback
+    queue='ansible',
+    verbose_name=_('Asset execute automation'),
+    activity_callback=task_activity_callback,
+    description=_("Unused")
 )
 def execute_asset_automation_task(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)

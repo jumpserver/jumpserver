@@ -47,8 +47,15 @@ def _run_ops_job_execution(execution):
 
 
 @shared_task(
-    soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"),
-    activity_callback=job_task_activity_callback
+    soft_time_limit=60,
+    queue="ansible",
+    verbose_name=_("Run ansible task"),
+    activity_callback=job_task_activity_callback,
+    description=_(
+        """
+        Execute scheduled adhoc and playbooks, periodically invoking the task for execution
+        """
+    )
 )
 def run_ops_job(job_id):
     with tmp_to_root_org():
@@ -73,8 +80,15 @@ def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
 
 
 @shared_task(
-    soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"),
-    activity_callback=job_execution_task_activity_callback
+    soft_time_limit=60,
+    queue="ansible",
+    verbose_name=_("Run ansible task execution"),
+    activity_callback=job_execution_task_activity_callback,
+    description=_(
+        """
+        Execute the task when manually adhoc or playbooks
+        """
+    )
 )
 def run_ops_job_execution(execution_id, **kwargs):
     with tmp_to_root_org():
@@ -86,7 +100,14 @@ def run_ops_job_execution(execution_id, **kwargs):
     _run_ops_job_execution(execution)
 
 
-@shared_task(verbose_name=_('Clear celery periodic tasks'))
+@shared_task(
+    verbose_name=_('Clear celery periodic tasks'),
+    description=_(
+        """
+        At system startup, clean up celery tasks that no longer exist
+        """
+    )
+)
 @after_app_ready_start
 def clean_celery_periodic_tasks():
     """清除celery定时任务"""
@@ -107,7 +128,16 @@ def clean_celery_periodic_tasks():
             logger.info('Clean task failure: {}'.format(task))
 
 
-@shared_task(verbose_name=_('Create or update periodic tasks'))
+@shared_task(
+    verbose_name=_('Create or update periodic tasks'),
+    description=_(
+        """
+        With version iterations, new tasks may be added, or task names and execution times may 
+        be modified. Therefore, upon system startup, tasks will be registered or the parameters 
+        of scheduled tasks will be updated
+        """
+    )
+)
 @after_app_ready_start
 def create_or_update_registered_periodic_tasks():
     from .celery.decorator import get_register_period_tasks
@@ -115,20 +145,48 @@ def create_or_update_registered_periodic_tasks():
         create_or_update_celery_periodic_tasks(task)
 
 
-@shared_task(verbose_name=_("Periodic check service performance"))
+@shared_task(
+    verbose_name=_("Periodic check service performance"),
+    description=_(
+        """
+        Check every hour whether each component is offline and whether the CPU, memory, 
+        and disk usage exceed the thresholds, and send an alert message to the administrator
+        """
+    )
+)
 @register_as_period_task(interval=3600)
 def check_server_performance_period():
     ServerPerformanceCheckUtil().check_and_publish()
 
 
-@shared_task(verbose_name=_("Clean up unexpected jobs"))
+@shared_task(
+    verbose_name=_("Clean up unexpected jobs"),
+    description=_(
+        """
+        Due to exceptions caused by executing adhoc and playbooks in the Job Center, 
+        which result in the task status not being updated, the system will clean up abnormal jobs 
+        that have not been completed for more than 3 hours every hour and mark these tasks as 
+        failed
+        """
+    )
+)
 @register_as_period_task(interval=3600)
 def clean_up_unexpected_jobs():
     with tmp_to_root_org():
         JobExecution.clean_unexpected_execution()
 
 
-@shared_task(verbose_name=_('Clean job_execution db record'))
+@shared_task(
+    verbose_name=_('Clean job_execution db record'),
+    description=_(
+        """
+        Due to the execution of adhoc and playbooks in the Job Center, execution records will 
+        be generated. The system will clean up records that exceed the retention period every day 
+        at 2 a.m., based on the configuration of 'System Settings - Tasks - Regular clean-up - 
+        Job execution retention days'
+        """
+    )
+)
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_job_execution_period():
     logger.info("Start clean job_execution db record")
@@ -137,7 +195,8 @@ def clean_job_execution_period():
     expired_day = now - datetime.timedelta(days=days)
     with tmp_to_root_org():
         del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
-        logger.info(f"clean job_execution db record success! delete {days} days {del_res[0]} records")
+        logger.info(
+            f"clean job_execution db record success! delete {days} days {del_res[0]} records")
 
 # 测试使用，注释隐藏
 # @shared_task
