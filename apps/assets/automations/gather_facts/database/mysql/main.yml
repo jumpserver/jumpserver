@@ -3,6 +3,9 @@
   vars:
     ansible_python_interpreter: /opt/py3/bin/python
     check_ssl: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
+    ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
+    ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
+    ssl_key: "{{ jms_asset.secret_info.client_cert | default('') }}"
 
   tasks:
     - name: Get info
@@ -12,9 +15,9 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         check_hostname: "{{ check_ssl if check_ssl else omit }}"
-        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) if check_ssl else omit }}"
-        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) if check_ssl else omit }}"
-        client_key: "{{ jms_asset.secret_info.client_key | default(omit) if check_ssl else omit }}"
+        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
+        client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
+        client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
         filter: version
       register: db_info
 
