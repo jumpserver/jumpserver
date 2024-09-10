@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 19:05+0800\n"
+"POT-Creation-Date: 2024-09-10 16:58+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -707,7 +707,7 @@ msgstr "密码规则"
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:169 labels/models.py:11
-#: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
+#: ops/mixin.py:28 ops/models/adhoc.py:20 ops/models/celery.py:15
 #: ops/models/celery.py:81 ops/models/job.py:142 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
@@ -1161,15 +1161,29 @@ msgstr "周期清理改密记录和推送记录"
 #: accounts/tasks/automation.py:102
 msgid ""
 "\n"
-"        Clean change secret and push record period description\n"
+"        The system will periodically clean up unnecessary password change "
+"and push records, \n"
+"        including their associated change tasks, execution logs, assets, and "
+"accounts. When any \n"
+"        of these associated items are deleted, the corresponding password "
+"change and push records \n"
+"        become invalid. Therefore, to maintain a clean and efficient "
+"database, the system will \n"
+"        clean up expired records at 2 a.m daily, based on the interval "
+"specified by \n"
+"        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. "
+"This periodic cleanup \n"
+"        mechanism helps free up storage space and enhances the security and "
+"overall performance \n"
+"        of data management\n"
 "        "
 msgstr ""
 "\n"
 "系统会定期清理不再需要的改密记录和推送记录，包括那些关联的改密任务、执行记"
 "录、资产和账号。当这些关联项中的任意一个被删除时，对应的改密和推送记录将变为"
-"无效。因此，为了保持数据库的整洁和高效运行，系统默认每180天自动清理这些无效记"
-"录。这种定期清理机制不仅有助于释放存储空间，还能提高数据管理的安全性和整体性"
-"能。"
+"无效。因此，为了保持数据库的整洁和高效运行，根据系统配置文件 config.txt 中 "
+"PERM_EXPIRED_CHECK_PERIODIC 的时间间隔对于超出时间的于每天凌晨2点进行清理。这"
+"种定期清理机制不仅有助于释放存储空间，还能提高数据管理的安全和整体性能"
 
 #: accounts/tasks/backup_account.py:26
 msgid "Execute account backup plan"
@@ -3063,33 +3077,23 @@ msgid ""
 "\n"
 "        Since the system generates login logs, operation logs, file upload "
 "logs, activity \n"
-"        logs, Celery execution logs, session recordings, and command "
-"records, as well as password \n"
-"        change logs, it will clean up these records based on the periodic "
-"cleanup configuration \n"
-"        in \"System Settings - Tasks\" The system will clean up login logs, "
-"task logs, operation \n"
-"        logs, password change logs, upload and download logs, session logs, "
-"activity records, \n"
-"        job center execution history logs, and cloud synchronization records "
-"that exceed the set \n"
-"        time limit every day at 2 a.m., according to the periodic cleanup "
-"configuration in \n"
-"        'System Settings - Tasks'\n"
+"        logs, Celery execution logs, session recordings, command records, "
+"and password change \n"
+"        logs, it will perform cleanup of records that exceed the time limit "
+"according to the \n"
+"        'Tasks - Regular clean-up' in the system settings at 2 a.m daily\n"
 "        "
 msgstr ""
 "\n"
 "由于系统会产生登录日志，操作日志，文件上传日志，活动日志，celery执行日志，会"
-"话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置对这"
-"些记录进行清理。系统会根据系统设置-任务列表-定期清理的配置，对于超出时间的登"
-"录日志、任务日志、操作日志、改密日志、上传下载日志、会话日志、活动记录、作业"
-"中心执行历史日志、云同步记录日志于每天凌晨2点进行清理"
+"话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置，对"
+"于超出时间的于每天凌晨2点进行清理"
 
-#: audits/tasks.py:160
+#: audits/tasks.py:156
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
-#: audits/tasks.py:162
+#: audits/tasks.py:158
 msgid ""
 "\n"
 "        If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
@@ -4881,33 +4885,33 @@ msgstr "命令执行已禁用"
 msgid "no valid program entry found."
 msgstr "没有可用程序入口"
 
-#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:73
+#: ops/mixin.py:30 ops/mixin.py:110 settings/serializers/auth/ldap.py:73
 msgid "Periodic run"
 msgstr "周期执行"
 
-#: ops/mixin.py:25 ops/mixin.py:88 ops/mixin.py:108
+#: ops/mixin.py:32 ops/mixin.py:96 ops/mixin.py:116
 #: settings/serializers/auth/ldap.py:80
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/mixin.py:28 ops/mixin.py:86 ops/mixin.py:105
+#: ops/mixin.py:35 ops/mixin.py:94 ops/mixin.py:113
 #: settings/serializers/auth/ldap.py:77
 msgid "Crontab"
 msgstr "Crontab"
 
-#: ops/mixin.py:110
+#: ops/mixin.py:118
 msgid "Run period"
 msgstr "执行周期"
 
-#: ops/mixin.py:119
+#: ops/mixin.py:127
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: ops/mixin.py:126
+#: ops/mixin.py:134
 msgid "Range {} to {}"
 msgstr "输入在 {} - {} 范围之间"
 
-#: ops/mixin.py:137
+#: ops/mixin.py:145
 msgid "Require interval or crontab setting"
 msgstr "需要周期或定期设置"
 
@@ -10522,15 +10526,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-#~ msgid "Per Session"
-#~ msgstr "每用户"
-
-#~ msgid "Per Device"
-#~ msgstr "每设备"
-
-#~ msgid "None"
-#~ msgstr "无"
-
-#~ msgid "Yes,No"
-#~ msgstr "Yes，No"
