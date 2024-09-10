@@ -133,13 +133,9 @@ def clean_expired_session_period():
     description=_(
         """
         Since the system generates login logs, operation logs, file upload logs, activity 
-        logs, Celery execution logs, session recordings, and command records, as well as password 
-        change logs, it will clean up these records based on the periodic cleanup configuration 
-        in "System Settings - Tasks" The system will clean up login logs, task logs, operation 
-        logs, password change logs, upload and download logs, session logs, activity records, 
-        job center execution history logs, and cloud synchronization records that exceed the set 
-        time limit every day at 2 a.m., according to the periodic cleanup configuration in 
-        'System Settings - Tasks'
+        logs, Celery execution logs, session recordings, command records, and password change 
+        logs, it will perform cleanup of records that exceed the time limit according to the 
+        'Tasks - Regular clean-up' in the system settings at 2 a.m daily
         """
     )
 )
