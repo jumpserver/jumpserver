@@ -16,6 +16,13 @@ __all__ = [
 ]
 
 
+class PeriodTaskModelQuerySet(models.QuerySet):
+    def delete(self, *args, **kwargs):
+        for obj in self:
+            obj.delete()
+        return super().delete(*args, **kwargs)
+
+
 class PeriodTaskModelMixin(models.Model):
     name = models.CharField(
         max_length=128, unique=False, verbose_name=_("Name")
@@ -27,6 +34,7 @@ class PeriodTaskModelMixin(models.Model):
     crontab = models.CharField(
         blank=True, max_length=128, null=True, verbose_name=_("Crontab"),
     )
+    objects = PeriodTaskModelQuerySet.as_manager()
 
     @abc.abstractmethod
     def get_register_task(self):
