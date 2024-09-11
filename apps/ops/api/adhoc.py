@@ -30,7 +30,7 @@ class AdHocViewSet(JMSBulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        if is_true(self.request.query_params.get('only_myself')):
+        if is_true(self.request.query_params.get('only_mine')):
             queryset = queryset.filter(creator=user)
         else:
             queryset = queryset.filter(Q(creator=user) | Q(scope=Scope.public))
