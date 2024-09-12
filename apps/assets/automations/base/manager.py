@@ -170,6 +170,7 @@ class BasePlaybookManager:
             result = self.write_cert_to_file(
                 os.path.join(cert_dir, f), specific.get(f)
             )
+            os.chmod(result, 0o600)
             host['jms_asset']['secret_info'][f] = result
         return host
 

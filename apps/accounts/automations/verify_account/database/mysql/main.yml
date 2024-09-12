@@ -5,7 +5,7 @@
     check_ssl: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
-    ssl_key: "{{ jms_asset.secret_info.client_cert | default('') }}"
+    ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
 
   tasks:
     - name: Verify account
