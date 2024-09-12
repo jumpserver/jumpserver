@@ -78,7 +78,7 @@ class LDAPConfig(object):
         self.bind_dn = getattr(settings, f"{prefix}_BIND_DN")
         self.password = getattr(settings, f"{prefix}_BIND_PASSWORD")
         self.use_ssl = getattr(settings, f"{prefix}_START_TLS")
-        self.search_ou = getattr(settings, f"{prefix})_SEARCH_OU")
+        self.search_ou = getattr(settings, f"{prefix}_SEARCH_OU")
         self.search_filter = getattr(settings, f"{prefix}_SEARCH_FILTER")
         self.attr_map = getattr(settings, f"{prefix}_USER_ATTR_MAP")
         self.auth_ldap = getattr(settings, prefix)

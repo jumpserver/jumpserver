@@ -117,11 +117,14 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         data = json.loads(text_data)
         msg_type = data.pop('msg_type', 'testing_config')
         try:
-            tool_func = getattr(self, f'run_{msg_type.lower()}')
-            ok, msg = await asyncio.to_thread(tool_func, data)
+            ok, msg = await asyncio.to_thread(self.run_func, f'run_{msg_type.lower()}', data)
             await self.send_msg(ok, msg)
         except Exception as error:
             await self.send_msg(msg='Exception: %s' % error)
+
+    def run_func(self, func_name, data):
+        with translation.override(getattr(self.scope['user'], 'lang', settings.LANGUAGE_CODE)):
+            return getattr(self, func_name)(data)
 
     async def send_msg(self, ok=True, msg=''):
         await self.send_json({'ok': ok, 'msg': f'{msg}'})
@@ -186,11 +189,6 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         return ok, msg
 
     def run_import_user(self, data):
-        lang = getattr(self.scope['user'], 'lang', settings.LANGUAGE_CODE)
-        with translation.override(lang):
-            return self._run_import_user(data)
-
-    def _run_import_user(self, data):
         ok = False
         org_ids = data.get('org_ids')
         username_list = data.get('username_list', [])
