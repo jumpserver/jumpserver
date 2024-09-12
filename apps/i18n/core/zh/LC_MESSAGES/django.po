@@ -4886,7 +4886,7 @@ msgstr "命令执行已禁用"
 #: ops/const.py:86
 msgctxt "scope"
 msgid "Public"
-msgstr "公有
+msgstr "公有"
 
 #: ops/const.py:87
 msgid "Private"
