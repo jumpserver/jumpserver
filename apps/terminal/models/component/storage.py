@@ -127,9 +127,7 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
         logger.error(f"Command storage `{self.type}` not support")
         return Command.objects.none()
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(
             force_insert=force_insert,
             force_update=force_update,
@@ -205,10 +203,10 @@ class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
         src = os.path.join(settings.BASE_DIR, "common", target)
         return storage.is_valid(src, target)
 
-    def is_use(self):
+    def used_by(self):
         return Terminal.objects.filter(
             replay_storage=self.name, is_deleted=False
-        ).exists()
+        )
 
     class Meta:
         verbose_name = _("Replay storage")
