@@ -2,16 +2,43 @@
 
 from django.conf import settings
 from django.db import migrations, models
+from orgs.models import Organization
+
+
+def migrate_ops_adhoc_and_playbook_name(apps, schema_editor):
+    Adhoc = apps.get_model('ops', 'adhoc')
+    Playbook = apps.get_model('ops', 'playbook')
+    adhocs_to_update = Adhoc.objects.exclude(org_id=Organization.DEFAULT_ID)
+    for adhoc in adhocs_to_update:
+        try:
+            org = Organization.objects.get(id=adhoc.org_id)
+            suffix = f'({org.name})'
+        except Exception as e:
+            suffix = f'({str(adhoc.id)[:6]})'
+
+        adhoc.name = f'{adhoc.name}{suffix}'
+    Adhoc.objects.bulk_update(adhocs_to_update, ['name'])
+
+    playbooks_to_update = Playbook.objects.exclude(org_id=Organization.DEFAULT_ID)
+    for playbook in playbooks_to_update:
+        try:
+            org = Organization.objects.get(id=playbook.org_id)
+            suffix = f'({org.name})'
+        except Exception as e:
+            suffix = f'({str(playbook.id)[:6]})'
+        playbook.name = f'{playbook.name}{suffix}'
+        playbook.save()
+    Playbook.objects.bulk_update(playbooks_to_update, ['name'])
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('ops', '0002_celerytask'),
     ]
 
     operations = [
+        migrations.RunPython(migrate_ops_adhoc_and_playbook_name),
         migrations.AlterUniqueTogether(
             name='adhoc',
             unique_together={('name', 'creator')},
