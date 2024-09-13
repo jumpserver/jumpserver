@@ -178,7 +178,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             instance.save()
             return instance, 'updated'
         else:
-            raise serializers.ValidationError('Account already exists')
+            raise serializers.ValidationError(_('Account already exists'))
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
