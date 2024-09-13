@@ -50,37 +50,33 @@ LOGGING = {
         'file': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'main',
             'filename': JUMPSERVER_LOG_FILE,
         },
         'ansible_logs': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'main',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
             'filename': ANSIBLE_LOG_FILE,
         },
         'drf_exception': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'exception',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
             'filename': DRF_EXCEPTION_LOG_FILE,
         },
         'unexpected_exception': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'exception',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
             'filename': UNEXPECTED_EXCEPTION_LOG_FILE,
         },
         'syslog': {
@@ -155,3 +151,4 @@ if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR, mode=0o755)
+
