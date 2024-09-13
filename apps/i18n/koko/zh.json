@@ -62,5 +62,9 @@
     "VerifyCode": "验证码",
     "WaitFileTransfer": "等待文件传输结束",
     "WebSocketClosed": "WebSocket 已关闭",
-    "Writable": "读写"
+    "Reconnect": "重新连接",
+    "Close Current Tab": "关闭当前",
+    "Close All Tabs": "关闭所有",
+    "Clone Connect": "复制窗口",
+    "Custom Setting": "自定义设置"
 }

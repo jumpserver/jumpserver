@@ -195,10 +195,8 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 @shared_task(
     verbose_name=_('Clean up expired user sessions'),
     description=_(
-        """
-        After logging in via the web, a user session record is created. At 2 a.m. every day, 
-        the system cleans up inactive user devices
-        """
+        """After logging in via the web, a user session record is created. At 2 a.m. every day, 
+        the system cleans up inactive user devices"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)

@@ -131,12 +131,10 @@ def clean_expired_session_period():
 @shared_task(
     verbose_name=_('Clean audits session task log'),
     description=_(
-        """
-        Since the system generates login logs, operation logs, file upload logs, activity 
+        """Since the system generates login logs, operation logs, file upload logs, activity 
         logs, Celery execution logs, session recordings, command records, and password change 
         logs, it will perform cleanup of records that exceed the time limit according to the 
-        'Tasks - Regular clean-up' in the system settings at 2 a.m daily
-        """
+        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
@@ -155,10 +153,8 @@ def clean_audits_log_period():
 @shared_task(
     verbose_name=_('Upload FTP file to external storage'),
     description=_(
-        """
-        If SERVER_REPLAY_STORAGE is configured, files uploaded through file management will be 
-        synchronized to external storage
-        """
+        """If SERVER_REPLAY_STORAGE is configured, files uploaded through file management will be 
+        synchronized to external storage"""
     )
 )
 def upload_ftp_file_to_external_storage(ftp_log_id, file_name):

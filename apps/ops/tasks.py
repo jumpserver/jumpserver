@@ -1,6 +1,5 @@
 # coding: utf-8
 import datetime
-import time
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
@@ -13,7 +12,7 @@ from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from ops.celery import app
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
-    register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
+    register_as_period_task, after_app_ready_start
 )
 from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
@@ -52,9 +51,7 @@ def _run_ops_job_execution(execution):
     verbose_name=_("Run ansible task"),
     activity_callback=job_task_activity_callback,
     description=_(
-        """
-        Execute scheduled adhoc and playbooks, periodically invoking the task for execution
-        """
+        "Execute scheduled adhoc and playbooks, periodically invoking the task for execution"
     )
 )
 def run_ops_job(job_id):
@@ -85,9 +82,7 @@ def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
     verbose_name=_("Run ansible task execution"),
     activity_callback=job_execution_task_activity_callback,
     description=_(
-        """
-        Execute the task when manually adhoc or playbooks
-        """
+        "Execute the task when manually adhoc or playbooks"
     )
 )
 def run_ops_job_execution(execution_id, **kwargs):
@@ -103,9 +98,7 @@ def run_ops_job_execution(execution_id, **kwargs):
 @shared_task(
     verbose_name=_('Clear celery periodic tasks'),
     description=_(
-        """
-        At system startup, clean up celery tasks that no longer exist
-        """
+        "At system startup, clean up celery tasks that no longer exist"
     )
 )
 @after_app_ready_start
@@ -131,11 +124,9 @@ def clean_celery_periodic_tasks():
 @shared_task(
     verbose_name=_('Create or update periodic tasks'),
     description=_(
-        """
-        With version iterations, new tasks may be added, or task names and execution times may 
+        """With version iterations, new tasks may be added, or task names and execution times may 
         be modified. Therefore, upon system startup, tasks will be registered or the parameters 
-        of scheduled tasks will be updated
-        """
+        of scheduled tasks will be updated"""
     )
 )
 @after_app_ready_start
@@ -148,10 +139,8 @@ def create_or_update_registered_periodic_tasks():
 @shared_task(
     verbose_name=_("Periodic check service performance"),
     description=_(
-        """
-        Check every hour whether each component is offline and whether the CPU, memory, 
-        and disk usage exceed the thresholds, and send an alert message to the administrator
-        """
+        """Check every hour whether each component is offline and whether the CPU, memory, 
+        and disk usage exceed the thresholds, and send an alert message to the administrator"""
     )
 )
 @register_as_period_task(interval=3600)
@@ -162,12 +151,10 @@ def check_server_performance_period():
 @shared_task(
     verbose_name=_("Clean up unexpected jobs"),
     description=_(
-        """
-        Due to exceptions caused by executing adhoc and playbooks in the Job Center, 
+        """Due to exceptions caused by executing adhoc and playbooks in the Job Center, 
         which result in the task status not being updated, the system will clean up abnormal jobs 
         that have not been completed for more than 3 hours every hour and mark these tasks as 
-        failed
-        """
+        failed"""
     )
 )
 @register_as_period_task(interval=3600)
@@ -179,12 +166,10 @@ def clean_up_unexpected_jobs():
 @shared_task(
     verbose_name=_('Clean job_execution db record'),
     description=_(
-        """
-        Due to the execution of adhoc and playbooks in the Job Center, execution records will 
+        """Due to the execution of adhoc and playbooks in the Job Center, execution records will 
         be generated. The system will clean up records that exceed the retention period every day 
         at 2 a.m., based on the configuration of 'System Settings - Tasks - Regular clean-up - 
-        Job execution retention days'
-        """
+        Job execution retention days'"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)

@@ -62,5 +62,10 @@
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "Reconnect": "Reconnect",
+    "Close Current Tab": "Close Current Tab",
+    "Close All Tabs": "Close All Tabs",
+    "Clone Connect": "Clone Connect",
+    "Custom Setting": "Custom Setting"
 }

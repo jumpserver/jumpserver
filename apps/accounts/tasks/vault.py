@@ -31,10 +31,7 @@ def sync_instance(instance):
 @shared_task(
     verbose_name=_('Sync secret to vault'),
     description=_(
-        """
-        When clicking 'Sync' in 'System Settings - Features - Account Storage' this task will 
-        be executed
-        """
+        "When clicking 'Sync' in 'System Settings - Features - Account Storage' this task will be executed"
     )
 )
 def sync_secret_to_vault():

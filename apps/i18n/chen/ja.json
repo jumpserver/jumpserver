@@ -9,6 +9,7 @@
     "CommandReviewMessage": "入力されたコマンドはレビュー後に実行されます。レビューリクエストを送信しますか?",
     "CommandReviewRejectBy": "コマンドレビューが%sに拒否されました",
     "CommandReviewTimeoutError": "コマンドレビューがタイムアウトしました",
+    "CommandWarningDialogMessage": "あなたが実行したコマンドにはリスクがあり、警告通知が管理者に送信されます。続行しますか？",
     "Confirm": "確認",
     "ConnectError": "接続に失敗しました",
     "ConnectSuccess": "接続に成功しました",
@@ -22,6 +23,7 @@
     "ErrorMessage": "エラーメッセージ",
     "ExecuteError": "実行に失敗しました",
     "ExecuteSuccess": "実行に成功しました",
+    "ExecutionCanceled": "実行がキャンセルされました",
     "ExportALL": "すべてのデータをエクスポート",
     "ExportAll": "すべてエクスポート",
     "ExportCurrent": "現在のページをエクスポート",
@@ -67,5 +69,6 @@
     "Version": "バージョン",
     "ViewData": "データを見る",
     "WaitCommandReviewMessage": "レビューリクエストが送信されました。レビュー結果をお待ちください",
+    "Warning": "警告",
     "initializingDatasourceFailedMessage": "接続に失敗しました。データベース接続設定が正しいか確認してください"
 }

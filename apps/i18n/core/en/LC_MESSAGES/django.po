@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 16:05+0800\n"
+"POT-Creation-Date: 2024-09-13 17:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,9 +125,10 @@ msgstr ""
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
 #: settings/serializers/auth/ldap.py:26 settings/serializers/auth/ldap.py:52
-#: settings/serializers/msg.py:37 settings/serializers/terminal.py:28
-#: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
-#: users/forms/profile.py:21 users/serializers/user.py:144
+#: settings/serializers/auth/ldap_ha.py:34 settings/serializers/msg.py:37
+#: settings/serializers/terminal.py:28 terminal/serializers/storage.py:123
+#: terminal/serializers/storage.py:142 users/forms/profile.py:21
+#: users/serializers/user.py:144
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -208,8 +209,8 @@ msgstr ""
 msgid "Verify account"
 msgstr ""
 
-#: accounts/const/automation.py:27 accounts/tasks/remove_account.py:24
-#: accounts/tasks/remove_account.py:33
+#: accounts/const/automation.py:27 accounts/tasks/remove_account.py:25
+#: accounts/tasks/remove_account.py:38
 msgid "Remove account"
 msgstr ""
 
@@ -311,7 +312,7 @@ msgid "Pending"
 msgstr ""
 
 #: accounts/const/vault.py:8 assets/const/category.py:12
-#: assets/models/asset/database.py:9 assets/models/asset/database.py:24
+#: assets/models/asset/database.py:10 assets/models/asset/database.py:29
 msgid "Database"
 msgstr ""
 
@@ -459,7 +460,7 @@ msgstr ""
 
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:88 ops/models/job.py:242
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:242
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:25
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -471,7 +472,7 @@ msgstr ""
 
 #: accounts/models/automations/backup_account.py:123
 #: authentication/templates/authentication/_msg_oauth_bind.html:11
-#: notifications/notifications.py:194
+#: notifications/notifications.py:199
 #: settings/templates/ldap/_msg_import_ldap_user.html:3
 msgid "Time"
 msgstr ""
@@ -550,7 +551,8 @@ msgstr ""
 #: accounts/models/automations/gather_account.py:58
 #: accounts/serializers/account/backup.py:40
 #: accounts/serializers/automations/change_secret.py:58
-#: settings/serializers/auth/ldap.py:100 settings/serializers/msg.py:45
+#: settings/serializers/auth/ldap.py:100
+#: settings/serializers/auth/ldap_ha.py:82 settings/serializers/msg.py:45
 msgid "Recipient"
 msgstr "Recipients"
 
@@ -572,7 +574,7 @@ msgstr ""
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:89 ops/models/job.py:243
+#: ops/models/celery.py:90 ops/models/job.py:243
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr ""
@@ -634,7 +636,7 @@ msgid "Address login"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:44
-#: accounts/tasks/gather_accounts.py:29
+#: accounts/tasks/gather_accounts.py:30
 msgid "Gather asset accounts"
 msgstr ""
 
@@ -708,8 +710,8 @@ msgstr ""
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:169 labels/models.py:11
-#: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
-#: ops/models/celery.py:80 ops/models/job.py:142 ops/models/playbook.py:28
+#: ops/mixin.py:28 ops/models/adhoc.py:19 ops/models/celery.py:15
+#: ops/models/celery.py:81 ops/models/job.py:142 ops/models/playbook.py:30
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 settings/models.py:35 settings/models.py:184
@@ -879,7 +881,7 @@ msgstr ""
 msgid "Has secret"
 msgstr ""
 
-#: accounts/serializers/account/account.py:272 ops/models/celery.py:83
+#: accounts/serializers/account/account.py:272 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
 msgid "State"
@@ -1027,8 +1029,8 @@ msgid ""
 msgstr ""
 
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
-#: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:26
-#: ops/models/job.py:158 ops/models/playbook.py:31 rbac/models/role.py:37
+#: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
+#: ops/models/job.py:158 ops/models/playbook.py:33 rbac/models/role.py:37
 #: settings/models.py:40 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:25
@@ -1111,47 +1113,101 @@ msgstr ""
 msgid "Delete account: %s"
 msgstr ""
 
-#: accounts/tasks/automation.py:31
+#: accounts/tasks/automation.py:32
 msgid "Account execute automation"
 msgstr ""
 
-#: accounts/tasks/automation.py:57 accounts/tasks/automation.py:62
+#: accounts/tasks/automation.py:35
+msgid ""
+"Unified execution entry for account automation tasks: when the system "
+"performs tasks \n"
+"        such as account push, password change, account verification, account "
+"collection, \n"
+"        and gateway account verification, all tasks are executed through "
+"this unified entry"
+msgstr ""
+
+#: accounts/tasks/automation.py:64 accounts/tasks/automation.py:72
 msgid "Execute automation record"
 msgstr ""
 
-#: accounts/tasks/automation.py:86
+#: accounts/tasks/automation.py:67
+msgid "When manually executing password change records, this task is used"
+msgstr ""
+
+#: accounts/tasks/automation.py:96
 msgid "Clean change secret and push record period"
 msgstr ""
 
-#: accounts/tasks/automation.py:87
-msgid "Clean change secret and push record period description"
+#: accounts/tasks/automation.py:98
+msgid ""
+"The system will periodically clean up unnecessary password change and push "
+"records, \n"
+"        including their associated change tasks, execution logs, assets, and "
+"accounts. When any \n"
+"        of these associated items are deleted, the corresponding password "
+"change and push records \n"
+"        become invalid. Therefore, to maintain a clean and efficient "
+"database, the system will \n"
+"        clean up expired records at 2 a.m daily, based on the interval "
+"specified by \n"
+"        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. "
+"This periodic cleanup \n"
+"        mechanism helps free up storage space and enhances the security and "
+"overall performance \n"
+"        of data management"
 msgstr ""
-"The system will periodically clean up unnecessary change secret records and "
-"push records, including those associated with change tasks, execution "
-"records, assets, and accounts. When any of these associated items are "
-"deleted, the corresponding change secret and push records become invalid. "
-"Therefore, to maintain a tidy and efficient database, the system "
-"automatically cleans up these invalid records every 180 days by default. "
-"This regular cleanup process helps free up storage space and improves the "
-"security and overall performance of data management."
 
-#: accounts/tasks/backup_account.py:25
+#: accounts/tasks/backup_account.py:26
 msgid "Execute account backup plan"
 msgstr ""
 
-#: accounts/tasks/gather_accounts.py:34
+#: accounts/tasks/backup_account.py:29
+msgid "When performing scheduled or manual account backups, this task is used"
+msgstr ""
+
+#: accounts/tasks/gather_accounts.py:32 assets/tasks/automation.py:27
+#: orgs/tasks.py:11 terminal/tasks.py:33
+msgid "Unused"
+msgstr ""
+
+#: accounts/tasks/gather_accounts.py:36
 msgid "Gather assets accounts"
 msgstr ""
 
-#: accounts/tasks/push_account.py:15 accounts/tasks/push_account.py:23
+#: accounts/tasks/push_account.py:16 accounts/tasks/push_account.py:27
 msgid "Push accounts to assets"
 msgstr ""
 
-#: accounts/tasks/remove_account.py:44
+#: accounts/tasks/push_account.py:19
+msgid ""
+"When creating or modifying an account requires account push, this task is "
+"executed"
+msgstr ""
+
+#: accounts/tasks/remove_account.py:28
+msgid ""
+"When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered "
+"accounts' this \n"
+"        task will be executed"
+msgstr ""
+
+#: accounts/tasks/remove_account.py:50
 msgid "Clean historical accounts"
 msgstr ""
 
-#: accounts/tasks/remove_account.py:76
+#: accounts/tasks/remove_account.py:52
+msgid ""
+"Each time an asset account is updated, a historical account is generated, so "
+"it is \n"
+"        necessary to clean up the asset account history. The system will "
+"clean up excess account \n"
+"        records at 2 a.m. daily based on the configuration in the \"System "
+"settings - Features - \n"
+"        Account storage - Record limit"
+msgstr ""
+
+#: accounts/tasks/remove_account.py:89
 msgid "Remove historical accounts that are out of range."
 msgstr ""
 
@@ -1159,15 +1215,34 @@ msgstr ""
 msgid "Template sync info to related accounts"
 msgstr ""
 
-#: accounts/tasks/vault.py:31
+#: accounts/tasks/template.py:14
+msgid ""
+"When clicking 'Sync new secret to accounts' in 'Console - Account - "
+"Templates - \n"
+"        Accounts' this task will be executed"
+msgstr ""
+
+#: accounts/tasks/vault.py:32
 msgid "Sync secret to vault"
 msgstr ""
 
-#: accounts/tasks/verify_account.py:49
+#: accounts/tasks/vault.py:34
+msgid ""
+"When clicking 'Sync' in 'System Settings - Features - Account Storage' this "
+"task will be executed"
+msgstr ""
+
+#: accounts/tasks/verify_account.py:50
 msgid "Verify asset account availability"
 msgstr ""
 
-#: accounts/tasks/verify_account.py:55
+#: accounts/tasks/verify_account.py:53
+msgid ""
+"When clicking 'Test' in 'Console - Asset details - Accounts' this task will "
+"be executed"
+msgstr ""
+
+#: accounts/tasks/verify_account.py:59
 msgid "Verify accounts connectivity"
 msgstr ""
 
@@ -1496,32 +1571,32 @@ msgstr ""
 msgid "App Assets"
 msgstr "Assets"
 
-#: assets/automations/base/manager.py:187
+#: assets/automations/base/manager.py:188
 msgid "{} disabled"
 msgstr ""
 
-#: assets/automations/base/manager.py:250
+#: assets/automations/base/manager.py:251
 msgid "  - Platform {} ansible disabled"
 msgstr ""
 
-#: assets/automations/base/manager.py:323
+#: assets/automations/base/manager.py:324
 msgid ">>> Task preparation phase"
 msgstr ""
 
-#: assets/automations/base/manager.py:326
+#: assets/automations/base/manager.py:327
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ""
 
-#: assets/automations/base/manager.py:328
+#: assets/automations/base/manager.py:329
 msgid ">>> Start executing tasks"
 msgstr ""
 
-#: assets/automations/base/manager.py:330
+#: assets/automations/base/manager.py:331
 msgid ">>> No tasks need to be executed"
 msgstr ""
 
-#: assets/automations/base/manager.py:335
+#: assets/automations/base/manager.py:336
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ""
@@ -1663,7 +1738,11 @@ msgstr ""
 
 #: assets/const/protocol.py:53
 msgid "Netcat help text"
-msgstr "Use netcat (nc) as a proxy tool to forward connections from the proxy server to the target host. This is useful in environments that do not support the SSH native proxy option (-W), or when more flexibility and timeout control are needed."
+msgstr ""
+"Use netcat (nc) as a proxy tool to forward connections from the proxy server "
+"to the target host. This is useful in environments that do not support the "
+"SSH native proxy option (-W), or when more flexibility and timeout control "
+"are needed."
 
 #: assets/const/protocol.py:64
 msgid "SFTP root"
@@ -1733,7 +1812,7 @@ msgstr ""
 msgid "We will consider login success when we see this prompt"
 msgstr ""
 
-#: assets/const/protocol.py:145 assets/models/asset/database.py:10
+#: assets/const/protocol.py:145 assets/models/asset/database.py:11
 #: settings/serializers/msg.py:49
 msgid "Use SSL"
 msgstr ""
@@ -1870,20 +1949,24 @@ msgstr ""
 msgid "Custom asset"
 msgstr ""
 
-#: assets/models/asset/database.py:11
+#: assets/models/asset/database.py:12
 msgid "CA cert"
 msgstr ""
 
-#: assets/models/asset/database.py:12
+#: assets/models/asset/database.py:13
 msgid "Client cert"
 msgstr ""
 
-#: assets/models/asset/database.py:13
+#: assets/models/asset/database.py:14
 msgid "Client key"
 msgstr ""
 
-#: assets/models/asset/database.py:14
+#: assets/models/asset/database.py:15
 msgid "Allow invalid cert"
+msgstr ""
+
+#: assets/models/asset/database.py:18
+msgid "Postgresql SSL mode"
 msgstr ""
 
 #: assets/models/asset/gpt.py:8 settings/serializers/feature.py:92
@@ -2244,6 +2327,25 @@ msgstr ""
 msgid "Default database"
 msgstr ""
 
+#: assets/serializers/asset/database.py:23
+msgid "CA cert help text"
+msgstr ""
+"The Common Name (CN) field has been deprecated. Please use the Subject "
+"Alternative Name (SAN) field to verify the domain name according to RFC 5280 "
+"for better security."
+
+#: assets/serializers/asset/database.py:24
+msgid "Postgresql ssl model help text"
+msgstr ""
+"Prefer: I don't care about encryption, but I wish to pay the overhead of "
+"encryption if the server supports it.Require: I want my data to be "
+"encrypted, and I accept the overhead. I trust that the network will make "
+"sure I always connect to the server I want.Verify CA: I want my data "
+"encrypted, and I accept the overhead. I want to be sure that I connect to a "
+"server that I trust.Verify Full: I want my data encrypted, and I accept the "
+"overhead. I want to be sure that I connect to a server I trust, and that "
+"it's the one I specify."
+
 #: assets/serializers/asset/gpt.py:20
 msgid ""
 "If the server cannot directly connect to the API address, you need set up an "
@@ -2442,7 +2544,7 @@ msgstr ""
 msgid "Protocols is required"
 msgstr ""
 
-#: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:35
+#: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:39
 msgid "Test assets connectivity "
 msgstr ""
 
@@ -2450,19 +2552,26 @@ msgstr ""
 msgid "Gather asset hardware info"
 msgstr ""
 
-#: assets/tasks/automation.py:24
+#: assets/tasks/automation.py:25
 msgid "Asset execute automation"
 msgstr ""
 
-#: assets/tasks/gather_facts.py:21 assets/tasks/gather_facts.py:27
+#: assets/tasks/gather_facts.py:22 assets/tasks/gather_facts.py:32
 msgid "Gather assets facts"
 msgstr ""
 
-#: assets/tasks/gather_facts.py:39
+#: assets/tasks/gather_facts.py:25
+msgid ""
+"When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' "
+"this task \n"
+"        will be executed"
+msgstr ""
+
+#: assets/tasks/gather_facts.py:44
 msgid "Update assets hardware info: "
 msgstr ""
 
-#: assets/tasks/gather_facts.py:47
+#: assets/tasks/gather_facts.py:52
 msgid "Update node asset hardware information: "
 msgstr ""
 
@@ -2470,26 +2579,54 @@ msgstr ""
 msgid "Check the amount of assets under the node"
 msgstr ""
 
-#: assets/tasks/nodes_amount.py:28
+#: assets/tasks/nodes_amount.py:18
+msgid ""
+"Manually verifying asset quantities updates the asset count for nodes under "
+"the \n"
+"        current organization. This task will be called in the following two "
+"cases: when updating \n"
+"        nodes and when the number of nodes exceeds 100"
+msgstr ""
+
+#: assets/tasks/nodes_amount.py:34
 msgid ""
 "The task of self-checking is already running and cannot be started repeatedly"
 msgstr ""
 
-#: assets/tasks/nodes_amount.py:33
+#: assets/tasks/nodes_amount.py:40
 msgid "Periodic check the amount of assets under the node"
 msgstr ""
 
-#: assets/tasks/ping.py:20 assets/tasks/ping.py:26
+#: assets/tasks/nodes_amount.py:42
+msgid ""
+"Schedule the check_node_assets_amount_task to periodically update the asset "
+"count of \n"
+"        all nodes under all organizations"
+msgstr ""
+
+#: assets/tasks/ping.py:20 assets/tasks/ping.py:30
 msgid "Test assets connectivity"
 msgstr ""
 
-#: assets/tasks/ping.py:42
+#: assets/tasks/ping.py:24
+msgid ""
+"When clicking 'Test Asset Connectivity' in 'Asset Details - Basic Settings' "
+"this task will be executed"
+msgstr ""
+
+#: assets/tasks/ping.py:46
 msgid "Test if the assets under the node are connectable "
 msgstr ""
 
-#: assets/tasks/ping_gateway.py:19 assets/tasks/ping_gateway.py:25
-#: assets/tasks/ping_gateway.py:34
+#: assets/tasks/ping_gateway.py:19 assets/tasks/ping_gateway.py:29
+#: assets/tasks/ping_gateway.py:38
 msgid "Test gateways connectivity"
+msgstr ""
+
+#: assets/tasks/ping_gateway.py:23
+msgid ""
+"When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
+"be executed"
 msgstr ""
 
 #: assets/tasks/utils.py:16
@@ -2598,7 +2735,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: audits/const.py:41 ops/models/celery.py:84
+#: audits/const.py:41 ops/models/celery.py:85
 #: terminal/models/session/sharing.py:128 tickets/const.py:25
 #: xpack/plugins/cloud/const.py:67
 msgid "Finished"
@@ -2759,9 +2896,9 @@ msgstr ""
 msgid "Offline user session"
 msgstr ""
 
-#: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/celery.py:86 ops/models/job.py:151
-#: ops/models/job.py:240 ops/models/playbook.py:30
+#: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
+#: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:151
+#: ops/models/job.py:240 ops/models/playbook.py:32
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr ""
@@ -2816,7 +2953,7 @@ msgstr ""
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:78 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
-#: users/models/user/__init__.py:122 users/models/user/_source.py:18
+#: users/models/user/__init__.py:122 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr ""
 
@@ -2824,21 +2961,21 @@ msgstr ""
 #: authentication/views/login.py:90 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:128
-#: users/models/user/_source.py:20
+#: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:40 authentication/views/login.py:102
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
-#: users/models/user/__init__.py:134 users/models/user/_source.py:22
+#: users/models/user/__init__.py:134 users/models/user/_source.py:23
 msgid "Slack"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
 #: authentication/views/login.py:84 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:125
-#: users/models/user/_source.py:19
+#: users/models/user/_source.py:20
 msgid "DingTalk"
 msgstr ""
 
@@ -2853,12 +2990,30 @@ msgstr ""
 msgid "Passkey"
 msgstr ""
 
-#: audits/tasks.py:131
+#: audits/tasks.py:132
 msgid "Clean audits session task log"
 msgstr ""
 
-#: audits/tasks.py:145
+#: audits/tasks.py:134
+msgid ""
+"Since the system generates login logs, operation logs, file upload logs, "
+"activity \n"
+"        logs, Celery execution logs, session recordings, command records, "
+"and password change \n"
+"        logs, it will perform cleanup of records that exceed the time limit "
+"according to the \n"
+"        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"
+msgstr ""
+
+#: audits/tasks.py:154
 msgid "Upload FTP file to external storage"
+msgstr ""
+
+#: audits/tasks.py:156
+msgid ""
+"If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
+"management will be \n"
+"        synchronized to external storage"
 msgstr ""
 
 #: authentication/api/access_key.py:39
@@ -3254,7 +3409,7 @@ msgstr ""
 msgid "Clear phone number to disable"
 msgstr ""
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:681
+#: authentication/middleware.py:94 settings/utils/ldap.py:691
 msgid "Authentication failed (before login check failed): {}"
 msgstr ""
 
@@ -3498,8 +3653,14 @@ msgstr ""
 msgid "Is valid"
 msgstr "Is Valid"
 
-#: authentication/tasks.py:11
+#: authentication/tasks.py:13
 msgid "Clean expired session"
+msgstr ""
+
+#: authentication/tasks.py:15
+msgid ""
+"Since user logins create sessions, the system will clean up expired sessions "
+"every 24 hours"
 msgstr ""
 
 #: authentication/templates/authentication/_access_key_modal.html:6
@@ -3561,7 +3722,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:502
+#: jumpserver/conf.py:522
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -4228,16 +4389,34 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: common/tasks.py:31
+#: common/tasks.py:32
 msgid "Send email"
 msgstr ""
 
-#: common/tasks.py:58
+#: common/tasks.py:35
+msgid "This task will be executed when sending email notifications"
+msgstr ""
+
+#: common/tasks.py:65
 msgid "Send email attachment"
 msgstr ""
 
-#: common/tasks.py:80 terminal/tasks.py:58
-msgid "Upload session replay to external storage"
+#: common/tasks.py:68
+msgid ""
+"When an account password is changed or an account backup generates "
+"attachments, \n"
+"        this task needs to be executed for sending emails and handling "
+"attachments"
+msgstr ""
+
+#: common/tasks.py:94
+msgid "Upload account backup to external storage"
+msgstr ""
+
+#: common/tasks.py:96
+msgid ""
+"When performing an account backup, this task needs to be executed to "
+"external storage (SFTP)"
 msgstr ""
 
 #: common/utils/ip/geoip/utils.py:26
@@ -4253,8 +4432,15 @@ msgstr ""
 msgid "Hello %s"
 msgstr ""
 
-#: common/utils/verify_code.py:16
+#: common/utils/verify_code.py:17
 msgid "Send SMS code"
+msgstr ""
+
+#: common/utils/verify_code.py:19
+msgid ""
+"When resetting a password, forgetting a password, or verifying MFA, this "
+"task needs to \n"
+"        be executed to send SMS messages"
 msgstr ""
 
 #: common/validators.py:16
@@ -4269,16 +4455,16 @@ msgstr ""
 msgid "The mobile phone number format is incorrect"
 msgstr ""
 
-#: jumpserver/conf.py:496
+#: jumpserver/conf.py:516
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr ""
 
-#: jumpserver/conf.py:501
+#: jumpserver/conf.py:521
 msgid "Create account successfully"
 msgstr ""
 
-#: jumpserver/conf.py:503
+#: jumpserver/conf.py:523
 msgid "Your account has been created successfully"
 msgstr ""
 
@@ -4368,15 +4554,22 @@ msgstr ""
 msgid "Publish the station message"
 msgstr ""
 
-#: ops/ansible/inventory.py:106 ops/models/job.py:65
+#: notifications/notifications.py:48
+msgid ""
+"This task needs to be executed for sending internal messages for system "
+"alerts, \n"
+"        work orders, and other notifications"
+msgstr ""
+
+#: ops/ansible/inventory.py:116 ops/models/job.py:65
 msgid "No account available"
 msgstr ""
 
-#: ops/ansible/inventory.py:286
+#: ops/ansible/inventory.py:296
 msgid "Ansible disabled"
 msgstr ""
 
-#: ops/ansible/inventory.py:302
+#: ops/ansible/inventory.py:312
 msgid "Skip hosts below:"
 msgstr ""
 
@@ -4424,31 +4617,31 @@ msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr ""
 
-#: ops/api/playbook.py:39
+#: ops/api/playbook.py:50
 msgid "Currently playbook is being used in a job"
 msgstr ""
 
-#: ops/api/playbook.py:97
+#: ops/api/playbook.py:113
 msgid "Unsupported file content"
 msgstr ""
 
-#: ops/api/playbook.py:99 ops/api/playbook.py:145 ops/api/playbook.py:193
+#: ops/api/playbook.py:115 ops/api/playbook.py:161 ops/api/playbook.py:209
 msgid "Invalid file path"
 msgstr ""
 
-#: ops/api/playbook.py:171
+#: ops/api/playbook.py:187
 msgid "This file can not be rename"
 msgstr ""
 
-#: ops/api/playbook.py:190
+#: ops/api/playbook.py:206
 msgid "File already exists"
 msgstr ""
 
-#: ops/api/playbook.py:208
+#: ops/api/playbook.py:224
 msgid "File key is required"
 msgstr ""
 
-#: ops/api/playbook.py:211
+#: ops/api/playbook.py:227
 msgid "This file can not be delete"
 msgstr ""
 
@@ -4492,7 +4685,7 @@ msgstr ""
 msgid "Adhoc"
 msgstr ""
 
-#: ops/const.py:39 ops/models/job.py:149 ops/models/playbook.py:88
+#: ops/const.py:39 ops/models/job.py:149 ops/models/playbook.py:91
 msgid "Playbook"
 msgstr ""
 
@@ -4556,51 +4749,67 @@ msgstr ""
 msgid "Command execution disabled"
 msgstr ""
 
+#: ops/const.py:86
+msgctxt "scope"
+msgid "Public"
+msgstr ""
+
+#: ops/const.py:87
+msgid "Private"
+msgstr ""
+
 #: ops/exception.py:6
 msgid "no valid program entry found."
 msgstr ""
 
-#: ops/mixin.py:23 ops/mixin.py:102 settings/serializers/auth/ldap.py:73
+#: ops/mixin.py:30 ops/mixin.py:110 settings/serializers/auth/ldap.py:73
+#: settings/serializers/auth/ldap_ha.py:55
 msgid "Periodic run"
 msgstr "Periodic"
 
-#: ops/mixin.py:25 ops/mixin.py:88 ops/mixin.py:108
-#: settings/serializers/auth/ldap.py:80
+#: ops/mixin.py:32 ops/mixin.py:96 ops/mixin.py:116
+#: settings/serializers/auth/ldap.py:80 settings/serializers/auth/ldap_ha.py:62
 msgid "Interval"
 msgstr ""
 
-#: ops/mixin.py:28 ops/mixin.py:86 ops/mixin.py:105
-#: settings/serializers/auth/ldap.py:77
+#: ops/mixin.py:35 ops/mixin.py:94 ops/mixin.py:113
+#: settings/serializers/auth/ldap.py:77 settings/serializers/auth/ldap_ha.py:59
 msgid "Crontab"
 msgstr ""
 
-#: ops/mixin.py:110
+#: ops/mixin.py:118
 msgid "Run period"
 msgstr "Period"
 
-#: ops/mixin.py:119
+#: ops/mixin.py:127
 msgid "* Please enter a valid crontab expression"
 msgstr ""
 
-#: ops/mixin.py:126
+#: ops/mixin.py:134
 msgid "Range {} to {}"
 msgstr ""
 
-#: ops/mixin.py:137
+#: ops/mixin.py:145
 msgid "Require interval or crontab setting"
 msgstr ""
 
-#: ops/models/adhoc.py:21
+#: ops/models/adhoc.py:20
 msgid "Pattern"
 msgstr ""
 
-#: ops/models/adhoc.py:23 ops/models/job.py:146
+#: ops/models/adhoc.py:22 ops/models/job.py:146
 msgid "Module"
 msgstr ""
 
-#: ops/models/adhoc.py:24 ops/models/celery.py:81 ops/models/job.py:144
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:144
 #: terminal/models/component/task.py:14
 msgid "Args"
+msgstr ""
+
+#: ops/models/adhoc.py:26 ops/models/playbook.py:36 ops/serializers/mixin.py:10
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:46
+#: rbac/serializers/role.py:12 settings/serializers/auth/oauth2.py:37
+msgid "Scope"
 msgstr ""
 
 #: ops/models/base.py:19
@@ -4629,23 +4838,23 @@ msgstr ""
 msgid "Date last publish"
 msgstr ""
 
-#: ops/models/celery.py:70
+#: ops/models/celery.py:71
 msgid "Celery Task"
 msgstr ""
 
-#: ops/models/celery.py:73
+#: ops/models/celery.py:74
 msgid "Can view task monitor"
 msgstr ""
 
-#: ops/models/celery.py:82 terminal/models/component/task.py:15
+#: ops/models/celery.py:83 terminal/models/component/task.py:15
 msgid "Kwargs"
 msgstr ""
 
-#: ops/models/celery.py:87
+#: ops/models/celery.py:88
 msgid "Date published"
 msgstr ""
 
-#: ops/models/celery.py:112
+#: ops/models/celery.py:113
 msgid "Celery Task Execution"
 msgstr ""
 
@@ -4690,11 +4899,11 @@ msgstr ""
 msgid "Job Execution"
 msgstr ""
 
-#: ops/models/playbook.py:33
+#: ops/models/playbook.py:35
 msgid "CreateMethod"
 msgstr ""
 
-#: ops/models/playbook.py:34
+#: ops/models/playbook.py:37
 msgid "VCS URL"
 msgstr ""
 
@@ -4758,32 +4967,85 @@ msgstr ""
 msgid "You do not have permission for the current job."
 msgstr ""
 
-#: ops/tasks.py:50
+#: ops/tasks.py:51
 msgid "Run ansible task"
 msgstr ""
 
-#: ops/tasks.py:76
+#: ops/tasks.py:54
+msgid ""
+"Execute scheduled adhoc and playbooks, periodically invoking the task for "
+"execution"
+msgstr ""
+
+#: ops/tasks.py:82
 msgid "Run ansible task execution"
 msgstr ""
 
-#: ops/tasks.py:89
+#: ops/tasks.py:85
+msgid "Execute the task when manually adhoc or playbooks"
+msgstr ""
+
+#: ops/tasks.py:99
 msgid "Clear celery periodic tasks"
 msgstr ""
 
-#: ops/tasks.py:110
+#: ops/tasks.py:101
+msgid "At system startup, clean up celery tasks that no longer exist"
+msgstr ""
+
+#: ops/tasks.py:125
 msgid "Create or update periodic tasks"
 msgstr ""
 
-#: ops/tasks.py:118
+#: ops/tasks.py:127
+msgid ""
+"With version iterations, new tasks may be added, or task names and execution "
+"times may \n"
+"        be modified. Therefore, upon system startup, tasks will be "
+"registered or the parameters \n"
+"        of scheduled tasks will be updated"
+msgstr ""
+
+#: ops/tasks.py:140
 msgid "Periodic check service performance"
 msgstr ""
 
-#: ops/tasks.py:124
+#: ops/tasks.py:142
+msgid ""
+"Check every hour whether each component is offline and whether the CPU, "
+"memory, \n"
+"        and disk usage exceed the thresholds, and send an alert message to "
+"the administrator"
+msgstr ""
+
+#: ops/tasks.py:152
 msgid "Clean up unexpected jobs"
 msgstr ""
 
-#: ops/tasks.py:131
+#: ops/tasks.py:154
+msgid ""
+"Due to exceptions caused by executing adhoc and playbooks in the Job "
+"Center, \n"
+"        which result in the task status not being updated, the system will "
+"clean up abnormal jobs \n"
+"        that have not been completed for more than 3 hours every hour and "
+"mark these tasks as \n"
+"        failed"
+msgstr ""
+
+#: ops/tasks.py:167
 msgid "Clean job_execution db record"
+msgstr ""
+
+#: ops/tasks.py:169
+msgid ""
+"Due to the execution of adhoc and playbooks in the Job Center, execution "
+"records will \n"
+"        be generated. The system will clean up records that exceed the "
+"retention period every day \n"
+"        at 2 a.m., based on the configuration of 'System Settings - Tasks - "
+"Regular clean-up - \n"
+"        Job execution retention days'"
 msgstr ""
 
 #: ops/templates/ops/celery_task_log.html:4
@@ -4850,7 +5112,7 @@ msgstr "請選擇一個組織後再保存"
 
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
-#: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:52
+#: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:53
 #: terminal/templates/terminal/_msg_command_warning.html:21
 #: terminal/templates/terminal/_msg_session_sharing.html:14
 #: tickets/models/ticket/general.py:303 tickets/serializers/ticket/ticket.py:60
@@ -4911,7 +5173,7 @@ msgstr ""
 msgid "Asset permissions amount"
 msgstr ""
 
-#: orgs/tasks.py:9
+#: orgs/tasks.py:10
 msgid "Refresh organization cache"
 msgstr ""
 
@@ -5030,12 +5292,35 @@ msgstr ""
 msgid "Groups amount"
 msgstr ""
 
-#: perms/tasks.py:27
+#: perms/tasks.py:28
 msgid "Check asset permission expired"
 msgstr ""
 
-#: perms/tasks.py:40
+#: perms/tasks.py:30
+msgid ""
+"The cache of organizational collections, which have completed user "
+"authorization tree \n"
+"        construction, will expire. Therefore, expired collections need to be "
+"cleared from the \n"
+"        cache, and this task will be executed periodically based on the time "
+"interval specified \n"
+"        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file "
+"config.txt"
+msgstr ""
+
+#: perms/tasks.py:49
 msgid "Send asset permission expired notification"
+msgstr ""
+
+#: perms/tasks.py:51
+msgid ""
+"Check every day at 10 a.m. and send a notification message to users "
+"associated with \n"
+"        assets whose authorization is about to expire, as well as to the "
+"organization's \n"
+"        administrators, 3 days in advance, to remind them that the asset "
+"authorization will \n"
+"        expire in a few days"
 msgstr ""
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
@@ -5125,11 +5410,6 @@ msgstr ""
 
 #: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
-msgstr ""
-
-#: rbac/models/role.py:31 rbac/models/rolebinding.py:46
-#: rbac/serializers/role.py:12 settings/serializers/auth/oauth2.py:37
-msgid "Scope"
 msgstr ""
 
 #: rbac/models/role.py:46 rbac/models/rolebinding.py:52
@@ -5285,7 +5565,7 @@ msgstr ""
 msgid "Test smtp setting"
 msgstr ""
 
-#: settings/api/ldap.py:90
+#: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr ""
@@ -5383,58 +5663,62 @@ msgid "LDAP Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:14
-msgid "CAS Auth"
+msgid "LDAP Auth HA"
 msgstr ""
 
 #: settings/serializers/auth/base.py:15
-msgid "OPENID Auth"
+msgid "CAS Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:16
-msgid "SAML2 Auth"
+msgid "OPENID Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:17
-msgid "OAuth2 Auth"
+msgid "SAML2 Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:18
-msgid "RADIUS Auth"
+msgid "OAuth2 Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:19
-msgid "DingTalk Auth"
+msgid "RADIUS Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:20
-msgid "FeiShu Auth"
+msgid "DingTalk Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:21
-msgid "Lark Auth"
+msgid "FeiShu Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:22
-msgid "Slack Auth"
+msgid "Lark Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:23
-msgid "WeCom Auth"
+msgid "Slack Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:24
-msgid "SSO Auth"
+msgid "WeCom Auth"
 msgstr ""
 
 #: settings/serializers/auth/base.py:25
+msgid "SSO Auth"
+msgstr ""
+
+#: settings/serializers/auth/base.py:26
 msgid "Passkey Auth"
 msgstr ""
 
-#: settings/serializers/auth/base.py:27
+#: settings/serializers/auth/base.py:28
 msgid "Email suffix"
 msgstr ""
 
-#: settings/serializers/auth/base.py:29
+#: settings/serializers/auth/base.py:30
 msgid ""
 "After third-party user authentication is successful, if the third-party "
 "authentication service platform does not return the user's email "
@@ -5442,26 +5726,26 @@ msgid ""
 "suffix"
 msgstr ""
 
-#: settings/serializers/auth/base.py:36
+#: settings/serializers/auth/base.py:37
 msgid "Forgot Password URL"
 msgstr ""
 
-#: settings/serializers/auth/base.py:37
+#: settings/serializers/auth/base.py:38
 msgid "The URL for Forgotten Password on the user login page"
 msgstr ""
 
-#: settings/serializers/auth/base.py:40
+#: settings/serializers/auth/base.py:41
 msgid "Login redirection"
 msgstr ""
 
-#: settings/serializers/auth/base.py:42
+#: settings/serializers/auth/base.py:43
 msgid ""
 "Should an flash page be displayed before the user is redirected to third-"
 "party authentication when the administrator enables third-party redirect "
 "authentication"
 msgstr ""
 
-#: settings/serializers/auth/base.py:54
+#: settings/serializers/auth/base.py:55
 msgid ""
 "When you create a user, you associate the user to the organization of your "
 "choice. Users always belong to the Default organization."
@@ -5472,7 +5756,7 @@ msgid "CAS"
 msgstr ""
 
 #: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:44
-#: settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/ldap_ha.py:26 settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr ""
 
@@ -5499,9 +5783,10 @@ msgstr ""
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:66 settings/serializers/auth/oauth2.py:60
-#: settings/serializers/auth/oidc.py:39 settings/serializers/auth/saml2.py:35
-#: settings/serializers/auth/slack.py:18 settings/serializers/auth/wecom.py:18
+#: settings/serializers/auth/ldap.py:66 settings/serializers/auth/ldap_ha.py:48
+#: settings/serializers/auth/oauth2.py:60 settings/serializers/auth/oidc.py:39
+#: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
+#: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
 msgstr ""
 
@@ -5537,7 +5822,7 @@ msgid ""
 "name and the `value` is the FeiShu service user attribute name"
 msgstr ""
 
-#: settings/serializers/auth/lark.py:13 users/models/user/_source.py:21
+#: settings/serializers/auth/lark.py:13 users/models/user/_source.py:22
 msgid "Lark"
 msgstr ""
 
@@ -5555,48 +5840,48 @@ msgstr ""
 msgid "LDAP server URI"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap.py:48 settings/serializers/auth/ldap_ha.py:30
 msgid "Bind DN"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:49
+#: settings/serializers/auth/ldap.py:49 settings/serializers/auth/ldap_ha.py:31
 msgid "Binding Distinguished Name"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:53
+#: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
 msgid "Binding password"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:56
+#: settings/serializers/auth/ldap.py:56 settings/serializers/auth/ldap_ha.py:38
 msgid "Search OU"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:58
+#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/ldap_ha.py:40
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:62
+#: settings/serializers/auth/ldap.py:62 settings/serializers/auth/ldap_ha.py:44
 msgid "Search filter"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:63
+#: settings/serializers/auth/ldap.py:63 settings/serializers/auth/ldap_ha.py:45
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:68
+#: settings/serializers/auth/ldap.py:68 settings/serializers/auth/ldap_ha.py:50
 msgid ""
 "User attribute mapping, where the `key` is the JumpServer user attribute "
 "name and the `value` is the LDAP service user attribute name"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:84
+#: settings/serializers/auth/ldap.py:84 settings/serializers/auth/ldap_ha.py:66
 msgid "Connect timeout (s)"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:89
+#: settings/serializers/auth/ldap.py:89 settings/serializers/auth/ldap_ha.py:71
 msgid "User DN cache timeout (s)"
 msgstr ""
 
@@ -5608,8 +5893,25 @@ msgid ""
 "the user DN cache"
 msgstr ""
 
-#: settings/serializers/auth/ldap.py:97
+#: settings/serializers/auth/ldap.py:97 settings/serializers/auth/ldap_ha.py:79
 msgid "Search paged size (piece)"
+msgstr ""
+
+#: settings/serializers/auth/ldap_ha.py:23
+#: settings/serializers/auth/ldap_ha.py:85
+msgid "LDAP HA"
+msgstr ""
+
+#: settings/serializers/auth/ldap_ha.py:27
+msgid "LDAP HA server URI"
+msgstr ""
+
+#: settings/serializers/auth/ldap_ha.py:73
+msgid ""
+"Caching the User DN obtained during user login authentication can "
+"effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
+"the user OU structure has been adjusted, click Submit to clear the user DN "
+"cache"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:19
@@ -6574,12 +6876,40 @@ msgid ""
 "in the workbench"
 msgstr ""
 
-#: settings/tasks/ldap.py:28
+#: settings/tasks/ldap.py:73
 msgid "Periodic import ldap user"
 msgstr ""
 
-#: settings/tasks/ldap.py:66
+#: settings/tasks/ldap.py:75 settings/tasks/ldap.py:85
+msgid ""
+"When LDAP auto-sync is configured, this task will be invoked to synchronize "
+"users"
+msgstr ""
+
+#: settings/tasks/ldap.py:83
+msgid "Periodic import ldap ha user"
+msgstr ""
+
+#: settings/tasks/ldap.py:117
 msgid "Registration periodic import ldap user task"
+msgstr ""
+
+#: settings/tasks/ldap.py:119
+msgid ""
+"When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP "
+"sync task \n"
+"        will be re-registered or updated, and this task will be invoked"
+msgstr ""
+
+#: settings/tasks/ldap.py:133
+msgid "Registration periodic import ldap ha user task"
+msgstr ""
+
+#: settings/tasks/ldap.py:135
+msgid ""
+"When LDAP HA auto-sync parameters change, such as Crontab parameters, the "
+"LDAP HA sync task \n"
+"        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
@@ -6598,108 +6928,108 @@ msgstr ""
 msgid "No user synchronization required"
 msgstr ""
 
-#: settings/utils/ldap.py:496
+#: settings/utils/ldap.py:509
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr ""
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:520
 msgid "Host or port is disconnected: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:522
 msgid "The port is not the port of the LDAP service: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:511
+#: settings/utils/ldap.py:524
 msgid "Please add certificate: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:515 settings/utils/ldap.py:542
-#: settings/utils/ldap.py:572 settings/utils/ldap.py:600
+#: settings/utils/ldap.py:528 settings/utils/ldap.py:555
+#: settings/utils/ldap.py:585 settings/utils/ldap.py:613
 msgid "Unknown error: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:529
+#: settings/utils/ldap.py:542
 msgid "Bind DN or Password incorrect"
 msgstr ""
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:549
 msgid "Please enter Bind DN: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:551
 msgid "Please enter Password: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:540
+#: settings/utils/ldap.py:553
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:558
+#: settings/utils/ldap.py:571
 msgid "Invalid User OU or User search filter: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:589
+#: settings/utils/ldap.py:602
 msgid "LDAP User attr map not include: {}"
 msgstr ""
 
-#: settings/utils/ldap.py:596
+#: settings/utils/ldap.py:609
 msgid "LDAP User attr map is not dict"
 msgstr ""
 
-#: settings/utils/ldap.py:615
+#: settings/utils/ldap.py:628
 msgid "LDAP authentication is not enabled"
 msgstr ""
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:646
 msgid "Error (Invalid LDAP server): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:648
 msgid "Error (Invalid Bind DN): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:650
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:652
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:641
+#: settings/utils/ldap.py:654
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:643
+#: settings/utils/ldap.py:656
 msgid "Error (Unknown): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:646
+#: settings/utils/ldap.py:659
 msgid "Succeed: Match {} users"
 msgstr ""
 
-#: settings/utils/ldap.py:679
+#: settings/utils/ldap.py:689
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:693
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:685
+#: settings/utils/ldap.py:695
 msgid "Authentication failed (Unknown): {}"
 msgstr ""
 
-#: settings/utils/ldap.py:688
+#: settings/utils/ldap.py:698
 msgid "Authentication success: {}"
 msgstr ""
 
-#: settings/ws.py:203
+#: settings/ws.py:199
 msgid "No LDAP user was found"
 msgstr ""
 
-#: settings/ws.py:209
+#: settings/ws.py:205
 msgid "Total {}, success {}, failure {}"
 msgstr ""
 
@@ -6911,7 +7241,7 @@ msgstr ""
 msgid "Invalid"
 msgstr ""
 
-#: terminal/api/component/storage.py:132 terminal/tasks.py:149
+#: terminal/api/component/storage.py:132 terminal/tasks.py:187
 msgid "Test failure: {}"
 msgstr ""
 
@@ -7425,7 +7755,7 @@ msgstr ""
 msgid "Command and replay storage"
 msgstr "Storage"
 
-#: terminal/notifications.py:240 terminal/tasks.py:153
+#: terminal/notifications.py:240 terminal/tasks.py:191
 #: xpack/plugins/cloud/api.py:160
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
@@ -7871,32 +8201,88 @@ msgstr ""
 msgid "storage is null"
 msgstr ""
 
-#: terminal/tasks.py:31
+#: terminal/tasks.py:32
 msgid "Periodic delete terminal status"
 msgstr ""
 
-#: terminal/tasks.py:39
+#: terminal/tasks.py:43
 msgid "Clean orphan session"
 msgstr ""
 
-#: terminal/tasks.py:87
+#: terminal/tasks.py:45
+msgid ""
+"Check every 10 minutes for asset connection sessions that have been inactive "
+"for 3 \n"
+"        minutes and mark these sessions as completed"
+msgstr ""
+
+#: terminal/tasks.py:68
+msgid "Upload session replay to external storage"
+msgstr ""
+
+#: terminal/tasks.py:70
+msgid ""
+"If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands "
+"and \n"
+"        recordings will be uploaded to external storage"
+msgstr ""
+
+#: terminal/tasks.py:102
 msgid "Run applet host deployment"
 msgstr ""
 
-#: terminal/tasks.py:97
+#: terminal/tasks.py:105
+msgid ""
+"When deploying from the remote application publisher details page, and the "
+"'Deploy' \n"
+"        button is clicked, this task will be executed"
+msgstr ""
+
+#: terminal/tasks.py:116
 msgid "Install applet"
 msgstr ""
 
-#: terminal/tasks.py:108
-msgid "Uninstall applet"
-msgstr ""
-
 #: terminal/tasks.py:119
-msgid "Generate applet host accounts"
+msgid ""
+"When the 'Deploy' button is clicked in the 'Remote Application' section of "
+"the remote \n"
+"        application publisher details page, this task will be executed"
 msgstr ""
 
 #: terminal/tasks.py:131
+msgid "Uninstall applet"
+msgstr ""
+
+#: terminal/tasks.py:134
+msgid ""
+"When the 'Uninstall' button is clicked in the 'Remote Application' section "
+"of the \n"
+"        remote application publisher details page, this task will be executed"
+msgstr ""
+
+#: terminal/tasks.py:146
+msgid "Generate applet host accounts"
+msgstr ""
+
+#: terminal/tasks.py:149
+msgid ""
+"When a remote publishing server is created and an account needs to be "
+"created \n"
+"        automatically, this task will be executed"
+msgstr ""
+
+#: terminal/tasks.py:163
 msgid "Check command replay storage connectivity"
+msgstr ""
+
+#: terminal/tasks.py:165
+msgid ""
+"Check every day at midnight whether the external storage for commands and "
+"recordings \n"
+"        is accessible. If it is not accessible, send a notification to the "
+"recipients specified \n"
+"        in 'System Settings - Notifications - Subscription - Storage - "
+"Connectivity'"
 msgstr ""
 
 #: terminal/templates/terminal/_msg_command_alert.html:10
@@ -8689,31 +9075,79 @@ msgid ""
 "administrator."
 msgstr ""
 
-#: users/signal_handlers.py:193
+#: users/signal_handlers.py:196
 msgid "Clean up expired user sessions"
 msgstr ""
 
-#: users/tasks.py:25
+#: users/signal_handlers.py:198
+msgid ""
+"After logging in via the web, a user session record is created. At 2 a.m. "
+"every day, \n"
+"        the system cleans up inactive user devices"
+msgstr ""
+
+#: users/tasks.py:26
 msgid "Check password expired"
 msgstr ""
 
-#: users/tasks.py:39
+#: users/tasks.py:28
+msgid ""
+"Check every day at 10 AM whether the passwords of users in the system are "
+"expired, \n"
+"        and send a notification 5 days in advance"
+msgstr ""
+
+#: users/tasks.py:46
 msgid "Periodic check password expired"
 msgstr ""
 
-#: users/tasks.py:53
+#: users/tasks.py:48
+msgid ""
+"With version iterations, new tasks may be added, or task names and execution "
+"times may \n"
+"        be modified. Therefore, upon system startup, it is necessary to "
+"register or update the \n"
+"        parameters of the task that checks if passwords have expired"
+msgstr ""
+
+#: users/tasks.py:67
 msgid "Check user expired"
 msgstr ""
 
-#: users/tasks.py:70
+#: users/tasks.py:69
+msgid ""
+"Check every day at 10 AM whether the users in the system are expired, and "
+"send a \n"
+"        notification 5 days in advance"
+msgstr ""
+
+#: users/tasks.py:90
 msgid "Periodic check user expired"
 msgstr ""
 
-#: users/tasks.py:84
+#: users/tasks.py:92
+msgid ""
+"With version iterations, new tasks may be added, or task names and execution "
+"times may \n"
+"        be modified. Therefore, upon system startup, it is necessary to "
+"register or update the \n"
+"        parameters of the task that checks if users have expired"
+msgstr ""
+
+#: users/tasks.py:111
 msgid "Check unused users"
 msgstr ""
 
-#: users/tasks.py:123
+#: users/tasks.py:113
+msgid ""
+"At 2 a.m. every day, according to the configuration in \"System Settings - "
+"Security - \n"
+"        Auth security - Auto disable threshold\" users who have not logged "
+"in or whose API keys \n"
+"        have not been used for a long time will be disabled"
+msgstr ""
+
+#: users/tasks.py:157
 msgid "The user has not logged in recently and has been disabled."
 msgstr ""
 
@@ -9200,7 +9634,7 @@ msgstr ""
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:484 xpack/plugins/cloud/tasks.py:30
+#: xpack/plugins/cloud/manager.py:484 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr ""
 
@@ -9673,8 +10107,23 @@ msgstr ""
 msgid "Instance count"
 msgstr ""
 
-#: xpack/plugins/cloud/tasks.py:44
+#: xpack/plugins/cloud/tasks.py:33
+msgid ""
+"Execute this task when manually or scheduled cloud synchronization tasks are "
+"performed"
+msgstr ""
+
+#: xpack/plugins/cloud/tasks.py:50
 msgid "Period clean sync instance task execution"
+msgstr ""
+
+#: xpack/plugins/cloud/tasks.py:52
+msgid ""
+"Every day, according to the configuration in \"System Settings - Tasks - "
+"Regular \n"
+"        clean-up - Cloud sync task history retention days\" the system will "
+"clean up the execution \n"
+"        records generated by cloud synchronization"
 msgstr ""
 
 #: xpack/plugins/interface/api.py:52
@@ -9746,3 +10195,14 @@ msgstr ""
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr ""
+
+#~ msgid "Clean change secret and push record period description"
+#~ msgstr ""
+#~ "The system will periodically clean up unnecessary change secret records "
+#~ "and push records, including those associated with change tasks, execution "
+#~ "records, assets, and accounts. When any of these associated items are "
+#~ "deleted, the corresponding change secret and push records become invalid. "
+#~ "Therefore, to maintain a tidy and efficient database, the system "
+#~ "automatically cleans up these invalid records every 180 days by default. "
+#~ "This regular cleanup process helps free up storage space and improves the "
+#~ "security and overall performance of data management."

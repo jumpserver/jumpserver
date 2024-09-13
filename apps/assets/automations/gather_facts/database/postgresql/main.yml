@@ -3,7 +3,6 @@
   vars:
     ansible_python_interpreter: /opt/py3/bin/python
     check_ssl: "{{ jms_asset.spec_info.use_ssl }}"
-    check_ca: "{{ check_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
@@ -16,10 +15,10 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_db: "{{ jms_asset.spec_info.db_name }}"
-        ca_cert: "{{ ca_cert if check_ca and ca_cert | length > 0 else omit }}"
+        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        ssl_mode: "{{ 'verify-full' if check_ca else 'require' if check_ssl else 'prefer' }}"
+        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
       register: db_info
 
     - name: Define info by set_fact

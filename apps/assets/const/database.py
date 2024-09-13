@@ -1,3 +1,5 @@
+from django.db.models import TextChoices
+
 from .base import BaseType
 
 
@@ -120,3 +122,10 @@ class DatabaseTypes(BaseType):
             cls.MYSQL, cls.MARIADB, cls.POSTGRESQL,
             cls.MONGODB, cls.REDIS,
         ]
+
+
+class PostgresqlSSLMode(TextChoices):
+    PREFER = 'prefer', 'Prefer'
+    REQUIRE = 'require', 'Require'
+    VERIFY_CA = 'verify-ca', 'Verify CA'
+    VERIFY_FULL = 'verify-full', 'Verify Full'

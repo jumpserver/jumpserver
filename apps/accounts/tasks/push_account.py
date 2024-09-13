@@ -16,9 +16,7 @@ __all__ = [
     verbose_name=_('Push accounts to assets'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None),
     description=_(
-        """
-        When creating or modifying an account requires account push, this task is executed
-        """
+        "When creating or modifying an account requires account push, this task is executed"
     )
 )
 def push_accounts_to_assets_task(account_ids, params=None):

@@ -16,9 +16,14 @@ class DatabaseSerializer(AssetSerializer):
         model = Database
         extra_fields = [
             'db_name', 'use_ssl', 'ca_cert', 'client_cert',
-            'client_key', 'allow_invalid_cert'
+            'client_key', 'allow_invalid_cert', 'pg_ssl_mode'
         ]
         fields = AssetSerializer.Meta.fields + extra_fields
+        extra_kwargs = {
+            'ca_cert': {'help_text': _('CA cert help text')},
+            'pg_ssl_mode': {'help_text': _('Postgresql ssl model help text')},
+        }
+        extra_kwargs.update(AssetSerializer.Meta.extra_kwargs)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -25,10 +25,8 @@ logger = get_logger(__file__)
 @shared_task(
     verbose_name=_('Check password expired'),
     description=_(
-        """
-        Check every day at 10 AM whether the passwords of users in the system are expired, 
-        and send a notification 5 days in advance
-        """
+        """Check every day at 10 AM whether the passwords of users in the system are expired, 
+        and send a notification 5 days in advance"""
     )
 )
 def check_password_expired():
@@ -47,11 +45,9 @@ def check_password_expired():
 @shared_task(
     verbose_name=_('Periodic check password expired'),
     description=_(
-        """
-        With version iterations, new tasks may be added, or task names and execution times may 
+        """With version iterations, new tasks may be added, or task names and execution times may 
         be modified. Therefore, upon system startup, it is necessary to register or update the 
-        parameters of the task that checks if passwords have expired
-        """
+        parameters of the task that checks if passwords have expired"""
     )
 )
 @after_app_ready_start
@@ -70,10 +66,8 @@ def check_password_expired_periodic():
 @shared_task(
     verbose_name=_('Check user expired'),
     description=_(
-        """
-        Check every day at 10 AM whether the users in the system are expired, and send a 
-        notification 5 days in advance
-        """
+        """Check every day at 10 AM whether the users in the system are expired, and send a 
+        notification 5 days in advance"""
     )
 )
 def check_user_expired():
@@ -95,11 +89,9 @@ def check_user_expired():
 @shared_task(
     verbose_name=_('Periodic check user expired'),
     description=_(
-        """
-        With version iterations, new tasks may be added, or task names and execution times may 
+        """With version iterations, new tasks may be added, or task names and execution times may 
         be modified. Therefore, upon system startup, it is necessary to register or update the 
-        parameters of the task that checks if users have expired
-        """
+        parameters of the task that checks if users have expired"""
     )
 )
 @after_app_ready_start
@@ -118,11 +110,9 @@ def check_user_expired_periodic():
 @shared_task(
     verbose_name=_('Check unused users'),
     description=_(
-        """
-        At 2 a.m. every day, according to the configuration in "System Settings - Security - 
+        """At 2 a.m. every day, according to the configuration in "System Settings - Security - 
         Auth security - Auto disable threshold" users who have not logged in or whose API keys 
-        have not been used for a long time will be disabled
-        """
+        have not been used for a long time will be disabled"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_PM_TWO)
