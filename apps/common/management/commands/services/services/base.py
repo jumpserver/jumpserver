@@ -59,7 +59,8 @@ class BaseService(object):
 
     @property
     def log_filepath(self):
-        return os.path.join(LOG_DIR, self.log_filename)
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+        return os.path.join(LOG_DIR, date, self.log_filename)
 
     @property
     def log_file(self):
@@ -156,7 +157,7 @@ class BaseService(object):
         self._check()
         if not self.is_running:
             self._restart()
-        self._rotate_log()
+        self._cleanup_expired_log_dir()
 
     def _check(self):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -181,27 +182,14 @@ class BaseService(object):
         logging.info(f'> Find {self.name} stopped, retry {self.retry}, {self.pid}')
         self.start()
 
-    def _rotate_log(self):
+    def _cleanup_expired_log_dir(self):
         now = datetime.datetime.now()
         _time = now.strftime('%H:%M')
         if _time != '23:59':
             return
-
-        backup_date = now.strftime('%Y-%m-%d')
-        backup_log_dir = os.path.join(self.log_dir, backup_date)
-        if not os.path.exists(backup_log_dir):
-            os.mkdir(backup_log_dir)
-
-        backup_log_path = os.path.join(backup_log_dir, self.log_filename)
-        if os.path.isfile(self.log_filepath) and not os.path.isfile(backup_log_path):
-            logging.info(f'Rotate log file: {self.log_filepath} => {backup_log_path}')
-            shutil.copy(self.log_filepath, backup_log_path)
-            with open(self.log_filepath, 'w') as f:
-                pass
 
         to_delete_date = now - datetime.timedelta(days=self.LOG_KEEP_DAYS)
         to_delete_dir = os.path.join(LOG_DIR, to_delete_date.strftime('%Y-%m-%d'))
         if os.path.exists(to_delete_dir):
             logging.info(f'Remove old log: {to_delete_dir}')
             shutil.rmtree(to_delete_dir, ignore_errors=True)
-    # -- end action --
