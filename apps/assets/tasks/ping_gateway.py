@@ -20,10 +20,7 @@ __all__ = [
     queue='ansible',
     activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
     description=_(
-        """
-        When clicking 'Test Connection' in 'Domain Details - Gateway' this task will be 
-        executed
-        """
+        "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will be executed"
     )
 )
 def test_gateways_connectivity_task(asset_ids, org_id, local_port, task_name=None):

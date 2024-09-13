@@ -42,10 +42,8 @@ def delete_terminal_status_period():
 @shared_task(
     verbose_name=_('Clean orphan session'),
     description=_(
-        """
-        Check every 10 minutes for asset connection sessions that have been inactive for 3 
-        minutes and mark these sessions as completed
-        """
+        """Check every 10 minutes for asset connection sessions that have been inactive for 3 
+        minutes and mark these sessions as completed"""
     )
 )
 @register_as_period_task(interval=600)
@@ -69,10 +67,8 @@ def clean_orphan_session():
 @shared_task(
     verbose_name=_('Upload session replay to external storage'),
     description=_(
-        """
-        If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and 
-        recordings will be uploaded to external storage
-        """
+        """If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and 
+        recordings will be uploaded to external storage"""
     )
 )
 def upload_session_replay_to_external_storage(session_id):
@@ -106,10 +102,8 @@ def upload_session_replay_to_external_storage(session_id):
     verbose_name=_('Run applet host deployment'),
     activity_callback=lambda self, did, *args, **kwargs: ([did],),
     description=_(
-        """
-        When deploying from the remote application publisher details page, and the 'Deploy' 
-        button is clicked, this task will be executed
-        """
+        """When deploying from the remote application publisher details page, and the 'Deploy' 
+        button is clicked, this task will be executed"""
     )
 )
 def run_applet_host_deployment(did, install_applets):
@@ -122,10 +116,8 @@ def run_applet_host_deployment(did, install_applets):
     verbose_name=_('Install applet'),
     activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,),
     description=_(
-        """
-        When the 'Deploy' button is clicked in the 'Remote Application' section of the remote 
-        application publisher details page, this task will be executed
-        """
+        """When the 'Deploy' button is clicked in the 'Remote Application' section of the remote 
+        application publisher details page, this task will be executed"""
     )
 )
 def run_applet_host_deployment_install_applet(ids, applet_id):
@@ -139,10 +131,8 @@ def run_applet_host_deployment_install_applet(ids, applet_id):
     verbose_name=_('Uninstall applet'),
     activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,),
     description=_(
-        """
-        When the 'Uninstall' button is clicked in the 'Remote Application' section of the 
-        remote application publisher details page, this task will be executed
-        """
+        """When the 'Uninstall' button is clicked in the 'Remote Application' section of the 
+        remote application publisher details page, this task will be executed"""
     )
 )
 def run_applet_host_deployment_uninstall_applet(ids, applet_id):
@@ -156,10 +146,8 @@ def run_applet_host_deployment_uninstall_applet(ids, applet_id):
     verbose_name=_('Generate applet host accounts'),
     activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],),
     description=_(
-        """
-        When a remote publishing server is created and an account needs to be created 
-        automatically, this task will be executed
-        """
+        """When a remote publishing server is created and an account needs to be created 
+        automatically, this task will be executed"""
     )
 )
 def applet_host_generate_accounts(host_id):
@@ -174,11 +162,9 @@ def applet_host_generate_accounts(host_id):
 @shared_task(
     verbose_name=_('Check command replay storage connectivity'),
     description=_(
-        """
-        Check every day at midnight whether the external storage for commands and recordings 
+        """Check every day at midnight whether the external storage for commands and recordings 
         is accessible. If it is not accessible, send a notification to the recipients specified 
-        in 'System Settings - Notifications - Subscription - Storage - Connectivity'
-        """
+        in 'System Settings - Notifications - Subscription - Storage - Connectivity'"""
     )
 )
 @register_as_period_task(crontab='0 0 * * *')

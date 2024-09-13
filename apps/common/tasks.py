@@ -1,10 +1,10 @@
 import os
 
+import jms_storage
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
-import jms_storage
 
 from .utils import get_logger
 
@@ -32,9 +32,7 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
     verbose_name=_("Send email"),
     activity_callback=task_activity_callback,
     description=_(
-        """
-        This task will be executed when sending email notifications
-        """
+        "This task will be executed when sending email notifications"
     )
 )
 def send_mail_async(*args, **kwargs):
@@ -67,10 +65,8 @@ def send_mail_async(*args, **kwargs):
     verbose_name=_("Send email attachment"),
     activity_callback=task_activity_callback,
     description=_(
-        """
-        When an account password is changed or an account backup generates attachments, 
-        this task needs to be executed for sending emails and handling attachments
-        """
+        """When an account password is changed or an account backup generates attachments, 
+        this task needs to be executed for sending emails and handling attachments"""
     )
 )
 def send_mail_attachment_async(subject, message, recipient_list, attachment_list=None):
@@ -97,10 +93,7 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
 @shared_task(
     verbose_name=_('Upload account backup to external storage'),
     description=_(
-        """
-        When performing an account backup, this task needs to be executed to external storage 
-        (SFTP)
-        """
+        "When performing an account backup, this task needs to be executed to external storage (SFTP)"
     )
 )
 def upload_backup_to_obj_storage(recipient, upload_file):

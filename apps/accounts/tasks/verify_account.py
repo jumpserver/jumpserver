@@ -50,9 +50,7 @@ def verify_accounts_connectivity_util(accounts, task_name):
     verbose_name=_('Verify asset account availability'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None),
     description=_(
-        """
-        When clicking 'Test' in 'Console - Asset details - Accounts' this task will be executed
-        """
+        "When clicking 'Test' in 'Console - Asset details - Accounts' this task will be executed"
     )
 )
 def verify_accounts_connectivity_task(account_ids):

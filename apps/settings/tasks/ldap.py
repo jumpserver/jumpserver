@@ -1,5 +1,6 @@
 # coding: utf-8
 import time
+
 from celery import shared_task
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -8,7 +9,7 @@ from common.utils import get_logger
 from common.utils.timezone import local_now_display
 from ops.celery.decorator import after_app_ready_start
 from ops.celery.utils import (
-    create_or_update_celery_periodic_tasks, disable_celery_periodic_task
+    create_or_update_celery_periodic_tasks
 )
 from orgs.models import Organization
 from settings.notifications import LDAPImportMessage
@@ -71,9 +72,7 @@ def perform_import(category, util_server):
 @shared_task(
     verbose_name=_('Periodic import ldap user'),
     description=_(
-        """
-        When LDAP auto-sync is configured, this task will be invoked to synchronize users
-        """
+        "When LDAP auto-sync is configured, this task will be invoked to synchronize users"
     )
 )
 def import_ldap_user():
@@ -83,9 +82,7 @@ def import_ldap_user():
 @shared_task(
     verbose_name=_('Periodic import ldap ha user'),
     description=_(
-        """
-        When LDAP auto-sync is configured, this task will be invoked to synchronize users
-        """
+        "When LDAP auto-sync is configured, this task will be invoked to synchronize users"
     )
 )
 def import_ldap_ha_user():
@@ -119,10 +116,8 @@ def register_periodic_task(task_name, task_func, interval_key, enabled_key, cron
 @shared_task(
     verbose_name=_('Registration periodic import ldap user task'),
     description=_(
-        """
-        When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP sync task 
-        will be re-registered or updated, and this task will be invoked
-        """
+        """When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP sync task 
+        will be re-registered or updated, and this task will be invoked"""
     )
 )
 @after_app_ready_start
@@ -137,10 +132,8 @@ def import_ldap_user_periodic(**kwargs):
 @shared_task(
     verbose_name=_('Registration periodic import ldap ha user task'),
     description=_(
-        """
-        When LDAP HA auto-sync parameters change, such as Crontab parameters, the LDAP HA sync task 
-        will be re-registered or updated, and this task will be invoked
-        """
+        """When LDAP HA auto-sync parameters change, such as Crontab parameters, the LDAP HA sync task 
+        will be re-registered or updated, and this task will be invoked"""
     )
 )
 @after_app_ready_start

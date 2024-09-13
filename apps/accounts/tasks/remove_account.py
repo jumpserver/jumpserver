@@ -25,10 +25,8 @@ __all__ = ['remove_accounts_task']
     verbose_name=_('Remove account'),
     activity_callback=lambda self, gather_account_ids, *args, **kwargs: (gather_account_ids, None),
     description=_(
-        """
-        When clicking "Sync deletion" in 'Console - Gather Account - Gathered accounts' this 
-        task will be executed
-        """
+        """When clicking "Sync deletion" in 'Console - Gather Account - Gathered accounts' this 
+        task will be executed"""
     )
 )
 def remove_accounts_task(gather_account_ids):
@@ -51,12 +49,10 @@ def remove_accounts_task(gather_account_ids):
 @shared_task(
     verbose_name=_('Clean historical accounts'),
     description=_(
-        """
-        Each time an asset account is updated, a historical account is generated, so it is 
+        """Each time an asset account is updated, a historical account is generated, so it is 
         necessary to clean up the asset account history. The system will clean up excess account 
         records at 2 a.m. daily based on the configuration in the "System settings - Features - 
-        Account storage - Record limit
-        """
+        Account storage - Record limit"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)

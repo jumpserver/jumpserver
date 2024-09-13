@@ -26,9 +26,7 @@ def task_activity_callback(self, pid, trigger, *args, **kwargs):
     verbose_name=_('Execute account backup plan'),
     activity_callback=task_activity_callback,
     description=_(
-        """
-        When performing scheduled or manual account backups, this task is used
-        """
+        "When performing scheduled or manual account backups, this task is used"
     )
 )
 def execute_account_backup_task(pid, trigger, **kwargs):

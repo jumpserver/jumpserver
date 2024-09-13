@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-11 18:15+0800\n"
+"POT-Creation-Date: 2024-09-13 17:38+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -209,7 +209,7 @@ msgid "Verify account"
 msgstr "验证账号"
 
 #: accounts/const/automation.py:27 accounts/tasks/remove_account.py:25
-#: accounts/tasks/remove_account.py:40
+#: accounts/tasks/remove_account.py:38
 msgid "Remove account"
 msgstr "移除账号"
 
@@ -311,7 +311,7 @@ msgid "Pending"
 msgstr "待定的"
 
 #: accounts/const/vault.py:8 assets/const/category.py:12
-#: assets/models/asset/database.py:9 assets/models/asset/database.py:24
+#: assets/models/asset/database.py:10 assets/models/asset/database.py:29
 msgid "Database"
 msgstr "数据库"
 
@@ -471,7 +471,7 @@ msgstr "开始日期"
 
 #: accounts/models/automations/backup_account.py:123
 #: authentication/templates/authentication/_msg_oauth_bind.html:11
-#: notifications/notifications.py:202
+#: notifications/notifications.py:199
 #: settings/templates/ldap/_msg_import_ldap_user.html:3
 msgid "Time"
 msgstr "时间"
@@ -1130,41 +1130,32 @@ msgstr "账号执行自动化"
 
 #: accounts/tasks/automation.py:35
 msgid ""
-"\n"
-"        Unified execution entry for account automation tasks: when the "
-"system performs tasks \n"
+"Unified execution entry for account automation tasks: when the system "
+"performs tasks \n"
 "        such as account push, password change, account verification, account "
 "collection, \n"
 "        and gateway account verification, all tasks are executed through "
-"this unified entry\n"
-"        "
+"this unified entry"
 msgstr ""
-"\n"
 "账号自动化任务统一执行入口，当系统执行账号推送，更改密码，验证账号，收集账"
 "号，验证网关账号任务时，统一通过当前任务执行"
 
-#: accounts/tasks/automation.py:66 accounts/tasks/automation.py:76
+#: accounts/tasks/automation.py:64 accounts/tasks/automation.py:72
 msgid "Execute automation record"
 msgstr "自动化执行记录"
 
-#: accounts/tasks/automation.py:69
-msgid ""
-"\n"
-"        When manually executing password change records, this task is used\n"
-"        "
-msgstr ""
-"\n"
-"当手动执行改密记录时，通过该任务执行"
+#: accounts/tasks/automation.py:67
+msgid "When manually executing password change records, this task is used"
+msgstr "当手动执行改密记录时，通过该任务执行"
 
-#: accounts/tasks/automation.py:100
+#: accounts/tasks/automation.py:96
 msgid "Clean change secret and push record period"
 msgstr "周期清理改密记录和推送记录"
 
-#: accounts/tasks/automation.py:102
+#: accounts/tasks/automation.py:98
 msgid ""
-"\n"
-"        The system will periodically clean up unnecessary password change "
-"and push records, \n"
+"The system will periodically clean up unnecessary password change and push "
+"records, \n"
 "        including their associated change tasks, execution logs, assets, and "
 "accounts. When any \n"
 "        of these associated items are deleted, the corresponding password "
@@ -1177,10 +1168,8 @@ msgid ""
 "This periodic cleanup \n"
 "        mechanism helps free up storage space and enhances the security and "
 "overall performance \n"
-"        of data management\n"
-"        "
+"        of data management"
 msgstr ""
-"\n"
 "系统会定期清理不再需要的改密记录和推送记录，包括那些关联的改密任务、执行记"
 "录、资产和账号。当这些关联项中的任意一个被删除时，对应的改密和推送记录将变为"
 "无效。因此，为了保持数据库的整洁和高效运行，根据系统配置文件 config.txt 中 "
@@ -1192,14 +1181,8 @@ msgid "Execute account backup plan"
 msgstr "执行账号备份计划"
 
 #: accounts/tasks/backup_account.py:29
-msgid ""
-"\n"
-"        When performing scheduled or manual account backups, this task is "
-"used\n"
-"        "
-msgstr ""
-"\n"
-"定时或手动执行账号备份时，通过该任务执行"
+msgid "When performing scheduled or manual account backups, this task is used"
+msgstr "定时或手动执行账号备份时，通过该任务执行"
 
 #: accounts/tasks/gather_accounts.py:32 assets/tasks/automation.py:27
 #: orgs/tasks.py:11 terminal/tasks.py:33
@@ -1210,52 +1193,41 @@ msgstr "未使用"
 msgid "Gather assets accounts"
 msgstr "收集资产上的账号"
 
-#: accounts/tasks/push_account.py:16 accounts/tasks/push_account.py:29
+#: accounts/tasks/push_account.py:16 accounts/tasks/push_account.py:27
 msgid "Push accounts to assets"
 msgstr "推送账号到资产"
 
 #: accounts/tasks/push_account.py:19
 msgid ""
-"\n"
-"        When creating or modifying an account requires account push, this "
-"task is executed\n"
-"        "
-msgstr ""
-"\n"
-"当创建账号，修改账号时，需要账号推送时执行该任务"
+"When creating or modifying an account requires account push, this task is "
+"executed"
+msgstr "当创建账号，修改账号时，需要账号推送时执行该任务"
 
 #: accounts/tasks/remove_account.py:28
 msgid ""
-"\n"
-"        When clicking \"Sync deletion\" in 'Console - Gather Account - "
-"Gathered accounts' this \n"
-"        task will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当在控制台-自动化-账号收集-收集的账号-点击同步删除会执行该任务"
+"When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered "
+"accounts' this \n"
+"        task will be executed"
+msgstr "当在控制台-自动化-账号收集-收集的账号-点击同步删除会执行该任务"
 
-#: accounts/tasks/remove_account.py:52
+#: accounts/tasks/remove_account.py:50
 msgid "Clean historical accounts"
 msgstr "清理历史账号"
 
-#: accounts/tasks/remove_account.py:54
+#: accounts/tasks/remove_account.py:52
 msgid ""
-"\n"
-"        Each time an asset account is updated, a historical account is "
-"generated, so it is \n"
+"Each time an asset account is updated, a historical account is generated, so "
+"it is \n"
 "        necessary to clean up the asset account history. The system will "
 "clean up excess account \n"
 "        records at 2 a.m. daily based on the configuration in the \"System "
 "settings - Features - \n"
-"        Account storage - Record limit\n"
-"        "
+"        Account storage - Record limit"
 msgstr ""
-"\n"
 "由于每次更新资产账号，都会生成历史账号，所以需要清理资产账号的历史。系统会根"
 "据账号存储-记录限制的配置，每天凌晨2点对于超出的数量的账号记录进行清理"
 
-#: accounts/tasks/remove_account.py:93
+#: accounts/tasks/remove_account.py:89
 msgid "Remove historical accounts that are out of range."
 msgstr "删除超出范围的历史帐户。"
 
@@ -1265,14 +1237,10 @@ msgstr "同步信息到关联的账号"
 
 #: accounts/tasks/template.py:14
 msgid ""
-"\n"
-"        When clicking 'Sync new secret to accounts' in 'Console - Account - "
+"When clicking 'Sync new secret to accounts' in 'Console - Account - "
 "Templates - \n"
-"        Accounts' this task will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当在控制台-账号模板-账号-同步更新账号信息点击同步时，执行该任务"
+"        Accounts' this task will be executed"
+msgstr "当在控制台-账号模板-账号-同步更新账号信息点击同步时，执行该任务"
 
 #: accounts/tasks/vault.py:32
 msgid "Sync secret to vault"
@@ -1280,14 +1248,9 @@ msgstr "同步密文到 vault"
 
 #: accounts/tasks/vault.py:34
 msgid ""
-"\n"
-"        When clicking 'Sync' in 'System Settings - Features - Account "
-"Storage' this task will \n"
-"        be executed\n"
-"        "
-msgstr ""
-"\n"
-"在系统设置-功能设置-账号存储点击同步时，执行该任务"
+"When clicking 'Sync' in 'System Settings - Features - Account Storage' this "
+"task will be executed"
+msgstr "在系统设置-功能设置-账号存储点击同步时，执行该任务"
 
 #: accounts/tasks/verify_account.py:50
 msgid "Verify asset account availability"
@@ -1295,15 +1258,11 @@ msgstr "验证资产账号可用性"
 
 #: accounts/tasks/verify_account.py:53
 msgid ""
-"\n"
-"        When clicking 'Test' in 'Console - Asset details - Accounts' this "
-"task will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当在控制台-资产详情-账号点击测试执行该任务"
+"When clicking 'Test' in 'Console - Asset details - Accounts' this task will "
+"be executed"
+msgstr "当在控制台-资产详情-账号点击测试执行该任务"
 
-#: accounts/tasks/verify_account.py:61
+#: accounts/tasks/verify_account.py:59
 msgid "Verify accounts connectivity"
 msgstr "测试账号可连接性"
 
@@ -1638,32 +1597,32 @@ msgstr "同级别节点名字不能重复"
 msgid "App Assets"
 msgstr "资产管理"
 
-#: assets/automations/base/manager.py:187
+#: assets/automations/base/manager.py:188
 msgid "{} disabled"
 msgstr "{} 已禁用"
 
-#: assets/automations/base/manager.py:250
+#: assets/automations/base/manager.py:251
 msgid "  - Platform {} ansible disabled"
 msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
 
-#: assets/automations/base/manager.py:323
+#: assets/automations/base/manager.py:324
 msgid ">>> Task preparation phase"
 msgstr ">>> 任务准备阶段"
 
-#: assets/automations/base/manager.py:326
+#: assets/automations/base/manager.py:327
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> 分次执行任务，总共 {runner_count}"
 
-#: assets/automations/base/manager.py:328
+#: assets/automations/base/manager.py:329
 msgid ">>> Start executing tasks"
 msgstr ">>> 开始执行任务"
 
-#: assets/automations/base/manager.py:330
+#: assets/automations/base/manager.py:331
 msgid ">>> No tasks need to be executed"
 msgstr ">>> 没有需要执行的任务"
 
-#: assets/automations/base/manager.py:335
+#: assets/automations/base/manager.py:336
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> 开始执行第 {index} 批任务"
@@ -1883,7 +1842,7 @@ msgstr "成功提示"
 msgid "We will consider login success when we see this prompt"
 msgstr "当我们看到这个提示时，我们将认为登录成功"
 
-#: assets/const/protocol.py:145 assets/models/asset/database.py:10
+#: assets/const/protocol.py:145 assets/models/asset/database.py:11
 #: settings/serializers/msg.py:49
 msgid "Use SSL"
 msgstr "使用 SSL"
@@ -2021,21 +1980,25 @@ msgstr "可以修改资产节点"
 msgid "Custom asset"
 msgstr "自定义资产"
 
-#: assets/models/asset/database.py:11
+#: assets/models/asset/database.py:12
 msgid "CA cert"
 msgstr "CA 证书"
 
-#: assets/models/asset/database.py:12
+#: assets/models/asset/database.py:13
 msgid "Client cert"
 msgstr "客户端证书"
 
-#: assets/models/asset/database.py:13
+#: assets/models/asset/database.py:14
 msgid "Client key"
 msgstr "客户端密钥"
 
-#: assets/models/asset/database.py:14
+#: assets/models/asset/database.py:15
 msgid "Allow invalid cert"
 msgstr "忽略证书校验"
+
+#: assets/models/asset/database.py:18
+msgid "Postgresql SSL mode"
+msgstr "PostgreSQL SSL 模式"
 
 #: assets/models/asset/gpt.py:8 settings/serializers/feature.py:92
 msgid "Proxy"
@@ -2399,6 +2362,21 @@ msgstr "无效的数据"
 msgid "Default database"
 msgstr "默认数据库"
 
+#: assets/serializers/asset/database.py:23
+msgid "CA cert help text"
+msgstr ""
+"Common Name (CN) 字段已被弃用，请根据 RFC 5280 使用 Subject Alternative Name "
+"(SAN) 字段来验证域名，以提高安全性。"
+
+#: assets/serializers/asset/database.py:24
+msgid "Postgresql ssl model help text"
+msgstr ""
+"Prefer：我不关心加密，但如果服务器支持加密，我愿意支付加密的开销。Require：我"
+"希望我的数据被加密，我接受开销。我相信网络将确保我始终连接到我想要的服务器。"
+"Verify CA：我希望我的数据被加密，我接受开销。我想确保我连接到我信任的服务器。"
+"Verify Full：我希望我的数据被加密，我接受开销。我想确保我连接到我信任的服务"
+"器，并且它是我指定的服务器。"
+
 #: assets/serializers/asset/gpt.py:20
 msgid ""
 "If the server cannot directly connect to the API address, you need set up an "
@@ -2601,7 +2579,7 @@ msgstr "类型 该字段是必填项。"
 msgid "Protocols is required"
 msgstr "协议是必填的"
 
-#: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:42
+#: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:39
 msgid "Test assets connectivity "
 msgstr "测试资产可连接性"
 
@@ -2613,101 +2591,81 @@ msgstr "收集资产硬件信息"
 msgid "Asset execute automation"
 msgstr "资产执行自动化"
 
-#: assets/tasks/gather_facts.py:22 assets/tasks/gather_facts.py:34
+#: assets/tasks/gather_facts.py:22 assets/tasks/gather_facts.py:32
 msgid "Gather assets facts"
 msgstr "收集资产信息"
 
 #: assets/tasks/gather_facts.py:25
 msgid ""
-"\n"
-"        When clicking 'Refresh hardware info' in 'Console - Asset Details - "
-"Basic' this task \n"
-"        will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当在控制台资产详情-基本设置点击更新硬件信息执行该任务"
+"When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' "
+"this task \n"
+"        will be executed"
+msgstr "当在控制台资产详情-基本设置点击更新硬件信息执行该任务"
 
-#: assets/tasks/gather_facts.py:46
+#: assets/tasks/gather_facts.py:44
 msgid "Update assets hardware info: "
 msgstr "更新资产硬件信息"
 
-#: assets/tasks/gather_facts.py:54
+#: assets/tasks/gather_facts.py:52
 msgid "Update node asset hardware information: "
 msgstr "更新节点资产硬件信息: "
 
-#: assets/tasks/nodes_amount.py:17
+#: assets/tasks/nodes_amount.py:16
 msgid "Check the amount of assets under the node"
 msgstr "检查节点下资产数量"
 
-#: assets/tasks/nodes_amount.py:19
+#: assets/tasks/nodes_amount.py:18
 msgid ""
-"\n"
-"        Manually verifying asset quantities updates the asset count for "
-"nodes under the \n"
+"Manually verifying asset quantities updates the asset count for nodes under "
+"the \n"
 "        current organization. This task will be called in the following two "
 "cases: when updating \n"
-"        nodes and when the number of nodes exceeds 100\n"
-"        "
+"        nodes and when the number of nodes exceeds 100"
 msgstr ""
-"\n"
 "手动校对资产数量更新当前组织下的节点资产数量；更新节点，当节点数大于100这两种"
 "情况会调用该任务"
 
-#: assets/tasks/nodes_amount.py:37
+#: assets/tasks/nodes_amount.py:34
 msgid ""
 "The task of self-checking is already running and cannot be started repeatedly"
 msgstr "自检程序已经在运行，不能重复启动"
 
-#: assets/tasks/nodes_amount.py:43
+#: assets/tasks/nodes_amount.py:40
 msgid "Periodic check the amount of assets under the node"
 msgstr "周期性检查节点下资产数量"
 
-#: assets/tasks/nodes_amount.py:45
+#: assets/tasks/nodes_amount.py:42
 msgid ""
-"\n"
-"        Schedule the check_node_assets_amount_task to periodically update "
-"the asset count of \n"
-"        all nodes under all organizations\n"
-"        "
+"Schedule the check_node_assets_amount_task to periodically update the asset "
+"count of \n"
+"        all nodes under all organizations"
 msgstr ""
-"\n"
 "定时调用check_node_assets_amount_task任务，更新所有组织下所有节点的资产数量"
 
-#: assets/tasks/ping.py:20 assets/tasks/ping.py:33
+#: assets/tasks/ping.py:20 assets/tasks/ping.py:30
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
 #: assets/tasks/ping.py:24
 msgid ""
-"\n"
-"        When clicking 'Test Asset Connectivity' in 'Asset Details - Basic "
-"Settings' this task \n"
-"        will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当资产详情-基本设置点击测试资产可连接性 执行该任务"
+"When clicking 'Test Asset Connectivity' in 'Asset Details - Basic Settings' "
+"this task will be executed"
+msgstr "当资产详情-基本设置点击测试资产可连接性 执行该任务"
 
-#: assets/tasks/ping.py:49
+#: assets/tasks/ping.py:46
 msgid "Test if the assets under the node are connectable "
 msgstr "测试节点下资产是否可连接"
 
-#: assets/tasks/ping_gateway.py:19 assets/tasks/ping_gateway.py:32
-#: assets/tasks/ping_gateway.py:41
+#: assets/tasks/ping_gateway.py:19 assets/tasks/ping_gateway.py:29
+#: assets/tasks/ping_gateway.py:38
 msgid "Test gateways connectivity"
 msgstr "测试网关可连接性"
 
 #: assets/tasks/ping_gateway.py:23
 msgid ""
-"\n"
-"        When clicking 'Test Connection' in 'Domain Details - Gateway' this "
-"task will be \n"
-"        executed\n"
-"        "
-msgstr ""
-"\n"
-"当在网域详情-网关-测试连接时执行该任务"
+"When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
+"be executed"
+msgstr "当在网域详情-网关-测试连接时执行该任务"
 
 #: assets/tasks/utils.py:16
 msgid "Asset has been disabled, skipped: {}"
@@ -3076,34 +3034,28 @@ msgstr "清理资产审计会话任务日志"
 
 #: audits/tasks.py:134
 msgid ""
-"\n"
-"        Since the system generates login logs, operation logs, file upload "
-"logs, activity \n"
+"Since the system generates login logs, operation logs, file upload logs, "
+"activity \n"
 "        logs, Celery execution logs, session recordings, command records, "
 "and password change \n"
 "        logs, it will perform cleanup of records that exceed the time limit "
 "according to the \n"
-"        'Tasks - Regular clean-up' in the system settings at 2 a.m daily\n"
-"        "
+"        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"
 msgstr ""
-"\n"
 "由于系统会产生登录日志，操作日志，文件上传日志，活动日志，celery执行日志，会"
 "话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置，对"
 "于超出时间的于每天凌晨2点进行清理"
 
-#: audits/tasks.py:156
+#: audits/tasks.py:154
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
-#: audits/tasks.py:158
+#: audits/tasks.py:156
 msgid ""
-"\n"
-"        If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
+"If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
-"        synchronized to external storage\n"
-"        "
+"        synchronized to external storage"
 msgstr ""
-"\n"
 "如果设置了SERVER_REPLAY_STORAGE，将通过文件管理上传的文件同步到外部存储"
 
 #: authentication/api/access_key.py:39
@@ -3746,20 +3698,15 @@ msgstr "IP 白名单"
 msgid "Is valid"
 msgstr "是否有效"
 
-#: authentication/tasks.py:12
+#: authentication/tasks.py:13
 msgid "Clean expired session"
 msgstr "清除过期会话"
 
-#: authentication/tasks.py:14
+#: authentication/tasks.py:15
 msgid ""
-"\n"
-"        Since user logins create sessions, the system will clean up expired "
-"sessions every 24 \n"
-"        hours\n"
-"        "
-msgstr ""
-"\n"
-"由于用户登录系统会产生会话，系统会每24小时清理已经过期的会话"
+"Since user logins create sessions, the system will clean up expired sessions "
+"every 24 hours"
+msgstr "由于用户登录系统会产生会话，系统会每24小时清理已经过期的会话"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -4501,44 +4448,30 @@ msgid "Send email"
 msgstr "发件邮件"
 
 #: common/tasks.py:35
-msgid ""
-"\n"
-"        This task will be executed when sending email notifications\n"
-"        "
-msgstr ""
-"\n"
-"发送邮件消息时执行该任务"
+msgid "This task will be executed when sending email notifications"
+msgstr "发送邮件消息时执行该任务"
 
-#: common/tasks.py:67
+#: common/tasks.py:65
 msgid "Send email attachment"
 msgstr "发送邮件附件"
 
-#: common/tasks.py:70
+#: common/tasks.py:68
 msgid ""
-"\n"
-"        When an account password is changed or an account backup generates "
+"When an account password is changed or an account backup generates "
 "attachments, \n"
 "        this task needs to be executed for sending emails and handling "
-"attachments\n"
-"        "
-msgstr ""
-"\n"
-"当账号改密，账号备份产生附件，需要对发送邮件及附件，执行该任务"
+"attachments"
+msgstr "当账号改密，账号备份产生附件，需要对发送邮件及附件，执行该任务"
 
-#: common/tasks.py:98
+#: common/tasks.py:94
 msgid "Upload account backup to external storage"
 msgstr "上传会话录像到外部存储"
 
-#: common/tasks.py:100
+#: common/tasks.py:96
 msgid ""
-"\n"
-"        When performing an account backup, this task needs to be executed to "
-"external storage \n"
-"        (SFTP)\n"
-"        "
-msgstr ""
-"\n"
-"当执行账号备份，需要到外部存储（sftp），执行该任务"
+"When performing an account backup, this task needs to be executed to "
+"external storage (SFTP)"
+msgstr "当执行账号备份，需要到外部存储（sftp），执行该任务"
 
 #: common/utils/ip/geoip/utils.py:26
 msgid "Invalid ip"
@@ -4559,14 +4492,10 @@ msgstr "发送短信验证码"
 
 #: common/utils/verify_code.py:19
 msgid ""
-"\n"
-"        When resetting a password, forgetting a password, or verifying MFA, "
-"this task needs to \n"
-"        be executed to send SMS messages\n"
-"        "
-msgstr ""
-"\n"
-"当重置密码，忘记密码，验证mfa时，需要发送短信时执行该任务"
+"When resetting a password, forgetting a password, or verifying MFA, this "
+"task needs to \n"
+"        be executed to send SMS messages"
+msgstr "当重置密码，忘记密码，验证mfa时，需要发送短信时执行该任务"
 
 #: common/validators.py:16
 msgid "Special char not allowed"
@@ -4680,20 +4609,16 @@ msgstr "{} 订阅"
 msgid "System message"
 msgstr "系统信息"
 
-#: notifications/notifications.py:47
+#: notifications/notifications.py:46
 msgid "Publish the station message"
 msgstr "发布站内消息"
 
-#: notifications/notifications.py:49
+#: notifications/notifications.py:48
 msgid ""
-"\n"
-"        This task needs to be executed for sending internal messages for "
-"system alerts, \n"
-"        work orders, and other notifications\n"
-"        "
-msgstr ""
-"\n"
-"系统一些告警，工单等需要发送站内信时执行该任务"
+"This task needs to be executed for sending internal messages for system "
+"alerts, \n"
+"        work orders, and other notifications"
+msgstr "系统一些告警，工单等需要发送站内信时执行该任务"
 
 #: ops/ansible/inventory.py:116 ops/models/job.py:65
 msgid "No account available"
@@ -5101,118 +5026,92 @@ msgstr "任务 ID"
 msgid "You do not have permission for the current job."
 msgstr "你没有当前作业的权限。"
 
-#: ops/tasks.py:52
+#: ops/tasks.py:51
 msgid "Run ansible task"
 msgstr "运行 Ansible 任务"
 
-#: ops/tasks.py:55
+#: ops/tasks.py:54
 msgid ""
-"\n"
-"        Execute scheduled adhoc and playbooks, periodically invoking the "
-"task for execution\n"
-"        "
-msgstr ""
-"\n"
-"当执行定时的快捷命令，playbook，定时调用该任务执行"
+"Execute scheduled adhoc and playbooks, periodically invoking the task for "
+"execution"
+msgstr "当执行定时的快捷命令，playbook，定时调用该任务执行"
 
-#: ops/tasks.py:85
+#: ops/tasks.py:82
 msgid "Run ansible task execution"
 msgstr "开始执行 Ansible 任务"
 
-#: ops/tasks.py:88
-msgid ""
-"\n"
-"        Execute the task when manually adhoc or playbooks\n"
-"        "
-msgstr ""
-"\n"
-"手动执行快捷命令，playbook时执行该任务"
+#: ops/tasks.py:85
+msgid "Execute the task when manually adhoc or playbooks"
+msgstr "手动执行快捷命令，playbook时执行该任务"
 
-#: ops/tasks.py:104
+#: ops/tasks.py:99
 msgid "Clear celery periodic tasks"
 msgstr "清理周期任务"
 
-#: ops/tasks.py:106
-msgid ""
-"\n"
-"        At system startup, clean up celery tasks that no longer exist\n"
-"        "
-msgstr ""
-"\n"
-"系统启动时，清理已经不存在的celery任务"
+#: ops/tasks.py:101
+msgid "At system startup, clean up celery tasks that no longer exist"
+msgstr "系统启动时，清理已经不存在的celery任务"
 
-#: ops/tasks.py:132
+#: ops/tasks.py:125
 msgid "Create or update periodic tasks"
 msgstr "创建或更新周期任务"
 
-#: ops/tasks.py:134
+#: ops/tasks.py:127
 msgid ""
-"\n"
-"        With version iterations, new tasks may be added, or task names and "
-"execution times may \n"
+"With version iterations, new tasks may be added, or task names and execution "
+"times may \n"
 "        be modified. Therefore, upon system startup, tasks will be "
 "registered or the parameters \n"
-"        of scheduled tasks will be updated\n"
-"        "
+"        of scheduled tasks will be updated"
 msgstr ""
-"\n"
 "随着版本迭代，可能会新增任务或者修改任务的名称，执行时间，所以在系统启动"
 "时，，将会注册任务或者更新定时任务参数"
 
-#: ops/tasks.py:149
+#: ops/tasks.py:140
 msgid "Periodic check service performance"
 msgstr "周期检测服务性能"
 
-#: ops/tasks.py:151
+#: ops/tasks.py:142
 msgid ""
-"\n"
-"        Check every hour whether each component is offline and whether the "
-"CPU, memory, \n"
+"Check every hour whether each component is offline and whether the CPU, "
+"memory, \n"
 "        and disk usage exceed the thresholds, and send an alert message to "
-"the administrator\n"
-"        "
+"the administrator"
 msgstr ""
-"\n"
 "每小时检测各组件是否离线，cpu，内存，硬盘使用率是否超过阈值，向管理员发送消息"
 "预警"
 
-#: ops/tasks.py:163
+#: ops/tasks.py:152
 msgid "Clean up unexpected jobs"
 msgstr "清理异常作业"
 
-#: ops/tasks.py:165
+#: ops/tasks.py:154
 msgid ""
-"\n"
-"        Due to exceptions caused by executing adhoc and playbooks in the Job "
+"Due to exceptions caused by executing adhoc and playbooks in the Job "
 "Center, \n"
 "        which result in the task status not being updated, the system will "
 "clean up abnormal jobs \n"
 "        that have not been completed for more than 3 hours every hour and "
 "mark these tasks as \n"
-"        failed\n"
-"        "
+"        failed"
 msgstr ""
-"\n"
 "由于作业中心执行快捷命令，playbook会产生异常，任务状态未更新完成，系统将每小"
 "时执行清理超3小时未完成的异常作业，并将任务标记失败"
 
-#: ops/tasks.py:180
+#: ops/tasks.py:167
 msgid "Clean job_execution db record"
 msgstr "清理作业中心执行历史"
 
-#: ops/tasks.py:182
+#: ops/tasks.py:169
 msgid ""
-"\n"
-"        Due to the execution of adhoc and playbooks in the Job Center, "
-"execution records will \n"
+"Due to the execution of adhoc and playbooks in the Job Center, execution "
+"records will \n"
 "        be generated. The system will clean up records that exceed the "
 "retention period every day \n"
 "        at 2 a.m., based on the configuration of 'System Settings - Tasks - "
 "Regular clean-up - \n"
-"        Job execution retention days'\n"
-"        "
+"        Job execution retention days'"
 msgstr ""
-"\n"
 "由于作业中心执行快捷命令，playbook，会产生j执行记录，系统会根据系统设置-任务"
 "列表-定期清理-作业中心执行历史配置，每天凌晨2点对超出保存时间的记录进行清理"
 
@@ -5468,39 +5367,33 @@ msgstr "校验资产授权规则已过期"
 
 #: perms/tasks.py:30
 msgid ""
-"\n"
-"        The cache of organizational collections, which have completed user "
+"The cache of organizational collections, which have completed user "
 "authorization tree \n"
 "        construction, will expire. Therefore, expired collections need to be "
 "cleared from the \n"
 "        cache, and this task will be executed periodically based on the time "
 "interval specified \n"
 "        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file "
-"config.txt\n"
-"        "
+"config.txt"
 msgstr ""
-"\n"
 "用户授权树已经构建完成的组织集合缓存会过期，所以需要将过期的集合从缓存中清理"
 "掉，根据系统配置文件 config.txt 中 PERM_EXPIRED_CHECK_PERIODIC 的时间间隔定时"
 "执行该任务"
 
-#: perms/tasks.py:51
+#: perms/tasks.py:49
 msgid "Send asset permission expired notification"
 msgstr "发送资产权限过期通知"
 
-#: perms/tasks.py:53
+#: perms/tasks.py:51
 msgid ""
-"\n"
-"        Check every day at 10 a.m. and send a notification message to users "
+"Check every day at 10 a.m. and send a notification message to users "
 "associated with \n"
 "        assets whose authorization is about to expire, as well as to the "
 "organization's \n"
 "        administrators, 3 days in advance, to remind them that the asset "
 "authorization will \n"
-"        expire in a few days\n"
-"        "
+"        expire in a few days"
 msgstr ""
-"\n"
 "每天上午10点检查，对资产授权即将过期的所关联的用户及该组织管理员提前三天发送"
 "消息通知，提示资产还有几天即将过期"
 
@@ -7122,56 +7015,45 @@ msgid ""
 "in the workbench"
 msgstr "*! 如果启用，具有 RBAC 权限的用户将能够使用工作台中的所有工具"
 
-#: settings/tasks/ldap.py:72
+#: settings/tasks/ldap.py:73
 msgid "Periodic import ldap user"
 msgstr "周期导入 LDAP 用户"
 
-#: settings/tasks/ldap.py:74 settings/tasks/ldap.py:86
+#: settings/tasks/ldap.py:75 settings/tasks/ldap.py:85
 msgid ""
-"\n"
-"        When LDAP auto-sync is configured, this task will be invoked to "
-"synchronize users\n"
-"        "
-msgstr ""
-"\n"
-"当设置了LDAP自动同步，将调用该任务进行用户同步"
+"When LDAP auto-sync is configured, this task will be invoked to synchronize "
+"users"
+msgstr "当设置了LDAP自动同步，将调用该任务进行用户同步"
 
-#: settings/tasks/ldap.py:84
-
+#: settings/tasks/ldap.py:83
 msgid "Periodic import ldap ha user"
 msgstr "周期导入 LDAP HA 用户"
 
-#: settings/tasks/ldap.py:120
+#: settings/tasks/ldap.py:117
 msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
-#: settings/tasks/ldap.py:122
+#: settings/tasks/ldap.py:119
 msgid ""
-"\n"
-"        When LDAP auto-sync parameters change, such as Crontab parameters, "
-"the LDAP sync task \n"
-"        will be re-registered or updated, and this task will be invoked\n"
-"        "
+"When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP "
+"sync task \n"
+"        will be re-registered or updated, and this task will be invoked"
 msgstr ""
-"\n"
 "当设置了LDAP自动同步参数发生变化时，比如Crontab参数，重新注册或更新ldap同步任"
 "务将调用该任务"
 
-#: settings/tasks/ldap.py:138
+#: settings/tasks/ldap.py:133
 msgid "Registration periodic import ldap ha user task"
 msgstr "注册周期导入 LDAP HA 用户 任务"
 
-#: settings/tasks/ldap.py:140
+#: settings/tasks/ldap.py:135
 msgid ""
-"\n"
-"        When LDAP HA auto-sync parameters change, such as Crontab "
-"parameters, the LDAP HA sync task \n"
-"        will be re-registered or updated, and this task will be invoked\n"
-"        "
+"When LDAP HA auto-sync parameters change, such as Crontab parameters, the "
+"LDAP HA sync task \n"
+"        will be re-registered or updated, and this task will be invoked"
 msgstr ""
-"\n"
-"当设置了LDAP HA 自动同步参数发生变化时，比如Crontab参数，重新注册或更新ldap ha 同步任"
-"务将调用该任务"
+"当设置了LDAP HA 自动同步参数发生变化时，比如Crontab参数，重新注册或更新ldap "
+"ha 同步任务将调用该任务"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
 msgid "Sync task finish"
@@ -7286,11 +7168,11 @@ msgstr "认证失败: (未知): {}"
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
-#: settings/ws.py:201
+#: settings/ws.py:199
 msgid "No LDAP user was found"
 msgstr "没有获取到 LDAP 用户"
 
-#: settings/ws.py:207
+#: settings/ws.py:205
 msgid "Total {}, success {}, failure {}"
 msgstr "总共 {}，成功 {}，失败 {}"
 
@@ -7356,13 +7238,16 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_message.html:6
+#, fuzzy
+#| msgid ""
+#| "                Your account has expired, please contact the "
+#| "administrator.\n"
+#| "            "
 msgid ""
 "\n"
 "                Your account has expired, please contact the administrator.\n"
 "            "
-msgstr ""
-"\n"
-"                您的账号已经过期，请联系管理员。            "
+msgstr "                您的账号已经过期，请联系管理员。            "
 
 #: templates/_message.html:13
 msgid "Your account will at"
@@ -7522,7 +7407,7 @@ msgstr "命令存储"
 msgid "Invalid"
 msgstr "无效"
 
-#: terminal/api/component/storage.py:132 terminal/tasks.py:201
+#: terminal/api/component/storage.py:132 terminal/tasks.py:187
 msgid "Test failure: {}"
 msgstr "测试失败: {}"
 
@@ -8036,7 +7921,7 @@ msgstr "级别"
 msgid "Command and replay storage"
 msgstr "命令及录像存储"
 
-#: terminal/notifications.py:240 terminal/tasks.py:205
+#: terminal/notifications.py:240 terminal/tasks.py:191
 #: xpack/plugins/cloud/api.py:160
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
@@ -8512,107 +8397,80 @@ msgstr "清除离线会话"
 
 #: terminal/tasks.py:45
 msgid ""
-"\n"
-"        Check every 10 minutes for asset connection sessions that have been "
-"inactive for 3 \n"
-"        minutes and mark these sessions as completed\n"
-"        "
-msgstr ""
-"\n"
-"每10分钟检查3分钟未活跃的资产连接会话，将这些会话标记未已完成"
+"Check every 10 minutes for asset connection sessions that have been inactive "
+"for 3 \n"
+"        minutes and mark these sessions as completed"
+msgstr "每10分钟检查3分钟未活跃的资产连接会话，将这些会话标记未已完成"
 
-#: terminal/tasks.py:70
+#: terminal/tasks.py:68
 msgid "Upload session replay to external storage"
 msgstr "上传会话录像到外部存储"
 
-#: terminal/tasks.py:72
+#: terminal/tasks.py:70
 msgid ""
-"\n"
-"        If SERVER_REPLAY_STORAGE is configured in the config.txt, session "
-"commands and \n"
-"        recordings will be uploaded to external storage\n"
-"        "
+"If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands "
+"and \n"
+"        recordings will be uploaded to external storage"
 msgstr ""
-"\n"
 "如果设置了SERVER_REPLAY_STORAGE，将通过文件管理上传的文件同步到外部存储"
 
-#: terminal/tasks.py:106
+#: terminal/tasks.py:102
 msgid "Run applet host deployment"
 msgstr "运行应用机部署"
 
-#: terminal/tasks.py:109
+#: terminal/tasks.py:105
 msgid ""
-"\n"
-"        When deploying from the remote application publisher details page, "
-"and the 'Deploy' \n"
-"        button is clicked, this task will be executed\n"
-"        "
-msgstr ""
-"\n"
-"发布机部署，点击部署时，执行该任务"
+"When deploying from the remote application publisher details page, and the "
+"'Deploy' \n"
+"        button is clicked, this task will be executed"
+msgstr "发布机部署，点击部署时，执行该任务"
 
-#: terminal/tasks.py:122
+#: terminal/tasks.py:116
 msgid "Install applet"
 msgstr "安装应用"
 
-#: terminal/tasks.py:125
+#: terminal/tasks.py:119
 msgid ""
-"\n"
-"        When the 'Deploy' button is clicked in the 'Remote Application' "
-"section of the remote \n"
-"        application publisher details page, this task will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当远程应用发布机详情-远程应用，点击部署时，执行该任务"
+"When the 'Deploy' button is clicked in the 'Remote Application' section of "
+"the remote \n"
+"        application publisher details page, this task will be executed"
+msgstr "当远程应用发布机详情-远程应用，点击部署时，执行该任务"
 
-#: terminal/tasks.py:139
+#: terminal/tasks.py:131
 msgid "Uninstall applet"
 msgstr "卸载应用"
 
-#: terminal/tasks.py:142
+#: terminal/tasks.py:134
 msgid ""
-"\n"
-"        When the 'Uninstall' button is clicked in the 'Remote Application' "
-"section of the \n"
-"        remote application publisher details page, this task will be "
-"executed\n"
-"        "
-msgstr ""
-"\n"
-"当远程应用发布机详情-远程应用，点击卸载时，执行该任务"
+"When the 'Uninstall' button is clicked in the 'Remote Application' section "
+"of the \n"
+"        remote application publisher details page, this task will be executed"
+msgstr "当远程应用发布机详情-远程应用，点击卸载时，执行该任务"
 
-#: terminal/tasks.py:156
+#: terminal/tasks.py:146
 msgid "Generate applet host accounts"
 msgstr "收集远程应用上的账号"
 
-#: terminal/tasks.py:159
+#: terminal/tasks.py:149
 msgid ""
-"\n"
-"        When a remote publishing server is created and an account needs to "
-"be created \n"
-"        automatically, this task will be executed\n"
-"        "
-msgstr ""
-"\n"
-"当创建远程发布机后，需要自动创建账号时，执行该任务"
+"When a remote publishing server is created and an account needs to be "
+"created \n"
+"        automatically, this task will be executed"
+msgstr "当创建远程发布机后，需要自动创建账号时，执行该任务"
 
-#: terminal/tasks.py:175
+#: terminal/tasks.py:163
 msgid "Check command replay storage connectivity"
 msgstr "检查命令及录像存储可连接性 "
 
-#: terminal/tasks.py:177
+#: terminal/tasks.py:165
 msgid ""
-"\n"
-"        Check every day at midnight whether the external storage for "
-"commands and recordings \n"
+"Check every day at midnight whether the external storage for commands and "
+"recordings \n"
 "        is accessible. If it is not accessible, send a notification to the "
 "recipients specified \n"
 "        in 'System Settings - Notifications - Subscription - Storage - "
-"Connectivity'\n"
-"        "
+"Connectivity'"
 msgstr ""
-"\n"
 "每天凌晨0点检查命令及录像外部存储是否可连接，不可连接发送给：系统设置-通知设"
 "置-消息订阅-命令及录像存储设置的接收人"
 
@@ -9424,19 +9282,16 @@ msgid ""
 msgstr ""
 "管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
-#: users/signal_handlers.py:194
+#: users/signal_handlers.py:196
 msgid "Clean up expired user sessions"
 msgstr "清除过期的用户会话"
 
-#: users/signal_handlers.py:196
+#: users/signal_handlers.py:198
 msgid ""
-"\n"
-"        After logging in via the web, a user session record is created. At 2 "
-"a.m. every day, \n"
-"        the system cleans up inactive user devices\n"
-"        "
+"After logging in via the web, a user session record is created. At 2 a.m. "
+"every day, \n"
+"        the system cleans up inactive user devices"
 msgstr ""
-"\n"
 "使用web登录后，会产生用户会话在线记录，每天凌晨2点，清理未在线的用户设备"
 
 #: users/tasks.py:26
@@ -9445,85 +9300,68 @@ msgstr "校验密码已过期"
 
 #: users/tasks.py:28
 msgid ""
-"\n"
-"        Check every day at 10 AM whether the passwords of users in the "
-"system are expired, \n"
-"        and send a notification 5 days in advance\n"
-"        "
-msgstr ""
-"\n"
-"每天上午10点检查，系统中用户的密码是否过期，提前5天发送通知"
+"Check every day at 10 AM whether the passwords of users in the system are "
+"expired, \n"
+"        and send a notification 5 days in advance"
+msgstr "每天上午10点检查，系统中用户的密码是否过期，提前5天发送通知"
 
-#: users/tasks.py:48
+#: users/tasks.py:46
 msgid "Periodic check password expired"
 msgstr "周期校验密码过期"
 
-#: users/tasks.py:50
+#: users/tasks.py:48
 msgid ""
-"\n"
-"        With version iterations, new tasks may be added, or task names and "
-"execution times may \n"
+"With version iterations, new tasks may be added, or task names and execution "
+"times may \n"
 "        be modified. Therefore, upon system startup, it is necessary to "
 "register or update the \n"
-"        parameters of the task that checks if passwords have expired\n"
-"        "
+"        parameters of the task that checks if passwords have expired"
 msgstr ""
-"\n"
 "随着版本迭代，可能会新增任务或者修改任务的名称，执行时间，所以在系统启动时，"
 "注册或者更新校验密码已过期任务的参数"
 
-#: users/tasks.py:71
+#: users/tasks.py:67
 msgid "Check user expired"
 msgstr "校验用户已过期"
 
-#: users/tasks.py:73
+#: users/tasks.py:69
 msgid ""
-"\n"
-"        Check every day at 10 AM whether the users in the system are "
-"expired, and send a \n"
-"        notification 5 days in advance\n"
-"        "
-msgstr ""
-"\n"
-"每天上午10点检查，系统中的用户是否过期，提前5天发送通知"
+"Check every day at 10 AM whether the users in the system are expired, and "
+"send a \n"
+"        notification 5 days in advance"
+msgstr "每天上午10点检查，系统中的用户是否过期，提前5天发送通知"
 
-#: users/tasks.py:96
+#: users/tasks.py:90
 msgid "Periodic check user expired"
 msgstr "周期检测用户过期"
 
-#: users/tasks.py:98
+#: users/tasks.py:92
 msgid ""
-"\n"
-"        With version iterations, new tasks may be added, or task names and "
-"execution times may \n"
+"With version iterations, new tasks may be added, or task names and execution "
+"times may \n"
 "        be modified. Therefore, upon system startup, it is necessary to "
 "register or update the \n"
-"        parameters of the task that checks if users have expired\n"
-"        "
+"        parameters of the task that checks if users have expired"
 msgstr ""
-"\n"
 "随着版本迭代，可能会新增任务或者修改任务的名称，执行时间，所以在系统启动时，"
 "注册或者更新校验用户已过期任务的参数"
 
-#: users/tasks.py:119
+#: users/tasks.py:111
 msgid "Check unused users"
 msgstr "检查未使用的用户"
 
-#: users/tasks.py:121
+#: users/tasks.py:113
 msgid ""
-"\n"
-"        At 2 a.m. every day, according to the configuration in \"System "
-"Settings - Security - \n"
+"At 2 a.m. every day, according to the configuration in \"System Settings - "
+"Security - \n"
 "        Auth security - Auto disable threshold\" users who have not logged "
 "in or whose API keys \n"
-"        have not been used for a long time will be disabled\n"
-"        "
+"        have not been used for a long time will be disabled"
 msgstr ""
-"\n"
 "每天凌晨2点，根据系统配置-安全设置-不活跃用户自动禁用配置，对长时间不登录或"
 "api_key不使用的用户进行禁用"
 
-#: users/tasks.py:167
+#: users/tasks.py:157
 msgid "The user has not logged in recently and has been disabled."
 msgstr "该用户最近未登录，已被禁用。"
 
@@ -10489,29 +10327,22 @@ msgstr "实例个数"
 
 #: xpack/plugins/cloud/tasks.py:33
 msgid ""
-"\n"
-"        Execute this task when manually or scheduled cloud synchronization "
-"tasks are performed\n"
-"        "
-msgstr ""
-"\n"
-"手动，定时执行云同步任务时执行该任务"
+"Execute this task when manually or scheduled cloud synchronization tasks are "
+"performed"
+msgstr "手动，定时执行云同步任务时执行该任务"
 
-#: xpack/plugins/cloud/tasks.py:52
+#: xpack/plugins/cloud/tasks.py:50
 msgid "Period clean sync instance task execution"
 msgstr "定期清除同步实例任务执行记录"
 
-#: xpack/plugins/cloud/tasks.py:54
+#: xpack/plugins/cloud/tasks.py:52
 msgid ""
-"\n"
-"        Every day, according to the configuration in \"System Settings - "
-"Tasks - Regular \n"
+"Every day, according to the configuration in \"System Settings - Tasks - "
+"Regular \n"
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
-"        records generated by cloud synchronization\n"
-"        "
+"        records generated by cloud synchronization"
 msgstr ""
-"\n"
 "每天根据系统设置-任务列表-定期清理配置-云同步记录配置，对云同步产生的执行记录"
 "进行清理"
 

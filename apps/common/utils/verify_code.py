@@ -16,10 +16,8 @@ logger = get_logger(__file__)
 @shared_task(
     verbose_name=_('Send SMS code'),
     description=_(
-        """
-        When resetting a password, forgetting a password, or verifying MFA, this task needs to 
-        be executed to send SMS messages
-        """
+        """When resetting a password, forgetting a password, or verifying MFA, this task needs to 
+        be executed to send SMS messages"""
     )
 )
 def send_sms_async(target, code):
