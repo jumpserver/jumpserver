@@ -66,7 +66,7 @@ def check_password_expired_periodic():
 @shared_task(
     verbose_name=_('Check user expired'),
     description=_(
-        """Check every day at 10 AM whether the users in the system are expired, and send a 
+        """Check every day at 2 p.m whether the users in the system are expired, and send a 
         notification 5 days in advance"""
     )
 )
@@ -110,7 +110,7 @@ def check_user_expired_periodic():
 @shared_task(
     verbose_name=_('Check unused users'),
     description=_(
-        """At 2 a.m. every day, according to the configuration in "System Settings - Security - 
+        """At 2 p.m. every day, according to the configuration in "System Settings - Security - 
         Auth security - Auto disable threshold" users who have not logged in or whose API keys 
         have not been used for a long time will be disabled"""
     )
