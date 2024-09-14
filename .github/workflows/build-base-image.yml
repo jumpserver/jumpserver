@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - 'pr*'
-    paths:
-      - 'poetry.lock'
-      - 'pyproject.toml'
-      - 'Dockerfile-base'
 
 jobs:
   build-and-push:
@@ -16,6 +12,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check for changes
+        run: |
+          if git diff --name-only HEAD^ dev | grep -E 'poetry.lock|pyproject.toml|Dockerfile-base|package.json|go.mod|yarn.lock|pom.xml|install_deps.sh'; then
+            echo "Changes detected, proceeding with the job."
+          else
+            echo "No relevant changes detected, exiting."
+            exit 0
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
