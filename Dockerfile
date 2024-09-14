@@ -16,6 +16,7 @@ RUN set -ex \
     && export SECRET_KEY=$(head -c100 < /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 48) \
     && . /opt/py3/bin/activate \
     && cd apps \
+    && ls \
     && python manage.py compilemessages
 
 
