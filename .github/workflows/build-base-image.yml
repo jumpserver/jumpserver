@@ -11,6 +11,9 @@ jobs:
     outputs:
       should_skip: ${{ steps.set_skip_flag.outputs.should_skip }}  # 输出 should_skip 标志
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check conditions
         id: set_skip_flag
         run: |
