@@ -10423,3 +10423,7 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#: xpack/plugins/license/models.py:86
+msgid "Ultimate edition1"
+msgstr "企业旗舰版"
