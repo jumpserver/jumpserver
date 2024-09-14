@@ -17,7 +17,7 @@ jobs:
       - name: Check conditions
         id: set_skip_flag
         run: |
-          if git diff --name-only dev | grep -E 'poetry.lock|pyproject.toml|Dockerfile-base|package.json|go.mod|yarn.lock|pom.xml|install_deps.sh';then
+          if git diff --name-only HEAD^ HEAD | grep -E 'poetry.lock|pyproject.toml|Dockerfile-base|package.json|go.mod|yarn.lock|pom.xml|install_deps.sh';then
             echo "Found deps file changes"
           else
             echo "Not found deps file changes, skip build"
