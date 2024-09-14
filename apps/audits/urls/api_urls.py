@@ -16,9 +16,12 @@ router.register(r'password-change-logs', api.PasswordChangeLogViewSet, 'password
 router.register(r'job-logs', api.JobAuditViewSet, 'job-log')
 router.register(r'my-login-logs', api.MyLoginLogViewSet, 'my-login-log')
 router.register(r'user-sessions', api.UserSessionViewSet, 'user-session')
+router.register(r'log-storages', api.LogStorageViewSet, 'log-storage')
 
 urlpatterns = [
     path('activities/', api.ResourceActivityAPIView.as_view(), name='resource-activities'),
+    path('log-storages/<uuid:pk>/test-connective/', api.LogStorageTestConnectiveApi.as_view(),
+         name='log-storage-test-connective'),
 ]
 
 urlpatterns += router.urls

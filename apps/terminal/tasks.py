@@ -10,7 +10,7 @@ from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from common.storage.replay import ReplayStorageHandler
+from common.storage.backends.replay import ReplayStorageHandler
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start)
 from orgs.utils import tmp_to_builtin_org

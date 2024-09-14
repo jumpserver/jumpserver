@@ -176,7 +176,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
     }
     exclude_models = {
         'UserPasswordHistory', 'ContentType', 'Asset',
-        'MessageContent', 'SiteMessage',
+        'MessageContent', 'SiteMessage', 'UserSession',
         'PlatformAutomation', 'PlatformProtocol', 'Protocol',
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
         'BaseAutomation', 'CeleryTask', 'Command', 'JobLog',
@@ -189,7 +189,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
         'FavoriteAsset', 'ChangeSecretRecord'
     }
-    include_models = {'UserSession'}
+    include_models = set()
     for i, app in enumerate(apps.get_models(), 1):
         app_name = app._meta.app_label
         model_name = app._meta.object_name

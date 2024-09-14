@@ -6,11 +6,12 @@ from urllib.parse import urljoin, urlparse
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from audits.const import DEFAULT_CITY
+from audits.backends import get_log_storage
+from audits.const import LogType
 from users.models import User
 from audits.models import UserLoginLog
 from common.utils import get_logger, get_object_or_none
-from common.utils import validate_ip, get_ip_city, get_request_ip
+from common.utils import get_ip_city, get_request_ip
 from .notifications import DifferentCityLoginMessage
 
 logger = get_logger(__file__)
@@ -26,7 +27,7 @@ def check_different_city_login_if_need(user, request):
     if is_private:
         return
     usernames = [user.username, f"{user.name}({user.username})"]
-    last_user_login = UserLoginLog.objects.exclude(
+    last_user_login = get_log_storage(LogType.login_log).get_manager().exclude(
         city__in=city_white
     ).filter(username__in=usernames, status=True).first()
     if not last_user_login:

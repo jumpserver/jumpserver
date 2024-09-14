@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import uuid
+
 from collections import defaultdict
 from datetime import timedelta
 
@@ -22,6 +23,7 @@ from acls.models import CommandFilterACL
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
+from common.utils import lazyproperty
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, UploadFileRunner
 
 """stop all ssh child processes of the given ansible process pid."""

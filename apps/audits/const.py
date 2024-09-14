@@ -63,3 +63,15 @@ class MFAChoices(IntegerChoices):
 class LoginStatusChoices(IntegerChoices):
     success = True, _("Success")
     failed = False, _("Failed")
+
+
+class LogStorageType(TextChoices):
+    server = 'server', 'Server'
+    es = 'es', 'Elasticsearch'
+
+
+class LogType(TextChoices):
+    operate_log = 'operate_log', _('Operate log')
+    login_log = 'login_log', _('User login log')
+    ftp_log = 'ftp_log', _('File transfer log')
+    password_change_log = 'password_change_log', _('Password change log')

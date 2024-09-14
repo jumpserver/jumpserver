@@ -16,21 +16,14 @@ from settings.models import Setting
 from settings.serializers import SettingsSerializer
 from users.models import Preference
 from users.serializers import PreferenceSerializer
-from .backends import get_operate_log_storage
+from .const import LogType
+from .backends import get_log_storage
 
 logger = get_logger(__name__)
 
 
 class OperatorLogHandler(metaclass=Singleton):
     CACHE_KEY = 'OPERATOR_LOG_CACHE_KEY'
-
-    def __init__(self):
-        self.log_client = self.get_storage_client()
-
-    @staticmethod
-    def get_storage_client():
-        client = get_operate_log_storage()
-        return client
 
     @staticmethod
     def _consistent_type_to_str(value1, value2):
@@ -176,16 +169,11 @@ class OperatorLogHandler(metaclass=Singleton):
             'remote_addr': remote_addr, 'before': before, 'after': after,
         }
         with transaction.atomic():
-            if self.log_client.ping(timeout=1):
-                client = self.log_client
-            else:
-                logger.info('Switch default operate log storage save.')
-                client = get_operate_log_storage(default=True)
-
             try:
+                client = get_log_storage(LogType.operate_log)
                 client.save(**data)
             except Exception as e:
-                error_msg = 'An error occurred saving OperateLog.' \
+                error_msg = 'An error occurred saving OperateLog.\n' \
                             'Error: %s, Data: %s' % (e, data)
                 logger.error(error_msg)
 
