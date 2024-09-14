@@ -220,5 +220,7 @@
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user"
+    "user": "user",
+    "recordingIsBeingDownloaded": "Recording is being downloaded, please wait.",
+    "Play List": "Play List"
 }
