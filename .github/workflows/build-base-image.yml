@@ -6,13 +6,18 @@ on:
       - 'pr*'
 
 jobs:
-  check_change:
+  check-deps-change:
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.set_skip_flag.outputs.should_skip }}  # 输出 should_skip 标志
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # 确保检出完整历史
+
+      - name: Fetch all branches
+        run: git fetch --all  # 拉取所有分支
 
       - name: Check conditions
         id: set_skip_flag
@@ -26,8 +31,8 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
-    needs: check_change  # 依赖 check_skip job 的执行结果
-    if: needs.check_change.outputs.should_skip != 'true'
+    needs: check-deps-change  # 依赖 check_skip job 的执行结果
+    if: needs.check-deps-change.outputs.should_skip != 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
