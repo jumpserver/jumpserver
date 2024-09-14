@@ -65,6 +65,6 @@ jobs:
           git checkout -b ${{ github.event.pull_request.head.ref }}
           git add Dockerfile
           git commit -m "perf: Update Dockerfile with new base image tag"
-          git push
+          git push origin ${{ github.event.pull_request.head.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
