@@ -64,8 +64,9 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         return fields
 
     def pop_fields_if_need(self, fields):
-        if self.context['request'].method != "GET":
-            fields.pop("command_amount")
+        request = self.context.get('request')
+        if request and request.method != 'GET':
+            fields.pop("command_amount", None)
 
     def validate_asset(self, value):
         max_length = self.Meta.model.asset.field.max_length

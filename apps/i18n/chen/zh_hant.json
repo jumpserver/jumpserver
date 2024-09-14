@@ -9,6 +9,7 @@
     "CommandReviewMessage": "您輸入的命令需要覆核後才可以執行，是否發起覆核請求?",
     "CommandReviewRejectBy": "命令覆核被 %s 拒絕",
     "CommandReviewTimeoutError": "命令覆核超時",
+    "CommandWarningDialogMessage": "您進行的動作存在風險，警告通知將會寄給管理員。你確定要繼續嗎？",
     "Confirm": "確認",
     "ConnectError": "連接失敗",
     "ConnectSuccess": "連接成功",
@@ -22,6 +23,7 @@
     "ErrorMessage": "錯誤消息",
     "ExecuteError": "執行失敗",
     "ExecuteSuccess": "執行成功",
+    "ExecutionCanceled": "動作已取消",
     "ExportALL": "匯出所有資料",
     "ExportAll": "匯出全部",
     "ExportCurrent": "匯出當前頁面",
@@ -67,5 +69,6 @@
     "Version": "版本",
     "ViewData": "查看資料",
     "WaitCommandReviewMessage": "覆核請求已發起，請等待覆核結果",
+    "Warning": "警告。",
     "initializingDatasourceFailedMessage": "連接失敗，請檢查資料庫連接配置是否正確"
 }

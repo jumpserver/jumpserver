@@ -24,6 +24,7 @@ from .const import (
     OperateChoices,
     ActionChoices,
     ActivityChoices,
+    LogType,
     LoginTypeChoices,
     MFAChoices,
     LoginStatusChoices,
@@ -350,9 +351,8 @@ class LogStorage(CommonStorageModelMixin, JMSBaseModel):
             log_store.pre_use_check()
         return True
 
-    @staticmethod
-    def is_use():
-        return False
+    def used_by(self):
+        return [str(LogType(l).label) for l in self.meta.get('LOG_TYPES', [])]
 
     def save(self, *args, **kwargs):
         self.is_valid()

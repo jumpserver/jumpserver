@@ -427,7 +427,7 @@ def is_macos():
 def convert_html_to_markdown(html_str):
     h = html2text.HTML2Text()
     h.body_width = 0
-    h.ignore_links = True
+    h.ignore_links = False
 
     markdown = h.handle(html_str)
     markdown = markdown.replace('\n\n', '\n')

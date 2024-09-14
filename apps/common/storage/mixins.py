@@ -53,8 +53,9 @@ class StorageDestroyModelMixin(DestroyModelMixin):
     def perform_destroy(self, instance):
         if instance.type_null_or_server or instance.is_default:
             raise JMSException(detail=_('Deleting the default storage is not allowed'))
-        if instance.is_use():
-            raise JMSException(detail=_('Cannot delete storage that is being used'))
+        if used_by := instance.used_by():
+            names = ', '.join(list(used_by))
+            raise JMSException(detail=_('Cannot delete storage that is being used: {}').format(names))
         return super().perform_destroy(instance)
 
 

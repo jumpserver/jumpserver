@@ -52,6 +52,8 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
     if created:
         user.source = source
         user.save()
+
+    if created and isinstance(attrs, dict):
         org_ids = bind_user_to_org_role(user)
         group_names = attrs.get('groups')
         bind_user_to_group(org_ids, group_names, user)
@@ -190,7 +192,13 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
             user.save()
 
 
-@shared_task(verbose_name=_('Clean up expired user sessions'))
+@shared_task(
+    verbose_name=_('Clean up expired user sessions'),
+    description=_(
+        """After logging in via the web, a user session record is created. At 2 a.m. every day, 
+        the system cleans up inactive user devices"""
+    )
+)
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_expired_user_session_period():
     UserSession.clear_expired_sessions()

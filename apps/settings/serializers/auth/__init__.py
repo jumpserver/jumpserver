@@ -4,6 +4,7 @@ from .dingtalk import *
 from .feishu import *
 from .lark import *
 from .ldap import *
+from .ldap_ha import *
 from .oauth2 import *
 from .oidc import *
 from .passkey import *

@@ -130,7 +130,15 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
-@shared_task(verbose_name=_('Clean audits session task log'))
+@shared_task(
+    verbose_name=_('Clean audits session task log'),
+    description=_(
+        """Since the system generates login logs, operation logs, file upload logs, activity 
+        logs, Celery execution logs, session recordings, command records, and password change 
+        logs, it will perform cleanup of records that exceed the time limit according to the 
+        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"""
+    )
+)
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clean_audits_log_period():
     print("Start clean audit session task log")
@@ -144,7 +152,13 @@ def clean_audits_log_period():
         clean_password_change_log_period()
 
 
-@shared_task(verbose_name=_('Upload FTP file to external storage'))
+@shared_task(
+    verbose_name=_('Upload FTP file to external storage'),
+    description=_(
+        """If SERVER_REPLAY_STORAGE is configured, files uploaded through file management will be 
+        synchronized to external storage"""
+    )
+)
 def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
     logger.info(f'Start upload FTP file record to external storage: {ftp_log_id} - {file_name}')
     ftp_log = get_log_storage(LogType.ftp_log).get_manager().filter(id=ftp_log_id).first()

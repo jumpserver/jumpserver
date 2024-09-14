@@ -70,8 +70,8 @@ class RDPConnectionManager:
         connection_details = {
             'hostname': self.params['login_host'],
             'port': self.params['login_port'],
-            'username': self.params['username'],
-            'password': self.params['password']
+            'username': self.params['login_user'],
+            'password': self.params['login_password']
         }
         return connection_details
 

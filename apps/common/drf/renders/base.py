@@ -5,12 +5,13 @@ from datetime import datetime
 
 import pyzipper
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers import fields as common_fields
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -38,8 +39,10 @@ class BaseFileRenderer(BaseRenderer):
             filename_prefix = serializer.Meta.model.__name__.lower()
         else:
             filename_prefix = 'download'
-        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        filename = "{}_{}.{}".format(filename_prefix, now, self.format)
+        suffix = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        if self.template == 'import':
+            suffix = 'template'
+        filename = "{}_{}.{}".format(filename_prefix, suffix, self.format)
         disposition = 'attachment; filename="{}"'.format(filename)
         response['Content-Disposition'] = disposition
 
@@ -105,10 +108,10 @@ class BaseFileRenderer(BaseRenderer):
             value = field.to_file_representation(value)
         elif isinstance(value, bool):
             value = 'Yes' if value else 'No'
-        elif isinstance(field, LabeledChoiceField):
+        elif isinstance(field, common_fields.LabeledChoiceField):
             value = value or {}
             value = '{}({})'.format(value.get('label'), value.get('value'))
-        elif isinstance(field, ObjectRelatedField):
+        elif isinstance(field, common_fields.ObjectRelatedField):
             if field.many:
                 value = [self.to_id_name(v) for v in value]
             else:
@@ -126,6 +129,53 @@ class BaseFileRenderer(BaseRenderer):
             value = json.dumps(value, cls=encoders.JSONEncoder, ensure_ascii=False)
         return str(value)
 
+    def get_field_help_text(self, field):
+        text = ''
+        if hasattr(field, 'get_render_help_text'):
+            text = field.get_render_help_text()
+        elif isinstance(field, serializers.BooleanField):
+            text = _('Yes/No')
+        elif isinstance(field, serializers.CharField):
+            if field.max_length:
+                text = _('Text, max length {}').format(field.max_length)
+            else:
+                text = _("Long text, no length limit")
+        elif isinstance(field, serializers.IntegerField):
+            text = _('Number, min {} max {}').format(field.min_value, field.max_value)
+            text = text.replace('min None', '').replace('max None', '')
+        elif isinstance(field, serializers.DateTimeField):
+            text = _('Datetime format {}').format(timezone.now().strftime(settings.REST_FRAMEWORK['DATETIME_FORMAT']))
+        elif isinstance(field, serializers.IPAddressField):
+            text = _('IP')
+        elif isinstance(field, serializers.ChoiceField):
+            choices = [str(v) for v in field.choices.keys()]
+            if isinstance(field, common_fields.LabeledChoiceField):
+                text = _("Choices, format name(value), name is optional for human read,"
+                         " value is requisite, options {}").format(','.join(choices))
+            else:
+                text = _("Choices, options {}").format(",".join(choices))
+        elif isinstance(field, common_fields.PhoneField):
+            text = _("Phone number, format +8612345678901")
+        elif isinstance(field, common_fields.LabeledChoiceField):
+            text = _('Label, format ["key:value"]')
+        elif isinstance(field, common_fields.ObjectRelatedField):
+            text = _("Object, format name(id), name is optional for human read, id is requisite")
+        elif isinstance(field, serializers.PrimaryKeyRelatedField):
+            text = _('Object, format id')
+        elif isinstance(field, serializers.ManyRelatedField):
+            child_relation_class_name = field.child_relation.__class__.__name__
+            if child_relation_class_name == "ObjectRelatedField":
+                text = _('Objects, format ["name(id)", ...], name is optional for human read, id is requisite')
+            elif child_relation_class_name == "LabelRelatedField":
+                text = _('Labels, format ["key:value", ...], if label not exists, will create it')
+            else:
+                text = _('Objects, format ["id", ...]')
+        elif isinstance(field, serializers.ListSerializer):
+            child = field.child
+            if hasattr(child, 'get_render_help_text'):
+                text = child.get_render_help_text()
+        return text
+
     def generate_rows(self, data, render_fields):
         for item in data:
             row = []
@@ -134,6 +184,17 @@ class BaseFileRenderer(BaseRenderer):
                 value = self.render_value(field, value)
                 row.append(value)
             yield row
+
+    def write_help_text_if_need(self):
+        if self.template == 'export':
+            return
+        fields = self.get_rendered_fields()
+        row = []
+        for f in fields:
+            text = self.get_field_help_text(f)
+            row.append(text)
+        row[0] = '#Help ' + str(row[0])
+        self.write_row(row)
 
     @abc.abstractmethod
     def initial_writer(self):
@@ -184,6 +245,7 @@ class BaseFileRenderer(BaseRenderer):
             rows = self.generate_rows(data, rendered_fields)
             self.initial_writer()
             self.write_column_titles(column_titles)
+            self.write_help_text_if_need()
             self.write_rows(rows)
             self.after_render()
             value = self.get_rendered_value()
