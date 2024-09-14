@@ -18,32 +18,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and check compilemessages
+        uses: docker/build-push-action@v6
         with:
-          python-version: '3.11'
-
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libsasl2-dev python3-dev libldap2-dev libssl-dev gettext
-
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: |
-          poetry install
-          echo "VENV_PATH=$(poetry env info --path)" >> $GITHUB_ENV
-
-      - name: Set up environment
-        run: |
-          cp config_example.yml config.yml
-          sed -i 's/SECRET_KEY:.*/SECRET_KEY: ABC/' config.yml
-          sed -i 's/BOOTSTRAP_TOKEN:.*/BOOTSTRAP_TOKEN: ABC/' config.yml
-
-      - name: Run compilemessages
-        run: |
-          source $VENV_PATH/bin/activate
-          cd apps
-          python manage.py compilemessages
+          platforms: linux/amd64
+          push: false
+          file: Dockerfile
+          target: stage-build
+          tags: jumpserver/core:stage-build
