@@ -167,7 +167,7 @@ class BaseFileParser(BaseParser):
         rows = list(rows)
         if not rows:
             return rows
-        if rows[0][0] == '#Help':
+        if rows[0][0].startswith('#Help'):
             rows.pop(0)
         return rows
 
