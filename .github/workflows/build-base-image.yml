@@ -62,6 +62,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -b ${{ github.event.pull_request.head.ref }}
           git add Dockerfile
           git commit -m "perf: Update Dockerfile with new base image tag"
           git push
