@@ -18,8 +18,6 @@ __all__ = [
     'AppletHostStartupSerializer', 'AppletSetupSerializer'
 ]
 
-RDS_LICENSE_DOC_URL = 'https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-access-license'
-
 
 class DeployOptionsSerializer(serializers.Serializer):
     LICENSE_MODE_CHOICES = (
@@ -48,8 +46,11 @@ class DeployOptionsSerializer(serializers.Serializer):
     IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
     RDS_Licensing = serializers.BooleanField(
         default=False, label=_("Existing RDS license"),
-        help_text=_('If not exist, the RDS will be in trial mode, and the trial period is 120 days. '
-                    '<a href={}>Detail</a>').format(RDS_LICENSE_DOC_URL)
+        help_text=_(
+            'If not exist, the RDS will be in trial mode, and the trial period is 120 days. <a '
+            'href="https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-access'
+            '-license">Detail</a>'
+        )
     )
     RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
     RDS_LicensingMode = serializers.ChoiceField(

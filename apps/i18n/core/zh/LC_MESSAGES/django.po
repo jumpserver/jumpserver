@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-13 18:57+0800\n"
+"POT-Creation-Date: 2024-09-14 16:55+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -585,7 +585,7 @@ msgstr "结束日期"
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
-#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:147
+#: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:148
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:225
@@ -877,7 +877,7 @@ msgstr "类别"
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
-#: terminal/models/component/storage.py:154 terminal/serializers/applet.py:29
+#: terminal/models/component/storage.py:152 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:23 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
@@ -1675,7 +1675,7 @@ msgid "Gather facts"
 msgstr "收集资产信息"
 
 #: assets/const/base.py:32 audits/const.py:58
-#: terminal/serializers/applet_host.py:34 users/models/user/_auth.py:32
+#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr "禁用"
 
@@ -2181,7 +2181,7 @@ msgstr "设置"
 
 #: assets/models/platform.py:38 audits/const.py:59
 #: authentication/backends/passkey/models.py:11 settings/models.py:39
-#: terminal/serializers/applet_host.py:35 users/models/user/_auth.py:33
+#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "启用"
 
@@ -2783,7 +2783,7 @@ msgstr "结束"
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:78
+#: terminal/serializers/session.py:79
 msgid "Terminal"
 msgstr "终端"
 
@@ -5065,8 +5065,8 @@ msgid ""
 "registered or the parameters \n"
 "        of scheduled tasks will be updated"
 msgstr ""
-"随着版本迭代，可能会新增任务或者修改任务的名称，执行时间，所以在系统启动"
-"时，将会注册任务或者更新定时任务参数"
+"随着版本迭代，可能会新增任务或者修改任务的名称，执行时间，所以在系统启动时，"
+"将会注册任务或者更新定时任务参数"
 
 #: ops/tasks.py:140
 msgid "Periodic check service performance"
@@ -5113,8 +5113,8 @@ msgid ""
 "Regular clean-up - \n"
 "        Job execution retention days'"
 msgstr ""
-"由于作业中心执行快捷命令，playbook，会产生执行记录，系统会根据系统设置-任务"
-"列表-定期清理-作业中心执行历史配置，每天凌晨2点对超出保存时间的记录进行清理"
+"由于作业中心执行快捷命令，playbook，会产生执行记录，系统会根据系统设置-任务列"
+"表-定期清理-作业中心执行历史配置，每天凌晨2点对超出保存时间的记录进行清理"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"
@@ -7601,7 +7601,7 @@ msgstr "版本"
 msgid "Can concurrent"
 msgstr "可以并发"
 
-#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:178
+#: terminal/models/applet/applet.py:49 terminal/serializers/applet_host.py:179
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "主机"
@@ -7632,7 +7632,7 @@ msgstr "宿主机"
 msgid "Applet Publication"
 msgstr "应用发布"
 
-#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:80
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:81
 msgid "Deploy options"
 msgstr "部署参数"
 
@@ -7744,12 +7744,12 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models/component/storage.py:146
+#: terminal/models/component/storage.py:144
 #: terminal/models/component/terminal.py:91
 msgid "Command storage"
 msgstr "命令存储"
 
-#: terminal/models/component/storage.py:214
+#: terminal/models/component/storage.py:212
 #: terminal/models/component/terminal.py:92
 msgid "Replay storage"
 msgstr "录像存储"
@@ -7798,7 +7798,7 @@ msgstr "登录来源"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:77
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:78
 msgid "Command amount"
 msgstr "命令数量"
 
@@ -7938,19 +7938,19 @@ msgstr "无效的存储"
 msgid "Icon"
 msgstr "图标"
 
-#: terminal/serializers/applet_host.py:26
+#: terminal/serializers/applet_host.py:24
 msgid "Per Device (Device number limit)"
-msgstr ""
+msgstr "每用户 (限制设备数量)"
 
-#: terminal/serializers/applet_host.py:27
+#: terminal/serializers/applet_host.py:25
 msgid "Per User (User number limit)"
-msgstr ""
+msgstr "每设备 (限制用户数量)"
 
-#: terminal/serializers/applet_host.py:39
+#: terminal/serializers/applet_host.py:37
 msgid "Core API"
 msgstr "Core 服务地址"
 
-#: terminal/serializers/applet_host.py:40
+#: terminal/serializers/applet_host.py:38
 msgid ""
 " \n"
 "        Tips: The application release machine communicates with the Core "
@@ -7968,43 +7968,49 @@ msgstr ""
 "建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
 "https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:48 terminal/serializers/storage.py:207
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
-#: terminal/serializers/applet_host.py:50
+#: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
 msgstr "已有 RDS 许可证"
 
-#: terminal/serializers/applet_host.py:51
+#: terminal/serializers/applet_host.py:50
 msgid ""
 "If not exist, the RDS will be in trial mode, and the trial period is 120 "
-"days. <a href={}>Detail</a>"
+"days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
+"remote-desktop-services/rds-client-access-license\">Detail</a>"
 msgstr ""
+"如果不存在，RDS 将处于试用模式，试用期为 120 天。<a href='https://learn."
+"microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-"
+"access-license'>详情</a>"
 
-#: terminal/serializers/applet_host.py:54
+#: terminal/serializers/applet_host.py:55
 msgid "RDS License Server"
 msgstr "RDS 许可服务器"
 
-#: terminal/serializers/applet_host.py:56
+#: terminal/serializers/applet_host.py:57
 msgid "RDS Licensing Mode"
 msgstr "RDS 授权模式"
 
-#: terminal/serializers/applet_host.py:59
+#: terminal/serializers/applet_host.py:60
 msgid "RDS Single Session Per User"
 msgstr "RDS 单用户单会话"
 
-#: terminal/serializers/applet_host.py:60
+#: terminal/serializers/applet_host.py:61
 msgid ""
 "Tips: A RDS user can have only one session at a time. If set, when next "
 "login connected, previous session will be disconnected."
 msgstr ""
+"提示：RDS 用户一次只能有一个会话。如果设置了，当下一次登录连接时，之前的会话"
+"将会被断开"
 
-#: terminal/serializers/applet_host.py:64
+#: terminal/serializers/applet_host.py:65
 msgid "RDS Max Disconnection Time (ms)"
 msgstr "RDS 最大断开时间（毫秒）"
 
-#: terminal/serializers/applet_host.py:66
+#: terminal/serializers/applet_host.py:67
 msgid ""
 "Tips: Set the maximum duration for keeping a disconnected session active on "
 "the server (log off the session after 60000 milliseconds)."
@@ -8012,11 +8018,11 @@ msgstr ""
 "提示：设置某个已断开连接的会话在服务器上能保持活动状态的最长时间（60000 毫秒"
 "后注销会话）"
 
-#: terminal/serializers/applet_host.py:71
+#: terminal/serializers/applet_host.py:72
 msgid "RDS Remote App Logoff Time Limit (ms)"
 msgstr "RDS 远程应用注销时间限制（毫秒）"
 
-#: terminal/serializers/applet_host.py:73
+#: terminal/serializers/applet_host.py:74
 msgid ""
 "Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp "
 "programs (0 milliseconds, log off the session immediately)."
@@ -8024,12 +8030,12 @@ msgstr ""
 "提示：关闭所有 RemoteApp 程序之后设置 RemoteAPP 会话的注销时间（0 毫秒，立即"
 "注销会话）"
 
-#: terminal/serializers/applet_host.py:82 terminal/serializers/terminal.py:47
+#: terminal/serializers/applet_host.py:83 terminal/serializers/terminal.py:47
 #: terminal/serializers/virtualapp_provider.py:13
 msgid "Load status"
 msgstr "负载状态"
 
-#: terminal/serializers/applet_host.py:96
+#: terminal/serializers/applet_host.py:97
 msgid ""
 "These accounts are used to connect to the published application, the account "
 "is now divided into two types, one is dedicated to each account, each user "
@@ -8042,11 +8048,11 @@ msgstr ""
 "使用公共账号连接; <br />注意: 如果不开启自动创建账号, 当前发布机仅能被指定标"
 "签的资产调度到，默认不会放到调度池中，且需要手动维护账号"
 
-#: terminal/serializers/applet_host.py:103
+#: terminal/serializers/applet_host.py:104
 msgid "The number of public accounts created automatically"
 msgstr "公用账号自动创建的数量"
 
-#: terminal/serializers/applet_host.py:106
+#: terminal/serializers/applet_host.py:107
 msgid ""
 "Connect to the host using the same account first. For security reasons, "
 "please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
@@ -8055,15 +8061,15 @@ msgstr ""
 "优先使用同名账号连接发布机。为了安全，需配置文件中开启配置 "
 "CACHE_LOGIN_PASSWORD_ENABLED=true， 修改后重启服务"
 
-#: terminal/serializers/applet_host.py:148
+#: terminal/serializers/applet_host.py:149
 msgid "Install applets"
 msgstr "安装应用"
 
-#: terminal/serializers/applet_host.py:178
+#: terminal/serializers/applet_host.py:179
 msgid "Host ID"
 msgstr "主机 ID"
 
-#: terminal/serializers/applet_host.py:179
+#: terminal/serializers/applet_host.py:180
 msgid "Applet ID"
 msgstr "远程应用 ID"
 
