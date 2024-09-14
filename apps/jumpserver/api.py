@@ -2,7 +2,7 @@ import time
 from collections import defaultdict
 
 from django.core.cache import cache
-from django.db.models import Count, Max, F, CharField
+from django.db.models import Count, Max, F, CharField, Manager
 from django.db.models.functions import Cast
 from django.http.response import JsonResponse, HttpResponse
 from django.utils import timezone
@@ -14,9 +14,9 @@ from rest_framework.views import APIView
 
 from assets.const import AllTypes
 from assets.models import Asset
-from audits.api import OperateLogViewSet
-from audits.const import LoginStatusChoices
-from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, JobLog
+from audits.backends import get_log_storage
+from audits.const import LoginStatusChoices, LogType
+from audits.models import JobLog
 from audits.utils import construct_userlogin_usernames
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
@@ -99,33 +99,35 @@ class DateTimeMixin:
 
     @lazyproperty
     def login_logs_queryset(self):
-        qs = UserLoginLog.objects.all()
+        qs = get_log_storage(LogType.login_log).get_manager().all()
         qs = self.get_logs_queryset_filter(qs, 'datetime')
         queryset = self.get_logs_queryset(qs, 'username')
         return queryset
 
     @lazyproperty
     def user_login_logs_on_the_system_queryset(self):
-        qs = UserLoginLog.objects.filter(status=LoginStatusChoices.success)
+        qs = get_log_storage(LogType.login_log).get_manager().filter(
+            status=LoginStatusChoices.success
+        )
         qs = self.get_logs_queryset_filter(qs, 'datetime')
         queryset = qs.filter(username__in=construct_userlogin_usernames(self.users))
         return queryset
 
     @lazyproperty
     def password_change_logs_queryset(self):
-        qs = PasswordChangeLog.objects.all()
+        qs = get_log_storage(LogType.password_change_log).get_manager().all()
         qs = self.get_logs_queryset_filter(qs, 'datetime')
         queryset = self.get_logs_queryset(qs, 'user')
         return queryset
 
     @lazyproperty
     def operate_logs_queryset(self):
-        qs = OperateLogViewSet().get_queryset()
+        qs = get_log_storage(LogType.operate_log).get_manager()
         return self.get_logs_queryset_filter(qs, 'datetime')
 
     @lazyproperty
     def ftp_logs_queryset(self):
-        qs = FTPLog.objects.all()
+        qs = get_log_storage(LogType.ftp_log).get_manager().all()
         return self.get_logs_queryset_filter(qs, 'date_start')
 
     @lazyproperty
@@ -148,13 +150,13 @@ class DatesLoginMetricMixin:
     dates_list: list
     date_start_end: tuple
     command_type_queryset_tuple: tuple
-    sessions_queryset: Session.objects
-    ftp_logs_queryset: FTPLog.objects
-    job_logs_queryset: JobLog.objects
-    login_logs_queryset: UserLoginLog.objects
-    user_login_logs_on_the_system_queryset: UserLoginLog.objects
-    operate_logs_queryset: OperateLog.objects
-    password_change_logs_queryset: PasswordChangeLog.objects
+    sessions_queryset: Manager
+    ftp_logs_queryset: Manager
+    job_logs_queryset: Manager
+    login_logs_queryset: Manager
+    user_login_logs_on_the_system_queryset: Manager
+    operate_logs_queryset: Manager
+    password_change_logs_queryset: Manager
 
     @lazyproperty
     def get_type_to_assets(self):
@@ -203,8 +205,9 @@ class DatesLoginMetricMixin:
         return date_metrics_dict.get('user_id', []), date_metrics_dict.get('asset_id', [])
 
     def get_dates_metrics_total_count_login(self):
+        queryset = get_log_storage(LogType.login_log).get_manager()
         date_metrics_dict = self.get_date_metrics(
-            UserLoginLog.objects, 'datetime', 'id'
+            queryset, 'datetime', 'id'
         )
         return date_metrics_dict.get('id', [])
 

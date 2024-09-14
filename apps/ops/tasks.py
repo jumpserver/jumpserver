@@ -1,6 +1,5 @@
 # coding: utf-8
 import datetime
-import time
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded

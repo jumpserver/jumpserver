@@ -1,5 +1,6 @@
 import os
 import uuid
+
 from datetime import timedelta
 from importlib import import_module
 
@@ -11,8 +12,10 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
+from common.db.models import JMSBaseModel
 from common.sessions.cache import user_session_manager
-from common.utils import lazyproperty, i18n_trans
+from common.storage.mixins import CommonStorageModelMixin
+from common.utils import lazyproperty, i18n_trans, get_logger
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -24,6 +27,7 @@ from .const import (
     LoginTypeChoices,
     MFAChoices,
     LoginStatusChoices,
+    LogStorageType
 )
 
 __all__ = [
@@ -33,11 +37,47 @@ __all__ = [
     "PasswordChangeLog",
     "UserLoginLog",
     "JobLog",
-    "UserSession"
+    "UserSession",
+    "LogStorage",
 ]
 
 
-class JobLog(JobExecution):
+logger = get_logger(__file__)
+
+
+class LogMixin(object):
+    @lazyproperty
+    def python_table(self):
+        convert_table = {}
+        for field in self._meta.fields: # noqa
+            if hasattr(field, 'to_python') and hasattr(field, 'name'):
+                convert_table[field.name] = field.to_python
+            else:
+                convert_table[field.name] = lambda value: value
+        return convert_table
+
+    @classmethod
+    def from_dict(cls, d, flat=False):
+        self, result = cls(), []
+        for field, value in d.items():
+            value = value.pk if isinstance(value, models.Model) else value
+            handler = self.python_table.get(field)
+            if handler is None:
+                continue
+
+            real_value = handler(value)
+            if flat:
+                result.append(real_value)
+            else:
+                setattr(self, field, real_value)
+        return result if flat else self
+
+    @classmethod
+    def from_multi_dict(cls, l, flat=False):
+        return [cls.from_dict(d, flat) for d in l]
+
+
+class JobLog(LogMixin, JobExecution):
     @property
     def creator_name(self):
         return self.creator.name
@@ -47,7 +87,7 @@ class JobLog(JobExecution):
         verbose_name = _("Job audit log")
 
 
-class FTPLog(OrgModelMixin):
+class FTPLog(LogMixin, OrgModelMixin):
     upload_to = 'FTP_FILES'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -85,7 +125,7 @@ class FTPLog(OrgModelMixin):
         return name, None
 
 
-class OperateLog(OrgModelMixin):
+class OperateLog(LogMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     action = models.CharField(
@@ -112,21 +152,6 @@ class OperateLog(OrgModelMixin):
         if current_org.is_root() and not self.org_id:
             self.org_id = Organization.ROOT_ID
         return super(OperateLog, self).save(*args, **kwargs)
-
-    @classmethod
-    def from_dict(cls, d):
-        self = cls()
-        for k, v in d.items():
-            setattr(self, k, v)
-        return self
-
-    @classmethod
-    def from_multi_dict(cls, l):
-        operate_logs = []
-        for d in l:
-            operate_log = cls.from_dict(d)
-            operate_logs.append(operate_log)
-        return operate_logs
 
     class Meta:
         verbose_name = _("Operate log")
@@ -167,7 +192,7 @@ class ActivityLog(OrgModelMixin):
         return super(ActivityLog, self).save(*args, **kwargs)
 
 
-class PasswordChangeLog(models.Model):
+class PasswordChangeLog(LogMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     change_by = models.CharField(max_length=128, verbose_name=_("Change by"))
@@ -183,7 +208,7 @@ class PasswordChangeLog(models.Model):
         verbose_name = _("Password change log")
 
 
-class UserLoginLog(models.Model):
+class UserLoginLog(LogMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, verbose_name=_("Username"))
     type = models.CharField(
@@ -256,7 +281,7 @@ class UserLoginLog(models.Model):
         verbose_name = _("User login log")
 
 
-class UserSession(models.Model):
+class UserSession(LogMixin, models.Model):
     _OPERATE_LOG_ACTION = {'delete': ActionChoices.finished}
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -301,3 +326,34 @@ class UserSession(models.Model):
         permissions = [
             ('offline_usersession', _('Offline user session')),
         ]
+
+
+class LogStorage(CommonStorageModelMixin, JMSBaseModel):
+    type = models.CharField(
+        max_length=16, choices=LogStorageType.choices,
+        default=LogStorageType.es.value, verbose_name=_("Type"),
+    )
+
+    @property
+    def type_null_or_server(self):
+        return self.type == LogStorageType.server
+
+    def is_valid(self):
+        if self.type == LogStorageType.server:
+            return True
+
+        from .backends import get_log_storage
+        for log_type in self.meta.get('LOG_TYPES', []):
+            log_store = get_log_storage(
+                log_type, self.type, {'config': self.config}
+            )
+            log_store.pre_use_check()
+        return True
+
+    @staticmethod
+    def is_use():
+        return False
+
+    def save(self, *args, **kwargs):
+        self.is_valid()
+        super().save(*args, **kwargs)

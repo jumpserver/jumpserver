@@ -1,25 +1,48 @@
 # ~*~ coding: utf-8 ~*~
+from typing import Any
+
 from django.utils.translation import gettext_lazy as _
 
-from audits.models import OperateLog
-from perms.const import ActionChoices
+from audits.models import (
+    OperateLog, UserLoginLog, PasswordChangeLog, FTPLog
+)
+from audits.const import LogStorageType
+from .mixin import OperateStorageMixin
 
 
-class OperateLogStore(object):
-    # 使用 Unicode 单元分隔符\u001f，替代旧的分隔符\0 PostgreSQL 数据库不支持\0
-    SEP = '\u001f'
-    OLD_SEP = '\0'
-
-    def __init__(self, config):
-        self.model = OperateLog
-        self.max_length = 2048
-        self.max_length_tip_msg = _(
-            'The text content is too long. Use Elasticsearch to store operation logs'
-        )
+class BaseLogStore(OperateStorageMixin):
+    model: Any  # Log model
+    type = LogStorageType.server
 
     @staticmethod
     def ping(timeout=None):
         return True
+
+    @staticmethod
+    def update(instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+    def save(self, **kwargs):
+        return self.model.objects.create(**kwargs)
+
+    def get_manager(self):
+        return self.model.objects
+
+
+class OperateLogStore(BaseLogStore):
+    # 使用 Unicode 单元分隔符\u001f，替代旧的分隔符\0 PostgreSQL 数据库不支持\0
+    SEP = '\u001f'
+    OLD_SEP = '\0'
+    model = OperateLog
+
+    def __init__(self, *args, **kwargs):
+        self.max_length = 2048
+        self.max_length_tip_msg = _(
+            'The text content is too long. Use Elasticsearch to store operation logs'
+        )
 
     @classmethod
     def split_value(cls, value):
@@ -63,14 +86,6 @@ class OperateLogStore(object):
             before[k], after[k] = before_value, after_value
         return before, after
 
-    @staticmethod
-    def _get_special_handler(resource_type):
-        # 根据资源类型，处理特殊字段
-        resource_map = {
-            'Asset permission': lambda k, v: ActionChoices.display(int(v)) if k == 'Actions' else v
-        }
-        return resource_map.get(resource_type, lambda k, v: _(v))
-
     @classmethod
     def convert_diff_friendly(cls, op_log):
         diff_list = list()
@@ -111,3 +126,15 @@ class OperateLogStore(object):
         setattr(op_log, 'LOCKING_ORG', op_log.org_id)
         op_log.diff = diff
         op_log.save()
+
+
+class LoginLogStore(BaseLogStore):
+    model = UserLoginLog
+
+
+class FTPLogStore(BaseLogStore):
+    model = FTPLog
+
+
+class PasswordChangeLogStore(BaseLogStore):
+    model = PasswordChangeLog

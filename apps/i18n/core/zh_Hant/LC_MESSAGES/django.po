@@ -119,6 +119,10 @@ msgstr "未找到待處理帳戶"
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s, 失敗: %s, 總數: %s"
 
+#: audits/serializers.py:204 audits/serializers.py:215
+msgid "Log types"
+msgstr "日誌類型"
+
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:34
 #: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:9

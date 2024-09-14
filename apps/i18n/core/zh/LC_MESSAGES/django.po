@@ -203,6 +203,10 @@ msgstr "账号推送"
 msgid "Change secret"
 msgstr "更改密码"
 
+#: audits/serializers.py:204 audits/serializers.py:215
+msgid "Log types"
+msgstr "日志类型"
+
 #: accounts/const/automation.py:26
 msgid "Verify account"
 msgstr "验证账号"

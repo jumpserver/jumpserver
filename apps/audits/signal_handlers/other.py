@@ -3,6 +3,8 @@
 from django.dispatch import receiver
 from django.db import transaction
 
+from audits.backends import get_log_storage
+from audits.const import LogType
 from audits.models import (
     PasswordChangeLog, UserLoginLog, FTPLog, OperateLog
 )
@@ -34,9 +36,8 @@ def on_user_change_password(sender, user=None, **kwargs):
         else:
             change_by = str(current_request.user)
     with transaction.atomic():
-        PasswordChangeLog.objects.create(
-            user=str(user), change_by=change_by,
-            remote_addr=remote_addr,
+        get_log_storage(LogType.password_change_log).save(
+            user=str(user), change_by=change_by, remote_addr=remote_addr
         )
 
 

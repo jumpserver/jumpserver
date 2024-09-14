@@ -11,8 +11,10 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from audits.backends import get_log_storage
+from audits.const import LogType
 from common.const.crontab import CRONTAB_AT_AM_TWO
-from common.storage.ftp_file import FTPFileStorageHandler
+from common.storage.backends.ftp_file import FTPFileStorageHandler
 from common.utils import get_log_keep_day, get_logger
 from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
@@ -145,7 +147,7 @@ def clean_audits_log_period():
 @shared_task(verbose_name=_('Upload FTP file to external storage'))
 def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
     logger.info(f'Start upload FTP file record to external storage: {ftp_log_id} - {file_name}')
-    ftp_log = FTPLog.objects.filter(id=ftp_log_id).first()
+    ftp_log = get_log_storage(LogType.ftp_log).get_manager().filter(id=ftp_log_id).first()
     if not ftp_log:
         logger.error(f'FTP db item not found: {ftp_log_id}')
         return

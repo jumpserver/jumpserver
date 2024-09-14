@@ -101,6 +101,10 @@ msgstr ""
 msgid "An exception occurred during task execution"
 msgstr ""
 
+#: audits/serializers.py:204 audits/serializers.py:215
+msgid "Log types"
+msgstr "Log types"
+
 #: accounts/automations/backup_account/manager.py:23
 msgid "The account backup plan is being executed"
 msgstr ""

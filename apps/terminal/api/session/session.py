@@ -23,7 +23,7 @@ from common.drf.filters import BaseFilterSet
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.renders import PassthroughRenderer
 from common.permissions import IsServiceAccount
-from common.storage.replay import ReplayStorageHandler
+from common.storage.backends.replay import ReplayStorageHandler
 from common.utils import data_to_json, is_uuid, i18n_fmt
 from common.utils import get_logger, get_object_or_none
 from common.views.mixins import RecordViewLogMixin

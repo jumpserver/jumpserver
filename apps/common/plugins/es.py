@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 #
 import datetime
+import json
 import inspect
-import sys
+import warnings
 
-if sys.version_info.major == 3 and sys.version_info.minor >= 10:
-    from collections.abc import Iterable
-else:
-    from collections import Iterable
-from functools import reduce, partial
-from itertools import groupby
+from typing import Iterable, Sequence
+from functools import partial
 from uuid import UUID
 
 from django.utils.translation import gettext_lazy as _
-from django.db.models import QuerySet as DJQuerySet
+from django.db.models import QuerySet as DJQuerySet, Q
 from elasticsearch7 import Elasticsearch
 from elasticsearch7.helpers import bulk
-from elasticsearch7.exceptions import RequestError, SSLError
+from elasticsearch7.exceptions import RequestError, SSLError, ElasticsearchWarning
 from elasticsearch7.exceptions import NotFoundError as NotFoundError7
 
 from elasticsearch8.exceptions import NotFoundError as NotFoundError8
 from elasticsearch8.exceptions import BadRequestError
 
+from common.db.encoder import ModelJSONFieldEncoder
 from common.utils.common import lazyproperty
 from common.utils import get_logger
 from common.utils.timezone import local_now_date_display
-from common.exceptions import JMSException
+from common.exceptions import JMSException, JMSObjectDoesNotExist
+
+warnings.filterwarnings("ignore", category=ElasticsearchWarning)
 
 logger = get_logger(__file__)
 
@@ -60,6 +60,8 @@ class ESClient(object):
 
 
 class ESClientBase(object):
+    VERSION = 0
+
     @classmethod
     def get_properties(cls, data, index):
         return data[index]['mappings']['properties']
@@ -70,6 +72,8 @@ class ESClientBase(object):
 
 
 class ESClientV7(ESClientBase):
+    VERSION = 7
+
     def __init__(self, *args, **kwargs):
         from elasticsearch7 import Elasticsearch
         self.es = Elasticsearch(*args, **kwargs)
@@ -80,6 +84,7 @@ class ESClientV7(ESClientBase):
 
 
 class ESClientV6(ESClientV7):
+    VERSION = 6
 
     @classmethod
     def get_properties(cls, data, index):
@@ -91,6 +96,8 @@ class ESClientV6(ESClientV7):
 
 
 class ESClientV8(ESClientBase):
+    VERSION = 8
+
     def __init__(self, *args, **kwargs):
         from elasticsearch8 import Elasticsearch
         self.es = Elasticsearch(*args, **kwargs)
@@ -115,7 +122,6 @@ def get_es_client_version(**kwargs):
 class ES(object):
 
     def __init__(self, config, properties, keyword_fields, exact_fields=None, match_fields=None):
-        self.version = 7
         self.config = config
         hosts = self.config.get('HOSTS')
         kwargs = self.config.get('OTHER', {})
@@ -125,6 +131,7 @@ class ES(object):
             kwargs['verify_certs'] = None
         self.client = ESClient(hosts=hosts, max_retries=0, **kwargs)
         self.es = self.client.es
+        self.version = self.client.VERSION
         self.index_prefix = self.config.get('INDEX') or 'jumpserver'
         self.is_index_by_date = bool(self.config.get('INDEX_BY_DATE', False))
 
@@ -203,11 +210,14 @@ class ES(object):
             logger.error(e, exc_info=True)
 
     def make_data(self, data):
-        return []
+        return {}
 
     def save(self, **kwargs):
+        other_params = {}
         data = self.make_data(kwargs)
-        return self.es.index(index=self.index, doc_type=self.doc_type, body=data)
+        if self.version == 7:
+            other_params = {'doc_type': self.doc_type}
+        return self.es.index(index=self.index, body=data, refresh=True, **other_params)
 
     def bulk_save(self, command_set, raise_on_error=True):
         actions = []
@@ -227,21 +237,19 @@ class ES(object):
             item = data[0]
         return item
 
-    def filter(self, query: dict, from_=None, size=None, sort=None):
+    def filter(self, query: dict, from_=None, size=None, sort=None, fields=None):
         try:
-            data = self._filter(query, from_, size, sort)
+            from_, size = from_ or 0, size or 1
+            data = self._filter(query, from_, size, sort, fields)
         except Exception as e:
             logger.error('ES filter error: {}'.format(e))
             data = []
         return data
 
-    def _filter(self, query: dict, from_=None, size=None, sort=None):
-        body = self.get_query_body(**query)
+    def _filter(self, query: dict, from_=None, size=None, sort=None, fields=None):
+        body = self._get_query_body(query, fields)
         search_params = {
-            'index': self.query_index,
-            'body': body,
-            'from_': from_,
-            'size': size
+            'index': self.query_index, 'body': body, 'from_': from_, 'size': size
         }
         if sort is not None:
             search_params['sort'] = sort
@@ -257,7 +265,7 @@ class ES(object):
 
     def count(self, **query):
         try:
-            body = self.get_query_body(**query)
+            body = self._get_query_body(query_params=query)
             data = self.es.count(index=self.query_index, body=body)
             count = data["count"]
         except Exception as e:
@@ -275,24 +283,36 @@ class ES(object):
     def ping(self, timeout=None):
         try:
             return self.es.ping(request_timeout=timeout)
-        except Exception:
+        except Exception:  # noqa
             return False
 
-    @staticmethod
-    def handler_time_field(data):
-        datetime__gte = data.get('datetime__gte')
-        datetime__lte = data.get('datetime__lte')
-        datetime_range = {}
+    def _get_date_field_name(self):
+        date_field_name = ''
+        for name, attr in self.properties.items():
+            if attr.get('type', '') == 'date':
+                date_field_name = name
+                break
+        return date_field_name
 
+    def handler_time_field(self, data):
+        date_field_name = getattr(self, 'date_field_name', 'datetime')
+        datetime__gte = data.get(f'{date_field_name}__gte')
+        datetime__lte = data.get(f'{date_field_name}__lte')
+        datetime__range = data.get(f'{date_field_name}__range')
+        if isinstance(datetime__range, Sequence) and len(datetime__range) == 2:
+            datetime__gte = datetime__gte or datetime__range[0]
+            datetime__lte = datetime__lte or datetime__range[1]
+
+        datetime_range = {}
         if datetime__gte:
-            if isinstance(datetime__gte, datetime.datetime):
+            if isinstance(datetime__gte, (datetime.datetime, datetime.date)):
                 datetime__gte = datetime__gte.strftime('%Y-%m-%d %H:%M:%S')
             datetime_range['gte'] = datetime__gte
         if datetime__lte:
-            if isinstance(datetime__lte, datetime.datetime):
+            if isinstance(datetime__lte, (datetime.datetime, datetime.date)):
                 datetime__lte = datetime__lte.strftime('%Y-%m-%d %H:%M:%S')
             datetime_range['lte'] = datetime__lte
-        return 'datetime', datetime_range
+        return date_field_name, datetime_range
 
     @staticmethod
     def handle_exact_fields(exact):
@@ -306,33 +326,50 @@ class ES(object):
             })
         return _filter
 
-    def get_query_body(self, **kwargs):
+    @staticmethod
+    def __handle_field(key, value):
+        if isinstance(value, UUID):
+            value = str(value)
+        if key == 'pk':
+            key = 'id'
+        if key.endswith('__in'):
+            key = key.replace('__in', '')
+        return key, value
+
+    def __build_special_query_body(self, query_kwargs):
+        match, exact = {}, {}
+        for k, v in query_kwargs.items():
+            k, v = self.__handle_field(k, v)
+            if k in self.exact_fields:
+                exact[k] = v
+            elif k in self.match_fields:
+                match[k] = v
+
+        result = self.handle_exact_fields(exact) + [
+            {'match': {k: v}} for k, v in match.items()
+        ]
+        return result
+
+    def _get_query_body(self, query_params=None, fields=None):
+        query_params = query_params or {}
+        not_kwargs = query_params.pop('__not', {})
+        or_kwargs = query_params.pop('__or', {})
         new_kwargs = {}
-        for k, v in kwargs.items():
-            if isinstance(v, UUID):
-                v = str(v)
-            if k == 'pk':
-                k = 'id'
-            if k.endswith('__in'):
-                k = k.replace('__in', '')
+        for k, v in query_params.items():
+            k, v = self.__handle_field(k, v)
             new_kwargs[k] = v
         kwargs = new_kwargs
 
         index_in_field = 'id__in'
-        exact_fields = self.exact_fields
-        match_fields = self.match_fields
-
-        match = {}
-        exact = {}
-        index = {}
+        match, exact, index = {}, {}, {}
 
         if index_in_field in kwargs:
             index['values'] = kwargs[index_in_field]
 
         for k, v in kwargs.items():
-            if k in exact_fields:
+            if k in self.exact_fields:
                 exact[k] = v
-            elif k in match_fields:
+            elif k in self.match_fields:
                 match[k] = v
 
         # 处理时间
@@ -363,25 +400,29 @@ class ES(object):
         body = {
             'query': {
                 'bool': {
+                    'must_not': self.__build_special_query_body(not_kwargs),
                     'must': [
-                        {'match': {k: v}} for k, v in match.items()
-                    ],
-                    'should': should,
-                    'filter': self.handle_exact_fields(exact) +
-                              [
-                                  {
-                                      'range': {
-                                          time_field_name: time_range
-                                      }
-                                  }
+                                {'match': {k: v}} for k, v in match.items()
+                            ] + self.handle_exact_fields(exact),
+                    'should': should + self.__build_special_query_body(or_kwargs),
+                    'filter': [
+                                  {'range': {time_field_name: time_range}}
                               ] + [
-                                  {
-                                      'ids': {k: v}
-                                  } for k, v in index.items()
+                                  {'ids': {k: v}} for k, v in index.items()
                               ]
                 }
             },
         }
+        if len(body['query']['bool']['should']) > 0:
+            body['query']['bool']['minimum_should_match'] = 1
+        body = self.part_fields_query(body, fields)
+        return json.loads(json.dumps(body, cls=ModelJSONFieldEncoder))
+
+    @staticmethod
+    def part_fields_query(body, fields):
+        if not fields:
+            return body
+        body['_source'] = list(fields)
         return body
 
 
@@ -399,18 +440,25 @@ class QuerySet(DJQuerySet):
 
     @lazyproperty
     def _grouped_method_calls(self):
-        _method_calls = {k: list(v) for k, v in groupby(self._method_calls, lambda x: x[0])}
+        _method_calls = {}
+        for sub_action, sub_args, sub_kwargs in self._method_calls:
+            args, kwargs = _method_calls.get(sub_action, ([], {}))
+            args.extend(sub_args)
+            kwargs.update(sub_kwargs)
+            _method_calls[sub_action] = (args, kwargs)
         return _method_calls
 
-    @lazyproperty
-    def _filter_kwargs(self):
-        _method_calls = self._grouped_method_calls
-        filter_calls = _method_calls.get('filter')
-        if not filter_calls:
-            return {}
-        names, multi_args, multi_kwargs = zip(*filter_calls)
-        kwargs = reduce(lambda x, y: {**x, **y}, multi_kwargs, {})
+    def _merge_kwargs(self, filter_args, exclude_args, filter_kwargs, exclude_kwargs):
+        or_filter = {}
+        for f_arg in filter_args:
+            if f_arg.connector == Q.OR:
+                or_filter.update({c[0]: c[1] for c in f_arg.children})
+        filter_kwargs['__or'] = self.striped_kwargs(or_filter)
+        filter_kwargs['__not'] = self.striped_kwargs(exclude_kwargs)
+        return self.striped_kwargs(filter_kwargs)
 
+    @staticmethod
+    def striped_kwargs(kwargs):
         striped_kwargs = {}
         for k, v in kwargs.items():
             k = k.replace('__exact', '')
@@ -420,28 +468,32 @@ class QuerySet(DJQuerySet):
         return striped_kwargs
 
     @lazyproperty
-    def _sort(self):
-        order_by = self._grouped_method_calls.get('order_by')
-        if order_by:
-            for call in reversed(order_by):
-                fields = call[1]
-                if fields:
-                    field = fields[-1]
+    def _filter_kwargs(self):
+        f_args, f_kwargs = self._grouped_method_calls.get('filter', ((), {}))
+        e_args, e_kwargs = self._grouped_method_calls.get('exclude', ((), {}))
+        if not f_kwargs and not e_kwargs:
+            return {}
+        return self._merge_kwargs(f_args, e_args, f_kwargs, e_kwargs)
 
-                    if field.startswith('-'):
-                        direction = 'desc'
-                    else:
-                        direction = 'asc'
-                    field = field.lstrip('-+')
-                    sort = self._storage.client.get_sort(field, direction)
-                    return sort
+    @lazyproperty
+    def _sort(self):
+        order_by = self._grouped_method_calls.get('order_by', ((), {}))[0]
+        for field in order_by:
+            if field.startswith('-'):
+                direction = 'desc'
+            else:
+                direction = 'asc'
+            field = field.lstrip('-+')
+            sort = self._storage.client.get_sort(field, direction)
+            return sort
 
     def __execute(self):
-        _filter_kwargs = self._filter_kwargs
-        _sort = self._sort
-        from_, size = self._slice or (None, None)
-        data = self._storage.filter(_filter_kwargs, from_=from_, size=size, sort=_sort)
-        return self.model.from_multi_dict(data)
+        _vl_args, _vl_kwargs = self._grouped_method_calls.get('values_list', ((), {}))
+        from_, size = self._slice or (0, 20)
+        data = self._storage.filter(
+            self._filter_kwargs, from_=from_, size=size, sort=self._sort, fields=_vl_args
+        )
+        return self.model.from_multi_dict(data, flat=bool(_vl_args))
 
     def __stage_method_call(self, item, *args, **kwargs):
         _clone = self.__clone()
@@ -455,13 +507,22 @@ class QuerySet(DJQuerySet):
         uqs.model = self.model
         return uqs
 
+    def first(self):
+        self._slice = (0, 1)
+        data = self.__execute()
+        return self.model.from_dict(data[0]) if data else None
+
     def get(self, **kwargs):
         kwargs.update(self._filter_kwargs)
-        return self._storage.get(kwargs)
+        item = self._storage.get(kwargs)
+        if not item:
+            raise JMSObjectDoesNotExist(
+                object_name=self.model._meta.verbose_name  # noqa
+            )
+        return self.model.from_dict(item)
 
     def count(self, limit_to_max_result_window=True):
-        filter_kwargs = self._filter_kwargs
-        count = self._storage.count(**filter_kwargs)
+        count = self._storage.count(**self._filter_kwargs)
         if limit_to_max_result_window:
             count = min(count, self.max_result_window)
         return count

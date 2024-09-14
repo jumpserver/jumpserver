@@ -1,4 +1,5 @@
 import copy
+
 from datetime import datetime
 from itertools import chain
 
@@ -7,17 +8,18 @@ from django.db import models
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
 
+from audits.backends import get_log_storage
+from audits.const import LogType
 from common.db.fields import RelatedManager
 from common.utils import validate_ip, get_ip_city, get_logger
 from common.utils.timezone import as_current_tz
 from .const import DEFAULT_CITY
 
+
 logger = get_logger(__name__)
 
 
 def write_login_log(*args, **kwargs):
-    from audits.models import UserLoginLog
-
     ip = kwargs.get('ip') or ''
     if not (ip and validate_ip(ip)):
         ip = ip[:15]
@@ -25,7 +27,7 @@ def write_login_log(*args, **kwargs):
     else:
         city = get_ip_city(ip) or DEFAULT_CITY
     kwargs.update({'ip': ip, 'city': city})
-    return UserLoginLog.objects.create(**kwargs)
+    return get_log_storage(LogType.login_log).save(**kwargs)
 
 
 def _get_instance_field_value(

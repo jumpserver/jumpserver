@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from importlib import import_module
-
-from django.conf import settings
 from django.db.models import F, Value, CharField, Q
 from django.db.models.functions import Cast
 from django.http import HttpResponse, FileResponse
-from django.utils.encoding import escape_uri_path
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
@@ -18,9 +14,9 @@ from common.api import CommonApiMixin
 from common.const.http import GET, POST
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.permissions import IsServiceAccount
-from common.plugins.es import QuerySet as ESQuerySet
 from common.sessions.cache import user_session_manager
-from common.storage.ftp_file import FTPFileStorageHandler
+from common.storage.backends.ftp_file import FTPFileStorageHandler
+from common.storage.mixins import StorageDestroyModelMixin, StorageTestConnectiveMixin
 from common.utils import is_uuid, get_logger, lazyproperty
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.models import Organization
@@ -28,19 +24,20 @@ from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
 from users.models import User
-from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession
+    ActivityLog, JobLog, UserSession, LogStorage
 )
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
-    FileSerializer, UserSessionSerializer
+    FileSerializer, UserSessionSerializer, LogStorageSerializer
 )
+from .backends import get_log_storage
+from .const import LogType
 from .utils import construct_userlogin_usernames
 
 logger = get_logger(__name__)
@@ -73,6 +70,12 @@ class FTPLogViewSet(OrgModelViewSet):
         'download': 'audits.view_ftplog',
     }
 
+    def get_queryset(self):
+        return get_log_storage(LogType.ftp_log).get_manager().all()
+
+    def get_object(self):
+        return self.get_queryset().get(id=self.kwargs.get('pk'))
+
     def get_storage(self):
         return FTPFileStorageHandler(self.get_object())
 
@@ -89,11 +92,7 @@ class FTPLogViewSet(OrgModelViewSet):
             return HttpResponse(url)
 
         file = open(default_storage.path(local_path), 'rb')
-        response = FileResponse(file)
-        response['Content-Type'] = 'application/octet-stream'
-        filename = escape_uri_path(ftp_log.filename)
-        response["Content-Disposition"] = "attachment; filename*=UTF-8''{}".format(filename)
-        return response
+        return FileResponse(file, as_attachment=True, filename=ftp_log.filename)
 
     @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ], serializer_class=FileSerializer)
     def upload(self, request, *args, **kwargs):
@@ -124,6 +123,10 @@ class UserLoginCommonMixin:
     filterset_fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
     search_fields = ['id', 'username', 'ip', 'city']
 
+    def get_queryset(self):
+        storage = get_log_storage(LogType.login_log)
+        return storage.get_manager().all()
+
 
 class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
     @staticmethod
@@ -145,8 +148,9 @@ class MyLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        user = self.request.user
         qs = super().get_queryset()
-        qs = qs.filter(username=self.request.user.username)
+        qs = qs.filter(username__in=[f"{user.name}({user.username})", user.username])
         return qs
 
 
@@ -218,17 +222,10 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.all()
+        qs = get_log_storage(LogType.operate_log).get_manager().all()
         if self.is_action_detail:
             with tmp_to_root_org():
-                qs |= OperateLog.objects.filter(org_id=Organization.SYSTEM_ID)
-        es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
-        if es_config:
-            engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
-            store = engine_mod.OperateLogStore(es_config)
-            if store.ping(timeout=2):
-                qs = ESQuerySet(store)
-                qs.model = OperateLog
+                qs |= qs.filter(org_id=Organization.SYSTEM_ID)
         return qs
 
 
@@ -244,7 +241,7 @@ class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
     ordering = ['-datetime']
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = get_log_storage(LogType.password_change_log).get_manager()
         if not current_org.is_root():
             users = current_org.get_members()
             queryset = queryset.filter(
@@ -290,3 +287,19 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             user_session_manager.remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)
+
+
+class LogStorageViewSet(
+    StorageDestroyModelMixin, CommonApiMixin, viewsets.ModelViewSet
+):
+    search_fields = ('name', 'type')
+    filterset_fields = ['type',]
+    queryset = LogStorage.objects.all()
+    serializer_class = LogStorageSerializer
+
+
+class LogStorageTestConnectiveApi(StorageTestConnectiveMixin, generics.RetrieveAPIView):
+    queryset = LogStorage.objects.all()
+    rbac_perms = {
+        'retrieve': 'audits.view_logstorage'
+    }

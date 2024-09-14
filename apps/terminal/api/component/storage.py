@@ -4,14 +4,15 @@
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from django_filters import utils
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.api.mixin import CommonApiMixin
 from common.const.http import GET
 from common.drf.filters import BaseFilterSet
-from common.api.mixin import CommonApiMixin
+from common.storage.mixins import StorageDestroyModelMixin, StorageTestConnectiveMixin
 from terminal import const
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
 from terminal.models import CommandStorage, ReplayStorage
@@ -23,20 +24,9 @@ __all__ = [
 ]
 
 
-class BaseStorageViewSetMixin(CommonApiMixin):
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.type_null_or_server or instance.is_default:
-            data = {'msg': _('Deleting the default storage is not allowed')}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        if instance.is_use():
-            data = {'msg': _('Cannot delete storage that is being used')}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        return super().destroy(request, *args, **kwargs)
-
-
-class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
+class CommandStorageViewSet(
+    StorageDestroyModelMixin, CommonApiMixin, viewsets.ModelViewSet
+):
     search_fields = ('name', 'type')
     queryset = CommandStorage.objects.all()
     serializer_class = CommandStorageSerializer
@@ -113,41 +103,23 @@ class ReplayStorageFilterSet(BaseFilterSet):
         fields = ['name', 'type', 'is_default', 'type_not']
 
 
-class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
+class ReplayStorageViewSet(
+    StorageDestroyModelMixin, CommonApiMixin, viewsets.ModelViewSet
+):
     search_fields = ('name', 'type', 'is_default')
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
     filterset_class = ReplayStorageFilterSet
 
 
-class BaseStorageTestConnectiveMixin:
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        try:
-            is_valid = instance.is_valid()
-        except Exception as e:
-            is_valid = False
-            msg = _("Test failure: {}".format(str(e)))
-        else:
-            if is_valid:
-                msg = _("Test successful")
-            else:
-                msg = _("Test failure: Please check configuration")
-        data = {
-            'is_valid': is_valid,
-            'msg': msg
-        }
-        return Response(data)
-
-
-class CommandStorageTestConnectiveApi(BaseStorageTestConnectiveMixin, generics.RetrieveAPIView):
+class CommandStorageTestConnectiveApi(StorageTestConnectiveMixin, generics.RetrieveAPIView):
     queryset = CommandStorage.objects.all()
     rbac_perms = {
         'retrieve': 'terminal.view_commandstorage'
     }
 
 
-class ReplayStorageTestConnectiveApi(BaseStorageTestConnectiveMixin, generics.RetrieveAPIView):
+class ReplayStorageTestConnectiveApi(StorageTestConnectiveMixin, generics.RetrieveAPIView):
     queryset = ReplayStorage.objects.all()
     rbac_perms = {
         'retrieve': 'terminal.view_replaystorage'

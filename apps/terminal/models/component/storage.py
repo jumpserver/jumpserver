@@ -9,9 +9,9 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.db.fields import EncryptJsonDictTextField
 from common.db.models import JMSBaseModel
 from common.plugins.es import QuerySet as ESQuerySet
+from common.storage.mixins import CommonStorageModelMixin
 from common.utils import get_logger
 from common.utils.timezone import local_now_date_display
 from terminal import const
@@ -20,34 +20,6 @@ from .terminal import Terminal
 from ..session.command import Command
 
 logger = get_logger(__file__)
-
-
-class CommonStorageModelMixin(models.Model):
-    name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
-    meta = EncryptJsonDictTextField(default={})
-    is_default = models.BooleanField(default=False, verbose_name=_("Default"))
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return self.name
-
-    def set_to_default(self):
-        self.is_default = True
-        self.save(update_fields=["is_default"])
-        self.__class__.objects.select_for_update().filter(is_default=True).exclude(
-            id=self.id
-        ).update(is_default=False)
-
-    @classmethod
-    def default(cls):
-        objs = cls.objects.filter(is_default=True)
-        if not objs:
-            objs = cls.objects.filter(name="default", type="server")
-        if not objs:
-            objs = cls.objects.all()
-        return objs.first()
 
 
 class CommandStorage(CommonStorageModelMixin, JMSBaseModel):

@@ -81,6 +81,10 @@ msgstr "成功"
 msgid "Failed"
 msgstr "失敗しました"
 
+#: audits/serializers.py:204 audits/serializers.py:215
+msgid "Log types"
+msgstr "ログの種類"
+
 #: accounts/automations/backup_account/handlers.py:248
 msgid "The backup task has no assigned sftp server"
 msgstr "このバックアップタスクはsftpサーバーに割り当てられていません"

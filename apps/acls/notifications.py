@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Account
 from assets.models import Asset
+from audits.backends import get_log_storage
+from audits.const import LogType
 from audits.models import UserLoginLog
 from notifications.notifications import UserMessage
 from users.models import User
@@ -34,7 +36,8 @@ class UserLoginReminderMsg(UserMessage):
     @classmethod
     def gen_test_msg(cls):
         user = User.objects.first()
-        user_log = UserLoginLog.objects.first()
+        storage = get_log_storage(LogType.login_log)
+        user_log = storage.get_manager().first()
         return cls(user, user_log)
 
 

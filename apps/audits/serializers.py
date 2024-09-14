@@ -3,8 +3,9 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from audits.backends.db import OperateLogStore
+from audits.backends import get_log_storage, refresh_log_storage
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from common.storage.serializers import BaseStorageSerializer, StorageTypeESSerializer
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
 from ops.serializers.job import JobExecutionSerializer
@@ -13,9 +14,8 @@ from terminal.models import Session
 from users.models import User
 from . import models
 from .const import (
-    ActionChoices, OperateChoices,
-    MFAChoices, LoginStatusChoices,
-    LoginTypeChoices, ActivityChoices,
+    ActionChoices, OperateChoices, MFAChoices, LoginStatusChoices,
+    LoginTypeChoices, ActivityChoices, LogStorageType, LogType
 )
 
 
@@ -47,6 +47,13 @@ class FTPLogSerializer(serializers.ModelSerializer):
         ]
         fields = fields_small
 
+    def update(self, instance, validated_data):
+        return get_log_storage(LogType.ftp_log).update(instance, validated_data)
+
+    def create(self, validated_data):
+        storage = get_log_storage(LogType.ftp_log)
+        return storage.save(**validated_data)
+
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
     mfa = LabeledChoiceField(choices=MFAChoices.choices, label=_("MFA"))
@@ -77,7 +84,9 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
         fields = ('diff',)
 
     def to_representation(self, instance):
-        return {'diff': OperateLogStore.convert_diff_friendly(instance)}
+        return {
+            'diff': get_log_storage(LogType.operate_log).convert_diff_friendly(instance)
+        }
 
 
 class OperateLogSerializer(BulkOrgResourceModelSerializer):
@@ -189,3 +198,42 @@ class UserSessionSerializer(serializers.ModelSerializer):
         if not request:
             return False
         return request.session.session_key == obj.key
+
+
+class LogStorageWithESSerializer(StorageTypeESSerializer):
+    LOG_TYPES = serializers.MultipleChoiceField(choices=LogType.choices, label=_('Log types'))
+    INDEX = serializers.CharField(
+        max_length=1024, default='jumpserver', label=_('Index prefix'), allow_null=True
+    )
+
+
+class LogStorageSerializer(BaseStorageSerializer):
+    type = LabeledChoiceField(choices=LogStorageType.choices, label=_('Type'))
+    storage_type_serializer_classes_mapping = {
+        LogStorageType.es.value: LogStorageWithESSerializer
+    }
+    log_types_display = serializers.SerializerMethodField(label=_('Log types'))
+
+    class Meta(BaseStorageSerializer.Meta):
+        model = models.LogStorage
+        fields = ['id', 'name', 'type', 'meta', 'comment', 'log_types_display']
+
+    @staticmethod
+    def get_log_types_display(obj):
+        return [LogType(i).label for i in obj.meta.get('LOG_TYPES', [])]
+
+    @staticmethod
+    def update_log_types(instance):
+        current_log_types = instance.meta.get('LOG_TYPES', [])
+        storages = models.LogStorage.objects.exclude(id=instance.id)
+        for storage in storages:
+            log_types = storage.meta.get('LOG_TYPES', [])
+            storage.meta['LOG_TYPES'] = set(log_types) - set(current_log_types)
+        models.LogStorage.objects.bulk_update(storages, ['meta'])
+        return current_log_types
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        self.update_log_types(instance)
+        refresh_log_storage()
+        return instance

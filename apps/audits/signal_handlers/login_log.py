@@ -11,6 +11,8 @@ from rest_framework.request import Request
 
 from acls.models import LoginACL
 from acls.notifications import UserLoginReminderMsg
+from audits.backends import get_log_storage
+from audits.const import LogType
 from audits.models import UserLoginLog
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
@@ -105,7 +107,7 @@ def create_user_session(request, user_id, instance: UserLoginLog):
 
 def send_login_info_to_reviewers(instance: UserLoginLog | str, auth_acl_id):
     if isinstance(instance, str):
-        instance = UserLoginLog.objects.filter(id=instance).first()
+        instance = get_log_storage(LogType.login_log).filter(id=instance).first()
 
     if not instance:
         return
