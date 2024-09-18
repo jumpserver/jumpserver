@@ -16,6 +16,7 @@ class CustomSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Custom
         fields = AssetSerializer.Meta.fields + ['custom_info']
+        fields_unimport_template = ['custom_info']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

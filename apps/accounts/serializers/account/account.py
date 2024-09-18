@@ -247,6 +247,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'name': {'required': False},
             'source_id': {'required': False, 'allow_null': True},
         }
+        fields_unimport_template = ['params']
 
     @classmethod
     def setup_eager_loading(cls, queryset):
