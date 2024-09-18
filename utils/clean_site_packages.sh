@@ -4,7 +4,7 @@
 lib_path="/opt/py3/lib/python3.11/site-packages"
 
 # 清理不需要的模块
-need_clean="jedi botocore/data"
+need_clean="jedi"
 for i in $need_clean; do
   rm -rf "${lib_path}/${i}"
 done
