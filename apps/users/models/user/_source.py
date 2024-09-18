@@ -35,6 +35,7 @@ class SourceMixin:
             settings.AUTH_BACKEND_PUBKEY,
         ],
         Source.ldap: [settings.AUTH_BACKEND_LDAP],
+        Source.ldap_ha: [settings.AUTH_BACKEND_LDAP_HA],
         Source.openid: [
             settings.AUTH_BACKEND_OIDC_PASSWORD,
             settings.AUTH_BACKEND_OIDC_CODE,
