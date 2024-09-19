@@ -247,6 +247,9 @@ def bind_user_to_org_role(user):
 
 
 def bind_user_to_group(org_ids, group_names, user):
+    if isinstance(group_names, str):
+        group_names = [group_names]
+
     if not isinstance(group_names, list):
         return
 
