@@ -14,7 +14,7 @@ on:
       - yarn.lock
       - pom.xml
       - install_deps.sh
-      - clean_site_packages.sh
+      - utils/clean_site_packages.sh
     types:
       - opened
       - synchronize
