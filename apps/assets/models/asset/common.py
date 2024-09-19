@@ -38,6 +38,13 @@ class AssetQuerySet(models.QuerySet):
     def valid(self):
         return self.active()
 
+    def gateways(self, is_gateway=1):
+        kwargs = {'platform__name__startswith': 'Gateway'}
+        if is_gateway:
+            return self.filter(**kwargs)
+        else:
+            return self.exclude(**kwargs)
+
     def has_protocol(self, name):
         return self.filter(protocols__contains=name)
 
@@ -158,10 +165,16 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=767, verbose_name=_('Address'), db_index=True)
-    platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
-    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
-                               verbose_name=_("Zone"), on_delete=models.SET_NULL)
-    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
+    platform = models.ForeignKey(
+        Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets'
+    )
+    domain = models.ForeignKey(
+        "assets.Domain", null=True, blank=True, related_name='assets',
+        verbose_name=_("Zone"), on_delete=models.SET_NULL
+    )
+    nodes = models.ManyToManyField(
+        'assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes")
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
     custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)

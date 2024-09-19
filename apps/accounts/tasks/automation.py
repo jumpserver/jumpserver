@@ -1,9 +1,15 @@
+import datetime
+
 from celery import shared_task
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
 
 from accounts.const import AutomationTypes
 from accounts.tasks.common import quickstart_automation_by_snapshot
-from common.utils import get_logger, get_object_or_none
+from common.const.crontab import CRONTAB_AT_AM_THREE
+from common.utils import get_logger, get_object_or_none, get_log_keep_day
+from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 logger = get_logger(__file__)
@@ -22,8 +28,14 @@ def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
 
 
 @shared_task(
-    queue='ansible', verbose_name=_('Account execute automation'),
-    activity_callback=task_activity_callback
+    queue='ansible',
+    verbose_name=_('Account execute automation'),
+    activity_callback=task_activity_callback,
+    description=_(
+        """Unified execution entry for account automation tasks: when the system performs tasks 
+        such as account push, password change, account verification, account collection, 
+        and gateway account verification, all tasks are executed through this unified entry"""
+    )
 )
 def execute_account_automation_task(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)
@@ -48,8 +60,12 @@ def record_task_activity_callback(self, record_ids, *args, **kwargs):
 
 
 @shared_task(
-    queue='ansible', verbose_name=_('Execute automation record'),
-    activity_callback=record_task_activity_callback
+    queue='ansible',
+    verbose_name=_('Execute automation record'),
+    activity_callback=record_task_activity_callback,
+    description=_(
+        """When manually executing password change records, this task is used"""
+    )
 )
 def execute_automation_record_task(record_ids, tp):
     from accounts.models import ChangeSecretRecord
@@ -74,3 +90,33 @@ def execute_automation_record_task(record_ids, tp):
     }
     with tmp_to_org(record.execution.org_id):
         quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
+
+
+@shared_task(
+    verbose_name=_('Clean change secret and push record period'),
+    description=_(
+        """The system will periodically clean up unnecessary password change and push records, 
+        including their associated change tasks, execution logs, assets, and accounts. When any 
+        of these associated items are deleted, the corresponding password change and push records 
+        become invalid. Therefore, to maintain a clean and efficient database, the system will 
+        clean up expired records at 2 a.m daily, based on the interval specified by 
+        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. This periodic cleanup 
+        mechanism helps free up storage space and enhances the security and overall performance 
+        of data management"""
+    )
+)
+@register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
+def clean_change_secret_and_push_record_period():
+    from accounts.models import ChangeSecretRecord
+    print('Start clean change secret and push record period')
+    with tmp_to_root_org():
+        now = timezone.now()
+        days = get_log_keep_day('ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS')
+        expired_day = now - datetime.timedelta(days=days)
+        records = ChangeSecretRecord.objects.filter(
+            date_updated__lt=expired_day
+        ).filter(
+            Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
+        )
+
+        records.delete()

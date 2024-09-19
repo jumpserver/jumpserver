@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class Source(models.TextChoices):
     local = "local", _("Local")
     ldap = "ldap", "LDAP/AD"
+    ldap_ha = "ldap_ha", "LDAP/AD (HA)"
     openid = "openid", "OpenID"
     radius = "radius", "Radius"
     cas = "cas", "CAS"
@@ -34,6 +35,7 @@ class SourceMixin:
             settings.AUTH_BACKEND_PUBKEY,
         ],
         Source.ldap: [settings.AUTH_BACKEND_LDAP],
+        Source.ldap_ha: [settings.AUTH_BACKEND_LDAP_HA],
         Source.openid: [
             settings.AUTH_BACKEND_OIDC_PASSWORD,
             settings.AUTH_BACKEND_OIDC_CODE,
@@ -55,6 +57,7 @@ class SourceMixin:
         mapper = {
             cls.Source.local: True,
             cls.Source.ldap: settings.AUTH_LDAP,
+            cls.Source.ldap_ha: settings.AUTH_LDAP_HA,
             cls.Source.openid: settings.AUTH_OPENID,
             cls.Source.radius: settings.AUTH_RADIUS,
             cls.Source.cas: settings.AUTH_CAS,

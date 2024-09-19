@@ -2,10 +2,10 @@
 #
 from collections import defaultdict
 
-import django_filters
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from django_filters import rest_framework as drf_filters
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,6 +22,7 @@ from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
+from ...const import GATEWAY_NAME
 from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
 logger = get_logger(__file__)
@@ -32,31 +33,32 @@ __all__ = [
 
 
 class AssetFilterSet(BaseFilterSet):
-    platform = django_filters.CharFilter(method='filter_platform')
-    exclude_platform = django_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
-    domain = django_filters.CharFilter(method='filter_domain')
-    type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
-    category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
-    protocols = django_filters.CharFilter(method='filter_protocols')
-    domain_enabled = django_filters.BooleanFilter(
+    platform = drf_filters.CharFilter(method='filter_platform')
+    is_gateway = drf_filters.BooleanFilter(method='filter_is_gateway')
+    exclude_platform = drf_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
+    domain = drf_filters.CharFilter(method='filter_domain')
+    type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
+    category = drf_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
+    protocols = drf_filters.CharFilter(method='filter_protocols')
+    domain_enabled = drf_filters.BooleanFilter(
         field_name="platform__domain_enabled", lookup_expr="exact"
     )
-    ping_enabled = django_filters.BooleanFilter(
+    ping_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__ping_enabled", lookup_expr="exact"
     )
-    gather_facts_enabled = django_filters.BooleanFilter(
+    gather_facts_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__gather_facts_enabled", lookup_expr="exact"
     )
-    change_secret_enabled = django_filters.BooleanFilter(
+    change_secret_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__change_secret_enabled", lookup_expr="exact"
     )
-    push_account_enabled = django_filters.BooleanFilter(
+    push_account_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__push_account_enabled", lookup_expr="exact"
     )
-    verify_account_enabled = django_filters.BooleanFilter(
+    verify_account_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__verify_account_enabled", lookup_expr="exact"
     )
-    gather_accounts_enabled = django_filters.BooleanFilter(
+    gather_accounts_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__gather_accounts_enabled", lookup_expr="exact"
     )
 
@@ -71,8 +73,15 @@ class AssetFilterSet(BaseFilterSet):
     def filter_platform(queryset, name, value):
         if value.isdigit():
             return queryset.filter(platform_id=value)
+        elif value == GATEWAY_NAME:
+            return queryset.filter(platform__name__istartswith=GATEWAY_NAME)
         else:
             return queryset.filter(platform__name=value)
+
+    @staticmethod
+    def filter_is_gateway(queryset, name, value):
+        queryset = queryset.gateways(value)
+        return queryset
 
     @staticmethod
     def filter_domain(queryset, name, value):
@@ -298,6 +307,7 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     def check_permissions(self, request):
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
+            "test": "assets.test_assetconnectivity",
         }
         _action = request.data.get("action")
         perm_required = action_perm_require.get(_action)

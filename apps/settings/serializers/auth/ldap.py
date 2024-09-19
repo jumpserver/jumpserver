@@ -33,6 +33,7 @@ class LDAPUserSerializer(serializers.Serializer):
     email = serializers.CharField()
     groups = serializers.ListField(child=serializers.CharField(), default=[])
     existing = serializers.BooleanField(read_only=True)
+    status = serializers.JSONField(read_only=True)
 
 
 class LDAPSettingSerializer(serializers.Serializer):
@@ -87,7 +88,7 @@ class LDAPSettingSerializer(serializers.Serializer):
         default=3600 * 24 * 30,
         required=False, label=_('User DN cache timeout (s)'),
         help_text=_(
-            'Caching the User DN obtained during user login authentication can effectively'
+            'Caching the User DN obtained during user login authentication can effectively '
             'improve the speed of user authentication., 0 means no cache<br>'
             'If the user OU structure has been adjusted, click Submit to clear the user DN cache'
         )

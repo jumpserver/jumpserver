@@ -16,8 +16,12 @@ __all__ = [
 
 
 @shared_task(
-    verbose_name=_('Test gateways connectivity'), queue='ansible',
-    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id)
+    verbose_name=_('Test gateways connectivity'),
+    queue='ansible',
+    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
+    description=_(
+        "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will be executed"
+    )
 )
 def test_gateways_connectivity_task(asset_ids, org_id, local_port, task_name=None):
     from assets.models import PingAutomation
@@ -33,4 +37,5 @@ def test_gateways_connectivity_task(asset_ids, org_id, local_port, task_name=Non
 def test_gateways_connectivity_manual(gateway_ids, local_port):
     task_name = gettext_noop("Test gateways connectivity")
     gateway_ids = [str(i) for i in gateway_ids]
-    return test_gateways_connectivity_task.delay(gateway_ids, str(current_org.id), local_port, task_name)
+    return test_gateways_connectivity_task.delay(gateway_ids, str(current_org.id), local_port,
+                                                 task_name)

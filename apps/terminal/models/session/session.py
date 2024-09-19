@@ -51,7 +51,7 @@ class Session(OrgModelMixin):
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
     LOCK_CACHE_KEY_PREFIX = 'TOGGLE_LOCKED_SESSION_{}'
-    SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz', 4: '.replay.mp4'}
+    SUFFIX_MAP = {2: '.replay.gz', 3: '.cast.gz', 4: '.replay.mp4', 5: '.replay.json'}
     DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz', '.replay.mp4']
 
     # Todo: 将来干掉 local_path, 使用 default storage 实现
@@ -75,22 +75,22 @@ class Session(OrgModelMixin):
         """
         local_path: replay/2021-12-08/session_id.cast.gz
         通过后缀名获取本地存储的录像文件路径
-        :param suffix: .cast.gz | '.replay.gz' | '.gz'
+        :param suffix: .cast.gz | '.replay.gz'
         :return:
         """
         rel_path = self.get_relative_path_by_suffix(suffix)
-        if suffix == '.gz':
-            # 兼容 v1 的版本
-            return rel_path
         return os.path.join(self.upload_to, rel_path)
 
     def get_relative_path_by_suffix(self, suffix='.cast.gz'):
         """
         relative_path: 2021-12-08/session_id.cast.gz
         通过后缀名获取外部存储录像文件路径
-        :param suffix: .cast.gz | '.replay.gz' | '.gz'
+        :param suffix: .cast.gz | '.replay.gz' | '.replay.json'
         :return:
         """
+        if suffix == '.replay.json':
+            meta_filename = str(self.id) + suffix
+            return self.get_replay_part_file_relative_path(meta_filename)
         date = self.date_start.strftime('%Y-%m-%d')
         return os.path.join(date, str(self.id) + suffix)
 
@@ -172,17 +172,35 @@ class Session(OrgModelMixin):
         display = self.terminal.name if self.terminal else ''
         return display
 
+    def get_replay_dir_relative_path(self):
+        date = self.date_start.strftime('%Y-%m-%d')
+        return os.path.join(date, str(self.id))
+
+    def get_replay_part_file_relative_path(self, filename):
+        return os.path.join(self.get_replay_dir_relative_path(), filename)
+
+    def get_replay_part_file_local_storage_path(self, filename):
+        return os.path.join(self.upload_to, self.get_replay_part_file_relative_path(filename))
+
     def save_replay_to_storage_with_version(self, f, version=2):
-        suffix = self.SUFFIX_MAP.get(version, '.cast.gz')
-        local_path = self.get_local_storage_path_by_suffix(suffix)
+        if version <= 4:
+            # compatible old API and deprecated in future version
+            suffix = self.SUFFIX_MAP.get(version, '.cast.gz')
+            rel_path = self.get_relative_path_by_suffix(suffix)
+            local_path = self.get_local_storage_path_by_suffix(suffix)
+        else:
+            # 文件名依赖 上传的文件名，不再使用默认的文件名
+            filename = f.name
+            rel_path = self.get_replay_part_file_relative_path(filename)
+            local_path = self.get_replay_part_file_local_storage_path(filename)
         try:
             name = default_storage.save(local_path, f)
         except OSError as e:
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
-            from terminal.tasks import upload_session_replay_to_external_storage
-            upload_session_replay_to_external_storage.delay(str(self.id))
+            from terminal.tasks import upload_session_replay_file_to_external_storage
+            upload_session_replay_file_to_external_storage.delay(str(self.id), local_path, rel_path)
         return name, None
 
     @classmethod

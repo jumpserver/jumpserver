@@ -1,7 +1,6 @@
 import textwrap
 import traceback
 from itertools import chain
-from typing import Iterable
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
@@ -43,7 +42,13 @@ class MessageType(type):
         return clz
 
 
-@shared_task(verbose_name=_('Publish the station message'))
+@shared_task(
+    verbose_name=_('Publish the station message'),
+    description=_(
+        """This task needs to be executed for sending internal messages for system alerts, 
+        work orders, and other notifications"""
+    )
+)
 def publish_task(receive_user_ids, backends_msg_mapper):
     Message.send_msg(receive_user_ids, backends_msg_mapper)
 

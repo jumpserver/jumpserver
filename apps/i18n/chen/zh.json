@@ -67,5 +67,8 @@
     "Version": "版本",
     "ViewData": "查看数据",
     "WaitCommandReviewMessage": "复核请求已发起, 请等待复核结果",
-    "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确"
+    "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确",
+    "Warning": "警告",
+    "ExecutionCanceled": "执行已取消",
+    "CommandWarningDialogMessage": "您执行的命令存在风险，告警通知将发送给管理员。是否继续？"
 }

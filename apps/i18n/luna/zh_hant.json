@@ -90,7 +90,7 @@
     "Info": "提示",
     "InstallClientMsg": "JumpServer 用戶端沒有安裝，現在去下載安裝?",
     "Japanese keyboard layout": "Japanese (Qwerty)",
-    "Keyboard keys": "Option + Left / Option + Right",
+    "Keyboard keys": "Option + Shift + Left / Right",
     "Keyboard layout": "鍵盤布局",
     "Keyboard switch session": "切換會話 → 快捷鍵",
     "Kubernetes": "Kubernetes",
@@ -123,6 +123,7 @@
     "NoTabs": "沒有視窗",
     "Not quick command": "暫無快捷命令",
     "Open in new window": "新窗口打開",
+    "Operator": "操作人",
     "Password": "密碼",
     "Password is token password on the table": "密碼是表格中的 Token 密碼",
     "Password is your password login to system": "密碼是你登入系統的密碼",
@@ -203,6 +204,7 @@
     "Users": "用戶",
     "Using token": "使用 Token",
     "View": "視圖",
+    "Viewer": "查看人",
     "VirtualApp": "虛擬應用",
     "Web Terminal": "Web終端",
     "Website": "官網",
@@ -220,7 +222,5 @@
     "start time": "開始時間",
     "success": "成功",
     "system user": "系統用戶",
-    "user": "用戶",
-    "Viewer": "查看人",
-    "Operator": "操作人"
+    "user": "用戶"
 }

@@ -1,8 +1,7 @@
-import html2text
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
-from common.utils import get_logger
+from common.utils import get_logger, convert_html_to_markdown
 from tickets.const import TicketState, TicketType
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
@@ -97,9 +96,8 @@ class BaseHandler:
         approve_info = _('{} {} the ticket').format(user_display, state_display)
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
-        body = self.safe_html_script(
-            render_to_string('tickets/ticket_approve_diff.html', context)
-        )
+        html_str = render_to_string('tickets/ticket_approve_diff.html', context)
+        body = convert_html_to_markdown(html_str)
         data = {
             'body': body,
             'user': user,
@@ -108,9 +106,3 @@ class BaseHandler:
             'state': state
         }
         return self.ticket.comments.create(**data)
-
-    @staticmethod
-    def safe_html_script(unsafe_html):
-        unsafe_html = unsafe_html.replace('\n', '')
-        html_str = html2text.html2text(unsafe_html)
-        return html_str

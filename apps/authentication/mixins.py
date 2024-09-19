@@ -301,6 +301,7 @@ class MFAMixin:
 
 
 class AuthPostCheckMixin:
+
     @classmethod
     def generate_reset_password_url_with_flash_msg(cls, user, message):
         reset_passwd_url = reverse('authentication:reset-password')
@@ -319,20 +320,26 @@ class AuthPostCheckMixin:
 
     @classmethod
     def _check_passwd_is_too_simple(cls, user: User, password):
-        if password == 'admin' or password == 'ChangeMe':
+        if not user.is_auth_backend_model():
+            return
+        if user.check_passwd_too_simple(password):
             message = _('Your password is too simple, please change it for security')
             url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
             raise errors.PasswordTooSimple(url)
 
     @classmethod
     def _check_passwd_need_update(cls, user: User):
-        if user.need_update_password:
+        if not user.is_auth_backend_model():
+            return
+        if user.check_need_update_password():
             message = _('You should to change your password before login')
             url = cls.generate_reset_password_url_with_flash_msg(user, message)
             raise errors.PasswordNeedUpdate(url)
 
     @classmethod
     def _check_password_require_reset_or_not(cls, user: User):
+        if not user.is_auth_backend_model():
+            return
         if user.password_has_expired:
             message = _('Your password has expired, please reset before logging in')
             url = cls.generate_reset_password_url_with_flash_msg(user, message)

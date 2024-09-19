@@ -108,7 +108,7 @@ class BaseFileParser(BaseParser):
         if not matched:
             return v
         obj_name, obj_id = matched.groups()
-        if len(obj_id) < 36:
+        if obj_id.isdigit():
             obj_id = int(obj_id)
         return {'pk': obj_id, 'name': obj_name}
 
@@ -119,8 +119,6 @@ class BaseFileParser(BaseParser):
             value = field.to_file_internal_value(value)
         elif isinstance(field, serializers.BooleanField):
             value = value.lower() in ['true', '1', 'yes']
-        elif isinstance(field, serializers.ChoiceField):
-            value = value
         elif isinstance(field, ObjectRelatedField):
             if field.many:
                 value = [self.id_name_to_obj(v) for v in value]
@@ -164,6 +162,15 @@ class BaseFileParser(BaseParser):
             data.append(row_data)
         return data
 
+    @staticmethod
+    def pop_help_text_if_need(rows):
+        rows = list(rows)
+        if not rows:
+            return rows
+        if rows[0][0].startswith('#Help'):
+            rows.pop(0)
+        return rows
+
     def parse(self, stream, media_type=None, parser_context=None):
         assert parser_context is not None, '`parser_context` should not be `None`'
 
@@ -192,6 +199,7 @@ class BaseFileParser(BaseParser):
                 request.jms_context = {}
             request.jms_context['column_title_field_pairs'] = column_title_field_pairs
 
+            rows = self.pop_help_text_if_need(rows)
             data = self.generate_data(field_names, rows)
             return data
         except Exception as e:

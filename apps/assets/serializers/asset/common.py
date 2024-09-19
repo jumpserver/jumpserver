@@ -31,6 +31,12 @@ __all__ = [
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=0)
 
+    def get_render_help_text(self):
+        if self.parent and self.parent.many:
+            return _('Protocols, format is ["protocol/port"]')
+        else:
+            return _('Protocol, format is name/port')
+
     def to_file_representation(self, data):
         return '{name}/{port}'.format(**data)
 
@@ -97,6 +103,9 @@ class AssetAccountSerializer(AccountSerializer):
         attrs = super().validate(attrs)
         return self.set_secret(attrs)
 
+    def get_render_help_text(self):
+        return _('Accounts, format [{"name": "x", "username": "x", "secret": "x", "secret_type": "password"}]')
+
     class Meta(AccountSerializer.Meta):
         fields = [
             f for f in AccountSerializer.Meta.fields
@@ -121,19 +130,30 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
         }
 
 
+class NodeDisplaySerializer(serializers.ListField):
+    def get_render_help_text(self):
+        return _('Node path, format ["/org_name/node_name"], if node not exist, will create it')
+
+    def to_internal_value(self, data):
+        return data
+
+    def to_representation(self, data):
+        return data
+
+
 class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
-    nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
+    nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
     _accounts = None
 
     class Meta:
         model = Asset
-        fields_mini = ['id', 'name', 'address']
-        fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform']
+        fields_mini = ['id', 'name', 'address'] + fields_fk
+        fields_small = fields_mini + ['is_active', 'comment']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',

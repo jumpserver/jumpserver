@@ -8,7 +8,6 @@ LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 DRF_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'drf_exception.log')
 UNEXPECTED_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'unexpected_exception.log')
-ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
 GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
 LOG_LEVEL = CONFIG.LOG_LEVEL
 
@@ -50,37 +49,25 @@ LOGGING = {
         'file': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'main',
             'filename': JUMPSERVER_LOG_FILE,
-        },
-        'ansible_logs': {
-            'encoding': 'utf8',
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'main',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
-            'filename': ANSIBLE_LOG_FILE,
         },
         'drf_exception': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'exception',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
             'filename': DRF_EXCEPTION_LOG_FILE,
         },
         'unexpected_exception': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
+            'when': 'midnight',
             'formatter': 'exception',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
             'filename': UNEXPECTED_EXCEPTION_LOG_FILE,
         },
         'syslog': {
@@ -117,10 +104,6 @@ LOGGING = {
             'handlers': ['unexpected_exception'],
             'level': LOG_LEVEL,
         },
-        'ops.ansible_api': {
-            'handlers': ['console', 'ansible_logs'],
-            'level': LOG_LEVEL,
-        },
         'django_auth_ldap': {
             'handlers': ['console', 'file'],
             'level': "INFO",
@@ -155,3 +138,4 @@ if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR, mode=0o755)
+

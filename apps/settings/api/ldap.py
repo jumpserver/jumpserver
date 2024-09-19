@@ -6,6 +6,7 @@ from rest_framework.views import Response
 
 from common.utils import get_logger
 from users.models import User
+from ..const import ImportStatus
 from ..models import Setting
 from ..serializers import LDAPUserSerializer
 from ..utils import (
@@ -25,12 +26,14 @@ class LDAPUserListApi(generics.ListAPIView):
 
     def get_queryset_from_cache(self):
         search_value = self.request.query_params.get('search')
-        users = LDAPCacheUtil().search(search_value=search_value)
+        category = self.request.query_params.get('category')
+        users = LDAPCacheUtil(category=category).search(search_value=search_value)
         return users
 
     def get_queryset_from_server(self):
         search_value = self.request.query_params.get('search')
-        users = LDAPServerUtil().search(search_value=search_value)
+        category = self.request.query_params.get('category')
+        users = LDAPServerUtil(category=category).search(search_value=search_value)
         return users
 
     def get_queryset(self):

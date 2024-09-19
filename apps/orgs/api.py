@@ -24,8 +24,7 @@ logger = get_logger(__file__)
 
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
-    User, UserGroup, Asset, Label, Domain, Node, Label,
-    AssetPermission,
+    User, UserGroup, Asset, Node, Label, Domain, AssetPermission
 ]
 
 

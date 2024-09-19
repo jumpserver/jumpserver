@@ -1,21 +1,33 @@
 name: Build and Push Base Image
 
 on:
-  push:
+  pull_request:
     branches:
-      - 'pr*'
+      - 'dev'
+      - 'v*'
     paths:
-      - 'poetry.lock'
-      - 'pyproject.toml'
-      - 'Dockerfile-base'
+      - poetry.lock
+      - pyproject.toml
+      - Dockerfile-base
+      - package.json
+      - go.mod
+      - yarn.lock
+      - pom.xml
+      - install_deps.sh
+      - utils/clean_site_packages.sh
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -55,6 +67,6 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add Dockerfile
           git commit -m "perf: Update Dockerfile with new base image tag"
-          git push
+          git push origin ${{ github.event.pull_request.head.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

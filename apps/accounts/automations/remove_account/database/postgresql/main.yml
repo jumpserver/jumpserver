@@ -2,6 +2,10 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /opt/py3/bin/python
+    check_ssl: "{{ jms_asset.spec_info.use_ssl }}"
+    ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
+    ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
+    ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
 
   tasks:
     - name: "Remove account"
@@ -12,4 +16,8 @@
         login_port: "{{ jms_asset.port }}"
         db: "{{ jms_asset.spec_info.db_name }}"
         name: "{{ account.username }}"
+        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
+        ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
+        ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
+        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
         state: absent

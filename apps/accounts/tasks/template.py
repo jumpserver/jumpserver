@@ -9,7 +9,11 @@ from orgs.utils import tmp_to_root_org, tmp_to_org
 
 @shared_task(
     verbose_name=_('Template sync info to related accounts'),
-    activity_callback=lambda self, template_id, *args, **kwargs: (template_id, None)
+    activity_callback=lambda self, template_id, *args, **kwargs: (template_id, None),
+    description=_(
+        """When clicking 'Sync new secret to accounts' in 'Console - Account - Templates - 
+        Accounts' this task will be executed"""
+    )
 )
 def template_sync_related_accounts(template_id, user_id=None):
     from accounts.models import Account, AccountTemplate

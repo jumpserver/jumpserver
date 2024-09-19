@@ -19,6 +19,16 @@ class PasswordRulesSerializer(serializers.Serializer):
         default='', allow_blank=True, max_length=16, label=_('Exclude symbol')
     )
 
+    @staticmethod
+    def get_render_help_text():
+        return _("""length is the length of the password, and the range is 8 to 30.
+lowercase indicates whether the password contains lowercase letters, 
+uppercase indicates whether it contains uppercase letters,
+digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.
+exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). 
+If you do not need to exclude symbols, you can leave it blank.
+default: {"length": 16, "lowercase": true, "uppercase": true, "digit": true, "symbol": true, "exclude_symbols": ""}""")
+
 
 class AccountTemplateSerializer(BaseAccountSerializer):
     password_rules = PasswordRulesSerializer(required=False, label=_('Password rules'))
@@ -46,6 +56,7 @@ class AccountTemplateSerializer(BaseAccountSerializer):
                 'required': False
             },
         }
+        fields_unimport_template = ['push_params']
 
     @staticmethod
     def generate_secret(attrs):

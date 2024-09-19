@@ -8,27 +8,26 @@
 """
 
 import base64
-import requests
 
-from rest_framework.exceptions import ParseError
+import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import SuspiciousOperation
 from django.db import transaction
 from django.urls import reverse
-from django.conf import settings
+from rest_framework.exceptions import ParseError
 
-from common.utils import get_logger
+from authentication.signals import user_auth_success, user_auth_failed
 from authentication.utils import build_absolute_uri_for_oidc
+from common.utils import get_logger
 from users.utils import construct_user_email
-
-from ..base import JMSBaseAuthBackend
-from .utils import validate_and_return_id_token
 from .decorator import ssl_verification
 from .signals import (
     openid_create_or_update_user
 )
-from authentication.signals import user_auth_success, user_auth_failed
+from .utils import validate_and_return_id_token
+from ..base import JMSBaseAuthBackend
 
 logger = get_logger(__file__)
 
@@ -55,16 +54,17 @@ class UserMixin:
         logger.debug(log_prompt.format(user_attrs))
 
         username = user_attrs.get('username')
-        name = user_attrs.get('name')
+        groups = user_attrs.pop('groups', None)
 
         user, created = get_user_model().objects.get_or_create(
             username=username, defaults=user_attrs
         )
+        user_attrs['groups'] = groups
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
         logger.debug(log_prompt.format("Send signal => openid create or update user"))
         openid_create_or_update_user.send(
-            sender=self.__class__, request=request, user=user, created=created,
-            name=name, username=username, email=email
+            sender=self.__class__, request=request, user=user,
+            created=created, attrs=user_attrs,
         )
         return user, created
 
@@ -269,7 +269,8 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
 
         # Calls the token endpoint.
         logger.debug(log_prompt.format('Call the token endpoint'))
-        token_response = requests.post(settings.AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT, data=token_payload, timeout=request_timeout)
+        token_response = requests.post(settings.AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT, data=token_payload,
+                                       timeout=request_timeout)
         try:
             token_response.raise_for_status()
             token_response_data = token_response.json()

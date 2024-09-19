@@ -8,14 +8,13 @@ from common.utils import get_logger
 
 __all__ = ["AdHoc"]
 
-from ops.const import AdHocModules
-
-from orgs.mixins.models import JMSOrgBaseModel
+from common.db.models import JMSBaseModel
+from ops.const import AdHocModules, Scope
 
 logger = get_logger(__file__)
 
 
-class AdHoc(JMSOrgBaseModel):
+class AdHoc(JMSBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
@@ -24,6 +23,7 @@ class AdHoc(JMSOrgBaseModel):
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
+    scope = models.CharField(max_length=64, default=Scope.public, verbose_name=_('Scope'))
 
     @property
     def row_count(self):
@@ -40,5 +40,5 @@ class AdHoc(JMSOrgBaseModel):
         return "{}: {}".format(self.module, self.args)
 
     class Meta:
-        unique_together = [('name', 'org_id', 'creator')]
+        unique_together = [('name', 'creator')]
         verbose_name = _("Adhoc")

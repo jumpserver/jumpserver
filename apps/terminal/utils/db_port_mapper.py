@@ -13,7 +13,7 @@ logger = get_logger(__file__)
 
 
 @Singleton
-class DBPortManager(object):
+class DBPortManager:
     """ 管理端口-数据库ID的映射, Magnus 要使用 """
     CACHE_KEY = 'PORT_DB_MAPPER'
 
@@ -52,7 +52,9 @@ class DBPortManager(object):
 
         db_ids_to_pop = set(mapper.values()) - set(db_ids)
         mapper = self.bulk_pop(db_ids_to_pop, mapper)
-        self.set_mapper(mapper)
+
+        if db_ids_to_add or db_ids_to_pop:
+            self.set_mapper(mapper)
 
         if settings.DEBUG:
             logger.debug("Oracle listen ports: {}".format(len(mapper.keys())))
@@ -63,6 +65,7 @@ class DBPortManager(object):
         db_ids = [str(i) for i in db_ids]
         mapper = dict(zip(self.all_avail_ports, list(db_ids)))
         self.set_mapper(mapper)
+        return mapper
 
     def bulk_add(self, db_ids, mapper):
         for db_id in db_ids:
@@ -125,12 +128,20 @@ class DBPortManager(object):
         mapper = self.get_mapper()
         return sorted([int(i) for i in mapper.keys()])
 
+    @staticmethod
+    def oracle_ports_setting_changed():
+        oracle_ports_cache = cache.get('MAGNUS_ORACLE_PORTS') or ''
+        if settings.MAGNUS_ORACLE_PORTS.split('-')[0] != oracle_ports_cache.split('-')[0]:
+            logger.info('Oracle ports setting changed')
+            return True
+        return False
+
     def get_mapper(self):
         mapper = cache.get(self.CACHE_KEY, {})
-        if not mapper:
+        if not mapper or self.oracle_ports_setting_changed():
             # redis 可能被清空，重新初始化一下
-            self.init()
-        return cache.get(self.CACHE_KEY, {})
+            mapper = self.init()
+        return mapper
 
     def set_mapper(self, value):
         """
@@ -139,6 +150,7 @@ class DBPortManager(object):
         }
         """
         cache.set(self.CACHE_KEY, value, timeout=None)
+        cache.set('MAGNUS_ORACLE_PORTS', settings.MAGNUS_ORACLE_PORTS)
 
 
 db_port_manager = DBPortManager()

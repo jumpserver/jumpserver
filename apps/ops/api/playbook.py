@@ -4,13 +4,16 @@ import zipfile
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
+from common.api.generic import JMSBulkModelViewSet
 from common.exceptions import JMSException
-from orgs.mixins.api import OrgBulkModelViewSet
+from common.utils.http import is_true
 from rbac.permissions import RBACPermission
+from ..const import Scope
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
 from ..serializers.playbook import PlaybookSerializer
@@ -28,11 +31,19 @@ def unzip_playbook(src, dist):
         fz.extract(file, dist)
 
 
-class PlaybookViewSet(OrgBulkModelViewSet):
+class PlaybookViewSet(JMSBulkModelViewSet):
     serializer_class = PlaybookSerializer
     permission_classes = (RBACPermission,)
-    model = Playbook
+    queryset = Playbook.objects.all()
     search_fields = ('name', 'comment')
+    filterset_fields = ['scope', 'creator']
+
+    def check_object_permissions(self, request, obj):
+        if request.method != 'GET' and obj.creator != request.user:
+            self.permission_denied(
+                request, message={"detail": "Deleting other people's playbook is not allowed"}
+            )
+        return super().check_object_permissions(request, obj)
 
     def perform_destroy(self, instance):
         if instance.job_set.exists():
@@ -45,7 +56,11 @@ class PlaybookViewSet(OrgBulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(creator=self.request.user)
+        user = self.request.user
+        if is_true(self.request.query_params.get('only_mine')):
+            queryset = queryset.filter(creator=user)
+        else:
+            queryset = queryset.filter(Q(creator=user) | Q(scope=Scope.public))
         return queryset
 
     def perform_create(self, serializer):
@@ -85,7 +100,8 @@ class PlaybookFileBrowserAPIView(APIView):
 
     def get(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
-        playbook = self.get_playbook(playbook_id)
+        user = self.request.user
+        playbook = get_object_or_404(Playbook, Q(creator=user) | Q(scope=Scope.public), id=playbook_id)
         work_path = playbook.work_dir
         file_key = request.query_params.get('key', '')
         if file_key:

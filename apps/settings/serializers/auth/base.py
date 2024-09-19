@@ -11,6 +11,7 @@ class AuthSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Authentication')
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('LDAP Auth'))
+    AUTH_LDAP_HA = serializers.BooleanField(required=False, label=_('LDAP Auth HA'))
     AUTH_CAS = serializers.BooleanField(required=False, label=_('CAS Auth'))
     AUTH_OPENID = serializers.BooleanField(required=False, label=_('OPENID Auth'))
     AUTH_SAML2 = serializers.BooleanField(default=False, label=_("SAML2 Auth"))

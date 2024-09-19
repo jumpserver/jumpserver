@@ -28,7 +28,10 @@ RUNNING = False
 logger = get_task_logger(__name__)
 
 
-@shared_task(verbose_name=_('Periodic delete terminal status'))
+@shared_task(
+    verbose_name=_('Periodic delete terminal status'),
+    description=_("Unused")
+)
 @register_as_period_task(interval=3600)
 @after_app_ready_start
 def delete_terminal_status_period():
@@ -36,7 +39,13 @@ def delete_terminal_status_period():
     Status.objects.filter(date_created__lt=yesterday).delete()
 
 
-@shared_task(verbose_name=_('Clean orphan session'))
+@shared_task(
+    verbose_name=_('Clean orphan session'),
+    description=_(
+        """Check every 10 minutes for asset connection sessions that have been inactive for 3 
+        minutes and mark these sessions as completed"""
+    )
+)
 @register_as_period_task(interval=600)
 @after_app_ready_start
 @tmp_to_root_org()
@@ -55,7 +64,13 @@ def clean_orphan_session():
         session.save()
 
 
-@shared_task(verbose_name=_('Upload session replay to external storage'))
+@shared_task(
+    verbose_name=_('Upload session replay to external storage'),
+    description=_(
+        """If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and 
+        recordings will be uploaded to external storage"""
+    )
+)
 def upload_session_replay_to_external_storage(session_id):
     logger.info(f'Start upload session to external storage: {session_id}')
     session = Session.objects.filter(id=session_id).first()
@@ -84,8 +99,33 @@ def upload_session_replay_to_external_storage(session_id):
 
 
 @shared_task(
+    verbose_name=_('Upload session replay part file to external storage'),
+    description=_(
+        """If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and 
+        recordings will be uploaded to external storage"""
+    ))
+def upload_session_replay_file_to_external_storage(session_id, local_path, remote_path):
+    abs_path = default_storage.path(local_path)
+    ok, err = server_replay_storage.upload(abs_path, remote_path)
+    if not ok:
+        logger.error(f'Session replay file {local_path} upload to external error: {err}')
+        return
+
+    try:
+        default_storage.delete(local_path)
+    except:
+        pass
+    return
+
+
+
+@shared_task(
     verbose_name=_('Run applet host deployment'),
-    activity_callback=lambda self, did, *args, **kwargs: ([did],)
+    activity_callback=lambda self, did, *args, **kwargs: ([did],),
+    description=_(
+        """When deploying from the remote application publisher details page, and the 'Deploy' 
+        button is clicked, this task will be executed"""
+    )
 )
 def run_applet_host_deployment(did, install_applets):
     with tmp_to_builtin_org(system=1):
@@ -95,7 +135,11 @@ def run_applet_host_deployment(did, install_applets):
 
 @shared_task(
     verbose_name=_('Install applet'),
-    activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,)
+    activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,),
+    description=_(
+        """When the 'Deploy' button is clicked in the 'Remote Application' section of the remote 
+        application publisher details page, this task will be executed"""
+    )
 )
 def run_applet_host_deployment_install_applet(ids, applet_id):
     with tmp_to_builtin_org(system=1):
@@ -106,7 +150,11 @@ def run_applet_host_deployment_install_applet(ids, applet_id):
 
 @shared_task(
     verbose_name=_('Uninstall applet'),
-    activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,)
+    activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,),
+    description=_(
+        """When the 'Uninstall' button is clicked in the 'Remote Application' section of the 
+        remote application publisher details page, this task will be executed"""
+    )
 )
 def run_applet_host_deployment_uninstall_applet(ids, applet_id):
     with tmp_to_builtin_org(system=1):
@@ -117,7 +165,11 @@ def run_applet_host_deployment_uninstall_applet(ids, applet_id):
 
 @shared_task(
     verbose_name=_('Generate applet host accounts'),
-    activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],)
+    activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],),
+    description=_(
+        """When a remote publishing server is created and an account needs to be created 
+        automatically, this task will be executed"""
+    )
 )
 def applet_host_generate_accounts(host_id):
     applet_host = AppletHost.objects.filter(id=host_id).first()
@@ -128,7 +180,14 @@ def applet_host_generate_accounts(host_id):
         applet_host.generate_accounts()
 
 
-@shared_task(verbose_name=_('Check command replay storage connectivity'))
+@shared_task(
+    verbose_name=_('Check command replay storage connectivity'),
+    description=_(
+        """Check every day at midnight whether the external storage for commands and recordings 
+        is accessible. If it is not accessible, send a notification to the recipients specified 
+        in 'System Settings - Notifications - Subscription - Storage - Connectivity'"""
+    )
+)
 @register_as_period_task(crontab='0 0 * * *')
 @tmp_to_root_org()
 def check_command_replay_storage_connectivity():

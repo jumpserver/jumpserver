@@ -1,31 +1,22 @@
 import abc
-from urllib.parse import parse_qsl
 
 from django.conf import settings
 from django.db.models import F, Value, CharField
-from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.generics import ListAPIView
-from rest_framework.generics import get_object_or_404
-from rest_framework.request import Request
 from rest_framework.response import Response
 
-from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
 from assets.models import Asset
-from assets.utils import KubernetesTree
-from authentication.models import ConnectionToken
-from common.exceptions import JMSException
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
 from perms.hands import Node
 from perms.models import PermNode
-from perms.utils import PermAssetDetailUtil, UserPermNodeUtil
 from perms.utils import UserPermAssetUtil
+from perms.utils import UserPermNodeUtil
 from .mixin import RebuildTreeMixin
 from ..mixin import SelfOrPKUserMixin
 
 __all__ = [
-    'UserGrantedK8sAsTreeApi',
     'UserPermedNodesWithAssetsAsTreeApi',
     'UserPermedNodeChildrenWithAssetsAsTreeApi',
     'UserPermedNodeChildrenWithAssetsAsCategoryTreeApi',
@@ -218,55 +209,3 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(BaseUserNodeWithAssetAsT
             return self.get_assets()
         else:
             return []
-
-
-class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
-    """ 用户授权的K8s树 """
-
-    def get_token(self):
-        token_id = self.request.query_params.get('token')
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            raise PermissionDenied('Token is expired')
-        token.renewal()
-        return token
-
-    def get_account_secret(self, token: ConnectionToken):
-        util = PermAssetDetailUtil(self.user, token.asset)
-        accounts = util.get_permed_accounts_for_user()
-        account_name = token.account
-
-        if account_name in [AliasAccount.INPUT, AliasAccount.USER]:
-            return token.input_secret
-        else:
-            accounts = filter(lambda x: x.name == account_name, accounts)
-            accounts = list(accounts)
-            if not accounts:
-                raise NotFound('Account is not found')
-            account = accounts[0]
-            return account.secret
-
-    @staticmethod
-    def get_namespace_and_pod(key):
-        namespace_and_pod = dict(parse_qsl(key))
-        pod = namespace_and_pod.get('pod')
-        namespace = namespace_and_pod.get('namespace')
-        return namespace, pod
-
-    def list(self, request: Request, *args, **kwargs):
-        token = self.get_token()
-        asset = token.asset
-        secret = self.get_account_secret(token)
-        key = self.request.query_params.get('key')
-        namespace, pod = self.get_namespace_and_pod(key)
-
-        tree = []
-        k8s_tree_instance = KubernetesTree(asset, secret)
-        if not any([namespace, pod]) and not key:
-            asset_node = k8s_tree_instance.as_asset_tree_node()
-            tree.append(asset_node)
-        try:
-            tree.extend(k8s_tree_instance.async_tree_node(namespace, pod))
-            return Response(data=tree)
-        except Exception as e:
-            raise JMSException(e)

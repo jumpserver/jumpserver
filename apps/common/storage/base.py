@@ -1,13 +1,30 @@
 import os
 
 import jms_storage
-
 from django.conf import settings
+from django.core.files.storage import default_storage
 
-from terminal.models import default_storage, ReplayStorage
 from common.utils import get_logger, make_dirs
+from terminal.models import ReplayStorage
 
 logger = get_logger(__name__)
+
+
+def get_multi_object_storage():
+    replay_storages = ReplayStorage.objects.all()
+    configs = {}
+    for storage in replay_storages:
+        if storage.type_sftp:
+            continue
+        if storage.type_null_or_server:
+            continue
+        configs[storage.name] = storage.config
+    if settings.SERVER_REPLAY_STORAGE:
+        configs['SERVER_REPLAY_STORAGE'] = settings.SERVER_REPLAY_STORAGE
+    if not configs:
+        return None
+    storage = jms_storage.get_multi_object_storage(configs)
+    return storage
 
 
 class BaseStorageHandler(object):
@@ -24,20 +41,10 @@ class BaseStorageHandler(object):
         raise NotImplementedError
 
     def download(self):
-        replay_storages = ReplayStorage.objects.all()
-        configs = {}
-        for storage in replay_storages:
-            if storage.type_sftp:
-                continue
-            if storage.type_null_or_server:
-                continue
-            configs[storage.name] = storage.config
-        if settings.SERVER_REPLAY_STORAGE:
-            configs['SERVER_REPLAY_STORAGE'] = settings.SERVER_REPLAY_STORAGE
-        if not configs:
+        storage = get_multi_object_storage()
+        if not storage:
             msg = f"Not found {self.NAME} file, and not remote storage set"
             return None, msg
-        storage = jms_storage.get_multi_object_storage(configs)
 
         remote_path, local_path = self.get_file_path(storage=storage)
         if not remote_path:

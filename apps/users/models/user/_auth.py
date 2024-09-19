@@ -228,6 +228,22 @@ class AuthMixin:
             return True
         return False
 
+    def check_need_update_password(self):
+        if self.is_local and self.need_update_password:
+            return True
+        return False
+
+    @staticmethod
+    def check_passwd_too_simple(password):
+        simple_passwords = ['admin', 'ChangeMe']
+        if password in simple_passwords:
+            return True
+        return False
+
+    def is_auth_backend_model(self):
+        backend = getattr(self, 'backend', None)
+        return backend == settings.AUTH_BACKEND_MODEL
+
     @staticmethod
     def get_public_key_md5(key):
         try:

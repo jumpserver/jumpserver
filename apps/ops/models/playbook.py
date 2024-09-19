@@ -6,9 +6,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from private_storage.fields import PrivateFileField
 
-from ops.const import CreateMethods
+from common.db.models import JMSBaseModel
+from ops.const import CreateMethods, Scope
 from ops.exception import PlaybookNoValidEntry
-from orgs.mixins.models import JMSOrgBaseModel
 
 dangerous_keywords = (
     'hosts:localhost',
@@ -23,7 +23,9 @@ dangerous_keywords = (
 )
 
 
-class Playbook(JMSOrgBaseModel):
+
+
+class Playbook(JMSBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
     path = PrivateFileField(upload_to='playbooks/')
@@ -31,6 +33,7 @@ class Playbook(JMSOrgBaseModel):
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
     create_method = models.CharField(max_length=128, choices=CreateMethods.choices, default=CreateMethods.blank,
                                      verbose_name=_('CreateMethod'))
+    scope = models.CharField(max_length=64, default=Scope.public, verbose_name=_('Scope'))
     vcs_url = models.CharField(max_length=1024, default='', verbose_name=_('VCS URL'), null=True, blank=True)
 
     def __str__(self):
@@ -84,6 +87,6 @@ class Playbook(JMSOrgBaseModel):
         return work_dir
 
     class Meta:
-        unique_together = [('name', 'org_id', 'creator')]
+        unique_together = [('name', 'creator')]
         verbose_name = _("Playbook")
         ordering = ['date_created']

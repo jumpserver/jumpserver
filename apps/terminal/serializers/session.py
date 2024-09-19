@@ -58,6 +58,16 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'terminal_display': {'label': _('Terminal display')},
         }
 
+    def get_fields(self):
+        fields = super().get_fields()
+        self.pop_fields_if_need(fields)
+        return fields
+
+    def pop_fields_if_need(self, fields):
+        request = self.context.get('request')
+        if request and request.method != 'GET':
+            fields.pop("command_amount", None)
+
     def validate_asset(self, value):
         max_length = self.Meta.model.asset.field.max_length
         value = pretty_string(value, max_length=max_length)
@@ -74,7 +84,7 @@ class SessionDisplaySerializer(SessionSerializer):
 
 class ReplaySerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
-    version = serializers.IntegerField(write_only=True, required=False, min_value=2, max_value=4)
+    version = serializers.IntegerField(write_only=True, required=False, min_value=2, max_value=5)
 
 
 class SessionJoinValidateSerializer(serializers.Serializer):

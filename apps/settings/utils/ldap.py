@@ -24,12 +24,14 @@ from ldap3.core.exceptions import (
     LDAPAttributeError,
 )
 
-from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
+from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser, \
+    LDAPHAAuthorizationBackend
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.db.utils import close_old_connections
 from common.utils import timeit, get_logger
 from common.utils.http import is_true
 from orgs.utils import tmp_to_org
+from settings.const import ImportStatus
 from users.models import User, UserGroup
 from users.utils import construct_user_email
 
@@ -45,7 +47,7 @@ LDAP_USE_CACHE_FLAGS = [1, '1', 'true', 'True', True]
 
 class LDAPConfig(object):
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, category='ldap'):
         self.server_uri = None
         self.bind_dn = None
         self.password = None
@@ -54,6 +56,7 @@ class LDAPConfig(object):
         self.search_filter = None
         self.attr_map = None
         self.auth_ldap = None
+        self.category = category
         if isinstance(config, dict):
             self.load_from_config(config)
         else:
@@ -70,25 +73,26 @@ class LDAPConfig(object):
         self.auth_ldap = config.get('auth_ldap')
 
     def load_from_settings(self):
-        self.server_uri = settings.AUTH_LDAP_SERVER_URI
-        self.bind_dn = settings.AUTH_LDAP_BIND_DN
-        self.password = settings.AUTH_LDAP_BIND_PASSWORD
-        self.use_ssl = settings.AUTH_LDAP_START_TLS
-        self.search_ou = settings.AUTH_LDAP_SEARCH_OU
-        self.search_filter = settings.AUTH_LDAP_SEARCH_FILTER
-        self.attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
-        self.auth_ldap = settings.AUTH_LDAP
+        prefix = 'AUTH_LDAP' if self.category == 'ldap' else 'AUTH_LDAP_HA'
+        self.server_uri = getattr(settings, f"{prefix}_SERVER_URI")
+        self.bind_dn = getattr(settings, f"{prefix}_BIND_DN")
+        self.password = getattr(settings, f"{prefix}_BIND_PASSWORD")
+        self.use_ssl = getattr(settings, f"{prefix}_START_TLS")
+        self.search_ou = getattr(settings, f"{prefix}_SEARCH_OU")
+        self.search_filter = getattr(settings, f"{prefix}_SEARCH_FILTER")
+        self.attr_map = getattr(settings, f"{prefix}_USER_ATTR_MAP")
+        self.auth_ldap = getattr(settings, prefix)
 
 
 class LDAPServerUtil(object):
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, category='ldap'):
         if isinstance(config, dict):
             self.config = LDAPConfig(config=config)
         elif isinstance(config, LDAPConfig):
             self.config = config
         else:
-            self.config = LDAPConfig()
+            self.config = LDAPConfig(category=category)
         self._conn = None
         self._paged_size = self.get_paged_size()
         self.search_users = None
@@ -199,6 +203,7 @@ class LDAPServerUtil(object):
                 if not isinstance(value, list):
                     value = []
             user[attr] = value.strip() if isinstance(value, str) else value
+            user['status'] = ImportStatus.pending
         return user
 
     def user_entries_to_dict(self, user_entries):
@@ -228,25 +233,29 @@ class LDAPServerUtil(object):
 
 
 class LDAPCacheUtil(object):
-    CACHE_KEY_USERS = 'CACHE_KEY_LDAP_USERS'
 
-    def __init__(self):
+    def __init__(self, category='ldap'):
         self.search_users = None
         self.search_value = None
+        self.category = category
+        if self.category == 'ldap':
+            self.cache_key_users = 'CACHE_KEY_LDAP_USERS'
+        else:
+            self.cache_key_users = 'CACHE_KEY_LDAP_HA_USERS'
 
     def set_users(self, users):
         logger.info('Set ldap users to cache, count: {}'.format(len(users)))
-        cache.set(self.CACHE_KEY_USERS, users, None)
+        cache.set(self.cache_key_users, users, None)
 
     def get_users(self):
-        users = cache.get(self.CACHE_KEY_USERS)
+        users = cache.get(self.cache_key_users)
         count = users if users is None else len(users)
         logger.info('Get ldap users from cache, count: {}'.format(count))
         return users
 
     def delete_users(self):
         logger.info('Delete ldap users from cache')
-        cache.delete(self.CACHE_KEY_USERS)
+        cache.delete(self.cache_key_users)
 
     def filter_users(self, users):
         if users is None:
@@ -286,10 +295,11 @@ class LDAPSyncUtil(object):
     TASK_STATUS_IS_RUNNING = 'RUNNING'
     TASK_STATUS_IS_OVER = 'OVER'
 
-    def __init__(self):
-        self.server_util = LDAPServerUtil()
-        self.cache_util = LDAPCacheUtil()
+    def __init__(self, category='ldap'):
+        self.server_util = LDAPServerUtil(category=category)
+        self.cache_util = LDAPCacheUtil(category=category)
         self.task_error_msg = None
+        self.category = category
 
     def clear_cache(self):
         logger.info('Clear ldap sync cache')
@@ -345,7 +355,7 @@ class LDAPSyncUtil(object):
     def perform_sync(self):
         logger.info('Start perform sync ldap users from server to cache')
         try:
-            ok, msg = LDAPTestUtil().test_config()
+            ok, msg = LDAPTestUtil(category=self.category).test_config()
             if not ok:
                 raise self.LDAPSyncUtilException(msg)
             self.sync()
@@ -375,6 +385,7 @@ class LDAPImportUtil(object):
         user['email'] = self.get_user_email(user)
         if user['username'] not in ['admin']:
             user['source'] = User.Source.ldap.value
+        user.pop('status', None)
         obj, created = User.objects.update_or_create(
             username=user['username'], defaults=user
         )
@@ -474,9 +485,13 @@ class LDAPTestUtil(object):
     class LDAPBeforeLoginCheckError(LDAPExceptionError):
         pass
 
-    def __init__(self, config=None):
-        self.config = LDAPConfig(config)
+    def __init__(self, config=None, category='ldap'):
+        self.config = LDAPConfig(config, category)
         self.user_entries = []
+        if category == 'ldap':
+            self.backend = LDAPAuthorizationBackend()
+        else:
+            self.backend = LDAPHAAuthorizationBackend()
 
     def _test_connection_bind(self, authentication=None, user=None, password=None):
         server = Server(self.config.server_uri)
@@ -654,15 +669,12 @@ class LDAPTestUtil(object):
         if not cache.get(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS):
             self.test_config()
 
-        backend = LDAPAuthorizationBackend()
-        ok, msg = backend.pre_check(username, password)
+        ok, msg = self.backend.pre_check(username, password)
         if not ok:
             raise self.LDAPBeforeLoginCheckError(msg)
 
-    @staticmethod
-    def _test_login_auth(username, password):
-        backend = LDAPAuthorizationBackend()
-        ldap_user = LDAPUser(backend, username=username.strip())
+    def _test_login_auth(self, username, password):
+        ldap_user = LDAPUser(self.backend, username=username.strip())
         ldap_user._authenticate_user_dn(password)
 
     def _test_login(self, username, password):

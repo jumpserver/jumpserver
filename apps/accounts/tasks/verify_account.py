@@ -4,7 +4,6 @@ from django.utils.translation import gettext_noop
 
 from accounts.const import AutomationTypes
 from accounts.tasks.common import quickstart_automation_by_snapshot
-from assets.const import GATEWAY_NAME
 from common.utils import get_logger
 from orgs.utils import org_aware_func
 
@@ -32,13 +31,13 @@ def verify_accounts_connectivity_util(accounts, task_name):
     asset_ids = [a.asset_id for a in accounts]
     assets = Asset.objects.filter(id__in=asset_ids)
 
-    gateways = assets.filter(platform__name=GATEWAY_NAME)
+    gateways = assets.gateways()
     verify_connectivity_util(
         gateways, AutomationTypes.verify_gateway_account,
         accounts, task_name
     )
 
-    common_assets = assets.exclude(platform__name=GATEWAY_NAME)
+    common_assets = assets.gateways(0)
     verify_connectivity_util(
         common_assets, AutomationTypes.verify_account,
         accounts, task_name
@@ -46,8 +45,12 @@ def verify_accounts_connectivity_util(accounts, task_name):
 
 
 @shared_task(
-    queue="ansible", verbose_name=_('Verify asset account availability'),
-    activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None)
+    queue="ansible",
+    verbose_name=_('Verify asset account availability'),
+    activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None),
+    description=_(
+        "When clicking 'Test' in 'Console - Asset details - Accounts' this task will be executed"
+    )
 )
 def verify_accounts_connectivity_task(account_ids):
     from accounts.models import Account, VerifyAccountAutomation

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from assets.const import PostgresqlSSLMode
 from common.db.fields import EncryptTextField
 from .common import Asset
 
@@ -12,6 +13,10 @@ class Database(Asset):
     client_cert = EncryptTextField(verbose_name=_("Client cert"), blank=True)
     client_key = EncryptTextField(verbose_name=_("Client key"), blank=True)
     allow_invalid_cert = models.BooleanField(default=False, verbose_name=_('Allow invalid cert'))
+    pg_ssl_mode = models.CharField(
+        max_length=16, choices=PostgresqlSSLMode.choices,
+        default=PostgresqlSSLMode.PREFER, verbose_name=_('Postgresql SSL mode')
+    )
 
     def __str__(self):
         return '{}({}://{}/{})'.format(self.name, self.type, self.address, self.db_name)

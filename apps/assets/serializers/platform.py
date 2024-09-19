@@ -147,6 +147,10 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         name, port = data.split('/')
         return {'name': name, 'port': port}
 
+    @staticmethod
+    def get_render_help_text():
+        return _('Protocols, format is ["protocol/port"]')
+
 
 class PlatformCustomField(serializers.Serializer):
     TYPE_CHOICES = [(t, t) for t, c in type_field_map.items()]
