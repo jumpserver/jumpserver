@@ -1,5 +1,4 @@
 #!/bin/bash
-#
 
 lib_path="/opt/py3/lib/python3.11/site-packages"
 
