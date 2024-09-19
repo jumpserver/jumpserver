@@ -8,7 +8,6 @@ LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 DRF_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'drf_exception.log')
 UNEXPECTED_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'unexpected_exception.log')
-ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
 GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
 LOG_LEVEL = CONFIG.LOG_LEVEL
 
@@ -54,14 +53,6 @@ LOGGING = {
             'when': 'midnight',
             'formatter': 'main',
             'filename': JUMPSERVER_LOG_FILE,
-        },
-        'ansible_logs': {
-            'encoding': 'utf8',
-            'level': 'DEBUG',
-            'class': 'jumpserver.rewriting.logging.DailyTimedRotatingFileHandler',
-            'when': 'midnight',
-            'formatter': 'main',
-            'filename': ANSIBLE_LOG_FILE,
         },
         'drf_exception': {
             'encoding': 'utf8',
@@ -111,10 +102,6 @@ LOGGING = {
         },
         'unexpected_exception': {
             'handlers': ['unexpected_exception'],
-            'level': LOG_LEVEL,
-        },
-        'ops.ansible_api': {
-            'handlers': ['console', 'ansible_logs'],
             'level': LOG_LEVEL,
         },
         'django_auth_ldap': {
