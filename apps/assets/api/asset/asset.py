@@ -22,6 +22,7 @@ from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
+from ...const import GATEWAY_NAME
 from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
 logger = get_logger(__file__)
@@ -71,6 +72,8 @@ class AssetFilterSet(BaseFilterSet):
     def filter_platform(queryset, name, value):
         if value.isdigit():
             return queryset.filter(platform_id=value)
+        elif value == GATEWAY_NAME:
+            return queryset.filter(platform__name__istartswith=GATEWAY_NAME)
         else:
             return queryset.filter(platform__name=value)
 
