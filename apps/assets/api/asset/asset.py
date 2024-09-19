@@ -2,10 +2,10 @@
 #
 from collections import defaultdict
 
-import django_filters
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from django_filters import rest_framework as drf_filters
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -32,31 +32,32 @@ __all__ = [
 
 
 class AssetFilterSet(BaseFilterSet):
-    platform = django_filters.CharFilter(method='filter_platform')
-    exclude_platform = django_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
-    domain = django_filters.CharFilter(method='filter_domain')
-    type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
-    category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
-    protocols = django_filters.CharFilter(method='filter_protocols')
-    domain_enabled = django_filters.BooleanFilter(
+    platform = drf_filters.CharFilter(method='filter_platform')
+    is_gateway = drf_filters.BooleanFilter(method='filter_is_gateway')
+    exclude_platform = drf_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
+    domain = drf_filters.CharFilter(method='filter_domain')
+    type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
+    category = drf_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
+    protocols = drf_filters.CharFilter(method='filter_protocols')
+    domain_enabled = drf_filters.BooleanFilter(
         field_name="platform__domain_enabled", lookup_expr="exact"
     )
-    ping_enabled = django_filters.BooleanFilter(
+    ping_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__ping_enabled", lookup_expr="exact"
     )
-    gather_facts_enabled = django_filters.BooleanFilter(
+    gather_facts_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__gather_facts_enabled", lookup_expr="exact"
     )
-    change_secret_enabled = django_filters.BooleanFilter(
+    change_secret_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__change_secret_enabled", lookup_expr="exact"
     )
-    push_account_enabled = django_filters.BooleanFilter(
+    push_account_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__push_account_enabled", lookup_expr="exact"
     )
-    verify_account_enabled = django_filters.BooleanFilter(
+    verify_account_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__verify_account_enabled", lookup_expr="exact"
     )
-    gather_accounts_enabled = django_filters.BooleanFilter(
+    gather_accounts_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__gather_accounts_enabled", lookup_expr="exact"
     )
 
@@ -73,6 +74,11 @@ class AssetFilterSet(BaseFilterSet):
             return queryset.filter(platform_id=value)
         else:
             return queryset.filter(platform__name=value)
+
+    @staticmethod
+    def filter_is_gateway(queryset, name, value):
+        queryset = queryset.gateways(value)
+        return queryset
 
     @staticmethod
     def filter_domain(queryset, name, value):

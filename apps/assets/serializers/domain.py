@@ -68,7 +68,7 @@ class DomainListSerializer(DomainSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset.annotate(
-            assets_amount=Count('assets', filter=~Q(assets__platform__name='Gateway'), distinct=True),
+            assets_amount=Count('assets', filter=~Q(assets__platform__name__startswith='Gateway'), distinct=True),
         )
         return queryset
 

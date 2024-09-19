@@ -38,6 +38,13 @@ class AssetQuerySet(models.QuerySet):
     def valid(self):
         return self.active()
 
+    def gateways(self, is_gateway=1):
+        kwargs = {'platform__name__startswith': 'Gateway'}
+        if is_gateway:
+            return self.filter(**kwargs)
+        else:
+            return self.exclude(**kwargs)
+
     def has_protocol(self, name):
         return self.filter(protocols__contains=name)
 

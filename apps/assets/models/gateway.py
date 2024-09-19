@@ -33,10 +33,6 @@ class Gateway(Host):
         proxy = True
         verbose_name = _("Gateway")
 
-    def save(self, *args, **kwargs):
-        self.platform = self.default_platform()
-        return super().save(*args, **kwargs)
-
     @classmethod
     def default_platform(cls):
         return Platform.objects.get(name=GATEWAY_NAME, internal=True)
