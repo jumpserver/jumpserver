@@ -108,7 +108,7 @@ class BaseFileParser(BaseParser):
         if not matched:
             return v
         obj_name, obj_id = matched.groups()
-        if len(obj_id) < 36:
+        if obj_id.isdigit():
             obj_id = int(obj_id)
         return {'pk': obj_id, 'name': obj_name}
 
