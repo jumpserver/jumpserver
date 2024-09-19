@@ -3,8 +3,10 @@ from urllib import parse
 
 from django.conf import settings
 from django.contrib import auth
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
@@ -14,6 +16,7 @@ from onelogin.saml2.idp_metadata_parser import (
     dict_deep_merge
 )
 
+from authentication.views.mixins import FlashMessageMixin
 from common.utils import get_logger
 from .settings import JmsSaml2Settings
 
@@ -243,7 +246,7 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
         return HttpResponseRedirect(logout_url)
 
 
-class Saml2AuthCallbackView(View, PrepareRequestMixin):
+class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
 
     def post(self, request):
         log_prompt = "Process SAML2 POST requests: {}"
@@ -272,7 +275,13 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
 
         logger.debug(log_prompt.format('Process authenticate'))
         saml_user_data = self.get_attributes(saml_instance)
-        user = auth.authenticate(request=request, saml_user_data=saml_user_data)
+        try:
+            user = auth.authenticate(request=request, saml_user_data=saml_user_data)
+        except IntegrityError:
+            title = _("SAML2 Error")
+            msg = _('Please check if a user with the same username or email already exists')
+            response = self.get_failed_response('/', title, msg)
+            return response
         if user and user.is_valid:
             logger.debug(log_prompt.format('Login: {}'.format(user)))
             auth.login(self.request, user)

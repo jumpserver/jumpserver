@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 16:31+0800\n"
+"POT-Creation-Date: 2024-09-19 17:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1038,11 +1038,12 @@ msgid ""
 "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, "
 "\"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgstr ""
-"length 是密码的长度，填写范围为 8 到 30。"
-"lowercase 表示密码中是否包含小写字母，uppercase 表示是否包含大写字母，"
-"digit 表示是否包含数字，symbol 表示是否包含特殊符号。"
-"exclude_symbols 用于排除特定符号，您可以填写要排除的符号字符（最多 16 个），如果无需排除符号，可以留空。"
-"默认: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+"length 是密码的长度，填写范围为 8 到 30。lowercase 表示密码中是否包含小写字"
+"母，uppercase 表示是否包含大写字母，digit 表示是否包含数字，symbol 表示是否包"
+"含特殊符号。exclude_symbols 用于排除特定符号，您可以填写要排除的符号字符（最"
+"多 16 个），如果无需排除符号，可以留空。默认: {\"length\": 16, "
+"\"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, "
+"\"exclude_symbols\": \"\"}"
 
 #: accounts/serializers/account/template.py:49
 msgid "Secret generation strategy for account creation"
@@ -3174,6 +3175,7 @@ msgid "OpenID Error"
 msgstr "OpenID 错误"
 
 #: authentication/backends/oidc/views.py:175
+#: authentication/backends/saml2/views.py:282
 msgid "Please check if a user with the same username or email already exists"
 msgstr "请检查是否已经存在相同用户名或邮箱的用户"
 
@@ -3202,6 +3204,10 @@ msgstr "最后使用日期"
 #: authentication/backends/passkey/models.py:15
 msgid "Credential ID"
 msgstr "凭证 ID"
+
+#: authentication/backends/saml2/views.py:281
+msgid "SAML2 Error"
+msgstr "SAML2 错误"
 
 #: authentication/confirm/password.py:16
 msgid "Authentication failed password incorrect"
@@ -7262,7 +7268,8 @@ msgid ""
 "\n"
 "                Your account has expired, please contact the administrator.\n"
 "            "
-msgstr "\n"
+msgstr ""
+"\n"
 "                您的账号已经过期，请联系管理员。            "
 
 #: templates/_message.html:13
