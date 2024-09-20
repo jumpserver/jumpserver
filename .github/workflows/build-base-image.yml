@@ -59,7 +59,7 @@ jobs:
 
       - name: Update Dockerfile
         run: |
-          sed -i 's|-base:.* AS stage-build|-base:${{ env.IMAGE_TAG }}|' Dockerfile
+          sed -i 's|-base:.*|-base:${{ env.IMAGE_TAG }}|' Dockerfile
 
       - name: Commit changes
         run: |
