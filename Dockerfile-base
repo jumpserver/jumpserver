@@ -13,7 +13,20 @@ ARG DEPENDENCIES="                    \
         gettext                       \
         libkrb5-dev                   \
         libldap2-dev                  \
-        libsasl2-dev"
+        libsasl2-dev                  \
+        libx11-dev                    \
+        openssh-client                \
+        sshpass                       \
+        bubblewrap                    \
+        g++                           \
+        curl                          \
+        iputils-ping                  \
+        netcat-openbsd                \
+        nmap                          \
+        telnet                        \
+        vim                           \
+        wget                          \
+        "
 
 
 ARG APT_MIRROR=http://deb.debian.org

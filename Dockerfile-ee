@@ -5,25 +5,6 @@ FROM jumpserver/core:${VERSION}-ce
 
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
-ARG TOOLS="                           \
-        g++                           \
-        curl                          \
-        iputils-ping                  \
-        netcat-openbsd                \
-        nmap                          \
-        telnet                        \
-        vim                           \
-        wget"
-
-ARG APT_MIRROR=http://deb.debian.org
-RUN set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
-    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
-    && apt-get update \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash
-
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
