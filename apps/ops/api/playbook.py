@@ -65,9 +65,19 @@ class PlaybookViewSet(JMSBulkModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
+        base_path = safe_join(settings.DATA_DIR, "ops", "playbook")
+        clone_id = self.request.query_params.get('clone_from')
+        if clone_id:
+            src_path = safe_join(base_path, clone_id)
+            dest_path = safe_join(base_path, str(instance.id))
+            if not os.path.exists(src_path):
+                raise JMSException(code='invalid_playbook_id', detail={"msg": "clone playbook file not found"})
+            shutil.copytree(src_path, dest_path)
+            return
+
         if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = safe_join(settings.MEDIA_ROOT, instance.path.name)
-            dest_path = safe_join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
+            dest_path = safe_join(base_path, str(instance.id))
 
             try:
                 unzip_playbook(src_path, dest_path)
@@ -78,7 +88,7 @@ class PlaybookViewSet(JMSBulkModelViewSet):
                 raise PlaybookNoValidEntry
 
         elif instance.create_method == 'blank':
-            dest_path = safe_join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
+            dest_path = safe_join(base_path, str(instance.id))
             os.makedirs(dest_path)
             with open(safe_join(dest_path, 'main.yml'), 'w') as f:
                 f.write('## write your playbook here')
