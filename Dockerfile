@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20240919_024156
+FROM jumpserver/core-base:20240920_074001
 
 ARG VERSION
 
