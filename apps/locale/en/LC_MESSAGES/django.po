@@ -8610,7 +8610,7 @@ msgstr ""
 
 #: xpack/plugins/cloud/models.py:100
 #: xpack/plugins/cloud/serializers/task.py:167
-msgid "Sync IP type"
+msgid "Preferred IP type"
 msgstr ""
 
 #: xpack/plugins/cloud/models.py:103
