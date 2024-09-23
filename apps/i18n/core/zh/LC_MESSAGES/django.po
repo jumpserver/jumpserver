@@ -9925,8 +9925,8 @@ msgstr "IP网段组"
 
 #: xpack/plugins/cloud/models.py:115
 #: xpack/plugins/cloud/serializers/task.py:161
-msgid "Sync IP type"
-msgstr "同步IP类型"
+msgid "Preferred IP type"
+msgstr "首选 IP 类型"
 
 #: xpack/plugins/cloud/models.py:118
 msgid "Always update"
