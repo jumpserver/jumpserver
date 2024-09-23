@@ -8900,8 +8900,8 @@ msgstr "IPネットワークセグメントグループ"
 
 #: xpack/plugins/cloud/models.py:100
 #: xpack/plugins/cloud/serializers/task.py:167
-msgid "Sync IP type"
-msgstr "同期IPタイプ"
+msgid "Preferred IP type"
+msgstr "優先 IP タイプ"
 
 #: xpack/plugins/cloud/models.py:103
 #: xpack/plugins/cloud/serializers/task.py:185
