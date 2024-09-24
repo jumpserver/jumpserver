@@ -2662,19 +2662,23 @@ reference = "aliyun"
 
 [[package]]
 name = "geoip2"
-version = "4.7.0"
+version = "4.8.0"
 description = "MaxMind GeoIP2 API"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "geoip2-4.7.0-py2.py3-none-any.whl", hash = "sha256:078fcd4cce26ea029b1e3252a0f0ec20a1f42e7ab0f19b7be3864f20f4db2b51"},
-    {file = "geoip2-4.7.0.tar.gz", hash = "sha256:3bdde4994f6bc917eafab5b51e772d737b2ae00037a5b85001fb06dc68f779df"},
+    {file = "geoip2-4.8.0-py2.py3-none-any.whl", hash = "sha256:39b38ec703575355d10475c0e6aa981827a2b4b5471d308c4ecb5e79cbe366ce"},
+    {file = "geoip2-4.8.0.tar.gz", hash = "sha256:dd9cc180b7d41724240ea481d5d539149e65b234f64282b231b9170794a9ac35"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.6.2,<4.0.0"
-maxminddb = ">=2.3.0,<3.0.0"
+maxminddb = ">=2.5.1,<3.0.0"
 requests = ">=2.24.0,<3.0.0"
+setuptools = ">=60.0.0"
+
+[package.extras]
+test = ["mocket (>=3.11.1)"]
 
 [package.source]
 type = "legacy"
@@ -7670,4 +7674,4 @@ reference = "aliyun"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "9acfafd75bf7dbb7e0dffb54b7f11f6b09aa4ceff769d193a3906d03ae796ccc"
+content-hash = "ecc26ab3966eeb87427e4a12fbed86ead9709ae85b8748aee89729c8c9cd143e"
