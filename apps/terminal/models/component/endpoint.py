@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 
 from assets.models import Asset
@@ -23,6 +24,7 @@ class Endpoint(JMSBaseModel):
     sqlserver_port = PortField(default=14330, verbose_name=_('SQLServer port'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     default_id = '00000000-0000-0000-0000-000000000001'
 
@@ -98,7 +100,7 @@ class Endpoint(JMSBaseModel):
         values = instance.labels.filter(label__name='endpoint').values_list('label__value', flat=True)
         if not values:
             return None
-        endpoints = cls.objects.filter(name__in=list(values)).order_by('-date_updated')
+        endpoints = cls.objects.filter(is_active=True, name__in=list(values)).order_by('-date_updated')
         for endpoint in endpoints:
             if endpoint.is_valid_for(instance, protocol):
                 endpoint = cls.handle_endpoint_host(endpoint, request)
@@ -128,7 +130,8 @@ class EndpointRule(JMSBaseModel):
 
     @classmethod
     def match(cls, target_instance, target_ip, protocol):
-        for endpoint_rule in cls.objects.prefetch_related('endpoint').filter(is_active=True):
+        active_endpoints = Prefetch('endpoint', queryset=Endpoint.objects.filter(is_active=True))
+        for endpoint_rule in cls.objects.prefetch_related(active_endpoints).filter(is_active=True):
             if not contains_ip(target_ip, endpoint_rule.ip_group):
                 continue
             if not endpoint_rule.endpoint:
