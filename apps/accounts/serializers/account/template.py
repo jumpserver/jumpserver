@@ -10,7 +10,7 @@ from .base import BaseAccountSerializer
 
 
 class PasswordRulesSerializer(serializers.Serializer):
-    length = serializers.IntegerField(min_value=8, max_value=30, default=16, label=_('Password length'))
+    length = serializers.IntegerField(min_value=8, max_value=36, default=16, label=_('Password length'))
     lowercase = serializers.BooleanField(default=True, label=_('Lowercase'))
     uppercase = serializers.BooleanField(default=True, label=_('Uppercase'))
     digit = serializers.BooleanField(default=True, label=_('Digit'))

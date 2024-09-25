@@ -84,7 +84,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             msg = _("* Please enter the correct password length")
             raise serializers.ValidationError(msg)
 
-        if length < 6 or length > 30:
+        if length < 6 or length > 36:
             msg = _('* Password length range 6-30 bits')
             raise serializers.ValidationError(msg)
 
