@@ -1,4 +1,4 @@
-from .utils import gen_key_pair, rsa_decrypt, rsa_encrypt
+from common.utils import gen_key_pair, rsa_decrypt, rsa_encrypt
 
 
 def test_rsa_encrypt_decrypt(message='test-password-$%^&*'):
