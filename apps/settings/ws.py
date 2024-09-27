@@ -3,10 +3,11 @@
 import json
 import asyncio
 
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.cache import cache
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _, activate
+from django.utils.translation import gettext_lazy as _
 from django.utils import translation
 from urllib.parse import parse_qs
 
@@ -37,11 +38,27 @@ TASK_STATUS_IS_OVER = 'OVER'
 
 
 class ToolsWebsocket(AsyncJsonWebsocketConsumer):
+    is_closed: bool = False
+
+    @staticmethod
+    @sync_to_async
+    def get_user_roles(user):
+        return [str(i) for i in user.system_roles.values_list('id', flat=True)]
+
+    async def is_superuser(self, user):
+        from rbac.builtin import BuiltinRole
+
+        ids = await self.get_user_roles(user)
+        return BuiltinRole.system_admin.id in ids
 
     async def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
-            await self.accept()
+            has_perm = await sync_to_async(user.has_perm)('rbac.view_systemtools')
+            if await self.is_superuser(user) or (settings.TOOL_USER_ENABLED and has_perm):
+                await self.accept()
+            else:
+                await self.close()
         else:
             await self.close()
 
@@ -95,6 +112,12 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
             await self.send_msg('Exception: %s' % error)
         await self.send_msg()
         await self.close()
+
+    async def close(self, code=None):
+        if self.is_closed:
+            return
+        await super().close(code)
+        self.is_closed = True
 
     async def disconnect(self, code):
         await self.close()
