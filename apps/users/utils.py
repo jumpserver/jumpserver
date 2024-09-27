@@ -110,6 +110,7 @@ class BlockUtil:
     BLOCK_KEY_TMPL: str
 
     def __init__(self, username):
+        username = username.lower()
         self.block_key = self.BLOCK_KEY_TMPL.format(username)
         self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
 
@@ -125,6 +126,7 @@ class BlockUtilBase:
     BLOCK_KEY_TMPL: str
 
     def __init__(self, username, ip):
+        username = username.lower()
         self.username = username
         self.ip = ip
         self.limit_key = self.LIMIT_KEY_TMPL.format(username, ip)
@@ -158,6 +160,7 @@ class BlockUtilBase:
 
     @classmethod
     def unblock_user(cls, username):
+        username = username.lower()
         key_limit = cls.LIMIT_KEY_TMPL.format(username, '*')
         key_block = cls.BLOCK_KEY_TMPL.format(username)
         # Redis 尽量不要用通配
@@ -166,6 +169,7 @@ class BlockUtilBase:
 
     @classmethod
     def is_user_block(cls, username):
+        username = username.lower()
         block_key = cls.BLOCK_KEY_TMPL.format(username)
         return bool(cache.get(block_key))
 
