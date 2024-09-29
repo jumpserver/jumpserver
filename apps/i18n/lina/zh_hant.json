@@ -593,7 +593,6 @@
     "DomainUpdate": "更新網域",
     "Download": "下載",
     "DownloadCenter": "下載中心",
-    "DownloadFTPFileTip": "當前動作不記錄文件，或者檔案大小超過閾值（默認100M），或者還未保存到對應儲存中",
     "DownloadImportTemplateMsg": "下載創建模板",
     "DownloadReplay": "下載錄影",
     "DownloadUpdateTemplateMsg": "下載更新範本",

@@ -458,7 +458,6 @@
     "Docs": "文書",
     "Download": "ダウンロード",
     "DownloadCenter": "ダウンロードセンター",
-    "DownloadFTPFileTip": "現在のActionでは、ファイルは記録されず、またはファイルサイズが閾値（デフォルトは100M）を超える、またはまだ対応するストレージに保存されていない",
     "DownloadImportTemplateMsg": "テンプレートをダウンロードで作成",
     "DownloadReplay": "ビデオのダウンロード",
     "DownloadUpdateTemplateMsg": "更新テンプレートをダウンロード",
