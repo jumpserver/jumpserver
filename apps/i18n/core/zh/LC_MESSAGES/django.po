@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 17:03+0800\n"
+"POT-Creation-Date: 2024-10-08 11:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -116,6 +116,10 @@ msgstr "未找到待处理帐户"
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s, 失败: %s, 总数: %s"
+
+#: accounts/automations/verify_gateway_account/manager.py:18
+msgid ">>> Start executing the task to test gateway account connectivity"
+msgstr ">>> 开始执行测试网关账号可连接性任务"
 
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:34
@@ -351,7 +355,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:32 terminal/notifications.py:155
-#: terminal/serializers/command.py:17 terminal/serializers/session.py:28
+#: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:288
@@ -498,7 +502,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:136
 #: accounts/serializers/automations/change_secret.py:110
 #: accounts/serializers/automations/change_secret.py:145
-#: ops/serializers/job.py:74 terminal/serializers/session.py:52
+#: ops/serializers/job.py:74 terminal/serializers/session.py:54
 msgid "Is success"
 msgstr "是否成功"
 
@@ -715,8 +719,8 @@ msgstr "密码规则"
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 settings/models.py:35 settings/models.py:184
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
-#: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:109
+#: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:13
+#: terminal/models/component/endpoint.py:111
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
 #: terminal/models/virtualapp/provider.py:10
@@ -878,7 +882,7 @@ msgstr "类别"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:281
+#: terminal/serializers/session.py:25 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
@@ -1064,8 +1068,8 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: ops/models/job.py:158 ops/models/playbook.py:33 rbac/models/role.py:37
 #: settings/models.py:40 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:25
-#: terminal/models/component/endpoint.py:119
+#: terminal/models/component/endpoint.py:26
+#: terminal/models/component/endpoint.py:121
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:91
@@ -1354,12 +1358,12 @@ msgid "Notify and warn"
 msgstr "提示并告警"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:112 xpack/plugins/cloud/models.py:314
+#: terminal/models/component/endpoint.py:114 xpack/plugins/cloud/models.py:314
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:113 xpack/plugins/cloud/models.py:315
+#: terminal/models/component/endpoint.py:115 xpack/plugins/cloud/models.py:315
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -1373,8 +1377,8 @@ msgstr "审批人"
 #: authentication/models/connection_token.py:53
 #: authentication/models/ssh_key.py:13
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:82
-#: terminal/models/component/endpoint.py:120
+#: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:27
+#: terminal/models/component/endpoint.py:122
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 #: tickets/const.py:36
 msgid "Active"
@@ -1663,7 +1667,7 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr "无法连接到 {port} 上的端口 {address}"
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:93 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/middleware.py:94 xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr "认证失败"
 
@@ -1671,6 +1675,10 @@ msgstr "认证失败"
 #: assets/automations/ping_gateway/manager.py:86 terminal/const.py:102
 msgid "Connect failed"
 msgstr "连接失败"
+
+#: assets/automations/ping_gateway/manager.py:118
+msgid ">>> Start executing the task to test gateway connectivity"
+msgstr ">>> 开始执行测试网关可连接性任务"
 
 #: assets/const/automation.py:6 audits/const.py:6 audits/const.py:47
 #: audits/signal_handlers/activity_log.py:62 common/utils/ip/geoip/utils.py:31
@@ -1713,7 +1721,7 @@ msgstr "脚本"
 #: assets/const/category.py:10 assets/models/asset/host.py:8
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:52 settings/serializers/msg.py:30
-#: terminal/models/component/endpoint.py:13 terminal/serializers/applet.py:17
+#: terminal/models/component/endpoint.py:14 terminal/serializers/applet.py:17
 #: xpack/plugins/cloud/manager.py:83
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
@@ -2802,8 +2810,8 @@ msgstr "结束"
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:79
+#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:57
+#: terminal/serializers/session.py:113
 msgid "Terminal"
 msgstr "终端"
 
@@ -3480,7 +3488,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:691
+#: authentication/middleware.py:95 settings/utils/ldap.py:691
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
@@ -3503,7 +3511,7 @@ msgid "Please change your password"
 msgstr "请修改密码"
 
 #: authentication/models/access_key.py:22
-#: terminal/models/component/endpoint.py:110
+#: terminal/models/component/endpoint.py:112
 msgid "IP group"
 msgstr "IPグループ"
 
@@ -3525,7 +3533,7 @@ msgstr "自定义密码"
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
-#: terminal/serializers/session.py:21 terminal/serializers/session.py:48
+#: terminal/serializers/session.py:23 terminal/serializers/session.py:50
 #: terminal/serializers/storage.py:71
 msgid "Protocol"
 msgstr "协议"
@@ -3572,6 +3580,7 @@ msgid "Connection token expired at: {}"
 msgstr "连接令牌过期: {}"
 
 #: authentication/models/connection_token.py:125
+#: terminal/serializers/session.py:95
 msgid "No user or invalid user"
 msgstr "没有用户或用户失效"
 
@@ -4196,7 +4205,8 @@ msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
 #: common/db/fields.py:589 common/db/fields.py:594
-#: common/serializers/fields.py:144 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:144 terminal/serializers/session.py:81
+#: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -4706,27 +4716,27 @@ msgstr "正在创建任务，无法中断，请稍后重试。"
 msgid "Currently playbook is being used in a job"
 msgstr "当前 playbook 正在作业中使用"
 
-#: ops/api/playbook.py:113
+#: ops/api/playbook.py:123
 msgid "Unsupported file content"
 msgstr "不支持的文件内容"
 
-#: ops/api/playbook.py:115 ops/api/playbook.py:161 ops/api/playbook.py:209
+#: ops/api/playbook.py:125 ops/api/playbook.py:171 ops/api/playbook.py:219
 msgid "Invalid file path"
 msgstr "无效的文件路径"
 
-#: ops/api/playbook.py:187
+#: ops/api/playbook.py:197
 msgid "This file can not be rename"
 msgstr "该文件不能重命名"
 
-#: ops/api/playbook.py:206
+#: ops/api/playbook.py:216
 msgid "File already exists"
 msgstr "文件已存在"
 
-#: ops/api/playbook.py:224
+#: ops/api/playbook.py:234
 msgid "File key is required"
 msgstr "文件密钥该字段是必填项。"
 
-#: ops/api/playbook.py:227
+#: ops/api/playbook.py:237
 msgid "This file can not be delete"
 msgstr "无法删除此文件"
 
@@ -5032,7 +5042,7 @@ msgstr "下次执行时间"
 msgid "Execute after saving"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:52 terminal/serializers/session.py:47
+#: ops/serializers/job.py:52 terminal/serializers/session.py:49
 msgid "Duration"
 msgstr "时长"
 
@@ -5040,7 +5050,7 @@ msgstr "时长"
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:75 terminal/serializers/session.py:56
+#: ops/serializers/job.py:75 terminal/serializers/session.py:58
 msgid "Is finished"
 msgstr "是否完成"
 
@@ -7194,11 +7204,11 @@ msgstr "认证失败: (未知): {}"
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
-#: settings/ws.py:199
+#: settings/ws.py:222
 msgid "No LDAP user was found"
 msgstr "没有获取到 LDAP 用户"
 
-#: settings/ws.py:205
+#: settings/ws.py:228
 msgid "Total {}, success {}, failure {}"
 msgstr "总共 {}，成功 {}，失败 {}"
 
@@ -7690,51 +7700,51 @@ msgstr "初始化"
 msgid "Applet host deployment"
 msgstr "应用部署"
 
-#: terminal/models/component/endpoint.py:15
+#: terminal/models/component/endpoint.py:16
 msgid "HTTPS port"
 msgstr "HTTPS 端口"
 
-#: terminal/models/component/endpoint.py:16
+#: terminal/models/component/endpoint.py:17
 msgid "HTTP port"
 msgstr "HTTP 端口"
 
-#: terminal/models/component/endpoint.py:17
+#: terminal/models/component/endpoint.py:18
 msgid "SSH port"
 msgstr "SSH 端口"
 
-#: terminal/models/component/endpoint.py:18
+#: terminal/models/component/endpoint.py:19
 msgid "RDP port"
 msgstr "RDP 端口"
 
-#: terminal/models/component/endpoint.py:19
+#: terminal/models/component/endpoint.py:20
 msgid "MySQL port"
 msgstr "MySQL 端口"
 
-#: terminal/models/component/endpoint.py:20
+#: terminal/models/component/endpoint.py:21
 msgid "MariaDB port"
 msgstr "MariaDB 端口"
 
-#: terminal/models/component/endpoint.py:21
+#: terminal/models/component/endpoint.py:22
 msgid "PostgreSQL port"
 msgstr "PostgreSQL 端口"
 
-#: terminal/models/component/endpoint.py:22
+#: terminal/models/component/endpoint.py:23
 msgid "Redis port"
 msgstr "Redis 端口"
 
-#: terminal/models/component/endpoint.py:23
+#: terminal/models/component/endpoint.py:24
 msgid "SQLServer port"
 msgstr "SQLServer 端口"
 
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:117
+#: terminal/models/component/endpoint.py:32
+#: terminal/models/component/endpoint.py:119
 #: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/component/endpoint.py:123
+#: terminal/models/component/endpoint.py:125
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -7820,11 +7830,11 @@ msgstr "登录来源"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:78
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:112
 msgid "Command amount"
 msgstr "命令数量"
 
-#: terminal/models/session/session.py:49 terminal/serializers/session.py:30
+#: terminal/models/session/session.py:49 terminal/serializers/session.py:32
 msgid "Error reason"
 msgstr "错误原因"
 
@@ -8159,33 +8169,37 @@ msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
 msgid "Asset IP"
 msgstr "资产 IP"
 
-#: terminal/serializers/session.py:25 terminal/serializers/session.py:53
+#: terminal/serializers/session.py:27 terminal/serializers/session.py:55
 msgid "Can replay"
 msgstr "是否可重放"
 
-#: terminal/serializers/session.py:26 terminal/serializers/session.py:54
+#: terminal/serializers/session.py:28 terminal/serializers/session.py:56
 msgid "Can join"
 msgstr "是否可加入"
 
-#: terminal/serializers/session.py:27 terminal/serializers/session.py:57
+#: terminal/serializers/session.py:29 terminal/serializers/session.py:59
 msgid "Can terminate"
 msgstr "是否可中断"
 
-#: terminal/serializers/session.py:49
+#: terminal/serializers/session.py:51
 msgid "User ID"
 msgstr "用户 ID"
 
-#: terminal/serializers/session.py:50
+#: terminal/serializers/session.py:52
 msgid "Asset ID"
 msgstr "资产 ID"
 
-#: terminal/serializers/session.py:51
+#: terminal/serializers/session.py:53
 msgid "Login from display"
 msgstr "登录来源名称"
 
-#: terminal/serializers/session.py:58
+#: terminal/serializers/session.py:60
 msgid "Terminal display"
 msgstr "终端显示"
+
+#: terminal/serializers/session.py:103
+msgid "No asset or invalid asset"
+msgstr "没有资产或资产未激活"
 
 #: terminal/serializers/storage.py:23
 msgid "Endpoint invalid: remove path `{}`"
@@ -9925,8 +9939,8 @@ msgstr "IP网段组"
 
 #: xpack/plugins/cloud/models.py:115
 #: xpack/plugins/cloud/serializers/task.py:161
-msgid "Preferred IP type"
-msgstr "首选 IP 类型"
+msgid "Sync IP type"
+msgstr "密文类型"
 
 #: xpack/plugins/cloud/models.py:118
 msgid "Always update"

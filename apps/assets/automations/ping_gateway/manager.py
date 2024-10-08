@@ -115,7 +115,7 @@ class PingGatewayManager:
 
     @staticmethod
     def before_runner_start():
-        print(">>> 开始执行测试网关可连接性任务")
+        print(_(">>> Start executing the task to test gateway connectivity"))
 
     def get_accounts(self, gateway):
         account = gateway.select_account
