@@ -58,6 +58,13 @@ class EndpointSerializer(BulkModelSerializer):
                 extra_kwargs[field.name] = kwargs
         return extra_kwargs
 
+    def validate_is_active(self, value):
+        if str(self.instance.id) == Endpoint.default_id:
+            # 默认端点不能禁用
+            return True
+        else:
+            return value
+
 
 class EndpointRuleSerializer(BulkModelSerializer):
     _ip_group_help_text = '{}, {} <br>{}'.format(
