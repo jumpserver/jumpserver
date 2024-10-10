@@ -15,7 +15,7 @@
     RDS_MaxDisconnectionTime: 60000
     RDS_RemoteAppLogoffTimeLimit: 0
     INSTALL_APPLETS: true
-    PYTHON_VERSION: 3.11.6
+    PYTHON_VERSION: 3.11.10
     CHROME_VERSION: 118.0.5993.118
     CHROME_DRIVER_VERSION: 118.0.5993.70
     TINKER_VERSION: v0.1.7
@@ -76,39 +76,43 @@
 
         - name: Download python-{{ PYTHON_VERSION }}
           ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-{{ PYTHON_VERSION }}-amd64.exe"
-            dest: "{{ ansible_env.TEMP }}\\python-{{ PYTHON_VERSION }}-amd64.exe"
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
+            dest: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
         - name: Install the python-{{ PYTHON_VERSION }}
-          ansible.windows.win_package:
-            path: "{{ ansible_env.TEMP }}\\python-{{ PYTHON_VERSION }}-amd64.exe"
-            arguments:
-              - /quiet
-              - InstallAllUsers=1
-              - PrependPath=1
-              - Include_test=0
-              - Include_launcher=0
-            state: present
-          register: win_install_python
+          community.windows.win_unzip:
+            src: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
+            dest: "%ProgramFiles%\\JumpServer\\applications"
 
-        - name: Check pip command exists
-          ansible.windows.win_powershell:
-            script: |
-              if (Get-Command -Name 'pip' -ErrorAction SilentlyContinue) {
-                $Ansible.Changed = $false
-              }
-              else {
-               $Ansible.Changed = $true
-              }
-          ignore_errors: yes
-          register: check_pip_command
+        - name: Check and Clean global system path (Python)
+          ansible.windows.win_path:
+            elements:
+              - 'C:\Program Files\Python310\Scripts'
+              - 'C:\Program Files\Python310'
+              - 'C:\Program Files\Python311\Scripts'
+              - 'C:\Program Files\Python311'
+            state: absent
+
+        - name: Set python-{{ PYTHON_VERSION }} on the global system path
+          ansible.windows.win_path:
+            elements:
+              - '%ProgramFiles%\JumpServer\applications\Python'
+              - '%ProgramFiles%\JumpServer\applications\Python\Scripts'
+
+        - name: Set python-{{ PYTHON_VERSION }} on the global system python path
+          ansible.windows.win_path:
+            name: PYTHONPATH
+            scope: machine
+            elements:
+              - '%ProgramFiles%\JumpServer\applications\Python\packages'
+              - '%ProgramFiles%\JumpServer\applications\Python\Lib\site-packages'
 
         - name: Reboot if installing requires it
           ansible.windows.win_reboot:
             post_reboot_delay: 10
             test_command: whoami
-          when: check_pip_command.changed or rds_install.reboot_required or win_install_python.reboot_required
+          when: rds_install.reboot_required
 
         - name: Set RDS LicenseServer (regedit)
           ansible.windows.win_regedit:
@@ -149,22 +153,6 @@
             data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
             type: dword
 
-        - name: Download pip packages
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/pip_packages.zip"
-            dest: "{{ ansible_env.TEMP }}\\pip_packages.zip"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-
-        - name: Unzip pip_packages
-          community.windows.win_unzip:
-            src: "{{ ansible_env.TEMP }}\\pip_packages.zip"
-            dest: "{{ ansible_env.TEMP }}\\pip_packages"
-
-        - name: Install python requirements offline
-          ansible.windows.win_powershell:
-            script: |
-              pip install -r '{{ ansible_env.TEMP }}\pip_packages\pip_packages\requirements.txt' --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages\pip_packages'
-
         - name: Stop chromedriver before install
           ansible.windows.win_powershell:
             script: |
@@ -180,10 +168,10 @@
             path: "{{ item }}"
             state: absent
           with_items:
-            - C:\Program Files\JumpServer\drivers\chromedriver-win32
-            - C:\Program Files\JumpServer\drivers\chromedriver_win32
-            - C:\Program Files\JumpServer\drivers\chromedriver-win64
-            - C:\Program Files\JumpServer\drivers\chromedriver_win64
+            - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
+            - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
+            - 'C:\Program Files\JumpServer\drivers\chromedriver-win64'
+            - 'C:\Program Files\JumpServer\drivers\chromedriver_win64'
 
         - name: Download chromedriver (Chrome)
           ansible.windows.win_get_url:
@@ -194,7 +182,7 @@
         - name: Unzip chromedriver (Chrome)
           community.windows.win_unzip:
             src: "{{ ansible_env.TEMP }}\\chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
-            dest: C:\Program Files\JumpServer\drivers
+            dest: "%ProgramFiles%\\JumpServer\\drivers"
 
         - name: Download Chrome zip package (Chrome)
           ansible.windows.win_get_url:
@@ -217,21 +205,19 @@
             path: "{{ item }}"
             state: absent
           with_items:
-            - C:\Program Files\JumpServer\applications\Chrome
-            - C:\Program Files\Chrome\chrome-win32
-            - C:\Program Files\Chrome\chrome-win
-            - C:\Program Files\chrome-win
+            - 'C:\Program Files\JumpServer\applications\Chrome'
+            - 'C:\Program Files\Chrome\chrome-win32'
+            - 'C:\Program Files\Chrome\chrome-win'
+            - 'C:\Program Files\chrome-win'
 
         - name: Unzip Chrome (Chrome)
           community.windows.win_unzip:
             src: "{{ ansible_env.TEMP }}\\chrome-{{ CHROME_VERSION }}-win.zip"
-            dest: C:\Program Files\JumpServer\applications
+            dest: "%ProgramFiles%\\JumpServer\\applications"
 
         - name: Check and Clean global system path (Chrome)
           ansible.windows.win_path:
             elements:
-              - 'C:\Program Files\Python310\Scripts\'
-              - 'C:\Program Files\Python310\'
               - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
               - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
               - 'C:\Program Files\Chrome\chrome-win32'
@@ -242,8 +228,8 @@
         - name: Set Chrome and driver on the global system path (Chrome)
           ansible.windows.win_path:
             elements:
-              - 'C:\Program Files\JumpServer\applications\Chrome\Application'
-              - 'C:\Program Files\JumpServer\drivers\chromedriver-win64'
+              - '%ProgramFiles%\JumpServer\applications\Chrome\Application'
+              - '%ProgramFiles%\JumpServer\drivers\chromedriver-win64'
 
         - name: Set Chrome variables disable Google Api (Chrome)
           ansible.windows.win_environment:
