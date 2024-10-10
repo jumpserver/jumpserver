@@ -659,7 +659,6 @@ class Config(dict):
 
         # API 分页
         'MAX_LIMIT_PER_PAGE': 10000,
-        'DEFAULT_PAGE_SIZE': None,
 
         'LIMIT_SUPER_PRIV': False,
 
