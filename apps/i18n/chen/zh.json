@@ -70,5 +70,8 @@
     "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确",
     "Warning": "警告",
     "ExecutionCanceled": "执行已取消",
-    "CommandWarningDialogMessage": "您执行的命令存在风险，告警通知将发送给管理员。是否继续？"
+    "CommandWarningDialogMessage": "您执行的命令存在风险，告警通知将发送给管理员。是否继续？",
+    "PermissionExpiredDialogTitle": "授权已过期",
+    "PermissionExpiredDialogMessage": "授权已过期，会话将在十分钟后过期，请及时联系管理员续期",
+    "PermissionAlreadyExpired": "授权已过期"
 }

@@ -70,5 +70,8 @@
     "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct",
     "Warning": "Warning",
     "ExecutionCanceled": "Execution Canceled",
-    "CommandWarningDialogMessage": "The command you executed is risky and an alert notification will be sent to the administrator. Do you want to continue?"
+    "CommandWarningDialogMessage": "The command you executed is risky and an alert notification will be sent to the administrator. Do you want to continue?",
+    "PermissionExpiredDialogTitle": "Permission expired",
+    "PermissionExpiredDialogMessage": "Permission has expired, and the session will expire in ten minutes. Please contact the administrator promptly for renewal",
+    "PermissionAlreadyExpired": "Permission already expired"
 }
