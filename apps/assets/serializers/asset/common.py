@@ -309,6 +309,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             })
         return protocols_data_map.values()
 
+    def validate_platform(self, platform_data):
+        if self.Meta.model.__name__.lower() != platform_data.category:
+            raise serializers.ValidationError({
+                'platform': f"platform is not match: {platform_data.name}"
+            })
+        return platform_data
+
     @staticmethod
     def update_account_su_from(accounts, include_su_from_accounts):
         if not include_su_from_accounts:
