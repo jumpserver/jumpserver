@@ -3,7 +3,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from audits.backends.db import OperateLogStore
+from audits.backends import get_operate_log_storage
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
@@ -77,7 +77,7 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
         fields = ('diff',)
 
     def to_representation(self, instance):
-        return {'diff': OperateLogStore.convert_diff_friendly(instance)}
+        return {'diff': get_operate_log_storage().convert_diff_friendly(instance)}
 
 
 class OperateLogSerializer(BulkOrgResourceModelSerializer):

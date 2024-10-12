@@ -28,7 +28,7 @@ from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
 from users.models import User
-from .backends import TYPE_ENGINE_MAPPING
+from .backends import get_operate_log_storage
 from .const import ActivityChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
@@ -224,13 +224,11 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         if self.is_action_detail:
             with tmp_to_root_org():
                 qs |= OperateLog.objects.filter(org_id=Organization.SYSTEM_ID)
-        es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
-        if es_config:
-            engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
-            store = engine_mod.OperateLogStore(es_config)
-            if store.ping(timeout=2):
-                qs = ESQuerySet(store)
-                qs.model = OperateLog
+
+        storage = get_operate_log_storage()
+        if storage.get_type() == 'es':
+            qs = ESQuerySet(storage)
+            qs.model = OperateLog
         return qs
 
 

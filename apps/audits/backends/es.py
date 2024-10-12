@@ -2,16 +2,17 @@
 #
 import uuid
 
+from django.utils.translation import gettext_lazy as _
+
 from common.utils.timezone import local_now_display
 from common.utils import get_logger
-from common.utils.encode import Singleton
 from common.plugins.es import ES
-
+from .base import BaseOperateStorage
 
 logger = get_logger(__file__)
 
 
-class OperateLogStore(ES, metaclass=Singleton):
+class OperateLogStore(BaseOperateStorage, ES):
     def __init__(self, config):
         properties = {
             "id": {
@@ -48,7 +49,26 @@ class OperateLogStore(ES, metaclass=Singleton):
         self.pre_use_check()
 
     @staticmethod
-    def make_data(data):
+    def get_type():
+        return 'es'
+
+    @classmethod
+    def convert_diff_friendly(cls, op_log):
+        diff_list = []
+        handler = cls._get_special_handler(op_log.get('resource_type'))
+        before = op_log.get('before') or {}
+        after = op_log.get('after') or {}
+        keys = set(before.keys()) | set(after.keys())
+        for key in keys:
+            before_v, after_v = before.get(key), after.get(key)
+            diff_list.append({
+                'field': _(key),
+                'before': handler(key, before_v) if before_v else _('empty'),
+                'after': handler(key, after_v) if after_v else _('empty'),
+            })
+        return diff_list
+
+    def make_data(self, data):
         op_id = data.get('id', str(uuid.uuid4()))
         datetime_param = data.get('datetime', local_now_display())
         data = {
