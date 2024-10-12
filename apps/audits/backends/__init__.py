@@ -29,8 +29,7 @@ def _send_es_unavailable_alarm_msg():
         'msg': _("Connect failed"), 'name': f"{_('Operate log')}",
         'type': CommandStorageType.es.label
     }]
-    StorageConnectivityMessage(errors).publish()
-    # StorageConnectivityMessage(errors).publish_async()
+    StorageConnectivityMessage(errors).publish_async()
 
 
 def refresh_log_storage():
