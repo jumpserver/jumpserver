@@ -481,6 +481,16 @@ class JobExecution(JMSOrgBaseModel):
             for acl in acls:
                 if self.match_command_group(acl, asset):
                     break
+        command = self.current_job.args
+        if command and set(command.split()).intersection(set(settings.SECURITY_COMMAND_BLACKLIST)):
+            CommandExecutionAlert({
+                "assets": self.current_job.assets.all(),
+                "input": self.material,
+                "risk_level": RiskLevelChoices.reject,
+                "user": self.creator,
+            }).publish_async()
+            raise CommandInBlackListException(
+                "Command is rejected by black list: {}".format(self.current_job.args))
 
     def check_danger_keywords(self):
         lines = self.job.playbook.check_dangerous_keywords()
