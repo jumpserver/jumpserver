@@ -14,7 +14,8 @@ class SiteMessageUtil:
     def send_msg(cls, subject, message, user_ids=(), group_ids=(),
                  sender=None, is_broadcast=False):
         if not any((user_ids, group_ids, is_broadcast)):
-            raise ValueError('No recipient is specified')
+            logger.warning(f'No recipient is specified, message subject: {subject}')
+            return
 
         with transaction.atomic():
             site_msg = SiteMessageModel.objects.create(

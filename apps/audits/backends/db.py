@@ -2,14 +2,14 @@
 from django.utils.translation import gettext_lazy as _
 
 from audits.models import OperateLog
-from perms.const import ActionChoices
+from .base import BaseOperateStorage
 
 
-class OperateLogStore(object):
+class OperateLogStore(BaseOperateStorage):
     # 用不可见字符分割前后数据，节省存储-> diff: {'key': 'before\0after'}
     SEP = '\0'
 
-    def __init__(self, config):
+    def __init__(self, *args, **kwargs):
         self.model = OperateLog
         self.max_length = 2048
         self.max_length_tip_msg = _(
@@ -17,8 +17,12 @@ class OperateLogStore(object):
         )
 
     @staticmethod
-    def ping(timeout=None):
+    def ping(*args, **kwargs):
         return True
+
+    @staticmethod
+    def get_type():
+        return 'db'
 
     @classmethod
     def convert_before_after_to_diff(cls, before, after):
@@ -46,20 +50,9 @@ class OperateLogStore(object):
             before[k], after[k] = before_value, after_value
         return before, after
 
-    @staticmethod
-    def _get_special_handler(resource_type):
-        # 根据资源类型，处理特殊字段
-        resource_map = {
-            'Asset permission': lambda k, v: ActionChoices.display(int(v)) if k == 'Actions' else v
-        }
-        return resource_map.get(resource_type, lambda k, v: _(v))
-
     @classmethod
     def convert_diff_friendly(cls, op_log):
         diff_list = list()
-        # 标记翻译字符串
-        labels = _("labels")
-        operate_log_id = _("operate_log_id")
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
             before, after = v.split(cls.SEP, 1)

@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 
 from common.local import encrypted_field_set
 from common.utils import get_request_ip, get_logger
-from common.utils.encode import Singleton
 from common.utils.timezone import as_current_tz
 from jumpserver.utils import current_request
 from orgs.models import Organization
@@ -21,16 +20,8 @@ from .backends import get_operate_log_storage
 logger = get_logger(__name__)
 
 
-class OperatorLogHandler(metaclass=Singleton):
+class OperatorLogHandler(object):
     CACHE_KEY = 'OPERATOR_LOG_CACHE_KEY'
-
-    def __init__(self):
-        self.log_client = self.get_storage_client()
-
-    @staticmethod
-    def get_storage_client():
-        client = get_operate_log_storage()
-        return client
 
     @staticmethod
     def _consistent_type_to_str(value1, value2):
@@ -164,13 +155,8 @@ class OperatorLogHandler(metaclass=Singleton):
             'remote_addr': remote_addr, 'before': before, 'after': after,
         }
         with transaction.atomic():
-            if self.log_client.ping(timeout=1):
-                client = self.log_client
-            else:
-                logger.info('Switch default operate log storage save.')
-                client = get_operate_log_storage(default=True)
-
             try:
+                client = get_operate_log_storage()
                 client.save(**data)
             except Exception as e:
                 error_msg = 'An error occurred saving OperateLog.' \
