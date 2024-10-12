@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 16:31+0800\n"
+"POT-Creation-Date: 2024-10-12 11:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,6 +116,10 @@ msgstr ""
 #: accounts/automations/change_secret/manager.py:225
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
+msgstr ""
+
+#: accounts/automations/verify_gateway_account/manager.py:18
+msgid ">>> Start executing the task to test gateway account connectivity"
 msgstr ""
 
 #: accounts/const/account.py:6
@@ -352,7 +356,7 @@ msgstr ""
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:32 terminal/notifications.py:155
-#: terminal/serializers/command.py:17 terminal/serializers/session.py:28
+#: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:288
@@ -499,7 +503,7 @@ msgstr ""
 #: accounts/models/automations/backup_account.py:136
 #: accounts/serializers/automations/change_secret.py:110
 #: accounts/serializers/automations/change_secret.py:145
-#: ops/serializers/job.py:74 terminal/serializers/session.py:52
+#: ops/serializers/job.py:74 terminal/serializers/session.py:54
 msgid "Is success"
 msgstr "Is success"
 
@@ -716,8 +720,8 @@ msgstr ""
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 settings/models.py:35 settings/models.py:184
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
-#: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:109
+#: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:13
+#: terminal/models/component/endpoint.py:111
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
 #: terminal/models/virtualapp/provider.py:10
@@ -870,7 +874,7 @@ msgstr ""
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:281
+#: terminal/serializers/session.py:25 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
@@ -1048,8 +1052,8 @@ msgstr ""
 #: ops/models/job.py:158 ops/models/playbook.py:33 rbac/models/role.py:37
 #: settings/models.py:40 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:25
-#: terminal/models/component/endpoint.py:119
+#: terminal/models/component/endpoint.py:26
+#: terminal/models/component/endpoint.py:121
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:91
@@ -1328,12 +1332,12 @@ msgid "Notify and warn"
 msgstr ""
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:112 xpack/plugins/cloud/models.py:314
+#: terminal/models/component/endpoint.py:114 xpack/plugins/cloud/models.py:314
 msgid "Priority"
 msgstr ""
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:113 xpack/plugins/cloud/models.py:315
+#: terminal/models/component/endpoint.py:115 xpack/plugins/cloud/models.py:315
 msgid "1-100, the lower the value will be match first"
 msgstr ""
 
@@ -1347,8 +1351,8 @@ msgstr ""
 #: authentication/models/connection_token.py:53
 #: authentication/models/ssh_key.py:13
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:82
-#: terminal/models/component/endpoint.py:120
+#: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:27
+#: terminal/models/component/endpoint.py:122
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 #: tickets/const.py:36
 msgid "Active"
@@ -1631,13 +1635,17 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr ""
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:93 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/middleware.py:94 xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr ""
 
 #: assets/automations/ping_gateway/manager.py:60
 #: assets/automations/ping_gateway/manager.py:86 terminal/const.py:102
 msgid "Connect failed"
+msgstr ""
+
+#: assets/automations/ping_gateway/manager.py:118
+msgid ">>> Start executing the task to test gateway connectivity"
 msgstr ""
 
 #: assets/const/automation.py:6 audits/const.py:6 audits/const.py:47
@@ -1681,7 +1689,7 @@ msgstr ""
 #: assets/const/category.py:10 assets/models/asset/host.py:8
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:52 settings/serializers/msg.py:30
-#: terminal/models/component/endpoint.py:13 terminal/serializers/applet.py:17
+#: terminal/models/component/endpoint.py:14 terminal/serializers/applet.py:17
 #: xpack/plugins/cloud/manager.py:83
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
@@ -2353,13 +2361,13 @@ msgstr ""
 msgid "Postgresql ssl model help text"
 msgstr ""
 "Prefer: I don't care about encryption, but I wish to pay the overhead of "
-"encryption if the server supports it.Require: I want my data to be "
-"encrypted, and I accept the overhead. I trust that the network will make "
-"sure I always connect to the server I want.Verify CA: I want my data "
-"encrypted, and I accept the overhead. I want to be sure that I connect to a "
-"server that I trust.Verify Full: I want my data encrypted, and I accept the "
-"overhead. I want to be sure that I connect to a server I trust, and that "
-"it's the one I specify."
+"encryption if the server supports it.\n"
+"Require: I want my data to be encrypted, and I accept the overhead. I trust that the network will make "
+"sure I always connect to the server I want.\n"
+"Verify CA: I want my data encrypted, and I accept the overhead. I want to be sure that I connect to a "
+"server that I trust.\n"
+"Verify Full: I want my data encrypted, and I accept the "
+"overhead. I want to be sure that I connect to a server I trust, and that it's the one I specify."
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
@@ -2758,8 +2766,8 @@ msgstr ""
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:79
+#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:57
+#: terminal/serializers/session.py:113
 msgid "Terminal"
 msgstr ""
 
@@ -3127,6 +3135,7 @@ msgid "OpenID Error"
 msgstr ""
 
 #: authentication/backends/oidc/views.py:175
+#: authentication/backends/saml2/views.py:282
 msgid "Please check if a user with the same username or email already exists"
 msgstr ""
 
@@ -3154,6 +3163,10 @@ msgstr ""
 
 #: authentication/backends/passkey/models.py:15
 msgid "Credential ID"
+msgstr ""
+
+#: authentication/backends/saml2/views.py:281
+msgid "SAML2 Error"
 msgstr ""
 
 #: authentication/confirm/password.py:16
@@ -3424,7 +3437,7 @@ msgstr ""
 msgid "Clear phone number to disable"
 msgstr ""
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:691
+#: authentication/middleware.py:95 settings/utils/ldap.py:691
 msgid "Authentication failed (before login check failed): {}"
 msgstr ""
 
@@ -3447,7 +3460,7 @@ msgid "Please change your password"
 msgstr ""
 
 #: authentication/models/access_key.py:22
-#: terminal/models/component/endpoint.py:110
+#: terminal/models/component/endpoint.py:112
 msgid "IP group"
 msgstr ""
 
@@ -3469,7 +3482,7 @@ msgstr ""
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
-#: terminal/serializers/session.py:21 terminal/serializers/session.py:48
+#: terminal/serializers/session.py:23 terminal/serializers/session.py:50
 #: terminal/serializers/storage.py:71
 msgid "Protocol"
 msgstr ""
@@ -3516,6 +3529,7 @@ msgid "Connection token expired at: {}"
 msgstr ""
 
 #: authentication/models/connection_token.py:125
+#: terminal/serializers/session.py:95
 msgid "No user or invalid user"
 msgstr ""
 
@@ -3750,7 +3764,7 @@ msgstr ""
 msgid "Your account has remote login behavior, please pay attention"
 msgstr ""
 
-#: authentication/templates/authentication/_msg_different_city.html:16
+#: authentication/templates/authentication/_msg_different_city.html:14
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
@@ -3774,13 +3788,13 @@ msgstr ""
 msgid "Click here reset password"
 msgstr ""
 
-#: authentication/templates/authentication/_msg_reset_password.html:16
-#: users/templates/users/_msg_user_created.html:22
+#: authentication/templates/authentication/_msg_reset_password.html:15
+#: users/templates/users/_msg_user_created.html:20
 msgid "This link is valid for 1 hour. After it expires"
 msgstr ""
 
-#: authentication/templates/authentication/_msg_reset_password.html:17
-#: users/templates/users/_msg_user_created.html:23
+#: authentication/templates/authentication/_msg_reset_password.html:16
+#: users/templates/users/_msg_user_created.html:21
 msgid "request new one"
 msgstr ""
 
@@ -3809,14 +3823,14 @@ msgstr ""
 msgid "Browser"
 msgstr ""
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:13
+#: authentication/templates/authentication/_msg_rest_password_success.html:12
 msgid ""
 "If the password update was not initiated by you, your account may have "
 "security issues"
 msgstr ""
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:14
-#: authentication/templates/authentication/_msg_rest_public_key_success.html:14
+#: authentication/templates/authentication/_msg_rest_password_success.html:13
+#: authentication/templates/authentication/_msg_rest_public_key_success.html:13
 msgid "If you have any questions, you can contact the administrator"
 msgstr ""
 
@@ -3824,7 +3838,7 @@ msgstr ""
 msgid "Your public key has just been successfully updated"
 msgstr ""
 
-#: authentication/templates/authentication/_msg_rest_public_key_success.html:13
+#: authentication/templates/authentication/_msg_rest_public_key_success.html:12
 msgid ""
 "If the public key update was not initiated by you, your account may have "
 "security issues"
@@ -3897,7 +3911,7 @@ msgid "LAN"
 msgstr ""
 
 #: authentication/views/base.py:71
-#: perms/templates/perms/_msg_permed_items_expire.html:21
+#: perms/templates/perms/_msg_permed_items_expire.html:20
 msgid "If you have any question, please contact the administrator"
 msgstr ""
 
@@ -4134,7 +4148,8 @@ msgid "Invalid ids for ids, should be a list"
 msgstr ""
 
 #: common/db/fields.py:589 common/db/fields.py:594
-#: common/serializers/fields.py:144 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:144 terminal/serializers/session.py:81
+#: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -4636,27 +4651,27 @@ msgstr ""
 msgid "Currently playbook is being used in a job"
 msgstr ""
 
-#: ops/api/playbook.py:113
+#: ops/api/playbook.py:123
 msgid "Unsupported file content"
 msgstr ""
 
-#: ops/api/playbook.py:115 ops/api/playbook.py:161 ops/api/playbook.py:209
+#: ops/api/playbook.py:125 ops/api/playbook.py:171 ops/api/playbook.py:219
 msgid "Invalid file path"
 msgstr ""
 
-#: ops/api/playbook.py:187
+#: ops/api/playbook.py:197
 msgid "This file can not be rename"
 msgstr ""
 
-#: ops/api/playbook.py:206
+#: ops/api/playbook.py:216
 msgid "File already exists"
 msgstr ""
 
-#: ops/api/playbook.py:224
+#: ops/api/playbook.py:234
 msgid "File key is required"
 msgstr ""
 
-#: ops/api/playbook.py:227
+#: ops/api/playbook.py:237
 msgid "This file can not be delete"
 msgstr ""
 
@@ -4962,7 +4977,7 @@ msgstr ""
 msgid "Execute after saving"
 msgstr "Execute after saving"
 
-#: ops/serializers/job.py:52 terminal/serializers/session.py:47
+#: ops/serializers/job.py:52 terminal/serializers/session.py:49
 msgid "Duration"
 msgstr ""
 
@@ -4970,7 +4985,7 @@ msgstr ""
 msgid "Job type"
 msgstr ""
 
-#: ops/serializers/job.py:75 terminal/serializers/session.py:56
+#: ops/serializers/job.py:75 terminal/serializers/session.py:58
 msgid "Is finished"
 msgstr "Finished"
 
@@ -7040,11 +7055,11 @@ msgstr ""
 msgid "Authentication success: {}"
 msgstr ""
 
-#: settings/ws.py:199
+#: settings/ws.py:222
 msgid "No LDAP user was found"
 msgstr ""
 
-#: settings/ws.py:205
+#: settings/ws.py:228
 msgid "Total {}, success {}, failure {}"
 msgstr ""
 
@@ -7516,51 +7531,51 @@ msgstr ""
 msgid "Applet host deployment"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:15
+#: terminal/models/component/endpoint.py:16
 msgid "HTTPS port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:16
+#: terminal/models/component/endpoint.py:17
 msgid "HTTP port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:17
+#: terminal/models/component/endpoint.py:18
 msgid "SSH port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:18
+#: terminal/models/component/endpoint.py:19
 msgid "RDP port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:19
+#: terminal/models/component/endpoint.py:20
 msgid "MySQL port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:20
+#: terminal/models/component/endpoint.py:21
 msgid "MariaDB port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:21
+#: terminal/models/component/endpoint.py:22
 msgid "PostgreSQL port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:22
+#: terminal/models/component/endpoint.py:23
 msgid "Redis port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:23
+#: terminal/models/component/endpoint.py:24
 msgid "SQLServer port"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:117
-#: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
+#: terminal/models/component/endpoint.py:32
+#: terminal/models/component/endpoint.py:119
+#: terminal/serializers/endpoint.py:80 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr ""
 
-#: terminal/models/component/endpoint.py:123
+#: terminal/models/component/endpoint.py:125
 msgid "Endpoint rule"
 msgstr ""
 
@@ -7646,11 +7661,11 @@ msgstr ""
 msgid "Replay"
 msgstr ""
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:78
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:112
 msgid "Command amount"
 msgstr ""
 
-#: terminal/models/session/session.py:49 terminal/serializers/session.py:30
+#: terminal/models/session/session.py:49 terminal/serializers/session.py:32
 msgid "Error reason"
 msgstr ""
 
@@ -7947,47 +7962,51 @@ msgid ""
 "does not allow modification of the host)"
 msgstr ""
 
-#: terminal/serializers/endpoint.py:64
+#: terminal/serializers/endpoint.py:71
 msgid ""
 "The assets within this IP range, the following endpoint will be used for the "
 "connection"
 msgstr ""
 
-#: terminal/serializers/endpoint.py:65
+#: terminal/serializers/endpoint.py:72
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
 
-#: terminal/serializers/endpoint.py:69
+#: terminal/serializers/endpoint.py:76
 msgid "Asset IP"
 msgstr ""
 
-#: terminal/serializers/session.py:25 terminal/serializers/session.py:53
+#: terminal/serializers/session.py:27 terminal/serializers/session.py:55
 msgid "Can replay"
 msgstr ""
 
-#: terminal/serializers/session.py:26 terminal/serializers/session.py:54
+#: terminal/serializers/session.py:28 terminal/serializers/session.py:56
 msgid "Can join"
 msgstr ""
 
-#: terminal/serializers/session.py:27 terminal/serializers/session.py:57
+#: terminal/serializers/session.py:29 terminal/serializers/session.py:59
 msgid "Can terminate"
 msgstr ""
 
-#: terminal/serializers/session.py:49
+#: terminal/serializers/session.py:51
 msgid "User ID"
 msgstr ""
 
-#: terminal/serializers/session.py:50
+#: terminal/serializers/session.py:52
 msgid "Asset ID"
 msgstr ""
 
-#: terminal/serializers/session.py:51
+#: terminal/serializers/session.py:53
 msgid "Login from display"
 msgstr ""
 
-#: terminal/serializers/session.py:58
+#: terminal/serializers/session.py:60
 msgid "Terminal display"
+msgstr ""
+
+#: terminal/serializers/session.py:103
+msgid "No asset or invalid asset"
 msgstr ""
 
 #: terminal/serializers/storage.py:23
@@ -8850,7 +8869,7 @@ msgid "Force enabled"
 msgstr ""
 
 #: users/notifications.py:55
-#: users/templates/users/_msg_password_expire_reminder.html:17
+#: users/templates/users/_msg_password_expire_reminder.html:16
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
@@ -9195,7 +9214,7 @@ msgstr ""
 msgid "Click here update password"
 msgstr ""
 
-#: users/templates/users/_msg_password_expire_reminder.html:16
+#: users/templates/users/_msg_password_expire_reminder.html:15
 msgid "If your password has expired, please click the link below to"
 msgstr ""
 
@@ -9696,7 +9715,7 @@ msgstr ""
 
 #: xpack/plugins/cloud/models.py:115
 #: xpack/plugins/cloud/serializers/task.py:161
-msgid "Preferred IP type"
+msgid "Sync IP type"
 msgstr ""
 
 #: xpack/plugins/cloud/models.py:118
