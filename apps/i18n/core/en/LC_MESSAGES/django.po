@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-12 11:30+0800\n"
+"POT-Creation-Date: 2024-10-14 15:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -377,16 +377,20 @@ msgstr "Switch from"
 msgid "Version"
 msgstr ""
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:228
+#: accounts/models/account.py:57
+msgid "historical Account"
+msgstr ""
+
+#: accounts/models/account.py:58 accounts/serializers/account/account.py:228
 #: users/models/user/__init__.py:119
 msgid "Source"
 msgstr ""
 
-#: accounts/models/account.py:58
+#: accounts/models/account.py:59
 msgid "Source ID"
 msgstr ""
 
-#: accounts/models/account.py:61
+#: accounts/models/account.py:62
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:144
 #: accounts/templates/accounts/change_secret_failed_info.html:12
@@ -404,27 +408,27 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: accounts/models/account.py:67
+#: accounts/models/account.py:68
 msgid "Can view asset account secret"
 msgstr ""
 
-#: accounts/models/account.py:68
+#: accounts/models/account.py:69
 msgid "Can view asset history account"
 msgstr ""
 
-#: accounts/models/account.py:69
+#: accounts/models/account.py:70
 msgid "Can view asset history account secret"
 msgstr ""
 
-#: accounts/models/account.py:70
+#: accounts/models/account.py:71
 msgid "Can verify account"
 msgstr ""
 
-#: accounts/models/account.py:71
+#: accounts/models/account.py:72
 msgid "Can push account"
 msgstr ""
 
-#: accounts/models/account.py:72
+#: accounts/models/account.py:73
 msgid "Can remove account"
 msgstr ""
 
@@ -926,7 +930,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:459
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:83
-#: assets/serializers/asset/common.py:407
+#: assets/serializers/asset/common.py:418
 msgid "Spec info"
 msgstr ""
 
@@ -1366,7 +1370,7 @@ msgstr ""
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
 #: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
+#: assets/serializers/asset/common.py:417 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr ""
@@ -1943,7 +1947,7 @@ msgstr ""
 msgid "Zone"
 msgstr ""
 
-#: assets/models/asset/common.py:179 assets/serializers/asset/common.py:408
+#: assets/models/asset/common.py:179 assets/serializers/asset/common.py:419
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr ""
@@ -2124,7 +2128,7 @@ msgstr ""
 msgid "New node"
 msgstr ""
 
-#: assets/models/node.py:467 audits/backends/db.py:82 audits/backends/db.py:83
+#: assets/models/node.py:467 audits/backends/db.py:85 audits/backends/db.py:86
 msgid "empty"
 msgstr ""
 
@@ -2326,7 +2330,7 @@ msgid "Node path"
 msgstr ""
 
 #: assets/serializers/asset/common.py:168
-#: assets/serializers/asset/common.py:409
+#: assets/serializers/asset/common.py:420
 msgid "Auto info"
 msgstr ""
 
@@ -2342,7 +2346,7 @@ msgstr ""
 msgid "Protocol is required: {}"
 msgstr ""
 
-#: assets/serializers/asset/common.py:336
+#: assets/serializers/asset/common.py:347
 msgid "Invalid data"
 msgstr ""
 
@@ -2362,12 +2366,12 @@ msgid "Postgresql ssl model help text"
 msgstr ""
 "Prefer: I don't care about encryption, but I wish to pay the overhead of "
 "encryption if the server supports it.\n"
-"Require: I want my data to be encrypted, and I accept the overhead. I trust that the network will make "
-"sure I always connect to the server I want.\n"
-"Verify CA: I want my data encrypted, and I accept the overhead. I want to be sure that I connect to a "
-"server that I trust.\n"
-"Verify Full: I want my data encrypted, and I accept the "
-"overhead. I want to be sure that I connect to a server I trust, and that it's the one I specify."
+"Require: I want my data to be encrypted, and I accept the overhead. I trust "
+"that the network will make sure I always connect to the server I want.\n"
+"Verify CA: I want my data encrypted, and I accept the overhead. I want to be "
+"sure that I connect to a server that I trust.\n"
+"Verify Full: I want my data encrypted, and I accept the overhead. I want to "
+"be sure that I connect to a server I trust, and that it's the one I specify."
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
@@ -2676,7 +2680,15 @@ msgstr "Activities"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr ""
 
-#: audits/backends/db.py:108
+#: audits/backends/db.py:78
+msgid "labels"
+msgstr "Labels"
+
+#: audits/backends/db.py:79
+msgid "operate_log_id"
+msgstr ""
+
+#: audits/backends/db.py:111
 msgid "Tips"
 msgstr ""
 
@@ -4526,7 +4538,7 @@ msgstr ""
 
 #: labels/apps.py:8
 msgid "App Labels"
-msgstr "Labels"
+msgstr "App labels"
 
 #: labels/models.py:15
 msgid "Color"
@@ -4925,7 +4937,7 @@ msgstr ""
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:548
+#: ops/models/job.py:558
 msgid "Job Execution"
 msgstr ""
 

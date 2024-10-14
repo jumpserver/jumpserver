@@ -9,6 +9,7 @@
     "CommandReviewMessage": "The command you entered requires verification before it can be executed. Would you like to initiate a review request?",
     "CommandReviewRejectBy": "Command review request has been rejected by %s",
     "CommandReviewTimeoutError": "Command review request has timed out",
+    "CommandWarningDialogMessage": "The command you executed is risky and an alert notification will be sent to the administrator. Do you want to continue?",
     "Confirm": "Confirm",
     "ConnectError": "Error while fetching data",
     "ConnectSuccess": "Connected successfully",
@@ -22,6 +23,7 @@
     "ErrorMessage": "Error message",
     "ExecuteError": "Error while executing",
     "ExecuteSuccess": "Executed successfully",
+    "ExecutionCanceled": "Execution Canceled",
     "ExportALL": "Export all data",
     "ExportAll": "Export all",
     "ExportCurrent": "Export current page",
@@ -42,6 +44,9 @@
     "OverMaxSessionTimeError": "Since this session has been active for more than %d hours, it has been closed",
     "ParseError": "Error while parsing",
     "PasteNotAllowed": "You are not allowed to paste, please contact the administrator to open it!",
+    "PermissionAlreadyExpired": "Permission already expired",
+    "PermissionExpiredDialogMessage": "Permission has expired, and the session will expire in ten minutes. Please contact the administrator promptly for renewal",
+    "PermissionExpiredDialogTitle": "Permission expired",
     "PermissionsExpiredOn": "Permissions associated with this session expired on %s",
     "Properties": "Properties",
     "Refresh": "Refresh",
@@ -67,11 +72,6 @@
     "Version": "Version",
     "ViewData": "View data",
     "WaitCommandReviewMessage": "The review request has been initiated, please wait for the review results",
-    "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct",
     "Warning": "Warning",
-    "ExecutionCanceled": "Execution Canceled",
-    "CommandWarningDialogMessage": "The command you executed is risky and an alert notification will be sent to the administrator. Do you want to continue?",
-    "PermissionExpiredDialogTitle": "Permission expired",
-    "PermissionExpiredDialogMessage": "Permission has expired, and the session will expire in ten minutes. Please contact the administrator promptly for renewal",
-    "PermissionAlreadyExpired": "Permission already expired"
+    "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct"
 }
