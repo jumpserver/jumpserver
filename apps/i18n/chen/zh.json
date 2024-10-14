@@ -9,6 +9,7 @@
     "CommandReviewMessage": "您输入的命令需要复核后才可以执行, 是否发起复核请求?",
     "CommandReviewRejectBy": "命令复核被 %s 拒绝",
     "CommandReviewTimeoutError": "命令复核超时",
+    "CommandWarningDialogMessage": "您执行的命令存在风险，告警通知将发送给管理员。是否继续？",
     "Confirm": "确认",
     "ConnectError": "连接失败",
     "ConnectSuccess": "连接成功",
@@ -22,6 +23,7 @@
     "ErrorMessage": "错误消息",
     "ExecuteError": "执行失败",
     "ExecuteSuccess": "执行成功",
+    "ExecutionCanceled": "执行已取消",
     "ExportALL": "导出所有数据",
     "ExportAll": "导出全部",
     "ExportCurrent": "导出当前页面",
@@ -42,6 +44,9 @@
     "OverMaxSessionTimeError": "由于此会话时间大于 %d 小时，已经被关闭",
     "ParseError": "解析失败",
     "PasteNotAllowed": "不允许粘贴，请联系管理员开启权限！",
+    "PermissionAlreadyExpired": "授权已过期",
+    "PermissionExpiredDialogMessage": "授权已过期，会话将在十分钟后过期，请及时联系管理员续期",
+    "PermissionExpiredDialogTitle": "授权已过期",
     "PermissionsExpiredOn": "此会话关联的权限已于 %s 过期",
     "Properties": "属性",
     "Refresh": "刷新",
@@ -67,11 +72,6 @@
     "Version": "版本",
     "ViewData": "查看数据",
     "WaitCommandReviewMessage": "复核请求已发起, 请等待复核结果",
-    "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确",
     "Warning": "警告",
-    "ExecutionCanceled": "执行已取消",
-    "CommandWarningDialogMessage": "您执行的命令存在风险，告警通知将发送给管理员。是否继续？",
-    "PermissionExpiredDialogTitle": "授权已过期",
-    "PermissionExpiredDialogMessage": "授权已过期，会话将在十分钟后过期，请及时联系管理员续期",
-    "PermissionAlreadyExpired": "授权已过期"
+    "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确"
 }

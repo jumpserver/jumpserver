@@ -128,6 +128,7 @@
     "Password is your password login to system": "密码是你登录系统的密码",
     "Pause": "暂停",
     "Pause task has been send": "暂停任务已发送",
+    "Play List": "播放列表",
     "Please choose an account": "请选择一个用户",
     "Please input password": "请输入密码",
     "Port": "端口",
@@ -214,11 +215,10 @@
     "connectDisabledTipsNoAccount": "提示：未找到有效的授权账号，当前资源无法连接，请联系管理员进行处理",
     "connectDisabledTipsNoConnectMethod": "提示：未找到有效的连接方式，当前资源无法连接，请联系管理员进行处理",
     "download": "下载",
+    "recordingIsBeingDownloaded": "录像正在下载中，请稍候",
     "rows": "行数",
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户",
-    "recordingIsBeingDownloaded": "录像正在下载中，请稍候",
-    "Play List": "播放列表"
+    "user": "用户"
 }

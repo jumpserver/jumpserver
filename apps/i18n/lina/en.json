@@ -443,9 +443,6 @@
     "Docs": "Docs",
     "Download": "Download",
     "DownloadCenter": "Download",
-    "FTPStorageNotEnabled": "The file storage function is not enabled. Please modify the configuration file and add the following configuration: FTP_FILE_MAX_STORE=100 (supports saving files within 100M)",
-    "FTPFileNotStored": "The file has not been saved to storage yet, please check back later.",
-    "FTPUnknownStorageState": "Unknown file storage status, please contact your administrator.",
     "DownloadImportTemplateMsg": "Download creation template",
     "DownloadReplay": "Download recording",
     "DownloadUpdateTemplateMsg": "Download update template",
@@ -507,6 +504,9 @@
     "ExportOnlySelectedItems": "Export selected items",
     "ExportRange": "Export range",
     "FC": "Fusion compute",
+    "FTPFileNotStored": "The file has not been saved to storage yet, please check back later.",
+    "FTPStorageNotEnabled": "The file storage function is not enabled. Please modify the configuration file and add the following configuration: FTP_FILE_MAX_STORE=100 (supports saving files within 100M)",
+    "FTPUnknownStorageState": "Unknown file storage status, please contact your administrator.",
     "Failed": "Failed",
     "FailedAsset": "Failed assets",
     "FaviconTip": "Note: website icon (suggested image size: 16px*16px)",
@@ -1217,6 +1217,7 @@
     "TaskID": "Task id",
     "TaskList": "Tasks",
     "TaskMonitor": "Monitoring",
+    "TaskPath": "Task path",
     "TechnologyConsult": "Technical consultation",
     "TempPasswordTip": "The temporary password is valid for 300 seconds and becomes invalid immediately after use",
     "TempToken": "Temporary tokens",
@@ -1399,6 +1400,5 @@
     "ZoneUpdate": "Update the zone",
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove",
-    "TaskPath": "Task path"
+    "removeWarningMsg": "Are you sure you want to remove"
 }
