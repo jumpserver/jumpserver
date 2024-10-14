@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-12 11:30+0800\n"
+"POT-Creation-Date: 2024-10-14 15:06+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -376,16 +376,20 @@ msgstr "切换自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:228
+#: accounts/models/account.py:57
+msgid "historical Account"
+msgstr "账号历史"
+
+#: accounts/models/account.py:58 accounts/serializers/account/account.py:228
 #: users/models/user/__init__.py:119
 msgid "Source"
 msgstr "来源"
 
-#: accounts/models/account.py:58
+#: accounts/models/account.py:59
 msgid "Source ID"
 msgstr "来源 ID"
 
-#: accounts/models/account.py:61
+#: accounts/models/account.py:62
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:144
 #: accounts/templates/accounts/change_secret_failed_info.html:12
@@ -403,27 +407,27 @@ msgstr "来源 ID"
 msgid "Account"
 msgstr "账号"
 
-#: accounts/models/account.py:67
+#: accounts/models/account.py:68
 msgid "Can view asset account secret"
 msgstr "可以查看资产账号密码"
 
-#: accounts/models/account.py:68
+#: accounts/models/account.py:69
 msgid "Can view asset history account"
 msgstr "可以查看资产历史账号"
 
-#: accounts/models/account.py:69
+#: accounts/models/account.py:70
 msgid "Can view asset history account secret"
 msgstr "可以查看资产历史账号密码"
 
-#: accounts/models/account.py:70
+#: accounts/models/account.py:71
 msgid "Can verify account"
 msgstr "可以验证账号"
 
-#: accounts/models/account.py:71
+#: accounts/models/account.py:72
 msgid "Can push account"
 msgstr "可以推送账号"
 
-#: accounts/models/account.py:72
+#: accounts/models/account.py:73
 msgid "Can remove account"
 msgstr "可以移除账号"
 
@@ -934,7 +938,7 @@ msgstr "账号已存在"
 #: accounts/serializers/account/account.py:459
 #: accounts/serializers/account/base.py:93
 #: accounts/serializers/account/template.py:83
-#: assets/serializers/asset/common.py:407
+#: assets/serializers/asset/common.py:418
 msgid "Spec info"
 msgstr "特殊信息"
 
@@ -1392,7 +1396,7 @@ msgstr "用户"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
 #: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:406 perms/serializers/permission.py:55
+#: assets/serializers/asset/common.py:417 perms/serializers/permission.py:55
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号"
@@ -1980,7 +1984,7 @@ msgstr "平台"
 msgid "Zone"
 msgstr "网域"
 
-#: assets/models/asset/common.py:179 assets/serializers/asset/common.py:408
+#: assets/models/asset/common.py:179 assets/serializers/asset/common.py:419
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集资产硬件信息"
@@ -2163,7 +2167,7 @@ msgstr "我的资产"
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:467 audits/backends/db.py:82 audits/backends/db.py:83
+#: assets/models/node.py:467 audits/backends/db.py:85 audits/backends/db.py:86
 msgid "empty"
 msgstr "空"
 
@@ -2367,7 +2371,7 @@ msgid "Node path"
 msgstr "节点路径"
 
 #: assets/serializers/asset/common.py:168
-#: assets/serializers/asset/common.py:409
+#: assets/serializers/asset/common.py:420
 msgid "Auto info"
 msgstr "自动化信息"
 
@@ -2383,7 +2387,7 @@ msgstr "端口超出范围 (0-65535)"
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/common.py:336
+#: assets/serializers/asset/common.py:347
 msgid "Invalid data"
 msgstr "无效的数据"
 
@@ -2401,9 +2405,12 @@ msgstr ""
 msgid "Postgresql ssl model help text"
 msgstr ""
 "Prefer：我不关心加密，但如果服务器支持加密，我愿意支付加密的开销。\n"
-"Require：我希望我的数据被加密，我接受开销。我相信网络将确保我始终连接到我想要的服务器。\n"
-"Verify CA：我希望我的数据被加密，我接受开销。我想确保我连接到我信任的服务器。\n"
-"Verify Full：我希望我的数据被加密，我接受开销。我想确保我连接到我信任的服务器，并且它是我指定的服务器。"
+"Require：我希望我的数据被加密，我接受开销。我相信网络将确保我始终连接到我想要"
+"的服务器。\n"
+"Verify CA：我希望我的数据被加密，我接受开销。我想确保我连接到我信任的服务"
+"器。\n"
+"Verify Full：我希望我的数据被加密，我接受开销。我想确保我连接到我信任的服务"
+"器，并且它是我指定的服务器。"
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
@@ -2719,7 +2726,15 @@ msgstr "日志审计"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文字内容太长。请使用 Elasticsearch 存储操作日志"
 
-#: audits/backends/db.py:108
+#: audits/backends/db.py:78
+msgid "labels"
+msgstr "标签"
+
+#: audits/backends/db.py:79
+msgid "operate_log_id"
+msgstr "操作日志ID"
+
+#: audits/backends/db.py:111
 msgid "Tips"
 msgstr "提示"
 
@@ -4989,7 +5004,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:548
+#: ops/models/job.py:558
 msgid "Job Execution"
 msgstr "作业执行"
 
