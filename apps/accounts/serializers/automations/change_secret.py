@@ -75,19 +75,6 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         if self.initial_data.get('secret_strategy') == SecretStrategy.custom:
             return password_rules
 
-        length = password_rules.get('length')
-
-        try:
-            length = int(length)
-        except Exception as e:
-            logger.error(e)
-            msg = _("* Please enter the correct password length")
-            raise serializers.ValidationError(msg)
-
-        if length < 6 or length > 36:
-            msg = _('* Password length range 6-30 bits')
-            raise serializers.ValidationError(msg)
-
         return password_rules
 
     def validate(self, attrs):
