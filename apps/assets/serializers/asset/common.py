@@ -14,7 +14,7 @@ from common.serializers import (
     CommonModelSerializer, MethodSerializer, ResourceLabelsMixin
 )
 from common.serializers.common import DictSerializer
-from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -147,6 +147,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
     nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
+    platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'), attrs=('id', 'name', 'type'))
     _accounts = None
 
     class Meta:

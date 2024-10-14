@@ -202,7 +202,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
 
 class AccountAssetSerializer(serializers.ModelSerializer):
-    platform = ObjectRelatedField(read_only=True)
+    platform = ObjectRelatedField(read_only=True, attrs=('id', 'name', 'type'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
 
@@ -238,6 +238,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'version',
             'source', 'source_id', 'connectivity',
+            'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + [
             'connectivity'

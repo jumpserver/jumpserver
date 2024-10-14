@@ -53,6 +53,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
+    secret_reset = models.BooleanField(default=True, verbose_name=_('Secret reset'))
     history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))

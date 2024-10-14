@@ -8,6 +8,7 @@ GATEWAY_NAME = 'Gateway'
 class HostTypes(BaseType):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
+    MacOS = 'macos', 'macOS'
     UNIX = 'unix', 'Unix'
     OTHER_HOST = 'other', _("Other")
 
