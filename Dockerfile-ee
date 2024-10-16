@@ -15,11 +15,9 @@ ARG TOOLS="                           \
         vim                           \
         wget"
 
-ARG APT_MIRROR=http://deb.debian.org
-RUN set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
-    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${TOOLS}
 

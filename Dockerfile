@@ -33,14 +33,16 @@ ARG TOOLS="                           \
         bubblewrap"
 
 ARG APT_MIRROR=http://deb.debian.org
-RUN set -ex \
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update > /dev/null \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${TOOLS} \
-    && apt-get clean \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
     && echo "no" | dpkg-reconfigure dash
