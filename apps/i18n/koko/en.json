@@ -36,6 +36,8 @@
     "OnlineUsers": "Online Users",
     "Paste": "Paste",
     "PauseSession": "Pause Session",
+    "PermissionExpired": "Permission expired",
+    "PermissionValid": "Permission valid",
     "ReadOnly": "Read-Only",
     "Reconnect": "Reconnect",
     "Refresh": "Refresh",
