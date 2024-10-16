@@ -57,6 +57,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
+    date_last_access = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
 
     class Meta:
         verbose_name = _('Account')

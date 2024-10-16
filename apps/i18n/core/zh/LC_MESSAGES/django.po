@@ -215,7 +215,7 @@ msgstr "移除账号"
 
 #: accounts/const/automation.py:28
 msgid "Gather accounts"
-msgstr "收集账号"
+msgstr "账号发现"
 
 #: accounts/const/automation.py:29
 msgid "Verify gateway account"
@@ -528,11 +528,11 @@ msgstr "创建改密执行"
 
 #: accounts/models/automations/base.py:38
 msgid "Can view gather accounts execution"
-msgstr "查看收集账号执行"
+msgstr "查看账号发现执行"
 
 #: accounts/models/automations/base.py:39
 msgid "Can add gather accounts execution"
-msgstr "创建收集账号执行"
+msgstr "创建账号发现执行"
 
 #: accounts/models/automations/base.py:41
 msgid "Can view push account execution"
@@ -637,7 +637,7 @@ msgstr "最后登录地址"
 #: accounts/models/automations/gather_account.py:44
 #: accounts/tasks/gather_accounts.py:30
 msgid "Gather asset accounts"
-msgstr "收集账号"
+msgstr "账号发现"
 
 #: accounts/models/automations/gather_account.py:56
 msgid "Is sync account"
@@ -645,7 +645,7 @@ msgstr "是否同步账号"
 
 #: accounts/models/automations/gather_account.py:75
 msgid "Gather account automation"
-msgstr "自动化收集账号"
+msgstr "自动化账号发现"
 
 #: accounts/models/automations/push_account.py:14
 msgid "Triggers"
@@ -1233,7 +1233,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"当在控制台-自动化-账号收集-收集的账号-点击同步删除会执行该任务"
+"当在控制台-自动化-账号收集-发现的账号-点击同步删除会执行该任务"
 
 #: accounts/tasks/remove_account.py:52
 msgid "Clean historical accounts"
@@ -2526,11 +2526,11 @@ msgstr "启用账号收集"
 
 #: assets/serializers/platform.py:67
 msgid "Enable account collection"
-msgstr "自动化收集账号"
+msgstr "自动化账号发现"
 
 #: assets/serializers/platform.py:70
 msgid "Gather accounts method"
-msgstr "收集账号方式"
+msgstr "账号发现方式"
 
 #: assets/serializers/platform.py:76
 msgid "Remove accounts enabled"
@@ -5673,7 +5673,7 @@ msgstr "备份账号"
 
 #: rbac/tree.py:51
 msgid "Gather account"
-msgstr "收集账号"
+msgstr "账号发现"
 
 #: rbac/tree.py:53
 msgid "Account change secret"

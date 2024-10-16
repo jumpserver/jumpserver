@@ -2397,7 +2397,7 @@ msgstr "啟用帳號收集"
 
 #: assets/serializers/platform.py:67
 msgid "Enable account collection"
-msgstr "自动收集账号"
+msgstr "自动账号发现"
 
 #: assets/serializers/platform.py:70
 msgid "Gather accounts method"

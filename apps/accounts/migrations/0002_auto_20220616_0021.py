@@ -50,7 +50,15 @@ class Migration(migrations.Migration):
                 ('secret', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Secret')),
                 ('secret_strategy', models.CharField(choices=[('specific', 'Specific secret'), ('random', 'Random generate')], default='specific', max_length=16, verbose_name='Secret strategy')),
                 ('password_rules', models.JSONField(default=dict, verbose_name='Password rules')),
-                ('ssh_key_change_strategy', models.CharField(choices=[('add', 'Append SSH KEY'), ('set', 'Empty and append SSH KEY'), ('set_jms', 'Replace (Replace only keys pushed by JumpServer) ')], default='add', max_length=16, verbose_name='SSH key change strategy')),
+                ('ssh_key_change_strategy', models.CharField(
+                    choices=[
+                        ("set_jms", "Replace (Replace only keys pushed by JumpServer) "),
+                        ("set", "Empty and append SSH KEY"),
+                    ],
+                    default="set_jms",
+                    max_length=16,
+                    verbose_name="SSH key change strategy",
+                )),
             ],
             options={
                 'verbose_name': 'Change secret automation',
@@ -76,7 +84,15 @@ class Migration(migrations.Migration):
                 ('secret', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Secret')),
                 ('secret_strategy', models.CharField(choices=[('specific', 'Specific secret'), ('random', 'Random generate')], default='specific', max_length=16, verbose_name='Secret strategy')),
                 ('password_rules', models.JSONField(default=dict, verbose_name='Password rules')),
-                ('ssh_key_change_strategy', models.CharField(choices=[('add', 'Append SSH KEY'), ('set', 'Empty and append SSH KEY'), ('set_jms', 'Replace (Replace only keys pushed by JumpServer) ')], default='add', max_length=16, verbose_name='SSH key change strategy')),
+                ('ssh_key_change_strategy', models.CharField(
+                    choices=[
+                        ("set_jms", "Replace (Replace only keys pushed by JumpServer) "),
+                        ("set", "Empty and append SSH KEY"),
+                    ],
+                    default="set_jms",
+                    max_length=16,
+                    verbose_name="SSH key change strategy",
+                )),
                 ('triggers', models.JSONField(default=list, max_length=16, verbose_name='Triggers')),
                 ('username', models.CharField(max_length=128, verbose_name='Username')),
                 ('action', models.CharField(max_length=16, verbose_name='Action')),

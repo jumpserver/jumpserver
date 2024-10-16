@@ -34,6 +34,14 @@ class PeriodTaskModelMixin(models.Model):
     crontab = models.CharField(
         blank=True, max_length=128, null=True, verbose_name=_("Crontab"),
     )
+    start_time = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name=_('Start Datetime'),
+        help_text=_(
+            'Datetime when the schedule should begin '
+            'triggering the task to run'
+        ),
+    )
     objects = PeriodTaskModelQuerySet.as_manager()
 
     @abc.abstractmethod
@@ -73,6 +81,7 @@ class PeriodTaskModelMixin(models.Model):
                 'args': args,
                 'kwargs': kwargs,
                 'enabled': True,
+                'start_time': self.start_time,
             }
         }
         create_or_update_celery_periodic_tasks(tasks)
@@ -113,12 +122,18 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
         allow_null=True, required=False, label=_('Crontab')
     )
     interval = serializers.IntegerField(
-        default=24, allow_null=True, required=False, label=_('Interval')
+        default=24, allow_null=True, required=False, label=_('Interval'),
+        max_value=65535, min_value=1,
+    )
+    start_time = serializers.DateTimeField(
+        allow_null=True, required=False,
+        label=_('Start Datetime'),
+        help_text=_(
+            'Datetime when the schedule should begin '
+            'triggering the task to run'
+        ),
     )
     periodic_display = serializers.CharField(read_only=True, label=_('Run period'))
-
-    INTERVAL_MAX = 65535
-    INTERVAL_MIN = 1
 
     def validate_crontab(self, crontab):
         if not crontab:
@@ -131,9 +146,6 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
     def validate_interval(self, interval):
         if not interval and not isinstance(interval, int):
             return interval
-        msg = _("Range {} to {}").format(self.INTERVAL_MIN, self.INTERVAL_MAX)
-        if interval > self.INTERVAL_MAX or interval < self.INTERVAL_MIN:
-            raise serializers.ValidationError(msg)
         return interval
 
     def validate_is_periodic(self, ok):

@@ -33,7 +33,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             'secret_strategy', SecretStrategy.custom
         )
         self.ssh_key_change_strategy = self.execution.snapshot.get(
-            'ssh_key_change_strategy', SSHKeyStrategy.add
+            'ssh_key_change_strategy', SSHKeyStrategy.set_jms
         )
         self.account_ids = self.execution.snapshot['accounts']
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
