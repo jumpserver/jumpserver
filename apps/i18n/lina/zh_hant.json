@@ -2283,5 +2283,6 @@
     "weComTest": "測試",
     "week": "周",
     "weekOf": "周的星期",
-    "wildcardsAllowed": "允許的通配符"
+    "wildcardsAllowed": "允許的通配符",
+    "InstanceNamePartIp": "實例名稱和部分IP"
 }

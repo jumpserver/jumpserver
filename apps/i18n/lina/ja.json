@@ -1442,5 +1442,6 @@
     "ZoneUpdate": "更新エリア",
     "disallowSelfUpdateFields": "現在のフィールドを自分で変更することは許可されていません",
     "forceEnableMFAHelpText": "強制的に有効化すると、ユーザーは自分で無効化することができません。",
-    "removeWarningMsg": "削除してもよろしいですか"
+    "removeWarningMsg": "削除してもよろしいですか",
+    "InstanceNamePartIp": "インスタンス名と部分IP"
 }
