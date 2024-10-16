@@ -21,8 +21,7 @@ RUN set -ex \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
     && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash
+    && apt-get -y install --no-install-recommends ${TOOLS}
 
 WORKDIR /opt/jumpserver
 

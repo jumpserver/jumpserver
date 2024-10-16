@@ -24,12 +24,10 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
-        libldap2-dev                  \
         libx11-dev"
 
 ARG TOOLS="                           \
         ca-certificates               \
-        default-libmysqlclient-dev    \
         openssh-client                \
         sshpass                       \
         bubblewrap"
@@ -45,9 +43,7 @@ RUN set -ex \
     && apt-get clean \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
-    && echo "no" | dpkg-reconfigure dash \
-    && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc
+    && echo "no" | dpkg-reconfigure dash
 
 COPY --from=stage-build /opt /opt
 COPY --from=stage-build /usr/local/bin /usr/local/bin

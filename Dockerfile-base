@@ -5,14 +5,7 @@ ARG TARGETARCH
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget                          \
-        g++                           \
-        make                          \
-        pkg-config                    \
-        default-libmysqlclient-dev    \
-        gettext                       \
-        libkrb5-dev                   \
-        libldap2-dev                  \
-        libsasl2-dev"
+        gettext"
 
 
 ARG APT_MIRROR=http://deb.debian.org
