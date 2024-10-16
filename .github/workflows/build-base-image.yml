@@ -29,13 +29,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: build-core-${{ hashFiles('**/pyproject.toml') }}
-          restore-keys: build-core-
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -63,8 +56,6 @@ jobs:
           push: true
           file: Dockerfile-base
           tags: jumpserver/core-base:${{ env.IMAGE_TAG }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
       - name: Update Dockerfile
         run: |
@@ -79,8 +70,3 @@ jobs:
           git push origin ${{ github.event.pull_request.head.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
