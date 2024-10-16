@@ -27,6 +27,8 @@ __all__ = [
     'ApplyCommandTicketViewSet'
 ]
 
+from ..utils import ticket_lock
+
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketSerializer
@@ -94,28 +96,33 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
                 after=after, object_name=object_name
             )
 
-    @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
+    @ticket_lock
+    @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee])
     def approve(self, request, *args, **kwargs):
         self.ticket_not_allowed()
 
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
         with tmp_to_root_org():
             serializer.is_valid(raise_exception=True)
             instance = serializer.save()
+
         instance.approve(processor=request.user)
         self._record_operate_log(instance, TicketAction.approve)
         return Response('ok')
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
+    @ticket_lock
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.reject(processor=request.user)
         self._record_operate_log(instance, TicketAction.reject)
         return Response('ok')
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee | IsApplicant, ])
+    @ticket_lock
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee | IsApplicant])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.close()
