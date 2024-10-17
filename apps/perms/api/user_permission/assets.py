@@ -56,8 +56,9 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
         return assets
 
     def get_serializer(self, *args, **kwargs):
-        if len(args) == 1 and kwargs.get('many', False) and self.request_user_is_self():
-            MyAsset.set_asset_custom_value(args[0], self.request.user)
+        need_custom_value_user = self.request_user_is_self() or self.request.user.is_service_account
+        if len(args) == 1 and kwargs.get('many', False) and need_custom_value_user:
+            MyAsset.set_asset_custom_value(args[0], self.user)
         return super().get_serializer(*args, **kwargs)
 
     @abc.abstractmethod

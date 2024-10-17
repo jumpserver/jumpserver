@@ -15,5 +15,5 @@ class AdHocSerializer(ScopeSerializerMixin, CommonBulkModelSerializer):
 
     class Meta:
         model = AdHoc
-        read_only_field = ["id", "creator", "date_created", "date_updated"]
+        read_only_field = ["id", "creator", "date_created", "date_updated", "created_by"]
         fields = read_only_field + ["id", "name", "scope", "module", "args", "comment"]

@@ -25,7 +25,7 @@ class PlaybookSerializer(ScopeSerializerMixin, CommonBulkModelSerializer):
 
     class Meta:
         model = Playbook
-        read_only_fields = ["id", "date_created", "date_updated"]
+        read_only_fields = ["id", "date_created", "date_updated", "created_by"]
         fields = read_only_fields + [
             "id", 'path', 'scope', "name", "comment", "creator",
             'create_method', 'vcs_url',

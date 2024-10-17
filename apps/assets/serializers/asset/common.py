@@ -18,7 +18,7 @@ from common.serializers.fields import LabeledChoiceField
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Protocol
+from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -308,6 +308,17 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
                 'protocols': _("Protocol is required: {}").format(', '.join(protocols_not_found))
             })
         return protocols_data_map.values()
+
+    def validate_platform(self, platform_data):
+        check_models = {Host, Device, Database, Cloud, Web, Custom}
+        if self.Meta.model not in check_models:
+            return platform_data
+        model_name = self.Meta.model.__name__.lower()
+        if model_name != platform_data.category:
+            raise serializers.ValidationError({
+                'platform': f"Platform does not match: {platform_data.name}"
+            })
+        return platform_data
 
     @staticmethod
     def update_account_su_from(accounts, include_su_from_accounts):

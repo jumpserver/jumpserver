@@ -2,6 +2,7 @@ import base64
 
 from django.conf import settings
 from django.contrib.auth import logout as auth_logout
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
@@ -116,23 +117,43 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
 
 
 class SessionCookieMiddleware(MiddlewareMixin):
+    USER_LOGIN_ENCRYPTION_KEY_PAIR = 'user_login_encryption_key_pair'
 
-    @staticmethod
-    def set_cookie_public_key(request, response):
+    def set_cookie_public_key(self, request, response):
         if request.path.startswith('/api'):
             return
-        pub_key_name = settings.SESSION_RSA_PUBLIC_KEY_NAME
-        public_key = request.session.get(pub_key_name)
-        cookie_key = request.COOKIES.get(pub_key_name)
-        if public_key and public_key == cookie_key:
+
+        session_public_key_name = settings.SESSION_RSA_PUBLIC_KEY_NAME
+        session_private_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
+
+        session_public_key = request.session.get(session_public_key_name)
+        cookie_public_key = request.COOKIES.get(session_public_key_name)
+
+        if session_public_key and session_public_key == cookie_public_key:
             return
 
-        pri_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
-        private_key, public_key = gen_key_pair()
+        private_key, public_key = self.get_key_pair()
+
         public_key_decode = base64.b64encode(public_key.encode()).decode()
-        request.session[pub_key_name] = public_key_decode
-        request.session[pri_key_name] = private_key
-        response.set_cookie(pub_key_name, public_key_decode)
+
+        request.session[session_public_key_name] = public_key_decode
+        request.session[session_private_key_name] = private_key
+        response.set_cookie(session_public_key_name, public_key_decode)
+
+    def get_key_pair(self):
+        key_pair = cache.get(self.USER_LOGIN_ENCRYPTION_KEY_PAIR)
+        if key_pair:
+            return key_pair['private_key'], key_pair['public_key']
+
+        private_key, public_key = gen_key_pair()
+
+        key_pair = {
+            'private_key': private_key,
+            'public_key': public_key
+        }
+        cache.set(self.USER_LOGIN_ENCRYPTION_KEY_PAIR, key_pair, None)
+
+        return private_key, public_key
 
     @staticmethod
     def set_cookie_session_prefix(request, response):

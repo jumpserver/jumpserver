@@ -505,6 +505,9 @@
     "ExportOnlySelectedItems": "仅导出选择项",
     "ExportRange": "导出范围",
     "FC": "Fusion Compute",
+    "FTPFileNotStored": "文件尚未保存到存储中，请稍后查看。",
+    "FTPStorageNotEnabled": "文件存储功能未开启，请修改配置文件并添加配置：FTP_FILE_MAX_STORE=100（支持保存100M以内的文件）",
+    "FTPUnknownStorageState": "未知的文件存储状态，请联系管理员。",
     "Failed": "失败",
     "FailedAsset": "失败的资产",
     "FaviconTip": "提示：网站图标（建议图片大小为: 16px*16px）",
@@ -619,6 +622,7 @@
     "InputPhone": "请输入手机号码",
     "InstanceAddress": "实例地址",
     "InstanceName": "实例名称",
+    "InstanceNamePartIp": "实例名称和部分IP",
     "InstancePlatformName": "实例平台名称",
     "Interface": "网络接口",
     "InterfaceSettings": "界面设置",
@@ -1218,6 +1222,7 @@
     "TaskID": "任务 ID",
     "TaskList": "任务列表",
     "TaskMonitor": "任务监控",
+    "TaskPath": "任务路径",
     "TechnologyConsult": "技术咨询",
     "TempPasswordTip": "临时密码有效期为 300 秒，使用后立刻失效",
     "TempToken": "临时密码",
@@ -1400,6 +1405,5 @@
     "ZoneUpdate": "更新网域",
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
-    "removeWarningMsg": "你确定要移除",
-    "TaskPath": "任务路径"
+    "removeWarningMsg": "你确定要移除"
 }

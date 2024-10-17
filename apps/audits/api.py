@@ -146,7 +146,9 @@ class MyLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.filter(username=self.request.user.username)
+        username = self.request.user.username
+        q = Q(username=username) | Q(username__icontains=f'({username})')
+        qs = qs.filter(q)
         return qs
 
 

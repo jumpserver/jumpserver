@@ -472,6 +472,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken',
+        'check': 'authentication.view_superconnectiontoken',
         'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
@@ -483,6 +484,28 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
     def get_user(self, serializer):
         return serializer.validated_data.get('user')
+
+    @action(methods=['GET'], detail=True, url_path='check')
+    def check(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = {
+            "detail": "OK",
+            "code": "perm_ok",
+            "expired": instance.is_expired
+        }
+        try:
+            self._validate_perm(
+                instance.user,
+                instance.asset,
+                instance.account,
+                instance.protocol
+            )
+        except JMSException as e:
+            data['code'] = e.detail.code
+            data['detail'] = str(e.detail)
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
     @action(methods=['PATCH'], detail=False)
     def renewal(self, request, *args, **kwargs):

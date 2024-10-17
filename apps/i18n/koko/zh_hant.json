@@ -36,6 +36,8 @@
     "OnlineUsers": "在線人員",
     "Paste": "貼上",
     "PauseSession": "暫停此會話",
+    "PermissionExpired": "權限已過期",
+    "PermissionValid": "權限有效",
     "ReadOnly": "只讀",
     "Reconnect": "重新連線",
     "Refresh": "刷新",

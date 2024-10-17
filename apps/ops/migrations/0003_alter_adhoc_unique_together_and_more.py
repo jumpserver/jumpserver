@@ -28,6 +28,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('ops', '0002_celerytask'),
+        ('orgs', '0002_auto_20180903_1132'),
     ]
 
     operations = [

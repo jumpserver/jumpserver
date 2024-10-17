@@ -53,10 +53,11 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
         user.source = source
         user.save()
 
-    if created and isinstance(attrs, dict):
+    if created:
         org_ids = bind_user_to_org_role(user)
-        group_names = attrs.get('groups')
-        bind_user_to_group(org_ids, group_names, user)
+        if isinstance(attrs, dict):
+            group_names = attrs.get('groups')
+            bind_user_to_group(org_ids, group_names, user)
 
     if not attrs:
         return

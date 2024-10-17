@@ -1,6 +1,9 @@
 {
     "ActionPerm": "Actions",
     "Cancel": "Cancel",
+    "Clone Connect": "Clone Connect",
+    "Close All Tabs": "Close All Tabs",
+    "Close Current Tab": "Close Current Tab",
     "Confirm": "Confirm",
     "ConfirmBtn": "Confirm",
     "Connect": "Connect",
@@ -8,6 +11,7 @@
     "CopyShareURLSuccess": "Copy Share URL Success",
     "CreateLink": "Create Share Link",
     "CreateSuccess": "Success",
+    "Custom Setting": "Custom Setting",
     "DownArrow": "Down arrow",
     "Download": "Download",
     "DownloadSuccess": "Download success",
@@ -32,7 +36,10 @@
     "OnlineUsers": "Online Users",
     "Paste": "Paste",
     "PauseSession": "Pause Session",
+    "PermissionExpired": "Permission expired",
+    "PermissionValid": "Permission valid",
     "ReadOnly": "Read-Only",
+    "Reconnect": "Reconnect",
     "Refresh": "Refresh",
     "Remove": "Remove",
     "RemoveShareUser": "You have been removed from the shared session.",
@@ -62,10 +69,5 @@
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
-    "Writable": "Writable",
-    "Reconnect": "Reconnect",
-    "Close Current Tab": "Close Current Tab",
-    "Close All Tabs": "Close All Tabs",
-    "Clone Connect": "Clone Connect",
-    "Custom Setting": "Custom Setting"
+    "Writable": "Writable"
 }
