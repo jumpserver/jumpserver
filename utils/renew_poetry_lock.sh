@@ -1,6 +1,6 @@
 #!/bin/bash
 
-command -v poetry >/dev/null 2>&1 || { 
+command -v poetry >/dev/null 2>&1 || {
     echo "poetry not found. Aborting."
     exit 1
 }
