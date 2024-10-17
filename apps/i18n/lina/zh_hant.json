@@ -812,6 +812,7 @@
     "InsecureCommandNotifyToSubscription": "危險命令通知已升級到消息訂閱中，支持更多通知方式",
     "InstanceAddress": "實例地址",
     "InstanceName": "實例名稱",
+    "InstanceNamePartIp": "實例名稱和部分IP",
     "InstancePlatformName": "實例平台名稱",
     "Interface": "網路介面",
     "InterfaceSettings": "界面設置",
@@ -2283,6 +2284,5 @@
     "weComTest": "測試",
     "week": "周",
     "weekOf": "周的星期",
-    "wildcardsAllowed": "允許的通配符",
-    "InstanceNamePartIp": "實例名稱和部分IP"
+    "wildcardsAllowed": "允許的通配符"
 }

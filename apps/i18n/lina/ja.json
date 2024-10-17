@@ -640,6 +640,7 @@
     "InputPhone": "携帯電話番号を入力してください",
     "InstanceAddress": "インスタンスのアドレス",
     "InstanceName": "インスタンス名",
+    "InstanceNamePartIp": "インスタンス名と部分IP",
     "InstancePlatformName": "インスタンスプラットフォーム名",
     "Interface": "ネットワークインターフェース",
     "InterfaceSettings": "インターフェースの設定",
@@ -1442,6 +1443,5 @@
     "ZoneUpdate": "更新エリア",
     "disallowSelfUpdateFields": "現在のフィールドを自分で変更することは許可されていません",
     "forceEnableMFAHelpText": "強制的に有効化すると、ユーザーは自分で無効化することができません。",
-    "removeWarningMsg": "削除してもよろしいですか",
-    "InstanceNamePartIp": "インスタンス名と部分IP"
+    "removeWarningMsg": "削除してもよろしいですか"
 }
