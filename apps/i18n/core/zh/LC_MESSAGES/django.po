@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-14 15:06+0800\n"
+"POT-Creation-Date: 2024-10-17 11:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -63,7 +63,7 @@ msgstr "完成"
 
 #: accounts/automations/backup_account/handlers.py:219
 #: accounts/const/automation.py:110
-#: accounts/serializers/automations/change_secret.py:166
+#: accounts/serializers/automations/change_secret.py:153
 #: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
@@ -74,7 +74,7 @@ msgstr "成功"
 
 #: accounts/automations/backup_account/handlers.py:221
 #: accounts/const/account.py:34 accounts/const/automation.py:109
-#: accounts/serializers/automations/change_secret.py:167 audits/const.py:65
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:65
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:66
 #: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:47
 msgid "Failed"
@@ -346,8 +346,8 @@ msgstr "用户 %s 查看/导出 了密码"
 #: accounts/serializers/account/account.py:226
 #: accounts/serializers/account/account.py:272
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:111
-#: accounts/serializers/automations/change_secret.py:143
+#: accounts/serializers/automations/change_secret.py:98
+#: accounts/serializers/automations/change_secret.py:130
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: acls/serializers/base.py:123 assets/models/asset/common.py:102
@@ -358,7 +358,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
-#: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:288
+#: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:289
 msgid "Asset"
 msgstr "资产"
 
@@ -390,8 +390,8 @@ msgid "Source ID"
 msgstr "来源 ID"
 
 #: accounts/models/account.py:62
-#: accounts/serializers/automations/change_secret.py:113
-#: accounts/serializers/automations/change_secret.py:144
+#: accounts/serializers/automations/change_secret.py:100
+#: accounts/serializers/automations/change_secret.py:131
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:124
 #: acls/templates/acls/asset_login_reminder.html:10
@@ -492,20 +492,20 @@ msgstr "账号备份快照"
 #: accounts/serializers/account/backup.py:48
 #: accounts/serializers/automations/base.py:56
 #: assets/models/automations/base.py:122
-#: assets/serializers/automations/base.py:40 xpack/plugins/cloud/models.py:240
-#: xpack/plugins/cloud/serializers/task.py:243
+#: assets/serializers/automations/base.py:40 xpack/plugins/cloud/models.py:241
+#: xpack/plugins/cloud/serializers/task.py:247
 msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:134 audits/models.py:203
 #: terminal/models/session/sharing.py:125 xpack/plugins/cloud/manager.py:158
-#: xpack/plugins/cloud/models.py:229
+#: xpack/plugins/cloud/models.py:230
 msgid "Reason"
 msgstr "原因"
 
 #: accounts/models/automations/backup_account.py:136
-#: accounts/serializers/automations/change_secret.py:110
-#: accounts/serializers/automations/change_secret.py:145
+#: accounts/serializers/automations/change_secret.py:97
+#: accounts/serializers/automations/change_secret.py:132
 #: ops/serializers/job.py:74 terminal/serializers/session.py:54
 msgid "Is success"
 msgstr "是否成功"
@@ -596,8 +596,8 @@ msgstr "结束日期"
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:148
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:225
-#: xpack/plugins/cloud/models.py:292
+#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:226
+#: xpack/plugins/cloud/models.py:293
 msgid "Status"
 msgstr "状态"
 
@@ -731,7 +731,7 @@ msgstr "密码规则"
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:32 users/models/group.py:13
 #: users/models/preference.py:11 users/models/user/__init__.py:57
-#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:308
+#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:309
 #: xpack/plugins/cloud/serializers/task.py:75
 msgid "Name"
 msgstr "名称"
@@ -760,7 +760,7 @@ msgstr "平台"
 msgid "Push params"
 msgstr "账号推送参数"
 
-#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:389
+#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:390
 msgid "Account template"
 msgstr "账号模板"
 
@@ -1077,7 +1077,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:91
-#: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:122
+#: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:123
 msgid "Comment"
 msgstr "备注"
 
@@ -1125,15 +1125,7 @@ msgid ""
 "type."
 msgstr "参数设置，目前只对 AIX LINUX UNIX 类型的资产有效。"
 
-#: accounts/serializers/automations/change_secret.py:84
-msgid "* Please enter the correct password length"
-msgstr "* 请输入正确的密码长度"
-
-#: accounts/serializers/automations/change_secret.py:88
-msgid "* Password length range 6-30 bits"
-msgstr "* 密码长度范围 6-30 位"
-
-#: accounts/serializers/automations/change_secret.py:117
+#: accounts/serializers/automations/change_secret.py:104
 #: assets/models/automations/base.py:127
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
@@ -1362,12 +1354,12 @@ msgid "Notify and warn"
 msgstr "提示并告警"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:114 xpack/plugins/cloud/models.py:314
+#: terminal/models/component/endpoint.py:114 xpack/plugins/cloud/models.py:315
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:115 xpack/plugins/cloud/models.py:315
+#: terminal/models/component/endpoint.py:115 xpack/plugins/cloud/models.py:316
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -1411,7 +1403,7 @@ msgid "Command"
 msgstr "命令"
 
 #: acls/models/command_acl.py:17 assets/models/cmd_filter.py:59
-#: xpack/plugins/cloud/models.py:355
+#: xpack/plugins/cloud/models.py:356
 msgid "Regex"
 msgstr "正则表达式"
 
@@ -1532,7 +1524,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: common/drf/renders/base.py:150 xpack/plugins/cloud/models.py:390
+#: common/drf/renders/base.py:150 xpack/plugins/cloud/models.py:391
 msgid "IP"
 msgstr "IP"
 
@@ -1976,7 +1968,7 @@ msgstr "地址"
 #: assets/models/asset/common.py:169 assets/models/platform.py:149
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
-#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:385
+#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:386
 msgid "Platform"
 msgstr "平台"
 
@@ -2039,7 +2031,7 @@ msgstr "代理"
 
 #: assets/models/automations/base.py:18 assets/models/cmd_filter.py:32
 #: assets/models/node.py:553 perms/models/asset_permission.py:72
-#: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:386
+#: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:387
 msgid "Node"
 msgstr "节点"
 
@@ -2360,7 +2352,7 @@ msgstr "节点路径，格式为 [\"/组织/节点名\"], 如果节点不存在�
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
-#: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:388
+#: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:389
 #: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr "协议组"
@@ -3660,7 +3652,7 @@ msgid "Component"
 msgstr "组件"
 
 #: authentication/serializers/connect_token_secret.py:136
-#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:387
+#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:388
 msgid "Domain"
 msgstr "网域"
 
@@ -4934,7 +4926,7 @@ msgid "Date last run"
 msgstr "最后运行日期"
 
 #: ops/models/base.py:51 ops/models/job.py:238
-#: xpack/plugins/cloud/models.py:223
+#: xpack/plugins/cloud/models.py:224
 msgid "Result"
 msgstr "结果"
 
@@ -8233,7 +8225,7 @@ msgid "Access key secret"
 msgstr "Access key secret(SK)"
 
 #: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:100
-#: xpack/plugins/cloud/models.py:285
+#: xpack/plugins/cloud/models.py:286
 msgid "Region"
 msgstr "地域"
 
@@ -9343,11 +9335,11 @@ msgid ""
 msgstr ""
 "管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
-#: users/signal_handlers.py:196
+#: users/signal_handlers.py:197
 msgid "Clean up expired user sessions"
 msgstr "清除过期的用户会话"
 
-#: users/signal_handlers.py:198
+#: users/signal_handlers.py:199
 msgid ""
 "After logging in via the web, a user session record is created. At 2 a.m. "
 "every day, \n"
@@ -9786,7 +9778,7 @@ msgstr "私有IP"
 msgid "Public IP"
 msgstr "公网IP"
 
-#: xpack/plugins/cloud/const.py:42 xpack/plugins/cloud/models.py:359
+#: xpack/plugins/cloud/const.py:42 xpack/plugins/cloud/models.py:360
 msgid "Instance name"
 msgstr "实例名称"
 
@@ -9951,133 +9943,133 @@ msgstr "主机名策略"
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:115
+#: xpack/plugins/cloud/models.py:116
 #: xpack/plugins/cloud/serializers/task.py:161
-msgid "Sync IP type"
-msgstr "同步 IP 类型"
+msgid "Preferred IP type"
+msgstr ""
 
-#: xpack/plugins/cloud/models.py:118
+#: xpack/plugins/cloud/models.py:119
 msgid "Always update"
 msgstr "总是更新"
 
-#: xpack/plugins/cloud/models.py:120
+#: xpack/plugins/cloud/models.py:121
 msgid "Fully synchronous"
 msgstr "完全同步"
 
-#: xpack/plugins/cloud/models.py:125
+#: xpack/plugins/cloud/models.py:126
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:128 xpack/plugins/cloud/models.py:377
-#: xpack/plugins/cloud/models.py:403
+#: xpack/plugins/cloud/models.py:129 xpack/plugins/cloud/models.py:378
+#: xpack/plugins/cloud/models.py:404
 msgid "Strategy"
 msgstr "策略"
 
-#: xpack/plugins/cloud/models.py:133 xpack/plugins/cloud/models.py:221
+#: xpack/plugins/cloud/models.py:134 xpack/plugins/cloud/models.py:222
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:232 xpack/plugins/cloud/models.py:295
+#: xpack/plugins/cloud/models.py:233 xpack/plugins/cloud/models.py:296
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:236
+#: xpack/plugins/cloud/models.py:237
 msgid "Sync instance snapshot"
 msgstr "同步实例快照"
 
-#: xpack/plugins/cloud/models.py:244
+#: xpack/plugins/cloud/models.py:245
 msgid "Sync instance task execution"
 msgstr "同步实例任务执行"
 
-#: xpack/plugins/cloud/models.py:275
+#: xpack/plugins/cloud/models.py:276
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:279
+#: xpack/plugins/cloud/models.py:280
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:282
+#: xpack/plugins/cloud/models.py:283
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:299
+#: xpack/plugins/cloud/models.py:300
 msgid "Sync instance detail"
 msgstr "同步实例详情"
 
-#: xpack/plugins/cloud/models.py:311 xpack/plugins/cloud/serializers/task.py:77
+#: xpack/plugins/cloud/models.py:312 xpack/plugins/cloud/serializers/task.py:77
 msgid "Rule relation"
 msgstr "条件关系"
 
-#: xpack/plugins/cloud/models.py:321
+#: xpack/plugins/cloud/models.py:322
 msgid "Task strategy"
 msgstr "任务策略"
 
-#: xpack/plugins/cloud/models.py:348
+#: xpack/plugins/cloud/models.py:349
 msgid "Equal"
 msgstr "等于"
 
-#: xpack/plugins/cloud/models.py:349
+#: xpack/plugins/cloud/models.py:350
 msgid "Not Equal"
 msgstr "不等于"
 
-#: xpack/plugins/cloud/models.py:350
+#: xpack/plugins/cloud/models.py:351
 msgid "In"
 msgstr "在...中"
 
-#: xpack/plugins/cloud/models.py:351
+#: xpack/plugins/cloud/models.py:352
 msgid "Contains"
 msgstr "包含"
 
-#: xpack/plugins/cloud/models.py:352
+#: xpack/plugins/cloud/models.py:353
 msgid "Exclude"
 msgstr "排除"
 
-#: xpack/plugins/cloud/models.py:353
+#: xpack/plugins/cloud/models.py:354
 msgid "Startswith"
 msgstr "以...开头"
 
-#: xpack/plugins/cloud/models.py:354
+#: xpack/plugins/cloud/models.py:355
 msgid "Endswith"
 msgstr "以...结尾"
 
-#: xpack/plugins/cloud/models.py:360
+#: xpack/plugins/cloud/models.py:361
 msgid "Instance platform"
 msgstr "实例平台"
 
-#: xpack/plugins/cloud/models.py:361
+#: xpack/plugins/cloud/models.py:362
 msgid "Instance address"
 msgstr "实例地址"
 
-#: xpack/plugins/cloud/models.py:368
+#: xpack/plugins/cloud/models.py:369
 msgid "Rule attr"
 msgstr "规则属性"
 
-#: xpack/plugins/cloud/models.py:372
+#: xpack/plugins/cloud/models.py:373
 msgid "Rule match"
 msgstr "规则匹配"
 
-#: xpack/plugins/cloud/models.py:374
+#: xpack/plugins/cloud/models.py:375
 msgid "Rule value"
 msgstr "规则值"
 
-#: xpack/plugins/cloud/models.py:381 xpack/plugins/cloud/serializers/task.py:80
+#: xpack/plugins/cloud/models.py:382 xpack/plugins/cloud/serializers/task.py:80
 msgid "Strategy rule"
 msgstr "条件"
 
-#: xpack/plugins/cloud/models.py:391
+#: xpack/plugins/cloud/models.py:392
 msgid "Name strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:398
+#: xpack/plugins/cloud/models.py:399
 msgid "Action attr"
 msgstr "动作属性"
 
-#: xpack/plugins/cloud/models.py:400
+#: xpack/plugins/cloud/models.py:401
 msgid "Action value"
 msgstr "动作值"
 
-#: xpack/plugins/cloud/models.py:407 xpack/plugins/cloud/serializers/task.py:83
+#: xpack/plugins/cloud/models.py:408 xpack/plugins/cloud/serializers/task.py:83
 msgid "Strategy action"
 msgstr "动作"
 
@@ -10483,3 +10475,12 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "* Please enter the correct password length"
+#~ msgstr "* 请输入正确的密码长度"
+
+#~ msgid "* Password length range 6-30 bits"
+#~ msgstr "* 密码长度范围 6-30 位"
+
+#~ msgid "Sync IP type"
+#~ msgstr "同步 IP 类型"
