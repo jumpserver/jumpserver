@@ -1207,7 +1207,7 @@
     "SystemTasks": "任务列表",
     "SystemTools": "系统工具",
     "TableColSetting": "选择可见属性列",
-    "TableSetting": "表格偏好",
+    "ListPreference": "列表偏好",
     "TagCreate": "创建标签",
     "TagInputFormatValidation": "标签格式错误，正确格式为：name:value",
     "TagList": "标签列表",
