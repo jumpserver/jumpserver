@@ -1203,7 +1203,7 @@
     "SystemTasks": "Tasks",
     "SystemTools": "Tools",
     "TableColSetting": "Select visible attribute columns",
-    "TableSetting": "Table preferences",
+    "ListPreference": "List preferences",
     "TagCreate": "Create tag",
     "TagInputFormatValidation": "Tag format error, the correct format is: name:value",
     "TagList": "Tags",
