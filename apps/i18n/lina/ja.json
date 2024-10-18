@@ -1244,7 +1244,7 @@
     "SystemTasks": "タスクリスト",
     "SystemTools": "システムツール",
     "TableColSetting": "表示属性列の選択",
-    "TableSetting": "テーブル環境設定",
+    "ListPreference": "リスト設定",
     "TagCreate": "ラベルの作成",
     "TagInputFormatValidation": "ラベルの形式が間違っています、正しい形式は：name:value",
     "TagList": "タグ一覧",

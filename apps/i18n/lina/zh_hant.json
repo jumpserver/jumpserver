@@ -1587,7 +1587,7 @@
     "SystemUsers": "系統用戶",
     "TableColSetting": "選擇可見屬性列",
     "TableColSettingInfo": "請選擇您想顯示的列表詳細資訊。",
-    "TableSetting": "表單偏好",
+    "ListPreference": "列表偏好",
     "TagCreate": "創建標籤",
     "TagInputFormatValidation": "Label format error, correct format is: name:value",
     "TagList": "標籤列表",
