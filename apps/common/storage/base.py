@@ -1,9 +1,9 @@
 import os
 
-import jms_storage
 from django.conf import settings
 from django.core.files.storage import default_storage
 
+from common.storage import jms_storage
 from common.utils import get_logger, make_dirs
 from terminal.models import ReplayStorage
 
