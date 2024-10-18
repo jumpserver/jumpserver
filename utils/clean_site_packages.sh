@@ -18,7 +18,7 @@ for i in $need_clean; do
 done
 
 # 清理缓存文件
-cd lib_path
+cd ${lib_path} || exit 1
 find . -name "*.pyc" -exec rm -f {} \;
 
 # 清理不需要的国际化文件
