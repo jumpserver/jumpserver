@@ -127,13 +127,16 @@ class Message(metaclass=MessageType):
     def get_html_msg(self) -> dict:
         return self.get_common_msg()
 
-    def get_markdown_msg(self) -> dict:
+    @staticmethod
+    def html_to_markdown(html_msg):
         h = HTML2Text()
-        h.body_width = 300
-        msg = self.get_html_msg()
-        content = msg['message']
-        msg['message'] = h.handle(content)
-        return msg
+        h.body_width = 0
+        content = html_msg['message']
+        html_msg['message'] = h.handle(content)
+        return html_msg
+
+    def get_markdown_msg(self) -> dict:
+        return self.html_to_markdown(self.get_html_msg())
 
     def get_text_msg(self) -> dict:
         h = HTML2Text()
