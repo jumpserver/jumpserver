@@ -3,8 +3,8 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Asset
-from common.serializers.fields import ReadableHiddenField
+from assets.models import Asset, Node
+from common.serializers.fields import ReadableHiddenField, ObjectRelatedField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -13,10 +13,10 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     run_after_save = serializers.BooleanField(label=_("Execute after saving"), default=False, required=False)
-    nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
     assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True, required=False)
+    nodes = ObjectRelatedField(label=_('Nodes'), queryset=Node.objects, many=True, required=False)
 
     def to_internal_value(self, data):
         instant = data.get('instant', False)

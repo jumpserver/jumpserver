@@ -51,7 +51,7 @@ class NodePermedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = [
-            'id', 'name', 'key', 'value',
+            'id', 'name', 'key', 'value', 'full_value',
             'org_id', "assets_amount"
         ]
         read_only_fields = fields
