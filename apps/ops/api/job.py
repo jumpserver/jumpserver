@@ -22,6 +22,7 @@ from ops.models import Job, JobExecution
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 )
+from ops.utils import merge_nodes_and_assets
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
@@ -36,8 +37,6 @@ from accounts.models import Account
 from assets.const import Protocol
 from perms.const import ActionChoices
 from perms.utils.asset_perm import PermAssetDetailUtil
-from perms.models import PermNode
-from perms.utils import UserPermAssetUtil
 from jumpserver.settings import get_file_md5
 
 
@@ -45,21 +44,6 @@ def set_task_to_serializer_data(serializer, task_id):
     data = getattr(serializer, "_data", {})
     data["task_id"] = task_id
     setattr(serializer, "_data", data)
-
-
-def merge_nodes_and_assets(nodes, assets, user):
-    if not nodes:
-        return assets
-    perm_util = UserPermAssetUtil(user=user)
-    for node_id in nodes:
-        if node_id == PermNode.FAVORITE_NODE_KEY:
-            node_assets = perm_util.get_favorite_assets()
-        elif node_id == PermNode.UNGROUPED_NODE_KEY:
-            node_assets = perm_util.get_ungroup_assets()
-        else:
-            _, node_assets = perm_util.get_node_all_assets(node_id)
-        assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
-    return assets
 
 
 class JobViewSet(OrgBulkModelViewSet):
@@ -106,10 +90,9 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
-        node_ids = serializer.validated_data.pop('nodes', [])
-        assets = serializer.validated_data.get('assets')
-        assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
-        serializer.validated_data['assets'] = assets
+        nodes = serializer.validated_data.pop('nodes', [])
+        assets = serializer.validated_data.get('assets', [])
+        assets = merge_nodes_and_assets(nodes, assets, self.request.user)
         if serializer.validated_data.get('type') == Types.upload_file:
             account_name = serializer.validated_data.get('runas')
             self.check_upload_permission(assets, account_name)
@@ -300,7 +283,7 @@ class UsernameHintsAPI(APIView):
     permission_classes = [IsValidUser]
 
     def post(self, request, **kwargs):
-        node_ids = request.data.get('nodes', None)
+        node_ids = request.data.get('nodes', [])
         asset_ids = request.data.get('assets', [])
         query = request.data.get('query', None)
 
