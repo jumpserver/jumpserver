@@ -55,3 +55,4 @@
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
         ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
+      when: check_conn_after_change

@@ -54,3 +54,4 @@
         client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
         filter: version
+      when: check_conn_after_change
