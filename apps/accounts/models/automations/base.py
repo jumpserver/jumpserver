@@ -50,8 +50,14 @@ class AutomationExecution(AssetAutomationExecution):
 
 class ChangeSecretMixin(SecretWithRandomMixin):
     ssh_key_change_strategy = models.CharField(
-        choices=SSHKeyStrategy.choices, max_length=16,
-        default=SSHKeyStrategy.set_jms, verbose_name=_('SSH key change strategy')
+        choices=SSHKeyStrategy.choices,
+        max_length=16,
+        default=SSHKeyStrategy.set_jms,
+        verbose_name=_('SSH key change strategy')
+    )
+    check_conn_after_change = models.BooleanField(
+        default=True,
+        verbose_name=_('Check connection after change')
     )
     get_all_assets: callable  # get all assets
 
@@ -81,5 +87,6 @@ class ChangeSecretMixin(SecretWithRandomMixin):
             'password_rules': self.password_rules,
             'secret_strategy': self.secret_strategy,
             'ssh_key_change_strategy': self.ssh_key_change_strategy,
+            'check_conn_after_change': self.check_conn_after_change,
         })
         return attr_json

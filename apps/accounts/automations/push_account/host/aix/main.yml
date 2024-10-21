@@ -100,7 +100,7 @@
         become_password: "{{ account.become.ansible_password | default('') }}"
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
-      when: account.secret_type == "password"
+      when: account.secret_type == "password" and check_conn_after_change
       delegate_to: localhost
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
@@ -111,6 +111,6 @@
         login_private_key_path: "{{ account.private_key_path  }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
-      when: account.secret_type == "ssh_key"
+      when: account.secret_type == "ssh_key" and check_conn_after_change
       delegate_to: localhost
 
