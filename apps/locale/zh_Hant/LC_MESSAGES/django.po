@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-22 16:57+0800\n"
+"POT-Creation-Date: 2024-10-22 17:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1971,7 +1971,7 @@ msgstr "標籤"
 msgid "New node"
 msgstr "新節點"
 
-#: assets/models/node.py:467 audits/backends/db.py:61 audits/backends/db.py:62
+#: assets/models/node.py:467 audits/backends/db.py:64 audits/backends/db.py:65
 #: audits/backends/es.py:66 audits/backends/es.py:67
 msgid "empty"
 msgstr "空"
@@ -2392,7 +2392,15 @@ msgstr "日誌審計"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文字內容太長。請使用 Elasticsearch 儲存操作日誌"
 
-#: audits/backends/db.py:87
+#: audits/backends/db.py:58
+msgid "labels"
+msgstr "標籤"
+
+#: audits/backends/db.py:59
+msgid "operate_log_id"
+msgstr "操作日誌ID"
+
+#: audits/backends/db.py:90
 msgid "Tips"
 msgstr "提示"
 

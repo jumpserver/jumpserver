@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-22 16:56+0800\n"
+"POT-Creation-Date: 2024-10-22 17:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1979,7 +1979,7 @@ msgstr "ラベル"
 msgid "New node"
 msgstr "新しいノード"
 
-#: assets/models/node.py:467 audits/backends/db.py:61 audits/backends/db.py:62
+#: assets/models/node.py:467 audits/backends/db.py:64 audits/backends/db.py:65
 #: audits/backends/es.py:66 audits/backends/es.py:67
 msgid "empty"
 msgstr "空"
@@ -2409,7 +2409,15 @@ msgstr "監査"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文章の内容が長すぎる。Elasticsearchで操作履歴を保存する"
 
-#: audits/backends/db.py:87
+#: audits/backends/db.py:58
+msgid "labels"
+msgstr "タグ"
+
+#: audits/backends/db.py:59
+msgid "operate_log_id"
+msgstr "操作ログID"
+
+#: audits/backends/db.py:90
 msgid "Tips"
 msgstr "謎々"
 

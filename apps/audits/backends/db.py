@@ -54,6 +54,9 @@ class OperateLogStore(BaseOperateStorage):
     def convert_diff_friendly(cls, op_log):
         diff_list = list()
         handler = cls._get_special_handler(op_log.resource_type)
+        # 标记翻译字符串
+        labels = _("labels")
+        operate_log_id = _("operate_log_id")
         for k, v in op_log.diff.items():
             before, after = v.split(cls.SEP, 1)
             diff_list.append({
