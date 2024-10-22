@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-20 14:54+0800\n"
+"POT-Creation-Date: 2024-10-22 16:56+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -796,8 +796,8 @@ msgstr "类别"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:271
-#: terminal/serializers/storage.py:283 tickets/models/comment.py:26
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:274
+#: terminal/serializers/storage.py:286 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
@@ -1415,12 +1415,13 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr "无法连接到 {port} 上的端口 {address}"
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:93 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/middleware.py:94 xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr "认证失败"
 
 #: assets/automations/ping_gateway/manager.py:60
-#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:102
+#: assets/automations/ping_gateway/manager.py:86 audits/backends/__init__.py:29
+#: terminal/const.py:102
 msgid "Connect failed"
 msgstr "连接失败"
 
@@ -1968,7 +1969,8 @@ msgstr "标签"
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:467 audits/backends/db.py:68 audits/backends/db.py:69
+#: assets/models/node.py:467 audits/backends/db.py:61 audits/backends/db.py:62
+#: audits/backends/es.py:66 audits/backends/es.py:67
 msgid "empty"
 msgstr "空"
 
@@ -2388,15 +2390,7 @@ msgstr "日志审计"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文字内容太长。请使用 Elasticsearch 存储操作日志"
 
-#: audits/backends/db.py:61
-msgid "labels"
-msgstr "标签"
-
-#: audits/backends/db.py:62
-msgid "operate_log_id"
-msgstr "操作日志ID"
-
-#: audits/backends/db.py:94
+#: audits/backends/db.py:87
 msgid "Tips"
 msgstr "提示"
 
@@ -2479,7 +2473,7 @@ msgstr "结束"
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:69
+#: terminal/serializers/session.py:79
 msgid "Terminal"
 msgstr "终端"
 
@@ -2504,11 +2498,11 @@ msgstr "任务"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:116
+#: audits/handler.py:107
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:116
+#: audits/handler.py:107
 msgid "No"
 msgstr "否"
 
@@ -3108,7 +3102,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:95 settings/utils/ldap.py:679
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
@@ -3387,7 +3381,7 @@ msgstr "你的账号存在异地登录行为，请关注。"
 msgid "Login time"
 msgstr "登录日期"
 
-#: authentication/templates/authentication/_msg_different_city.html:16
+#: authentication/templates/authentication/_msg_different_city.html:14
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
@@ -3411,13 +3405,13 @@ msgstr "请点击下面链接重置密码， 如果不是您申请的，请关�
 msgid "Click here reset password"
 msgstr "点击这里重置密码"
 
-#: authentication/templates/authentication/_msg_reset_password.html:16
-#: users/templates/users/_msg_user_created.html:22
+#: authentication/templates/authentication/_msg_reset_password.html:15
+#: users/templates/users/_msg_user_created.html:20
 msgid "This link is valid for 1 hour. After it expires"
 msgstr "这个链接有效期1小时, 超过时间您可以"
 
-#: authentication/templates/authentication/_msg_reset_password.html:17
-#: users/templates/users/_msg_user_created.html:23
+#: authentication/templates/authentication/_msg_reset_password.html:16
+#: users/templates/users/_msg_user_created.html:21
 msgid "request new one"
 msgstr "重新申请"
 
@@ -3446,14 +3440,14 @@ msgstr "你的密码刚刚成功更新"
 msgid "Browser"
 msgstr "浏览器"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:13
+#: authentication/templates/authentication/_msg_rest_password_success.html:12
 msgid ""
 "If the password update was not initiated by you, your account may have "
 "security issues"
 msgstr "如果这次密码更新不是由你发起的，那么你的账号可能存在安全问题"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:14
-#: authentication/templates/authentication/_msg_rest_public_key_success.html:14
+#: authentication/templates/authentication/_msg_rest_password_success.html:13
+#: authentication/templates/authentication/_msg_rest_public_key_success.html:13
 msgid "If you have any questions, you can contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
@@ -3461,7 +3455,7 @@ msgstr "如果有疑问或需求，请联系系统管理员"
 msgid "Your public key has just been successfully updated"
 msgstr "你的公钥刚刚成功更新"
 
-#: authentication/templates/authentication/_msg_rest_public_key_success.html:13
+#: authentication/templates/authentication/_msg_rest_public_key_success.html:12
 msgid ""
 "If the public key update was not initiated by you, your account may have "
 "security issues"
@@ -3534,7 +3528,7 @@ msgid "LAN"
 msgstr "局域网"
 
 #: authentication/views/base.py:70
-#: perms/templates/perms/_msg_permed_items_expire.html:21
+#: perms/templates/perms/_msg_permed_items_expire.html:20
 msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
@@ -4408,7 +4402,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:545
+#: ops/models/job.py:555
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -6514,7 +6508,7 @@ msgstr "不允许删除正在使用的存储配置"
 msgid "Command storages"
 msgstr "命令存储"
 
-#: terminal/api/component/storage.py:82
+#: terminal/api/component/storage.py:82 xpack/plugins/cloud/manager.py:83
 msgid "Invalid"
 msgstr "无效"
 
@@ -6908,7 +6902,7 @@ msgstr "登录来源"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:68
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:78
 msgid "Command amount"
 msgstr "命令数量"
 
@@ -7286,7 +7280,8 @@ msgstr "Access key ID(AK)"
 msgid "Access key secret"
 msgstr "Access key secret(SK)"
 
-#: terminal/serializers/storage.py:68 xpack/plugins/cloud/models.py:258
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:83
+#: xpack/plugins/cloud/models.py:258
 msgid "Region"
 msgstr "地域"
 
@@ -7342,6 +7337,14 @@ msgstr "索引"
 #: terminal/serializers/storage.py:206
 msgid "Doc type"
 msgstr "文档类型"
+
+#: terminal/serializers/storage.py:258
+msgid "Store locally"
+msgstr "本地存储"
+
+#: terminal/serializers/storage.py:259
+msgid "Do not save"
+msgstr "不保存"
 
 #: terminal/serializers/task.py:9
 msgid "Session id"
@@ -8100,7 +8103,7 @@ msgid "User password history"
 msgstr "用户密码历史"
 
 #: users/notifications.py:55
-#: users/templates/users/_msg_password_expire_reminder.html:17
+#: users/templates/users/_msg_password_expire_reminder.html:16
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
@@ -8355,7 +8358,7 @@ msgstr "为了您的账号安全，请点击下面的链接及时更新密码"
 msgid "Click here update password"
 msgstr "点击这里更新密码"
 
-#: users/templates/users/_msg_password_expire_reminder.html:16
+#: users/templates/users/_msg_password_expire_reminder.html:15
 msgid "If your password has expired, please click the link below to"
 msgstr "如果你的密码已过期，请点击"
 
@@ -8728,11 +8731,6 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:55 xpack/plugins/cloud/providers/gcp.py:64
-#: xpack/plugins/cloud/providers/huaweicloud.py:34
-msgid "Account unavailable"
-msgstr "账号无效"
-
 #: xpack/plugins/cloud/meta.py:9
 msgid "Cloud center"
 msgstr "云管中心"
@@ -8767,8 +8765,8 @@ msgstr "IP网段组"
 
 #: xpack/plugins/cloud/models.py:100
 #: xpack/plugins/cloud/serializers/task.py:167
-msgid "Preferred IP type"
-msgstr "首选 IP 类型"
+msgid "Sync IP type"
+msgstr "同步 IP 类型"
 
 #: xpack/plugins/cloud/models.py:103
 #: xpack/plugins/cloud/serializers/task.py:185
@@ -9028,6 +9026,11 @@ msgstr "华东-上海"
 msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
+#: xpack/plugins/cloud/providers/gcp.py:64
+#: xpack/plugins/cloud/providers/huaweicloud.py:34
+msgid "Account unavailable"
+msgstr "账号无效"
+
 #: xpack/plugins/cloud/providers/huaweicloud.py:44
 msgid "CN North-Beijing1"
 msgstr "华北-北京1"
@@ -9276,6 +9279,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-#~ msgid "Account history"
-#~ msgstr "账号历史"
