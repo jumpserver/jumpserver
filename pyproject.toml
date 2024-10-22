@@ -31,7 +31,6 @@ phonenumbers = "8.13.17"
 gmssl = "3.2.2"
 itsdangerous = "1.1.0"
 pyotp = "2.8.0"
-jms-storage = "^0.0.59"
 simplejson = "3.19.1"
 sshtunnel = "0.4.0"
 sshpubkeys = "3.3.1"
@@ -124,6 +123,9 @@ elasticsearch8 = "8.13.2"
 polib = "^1.2.0"
 psycopg2-binary = "2.9.6"
 pycountry = "^24.6.1"
+boto = "2.49.0"
+azure-storage-blob = "12.17.0"
+esdk-obs-python = "3.21.4"
 
 [tool.poetry.group.xpack]
 optional = true
