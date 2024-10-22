@@ -25,4 +25,11 @@ class Migration(migrations.Migration):
                 verbose_name="Start Datetime",
             ),
         ),
+        migrations.AddField(
+            model_name="account",
+            name="date_last_access",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Date last access"
+            ),
+        ),
     ]
