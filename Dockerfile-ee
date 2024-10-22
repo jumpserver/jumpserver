@@ -15,11 +15,11 @@ ARG TOOLS="                           \
         vim                           \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
-    set -ex \
+RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${TOOLS}
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/jumpserver
 
