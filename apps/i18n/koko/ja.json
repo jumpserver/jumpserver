@@ -36,6 +36,8 @@
     "OnlineUsers": "オンラインスタッフ",
     "Paste": "貼り付け",
     "PauseSession": "セッションを一時停止",
+    "PermissionExpired": "許可が期限切れになりました",
+    "PermissionValid": "権限は有効です",
     "ReadOnly": "読み取り専用",
     "Reconnect": "再接続",
     "Refresh": "リフレッシュ",

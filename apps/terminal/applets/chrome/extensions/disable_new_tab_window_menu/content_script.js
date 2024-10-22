@@ -36,7 +36,7 @@ document.addEventListener("contextmenu", function (event) {
 
 const AllowedKeys = ['P', 'F', 'C', 'V']
 window.addEventListener("keydown", function (e) {
-    if (e.key === "F12" || (e.ctrlKey && !AllowedKeys.includes(e.key.toUpperCase()))) {
+    if (e.key === "F12" || e.key === "F1" || (e.ctrlKey && !AllowedKeys.includes(e.key.toUpperCase()))) {
         e.preventDefault();
         e.stopPropagation();
         debug('Press key: ', e.ctrlKey ? 'Ctrl' : '', e.shiftKey ? ' Shift' : '', e.key)

@@ -63,6 +63,26 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             )},
         }}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_ssh_key_change_strategy_choices()
+
+    def set_ssh_key_change_strategy_choices(self):
+        ssh_key_change_strategy = self.fields.get("ssh_key_change_strategy")
+        if not ssh_key_change_strategy:
+            return
+        ssh_key_change_strategy._choices.pop(SSHKeyStrategy.add, None)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        ssh_strategy_value = data.get('ssh_key_change_strategy', {}).get('value')
+        if ssh_strategy_value == SSHKeyStrategy.add:
+            data['ssh_key_change_strategy'] = {
+                'label': SSHKeyStrategy.set_jms.label,
+                'value': SSHKeyStrategy.set_jms.value
+            }
+        return data
+
     @property
     def model_type(self):
         return AutomationTypes.change_secret

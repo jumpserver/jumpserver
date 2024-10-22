@@ -1,6 +1,8 @@
 import json
 import os
+import shutil
 import tarfile
+import time
 from itertools import chain
 
 from django.core.files.storage import default_storage
@@ -62,16 +64,17 @@ class SessionPartReplayStorageHandler(object):
 
         # 保存到storage的路径
         target_path = os.path.join(default_storage.base_location, local_path)
-
+        target_tmp_path = target_path + f'.tmp{int(time.time())}'
         target_dir = os.path.dirname(target_path)
         if not os.path.isdir(target_dir):
             make_dirs(target_dir, exist_ok=True)
 
-        ok, err = storage.download(remote_path, target_path)
+        ok, err = storage.download(remote_path, target_tmp_path)
         if not ok:
             msg = 'Failed download {} file: {}'.format(part_filename, err)
             logger.error(msg)
             return None, msg
+        shutil.move(target_tmp_path, target_path)
         url = default_storage.url(local_path)
         return local_path, url
 
