@@ -47,7 +47,7 @@ class Subscription:
         self.ch = pb.ch
         self.sub = sub
         self.unsubscribed = False
-        logger.info("Subscribed to channel: ", sub)
+        logger.info(f"Subscribed to channel: {sub}")
 
     def _handle_msg(self, _next, error, complete):
         """
@@ -106,11 +106,11 @@ class Subscription:
 
     def unsubscribe(self):
         self.unsubscribed = True
-        logger.info("Unsubscribed from channel: ", self.sub)
+        logger.info(f"Unsubscribed from channel: {self.sub}")
         try:
             self.sub.close()
         except Exception as e:
-            logger.warning('Unsubscribe msg error: {}'.format(e))
+            logger.warning(f'Unsubscribe msg error: {e}')
 
     def retry(self, _next, error, complete):
         logger.info('Retry subscribe channel: {}'.format(self.ch))

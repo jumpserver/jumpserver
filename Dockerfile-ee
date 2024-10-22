@@ -15,14 +15,11 @@ ARG TOOLS="                           \
         vim                           \
         wget"
 
-ARG APT_MIRROR=http://deb.debian.org
 RUN set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
-    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/jumpserver
 
