@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-20 14:54+0800\n"
+"POT-Creation-Date: 2024-10-22 16:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -798,8 +798,8 @@ msgstr "カテゴリ"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:23 terminal/serializers/storage.py:271
-#: terminal/serializers/storage.py:283 tickets/models/comment.py:26
+#: terminal/serializers/session.py:23 terminal/serializers/storage.py:274
+#: terminal/serializers/storage.py:286 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
@@ -1425,12 +1425,13 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr "{port} のポート {address} に接続できません"
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:93 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/middleware.py:94 xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr "認証に失敗しました"
 
 #: assets/automations/ping_gateway/manager.py:60
-#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:102
+#: assets/automations/ping_gateway/manager.py:86 audits/backends/__init__.py:29
+#: terminal/const.py:102
 msgid "Connect failed"
 msgstr "接続に失敗しました"
 
@@ -1978,7 +1979,8 @@ msgstr "ラベル"
 msgid "New node"
 msgstr "新しいノード"
 
-#: assets/models/node.py:467 audits/backends/db.py:68 audits/backends/db.py:69
+#: assets/models/node.py:467 audits/backends/db.py:61 audits/backends/db.py:62
+#: audits/backends/es.py:66 audits/backends/es.py:67
 msgid "empty"
 msgstr "空"
 
@@ -2407,15 +2409,7 @@ msgstr "監査"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文章の内容が長すぎる。Elasticsearchで操作履歴を保存する"
 
-#: audits/backends/db.py:61
-msgid "labels"
-msgstr "ラベル"
-
-#: audits/backends/db.py:62
-msgid "operate_log_id"
-msgstr "操作ログID"
-
-#: audits/backends/db.py:94
+#: audits/backends/db.py:87
 msgid "Tips"
 msgstr "謎々"
 
@@ -2498,7 +2492,7 @@ msgstr "終了"
 #: audits/const.py:46 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:175
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:55
-#: terminal/serializers/session.py:69
+#: terminal/serializers/session.py:79
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -2523,11 +2517,11 @@ msgstr "タスク"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:116
+#: audits/handler.py:107
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:116
+#: audits/handler.py:107
 msgid "No"
 msgstr "否"
 
@@ -3140,7 +3134,7 @@ msgstr "電話番号を設定して有効にする"
 msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:95 settings/utils/ldap.py:679
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
@@ -3421,7 +3415,7 @@ msgstr "アカウントにリモートログイン動作があります。注意
 msgid "Login time"
 msgstr "ログイン時間"
 
-#: authentication/templates/authentication/_msg_different_city.html:16
+#: authentication/templates/authentication/_msg_different_city.html:14
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
@@ -3449,13 +3443,13 @@ msgstr ""
 msgid "Click here reset password"
 msgstr "ここをクリックしてパスワードをリセット"
 
-#: authentication/templates/authentication/_msg_reset_password.html:16
-#: users/templates/users/_msg_user_created.html:22
+#: authentication/templates/authentication/_msg_reset_password.html:15
+#: users/templates/users/_msg_user_created.html:20
 msgid "This link is valid for 1 hour. After it expires"
 msgstr "このリンクは1時間有効です。有効期限が切れた後"
 
-#: authentication/templates/authentication/_msg_reset_password.html:17
-#: users/templates/users/_msg_user_created.html:23
+#: authentication/templates/authentication/_msg_reset_password.html:16
+#: users/templates/users/_msg_user_created.html:21
 msgid "request new one"
 msgstr "新しいものを要求する"
 
@@ -3484,7 +3478,7 @@ msgstr "パスワードが正常に更新されました"
 msgid "Browser"
 msgstr "ブラウザ"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:13
+#: authentication/templates/authentication/_msg_rest_password_success.html:12
 msgid ""
 "If the password update was not initiated by you, your account may have "
 "security issues"
@@ -3492,8 +3486,8 @@ msgstr ""
 "パスワードの更新が開始されなかった場合、アカウントにセキュリティ上の問題があ"
 "る可能性があります"
 
-#: authentication/templates/authentication/_msg_rest_password_success.html:14
-#: authentication/templates/authentication/_msg_rest_public_key_success.html:14
+#: authentication/templates/authentication/_msg_rest_password_success.html:13
+#: authentication/templates/authentication/_msg_rest_public_key_success.html:13
 msgid "If you have any questions, you can contact the administrator"
 msgstr "質問があれば、管理者に連絡できます"
 
@@ -3501,7 +3495,7 @@ msgstr "質問があれば、管理者に連絡できます"
 msgid "Your public key has just been successfully updated"
 msgstr "公開鍵が正常に更新されました"
 
-#: authentication/templates/authentication/_msg_rest_public_key_success.html:13
+#: authentication/templates/authentication/_msg_rest_public_key_success.html:12
 msgid ""
 "If the public key update was not initiated by you, your account may have "
 "security issues"
@@ -3580,7 +3574,7 @@ msgid "LAN"
 msgstr "ローカルエリアネットワーク"
 
 #: authentication/views/base.py:70
-#: perms/templates/perms/_msg_permed_items_expire.html:21
+#: perms/templates/perms/_msg_permed_items_expire.html:20
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
@@ -4467,7 +4461,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:545
+#: ops/models/job.py:555
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -6617,7 +6611,7 @@ msgstr "使用中のストレージを削除できません"
 msgid "Command storages"
 msgstr "コマンドストア"
 
-#: terminal/api/component/storage.py:82
+#: terminal/api/component/storage.py:82 xpack/plugins/cloud/manager.py:83
 msgid "Invalid"
 msgstr "無効"
 
@@ -7011,7 +7005,7 @@ msgstr "ログイン元"
 msgid "Replay"
 msgstr "リプレイ"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:68
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:78
 msgid "Command amount"
 msgstr "コマンド量"
 
@@ -7396,7 +7390,8 @@ msgstr "アクセスキー"
 msgid "Access key secret"
 msgstr "アクセスキーシークレット"
 
-#: terminal/serializers/storage.py:68 xpack/plugins/cloud/models.py:258
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:83
+#: xpack/plugins/cloud/models.py:258
 msgid "Region"
 msgstr "リージョン"
 
@@ -7452,6 +7447,14 @@ msgstr "インデックス"
 #: terminal/serializers/storage.py:206
 msgid "Doc type"
 msgstr "Docタイプ"
+
+#: terminal/serializers/storage.py:258
+msgid "Store locally"
+msgstr "ローカルに保存する"
+
+#: terminal/serializers/storage.py:259
+msgid "Do not save"
+msgstr "保存しない"
 
 #: terminal/serializers/task.py:9
 msgid "Session id"
@@ -8216,7 +8219,7 @@ msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
 #: users/notifications.py:55
-#: users/templates/users/_msg_password_expire_reminder.html:17
+#: users/templates/users/_msg_password_expire_reminder.html:16
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
@@ -8477,7 +8480,7 @@ msgstr ""
 msgid "Click here update password"
 msgstr "ここをクリック更新パスワード"
 
-#: users/templates/users/_msg_password_expire_reminder.html:16
+#: users/templates/users/_msg_password_expire_reminder.html:15
 msgid "If your password has expired, please click the link below to"
 msgstr ""
 "パスワードの有効期限が切れている場合は、以下のリンクをクリックしてください"
@@ -8861,11 +8864,6 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:55 xpack/plugins/cloud/providers/gcp.py:64
-#: xpack/plugins/cloud/providers/huaweicloud.py:34
-msgid "Account unavailable"
-msgstr "利用できないアカウント"
-
 #: xpack/plugins/cloud/meta.py:9
 msgid "Cloud center"
 msgstr "クラウドセンター"
@@ -8900,8 +8898,8 @@ msgstr "IPネットワークセグメントグループ"
 
 #: xpack/plugins/cloud/models.py:100
 #: xpack/plugins/cloud/serializers/task.py:167
-msgid "Preferred IP type"
-msgstr "優先 IP タイプ"
+msgid "Sync IP type"
+msgstr "同期IPタイプ"
 
 #: xpack/plugins/cloud/models.py:103
 #: xpack/plugins/cloud/serializers/task.py:185
@@ -9161,6 +9159,11 @@ msgstr "華東-上海"
 msgid "AP-Singapore"
 msgstr "アジア太平洋-シンガポール"
 
+#: xpack/plugins/cloud/providers/gcp.py:64
+#: xpack/plugins/cloud/providers/huaweicloud.py:34
+msgid "Account unavailable"
+msgstr "利用できないアカウント"
+
 #: xpack/plugins/cloud/providers/huaweicloud.py:44
 msgid "CN North-Beijing1"
 msgstr "華北-北京1"
@@ -9412,11 +9415,3 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
-
-#~ msgid "Account history"
-#~ msgstr "アカウント履歴"
-
-#, fuzzy
-#~| msgid "Operate log"
-#~ msgid "Operate log id"
-#~ msgstr "ログの操作"
