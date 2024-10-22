@@ -1,6 +1,6 @@
 name: chrome
 display_name: "{{ 'Chrome Browser' | trans }}"
-version: 1.0
+version: 1.1
 comment: "{{ 'Chrome Browser Open URL Page Address' | trans }}"
 author: JumpServer Team
 exec_type: python
