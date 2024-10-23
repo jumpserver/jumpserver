@@ -156,13 +156,13 @@ distro = "1.9.0"
 tqdm = "4.66.4"
 elasticsearch7 = "7.17.9"
 elasticsearch8 = "8.13.2"
-
+azure-identity = "1.13.0"
+azure-keyvault-keys = "4.10.0"
 
 
 [tool.poetry.group.xpack.dependencies]
 qingcloud-sdk = "1.2.15"
 azure-mgmt-subscription = "3.1.1"
-azure-identity = "1.13.0"
 azure-mgmt-compute = "30.0.0"
 azure-mgmt-network = "23.1.0"
 google-cloud-compute = "1.15.0"
