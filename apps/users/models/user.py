@@ -69,7 +69,7 @@ class AuthMixin:
             if self.username:
                 self.date_password_last_updated = timezone.now()
                 post_user_change_password.send(self.__class__, user=self)
-            super().set_password(raw_password) # noqa
+            super().set_password(raw_password)  # noqa
 
     def set_public_key(self, public_key):
         if self.can_update_ssh_key():
@@ -159,6 +159,22 @@ class AuthMixin:
         if self.is_local and 0 <= self.password_expired_remain_days < 5:
             return True
         return False
+
+    def check_need_update_password(self):
+        if self.is_local and self.need_update_password:
+            return True
+        return False
+
+    @staticmethod
+    def check_passwd_too_simple(password):
+        simple_passwords = ['admin', 'ChangeMe']
+        if password in simple_passwords:
+            return True
+        return False
+
+    def is_auth_backend_model(self):
+        backend = getattr(self, 'backend', None)
+        return backend == settings.AUTH_BACKEND_MODEL
 
     @staticmethod
     def get_public_key_md5(key):
