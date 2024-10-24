@@ -157,7 +157,7 @@ tqdm = "4.66.4"
 elasticsearch7 = "7.17.9"
 elasticsearch8 = "8.13.2"
 azure-identity = "1.13.0"
-azure-keyvault-keys = "4.10.0"
+azure-keyvault-secrets = "4.9.0"
 
 
 [tool.poetry.group.xpack.dependencies]
