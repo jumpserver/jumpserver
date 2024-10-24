@@ -10,10 +10,25 @@ protocol: ssh
 priority: 50
 params:
   - name: commands
-    type: list
+    type: text
     label: "{{ 'Params commands label' | trans }}"
-    default: [ '' ]
+    default: ''
     help_text: "{{ 'Params commands help text' | trans }}"
+  - name: recv_timeout
+    type: int
+    label: "{{ 'Params recv_timeout label' | trans }}"
+    default: 30
+    help_text: "{{ 'Params recv_timeout help text' | trans }}"
+  - name: prompt
+    type: str
+    label: "{{ 'Params prompt label' | trans }}"
+    default: '.*'
+    help_text: "{{ 'Params prompt help text' | trans }}"
+  - name: answers
+    type: text
+    label: "{{ 'Params answer label' | trans }}"
+    default: '.*'
+    help_text: "{{ 'Params answer help text' | trans }}"
 
 i18n:
   SSH account change secret:
@@ -22,11 +37,81 @@ i18n:
     en: 'Custom password change by SSH command line'
 
   Params commands help text:
-    zh: '自定义命令中如需包含账号的 账号、密码、SSH 连接的用户密码 字段，<br />请使用 &#123;username&#125;、&#123;password&#125;、&#123;login_password&#125;格式，执行任务时会进行替换 。<br />比如针对 Cisco 主机进行改密，一般需要配置五条命令：<br />1. enable<br />2. &#123;login_password&#125;<br />3. configure terminal<br />4. username &#123;username&#125; privilege 0 password &#123;password&#125; <br />5. end'
-    ja: 'カスタム コマンドに SSH 接続用のアカウント番号、パスワード、ユーザー パスワード フィールドを含める必要がある場合は、<br />&#123;ユーザー名&#125;、&#123;パスワード&#125;、&#123;login_password& を使用してください。 # 125; 形式。タスクの実行時に置き換えられます。 <br />たとえば、Cisco ホストのパスワードを変更するには、通常、次の 5 つのコマンドを設定する必要があります:<br />1.enable<br />2.&#123;login_password&#125;<br />3 .ターミナルの設定<br / >4. ユーザー名 &#123;ユーザー名&#125; 権限 0 パスワード &#123;パスワード&#125; <br />5. 終了'
-    en: 'If the custom command needs to include the account number, password, and user password field for SSH connection,<br />Please use &#123;username&#125;, &#123;password&#125;, &#123;login_password&# 125; format, which will be replaced when executing the task. <br />For example, to change the password of a Cisco host, you generally need to configure five commands:<br />1. enable<br />2. &#123;login_password&#125;<br />3. configure terminal<br / >4. username &#123;username&#125; privilege 0 password &#123;password&#125; <br />5. end'
+    zh: |
+      请将命令中的指定位置改成特殊符号 <br />
+      1. 改密账号 -> {username} <br />
+      2. 改密密码 -> {password} <br />
+      3. 登录用户密码 -> {login_password} <br />
+      多条命令使用换行分割，执行任务时系统会根据特殊符号替换真实数据。<br />
+      比如针对 Cisco 主机进行改密，一般需要配置五条命令：<br />
+      enable <br />
+      {login_password} <br />
+      configure terminal <br />
+      username {username} privilege 0 password {password} <br />
+      end <br />
+    ja: |
+      コマンド内の指定された位置を特殊記号に変更してください。<br />
+      新しいパスワード（アカウント変更） -> {username} <br />
+      新しいパスワード（パスワード変更） -> {password} <br />
+      ログインユーザーパスワード -> {login_password} <br />
+      複数のコマンドは改行で区切り、タスクを実行するときにシステムは特殊記号を使用して実際のデータを置き換えます。<br />
+      例えば、Cisco機器のパスワードを変更する場合、一般的には5つのコマンドを設定する必要があります：<br />
+      enable <br />
+      {login_password} <br />
+      configure terminal <br />
+      username {username} privilege 0 password {password} <br />
+      end <br />
+    en: |
+      Please change the specified positions in the command to special symbols. <br /> 
+      Change password account -> {username} <br /> 
+      Change password -> {password} <br /> 
+      Login user password -> {login_password} <br /> 
+      Multiple commands are separated by new lines, and when executing tasks, <br /> 
+      the system will replace the special symbols with real data. <br /> 
+      For example, to change the password for a Cisco device, you generally need to configure five commands: <br />
+      enable <br />
+      {login_password} <br />
+      configure terminal <br />
+      username {username} privilege 0 password {password} <br />
+      end <br />
 
   Params commands label:
     zh: '自定义命令'
     ja: 'カスタムコマンド'
     en: 'Custom command'
+
+  Params recv_timeout label:
+    zh: '超时时间（秒）'
+    ja: 'タイムアウト（秒）'
+    en: 'Timeout (Seconds)'
+
+  Params recv_timeout help text:
+    zh: '等待命令结果返回的超时时间'
+    ja: 'コマンドの結果を待つタイムアウト時間'
+    en: 'The timeout for waiting for the command result to return'
+
+  Params prompt label:
+    zh: '提示符'
+    ja: 'ヒント'
+    en: 'Prompt'
+
+  Params prompt help text:
+    zh: '终端连接后显示的提示符信息（正则表达式）'
+    ja: 'ターミナル接続後に表示されるプロンプト情報（正規表現）'
+    en: 'Prompt information displayed after terminal connection (Regular expression)'
+
+  Params answer label:
+    zh: '命令结果'
+    ja: 'コマンド結果'
+    en: 'Command result'
+
+  Params answer help text:
+    zh: |
+      根据结果匹配度决定是否执行下一条命令，输入框的内容和上方 “自定义命令” 内容按行一一对应（正则表达式）
+    ja: |
+      結果の一致度に基づいて次のコマンドを実行するかどうかを決定します。
+      入力欄の内容は、上の「カスタムコマンド」の内容と行ごとに対応しています（せいきひょうげん）
+    en: |
+      Decide whether to execute the next command based on the result match. 
+      The input content corresponds line by line with the content 
+      of the `Custom command` above. (Regular expression)

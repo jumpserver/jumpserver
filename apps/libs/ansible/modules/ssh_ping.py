@@ -34,7 +34,7 @@ is_available:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from libs.ansible.modules_utils.custom_common import (
+from libs.ansible.modules_utils.paramiko_client import (
     SSHClient, common_argument_spec
 )
 
@@ -49,14 +49,11 @@ def main():
     module = AnsibleModule(argument_spec=options, supports_check_mode=True,)
 
     result = {
-        'changed': False, 'is_available': True
+        'changed': False, 'is_available': False
     }
-    client = SSHClient(module)
-    err = client.connect()
-    if err:
-        module.fail_json(msg='Unable to connect to asset: %s' % err)
-        result['is_available'] = False
-
+    with SSHClient(module) as client:
+        client.connect()
+    result['is_available'] = True
     return module.exit_json(**result)
 
 
