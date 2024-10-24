@@ -1,0 +1,32 @@
+id: push_account_by_ssh
+name: "{{ 'SSH account push' | trans }}"
+category:
+  - device
+  - host
+type:
+  - all
+method: push_account
+protocol: ssh
+priority: 50
+params:
+  - name: commands
+    type: list
+    label: "{{ 'Params commands label' | trans }}"
+    default: [ '' ]
+    help_text: "{{ 'Params commands help text' | trans }}"
+
+i18n:
+  SSH account push:
+    zh: '使用 SSH 命令行自定义推送'
+    ja: 'SSHコマンドラインを使用してプッシュをカスタマイズする'
+    en: 'Custom push using SSH command line'
+
+  Params commands help text:
+    zh: '自定义命令中如需包含账号的 账号、密码、SSH 连接的用户密码 字段，<br />请使用 &#123;username&#125;、&#123;password&#125;、&#123;login_password&#125;格式，执行任务时会进行替换 。<br />比如针对 Cisco 主机进行改密，一般需要配置五条命令：<br />1. enable<br />2. &#123;login_password&#125;<br />3. configure terminal<br />4. username &#123;username&#125; privilege 0 password &#123;password&#125; <br />5. end'
+    ja: 'カスタム コマンドに SSH 接続用のアカウント番号、パスワード、ユーザー パスワード フィールドを含める必要がある場合は、<br />&#123;ユーザー名&#125;、&#123;パスワード&#125;、&#123;login_password& を使用してください。 # 125; 形式。タスクの実行時に置き換えられます。 <br />たとえば、Cisco ホストのパスワードを変更するには、通常、次の 5 つのコマンドを設定する必要があります:<br />1.enable<br />2.&#123;login_password&#125;<br />3 .ターミナルの設定<br / >4. ユーザー名 &#123;ユーザー名&#125; 権限 0 パスワード &#123;パスワード&#125; <br />5. 終了'
+    en: 'If the custom command needs to include the account number, password, and user password field for SSH connection,<br />Please use &#123;username&#125;, &#123;password&#125;, &#123;login_password&# 125; format, which will be replaced when executing the task. <br />For example, to change the password of a Cisco host, you generally need to configure five commands:<br />1. enable<br />2. &#123;login_password&#125;<br />3. configure terminal<br / >4. username &#123;username&#125; privilege 0 password &#123;password&#125; <br />5. end'
+
+  Params commands label:
+    zh: '自定义命令'
+    ja: 'カスタムコマンド'
+    en: 'Custom command'

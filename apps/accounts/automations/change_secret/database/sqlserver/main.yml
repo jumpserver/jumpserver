@@ -64,3 +64,4 @@
         name: '{{ jms_asset.spec_info.db_name }}'
         script: |
           SELECT @@version
+      when: check_conn_after_change
