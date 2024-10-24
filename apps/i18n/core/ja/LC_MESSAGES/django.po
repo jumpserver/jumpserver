@@ -5096,11 +5096,11 @@ msgstr "パラメータ定義"
 
 #: ops/models/job.py:155
 msgid "Run as"
-msgstr "ユーザーとして実行"
+msgstr "実行アカウント (じっこうアカウント)"
 
 #: ops/models/job.py:157
 msgid "Run as policy"
-msgstr "ユーザー ポリシー"
+msgstr "アカウントポリシー "
 
 #: ops/models/job.py:222 ops/serializers/job.py:92
 #: terminal/notifications.py:174
