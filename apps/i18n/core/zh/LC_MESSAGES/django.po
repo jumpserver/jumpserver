@@ -4979,11 +4979,11 @@ msgstr "参数定义"
 
 #: ops/models/job.py:155
 msgid "Run as"
-msgstr "运行用户"
+msgstr "运行账号"
 
 #: ops/models/job.py:157
 msgid "Run as policy"
-msgstr "用户策略"
+msgstr "账户策略"
 
 #: ops/models/job.py:222 ops/serializers/job.py:92
 #: terminal/notifications.py:182

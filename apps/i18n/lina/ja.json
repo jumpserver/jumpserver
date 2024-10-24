@@ -1053,7 +1053,7 @@
     "Rules": "規則",
     "Run": "Action",
     "RunAgain": "再実行",
-    "RunAs": "実行ユーザー",
+    "RunAs": "実行アカウント (じっこうアカウント)",
     "RunCommand": "コマンドの実行",
     "RunJob": "ジョブを実行",
     "RunSucceed": "タスクが成功",
