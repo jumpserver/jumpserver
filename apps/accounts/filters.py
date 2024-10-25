@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils import timezone
 from django_filters import rest_framework as drf_filters
 
@@ -28,9 +28,7 @@ class AccountFilterSet(BaseFilterSet):
     latest_updated = drf_filters.BooleanFilter(method='filter_latest')
     latest_secret_changed = drf_filters.BooleanFilter(method='filter_latest')
     latest_secret_change_failed = drf_filters.BooleanFilter(method='filter_latest')
-    is_zombie = drf_filters.BooleanFilter(method='filter_risk',)
-    is_ghost = drf_filters.BooleanFilter(method='filter_risk',)
-    is_weak_password = drf_filters.BooleanFilter(method='filter_risk',)
+    risk = drf_filters.CharFilter(method='filter_risk',)
     long_time_no_change_secret = drf_filters.BooleanFilter(method='filter_long_time')
     long_time_no_verified = drf_filters.BooleanFilter(method='filter_long_time')
 
@@ -44,10 +42,28 @@ class AccountFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_long_time(queryset, name, value):
+        date = timezone.now() - timezone.timedelta(days=30)
+
+        if name == 'long_time_no_change_secret':
+            field = 'date_change_secret'
+            confirm_field = 'change_secret_status'
+        else:
+            field = 'date_verified'
+            confirm_field = 'connectivity'
+
+        q = Q(**{f'{field}__lt': date}) | Q(**{f'{field}__isnull': True})
+        confirm_q = {f'{confirm_field}': 'na'}
+        queryset = queryset.exclude(**confirm_q).filter(q)
         return queryset
 
     @staticmethod
     def filter_risk(queryset, name, value):
+        if not value:
+            return queryset
+
+        queryset = queryset.prefetch_related('risks') \
+            .annotate(risk=F('risks__risk'), confirmed=F('risks__confirmed')) \
+            .filter(risk=value, confirmed=False)
         return queryset
 
     @staticmethod

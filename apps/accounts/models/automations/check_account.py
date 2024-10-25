@@ -45,3 +45,10 @@ class AccountRisk(JMSOrgBaseModel):
     account = models.ForeignKey('Account', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Account'))
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
     confirmed = models.BooleanField(default=False, verbose_name=_('Confirmed'))
+
+    class Meta:
+        verbose_name = _('Account risk')
+        unique_together = [('account', 'risk'),]
+
+    def __str__(self):
+        return f"{self.account} - {self.risk}"
