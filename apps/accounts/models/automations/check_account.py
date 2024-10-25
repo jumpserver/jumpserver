@@ -48,7 +48,6 @@ class AccountRisk(JMSOrgBaseModel):
 
     class Meta:
         verbose_name = _('Account risk')
-        unique_together = [('account', 'risk'),]
 
     def __str__(self):
         return f"{self.account} - {self.risk}"
