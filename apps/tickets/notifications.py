@@ -43,8 +43,8 @@ class BaseTicketMessage(UserMessage):
 
     def get_wecom_context(self):
         ticket_detail_url = wecom_tool.wrap_redirect_url(
-            [self.get_ticket_detail_url(external=False)]
-        )[0]
+            self.get_ticket_detail_url(external=False)
+        )
         return {'ticket_detail_url': ticket_detail_url}
 
     def gen_html_string(self, **other_context):
