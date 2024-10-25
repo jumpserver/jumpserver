@@ -7,6 +7,7 @@ ARG DEPENDENCIES="                    \
         wget                          \
         g++                           \
         make                          \
+        cron                          \
         pkg-config                    \
         default-libmysqlclient-dev    \
         freetds-dev                   \
@@ -26,6 +27,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && apt-get update > /dev/null \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && echo "no" | dpkg-reconfigure dash
+
+# Clean up /tmp
+RUN echo "0 3 * * * root find /tmp -type f -mtime +1 -size +1M -exec rm -f {} \; && date > /tmp/clean.log" > /etc/cron.d/cleanup_tmp \
+    && chmod 0644 /etc/cron.d/cleanup_tmp
 
 
 # Install bin tools
