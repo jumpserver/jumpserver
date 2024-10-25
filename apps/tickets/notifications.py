@@ -4,12 +4,12 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.core.cache import cache
 from django.forms import model_to_dict
-from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
-from common.utils import get_logger, random_string
+from common.sdk.im.wecom import wecom_tool
+from common.utils import get_logger, random_string, reverse
 from notifications.notifications import UserMessage
 from . import const
 from .models import Ticket
@@ -22,16 +22,13 @@ class BaseTicketMessage(UserMessage):
     ticket: Ticket
     content_title: str
 
-    @property
-    def ticket_detail_url(self):
-        tp = self.ticket.type
-        return urljoin(
-            settings.SITE_URL,
-            const.TICKET_DETAIL_URL.format(
-                id=str(self.ticket.id),
-                type=tp
-            )
+    def get_ticket_detail_url(self, external=True):
+        detail_url = const.TICKET_DETAIL_URL.format(
+            id=str(self.ticket.id), type=self.ticket.type
         )
+        if not external:
+            return detail_url
+        return urljoin(settings.SITE_URL, detail_url)
 
     @property
     def content_title(self):
@@ -41,17 +38,31 @@ class BaseTicketMessage(UserMessage):
     def subject(self):
         raise NotImplementedError
 
-    def get_html_msg(self) -> dict:
-        context = dict(
-            title=self.content_title,
-            content=self.content,
-            ticket_detail_url=self.ticket_detail_url
+    def get_html_context(self):
+        return {'ticket_detail_url': self.get_ticket_detail_url()}
+
+    def get_wecom_context(self):
+        ticket_detail_url = wecom_tool.wrap_redirect_url(
+            self.get_ticket_detail_url(external=False)
         )
-        message = render_to_string('tickets/_msg_ticket.html', context)
-        return {
-            'subject': self.subject,
-            'message': message
+        return {'ticket_detail_url': ticket_detail_url}
+
+    def gen_html_string(self, **other_context):
+        context = {
+            'title': self.content_title, 'content': self.content,
         }
+        context.update(other_context)
+        message = render_to_string(
+            'tickets/_msg_ticket.html', context
+        )
+        return {'subject': self.subject, 'message': message}
+
+    def get_html_msg(self) -> dict:
+        return self.gen_html_string(**self.get_html_context())
+
+    def get_wecom_msg(self):
+        message = self.gen_html_string(**self.get_wecom_context())
+        return self.html_to_markdown(message)
 
     @classmethod
     def gen_test_msg(cls):
@@ -113,27 +124,21 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         )
         return title
 
-    def get_ticket_approval_url(self):
+    def get_ticket_approval_url(self, external=True):
         url = reverse('tickets:direct-approve', kwargs={'token': self.token})
+        if not external:
+            return url
         return urljoin(settings.SITE_URL, url)
 
-    def get_html_msg(self) -> dict:
-        context = dict(
-            title=self.content_title,
-            content=self.content,
-            ticket_detail_url=self.ticket_detail_url
-        )
-
-        ticket_approval_url = self.get_ticket_approval_url()
-        context.update({'ticket_approval_url': ticket_approval_url})
-        message = render_to_string('tickets/_msg_ticket.html', context)
-        cache.set(self.token, {
-            'ticket_id': self.ticket.id, 'approver_id': self.user.id,
-            'content': self.content,
-        }, 3600)
-        return {
-            'subject': self.subject, 'message': message
+    def get_html_context(self):
+        context = super().get_html_context()
+        context['ticket_approval_url'] = self.get_ticket_approval_url()
+        data = {
+            'ticket_id': self.ticket.id,
+            'approver_id': self.user.id, 'content': self.content,
         }
+        cache.set(self.token, data, 3600)
+        return context
 
     @classmethod
     def gen_test_msg(cls):
