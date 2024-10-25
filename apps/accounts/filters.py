@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q
+from django.utils import timezone
 from django_filters import rest_framework as drf_filters
 
 from assets.models import Node
@@ -22,14 +23,56 @@ class AccountFilterSet(BaseFilterSet):
     platform = drf_filters.CharFilter(field_name='asset__platform_id', lookup_expr='exact')
     category = drf_filters.CharFilter(field_name='asset__platform__category', lookup_expr='exact')
     type = drf_filters.CharFilter(field_name='asset__platform__type', lookup_expr='exact')
+    latest_discovery = drf_filters.BooleanFilter(method='filter_latest')
+    latest_accessed = drf_filters.BooleanFilter(method='filter_latest')
+    latest_updated = drf_filters.BooleanFilter(method='filter_latest')
+    latest_secret_changed = drf_filters.BooleanFilter(method='filter_latest')
+    latest_secret_change_failed = drf_filters.BooleanFilter(method='filter_latest')
+    is_zombie = drf_filters.BooleanFilter(method='filter_risk',)
+    is_ghost = drf_filters.BooleanFilter(method='filter_risk',)
+    is_weak_password = drf_filters.BooleanFilter(method='filter_risk',)
+    long_time_no_change_secret = drf_filters.BooleanFilter(method='filter_long_time')
+    long_time_no_verified = drf_filters.BooleanFilter(method='filter_long_time')
 
     @staticmethod
     def filter_has_secret(queryset, name, has_secret):
-        q = Q(secret__isnull=True) | Q(secret='')
+        q = Q(_secret__isnull=True) | Q(_secret='')
         if has_secret:
             return queryset.exclude(q)
         else:
             return queryset.filter(q)
+
+    @staticmethod
+    def filter_long_time(queryset, name, value):
+        return queryset
+
+    @staticmethod
+    def filter_risk(queryset, name, value):
+        return queryset
+
+    @staticmethod
+    def filter_latest(queryset, name, value):
+        if not value:
+            return queryset
+
+        date = timezone.now() - timezone.timedelta(days=7)
+        kwargs = {}
+
+        if name == 'latest_discovery':
+            kwargs.update({'date_created__gte': date, 'source': 'collected'})
+        elif name == 'latest_accessed':
+            kwargs.update({'date_last_access__gte': date})
+        elif name == 'latest_updated':
+            kwargs.update({'date_updated__gte': date})
+        elif name == 'latest_secret_changed':
+            kwargs.update({'date_change_secret__gt': date})
+
+        if name == 'latest_secret_change_failed':
+            queryset = queryset.filter(date_change_secret__gt=date).exclude(change_secret_status='ok')
+
+        if kwargs:
+            queryset = queryset.filter(date_last_access__gte=date)
+        return queryset
 
     @staticmethod
     def filter_nodes(queryset, name, value):
@@ -46,7 +89,7 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['id', 'asset', 'source_id', 'secret_type']
+        fields = ['id', 'asset', 'source_id', 'secret_type', 'category', 'type']
 
 
 class GatheredAccountFilterSet(BaseFilterSet):

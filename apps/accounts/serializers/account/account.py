@@ -235,14 +235,15 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
+        automation_fields = [
+            'date_last_access', 'access_by', 'date_verified', 'connectivity',
+            'date_change_secret', 'change_secret_status'
+        ]
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'version',
-            'source', 'source_id', 'connectivity',
-            'secret_reset',
-        ] + AccountCreateUpdateSerializerMixin.Meta.fields
-        read_only_fields = BaseAccountSerializer.Meta.read_only_fields + [
-            'connectivity'
-        ]
+            'source', 'source_id', 'secret_reset',
+        ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
+        read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False},

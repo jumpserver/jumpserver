@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
-                ('connectivity', models.CharField(choices=[('-', 'Unknown'), ('ok', 'OK'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity')),
+                ('connectivity', models.CharField(choices=[('-', 'Unknown'), ('na', 'N/A'), ('ok', 'OK'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity')),
                 ('date_verified', models.DateTimeField(null=True, verbose_name='Date verified')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('address', models.CharField(db_index=True, max_length=767, verbose_name='Address')),
