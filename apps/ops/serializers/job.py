@@ -4,19 +4,22 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Asset, Node
+from common.serializers import WritableNestedModelSerializer
 from common.serializers.fields import ReadableHiddenField, ObjectRelatedField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from ops.serializers import JobVariableSerializer
 
 
-class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
+class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, WritableNestedModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     run_after_save = serializers.BooleanField(label=_("Execute after saving"), default=False, required=False)
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
     assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True, required=False)
     nodes = ObjectRelatedField(label=_('Nodes'), queryset=Node.objects, many=True, required=False)
+    variable = JobVariableSerializer(many=True, required=False, allow_null=True, label=_('Variable'))
 
     def to_internal_value(self, data):
         instant = data.get('instant', False)
@@ -39,6 +42,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "id", "date_last_run", "date_created",
             "date_updated", "average_time_cost"
         ]
+        fields_m2m = ['variable']
         fields = read_only_fields + [
             "name", "instant", "type", "module",
             "args", "playbook", "assets",
@@ -47,7 +51,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "timeout", "chdir", "comment", "summary",
             "is_periodic", "interval", "crontab", "nodes",
             "run_after_save"
-        ]
+        ] + fields_m2m
         extra_kwargs = {
             'average_time_cost': {'label': _('Duration')},
         }
