@@ -156,6 +156,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Node"))
     use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
     parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
+    periodic_variable = models.JSONField(default=dict, verbose_name=_('Periodic variable'))
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Run as'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
                                     verbose_name=_('Run as policy'))

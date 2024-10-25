@@ -22,12 +22,20 @@ dangerous_keywords = (
 
 class Variable(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
-    username = models.CharField(max_length=128, verbose_name=_('Username'), null=True)
+    var_name = models.CharField(max_length=128, verbose_name=_('VarName'), null=True)
     default_value = models.CharField(max_length=128, verbose_name=_('DefaultValue'), null=True)
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     type = models.CharField(max_length=64, default=FieldType.text, verbose_name=_('参数类型'))
     tips = models.CharField(max_length=1024, default='', verbose_name=_('Tips'), null=True, blank=True)
-    require = models.BooleanField(default=False, verbose_name=_('Require'))
+    required = models.BooleanField(default=False, verbose_name=_('Required'))
+    playbook = models.ForeignKey(
+        'ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL, related_name='variable'
+    )
+    adhoc = models.ForeignKey(
+        'ops.AdHoc', verbose_name=_("Adhoc"), null=True, on_delete=models.SET_NULL, related_name='variable'
+    )
+    job = models.ForeignKey('ops.Job', verbose_name=_("Job"), null=True, on_delete=models.SET_NULL,
+                            related_name='variable')
 
     def __str__(self):
         return self.name
