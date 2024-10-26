@@ -257,9 +257,16 @@ class Config(dict):
 
         # Vault
         'VAULT_ENABLED': False,
+        'VAULT_BACKEND': 'local',
+
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'jumpserver',
+
+        'VAULT_AZURE_HOST': '',
+        'VAULT_AZURE_CLIENT_ID': '',
+        'VAULT_AZURE_CLIENT_SECRET': '',
+        'VAULT_AZURE_TENANT_ID': '',
 
         'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
 
