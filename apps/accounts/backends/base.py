@@ -8,7 +8,7 @@ __all__ = ['BaseVault']
 class BaseVault(ABC):
 
     def __init__(self, *args, **kwargs):
-        self.enabled = kwargs.get('VAULT_ENABLED')
+        pass
 
     def get(self, instance):
         """ 返回 secret 值 """
@@ -18,9 +18,6 @@ class BaseVault(ABC):
         if not instance.secret_has_save_to_vault:
             self._create(instance)
             self._clean_db_secret(instance)
-            self.save_metadata(instance)
-
-        if instance.is_sync_metadata:
             self.save_metadata(instance)
 
     def update(self, instance):
