@@ -4,7 +4,7 @@ ARG TARGETARCH
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
         ca-certificates               \
-        wget                          \                         \
+        wget                          \
         cron                          \
         gettext"
 
