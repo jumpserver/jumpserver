@@ -624,6 +624,7 @@
     "InputPhone": "Phone number",
     "InstanceAddress": "Instance address",
     "InstanceName": "Instance name",
+    "InstanceNamePartIp": "Instance name and Partial IP",
     "InstancePlatformName": "Instance platform name",
     "Interface": "Appearance",
     "InterfaceSettings": "Appearance",
@@ -1202,7 +1203,7 @@
     "SystemTasks": "Tasks",
     "SystemTools": "Tools",
     "TableColSetting": "Select visible attribute columns",
-    "TableSetting": "Table preferences",
+    "ListPreference": "List preferences",
     "TagCreate": "Create tag",
     "TagInputFormatValidation": "Tag format error, the correct format is: name:value",
     "TagList": "Tags",
@@ -1400,6 +1401,5 @@
     "ZoneUpdate": "Update the zone",
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove",
-    "InstanceNamePartIp": "Instance name and Partial IP"
+    "removeWarningMsg": "Are you sure you want to remove"
 }

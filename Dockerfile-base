@@ -4,20 +4,12 @@ ARG TARGETARCH
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
         ca-certificates               \
-        wget                          \
-        g++                           \
-        make                          \
+        wget                          \                         \
         cron                          \
-        pkg-config                    \
-        default-libmysqlclient-dev    \
-        freetds-dev                   \
-        gettext                       \
-        libkrb5-dev                   \
-        libldap2-dev                  \
-        libsasl2-dev"
-
+        gettext"
 
 ARG APT_MIRROR=http://deb.debian.org
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
     set -ex \
@@ -31,10 +23,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 # Clean up /tmp
 RUN echo "0 3 * * * root find /tmp -type f -mtime +1 -size +1M -exec rm -f {} \; && date > /tmp/clean.log" > /etc/cron.d/cleanup_tmp \
     && chmod 0644 /etc/cron.d/cleanup_tmp
-
-
+    
 # Install bin tools
-ARG CHECK_VERSION=v1.0.3
+ARG CHECK_VERSION=v1.0.4
 RUN set -ex \
     && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
@@ -43,14 +34,13 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-
 # Install Python dependencies
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
 ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
 
-RUN --mount=type=cache,target=/root/.cache,sharing=locked,id=core \
+RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=poetry.lock,target=poetry.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=utils/clean_site_packages.sh,target=clean_site_packages.sh \

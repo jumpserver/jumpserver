@@ -1,11 +1,11 @@
 import os
 
-import jms_storage
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
 
+from common.storage import jms_storage
 from .utils import get_logger
 
 logger = get_logger(__file__)

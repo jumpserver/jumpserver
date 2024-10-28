@@ -4,7 +4,6 @@ import copy
 import os
 from importlib import import_module
 
-import jms_storage
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from common.db.fields import EncryptJsonDictTextField
 from common.db.models import JMSBaseModel
 from common.plugins.es import QuerySet as ESQuerySet
+from common.storage import jms_storage
 from common.utils import get_logger
 from common.utils.timezone import local_now_date_display
 from terminal import const

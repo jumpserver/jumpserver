@@ -16,12 +16,6 @@ def digest(corp_id, corp_secret):
     return dist
 
 
-def update_values(default: dict, others: dict):
-    for key in default.keys():
-        if key in others:
-            default[key] = others[key]
-
-
 def set_default(data: dict, default: dict):
     for key in default.keys():
         if key not in data:
