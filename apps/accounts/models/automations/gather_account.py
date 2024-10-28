@@ -1,9 +1,11 @@
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes, Source
 from accounts.models import Account
+from common.const import ConfirmOrIgnore
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
@@ -11,19 +13,46 @@ __all__ = ['GatherAccountsAutomation', 'GatheredAccount']
 
 
 class GatheredAccount(JMSOrgBaseModel):
-    present = models.BooleanField(default=True, verbose_name=_("Present"))
+    present = models.BooleanField(default=True, verbose_name=_("Present"))  # 资产上是否还存在
     date_last_login = models.DateTimeField(null=True, verbose_name=_("Date login"))
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_("Asset"))
     username = models.CharField(max_length=32, blank=True, db_index=True, verbose_name=_('Username'))
     address_last_login = models.CharField(max_length=39, default='', verbose_name=_("Address login"))
+    status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Action"))
 
     @property
     def address(self):
         return self.asset.address
 
-    @staticmethod
-    def sync_accounts(gathered_accounts):
+    @classmethod
+    def update_exists_accounts(cls, gathered_account, accounts):
+        if not gathered_account.date_last_login:
+            return
+
+        for account in accounts:
+            if (not account.date_last_login or
+                    account.date_last_login - gathered_account.date_last_login > timezone.timedelta(minutes=5)):
+                account.date_last_login = gathered_account.date_last_login
+                account.login_by = '{}({})'.format('unknown', gathered_account.address_last_login)
+                account.save(update_fields=['date_last_login', 'login_by'])
+
+    @classmethod
+    def create_accounts(cls, gathered_account, accounts):
         account_objs = []
+        asset_id = gathered_account.asset_id
+        username = gathered_account.username
+        access_by = '{}({})'.format('unknown', gathered_account.address_last_login)
+        account = Account(
+            asset_id=asset_id, username=username,
+            name=username, source=Source.COLLECTED,
+            date_last_access=gathered_account.date_last_login,
+            access_by=access_by
+        )
+        account_objs.append(account)
+        Account.objects.bulk_create(account_objs)
+
+    @classmethod
+    def sync_accounts(cls, gathered_accounts):
         for gathered_account in gathered_accounts:
             asset_id = gathered_account.asset_id
             username = gathered_account.username
@@ -32,13 +61,12 @@ class GatheredAccount(JMSOrgBaseModel):
                 Q(asset_id=asset_id, name=username)
             )
             if accounts.exists():
-                continue
-            account = Account(
-                asset_id=asset_id, username=username,
-                name=username, source=Source.COLLECTED
-            )
-            account_objs.append(account)
-        Account.objects.bulk_create(account_objs)
+                cls.update_exists_accounts(gathered_account, accounts)
+            else:
+                cls.create_accounts(gathered_account, accounts)
+
+            gathered_account.status = ConfirmOrIgnore.confirmed
+            gathered_account.save(update_fields=['action'])
 
     class Meta:
         verbose_name = _("Gather asset accounts")

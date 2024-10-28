@@ -57,8 +57,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
-    date_last_access = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
-    access_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
+    date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
+    login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
     change_secret_status = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Change secret status'))
 

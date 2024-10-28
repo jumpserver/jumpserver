@@ -75,4 +75,9 @@ class Language(models.TextChoices):
     jp = 'ja', '日本語',
 
 
+class ConfirmOrIgnore(models.TextChoices):
+    confirmed = 'confirmed', _('Confirmed')
+    ignored = 'ignored', _('Ignored')
+
+
 COUNTRY_CALLING_CODES = get_country_phone_choices()

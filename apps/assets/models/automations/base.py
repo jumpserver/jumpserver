@@ -131,8 +131,8 @@ class AutomationExecution(OrgModelMixin):
         return self.snapshot['type']
 
     def get_all_asset_ids(self):
-        node_ids = self.snapshot['nodes']
-        asset_ids = self.snapshot['assets']
+        node_ids = self.snapshot.get('nodes', [])
+        asset_ids = self.snapshot.get('assets', [])
         nodes = Node.objects.filter(id__in=node_ids)
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         asset_ids = set(list(asset_ids) + list(node_asset_ids))

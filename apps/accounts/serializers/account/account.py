@@ -236,7 +236,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         automation_fields = [
-            'date_last_access', 'access_by', 'date_verified', 'connectivity',
+            'date_last_login', 'login_by', 'date_verified', 'connectivity',
             'date_change_secret', 'change_secret_status'
         ]
         fields = BaseAccountSerializer.Meta.fields + [

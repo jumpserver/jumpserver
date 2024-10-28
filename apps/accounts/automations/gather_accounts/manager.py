@@ -3,6 +3,7 @@ from collections import defaultdict
 from accounts.const import AutomationTypes
 from accounts.models import GatheredAccount
 from assets.models import Asset
+from common.const import ConfirmOrIgnore
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
 from users.models import User
@@ -70,8 +71,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
     def update_or_create_accounts(self):
         for asset, data in self.asset_account_info.items():
-            with tmp_to_org(asset.org_id):
+            with (tmp_to_org(asset.org_id)):
                 gathered_accounts = []
+                # 把所有的设置为 present = False, 创建的时候如果有就会更新
                 GatheredAccount.objects.filter(asset=asset, present=True).update(present=False)
                 for d in data:
                     username = d['username']
@@ -79,9 +81,15 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         defaults=d, asset=asset, username=username,
                     )
                     gathered_accounts.append(gathered_account)
+                # 不存在的标识为待处理
+                GatheredAccount.objects \
+                    .filter(asset=asset, present=False) \
+                    .exclude(status=ConfirmOrIgnore.ignored) \
+                    .update(status='')
                 if not self.is_sync_account:
                     continue
                 GatheredAccount.sync_accounts(gathered_accounts)
+
 
     def run(self, *args, **kwargs):
         super().run(*args, **kwargs)
