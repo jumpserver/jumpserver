@@ -16,8 +16,8 @@ router.register('apply-login-tickets', api.ApplyLoginTicketViewSet, 'apply-login
 router.register('apply-command-tickets', api.ApplyCommandTicketViewSet, 'apply-command-ticket')
 router.register('apply-login-asset-tickets', api.ApplyLoginAssetTicketViewSet, 'apply-login-asset-ticket')
 router.register('ticket-session-relation', api.TicketSessionRelationViewSet, 'ticket-session-relation')
-router.register('apply-assets', api.ApplyAssetsViewSet, 'ticket-session-relation')
-router.register('apply-nodes', api.ApplyNodesViewSet, 'ticket-session-relation')
+router.register('apply-assets', api.ApplyAssetsViewSet, 'apply-assets')
+router.register('apply-nodes', api.ApplyNodesViewSet, 'apply-nodes')
 
 urlpatterns = [
     path('tickets/<uuid:ticket_id>/session/', api.TicketSessionApi.as_view(), name='ticket-session'),
