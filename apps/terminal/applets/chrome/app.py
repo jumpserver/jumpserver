@@ -269,7 +269,6 @@ class AppletApplication(BaseApplication):
         from common import check_pid_alive
         parent_id = self.service.process.pid
         pids = get_children_pids(parent_id)
-        print('pids: ', pids)
         pids_status = {pid: True for pid in pids}
         # 退出 chromedriver 进程，等待所有子进程退出
         self.service.stop()
@@ -279,7 +278,6 @@ class AppletApplication(BaseApplication):
                 pids_status[pid] = check_pid_alive(pid)
             status = any(pids_status.values())
             if not status:
-                print("all pids are not alive", pids)
                 break
 
     def close(self):
@@ -311,5 +309,5 @@ def get_children_pids(parent_pid):
                 pids.append(int(pid))
 
     except Exception as e:
-        print("get_children_pids err: ", e)
+        pass
     return pids
