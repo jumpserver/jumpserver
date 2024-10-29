@@ -333,7 +333,7 @@ class JobExecution(JMSOrgBaseModel):
         if isinstance(self.parameters, str):
             extra_vars = json.loads(self.parameters)
         else:
-            extra_vars = {}
+            extra_vars = self.parameters if self.parameters else {}
         static_variables = self.gather_static_variables()
         extra_vars.update(static_variables)
 

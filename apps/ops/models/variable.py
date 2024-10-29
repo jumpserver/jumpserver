@@ -40,6 +40,19 @@ class Variable(JMSBaseModel):
     def __str__(self):
         return self.name
 
+    @property
+    def form_data(self):
+        return {
+            'var_name': self.var_name,
+            'label': self.name,
+            'help_text': self.tips,
+            'read_only': False,
+            'required': self.required,
+            'type': 'string',
+            'write_only': True,
+            'default': self.default_value
+        }
+
     class Meta:
         verbose_name = _("Variable")
         ordering = ['date_created']
