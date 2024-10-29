@@ -28,14 +28,10 @@ class Migration(migrations.Migration):
             model_name="gatheredaccount",
             name="action",
             field=models.CharField(
-                choices=[
-                    ("pending", "Pending"),
-                    ("confirm", "Confirm"),
-                    ("ignore", "Ignore"),
-                ],
-                default="pending",
+                choices=[("confirmed", "Confirmed"), ("ignored", "Ignored")],
+                default="",
                 max_length=32,
-                verbose_name="Action",
+                verbose_name="Status",
             ),
         ),
     ]

@@ -1,16 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-from accounts.const import AutomationTypes
-from accounts.models import AccountCheckAutomation
-from common.utils import get_logger
+from rest_framework.serializers import ModelSerializer
 
+from accounts.const import AutomationTypes
+from accounts.models import AccountCheckAutomation, AccountRisk
+from common.utils import get_logger
 from .base import BaseAutomationSerializer
 
 logger = get_logger(__file__)
 
 __all__ = [
     'CheckAccountsAutomationSerializer',
+    'AccountRiskSerializer'
 ]
+
+
+class AccountRiskSerializer(ModelSerializer):
+    class Meta:
+        model = AccountRisk
+        fields = '__all__'
 
 
 class CheckAccountsAutomationSerializer(BaseAutomationSerializer):

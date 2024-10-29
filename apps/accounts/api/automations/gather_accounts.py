@@ -48,11 +48,20 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     filterset_class = GatheredAccountFilterSet
     serializer_classes = {
         'default': serializers.GatheredAccountSerializer,
+        'status': serializers.GatheredAccountActionSerializer,
     }
     rbac_perms = {
         'sync_accounts': 'assets.add_gatheredaccount',
         'discover': 'assets.add_gatheredaccount',
+        'status': 'assets.change_gatheredaccount',
     }
+
+    @action(methods=['put'], detail=True, url_path='status')
+    def status(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.status = request.data.get('status')
+        instance.save()
+        return Response(status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False, url_path='discover')
     def discover(self, request, *args, **kwargs):

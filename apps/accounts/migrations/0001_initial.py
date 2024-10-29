@@ -168,7 +168,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('org_id',
                  models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
-                ('present', models.BooleanField(default=True, verbose_name='Present')),
+                ('present', models.BooleanField(default=True, verbose_name='Remote present')),
                 ('date_last_login', models.DateTimeField(null=True, verbose_name='Date login')),
                 ('username', models.CharField(blank=True, db_index=True, max_length=32, verbose_name='Username')),
                 ('address_last_login', models.CharField(default='', max_length=39, verbose_name='Address login')),

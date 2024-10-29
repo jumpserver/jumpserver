@@ -5,6 +5,11 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .account import AccountAssetSerializer as _AccountAssetSerializer
 from .base import BaseAccountSerializer
 
+__all__ = [
+    'GatheredAccountSerializer',
+    'GatheredAccountActionSerializer',
+]
+
 
 class AccountAssetSerializer(_AccountAssetSerializer):
     class Meta(_AccountAssetSerializer.Meta):
@@ -21,9 +26,15 @@ class GatheredAccountSerializer(BulkOrgResourceModelSerializer):
             'date_updated', 'address_last_login',
             'date_last_login', 'status'
         ]
+        read_only_fields = fields
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related('asset', 'asset__platform')
         return queryset
+
+
+class GatheredAccountActionSerializer(GatheredAccountSerializer):
+    class Meta(GatheredAccountSerializer.Meta):
+        read_only_fields = list(set(GatheredAccountSerializer.Meta.read_only_fields) - {'status'})

@@ -90,7 +90,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     continue
                 GatheredAccount.sync_accounts(gathered_accounts)
 
-
     def run(self, *args, **kwargs):
         super().run(*args, **kwargs)
         users, change_info = self.generate_send_users_and_change_info()

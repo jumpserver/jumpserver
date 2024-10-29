@@ -42,7 +42,6 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
     search_fields = ('username',)
-    filterset_class = AccountRiskFilterSet
     serializer_classes = {
         'default': serializers.AccountRiskSerializer,
     }
