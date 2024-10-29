@@ -5,8 +5,16 @@ ARG TARGETARCH
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget                          \
+        g++                           \
+        make                          \
         cron                          \
-        gettext"
+        pkg-config                    \
+        default-libmysqlclient-dev    \
+        freetds-dev                   \
+        gettext                       \
+        libkrb5-dev                   \
+        libldap2-dev                  \
+        libsasl2-dev"
 
 ARG APT_MIRROR=http://deb.debian.org
 
@@ -48,8 +56,9 @@ RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && python3 -m venv /opt/py3 \
     && pip install poetry -i ${PIP_MIRROR} \
-    && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
+    && poetry config virtualenvs.create false \
+    && poetry config repositories.pypi ${PIP_MIRROR} \
     && poetry install --only main \
     && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
     && bash clean_site_packages.sh
