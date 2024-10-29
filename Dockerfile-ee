@@ -29,5 +29,6 @@ RUN set -ex \
     && . /opt/py3/bin/activate \
     && pip install poetry -i ${PIP_MIRROR} \
     && poetry config repositories.pypi ${PIP_MIRROR} \
-    && poetry install --only xpack
+    && poetry install --only xpack \
+    && poetry cache clear pypi --all
 
