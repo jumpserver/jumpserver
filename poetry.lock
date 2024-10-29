@@ -415,7 +415,7 @@ description = "\"Consistent Ansible Python API and CLI with container and proces
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "2.4.0.1.zip", hash = "sha256:2753fc458afc047c637473a579154e92cd26b891a6d959e5083d36e4d478182a"},
+    {file = "2.4.0.1.zip", hash = "sha256:91df951047fae004f30f7a8b6b776940f44832a7646ecc5ff2cc15e4a887c47e"},
 ]
 
 [package.dependencies]
