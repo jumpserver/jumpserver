@@ -28,6 +28,7 @@ ARG DEPENDENCIES="                    \
 
 ARG TOOLS="                           \
         ca-certificates               \
+        default-libmysqlclient-dev    \
         openssh-client                \
         sshpass                       \
         bubblewrap"
