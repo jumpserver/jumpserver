@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
 import io
+import os
+
 import paramiko
-from jms_storage.base import ObjectStorage
+
+from .base import ObjectStorage
 
 
 class SFTPStorage(ObjectStorage):

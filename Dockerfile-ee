@@ -28,5 +28,6 @@ COPY poetry.lock pyproject.toml ./
 RUN set -ex \
     && . /opt/py3/bin/activate \
     && pip install poetry -i ${PIP_MIRROR} \
+    && poetry config repositories.pypi ${PIP_MIRROR} \
     && poetry install --only xpack
 
