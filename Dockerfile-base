@@ -59,6 +59,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && . /opt/py3/bin/activate \
     && poetry config virtualenvs.create false \
     && poetry config repositories.pypi ${PIP_MIRROR} \
-    && poetry install --only main \
+    && poetry install --no-cache --only main \
     && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
-    && bash clean_site_packages.sh
+    && bash clean_site_packages.sh \
+    && poetry cache clear pypi --all
