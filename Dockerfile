@@ -27,6 +27,7 @@ ARG DEPENDENCIES="                    \
         libx11-dev"
 
 ARG TOOLS="                           \
+        cron                          \
         ca-certificates               \
         openssh-client                \
         sshpass                       \
