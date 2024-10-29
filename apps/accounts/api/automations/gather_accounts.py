@@ -60,7 +60,11 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     def status(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.status = request.data.get('status')
-        instance.save()
+        instance.save(update_fields=['status'])
+
+        if instance.status == 'confirmed':
+            GatheredAccount.sync_accounts([instance])
+
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False, url_path='discover')
@@ -74,18 +78,17 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
             'assets': [asset_id],
             'nodes': [],
             'type': 'gather_accounts',
-            'is_sync_account': True,
+            'is_sync_account': False,
             'name': 'Adhoc gather accounts: {}'.format(asset_id),
         }
         execution.save()
         execution.start()
         accounts = self.model.objects.filter(asset=asset)
-        serializer = self.get_serializer(accounts, many=True)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return self.get_paginated_response_from_queryset(accounts)
 
     @action(methods=['post'], detail=False, url_path='sync-accounts')
     def sync_accounts(self, request, *args, **kwargs):
         gathered_account_ids = request.data.get('gathered_account_ids')
-        gathered_accounts = self.model.objects.filter(id__in=gathered_account_ids)
+        gathered_accounts = self.model.objects.filter(id__in=gathered_account_ids).filter(status='')
         self.model.sync_accounts(gathered_accounts)
         return Response(status=status.HTTP_201_CREATED)

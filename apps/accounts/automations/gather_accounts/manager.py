@@ -71,6 +71,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
     def update_or_create_accounts(self):
         for asset, data in self.asset_account_info.items():
+            asset_accounts_usernames = set(asset.accounts.values_list('username', flat=True))
             with (tmp_to_org(asset.org_id)):
                 gathered_accounts = []
                 # 把所有的设置为 present = False, 创建的时候如果有就会更新
@@ -81,7 +82,15 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         defaults=d, asset=asset, username=username,
                     )
                     gathered_accounts.append(gathered_account)
-                # 不存在的标识为待处理
+
+                # 账号中不存在的标识为待处理的, 有可能是账号那边删除了
+                GatheredAccount.objects \
+                    .filter(asset=asset, present=True) \
+                    .exclude(username__in=asset_accounts_usernames) \
+                    .exclude(status=ConfirmOrIgnore.ignored) \
+                    .update(status='')
+
+                # 远端资产上不存在的，标识为待处理，需要管理员介入
                 GatheredAccount.objects \
                     .filter(asset=asset, present=False) \
                     .exclude(status=ConfirmOrIgnore.ignored) \

@@ -77,7 +77,7 @@ class AccountFilterSet(BaseFilterSet):
         if name == 'latest_discovery':
             kwargs.update({'date_created__gte': date, 'source': 'collected'})
         elif name == 'latest_accessed':
-            kwargs.update({'date_last_access__gte': date})
+            kwargs.update({'date_last_login__gte': date})
         elif name == 'latest_updated':
             kwargs.update({'date_updated__gte': date})
         elif name == 'latest_secret_changed':
@@ -87,7 +87,7 @@ class AccountFilterSet(BaseFilterSet):
             queryset = queryset.filter(date_change_secret__gt=date).exclude(change_secret_status='ok')
 
         if kwargs:
-            queryset = queryset.filter(date_last_access__gte=date)
+            queryset = queryset.filter(date_last_login__gte=date)
         return queryset
 
     @staticmethod
