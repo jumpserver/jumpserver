@@ -22,5 +22,6 @@ elif [[ "$action" == "sleep" ]];then
     echo "Sleep 365 days"
     sleep 365d
 else
+    which cron &>/dev/null && [[ ! -f /var/run/crond.pid ]] && cron || echo ""
     python jms "${action}" "${service}"
 fi
