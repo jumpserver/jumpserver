@@ -46,6 +46,7 @@ RUN set -ex \
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
+ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
 ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
 
 RUN --mount=type=cache,target=/root/.cache \
@@ -55,10 +56,9 @@ RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=requirements/collections.yml,target=collections.yml \
     set -ex \
     && python3 -m venv /opt/py3 \
-    && pip install poetry -i ${PIP_MIRROR} \
+    && pip install poetry poetry-plugin-pypi-mirror -i ${PIP_MIRROR} \
     && . /opt/py3/bin/activate \
     && poetry config virtualenvs.create false \
-    && poetry config repositories.pypi ${PIP_MIRROR} \
     && poetry install --no-cache --only main \
     && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
     && bash clean_site_packages.sh \
