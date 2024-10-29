@@ -46,7 +46,9 @@ RUN set -ex \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
     && echo "no" | dpkg-reconfigure dash \
     && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "0 3 * * * root find /tmp -type f -mtime +1 -size +1M -exec rm -f {} \; && date > /tmp/clean.log" > /etc/cron.d/cleanup_tmp \
+    && chmod 0644 /etc/cron.d/cleanup_tmp
 
 COPY --from=stage-build /opt /opt
 COPY --from=stage-build /usr/local/bin /usr/local/bin
