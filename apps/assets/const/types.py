@@ -3,6 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from django.conf import settings
+from django.utils.functional import lazy
 from django.utils.translation import gettext as _
 
 from common.db.models import ChoicesMixin
@@ -29,14 +30,14 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def choices(cls):
+        return lazy(cls.get_choices, list)()
+
+    @classmethod
+    def get_choices(cls):
         choices = []
         for tp in cls.includes:
             choices.extend(tp.get_choices())
         return choices
-
-    @classmethod
-    def get_choices(cls):
-        return cls.choices()
 
     @classmethod
     def filter_choices(cls, category):
