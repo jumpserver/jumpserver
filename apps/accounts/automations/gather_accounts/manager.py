@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 
 from accounts.const import AutomationTypes
@@ -61,6 +62,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         return data
 
     def on_host_success(self, host, result):
+        print("Result: ")
+        print(json.dumps(result, indent=4))
+        print(">>>>>>>>>>>>>>>>.")
         info = self.get_nested_info(result, 'debug', 'res', 'info')
         asset = self.host_asset_mapper.get(host)
         if asset and info:
@@ -69,9 +73,28 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         else:
             print(f'\033[31m Not found {host} info \033[0m\n')
 
+    @staticmethod
+    def update_gather_accounts_status(asset):
+        """
+        对于资产上不存在的账号，标识为待处理
+        对于账号中不存在的，标识为待处理
+        """
+        asset_accounts_usernames = asset.accounts.values_list('username', flat=True)
+        # 账号中不存在的标识为待处理的, 有可能是账号那边删除了
+        GatheredAccount.objects \
+            .filter(asset=asset, present=True) \
+            .exclude(username__in=asset_accounts_usernames) \
+            .exclude(status=ConfirmOrIgnore.ignored) \
+            .update(status='')
+
+        # 远端资产上不存在的，标识为待处理，需要管理员介入
+        GatheredAccount.objects \
+            .filter(asset=asset, present=False) \
+            .exclude(status=ConfirmOrIgnore.ignored) \
+            .update(status='')
+
     def update_or_create_accounts(self):
         for asset, data in self.asset_account_info.items():
-            asset_accounts_usernames = set(asset.accounts.values_list('username', flat=True))
             with (tmp_to_org(asset.org_id)):
                 gathered_accounts = []
                 # 把所有的设置为 present = False, 创建的时候如果有就会更新
@@ -83,21 +106,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     )
                     gathered_accounts.append(gathered_account)
 
-                # 账号中不存在的标识为待处理的, 有可能是账号那边删除了
-                GatheredAccount.objects \
-                    .filter(asset=asset, present=True) \
-                    .exclude(username__in=asset_accounts_usernames) \
-                    .exclude(status=ConfirmOrIgnore.ignored) \
-                    .update(status='')
-
-                # 远端资产上不存在的，标识为待处理，需要管理员介入
-                GatheredAccount.objects \
-                    .filter(asset=asset, present=False) \
-                    .exclude(status=ConfirmOrIgnore.ignored) \
-                    .update(status='')
-                if not self.is_sync_account:
-                    continue
-                GatheredAccount.sync_accounts(gathered_accounts)
+                self.update_gather_accounts_status(asset)
+                GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
 
     def run(self, *args, **kwargs):
         super().run(*args, **kwargs)
@@ -115,7 +125,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             return users, None
 
         asset_ids = self.asset_username_mapper.keys()
-
         assets = Asset.objects.filter(id__in=asset_ids).prefetch_related('accounts')
         gather_accounts = GatheredAccount.objects.filter(asset_id__in=asset_ids, present=True)
 

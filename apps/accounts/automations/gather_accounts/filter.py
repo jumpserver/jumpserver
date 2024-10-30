@@ -5,7 +5,7 @@ from django.utils import timezone
 __all__ = ['GatherAccountsFilter']
 
 
-# TODO 后期会挪到playbook中
+# TODO 后期会挪到 playbook 中
 class GatherAccountsFilter:
 
     def __init__(self, tp):

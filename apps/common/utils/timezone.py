@@ -37,9 +37,11 @@ def local_monday():
     return zero_hour_time - timedelta(zero_hour_time.weekday())
 
 
-def is_date_difference_than(d1, d2, threshold='1d'):
-    if d1 is None or d2 is None:
+def is_date_more_than(d1, d2, threshold='1d'):
+    if d1 is None:
         return False
+    if d2 is None:
+        return True
 
     kwargs = {}
     if 'd' in threshold:
@@ -52,8 +54,7 @@ def is_date_difference_than(d1, d2, threshold='1d'):
         raise ValueError('Invalid threshold format')
 
     delta = dj_timezone.timedelta(**kwargs)
-
-    return abs((time1 - time2).days) > threshold_in_days
+    return d1 - d2 > delta
 
 
 _rest_dt_field = DateTimeField()

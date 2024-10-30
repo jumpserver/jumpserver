@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="gatheredaccount",
-            name="action",
+            name="status",
             field=models.CharField(
                 choices=[("confirmed", "Confirmed"), ("ignored", "Ignored")],
                 default="",
