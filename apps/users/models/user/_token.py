@@ -36,8 +36,8 @@ class TokenMixin:
         self.delete_private_token()
         return self.create_private_token()
 
-    def create_bearer_token(self, request=None):
-        expiration = settings.TOKEN_EXPIRATION or 3600
+    def create_bearer_token(self, request=None, age=None):
+        expiration = age or settings.TOKEN_EXPIRATION or 3600
         if request:
             remote_addr = request.META.get("REMOTE_ADDR", "")
         else:

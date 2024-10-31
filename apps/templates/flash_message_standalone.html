@@ -16,7 +16,7 @@
             {% if error %}
                 {{ error }}
             {% else %}
-                {{ message|safe }}
+                {{ message | safe }}
             {% endif %}
             </div>
         </p>
@@ -52,6 +52,7 @@
     {% else %}
         message = '{{ message|safe }}'
     {% endif %}
+    var redirect_url = '{{ redirect_url }}'
 
     function redirect_page() {
         if (time >= 0) {
@@ -60,7 +61,7 @@
             time -= ttl;
             setTimeout(redirect_page, ttl * 1000);
         } else {
-            window.location.href = "{{ redirect_url }}";
+            window.location.href = redirect_url
         }
     }
     {% if auto_redirect %}
