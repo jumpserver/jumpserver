@@ -6,10 +6,11 @@ from rest_framework import serializers
 from common.serializers.fields import ReadableHiddenField, LabeledChoiceField, EncryptedField
 from common.serializers.mixin import CommonBulkModelSerializer
 from ops.const import FieldType
-from ops.models import Variable, AdHoc, Job
+from ops.models import Variable, AdHoc, Job, Playbook
 
 __all__ = [
-    'VariableSerializer', 'AdhocVariableSerializer', 'JobVariableSerializer', 'VariableFormDataSerializer'
+    'VariableSerializer', 'AdhocVariableSerializer', 'JobVariableSerializer', 'PlaybookVariableSerializer',
+    'VariableFormDataSerializer'
 ]
 
 
@@ -50,7 +51,7 @@ class VariableSerializer(CommonBulkModelSerializer):
 
     @classmethod
     def setup_eager_loading(cls, queryset):
-        queryset = queryset.prefetch_related('adhoc', 'job')
+        queryset = queryset.prefetch_related('adhoc', 'job', 'playbook')
         return queryset
 
 
@@ -63,6 +64,13 @@ class AdhocVariableSerializer(VariableSerializer):
 
 class JobVariableSerializer(VariableSerializer):
     job = serializers.PrimaryKeyRelatedField(queryset=Job.objects, required=False)
+
+    class Meta(VariableSerializer.Meta):
+        fields = VariableSerializer.Meta.fields
+
+
+class PlaybookVariableSerializer(VariableSerializer):
+    playbook = serializers.PrimaryKeyRelatedField(queryset=Playbook.objects, required=False)
 
     class Meta(VariableSerializer.Meta):
         fields = VariableSerializer.Meta.fields
