@@ -51,6 +51,7 @@ class JobViewSet(OrgBulkModelViewSet):
     filterset_fields = ('name', 'type')
     search_fields = ('name', 'comment')
     model = Job
+    _parameters = None
 
     def check_permissions(self, request):
         # job: upload_file
@@ -90,6 +91,7 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
+        self._parameters = serializer.validated_data.pop('parameters', None)
         nodes = serializer.validated_data.pop('nodes', [])
         assets = serializer.validated_data.get('assets', [])
         assets = merge_nodes_and_assets(nodes, assets, self.request.user)
@@ -109,6 +111,8 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def run_job(self, job, serializer):
         execution = job.create_execution()
+        if self._parameters:
+            execution.parameters = JobExecutionSerializer.validate_parameters(self._parameters)
         execution.creator = self.request.user
         execution.save()
 

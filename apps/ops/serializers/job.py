@@ -20,6 +20,8 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
     assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True, required=False)
     nodes = ObjectRelatedField(label=_('Nodes'), queryset=Node.objects, many=True, required=False)
     variable = JobVariableSerializer(many=True, required=False, allow_null=True, label=_('Variable'))
+    parameters = serializers.JSONField(label=_('Parameters'), default={}, write_only=True, required=False,
+                                       allow_null=True)
 
     def to_internal_value(self, data):
         instant = data.get('instant', False)
@@ -50,7 +52,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
             "use_parameter_define", "parameters_define",
             "timeout", "chdir", "comment", "summary",
             "is_periodic", "interval", "crontab", "nodes",
-            "run_after_save"
+            "run_after_save", "parameters"
         ] + fields_m2m
         extra_kwargs = {
             'average_time_cost': {'label': _('Duration')},
@@ -102,7 +104,8 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(_("You do not have permission for the current job."))
         return job_obj
 
-    def validate_parameters(self, parameters):
+    @staticmethod
+    def validate_parameters(parameters):
         prefix = "jms_"
         new_parameters = {}
         for key, value in parameters.items():
