@@ -15,7 +15,7 @@
         ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
         ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert }}"
         filter: users
       register: db_info
 

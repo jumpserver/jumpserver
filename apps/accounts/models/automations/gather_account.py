@@ -9,7 +9,7 @@ from common.utils.timezone import is_date_more_than
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
-__all__ = ['GatherAccountsAutomation', 'GatheredAccount']
+__all__ = ['GatherAccountsAutomation', 'GatheredAccount', 'GatheredAccountDiff']
 
 
 class GatheredAccountDiff(models.Model):
@@ -27,7 +27,7 @@ class GatheredAccount(JMSOrgBaseModel):
     address_last_login = models.CharField(max_length=39, default='', verbose_name=_("Address login"))
     status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
     authorized_keys = models.TextField(default='', blank=True, verbose_name=_("Authorized keys"))
-    sudo = models.TextField(default=False, verbose_name=_("Sudo"))
+    sudoers = models.TextField(default=False, verbose_name=_("Sudoers"))
     groups = models.TextField(default='', blank=True, verbose_name=_("Groups"))
 
     @property

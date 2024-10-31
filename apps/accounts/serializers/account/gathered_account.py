@@ -24,6 +24,7 @@ class GatheredAccountSerializer(BulkOrgResourceModelSerializer):
         fields = [
             'id', 'present', 'asset', 'username',
             'date_updated', 'address_last_login',
+            'groups', 'sudoers', 'authorized_keys',
             'date_last_login', 'status'
         ]
         read_only_fields = fields

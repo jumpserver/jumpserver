@@ -1,5 +1,3 @@
-import re
-
 from django.utils import timezone
 
 __all__ = ['GatherAccountsFilter']
@@ -7,7 +5,6 @@ __all__ = ['GatherAccountsFilter']
 
 # TODO 后期会挪到 playbook 中
 class GatherAccountsFilter:
-
     def __init__(self, tp):
         self.tp = tp
 
@@ -29,26 +26,58 @@ class GatherAccountsFilter:
 
     @staticmethod
     def posix_filter(info):
-        username_pattern = re.compile(r'^(\S+)')
-        ip_pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-        login_time_pattern = re.compile(r'\w{3} \w{3}\s+\d{1,2} \d{2}:\d{2}:\d{2} \d{4}')
-        result = {}
-        for line in info:
-            usernames = username_pattern.findall(line)
-            username = ''.join(usernames)
-            if username:
-                result[username] = {}
-            else:
+        user_groups = info.pop('user_groups', [])
+        username_groups = {}
+        for line in user_groups:
+            if ':' not in line:
                 continue
-            ip_addrs = ip_pattern.findall(line)
-            ip_addr = ''.join(ip_addrs)
-            if ip_addr:
-                result[username].update({'address': ip_addr})
-            login_times = login_time_pattern.findall(line)
-            if login_times:
-                datetime_str = login_times[0].split(' ', 1)[1] + " +0800"
-                date = timezone.datetime.strptime(datetime_str, '%b %d %H:%M:%S %Y %z')
-                result[username].update({'date': date})
+            username, groups = line.split(':', 1)
+            username_groups[username.strip()] = groups.strip()
+
+        user_sudo = info.pop('user_sudo', [])
+        username_sudo = {}
+        for line in user_sudo:
+            if ':' not in line:
+                continue
+            username, sudo = line.split(':', 1)
+            if not sudo.strip():
+                continue
+            username_sudo[username.strip()] = sudo.strip()
+
+        user_authorized = info.pop('user_authorized', [])
+        username_authorized = {}
+        for line in user_authorized:
+            if ':' not in line:
+                continue
+            username, authorized = line.split(':', 1)
+            username_authorized[username.strip()] = authorized.strip()
+
+        result = {}
+        users = info.pop('users', '')
+        for line in users:
+            parts = line.split()
+            if len(parts) < 4:
+                continue
+
+            username = parts[0]
+            if not username:
+                continue
+            user = dict()
+            address = parts[2]
+            user['address_last_login'] = address
+            login_time = parts[3]
+
+            try:
+                login_date = timezone.datetime.fromisoformat(login_time)
+                user['date_last_login'] = login_date
+            except ValueError:
+                pass
+
+            user['groups'] = username_groups.get(username)
+            user['sudoers'] = username_sudo.get(username)
+            user['authorized_keys'] = username_authorized.get(username)
+
+            result[username] = user
         return result
 
     @staticmethod

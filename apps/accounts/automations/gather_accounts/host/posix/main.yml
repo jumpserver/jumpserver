@@ -10,7 +10,7 @@
     - name: Gather posix account
       ansible.builtin.shell: |
         for user in {{ users.stdout_lines | join(" ") }}; do
-          k=$(last --time-format iso $user -1 | head -1 | grep -v ^$ | awk '{ print $0 }')
+          k=$(last -i --time-format iso -1 ${user} | head -1 | grep -v ^$ )
           if [ -n "$k" ]; then
             echo $k
           fi
@@ -24,7 +24,7 @@
         done
       register: user_groups
 
-    - name: Get sudo permissions
+    - name: Get sudoers
       ansible.builtin.shell: |
         for user in {{ users.stdout_lines | join(" ") }}; do
           echo "$user: $(grep "^$user " /etc/sudoers | tr '\n' ';' || echo '')"
@@ -43,22 +43,12 @@
         done
       register: user_authorized
 
-    - name: Display user groups
-      ansible.builtin.debug:
-        var: user_groups.stdout_lines
+    - set_fact:
+        info:
+          users: "{{ last_login.stdout_lines }}"
+          user_groups: "{{ user_groups.stdout_lines }}"
+          user_sudo: "{{ user_sudo.stdout_lines }}"
+          user_authorized: "{{ user_authorized.stdout_lines }}"
 
-    - name: Display sudo permissions
-      ansible.builtin.debug:
-        var: user_sudo.stdout_lines
-
-    - name: Display authorized keys
-      ansible.builtin.debug:
-        var: user_authorized.stdout_lines
-
-    - name: Display last login
-      ansible.builtin.debug:
-        var: last_login.stdout_lines
-
-    - name: Define info by set_fact
-      ansible.builtin.set_fact:
-        var: last_login.stdout_lines
+    - debug:
+        var: info
