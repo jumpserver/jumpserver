@@ -354,7 +354,8 @@ class JobExecution(JMSOrgBaseModel):
             runner = PlaybookRunner(
                 self.inventory_path,
                 self.current_job.playbook.entry,
-                self.private_dir
+                self.private_dir,
+                extra_vars=extra_vars,
             )
         elif self.current_job.type == Types.upload_file:
             job_id = self.current_job.id

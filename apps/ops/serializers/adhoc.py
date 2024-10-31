@@ -1,11 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
-from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import WritableNestedModelSerializer
-from common.serializers.fields import ReadableHiddenField, ObjectRelatedField
+from common.serializers.fields import ReadableHiddenField
 from common.serializers.mixin import CommonBulkModelSerializer
 from .mixin import ScopeSerializerMixin
 from ..models import AdHoc
