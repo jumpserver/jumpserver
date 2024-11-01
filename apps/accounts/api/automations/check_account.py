@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.const import AutomationTypes
@@ -13,7 +10,7 @@ from .base import AutomationExecutionViewSet
 
 __all__ = [
     'CheckAccountsAutomationViewSet', 'CheckAccountExecutionViewSet',
-    'AccountRiskViewSet'
+    'AccountRiskViewSet', 'AccountCheckEngineViewSet',
 ]
 
 
@@ -49,9 +46,26 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
         'sync_accounts': 'assets.add_AccountRisk',
     }
 
-    @action(methods=['post'], detail=False, url_path='sync-accounts')
-    def sync_accounts(self, request, *args, **kwargs):
-        gathered_account_ids = request.data.get('gathered_account_ids')
-        gathered_accounts = self.model.objects.filter(id__in=gathered_account_ids)
-        self.model.sync_accounts(gathered_accounts)
-        return Response(status=status.HTTP_201_CREATED)
+
+class AccountCheckEngineViewSet(OrgBulkModelViewSet):
+    search_fields = ('name',)
+    serializer_class = serializers.AccountCheckEngineSerializer
+    rbac_perms = {
+        'list': 'assets.view_accountcheckautomation',
+    }
+
+    def get_queryset(self):
+        return [
+            {
+                'id': 1,
+                'name': 'check_gathered_account',
+                'display_name': '检查发现的账号',
+                'description': '基于自动发现的账号结果进行检查分析 '
+            },
+            {
+                'id': 2,
+                'name': 'check_account_secret',
+                'display_name': '检查账号密码强弱',
+                'description': '基于账号密码的安全性进行检查分析'
+            }
+        ]

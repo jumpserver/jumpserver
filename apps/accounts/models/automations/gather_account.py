@@ -20,7 +20,8 @@ class GatheredAccountDiff(models.Model):
 
 
 class GatheredAccount(JMSOrgBaseModel):
-    present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 资产上是否还存在
+    remote_present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 远端资产上是否还存在
+    present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在
     date_last_login = models.DateTimeField(null=True, verbose_name=_("Date login"))
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_("Asset"))
     username = models.CharField(max_length=32, blank=True, db_index=True, verbose_name=_('Username'))

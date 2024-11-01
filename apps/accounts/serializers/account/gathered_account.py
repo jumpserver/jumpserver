@@ -22,9 +22,10 @@ class GatheredAccountSerializer(BulkOrgResourceModelSerializer):
     class Meta(BaseAccountSerializer.Meta):
         model = GatheredAccount
         fields = [
-            'id', 'present', 'asset', 'username',
+            'id', 'asset', 'username',
             'date_updated', 'address_last_login',
             'groups', 'sudoers', 'authorized_keys',
+            'remote_present', 'present',
             'date_last_login', 'status'
         ]
         read_only_fields = fields

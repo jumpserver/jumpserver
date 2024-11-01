@@ -59,7 +59,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for username, info in result.items():
             self.asset_usernames_mapper[asset].add(username)
 
-            d = {'asset': asset, 'username': username, 'present': True, **info}
+            d = {'asset': asset, 'username': username, 'remote_present': True, **info}
             if len(d['address_last_login']) > 32:
                 d['address_last_login'] = d['address_last_login'][:32]
             accounts.append(d)
@@ -112,11 +112,11 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         # 新增创建，不用处理状态
 
         # 远端上 比 收集账号少的
-        # 标识 present=False, 标记为待处理
+        # 标识 remote_present=False, 标记为待处理
         # 远端资产上不存在的，标识为待处理，需要管理员介入
         lost_users = ori_ga_users - remote_users
         if lost_users:
-            queryset.filter(username__in=lost_users).update(status='', present=False)
+            queryset.filter(username__in=lost_users).update(status='', remote_present=False)
 
         # 收集的账号 比 账号列表多的, 有可能是账号中删掉了, 但这时候状态已经是 confirm 了
         # 标识状态为 待处理, 让管理员去确认
@@ -128,18 +128,21 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         # 这个好像不不用对比，原始情况就这样
 
         # 远端账号 比 账号列表少的
-        # 创建收集账号，标识 present=False, 状态待处理
+        # 创建收集账号，标识 remote_present=False, 状态待处理
 
         # 远端账号 比 账号列表多的
         # 正常情况, 不用处理，因为远端账号会创建到收集账号，收集账号再去对比
-        
-        # 远端存在的账号，标识为已存在
-        queryset.filter(username__in=remote_users, present=False).update(present=True)
 
         # 不过这个好像也处理一下 status，因为已存在，这是状态应该是确认
         (queryset.filter(username__in=ori_users)
          .exclude(status=ConfirmOrIgnore.confirmed)
          .update(status=ConfirmOrIgnore.confirmed))
+        
+        # 远端存在的账号，标识为已存在
+        queryset.filter(username__in=remote_users, remote_present=False).update(remote_present=True)
+
+        # 资产上没有的，标识为为存在
+        queryset.exclude(username__in=ori_users).filter(present=False).update(present=True)
 
     def batch_create_gathered_account(self, d, batch_size=20):
         if d is None:
@@ -222,7 +225,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
         asset_ids = self.asset_usernames_mapper.keys()
         assets = Asset.objects.filter(id__in=asset_ids).prefetch_related('accounts')
-        gather_accounts = GatheredAccount.objects.filter(asset_id__in=asset_ids, present=True)
+        gather_accounts = GatheredAccount.objects.filter(asset_id__in=asset_ids, remote_present=True)
 
         asset_id_map = {str(asset.id): asset for asset in assets}
         asset_id_username = list(assets.values_list('id', 'accounts__username'))
