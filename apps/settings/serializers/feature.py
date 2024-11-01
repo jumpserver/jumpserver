@@ -3,12 +3,13 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import VaultTypeChoices
 from assets.const import Protocol
 from common.serializers.fields import EncryptedField
 
 __all__ = [
-    'AnnouncementSettingSerializer', 'OpsSettingSerializer',
-    'VaultSettingSerializer', 'TicketSettingSerializer',
+    'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
+    'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'VirtualAppSerializer',
 ]
 
@@ -40,19 +41,13 @@ class AnnouncementSettingSerializer(serializers.Serializer):
 
 
 class VaultSettingSerializer(serializers.Serializer):
-    PREFIX_TITLE = _('HCP Vault')
+    PREFIX_TITLE = _('Vault')
 
     VAULT_ENABLED = serializers.BooleanField(
         required=False, label=_('Enable Vault'), read_only=True
     )
-    VAULT_HCP_HOST = serializers.CharField(
-        max_length=256, allow_blank=True, required=False, label=_('Host')
-    )
-    VAULT_HCP_TOKEN = EncryptedField(
-        max_length=256, allow_blank=True, required=False, label=_('Token'), default=''
-    )
-    VAULT_HCP_MOUNT_POINT = serializers.CharField(
-        max_length=256, allow_blank=True, required=False, label=_('Mount Point')
+    VAULT_BACKEND = serializers.ChoiceField(
+        choices=VaultTypeChoices.choices, default=VaultTypeChoices.local, label=_('Vault provider')
     )
 
     HISTORY_ACCOUNT_CLEAN_LIMIT = serializers.IntegerField(
@@ -64,6 +59,35 @@ class VaultSettingSerializer(serializers.Serializer):
             'check and delete historical accounts that exceed the predetermined number. '
             'If the value reaches or exceeds 999, no historical account deletion will be performed.'
         )
+    )
+
+
+class HashicorpKVSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Vault')
+    VAULT_HCP_HOST = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Host')
+    )
+    VAULT_HCP_TOKEN = EncryptedField(
+        max_length=256, allow_blank=True, required=False, label=_('Token'), default=''
+    )
+    VAULT_HCP_MOUNT_POINT = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Mount Point')
+    )
+
+
+class AzureKVSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Vault')
+    VAULT_AZURE_HOST = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Host')
+    )
+    VAULT_AZURE_CLIENT_ID = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, label=_('Client ID')
+    )
+    VAULT_AZURE_CLIENT_SECRET = EncryptedField(
+        max_length=4096, allow_blank=True, required=False, label=_('Client Secret'), default=''
+    )
+    VAULT_AZURE_TENANT_ID = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, label=_('Tenant ID')
     )
 
 

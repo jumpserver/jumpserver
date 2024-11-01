@@ -15,8 +15,8 @@ from .auth import (
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
 from .feature import (
-    AnnouncementSettingSerializer, OpsSettingSerializer, VaultSettingSerializer,
-    TicketSettingSerializer, ChatAISettingSerializer, VirtualAppSerializer
+    AnnouncementSettingSerializer, OpsSettingSerializer, VaultSettingSerializer, AzureKVSerializer,
+    HashicorpKVSerializer, TicketSettingSerializer, ChatAISettingSerializer, VirtualAppSerializer
 )
 from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
@@ -99,6 +99,8 @@ class SettingsSerializer(
     AnnouncementSettingSerializer,
     OpsSettingSerializer,
     VaultSettingSerializer,
+    AzureKVSerializer,
+    HashicorpKVSerializer,
     TicketSettingSerializer,
     VirtualAppSerializer,
 ):

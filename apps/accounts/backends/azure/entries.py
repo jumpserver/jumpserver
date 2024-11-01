@@ -16,14 +16,7 @@ class BaseEntry(ABC):
 
     @lazyproperty
     def full_path(self):
-        path_base = self.path_base
-        path_spec = self.path_spec
-        path = f'{path_base}-{path_spec}'
-        return path
-
-    @property
-    def path_base(self):
-        raise NotImplementedError
+        return self.path_spec
 
     @property
     def path_spec(self):
