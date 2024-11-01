@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from azure.core.exceptions import ResourceNotFoundError
+from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
 from azure.identity import ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
 
@@ -22,34 +22,43 @@ class AZUREVaultClient(object):
         )
         self.client = SecretClient(vault_url=vault_url, credential=credentials)
 
+    def is_active(self):
+        try:
+            self.client.set_secret('jumpserver', '666')
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
+            logger.error(str(e))
+            return False, f'Vault is not reachable: {e}'
+        else:
+            return True, ''
+
     def get(self, name, version=None):
         try:
             secret = self.client.get_secret(name, version)
             return secret.value
-        except ResourceNotFoundError as e:
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'get: {name} {str(e)}')
             return ''
 
     def create(self, name, secret):
         try:
             self.client.set_secret(name, secret)
-        except ResourceNotFoundError as e:
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'create: {name} {str(e)}')
 
     def update(self, name, secret):
         try:
             self.client.set_secret(name, secret)
-        except ResourceNotFoundError as e:
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'update: {name} {str(e)}')
 
     def delete(self, name):
         try:
             self.client.begin_delete_secret(name)
-        except ResourceNotFoundError as e:
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'delete: {name} {str(e)}')
 
     def update_metadata(self, name, metadata: dict):
         try:
             self.client.update_secret_properties(name, tags=metadata)
-        except ResourceNotFoundError as e:
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'update_metadata: {name} {str(e)}')

@@ -19,27 +19,27 @@ class Vault(BaseVault):
         )
 
     def is_active(self):
-        return True, ''
+        return self.client.is_active()
 
     def _get(self, instance):
         entry = build_entry(instance)
-        secret = self.client.get(name=entry.full_name)
+        secret = self.client.get(name=entry.full_path)
         secret = entry.to_external_data(secret)
         return secret
 
     def _create(self, instance):
         entry = build_entry(instance)
         secret = entry.to_internal_data()
-        self.client.create(name=entry.full_name, secret=secret)
+        self.client.create(name=entry.full_path, secret=secret)
 
     def _update(self, instance):
         entry = build_entry(instance)
         secret = entry.to_internal_data()
-        self.client.update(name=entry.full_name, secret=secret)
+        self.client.update(name=entry.full_path, secret=secret)
 
     def _delete(self, instance):
         entry = build_entry(instance)
-        self.client.delete(name=entry.full_name)
+        self.client.delete(name=entry.full_path)
 
     def _clean_db_secret(self, instance):
         instance.is_sync_metadata = False
