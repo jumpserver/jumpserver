@@ -1,28 +1,24 @@
-name: Post Release to Discord
+name: Publish Release to Discord
 
 on:
   release:
     types: [published]
 
 jobs:
-  post-release-to-discord:
+  send_discord_notification:
     runs-on: ubuntu-latest
-
+    if: startsWith(github.event.release.tag_name, 'v4.')
     steps:
-      - name: Check if release tag starts with v4
-        id: check_tag
+      - name: Send release notification to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_CHANGELOG_WEBHOOK }}
         run: |
-          if [[ "${{ github.event.release.tag_name }}" == v4* ]]; then
-            echo "Tag starts with v4"
-            echo "::set-output name=send_message::true"
-          else
-            echo "Tag does not start with v4"
-            echo "::set-output name=send_message::false"
-          fi
+          # 获取标签名称和 release body
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
 
-      - name: Post release to Discord
-        if: steps.check_tag.outputs.send_message == 'true'
-        run: |
-          curl -H "Content-Type: application/json" -d \
-          "{\"content\": \"JumpServer ${{ github.event.release.tag_name }} Released! 🚀\\n${{ github.event.release.body }}\"}" \
-          $DISCORD_CHANGELOG_WEBHOOK
+          # 使用 jq 构建 JSON 数据，以确保安全传递
+          JSON_PAYLOAD=$(jq -n --arg tag "# JumpServer $TAG_NAME Released! 🚀" --arg body "$RELEASE_BODY" '{content: "\($tag)\n\($body)"}')
+
+          # 使用 curl 发送 JSON 数据
+          curl -X POST -H "Content-Type: application/json" -d "$JSON_PAYLOAD" "$WEBHOOK_URL"
