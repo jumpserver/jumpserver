@@ -56,14 +56,8 @@ class AccountTemplateEntry(BaseEntry):
 class HistoricalAccountEntry(BaseEntry):
 
     @property
-    def path_base(self):
-        account = self.instance.instance
-        path = f'accounts-{account.id}'
-        return path
-
-    @property
     def path_spec(self):
-        path = f'histories-{self.instance.history_id}'
+        path = f'accounts-{self.instance.instance.id}-histories-{self.instance.history_id}'
         return path
 
 
