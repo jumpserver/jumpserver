@@ -1,0 +1,28 @@
+name: Post Release to Discord
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  post-release-to-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if release tag starts with v4
+        id: check_tag
+        run: |
+          if [[ "${{ github.event.release.tag_name }}" == v4* ]]; then
+            echo "Tag starts with v4"
+            echo "::set-output name=send_message::true"
+          else
+            echo "Tag does not start with v4"
+            echo "::set-output name=send_message::false"
+          fi
+
+      - name: Post release to Discord
+        if: steps.check_tag.outputs.send_message == 'true'
+        run: |
+          curl -H "Content-Type: application/json" -d \
+          "{\"content\": \"JumpServer ${{ github.event.release.tag_name }} Released! 🚀\\n${{ github.event.release.body }}\"}" \
+          $DISCORD_CHANGELOG_WEBHOOK
