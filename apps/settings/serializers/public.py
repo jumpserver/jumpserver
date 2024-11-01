@@ -66,6 +66,8 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     LOKI_LOG_ENABLED = serializers.BooleanField()
     TOOL_USER_ENABLED = serializers.BooleanField()
 
+    DEFAULT_EXPIRED_YEARS = serializers.IntegerField()
+
 
 class ServerInfoSerializer(serializers.Serializer):
     CURRENT_TIME = serializers.DateTimeField()
