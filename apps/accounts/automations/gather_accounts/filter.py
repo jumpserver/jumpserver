@@ -73,9 +73,9 @@ class GatherAccountsFilter:
             except ValueError:
                 pass
 
-            user['groups'] = username_groups.get(username)
-            user['sudoers'] = username_sudo.get(username)
-            user['authorized_keys'] = username_authorized.get(username)
+            user['groups'] = username_groups.get(username) or ''
+            user['sudoers'] = username_sudo.get(username) or ''
+            user['authorized_keys'] = username_authorized.get(username) or ''
 
             result[username] = user
         return result

@@ -104,29 +104,25 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         ori_users = self.ori_asset_usernames[asset]
         ori_ga_users = self.ori_gathered_usernames[asset]
 
+        queryset = (GatheredAccount.objects
+                    .filter(asset=asset)
+                    .exclude(status=ConfirmOrIgnore.ignored))
+
         # 远端账号 比 收集账号多的
         # 新增创建，不用处理状态
 
         # 远端上 比 收集账号少的
         # 标识 present=False, 标记为待处理
         # 远端资产上不存在的，标识为待处理，需要管理员介入
-        lost_users = ori_users - remote_users
+        lost_users = ori_ga_users - remote_users
         if lost_users:
-            GatheredAccount.objects \
-                .filter(asset=asset, present=True) \
-                .exclude(status=ConfirmOrIgnore.ignored) \
-                .filter(username__in=lost_users) \
-                .update(status='', present=False)
+            queryset.filter(username__in=lost_users).update(status='', present=False)
 
         # 收集的账号 比 账号列表多的, 有可能是账号中删掉了, 但这时候状态已经是 confirm 了
         # 标识状态为 待处理, 让管理员去确认
         ga_added_users = ori_ga_users - ori_users
         if ga_added_users:
-            GatheredAccount.objects \
-                .filter(asset=asset) \
-                .exclude(status=ConfirmOrIgnore.ignored) \
-                .filter(username__in=ga_added_users) \
-                .update(status='')
+            queryset.filter(username__in=ga_added_users).update(status='')
 
         # 收集的账号 比 账号列表少的
         # 这个好像不不用对比，原始情况就这样
@@ -136,6 +132,14 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
         # 远端账号 比 账号列表多的
         # 正常情况, 不用处理，因为远端账号会创建到收集账号，收集账号再去对比
+        
+        # 远端存在的账号，标识为已存在
+        queryset.filter(username__in=remote_users, present=False).update(present=True)
+
+        # 不过这个好像也处理一下 status，因为已存在，这是状态应该是确认
+        (queryset.filter(username__in=ori_users)
+         .exclude(status=ConfirmOrIgnore.confirmed)
+         .update(status=ConfirmOrIgnore.confirmed))
 
     def batch_create_gathered_account(self, d, batch_size=20):
         if d is None:
@@ -153,9 +157,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             self.batch_create_gathered_account(None)
 
     def batch_update_gathered_account(self, ori_account, d, batch_size=20):
-        if ori_account or d is None:
+        if not ori_account or d is None:
             if self.pending_update_accounts:
-                GatheredAccount.objects.bulk_update(self.pending_update_accounts, ['status', 'present'])
+                GatheredAccount.objects.bulk_update(self.pending_update_accounts, [*self.diff_items])
                 self.pending_update_accounts = []
 
             if self.pending_add_diffs:

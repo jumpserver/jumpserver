@@ -27,7 +27,7 @@ class GatheredAccount(JMSOrgBaseModel):
     address_last_login = models.CharField(max_length=39, default='', verbose_name=_("Address login"))
     status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
     authorized_keys = models.TextField(default='', blank=True, verbose_name=_("Authorized keys"))
-    sudoers = models.TextField(default=False, verbose_name=_("Sudoers"))
+    sudoers = models.TextField(default='', verbose_name=_("Sudoers"), blank=True)
     groups = models.TextField(default='', blank=True, verbose_name=_("Groups"))
 
     @property
@@ -55,12 +55,10 @@ class GatheredAccount(JMSOrgBaseModel):
         account_objs = []
         asset_id = gathered_account.asset_id
         username = gathered_account.username
-        access_by = '{}({})'.format('unknown', gathered_account.address_last_login)
         account = Account(
             asset_id=asset_id, username=username,
             name=username, source=Source.COLLECTED,
             date_last_login=gathered_account.date_last_login,
-            access_by=access_by
         )
         account_objs.append(account)
         Account.objects.bulk_create(account_objs)
