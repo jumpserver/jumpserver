@@ -28,6 +28,7 @@ from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from users.models import User
 
+
 __all__ = ['IndexApi']
 
 
