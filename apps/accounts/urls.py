@@ -25,6 +25,7 @@ router.register(r'push-account-automations', api.PushAccountAutomationViewSet, '
 router.register(r'push-account-executions', api.PushAccountExecutionViewSet, 'push-account-execution')
 router.register(r'push-account-records', api.PushAccountRecordViewSet, 'push-account-record')
 router.register(r'account-check-engines', api.AccountCheckEngineViewSet, 'account-check-engine')
+router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 
 urlpatterns = [
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),

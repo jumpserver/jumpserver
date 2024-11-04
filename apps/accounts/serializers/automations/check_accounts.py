@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from accounts.const import AutomationTypes
-from accounts.models import AccountCheckAutomation, AccountRisk
+from accounts.models import AccountCheckAutomation, AccountRisk, RiskChoice
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
 
@@ -12,7 +12,8 @@ logger = get_logger(__file__)
 __all__ = [
     'CheckAccountsAutomationSerializer',
     'AccountRiskSerializer',
-    'AccountCheckEngineSerializer'
+    'AccountCheckEngineSerializer',
+    'AssetRiskSerializer',
 ]
 
 
@@ -20,6 +21,27 @@ class AccountRiskSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountRisk
         fields = '__all__'
+
+
+class RiskSummarySerializer(serializers.Serializer):
+    risk = serializers.CharField(max_length=128)
+    count = serializers.IntegerField()
+
+
+class AssetRiskSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=128, required=False, source='asset__id')
+    name = serializers.CharField(max_length=128, required=False, source='asset__name')
+    address = serializers.CharField(max_length=128, required=False, source='asset__address')
+    platform = serializers.CharField(max_length=128, required=False, source='asset__platform__name')
+    risk_total = serializers.IntegerField()
+    risk_summary = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_risk_summary(obj):
+        summary = {}
+        for risk in RiskChoice.choices:
+            summary[f'{risk[0]}_count'] = obj.get(f'{risk[0]}_count', 0)
+        return summary
 
 
 class CheckAccountsAutomationSerializer(BaseAutomationSerializer):

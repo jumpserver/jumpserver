@@ -1,3 +1,5 @@
+from itertools import islice
+
 from django.db import models
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +9,7 @@ from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 from ...const import AutomationTypes
 
-__all__ = ['AccountCheckAutomation', 'AccountRisk']
+__all__ = ['AccountCheckAutomation', 'AccountRisk', 'RiskChoice']
 
 
 class AccountCheckAutomation(AccountBaseAutomation):
@@ -35,14 +37,22 @@ class AccountCheckAutomation(AccountBaseAutomation):
 
 
 class RiskChoice(TextChoices):
-    zombie = 'zombie', _('Zombie')  # 好久没登录的账号
-    ghost = 'ghost', _('Ghost')  # 未被纳管的账号
+    zombie = 'zombie', _('Long time no login')  # 好久没登录的账号
+    ghost = 'ghost', _('Not managed')  # 未被纳管的账号
+    long_time_password = 'long_time_password', _('Long time no change')
     weak_password = 'weak_password', _('Weak password')
-    longtime_no_change = 'long_time_no_change', _('Long time no change')
+    password_error = 'password_error', _('Password error')
+    password_expired = 'password_expired', _('Password expired')
+    group_changed = 'group_changed', _('Group change')
+    sudo_changed = 'sudo_changed', _('Sudo changed')
+    account_deleted = 'account_deleted', _('Account delete')
+    no_admin_account = 'no_admin_account', _('No admin account')  # 为什么不叫 No privileged 呢，是因为有 privileged，但是不可用
+    other = 'others', _('Others')
 
 
 class AccountRisk(JMSOrgBaseModel):
-    account = models.ForeignKey('Account', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Account'))
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Asset'))
+    username = models.CharField(max_length=32, verbose_name=_('Username'))
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
     confirmed = models.BooleanField(default=False, verbose_name=_('Confirmed'))
 
@@ -50,4 +60,29 @@ class AccountRisk(JMSOrgBaseModel):
         verbose_name = _('Account risk')
 
     def __str__(self):
-        return f"{self.account} - {self.risk}"
+        return f"{self.username}@{self.asset} - {self.risk}"
+
+    @classmethod
+    def gen_fake_data(cls, count=1000, batch_size=50):
+        from assets.models import Asset
+        from accounts.models import Account
+
+        assets = Asset.objects.all()
+        accounts = Account.objects.all()
+
+        counter = iter(range(count))
+        while True:
+            batch = list(islice(counter, batch_size))
+            if not batch:
+                break
+
+            to_create = []
+            for i in batch:
+                asset = assets[i % len(assets)]
+                account = accounts[i % len(accounts)]
+                risk = RiskChoice.choices[i % len(RiskChoice.choices)][0]
+                to_create.append(cls(asset=asset, username=account.username, risk=risk))
+
+            cls.objects.bulk_create(to_create)
+
+
