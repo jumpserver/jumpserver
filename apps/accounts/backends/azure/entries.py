@@ -16,7 +16,7 @@ class BaseEntry(ABC):
 
     @lazyproperty
     def full_path(self):
-`        return self.path_spec
+        return self.path_spec
 
     @property
     def path_spec(self):
