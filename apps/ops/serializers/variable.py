@@ -122,7 +122,7 @@ class VariableFormDataSerializer(serializers.Serializer):
                 default = field['default']
                 if field_type == FieldType.text:
                     self.fields[var_name] = serializers.CharField(
-                        max_length=1024, label=label, help_text=help_text, default=default
+                        max_length=1024, label=label, help_text=help_text, required=required
                     )
                 elif field_type == FieldType.select:
                     extra_args = field.get('extra_args', {})
@@ -136,7 +136,7 @@ class VariableFormDataSerializer(serializers.Serializer):
                         }
                     )
                     self.fields[var_name] = LabeledChoiceField(
-                        choices=DynamicFieldType.choices, default=default, label=label,
+                        choices=DynamicFieldType.choices, required=required, label=label,
                         help_text=help_text
                     )
                 if required and default is not None:

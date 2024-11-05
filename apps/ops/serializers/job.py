@@ -52,7 +52,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
             "use_parameter_define", "parameters_define",
             "timeout", "chdir", "comment", "summary",
             "is_periodic", "interval", "crontab", "nodes",
-            "run_after_save", "parameters"
+            "run_after_save", "parameters", "periodic_variable"
         ] + fields_m2m
         extra_kwargs = {
             'average_time_cost': {'label': _('Duration')},

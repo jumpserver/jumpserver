@@ -55,7 +55,7 @@ class Variable(JMSBaseModel):
             'read_only': False,
             'required': self.required,
             'type': self.type,
-            'write_only': True,
+            'write_only': False,
             'default': self.default_value,
             'extra_args': self.extra_args,
         }

@@ -10,6 +10,7 @@ from django_celery_beat.models import PeriodicTask
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from ops.celery import app
+from ops.serializers.job import JobExecutionSerializer
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
     register_as_period_task, after_app_ready_start
@@ -64,6 +65,8 @@ def run_ops_job(job_id):
     with tmp_to_org(job.org):
         execution = job.create_execution()
         execution.creator = job.creator
+        if job.periodic_variable:
+            execution.parameters = JobExecutionSerializer.validate_parameters(job.periodic_variable)
         _run_ops_job_execution(execution)
 
 
