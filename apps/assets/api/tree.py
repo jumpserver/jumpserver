@@ -146,7 +146,8 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
     def list(self, request, *args, **kwargs):
         nodes = self.filter_queryset(self.get_queryset()).order_by('value')
-        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
+        nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
         node_key = self.instance.key if self.instance else None
         assets = self.serialize_assets(assets, node_key=node_key)

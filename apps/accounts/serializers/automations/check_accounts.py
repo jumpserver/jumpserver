@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import AutomationTypes
 from accounts.models import AccountCheckAutomation, AccountRisk, RiskChoice
+from assets.models import Asset
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
 
@@ -18,9 +21,15 @@ __all__ = [
 
 
 class AccountRiskSerializer(serializers.ModelSerializer):
+    asset = ObjectRelatedField(queryset=Asset.objects.all(), required=False,label=_("Asset"))
+    risk = LabeledChoiceField(choices=RiskChoice.choices, required=False, read_only=True, label=_("Risk"))
+
     class Meta:
         model = AccountRisk
-        fields = '__all__'
+        fields = [
+            'id', 'asset', 'username', 'risk', 'confirmed',
+            'date_created'
+        ]
 
 
 class RiskSummarySerializer(serializers.Serializer):
