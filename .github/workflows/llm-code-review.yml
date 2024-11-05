@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: fit2cloud/LLM-CodeReview-Action@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FIT2CLOUDRD_LLM_CODE_REVIEW_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.ALIYUN_LLM_API_KEY }}
           LANGUAGE: English
           OPENAI_API_ENDPOINT: https://dashscope.aliyuncs.com/compatible-mode/v1
