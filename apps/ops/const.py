@@ -88,5 +88,5 @@ class Scope(models.TextChoices):
 
 
 class FieldType(models.TextChoices):
-    text = 'text', _('文本框')
-    select = 'select', _('下拉框')
+    text = 'text', _('Text')
+    select = 'select', _('Select')
