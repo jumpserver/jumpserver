@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, SecretType
 from accounts.models import Account
 from .base import AccountBaseAutomation
 from .change_secret import ChangeSecretMixin
@@ -23,7 +23,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
         create_usernames = set(usernames) - set(account_usernames)
         create_account_objs = [
             Account(
-                name=f'{username}-{secret_type}', username=username,
+                name=f"{username}-{secret_type}" if secret_type != SecretType.PASSWORD else username,
+                username=username,
                 secret_type=secret_type, asset=asset,
             )
             for username in create_usernames
