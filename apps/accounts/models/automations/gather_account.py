@@ -58,7 +58,7 @@ class GatheredAccount(JMSOrgBaseModel):
         username = gathered_account.username
         account = Account(
             asset_id=asset_id, username=username,
-            name=username, source=Source.COLLECTED,
+            name=username, source=Source.DISCOVERY,
             date_last_login=gathered_account.date_last_login,
         )
         account_objs.append(account)

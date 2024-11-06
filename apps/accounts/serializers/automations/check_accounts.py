@@ -27,7 +27,7 @@ class AccountRiskSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountRisk
         fields = [
-            'id', 'asset', 'username', 'risk', 'confirmed',
+            'id', 'asset', 'username', 'risk', 'status',
             'date_created'
         ]
 
