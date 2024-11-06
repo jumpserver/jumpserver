@@ -1406,7 +1406,12 @@
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
-    "VariableName": "参数名",
-    "VariableUsername": "变量名",
-    "ExecuteAfterSaving": "保存后执行"
+    "VariableName": "变量名",
+    "ExecuteAfterSaving": "保存后执行",
+    "DefaultValue": "默认值",
+    "AddVariable": "添加参数",
+    "LoadTemplate": "从模板中加载",
+    "Templates": "模板",
+    "ExtraArgsPlaceholder": "每行一个选项，例如：\n选项1:值1\n选项2:值2\n",
+    "setVariable": "设置参数"
 }

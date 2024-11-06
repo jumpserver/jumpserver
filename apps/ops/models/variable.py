@@ -1,32 +1,17 @@
-import os.path
-import uuid
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from ops.const import FieldType
 
-dangerous_keywords = (
-    'hosts:localhost',
-    'hosts:127.0.0.1',
-    'hosts:::1',
-    'delegate_to:localhost',
-    'delegate_to:127.0.0.1',
-    'delegate_to:::1',
-    'local_action',
-    'connection:local',
-    'ansible_connection'
-)
-
 
 class Variable(JMSBaseModel):
     name = models.CharField(max_length=1024, verbose_name=_('Name'), null=True)
     var_name = models.CharField(
         max_length=1024, null=True, verbose_name=_('Variable name'),
-        help_text="The variable name used in the script has a fixed prefix 'jms_' followed by the input variable "
-                  "name. For example, if the variable name is 'name,' the final generated environment variable will "
-                  "be 'jms_name'."
+        help_text=_("The variable name used in the script has a fixed prefix 'jms_' followed by the input variable "
+                    "name. For example, if the variable name is 'name,' the final generated environment variable will "
+                    "be 'jms_name'.")
     )
     default_value = models.CharField(max_length=2048, verbose_name=_('Default Value'), null=True)
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)

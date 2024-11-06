@@ -17,11 +17,13 @@ __all__ = [
 class VariableSerializer(CommonBulkModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     type = LabeledChoiceField(
-        choices=FieldType.choices, default=FieldType.text, label=_("参数类型")
+        choices=FieldType.choices, default=FieldType.text, label=_("Variable Type")
     )
     extra_args = serializers.CharField(
-        max_length=1024, label=_("额外参数"), required=False, allow_blank=True,
-        help_text="每项单独一行，每行可以用英文冒号分割前边是值后边是显示的内容"
+        max_length=1024, label=_("ExtraVars"), required=False, allow_blank=True,
+        help_text=_(
+            "Each item is on a separate line, with each line separated by a colon. The part before the colon is the "
+            "display content, and the part after the colon is the value.")
     )
 
     class Meta:
@@ -85,11 +87,9 @@ def create_dynamic_text_choices(options):
     动态创建一个 TextChoices 子类。`options` 应该是一个列表，
     格式为 [(value1, display1), (value2, display2), ...]
     """
-    # 构建类属性字典
     attrs = {
         key.upper(): value for value, key in options
     }
-    # choices 属性直接为原始选项列表
     attrs['choices'] = options
     return type('DynamicTextChoices', (models.TextChoices,), attrs)
 

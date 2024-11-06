@@ -1401,5 +1401,12 @@
     "ZoneUpdate": "Update the zone",
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "DefaultValue": "Default value",
+    "AddVariable": "Add Variable",
+    "VariableName": "Variable name",
+    "LoadTemplate": "Load template",
+    "Templates": "Templates",
+    "ExtraArgsPlaceholder": "One option per line, for example:\nOption 1: Value 1\nOption 2: Value 2",
+    "setVariable": "Set variable"
 }
