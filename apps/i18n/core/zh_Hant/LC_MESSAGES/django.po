@@ -4982,11 +4982,11 @@ msgstr "參數定義"
 
 #: ops/models/job.py:155
 msgid "Run as"
-msgstr "執行使用者"
+msgstr "運行賬號"
 
 #: ops/models/job.py:157
 msgid "Run as policy"
-msgstr "使用者策略"
+msgstr "賬號策略"
 
 #: ops/models/job.py:222 ops/serializers/job.py:92
 #: terminal/notifications.py:182

@@ -70,7 +70,7 @@
     "AdhocCreate": "Create the command",
     "AdhocDetail": "Command details",
     "AdhocManage": "Script",
-    "AdhocUpdate": "Update the command",
+    "AdhocUpdate": "Update Script",
     "Advanced": "Advanced settings",
     "AfterChange": "After changes",
     "AjaxError404": "404 request error",
@@ -1401,5 +1401,12 @@
     "ZoneUpdate": "Update the zone",
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
-    "removeWarningMsg": "Are you sure you want to remove"
+    "removeWarningMsg": "Are you sure you want to remove",
+    "DefaultValue": "Default value",
+    "AddVariable": "Add Variable",
+    "VariableName": "Variable name",
+    "LoadTemplate": "Load template",
+    "Templates": "Templates",
+    "ExtraArgsPlaceholder": "One option per line, for example:\nOption 1: Value 1\nOption 2: Value 2",
+    "setVariable": "Set variable"
 }
