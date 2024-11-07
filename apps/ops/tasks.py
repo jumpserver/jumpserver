@@ -6,6 +6,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
+from django.conf import settings
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
@@ -56,6 +57,8 @@ def _run_ops_job_execution(execution):
     )
 )
 def run_ops_job(job_id):
+    if not settings.SECURITY_COMMAND_EXECUTION:
+        return
     with tmp_to_root_org():
         job = get_object_or_none(Job, id=job_id)
     if not job:
@@ -89,6 +92,8 @@ def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
     )
 )
 def run_ops_job_execution(execution_id, **kwargs):
+    if not settings.SECURITY_COMMAND_EXECUTION:
+        return
     with tmp_to_root_org():
         execution = get_object_or_none(JobExecution, id=execution_id)
 
