@@ -200,7 +200,7 @@
     "BaseCommandFilterAclList": "Command filter",
     "BaseConnectMethodACL": "Connect Method ACL",
     "BaseFlowSetUp": "Flow Set Up",
-    "BaseJobManagement": "Job Management",
+    "BaseJobManagement": "Job List",
     "BaseLoginLog": "Login Log",
     "BaseMyAssets": "My Assets",
     "BaseOperateLog": "Operate Log",
@@ -651,8 +651,8 @@
     "JobCenter": "Job center",
     "JobCreate": "Create job",
     "JobDetail": "Job details",
-    "JobExecutionLog": "Job logs",
-    "JobManagement": "Jobs",
+    "JobExecutionLog": "Execution record",
+    "JobManagement": "Job List",
     "JobUpdate": "Update the job",
     "KingSoftCloud": "KingSoft cloud",
     "KokoSetting": "KoKo",
@@ -1410,5 +1410,8 @@
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
-    "setVariable": "Set variable"
+    "setVariable": "Set variable",
+    "JobsAudit": "Jobs audit",
+    "JobList": "Job List",
+    "StopJobMsg": "Stop job successfully"
 }
