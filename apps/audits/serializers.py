@@ -7,7 +7,7 @@ from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
-from ops.serializers.job import JobExecutionSerializer
+from ops.serializers.job import JobExecutionSerializer, JobSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from terminal.models import Session
 from users.models import User
@@ -32,6 +32,21 @@ class JobLogSerializer(JobExecutionSerializer):
         extra_kwargs = {
             "creator_name": {"label": _("Creator")},
         }
+
+
+class JobsAuditSerializer(JobSerializer):
+    class Meta(JobSerializer.Meta):
+        fields = JobSerializer.Meta.fields
+
+    def validate(self, attrs):
+        allowed_fields = {'is_periodic'}
+        submitted_fields = set(attrs.keys())
+        invalid_fields = submitted_fields - allowed_fields
+        if invalid_fields:
+            raise serializers.ValidationError(
+                f"Updating  {', '.join(invalid_fields)} fields is not allowed"
+            )
+        return attrs
 
 
 class FTPLogSerializer(serializers.ModelSerializer):

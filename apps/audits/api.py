@@ -22,6 +22,9 @@ from common.plugins.es import QuerySet as ESQuerySet
 from common.sessions.cache import user_session_manager
 from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import is_uuid, get_logger, lazyproperty
+from ops.const import Types
+from ops.models import Job
+from ops.serializers.job import JobSerializer
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
@@ -39,14 +42,14 @@ from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
-    FileSerializer, UserSessionSerializer
+    FileSerializer, UserSessionSerializer, JobsAuditSerializer
 )
 from .utils import construct_userlogin_usernames
 
 logger = get_logger(__name__)
 
 
-class JobAuditViewSet(OrgReadonlyModelViewSet):
+class JobLogAuditViewSet(OrgReadonlyModelViewSet):
     model = JobLog
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
@@ -56,6 +59,20 @@ class JobAuditViewSet(OrgReadonlyModelViewSet):
     filterset_fields = ['creator__name', 'material']
     serializer_class = JobLogSerializer
     ordering = ['-date_start']
+
+
+class JobsAuditViewSet(OrgModelViewSet):
+    model = Job
+    search_fields = ['creator__name']
+    filterset_fields = ['creator__name']
+    serializer_class = JobsAuditSerializer
+    ordering = ['-is_periodic', '-date_created']
+    http_method_names = ['get', 'options', 'patch']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.exclude(type=Types.upload_file).filter(instant=False)
+        return queryset
 
 
 class FTPLogViewSet(OrgModelViewSet):

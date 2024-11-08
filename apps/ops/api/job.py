@@ -225,7 +225,11 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
             return Response({'error': serializer.errors}, status=400)
         task_id = serializer.validated_data['task_id']
         try:
-            instance = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
+            user = request.user
+            if user.has_perm("audits.view_joblog"):
+                instance = get_object_or_404(JobExecution, pk=task_id)
+            else:
+                instance = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
         except Http404:
             return Response(
                 {'error': _('The task is being created and cannot be interrupted. Please try again later.')},

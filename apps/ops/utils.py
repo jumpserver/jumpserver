@@ -45,6 +45,6 @@ def merge_nodes_and_assets(nodes, assets, user):
         elif node_id == PermNode.UNGROUPED_NODE_KEY:
             node_assets = perm_util.get_ungroup_assets()
         else:
-            _, node_assets = perm_util.get_node_all_assets(node_id)
+            node, node_assets = perm_util.get_node_all_assets(node_id)
         assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
     return assets

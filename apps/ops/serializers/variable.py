@@ -101,6 +101,8 @@ class VariableFormDataSerializer(serializers.Serializer):
         if not request:
             return
         params = request.query_params
+        if params.get('format') == 'openapi':
+            return
         job = params.get('job')
         adhoc = params.get('adhoc')
         playbook = params.get('playbook')
