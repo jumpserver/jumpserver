@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 import base64
+import json
 import logging
 import os
 import re
@@ -9,9 +10,10 @@ import time
 import pyotp
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.translation import gettext as _
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, ip, safe_next_url
+from common.utils import reverse, get_object_or_none, ip, safe_next_url, FlashMessageUtil
 from .models import User
 
 logger = logging.getLogger('jumpserver.users')
@@ -45,10 +47,34 @@ def get_user_or_pre_auth_user(request):
     return user
 
 
+def get_redirect_client_url(request):
+    bearer_token, date_expired = request.user.create_bearer_token(request, age=3600*36*5)
+    data = {
+        'type': 'auth',
+        'bearer_token': bearer_token,
+        'date_expired': date_expired.timestamp()
+    }
+    buf = base64.b64encode(json.dumps(data).encode()).decode()
+    redirect_url = 'jms://{}'.format(buf)
+    message_data = {
+        'title': _('Auth success'),
+        'message': _("Redirecting to JumpServer Client"),
+        'redirect_url': redirect_url,
+        'interval': 1,
+        'has_cancel': False,
+    }
+    url = FlashMessageUtil.gen_message_url(message_data)
+    return url
+
+
 def redirect_user_first_login_or_index(request, redirect_field_name):
     url = request.POST.get(redirect_field_name)
     if not url:
         url = request.GET.get(redirect_field_name)
+
+    if url == 'client':
+        url = get_redirect_client_url(request)
+
     url = safe_next_url(url, request=request)
     # 防止 next 地址为 None
     if not url or url.lower() in ['none']:

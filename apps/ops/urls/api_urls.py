@@ -15,8 +15,8 @@ bulk_router = BulkRouter()
 bulk_router.register(r'adhocs', api.AdHocViewSet, 'adhoc')
 bulk_router.register(r'playbooks', api.PlaybookViewSet, 'playbook')
 bulk_router.register(r'jobs', api.JobViewSet, 'job')
+bulk_router.register(r'variable', api.VariableViewSet, 'variable')
 bulk_router.register(r'job-executions', api.JobExecutionViewSet, 'job-execution')
-
 router.register(r'celery/period-tasks', api.CeleryPeriodTaskViewSet, 'celery-period-task')
 
 router.register(r'tasks', api.CeleryTaskViewSet, 'task')

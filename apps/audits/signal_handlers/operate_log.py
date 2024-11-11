@@ -187,7 +187,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FavoriteAsset', 'ChangeSecretRecord', 'AppProvider',
+        'FavoriteAsset', 'ChangeSecretRecord', 'AppProvider', 'Variable'
     }
     include_models = {'UserSession'}
     for i, app in enumerate(apps.get_models(), 1):

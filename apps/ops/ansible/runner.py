@@ -78,7 +78,7 @@ class AdHocRunner:
 
 
 class PlaybookRunner:
-    def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None):
+    def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None, ):
 
         self.id = uuid.uuid4()
         self.inventory = inventory
@@ -89,6 +89,9 @@ class PlaybookRunner:
         self.cb = callback
         self.isolate = True
         self.envs = {}
+        if extra_vars is None:
+            extra_vars = {}
+        self.extra_vars = extra_vars
 
     def copy_playbook(self):
         entry = os.path.basename(self.playbook)
@@ -119,6 +122,7 @@ class PlaybookRunner:
             status_handler=self.cb.status_handler,
             host_cwd=self.project_dir,
             envvars=self.envs,
+            extravars=self.extra_vars,
             **kwargs
         )
         return self.cb
