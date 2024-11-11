@@ -67,6 +67,8 @@ class TerminalType(TextChoices):
     chen = 'chen', 'Chen'
     kael = 'kael', 'Kael'
     panda = 'panda', 'Panda'
+    nec = 'nec', 'Nec'
+    facelive = 'facelive', 'Facelive'
 
     @classmethod
     def types(cls):
