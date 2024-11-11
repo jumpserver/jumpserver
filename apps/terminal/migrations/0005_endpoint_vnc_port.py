@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='endpoint',
             name='vnc_port',
-            field=common.db.fields.PortField(default=5900, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='VNC port'),
+            field=common.db.fields.PortField(default=15900, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='VNC port'),
         ),
     ]
