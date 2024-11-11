@@ -164,6 +164,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             self.batch_create_gathered_account(None)
 
     def _analyse_item_changed(self, ori_account, d):
+        now = timezone.now().isoformat()
         diff = self.get_items_diff(ori_account, d)
 
         if not diff:
@@ -172,7 +173,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for k, v in diff.items():
             self.pending_add_risks.append(AccountRisk(
                 asset=ori_account.asset, username=ori_account.username,
-                risk=k+'_changed', comment=v
+                risk=k+'_changed', details=[{'datetime': now, 'diff': v}]
             ))
 
     @staticmethod
@@ -187,7 +188,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             if not found:
                 r.save()
             else:
-                found.comment = r.comment + '\n------\n' + found.comment
+                found.details.extend(r.details)
 
     def batch_analyse_risk(self, asset, ori_account, d, batch_size=20):
         if asset is None:
@@ -196,31 +197,32 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 self.pending_add_risks = []
             return
 
-        now = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-        basic = {'asset': asset, 'username': d['username']}
+        now = timezone.now().isoformat()
+        basic = {'asset': asset, 'username': d['username'], 'details': [{'datetime': now}]}
+
         if ori_account:
             self._analyse_item_changed(ori_account, d)
         else:
             self.pending_add_risks.append(
-                AccountRisk(**basic, risk='ghost', comment='{}'.format(now))
+                AccountRisk(**basic, risk='ghost', )
             )
 
         last_login = d.get('date_last_login')
         if last_login and last_login < timezone.now() - self.long_time:
             self.pending_add_risks.append(
-                AccountRisk(**basic, risk='zombie', comment='{}'.format(last_login))
+                AccountRisk(**basic, risk='zombie')
             )
 
         date_password_change = d.get('date_password_change')
         if date_password_change and date_password_change < timezone.now() - self.long_time:
             self.pending_add_risks.append(
-                AccountRisk(**basic, risk='long_time_password', comment='{}'.format(date_password_change))
+                AccountRisk(**basic, risk='long_time_password')
             )
 
         date_password_expired = d.get('date_password_expired')
         if date_password_expired and date_password_expired < timezone.now():
             self.pending_add_risks.append(
-                AccountRisk(**basic, risk='password_expired', comment='{}'.format(date_password_expired))
+                AccountRisk(**basic, risk='password_expired')
             )
 
         if len(self.pending_add_risks) > batch_size:
