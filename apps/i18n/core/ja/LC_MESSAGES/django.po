@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:27+0800\n"
+"POT-Creation-Date: 2024-11-11 19:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,7 +36,7 @@ msgstr "アセットまたはアプリケーション関連のバックアップ
 
 #: accounts/automations/backup_account/handlers.py:156
 #: accounts/automations/backup_account/handlers.py:295
-#: accounts/automations/backup_account/manager.py:40 ops/serializers/job.py:76
+#: accounts/automations/backup_account/manager.py:40 ops/serializers/job.py:82
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 msgid "Time cost"
 msgstr "時を過ごす"
@@ -68,7 +68,7 @@ msgstr "仕上げ"
 #: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
-#: terminal/const.py:78 terminal/models/session/sharing.py:121
+#: terminal/const.py:80 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
 msgstr "成功"
@@ -77,7 +77,7 @@ msgstr "成功"
 #: accounts/const/account.py:34 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:174 audits/const.py:65
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:66
-#: ops/const.py:76 terminal/const.py:79 xpack/plugins/cloud/const.py:47
+#: ops/const.py:76 terminal/const.py:81 xpack/plugins/cloud/const.py:47
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -150,7 +150,7 @@ msgid "Access key"
 msgstr "アクセスキー"
 
 #: accounts/const/account.py:9 authentication/backends/passkey/models.py:16
-#: authentication/models/sso_token.py:14 settings/serializers/feature.py:55
+#: authentication/models/sso_token.py:14 settings/serializers/feature.py:75
 msgid "Token"
 msgstr "トークン"
 
@@ -305,12 +305,12 @@ msgstr "作成のみ"
 msgid "Email"
 msgstr "メール"
 
-#: accounts/const/automation.py:105 terminal/const.py:87
+#: accounts/const/automation.py:105 terminal/const.py:89
 msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
-#: common/const/choices.py:63 terminal/const.py:77 tickets/const.py:29
+#: common/const/choices.py:63 terminal/const.py:79 tickets/const.py:29
 #: tickets/const.py:38
 msgid "Pending"
 msgstr "未定"
@@ -320,9 +320,13 @@ msgstr "未定"
 msgid "Database"
 msgstr "データベース"
 
-#: accounts/const/vault.py:9 settings/serializers/feature.py:46
+#: accounts/const/vault.py:9 settings/serializers/feature.py:70
 msgid "HCP Vault"
 msgstr "HashiCorp Vault"
+
+#: accounts/const/vault.py:10 settings/serializers/feature.py:83
+msgid "Azure Key Vault"
+msgstr "Azure Key Vault"
 
 #: accounts/mixins.py:35
 msgid "Export all"
@@ -468,9 +472,9 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:242
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:247
 #: ops/templates/ops/celery_task_log.html:101
-#: perms/models/asset_permission.py:78 settings/serializers/feature.py:25
+#: perms/models/asset_permission.py:78 settings/serializers/feature.py:26
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
@@ -507,7 +511,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:136
 #: accounts/serializers/automations/change_secret.py:117
 #: accounts/serializers/automations/change_secret.py:152
-#: ops/serializers/job.py:74 terminal/serializers/session.py:54
+#: ops/serializers/job.py:80 terminal/serializers/session.py:54
 msgid "Is success"
 msgstr "成功は"
 
@@ -582,7 +586,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:243
+#: ops/models/celery.py:90 ops/models/job.py:248
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "終了日"
@@ -590,7 +594,7 @@ msgstr "終了日"
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113
 #: assets/serializers/automations/base.py:39 audits/models.py:208
-#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:234
+#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:239
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -665,12 +669,12 @@ msgstr "トリガー方式"
 #: audits/models.py:92 audits/serializers.py:84
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: behemoth/serializers/environment.py:13 perms/serializers/permission.py:52
-#: perms/serializers/permission.py:74 tickets/serializers/ticket/ticket.py:21
+#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
+#: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr "アクション"
 
-#: accounts/models/automations/push_account.py:57
+#: accounts/models/automations/push_account.py:58
 msgid "Push asset account"
 msgstr "アカウントプッシュ"
 
@@ -719,13 +723,13 @@ msgstr "パスワードルール"
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:169 labels/models.py:11
 #: ops/mixin.py:28 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:142 ops/models/playbook.py:30
-#: ops/serializers/job.py:18 orgs/models.py:82
+#: ops/models/celery.py:81 ops/models/job.py:145 ops/models/playbook.py:28
+#: ops/models/variable.py:9 ops/serializers/job.py:19 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 settings/models.py:35 settings/models.py:184
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
 #: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:111
+#: terminal/models/component/endpoint.py:112
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:85
 #: terminal/models/virtualapp/provider.py:10
@@ -884,7 +888,7 @@ msgstr "カテゴリ"
 #: assets/serializers/asset/common.py:146 assets/serializers/platform.py:159
 #: assets/serializers/platform.py:171 audits/serializers.py:53
 #: audits/serializers.py:170
-#: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
+#: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:29
@@ -920,10 +924,8 @@ msgstr "編集済み"
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
 #: assets/serializers/platform.py:180 assets/serializers/platform.py:212
-#: authentication/api/connection_token.py:410
-#: behemoth/serializers/environment.py:11
-#: behemoth/serializers/environment.py:22 ops/models/base.py:17
-#: ops/models/job.py:152 ops/serializers/job.py:19
+#: authentication/api/connection_token.py:410 ops/models/base.py:17
+#: ops/models/job.py:155 ops/serializers/job.py:20
 #: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:89
@@ -1074,11 +1076,11 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:158 ops/models/playbook.py:33 rbac/models/role.py:37
+#: ops/models/job.py:163 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:40 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:26
-#: terminal/models/component/endpoint.py:121
+#: terminal/models/component/endpoint.py:27
+#: terminal/models/component/endpoint.py:122
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:91
@@ -1099,7 +1101,8 @@ msgstr ""
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:176 assets/serializers/asset/common.py:172
-#: assets/serializers/automations/base.py:21 perms/serializers/permission.py:47
+#: assets/serializers/automations/base.py:21 ops/serializers/job.py:21
+#: perms/serializers/permission.py:47
 msgid "Nodes"
 msgstr "ノード"
 
@@ -1382,12 +1385,12 @@ msgid "Notify and warn"
 msgstr "プロンプトと警告"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:114 xpack/plugins/cloud/models.py:316
+#: terminal/models/component/endpoint.py:115 xpack/plugins/cloud/models.py:316
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:115 xpack/plugins/cloud/models.py:317
+#: terminal/models/component/endpoint.py:116 xpack/plugins/cloud/models.py:317
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -1401,8 +1404,8 @@ msgstr "レビュー担当者"
 #: authentication/models/connection_token.py:53
 #: authentication/models/ssh_key.py:13
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:27
-#: terminal/models/component/endpoint.py:122
+#: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:28
+#: terminal/models/component/endpoint.py:123
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 #: tickets/const.py:36
 msgid "Active"
@@ -1422,7 +1425,7 @@ msgid "Accounts"
 msgstr "アカウント"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:73 terminal/const.py:86
+#: ops/serializers/job.py:79 terminal/const.py:88
 #: terminal/models/session/session.py:43 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -1436,7 +1439,7 @@ msgid "Regex"
 msgstr "正規情報"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-#: settings/models.py:185 settings/serializers/feature.py:20
+#: settings/models.py:185 settings/serializers/feature.py:21
 #: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr "コンテンツ"
@@ -1700,7 +1703,7 @@ msgid "Authentication failed"
 msgstr "認証に失敗しました"
 
 #: assets/automations/ping_gateway/manager.py:60
-#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:102
+#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:104
 msgid "Connect failed"
 msgstr "接続に失敗しました"
 
@@ -1748,9 +1751,9 @@ msgstr "脚本"
 
 #: assets/const/category.py:10 assets/models/asset/host.py:8
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
-#: settings/serializers/feature.py:52 settings/serializers/msg.py:30
-#: terminal/models/component/endpoint.py:14 terminal/serializers/applet.py:17
-#: xpack/plugins/cloud/manager.py:89
+#: settings/serializers/feature.py:72 settings/serializers/feature.py:85
+#: settings/serializers/msg.py:30 terminal/models/component/endpoint.py:14
+#: terminal/serializers/applet.py:17 xpack/plugins/cloud/manager.py:89
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "ホスト"
@@ -2062,18 +2065,19 @@ msgstr "証明書チェックを無視"
 msgid "Postgresql SSL mode"
 msgstr "PostgreSQL SSL モード"
 
-#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:92
+#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:115
 msgid "Proxy"
 msgstr "プロキシー"
 
 #: assets/models/automations/base.py:18 assets/models/cmd_filter.py:32
-#: assets/models/node.py:553 perms/models/asset_permission.py:72
-#: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:388
+#: assets/models/node.py:553 ops/models/job.py:156
+#: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:14
+#: xpack/plugins/cloud/models.py:388
 msgid "Node"
 msgstr "ノード"
 
-#: assets/models/automations/base.py:22 ops/models/job.py:237
-#: settings/serializers/auth/sms.py:108
+#: assets/models/automations/base.py:22 ops/models/job.py:242
+#: ops/serializers/job.py:23 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "パラメータ"
 
@@ -2086,7 +2090,7 @@ msgid "Asset automation task"
 msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
-#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:241
+#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:246
 #: users/models/user/__init__.py:311
 msgid "Date created"
 msgstr "作成された日付"
@@ -2218,7 +2222,7 @@ msgstr "ノードを一致させることができます"
 msgid "Primary"
 msgstr "主要"
 
-#: assets/models/platform.py:18
+#: assets/models/platform.py:18 ops/models/variable.py:20
 msgid "Required"
 msgstr "必要"
 
@@ -2786,7 +2790,7 @@ msgstr "タグ"
 msgid "operate_log_id"
 msgstr "操作ログID"
 
-#: audits/backends/db.py:111
+#: audits/backends/db.py:111 ops/models/variable.py:19
 msgid "Tips"
 msgstr "謎々"
 
@@ -3030,8 +3034,8 @@ msgid "Offline user session"
 msgstr "オフラインユーザセッション"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:151
-#: ops/models/job.py:240 ops/models/playbook.py:32
+#: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
+#: ops/models/job.py:245 ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "作成者"
@@ -3596,7 +3600,7 @@ msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
 #: authentication/models/access_key.py:22
-#: terminal/models/component/endpoint.py:112
+#: terminal/models/component/endpoint.py:113
 msgid "IP group"
 msgstr "IP グループ"
 
@@ -3891,7 +3895,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:522
+#: jumpserver/conf.py:529
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -4662,16 +4666,16 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:516
+#: jumpserver/conf.py:523
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "認証コードは: {code}"
 
-#: jumpserver/conf.py:521
+#: jumpserver/conf.py:528
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:523
+#: jumpserver/conf.py:530
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -4778,7 +4782,7 @@ msgid ""
 "        work orders, and other notifications"
 msgstr "システムの警告やチケットなどを送信するためには、このタスクを実行します"
 
-#: ops/ansible/inventory.py:116 ops/models/job.py:65
+#: ops/ansible/inventory.py:116 ops/models/job.py:68
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
@@ -4802,7 +4806,7 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:83
+#: ops/api/job.py:68
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
@@ -4811,22 +4815,22 @@ msgstr ""
 "資産({asset})には、少なくともSSH、SFTP、WinRMのいずれか一つのプロトコルを追加"
 "する必要があります"
 
-#: ops/api/job.py:84
+#: ops/api/job.py:69
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr ""
 "資産({asset})の認証にはSSH、SFTP、またはWinRMプロトコルが不足しています"
 
-#: ops/api/job.py:85
+#: ops/api/job.py:70
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "資産({asset})の認証にはアップロード権限が不足しています"
 
-#: ops/api/job.py:170
+#: ops/api/job.py:157
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:175
+#: ops/api/job.py:162
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
@@ -4834,7 +4838,7 @@ msgstr ""
 "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択し"
 "てください。"
 
-#: ops/api/job.py:244
+#: ops/api/job.py:231
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
@@ -4903,11 +4907,13 @@ msgstr "空欄"
 msgid "VCS"
 msgstr "VCS"
 
-#: ops/const.py:38 ops/models/adhoc.py:44 settings/serializers/feature.py:123
+#: ops/const.py:38 ops/models/adhoc.py:44 ops/models/variable.py:26
+#: settings/serializers/feature.py:146
 msgid "Adhoc"
 msgstr "コマンド"
 
-#: ops/const.py:39 ops/models/job.py:149 ops/models/playbook.py:91
+#: ops/const.py:39 ops/models/job.py:152 ops/models/playbook.py:89
+#: ops/models/variable.py:23
 msgid "Playbook"
 msgstr "Playbook"
 
@@ -5019,16 +5025,16 @@ msgstr "定期的または定期的に設定を行う必要があります"
 msgid "Pattern"
 msgstr "パターン"
 
-#: ops/models/adhoc.py:22 ops/models/job.py:146
+#: ops/models/adhoc.py:22 ops/models/job.py:149
 msgid "Module"
 msgstr "モジュール"
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:144
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:147
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "アルグ"
 
-#: ops/models/adhoc.py:26 ops/models/playbook.py:36 ops/serializers/mixin.py:10
+#: ops/models/adhoc.py:26 ops/models/playbook.py:34 ops/serializers/mixin.py:10
 #: rbac/models/role.py:31 rbac/models/rolebinding.py:46
 #: rbac/serializers/role.py:12 settings/serializers/auth/oauth2.py:37
 msgid "Scope"
@@ -5042,16 +5048,16 @@ msgstr "アカウント ポリシー"
 msgid "Last execution"
 msgstr "最後の実行"
 
-#: ops/models/base.py:22 ops/serializers/job.py:17
+#: ops/models/base.py:22 ops/serializers/job.py:18
 msgid "Date last run"
 msgstr "最終実行日"
 
-#: ops/models/base.py:51 ops/models/job.py:238
+#: ops/models/base.py:51 ops/models/job.py:243
 #: xpack/plugins/cloud/models.py:225
 msgid "Result"
 msgstr "結果"
 
-#: ops/models/base.py:52 ops/models/job.py:239
+#: ops/models/base.py:52 ops/models/job.py:244
 #: xpack/plugins/cloud/manager.py:99
 msgid "Summary"
 msgstr "Summary"
@@ -5080,52 +5086,52 @@ msgstr "発売日"
 msgid "Celery Task Execution"
 msgstr "Celery タスク実行"
 
-#: ops/models/job.py:147
+#: ops/models/job.py:150
 msgid "Run dir"
 msgstr "実行ディレクトリ"
 
-#: ops/models/job.py:148
+#: ops/models/job.py:151
 msgid "Timeout (Seconds)"
 msgstr "タイムアウト（秒）"
 
-#: ops/models/job.py:153
+#: ops/models/job.py:157
 msgid "Use Parameter Define"
 msgstr "パラメータ定義を使用する"
 
-#: ops/models/job.py:154
+#: ops/models/job.py:158
 msgid "Parameters define"
 msgstr "パラメータ定義"
 
-#: ops/models/job.py:155
+#: ops/models/job.py:160
 msgid "Run as"
 msgstr "実行アカウント (じっこうアカウント)"
 
-#: ops/models/job.py:157
+#: ops/models/job.py:162
 msgid "Run as policy"
 msgstr "アカウントポリシー "
 
-#: ops/models/job.py:222 ops/serializers/job.py:92
+#: ops/models/job.py:227 ops/models/variable.py:28 ops/serializers/job.py:98
 #: terminal/notifications.py:182
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
-#: ops/models/job.py:245
+#: ops/models/job.py:250
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:247
+#: ops/models/job.py:252
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:558
+#: ops/models/job.py:564
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
-#: ops/models/playbook.py:35
+#: ops/models/playbook.py:33
 msgid "CreateMethod"
 msgstr "创建方式"
 
-#: ops/models/playbook.py:37
+#: ops/models/playbook.py:35
 msgid "VCS URL"
 msgstr "VCS URL"
 
@@ -5165,27 +5171,27 @@ msgstr "ジョブ実行"
 msgid "Next execution time"
 msgstr "最後の実行"
 
-#: ops/serializers/job.py:15
+#: ops/serializers/job.py:17
 msgid "Execute after saving"
 msgstr "保存後に実行"
 
-#: ops/serializers/job.py:52 terminal/serializers/session.py:49
+#: ops/serializers/job.py:58 terminal/serializers/session.py:49
 msgid "Duration"
 msgstr "きかん"
 
-#: ops/serializers/job.py:72
+#: ops/serializers/job.py:78
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:75 terminal/serializers/session.py:58
+#: ops/serializers/job.py:81 terminal/serializers/session.py:58
 msgid "Is finished"
 msgstr "終了しました"
 
-#: ops/serializers/job.py:89
+#: ops/serializers/job.py:95
 msgid "Task id"
 msgstr "タスク ID"
 
-#: ops/serializers/job.py:98
+#: ops/serializers/job.py:104
 msgid "You do not have permission for the current job."
 msgstr "あなたは現在のジョブの権限を持っていません。"
 
@@ -5193,7 +5199,7 @@ msgstr "あなたは現在のジョブの権限を持っていません。"
 msgid "Run ansible task"
 msgstr "Ansible タスクを実行する"
 
-#: ops/tasks.py:54
+#: ops/tasks.py:56
 msgid ""
 "Execute scheduled adhoc and playbooks, periodically invoking the task for "
 "execution"
@@ -5201,29 +5207,29 @@ msgstr ""
 "タイムスケジュールのショートカットコマンドやplaybookを実行するときは、このタ"
 "スクを呼び出します"
 
-#: ops/tasks.py:82
+#: ops/tasks.py:88
 msgid "Run ansible task execution"
 msgstr "Ansible タスクの実行を開始する"
 
-#: ops/tasks.py:85
+#: ops/tasks.py:91
 msgid "Execute the task when manually adhoc or playbooks"
 msgstr ""
 "手動でショートカットコマンドやplaybookを実行するときは、このタスクを実行しま"
 "す"
 
-#: ops/tasks.py:99
+#: ops/tasks.py:107
 msgid "Clear celery periodic tasks"
 msgstr "タスクログを定期的にクリアする"
 
-#: ops/tasks.py:101
+#: ops/tasks.py:109
 msgid "At system startup, clean up celery tasks that no longer exist"
 msgstr "システム起動時、既に存在しないceleryのタスクをクリーニングします"
 
-#: ops/tasks.py:125
+#: ops/tasks.py:133
 msgid "Create or update periodic tasks"
 msgstr "定期的なタスクの作成または更新"
 
-#: ops/tasks.py:127
+#: ops/tasks.py:135
 msgid ""
 "With version iterations, new tasks may be added, or task names and execution "
 "times may \n"
@@ -5235,11 +5241,11 @@ msgstr ""
 "行時間が変更される可能性があるため、システムが起動すると、タスクを登録した"
 "り、タスクのパラメータを更新したりします"
 
-#: ops/tasks.py:140
+#: ops/tasks.py:148
 msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
 
-#: ops/tasks.py:142
+#: ops/tasks.py:150
 msgid ""
 "Check every hour whether each component is offline and whether the CPU, "
 "memory, \n"
@@ -5249,11 +5255,11 @@ msgstr ""
 "毎時、各コンポーネントがオフラインになっていないか、CPU、メモリ、ディスク使用"
 "率が閾値を超えていないかをチェックし、管理者にメッセージで警告を送ります"
 
-#: ops/tasks.py:152
+#: ops/tasks.py:160
 msgid "Clean up unexpected jobs"
 msgstr "例外ジョブのクリーンアップ"
 
-#: ops/tasks.py:154
+#: ops/tasks.py:162
 msgid ""
 "Due to exceptions caused by executing adhoc and playbooks in the Job "
 "Center, \n"
@@ -5267,11 +5273,11 @@ msgstr ""
 "スクの状態が更新されないことがあります。そのため、システムは毎時間、3時間以上"
 "終了していない異常なジョブをクリーニングし、タスクを失敗とマークします"
 
-#: ops/tasks.py:167
+#: ops/tasks.py:175
 msgid "Clean job_execution db record"
 msgstr "ジョブセンター実行履歴のクリーンアップ"
 
-#: ops/tasks.py:169
+#: ops/tasks.py:177
 msgid ""
 "Due to the execution of adhoc and playbooks in the Job Center, execution "
 "records will \n"
@@ -5493,7 +5499,7 @@ msgid "today"
 msgstr "今日"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:114
+#: settings/serializers/feature.py:137
 msgid "day"
 msgstr "日"
 
@@ -5750,7 +5756,7 @@ msgstr "アカウントの秘密の変更"
 msgid "App ops"
 msgstr "アプリ操作"
 
-#: rbac/tree.py:57 settings/serializers/feature.py:120
+#: rbac/tree.py:57 settings/serializers/feature.py:143
 msgid "Feature"
 msgstr "機能"
 
@@ -5785,8 +5791,8 @@ msgstr "アプリ組織"
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:159 settings/serializers/feature.py:101
-#: settings/serializers/feature.py:103 tickets/models/ticket/general.py:308
+#: rbac/tree.py:159 settings/serializers/feature.py:124
+#: settings/serializers/feature.py:126 tickets/models/ticket/general.py:308
 msgid "Ticket"
 msgstr "チケット"
 
@@ -5804,7 +5810,7 @@ msgstr "チャットAIがオンになっていない"
 
 #: settings/api/chat.py:79 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
-#: settings/api/vault.py:40 settings/api/wecom.py:37
+#: settings/api/vault.py:48 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "テストの成功"
 
@@ -6206,12 +6212,13 @@ msgstr "アイコン"
 msgid "Service provider"
 msgstr "サービスプロバイダー"
 
-#: settings/serializers/auth/oauth2.py:31
+#: settings/serializers/auth/oauth2.py:31 settings/serializers/feature.py:88
 #: xpack/plugins/cloud/serializers/account_attrs.py:35
 msgid "Client ID"
 msgstr "クライアントID"
 
 #: settings/serializers/auth/oauth2.py:34 settings/serializers/auth/oidc.py:24
+#: settings/serializers/feature.py:91
 #: xpack/plugins/cloud/serializers/account_attrs.py:38
 msgid "Client Secret"
 msgstr "クライアント秘密"
@@ -6645,38 +6652,38 @@ msgstr ""
 msgid "Change secret and push record retention days (day)"
 msgstr "パスワード変更プッシュ記録を保持する日数 (日)"
 
-#: settings/serializers/feature.py:19 settings/serializers/msg.py:68
+#: settings/serializers/feature.py:20 settings/serializers/msg.py:68
 msgid "Subject"
 msgstr "件名"
 
-#: settings/serializers/feature.py:23
+#: settings/serializers/feature.py:24
 msgid "More Link"
 msgstr "もっとURL"
 
-#: settings/serializers/feature.py:26
+#: settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
 #: terminal/models/session/session.py:46
 msgid "Date end"
 msgstr "終了日"
 
-#: settings/serializers/feature.py:39 settings/serializers/feature.py:41
-#: settings/serializers/feature.py:42
+#: settings/serializers/feature.py:40 settings/serializers/feature.py:42
+#: settings/serializers/feature.py:43
 msgid "Announcement"
 msgstr "発表"
 
-#: settings/serializers/feature.py:49
+#: settings/serializers/feature.py:47 settings/serializers/feature.py:50
 msgid "Vault"
 msgstr "有効化 Vault"
 
-#: settings/serializers/feature.py:58
-msgid "Mount Point"
-msgstr "マウントポイント"
+#: settings/serializers/feature.py:53
+msgid "Vault provider"
+msgstr "プロバイダー"
 
-#: settings/serializers/feature.py:64
+#: settings/serializers/feature.py:58
 msgid "Record limit"
 msgstr "記録制限"
 
-#: settings/serializers/feature.py:66
+#: settings/serializers/feature.py:60
 msgid ""
 "If the specific value is less than 999 (default), the system will "
 "automatically perform a task every night: check and delete historical "
@@ -6687,76 +6694,85 @@ msgstr ""
 "所定の数を超える履歴アカウントを確認して削除します。 値が 999 以上の場合、履"
 "歴アカウントの削除は実行されません。"
 
-#: settings/serializers/feature.py:76 settings/serializers/feature.py:82
+#: settings/serializers/feature.py:78
+msgid "Mount Point"
+msgstr "マウントポイント"
+
+#: settings/serializers/feature.py:94
+#: xpack/plugins/cloud/serializers/account_attrs.py:41
+msgid "Tenant ID"
+msgstr "テナントID"
+
+#: settings/serializers/feature.py:99 settings/serializers/feature.py:105
 msgid "Chat AI"
 msgstr "チャットAI"
 
-#: settings/serializers/feature.py:85
+#: settings/serializers/feature.py:108
 msgid "GPT Base URL"
 msgstr "GPTアドレス"
 
-#: settings/serializers/feature.py:86
+#: settings/serializers/feature.py:109
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
 msgstr "GPTサービスの基本のURL。例えば：https://api.openai.com/v1"
 
-#: settings/serializers/feature.py:89 templates/_header_bar.html:96
+#: settings/serializers/feature.py:112 templates/_header_bar.html:96
 msgid "API Key"
 msgstr "API Key"
 
-#: settings/serializers/feature.py:93
+#: settings/serializers/feature.py:116
 msgid ""
 "The proxy server address of the GPT service. For example: http://ip:port"
 msgstr "GPTサービスのプロキシサーバーのアドレス。例えば：http://ip:port"
 
-#: settings/serializers/feature.py:96
+#: settings/serializers/feature.py:119
 msgid "GPT Model"
 msgstr "GPTモデル"
 
-#: settings/serializers/feature.py:105
+#: settings/serializers/feature.py:128
 msgid "Approval without login"
 msgstr "ログイン承認なし"
 
-#: settings/serializers/feature.py:106
+#: settings/serializers/feature.py:129
 msgid "Allow direct approval ticket without login"
 msgstr "ログインせずに直接承認チケットを許可します"
 
-#: settings/serializers/feature.py:110
+#: settings/serializers/feature.py:133
 msgid "Period"
 msgstr "期間"
 
-#: settings/serializers/feature.py:111
+#: settings/serializers/feature.py:134
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr "ワークオーダーの資産申請に対するデフォルトの承認時間帯"
 
-#: settings/serializers/feature.py:114
+#: settings/serializers/feature.py:137
 msgid "hour"
 msgstr "時"
 
-#: settings/serializers/feature.py:115
+#: settings/serializers/feature.py:138
 msgid "Unit"
 msgstr "単位"
 
-#: settings/serializers/feature.py:115
+#: settings/serializers/feature.py:138
 msgid "The unit of period"
 msgstr "ユーザーの実行"
 
-#: settings/serializers/feature.py:124
+#: settings/serializers/feature.py:147
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr ""
 "ユーザーがワークベンチ - ジョブセンター - Adhocでバッチコマンドを実行すること"
 "を許可します"
 
-#: settings/serializers/feature.py:128
+#: settings/serializers/feature.py:151
 msgid "Command blacklist"
 msgstr "コマンドフィルタリング"
 
-#: settings/serializers/feature.py:129
+#: settings/serializers/feature.py:152
 msgid "Command blacklist in Adhoc"
 msgstr "コマンドフィルタリング"
 
-#: settings/serializers/feature.py:134
+#: settings/serializers/feature.py:157
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -6764,11 +6780,11 @@ msgstr "コマンドフィルタリング"
 msgid "Virtual app"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:160
 msgid "Virtual App"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:139
+#: settings/serializers/feature.py:162
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -7733,6 +7749,18 @@ msgstr "リモートデスクトップ"
 msgid "RDP Guide"
 msgstr "RDP 接続ウィザード"
 
+#: terminal/connect_methods.py:39
+#, fuzzy
+#| msgid "Client"
+msgid "VNC Client"
+msgstr "クライアント"
+
+#: terminal/connect_methods.py:40
+#, fuzzy
+#| msgid "DB Guide"
+msgid "VNC Guide"
+msgstr "DB 接続ウィザード"
+
 #: terminal/const.py:10
 msgid "Warning"
 msgstr "警告"
@@ -7757,7 +7785,7 @@ msgstr "クリティカル"
 msgid "High"
 msgstr "高い"
 
-#: terminal/const.py:47 terminal/const.py:84
+#: terminal/const.py:47 terminal/const.py:86
 #: users/templates/users/reset_password.html:54
 msgid "Normal"
 msgstr "正常"
@@ -7766,47 +7794,47 @@ msgstr "正常"
 msgid "Offline"
 msgstr "オフライン"
 
-#: terminal/const.py:80
+#: terminal/const.py:82
 msgid "Mismatch"
 msgstr "一致しない"
 
-#: terminal/const.py:85
+#: terminal/const.py:87
 msgid "Tunnel"
 msgstr "ちかチャネル"
 
-#: terminal/const.py:91
+#: terminal/const.py:93
 msgid "Read only"
 msgstr "読み取り専用"
 
-#: terminal/const.py:92
+#: terminal/const.py:94
 msgid "Writable"
 msgstr "書き込み可能"
 
-#: terminal/const.py:96
+#: terminal/const.py:98
 msgid "Kill session"
 msgstr "セッションを終了する"
 
-#: terminal/const.py:97
+#: terminal/const.py:99
 msgid "Lock session"
 msgstr "セッションをロックする"
 
-#: terminal/const.py:98
+#: terminal/const.py:100
 msgid "Unlock session"
 msgstr "セッションのロックを解除する"
 
-#: terminal/const.py:103
+#: terminal/const.py:105
 msgid "Replay create failed"
 msgstr "ビデオの作成に失敗しました"
 
-#: terminal/const.py:104
+#: terminal/const.py:106
 msgid "Replay upload failed"
 msgstr "動画のアップロードに失敗しました"
 
-#: terminal/const.py:105
+#: terminal/const.py:107
 msgid "Replay convert failed"
 msgstr "ビデオのトランスコーディングに失敗しました"
 
-#: terminal/const.py:106
+#: terminal/const.py:108
 msgid "Replay unsupported"
 msgstr "録画はサポートされていません"
 
@@ -7947,15 +7975,19 @@ msgstr "Redis ポート"
 msgid "SQLServer port"
 msgstr "SQLServer ポート"
 
-#: terminal/models/component/endpoint.py:32
-#: terminal/models/component/endpoint.py:119
+#: terminal/models/component/endpoint.py:25
+msgid "VNC port"
+msgstr "VNC ポート"
+
+#: terminal/models/component/endpoint.py:33
+#: terminal/models/component/endpoint.py:120
 #: terminal/serializers/endpoint.py:80 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/component/endpoint.py:125
+#: terminal/models/component/endpoint.py:126
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
@@ -9858,6 +9890,14 @@ msgstr ""
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "MFA Authenticatorを開き、6ビットの動的コードを入力します"
 
+#: users/utils.py:60
+msgid "Auth success"
+msgstr "認証データベース"
+
+#: users/utils.py:61
+msgid "Redirecting to JumpServer Client"
+msgstr ""
+
 #: users/views/profile/otp.py:106
 msgid "Already bound"
 msgstr "すでにバインド済み"
@@ -10561,10 +10601,6 @@ msgstr "プロバイダ表示"
 #: xpack/plugins/cloud/serializers/account_attrs.py:17
 msgid "Access key id"
 msgstr "アクセスキー"
-
-#: xpack/plugins/cloud/serializers/account_attrs.py:41
-msgid "Tenant ID"
-msgstr "テナントID"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:44
 msgid "Subscription ID"

@@ -20,9 +20,6 @@ class BaseVault(ABC):
             self._clean_db_secret(instance)
             self.save_metadata(instance)
 
-        if instance.is_sync_metadata:
-            self.save_metadata(instance)
-
     def update(self, instance):
         if not instance.secret_has_save_to_vault:
             self._update(instance)
