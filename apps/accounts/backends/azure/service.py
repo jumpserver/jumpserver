@@ -41,12 +41,16 @@ class AZUREVaultClient(object):
 
     def create(self, name, secret):
         try:
+            if not secret:
+                secret = ''
             self.client.set_secret(name, secret)
         except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'create: {name} {str(e)}')
 
     def update(self, name, secret):
         try:
+            if not secret:
+                secret = ''
             self.client.set_secret(name, secret)
         except (ResourceNotFoundError, ClientAuthenticationError) as e:
             logger.error(f'update: {name} {str(e)}')
