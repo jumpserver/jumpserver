@@ -1,7 +1,9 @@
 from collections import defaultdict
 
+from django.utils import timezone
+
 from accounts.const import AutomationTypes
-from accounts.models import GatheredAccount, Account, GatheredAccountDiff
+from accounts.models import GatheredAccount, Account, AccountRisk
 from assets.models import Asset
 from common.const import ConfirmOrIgnore
 from common.utils import get_logger
@@ -16,7 +18,11 @@ logger = get_logger(__name__)
 
 
 class GatherAccountsManager(AccountBasePlaybookManager):
-    diff_items = ['authorized_keys', 'sudoers', 'groups']
+    diff_items = [
+        'authorized_keys', 'sudoers', 'groups',
+        'date_password_change', 'date_password_expired',
+    ]
+    long_time = timezone.timedelta(days=90)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,7 +36,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.is_sync_account = self.execution.snapshot.get('is_sync_account')
         self.pending_add_accounts = []
         self.pending_update_accounts = []
-        self.pending_add_diffs = []
+        self.pending_add_risks = []
 
     @classmethod
     def method_type(cls):
@@ -60,8 +66,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             self.asset_usernames_mapper[asset].add(username)
 
             d = {'asset': asset, 'username': username, 'remote_present': True, **info}
-            if len(d['address_last_login']) > 32:
-                d['address_last_login'] = d['address_last_login'][:32]
             accounts.append(d)
         self.asset_account_info[asset] = accounts
 
@@ -147,7 +151,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def batch_create_gathered_account(self, d, batch_size=20):
         if d is None:
             if self.pending_add_accounts:
-                GatheredAccount.objects.bulk_create(self.pending_add_accounts)
+                GatheredAccount.objects.bulk_create(self.pending_add_accounts, ignore_conflicts=True)
                 self.pending_add_accounts = []
             return
 
@@ -159,32 +163,103 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         if len(self.pending_add_accounts) > batch_size:
             self.batch_create_gathered_account(None)
 
-    def batch_update_gathered_account(self, ori_account, d, batch_size=20):
-        if not ori_account or d is None:
-            if self.pending_update_accounts:
-                GatheredAccount.objects.bulk_update(self.pending_update_accounts, [*self.diff_items])
-                self.pending_update_accounts = []
+    def _analyse_item_changed(self, ori_account, d):
+        diff = self.get_items_diff(ori_account, d)
 
-            if self.pending_add_diffs:
-                GatheredAccountDiff.objects.bulk_create(self.pending_add_diffs)
-                self.pending_add_diffs = []
+        if not diff:
             return
+
+        for k, v in diff.items():
+            self.pending_add_risks.append(AccountRisk(
+                asset=ori_account.asset, username=ori_account.username,
+                risk=k+'_changed', comment=v
+            ))
+
+    @staticmethod
+    def perform_save_risks(risks):
+        assets = {r.asset for r in risks}
+        assets_risks = AccountRisk.objects.filter(asset__in=assets)
+        assets_risks = {f"{r.asset_id}_{r.username}": r for r in assets_risks}
+
+        for r in risks:
+            found = assets_risks.get(f"{r.asset_id}_{r.username}")
+
+            if not found:
+                r.save()
+            else:
+                found.comment = r.comment + '\n------\n' + found.comment
+
+    def batch_analyse_risk(self, asset, ori_account, d, batch_size=20):
+        if asset is None:
+            if self.pending_add_risks:
+                self.perform_save_risks(self.pending_add_risks)
+                self.pending_add_risks = []
+            return
+
+        now = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+        basic = {'asset': asset, 'username': d['username']}
+        if ori_account:
+            self._analyse_item_changed(ori_account, d)
+        else:
+            self.pending_add_risks.append(
+                AccountRisk(**basic, risk='ghost', comment='{}'.format(now))
+            )
+
+        last_login = d.get('date_last_login')
+        if last_login and last_login < timezone.now() - self.long_time:
+            self.pending_add_risks.append(
+                AccountRisk(**basic, risk='zombie', comment='{}'.format(last_login))
+            )
+
+        date_password_change = d.get('date_password_change')
+        if date_password_change and date_password_change < timezone.now() - self.long_time:
+            self.pending_add_risks.append(
+                AccountRisk(**basic, risk='long_time_password', comment='{}'.format(date_password_change))
+            )
+
+        date_password_expired = d.get('date_password_expired')
+        if date_password_expired and date_password_expired < timezone.now():
+            self.pending_add_risks.append(
+                AccountRisk(**basic, risk='password_expired', comment='{}'.format(date_password_expired))
+            )
+
+        if len(self.pending_add_risks) > batch_size:
+            self.batch_analyse_risk(None, None, {})
+
+    def get_items_diff(self, ori_account, d):
+        if hasattr(ori_account, '_diff'):
+            return ori_account._diff
 
         diff = {}
         for item in self.diff_items:
             ori = getattr(ori_account, item)
             new = d.get(item, '')
 
+            if not ori:
+                continue
+
+            if isinstance(new, timezone.datetime):
+                new = ori.strftime('%Y-%m-%d %H:%M:%S')
+                ori = ori.strftime('%Y-%m-%d %H:%M:%S')
+
             if new != ori:
-                setattr(ori_account, item, new)
                 diff[item] = get_text_diff(ori, new)
 
+        ori_account._diff = diff
+        return diff
+
+    def batch_update_gathered_account(self, ori_account, d, batch_size=20):
+        if not ori_account or d is None:
+            if self.pending_update_accounts:
+                GatheredAccount.objects.bulk_update(self.pending_update_accounts, [*self.diff_items])
+                self.pending_update_accounts = []
+            return
+
+        diff = self.get_items_diff(ori_account, d)
         if diff:
+            for k in diff:
+                setattr(ori_account, k, d[k])
             self.pending_update_accounts.append(ori_account)
-            for k, v in diff.items():
-                self.pending_add_diffs.append(
-                    GatheredAccountDiff(account=ori_account, item=k, diff=v)
-                )
 
         if len(self.pending_update_accounts) > batch_size:
             self.batch_update_gathered_account(None, None)
@@ -202,11 +277,14 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     else:
                         self.batch_update_gathered_account(ori_account, d)
 
+                    self.batch_analyse_risk(asset, ori_account, d)
+
                 self.update_gather_accounts_status(asset)
                 GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
 
         self.batch_create_gathered_account(None)
         self.batch_update_gathered_account(None, None)
+        self.batch_analyse_risk(None, None, {})
 
     def run(self, *args, **kwargs):
         super().run(*args, **kwargs)

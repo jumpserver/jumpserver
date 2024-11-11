@@ -44,6 +44,14 @@ class GatherAccountsFilter:
                 continue
             username_sudo[username.strip()] = sudo.strip()
 
+        last_login = info.pop('last_login', '')
+        user_last_login = {}
+        for line in last_login:
+            if not line.strip() or ' ' not in line:
+                continue
+            username, login = line.split(' ', 1)
+            user_last_login[username] = login
+
         user_authorized = info.pop('user_authorized', [])
         username_authorized = {}
         for line in user_authorized:
@@ -52,26 +60,38 @@ class GatherAccountsFilter:
             username, authorized = line.split(':', 1)
             username_authorized[username.strip()] = authorized.strip()
 
+        passwd_date = info.pop('passwd_date', [])
+        username_password_date = {}
+        for line in passwd_date:
+            if ':' not in line:
+                continue
+            username, password_date = line.split(':', 1)
+            username_password_date[username.strip()] = password_date.strip().split()
+
         result = {}
         users = info.pop('users', '')
-        for line in users:
-            parts = line.split()
-            if len(parts) < 4:
-                continue
 
-            username = parts[0]
+        for username in users:
             if not username:
                 continue
             user = dict()
-            address = parts[2]
-            user['address_last_login'] = address
-            login_time = parts[3]
 
-            try:
-                login_date = timezone.datetime.fromisoformat(login_time)
-                user['date_last_login'] = login_date
-            except ValueError:
-                pass
+            login = user_last_login.get(username) or ''
+            if login and len(login) == 3:
+                user['address_last_login'] = login[1][:32]
+                try:
+                    login_date = timezone.datetime.fromisoformat(login[2])
+                    user['date_last_login'] = login_date
+                except ValueError:
+                    pass
+
+            start_date = timezone.make_aware(timezone.datetime(1970, 1, 1))
+            _password_date = username_password_date.get(username) or ''
+            if _password_date and len(_password_date) == 2:
+                if _password_date[0] and _password_date[0] != '0':
+                    user['date_password_change'] = start_date + timezone.timedelta(days=int(_password_date[0]))
+                if _password_date[1] and _password_date[1] != '0':
+                    user['date_password_expired'] = start_date + timezone.timedelta(days=int(_password_date[1]))
 
             user['groups'] = username_groups.get(username) or ''
             user['sudoers'] = username_sudo.get(username) or ''

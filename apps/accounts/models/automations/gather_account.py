@@ -9,35 +9,26 @@ from common.utils.timezone import is_date_more_than
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
-__all__ = ['GatherAccountsAutomation', 'GatheredAccount', 'GatheredAccountDiff']
-
-
-class GatheredAccountDiff(models.Model):
-    account = models.ForeignKey('GatheredAccount', on_delete=models.CASCADE, verbose_name=_("Gathered account"))
-    diff = models.TextField(default='', verbose_name=_("Diff"))
-    item = models.CharField(max_length=32, default='', verbose_name=_("Item"))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+__all__ = ['GatherAccountsAutomation', 'GatheredAccount', ]
 
 
 class GatheredAccount(JMSOrgBaseModel):
-    remote_present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 远端资产上是否还存在
-    present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在
-    date_last_login = models.DateTimeField(null=True, verbose_name=_("Date login"))
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_("Asset"))
     username = models.CharField(max_length=32, blank=True, db_index=True, verbose_name=_('Username'))
     address_last_login = models.CharField(max_length=39, default='', verbose_name=_("Address login"))
-    status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
+    date_last_login = models.DateTimeField(null=True, verbose_name=_("Date login"))
     authorized_keys = models.TextField(default='', blank=True, verbose_name=_("Authorized keys"))
     sudoers = models.TextField(default='', verbose_name=_("Sudoers"), blank=True)
     groups = models.TextField(default='', blank=True, verbose_name=_("Groups"))
+    remote_present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 远端资产上是否还存在
+    present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在
+    date_change_password = models.DateTimeField(null=True, verbose_name=_("Date change password"))
+    date_password_expired = models.DateTimeField(null=True, verbose_name=_("Date password expired"))
+    status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
 
     @property
     def address(self):
         return self.asset.address
-
-    @classmethod
-    def find_account_risk(cls, gathered_account, accounts):
-        pass
 
     @classmethod
     def update_exists_accounts(cls, gathered_account, accounts):

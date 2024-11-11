@@ -37,16 +37,18 @@ class AccountCheckAutomation(AccountBaseAutomation):
 
 
 class RiskChoice(TextChoices):
+    # 依赖自动发现的
     zombie = 'zombie', _('Long time no login')  # 好久没登录的账号, 禁用、删除
     ghost = 'ghost', _('Not managed')  # 未被纳管的账号, 纳管, 删除, 禁用
-    long_time_password = 'long_time_password', _('Long time no change')  # 好久没改密码的账号, 改密码
-    weak_password = 'weak_password', _('Weak password')  # 弱密码, 改密
-    password_error = 'password_error', _('Password error')  # 密码错误, 修改账号
-    password_expired = 'password_expired', _('Password expired')  # 密码过期, 修改密码
-    group_changed = 'group_changed', _('Group change')  # 组变更, 确认
-    sudo_changed = 'sudo_changed', _('Sudo changed')  # sudo 变更, 确认
+    group_changed = 'groups_changed', _('Groups change')  # 组变更, 确认
+    sudo_changed = 'sudoers_changed', _('Sudo changed')  # sudo 变更, 确认
     authorized_keys_changed = 'authorized_keys_changed', _('Authorized keys changed')  # authorized_keys 变更, 确认
     account_deleted = 'account_deleted', _('Account delete')  # 账号被删除, 确认
+    password_expired = 'password_expired', _('Password expired')  # 密码过期, 修改密码
+    long_time_password = 'long_time_password', _('Long time no change')  # 好久没改密码的账号, 改密码
+
+    weak_password = 'weak_password', _('Weak password')  # 弱密码, 改密
+    password_error = 'password_error', _('Password error')  # 密码错误, 修改账号
     no_admin_account = 'no_admin_account', _('No admin account')  # 无管理员账号, 设置账号
     others = 'others', _('Others')  # 其他风险, 确认
 
@@ -56,24 +58,14 @@ class AccountRisk(JMSOrgBaseModel):
     username = models.CharField(max_length=32, verbose_name=_('Username'))
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
     status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default='', blank=True, verbose_name=_('Status'))
+    comment = models.TextField(default='', verbose_name=_('Comment'))
 
     class Meta:
         verbose_name = _('Account risk')
+        unique_together = ('asset', 'username', 'risk')
 
     def __str__(self):
         return f"{self.username}@{self.asset} - {self.risk}"
-
-    def disable_account(self):
-        pass
-
-    def remove_account(self):
-        pass
-
-    def change_password(self):
-        pass
-
-    def handle_risk(self):
-        pass
 
     @classmethod
     def gen_fake_data(cls, count=1000, batch_size=50):

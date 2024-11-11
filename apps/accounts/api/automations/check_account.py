@@ -39,11 +39,16 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
 
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
-    search_fields = ('username',)
+    search_fields = ('username', 'asset')
+    filterset_fields = ('risk', 'status', 'asset')
     serializer_classes = {
         'default': serializers.AccountRiskSerializer,
         'assets': serializers.AssetRiskSerializer,
     }
+    ordering_fields = (
+        'asset', 'risk', 'status',  'username', 'date_created'
+    )
+    ordering = ('-asset', 'date_created')
     rbac_perms = {
         'sync_accounts': 'assets.add_accountrisk',
         'assets': 'accounts.view_accountrisk'
