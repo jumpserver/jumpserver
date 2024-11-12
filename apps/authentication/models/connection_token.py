@@ -12,6 +12,7 @@ from rest_framework.exceptions import PermissionDenied
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
+from authentication.const import ConnectionTokenType
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
 from common.utils import lazyproperty, pretty_string, bulk_get
@@ -26,6 +27,8 @@ def date_expired_default():
 
 
 class ConnectionToken(JMSOrgBaseModel):
+    _type = ConnectionTokenType.USER
+
     value = models.CharField(max_length=64, default='', verbose_name=_("Value"))
     user = models.ForeignKey(
         'users.User', on_delete=models.SET_NULL, null=True, blank=True,
@@ -52,6 +55,11 @@ class ConnectionToken(JMSOrgBaseModel):
     )
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
+    type = models.CharField(
+        max_length=16, choices=ConnectionTokenType.choices,
+        default=ConnectionTokenType.USER, verbose_name=_('Type')
+    )
+
     class Meta:
         ordering = ('-date_expired',)
         permissions = [
@@ -59,6 +67,10 @@ class ConnectionToken(JMSOrgBaseModel):
             ('reuse_connectiontoken', _('Can reuse connection token')),
         ]
         verbose_name = _('Connection token')
+
+    def save(self, *args, **kwargs):
+        self.type = self._meta.model._type
+        return super().save(*args, **kwargs)
 
     @property
     def is_expired(self):
@@ -268,9 +280,28 @@ class ConnectionToken(JMSOrgBaseModel):
 
 
 class SuperConnectionToken(ConnectionToken):
+    _type = ConnectionTokenType.SUPER
+
     class Meta:
         proxy = True
         permissions = [
             ('view_superconnectiontokensecret', _('Can view super connection token secret'))
         ]
         verbose_name = _("Super connection token")
+
+
+class AdminConnectionTokenManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(type=ConnectionTokenType.ADMIN)
+        return queryset
+
+
+class AdminConnectionToken(ConnectionToken):
+    _type = ConnectionTokenType.ADMIN
+
+    objects = AdminConnectionTokenManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Admin connection token")

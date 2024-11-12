@@ -37,3 +37,9 @@ class MFAType(TextChoices):
     SMS = MFASms.name, MFASms.display_name
     Radius = MFARadius.name, MFARadius.display_name
     Custom = MFACustom.name, MFACustom.display_name
+
+
+class ConnectionTokenType(TextChoices):
+    ADMIN = 'admin', 'Admin'
+    SUPER = 'super', 'Super'
+    USER = 'user', 'User'
