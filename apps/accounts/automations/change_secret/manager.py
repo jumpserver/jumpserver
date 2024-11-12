@@ -93,6 +93,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
+        host['check_conn_after_change'] = self.execution.snapshot.get('check_conn_after_change', True)
+
         accounts = self.get_accounts(account)
         error_msg = _("No pending accounts found")
         if not accounts:

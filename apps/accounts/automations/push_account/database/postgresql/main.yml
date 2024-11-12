@@ -60,5 +60,6 @@
       when:
         - result is succeeded
         - change_info is succeeded
+        - check_conn_after_change
       register: result
       failed_when: not result.is_available

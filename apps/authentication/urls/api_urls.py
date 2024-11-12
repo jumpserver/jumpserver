@@ -13,6 +13,7 @@ router.register('sso', api.SSOViewSet, 'sso')
 router.register('temp-tokens', api.TempTokenViewSet, 'temp-token')
 router.register('connection-token', api.ConnectionTokenViewSet, 'connection-token')
 router.register('super-connection-token', api.SuperConnectionTokenViewSet, 'super-connection-token')
+router.register('admin-connection-token', api.AdminConnectionTokenViewSet, 'admin-connection-token')
 router.register('confirm', api.UserConfirmationViewSet, 'confirm')
 router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 
