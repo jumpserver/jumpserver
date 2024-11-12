@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0006_accountcheckautomation_accountrisk'),
+        ('accounts', '0007_alter_accountrisk_risk'),
     ]
 
     operations = [
