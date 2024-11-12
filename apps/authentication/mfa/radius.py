@@ -12,7 +12,7 @@ class MFARadius(BaseMFA):
     display_name = 'Radius'
     placeholder = _("Radius verification code")
 
-    def check_code(self, code):
+    def check_code(self, code=None):
         assert self.is_authenticated()
         backend = RadiusBackend()
         username = self.user.username

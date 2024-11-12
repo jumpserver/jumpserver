@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+import base64
+import struct
 import uuid
 
+import math
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager as _UserManager
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -23,13 +27,15 @@ from ._json import JSONFilterMixin
 from ._role import RoleMixin, SystemRoleManager, OrgRoleManager
 from ._source import SourceMixin, Source
 from ._token import TokenMixin
+from ._face import FaceMixin
 
 logger = get_logger(__file__)
 __all__ = [
     "User",
     "UserPasswordHistory",
     "MFAMixin",
-    "AuthMixin"
+    "AuthMixin",
+    "FaceMixin"
 ]
 
 
@@ -48,6 +54,7 @@ class User(
     TokenMixin,
     RoleMixin,
     MFAMixin,
+    FaceMixin,
     LabeledMixin,
     JSONFilterMixin,
     AbstractUser,
@@ -132,6 +139,9 @@ class User(
     )
     slack_id = models.CharField(
         null=True, default=None, max_length=128, verbose_name=_("Slack")
+    )
+    face_vector = fields.EncryptTextField(
+        null=True, blank=True, max_length=2048, verbose_name=_("Face Vector")
     )
     date_api_key_last_used = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Date api key used")

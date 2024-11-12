@@ -1,0 +1,92 @@
+{% extends '_base_only_content.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+    <div style="text-align: center">
+        {% trans 'Face Recognition' %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form class="m-t" role="form" method="post" action="">
+        {% csrf_token %}
+        {% if 'code' in form.errors %}
+            <p class="red-fonts">{{ form.code.errors.as_text }}</p>
+        {% endif %}
+        <button id="submit_button" type="submit" style="display: none"></button>
+    </form>
+
+    <div id="iframe_container"
+         style="display: none; justify-content: center; align-items: center; height: 800px; width: 100%; background-color: #0a6aa1">
+        <iframe
+                title="face capture"
+                id="face_capture_iframe"
+                allow="camera"
+                sandbox="allow-scripts allow-same-origin"
+                style="width: 100%; height: 100%;border: none;">
+        </iframe>
+    </div>
+
+    <div id="retry_container" style="text-align: center; margin-top: 20px; display: none;">
+        <button id="retry_button" class="btn btn-primary">{% trans 'Retry' %}</button>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const apiUrl = "{% url 'api-auth:mfa-face-context' %}";
+            const faceCaptureUrl = "/faceliving/capture";
+            let token;
+
+            function createFaceCaptureToken() {
+                const csrf = getCookie('jms_csrftoken');
+                $.ajax({
+                    url: apiUrl,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrf
+                    },
+                    success: function (data) {
+                        token = data.token;
+                        $('#iframe_container').show();
+                        $('#face_capture_iframe').attr('src', `${faceCaptureUrl}?token=${token}`);
+                        startCheckingStatus();
+                    },
+                    error: function (error) {
+                        $('#retry_container').show();
+                    }
+                });
+            }
+
+            function startCheckingStatus() {
+                const interval = 1000;
+                const timer = setInterval(function () {
+                    $.ajax({
+                        url: `${apiUrl}?token=${token}`,
+                        method: 'GET',
+                        success: function (data) {
+                            if (data.is_finished) {
+                                clearInterval(timer);
+                                $('#submit_button').click();
+                            }
+                        },
+                        error: function (error) {
+                            console.error('API request failed:', error);
+                        }
+                    });
+                }, interval);
+            }
+
+            const active = "{{ active }}";
+            if (active) {
+                createFaceCaptureToken();
+            } else {
+                $('#retry_container').show();
+            }
+
+            $('#retry_button').on('click', function () {
+                window.location.href = "{% url 'authentication:login-face-capture' %}";
+            });
+        });
+    </script>
+{% endblock %}

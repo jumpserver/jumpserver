@@ -14,6 +14,7 @@ urlpatterns = [
     path('login/', non_atomic_requests(views.UserLoginView.as_view()), name='login'),
     path('login/mfa/', views.UserLoginMFAView.as_view(), name='login-mfa'),
     path('login/wait-confirm/', views.UserLoginWaitConfirmView.as_view(), name='login-wait-confirm'),
+    path('login/mfa/face/capture/', views.UserLoginMFAFaceView.as_view(), name='login-face-capture'),
     path('login/guard/', views.UserLoginGuardView.as_view(), name='login-guard'),
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
 
@@ -73,6 +74,8 @@ urlpatterns = [
     path('profile/otp/disable/', users_view.UserOtpDisableView.as_view(),
          name='user-otp-disable'),
 
+    path('profile/face/enable/', users_view.UserFaceEnableView.as_view(), name='user-face-enable'),
+    path('profile/face/disable/', users_view.UserFaceDisableView.as_view(), name='user-face-disable'),
     # other authentication protocol
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),
     path('openid/', include(('authentication.backends.oidc.urls', 'authentication'), namespace='openid')),
