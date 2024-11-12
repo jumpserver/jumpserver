@@ -12,9 +12,13 @@ class BaseMFA(abc.ABC):
         因为首页登录时，可能没法获取到一些状态
         """
         self.user = user
+        self.request = None
 
     def is_authenticated(self):
         return self.user and self.user.is_authenticated
+
+    def set_request(self, request):
+        self.request = request
 
     @property
     @abc.abstractmethod
