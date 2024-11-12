@@ -22,7 +22,7 @@ class GatheredAccount(JMSOrgBaseModel):
     groups = models.TextField(default='', blank=True, verbose_name=_("Groups"))
     remote_present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 远端资产上是否还存在
     present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在
-    date_change_password = models.DateTimeField(null=True, verbose_name=_("Date change password"))
+    date_password_change = models.DateTimeField(null=True, verbose_name=_("Date change password"))
     date_password_expired = models.DateTimeField(null=True, verbose_name=_("Date password expired"))
     status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
 

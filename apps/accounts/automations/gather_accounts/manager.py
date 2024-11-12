@@ -20,9 +20,13 @@ logger = get_logger(__name__)
 class GatherAccountsManager(AccountBasePlaybookManager):
     diff_items = [
         'authorized_keys', 'sudoers', 'groups',
-        'date_password_change', 'date_password_expired',
     ]
     long_time = timezone.timedelta(days=90)
+    datetime_check_items = [
+        {'field': 'date_last_login', 'risk': 'zombie', 'delta': long_time},
+        {'field': 'date_password_change', 'risk': 'long_time_password', 'delta': long_time},
+        {'field': 'date_password_expired', 'risk': 'password_expired', 'delta': timezone.timedelta(seconds=1)}
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,6 +74,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.asset_account_info[asset] = accounts
 
     def on_runner_failed(self,  runner, e):
+        print("Runner failed: ", e)
         raise e
 
     def on_host_success(self, host, result):
@@ -167,6 +172,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         now = timezone.now().isoformat()
         diff = self.get_items_diff(ori_account, d)
 
+        print("Diff items: ", diff)
         if not diff:
             return
 
@@ -175,20 +181,43 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 asset=ori_account.asset, username=ori_account.username,
                 risk=k+'_changed', details=[{'datetime': now, 'diff': v}]
             ))
+            print("Pending add risks: ", self.pending_add_risks)
 
     @staticmethod
     def perform_save_risks(risks):
+        # 提前取出来，避免每次都查数据库
         assets = {r.asset for r in risks}
         assets_risks = AccountRisk.objects.filter(asset__in=assets)
-        assets_risks = {f"{r.asset_id}_{r.username}": r for r in assets_risks}
+        assets_risks = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in assets_risks}
 
         for r in risks:
-            found = assets_risks.get(f"{r.asset_id}_{r.username}")
+            found = assets_risks.get(f"{r.asset_id}_{r.username}_{r.risk}")
 
             if not found:
                 r.save()
-            else:
-                found.details.extend(r.details)
+                continue
+
+            found.details.extend(r.details)
+            found.save(update_fields=['details'])
+
+    def _analyse_datetime_changed(self, ori_account, d, asset, username):
+        for item in self.datetime_check_items:
+            field = item['field']
+            risk = item['risk']
+            delta = item['delta']
+
+            date = d.get(field)
+            if not date:
+                continue
+
+            pre_date = ori_account and getattr(ori_account, field)
+            if pre_date == date:
+                continue
+
+            if date and date < timezone.now() - delta:
+                self.pending_add_risks.append(
+                    AccountRisk(asset=asset, username=username, risk=risk)
+                )
 
     def batch_analyse_risk(self, asset, ori_account, d, batch_size=20):
         if asset is None:
@@ -204,26 +233,10 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             self._analyse_item_changed(ori_account, d)
         else:
             self.pending_add_risks.append(
-                AccountRisk(**basic, risk='ghost', )
+                AccountRisk(**basic, risk='ghost')
             )
 
-        last_login = d.get('date_last_login')
-        if last_login and last_login < timezone.now() - self.long_time:
-            self.pending_add_risks.append(
-                AccountRisk(**basic, risk='zombie')
-            )
-
-        date_password_change = d.get('date_password_change')
-        if date_password_change and date_password_change < timezone.now() - self.long_time:
-            self.pending_add_risks.append(
-                AccountRisk(**basic, risk='long_time_password')
-            )
-
-        date_password_expired = d.get('date_password_expired')
-        if date_password_expired and date_password_expired < timezone.now():
-            self.pending_add_risks.append(
-                AccountRisk(**basic, risk='password_expired')
-            )
+        self._analyse_datetime_changed(ori_account, d, asset, d['username'])
 
         if len(self.pending_add_risks) > batch_size:
             self.batch_analyse_risk(None, None, {})
@@ -279,6 +292,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     else:
                         self.batch_update_gathered_account(ori_account, d)
 
+                    print("Batch analyse risk")
                     self.batch_analyse_risk(asset, ori_account, d)
 
                 self.update_gather_accounts_status(asset)

@@ -49,13 +49,13 @@
       register: user_authorized
 
     - set_fact:
-      info:
-        users: "{{ users.stdout_lines }}"
-        last_login: "{{ last_login.stdout_lines }}"
-        user_groups: "{{ user_groups.stdout_lines }}"
-        user_sudo: "{{ user_sudo.stdout_lines }}"
-        user_authorized: "{{ user_authorized.stdout_lines }}"
-        passwd_date: "{{ passwd_date.stdout_lines }}"
+        info:
+          users: "{{ users.stdout_lines }}"
+          last_login: "{{ last_login.stdout_lines }}"
+          user_groups: "{{ user_groups.stdout_lines }}"
+          user_sudo: "{{ user_sudo.stdout_lines }}"
+          user_authorized: "{{ user_authorized.stdout_lines }}"
+          passwd_date: "{{ passwd_date.stdout_lines }}"
 
     - debug:
-      var: info
+        var: info
