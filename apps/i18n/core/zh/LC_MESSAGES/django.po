@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 16:37+0800\n"
+"POT-Creation-Date: 2024-11-11 17:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -157,7 +157,7 @@ msgstr "令牌"
 msgid "API key"
 msgstr "API key"
 
-#: accounts/const/account.py:14 common/db/fields.py:230
+#: accounts/const/account.py:14 common/db/fields.py:249
 #: settings/serializers/terminal.py:14
 msgid "All"
 msgstr "全部"
@@ -294,11 +294,11 @@ msgid "Only create"
 msgstr "仅创建"
 
 #: accounts/const/automation.py:103
-#: authentication/serializers/password_mfa.py:16
-#: authentication/serializers/password_mfa.py:24
+#: authentication/serializers/password_mfa.py:17
+#: authentication/serializers/password_mfa.py:25
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:61 users/forms/profile.py:100
-#: users/forms/profile.py:108 users/models/user/__init__.py:58
+#: users/forms/profile.py:108 users/models/user/__init__.py:62
 #: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
@@ -381,7 +381,7 @@ msgid "historical Account"
 msgstr "账号历史"
 
 #: accounts/models/account.py:58 accounts/serializers/account/account.py:228
-#: users/models/user/__init__.py:119
+#: users/models/user/__init__.py:123
 msgid "Source"
 msgstr "来源"
 
@@ -632,7 +632,7 @@ msgstr "最后登录日期"
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: terminal/serializers/storage.py:136 users/forms/profile.py:31
-#: users/forms/profile.py:114 users/models/user/__init__.py:56
+#: users/forms/profile.py:114 users/models/user/__init__.py:60
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
@@ -669,7 +669,7 @@ msgstr "触发方式"
 msgid "Action"
 msgstr "动作"
 
-#: accounts/models/automations/push_account.py:57
+#: accounts/models/automations/push_account.py:58
 msgid "Push asset account"
 msgstr "账号推送"
 
@@ -730,7 +730,7 @@ msgstr "密码规则"
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:32 users/models/group.py:13
-#: users/models/preference.py:11 users/models/user/__init__.py:57
+#: users/models/preference.py:11 users/models/user/__init__.py:61
 #: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:310
 #: xpack/plugins/cloud/serializers/task.py:75
 msgid "Name"
@@ -966,8 +966,8 @@ msgstr "ID"
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
-#: users/const.py:14 users/models/user/__init__.py:281
-#: users/models/user/__init__.py:308
+#: users/const.py:14 users/models/user/__init__.py:321
+#: users/models/user/__init__.py:348
 msgid "User"
 msgstr "用户"
 
@@ -1076,7 +1076,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: terminal/models/component/endpoint.py:121
 #: terminal/models/session/session.py:47
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:91
+#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:95
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:124
 msgid "Comment"
 msgstr "备注"
@@ -2054,7 +2054,7 @@ msgstr "资产自动化任务"
 # msgstr "备注"
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:246
-#: users/models/user/__init__.py:311
+#: users/models/user/__init__.py:351
 msgid "Date created"
 msgstr "创建日期"
 
@@ -2075,17 +2075,17 @@ msgid "Date verified"
 msgstr "校验日期"
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
-#: users/models/group.py:25 users/models/user/__init__.py:63
+#: users/models/group.py:25 users/models/user/__init__.py:67
 msgid "User group"
 msgstr "用户组"
 
 #: assets/models/cmd_filter.py:42 common/db/models.py:35
-#: users/models/user/__init__.py:139
+#: users/models/user/__init__.py:146
 msgid "Date updated"
 msgstr "更新日期"
 
 #: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:91
-#: common/db/models.py:32 users/models/user/__init__.py:101
+#: common/db/models.py:32 users/models/user/__init__.py:105
 #: users/serializers/group.py:32
 msgid "Created by"
 msgstr "创建者"
@@ -2936,7 +2936,7 @@ msgstr "登录 IP"
 
 #: audits/models.py:200 audits/serializers.py:52
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:63 users/models/user/__init__.py:79
+#: users/forms/profile.py:63 users/models/user/__init__.py:83
 #: users/serializers/profile.py:70
 msgid "MFA"
 msgstr "MFA"
@@ -2994,7 +2994,7 @@ msgstr "用户 %s %s 了当前资源"
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:98
+#: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:102
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -3028,14 +3028,14 @@ msgstr "认证令牌"
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:78 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
-#: users/models/user/__init__.py:122 users/models/user/_source.py:19
+#: users/models/user/__init__.py:126 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
 #: authentication/views/login.py:90 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
-#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:128
+#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:132
 #: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr "飞书"
@@ -3043,13 +3043,13 @@ msgstr "飞书"
 #: audits/signal_handlers/login_log.py:40 authentication/views/login.py:102
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
-#: users/models/user/__init__.py:134 users/models/user/_source.py:23
+#: users/models/user/__init__.py:138 users/models/user/_source.py:23
 msgid "Slack"
 msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
 #: authentication/views/login.py:84 notifications/backends/__init__.py:12
-#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:125
+#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:129
 #: users/models/user/_source.py:20
 msgid "DingTalk"
 msgstr "钉钉"
@@ -3104,7 +3104,7 @@ msgstr "最多可以创建10个访问密钥"
 msgid "The value in the parameter must contain %s"
 msgstr "参数中的值必须包含 %s"
 
-#: authentication/api/confirm.py:50
+#: authentication/api/confirm.py:51
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
@@ -3132,7 +3132,7 @@ msgstr "ACL 动作是拒绝: {}({})"
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
-#: authentication/api/mfa.py:62
+#: authentication/api/mfa.py:155
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
@@ -3443,6 +3443,19 @@ msgstr "自定义 MFA 验证码"
 msgid "MFA custom global enabled, cannot disable"
 msgstr "自定义 MFA 全局开启，无法被禁用"
 
+#: authentication/mfa/face.py:8
+msgid "Face Recognition"
+msgstr "人脸识别"
+
+#: authentication/mfa/face.py:18
+msgid "Facial comparison failed"
+msgstr "人脸对比失败"
+
+#: authentication/mfa/face.py:47
+#: authentication/templates/authentication/face_capture.html:6
+msgid "Frontal Face Recognition"
+msgstr "正面人脸识别"
+
 #: authentication/mfa/otp.py:7
 msgid "OTP code invalid, or server time error"
 msgstr "虚拟 MFA 验证码错误，或者服务器端时间不对"
@@ -3475,8 +3488,8 @@ msgstr "Radius MFA 全局开启，无法被禁用"
 msgid "SMS verify code invalid"
 msgstr "短信验证码校验失败"
 
-#: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
-#: authentication/serializers/password_mfa.py:24
+#: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:17
+#: authentication/serializers/password_mfa.py:25
 #: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
 #: users/forms/profile.py:103 users/forms/profile.py:108
 #: users/templates/users/forgot_password.html:157
@@ -3609,13 +3622,13 @@ msgid "Private Token"
 msgstr "私有令牌"
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
-#: users/models/user/__init__.py:86
+#: users/models/user/__init__.py:90
 #: xpack/plugins/cloud/serializers/account_attrs.py:213
 msgid "Private key"
 msgstr "ssh私钥"
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:34
-#: users/forms/profile.py:172 users/models/user/__init__.py:89
+#: users/forms/profile.py:172 users/models/user/__init__.py:93
 #: xpack/plugins/cloud/serializers/account_attrs.py:210
 msgid "Public key"
 msgstr "SSH公钥"
@@ -3703,7 +3716,7 @@ msgstr "已过期"
 msgid "Org name"
 msgstr "组织名称"
 
-#: authentication/serializers/password_mfa.py:29
+#: authentication/serializers/password_mfa.py:30
 #: users/templates/users/forgot_password.html:153
 msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
@@ -3907,6 +3920,10 @@ msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能
 #: templates/flash_message_standalone.html:28 tickets/const.py:18
 msgid "Cancel"
 msgstr "取消"
+
+#: authentication/templates/authentication/face_capture.html:29
+msgid "Retry"
+msgstr "重试"
 
 #: authentication/templates/authentication/login.html:308
 msgid ""
@@ -4194,7 +4211,7 @@ msgstr "编码数据为 text"
 msgid "Encrypt field using Secret Key"
 msgstr "加密的字段"
 
-#: common/db/fields.py:577
+#: common/db/fields.py:596
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -4204,15 +4221,15 @@ msgstr ""
 "{'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': "
 "'1.1.1.1'}}"
 
-#: common/db/fields.py:584
+#: common/db/fields.py:603
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "无效类型，应为 all、ids 或 attrs"
 
-#: common/db/fields.py:587
+#: common/db/fields.py:606
 msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
-#: common/db/fields.py:589 common/db/fields.py:594
+#: common/db/fields.py:608 common/db/fields.py:613
 #: common/serializers/fields.py:144 terminal/serializers/session.py:81
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
@@ -4221,11 +4238,11 @@ msgstr "无效的ID，应为列表"
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
-#: common/db/fields.py:592 common/db/fields.py:597
+#: common/db/fields.py:611 common/db/fields.py:616
 msgid "Invalid attrs, should be a list of dict"
 msgstr "无效的属性，应为dict列表"
 
-#: common/db/fields.py:599
+#: common/db/fields.py:618
 msgid "Invalid attrs, should be has name and value"
 msgstr "无效属性，应具有名称和值"
 
@@ -4237,7 +4254,7 @@ msgstr "忽略的"
 msgid "discard time"
 msgstr "忽略时间"
 
-#: common/db/models.py:33 users/models/user/__init__.py:104
+#: common/db/models.py:33 users/models/user/__init__.py:108
 msgid "Updated by"
 msgstr "最后更新者"
 
@@ -5033,7 +5050,9 @@ msgid ""
 "The variable name used in the script has a fixed prefix 'jms_' followed by "
 "the input variable name. For example, if the variable name is 'name,' the "
 "final generated environment variable will be 'jms_name'."
-msgstr "在脚本使用的变量名称，固定前缀 jms_ + 输入的变量名，例如变量名name，则最终生成环境变量为 jms_name"
+msgstr ""
+"在脚本使用的变量名称，固定前缀 jms_ + 输入的变量名，例如变量名name，则最终生"
+"成环境变量为 jms_name"
 
 #: ops/models/variable.py:16
 msgid "Default Value"
@@ -5587,7 +5606,7 @@ msgid "Permissions"
 msgstr "授权"
 
 #: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user/__init__.py:66
+#: users/models/user/__init__.py:70
 msgid "Role"
 msgstr "角色"
 
@@ -6371,7 +6390,7 @@ msgstr "签名"
 msgid "Template code"
 msgstr "模板"
 
-#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:76
+#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:80
 #: users/serializers/user.py:155
 msgid "Phone"
 msgstr "手机"
@@ -7407,17 +7426,17 @@ msgstr ""
 "href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-#: templates/_mfa_login_field.html:28
+#: templates/_mfa_login_field.html:32
 #: users/templates/users/forgot_password.html:101
 msgid "Send"
 msgstr "发送"
 
-#: templates/_mfa_login_field.html:106
+#: templates/_mfa_login_field.html:111
 #: users/templates/users/forgot_password.html:176
 msgid "Wait: "
 msgstr "等待："
 
-#: templates/_mfa_login_field.html:116
+#: templates/_mfa_login_field.html:121
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
@@ -9076,58 +9095,62 @@ msgstr "不能和原来的密钥相同"
 msgid "Preference"
 msgstr "用户设置"
 
-#: users/models/user/__init__.py:69 users/serializers/user.py:271
+#: users/models/user/__init__.py:73 users/serializers/user.py:271
 msgid "Is service account"
 msgstr "服务账号"
 
-#: users/models/user/__init__.py:71
+#: users/models/user/__init__.py:75
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user/__init__.py:73
+#: users/models/user/__init__.py:77
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user/__init__.py:82
+#: users/models/user/__init__.py:86
 msgid "OTP secret key"
 msgstr "OTP 密钥"
 
 # msgid "Private key"
 # msgstr "ssh私钥"
-#: users/models/user/__init__.py:92 users/serializers/profile.py:97
+#: users/models/user/__init__.py:96 users/serializers/profile.py:97
 #: users/serializers/user.py:268
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/models/user/__init__.py:110
+#: users/models/user/__init__.py:114
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user/__init__.py:113
+#: users/models/user/__init__.py:117
 msgid "Need update password"
 msgstr "需要更新密码"
 
-#: users/models/user/__init__.py:137
+#: users/models/user/__init__.py:141
+msgid "Face Vector"
+msgstr ""
+
+#: users/models/user/__init__.py:144
 msgid "Date api key used"
 msgstr "API key 最后使用日期"
 
-#: users/models/user/__init__.py:276
+#: users/models/user/__init__.py:316
 msgid "Can not delete admin user"
 msgstr "无法删除管理员用户"
 
-#: users/models/user/__init__.py:290
+#: users/models/user/__init__.py:330
 msgid "Can invite user"
 msgstr "可以邀请用户"
 
-#: users/models/user/__init__.py:291
+#: users/models/user/__init__.py:331
 msgid "Can remove user"
 msgstr "可以移除用户"
 
-#: users/models/user/__init__.py:292
+#: users/models/user/__init__.py:332
 msgid "Can match user"
 msgstr "可以匹配用户"
 
-#: users/models/user/__init__.py:321
+#: users/models/user/__init__.py:361
 msgid "User password history"
 msgstr "用户密码历史"
 

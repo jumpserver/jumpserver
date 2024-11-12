@@ -18,15 +18,19 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
              style="display: none"
         >
-            <input type="text" class="form-control input-style"
-                   placeholder="{{ backend.placeholder }}"
-            >
-            {% if backend.challenge_required %}
-                <button class="btn btn-primary full-width btn-challenge"
-                        type='button' onclick="sendChallengeCode(this)"
+
+            {% if backend.name == 'face' %}
+            {% else %}
+                <input type="text" class="form-control input-style"
+                       placeholder="{{ backend.placeholder }}"
                 >
-                    {% trans 'Send' %}
-                </button>
+                {% if backend.challenge_required %}
+                    <button class="btn btn-primary full-width btn-challenge"
+                            type='button' onclick="sendChallengeCode(this)"
+                    >
+                        {% trans 'Send' %}
+                    </button>
+                {% endif %}
             {% endif %}
         </div>
     {% endfor %}

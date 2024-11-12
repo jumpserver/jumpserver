@@ -346,6 +346,8 @@ class Config(dict):
         'AUTH_OPENID_REALM_NAME': None,
         'OPENID_ORG_IDS': [DEFAULT_ID],
 
+        # 人脸识别
+
         # Raidus 认证
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
@@ -479,6 +481,10 @@ class Config(dict):
 
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
+
+        'FACE_RECOGNITION_ENABLED': False,
+        'FACE_RECOGNITION_DISTANCE_THRESHOLD': 0.35,
+        'FACE_RECOGNITION_COSINE_THRESHOLD': 0.95,
 
         'SMS_ENABLED': False,
         'SMS_BACKEND': '',
