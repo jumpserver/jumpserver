@@ -35,6 +35,7 @@ class ComponentI18nApi(RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         name = kwargs.get('name')
         lang = request.query_params.get('lang')
+        lang = lang if lang in ['en', 'ja', 'zh_hant', 'zh'] else 'en'
         data = self.get_component_translations(name)
 
         if lang:
