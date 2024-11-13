@@ -66,7 +66,7 @@ class JobsAuditViewSet(OrgModelViewSet):
     search_fields = ['creator__name']
     filterset_fields = ['creator__name']
     serializer_class = JobsAuditSerializer
-    ordering = ['-is_periodic', '-date_created']
+    ordering = ['-is_periodic', '-date_updated']
     http_method_names = ['get', 'options', 'patch']
 
     def get_queryset(self):

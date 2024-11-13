@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 19:17+0800\n"
+"POT-Creation-Date: 2024-11-13 11:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -593,7 +593,7 @@ msgstr "结束日期"
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113
 #: assets/serializers/automations/base.py:39 audits/models.py:208
-#: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:239
+#: audits/serializers.py:69 ops/models/base.py:49 ops/models/job.py:239
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -665,7 +665,7 @@ msgstr "触发方式"
 
 #: accounts/models/automations/push_account.py:16 acls/models/base.py:41
 #: acls/serializers/base.py:57 assets/models/cmd_filter.py:81
-#: audits/models.py:92 audits/serializers.py:84
+#: audits/models.py:92 audits/serializers.py:99
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:52 perms/serializers/permission.py:74
@@ -884,8 +884,8 @@ msgstr "类别"
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:146 assets/serializers/platform.py:159
-#: assets/serializers/platform.py:171 audits/serializers.py:53
-#: audits/serializers.py:170
+#: assets/serializers/platform.py:171 audits/serializers.py:68
+#: audits/serializers.py:185
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
@@ -958,7 +958,7 @@ msgstr "ID"
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:271
-#: audits/serializers.py:171 authentication/models/connection_token.py:32
+#: audits/serializers.py:186 authentication/models/connection_token.py:32
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
@@ -1587,7 +1587,7 @@ msgid "Login city"
 msgstr "登录城市"
 
 #: acls/templates/acls/user_login_reminder.html:11 audits/models.py:197
-#: audits/models.py:266 audits/serializers.py:68
+#: audits/models.py:266 audits/serializers.py:83
 msgid "User agent"
 msgstr "用户代理"
 
@@ -2821,7 +2821,7 @@ msgid "Finished"
 msgstr "结束"
 
 #: audits/const.py:46 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:174
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:182
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:57
 #: terminal/serializers/session.py:113
 msgid "Terminal"
@@ -2866,7 +2866,7 @@ msgstr "作业审计日志"
 msgid "Remote addr"
 msgstr "远端地址"
 
-#: audits/models.py:61 audits/serializers.py:38
+#: audits/models.py:61 audits/serializers.py:53
 msgid "Operate"
 msgstr "操作"
 
@@ -2891,12 +2891,12 @@ msgstr "会话"
 msgid "File transfer log"
 msgstr "文件传输"
 
-#: audits/models.py:94 audits/serializers.py:86
+#: audits/models.py:94 audits/serializers.py:101
 msgid "Resource Type"
 msgstr "资源类型"
 
 #: audits/models.py:95 audits/models.py:98 audits/models.py:144
-#: audits/serializers.py:85 labels/serializers.py:46
+#: audits/serializers.py:100 labels/serializers.py:46
 msgid "Resource"
 msgstr "资源"
 
@@ -2938,7 +2938,7 @@ msgstr "登录方式"
 msgid "Login IP"
 msgstr "登录 IP"
 
-#: audits/models.py:200 audits/serializers.py:52
+#: audits/models.py:200 audits/serializers.py:67
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:63 users/models/user/__init__.py:79
 #: users/serializers/profile.py:70
@@ -2982,20 +2982,20 @@ msgstr "下线用户会话"
 msgid "Creator"
 msgstr "创建者"
 
-#: audits/serializers.py:69
+#: audits/serializers.py:84
 msgid "Reason display"
 msgstr "原因描述"
 
-#: audits/serializers.py:70 audits/serializers.py:184
+#: audits/serializers.py:85 audits/serializers.py:199
 msgid "Auth backend display"
 msgstr "认证方式"
 
-#: audits/serializers.py:134
+#: audits/serializers.py:149
 #, python-format
 msgid "%s %s this resource"
 msgstr "用户 %s %s 了当前资源"
 
-#: audits/serializers.py:172 authentication/models/connection_token.py:47
+#: audits/serializers.py:187 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:98
@@ -4719,7 +4719,7 @@ msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
 
-#: ops/api/job.py:231
+#: ops/api/job.py:235
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "正在创建任务，无法中断，请稍后重试。"
@@ -4971,7 +4971,7 @@ msgstr "其它参数"
 msgid "Date published"
 msgstr "发布日期"
 
-#: ops/models/celery.py:113
+#: ops/models/celery.py:124
 msgid "Celery Task Execution"
 msgstr "Celery 任务执行"
 
@@ -4992,10 +4992,8 @@ msgid "Parameters define"
 msgstr "参数定义"
 
 #: ops/models/job.py:159
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Periodic variable"
-msgstr "周期执行"
+msgstr "周期执行变量"
 
 #: ops/models/job.py:160
 msgid "Run as"
@@ -5031,40 +5029,32 @@ msgid "VCS URL"
 msgstr "VCS URL"
 
 #: ops/models/variable.py:11
-#, fuzzy
-#| msgid "Variable Type"
 msgid "Variable name"
-msgstr "参数类型"
+msgstr "变量名"
 
 #: ops/models/variable.py:12
 msgid ""
 "The variable name used in the script has a fixed prefix 'jms_' followed by "
 "the input variable name. For example, if the variable name is 'name,' the "
 "final generated environment variable will be 'jms_name'."
-msgstr ""
+msgstr "在脚本使用的变量名称，固定前缀 jms_ + 输入的变量名，例如变量名name，则最终生成环境变量为 jms_name"
 
 #: ops/models/variable.py:16
-#, fuzzy
-#| msgid "Default"
 msgid "Default Value"
 msgstr "默认"
 
 #: ops/models/variable.py:18
-#, fuzzy
-#| msgid "Variable Type"
 msgid "Variable type"
-msgstr "参数类型"
+msgstr "变量类型"
 
-#: ops/models/variable.py:21 ops/serializers/variable.py:23
+#: ops/models/variable.py:21 ops/serializers/variable.py:25
 msgid "ExtraVars"
-msgstr ""
+msgstr "额外参数"
 
 #: ops/models/variable.py:49 ops/serializers/adhoc.py:16
 #: ops/serializers/job.py:22 ops/serializers/playbook.py:21
-#, fuzzy
-#| msgid "Variable Type"
 msgid "Variable"
-msgstr "参数类型"
+msgstr "变量"
 
 #: ops/notifications.py:20
 msgid "Server performance"
@@ -5126,11 +5116,11 @@ msgstr "任务 ID"
 msgid "You do not have permission for the current job."
 msgstr "你没有当前作业的权限。"
 
-#: ops/serializers/variable.py:20
+#: ops/serializers/variable.py:22
 msgid "Variable Type"
-msgstr "参数类型"
+msgstr "变量类型"
 
-#: ops/serializers/variable.py:25
+#: ops/serializers/variable.py:27
 msgid ""
 "Each item is on a separate line, with each line separated by a colon. The "
 "part before the colon is the display content, and the part after the colon "
@@ -6586,8 +6576,6 @@ msgid "Vault"
 msgstr "启用 Vault"
 
 #: settings/serializers/feature.py:53
-#, fuzzy
-#| msgid "Provider"
 msgid "Vault provider"
 msgstr "云服务商"
 
@@ -6611,8 +6599,6 @@ msgstr "挂载点"
 
 #: settings/serializers/feature.py:94
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
-#, fuzzy
-#| msgid "Client ID"
 msgid "Tenant ID"
 msgstr "客户端 ID"
 
@@ -7899,7 +7885,7 @@ msgstr "远端地址"
 msgid "Application User"
 msgstr "应用用户"
 
-#: terminal/models/component/terminal.py:176
+#: terminal/models/component/terminal.py:184
 msgid "Can view terminal config"
 msgstr "可以查看终端配置"
 
@@ -8823,7 +8809,7 @@ msgstr "工单快照"
 msgid "Please try again"
 msgstr "请再次尝试"
 
-#: tickets/models/ticket/general.py:481
+#: tickets/models/ticket/general.py:483
 msgid "Super ticket"
 msgstr "超级工单"
 
