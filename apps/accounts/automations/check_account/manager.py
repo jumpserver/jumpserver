@@ -41,6 +41,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.pending_add_accounts = []
         self.pending_update_accounts = []
         self.pending_add_risks = []
+        self.now = timezone.now()
 
     @classmethod
     def method_type(cls):
@@ -169,38 +170,40 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             self.batch_create_gathered_account(None)
 
     def _analyse_item_changed(self, ori_account, d):
-        now = timezone.now().isoformat()
         diff = self.get_items_diff(ori_account, d)
 
-        print("Diff items: ", diff)
         if not diff:
             return
 
         for k, v in diff.items():
-            self.pending_add_risks.append(AccountRisk(
+            self.pending_add_risks.append(dict(
                 asset=ori_account.asset, username=ori_account.username,
-                risk=k+'_changed', details=[{'datetime': now, 'diff': v}]
+                risk=k+'_changed', detail={'diff': v}
             ))
-            print("Pending add risks: ", self.pending_add_risks)
 
-    @staticmethod
-    def perform_save_risks(risks):
+    def perform_save_risks(self, risks):
         # 提前取出来，避免每次都查数据库
-        assets = {r.asset for r in risks}
+        assets = {r['asset'] for r in risks}
         assets_risks = AccountRisk.objects.filter(asset__in=assets)
         assets_risks = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in assets_risks}
 
-        for r in risks:
-            found = assets_risks.get(f"{r.asset_id}_{r.username}_{r.risk}")
+        for d in risks:
+            detail = d.pop('detail', {})
+            detail['datetime'] = self.now.isoformat()
+            key = f"{d['asset'].id}_{d['username']}_{d['risk']}"
+            found = assets_risks.get(key)
 
             if not found:
+                r = AccountRisk(**d, details=[detail])
                 r.save()
                 continue
 
-            found.details.extend(r.details)
+            found.details.append(detail)
             found.save(update_fields=['details'])
 
     def _analyse_datetime_changed(self, ori_account, d, asset, username):
+        basic = {'asset': asset, 'username': username}
+
         for item in self.datetime_check_items:
             field = item['field']
             risk = item['risk']
@@ -216,7 +219,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
             if date and date < timezone.now() - delta:
                 self.pending_add_risks.append(
-                    AccountRisk(asset=asset, username=username, risk=risk)
+                    dict(**basic, risk=risk, detail={'date': date.isoformat()})
                 )
 
     def batch_analyse_risk(self, asset, ori_account, d, batch_size=20):
@@ -226,14 +229,12 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 self.pending_add_risks = []
             return
 
-        now = timezone.now().isoformat()
-        basic = {'asset': asset, 'username': d['username'], 'details': [{'datetime': now}]}
-
+        basic = {'asset': asset, 'username': d['username']}
         if ori_account:
             self._analyse_item_changed(ori_account, d)
         else:
             self.pending_add_risks.append(
-                AccountRisk(**basic, risk='ghost')
+                dict(**basic, risk='ghost')
             )
 
         self._analyse_datetime_changed(ori_account, d, asset, d['username'])
@@ -292,7 +293,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     else:
                         self.batch_update_gathered_account(ori_account, d)
 
-                    print("Batch analyse risk")
                     self.batch_analyse_risk(asset, ori_account, d)
 
                 self.update_gather_accounts_status(asset)

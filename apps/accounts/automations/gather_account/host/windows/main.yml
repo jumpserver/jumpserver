@@ -1,0 +1,14 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Gather windows account
+      ansible.builtin.win_shell: net user
+      register: result
+      ignore_errors: true
+
+    - name: Define info by set_fact
+      ansible.builtin.set_fact:
+        info: "{{ result.stdout_lines }}"
+
+    - debug:
+        var: info

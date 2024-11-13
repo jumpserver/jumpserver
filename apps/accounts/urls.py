@@ -24,6 +24,8 @@ router.register(r'gather-account-executions', api.GatherAccountsExecutionViewSet
 router.register(r'push-account-automations', api.PushAccountAutomationViewSet, 'push-account-automation')
 router.register(r'push-account-executions', api.PushAccountExecutionViewSet, 'push-account-execution')
 router.register(r'push-account-records', api.PushAccountRecordViewSet, 'push-account-record')
+router.register(r'check-account-automations', api.CheckAccountAutomationViewSet, 'check-account-automation')
+router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, 'check-account-execution')
 router.register(r'account-check-engines', api.AccountCheckEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 

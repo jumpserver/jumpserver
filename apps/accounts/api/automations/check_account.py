@@ -10,12 +10,12 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 
 __all__ = [
-    'CheckAccountsAutomationViewSet', 'CheckAccountExecutionViewSet',
+    'CheckAccountAutomationViewSet', 'CheckAccountExecutionViewSet',
     'AccountRiskViewSet', 'AccountCheckEngineViewSet',
 ]
 
 
-class CheckAccountsAutomationViewSet(OrgBulkModelViewSet):
+class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
     model = AccountCheckAutomation
     filterset_fields = ('name',)
     search_fields = filterset_fields
@@ -29,7 +29,7 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
         ("create", "accounts.add_gatheraccountsexecution"),
     )
 
-    tp = AutomationTypes.gather_accounts
+    tp = AutomationTypes.check_account
 
     def get_queryset(self):
         queryset = super().get_queryset()

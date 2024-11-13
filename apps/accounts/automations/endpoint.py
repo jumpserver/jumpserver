@@ -1,6 +1,6 @@
 from .backup_account.manager import AccountBackupManager
 from .change_secret.manager import ChangeSecretManager
-from .gather_accounts.manager import GatherAccountsManager
+from .gather_account.manager import GatherAccountsManager
 from .push_account.manager import PushAccountManager
 from .remove_account.manager import RemoveAccountManager
 from .verify_account.manager import VerifyAccountManager
