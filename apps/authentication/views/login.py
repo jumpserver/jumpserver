@@ -311,6 +311,7 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
 
 
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
+    query_string = True
     redirect_field_name = 'next'
     login_url = reverse_lazy('authentication:login')
     login_mfa_url = reverse_lazy('authentication:login-mfa')
