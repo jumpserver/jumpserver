@@ -35,8 +35,14 @@ class JobLogSerializer(JobExecutionSerializer):
 
 
 class JobsAuditSerializer(JobSerializer):
+    material = serializers.ReadOnlyField(label=_("Command"))
+    summary = serializers.ReadOnlyField(label=_("Summary"))
+
     class Meta(JobSerializer.Meta):
-        fields = JobSerializer.Meta.fields
+        read_only_fields = [
+            "id", 'name', 'args', 'material', 'type', 'crontab', 'interval', 'date_last_run', 'summary', 'created_by'
+        ]
+        fields = read_only_fields + ['is_periodic']
 
     def validate(self, attrs):
         allowed_fields = {'is_periodic'}

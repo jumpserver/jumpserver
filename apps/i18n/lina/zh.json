@@ -1418,5 +1418,6 @@
     "setVariable": "设置参数",
     "JobsAudit": "作业审计",
     "JobList": "作业列表",
-    "StopJobMsg": "停止成功"
+    "StopJobMsg": "停止成功",
+    "ExtraArgsFormatError": "格式错误，请按要求输入"
 }

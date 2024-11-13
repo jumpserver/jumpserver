@@ -1413,5 +1413,6 @@
     "setVariable": "Set variable",
     "JobsAudit": "Jobs audit",
     "JobList": "Job List",
-    "StopJobMsg": "Stop job successfully"
+    "StopJobMsg": "Stop job successfully",
+    "ExtraArgsFormatError": "Format error, please enter according to the requirements"
 }
