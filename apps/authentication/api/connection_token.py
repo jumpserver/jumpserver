@@ -560,7 +560,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             return Response({'error': 'not found or expired'}, status=400)
 
 
-class AdminConnectionTokenViewSet(SuperConnectionTokenViewSet):
+class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
 
     def check_permissions(self, request):
         user = request.user
