@@ -2917,7 +2917,7 @@ msgstr "否"
 
 #: audits/models.py:47
 msgid "Job audit log"
-msgstr "ジョブ監査ログ"
+msgstr "業務監査"
 
 #: audits/models.py:56 audits/models.py:100 audits/models.py:175
 #: terminal/models/session/session.py:39 terminal/models/session/sharing.py:113
