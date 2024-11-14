@@ -58,10 +58,10 @@ class VariableSerializer(CommonBulkModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if instance.type == FieldType.select:
-            data['extra_args'] = instance.extra_args.get('options', '')
             data['select_default_value'] = instance.default_value
         if instance.type == FieldType.text:
             data['text_default_value'] = instance.default_value
+        data['extra_args'] = instance.extra_args.get('options', '')
         return data
 
     @classmethod
