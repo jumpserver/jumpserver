@@ -34,14 +34,14 @@ class AutomationTypes(models.TextChoices):
         from accounts.models import (
             PushAccountAutomation, ChangeSecretAutomation,
             VerifyAccountAutomation, GatherAccountsAutomation,
-            AccountCheckAutomation,
+            CheckAccountAutomation,
         )
         type_model_dict = {
             cls.push_account: PushAccountAutomation,
             cls.change_secret: ChangeSecretAutomation,
             cls.verify_account: VerifyAccountAutomation,
             cls.gather_accounts: GatherAccountsAutomation,
-            cls.check_account: AccountCheckAutomation,
+            cls.check_account: CheckAccountAutomation,
         }
         return type_model_dict.get(tp)
 

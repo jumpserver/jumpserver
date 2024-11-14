@@ -5,28 +5,29 @@ from rest_framework.decorators import action
 
 from accounts import serializers
 from accounts.const import AutomationTypes
-from accounts.models import AccountCheckAutomation, AccountRisk, RiskChoice
+from accounts.models import CheckAccountAutomation, AccountRisk, RiskChoice, CheckAccountEngine
+from common.api import JMSModelViewSet
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 
 __all__ = [
     'CheckAccountAutomationViewSet', 'CheckAccountExecutionViewSet',
-    'AccountRiskViewSet', 'AccountCheckEngineViewSet',
+    'AccountRiskViewSet', 'CheckAccountEngineViewSet',
 ]
 
 
 class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
-    model = AccountCheckAutomation
+    model = CheckAccountAutomation
     filterset_fields = ('name',)
     search_fields = filterset_fields
-    serializer_class = serializers.CheckAccountsAutomationSerializer
+    serializer_class = serializers.CheckAccountAutomationSerializer
 
 
 class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
     rbac_perms = (
-        ("list", "accounts.view_gatheraccountsexecution"),
-        ("retrieve", "accounts.view_gatheraccountsexecution"),
-        ("create", "accounts.add_gatheraccountsexecution"),
+        ("list", "accounts.view_checkaccountexecution"),
+        ("retrieve", "accounts.view_checkaccountsexecution"),
+        ("create", "accounts.add_checkaccountexecution"),
     )
 
     tp = AutomationTypes.check_account
@@ -71,25 +72,10 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
         return self.get_paginated_response_from_queryset(queryset)
 
 
-class AccountCheckEngineViewSet(OrgBulkModelViewSet):
+class CheckAccountEngineViewSet(JMSModelViewSet):
     search_fields = ('name',)
-    serializer_class = serializers.AccountCheckEngineSerializer
-    rbac_perms = {
-        'list': 'assets.view_accountcheckautomation',
-    }
+    serializer_class = serializers.CheckAccountEngineSerializer
 
     def get_queryset(self):
-        return [
-            {
-                'id': 1,
-                'name': 'check_gathered_account',
-                'display_name': '检查发现的账号',
-                'description': '基于自动发现的账号结果进行检查分析，检查 用户组、公钥、sudoers 等信息'
-            },
-            {
-                'id': 2,
-                'name': 'check_account_secret',
-                'display_name': '检查账号密码强弱',
-                'description': '基于账号密码的安全性进行检查分析, 检查密码强度、泄露等信息'
-            }
-        ]
+        return CheckAccountEngine.objects.all()
+

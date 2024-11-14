@@ -1,5 +1,6 @@
 from .backup_account.manager import AccountBackupManager
 from .change_secret.manager import ChangeSecretManager
+from .check_account.manager import CheckAccountManager
 from .gather_account.manager import GatherAccountsManager
 from .push_account.manager import PushAccountManager
 from .remove_account.manager import RemoveAccountManager
@@ -16,6 +17,7 @@ class ExecutionManager:
         AutomationTypes.remove_account: RemoveAccountManager,
         AutomationTypes.gather_accounts: GatherAccountsManager,
         AutomationTypes.verify_gateway_account: VerifyGatewayAccountManager,
+        AutomationTypes.check_account: CheckAccountManager,
         # TODO 后期迁移到自动化策略中
         'backup_account': AccountBackupManager,
     }

@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 import abc
+from datetime import timedelta
 
+from celery.schedules import crontab
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule, ClockedSchedule
 from rest_framework import serializers
 
 from .celery.utils import (
@@ -32,7 +36,7 @@ class PeriodTaskModelMixin(models.Model):
         default=24, null=True, blank=True, verbose_name=_("Interval"),
     )
     crontab = models.CharField(
-        blank=True, max_length=128, null=True, verbose_name=_("Crontab"),
+        blank=True, max_length=128, default='', verbose_name=_("Crontab"),
     )
     start_time = models.DateTimeField(
         blank=True, null=True,
@@ -42,6 +46,7 @@ class PeriodTaskModelMixin(models.Model):
             'triggering the task to run'
         ),
     )
+    date_last_run = models.DateTimeField(blank=True, null=True, verbose_name=_("Date last run"))
     objects = PeriodTaskModelQuerySet.as_manager()
 
     @abc.abstractmethod
@@ -67,9 +72,9 @@ class PeriodTaskModelMixin(models.Model):
             disable_celery_periodic_task(name)
             return
 
-        crontab = interval = None
+        cron = interval = None
         if self.crontab:
-            crontab = self.crontab
+            cron = self.crontab
         elif self.interval:
             interval = self.interval * self.interval_ratio[0]
 
@@ -77,7 +82,7 @@ class PeriodTaskModelMixin(models.Model):
             name: {
                 'task': task,
                 'interval': interval,
-                'crontab': crontab,
+                'crontab': cron,
                 'args': args,
                 'kwargs': kwargs,
                 'enabled': True,
@@ -85,6 +90,9 @@ class PeriodTaskModelMixin(models.Model):
             }
         }
         create_or_update_celery_periodic_tasks(tasks)
+
+    def execute(self, *args, **kwargs):
+        self.date_last_run = timezone.now()
 
     def save(self, *args, **kwargs):
         instance = super().save(**kwargs)
@@ -110,6 +118,45 @@ class PeriodTaskModelMixin(models.Model):
         from django_celery_beat.models import PeriodicTask
         name = self.get_register_task()[0]
         return PeriodicTask.objects.filter(name=name).first()
+
+    def get_next_run_time(self):
+        if not self.is_periodic:
+            return None
+        task = self.schedule
+        now = task.schedule.nowfun()
+
+        if self.start_time and self.start_time > now:
+            return self.start_time
+
+        scheduler = task.scheduler
+        # 根据不同的调度类型计算下次执行时间
+        if isinstance(scheduler, CrontabSchedule):
+            schedule = crontab(
+                minute=scheduler.minute,
+                hour=scheduler.hour,
+                day_of_week=scheduler.day_of_week,
+                day_of_month=scheduler.day_of_month,
+                month_of_year=scheduler.month_of_year,
+            )
+            next_run = schedule.remaining_estimate(now)
+            return now + next_run
+        elif isinstance(scheduler, IntervalSchedule):
+            interval = timedelta(
+                seconds=scheduler.every * {
+                    IntervalSchedule.SECONDS: 1,
+                    IntervalSchedule.MINUTES: 60,
+                    IntervalSchedule.HOURS: 3600,
+                    IntervalSchedule.DAYS: 86400,
+                }[scheduler.period]
+            )
+            last_run = task.last_run_at or now
+            return last_run + interval
+
+        elif isinstance(scheduler, ClockedSchedule):
+            return scheduler.clocked_time
+
+        else:
+            raise ValueError("不支持的任务调度类型")
 
     class Meta:
         abstract = True

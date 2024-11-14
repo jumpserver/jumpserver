@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import AutomationTypes
-from accounts.models import AccountCheckAutomation, AccountRisk, RiskChoice
+from accounts.models import CheckAccountAutomation, AccountRisk, RiskChoice, CheckAccountEngine
 from assets.models import Asset
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
@@ -13,9 +13,9 @@ from .base import BaseAutomationSerializer
 logger = get_logger(__file__)
 
 __all__ = [
-    'CheckAccountsAutomationSerializer',
+    'CheckAccountAutomationSerializer',
     'AccountRiskSerializer',
-    'AccountCheckEngineSerializer',
+    'CheckAccountEngineSerializer',
     'AssetRiskSerializer',
 ]
 
@@ -53,12 +53,12 @@ class AssetRiskSerializer(serializers.Serializer):
         return summary
 
 
-class CheckAccountsAutomationSerializer(BaseAutomationSerializer):
+class CheckAccountAutomationSerializer(BaseAutomationSerializer):
     class Meta:
-        model = AccountCheckAutomation
+        model = CheckAccountAutomation
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields \
-                 + [] + read_only_fields
+                 + ['engines'] + read_only_fields
         extra_kwargs = BaseAutomationSerializer.Meta.extra_kwargs
 
     @property
@@ -66,8 +66,11 @@ class CheckAccountsAutomationSerializer(BaseAutomationSerializer):
         return AutomationTypes.check_account
 
 
-class AccountCheckEngineSerializer(serializers.Serializer):
-    id = serializers.IntegerField(required=False)
-    name = serializers.CharField(max_length=128, required=True)
-    display_name = serializers.CharField(max_length=128, required=False)
-    description = serializers.CharField(required=False)
+class CheckAccountEngineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckAccountEngine
+        fields = ['id', 'name', 'slug', 'is_active', 'comment']
+        read_only_fields = ['slug']
+        extra_kwargs = {
+            'is_active': {'required': False},
+        }

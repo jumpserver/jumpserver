@@ -4,27 +4,22 @@ from django.db import models
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
-from common.const import Trigger, ConfirmOrIgnore
+from common.const import ConfirmOrIgnore
+from common.db.models import JMSBaseModel
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 from ...const import AutomationTypes
 
-__all__ = ['AccountCheckAutomation', 'AccountRisk', 'RiskChoice']
+__all__ = ['CheckAccountAutomation', 'AccountRisk', 'RiskChoice', 'CheckAccountEngine']
 
 
-class AccountCheckAutomation(AccountBaseAutomation):
-
-    def get_register_task(self):
-        from ...tasks import check_accounts_task
-        name = "check_accounts_task_period_{}".format(str(self.id)[:8])
-        task = check_accounts_task.name
-        args = (str(self.id), Trigger.timing)
-        kwargs = {}
-        return name, task, args, kwargs
+class CheckAccountAutomation(AccountBaseAutomation):
+    engines = models.ManyToManyField('CheckAccountEngine', related_name='check_automations', verbose_name=_('Engines'))
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
+            'engines': [engine.slug for engine in self.engines.all()],
         })
         return attr_json
 
@@ -33,7 +28,11 @@ class AccountCheckAutomation(AccountBaseAutomation):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = _('Gather account automation')
+        verbose_name = _('account check automation')
+        permissions = [
+            ('view_checkaccountexecution', _('Can view check account execution')),
+            ('add_checkaccountexecution', _('Can add check account execution')),
+        ]
 
 
 class RiskChoice(TextChoices):
@@ -90,4 +89,18 @@ class AccountRisk(JMSOrgBaseModel):
 
             cls.objects.bulk_create(to_create)
 
+
+class CheckAccountEngine(JMSBaseModel):
+    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
+    slug = models.SlugField(max_length=128, verbose_name=_('Slug'), unique=True) #
+    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+
+    def __str__(self):
+        return self.name
+
+    def internals(self):
+        return [
+            'check_gathered_account',
+            'check_account_secret'
+        ]
 
