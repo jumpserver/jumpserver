@@ -1415,7 +1415,7 @@
     "SecuritySetting": "安全設定",
     "Select": "選擇",
     "SelectAccount": "選擇帳號",
-    "SelectAdhoc": "選擇命令",
+    "SelectAdhoc": "選擇腳本模板",
     "SelectAll": "全選",
     "SelectAtLeastOneAssetOrNodeErrMsg": "資產或者節點至少選擇一項",
     "SelectAttrs": "選擇屬性",
