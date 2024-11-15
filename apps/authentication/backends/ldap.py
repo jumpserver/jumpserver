@@ -3,8 +3,9 @@
 import abc
 import ldap
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django_auth_ldap.backend import _LDAPUser, LDAPBackend
+from django_auth_ldap.backend import _LDAPUser, LDAPBackend, valid_cache_key
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
 from users.utils import construct_user_email
@@ -146,11 +147,40 @@ class LDAPHAAuthorizationBackend(JMSBaseAuthBackend, LDAPBaseBackend):
 
 class LDAPUser(_LDAPUser):
 
+    def __init__(self, backend, username=None, user=None, request=None):
+        super().__init__(backend=backend, username=username, user=user, request=request)
+        config_prefix = "" if isinstance(self.backend, LDAPAuthorizationBackend) else "_ha"
+        self.user_dn_cache_key = valid_cache_key(
+            f"django_auth_ldap{config_prefix}.user_dn.{self._username}"
+        )
+        self.category = f"ldap{config_prefix}"
+        self.search_filter = getattr(settings, f"AUTH_LDAP{config_prefix.upper()}_SEARCH_FILTER", None)
+        self.search_ou = getattr(settings, f"AUTH_LDAP{config_prefix.upper()}_SEARCH_OU", None)
+
     def _search_for_user_dn_from_ldap_util(self):
         from settings.utils import LDAPServerUtil
-        util = LDAPServerUtil()
+        util = LDAPServerUtil(category=self.category)
         user_dn = util.search_for_user_dn(self._username)
         return user_dn
+
+    def _load_user_dn(self):
+        """
+        Populates self._user_dn with the distinguished name of our user.
+
+        This will either construct the DN from a template in
+        AUTH_LDAP_USER_DN_TEMPLATE or connect to the server and search for it.
+        If we have to search, we'll cache the DN.
+
+        """
+        if self._using_simple_bind_mode():
+            self._user_dn = self._construct_simple_user_dn()
+        else:
+            if self.settings.CACHE_TIMEOUT > 0:
+                self._user_dn = cache.get_or_set(
+                    self.user_dn_cache_key, self._search_for_user_dn, self.settings.CACHE_TIMEOUT
+                )
+            else:
+                self._user_dn = self._search_for_user_dn()
 
     def _search_for_user_dn(self):
         """
@@ -158,18 +188,12 @@ class LDAPUser(_LDAPUser):
         configuration in the settings.py file
         is configured with a `lambda` problem value
         """
-        if isinstance(self.backend, LDAPAuthorizationBackend):
-            search_filter = settings.AUTH_LDAP_SEARCH_FILTER
-            search_ou = settings.AUTH_LDAP_SEARCH_OU
-        else:
-            search_filter = settings.AUTH_LDAP_HA_SEARCH_FILTER
-            search_ou = settings.AUTH_LDAP_HA_SEARCH_OU
         user_search_union = [
             LDAPSearch(
                 USER_SEARCH, ldap.SCOPE_SUBTREE,
-                search_filter
+                self.search_filter
             )
-            for USER_SEARCH in str(search_ou).split("|")
+            for USER_SEARCH in str(self.search_ou).split("|")
         ]
 
         search = LDAPSearchUnion(*user_search_union)
