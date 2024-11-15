@@ -40,26 +40,17 @@ class AZUREVaultClient(object):
             return ''
 
     def create(self, name, secret):
-        try:
-            if not secret:
-                secret = ''
-            self.client.set_secret(name, secret)
-        except (ResourceNotFoundError, ClientAuthenticationError) as e:
-            logger.error(f'create: {name} {str(e)}')
+        if not secret:
+            secret = ''
+        self.client.set_secret(name, secret)
 
     def update(self, name, secret):
-        try:
-            if not secret:
-                secret = ''
-            self.client.set_secret(name, secret)
-        except (ResourceNotFoundError, ClientAuthenticationError) as e:
-            logger.error(f'update: {name} {str(e)}')
+        if not secret:
+            secret = ''
+        self.client.set_secret(name, secret)
 
     def delete(self, name):
-        try:
-            self.client.begin_delete_secret(name)
-        except (ResourceNotFoundError, ClientAuthenticationError) as e:
-            logger.error(f'delete: {name} {str(e)}')
+        self.client.begin_delete_secret(name)
 
     def update_metadata(self, name, metadata: dict):
         try:
