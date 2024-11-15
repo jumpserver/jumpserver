@@ -1069,7 +1069,7 @@
     "Secure": "Security",
     "Security": "Security",
     "Select": "Select",
-    "SelectAdhoc": "Select command",
+    "SelectAdhoc": "Select command template",
     "SelectAll": "Select all",
     "SelectAtLeastOneAssetOrNodeErrMsg": "Select at least one asset or node",
     "SelectAttrs": "Select attributes",

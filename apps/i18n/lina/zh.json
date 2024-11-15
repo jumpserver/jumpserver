@@ -1074,7 +1074,7 @@
     "Secure": "安全",
     "Security": "安全设置",
     "Select": "选择",
-    "SelectAdhoc": "选择命令",
+    "SelectAdhoc": "选择脚本模板",
     "SelectAll": "全选",
     "SelectAtLeastOneAssetOrNodeErrMsg": "资产或者节点至少选择一项",
     "SelectAttrs": "选择属性",

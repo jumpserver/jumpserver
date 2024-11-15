@@ -1100,7 +1100,7 @@
     "Secure": "安全",
     "Security": "セキュリティ設定",
     "Select": "選択",
-    "SelectAdhoc": "コマンドの選択",
+    "SelectAdhoc": "スクリプトテンプレートを選択",
     "SelectAll": "全選択",
     "SelectAtLeastOneAssetOrNodeErrMsg": "アセットまたはノードは少なくとも一つ選択してください",
     "SelectAttrs": "属性の選択",
