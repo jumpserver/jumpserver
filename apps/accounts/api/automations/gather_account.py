@@ -32,6 +32,7 @@ class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
         ("list", "accounts.view_gatheraccountsexecution"),
         ("retrieve", "accounts.view_gatheraccountsexecution"),
         ("create", "accounts.add_gatheraccountsexecution"),
+        ("report", "accounts.view_gatheraccountsexecution"),
     )
 
     tp = AutomationTypes.gather_accounts

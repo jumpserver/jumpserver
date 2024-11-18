@@ -2,15 +2,21 @@ import hashlib
 import json
 import os
 import shutil
+import time
+from collections import defaultdict
 from socket import gethostname
 
 import yaml
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from premailer import transform
 from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
+from common.db.utils import safe_db_connection
+from common.tasks import send_mail_async
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
 from ops.ansible.interface import interface
@@ -81,13 +87,87 @@ class PlaybookCallback(DefaultCallback):
         super().playbook_on_stats(event_data, **kwargs)
 
 
-class BasePlaybookManager:
+class BaseManager:
+    def __init__(self, execution):
+        self.execution = execution
+        self.time_start = time.time()
+        self.summary = defaultdict(int)
+        self.result = defaultdict(list)
+        self.duration = 0
+
+    def get_assets_group_by_platform(self):
+        return self.execution.all_assets_group_by_platform()
+
+    def before_run(self):
+        self.execution.date_start = timezone.now()
+        self.execution.save(update_fields=['date_start'])
+
+    def get_report_subject(self):
+        return f'Automation {self.execution.id} finished'
+
+    def send_report_if_need(self):
+        recipients = self.execution.recipients
+        if not recipients:
+            return
+
+        report = self.gen_report()
+        report = transform(report)
+        subject = self.get_report_subject()
+        print("Send resport to: {}".format([str(r) for r in recipients]))
+        emails = [r.email for r in recipients if r.email]
+        send_mail_async(subject, report, emails, html_message=report)
+
+    def update_execution(self):
+        self.duration = int(time.time() - self.time_start)
+        self.execution.date_finished = timezone.now()
+        self.execution.duration = self.duration
+        self.execution.summary = self.summary
+        self.execution.result = self.result
+
+        with safe_db_connection():
+            self.execution.save(update_fields=['date_finished', 'duration', 'summary', 'result'])
+
+    def print_summary(self):
+        pass
+
+    def get_template_path(self):
+        raise NotImplementedError
+
+    def gen_report(self):
+        template_path = self.get_template_path()
+        context = {
+            'execution': self.execution,
+            'summary': self.execution.summary,
+            'result': self.execution.result
+        }
+        data = render_to_string(template_path, context)
+        return data
+
+    def after_run(self):
+        self.update_execution()
+        self.print_summary()
+        self.send_report_if_need()
+
+    def run(self, *args, **kwargs):
+        self.before_run()
+        self.do_run(*args, **kwargs)
+        self.after_run()
+
+    def do_run(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @staticmethod
+    def json_dumps(data):
+        return json.dumps(data, indent=4, sort_keys=True)
+
+
+class BasePlaybookManager(BaseManager):
     bulk_size = 100
     ansible_account_policy = 'privileged_first'
     ansible_account_prefer = 'root,Administrator'
 
     def __init__(self, execution):
-        self.execution = execution
+        super().__init__(execution)
         self.method_id_meta_mapper = {
             method['id']: method
             for method in self.platform_automation_methods
@@ -178,10 +258,12 @@ class BasePlaybookManager:
         enabled_attr = '{}_enabled'.format(method_type)
         method_attr = '{}_method'.format(method_type)
 
-        method_enabled = automation and \
-                         getattr(automation, enabled_attr) and \
-                         getattr(automation, method_attr) and \
-                         getattr(automation, method_attr) in self.method_id_meta_mapper
+        method_enabled = (
+            automation
+            and getattr(automation, enabled_attr)
+            and getattr(automation, method_attr)
+            and getattr(automation, method_attr) in self.method_id_meta_mapper
+        )
 
         if not method_enabled:
             host['error'] = _('{} disabled'.format(self.__class__.method_type()))
@@ -242,6 +324,7 @@ class BasePlaybookManager:
         if settings.DEBUG_DEV:
             msg = 'Assets group by platform: {}'.format(dict(assets_group_by_platform))
             print(msg)
+
         runners = []
         for platform, assets in assets_group_by_platform.items():
             if not assets:
@@ -249,8 +332,8 @@ class BasePlaybookManager:
             if not platform.automation or not platform.automation.ansible_enabled:
                 print(_("  - Platform {} ansible disabled").format(platform.name))
                 continue
-            assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
 
+            assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
             for i, _assets in enumerate(assets_bulked, start=1):
                 sub_dir = '{}_{}'.format(platform.name, i)
                 playbook_dir = os.path.join(self.runtime_dir, sub_dir)
@@ -262,6 +345,7 @@ class BasePlaybookManager:
                 if not method:
                     logger.error("Method not found: {}".format(method_id))
                     continue
+
                 protocol = method.get('protocol')
                 self.generate_inventory(_assets, inventory_path, protocol)
                 playbook_path = self.generate_playbook(method, playbook_dir)
@@ -290,36 +374,37 @@ class BasePlaybookManager:
         if settings.DEBUG_DEV:
             print('host error: {} -> {}'.format(host, error))
 
+    def _on_host_success(self, host, result, error, detail):
+        self.on_host_success(host, result)
+
+    def _on_host_error(self, host, result, error, detail):
+        self.on_host_error(host, error, detail)
+
     def on_runner_success(self, runner, cb):
         summary = cb.summary
         for state, hosts in summary.items():
+            if state == 'ok':
+                handler = self._on_host_success
+            elif state == 'skipped':
+                continue
+            else:
+                handler = self._on_host_error
+
             for host in hosts:
                 result = cb.host_results.get(host)
-                if state == 'ok':
-                    self.on_host_success(host, result.get('ok', ''))
-                elif state == 'skipped':
-                    pass
-                else:
-                    error = hosts.get(host)
-                    self.on_host_error(
-                        host, error,
-                        result.get('failures', '')
-                        or result.get('dark', '')
-                    )
+                error = hosts.get(host, '')
+                detail = result.get('failures', '') or result.get('dark', '')
+                handler(host, result, error, detail)
 
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))
-
-    @staticmethod
-    def json_dumps(data):
-        return json.dumps(data, indent=4, sort_keys=True)
 
     def delete_runtime_dir(self):
         if settings.DEBUG_DEV:
             return
         shutil.rmtree(self.runtime_dir, ignore_errors=True)
 
-    def run(self, *args, **kwargs):
+    def do_run(self, *args, **kwargs):
         print(_(">>> Task preparation phase"), end="\n")
         runners = self.get_runners()
         if len(runners) > 1:
@@ -329,12 +414,12 @@ class BasePlaybookManager:
         else:
             print(_(">>> No tasks need to be executed"), end="\n")
 
-        self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
             if len(runners) > 1:
                 print(_(">>> Begin executing batch {index} of tasks").format(index=i))
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
+
             try:
                 kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
@@ -344,7 +429,5 @@ class BasePlaybookManager:
             finally:
                 ssh_tunnel.local_gateway_clean(runner)
                 print('\n')
-        self.execution.status = 'success'
-        self.execution.date_finished = timezone.now()
-        self.execution.save()
-        self.delete_runtime_dir()
+
+

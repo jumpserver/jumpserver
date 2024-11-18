@@ -91,11 +91,13 @@ class GatherAccountsAutomation(AccountBaseAutomation):
         default=False, blank=True, verbose_name=_("Is sync account")
     )
     recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
+    check_risk = models.BooleanField(default=True, verbose_name=_("Check risk"))
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
             'is_sync_account': self.is_sync_account,
+            'check_risk': self.check_risk,
             'recipients': [
                 str(recipient.id) for recipient in self.recipients.all()
             ]

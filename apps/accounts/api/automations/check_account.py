@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q, Count
-from django.http import HttpResponse
 from rest_framework.decorators import action
 
 from accounts import serializers
@@ -38,12 +37,6 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
         queryset = super().get_queryset()
         queryset = queryset.filter(automation__type=self.tp)
         return queryset
-
-    @action(methods=['get'], detail=True, url_path='report')
-    def report(self, request, *args, **kwargs):
-        execution = self.get_object()
-        report = execution.manager.gen_report()
-        return HttpResponse(report)
 
 
 class AccountRiskViewSet(OrgBulkModelViewSet):

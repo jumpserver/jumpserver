@@ -16,10 +16,34 @@ from ...notifications import GatherAccountChangeMsg
 logger = get_logger(__name__)
 
 
-class GatherAccountsManager(AccountBasePlaybookManager):
-    diff_items = [
-        'authorized_keys', 'sudoers', 'groups',
-    ]
+diff_items = [
+    'authorized_keys', 'sudoers', 'groups',
+]
+
+
+def get_items_diff(ori_account, d):
+    if hasattr(ori_account, '_diff'):
+        return ori_account._diff
+
+    diff = {}
+    for item in diff_items:
+        ori = getattr(ori_account, item)
+        new = d.get(item, '')
+
+        if not ori:
+            continue
+
+        if isinstance(new, timezone.datetime):
+            new = ori.strftime('%Y-%m-%d %H:%M:%S')
+            ori = ori.strftime('%Y-%m-%d %H:%M:%S')
+        if new != ori:
+            diff[item] = get_text_diff(ori, new)
+
+    ori_account._diff = diff
+    return diff
+
+
+class AnalyseAccountRisk:
     long_time = timezone.timedelta(days=90)
     datetime_check_items = [
         {'field': 'date_last_login', 'risk': 'zombie', 'delta': long_time},
@@ -27,20 +51,101 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         {'field': 'date_password_expired', 'risk': 'password_expired', 'delta': timezone.timedelta(seconds=1)}
     ]
 
+    def __init__(self, check_risk=True):
+        self.check_risk = check_risk
+        self.now = timezone.now()
+        self.pending_add_risks = []
+
+    def _analyse_item_changed(self, ori_account, d):
+        diff = get_items_diff(ori_account, d)
+
+        if not diff:
+            return
+
+        for k, v in diff.items():
+            self.pending_add_risks.append(dict(
+                asset=ori_account.asset, username=ori_account.username,
+                risk=k+'_changed', detail={'diff': v}
+            ))
+
+    def perform_save_risks(self, risks):
+        # 提前取出来，避免每次都查数据库
+        assets = {r['asset'] for r in risks}
+        assets_risks = AccountRisk.objects.filter(asset__in=assets)
+        assets_risks = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in assets_risks}
+
+        for d in risks:
+            detail = d.pop('detail', {})
+            detail['datetime'] = self.now.isoformat()
+            key = f"{d['asset'].id}_{d['username']}_{d['risk']}"
+            found = assets_risks.get(key)
+
+            if not found:
+                r = AccountRisk(**d, details=[detail])
+                r.save()
+                continue
+
+            found.details.append(detail)
+            found.save(update_fields=['details'])
+
+    def _analyse_datetime_changed(self, ori_account, d, asset, username):
+        basic = {'asset': asset, 'username': username}
+
+        for item in self.datetime_check_items:
+            field = item['field']
+            risk = item['risk']
+            delta = item['delta']
+
+            date = d.get(field)
+            if not date:
+                continue
+
+            pre_date = ori_account and getattr(ori_account, field)
+            if pre_date == date:
+                continue
+
+            if date and date < timezone.now() - delta:
+                self.pending_add_risks.append(
+                    dict(**basic, risk=risk, detail={'date': date.isoformat()})
+                )
+
+    def batch_analyse_risk(self, asset, ori_account, d, batch_size=20):
+        if not self.check_risk:
+            return
+
+        if asset is None:
+            if self.pending_add_risks:
+                self.perform_save_risks(self.pending_add_risks)
+                self.pending_add_risks = []
+            return
+
+        basic = {'asset': asset, 'username': d['username']}
+        if ori_account:
+            self._analyse_item_changed(ori_account, d)
+        else:
+            self.pending_add_risks.append(
+                dict(**basic, risk='ghost')
+            )
+
+        self._analyse_datetime_changed(ori_account, d, asset, d['username'])
+
+        if len(self.pending_add_risks) > batch_size:
+            self.batch_analyse_risk(None, None, {})
+
+
+class GatherAccountsManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_asset_mapper = {}
         self.asset_account_info = {}
-
+        self.pending_add_accounts = []
+        self.pending_update_accounts = []
         self.asset_usernames_mapper = defaultdict(set)
         self.ori_asset_usernames = defaultdict(set)
         self.ori_gathered_usernames = defaultdict(set)
         self.ori_gathered_accounts_mapper = dict()
         self.is_sync_account = self.execution.snapshot.get('is_sync_account')
-        self.pending_add_accounts = []
-        self.pending_update_accounts = []
-        self.pending_add_risks = []
-        self.now = timezone.now()
+        self.check_risk = self.execution.snapshot.get('check_risk', False)
 
     @classmethod
     def method_type(cls):
@@ -168,109 +273,14 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         if len(self.pending_add_accounts) > batch_size:
             self.batch_create_gathered_account(None)
 
-    def _analyse_item_changed(self, ori_account, d):
-        diff = self.get_items_diff(ori_account, d)
-
-        if not diff:
-            return
-
-        for k, v in diff.items():
-            self.pending_add_risks.append(dict(
-                asset=ori_account.asset, username=ori_account.username,
-                risk=k+'_changed', detail={'diff': v}
-            ))
-
-    def perform_save_risks(self, risks):
-        # 提前取出来，避免每次都查数据库
-        assets = {r['asset'] for r in risks}
-        assets_risks = AccountRisk.objects.filter(asset__in=assets)
-        assets_risks = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in assets_risks}
-
-        for d in risks:
-            detail = d.pop('detail', {})
-            detail['datetime'] = self.now.isoformat()
-            key = f"{d['asset'].id}_{d['username']}_{d['risk']}"
-            found = assets_risks.get(key)
-
-            if not found:
-                r = AccountRisk(**d, details=[detail])
-                r.save()
-                continue
-
-            found.details.append(detail)
-            found.save(update_fields=['details'])
-
-    def _analyse_datetime_changed(self, ori_account, d, asset, username):
-        basic = {'asset': asset, 'username': username}
-
-        for item in self.datetime_check_items:
-            field = item['field']
-            risk = item['risk']
-            delta = item['delta']
-
-            date = d.get(field)
-            if not date:
-                continue
-
-            pre_date = ori_account and getattr(ori_account, field)
-            if pre_date == date:
-                continue
-
-            if date and date < timezone.now() - delta:
-                self.pending_add_risks.append(
-                    dict(**basic, risk=risk, detail={'date': date.isoformat()})
-                )
-
-    def batch_analyse_risk(self, asset, ori_account, d, batch_size=20):
-        if asset is None:
-            if self.pending_add_risks:
-                self.perform_save_risks(self.pending_add_risks)
-                self.pending_add_risks = []
-            return
-
-        basic = {'asset': asset, 'username': d['username']}
-        if ori_account:
-            self._analyse_item_changed(ori_account, d)
-        else:
-            self.pending_add_risks.append(
-                dict(**basic, risk='ghost')
-            )
-
-        self._analyse_datetime_changed(ori_account, d, asset, d['username'])
-
-        if len(self.pending_add_risks) > batch_size:
-            self.batch_analyse_risk(None, None, {})
-
-    def get_items_diff(self, ori_account, d):
-        if hasattr(ori_account, '_diff'):
-            return ori_account._diff
-
-        diff = {}
-        for item in self.diff_items:
-            ori = getattr(ori_account, item)
-            new = d.get(item, '')
-
-            if not ori:
-                continue
-
-            if isinstance(new, timezone.datetime):
-                new = ori.strftime('%Y-%m-%d %H:%M:%S')
-                ori = ori.strftime('%Y-%m-%d %H:%M:%S')
-
-            if new != ori:
-                diff[item] = get_text_diff(ori, new)
-
-        ori_account._diff = diff
-        return diff
-
     def batch_update_gathered_account(self, ori_account, d, batch_size=20):
         if not ori_account or d is None:
             if self.pending_update_accounts:
-                GatheredAccount.objects.bulk_update(self.pending_update_accounts, [*self.diff_items])
+                GatheredAccount.objects.bulk_update(self.pending_update_accounts, [*diff_items])
                 self.pending_update_accounts = []
             return
 
-        diff = self.get_items_diff(ori_account, d)
+        diff = get_items_diff(ori_account, d)
         if diff:
             for k in diff:
                 setattr(ori_account, k, d[k])
@@ -279,7 +289,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         if len(self.pending_update_accounts) > batch_size:
             self.batch_update_gathered_account(None, None)
 
-    def update_or_create_accounts(self):
+    def do_run(self):
+        risk_analyser = AnalyseAccountRisk(self.check_risk)
+
         for asset, accounts_data in self.asset_account_info.items():
             with (tmp_to_org(asset.org_id)):
                 gathered_accounts = []
@@ -291,21 +303,18 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         self.batch_create_gathered_account(d)
                     else:
                         self.batch_update_gathered_account(ori_account, d)
-
-                    self.batch_analyse_risk(asset, ori_account, d)
+                    risk_analyser.batch_analyse_risk(asset, ori_account, d)
 
                 self.update_gather_accounts_status(asset)
                 GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
 
         self.batch_create_gathered_account(None)
         self.batch_update_gathered_account(None, None)
-        self.batch_analyse_risk(None, None, {})
+        risk_analyser.batch_analyse_risk(None, None, {})
 
-    def run(self, *args, **kwargs):
-        super().run(*args, **kwargs)
+    def before_run(self):
+        super().before_run()
         self.prefetch_origin_account_usernames()
-        self.update_or_create_accounts()
-        # self.send_email_if_need()
 
     def generate_send_users_and_change_info(self):
         recipients = self.execution.recipients

@@ -19,9 +19,15 @@ class GatherAccountAutomationSerializer(BaseAutomationSerializer):
     class Meta:
         model = GatherAccountsAutomation
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
-        fields = BaseAutomationSerializer.Meta.fields \
-                 + ['is_sync_account', 'recipients'] + read_only_fields
-        extra_kwargs = BaseAutomationSerializer.Meta.extra_kwargs
+        fields = (BaseAutomationSerializer.Meta.fields
+            + ['is_sync_account', 'check_risk', 'recipients']
+            + read_only_fields)
+        extra_kwargs = {
+            'check_risk': {
+                'help_text': _('Whether to check the risk of the gathered accounts.'),
+            },
+            **BaseAutomationSerializer.Meta.extra_kwargs
+        }
 
     @property
     def model_type(self):
