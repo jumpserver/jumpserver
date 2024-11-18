@@ -20,6 +20,11 @@ class AdHocViewSet(JMSBulkModelViewSet):
     search_fields = ('name', 'comment')
     filterset_fields = ['scope', 'creator']
 
+    def allow_bulk_destroy(self, qs, filtered):
+        for obj in filtered:
+            self.check_object_permissions(self.request, obj)
+        return True
+
     def check_object_permissions(self, request, obj):
         if request.method != 'GET' and obj.creator != request.user:
             self.permission_denied(

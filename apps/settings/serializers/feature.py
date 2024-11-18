@@ -49,10 +49,9 @@ class VaultSettingSerializer(serializers.Serializer):
     VAULT_ENABLED = serializers.BooleanField(
         required=False, label=_('Vault'), read_only=True
     )
-    VAULT_BACKEND = serializers.ChoiceField(
-        choices=VaultTypeChoices.choices, default=VaultTypeChoices.local, label=_('Vault provider')
+    VAULT_BACKEND = serializers.CharField(
+        max_length=16, required=False, label=_('Vault provider'), read_only=True
     )
-
     HISTORY_ACCOUNT_CLEAN_LIMIT = serializers.IntegerField(
         default=999, max_value=999, min_value=1,
         required=False, label=_('Record limit'),

@@ -123,6 +123,10 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
         NodeFilterBackend, AttrRulesFilterBackend
     ]
 
+    def perform_destroy(self, instance):
+        instance.accounts.update(su_from_id=None)
+        instance.delete()
+
     def get_queryset(self):
         queryset = super().get_queryset()
         if queryset.model is not Asset:

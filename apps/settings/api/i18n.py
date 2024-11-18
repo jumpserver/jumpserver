@@ -38,6 +38,7 @@ class ComponentI18nApi(RetrieveAPIView):
         data = self.get_component_translations(name)
 
         if lang:
+            lang = lang if lang in data.keys() else 'en'
             data = data.get(lang) or {}
             flat = request.query_params.get('flat', '1')
             if flat == '0':

@@ -22,6 +22,8 @@ XPACK_LICENSE_INFO = {
     'corporation': corporation,
 }
 
+XPACK_LICENSE_CONTENT = ''
+
 if XPACK_ENABLED:
     from xpack.utils import get_xpack_templates_dir, get_xpack_context_processor
 

@@ -94,7 +94,7 @@ class BaseTicketMessage(UserMessage):
 
     @property
     def basic_items(self):
-        item_names = ['serial_num', 'title', 'type', 'state', 'applicant', 'comment']
+        item_names = ['serial_num', 'title', 'type', 'state', 'org_id', 'applicant', 'comment']
         return self._get_fields_items(item_names)
 
     @property

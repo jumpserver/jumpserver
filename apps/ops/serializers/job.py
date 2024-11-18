@@ -42,7 +42,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
         model = Job
         read_only_fields = [
             "id", "date_last_run", "date_created",
-            "date_updated", "average_time_cost"
+            "date_updated", "average_time_cost", "created_by", "material"
         ]
         fields_m2m = ['variable']
         fields = read_only_fields + [
