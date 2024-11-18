@@ -1,0 +1,108 @@
+{% load i18n %}
+
+<div class='summary'>
+    <p>{% trans 'The following is a summary of the account check tasks. Please review and handle them' %}</p>
+    <table>
+        <thead>
+            <tr>
+                <th colspan='2'>任务汇总: </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{% trans 'Task name' %}: </td>
+                <td>{{ execution.automation.name }} </td>
+            </tr>
+            <tr>
+                <td>{% trans 'Date start' %}: </td>
+                <td>{{ execution.date_start }}</td>
+            </tr>
+            <tr>
+                <td>{% trans 'Date end' %}: </td>
+                <td>{{ execution.date_finished }}</td>
+            </tr>
+            <tr>
+                <td>{% trans 'Time using' %}: </td>
+                <td>{{ execution.duration }}s</td>
+            </tr>
+            <tr>
+                <td>{% trans 'Assets count' %}: </td>
+                <td>{{ summary.assets }}</td>
+            </tr>
+            <tr>
+                <td>{% trans 'Account count' %}: </td>
+                <td>{{ summary.accounts }}</td>
+            </tr>
+            <tr>
+                <td>{% trans 'Week password count' %}:</td>
+                <td> <span> {{ summary.weak_password }}</span></td>
+            </tr>
+            <tr>
+                <td>{% trans 'Ok count' %}: </td>
+                <td>{{ summary.ok }}</td>
+            </tr>
+            <tr>
+                <td>{% trans 'No password count' %}: </td>
+                <td>{{ summary.no_secret }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class='result'>
+   <p>{% trans 'Account check details' %}:</p>
+    <table style="">
+        <thead>
+        <tr>
+            <th>{% trans 'No.' %}</th>
+            <th>{% trans 'Asset' %}</th>
+            <th>{% trans 'Username' %}</th>
+            <th>{% trans 'Result' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for account in result.weak_password %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ account.asset }}</td>
+                <td>{{ account.username }}</td>
+                <td>{% trans 'Week password' %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        max-width: 100%;
+        text-align: left;
+        margin-top: 20px;
+        padding: 20px;
+    }
+
+    th {
+        background: #f2f2f2;
+        font-size: 14px;
+        padding: 5px;
+        border: 1px solid #ddd;
+    }
+
+    tr :first-child {
+        width: 30%;
+    }
+
+    td {
+        border: 1px solid #ddd;
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .result tr :first-child {
+        width: 10%;
+    }
+
+
+</style>

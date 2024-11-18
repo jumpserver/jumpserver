@@ -165,6 +165,7 @@ polib = "^1.2.0"
 # psycopg2 = "2.9.6"
 psycopg2-binary = "2.9.6"
 pycountry = "^24.6.1"
+premailer = "^3.10.0"
 
 [tool.poetry.group.xpack]
 optional = true

@@ -15,7 +15,6 @@ from assets.const import HostTypes
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_filename
-from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 from ...utils import SecretGenerator
 
@@ -247,7 +246,6 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         ]
 
         recipients = self.execution.recipients
-        recipients = User.objects.filter(id__in=list(recipients.keys()))
         if not recipients:
             return
 

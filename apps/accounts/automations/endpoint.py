@@ -18,7 +18,6 @@ class ExecutionManager:
         AutomationTypes.gather_accounts: GatherAccountsManager,
         AutomationTypes.verify_gateway_account: VerifyGatewayAccountManager,
         AutomationTypes.check_account: CheckAccountManager,
-        # TODO 后期迁移到自动化策略中
         'backup_account': AccountBackupManager,
     }
 
@@ -28,3 +27,6 @@ class ExecutionManager:
 
     def run(self, *args, **kwargs):
         return self._runner.run(*args, **kwargs)
+
+    def __getattr__(self, item):
+        return getattr(self._runner, item)

@@ -58,7 +58,7 @@ class CheckAccountAutomationSerializer(BaseAutomationSerializer):
         model = CheckAccountAutomation
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields \
-                 + ['engines'] + read_only_fields
+                 + ['engines', 'recipients'] + read_only_fields
         extra_kwargs = BaseAutomationSerializer.Meta.extra_kwargs
 
     @property

@@ -9,7 +9,6 @@ from common.const import ConfirmOrIgnore
 from common.utils import get_logger
 from common.utils.strings import get_text_diff
 from orgs.utils import tmp_to_org
-from users.models import User
 from .filter import GatherAccountsFilter
 from ..base.manager import AccountBasePlaybookManager
 from ...notifications import GatherAccountChangeMsg
@@ -313,10 +312,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         if not self.asset_usernames_mapper or not recipients:
             return None, None
 
-        users = User.objects.filter(id__in=recipients)
-        if not users.exists():
-            return users, None
-
+        users = recipients
         asset_ids = self.asset_usernames_mapper.keys()
         assets = Asset.objects.filter(id__in=asset_ids).prefetch_related('accounts')
         gather_accounts = GatheredAccount.objects.filter(asset_id__in=asset_ids, remote_present=True)

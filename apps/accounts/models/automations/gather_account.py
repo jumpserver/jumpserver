@@ -9,7 +9,7 @@ from common.utils.timezone import is_date_more_than
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
-__all__ = ['GatherAccountsAutomation', 'GatheredAccount', ]
+__all__ = ['GatherAccountsAutomation', 'GatheredAccount',]
 
 
 class GatheredAccount(JMSOrgBaseModel):

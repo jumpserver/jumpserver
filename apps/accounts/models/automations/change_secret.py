@@ -24,10 +24,7 @@ class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
-            'recipients': {
-                str(recipient.id): (str(recipient), bool(recipient.secret_key))
-                for recipient in self.recipients.all()
-            }
+            'recipients': [str(r.id) for r in self.recipients.all()]
         })
         return attr_json
 

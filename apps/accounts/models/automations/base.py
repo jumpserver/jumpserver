@@ -42,10 +42,11 @@ class AutomationExecution(AssetAutomationExecution):
             ('add_pushaccountexecution', _('Can add push account execution')),
         ]
 
-    def start(self):
+    @property
+    def manager(self):
         from accounts.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
-        return manager.run()
+        return manager
 
 
 class ChangeSecretMixin(SecretWithRandomMixin):

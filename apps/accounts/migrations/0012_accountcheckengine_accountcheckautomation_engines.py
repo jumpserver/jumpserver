@@ -5,7 +5,6 @@ import django.db.models.deletion
 import uuid
 
 
-
 def init_account_check_engine(apps, schema_editor):
     data = [
         {
@@ -24,7 +23,6 @@ def init_account_check_engine(apps, schema_editor):
     model_cls = apps.get_model('accounts', 'AccountCheckEngine')
     for item in data:
         model_cls.objects.create(**item)
-
 
 
 class Migration(migrations.Migration):

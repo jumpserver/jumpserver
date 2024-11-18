@@ -48,13 +48,13 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-                    model_name='changesecretautomation',
-                    name='check_conn_after_change',
-                    field=models.BooleanField(default=True, verbose_name='Check connection after change'),
-                ),
-                migrations.AddField(
-                    model_name='pushaccountautomation',
-                    name='check_conn_after_change',
-                    field=models.BooleanField(default=True, verbose_name='Check connection after change'),
-                ),
+            model_name='changesecretautomation',
+            name='check_conn_after_change',
+            field=models.BooleanField(default=True, verbose_name='Check connection after change'),
+        ),
+        migrations.AddField(
+            model_name='pushaccountautomation',
+            name='check_conn_after_change',
+            field=models.BooleanField(default=True, verbose_name='Check connection after change'),
+        ),
     ]

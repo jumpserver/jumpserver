@@ -11,6 +11,7 @@ from common.const.choices import Trigger
 from common.db.fields import EncryptJsonDictTextField
 from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
+from users.models import User
 
 
 class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
@@ -20,6 +21,9 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     type = models.CharField(max_length=16, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     params = models.JSONField(default=dict, verbose_name=_("Parameters"))
+
+    def get_report_template(self):
+        raise NotImplementedError
 
     def __str__(self):
         return self.name + '@' + str(self.created_by)
@@ -114,6 +118,7 @@ class AutomationExecution(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
+    duration = models.IntegerField(default=0, verbose_name=_('Duration'))
     snapshot = EncryptJsonDictTextField(
         default=dict, blank=True, null=True, verbose_name=_('Automation snapshot')
     )
@@ -121,6 +126,8 @@ class AutomationExecution(OrgModelMixin):
         max_length=128, default=Trigger.manual, choices=Trigger.choices,
         verbose_name=_('Trigger mode')
     )
+    summary = models.JSONField(default=dict, verbose_name=_('Summary'))
+    result = models.JSONField(default=dict, verbose_name=_('Result'))
 
     class Meta:
         ordering = ('org_id', '-date_start',)
@@ -150,10 +157,14 @@ class AutomationExecution(OrgModelMixin):
     def recipients(self):
         recipients = self.snapshot.get('recipients')
         if not recipients:
-            return {}
-        return recipients
+            return []
+        users = User.objects.filter(id__in=recipients)
+        return users
+
+    @property
+    def manager(self):
+        from assets.automations.endpoint import ExecutionManager
+        return ExecutionManager(execution=self)
 
     def start(self):
-        from assets.automations.endpoint import ExecutionManager
-        manager = ExecutionManager(execution=self)
-        return manager.run()
+        return self.manager.run()

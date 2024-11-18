@@ -15,11 +15,16 @@ __all__ = ['CheckAccountAutomation', 'AccountRisk', 'RiskChoice', 'CheckAccountE
 
 class CheckAccountAutomation(AccountBaseAutomation):
     engines = models.ManyToManyField('CheckAccountEngine', related_name='check_automations', verbose_name=_('Engines'))
+    recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
+
+    def get_report_template(self):
+        return 'accounts/check_account_report.html'
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
             'engines': [engine.slug for engine in self.engines.all()],
+            'recipients': [str(user.id) for user in self.recipients.all()]
         })
         return attr_json
 
