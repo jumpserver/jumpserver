@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
@@ -82,7 +83,8 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
             'is_sync_account': False,
             'name': 'Adhoc gather accounts: {}'.format(asset_id),
         }
-        execution.save()
+        with transaction.atomic():
+            execution.save()
         execution.start()
         accounts = self.model.objects.filter(asset=asset)
         return self.get_paginated_response_from_queryset(accounts)

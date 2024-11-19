@@ -11,8 +11,8 @@ from functools import wraps
 
 from django.db import transaction
 
-from .utils import logger
 from .db.utils import open_db_connection
+from .utils import logger
 
 
 def on_transaction_commit(func):
@@ -291,6 +291,107 @@ def cached_method(ttl=20):
             _cache[key] = {'result': result, 'timestamp': time.time()}
             return result
 
+        return wrapper
+
+    return decorator
+
+
+def bulk_create_decorator(instance_model, batch_size=50):
+    """
+    装饰器，用于将实例批量保存，并提供 `commit` 方法提交剩余的实例。
+
+    :param instance_model: Django模型类，用于调用 bulk_create 方法。
+    :param batch_size: 批量保存的阈值，默认50。
+    """
+    def decorator(func):
+        cache = []  # 缓存实例的列表
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal cache
+
+            # 调用被装饰的函数，生成一个实例
+            instance = func(*args, **kwargs)
+            if instance is None:
+                return None
+
+            # 添加实例到缓存
+            cache.append(instance)
+            print(f"Instance added to cache. Cache size: {len(cache)}")
+
+            # 如果缓存大小达到批量保存阈值，执行保存
+            if len(cache) >= batch_size:
+                print(f"Batch size reached. Saving {len(cache)} instances...")
+                instance_model.objects.bulk_create(cache)
+                cache.clear()
+
+            return instance
+
+        # 提交剩余实例的方法
+        def commit():
+            nonlocal cache
+            if cache:
+                print(f"Committing remaining {len(cache)} instances...")
+                instance_model.objects.bulk_create(cache)
+                cache.clear()
+
+        wrapper.finish = commit
+        return wrapper
+
+    return decorator
+
+
+def bulk_update_decorator(instance_model, batch_size=50, update_fields=None):
+    """
+    装饰器，用于批量更新实例，并提供 `commit` 方法提交剩余的更新。
+
+    :param instance_model: Django模型类，用于调用 bulk_update 方法。
+    :param batch_size: 批量更新的阈值，默认50。
+    :param update_fields: 指定要更新的字段列表，默认为 None，表示更新所有字段。
+    """
+    def decorator(func):
+        cache = []  # 缓存待更新实例的列表
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal cache
+
+            # 调用被装饰的函数，获取一个需要更新的实例
+            instance = func(*args, **kwargs)
+            if instance is None:
+                return None
+
+            # 添加实例到缓存
+            cache.append(instance)
+            print(f"Instance added to update cache. Cache size: {len(cache)}")
+
+            # 如果缓存大小达到批量更新阈值，执行更新
+            if len(cache) >= batch_size:
+                print(f"Batch size reached. Updating {len(cache)} instances...")
+                instance_model.objects.bulk_update(cache, update_fields)
+                cache.clear()
+
+            return instance
+
+        # 提交剩余更新的方法
+        def commit():
+            nonlocal cache
+            if cache:
+                print(f"Committing remaining {len(cache)} instances..., {update_fields}")
+                # with transaction.atomic():
+                #     for c in cache:
+                #         o = instance_model.objects.get(id=str(c.id))
+                #         print("Origin: ", o.id, o.sudoers)
+                #         o.sudoers = c.sudoers
+                #         o.save()
+                #         print("New: ", c.id, c.sudoers)
+                instance_model.objects.bulk_update(cache, update_fields)
+                # print("Committing remaining instances... done, ", cache[0].sudoers, cache[0].id, instance_model)
+                # print(instance_model.objects.get(id=str(cache[0].id)).sudoers)
+                cache.clear()
+
+        # 将 commit 方法绑定到装饰后的函数
+        wrapper.finish = commit
         return wrapper
 
     return decorator

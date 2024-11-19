@@ -98,12 +98,36 @@ class BaseManager:
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
 
-    def before_run(self):
+    def pre_run(self):
         self.execution.date_start = timezone.now()
         self.execution.save(update_fields=['date_start'])
 
+    def update_execution(self):
+        self.duration = int(time.time() - self.time_start)
+        self.execution.date_finished = timezone.now()
+        self.execution.duration = self.duration
+        self.execution.summary = self.summary
+        self.execution.result = self.result
+        self.execution.status = 'success'
+
+        with safe_db_connection():
+            self.execution.save()
+
+    def print_summary(self):
+        pass
+
+    def get_report_template(self):
+        raise NotImplementedError
+
     def get_report_subject(self):
         return f'Automation {self.execution.id} finished'
+
+    def get_report_context(self):
+        return {
+            'execution': self.execution,
+            'summary': self.execution.summary,
+            'result': self.execution.result
+        }
 
     def send_report_if_need(self):
         recipients = self.execution.recipients
@@ -113,45 +137,24 @@ class BaseManager:
         report = self.gen_report()
         report = transform(report)
         subject = self.get_report_subject()
-        print("Send resport to: {}".format([str(r) for r in recipients]))
         emails = [r.email for r in recipients if r.email]
         send_mail_async(subject, report, emails, html_message=report)
 
-    def update_execution(self):
-        self.duration = int(time.time() - self.time_start)
-        self.execution.date_finished = timezone.now()
-        self.execution.duration = self.duration
-        self.execution.summary = self.summary
-        self.execution.result = self.result
-
-        with safe_db_connection():
-            self.execution.save(update_fields=['date_finished', 'duration', 'summary', 'result'])
-
-    def print_summary(self):
-        pass
-
-    def get_template_path(self):
-        raise NotImplementedError
-
     def gen_report(self):
-        template_path = self.get_template_path()
-        context = {
-            'execution': self.execution,
-            'summary': self.execution.summary,
-            'result': self.execution.result
-        }
+        template_path = self.get_report_template()
+        context = self.get_report_context()
         data = render_to_string(template_path, context)
         return data
 
-    def after_run(self):
+    def post_run(self):
         self.update_execution()
         self.print_summary()
         self.send_report_if_need()
 
     def run(self, *args, **kwargs):
-        self.before_run()
+        self.pre_run()
         self.do_run(*args, **kwargs)
-        self.after_run()
+        self.post_run()
 
     def do_run(self, *args, **kwargs):
         raise NotImplementedError
@@ -374,15 +377,19 @@ class BasePlaybookManager(BaseManager):
         if settings.DEBUG_DEV:
             print('host error: {} -> {}'.format(host, error))
 
-    def _on_host_success(self, host, result, error, detail):
-        self.on_host_success(host, result)
+    def _on_host_success(self, host, result, hosts):
+        self.on_host_success(host, result.get("ok", ''))
 
-    def _on_host_error(self, host, result, error, detail):
+    def _on_host_error(self, host, result, hosts):
+        error = hosts.get(host, '')
+        detail = result.get('failures', '') or result.get('dark', '')
         self.on_host_error(host, error, detail)
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary
         for state, hosts in summary.items():
+            # 错误行为为，host 是 dict， ok 时是 list
+
             if state == 'ok':
                 handler = self._on_host_success
             elif state == 'skipped':
@@ -392,9 +399,7 @@ class BasePlaybookManager(BaseManager):
 
             for host in hosts:
                 result = cb.host_results.get(host)
-                error = hosts.get(host, '')
-                detail = result.get('failures', '') or result.get('dark', '')
-                handler(host, result, error, detail)
+                handler(host, result, hosts)
 
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))

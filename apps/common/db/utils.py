@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from django.db import connections, transaction
+from django.db import connections, transaction, connection
 from django.utils.encoding import force_str
 
 from common.utils import get_logger, signer, crypto
@@ -13,7 +13,7 @@ def get_object_if_need(model, pk):
         try:
             return model.objects.get(id=pk)
         except model.DoesNotExist as e:
-            logger.error(f'DoesNotExist: <{model.__name__}:{pk}> not exist')
+            logger.error(f"DoesNotExist: <{model.__name__}:{pk}> not exist")
             raise e
     return pk
 
@@ -26,8 +26,8 @@ def get_objects_if_need(model, pks):
         if len(objs) != len(pks):
             pks = set(pks)
             exists_pks = {o.id for o in objs}
-            not_found_pks = ','.join(pks - exists_pks)
-            logger.error(f'DoesNotExist: <{model.__name__}: {not_found_pks}>')
+            not_found_pks = ",".join(pks - exists_pks)
+            logger.error(f"DoesNotExist: <{model.__name__}: {not_found_pks}>")
         return objs
     return pks
 
@@ -41,7 +41,7 @@ def get_objects(model, pks):
         pks = set(pks)
         exists_pks = {o.id for o in objs}
         not_found_pks = pks - exists_pks
-        logger.error(f'DoesNotExist: <{model.__name__}: {not_found_pks}>')
+        logger.error(f"DoesNotExist: <{model.__name__}: {not_found_pks}>")
     return objs
 
 
@@ -53,13 +53,17 @@ def close_old_connections():
 
 @contextmanager
 def safe_db_connection():
-    close_old_connections()
-    yield
-    close_old_connections()
+    try:
+        close_old_connections()  # 确保旧连接关闭
+        if connection.connection:  # 如果连接已关闭，重新连接
+            connection.connect()
+        yield
+    finally:
+        close_old_connections()  # 确保最终关闭连接
 
 
 @contextmanager
-def open_db_connection(alias='default'):
+def open_db_connection(alias="default"):
     connection = transaction.get_connection(alias)
     try:
         connection.connect()

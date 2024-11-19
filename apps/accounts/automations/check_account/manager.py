@@ -88,7 +88,7 @@ def check_account_secrets(accounts, assets):
 
 
 class CheckAccountManager(BaseManager):
-    batch_size=100
+    batch_size = 100
 
     def __init__(self, execution):
         super().__init__(execution)
@@ -117,8 +117,14 @@ class CheckAccountManager(BaseManager):
                 for k, v in result.items():
                     self.result[k].extend(v)
 
+    def get_report_subject(self):
+        return "Check account report of %s" % self.execution.id
+
+    def get_report_template(self):
+        return 'accounts/check_account_report.html'
+
     def print_summary(self):
         tmpl = "\n---\nSummary: \nok: %s, weak password: %s, no secret: %s, using time: %ss" % (
-            self.summary['ok'], self.summary['weak_password'], self.summary['no_secret'], int(self.timedelta)
+            self.summary['ok'], self.summary['weak_password'], self.summary['no_secret'], int(self.duration)
         )
         print(tmpl)
