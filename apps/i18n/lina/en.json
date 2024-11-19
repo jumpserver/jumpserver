@@ -1414,5 +1414,7 @@
     "JobsAudit": "Jobs audit",
     "JobList": "Job List",
     "StopJobMsg": "Stop job successfully",
-    "ExtraArgsFormatError": "Format error, please enter according to the requirements"
+    "ExtraArgsFormatError": "Format error, please enter according to the requirements",
+    "MFAOnlyAdminUsers": "Enabled only admin users",
+    "MFAAllUsers": "Globally Enabled"
 }
