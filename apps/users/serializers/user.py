@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+from copy import copy
 from functools import partial
 
 from django.conf import settings
@@ -27,6 +27,7 @@ from ..models import User
 
 __all__ = [
     "UserSerializer",
+    "SmallUserSerializer",
     "MiniUserSerializer",
     "InviteSerializer",
     "ServiceAccountSerializer",
@@ -409,6 +410,15 @@ class UserRetrieveSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ["login_confirm_settings"]
+
+
+class SmallUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        total_fields = UserSerializer.Meta.fields_small + UserSerializer.Meta.fields_date
+        fields = [
+            f for f in total_fields if f not in ['password', 'public_key', 'org_roles']
+        ]
 
 
 class MiniUserSerializer(serializers.ModelSerializer):
