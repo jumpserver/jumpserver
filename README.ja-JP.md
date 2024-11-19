@@ -2,7 +2,7 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## An open-source PAM tool (Bastion Host)
+## オープンソースのPAMツール（バスティオンホスト）
 
 [![][license-shield]][license-link]
 [![][discord-shield]][discord-link]
@@ -10,31 +10,31 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-**English** · [简体中文](./README.zh-CN.md) · [日本語](./README.ja-JP.md)
+[English](README.md) · [简体中文](./README.zh-CN.md) · **日本語**
 </div>
 <br/>
 
-## What is JumpServer?
+## JumpServerとは？
 
-JumpServer is an open-source Privileged Access Management (PAM) tool that provides DevOps and IT teams with on-demand and secure access to SSH, RDP, Kubernetes, Database and RemoteApp endpoints through a web browser.
+JumpServerは、DevOpsおよびITチームに対して、Webブラウザを通じてSSH、RDP、Kubernetes、データベース、およびRemoteAppエンドポイントへのオンデマンドで安全なアクセスを提供するオープンソースの特権アクセス管理（PAM）ツールです。
 
 ![JumpServer Overview](https://github.com/jumpserver/jumpserver/assets/32935519/35a371cb-8590-40ed-88ec-f351f8cf9045)
 
-## Quickstart
+## クイックスタート
 
-Prepare a clean Linux Server ( 64 bit, >= 4c8g )
+クリーンなLinuxサーバーを準備します（64ビット、>= 4c8g）
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Access JumpServer in your browser at `http://your-jumpserver-ip/`
-- Username: `admin`
-- Password: `ChangeMe`
+ブラウザでJumpServerにアクセスします `http://your-jumpserver-ip/`
+- ユーザー名: `admin`
+- パスワード: `ChangeMe`
 
 [![JumpServer Quickstart](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
 
-## Screenshots
+## スクリーンショット
 
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
@@ -57,11 +57,11 @@ Access JumpServer in your browser at `http://your-jumpserver-ip/`
   </tr>
 </table>
 
-## Components
+## コンポーネント
 
-JumpServer consists of multiple key components, which collectively form the functional framework of JumpServer, providing users with comprehensive capabilities for operations management and security control.
+JumpServerは、複数の主要コンポーネントで構成されており、これらがJumpServerの機能フレームワークを形成し、ユーザーに包括的な運用管理およびセキュリティ制御の機能を提供します。
 
-| Project                                                | Status                                                                                                                                                                 | Description                                                                                             |
+| プロジェクト                                                | ステータス                                                                                                                                                                 | 説明                                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer Web UI                                                                                       |
 | [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal                                                                                 |
@@ -73,17 +73,17 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer EE Remote Application Connector (Linux)                                                         |
 | [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer EE Database Proxy Connector                                                                     |
 
-## Contributing
+## 貢献
 
-Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributing-link] for guidelines.
+PRの提出を歓迎します。ガイドラインについては[CONTRIBUTING.md][contributing-link]を参照してください。
 
-## Security
+## セキュリティ
 
-JumpServer is a mission critical product. Please refer to the Basic Security Recommendations for installation and deployment. If you encounter any security-related issues, please contact us directly:
+JumpServerはミッションクリティカルな製品です。インストールおよび展開については基本的なセキュリティ推奨事項を参照してください。セキュリティ関連の問題が発生した場合は、直接ご連絡ください：
 
-- Email: support@fit2cloud.com
+- メール: support@fit2cloud.com
 
-## License
+## ライセンス
 
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.
 
