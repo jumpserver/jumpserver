@@ -188,11 +188,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def average_time_cost(self):
-        total_cost = 0
-        finished_count = self.executions.filter(status__in=['success', 'failed']).count()
-        for execution in self.executions.filter(status__in=['success', 'failed']).all():
-            total_cost += execution.time_cost
-        return total_cost / finished_count if finished_count else 0
+        return self.last_execution.time_cost if self.last_execution else 0
 
     def get_register_task(self):
         from ..tasks import run_ops_job
