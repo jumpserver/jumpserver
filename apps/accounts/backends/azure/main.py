@@ -3,12 +3,16 @@ from .entries import build_entry
 from .service import AZUREVaultClient
 from ..base import BaseVault
 
-__all__ = ['Vault']
+from ...const import VaultTypeChoices
 
 logger = get_logger(__name__)
 
+__all__ = ['Vault']
+
 
 class Vault(BaseVault):
+    type = VaultTypeChoices.azure
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.client = AZUREVaultClient(

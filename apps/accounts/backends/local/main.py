@@ -1,5 +1,6 @@
 from common.utils import get_logger
 from ..base import BaseVault
+from ...const import VaultTypeChoices
 
 logger = get_logger(__name__)
 
@@ -7,6 +8,7 @@ __all__ = ['Vault']
 
 
 class Vault(BaseVault):
+    type = VaultTypeChoices.local
 
     def is_active(self):
         return True, ''

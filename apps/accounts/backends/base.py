@@ -10,6 +10,11 @@ class BaseVault(ABC):
     def __init__(self, *args, **kwargs):
         self.enabled = kwargs.get('VAULT_ENABLED')
 
+    @property
+    @abstractmethod
+    def type(self):
+        raise NotImplementedError
+
     def get(self, instance):
         """ 返回 secret 值 """
         return self._get(instance)
