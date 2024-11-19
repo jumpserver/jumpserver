@@ -2,29 +2,41 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}
-    <div style="text-align: center">
-        {% trans 'Face Recognition' %}
-    </div>
-{% endblock %}
 
 {% block content %}
-    <form class="m-t" role="form" method="post" action="">
+
+    <style>
+        .ibox-content {
+            padding: 0;
+        }
+
+        h2 {
+            display: none;
+        }
+
+        .ibox-context-margin {
+            margin: 0;
+        }
+
+    </style>
+
+    {% if 'code' in form.errors %}
+        <p class="red-fonts">{{ form.code.errors.as_text }}</p>
+    {% endif %}
+
+    <form class="m-t" role="form" method="post" action="" style="display: none">
         {% csrf_token %}
-        {% if 'code' in form.errors %}
-            <p class="red-fonts">{{ form.code.errors.as_text }}</p>
-        {% endif %}
         <button id="submit_button" type="submit" style="display: none"></button>
     </form>
 
     <div id="iframe_container"
-         style="display: none; justify-content: center; align-items: center; height: 800px; width: 100%; background-color: #0a6aa1">
+         style="display: none; justify-content: center; align-items: center; height: 520px; width: 100%;">
         <iframe
                 title="face capture"
                 id="face_capture_iframe"
                 allow="camera"
                 sandbox="allow-scripts allow-same-origin"
-                style="width: 100%; height: 100%;border: none;">
+                style="width: 100%; height:100%;border: none;">
         </iframe>
     </div>
 

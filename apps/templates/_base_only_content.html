@@ -22,6 +22,9 @@
         .ibox-content {
             padding: 30px;
         }
+        .ibox-context-margin {
+            margin: 20px 0 0 0;
+        }
     </style>
     {% block custom_head_css_js %} {% endblock %}
 </head>
@@ -34,7 +37,7 @@
                     <h2 class="font-bold">
                         {% block title %}{% endblock %}
                     </h2>
-                    <div style="margin: 20px 0 0 0">
+                    <div class="ibox-context-margin">
                         {% block content %} {% endblock %}
                     </div>
                 </div>
