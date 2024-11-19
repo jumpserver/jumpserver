@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 16:36+0800\n"
+"POT-Creation-Date: 2024-11-19 17:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -472,7 +472,7 @@ msgstr ""
 
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:247
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:243
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:26
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -586,7 +586,7 @@ msgstr ""
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:248
+#: ops/models/celery.py:90 ops/models/job.py:244
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr ""
@@ -594,7 +594,7 @@ msgstr ""
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113
 #: assets/serializers/automations/base.py:39 audits/models.py:208
-#: audits/serializers.py:75 ops/models/base.py:49 ops/models/job.py:239
+#: audits/serializers.py:76 ops/models/base.py:49 ops/models/job.py:235
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -666,7 +666,7 @@ msgstr ""
 
 #: accounts/models/automations/push_account.py:16 acls/models/base.py:41
 #: acls/serializers/base.py:57 assets/models/cmd_filter.py:81
-#: audits/models.py:92 audits/serializers.py:105
+#: audits/models.py:92 audits/serializers.py:106
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:52 perms/serializers/permission.py:74
@@ -877,8 +877,8 @@ msgstr ""
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:146 assets/serializers/platform.py:159
-#: assets/serializers/platform.py:171 audits/serializers.py:74
-#: audits/serializers.py:191
+#: assets/serializers/platform.py:171 audits/serializers.py:75
+#: audits/serializers.py:192
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
@@ -951,7 +951,7 @@ msgstr ""
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:271
-#: audits/serializers.py:192 authentication/models/connection_token.py:32
+#: audits/serializers.py:193 authentication/models/connection_token.py:32
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
@@ -1556,7 +1556,7 @@ msgid "Login city"
 msgstr ""
 
 #: acls/templates/acls/user_login_reminder.html:11 audits/models.py:197
-#: audits/models.py:266 audits/serializers.py:89
+#: audits/models.py:266 audits/serializers.py:90
 msgid "User agent"
 msgstr ""
 
@@ -2005,7 +2005,7 @@ msgstr ""
 msgid "Node"
 msgstr ""
 
-#: assets/models/automations/base.py:22 ops/models/job.py:242
+#: assets/models/automations/base.py:22 ops/models/job.py:238
 #: ops/serializers/job.py:23 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr ""
@@ -2019,7 +2019,7 @@ msgid "Asset automation task"
 msgstr ""
 
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
-#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:246
+#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:242
 #: users/models/user/__init__.py:321
 msgid "Date created"
 msgstr ""
@@ -2821,7 +2821,7 @@ msgstr ""
 msgid "Remote addr"
 msgstr ""
 
-#: audits/models.py:61 audits/serializers.py:59
+#: audits/models.py:61 audits/serializers.py:60
 msgid "Operate"
 msgstr ""
 
@@ -2846,12 +2846,12 @@ msgstr ""
 msgid "File transfer log"
 msgstr ""
 
-#: audits/models.py:94 audits/serializers.py:107
+#: audits/models.py:94 audits/serializers.py:108
 msgid "Resource Type"
 msgstr ""
 
 #: audits/models.py:95 audits/models.py:98 audits/models.py:144
-#: audits/serializers.py:106 labels/serializers.py:46
+#: audits/serializers.py:107 labels/serializers.py:46
 msgid "Resource"
 msgstr ""
 
@@ -2893,7 +2893,7 @@ msgstr ""
 msgid "Login IP"
 msgstr ""
 
-#: audits/models.py:200 audits/serializers.py:73
+#: audits/models.py:200 audits/serializers.py:74
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:63 users/models/user/__init__.py:86
 #: users/serializers/profile.py:70
@@ -2932,30 +2932,34 @@ msgstr ""
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
-#: ops/models/job.py:245 ops/models/playbook.py:30 ops/models/variable.py:17
+#: ops/models/job.py:241 ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr ""
 
-#: audits/serializers.py:39 ops/models/base.py:52 ops/models/job.py:244
+#: audits/serializers.py:39 ops/models/base.py:52 ops/models/job.py:240
 #: xpack/plugins/cloud/manager.py:99
 msgid "Summary"
 msgstr ""
 
-#: audits/serializers.py:90
+#: audits/serializers.py:40 ops/serializers/celery.py:33
+msgid "Execution cycle"
+msgstr ""
+
+#: audits/serializers.py:91
 msgid "Reason display"
 msgstr ""
 
-#: audits/serializers.py:91 audits/serializers.py:205
+#: audits/serializers.py:92 audits/serializers.py:206
 msgid "Auth backend display"
 msgstr ""
 
-#: audits/serializers.py:155
+#: audits/serializers.py:156
 #, python-format
 msgid "%s %s this resource"
 msgstr ""
 
-#: audits/serializers.py:193 authentication/models/connection_token.py:47
+#: audits/serializers.py:194 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:105
@@ -4896,7 +4900,7 @@ msgstr ""
 msgid "Date last run"
 msgstr ""
 
-#: ops/models/base.py:51 ops/models/job.py:243
+#: ops/models/base.py:51 ops/models/job.py:239
 #: xpack/plugins/cloud/models.py:225
 msgid "Result"
 msgstr ""
@@ -4955,20 +4959,20 @@ msgstr ""
 msgid "Run as policy"
 msgstr ""
 
-#: ops/models/job.py:227 ops/models/variable.py:28 ops/serializers/job.py:98
+#: ops/models/job.py:223 ops/models/variable.py:28 ops/serializers/job.py:98
 #: terminal/notifications.py:182
 msgid "Job"
 msgstr ""
 
-#: ops/models/job.py:250
+#: ops/models/job.py:246
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:252
+#: ops/models/job.py:248
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:564
+#: ops/models/job.py:560
 msgid "Job Execution"
 msgstr ""
 
@@ -5034,10 +5038,6 @@ msgstr ""
 #: ops/notifications.py:86
 #, python-brace-format
 msgid "CPU load more than {max_threshold}: => {value}"
-msgstr ""
-
-#: ops/serializers/celery.py:33
-msgid "Execution cycle"
 msgstr ""
 
 #: ops/serializers/celery.py:35
@@ -9492,11 +9492,11 @@ msgstr ""
 msgid "Face recognition enable success, return login page"
 msgstr ""
 
-#: users/views/profile/face.py:78
+#: users/views/profile/face.py:79
 msgid "Face recognition disable success"
 msgstr ""
 
-#: users/views/profile/face.py:79
+#: users/views/profile/face.py:80
 msgid "Face recognition disable success, return login page"
 msgstr ""
 

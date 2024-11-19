@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 16:36+0800\n"
+"POT-Creation-Date: 2024-11-19 17:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -327,7 +327,7 @@ msgstr "HashiCorp Vault"
 
 #: accounts/const/vault.py:10 settings/serializers/feature.py:82
 msgid "Azure Key Vault"
-msgstr ""
+msgstr "Azure Key Vault"
 
 #: accounts/mixins.py:35
 msgid "Export all"
@@ -473,7 +473,7 @@ msgstr "帳號備份計劃"
 
 #: accounts/models/automations/backup_account.py:120
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:247
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:243
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:26
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -587,7 +587,7 @@ msgstr "開始日期"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:248
+#: ops/models/celery.py:90 ops/models/job.py:244
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "結束日期"
@@ -595,7 +595,7 @@ msgstr "結束日期"
 #: accounts/models/automations/change_secret.py:44
 #: assets/models/automations/base.py:113
 #: assets/serializers/automations/base.py:39 audits/models.py:208
-#: audits/serializers.py:75 ops/models/base.py:49 ops/models/job.py:239
+#: audits/serializers.py:76 ops/models/base.py:49 ops/models/job.py:235
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -667,7 +667,7 @@ msgstr "觸發方式"
 
 #: accounts/models/automations/push_account.py:16 acls/models/base.py:41
 #: acls/serializers/base.py:57 assets/models/cmd_filter.py:81
-#: audits/models.py:92 audits/serializers.py:105
+#: audits/models.py:92 audits/serializers.py:106
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:52 perms/serializers/permission.py:74
@@ -887,8 +887,8 @@ msgstr "類別"
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:146 assets/serializers/platform.py:159
-#: assets/serializers/platform.py:171 audits/serializers.py:74
-#: audits/serializers.py:191
+#: assets/serializers/platform.py:171 audits/serializers.py:75
+#: audits/serializers.py:192
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
@@ -961,7 +961,7 @@ msgstr "ID"
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:271
-#: audits/serializers.py:192 authentication/models/connection_token.py:32
+#: audits/serializers.py:193 authentication/models/connection_token.py:32
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
@@ -1590,7 +1590,7 @@ msgid "Login city"
 msgstr "登錄城市"
 
 #: acls/templates/acls/user_login_reminder.html:11 audits/models.py:197
-#: audits/models.py:266 audits/serializers.py:89
+#: audits/models.py:266 audits/serializers.py:90
 msgid "User agent"
 msgstr "用戶代理"
 
@@ -2044,7 +2044,7 @@ msgstr "代理"
 msgid "Node"
 msgstr "節點"
 
-#: assets/models/automations/base.py:22 ops/models/job.py:242
+#: assets/models/automations/base.py:22 ops/models/job.py:238
 #: ops/serializers/job.py:23 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "參數"
@@ -2060,7 +2060,7 @@ msgstr "資產自動化任務"
 # msgid "Comment"
 # msgstr "備註"
 #: assets/models/automations/base.py:114 assets/models/cmd_filter.py:41
-#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:246
+#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:242
 #: users/models/user/__init__.py:321
 msgid "Date created"
 msgstr "創建日期"
@@ -2500,7 +2500,7 @@ msgstr "資產數量"
 
 #: assets/serializers/gateway.py:19
 msgid "The platform must start with Gateway"
-msgstr ""
+msgstr "平台必須從 Gateway 開始"
 
 #: assets/serializers/gateway.py:28 common/validators.py:34
 msgid "This field must be unique."
@@ -2869,7 +2869,7 @@ msgstr "作業審計"
 msgid "Remote addr"
 msgstr "遠端地址"
 
-#: audits/models.py:61 audits/serializers.py:59
+#: audits/models.py:61 audits/serializers.py:60
 msgid "Operate"
 msgstr "操作"
 
@@ -2894,12 +2894,12 @@ msgstr "會話"
 msgid "File transfer log"
 msgstr "文件管理"
 
-#: audits/models.py:94 audits/serializers.py:107
+#: audits/models.py:94 audits/serializers.py:108
 msgid "Resource Type"
 msgstr "資源類型"
 
 #: audits/models.py:95 audits/models.py:98 audits/models.py:144
-#: audits/serializers.py:106 labels/serializers.py:46
+#: audits/serializers.py:107 labels/serializers.py:46
 msgid "Resource"
 msgstr "資源"
 
@@ -2941,7 +2941,7 @@ msgstr "登錄方式"
 msgid "Login IP"
 msgstr "登錄 IP"
 
-#: audits/models.py:200 audits/serializers.py:73
+#: audits/models.py:200 audits/serializers.py:74
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:63 users/models/user/__init__.py:86
 #: users/serializers/profile.py:70
@@ -2980,30 +2980,34 @@ msgstr "下線用戶會話"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
-#: ops/models/job.py:245 ops/models/playbook.py:30 ops/models/variable.py:17
+#: ops/models/job.py:241 ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "創建者"
 
-#: audits/serializers.py:39 ops/models/base.py:52 ops/models/job.py:244
+#: audits/serializers.py:39 ops/models/base.py:52 ops/models/job.py:240
 #: xpack/plugins/cloud/manager.py:99
 msgid "Summary"
 msgstr "匯總"
 
-#: audits/serializers.py:90
+#: audits/serializers.py:40 ops/serializers/celery.py:33
+msgid "Execution cycle"
+msgstr "週期性Action"
+
+#: audits/serializers.py:91
 msgid "Reason display"
 msgstr "原因描述"
 
-#: audits/serializers.py:91 audits/serializers.py:205
+#: audits/serializers.py:92 audits/serializers.py:206
 msgid "Auth backend display"
 msgstr "认证代币描述"
 
-#: audits/serializers.py:155
+#: audits/serializers.py:156
 #, python-format
 msgid "%s %s this resource"
 msgstr "用户 %s %s 了当前资源"
 
-#: audits/serializers.py:193 authentication/models/connection_token.py:47
+#: audits/serializers.py:194 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:105
@@ -3456,18 +3460,16 @@ msgid "MFA custom global enabled, cannot disable"
 msgstr "自訂 MFA 全局開啟，無法被禁用"
 
 #: authentication/mfa/face.py:13
-#, fuzzy
-#| msgid "Basic edition"
 msgid "Face Recognition"
-msgstr "企業基礎版"
+msgstr "臉部辨識"
 
 #: authentication/mfa/face.py:23 authentication/mfa/face.py:25
 msgid "Facial comparison failed"
-msgstr ""
+msgstr "臉部比對失敗"
 
 #: authentication/mfa/face.py:53
 msgid "Frontal Face Recognition"
-msgstr ""
+msgstr "正面臉部辨識"
 
 #: authentication/mfa/otp.py:7
 msgid "OTP code invalid, or server time error"
@@ -3936,7 +3938,7 @@ msgstr "取消"
 
 #: authentication/templates/authentication/face_capture.html:44
 msgid "Retry"
-msgstr ""
+msgstr "重試"
 
 #: authentication/templates/authentication/login.html:308
 msgid ""
@@ -4297,7 +4299,7 @@ msgstr "無效的 excel 文件"
 
 #: common/drf/renders/base.py:138
 msgid "Yes/No"
-msgstr ""
+msgstr "是/否"
 
 #: common/drf/renders/base.py:141
 msgid "Text, max length {}"
@@ -4894,13 +4896,11 @@ msgstr "私有"
 
 #: ops/const.py:91
 msgid "Text"
-msgstr ""
+msgstr "文字框"
 
 #: ops/const.py:92
-#, fuzzy
-#| msgid "Collect"
 msgid "Select"
-msgstr "收集"
+msgstr "選擇框"
 
 #: ops/exception.py:6
 msgid "no valid program entry found."
@@ -4970,7 +4970,7 @@ msgstr "最後執行"
 msgid "Date last run"
 msgstr "最後運行日期"
 
-#: ops/models/base.py:51 ops/models/job.py:243
+#: ops/models/base.py:51 ops/models/job.py:239
 #: xpack/plugins/cloud/models.py:225
 msgid "Result"
 msgstr "結果"
@@ -5016,10 +5016,8 @@ msgid "Parameters define"
 msgstr "參數定義"
 
 #: ops/models/job.py:159
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Periodic variable"
-msgstr "週期性執行"
+msgstr "週期執行變數"
 
 #: ops/models/job.py:160
 msgid "Run as"
@@ -5029,20 +5027,20 @@ msgstr "執行使用者"
 msgid "Run as policy"
 msgstr "使用者策略"
 
-#: ops/models/job.py:227 ops/models/variable.py:28 ops/serializers/job.py:98
+#: ops/models/job.py:223 ops/models/variable.py:28 ops/serializers/job.py:98
 #: terminal/notifications.py:182
 msgid "Job"
 msgstr "作業"
 
-#: ops/models/job.py:250
+#: ops/models/job.py:246
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:252
+#: ops/models/job.py:248
 msgid "Material Type"
 msgstr "Material 類型"
 
-#: ops/models/job.py:564
+#: ops/models/job.py:560
 msgid "Job Execution"
 msgstr "作業執行"
 
@@ -5055,10 +5053,8 @@ msgid "VCS URL"
 msgstr "VCS URL"
 
 #: ops/models/variable.py:11 ops/serializers/variable.py:22
-#, fuzzy
-#| msgid "Filename"
 msgid "Variable name"
-msgstr "檔案名"
+msgstr "變數名"
 
 #: ops/models/variable.py:12 ops/serializers/variable.py:23
 msgid ""
@@ -5066,27 +5062,25 @@ msgid ""
 "the input variable name. For example, if the variable name is 'name,' the "
 "final generated environment variable will be 'jms_name'."
 msgstr ""
+"在程式碼中使用的變數名稱，固定前綴 jms_ + 輸入的變數名，例如變數名稱為name，"
+"則最終生成環境變數為 jms_name"
 
 #: ops/models/variable.py:16
-#, fuzzy
-#| msgid "Default"
 msgid "Default Value"
-msgstr "默認"
+msgstr "預設"
 
 #: ops/models/variable.py:18
 msgid "Variable type"
-msgstr ""
+msgstr "變數類型"
 
 #: ops/models/variable.py:21 ops/serializers/variable.py:32
 msgid "ExtraVars"
-msgstr ""
+msgstr "額外參數"
 
 #: ops/models/variable.py:49 ops/serializers/adhoc.py:16
 #: ops/serializers/job.py:22 ops/serializers/playbook.py:21
-#, fuzzy
-#| msgid "Writable"
 msgid "Variable"
-msgstr "讀寫"
+msgstr "變數"
 
 #: ops/notifications.py:20
 msgid "Server performance"
@@ -5115,10 +5109,6 @@ msgstr "記憶體使用率超過 {max_threshold}%: => {value}"
 #, python-brace-format
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超過 {max_threshold}: => {value}"
-
-#: ops/serializers/celery.py:33
-msgid "Execution cycle"
-msgstr "週期性Action"
 
 #: ops/serializers/celery.py:35
 msgid "Next execution time"
@@ -5149,17 +5139,15 @@ msgid "You do not have permission for the current job."
 msgstr "你沒有當前作業的權限。"
 
 #: ops/serializers/variable.py:29
-#, fuzzy
-#| msgid "Material Type"
 msgid "Variable Type"
-msgstr "Material 類型"
+msgstr "變數類型"
 
 #: ops/serializers/variable.py:34
 msgid ""
 "Each item is on a separate line, with each line separated by a colon. The "
 "part before the colon is the display content, and the part after the colon "
 "is the value."
-msgstr ""
+msgstr "每項單獨一行，每行可以用英文冒號分割前面是顯示的內容後面是值"
 
 #: ops/tasks.py:53
 msgid "Run ansible task"
@@ -6610,10 +6598,8 @@ msgid "Vault"
 msgstr "啟用 Vault"
 
 #: settings/serializers/feature.py:53
-#, fuzzy
-#| msgid "Provider"
 msgid "Vault provider"
-msgstr "雲服務商"
+msgstr "保管庫服務商"
 
 #: settings/serializers/feature.py:57
 msgid "Record limit"
@@ -6729,7 +6715,7 @@ msgstr "SMTP"
 
 #: settings/serializers/msg.py:25
 msgid "EXCHANGE"
-msgstr ""
+msgstr "交換"
 
 #: settings/serializers/msg.py:34
 msgid "The user to be used for email server authentication"
@@ -7634,16 +7620,12 @@ msgid "RDP Guide"
 msgstr "RDP 連接嚮導"
 
 #: terminal/connect_methods.py:39
-#, fuzzy
-#| msgid "Client"
 msgid "VNC Client"
-msgstr "用戶端"
+msgstr "VNC 客戶端"
 
 #: terminal/connect_methods.py:40
-#, fuzzy
-#| msgid "DB Guide"
 msgid "VNC Guide"
-msgstr "DB 連接嚮導"
+msgstr "VNC 連線精靈"
 
 #: terminal/const.py:10
 msgid "Warning"
@@ -7860,10 +7842,8 @@ msgid "SQLServer port"
 msgstr "SQLServer 埠"
 
 #: terminal/models/component/endpoint.py:25
-#, fuzzy
-#| msgid "SSH port"
 msgid "VNC port"
-msgstr "SSH 埠"
+msgstr "VNC 端口"
 
 #: terminal/models/component/endpoint.py:33
 #: terminal/models/component/endpoint.py:120
@@ -9176,7 +9156,7 @@ msgstr "需要更新密碼"
 
 #: users/models/user/__init__.py:144
 msgid "Face Vector"
-msgstr ""
+msgstr "人臉向量"
 
 #: users/models/user/__init__.py:147
 msgid "Date api key used"
@@ -9732,38 +9712,28 @@ msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "請打開 MFA 驗證器，輸入 6 位動態碼"
 
 #: users/utils.py:60
-#, fuzzy
-#| msgid "Auth source"
 msgid "Auth success"
-msgstr "認證資料庫"
+msgstr "認證成功"
 
 #: users/utils.py:61
 msgid "Redirecting to JumpServer Client"
-msgstr ""
+msgstr "重新導向到 JumpServer 客戶端"
 
 #: users/views/profile/face.py:54
-#, fuzzy
-#| msgid "Basic edition"
 msgid "Face recognition enable success"
-msgstr "企業基礎版"
+msgstr "MFA(人臉識別) 開啟成功"
 
 #: users/views/profile/face.py:55
-#, fuzzy
-#| msgid "OTP enable success, return login page"
 msgid "Face recognition enable success, return login page"
-msgstr "MFA(OTP) 啟用成功，返回到登入頁面"
-
-#: users/views/profile/face.py:78
-#, fuzzy
-#| msgid "OTP disable success"
-msgid "Face recognition disable success"
-msgstr "MFA(OTP) 禁用成功"
+msgstr "MFA(人臉識別) 啟用成功，返回到登錄頁面"
 
 #: users/views/profile/face.py:79
-#, fuzzy
-#| msgid "OTP disable success, return login page"
+msgid "Face recognition disable success"
+msgstr "MFA(人臉識別) 禁用成功"
+
+#: users/views/profile/face.py:80
 msgid "Face recognition disable success, return login page"
-msgstr "MFA(OTP) 禁用成功，返回登入頁面"
+msgstr "MFA(人臉識別) 禁用成功，返回登錄頁面"
 
 #: users/views/profile/otp.py:106
 msgid "Already bound"
@@ -10635,7 +10605,7 @@ msgstr "許可證匯入成功"
 
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
-msgstr "無效 IP"
+msgstr "許可證無效"
 
 #: xpack/plugins/license/models.py:80
 msgid "Basic edition"
