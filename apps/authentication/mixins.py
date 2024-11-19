@@ -226,11 +226,19 @@ class MFAFaceMixin:
     def is_context_finished(context):
         return context.get('is_finished', False)
 
+    @staticmethod
+    def is_context_success(context):
+        return context.get('success', False)
+
     def get_face_code(self):
         context = self.get_face_recognition_context()
 
         if not self.is_context_finished(context):
             raise RuntimeError("Face recognition is not yet completed.")
+
+        if not self.is_context_success(context):
+            msg = context.get('error_message', '')
+            raise RuntimeError("Face recognition failed,{}".format(msg))
 
         face_code = context.get('face_code')
         if not face_code:
