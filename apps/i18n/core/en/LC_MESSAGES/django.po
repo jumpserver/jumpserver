@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 15:05+0800\n"
+"POT-Creation-Date: 2024-11-19 16:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9482,6 +9482,22 @@ msgstr ""
 
 #: users/utils.py:61
 msgid "Redirecting to JumpServer Client"
+msgstr ""
+
+#: users/views/profile/face.py:54
+msgid "Face recognition enable success"
+msgstr ""
+
+#: users/views/profile/face.py:55
+msgid "Face recognition enable success, return login page"
+msgstr ""
+
+#: users/views/profile/face.py:78
+msgid "Face recognition disable success"
+msgstr ""
+
+#: users/views/profile/face.py:79
+msgid "Face recognition disable success, return login page"
 msgstr ""
 
 #: users/views/profile/otp.py:106
