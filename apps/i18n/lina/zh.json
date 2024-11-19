@@ -1420,6 +1420,6 @@
     "JobList": "作业列表",
     "StopJobMsg": "停止成功",
     "ExtraArgsFormatError": "格式错误，请按要求输入",
-    "MFAOnlyAdminUsers": "全局启用仅管理员",
-    "MFAAllUsers": "全局启用"
+    "MFAOnlyAdminUsers": "全局启用: 仅管理员",
+    "MFAAllUsers": "全局启用: 所有用户"
 }
