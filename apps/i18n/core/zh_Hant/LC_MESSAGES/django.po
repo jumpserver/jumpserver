@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 15:05+0800\n"
+"POT-Creation-Date: 2024-11-19 16:36+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -9740,6 +9740,30 @@ msgstr "認證資料庫"
 #: users/utils.py:61
 msgid "Redirecting to JumpServer Client"
 msgstr ""
+
+#: users/views/profile/face.py:54
+#, fuzzy
+#| msgid "Basic edition"
+msgid "Face recognition enable success"
+msgstr "企業基礎版"
+
+#: users/views/profile/face.py:55
+#, fuzzy
+#| msgid "OTP enable success, return login page"
+msgid "Face recognition enable success, return login page"
+msgstr "MFA(OTP) 啟用成功，返回到登入頁面"
+
+#: users/views/profile/face.py:78
+#, fuzzy
+#| msgid "OTP disable success"
+msgid "Face recognition disable success"
+msgstr "MFA(OTP) 禁用成功"
+
+#: users/views/profile/face.py:79
+#, fuzzy
+#| msgid "OTP disable success, return login page"
+msgid "Face recognition disable success, return login page"
+msgstr "MFA(OTP) 禁用成功，返回登入頁面"
 
 #: users/views/profile/otp.py:106
 msgid "Already bound"

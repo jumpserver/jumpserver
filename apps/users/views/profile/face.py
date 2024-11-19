@@ -2,12 +2,15 @@ from django.contrib.auth import logout as auth_logout
 from django.shortcuts import redirect
 from django.views.generic import FormView
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from authentication import errors
 from authentication.mixins import AuthMixin, MFAFaceMixin
 
 __all__ = ['UserFaceCaptureView', 'UserFaceEnableView',
            'UserFaceDisableView']
+
+from common.utils import reverse, FlashMessageUtil
 
 
 class UserFaceCaptureForm(forms.Form):
@@ -21,7 +24,7 @@ class UserFaceCaptureView(AuthMixin, FormView):
     code = ''
 
     def form_valid(self, form):
-        raise NotImplementedError
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -44,7 +47,17 @@ class UserFaceEnableView(UserFaceCaptureView, MFAFaceMixin):
         user.save(update_fields=['face_vector'])
 
         auth_logout(self.request)
-        return redirect('authentication:login')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        message_data = {
+            'title': _('Face recognition enable success'),
+            'message': _('Face recognition enable success, return login page'),
+            'interval': 5,
+            'redirect_url': reverse('authentication:login'),
+        }
+        url = FlashMessageUtil.gen_message_url(message_data)
+        return url
 
 
 class UserFaceDisableView(UserFaceCaptureView):
@@ -54,9 +67,19 @@ class UserFaceDisableView(UserFaceCaptureView):
             user = self.get_user_from_session()
             user.face_vector = None
             user.save(update_fields=['face_vector'])
-            auth_logout(self.request)
         except (errors.MFAFailedError, errors.BlockMFAError) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)
 
-        return redirect('authentication:login')
+        auth_logout(self.request)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        message_data = {
+            'title': _('Face recognition disable success'),
+            'message': _('Face recognition disable success, return login page'),
+            'interval': 5,
+            'redirect_url': reverse('authentication:login'),
+        }
+        url = FlashMessageUtil.gen_message_url(message_data)
+        return url
