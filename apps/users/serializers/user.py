@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from copy import copy
 from functools import partial
 
 from django.conf import settings
