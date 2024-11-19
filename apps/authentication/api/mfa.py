@@ -18,7 +18,7 @@ from common.utils import get_logger
 from users.models.user import User
 from .. import errors
 from .. import serializers
-from ..const import MFA_FACE_CONTEXT_CACHE_KEY_PREFIX, MFA_FACE_SESSION_KEY
+from ..const import MFA_FACE_CONTEXT_CACHE_KEY_PREFIX, MFA_FACE_SESSION_KEY, MFA_FACE_CONTEXT_CACHE_TTL
 from ..errors import SessionEmptyError
 from ..mixins import AuthMixin
 
@@ -74,7 +74,7 @@ class MFAFaceCallbackApi(AuthMixin, CreateAPIView):
 
     def _update_cache(self, context):
         cache_key = self.get_face_cache_key(context['token'])
-        cache.set(cache_key, context, 3600)
+        cache.set(cache_key, context, MFA_FACE_CONTEXT_CACHE_TTL)
 
     def _handle_success(self, context, face_code):
         context.update({
@@ -100,7 +100,7 @@ class MFAFaceContextApi(AuthMixin, RetrieveAPIView, CreateAPIView):
             "token": token,
             "is_finished": False
         }
-        cache.set(cache_key, face_context)
+        cache.set(cache_key, face_context, MFA_FACE_CONTEXT_CACHE_TTL)
         self.request.session[self.face_token_session_key] = token
         return token
 
