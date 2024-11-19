@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 17:51+0800\n"
+"POT-Creation-Date: 2024-11-19 18:55+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -5722,7 +5722,7 @@ msgid "Appearance"
 msgstr "介面"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:152
+#: xpack/plugins/license/models.py:155
 msgid "License"
 msgstr "許可證"
 
@@ -10622,6 +10622,10 @@ msgstr "企業專業版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企業旗艦版"
+
+#: xpack/plugins/license/models.py:101
+msgid "FIT2CLOUD"
+msgstr ""
 
 #~ msgid "* Please enter the correct password length"
 #~ msgstr "* 請輸入正確的密碼長度"

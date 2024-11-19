@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 17:51+0800\n"
+"POT-Creation-Date: 2024-11-19 18:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5850,7 +5850,7 @@ msgid "Appearance"
 msgstr "外見"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:152
+#: xpack/plugins/license/models.py:155
 msgid "License"
 msgstr "ライセンス"
 
@@ -10872,6 +10872,10 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#: xpack/plugins/license/models.py:101
+msgid "FIT2CLOUD"
+msgstr ""
 
 #~ msgid "* Please enter the correct password length"
 #~ msgstr "* 正しいパスワードの長さを入力してください"
