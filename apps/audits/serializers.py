@@ -37,6 +37,7 @@ class JobLogSerializer(JobExecutionSerializer):
 class JobsAuditSerializer(JobSerializer):
     material = serializers.ReadOnlyField(label=_("Command"))
     summary = serializers.ReadOnlyField(label=_("Summary"))
+    crontab = serializers.ReadOnlyField(label=_("Execution cycle"))
 
     class Meta(JobSerializer.Meta):
         read_only_fields = [

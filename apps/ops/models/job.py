@@ -181,13 +181,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     @property
     def summary(self):
         summary = {
-            "total": 0,
-            "success": 0,
+            "total": self.executions.count(),
+            "success": self.executions.filter(status=JobStatus.success).count(),
         }
-        for execution in self.executions.all():
-            summary["total"] += 1
-            if execution.is_success:
-                summary["success"] += 1
         return summary
 
     @property
