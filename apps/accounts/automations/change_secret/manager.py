@@ -163,7 +163,6 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             self.get_or_create_record(asset, account, new_secret, h['name'])
             inventory_hosts.append(h)
 
-        self.create_record.finish()
         return inventory_hosts
 
     def on_host_success(self, host, result):

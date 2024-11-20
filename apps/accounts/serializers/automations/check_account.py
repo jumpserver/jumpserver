@@ -31,6 +31,10 @@ class AccountRiskSerializer(serializers.ModelSerializer):
             'date_created', 'details',
         ]
 
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset.select_related('asset')
+
 
 class RiskSummarySerializer(serializers.Serializer):
     risk = serializers.CharField(max_length=128)

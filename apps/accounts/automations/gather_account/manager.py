@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 from django.utils import timezone
@@ -122,10 +123,6 @@ class AnalyseAccountRisk:
     def _update_risk(self, account):
         return account
 
-    def finish(self):
-        self._create_risk.finish()
-        self._update_risk.finish()
-
     def analyse_risk(self, asset, ori_account, d):
         if not self.check_risk:
             return
@@ -134,7 +131,7 @@ class AnalyseAccountRisk:
         if ori_account:
             self._analyse_item_changed(ori_account, d)
         else:
-            self._create_risk(dict(**basic, risk='new_account'))
+            self._create_risk(dict(**basic, risk='ghost', details=[{'datetime': self.now.isoformat()}]))
 
         self._analyse_datetime_changed(ori_account, d, asset, d['username'])
 
@@ -298,10 +295,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
                 self.update_gather_accounts_status(asset)
                 GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
-
-        self.create_gathered_account.finish()
-        self.update_gathered_account.finish()
-        risk_analyser.finish()
+        # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步
+        time.sleep(0.5)
 
     def send_report_if_need(self):
         pass

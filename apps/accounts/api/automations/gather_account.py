@@ -81,10 +81,10 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
             'nodes': [],
             'type': 'gather_accounts',
             'is_sync_account': False,
+            'check_risk': True,
             'name': 'Adhoc gather accounts: {}'.format(asset_id),
         }
-        with transaction.atomic():
-            execution.save()
+        execution.save()
         execution.start()
         accounts = self.model.objects.filter(asset=asset).prefetch_related('asset', 'asset__platform')
         return self.get_paginated_response_from_queryset(accounts)
