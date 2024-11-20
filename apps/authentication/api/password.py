@@ -1,5 +1,6 @@
 import time
 
+from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
@@ -40,12 +41,15 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         return user, None
 
     @staticmethod
-    def safe_send_code(token, code, target, form_type, content):
+    def safe_send_code(token, code, target, form_type, content, user_info):
         token_sent_key = '{}_send_at'.format(token)
         token_send_at = cache.get(token_sent_key, 0)
         if token_send_at:
             raise IntervalTooShort(60)
-        SendAndVerifyCodeUtil(target, code, backend=form_type, **content).gen_and_send_async()
+        tooler = SendAndVerifyCodeUtil(
+            target, code, backend=form_type, user_info=user_info, **content
+        )
+        tooler.gen_and_send_async()
         cache.set(token_sent_key, int(time.time()), 60)
 
     def prepare_code_data(self, user_info, serializer):
@@ -61,7 +65,7 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         if not user:
             raise ValueError(err)
 
-        code = random_string(6, lower=False, upper=False)
+        code = random_string(settings.SMS_CODE_LENGTH, lower=False, upper=False)
         subject = '%s: %s' % (get_login_title(), _('Forgot password'))
         context = {
             'user': user, 'title': subject, 'code': code,
@@ -82,7 +86,7 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
             code, target, form_type, content = self.prepare_code_data(user_info, serializer)
         except ValueError as e:
             return Response({'error': str(e)}, status=400)
-        self.safe_send_code(token, code, target, form_type, content)
+        self.safe_send_code(token, code, target, form_type, content, user_info)
         return Response({'data': 'ok'}, status=200)
 
 

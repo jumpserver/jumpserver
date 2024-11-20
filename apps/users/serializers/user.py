@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from functools import partial
 
 from django.conf import settings
@@ -27,6 +26,7 @@ from ..models import User
 
 __all__ = [
     "UserSerializer",
+    "SmsUserSerializer",
     "MiniUserSerializer",
     "InviteSerializer",
     "ServiceAccountSerializer",
@@ -409,6 +409,14 @@ class UserRetrieveSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ["login_confirm_settings"]
+
+
+class SmsUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'name', 'email', 'phone', 'source', 'is_active', 'comment'
+        ]
 
 
 class MiniUserSerializer(serializers.ModelSerializer):

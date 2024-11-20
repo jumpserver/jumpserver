@@ -43,7 +43,7 @@ class SMS:
             **kwargs
         )
 
-    def send_verify_code(self, phone_number, code):
+    def send_verify_code(self, phone_number, code, **kwargs):
         prefix = getattr(self.client, 'SIGN_AND_TMPL_SETTING_FIELD_PREFIX', '')
         sign_name = getattr(settings, f'{prefix}_VERIFY_SIGN_NAME', None)
         template_code = getattr(settings, f'{prefix}_VERIFY_TEMPLATE_CODE', None)
@@ -53,4 +53,7 @@ class SMS:
                 code='verify_code_sign_tmpl_invalid',
                 detail=_('SMS verification code signature or template invalid')
             )
-        return self.send_sms([phone_number], sign_name, template_code, OrderedDict(code=code))
+        return self.send_sms(
+            [phone_number], sign_name, template_code,
+            OrderedDict(code=code), **kwargs
+        )
