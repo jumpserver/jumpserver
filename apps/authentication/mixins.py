@@ -238,7 +238,7 @@ class MFAFaceMixin:
 
         if not self.is_context_success(context):
             msg = context.get('error_message', '')
-            raise RuntimeError("Face recognition failed,{}".format(msg))
+            raise RuntimeError(msg)
 
         face_code = context.get('face_code')
         if not face_code:
