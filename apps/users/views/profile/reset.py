@@ -16,7 +16,7 @@ from authentication.utils import check_user_property_is_correct
 from common.const.choices import COUNTRY_CALLING_CODES
 from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
-from users.serializers import SmallUserSerializer
+from users.serializers import SmsUserSerializer
 from users.notifications import ResetPasswordSuccessMsg
 from ... import forms
 from ...models import User
@@ -52,7 +52,7 @@ class UserForgotPasswordPreviewingView(FormView):
         if token_sent_at:
             raise IntervalTooShort(sent_ttl)
         token = random_string(36)
-        cache.set(token, SmallUserSerializer(user).data, 5 * 60)
+        cache.set(token, SmsUserSerializer(user).data, 5 * 60)
         cache.set(token_sent_at_key, time.time(), sent_ttl)
         return token
 
