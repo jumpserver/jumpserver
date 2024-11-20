@@ -38,8 +38,8 @@ def is_weak_password(password):
 
 
 @bulk_create_decorator(AccountRisk)
-def create_risk(account, risk):
-    pass
+def create_risk(data):
+    return AccountRisk(**data)
 
 
 @bulk_update_decorator(AccountRisk, update_fields=["details"])

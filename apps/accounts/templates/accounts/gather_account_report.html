@@ -25,32 +25,69 @@
                 <td>{% trans 'Time using' %}: </td>
                 <td>{{ execution.duration }}s</td>
             </tr>
+
             <tr>
                 <td>{% trans 'Assets count' %}: </td>
                 <td>{{ summary.assets }}</td>
             </tr>
             <tr>
-                <td>{% trans 'Account count' %}: </td>
-                <td>{{ summary.accounts }}</td>
+                <td>{% trans 'Asset success count' %}: </td>
+                <td>{{ summary.success_assets }}</td>
             </tr>
             <tr>
-                <td>{% trans 'Week password count' %}:</td>
-                <td> <span> {{ summary.weak_password }}</span></td>
+                <td>{% trans 'Asset failed count' %}: </td>
+                <td>{{ summary.fail_assets }}</td>
             </tr>
             <tr>
-                <td>{% trans 'Ok count' %}: </td>
-                <td>{{ summary.ok }}</td>
+                <td>{% trans 'Asset not support count' %}: </td>
+                <td>{{ summary.na_assets }}</td>
+            </tr>
+
+            <tr>
+                <td>{% trans 'Account new found count' %}: </td>
+                <td>{{ summary.new_accounts }}</td>
+            </tr>
+
+            <tr>
+                <td>{% trans 'Sudo changed count' %}:</td>
+                <td> <span> {{ summary.sudo_changed }}</span></td>
             </tr>
             <tr>
-                <td>{% trans 'No password count' %}: </td>
-                <td>{{ summary.no_secret }}</td>
+                <td>{% trans 'Groups changed count' %}:</td>
+                <td> <span> {{ summary.groups_changed }}</span></td>
+            </tr>
+            <tr>
+                <td>{% trans 'Authorized key changed count' %}:</td>
+                <td> <span> {{ summary.authorized_key_changed }}</span></td>
             </tr>
         </tbody>
     </table>
 </div>
 
 <div class='result'>
-   <p>{% trans 'Account check details' %}:</p>
+   <p>{% trans 'New found accounts' %}:</p>
+    <table style="">
+        <thead>
+        <tr>
+            <th>{% trans 'No.' %}</th>
+            <th>{% trans 'Asset' %}</th>
+            <th>{% trans 'Username' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for account in result.new_accounts %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ account.asset }}</td>
+                <td>{{ account.username }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class='result'>
+   <p>{% trans 'New found risk' %}:</p>
     <table style="">
         <thead>
         <tr>
@@ -61,12 +98,12 @@
         </tr>
         </thead>
         <tbody>
-        {% for account in result.weak_password %}
+        {% for risk in result.risks %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ account.asset }}</td>
-                <td>{{ account.username }}</td>
-                <td>{% trans 'Week password' %}</td>
+                <td>{{ risk.asset }}</td>
+                <td>{{ risk.username }}</td>
+                <td>{{ risk.risk }}</td>
             </tr>
         {% endfor %}
         </tbody>

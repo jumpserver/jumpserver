@@ -183,9 +183,15 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         print("Runner failed: ", e)
         raise e
 
+    def on_host_error(self, host, error, result):
+        print(f'\033[31m {host} error: {error} \033[0m\n')
+        self.summary['error_assets'] += 1
+
     def on_host_success(self, host, result):
         info = self._get_nested_info(result, 'debug', 'res', 'info')
         asset = self.host_asset_mapper.get(host)
+        self.summary['success_assets'] += 1
+
         if asset and info:
             self._collect_asset_account_info(asset, info)
         else:
