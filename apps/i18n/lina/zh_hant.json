@@ -238,6 +238,7 @@
     "AwaitingMyApproval": "待我審批",
     "Azure": "Azure (中國)",
     "Azure_Int": "Azure (國際)",
+    "AzureKeyVault": "Azure vault",
     "Backup": "備份",
     "BackupAccountsHelpText": "備份帳號資訊至外部。可以儲存到外部系統或寄送郵件，支援分段方式",
     "BadConflictErrorMsg": "正在刷新中，請稍後再試",
