@@ -76,3 +76,32 @@ class Language(models.TextChoices):
 
 
 COUNTRY_CALLING_CODES = get_country_phone_choices()
+
+
+class LicenseEditionChoices(models.TextChoices):
+    COMMUNITY = 'community', _('Community edition')
+    BASIC = 'basic', _('Basic edition')
+    STANDARD = 'standard', _('Standard edition')
+    PROFESSIONAL = 'professional', _('Professional edition')
+    ULTIMATE = 'ultimate', _('Ultimate edition')
+
+    @staticmethod
+    def from_key(key: str):
+        for choice in LicenseEditionChoices:
+            if choice == key:
+                return choice
+        return LicenseEditionChoices.COMMUNITY
+    @staticmethod
+    def parse_license_edition(info):
+        count = info.get('license', {}).get('count', 0)
+
+        if 50 >= count > 0:
+            return LicenseEditionChoices.BASIC
+        elif count <= 500:
+            return LicenseEditionChoices.STANDARD
+        elif count < 5000:
+            return LicenseEditionChoices.PROFESSIONAL
+        elif count >= 5000:
+            return LicenseEditionChoices.ULTIMATE
+        else:
+            return LicenseEditionChoices.COMMUNITY
