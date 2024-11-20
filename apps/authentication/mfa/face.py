@@ -32,7 +32,9 @@ class MFAFace(BaseMFA, MFAFaceMixin):
 
     @staticmethod
     def global_enabled():
-        return settings.XPACK_LICENSE_IS_VALID and settings.FACE_RECOGNITION_ENABLED
+        return settings.XPACK_LICENSE_IS_VALID \
+            and settings.XPACK_LICENSE_EDITION == 'ultimate' \
+            and settings.FACE_RECOGNITION_ENABLED
 
     def get_enable_url(self) -> str:
         return reverse('authentication:user-face-enable')
