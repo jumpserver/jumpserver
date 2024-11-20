@@ -1,9 +1,9 @@
 import uuid
+
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.const import VaultTypeChoices
 from assets.const import Protocol
 from common.serializers.fields import EncryptedField
 from common.utils import date_expired_default
@@ -43,7 +43,16 @@ class AnnouncementSettingSerializer(serializers.Serializer):
     ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
 
 
-class VaultSettingSerializer(serializers.Serializer):
+class BaseVaultSettingSerializer(serializers.Serializer):
+
+    def validate(self, data):
+        from accounts.signal_handlers import vault_pub_sub
+        data = super().validate(data)
+        vault_pub_sub.publish('vault')
+        return data
+
+
+class VaultSettingSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     PREFIX_TITLE = _('Vault')
 
     VAULT_ENABLED = serializers.BooleanField(
@@ -65,7 +74,7 @@ class VaultSettingSerializer(serializers.Serializer):
     )
 
 
-class HashicorpKVSerializer(serializers.Serializer):
+class HashicorpKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     PREFIX_TITLE = _('HCP Vault')
     VAULT_HCP_HOST = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Host')
@@ -78,7 +87,7 @@ class HashicorpKVSerializer(serializers.Serializer):
     )
 
 
-class AzureKVSerializer(serializers.Serializer):
+class AzureKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     PREFIX_TITLE = _('Azure Key Vault')
     VAULT_AZURE_HOST = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Host')

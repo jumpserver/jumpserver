@@ -178,6 +178,7 @@
     "Azure": "Azure(中国)",
     "Azure_Int": "アジュール（インターナショナル）",
     "AzureKeyVault": "Azure vault",
+    "HashicorpVault": "HCP vault",
     "Backup": "バックアップ",
     "BackupAccountsHelpText": "アカウント情報を外部にバックアップする。外部システムに保存するかメールを送信することもできます、セクション方式をサポートしています",
     "BadConflictErrorMsg": "更新中です、しばらくお待ちください",
