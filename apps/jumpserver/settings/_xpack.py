@@ -18,11 +18,12 @@ if not XPACK_DISABLED:
 XPACK_TEMPLATES_DIR = []
 XPACK_CONTEXT_PROCESSOR = []
 XPACK_LICENSE_IS_VALID = False
+XPACK_LICENSE_EDITION = ""
 XPACK_LICENSE_INFO = {
     'corporation': corporation,
 }
 
-XPACK_LICENSE_CONTENT = ''
+XPACK_LICENSE_CONTENT = 'community'
 
 if XPACK_ENABLED:
     from xpack.utils import get_xpack_templates_dir, get_xpack_context_processor
