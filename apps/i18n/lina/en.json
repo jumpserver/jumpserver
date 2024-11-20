@@ -177,6 +177,7 @@
     "AwaitingMyApproval": "Assigned",
     "Azure": "Azure (China)",
     "Azure_Int": "Azure (International)",
+    "AzureKeyVault": "Azure vault",
     "Backup": "Backup",
     "BackupAccountsHelpText": "Backup account information externally. it can be stored in an external system or sent via email, supporting segmented delivery.",
     "BadConflictErrorMsg": "Refreshing, please try again later",
