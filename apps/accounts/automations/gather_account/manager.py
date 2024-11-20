@@ -205,7 +205,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for asset, username in accounts:
             self.ori_asset_usernames[asset].add(username)
 
-        ga_accounts = GatheredAccount.objects.filter(asset__in=assets)
+        ga_accounts = GatheredAccount.objects.filter(asset__in=assets).prefetch_related('asset')
         for account in ga_accounts:
             self.ori_gathered_usernames[account.asset].add(account.username)
             key = '{}_{}'.format(account.asset_id, account.username)

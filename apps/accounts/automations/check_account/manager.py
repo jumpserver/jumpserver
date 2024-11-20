@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from accounts.models import Account, AccountRisk
 from assets.automations.base.manager import BaseManager
+from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils.strings import color_fmt
 
 
@@ -27,11 +28,23 @@ def is_weak_password(password):
         return True
 
     # 正则表达式判断字符多样性（数字、字母、特殊字符）
-    if (not re.search(r'[A-Za-z]', password)
-            or not re.search(r'[0-9]', password)
-            or not re.search(r'[\W_]', password)):
+    if (
+        not re.search(r"[A-Za-z]", password)
+        or not re.search(r"[0-9]", password)
+        or not re.search(r"[\W_]", password)
+    ):
         return True
     return False
+
+
+@bulk_create_decorator(AccountRisk)
+def create_risk(account, risk):
+    pass
+
+
+@bulk_update_decorator(AccountRisk, update_fields=["details"])
+def update_risk(risk):
+    return risk
 
 
 def check_account_secrets(accounts, assets):
@@ -40,50 +53,52 @@ def check_account_secrets(accounts, assets):
     tmpl = "Check account %s: %s"
     summary = defaultdict(int)
     result = defaultdict(list)
-    summary['accounts'] = len(accounts)
-    summary['assets'] = len(assets)
+    summary["accounts"] = len(accounts)
+    summary["assets"] = len(assets)
 
     for account in accounts:
         result_item = {
-            'asset': str(account.asset),
-            'username': account.username,
+            "asset": str(account.asset),
+            "username": account.username,
         }
         if not account.secret:
             print(tmpl % (account, "no secret"))
-            summary['no_secret'] += 1
-            result['no_secret'].append(result_item)
+            summary["no_secret"] += 1
+            result["no_secret"].append(result_item)
             continue
 
         if is_weak_password(account.secret):
             print(tmpl % (account, color_fmt("weak", "red")))
-            summary['weak_password'] += 1
-            result['weak_password'].append(result_item)
-            risks.append({
-                'account': account,
-                'risk': 'weak_password',
-            })
+            summary["weak_password"] += 1
+            result["weak_password"].append(result_item)
+            risks.append(
+                {
+                    "account": account,
+                    "risk": "weak_password",
+                }
+            )
         else:
-            summary['ok'] += 1
-            result['ok'].append(result_item)
+            summary["ok"] += 1
+            result["ok"].append(result_item)
             print(tmpl % (account, color_fmt("ok", "green")))
 
     origin_risks = AccountRisk.objects.filter(asset__in=assets)
-    origin_risks_dict = {f'{r.asset_id}_{r.username}_{r.risk}': r for r in origin_risks}
+    origin_risks_dict = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in origin_risks}
 
     for d in risks:
         key = f'{d["account"].asset_id}_{d["account"].username}_{d["risk"]}'
         origin_risk = origin_risks_dict.get(key)
 
         if origin_risk:
-            origin_risk.details.append({'datetime': now})
-            origin_risk.save(update_fields=['details'])
+            origin_risk.details.append({"datetime": now})
+            update_risk(origin_risk)
         else:
-            AccountRisk.objects.create(
-                asset=d['account'].asset,
-                username=d['account'].username,
-                risk=d['risk'],
-                details=[{'datetime': now}],
-            )
+            create_risk({
+                "asset": d["account"].asset,
+                "username": d["account"].username,
+                "risk": d["risk"],
+                "details": [{"datetime": now}],
+            })
     return summary, result
 
 
@@ -98,17 +113,17 @@ class CheckAccountManager(BaseManager):
     def pre_run(self):
         self.assets = self.execution.get_all_assets()
         self.execution.date_start = timezone.now()
-        self.execution.save(update_fields=['date_start'])
+        self.execution.save(update_fields=["date_start"])
 
     def do_run(self, *args, **kwargs):
-        for engine in self.execution.snapshot.get('engines', []):
-            if engine == 'check_account_secret':
+        for engine in self.execution.snapshot.get("engines", []):
+            if engine == "check_account_secret":
                 handle = check_account_secrets
             else:
                 continue
 
             for i in range(0, len(self.assets), self.batch_size):
-                _assets = self.assets[i:i + self.batch_size]
+                _assets = self.assets[i : i + self.batch_size]
                 accounts = Account.objects.filter(asset__in=_assets)
                 summary, result = handle(accounts, _assets)
 
@@ -121,10 +136,16 @@ class CheckAccountManager(BaseManager):
         return "Check account report of %s" % self.execution.id
 
     def get_report_template(self):
-        return 'accounts/check_account_report.html'
+        return "accounts/check_account_report.html"
 
     def print_summary(self):
-        tmpl = "\n---\nSummary: \nok: %s, weak password: %s, no secret: %s, using time: %ss" % (
-            self.summary['ok'], self.summary['weak_password'], self.summary['no_secret'], int(self.duration)
+        tmpl = (
+            "\n---\nSummary: \nok: %s, weak password: %s, no secret: %s, using time: %ss"
+            % (
+                self.summary["ok"],
+                self.summary["weak_password"],
+                self.summary["no_secret"],
+                int(self.duration),
+            )
         )
         print(tmpl)

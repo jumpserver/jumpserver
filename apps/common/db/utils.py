@@ -53,13 +53,18 @@ def close_old_connections():
 
 @contextmanager
 def safe_db_connection():
+    in_atomic_block = connection.in_atomic_block  # 当前是否处于事务中
+    autocommit = transaction.get_autocommit()  # 是否启用了自动提交
+
     try:
-        close_old_connections()  # 确保旧连接关闭
-        if connection.connection:  # 如果连接已关闭，重新连接
+        if not connection.is_usable():
+            connection.close()
             connection.connect()
         yield
     finally:
-        close_old_connections()  # 确保最终关闭连接
+        # 如果不是事务中（API 请求中可能需要提交事务），则关闭连接
+        if not in_atomic_block and autocommit:
+            close_old_connections()
 
 
 @contextmanager

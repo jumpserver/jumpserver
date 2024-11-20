@@ -86,7 +86,7 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         with transaction.atomic():
             execution.save()
         execution.start()
-        accounts = self.model.objects.filter(asset=asset)
+        accounts = self.model.objects.filter(asset=asset).prefetch_related('asset', 'asset__platform')
         return self.get_paginated_response_from_queryset(accounts)
 
     @action(methods=['post'], detail=False, url_path='sync-accounts')

@@ -296,13 +296,7 @@ def cached_method(ttl=20):
     return decorator
 
 
-def bulk_create_decorator(instance_model, batch_size=50):
-    """
-    装饰器，用于将实例批量保存，并提供 `commit` 方法提交剩余的实例。
-
-    :param instance_model: Django模型类，用于调用 bulk_create 方法。
-    :param batch_size: 批量保存的阈值，默认50。
-    """
+def bulk_create_decorator(instance_model, batch_size=50, ignore_conflict=True):
     def decorator(func):
         cache = []  # 缓存实例的列表
 
@@ -322,7 +316,7 @@ def bulk_create_decorator(instance_model, batch_size=50):
             # 如果缓存大小达到批量保存阈值，执行保存
             if len(cache) >= batch_size:
                 print(f"Batch size reached. Saving {len(cache)} instances...")
-                instance_model.objects.bulk_create(cache)
+                instance_model.objects.bulk_create(cache, ignore_conflict=ignore_conflict)
                 cache.clear()
 
             return instance
@@ -378,16 +372,7 @@ def bulk_update_decorator(instance_model, batch_size=50, update_fields=None):
             nonlocal cache
             if cache:
                 print(f"Committing remaining {len(cache)} instances..., {update_fields}")
-                # with transaction.atomic():
-                #     for c in cache:
-                #         o = instance_model.objects.get(id=str(c.id))
-                #         print("Origin: ", o.id, o.sudoers)
-                #         o.sudoers = c.sudoers
-                #         o.save()
-                #         print("New: ", c.id, c.sudoers)
                 instance_model.objects.bulk_update(cache, update_fields)
-                # print("Committing remaining instances... done, ", cache[0].sudoers, cache[0].id, instance_model)
-                # print(instance_model.objects.get(id=str(cache[0].id)).sudoers)
                 cache.clear()
 
         # 将 commit 方法绑定到装饰后的函数
