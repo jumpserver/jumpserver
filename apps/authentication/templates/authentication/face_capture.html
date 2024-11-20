@@ -2,27 +2,17 @@
 {% load i18n %}
 {% load static %}
 
-
 {% block content %}
 
-    <style>
-        .ibox-content {
-            padding: 0;
-        }
-
-        h2 {
-            display: none;
-        }
-
-        .ibox-context-margin {
-            margin: 0;
-        }
-
-    </style>
-
     {% if 'code' in form.errors %}
-        <p class="red-fonts">{{ form.code.errors.as_text }}</p>
+        <div class="alert  alert-danger" id="messages">
+            <p class="red-fonts">{{ form.code.errors.as_text }}</p>
+        </div>
     {% endif %}
+
+    <div id="retry_container" style="text-align: center; margin-top: 20px; display: none;">
+        <button id="retry_button" class="btn btn-primary">{% trans 'Retry' %}</button>
+    </div>
 
     <form class="m-t" role="form" method="post" action="" style="display: none">
         {% csrf_token %}
@@ -40,9 +30,7 @@
         </iframe>
     </div>
 
-    <div id="retry_container" style="text-align: center; margin-top: 20px; display: none;">
-        <button id="retry_button" class="btn btn-primary">{% trans 'Retry' %}</button>
-    </div>
+
 
     <script>
         $(document).ready(function () {
