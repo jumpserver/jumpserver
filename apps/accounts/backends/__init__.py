@@ -5,8 +5,7 @@ from django.utils.functional import LazyObject
 from common.utils import get_logger
 from ..const import VaultTypeChoices
 
-__all__ = ['vault_client', 'get_vault_client']
-
+__all__ = ['vault_client', 'get_vault_client', 'refresh_vault_client']
 
 logger = get_logger(__file__)
 
@@ -38,3 +37,8 @@ class VaultClient(LazyObject):
 
 """ 为了安全, 页面修改配置, 重启服务后才会重新初始化 vault_client """
 vault_client = VaultClient()
+
+
+def refresh_vault_client():
+    vault_client._wrapped = None
+    vault_client._setup()
