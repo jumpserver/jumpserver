@@ -105,6 +105,7 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_update(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
+        self._parameters = serializer.validated_data.pop('parameters', None)
         instance = serializer.save()
         if run_after_save:
             self.run_job(instance, serializer)

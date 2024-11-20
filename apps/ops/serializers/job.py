@@ -38,6 +38,18 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
         user = request.user if request else None
         return user
 
+    def get_periodic_variable(self, variables):
+        periodic_variable = {}
+        for variable in variables:
+            periodic_variable[variable['var_name']] = variable['default_value']
+        return periodic_variable
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if attrs.get('is_periodic') is True:
+            attrs['periodic_variable'] = self.get_periodic_variable(attrs.get('variable', []))
+        return attrs
+
     class Meta:
         model = Job
         read_only_fields = [
