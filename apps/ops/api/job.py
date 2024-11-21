@@ -22,6 +22,7 @@ from ops.models import Job, JobExecution
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 )
+from ops.utils import merge_nodes_and_assets
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
@@ -36,8 +37,6 @@ from accounts.models import Account
 from assets.const import Protocol
 from perms.const import ActionChoices
 from perms.utils.asset_perm import PermAssetDetailUtil
-from perms.models import PermNode
-from perms.utils import UserPermAssetUtil
 from jumpserver.settings import get_file_md5
 
 
@@ -47,26 +46,12 @@ def set_task_to_serializer_data(serializer, task_id):
     setattr(serializer, "_data", data)
 
 
-def merge_nodes_and_assets(nodes, assets, user):
-    if not nodes:
-        return assets
-    perm_util = UserPermAssetUtil(user=user)
-    for node_id in nodes:
-        if node_id == PermNode.FAVORITE_NODE_KEY:
-            node_assets = perm_util.get_favorite_assets()
-        elif node_id == PermNode.UNGROUPED_NODE_KEY:
-            node_assets = perm_util.get_ungroup_assets()
-        else:
-            _, node_assets = perm_util.get_node_all_assets(node_id)
-        assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
-    return assets
-
-
 class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
     filterset_fields = ('name', 'type')
     search_fields = ('name', 'comment')
     model = Job
+    _parameters = None
 
     def check_permissions(self, request):
         # job: upload_file
@@ -106,10 +91,10 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
-        node_ids = serializer.validated_data.pop('nodes', [])
-        assets = serializer.validated_data.get('assets')
-        assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
-        serializer.validated_data['assets'] = assets
+        self._parameters = serializer.validated_data.pop('parameters', None)
+        nodes = serializer.validated_data.pop('nodes', [])
+        assets = serializer.validated_data.get('assets', [])
+        assets = merge_nodes_and_assets(nodes, assets, self.request.user)
         if serializer.validated_data.get('type') == Types.upload_file:
             account_name = serializer.validated_data.get('runas')
             self.check_upload_permission(assets, account_name)
@@ -120,12 +105,15 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_update(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
+        self._parameters = serializer.validated_data.pop('parameters', None)
         instance = serializer.save()
         if run_after_save:
             self.run_job(instance, serializer)
 
     def run_job(self, job, serializer):
         execution = job.create_execution()
+        if self._parameters:
+            execution.parameters = JobExecutionSerializer.validate_parameters(self._parameters)
         execution.creator = self.request.user
         execution.save()
 
@@ -238,7 +226,11 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
             return Response({'error': serializer.errors}, status=400)
         task_id = serializer.validated_data['task_id']
         try:
-            instance = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
+            user = request.user
+            if user.has_perm("audits.view_joblog"):
+                instance = get_object_or_404(JobExecution, task_id=task_id)
+            else:
+                instance = get_object_or_404(JobExecution, task_id=task_id, creator=request.user)
         except Http404:
             return Response(
                 {'error': _('The task is being created and cannot be interrupted. Please try again later.')},
@@ -300,7 +292,7 @@ class UsernameHintsAPI(APIView):
     permission_classes = [IsValidUser]
 
     def post(self, request, **kwargs):
-        node_ids = request.data.get('nodes', None)
+        node_ids = request.data.get('nodes', [])
         asset_ids = request.data.get('assets', [])
         query = request.data.get('query', None)
 

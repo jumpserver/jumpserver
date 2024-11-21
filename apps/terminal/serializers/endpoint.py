@@ -27,7 +27,7 @@ class EndpointSerializer(BulkModelSerializer):
         fields_mini = ['id', 'name']
         fields_small = [
             'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
-            'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port',
+            'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port', 'vnc_port',
             'oracle_port_range', 'oracle_port', 'sqlserver_port', 'is_active'
         ]
         fields = fields_mini + fields_small + [
@@ -59,7 +59,7 @@ class EndpointSerializer(BulkModelSerializer):
         return extra_kwargs
 
     def validate_is_active(self, value):
-        if str(self.instance.id) == Endpoint.default_id:
+        if self.instance and str(self.instance.id) == Endpoint.default_id:
             # 默认端点不能禁用
             return True
         else:

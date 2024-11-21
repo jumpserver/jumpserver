@@ -127,6 +127,13 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
             'GPT_MODEL': settings.GPT_MODEL,
         }
 
+    @staticmethod
+    def get_xpack_license():
+        return {
+            'XPACK_LICENSE_IS_VALID': settings.XPACK_LICENSE_IS_VALID,
+            'XPACK_LICENSE_CONTENT': settings.XPACK_LICENSE_CONTENT
+        }
+
     @property
     def config(self):
         configs = {}
@@ -138,6 +145,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_replay_storage_setting())
         configs.update(self.get_login_title_setting())
         configs.update(self.get_chat_ai_setting())
+        configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,
             'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,

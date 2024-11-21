@@ -1,19 +1,21 @@
 from importlib import import_module
 
-from django.utils.functional import LazyObject
+from django.utils.functional import LazyObject, empty
 
 from common.utils import get_logger
 from ..const import VaultTypeChoices
 
-__all__ = ['vault_client', 'get_vault_client']
-
+__all__ = ['vault_client', 'get_vault_client', 'refresh_vault_client']
 
 logger = get_logger(__file__)
 
 
 def get_vault_client(raise_exception=False, **kwargs):
-    enabled = kwargs.get('VAULT_ENABLED')
-    tp = 'hcp' if enabled else 'local'
+    tp = kwargs.get('VAULT_BACKEND') if kwargs.get('VAULT_ENABLED') else VaultTypeChoices.local
+
+    # TODO: Temporary processing, subsequent deletion
+    tp = VaultTypeChoices.local if tp == VaultTypeChoices.azure else tp
+
     try:
         module_path = f'apps.accounts.backends.{tp}.main'
         client = import_module(module_path).Vault(**kwargs)
@@ -39,3 +41,7 @@ class VaultClient(LazyObject):
 
 """ 为了安全, 页面修改配置, 重启服务后才会重新初始化 vault_client """
 vault_client = VaultClient()
+
+
+def refresh_vault_client():
+    vault_client._wrapped = empty

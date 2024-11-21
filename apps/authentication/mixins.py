@@ -199,6 +199,53 @@ class AuthPreCheckMixin:
             self.raise_credential_error(errors.reason_user_not_exist)
 
 
+class MFAFaceMixin:
+    request = None
+
+    def get_face_recognition_token(self):
+        from authentication.const import MFA_FACE_SESSION_KEY
+        token = self.request.session.get(MFA_FACE_SESSION_KEY)
+        if not token:
+            raise ValueError("Face recognition token is missing from the session.")
+        return token
+
+    @staticmethod
+    def get_face_cache_key(token):
+        from authentication.const import MFA_FACE_CONTEXT_CACHE_KEY_PREFIX
+        return f"{MFA_FACE_CONTEXT_CACHE_KEY_PREFIX}_{token}"
+
+    def get_face_recognition_context(self):
+        token = self.get_face_recognition_token()
+        cache_key = self.get_face_cache_key(token)
+        context = cache.get(cache_key)
+        if not context:
+            raise ValueError(f"Face recognition context does not exist for token: {token}")
+        return context
+
+    @staticmethod
+    def is_context_finished(context):
+        return context.get('is_finished', False)
+
+    @staticmethod
+    def is_context_success(context):
+        return context.get('success', False)
+
+    def get_face_code(self):
+        context = self.get_face_recognition_context()
+
+        if not self.is_context_finished(context):
+            raise RuntimeError("Face recognition is not yet completed.")
+
+        if not self.is_context_success(context):
+            msg = context.get('error_message', '')
+            raise RuntimeError(msg)
+
+        face_code = context.get('face_code')
+        if not face_code:
+            raise ValueError("Face code is missing from the context.")
+        return face_code
+
+
 class MFAMixin:
     request: Request
     get_user_from_session: Callable
@@ -263,7 +310,6 @@ class MFAMixin:
         user = user if user else self.get_user_from_session()
         if not user.mfa_enabled:
             return
-
         # 监测 MFA 是不是屏蔽了
         ip = self.get_request_ip()
         self.check_mfa_is_block(user.username, ip)
@@ -276,6 +322,7 @@ class MFAMixin:
         elif not mfa_backend.is_active():
             msg = backend_error.format(mfa_backend.display_name)
         else:
+            mfa_backend.set_request(self.request)
             ok, msg = mfa_backend.check_code(code)
 
         if ok:

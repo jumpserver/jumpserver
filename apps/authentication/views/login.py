@@ -24,8 +24,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
-from common.utils import FlashMessageUtil, static_or_direct, safe_next_url
 from common.const import Language
+from common.utils import FlashMessageUtil, static_or_direct, safe_next_url
 from users.utils import (
     redirect_user_first_login_or_index
 )

@@ -23,8 +23,6 @@ dangerous_keywords = (
 )
 
 
-
-
 class Playbook(JMSBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)

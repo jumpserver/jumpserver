@@ -158,7 +158,8 @@ def task_sent_handler(headers=None, body=None, **kwargs):
 
     with transaction.atomic():
         try:
-            CeleryTaskExecution.objects.create(**data)
+            task_execution = CeleryTaskExecution.objects.create(**data)
+            task_execution.set_creator_if_need()
         except Exception as e:
             logger.error('Create celery task execution error: {}'.format(e))
         CeleryTask.objects.filter(name=task).update(date_last_publish=timezone.now())

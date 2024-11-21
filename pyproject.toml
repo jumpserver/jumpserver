@@ -55,7 +55,6 @@ pynacl = "1.5.0"
 python-dateutil = "2.8.2"
 pyyaml = "6.0.1"
 requests = "2.31.0"
-jms-storage = "^0.0.59"
 simplejson = "3.19.1"
 six = "1.16.0"
 sshtunnel = "0.4.0"
@@ -123,9 +122,6 @@ django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/ta
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
 python-cas = "1.6.0"
 django-auth-ldap = "4.4.0"
-boto3 = "1.28.9"
-botocore = "1.31.9"
-s3transfer = "0.6.1"
 mysqlclient = "2.2.4"
 pymssql = "2.2.8"
 django-redis = "5.3.0"
@@ -162,9 +158,19 @@ tqdm = "4.66.4"
 elasticsearch7 = "7.17.9"
 elasticsearch8 = "8.13.2"
 polib = "^1.2.0"
+azure-identity = "1.13.0"
+azure-keyvault-secrets = "4.9.0"
 # psycopg2 = "2.9.6"
 psycopg2-binary = "2.9.6"
 pycountry = "^24.6.1"
+# Depend by jms storage
+boto = "2.49.0"
+azure-storage-blob = "12.17.0"
+esdk-obs-python = "3.21.4"
+oss2 = "2.18.1"
+boto3 = "1.28.9"
+botocore = "1.31.9"
+s3transfer = "0.6.1"
 
 [tool.poetry.group.xpack]
 optional = true
@@ -172,7 +178,6 @@ optional = true
 [tool.poetry.group.xpack.dependencies]
 qingcloud-sdk = "1.2.15"
 azure-mgmt-subscription = "3.1.1"
-azure-identity = "1.13.0"
 azure-mgmt-compute = "30.0.0"
 azure-mgmt-network = "23.1.0"
 google-cloud-compute = "1.15.0"
@@ -189,11 +194,6 @@ ucloud-sdk-python3 = "0.11.50"
 huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
 volcengine-python-sdk = "1.0.71"
-
-[[tool.poetry.source]]
-name = "aliyun"
-url = "https://mirrors.aliyun.com/pypi/simple"
-priority = "primary"
 
 [[tool.poetry.source]]
 name = "pypi"

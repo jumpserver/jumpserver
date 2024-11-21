@@ -64,6 +64,7 @@ extra_nodes_data = [
     {'id': "tasks", "name": _("Task"), "pId": "view_setting"},
     {'id': "license", "name": _("License"), "pId": "view_setting"},
     {'id': "other", "name": _("Other"), "pId": "view_setting"},
+    {'id': "job_audit", "name": _("Job audit"), "pId": "view_audit"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -109,7 +110,8 @@ special_pid_mapper = {
     "rbac.view_webterminal": "view_workbench",
     "rbac.view_filemanager": "view_workbench",
     "rbac.view_systemtools": "view_workbench",
-    'tickets.view_ticket': 'tickets'
+    'tickets.view_ticket': 'tickets',
+    "audits.joblog": "job_audit",
 }
 
 special_setting_pid_mapper = {

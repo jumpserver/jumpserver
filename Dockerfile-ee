@@ -15,21 +15,20 @@ ARG TOOLS="                           \
         vim                           \
         wget"
 
-ARG APT_MIRROR=http://deb.debian.org
 RUN set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
-    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
+ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
 COPY poetry.lock pyproject.toml ./
 RUN set -ex \
     && . /opt/py3/bin/activate \
-    && pip install poetry -i ${PIP_MIRROR} \
-    && poetry install --only xpack
+    && pip install poetry poetry-plugin-pypi-mirror -i ${PIP_MIRROR} \
+    && poetry install --only xpack \
+    && poetry cache clear pypi --all
 

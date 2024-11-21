@@ -126,7 +126,7 @@ class BaseFileParser(BaseParser):
                 value = self.id_name_to_obj(value)
         elif isinstance(field, LabeledChoiceField):
             value = self.id_name_to_obj(value)
-            if isinstance(value, dict) and value.get('pk'):
+            if isinstance(value, dict) and 'pk' in value:
                 value = value.get('pk')
         elif isinstance(field, serializers.ListSerializer):
             value = [self.parse_value(field.child, v) for v in value]

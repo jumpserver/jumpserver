@@ -30,6 +30,6 @@
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
-        gateway_args: "{{ jms_gateway | default(None) }}"
+        gateway_args: "{{ jms_gateway | default({}) }}"
       when: account.secret_type == "password"
       delegate_to: localhost

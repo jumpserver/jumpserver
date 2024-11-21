@@ -9,4 +9,11 @@
       ansible.windows.win_powershell:
         script: |
           tinkerd install --name {{ applet_name }}
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -ne 0) {
+              Write-Host "Failed to install {{ applet_name }}"
+              Write-Host "Exit code: $exitCode"
+              $Ansible.Failed = $true
+              exit 1
+          }
       when: applet_name != 'all'

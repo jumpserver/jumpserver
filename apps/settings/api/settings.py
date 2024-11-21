@@ -61,6 +61,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cmpp2': serializers.CMPP2SMSSettingSerializer,
         'custom': serializers.CustomSMSSettingSerializer,
         'vault': serializers.VaultSettingSerializer,
+        'azure_kv': serializers.AzureKVSerializer,
+        'hcp': serializers.HashicorpKVSerializer,
         'chat': serializers.ChatAISettingSerializer,
         'announcement': serializers.AnnouncementSettingSerializer,
         'ticket': serializers.TicketSettingSerializer,

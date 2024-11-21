@@ -69,5 +69,7 @@
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "UploadStart": "Upload start",
+    "UploadEnd": "Upload completed, please wait for further processing"
 }

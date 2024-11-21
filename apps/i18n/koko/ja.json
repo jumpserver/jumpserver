@@ -69,5 +69,7 @@
     "VerifyCode": "認証コード",
     "WaitFileTransfer": "ファイル転送終了待ち",
     "WebSocketClosed": "WebSocket 閉店",
-    "Writable": "書き込み可能"
+    "Writable": "書き込み可能",
+    "UploadStart": "アップロード開始",
+    "UploadEnd": "アップロードが完了しました。後の処理をお待ちください"
 }

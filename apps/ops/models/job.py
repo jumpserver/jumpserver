@@ -29,6 +29,7 @@ from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, RunasPolicies, JobStatus, JobModules
+from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
 from perms.utils import UserPermAssetUtil
@@ -50,11 +51,13 @@ def get_parent_keys(key, include_self=True):
 class JMSPermedInventory(JMSInventory):
     def __init__(self,
                  assets,
+                 nodes,
                  account_policy='privileged_first',
                  account_prefer='root,Administrator',
                  module=None,
                  host_callback=None,
                  user=None):
+        assets = merge_nodes_and_assets(list(nodes), list(assets), user)
         super().__init__(assets, account_policy, account_prefer, host_callback, exclude_localhost=True)
         self.user = user
         self.module = module
@@ -149,9 +152,11 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
-    assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
+    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
+    nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Node"))
     use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
     parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
+    periodic_variable = models.JSONField(default=dict, verbose_name=_('Periodic variable'))
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Run as'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
                                     verbose_name=_('Run as policy'))
@@ -176,13 +181,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     @property
     def summary(self):
         summary = {
-            "total": 0,
-            "success": 0,
+            "total": self.executions.count(),
+            "success": self.executions.filter(status=JobStatus.success).count(),
         }
-        for execution in self.executions.all():
-            summary["total"] += 1
-            if execution.is_success:
-                summary["success"] += 1
         return summary
 
     @property
@@ -203,7 +204,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSPermedInventory(self.assets.all(),
+        return JMSPermedInventory(self.assets.all(), self.nodes.all(),
                                   self.runas_policy, self.runas,
                                   user=self.creator, module=self.module)
 
@@ -220,7 +221,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     class Meta:
         verbose_name = _("Job")
-        unique_together = [('name', 'org_id', 'creator')]
+        unique_together = [('name', 'org_id', 'creator', 'type')]
         ordering = ['date_created']
 
 
@@ -328,7 +329,7 @@ class JobExecution(JMSOrgBaseModel):
         if isinstance(self.parameters, str):
             extra_vars = json.loads(self.parameters)
         else:
-            extra_vars = {}
+            extra_vars = self.parameters if self.parameters else {}
         static_variables = self.gather_static_variables()
         extra_vars.update(static_variables)
 
@@ -349,7 +350,8 @@ class JobExecution(JMSOrgBaseModel):
             runner = PlaybookRunner(
                 self.inventory_path,
                 self.current_job.playbook.entry,
-                self.private_dir
+                self.private_dir,
+                extra_vars=extra_vars,
             )
         elif self.current_job.type == Types.upload_file:
             job_id = self.current_job.id

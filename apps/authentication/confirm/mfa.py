@@ -22,5 +22,6 @@ class ConfirmMFA(BaseConfirm):
 
     def authenticate(self, secret_key, mfa_type):
         mfa_backend = self.user.get_mfa_backend_by_type(mfa_type)
+        mfa_backend.set_request(self.request)
         ok, msg = mfa_backend.check_code(secret_key)
         return ok, msg

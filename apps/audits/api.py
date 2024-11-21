@@ -7,6 +7,7 @@ from django.db.models import F, Value, CharField, Q
 from django.db.models.functions import Cast
 from django.http import HttpResponse, FileResponse
 from django.utils.encoding import escape_uri_path
+from django_celery_beat.models import PeriodicTask
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
@@ -22,6 +23,9 @@ from common.plugins.es import QuerySet as ESQuerySet
 from common.sessions.cache import user_session_manager
 from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import is_uuid, get_logger, lazyproperty
+from ops.const import Types
+from ops.models import Job
+from ops.serializers.job import JobSerializer
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
@@ -39,14 +43,14 @@ from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
-    FileSerializer, UserSessionSerializer
+    FileSerializer, UserSessionSerializer, JobsAuditSerializer
 )
 from .utils import construct_userlogin_usernames
 
 logger = get_logger(__name__)
 
 
-class JobAuditViewSet(OrgReadonlyModelViewSet):
+class JobLogAuditViewSet(OrgReadonlyModelViewSet):
     model = JobLog
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
@@ -56,6 +60,35 @@ class JobAuditViewSet(OrgReadonlyModelViewSet):
     filterset_fields = ['creator__name', 'material']
     serializer_class = JobLogSerializer
     ordering = ['-date_start']
+
+
+class JobsAuditViewSet(OrgModelViewSet):
+    model = Job
+    search_fields = ['creator__name']
+    filterset_fields = ['creator__name']
+    serializer_class = JobsAuditSerializer
+    ordering = ['-is_periodic', '-date_updated']
+    http_method_names = ['get', 'options', 'patch']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.exclude(type=Types.upload_file).filter(instant=False)
+        return queryset
+
+    def perform_update(self, serializer):
+        job = self.get_object()
+        is_periodic = serializer.validated_data.get('is_periodic')
+        if job.is_periodic != is_periodic:
+            job.is_periodic = is_periodic
+            job.save()
+        name, task, args, kwargs = job.get_register_task()
+        task_obj = PeriodicTask.objects.filter(name=name).first()
+        if task_obj:
+            is_periodic = job.is_periodic
+            if task_obj.enabled != is_periodic:
+                task_obj.enabled = is_periodic
+                task_obj.save()
+        return super().perform_update(serializer)
 
 
 class FTPLogViewSet(OrgModelViewSet):

@@ -6,18 +6,25 @@ from rest_framework.views import Response, APIView
 
 from accounts.backends import get_vault_client
 from accounts.tasks.vault import sync_secret_to_vault
+from common.exceptions import JMSException
 from settings.models import Setting
 from .. import serializers
 
 
 class VaultTestingAPI(GenericAPIView):
-    serializer_class = serializers.VaultSettingSerializer
+    backends_serializer = {
+        'azure': serializers.AzureKVSerializer,
+        'hcp': serializers.HashicorpKVSerializer
+    }
     rbac_perms = {
         'POST': 'settings.change_vault'
     }
 
-    def get_config(self, request):
-        serializer = self.serializer_class(data=request.data)
+    def get_config(self, request, backend):
+        serializer_class = self.backends_serializer.get(backend)
+        if serializer_class is None:
+            raise JMSException()
+        serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         for k, v in data.items():
@@ -27,9 +34,10 @@ class VaultTestingAPI(GenericAPIView):
             data[k] = getattr(settings, k, None)
         return data
 
-    def post(self, request):
-        config = self.get_config(request)
+    def post(self, request, backend):
+        config = self.get_config(request, backend)
         config['VAULT_ENABLED'] = settings.VAULT_ENABLED
+        config['VAULT_BACKEND'] = backend
         try:
             client = get_vault_client(raise_exception=True, **config)
             ok, error = client.is_active()
@@ -58,4 +66,3 @@ class VaultSyncDataAPI(APIView):
     def _run_task():
         task = sync_secret_to_vault.delay()
         return task
-

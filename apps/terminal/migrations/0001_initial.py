@@ -357,7 +357,7 @@ class Migration(migrations.Migration):
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('type', models.CharField(choices=[('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'), ('xrdp', 'Xrdp'), ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'), ('magnus', 'Magnus'), ('razor', 'Razor'), ('tinker', 'Tinker'), ('video_worker', 'Video Worker'), ('chen', 'Chen'), ('kael', 'Kael'), ('panda', 'Panda')], default='koko', max_length=64, verbose_name='type')),
+                ('type', models.CharField(choices=[('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'), ('xrdp', 'Xrdp'), ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'), ('magnus', 'Magnus'), ('razor', 'Razor'), ('tinker', 'Tinker'), ('video_worker', 'Video Worker'), ('chen', 'Chen'), ('kael', 'Kael'), ('panda', 'Panda'), ('nec', 'Nec'), ('facelive', 'Facelive')], default='koko', max_length=64, verbose_name='type')),
                 ('remote_addr', models.CharField(blank=True, max_length=128, verbose_name='Remote Address')),
                 ('command_storage', models.CharField(default='default', max_length=128, verbose_name='Command storage')),
                 ('replay_storage', models.CharField(default='default', max_length=128, verbose_name='Replay storage')),

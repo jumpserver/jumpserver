@@ -228,6 +228,8 @@ def default_chrome_driver_options():
         "profile.password_manager_enabled": False
     }
     options.add_experimental_option("prefs", prefs)
+    # chromedriver 退出后也不关闭浏览器
+    options.add_experimental_option("detach", True)
     options.add_experimental_option("excludeSwitches", ['enable-automation'])
     return options
 
@@ -237,6 +239,7 @@ class AppletApplication(BaseApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.driver = None
+        self.service = None
         self.app = WebAPP(app_name=self.app_name, user=self.user,
                           account=self.account, asset=self.asset, platform=self.platform)
         self._tmp_user_dir = tempfile.TemporaryDirectory()
@@ -251,10 +254,10 @@ class AppletApplication(BaseApplication):
 
     @wrapper_progress_bar
     def run(self):
-        service = Service()
+        self.service = Service()
         #  driver 的 console 终端框不显示
-        service.creationflags = CREATE_NO_WINDOW
-        self.driver = webdriver.Chrome(options=self._chrome_options, service=service)
+        self.service.creationflags = CREATE_NO_WINDOW
+        self.driver = webdriver.Chrome(options=self._chrome_options, service=self.service)
         self.driver.implicitly_wait(10)
         if self.app.asset.address != "":
             ok = self.app.execute(self.driver)
@@ -263,21 +266,19 @@ class AppletApplication(BaseApplication):
         self.driver.maximize_window()
 
     def wait(self):
-        disconnected_msg = "Unable to evaluate script: disconnected: not connected to DevTools\n"
-        closed_msg = "Unable to evaluate script: no such window: target window already closed"
-
+        from common import check_pid_alive
+        parent_id = self.service.process.pid
+        pids = get_children_pids(parent_id)
+        pids_status = {pid: True for pid in pids}
+        # 退出 chromedriver 进程，等待所有子进程退出
+        self.service.stop()
         while True:
             time.sleep(5)
-            logs = self.driver.get_log('driver')
-            if len(logs) == 0:
-                continue
-            ret = logs[-1]
-            if isinstance(ret, dict):
-                message = ret.get('message', '')
-                if disconnected_msg in message or closed_msg in message:
-                    break
-                print("ret: ", ret)
-        self.close()
+            for pid in pids_status:
+                pids_status[pid] = check_pid_alive(pid)
+            status = any(pids_status.values())
+            if not status:
+                break
 
     def close(self):
         if self.driver:
@@ -290,3 +291,23 @@ class AppletApplication(BaseApplication):
             self._tmp_user_dir.cleanup()
         except Exception as e:
             print(e)
+
+
+def get_children_pids(parent_pid):
+    import subprocess
+    from common import decode_content
+    pids = []
+    # wmic process where (ParentProcessId={5088}) get ProcessId
+    try:
+        cmd = ['wmic', 'process', 'where', f'(ParentProcessId={parent_pid})', 'get', 'ProcessId']
+        ret = subprocess.check_output(cmd, creationflags=CREATE_NO_WINDOW)
+        content = decode_content(ret)
+        content_list = content.strip().split("\r\n")
+        for pid in content_list[1:]:
+            pid = pid.strip()
+            if pid:
+                pids.append(int(pid))
+
+    except Exception as e:
+        pass
+    return pids
