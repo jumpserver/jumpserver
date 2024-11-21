@@ -7,6 +7,7 @@ from django.db.models import F, Value, CharField, Q
 from django.db.models.functions import Cast
 from django.http import HttpResponse, FileResponse
 from django.utils.encoding import escape_uri_path
+from django_celery_beat.models import PeriodicTask
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
@@ -73,6 +74,21 @@ class JobsAuditViewSet(OrgModelViewSet):
         queryset = super().get_queryset()
         queryset = queryset.exclude(type=Types.upload_file).filter(instant=False)
         return queryset
+
+    def perform_update(self, serializer):
+        job = self.get_object()
+        is_periodic = serializer.validated_data.get('is_periodic')
+        if job.is_periodic != is_periodic:
+            job.is_periodic = is_periodic
+            job.save()
+        name, task, args, kwargs = job.get_register_task()
+        task_obj = PeriodicTask.objects.filter(name=name).first()
+        if task_obj:
+            is_periodic = job.is_periodic
+            if task_obj.enabled != is_periodic:
+                task_obj.enabled = is_periodic
+                task_obj.save()
+        return super().perform_update(serializer)
 
 
 class FTPLogViewSet(OrgModelViewSet):
