@@ -228,9 +228,9 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         try:
             user = request.user
             if user.has_perm("audits.view_joblog"):
-                instance = get_object_or_404(JobExecution, pk=task_id)
+                instance = get_object_or_404(JobExecution, task_id=task_id)
             else:
-                instance = get_object_or_404(JobExecution, pk=task_id, creator=request.user)
+                instance = get_object_or_404(JobExecution, task_id=task_id, creator=request.user)
         except Http404:
             return Response(
                 {'error': _('The task is being created and cannot be interrupted. Please try again later.')},
