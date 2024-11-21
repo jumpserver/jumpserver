@@ -55,6 +55,10 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         user_role_ids = set(map(str, roles.values_list('id', flat=True)))
         return user_role_ids
 
+    @sync_to_async
+    def has_perms(self, user, perms):
+        return user.has_perms(perms)
+
     async def receive_json(self, content, **kwargs):
         task_id = content.get('task')
         task = await self.get_task(task_id)
@@ -71,8 +75,10 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         user_role_ids = await self.get_current_user_role_ids(user)
         has_admin_auditor_role = bool(admin_auditor_role_ids & user_role_ids)
-
-        if not has_admin_auditor_role and task.name in self.user_tasks and task.creator != user:
+        has_perms = await self.has_perms(user, ['audits.view_joblog'])
+        user_can_view = task.name in self.user_tasks and (task.creator == user or has_perms)
+        # (有管理员或审计员角色) 或者 (任务是用户自己创建的 或者 有查看任务日志权限), 其他情况没有权限
+        if not (has_admin_auditor_role or user_can_view):
             await self.send_json({'message': 'No permission', 'task': task_id})
             return
 
