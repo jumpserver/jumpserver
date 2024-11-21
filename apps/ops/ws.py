@@ -4,9 +4,12 @@ import os
 import aiofiles
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from http.cookies import SimpleCookie
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
+from orgs.models import Organization
+from orgs.utils import tmp_to_org, current_org
 from rbac.builtin import BuiltinRole
 from .ansible.utils import get_ansible_task_log_path
 from .celery.utils import get_celery_task_log_path
@@ -18,6 +21,8 @@ logger = get_logger(__name__)
 
 class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
     disconnected = False
+    cookie = None
+    org = None
     user_tasks = (
         'ops.tasks.run_ops_job',
         'ops.tasks.run_ops_job_execution',
@@ -28,10 +33,25 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         'ansible': get_ansible_task_log_path
     }
 
+    def get_cookie(self):
+        try:
+            headers = self.scope['headers']
+            headers_dict = {key.decode('utf-8'): value.decode('utf-8') for key, value in headers}
+            cookie = SimpleCookie(headers_dict.get('cookie', ''))
+        except Exception as e:
+            cookie = SimpleCookie()
+        return cookie
+
+    def get_current_org(self):
+        oid = self.cookie.get('X-JMS-ORG')
+        return oid.value if oid else None
+
     async def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
             await self.accept()
+            self.cookie = self.get_cookie()
+            self.org = self.get_current_org()
         else:
             await self.close()
 
@@ -51,13 +71,17 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
 
     @sync_to_async
     def get_current_user_role_ids(self, user):
-        roles = user.system_roles.all() | user.org_roles.all()
+        with tmp_to_org(self.org):
+            org_roles = user.org_roles.all()
+        system_roles = user.system_roles.all()
+        roles = system_roles | org_roles
         user_role_ids = set(map(str, roles.values_list('id', flat=True)))
         return user_role_ids
 
     @sync_to_async
     def has_perms(self, user, perms):
-        return user.has_perms(perms)
+        with tmp_to_org(self.org):
+            return user.has_perms(perms)
 
     async def receive_json(self, content, **kwargs):
         task_id = content.get('task')
