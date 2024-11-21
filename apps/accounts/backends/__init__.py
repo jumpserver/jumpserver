@@ -1,6 +1,6 @@
 from importlib import import_module
 
-from django.utils.functional import LazyObject
+from django.utils.functional import LazyObject, empty
 
 from common.utils import get_logger
 from ..const import VaultTypeChoices
@@ -40,5 +40,4 @@ vault_client = VaultClient()
 
 
 def refresh_vault_client():
-    vault_client._wrapped = None
-    vault_client._setup()
+    vault_client._wrapped = empty
