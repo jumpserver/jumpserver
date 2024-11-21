@@ -101,7 +101,7 @@ class ResourceDownload(TemplateView):
         MRD_VERSION=10.6.7
         OPENSSH_VERSION=v9.4.0.0
         TINKER_VERSION=v0.1.6
-        VIDEO_PLAYER_VERSION=0.1.9
+        VIDEO_PLAYER_VERSION=0.2.1
         CLIENT_VERSION=v2.1.3
         """
 
