@@ -312,7 +312,7 @@ class MFAMixin:
             return
         # 监测 MFA 是不是屏蔽了
         ip = self.get_request_ip()
-        self.check_mfa_is_block(user.username, ip)
+        # self.check_mfa_is_block(user.username, ip)
 
         ok = False
         mfa_backend = user.get_mfa_backend_by_type(mfa_type)
