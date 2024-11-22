@@ -27,24 +27,31 @@ class UserFaceCaptureView(AuthMixin, FormView):
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data()
+        context = super().get_context_data(**kwargs)
 
-        if not self.get_form().is_bound:
+        if 'form' not in kwargs:
+            form = self.get_form()
+            context['form'] = form
+
+        if not context['form'].is_bound:
             context.update({
                 "active": True,
             })
 
-        kwargs.update(context)
-        return kwargs
+        return context
 
 
-class UserFaceEnableView(UserFaceCaptureView, MFAFaceMixin):
+class UserFaceEnableView(MFAFaceMixin, UserFaceCaptureView):
     def form_valid(self, form):
-        code = self.get_face_code()
 
-        user = self.get_user_from_session()
-        user.face_vector = code
-        user.save(update_fields=['face_vector'])
+        try:
+            code = self.get_face_code()
+            user = self.get_user_from_session()
+            user.face_vector = code
+            user.save(update_fields=['face_vector'])
+        except Exception as e:
+            form.add_error("code", str(e))
+            return super().form_invalid(form)
 
         auth_logout(self.request)
         return super().form_valid(form)
