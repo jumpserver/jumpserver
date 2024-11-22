@@ -85,7 +85,7 @@
             }
 
             $('#retry_button').on('click', function () {
-                window.location.href = "{% url 'authentication:login-face-capture' %}";
+                window.location.href = "{{ request.get_full_path }}";
             });
         });
     </script>
