@@ -14,7 +14,7 @@ router.register(r'login-logs', api.UserLoginLogViewSet, 'login-log')
 router.register(r'operate-logs', api.OperateLogViewSet, 'operate-log')
 router.register(r'password-change-logs', api.PasswordChangeLogViewSet, 'password-change-log')
 router.register(r'job-logs', api.JobLogAuditViewSet, 'job-log')
-router.register(r'jobs', api.JobsAuditViewSet, 'jobs')
+router.register(r'jobs', api.JobsAuditViewSet, 'job')
 
 router.register(r'my-login-logs', api.MyLoginLogViewSet, 'my-login-log')
 router.register(r'user-sessions', api.UserSessionViewSet, 'user-session')
