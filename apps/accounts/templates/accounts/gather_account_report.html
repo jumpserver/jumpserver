@@ -28,11 +28,11 @@
 
             <tr>
                 <td>{% trans 'Assets count' %}: </td>
-                <td>{{ summary.assets }}</td>
+                <td>{{ summary.total_assets }}</td>
             </tr>
             <tr>
                 <td>{% trans 'Asset success count' %}: </td>
-                <td>{{ summary.success_assets }}</td>
+                <td>{{ summary.ok_assets }}</td>
             </tr>
             <tr>
                 <td>{% trans 'Asset failed count' %}: </td>
@@ -40,32 +40,24 @@
             </tr>
             <tr>
                 <td>{% trans 'Asset not support count' %}: </td>
-                <td>{{ summary.na_assets }}</td>
+                <td>{{ summary.error_assets }}</td>
             </tr>
 
             <tr>
                 <td>{% trans 'Account new found count' %}: </td>
                 <td>{{ summary.new_accounts }}</td>
             </tr>
-
             <tr>
-                <td>{% trans 'Sudo changed count' %}:</td>
-                <td> <span> {{ summary.sudo_changed }}</span></td>
-            </tr>
-            <tr>
-                <td>{% trans 'Groups changed count' %}:</td>
-                <td> <span> {{ summary.groups_changed }}</span></td>
-            </tr>
-            <tr>
-                <td>{% trans 'Authorized key changed count' %}:</td>
-                <td> <span> {{ summary.authorized_key_changed }}</span></td>
+                <td>{% trans 'Account lost count' %}: </td>
+                <td>{{ summary.lost_accounts }}</td>
             </tr>
         </tbody>
     </table>
 </div>
 
 <div class='result'>
-   <p>{% trans 'New found accounts' %}:</p>
+   <p>{% trans 'New found accounts' %}: {{ summary.new_accounts }}</p>
+    {% if summary.new_accounts %}
     <table style="">
         <thead>
         <tr>
@@ -84,10 +76,36 @@
         {% endfor %}
         </tbody>
     </table>
+    {% endif %}
+</div>
+<div class='result'>
+   <p>{% trans 'Lost accounts' %}: {{ summary.lost_accounts }}</p>
+    {% if summary.lost_accounts %}
+    <table style="">
+        <thead>
+        <tr>
+            <th>{% trans 'No.' %}</th>
+            <th>{% trans 'Asset' %}</th>
+            <th>{% trans 'Username' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for account in result.lost_accounts %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ account.asset }}</td>
+                <td>{{ account.username }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
 </div>
 
+
 <div class='result'>
-   <p>{% trans 'New found risk' %}:</p>
+   <p>{% trans 'New found risks' %}: {{ summary.new_risks }}</p>
+    {% if summary.new_risks %}
     <table style="">
         <thead>
         <tr>
@@ -108,6 +126,7 @@
         {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 </div>
 
 <style>
@@ -116,7 +135,7 @@
         border-collapse: collapse;
         max-width: 100%;
         text-align: left;
-        margin-top: 20px;
+        margin-top: 10px;
         padding: 20px;
     }
 
@@ -135,6 +154,10 @@
         border: 1px solid #ddd;
         padding: 5px;
         font-size: 12px;
+    }
+
+    .result {
+        margin-top: 20px;
     }
 
     .result tr :first-child {

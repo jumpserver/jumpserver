@@ -74,8 +74,6 @@ def sorted_methods(methods):
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 platform_automation_methods = get_platform_automation_methods(BASE_DIR)
-print("platform_automation_methods: ")
-print(json.dumps(platform_automation_methods, indent=4))
 
 if __name__ == '__main__':
     print(json.dumps(platform_automation_methods, indent=4))

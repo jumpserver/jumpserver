@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
@@ -86,8 +87,8 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         }
         execution.save()
         execution.start()
-        accounts = self.model.objects.filter(asset=asset).prefetch_related('asset', 'asset__platform')
-        return self.get_paginated_response_from_queryset(accounts)
+        report = execution.manager.gen_report()
+        return HttpResponse(report)
 
     @action(methods=['post'], detail=False, url_path='sync-accounts')
     def sync_accounts(self, request, *args, **kwargs):

@@ -117,7 +117,11 @@ class BaseManager:
             self.execution.save()
 
     def print_summary(self):
-        pass
+        content = "\nSummery: \n"
+        for k, v in self.summary.items():
+            content += f"\t - {k}: {v}\n"
+        content += "\t - Using: {}s\n".format(self.duration)
+        print(content)
 
     def get_report_template(self):
         raise NotImplementedError
@@ -136,6 +140,7 @@ class BaseManager:
         recipients = self.execution.recipients
         if not recipients:
             return
+        print("Send report to: ",  ",".join(recipients))
 
         report = self.gen_report()
         report = transform(report)
@@ -167,26 +172,18 @@ class BaseManager:
         return json.dumps(data, indent=4, sort_keys=True)
 
 
-class PlaybookUtil:
+class PlaybookPrepareMixin:
     bulk_size = 100
     ansible_account_policy = "privileged_first"
     ansible_account_prefer = "root,Administrator"
 
-    def __init__(self, assets, playbook_dir, inventory_path):
-        self.assets = assets
-        self.playbook_dir = playbook_dir
-        self.inventory_path = inventory_path
+    summary: dict
+    result: dict
+    params: dict
+    execution = None
 
-
-
-
-class BasePlaybookManager(BaseManager):
-    bulk_size = 100
-    ansible_account_policy = "privileged_first"
-    ansible_account_prefer = "root,Administrator"
-
-    def __init__(self, execution):
-        super().__init__(execution)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # example: {'gather_fact_windows': {'id': 'gather_fact_windows', 'name': '', 'method': 'gather_fact', ...} }
         self.method_id_meta_mapper = {
             method["id"]: method
@@ -196,8 +193,10 @@ class BasePlaybookManager(BaseManager):
         # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
         # 然后根据执行方式分组, 再根据 bulk_size 分组, 生成不同的 playbook
         self.playbooks = []
-        params = self.execution.snapshot.get("params")
-        self.params = params or {}
+
+    @classmethod
+    def method_type(cls):
+        raise NotImplementedError
 
     def get_params(self, automation, method_type):
         method_attr = "{}_method".format(method_type)
@@ -219,13 +218,6 @@ class BasePlaybookManager(BaseManager):
     def platform_automation_methods(self):
         return platform_automation_methods
 
-    @classmethod
-    def method_type(cls):
-        raise NotImplementedError
-
-    def get_assets_group_by_platform(self):
-        return self.execution.all_assets_group_by_platform()
-
     def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
         task_name = self.execution.snapshot["name"]
@@ -241,13 +233,11 @@ class BasePlaybookManager(BaseManager):
             os.makedirs(path, exist_ok=True, mode=0o755)
         return path
 
-    @lazyproperty
-    def runtime_dir(self):
-        path = self.prepare_runtime_dir()
-        if settings.DEBUG_DEV:
-            msg = "Ansible runtime dir: {}".format(path)
-            print(msg)
-        return path
+    def host_callback(self, host, automation=None, **kwargs):
+        method_type = self.__class__.method_type()
+        host = self.convert_cert_to_file(host, kwargs.get("path_dir"))
+        host["params"] = self.get_params(automation, method_type)
+        return host
 
     @staticmethod
     def write_cert_to_file(filename, content):
@@ -272,15 +262,6 @@ class BasePlaybookManager(BaseManager):
         for f in filtered:
             result = self.write_cert_to_file(os.path.join(cert_dir, f), specific.get(f))
             host["jms_asset"]["secret_info"][f] = result
-        return host
-
-    def on_host_method_not_enabled(self, host, **kwargs):
-        host["error"] = _("{} disabled".format(self.__class__.method_type()))
-
-    def host_callback(self, host, automation=None, **kwargs):
-        method_type = self.__class__.method_type()
-        host = self.convert_cert_to_file(host, kwargs.get("path_dir"))
-        host["params"] = self.get_params(automation, method_type)
         return host
 
     @staticmethod
@@ -314,6 +295,14 @@ class BasePlaybookManager(BaseManager):
         )
         inventory.write_to_file(inventory_path)
 
+    @lazyproperty
+    def runtime_dir(self):
+        path = self.prepare_runtime_dir()
+        if settings.DEBUG_DEV:
+            msg = "Ansible runtime dir: {}".format(path)
+            print(msg)
+        return path
+
     @staticmethod
     def generate_playbook(method, sub_playbook_dir):
         method_playbook_dir_path = method["dir"]
@@ -328,17 +317,6 @@ class BasePlaybookManager(BaseManager):
         with open(sub_playbook_path, "w") as f:
             yaml.safe_dump(plays, f)
         return sub_playbook_path
-
-    def on_assets_not_ansible_enabled(self, assets):
-        for asset in assets:
-            print("\t{}".format(asset))
-
-    def on_assets_not_method_enabled(self, assets, method_id):
-        for asset in assets:
-            print("\t{}".format(asset))
-
-    def on_playbook_not_found(self, assets):
-        pass
 
     def check_automation_enabled(self, platform, assets):
         if not platform.automation or not platform.automation.ansible_enabled:
@@ -360,6 +338,67 @@ class BasePlaybookManager(BaseManager):
 
         if not method_enabled:
             self.on_assets_not_method_enabled(assets, method_type)
+            return False
+        return True
+
+    def on_assets_not_ansible_enabled(self, assets):
+        self.summary["error_assets"] += len(assets)
+        self.result["error_assets"].extend([str(asset) for asset in assets])
+        for asset in assets:
+            print("\t{}".format(asset))
+
+    def on_assets_not_method_enabled(self, assets, method_type):
+        self.summary["error_assets"] += len(assets)
+        self.result["error_assets"].extend([str(asset) for asset in assets])
+        for asset in assets:
+            print("\t{}".format(asset))
+
+    def on_playbook_not_found(self, assets):
+        print("Playbook generate failed")
+
+
+class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
+    bulk_size = 100
+    ansible_account_policy = "privileged_first"
+    ansible_account_prefer = "root,Administrator"
+
+    def __init__(self, execution):
+        super().__init__(execution)
+        self.params = execution.snapshot.get("params", {})
+
+    def get_assets_group_by_platform(self):
+        return self.execution.all_assets_group_by_platform()
+
+    @classmethod
+    def method_type(cls):
+        raise NotImplementedError
+
+    def get_runners_by_platform(self, platform, _assets, _index):
+        sub_dir = "{}_{}".format(platform.name, _index)
+        playbook_dir = os.path.join(self.runtime_dir, sub_dir)
+        inventory_path = os.path.join(self.runtime_dir, sub_dir, "hosts.json")
+
+        method_id = getattr(
+            platform.automation,
+            "{}_method".format(self.__class__.method_type()),
+        )
+        method = self.method_id_meta_mapper.get(method_id)
+
+        protocol = method.get("protocol")
+        self.generate_inventory(_assets, inventory_path, protocol)
+        playbook_path = self.generate_playbook(method, playbook_dir)
+
+        if not playbook_path:
+            self.on_playbook_not_found(_assets)
+            return None, None
+
+        runner = SuperPlaybookRunner(
+            inventory_path,
+            playbook_path,
+            self.runtime_dir,
+            callback=PlaybookCallback(),
+        )
+        return runner, inventory_path
 
     def get_runners(self):
         assets_group_by_platform = self.get_assets_group_by_platform()
@@ -369,10 +408,13 @@ class BasePlaybookManager(BaseManager):
 
         runners = []
         for platform, assets in assets_group_by_platform.items():
+            self.summary["total_assets"] += len(assets)
             if not assets:
+                print("No assets for platform: {}".format(platform.name))
                 continue
 
             if not self.check_automation_enabled(platform, assets):
+                print("Platform {} ansible disabled".format(platform.name))
                 continue
 
             # 避免一个任务太大，分批执行
@@ -381,45 +423,38 @@ class BasePlaybookManager(BaseManager):
                 for i in range(0, len(assets), self.bulk_size)
             ]
             for i, _assets in enumerate(assets_bulked, start=1):
-                sub_dir = "{}_{}".format(platform.name, i)
-                playbook_dir = os.path.join(self.runtime_dir, sub_dir)
-                inventory_path = os.path.join(self.runtime_dir, sub_dir, "hosts.json")
-
-                # method_id = getattr(
-                #     platform.automation,
-                #     "{}_method".format(self.__class__.method_type()),
-                # )
-                method = self.method_id_meta_mapper.get(method_id)
-
-                protocol = method.get("protocol")
-                self.generate_inventory(_assets, inventory_path, protocol)
-                playbook_path = self.generate_playbook(method, playbook_dir)
-
-                if not playbook_path:
-                    self.on_playbook_not_found(_assets)
-                    continue
-
-                runer = SuperPlaybookRunner(
-                    inventory_path,
-                    playbook_path,
-                    self.runtime_dir,
-                    callback=PlaybookCallback(),
+                runner, inventory_path = self.get_runners_by_platform(
+                    platform, _assets, i
                 )
+
+                if not runner or not inventory_path:
+                    continue
 
                 with open(inventory_path, "r") as f:
                     inventory_data = json.load(f)
                     if not inventory_data["all"].get("hosts"):
                         continue
 
-                runners.append(runer)
+                runners.append(
+                    (
+                        runner,
+                        {
+                            "assets": _assets,
+                            "inventory": inventory_path,
+                            "platform": platform,
+                        },
+                    )
+                )
         return runners
 
     def on_host_success(self, host, result):
-        pass
+        self.summary["ok_assets"] += 1
+        self.result["ok_assets"].append(host)
 
     def on_host_error(self, host, error, result):
-        if settings.DEBUG_DEV:
-            print("host error: {} -> {}".format(host, error))
+        self.summary["fail_assets"] += 1
+        self.result["fail_assets"].append((host, str(error)))
+        print(f"\033[31m {host} error: {error} \033[0m\n")
 
     def _on_host_success(self, host, result, hosts):
         self.on_host_success(host, result.get("ok", ""))
@@ -445,7 +480,11 @@ class BasePlaybookManager(BaseManager):
                 result = cb.host_results.get(host)
                 handler(host, result, hosts)
 
-    def on_runner_failed(self, runner, e):
+    def on_runner_failed(self, runner, e, assets=None, **kwargs):
+        self.summary["fail_assets"] += len(assets)
+        self.result["fail_assets"].extend(
+            [(str(asset), str("e")[:10]) for asset in assets]
+        )
         print("Runner failed: {} {}".format(e, self))
 
     def delete_runtime_dir(self):
@@ -467,9 +506,11 @@ class BasePlaybookManager(BaseManager):
         else:
             print(_(">>> No tasks need to be executed"), end="\n")
 
-        for i, runner in enumerate(runners, start=1):
+        for i, runner_info in enumerate(runners, start=1):
             if len(runners) > 1:
                 print(_(">>> Begin executing batch {index} of tasks").format(index=i))
+
+            runner, info = runner_info
             ssh_tunnel = SSHTunnelManager()
             ssh_tunnel.local_gateway_prepare(runner)
 
@@ -478,7 +519,7 @@ class BasePlaybookManager(BaseManager):
                 cb = runner.run(**kwargs)
                 self.on_runner_success(runner, cb)
             except Exception as e:
-                self.on_runner_failed(runner, e)
+                self.on_runner_failed(runner, e, **runner_info)
             finally:
                 ssh_tunnel.local_gateway_clean(runner)
                 print("\n")
