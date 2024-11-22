@@ -1,5 +1,5 @@
 from common.db.utils import get_logger
-from .service import AZUREVaultClient
+from .service import AmazonSecretsManagerClient
 from ..base.vault import BaseVault
 from ...const import VaultTypeChoices
 
@@ -10,15 +10,14 @@ __all__ = ['Vault']
 
 
 class Vault(BaseVault):
-    type = VaultTypeChoices.azure
+    type = VaultTypeChoices.aws
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.client = AZUREVaultClient(
-            vault_url=kwargs.get('VAULT_AZURE_HOST'),
-            tenant_id=kwargs.get('VAULT_AZURE_TENANT_ID'),
-            client_id=kwargs.get('VAULT_AZURE_CLIENT_ID'),
-            client_secret=kwargs.get('VAULT_AZURE_CLIENT_SECRET')
+        self.client = AmazonSecretsManagerClient(
+            region_name=kwargs.get('VAULT_AWS_REGION_NAME'),
+            access_key_id=kwargs.get('VAULT_AWS_ACCESS_KEY_ID'),
+            secret_key=kwargs.get('VAULT_AWS_ACCESS_SECRET_KEY'),
         )
 
     def is_active(self):

@@ -62,6 +62,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'custom': serializers.CustomSMSSettingSerializer,
         'vault': serializers.VaultSettingSerializer,
         'azure_kv': serializers.AzureKVSerializer,
+        'aws_sm': serializers.AmazonSMSerializer,
         'hcp': serializers.HashicorpKVSerializer,
         'chat': serializers.ChatAISettingSerializer,
         'announcement': serializers.AnnouncementSettingSerializer,

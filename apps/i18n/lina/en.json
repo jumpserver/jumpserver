@@ -1363,7 +1363,7 @@
     "VariableHelpText": "You can use {{ key }} to read built-in variables in commands",
     "VariableName": "Variable name",
     "VaultHCPMountPoint": "The mount point of the Vault server, default is jumpserver",
-    "VaultHelpText": "1. for security reasons, vault storage must be enabled in the configuration file.<br>2. after enabled, fill in other configurations, and perform tests.<br>3. carry out data synchronization, which is one-way, only syncing from the local database to the distant vault, once synchronization is completed, the local database will no longer store passwords, please back up your data.<br>4. after modifying vault configuration the second time, you need to restart the service.",
+    "VaultHelpText": "1. for security reasons, add the parameters VAULT_ENABLED=true and VAULT_BACKEND=hcp/azure/aws in the configuration file to enable Vault storage.<br>2. after enabled, fill in other configurations, and perform tests.<br>3. carry out data synchronization, which is one-way, only syncing from the local database to the distant vault, once synchronization is completed, the local database will no longer store passwords, please back up your data.<br>4. after modifying vault configuration the second time, you need to restart the service.",
     "VerificationCodeSent": "Verification code has been sent",
     "VerifySignTmpl": "Sms template",
     "Version": "Version",

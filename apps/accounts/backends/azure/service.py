@@ -50,7 +50,10 @@ class AZUREVaultClient(object):
         self.client.set_secret(name, secret)
 
     def delete(self, name):
-        self.client.begin_delete_secret(name)
+        try:
+            self.client.begin_delete_secret(name)
+        except ResourceNotFoundError as e:
+            logger.warning(f'Delete {name} failed: {str(e)}')
 
     def update_metadata(self, name, metadata: dict):
         try:

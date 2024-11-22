@@ -1804,7 +1804,7 @@
     "VariableName": "變數名",
     "Vault": "密碼匣子",
     "VaultHCPMountPoint": "重新嘗試所選",
-    "VaultHelpText": "1. 由於安全原因，需要配置文件中開啟 Vault 儲存。<br>2. 開啟後，填寫其他配置，進行測試。<br>3. 進行數據同步，同步是單向的，只會從本地資料庫同步到遠端 Vault，同步完成本地資料庫不再儲存密碼，請備份好數據。<br>4. 二次修改 Vault 配置後需重啟服務。",
+    "VaultHelpText": "1. 由於安全原因，需要在配置文件中增加參數 VAULT_ENABLED=true 和 VAULT_BACKEND=hcp/azure/aws 以開啟 Vault 存儲。<br>2. 開啟後，填寫其他配置，進行測試。<br>3. 進行數據同步，同步是單向的，只會從本地資料庫同步到遠端 Vault，同步完成本地資料庫不再儲存密碼，請備份好數據。<br>4. 二次修改 Vault 配置後需重啟服務。",
     "Vendor": "製造商",
     "VerificationCodeSent": "驗證碼已發送",
     "VerifySignTmpl": "驗證碼簡訊模板",
