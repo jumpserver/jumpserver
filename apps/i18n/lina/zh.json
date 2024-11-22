@@ -177,6 +177,8 @@
     "AwaitingMyApproval": "待我审批",
     "Azure": "Azure (中国)",
     "Azure_Int": "Azure (国际)",
+    "AzureKeyVault": "Azure vault",
+    "HashicorpVault": "HCP vault",
     "Backup": "备份",
     "BackupAccountsHelpText": "备份账号信息到外部。可以存储到外部系统或发送邮件，支持分段方式",
     "BadConflictErrorMsg": "正在刷新中，请稍后再试",

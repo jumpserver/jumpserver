@@ -24,6 +24,7 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
+        libldap2-dev                  \
         libx11-dev"
 
 ARG TOOLS="                           \

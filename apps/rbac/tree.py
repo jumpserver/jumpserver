@@ -64,7 +64,7 @@ extra_nodes_data = [
     {'id': "tasks", "name": _("Task"), "pId": "view_setting"},
     {'id': "license", "name": _("License"), "pId": "view_setting"},
     {'id': "other", "name": _("Other"), "pId": "view_setting"},
-    {'id': "job_audit", "name": _("Job audit log"), "pId": "view_audit"},
+    {'id': "job_audit", "name": _("Job audit"), "pId": "view_audit"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中

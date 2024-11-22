@@ -51,7 +51,7 @@ class AutomationExecution(AssetAutomationExecution):
 class ChangeSecretMixin(SecretWithRandomMixin):
     ssh_key_change_strategy = models.CharField(
         choices=SSHKeyStrategy.choices, max_length=16,
-        default=SSHKeyStrategy.add, verbose_name=_('SSH key change strategy')
+        default=SSHKeyStrategy.set_jms, verbose_name=_('SSH key change strategy')
     )
     get_all_assets: callable  # get all assets
 

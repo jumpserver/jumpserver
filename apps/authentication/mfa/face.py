@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 
 from authentication.mixins import MFAFaceMixin
+from common.const import LicenseEditionChoices
 from settings.api import settings
 
 
@@ -32,7 +33,10 @@ class MFAFace(BaseMFA, MFAFaceMixin):
 
     @staticmethod
     def global_enabled():
-        return settings.XPACK_LICENSE_IS_VALID and settings.FACE_RECOGNITION_ENABLED
+        return settings.XPACK_LICENSE_IS_VALID \
+            and LicenseEditionChoices.ULTIMATE == \
+            LicenseEditionChoices.from_key(settings.XPACK_LICENSE_EDITION) \
+            and settings.FACE_RECOGNITION_ENABLED
 
     def get_enable_url(self) -> str:
         return reverse('authentication:user-face-enable')

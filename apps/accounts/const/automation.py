@@ -49,9 +49,9 @@ class SecretStrategy(models.TextChoices):
 
 
 class SSHKeyStrategy(models.TextChoices):
-    add = 'add', _('Append SSH KEY')
-    set = 'set', _('Empty and append SSH KEY')
     set_jms = 'set_jms', _('Replace (Replace only keys pushed by JumpServer) ')
+    set = 'set', _('Empty and append SSH KEY')
+    add = 'add', _('Append SSH KEY')
 
 
 class TriggerChoice(models.TextChoices, TreeChoices):
