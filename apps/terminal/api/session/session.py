@@ -4,6 +4,7 @@ import os
 import tarfile
 
 from django.core.files.storage import default_storage
+from django.conf import settings
 from django.db.models import F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, reverse
@@ -156,6 +157,8 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
 
     @action(methods=[GET], detail=False, permission_classes=[IsAuthenticated], url_path='online-info', )
     def online_info(self, request, *args, **kwargs):
+        if not settings.VIEW_ASSET_ONLINE_SESSION_INFO:
+            return self.permission_denied(request, "view asset online session info disabled")
         asset = self.request.query_params.get('asset_id')
         account = self.request.query_params.get('account')
         if asset is None or account is None:

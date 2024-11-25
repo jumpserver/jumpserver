@@ -234,6 +234,7 @@ class Config(dict):
         'SESSION_COOKIE_NAME_PREFIX': None,
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
+        'VIEW_ASSET_ONLINE_SESSION_INFO': True,
         'LOGIN_URL': reverse_lazy('authentication:login'),
 
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认(new)
