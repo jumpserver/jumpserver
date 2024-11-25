@@ -30,6 +30,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField()
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField()
     SESSION_EXPIRE_AT_BROWSER_CLOSE = serializers.BooleanField()
+    VIEW_ASSET_ONLINE_SESSION_INFO = serializers.BooleanField()
     PASSWORD_RULE = serializers.DictField()
     SECURITY_SESSION_SHARE = serializers.BooleanField()
     XPACK_LICENSE_IS_VALID = serializers.BooleanField()
