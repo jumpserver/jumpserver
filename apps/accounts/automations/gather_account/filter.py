@@ -50,7 +50,7 @@ class GatherAccountsFilter:
             if not line.strip() or ' ' not in line:
                 continue
             username, login = line.split(' ', 1)
-            user_last_login[username] = login
+            user_last_login[username] = login.split()
 
         user_authorized = info.pop('user_authorized', [])
         username_authorized = {}
@@ -78,9 +78,9 @@ class GatherAccountsFilter:
 
             login = user_last_login.get(username) or ''
             if login and len(login) == 3:
-                user['address_last_login'] = login[1][:32]
+                user['address_last_login'] = login[0][:32]
                 try:
-                    login_date = timezone.datetime.fromisoformat(login[2])
+                    login_date = timezone.datetime.fromisoformat(login[1])
                     user['date_last_login'] = login_date
                 except ValueError:
                     pass

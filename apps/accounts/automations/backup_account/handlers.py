@@ -153,7 +153,7 @@ class AccountBackupHandler:
         wb.close()
         files.append(filename)
         timedelta = round((time.time() - time_start), 2)
-        time_cost = _('Time cost')
+        time_cost = _('Duration')
         file_created = _('Backup file creation completed')
         print('{}: {} {}s'.format(file_created, time_cost, timedelta))
         return files
@@ -292,7 +292,7 @@ class AccountBackupHandler:
     def run(self):
         plan_start = _('Plan start')
         plan_end = _('Plan end')
-        time_cost = _('Time cost')
+        time_cost = _('Duration')
         error = _('An exception occurred during task execution')
         print('{}: {}'.format(plan_start, local_now_display()))
         time_start = time.time()

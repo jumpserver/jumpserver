@@ -73,7 +73,7 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     material = serializers.ReadOnlyField(label=_("Command"))
     is_success = serializers.ReadOnlyField(label=_("Is success"))
     is_finished = serializers.ReadOnlyField(label=_("Is finished"))
-    time_cost = serializers.ReadOnlyField(label=_("Time cost"))
+    time_cost = serializers.ReadOnlyField(label=_("Duration"))
 
     class Meta:
         model = JobExecution

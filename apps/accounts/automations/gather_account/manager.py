@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from accounts.const import AutomationTypes
 from accounts.models import GatheredAccount, Account, AccountRisk
-from assets.models import Asset
 from common.const import ConfirmOrIgnore
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils import get_logger
@@ -13,15 +12,20 @@ from common.utils.strings import get_text_diff
 from orgs.utils import tmp_to_org
 from .filter import GatherAccountsFilter
 from ..base.manager import AccountBasePlaybookManager
-from ...notifications import GatherAccountChangeMsg
 
 logger = get_logger(__name__)
 
-
-diff_items = [
+risk_items = [
     "authorized_keys",
     "sudoers",
     "groups",
+]
+
+diff_items = risk_items + [
+    "address_last_login",
+    "date_last_login",
+    "date_password_change",
+    "date_password_expired",
 ]
 
 
@@ -34,14 +38,16 @@ def get_items_diff(ori_account, d):
         ori = getattr(ori_account, item)
         new = d.get(item, "")
 
-        if not ori:
+        if not ori and not new:
             continue
 
-        if isinstance(new, timezone.datetime):
-            new = ori.strftime("%Y-%m-%d %H:%M:%S")
+        if isinstance(ori, timezone.datetime):
             ori = ori.strftime("%Y-%m-%d %H:%M:%S")
+        if isinstance(new, timezone.datetime):
+            new = new.strftime("%Y-%m-%d %H:%M:%S")
+
         if new != ori:
-            diff[item] = get_text_diff(ori, new)
+            diff[item] = get_text_diff(str(ori), str(new))
 
     ori_account._diff = diff
     return diff
@@ -70,12 +76,13 @@ class AnalyseAccountRisk:
 
     def _analyse_item_changed(self, ori_account, d):
         diff = get_items_diff(ori_account, d)
-
         if not diff:
             return
 
         risks = []
         for k, v in diff.items():
+            if k not in risk_items:
+                continue
             risks.append(
                 dict(
                     asset=ori_account.asset,
@@ -191,7 +198,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         result = self._filter_success_result(asset.type, info)
         accounts = []
         for username, info in result.items():
-            self.asset_usernames_mapper[asset].add(username)
+            self.asset_usernames_mapper[str(asset.id)].add(username)
 
             d = {"asset": asset, "username": username, "remote_present": True, **info}
             accounts.append(d)
@@ -217,14 +224,14 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             "asset", "username"
         )
 
-        for asset, username in accounts:
-            self.ori_asset_usernames[asset].add(username)
+        for asset_id, username in accounts:
+            self.ori_asset_usernames[str(asset_id)].add(username)
 
         ga_accounts = GatheredAccount.objects.filter(asset__in=assets).prefetch_related(
             "asset"
         )
         for account in ga_accounts:
-            self.ori_gathered_usernames[account.asset].add(account.username)
+            self.ori_gathered_usernames[str(account.asset_id)].add(account.username)
             key = "{}_{}".format(account.asset_id, account.username)
             self.ori_gathered_accounts_mapper[key] = account
 
@@ -235,9 +242,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
         远端账号 -> 收集账号 -> 特权账号
         """
-        remote_users = self.asset_usernames_mapper[asset]
-        ori_users = self.ori_asset_usernames[asset]
-        ori_ga_users = self.ori_gathered_usernames[asset]
+        remote_users = self.asset_usernames_mapper[str(asset.id)]
+        ori_users = self.ori_asset_usernames[str(asset.id)]
+        ori_ga_users = self.ori_gathered_usernames[str(asset.id)]
 
         queryset = GatheredAccount.objects.filter(asset=asset).exclude(
             status=ConfirmOrIgnore.ignored
@@ -305,8 +312,11 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         # 资产上没有的，标识为为存在
         (
             queryset.exclude(username__in=ori_users)
-            .filter(present=False)
-            .update(present=True)
+            .filter(present=True)
+            .update(present=False)
+        )
+        queryset.filter(username__in=ori_users).filter(present=False).update(
+            present=True
         )
 
     @bulk_create_decorator(GatheredAccount)

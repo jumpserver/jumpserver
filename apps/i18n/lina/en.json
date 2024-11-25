@@ -1249,7 +1249,7 @@
   "TicketFlowUpdate": "Update the approval flow",
   "Tickets": "Tickets",
   "Time": "Time",
-  "TimeDelta": "Time cost",
+  "TimeDelta": "Duration",
   "TimeExpression": "Time expression",
   "Timeout": "Timeout",
   "TimeoutHelpText": "When this value is -1, no timeout is specified.",

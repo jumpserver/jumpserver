@@ -37,7 +37,7 @@ msgstr "生成资产或应用相关备份信息文件"
 #: accounts/automations/backup_account/handlers.py:295
 #: accounts/automations/backup_account/manager.py:40 ops/serializers/job.py:76
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
-msgid "Time cost"
+msgid "Duration"
 msgstr "花费时间"
 
 #: accounts/automations/backup_account/handlers.py:157

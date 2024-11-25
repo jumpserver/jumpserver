@@ -32,5 +32,5 @@ class AccountBackupManager(BaseManager):
         print('\n\n' + '-' * 80)
         plan_execution_end = _('Plan execution end')
         print('{} {}\n'.format(plan_execution_end, local_now_display()))
-        time_cost = _('Time cost')
+        time_cost = _('Duration')
         print('{}: {}s'.format(time_cost, self.duration))

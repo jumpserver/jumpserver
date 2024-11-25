@@ -38,7 +38,7 @@ msgstr "アセットまたはアプリケーション関連のバックアップ
 #: accounts/automations/backup_account/handlers.py:295
 #: accounts/automations/backup_account/manager.py:40 ops/serializers/job.py:76
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
-msgid "Time cost"
+msgid "Duration"
 msgstr "時を過ごす"
 
 #: accounts/automations/backup_account/handlers.py:157
