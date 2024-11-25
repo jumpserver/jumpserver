@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-20 19:32+0800\n"
+"POT-Creation-Date: 2024-11-25 14:58+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1415,7 +1415,7 @@ msgstr "正则表达式"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:185 settings/serializers/feature.py:21
-#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
 msgid "Content"
 msgstr "内容"
 
@@ -1826,7 +1826,7 @@ msgid "Any"
 msgstr "任意"
 
 #: assets/const/protocol.py:88 rbac/tree.py:62
-#: settings/serializers/security.py:232
+#: settings/serializers/security.py:241
 msgid "Security"
 msgstr "安全"
 
@@ -2765,7 +2765,7 @@ msgstr "建立软链接"
 
 #: audits/const.py:18 audits/const.py:28
 #: ops/templates/ops/celery_task_log.html:86
-#: terminal/api/session/session.py:153
+#: terminal/api/session/session.py:154
 msgid "Download"
 msgstr "下载"
 
@@ -2773,7 +2773,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:268 terminal/api/session/session.py:281
+#: audits/const.py:23 rbac/tree.py:268 terminal/api/session/session.py:284
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:90
@@ -3150,7 +3150,7 @@ msgstr "ACL 动作是复核"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:34 terminal/api/session/session.py:334
+#: authentication/api/password.py:34 terminal/api/session/session.py:337
 #: users/views/profile/reset.py:63
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
@@ -3457,15 +3457,15 @@ msgstr "自定义 MFA 验证码"
 msgid "MFA custom global enabled, cannot disable"
 msgstr "自定义 MFA 全局开启，无法被禁用"
 
-#: authentication/mfa/face.py:13
+#: authentication/mfa/face.py:14
 msgid "Face Recognition"
 msgstr "人脸识别"
 
-#: authentication/mfa/face.py:23 authentication/mfa/face.py:25
+#: authentication/mfa/face.py:24 authentication/mfa/face.py:26
 msgid "Facial comparison failed"
 msgstr "人脸比对失败"
 
-#: authentication/mfa/face.py:53
+#: authentication/mfa/face.py:57
 msgid "Frontal Face Recognition"
 msgstr "正面人脸识别"
 
@@ -3836,7 +3836,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:536
+#: jumpserver/conf.py:535
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -4181,6 +4181,26 @@ msgstr "运行中"
 #: common/const/choices.py:68
 msgid "Canceled"
 msgstr "取消"
+
+#: common/const/choices.py:82 terminal/models/applet/applet.py:31
+msgid "Community edition"
+msgstr "社区版"
+
+#: common/const/choices.py:83
+msgid "Basic edition"
+msgstr "企业基础版"
+
+#: common/const/choices.py:84
+msgid "Standard edition"
+msgstr "企业标准版"
+
+#: common/const/choices.py:85
+msgid "Professional edition"
+msgstr "企业专业版"
+
+#: common/const/choices.py:86
+msgid "Ultimate edition"
+msgstr "企业旗舰版"
 
 #: common/const/common.py:5 xpack/plugins/cloud/manager.py:429
 #, python-format
@@ -4583,16 +4603,16 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:530
+#: jumpserver/conf.py:529
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
-#: jumpserver/conf.py:535
+#: jumpserver/conf.py:534
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:537
+#: jumpserver/conf.py:536
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -4739,17 +4759,17 @@ msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "资产({asset})授权缺少上传权限"
 
-#: ops/api/job.py:157
+#: ops/api/job.py:158
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
-#: ops/api/job.py:162
+#: ops/api/job.py:163
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
 
-#: ops/api/job.py:235
+#: ops/api/job.py:236
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "正在创建任务，无法中断，请稍后重试。"
@@ -5727,7 +5747,7 @@ msgid "Appearance"
 msgstr "界面"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:154
+#: xpack/plugins/license/models.py:151
 msgid "License"
 msgstr "许可证"
 
@@ -7038,36 +7058,47 @@ msgstr "会话在浏览器关闭时过期"
 msgid "Whether to expire the session when the user closes their browser."
 msgstr "当用户关闭浏览器时是否使会话过期。"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:206
+msgid "Allow users to view asset session information"
+msgstr "允许用户查看资产在线会话信息"
+
+#: settings/serializers/security.py:208
+msgid ""
+"When a user connects to an asset, the account selection popup displays the "
+"number of active sessions for the current asset (RDP protocol only)."
+msgstr ""
+"当用户连接资产时，账号选择弹窗中显示当前资产的在线会话数量（仅 rdp 协议）"
+
+#: settings/serializers/security.py:214
 msgid "Max online time (hour)"
 msgstr "会话连接最大时间 (时)"
 
-#: settings/serializers/security.py:206
+#: settings/serializers/security.py:215
 msgid "If session connection time more than it, disconnect connection."
 msgstr "提示：如果会话连接超过该配置，连接会被断开"
 
-#: settings/serializers/security.py:209
+#: settings/serializers/security.py:218
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:212
+#: settings/serializers/security.py:221
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:213
+#: settings/serializers/security.py:222
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给他人，协同工作"
 
-#: settings/serializers/security.py:219
+#: settings/serializers/security.py:228
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:222
+#: settings/serializers/security.py:231
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:223
+#: settings/serializers/security.py:232
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
@@ -7562,20 +7593,20 @@ msgstr "测试失败：请检查配置"
 msgid "Have online sessions"
 msgstr "有在线会话"
 
-#: terminal/api/session/session.py:48
+#: terminal/api/session/session.py:49
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
 
-#: terminal/api/session/session.py:326
+#: terminal/api/session/session.py:329
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session/session.py:329
+#: terminal/api/session/session.py:332
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:342
+#: terminal/api/session/session.py:345
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -7720,10 +7751,6 @@ msgstr "不支持批量创建"
 #: terminal/exceptions.py:13
 msgid "Storage is invalid"
 msgstr "存储无效"
-
-#: terminal/models/applet/applet.py:31 xpack/plugins/license/models.py:88
-msgid "Community edition"
-msgstr "社区版"
 
 #: terminal/models/applet/applet.py:32
 msgid "Enterprise"
@@ -9722,19 +9749,19 @@ msgstr "认证成功"
 msgid "Redirecting to JumpServer Client"
 msgstr "重定向到 JumpServer 客户端"
 
-#: users/views/profile/face.py:54
+#: users/views/profile/face.py:61
 msgid "Face recognition enable success"
 msgstr "MFA(人脸识别) 开启成功"
 
-#: users/views/profile/face.py:55
+#: users/views/profile/face.py:62
 msgid "Face recognition enable success, return login page"
 msgstr "MFA(人脸识别) 启用成功，返回到登录页面"
 
-#: users/views/profile/face.py:79
+#: users/views/profile/face.py:86
 msgid "Face recognition disable success"
 msgstr "MFA(人脸识别) 禁用成功"
 
-#: users/views/profile/face.py:80
+#: users/views/profile/face.py:87
 msgid "Face recognition disable success, return login page"
 msgstr "MFA(人脸识别) 禁用成功，返回登录页面"
 
@@ -10604,25 +10631,13 @@ msgstr "许可证导入成功"
 msgid "Invalid license"
 msgstr "许可证无效"
 
-#: xpack/plugins/license/models.py:80
-msgid "Basic edition"
-msgstr "企业基础版"
+#, fuzzy
+#~| msgid "Have online sessions"
+#~ msgid "View asset online session info"
+#~ msgstr "有在线会话"
 
-#: xpack/plugins/license/models.py:82
-msgid "Standard edition"
-msgstr "企业标准版"
-
-#: xpack/plugins/license/models.py:84
-msgid "Professional edition"
-msgstr "企业专业版"
-
-#: xpack/plugins/license/models.py:86
-msgid "Ultimate edition"
-msgstr "企业旗舰版"
-
-#: xpack/plugins/license/models.py:100
-msgid "FIT2CLOUD"
-msgstr "飞致云"
+#~ msgid "FIT2CLOUD"
+#~ msgstr "飞致云"
 
 #~ msgid "* Please enter the correct password length"
 #~ msgstr "* 请输入正确的密码长度"
