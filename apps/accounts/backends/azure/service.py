@@ -36,7 +36,6 @@ class AZUREVaultClient(object):
             secret = self.client.get_secret(name, version)
             return secret.value
         except (ResourceNotFoundError, ClientAuthenticationError) as e:
-            logger.error(f'get: {name} {str(e)}')
             return ''
 
     def create(self, name, secret):
