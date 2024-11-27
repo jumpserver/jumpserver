@@ -2,6 +2,10 @@
 #
 from django.db.models import Q, Count
 from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
+from operator import itemgetter
+
+from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.const import AutomationTypes
@@ -14,6 +18,8 @@ __all__ = [
     'CheckAccountAutomationViewSet', 'CheckAccountExecutionViewSet',
     'AccountRiskViewSet', 'CheckAccountEngineViewSet',
 ]
+
+from ...risk_handlers import RiskHandler
 
 
 class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
@@ -46,6 +52,7 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
     serializer_classes = {
         'default': serializers.AccountRiskSerializer,
         'assets': serializers.AssetRiskSerializer,
+        'handle': serializers.HandleRiskSerializer
     }
     ordering_fields = (
         'asset', 'risk', 'status',  'username', 'date_created'
@@ -53,9 +60,15 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
     ordering = ('-asset', 'date_created')
     rbac_perms = {
         'sync_accounts': 'assets.add_accountrisk',
-        'assets': 'accounts.view_accountrisk'
+        'assets': 'accounts.view_accountrisk',
+        'handle': 'accounts.change_accountrisk'
     }
-    http_method_names = ['get', 'head', 'options']
+
+    def update(self, request, *args, **kwargs):
+        raise MethodNotAllowed('PUT')
+
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed('POST')
 
     @action(methods=['get'], detail=False, url_path='assets')
     def assets(self, request, *args, **kwargs):
@@ -71,6 +84,32 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
             .annotate(**annotations)  # 使用上面定义的 annotations 进行计数
         )
         return self.get_paginated_response_from_queryset(queryset)
+
+    @action(methods=['post'], detail=False, url_path='handle')
+    def handle(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        asset, username, act, risk = itemgetter('asset', 'username', 'action', 'risk')(serializer.validated_data)
+        handler = RiskHandler(asset=asset, username=username)
+        data = handler.handle(act, risk)
+        if not data:
+            data = {'message': 'Success'}
+        return Response(data)
+
+        # 处理风险
+
+    def handle_add_account(self):
+        pass
+
+    def handle_disable_remote(self):
+        pass
+
+    def handle_delete_remote(self):
+        pass
+
+    def handle_delete_both(self):
+        pass
 
 
 class CheckAccountEngineViewSet(JMSModelViewSet):

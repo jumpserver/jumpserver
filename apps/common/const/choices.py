@@ -76,6 +76,7 @@ class Language(models.TextChoices):
 
 
 class ConfirmOrIgnore(models.TextChoices):
+    pending = '', _('Pending')
     confirmed = 'confirmed', _('Confirmed')
     ignored = 'ignored', _('Ignored')
 

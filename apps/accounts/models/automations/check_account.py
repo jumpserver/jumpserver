@@ -39,8 +39,8 @@ class CheckAccountAutomation(AccountBaseAutomation):
 
 class RiskChoice(TextChoices):
     # 依赖自动发现的
-    zombie = 'zombie', _('Long time no login')  # 好久没登录的账号, 禁用、删除
-    ghost = 'ghost', _('Not managed')  # 未被纳管的账号, 纳管, 删除, 禁用
+    long_time_no_login = 'long_time_no_login', _('Long time no login')  # 好久没登录的账号, 禁用、删除
+    new_found = 'new_found', _('New found')  # 未被纳管的账号, 纳管, 删除, 禁用
     group_changed = 'groups_changed', _('Groups change')  # 组变更, 确认
     sudo_changed = 'sudoers_changed', _('Sudo changed')  # sudo 变更, 确认
     authorized_keys_changed = 'authorized_keys_changed', _('Authorized keys changed')  # authorized_keys 变更, 确认
@@ -58,7 +58,7 @@ class AccountRisk(JMSOrgBaseModel):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Asset'))
     username = models.CharField(max_length=32, verbose_name=_('Username'))
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
-    status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default='', blank=True, verbose_name=_('Status'))
+    status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default=ConfirmOrIgnore.pending, blank=True, verbose_name=_('Status'))
     details = models.JSONField(default=list,  verbose_name=_('Details'))
 
     class Meta:

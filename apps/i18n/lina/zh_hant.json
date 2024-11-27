@@ -719,7 +719,7 @@
   "GatewayUpdate": "更新網關",
   "DiscoverAccounts": "帳號收集",
   "DiscoverAccountsHelpText": "收集資產上的賬號資訊。收集後的賬號資訊可以導入到系統中，方便統一",
-  "GatheredAccountList": "Collected accounts",
+  "DiscoveredAccountList": "Collected accounts",
   "General": "基本",
   "GeneralAccounts": "普通帳號",
   "GeneralSetting": "General Settings",

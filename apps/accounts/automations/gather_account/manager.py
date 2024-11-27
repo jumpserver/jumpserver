@@ -56,7 +56,7 @@ def get_items_diff(ori_account, d):
 class AnalyseAccountRisk:
     long_time = timezone.timedelta(days=90)
     datetime_check_items = [
-        {"field": "date_last_login", "risk": "zombie", "delta": long_time},
+        {"field": "date_last_login", "risk": "long_time_no_login", "delta": long_time},
         {
             "field": "date_password_change",
             "risk": "long_time_password",
@@ -154,7 +154,7 @@ class AnalyseAccountRisk:
         else:
             self._create_risk(
                 dict(
-                    **basic, risk="ghost", details=[{"datetime": self.now.isoformat()}]
+                    **basic, risk="new_found", details=[{"datetime": self.now.isoformat()}]
                 )
             )
 
@@ -227,8 +227,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for asset_id, username in accounts:
             self.ori_asset_usernames[str(asset_id)].add(username)
 
-        ga_accounts = GatheredAccount.objects.filter(asset__in=assets).prefetch_related(
-            "asset"
+        ga_accounts = (
+            GatheredAccount.objects.filter(asset__in=assets)
+            .prefetch_related("asset")
         )
         for account in ga_accounts:
             self.ori_gathered_usernames[str(account.asset_id)].add(account.username)
@@ -315,8 +316,10 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             .filter(present=True)
             .update(present=False)
         )
-        queryset.filter(username__in=ori_users).filter(present=False).update(
-            present=True
+        (
+            queryset.filter(username__in=ori_users)
+            .filter(present=False)
+            .update(present=True)
         )
 
     @bulk_create_decorator(GatheredAccount)

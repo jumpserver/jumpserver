@@ -548,7 +548,7 @@
   "GatewayUpdate": "更新网关",
   "DiscoverAccounts": "账号发现",
   "DiscoverAccountsHelpText": "收集资产上的账号信息。收集后的账号信息可以导入到系统中，方便统一管理",
-  "GatheredAccountList": "发现的账号",
+  "DiscoveredAccountList": "发现的账号",
   "General": "基本",
   "GeneralAccounts": "普通账号",
   "GeneralSetting": "通用配置",

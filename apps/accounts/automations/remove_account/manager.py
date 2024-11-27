@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict
 from copy import deepcopy
 
 from django.db.models import QuerySet
@@ -12,10 +13,16 @@ logger = get_logger(__name__)
 
 
 class RemoveAccountManager(AccountBasePlaybookManager):
+    super_accounts = ['root', 'administrator']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.host_account_mapper = {}
+        self.host_account_mapper = dict()
+        self.host_accounts = defaultdict(list)
+        snapshot_account = self.execution.snapshot.get('accounts', [])
+        self.snapshot_asset_account_map = defaultdict(list)
+        for account in snapshot_account:
+            self.snapshot_asset_account_map[str(account['asset'])].append(account)
 
     def prepare_runtime_dir(self):
         path = super().prepare_runtime_dir()
@@ -30,28 +37,22 @@ class RemoveAccountManager(AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.remove_account
 
-    def get_gather_accounts(self, privilege_account, gather_accounts: QuerySet):
-        gather_account_ids = self.execution.snapshot['gather_accounts']
-        gather_accounts = gather_accounts.filter(id__in=gather_account_ids)
-        gather_accounts = gather_accounts.exclude(
-            username__in=[privilege_account.username, 'root', 'Administrator']
-        )
-        return gather_accounts
-
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         if host.get('error'):
             return host
 
-        gather_accounts = asset.gatheredaccount_set.all()
-        gather_accounts = self.get_gather_accounts(account, gather_accounts)
-
         inventory_hosts = []
+        accounts_to_remove = self.snapshot_asset_account_map.get(str(asset.id), [])
 
-        for gather_account in gather_accounts:
+        for account in accounts_to_remove:
+            username = account.get('username')
+            if not username or username.lower() in self.super_accounts:
+                print("Super account can not be remove: ", username)
+                continue
             h = deepcopy(host)
-            h['name'] += '(' + gather_account.username + ')'
-            self.host_account_mapper[h['name']] = (asset, gather_account)
-            h['account'] = {'username': gather_account.username}
+            h['name'] += '(' + username + ')'
+            self.host_account_mapper[h['name']] = account
+            h['account'] = {'username': username}
             inventory_hosts.append(h)
         return inventory_hosts
 

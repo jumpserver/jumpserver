@@ -563,7 +563,7 @@
   "GatewayUpdate": "ゲートウェイの更新",
   "DiscoverAccounts": "アカウント収集",
   "DiscoverAccountsHelpText": "資産上のアカウント情報を収集します。収集したアカウント情報は、システムにインポートして一元管理が可能です",
-  "GatheredAccountList": "収集したアカウント",
+  "DiscoveredAccountList": "収集したアカウント",
   "General": "基本",
   "GeneralAccounts": "一般アカウント",
   "GeneralSetting": "汎用設定",

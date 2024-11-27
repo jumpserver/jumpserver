@@ -41,7 +41,7 @@ def remove_accounts_task(gather_account_ids):
 
     task_snapshot = {
         'assets': [str(i.asset_id) for i in gather_accounts],
-        'gather_accounts': [str(i.id) for i in gather_accounts],
+        'accounts': [{'asset': str(i.asset_id), 'username': i.username} for i in gather_accounts],
     }
 
     tp = AutomationTypes.remove_account

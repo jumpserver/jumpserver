@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
             name="status",
             field=models.CharField(
                 blank=True,
-                choices=[("confirmed", "Confirmed"), ("ignored", "Ignored")],
+                choices=[("confirmed", "Confirmed"), ("ignored", "Ignored"), ("pending", "Pending")],
                 default="",
                 max_length=32,
                 verbose_name="Status",

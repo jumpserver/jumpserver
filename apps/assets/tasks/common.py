@@ -45,3 +45,4 @@ def quickstart_automation(task_name, tp, task_snapshot=None):
         trigger=Trigger.manual, **data
     )
     execution.start()
+    return execution

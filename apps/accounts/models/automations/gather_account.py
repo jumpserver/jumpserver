@@ -24,7 +24,7 @@ class GatheredAccount(JMSOrgBaseModel):
     present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在
     date_password_change = models.DateTimeField(null=True, verbose_name=_("Date change password"))
     date_password_expired = models.DateTimeField(null=True, verbose_name=_("Date password expired"))
-    status = models.CharField(max_length=32, default='', blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
+    status = models.CharField(max_length=32, default=ConfirmOrIgnore.pending, blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
 
     @property
     def address(self):
