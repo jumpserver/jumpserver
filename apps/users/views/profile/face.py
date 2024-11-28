@@ -1,5 +1,3 @@
-from django.contrib.auth import logout as auth_logout
-from django.shortcuts import redirect
 from django.views.generic import FormView
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -53,15 +51,14 @@ class UserFaceEnableView(MFAFaceMixin, UserFaceCaptureView):
             form.add_error("code", str(e))
             return super().form_invalid(form)
 
-        auth_logout(self.request)
         return super().form_valid(form)
 
     def get_success_url(self):
         message_data = {
-            'title': _('Face recognition enable success'),
-            'message': _('Face recognition enable success, return login page'),
-            'interval': 5,
-            'redirect_url': reverse('authentication:login'),
+            'title': _('Face binding successful'),
+            'message': _('Face binding successful'),
+            'interval': 2,
+            'redirect_url': '/ui/#/profile/index'
         }
         url = FlashMessageUtil.gen_message_url(message_data)
         return url
@@ -77,16 +74,14 @@ class UserFaceDisableView(UserFaceCaptureView):
         except (errors.MFAFailedError, errors.BlockMFAError) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)
-
-        auth_logout(self.request)
         return super().form_valid(form)
 
     def get_success_url(self):
         message_data = {
-            'title': _('Face recognition disable success'),
-            'message': _('Face recognition disable success, return login page'),
-            'interval': 5,
-            'redirect_url': reverse('authentication:login'),
+            'title': _('Face unbinding successful'),
+            'message': _('Face unbinding successful'),
+            'interval': 2,
+            'redirect_url': '/ui/#/profile/index'
         }
         url = FlashMessageUtil.gen_message_url(message_data)
         return url
