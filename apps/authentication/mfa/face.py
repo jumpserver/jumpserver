@@ -1,7 +1,4 @@
-from django.core.cache import cache
-
 from authentication.mfa.base import BaseMFA
-from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 
 from authentication.mixins import MFAFaceMixin
@@ -39,10 +36,10 @@ class MFAFace(BaseMFA, MFAFaceMixin):
             and settings.FACE_RECOGNITION_ENABLED
 
     def get_enable_url(self) -> str:
-        return reverse('authentication:user-face-enable')
+        return '/ui/#/profile/index'
 
     def get_disable_url(self) -> str:
-        return reverse('authentication:user-face-disable')
+        return '/ui/#/profile/index'
 
     def disable(self):
         assert self.is_authenticated()
@@ -54,4 +51,8 @@ class MFAFace(BaseMFA, MFAFaceMixin):
 
     @staticmethod
     def help_text_of_enable():
-        return _("Frontal Face Recognition")
+        return _("Bind face to enable")
+
+    @staticmethod
+    def help_text_of_disable():
+        return _("Unbind face to disable")

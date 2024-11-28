@@ -15,6 +15,10 @@ logger = get_logger(__file__)
 class FaceMixin:
     face_vector = None
 
+    @property
+    def is_face_code_set(self):
+        return self.face_vector is not None
+
     def get_face_vector(self) -> list[float]:
         if not self.face_vector:
             raise ValidationError("Face vector is not set.")
