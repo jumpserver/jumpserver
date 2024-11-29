@@ -54,7 +54,10 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        return ChangeSecretRecord.objects.all()
+        qs = ChangeSecretRecord.get_valid_records()
+        return qs.objects.filter(
+            execution__automation__type=self.tp
+        )
 
     @action(methods=['post'], detail=False, url_path='execute')
     def execute(self, request, *args, **kwargs):

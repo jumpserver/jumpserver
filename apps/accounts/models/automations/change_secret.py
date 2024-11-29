@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
@@ -48,3 +49,9 @@ class ChangeSecretRecord(JMSBaseModel):
 
     def __str__(self):
         return f'{self.account.username}@{self.asset}'
+
+    @staticmethod
+    def get_valid_records():
+        return ChangeSecretRecord.objects.exclude(
+            Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
+        )
