@@ -32,6 +32,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.BasicAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
+        'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.SessionAuthentication',
     ),
