@@ -1,7 +1,7 @@
-import datetime
 import requests
 import uuid
 
+from datetime import datetime
 from urllib.parse import urlencode
 from httpsig.requests_auth import HTTPSignatureAuth
 from requests.exceptions import RequestException
@@ -113,7 +113,7 @@ class JumpServerPAM(object):
         return {
             'Accept': 'application/json',
             'X-JMS-ORG': self.org_id,
-            'Date': datetime.datetime.utcnow().strftime(gmt_form),
+            'Date': datetime.utcnow().strftime(gmt_form),
             'X-Source': 'jms-pam'
         }
 
