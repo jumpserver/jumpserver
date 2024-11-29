@@ -158,7 +158,10 @@ def is_uuid(seq):
 def get_request_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
     if x_forwarded_for and x_forwarded_for[0]:
-        login_ip = x_forwarded_for[0].split(":")[0]
+        login_ip = x_forwarded_for[0]
+        if login_ip.count(':') == 1:
+            # format: ipv4:port (非标准格式的 X-Forwarded-For)
+            login_ip = login_ip.split(":")[0]
         return login_ip
 
     login_ip = request.META.get('REMOTE_ADDR', '')
