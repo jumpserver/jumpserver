@@ -1370,7 +1370,7 @@
     "VariableHelpText": "您可以在命令中使用 {{ key }} 读取内置变量",
     "VariableName": "变量名",
     "VaultHCPMountPoint": "Vault 服务器的挂载点，默认为 jumpserver",
-    "VaultHelpText": "1. 由于安全原因，需要配置文件中开启 Vault 存储。<br>2. 开启后，填写其他配置，进行测试。<br>3. 进行数据同步，同步是单向的，只会从本地数据库同步到远端 Vault，同步完成本地数据库不再存储密码，请备份好数据。<br>4. 二次修改 Vault 配置后需重启服务。",
+    "VaultHelpText": "1. 由于安全原因，需要配置文件中增加参数 VAULT_ENABLED=true 和 VAULT_BACKEND=hcp/azure/aws 以开启 Vault 存储。<br>2. 开启后，填写其他配置，进行测试。<br>3. 进行数据同步，同步是单向的，只会从本地数据库同步到远端 Vault，同步完成本地数据库不再存储密码，请备份好数据。<br>4. 二次修改 Vault 配置后需重启服务。",
     "VerificationCodeSent": "验证码已发送",
     "VerifySignTmpl": "验证码短信模板",
     "Version": "版本",

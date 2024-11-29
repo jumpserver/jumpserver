@@ -14,6 +14,7 @@ from .. import serializers
 class VaultTestingAPI(GenericAPIView):
     backends_serializer = {
         'azure': serializers.AzureKVSerializer,
+        'aws': serializers.AmazonSMSerializer,
         'hcp': serializers.HashicorpKVSerializer
     }
     rbac_perms = {

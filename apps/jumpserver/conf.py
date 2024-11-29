@@ -270,6 +270,10 @@ class Config(dict):
         'VAULT_AZURE_CLIENT_SECRET': '',
         'VAULT_AZURE_TENANT_ID': '',
 
+        'VAULT_AWS_REGION_NAME': '',
+        'VAULT_AWS_ACCESS_KEY_ID': '',
+        'VAULT_AWS_ACCESS_SECRET_KEY': '',
+
         'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
 
         # Cache login password

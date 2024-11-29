@@ -8,3 +8,4 @@ class VaultTypeChoices(models.TextChoices):
     local = 'local', _('Database')
     hcp = 'hcp', _('HCP Vault')
     azure = 'azure', _('Azure Key Vault')
+    aws = 'aws', _('Amazon Secrets Manager')

@@ -1,9 +1,9 @@
 from common.db.utils import get_logger
-from .entries import build_entry
 from .service import VaultKVClient
-from ..base import BaseVault
+from ..base.vault import BaseVault
 
 from ...const import VaultTypeChoices
+
 
 logger = get_logger(__name__)
 
@@ -24,34 +24,25 @@ class Vault(BaseVault):
     def is_active(self):
         return self.client.is_active()
 
-    def _get(self, instance):
-        entry = build_entry(instance)
+    def _get(self, entry):
         # TODO: get data 是不是层数太多了
         data = self.client.get(path=entry.full_path).get('data', {})
-        data = entry.to_external_data(data)
+        data = entry.get_decrypt_secret(data.get('secret'))
         return data
 
-    def _create(self, instance):
-        entry = build_entry(instance)
-        data = entry.to_internal_data()
+    def _create(self, entry):
+        data = {'secret': entry.get_encrypt_secret()}
         self.client.create(path=entry.full_path, data=data)
 
-    def _update(self, instance):
-        entry = build_entry(instance)
-        data = entry.to_internal_data()
+    def _update(self, entry):
+        data = {'secret': entry.get_encrypt_secret()}
         self.client.patch(path=entry.full_path, data=data)
 
-    def _delete(self, instance):
-        entry = build_entry(instance)
+    def _delete(self, entry):
         self.client.delete(path=entry.full_path)
 
-    def _clean_db_secret(self, instance):
-        instance.is_sync_metadata = False
-        instance.mark_secret_save_to_vault()
-
-    def _save_metadata(self, instance, metadata):
+    def _save_metadata(self, entry, metadata):
         try:
-            entry = build_entry(instance)
             self.client.update_metadata(path=entry.full_path, metadata=metadata)
         except Exception as e:
             logger.error(f'save metadata error: {e}')
