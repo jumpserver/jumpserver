@@ -61,17 +61,6 @@ class VaultSettingSerializer(BaseVaultSettingSerializer, serializers.Serializer)
     VAULT_BACKEND = serializers.CharField(
         max_length=16, required=False, label=_('Vault provider'), read_only=True
     )
-    HISTORY_ACCOUNT_CLEAN_LIMIT = serializers.IntegerField(
-        default=999, max_value=999, min_value=1,
-        required=False, label=_('Record limit'),
-        help_text=_(
-            'If the specific value is less than 999 (default), '
-            'the system will automatically perform a task every night: '
-            'check and delete historical accounts that exceed the predetermined number. '
-            'If the value reaches or exceeds 999 (default), '
-            'no historical account deletion will be performed'
-        )
-    )
 
 
 class HashicorpKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):

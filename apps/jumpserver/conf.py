@@ -274,8 +274,6 @@ class Config(dict):
         'VAULT_AWS_ACCESS_KEY_ID': '',
         'VAULT_AWS_ACCESS_SECRET_KEY': '',
 
-        'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
-
         # Cache login password
         'CACHE_LOGIN_PASSWORD_ENABLED': False,
         'CACHE_LOGIN_PASSWORD_TTL': 60 * 60 * 24,
