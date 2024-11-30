@@ -123,7 +123,7 @@ class ConfigCrypto:
             plaintext = self.decrypt(value)
             if plaintext:
                 value = plaintext
-        except Exception as e:
+        except Exception:
             pass
         return value
 
@@ -645,6 +645,7 @@ class Config(dict):
         'JOB_EXECUTION_KEEP_DAYS': 180,
         'PASSWORD_CHANGE_LOG_KEEP_DAYS': 999,
         'ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS': 180,
+        'OLD_HISTORY_KEEP_DAYS': 180,
 
         'TICKETS_ENABLED': True,
         'TICKETS_DIRECT_APPROVE': False,

@@ -52,3 +52,7 @@ class CleaningSerializer(serializers.Serializer):
         min_value=MIN_VALUE, max_value=9999,
         label=_("Change secret and push record retention days (day)"),
     )
+    OLD_HISTORY_KEEP_DAYS = serializers.IntegerField(
+        min_value=MIN_VALUE, max_value=9999,
+        label=_("Remove historical records that have existed for a certain amount of time"),
+    )

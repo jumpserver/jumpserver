@@ -3,6 +3,7 @@
 import datetime
 import os
 import subprocess
+from django.core import management
 
 from celery import shared_task
 from django.conf import settings
@@ -44,6 +45,17 @@ def clean_password_change_log_period():
     expired_day = now - datetime.timedelta(days=days)
     PasswordChangeLog.objects.filter(datetime__lt=expired_day).delete()
     logger.info("Clean password change log done")
+
+def clean_old_history():
+    days = get_log_keep_day('OLD_HISTORY_KEEP_DAYS')
+    logger.info(
+        "Clean old history done, %s",
+        management.call_command(
+            "clean_old_history",
+            auto=True,
+            days=days,
+        ),
+    )
 
 
 def clean_activity_log_period():
@@ -148,7 +160,7 @@ def clean_audits_log_period():
         clean_celery_tasks_period()
         clean_expired_session_period()
         clean_password_change_log_period()
-
+        clean_old_history()
 
 @shared_task(
     verbose_name=_('Upload FTP file to external storage'),
