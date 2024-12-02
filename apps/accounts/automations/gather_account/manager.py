@@ -359,6 +359,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         self.update_gathered_account(ori_account, d)
                     risk_analyser.analyse_risk(asset, ori_account, d)
 
+                self.create_gathered_account.finish()
+                self.update_gathered_account.finish()
                 self.update_gather_accounts_status(asset)
                 GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
         # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步

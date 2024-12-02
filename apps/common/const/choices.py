@@ -76,9 +76,9 @@ class Language(models.TextChoices):
 
 
 class ConfirmOrIgnore(models.TextChoices):
-    pending = '', _('Pending')
-    confirmed = 'confirmed', _('Confirmed')
-    ignored = 'ignored', _('Ignored')
+    pending = '0', _('Pending')
+    confirmed = '1', _('Confirmed')
+    ignored = '2', _('Ignored')
 
 
 COUNTRY_CALLING_CODES = get_country_phone_choices()
