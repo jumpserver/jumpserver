@@ -189,3 +189,19 @@ class UserSessionSerializer(serializers.ModelSerializer):
         if not request:
             return False
         return request.session.session_key == obj.key
+
+
+class ServiceAccessLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ServiceAccessLog
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'remote_addr', 'service', 'service_id', 'asset', 'account', 'datetime'
+        ]
+        fields = fields_small
+        extra_kwargs = {
+            'remote_addr': {'label': _('Remote Address')},
+            'asset': {'label': _('Asset')},
+            'account': {'label': _('Account')},
+            'datetime': {'label': _('Datetime')},
+        }

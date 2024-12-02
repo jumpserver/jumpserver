@@ -297,6 +297,7 @@ class JSONManyToManyField(serializers.JSONField):
         if not data:
             data = {}
         try:
+            data = super().to_internal_value(data)
             ModelJSONManyToManyField.check_value(data)
         except ValueError as e:
             raise serializers.ValidationError(e)

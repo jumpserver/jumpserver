@@ -25,7 +25,7 @@ __all__ = [
     'IDInFilterBackend', "CustomFilterBackend",
     "BaseFilterSet", 'IDNotFilterBackend',
     'NotOrRelFilterBackend', 'LabelFilterBackend',
-    'RewriteOrderingFilter'
+    'RewriteOrderingFilter', 'AttrRulesFilterBackend'
 ]
 
 

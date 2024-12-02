@@ -12,6 +12,7 @@ from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.permissions import IsValidUser
+from common.drf.filters import AttrRulesFilterBackend
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
@@ -24,6 +25,7 @@ __all__ = [
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
     search_fields = ('username', 'name', 'asset__name', 'asset__address', 'comment')
+    extra_filter_backends = [AttrRulesFilterBackend]
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,

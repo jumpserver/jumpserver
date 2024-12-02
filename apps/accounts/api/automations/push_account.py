@@ -45,8 +45,9 @@ class PushAccountRecordViewSet(ChangeSecretRecordViewSet):
     tp = AutomationTypes.push_account
 
     def get_queryset(self):
-        return ChangeSecretRecord.objects.filter(
-            execution__automation__type=AutomationTypes.push_account
+        qs = ChangeSecretRecord.get_valid_records()
+        return qs.objects.filter(
+            execution__automation__type=self.tp
         )
 
 
