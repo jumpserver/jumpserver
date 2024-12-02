@@ -52,7 +52,7 @@ def sync_secret_to_vault():
         for model in to_sync_models:
             instances += list(model.objects.all())
 
-        max_workers = 1 if VaultTypeChoices.azure == vault_client.type else max_workers = 10
+        max_workers = 1 if VaultTypeChoices.azure == vault_client.type else 10
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             tasks = [executor.submit(sync_instance, instance) for instance in instances]
 
