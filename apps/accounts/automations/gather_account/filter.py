@@ -1,6 +1,19 @@
 from django.utils import timezone
+from datetime import datetime
 
 __all__ = ['GatherAccountsFilter']
+
+
+def parse_date(date_str, default=''):
+    if not date_str:
+        return default
+    if date_str == 'Never':
+        return None
+    try:
+        dt = datetime.strptime(date_str, '%Y/%m/%d %H:%M:%S')
+        return timezone.make_aware(dt, timezone.get_current_timezone())
+    except ValueError:
+        return default
 
 
 # TODO 后期会挪到 playbook 中
@@ -101,11 +114,26 @@ class GatherAccountsFilter:
 
     @staticmethod
     def windows_filter(info):
-        info = info[4:-2]
         result = {}
-        for i in info:
-            for username in i.split():
-                result[username] = {}
+        for user_details in info['user_details']:
+            user_info = {}
+            lines = user_details['stdout_lines']
+            for line in lines:
+                if not line.strip():
+                    continue
+                parts = line.split('  ', 1)
+                if len(parts) == 2:
+                    key, value = parts
+                    user_info[key.strip()] = value.strip()
+            user = {
+                'username': user_info.get('User name', ''),
+                'groups': user_info.get('Global Group memberships', ''),
+                'date_password_change': parse_date(user_info.get('Password last set', '')),
+                'date_password_expired': parse_date(user_info.get('Password expires', '')),
+                'date_last_login': parse_date(user_info.get('Last logon', '')),
+                'can_change_password': user_info.get('User may change password', 'Yes')
+            }
+            result[user['username']] = user
         return result
 
     def run(self, method_id_meta_mapper, info):
