@@ -37,7 +37,8 @@ class ChangeSecretRecord(JMSBaseModel):
     old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
     date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
-    date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'))
+    date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'), db_index=True)
+    ignore_fail = models.BooleanField(default=False, verbose_name=_('Ignore fail'))
     status = models.CharField(
         max_length=16, verbose_name=_('Status'), default=ChangeSecretRecordStatusChoice.pending.value
     )
