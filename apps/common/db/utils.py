@@ -8,6 +8,10 @@ from common.utils import get_logger, signer, crypto
 logger = get_logger(__file__)
 
 
+def default_ip_group():
+    return ["*"]
+
+
 def get_object_if_need(model, pk):
     if not isinstance(pk, model):
         try:

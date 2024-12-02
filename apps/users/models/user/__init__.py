@@ -29,7 +29,8 @@ __all__ = [
     "User",
     "UserPasswordHistory",
     "MFAMixin",
-    "AuthMixin"
+    "AuthMixin",
+    "RoleMixin"
 ]
 
 
