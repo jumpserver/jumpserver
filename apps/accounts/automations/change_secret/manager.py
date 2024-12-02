@@ -11,7 +11,7 @@ from accounts.const import (
     AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy, ChangeSecretRecordStatusChoice
 )
 from accounts.models import ChangeSecretRecord, BaseAccountQuerySet
-from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretFailedMsg
+from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretReportMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
 from common.db.utils import safe_db_connection
@@ -183,6 +183,14 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         with safe_db_connection():
             recorder.save(update_fields=['status', 'date_finished'])
             account.save(update_fields=['secret', 'version', 'date_updated'])
+        self.summary['ok_accounts'] += 1
+        self.result['ok_accounts'].append(
+            {
+                "asset": str(account.asset),
+                "username": account.username,
+            }
+        )
+        super().on_host_success(host, result)
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -195,9 +203,14 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             recorder.save()
         except Exception as e:
             print(f"\033[31m Save {host} recorder error: {e} \033[0m\n")
-
-    def on_runner_failed(self, runner, e, **kwargs):
-        logger.error("Account error: ", e)
+        self.summary['fail_accounts'] += 1
+        self.result['fail_accounts'].append(
+            {
+                "asset": str(recorder.asset),
+                "username": recorder.account.username,
+            }
+        )
+        super().on_host_success(host, result)
 
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
@@ -236,24 +249,13 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         if self.record_map:
             return
 
-        failed_recorders = [
-            r for r in recorders
-            if r.status == ChangeSecretRecordStatusChoice.failed.value
-        ]
-
         recipients = self.execution.recipients
         if not recipients:
             return
 
-        if failed_recorders:
-            name = self.execution.snapshot.get('name')
-            execution_id = str(self.execution.id)
-            _ids = [r.id for r in failed_recorders]
-            asset_account_errors = ChangeSecretRecord.objects.filter(
-                id__in=_ids).values_list('asset__name', 'account__username', 'error')
-
-            for user in recipients:
-                ChangeSecretFailedMsg(name, execution_id, user, asset_account_errors).publish()
+        context = self.get_report_context()
+        for user in recipients:
+            ChangeSecretReportMsg(user, context).publish()
 
         if not recorders:
             return
@@ -295,3 +297,6 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 ws.write_string(row_index, col_index, col_data)
         wb.close()
         return True
+
+    def get_report_template(self):
+        return "accounts/change_secret_report.html"
