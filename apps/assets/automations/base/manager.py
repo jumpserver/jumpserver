@@ -140,7 +140,7 @@ class BaseManager:
         recipients = self.execution.recipients
         if not recipients:
             return
-        print("Send report to: ",  ",".join(recipients))
+        print("Send report to: ",  ",".join([str(u) for u in recipients]))
 
         report = self.gen_report()
         report = transform(report)
