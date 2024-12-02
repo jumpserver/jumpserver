@@ -519,7 +519,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
                 cb = runner.run(**kwargs)
                 self.on_runner_success(runner, cb)
             except Exception as e:
-                self.on_runner_failed(runner, e, **runner_info)
+                self.on_runner_failed(runner, e, **info)
             finally:
                 ssh_tunnel.local_gateway_clean(runner)
                 print("\n")

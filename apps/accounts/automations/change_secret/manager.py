@@ -196,7 +196,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         except Exception as e:
             print(f"\033[31m Save {host} recorder error: {e} \033[0m\n")
 
-    def on_runner_failed(self, runner, e):
+    def on_runner_failed(self, runner, e, **kwargs):
         logger.error("Account error: ", e)
 
     def check_secret(self):

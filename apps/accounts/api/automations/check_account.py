@@ -97,20 +97,6 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
             data = {'message': 'Success'}
         return Response(data)
 
-        # 处理风险
-
-    def handle_add_account(self):
-        pass
-
-    def handle_disable_remote(self):
-        pass
-
-    def handle_delete_remote(self):
-        pass
-
-    def handle_delete_both(self):
-        pass
-
 
 class CheckAccountEngineViewSet(JMSModelViewSet):
     search_fields = ('name',)
