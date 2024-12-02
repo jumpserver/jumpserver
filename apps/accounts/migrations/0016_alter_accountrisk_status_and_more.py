@@ -15,12 +15,8 @@ class Migration(migrations.Migration):
             name="status",
             field=models.CharField(
                 blank=True,
-                choices=[
-                    ("", "Pending"),
-                    ("confirmed", "Confirmed"),
-                    ("ignored", "Ignored"),
-                ],
-                default="",
+                choices=[("0", "Pending"), ("1", "Confirmed"), ("2", "Ignored")],
+                default="0",
                 max_length=32,
                 verbose_name="Status",
             ),
@@ -30,12 +26,8 @@ class Migration(migrations.Migration):
             name="status",
             field=models.CharField(
                 blank=True,
-                choices=[
-                    ("", "Pending"),
-                    ("confirmed", "Confirmed"),
-                    ("ignored", "Ignored"),
-                ],
-                default="",
+                choices=[("0", "Pending"), ("1", "Confirmed"), ("2", "Ignored")],
+                default="0",
                 max_length=32,
                 verbose_name="Status",
             ),

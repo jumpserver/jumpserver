@@ -11,7 +11,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0014_gatheraccountsautomation_check_risk'),
+        ('accounts', '0016_alter_accountrisk_status_and_more'),
     ]
 
     operations = [
