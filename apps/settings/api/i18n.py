@@ -7,6 +7,8 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from common.const.choices import Language
+
 
 class ComponentI18nApi(RetrieveAPIView):
     base_path = 'locale'
@@ -26,9 +28,9 @@ class ComponentI18nApi(RetrieveAPIView):
         for file in files:
             if not file.endswith('.json'):
                 continue
-            _lang = file.split('.')[0]
+            lang = file.split('.')[0]
             with open(safe_join(component_dir, file), 'r') as f:
-                data[_lang] = json.load(f)
+                data[lang] = json.load(f)
         self.lang_data[name] = data
         return data
 
@@ -36,11 +38,11 @@ class ComponentI18nApi(RetrieveAPIView):
         name = kwargs.get('name')
         lang = request.query_params.get('lang')
         data = self.get_component_translations(name)
-
         if lang:
-            lang = lang if lang in data.keys() else 'en'
-            data = data.get(lang) or {}
+            code = Language.to_internal_code(lang, with_filename=True)
+            data = data.get(code) or {}
             flat = request.query_params.get('flat', '1')
             if flat == '0':
+                # 这里要使用原始的 lang, lina 会 merge
                 data = {lang: data}
         return Response(data)

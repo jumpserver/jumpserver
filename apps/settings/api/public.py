@@ -29,7 +29,8 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
             "LANGUAGES":  [
                 {
                     'name': title,
-                    'code': code
+                    'code': code,
+                    'other_codes': Language.get_other_codes(code),
                 }
                 for code, title in Language.choices
             ]

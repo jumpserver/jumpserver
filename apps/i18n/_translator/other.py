@@ -36,6 +36,7 @@ class OtherTranslateManager(BaseTranslateManager):
         zh_dict = self.load_json_as_dict()
 
         for file_prefix, target_lang in self.LANG_MAPPER.items():
+            file_prefix = file_prefix.lower()
             other_dict = self.load_json_as_dict(file_prefix)
             need_trans_dict = self.get_need_trans_dict(zh_dict, other_dict)
             print(f'{GREEN}Translate: {self.dir_name} {file_prefix} need to translate '
