@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 15:42+0800\n"
+"POT-Creation-Date: 2024-12-03 11:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,7 +67,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:173
 #: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:66 ops/const.py:74 ops/serializers/celery.py:48
+#: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:80 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -76,7 +76,7 @@ msgstr "Success"
 #: accounts/automations/backup_account/handlers.py:221
 #: accounts/const/account.py:34 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:174 audits/const.py:65
-#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:67
+#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:66
 #: ops/const.py:76 terminal/const.py:81 xpack/plugins/cloud/const.py:47
 msgid "Failed"
 msgstr ""
@@ -234,16 +234,16 @@ msgstr ""
 msgid "Random generate"
 msgstr ""
 
-#: accounts/const/automation.py:52 ops/const.py:15
-msgid "Replace (Replace only keys pushed by JumpServer) "
+#: accounts/const/automation.py:52 ops/const.py:13
+msgid "Append SSH KEY"
 msgstr ""
 
 #: accounts/const/automation.py:53 ops/const.py:14
 msgid "Empty and append SSH KEY"
 msgstr ""
 
-#: accounts/const/automation.py:54 ops/const.py:13
-msgid "Append SSH KEY"
+#: accounts/const/automation.py:54 ops/const.py:15
+msgid "Replace (Replace only keys pushed by JumpServer) "
 msgstr ""
 
 #: accounts/const/automation.py:59
@@ -310,7 +310,7 @@ msgid "SFTP"
 msgstr ""
 
 #: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
-#: common/const/choices.py:64 terminal/const.py:79 tickets/const.py:29
+#: common/const/choices.py:63 terminal/const.py:79 tickets/const.py:29
 #: tickets/const.py:38
 msgid "Pending"
 msgstr ""
@@ -330,6 +330,12 @@ msgstr ""
 
 #: accounts/const/vault.py:11 settings/serializers/feature.py:107
 msgid "Amazon Secrets Manager"
+msgstr ""
+
+#: accounts/exceptions.py:7
+msgid ""
+"Vault operation failed. Please retry or check your account information on "
+"Vault."
 msgstr ""
 
 #: accounts/mixins.py:35
@@ -616,7 +622,7 @@ msgstr ""
 #: assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
-#: authentication/views/base.py:44 common/const/choices.py:68
+#: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr ""
@@ -1123,17 +1129,17 @@ msgstr ""
 
 # msgid "Success"
 # msgstr ""
-#: accounts/signal_handlers.py:51
+#: accounts/signal_handlers.py:52
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr ""
 
-#: accounts/signal_handlers.py:60
+#: accounts/signal_handlers.py:61
 #, python-format
 msgid "Add account: %s"
 msgstr ""
 
-#: accounts/signal_handlers.py:62
+#: accounts/signal_handlers.py:63
 #, python-format
 msgid "Delete account: %s"
 msgstr ""
@@ -1393,7 +1399,7 @@ msgstr ""
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:185 settings/serializers/feature.py:21
-#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr ""
 
@@ -3416,12 +3422,8 @@ msgstr ""
 msgid "Facial comparison failed"
 msgstr ""
 
-#: authentication/mfa/face.py:54
-msgid "Bind face to enable"
-msgstr ""
-
-#: authentication/mfa/face.py:58
-msgid "Unbind face to disable"
+#: authentication/mfa/face.py:53
+msgid "Frontal Face Recognition"
 msgstr ""
 
 #: authentication/mfa/otp.py:7
@@ -4110,48 +4112,28 @@ msgstr ""
 msgid "Request file format may be wrong"
 msgstr ""
 
-#: common/const/choices.py:41
+#: common/const/choices.py:40
 msgid "China"
 msgstr ""
 
-#: common/const/choices.py:58
+#: common/const/choices.py:57
 msgid "Manual trigger"
 msgstr ""
 
-#: common/const/choices.py:59
+#: common/const/choices.py:58
 msgid "Timing trigger"
 msgstr ""
 
-#: common/const/choices.py:63
+#: common/const/choices.py:62
 msgid "Ready"
 msgstr ""
 
-#: common/const/choices.py:65 ops/const.py:73
+#: common/const/choices.py:64 ops/const.py:73
 msgid "Running"
 msgstr ""
 
-#: common/const/choices.py:69
+#: common/const/choices.py:68
 msgid "Canceled"
-msgstr ""
-
-#: common/const/choices.py:121 terminal/models/applet/applet.py:31
-msgid "Community edition"
-msgstr ""
-
-#: common/const/choices.py:122
-msgid "Basic edition"
-msgstr ""
-
-#: common/const/choices.py:123
-msgid "Standard edition"
-msgstr ""
-
-#: common/const/choices.py:124
-msgid "Professional edition"
-msgstr ""
-
-#: common/const/choices.py:125
-msgid "Ultimate edition"
 msgstr ""
 
 #: common/const/common.py:5 xpack/plugins/cloud/manager.py:429
@@ -4667,10 +4649,6 @@ msgstr ""
 msgid "Skip hosts below:"
 msgstr ""
 
-#: ops/api/adhoc.py:32
-msgid "Deleting other people's script is not allowed"
-msgstr ""
-
 #: ops/api/celery.py:66 ops/api/celery.py:81
 msgid "Waiting task start"
 msgstr ""
@@ -4713,10 +4691,6 @@ msgstr ""
 #: ops/api/job.py:236
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
-msgstr ""
-
-#: ops/api/playbook.py:49
-msgid "Deleting other people's playbook is not allowed"
 msgstr ""
 
 #: ops/api/playbook.py:55
@@ -5670,15 +5644,9 @@ msgid "Appearance"
 msgstr ""
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:151
+#: xpack/plugins/license/models.py:152
 msgid "License"
 msgstr ""
-
-#: rbac/tree.py:67
-#, fuzzy
-#| msgid "Session audits"
-msgid "Job audit"
-msgstr "Session"
 
 #: rbac/tree.py:159
 msgid "App organizations"
@@ -6541,22 +6509,7 @@ msgstr ""
 msgid "Tenant ID"
 msgstr ""
 
-#: settings/serializers/feature.py:109 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:107 xpack/plugins/cloud/manager.py:112
-#: xpack/plugins/cloud/models.py:287
-msgid "Region"
-msgstr ""
-
-#: settings/serializers/feature.py:112 terminal/serializers/storage.py:33
-msgid "Access key ID"
-msgstr ""
-
-#: settings/serializers/feature.py:116 terminal/serializers/storage.py:37
-#: xpack/plugins/cloud/serializers/account_attrs.py:20
-msgid "Access key secret"
-msgstr ""
-
-#: settings/serializers/feature.py:121 settings/serializers/feature.py:127
+#: settings/serializers/feature.py:98 settings/serializers/feature.py:104
 msgid "Chat AI"
 msgstr ""
 
@@ -6944,17 +6897,7 @@ msgstr ""
 msgid "Whether to expire the session when the user closes their browser."
 msgstr ""
 
-#: settings/serializers/security.py:206
-msgid "Allow users to view asset session information"
-msgstr ""
-
-#: settings/serializers/security.py:208
-msgid ""
-"When a user connects to an asset, the account selection popup displays the "
-"number of active sessions for the current asset (RDP protocol only)."
-msgstr ""
-
-#: settings/serializers/security.py:214
+#: settings/serializers/security.py:205
 msgid "Max online time (hour)"
 msgstr ""
 
@@ -7605,6 +7548,10 @@ msgstr ""
 msgid "Storage is invalid"
 msgstr ""
 
+#: terminal/models/applet/applet.py:31 xpack/plugins/license/models.py:88
+msgid "Community edition"
+msgstr ""
+
 #: terminal/models/applet/applet.py:32
 msgid "Enterprise"
 msgstr ""
@@ -8182,6 +8129,20 @@ msgstr ""
 
 #: terminal/serializers/storage.py:29
 msgid "Bucket"
+msgstr ""
+
+#: terminal/serializers/storage.py:33
+msgid "Access key ID"
+msgstr ""
+
+#: terminal/serializers/storage.py:37
+#: xpack/plugins/cloud/serializers/account_attrs.py:20
+msgid "Access key secret"
+msgstr ""
+
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:107
+#: xpack/plugins/cloud/manager.py:112 xpack/plugins/cloud/models.py:287
+msgid "Region"
 msgstr ""
 
 #: terminal/serializers/storage.py:112
@@ -9212,11 +9173,7 @@ msgstr ""
 msgid "Can public key authentication"
 msgstr "Can public key authentication"
 
-#: users/serializers/user.py:144
-msgid "Is face code set"
-msgstr ""
-
-#: users/serializers/user.py:247
+#: users/serializers/user.py:242
 msgid "Full name"
 msgstr ""
 
@@ -9537,12 +9494,20 @@ msgstr ""
 msgid "Redirecting to JumpServer Client"
 msgstr ""
 
-#: users/views/profile/face.py:58 users/views/profile/face.py:59
-msgid "Face binding successful"
+#: users/views/profile/face.py:54
+msgid "Face recognition enable success"
 msgstr ""
 
-#: users/views/profile/face.py:81 users/views/profile/face.py:82
-msgid "Face unbinding successful"
+#: users/views/profile/face.py:55
+msgid "Face recognition enable success, return login page"
+msgstr ""
+
+#: users/views/profile/face.py:79
+msgid "Face recognition disable success"
+msgstr ""
+
+#: users/views/profile/face.py:80
+msgid "Face recognition disable success, return login page"
 msgstr ""
 
 #: users/views/profile/otp.py:106
@@ -10402,6 +10367,26 @@ msgstr ""
 
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
+msgstr ""
+
+#: xpack/plugins/license/models.py:80
+msgid "Basic edition"
+msgstr ""
+
+#: xpack/plugins/license/models.py:82
+msgid "Standard edition"
+msgstr ""
+
+#: xpack/plugins/license/models.py:84
+msgid "Professional edition"
+msgstr ""
+
+#: xpack/plugins/license/models.py:86
+msgid "Ultimate edition"
+msgstr ""
+
+#: xpack/plugins/license/models.py:101
+msgid "FIT2CLOUD"
 msgstr ""
 
 #~ msgid "Clean change secret and push record period description"

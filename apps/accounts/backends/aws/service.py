@@ -36,8 +36,7 @@ class AmazonSecretsManagerClient(object):
         try:
             secret = self.client.get_secret_value(**params)['SecretString']
             return secret if secret != self.empty_secret else ''
-        except Exception as e:
-            logger.error(f"Error retrieving secret: {e}")
+        except Exception: # noqa
             return ''
 
     def create(self, name, secret):

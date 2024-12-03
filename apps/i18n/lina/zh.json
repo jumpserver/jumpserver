@@ -83,6 +83,7 @@
     "AllClickRead": "全部已读",
     "AllMembers": "全部成员",
     "AllowInvalidCert": "忽略证书检查",
+    "AmazonSecretsManager": "Amazon Secrets Manager",
     "Announcement": "公告",
     "AnonymousAccount": "匿名账号",
     "AnonymousAccountTip": "连接资产时不使用用户名和密码，仅支持 web类型 和 自定义类型 的资产",

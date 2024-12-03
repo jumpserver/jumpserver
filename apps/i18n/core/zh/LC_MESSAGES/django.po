@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 15:42+0800\n"
+"POT-Creation-Date: 2024-12-03 11:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -66,7 +66,7 @@ msgstr "完成"
 #: accounts/serializers/automations/change_secret.py:173
 #: assets/serializers/automations/base.py:52 audits/const.py:64
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:66 ops/const.py:74 ops/serializers/celery.py:48
+#: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
 #: terminal/const.py:80 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -75,7 +75,7 @@ msgstr "成功"
 #: accounts/automations/backup_account/handlers.py:221
 #: accounts/const/account.py:34 accounts/const/automation.py:109
 #: accounts/serializers/automations/change_secret.py:174 audits/const.py:65
-#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:67
+#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:66
 #: ops/const.py:76 terminal/const.py:81 xpack/plugins/cloud/const.py:47
 msgid "Failed"
 msgstr "失败"
@@ -309,7 +309,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:111 assets/serializers/automations/base.py:54
-#: common/const/choices.py:64 terminal/const.py:79 tickets/const.py:29
+#: common/const/choices.py:63 terminal/const.py:79 tickets/const.py:29
 #: tickets/const.py:38
 msgid "Pending"
 msgstr "待定的"
@@ -329,7 +329,13 @@ msgstr "Azure Key Vault"
 
 #: accounts/const/vault.py:11 settings/serializers/feature.py:107
 msgid "Amazon Secrets Manager"
-msgstr ""
+msgstr "Amazon Secrets Manager"
+
+#: accounts/exceptions.py:7
+msgid ""
+"Vault operation failed. Please retry or check your account information on "
+"Vault."
+msgstr "Vault 操作失败，请重试，或者检查 Vault 上的账号信息。"
 
 #: accounts/mixins.py:35
 msgid "Export all"
@@ -615,7 +621,7 @@ msgstr "状态"
 #: assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
-#: authentication/views/base.py:44 common/const/choices.py:68
+#: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr "错误"
@@ -1140,17 +1146,17 @@ msgstr "参数设置，目前只对 AIX LINUX UNIX 类型的资产有效。"
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/signal_handlers.py:51
+#: accounts/signal_handlers.py:52
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr "推送账号到资产: %s, 由系统执行"
 
-#: accounts/signal_handlers.py:60
+#: accounts/signal_handlers.py:61
 #, python-format
 msgid "Add account: %s"
 msgstr "添加账号: %s"
 
-#: accounts/signal_handlers.py:62
+#: accounts/signal_handlers.py:63
 #, python-format
 msgid "Delete account: %s"
 msgstr "删除账号: %s"
@@ -1419,7 +1425,7 @@ msgstr "正则表达式"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:185 settings/serializers/feature.py:21
-#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr "内容"
 
@@ -3469,15 +3475,9 @@ msgstr "人脸识别"
 msgid "Facial comparison failed"
 msgstr "人脸比对失败"
 
-#: authentication/mfa/face.py:54
-#, fuzzy
-#| msgid "Gather facts enabled"
-msgid "Bind face to enable"
-msgstr "启用收集资产信息"
-
-#: authentication/mfa/face.py:58
-msgid "Unbind face to disable"
-msgstr ""
+#: authentication/mfa/face.py:57
+msgid "Frontal Face Recognition"
+msgstr "正面人脸识别"
 
 #: authentication/mfa/otp.py:7
 msgid "OTP code invalid, or server time error"
@@ -4168,47 +4168,48 @@ msgstr "请使用密码登录，然后绑定企业微信"
 msgid "Request file format may be wrong"
 msgstr "上传的文件格式错误 或 其它类型资源的文件"
 
-#: common/const/choices.py:41
+#: common/const/choices.py:40
 msgid "China"
 msgstr "中国"
 
-#: common/const/choices.py:58
+#: common/const/choices.py:57
 msgid "Manual trigger"
 msgstr "手动触发"
 
-#: common/const/choices.py:59
+#: common/const/choices.py:58
 msgid "Timing trigger"
 msgstr "定时触发"
 
-#: common/const/choices.py:63
+#: common/const/choices.py:62
 msgid "Ready"
 msgstr "准备"
 
-#: common/const/choices.py:65 ops/const.py:73
+#: common/const/choices.py:64 ops/const.py:73
 msgid "Running"
 msgstr "运行中"
 
-#: common/const/choices.py:69
+#: common/const/choices.py:68
 msgid "Canceled"
 msgstr "取消"
 
-#: common/const/choices.py:121 terminal/models/applet/applet.py:31
+#: common/const/choices.py:82 terminal/models/applet/applet.py:31
+#: xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "社区版"
 
-#: common/const/choices.py:122
+#: common/const/choices.py:83 xpack/plugins/license/models.py:80
 msgid "Basic edition"
 msgstr "企业基础版"
 
-#: common/const/choices.py:123
+#: common/const/choices.py:84 xpack/plugins/license/models.py:82
 msgid "Standard edition"
 msgstr "企业标准版"
 
-#: common/const/choices.py:124
+#: common/const/choices.py:85 xpack/plugins/license/models.py:84
 msgid "Professional edition"
 msgstr "企业专业版"
 
-#: common/const/choices.py:125
+#: common/const/choices.py:86 xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
 
@@ -5757,7 +5758,7 @@ msgid "Appearance"
 msgstr "界面"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:151
+#: xpack/plugins/license/models.py:152
 msgid "License"
 msgstr "许可证"
 
@@ -6663,22 +6664,7 @@ msgstr "挂载点"
 msgid "Tenant ID"
 msgstr "租户 ID"
 
-#: settings/serializers/feature.py:109 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:107 xpack/plugins/cloud/manager.py:112
-#: xpack/plugins/cloud/models.py:287
-msgid "Region"
-msgstr "地域"
-
-#: settings/serializers/feature.py:112 terminal/serializers/storage.py:33
-msgid "Access key ID"
-msgstr "Access key ID(AK)"
-
-#: settings/serializers/feature.py:116 terminal/serializers/storage.py:37
-#: xpack/plugins/cloud/serializers/account_attrs.py:20
-msgid "Access key secret"
-msgstr "Access key secret(SK)"
-
-#: settings/serializers/feature.py:121 settings/serializers/feature.py:127
+#: settings/serializers/feature.py:107 settings/serializers/feature.py:113
 msgid "Chat AI"
 msgstr "聊天 AI"
 
@@ -8379,6 +8365,20 @@ msgstr "端点无效: 移除路径 `{}`"
 msgid "Bucket"
 msgstr "桶名称"
 
+#: terminal/serializers/storage.py:33
+msgid "Access key ID"
+msgstr "Access key ID(AK)"
+
+#: terminal/serializers/storage.py:37
+#: xpack/plugins/cloud/serializers/account_attrs.py:20
+msgid "Access key secret"
+msgstr "Access key secret(SK)"
+
+#: terminal/serializers/storage.py:68 xpack/plugins/cloud/manager.py:107
+#: xpack/plugins/cloud/manager.py:112 xpack/plugins/cloud/models.py:287
+msgid "Region"
+msgstr "地域"
+
 #: terminal/serializers/storage.py:112
 msgid "Container name"
 msgstr "容器名称"
@@ -9427,13 +9427,7 @@ msgstr "组织管理员"
 msgid "Can public key authentication"
 msgstr "可以使用公钥认证"
 
-#: users/serializers/user.py:144
-#, fuzzy
-#| msgid "Instance count"
-msgid "Is face code set"
-msgstr "实例个数"
-
-#: users/serializers/user.py:247
+#: users/serializers/user.py:242
 msgid "Full name"
 msgstr "全称"
 
@@ -9766,17 +9760,21 @@ msgstr "认证成功"
 msgid "Redirecting to JumpServer Client"
 msgstr "重定向到 JumpServer 客户端"
 
-#: users/views/profile/face.py:58 users/views/profile/face.py:59
-#, fuzzy
-#| msgid "Binding %s successfully"
-msgid "Face binding successful"
-msgstr "绑定 %s 成功"
+#: users/views/profile/face.py:61
+msgid "Face recognition enable success"
+msgstr "MFA(人脸识别) 开启成功"
 
-#: users/views/profile/face.py:81 users/views/profile/face.py:82
-#, fuzzy
-#| msgid "Binding %s successfully"
-msgid "Face unbinding successful"
-msgstr "绑定 %s 成功"
+#: users/views/profile/face.py:62
+msgid "Face recognition enable success, return login page"
+msgstr "MFA(人脸识别) 启用成功，返回到登录页面"
+
+#: users/views/profile/face.py:86
+msgid "Face recognition disable success"
+msgstr "MFA(人脸识别) 禁用成功"
+
+#: users/views/profile/face.py:87
+msgid "Face recognition disable success, return login page"
+msgstr "MFA(人脸识别) 禁用成功，返回登录页面"
 
 #: users/views/profile/otp.py:106
 msgid "Already bound"
@@ -10643,21 +10641,6 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
-
-#~ msgid "Frontal Face Recognition"
-#~ msgstr "正面人脸识别"
-
-#~ msgid "Face recognition enable success"
-#~ msgstr "MFA(人脸识别) 开启成功"
-
-#~ msgid "Face recognition enable success, return login page"
-#~ msgstr "MFA(人脸识别) 启用成功，返回到登录页面"
-
-#~ msgid "Face recognition disable success"
-#~ msgstr "MFA(人脸识别) 禁用成功"
-
-#~ msgid "Face recognition disable success, return login page"
-#~ msgstr "MFA(人脸识别) 禁用成功，返回登录页面"
 
 #, fuzzy
 #~| msgid "Have online sessions"

@@ -113,7 +113,7 @@ class AmazonSMSerializer(serializers.Serializer):
     )
     VAULT_AWS_ACCESS_SECRET_KEY = EncryptedField(
         max_length=1024, required=False, allow_blank=True,
-        label=_('Access key secret'), allow_null=True,
+        label=_('Access key secret'), default=''
     )
 
 

@@ -83,6 +83,7 @@
     "AllClickRead": "すべて既読",
     "AllMembers": "全メンバー",
     "AllowInvalidCert": "証明書チェックを無視",
+    "AmazonSecretsManager": "Amazon Secrets Manager",
     "Announcement": "お知らせ",
     "AnonymousAccount": "匿名アカウント",
     "AnonymousAccountTip": "ユーザー名とパスワードを使わずに資産に接続し、Webタイプとカスタムタイプの資産のみをサポートします",
