@@ -125,6 +125,7 @@ class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
         ("list", "accounts.view_changesecretexecution"),
         ("retrieve", "accounts.view_changesecretexecution"),
         ("create", "accounts.add_changesecretexecution"),
+        ("report", "accounts.view_changesecretexecution"),
     )
 
     tp = AutomationTypes.change_secret
