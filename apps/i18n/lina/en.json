@@ -1243,7 +1243,7 @@
   "TestLdapLoginTitle": "Test ldap user login",
   "TestNodeAssetConnectivity": "Test assets connectivity of node",
   "TestPortErrorMsg": "Port error, please re-enter",
-  "TestSelected": "Test selected",
+  "TestSelected": "Verify selected",
   "TestSuccessMsg": "Test succeeded",
   "Thursday": "Thu",
   "Ticket": "Ticket",

@@ -433,3 +433,8 @@ def convert_html_to_markdown(html_str):
     markdown = markdown.replace('\n\n', '\n')
     markdown = markdown.replace('\n ', '\n')
     return markdown
+
+
+def many_get(d, keys, default=None):
+    res = [d.get(key, default) for key in keys]
+    return res

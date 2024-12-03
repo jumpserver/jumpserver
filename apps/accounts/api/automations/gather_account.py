@@ -80,7 +80,7 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         asset_id = request.data.get("asset_id")
         username = request.data.get("username")
         asset = get_object_or_404(Asset, pk=asset_id)
-        handler = RiskHandler(asset, username)
+        handler = RiskHandler(asset, username, request=self.request)
         handler.handle_delete_remote()
         return Response(status=status.HTTP_200_OK)
 

@@ -15,6 +15,7 @@ from premailer import transform
 from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
+from common.const import Status
 from common.db.utils import safe_db_connection
 from common.tasks import send_mail_async
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
@@ -97,13 +98,15 @@ class BaseManager:
         self.summary = defaultdict(int)
         self.result = defaultdict(list)
         self.duration = 0
+        self.status = 'success'
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
 
     def pre_run(self):
         self.execution.date_start = timezone.now()
-        self.execution.save(update_fields=["date_start"])
+        self.execution.status = Status.running
+        self.execution.save(update_fields=["date_start", "status"])
 
     def update_execution(self):
         self.duration = int(time.time() - self.time_start)
@@ -111,7 +114,7 @@ class BaseManager:
         self.execution.duration = self.duration
         self.execution.summary = self.summary
         self.execution.result = self.result
-        self.execution.status = "success"
+        self.execution.status = self.status
 
         with safe_db_connection():
             self.execution.save()
@@ -161,8 +164,12 @@ class BaseManager:
 
     def run(self, *args, **kwargs):
         self.pre_run()
-        self.do_run(*args, **kwargs)
-        self.post_run()
+        try:
+            self.do_run(*args, **kwargs)
+        except:
+            self.status = 'error'
+        finally:
+            self.post_run()
 
     def do_run(self, *args, **kwargs):
         raise NotImplementedError
@@ -365,6 +372,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def __init__(self, execution):
         super().__init__(execution)
         self.params = execution.snapshot.get("params", {})
+        self.host_success_callbacks = []
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
@@ -451,6 +459,9 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self.summary["ok_assets"] += 1
         self.result["ok_assets"].append(host)
 
+        for cb in self.host_success_callbacks:
+            cb(host, result)
+
     def on_host_error(self, host, error, result):
         self.summary["fail_assets"] += 1
         self.result["fail_assets"].append((host, str(error)))
@@ -463,6 +474,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         error = hosts.get(host, "")
         detail = result.get("failures", "") or result.get("dark", "")
         self.on_host_error(host, error, detail)
+
+    def post_run(self):
+        if self.summary['fail_assets']:
+            self.status = 'failed'
+        super().post_run()
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary

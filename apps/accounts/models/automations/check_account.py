@@ -3,6 +3,7 @@ from itertools import islice
 from django.db import models
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from common.const import ConfirmOrIgnore
 from common.db.models import JMSBaseModel
@@ -67,6 +68,15 @@ class AccountRisk(JMSOrgBaseModel):
 
     def __str__(self):
         return f"{self.username}@{self.asset} - {self.risk}"
+
+    def set_status(self, status, user):
+        self.status = status
+        self.details.append({'date': timezone.now().isoformat(), 'message': f'{user.username} set status to {status}'})
+        self.save()
+
+    def update_details(self, message, user):
+        self.details.append({'date': timezone.now().isoformat(), 'message': f'{user.username} {message}'})
+        self.save(update_fields=['details'])
 
     @classmethod
     def gen_fake_data(cls, count=1000, batch_size=50):

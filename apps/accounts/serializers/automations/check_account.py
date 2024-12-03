@@ -11,6 +11,7 @@ from accounts.models import (
     CheckAccountEngine,
 )
 from assets.models import Asset
+from common.const import ConfirmOrIgnore
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
@@ -33,6 +34,9 @@ class AccountRiskSerializer(serializers.ModelSerializer):
     )
     risk = LabeledChoiceField(
         choices=RiskChoice.choices, required=False, read_only=True, label=_("Risk")
+    )
+    status = LabeledChoiceField(
+        choices=ConfirmOrIgnore.choices, required=False, label=_("Status")
     )
 
     class Meta:

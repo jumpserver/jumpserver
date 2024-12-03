@@ -90,14 +90,14 @@ def check_account_secrets(accounts, assets):
         origin_risk = origin_risks_dict.get(key)
 
         if origin_risk:
-            origin_risk.details.append({"datetime": now})
+            origin_risk.details.append({"datetime": now, 'type': 'refind'})
             update_risk(origin_risk)
         else:
             create_risk({
                 "asset": d["account"].asset,
                 "username": d["account"].username,
                 "risk": d["risk"],
-                "details": [{"datetime": now}],
+                "details": [{"datetime": now, 'type': 'init'}],
             })
     return summary, result
 
