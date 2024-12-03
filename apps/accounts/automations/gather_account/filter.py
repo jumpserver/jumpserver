@@ -213,6 +213,22 @@ class GatherAccountsFilter:
             result[user['username']] = user
         return result
 
+    @staticmethod
+    def mongodb_filter(info):
+        result = {}
+        for db, users in info.items():
+            for username, user_info in users.items():
+                user = {
+                    'username': username,
+                    'date_password_change': None,
+                    'date_password_expired': None,
+                    'date_last_login': None,
+                    'groups': '',
+                }
+                result['detail'] = {'db': db, 'roles': user_info.get('roles', [])}
+                result[username] = user
+        return result
+
     def run(self, method_id_meta_mapper, info):
         run_method_name = None
         for k, v in method_id_meta_mapper.items():
