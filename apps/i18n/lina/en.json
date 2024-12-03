@@ -83,6 +83,7 @@
     "AllClickRead": "Mark all as read",
     "AllMembers": "All members",
     "AllowInvalidCert": "Ignore certificate check",
+    "AmazonSecretsManager": "Amazon Secrets Manager",
     "Announcement": "Announcement",
     "AnonymousAccount": "Anonymous account",
     "AnonymousAccountTip": "Connect to assets without using username and password, only support web type and custom type assets",

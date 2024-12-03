@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 14:58+0800\n"
+"POT-Creation-Date: 2024-12-03 11:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -131,7 +131,7 @@ msgstr ">>> 开始执行测试网关账号可连接性任务"
 #: settings/serializers/auth/ldap_ha.py:34 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:28 terminal/serializers/storage.py:123
 #: terminal/serializers/storage.py:142 users/forms/profile.py:22
-#: users/serializers/user.py:144
+#: users/serializers/user.py:148
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -326,6 +326,16 @@ msgstr "HashiCorp Vault"
 #: accounts/const/vault.py:10 settings/serializers/feature.py:91
 msgid "Azure Key Vault"
 msgstr "Azure Key Vault"
+
+#: accounts/const/vault.py:11 settings/serializers/feature.py:107
+msgid "Amazon Secrets Manager"
+msgstr "Amazon Secrets Manager"
+
+#: accounts/exceptions.py:7
+msgid ""
+"Vault operation failed. Please retry or check your account information on "
+"Vault."
+msgstr "Vault 操作失败，请重试，或者检查 Vault 上的账号信息。"
 
 #: accounts/mixins.py:35
 msgid "Export all"
@@ -749,7 +759,7 @@ msgstr "特权账号"
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:41
-#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:269
+#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:274
 msgid "Is active"
 msgstr "激活"
 
@@ -1136,17 +1146,17 @@ msgstr "参数设置，目前只对 AIX LINUX UNIX 类型的资产有效。"
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/signal_handlers.py:51
+#: accounts/signal_handlers.py:52
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr "推送账号到资产: %s, 由系统执行"
 
-#: accounts/signal_handlers.py:60
+#: accounts/signal_handlers.py:61
 #, python-format
 msgid "Add account: %s"
 msgstr "添加账号: %s"
 
-#: accounts/signal_handlers.py:62
+#: accounts/signal_handlers.py:63
 #, python-format
 msgid "Delete account: %s"
 msgstr "删除账号: %s"
@@ -1388,7 +1398,7 @@ msgstr "激活中"
 
 #: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
-#: users/serializers/group.py:21 users/serializers/user.py:432
+#: users/serializers/group.py:21 users/serializers/user.py:437
 msgid "Users"
 msgstr "用户"
 
@@ -1415,7 +1425,7 @@ msgstr "正则表达式"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:185 settings/serializers/feature.py:21
-#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr "内容"
 
@@ -2031,7 +2041,7 @@ msgstr "忽略证书校验"
 msgid "Postgresql SSL mode"
 msgstr "PostgreSQL SSL 模式"
 
-#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:123
+#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:137
 msgid "Proxy"
 msgstr "代理"
 
@@ -3179,7 +3189,7 @@ msgid "App Authentication"
 msgstr "认证管理"
 
 #: authentication/backends/custom.py:59
-#: authentication/backends/oauth2/backends.py:173
+#: authentication/backends/oauth2/backends.py:158
 msgid "User invalid, disabled or expired"
 msgstr "用户无效，已禁用或已过期"
 
@@ -3457,11 +3467,11 @@ msgstr "自定义 MFA 验证码"
 msgid "MFA custom global enabled, cannot disable"
 msgstr "自定义 MFA 全局开启，无法被禁用"
 
-#: authentication/mfa/face.py:14
+#: authentication/mfa/face.py:11
 msgid "Face Recognition"
 msgstr "人脸识别"
 
-#: authentication/mfa/face.py:24 authentication/mfa/face.py:26
+#: authentication/mfa/face.py:21 authentication/mfa/face.py:23
 msgid "Facial comparison failed"
 msgstr "人脸比对失败"
 
@@ -3720,7 +3730,7 @@ msgstr "动作"
 
 #: authentication/serializers/connection_token.py:42
 #: perms/serializers/permission.py:54 perms/serializers/permission.py:75
-#: users/serializers/user.py:127 users/serializers/user.py:273
+#: users/serializers/user.py:127 users/serializers/user.py:278
 msgid "Is expired"
 msgstr "已过期"
 
@@ -3763,7 +3773,7 @@ msgstr "IP 白名单"
 
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:53
 #: perms/serializers/permission.py:76 users/serializers/user.py:128
-#: users/serializers/user.py:270
+#: users/serializers/user.py:275
 msgid "Is valid"
 msgstr "是否有效"
 
@@ -3836,7 +3846,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:535
+#: jumpserver/conf.py:539
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -4183,22 +4193,23 @@ msgid "Canceled"
 msgstr "取消"
 
 #: common/const/choices.py:82 terminal/models/applet/applet.py:31
+#: xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "社区版"
 
-#: common/const/choices.py:83
+#: common/const/choices.py:83 xpack/plugins/license/models.py:80
 msgid "Basic edition"
 msgstr "企业基础版"
 
-#: common/const/choices.py:84
+#: common/const/choices.py:84 xpack/plugins/license/models.py:82
 msgid "Standard edition"
 msgstr "企业标准版"
 
-#: common/const/choices.py:85
+#: common/const/choices.py:85 xpack/plugins/license/models.py:84
 msgid "Professional edition"
 msgstr "企业专业版"
 
-#: common/const/choices.py:86
+#: common/const/choices.py:86 xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
 
@@ -4603,16 +4614,16 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:529
+#: jumpserver/conf.py:533
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
-#: jumpserver/conf.py:534
+#: jumpserver/conf.py:538
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:536
+#: jumpserver/conf.py:540
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -4843,7 +4854,7 @@ msgid "VCS"
 msgstr "VCS"
 
 #: ops/const.py:38 ops/models/adhoc.py:44 ops/models/variable.py:26
-#: settings/serializers/feature.py:154
+#: settings/serializers/feature.py:168
 msgid "Adhoc"
 msgstr "命令"
 
@@ -5469,7 +5480,7 @@ msgid "today"
 msgstr "今天"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:145
+#: settings/serializers/feature.py:159
 msgid "day"
 msgstr "天"
 
@@ -5501,7 +5512,7 @@ msgstr ""
 msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
 msgstr "协议，格式为 [\"ssh\", \"rdp\", \"vnc\"] 或 [\"all\"]"
 
-#: perms/serializers/permission.py:44 users/serializers/user.py:257
+#: perms/serializers/permission.py:44 users/serializers/user.py:262
 msgid "Groups"
 msgstr "用户组"
 
@@ -5724,7 +5735,7 @@ msgstr "账号改密"
 msgid "App ops"
 msgstr "作业中心"
 
-#: rbac/tree.py:57 settings/serializers/feature.py:151
+#: rbac/tree.py:57 settings/serializers/feature.py:165
 msgid "Feature"
 msgstr "功能"
 
@@ -5747,7 +5758,7 @@ msgid "Appearance"
 msgstr "界面"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:151
+#: xpack/plugins/license/models.py:152
 msgid "License"
 msgstr "许可证"
 
@@ -5763,8 +5774,8 @@ msgstr "组织管理"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:161 settings/serializers/feature.py:132
-#: settings/serializers/feature.py:134 tickets/models/ticket/general.py:308
+#: rbac/tree.py:161 settings/serializers/feature.py:146
+#: settings/serializers/feature.py:148 tickets/models/ticket/general.py:308
 msgid "Ticket"
 msgstr "工单"
 
@@ -5782,7 +5793,7 @@ msgstr "聊天 AI 没有开启"
 
 #: settings/api/chat.py:79 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
-#: settings/api/vault.py:48 settings/api/wecom.py:37
+#: settings/api/vault.py:49 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "测试成功"
 
@@ -6428,7 +6439,7 @@ msgid "Template code"
 msgstr "模板"
 
 #: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:83
-#: users/serializers/user.py:155
+#: users/serializers/user.py:159
 msgid "Phone"
 msgstr "手机"
 
@@ -6657,70 +6668,70 @@ msgstr "租户 ID"
 msgid "Chat AI"
 msgstr "聊天 AI"
 
-#: settings/serializers/feature.py:116
+#: settings/serializers/feature.py:130
 msgid "GPT Base URL"
 msgstr "GPT 地址"
 
-#: settings/serializers/feature.py:117
+#: settings/serializers/feature.py:131
 msgid "The base URL of the GPT service. For example: https://api.openai.com/v1"
 msgstr "GPT 服务的基本 URL。例如：https://api.openai.com/v1"
 
-#: settings/serializers/feature.py:120 templates/_header_bar.html:96
+#: settings/serializers/feature.py:134 templates/_header_bar.html:96
 msgid "API Key"
 msgstr "API Key"
 
-#: settings/serializers/feature.py:124
+#: settings/serializers/feature.py:138
 msgid ""
 "The proxy server address of the GPT service. For example: http://ip:port"
 msgstr "GPT 服务的代理服务器地址。例如：http://ip:port"
 
-#: settings/serializers/feature.py:127
+#: settings/serializers/feature.py:141
 msgid "GPT Model"
 msgstr "GPT 模型"
 
-#: settings/serializers/feature.py:136
+#: settings/serializers/feature.py:150
 msgid "Approval without login"
 msgstr "免登录审批"
 
-#: settings/serializers/feature.py:137
+#: settings/serializers/feature.py:151
 msgid "Allow direct approval ticket without login"
 msgstr "允许无需登录直接批准工单"
 
-#: settings/serializers/feature.py:141
+#: settings/serializers/feature.py:155
 msgid "Period"
 msgstr "时段"
 
-#: settings/serializers/feature.py:142
+#: settings/serializers/feature.py:156
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr "工单申请资产的默认授权时间段"
 
-#: settings/serializers/feature.py:145
+#: settings/serializers/feature.py:159
 msgid "hour"
 msgstr "时"
 
-#: settings/serializers/feature.py:146
+#: settings/serializers/feature.py:160
 msgid "Unit"
 msgstr "单位"
 
-#: settings/serializers/feature.py:146
+#: settings/serializers/feature.py:160
 msgid "The unit of period"
 msgstr "执行周期"
 
-#: settings/serializers/feature.py:155
+#: settings/serializers/feature.py:169
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr "允许用户在工作台 - 作业中心 - Adhoc 中执行批量命令"
 
-#: settings/serializers/feature.py:159
+#: settings/serializers/feature.py:173
 msgid "Command blacklist"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/feature.py:160
+#: settings/serializers/feature.py:174
 msgid "Command blacklist in Adhoc"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/feature.py:165
+#: settings/serializers/feature.py:179
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -6728,11 +6739,11 @@ msgstr "作业中心命令黑名单"
 msgid "Virtual app"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:168
+#: settings/serializers/feature.py:182
 msgid "Virtual App"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:170
+#: settings/serializers/feature.py:184
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -9160,7 +9171,7 @@ msgstr "不能和原来的密钥相同"
 msgid "Preference"
 msgstr "用户设置"
 
-#: users/models/user/__init__.py:76 users/serializers/user.py:271
+#: users/models/user/__init__.py:76 users/serializers/user.py:276
 msgid "Is service account"
 msgstr "服务账号"
 
@@ -9179,7 +9190,7 @@ msgstr "OTP 密钥"
 # msgid "Private key"
 # msgstr "ssh私钥"
 #: users/models/user/__init__.py:99 users/serializers/profile.py:97
-#: users/serializers/user.py:268
+#: users/serializers/user.py:273
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -9400,7 +9411,7 @@ msgstr "强制 MFA"
 msgid "Login blocked"
 msgstr "登录被锁定"
 
-#: users/serializers/user.py:130 users/serializers/user.py:277
+#: users/serializers/user.py:130 users/serializers/user.py:282
 msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
@@ -9420,19 +9431,19 @@ msgstr "可以使用公钥认证"
 msgid "Full name"
 msgstr "全称"
 
-#: users/serializers/user.py:245
+#: users/serializers/user.py:250
 msgid "Login username"
 msgstr "登录用户"
 
-#: users/serializers/user.py:248
+#: users/serializers/user.py:253
 msgid "Email address"
 msgstr "邮件地址"
 
-#: users/serializers/user.py:258
+#: users/serializers/user.py:263
 msgid "User groups to join"
 msgstr "用户组数量"
 
-#: users/serializers/user.py:262
+#: users/serializers/user.py:267
 msgid ""
 "User source identifies where the user was created, which could be AD or "
 "other sources.There are security settings that can restrict users to log in "
@@ -9441,32 +9452,32 @@ msgstr ""
 "用户来源标识用户的创建位置，可以是 AD 或其他来源。安全设置可以限制用户只能从"
 "指定来源登录系统。"
 
-#: users/serializers/user.py:266
+#: users/serializers/user.py:271
 msgid "Superuser"
 msgstr "超级用户"
 
-#: users/serializers/user.py:272
+#: users/serializers/user.py:277
 msgid "Is org admin"
 msgstr "组织管理员"
 
-#: users/serializers/user.py:274
+#: users/serializers/user.py:279
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:279
+#: users/serializers/user.py:284
 msgid "MFA level"
 msgstr "MFA"
 
-#: users/serializers/user.py:280
+#: users/serializers/user.py:285
 msgid "Multi-Factor Authentication"
 msgstr "认证"
 
-#: users/serializers/user.py:434
+#: users/serializers/user.py:439
 msgid ""
 "* For security, only a partial of users is displayed. You can search for more"
 msgstr "* 为安全起见，只显示部分用户。您可以搜索更多"
 
-#: users/serializers/user.py:469
+#: users/serializers/user.py:474
 msgid "name not unique"
 msgstr "名称重复"
 
