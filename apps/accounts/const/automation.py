@@ -28,13 +28,14 @@ class AutomationTypes(models.TextChoices):
     gather_accounts = 'gather_accounts', _('Gather accounts')
     verify_gateway_account = 'verify_gateway_account', _('Verify gateway account')
     check_account = 'check_account', _('Check account')
+    backup_account = 'backup_account', _('Backup account')
 
     @classmethod
     def get_type_model(cls, tp):
         from accounts.models import (
             PushAccountAutomation, ChangeSecretAutomation,
             VerifyAccountAutomation, GatherAccountsAutomation,
-            CheckAccountAutomation,
+            CheckAccountAutomation, BackupAccountAutomation
         )
         type_model_dict = {
             cls.push_account: PushAccountAutomation,
@@ -42,6 +43,7 @@ class AutomationTypes(models.TextChoices):
             cls.verify_account: VerifyAccountAutomation,
             cls.gather_accounts: GatherAccountsAutomation,
             cls.check_account: CheckAccountAutomation,
+            cls.backup_account: BackupAccountAutomation,
         }
         return type_model_dict.get(tp)
 

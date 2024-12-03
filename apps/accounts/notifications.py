@@ -9,7 +9,7 @@ from terminal.models.component.storage import ReplayStorage
 from users.models import User
 
 
-class AccountBackupExecutionTaskMsg(object):
+class AccountBackupExecutionTaskMsg:
     subject = _('Notification of account backup route task results')
 
     def __init__(self, name: str, user: User):
@@ -34,7 +34,7 @@ class AccountBackupExecutionTaskMsg(object):
         )
 
 
-class AccountBackupByObjStorageExecutionTaskMsg(object):
+class AccountBackupByObjStorageExecutionTaskMsg:
     subject = _('Notification of account backup route task results')
 
     def __init__(self, name: str, obj_storage: ReplayStorage):
@@ -53,7 +53,7 @@ class AccountBackupByObjStorageExecutionTaskMsg(object):
         )
 
 
-class ChangeSecretExecutionTaskMsg(object):
+class ChangeSecretExecutionTaskMsg:
     subject = _('Notification of implementation result of encryption change plan')
 
     def __init__(self, name: str, user: User, summary):
