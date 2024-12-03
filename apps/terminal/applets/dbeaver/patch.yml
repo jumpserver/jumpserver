@@ -1,5 +1,5 @@
 type: msi # exe, zip, manual, msi
-source: jms:///download/applets/dbeaver-patch.msi
+source: jms:///download/applets/dbeaver-patch-22.3.4-x86_64-setup.msi
 arguments:
   - /quiet
 destination:
