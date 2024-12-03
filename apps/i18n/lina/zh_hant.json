@@ -109,6 +109,7 @@
     "AllMembers": "全部成員",
     "AllOrganization": "組織列表",
     "AllowInvalidCert": "忽略證書檢查",
+    "AmazonSecretsManager": "Amazon Secrets Manager",
     "Announcement": "公告",
     "AnonymousAccount": "匿名帳號",
     "AnonymousAccountTip": "連接資產時不使用使用者名稱和密碼，僅支持 web類型 和 自訂類型 的資產",
