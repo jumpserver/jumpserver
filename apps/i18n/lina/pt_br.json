@@ -83,6 +83,7 @@
     "AllClickRead": "Tudo já lido",
     "AllMembers": "Todos os membros",
     "AllowInvalidCert": "Ignorar verificação de certificado",
+    "AmazonSecretsManager": "Segredos da Amazon Manager",
     "Announcement": "Anúncio",
     "AnonymousAccount": "Conta anônima",
     "AnonymousAccountTip": "Conectar-se a ativos sem usar nome de usuário e senha, apenas são suportados ativos de tipo web e de tipo personalizado",
