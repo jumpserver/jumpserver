@@ -3,6 +3,7 @@ import pycountry
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumbers import PhoneMetadata
+from common.utils import lazyproperty
 
 ADMIN = 'Admin'
 USER = 'User'
@@ -72,7 +73,38 @@ class Language(models.TextChoices):
     en = 'en', 'English'
     zh_hans = 'zh-hans', '中文(简体)'
     zh_hant = 'zh-hant', '中文(繁體)'
-    jp = 'ja', '日本語',
+    ja = 'ja', '日本語',
+    pt_br = 'pt-br', 'Português (Brasil)'
+
+    @classmethod
+    def get_code_mapper(cls):
+        code_mapper = {code: code for code, name in cls.choices}
+        code_mapper.update({
+            'zh': cls.zh_hans.value,
+            'zh-cn': cls.zh_hans.value,
+            'zh-tw': cls.zh_hant.value,
+            'zh-hk': cls.zh_hant.value,
+        })
+        return code_mapper
+
+    @classmethod
+    def to_internal_code(cls, code: str, default='en', with_filename=False):
+        code_mapper = cls.get_code_mapper()
+        code = code.lower()
+        code = code_mapper.get(code) or code_mapper.get(default)
+        if with_filename:
+            cf_mapper = {
+                cls.zh_hans.value: 'zh',
+            }
+            code = cf_mapper.get(code, code)
+            code = code.replace('-', '_')
+        return code
+
+    @classmethod
+    def get_other_codes(cls, code):
+        code_mapper = cls.get_code_mapper()
+        other_codes = [other_code for other_code, _code in code_mapper.items() if code == _code]
+        return other_codes
 
 
 COUNTRY_CALLING_CODES = get_country_phone_choices()

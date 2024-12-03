@@ -37,7 +37,6 @@ class CoreTranslateManager(BaseTranslateManager):
         zh_dict = {entry.msgid: entry.msgstr for entry in po.translated_entries()}
 
         for file_prefix, target_lang in self.LANG_MAPPER.items():
-            file_prefix = 'zh_Hant' if file_prefix == 'zh_hant' else file_prefix
             po_file_path = os.path.join(self._dir, file_prefix, 'LC_MESSAGES', 'django.po')
             trans_po = polib.pofile(po_file_path)
             need_trans_dict = self.get_need_trans_dict(zh_dict, trans_po)
