@@ -1,0 +1,18 @@
+name: Translate README.md
+on:
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: "Target languages"
+        required: false
+        default: "zh-hans,zh-hant,ja,pt-br"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto Translate
+        uses: BaiJiangJie/translate-readme@main
+        with:
+          gpt_token: ${{ secrets.GPT_API_TOKEN }}
+          gpt_mode: 'gpt-4o-mini'
+          target_languages: ${{ github.event.inputs.languages }}
