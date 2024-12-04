@@ -14,6 +14,7 @@ __all__ = ['Account', 'AccountHistoricalRecords']
 
 class AccountHistoricalRecords(HistoricalRecords):
     def __init__(self, *args, **kwargs):
+        self.updated_version = None
         self.included_fields = kwargs.pop('included_fields', None)
         super().__init__(*args, **kwargs)
 
@@ -22,9 +23,13 @@ class AccountHistoricalRecords(HistoricalRecords):
             return super().post_save(instance, created, using=using, **kwargs)
 
         check_fields = set(self.included_fields) - {'version'}
-        history_attrs = instance.history.all().values(*check_fields).first()
-        if history_attrs is None:
+
+        history_account = instance.history.first()
+        if history_account is None:
+            self.updated_version = 1
             return super().post_save(instance, created, using=using, **kwargs)
+
+        history_attrs = {field: getattr(history_account, field) for field in check_fields}
 
         attrs = {field: getattr(instance, field) for field in check_fields}
         history_attrs = set(history_attrs.items())
@@ -32,7 +37,14 @@ class AccountHistoricalRecords(HistoricalRecords):
         diff = attrs - history_attrs
         if not diff:
             return
+        self.updated_version = history_account.version + 1
         return super().post_save(instance, created, using=using, **kwargs)
+
+    def create_historical_record(self, instance, history_type, using=None):
+        super().create_historical_record(instance, history_type, using=using)
+        if self.updated_version is not None:
+            instance.version = self.updated_version
+            instance.save(update_fields=['version'])
 
     def create_history_model(self, model, inherited):
         if self.included_fields and not self.excluded_fields:
@@ -60,7 +72,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
     login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
-    change_secret_status = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Change secret status'))
+    change_secret_status = models.CharField(max_length=16, null=True, blank=True,
+                                            verbose_name=_('Change secret status'))
 
     class Meta:
         verbose_name = _('Account')

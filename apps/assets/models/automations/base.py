@@ -74,6 +74,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             "type": self.type,
             "comment": self.comment,
             "accounts": self.accounts,
+            "params": self.params,
             "org_id": str(self.org_id),
             "nodes": self.get_many_to_many_ids("nodes"),
             "assets": self.get_many_to_many_ids("assets"),
