@@ -180,7 +180,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         while retry_count < max_retries:
             try:
                 recorder.save()
-                account.save(update_fields=['secret', 'version', 'date_updated'])
+                account.save(update_fields=['secret', 'date_updated'])
                 break
             except Exception as e:
                 retry_count += 1

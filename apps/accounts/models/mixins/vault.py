@@ -80,6 +80,7 @@ class VaultModelMixin(models.Model):
 
     def mark_secret_save_to_vault(self):
         self._secret = self._secret_save_to_vault_mark
+        self.skip_history_when_saving = True
         self.save()
 
     @property
