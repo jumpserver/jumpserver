@@ -15,7 +15,7 @@ router.register(r'gathered-accounts', api.GatheredAccountViewSet, 'gathered-acco
 router.register(r'account-secrets', api.AccountSecretsViewSet, 'account-secret')
 router.register(r'account-templates', api.AccountTemplateViewSet, 'account-template')
 router.register(r'account-template-secrets', api.AccountTemplateSecretsViewSet, 'account-template-secret')
-router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
+router.register(r'account-backup-plans', api.BackupAccountViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.BackupAccountExecutionViewSet, 'account-backup-execution')
 router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automation')
 router.register(r'change-secret-executions', api.ChangSecretExecutionViewSet, 'change-secret-execution')

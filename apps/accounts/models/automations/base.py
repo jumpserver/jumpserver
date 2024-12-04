@@ -40,6 +40,9 @@ class AutomationExecution(AssetAutomationExecution):
 
             ('view_pushaccountexecution', _('Can view push account execution')),
             ('add_pushaccountexecution', _('Can add push account execution')),
+
+            ('view_backupaccountexecution', _('Can view backup account execution')),
+            ('add_backupaccountexecution', _('Can add backup account execution')),
         ]
 
     @property

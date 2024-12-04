@@ -9,11 +9,11 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 
 __all__ = [
-    'AccountBackupPlanViewSet', 'BackupAccountExecutionViewSet'
+    'BackupAccountViewSet', 'BackupAccountExecutionViewSet'
 ]
 
 
-class AccountBackupPlanViewSet(OrgBulkModelViewSet):
+class BackupAccountViewSet(OrgBulkModelViewSet):
     model = BackupAccountAutomation
     filterset_fields = ('name',)
     search_fields = filterset_fields
@@ -21,8 +21,13 @@ class AccountBackupPlanViewSet(OrgBulkModelViewSet):
 
 
 class BackupAccountExecutionViewSet(AutomationExecutionViewSet):
-    serializer_class = serializers.BackupAccountExecutionSerializer
-    http_method_names = ['get', 'post', 'options']
+    rbac_perms = (
+        ("list", "accounts.view_backupaccountexecution"),
+        ("retrieve", "accounts.view_backupaccountexecution"),
+        ("create", "accounts.add_backupaccountexecution"),
+        ("report", "accounts.view_backupaccountexecution"),
+    )
+
     tp = AutomationTypes.backup_account
 
     def get_queryset(self):
