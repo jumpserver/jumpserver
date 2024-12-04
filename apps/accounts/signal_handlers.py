@@ -23,6 +23,9 @@ logger = get_logger(__name__)
 
 @receiver(pre_save, sender=Account)
 def on_account_pre_save(sender, instance, **kwargs):
+    if getattr(instance, 'skip_history_when_saving', False):
+        return
+
     if instance.version == 0:
         instance.version = 1
     else:
