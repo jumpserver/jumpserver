@@ -1,0 +1,78 @@
+{% load i18n %}
+
+<div class='summary'>
+    <p>{% trans 'The following is a summary of account backup tasks, please review and handle them' %}</p>
+    <table>
+        <caption></caption>
+        <thead>
+        <tr>
+            <th colspan='2'>任务汇总:</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{% trans 'Task name' %}:</td>
+            <td>{{ execution.automation.name }} </td>
+        </tr>
+        <tr>
+            <td>{% trans 'Date start' %}:</td>
+            <td>{{ execution.date_start | date:"Y/m/d H:i:s" }}</td>
+        </tr>
+        <tr>
+            <td>{% trans 'Date end' %}:</td>
+            <td>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</td>
+        </tr>
+        <tr>
+            <td>{% trans 'Time using' %}:</td>
+            <td>{{ execution.duration }}s</td>
+        </tr>
+        <tr>
+            <td>{% trans 'Account count' %}:</td>
+            <td>{{ summary.total_accounts }}</td>
+        </tr>
+        <tr>
+            <td>{% trans 'Type count' %}:</td>
+            <td>{{ summary.total_types }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        max-width: 100%;
+        text-align: left;
+        margin-top: 10px;
+        padding: 20px;
+    }
+
+    th {
+        background: #f2f2f2;
+        font-size: 14px;
+        padding: 5px;
+        border: 1px solid #ddd;
+    }
+
+    tr :first-child {
+        width: 30%;
+    }
+
+    td {
+        border: 1px solid #ddd;
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .result {
+        margin-top: 20px;
+    }
+
+    .result tr :first-child {
+        width: 10%;
+    }
+
+
+</style>

@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
+from accounts.const import AutomationTypes
 from accounts.models import BackupAccountAutomation
-from common.const.choices import Trigger
-from common.serializers.fields import LabeledChoiceField, EncryptedField
+from common.serializers.fields import EncryptedField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
 
 logger = get_logger(__file__)
 
-__all__ = ['BackupAccountSerializer', 'BackupAccountExecutionSerializer']
+__all__ = ['BackupAccountSerializer']
 
 
 class BackupAccountSerializer(BaseAutomationSerializer):
@@ -41,14 +40,6 @@ class BackupAccountSerializer(BaseAutomationSerializer):
             'types': {'label': _('Asset type')}
         }
 
-
-class BackupAccountExecutionSerializer(serializers.ModelSerializer):
-    trigger = LabeledChoiceField(choices=Trigger.choices, label=_("Trigger mode"), read_only=True)
-
-    class Meta:
-        model = BackupAccountAutomation
-        read_only_fields = [
-            'id', 'date_start', 'timedelta', 'snapshot',
-            'trigger', 'reason', 'is_success', 'org_id'
-        ]
-        fields = read_only_fields + ['plan']
+    @property
+    def model_type(self):
+        return AutomationTypes.backup_account

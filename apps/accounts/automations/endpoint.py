@@ -18,7 +18,7 @@ class ExecutionManager:
         AutomationTypes.gather_accounts: GatherAccountsManager,
         AutomationTypes.verify_gateway_account: VerifyGatewayAccountManager,
         AutomationTypes.check_account: CheckAccountManager,
-        'backup_account': AccountBackupManager,
+        AutomationTypes.backup_account: AccountBackupManager,
     }
 
     def __init__(self, execution):

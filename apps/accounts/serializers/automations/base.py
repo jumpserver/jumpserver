@@ -26,15 +26,14 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
     class Meta:
         read_only_fields = [
             'date_created', 'date_updated', 'created_by',
-            'periodic_display', 'executed_amount'
+            'periodic_display', 'executed_amount', 'type'
         ]
         fields = read_only_fields + [
             'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
-            'type', 'accounts', 'nodes', 'assets', 'is_active',
+            'accounts', 'nodes', 'assets', 'is_active',
         ]
         extra_kwargs = {
             'name': {'required': True},
-            'type': {'read_only': True},
             'executed_amount': {'label': _('Executions')},
         }
 
@@ -58,7 +57,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AutomationExecution
         read_only_fields = [
-            'trigger', 'date_start', 'date_finished', 'snapshot', 'status'
+            'trigger', 'date_start', 'date_finished', 'snapshot', 'status', 'duration'
         ]
         fields = ['id', 'automation', 'type'] + read_only_fields
 
