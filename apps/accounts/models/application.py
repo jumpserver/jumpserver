@@ -15,7 +15,7 @@ class IntegrationApplication(JMSOrgBaseModel):
 
     name = models.CharField(max_length=128, unique=False, verbose_name=_('Name'))
     logo = PrivateImageField(
-        upload_to='integration-apps', max_length=128, verbose_name=_('Logo')
+        upload_to='images', max_length=128, verbose_name=_('Logo')
     )
     secret = fields.EncryptTextField(default='', verbose_name=_('Secret'))
     accounts = JSONManyToManyField('accounts.Account', default=dict, verbose_name=_('Accounts'))
