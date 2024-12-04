@@ -42,8 +42,20 @@ class GatherAccountsFilter:
     @staticmethod
     def postgresql_filter(info):
         result = {}
-        for username in info:
-            result[username] = {}
+        for username, user_info in info.items():
+            user = {
+                'username': username,
+                'date_password_change': None,
+                'date_password_expired': parse_date(user_info.get('valid_until')),
+                'date_last_login': None,
+                'groups': '',
+            }
+            detail = {
+                'canlogin': user_info.get('canlogin'),
+                'superuser': user_info.get('superuser'),
+            }
+            user['detail'] = detail
+            result[username] = user
         return result
 
     @staticmethod
