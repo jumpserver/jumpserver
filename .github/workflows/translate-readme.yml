@@ -16,3 +16,5 @@ jobs:
           gpt_token: ${{ secrets.GPT_API_TOKEN }}
           gpt_mode: 'gpt-4o-mini'
           target_languages: ${{ github.event.inputs.languages }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
