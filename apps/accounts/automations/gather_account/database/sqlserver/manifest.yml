@@ -1,0 +1,10 @@
+id: gather_accounts_sqlserver
+name: "{{ 'SQLServer account gather' | trans }}"
+category: database
+type:
+  - sqlserver
+method: gather_accounts
+i18n:
+  SQLServer account gather:
+    zh: SQLServer 账号收集
+    ja: SQLServer アカウントの収集

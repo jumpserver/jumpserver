@@ -47,6 +47,28 @@ class GatherAccountsFilter:
         return result
 
     @staticmethod
+    def sqlserver_filter(info):
+        if not info:
+            return {}
+        result = {}
+        for user_info in info[0][0]:
+            user = {
+                'username': user_info.get('name', ''),
+                'date_password_change': None,
+                'date_password_expired': None,
+                'date_last_login': None,
+                'groups': '',
+            }
+            detail = {
+                'create_date': user_info.get('create_date', ''),
+                'is_disabled': user_info.get('is_disabled', ''),
+                'default_database_name': user_info.get('default_database_name', ''),
+            }
+            user['detail'] = detail
+            result[user['username']] = user
+        return result
+
+    @staticmethod
     def oracle_filter(info):
         result = {}
         for default_tablespace, users in info.items():
