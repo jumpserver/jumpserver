@@ -75,24 +75,24 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         return accounts
 
     def gen_new_secret(self, account, path_dir):
-        private_key_path = None
         if self.secret_type is None:
             new_secret = account.secret
-            return new_secret, private_key_path
-
-        if self.secret_strategy == SecretStrategy.custom:
-            new_secret = self.execution.snapshot['secret']
         else:
-            generator = SecretGenerator(
-                self.secret_strategy, self.secret_type,
-                self.execution.snapshot.get('password_rules')
-            )
-            new_secret = generator.get_secret()
+            if self.secret_strategy == SecretStrategy.custom:
+                new_secret = self.execution.snapshot['secret']
+            else:
+                generator = SecretGenerator(
+                    self.secret_strategy, self.secret_type,
+                    self.execution.snapshot.get('password_rules')
+                )
+                new_secret = generator.get_secret()
 
+        recorder_secret = new_secret
+        private_key_path = None
         if account.secret_type == SecretType.SSH_KEY:
             private_key_path = self.generate_private_key_path(new_secret, path_dir)
             new_secret = self.generate_public_key(new_secret)
-        return new_secret, private_key_path
+        return new_secret, private_key_path, recorder_secret
 
     def get_or_create_record(self, asset, account, new_secret, name):
         asset_account_id = f'{asset.id}-{account.id}'
@@ -158,9 +158,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return inventory_hosts
 
         for account in accounts:
-            new_secret, private_key_path = self.gen_new_secret(account, path_dir)
+            new_secret, private_key_path, recorder_secret = self.gen_new_secret(account, path_dir)
             h = self.gen_change_secret_inventory(host, account, new_secret, private_key_path, asset)
-            self.get_or_create_record(asset, account, new_secret, h['name'])
+            self.get_or_create_record(asset, account, recorder_secret, h['name'])
             inventory_hosts.append(h)
 
         return inventory_hosts
@@ -182,7 +182,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         with safe_db_connection():
             recorder.save(update_fields=['status', 'date_finished'])
-            account.save(update_fields=['secret', 'version', 'date_updated'])
+            account.save(update_fields=['secret', 'date_updated'])
+
         self.summary['ok_accounts'] += 1
         self.result['ok_accounts'].append(
             {

@@ -11,8 +11,8 @@ from accounts.models import Account
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
-from common.permissions import IsValidUser
 from common.drf.filters import AttrRulesFilterBackend
+from common.permissions import IsValidUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
