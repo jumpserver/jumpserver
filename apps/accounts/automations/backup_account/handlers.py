@@ -3,15 +3,17 @@ import time
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from xlsxwriter import Workbook
 
 from accounts.const import AccountBackupType
-from accounts.models.automations.backup_account import AccountBackupAutomation
+from accounts.models import BackupAccountAutomation, Account
 from accounts.notifications import AccountBackupExecutionTaskMsg, AccountBackupByObjStorageExecutionTaskMsg
 from accounts.serializers import AccountSecretSerializer
 from assets.const import AllTypes
+from common.const import Status
 from common.utils.file import encrypt_and_compress_zip_file, zip_files
 from common.utils.timezone import local_now_filename, local_now_display
 from terminal.models.component.storage import ReplayStorage
@@ -19,6 +21,7 @@ from users.models import User
 
 PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
 split_help_text = _('The account key will be split into two parts and sent')
+
 
 class RecipientsNotFound(Exception):
     pass
@@ -73,9 +76,9 @@ class BaseAccountHandler:
 
 class AssetAccountHandler(BaseAccountHandler):
     @staticmethod
-    def get_filename(plan_name):
+    def get_filename(name):
         filename = os.path.join(
-            PATH, f'{plan_name}-{local_now_filename()}-{time.time()}.xlsx'
+            PATH, f'{name}-{local_now_filename()}-{time.time()}.xlsx'
         )
         return filename
 
@@ -117,32 +120,41 @@ class AssetAccountHandler(BaseAccountHandler):
             cls.handler_secret(data, section)
             data_map.update(cls.add_rows(data, header_fields, sheet_name))
         number_of_backup_accounts = _('Number of backup accounts')
-        print('\n\033[33m- {}: {}\033[0m'.format(number_of_backup_accounts, accounts.count()))
+        print('\033[33m- {}: {}\033[0m'.format(number_of_backup_accounts, accounts.count()))
         return data_map
 
 
 class AccountBackupHandler:
-    def __init__(self, execution):
+    def __init__(self, manager, execution):
+        self.manager = manager
         self.execution = execution
-        self.plan_name = self.execution.plan.name
-        self.is_frozen = False  # 任务状态冻结标志
+        self.name = self.execution.snapshot.get('name', '-')
+
+    def get_accounts(self):
+        # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
+        types = self.execution.snapshot.get('types', [])
+        self.manager.summary['total_types'] = len(types)
+        qs = Account.objects.filter(
+            asset__platform__type__in=types
+        ).annotate(type=F('asset__platform__type'))
+        return qs
 
     def create_excel(self, section='complete'):
-        hint = _('Generating asset or application related backup information files')
+        hint = _('Generating asset related backup information files')
         print(
-            '\n'
             f'\033[32m>>> {hint}\033[0m'
             ''
         )
-        # Print task start date
+
         time_start = time.time()
         files = []
-        accounts = self.execution.backup_accounts
+        accounts = self.get_accounts()
+        self.manager.summary['total_accounts'] = accounts.count()
         data_map = AssetAccountHandler.create_data_map(accounts, section)
         if not data_map:
             return files
 
-        filename = AssetAccountHandler.get_filename(self.plan_name)
+        filename = AssetAccountHandler.get_filename(self.name)
 
         wb = Workbook(filename)
         for sheet, data in data_map.items():
@@ -163,21 +175,19 @@ class AccountBackupHandler:
             return
         recipients = User.objects.filter(id__in=list(recipients))
         print(
-            '\n'
             f'\033[32m>>> {_("Start sending backup emails")}\033[0m'
             ''
         )
-        plan_name = self.plan_name
+        name = self.name
         for user in recipients:
             if not user.secret_key:
                 attachment_list = []
             else:
-                attachment = os.path.join(PATH, f'{plan_name}-{local_now_filename()}-{time.time()}.zip')
+                attachment = os.path.join(PATH, f'{name}-{local_now_filename()}-{time.time()}.zip')
                 encrypt_and_compress_zip_file(attachment, user.secret_key, files)
-                attachment_list = [attachment, ]
-            AccountBackupExecutionTaskMsg(plan_name, user).publish(attachment_list)
-            email_sent_to = _('Email sent to')
-            print('{} {}({})'.format(email_sent_to, user, user.email))
+                attachment_list = [attachment]
+            AccountBackupExecutionTaskMsg(name, user).publish(attachment_list)
+
         for file in files:
             os.remove(file)
 
@@ -186,63 +196,41 @@ class AccountBackupHandler:
             return
         recipients = ReplayStorage.objects.filter(id__in=list(recipients))
         print(
-            '\n'
             '\033[32m>>> 📃 ---> sftp \033[0m'
             ''
         )
-        plan_name = self.plan_name
+        name = self.name
         encrypt_file = _('Encrypting files using encryption password')
         for rec in recipients:
-            attachment = os.path.join(PATH, f'{plan_name}-{local_now_filename()}-{time.time()}.zip')
+            attachment = os.path.join(PATH, f'{name}-{local_now_filename()}-{time.time()}.zip')
             if password:
                 print(f'\033[32m>>> {encrypt_file}\033[0m')
                 encrypt_and_compress_zip_file(attachment, password, files)
             else:
                 zip_files(attachment, files)
             attachment_list = attachment
-            AccountBackupByObjStorageExecutionTaskMsg(plan_name, rec).publish(attachment_list)
+            AccountBackupByObjStorageExecutionTaskMsg(name, rec).publish(attachment_list)
             file_sent_to = _('The backup file will be sent to')
             print('{}: {}({})'.format(file_sent_to, rec.name, rec.id))
         for file in files:
             os.remove(file)
 
-    def step_perform_task_update(self, is_success, reason):
-        self.execution.reason = reason[:1024]
-        self.execution.is_success = is_success
-        self.execution.save()
-        finish = _('Finish')
-        print(f'\n{finish}\n')
-
-    @staticmethod
-    def step_finished(is_success):
-        if is_success:
-            print(_('Success'))
-        else:
-            print(_('Failed'))
-
     def _run(self):
-        is_success = False
-        error = '-'
         try:
-            backup_type = self.execution.snapshot.get('backup_type', AccountBackupType.email.value)
-            if backup_type == AccountBackupType.email.value:
+            backup_type = self.execution.snapshot.get('backup_type', AccountBackupType.email)
+            if backup_type == AccountBackupType.email:
                 self.backup_by_email()
-            elif backup_type == AccountBackupType.object_storage.value:
+            elif backup_type == AccountBackupType.object_storage:
                 self.backup_by_obj_storage()
         except Exception as e:
-            self.is_frozen = True
-            print(e)
             error = str(e)
-        else:
-            is_success = True
-        finally:
-            reason = error
-            self.step_perform_task_update(is_success, reason)
-            self.step_finished(is_success)
+            print(f'\033[31m>>> {error}\033[0m')
+            self.execution.status = Status.error
+            self.execution.summary['error'] = error
 
     def backup_by_obj_storage(self):
         object_id = self.execution.snapshot.get('id')
-        zip_encrypt_password = AccountBackupAutomation.objects.get(id=object_id).zip_encrypt_password
+        zip_encrypt_password = BackupAccountAutomation.objects.get(id=object_id).zip_encrypt_password
         obj_recipients_part_one = self.execution.snapshot.get('obj_recipients_part_one', [])
         obj_recipients_part_two = self.execution.snapshot.get('obj_recipients_part_two', [])
         no_assigned_sftp_server = _('The backup task has no assigned sftp server')
@@ -266,7 +254,6 @@ class AccountBackupHandler:
             self.send_backup_obj_storage(files, recipients, zip_encrypt_password)
 
     def backup_by_email(self):
-
         warn_text = _('The backup task has no assigned recipient')
         recipients_part_one = self.execution.snapshot.get('recipients_part_one', [])
         recipients_part_two = self.execution.snapshot.get('recipients_part_two', [])
@@ -276,7 +263,7 @@ class AccountBackupHandler:
                 f'\033[31m>>> {warn_text}\033[0m'
                 ''
             )
-            raise RecipientsNotFound('Not Found Recipients')
+            return
         if recipients_part_one and recipients_part_two:
             print(f'\033[32m>>> {split_help_text}\033[0m')
             files = self.create_excel(section='front')
@@ -290,18 +277,5 @@ class AccountBackupHandler:
             self.send_backup_mail(files, recipients)
 
     def run(self):
-        plan_start = _('Plan start')
-        plan_end = _('Plan end')
-        time_cost = _('Duration')
-        error = _('An exception occurred during task execution')
-        print('{}: {}'.format(plan_start, local_now_display()))
-        time_start = time.time()
-        try:
-            self._run()
-        except Exception as e:
-            print(error)
-            print(e)
-        finally:
-            print('\n{}: {}'.format(plan_end, local_now_display()))
-            timedelta = round((time.time() - time_start), 2)
-            print('{}: {}s'.format(time_cost, timedelta))
+        print('{}: {}'.format(_('Plan start'), local_now_display()))
+        self._run()

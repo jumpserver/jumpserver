@@ -98,7 +98,7 @@ class BaseManager:
         self.summary = defaultdict(int)
         self.result = defaultdict(list)
         self.duration = 0
-        self.status = 'success'
+        self.status = Status.success
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()

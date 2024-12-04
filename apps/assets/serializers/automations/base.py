@@ -42,17 +42,17 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AutomationExecution
         read_only_fields = [
-            'trigger', 'date_start', 'date_finished', 'snapshot', 'status'
+            'trigger', 'date_start', 'date_finished', 'snapshot', 'status', 'duration'
         ]
         fields = ['id', 'automation'] + read_only_fields
 
     @staticmethod
     def get_status(obj):
-        if obj.status == 'success':
-            return _("Success")
-        elif obj.status == 'pending':
-            return _("Pending")
-        return obj.status
+        from common.const import Status
+        status = Status._member_map_.get(obj.status)
+        if status is None:
+            return obj.status
+        return status.label
 
     @staticmethod
     def get_snapshot(obj):

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -13,7 +12,6 @@ from accounts.filters import GatheredAccountFilterSet
 from accounts.models import GatherAccountsAutomation, AutomationExecution
 from accounts.models import GatheredAccount
 from assets.models import Asset
-from accounts.tasks.common import quickstart_automation_by_snapshot
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 
