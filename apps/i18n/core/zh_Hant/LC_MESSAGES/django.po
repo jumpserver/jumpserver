@@ -6480,7 +6480,7 @@ msgid "Logo"
 msgstr "圖示"
 
 #: settings/serializers/auth/oauth2.py:28
-msgid "Service provider"
+msgid "Application provider"
 msgstr "服務提供商"
 
 #: settings/serializers/auth/oauth2.py:31
@@ -6632,7 +6632,7 @@ msgstr "只有 SSL 域名可以使用 Passkey(通行金鑰)認證"
 
 #: settings/serializers/auth/passkey.py:15
 msgid "FIDO Server ID"
-msgstr "Passkey Service Domain"
+msgstr "Passkey Application Domain"
 
 #: settings/serializers/auth/passkey.py:17
 msgid ""
@@ -6644,7 +6644,7 @@ msgstr ""
 
 #: settings/serializers/auth/passkey.py:22
 msgid "FIDO Server name"
-msgstr "Passkey Service Name"
+msgstr "Passkey Application Name"
 
 #: settings/serializers/auth/radius.py:14
 #: settings/serializers/auth/radius.py:16
@@ -6704,7 +6704,7 @@ msgstr ""
 "務使用者屬性名稱"
 
 #: settings/serializers/auth/sms.py:18
-msgid "Enable Short Message Service (SMS)"
+msgid "Enable Short Message Application (SMS)"
 msgstr "啟用簡訊服務 (SMS)"
 
 #: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:36
@@ -6712,7 +6712,7 @@ msgid "Provider"
 msgstr "雲服務商"
 
 #: settings/serializers/auth/sms.py:22
-msgid "Short Message Service (SMS) provider or protocol"
+msgid "Short Message Application (SMS) provider or protocol"
 msgstr "簡訊服務 (SMS) 供應商或協議"
 
 #: settings/serializers/auth/sms.py:25
@@ -6761,7 +6761,7 @@ msgstr "原始號碼(Src id)"
 
 #: settings/serializers/auth/sms.py:81
 msgid "Business type"
-msgstr "業務型態(Service id)"
+msgstr "業務型態(Application id)"
 
 #: settings/serializers/auth/sms.py:85
 #, python-brace-format
@@ -10759,7 +10759,7 @@ msgid "Key File"
 msgstr "金鑰文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:144
-msgid "Service account key"
+msgid "Application account key"
 msgstr "服務帳號金鑰"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145

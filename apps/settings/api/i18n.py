@@ -14,7 +14,7 @@ class ComponentI18nApi(RetrieveAPIView):
     lang_data = {}
 
     def get_component_translations(self, name):
-        if name in self.lang_data:
+        if not settings.DEBUG and name in self.lang_data:
             return self.lang_data[name]
 
         component_dir = safe_join(settings.APPS_DIR, 'i18n', name)

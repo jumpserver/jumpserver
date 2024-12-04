@@ -1089,7 +1089,7 @@
   "ServerAccountKey": "服务账号密钥",
   "ServerError": "服务器错误",
   "ServerTime": "服务器时间",
-  "ServiceIntegration": "服务对接",
+  "IntegrationApplication": "服务对接",
   "Session": "会话",
   "SessionCommands": "会话命令",
   "SessionConnectTrend": "会话连接趋势",

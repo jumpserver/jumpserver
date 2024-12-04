@@ -27,14 +27,14 @@ from .const import (
 )
 
 __all__ = [
+    "JobLog",
     "FTPLog",
     "OperateLog",
-    "ActivityLog",
-    "PasswordChangeLog",
-    "UserLoginLog",
-    "JobLog",
     "UserSession",
-    "ServiceAccessLog",
+    "ActivityLog",
+    "UserLoginLog",
+    "PasswordChangeLog",
+    "IntegrationApplicationLog",
 ]
 
 
@@ -304,11 +304,11 @@ class UserSession(models.Model):
         ]
 
 
-class ServiceAccessLog(models.Model):
+class IntegrationApplicationLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     remote_addr = models.GenericIPAddressField(verbose_name=_("Remote addr"))
-    service = models.CharField(max_length=128, verbose_name=_("Service"))
-    service_id = models.UUIDField(verbose_name=_("Service ID"))
+    service = models.CharField(max_length=128, verbose_name=_("Application"))
+    service_id = models.UUIDField(verbose_name=_("Application ID"))
     asset = models.CharField(max_length=128, verbose_name=_("Asset"))
     account = models.CharField(max_length=128, verbose_name=_("Account"))
     datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))

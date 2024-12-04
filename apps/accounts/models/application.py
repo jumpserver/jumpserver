@@ -10,12 +10,12 @@ from common.utils import random_string
 from orgs.mixins.models import JMSOrgBaseModel
 
 
-class ServiceIntegration(JMSOrgBaseModel):
+class IntegrationApplication(JMSOrgBaseModel):
     is_anonymous = False
 
     name = models.CharField(max_length=128, unique=False, verbose_name=_('Name'))
-    logo_image = PrivateImageField(
-        upload_to='service-integration', max_length=128, verbose_name=_('Logo')
+    logo = PrivateImageField(
+        upload_to='integration-apps', max_length=128, verbose_name=_('Logo')
     )
     secret = fields.EncryptTextField(default='', verbose_name=_('Secret'))
     accounts = JSONManyToManyField('accounts.Account', default=dict, verbose_name=_('Accounts'))
@@ -25,7 +25,7 @@ class ServiceIntegration(JMSOrgBaseModel):
 
     class Meta:
         unique_together = [('name', 'org_id')]
-        verbose_name = _('Service integration')
+        verbose_name = _('Integration App')
 
     @property
     def accounts_amount(self):
@@ -43,7 +43,7 @@ class ServiceIntegration(JMSOrgBaseModel):
 
     @staticmethod
     def has_perms(perms):
-        support_perms = ['accounts.view_serviceintegration']
+        support_perms = ['accounts.view_integrationapplication']
         return all([perm in support_perms for perm in perms])
 
     def get_secret(self):

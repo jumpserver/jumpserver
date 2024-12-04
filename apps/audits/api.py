@@ -33,7 +33,7 @@ from .const import ActivityChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession, ServiceAccessLog
+    ActivityLog, JobLog, UserSession, IntegrationApplicationLog
 )
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
@@ -293,7 +293,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
 
 class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
-    model = ServiceAccessLog
+    model = IntegrationApplicationLog
     serializer_class = ServiceAccessLogSerializer
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [

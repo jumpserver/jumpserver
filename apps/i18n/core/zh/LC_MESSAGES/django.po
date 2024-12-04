@@ -6519,7 +6519,7 @@ msgid "Logo"
 msgstr "图标"
 
 #: settings/serializers/auth/oauth2.py:28
-msgid "Service provider"
+msgid "Application provider"
 msgstr "服务提供商"
 
 #: settings/serializers/auth/oauth2.py:31
@@ -6743,7 +6743,7 @@ msgstr ""
 "户属性名称"
 
 #: settings/serializers/auth/sms.py:18
-msgid "Enable Short Message Service (SMS)"
+msgid "Enable Short Message Application (SMS)"
 msgstr "启用短信服务 (SMS)"
 
 #: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:36
@@ -6751,7 +6751,7 @@ msgid "Provider"
 msgstr "云服务商"
 
 #: settings/serializers/auth/sms.py:22
-msgid "Short Message Service (SMS) provider or protocol"
+msgid "Short Message Application (SMS) provider or protocol"
 msgstr "短信服务 (SMS) 提供商或协议"
 
 #: settings/serializers/auth/sms.py:25
@@ -6800,7 +6800,7 @@ msgstr "原始号码(Src id)"
 
 #: settings/serializers/auth/sms.py:81
 msgid "Business type"
-msgstr "业务类型(Service id)"
+msgstr "业务类型(Application id)"
 
 #: settings/serializers/auth/sms.py:85
 #, python-brace-format
@@ -10820,7 +10820,7 @@ msgid "Key File"
 msgstr "密钥文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:144
-msgid "Service account key"
+msgid "Application account key"
 msgstr "服务账号密钥"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145

@@ -7,8 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
-from accounts.models import ServiceIntegration
-from audits.models import ServiceAccessLog
+from accounts.models import IntegrationApplication
+from audits.models import IntegrationApplicationLog
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.exceptions import JMSException
 from common.permissions import IsValidUser
@@ -17,16 +17,16 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
 
-class ServiceIntegrationViewSet(OrgBulkModelViewSet):
-    model = ServiceIntegration
+class IntegrationApplicationViewSet(OrgBulkModelViewSet):
+    model = IntegrationApplication
     search_fields = ('name', 'comment')
     serializer_classes = {
-        'default': serializers.ServiceIntegrationSerializer,
-        'get_account_secret': serializers.ServiceAccountSecretSerializer
+        'default': serializers.IntegrationApplicationSerializer,
+        'get_account_secret': serializers.IntegrationAccountSecretSerializer
     }
     rbac_perms = {
-        'get_once_secret': 'accounts.change_serviceintegration',
-        'get_account_secret': 'accounts.view_serviceintegration',
+        'get_once_secret': 'accounts.change_integrationapplication',
+        'get_account_secret': 'view_integrationapplication',
     }
 
     @action(
@@ -66,7 +66,7 @@ class ServiceIntegrationViewSet(OrgBulkModelViewSet):
             msg = _('Account not found')
             raise JMSException(code='Not found', detail='%s' % msg)
         asset = account.asset
-        ServiceAccessLog.objects.create(
+        IntegrationApplicationLog.objects.create(
             remote_addr=get_request_ip(request), service=service.name, service_id=service.id,
             account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
         )

@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True, verbose_name='Active')),
             ],
             options={
-                'verbose_name': 'Service integration',
+                'verbose_name': 'Application integration',
                 'unique_together': {('name', 'org_id')},
             },
         ),

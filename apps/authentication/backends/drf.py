@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
 
-from accounts.models import ServiceIntegration
+from accounts.models import IntegrationApplication
 from common.auth import signature
 from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip, get_request_ip
@@ -36,7 +36,7 @@ def update_user_last_used(users=()):
 
 @merge_delay_run(ttl=60)
 def update_service_integration_last_used(service_integrations=()):
-    ServiceIntegration.objects.filter(
+    IntegrationApplication.objects.filter(
         id__in=service_integrations
     ).update(date_last_used=timezone.now())
 
@@ -162,7 +162,7 @@ class ServiceAuthentication(signature.SignatureAuthentication):
 
     def get_object(self, key_id):
         if not self.__instance:
-            self.__instance = ServiceIntegration.objects.filter(
+            self.__instance = IntegrationApplication.objects.filter(
                 id=key_id, is_active=True,
             ).first()
         return self.__instance

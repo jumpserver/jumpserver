@@ -6326,7 +6326,7 @@ msgid "Logo"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:28
-msgid "Service provider"
+msgid "Application provider"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:31
@@ -6539,7 +6539,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/auth/sms.py:18
-msgid "Enable Short Message Service (SMS)"
+msgid "Enable Short Message Application (SMS)"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:36
@@ -6547,7 +6547,7 @@ msgid "Provider"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:22
-msgid "Short Message Service (SMS) provider or protocol"
+msgid "Short Message Application (SMS) provider or protocol"
 msgstr ""
 
 #: settings/serializers/auth/sms.py:25
@@ -10486,7 +10486,7 @@ msgid "Key File"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:144
-msgid "Service account key"
+msgid "Application account key"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145

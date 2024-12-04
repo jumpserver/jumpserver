@@ -1,12 +1,12 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import ServiceIntegration
+from accounts.models import IntegrationApplication
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.serializers.fields import JSONManyToManyField
 
 
-class ServiceIntegrationSerializer(serializers.ModelSerializer):
+class IntegrationApplicationSerializer(serializers.ModelSerializer):
     accounts = JSONManyToManyField(label=_('Account'))
     ip_group = serializers.ListField(
         default=['*'], label=_('Access IP'), help_text=ip_group_help_text,
@@ -14,9 +14,9 @@ class ServiceIntegrationSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = ServiceIntegration
+        model = IntegrationApplication
         fields_mini = ['id', 'name']
-        fields_small = fields_mini + ['logo_image', 'accounts']
+        fields_small = fields_mini + ['logo', 'accounts']
         fields = fields_small + [
             'date_last_used', 'date_created', 'date_updated',
             'ip_group', 'accounts_amount', 'comment', 'is_active'
@@ -31,10 +31,10 @@ class ServiceIntegrationSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         request_method = self.context.get('request').method
         if request_method == 'PUT':
-            self.fields['logo_image'].required = False
+            self.fields['logo'].required = False
 
 
-class ServiceAccountSecretSerializer(serializers.Serializer):
+class IntegrationAccountSecretSerializer(serializers.Serializer):
     asset = serializers.CharField(required=False, allow_blank=True)
     asset_id = serializers.UUIDField(required=False, allow_null=True)
     account = serializers.CharField(required=False, allow_blank=True)

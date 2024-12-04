@@ -2,4 +2,4 @@ from .account import *
 from .task import *
 from .template import *
 from .virtual import *
-from .service import *
+from .application import *

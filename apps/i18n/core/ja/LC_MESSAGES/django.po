@@ -6566,7 +6566,7 @@ msgid "Logo"
 msgstr "アイコン"
 
 #: settings/serializers/auth/oauth2.py:28
-msgid "Service provider"
+msgid "Application provider"
 msgstr "サービスプロバイダー"
 
 #: settings/serializers/auth/oauth2.py:31
@@ -6794,7 +6794,7 @@ msgstr ""
 "`value` は Slack サービスのユーザー属性名です"
 
 #: settings/serializers/auth/sms.py:18
-msgid "Enable Short Message Service (SMS)"
+msgid "Enable Short Message Application (SMS)"
 msgstr "短信サービス（SMS）を有効にする"
 
 #: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:36
@@ -6802,7 +6802,7 @@ msgid "Provider"
 msgstr "プロバイダー"
 
 #: settings/serializers/auth/sms.py:22
-msgid "Short Message Service (SMS) provider or protocol"
+msgid "Short Message Application (SMS) provider or protocol"
 msgstr "短信サービス（SMS）のプロバイダーまたはプロトコル"
 
 #: settings/serializers/auth/sms.py:25
@@ -6851,7 +6851,7 @@ msgstr "元の番号(Src id)"
 
 #: settings/serializers/auth/sms.py:81
 msgid "Business type"
-msgstr "ビジネス・タイプ(Service id)"
+msgstr "ビジネス・タイプ(Application id)"
 
 #: settings/serializers/auth/sms.py:85
 #, python-brace-format
@@ -10936,7 +10936,7 @@ msgid "Key File"
 msgstr "キーファイル"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:144
-msgid "Service account key"
+msgid "Application account key"
 msgstr "サービスアカウントキー"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145

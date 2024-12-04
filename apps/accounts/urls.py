@@ -9,7 +9,6 @@ app_name = 'accounts'
 router = BulkRouter()
 
 router.register(r'accounts', api.AccountViewSet, 'account')
-router.register(r'service-integrations', api.ServiceIntegrationViewSet, 'service-integration')
 router.register(r'virtual-accounts', api.VirtualAccountViewSet, 'virtual-account')
 router.register(r'gathered-accounts', api.GatheredAccountViewSet, 'gathered-account')
 router.register(r'account-secrets', api.AccountSecretsViewSet, 'account-secret')
@@ -29,6 +28,8 @@ router.register(r'check-account-automations', api.CheckAccountAutomationViewSet,
 router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, 'check-account-execution')
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
+router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
+
 
 urlpatterns = [
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),

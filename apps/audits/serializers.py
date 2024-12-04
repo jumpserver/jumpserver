@@ -193,7 +193,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
 
 class ServiceAccessLogSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.ServiceAccessLog
+        model = models.IntegrationApplicationLog
         fields_mini = ['id']
         fields_small = fields_mini + [
             'remote_addr', 'service', 'service_id', 'asset', 'account', 'datetime'
