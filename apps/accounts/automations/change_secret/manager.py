@@ -171,6 +171,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         if not account:
             print("Account not found, deleted ?")
             return
+
+        version_update_required = account.secret != recorder.new_secret
         account.secret = recorder.new_secret
         account.date_updated = timezone.now()
 
@@ -180,7 +182,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         while retry_count < max_retries:
             try:
                 recorder.save()
-                account.save(update_fields=['secret', 'date_updated'])
+                account_update_fields = ['secret', 'date_updated']
+                if version_update_required:
+                    account_update_fields.append('version')
+                account.save(update_fields=account_update_fields)
                 break
             except Exception as e:
                 retry_count += 1
