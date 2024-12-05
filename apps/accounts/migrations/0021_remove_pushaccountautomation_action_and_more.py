@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0020_alter_automationexecution_options'),
+        ('accounts', '0020_integrationapplication_delete_serviceintegration_and_more'),
     ]
 
     operations = [
