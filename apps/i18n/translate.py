@@ -2,6 +2,7 @@ import asyncio
 import os
 
 
+
 from _translator.const import LOCALE_DIR, RED
 from _translator.core import CoreTranslateManager
 from _translator.other import OtherTranslateManager
