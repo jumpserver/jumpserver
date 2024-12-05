@@ -2,6 +2,19 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
+## An open-source PAM tool (Bastion Host)
+
+[![][license-shield]][license-link]
+[![][discord-shield]][discord-link]
+[![][docker-shield]][docker-link]
+[![][github-release-shield]][github-release-link]
+[![][github-stars-shield]][github-stars-link]
+
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md)
+
+</div>
+<br/>
+
 ## JumpServerとは？
 
 JumpServerは、DevOpsおよびITチームに対して、ウェブブラウザを通じてSSH、RDP、Kubernetes、データベース、RemoteAppエンドポイントに対するオンデマンドかつ安全なアクセスを提供する、オープンソースの特権アクセス管理（PAM）ツールです。
