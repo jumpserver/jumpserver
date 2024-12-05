@@ -17,7 +17,7 @@ on:
       prompt:
         description: "AI Translate Prompt"
         required: false
-        default: "Do not translate any content under the ‘## License’ section.\nKeep all content, Only delete the first line below [//]: # (Language navigation)."
+        default: ""
 
       gpt_mode:
         description: "GPT Mode"
