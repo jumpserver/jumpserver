@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto Translate
-        uses: BaiJiangJie/translate-readme@main
+        uses: jumpserver-dev/action-translate-readme@main
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.GPT_API_TOKEN }}
