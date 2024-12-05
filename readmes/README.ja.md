@@ -2,34 +2,21 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## オープンソースの PAM ツール (バスティオンホスト)
+## JumpServerとは？
 
-[![][license-shield]][license-link]
-[![][discord-shield]][discord-link]
-[![][docker-shield]][docker-link]
-[![][github-release-shield]][github-release-link]
-[![][github-stars-shield]][github-stars-link]
-
-[English](./README.md) · [中文(简体)](./readmes/README.zh-hans.md) · [中文(繁體)](./readmes/README.zh-hant.md) · [日本語](./readmes/README.ja.md) · [Português (Brasil)](./readmes/README.pt-br.md)
-
-</div>
-<br/>
-
-## JumpServer とは？
-
-JumpServer は、DevOps と IT チームに対して、ウェブブラウザーを通じて SSH、RDP、Kubernetes、データベース、リモートアプリのエンドポイントにオンデマンドかつ安全にアクセスを提供するオープンソースの特権アクセス管理 (PAM) ツールです。
+JumpServerは、DevOpsおよびITチームに対して、Webブラウザを介してSSH、RDP、Kubernetes、データベース、リモートアプリケーションエンドポイントへのオンデマンドかつ安全なアクセスを提供するオープンソースの特権アクセス管理（PAM）ツールです。
 
 ![JumpServer 概要](https://github.com/jumpserver/jumpserver/assets/32935519/35a371cb-8590-40ed-88ec-f351f8cf9045)
 
 ## クイックスタート
 
-クリーンな Linux サーバーを準備してください (64 ビット、>= 4c8g)
+クリーンなLinuxサーバーを準備します (64ビット, >= 4c8g)
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-ブラウザーで `http://your-jumpserver-ip/` にアクセスしてください
+ブラウザでJumpServerにアクセスします `http://your-jumpserver-ip/`
 - ユーザー名: `admin`
 - パスワード: `ChangeMe`
 
@@ -60,34 +47,34 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## コンポーネント
 
-JumpServer は、重要な複数のコンポーネントで構成されており、これらが共同で JumpServer の機能的フレームワークを形成し、ユーザーに運用管理とセキュリティ制御の包括的な能力を提供します。
+JumpServerは、複数の主要コンポーネントで構成されており、これらが集合してJumpServerの機能フレームワークを形成し、ユーザーに対して運用管理およびセキュリティ制御のための包括的な機能を提供します。
 
-| プロジェクト                                                | 状態                                                                                                                                                                 | 説明                                                                                              |
-|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer ウェブ UI                                                                                     |
-| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer ウェブターミナル                                                                                 |
-| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer キャラクタープロトコルコネクタ                                                                      |
-| [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | JumpServer グラフィカルプロトコルコネクタ                                                               |
-| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | JumpServer ウェブ DB                                                                                      |  
-| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer EE RDP プロキシコネクタ                                                                        |
-| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer EE リモートアプリケーションコネクタ (Windows)                                                |
-| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer EE リモートアプリケーションコネクタ (Linux)                                                  |
-| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer EE データベースプロキシコネクタ                                                                  |
-| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | JumpServer EE VNC プロキシコネクタ                                                                         |
-| [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | JumpServer EE 顔認識                                                                                      |
+| プロジェクト                                           | ステータス                                                                                                                                                             | 説明                                                                                                 |
+|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina リリース" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                  | JumpServer Web UI                                                                                   |
+| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna リリース" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                  | JumpServer Web ターミナル                                                                            |
+| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko リリース" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                  | JumpServer キャラクタープロトコルコネクタ                                                           |
+| [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion リリース" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                  | JumpServer グラフィカルプロトコルコネクタ                                                          |
+| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen リリース" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                      | JumpServer Web データベース                                                                           |  
+| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                           | JumpServer EE RDP プロキシコネクタ                                                                   |
+| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                         | JumpServer EE リモートアプリケーションコネクタ（Windows）                                           |
+| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                          | JumpServer EE リモートアプリケーションコネクタ（Linux）                                             |
+| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                         | JumpServer EE データベースプロキシコネクタ                                                           |
+| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer EE VNC プロキシコネクタ                                                                    |
+| [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                        | JumpServer EE 顔認識                                                                                 |
 
 
 ## コントリビューティング
 
-PR の提出を歓迎します。ガイドラインについては [CONTRIBUTING.md][contributing-link] をご参照ください。
+貢献するためのPRの送信を歓迎します。ガイドラインについては[CONTRIBUTING.md][contributing-link]を参照してください。
 
 ## セキュリティ
 
-JumpServer はミッションクリティカルな製品です。インストールとデプロイメントのための基本的なセキュリティ推奨事項を参照してください。セキュリティ関連の問題に遭遇した場合は、直接ご連絡ください：
+JumpServerはミッションクリティカルな製品です。インストールと展開のための基本的なセキュリティ推奨事項を参照してください。セキュリティに関連する問題に遭遇した場合は、直接ご連絡ください：
 
 - メール: support@fit2cloud.com
 
-## ライセンス
+## License
 
 Copyright (c) 2014-2024 FIT2CLOUD, All rights reserved.
 
