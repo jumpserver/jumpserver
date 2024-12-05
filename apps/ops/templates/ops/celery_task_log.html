@@ -125,7 +125,8 @@
             fontSize: 13,
             lineHeight: 1.2,
             rightClickSelectsWord: true,
-            disableStdin: true
+            disableStdin: true,
+            scrollback: 9999999,
         });
         term.open(document.getElementById('term'));
         window.fit.fit(term);

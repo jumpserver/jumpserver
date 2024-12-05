@@ -16,9 +16,9 @@ from ..base.manager import AccountBasePlaybookManager
 logger = get_logger(__name__)
 
 risk_items = [
-    "authorized_keys",
-    "sudoers",
-    "groups",
+    # "authorized_keys",
+    # "sudoers",
+    # "groups",
 ]
 
 diff_items = risk_items + [
@@ -81,8 +81,8 @@ class AnalyseAccountRisk:
 
         risks = []
         for k, v in diff.items():
-            if k not in risk_items:
-                continue
+            # if k not in risk_items:
+            #     continue
             risks.append(
                 dict(
                     asset=ori_account.asset,

@@ -9,7 +9,7 @@ from common.utils.timezone import is_date_more_than
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
-__all__ = ['GatherAccountsAutomation', 'GatheredAccount',]
+__all__ = ['GatherAccountsAutomation', 'GatheredAccount']
 
 
 class GatheredAccount(JMSOrgBaseModel):
@@ -17,14 +17,13 @@ class GatheredAccount(JMSOrgBaseModel):
     username = models.CharField(max_length=32, blank=True, db_index=True, verbose_name=_('Username'))
     address_last_login = models.CharField(max_length=39, default='', verbose_name=_("Address login"))
     date_last_login = models.DateTimeField(null=True, verbose_name=_("Date login"))
-    authorized_keys = models.TextField(default='', blank=True, verbose_name=_("Authorized keys"))
-    sudoers = models.TextField(default='', verbose_name=_("Sudoers"), blank=True)
-    groups = models.TextField(default='', blank=True, verbose_name=_("Groups"))
     remote_present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 远端资产上是否还存在
     present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在
     date_password_change = models.DateTimeField(null=True, verbose_name=_("Date change password"))
     date_password_expired = models.DateTimeField(null=True, verbose_name=_("Date password expired"))
-    status = models.CharField(max_length=32, default=ConfirmOrIgnore.pending, blank=True, choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
+    status = models.CharField(max_length=32, default=ConfirmOrIgnore.pending, blank=True,
+                              choices=ConfirmOrIgnore.choices, verbose_name=_("Status"))
+    detail = models.JSONField(default=dict, blank=True, verbose_name=_("Detail"))
 
     @property
     def address(self):

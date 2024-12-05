@@ -4,16 +4,25 @@ from datetime import datetime
 __all__ = ['GatherAccountsFilter']
 
 
-def parse_date(date_str, default=''):
+def parse_date(date_str, default=None):
     if not date_str:
         return default
-    if date_str == 'Never':
-        return None
-    try:
-        dt = datetime.strptime(date_str, '%Y/%m/%d %H:%M:%S')
-        return timezone.make_aware(dt, timezone.get_current_timezone())
-    except ValueError:
+    if date_str in ['Never', 'null']:
         return default
+    formats = [
+        '%Y/%m/%d %H:%M:%S',
+        '%Y-%m-%dT%H:%M:%S',
+        '%d-%m-%Y %H:%M:%S',
+        '%Y/%m/%d',
+        '%d-%m-%Y',
+    ]
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date_str, fmt)
+            return timezone.make_aware(dt, timezone.get_current_timezone())
+        except ValueError:
+            continue
+    return default
 
 
 # TODO 后期会挪到 playbook 中
@@ -24,17 +33,83 @@ class GatherAccountsFilter:
     @staticmethod
     def mysql_filter(info):
         result = {}
-        for _, user_dict in info.items():
-            for username, _ in user_dict.items():
-                if len(username.split('.')) == 1:
-                    result[username] = {}
+        for username, user_info in info.items():
+            password_last_changed = parse_date(user_info.get('password_last_changed'))
+            password_lifetime = user_info.get('password_lifetime')
+            user = {
+                'username': username,
+                'date_password_change': password_last_changed,
+                'date_password_expired': password_last_changed + timezone.timedelta(
+                    days=password_lifetime) if password_last_changed and password_lifetime else None,
+                'date_last_login': None,
+                'groups': '',
+            }
+            result[username] = user
         return result
 
     @staticmethod
     def postgresql_filter(info):
         result = {}
-        for username in info:
-            result[username] = {}
+        for username, user_info in info.items():
+            user = {
+                'username': username,
+                'date_password_change': None,
+                'date_password_expired': parse_date(user_info.get('valid_until')),
+                'date_last_login': None,
+                'groups': '',
+            }
+            detail = {
+                'canlogin': user_info.get('canlogin'),
+                'superuser': user_info.get('superuser'),
+            }
+            user['detail'] = detail
+            result[username] = user
+        return result
+
+    @staticmethod
+    def sqlserver_filter(info):
+        if not info:
+            return {}
+        result = {}
+        for user_info in info[0][0]:
+            user = {
+                'username': user_info.get('name', ''),
+                'date_password_change': None,
+                'date_password_expired': None,
+                'date_last_login': None,
+                'groups': '',
+            }
+            detail = {
+                'create_date': user_info.get('create_date', ''),
+                'is_disabled': user_info.get('is_disabled', ''),
+                'default_database_name': user_info.get('default_database_name', ''),
+            }
+            user['detail'] = detail
+            result[user['username']] = user
+        return result
+
+    @staticmethod
+    def oracle_filter(info):
+        result = {}
+        for default_tablespace, users in info.items():
+            for username, user_info in users.items():
+                user = {
+                    'username': username,
+                    'date_password_change': parse_date(user_info.get('password_change_date')),
+                    'date_password_expired': parse_date(user_info.get('expiry_date')),
+                    'date_last_login': parse_date(user_info.get('last_login')),
+                    'groups': '',
+                }
+                detail = {
+                    'uid': user_info.get('user_id', ''),
+                    'create_date': user_info.get('created', ''),
+                    'account_status': user_info.get('account_status', ''),
+                    'default_tablespace': default_tablespace,
+                    'roles': user_info.get('roles', []),
+                    'privileges': user_info.get('privileges', []),
+                }
+                user['detail'] = detail
+                result[user['username']] = user
         return result
 
     @staticmethod
@@ -105,10 +180,12 @@ class GatherAccountsFilter:
                     user['date_password_change'] = start_date + timezone.timedelta(days=int(_password_date[0]))
                 if _password_date[1] and _password_date[1] != '0':
                     user['date_password_expired'] = start_date + timezone.timedelta(days=int(_password_date[1]))
-
-            user['groups'] = username_groups.get(username) or ''
-            user['sudoers'] = username_sudo.get(username) or ''
-            user['authorized_keys'] = username_authorized.get(username) or ''
+            detail = {
+                'groups': username_groups.get(username) or '',
+                'sudoers': username_sudo.get(username) or '',
+                'authorized_keys': username_authorized.get(username) or ''
+            }
+            user['detail'] = detail
             result[username] = user
         return result
 
@@ -125,13 +202,13 @@ class GatherAccountsFilter:
                 if len(parts) == 2:
                     key, value = parts
                     user_info[key.strip()] = value.strip()
+            detail = {'groups': user_info.get('Global Group memberships', ''), }
             user = {
                 'username': user_info.get('User name', ''),
-                'groups': user_info.get('Global Group memberships', ''),
                 'date_password_change': parse_date(user_info.get('Password last set', '')),
                 'date_password_expired': parse_date(user_info.get('Password expires', '')),
                 'date_last_login': parse_date(user_info.get('Last logon', '')),
-                'can_change_password': user_info.get('User may change password', 'Yes')
+                'groups': detail,
             }
             result[user['username']] = user
         return result
