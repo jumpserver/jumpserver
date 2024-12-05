@@ -33,10 +33,18 @@ class GatherAccountsFilter:
     @staticmethod
     def mysql_filter(info):
         result = {}
-        for _, user_dict in info.items():
-            for username, _ in user_dict.items():
-                if len(username.split('.')) == 1:
-                    result[username] = {}
+        for username, user_info in info.items():
+            password_last_changed = parse_date(user_info.get('password_last_changed'))
+            password_lifetime = user_info.get('password_lifetime')
+            user = {
+                'username': username,
+                'date_password_change': password_last_changed,
+                'date_password_expired': password_last_changed + timezone.timedelta(
+                    days=password_lifetime) if password_last_changed and password_lifetime else None,
+                'date_last_login': None,
+                'groups': '',
+            }
+            result[username] = user
         return result
 
     @staticmethod
