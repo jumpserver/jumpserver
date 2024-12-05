@@ -1,0 +1,24 @@
+name: Auto update docs changelog
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update_docs_changelog:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name, 'v4.')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Update docs changelog
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          DOCS_TOKEN: ${{ secrets.DOCS_TOKEN }}
+        run: |
+          git config --global user.name 'BaiJiangJie'
+          git config --global user.email 'jiangjie.bai@fit2cloud.com'
+
+          git clone https://$DOCS_TOKEN@github.com/jumpservice/documentation.git
+          cd documentation/utils
+          bash update_changelog.sh
