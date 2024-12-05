@@ -113,4 +113,21 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name='AccountBackupExecution',
         ),
+        migrations.RemoveField(
+            model_name='gatheredaccount',
+            name='authorized_keys',
+        ),
+        migrations.RemoveField(
+            model_name='gatheredaccount',
+            name='groups',
+        ),
+        migrations.RemoveField(
+            model_name='gatheredaccount',
+            name='sudoers',
+        ),
+        migrations.AddField(
+            model_name='gatheredaccount',
+            name='detail',
+            field=models.JSONField(blank=True, default=dict, verbose_name='Detail'),
+        ),
     ]
