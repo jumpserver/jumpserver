@@ -2,7 +2,7 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.org/index-en.html"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## 一個開源的 PAM 工具（堡壘主機）
+## An open-source PAM tool (Bastion Host)
 
 [![][license-shield]][license-link]
 [![][discord-shield]][discord-link]
