@@ -1,67 +1,73 @@
 # -*- coding: utf-8 -*-
 #
-
+import boto3
 import os
-import boto
-import boto.s3.connection
 
 from .base import ObjectStorage
 
 
 class CEPHStorage(ObjectStorage):
-
     def __init__(self, config):
-        self.bucket = config.get("BUCKET", None)
+        self.bucket = config.get("BUCKET", "jumpserver")
         self.region = config.get("REGION", None)
         self.access_key = config.get("ACCESS_KEY", None)
         self.secret_key = config.get("SECRET_KEY", None)
-        self.hostname = config.get("HOSTNAME", None)
-        self.port = config.get("PORT", 7480)
-
-        if self.hostname and self.access_key and self.secret_key:
-            self.conn = boto.connect_s3(
-                aws_access_key_id=self.access_key,
-                aws_secret_access_key=self.secret_key,
-                host=self.hostname,
-                port=self.port,
-                is_secure=False,
-                calling_format=boto.s3.connection.OrdinaryCallingFormat(),
-            )
+        self.endpoint = config.get("ENDPOINT", None)
 
         try:
-            self.client = self.conn.get_bucket(bucket_name=self.bucket)
-        except Exception:
-            self.client = None
+            self.client = boto3.client(
+                's3', region_name=self.region,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+                endpoint_url=self.endpoint
+            )
+        except ValueError:
+            pass
 
     def upload(self, src, target):
         try:
-            key = self.client.new_key(target)
-            key.set_contents_from_filename(src)
-            return True, None
-        except Exception as e:
-            return False, e
-
-    def download(self, src, target):
-        try:
-            os.makedirs(os.path.dirname(target), 0o755, exist_ok=True)
-            key = self.client.get_key(src)
-            key.get_contents_to_filename(target)
-            return True, None
-        except Exception as e:
-            return False, e
-
-    def delete(self, path):
-        try:
-            self.client.delete_key(path)
+            self.client.upload_file(Filename=src, Bucket=self.bucket, Key=target)
             return True, None
         except Exception as e:
             return False, e
 
     def exists(self, path):
         try:
-            return self.client.get_key(path)
-        except Exception:
+            self.client.head_object(Bucket=self.bucket, Key=path)
+            return True
+        except Exception as e:
             return False
+
+    def download(self, src, target):
+        try:
+            os.makedirs(os.path.dirname(target), 0o755, exist_ok=True)
+            self.client.download_file(self.bucket, src, target)
+            return True, None
+        except Exception as e:
+            return False, e
+
+    def delete(self, path):
+        try:
+            self.client.delete_object(Bucket=self.bucket, Key=path)
+            return True, None
+        except Exception as e:
+            return False, e
+
+    def generate_presigned_url(self, path, expire=3600):
+        try:
+            return self.client.generate_presigned_url(
+                ClientMethod='get_object',
+                Params={'Bucket': self.bucket, 'Key': path},
+                ExpiresIn=expire,
+                HttpMethod='GET'), None
+        except Exception as e:
+            return False, e
+
+    def list_buckets(self):
+        response = self.client.list_buckets()
+        buckets = response.get('Buckets', [])
+        result = [b['Name'] for b in buckets if b.get('Name')]
+        return result
 
     @property
     def type(self):
