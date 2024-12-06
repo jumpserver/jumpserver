@@ -13,10 +13,8 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
-from django.core.exceptions import SuspiciousOperation
 from django.db import transaction
 from django.urls import reverse
-from rest_framework.exceptions import ParseError
 
 from authentication.signals import user_auth_success, user_auth_failed
 from authentication.utils import build_absolute_uri_for_oidc
@@ -107,7 +105,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
         # parameters because we won't be able to get a valid token for the user in that case.
         if (state is None and settings.AUTH_OPENID_USE_STATE) or code is None:
             logger.debug(log_prompt.format('Authorization code or state value is missing'))
-            raise SuspiciousOperation('Authorization code or state value is missing')
+            return
 
         # Prepares the token payload that will be used to request an authentication token to the
         # token endpoint of the OIDC provider.
@@ -165,7 +163,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
             error = "Json token response error, token response " \
                     "content is: {}, error is: {}".format(token_response.content, str(e))
             logger.debug(log_prompt.format(error))
-            raise ParseError(error)
+            return
 
         # Validates the token.
         logger.debug(log_prompt.format('Validate ID Token'))
@@ -206,7 +204,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
                 error = "Json claims response error, claims response " \
                         "content is: {}, error is: {}".format(claims_response.content, str(e))
                 logger.debug(log_prompt.format(error))
-                raise ParseError(error)
+                return
 
         logger.debug(log_prompt.format('Get or create user from claims'))
         user, created = self.get_or_create_user_from_claims(request, claims)
