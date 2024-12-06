@@ -164,7 +164,6 @@ azure-keyvault-secrets = "4.9.0"
 psycopg2-binary = "2.9.6"
 pycountry = "^24.6.1"
 # Depend by jms storage
-boto = "2.49.0"
 azure-storage-blob = "12.17.0"
 esdk-obs-python = "3.21.4"
 oss2 = "2.18.1"
