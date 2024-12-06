@@ -10,8 +10,12 @@ from assets.tasks import execute_asset_automation_task
 from common.const.choices import Trigger, Status
 from common.db.fields import EncryptJsonDictTextField
 from ops.mixin import PeriodTaskModelMixin
-from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
+from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel, OrgManager
 from users.models import User
+
+
+class BaseAutomationManager(OrgManager):
+    pass
 
 
 class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
@@ -23,6 +27,8 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     type = models.CharField(max_length=16, verbose_name=_("Type"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     params = models.JSONField(default=dict, verbose_name=_("Parameters"))
+
+    objects = BaseAutomationManager.from_queryset(models.QuerySet)()
 
     def get_report_template(self):
         raise NotImplementedError
