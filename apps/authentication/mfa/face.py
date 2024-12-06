@@ -1,12 +1,12 @@
 from authentication.mfa.base import BaseMFA
 from django.utils.translation import gettext_lazy as _
 
-from authentication.mixins import MFAFaceMixin
+from authentication.mixins import AuthFaceMixin
 from common.const import LicenseEditionChoices
 from settings.api import settings
 
 
-class MFAFace(BaseMFA, MFAFaceMixin):
+class MFAFace(BaseMFA, AuthFaceMixin):
     name = "face"
     display_name = _('Face Recognition')
     placeholder = 'Face Recognition'
