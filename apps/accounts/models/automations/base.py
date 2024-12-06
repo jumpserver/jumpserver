@@ -64,19 +64,25 @@ class ChangeSecretMixin(SecretWithRandomMixin):
         verbose_name=_('Check connection after change')
     )
     get_all_assets: callable  # get all assets
+    accounts: list  # account usernames
 
     class Meta:
         abstract = True
 
-    def create_nonlocal_accounts(self, usernames, asset):
-        pass
+    def gen_nonlocal_accounts(self, usernames, asset):
+        return []
 
     def get_account_ids(self):
+        account_objs = []
         usernames = self.accounts
-        accounts = Account.objects.none()
-        for asset in self.get_all_assets():
-            self.create_nonlocal_accounts(usernames, asset)
-            accounts = accounts | asset.accounts.all()
+        assets = self.get_all_assets()
+        for asset in assets:
+            objs = self.gen_nonlocal_accounts(usernames, asset)
+            account_objs.extend(objs)
+
+        Account.objects.bulk_create(account_objs)
+
+        accounts = Account.objects.filter(asset__in=assets)
         account_ids = accounts.filter(
             username__in=usernames, secret_type=self.secret_type
         ).values_list('id', flat=True)

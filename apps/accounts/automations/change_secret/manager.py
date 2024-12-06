@@ -46,7 +46,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.change_secret
 
-    def get_ssh_params(self, account, secret, secret_type):
+    def get_ssh_params(self, secret, secret_type):
         kwargs = {}
         if secret_type != SecretType.SSH_KEY:
             return kwargs
@@ -65,6 +65,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         asset = privilege_account.asset
         accounts = asset.accounts.all()
         accounts = accounts.filter(id__in=self.account_ids)
+
         if self.secret_type:
             accounts = accounts.filter(secret_type=self.secret_type)
 
@@ -74,37 +75,36 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             )
         return accounts
 
-    def gen_new_secret(self, account, path_dir):
-        if self.secret_type is None:
-            new_secret = account.secret
+    def get_secret(self, account):
+        if self.secret_strategy == SecretStrategy.custom:
+            new_secret = self.execution.snapshot['secret']
         else:
-            if self.secret_strategy == SecretStrategy.custom:
-                new_secret = self.execution.snapshot['secret']
-            else:
-                generator = SecretGenerator(
-                    self.secret_strategy, self.secret_type,
-                    self.execution.snapshot.get('password_rules')
-                )
-                new_secret = generator.get_secret()
+            generator = SecretGenerator(
+                self.secret_strategy, self.secret_type,
+                self.execution.snapshot.get('password_rules')
+            )
+            new_secret = generator.get_secret()
+        return new_secret
 
-        recorder_secret = new_secret
+    def gen_new_secret(self, account, new_secret, path_dir):
         private_key_path = None
         if account.secret_type == SecretType.SSH_KEY:
             private_key_path = self.generate_private_key_path(new_secret, path_dir)
             new_secret = self.generate_public_key(new_secret)
-        return new_secret, private_key_path, recorder_secret
+        return new_secret, private_key_path
 
-    def get_or_create_record(self, asset, account, new_secret, name):
+    def get_or_create_record(self, asset, account, name):
         asset_account_id = f'{asset.id}-{account.id}'
 
         if asset_account_id in self.record_map:
             record_id = self.record_map[asset_account_id]
             recorder = ChangeSecretRecord.objects.filter(id=record_id).first()
         else:
+            new_secret = self.get_secret(account)
             recorder = self.create_record(asset, account, new_secret)
 
-        if recorder:
-            self.name_recorder_mapper[name] = recorder
+        self.name_recorder_mapper[name] = recorder
+        return recorder
 
     @bulk_create_decorator(ChangeSecretRecord)
     def create_record(self, asset, account, new_secret):
@@ -115,11 +115,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         )
         return recorder
 
-    def gen_change_secret_inventory(self, host, account, new_secret, private_key_path, asset):
-        h = deepcopy(host)
+    def gen_change_secret_inventory(self, h, account, new_secret, private_key_path, asset):
         secret_type = account.secret_type
-        h['name'] += '(' + account.username + ')'
-        h['ssh_params'].update(self.get_ssh_params(account, new_secret, secret_type))
+        h['ssh_params'].update(self.get_ssh_params(new_secret, secret_type))
         h['account'] = {
             'name': account.name,
             'username': account.username,
@@ -144,7 +142,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         host['ssh_params'] = {}
 
         accounts = self.get_accounts(account)
-        error_msg = _("! No pending accounts found")
+        error_msg = _("No pending accounts found")
         if not accounts:
             print(f'{asset}: {error_msg}')
             return []
@@ -154,13 +152,15 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         inventory_hosts = []
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            print(f'! Windows {asset} does not support ssh key push')
+            print(f'Windows {asset} does not support ssh key push')
             return inventory_hosts
 
         for account in accounts:
-            new_secret, private_key_path, recorder_secret = self.gen_new_secret(account, path_dir)
-            h = self.gen_change_secret_inventory(host, account, new_secret, private_key_path, asset)
-            self.get_or_create_record(asset, account, recorder_secret, h['name'])
+            h = deepcopy(host)
+            h['name'] += '(' + account.username + ')'  # To distinguish different accounts
+            record = self.get_or_create_record(asset, account, h['name'])
+            new_secret, private_key_path = self.gen_new_secret(account, record.new_secret, path_dir)
+            h = self.gen_change_secret_inventory(h, account, new_secret, private_key_path, asset)
             inventory_hosts.append(h)
 
         return inventory_hosts
