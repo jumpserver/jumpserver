@@ -1,9 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.const import SecretStrategy, SecretType
 from accounts.models import AccountTemplate
-from accounts.utils import SecretGenerator
 from common.serializers import SecretReadableMixin
 from common.serializers.fields import ObjectRelatedField
 from .base import BaseAccountSerializer
@@ -46,21 +44,6 @@ class AccountTemplateSerializer(BaseAccountSerializer):
                 'required': False
             },
         }
-
-    @staticmethod
-    def generate_secret(attrs):
-        secret_type = attrs.get('secret_type', SecretType.PASSWORD)
-        secret_strategy = attrs.get('secret_strategy', SecretStrategy.custom)
-        password_rules = attrs.get('password_rules')
-        if secret_strategy != SecretStrategy.random:
-            return
-        generator = SecretGenerator(secret_strategy, secret_type, password_rules)
-        attrs['secret'] = generator.get_secret()
-
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        self.generate_secret(attrs)
-        return attrs
 
 
 class AccountTemplateSecretSerializer(SecretReadableMixin, AccountTemplateSerializer):

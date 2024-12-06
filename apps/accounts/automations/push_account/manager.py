@@ -10,3 +10,6 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
+
+    def get_secret(self, account):
+        return account.secret

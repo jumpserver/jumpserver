@@ -11,20 +11,22 @@ __all__ = ['PushAccountAutomation']
 
 class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
-    def create_nonlocal_accounts(self, usernames, asset):
+    def gen_nonlocal_accounts(self, usernames, asset):
         secret_type = self.secret_type
         account_usernames = asset.accounts \
             .filter(secret_type=self.secret_type) \
             .values_list('username', flat=True)
         create_usernames = set(usernames) - set(account_usernames)
-        create_account_objs = [
+
+        create_accounts = [
             Account(
-                name=f'{username}-{secret_type}', username=username,
+                name=f'{username}-{secret_type}',
+                username=username, secret=self.get_secret(),
                 secret_type=secret_type, asset=asset,
             )
             for username in create_usernames
         ]
-        Account.objects.bulk_create(create_account_objs)
+        return create_accounts
 
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.push_account
