@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from authentication.signals import user_auth_failed, user_auth_success
 from common.utils import get_logger
-from .base import JMSModelBackend
+from .base import JMSBaseAuthBackend
 
 logger = get_logger(__file__)
 
@@ -20,9 +20,10 @@ if settings.AUTH_CUSTOM:
         logger.warning('Import custom auth method failed: {}, Maybe not enabled'.format(e))
 
 
-class CustomAuthBackend(JMSModelBackend):
+class CustomAuthBackend(JMSBaseAuthBackend):
 
-    def is_enabled(self):
+    @staticmethod
+    def is_enabled():
         return settings.AUTH_CUSTOM and callable(custom_authenticate_method)
 
     @staticmethod
@@ -35,10 +36,10 @@ class CustomAuthBackend(JMSModelBackend):
         )
         return user, created
 
-    def authenticate(self, request, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None):
         try:
             userinfo: dict = custom_authenticate_method(
-                username=username, password=password, **kwargs
+                username=username, password=password
             )
             user, created = self.get_or_create_user_from_userinfo(userinfo)
         except Exception as e:

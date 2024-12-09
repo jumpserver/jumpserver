@@ -86,7 +86,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
     """
 
     @ssl_verification
-    def authenticate(self, request, nonce=None, code_verifier=None, **kwargs):
+    def authenticate(self, request, nonce=None, code_verifier=None):
         """ Authenticates users in case of the OpenID Connect Authorization code flow. """
         log_prompt = "Process authenticate [OIDCAuthCodeBackend]: {}"
         logger.debug(log_prompt.format('start'))
@@ -233,15 +233,15 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
 class OIDCAuthPasswordBackend(OIDCBaseBackend):
 
     @ssl_verification
-    def authenticate(self, request, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None):
         try:
-            return self._authenticate(request, username, password, **kwargs)
+            return self._authenticate(request, username, password)
         except Exception as e:
             error = f'Authenticate exception: {e}'
             logger.error(error, exc_info=True)
             return
 
-    def _authenticate(self, request, username=None, password=None, **kwargs):
+    def _authenticate(self, request, username=None, password=None):
         """
         https://oauth.net/2/
         https://aaronparecki.com/oauth-2-simplified/#password

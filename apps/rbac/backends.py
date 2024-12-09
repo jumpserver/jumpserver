@@ -9,7 +9,7 @@ class RBACBackend(JMSBaseAuthBackend):
     def is_enabled():
         return True
 
-    def authenticate(self, *args, **kwargs):
+    def authenticate(self):
         return None
 
     def username_allow_authenticate(self, username):
