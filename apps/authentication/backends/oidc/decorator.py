@@ -4,7 +4,9 @@
 import warnings
 import contextlib
 import requests
+import inspect
 
+from functools import wraps
 from django.conf import settings
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -52,6 +54,7 @@ def no_ssl_verification():
 
 
 def ssl_verification(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if not settings.AUTH_OPENID_IGNORE_SSL_VERIFICATION:
             return func(*args, **kwargs)

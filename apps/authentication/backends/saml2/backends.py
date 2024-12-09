@@ -10,14 +10,14 @@ from .signals import (
     saml2_create_or_update_user
 )
 from authentication.signals import user_auth_failed, user_auth_success
-from ..base import JMSModelBackend
+from ..base import JMSBaseAuthBackend
 
 __all__ = ['SAML2Backend']
 
 logger = get_logger(__name__)
 
 
-class SAML2Backend(JMSModelBackend):
+class SAML2Backend(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_SAML2
@@ -42,7 +42,7 @@ class SAML2Backend(JMSModelBackend):
         )
         return user, created
 
-    def authenticate(self, request, saml_user_data=None, **kwargs):
+    def authenticate(self, request, saml_user_data=None):
         log_prompt = "Process authenticate [SAML2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
         if saml_user_data is None:

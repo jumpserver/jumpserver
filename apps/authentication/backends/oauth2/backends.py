@@ -18,7 +18,7 @@ from common.exceptions import JMSException
 from .signals import (
     oauth2_create_or_update_user
 )
-from ..base import JMSModelBackend
+from ..base import JMSBaseAuthBackend
 
 
 __all__ = ['OAuth2Backend']
@@ -26,7 +26,7 @@ __all__ = ['OAuth2Backend']
 logger = get_logger(__name__)
 
 
-class OAuth2Backend(JMSModelBackend):
+class OAuth2Backend(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_OAUTH2
@@ -68,7 +68,7 @@ class OAuth2Backend(JMSModelBackend):
             response_data = response_data['data']
         return response_data
 
-    def authenticate(self, request, code=None, **kwargs):
+    def authenticate(self, request, code=None):
         log_prompt = "Process authenticate [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
         if code is None:

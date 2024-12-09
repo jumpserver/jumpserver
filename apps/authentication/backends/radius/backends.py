@@ -51,10 +51,10 @@ class RadiusBaseBackend(CreateUserMixin, JMSBaseAuthBackend):
 
 
 class RadiusBackend(RadiusBaseBackend, RADIUSBackend):
-    def authenticate(self, request, username='', password='', **kwargs):
+    def authenticate(self, request, username='', password=''):
         return super().authenticate(request, username=username, password=password)
 
 
 class RadiusRealmBackend(RadiusBaseBackend, RADIUSRealmBackend):
-    def authenticate(self, request, username='', password='', realm=None, **kwargs):
+    def authenticate(self, request, username='', password='', realm=None):
         return super().authenticate(request, username=username, password=password, realm=realm)
