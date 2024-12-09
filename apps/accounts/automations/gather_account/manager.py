@@ -270,7 +270,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         lost_users = ori_ga_users - remote_users
         if lost_users:
             queryset.filter(username__in=lost_users).update(
-                status="", remote_present=False
+                status=ConfirmOrIgnore.pending, remote_present=False
             )
             self.summary["lost_accounts"] += len(lost_users)
             for username in lost_users:
@@ -285,7 +285,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         # 标识状态为 待处理, 让管理员去确认
         ga_added_users = ori_ga_users - ori_users
         if ga_added_users:
-            queryset.filter(username__in=ga_added_users).update(status="")
+            queryset.filter(username__in=ga_added_users).update(status=ConfirmOrIgnore.pending)
 
         # 收集的账号 比 账号列表少的
         # 这个好像不不用对比，原始情况就这样
