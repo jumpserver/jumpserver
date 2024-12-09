@@ -12,7 +12,26 @@
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
         script: |
-          select * from sys.sql_logins
+          SELECT 
+              l.name,
+              l.modify_date,
+              l.is_disabled,
+              l.create_date,
+              l.default_database_name,
+              LOGINPROPERTY(name, 'DaysUntilExpiration') AS days_until_expiration,
+              MAX(s.login_time) AS last_login_time
+          FROM 
+              sys.sql_logins l
+          LEFT JOIN 
+              sys.dm_exec_sessions s
+          ON 
+              l.name = s.login_name
+          WHERE 
+              s.is_user_process = 1 OR s.login_name IS NULL
+          GROUP BY 
+              l.name, l.create_date, l.modify_date, l.is_disabled, l.default_database_name
+          ORDER BY 
+              last_login_time DESC;
         output: dict
       register: db_info
 
