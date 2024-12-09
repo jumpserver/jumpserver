@@ -45,8 +45,11 @@ class ChangeSecretRecord(JMSBaseModel):
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
     class Meta:
-        ordering = ('-date_created',)
         verbose_name = _("Change secret record")
+        permissions = [
+            ('view_pushsecretrecord', _('Can view change secret execution')),
+            ('add_pushsecretexecution', _('Can add change secret execution')),
+        ]
 
     def __str__(self):
         return f'{self.account.username}@{self.asset}'
