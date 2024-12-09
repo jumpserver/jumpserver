@@ -29,6 +29,7 @@ from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
 from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
+from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -283,7 +284,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
+class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
         'user_display', 'asset_display'
     )
@@ -304,6 +305,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
     input_username = ''
+    need_face_verify = False
 
     def get_queryset(self):
         queryset = ConnectionToken.objects \
@@ -388,6 +390,8 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket
+
+        if ticket or self.need_face_verify:
             data['is_active'] = False
         return data
 
@@ -444,6 +448,12 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
                 assignees=acl.reviewers.all(), org_id=asset.org_id
             )
             return ticket
+        if acl.is_action(acl.ActionChoices.face_verify) \
+                or acl.is_action(acl.ActionChoices.face_online):
+            if not self.request.query_params.get('face_verify'):
+                msg = _('ACL action is face verify')
+                raise JMSException(code='acl_face_verify', detail=msg)
+            self.need_face_verify = True
         if acl.is_action(acl.ActionChoices.notice):
             reviewers = acl.reviewers.all()
             if not reviewers:
@@ -455,9 +465,22 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
                     reviewer, asset, user, account, self.input_username
                 ).publish_async()
 
+    def create_face_verify(self, response):
+        if not self.request.user.face_vector:
+            raise JMSException(code='no_face_feature', detail=_('No available face feature'))
+        connection_token_id = response.data.get('id')
+        context_data = {
+            "action": "login_asset",
+            "connection_token_id": connection_token_id,
+        }
+        face_verify_token = self.create_face_verify_context(context_data)
+        response.data['face_token'] = face_verify_token
+
     def create(self, request, *args, **kwargs):
         try:
             response = super().create(request, *args, **kwargs)
+            if self.need_face_verify:
+                self.create_face_verify(response)
         except JMSException as e:
             data = {'code': e.detail.code, 'detail': e.detail}
             return Response(data, status=e.status_code)

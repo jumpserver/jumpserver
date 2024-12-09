@@ -3,12 +3,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from authentication import errors
-from authentication.mixins import AuthMixin, MFAFaceMixin
+from authentication.mixins import AuthMixin
 
 __all__ = ['UserFaceCaptureView', 'UserFaceEnableView',
            'UserFaceDisableView']
 
-from common.utils import reverse, FlashMessageUtil
+from common.utils import FlashMessageUtil
 
 
 class UserFaceCaptureForm(forms.Form):
@@ -39,9 +39,8 @@ class UserFaceCaptureView(AuthMixin, FormView):
         return context
 
 
-class UserFaceEnableView(MFAFaceMixin, UserFaceCaptureView):
+class UserFaceEnableView(UserFaceCaptureView):
     def form_valid(self, form):
-
         try:
             code = self.get_face_code()
             user = self.get_user_from_session()
