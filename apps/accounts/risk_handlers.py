@@ -1,7 +1,13 @@
 from django.utils.translation import gettext_lazy as _
 
+from accounts.const import AutomationTypes
 from common.const import ConfirmOrIgnore
-from accounts.models import GatheredAccount, AccountRisk, SecretType, AutomationExecution
+from accounts.models import (
+    GatheredAccount,
+    AccountRisk,
+    SecretType,
+    AutomationExecution,
+)
 from django.utils import timezone
 
 from common.const import ConfirmOrIgnore
@@ -18,13 +24,13 @@ TYPE_CHOICES = [
 
 
 class RiskHandler:
-    def __init__(self, asset, username, request=None, risk=''):
+    def __init__(self, asset, username, request=None, risk=""):
         self.asset = asset
         self.username = username
         self.request = request
         self.risk = risk
 
-    def handle(self, tp, risk=''):
+    def handle(self, tp, risk=""):
         self.risk = risk
         attr = f"handle_{tp}"
         if hasattr(self, attr):
@@ -38,11 +44,10 @@ class RiskHandler:
         r = self.get_risk()
         if not r:
             return
-        status = ConfirmOrIgnore.ignored if tp == 'ignore' else ConfirmOrIgnore.confirmed
-        r.details.append({
-            **self.process_detail,
-            'action': tp, 'status': status
-        })
+        status = (
+            ConfirmOrIgnore.ignored if tp == "ignore" else ConfirmOrIgnore.confirmed
+        )
+        r.details.append({**self.process_detail, "action": tp, "status": status})
         r.status = status
         r.save()
 
@@ -61,8 +66,9 @@ class RiskHandler:
     @property
     def process_detail(self):
         return {
-            "datetime": timezone.now().isoformat(), "type": "process",
-            "processor": str(self.request.user)
+            "datetime": timezone.now().isoformat(),
+            "type": "process",
+            "processor": str(self.request.user),
         }
 
     def handle_add_account(self):
@@ -76,12 +82,15 @@ class RiskHandler:
         GatheredAccount.objects.filter(asset=self.asset, username=self.username).update(
             present=True, status=ConfirmOrIgnore.confirmed
         )
-        self.risk = 'new_found'
+        self.risk = "new_found"
 
     def handle_disable_remote(self):
         pass
 
     def handle_delete_remote(self):
+        self._handle_delete(delete="remote")
+
+    def _handle_delete(self, delete="both"):
         asset = self.asset
         execution = AutomationExecution()
         execution.snapshot = {
@@ -89,16 +98,30 @@ class RiskHandler:
             "accounts": [{"asset": str(asset.id), "username": self.username}],
             "type": "remove_account",
             "name": "Remove remote account: {}@{}".format(self.username, asset.name),
+            "delete": delete,
+            "risk": self.risk
         }
         execution.save()
         execution.start()
         return execution.summary
 
     def handle_delete_both(self):
-        pass
+        self._handle_delete(delete="both")
 
     def handle_change_password_add(self):
         pass
 
     def handle_change_password(self):
-        pass
+        asset = self.asset
+        execution = AutomationExecution()
+        execution.snapshot = {
+            "assets": [str(asset.id)],
+            "accounts": [self.username],
+            "type": AutomationTypes.change_secret,
+            "secret_type": "password",
+            "secret_strategy": "random",
+            "name": "Change account password: {}@{}".format(self.username, asset.name),
+        }
+        execution.save()
+        execution.start()
+        return execution.summary

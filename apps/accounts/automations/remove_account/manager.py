@@ -6,6 +6,7 @@ from django.db.models import QuerySet
 
 from accounts.const import AutomationTypes
 from accounts.models import Account, GatheredAccount, AccountRisk
+from common.const import ConfirmOrIgnore
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
 
@@ -23,6 +24,10 @@ class RemoveAccountManager(AccountBasePlaybookManager):
         self.snapshot_asset_account_map = defaultdict(list)
         for account in snapshot_account:
             self.snapshot_asset_account_map[str(account["asset"])].append(account)
+
+        # 给 handler 使用
+        self.delete = self.execution.snapshot.get("delete", "both")
+        self.confirm_risk = self.execution.snapshot.get("risk", "")
 
     def prepare_runtime_dir(self):
         path = super().prepare_runtime_dir()
@@ -66,18 +71,24 @@ class RemoveAccountManager(AccountBasePlaybookManager):
             return
 
         try:
-            Account.objects.filter(
-                asset_id=account["asset"], username=account["username"]
-            ).delete()
+            if self.delete == "both":
+                Account.objects.filter(
+                    asset_id=account["asset"],
+                    username=account["username"]
+                ).delete()
+
+            if self.confirm_risk:
+                AccountRisk.objects.filter(
+                    asset_id=account["asset"],
+                    username=account["username"],
+                    risk__in=[self.confirm_risk],
+                ).update(status=ConfirmOrIgnore.confirmed)
+
             GatheredAccount.objects.filter(
-                asset_id=account["asset"], username=account["username"]
-            ).delete()
-            risk = AccountRisk.objects.filter(
                 asset_id=account["asset"],
-                username=account["username"],
-                risk__in=["new_found"],
-            )
-            print("Account removed: ", account)
+                username=account["username"]
+            ).delete()
+
         except Exception as e:
             logger.error(
                 f"Failed to delete account {account['username']} on asset {account['asset']}: {e}"
