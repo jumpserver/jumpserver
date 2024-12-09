@@ -30,6 +30,7 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
         ("list", "accounts.view_pushaccountexecution"),
         ("retrieve", "accounts.view_pushaccountexecution"),
         ("create", "accounts.add_pushaccountexecution"),
+        ("report", "accounts.view_pushaccountexecution"),
     )
 
     tp = AutomationTypes.push_account
@@ -44,9 +45,15 @@ class PushAccountRecordViewSet(ChangeSecretRecordViewSet):
     serializer_class = serializers.ChangeSecretRecordSerializer
     tp = AutomationTypes.push_account
 
+    rbac_perms = {
+        'list': 'accounts.view_pushsecretrecord',
+        'execute': 'accounts.add_pushsecretexecution',
+        'secret': 'accounts.view_pushsecretrecord',
+    }
+
     def get_queryset(self):
         qs = ChangeSecretRecord.get_valid_records()
-        return qs.objects.filter(
+        return qs.filter(
             execution__automation__type=self.tp
         )
 
