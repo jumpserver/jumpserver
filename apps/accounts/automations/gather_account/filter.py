@@ -72,11 +72,14 @@ class GatherAccountsFilter:
             return {}
         result = {}
         for user_info in info[0][0]:
+            days_until_expiration = user_info.get('days_until_expiration')
+            date_password_expired = timezone.now() + timezone.timedelta(
+                days=int(days_until_expiration)) if days_until_expiration else None
             user = {
                 'username': user_info.get('name', ''),
-                'date_password_change': None,
-                'date_password_expired': None,
-                'date_last_login': None,
+                'date_password_change': parse_date(user_info.get('modify_date')),
+                'date_password_expired': date_password_expired,
+                'date_last_login': parse_date(user_info.get('last_login_time')),
                 'groups': '',
             }
             detail = {
@@ -84,6 +87,7 @@ class GatherAccountsFilter:
                 'is_disabled': user_info.get('is_disabled', ''),
                 'default_database_name': user_info.get('default_database_name', ''),
             }
+            print(user)
             user['detail'] = detail
             result[user['username']] = user
         return result

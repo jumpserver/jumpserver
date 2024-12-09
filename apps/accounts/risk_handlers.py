@@ -58,7 +58,8 @@ class RiskHandler:
         return r.first()
 
     def handle_ignore(self):
-        pass
+        GatheredAccount.objects.filter(asset=self.asset, username=self.username).update(status=ConfirmOrIgnore.ignored)
+        self.risk = 'ignored'
 
     def handle_review(self):
         pass
