@@ -23,7 +23,8 @@ class TicketFilter(BaseFilterSet):
 
     def filter_assignees_id(self, queryset, name, value):
         return queryset.filter(
-            ticket_steps__ticket_assignees__assignee__id=value
+            ticket_steps__level=F('approval_step'),
+            ticket_steps__ticket_assignees__assignee_id=value
         )
 
     def filter_relevant_asset(self, queryset, name, value):
