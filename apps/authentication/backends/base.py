@@ -43,7 +43,7 @@ class JMSBaseAuthBackend:
             # 特殊值 None 表示没有限制
             return True
         backend_name = self.__class__.__name__
-        allowed_backend_names = [path.split('.drf.py')[-1] for path in allowed_backend_paths]
+        allowed_backend_names = [path.split('.')[-1] for path in allowed_backend_paths]
         allow = backend_name in allowed_backend_names
         if not allow:
             info = 'User {} skip authentication backend {}, because it not in {}'
