@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q, Count
+from django.http import HttpResponse
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 from operator import itemgetter
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework.response import Response
 
@@ -14,7 +17,9 @@ from accounts.models import (
     AccountRisk,
     RiskChoice,
     CheckAccountEngine,
+    AutomationExecution,
 )
+from assets.models import Asset
 from common.api import JMSModelViewSet
 from common.utils import many_get
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -42,6 +47,7 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
         ("list", "accounts.view_checkaccountexecution"),
         ("retrieve", "accounts.view_checkaccountsexecution"),
         ("create", "accounts.add_checkaccountexecution"),
+        ("adhoc", "accounts.add_checkaccountexecution"),
         ("report", "accounts.view_checkaccountsexecution"),
     )
     ordering = ("-date_created",)
@@ -51,6 +57,26 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
         queryset = super().get_queryset()
         queryset = queryset.filter(automation__type=self.tp)
         return queryset
+
+    @action(methods=["get"], detail=False, url_path="adhoc")
+    def adhoc(self, request, *args, **kwargs):
+        asset_id = request.query_params.get("asset_id")
+        if not asset_id:
+            return Response(status=400, data={"asset_id": "This field is required."})
+
+        get_object_or_404(Asset, pk=asset_id)
+        execution = AutomationExecution()
+        execution.snapshot = {
+            "assets": [asset_id],
+            "nodes": [],
+            "type": AutomationTypes.check_account,
+            "engines": ["check_account_secret"],
+            "name": "Check asset risk: {} {}".format(asset_id, timezone.now()),
+        }
+        execution.save()
+        execution.start()
+        report = execution.manager.gen_report()
+        return HttpResponse(report)
 
 
 class AccountRiskViewSet(OrgBulkModelViewSet):
@@ -99,7 +125,9 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
         s = self.get_serializer(data=request.data)
         s.is_valid(raise_exception=True)
 
-        asset, username, act, risk = many_get(s.validated_data, ("asset", "username", "action", "risk"))
+        asset, username, act, risk = many_get(
+            s.validated_data, ("asset", "username", "action", "risk")
+        )
         handler = RiskHandler(asset=asset, username=username, request=self.request)
         data = handler.handle(act, risk)
         if not data:

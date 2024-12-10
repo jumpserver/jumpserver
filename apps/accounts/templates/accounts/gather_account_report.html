@@ -68,6 +68,8 @@
             {% endfor %}
             </tbody>
         </table>
+    {% else %}
+        <p>{% trans 'No new accounts found' %}</p>
     {% endif %}
 </div>
 <div class='result'>
@@ -96,32 +98,32 @@
 </div>
 
 
-<div class='result'>
-    <p>{% trans 'New found risks' %}: {{ summary.new_risks }}</p>
-    {% if summary.new_risks %}
-        <table>
-            <caption></caption>
-            <thead>
-            <tr>
-                <th>{% trans 'No.' %}</th>
-                <th>{% trans 'Asset' %}</th>
-                <th>{% trans 'Username' %}</th>
-                <th>{% trans 'Result' %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for risk in result.risks %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ risk.asset }}</td>
-                    <td>{{ risk.username }}</td>
-                    <td>{{ risk.risk }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</div>
+{#<div class='result'>#}
+{#    <p>{% trans 'New found risks' %}: {{ summary.new_risks }}</p>#}
+{#    {% if summary.new_risks %}#}
+{#        <table>#}
+{#            <caption></caption>#}
+{#            <thead>#}
+{#            <tr>#}
+{#                <th>{% trans 'No.' %}</th>#}
+{#                <th>{% trans 'Asset' %}</th>#}
+{#                <th>{% trans 'Username' %}</th>#}
+{#                <th>{% trans 'Result' %}</th>#}
+{#            </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#            {% for risk in result.risks %}#}
+{#                <tr>#}
+{#                    <td>{{ forloop.counter }}</td>#}
+{#                    <td>{{ risk.asset }}</td>#}
+{#                    <td>{{ risk.username }}</td>#}
+{#                    <td>{{ risk.risk }}</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{#            </tbody>#}
+{#        </table>#}
+{#    {% endif %}#}
+{#</div>#}
 
 <style>
     table {

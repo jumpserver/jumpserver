@@ -123,7 +123,7 @@ class CheckAccountManager(BaseManager):
                 continue
 
             for i in range(0, len(self.assets), self.batch_size):
-                _assets = self.assets[i : i + self.batch_size]
+                _assets = self.assets[i: i + self.batch_size]
                 accounts = Account.objects.filter(asset__in=_assets)
                 summary, result = handle(accounts, _assets)
 

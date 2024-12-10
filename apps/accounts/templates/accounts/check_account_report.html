@@ -84,6 +84,8 @@
             {% endfor %}
             </tbody>
         </table>
+    {% else %}
+        <p>{% trans 'No weak password' %}</p>
     {% endif %}
 </div>
 

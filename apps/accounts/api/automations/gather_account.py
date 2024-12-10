@@ -36,6 +36,7 @@ class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
         ("list", "accounts.view_gatheraccountsexecution"),
         ("retrieve", "accounts.view_gatheraccountsexecution"),
         ("create", "accounts.add_gatheraccountsexecution"),
+        ("adhoc", "accounts.add_gatheraccountsexecution"),
         ("report", "accounts.view_gatheraccountsexecution"),
     )
 
@@ -45,6 +46,27 @@ class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
         queryset = super().get_queryset()
         queryset = queryset.filter(automation__type=self.tp)
         return queryset
+
+    @action(methods=["get"], detail=False, url_path="adhoc")
+    def adhoc(self, request, *args, **kwargs):
+        asset_id = request.query_params.get("asset_id")
+        if not asset_id:
+            return Response(status=400, data={"asset_id": "This field is required."})
+
+        get_object_or_404(Asset, pk=asset_id)
+        execution = AutomationExecution()
+        execution.snapshot = {
+            "assets": [asset_id],
+            "nodes": [],
+            "type": "gather_accounts",
+            "is_sync_account": False,
+            "check_risk": True,
+            "name": "Adhoc gather accounts: {}".format(asset_id),
+        }
+        execution.save()
+        execution.start()
+        report = execution.manager.gen_report()
+        return HttpResponse(report)
 
 
 class GatheredAccountViewSet(OrgBulkModelViewSet):
@@ -58,7 +80,6 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         "sync_accounts": "assets.add_gatheredaccount",
-        "discover": "assets.add_gatheredaccount",
         "status": "assets.change_gatheredaccount",
     }
 
@@ -81,24 +102,3 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         handler = RiskHandler(asset, username, request=self.request)
         handler.handle_delete_remote()
         return Response(status=status.HTTP_200_OK)
-
-    @action(methods=["get"], detail=False, url_path="discover")
-    def discover(self, request, *args, **kwargs):
-        asset_id = request.query_params.get("asset_id")
-        if not asset_id:
-            return Response(status=400, data={"asset_id": "This field is required."})
-
-        get_object_or_404(Asset, pk=asset_id)
-        execution = AutomationExecution()
-        execution.snapshot = {
-            "assets": [asset_id],
-            "nodes": [],
-            "type": "gather_accounts",
-            "is_sync_account": False,
-            "check_risk": True,
-            "name": "Adhoc gather accounts: {}".format(asset_id),
-        }
-        execution.save()
-        execution.start()
-        report = execution.manager.gen_report()
-        return HttpResponse(report)
