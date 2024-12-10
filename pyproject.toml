@@ -175,6 +175,7 @@ s3transfer = "0.6.1"
 optional = true
 
 [tool.poetry.group.xpack.dependencies]
+ipython = "8.30.0"
 qingcloud-sdk = "1.2.15"
 azure-mgmt-subscription = "3.1.1"
 azure-mgmt-compute = "30.0.0"
