@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <div class='summary'>
-    <p>{% trans 'The following is a summary of account change secret tasks, please read and process' %}</p>
+    <p>{% trans 'The following is a summary of account push tasks, please read and process' %}</p>
     <table>
         <caption></caption>
         <thead>
@@ -46,54 +46,6 @@
     </table>
 </div>
 
-<div class='result'>
-    {% if summary.ok_accounts %}
-        <p>{% trans 'Success accounts' %}: {{ summary.ok_accounts }}</p>
-        <table>
-            <caption></caption>
-            <thead>
-            <tr>
-                <th>{% trans 'No.' %}</th>
-                <th>{% trans 'Asset' %}</th>
-                <th>{% trans 'Username' %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for account in result.ok_accounts %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ account.asset }}</td>
-                    <td>{{ account.username }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</div>
-<div class='result'>
-    {% if summary.fail_accounts %}
-        <p>{% trans 'Failed accounts' %}: {{ summary.fail_accounts }}</p>
-        <table>
-            <caption></caption>
-            <thead>
-            <tr>
-                <th>{% trans 'No.' %}</th>
-                <th>{% trans 'Asset' %}</th>
-                <th>{% trans 'Username' %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for account in result.fail_accounts %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ account.asset }}</td>
-                    <td>{{ account.username }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</div>
 
 <style>
     table {
@@ -120,14 +72,6 @@
         border: 1px solid #ddd;
         padding: 5px;
         font-size: 12px;
-    }
-
-    .result {
-        margin-top: 20px;
-    }
-
-    .result tr :first-child {
-        width: 10%;
     }
 
 </style>
