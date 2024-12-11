@@ -223,5 +223,9 @@
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user"
+    "user": "user",
+    "Low Speed Broadband (256 Kbps - 2 Mbps)": "Low Speed Broadband (256 Kbps - 2 Mbps)",
+    "High-speed broadband (2 Mbps – 10 Mbps )": "High-speed broadband (2 Mbps – 10 Mbps )",
+    "Auto": "Auto",
+    "RDP connection speed": "RDP connection speed"
 }

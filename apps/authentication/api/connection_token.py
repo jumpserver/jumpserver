@@ -68,6 +68,36 @@ class RDPFileClientProtocolURLMixin:
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
         }
+
+        # copy from
+        # https://learn.microsoft.com/zh-cn/windows-server/administration/performance-tuning/role/remote-desktop/session-hosts
+        rdp_low_speed_broadband_option = {
+            "connection type:i": 2,
+            "disable wallpaper:i": 1,
+            "bitmapcachepersistenable:i": 1,
+            "disable full window drag:i": 1,
+            "disable menu anims:i": 1,
+            "allow font smoothing:i": 0,
+            "allow desktop composition:i": 0,
+            "disable themes:i": 0
+        }
+
+        rdp_high_speed_broadband_option = {
+            "connection type:i": 4,
+            "disable wallpaper:i": 0,
+            "bitmapcachepersistenable:i": 1,
+            "disable full window drag:i": 1,
+            "disable menu anims:i": 0,
+            "allow font smoothing:i": 0,
+            "allow desktop composition:i": 1,
+            "disable themes:i": 0
+        }
+
+        RDP_CONNECTION_SPEED_OPTION_MAP = {
+            "auto": {},
+            "low_speed_broadband": rdp_low_speed_broadband_option,
+            "high_speed_broadband": rdp_high_speed_broadband_option,
+        }
         # 设置多屏显示
         multi_mon = is_true(self.request.query_params.get('multi_mon'))
         if multi_mon:
@@ -116,6 +146,9 @@ class RDPFileClientProtocolURLMixin:
         rdp = token.asset.platform.protocols.filter(name='rdp').first()
         if rdp and rdp.setting.get('console'):
             rdp_options['administrative session:i'] = '1'
+        print(token.connect_options)
+        rdp_connection_speed = token.connect_options.get('rdp_connection_speed', 'auto')
+        rdp_options.update(RDP_CONNECTION_SPEED_OPTION_MAP.get(rdp_connection_speed, {}))
 
         # 文件名
         name = token.asset.name
