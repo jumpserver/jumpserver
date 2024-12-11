@@ -146,7 +146,6 @@ class RDPFileClientProtocolURLMixin:
         rdp = token.asset.platform.protocols.filter(name='rdp').first()
         if rdp and rdp.setting.get('console'):
             rdp_options['administrative session:i'] = '1'
-        print(token.connect_options)
         rdp_connection_speed = token.connect_options.get('rdp_connection_speed', 'auto')
         rdp_options.update(RDP_CONNECTION_SPEED_OPTION_MAP.get(rdp_connection_speed, {}))
 
