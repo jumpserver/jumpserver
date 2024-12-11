@@ -55,6 +55,7 @@ urlpatterns = [
     path('components/metrics/', api.ComponentsMetricsAPIView.as_view(), name='components-metrics'),
     path('components/connect-methods/', api.ConnectMethodListApi.as_view(), name='connect-methods'),
     path('loki/logs/', api.LokiLogAPI.as_view(), name='loki-logs'),
+    path('encrypted-config/', api.EncryptedTerminalConfig.as_view(), name='encrypted-terminal-config'),
 ]
 
 urlpatterns += router.urls

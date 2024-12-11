@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 #
 import logging
-from django.db.models import Q
+
 from django.conf import settings
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView, Response
-from django_filters import rest_framework as filters
 
-from common.drf.filters import BaseFilterSet
 from common.api import JMSBulkModelViewSet
+from common.drf.filters import BaseFilterSet
 from common.exceptions import JMSException
-from common.permissions import WithBootstrapToken
+from common.permissions import WithBootstrapToken, IsServiceAccount
+from jumpserver.conf import ConfigCrypto
 from terminal import serializers
 from terminal.models import Terminal
 
 __all__ = [
     'TerminalViewSet', 'TerminalConfig',
-    'TerminalRegistrationApi',
+    'TerminalRegistrationApi', 'EncryptedTerminalConfig'
 ]
 logger = logging.getLogger(__file__)
 
@@ -89,3 +91,17 @@ class TerminalRegistrationApi(generics.CreateAPIView):
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
+
+class EncryptedTerminalConfig(generics.CreateAPIView):
+    serializer_class = serializers.EncryptedConfigSerializer
+    permission_classes = [IsServiceAccount]
+    http_method_names = ['post']
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        encrypt_key = serializer.validated_data['secret_encrypt_key']
+        encrypted_value = serializer.validated_data['encrypted_value']
+        config_crypto = ConfigCrypto(encrypt_key)
+        value = config_crypto.decrypt(encrypted_value)
+        return Response(data={'value': value}, status=200)
