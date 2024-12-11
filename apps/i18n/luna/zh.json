@@ -221,5 +221,9 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "Low Speed Broadband (256 Kbps - 2 Mbps)": "低速宽带 (256 Kbps - 2 Mbps)",
+    "High-speed broadband (2 Mbps – 10 Mbps )": "高速宽带 (2 Mbps - 10 Mbps)",
+    "Auto": "自动",
+    "RDP connection speed": "RDP 连接速度"
 }
