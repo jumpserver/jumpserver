@@ -16,17 +16,24 @@ from ..base.manager import AccountBasePlaybookManager
 logger = get_logger(__name__)
 
 risk_items = [
-    # "authorized_keys",
-    # "sudoers",
-    # "groups",
+    "authorized_keys",
+    "sudoers",
+    "groups",
 ]
-
-diff_items = risk_items + [
+common_risk_items = [
     "address_last_login",
     "date_last_login",
     "date_password_change",
     "date_password_expired",
+    "detail"
 ]
+diff_items = risk_items + common_risk_items
+
+
+def format_datetime(value):
+    if isinstance(value, timezone.datetime):
+        return value.strftime("%Y-%m-%d %H:%M:%S")
+    return value
 
 
 def get_items_diff(ori_account, d):
@@ -35,22 +42,24 @@ def get_items_diff(ori_account, d):
 
     diff = {}
     for item in diff_items:
-        ori = getattr(ori_account, item)
-        new = d.get(item, "")
-
-        if not ori and not new:
-            continue
-
-        if isinstance(ori, timezone.datetime):
-            ori = ori.strftime("%Y-%m-%d %H:%M:%S")
-        if isinstance(new, timezone.datetime):
-            new = new.strftime("%Y-%m-%d %H:%M:%S")
-
-        if new != ori:
-            diff[item] = get_text_diff(str(ori), str(new))
-
+        get_item_diff(item, ori_account, d, diff)
     ori_account._diff = diff
     return diff
+
+
+def get_item_diff(item, ori_account, d, diff):
+    detail = getattr(ori_account, 'detail', {})
+    new_detail = d.get('detail', {})
+    ori = getattr(ori_account, item, None) or detail.get(item)
+    new = d.get(item, "") or new_detail.get(item)
+    if not ori and not new:
+        return
+
+    ori = format_datetime(ori)
+    new = format_datetime(new)
+
+    if new != ori:
+        diff[item] = get_text_diff(str(ori), str(new))
 
 
 class AnalyseAccountRisk:
@@ -81,8 +90,8 @@ class AnalyseAccountRisk:
 
         risks = []
         for k, v in diff.items():
-            # if k not in risk_items:
-            #     continue
+            if k not in risk_items:
+                continue
             risks.append(
                 dict(
                     asset=ori_account.asset,
@@ -330,12 +339,14 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
         return ga
 
-    @bulk_update_decorator(GatheredAccount, update_fields=diff_items)
+    @bulk_update_decorator(GatheredAccount, update_fields=common_risk_items)
     def update_gathered_account(self, ori_account, d):
         diff = get_items_diff(ori_account, d)
         if not diff:
             return
         for k in diff:
+            if k not in common_risk_items:
+                continue
             setattr(ori_account, k, d[k])
         return ori_account
 
@@ -353,7 +364,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     ori_account = self.ori_gathered_accounts_mapper.get(
                         "{}_{}".format(asset.id, username)
                     )
-
                     if not ori_account:
                         self.create_gathered_account(d)
                     else:
