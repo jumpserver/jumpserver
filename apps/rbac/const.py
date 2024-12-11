@@ -41,6 +41,8 @@ exclude_permissions = (
     ('assets', 'cloud', '*', '*'),
     ('assets', 'device', '*', '*'),
     ('assets', 'database', '*', '*'),
+    ('assets', 'gpt', '*', '*'),
+    ('assets', 'custom', '*', '*'),
     ('assets', 'protocol', '*', '*'),
     ('assets', 'baseautomation', '*', '*'),
     ('assets', 'assetbaseautomation', '*', '*'),
