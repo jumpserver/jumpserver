@@ -46,10 +46,6 @@ class ChangeSecretRecord(JMSBaseModel):
 
     class Meta:
         verbose_name = _("Change secret record")
-        permissions = [
-            ('view_pushsecretrecord', _('Can view change secret execution')),
-            ('add_pushsecretexecution', _('Can add change secret execution')),
-        ]
 
     def __str__(self):
         return f'{self.account.username}@{self.asset}'

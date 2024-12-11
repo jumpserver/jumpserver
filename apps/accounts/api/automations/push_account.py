@@ -2,19 +2,17 @@
 #
 from accounts import serializers
 from accounts.const import AutomationTypes
-from accounts.models import PushAccountAutomation, ChangeSecretRecord
+from accounts.models import PushAccountAutomation
 from orgs.mixins.api import OrgBulkModelViewSet
 
 from .base import (
     AutomationAssetsListApi, AutomationRemoveAssetApi, AutomationAddAssetApi,
     AutomationNodeAddRemoveApi, AutomationExecutionViewSet
 )
-from .change_secret import ChangeSecretRecordViewSet
 
 __all__ = [
     'PushAccountAutomationViewSet', 'PushAccountAssetsListApi', 'PushAccountRemoveAssetApi',
     'PushAccountAddAssetApi', 'PushAccountNodeAddRemoveApi', 'PushAccountExecutionViewSet',
-    'PushAccountRecordViewSet'
 ]
 
 
@@ -39,23 +37,6 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
         queryset = super().get_queryset()
         queryset = queryset.filter(automation__type=self.tp)
         return queryset
-
-
-class PushAccountRecordViewSet(ChangeSecretRecordViewSet):
-    serializer_class = serializers.ChangeSecretRecordSerializer
-    tp = AutomationTypes.push_account
-
-    rbac_perms = {
-        'list': 'accounts.view_pushsecretrecord',
-        'execute': 'accounts.add_pushsecretexecution',
-        'secret': 'accounts.view_pushsecretrecord',
-    }
-
-    def get_queryset(self):
-        qs = ChangeSecretRecord.get_valid_records()
-        return qs.filter(
-            execution__automation__type=self.tp
-        )
 
 
 class PushAccountAssetsListApi(AutomationAssetsListApi):
