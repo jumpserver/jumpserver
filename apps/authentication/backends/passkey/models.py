@@ -13,7 +13,7 @@ class Passkey(JMSBaseModel):
     added_on = models.DateTimeField(auto_now_add=True, verbose_name=_("Added on"))
     date_last_used = models.DateTimeField(null=True, default=None, verbose_name=_("Date last used"))
     credential_id = models.CharField(max_length=255, unique=True, null=False, verbose_name=_("Credential ID"))
-    token = models.CharField(max_length=255, null=False, verbose_name=_("Token"))
+    token = models.CharField(max_length=1024, null=False, verbose_name=_("Token"))
 
     def __str__(self):
         return self.name
