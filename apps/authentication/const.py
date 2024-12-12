@@ -43,3 +43,9 @@ class MFAType(TextChoices):
 FACE_CONTEXT_CACHE_KEY_PREFIX = "FACE_CONTEXT"
 FACE_CONTEXT_CACHE_TTL = 60
 FACE_SESSION_KEY = "face_token"
+
+
+class FaceMonitorActionChoices(TextChoices):
+    Verify = 'verify', 'verify'
+    Pause = 'pause', 'pause'
+    Resume = 'resume', 'resume'

@@ -50,6 +50,7 @@ class ConnectionToken(JMSOrgBaseModel):
         on_delete=models.SET_NULL, null=True, blank=True,
         verbose_name=_('From ticket')
     )
+    face_monitor_token = models.CharField(max_length=128, null=True, blank=True, verbose_name=_("Face monitor token"))
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     class Meta:

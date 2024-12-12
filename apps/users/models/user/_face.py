@@ -24,12 +24,14 @@ class FaceMixin:
             raise ValidationError("Face vector is not set.")
         return self._decode_base64_vector(str(self.face_vector))
 
-    def check_face(self, code) -> bool:
+    def check_face(self, code, distance_threshold=None, similarity_threshold=None) -> bool:
         distance = self.compare_euclidean_distance(code)
         similarity = self.compare_cosine_similarity(code)
 
-        return distance < settings.FACE_RECOGNITION_DISTANCE_THRESHOLD \
-            and similarity > settings.FACE_RECOGNITION_COSINE_THRESHOLD
+        distance_threshold = distance_threshold or settings.FACE_RECOGNITION_DISTANCE_THRESHOLD
+        similarity_threshold = similarity_threshold or settings.FACE_RECOGNITION_COSINE_THRESHOLD
+
+        return distance < distance_threshold and similarity > similarity_threshold
 
     def compare_euclidean_distance(self, base64_vector: str) -> float:
         target_vector = self._decode_base64_vector(base64_vector)

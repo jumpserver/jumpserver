@@ -29,6 +29,7 @@ from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
 from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
+from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
@@ -338,6 +339,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     }
     input_username = ''
     need_face_verify = False
+    face_monitor_token = ''
 
     def get_queryset(self):
         queryset = ConnectionToken.objects \
@@ -425,6 +427,10 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
 
         if ticket or self.need_face_verify:
             data['is_active'] = False
+        if self.face_monitor_token:
+            FaceMonitorContext.get_or_create_context(self.face_monitor_token,
+                                                      self.request.user.id)
+            data['face_monitor_token'] = self.face_monitor_token
         return data
 
     @staticmethod
@@ -480,12 +486,22 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 assignees=acl.reviewers.all(), org_id=asset.org_id
             )
             return ticket
-        if acl.is_action(acl.ActionChoices.face_verify) \
-                or acl.is_action(acl.ActionChoices.face_online):
+        if acl.is_action(acl.ActionChoices.face_verify):
             if not self.request.query_params.get('face_verify'):
                 msg = _('ACL action is face verify')
                 raise JMSException(code='acl_face_verify', detail=msg)
             self.need_face_verify = True
+        if acl.is_action(acl.ActionChoices.face_online):
+            face_verify = self.request.query_params.get('face_verify')
+            face_monitor_token = self.request.query_params.get('face_monitor_token')
+
+            if not face_verify or not face_monitor_token:
+                msg = _('ACL action is face online')
+                raise JMSException(code='acl_face_online', detail=msg)
+
+            self.need_face_verify = True
+            self.face_monitor_token = face_monitor_token
+
         if acl.is_action(acl.ActionChoices.notice):
             reviewers = acl.reviewers.all()
             if not reviewers:

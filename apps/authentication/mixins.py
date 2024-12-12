@@ -450,6 +450,7 @@ class AuthFaceMixin:
         context_data = {
             "action": "mfa",
             "token": token,
+            "user_id": self.request.user.id,
             "is_finished": False
         }
         if data:
