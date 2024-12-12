@@ -28,7 +28,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
             'connect_method', 'connect_options', 'protocol', 'actions',
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
-            'updated_by', 'org_id', 'org_name',
+            'updated_by', 'org_id', 'org_name','face_monitor_token',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
@@ -37,6 +37,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {
+            'face_monitor_token': {'read_only': True},
             'from_ticket': {'read_only': True},
             'value': {'read_only': True},
             'is_expired': {'read_only': True, 'label': _('Is expired')},
