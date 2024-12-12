@@ -14,6 +14,7 @@
     "Asset tree loading method": "Configure Asset Tree Loading Method",
     "Asset: ": "Asset: {{value}}",
     "Assignees": "Assignees",
+    "Auto": "Auto",
     "Automatic login next": "Automatic Login next (right click asset to re-select)",
     "Backspace as Ctrl+H": "Backspace as Ctrl+H",
     "Batch actions": "Batch actions",
@@ -88,6 +89,7 @@
     "Help or download": "Help → Download",
     "Help text": "Help text",
     "Hide left manager": "Hide left manager",
+    "High-speed broadband (2 Mbps – 10 Mbps )": "High-speed broadband (2 Mbps – 10 Mbps )",
     "Host": "Host",
     "Info": "Info",
     "InstallClientMsg": "JumpServer client not found, Go to download and install?",
@@ -106,6 +108,7 @@
     "Login reminder": "Login reminder",
     "Login review approved": "Login review has been approved, connecting assets...",
     "LoginExpireMsg": "Your session has timed out. Please log in through a new window and return to this page to continue your operations.",
+    "Low Speed Broadband (256 Kbps - 2 Mbps)": "Low Speed Broadband (256 Kbps - 2 Mbps)",
     "Manual accounts": "Manual accounts",
     "Module": "Module",
     "Multi Screen": "Multi Screen",
@@ -140,6 +143,7 @@
     "RDP File": "RDP File",
     "RDP client options": "RDP client options",
     "RDP color quality": "RDP Color Quality",
+    "RDP connection speed": "RDP connection speed",
     "RDP resolution": "RDP resolution",
     "RDP smart size": "RDP smart size",
     "Re-use for a long time after opening": "Re-use for a long time after opening",
@@ -223,9 +227,5 @@
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user",
-    "Low Speed Broadband (256 Kbps - 2 Mbps)": "Low Speed Broadband (256 Kbps - 2 Mbps)",
-    "High-speed broadband (2 Mbps – 10 Mbps )": "High-speed broadband (2 Mbps – 10 Mbps )",
-    "Auto": "Auto",
-    "RDP connection speed": "RDP connection speed"
+    "user": "user"
 }

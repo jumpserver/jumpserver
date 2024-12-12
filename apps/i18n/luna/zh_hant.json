@@ -14,6 +14,7 @@
     "Asset tree loading method": "配置資產樹載入方式",
     "Asset: ": "資產: {{value}}",
     "Assignees": "受理人",
+    "Auto": "自動",
     "Automatic login next": "下次自動登入 (右擊資產連接可以重新選擇)",
     "Backspace as Ctrl+H": "字元終端Backspace As Ctrl+H",
     "Batch actions": "批次操作",
@@ -87,6 +88,7 @@
     "Help or download": "菜單幫助 → 下載",
     "Help text": "說明",
     "Hide left manager": "隱藏左邊欄",
+    "High-speed broadband (2 Mbps – 10 Mbps )": "高速寬帶 (2 Mbps - 10 Mbps)",
     "Host": "主機",
     "Info": "提示",
     "InstallClientMsg": "JumpServer 用戶端沒有安裝，現在去下載安裝?",
@@ -105,6 +107,7 @@
     "Login reminder": "登入提醒",
     "Login review approved": "登入審核已通過, 正在連接資產...",
     "LoginExpireMsg": "目前登入已逾時，請不要關閉視窗。在新的視窗登入後即可恢復目前頁面，如未恢復請重新整理頁面。",
+    "Low Speed Broadband (256 Kbps - 2 Mbps)": "低速寬帶 (256 Kbps - 2 Mbps)",
     "Manual accounts": "手動帳號",
     "MenuAccountTemplates": "帳號範本",
     "Module": "模組",
@@ -141,6 +144,7 @@
     "RDP File": "RDP 文件",
     "RDP client options": "RDP 用戶端選項",
     "RDP color quality": "RDP 顏色質量",
+    "RDP connection speed": "RDP 連接速度",
     "RDP resolution": "RDP 解析度",
     "RDP smart size": "RDP 智慧大小",
     "Re-use for a long time after opening": "開啟後該連接資訊可長時間多次使用",
@@ -225,9 +229,5 @@
     "start time": "開始時間",
     "success": "成功",
     "system user": "系統用戶",
-    "user": "用戶",
-    "Low Speed Broadband (256 Kbps - 2 Mbps)": "低速寬帶 (256 Kbps - 2 Mbps)",
-    "High-speed broadband (2 Mbps – 10 Mbps )": "高速寬帶 (2 Mbps - 10 Mbps)",
-    "Auto": "自動",
-    "RDP connection speed": "RDP 連接速度"
+    "user": "用戶"
 }

@@ -39,6 +39,7 @@
     "GuacamoleErrSecurityNegotiationFailed": "遠程連接的安全協商失敗",
     "GuacamoleErrServerRefusedConnection": "遠程連接的伺服器拒絕連接",
     "GuacamoleErrServerRefusedConnectionBySecurityType": "遠程連接的伺服器拒絕連接，可能安全類型不匹配",
+    "GuacamoleErrUnableToConnectToVNCServer": "無法連接到 VNC 伺服器",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "遠程連接的憑證類型不支持",
     "GuacamoleErrUpstreamError": "遠程連接的伺服器發生錯誤",
     "JMSErrAPIFailed": "Core API 發生錯誤",
@@ -79,6 +80,5 @@
     "Username": "使用者名稱",
     "VerifyCode": "驗證碼",
     "WebSocketError": "WebSocket 連接失敗，請檢查網路",
-    "Writable": "讀寫",
-    "GuacamoleErrUnableToConnectToVNCServer": "無法連接到 VNC 伺服器"
+    "Writable": "讀寫"
 }

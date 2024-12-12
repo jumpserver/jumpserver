@@ -62,6 +62,8 @@
     "ThemeConfig": "主題",
     "UpArrow": "向上箭頭",
     "Upload": "上傳",
+    "UploadEnd": "上傳已完成，請等待後續處理",
+    "UploadStart": "上傳開始",
     "UploadSuccess": "上傳成功",
     "UploadTips": "將文件拖到此處，或點擊上傳",
     "UploadTitle": "上傳文件",
@@ -69,7 +71,5 @@
     "VerifyCode": "驗證碼",
     "WaitFileTransfer": "等待文件傳輸結束",
     "WebSocketClosed": "WebSocket 已關閉",
-    "Writable": "讀寫",
-    "UploadStart": "上傳開始",
-    "UploadEnd": "上傳已完成，請等待後續處理"
+    "Writable": "讀寫"
 }
