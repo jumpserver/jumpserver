@@ -79,5 +79,6 @@
     "Username": "Username",
     "VerifyCode": "Verify Code",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "GuacamoleErrUnableToConnectToVNCServer": "Unable to connect to VNC server"
 }

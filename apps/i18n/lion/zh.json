@@ -79,5 +79,6 @@
     "Username": "用户名",
     "VerifyCode": "验证码",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
-    "Writable": "读写"
+    "Writable": "读写",
+    "GuacamoleErrUnableToConnectToVNCServer": "无法连接到 VNC 服务器"
 }
