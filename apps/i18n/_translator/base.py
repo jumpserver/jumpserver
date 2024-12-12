@@ -13,7 +13,6 @@ class BaseTranslateManager:
         'ja': 'Japanese',
         'zh_Hant': 'Traditional Chinese',
         'pt_BR': 'Portuguese (Brazil)',
-        # 'en': 'English',
     }
 
     def __init__(self, dir_path, oai_trans_instance):

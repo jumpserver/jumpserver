@@ -39,6 +39,7 @@
     "GuacamoleErrSecurityNegotiationFailed": "Security negotiation failed (wrong security type?)",
     "GuacamoleErrServerRefusedConnection": "Server refused connection.",
     "GuacamoleErrServerRefusedConnectionBySecurityType": "Server refused connection (wrong security type?)",
+    "GuacamoleErrUnableToConnectToVNCServer": "Unable to connect to VNC server",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "Unsupported credential type requested.",
     "GuacamoleErrUpstreamError": "Upstream error.",
     "JMSErrAPIFailed": "Core API failed",
@@ -79,6 +80,5 @@
     "Username": "Username",
     "VerifyCode": "Verify Code",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable",
-    "GuacamoleErrUnableToConnectToVNCServer": "Unable to connect to VNC server"
+    "Writable": "Writable"
 }

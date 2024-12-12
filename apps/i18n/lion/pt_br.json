@@ -39,6 +39,7 @@
     "GuacamoleErrSecurityNegotiationFailed": "Falha na negociação de segurança da conexão remota",
     "GuacamoleErrServerRefusedConnection": "O servidor de conexão remota recusou a conexão",
     "GuacamoleErrServerRefusedConnectionBySecurityType": "A conexão remota foi recusada pelo servidor, possivelmente o tipo de segurança não corresponde",
+    "GuacamoleErrUnableToConnectToVNCServer": "Não é possível conectar ao servidor VNC",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "Tipo de credencial de conexão remota não suportado",
     "GuacamoleErrUpstreamError": "Ocorreu um erro no servidor de conexão remota",
     "JMSErrAPIFailed": "Ocorreu um erro com a API principal",
