@@ -101,6 +101,9 @@ class ChatPromptViewSet(JMSModelViewSet):
     def filter_default_prompts(self):
         lang = self.request.LANGUAGE_CODE
         default_prompts = DefaultChatPrompt.get_prompts(lang)
+        if not default_prompts:
+            return []
+
         search_query = self.request.query_params.get('search')
         search_query = search_query or self.request.query_params.get('name')
         if not search_query:

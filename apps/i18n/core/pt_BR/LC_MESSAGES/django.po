@@ -4778,7 +4778,7 @@ msgstr ""
 
 #: labels/apps.py:8
 msgid "App Labels"
-msgstr "管理标签"
+msgstr "Gerenciar tags"
 
 #: labels/models.py:15
 msgid "Color"
@@ -4810,7 +4810,7 @@ msgstr "Tipo de recurso"
 
 #: notifications/apps.py:7
 msgid "App Notifications"
-msgstr "管理通知"
+msgstr "Gerenciar notificações"
 
 #: notifications/backends/__init__.py:13
 msgid "Site message"
@@ -5364,7 +5364,7 @@ msgid ""
 msgstr ""
 "Verifique se cada componente está offline a cada hora, cpu, memória, se a "
 "taxa de uso do disco rígido ultrapassa o limite, e envie mensagens de alerta"
-" para o 管理员"
+" para o administrador"
 
 #: ops/tasks.py:160
 msgid "Clean up unexpected jobs"
@@ -8811,7 +8811,7 @@ msgstr "Desconexão por inatividade"
 
 #: terminal/session_lifecycle.py:156
 msgid "admin terminated"
-msgstr "管理员终断连接"
+msgstr "Administrador encerra conexão"
 
 #: terminal/session_lifecycle.py:157
 msgid "maximum session time has been reached"
@@ -8954,7 +8954,7 @@ msgstr "Solicitante"
 
 #: tickets/apps.py:7
 msgid "App Tickets"
-msgstr "管理"
+msgstr "Gerenciar ordens de serviço"
 
 #: tickets/const.py:10
 msgid "Apply for asset"
@@ -9279,7 +9279,7 @@ msgstr ""
 
 #: users/apps.py:9
 msgid "App Users"
-msgstr "用户管理"
+msgstr "Gerenciamento de usuários"
 
 #: users/const.py:10
 msgid "System administrator"
