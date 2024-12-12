@@ -77,10 +77,12 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     serializer_classes = {
         "default": serializers.GatheredAccountSerializer,
         "status": serializers.GatheredAccountActionSerializer,
+        "details": serializers.GatheredAccountDetailsSerializer
     }
     rbac_perms = {
         "sync_accounts": "assets.add_gatheredaccount",
         "status": "assets.change_gatheredaccount",
+        "details": "assets.view_gatheredaccount"
     }
 
     @action(methods=["put"], detail=True, url_path="status")
@@ -102,3 +104,10 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         handler = RiskHandler(asset, username, request=self.request)
         handler.handle_delete_remote()
         return Response(status=status.HTTP_200_OK)
+
+    @action(methods=["get"], detail=True, url_path="details")
+    def details(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        account = get_object_or_404(GatheredAccount, pk=pk)
+        serializer = self.get_serializer(account.detail)
+        return Response(data=serializer.data)
