@@ -4,6 +4,7 @@ from common.serializers import MethodSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseUserACLSerializer
 from .rules import RuleSerializer
+from ..const import ActionChoices
 from ..models import LoginACL
 
 __all__ = ["LoginACLSerializer"]
@@ -17,6 +18,7 @@ class LoginACLSerializer(BaseUserACLSerializer, BulkOrgResourceModelSerializer):
     class Meta(BaseUserACLSerializer.Meta):
         model = LoginACL
         fields = BaseUserACLSerializer.Meta.fields + ['rules', ]
+        action_choices_exclude = [ActionChoices.face_online, ActionChoices.face_verify]
 
     def get_rules_serializer(self):
         return RuleSerializer()
