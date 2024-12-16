@@ -255,6 +255,8 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_serializer: callable
     perform_create: callable
     validate_exchange_token: callable
+    need_face_verify: bool
+    create_face_verify: callable
 
     @action(methods=['POST', 'GET'], detail=True, url_path='rdp-file')
     def get_rdp_file(self, request, *args, **kwargs):
@@ -314,7 +316,10 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.date_expired = date_expired_default()
         instance.save()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response = Response(serializer.data, status=status.HTTP_201_CREATED)
+        if self.need_face_verify:
+            self.create_face_verify(response)
+        return response
 
 
 class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
@@ -429,7 +434,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             data['is_active'] = False
         if self.face_monitor_token:
             FaceMonitorContext.get_or_create_context(self.face_monitor_token,
-                                                      self.request.user.id)
+                                                     self.request.user.id)
             data['face_monitor_token'] = self.face_monitor_token
         return data
 
