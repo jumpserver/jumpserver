@@ -185,7 +185,7 @@ class FaceMonitorContext:
         self._send_task("kill_session")
 
     def _send_task(self, task_name):
-        create_sessions_tasks(self.session_ids, 'Administrator', task_name=task_name)
+        create_sessions_tasks(self.session_ids, 'facelive', task_name=task_name)
 
 
 class FaceMonitorContextApi(CreateAPIView):
