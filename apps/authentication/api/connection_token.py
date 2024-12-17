@@ -24,7 +24,7 @@ from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
 from orgs.utils import tmp_to_org
 from perms.models import ActionChoices
-from terminal.connect_methods import NativeClient, ConnectMethodUtil
+from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
 from users.const import RDPSmartSize, RDPColorQuality
@@ -396,8 +396,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         asset = data.get('asset')
         account_name = data.get('account')
         protocol = data.get('protocol')
+        connect_method = data.get('connect_method')
         self.input_username = self.get_input_username(data)
-        _data = self._validate(user, asset, account_name, protocol)
+        _data = self._validate(user, asset, account_name, protocol, connect_method)
         data.update(_data)
         return serializer
 
@@ -405,12 +406,12 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         user = token.user
         asset = token.asset
         account_name = token.account
-        _data = self._validate(user, asset, account_name, token.protocol)
+        _data = self._validate(user, asset, account_name, token.protocol, token.connect_method)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_name, protocol):
+    def _validate(self, user, asset, account_name, protocol, connect_method):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -426,7 +427,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
 
-        ticket = self._validate_acl(user, asset, account)
+        ticket = self._validate_acl(user, asset, account, connect_method)
         if ticket:
             data['from_ticket'] = ticket
 
@@ -464,7 +465,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 after=after, object_name=object_name
             )
 
-    def _validate_acl(self, user, asset, account):
+    def _validate_acl(self, user, asset, account, connect_method):
         from acls.models import LoginAssetACL
         kwargs = {'user': user, 'asset': asset, 'account': account}
         if account.username == AliasAccount.INPUT:
@@ -497,6 +498,10 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 raise JMSException(code='acl_face_verify', detail=msg)
             self.need_face_verify = True
         if acl.is_action(acl.ActionChoices.face_online):
+            if connect_method not in [WebMethod.web_cli, WebMethod.web_gui]:
+                msg = _('ACL action not supported for this asset')
+                raise JMSException(detail=msg, code='acl_face_online_not_supported')
+
             face_verify = self.request.query_params.get('face_verify')
             face_monitor_token = self.request.query_params.get('face_monitor_token')
 
