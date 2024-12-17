@@ -14,11 +14,15 @@ from common.db import fields
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import get_logger, lazyproperty
 from ops.mixin import PeriodTaskModelMixin
-from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
+from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel, OrgManager
 
 __all__ = ['AccountBackupAutomation', 'AccountBackupExecution']
 
 logger = get_logger(__file__)
+
+
+class BaseBackupAutomationManager(OrgManager):
+    pass
 
 
 class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
@@ -46,6 +50,8 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     zip_encrypt_password = fields.EncryptCharField(
         max_length=4096, blank=True, null=True, verbose_name=_('Zip encrypt password')
     )
+
+    objects = BaseBackupAutomationManager.from_queryset(models.QuerySet)()
 
     def __str__(self):
         return f'{self.name}({self.org_id})'
