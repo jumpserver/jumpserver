@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from assets.models import Asset
+from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.utils import get_object_or_none, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from terminal.backends import get_multi_command_storage
@@ -221,6 +222,7 @@ class Session(OrgModelMixin):
         if self.need_update_cmd_amount:
             cmd_amount = self.compute_command_amount()
             self.cmd_amount = cmd_amount
+            setattr(self, OP_LOG_SKIP_SIGNAL, True)
             self.save()
         elif self.need_compute_cmd_amount:
             cmd_amount = self.compute_command_amount()

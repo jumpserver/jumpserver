@@ -14,7 +14,7 @@ from audits.handler import (
     create_or_update_operate_log, get_instance_dict_from_cache
 )
 from audits.utils import model_to_dict_for_operate_log as model_to_dict
-from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
+from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, OP_LOG_SKIP_SIGNAL
 from common.signals import django_ready
 from jumpserver.utils import current_request
 from ..const import MODELS_NEED_RECORD, ActionChoices
@@ -77,7 +77,7 @@ def signal_of_operate_log_whether_continue(
     condition = True
     if not instance:
         condition = False
-    if instance and getattr(instance, SKIP_SIGNAL, False):
+    if instance and getattr(instance, OP_LOG_SKIP_SIGNAL, False):
         condition = False
     # 不记录组件的操作日志
     user = current_request.user if current_request else None
