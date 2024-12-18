@@ -228,16 +228,20 @@ class FaceMonitorCallbackApi(CreateAPIView):
             face_codes = serializer.validated_data.get('face_codes')
 
             if not user:
+                context.save()
                 return Response(data={'msg': 'user {} not found'
                                 .format(context.user_id)}, status=400)
 
-            if not self._check_face_codes(face_codes, user):
+            if not face_codes or not self._check_face_codes(face_codes, user):
+                context.save()
                 return Response(data={'msg': 'face codes not matched'}, status=400)
 
         if action == FaceMonitorActionChoices.Pause:
             context.pause_sessions()
         if action == FaceMonitorActionChoices.Resume:
             context.resume_sessions()
+
+        context.save()
         return Response(status=200)
 
     @staticmethod
