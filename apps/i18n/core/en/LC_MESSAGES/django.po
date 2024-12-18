@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-17 17:20+0800\n"
+"POT-Creation-Date: 2024-12-18 18:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,7 +113,7 @@ msgstr ""
 msgid "No pending accounts found"
 msgstr ""
 
-#: accounts/automations/change_secret/manager.py:230
+#: accounts/automations/change_secret/manager.py:234
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr ""
@@ -3012,21 +3012,21 @@ msgid "Auth Token"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
-#: authentication/views/login.py:78 notifications/backends/__init__.py:11
+#: authentication/views/login.py:79 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
 #: users/models/user/__init__.py:129 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
-#: authentication/views/login.py:90 notifications/backends/__init__.py:14
+#: authentication/views/login.py:91 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:135
 #: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr ""
 
-#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:102
+#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:103
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
 #: users/models/user/__init__.py:141 users/models/user/_source.py:23
@@ -3034,7 +3034,7 @@ msgid "Slack"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
-#: authentication/views/login.py:84 notifications/backends/__init__.py:12
+#: authentication/views/login.py:85 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:132
 #: users/models/user/_source.py:20
 msgid "DingTalk"
@@ -3045,7 +3045,7 @@ msgstr ""
 msgid "Temporary token"
 msgstr ""
 
-#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:108
+#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:109
 #: settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
@@ -3189,12 +3189,12 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/backends/oidc/views.py:174
+#: authentication/backends/oidc/views.py:175
 msgid "OpenID Error"
 msgstr ""
 
-#: authentication/backends/oidc/views.py:175
-#: authentication/backends/saml2/views.py:282
+#: authentication/backends/oidc/views.py:176
+#: authentication/backends/saml2/views.py:283
 msgid "Please check if a user with the same username or email already exists"
 msgstr ""
 
@@ -3224,7 +3224,7 @@ msgstr ""
 msgid "Credential ID"
 msgstr ""
 
-#: authentication/backends/saml2/views.py:281
+#: authentication/backends/saml2/views.py:282
 msgid "SAML2 Error"
 msgstr ""
 
@@ -3355,21 +3355,21 @@ msgstr ""
 msgid "SSO auth closed"
 msgstr ""
 
-#: authentication/errors/mfa.py:18 authentication/views/wecom.py:48
+#: authentication/errors/mfa.py:18 authentication/views/wecom.py:47
 msgid "WeCom is already bound"
 msgstr ""
 
-#: authentication/errors/mfa.py:23 authentication/views/wecom.py:143
-#: authentication/views/wecom.py:185
+#: authentication/errors/mfa.py:23 authentication/views/wecom.py:144
+#: authentication/views/wecom.py:186
 msgid "WeCom is not bound"
 msgstr ""
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:203
-#: authentication/views/dingtalk.py:245
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
+#: authentication/views/dingtalk.py:247
 msgid "DingTalk is not bound"
 msgstr ""
 
-#: authentication/errors/mfa.py:33 authentication/views/feishu.py:130
+#: authentication/errors/mfa.py:33 authentication/views/feishu.py:132
 msgid "FeiShu is not bound"
 msgstr ""
 
@@ -3377,7 +3377,7 @@ msgstr ""
 msgid "Lark is not bound"
 msgstr ""
 
-#: authentication/errors/mfa.py:43 authentication/views/slack.py:119
+#: authentication/errors/mfa.py:43 authentication/views/slack.py:121
 msgid "Slack is not bound"
 msgstr ""
 
@@ -3994,17 +3994,17 @@ msgstr ""
 msgid "If you have any question, please contact the administrator"
 msgstr ""
 
-#: authentication/views/base.py:141
+#: authentication/views/base.py:144
 #, python-format
 msgid "%s query user failed"
 msgstr ""
 
-#: authentication/views/base.py:149
+#: authentication/views/base.py:152
 #, python-format
 msgid "The %s is already bound to another user"
 msgstr ""
 
-#: authentication/views/base.py:155
+#: authentication/views/base.py:158
 #, python-format
 msgid "Binding %s successfully"
 msgstr ""
@@ -4013,7 +4013,7 @@ msgstr ""
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr ""
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:202
+#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:204
 msgid "DingTalk Error"
 msgstr ""
 
@@ -4037,15 +4037,15 @@ msgstr ""
 msgid "Binding DingTalk successfully"
 msgstr ""
 
-#: authentication/views/dingtalk.py:204 authentication/views/dingtalk.py:239
+#: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:241
 msgid "Failed to get user from DingTalk"
 msgstr ""
 
-#: authentication/views/dingtalk.py:246
+#: authentication/views/dingtalk.py:248
 msgid "Please login with a password and then bind the DingTalk"
 msgstr ""
 
-#: authentication/views/feishu.py:43 authentication/views/feishu.py:129
+#: authentication/views/feishu.py:43 authentication/views/feishu.py:131
 msgid "FeiShu Error"
 msgstr ""
 
@@ -4053,7 +4053,7 @@ msgstr ""
 msgid "FeiShu is already bound"
 msgstr ""
 
-#: authentication/views/feishu.py:131
+#: authentication/views/feishu.py:133
 msgid "Failed to get user from FeiShu"
 msgstr ""
 
@@ -4069,37 +4069,37 @@ msgstr ""
 msgid "Failed to get user from Lark"
 msgstr ""
 
-#: authentication/views/login.py:218
+#: authentication/views/login.py:219
 msgid "Redirecting"
 msgstr ""
 
-#: authentication/views/login.py:219
+#: authentication/views/login.py:220
 msgid "Redirecting to {} authentication"
 msgstr ""
 
-#: authentication/views/login.py:242
+#: authentication/views/login.py:243
 msgid "Login timeout, please try again."
 msgstr ""
 
-#: authentication/views/login.py:287
+#: authentication/views/login.py:288
 msgid "User email already exists ({})"
 msgstr ""
 
-#: authentication/views/login.py:364
+#: authentication/views/login.py:366
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
 msgstr ""
 
-#: authentication/views/login.py:369
+#: authentication/views/login.py:371
 msgid "No ticket found"
 msgstr ""
 
-#: authentication/views/login.py:405
+#: authentication/views/login.py:407
 msgid "Logout success"
 msgstr ""
 
-#: authentication/views/login.py:406
+#: authentication/views/login.py:408
 msgid "Logout success, return login page"
 msgstr ""
 
@@ -4109,7 +4109,7 @@ msgid ""
 "If you need to open it in the client, please log in again"
 msgstr ""
 
-#: authentication/views/slack.py:35 authentication/views/slack.py:118
+#: authentication/views/slack.py:35 authentication/views/slack.py:120
 msgid "Slack Error"
 msgstr ""
 
@@ -4117,27 +4117,27 @@ msgstr ""
 msgid "Slack is already bound"
 msgstr ""
 
-#: authentication/views/slack.py:120
+#: authentication/views/slack.py:122
 msgid "Failed to get user from Slack"
 msgstr ""
 
-#: authentication/views/wecom.py:37
+#: authentication/views/wecom.py:36
 msgid "WeCom Error, Please contact your system administrator"
 msgstr ""
 
-#: authentication/views/wecom.py:40 authentication/views/wecom.py:142
+#: authentication/views/wecom.py:39 authentication/views/wecom.py:143
 msgid "WeCom Error"
 msgstr ""
 
-#: authentication/views/wecom.py:102
+#: authentication/views/wecom.py:103
 msgid "Wecom"
 msgstr ""
 
-#: authentication/views/wecom.py:144 authentication/views/wecom.py:179
+#: authentication/views/wecom.py:145 authentication/views/wecom.py:180
 msgid "Failed to get user from WeCom"
 msgstr ""
 
-#: authentication/views/wecom.py:186
+#: authentication/views/wecom.py:187
 msgid "Please login with a password and then bind the WeCom"
 msgstr ""
 
@@ -4189,7 +4189,7 @@ msgstr ""
 msgid "Ultimate edition"
 msgstr ""
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:429
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:417
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -5703,7 +5703,7 @@ msgid "Appearance"
 msgstr ""
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:152
+#: xpack/plugins/license/models.py:151
 msgid "License"
 msgstr ""
 
@@ -9560,11 +9560,11 @@ msgstr ""
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr ""
 
-#: users/utils.py:61
+#: users/utils.py:60
 msgid "Auth success"
 msgstr ""
 
-#: users/utils.py:62
+#: users/utils.py:61
 msgid "Redirecting to JumpServer Client"
 msgstr ""
 
@@ -9850,42 +9850,42 @@ msgid ""
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:410
+#: xpack/plugins/cloud/manager.py:399
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:412
+#: xpack/plugins/cloud/manager.py:401
 #, python-format
 msgid "Update asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:415
+#: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:425
+#: xpack/plugins/cloud/manager.py:413
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:446
+#: xpack/plugins/cloud/manager.py:434
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:472
+#: xpack/plugins/cloud/manager.py:460
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:488
+#: xpack/plugins/cloud/manager.py:476
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:502 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:490 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr ""
 
@@ -10435,17 +10435,3 @@ msgstr ""
 msgid "Invalid license"
 msgstr ""
 
-#: xpack/plugins/license/models.py:90
-msgid "FIT2CLOUD"
-msgstr ""
-
-#~ msgid "Clean change secret and push record period description"
-#~ msgstr ""
-#~ "The system will periodically clean up unnecessary change secret records "
-#~ "and push records, including those associated with change tasks, execution "
-#~ "records, assets, and accounts. When any of these associated items are "
-#~ "deleted, the corresponding change secret and push records become invalid. "
-#~ "Therefore, to maintain a tidy and efficient database, the system "
-#~ "automatically cleans up these invalid records every 180 days by default. "
-#~ "This regular cleanup process helps free up storage space and improves the "
-#~ "security and overall performance of data management."

@@ -231,6 +231,7 @@
     "BindLabel": "Associated tags",
     "BindResource": "Associate resources",
     "BindSuccess": "Binding successful",
+    "BiometricFeatures": "Biometric Features",
     "BlockedIPS": "Locked ips",
     "BuiltinVariable": "Built-in variables",
     "BulkClearErrorMsg": "Bulk clear failed: ",
@@ -240,7 +241,6 @@
     "BulkRemoveErrorMsg": "Bulk remove failed: ",
     "BulkRemoveSuccessMsg": "Bulk remove successful",
     "BulkSyncErrorMsg": "Bulk sync failed: ",
-    "BiometricFeatures": "Biometric Features",
     "CACertificate": "Ca certificate",
     "CAS": "CAS",
     "CMPP2": "Cmpp v2.0",
@@ -420,6 +420,7 @@
     "DefaultDatabase": "Default database",
     "DefaultPort": "Default port",
     "DefaultValue": "Default value",
+    "DefaultValueTip": "Save and execute using default values for scheduled tasks. Not filling in the default values may cause the task to fail",
     "Delete": "Delete",
     "DeleteConfirmMessage": "Deletion is irreversible, do you wish to continue?",
     "DeleteErrorMsg": "Delete failed",
@@ -515,6 +516,7 @@
     "FTPFileNotStored": "The file has not been saved to storage yet, please check back later.",
     "FTPStorageNotEnabled": "The file storage function is not enabled. Please modify the configuration file and add the following configuration: FTP_FILE_MAX_STORE=100 (supports saving files within 100M)",
     "FTPUnknownStorageState": "Unknown file storage status, please contact your administrator.",
+    "FacialFeatures": "Facial features",
     "Failed": "Failed",
     "FailedAsset": "Failed assets",
     "FaviconTip": "Note: website icon (suggested image size: 16px*16px)",
@@ -548,7 +550,6 @@
     "FullName": "Full name",
     "FullySynchronous": "Assets completely synchronized",
     "FullySynchronousHelpTip": "Whether to continue synchronizing such assets when the asset conditions do not meet the matching policy rules",
-    "FacialFeatures": "Facial features",
     "GCP": "Google cloud",
     "GPTCreate": "Create asset - gpt",
     "GPTUpdate": "Update the asset - gpt",
@@ -1421,6 +1422,5 @@
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
-    "setVariable": "Set variable",
-    "DefaultValueTip": "Save and execute using default values for scheduled tasks. Not filling in the default values may cause the task to fail"
+    "setVariable": "Set variable"
 }
