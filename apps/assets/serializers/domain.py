@@ -27,7 +27,7 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         model = Domain
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
-        fields_m2m = ['assets', 'gateways', 'assets_amount']
+        fields_m2m = ['assets', 'gateways', 'labels', 'assets_amount']
         read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {
