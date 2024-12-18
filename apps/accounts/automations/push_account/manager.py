@@ -8,6 +8,11 @@ logger = get_logger(__name__)
 
 class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
+    @staticmethod
+    def need_change_account_version(account, recorder):
+        account.skip_history_when_saving = True
+        return False
+
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account

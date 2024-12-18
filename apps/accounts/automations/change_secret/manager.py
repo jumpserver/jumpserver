@@ -160,6 +160,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         ChangeSecretRecord.objects.bulk_create(records)
         return inventory_hosts
 
+    @staticmethod
+    def need_change_account_version(account, recorder):
+        return account.secret != recorder.new_secret
+
     def on_host_success(self, host, result):
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
@@ -172,7 +176,6 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             print("Account not found, deleted ?")
             return
 
-        version_update_required = account.secret != recorder.new_secret
         account.secret = recorder.new_secret
         account.date_updated = timezone.now()
 
@@ -183,7 +186,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             try:
                 recorder.save()
                 account_update_fields = ['secret', 'date_updated']
-                if version_update_required:
+                if self.need_change_account_version(account, recorder):
                     account_update_fields.append('version')
                 account.save(update_fields=account_update_fields)
                 break
