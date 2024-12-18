@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-17 17:20+0800\n"
+"POT-Creation-Date: 2024-12-18 18:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -112,7 +112,7 @@ msgstr "计划执行结束"
 msgid "No pending accounts found"
 msgstr "未找到待处理帐户"
 
-#: accounts/automations/change_secret/manager.py:230
+#: accounts/automations/change_secret/manager.py:234
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s, 失败: %s, 总数: %s"
@@ -3058,21 +3058,21 @@ msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
-#: authentication/views/login.py:78 notifications/backends/__init__.py:11
+#: authentication/views/login.py:79 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
 #: users/models/user/__init__.py:129 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
-#: authentication/views/login.py:90 notifications/backends/__init__.py:14
+#: authentication/views/login.py:91 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:135
 #: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr "飞书"
 
-#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:102
+#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:103
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
 #: users/models/user/__init__.py:141 users/models/user/_source.py:23
@@ -3080,7 +3080,7 @@ msgid "Slack"
 msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
-#: authentication/views/login.py:84 notifications/backends/__init__.py:12
+#: authentication/views/login.py:85 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:132
 #: users/models/user/_source.py:20
 msgid "DingTalk"
@@ -3091,7 +3091,7 @@ msgstr "钉钉"
 msgid "Temporary token"
 msgstr "临时密码"
 
-#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:108
+#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:109
 #: settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
@@ -3239,12 +3239,12 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
-#: authentication/backends/oidc/views.py:174
+#: authentication/backends/oidc/views.py:175
 msgid "OpenID Error"
 msgstr "OpenID 错误"
 
-#: authentication/backends/oidc/views.py:175
-#: authentication/backends/saml2/views.py:282
+#: authentication/backends/oidc/views.py:176
+#: authentication/backends/saml2/views.py:283
 msgid "Please check if a user with the same username or email already exists"
 msgstr "请检查是否已经存在相同用户名或邮箱的用户"
 
@@ -3274,7 +3274,7 @@ msgstr "最后使用日期"
 msgid "Credential ID"
 msgstr "凭证 ID"
 
-#: authentication/backends/saml2/views.py:281
+#: authentication/backends/saml2/views.py:282
 msgid "SAML2 Error"
 msgstr "SAML2 错误"
 
@@ -3408,21 +3408,21 @@ msgstr "手机号没有设置"
 msgid "SSO auth closed"
 msgstr "SSO 认证关闭了"
 
-#: authentication/errors/mfa.py:18 authentication/views/wecom.py:48
+#: authentication/errors/mfa.py:18 authentication/views/wecom.py:47
 msgid "WeCom is already bound"
 msgstr "企业微信已经绑定"
 
-#: authentication/errors/mfa.py:23 authentication/views/wecom.py:143
-#: authentication/views/wecom.py:185
+#: authentication/errors/mfa.py:23 authentication/views/wecom.py:144
+#: authentication/views/wecom.py:186
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:203
-#: authentication/views/dingtalk.py:245
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
+#: authentication/views/dingtalk.py:247
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
-#: authentication/errors/mfa.py:33 authentication/views/feishu.py:130
+#: authentication/errors/mfa.py:33 authentication/views/feishu.py:132
 msgid "FeiShu is not bound"
 msgstr "没有绑定飞书"
 
@@ -3430,7 +3430,7 @@ msgstr "没有绑定飞书"
 msgid "Lark is not bound"
 msgstr "Lark 没有绑定"
 
-#: authentication/errors/mfa.py:43 authentication/views/slack.py:119
+#: authentication/errors/mfa.py:43 authentication/views/slack.py:121
 msgid "Slack is not bound"
 msgstr "Slack 没有绑定"
 
@@ -4047,17 +4047,17 @@ msgstr "局域网"
 msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
-#: authentication/views/base.py:141
+#: authentication/views/base.py:144
 #, python-format
 msgid "%s query user failed"
 msgstr "%s 查询用户失败"
 
-#: authentication/views/base.py:149
+#: authentication/views/base.py:152
 #, python-format
 msgid "The %s is already bound to another user"
 msgstr "%s 已绑定到另一个用户"
 
-#: authentication/views/base.py:155
+#: authentication/views/base.py:158
 #, python-format
 msgid "Binding %s successfully"
 msgstr "绑定 %s 成功"
@@ -4066,7 +4066,7 @@ msgstr "绑定 %s 成功"
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "钉钉错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:202
+#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:204
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
@@ -4090,15 +4090,15 @@ msgstr "该钉钉已经绑定其他用户"
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:204 authentication/views/dingtalk.py:239
+#: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:241
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:246
+#: authentication/views/dingtalk.py:248
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
-#: authentication/views/feishu.py:43 authentication/views/feishu.py:129
+#: authentication/views/feishu.py:43 authentication/views/feishu.py:131
 msgid "FeiShu Error"
 msgstr "飞书错误"
 
@@ -4106,7 +4106,7 @@ msgstr "飞书错误"
 msgid "FeiShu is already bound"
 msgstr "飞书已经绑定"
 
-#: authentication/views/feishu.py:131
+#: authentication/views/feishu.py:133
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
@@ -4122,23 +4122,23 @@ msgstr "Lark 已经绑定"
 msgid "Failed to get user from Lark"
 msgstr "从 Lark 获取用户失败"
 
-#: authentication/views/login.py:218
+#: authentication/views/login.py:219
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:219
+#: authentication/views/login.py:220
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:242
+#: authentication/views/login.py:243
 msgid "Login timeout, please try again."
 msgstr "登录超时，请重新登录"
 
-#: authentication/views/login.py:287
+#: authentication/views/login.py:288
 msgid "User email already exists ({})"
 msgstr "用户邮箱已存在 ({})"
 
-#: authentication/views/login.py:364
+#: authentication/views/login.py:366
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -4146,15 +4146,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:369
+#: authentication/views/login.py:371
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:405
+#: authentication/views/login.py:407
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:406
+#: authentication/views/login.py:408
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -4165,7 +4165,7 @@ msgid ""
 msgstr ""
 "为了您的安全，客户端不支持自动跳转登录。如果需要在客户端中打开，请重新登录"
 
-#: authentication/views/slack.py:35 authentication/views/slack.py:118
+#: authentication/views/slack.py:35 authentication/views/slack.py:120
 msgid "Slack Error"
 msgstr "Slack 错误"
 
@@ -4173,27 +4173,27 @@ msgstr "Slack 错误"
 msgid "Slack is already bound"
 msgstr "Slack 已经绑定"
 
-#: authentication/views/slack.py:120
+#: authentication/views/slack.py:122
 msgid "Failed to get user from Slack"
 msgstr "从 Slack 获取用户失败"
 
-#: authentication/views/wecom.py:37
+#: authentication/views/wecom.py:36
 msgid "WeCom Error, Please contact your system administrator"
 msgstr "企业微信错误，请联系系统管理员"
 
-#: authentication/views/wecom.py:40 authentication/views/wecom.py:142
+#: authentication/views/wecom.py:39 authentication/views/wecom.py:143
 msgid "WeCom Error"
 msgstr "企业微信错误"
 
-#: authentication/views/wecom.py:102
+#: authentication/views/wecom.py:103
 msgid "Wecom"
 msgstr "企业微信"
 
-#: authentication/views/wecom.py:144 authentication/views/wecom.py:179
+#: authentication/views/wecom.py:145 authentication/views/wecom.py:180
 msgid "Failed to get user from WeCom"
 msgstr "从企业微信获取用户失败"
 
-#: authentication/views/wecom.py:186
+#: authentication/views/wecom.py:187
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
@@ -4245,7 +4245,7 @@ msgstr "企业专业版"
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:429
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:417
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 创建成功"
@@ -5790,7 +5790,7 @@ msgid "Appearance"
 msgstr "界面"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:152
+#: xpack/plugins/license/models.py:151
 msgid "License"
 msgstr "许可证"
 
@@ -9789,11 +9789,11 @@ msgstr "账号保护已开启，请根据提示完成以下操作"
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "请打开 MFA 验证器，输入 6 位动态码"
 
-#: users/utils.py:61
+#: users/utils.py:60
 msgid "Auth success"
 msgstr "认证成功"
 
-#: users/utils.py:62
+#: users/utils.py:61
 msgid "Redirecting to JumpServer Client"
 msgstr "重定向到 JumpServer 客户端"
 
@@ -10079,42 +10079,42 @@ msgid ""
 "platform type. Skip platform and protocol updates"
 msgstr "资产“%s”的更新平台与原平台类型不一致。跳过平台和协议更新"
 
-#: xpack/plugins/cloud/manager.py:410
+#: xpack/plugins/cloud/manager.py:399
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "资产 \"%s\" 已存在"
 
-#: xpack/plugins/cloud/manager.py:412
+#: xpack/plugins/cloud/manager.py:401
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "更新资产 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:415
+#: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "资产 \"%s\" 已更新"
 
-#: xpack/plugins/cloud/manager.py:425
+#: xpack/plugins/cloud/manager.py:413
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "准备创建资产 %s"
 
-#: xpack/plugins/cloud/manager.py:446
+#: xpack/plugins/cloud/manager.py:434
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "删除节点: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:472
+#: xpack/plugins/cloud/manager.py:460
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "删除账号: %s"
 
-#: xpack/plugins/cloud/manager.py:488
+#: xpack/plugins/cloud/manager.py:476
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "设置协议 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:502 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:490 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 
@@ -10670,36 +10670,3 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
-
-#: xpack/plugins/license/models.py:90
-msgid "FIT2CLOUD"
-msgstr "飞致云"
-
-#~ msgid "Frontal Face Recognition"
-#~ msgstr "正面人脸识别"
-
-#~ msgid "Face recognition enable success"
-#~ msgstr "MFA(人脸识别) 开启成功"
-
-#~ msgid "Face recognition enable success, return login page"
-#~ msgstr "MFA(人脸识别) 启用成功，返回到登录页面"
-
-#~ msgid "Face recognition disable success"
-#~ msgstr "MFA(人脸识别) 禁用成功"
-
-#~ msgid "Face recognition disable success, return login page"
-#~ msgstr "MFA(人脸识别) 禁用成功，返回登录页面"
-
-#, fuzzy
-#~| msgid "Have online sessions"
-#~ msgid "View asset online session info"
-#~ msgstr "有在线会话"
-
-#~ msgid "* Please enter the correct password length"
-#~ msgstr "* 请输入正确的密码长度"
-
-#~ msgid "* Password length range 6-30 bits"
-#~ msgstr "* 密码长度范围 6-30 位"
-
-#~ msgid "Sync IP type"
-#~ msgstr "同步 IP 类型"

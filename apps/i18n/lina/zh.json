@@ -231,6 +231,7 @@
     "BindLabel": "绑定标签",
     "BindResource": "关联资源",
     "BindSuccess": "绑定成功",
+    "BiometricFeatures": "生物特征",
     "BlockedIPS": "已锁定的 IP",
     "BuiltinVariable": "内置变量",
     "BulkClearErrorMsg": "批量清除失败：",
@@ -240,7 +241,6 @@
     "BulkRemoveErrorMsg": "批量移除失败：",
     "BulkRemoveSuccessMsg": "批量移除成功",
     "BulkSyncErrorMsg": "批量同步失败：",
-    "BiometricFeatures": "生物特征",
     "CACertificate": "CA 证书",
     "CAS": "CAS",
     "CMPP2": "CMPP v2.0",
@@ -420,6 +420,7 @@
     "DefaultDatabase": "默认数据库",
     "DefaultPort": "默认端口",
     "DefaultValue": "默认值",
+    "DefaultValueTip": "保存并执行和定时任务使用默认值执行，不填写默认值可能会导致任务执行失败",
     "Delete": "删除",
     "DeleteConfirmMessage": "删除后无法恢复,是否继续?",
     "DeleteErrorMsg": "删除失败",
@@ -517,6 +518,7 @@
     "FTPFileNotStored": "文件尚未保存到存储中，请稍后查看。",
     "FTPStorageNotEnabled": "文件存储功能未开启，请修改配置文件并添加配置：FTP_FILE_MAX_STORE=100（支持保存100M以内的文件）",
     "FTPUnknownStorageState": "未知的文件存储状态，请联系管理员。",
+    "FacialFeatures": "人脸特征",
     "Failed": "失败",
     "FailedAsset": "失败的资产",
     "FaviconTip": "提示：网站图标（建议图片大小为: 16px*16px）",
@@ -550,7 +552,6 @@
     "FullName": "全称",
     "FullySynchronous": "资产完全同步",
     "FullySynchronousHelpTip": "当资产条件不满足匹配政策规则时是否继续同步该资产",
-    "FacialFeatures": "人脸特征",
     "GCP": "谷歌云",
     "GPTCreate": "创建资产-GPT",
     "GPTUpdate": "更新资产-GPT",
@@ -1426,6 +1427,5 @@
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
-    "setVariable": "设置参数",
-    "DefaultValueTip": "保存并执行和定时任务使用默认值执行，不填写默认值可能会导致任务执行失败"
+    "setVariable": "设置参数"
 }
