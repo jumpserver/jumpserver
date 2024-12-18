@@ -1426,5 +1426,6 @@
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
-    "setVariable": "设置参数"
+    "setVariable": "设置参数",
+    "DefaultValueTip": "保存并执行和定时任务使用默认值执行，不填写默认值可能会导致任务执行失败"
 }
