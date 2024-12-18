@@ -2,13 +2,14 @@
 #
 
 from __future__ import unicode_literals
-from django.views.generic.edit import FormView
+
 from django.shortcuts import redirect, reverse
+from django.views.generic.edit import FormView
 
 from common.utils import get_logger
 from users.views import UserFaceCaptureView
-from .. import forms, errors, mixins
 from .utils import redirect_to_guard_view
+from .. import forms, errors, mixins
 from ..const import MFAType
 
 logger = get_logger(__name__)
@@ -48,7 +49,8 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
             self._do_check_user_mfa(code, mfa_type)
             user, ip = self.get_user_from_session(), self.get_request_ip()
             MFABlockUtils(user.username, ip).clean_failed_count()
-            return redirect_to_guard_view('mfa_ok')
+            query_string = self.request.GET.urlencode()
+            return redirect_to_guard_view('mfa_ok', query_string)
         except (errors.MFAFailedError, errors.BlockMFAError) as e:
             form.add_error('code', e.msg)
             return super().form_invalid(form)

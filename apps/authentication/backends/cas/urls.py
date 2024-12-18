@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.urls import path
 import django_cas_ng.views
+from django.urls import path
 
-from .views import CASLoginView
+from .views import CASLoginView, CASCallbackClientView
 
 urlpatterns = [
     path('login/', CASLoginView.as_view(), name='cas-login'),
     path('logout/', django_cas_ng.views.LogoutView.as_view(), name='cas-logout'),
     path('callback/', django_cas_ng.views.CallbackView.as_view(), name='cas-proxy-callback'),
+    path('login/client', CASCallbackClientView.as_view(), name='cas-proxy-callback-client'),
 ]
