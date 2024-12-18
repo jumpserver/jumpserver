@@ -9,7 +9,6 @@ import time
 
 import pyotp
 from django.conf import settings
-from django.contrib.auth import logout as auth_logout
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
@@ -75,7 +74,6 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
 
     if url == 'client':
         url = get_redirect_client_url(request)
-        auth_logout(request)
 
     url = safe_next_url(url, request=request)
     # 防止 next 地址为 None

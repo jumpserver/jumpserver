@@ -22,7 +22,6 @@ from users.views import UserVerifyPasswordView
 from .base import BaseLoginCallbackView, BaseBindCallbackView
 from .mixins import METAMixin, FlashMessageMixin
 
-
 logger = get_logger(__file__)
 
 
@@ -86,6 +85,8 @@ class WeComQRBindView(WeComQRMixin, View):
 
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
+        query_string = request.GET.urlencode()
+        redirect_url = f'{redirect_url}?{query_string}'
         redirect_uri = reverse('authentication:wecom-qr-bind-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
 

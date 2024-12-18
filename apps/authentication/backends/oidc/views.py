@@ -22,13 +22,14 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
-from django.views.generic import View
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import View
 
 from authentication.utils import build_absolute_uri_for_oidc
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import safe_next_url
 from .utils import get_logger
+from ...views.utils import redirect_to_guard_view
 
 logger = get_logger(__file__)
 
@@ -206,6 +207,13 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
 
         logger.debug(log_prompt.format('Redirect'))
         return HttpResponseRedirect(settings.AUTH_OPENID_AUTHENTICATION_FAILURE_REDIRECT_URI)
+
+
+class OIDCAuthCallbackClientView(View):
+    http_method_names = ['get', ]
+
+    def get(self, request):
+        return redirect_to_guard_view(query_string='next=client')
 
 
 class OIDCEndSessionView(View):

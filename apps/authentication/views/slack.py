@@ -98,6 +98,8 @@ class SlackQRLoginView(SlackMixin, View):
 
     def get(self, request: Request):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
+        query_string = request.GET.urlencode()
+        redirect_url = f'{redirect_url}?{query_string}'
         redirect_uri = reverse('authentication:slack-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({
             'redirect_url': redirect_url,
