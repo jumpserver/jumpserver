@@ -30,10 +30,11 @@ class MFAFace(BaseMFA, AuthFaceMixin):
 
     @staticmethod
     def global_enabled():
-        return settings.XPACK_LICENSE_IS_VALID \
-            and LicenseEditionChoices.ULTIMATE == \
-            LicenseEditionChoices.from_key(settings.XPACK_LICENSE_EDITION) \
-            and settings.FACE_RECOGNITION_ENABLED
+        return (
+            settings.XPACK_LICENSE_IS_VALID and
+            settings.XPACK_LICENSE_EDITION_ULTIMATE and
+            settings.FACE_RECOGNITION_ENABLED
+        )
 
     def get_enable_url(self) -> str:
         return '/ui/#/profile/index'
