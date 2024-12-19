@@ -34,6 +34,8 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     PASSWORD_RULE = serializers.DictField()
     SECURITY_SESSION_SHARE = serializers.BooleanField()
     XPACK_LICENSE_IS_VALID = serializers.BooleanField()
+    XPACK_LICENSE_EDITION_ULTIMATE = serializers.BooleanField()
+    FACE_RECOGNITION_ENABLED = serializers.BooleanField()
     XPACK_LICENSE_INFO = serializers.DictField()
     HELP_DOCUMENT_URL = serializers.CharField()
     HELP_SUPPORT_URL = serializers.CharField()
