@@ -128,7 +128,7 @@ class FaceContextApi(AuthMixin, RetrieveAPIView, CreateAPIView):
         return Response({
             "is_finished": context.get('is_finished', False),
             "success": context.get('success', False),
-            "error_message": context.get("error_message", '')
+            "error_message": _(context.get("error_message", ''))
         })
 
 
