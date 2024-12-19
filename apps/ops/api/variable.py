@@ -19,7 +19,7 @@ class VariableViewSet(JMSModelViewSet):
     http_method_names = ['options', 'get']
 
     @action(methods=[GET], detail=False, serializer_class=VariableFormDataSerializer,
-            permission_classes=[IsValidUser, ], url_path='form_data')
+            permission_classes=[IsValidUser, ], url_path='form-data')
     def form_data(self, request, *args, **kwargs):
         # 只是为了动态返回serializer fields info
         return Response({})

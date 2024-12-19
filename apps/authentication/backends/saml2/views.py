@@ -19,6 +19,7 @@ from onelogin.saml2.idp_metadata_parser import (
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import get_logger
 from .settings import JmsSaml2Settings
+from ...views.utils import redirect_to_guard_view
 
 logger = get_logger(__file__)
 
@@ -296,6 +297,13 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+
+class Saml2AuthCallbackClientView(View):
+    http_method_names = ['get', ]
+
+    def get(self, request):
+        return redirect_to_guard_view(query_string='next=client')
 
 
 class Saml2AuthMetadataView(View, PrepareRequestMixin):

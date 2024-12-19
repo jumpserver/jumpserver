@@ -34,7 +34,7 @@
 
     <script>
         $(document).ready(function () {
-            const apiUrl = "{% url 'api-auth:mfa-face-context' %}";
+            const apiUrl = "{% url 'api-auth:face-context' %}";
             const faceCaptureUrl = "/facelive/capture";
             let token;
 
@@ -85,7 +85,7 @@
             }
 
             $('#retry_button').on('click', function () {
-                window.location.href = "{% url 'authentication:login-face-capture' %}";
+                window.location.href = "{{ request.get_full_path }}";
             });
         });
     </script>

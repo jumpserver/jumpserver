@@ -45,69 +45,70 @@ class UserLoginContextMixin:
     error_origin: str
 
     def get_support_auth_methods(self):
+        query_string = self.request.GET.urlencode()
         auth_methods = [
             {
                 'name': 'OpenID',
                 'enabled': settings.AUTH_OPENID,
-                'url': reverse('authentication:openid:login'),
+                'url': f"{reverse('authentication:openid:login')}?{query_string}",
                 'logo': static('img/login_oidc_logo.png'),
                 'auto_redirect': True  # 是否支持自动重定向
             },
             {
                 'name': 'CAS',
                 'enabled': settings.AUTH_CAS,
-                'url': reverse('authentication:cas:cas-login'),
+                'url': f"{reverse('authentication:cas:cas-login')}?{query_string}",
                 'logo': static('img/login_cas_logo.png'),
                 'auto_redirect': True
             },
             {
                 'name': 'SAML2',
                 'enabled': settings.AUTH_SAML2,
-                'url': reverse('authentication:saml2:saml2-login'),
+                'url': f"{reverse('authentication:saml2:saml2-login')}?{query_string}",
                 'logo': static('img/login_saml2_logo.png'),
                 'auto_redirect': True
             },
             {
                 'name': settings.AUTH_OAUTH2_PROVIDER,
                 'enabled': settings.AUTH_OAUTH2,
-                'url': reverse('authentication:oauth2:login'),
+                'url': f"{reverse('authentication:oauth2:login')}?{query_string}",
                 'logo': static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
                 'auto_redirect': True
             },
             {
                 'name': _('WeCom'),
                 'enabled': settings.AUTH_WECOM,
-                'url': reverse('authentication:wecom-qr-login'),
+                'url': f"{reverse('authentication:wecom-qr-login')}?{query_string}",
                 'logo': static('img/login_wecom_logo.png'),
             },
             {
                 'name': _('DingTalk'),
                 'enabled': settings.AUTH_DINGTALK,
-                'url': reverse('authentication:dingtalk-qr-login'),
+                'url': f"{reverse('authentication:dingtalk-qr-login')}?{query_string}",
                 'logo': static('img/login_dingtalk_logo.png')
             },
             {
                 'name': _('FeiShu'),
                 'enabled': settings.AUTH_FEISHU,
-                'url': reverse('authentication:feishu-qr-login'),
+                'url': f"{reverse('authentication:feishu-qr-login')}?{query_string}",
                 'logo': static('img/login_feishu_logo.png')
             },
             {
                 'name': 'Lark',
                 'enabled': settings.AUTH_LARK,
-                'url': reverse('authentication:lark-qr-login'),
+                'url': f"{reverse('authentication:lark-qr-login')}?{query_string}",
                 'logo': static('img/login_lark_logo.png')
             },
             {
                 'name': _('Slack'),
                 'enabled': settings.AUTH_SLACK,
-                'url': reverse('authentication:slack-qr-login'),
+                'url': f"{reverse('authentication:slack-qr-login')}?{query_string}",
                 'logo': static('img/login_slack_logo.png')
             },
             {
                 'name': _("Passkey"),
                 'enabled': settings.AUTH_PASSKEY,
-                'url': reverse('api-auth:passkey-login'),
+                'url': f"{reverse('api-auth:passkey-login')}?{query_string}",
                 'logo': static('img/login_passkey.png')
             }
         ]
@@ -220,12 +221,16 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
                 'redirect_url': redirect_url,
                 'interval': 3,
                 'has_cancel': True,
-                'cancel_url': reverse('authentication:login') + '?admin=1'
+                'cancel_url': reverse('authentication:login') + f'?admin=1&{query_string}'
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
         return redirect_url
 
     def get(self, request, *args, **kwargs):
+        next_page = request.GET.get(self.redirect_field_name)
+        if next_page:
+            request.session[self.redirect_field_name] = next_page
+
         if request.user.is_staff:
             first_login_url = redirect_user_first_login_or_index(
                 request, self.redirect_field_name
@@ -306,6 +311,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     login_url = reverse_lazy('authentication:login')
     login_mfa_url = reverse_lazy('authentication:login-mfa')
     login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
+    query_string = True
 
     def format_redirect_url(self, url):
         args = self.request.META.get('QUERY_STRING', '')

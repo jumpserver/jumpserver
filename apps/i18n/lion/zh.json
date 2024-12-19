@@ -39,6 +39,7 @@
     "GuacamoleErrSecurityNegotiationFailed": "远程连接的安全协商失败",
     "GuacamoleErrServerRefusedConnection": "远程连接的服务器拒绝连接",
     "GuacamoleErrServerRefusedConnectionBySecurityType": "远程连接的服务器拒绝连接，可能安全类型不匹配",
+    "GuacamoleErrUnableToConnectToVNCServer": "无法连接到 VNC 服务器",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "远程连接的凭证类型不支持",
     "GuacamoleErrUpstreamError": "远程连接的服务器发生错误",
     "JMSErrAPIFailed": "Core API 发生错误",

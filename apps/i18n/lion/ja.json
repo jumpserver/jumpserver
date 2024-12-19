@@ -39,6 +39,7 @@
     "GuacamoleErrSecurityNegotiationFailed": "リモート接続のセキュリティネゴシエーションが失敗しました",
     "GuacamoleErrServerRefusedConnection": "リモート接続のサーバーが接続を拒否しました",
     "GuacamoleErrServerRefusedConnectionBySecurityType": "リモート接続のサーバーが接続を拒否しました、セキュリティタイプが一致していない可能性があります",
+    "GuacamoleErrUnableToConnectToVNCServer": "VNCサーバーに接続できません",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "リモート接続の資格タイプがサポートされていません",
     "GuacamoleErrUpstreamError": "リモート接続のサーバーにエラーが発生",
     "JMSErrAPIFailed": "Core APIエラーが発生",

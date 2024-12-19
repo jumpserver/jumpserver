@@ -15,3 +15,4 @@ from .ssh_key import *
 from .sso import *
 from .temp_token import *
 from .token import *
+from .face import *

@@ -2,6 +2,7 @@
 #
 import inspect
 import time
+import uuid
 from functools import partial
 from typing import Callable
 
@@ -23,6 +24,7 @@ from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bul
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
+from .const import FACE_CONTEXT_CACHE_TTL, FACE_SESSION_KEY, FACE_CONTEXT_CACHE_KEY_PREFIX
 from .signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
@@ -197,53 +199,6 @@ class AuthPreCheckMixin:
         if not exist:
             logger.error(f"Only allow exist user auth, login failed: {username}")
             self.raise_credential_error(errors.reason_user_not_exist)
-
-
-class MFAFaceMixin:
-    request = None
-
-    def get_face_recognition_token(self):
-        from authentication.const import MFA_FACE_SESSION_KEY
-        token = self.request.session.get(MFA_FACE_SESSION_KEY)
-        if not token:
-            raise ValueError("Face recognition token is missing from the session.")
-        return token
-
-    @staticmethod
-    def get_face_cache_key(token):
-        from authentication.const import MFA_FACE_CONTEXT_CACHE_KEY_PREFIX
-        return f"{MFA_FACE_CONTEXT_CACHE_KEY_PREFIX}_{token}"
-
-    def get_face_recognition_context(self):
-        token = self.get_face_recognition_token()
-        cache_key = self.get_face_cache_key(token)
-        context = cache.get(cache_key)
-        if not context:
-            raise ValueError(f"Face recognition context does not exist for token: {token}")
-        return context
-
-    @staticmethod
-    def is_context_finished(context):
-        return context.get('is_finished', False)
-
-    @staticmethod
-    def is_context_success(context):
-        return context.get('success', False)
-
-    def get_face_code(self):
-        context = self.get_face_recognition_context()
-
-        if not self.is_context_finished(context):
-            raise RuntimeError("Face recognition is not yet completed.")
-
-        if not self.is_context_success(context):
-            msg = context.get('error_message', '')
-            raise RuntimeError(msg)
-
-        face_code = context.get('face_code')
-        if not face_code:
-            raise ValueError("Face code is missing from the context.")
-        return face_code
 
 
 class MFAMixin:
@@ -475,7 +430,68 @@ class AuthACLMixin:
         return ticket
 
 
-class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPostCheckMixin):
+class AuthFaceMixin:
+    request: Request
+
+    @staticmethod
+    def _get_face_cache_key(token):
+        return f"{FACE_CONTEXT_CACHE_KEY_PREFIX}_{token}"
+
+    @staticmethod
+    def _is_context_finished(context):
+        return context.get('is_finished', False)
+
+    @staticmethod
+    def _is_context_success(context):
+        return context.get('success', False)
+
+    def create_face_verify_context(self, data=None):
+        token = uuid.uuid4().hex
+        context_data = {
+            "action": "mfa",
+            "token": token,
+            "user_id": self.request.user.id,
+            "is_finished": False
+        }
+        if data:
+            context_data.update(data)
+
+        cache_key = self._get_face_cache_key(token)
+        cache.set(cache_key, context_data, FACE_CONTEXT_CACHE_TTL)
+        self.request.session[FACE_SESSION_KEY] = token
+        return token
+
+    def get_face_token_from_session(self):
+        token = self.request.session.get(FACE_SESSION_KEY)
+        if not token:
+            raise ValueError("Face recognition token is missing from the session.")
+        return token
+
+    def get_face_verify_context(self):
+        token = self.get_face_token_from_session()
+        cache_key = self._get_face_cache_key(token)
+        context = cache.get(cache_key)
+        if not context:
+            raise ValueError(f"Face recognition context does not exist for token: {token}")
+        return context
+
+    def get_face_code(self):
+        context = self.get_face_verify_context()
+
+        if not self._is_context_finished(context):
+            raise RuntimeError("Face recognition is not yet completed.")
+
+        if not self._is_context_success(context):
+            msg = context.get('error_message', '')
+            raise RuntimeError(msg)
+
+        face_code = context.get('face_code')
+        if not face_code:
+            raise ValueError("Face code is missing from the context.")
+        return face_code
+
+
+class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFAMixin, AuthPostCheckMixin, ):
     request = None
     partial_credential_error = None
 
@@ -577,7 +593,8 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         keys = [
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
-            'user_session_id', 'user_log_id', 'can_send_notifications'
+            'user_session_id', 'user_log_id', 'can_send_notifications',
+            'next',
         ]
         for k in keys:
             self.request.session.pop(k, '')

@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20241105_025649 AS stage-build
+FROM jumpserver/core-base:20241210_070105 AS stage-build
 
 ARG VERSION
 
@@ -24,6 +24,7 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
+        libldap2-dev                  \
         libx11-dev"
 
 ARG TOOLS="                           \

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import base64
 import requests
 
 from django.utils.translation import gettext_lazy as _
@@ -17,7 +18,7 @@ from common.exceptions import JMSException
 from .signals import (
     oauth2_create_or_update_user
 )
-from ..base import JMSModelBackend
+from ..base import JMSBaseAuthBackend
 
 
 __all__ = ['OAuth2Backend']
@@ -25,7 +26,7 @@ __all__ = ['OAuth2Backend']
 logger = get_logger(__name__)
 
 
-class OAuth2Backend(JMSModelBackend):
+class OAuth2Backend(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_OAUTH2
@@ -67,15 +68,7 @@ class OAuth2Backend(JMSModelBackend):
             response_data = response_data['data']
         return response_data
 
-    @staticmethod
-    def get_query_dict(response_data, query_dict):
-        query_dict.update({
-            'uid': response_data.get('uid', ''),
-            'access_token': response_data.get('access_token', '')
-        })
-        return query_dict
-
-    def authenticate(self, request, code=None, **kwargs):
+    def authenticate(self, request, code=None):
         log_prompt = "Process authenticate [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
         if code is None:
@@ -83,29 +76,31 @@ class OAuth2Backend(JMSModelBackend):
             return None
 
         query_dict = {
-            'client_id': settings.AUTH_OAUTH2_CLIENT_ID,
-            'client_secret': settings.AUTH_OAUTH2_CLIENT_SECRET,
-            'grant_type': 'authorization_code',
-            'code': code,
+            'grant_type': 'authorization_code', 'code': code,
             'redirect_uri': build_absolute_uri(
                 request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         }
-        if '?' in settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT:
-            separator = '&'
-        else:
-            separator = '?'
+        separator = '&' if '?' in settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT else '?'
         access_token_url = '{url}{separator}{query}'.format(
-            url=settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT, separator=separator, query=urlencode(query_dict)
+            url=settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT,
+            separator=separator, query=urlencode(query_dict)
         )
         # token_method -> get, post(post_data), post_json
         token_method = settings.AUTH_OAUTH2_ACCESS_TOKEN_METHOD.lower()
         logger.debug(log_prompt.format('Call the access token endpoint[method: %s]' % token_method))
+        encoded_credentials = base64.b64encode(
+            f"{settings.AUTH_OAUTH2_CLIENT_ID}:{settings.AUTH_OAUTH2_CLIENT_SECRET}".encode()
+        ).decode()
         headers = {
-            'Accept': 'application/json'
+            'Accept': 'application/json', 'Authorization': f'Basic {encoded_credentials}'
         }
         if token_method.startswith('post'):
             body_key = 'json' if token_method.endswith('json') else 'data'
+            query_dict.update({
+                'client_id': settings.AUTH_OAUTH2_CLIENT_ID,
+                'client_secret': settings.AUTH_OAUTH2_CLIENT_SECRET,
+            })
             access_token_response = requests.post(
                 access_token_url, headers=headers, **{body_key: query_dict}
             )
@@ -121,22 +116,12 @@ class OAuth2Backend(JMSModelBackend):
             logger.error(log_prompt.format(error))
             return None
 
-        query_dict = self.get_query_dict(response_data, query_dict)
-
         headers = {
             'Accept': 'application/json',
             'Authorization': 'Bearer {}'.format(response_data.get('access_token', ''))
         }
-
         logger.debug(log_prompt.format('Get userinfo endpoint'))
-        if '?' in settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT:
-            separator = '&'
-        else:
-            separator = '?'
-        userinfo_url = '{url}{separator}{query}'.format(
-            url=settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT, separator=separator,
-            query=urlencode(query_dict)
-        )
+        userinfo_url = settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT
         userinfo_response = requests.get(userinfo_url, headers=headers)
         try:
             userinfo_response.raise_for_status()

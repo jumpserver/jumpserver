@@ -26,6 +26,12 @@ urlpatterns = [
     path('lark/event/subscription/callback/', api.LarkEventSubscriptionCallback.as_view(),
          name='lark-event-subscription-callback'),
 
+    path('face/callback/', api.FaceCallbackApi.as_view(), name='face-callback'),
+    path('face/context/', api.FaceContextApi.as_view(), name='face-context'),
+
+    path('face-monitor/callback/', api.FaceMonitorCallbackApi.as_view(), name='face-monitor-callback'),
+    path('face-monitor/context/', api.FaceMonitorContextApi.as_view(), name='face-monitor-context'),
+
     path('auth/', api.TokenCreateApi.as_view(), name='user-auth'),
     path('confirm-oauth/', api.ConfirmBindORUNBindOAuth.as_view(), name='confirm-oauth'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),
@@ -33,8 +39,6 @@ urlpatterns = [
     path('mfa/challenge/', api.MFAChallengeVerifyApi.as_view(), name='mfa-challenge'),
     path('mfa/select/', api.MFASendCodeApi.as_view(), name='mfa-select'),
     path('mfa/send-code/', api.MFASendCodeApi.as_view(), name='mfa-send-code'),
-    path('mfa/face/callback/', api.MFAFaceCallbackApi.as_view(), name='mfa-face-callback'),
-    path('mfa/face/context/', api.MFAFaceContextApi.as_view(), name='mfa-face-context'),
     path('password/reset-code/', api.UserResetPasswordSendCodeApi.as_view(), name='reset-password-code'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),

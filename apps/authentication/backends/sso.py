@@ -1,57 +1,41 @@
 from django.conf import settings
 
-from .base import JMSModelBackend
+from .base import JMSBaseAuthBackend
 
 
-class SSOAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
+class SSOAuthentication(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_SSO
 
-    def authenticate(self, request, sso_token=None, **kwargs):
+    def authenticate(self):
         pass
 
 
-class WeComAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
+class WeComAuthentication(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_WECOM
 
-    def authenticate(self, request, **kwargs):
+    def authenticate(self):
         pass
 
 
-class DingTalkAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
+class DingTalkAuthentication(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_DINGTALK
 
-    def authenticate(self, request, **kwargs):
+    def authenticate(self):
         pass
 
 
-class FeiShuAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
+class FeiShuAuthentication(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_FEISHU
 
-    def authenticate(self, request, **kwargs):
+    def authenticate(self):
         pass
 
 
@@ -61,23 +45,15 @@ class LarkAuthentication(FeiShuAuthentication):
         return settings.AUTH_LARK
 
 
-class SlackAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
+class SlackAuthentication(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_SLACK
 
-    def authenticate(self, request, **kwargs):
+    def authenticate(self):
         pass
 
 
-class AuthorizationTokenAuthentication(JMSModelBackend):
-    """
-    什么也不做呀😺
-    """
-
-    def authenticate(self, request, **kwargs):
+class AuthorizationTokenAuthentication(JMSBaseAuthBackend):
+    def authenticate(self):
         pass

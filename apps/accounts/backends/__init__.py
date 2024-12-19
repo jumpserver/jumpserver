@@ -13,9 +13,6 @@ logger = get_logger(__file__)
 def get_vault_client(raise_exception=False, **kwargs):
     tp = kwargs.get('VAULT_BACKEND') if kwargs.get('VAULT_ENABLED') else VaultTypeChoices.local
 
-    # TODO: Temporary processing, subsequent deletion
-    tp = VaultTypeChoices.local if tp == VaultTypeChoices.azure else tp
-
     try:
         module_path = f'apps.accounts.backends.{tp}.main'
         client = import_module(module_path).Vault(**kwargs)

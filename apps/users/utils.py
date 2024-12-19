@@ -68,9 +68,13 @@ def get_redirect_client_url(request):
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
-    url = request.POST.get(redirect_field_name)
-    if not url:
-        url = request.GET.get(redirect_field_name)
+    sources = [request.session, request.POST, request.GET]
+
+    url = ''
+    for source in sources:
+        url = source.get(redirect_field_name)
+        if url:
+            break
 
     if url == 'client':
         url = get_redirect_client_url(request)

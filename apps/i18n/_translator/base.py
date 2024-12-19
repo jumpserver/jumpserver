@@ -11,8 +11,8 @@ class BaseTranslateManager:
     SEPARATOR = "<SEP>"
     LANG_MAPPER = {
         'ja': 'Japanese',
-        'zh_hant': 'Traditional Chinese',
-        # 'en': 'English',
+        'zh_Hant': 'Traditional Chinese',
+        'pt_BR': 'Portuguese (Brazil)',
     }
 
     def __init__(self, dir_path, oai_trans_instance):

@@ -160,6 +160,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         ChangeSecretRecord.objects.bulk_create(records)
         return inventory_hosts
 
+    @staticmethod
+    def require_update_version(account, recorder):
+        return account.secret != recorder.new_secret
+
     def on_host_success(self, host, result):
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
@@ -171,6 +175,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         if not account:
             print("Account not found, deleted ?")
             return
+
+        version_update_required = self.require_update_version(account, recorder)
         account.secret = recorder.new_secret
         account.date_updated = timezone.now()
 
@@ -180,7 +186,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         while retry_count < max_retries:
             try:
                 recorder.save()
-                account.save(update_fields=['secret', 'version', 'date_updated'])
+                account_update_fields = ['secret', 'date_updated']
+                if version_update_required:
+                    account_update_fields.append('version')
+                account.save(update_fields=account_update_fields)
                 break
             except Exception as e:
                 retry_count += 1

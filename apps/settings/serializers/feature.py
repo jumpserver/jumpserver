@@ -11,7 +11,7 @@ from common.utils import date_expired_default
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
     'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
-    'ChatAISettingSerializer', 'VirtualAppSerializer',
+    'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
 
 
@@ -100,6 +100,20 @@ class AzureKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     )
     VAULT_AZURE_TENANT_ID = serializers.CharField(
         max_length=128, allow_blank=True, required=False, label=_('Tenant ID')
+    )
+
+
+class AmazonSMSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Amazon Secrets Manager')
+    VAULT_AWS_REGION_NAME = serializers.CharField(
+        max_length=256, required=True, label=_('Region')
+    )
+    VAULT_AWS_ACCESS_KEY_ID = serializers.CharField(
+        max_length=1024, required=True, label=_('Access key ID')
+    )
+    VAULT_AWS_ACCESS_SECRET_KEY = EncryptedField(
+        max_length=1024, required=False, allow_blank=True,
+        label=_('Access key secret'), default=''
     )
 
 

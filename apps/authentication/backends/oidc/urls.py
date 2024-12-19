@@ -12,9 +12,9 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path('login/', views.OIDCAuthRequestView.as_view(), name='login'),
     path('callback/', views.OIDCAuthCallbackView.as_view(), name='login-callback'),
+    path('callback/client/', views.OIDCAuthCallbackClientView.as_view(), name='login-callback-client'),
     path('logout/', views.OIDCEndSessionView.as_view(), name='logout'),
 ]

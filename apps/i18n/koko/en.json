@@ -62,6 +62,8 @@
     "ThemeConfig": "Theme",
     "UpArrow": "Up arrow",
     "Upload": "Upload",
+    "UploadEnd": "Upload completed, please wait for further processing",
+    "UploadStart": "Upload start",
     "UploadSuccess": "Upload success",
     "UploadTips": "Drag file here or click to upload",
     "UploadTitle": "file upload",
@@ -69,7 +71,5 @@
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
-    "Writable": "Writable",
-    "UploadStart": "Upload start",
-    "UploadEnd": "Upload completed, please wait for further processing"
+    "Writable": "Writable"
 }

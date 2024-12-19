@@ -222,9 +222,13 @@ class ResourceActivityAPIView(generics.ListAPIView):
             'id', 'datetime', 'r_detail', 'r_detail_id',
             'r_user', 'r_action', 'r_type'
         )
-        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
-        if resource_id:
-            org_q |= Q(org_id='') | Q(org_id=Organization.ROOT_ID)
+
+        org_q = Q()
+        if not current_org.is_root():
+            org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+            if resource_id:
+                org_q |= Q(org_id='') | Q(org_id=Organization.ROOT_ID)
+
         with tmp_to_root_org():
             qs1 = self.get_operate_log_qs(fields, limit, org_q, resource_id=resource_id)
             qs2 = self.get_activity_log_qs(fields, limit, org_q, resource_id=resource_id)

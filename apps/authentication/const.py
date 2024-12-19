@@ -40,6 +40,12 @@ class MFAType(TextChoices):
     Custom = MFACustom.name, MFACustom.display_name
 
 
-MFA_FACE_CONTEXT_CACHE_KEY_PREFIX = "MFA_FACE_RECOGNITION_CONTEXT"
-MFA_FACE_CONTEXT_CACHE_TTL = 60
-MFA_FACE_SESSION_KEY = "mfa_face_token"
+FACE_CONTEXT_CACHE_KEY_PREFIX = "FACE_CONTEXT"
+FACE_CONTEXT_CACHE_TTL = 60
+FACE_SESSION_KEY = "face_token"
+
+
+class FaceMonitorActionChoices(TextChoices):
+    Verify = 'verify', 'verify'
+    Pause = 'pause', 'pause'
+    Resume = 'resume', 'resume'

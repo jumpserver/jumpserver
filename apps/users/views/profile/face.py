@@ -1,16 +1,14 @@
-from django.contrib.auth import logout as auth_logout
-from django.shortcuts import redirect
 from django.views.generic import FormView
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from authentication import errors
-from authentication.mixins import AuthMixin, MFAFaceMixin
+from authentication.mixins import AuthMixin
 
 __all__ = ['UserFaceCaptureView', 'UserFaceEnableView',
            'UserFaceDisableView']
 
-from common.utils import reverse, FlashMessageUtil
+from common.utils import FlashMessageUtil
 
 
 class UserFaceCaptureForm(forms.Form):
@@ -27,34 +25,39 @@ class UserFaceCaptureView(AuthMixin, FormView):
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data()
+        context = super().get_context_data(**kwargs)
 
-        if not self.get_form().is_bound:
+        if 'form' not in kwargs:
+            form = self.get_form()
+            context['form'] = form
+
+        if not context['form'].is_bound:
             context.update({
                 "active": True,
             })
 
-        kwargs.update(context)
-        return kwargs
+        return context
 
 
-class UserFaceEnableView(UserFaceCaptureView, MFAFaceMixin):
+class UserFaceEnableView(UserFaceCaptureView):
     def form_valid(self, form):
-        code = self.get_face_code()
+        try:
+            code = self.get_face_code()
+            user = self.get_user_from_session()
+            user.face_vector = code
+            user.save(update_fields=['face_vector'])
+        except Exception as e:
+            form.add_error("code", str(e))
+            return super().form_invalid(form)
 
-        user = self.get_user_from_session()
-        user.face_vector = code
-        user.save(update_fields=['face_vector'])
-
-        auth_logout(self.request)
         return super().form_valid(form)
 
     def get_success_url(self):
         message_data = {
-            'title': _('Face recognition enable success'),
-            'message': _('Face recognition enable success, return login page'),
-            'interval': 5,
-            'redirect_url': reverse('authentication:login'),
+            'title': _('Face binding successful'),
+            'message': _('Face binding successful'),
+            'interval': 2,
+            'redirect_url': '/ui/#/profile/index'
         }
         url = FlashMessageUtil.gen_message_url(message_data)
         return url
@@ -63,23 +66,23 @@ class UserFaceEnableView(UserFaceCaptureView, MFAFaceMixin):
 class UserFaceDisableView(UserFaceCaptureView):
     def form_valid(self, form):
         try:
-            self._do_check_user_mfa(self.code, self.mfa_type)
+            code = self.get_face_code()
             user = self.get_user_from_session()
+            if not user.check_face(code):
+                raise Exception(_('Facial comparison failed'))
             user.face_vector = None
             user.save(update_fields=['face_vector'])
-        except (errors.MFAFailedError, errors.BlockMFAError) as e:
-            form.add_error('code', e.msg)
+        except Exception as e:
+            form.add_error('code', str(e))
             return super().form_invalid(form)
-
-        auth_logout(self.request)
         return super().form_valid(form)
 
     def get_success_url(self):
         message_data = {
-            'title': _('Face recognition disable success'),
-            'message': _('Face recognition disable success, return login page'),
-            'interval': 5,
-            'redirect_url': reverse('authentication:login'),
+            'title': _('Face unbinding successful'),
+            'message': _('Face unbinding successful'),
+            'interval': 2,
+            'redirect_url': '/ui/#/profile/index'
         }
         url = FlashMessageUtil.gen_message_url(message_data)
         return url

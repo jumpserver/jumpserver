@@ -175,6 +175,8 @@ class DingTalkQRLoginView(DingTalkQRMixin, METAMixin, View):
 
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
+        query_string = request.GET.urlencode()
+        redirect_url = f'{redirect_url}?{query_string}'
         next_url = self.get_next_url_from_meta() or reverse('index')
         next_url = safe_next_url(next_url, request=request)
 

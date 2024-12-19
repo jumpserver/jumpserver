@@ -8,7 +8,6 @@ from common.serializers.fields import EncryptedField
 __all__ = [
     'MFAChallengeSerializer', 'MFASelectTypeSerializer',
     'PasswordVerifySerializer', 'ResetPasswordCodeSerializer',
-    'MFAFaceCallbackSerializer'
 ]
 
 
@@ -51,17 +50,4 @@ class MFAChallengeSerializer(serializers.Serializer):
         pass
 
     def update(self, instance, validated_data):
-        pass
-
-
-class MFAFaceCallbackSerializer(serializers.Serializer):
-    token = serializers.CharField(required=True, allow_blank=False)
-    success = serializers.BooleanField(required=True, allow_null=False)
-    error_message = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    face_code = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
         pass

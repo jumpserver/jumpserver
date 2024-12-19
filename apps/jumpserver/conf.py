@@ -235,6 +235,7 @@ class Config(dict):
         'SESSION_COOKIE_NAME_PREFIX': None,
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
+        'VIEW_ASSET_ONLINE_SESSION_INFO': True,
         'LOGIN_URL': reverse_lazy('authentication:login'),
 
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认(new)
@@ -268,6 +269,10 @@ class Config(dict):
         'VAULT_AZURE_CLIENT_ID': '',
         'VAULT_AZURE_CLIENT_SECRET': '',
         'VAULT_AZURE_TENANT_ID': '',
+
+        'VAULT_AWS_REGION_NAME': '',
+        'VAULT_AWS_ACCESS_KEY_ID': '',
+        'VAULT_AWS_ACCESS_SECRET_KEY': '',
 
         'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
 
@@ -352,7 +357,6 @@ class Config(dict):
         'AUTH_OPENID_SERVER_URL': 'https://keycloak.example.com',
         'AUTH_OPENID_REALM_NAME': None,
         'OPENID_ORG_IDS': [DEFAULT_ID],
-
 
         # Raidus 认证
         'AUTH_RADIUS': False,
@@ -487,7 +491,6 @@ class Config(dict):
 
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
-
 
         # 人脸识别
         'FACE_RECOGNITION_ENABLED': False,

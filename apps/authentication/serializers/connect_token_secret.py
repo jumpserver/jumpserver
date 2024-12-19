@@ -148,9 +148,10 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'platform', 'command_filter_acls', 'protocol',
             'domain', 'gateway', 'actions', 'expire_at',
             'from_ticket', 'expire_now', 'connect_method',
-            'connect_options',
+            'connect_options', 'face_monitor_token'
         ]
         extra_kwargs = {
+            'face_monitor_token': {'read_only': True},
             'value': {'read_only': True},
         }
 

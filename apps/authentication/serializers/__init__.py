@@ -4,3 +4,4 @@ from .connection_token import *
 from .password_mfa import *
 from .ssh_key import *
 from .token import *
+from .face import *

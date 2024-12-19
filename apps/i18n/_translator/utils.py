@@ -26,7 +26,7 @@ class OpenAITranslate:
                         "content": text,
                     },
                 ],
-                model="gpt-4",
+                model="gpt-4o-mini",
             )
         except Exception as e:
             print("Open AI Error: ", e)

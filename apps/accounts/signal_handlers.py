@@ -14,6 +14,7 @@ from common.decorators import merge_delay_run
 from common.signals import django_ready
 from common.utils import get_logger, i18n_fmt
 from common.utils.connection import RedisPubSub
+from .exceptions import VaultException
 from .models import Account, AccountTemplate
 from .tasks.push_account import push_accounts_to_assets_task
 
@@ -22,6 +23,9 @@ logger = get_logger(__name__)
 
 @receiver(pre_save, sender=Account)
 def on_account_pre_save(sender, instance, **kwargs):
+    if getattr(instance, 'skip_history_when_saving', False):
+        return
+
     if instance.version == 0:
         instance.version = 1
     else:
@@ -65,7 +69,7 @@ def create_accounts_activities(account, action='create'):
 
 @receiver(post_save, sender=Account)
 def on_account_create_by_template(sender, instance, created=False, **kwargs):
-    if not created or instance.source != Source.TEMPLATE:
+    if not created:
         return
     push_accounts_if_need.delay(accounts=(instance,))
     create_accounts_activities(instance, action='create')
@@ -81,14 +85,22 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
-        if created:
-            vault_client.create(instance)
-        else:
-            vault_client.update(instance)
+        try:
+            if created:
+                vault_client.create(instance)
+            else:
+                vault_client.update(instance)
+        except Exception as e:
+            logger.error('Vault save failed: {}'.format(e))
+            raise VaultException()
 
     @staticmethod
     def delete_to_vault(sender, instance, **kwargs):
-        vault_client.delete(instance)
+        try:
+            vault_client.delete(instance)
+        except Exception as e:
+            logger.error('Vault delete failed: {}'.format(e))
+            raise VaultException()
 
 
 for model in (Account, AccountTemplate, Account.history.model):

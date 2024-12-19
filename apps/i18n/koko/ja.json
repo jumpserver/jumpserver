@@ -62,6 +62,8 @@
     "ThemeConfig": "テーマ",
     "UpArrow": "上向き矢印",
     "Upload": "アップロード",
+    "UploadEnd": "アップロードが完了しました。後の処理をお待ちください",
+    "UploadStart": "アップロード開始",
     "UploadSuccess": "アップロード成功",
     "UploadTips": "ファイルをここにドラッグするか、アップロードをクリックします",
     "UploadTitle": "ファイルのアップロード",
@@ -69,7 +71,5 @@
     "VerifyCode": "認証コード",
     "WaitFileTransfer": "ファイル転送終了待ち",
     "WebSocketClosed": "WebSocket 閉店",
-    "Writable": "書き込み可能",
-    "UploadStart": "アップロード開始",
-    "UploadEnd": "アップロードが完了しました。後の処理をお待ちください"
+    "Writable": "書き込み可能"
 }

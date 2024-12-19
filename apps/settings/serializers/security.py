@@ -200,6 +200,15 @@ class SecuritySessionSerializer(serializers.Serializer):
         required=False, default=False, label=_('Session expire at browser closed'),
         help_text=_('Whether to expire the session when the user closes their browser.')
     )
+    VIEW_ASSET_ONLINE_SESSION_INFO = serializers.BooleanField(
+        required=False,
+        default=True,
+        label=_('Allow users to view asset session information'),
+        help_text=_(
+            'When a user connects to an asset, the account selection popup displays the number of active sessions for '
+            'the current asset (RDP protocol only).'
+        )
+    )
     SECURITY_MAX_SESSION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,
         label=_('Max online time (hour)'),

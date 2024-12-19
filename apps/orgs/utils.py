@@ -24,13 +24,13 @@ def get_org_from_request(request):
     # 其次session
     if not oid:
         oid = request.session.get("oid")
-    
+
     if oid and oid.lower() == 'default':
         return Organization.default()
 
     if oid and oid.lower() == 'root':
         return Organization.root()
-    
+
     if oid and oid.lower() == 'system':
         return Organization.system()
 
@@ -39,14 +39,14 @@ def get_org_from_request(request):
     if org and org.internal:
         # 内置组织直接返回
         return org
-    
+
     if not settings.XPACK_ENABLED:
         # 社区版用户只能使用默认组织
         return Organization.default()
-    
+
     if not org and request.user.is_authenticated:
         # 企业版用户优先从自己有权限的组织中获取
-        org = request.user.orgs.first()
+        org = request.user.orgs.exclude(id=Organization.SYSTEM_ID).first()
 
     if not org:
         org = Organization.default()

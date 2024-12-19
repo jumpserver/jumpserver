@@ -73,7 +73,7 @@ known_unauth_urls = [
     "/api/v1/authentication/password/reset-code/",
     "/api/v1/authentication/login-confirm-ticket/status/",
     "/api/v1/authentication/mfa/select/",
-    "/api/v1/authentication/mfa/face/context/",
+    "/api/v1/authentication/face/context/",
     "/api/v1/authentication/mfa/send-code/",
     "/api/v1/authentication/sso/login/",
     "/api/v1/authentication/user-session/",
