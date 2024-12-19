@@ -227,6 +227,10 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
         return redirect_url
 
     def get(self, request, *args, **kwargs):
+        next_page = request.GET.get(self.redirect_field_name)
+        if next_page:
+            request.session[self.redirect_field_name] = next_page
+
         if request.user.is_staff:
             first_login_url = redirect_user_first_login_or_index(
                 request, self.redirect_field_name
