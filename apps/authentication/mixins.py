@@ -24,7 +24,6 @@ from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bul
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
-from .const import FACE_CONTEXT_CACHE_TTL, FACE_SESSION_KEY, FACE_CONTEXT_CACHE_KEY_PREFIX
 from .signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
@@ -435,6 +434,7 @@ class AuthFaceMixin:
 
     @staticmethod
     def _get_face_cache_key(token):
+        from authentication.const import FACE_CONTEXT_CACHE_KEY_PREFIX
         return f"{FACE_CONTEXT_CACHE_KEY_PREFIX}_{token}"
 
     @staticmethod
@@ -457,11 +457,13 @@ class AuthFaceMixin:
             context_data.update(data)
 
         cache_key = self._get_face_cache_key(token)
+        from .const import FACE_CONTEXT_CACHE_TTL, FACE_SESSION_KEY
         cache.set(cache_key, context_data, FACE_CONTEXT_CACHE_TTL)
         self.request.session[FACE_SESSION_KEY] = token
         return token
 
     def get_face_token_from_session(self):
+        from authentication.const import FACE_SESSION_KEY
         token = self.request.session.get(FACE_SESSION_KEY)
         if not token:
             raise ValueError("Face recognition token is missing from the session.")
@@ -593,8 +595,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         keys = [
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
-            'user_session_id', 'user_log_id', 'can_send_notifications',
-            'next',
+            'user_session_id', 'user_log_id', 'can_send_notifications'
         ]
         for k in keys:
             self.request.session.pop(k, '')
