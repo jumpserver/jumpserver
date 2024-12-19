@@ -28,6 +28,7 @@ class VariableSerializer(CommonBulkModelSerializer):
     type = LabeledChoiceField(
         choices=FieldType.choices, default=FieldType.text, label=_("Variable Type")
     )
+    default_value = serializers.CharField(max_length=2048, label=_('Default Value'), required=False, allow_blank=True)
     extra_args = serializers.CharField(
         max_length=1024, label=_("ExtraVars"), required=False, allow_blank=True,
         help_text=_(
