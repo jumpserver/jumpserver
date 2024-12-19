@@ -35,7 +35,7 @@ class MFAMiddleware:
 
         # 这个是 mfa 登录页需要的请求, 也得放出来, 用户其实已经在 CAS/OIDC 中完成登录了
         white_urls = [
-            'login/mfa', 'mfa/select', 'mfa/face','jsi18n/', '/static/',
+            'login/mfa', 'mfa/select', 'face/context','jsi18n/', '/static/',
             '/profile/otp', '/logout/',
         ]
         for url in white_urls:
