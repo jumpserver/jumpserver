@@ -66,12 +66,14 @@ class UserFaceEnableView(UserFaceCaptureView):
 class UserFaceDisableView(UserFaceCaptureView):
     def form_valid(self, form):
         try:
-            self._do_check_user_mfa(self.code, self.mfa_type)
+            code = self.get_face_code()
             user = self.get_user_from_session()
+            if not user.check_face(code):
+                raise Exception(_('Facial comparison failed'))
             user.face_vector = None
             user.save(update_fields=['face_vector'])
-        except (errors.MFAFailedError, errors.BlockMFAError) as e:
-            form.add_error('code', e.msg)
+        except Exception as e:
+            form.add_error('code', str(e))
             return super().form_invalid(form)
         return super().form_valid(form)
 
