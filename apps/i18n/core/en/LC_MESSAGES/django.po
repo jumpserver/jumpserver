@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-18 18:13+0800\n"
+"POT-Creation-Date: 2024-12-19 15:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -369,7 +369,7 @@ msgstr ""
 #: assets/models/asset/common.py:362 assets/models/cmd_filter.py:36
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:32 terminal/notifications.py:156
+#: terminal/models/session/session.py:33 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
@@ -413,7 +413,7 @@ msgstr ""
 #: assets/serializers/gateway.py:33 audits/models.py:59
 #: authentication/api/connection_token.py:459 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:34
+#: terminal/backends/command/models.py:18 terminal/models/session/session.py:35
 #: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
@@ -486,7 +486,7 @@ msgstr ""
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:26
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
-#: terminal/models/applet/host.py:141 terminal/models/session/session.py:45
+#: terminal/models/applet/host.py:141 terminal/models/session/session.py:46
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Date start"
@@ -967,7 +967,7 @@ msgstr ""
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
 #: rbac/builtin.py:125 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:30 terminal/models/session/sharing.py:34
+#: terminal/models/session/session.py:31 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
@@ -1073,7 +1073,7 @@ msgstr ""
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:27
 #: terminal/models/component/endpoint.py:122
-#: terminal/models/session/session.py:47
+#: terminal/models/session/session.py:48
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:98
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:124
@@ -1393,7 +1393,7 @@ msgstr ""
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: audits/serializers.py:38 ops/serializers/job.py:91 terminal/const.py:88
-#: terminal/models/session/session.py:43 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:44 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:23
@@ -2835,7 +2835,7 @@ msgid "Job audit log"
 msgstr ""
 
 #: audits/models.py:56 audits/models.py:100 audits/models.py:175
-#: terminal/models/session/session.py:39 terminal/models/session/sharing.py:113
+#: terminal/models/session/session.py:40 terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr ""
 
@@ -4584,6 +4584,14 @@ msgstr ""
 msgid "The mobile phone number format is incorrect"
 msgstr ""
 
+#: common/views/msg.py:18
+msgid "Not found the code"
+msgstr ""
+
+#: common/views/msg.py:22
+msgid "The message code provided is invalid or has expired"
+msgstr ""
+
 #: jumpserver/conf.py:533
 #, python-brace-format
 msgid "The verification code is: {code}"
@@ -5064,7 +5072,7 @@ msgid ""
 "final generated environment variable will be 'jms_name'."
 msgstr ""
 
-#: ops/models/variable.py:16
+#: ops/models/variable.py:16 ops/serializers/variable.py:31
 msgid "Default Value"
 msgstr ""
 
@@ -5072,7 +5080,7 @@ msgstr ""
 msgid "Variable type"
 msgstr ""
 
-#: ops/models/variable.py:21 ops/serializers/variable.py:32
+#: ops/models/variable.py:21 ops/serializers/variable.py:33
 msgid "ExtraVars"
 msgstr ""
 
@@ -5141,7 +5149,7 @@ msgstr ""
 msgid "Variable Type"
 msgstr ""
 
-#: ops/serializers/variable.py:34
+#: ops/serializers/variable.py:35
 msgid ""
 "Each item is on a separate line, with each line separated by a colon. The "
 "part before the colon is the display content, and the part after the colon "
@@ -6534,7 +6542,7 @@ msgstr ""
 
 #: settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
-#: terminal/models/session/session.py:46
+#: terminal/models/session/session.py:47
 msgid "Date end"
 msgstr ""
 
@@ -7847,43 +7855,43 @@ msgstr ""
 msgid "Can download session replay"
 msgstr ""
 
-#: terminal/models/session/session.py:35
+#: terminal/models/session/session.py:36
 msgid "Account ID"
 msgstr ""
 
-#: terminal/models/session/session.py:37 terminal/models/session/sharing.py:118
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr ""
 
-#: terminal/models/session/session.py:42
+#: terminal/models/session/session.py:43
 msgid "Replay"
 msgstr ""
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:112
+#: terminal/models/session/session.py:49 terminal/serializers/session.py:112
 msgid "Command amount"
 msgstr ""
 
-#: terminal/models/session/session.py:49 terminal/serializers/session.py:32
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:32
 msgid "Error reason"
 msgstr ""
 
-#: terminal/models/session/session.py:308
+#: terminal/models/session/session.py:310
 msgid "Session record"
 msgstr ""
 
-#: terminal/models/session/session.py:310
+#: terminal/models/session/session.py:312
 msgid "Can monitor session"
 msgstr ""
 
-#: terminal/models/session/session.py:311
+#: terminal/models/session/session.py:313
 msgid "Can share session"
 msgstr ""
 
-#: terminal/models/session/session.py:312
+#: terminal/models/session/session.py:314
 msgid "Can terminate session"
 msgstr ""
 
-#: terminal/models/session/session.py:313
+#: terminal/models/session/session.py:315
 msgid "Can validate session action perm"
 msgstr ""
 
@@ -10434,4 +10442,3 @@ msgstr ""
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr ""
-
