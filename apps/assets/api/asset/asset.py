@@ -235,11 +235,11 @@ class AssetsTaskMixin:
     def perform_assets_task(self, serializer):
         data = serializer.validated_data
         assets = data.get("assets", [])
-        port = data.get("port", 22)
 
         if data["action"] == "refresh":
             task = update_assets_hardware_info_manual(assets)
         elif data["action"] == "test_port":
+            port = data.get("port", 22)
             task = test_assets_port_connectivity_manual(assets, port)
         else:
             asset = assets[0]
