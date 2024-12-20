@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-18 18:13+0800\n"
+"POT-Creation-Date: 2024-12-19 15:10+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -368,7 +368,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: assets/models/asset/common.py:362 assets/models/cmd_filter.py:36
 #: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:32 terminal/notifications.py:156
+#: terminal/models/session/session.py:33 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
@@ -412,7 +412,7 @@ msgstr "来源 ID"
 #: assets/serializers/gateway.py:33 audits/models.py:59
 #: authentication/api/connection_token.py:459 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:34
+#: terminal/backends/command/models.py:18 terminal/models/session/session.py:35
 #: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
@@ -485,7 +485,7 @@ msgstr "账号备份计划"
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:26
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
-#: terminal/models/applet/host.py:141 terminal/models/session/session.py:45
+#: terminal/models/applet/host.py:141 terminal/models/session/session.py:46
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Date start"
@@ -975,7 +975,7 @@ msgstr "ID"
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:63
 #: rbac/builtin.py:125 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:30 terminal/models/session/sharing.py:34
+#: terminal/models/session/session.py:31 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
@@ -1089,7 +1089,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:27
 #: terminal/models/component/endpoint.py:122
-#: terminal/models/session/session.py:47
+#: terminal/models/session/session.py:48
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:98
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:124
@@ -1419,7 +1419,7 @@ msgstr "账号"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: audits/serializers.py:38 ops/serializers/job.py:91 terminal/const.py:88
-#: terminal/models/session/session.py:43 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:44 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:23
@@ -2881,7 +2881,7 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:56 audits/models.py:100 audits/models.py:175
-#: terminal/models/session/session.py:39 terminal/models/session/sharing.py:113
+#: terminal/models/session/session.py:40 terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -4646,6 +4646,14 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
+#: common/views/msg.py:18
+msgid "Not found the code"
+msgstr "未找到 Code"
+
+#: common/views/msg.py:22
+msgid "The message code provided is invalid or has expired"
+msgstr "提供的消息代码无效或已过期"
+
 #: jumpserver/conf.py:533
 #, python-brace-format
 msgid "The verification code is: {code}"
@@ -5133,7 +5141,7 @@ msgstr ""
 "在脚本使用的变量名称，固定前缀 jms_ + 输入的变量名，例如变量名name，则最终生"
 "成环境变量为 jms_name"
 
-#: ops/models/variable.py:16
+#: ops/models/variable.py:16 ops/serializers/variable.py:31
 msgid "Default Value"
 msgstr "默认"
 
@@ -5141,7 +5149,7 @@ msgstr "默认"
 msgid "Variable type"
 msgstr "变量类型"
 
-#: ops/models/variable.py:21 ops/serializers/variable.py:32
+#: ops/models/variable.py:21 ops/serializers/variable.py:33
 msgid "ExtraVars"
 msgstr "额外参数"
 
@@ -5210,7 +5218,7 @@ msgstr "你没有当前作业的权限。"
 msgid "Variable Type"
 msgstr "变量类型"
 
-#: ops/serializers/variable.py:34
+#: ops/serializers/variable.py:35
 msgid ""
 "Each item is on a separate line, with each line separated by a colon. The "
 "part before the colon is the display content, and the part after the colon "
@@ -6656,7 +6664,7 @@ msgstr "更多信息 URL"
 
 #: settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
-#: terminal/models/session/session.py:46
+#: terminal/models/session/session.py:47
 msgid "Date end"
 msgstr "结束日期"
 
@@ -8021,43 +8029,43 @@ msgstr "可以上传会话录像"
 msgid "Can download session replay"
 msgstr "可以下载会话录像"
 
-#: terminal/models/session/session.py:35
+#: terminal/models/session/session.py:36
 msgid "Account ID"
 msgstr "账号"
 
-#: terminal/models/session/session.py:37 terminal/models/session/sharing.py:118
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr "登录来源"
 
-#: terminal/models/session/session.py:42
+#: terminal/models/session/session.py:43
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:48 terminal/serializers/session.py:112
+#: terminal/models/session/session.py:49 terminal/serializers/session.py:112
 msgid "Command amount"
 msgstr "命令数量"
 
-#: terminal/models/session/session.py:49 terminal/serializers/session.py:32
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:32
 msgid "Error reason"
 msgstr "错误原因"
 
-#: terminal/models/session/session.py:308
+#: terminal/models/session/session.py:310
 msgid "Session record"
 msgstr "会话记录"
 
-#: terminal/models/session/session.py:310
+#: terminal/models/session/session.py:312
 msgid "Can monitor session"
 msgstr "可以监控会话"
 
-#: terminal/models/session/session.py:311
+#: terminal/models/session/session.py:313
 msgid "Can share session"
 msgstr "可以分享会话"
 
-#: terminal/models/session/session.py:312
+#: terminal/models/session/session.py:314
 msgid "Can terminate session"
 msgstr "可以终断会话"
 
-#: terminal/models/session/session.py:313
+#: terminal/models/session/session.py:315
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 

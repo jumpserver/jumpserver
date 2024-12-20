@@ -70,6 +70,13 @@ class ActionAclSerializer(serializers.Serializer):
             return
         if not settings.XPACK_LICENSE_IS_VALID:
             field_action._choices.pop(ActionChoices.review, None)
+        if not (
+            settings.XPACK_LICENSE_IS_VALID and
+            settings.XPACK_LICENSE_EDITION_ULTIMATE and
+            settings.FACE_RECOGNITION_ENABLED
+        ):
+            field_action._choices.pop(ActionChoices.face_verify, None)
+            field_action._choices.pop(ActionChoices.face_online, None)
         for choice in self.Meta.action_choices_exclude:
             field_action._choices.pop(choice, None)
 
