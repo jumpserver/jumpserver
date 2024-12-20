@@ -67,7 +67,7 @@ class LDAPHASettingSerializer(serializers.Serializer):
     )
     AUTH_LDAP_HA_CACHE_TIMEOUT = serializers.IntegerField(
         min_value=0, max_value=3600 * 24 * 30 * 12,
-        default=3600 * 24 * 30,
+        default=0,
         required=False, label=_('User DN cache timeout (s)'),
         help_text=_(
             'Caching the User DN obtained during user login authentication can effectively'
