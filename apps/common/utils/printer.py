@@ -48,7 +48,7 @@ class ColoredFilePrinter(ColoredPrinter):
     def close(self):
         try:
             self.file.close()
-        except: # noqa
+        except Exception: # noqa
             pass
 
     def __del__(self):
