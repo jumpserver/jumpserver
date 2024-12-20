@@ -16,7 +16,11 @@ from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway, Platform, Protocol
-from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
+from assets.tasks import (
+    test_assets_connectivity_manual,
+    update_assets_hardware_info_manual,
+    test_assets_port_connectivity_manual,
+)
 from common.api import SuggestionMixin
 from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
@@ -231,9 +235,12 @@ class AssetsTaskMixin:
     def perform_assets_task(self, serializer):
         data = serializer.validated_data
         assets = data.get("assets", [])
+        port = data.get("port", 22)
 
         if data["action"] == "refresh":
             task = update_assets_hardware_info_manual(assets)
+        elif data["action"] == "test_port":
+            task = test_assets_port_connectivity_manual(assets, port)
         else:
             asset = assets[0]
             if not asset.auto_config['ansible_enabled'] or \

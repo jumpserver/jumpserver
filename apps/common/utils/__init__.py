@@ -10,3 +10,4 @@ from .ip import *
 from .jumpserver import *
 from .random import *
 from .translate import *
+from .printer import *
