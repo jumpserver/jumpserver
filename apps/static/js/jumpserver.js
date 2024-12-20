@@ -147,6 +147,9 @@ function activeNav(prefix) {
     }
     var path = document.location.pathname;
     path = path.replace(prefix, '');
+    if (path === '/core/download/') {
+        return
+    }
     var urlArray = path.split("/");
     var app = urlArray[1];
     var resource = urlArray[2];
