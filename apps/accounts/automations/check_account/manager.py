@@ -1,9 +1,12 @@
+import os
 import re
+
 from collections import defaultdict
 
+from django.conf import settings
 from django.utils import timezone
 
-from accounts.models import Account, AccountRisk
+from accounts.models import Account, AccountRisk, RiskChoice
 from assets.automations.base.manager import BaseManager
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils.strings import color_fmt
@@ -47,70 +50,95 @@ def update_risk(risk):
     return risk
 
 
-def check_account_secrets(accounts, assets):
-    now = timezone.now().isoformat()
-    risks = []
-    tmpl = "Check account %s: %s"
-    summary = defaultdict(int)
-    result = defaultdict(list)
-    summary["accounts"] = len(accounts)
-    summary["assets"] = len(assets)
-
-    for account in accounts:
-        result_item = {
-            "asset": str(account.asset),
-            "username": account.username,
-        }
-        if not account.secret:
-            print(tmpl % (account, "no secret"))
-            summary["no_secret"] += 1
-            result["no_secret"].append(result_item)
-            continue
-
-        if is_weak_password(account.secret):
-            print(tmpl % (account, color_fmt("weak", "red")))
-            summary["weak_password"] += 1
-            result["weak_password"].append(result_item)
-            risks.append(
-                {
-                    "account": account,
-                    "risk": "weak_password",
-                }
-            )
-        else:
-            summary["ok"] += 1
-            result["ok"].append(result_item)
-            print(tmpl % (account, color_fmt("ok", "green")))
-
-    origin_risks = AccountRisk.objects.filter(asset__in=assets)
-    origin_risks_dict = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in origin_risks}
-
-    for d in risks:
-        key = f'{d["account"].asset_id}_{d["account"].username}_{d["risk"]}'
-        origin_risk = origin_risks_dict.get(key)
-
-        if origin_risk:
-            origin_risk.details.append({"datetime": now, 'type': 'refind'})
-            update_risk(origin_risk)
-        else:
-            create_risk({
-                "asset": d["account"].asset,
-                "username": d["account"].username,
-                "risk": d["risk"],
-                "details": [{"datetime": now, 'type': 'init'}],
-            })
-    return summary, result
-
-
 class CheckAccountManager(BaseManager):
     batch_size = 100
+    tmpl = 'Checked the status of account %s: %s'
 
     def __init__(self, execution):
         super().__init__(execution)
         self.accounts = []
         self.assets = []
+        self._leak_pwd_set = set()
+        self.global_origin_risks_dict = dict()
+
+    def load_leak_pwd_set(self):
+        path = os.path.join(
+            settings.APPS_DIR, 'accounts', 'automations', 'check_account', 'leak_password.txt'
+        )
+        file = open(path, 'r')
+        for line in file.readlines():
+            self._leak_pwd_set.add(line.strip())
+        file.close()
+
+    @staticmethod
+    def create_or_update_risk(risks, origin_risks_dict):
+        now = timezone.now().isoformat()
+        for d in risks:
+            key = f'{d["account"].asset_id}_{d["account"].username}_{d["risk"]}'
+            origin_risk = origin_risks_dict.get(key)
+
+            if origin_risk:
+                origin_risk.details.append({"datetime": now, 'type': 'refind'})
+                update_risk(origin_risk)
+            else:
+                create_risk({
+                    "asset": d["account"].asset,
+                    "username": d["account"].username,
+                    "risk": d["risk"],
+                    "details": [{"datetime": now, 'type': 'init'}],
+                })
+
+    def check_account_secrets(self, accounts, assets):
+        risks = []
+        for account in accounts:
+            if not account.secret:
+                print(self.tmpl % (account, "no secret"))
+                self.risk_record('no_secret', account)
+                continue
+
+            if is_weak_password(account.secret):
+                key = RiskChoice.weak_password
+                print(self.tmpl % (account, color_fmt(key.value, "red")))
+                risks.append(self.risk_record(key, account))
+            elif account.secret in self._leak_pwd_set:
+                key = RiskChoice.leaked_password
+                print(self.tmpl % (account, color_fmt(key.value, "red")))
+                risks.append(self.risk_record(key, account))
+            else:
+                self.accounts.append(account)
+
+        origin_risks = AccountRisk.objects.filter(asset__in=assets)
+        origin_risks_dict = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in origin_risks}
+        self.global_origin_risks_dict.update(origin_risks_dict)
+        self.create_or_update_risk(risks, origin_risks_dict)
+
+    def risk_record(self, key, account):
+        self.summary[key] += 1
+        self.result[key].append({
+            'asset': str(account.asset), 'username': account.username,
+        })
+        return {'account': account, 'risk': key}
+
+    def check_repeat_secrets(self):
+        grouped_accounts = defaultdict(list)
+        risks = []
+        for account in self.accounts:
+            grouped_accounts[account.secret].append(account)
+
+        for secret, accounts in grouped_accounts.items():
+            if len(accounts) >= 2:
+                key = RiskChoice.repeated_password
+                for a in accounts:
+                    print(self.tmpl % (a, color_fmt(key.value, "red")))
+                    risks.append(self.risk_record(key, a))
+            else:
+                key = 'ok'
+                print(self.tmpl % (accounts[0], color_fmt("ok", "green")))
+                self.risk_record(key, accounts[0])
+        self.create_or_update_risk(risks, self.global_origin_risks_dict)
 
     def pre_run(self):
+        self.load_leak_pwd_set()
         self.assets = self.execution.get_all_assets()
         self.execution.date_start = timezone.now()
         self.execution.save(update_fields=["date_start"])
@@ -118,19 +146,17 @@ class CheckAccountManager(BaseManager):
     def do_run(self, *args, **kwargs):
         for engine in self.execution.snapshot.get("engines", []):
             if engine == "check_account_secret":
-                handle = check_account_secrets
+                batch_handle = self.check_account_secrets
+                global_handle = self.check_repeat_secrets
             else:
                 continue
 
             for i in range(0, len(self.assets), self.batch_size):
                 _assets = self.assets[i: i + self.batch_size]
                 accounts = Account.objects.filter(asset__in=_assets)
-                summary, result = handle(accounts, _assets)
+                batch_handle(accounts, _assets)
 
-                for k, v in summary.items():
-                    self.summary[k] = self.summary.get(k, 0) + v
-                for k, v in result.items():
-                    self.result[k].extend(v)
+            global_handle()
 
     def get_report_subject(self):
         return "Check account report of %s" % self.execution.id
@@ -140,10 +166,13 @@ class CheckAccountManager(BaseManager):
 
     def print_summary(self):
         tmpl = (
-            "\n---\nSummary: \nok: %s, weak password: %s, no secret: %s, using time: %ss"
+            "\n---\nSummary: \nok: %s, weak password: %s, leaked password: %s, "
+            "repeated password: %s, no secret: %s, using time: %ss"
             % (
                 self.summary["ok"],
-                self.summary["weak_password"],
+                self.summary[RiskChoice.weak_password],
+                self.summary[RiskChoice.leaked_password],
+                self.summary[RiskChoice.repeated_password],
                 self.summary["no_secret"],
                 int(self.duration),
             )

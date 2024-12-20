@@ -50,6 +50,8 @@ class RiskChoice(TextChoices):
     long_time_password = 'long_time_password', _('Long time no change')  # 好久没改密码的账号, 改密码
 
     weak_password = 'weak_password', _('Weak password')  # 弱密码, 改密
+    leaked_password = 'leaked_password', _('Leaked password')  # 可能泄露的密码, 改密
+    repeated_password = 'repeated_password', _('Repeated password')  # 重复度高的密码, 改密
     password_error = 'password_error', _('Password error')  # 密码错误, 修改账号
     no_admin_account = 'no_admin_account', _('No admin account')  # 无管理员账号, 设置账号
     others = 'others', _('Others')  # 其他风险, 确认
