@@ -9,9 +9,10 @@ from rest_framework.response import Response
 from accounts import serializers
 from accounts.const import AutomationTypes
 from accounts.filters import GatheredAccountFilterSet
-from accounts.models import GatherAccountsAutomation, AutomationExecution
+from accounts.models import GatherAccountsAutomation, AutomationExecution, Account
 from accounts.models import GatheredAccount
 from assets.models import Asset
+from common.utils.http import is_true
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 
@@ -96,14 +97,24 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
 
         return Response(status=status.HTTP_200_OK)
 
-    @action(methods=["post"], detail=False, url_path="delete-remote")
-    def delete_remote(self, request, *args, **kwargs):
-        asset_id = request.data.get("asset_id")
-        username = request.data.get("username")
+    def perform_destroy(self, instance):
+        request = self.request
+        params = request.query_params
+        is_delete_remote = params.get("is_delete_remote")
+        is_delete_account = params.get("is_delete_account")
+        asset_id = params.get("asset")
+        username = params.get("username")
+        if is_true(is_delete_remote):
+            self._delete_remote(asset_id, username)
+        if is_true(is_delete_account):
+            account = get_object_or_404(Account, username=username, asset_id=asset_id)
+            account.delete()
+        super().perform_destroy(instance)
+
+    def _delete_remote(self, asset_id, username):
         asset = get_object_or_404(Asset, pk=asset_id)
         handler = RiskHandler(asset, username, request=self.request)
         handler.handle_delete_remote()
-        return Response(status=status.HTTP_200_OK)
 
     @action(methods=["get"], detail=True, url_path="details")
     def details(self, request, *args, **kwargs):
