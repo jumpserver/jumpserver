@@ -12,6 +12,7 @@ from django.conf import settings
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from ops.celery import app
+from ops.const import Types
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
     register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
@@ -52,14 +53,13 @@ def _run_ops_job_execution(execution):
     activity_callback=job_task_activity_callback
 )
 def run_ops_job(job_id):
-    if not settings.SECURITY_COMMAND_EXECUTION:
-        return
     with tmp_to_root_org():
         job = get_object_or_none(Job, id=job_id)
     if not job:
         logger.error("Did not get the execution: {}".format(job_id))
         return
-
+    if not settings.SECURITY_COMMAND_EXECUTION and job.type != Types.upload_file:
+        return
     with tmp_to_org(job.org):
         execution = job.create_execution()
         execution.creator = job.creator
@@ -80,13 +80,13 @@ def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
     activity_callback=job_execution_task_activity_callback
 )
 def run_ops_job_execution(execution_id, **kwargs):
-    if not settings.SECURITY_COMMAND_EXECUTION:
-        return
     with tmp_to_root_org():
         execution = get_object_or_none(JobExecution, id=execution_id)
 
     if not execution:
         logger.error("Did not get the execution: {}".format(execution_id))
+        return
+    if not settings.SECURITY_COMMAND_EXECUTION and execution.job.type != Types.upload_file:
         return
     _run_ops_job_execution(execution)
 
