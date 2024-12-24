@@ -3,11 +3,13 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from assets.models.base import AbsConnectivity
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from labels.mixins import LabeledMixin
 from .base import BaseAccount
 from .mixins import VaultModelMixin
 from ..const import Source
+
+logger = get_logger(__file__)
 
 __all__ = ['Account', 'AccountHistoricalRecords']
 
@@ -26,7 +28,7 @@ class AccountHistoricalRecords(HistoricalRecords):
 
         history_account = instance.history.first()
         if history_account is None:
-            self.updated_version = 1
+            self.updated_version = 0
             return super().post_save(instance, created, using=using, **kwargs)
 
         history_attrs = {field: getattr(history_account, field) for field in check_fields}
@@ -38,12 +40,13 @@ class AccountHistoricalRecords(HistoricalRecords):
         if not diff:
             return
         self.updated_version = history_account.version + 1
+        instance.version = self.updated_version
         return super().post_save(instance, created, using=using, **kwargs)
 
     def create_historical_record(self, instance, history_type, using=None):
         super().create_historical_record(instance, history_type, using=using)
-        if self.updated_version is not None:
-            instance.version = self.updated_version
+        # Ignore deletion history_type: -
+        if self.updated_version is not None and history_type != '-':
             instance.save(update_fields=['version'])
 
     def create_history_model(self, model, inherited):
