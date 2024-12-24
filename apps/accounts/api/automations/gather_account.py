@@ -81,19 +81,18 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         "details": serializers.GatheredAccountDetailsSerializer
     }
     rbac_perms = {
-        "sync_accounts": "assets.add_gatheredaccount",
         "status": "assets.change_gatheredaccount",
         "details": "assets.view_gatheredaccount"
     }
 
-    @action(methods=["put"], detail=True, url_path="status")
+    @action(methods=["put"], detail=False, url_path="status")
     def status(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.status = request.data.get("status")
-        instance.save(update_fields=["status"])
-
-        if instance.status == "confirmed":
-            GatheredAccount.sync_accounts([instance])
+        ids = request.data.get('ids', [])
+        new_status = request.data.get("status")
+        updated_instances = GatheredAccount.objects.filter(id__in=ids)
+        updated_instances.update(status=new_status)
+        if new_status == "confirmed":
+            GatheredAccount.sync_accounts(updated_instances)
 
         return Response(status=status.HTTP_200_OK)
 
