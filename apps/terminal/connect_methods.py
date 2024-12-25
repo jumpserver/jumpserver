@@ -105,6 +105,8 @@ class AppletMethod:
         if not has_applet_hosts:
             return methods
         applets = Applet.objects.filter(is_active=True)
+        if not settings.XPACK_LICENSE_IS_VALID:
+            applets = applets.filter(builtin=True)
         for applet in applets:
             for protocol in applet.protocols:
                 methods[protocol].append({
@@ -124,6 +126,8 @@ class VirtualAppMethod:
         from .models import VirtualApp
         methods = defaultdict(list)
         if not getattr(settings, 'VIRTUAL_APP_ENABLED'):
+            return methods
+        if not settings.XPACK_LICENSE_IS_VALID:
             return methods
         virtual_apps = VirtualApp.objects.filter(is_active=True)
         for virtual_app in virtual_apps:
