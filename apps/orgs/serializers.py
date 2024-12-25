@@ -38,7 +38,7 @@ class OrgSerializer(ModelSerializer):
 class CurrentOrgSerializer(ModelSerializer):
     class Meta:
         model = Organization
-        fields = ['id', 'name', 'is_default', 'is_root', 'comment']
+        fields = ['id', 'name', 'is_default', 'is_root', 'is_system', 'comment']
 
 
 class CurrentOrgDefault:
