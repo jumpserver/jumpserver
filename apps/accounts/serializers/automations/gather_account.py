@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, GatherAccountDetailField
 from accounts.models import GatherAccountsAutomation
 from accounts.models import GatheredAccount
 from accounts.serializers.account.account import AccountAssetSerializer as _AccountAssetSerializer
@@ -82,7 +82,9 @@ class GatheredAccountDetailsSerializer(serializers.Serializer):
         obj = get_object_or_404(GatheredAccount, pk=pk)
         details = obj.detail
         for key, value in details.items():
+            field_dict = GatherAccountDetailField._member_map_
+            label = field_dict[key].label if key in field_dict else key
             if isinstance(value, bool):
-                self.fields[key] = serializers.BooleanField(label=key, read_only=True)
+                self.fields[key] = serializers.BooleanField(label=label, read_only=True)
             else:
-                self.fields[key] = serializers.CharField(label=key, read_only=True)
+                self.fields[key] = serializers.CharField(label=label, read_only=True)
