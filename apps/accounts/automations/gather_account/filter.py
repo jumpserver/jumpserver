@@ -59,7 +59,7 @@ class GatherAccountsFilter:
                 'groups': '',
             }
             detail = {
-                'canlogin': user_info.get('canlogin'),
+                'can_login': user_info.get('canlogin'),
                 'superuser': user_info.get('superuser'),
             }
             user['detail'] = detail
@@ -87,7 +87,6 @@ class GatherAccountsFilter:
                 'is_disabled': user_info.get('is_disabled', ''),
                 'default_database_name': user_info.get('default_database_name', ''),
             }
-            print(user)
             user['detail'] = detail
             result[user['username']] = user
         return result
