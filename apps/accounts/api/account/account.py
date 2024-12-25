@@ -5,14 +5,16 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
+from accounts.const import ChangeSecretRecordStatusChoice
 from accounts.filters import AccountFilterSet
 from accounts.mixins import AccountRecordViewLogMixin
-from accounts.models import Account
+from accounts.models import Account, ChangeSecretRecord
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.drf.filters import AttrRulesFilterBackend
 from common.permissions import IsValidUser
+from common.utils import lazyproperty
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
@@ -127,17 +129,31 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
         'GET': 'accounts.view_accountsecret',
     }
 
-    def get_object(self):
+    @lazyproperty
+    def account(self) -> Account:
         return get_object_or_404(Account, pk=self.kwargs.get('pk'))
+
+    def get_object(self):
+        return self.account
+
+    @lazyproperty
+    def latest_history(self):
+        return self.account.history.first()
+
+    @property
+    def latest_change_secret_record(self) -> ChangeSecretRecord:
+        return self.account.change_secret_records.filter(
+            status=ChangeSecretRecordStatusChoice.pending
+        ).order_by('-date_created').first()
 
     @staticmethod
     def filter_spm_queryset(resource_ids, queryset):
         return queryset.filter(history_id__in=resource_ids)
 
     def get_queryset(self):
-        account = self.get_object()
+        account = self.account
         histories = account.history.all()
-        latest_history = account.history.first()
+        latest_history = self.latest_history
         if not latest_history:
             return histories
         if account.secret != latest_history.secret:
@@ -146,3 +162,25 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
             return histories
         histories = histories.exclude(history_id=latest_history.history_id)
         return histories
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = list(queryset)
+        latest_history = self.latest_history
+        if not latest_history:
+            return queryset
+
+        latest_change_secret_record = self.latest_change_secret_record
+        if not latest_change_secret_record:
+            return queryset
+
+        if latest_change_secret_record.date_created > latest_history.history_date:
+            temp_history = self.model(
+                secret=latest_change_secret_record.new_secret,
+                secret_type=self.account.secret_type,
+                version=latest_history.version,
+                history_date=latest_change_secret_record.date_created,
+            )
+            queryset = [temp_history] + queryset
+
+        return queryset

@@ -31,12 +31,20 @@ class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
 
 class ChangeSecretRecord(JMSBaseModel):
-    execution = models.ForeignKey('accounts.AutomationExecution', on_delete=models.SET_NULL, null=True)
-    asset = models.ForeignKey('assets.Asset', on_delete=models.SET_NULL, null=True)
-    account = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True)
+    account = models.ForeignKey(
+        'accounts.Account', on_delete=models.SET_NULL,
+        null=True, related_name='change_secret_records'
+    )
+    asset = models.ForeignKey(
+        'assets.Asset', on_delete=models.SET_NULL,
+        null=True, related_name='asset_change_secret_records'
+    )
+    execution = models.ForeignKey(
+        'accounts.AutomationExecution', on_delete=models.SET_NULL,
+        null=True, related_name='execution_change_secret_records',
+    )
     old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
-    date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'), db_index=True)
     ignore_fail = models.BooleanField(default=False, verbose_name=_('Ignore fail'))
     status = models.CharField(
