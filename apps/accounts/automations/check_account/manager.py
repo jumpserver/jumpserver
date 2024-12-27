@@ -1,7 +1,6 @@
 import os
 import re
-
-from collections import defaultdict
+import sqlite3
 
 from django.conf import settings
 from django.utils import timezone
@@ -58,17 +57,42 @@ class CheckAccountManager(BaseManager):
         super().__init__(execution)
         self.accounts = []
         self.assets = []
-        self._leak_pwd_set = set()
         self.global_origin_risks_dict = dict()
+        self.db_conn = None
+        self.db_cursor = None
 
-    def load_leak_pwd_set(self):
-        path = os.path.join(
-            settings.APPS_DIR, 'accounts', 'automations', 'check_account', 'leak_password.txt'
+    def init_leak_password_db(self):
+        default_path = os.path.join(
+            settings.APPS_DIR, 'accounts', 'automations', 'check_account'
         )
-        file = open(path, 'r')
-        for line in file.readlines():
-            self._leak_pwd_set.add(line.strip())
-        file.close()
+        create_table = '''
+        CREATE TABLE IF NOT EXISTS accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id TEXT, asset_name TEXT, name TEXT, 
+            username TEXT, password TEXT
+        )
+        '''
+        if (settings.LEAK_PASSWORD_DB_PATH
+                and os.path.exists(settings.LEAK_PASSWORD_DB_PATH)):
+            db_path = settings.LEAK_PASSWORD_DB_PATH
+        else:
+            db_path = os.path.join(default_path, 'leak_passwords.db')
+
+        self.db_conn = sqlite3.connect(db_path)
+        self.db_cursor = self.db_conn.cursor()
+        self.db_cursor.execute(create_table)
+
+    def drop_account_table(self):
+        sql = 'DROP TABLE IF EXISTS accounts'
+        self.db_cursor.execute(sql)
+        self.db_conn.commit()
+
+    def close_db(self):
+        try:
+            self.db_cursor.close()
+            self.db_conn.close()
+        except Exception: # noqa
+            pass
 
     @staticmethod
     def create_or_update_risk(risks, origin_risks_dict):
@@ -88,6 +112,11 @@ class CheckAccountManager(BaseManager):
                     "details": [{"datetime": now, 'type': 'init'}],
                 })
 
+    def is_leak_password(self, password):
+        sql = 'SELECT 1 FROM leak_passwords WHERE password = ? LIMIT 1'
+        self.db_cursor.execute(sql, (password,))
+        return self.db_cursor.fetchone() is not None
+
     def check_account_secrets(self, accounts, assets):
         risks = []
         for account in accounts:
@@ -100,12 +129,20 @@ class CheckAccountManager(BaseManager):
                 key = RiskChoice.weak_password
                 print(self.tmpl % (account, color_fmt(key.value, "red")))
                 risks.append(self.risk_record(key, account))
-            elif account.secret in self._leak_pwd_set:
+            elif self.is_leak_password(account.secret):
                 key = RiskChoice.leaked_password
                 print(self.tmpl % (account, color_fmt(key.value, "red")))
                 risks.append(self.risk_record(key, account))
             else:
-                self.accounts.append(account)
+                sql = ("INSERT INTO accounts (name, username, password, asset_id, asset_name) "
+                       "VALUES (?, ?, ?, ?, ?)")
+                self.db_cursor.execute(
+                    sql, [
+                        account.name, account.username, account.secret,
+                        str(account.asset_id), account.asset.name
+                    ]
+                )
+                self.db_conn.commit()
 
         origin_risks = AccountRisk.objects.filter(asset__in=assets)
         origin_risks_dict = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in origin_risks}
@@ -120,25 +157,30 @@ class CheckAccountManager(BaseManager):
         return {'account': account, 'risk': key}
 
     def check_repeat_secrets(self):
-        grouped_accounts = defaultdict(list)
         risks = []
-        for account in self.accounts:
-            grouped_accounts[account.secret].append(account)
-
-        for secret, accounts in grouped_accounts.items():
-            if len(accounts) >= 2:
+        sql = '''
+        SELECT name, username, password, asset_id, asset_name, 
+        CASE WHEN password IN (
+            SELECT password FROM accounts GROUP BY password HAVING COUNT(*) > 1
+        ) THEN 1 ELSE 0 END AS is_repeated FROM accounts
+        '''
+        self.db_cursor.execute(sql)
+        for results in self.db_cursor.fetchall():
+            name, username, *_, asset_id, asset_name, is_repeat = results
+            account = Account(asset_id=asset_id, username=username, name=name)
+            account_display = f'{name}({asset_name})'
+            if is_repeat:
                 key = RiskChoice.repeated_password
-                for a in accounts:
-                    print(self.tmpl % (a, color_fmt(key.value, "red")))
-                    risks.append(self.risk_record(key, a))
+                print(self.tmpl % (account_display, color_fmt(key.value, "red")))
+                risks.append(self.risk_record(key, account))
             else:
                 key = 'ok'
-                print(self.tmpl % (accounts[0], color_fmt("ok", "green")))
-                self.risk_record(key, accounts[0])
+                print(self.tmpl % (account_display, color_fmt("ok", "green")))
+                self.risk_record(key, account)
         self.create_or_update_risk(risks, self.global_origin_risks_dict)
 
     def pre_run(self):
-        self.load_leak_pwd_set()
+        self.init_leak_password_db()
         self.assets = self.execution.get_all_assets()
         self.execution.date_start = timezone.now()
         self.execution.save(update_fields=["date_start"])
@@ -157,6 +199,11 @@ class CheckAccountManager(BaseManager):
                 batch_handle(accounts, _assets)
 
             global_handle()
+
+    def post_run(self):
+        super().post_run()
+        self.drop_account_table()
+        self.close_db()
 
     def get_report_subject(self):
         return "Check account report of %s" % self.execution.id

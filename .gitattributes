@@ -1,4 +1,4 @@
 *.mmdb filter=lfs diff=lfs merge=lfs -text
 *.mo filter=lfs diff=lfs merge=lfs -text
 *.ipdb filter=lfs diff=lfs merge=lfs -text
-leak_password.txt filter=lfs diff=lfs merge=lfs -text
+leak_passwords.db filter=lfs diff=lfs merge=lfs -text
