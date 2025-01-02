@@ -90,6 +90,43 @@ class AccountViewSet(OrgBulkModelViewSet):
         self.model.objects.filter(id__in=account_ids).update(secret=None)
         return Response(status=HTTP_200_OK)
 
+    def _copy_or_move_to_assets(self, request, move=False):
+        account = self.get_object()
+        asset_ids = request.data.get('assets', [])
+        assets = Asset.objects.filter(id__in=asset_ids)
+        field_names = [
+            'name', 'username', 'secret_type', 'secret',
+            'privileged', 'is_active', 'source', 'source_id', 'comment'
+        ]
+        account_data = {field: getattr(account, field) for field in field_names}
+
+        creation_results = {}
+        success_count = 0
+
+        for asset in assets:
+            account_data['asset'] = asset
+            creation_results[asset] = {'state': 'created'}
+            try:
+                self.model.objects.create(**account_data)
+                success_count += 1
+            except Exception as e:
+                creation_results[asset] = {'error': str(e), 'state': 'error'}
+
+        results = [{'asset': asset, **res} for asset, res in creation_results.items()]
+
+        if move and success_count > 0:
+            account.delete()
+
+        return Response(data=results, status=HTTP_200_OK)
+
+    @action(methods=['patch'], detail=True, url_path='move-to-assets')
+    def move_to_assets(self, request, *args, **kwargs):
+        return self._copy_or_move_to_assets(request, move=True)
+
+    @action(methods=['patch'], detail=True, url_path='copy-to-assets')
+    def copy_to_assets(self, request, *args, **kwargs):
+        return self._copy_or_move_to_assets(request, move=False)
+
 
 class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
     """
