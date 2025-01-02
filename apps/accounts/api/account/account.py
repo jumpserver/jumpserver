@@ -37,6 +37,8 @@ class AccountViewSet(OrgBulkModelViewSet):
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
         'clear_secret': 'accounts.change_account',
+        'move_to_assets': 'accounts.create_account',
+        'copy_to_assets': 'accounts.create_account',
     }
     export_as_zip = True
 
@@ -112,18 +114,18 @@ class AccountViewSet(OrgBulkModelViewSet):
             except Exception as e:
                 creation_results[asset] = {'error': str(e), 'state': 'error'}
 
-        results = [{'asset': asset, **res} for asset, res in creation_results.items()]
+        results = [{'asset': str(asset), **res} for asset, res in creation_results.items()]
 
         if move and success_count > 0:
             account.delete()
 
-        return Response(data=results, status=HTTP_200_OK)
+        return Response(results, status=HTTP_200_OK)
 
-    @action(methods=['patch'], detail=True, url_path='move-to-assets')
+    @action(methods=['post'], detail=True, url_path='move-to-assets')
     def move_to_assets(self, request, *args, **kwargs):
         return self._copy_or_move_to_assets(request, move=True)
 
-    @action(methods=['patch'], detail=True, url_path='copy-to-assets')
+    @action(methods=['post'], detail=True, url_path='copy-to-assets')
     def copy_to_assets(self, request, *args, **kwargs):
         return self._copy_or_move_to_assets(request, move=False)
 

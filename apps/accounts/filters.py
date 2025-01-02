@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q, F
+from django.db.models import Q, F, Value, CharField
+from django.db.models.functions import Concat
 from django.utils import timezone
 from django_filters import rest_framework as drf_filters
 
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
-from .models import Account, GatheredAccount, ChangeSecretRecord
+from .models import Account, GatheredAccount, ChangeSecretRecord, AccountRisk
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -62,9 +63,20 @@ class AccountFilterSet(BaseFilterSet):
         if not value:
             return queryset
 
-        queryset = queryset.prefetch_related('risks') \
-            .annotate(risk=F('risks__risk'), confirmed=F('risks__confirmed')) \
-            .filter(risk=value, confirmed=False)
+        asset_usernames = AccountRisk.objects.filter(risk=value). \
+            values_list(
+            Concat(
+                F('asset_id'), Value('-'), F('username'),
+                output_field=CharField()
+            ), flat=True
+        )
+
+        queryset = queryset.annotate(
+            asset_username=Concat(
+                F('asset_id'), Value('-'), F('username'),
+                output_field=CharField()
+            )
+        ).filter(asset_username__in=asset_usernames)
         return queryset
 
     @staticmethod
