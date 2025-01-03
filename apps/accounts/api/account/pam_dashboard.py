@@ -20,6 +20,9 @@ class PamDashboardApi(APIView):
 
         account_count = Account.objects.count()
         privileged_account_count = Account.objects.filter(privileged=True).count()
+        
+        if query_params.get('total_accounts'):
+            data['total_accounts'] = account_count
 
         if query_params.get('total_privileged_accounts'):
             data['total_privileged_accounts'] = privileged_account_count
