@@ -39,8 +39,7 @@ class DeviceTypes(BaseType):
             '*': {
                 'ansible_enabled': True,
                 'ansible_config': {
-                    'ansible_connection': 'local',
-                    'first_conn_delay_time': 0.5,
+                    'ansible_connection': 'local'
                 },
                 'ping_enabled': True,
                 'gather_facts_enabled': False,
