@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from assets.api import SerializeToTreeNodeMixin
 from common.utils import get_logger
 
-from .mixin import RebuildTreeMixin
 from ..nodes import (
     UserAllPermedNodesApi,
     UserPermedNodeChildrenApi,
@@ -17,7 +16,7 @@ __all__ = [
 ]
 
 
-class NodeTreeMixin(RebuildTreeMixin, SerializeToTreeNodeMixin):
+class NodeTreeMixin(SerializeToTreeNodeMixin):
     filter_queryset: callable
     get_queryset: callable
 
