@@ -10110,12 +10110,12 @@ msgstr "准备创建资产 %s"
 #: xpack/plugins/cloud/manager.py:434
 #, python-format
 msgid "Set nodes \"%s\""
-msgstr "删除节点: \"%s\""
+msgstr "设置节点: \"%s\""
 
 #: xpack/plugins/cloud/manager.py:460
 #, python-format
 msgid "Set accounts \"%s\""
-msgstr "删除账号: %s"
+msgstr "设置账号: %s"
 
 #: xpack/plugins/cloud/manager.py:476
 #, python-format
@@ -10678,3 +10678,7 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:74
+msgid "Auto node classification"
+msgstr "自动节点分类 "

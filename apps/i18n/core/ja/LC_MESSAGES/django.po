@@ -10377,12 +10377,12 @@ msgstr "資産 \"%s\" の作成準備"
 #: xpack/plugins/cloud/manager.py:434
 #, python-format
 msgid "Set nodes \"%s\""
-msgstr "ノード \"%s\" の設定"
+msgstr "ノードを設定する \"%s\""
 
 #: xpack/plugins/cloud/manager.py:460
 #, python-format
 msgid "Set accounts \"%s\""
-msgstr "アカウント \"%s\" の設定"
+msgstr "アカウントを設定する \"%s\""
 
 #: xpack/plugins/cloud/manager.py:476
 #, python-format
@@ -10946,3 +10946,7 @@ msgstr "ライセンスのインポートに成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:74
+msgid "Auto node classification"
+msgstr "オートノード分類"
