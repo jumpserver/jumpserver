@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q, F, Value, CharField
-from django.db.models.functions import Concat
+from django.db.models import Q, Exists, OuterRef
 from django.utils import timezone
 from django_filters import rest_framework as drf_filters
 
@@ -63,20 +62,15 @@ class AccountFilterSet(BaseFilterSet):
         if not value:
             return queryset
 
-        asset_usernames = AccountRisk.objects.filter(risk=value). \
-            values_list(
-            Concat(
-                F('asset_id'), Value('-'), F('username'),
-                output_field=CharField()
-            ), flat=True
-        )
-
-        queryset = queryset.annotate(
-            asset_username=Concat(
-                F('asset_id'), Value('-'), F('username'),
-                output_field=CharField()
+        queryset = queryset.filter(
+            Exists(
+                AccountRisk.objects.filter(
+                    risk=value,
+                    asset_id=OuterRef('asset_id'),
+                    username=OuterRef('username')
+                )
             )
-        ).filter(asset_username__in=asset_usernames)
+        )
         return queryset
 
     @staticmethod
