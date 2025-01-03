@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from django.utils import timezone
 
-from accounts.models import Account, AccountRisk
+from accounts.models import Account, AccountRisk, RiskChoice
 from assets.automations.base.manager import BaseManager
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils.strings import color_fmt
@@ -69,12 +69,12 @@ def check_account_secrets(accounts, assets):
 
         if is_weak_password(account.secret):
             print(tmpl % (account, color_fmt("weak", "red")))
-            summary["weak_password"] += 1
-            result["weak_password"].append(result_item)
+            summary[RiskChoice.weak_password] += 1
+            result[RiskChoice.weak_password].append(result_item)
             risks.append(
                 {
                     "account": account,
-                    "risk": "weak_password",
+                    "risk": RiskChoice.weak_password,
                 }
             )
         else:
@@ -143,7 +143,7 @@ class CheckAccountManager(BaseManager):
             "\n---\nSummary: \nok: %s, weak password: %s, no secret: %s, using time: %ss"
             % (
                 self.summary["ok"],
-                self.summary["weak_password"],
+                self.summary[RiskChoice.weak_password],
                 self.summary["no_secret"],
                 int(self.duration),
             )

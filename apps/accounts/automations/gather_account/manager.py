@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
-from accounts.models import GatheredAccount, Account, AccountRisk
+from accounts.models import GatheredAccount, Account, AccountRisk, RiskChoice
 from common.const import ConfirmOrIgnore
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils import get_logger
@@ -68,7 +68,7 @@ class AnalyseAccountRisk:
         {"field": "date_last_login", "risk": "long_time_no_login", "delta": long_time},
         {
             "field": "date_password_change",
-            "risk": "long_time_password",
+            "risk": RiskChoice.long_time_password,
             "delta": long_time,
         },
         {
@@ -164,7 +164,7 @@ class AnalyseAccountRisk:
             self._create_risk(
                 dict(
                     **basic,
-                    risk="new_found",
+                    risk=RiskChoice.new_found,
                     details=[{"datetime": self.now.isoformat()}],
                 )
             )
