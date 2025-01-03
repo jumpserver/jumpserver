@@ -10442,3 +10442,7 @@ msgstr ""
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr ""
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:74
+msgid "Auto node classification"
+msgstr ""

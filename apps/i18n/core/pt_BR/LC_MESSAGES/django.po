@@ -10511,12 +10511,12 @@ msgstr "Preparar para criar ativo %s"
 #: xpack/plugins/cloud/manager.py:434
 #, python-format
 msgid "Set nodes \"%s\""
-msgstr "Deletar nó: \"%s\""
+msgstr "Configurar os nós: \"%s\""
 
 #: xpack/plugins/cloud/manager.py:460
 #, python-format
 msgid "Set accounts \"%s\""
-msgstr "Deletar conta: %s"
+msgstr "Configurar a conta: %s"
 
 #: xpack/plugins/cloud/manager.py:476
 #, python-format
@@ -11085,3 +11085,7 @@ msgstr "Importação de licença bem-sucedida"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Licença inválida"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:74
+msgid "Auto node classification"
+msgstr "Classificação automática de nós"
