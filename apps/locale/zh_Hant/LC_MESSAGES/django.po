@@ -9288,3 +9288,7 @@ msgstr "企業專業版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企業旗艦版"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:74
+msgid "Auto node classification"
+msgstr "自動節點分類"

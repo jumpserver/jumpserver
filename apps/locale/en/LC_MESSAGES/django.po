@@ -9112,3 +9112,7 @@ msgstr ""
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr ""
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:74
+msgid "Auto node classification"
+msgstr ""
