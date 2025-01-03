@@ -16,7 +16,7 @@ DEFAULT_PASSWORD_RULES = {
 __all__ = [
     'AutomationTypes', 'SecretStrategy', 'SSHKeyStrategy', 'Connectivity',
     'DEFAULT_PASSWORD_LENGTH', 'DEFAULT_PASSWORD_RULES', 'TriggerChoice',
-    'PushAccountActionChoice', 'AccountBackupType', 'ChangeSecretRecordStatusChoice',
+    'PushAccountActionChoice', 'AccountBackupType', 'ChangeSecretRecordStatusChoice', 'GatherAccountDetailField'
 ]
 
 
@@ -114,3 +114,20 @@ class ChangeSecretRecordStatusChoice(models.TextChoices):
     failed = 'failed', _('Failed')
     success = 'success', _('Success')
     pending = 'pending', _('Pending')
+
+
+class GatherAccountDetailField(models.TextChoices):
+    can_login = 'can_login', _('Can login')
+    superuser = 'superuser', _('Superuser')
+    create_date = 'create_date', _('Create date')
+    is_disabled = 'is_disabled', _('Is disabled')
+    default_database_name = 'default_database_name', _('Default database name')
+    uid = 'uid', _('UID')
+    account_status = 'account_status', _('Account status')
+    default_tablespace = 'default_tablespace', _('Default tablespace')
+    roles = 'roles', _('Roles')
+    privileges = 'privileges', _('Privileges')
+    groups = 'groups', _('Groups')
+    sudoers = 'sudoers', 'sudoers'
+    authorized_keys = 'authorized_keys', _('Authorized keys')
+    db = 'db', _('DB')

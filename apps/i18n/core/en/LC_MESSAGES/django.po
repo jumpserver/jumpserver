@@ -5254,7 +5254,7 @@ msgstr ""
 
 #: ops/models/job.py:148
 msgid "Timeout (Seconds)"
-msgstr ""
+msgstr "Timeout (Sec)"
 
 #: ops/models/job.py:153
 msgid "Use Parameter Define"
@@ -5334,8 +5334,8 @@ msgid "Next execution time"
 msgstr ""
 
 #: ops/serializers/job.py:15
-msgid "Execute after saving"
-msgstr "Execute after saving"
+msgid "Run on save"
+msgstr "Run on save"
 
 #: ops/serializers/job.py:72
 msgid "Job type"
