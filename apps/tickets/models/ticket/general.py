@@ -423,6 +423,9 @@ class Ticket(StatusMixin, JMSBaseModel):
                 new_value = alias if alias else account
                 new_values.append(str(new_value))
             value = ', '.join(new_values)
+        elif name == 'org_id':
+            org = Organization.get_instance(value)
+            value = org.name if org else ''
         elif isinstance(value, list):
             value = ', '.join(value)
         return value
