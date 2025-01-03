@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -164,6 +165,22 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
             return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
 
         return escape(value)
+
+    @classmethod
+    def get_risks(cls, queryset=None, risk_type=None):
+        from accounts.models import AccountRisk
+        subquery = AccountRisk.objects.filter(
+            asset_id=OuterRef('asset_id'),
+            username=OuterRef('username')
+        )
+
+        if risk_type:
+            subquery = subquery.filter(risk=risk_type)
+
+        if queryset is None:
+            queryset = cls.objects.all()
+
+        return queryset.filter(Exists(subquery))
 
 
 def replace_history_model_with_mixin():

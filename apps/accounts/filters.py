@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q, Exists, OuterRef
+from django.db.models import Q
 from django.utils import timezone
 from django_filters import rest_framework as drf_filters
 
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
-from .models import Account, GatheredAccount, ChangeSecretRecord, AccountRisk
+from .models import Account, GatheredAccount, ChangeSecretRecord
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -62,16 +62,7 @@ class AccountFilterSet(BaseFilterSet):
         if not value:
             return queryset
 
-        queryset = queryset.filter(
-            Exists(
-                AccountRisk.objects.filter(
-                    risk=value,
-                    asset_id=OuterRef('asset_id'),
-                    username=OuterRef('username')
-                )
-            )
-        )
-        return queryset
+        return Account.get_risks(queryset, value)
 
     @staticmethod
     def filter_latest(queryset, name, value):
