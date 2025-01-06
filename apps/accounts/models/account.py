@@ -168,6 +168,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
 
     @classmethod
     def get_risks(cls, queryset=None, risk_type=None):
+        # TODO 数据量大时，子查询性能不佳，考虑用原生sql或者在模型层面做出改动
         from accounts.models import AccountRisk
         subquery = AccountRisk.objects.filter(
             asset_id=OuterRef('asset_id'),
