@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q, F, Value, CharField
-from django.db.models.functions import Concat
+from django.db.models import Q
 from django.utils import timezone
 from django_filters import rest_framework as drf_filters
 

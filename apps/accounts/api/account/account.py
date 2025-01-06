@@ -1,4 +1,6 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
@@ -14,9 +16,11 @@ from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.drf.filters import AttrRulesFilterBackend
 from common.permissions import IsValidUser
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
+
+logger = get_logger(__file__)
 
 __all__ = [
     'AccountViewSet', 'AccountSecretsViewSet',
@@ -109,10 +113,12 @@ class AccountViewSet(OrgBulkModelViewSet):
             account_data['asset'] = asset
             creation_results[asset] = {'state': 'created'}
             try:
-                self.model.objects.create(**account_data)
-                success_count += 1
+                with transaction.atomic():
+                    self.model.objects.create(**account_data)
+                    success_count += 1
             except Exception as e:
-                creation_results[asset] = {'error': str(e), 'state': 'error'}
+                logger.debug(f'{ "Move" if move else "Copy" } to assets error: {e}')
+                creation_results[asset] = {'error': _('Account already exists'), 'state': 'error'}
 
         results = [{'asset': str(asset), **res} for asset, res in creation_results.items()]
 

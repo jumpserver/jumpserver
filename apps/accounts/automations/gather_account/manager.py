@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
-from accounts.models import GatheredAccount, Account, AccountRisk
+from accounts.models import GatheredAccount, Account, AccountRisk, RiskChoice
 from common.const import ConfirmOrIgnore
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils import get_logger
@@ -68,7 +68,7 @@ class AnalyseAccountRisk:
         {"field": "date_last_login", "risk": "long_time_no_login", "delta": long_time},
         {
             "field": "date_password_change",
-            "risk": "long_time_password",
+            "risk": RiskChoice.long_time_password,
             "delta": long_time,
         },
         {
@@ -164,7 +164,7 @@ class AnalyseAccountRisk:
             self._create_risk(
                 dict(
                     **basic,
-                    risk="new_found",
+                    risk=RiskChoice.new_found,
                     details=[{"datetime": self.now.isoformat()}],
                 )
             )
@@ -358,7 +358,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for asset, accounts_data in self.asset_account_info.items():
             ori_users = self.ori_asset_usernames[str(asset.id)]
             with tmp_to_org(asset.org_id):
-                gathered_accounts = []
                 for d in accounts_data:
                     username = d["username"]
                     ori_account = self.ori_gathered_accounts_mapper.get(
@@ -374,6 +373,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 self.create_gathered_account.finish()
                 self.update_gathered_account.finish()
                 self.update_gather_accounts_status(asset)
+                if not self.is_sync_account:
+                    continue
+                gathered_accounts = GatheredAccount.objects.filter(asset=asset)
                 GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
         # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步
         time.sleep(0.5)
