@@ -71,20 +71,10 @@ class AccountFilterSet(BaseFilterSet):
         if not value:
             return queryset
 
-        asset_usernames = AccountRisk.objects.filter(risk=value). \
-            values_list(
-            Concat(
-                F('asset_id'), Value('-'), F('username'),
-                output_field=CharField()
-            ), flat=True
-        )
-
-        queryset = queryset.annotate(
-            asset_username=Concat(
-                F('asset_id'), Value('-'), F('username'),
-                output_field=CharField()
-            )
-        ).filter(asset_username__in=asset_usernames)
+        risks = AccountRisk.objects.filter(risk=value)
+        usernames = risks.values_list('username', flat=True)
+        assets = risks.values_list('asset', flat=True)
+        queryset = queryset.filter(username__in=usernames, asset__in=assets)
         return queryset
 
     @staticmethod
