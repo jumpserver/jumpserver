@@ -9,9 +9,9 @@ class Variable(JMSBaseModel):
     name = models.CharField(max_length=1024, verbose_name=_('Name'), null=True)
     var_name = models.CharField(
         max_length=1024, null=True, verbose_name=_('Variable name'),
-        help_text=_("The variable name used in the script has a fixed prefix 'jms_' followed by the input variable "
-                    "name. For example, if the variable name is 'name,' the final generated environment variable will "
-                    "be 'jms_name'.")
+        help_text=_("The variable name used in the script will have a fixed prefix jms_ added to the input variable "
+                    "name. For example, if the input variable name is name, the resulting environment variable will "
+                    "be jms_name, and it can be referenced in the script using {{ jms_name }}")
     )
     default_value = models.CharField(max_length=2048, verbose_name=_('Default Value'), null=True)
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
