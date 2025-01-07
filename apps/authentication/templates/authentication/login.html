@@ -402,6 +402,14 @@
                         </button>
                     </div>
 
+                    {% if demo_mode %}
+                    <div>
+                        <p class="red-fonts" style='text-align: center;'>
+                            {% trans 'Username' %}: demo {% trans 'Password' %}: jumpserver
+                        </p>
+                    </div>
+                    {% endif %}
+
                     <div class="more-login">
                         {% if auth_methods %}
                             <div class="more-methods-title {{ current_lang.code }}">

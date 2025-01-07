@@ -1,15 +1,13 @@
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes
-from common.const import ConfirmOrIgnore
 from accounts.models import (
     GatheredAccount,
     AccountRisk,
     SecretType,
-    AutomationExecution,
+    AutomationExecution, RiskChoice,
 )
-from django.utils import timezone
-
 from common.const import ConfirmOrIgnore
 
 TYPE_CHOICES = [
@@ -83,7 +81,7 @@ class RiskHandler:
         GatheredAccount.objects.filter(asset=self.asset, username=self.username).update(
             present=True, status=ConfirmOrIgnore.confirmed
         )
-        self.risk = "new_found"
+        self.risk = RiskChoice.new_found
 
     def handle_disable_remote(self):
         pass

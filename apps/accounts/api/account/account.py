@@ -1,20 +1,26 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
+from accounts.const import ChangeSecretRecordStatusChoice
 from accounts.filters import AccountFilterSet
 from accounts.mixins import AccountRecordViewLogMixin
-from accounts.models import Account
+from accounts.models import Account, ChangeSecretRecord
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.drf.filters import AttrRulesFilterBackend
 from common.permissions import IsValidUser
+from common.utils import lazyproperty, get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
+
+logger = get_logger(__file__)
 
 __all__ = [
     'AccountViewSet', 'AccountSecretsViewSet',
@@ -35,6 +41,8 @@ class AccountViewSet(OrgBulkModelViewSet):
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
         'clear_secret': 'accounts.change_account',
+        'move_to_assets': 'accounts.create_account',
+        'copy_to_assets': 'accounts.create_account',
     }
     export_as_zip = True
 
@@ -88,6 +96,45 @@ class AccountViewSet(OrgBulkModelViewSet):
         self.model.objects.filter(id__in=account_ids).update(secret=None)
         return Response(status=HTTP_200_OK)
 
+    def _copy_or_move_to_assets(self, request, move=False):
+        account = self.get_object()
+        asset_ids = request.data.get('assets', [])
+        assets = Asset.objects.filter(id__in=asset_ids)
+        field_names = [
+            'name', 'username', 'secret_type', 'secret',
+            'privileged', 'is_active', 'source', 'source_id', 'comment'
+        ]
+        account_data = {field: getattr(account, field) for field in field_names}
+
+        creation_results = {}
+        success_count = 0
+
+        for asset in assets:
+            account_data['asset'] = asset
+            creation_results[asset] = {'state': 'created'}
+            try:
+                with transaction.atomic():
+                    self.model.objects.create(**account_data)
+                    success_count += 1
+            except Exception as e:
+                logger.debug(f'{ "Move" if move else "Copy" } to assets error: {e}')
+                creation_results[asset] = {'error': _('Account already exists'), 'state': 'error'}
+
+        results = [{'asset': str(asset), **res} for asset, res in creation_results.items()]
+
+        if move and success_count > 0:
+            account.delete()
+
+        return Response(results, status=HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='move-to-assets')
+    def move_to_assets(self, request, *args, **kwargs):
+        return self._copy_or_move_to_assets(request, move=True)
+
+    @action(methods=['post'], detail=True, url_path='copy-to-assets')
+    def copy_to_assets(self, request, *args, **kwargs):
+        return self._copy_or_move_to_assets(request, move=False)
+
 
 class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
     """
@@ -127,17 +174,31 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
         'GET': 'accounts.view_accountsecret',
     }
 
-    def get_object(self):
+    @lazyproperty
+    def account(self) -> Account:
         return get_object_or_404(Account, pk=self.kwargs.get('pk'))
+
+    def get_object(self):
+        return self.account
+
+    @lazyproperty
+    def latest_history(self):
+        return self.account.history.first()
+
+    @property
+    def latest_change_secret_record(self) -> ChangeSecretRecord:
+        return self.account.change_secret_records.filter(
+            status=ChangeSecretRecordStatusChoice.pending
+        ).order_by('-date_created').first()
 
     @staticmethod
     def filter_spm_queryset(resource_ids, queryset):
         return queryset.filter(history_id__in=resource_ids)
 
     def get_queryset(self):
-        account = self.get_object()
+        account = self.account
         histories = account.history.all()
-        latest_history = account.history.first()
+        latest_history = self.latest_history
         if not latest_history:
             return histories
         if account.secret != latest_history.secret:
@@ -146,3 +207,25 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
             return histories
         histories = histories.exclude(history_id=latest_history.history_id)
         return histories
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = list(queryset)
+        latest_history = self.latest_history
+        if not latest_history:
+            return queryset
+
+        latest_change_secret_record = self.latest_change_secret_record
+        if not latest_change_secret_record:
+            return queryset
+
+        if latest_change_secret_record.date_created > latest_history.history_date:
+            temp_history = self.model(
+                secret=latest_change_secret_record.new_secret,
+                secret_type=self.account.secret_type,
+                version=latest_history.version,
+                history_date=latest_change_secret_record.date_created,
+            )
+            queryset = [temp_history] + queryset
+
+        return queryset

@@ -49,6 +49,61 @@ def update_risk(risk):
     return risk
 
 
+def check_account_secrets(accounts, assets):
+    now = timezone.now().isoformat()
+    risks = []
+    tmpl = "Check account %s: %s"
+    summary = defaultdict(int)
+    result = defaultdict(list)
+    summary["accounts"] = len(accounts)
+    summary["assets"] = len(assets)
+
+    for account in accounts:
+        result_item = {
+            "asset": str(account.asset),
+            "username": account.username,
+        }
+        if not account.secret:
+            print(tmpl % (account, "no secret"))
+            summary["no_secret"] += 1
+            result["no_secret"].append(result_item)
+            continue
+
+        if is_weak_password(account.secret):
+            print(tmpl % (account, color_fmt("weak", "red")))
+            summary[RiskChoice.weak_password] += 1
+            result[RiskChoice.weak_password].append(result_item)
+            risks.append(
+                {
+                    "account": account,
+                    "risk": RiskChoice.weak_password,
+                }
+            )
+        else:
+            summary["ok"] += 1
+            result["ok"].append(result_item)
+            print(tmpl % (account, color_fmt("ok", "green")))
+
+    origin_risks = AccountRisk.objects.filter(asset__in=assets)
+    origin_risks_dict = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in origin_risks}
+
+    for d in risks:
+        key = f'{d["account"].asset_id}_{d["account"].username}_{d["risk"]}'
+        origin_risk = origin_risks_dict.get(key)
+
+        if origin_risk:
+            origin_risk.details.append({"datetime": now, 'type': 'refind'})
+            update_risk(origin_risk)
+        else:
+            create_risk({
+                "asset": d["account"].asset,
+                "username": d["account"].username,
+                "risk": d["risk"],
+                "details": [{"datetime": now, 'type': 'init'}],
+            })
+    return summary, result
+
+
 class CheckAccountManager(BaseManager):
     batch_size = 100
     tmpl = 'Checked the status of account %s: %s'
@@ -220,6 +275,7 @@ class CheckAccountManager(BaseManager):
                 self.summary[RiskChoice.weak_password],
                 self.summary[RiskChoice.leaked_password],
                 self.summary[RiskChoice.repeated_password],
+
                 self.summary["no_secret"],
                 int(self.duration),
             )

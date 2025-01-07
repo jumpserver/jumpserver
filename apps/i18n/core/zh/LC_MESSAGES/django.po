@@ -5478,7 +5478,7 @@ msgid "Next execution time"
 msgstr "下次执行时间"
 
 #: ops/serializers/job.py:15
-msgid "Execute after saving"
+msgid "Run on save"
 msgstr "保存后执行"
 
 #: ops/serializers/job.py:72
