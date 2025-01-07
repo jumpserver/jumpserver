@@ -230,7 +230,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type")) \
-            .annotate(assets_amount=Count('accounts'))
+            .annotate(accounts_amount=Count('accounts'))
         if queryset.model is Asset:
             queryset = queryset.prefetch_related('labels__label', 'labels')
         else:
