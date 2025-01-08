@@ -21,8 +21,7 @@ from perms.hands import Node
 from perms.models import PermNode
 from perms.utils import PermAssetDetailUtil, UserPermNodeUtil
 from perms.utils import UserPermAssetUtil
-from .mixin import RebuildTreeMixin
-from ..mixin import SelfOrPKUserMixin
+from ..mixin import SelfOrPKUserMixin, RebuildTreeMixin
 
 __all__ = [
     'UserGrantedK8sAsTreeApi',
