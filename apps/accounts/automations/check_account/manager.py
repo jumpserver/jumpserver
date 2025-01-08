@@ -1,6 +1,7 @@
 import os
 import re
 import sqlite3
+from collections import defaultdict
 
 from django.conf import settings
 from django.utils import timezone
