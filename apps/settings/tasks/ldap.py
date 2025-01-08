@@ -9,7 +9,7 @@ from common.utils import get_logger
 from common.utils.timezone import local_now_display
 from ops.celery.decorator import after_app_ready_start
 from ops.celery.utils import (
-    create_or_update_celery_periodic_tasks
+    create_or_update_celery_periodic_tasks, disable_celery_periodic_task
 )
 from orgs.models import Organization
 from settings.notifications import LDAPImportMessage
@@ -90,9 +90,12 @@ def import_ldap_ha_user():
 
 
 def register_periodic_task(task_name, task_func, interval_key, enabled_key, crontab_key, **kwargs):
-    interval = kwargs.get(interval_key, settings.AUTH_LDAP_SYNC_INTERVAL)
-    enabled = kwargs.get(enabled_key, settings.AUTH_LDAP_SYNC_IS_PERIODIC)
-    crontab = kwargs.get(crontab_key, settings.AUTH_LDAP_SYNC_CRONTAB)
+    interval = kwargs.get(interval_key, getattr(settings, interval_key))
+    enabled = kwargs.get(enabled_key, getattr(settings, enabled_key))
+    crontab = kwargs.get(crontab_key, getattr(settings, crontab_key))
+
+    if not enabled:
+        disable_celery_periodic_task(task_name)
 
     if isinstance(interval, int):
         interval = interval * 3600
