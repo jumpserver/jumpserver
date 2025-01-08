@@ -1,14 +1,15 @@
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, Source
 from accounts.models import (
     GatheredAccount,
     AccountRisk,
     SecretType,
-    AutomationExecution, RiskChoice,
+    AutomationExecution, RiskChoice, Account
 )
 from common.const import ConfirmOrIgnore
+from common.utils import random_string
 
 TYPE_CHOICES = [
     ("ignore", _("Ignore")),
@@ -17,7 +18,7 @@ TYPE_CHOICES = [
     ("delete_both", _("Delete remote")),
     ("add_account", _("Add account")),
     ("change_password_add", _("Change password and Add")),
-    ("change_password", _("Change password")),
+    ("change_password", _("Change password"))
 ]
 
 
@@ -107,9 +108,6 @@ class RiskHandler:
     def handle_delete_both(self):
         self._handle_delete(delete="both")
 
-    def handle_change_password_add(self):
-        pass
-
     def handle_change_password(self):
         asset = self.asset
         execution = AutomationExecution()
@@ -120,6 +118,37 @@ class RiskHandler:
             "secret_type": "password",
             "secret_strategy": "random",
             "name": "Change account password: {}@{}".format(self.username, asset.name),
+        }
+        execution.save()
+        execution.start()
+        return execution.summary
+
+    def handle_change_password_add(self):
+        asset = self.asset
+        secret_type = SecretType.PASSWORD
+        secret = random_string(30)
+        account_data = {
+            "username": self.username,
+            "name": f'{self.username}-{secret_type}',
+            "secret_type": SecretType.PASSWORD,
+            "source": Source.DISCOVERY,
+            "asset": asset,
+            "secret": secret
+        }
+        account, _ = self.asset.accounts.get_or_create(defaults=account_data, username=self.username)
+        execution = AutomationExecution()
+        execution.snapshot = {
+            "assets": [str(asset.id)],
+            "accounts": [str(account.id)],
+            "type": AutomationTypes.push_account,
+            "secret_type": secret_type,
+            'nodes': [],
+            'org_id': self.asset.org_id,
+            "secret_strategy": "random",
+            "secret": secret,
+            'ssh_key_change_strategy': 'set_jms',
+            'check_conn_after_change': True,
+            "name": "Push account password: {}@{}".format(self.username, asset.name),
         }
         execution.save()
         execution.start()
