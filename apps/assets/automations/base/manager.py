@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import shutil
 import time
@@ -143,7 +144,7 @@ class BaseManager:
         recipients = self.execution.recipients
         if not recipients:
             return
-        print("Send report to: ",  ",".join([str(u) for u in recipients]))
+        print("Send report to: ", ",".join([str(u) for u in recipients]))
 
         report = self.gen_report()
         report = transform(report)
@@ -166,7 +167,8 @@ class BaseManager:
         self.pre_run()
         try:
             self.do_run(*args, **kwargs)
-        except:
+        except Exception as e:
+            logging.exception(e)
             self.status = 'error'
         finally:
             self.post_run()
@@ -337,10 +339,10 @@ class PlaybookPrepareMixin:
         method_attr = "{}_method".format(method_type)
 
         method_enabled = (
-            automation
-            and getattr(automation, enabled_attr)
-            and getattr(automation, method_attr)
-            and getattr(automation, method_attr) in self.method_id_meta_mapper
+                automation
+                and getattr(automation, enabled_attr)
+                and getattr(automation, method_attr)
+                and getattr(automation, method_attr) in self.method_id_meta_mapper
         )
 
         if not method_enabled:
@@ -427,7 +429,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
             # 避免一个任务太大，分批执行
             assets_bulked = [
-                assets[i : i + self.bulk_size]
+                assets[i: i + self.bulk_size]
                 for i in range(0, len(assets), self.bulk_size)
             ]
             for i, _assets in enumerate(assets_bulked, start=1):

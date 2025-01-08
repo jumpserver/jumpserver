@@ -2,12 +2,10 @@
 #
 from django.db.models import Q, Count
 from django.http import HttpResponse
-from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
-from operator import itemgetter
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-
+from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
 from accounts import serializers
@@ -140,7 +138,7 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
     serializer_class = serializers.CheckAccountEngineSerializer
 
     @staticmethod
-    def init_if_need():
+    def get_default_engines():
         data = [
             {
                 "id": "00000000-0000-0000-0000-000000000001",
@@ -154,15 +152,32 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
                 "name": "检查账号密码强弱",
                 "comment": "基于账号密码的安全性进行检查分析, 检查密码强度、泄露等信息",
             },
+            {
+                "id": "00000000-0000-0000-0000-000000000003",
+                "slug": "check_account_repeat",
+                "name": "检查账号密码是否重复",
+                "comment": "检查账号是否与其它账号相同"
+            },
+            {
+                "id": "00000000-0000-0000-0000-000000000004",
+                "slug": "check_account_leak",
+                "name": "检查账号密码是否是常见密码",
+                "comment": "检查账号密码是否是常见泄露的密码"
+            },
         ]
+        return data
 
+    def init_if_need(self):
+        data = self.get_default_engines()
         model_cls = CheckAccountEngine
-        if model_cls.objects.all().count() == 2:
+
+        if model_cls.objects.count() == 4:
             return
 
         for item in data:
-            model_cls.objects.create(**item)
+            model_cls.objects.update_or_create(defaults=item, id=item["id"])
 
     def get_queryset(self):
+        # return self.get_default_engines()
         self.init_if_need()
         return CheckAccountEngine.objects.all()
