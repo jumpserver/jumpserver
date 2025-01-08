@@ -94,7 +94,7 @@ class AnalyseAccountRisk:
                 continue
             risks.append(
                 dict(
-                    asset=ori_account.asset,
+                    asset_id=str(ori_account.asset_id),
                     username=ori_account.username,
                     risk=k + "_changed",
                     detail={"diff": v},
@@ -103,7 +103,7 @@ class AnalyseAccountRisk:
         self.save_or_update_risks(risks)
 
     def _analyse_datetime_changed(self, ori_account, d, asset, username):
-        basic = {"asset": asset, "username": username}
+        basic = {"asset_id": str(asset.id), "username": username}
 
         risks = []
         for item in self.datetime_check_items:
@@ -128,14 +128,14 @@ class AnalyseAccountRisk:
 
     def save_or_update_risks(self, risks):
         # 提前取出来，避免每次都查数据库
-        assets = {r["asset"] for r in risks}
-        assets_risks = AccountRisk.objects.filter(asset__in=assets)
+        asset_ids = {r["asset_id"] for r in risks}
+        assets_risks = AccountRisk.objects.filter(asset_id__in=asset_ids)
         assets_risks = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in assets_risks}
 
         for d in risks:
             detail = d.pop("detail", {})
             detail["datetime"] = self.now.isoformat()
-            key = f"{d['asset'].id}_{d['username']}_{d['risk']}"
+            key = f"{d['asset_id']}_{d['username']}_{d['risk']}"
             found = assets_risks.get(key)
 
             if not found:
@@ -237,9 +237,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for asset_id, username in accounts:
             self.ori_asset_usernames[str(asset_id)].add(username)
 
-        ga_accounts = GatheredAccount.objects.filter(asset__in=assets).prefetch_related(
-            "asset"
-        )
+        ga_accounts = GatheredAccount.objects.filter(asset__in=assets)
         for account in ga_accounts:
             self.ori_gathered_usernames[str(account.asset_id)].add(account.username)
             key = "{}_{}".format(account.asset_id, account.username)
