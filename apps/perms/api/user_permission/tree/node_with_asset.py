@@ -13,8 +13,7 @@ from perms.hands import Node
 from perms.models import PermNode
 from perms.utils import UserPermAssetUtil
 from perms.utils import UserPermNodeUtil
-from .mixin import RebuildTreeMixin
-from ..mixin import SelfOrPKUserMixin
+from ..mixin import SelfOrPKUserMixin, RebuildTreeMixin
 
 __all__ = [
     'UserPermedNodesWithAssetsAsTreeApi',
