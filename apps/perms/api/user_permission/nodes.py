@@ -8,8 +8,7 @@ from assets.models import Node
 from common.utils import get_logger, lazyproperty
 from perms import serializers
 from perms.utils import UserPermNodeUtil
-from .mixin import SelfOrPKUserMixin
-from .tree.mixin import RebuildTreeMixin
+from .mixin import SelfOrPKUserMixin, RebuildTreeMixin
 
 logger = get_logger(__name__)
 

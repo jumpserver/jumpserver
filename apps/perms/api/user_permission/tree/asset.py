@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from assets.api import SerializeToTreeNodeMixin
 from assets.models import Asset
 from common.utils import get_logger
-from .mixin import RebuildTreeMixin
+from ..mixin import RebuildTreeMixin
 from ..assets import UserAllPermedAssetsApi
 
 logger = get_logger(__name__)
