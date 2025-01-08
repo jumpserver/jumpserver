@@ -76,8 +76,9 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
     login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
-    change_secret_status = models.CharField(max_length=16, null=True, blank=True,
-                                            verbose_name=_('Change secret status'))
+    change_secret_status = models.CharField(
+        max_length=16, null=True, blank=True, verbose_name=_('Change secret status')
+    )
 
     class Meta:
         verbose_name = _('Account')
