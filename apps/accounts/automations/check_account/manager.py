@@ -156,7 +156,7 @@ class CheckLeakHandler(BaseCheckHandler):
         if not account.secret:
             return False
 
-        sql = 'SELECT 1 FROM leak_passwords WHERE password = ? LIMIT 1'
+        sql = 'SELECT 1 FROM passwords WHERE password = ? LIMIT 1'
         self.cursor.execute(sql, (account.secret,))
         leak = self.cursor.fetchone() is not None
         return leak
