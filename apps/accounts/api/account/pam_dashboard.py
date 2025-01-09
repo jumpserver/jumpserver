@@ -4,7 +4,10 @@ from django.db.models import Count, F, Q
 from django.http.response import JsonResponse
 from rest_framework.views import APIView
 
-from accounts.models import Account, RiskChoice
+from accounts.models import (
+    Account, RiskChoice, GatherAccountsAutomation,
+    PushAccountAutomation, BackupAccountAutomation, AccountRisk, IntegrationApplication
+)
 from assets.const import AllTypes
 from common.utils.timezone import local_monday
 
@@ -85,9 +88,34 @@ class PamDashboardApi(APIView):
             data['total_long_time_change_password_accounts'] = Account.get_risks(
                 risk_type=RiskChoice.long_time_password).count()
 
-        if _all or query_params.get('total_count_type_to_accounts_amount'):
+        if _all or query_params.get('total_count_type_to_accounts'):
             data.update({
-                'total_count_type_to_accounts_amount': self.get_type_to_accounts(),
+                'total_count_type_to_accounts': self.get_type_to_accounts(),
+            })
+
+        if _all or query_params.get('total_count_gathered_account_automation'):
+            data.update({
+                'total_count_gathered_account_automation': GatherAccountsAutomation.objects.count()
+            })
+
+        if _all or query_params.get('total_count_push_account_automation'):
+            data.update({
+                'total_count_push_account_automation': PushAccountAutomation.objects.count()
+            })
+
+        if _all or query_params.get('total_count_backup_account_automation'):
+            data.update({
+                'total_count_backup_account_automation': BackupAccountAutomation.objects.count()
+            })
+
+        if _all or query_params.get('total_count_risk_account'):
+            data.update({
+                'total_count_risk_account': AccountRisk.objects.count()
+            })
+            
+        if _all or query_params.get('total_count_integration_application'):
+            data.update({
+                'total_count_integration_application': IntegrationApplication.objects.count()
             })
 
         return JsonResponse(data, status=200)
