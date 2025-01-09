@@ -45,3 +45,4 @@ test.py
 .history/
 .test/
 *.mo
+apps.iml
