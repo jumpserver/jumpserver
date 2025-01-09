@@ -6,7 +6,8 @@ from rest_framework.views import APIView
 
 from accounts.models import (
     Account, RiskChoice, GatherAccountsAutomation,
-    PushAccountAutomation, BackupAccountAutomation, AccountRisk, IntegrationApplication
+    PushAccountAutomation, BackupAccountAutomation,
+    AccountRisk, IntegrationApplication, ChangeSecretAutomation
 )
 from assets.const import AllTypes
 from common.utils.timezone import local_monday
@@ -93,6 +94,11 @@ class PamDashboardApi(APIView):
                 'total_count_type_to_accounts': self.get_type_to_accounts(),
             })
 
+        if _all or query_params.get('total_count_change_secret_automation'):
+            data.update({
+                'total_count_change_secret_automation': ChangeSecretAutomation.objects.count()
+            })
+
         if _all or query_params.get('total_count_gathered_account_automation'):
             data.update({
                 'total_count_gathered_account_automation': GatherAccountsAutomation.objects.count()
@@ -112,7 +118,7 @@ class PamDashboardApi(APIView):
             data.update({
                 'total_count_risk_account': AccountRisk.objects.count()
             })
-            
+
         if _all or query_params.get('total_count_integration_application'):
             data.update({
                 'total_count_integration_application': IntegrationApplication.objects.count()
