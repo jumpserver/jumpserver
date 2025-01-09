@@ -345,7 +345,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         for k in diff:
             if k not in common_risk_items:
                 continue
-            setattr(ori_account, k, d[k])
+            v = d.get(k)
+            setattr(ori_account, k, v)
         return ori_account
 
     def do_run(self, *args, **kwargs):
