@@ -89,6 +89,14 @@ class PamDashboardApi(APIView):
             data['total_long_time_change_password_accounts'] = Account.get_risks(
                 risk_type=RiskChoice.long_time_password).count()
 
+        if _all or query_params.get('total_leaked_password_accounts'):
+            data['total_leaked_password_accounts'] = Account.get_risks(
+                risk_type=RiskChoice.leaked_password).count()
+
+        if _all or query_params.get('total_repeated_password_accounts'):
+            data['total_repeated_password_accounts'] = Account.get_risks(
+                risk_type=RiskChoice.repeated_password).count()
+
         if _all or query_params.get('total_count_type_to_accounts'):
             data.update({
                 'total_count_type_to_accounts': self.get_type_to_accounts(),
