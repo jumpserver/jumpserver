@@ -37,41 +37,54 @@ class PamDashboardApi(APIView):
         return result
 
     def get(self, request, *args, **kwargs):
-        data = {}
         monday_time = local_monday()
         query_params = self.request.query_params
 
-        account_stats = Account.objects.aggregate(
-            total_count=Count('id'),
-            privileged_count=Count('id', filter=Q(privileged=True)),
-            connectivity_ok_count=Count('id', filter=Q(connectivity='ok')),
-            secret_reset_count=Count('id', filter=Q(secret_reset=True)),
-            unavailable_count=Count('id', filter=Q(is_active=False)),
-            week_add_count=Count('id', filter=Q(date_created__gte=monday_time)),
-        )
-
         _all = query_params.get('all')
 
-        if _all or query_params.get('total_accounts'):
-            data['total_accounts'] = account_stats['total_count']
+        agg_map = {
+            'total_accounts': (
+                'total_count',
+                Count('id')
+            ),
+            'total_privileged_accounts': (
+                'privileged_count',
+                Count('id', filter=Q(privileged=True))
+            ),
+            'total_connectivity_ok_accounts': (
+                'connectivity_ok_count',
+                Count('id', filter=Q(connectivity='ok'))
+            ),
+            'total_secret_reset_accounts': (
+                'secret_reset_count',
+                Count('id', filter=Q(secret_reset=True))
+            ),
+            'total_unavailable_accounts': (
+                'unavailable_count',
+                Count('id', filter=Q(is_active=False))
+            ),
+            'total_week_add_accounts': (
+                'week_add_count',
+                Count('id', filter=Q(date_created__gte=monday_time))
+            ),
+        }
 
-        if _all or query_params.get('total_week_add_accounts'):
-            data['total_week_add_accounts'] = account_stats['week_add_count']
+        aggregations = {}
+        for param_key, (agg_key, agg_expr) in agg_map.items():
+            if _all or query_params.get(param_key):
+                aggregations[agg_key] = agg_expr
 
-        if _all or query_params.get('total_privileged_accounts'):
-            data['total_privileged_accounts'] = account_stats['privileged_count']
+        data = {}
+        if aggregations:
+            account_stats = Account.objects.aggregate(**aggregations)
+            for param_key, (agg_key, __) in agg_map.items():
+                if agg_key in account_stats:
+                    data[param_key] = account_stats[agg_key]
 
-        if _all or query_params.get('total_connectivity_ok_accounts'):
-            data['total_connectivity_ok_accounts'] = account_stats['connectivity_ok_count']
-
-        if _all or query_params.get('total_secret_reset_accounts'):
-            data['total_secret_reset_accounts'] = account_stats['secret_reset_count']
-
-        if _all or query_params.get('total_ordinary_accounts'):
-            data['total_ordinary_accounts'] = account_stats['total_count'] - account_stats['privileged_count']
-
-        if _all or query_params.get('total_unavailable_accounts'):
-            data['total_unavailable_accounts'] = account_stats['unavailable_count']
+            if (_all or query_params.get('total_ordinary_accounts')):
+                if 'total_count' in account_stats and 'privileged_count' in account_stats:
+                    data['total_ordinary_accounts'] = \
+                        account_stats['total_count'] - account_stats['privileged_count']
 
         if _all or query_params.get('total_unmanaged_accounts'):
             data['total_unmanaged_accounts'] = Account.get_risks(
