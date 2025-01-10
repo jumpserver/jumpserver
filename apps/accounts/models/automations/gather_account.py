@@ -15,7 +15,7 @@ __all__ = ['GatherAccountsAutomation', 'GatheredAccount']
 class GatheredAccount(JMSOrgBaseModel):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_("Asset"))
     username = models.CharField(max_length=32, blank=True, db_index=True, verbose_name=_('Username'))
-    address_last_login = models.CharField(max_length=39, default='', verbose_name=_("Address login"))
+    address_last_login = models.CharField(null=True, max_length=39, default='', verbose_name=_("Address login"))
     date_last_login = models.DateTimeField(null=True, verbose_name=_("Date login"))
     remote_present = models.BooleanField(default=True, verbose_name=_("Remote present"))  # 远端资产上是否还存在
     present = models.BooleanField(default=False, verbose_name=_("Present"))  # 系统资产上是否还存在

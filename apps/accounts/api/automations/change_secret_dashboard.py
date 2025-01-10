@@ -117,28 +117,26 @@ class ChangeSecretDashboardApi(APIView):
         query_params = self.request.query_params
         data = {}
 
-        if query_params.get('total_count_change_secrets'):
+        _all = query_params.get('all')
+
+        if _all or query_params.get('total_count_change_secrets'):
             data['total_count_change_secrets'] = self.get_filtered_counts(
                 self.change_secrets_queryset, 'date_updated'
             )
 
-        if query_params.get('total_count_periodic_change_secrets'):
+        if _all or query_params.get('total_count_periodic_change_secrets'):
             data['total_count_periodic_change_secrets'] = self.get_filtered_counts(
                 self.change_secrets_queryset.filter(is_periodic=True), 'date_updated'
             )
 
-        if query_params.get('total_count_change_secret_assets'):
+        if _all or query_params.get('total_count_change_secret_assets'):
             data['total_count_change_secret_assets'] = self.get_change_secret_asset_queryset().count()
 
-        if query_params.get('total_count_change_secret_status'):
+        if _all or query_params.get('total_count_change_secret_status'):
             records = self.get_queryset_date_filter(self.change_secret_records_queryset, 'date_finished')
             data.update(self.get_status_counts(records))
 
-        if query_params.get('total_count_change_secret_status'):
-            records = self.get_queryset_date_filter(self.change_secret_records_queryset, 'date_finished')
-            data.update(self.get_status_counts(records))
-
-        if query_params.get('daily_success_and_failure_metrics'):
+        if _all or query_params.get('daily_success_and_failure_metrics'):
             success, failed = self.get_daily_success_and_failure_metrics()
             data.update({
                 'dates_metrics_date': [date.strftime('%m-%d') for date in self.date_range_list] or ['0'],
@@ -146,17 +144,18 @@ class ChangeSecretDashboardApi(APIView):
                 'dates_metrics_total_count_failed': failed,
             })
 
-        if query_params.get('total_count_ongoing_change_secret'):
+        if _all or query_params.get('total_count_ongoing_change_secret'):
             execution_ids = []
             inspect = app.control.inspect()
             active_tasks = inspect.active()
-            for tasks in active_tasks.values():
-                for task in tasks:
-                    _id = task.get('id')
-                    name = task.get('name')
-                    tp = task.kwargs.get('tp')
-                    if name == self.task_name and tp == self.tp:
-                        execution_ids.append(_id)
+            if active_tasks:
+                for tasks in active_tasks.values():
+                    for task in tasks:
+                        _id = task.get('id')
+                        name = task.get('name')
+                        tp = task.kwargs.get('tp')
+                        if name == self.task_name and tp == self.tp:
+                            execution_ids.append(_id)
 
             snapshots = self.change_secret_executions_queryset.filter(
                 id__in=execution_ids).values_list('id', 'snapshot')
