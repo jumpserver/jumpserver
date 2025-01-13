@@ -221,6 +221,24 @@ class CheckAccountManager(BaseManager):
         self.execution.date_start = timezone.now()
         self.execution.save(update_fields=["date_start"])
 
+    def batch_check(self, handler):
+        print("Engine: {}".format(handler.__class__.__name__))
+        for i in range(0, len(self.assets), self.batch_size):
+            _assets = self.assets[i: i + self.batch_size]
+            accounts = Account.objects.filter(asset__in=_assets)
+
+            print("Start to check accounts: {}".format(len(accounts)))
+
+            for account in accounts:
+                error = handler.check(account)
+                msg = handler.risk if error else 'ok'
+
+                print("Check: {} => {}".format(account, msg))
+                if not error:
+                    continue
+                self.add_risk(handler.risk, account)
+            self.commit_risks(_assets)
+
     def do_run(self, *args, **kwargs):
         for engine in self.execution.snapshot.get("engines", []):
             if engine == "check_account_secret":
@@ -234,22 +252,7 @@ class CheckAccountManager(BaseManager):
                 continue
 
             self.handlers.append(handler)
-
-            print("Engine: {}".format(handler.__class__.__name__))
-            for i in range(0, len(self.assets), self.batch_size):
-                _assets = self.assets[i: i + self.batch_size]
-                accounts = Account.objects.filter(asset__in=_assets)
-
-                print("Start to check accounts: {}".format(len(accounts)))
-
-                for account in accounts:
-                    error = handler.check(account)
-                    print("Check: {} => {}".format(account, error))
-                    if not error:
-                        continue
-                    self.add_risk(handler.risk, account)
-
-                self.commit_risks(_assets)
+            self.batch_check(handler)
 
     def post_run(self):
         super().post_run()

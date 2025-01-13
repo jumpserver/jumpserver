@@ -2,8 +2,8 @@ from itertools import islice
 
 from django.db import models
 from django.db.models import TextChoices
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from common.const import ConfirmOrIgnore
 from common.db.models import JMSBaseModel
@@ -60,9 +60,12 @@ class RiskChoice(TextChoices):
 class AccountRisk(JMSOrgBaseModel):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Asset'))
     username = models.CharField(max_length=32, verbose_name=_('Username'))
+    account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, related_name='risks',
+                                verbose_name=_('Account'), null=True)
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
-    status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default=ConfirmOrIgnore.pending, blank=True, verbose_name=_('Status'))
-    details = models.JSONField(default=list,  verbose_name=_('Details'))
+    status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default=ConfirmOrIgnore.pending,
+                              blank=True, verbose_name=_('Status'))
+    details = models.JSONField(default=list, verbose_name=_('Details'))
 
     class Meta:
         verbose_name = _('Account risk')
@@ -106,7 +109,7 @@ class AccountRisk(JMSOrgBaseModel):
 
 class CheckAccountEngine(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    slug = models.SlugField(max_length=128, verbose_name=_('Slug'), unique=True) #
+    slug = models.SlugField(max_length=128, verbose_name=_('Slug'), unique=True)  #
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     def __str__(self):
@@ -117,4 +120,3 @@ class CheckAccountEngine(JMSBaseModel):
             'check_gathered_account',
             'check_account_secret'
         ]
-

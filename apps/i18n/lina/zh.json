@@ -994,6 +994,7 @@
     "ResetSSHKeyWarningMsg": "你确定要发送重置用户的SSH Key的邮件吗?",
     "Resource": "资源",
     "ResourceType": "资源类型",
+    "ResolveSelected": "解决所选",
     "RestoreButton": "恢复默认",
     "RestoreDefault": "恢复默认",
     "RestoreDialogMessage": "您确定要恢复默认初始化吗？",

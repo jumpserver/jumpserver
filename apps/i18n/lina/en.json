@@ -996,6 +996,7 @@
     "ResetSSHKeyWarningMsg": "Are you sure you want to send a reset ssh key email to the user?",
     "Resource": "Resources",
     "ResourceType": "Resource type",
+    "ResolveSelected": "Resolve selected",
     "RestoreButton": "Restore",
     "RestoreDefault": "Reset to default",
     "RestoreDialogMessage": "Are you sure you want to restore to default initialization?",
