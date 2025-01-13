@@ -51,7 +51,7 @@ auth._get_backends = _get_backends
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
-    之所以 hack 这个 auticate
+    之所以 hack 这个 authenticate
     """
     username = credentials.get('username')
 
@@ -500,10 +500,12 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
     key_prefix_captcha = "_LOGIN_INVALID_{}"
 
     def _check_auth_user_is_valid(self, username, password, public_key):
-        user = authenticate(
-            self.request, username=username,
-            password=password, public_key=public_key
-        )
+        credentials = {'username': username}
+        if password:
+            credentials['password'] = password
+        if public_key:
+            credentials['public_key'] = public_key
+        user = authenticate(self.request, **credentials)
         if not user:
             self.raise_credential_error(errors.reason_password_failed)
 
