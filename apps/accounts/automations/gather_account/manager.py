@@ -83,8 +83,8 @@ class AnalyseAccountRisk:
         self.now = timezone.now()
         self.pending_add_risks = []
 
-    def _analyse_item_changed(self, ori_account, d):
-        diff = get_items_diff(ori_account, d)
+    def _analyse_item_changed(self, ori_ga, d):
+        diff = get_items_diff(ori_ga, d)
         if not diff:
             return
 
@@ -94,8 +94,9 @@ class AnalyseAccountRisk:
                 continue
             risks.append(
                 dict(
-                    asset_id=str(ori_account.asset_id),
-                    username=ori_account.username,
+                    asset_id=str(ori_ga.asset_id),
+                    username=ori_ga.username,
+                    gathered_account=ori_ga,
                     risk=k + "_changed",
                     detail={"diff": v},
                 )
@@ -153,13 +154,13 @@ class AnalyseAccountRisk:
     def _update_risk(self, account):
         return account
 
-    def analyse_risk(self, asset, ori_account, d, sys_found):
+    def analyse_risk(self, asset, ga, d, sys_found):
         if not self.check_risk:
             return
 
-        basic = {"asset": asset, "username": d["username"]}
-        if ori_account:
-            self._analyse_item_changed(ori_account, d)
+        basic = {"asset": asset, "username": d["username"], 'gathered_account': ga.id}
+        if ga:
+            self._analyse_item_changed(ga, d)
         elif not sys_found:
             self._create_risk(
                 dict(
@@ -168,7 +169,7 @@ class AnalyseAccountRisk:
                     details=[{"datetime": self.now.isoformat()}],
                 )
             )
-        self._analyse_datetime_changed(ori_account, d, asset, d["username"])
+        self._analyse_datetime_changed(ga, d, asset, d["username"])
 
 
 class GatherAccountsManager(AccountBasePlaybookManager):
@@ -363,11 +364,12 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         "{}_{}".format(asset.id, username)
                     )
                     if not ori_account:
-                        self.create_gathered_account(d)
+                        ga = self.create_gathered_account(d)
                     else:
+                        ga = ori_account
                         self.update_gathered_account(ori_account, d)
                     ori_found = username in ori_users
-                    risk_analyser.analyse_risk(asset, ori_account, d, ori_found)
+                    risk_analyser.analyse_risk(asset, ga, d, ori_found)
 
                 self.create_gathered_account.finish()
                 self.update_gathered_account.finish()

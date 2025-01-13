@@ -189,12 +189,12 @@ class CheckAccountManager(BaseManager):
         ori_risk_map = {}
 
         for risk in account_risks:
-            key = f'{risk.asset_id}_{risk.username}_{risk.risk}'
+            key = f'{risk.account_id}_{risk.risk}'
             ori_risk_map[key] = risk
 
         now = timezone.now().isoformat()
         for d in self.batch_risks:
-            key = f'{d["account"].asset_id}_{d["account"].username}_{d["risk"]}'
+            key = f'{d["account"].id}_{d["risk"]}'
             origin_risk = ori_risk_map.get(key)
 
             if origin_risk and origin_risk.status != ConfirmOrIgnore.pending:
@@ -209,6 +209,7 @@ class CheckAccountManager(BaseManager):
                 update_risk(origin_risk)
             else:
                 create_risk({
+                    "account": d["account"],
                     "asset": d["account"].asset,
                     "username": d["account"].username,
                     "risk": d["risk"],
