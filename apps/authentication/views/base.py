@@ -111,7 +111,7 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
             response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
-        if 'next=client' in redirect_url:
+        if redirect_url and 'next=client' in redirect_url:
             self.request.META['QUERY_STRING'] += '&next=client'
         return self.redirect_to_guard_view()
 
