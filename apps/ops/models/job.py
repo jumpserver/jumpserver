@@ -9,8 +9,7 @@ from datetime import timedelta
 from celery import current_task
 from django.conf import settings
 from django.db import models
-from django.db.models import Q, Avg, F, FloatField
-from django.db.models.functions import Coalesce, Now, Extract
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -189,17 +188,11 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def average_time_cost(self):
-        executions = self.executions.filter(status__in=['success', 'failed'])
-        if not executions.exists():
-            return 0
-        average = executions.annotate(
-            time_cost=Coalesce(F('date_finished'), Now()) - F('date_start')
-        ).annotate(
-            time_cost_seconds=Extract('time_cost', 'epoch')
-        ).aggregate(
-            avg_time=Avg('time_cost_seconds')
-        )['avg_time']
-        return average if average is not None else 0
+        total_cost = 0
+        finished_count = self.executions.filter(status__in=['success', 'failed']).count()
+        for execution in self.executions.filter(status__in=['success', 'failed']).all():
+            total_cost += execution.time_cost
+        return total_cost / finished_count if finished_count else 0
 
     def get_register_task(self):
         from ..tasks import run_ops_job
