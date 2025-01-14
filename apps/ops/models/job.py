@@ -8,8 +8,9 @@ from datetime import timedelta
 
 from celery import current_task
 from django.conf import settings
-from django.db import models
-from django.db.models import Q, Avg, F, FloatField
+from django.db import models, connection
+from django.db.models import Q, F, FloatField, Avg
+from django.db.models.expressions import Func
 from django.db.models.functions import Coalesce, Now, Extract
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -142,6 +143,11 @@ class JMSPermedInventory(JMSInventory):
         return mapper
 
 
+class UNIXTimestamp(Func):
+    function = 'UNIX_TIMESTAMP'
+    output_field = FloatField()
+
+
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
@@ -192,13 +198,19 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         executions = self.executions.filter(status__in=['success', 'failed'])
         if not executions.exists():
             return 0
-        average = executions.annotate(
-            time_cost=Coalesce(F('date_finished'), Now()) - F('date_start')
-        ).annotate(
-            time_cost_seconds=Extract('time_cost', 'epoch')
-        ).aggregate(
-            avg_time=Avg('time_cost_seconds')
-        )['avg_time']
+        if connection.vendor == 'postgresql':
+            annotate = executions.annotate(
+                time_cost=Coalesce(F('date_finished'), Now()) - F('date_start')
+            ).annotate(
+                time_cost_seconds=Extract('time_cost', 'epoch')
+            )
+        elif connection.vendor == 'mysql':
+            annotate = executions.annotate(
+                time_cost_seconds=UNIXTimestamp(Coalesce(F('date_finished'), Now())) - UNIXTimestamp(F('date_start'))
+            )
+        else:
+            return 0
+        average = annotate.aggregate(avg_time=Avg('time_cost_seconds'))['avg_time']
         return average if average is not None else 0
 
     def get_register_task(self):
