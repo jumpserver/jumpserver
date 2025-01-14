@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -169,20 +168,14 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
 
     @classmethod
     def get_risks(cls, queryset=None, risk_type=None):
-        # TODO 数据量大时，子查询性能不佳，考虑用原生sql或者在模型层面做出改动
-        from accounts.models import AccountRisk
-        subquery = AccountRisk.objects.filter(
-            asset_id=OuterRef('asset_id'),
-            username=OuterRef('username')
-        )
-
-        if risk_type:
-            subquery = subquery.filter(risk=risk_type)
+        query = {
+            'risks__risk': risk_type
+        }
 
         if queryset is None:
             queryset = cls.objects.all()
 
-        return queryset.filter(Exists(subquery))
+        return queryset.filter(**query)
 
 
 def replace_history_model_with_mixin():

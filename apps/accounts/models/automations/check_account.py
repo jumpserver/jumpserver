@@ -58,7 +58,9 @@ class RiskChoice(TextChoices):
 
 
 class AccountRisk(JMSOrgBaseModel):
-    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Asset'))
+    asset = models.ForeignKey(
+        'assets.Asset', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Asset')
+    )
     username = models.CharField(max_length=32, verbose_name=_('Username'))
     account = models.ForeignKey(
         'accounts.Account', on_delete=models.CASCADE, related_name='risks',
