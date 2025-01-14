@@ -61,16 +61,19 @@ class AccountRisk(JMSOrgBaseModel):
     asset = models.ForeignKey(
         'assets.Asset', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Asset')
     )
-    account = models.ForeignKey(
-        'accounts.Account', on_delete=models.CASCADE, related_name='risks', verbose_name=_('Account'), null=True
-    )
-    status = models.CharField(
-        max_length=32, choices=ConfirmOrIgnore.choices,
-        default=ConfirmOrIgnore.pending, blank=True, verbose_name=_('Status')
-    )
     username = models.CharField(max_length=32, verbose_name=_('Username'))
-    details = models.JSONField(default=list, verbose_name=_('Details'))
+    account = models.ForeignKey(
+        'accounts.Account', on_delete=models.CASCADE, related_name='risks',
+        verbose_name=_('Account'), null=True
+    )
+    gathered_account = models.ForeignKey(
+        'accounts.GatheredAccount', on_delete=models.CASCADE,
+        related_name='risks', null=True
+    )
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
+    status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default=ConfirmOrIgnore.pending,
+                              blank=True, verbose_name=_('Status'))
+    details = models.JSONField(default=list, verbose_name=_('Details'))
 
     class Meta:
         verbose_name = _('Account risk')
