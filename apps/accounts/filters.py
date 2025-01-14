@@ -7,7 +7,7 @@ from django_filters import rest_framework as drf_filters
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
-from .models import Account, GatheredAccount, ChangeSecretRecord, AccountRisk
+from .models import Account, GatheredAccount, ChangeSecretRecord
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -70,10 +70,7 @@ class AccountFilterSet(BaseFilterSet):
         if not value:
             return queryset
 
-        risks = AccountRisk.objects.filter(risk=value)
-        usernames = risks.values_list('username', flat=True)
-        assets = risks.values_list('asset', flat=True)
-        queryset = queryset.filter(username__in=usernames, asset__in=assets)
+        queryset = queryset.filter(risks__risk=value)
         return queryset
 
     @staticmethod
