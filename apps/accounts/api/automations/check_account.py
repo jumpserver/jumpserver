@@ -130,7 +130,8 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
         data = handler.handle(act, risk)
         if not data:
             data = {"message": "Success"}
-        return Response(data)
+        s = serializers.AccountRiskSerializer(instance=data)
+        return Response(data=s.data)
 
 
 class CheckAccountEngineViewSet(JMSModelViewSet):
