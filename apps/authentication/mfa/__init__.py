@@ -3,3 +3,4 @@ from .sms import MFASms
 from .radius import MFARadius
 from .custom import MFACustom
 from .face import MFAFace
+from .email import MFAEmail
