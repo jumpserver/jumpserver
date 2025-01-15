@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
 from .base import OrgListField
+from .mixin import LDAPSerializerMixin
 
 __all__ = [
     'LDAPTestConfigSerializer', 'LDAPUserSerializer', 'LDAPTestLoginSerializer',
@@ -36,7 +37,7 @@ class LDAPUserSerializer(serializers.Serializer):
     status = serializers.JSONField(read_only=True)
 
 
-class LDAPSettingSerializer(serializers.Serializer):
+class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
     # encrypt_fields 现在使用 write_only 来判断了
     PREFIX_TITLE = _('LDAP')
 
@@ -85,7 +86,7 @@ class LDAPSettingSerializer(serializers.Serializer):
     )
     AUTH_LDAP_CACHE_TIMEOUT = serializers.IntegerField(
         min_value=0, max_value=3600 * 24 * 30 * 12,
-        default=3600 * 24 * 30,
+        default=0,
         required=False, label=_('User DN cache timeout (s)'),
         help_text=_(
             'Caching the User DN obtained during user login authentication can effectively '
@@ -103,10 +104,11 @@ class LDAPSettingSerializer(serializers.Serializer):
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('LDAP'))
     AUTH_LDAP_SYNC_ORG_IDS = OrgListField()
 
-    def post_save(self):
-        keys = ['AUTH_LDAP_SYNC_IS_PERIODIC', 'AUTH_LDAP_SYNC_INTERVAL', 'AUTH_LDAP_SYNC_CRONTAB']
-        kwargs = {k: self.validated_data[k] for k in keys if k in self.validated_data}
-        if not kwargs:
-            return
+    periodic_key = 'AUTH_LDAP_SYNC_IS_PERIODIC'
+    interval_key = 'AUTH_LDAP_SYNC_INTERVAL'
+    crontab_key = 'AUTH_LDAP_SYNC_CRONTAB'
+
+    @staticmethod
+    def import_task_function(**kwargs):
         from settings.tasks import import_ldap_user_periodic
         import_ldap_user_periodic(**kwargs)

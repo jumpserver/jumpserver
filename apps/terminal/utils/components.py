@@ -97,10 +97,10 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
     def convert_status_metrics(metrics):
         return {
             'any': metrics['total'],
-            'normal': metrics['normal'],
-            'high': metrics['high'],
-            'critical': metrics['critical'],
-            'offline': metrics['offline']
+            'normal': len(metrics['normal']),
+            'high': len(metrics['high']),
+            'critical': len(metrics['critical']),
+            'offline': len(metrics['offline'])
         }
 
     def get_component_status_metrics(self):
@@ -112,8 +112,8 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
             tp = metric['type']
             prometheus_metrics.append(f'## 组件: {tp}')
             status_metrics = self.convert_status_metrics(metric)
-            for status, value in status_metrics.items():
-                metric_text = status_metric_text % (tp, status, value)
+            for status, count in status_metrics.items():
+                metric_text = status_metric_text % (tp, status, count)
                 prometheus_metrics.append(metric_text)
         return prometheus_metrics
 

@@ -20,9 +20,9 @@ class VariableSerializer(CommonBulkModelSerializer):
     name = serializers.CharField(max_length=1024, label=_('Name'), required=True)
     var_name = serializers.CharField(
         max_length=1024, required=True, label=_('Variable name'),
-        help_text=_("The variable name used in the script has a fixed prefix 'jms_' followed by the input variable "
-                    "name. For example, if the variable name is 'name,' the final generated environment variable will "
-                    "be 'jms_name'.")
+        help_text=_("The variable name used in the script will have a fixed prefix jms_ added to the input variable "
+                    "name. For example, if the input variable name is name, the resulting environment variable will "
+                    "be jms_name, and it can be referenced in the script using {{ jms_name }}")
     )
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     type = LabeledChoiceField(

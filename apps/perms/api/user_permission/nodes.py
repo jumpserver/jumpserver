@@ -8,7 +8,7 @@ from assets.models import Node
 from common.utils import get_logger, lazyproperty
 from perms import serializers
 from perms.utils import UserPermNodeUtil
-from .mixin import SelfOrPKUserMixin
+from .mixin import SelfOrPKUserMixin, RebuildTreeMixin
 
 logger = get_logger(__name__)
 
@@ -18,7 +18,7 @@ __all__ = [
 ]
 
 
-class BaseUserPermedNodesApi(SelfOrPKUserMixin, ListAPIView):
+class BaseUserPermedNodesApi(SelfOrPKUserMixin, RebuildTreeMixin, ListAPIView):
     serializer_class = serializers.NodePermedSerializer
 
     def get_queryset(self):
