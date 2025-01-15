@@ -159,7 +159,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
 
         read_only_fields = [
             "date_joined", "last_login", "created_by",
-            "is_first_login", *fields_xpack, "date_api_key_last_used",
+            "is_first_login", "date_api_key_last_used",
         ]
         fields_only_root_org = ["orgs_roles"]
         disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
