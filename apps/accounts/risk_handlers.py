@@ -16,6 +16,7 @@ from common.utils import random_string
 TYPE_CHOICES = [
     ("ignore", _("Ignore")),
     ("reopen", _("Reopen")),
+    ("close", _("Close")),
     ("disable_remote", _("Disable remote")),
     ("delete_remote", _("Delete remote")),
     ("delete_both", _("Delete remote")),
@@ -70,6 +71,9 @@ class RiskHandler:
          .update(status=ConfirmOrIgnore.ignored))
 
     def handle_reopen(self):
+        pass
+
+    def handle_close(self):
         pass
 
     def handle_review(self):
