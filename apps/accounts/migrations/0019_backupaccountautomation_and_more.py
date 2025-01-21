@@ -47,8 +47,6 @@ def migrate_account_backup(apps, schema_editor):
         automation_id = backup_id_old_new_map.get(str(execution.plan_id))
         if not automation_id:
             continue
-        snapshot = execution.snapshot
-        snapshot['type'] = "backup_account"
         data = {
             'automation_id': automation_id,
             'date_start': execution.date_start,
