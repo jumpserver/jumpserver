@@ -1,77 +1,315 @@
 {% load i18n %}
+{% load static %}
+{% load bootstrap3 %} 
 
-<div class='summary'>
-    <p>{% trans 'The following is a summary of account push tasks, please read and process' %}</p>
-    <table>
-        <caption></caption>
-        <thead>
-        <tr>
-            <th colspan='2'>任务汇总:</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{% trans 'Task name' %}:</td>
-            <td>{{ execution.automation.name }} </td>
-        </tr>
-        <tr>
-            <td>{% trans 'Date start' %}:</td>
-            <td>{{ execution.date_start | date:"Y/m/d H:i:s" }}</td>
-        </tr>
-        <tr>
-            <td>{% trans 'Date end' %}:</td>
-            <td>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</td>
-        </tr>
-        <tr>
-            <td>{% trans 'Time using' %}:</td>
-            <td>{{ execution.duration }}s</td>
-        </tr>
-        <tr>
-            <td>{% trans 'Assets count' %}:</td>
-            <td>{{ summary.total_assets }}</td>
-        </tr>
-        <tr>
-            <td>{% trans 'Asset success count' %}:</td>
-            <td>{{ summary.ok_assets }}</td>
-        </tr>
-        <tr>
-            <td>{% trans 'Asset failed count' %}:</td>
-            <td>{{ summary.fail_assets }}</td>
-        </tr>
-        <tr>
-            <td>{% trans 'Asset not support count' %}:</td>
-            <td>{{ summary.error_assets }}</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"></link>
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+  
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
 
+<body>
+    <div class="report-container">
+        <header class="header">
+            <img src="{% static 'img/JumpServer_white_logo.svg' %}" alt="Logo" />
+        </header>
+    
+        <div class="info-section">
+            <h2 class="info">
+                <!-- 对应报表的 name -->
+                账号推送
+            </h2>
+
+            <div class="time">
+                <!-- 具体的生成时间 -->
+                生成于：星期五，2025年1月20日 10:00:00 中国标准时间
+            </div>
+        </div>
+        
+        <main class="main-section">
+
+            <div class="synopsis-section">
+                <div class="synopsis-item">
+                    <h3>
+                      {% comment %} {% trans 'New found accounts' %}: {% endcomment %}
+                      <span> summary 1 </span>
+                    </h3>
+          
+                    <div class="synopsis-item-content">
+                      <p>
+                        {% trans 'Assets count' %}:
+                        <span>100</span>
+                      </p>
+                      <p>
+                        {% trans 'Asset success count' %}:
+                        <span>100</span>
+                      </p>
+                      <p>
+                        {% trans 'Asset failed count' %}:
+                        <span>100</span>
+                      </p>
+                      <p>
+                        {% trans 'Asset not support count' %}:
+                        <span>100</span>
+                      </p>
+                    </div>
+                  </div>  
+                <div class="synopsis-item">
+                  <h3>
+                    {% comment %} {% trans 'New found accounts' %}: {% endcomment %}
+                    <span>summary 2</span>
+                  </h3>
+        
+                  <div class="synopsis-item-content-charts">
+                    <div id="main" style="width: 600px; height: 250px;"></div>
+                  </div>
+                </div>  
+              </div>
+
+            <div class="push-account-section">
+                <h3>
+                    {% trans 'The following is a summary of account push tasks, please read and process' %}
+                </h3>
+                <table class="custom-table table table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan='2'>任务汇总:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{% trans 'Task name' %}:</td>
+                            <td>{{ execution.automation.name }} </td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Date start' %}:</td>
+                            <td>{{ execution.date_start | date:"Y/m/d H:i:s" }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Date end' %}:</td>
+                            <td>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Time using' %}:</td>
+                            <td>{{ execution.duration }}s</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Assets count' %}:</td>
+                            <td>{{ summary.total_assets }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Asset success count' %}:</td>
+                            <td>{{ summary.ok_assets }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Asset failed count' %}:</td>
+                            <td>{{ summary.fail_assets }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans 'Asset not support count' %}:</td>
+                            <td>{{ summary.error_assets }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    {% block extra_js %}
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+            var myChart = echarts.init(document.getElementById('main'));
+            
+            var option = {
+                tooltip: {},
+                series: [{
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                labelLine: {
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                    show: true,
+                    fontSize: '13',
+                    fontWeight: 'bold'
+                    }
+                },
+                data: [
+                    { value: {{ summary.ok_assets | default:10 }}, name: '{% trans "Asset success count" %}' },
+                    { value: {{ summary.fail_assets | default:10 }}, name: '{% trans "Asset failed count" %}' },
+                    { value: {{ summary.error_assets | default:10 }}, name: '{% trans "Asset not support count" %}' }
+                ]
+                }]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+            });
+        </script>
+  {% endblock %}
+</body>
 
 <style>
-    table {
+    body,
+    p, {
+      margin: 0;
+      padding: 0;
+    }
+
+    .report-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .report-container .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 4rem;
+    padding: 0.3rem 1rem;
+    background-color: #148f76;
+    }
+
+    .report-container .header img {
+    height: 100%
+    }
+
+    .info-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f5f5f5;
+    height: 4rem;
+    padding: 0 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-section .info {
+    margin: unset;
+    font-size: 2rem;
+    }
+
+    .info-section .time {
+    color: #888;
+    font-size: 1.3rem;
+    }
+
+    .main-section {
+    margin-top: 3rem;
+    padding: 0 1rem;
+    }
+
+    .main-section .push-account-section {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        align-items: flex-start;
+        width: inherit;
+        margin-top: 2rem;
+        padding: 1rem;
+    }
+    
+      .main-section .tabel-execution-section h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+    }
+
+    .custom-table {
+        margin-bottom: 0;
         width: 100%;
         border-collapse: collapse;
-        max-width: 100%;
-        text-align: left;
-        margin-top: 10px;
-        padding: 20px;
+        overflow: hidden;
     }
 
-    th {
-        background: #f2f2f2;
-        font-size: 14px;
-        padding: 5px;
-        border: 1px solid #ddd;
+    .custom-table table {
+        width: 100%;
+    }
+    
+    .custom-table th {
+        background: #f6f6f6;
+        color: #495057;
+        padding: 0.75rem;
+        border-bottom: 2px solid #e0e0e0;
     }
 
-    tr :first-child {
-        width: 30%;
+    .custom-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e0e0e0;
     }
 
-    td {
-        border: 1px solid #ddd;
-        padding: 5px;
-        font-size: 12px;
+    .custom-table tr:last-child td {
+        border-bottom: none;
     }
 
+    .main-section .synopsis-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+    
+    .main-section .synopsis-section .synopsis-item {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 1rem 2rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        height: 350px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .main-section .synopsis-section .synopsis-item:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: flex-start;
+        margin-top: 1rem;
+        height: 100%;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content p {
+        display: inline-flex;
+        width: 100%;
+        line-height: 1;
+        gap: 2rem;
+        font-weight: 500;
+    }
+    
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content span {
+        align-items: center;
+        justify-content: center;
+        font-weight: normal;
+    }
+
+    .synopsis-item-content-charts {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1rem;
+    }
 </style>
