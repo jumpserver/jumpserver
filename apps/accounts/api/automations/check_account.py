@@ -138,47 +138,16 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
     search_fields = ("name",)
     serializer_class = serializers.CheckAccountEngineSerializer
 
-    @staticmethod
-    def get_default_engines():
-        data = [
-            {
-                "id": "00000000-0000-0000-0000-000000000001",
-                "slug": "check_gathered_account",
-                "name": "检查发现的账号",
-                "comment": "基于自动发现的账号结果进行检查分析，检查 用户组、公钥、sudoers 等信息",
-            },
-            {
-                "id": "00000000-0000-0000-0000-000000000002",
-                "slug": "check_account_secret",
-                "name": "检查账号密码强弱",
-                "comment": "基于账号密码的安全性进行检查分析, 检查密码强度、泄露等信息",
-            },
-            {
-                "id": "00000000-0000-0000-0000-000000000003",
-                "slug": "check_account_repeat",
-                "name": "检查账号密码是否重复",
-                "comment": "检查账号是否与其它账号相同"
-            },
-            {
-                "id": "00000000-0000-0000-0000-000000000004",
-                "slug": "check_account_leak",
-                "name": "检查账号密码是否是常见密码",
-                "comment": "检查账号密码是否是常见泄露的密码"
-            },
-        ]
-        return data
-
-    def init_if_need(self):
-        data = self.get_default_engines()
-        model_cls = CheckAccountEngine
-
-        if model_cls.objects.count() == 4:
-            return
-
-        for item in data:
-            model_cls.objects.update_or_create(defaults=item, id=item["id"])
+    perm_model = CheckAccountEngine
 
     def get_queryset(self):
-        # return self.get_default_engines()
-        self.init_if_need()
-        return CheckAccountEngine.objects.all()
+        return CheckAccountEngine.get_default_engines()
+
+    def filter_queryset(self, queryset: list):
+        search = self.request.GET.get('search')
+        if search is not None:
+            queryset = [
+                item for item in queryset
+                if search in item['name']
+            ]
+        return queryset

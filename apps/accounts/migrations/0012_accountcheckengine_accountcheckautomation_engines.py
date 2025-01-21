@@ -6,28 +6,7 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
-def init_account_check_engine(apps, schema_editor):
-    data = [
-        {
-            'id': '00000000-0000-0000-0000-000000000001',
-            'slug': 'check_gathered_account',
-            'name': '检查发现的账号',
-            'comment': '基于自动发现的账号结果进行检查分析，检查 用户组、公钥、sudoers 等信息'
-        },
-        {
-            'id': '00000000-0000-0000-0000-000000000002',
-            'slug': 'check_account_secret',
-            'name': '检查账号密码强弱',
-            'comment': '基于账号密码的安全性进行检查分析, 检查密码强度、泄露等信息'
-        }
-    ]
-    model_cls = apps.get_model('accounts', 'CheckAccountEngine')
-    for item in data:
-        model_cls.objects.create(**item)
-
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ("assets", "0007_baseautomation_date_last_run_and_more"),
         (
@@ -139,5 +118,4 @@ class Migration(migrations.Migration):
                 verbose_name="Engines",
             ),
         ),
-        migrations.RunPython(init_account_check_engine),
     ]

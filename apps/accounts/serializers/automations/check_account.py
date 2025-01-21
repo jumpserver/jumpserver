@@ -10,12 +10,12 @@ from accounts.models import (
     RiskChoice,
     CheckAccountEngine,
 )
+from accounts.risk_handlers import TYPE_CHOICES
 from assets.models import Asset
 from common.const import ConfirmOrIgnore
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
-from accounts.risk_handlers import TYPE_CHOICES
 
 logger = get_logger(__file__)
 
@@ -88,9 +88,9 @@ class CheckAccountAutomationSerializer(BaseAutomationSerializer):
         model = CheckAccountAutomation
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = (
-            BaseAutomationSerializer.Meta.fields
-            + ["engines", "recipients"]
-            + read_only_fields
+                BaseAutomationSerializer.Meta.fields
+                + ["engines", "recipients"]
+                + read_only_fields
         )
         extra_kwargs = BaseAutomationSerializer.Meta.extra_kwargs
 
@@ -98,12 +98,18 @@ class CheckAccountAutomationSerializer(BaseAutomationSerializer):
     def model_type(self):
         return AutomationTypes.check_account
 
+    @staticmethod
+    def validate_engines(engines):
+        valid_slugs = {i['slug'] for i in CheckAccountEngine.get_default_engines()}
+
+        if not all(engine in valid_slugs for engine in engines):
+            raise serializers.ValidationError(_("Invalid engine id"))
+
+        return engines
+
 
 class CheckAccountEngineSerializer(serializers.ModelSerializer):
     class Meta:
         model = CheckAccountEngine
-        fields = ["id", "name", "slug", "is_active", "comment"]
+        fields = ["id", "name", "slug", "comment"]
         read_only_fields = ["slug"]
-        extra_kwargs = {
-            "is_active": {"required": False},
-        }

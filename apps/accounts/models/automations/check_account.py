@@ -15,13 +15,13 @@ __all__ = ['CheckAccountAutomation', 'AccountRisk', 'RiskChoice', 'CheckAccountE
 
 
 class CheckAccountAutomation(AccountBaseAutomation):
-    engines = models.ManyToManyField('CheckAccountEngine', related_name='check_automations', verbose_name=_('Engines'))
+    engines = models.JSONField(default=list, verbose_name=_('Engines'))
     recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
-            'engines': [engine.slug for engine in self.engines.all()],
+            'engines': self.engines,
             'recipients': [str(user.id) for user in self.recipients.all()]
         })
         return attr_json
@@ -117,14 +117,43 @@ class AccountRisk(JMSOrgBaseModel):
 
 class CheckAccountEngine(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    slug = models.SlugField(max_length=128, verbose_name=_('Slug'), unique=True)  #
-    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+    slug = models.SlugField(max_length=128, verbose_name=_('Slug'), unique=True)
 
     def __str__(self):
         return self.name
 
-    def internals(self):
-        return [
-            'check_gathered_account',
-            'check_account_secret'
+    @staticmethod
+    def get_default_engines():
+        data = [
+            {
+                "id": "00000000-0000-0000-0000-000000000001",
+                "slug": "check_gathered_account",
+                "name": _("Check the discovered accounts"),
+                "comment": _(
+                    "Perform checks and analyses based on automatically discovered account results, "
+                    "including user groups, public keys, sudoers, and other information"
+                )
+            },
+            {
+                "id": "00000000-0000-0000-0000-000000000002",
+                "slug": "check_account_secret",
+                "name": _("Check the strength of your account and password"),
+                "comment": _(
+                    "Perform checks and analyses based on the security of account passwords, "
+                    "including password strength, leakage, etc."
+                )
+            },
+            {
+                "id": "00000000-0000-0000-0000-000000000003",
+                "slug": "check_account_repeat",
+                "name": _("Check if the account and password are repeated"),
+                "comment": _("Check if the account is the same as other accounts")
+            },
+            {
+                "id": "00000000-0000-0000-0000-000000000004",
+                "slug": "check_account_leak",
+                "name": _("Check whether the account password is a common password"),
+                "comment": _("Check whether the account password is a commonly leaked password")
+            },
         ]
+        return data
