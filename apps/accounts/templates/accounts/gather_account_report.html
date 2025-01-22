@@ -24,7 +24,7 @@
     <div class="info-section">
       <h2 class="info">
         <!-- 对应报表的 name -->
-        密码清单
+        账号发现
       </h2>
       <div class="time">
         <!-- 具体的生成时间 -->
@@ -34,33 +34,35 @@
   
     <main class="main-section">
 
-      {% comment %} 摘要部分 {% endcomment %}
       <div class="synopsis-section">
         <div class="synopsis-item">
           <h3>
-            {% comment %} {% trans 'New found accounts' %}: {% endcomment %}
-            <span> summary 1 </span>
+            {% trans 'The following is a summary of the account check tasks. Please review and handle them' %}
           </h3>
 
           <div class="synopsis-item-content">
             <p>
-              {% trans 'New found accounts' %}:
-              <span>100</span>
+              <span class="item-label">{% trans 'Task name' %}</span>:
+              <span>{{ execution.automation.name }}</span>
             </p>
             <p>
-              {% trans 'New found accounts' %}:
-              <span>100</span>
+              <span class="item-label">{% trans 'Date start' %}</span>:
+              <span>{{ execution.date_start | date:"Y/m/d H:i:s" }}</span>
             </p>
             <p>
-              {% trans 'New found accounts' %}:
-              <span>100</span>
+              <span class="item-label">{% trans 'Date end' %}</span>:
+              <span>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</span>
             </p>
             <p>
-              {% trans 'New found accounts' %}:
-              <span>100</span>
+              <span class="item-label">{% trans 'Time using' %}</span>:   
+              <span>{{ execution.duration }}s</span>
             </p>
-          </div>
-        </div>  
+            <p>
+              <span class="item-label">{% trans 'Assets count' %}</span>:
+              <span>{{ summary.total_assets }}s</span>
+            </p>
+              </div>
+            </div>  
         <div class="synopsis-item">
           <h3>
             {% comment %} {% trans 'New found accounts' %}: {% endcomment %}
@@ -114,7 +116,7 @@
           </div>
   
           {% if summary.lost_accounts %}
-          <table class="custom-table table-striped table-hover data-table">
+          <table class="custom-table table-hover data-table">
             <thead>
               <tr>
                 <th>{% trans 'No.' %}</th>
@@ -137,53 +139,6 @@
           {% endif %}
         </div>
       </div>
-  
-      <div class="tabel-execution-section">
-        <h3>
-          {% trans 'The following is a summary of the account check tasks. Please review and handle them' %}
-        </h3>
-        <table class="execution-table custom-table">
-          <thead>
-            <tr>
-              <th colspan="2">{% trans 'Task Summary' %}:</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{% trans 'Task name' %}:</td>
-              <td>{{ execution.automation.name }}</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Date start' %}:</td>
-              <td>{{ execution.date_start | date:"Y/m/d H:i:s" }}</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Date end' %}:</td>
-              <td>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Time using' %}:</td>
-              <td>{{ execution.duration }}s</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Assets count' %}:</td>
-              <td>{{ summary.total_assets }}</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Asset success count' %}:</td>
-              <td class="success">{{ summary.ok_assets }}</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Asset failed count' %}:</td>
-              <td class="error">{{ summary.fail_assets }}</td>
-            </tr>
-            <tr>
-              <td>{% trans 'Asset not support count' %}:</td>
-              <td class="warning">{{ summary.error_assets }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </main>
   </div>
 
@@ -193,11 +148,21 @@
       var myChart = echarts.init(document.getElementById('main'));
       
       var option = {
-        tooltip: {},
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          left: 'right',
+          orient: 'vertical'
+        },
         series: [{
           type: 'pie',
-          radius: ['50%', '70%'],
+          radius: ['40%', '70%'],
           avoidLabelOverlap: false,
+          padAngle: 5,
+          itemStyle: {
+            borderRadius: 10
+          },
           label: {
             show: false,
             position: 'center'
@@ -205,17 +170,10 @@
           labelLine: {
             show: false
           },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: '13',
-              fontWeight: 'bold'
-            }
-          },
           data: [
-            { value: {{ summary.ok_assets | default:10 }}, name: '{% trans "Asset success count" %}' },
-            { value: {{ summary.fail_assets | default:10 }}, name: '{% trans "Asset failed count" %}' },
-            { value: {{ summary.error_assets | default:10 }}, name: '{% trans "Asset not support count" %}' }
+            { value: {{ summary.ok_assets | default:0 }}, name: '{% trans "Asset success count" %}' },
+            { value: {{ summary.fail_assets | default:1 }}, name: '{% trans "Asset failed count" %}' },
+            { value: {{ summary.error_assets | default:1 }}, name: '{% trans "Asset not support count" %}' }
           ]
         }]
       };
@@ -269,7 +227,7 @@
 
   .info-section .info {
     margin: unset;
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
 
   .info-section .time {
@@ -299,12 +257,11 @@
     border-radius: 8px;
     height: 350px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
   }
 
-  .main-section .synopsis-section .synopsis-item:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+  .main-section .synopsis-section .synopsis-item h3 {
+    font-weight: 500;
+    font-size: 1.5rem;
   }
 
   .main-section .synopsis-section .synopsis-item .synopsis-item-content {
@@ -314,7 +271,6 @@
     align-items: flex-start;
     margin-top: 1rem;
     height: 100%;
-    font-size: 1.5rem;
     cursor: pointer;
   }
 
@@ -323,7 +279,11 @@
     width: 100%;
     line-height: 1;
     gap: 2rem;
-    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .main-section .synopsis-section .synopsis-item .synopsis-item-content p .item-label {
+    width: 10rem;
   }
 
   .main-section .synopsis-section .synopsis-item .synopsis-item-content span {
@@ -356,7 +316,6 @@
     background: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    {% comment %} box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); {% endcomment %}
   }
 
   .main-section .tabel-execution-section {
@@ -408,12 +367,18 @@
     background: #f6f6f6;
     color: #495057;
     padding: 0.75rem;
+    font-size: 1.5rem;
     border-bottom: 2px solid #e0e0e0;
   }
 
   .custom-table td {
     padding: 0.75rem;
+    font-size: 14px;
     border-bottom: 1px solid #e0e0e0;
+  }
+
+  .custom-table tr:nth-child(even) {
+    background-color: #f6f6f6;
   }
 
   .custom-table tr:last-child td {
