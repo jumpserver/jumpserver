@@ -1,407 +1,315 @@
-{% load i18n %} 
+{% load i18n %}
 {% load static %}
-{% load bootstrap3 %} 
+
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"></link>
-  <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
-
-  <script src="{% static 'js/echarts.js' %}"></script>
-  <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
-  <script src="{% static 'js/bootstrap.min.js' %}"></script>
-</head>
-
-<body>
-  <div class="report-container">
+<div class="report-container">
     <header class="header">
-      <img src="{% static 'img/JumpServer_white_logo.svg' %}" alt="Logo" />
+        <img src="{% static 'img/JumpServer_white_logo.svg' %}" alt="Logo"/>
     </header>
-  
-    <!-- Info Section -->
+
     <div class="info-section">
-      <h2 class="info">
-        <!-- 对应报表的 name -->
-        账号发现
-      </h2>
-      <div class="time">
-        <!-- 具体的生成时间 -->
-        生成于：星期五，2025年1月20日 10:00:00 中国标准时间
-      </div>
-    </div>
-  
-    <main class="main-section">
-
-      <div class="synopsis-section">
-        <div class="synopsis-item">
-          <h3>
+        <h2 class="info">
             {% trans 'The following is a summary of the account check tasks. Please review and handle them' %}
-          </h3>
+        </h2>
+    </div>
 
-          <div class="synopsis-item-content">
-            <p>
-              <span class="item-label">{% trans 'Task name' %}</span>:
-              <span>{{ execution.automation.name }}</span>
-            </p>
-            <p>
-              <span class="item-label">{% trans 'Date start' %}</span>:
-              <span>{{ execution.date_start | date:"Y/m/d H:i:s" }}</span>
-            </p>
-            <p>
-              <span class="item-label">{% trans 'Date end' %}</span>:
-              <span>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</span>
-            </p>
-            <p>
-              <span class="item-label">{% trans 'Time using' %}</span>:   
-              <span>{{ execution.duration }}s</span>
-            </p>
-            <p>
-              <span class="item-label">{% trans 'Assets count' %}</span>:
-              <span>{{ summary.total_assets }}s</span>
-            </p>
-              </div>
-            </div>  
-        <div class="synopsis-item">
-          <h3>
-            {% comment %} {% trans 'New found accounts' %}: {% endcomment %}
-            <span>summary 2</span>
-          </h3>
-
-          <div class="synopsis-item-content-charts">
-            <div id="main" style="width: 600px; height: 250px;"></div>
-          </div>
-        </div>  
-      </div>
-
-      <div class="tabel-section tabel-summery-section">
-        <div class="new-accounts result-section table-responsive">
-          <div class="section-header">
-            <h3>
-              {% trans 'New found accounts' %}:
-              <span>{{ summary.new_accounts | default:100 }}</span>
-            </h3>
-          </div>
-          {% if summary.new_accounts %}
-          <table class="custom-table table-striped table-hover data-table">
-            <thead>
-              <tr>
-                <th>{% trans 'No.' %}</th>
-                <th>{% trans 'Asset' %}</th>
-                <th>{% trans 'Username' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for account in result.new_accounts %}
-              <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ account.asset }}</td>
-                <td>{{ account.username }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <p class="no-data">{% trans 'No new accounts found' %}</p>
-          {% endif %}
+    <main class="main-section">
+        <div class="synopsis-section">
+            <div class="synopsis-item">
+                <div class="synopsis-item-content">
+                    <p>
+                        <span class="item-label">{% trans 'Task name' %}</span>:
+                        <span>{{ execution.automation.name }}</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Date start' %}</span>:
+                        <span>{{ execution.date_start | date:"Y/m/d H:i:s" }}</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Date end' %}</span>:
+                        <span>{{ execution.date_finished | date:"Y/m/d H:i:s" }}</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Time using' %}</span>:
+                        <span>{{ execution.duration }}s</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Assets count' %}</span>:
+                        <span>{{ summary.total_assets }}</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Asset success count' %}</span>:
+                        <span>{{ summary.ok_assets | default:0 }}</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Asset failed count' %}</span>:
+                        <span>{{ summary.fail_assets | default:0 }}</span>
+                    </p>
+                    <p>
+                        <span class="item-label">{% trans 'Asset not support count' %}</span>:
+                        <span>{{ summary.error_assets | default:0 }}</span>
+                    </p>
+                </div>
+            </div>
         </div>
-  
-        <div class="lost-accounts result-section table-responsive">
-          <div class="section-header">
-            <h3>
-              {% trans 'Lost accounts' %}:
-              <span>{{ summary.lost_accounts }}</span>
-            </h3>
-          </div>
-  
-          {% if summary.lost_accounts %}
-          <table class="custom-table table-hover data-table">
-            <thead>
-              <tr>
-                <th>{% trans 'No.' %}</th>
-                <th>{% trans 'Asset' %}</th>
-                <th>{% trans 'Username' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for account in result.lost_accounts %}
-              <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ account.asset }}</td>
-                <td>{{ account.username }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <p class="no-data">{% trans 'No new accounts found' %}</p>
-          {% endif %}
+
+        <div class="tabel-section tabel-summery-section">
+            <div class="new-accounts result-section table-responsive">
+                <div class="section-header">
+                    <h3>
+                        {% trans 'New found accounts' %}:
+                        <span>{{ summary.new_accounts | default:0 }}</span>
+                    </h3>
+                </div>
+                {% if summary.new_accounts %}
+                    <table class="custom-table table-striped table-hover data-table">
+                        <thead>
+                        <tr>
+                            <th>{% trans 'No.' %}</th>
+                            <th>{% trans 'Asset' %}</th>
+                            <th>{% trans 'Username' %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for account in result.new_accounts %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ account.asset }}</td>
+                                <td>{{ account.username }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">{% trans 'No new accounts found' %}</p>
+                {% endif %}
+            </div>
+
+            <div class="lost-accounts result-section table-responsive">
+                <div class="section-header">
+                    <h3>
+                        {% trans 'Lost accounts' %}:
+                        <span>{{ summary.lost_accounts | default:0 }}</span>
+                    </h3>
+                </div>
+
+                {% if summary.lost_accounts %}
+                    <table class="custom-table table-hover data-table">
+                        <thead>
+                        <tr>
+                            <th>{% trans 'No.' %}</th>
+                            <th>{% trans 'Asset' %}</th>
+                            <th>{% trans 'Username' %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for account in result.lost_accounts %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ account.asset }}</td>
+                                <td>{{ account.username }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">{% trans 'No new accounts found' %}</p>
+                {% endif %}
+            </div>
         </div>
-      </div>
     </main>
-  </div>
-
-  {% block extra_js %}
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-      var myChart = echarts.init(document.getElementById('main'));
-      
-      var option = {
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          left: 'right',
-          orient: 'vertical'
-        },
-        series: [{
-          type: 'pie',
-          radius: ['40%', '70%'],
-          avoidLabelOverlap: false,
-          padAngle: 5,
-          itemStyle: {
-            borderRadius: 10
-          },
-          label: {
-            show: false,
-            position: 'center'
-          },
-          labelLine: {
-            show: false
-          },
-          data: [
-            { value: {{ summary.ok_assets | default:0 }}, name: '{% trans "Asset success count" %}' },
-            { value: {{ summary.fail_assets | default:1 }}, name: '{% trans "Asset failed count" %}' },
-            { value: {{ summary.error_assets | default:1 }}, name: '{% trans "Asset not support count" %}' }
-          ]
-        }]
-      };
-      
-      myChart.setOption(option);
-      
-      window.addEventListener('resize', function() {
-        myChart.resize();
-      });
-    });
-  </script>
-  {% endblock %}
-</body>
-
-
+</div>
 
 <style>
-  body,
-  p, {
-    margin: 0;
-    padding: 0;
-  }
+    body,
+    p {
+        margin: 0;
+        padding: 0;
+    }
 
-  .report-container {
-    display: flex;
-    flex-direction: column;
-  }
+    .report-container {
+        display: flex;
+        flex-direction: column;
+    }
 
-  .report-container .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 4rem;
-    padding: 0.3rem 1rem;
-    background-color: #148f76;
-  }
+    .report-container .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 4rem;
+        padding: 0.3rem 1rem;
+        background-color: #148f76;
+    }
 
-  .report-container .header img {
-    height: 100%
-  }
-  
-  .info-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f5f5f5;
-    height: 4rem;
-    padding: 0 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
+    .report-container .header img {
+        height: 100%
+    }
 
-  .info-section .info {
-    margin: unset;
-    font-size: 1.6rem;
-  }
+    .info-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f5f5f5;
+        height: 4rem;
+        padding: 0 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
 
-  .info-section .time {
-    color: #888;
-    font-size: 1.3rem;
-  }
+    .info-section .info {
+        margin: unset;
+        font-size: 1.6rem;
+    }
 
-  .main-section {
-    margin-top: 3rem;
-    padding: 0 1rem;
-  }
+    .main-section {
+        margin-top: 3rem;
+        padding: 0 1rem;
+    }
 
-  .main-section .synopsis-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
+    .main-section .synopsis-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
 
-  .main-section .synopsis-section .synopsis-item {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    padding: 1rem 2rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    height: 350px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
+    .main-section .synopsis-section .synopsis-item {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 1rem 2rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        height: 350px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
 
-  .main-section .synopsis-section .synopsis-item h3 {
-    font-weight: 500;
-    font-size: 1.5rem;
-  }
+    .main-section .synopsis-section .synopsis-item h3 {
+        font-weight: 500;
+        font-size: 1.5rem;
+    }
 
-  .main-section .synopsis-section .synopsis-item .synopsis-item-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: flex-start;
-    margin-top: 1rem;
-    height: 100%;
-    cursor: pointer;
-  }
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: flex-start;
+        height: 100%;
+        cursor: pointer;
+    }
 
-  .main-section .synopsis-section .synopsis-item .synopsis-item-content p {
-    display: inline-flex;
-    width: 100%;
-    line-height: 1;
-    gap: 2rem;
-    font-size: 14px;
-  }
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content p {
+        display: inline-flex;
+        width: 100%;
+        line-height: 1;
+        gap: 2rem;
+        font-size: 14px;
+    }
 
-  .main-section .synopsis-section .synopsis-item .synopsis-item-content p .item-label {
-    width: 10rem;
-  }
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content p .item-label {
+        width: 18rem;
+    }
 
-  .main-section .synopsis-section .synopsis-item .synopsis-item-content span {
-    align-items: center;
-    justify-content: center;
-    font-weight: normal;
-  }
+    .main-section .synopsis-section .synopsis-item .synopsis-item-content span {
+        align-items: center;
+        justify-content: center;
+        font-weight: normal;
+    }
 
-  .synopsis-item-content-charts {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1rem;
-  }
+    .main-section .tabel-summery-section {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        gap: 2rem;
+        width: inherit;
+        margin-top: 2rem;
+    }
 
-  .main-section .tabel-summery-section {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    gap: 2rem;
-    width: inherit;
-    margin-top: 2rem;
-  }
+    .main-section .tabel-summery-section .result-section {
+        width: 100%;
+        padding: 1rem;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+    }
 
-  .main-section .tabel-summery-section .result-section {
-    width: 100%;
-    padding: 1rem;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-  }
+    .main-section .tabel-execution-section h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+    }
 
-  .main-section .tabel-execution-section {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: column;
-    align-items: flex-start;
-    width: inherit;
-    margin-top: 2rem;
-    padding: 1rem;
-  }
+    .section-header {
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
 
-  .main-section .tabel-execution-section h3 {
-    font-size: 1.5rem;
-    color: #2c3e50;
-  }
+    .section-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+        color: #2c3e50;
+        font-size: inherit;
+    }
 
-  .section-header {
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-  }
+    .section-header span {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 0.2rem 0.8rem;
+        border-radius: 1rem;
+        font-size: inherit;
+    }
 
-  .section-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    color: #2c3e50;
-    font-size: inherit;
-  }
+    .custom-table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+    }
 
-  .section-header span {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 0.2rem 0.8rem;
-    border-radius: 1rem;
-    font-size: inherit;
-  }
+    .custom-table th {
+        background: #f6f6f6;
+        color: #495057;
+        padding: 0.75rem;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
 
-  .custom-table {
-    margin-bottom: 0;
-    width: 100%;
-    border-collapse: collapse;
-    overflow: hidden;
-  }
+    .custom-table td {
+        padding: 0.75rem;
+        font-size: 14px;
+        border-bottom: 1px solid #e0e0e0;
+    }
 
-  .custom-table th {
-    background: #f6f6f6;
-    color: #495057;
-    padding: 0.75rem;
-    font-size: 1.5rem;
-    border-bottom: 2px solid #e0e0e0;
-  }
+    .custom-table tr:nth-child(even) {
+        background-color: #f6f6f6;
+    }
 
-  .custom-table td {
-    padding: 0.75rem;
-    font-size: 14px;
-    border-bottom: 1px solid #e0e0e0;
-  }
+    .custom-table tr:last-child td {
+        border-bottom: none;
+    }
 
-  .custom-table tr:nth-child(even) {
-    background-color: #f6f6f6;
-  }
+    .no-data {
+        text-align: center;
+        color: #6c757d;
+        padding: 2rem;
+        background: #f6f6f6;
+        border-radius: 8px;
+        margin: 1rem 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
 
-  .custom-table tr:last-child td {
-    border-bottom: none;
-  }
+    .new-accounts .section-header span {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
 
-  .no-data {
-    text-align: center;
-    color: #6c757d;
-    padding: 2rem;
-    background: #f6f6f6;
-    border-radius: 8px;
-    margin: 1rem 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  .new-accounts .section-header span {
-    background: #e8f5e9;
-    color: #2e7d32;
-  }
-
-  .lost-accounts .section-header span {
-    background: #fbe9e7;
-    color: #d84315;
-  }
+    .lost-accounts .section-header span {
+        background: #fbe9e7;
+        color: #d84315;
+    }
 </style>
