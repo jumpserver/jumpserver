@@ -5,32 +5,21 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from settings.utils import get_login_title
-from users.serializers import SmsUserSerializer
 from .base import BaseMFA
 
-otp_failed_msg = _("OTP code invalid, or server time error")
+email_failed_msg = _("Email verify code invalid")
 
 
 class MFAEmail(BaseMFA):
     name = 'email'
     display_name = _('Email')
-    placeholder = _('OTP verification code')
-
-    def __init__(self, user):
-        super().__init__(user)
-        self.email, self.user_info = '', None
-        if self.is_authenticated():
-            self.email = user.email
-            self.user_info = SmsUserSerializer(user).data
+    placeholder = _('Email verification code')
 
     def check_code(self, code):
         assert self.is_authenticated()
-        ok = False
-        msg = ''
-        try:
-            ok = self.email.verify(code)
-        except Exception as e:
-            msg = str(e)
+        sender_util = SendAndVerifyCodeUtil(self.user.email, backend=self.name)
+        ok = sender_util.verify(code)
+        msg = '' if ok else email_failed_msg
         return ok, msg
 
     def is_active(self):
@@ -44,17 +33,16 @@ class MFAEmail(BaseMFA):
 
     def send_challenge(self):
         code = random_string(6, lower=False, upper=False)
-        subject = '%s: %s' % (get_login_title(), _('Forgot password'))
+        subject = '%s: %s' % (get_login_title(), _('MFA code'))
         context = {
             'user': self.user, 'title': subject, 'code': code,
         }
-        subject = '%s: %s' % (get_login_title(), _('Forgot password'))
-        message = render_to_string('authentication/_msg_reset_password_code.html', context)
+        message = render_to_string('authentication/_msg_mfa_email_code.html', context)
         content = {'subject': subject, 'message': message}
-        self.email = SendAndVerifyCodeUtil(
-            self.email, code=code, backend=self.name, user_info=self.user_info, **content
+        sender_util = SendAndVerifyCodeUtil(
+            self.user.email, code=code, backend=self.name, timeout=60, **content
         )
-        self.email.gen_and_send_async()
+        sender_util.gen_and_send_async()
 
     @staticmethod
     def global_enabled():
