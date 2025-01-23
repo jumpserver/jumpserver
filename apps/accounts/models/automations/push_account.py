@@ -3,10 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes
 from accounts.models import Account
-from .base import AccountBaseAutomation
-from .change_secret import ChangeSecretMixin
+from .base import AccountBaseAutomation, ChangeSecretMixin
+from .change_secret import BaseSecretRecord
 
-__all__ = ['PushAccountAutomation']
+__all__ = ['PushAccountAutomation', 'PushSecretRecord']
 
 
 class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
@@ -36,3 +36,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
     class Meta:
         verbose_name = _("Push asset account")
+
+
+class PushSecretRecord(BaseSecretRecord):
+    class Meta:
+        verbose_name = _("Push secret record")

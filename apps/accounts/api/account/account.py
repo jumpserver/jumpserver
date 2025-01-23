@@ -187,7 +187,7 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
 
     @property
     def latest_change_secret_record(self) -> ChangeSecretRecord:
-        return self.account.change_secret_records.filter(
+        return self.account.changesecretrecords.filter(
             status=ChangeSecretRecordStatusChoice.pending
         ).order_by('-date_created').first()
 
