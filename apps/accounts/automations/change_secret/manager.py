@@ -2,7 +2,6 @@ import os
 import time
 
 from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from xlsxwriter import Workbook
 
@@ -12,7 +11,6 @@ from accounts.const import (
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretReportMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
-from common.db.utils import safe_db_connection
 from common.decorators import bulk_create_decorator
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
@@ -25,11 +23,6 @@ logger = get_logger(__name__)
 
 class ChangeSecretManager(BaseChangeSecretPushManager):
     ansible_account_prefer = ''
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.record_map = self.execution.snapshot.get('record_map', {})  # 这个是某个失败的记录重试
-        self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
@@ -73,54 +66,6 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
             comment=f'{account.username}@{asset.address}'
         )
         return recorder
-
-    def on_host_success(self, host, result):
-        recorder = self.name_recorder_mapper.get(host)
-        if not recorder:
-            return
-        recorder.status = ChangeSecretRecordStatusChoice.success.value
-        recorder.date_finished = timezone.now()
-
-        account = recorder.account
-        if not account:
-            print("Account not found, deleted ?")
-            return
-
-        account.secret = recorder.new_secret
-        account.date_updated = timezone.now()
-
-        with safe_db_connection():
-            recorder.save(update_fields=['status', 'date_finished'])
-            account.save(update_fields=['secret', 'date_updated'])
-
-        self.summary['ok_accounts'] += 1
-        self.result['ok_accounts'].append(
-            {
-                "asset": str(account.asset),
-                "username": account.username,
-            }
-        )
-        super().on_host_success(host, result)
-
-    def on_host_error(self, host, error, result):
-        recorder = self.name_recorder_mapper.get(host)
-        if not recorder:
-            return
-        recorder.status = ChangeSecretRecordStatusChoice.failed.value
-        recorder.date_finished = timezone.now()
-        recorder.error = error
-        try:
-            recorder.save()
-        except Exception as e:
-            print(f"\033[31m Save {host} recorder error: {e} \033[0m\n")
-        self.summary['fail_accounts'] += 1
-        self.result['fail_accounts'].append(
-            {
-                "asset": str(recorder.asset),
-                "username": recorder.account.username,
-            }
-        )
-        super().on_host_success(host, result)
 
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \

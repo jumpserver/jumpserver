@@ -1,13 +1,15 @@
 from copy import deepcopy
 
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.automations.methods import platform_automation_methods
-from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType
+from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice
 from accounts.models import BaseAccountQuerySet
 from assets.automations.base.manager import BasePlaybookManager
 from assets.const import HostTypes
+from common.db.utils import safe_db_connection
 from common.utils import get_logger
 
 logger = get_logger(__name__)
@@ -32,6 +34,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             'ssh_key_change_strategy', SSHKeyStrategy.set_jms
         )
         self.account_ids = self.execution.snapshot['accounts']
+        self.record_map = self.execution.snapshot.get('record_map', {})  # 这个是某个失败的记录重试
+        self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     def gen_account_inventory(self, account, asset, h, path_dir):
         raise NotImplementedError
@@ -119,3 +123,51 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             inventory_hosts.append(h)
 
         return inventory_hosts
+
+    def on_host_success(self, host, result):
+        recorder = self.name_recorder_mapper.get(host)
+        if not recorder:
+            return
+        recorder.status = ChangeSecretRecordStatusChoice.success.value
+        recorder.date_finished = timezone.now()
+
+        account = recorder.account
+        if not account:
+            print("Account not found, deleted ?")
+            return
+
+        account.secret = getattr(recorder, 'new_secret', account.secret)
+        account.date_updated = timezone.now()
+
+        with safe_db_connection():
+            recorder.save(update_fields=['status', 'date_finished'])
+            account.save(update_fields=['secret', 'date_updated'])
+
+        self.summary['ok_accounts'] += 1
+        self.result['ok_accounts'].append(
+            {
+                "asset": str(account.asset),
+                "username": account.username,
+            }
+        )
+        super().on_host_success(host, result)
+
+    def on_host_error(self, host, error, result):
+        recorder = self.name_recorder_mapper.get(host)
+        if not recorder:
+            return
+        recorder.status = ChangeSecretRecordStatusChoice.failed.value
+        recorder.date_finished = timezone.now()
+        recorder.error = error
+        try:
+            recorder.save()
+        except Exception as e:
+            print(f"\033[31m Save {host} recorder error: {e} \033[0m\n")
+        self.summary['fail_accounts'] += 1
+        self.result['fail_accounts'].append(
+            {
+                "asset": str(recorder.asset),
+                "username": recorder.account.username,
+            }
+        )
+        super().on_host_error(host, error, result)
