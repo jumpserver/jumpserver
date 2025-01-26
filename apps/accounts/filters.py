@@ -7,7 +7,7 @@ from django_filters import rest_framework as drf_filters
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
-from .models import Account, GatheredAccount, ChangeSecretRecord
+from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -134,7 +134,7 @@ class GatheredAccountFilterSet(BaseFilterSet):
         fields = ["id", "username"]
 
 
-class ChangeSecretRecordFilterSet(BaseFilterSet):
+class SecretRecordMixin:
     asset_name = drf_filters.CharFilter(
         field_name="asset__name", lookup_expr="icontains"
     )
@@ -155,6 +155,14 @@ class ChangeSecretRecordFilterSet(BaseFilterSet):
             dt = local_now() - timezone.timedelta(days=value)
         return queryset.filter(date_finished__gte=dt)
 
+
+class ChangeSecretRecordFilterSet(SecretRecordMixin, BaseFilterSet):
     class Meta:
         model = ChangeSecretRecord
+        fields = ["id", "status", "asset_id", "execution"]
+
+
+class PushAccountRecordFilterSet(SecretRecordMixin, BaseFilterSet):
+    class Meta:
+        model = PushSecretRecord
         fields = ["id", "status", "asset_id", "execution"]
