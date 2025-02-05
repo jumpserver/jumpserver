@@ -166,17 +166,6 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
 
         return escape(value)
 
-    @classmethod
-    def get_risks(cls, queryset=None, risk_type=None):
-        query = {
-            'risks__risk': risk_type
-        }
-
-        if queryset is None:
-            queryset = cls.objects.all()
-
-        return queryset.filter(**query)
-
 
 def replace_history_model_with_mixin():
     """
