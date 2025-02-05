@@ -90,7 +90,7 @@ class PamDashboardApi(APIView):
             if agg_key in account_stats:
                 data[param_key] = account_stats[agg_key]
 
-        if (_all or query_params.get('total_ordinary_accounts')):
+        if _all or query_params.get('total_ordinary_accounts'):
             if 'total_count' in account_stats and 'privileged_count' in account_stats:
                 data['total_ordinary_accounts'] = \
                     account_stats['total_count'] - account_stats['privileged_count']
