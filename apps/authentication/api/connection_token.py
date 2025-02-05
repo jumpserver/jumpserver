@@ -123,13 +123,15 @@ class RDPFileClientProtocolURLMixin:
         # rdp_options['domain:s'] = token.account_ad_domain
 
         # 设置宽高
-        height = self.request.query_params.get('height')
-        width = self.request.query_params.get('width')
-        if width and height:
-            rdp_options['desktopwidth:i'] = width
-            rdp_options['desktopheight:i'] = height
-            rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
-            rdp_options['dynamic resolution:i'] = '0'
+
+        resolution_value = token.connect_options.get('resolution', 'auto')
+        if resolution_value != 'auto':
+            width, height = resolution_value.split('x')
+            if width and height:
+                rdp_options['desktopwidth:i'] = width
+                rdp_options['desktopheight:i'] = height
+                rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
+                rdp_options['dynamic resolution:i'] = '0'
 
         color_quality = self.request.query_params.get('rdp_color_quality')
         color_quality = color_quality if color_quality else os.getenv('JUMPSERVER_COLOR_DEPTH', RDPColorQuality.HIGH)

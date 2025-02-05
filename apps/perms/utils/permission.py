@@ -23,14 +23,14 @@ class AssetPermissionUtil(object):
         # group
         if with_group:
             groups = user.groups.all()
-            group_perm_ids = self.get_permissions_for_user_groups(groups, flat=True)
+            group_perm_ids = self.get_permissions_for_user_groups(groups, flat=True, with_expired=with_expired)
             perm_ids.update(group_perm_ids)
         perms = self.get_permissions(ids=perm_ids, with_expired=with_expired)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
 
-    def get_permissions_for_user_groups(self, user_groups, flat=False):
+    def get_permissions_for_user_groups(self, user_groups, flat=False, with_expired=False):
         """ 获取用户组的授权规则 """
         if isinstance(user_groups, list):
             group_ids = [g.id for g in user_groups]
@@ -39,7 +39,7 @@ class AssetPermissionUtil(object):
         perm_ids = AssetPermission.user_groups.through.objects \
             .filter(usergroup_id__in=group_ids) \
             .values_list('assetpermission_id', flat=True).distinct()
-        perms = self.get_permissions(ids=perm_ids)
+        perms = self.get_permissions(ids=perm_ids, with_expired=with_expired)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
