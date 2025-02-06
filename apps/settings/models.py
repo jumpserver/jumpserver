@@ -9,7 +9,8 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
-from common.utils import signer, get_logger
+from common.utils import get_logger
+from common.db.utils import Encryptor
 
 logger = get_logger(__name__)
 
@@ -51,7 +52,7 @@ class Setting(models.Model):
         try:
             value = self.value
             if self.encrypted:
-                value = signer.unsign(value)
+                value = Encryptor(value).decrypt()
             if not value:
                 return None
             value = json.loads(value)
@@ -64,7 +65,7 @@ class Setting(models.Model):
         try:
             v = json.dumps(item)
             if self.encrypted:
-                v = signer.sign(v)
+                v = Encryptor(v).encrypt()
             self.value = v
         except json.JSONDecodeError as e:
             raise ValueError("Json dump error: {}".format(str(e)))
