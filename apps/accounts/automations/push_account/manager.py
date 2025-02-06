@@ -1,9 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes
+from common.decorators import bulk_create_decorator
 from common.utils import get_logger
 from common.utils.timezone import local_now_filename
 from ..base.manager import BaseChangeSecretPushManager
+from ...models import PushSecretRecord
 
 logger = get_logger(__name__)
 
@@ -17,11 +19,32 @@ class PushAccountManager(BaseChangeSecretPushManager):
         return account.secret
 
     def gen_account_inventory(self, account, asset, h, path_dir):
+        self.get_or_create_record(asset, account, h['name'])
         secret = self.get_secret(account)
         secret_type = account.secret_type
         new_secret, private_key_path = self.handle_ssh_secret(secret_type, secret, path_dir)
         h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
         return h
+
+    def get_or_create_record(self, asset, account, name):
+        asset_account_id = f'{asset.id}-{account.id}'
+
+        if asset_account_id in self.record_map:
+            record_id = self.record_map[asset_account_id]
+            recorder = PushSecretRecord.objects.filter(id=record_id).first()
+        else:
+            recorder = self.create_record(asset, account)
+
+        self.name_recorder_mapper[name] = recorder
+        return recorder
+    
+    @bulk_create_decorator(PushSecretRecord)
+    def create_record(self, asset, account):
+        recorder = PushSecretRecord(
+            asset=asset, account=account, execution=self.execution,
+            comment=f'{account.username}@{asset.address}'
+        )
+        return recorder
 
     def print_summary(self):
         print('\n\n' + '-' * 80)

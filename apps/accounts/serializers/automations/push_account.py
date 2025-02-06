@@ -2,7 +2,7 @@ from accounts.const import AutomationTypes
 from accounts.models import PushAccountAutomation
 from .change_secret import (
     ChangeSecretAutomationSerializer, ChangeSecretUpdateAssetSerializer,
-    ChangeSecretUpdateNodeSerializer
+    ChangeSecretUpdateNodeSerializer, ChangeSecretRecordSerializer
 )
 
 
@@ -17,6 +17,10 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
     @property
     def model_type(self):
         return AutomationTypes.push_account
+
+
+class PushSecretRecordSerializer(ChangeSecretRecordSerializer):
+    pass
 
 
 class PushAccountUpdateAssetSerializer(ChangeSecretUpdateAssetSerializer):

@@ -9,7 +9,7 @@ from common.db import fields
 from common.db.models import JMSBaseModel
 from .base import AccountBaseAutomation, ChangeSecretMixin
 
-__all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', ]
+__all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'BaseSecretRecord']
 
 
 class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
@@ -30,36 +30,42 @@ class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
         return attr_json
 
 
-class ChangeSecretRecord(JMSBaseModel):
+class BaseSecretRecord(JMSBaseModel):
     account = models.ForeignKey(
         'accounts.Account', on_delete=models.SET_NULL,
-        null=True, related_name='change_secret_records'
+        null=True, related_name='%(class)ss'
     )
     asset = models.ForeignKey(
         'assets.Asset', on_delete=models.SET_NULL,
-        null=True, related_name='asset_change_secret_records'
+        null=True, related_name='asset_%(class)ss'
     )
     execution = models.ForeignKey(
         'accounts.AutomationExecution', on_delete=models.SET_NULL,
-        null=True, related_name='execution_change_secret_records',
+        null=True, related_name='execution_%(class)ss',
     )
-    old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
-    new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'), db_index=True)
-    ignore_fail = models.BooleanField(default=False, verbose_name=_('Ignore fail'))
     status = models.CharField(
         max_length=16, verbose_name=_('Status'), default=ChangeSecretRecordStatusChoice.pending.value
     )
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
     class Meta:
-        verbose_name = _("Change secret record")
+        abstract = True
 
     def __str__(self):
         return f'{self.account.username}@{self.asset}'
 
-    @staticmethod
-    def get_valid_records():
-        return ChangeSecretRecord.objects.exclude(
+    @classmethod
+    def get_valid_records(cls):
+        return cls.objects.exclude(
             Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
         )
+
+
+class ChangeSecretRecord(BaseSecretRecord):
+    old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
+    new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
+    ignore_fail = models.BooleanField(default=False, verbose_name=_('Ignore fail'))
+
+    class Meta:
+        verbose_name = _("Change secret record")
