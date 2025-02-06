@@ -26,7 +26,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
-        'get_account_secret': 'view_integrationapplication',
+        'get_account_secret': 'accounts.view_integrationapplication'
     }
 
     @action(
@@ -43,7 +43,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         if os.path.exists(readme_path):
             with open(readme_path, 'r') as f:
                 readme = f.read()
-        return Response(data={'readme': readme })
+        return Response(data={'readme': readme})
 
     @action(
         ['GET'], detail=True, url_path='secret',
@@ -54,7 +54,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         secret = instance.get_secret()
         return Response(data={'id': instance.id, 'secret': secret})
 
-    @action(['GET'], detail=False, url_path='account-secret')
+    @action(['GET'], detail=False, url_path='account-secret',
+            permission_classes=[RBACPermission])
     def get_account_secret(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.query_params)
         if not serializer.is_valid():
@@ -71,4 +72,3 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
             account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
         )
         return Response(data={'id': request.user.id, 'secret': account.secret})
-

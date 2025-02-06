@@ -7,7 +7,7 @@ from django_filters import rest_framework as drf_filters
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
-from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord
+from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord, IntegrationApplication
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -38,6 +38,7 @@ class AccountFilterSet(BaseFilterSet):
     risk = drf_filters.CharFilter(
         method="filter_risk",
     )
+    integrationapplication = drf_filters.CharFilter(method="filter_integrationapplication")
     long_time_no_change_secret = drf_filters.BooleanFilter(method="filter_long_time")
     long_time_no_verified = drf_filters.BooleanFilter(method="filter_long_time")
 
@@ -71,6 +72,17 @@ class AccountFilterSet(BaseFilterSet):
             return queryset
 
         queryset = queryset.filter(risks__risk=value)
+        return queryset
+
+    @staticmethod
+    def filter_integrationapplication(queryset, name, value):
+        if not value:
+            return queryset
+
+        integrationapplication = IntegrationApplication.objects.filter(pk=value).first()
+        if not integrationapplication:
+            return IntegrationApplication.objects.none()
+        queryset = integrationapplication.get_accounts()
         return queryset
 
     @staticmethod
