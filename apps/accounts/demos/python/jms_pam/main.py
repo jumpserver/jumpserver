@@ -1,11 +1,10 @@
-import requests
 import uuid
-
 from datetime import datetime
 from urllib.parse import urlencode
+
+import requests
 from httpsig.requests_auth import HTTPSignatureAuth
 from requests.exceptions import RequestException
-
 
 DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000002'
 
@@ -36,6 +35,7 @@ class SecretRequest(object):
     Raises:
         ValueError: If the parameters do not meet the requirements, a detailed error message will be raised.
     """
+
     def __init__(self, asset='', asset_id='', account='', account_id=''):
         self.account_id = account_id
         self.asset_id = asset_id
@@ -143,3 +143,6 @@ class JumpServerPAM(object):
         except RequestException as e:
             return Secret.from_exception(e)
         return Secret.from_response(response)
+
+    def get_accounts(self):
+        pass

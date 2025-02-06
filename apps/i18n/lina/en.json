@@ -1014,6 +1014,8 @@
     "RoleInfo": "Role information",
     "RoleList": "Roles",
     "RoleUpdate": "Update the role",
+    "UpgradeEnterpriseEditionHelpText": "Upgrade to enterprise edition to enjoy this feature",
+    "UpgradeEnterpriseEdition": "Upgrade to Enterprise Edition",
     "RoleUsers": "Authorized users",
     "Rows": "Row",
     "Rule": "Condition",

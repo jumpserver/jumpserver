@@ -1,3 +1,2 @@
 [MESSAGES CONTROL]
-disable=C0115
-disable=C0116
+disable=missing-module-docstring,missing-class-docstring,missing-function-docstring,too-many-ancestors

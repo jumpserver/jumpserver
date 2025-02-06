@@ -992,6 +992,8 @@
     "ResetSSHKey": "重置SSH密钥",
     "ResetSSHKeySuccessMsg": "发送邮件任务已提交, 用户稍后会收到重置密钥邮件",
     "ResetSSHKeyWarningMsg": "你确定要发送重置用户的SSH Key的邮件吗?",
+    "UpgradeEnterpriseEditionHelpText": "升级到企业版，解锁当前功能",
+    "UpgradeEnterpriseEdition": "升级企业版",
     "Resource": "资源",
     "ResourceType": "资源类型",
     "ResolveSelected": "解决所选",

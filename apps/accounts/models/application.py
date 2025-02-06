@@ -27,11 +27,14 @@ class IntegrationApplication(JMSOrgBaseModel):
         unique_together = [('name', 'org_id')]
         verbose_name = _('Integration App')
 
-    @property
-    def accounts_amount(self):
+    def get_accounts(self):
         qs = Account.objects.all()
         query = RelatedManager.get_to_filter_qs(self.accounts.value, Account)
-        return qs.filter(*query).count()
+        return qs.filter(*query)
+
+    @property
+    def accounts_amount(self):
+        return self.get_accounts().count()
 
     @property
     def is_valid(self):
