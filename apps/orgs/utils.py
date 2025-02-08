@@ -97,20 +97,24 @@ def get_current_org_id_for_serializer():
 @contextmanager
 def tmp_to_root_org():
     ori_org = get_current_org()
-    set_to_root_org()
-    yield
-    if ori_org is not None:
-        set_current_org(ori_org)
+    try:
+        set_to_root_org()
+        yield
+    finally:
+        if ori_org is not None:
+            set_current_org(ori_org)
 
 
 @contextmanager
 def tmp_to_org(org):
     ori_org = get_current_org()
-    if org:
-        set_current_org(org)
-    yield
-    if ori_org is not None:
-        set_current_org(ori_org)
+    try:
+        if org:
+            set_current_org(org)
+        yield
+    finally:
+        if ori_org is not None:
+            set_current_org(ori_org)
 
 
 @contextmanager
@@ -121,11 +125,13 @@ def tmp_to_builtin_org(system=0, default=0):
         org_id = Organization.DEFAULT_ID
     else:
         raise ValueError("Must set system or default")
-    ori_org = get_current_org()
-    set_current_org(org_id)
-    yield
-    if ori_org is not None:
-        set_current_org(ori_org)
+    try:
+        ori_org = get_current_org()
+        set_current_org(org_id)
+        yield
+    finally:
+        if ori_org is not None:
+            set_current_org(ori_org)
 
 
 def filter_org_queryset(queryset):
