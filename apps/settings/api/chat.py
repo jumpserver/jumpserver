@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser, OnlySuperUser
 from .. import serializers
+from ..const import ChatAITypeChoices
 from ..models import ChatPrompt
 from ..prompt import DefaultChatPrompt
 
@@ -41,7 +42,11 @@ class ChatAITestingAPI(GenericAPIView):
             )
 
         proxy = config['GPT_PROXY']
-        model = config['GPT_MODEL']
+        tp = config['CHAT_AI_TYPE']
+        if tp == ChatAITypeChoices.gpt:
+            model = config['GPT_MODEL']
+        else:
+            model = config['DEEPSEEK_MODEL']
 
         kwargs = {
             'base_url': config['GPT_BASE_URL'] or None,

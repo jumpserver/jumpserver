@@ -10,8 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.db.models import JMSBaseModel
-from common.utils import get_logger
 from common.db.utils import Encryptor
+from common.utils import get_logger
+from .const import ChatAITypeChoices
 from .signals import setting_changed
 
 logger = get_logger(__name__)
@@ -191,3 +192,9 @@ class ChatPrompt(JMSBaseModel):
 
     def __str__(self):
         return self.name
+
+
+def get_chatai_model():
+    if settings.CHAT_AI_TYPE == ChatAITypeChoices.gpt:
+        return settings.GPT_MODEL
+    return settings.DEEPSEEK_MODEL

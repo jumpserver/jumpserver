@@ -681,10 +681,12 @@ class Config(dict):
 
         # Chat AI
         'CHAT_AI_ENABLED': False,
+        'CHAT_AI_TYPE': 'gpt',
         'GPT_API_KEY': '',
         'GPT_BASE_URL': '',
         'GPT_PROXY': '',
-        'GPT_MODEL': 'gpt-3.5-turbo',
+        'GPT_MODEL': 'gpt-4o-mini',
+        'DEEPSEEK_MODEL': 'deepseek-chat',
         'VIRTUAL_APP_ENABLED': False,
 
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
