@@ -10,7 +10,6 @@ from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
 from users.notifications import (
     ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
-    ResetPublicKeySuccessMsg,
 )
 from .mixins import UserQuerysetMixin
 from .. import serializers
