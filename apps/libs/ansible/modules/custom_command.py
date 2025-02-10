@@ -97,7 +97,7 @@ def main():
             msg='No command found, please go to the platform details to add'
         )
     with SSHClient(module) as client:
-        output, err_msg = client.execute(commands, answers)
+        __, err_msg = client.execute(commands, answers)
         if err_msg:
             module.fail_json(
                 msg='There was a problem executing the command: %s' % err_msg
