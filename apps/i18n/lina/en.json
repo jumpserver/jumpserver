@@ -653,6 +653,7 @@
     "IsSuccess": "Success",
     "IsSyncAccountHelpText": "Upon collection completion, the collected account will be synced to asset",
     "IsSyncAccountLabel": "Sync to assets",
+    "Effective": "Effective",
     "JDCloud": "JD cloud",
     "Job": "Job",
     "JobCenter": "Job center",
