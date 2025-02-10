@@ -1,96 +1,45 @@
-# JumpServer PAM 客户端
-
-该包提供了一个 Python 客户端，用于与 JumpServer PAM API 交互，以检索各种资产的密码。它简化了发送请求和处理响应的过程。
-
-## 特性
-
-- 在发送请求之前验证参数。
-- 支持基于资产和账户的密码检索。
-- 通过 HTTP 签名轻松集成 JumpServer PAM API。
-
-## 安装
-
-您可以通过 pip 安装该包：
-
-```bash
-pip install jms_pam-0.0.1-py3-none-any.whl
-```
-
-## 需求
-
-- `Python 3.6+`
-- `requests`
-- `httpsig`
-
-## 使用方法
-
-### 初始化
-
-要使用 JumpServer PAM 客户端，通过提供所需的 `endpoint`、`key_id` 和 `key_secret` 创建一个实例。
-
 ```python
-from jms_pam import JumpServerPAM, SecretRequest
+import requests
+import os
+from datetime import datetime
+from httpsig.requests_auth import HTTPSignatureAuth
 
-client = JumpServerPAM(
-    endpoint='http://127.0.0.1',
-    key_id='your-key-id',
-    key_secret='your-key-secret'
-)
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8080")
+KEY_ID = os.getenv("API_KEY_ID", "72b0b0aa-ad82-4182-a631-ae4865e8ae0e")
+KEY_SECRET = os.getenv("API_KEY_SECRET", "6fuSO7P1m4cj8SSlgaYdblOjNAmnxDVD7tr8")
+ORG_ID = os.getenv("ORG_ID", "00000000-0000-0000-0000-000000000002")
+
+
+class APIClient:
+    def __init__(self):
+        self.session = requests.Session()
+        self.auth = HTTPSignatureAuth(
+            key_id=KEY_ID, secret=KEY_SECRET,
+            algorithm='hmac-sha256', headers=['(request-target)', 'accept', 'date', 'x-jms-org']
+        )
+
+    def get_account_secret(self, asset, account):
+        url = f"{API_URL}/api/v1/accounts/integration-applications/account-secret/"
+        headers = {
+            'Accept': 'application/json',
+            'X-JMS-ORG': ORG_ID,
+            'Date': datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT'),
+            'X-Source': 'jms-pam'
+        }
+        params = {"asset": asset, "account": account}
+
+        try:
+            response = self.session.get(url, auth=self.auth, headers=headers, params=params, timeout=10)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            print(f"API 请求失败: {e}")
+            return None
+
+
+# 示例调用
+if __name__ == "__main__":
+    client = APIClient()
+    result = client.get_account_secret(asset="ubuntu_docker", account="root")
+    print(result)
 ```
-
-### 创建密码请求
-
-您可以通过指定资产或账户信息来创建一个密码请求。
-
-```python
-request = SecretRequest(asset='Linux', account='root')
-```
-
-### 发送请求
-
-使用客户端的 `send` 方法发送请求。
-
-```python
-secret_obj = client.send(request)
-```
-
-### 处理响应
-
-检查密码是否成功检索，并相应地处理响应。
-
-```python
-if secret_obj.valid:
-    print('密码: %s' % secret_obj.secret)
-else:
-    print('获取密码失败: %s' % secret_obj.desc)
-```
-
-### 完整示例
-
-以下是如何使用该客户端的完整示例：
-
-```python
-from jms_pam import JumpServerPAM, SecretRequest
-
-client = JumpServerPAM(
-    endpoint='http://127.0.0.1',
-    key_id='your-key-id',
-    key_secret='your-key-secret'
-)
-
-request = SecretRequest(asset='Linux', account='root')
-secret_obj = client.send(request)
-
-if secret_obj.valid:
-    print('密码: %s' % secret_obj.secret)
-else:
-    print('获取密码失败: %s' % secret_obj.desc)
-```
-
-## 错误处理
-
-如果提供的参数不符合验证要求，库会引发 `RequestParamsError`。这包括对有效 UUID 的检查和参数之间的相互依赖性检查。
-
-## 贡献
-
-欢迎贡献！请打开一个问题或提交拉取请求，以进行任何增强或修复错误。

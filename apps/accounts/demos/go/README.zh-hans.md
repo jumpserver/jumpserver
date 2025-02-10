@@ -1,133 +1,121 @@
-# JumpServer PAM 客户端
-
-该包提供了一个 Go 客户端，用于与 JumpServer PAM API 交互，以检索各种资产的密码。它简化了发送请求和处理响应的过程。
-
-## 功能
-
-- 在发送请求之前验证参数。
-- 支持基于资产和账户的密码检索。
-- 使用 HMAC-SHA256 签名进行身份验证，方便与 JumpServer PAM API 集成。
-
-## 使用说明
-
-1. **下载 Go 代码文件**：
-   将代码文件下载到您的项目目录中。
-
-2. **导入包**：
-   在您的 Go 文件中导入该包，您即可直接使用其功能。
-
-## 需求
-
-- `Go 1.16+`
-- `github.com/google/uuid`
-- `gopkg.in/twindagger/httpsig.v1`
-
-## 使用方法
-
-### 初始化
-
-要使用 JumpServer PAM 客户端，通过提供所需的 `endpoint`、`keyID` 和 `keySecret` 创建一个实例。
-
 ```go
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
-	
-	"your_module_path/jms_pam"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
+	"time"
 )
 
-func main() {
-	client := jms_pam.NewJumpServerPAM(
-		"http://127.0.0.1", // 替换为您的 JumpServer 端点
-		"your-key-id",      // 替换为您的实际 Key ID
-		"your-key-secret",  // 替换为您的实际 Key Secret
-		"",                 // 留空以使用默认的组织 ID
-	)
+type APIClient struct {
+	Client    *http.Client
+	APIURL    string
+	KeyID     string
+	KeySecret string
+	OrgID     string
 }
-```
 
-### 创建密码请求
-
-您可以通过指定资产或账户信息来创建请求。
-
-```go
-request, err := jms_pam.NewSecretRequest("Linux", "", "root", "")
-if err != nil {
-    fmt.Println("创建请求时出错:", err)
-    return
+func NewAPIClient() *APIClient {
+	return &APIClient{
+		Client:    &http.Client{},
+		APIURL:    getEnv("API_URL", "http://127.0.0.1:8080"),
+		KeyID:     getEnv("API_KEY_ID", "72b0b0aa-ad82-4182-a631-ae4865e8ae0e"),
+		KeySecret: getEnv("API_KEY_SECRET", "6fuSO7P1m4cj8SSlgaYdblOjNAmnxDVD7tr8"),
+		OrgID:     getEnv("ORG_ID", "00000000-0000-0000-0000-000000000002"),
+	}
 }
-```
 
-### 发送请求
-
-使用客户端的 `Send` 方法发送请求。
-
-```go
-secretObj, err := client.Send(request)
-if err != nil {
-    fmt.Println("发送请求时出错:", err)
-    return
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }
-```
 
-### 处理响应
-
-检查密码是否成功检索，并相应地处理响应。
-
-```go
-if secretObj.Valid {
-    fmt.Println("密码:", secretObj.Secret)
-} else {
-    fmt.Println("获取密码失败:", string(secretObj.Desc))
-}
-```
-
-### 完整示例
-
-以下是如何使用该客户端的完整示例：
-
-```go
-package main
-
-import (
-	"fmt"
-	
-	"your_module_path/jms_pam"
-)
-
-func main() {
-	client := jms_pam.NewJumpServerPAM(
-		"http://127.0.0.1",
-		"your-key-id",
-		"your-key-secret",
-		"",
-	)
-
-	request, err := jms_pam.NewSecretRequest("Linux", "", "root", "")
+func (c *APIClient) GetAccountSecret(asset, account string) (map[string]interface{}, error) {
+	u, err := url.Parse(c.APIURL)
 	if err != nil {
-		fmt.Println("创建请求时出错:", err)
-		return
+		return nil, fmt.Errorf("failed to parse API URL: %v", err)
 	}
+	u.Path = "/api/v1/accounts/integration-applications/account-secret/"
 
-	secretObj, err := client.Send(request)
+	q := u.Query()
+	q.Add("asset", asset)
+	q.Add("account", account)
+	u.RawQuery = q.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		fmt.Println("发送请求时出错:", err)
-		return
+		return nil, fmt.Errorf("failed to create request: %v", err)
 	}
 
-	if secretObj.Valid {
-		fmt.Println("密码:", secretObj.Secret)
-	} else {
-		fmt.Println("获取密码失败:", string(secretObj.Desc))
+	date := time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("X-JMS-ORG", c.OrgID)
+	req.Header.Set("Date", date)
+	req.Header.Set("X-Source", "jms-pam")
+
+	headersList := []string{"(request-target)", "accept", "date", "x-jms-org"}
+	var signatureParts []string
+
+	for _, h := range headersList {
+		var value string
+		if h == "(request-target)" {
+			value = strings.ToLower(req.Method) + " " + req.URL.RequestURI()
+		} else {
+			canonicalKey := http.CanonicalHeaderKey(h)
+			value = req.Header.Get(canonicalKey)
+		}
+		signatureParts = append(signatureParts, fmt.Sprintf("%s: %s", h, value))
 	}
+
+	signatureString := strings.Join(signatureParts, "\n")
+	mac := hmac.New(sha256.New, []byte(c.KeySecret))
+	mac.Write([]byte(signatureString))
+	signatureB64 := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+
+	headersJoined := strings.Join(headersList, " ")
+	authHeader := fmt.Sprintf(
+		`Signature keyId="%s",algorithm="hmac-sha256",headers="%s",signature="%s"`,
+		c.KeyID,
+		headersJoined,
+		signatureB64,
+	)
+	req.Header.Set("Authorization", authHeader)
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned non-200 status: %d", resp.StatusCode)
+	}
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %v", err)
+	}
+
+	return result, nil
+}
+
+func main() {
+	client := NewAPIClient()
+	result, err := client.GetAccountSecret("ubuntu_docker", "root")
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+	fmt.Printf("Result: %+v\n", result)
 }
 ```
-
-## 错误处理
-
-该库会在创建 `SecretRequest` 时返回无效参数的错误。这包括对有效 UUID 的检查以及确保提供了必需的参数。
-
-## 贡献
-
-欢迎贡献！如有任何增强或错误修复，请提出问题或提交拉取请求。
