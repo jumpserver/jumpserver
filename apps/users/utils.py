@@ -172,6 +172,12 @@ class BlockUtilBase:
     def is_block(self):
         return bool(cache.get(self.block_key))
 
+    @classmethod
+    def get_blocked_usernames(cls):
+        key = cls.BLOCK_KEY_TMPL.format('*')
+        keys = cache.keys(key)
+        return [k.split('_')[-1] for k in keys]
+
 
 class BlockGlobalIpUtilBase:
     LIMIT_KEY_TMPL: str
