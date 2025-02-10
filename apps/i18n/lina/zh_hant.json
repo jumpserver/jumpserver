@@ -851,6 +851,7 @@
     "IsSuccess": "是否成功",
     "IsSyncAccountHelpText": "收集完成後會把收集的帳號同步到資產",
     "IsSyncAccountLabel": "同步到資產",
+    "Effective": "生效",
     "JDCloud": "京東雲",
     "JMSSSO": "SSO Token 登入",
     "Job": "作業",
