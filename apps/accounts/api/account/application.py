@@ -1,8 +1,6 @@
 import os
-
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 from django.conf import settings
-from django.utils import translation
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -34,16 +32,25 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         permission_classes=[IsValidUser]
     )
     def get_sdks_info(self, request, *args, **kwargs):
-        readme = ''
-        sdk_language = self.request.query_params.get('language', 'python')
-        filename = f'readme.{translation.get_language()}.md'
-        readme_path = os.path.join(
-            settings.APPS_DIR, 'accounts', 'demos', sdk_language, filename
-        )
-        if os.path.exists(readme_path):
-            with open(readme_path, 'r') as f:
-                readme = f.read()
-        return Response(data={'readme': readme})
+        code_suffix_mapper = {
+            'python': 'py',
+            'java': 'java',
+            'go': 'go',
+            'javascript': 'js',
+            'php': 'php',
+        }
+        sdk_language = request.query_params.get('language','python')
+        sdk_path = os.path.join(settings.APPS_DIR, 'accounts', 'demos', sdk_language)
+        readme_path = os.path.join(sdk_path, f'readme.{get_language()}.md')
+        demo_path = os.path.join(sdk_path, f'demo.{code_suffix_mapper[sdk_language]}')
+
+        def read_file(path):
+            if os.path.exists(path):
+                with open(path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            return ''
+
+        return Response(data={'readme': read_file(readme_path), 'code': read_file(demo_path)})
 
     @action(
         ['GET'], detail=True, url_path='secret',

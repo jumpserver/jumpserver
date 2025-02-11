@@ -347,6 +347,7 @@
     "ConvenientOperate": "便捷操作",
     "Copy": "复制",
     "CopySuccess": "复制成功",
+    "CopyFailed": "复制失败",
     "Corporation": "公司",
     "Create": "创建",
     "CreateAccessKey": "创建访问密钥",
