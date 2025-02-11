@@ -37,7 +37,7 @@ class PamDashboardApi(APIView):
     @staticmethod
     def get_account_risk_data(_all, query_params):
         agg_map = {
-            'total_privileged_accounts': ('long_time_no_login_count', Q(risk='long_time_no_login')),
+            'total_long_time_no_login_accounts': ('long_time_no_login_count', Q(risk='long_time_no_login')),
             'total_new_found_accounts': ('new_found_count', Q(risk='new_found')),
             'total_group_changed_accounts': ('group_changed_count', Q(risk='group_changed')),
             'total_sudo_changed_accounts': ('sudo_changed_count', Q(risk='sudo_changed')),
@@ -74,7 +74,7 @@ class PamDashboardApi(APIView):
             'total_privileged_accounts': ('privileged_count', Count('id', filter=Q(privileged=True))),
             'total_connectivity_ok_accounts': ('connectivity_ok_count', Count('id', filter=Q(connectivity='ok'))),
             'total_secret_reset_accounts': ('secret_reset_count', Count('id', filter=Q(secret_reset=True))),
-            'total_unavailable_accounts': ('unavailable_count', Count('id', filter=Q(is_active=False))),
+            'total_valid_accounts': ('valid_count', Count('id', filter=Q(is_active=True))),
             'total_week_add_accounts': ('week_add_count', Count('id', filter=Q(date_created__gte=local_monday()))),
         }
 
@@ -105,7 +105,6 @@ class PamDashboardApi(APIView):
             'total_count_gathered_account_automation': GatherAccountsAutomation,
             'total_count_push_account_automation': PushAccountAutomation,
             'total_count_backup_account_automation': BackupAccountAutomation,
-            'total_count_risk_account': AccountRisk,
             'total_count_integration_application': IntegrationApplication,
         }
 
