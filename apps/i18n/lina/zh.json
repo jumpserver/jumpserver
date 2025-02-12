@@ -1466,5 +1466,6 @@
     "RiskDetection": "风险检测",
     "DetectResults": "检测结果",
     "DetectTasks": "检测任务",
-    "DetectEngines": "检测引擎"
+    "DetectEngines": "检测引擎",
+    "ChangeSecret": "账号改密"
 }
