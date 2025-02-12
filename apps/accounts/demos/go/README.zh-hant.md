@@ -1,26 +1,46 @@
-# JumpServer PAM 客戶端
+## 1. 簡介
 
-該包提供了一個 Go 客戶端，用於與 JumpServer PAM API 交互，以檢索各種資產的密碼。它簡化了發送請求和處理響應的過程。
+本 API 提供了 PAM 查看資產賬號服務，支持 RESTful 風格的調用，返回數據採用 JSON 格式。
 
-## 功能
-
-- 在發送請求之前驗證參數。
-- 支持基於資產和帳戶的密碼檢索。
-- 使用 HMAC-SHA256 簽名進行身份驗證，方便與 JumpServer PAM API 集成。
-
-## 使用說明
-
-1. **下載 Go 代碼文件**：
-   將代碼文件下載到您的項目目錄中。
-
-2. **導入包**：
-   在您的 Go 文件中導入該包，您即可直接使用其功能。
-
-## 需求
+## 2. 環境要求
 
 - `Go 1.16+`
-- `github.com/google/uuid`
-- `gopkg.in/twindagger/httpsig.v1`
+- `crypto/hmac`
+- `crypto/sha256`
+- `encoding/base64`
+- `net/http`
+
+## 3. 使用方法
+
+**請求方式**: `GET api/v1/accounts/integration-applications/account-secret/`
+
+**請求參數**
+
+| 參數名    | 類型   | 必填 | 說明            |
+|----------|------|-----|---------------|
+| asset    | str  | 是   | 資產 ID / 資產名稱 |
+| account  | str  | 是   | 賬號 ID / 賬號名稱 |
+
+**響應示例**:
+```json
+{
+    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e", 
+    "secret": "123456"
+}
+```
+
+## 常見問題（FAQ）
+
+Q: API Key 如何獲取？
+
+A: 你可以在 PAM - 應用管理 創建應用生成 KEY_ID 和 KEY_SECRET。
+
+## 版本歷史（Changelog）
+
+
+| 版本號   | 變更內容              | 日期         |
+| ----- | ----------------- |------------|
+| 1.0.0 | 初始版本              | 2025-02-11 |
 
 ## 使用方法
 

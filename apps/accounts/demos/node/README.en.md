@@ -2,23 +2,24 @@
 
 ## 1. Introduction
 
-This API provides the PAM asset account service, supports RESTful style calls, and returns data in JSON format.
+This API provides PAM asset account viewing service, supports RESTful style calls, and returns data in JSON format.
 
 ## 2. Environment Requirements
 
-- `Python 3.11+`
-- `requests==2.31.0`
-- `httpsig==1.3.0`
+- `Node.js 16+`
+- `axios ^1.7.9`
+- `moment ^2.30.1`
 
 ## 3. Usage
+
 **Request Method**: `GET api/v1/accounts/integration-applications/account-secret/`
 
 **Request Parameters**
 
 | Parameter Name | Type | Required | Description       |
 |----------------|------|----------|-------------------|
-| asset          | str  | Yes      | Asset ID / Asset Name |
-| account        | str  | Yes      | Account ID / Account Name |
+| asset          | str  | Yes      | Asset ID / Name   |
+| account        | str  | Yes      | Account ID / Name |
 
 **Response Example**:
 ```json
