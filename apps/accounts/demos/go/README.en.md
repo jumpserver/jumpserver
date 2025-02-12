@@ -1,133 +1,45 @@
-# JumpServer PAM Client
+# Instructions
 
-This package provides a Go client for interacting with the JumpServer PAM API to retrieve secrets for various assets. It simplifies the process of sending requests and handling responses.
+## 1. Introduction
 
-## Features
+This API provides the PAM asset account service, supports RESTful style calls, and returns data in JSON format.
 
-- Validate parameters before sending requests.
-- Support for both asset and account-based secret retrieval.
-- Easy integration with JumpServer PAM API using HMAC-SHA256 signatures for authentication.
-
-## Usage Instructions
-
-1. **Download Go Code Files**:
-   Download the code files into your project directory.
-
-2. **Import the Package**:
-   Import the package in your Go file, and you can directly use its functionalities.
-
-## Requirements
+## 2. Environment Requirements
 
 - `Go 1.16+`
-- `github.com/google/uuid`
-- `gopkg.in/twindagger/httpsig.v1`
+- `crypto/hmac`
+- `crypto/sha256`
+- `encoding/base64`
+- `net/http`
 
-## Usage
+## 3. Usage
 
-### Initialization
+**Request Method**: `GET api/v1/accounts/integration-applications/account-secret/`
 
-To use the JumpServer PAM client, create an instance by providing the required `endpoint`, `keyID`, and `keySecret`.
+**Request Parameters**
 
-```go
-package main
+| Parameter Name | Type | Required | Description       |
+|----------------|------|----------|-------------------|
+| asset          | str  | Yes      | Asset ID / Asset Name |
+| account        | str  | Yes      | Account ID / Account Name |
 
-import (
-	"fmt"
-	
-	"your_module_path/jms_pam" 
-)
-
-func main() {
-	client := jms_pam.NewJumpServerPAM(
-		"http://127.0.0.1", // Replace with your JumpServer endpoint
-		"your-key-id",      // Replace with your actual Key ID
-		"your-key-secret",  // Replace with your actual Key Secret
-		"",                 // Leave empty for default organization ID
-	)
+**Response Example**:
+```json
+{
+    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e", 
+    "secret": "123456"
 }
 ```
 
-### Creating a Secret Request
+## Frequently Asked Questions (FAQ)
 
-You can create a request for a secret by specifying the asset or account information.
+Q: How to obtain the API Key?
 
-```go
-request, err := jms_pam.NewSecretRequest("Linux", "", "root", "")
-if err != nil {
-    fmt.Println("Error creating request:", err)
-    return
-}
-```
+A: You can create an application in PAM - Application Management to generate KEY_ID and KEY_SECRET.
 
-### Sending the Request
+## Changelog
 
-Send the request using the `Send` method of the client.
 
-```go
-secretObj, err := client.Send(request)
-if err != nil {
-    fmt.Println("Error sending request:", err)
-    return
-}
-```
-
-### Handling the Response
-
-Check if the secret was retrieved successfully and handle the response accordingly.
-
-```go
-if secretObj.Valid {
-    fmt.Println("Secret:", secretObj.Secret)
-} else {
-    fmt.Println("Get secret failed:", string(secretObj.Desc))
-}
-```
-
-### Complete Example
-
-Here’s a complete example of how to use the client:
-
-```go
-package main
-
-import (
-	"fmt"
-	
-	"your_module_path/jms_pam"
-)
-
-func main() {
-	client := jms_pam.NewJumpServerPAM(
-		"http://127.0.0.1",
-		"your-key-id",
-		"your-key-secret",
-		"",
-	)
-
-	request, err := jms_pam.NewSecretRequest("Linux", "", "root", "")
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return
-	}
-
-	secretObj, err := client.Send(request)
-	if err != nil {
-		fmt.Println("Error sending request:", err)
-		return
-	}
-
-	if secretObj.Valid {
-		fmt.Println("Secret:", secretObj.Secret)
-	} else {
-		fmt.Println("Get secret failed:", string(secretObj.Desc))
-	}
-}
-```
-
-## Error Handling
-
-The library returns errors for invalid parameters when creating a `SecretRequest`. This includes checks for valid UUIDs and ensuring that required parameters are provided.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+| Version | Changes                | Date       |
+|---------|------------------------|------------|
+| 1.0.0   | Initial version        | 2025-02-11 |
