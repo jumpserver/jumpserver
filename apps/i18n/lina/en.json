@@ -510,6 +510,8 @@
     "Existing": "Already exists",
     "ExpirationTimeout": "Expiration timeout (seconds)",
     "Expire": "Expire",
+    "QuickFilter": "Quick filter",
+    "NoResource": "No valid resources",
     "Expired": "Expired",
     "Export": "Export",
     "NeverLogin": "Never login",
