@@ -14,7 +14,6 @@
     "AccountBackupDetail": "账号备份详情",
     "AccountBackupList": "账号备份列表",
     "AccountBackupUpdate": "更新账号备份",
-    "AccountChangeSecret": "账号改密",
     "AccountChangeSecretDetail": "账号改密详情",
     "AccountDeleteConfirmMsg": "删除账号，是否继续？",
     "AccountDiscoverDetail": "账号发现详情",
@@ -1460,5 +1459,12 @@
     "FailCount": "失败数",
     "ChangeSecretFailAccounts": "改密失败账号",
     "OngoingPwdChange": "当前正在改密情况",
-    "AccountResult": "账号成功/失败情况"
+    "AccountResult": "账号成功/失败情况",
+    "ResetSecret": "可改密",
+    "Connectable": "可连接",
+    "AccountRecord": "账号记录",
+    "RiskDetection": "风险检测",
+    "DetectResults": "检测结果",
+    "DetectTasks": "检测任务",
+    "DetectEngines": "检测引擎"
 }

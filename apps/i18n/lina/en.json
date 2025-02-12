@@ -15,7 +15,6 @@
     "AccountBackupDetail": "Backup account details",
     "AccountBackupList": "Backup account",
     "AccountBackupUpdate": "Update account backup",
-    "AccountChangeSecret": "Change account secret",
     "AccountChangeSecretDetail": "Change account secret details",
     "AccountDeleteConfirmMsg": "Delete account, continue?",
     "AccountDiscoverDetail": "Gather account details",
@@ -1462,5 +1461,8 @@
     "FailCount": "Failure Count",
     "ChangeSecretFailAccounts": "Secret Change Failed Accounts",
     "OngoingPwdChange": "Ongoing Secret Change",
-    "AccountResult": "Account Success/Failure"
+    "AccountResult": "Account Success/Failure",
+    "ResetSecret": "Reset secret",
+    "Connectable": "Connectable",
+    "AccountRecord": "Account record"
 }
