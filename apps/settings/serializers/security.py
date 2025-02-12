@@ -124,6 +124,11 @@ class SecurityAuthSerializer(serializers.Serializer):
         label=_('Third-party login MFA'),
         help_text=_('The third-party login modes include OIDC, CAS, and SAML2'),
     )
+    SECURITY_MFA_BY_EMAIL = serializers.BooleanField(
+        required=False, default=False,
+        label=_('MFA via Email'),
+        help_text=_('Email as a method for multi-factor authentication')
+    )
     OTP_ISSUER_NAME = serializers.CharField(
         required=False, max_length=16, label=_('OTP issuer name'),
     )
