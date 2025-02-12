@@ -73,5 +73,7 @@
     "ViewData": "View data",
     "WaitCommandReviewMessage": "The review request has been initiated, please wait for the review results",
     "Warning": "Warning",
-    "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct"
+    "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct",
+    "Scope": "Scope",
+    "Format": "Format"
 }

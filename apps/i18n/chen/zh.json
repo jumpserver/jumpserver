@@ -73,5 +73,7 @@
     "ViewData": "查看数据",
     "WaitCommandReviewMessage": "复核请求已发起, 请等待复核结果",
     "Warning": "警告",
-    "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确"
+    "initializingDatasourceFailedMessage": "连接失败，请检查数据库连接配置是否正确",
+    "Scope": "范围",
+    "Format": "格式"
 }
