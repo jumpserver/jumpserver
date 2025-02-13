@@ -1424,7 +1424,6 @@
     "RecentlyChangedPassword": "最近改密",
     "RecentPasswordChangeFailed": "最近改密失败",
     "RiskyAccount": "风险账号",
-    "RiskDetection": "风险检测",
     "LongTimeNoLogin": "长期未登录账号",
     "UnmanagedAccount": "未托管账号",
     "UnavailableAccount": "不可用账号",
@@ -1459,7 +1458,6 @@
     "ProportionOfAccountTypes": "账号类型占比",
     "CurrentStatus": "当前状态",
     "ChangeSecretTaskStatus": "改密任务执行状态",
-    "ChangeSecret": "账号改密",
     "MenuChangeSecret": "账号改密",
     "TaskCount": "任务数",
     "ScheduledTaskCount": "定时任务数",
@@ -1471,10 +1469,11 @@
     "AccountResult": "账号成功/失败情况",
     "ResetSecret": "可改密",
     "Connectable": "可连接",
-    "AccountRecord": "账号记录",
+    "RecordList": "记录",
     "RiskDetection": "风险检测",
     "DetectResults": "检测结果",
     "DetectTasks": "检测任务",
     "DetectEngines": "检测引擎",
-    "ChangeSecret": "账号改密"
+    "ChangeSecret": "账号改密",
+    "Documentation": "文档"
 }
