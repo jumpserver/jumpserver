@@ -5,8 +5,8 @@ from contextlib import contextmanager
 from functools import wraps
 from inspect import signature
 
-from werkzeug.local import LocalProxy
 from django.conf import settings
+from werkzeug.local import LocalProxy
 
 from common.local import thread_local
 from .models import Organization
@@ -57,6 +57,8 @@ def get_org_from_request(request):
 def set_current_org(org):
     if isinstance(org, (str, uuid.UUID)):
         org = Organization.get_instance(org)
+        if not org:
+            return
     setattr(thread_local, 'current_org_id', org.id)
 
 
