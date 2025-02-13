@@ -143,6 +143,17 @@ class ChatAISettingSerializer(serializers.Serializer):
         default=GPTModelChoices.gpt_4o_mini, choices=GPTModelChoices.choices,
         label=_("GPT Model"), required=False,
     )
+    DEEPSEEK_BASE_URL = serializers.CharField(
+        allow_blank=True, required=False, label=_('Base URL'),
+        help_text=_('The base URL of the Chat service.')
+    )
+    DEEPSEEK_API_KEY = EncryptedField(
+        allow_blank=True, required=False, label=_('API Key'),
+    )
+    DEEPSEEK_PROXY = serializers.CharField(
+        allow_blank=True, required=False, label=_('Proxy'),
+        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
+    )
     DEEPSEEK_MODEL = serializers.ChoiceField(
         default=DeepSeekModelChoices.deepseek_chat, choices=DeepSeekModelChoices.choices,
         label=_("DeepSeek Model"), required=False,

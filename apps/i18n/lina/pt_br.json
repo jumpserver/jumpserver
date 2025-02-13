@@ -264,7 +264,6 @@
     "ChangeViewHelpText": "Clique para alternar diferentes pontos de vista",
     "Chat": "Chat",
     "ChatAI": "Resposta inteligente",
-    "ChatAITypeHelpText": "Utilizado apenas para a troca de página. Após alterar o tipo, é necessário atualizar os atributos abaixo para que a mudança tenha efeito.",
     "ChatHello": "Olá! Como posso ajudá-lo? ",
     "ChdirHelpText": "O diretório de execução padrão é o diretório home do usuário de execução",
     "CheckAssetsAmount": "Verificar Quantidade de Ativos",

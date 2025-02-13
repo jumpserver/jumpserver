@@ -264,7 +264,6 @@
     "ChangeViewHelpText": "点击切换不同视图",
     "Chat": "聊天",
     "ChatAI": "智能问答",
-    "ChatAITypeHelpText": "仅用于页面切换，切换类型后需更新下方属性才能生效。",
     "ChatHello": "你好！我能为你提供什么帮助？",
     "ChdirHelpText": "默认执行目录为执行用户的 home 目录",
     "CheckAssetsAmount": "校对资产数量",
