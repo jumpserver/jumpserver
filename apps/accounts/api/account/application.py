@@ -27,6 +27,12 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         'get_account_secret': 'accounts.view_integrationapplication'
     }
 
+    def read_file(self, path):
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as file:
+                return file.read()
+        return ''
+
     @action(
         ['GET'], detail=False, url_path='sdks',
         permission_classes=[IsValidUser]
@@ -36,21 +42,18 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
             'python': 'py',
             'java': 'java',
             'go': 'go',
-            'javascript': 'js',
-            'php': 'php',
+            'node': 'js',
+            'curl': 'sh',
         }
         sdk_language = request.query_params.get('language','python')
         sdk_path = os.path.join(settings.APPS_DIR, 'accounts', 'demos', sdk_language)
         readme_path = os.path.join(sdk_path, f'readme.{get_language()}.md')
         demo_path = os.path.join(sdk_path, f'demo.{code_suffix_mapper[sdk_language]}')
 
-        def read_file(path):
-            if os.path.exists(path):
-                with open(path, 'r', encoding='utf-8') as f:
-                    return f.read()
-            return ''
+        readme_content = self.read_file(readme_path)
+        demo_content = self.read_file(demo_path)
 
-        return Response(data={'readme': read_file(readme_path), 'code': read_file(demo_path)})
+        return Response(data={'readme': readme_content, 'code': demo_content})
 
     @action(
         ['GET'], detail=True, url_path='secret',
