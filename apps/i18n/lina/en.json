@@ -264,7 +264,6 @@
     "ChangeViewHelpText": "Click to switch different views",
     "Chat": "Chat",
     "ChatAI": "Chat AI",
-    "ChatAITypeHelpText": "Only used for page switching. After switching the type, you need to update the following properties to take effect.",
     "ChatHello": "Hello, can I help you?",
     "ChdirHelpText": "By default, the execution directory is the user's home directory",
     "CheckAssetsAmount": "Check asset quantity",

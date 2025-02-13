@@ -351,7 +351,6 @@
     "Charset": "字元集",
     "Chat": "聊天",
     "ChatAI": "智慧問答",
-    "ChatAITypeHelpText": "僅用於頁面切換，切換類型後需更新下方屬性方能生效。",
     "ChatHello": "你好！我能為你提供什麼幫助？",
     "ChdirHelpText": "默認執行目錄為執行用戶的 home 目錄",
     "CheckAssetsAmount": "校對資產數量",
