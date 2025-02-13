@@ -1863,7 +1863,7 @@ msgstr "Outros"
 
 #: assets/const/protocol.py:46
 msgid "Old SSH version"
-msgstr "Versão antiga do SSH"
+msgstr "Versão antiga SSH"
 
 #: assets/const/protocol.py:47
 msgid "Old SSH version like openssh 5.x or 6.x"
