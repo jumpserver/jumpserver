@@ -1423,5 +1423,6 @@
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
-    "setVariable": "Set variable"
+    "setVariable": "Set variable",
+    "ChatAITypeHelpText": "Only used for page switching. After switching the type, you need to update the following properties to take effect."
 }
