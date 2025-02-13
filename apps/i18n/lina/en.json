@@ -1466,5 +1466,6 @@
     "AccountResult": "Account Success/Failure",
     "ResetSecret": "Reset secret",
     "Connectable": "Connectable",
-    "AccountRecord": "Account record"
+    "RecordList": "Records",
+    "Documentation": "Documentation"
 }
