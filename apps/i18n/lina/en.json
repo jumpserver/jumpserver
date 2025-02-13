@@ -264,6 +264,7 @@
     "ChangeViewHelpText": "Click to switch different views",
     "Chat": "Chat",
     "ChatAI": "Chat AI",
+    "ChatAITypeHelpText": "Only used for page switching. After switching the type, you need to update the following properties to take effect.",
     "ChatHello": "Hello, can I help you?",
     "ChdirHelpText": "By default, the execution directory is the user's home directory",
     "CheckAssetsAmount": "Check asset quantity",
@@ -462,6 +463,7 @@
     "Edit": "Edit",
     "EditRecipient": "Edit recipient",
     "Edition": "Version",
+    "Effective": "Effective",
     "Email": "Email",
     "EmailContent": "Custom content",
     "EmailTemplate": "Template",
@@ -653,7 +655,6 @@
     "IsSuccess": "Success",
     "IsSyncAccountHelpText": "Upon collection completion, the collected account will be synced to asset",
     "IsSyncAccountLabel": "Sync to assets",
-    "Effective": "Effective",
     "JDCloud": "JD cloud",
     "Job": "Job",
     "JobCenter": "Job center",
@@ -1423,6 +1424,5 @@
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
-    "setVariable": "Set variable",
-    "ChatAITypeHelpText": "Only used for page switching. After switching the type, you need to update the following properties to take effect."
+    "setVariable": "Set variable"
 }

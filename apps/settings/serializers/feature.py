@@ -126,7 +126,7 @@ class ChatAISettingSerializer(serializers.Serializer):
     )
     CHAT_AI_TYPE = serializers.ChoiceField(
         default=ChatAITypeChoices.gpt, choices=ChatAITypeChoices.choices,
-        label=_("Chat AI type"), required=False,
+        label=_("Types"), required=False,
     )
     GPT_BASE_URL = serializers.CharField(
         allow_blank=True, required=False, label=_('Base URL'),
