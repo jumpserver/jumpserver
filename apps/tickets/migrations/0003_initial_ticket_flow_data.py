@@ -11,7 +11,7 @@ def create_ticket_flow_and_approval_rule(apps, schema_editor):
     ApprovalRule = apps.get_model("tickets", "ApprovalRule")
 
     super_user = User.objects.get(username='admin')
-    flow = TicketFlow.objects.create(created_by='System', type='apply_asset', org_id=org_id)
+    flow, created = TicketFlow.objects.get_or_create(created_by='System', type='apply_asset', org_id=org_id)
     rule_instance = ApprovalRule.objects.create(strategy='super_admin')
     rule_instance.assignees.set([super_user])
     flow.rules.set([rule_instance, ])
