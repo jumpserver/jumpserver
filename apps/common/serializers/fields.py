@@ -8,7 +8,7 @@ from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
 
 from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
-from common.utils import decrypt_password
+from common.utils import decrypt_password, is_uuid
 
 __all__ = [
     "ReadableHiddenField",
@@ -127,12 +127,14 @@ class LabelRelatedField(serializers.RelatedField):
         if isinstance(data, dict) and (data.get("id") or data.get("pk")):
             pk = data.get("id") or data.get("pk")
             label = Label.objects.get(pk=pk)
+        elif is_uuid(data):
+            label = Label.objects.get(pk=data)
         else:
             if isinstance(data, dict):
                 k = data.get("name")
                 v = data.get("value")
             elif isinstance(data, str) and ":" in data:
-                k, v = data.split(":", 1)
+                k, v = [x.strip() for x in data.split(":", 1)]
             else:
                 raise serializers.ValidationError(_("Invalid data type"))
             label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
