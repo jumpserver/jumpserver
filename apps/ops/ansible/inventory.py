@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import sys
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
@@ -191,6 +192,7 @@ class JMSInventory:
         secret_info = {k: v for k, v in asset.secret_info.items() if v}
         host = {
             'name': name,
+            'local_python_interpreter': sys.executable,
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': tp, 'category': category,
