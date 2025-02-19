@@ -127,6 +127,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
             'GPT_API_KEY': data['api_key'],
             'GPT_PROXY': data['proxy'],
             'GPT_MODEL': data['model'],
+            'CHAT_AI_TYPE': settings.CHAT_AI_TYPE,
         }
 
     @staticmethod
