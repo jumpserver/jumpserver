@@ -1424,5 +1424,7 @@
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
-    "VerifyFace": "Verify face"
+    "VerifyFace": "Verify face",
+    "ServerBusyRetry": "The server is busy, please try again later.",
+    "DeeplyThoughtAbout": "Deeply thought about"
 }
