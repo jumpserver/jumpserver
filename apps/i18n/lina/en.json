@@ -1260,7 +1260,7 @@
     "TestConnection": "Test connection",
     "TestGatewayHelpMessage": "If nat port mapping is used, please set it to the real port listened to by ssh",
     "TestGatewayTestConnection": "Test connect to gateway",
-    "TestLdapLoginTitle": "Test ldap user login",
+    "TestLdapLoginTitle": "Test LDAP user login",
     "TestNodeAssetConnectivity": "Test assets connectivity of node",
     "TestPortErrorMsg": "Port error, please re-enter",
     "TestSelected": "Test selected",
