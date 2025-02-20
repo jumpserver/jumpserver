@@ -4566,11 +4566,11 @@ msgid "China"
 msgstr "中国"
 
 #: common/const/choices.py:57
-msgid "Manual trigger"
+msgid "Manual"
 msgstr "手動トリガー"
 
 #: common/const/choices.py:58
-msgid "Timing trigger"
+msgid "Timing"
 msgstr "タイミングトリガー"
 
 #: common/const/choices.py:62

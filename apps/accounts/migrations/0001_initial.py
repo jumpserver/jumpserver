@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                 ('snapshot',
                  models.JSONField(blank=True, default=dict, encoder=common.db.encoder.ModelJSONFieldEncoder, null=True,
                                   verbose_name='Account backup snapshot')),
-                ('trigger', models.CharField(choices=[('manual', 'Manual trigger'), ('timing', 'Timing trigger')],
+                ('trigger', models.CharField(choices=[('manual', 'Manual'), ('timing', 'Timing')],
                                              default='manual', max_length=128, verbose_name='Trigger mode')),
                 ('reason', models.CharField(blank=True, max_length=1024, null=True, verbose_name='Reason')),
                 ('is_success', models.BooleanField(default=False, verbose_name='Is success')),

@@ -54,8 +54,8 @@ def get_country_phone_choices():
 
 
 class Trigger(models.TextChoices):
-    manual = 'manual', _('Manual trigger')
-    timing = 'timing', _('Timing trigger')
+    manual = 'manual', _('Manual')
+    timing = 'timing', _('Timing')
 
 
 class Status(models.TextChoices):

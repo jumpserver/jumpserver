@@ -4533,11 +4533,11 @@ msgid "China"
 msgstr "中国"
 
 #: common/const/choices.py:57
-msgid "Manual trigger"
+msgid "Manual"
 msgstr "手动触发"
 
 #: common/const/choices.py:58
-msgid "Timing trigger"
+msgid "Timing"
 msgstr "定时触发"
 
 #: common/const/choices.py:62

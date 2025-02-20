@@ -11,7 +11,6 @@ import common.db.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -27,8 +26,11 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
-                ('connectivity', models.CharField(choices=[('-', 'Unknown'), ('na', 'N/A'), ('ok', 'OK'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity')),
+                ('org_id',
+                 models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('connectivity',
+                 models.CharField(choices=[('-', 'Unknown'), ('na', 'N/A'), ('ok', 'OK'), ('err', 'Error')],
+                                  default='-', max_length=16, verbose_name='Connectivity')),
                 ('date_verified', models.DateTimeField(null=True, verbose_name='Date verified')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('address', models.CharField(db_index=True, max_length=767, verbose_name='Address')),
@@ -39,21 +41,27 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Asset',
                 'ordering': [],
-                'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'), ('test_assetconnectivity', 'Can test asset connectivity'), ('match_asset', 'Can match asset'), ('change_assetnodes', 'Can change asset nodes')],
+                'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'),
+                                ('test_assetconnectivity', 'Can test asset connectivity'),
+                                ('match_asset', 'Can match asset'), ('change_assetnodes', 'Can change asset nodes')],
             },
-            bases=(assets.models.asset.common.NodesRelationMixin, assets.models.asset.common.JSONFilterMixin, models.Model),
+            bases=(
+            assets.models.asset.common.NodesRelationMixin, assets.models.asset.common.JSONFilterMixin, models.Model),
         ),
         migrations.CreateModel(
             name='AutomationExecution',
             fields=[
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id',
+                 models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('status', models.CharField(default='pending', max_length=16, verbose_name='Status')),
                 ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
                 ('date_start', models.DateTimeField(db_index=True, null=True, verbose_name='Date start')),
                 ('date_finished', models.DateTimeField(null=True, verbose_name='Date finished')),
-                ('snapshot', common.db.fields.EncryptJsonDictTextField(blank=True, default=dict, null=True, verbose_name='Automation snapshot')),
-                ('trigger', models.CharField(choices=[('manual', 'Manual trigger'), ('timing', 'Timing trigger')], default='manual', max_length=128, verbose_name='Trigger mode')),
+                ('snapshot', common.db.fields.EncryptJsonDictTextField(blank=True, default=dict, null=True,
+                                                                       verbose_name='Automation snapshot')),
+                ('trigger', models.CharField(choices=[('manual', 'Manual'), ('timing', 'Timing')], default='manual',
+                                             max_length=128, verbose_name='Trigger mode')),
             ],
             options={
                 'verbose_name': 'Automation task execution',
@@ -69,7 +77,8 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id',
+                 models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('is_periodic', models.BooleanField(default=False, verbose_name='Periodic run')),
                 ('interval', models.IntegerField(blank=True, default=24, null=True, verbose_name='Interval')),
@@ -92,7 +101,8 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id',
+                 models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
             ],
             options={
@@ -108,7 +118,8 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id',
+                 models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('key', models.CharField(max_length=64, unique=True, verbose_name='Key')),
                 ('value', models.CharField(max_length=128, verbose_name='Value')),
@@ -123,7 +134,8 @@ class Migration(migrations.Migration):
                 'ordering': ['parent_key', 'value'],
                 'permissions': [('match_node', 'Can match node')],
             },
-            bases=(models.Model, assets.models.node.SomeNodesMixin, assets.models.node.FamilyMixin, assets.models.node.NodeAssetsMixin),
+            bases=(models.Model, assets.models.node.SomeNodesMixin, assets.models.node.FamilyMixin,
+                   assets.models.node.NodeAssetsMixin),
         ),
         migrations.CreateModel(
             name='Platform',
@@ -139,7 +151,9 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(default='linux', max_length=32, verbose_name='Type')),
                 ('meta', common.db.fields.JsonDictTextField(blank=True, null=True, verbose_name='Meta')),
                 ('internal', models.BooleanField(default=False, verbose_name='Internal')),
-                ('charset', models.CharField(choices=[('utf-8', 'UTF-8'), ('gbk', 'GBK')], default='utf-8', max_length=8, verbose_name='Charset')),
+                ('charset',
+                 models.CharField(choices=[('utf-8', 'UTF-8'), ('gbk', 'GBK')], default='utf-8', max_length=8,
+                                  verbose_name='Charset')),
                 ('domain_enabled', models.BooleanField(default=True, verbose_name='Gateway enabled')),
                 ('su_enabled', models.BooleanField(default=False, verbose_name='Su enabled')),
                 ('su_method', models.CharField(blank=True, max_length=32, null=True, verbose_name='Su method')),
@@ -152,7 +166,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Cloud',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
             ],
             options={
                 'verbose_name': 'Cloud',
@@ -162,7 +178,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Custom',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
             ],
             options={
                 'verbose_name': 'Custom asset',
@@ -172,7 +190,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Database',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
                 ('db_name', models.CharField(blank=True, max_length=1024, verbose_name='Database')),
                 ('use_ssl', models.BooleanField(default=False, verbose_name='Use SSL')),
                 ('ca_cert', common.db.fields.EncryptTextField(blank=True, verbose_name='CA cert')),
@@ -188,7 +208,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Device',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
             ],
             options={
                 'verbose_name': 'Device',
@@ -198,7 +220,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GPT',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
                 ('proxy', models.CharField(blank=True, default='', max_length=128, verbose_name='Proxy')),
             ],
             options={
@@ -209,7 +233,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Host',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
             ],
             options={
                 'verbose_name': 'Host',
@@ -219,11 +245,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Web',
             fields=[
-                ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
-                ('autofill', models.CharField(choices=[('no', 'Disabled'), ('basic', 'Basic'), ('script', 'Script')], default='basic', max_length=16, verbose_name='Autofill')),
-                ('username_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Username selector')),
-                ('password_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Password selector')),
-                ('submit_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Submit selector')),
+                ('asset_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.asset')),
+                ('autofill', models.CharField(choices=[('no', 'Disabled'), ('basic', 'Basic'), ('script', 'Script')],
+                                              default='basic', max_length=16, verbose_name='Autofill')),
+                ('username_selector',
+                 models.CharField(blank=True, default='', max_length=128, verbose_name='Username selector')),
+                ('password_selector',
+                 models.CharField(blank=True, default='', max_length=128, verbose_name='Password selector')),
+                ('submit_selector',
+                 models.CharField(blank=True, default='', max_length=128, verbose_name='Submit selector')),
                 ('script', models.JSONField(blank=True, default=list, verbose_name='Script')),
             ],
             options={
@@ -237,7 +269,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=32, verbose_name='Name')),
                 ('port', models.IntegerField(verbose_name='Port')),
-                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='protocols', to='assets.asset', verbose_name='Asset')),
+                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='protocols',
+                                            to='assets.asset', verbose_name='Asset')),
             ],
         ),
         migrations.CreateModel(
@@ -251,7 +284,8 @@ class Migration(migrations.Migration):
                 ('default', models.BooleanField(default=False, verbose_name='Default')),
                 ('public', models.BooleanField(default=True, verbose_name='Public')),
                 ('setting', models.JSONField(default=dict, verbose_name='Setting')),
-                ('platform', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='protocols', to='assets.platform')),
+                ('platform', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='protocols',
+                                               to='assets.platform')),
             ],
         ),
         migrations.CreateModel(
@@ -264,24 +298,32 @@ class Migration(migrations.Migration):
                 ('ping_method', models.CharField(blank=True, max_length=32, null=True, verbose_name='Ping method')),
                 ('ping_params', models.JSONField(default=dict, verbose_name='Ping params')),
                 ('gather_facts_enabled', models.BooleanField(default=False, verbose_name='Gather facts enabled')),
-                ('gather_facts_method', models.TextField(blank=True, max_length=32, null=True, verbose_name='Gather facts method')),
+                ('gather_facts_method',
+                 models.TextField(blank=True, max_length=32, null=True, verbose_name='Gather facts method')),
                 ('gather_facts_params', models.JSONField(default=dict, verbose_name='Gather facts params')),
                 ('change_secret_enabled', models.BooleanField(default=False, verbose_name='Change secret enabled')),
-                ('change_secret_method', models.TextField(blank=True, max_length=32, null=True, verbose_name='Change secret method')),
+                ('change_secret_method',
+                 models.TextField(blank=True, max_length=32, null=True, verbose_name='Change secret method')),
                 ('change_secret_params', models.JSONField(default=dict, verbose_name='Change secret params')),
                 ('push_account_enabled', models.BooleanField(default=False, verbose_name='Push account enabled')),
-                ('push_account_method', models.TextField(blank=True, max_length=32, null=True, verbose_name='Push account method')),
+                ('push_account_method',
+                 models.TextField(blank=True, max_length=32, null=True, verbose_name='Push account method')),
                 ('push_account_params', models.JSONField(default=dict, verbose_name='Push account params')),
                 ('verify_account_enabled', models.BooleanField(default=False, verbose_name='Verify account enabled')),
-                ('verify_account_method', models.TextField(blank=True, max_length=32, null=True, verbose_name='Verify account method')),
+                ('verify_account_method',
+                 models.TextField(blank=True, max_length=32, null=True, verbose_name='Verify account method')),
                 ('verify_account_params', models.JSONField(default=dict, verbose_name='Verify account params')),
                 ('gather_accounts_enabled', models.BooleanField(default=False, verbose_name='Gather facts enabled')),
-                ('gather_accounts_method', models.TextField(blank=True, max_length=32, null=True, verbose_name='Gather facts method')),
+                ('gather_accounts_method',
+                 models.TextField(blank=True, max_length=32, null=True, verbose_name='Gather facts method')),
                 ('gather_accounts_params', models.JSONField(default=dict, verbose_name='Gather facts params')),
                 ('remove_account_enabled', models.BooleanField(default=False, verbose_name='Remove account enabled')),
-                ('remove_account_method', models.TextField(blank=True, max_length=32, null=True, verbose_name='Remove account method')),
+                ('remove_account_method',
+                 models.TextField(blank=True, max_length=32, null=True, verbose_name='Remove account method')),
                 ('remove_account_params', models.JSONField(default=dict, verbose_name='Remove account params')),
-                ('platform', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='automation', to='assets.platform')),
+                ('platform',
+                 models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='automation',
+                                      to='assets.platform')),
             ],
         ),
         migrations.CreateModel(
@@ -293,10 +335,12 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id',
+                 models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('value', models.CharField(max_length=128, verbose_name='Value')),
-                ('category', models.CharField(choices=[('S', 'System'), ('U', 'User')], default='U', max_length=128, verbose_name='Category')),
+                ('category', models.CharField(choices=[('S', 'System'), ('U', 'User')], default='U', max_length=128,
+                                              verbose_name='Category')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
             ],
             options={
