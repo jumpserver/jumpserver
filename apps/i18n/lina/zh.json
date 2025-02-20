@@ -463,6 +463,7 @@
     "Edit": "编辑",
     "EditRecipient": "编辑接收人",
     "Edition": "版本",
+    "Effective": "生效",
     "Email": "邮箱",
     "EmailContent": "邮件内容定制",
     "EmailTemplate": "邮件模版",
@@ -1427,5 +1428,8 @@
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
-    "setVariable": "设置参数"
+    "setVariable": "设置参数",
+    "VerifyFace": "验证人脸",
+    "ServerBusyRetry": "服务器繁忙，请稍后再试。",
+    "DeeplyThoughtAbout": "已深度思考"
 }

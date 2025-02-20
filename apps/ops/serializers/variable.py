@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from common.serializers.fields import ReadableHiddenField, LabeledChoiceField, EncryptedField
+from common.serializers.fields import ReadableHiddenField, LabeledChoiceField
 from common.serializers.mixin import CommonBulkModelSerializer
 from ops.const import FieldType
 from ops.models import Variable, AdHoc, Job, Playbook
@@ -28,7 +28,9 @@ class VariableSerializer(CommonBulkModelSerializer):
     type = LabeledChoiceField(
         choices=FieldType.choices, default=FieldType.text, label=_("Variable Type")
     )
-    default_value = serializers.CharField(max_length=2048, label=_('Default Value'), required=False, allow_blank=True)
+    default_value = serializers.CharField(
+        max_length=2048, label=_('Default Value'), required=False, allow_blank=True, allow_null=True
+    )
     extra_args = serializers.CharField(
         max_length=1024, label=_("ExtraVars"), required=False, allow_blank=True,
         help_text=_(

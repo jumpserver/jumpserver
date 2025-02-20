@@ -462,6 +462,7 @@
     "Edit": "Edit",
     "EditRecipient": "Edit recipient",
     "Edition": "Version",
+    "Effective": "Effective",
     "Email": "Email",
     "EmailContent": "Custom content",
     "EmailTemplate": "Template",
@@ -1422,5 +1423,8 @@
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
-    "setVariable": "Set variable"
+    "setVariable": "Set variable",
+    "VerifyFace": "Verify face",
+    "ServerBusyRetry": "The server is busy, please try again later.",
+    "DeeplyThoughtAbout": "Deeply thought about"
 }

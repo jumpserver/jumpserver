@@ -9,6 +9,7 @@ from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
 from orgs.utils import tmp_to_root_org
+from settings.models import get_chatai_data
 from terminal.const import TerminalType as TypeChoices
 from users.models import User
 from .status import Status
@@ -120,11 +121,13 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
 
     @staticmethod
     def get_chat_ai_setting():
+        data = get_chatai_data()
         return {
-            'GPT_BASE_URL': settings.GPT_BASE_URL,
-            'GPT_API_KEY': settings.GPT_API_KEY,
-            'GPT_PROXY': settings.GPT_PROXY,
-            'GPT_MODEL': settings.GPT_MODEL,
+            'GPT_BASE_URL': data['url'],
+            'GPT_API_KEY': data['api_key'],
+            'GPT_PROXY': data['proxy'],
+            'GPT_MODEL': data['model'],
+            'CHAT_AI_TYPE': settings.CHAT_AI_TYPE,
         }
 
     @staticmethod

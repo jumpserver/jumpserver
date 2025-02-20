@@ -230,5 +230,6 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "SessionIsBeingMonitored": "会话正在被监控"
 }
