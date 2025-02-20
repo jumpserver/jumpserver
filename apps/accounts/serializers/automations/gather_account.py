@@ -11,14 +11,14 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseAutomationSerializer
 
 __all__ = [
-    'GatheredAccountSerializer',
-    'GatheredAccountActionSerializer',
-    'GatherAccountAutomationSerializer',
-    'GatheredAccountDetailsSerializer'
+    'DiscoverAccountSerializer',
+    'DiscoverAccountActionSerializer',
+    'DiscoverAccountAutomationSerializer',
+    'DiscoverAccountDetailsSerializer'
 ]
 
 
-class GatherAccountAutomationSerializer(BaseAutomationSerializer):
+class DiscoverAccountAutomationSerializer(BaseAutomationSerializer):
     class Meta:
         model = GatherAccountsAutomation
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
@@ -43,7 +43,7 @@ class AccountAssetSerializer(_AccountAssetSerializer):
         fields = [f for f in _AccountAssetSerializer.Meta.fields if f != 'auto_config']
 
 
-class GatheredAccountSerializer(BulkOrgResourceModelSerializer):
+class DiscoverAccountSerializer(BulkOrgResourceModelSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
 
     class Meta(BaseAccountSerializer.Meta):
@@ -63,12 +63,12 @@ class GatheredAccountSerializer(BulkOrgResourceModelSerializer):
         return queryset
 
 
-class GatheredAccountActionSerializer(GatheredAccountSerializer):
-    class Meta(GatheredAccountSerializer.Meta):
-        read_only_fields = list(set(GatheredAccountSerializer.Meta.read_only_fields) - {'status'})
+class DiscoverAccountActionSerializer(DiscoverAccountSerializer):
+    class Meta(DiscoverAccountSerializer.Meta):
+        read_only_fields = list(set(DiscoverAccountSerializer.Meta.read_only_fields) - {'status'})
 
 
-class GatheredAccountDetailsSerializer(serializers.Serializer):
+class DiscoverAccountDetailsSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
@@ -78,6 +78,7 @@ class GatheredAccountDetailsSerializer(serializers.Serializer):
         params = request.query_params
         if params.get('format') == 'openapi':
             return
+
         pk = request.parser_context['kwargs'].get('pk')
         obj = get_object_or_404(GatheredAccount, pk=pk)
         details = obj.detail
