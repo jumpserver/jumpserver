@@ -17,22 +17,22 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 
 __all__ = [
-    "GatherAccountsAutomationViewSet",
-    "GatherAccountsExecutionViewSet",
+    "DiscoverAccountsAutomationViewSet",
+    "DiscoverAccountsExecutionViewSet",
     "GatheredAccountViewSet",
 ]
 
 from ...risk_handlers import RiskHandler
 
 
-class GatherAccountsAutomationViewSet(OrgBulkModelViewSet):
+class DiscoverAccountsAutomationViewSet(OrgBulkModelViewSet):
     model = GatherAccountsAutomation
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    serializer_class = serializers.GatherAccountAutomationSerializer
+    serializer_class = serializers.DiscoverAccountAutomationSerializer
 
 
-class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
+class DiscoverAccountsExecutionViewSet(AutomationExecutionViewSet):
     rbac_perms = (
         ("list", "accounts.view_gatheraccountsexecution"),
         ("retrieve", "accounts.view_gatheraccountsexecution"),
@@ -76,9 +76,9 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     filterset_class = GatheredAccountFilterSet
     ordering = ("status",)
     serializer_classes = {
-        "default": serializers.GatheredAccountSerializer,
-        "status": serializers.GatheredAccountActionSerializer,
-        "details": serializers.GatheredAccountDetailsSerializer
+        "default": serializers.DiscoverAccountSerializer,
+        "status": serializers.DiscoverAccountActionSerializer,
+        "details": serializers.DiscoverAccountDetailsSerializer
     }
     rbac_perms = {
         "status": "assets.change_gatheredaccount",

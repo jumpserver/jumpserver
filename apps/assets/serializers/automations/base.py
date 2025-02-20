@@ -22,15 +22,20 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
     class Meta:
         read_only_fields = [
-            'date_created', 'date_updated', 'created_by', 'periodic_display'
+            'date_created', 'date_updated', 'created_by',
+            'periodic_display', 'executed_amount', 'type'
         ]
-        fields = [
-                     'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
-                     'type', 'accounts', 'nodes', 'assets', 'is_active'
-                 ] + read_only_fields
+        mini_fields = [
+            'id', 'name', 'type', 'is_periodic', 'interval',
+            'crontab', 'comment', 'is_active'
+        ]
+        fields = mini_fields + [
+            'accounts', 'nodes', 'assets',
+        ] + read_only_fields
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
+            'executed_amount': {'label': _('Executions')},
         }
 
 
@@ -38,6 +43,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
     trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
     status = LabeledChoiceField(choices=Status.choices, read_only=True, label=_('Status'))
+    short_id = serializers.CharField(read_only=True, label=_('Short ID'))
 
     class Meta:
         model = AutomationExecution
@@ -45,7 +51,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
             'trigger', 'date_start', 'date_finished',
             'snapshot', 'status', 'duration'
         ]
-        fields = ['id', 'automation'] + read_only_fields
+        fields = ['id', 'short_id', 'automation'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):

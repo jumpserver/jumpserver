@@ -19,8 +19,8 @@ router.register(r'account-backup-plan-executions', api.BackupAccountExecutionVie
 router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automation')
 router.register(r'change-secret-executions', api.ChangSecretExecutionViewSet, 'change-secret-execution')
 router.register(r'change-secret-records', api.ChangeSecretRecordViewSet, 'change-secret-record')
-router.register(r'gather-account-automations', api.GatherAccountsAutomationViewSet, 'gather-account-automation')
-router.register(r'gather-account-executions', api.GatherAccountsExecutionViewSet, 'gather-account-execution')
+router.register(r'gather-account-automations', api.DiscoverAccountsAutomationViewSet, 'gather-account-automation')
+router.register(r'gather-account-executions', api.DiscoverAccountsExecutionViewSet, 'gather-account-execution')
 router.register(r'push-account-automations', api.PushAccountAutomationViewSet, 'push-account-automation')
 router.register(r'push-account-executions', api.PushAccountExecutionViewSet, 'push-account-execution')
 router.register(r'push-account-records', api.PushAccountRecordViewSet, 'push-account-record')
@@ -29,7 +29,6 @@ router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, '
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
-
 
 urlpatterns = [
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),
