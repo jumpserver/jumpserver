@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Asset, Node, BaseAutomation, AutomationExecution
-from common.const.choices import Trigger
+from common.const.choices import Trigger, Status
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from ops.mixin import PeriodTaskSerializerMixin
@@ -36,23 +36,16 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
 class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    status = serializers.SerializerMethodField(label=_("Status"))
     trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
+    status = LabeledChoiceField(choices=Status.choices, read_only=True, label=_('Status'))
 
     class Meta:
         model = AutomationExecution
         read_only_fields = [
-            'trigger', 'date_start', 'date_finished', 'snapshot', 'status', 'duration'
+            'trigger', 'date_start', 'date_finished',
+            'snapshot', 'status', 'duration'
         ]
         fields = ['id', 'automation'] + read_only_fields
-
-    @staticmethod
-    def get_status(obj):
-        from common.const import Status
-        status = Status._member_map_.get(obj.status)
-        if status is None:
-            return obj.status
-        return status.label
 
     @staticmethod
     def get_snapshot(obj):

@@ -1,11 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import AutomationExecution
 from assets.const import AutomationTypes
 from assets.models import Asset, Node, BaseAutomation
-from common.const.choices import Trigger
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from assets.serializers.automations import AutomationExecutionSerializer as AssetAutomationExecutionSerializer
+from common.serializers.fields import ObjectRelatedField
 from common.utils import get_logger
 from ops.mixin import PeriodTaskSerializerMixin
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -49,17 +48,8 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         raise NotImplementedError
 
 
-class AutomationExecutionSerializer(serializers.ModelSerializer):
+class AutomationExecutionSerializer(AssetAutomationExecutionSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    type = serializers.ChoiceField(choices=AutomationTypes.choices, write_only=True, label=_('Type'))
-    trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
-
-    class Meta:
-        model = AutomationExecution
-        read_only_fields = [
-            'trigger', 'date_start', 'date_finished', 'snapshot', 'status', 'duration'
-        ]
-        fields = ['id', 'automation', 'type'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):

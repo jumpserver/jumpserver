@@ -4414,11 +4414,11 @@ msgid "China"
 msgstr ""
 
 #: common/const/choices.py:57
-msgid "Manual trigger"
+msgid "Manual"
 msgstr ""
 
 #: common/const/choices.py:58
-msgid "Timing trigger"
+msgid "Timing"
 msgstr ""
 
 #: common/const/choices.py:62

@@ -4508,11 +4508,11 @@ msgid "China"
 msgstr "中國"
 
 #: common/const/choices.py:57
-msgid "Manual trigger"
+msgid "Manual"
 msgstr "手動觸發"
 
 #: common/const/choices.py:58
-msgid "Timing trigger"
+msgid "Timing"
 msgstr "定時觸發"
 
 #: common/const/choices.py:62
