@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import SecretType, DEFAULT_PASSWORD_RULES
+
 from common.utils import ssh_key_gen, random_string
 from common.utils import validate_ssh_private_key, parse_ssh_private_key_str
 
@@ -26,12 +27,12 @@ class SecretGenerator:
         rules = copy.deepcopy(DEFAULT_PASSWORD_RULES)
         rules.update(password_rules)
         rules = {
-            'length': rules['length'],
-            'lower': rules['lowercase'],
-            'upper': rules['uppercase'],
-            'digit': rules['digit'],
-            'special_char': rules['symbol'],
-            'exclude_chars': rules.get('exclude_symbols', ''),
+            "length": rules["length"],
+            "lower": rules["lowercase"],
+            "upper": rules["uppercase"],
+            "digit": rules["digit"],
+            "special_char": rules["symbol"],
+            "exclude_chars": rules.get("exclude_symbols", ""),
         }
         return random_string(**rules)
 
@@ -46,10 +47,12 @@ class SecretGenerator:
 
 
 def validate_password_for_ansible(password):
-    """ 校验 Ansible 不支持的特殊字符 """
-    if password.startswith('{{') and password.endswith('}}'):
+    """校验 Ansible 不支持的特殊字符"""
+    if password.startswith("{{") and password.endswith("}}"):
         raise serializers.ValidationError(
-            _('If the password starts with {{` and ends with }} `, then the password is not allowed.')
+            _(
+                "If the password starts with {{` and ends with }} `, then the password is not allowed."
+            )
         )
 
 

@@ -7,9 +7,10 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
 
+from accounts.models import IntegrationApplication
 from common.auth import signature
 from common.decorators import merge_delay_run
-from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip
+from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip, get_request_ip
 from users.models import User
 from ..models import AccessKey, PrivateToken
 
@@ -31,6 +32,13 @@ def update_token_last_used(tokens=()):
 @merge_delay_run(ttl=60)
 def update_user_last_used(users=()):
     User.objects.filter(id__in=users).update(date_api_key_last_used=timezone.now())
+
+
+@merge_delay_run(ttl=60)
+def update_service_integration_last_used(service_integrations=()):
+    IntegrationApplication.objects.filter(
+        id__in=service_integrations
+    ).update(date_last_used=timezone.now())
 
 
 def after_authenticate_update_date(user, token=None):
@@ -146,3 +154,30 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return True
         except (AccessKey.DoesNotExist, exceptions.ValidationError):
             return False
+
+
+class ServiceAuthentication(signature.SignatureAuthentication):
+    __instance = None
+    source = 'jms-pam'
+
+    def get_object(self, key_id):
+        if not self.__instance:
+            self.__instance = IntegrationApplication.objects.filter(
+                id=key_id, is_active=True,
+            ).first()
+        return self.__instance
+
+    def fetch_user_data(self, key_id, algorithm=None):
+        obj = self.get_object(key_id)
+        if not obj:
+            return None, None
+        return obj, obj.secret
+
+    def is_ip_allow(self, key_id, request):
+        obj = self.get_object(key_id)
+        if not contains_ip(get_request_ip(request), obj.ip_group):
+            return False
+        return True
+
+    def after_authenticate_update_date(self, user):
+        update_service_integration_last_used.delay((user.id,))

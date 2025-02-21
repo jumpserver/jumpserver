@@ -9,7 +9,8 @@
         database: passwd
         key: "{{ account.username }}"
       register: user_info
-      ignore_errors: yes  # 忽略错误，如果用户不存在时不会导致playbook失败
+      failed_when: false
+      changed_when: false
 
     - name: "Add {{ account.username }} user"
       ansible.builtin.user:
@@ -18,10 +19,10 @@
         shell: "{{ params.shell if params.shell | length > 0 else omit }}"
         home: "{{ params.home if params.home | length > 0 else '/home/' + account.username }}"
         groups: "{{ params.groups if params.groups | length > 0 else omit }}"
-        append: yes
+        append: "{{ true if params.groups | length > 0 else false }}"
         expires: -1
         state: present
-      when: user_info.failed
+      when: user_info.msg is defined
 
     - name: "Set {{ account.username }} sudo setting"
       ansible.builtin.lineinfile:
@@ -31,7 +32,7 @@
         line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
         validate: visudo -cf %s
       when:
-        - user_info.failed or params.modify_sudo
+        - user_info.msg is defined or params.modify_sudo
         - params.sudo
 
     - name: "Change {{ account.username }} password"
@@ -100,7 +101,7 @@
         become_password: "{{ account.become.ansible_password | default('') }}"
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
-      when: account.secret_type == "password"
+      when: account.secret_type == "password" and check_conn_after_change
       delegate_to: localhost
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
@@ -111,5 +112,5 @@
         login_private_key_path: "{{ account.private_key_path  }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
-      when: account.secret_type == "ssh_key"
+      when: account.secret_type == "ssh_key" and check_conn_after_change
       delegate_to: localhost

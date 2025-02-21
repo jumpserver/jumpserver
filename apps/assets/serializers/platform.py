@@ -6,7 +6,8 @@ from rest_framework.validators import UniqueValidator
 from assets.models import Asset
 from common.serializers import (
     WritableNestedModelSerializer, type_field_map, MethodSerializer,
-    DictSerializer, create_serializer_class, ResourceLabelsMixin
+    DictSerializer, create_serializer_class, ResourceLabelsMixin,
+    CommonSerializerMixin
 )
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import lazyproperty
@@ -162,7 +163,7 @@ class PlatformCustomField(serializers.Serializer):
     choices = serializers.ListField(default=list, label=_("Choices"), required=False)
 
 
-class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
+class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNestedModelSerializer):
     id = serializers.IntegerField(
         label='ID', required=False,
         validators=[UniqueValidator(queryset=Platform.objects.all())]

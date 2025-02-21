@@ -49,3 +49,9 @@ class FaceMonitorActionChoices(TextChoices):
     Verify = 'verify', 'verify'
     Pause = 'pause', 'pause'
     Resume = 'resume', 'resume'
+
+
+class ConnectionTokenType(TextChoices):
+    ADMIN = 'admin', 'Admin'
+    SUPER = 'super', 'Super'
+    USER = 'user', 'User'

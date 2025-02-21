@@ -20,6 +20,7 @@
         become_private_key_path: "{{ jms_custom_become_private_key_path | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+        recv_timeout: "{{ params.recv_timeout | default(30) }}"
       register: ping_info
       delegate_to: localhost
 
@@ -39,9 +40,12 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         commands: "{{ params.commands }}"
-        first_conn_delay_time: "{{ first_conn_delay_time | default(0.5) }}"
+        answers: "{{ params.answers }}"
+        recv_timeout: "{{ params.recv_timeout | default(30) }}"
+        delay_time: "{{ params.delay_time | default(2) }}"
+        prompt: "{{ params.prompt | default('.*') }}"
       ignore_errors: true
-      when: ping_info is succeeded
+      when: ping_info is succeeded and check_conn_after_change
       register: change_info
       delegate_to: localhost
 
@@ -58,4 +62,6 @@
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+        recv_timeout: "{{ params.recv_timeout | default(30) }}"
       delegate_to: localhost
+      when: check_conn_after_change

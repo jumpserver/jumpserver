@@ -5,15 +5,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 import common.db.models
+
+from common.db.utils import default_ip_group
 from common.utils.random import random_string
 
 
 def default_secret():
     return random_string(36)
-
-
-def default_ip_group():
-    return ["*"]
 
 
 class AccessKey(models.Model):

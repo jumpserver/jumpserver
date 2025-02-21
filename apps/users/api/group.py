@@ -25,7 +25,7 @@ class UserGroupViewSet(OrgBulkModelViewSet):
     )
 
     @action(methods=['post'], detail=True, url_path='add-all-users')
-    def add_all_users(self, request, *args, **kwargs):
+    def add_all_users(self, _):
         instance = self.get_object()
         users = User.get_org_users().exclude(groups__id=instance.id)
         instance.users.add(*users)

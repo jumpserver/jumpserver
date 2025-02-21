@@ -21,4 +21,5 @@
         become_private_key_path: "{{ jms_custom_become_private_key_path | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+        recv_timeout: "{{ params.recv_timeout | default(30) }}"
 

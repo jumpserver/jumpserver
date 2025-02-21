@@ -116,7 +116,7 @@ def main():
 
     try:
         client.close()
-    except Exception:
+    except Exception: # noqa
         pass
 
     return module.exit_json(**result)

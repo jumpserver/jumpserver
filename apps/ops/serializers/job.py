@@ -14,7 +14,8 @@ from ops.serializers import JobVariableSerializer
 
 class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, WritableNestedModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
-    run_after_save = serializers.BooleanField(label=_("Execute after saving"), default=False, required=False)
+    run_after_save = serializers.BooleanField(label=_("Run on save"), default=False, required=False)
+    nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
     assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True, required=False)
@@ -91,7 +92,7 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     material = serializers.ReadOnlyField(label=_("Command"))
     is_success = serializers.ReadOnlyField(label=_("Is success"))
     is_finished = serializers.ReadOnlyField(label=_("Is finished"))
-    time_cost = serializers.ReadOnlyField(label=_("Time cost"))
+    time_cost = serializers.ReadOnlyField(label=_("Duration"))
 
     class Meta:
         model = JobExecution
