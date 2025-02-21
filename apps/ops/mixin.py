@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 import abc
+from datetime import timedelta
 
+from celery.schedules import crontab
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule, ClockedSchedule
 from rest_framework import serializers
 
 from .celery.utils import (
@@ -32,8 +36,17 @@ class PeriodTaskModelMixin(models.Model):
         default=24, null=True, blank=True, verbose_name=_("Interval"),
     )
     crontab = models.CharField(
-        blank=True, max_length=128, null=True, verbose_name=_("Crontab"),
+        blank=True, max_length=128, default='', verbose_name=_("Crontab"),
     )
+    start_time = models.DateTimeField(
+        blank=True, null=True,
+        verbose_name=_('Start Datetime'),
+        help_text=_(
+            'Datetime when the schedule should begin '
+            'triggering the task to run'
+        ),
+    )
+    date_last_run = models.DateTimeField(blank=True, null=True, verbose_name=_("Date last run"))
     objects = PeriodTaskModelQuerySet.as_manager()
 
     @abc.abstractmethod
@@ -59,9 +72,9 @@ class PeriodTaskModelMixin(models.Model):
             disable_celery_periodic_task(name)
             return
 
-        crontab = interval = None
+        cron = interval = None
         if self.crontab:
-            crontab = self.crontab
+            cron = self.crontab
         elif self.interval:
             interval = self.interval * self.interval_ratio[0]
 
@@ -69,13 +82,17 @@ class PeriodTaskModelMixin(models.Model):
             name: {
                 'task': task,
                 'interval': interval,
-                'crontab': crontab,
+                'crontab': cron,
                 'args': args,
                 'kwargs': kwargs,
                 'enabled': True,
+                'start_time': self.start_time,
             }
         }
         create_or_update_celery_periodic_tasks(tasks)
+
+    def execute(self, *args, **kwargs):
+        self.date_last_run = timezone.now()
 
     def save(self, *args, **kwargs):
         instance = super().save(**kwargs)
@@ -102,6 +119,45 @@ class PeriodTaskModelMixin(models.Model):
         name = self.get_register_task()[0]
         return PeriodicTask.objects.filter(name=name).first()
 
+    def get_next_run_time(self):
+        if not self.is_periodic:
+            return None
+        task = self.schedule
+        now = task.schedule.nowfun()
+
+        if self.start_time and self.start_time > now:
+            return self.start_time
+
+        scheduler = task.scheduler
+        # 根据不同的调度类型计算下次执行时间
+        if isinstance(scheduler, CrontabSchedule):
+            schedule = crontab(
+                minute=scheduler.minute,
+                hour=scheduler.hour,
+                day_of_week=scheduler.day_of_week,
+                day_of_month=scheduler.day_of_month,
+                month_of_year=scheduler.month_of_year,
+            )
+            next_run = schedule.remaining_estimate(now)
+            return now + next_run
+        elif isinstance(scheduler, IntervalSchedule):
+            interval = timedelta(
+                seconds=scheduler.every * {
+                    IntervalSchedule.SECONDS: 1,
+                    IntervalSchedule.MINUTES: 60,
+                    IntervalSchedule.HOURS: 3600,
+                    IntervalSchedule.DAYS: 86400,
+                }[scheduler.period]
+            )
+            last_run = task.last_run_at or now
+            return last_run + interval
+
+        elif isinstance(scheduler, ClockedSchedule):
+            return scheduler.clocked_time
+
+        else:
+            raise ValueError("不支持的任务调度类型")
+
     class Meta:
         abstract = True
 
@@ -113,12 +169,18 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
         allow_null=True, required=False, label=_('Crontab')
     )
     interval = serializers.IntegerField(
-        default=24, allow_null=True, required=False, label=_('Interval')
+        default=24, allow_null=True, required=False, label=_('Interval'),
+        max_value=65535, min_value=1,
+    )
+    start_time = serializers.DateTimeField(
+        allow_null=True, required=False,
+        label=_('Start Datetime'),
+        help_text=_(
+            'Datetime when the schedule should begin '
+            'triggering the task to run'
+        ),
     )
     periodic_display = serializers.CharField(read_only=True, label=_('Run period'))
-
-    INTERVAL_MAX = 65535
-    INTERVAL_MIN = 1
 
     def validate_crontab(self, crontab):
         if not crontab:
@@ -131,9 +193,6 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
     def validate_interval(self, interval):
         if not interval and not isinstance(interval, int):
             return interval
-        msg = _("Range {} to {}").format(self.INTERVAL_MIN, self.INTERVAL_MAX)
-        if interval > self.INTERVAL_MAX or interval < self.INTERVAL_MIN:
-            raise serializers.ValidationError(msg)
         return interval
 
     def validate_is_periodic(self, ok):

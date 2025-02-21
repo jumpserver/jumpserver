@@ -4,6 +4,11 @@ from .base import BaseType
 
 
 class DeviceTypes(BaseType):
+    CISCO = 'cisco', _("Cisco")
+    HUAWEI = 'huawei', _("Huawei")
+    H3C = 'h3c', _("H3C")
+    JUNIPER = 'juniper', _("Juniper")
+    TP_LINK = 'tp_link', _("TP-Link")
     GENERAL = 'general', _("General")
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
@@ -34,8 +39,7 @@ class DeviceTypes(BaseType):
             '*': {
                 'ansible_enabled': True,
                 'ansible_config': {
-                    'ansible_connection': 'local',
-                    'first_conn_delay_time': 0.5,
+                    'ansible_connection': 'local'
                 },
                 'ping_enabled': True,
                 'gather_facts_enabled': False,

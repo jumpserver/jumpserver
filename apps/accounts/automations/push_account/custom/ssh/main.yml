@@ -1,0 +1,62 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_become: false
+
+  tasks:
+    - name: Test privileged account (paramiko)
+      ssh_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_secret_type: "{{ jms_account.secret_type }}"
+        login_private_key_path: "{{ jms_account.private_key_path }}"
+        become: "{{ jms_custom_become | default(False) }}"
+        become_method: "{{ jms_custom_become_method | default('su') }}"
+        become_user: "{{ jms_custom_become_user | default('') }}"
+        become_password: "{{ jms_custom_become_password | default('') }}"
+        become_private_key_path: "{{ jms_custom_become_private_key_path | default(None) }}"
+        old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+      register: ping_info
+      delegate_to: localhost
+
+    - name: Change asset password (paramiko)
+      custom_command:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_secret_type: "{{ jms_account.secret_type }}"
+        login_private_key_path: "{{ jms_account.private_key_path }}"
+        become: "{{ jms_custom_become | default(False) }}"
+        become_method: "{{ jms_custom_become_method | default('su') }}"
+        become_user: "{{ jms_custom_become_user | default('') }}"
+        become_password: "{{ jms_custom_become_password | default('') }}"
+        become_private_key_path: "{{ jms_custom_become_private_key_path | default(None) }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        commands: "{{ params.commands }}"
+        first_conn_delay_time: "{{ first_conn_delay_time | default(0.5) }}"
+      ignore_errors: true
+      when: ping_info is succeeded and check_conn_after_change
+      register: change_info
+      delegate_to: localhost
+
+    - name: Verify password (paramiko)
+      ssh_ping:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        become: "{{ account.become.ansible_become | default(False) }}"
+        become_method: su
+        become_user: "{{ account.become.ansible_user | default('') }}"
+        become_password: "{{ account.become.ansible_password | default('') }}"
+        become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
+        old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+      delegate_to: localhost
+      when: check_conn_after_change

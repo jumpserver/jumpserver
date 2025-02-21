@@ -52,7 +52,7 @@ class RBACPermission(permissions.DjangoModelPermissions):
         return cls.format_perms(perm_tmpl, model_cls)
 
     def get_default_action_perms(self, model_cls):
-        if model_cls is None:
+        if model_cls is None or not hasattr(model_cls, '_meta'):
             return {}
 
         perms = {}

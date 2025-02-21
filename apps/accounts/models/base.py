@@ -54,10 +54,9 @@ class SecretWithRandomMixin(models.Model):
         )
 
     def get_secret(self):
-        if self.secret_strategy == 'random':
-            return self.secret_generator.get_secret()
-        else:
+        if self.secret_strategy == SecretStrategy.custom:
             return self.secret
+        return self.secret_generator.get_secret()
 
 
 class BaseAccount(VaultModelMixin, JMSOrgBaseModel):

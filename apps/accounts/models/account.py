@@ -3,17 +3,20 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from assets.models.base import AbsConnectivity
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from labels.mixins import LabeledMixin
 from .base import BaseAccount
 from .mixins import VaultModelMixin
 from ..const import Source
+
+logger = get_logger(__file__)
 
 __all__ = ['Account', 'AccountHistoricalRecords']
 
 
 class AccountHistoricalRecords(HistoricalRecords):
     def __init__(self, *args, **kwargs):
+        self.updated_version = None
         self.included_fields = kwargs.pop('included_fields', None)
         super().__init__(*args, **kwargs)
 
@@ -22,9 +25,13 @@ class AccountHistoricalRecords(HistoricalRecords):
             return super().post_save(instance, created, using=using, **kwargs)
 
         check_fields = set(self.included_fields) - {'version'}
-        history_attrs = instance.history.all().values(*check_fields).first()
-        if history_attrs is None:
+
+        history_account = instance.history.first()
+        if history_account is None:
+            self.updated_version = 0
             return super().post_save(instance, created, using=using, **kwargs)
+
+        history_attrs = {field: getattr(history_account, field) for field in check_fields}
 
         attrs = {field: getattr(instance, field) for field in check_fields}
         history_attrs = set(history_attrs.items())
@@ -32,7 +39,15 @@ class AccountHistoricalRecords(HistoricalRecords):
         diff = attrs - history_attrs
         if not diff:
             return
+        self.updated_version = history_account.version + 1
+        instance.version = self.updated_version
         return super().post_save(instance, created, using=using, **kwargs)
+
+    def create_historical_record(self, instance, history_type, using=None):
+        super().create_historical_record(instance, history_type, using=using)
+        # Ignore deletion history_type: -
+        if self.updated_version is not None and history_type != '-':
+            instance.save(update_fields=['version'])
 
     def create_history_model(self, model, inherited):
         if self.included_fields and not self.excluded_fields:
@@ -55,8 +70,15 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'],
                                        verbose_name=_("historical Account"))
+    secret_reset = models.BooleanField(default=True, verbose_name=_('Secret reset'))
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
+    date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
+    login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
+    date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
+    change_secret_status = models.CharField(
+        max_length=16, null=True, blank=True, verbose_name=_('Change secret status')
+    )
 
     class Meta:
         verbose_name = _('Account')

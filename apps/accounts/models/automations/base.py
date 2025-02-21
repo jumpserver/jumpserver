@@ -40,33 +40,49 @@ class AutomationExecution(AssetAutomationExecution):
 
             ('view_pushaccountexecution', _('Can view push account execution')),
             ('add_pushaccountexecution', _('Can add push account execution')),
+
+            ('view_backupaccountexecution', _('Can view backup account execution')),
+            ('add_backupaccountexecution', _('Can add backup account execution')),
         ]
 
-    def start(self):
+    @property
+    def manager(self):
         from accounts.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
-        return manager.run()
+        return manager
 
 
 class ChangeSecretMixin(SecretWithRandomMixin):
     ssh_key_change_strategy = models.CharField(
-        choices=SSHKeyStrategy.choices, max_length=16,
-        default=SSHKeyStrategy.set_jms, verbose_name=_('SSH key change strategy')
+        choices=SSHKeyStrategy.choices,
+        max_length=16,
+        default=SSHKeyStrategy.set_jms,
+        verbose_name=_('SSH key change strategy')
+    )
+    check_conn_after_change = models.BooleanField(
+        default=True,
+        verbose_name=_('Check connection after change')
     )
     get_all_assets: callable  # get all assets
+    accounts: list  # account usernames
 
     class Meta:
         abstract = True
 
-    def create_nonlocal_accounts(self, usernames, asset):
-        pass
+    def gen_nonlocal_accounts(self, usernames, asset):
+        return []
 
     def get_account_ids(self):
+        account_objs = []
         usernames = self.accounts
-        accounts = Account.objects.none()
-        for asset in self.get_all_assets():
-            self.create_nonlocal_accounts(usernames, asset)
-            accounts = accounts | asset.accounts.all()
+        assets = self.get_all_assets()
+        for asset in assets:
+            objs = self.gen_nonlocal_accounts(usernames, asset)
+            account_objs.extend(objs)
+
+        Account.objects.bulk_create(account_objs)
+
+        accounts = Account.objects.filter(asset__in=assets)
         account_ids = accounts.filter(
             username__in=usernames, secret_type=self.secret_type
         ).values_list('id', flat=True)
@@ -81,5 +97,6 @@ class ChangeSecretMixin(SecretWithRandomMixin):
             'password_rules': self.password_rules,
             'secret_strategy': self.secret_strategy,
             'ssh_key_change_strategy': self.ssh_key_change_strategy,
+            'check_conn_after_change': self.check_conn_after_change,
         })
         return attr_json

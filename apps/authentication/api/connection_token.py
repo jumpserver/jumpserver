@@ -29,16 +29,16 @@ from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
 from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
+from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
-from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
     ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer
 )
 
-__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
+__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet', 'AdminConnectionTokenViewSet']
 logger = get_logger(__name__)
 
 
@@ -664,3 +664,14 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         else:
             logger.error('Release applet account error: {}'.format(lock_key))
             return Response({'error': 'not found or expired'}, status=400)
+
+
+class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
+
+    def check_permissions(self, request):
+        user = request.user
+        if not user.is_superuser:
+            self.permission_denied(request)
+
+    def get_queryset(self):
+        return AdminConnectionToken.objects.all()

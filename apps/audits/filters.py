@@ -63,7 +63,7 @@ class OperateLogFilterSet(BaseFilterSet):
         with translation.override(current_lang):
             mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
         tp = mapper.get(resource_type)
-        queryset = queryset.filter(resource_type=tp)
+        queryset = queryset.filter(resource_type__in=[tp, resource_type])
         return queryset
 
     class Meta:

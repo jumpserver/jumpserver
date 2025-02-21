@@ -32,6 +32,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.BasicAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
+        'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.SessionAuthentication',
     ),
@@ -194,3 +195,5 @@ DJANGO_REDIS_SCAN_ITERSIZE = 1000
 # GM DEVICE
 PIICO_DEVICE_ENABLE = CONFIG.PIICO_DEVICE_ENABLE
 PIICO_DRIVER_PATH = CONFIG.PIICO_DRIVER_PATH
+
+LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH

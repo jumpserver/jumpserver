@@ -55,8 +55,8 @@ def get_country_phone_choices():
 
 
 class Trigger(models.TextChoices):
-    manual = 'manual', _('Manual trigger')
-    timing = 'timing', _('Timing trigger')
+    manual = 'manual', _('Manual')
+    timing = 'timing', _('Timing')
 
 
 class Status(models.TextChoices):
@@ -105,6 +105,12 @@ class Language(models.TextChoices):
         code_mapper = cls.get_code_mapper()
         other_codes = [other_code for other_code, _code in code_mapper.items() if code == _code]
         return other_codes
+
+
+class ConfirmOrIgnore(models.TextChoices):
+    pending = '0', _('Pending')
+    confirmed = '1', _('Confirmed')
+    ignored = '2', _('Ignored')
 
 
 COUNTRY_CALLING_CODES = get_country_phone_choices()

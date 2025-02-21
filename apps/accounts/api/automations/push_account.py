@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 #
+from rest_framework import mixins
+
 from accounts import serializers
 from accounts.const import AutomationTypes
-from accounts.models import PushAccountAutomation, ChangeSecretRecord
-from orgs.mixins.api import OrgBulkModelViewSet
-
+from accounts.filters import PushAccountRecordFilterSet
+from accounts.models import PushAccountAutomation, PushSecretRecord
+from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
 from .base import (
     AutomationAssetsListApi, AutomationRemoveAssetApi, AutomationAddAssetApi,
     AutomationNodeAddRemoveApi, AutomationExecutionViewSet
 )
-from .change_secret import ChangeSecretRecordViewSet
 
 __all__ = [
     'PushAccountAutomationViewSet', 'PushAccountAssetsListApi', 'PushAccountRemoveAssetApi',
@@ -30,6 +31,7 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
         ("list", "accounts.view_pushaccountexecution"),
         ("retrieve", "accounts.view_pushaccountexecution"),
         ("create", "accounts.add_pushaccountexecution"),
+        ("report", "accounts.view_pushaccountexecution"),
     )
 
     tp = AutomationTypes.push_account
@@ -40,13 +42,19 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
         return queryset
 
 
-class PushAccountRecordViewSet(ChangeSecretRecordViewSet):
-    serializer_class = serializers.ChangeSecretRecordSerializer
+class PushAccountRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
+    filterset_class = PushAccountRecordFilterSet
+    search_fields = ('asset__address', 'account_username')
+    ordering_fields = ('date_finished',)
     tp = AutomationTypes.push_account
+    serializer_classes = {
+        'default': serializers.PushSecretRecordSerializer,
+    }
 
     def get_queryset(self):
-        return ChangeSecretRecord.objects.filter(
-            execution__automation__type=AutomationTypes.push_account
+        qs = PushSecretRecord.get_valid_records()
+        return qs.filter(
+            execution__automation__type=self.tp
         )
 
 

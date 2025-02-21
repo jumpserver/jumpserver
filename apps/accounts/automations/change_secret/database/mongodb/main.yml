@@ -1,7 +1,7 @@
 - hosts: mongodb
   gather_facts: no
   vars:
-    ansible_python_interpreter: /opt/py3/bin/python
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
 
   tasks:
     - name: Test MongoDB connection
@@ -53,3 +53,4 @@
         ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
+      when: check_conn_after_change

@@ -37,13 +37,14 @@ from .const import ActivityChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession
+    ActivityLog, JobLog, UserSession, IntegrationApplicationLog
 )
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
-    FileSerializer, UserSessionSerializer, JobsAuditSerializer
+    FileSerializer, UserSessionSerializer, JobsAuditSerializer,
+    ServiceAccessLogSerializer
 )
 from .utils import construct_userlogin_usernames
 
@@ -329,3 +330,15 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             user_session_manager.remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)
+
+
+class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
+    model = IntegrationApplicationLog
+    serializer_class = ServiceAccessLogSerializer
+    extra_filter_backends = [DatetimeRangeFilterBackend]
+    date_range_filter_fields = [
+        ('datetime', ('date_from', 'date_to'))
+    ]
+    filterset_fields = ['account', 'remote_addr', 'service_id']
+    search_fields = filterset_fields
+    ordering = ['-datetime']

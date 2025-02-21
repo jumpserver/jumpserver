@@ -41,7 +41,8 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         choices=SecretStrategy.choices, required=True, label=_('Secret strategy')
     )
     ssh_key_change_strategy = LabeledChoiceField(
-        choices=SSHKeyStrategy.choices, required=False, label=_('SSH Key strategy')
+        choices=SSHKeyStrategy.choices, required=False, label=_('SSH Key strategy'),
+        default="set_jms"
     )
     password_rules = PasswordRulesSerializer(required=False, label=_('Password rules'))
     secret_type = LabeledChoiceField(choices=get_secret_types(), required=True, label=_('Secret type'))
@@ -51,13 +52,14 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields + read_only_fields + [
             'secret_type', 'secret_strategy', 'secret', 'password_rules',
-            'ssh_key_change_strategy', 'passphrase', 'recipients', 'params'
+            'ssh_key_change_strategy', 'passphrase', 'recipients', 'params', 'check_conn_after_change'
         ]
         extra_kwargs = {**BaseAutomationSerializer.Meta.extra_kwargs, **{
             'accounts': {'required': True, 'help_text': _('Please enter your account username')},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 "Currently only mail sending is supported"
             )},
+            'pre_recipients': {'help_text': _("Notification before execution")},
             'params': {'help_text': _(
                 "Secret parameter settings, currently only effective for assets of the host type."
             )},
