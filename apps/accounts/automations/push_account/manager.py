@@ -10,17 +10,13 @@ from ...models import PushSecretRecord
 logger = get_logger(__name__)
 
 
-<<<<<<< HEAD
-class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
+class PushAccountManager(BaseChangeSecretPushManager):
 
     @staticmethod
     def require_update_version(account, recorder):
         account.skip_history_when_saving = True
         return False
 
-=======
-class PushAccountManager(BaseChangeSecretPushManager):
->>>>>>> pam
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
@@ -47,7 +43,7 @@ class PushAccountManager(BaseChangeSecretPushManager):
 
         self.name_recorder_mapper[name] = recorder
         return recorder
-    
+
     @bulk_create_decorator(PushSecretRecord)
     def create_record(self, asset, account):
         recorder = PushSecretRecord(

@@ -21,21 +21,6 @@ from .tasks.push_account import push_accounts_to_assets_task
 logger = get_logger(__name__)
 
 
-<<<<<<< HEAD
-@receiver(pre_save, sender=Account)
-def on_account_pre_save(sender, instance, **kwargs):
-    if getattr(instance, 'skip_history_when_saving', False):
-        return
-
-    if instance.version == 0:
-        instance.version = 1
-    else:
-        history_account = instance.history.first()
-        instance.version = history_account.version + 1 if history_account else 0
-
-
-=======
->>>>>>> pam
 @merge_delay_run(ttl=5)
 def push_accounts_if_need(accounts=()):
     from .models import AccountTemplate

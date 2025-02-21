@@ -269,34 +269,8 @@ class PlaybookPrepareMixin:
             os.makedirs(cert_dir, 0o700, True)
 
         for f in filtered:
-<<<<<<< HEAD
-            result = self.write_cert_to_file(
-                os.path.join(cert_dir, f), specific.get(f)
-            )
-            os.chmod(result, 0o600)
-            host['jms_asset']['secret_info'][f] = result
-        return host
-
-    def host_callback(self, host, automation=None, **kwargs):
-        method_type = self.__class__.method_type()
-        enabled_attr = '{}_enabled'.format(method_type)
-        method_attr = '{}_method'.format(method_type)
-
-        method_enabled = automation and \
-                         getattr(automation, enabled_attr) and \
-                         getattr(automation, method_attr) and \
-                         getattr(automation, method_attr) in self.method_id_meta_mapper
-
-        if not method_enabled:
-            host['error'] = _('{} disabled'.format(self.__class__.method_type()))
-            return host
-
-        host = self.convert_cert_to_file(host, kwargs.get('path_dir'))
-        host['params'] = self.get_params(automation, method_type)
-=======
             result = self.write_cert_to_file(os.path.join(cert_dir, f), specific.get(f))
             host["jms_asset"]["secret_info"][f] = result
->>>>>>> pam
         return host
 
     @staticmethod

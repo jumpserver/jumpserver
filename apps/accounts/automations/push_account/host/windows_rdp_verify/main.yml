@@ -26,11 +26,6 @@
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
-<<<<<<< HEAD
         gateway_args: "{{ jms_gateway | default({}) }}"
-      when: account.secret_type == "password"
-=======
-        gateway_args: "{{ jms_gateway | default(None) }}"
       when: account.secret_type == "password" and check_conn_after_change
->>>>>>> pam
       delegate_to: localhost

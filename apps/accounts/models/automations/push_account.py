@@ -20,13 +20,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
         create_accounts = [
             Account(
-<<<<<<< HEAD
                 name=f"{username}-{secret_type}" if secret_type != SecretType.PASSWORD else username,
-                username=username,
-=======
-                name=f'{username}-{secret_type}',
                 username=username, secret=self.get_secret(),
->>>>>>> pam
                 secret_type=secret_type, asset=asset,
             )
             for username in create_usernames
