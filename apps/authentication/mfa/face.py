@@ -1,9 +1,8 @@
-from authentication.mfa.base import BaseMFA
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
+from authentication.mfa.base import BaseMFA
 from authentication.mixins import AuthFaceMixin
-from common.const import LicenseEditionChoices
-from settings.api import settings
 
 
 class MFAFace(BaseMFA, AuthFaceMixin):
@@ -31,9 +30,9 @@ class MFAFace(BaseMFA, AuthFaceMixin):
     @staticmethod
     def global_enabled():
         return (
-            settings.XPACK_LICENSE_IS_VALID and
-            settings.XPACK_LICENSE_EDITION_ULTIMATE and
-            settings.FACE_RECOGNITION_ENABLED
+                settings.XPACK_LICENSE_IS_VALID and
+                settings.XPACK_LICENSE_EDITION_ULTIMATE and
+                settings.FACE_RECOGNITION_ENABLED
         )
 
     def get_enable_url(self) -> str:
