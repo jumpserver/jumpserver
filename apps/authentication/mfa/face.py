@@ -3,11 +3,12 @@ from django.utils.translation import gettext_lazy as _
 
 from authentication.mfa.base import BaseMFA
 from authentication.mixins import AuthFaceMixin
+from ..const import MFAType
 
 
 class MFAFace(BaseMFA, AuthFaceMixin):
-    name = "face"
-    display_name = _('Face Recognition')
+    name = MFAType.Face.value
+    display_name = MFAType.Face.name
     placeholder = 'Face Recognition'
 
     def check_code(self, code):
