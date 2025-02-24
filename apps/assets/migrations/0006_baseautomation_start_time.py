@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("assets", "0006_database_pg_ssl_mode"),
+        ("assets", "0005_myasset"),
     ]
 
     operations = [
