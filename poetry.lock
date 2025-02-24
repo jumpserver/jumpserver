@@ -1346,11 +1346,6 @@ ssh = ["bcrypt (>=3.1.5)"]
 test = ["pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-xdist"]
 test-randomorder = ["pytest-randomly"]
 
-[package.source]
-type = "legacy"
-url = "https://mirrors.aliyun.com/pypi/simple"
-reference = "aliyun"
-
 [[package]]
 name = "cssselect"
 version = "1.2.0"
@@ -1361,11 +1356,6 @@ files = [
     {file = "cssselect-1.2.0-py2.py3-none-any.whl", hash = "sha256:da1885f0c10b60c03ed5eccbb6b68d6eff248d91976fcde348f395d54c9fd35e"},
     {file = "cssselect-1.2.0.tar.gz", hash = "sha256:666b19839cfaddb9ce9d36bfe4c969132c647b92fc9088c4e23f786b30f1b3dc"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://mirrors.aliyun.com/pypi/simple"
-reference = "aliyun"
 
 [[package]]
 name = "cssutils"
@@ -3421,11 +3411,6 @@ files = [
     {file = "mistune-2.0.3.tar.gz", hash = "sha256:d7605b46b6156b53b7d52a465202b29a6f00f4ea4130ad5d25e9d5547d6b7e50"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://mirrors.aliyun.com/pypi/simple"
-reference = "aliyun"
-
 [[package]]
 name = "more-itertools"
 version = "10.5.0"
@@ -4175,11 +4160,6 @@ pywin32 = {version = ">=226", markers = "platform_system == \"Windows\""}
 docs = ["sphinx (>=1.7.1)"]
 redis = ["redis"]
 tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "pytest-timeout (>=2.1.0)", "redis", "sphinx (>=6.0.0)", "types-redis"]
-
-[package.source]
-type = "legacy"
-url = "https://mirrors.aliyun.com/pypi/simple"
-reference = "aliyun"
 
 [[package]]
 name = "premailer"
@@ -6744,4 +6724,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "ebb8489221c06b52f600454895456831b92f37c0c6422bc7abcc9b4cbf92b67a"
+content-hash = "3ce6d7862faf31b427c9400908946447b54cea8816e82fac6ef132f485b06ebf"
