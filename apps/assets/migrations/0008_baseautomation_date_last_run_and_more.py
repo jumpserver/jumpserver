@@ -6,19 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ops", "0004_historicaljob_start_time_job_start_time"),
+        ("assets", "0007_baseautomation_start_time"),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name="historicaljob",
-            name="crontab",
-            field=models.CharField(
-                blank=True, default="", max_length=128, verbose_name="Crontab"
+        migrations.AddField(
+            model_name="baseautomation",
+            name="date_last_run",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Date last run"
             ),
         ),
         migrations.AlterField(
-            model_name="job",
+            model_name="baseautomation",
             name="crontab",
             field=models.CharField(
                 blank=True, default="", max_length=128, verbose_name="Crontab"

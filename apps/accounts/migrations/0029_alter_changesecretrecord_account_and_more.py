@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0011_auto_20241204_1516'),
+        ('assets', '0012_auto_20241204_1516'),
         ('accounts', '0028_remove_checkaccountengine_is_active_and_more'),
     ]
 
