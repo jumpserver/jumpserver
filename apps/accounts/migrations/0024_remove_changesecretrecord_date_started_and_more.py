@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0011_auto_20241204_1516'),
+        ('assets', '0012_auto_20241204_1516'),
         ('accounts', '0023_alter_changesecretrecord_options'),
     ]
 

@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("assets", "0006_baseautomation_start_time"),
+        ("assets", "0007_baseautomation_start_time"),
         ("accounts", "0005_account_secret_reset"),
     ]
 

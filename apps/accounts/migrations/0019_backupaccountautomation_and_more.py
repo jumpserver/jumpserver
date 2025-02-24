@@ -62,7 +62,7 @@ def migrate_account_backup(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0010_alter_automationexecution_duration'),
+        ('assets', '0011_alter_automationexecution_duration'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('terminal', '0003_auto_20171230_0308'),
         ('accounts', '0018_changesecretrecord_ignore_fail_and_more'),

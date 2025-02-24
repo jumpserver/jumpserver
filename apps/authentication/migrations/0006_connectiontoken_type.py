@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0003_sshkey'),
+        ('authentication', '0005_connectiontoken_face_monitor_token'),
     ]
 
     operations = [

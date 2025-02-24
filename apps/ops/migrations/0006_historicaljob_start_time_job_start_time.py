@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ops", "0003_alter_adhoc_unique_together_and_more"),
+        ("ops", "0005_historicaljob_periodic_variable_and_more"),
     ]
 
     operations = [

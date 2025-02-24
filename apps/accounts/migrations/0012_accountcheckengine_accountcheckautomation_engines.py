@@ -8,7 +8,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("assets", "0007_baseautomation_date_last_run_and_more"),
+        ("assets", "0008_baseautomation_date_last_run_and_more"),
         (
             "accounts",
             "0011_rename_date_change_password_gatheredaccount_date_password_change",

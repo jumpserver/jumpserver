@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("assets", "0007_baseautomation_date_last_run_and_more"),
+        ("assets", "0008_baseautomation_date_last_run_and_more"),
     ]
 
     operations = [

@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("assets", "0006_baseautomation_start_time"),
+        ("assets", "0007_baseautomation_start_time"),
         ("accounts", "0004_alter_changesecretrecord_account_and_more"),
     ]
 

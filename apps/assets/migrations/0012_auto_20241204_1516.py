@@ -15,7 +15,7 @@ def migrate_platform_sqlserver_automation(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0010_alter_automationexecution_duration'),
+        ('assets', '0011_alter_automationexecution_duration'),
     ]
 
     operations = [
