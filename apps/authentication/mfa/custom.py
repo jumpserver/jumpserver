@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
 from .base import BaseMFA
+from ..const import MFAType
 
 logger = get_logger(__file__)
 
@@ -21,8 +22,8 @@ custom_failed_msg = _("MFA Custom code invalid")
 
 
 class MFACustom(BaseMFA):
-    name = 'mfa_custom'
-    display_name = 'Custom'
+    name = MFAType.Custom.value
+    display_name = MFAType.Custom.name
     placeholder = _("MFA custom verification code")
 
     def check_code(self, code):

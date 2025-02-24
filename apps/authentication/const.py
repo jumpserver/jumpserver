@@ -1,8 +1,8 @@
 from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 
 from authentication.confirm import CONFIRM_BACKENDS
 from .confirm import ConfirmMFA, ConfirmPassword, ConfirmReLogin
-from .mfa import MFAOtp, MFASms, MFARadius, MFAFace, MFACustom
 
 RSA_PRIVATE_KEY = 'rsa_private_key'
 RSA_PUBLIC_KEY = 'rsa_public_key'
@@ -33,11 +33,11 @@ class ConfirmType(TextChoices):
 
 
 class MFAType(TextChoices):
-    OTP = MFAOtp.name, MFAOtp.display_name
-    SMS = MFASms.name, MFASms.display_name
-    Face = MFAFace.name, MFAFace.display_name
-    Radius = MFARadius.name, MFARadius.display_name
-    Custom = MFACustom.name, MFACustom.display_name
+    OTP = 'otp', _('OTP')
+    SMS = 'sms', _('SMS')
+    Face = 'face', _('Face Recognition')
+    Radius = 'otp_radius', _('Radius')
+    Custom = 'mfa_custom', _('Custom')
 
 
 FACE_CONTEXT_CACHE_KEY_PREFIX = "FACE_CONTEXT"
