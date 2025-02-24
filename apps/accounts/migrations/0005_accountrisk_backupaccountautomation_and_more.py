@@ -14,7 +14,38 @@ import common.db.utils
 
 
 def migrate_account_backup(apps, schema_editor):
-    old_backup_model = apps.get_model('accounts', 'AccountBackupAutomation')
+    backup_id_old_new_map = migrate_backup_account_automation(apps)
+    migrate_automation_execution(apps, backup_id_old_new_map)
+
+
+def migrate_automation_execution(apps, backup_id_old_new_map):
+    try:
+        old_execution_model = apps.get_model('accounts', 'AccountBackupExecution')
+    except LookupError:
+        return
+    backup_execution_model = apps.get_model('accounts', 'AutomationExecution')
+    for execution in old_execution_model.objects.all():
+        automation_id = backup_id_old_new_map.get(str(execution.plan_id))
+        if not automation_id:
+            continue
+        data = {
+            'automation_id': automation_id,
+            'date_start': execution.date_start,
+            'duration': int(execution.timedelta),
+            'date_finished': execution.date_start + dt_timedelta(seconds=int(execution.timedelta)),
+            'snapshot': execution.snapshot,
+            'trigger': execution.trigger,
+            'status': 'error' if execution.reason == '-' else 'success',
+            'org_id': execution.org_id
+        }
+        backup_execution_model.objects.create(**data)
+
+
+def migrate_backup_account_automation(apps):
+    try:
+        old_backup_model = apps.get_model('accounts', 'AccountBackupAutomation')
+    except LookupError:
+        return
     account_backup_model = apps.get_model('accounts', 'BackupAccountAutomation')
     backup_id_old_new_map = {}
     for backup in old_backup_model.objects.all():
@@ -44,25 +75,7 @@ def migrate_account_backup(apps, schema_editor):
         obj.recipients_part_two.set(backup.recipients_part_two.all())
         obj.obj_recipients_part_one.set(backup.obj_recipients_part_one.all())
         obj.obj_recipients_part_two.set(backup.obj_recipients_part_two.all())
-
-    old_execution_model = apps.get_model('accounts', 'AccountBackupExecution')
-    backup_execution_model = apps.get_model('accounts', 'AutomationExecution')
-
-    for execution in old_execution_model.objects.all():
-        automation_id = backup_id_old_new_map.get(str(execution.plan_id))
-        if not automation_id:
-            continue
-        data = {
-            'automation_id': automation_id,
-            'date_start': execution.date_start,
-            'duration': int(execution.timedelta),
-            'date_finished': execution.date_start + dt_timedelta(seconds=int(execution.timedelta)),
-            'snapshot': execution.snapshot,
-            'trigger': execution.trigger,
-            'status': 'error' if execution.reason == '-' else 'success',
-            'org_id': execution.org_id
-        }
-        backup_execution_model.objects.create(**data)
+    return backup_id_old_new_map
 
 
 class Migration(migrations.Migration):
