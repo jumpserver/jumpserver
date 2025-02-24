@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("ops", "0004_historicaljob_start_time_job_start_time"),
+        ("ops", "0005_historicaljob_periodic_variable_and_more"),
     ]
 
     operations = [

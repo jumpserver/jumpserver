@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("assets", "0006_baseautomation_start_time"),
+        ("assets", "0006_database_pg_ssl_mode"),
     ]
 
     operations = [

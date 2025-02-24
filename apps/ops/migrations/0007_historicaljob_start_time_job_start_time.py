@@ -4,14 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("assets", "0005_myasset"),
+        ("ops", "0006_alter_historicaljob_crontab_alter_job_crontab"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="baseautomation",
+            model_name="historicaljob",
+            name="start_time",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="Datetime when the schedule should begin triggering the task to run",
+                null=True,
+                verbose_name="Start Datetime",
+            ),
+        ),
+        migrations.AddField(
+            model_name="job",
             name="start_time",
             field=models.DateTimeField(
                 blank=True,

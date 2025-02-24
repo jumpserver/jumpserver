@@ -4,24 +4,13 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("ops", "0003_alter_adhoc_unique_together_and_more"),
+        ("assets", "0011_auto_20241204_1516"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="historicaljob",
-            name="start_time",
-            field=models.DateTimeField(
-                blank=True,
-                help_text="Datetime when the schedule should begin triggering the task to run",
-                null=True,
-                verbose_name="Start Datetime",
-            ),
-        ),
-        migrations.AddField(
-            model_name="job",
+            model_name="baseautomation",
             name="start_time",
             field=models.DateTimeField(
                 blank=True,

@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("assets", "0006_baseautomation_start_time"),
+        ("assets", "0012_baseautomation_start_time"),
         ("accounts", "0008_remove_accountrisk_confirmed_accountrisk_status_and_more"),
     ]
 

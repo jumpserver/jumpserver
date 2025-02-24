@@ -4,16 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('authentication', '0003_sshkey'),
+        ('authentication', '0005_connectiontoken_face_monitor_token'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='connectiontoken',
             name='type',
-            field=models.CharField(choices=[('admin', 'Admin'), ('super', 'Super'), ('user', 'User')], default='user', max_length=16, verbose_name='Type'),
+            field=models.CharField(choices=[('admin', 'Admin'), ('super', 'Super'), ('user', 'User')], default='user',
+                                   max_length=16, verbose_name='Type'),
         ),
         migrations.CreateModel(
             name='AdminConnectionToken',
