@@ -14,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
 from rest_framework.settings import api_settings
 from rest_framework.utils import html
+from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.db.fields import EncryptMixin
 from common.serializers.fields import (
@@ -72,7 +73,6 @@ class BulkSerializerMixin(object):
     """
 
     def to_internal_value(self, data):
-        from rest_framework_bulk import BulkListSerializer
 
         ret = super(BulkSerializerMixin, self).to_internal_value(data)
 

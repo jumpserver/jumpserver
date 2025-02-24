@@ -52,7 +52,7 @@ class UserFilter(BaseFilterSet):
 
         if name == 'is_password_expired':
             key = 'date_password_last_updated'
-        elif name == 'long_time_no_login':
+        elif name == 'is_long_time_no_login':
             key = 'last_login'
         else:
             raise ValueError('Invalid filter name')
