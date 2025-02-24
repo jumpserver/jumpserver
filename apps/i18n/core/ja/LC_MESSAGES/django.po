@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-24 14:26+0800\n"
+"POT-Creation-Date: 2025-02-24 19:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,10 +42,8 @@ msgid "Number of backup accounts"
 msgstr "バックアップアカウントの数"
 
 #: accounts/automations/backup_account/handlers.py:143
-#, fuzzy
-#| msgid "Generating asset or application related backup information files"
 msgid "Generating asset related backup information files"
-msgstr "アセットまたはアプリケーション関連のバックアップ情報ファイルを生成中"
+msgstr "資産関連のバックアップ情報ファイルを生成"
 
 #: accounts/automations/backup_account/handlers.py:168
 #: accounts/automations/backup_account/manager.py:26
@@ -93,10 +91,8 @@ msgid "Plan execution end"
 msgstr "計画実行終了"
 
 #: accounts/automations/base/manager.py:106
-#, fuzzy
-#| msgid "No pending accounts found"
 msgid "No pending accounts found"
-msgstr "保留中のアカウントが見つかりません"
+msgstr "処理待ちのアカウントが見つかりません"
 
 #: accounts/automations/change_secret/manager.py:86
 #, python-format
@@ -220,10 +216,8 @@ msgid "Verify gateway account"
 msgstr "ゲートウェイ アカウントを確認する"
 
 #: accounts/const/automation.py:31
-#, fuzzy
-#| msgid "Backup account"
 msgid "Check account"
-msgstr "バックアップアカウント"
+msgstr "アカウントを確認"
 
 #: accounts/const/automation.py:32 rbac/tree.py:50
 msgid "Backup account"
@@ -324,61 +318,44 @@ msgid "Pending"
 msgstr "未定"
 
 #: accounts/const/automation.py:121
-#, fuzzy
-#| msgid "Can join"
 msgid "Can login"
-msgstr "参加できます"
+msgstr "ログイン可能"
 
 #: accounts/const/automation.py:122 users/serializers/user.py:271
 msgid "Superuser"
 msgstr "システムユーザー"
 
 #: accounts/const/automation.py:123
-#, fuzzy
-#| msgid "Create Type"
 msgid "Create date"
-msgstr "タイプを作成"
+msgstr "作成日"
 
 #: accounts/const/automation.py:124
-#, fuzzy
-#| msgid "{} disabled"
 msgid "Is disabled"
-msgstr "{} 無効"
+msgstr "無効化済み"
 
 #: accounts/const/automation.py:125
-#, fuzzy
-#| msgid "Default database"
 msgid "Default database name"
-msgstr "デフォルト・データベース"
+msgstr "デフォルトデータベース名"
 
 #: accounts/const/automation.py:126
-#, fuzzy
-#| msgid "ID"
 msgid "UID"
-msgstr "ID"
+msgstr "UID"
 
 #: accounts/const/automation.py:127
-#, fuzzy
-#| msgid "Account Details"
 msgid "Account status"
-msgstr "アカウントの詳細"
+msgstr "アカウントステータス"
 
 #: accounts/const/automation.py:128
-#, fuzzy
-#| msgid "Default database"
 msgid "Default tablespace"
-msgstr "デフォルト・データベース"
+msgstr "デフォルト表領域"
 
-#: accounts/const/automation.py:129
-#, fuzzy
-#| msgid "Role"
-msgid "Roles"
+#: accounts/const/automation.py:129 rbac/models/role.py:46
+#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:74
+msgid "Role"
 msgstr "ロール"
 
-#: accounts/const/automation.py:130
-#, fuzzy
-#| msgid "Privileged"
-msgid "Privileges"
+#: accounts/const/automation.py:130 accounts/models/base.py:68
+msgid "Privileged"
 msgstr "特権アカウント"
 
 #: accounts/const/automation.py:131 perms/serializers/permission.py:44
@@ -388,7 +365,7 @@ msgstr "ユーザーグループ"
 
 #: accounts/const/automation.py:133
 msgid "Authorized keys"
-msgstr ""
+msgstr "認証キー"
 
 #: accounts/const/automation.py:134
 msgid "DB"
@@ -487,10 +464,23 @@ msgid "historical Account"
 msgstr "アカウントの歴史"
 
 #: accounts/models/account.py:73
-#, fuzzy
-#| msgid "Secret type"
 msgid "Secret reset"
-msgstr "鍵の種類"
+msgstr ""
+"可改密 - パスワード変更可  \n"
+"上次访问日期 - 最終訪問日  \n"
+"访问方式 - アクセス方法  \n"
+"密码日期 - パスワード日付  \n"
+"改密状态 - パスワード変更状況  \n"
+"可以查看备份账号执行情况 - バックアップアカウントの実行状況を確認できます  \n"
+"可以添加备份账号执行 - バックアップアカウントの実行を追加できます  \n"
+"更改后检查连接 - 変更後の接続を確認  \n"
+"忽略失败 - 失敗を無視  \n"
+"帐号检查自动化 - アカウントチェックの自動化  \n"
+"可以查看账号执行 - アカウントの実行状況を確認できます  \n"
+"可以添加检查账号执行情况 - チェックアカウントの実行状況を追加できます  \n"
+"长时间未登录 - 長期間ログインしていない  \n"
+"新发现 - 新たな発見  \n"
+"组变更 - グループ変更"
 
 #: accounts/models/account.py:74 accounts/serializers/account/account.py:228
 #: users/models/user/__init__.py:127
@@ -502,28 +492,20 @@ msgid "Source ID"
 msgstr "ソース ID"
 
 #: accounts/models/account.py:76
-#, fuzzy
-#| msgid "Date last used"
 msgid "Date last access"
-msgstr "最後に使用した日付"
+msgstr "最終訪問日"
 
 #: accounts/models/account.py:77
-#, fuzzy
-#| msgid "Access key"
 msgid "Access by"
-msgstr "アクセスキー"
+msgstr "アクセス方法"
 
 #: accounts/models/account.py:78
-#, fuzzy
-#| msgid "Change secret"
 msgid "Date change secret"
-msgstr "パスワードを変更する"
+msgstr "パスワード日"
 
 #: accounts/models/account.py:80
-#, fuzzy
-#| msgid "Change secret params"
 msgid "Change secret status"
-msgstr "パスワード変更パラメータ"
+msgstr "変更状態"
 
 #: accounts/models/account.py:84
 #: accounts/models/automations/check_account.py:67
@@ -724,26 +706,20 @@ msgid "Can add push account execution"
 msgstr "プッシュ アカウントの作成の実行"
 
 #: accounts/models/automations/base.py:44
-#, fuzzy
-#| msgid "Can view push account execution"
 msgid "Can view backup account execution"
-msgstr "プッシュ アカウントの実行を表示する"
+msgstr "バックアップアカウントの実行状況を確認できます"
 
 #: accounts/models/automations/base.py:45
-#, fuzzy
-#| msgid "Can add push account execution"
 msgid "Can add backup account execution"
-msgstr "プッシュ アカウントの作成の実行"
+msgstr "バックアップアカウントの実行を追加できます"
 
 #: accounts/models/automations/base.py:60
 msgid "SSH key change strategy"
 msgstr "SSHキープッシュ方式"
 
 #: accounts/models/automations/base.py:64
-#, fuzzy
-#| msgid "Super connection token"
 msgid "Check connection after change"
-msgstr "スーパー接続トークン"
+msgstr "変更後に接続を確認"
 
 #: accounts/models/automations/change_secret.py:16
 #: accounts/models/automations/check_account.py:19
@@ -803,10 +779,8 @@ msgid "New secret"
 msgstr "新しい鍵"
 
 #: accounts/models/automations/change_secret.py:68
-#, fuzzy
-#| msgid "Ignore case"
 msgid "Ignore fail"
-msgstr "家を無視する"
+msgstr "失敗を無視"
 
 #: accounts/models/automations/change_secret.py:71
 msgid "Change secret record"
@@ -817,56 +791,40 @@ msgid "Engines"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:34
-#, fuzzy
-#| msgid "Account execute automation"
 msgid "account check automation"
-msgstr "アカウント実行の自動化"
+msgstr "アカウントチェックの自動化"
 
 #: accounts/models/automations/check_account.py:36
-#, fuzzy
-#| msgid "Can view push account execution"
 msgid "Can view check account execution"
-msgstr "プッシュ アカウントの実行を表示する"
+msgstr "アカウント実行を確認できます"
 
 #: accounts/models/automations/check_account.py:37
-#, fuzzy
-#| msgid "Can add push account execution"
 msgid "Can add check account execution"
-msgstr "プッシュ アカウントの作成の実行"
+msgstr "チェックアカウントの実行状況を追加できます"
 
 #: accounts/models/automations/check_account.py:43
-#, fuzzy
-#| msgid "Login log"
 msgid "Long time no login"
-msgstr "ログインログ"
+msgstr "長時間ログインしていない"
 
 #: accounts/models/automations/check_account.py:44
-#, fuzzy
-#| msgid "Not found"
 msgid "New found"
-msgstr "見つかりません"
+msgstr "新しい発見"
 
 #: accounts/models/automations/check_account.py:45
-#, fuzzy
-#| msgid "After change"
 msgid "Groups change"
-msgstr "変更後"
+msgstr "グループ変更"
 
 #: accounts/models/automations/check_account.py:46
-#, fuzzy
-#| msgid "Before change"
 msgid "Sudo changed"
-msgstr "変更前"
+msgstr "Sudo変更"
 
 #: accounts/models/automations/check_account.py:47
 msgid "Authorized keys changed"
-msgstr ""
+msgstr "キー変更"
 
 #: accounts/models/automations/check_account.py:48
-#, fuzzy
-#| msgid "Account template"
 msgid "Account delete"
-msgstr "アカウント テンプレート"
+msgstr "アカウントは削除されました"
 
 #: accounts/models/automations/check_account.py:49
 #: authentication/errors/const.py:23
@@ -874,44 +832,32 @@ msgid "Password expired"
 msgstr "パスワード期限切れ"
 
 #: accounts/models/automations/check_account.py:50
-#, fuzzy
-#| msgid "On perm change"
 msgid "Long time no change"
-msgstr "権限が変更されたとき"
+msgstr "長期間パスワードが変更されていません"
 
 #: accounts/models/automations/check_account.py:52
-#, fuzzy
-#| msgid "Set password"
+#: accounts/templates/accounts/check_account_report.html:69
+#: accounts/templates/accounts/check_account_report.html:89
 msgid "Weak password"
-msgstr "パスワードの設定"
+msgstr "弱いパスワード"
 
 #: accounts/models/automations/check_account.py:53
-#, fuzzy
-#| msgid "Set password"
 msgid "Leaked password"
-msgstr "パスワードの設定"
+msgstr "パスワード漏洩"
 
 #: accounts/models/automations/check_account.py:54
-#, fuzzy
-#| msgid "Reset password"
 msgid "Repeated password"
-msgstr "パスワードのリセット"
+msgstr "パスワードの重複"
 
 #: accounts/models/automations/check_account.py:55
-#, fuzzy
-#| msgid "Old password error"
 msgid "Password error"
-msgstr "古いパスワードエラー"
+msgstr "パスワードが誤っています"
 
 #: accounts/models/automations/check_account.py:56
-#, fuzzy
-#| msgid "No account"
 msgid "No admin account"
-msgstr "アカウントなし"
+msgstr "管理アカウントがありません"
 
 #: accounts/models/automations/check_account.py:57
-#, fuzzy
-#| msgid "Other"
 msgid "Others"
 msgstr "その他"
 
@@ -941,29 +887,24 @@ msgstr "ユーザー名"
 #: accounts/models/automations/check_account.py:73
 #: accounts/serializers/automations/check_account.py:36
 msgid "Risk"
-msgstr ""
+msgstr "リスク"
 
 #: accounts/models/automations/check_account.py:76
-#, fuzzy
-#| msgid "Detail"
-msgid "Details"
+#: accounts/models/automations/gather_account.py:26 audits/models.py:151
+msgid "Detail"
 msgstr "詳細"
 
 #: accounts/models/automations/check_account.py:79
-#, fuzzy
-#| msgid "Accounts"
 msgid "Account risk"
-msgstr "アカウント"
+msgstr "アカウントリスク"
 
 #: accounts/models/automations/check_account.py:120
 msgid "Slug"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:131
-#, fuzzy
-#| msgid "Clean historical accounts"
 msgid "Check the discovered accounts"
-msgstr "過去のアカウントをクリアする"
+msgstr "確認されたアカウント"
 
 #: accounts/models/automations/check_account.py:133
 msgid ""
@@ -1002,36 +943,24 @@ msgid "Address login"
 msgstr "最終ログインアドレス"
 
 #: accounts/models/automations/gather_account.py:19
-#, fuzzy
-#| msgid "Date joined"
 msgid "Date login"
-msgstr "参加日"
+msgstr "最終ログイン日"
 
 #: accounts/models/automations/gather_account.py:20
-#, fuzzy
-#| msgid "Remote Desktop"
 msgid "Remote present"
-msgstr "リモートデスクトップ"
+msgstr "リモートに存在"
 
 #: accounts/models/automations/gather_account.py:21
 msgid "Present"
-msgstr ""
+msgstr "存在"
 
 #: accounts/models/automations/gather_account.py:22
-#, fuzzy
-#| msgid "Change password"
 msgid "Date change password"
-msgstr "パスワードを変更する"
+msgstr "パスワード変更日"
 
 #: accounts/models/automations/gather_account.py:23
-#, fuzzy
-#| msgid "Check password expired"
 msgid "Date password expired"
-msgstr "パスワードの有効期限が切れていることを確認する"
-
-#: accounts/models/automations/gather_account.py:26 audits/models.py:151
-msgid "Detail"
-msgstr "詳細"
+msgstr "パスワード有効期限"
 
 #: accounts/models/automations/gather_account.py:78
 msgid "Gather asset accounts"
@@ -1054,10 +983,8 @@ msgid "Push asset account"
 msgstr "アカウントプッシュ"
 
 #: accounts/models/automations/push_account.py:43
-#, fuzzy
-#| msgid "Change secret record"
 msgid "Push secret record"
-msgstr "パスワード レコードの変更"
+msgstr "暗号化された記録をプッシュ"
 
 #: accounts/models/automations/verify_account.py:15
 msgid "Verify asset account"
@@ -1082,10 +1009,6 @@ msgstr "鍵ポリシー"
 #: accounts/serializers/automations/change_secret.py:47
 msgid "Password rules"
 msgstr "パスワードルール"
-
-#: accounts/models/base.py:68
-msgid "Privileged"
-msgstr "特権アカウント"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
@@ -1197,11 +1120,9 @@ msgstr "アカウント変更情報"
 msgid "Change secret or push account failed information"
 msgstr "パスワード変更またはアカウントプッシュ失敗情報"
 
-#: accounts/risk_handlers.py:17
-#, fuzzy
-#| msgid "Ignore case"
-msgid "Ignore"
-msgstr "家を無視する"
+#: accounts/risk_handlers.py:17 common/const/choices.py:113
+msgid "Ignored"
+msgstr "無視する"
 
 #: accounts/risk_handlers.py:18
 msgid "Reopen"
@@ -1215,28 +1136,21 @@ msgid "Close"
 msgstr "閉じる"
 
 #: accounts/risk_handlers.py:20
-#, fuzzy
-#| msgid "Disabled or expired"
 msgid "Disable remote"
-msgstr "無効または期限切れ"
+msgstr "リモートを無効にする"
 
 #: accounts/risk_handlers.py:21 accounts/risk_handlers.py:22
-#, fuzzy
-#| msgid "Deleted account"
 msgid "Delete remote"
-msgstr "アカウントの削除"
+msgstr "リモートを削除する"
 
 #: accounts/risk_handlers.py:23
-#, fuzzy
-#| msgid "Added account"
+#: accounts/templates/accounts/asset_account_change_info.html:10
 msgid "Add account"
-msgstr "新規アカウント"
+msgstr "アカウントを追加する"
 
 #: accounts/risk_handlers.py:24
-#, fuzzy
-#| msgid "Change password"
 msgid "Change password and Add"
-msgstr "パスワードを変更する"
+msgstr "パスワードを変更して追加する"
 
 #: accounts/risk_handlers.py:25 audits/const.py:31 ops/const.py:9
 msgid "Change password"
@@ -1329,6 +1243,7 @@ msgid "Spec info"
 msgstr "特別情報"
 
 #: accounts/serializers/account/account.py:467
+#: assets/serializers/automations/base.py:46
 #: authentication/serializers/connect_token_secret.py:160
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
@@ -1500,10 +1415,8 @@ msgid "Please enter your account username"
 msgstr "アカウントのユーザー名を入力してください"
 
 #: accounts/serializers/automations/change_secret.py:62
-#, fuzzy
-#| msgid "Automation execution"
 msgid "Notification before execution"
-msgstr "自動実行"
+msgstr "実行前通知"
 
 #: accounts/serializers/automations/change_secret.py:64
 msgid ""
@@ -1513,16 +1426,12 @@ msgstr ""
 "パラメータ設定は現在、AIX LINUX UNIX タイプの資産に対してのみ有効です。"
 
 #: accounts/serializers/automations/change_secret.py:86
-#, fuzzy
-#| msgid "Please enter correct Bind DN and Password: {}"
 msgid "* Please enter the correct password length"
-msgstr "正しいバインドDNとパスワードを入力してください: {}"
+msgstr "* 正しいパスワードの長さを入力してください"
 
 #: accounts/serializers/automations/change_secret.py:90
-#, fuzzy
-#| msgid "Password length"
 msgid "* Password length range 6-30 bits"
-msgstr "パスワードの長さ"
+msgstr "* パスワードの長さ範囲は6-30文字です"
 
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:147
@@ -1536,10 +1445,8 @@ msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
 #: accounts/serializers/automations/check_account.py:106
-#, fuzzy
-#| msgid "Invalid session id"
 msgid "Invalid engine id"
-msgstr "無効なセッションID"
+msgstr "エンジンIDが無効です"
 
 #: accounts/serializers/automations/gather_account.py:30
 msgid "Whether to check the risk of the gathered accounts."
@@ -1701,10 +1608,6 @@ msgstr ""
 msgid "Verify accounts connectivity"
 msgstr "アカウント接続のテスト"
 
-#: accounts/templates/accounts/asset_account_change_info.html:10
-msgid "Added account"
-msgstr "新規アカウント"
-
 #: accounts/templates/accounts/asset_account_change_info.html:13
 msgid "Deleted account"
 msgstr "アカウントの削除"
@@ -1762,16 +1665,13 @@ msgstr ""
 
 #: accounts/templates/accounts/backup_account_report.html:38
 #: accounts/templates/accounts/check_account_report.html:38
-#, fuzzy
-#| msgid "Accounts create amount"
-msgid "Account count"
-msgstr "作成するアカウント数"
+#: assets/serializers/asset/common.py:151
+msgid "Accounts amount"
+msgstr "アカウント数"
 
 #: accounts/templates/accounts/backup_account_report.html:42
-#, fuzzy
-#| msgid "CPU count"
 msgid "Type count"
-msgstr "CPU カウント"
+msgstr "タイプ数"
 
 #: accounts/templates/accounts/change_secret_failed_info.html:4
 msgid "Task execution id"
@@ -1798,44 +1698,36 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
 #: accounts/templates/accounts/push_account_report.html:38
-#, fuzzy
-#| msgid "Assets amount"
-msgid "Assets count"
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
+msgid "Assets amount"
 msgstr "資産数量"
 
 #: accounts/templates/accounts/change_secret_report.html:42
 #: accounts/templates/accounts/check_account_report.html:50
 #: accounts/templates/accounts/gather_account_report.html:43
 #: accounts/templates/accounts/push_account_report.html:42
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset success count"
-msgstr "資産数量"
+msgstr "成功した資産数"
 
 #: accounts/templates/accounts/change_secret_report.html:46
 #: accounts/templates/accounts/check_account_report.html:54
 #: accounts/templates/accounts/gather_account_report.html:47
 #: accounts/templates/accounts/push_account_report.html:46
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset failed count"
-msgstr "資産数量"
+msgstr "失敗した資産数"
 
 #: accounts/templates/accounts/change_secret_report.html:50
 #: accounts/templates/accounts/check_account_report.html:58
 #: accounts/templates/accounts/gather_account_report.html:51
 #: accounts/templates/accounts/push_account_report.html:50
-#, fuzzy
-#| msgid "Asset not found"
 msgid "Asset not support count"
-msgstr "資産が存在しません"
+msgstr "サポートされていない資産数"
 
 #: accounts/templates/accounts/change_secret_report.html:61
 #: accounts/templates/accounts/push_account_report.html:61
-#, fuzzy
-#| msgid "Push account"
 msgid "Success accounts"
-msgstr "アカウントプッシュ"
+msgstr "成功したアカウント"
 
 #: accounts/templates/accounts/change_secret_report.html:69
 #: accounts/templates/accounts/change_secret_report.html:101
@@ -1844,9 +1736,8 @@ msgstr "アカウントプッシュ"
 #: accounts/templates/accounts/gather_account_report.html:102
 #: accounts/templates/accounts/push_account_report.html:69
 #: accounts/templates/accounts/push_account_report.html:101
-#, fuzzy
-#| msgid "No"
-msgid "No."
+#: audits/handler.py:128
+msgid "No"
 msgstr "否"
 
 #: accounts/templates/accounts/change_secret_report.html:85
@@ -1855,17 +1746,13 @@ msgstr "否"
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:85
 #: accounts/templates/accounts/push_account_report.html:117
-#, fuzzy
-#| msgid "No pending accounts found"
 msgid "No new accounts found"
-msgstr "保留中のアカウントが見つかりません"
+msgstr "新しいアカウントが見つかりません"
 
 #: accounts/templates/accounts/change_secret_report.html:92
 #: accounts/templates/accounts/push_account_report.html:92
-#, fuzzy
-#| msgid "Email account"
 msgid "Failed accounts"
-msgstr "メールアドレス"
+msgstr "失敗したアカウント"
 
 #: accounts/templates/accounts/check_account_report.html:13
 #: accounts/templates/accounts/gather_account_report.html:14
@@ -1873,25 +1760,15 @@ msgid ""
 "The following is a summary of the account check tasks. Please review and "
 "handle them"
 msgstr ""
+"以下はアカウントチェックタスクのまとめですので、ご確認の上、処理してください"
 
 #: accounts/templates/accounts/check_account_report.html:42
-#, fuzzy
-#| msgid "CPU count"
 msgid "Ok count"
-msgstr "CPU カウント"
+msgstr "成功した数"
 
 #: accounts/templates/accounts/check_account_report.html:46
-#, fuzzy
-#| msgid "Recent password count"
 msgid "No password count"
-msgstr "繰り返された履歴パスワードの数"
-
-#: accounts/templates/accounts/check_account_report.html:69
-#: accounts/templates/accounts/check_account_report.html:89
-#, fuzzy
-#| msgid "Set password"
-msgid "Week password"
-msgstr "パスワードの設定"
+msgstr "パスワードなしの数"
 
 #: accounts/templates/accounts/check_account_report.html:80
 #: assets/models/automations/base.py:153 ops/models/base.py:51
@@ -1900,22 +1777,16 @@ msgid "Result"
 msgstr "結果"
 
 #: accounts/templates/accounts/check_account_report.html:95
-#, fuzzy
-#| msgid "Set password"
 msgid "No weak password"
-msgstr "パスワードの設定"
+msgstr "弱いパスワードなし"
 
 #: accounts/templates/accounts/gather_account_report.html:62
-#, fuzzy
-#| msgid "Test cloud account"
 msgid "New found accounts"
-msgstr "クラウドアカウントのテスト"
+msgstr "新たに発見されたアカウント"
 
 #: accounts/templates/accounts/gather_account_report.html:93
-#, fuzzy
-#| msgid "No account"
 msgid "Lost accounts"
-msgstr "アカウントなし"
+msgstr "失われたアカウント"
 
 #: accounts/templates/accounts/push_account_report.html:13
 msgid ""
@@ -3023,12 +2894,6 @@ msgstr "プロトコル"
 msgid "Node path"
 msgstr "ノードパスです"
 
-#: assets/serializers/asset/common.py:151
-#, fuzzy
-#| msgid "Accounts create amount"
-msgid "Accounts amount"
-msgstr "作成するアカウント数"
-
 #: assets/serializers/asset/common.py:170
 #: assets/serializers/asset/common.py:423
 msgid "Auto info"
@@ -3145,12 +3010,6 @@ msgstr "システムアーキテクチャ"
 msgid "Executions"
 msgstr "ジョブ実行"
 
-#: assets/serializers/automations/base.py:46
-#, fuzzy
-#| msgid "Host ID"
-msgid "Short ID"
-msgstr "ホスト ID"
-
 #: assets/serializers/cagegory.py:13
 msgid "Constraints"
 msgstr "制約"
@@ -3166,11 +3025,6 @@ msgid ""
 msgstr ""
 "ゲートウェイはドメインのネットワーク代理であり、ドメイン内のリソースに接続す"
 "る際には、接続はゲートウェイを通してルーティングされます。"
-
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
-#: orgs/serializers.py:13 perms/serializers/permission.py:50
-msgid "Assets amount"
-msgstr "資産数量"
 
 #: assets/serializers/gateway.py:19
 msgid "The platform must start with Gateway"
@@ -3538,10 +3392,6 @@ msgstr "-"
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:128
-msgid "No"
-msgstr "否"
-
 #: audits/models.py:48
 msgid "Job audit log"
 msgstr "業務監査"
@@ -3664,16 +3514,12 @@ msgid "Offline user session"
 msgstr "オフラインユーザセッション"
 
 #: audits/models.py:310
-#, fuzzy
-#| msgid "Application User"
 msgid "Application"
-msgstr "ユーザーの適用"
+msgstr "アプリ"
 
 #: audits/models.py:311
-#, fuzzy
-#| msgid "Application User"
 msgid "Application ID"
-msgstr "ユーザーの適用"
+msgstr "アプリ ID"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
@@ -4355,10 +4201,8 @@ msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
 #: authentication/models/connection_token.py:308
-#, fuzzy
-#| msgid "Connection token"
 msgid "Admin connection token"
-msgstr "接続トークン"
+msgstr "管理者接続トークン"
 
 #: authentication/models/private_token.py:11
 msgid "Private Token"
@@ -4912,16 +4756,12 @@ msgid "China"
 msgstr "中国"
 
 #: common/const/choices.py:58
-#, fuzzy
-#| msgid "Manual input"
 msgid "Manual"
-msgstr "手動入力"
+msgstr "手動トリガー"
 
 #: common/const/choices.py:59
-#, fuzzy
-#| msgid "Timing trigger"
 msgid "Timing"
-msgstr "タイミングトリガー"
+msgstr "定期トリガー"
 
 #: common/const/choices.py:63
 msgid "Ready"
@@ -4936,16 +4776,8 @@ msgid "Canceled"
 msgstr "キャンセル"
 
 #: common/const/choices.py:112
-#, fuzzy
-#| msgid "Confirm"
 msgid "Confirmed"
 msgstr "確認"
-
-#: common/const/choices.py:113
-#, fuzzy
-#| msgid "Ignore case"
-msgid "Ignored"
-msgstr "家を無視する"
 
 #: common/const/choices.py:120 terminal/models/applet/applet.py:31
 msgid "Community edition"
@@ -5751,10 +5583,8 @@ msgid "Crontab"
 msgstr "含む"
 
 #: ops/mixin.py:43 ops/mixin.py:177
-#, fuzzy
-#| msgid "Datetime"
 msgid "Start Datetime"
-msgstr "時間"
+msgstr "開始日"
 
 #: ops/mixin.py:45 ops/mixin.py:179
 msgid "Datetime when the schedule should begin triggering the task to run"
@@ -5945,10 +5775,8 @@ msgid "Next execution time"
 msgstr "最後の実行"
 
 #: ops/serializers/job.py:17
-#, fuzzy
-#| msgid "Do not save"
 msgid "Run on save"
-msgstr "保存しない"
+msgstr "保存後に実行"
 
 #: ops/serializers/job.py:91
 msgid "Job type"
@@ -6356,6 +6184,10 @@ msgstr ""
 "織の管理者に、資産が何日で期限切れになるかを3日前に通知を送ります"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
+#, python-format
+msgid "The following %(item_type)s will expire in %(count)s"
+msgstr "以下の %(item_type)s は %(count)s 後に期限が切れます。"
+
 #: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid ""
@@ -6446,11 +6278,6 @@ msgstr "コンテンツタイプ"
 #: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "権限"
-
-#: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user/__init__.py:74
-msgid "Role"
-msgstr "ロール"
 
 #: rbac/models/role.py:144
 msgid "System role"
@@ -6984,8 +6811,6 @@ msgid "OAuth2"
 msgstr "OAuth2"
 
 #: settings/serializers/auth/oauth2.py:28
-#, fuzzy
-#| msgid "Application provider"
 msgid "Service provider"
 msgstr "サービスプロバイダー"
 
@@ -7215,20 +7040,16 @@ msgstr ""
 "`value` は Slack サービスのユーザー属性名です"
 
 #: settings/serializers/auth/sms.py:18
-#, fuzzy
-#| msgid "Enable Short Message Application (SMS)"
 msgid "Enable Short Message Service (SMS)"
-msgstr "短信サービス（SMS）を有効にする"
+msgstr "SMSサービスを有効化"
 
 #: settings/serializers/auth/sms.py:21 xpack/plugins/cloud/models.py:36
 msgid "Provider"
 msgstr "プロバイダー"
 
 #: settings/serializers/auth/sms.py:22
-#, fuzzy
-#| msgid "Short Message Application (SMS) provider or protocol"
 msgid "Short Message Service (SMS) provider or protocol"
-msgstr "短信サービス（SMS）のプロバイダーまたはプロトコル"
+msgstr "SMSサービスプロバイダーまたはプロトコル"
 
 #: settings/serializers/auth/sms.py:25
 msgid "Code length"
@@ -8302,78 +8123,57 @@ msgid "Logout"
 msgstr "ログアウト"
 
 #: templates/_message.html:6
-msgid ""
-"\n"
-"                Your account has expired, please contact the administrator.\n"
-"            "
-msgstr ""
-"\n"
-"                アカウントが期限切れになったので、管理者に連絡してくださ"
-"い。            "
+msgid "Your account has expired, please contact the administrator."
+msgstr "あなたのアカウントは既に期限切れです。管理者にご連絡ください。"
 
-#: templates/_message.html:13
+#: templates/_message.html:11
 msgid "Your account will at"
 msgstr "あなたのアカウントは"
 
-#: templates/_message.html:13 templates/_message.html:30
+#: templates/_message.html:11 templates/_message.html:26
 msgid "expired. "
 msgstr "期限切れです。"
 
-#: templates/_message.html:23
+#: templates/_message.html:21
 #, python-format
 msgid ""
-"\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
-"            "
+"Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password."
 msgstr ""
-"\n"
-"                パスワードが期限切れになりましたので、クリックしてください "
-"<a href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
-"        "
+"あなたのパスワードは期限切れです。<a href=\"%(user_password_update_url)s\">こ"
+"ちらのリンク</a>をクリックしてパスワードを更新してください。"
 
-#: templates/_message.html:30
+#: templates/_message.html:26
 msgid "Your password will at"
 msgstr "あなたのパスワードは"
 
-#: templates/_message.html:31
+#: templates/_message.html:27
 #, python-format
 msgid ""
-"\n"
-"                please click <a href=\"%(user_password_update_url)s\"> this "
-"link </a> to update your password.\n"
-"            "
+"please click <a href=\"%(user_password_update_url)s\"> this link </a> to "
+"update your password."
 msgstr ""
-"\n"
-"                クリックしてください <a "
-"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
-"        "
+"パスワードを更新するには、<a href=\"%(user_password_update_url)s\">こちらのリ"
+"ンク</a>をクリックしてください。"
 
-#: templates/_message.html:43
+#: templates/_message.html:37
 #, python-format
 msgid ""
-"\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
-"        "
+"Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information."
 msgstr ""
-"\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a "
-"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
-"                "
+"あなたの情報が不完全です。<a href=\"%(first_login_url)s\">こちらのリンク</a>"
+"をクリックして、情報を完全にしてください。"
 
-#: templates/_message.html:56
+#: templates/_message.html:48
 #, python-format
 msgid ""
-"\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
-"        "
+"Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update"
 msgstr ""
-"\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a "
-"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
-"        "
+"あなたのSSHキーは設定されていないか、無効です。<a "
+"href=\"%(user_pubkey_update)s\">こちらのリンク</a>をクリックして更新してくだ"
+"さい。"
 
 #: templates/_mfa_login_field.html:31
 #: users/templates/users/forgot_password.html:101
@@ -11510,17 +11310,15 @@ msgstr "同期インスタンス タスクの実行記録を定期的にクリ�
 
 #: xpack/plugins/cloud/tasks.py:54
 msgid ""
-"\n"
-"        Every day, according to the configuration in \"System Settings - "
-"Tasks - Regular \n"
+"Every day, according to the configuration in \"System Settings - Tasks - "
+"Regular \n"
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
-"        records generated by cloud synchronization\n"
-"        "
+"        records generated by cloud synchronization"
 msgstr ""
-"\n"
-"毎日、システム設定-タスクリスト-定期的なクリーニング設定-クラウド同期記録設定"
-"に基づき、クラウド同期によって生成された実行記録をクリーニングします。"
+"毎日、システム設定に基づき-タスクリスト-定期的な設定のクリーンアップ-クラウド"
+"同期記録の設定に従って、クラウド同期によって生成された実行記録をクリーンアッ"
+"プします。"
 
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
@@ -11575,77 +11373,3 @@ msgstr "ライセンスのインポートに成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
-
-#~ msgid "Email sent to"
-#~ msgstr "メールが送信されました"
-
-#~ msgid "Plan end"
-#~ msgstr "計画終了"
-
-#~ msgid "An exception occurred during task execution"
-#~ msgstr "タスク実行中に例外が発生しました"
-
-#~ msgid "Account backup snapshot"
-#~ msgstr "アカウントのバックアップスナップショット"
-
-#~ msgid "Account backup execution"
-#~ msgstr "アカウントバックアップの実行"
-
-#~ msgid "Date started"
-#~ msgstr "開始日"
-
-#~ msgid "Triggers"
-#~ msgstr "トリガー方式"
-
-#~ msgid "Periodic perform"
-#~ msgstr "定期的なパフォーマンス"
-
-#~ msgid "Execute account backup plan"
-#~ msgstr "アカウントのバックアップ計画を実施する"
-
-#~ msgid ""
-#~ "When performing scheduled or manual account backups, this task is used"
-#~ msgstr ""
-#~ "定時または手動でアカウントバックアップを実行する際は、このタスクを通じて実"
-#~ "行します"
-
-#~ msgid "Gather assets accounts"
-#~ msgstr "資産の口座番号を収集する"
-
-#, fuzzy
-#~| msgid "Recent password count"
-#~ msgid "Week password count"
-#~ msgstr "繰り返された履歴パスワードの数"
-
-#, fuzzy
-#~| msgid "Account Details"
-#~ msgid "Account check details"
-#~ msgstr "アカウントの詳細"
-
-#, fuzzy
-#~| msgid "Account not found"
-#~ msgid "Account new found count"
-#~ msgstr "アカウントが見つかりません"
-
-#, fuzzy
-#~| msgid "Account not found"
-#~ msgid "Account lost count"
-#~ msgstr "アカウントが見つかりません"
-
-#~ msgid "Manual trigger"
-#~ msgstr "手動トリガー"
-
-#~ msgid "Range {} to {}"
-#~ msgstr "{} から {} までの範囲"
-
-#~ msgid "Execute after saving"
-#~ msgstr "保存後に実行"
-
-#, fuzzy
-#~| msgid "Chat AI"
-#~ msgid "Chat AI type"
-#~ msgstr "チャットAI"
-
-#~ msgid ""
-#~ "The base URL of the GPT service. For example: https://api.openai.com/v1"
-#~ msgstr "GPTサービスの基本のURL。例えば：https://api.openai.com/v1"
