@@ -126,7 +126,10 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ["id", "asset", "source_id", "secret_type", "category", "type"]
+        fields = [
+            "id", "asset", "source_id", "secret_type", "category",
+            "type", "privileged", "secret_reset", "connectivity"
+        ]
 
 
 class GatheredAccountFilterSet(BaseFilterSet):
