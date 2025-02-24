@@ -126,8 +126,8 @@ class GatherAccountDetailField(models.TextChoices):
     uid = 'uid', _('UID')
     account_status = 'account_status', _('Account status')
     default_tablespace = 'default_tablespace', _('Default tablespace')
-    roles = 'roles', _('Roles')
-    privileges = 'privileges', _('Privileges')
+    roles = 'roles', _('Role')
+    privileges = 'privileges', _('Privileged')
     groups = 'groups', _('Groups')
     sudoers = 'sudoers', 'sudoers'
     authorized_keys = 'authorized_keys', _('Authorized keys')

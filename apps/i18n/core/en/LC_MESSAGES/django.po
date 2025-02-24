@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-24 14:26+0800\n"
+"POT-Creation-Date: 2025-02-24 19:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,10 +91,8 @@ msgid "Plan execution end"
 msgstr ""
 
 #: accounts/automations/base/manager.py:106
-#, fuzzy
-#| msgid "Domains amount"
 msgid "No pending accounts found"
-msgstr "Zones amount"
+msgstr ""
 
 #: accounts/automations/change_secret/manager.py:86
 #, python-format
@@ -218,10 +216,8 @@ msgid "Verify gateway account"
 msgstr ""
 
 #: accounts/const/automation.py:31
-#, fuzzy
-#| msgid "Is service account"
 msgid "Check account"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/const/automation.py:32 rbac/tree.py:50
 msgid "Backup account"
@@ -346,21 +342,20 @@ msgid "UID"
 msgstr ""
 
 #: accounts/const/automation.py:127
-#, fuzzy
-#| msgid "Domains amount"
 msgid "Account status"
-msgstr "Zones amount"
+msgstr ""
 
 #: accounts/const/automation.py:128
 msgid "Default tablespace"
 msgstr ""
 
-#: accounts/const/automation.py:129
-msgid "Roles"
+#: accounts/const/automation.py:129 rbac/models/role.py:46
+#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:74
+msgid "Role"
 msgstr ""
 
-#: accounts/const/automation.py:130
-msgid "Privileges"
+#: accounts/const/automation.py:130 accounts/models/base.py:68
+msgid "Privileged"
 msgstr ""
 
 #: accounts/const/automation.py:131 perms/serializers/permission.py:44
@@ -463,10 +458,8 @@ msgid "Version"
 msgstr ""
 
 #: accounts/models/account.py:72
-#, fuzzy
-#| msgid "Resource count"
 msgid "historical Account"
-msgstr "Resource count"
+msgstr ""
 
 #: accounts/models/account.py:73
 msgid "Secret reset"
@@ -486,10 +479,8 @@ msgid "Date last access"
 msgstr ""
 
 #: accounts/models/account.py:77
-#, fuzzy
-#| msgid "Access key id"
 msgid "Access by"
-msgstr "Access key id"
+msgstr "Access by"
 
 #: accounts/models/account.py:78
 msgid "Date change secret"
@@ -828,32 +819,26 @@ msgid "Long time no change"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:52
-#, fuzzy
-#| msgid "Zip encrypt password"
+#: accounts/templates/accounts/check_account_report.html:69
+#: accounts/templates/accounts/check_account_report.html:89
 msgid "Weak password"
-msgstr "Passphrase"
+msgstr ""
 
 #: accounts/models/automations/check_account.py:53
-#, fuzzy
-#| msgid "Zip encrypt password"
 msgid "Leaked password"
-msgstr "Passphrase"
+msgstr ""
 
 #: accounts/models/automations/check_account.py:54
-#, fuzzy
-#| msgid "Zip encrypt password"
 msgid "Repeated password"
-msgstr "Passphrase"
+msgstr ""
 
 #: accounts/models/automations/check_account.py:55
 msgid "Password error"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:56
-#, fuzzy
-#| msgid "Domains amount"
 msgid "No admin account"
-msgstr "Zones amount"
+msgstr ""
 
 #: accounts/models/automations/check_account.py:57
 msgid "Others"
@@ -888,7 +873,8 @@ msgid "Risk"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:76
-msgid "Details"
+#: accounts/models/automations/gather_account.py:26 audits/models.py:151
+msgid "Detail"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:79
@@ -900,10 +886,8 @@ msgid "Slug"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:131
-#, fuzzy
-#| msgid "Is service account"
 msgid "Check the discovered accounts"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/models/automations/check_account.py:133
 msgid ""
@@ -954,19 +938,11 @@ msgid "Present"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:22
-#, fuzzy
-#| msgid "Zip encrypt password"
 msgid "Date change password"
-msgstr "Passphrase"
+msgstr ""
 
 #: accounts/models/automations/gather_account.py:23
-#, fuzzy
-#| msgid "Date password last updated"
 msgid "Date password expired"
-msgstr "Password updated"
-
-#: accounts/models/automations/gather_account.py:26 audits/models.py:151
-msgid "Detail"
 msgstr ""
 
 #: accounts/models/automations/gather_account.py:78
@@ -1015,10 +991,6 @@ msgstr ""
 #: accounts/models/base.py:44 accounts/serializers/account/template.py:32
 #: accounts/serializers/automations/change_secret.py:47
 msgid "Password rules"
-msgstr ""
-
-#: accounts/models/base.py:68
-msgid "Privileged"
 msgstr ""
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
@@ -1121,8 +1093,8 @@ msgstr ""
 msgid "Change secret or push account failed information"
 msgstr ""
 
-#: accounts/risk_handlers.py:17
-msgid "Ignore"
+#: accounts/risk_handlers.py:17 common/const/choices.py:113
+msgid "Ignored"
 msgstr ""
 
 #: accounts/risk_handlers.py:18
@@ -1145,16 +1117,13 @@ msgid "Delete remote"
 msgstr ""
 
 #: accounts/risk_handlers.py:23
-#, fuzzy
-#| msgid "Is service account"
+#: accounts/templates/accounts/asset_account_change_info.html:10
 msgid "Add account"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/risk_handlers.py:24
-#, fuzzy
-#| msgid "Date password last updated"
 msgid "Change password and Add"
-msgstr "Password updated"
+msgstr ""
 
 #: accounts/risk_handlers.py:25 audits/const.py:31 ops/const.py:9
 msgid "Change password"
@@ -1247,6 +1216,7 @@ msgid "Spec info"
 msgstr ""
 
 #: accounts/serializers/account/account.py:467
+#: assets/serializers/automations/base.py:46
 #: authentication/serializers/connect_token_secret.py:160
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
@@ -1574,10 +1544,6 @@ msgstr ""
 msgid "Verify accounts connectivity"
 msgstr ""
 
-#: accounts/templates/accounts/asset_account_change_info.html:10
-msgid "Added account"
-msgstr ""
-
 #: accounts/templates/accounts/asset_account_change_info.html:13
 msgid "Deleted account"
 msgstr ""
@@ -1635,16 +1601,13 @@ msgstr ""
 
 #: accounts/templates/accounts/backup_account_report.html:38
 #: accounts/templates/accounts/check_account_report.html:38
-#, fuzzy
-#| msgid "Domains amount"
-msgid "Account count"
-msgstr "Zones amount"
+#: assets/serializers/asset/common.py:151
+msgid "Accounts amount"
+msgstr ""
 
 #: accounts/templates/accounts/backup_account_report.html:42
-#, fuzzy
-#| msgid "Is service account"
 msgid "Type count"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/templates/accounts/change_secret_failed_info.html:4
 msgid "Task execution id"
@@ -1669,28 +1632,24 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
 #: accounts/templates/accounts/push_account_report.html:38
-#, fuzzy
-#| msgid "Resource count"
-msgid "Assets count"
-msgstr "Resource count"
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
+msgid "Assets amount"
+msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:42
 #: accounts/templates/accounts/check_account_report.html:50
 #: accounts/templates/accounts/gather_account_report.html:43
 #: accounts/templates/accounts/push_account_report.html:42
-#, fuzzy
-#| msgid "Resource count"
 msgid "Asset success count"
-msgstr "Resource count"
+msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:46
 #: accounts/templates/accounts/check_account_report.html:54
 #: accounts/templates/accounts/gather_account_report.html:47
 #: accounts/templates/accounts/push_account_report.html:46
-#, fuzzy
-#| msgid "Is service account"
 msgid "Asset failed count"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:50
 #: accounts/templates/accounts/check_account_report.html:58
@@ -1701,10 +1660,8 @@ msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:61
 #: accounts/templates/accounts/push_account_report.html:61
-#, fuzzy
-#| msgid "Is sync account"
 msgid "Success accounts"
-msgstr "Is sync account"
+msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:69
 #: accounts/templates/accounts/change_secret_report.html:101
@@ -1713,7 +1670,8 @@ msgstr "Is sync account"
 #: accounts/templates/accounts/gather_account_report.html:102
 #: accounts/templates/accounts/push_account_report.html:69
 #: accounts/templates/accounts/push_account_report.html:101
-msgid "No."
+#: audits/handler.py:128
+msgid "No"
 msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:85
@@ -1722,17 +1680,13 @@ msgstr ""
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:85
 #: accounts/templates/accounts/push_account_report.html:117
-#, fuzzy
-#| msgid "Domains amount"
 msgid "No new accounts found"
-msgstr "Zones amount"
+msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:92
 #: accounts/templates/accounts/push_account_report.html:92
-#, fuzzy
-#| msgid "Is service account"
 msgid "Failed accounts"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/templates/accounts/check_account_report.html:13
 #: accounts/templates/accounts/gather_account_report.html:14
@@ -1742,23 +1696,12 @@ msgid ""
 msgstr ""
 
 #: accounts/templates/accounts/check_account_report.html:42
-#, fuzzy
-#| msgid "Is service account"
 msgid "Ok count"
-msgstr "Is service account"
+msgstr ""
 
 #: accounts/templates/accounts/check_account_report.html:46
-#, fuzzy
-#| msgid "Domains amount"
 msgid "No password count"
-msgstr "Zones amount"
-
-#: accounts/templates/accounts/check_account_report.html:69
-#: accounts/templates/accounts/check_account_report.html:89
-#, fuzzy
-#| msgid "Zip encrypt password"
-msgid "Week password"
-msgstr "Passphrase"
+msgstr ""
 
 #: accounts/templates/accounts/check_account_report.html:80
 #: assets/models/automations/base.py:153 ops/models/base.py:51
@@ -1767,22 +1710,16 @@ msgid "Result"
 msgstr ""
 
 #: accounts/templates/accounts/check_account_report.html:95
-#, fuzzy
-#| msgid "Zip encrypt password"
 msgid "No weak password"
-msgstr "Passphrase"
+msgstr ""
 
 #: accounts/templates/accounts/gather_account_report.html:62
-#, fuzzy
-#| msgid "Domains amount"
 msgid "New found accounts"
-msgstr "Zones amount"
+msgstr ""
 
 #: accounts/templates/accounts/gather_account_report.html:93
-#, fuzzy
-#| msgid "Is sync account"
 msgid "Lost accounts"
-msgstr "Is sync account"
+msgstr ""
 
 #: accounts/templates/accounts/push_account_report.html:13
 msgid ""
@@ -2861,12 +2798,6 @@ msgstr ""
 msgid "Node path"
 msgstr ""
 
-#: assets/serializers/asset/common.py:151
-#, fuzzy
-#| msgid "Domains amount"
-msgid "Accounts amount"
-msgstr "Zones amount"
-
 #: assets/serializers/asset/common.py:170
 #: assets/serializers/asset/common.py:423
 msgid "Auto info"
@@ -2893,14 +2824,8 @@ msgid "Default database"
 msgstr ""
 
 #: assets/serializers/asset/database.py:23
-#, fuzzy
-#| msgid "Netcat help text"
 msgid "CA cert help text"
 msgstr ""
-"Use netcat (nc) as a proxy tool to forward connections from the proxy server "
-"to the target host. This is useful in environments that do not support the "
-"SSH native proxy option (-W), or when more flexibility and timeout control "
-"are needed."
 
 #: assets/serializers/asset/database.py:24
 msgid "Postgresql ssl model help text"
@@ -2974,10 +2899,6 @@ msgstr ""
 msgid "Executions"
 msgstr "Executions"
 
-#: assets/serializers/automations/base.py:46
-msgid "Short ID"
-msgstr ""
-
 #: assets/serializers/cagegory.py:13
 msgid "Constraints"
 msgstr ""
@@ -2990,11 +2911,6 @@ msgstr ""
 msgid ""
 "A gateway is a network proxy for a zone, and when connecting assets within "
 "the zone, the connection is routed through the gateway."
-msgstr ""
-
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
-#: orgs/serializers.py:13 perms/serializers/permission.py:50
-msgid "Assets amount"
 msgstr ""
 
 #: assets/serializers/gateway.py:19
@@ -3226,10 +3142,8 @@ msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr ""
 
 #: audits/backends/db.py:78
-#, fuzzy
-#| msgid "App Labels"
 msgid "labels"
-msgstr "Labels"
+msgstr ""
 
 #: audits/backends/db.py:79
 msgid "operate_log_id"
@@ -3343,10 +3257,6 @@ msgstr ""
 
 #: audits/handler.py:128
 msgid "Yes"
-msgstr ""
-
-#: audits/handler.py:128
-msgid "No"
 msgstr ""
 
 #: audits/models.py:48
@@ -3471,16 +3381,12 @@ msgid "Offline user session"
 msgstr ""
 
 #: audits/models.py:310
-#, fuzzy
-#| msgid "App Authentication"
 msgid "Application"
-msgstr "Authentication"
+msgstr ""
 
 #: audits/models.py:311
-#, fuzzy
-#| msgid "App Authentication"
 msgid "Application ID"
-msgstr "Authentication"
+msgstr ""
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
@@ -4694,10 +4600,6 @@ msgstr ""
 msgid "Confirmed"
 msgstr ""
 
-#: common/const/choices.py:113
-msgid "Ignored"
-msgstr ""
-
 #: common/const/choices.py:120 terminal/models/applet/applet.py:31
 msgid "Community edition"
 msgstr ""
@@ -5557,10 +5459,8 @@ msgid "Parameters define"
 msgstr ""
 
 #: ops/models/job.py:159
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Periodic variable"
-msgstr "Periodic"
+msgstr ""
 
 #: ops/models/job.py:160
 msgid "Run as"
@@ -6040,6 +5940,10 @@ msgid ""
 msgstr ""
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
+#, python-format
+msgid "The following %(item_type)s will expire in %(count)s"
+msgstr ""
+
 #: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid ""
@@ -6126,11 +6030,6 @@ msgstr ""
 
 #: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
-msgstr ""
-
-#: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user/__init__.py:74
-msgid "Role"
 msgstr ""
 
 #: rbac/models/role.py:144
@@ -6239,10 +6138,8 @@ msgid "License"
 msgstr ""
 
 #: rbac/tree.py:67
-#, fuzzy
-#| msgid "Session audits"
 msgid "Job audit"
-msgstr "Session"
+msgstr ""
 
 #: rbac/tree.py:159
 msgid "App organizations"
@@ -7843,58 +7740,47 @@ msgid "Logout"
 msgstr ""
 
 #: templates/_message.html:6
-msgid ""
-"\n"
-"                Your account has expired, please contact the administrator.\n"
-"            "
+msgid "Your account has expired, please contact the administrator."
 msgstr ""
 
-#: templates/_message.html:13
+#: templates/_message.html:11
 msgid "Your account will at"
 msgstr ""
 
-#: templates/_message.html:13 templates/_message.html:30
+#: templates/_message.html:11 templates/_message.html:26
 msgid "expired. "
 msgstr ""
 
-#: templates/_message.html:23
+#: templates/_message.html:21
 #, python-format
 msgid ""
-"\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
-"            "
+"Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password."
 msgstr ""
 
-#: templates/_message.html:30
+#: templates/_message.html:26
 msgid "Your password will at"
 msgstr ""
 
-#: templates/_message.html:31
+#: templates/_message.html:27
 #, python-format
 msgid ""
-"\n"
-"                please click <a href=\"%(user_password_update_url)s\"> this "
-"link </a> to update your password.\n"
-"            "
+"please click <a href=\"%(user_password_update_url)s\"> this link </a> to "
+"update your password."
 msgstr ""
 
-#: templates/_message.html:43
+#: templates/_message.html:37
 #, python-format
 msgid ""
-"\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
-"        "
+"Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information."
 msgstr ""
 
-#: templates/_message.html:56
+#: templates/_message.html:48
 #, python-format
 msgid ""
-"\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
-"        "
+"Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update"
 msgstr ""
 
 #: templates/_mfa_login_field.html:31
@@ -10085,10 +9971,8 @@ msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr ""
 
 #: users/utils.py:60
-#, fuzzy
-#| msgid "Is success"
 msgid "Auth success"
-msgstr "Is success"
+msgstr ""
 
 #: users/utils.py:61
 msgid "Redirecting to JumpServer Client"
@@ -10843,10 +10727,8 @@ msgid "Key File"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145
-#, fuzzy
-#| msgid "Is service account"
 msgid "Service account key"
-msgstr "Is service account"
+msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:146
 msgid "The file is in JSON format"
@@ -10909,13 +10791,11 @@ msgstr ""
 
 #: xpack/plugins/cloud/tasks.py:54
 msgid ""
-"\n"
-"        Every day, according to the configuration in \"System Settings - "
-"Tasks - Regular \n"
+"Every day, according to the configuration in \"System Settings - Tasks - "
+"Regular \n"
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
-"        records generated by cloud synchronization\n"
-"        "
+"        records generated by cloud synchronization"
 msgstr ""
 
 #: xpack/plugins/interface/api.py:52
@@ -10971,32 +10851,3 @@ msgstr ""
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr ""
-
-#~ msgid "Periodic perform"
-#~ msgstr "Periodic"
-
-#, fuzzy
-#~| msgid "Zip encrypt password"
-#~ msgid "Week password count"
-#~ msgstr "Passphrase"
-
-#, fuzzy
-#~| msgid "Domains amount"
-#~ msgid "Account new found count"
-#~ msgstr "Zones amount"
-
-#, fuzzy
-#~| msgid "Domains amount"
-#~ msgid "Account lost count"
-#~ msgstr "Zones amount"
-
-#~ msgid "Clean change secret and push record period description"
-#~ msgstr ""
-#~ "The system will periodically clean up unnecessary change secret records "
-#~ "and push records, including those associated with change tasks, execution "
-#~ "records, assets, and accounts. When any of these associated items are "
-#~ "deleted, the corresponding change secret and push records become invalid. "
-#~ "Therefore, to maintain a tidy and efficient database, the system "
-#~ "automatically cleans up these invalid records every 180 days by default. "
-#~ "This regular cleanup process helps free up storage space and improves the "
-#~ "security and overall performance of data management."

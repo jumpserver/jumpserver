@@ -174,6 +174,7 @@
     "Send command": "發送命令",
     "Send text to all ssh terminals": "發送文本到所有ssh終端",
     "Send text to current ssh terminals": "發送文本到當前ssh終端",
+    "SessionIsBeingMonitored": "對話正在被監控。",
     "Set reusable": "開啟復用",
     "Setting": "設置",
     "Settings or basic settings": "菜單設置 → 基本設置",

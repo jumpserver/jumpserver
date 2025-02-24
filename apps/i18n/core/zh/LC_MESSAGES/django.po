@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-24 14:26+0800\n"
+"POT-Creation-Date: 2025-02-24 19:18+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -41,10 +41,8 @@ msgid "Number of backup accounts"
 msgstr "备份账号数量"
 
 #: accounts/automations/backup_account/handlers.py:143
-#, fuzzy
-#| msgid "Generating asset or application related backup information files"
 msgid "Generating asset related backup information files"
-msgstr "生成资产或应用相关备份信息文件"
+msgstr "生成资产相关备份信息文件"
 
 #: accounts/automations/backup_account/handlers.py:168
 #: accounts/automations/backup_account/manager.py:26
@@ -92,8 +90,6 @@ msgid "Plan execution end"
 msgstr "计划执行结束"
 
 #: accounts/automations/base/manager.py:106
-#, fuzzy
-#| msgid "No pending accounts found"
 msgid "No pending accounts found"
 msgstr "未找到待处理帐户"
 
@@ -219,10 +215,8 @@ msgid "Verify gateway account"
 msgstr "验证网关账号"
 
 #: accounts/const/automation.py:31
-#, fuzzy
-#| msgid "Backup account"
 msgid "Check account"
-msgstr "备份账号"
+msgstr "检查帐号"
 
 #: accounts/const/automation.py:32 rbac/tree.py:50
 msgid "Backup account"
@@ -323,61 +317,44 @@ msgid "Pending"
 msgstr "待定的"
 
 #: accounts/const/automation.py:121
-#, fuzzy
-#| msgid "Can join"
 msgid "Can login"
-msgstr "是否可加入"
+msgstr "可登录"
 
 #: accounts/const/automation.py:122 users/serializers/user.py:271
 msgid "Superuser"
 msgstr "超级用户"
 
 #: accounts/const/automation.py:123
-#, fuzzy
-#| msgid "Create Type"
 msgid "Create date"
-msgstr "创建类型"
+msgstr "创建日期"
 
 #: accounts/const/automation.py:124
-#, fuzzy
-#| msgid "{} disabled"
 msgid "Is disabled"
-msgstr "{} 已禁用"
+msgstr "已禁用"
 
 #: accounts/const/automation.py:125
-#, fuzzy
-#| msgid "Default database"
 msgid "Default database name"
-msgstr "默认数据库"
+msgstr "默认数据库名称"
 
 #: accounts/const/automation.py:126
-#, fuzzy
-#| msgid "ID"
 msgid "UID"
-msgstr "ID"
+msgstr "UID"
 
 #: accounts/const/automation.py:127
-#, fuzzy
-#| msgid "Account Details"
 msgid "Account status"
-msgstr "账号"
+msgstr "账号状态"
 
 #: accounts/const/automation.py:128
-#, fuzzy
-#| msgid "Default database"
 msgid "Default tablespace"
-msgstr "默认数据库"
+msgstr "默认表空间"
 
-#: accounts/const/automation.py:129
-#, fuzzy
-#| msgid "Role"
-msgid "Roles"
+#: accounts/const/automation.py:129 rbac/models/role.py:46
+#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:74
+msgid "Role"
 msgstr "角色"
 
-#: accounts/const/automation.py:130
-#, fuzzy
-#| msgid "Privileged"
-msgid "Privileges"
+#: accounts/const/automation.py:130 accounts/models/base.py:68
+msgid "Privileged"
 msgstr "特权账号"
 
 #: accounts/const/automation.py:131 perms/serializers/permission.py:44
@@ -480,16 +457,12 @@ msgid "Version"
 msgstr "版本"
 
 #: accounts/models/account.py:72
-#, fuzzy
-#| msgid "Clean historical accounts"
 msgid "historical Account"
-msgstr "清理历史账号"
+msgstr "历史账号"
 
 #: accounts/models/account.py:73
-#, fuzzy
-#| msgid "Secret type"
 msgid "Secret reset"
-msgstr "密文类型"
+msgstr "可改密"
 
 #: accounts/models/account.py:74 accounts/serializers/account/account.py:228
 #: users/models/user/__init__.py:127
@@ -501,28 +474,20 @@ msgid "Source ID"
 msgstr "来源 ID"
 
 #: accounts/models/account.py:76
-#, fuzzy
-#| msgid "Date last used"
 msgid "Date last access"
-msgstr "最后使用日期"
+msgstr "上次访问日期"
 
 #: accounts/models/account.py:77
-#, fuzzy
-#| msgid "Access key"
 msgid "Access by"
-msgstr "Access key"
+msgstr "访问方式"
 
 #: accounts/models/account.py:78
-#, fuzzy
-#| msgid "Change secret"
 msgid "Date change secret"
-msgstr "更改密码"
+msgstr "密码日期"
 
 #: accounts/models/account.py:80
-#, fuzzy
-#| msgid "Change secret params"
 msgid "Change secret status"
-msgstr "改密参数"
+msgstr "改密状态"
 
 #: accounts/models/account.py:84
 #: accounts/models/automations/check_account.py:67
@@ -723,26 +688,20 @@ msgid "Can add push account execution"
 msgstr "创建推送账号执行"
 
 #: accounts/models/automations/base.py:44
-#, fuzzy
-#| msgid "Can view push account execution"
 msgid "Can view backup account execution"
-msgstr "查看推送账号执行"
+msgstr "可以查看备份账号执行情况"
 
 #: accounts/models/automations/base.py:45
-#, fuzzy
-#| msgid "Can add push account execution"
 msgid "Can add backup account execution"
-msgstr "创建推送账号执行"
+msgstr "可以添加备份账号执行"
 
 #: accounts/models/automations/base.py:60
 msgid "SSH key change strategy"
 msgstr "SSH 密钥推送方式"
 
 #: accounts/models/automations/base.py:64
-#, fuzzy
-#| msgid "Super connection token"
 msgid "Check connection after change"
-msgstr "超级连接令牌"
+msgstr "更改后检查连接"
 
 #: accounts/models/automations/change_secret.py:16
 #: accounts/models/automations/check_account.py:19
@@ -802,10 +761,8 @@ msgid "New secret"
 msgstr "新密钥"
 
 #: accounts/models/automations/change_secret.py:68
-#, fuzzy
-#| msgid "Ignore case"
 msgid "Ignore fail"
-msgstr "忽略大小写"
+msgstr "忽略失败"
 
 #: accounts/models/automations/change_secret.py:71
 msgid "Change secret record"
@@ -816,36 +773,26 @@ msgid "Engines"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:34
-#, fuzzy
-#| msgid "Account execute automation"
 msgid "account check automation"
-msgstr "账号执行自动化"
+msgstr "帐号检查自动化"
 
 #: accounts/models/automations/check_account.py:36
-#, fuzzy
-#| msgid "Can view push account execution"
 msgid "Can view check account execution"
-msgstr "查看推送账号执行"
+msgstr "可以查看账号执行"
 
 #: accounts/models/automations/check_account.py:37
-#, fuzzy
-#| msgid "Can add push account execution"
 msgid "Can add check account execution"
-msgstr "创建推送账号执行"
+msgstr "可以添加检查账号执行情况"
 
 #: accounts/models/automations/check_account.py:43
 msgid "Long time no login"
 msgstr "长时间未登录"
 
 #: accounts/models/automations/check_account.py:44
-#, fuzzy
-#| msgid "Not found"
 msgid "New found"
-msgstr "没有发现"
+msgstr "新发现"
 
 #: accounts/models/automations/check_account.py:45
-#, fuzzy
-#| msgid "Group change"
 msgid "Groups change"
 msgstr "组变更"
 
@@ -854,10 +801,8 @@ msgid "Sudo changed"
 msgstr "Sudo变更"
 
 #: accounts/models/automations/check_account.py:47
-#, fuzzy
-#| msgid "Authorized keys"
 msgid "Authorized keys changed"
-msgstr "认证密钥"
+msgstr "密钥变更"
 
 #: accounts/models/automations/check_account.py:48
 msgid "Account delete"
@@ -873,20 +818,18 @@ msgid "Long time no change"
 msgstr "长时间未改密"
 
 #: accounts/models/automations/check_account.py:52
+#: accounts/templates/accounts/check_account_report.html:69
+#: accounts/templates/accounts/check_account_report.html:89
 msgid "Weak password"
 msgstr "弱密码"
 
 #: accounts/models/automations/check_account.py:53
-#, fuzzy
-#| msgid "Weak password"
 msgid "Leaked password"
-msgstr "弱密码"
+msgstr "密码泄露"
 
 #: accounts/models/automations/check_account.py:54
-#, fuzzy
-#| msgid "Reset password"
 msgid "Repeated password"
-msgstr "重置密码"
+msgstr "重复密码"
 
 #: accounts/models/automations/check_account.py:55
 msgid "Password error"
@@ -929,9 +872,8 @@ msgid "Risk"
 msgstr "风险"
 
 #: accounts/models/automations/check_account.py:76
-#, fuzzy
-#| msgid "Detail"
-msgid "Details"
+#: accounts/models/automations/gather_account.py:26 audits/models.py:151
+msgid "Detail"
 msgstr "详情"
 
 #: accounts/models/automations/check_account.py:79
@@ -943,10 +885,8 @@ msgid "Slug"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:131
-#, fuzzy
-#| msgid "Clean historical accounts"
 msgid "Check the discovered accounts"
-msgstr "清理历史账号"
+msgstr "检查发现的帐户"
 
 #: accounts/models/automations/check_account.py:133
 msgid ""
@@ -997,20 +937,12 @@ msgid "Present"
 msgstr "存在"
 
 #: accounts/models/automations/gather_account.py:22
-#, fuzzy
-#| msgid "Change password"
 msgid "Date change password"
-msgstr "改密"
+msgstr "改密日期"
 
 #: accounts/models/automations/gather_account.py:23
-#, fuzzy
-#| msgid "Check password expired"
 msgid "Date password expired"
-msgstr "校验密码已过期"
-
-#: accounts/models/automations/gather_account.py:26 audits/models.py:151
-msgid "Detail"
-msgstr "详情"
+msgstr "密码过期日期"
 
 #: accounts/models/automations/gather_account.py:78
 msgid "Gather asset accounts"
@@ -1033,10 +965,8 @@ msgid "Push asset account"
 msgstr "账号推送"
 
 #: accounts/models/automations/push_account.py:43
-#, fuzzy
-#| msgid "Change secret record"
 msgid "Push secret record"
-msgstr "改密记录"
+msgstr "推送密文记录"
 
 #: accounts/models/automations/verify_account.py:15
 msgid "Verify asset account"
@@ -1061,10 +991,6 @@ msgstr "密文策略"
 #: accounts/serializers/automations/change_secret.py:47
 msgid "Password rules"
 msgstr "密码规则"
-
-#: accounts/models/base.py:68
-msgid "Privileged"
-msgstr "特权账号"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
@@ -1175,11 +1101,9 @@ msgstr "账号变更信息"
 msgid "Change secret or push account failed information"
 msgstr "改密或推送账号失败信息"
 
-#: accounts/risk_handlers.py:17
-#, fuzzy
-#| msgid "Ignore case"
-msgid "Ignore"
-msgstr "忽略大小写"
+#: accounts/risk_handlers.py:17 common/const/choices.py:113
+msgid "Ignored"
+msgstr "忽略"
 
 #: accounts/risk_handlers.py:18
 msgid "Reopen"
@@ -1193,28 +1117,21 @@ msgid "Close"
 msgstr "关闭"
 
 #: accounts/risk_handlers.py:20
-#, fuzzy
-#| msgid "Disabled or expired"
 msgid "Disable remote"
-msgstr "禁用或失效"
+msgstr "禁用远程"
 
 #: accounts/risk_handlers.py:21 accounts/risk_handlers.py:22
-#, fuzzy
-#| msgid "Deleted account"
 msgid "Delete remote"
-msgstr "删除账号"
+msgstr "删除远程"
 
 #: accounts/risk_handlers.py:23
-#, fuzzy
-#| msgid "Added account"
+#: accounts/templates/accounts/asset_account_change_info.html:10
 msgid "Add account"
 msgstr "新增账号"
 
 #: accounts/risk_handlers.py:24
-#, fuzzy
-#| msgid "Change password"
 msgid "Change password and Add"
-msgstr "改密"
+msgstr "改密并添加"
 
 #: accounts/risk_handlers.py:25 audits/const.py:31 ops/const.py:9
 msgid "Change password"
@@ -1307,6 +1224,7 @@ msgid "Spec info"
 msgstr "特殊信息"
 
 #: accounts/serializers/account/account.py:467
+#: assets/serializers/automations/base.py:46
 #: authentication/serializers/connect_token_secret.py:160
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
@@ -1473,13 +1391,11 @@ msgstr "SSH 密钥更改方式"
 
 #: accounts/serializers/automations/change_secret.py:58
 msgid "Please enter your account username"
-msgstr "请输入您的账户用户名"
+msgstr "请输入您的账号用户名"
 
 #: accounts/serializers/automations/change_secret.py:62
-#, fuzzy
-#| msgid "Automation execution"
 msgid "Notification before execution"
-msgstr "自动化执行"
+msgstr "执行前通知"
 
 #: accounts/serializers/automations/change_secret.py:64
 msgid ""
@@ -1507,10 +1423,8 @@ msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
 #: accounts/serializers/automations/check_account.py:106
-#, fuzzy
-#| msgid "Invalid session id"
 msgid "Invalid engine id"
-msgstr "无效的 Session ID"
+msgstr "引擎 ID 无效"
 
 #: accounts/serializers/automations/gather_account.py:30
 msgid "Whether to check the risk of the gathered accounts."
@@ -1594,20 +1508,11 @@ msgid ""
 msgstr "当创建账号，修改账号时，需要账号推送时执行该任务"
 
 #: accounts/tasks/remove_account.py:28
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "        When clicking \"Sync deletion\" in 'Console - Gather Account - "
-#| "Gathered accounts' this \n"
-#| "        task will be executed\n"
-#| "        "
 msgid ""
 "When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered "
 "accounts' this \n"
 "        task will be executed"
-msgstr ""
-"\n"
-"当在控制台-自动化-账号收集-发现的账号-点击同步删除会执行该任务"
+msgstr "在控制台-收集账号-收集的账号中单击同步删除时，将执行此任务"
 
 #: accounts/tasks/remove_account.py:50
 msgid "Clean historical accounts"
@@ -1664,10 +1569,6 @@ msgstr "当在控制台-资产详情-账号点击测试执行该任务"
 #: accounts/tasks/verify_account.py:58
 msgid "Verify accounts connectivity"
 msgstr "测试账号可连接性"
-
-#: accounts/templates/accounts/asset_account_change_info.html:10
-msgid "Added account"
-msgstr "新增账号"
 
 #: accounts/templates/accounts/asset_account_change_info.html:13
 msgid "Deleted account"
@@ -1726,16 +1627,13 @@ msgstr ""
 
 #: accounts/templates/accounts/backup_account_report.html:38
 #: accounts/templates/accounts/check_account_report.html:38
-#, fuzzy
-#| msgid "Accounts create amount"
-msgid "Account count"
-msgstr "创建账号数量"
+#: assets/serializers/asset/common.py:151
+msgid "Accounts amount"
+msgstr "账号数量"
 
 #: accounts/templates/accounts/backup_account_report.html:42
-#, fuzzy
-#| msgid "CPU count"
 msgid "Type count"
-msgstr "CPU数量"
+msgstr "类型数"
 
 #: accounts/templates/accounts/change_secret_failed_info.html:4
 msgid "Task execution id"
@@ -1749,7 +1647,7 @@ msgstr "尊敬的"
 msgid ""
 "Hello! The following is the failure of changing the password of your assets "
 "or pushing the account. Please check and handle it in time."
-msgstr "你好！ 以下是资产改密或推送账户失败的情况。 请及时检查并处理。"
+msgstr "你好！ 以下是资产改密或推送账号失败的情况。 请及时检查并处理。"
 
 #: accounts/templates/accounts/change_secret_report.html:13
 msgid ""
@@ -1760,44 +1658,36 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
 #: accounts/templates/accounts/push_account_report.html:38
-#, fuzzy
-#| msgid "Assets amount"
-msgid "Assets count"
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
+msgid "Assets amount"
 msgstr "资产数量"
 
 #: accounts/templates/accounts/change_secret_report.html:42
 #: accounts/templates/accounts/check_account_report.html:50
 #: accounts/templates/accounts/gather_account_report.html:43
 #: accounts/templates/accounts/push_account_report.html:42
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset success count"
-msgstr "资产数量"
+msgstr "资产成功数"
 
 #: accounts/templates/accounts/change_secret_report.html:46
 #: accounts/templates/accounts/check_account_report.html:54
 #: accounts/templates/accounts/gather_account_report.html:47
 #: accounts/templates/accounts/push_account_report.html:46
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset failed count"
-msgstr "资产数量"
+msgstr "资产失败数"
 
 #: accounts/templates/accounts/change_secret_report.html:50
 #: accounts/templates/accounts/check_account_report.html:58
 #: accounts/templates/accounts/gather_account_report.html:51
 #: accounts/templates/accounts/push_account_report.html:50
-#, fuzzy
-#| msgid "Asset not found"
 msgid "Asset not support count"
-msgstr "资产不存在"
+msgstr "资产不支持数"
 
 #: accounts/templates/accounts/change_secret_report.html:61
 #: accounts/templates/accounts/push_account_report.html:61
-#, fuzzy
-#| msgid "Gather accounts"
 msgid "Success accounts"
-msgstr "账号发现"
+msgstr "成功帐号"
 
 #: accounts/templates/accounts/change_secret_report.html:69
 #: accounts/templates/accounts/change_secret_report.html:101
@@ -1806,9 +1696,8 @@ msgstr "账号发现"
 #: accounts/templates/accounts/gather_account_report.html:102
 #: accounts/templates/accounts/push_account_report.html:69
 #: accounts/templates/accounts/push_account_report.html:101
-#, fuzzy
-#| msgid "No"
-msgid "No."
+#: audits/handler.py:128
+msgid "No"
 msgstr "否"
 
 #: accounts/templates/accounts/change_secret_report.html:85
@@ -1817,43 +1706,28 @@ msgstr "否"
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:85
 #: accounts/templates/accounts/push_account_report.html:117
-#, fuzzy
-#| msgid "No pending accounts found"
 msgid "No new accounts found"
-msgstr "未找到待处理帐户"
+msgstr "未找到新帐户"
 
 #: accounts/templates/accounts/change_secret_report.html:92
 #: accounts/templates/accounts/push_account_report.html:92
-#, fuzzy
-#| msgid "Email account"
 msgid "Failed accounts"
-msgstr "邮箱账号"
+msgstr "失败账号"
 
 #: accounts/templates/accounts/check_account_report.html:13
 #: accounts/templates/accounts/gather_account_report.html:14
 msgid ""
 "The following is a summary of the account check tasks. Please review and "
 "handle them"
-msgstr ""
+msgstr "以下是账号检查任务的汇总，请查阅并处理"
 
 #: accounts/templates/accounts/check_account_report.html:42
-#, fuzzy
-#| msgid "CPU count"
 msgid "Ok count"
-msgstr "CPU数量"
+msgstr "成功数"
 
 #: accounts/templates/accounts/check_account_report.html:46
-#, fuzzy
-#| msgid "Recent password count"
 msgid "No password count"
-msgstr "不能设置近几次密码"
-
-#: accounts/templates/accounts/check_account_report.html:69
-#: accounts/templates/accounts/check_account_report.html:89
-#, fuzzy
-#| msgid "Weak password"
-msgid "Week password"
-msgstr "弱密码"
+msgstr "无密码数"
 
 #: accounts/templates/accounts/check_account_report.html:80
 #: assets/models/automations/base.py:153 ops/models/base.py:51
@@ -1862,22 +1736,16 @@ msgid "Result"
 msgstr "结果"
 
 #: accounts/templates/accounts/check_account_report.html:95
-#, fuzzy
-#| msgid "Weak password"
 msgid "No weak password"
-msgstr "弱密码"
+msgstr "无弱密码"
 
 #: accounts/templates/accounts/gather_account_report.html:62
-#, fuzzy
-#| msgid "Test cloud account"
 msgid "New found accounts"
-msgstr "测试云账号"
+msgstr "新发现的帐户"
 
 #: accounts/templates/accounts/gather_account_report.html:93
-#, fuzzy
-#| msgid "No account"
 msgid "Lost accounts"
-msgstr "没有账号"
+msgstr "丢失的账号"
 
 #: accounts/templates/accounts/push_account_report.html:13
 msgid ""
@@ -2326,10 +2194,8 @@ msgid "Cisco"
 msgstr ""
 
 #: assets/const/device.py:8
-#, fuzzy
-#| msgid "Huawei Cloud"
 msgid "Huawei"
-msgstr "华为云"
+msgstr ""
 
 #: assets/const/device.py:9
 msgid "H3C"
@@ -2973,12 +2839,6 @@ msgstr "协议组"
 msgid "Node path"
 msgstr "节点路径"
 
-#: assets/serializers/asset/common.py:151
-#, fuzzy
-#| msgid "Accounts create amount"
-msgid "Accounts amount"
-msgstr "创建账号数量"
-
 #: assets/serializers/asset/common.py:170
 #: assets/serializers/asset/common.py:423
 msgid "Auto info"
@@ -3091,12 +2951,6 @@ msgstr "系统架构"
 msgid "Executions"
 msgstr "执行次数"
 
-#: assets/serializers/automations/base.py:46
-#, fuzzy
-#| msgid "Host ID"
-msgid "Short ID"
-msgstr "主机 ID"
-
 #: assets/serializers/cagegory.py:13
 msgid "Constraints"
 msgstr "约束"
@@ -3110,11 +2964,6 @@ msgid ""
 "A gateway is a network proxy for a zone, and when connecting assets within "
 "the zone, the connection is routed through the gateway."
 msgstr "网关是网域的网络代理，当连接网域内的资产时，连接将通过网关进行路由。"
-
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
-#: orgs/serializers.py:13 perms/serializers/permission.py:50
-msgid "Assets amount"
-msgstr "资产数量"
 
 #: assets/serializers/gateway.py:19
 msgid "The platform must start with Gateway"
@@ -3214,7 +3063,7 @@ msgid ""
 "another, similar to logging in with a regular account and then switching to "
 "root"
 msgstr ""
-"在访问资产时使用账户登录，然后自动切换到另一个账户，就像用普通账户登录然后切"
+"在访问资产时使用账号登录，然后自动切换到另一个账号，就像用普通账号登录然后切"
 "换到 root 一样"
 
 #: assets/serializers/platform.py:210
@@ -3467,10 +3316,6 @@ msgstr "-"
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:128
-msgid "No"
-msgstr "否"
-
 #: audits/models.py:48
 msgid "Job audit log"
 msgstr "作业审计日志"
@@ -3593,16 +3438,12 @@ msgid "Offline user session"
 msgstr "下线用户会话"
 
 #: audits/models.py:310
-#, fuzzy
-#| msgid "Application User"
 msgid "Application"
-msgstr "应用用户"
+msgstr "应用"
 
 #: audits/models.py:311
-#, fuzzy
-#| msgid "Application User"
 msgid "Application ID"
-msgstr "应用用户"
+msgstr "应用 ID"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
@@ -4224,10 +4065,8 @@ msgid "From ticket"
 msgstr "来自工单"
 
 #: authentication/models/connection_token.py:56
-#, fuzzy
-#| msgid "Can monitor session"
 msgid "Face monitor token"
-msgstr "可以监控会话"
+msgstr "人脸监控令牌"
 
 #: authentication/models/connection_token.py:67
 msgid "Can expire connection token"
@@ -4267,10 +4106,8 @@ msgid "Super connection token"
 msgstr "超级连接令牌"
 
 #: authentication/models/connection_token.py:308
-#, fuzzy
-#| msgid "Connection token"
 msgid "Admin connection token"
-msgstr "连接令牌"
+msgstr "管理员连接令牌"
 
 #: authentication/models/private_token.py:11
 msgid "Private Token"
@@ -4830,17 +4667,9 @@ msgstr "取消"
 msgid "Confirmed"
 msgstr "确认"
 
-#: common/const/choices.py:113
-#, fuzzy
-#| msgid "Ignore case"
-msgid "Ignored"
-msgstr "忽略大小写"
-
 #: common/const/choices.py:120 terminal/models/applet/applet.py:31
-#, fuzzy
-#| msgid "Common setting"
 msgid "Community edition"
-msgstr "一般设置"
+msgstr "社区版"
 
 #: common/const/choices.py:121
 msgid "Basic edition"
@@ -5617,10 +5446,8 @@ msgid "Crontab"
 msgstr "Crontab"
 
 #: ops/mixin.py:43 ops/mixin.py:177
-#, fuzzy
-#| msgid "Datetime"
 msgid "Start Datetime"
-msgstr "日期"
+msgstr "开始日期"
 
 #: ops/mixin.py:45 ops/mixin.py:179
 msgid "Datetime when the schedule should begin triggering the task to run"
@@ -6208,6 +6035,10 @@ msgstr ""
 "消息通知，提示资产还有几天即将过期"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
+#, python-format
+msgid "The following %(item_type)s will expire in %(count)s"
+msgstr "以下 %(item_type)s 即将在 %(count)s 后过期"
+
 #: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid ""
@@ -6298,11 +6129,6 @@ msgstr "内容类型"
 #: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "授权"
-
-#: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user/__init__.py:74
-msgid "Role"
-msgstr "角色"
 
 #: rbac/models/role.py:144
 msgid "System role"
@@ -6826,8 +6652,6 @@ msgid "OAuth2"
 msgstr "OAuth2"
 
 #: settings/serializers/auth/oauth2.py:28
-#, fuzzy
-#| msgid "Application provider"
 msgid "Service provider"
 msgstr "服务提供商"
 
@@ -7053,8 +6877,6 @@ msgstr ""
 "户属性名称"
 
 #: settings/serializers/auth/sms.py:18
-#, fuzzy
-#| msgid "Enable Short Message Application (SMS)"
 msgid "Enable Short Message Service (SMS)"
 msgstr "启用短信服务 (SMS)"
 
@@ -7063,8 +6885,6 @@ msgid "Provider"
 msgstr "云服务商"
 
 #: settings/serializers/auth/sms.py:22
-#, fuzzy
-#| msgid "Short Message Application (SMS) provider or protocol"
 msgid "Short Message Service (SMS) provider or protocol"
 msgstr "短信服务 (SMS) 提供商或协议"
 
@@ -7894,18 +7714,13 @@ msgid "Registration periodic import ldap ha user task"
 msgstr "注册周期导入 LDAP HA 用户 任务"
 
 #: settings/tasks/ldap.py:138
-#, fuzzy
-#| msgid ""
-#| "When LDAP auto-sync parameters change, such as Crontab parameters, the "
-#| "LDAP sync task \n"
-#| "        will be re-registered or updated, and this task will be invoked"
 msgid ""
 "When LDAP HA auto-sync parameters change, such as Crontab parameters, the "
 "LDAP HA sync task \n"
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
-"当设置了LDAP自动同步参数发生变化时，比如Crontab参数，重新注册或更新ldap同步任"
-"务将调用该任务"
+"当 LDAP HA 自动同步参数发生变化时，例如 Crontab 参数，将重新注册或更新“LDAP "
+"HA 同步任务, 并调用此任务"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
 msgid "Sync task finish"
@@ -8090,77 +7905,53 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_message.html:6
-msgid ""
-"\n"
-"                Your account has expired, please contact the administrator.\n"
-"            "
-msgstr ""
-"\n"
-"                您的账号已经过期，请联系管理员。            "
+msgid "Your account has expired, please contact the administrator."
+msgstr "您的账号已经过期，请联系管理员。"
 
-#: templates/_message.html:13
+#: templates/_message.html:11
 msgid "Your account will at"
 msgstr "您的账号将于"
 
-#: templates/_message.html:13 templates/_message.html:30
+#: templates/_message.html:11 templates/_message.html:26
 msgid "expired. "
 msgstr "过期。"
 
-#: templates/_message.html:23
+#: templates/_message.html:21
 #, python-format
 msgid ""
-"\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
-"            "
+"Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password."
 msgstr ""
-"\n"
-"                您的密码已经过期，请点击 <a "
-"href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
-"        "
+"您的密码已经过期，请点击 <a href=\"%(user_password_update_url)s\"> 链接 </a> "
+"更新密码"
 
-#: templates/_message.html:30
+#: templates/_message.html:26
 msgid "Your password will at"
 msgstr "您的密码将于"
 
-#: templates/_message.html:31
+#: templates/_message.html:27
 #, python-format
 msgid ""
-"\n"
-"                please click <a href=\"%(user_password_update_url)s\"> this "
-"link </a> to update your password.\n"
-"            "
-msgstr ""
-"\n"
-"                请点击 <a href=\"%(user_password_update_url)s\"> 链接 </a> 更"
-"新密码\n"
-"        "
+"please click <a href=\"%(user_password_update_url)s\"> this link </a> to "
+"update your password."
+msgstr "请点击 <a href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码"
 
-#: templates/_message.html:43
+#: templates/_message.html:37
 #, python-format
 msgid ""
-"\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
-"        "
+"Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information."
 msgstr ""
-"\n"
-"                你的信息不完整,请点击 <a href=\"%(first_login_url)s\"> 链接 "
-"</a> 补充完整\n"
-"                "
+"你的信息不完整,请点击 <a href=\"%(first_login_url)s\"> 链接 </a> 补充完整"
 
-#: templates/_message.html:56
+#: templates/_message.html:48
 #, python-format
 msgid ""
-"\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
-"        "
+"Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update"
 msgstr ""
-"\n"
-"                您的SSH密钥没有设置或已失效，请点击 <a "
-"href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
-"        "
+"您的SSH密钥没有设置或已失效，请点击 <a href=\"%(user_pubkey_update)s\"> 链接 "
+"</a> 更新"
 
 #: templates/_mfa_login_field.html:31
 #: users/templates/users/forgot_password.html:101
@@ -9740,10 +9531,8 @@ msgid "Suffix"
 msgstr "加后缀"
 
 #: users/exceptions.py:9
-#, fuzzy
-#| msgid "MFA enabled"
 msgid "MFA not enabled"
-msgstr "MFA 已启用"
+msgstr "MFA 未启用"
 
 #: users/exceptions.py:19
 msgid "Unable to delete all users"
@@ -10792,10 +10581,8 @@ msgid "Fully synchronous"
 msgstr "完全同步"
 
 #: xpack/plugins/cloud/models.py:122
-#, fuzzy
-#| msgid "permed assets"
 msgid "Release assets"
-msgstr "授权的资产"
+msgstr "发布资产"
 
 #: xpack/plugins/cloud/models.py:127
 msgid "Date last sync"
@@ -11167,10 +10954,8 @@ msgid "Key File"
 msgstr "密钥文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145
-#, fuzzy
-#| msgid "Is service account"
 msgid "Service account key"
-msgstr "服务账号"
+msgstr "服务帐号密钥"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:146
 msgid "The file is in JSON format"
@@ -11237,15 +11022,12 @@ msgstr "定期清除同步实例任务执行记录"
 
 #: xpack/plugins/cloud/tasks.py:54
 msgid ""
-"\n"
-"        Every day, according to the configuration in \"System Settings - "
-"Tasks - Regular \n"
+"Every day, according to the configuration in \"System Settings - Tasks - "
+"Regular \n"
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
-"        records generated by cloud synchronization\n"
-"        "
+"        records generated by cloud synchronization"
 msgstr ""
-"\n"
 "每天根据系统设置-任务列表-定期清理配置-云同步记录配置，对云同步产生的执行记录"
 "进行清理"
 
@@ -11302,94 +11084,3 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
-
-#~ msgid "Email sent to"
-#~ msgstr "邮件已发送至"
-
-#~ msgid "Plan end"
-#~ msgstr "任务结束"
-
-#~ msgid "An exception occurred during task execution"
-#~ msgstr "任务运行出现异常"
-
-#~ msgid "Account backup snapshot"
-#~ msgstr "账号备份快照"
-
-#~ msgid "Account backup execution"
-#~ msgstr "账号备份执行"
-
-#~ msgid "Date started"
-#~ msgstr "开始日期"
-
-#~ msgid "Triggers"
-#~ msgstr "触发方式"
-
-#~ msgid "Periodic perform"
-#~ msgstr "定期执行"
-
-#~ msgid "Execute account backup plan"
-#~ msgstr "执行账号备份计划"
-
-#~ msgid ""
-#~ "\n"
-#~ "        When performing scheduled or manual account backups, this task is "
-#~ "used\n"
-#~ "        "
-#~ msgstr ""
-#~ "\n"
-#~ "定时或手动执行账号备份时，通过该任务执行"
-
-#, fuzzy
-#~| msgid "Recent password count"
-#~ msgid "Week password count"
-#~ msgstr "不能设置近几次密码"
-
-#, fuzzy
-#~| msgid "Account Details"
-#~ msgid "Account check details"
-#~ msgstr "账号"
-
-#, fuzzy
-#~| msgid "Account not found"
-#~ msgid "Account new found count"
-#~ msgstr "账号未找到"
-
-#, fuzzy
-#~| msgid "Account not found"
-#~ msgid "Account lost count"
-#~ msgstr "账号未找到"
-
-#~ msgid ""
-#~ "When LDAP HA auto-sync parameters change, such as Crontab parameters, the "
-#~ "LDAP HA sync task will be re-registered or updated, and this task will be "
-#~ "invoked"
-#~ msgstr ""
-#~ "当设置了LDAP HA 自动同步参数发生变化时，比如Crontab参数，重新注册或更新"
-#~ "ldap ha 同步任务将调用该任务"
-
-#~ msgid "Application account key"
-#~ msgstr "服务账号密钥"
-
-#~ msgid "Collected"
-#~ msgstr "收集"
-
-#~ msgid "Not managed"
-#~ msgstr "新发现"
-
-#~ msgid "Gathered account"
-#~ msgstr "发现账号"
-
-#~ msgid "Diff"
-#~ msgstr "差异"
-
-#~ msgid "Item"
-#~ msgstr "项"
-
-#~ msgid "Sync IP type"
-#~ msgstr "同步IP类型"
-
-#~ msgid "Gather assets accounts"
-#~ msgstr "收集资产上的账号"
-
-#~ msgid "Range {} to {}"
-#~ msgstr "输入在 {} - {} 范围之间"

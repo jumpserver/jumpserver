@@ -73,7 +73,7 @@ class AccountRisk(JMSOrgBaseModel):
     risk = models.CharField(max_length=128, verbose_name=_('Risk'), choices=RiskChoice.choices)
     status = models.CharField(max_length=32, choices=ConfirmOrIgnore.choices, default=ConfirmOrIgnore.pending,
                               blank=True, verbose_name=_('Status'))
-    details = models.JSONField(default=list, verbose_name=_('Details'))
+    details = models.JSONField(default=list, verbose_name=_('Detail'))
 
     class Meta:
         verbose_name = _('Account risk')

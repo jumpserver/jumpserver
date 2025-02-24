@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-24 14:26+0800\n"
+"POT-Creation-Date: 2025-02-24 19:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,11 +42,8 @@ msgid "Number of backup accounts"
 msgstr "Número de contas de backup"
 
 #: accounts/automations/backup_account/handlers.py:143
-#, fuzzy
-#| msgid "Generating asset or application related backup information files"
 msgid "Generating asset related backup information files"
-msgstr ""
-"Gerar arquivo de informações de backup relacionado a ativos ou aplicativos"
+msgstr "Gerar arquivo de informações de backup relacionado ao ativo"
 
 #: accounts/automations/backup_account/handlers.py:168
 #: accounts/automations/backup_account/manager.py:26
@@ -219,10 +216,8 @@ msgid "Verify gateway account"
 msgstr "Verificar Gateway de Conta"
 
 #: accounts/const/automation.py:31
-#, fuzzy
-#| msgid "Backup account"
 msgid "Check account"
-msgstr "Conta de backup"
+msgstr "Verificar Conta"
 
 #: accounts/const/automation.py:32 rbac/tree.py:50
 msgid "Backup account"
@@ -324,61 +319,44 @@ msgid "Pending"
 msgstr "Pendente"
 
 #: accounts/const/automation.py:121
-#, fuzzy
-#| msgid "Can join"
 msgid "Can login"
-msgstr "Pode ser adicionado"
+msgstr "Login Permitido"
 
 #: accounts/const/automation.py:122 users/serializers/user.py:271
 msgid "Superuser"
 msgstr "Superusuário"
 
 #: accounts/const/automation.py:123
-#, fuzzy
-#| msgid "Create Type"
 msgid "Create date"
-msgstr "Tipo de Criação"
+msgstr "Data de Criação"
 
 #: accounts/const/automation.py:124
-#, fuzzy
-#| msgid "{} disabled"
 msgid "Is disabled"
-msgstr "{} foi desativado"
+msgstr "Desativado"
 
 #: accounts/const/automation.py:125
-#, fuzzy
-#| msgid "Default database"
 msgid "Default database name"
-msgstr "Banco de dados padrão"
+msgstr "Nome do Banco de Dados Padrão"
 
 #: accounts/const/automation.py:126
-#, fuzzy
-#| msgid "ID"
 msgid "UID"
-msgstr "ID"
+msgstr "UID"
 
 #: accounts/const/automation.py:127
-#, fuzzy
-#| msgid "Account Details"
 msgid "Account status"
-msgstr "Conta"
+msgstr "Status da Conta"
 
 #: accounts/const/automation.py:128
-#, fuzzy
-#| msgid "Default database"
 msgid "Default tablespace"
-msgstr "Banco de dados padrão"
+msgstr "Espaço de Tabela Padrão"
 
-#: accounts/const/automation.py:129
-#, fuzzy
-#| msgid "Role"
-msgid "Roles"
+#: accounts/const/automation.py:129 rbac/models/role.py:46
+#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:74
+msgid "Role"
 msgstr "Papel"
 
-#: accounts/const/automation.py:130
-#, fuzzy
-#| msgid "Privileged"
-msgid "Privileges"
+#: accounts/const/automation.py:130 accounts/models/base.py:68
+msgid "Privileged"
 msgstr "Conta privilegiada"
 
 #: accounts/const/automation.py:131 perms/serializers/permission.py:44
@@ -388,7 +366,7 @@ msgstr "Grupos de usuários"
 
 #: accounts/const/automation.py:133
 msgid "Authorized keys"
-msgstr ""
+msgstr "Chave de Certificação"
 
 #: accounts/const/automation.py:134
 msgid "DB"
@@ -487,10 +465,8 @@ msgid "historical Account"
 msgstr "Histórico de Conta"
 
 #: accounts/models/account.py:73
-#, fuzzy
-#| msgid "Secret type"
 msgid "Secret reset"
-msgstr "Tipo de texto cifrado"
+msgstr "Senha Alterável"
 
 #: accounts/models/account.py:74 accounts/serializers/account/account.py:228
 #: users/models/user/__init__.py:127
@@ -502,28 +478,20 @@ msgid "Source ID"
 msgstr "ID de origem"
 
 #: accounts/models/account.py:76
-#, fuzzy
-#| msgid "Date last used"
 msgid "Date last access"
-msgstr "Data do último uso"
+msgstr "Data do Último Acesso"
 
 #: accounts/models/account.py:77
-#, fuzzy
-#| msgid "Access key"
 msgid "Access by"
-msgstr "Access key"
+msgstr "Método de Acesso"
 
 #: accounts/models/account.py:78
-#, fuzzy
-#| msgid "Change secret"
 msgid "Date change secret"
-msgstr "Alterar Senha"
+msgstr "Data da Senha"
 
 #: accounts/models/account.py:80
-#, fuzzy
-#| msgid "Change secret params"
 msgid "Change secret status"
-msgstr "Parâmetros de Alteração de Senha"
+msgstr "Status da Alteração de Senha"
 
 #: accounts/models/account.py:84
 #: accounts/models/automations/check_account.py:67
@@ -724,26 +692,20 @@ msgid "Can add push account execution"
 msgstr "Criar ação de contas lançadas"
 
 #: accounts/models/automations/base.py:44
-#, fuzzy
-#| msgid "Can view push account execution"
 msgid "Can view backup account execution"
-msgstr "Ver ação de contas lançadas"
+msgstr "Pode visualizar o desempenho da conta de backup"
 
 #: accounts/models/automations/base.py:45
-#, fuzzy
-#| msgid "Can add push account execution"
 msgid "Can add backup account execution"
-msgstr "Criar ação de contas lançadas"
+msgstr "Pode adicionar conta de backup para execução"
 
 #: accounts/models/automations/base.py:60
 msgid "SSH key change strategy"
 msgstr "Método de lançamento da chave SSH"
 
 #: accounts/models/automations/base.py:64
-#, fuzzy
-#| msgid "Super connection token"
 msgid "Check connection after change"
-msgstr "Token de link super"
+msgstr "Verifique a conexão após a alteração"
 
 #: accounts/models/automations/change_secret.py:16
 #: accounts/models/automations/check_account.py:19
@@ -803,10 +765,8 @@ msgid "New secret"
 msgstr "Nova senha"
 
 #: accounts/models/automations/change_secret.py:68
-#, fuzzy
-#| msgid "Ignore case"
 msgid "Ignore fail"
-msgstr "Ignorar Maiúsculas e Minúsculas"
+msgstr "Ignorar falhas"
 
 #: accounts/models/automations/change_secret.py:71
 msgid "Change secret record"
@@ -817,56 +777,40 @@ msgid "Engines"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:34
-#, fuzzy
-#| msgid "Account execute automation"
 msgid "account check automation"
-msgstr "Execução automática da conta"
+msgstr "Automatização da verificação de contas"
 
 #: accounts/models/automations/check_account.py:36
-#, fuzzy
-#| msgid "Can view push account execution"
 msgid "Can view check account execution"
-msgstr "Ver ação de contas lançadas"
+msgstr "Pode visualizar o desempenho da conta"
 
 #: accounts/models/automations/check_account.py:37
-#, fuzzy
-#| msgid "Can add push account execution"
 msgid "Can add check account execution"
-msgstr "Criar ação de contas lançadas"
+msgstr "Pode adicionar conta de verificação para desempenho"
 
 #: accounts/models/automations/check_account.py:43
-#, fuzzy
-#| msgid "Login log"
 msgid "Long time no login"
-msgstr "Registro de Login"
+msgstr "Inatividade por longos períodos"
 
 #: accounts/models/automations/check_account.py:44
-#, fuzzy
-#| msgid "Not found"
 msgid "New found"
-msgstr "Não encontrado"
+msgstr "Novas Descobertas"
 
 #: accounts/models/automations/check_account.py:45
-#, fuzzy
-#| msgid "Groups amount"
 msgid "Groups change"
-msgstr "Quantidade de grupos de usuários."
+msgstr "Alterações de Grupo"
 
 #: accounts/models/automations/check_account.py:46
-#, fuzzy
-#| msgid "Before change"
 msgid "Sudo changed"
-msgstr "Antes da alteração"
+msgstr "Alterações Sudo"
 
 #: accounts/models/automations/check_account.py:47
 msgid "Authorized keys changed"
-msgstr ""
+msgstr "Alteração de Chave"
 
 #: accounts/models/automations/check_account.py:48
-#, fuzzy
-#| msgid "Account template"
 msgid "Account delete"
-msgstr "Template de Conta"
+msgstr "Conta deletada"
 
 #: accounts/models/automations/check_account.py:49
 #: authentication/errors/const.py:23
@@ -874,46 +818,49 @@ msgid "Password expired"
 msgstr "Senha expirou"
 
 #: accounts/models/automations/check_account.py:50
-#, fuzzy
-#| msgid "On perm change"
 msgid "Long time no change"
-msgstr " Quando as permissões mudam "
+msgstr ""
+"- Longo tempo sem alterar a senha\n"
+"- Vazamento de senha\n"
+"- Senha repetida\n"
+"- Senha incorreta\n"
+"- Não há conta de gestão\n"
+"- Outros\n"
+"- Risco da conta\n"
+"- Contas verificadas\n"
+"- Existência remota\n"
+"- Data da alteração da senha\n"
+"- Data de expiração da senha\n"
+"- Registro de textos cifrados enviados\n"
+"- Ignorar\n"
+"- Desabilitar remoto\n"
+"- Remover remoto"
 
 #: accounts/models/automations/check_account.py:52
-#, fuzzy
-#| msgid "Set password"
+#: accounts/templates/accounts/check_account_report.html:69
+#: accounts/templates/accounts/check_account_report.html:89
 msgid "Weak password"
-msgstr "Definir senha"
+msgstr "Senha fraca"
 
 #: accounts/models/automations/check_account.py:53
-#, fuzzy
-#| msgid "Reset password"
 msgid "Leaked password"
-msgstr "Resetar senha"
+msgstr "Vazamento de senha"
 
 #: accounts/models/automations/check_account.py:54
-#, fuzzy
-#| msgid "Reset password"
 msgid "Repeated password"
-msgstr "Resetar senha"
+msgstr "Senha repetida"
 
 #: accounts/models/automations/check_account.py:55
-#, fuzzy
-#| msgid "Old password error"
 msgid "Password error"
-msgstr "Senha anterior incorreta"
+msgstr "Senha incorreta"
 
 #: accounts/models/automations/check_account.py:56
-#, fuzzy
-#| msgid "No account"
 msgid "No admin account"
-msgstr "Sem conta"
+msgstr "Sem conta de gestão"
 
 #: accounts/models/automations/check_account.py:57
-#, fuzzy
-#| msgid "Other"
 msgid "Others"
-msgstr "Outros"
+msgstr "Outro"
 
 #: accounts/models/automations/check_account.py:64
 #: accounts/models/automations/gather_account.py:17 accounts/models/base.py:64
@@ -941,29 +888,24 @@ msgstr "Nome de usuário"
 #: accounts/models/automations/check_account.py:73
 #: accounts/serializers/automations/check_account.py:36
 msgid "Risk"
-msgstr ""
+msgstr "Risco"
 
 #: accounts/models/automations/check_account.py:76
-#, fuzzy
-#| msgid "Detail"
-msgid "Details"
+#: accounts/models/automations/gather_account.py:26 audits/models.py:151
+msgid "Detail"
 msgstr "Detalhes"
 
 #: accounts/models/automations/check_account.py:79
-#, fuzzy
-#| msgid "Accounts"
 msgid "Account risk"
-msgstr "Conta"
+msgstr "Risco de conta"
 
 #: accounts/models/automations/check_account.py:120
 msgid "Slug"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:131
-#, fuzzy
-#| msgid "Clean historical accounts"
 msgid "Check the discovered accounts"
-msgstr "Limpar contas históricas"
+msgstr "Verificar contas encontradas"
 
 #: accounts/models/automations/check_account.py:133
 msgid ""
@@ -1006,30 +948,20 @@ msgid "Date login"
 msgstr "Data do último login"
 
 #: accounts/models/automations/gather_account.py:20
-#, fuzzy
-#| msgid "Remote Desktop"
 msgid "Remote present"
-msgstr "Cliente de Área de Trabalho Remota"
+msgstr "Existente remotamente"
 
 #: accounts/models/automations/gather_account.py:21
 msgid "Present"
 msgstr "Existe"
 
 #: accounts/models/automations/gather_account.py:22
-#, fuzzy
-#| msgid "Change password"
 msgid "Date change password"
-msgstr "Alterar Senha"
+msgstr "Data da alteração de senha"
 
 #: accounts/models/automations/gather_account.py:23
-#, fuzzy
-#| msgid "Check password expired"
 msgid "Date password expired"
-msgstr "A verificação da senha expirou"
-
-#: accounts/models/automations/gather_account.py:26 audits/models.py:151
-msgid "Detail"
-msgstr "Detalhes"
+msgstr "Data de expiração da senha"
 
 #: accounts/models/automations/gather_account.py:78
 msgid "Gather asset accounts"
@@ -1052,10 +984,8 @@ msgid "Push asset account"
 msgstr "Conta enviada"
 
 #: accounts/models/automations/push_account.py:43
-#, fuzzy
-#| msgid "Change secret record"
 msgid "Push secret record"
-msgstr "Registro de alteração de senha"
+msgstr "Registro de texto cifrado enviado"
 
 #: accounts/models/automations/verify_account.py:15
 msgid "Verify asset account"
@@ -1080,10 +1010,6 @@ msgstr "Estratégia de texto cifrado"
 #: accounts/serializers/automations/change_secret.py:47
 msgid "Password rules"
 msgstr "Regras de senha"
-
-#: accounts/models/base.py:68
-msgid "Privileged"
-msgstr "Conta privilegiada"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
@@ -1199,11 +1125,9 @@ msgstr "Informações de alterações de conta"
 msgid "Change secret or push account failed information"
 msgstr "Informações de falha na alteração de senha ou conta de push"
 
-#: accounts/risk_handlers.py:17
-#, fuzzy
-#| msgid "Ignore case"
-msgid "Ignore"
-msgstr "Ignorar Maiúsculas e Minúsculas"
+#: accounts/risk_handlers.py:17 common/const/choices.py:113
+msgid "Ignored"
+msgstr "Ignorar"
 
 #: accounts/risk_handlers.py:18
 msgid "Reopen"
@@ -1217,28 +1141,21 @@ msgid "Close"
 msgstr "Fechar"
 
 #: accounts/risk_handlers.py:20
-#, fuzzy
-#| msgid "Disabled or expired"
 msgid "Disable remote"
-msgstr "Desativado ou inválido"
+msgstr "Desativar remoto"
 
 #: accounts/risk_handlers.py:21 accounts/risk_handlers.py:22
-#, fuzzy
-#| msgid "Deleted account"
 msgid "Delete remote"
-msgstr "Excluir conta"
+msgstr "Excluir remoto"
 
 #: accounts/risk_handlers.py:23
-#, fuzzy
-#| msgid "Added account"
+#: accounts/templates/accounts/asset_account_change_info.html:10
 msgid "Add account"
 msgstr "Adicionar conta"
 
 #: accounts/risk_handlers.py:24
-#, fuzzy
-#| msgid "Change password"
 msgid "Change password and Add"
-msgstr "Alterar Senha"
+msgstr "Alterar senha e adicionar"
 
 #: accounts/risk_handlers.py:25 audits/const.py:31 ops/const.py:9
 msgid "Change password"
@@ -1331,6 +1248,7 @@ msgid "Spec info"
 msgstr "Informações especiais"
 
 #: accounts/serializers/account/account.py:467
+#: assets/serializers/automations/base.py:46
 #: authentication/serializers/connect_token_secret.py:160
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
@@ -1509,10 +1427,8 @@ msgid "Please enter your account username"
 msgstr "Por favor, digite seu nome de usuário"
 
 #: accounts/serializers/automations/change_secret.py:62
-#, fuzzy
-#| msgid "Automation execution"
 msgid "Notification before execution"
-msgstr "Execução Automatizada"
+msgstr "Notificação antes da execução"
 
 #: accounts/serializers/automations/change_secret.py:64
 msgid ""
@@ -1523,16 +1439,12 @@ msgstr ""
 "AIX LINUX UNIX."
 
 #: accounts/serializers/automations/change_secret.py:86
-#, fuzzy
-#| msgid "Please enter correct Bind DN and Password: {}"
 msgid "* Please enter the correct password length"
-msgstr "Por favor, insira o DN de vinculação e a senha corretos: {}"
+msgstr "* Por favor, insira um comprimento de senha correto"
 
 #: accounts/serializers/automations/change_secret.py:90
-#, fuzzy
-#| msgid "Password length"
 msgid "* Password length range 6-30 bits"
-msgstr "Comprimento da senha"
+msgstr "* O comprimento da senha deve estar entre 6 e 30 caracteres"
 
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:147
@@ -1546,10 +1458,8 @@ msgid "Automation task execution"
 msgstr "Histórico de execução de tarefas automáticas"
 
 #: accounts/serializers/automations/check_account.py:106
-#, fuzzy
-#| msgid "Invalid session id"
 msgid "Invalid engine id"
-msgstr "ID de sessão inválida"
+msgstr "ID do motor inválido"
 
 #: accounts/serializers/automations/gather_account.py:30
 msgid "Whether to check the risk of the gathered accounts."
@@ -1719,10 +1629,6 @@ msgstr ""
 msgid "Verify accounts connectivity"
 msgstr "Testar a conectividade da conta"
 
-#: accounts/templates/accounts/asset_account_change_info.html:10
-msgid "Added account"
-msgstr "Adicionar conta"
-
 #: accounts/templates/accounts/asset_account_change_info.html:13
 msgid "Deleted account"
 msgstr "Excluir conta"
@@ -1782,16 +1688,13 @@ msgstr "Tempo gasto"
 
 #: accounts/templates/accounts/backup_account_report.html:38
 #: accounts/templates/accounts/check_account_report.html:38
-#, fuzzy
-#| msgid "Accounts create amount"
-msgid "Account count"
-msgstr "Número de Contas Criadas"
+#: assets/serializers/asset/common.py:151
+msgid "Accounts amount"
+msgstr "Quantidade de contas"
 
 #: accounts/templates/accounts/backup_account_report.html:42
-#, fuzzy
-#| msgid "CPU count"
 msgid "Type count"
-msgstr "Quantidade de CPUs"
+msgstr "Número de tipos"
 
 #: accounts/templates/accounts/change_secret_failed_info.html:4
 msgid "Task execution id"
@@ -1818,44 +1721,36 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
 #: accounts/templates/accounts/push_account_report.html:38
-#, fuzzy
-#| msgid "Assets amount"
-msgid "Assets count"
+#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
+#: orgs/serializers.py:13 perms/serializers/permission.py:50
+msgid "Assets amount"
 msgstr "Número de ativos"
 
 #: accounts/templates/accounts/change_secret_report.html:42
 #: accounts/templates/accounts/check_account_report.html:50
 #: accounts/templates/accounts/gather_account_report.html:43
 #: accounts/templates/accounts/push_account_report.html:42
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset success count"
-msgstr "Número de ativos"
+msgstr "Número de ativos bem-sucedidos"
 
 #: accounts/templates/accounts/change_secret_report.html:46
 #: accounts/templates/accounts/check_account_report.html:54
 #: accounts/templates/accounts/gather_account_report.html:47
 #: accounts/templates/accounts/push_account_report.html:46
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset failed count"
-msgstr "Número de ativos"
+msgstr "Número de ativos com falha"
 
 #: accounts/templates/accounts/change_secret_report.html:50
 #: accounts/templates/accounts/check_account_report.html:58
 #: accounts/templates/accounts/gather_account_report.html:51
 #: accounts/templates/accounts/push_account_report.html:50
-#, fuzzy
-#| msgid "Asset not found"
 msgid "Asset not support count"
-msgstr "Ativo não existe"
+msgstr "Número de ativos não suportados"
 
 #: accounts/templates/accounts/change_secret_report.html:61
 #: accounts/templates/accounts/push_account_report.html:61
-#, fuzzy
-#| msgid "Push account"
 msgid "Success accounts"
-msgstr "Push de Conta"
+msgstr "Contas bem-sucedidas"
 
 #: accounts/templates/accounts/change_secret_report.html:69
 #: accounts/templates/accounts/change_secret_report.html:101
@@ -1864,9 +1759,8 @@ msgstr "Push de Conta"
 #: accounts/templates/accounts/gather_account_report.html:102
 #: accounts/templates/accounts/push_account_report.html:69
 #: accounts/templates/accounts/push_account_report.html:101
-#, fuzzy
-#| msgid "No"
-msgid "No."
+#: audits/handler.py:128
+msgid "No"
 msgstr "Não"
 
 #: accounts/templates/accounts/change_secret_report.html:85
@@ -1875,17 +1769,13 @@ msgstr "Não"
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:85
 #: accounts/templates/accounts/push_account_report.html:117
-#, fuzzy
-#| msgid "No pending accounts found"
 msgid "No new accounts found"
-msgstr "Conta pendente não encontrada"
+msgstr "Conta nova não encontrada"
 
 #: accounts/templates/accounts/change_secret_report.html:92
 #: accounts/templates/accounts/push_account_report.html:92
-#, fuzzy
-#| msgid "Email account"
 msgid "Failed accounts"
-msgstr "Conta de e-mail"
+msgstr "Contas com falha"
 
 #: accounts/templates/accounts/check_account_report.html:13
 #: accounts/templates/accounts/gather_account_report.html:14
@@ -1893,25 +1783,16 @@ msgid ""
 "The following is a summary of the account check tasks. Please review and "
 "handle them"
 msgstr ""
+"A seguir, está o resumo das tarefas de verificação de conta, por favor, "
+"consulte e trate"
 
 #: accounts/templates/accounts/check_account_report.html:42
-#, fuzzy
-#| msgid "CPU count"
 msgid "Ok count"
-msgstr "Quantidade de CPUs"
+msgstr "Número de sucessos"
 
 #: accounts/templates/accounts/check_account_report.html:46
-#, fuzzy
-#| msgid "Recent password count"
 msgid "No password count"
-msgstr "Não pode definir senhas recentes"
-
-#: accounts/templates/accounts/check_account_report.html:69
-#: accounts/templates/accounts/check_account_report.html:89
-#, fuzzy
-#| msgid "Reset password"
-msgid "Week password"
-msgstr "Resetar senha"
+msgstr "SemSenhaNum"
 
 #: accounts/templates/accounts/check_account_report.html:80
 #: assets/models/automations/base.py:153 ops/models/base.py:51
@@ -1920,22 +1801,16 @@ msgid "Result"
 msgstr "Resultado"
 
 #: accounts/templates/accounts/check_account_report.html:95
-#, fuzzy
-#| msgid "New password"
 msgid "No weak password"
-msgstr "Nova senha"
+msgstr "SemSenhaFraca"
 
 #: accounts/templates/accounts/gather_account_report.html:62
-#, fuzzy
-#| msgid "Test cloud account"
 msgid "New found accounts"
-msgstr "Testar Conta Cloud"
+msgstr "ContaNovaDescoberta"
 
 #: accounts/templates/accounts/gather_account_report.html:93
-#, fuzzy
-#| msgid "No account"
 msgid "Lost accounts"
-msgstr "Sem conta"
+msgstr "ContaPerdida"
 
 #: accounts/templates/accounts/push_account_report.html:13
 msgid ""
@@ -3050,12 +2925,6 @@ msgstr "Grupo de Protocolo"
 msgid "Node path"
 msgstr "Caminho do nó"
 
-#: assets/serializers/asset/common.py:151
-#, fuzzy
-#| msgid "Accounts create amount"
-msgid "Accounts amount"
-msgstr "Número de Contas Criadas"
-
 #: assets/serializers/asset/common.py:170
 #: assets/serializers/asset/common.py:423
 msgid "Auto info"
@@ -3172,12 +3041,6 @@ msgstr "Arquitetura do sistema"
 msgid "Executions"
 msgstr "Número de vezes executado"
 
-#: assets/serializers/automations/base.py:46
-#, fuzzy
-#| msgid "Host ID"
-msgid "Short ID"
-msgstr "ID do host"
-
 #: assets/serializers/cagegory.py:13
 msgid "Constraints"
 msgstr "Restrições"
@@ -3193,11 +3056,6 @@ msgid ""
 msgstr ""
 "O gateway é o proxy de rede do domínio. Ao conectar-se a ativos dentro do "
 "domínio, a conexão será roteada através do gateway."
-
-#: assets/serializers/domain.py:24 assets/serializers/platform.py:182
-#: orgs/serializers.py:13 perms/serializers/permission.py:50
-msgid "Assets amount"
-msgstr "Número de ativos"
 
 #: assets/serializers/gateway.py:19
 msgid "The platform must start with Gateway"
@@ -3567,10 +3425,6 @@ msgstr "-"
 msgid "Yes"
 msgstr "Sim"
 
-#: audits/handler.py:128
-msgid "No"
-msgstr "Não"
-
 #: audits/models.py:48
 msgid "Job audit log"
 msgstr "Logs de auditoria de tarefas"
@@ -3693,16 +3547,12 @@ msgid "Offline user session"
 msgstr "Desconectar Sessão do Usuário"
 
 #: audits/models.py:310
-#, fuzzy
-#| msgid "Application User"
 msgid "Application"
-msgstr "Usuário de aplicativo"
+msgstr "Aplicativo"
 
 #: audits/models.py:311
-#, fuzzy
-#| msgid "Application User"
 msgid "Application ID"
-msgstr "Usuário de aplicativo"
+msgstr "IDdoAplicativo"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
@@ -4389,10 +4239,8 @@ msgid "Super connection token"
 msgstr "Token de link super"
 
 #: authentication/models/connection_token.py:308
-#, fuzzy
-#| msgid "Connection token"
 msgid "Admin connection token"
-msgstr "Token de conexão"
+msgstr "TokenDeConexãoAdmin"
 
 #: authentication/models/private_token.py:11
 msgid "Private Token"
@@ -4963,16 +4811,12 @@ msgid "China"
 msgstr "China"
 
 #: common/const/choices.py:58
-#, fuzzy
-#| msgid "Manual input"
 msgid "Manual"
-msgstr "Entrada manual"
+msgstr "AçãoManual"
 
 #: common/const/choices.py:59
-#, fuzzy
-#| msgid "Timing trigger"
 msgid "Timing"
-msgstr "Action por tempo programado"
+msgstr "AçãoProgramada"
 
 #: common/const/choices.py:63
 msgid "Ready"
@@ -4987,16 +4831,8 @@ msgid "Canceled"
 msgstr "Cancelar"
 
 #: common/const/choices.py:112
-#, fuzzy
-#| msgid "Confirm"
 msgid "Confirmed"
-msgstr "Confirme"
-
-#: common/const/choices.py:113
-#, fuzzy
-#| msgid "Ignore case"
-msgid "Ignored"
-msgstr "Ignorar Maiúsculas e Minúsculas"
+msgstr "Confirmar"
 
 #: common/const/choices.py:120 terminal/models/applet/applet.py:31
 msgid "Community edition"
@@ -5806,10 +5642,8 @@ msgid "Crontab"
 msgstr "Crontab"
 
 #: ops/mixin.py:43 ops/mixin.py:177
-#, fuzzy
-#| msgid "Datetime"
 msgid "Start Datetime"
-msgstr "Data"
+msgstr "DataDeInício"
 
 #: ops/mixin.py:45 ops/mixin.py:179
 msgid "Datetime when the schedule should begin triggering the task to run"
@@ -6001,10 +5835,8 @@ msgid "Next execution time"
 msgstr "Próxima Hora de Execução"
 
 #: ops/serializers/job.py:17
-#, fuzzy
-#| msgid "Do not save"
 msgid "Run on save"
-msgstr "Não salvar"
+msgstr "ExecutarApósSalvar"
 
 #: ops/serializers/job.py:91
 msgid "Job type"
@@ -6420,6 +6252,10 @@ msgstr ""
 "expirar"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
+#, python-format
+msgid "The following %(item_type)s will expire in %(count)s"
+msgstr "Os seguintes %(item_type)s irão expirar em %(count)s"
+
 #: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid ""
@@ -6510,11 +6346,6 @@ msgstr "Tipo de conteúdo"
 #: rbac/models/permission.py:79 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "Autorização"
-
-#: rbac/models/role.py:46 rbac/models/rolebinding.py:52
-#: users/models/user/__init__.py:74
-msgid "Role"
-msgstr "Papel"
 
 #: rbac/models/role.py:144
 msgid "System role"
@@ -8399,78 +8230,57 @@ msgid "Logout"
 msgstr "Logout"
 
 #: templates/_message.html:6
-msgid ""
-"\n"
-"                Your account has expired, please contact the administrator.\n"
-"            "
-msgstr ""
-"\n"
-"                Sua conta expirou, por favor entre em contato com o "
-"administrador.            "
+msgid "Your account has expired, please contact the administrator."
+msgstr "Sua conta já expirou, por favor, entre em contato com o administrador."
 
-#: templates/_message.html:13
+#: templates/_message.html:11
 msgid "Your account will at"
 msgstr "Sua conta irá expirar em"
 
-#: templates/_message.html:13 templates/_message.html:30
+#: templates/_message.html:11 templates/_message.html:26
 msgid "expired. "
 msgstr "."
 
-#: templates/_message.html:23
+#: templates/_message.html:21
 #, python-format
 msgid ""
-"\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
-"            "
+"Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password."
 msgstr ""
-"\n"
-"                Sua senha expirou, por favor clique no <a "
-"href=\"%(user_password_update_url)s\"> link </a> para atualizar sua senha\n"
-"        "
+"Sua senha expirou, por favor, clique <a "
+"href=\"%(user_password_update_url)s\">neste link</a> para atualizar sua "
+"senha."
 
-#: templates/_message.html:30
+#: templates/_message.html:26
 msgid "Your password will at"
 msgstr "Sua senha irá expirar em"
 
-#: templates/_message.html:31
+#: templates/_message.html:27
 #, python-format
 msgid ""
-"\n"
-"                please click <a href=\"%(user_password_update_url)s\"> this "
-"link </a> to update your password.\n"
-"            "
+"please click <a href=\"%(user_password_update_url)s\"> this link </a> to "
+"update your password."
 msgstr ""
-"\n"
-"                Por favor, clique no <a "
-"href=\"%(user_password_update_url)s\"> link </a> para atualizar sua senha\n"
-"        "
+"Por favor, clique <a href=\"%(user_password_update_url)s\">neste link</a> "
+"para atualizar sua senha."
 
-#: templates/_message.html:43
+#: templates/_message.html:37
 #, python-format
 msgid ""
-"\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
-"        "
+"Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information."
 msgstr ""
-"\n"
-"                Suas informações estão incompletas, por favor clique no <a "
-"href=\"%(first_login_url)s\"> link </a> para completar\n"
-"                "
+"Suas informações estão incompletas, por favor, clique <a "
+"href=\"%(first_login_url)s\">neste link</a> para completá-las."
 
-#: templates/_message.html:56
+#: templates/_message.html:48
 #, python-format
 msgid ""
-"\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
-"        "
+"Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update"
 msgstr ""
-"\n"
-"                Sua chave SSH não está definida ou expirou, por favor clique "
-"no <a href=\"%(user_pubkey_update)s\"> link </a> para atualizar\n"
-"        "
+"Sua chave SSH não está configurada ou está inválida, por favor, clique <a "
+"href=\"%(user_pubkey_update)s\">neste link</a> para atualizar."
 
 #: templates/_mfa_login_field.html:31
 #: users/templates/users/forgot_password.html:101
@@ -11640,18 +11450,15 @@ msgstr ""
 
 #: xpack/plugins/cloud/tasks.py:54
 msgid ""
-"\n"
-"        Every day, according to the configuration in \"System Settings - "
-"Tasks - Regular \n"
+"Every day, according to the configuration in \"System Settings - Tasks - "
+"Regular \n"
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
-"        records generated by cloud synchronization\n"
-"        "
+"        records generated by cloud synchronization"
 msgstr ""
-"\n"
-"Todos os dias, de acordo com as configurações do sistema - lista de tarefas "
-"- limpeza regular - configuração de registros de sincronização em nuvem, "
-"limpa os registros de execução gerados pela sincronização na nuvem."
+"Diariamente, de acordo com as configurações do sistema - lista de tarefas - "
+"limpeza regular de configurações - configuração de registro de sincronização "
+"em nuvem, as execuções geradas pela sincronização em nuvem serão limpas."
 
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
@@ -11706,60 +11513,3 @@ msgstr "Importação de licença bem-sucedida"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Licença inválida"
-
-#~ msgid "Email sent to"
-#~ msgstr "O email foi enviado para"
-
-#~ msgid "Plan end"
-#~ msgstr "Tarefa concluída"
-
-#~ msgid "An exception occurred during task execution"
-#~ msgstr "Tarefa executada com exceções"
-
-#~ msgid "Collected"
-#~ msgstr "Coleção"
-
-#~ msgid "Account backup snapshot"
-#~ msgstr "Snapshot de Backup de Conta"
-
-#~ msgid "Account backup execution"
-#~ msgstr "Execução de Backup de Conta"
-
-#~ msgid "Date started"
-#~ msgstr "Data de início"
-
-#~ msgid "Triggers"
-#~ msgstr "Método de acionamento"
-
-#~ msgid "Periodic perform"
-#~ msgstr "Execução periódica"
-
-#~ msgid "Execute account backup plan"
-#~ msgstr "Execute o plano de backup de conta"
-
-#~ msgid ""
-#~ "When performing scheduled or manual account backups, this task is used"
-#~ msgstr ""
-#~ "Ao agendar ou executar manualmente o backup de uma conta, essa tarefa é "
-#~ "realizada"
-
-#~ msgid "Gather assets accounts"
-#~ msgstr "Coletando contas em ativos"
-
-#~ msgid "Manual trigger"
-#~ msgstr "Action manual"
-
-#~ msgid "Range {} to {}"
-#~ msgstr "Insira no intervalo de {} - {}"
-
-#~ msgid "Execute after saving"
-#~ msgstr "Executar após Salvar"
-
-#, fuzzy
-#~| msgid "Chat AI"
-#~ msgid "Chat AI type"
-#~ msgstr "Chat AI"
-
-#~ msgid ""
-#~ "The base URL of the GPT service. For example: https://api.openai.com/v1"
-#~ msgstr "URL básico do serviço GPT. Por exemplo: https://api.openai.com/v1"

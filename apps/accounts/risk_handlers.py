@@ -14,7 +14,7 @@ from common.const import ConfirmOrIgnore
 from common.utils import random_string
 
 TYPE_CHOICES = [
-    ("ignore", _("Ignore")),
+    ("ignore", _("Ignored")),
     ("reopen", _("Reopen")),
     ("close", _("Close")),
     ("disable_remote", _("Disable remote")),

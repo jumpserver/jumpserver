@@ -43,7 +43,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
     trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
     status = LabeledChoiceField(choices=Status.choices, read_only=True, label=_('Status'))
-    short_id = serializers.CharField(read_only=True, label=_('Short ID'))
+    short_id = serializers.CharField(read_only=True, label=_('ID'))
 
     class Meta:
         model = AutomationExecution

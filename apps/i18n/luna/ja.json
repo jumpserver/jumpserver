@@ -175,6 +175,7 @@
     "Send command": "コマンドを送信",
     "Send text to all ssh terminals": "すべてのssh端末にテキストを送信します",
     "Send text to current ssh terminals": "現在の SSH 端末にテキストを送信する",
+    "SessionIsBeingMonitored": "会話が監視されています。",
     "Set reusable": "再利用可能な",
     "Setting": "設定",
     "Settings or basic settings": "設定 → 基本設定",
