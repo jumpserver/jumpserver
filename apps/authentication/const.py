@@ -1,19 +1,14 @@
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
-from authentication.confirm import CONFIRM_BACKENDS
-from .confirm import ConfirmMFA, ConfirmPassword, ConfirmReLogin
-
 RSA_PRIVATE_KEY = 'rsa_private_key'
 RSA_PUBLIC_KEY = 'rsa_public_key'
 
-CONFIRM_BACKEND_MAP = {backend.name: backend for backend in CONFIRM_BACKENDS}
-
 
 class ConfirmType(TextChoices):
-    RELOGIN = ConfirmReLogin.name, ConfirmReLogin.display_name
-    PASSWORD = ConfirmPassword.name, ConfirmPassword.display_name
-    MFA = ConfirmMFA.name, ConfirmMFA.display_name
+    RELOGIN = 'relogin', 'Re-Login'
+    PASSWORD = 'password', _('Password')
+    MFA = 'mfa', 'MFA'
 
     @classmethod
     def get_can_confirm_types(cls, confirm_type):
@@ -24,6 +19,7 @@ class ConfirmType(TextChoices):
 
     @classmethod
     def get_prop_backends(cls, confirm_type):
+        from authentication.confirm import CONFIRM_BACKEND_MAP
         types = cls.get_can_confirm_types(confirm_type)
         backend_classes = [
             CONFIRM_BACKEND_MAP[tp]
