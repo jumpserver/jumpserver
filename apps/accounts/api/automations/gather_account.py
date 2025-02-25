@@ -2,6 +2,7 @@
 #
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -48,6 +49,7 @@ class DiscoverAccountsExecutionViewSet(AutomationExecutionViewSet):
         queryset = queryset.filter(automation__type=self.tp)
         return queryset
 
+    @xframe_options_sameorigin
     @action(methods=["get"], detail=False, url_path="adhoc")
     def adhoc(self, request, *args, **kwargs):
         asset_id = request.query_params.get("asset_id")

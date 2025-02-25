@@ -18,7 +18,7 @@
     "AccountData": "账号数据",
     "AccountDeleteConfirmMsg": "删除账号，是否继续？",
     "AccountDeleted": "账号删除",
-    "AccountDiscoverTask": "账号发现",
+    "AccountDiscover": "账号发现",
     "AccountExportTips": "导出信息中包含账号密文涉及敏感信息，导出的格式为一个加密的zip文件（若没有设置加密密码，请前往个人信息中设置文件加密密码）。",
     "AccountList": "账号",
     "AccountPolicy": "账号策略",
