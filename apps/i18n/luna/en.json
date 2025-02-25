@@ -171,6 +171,7 @@
     "Select account": "Select account",
     "Send command": "Send command",
     "Send text to all ssh terminals": "Send text to all ssh terminals",
+    "SessionIsBeingMonitored": "session is being monitored",
     "Set reusable": "Set reusable",
     "Setting": "Setting",
     "Settings or basic settings": "Settings → Basic Settings",
@@ -232,6 +233,5 @@
     "start time": "start time",
     "success": "success",
     "system user": "system user",
-    "user": "user",
-    "SessionIsBeingMonitored": "session is being monitored"
+    "user": "user"
 }

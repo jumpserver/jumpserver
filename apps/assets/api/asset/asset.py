@@ -130,7 +130,6 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         if queryset.model.__name__ != 'Asset':
-            print("get query prefetch")
             queryset = queryset.select_related('asset_ptr')
         return queryset
 
