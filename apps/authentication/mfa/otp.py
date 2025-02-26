@@ -1,9 +1,8 @@
-from django.utils.translation import gettext_lazy as _
 from django.shortcuts import reverse
+from django.utils.translation import gettext_lazy as _
 
 from .base import BaseMFA
 from ..const import MFAType
-
 
 otp_failed_msg = _("OTP code invalid, or server time error")
 
@@ -13,7 +12,7 @@ class MFAOtp(BaseMFA):
     display_name = MFAType.OTP.name
     placeholder = _('OTP verification code')
 
-    def check_code(self, code):
+    def _check_code(self, code):
         from users.utils import check_otp_code
         assert self.is_authenticated()
 
