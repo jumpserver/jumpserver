@@ -1048,6 +1048,7 @@
     "RunningPath": "运行路径",
     "RunningPathHelpText": "填写脚本的运行路径，此设置仅 shell 脚本生效",
     "RunningTimes": "最近5次运行时间",
+    "RunningSummary": "运行中",
     "SCP": "深信服云平台",
     "SMS": "短信",
     "SMSProvider": "短信服务商",
@@ -1237,6 +1238,7 @@
     "TaskList": "任务列表",
     "TaskMonitor": "任务监控",
     "TaskPath": "任务路径",
+    "TaskSummary": "任务汇总",
     "TechnologyConsult": "技术咨询",
     "TempPasswordTip": "临时密码有效期为 300 秒，使用后立刻失效",
     "TempToken": "临时密码",
@@ -1474,6 +1476,7 @@
     "DiscoveredAccountList": "发现账号",
     "AccountDiscoverTask": "账号发现",
     "ExecutionRecord": "执行记录",
+    "ExecutionSummary": "执行状态",
     "FoundAccountInAssetDeleteMsg": "删除从系统资产中发现的找好",
     "RemoteAssetFoundAccountDeleteMsg": "删除从远端资产中发现的找好",
     "PushAccountHelpText": "若账号已存在，则使用账号密文进行推送；若账号不存在，则根据填写的密文创建账号，然后进行推送。"
