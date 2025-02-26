@@ -108,7 +108,7 @@ class AccountFilterSet(BaseFilterSet):
             )
 
         if kwargs:
-            queryset = queryset.filter(date_last_login__gte=date)
+            queryset = queryset.filter(**kwargs)
         return queryset
 
     @staticmethod
