@@ -7,8 +7,8 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.translation import gettext as _
 from django.utils._os import safe_join
+from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
