@@ -129,7 +129,7 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
         handler = RiskHandler(asset=asset, username=username, request=self.request)
         data = handler.handle(act, risk)
         if not data:
-            data = {"message": "Success"}
+            return Response(data={"message": "Success"})
         s = serializers.AccountRiskSerializer(instance=data)
         return Response(data=s.data)
 

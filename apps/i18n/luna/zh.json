@@ -112,7 +112,6 @@
     "LoginExpireMsg": "当前登录已超时，请不要关闭窗口。在新的窗口登录后即可恢复当前页面，如未恢复请刷新页面。",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "低速宽带 (256 Kbps - 2 Mbps)",
     "Manual accounts": "手动账号",
-    "MenuAccountTemplates": "账号模版",
     "Module": "模块",
     "Multi Screen": "多屏显示",
     "My applications": "我的应用",
@@ -170,6 +169,7 @@
     "Select account": "选择账号",
     "Send command": "发送命令",
     "Send text to all ssh terminals": "发送文本到所有ssh终端",
+    "SessionIsBeingMonitored": "会话正在被监控",
     "Set reusable": "开启复用",
     "Setting": "设置",
     "Settings or basic settings": "菜单设置 → 基本设置",
@@ -230,6 +230,5 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户",
-    "SessionIsBeingMonitored": "会话正在被监控"
+    "user": "用户"
 }
