@@ -83,7 +83,7 @@
     "AllClickRead": "全部已读",
     "AllMembers": "全部成员",
     "AllowInvalidCert": "忽略证书检查",
-    "AmazonSecretsManager": "Amazon Secrets Manager",
+    "AmazonSecretsManager": "Amazon 机密管理器",
     "Announcement": "公告",
     "AnonymousAccount": "匿名账号",
     "AnonymousAccountTip": "连接资产时不使用用户名和密码，仅支持 web类型 和 自定义类型 的资产",
@@ -251,7 +251,7 @@
     "CancelTicket": "取消工单",
     "CannotAccess": "无法访问当前页面",
     "Category": "类别",
-    "CeleryTaskLog": "Celery任务日志",
+    "CeleryTaskLog": "Celery 任务日志",
     "Certificate": "证书",
     "CertificateKey": "客户端密钥",
     "ChangeCredentials": "账号改密",
@@ -587,7 +587,7 @@
     "Hardware": "硬件信息",
     "HardwareInfo": "硬件信息",
     "HasImportErrorItemMsg": "存在导入失败项，点击左侧 x 查看失败原因，点击表格编辑后，可以继续导入失败项",
-    "HashicorpVault": "HCP vault",
+    "HashicorpVault": "HCP 保险库",
     "Help": "帮助",
     "HighLoad": "较高",
     "HistoricalSessionNum": "历史会话数",
@@ -1470,5 +1470,8 @@
     "setVariable": "设置参数",
     "TableSetting": "表格偏好",
     "AccountDiscoverTask": "账号发现",
-    "ExecutionSummary": "执行汇总"
+    "ExecutionSummary": "执行汇总",
+    "TotalAccounts": "账号总数",
+    "Periodic": "定期",
+    "ChangeSecretFailAccounts": "改密失败账号"
 }

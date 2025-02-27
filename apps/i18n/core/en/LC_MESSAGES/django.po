@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-24 19:16+0800\n"
+"POT-Creation-Date: 2025-02-27 18:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "Account not found"
 msgstr ""
 
-#: accounts/api/automations/base.py:81 tickets/api/ticket.py:132
+#: accounts/api/automations/base.py:82 tickets/api/ticket.py:132
 msgid "The parameter 'action' must be [{}]"
 msgstr ""
 
@@ -105,8 +105,8 @@ msgstr ""
 
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:34
-#: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:9
-#: authentication/confirm/password.py:24 authentication/confirm/password.py:26
+#: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:25
+#: authentication/confirm/password.py:27 authentication/const.py:10
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
 #: authentication/templates/authentication/login.html:408
@@ -412,7 +412,7 @@ msgstr ""
 msgid "User %s view/export secret"
 msgstr ""
 
-#: accounts/models/account.py:64
+#: accounts/models/account.py:65
 #: accounts/models/automations/check_account.py:62
 #: accounts/models/automations/gather_account.py:16
 #: accounts/serializers/account/account.py:226
@@ -435,7 +435,7 @@ msgstr ""
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:228
 #: authentication/models/connection_token.py:39
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:33 terminal/notifications.py:156
+#: terminal/models/session/session.py:34 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
@@ -443,7 +443,7 @@ msgstr ""
 msgid "Asset"
 msgstr ""
 
-#: accounts/models/account.py:68 accounts/models/template.py:16
+#: accounts/models/account.py:69 accounts/models/template.py:16
 #: accounts/serializers/account/account.py:233
 #: accounts/serializers/account/account.py:284
 #: accounts/serializers/account/template.py:35
@@ -451,46 +451,46 @@ msgstr ""
 msgid "Su from"
 msgstr "Switch from"
 
-#: accounts/models/account.py:70 assets/const/protocol.py:195
+#: accounts/models/account.py:71 assets/const/protocol.py:195
 #: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
 msgstr ""
 
-#: accounts/models/account.py:72
+#: accounts/models/account.py:73
 msgid "historical Account"
 msgstr ""
 
-#: accounts/models/account.py:73
+#: accounts/models/account.py:74
 msgid "Secret reset"
 msgstr ""
 
-#: accounts/models/account.py:74 accounts/serializers/account/account.py:228
+#: accounts/models/account.py:75 accounts/serializers/account/account.py:228
 #: users/models/user/__init__.py:127
 msgid "Source"
 msgstr ""
 
-#: accounts/models/account.py:75
+#: accounts/models/account.py:76
 msgid "Source ID"
 msgstr ""
 
-#: accounts/models/account.py:76
+#: accounts/models/account.py:77
 msgid "Date last access"
 msgstr ""
 
-#: accounts/models/account.py:77
+#: accounts/models/account.py:78
 msgid "Access by"
 msgstr "Access by"
 
-#: accounts/models/account.py:78
+#: accounts/models/account.py:79
 msgid "Date change secret"
 msgstr ""
 
-#: accounts/models/account.py:80
+#: accounts/models/account.py:81
 msgid "Change secret status"
 msgstr ""
 
-#: accounts/models/account.py:84
+#: accounts/models/account.py:85
 #: accounts/models/automations/check_account.py:67
 #: accounts/serializers/account/service.py:10
 #: accounts/serializers/automations/change_secret.py:115
@@ -502,7 +502,7 @@ msgstr ""
 #: audits/serializers.py:229 authentication/api/connection_token.py:461
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:35 terminal/serializers/command.py:72
+#: terminal/models/session/session.py:36 terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13
@@ -510,27 +510,27 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: accounts/models/account.py:90
+#: accounts/models/account.py:91
 msgid "Can view asset account secret"
 msgstr ""
 
-#: accounts/models/account.py:91
+#: accounts/models/account.py:92
 msgid "Can view asset history account"
 msgstr ""
 
-#: accounts/models/account.py:92
+#: accounts/models/account.py:93
 msgid "Can view asset history account secret"
 msgstr ""
 
-#: accounts/models/account.py:93
+#: accounts/models/account.py:94
 msgid "Can verify account"
 msgstr ""
 
-#: accounts/models/account.py:94
+#: accounts/models/account.py:95
 msgid "Can push account"
 msgstr ""
 
-#: accounts/models/account.py:95
+#: accounts/models/account.py:96
 msgid "Can remove account"
 msgstr ""
 
@@ -1216,7 +1216,6 @@ msgid "Spec info"
 msgstr ""
 
 #: accounts/serializers/account/account.py:467
-#: assets/serializers/automations/base.py:46
 #: authentication/serializers/connect_token_secret.py:160
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
@@ -1234,7 +1233,7 @@ msgstr ""
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
 #: rbac/builtin.py:125 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:31 terminal/models/session/sharing.py:34
+#: terminal/models/session/session.py:32 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
@@ -1274,7 +1273,7 @@ msgstr ""
 #: terminal/models/applet/applet.py:332 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:27
 #: terminal/models/component/endpoint.py:122
-#: terminal/models/session/session.py:48
+#: terminal/models/session/session.py:49
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:99
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:124
@@ -1574,7 +1573,7 @@ msgstr ""
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
-#: terminal/models/applet/host.py:141 terminal/models/session/session.py:46
+#: terminal/models/applet/host.py:141 terminal/models/session/session.py:47
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Date start"
@@ -1587,7 +1586,7 @@ msgstr ""
 #: accounts/templates/accounts/push_account_report.html:30
 #: settings/serializers/feature.py:28
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
-#: terminal/models/session/session.py:47
+#: terminal/models/session/session.py:48
 msgid "Date end"
 msgstr ""
 
@@ -1805,7 +1804,7 @@ msgstr ""
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: audits/serializers.py:38 ops/serializers/job.py:92 terminal/const.py:88
-#: terminal/models/session/session.py:44 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:45 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:23
@@ -1990,11 +1989,11 @@ msgstr ""
 msgid "User agent"
 msgstr ""
 
-#: assets/api/asset/asset.py:195
+#: assets/api/asset/asset.py:194
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 
-#: assets/api/asset/asset.py:199
+#: assets/api/asset/asset.py:198
 msgid "The number of assets exceeds the limit of 5000"
 msgstr ""
 
@@ -2143,7 +2142,7 @@ msgstr ""
 
 #: assets/const/category.py:15 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
-msgstr "Custom"
+msgstr ""
 
 #: assets/const/cloud.py:7
 msgid "Public cloud"
@@ -2897,7 +2896,7 @@ msgstr ""
 
 #: assets/serializers/automations/base.py:38
 msgid "Executions"
-msgstr "Executions"
+msgstr ""
 
 #: assets/serializers/cagegory.py:13
 msgid "Constraints"
@@ -3264,7 +3263,7 @@ msgid "Job audit log"
 msgstr ""
 
 #: audits/models.py:57 audits/models.py:101 audits/models.py:176
-#: audits/models.py:309 terminal/models/session/session.py:40
+#: audits/models.py:309 terminal/models/session/session.py:41
 #: terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr ""
@@ -3566,12 +3565,12 @@ msgstr ""
 msgid "No available face feature"
 msgstr ""
 
-#: authentication/api/face.py:100 authentication/mfa/face.py:20
-#: authentication/mfa/face.py:22 users/views/profile/face.py:72
+#: authentication/api/face.py:100 authentication/mfa/face.py:21
+#: authentication/mfa/face.py:23 users/views/profile/face.py:72
 msgid "Facial comparison failed"
 msgstr ""
 
-#: authentication/api/mfa.py:63
+#: authentication/api/mfa.py:61
 msgid "Current user not support mfa type: {}"
 msgstr ""
 
@@ -3658,12 +3657,38 @@ msgstr ""
 msgid "SAML2 Error"
 msgstr ""
 
-#: authentication/confirm/password.py:16
+#: authentication/confirm/password.py:17
 msgid "Authentication failed password incorrect"
 msgstr ""
 
-#: authentication/confirm/relogin.py:10
+#: authentication/confirm/relogin.py:11
 msgid "Login time has exceeded {} minutes, please login again"
+msgstr ""
+
+#: authentication/const.py:32
+msgid "OTP"
+msgstr ""
+
+#: authentication/const.py:33 authentication/serializers/password_mfa.py:16
+#: authentication/serializers/password_mfa.py:24
+#: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
+#: users/forms/profile.py:104 users/forms/profile.py:111
+#: users/templates/users/forgot_password.html:157
+#: users/views/profile/reset.py:100
+msgid "SMS"
+msgstr ""
+
+#: authentication/const.py:34
+msgid "Face Recognition"
+msgstr ""
+
+#: authentication/const.py:35 settings/serializers/auth/radius.py:14
+#: settings/serializers/auth/radius.py:16
+msgid "Radius"
+msgstr ""
+
+#: authentication/const.py:36
+msgid "Custom"
 msgstr ""
 
 #: authentication/errors/const.py:18
@@ -3853,40 +3878,38 @@ msgstr ""
 msgid "Dynamic code"
 msgstr ""
 
-#: authentication/mfa/base.py:7
+#: authentication/mfa/base.py:8
 msgid "Please input security code"
 msgstr ""
 
-#: authentication/mfa/custom.py:20
+#: authentication/mfa/base.py:27
+msgid ""
+"The two-factor code you entered has either already been used or has expired. "
+"Please request a new one."
+msgstr ""
+
+#: authentication/mfa/custom.py:21
 msgid "MFA Custom code invalid"
 msgstr ""
 
-#: authentication/mfa/custom.py:26
+#: authentication/mfa/custom.py:27
 msgid "MFA custom verification code"
 msgstr ""
 
-#: authentication/mfa/custom.py:56
+#: authentication/mfa/custom.py:57
 msgid "MFA custom global enabled, cannot disable"
 msgstr ""
 
-#: authentication/mfa/face.py:10
-msgid "Face Recognition"
-msgstr ""
-
-#: authentication/mfa/face.py:54
+#: authentication/mfa/face.py:55
 msgid "Bind face to enable"
 msgstr ""
 
-#: authentication/mfa/face.py:58
+#: authentication/mfa/face.py:59
 msgid "Unbind face to disable"
 msgstr ""
 
 #: authentication/mfa/otp.py:7
 msgid "OTP code invalid, or server time error"
-msgstr ""
-
-#: authentication/mfa/otp.py:12
-msgid "OTP"
 msgstr ""
 
 #: authentication/mfa/otp.py:13
@@ -3897,40 +3920,31 @@ msgstr ""
 msgid "Virtual OTP based MFA"
 msgstr ""
 
-#: authentication/mfa/radius.py:7
+#: authentication/mfa/radius.py:8
 msgid "Radius verify code invalid"
 msgstr ""
 
-#: authentication/mfa/radius.py:13
+#: authentication/mfa/radius.py:14
 msgid "Radius verification code"
 msgstr ""
 
-#: authentication/mfa/radius.py:44
+#: authentication/mfa/radius.py:45
 msgid "Radius global enabled, cannot disable"
 msgstr ""
 
-#: authentication/mfa/sms.py:8
+#: authentication/mfa/sms.py:9
 msgid "SMS verify code invalid"
 msgstr ""
 
-#: authentication/mfa/sms.py:13 authentication/serializers/password_mfa.py:16
-#: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
-#: users/forms/profile.py:104 users/forms/profile.py:111
-#: users/templates/users/forgot_password.html:157
-#: users/views/profile/reset.py:100
-msgid "SMS"
-msgstr ""
-
-#: authentication/mfa/sms.py:14
+#: authentication/mfa/sms.py:15
 msgid "SMS verification code"
 msgstr ""
 
-#: authentication/mfa/sms.py:63
+#: authentication/mfa/sms.py:64
 msgid "Set phone number to enable"
 msgstr ""
 
-#: authentication/mfa/sms.py:67
+#: authentication/mfa/sms.py:68
 msgid "Clear phone number to disable"
 msgstr ""
 
@@ -6695,11 +6709,6 @@ msgstr ""
 msgid "FIDO Server name"
 msgstr ""
 
-#: settings/serializers/auth/radius.py:14
-#: settings/serializers/auth/radius.py:16
-msgid "Radius"
-msgstr ""
-
 #: settings/serializers/auth/radius.py:23
 msgid "OTP in RADIUS"
 msgstr ""
@@ -8257,43 +8266,43 @@ msgstr ""
 msgid "Can download session replay"
 msgstr ""
 
-#: terminal/models/session/session.py:36
+#: terminal/models/session/session.py:37
 msgid "Account ID"
 msgstr ""
 
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:118
+#: terminal/models/session/session.py:39 terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr ""
 
-#: terminal/models/session/session.py:43
+#: terminal/models/session/session.py:44
 msgid "Replay"
 msgstr ""
 
-#: terminal/models/session/session.py:49 terminal/serializers/session.py:112
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:112
 msgid "Command amount"
 msgstr ""
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:32
+#: terminal/models/session/session.py:51 terminal/serializers/session.py:32
 msgid "Error reason"
 msgstr ""
 
-#: terminal/models/session/session.py:310
+#: terminal/models/session/session.py:315
 msgid "Session record"
 msgstr ""
 
-#: terminal/models/session/session.py:312
+#: terminal/models/session/session.py:317
 msgid "Can monitor session"
 msgstr ""
 
-#: terminal/models/session/session.py:313
+#: terminal/models/session/session.py:318
 msgid "Can share session"
 msgstr ""
 
-#: terminal/models/session/session.py:314
+#: terminal/models/session/session.py:319
 msgid "Can terminate session"
 msgstr ""
 
-#: terminal/models/session/session.py:315
+#: terminal/models/session/session.py:320
 msgid "Can validate session action perm"
 msgstr ""
 

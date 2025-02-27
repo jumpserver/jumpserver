@@ -160,10 +160,6 @@ class AutomationExecution(OrgModelMixin):
         verbose_name = _("Automation task execution")
 
     @property
-    def short_id(self):
-        return str(self.id)[:8]
-
-    @property
     def is_finished(self):
         return bool(self.date_finished)
 
