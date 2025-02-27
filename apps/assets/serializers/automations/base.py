@@ -43,7 +43,6 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
     trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
     status = LabeledChoiceField(choices=Status.choices, read_only=True, label=_('Status'))
-    short_id = serializers.CharField(read_only=True, label=_('ID'))
 
     class Meta:
         model = AutomationExecution
@@ -51,7 +50,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
             'trigger', 'date_start', 'date_finished',
             'snapshot', 'status', 'duration'
         ]
-        fields = ['id', 'short_id', 'automation'] + read_only_fields
+        fields = ['id', 'automation'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):
