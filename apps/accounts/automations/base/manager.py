@@ -138,10 +138,12 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         account.secret = getattr(recorder, 'new_secret', account.secret)
         account.date_updated = timezone.now()
+        account.date_change_secret = timezone.now()
+        account.change_secret_status = ChangeSecretRecordStatusChoice.success
 
         with safe_db_connection():
             recorder.save(update_fields=['status', 'date_finished'])
-            account.save(update_fields=['secret', 'date_updated'])
+            account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
 
         self.summary['ok_accounts'] += 1
         self.result['ok_accounts'].append(

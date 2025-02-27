@@ -26,7 +26,7 @@ class MFACustom(BaseMFA):
     display_name = MFAType.Custom.name
     placeholder = _("MFA custom verification code")
 
-    def check_code(self, code):
+    def _check_code(self, code):
         assert self.is_authenticated()
         ok = False
         try:

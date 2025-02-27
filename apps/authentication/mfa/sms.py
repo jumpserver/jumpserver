@@ -24,7 +24,7 @@ class MFASms(BaseMFA):
             phone, backend=self.name, user_info=user_info
         )
 
-    def check_code(self, code):
+    def _check_code(self, code):
         assert self.is_authenticated()
         ok = False
         msg = ''
