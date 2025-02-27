@@ -11,6 +11,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import Account
 from assets.models import Asset
 from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.utils import get_object_or_none, lazyproperty
@@ -124,6 +125,10 @@ class Session(OrgModelMixin):
     @property
     def user_obj(self):
         return User.objects.get(id=self.user_id)
+
+    @property
+    def account_obj(self):
+        return get_object_or_none(Account, pk=self.account_id)
 
     def can_replay(self):
         return self.has_replay

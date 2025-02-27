@@ -5,9 +5,11 @@ from terminal.models import Session
 
 
 @receiver(pre_save, sender=Session)
-def on_session_pre_save(sender, instance,**kwargs):
+def on_session_pre_save(sender, instance, **kwargs):
     if instance.need_update_cmd_amount:
         instance.cmd_amount = instance.compute_command_amount()
+    if instance.account_obj:
+        instance.account_obj.update_last_login_date()
 
 
 @receiver(post_save, sender=Session)
@@ -16,4 +18,3 @@ def on_session_finished(sender, instance: Session, created, **kwargs):
         return
     # 清理一次可能因 task 未执行的缓存数据
     Session.unlock_session(instance.id)
-
