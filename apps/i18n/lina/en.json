@@ -176,7 +176,7 @@
     "AuthUserAttrMapHelpText": "The key on the left belongs to the jumpserver user properties, and the value on the right belongs to the authentication platform user properties",
     "Authentication": "Authentication",
     "AutoPush": "Auto push",
-    "Automation": "Automation | Automations",
+    "Automation": "Automation",
     "AverageTimeCost": "Average spend time",
     "AwaitingMyApproval": "Assigned",
     "Azure": "Azure (China)",
