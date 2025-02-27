@@ -10,9 +10,9 @@ class MFAFace(BaseMFA, AuthFaceMixin):
     name = MFAType.Face.value
     display_name = MFAType.Face.name
     placeholder = 'Face Recognition'
+    skip_cache_check = True
 
-    def check_code(self, code):
-
+    def _check_code(self, code):
         assert self.is_authenticated()
 
         try:

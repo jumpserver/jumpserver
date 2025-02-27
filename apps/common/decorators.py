@@ -381,4 +381,3 @@ def bulk_update_decorator(instance_model, batch_size=50, update_fields=None, tim
         instance_model.objects.bulk_update(cache, update_fields)
 
     return bulk_handle(handle, batch_size, timeout)
-

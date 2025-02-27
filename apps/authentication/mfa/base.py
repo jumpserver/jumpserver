@@ -1,10 +1,12 @@
 import abc
 
+from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
 
 class BaseMFA(abc.ABC):
     placeholder = _('Please input security code')
+    skip_cache_check = False
 
     def __init__(self, user):
         """
@@ -13,6 +15,25 @@ class BaseMFA(abc.ABC):
         """
         self.user = user
         self.request = None
+
+    def check_code(self, code):
+        if self.skip_cache_check:
+            return self._check_code(code)
+
+        cache_key = f'{self.name}_{self.user.username}'
+        cache_code = cache.get(cache_key)
+        if cache_code == code:
+            return False, _(
+                "The two-factor code you entered has either already been used or has expired. "
+                "Please request a new one."
+            )
+
+        ok, msg = self._check_code(code)
+        if not ok:
+            return False, msg
+
+        cache.set(cache_key, code, 60 * 5)
+        return True, msg
 
     def is_authenticated(self):
         return self.user and self.user.is_authenticated
@@ -38,7 +59,7 @@ class BaseMFA(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def check_code(self, code) -> tuple:
+    def _check_code(self, code) -> tuple:
         return False, 'Error msg'
 
     @abc.abstractmethod
