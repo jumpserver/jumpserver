@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-27 18:42+0800\n"
+"POT-Creation-Date: 2025-02-28 18:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,7 +167,7 @@ msgstr "Banco de Dados"
 
 #: accounts/const/account.py:27
 msgid "Discovery"
-msgstr ""
+msgstr "Descubra"
 
 #: accounts/const/account.py:28 accounts/serializers/account/account.py:28
 #: settings/serializers/auth/sms.py:84
@@ -370,7 +370,7 @@ msgstr "Chave de Certificação"
 
 #: accounts/const/automation.py:134
 msgid "DB"
-msgstr ""
+msgstr "banco de dados"
 
 #: accounts/const/vault.py:8 assets/const/category.py:12
 #: assets/models/asset/database.py:10 assets/models/asset/database.py:29
@@ -618,7 +618,7 @@ msgstr "Ativação em andamento"
 
 #: accounts/models/application.py:28
 msgid "Integration App"
-msgstr ""
+msgstr "aplicativo de integração"
 
 #: accounts/models/automations/backup_account.py:27
 msgid "Backup type"
@@ -630,12 +630,12 @@ msgid "Password divided"
 msgstr " A chave é dividida em duas partes?"
 
 #: accounts/models/automations/backup_account.py:33
-#: accounts/serializers/automations/backup.py:33
+#: accounts/serializers/automations/backup.py:34
 msgid "Recipient part one"
 msgstr "Parte um do destinatário"
 
 #: accounts/models/automations/backup_account.py:37
-#: accounts/serializers/automations/backup.py:37
+#: accounts/serializers/automations/backup.py:38
 msgid "Recipient part two"
 msgstr "Parte dois do destinatário"
 
@@ -774,7 +774,7 @@ msgstr "Registro de alteração de senha"
 
 #: accounts/models/automations/check_account.py:18
 msgid "Engines"
-msgstr ""
+msgstr "motor"
 
 #: accounts/models/automations/check_account.py:34
 msgid "account check automation"
@@ -912,32 +912,37 @@ msgid ""
 "Perform checks and analyses based on automatically discovered account "
 "results, including user groups, public keys, sudoers, and other information"
 msgstr ""
+"Realize uma análise de verificação com base nos resultados de descoberta "
+"automática das contas, incluindo informações sobre grupos de usuários, "
+"chaves públicas, sudoers, etc."
 
 #: accounts/models/automations/check_account.py:140
 msgid "Check the strength of your account and password"
-msgstr ""
+msgstr "Verifique a força da sua conta e senha"
 
 #: accounts/models/automations/check_account.py:142
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
 msgstr ""
+"Realize uma análise de verificação sobre a segurança da conta e da senha, "
+"incluindo a força da senha e situações de vazamento."
 
 #: accounts/models/automations/check_account.py:149
 msgid "Check if the account and password are repeated"
-msgstr ""
+msgstr "Verifique se as contas e senhas são duplicadas"
 
 #: accounts/models/automations/check_account.py:150
 msgid "Check if the account is the same as other accounts"
-msgstr ""
+msgstr "Verifique se esta conta é igual a outras contas"
 
 #: accounts/models/automations/check_account.py:155
 msgid "Check whether the account password is a common password"
-msgstr ""
+msgstr "Verifique se a conta e a senha são senhas comuns"
 
 #: accounts/models/automations/check_account.py:156
 msgid "Check whether the account password is a commonly leaked password"
-msgstr ""
+msgstr "Verifique se a conta e a senha são senhas frequentemente vazadas"
 
 #: accounts/models/automations/gather_account.py:18
 msgid "Address login"
@@ -973,7 +978,7 @@ msgstr "Conta sincronizada"
 
 #: accounts/models/automations/gather_account.py:93
 msgid "Check risk"
-msgstr ""
+msgstr "Verificação de risco"
 
 #: accounts/models/automations/gather_account.py:111
 msgid "Gather account automation"
@@ -1131,7 +1136,7 @@ msgstr "Ignorar"
 
 #: accounts/risk_handlers.py:18
 msgid "Reopen"
-msgstr ""
+msgstr "Reabrir"
 
 #: accounts/risk_handlers.py:19 audits/const.py:38
 #: authentication/templates/authentication/_access_key_modal.html:155
@@ -1314,6 +1319,13 @@ msgstr "Lista branca de IP"
 msgid "Comment"
 msgstr "Observação"
 
+#: accounts/serializers/account/service.py:27
+#: accounts/templates/accounts/backup_account_report.html:38
+#: accounts/templates/accounts/check_account_report.html:38
+#: assets/serializers/asset/common.py:151
+msgid "Accounts amount"
+msgstr "Quantidade de contas"
+
 #: accounts/serializers/account/template.py:11
 msgid "Password length"
 msgstr "Comprimento da senha"
@@ -1397,13 +1409,13 @@ msgstr ""
 msgid "Zip Encrypt Password"
 msgstr "Senha de encriptação do arquivo"
 
-#: accounts/serializers/automations/backup.py:34
-#: accounts/serializers/automations/backup.py:38
+#: accounts/serializers/automations/backup.py:35
+#: accounts/serializers/automations/backup.py:39
 #: accounts/serializers/automations/change_secret.py:60
 msgid "Currently only mail sending is supported"
 msgstr "Atualmente só suporta o envio de e-mail"
 
-#: accounts/serializers/automations/backup.py:40
+#: accounts/serializers/automations/backup.py:41
 msgid "Asset type"
 msgstr "Tipo de bem"
 
@@ -1462,7 +1474,7 @@ msgstr "ID do motor inválido"
 
 #: accounts/serializers/automations/gather_account.py:30
 msgid "Whether to check the risk of the gathered accounts."
-msgstr ""
+msgstr "Deve ser realizada uma verificação de risco para as contas agrupadas."
 
 #: accounts/signal_handlers.py:43
 #, python-format
@@ -1637,6 +1649,8 @@ msgid ""
 "The following is a summary of account backup tasks, please review and handle "
 "them"
 msgstr ""
+"Abaixo estão os resumos das tarefas de backup de contas, por favor, revise e "
+"trate."
 
 #: accounts/templates/accounts/backup_account_report.html:22
 #: accounts/templates/accounts/change_secret_failed_info.html:3
@@ -1680,16 +1694,8 @@ msgstr "Data de Encerramento"
 #: accounts/templates/accounts/check_account_report.html:34
 #: accounts/templates/accounts/gather_account_report.html:35
 #: accounts/templates/accounts/push_account_report.html:34
-#, fuzzy
-#| msgid "Time cost"
 msgid "Time using"
-msgstr "Tempo gasto"
-
-#: accounts/templates/accounts/backup_account_report.html:38
-#: accounts/templates/accounts/check_account_report.html:38
-#: assets/serializers/asset/common.py:151
-msgid "Accounts amount"
-msgstr "Quantidade de contas"
+msgstr "Duração."
 
 #: accounts/templates/accounts/backup_account_report.html:42
 msgid "Type count"
@@ -1716,6 +1722,8 @@ msgid ""
 "The following is a summary of account change secret tasks, please read and "
 "process"
 msgstr ""
+"Aqui está um resumo da missão secreta de alteração de conta, por favor, leia "
+"e processe."
 
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
@@ -1815,6 +1823,8 @@ msgstr "ContaPerdida"
 msgid ""
 "The following is a summary of account push tasks, please read and process"
 msgstr ""
+"Abaixo está a compilação da tarefa de notificação de conta, por favor, leia "
+"e processe."
 
 #: accounts/utils.py:54
 msgid ""
@@ -2189,7 +2199,7 @@ msgstr "Desconhecido"
 
 #: assets/const/automation.py:7
 msgid "N/A"
-msgstr ""
+msgstr "Não aplicável."
 
 #: assets/const/automation.py:8
 msgid "OK"
@@ -2264,13 +2274,11 @@ msgstr "Kubernetes"
 
 #: assets/const/device.py:7
 msgid "Cisco"
-msgstr ""
+msgstr "Cisco."
 
 #: assets/const/device.py:8
-#, fuzzy
-#| msgid "Huawei Cloud"
 msgid "Huawei"
-msgstr "Huawei Cloud"
+msgstr "Huawei."
 
 #: assets/const/device.py:9
 msgid "H3C"
@@ -3872,10 +3880,8 @@ msgid "Radius"
 msgstr "Radius"
 
 #: authentication/const.py:36
-#, fuzzy
-#| msgid "Custom type"
 msgid "Custom"
-msgstr "Personalizado"
+msgstr "Personalizado."
 
 #: authentication/errors/const.py:18
 msgid "Username/password check failed"
@@ -4658,7 +4664,7 @@ msgid "LAN"
 msgstr "Rede Local"
 
 #: authentication/views/base.py:71
-#: perms/templates/perms/_msg_permed_items_expire.html:20
+#: perms/templates/perms/_msg_permed_items_expire.html:18
 msgid "If you have any question, please contact the administrator"
 msgstr ""
 "Em caso de dúvidas ou necessidades, por favor, entre em contato com o "
@@ -5664,6 +5670,7 @@ msgstr "DataDeInício"
 #: ops/mixin.py:45 ops/mixin.py:179
 msgid "Datetime when the schedule should begin triggering the task to run"
 msgstr ""
+"A data e hora em que o plano deve começar a acionar a execução da tarefa."
 
 #: ops/mixin.py:49 ops/models/base.py:22 ops/serializers/job.py:19
 msgid "Date last run"
@@ -6268,20 +6275,10 @@ msgstr ""
 "expirar"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
+#: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid "The following %(item_type)s will expire in %(count)s"
 msgstr "Os seguintes %(item_type)s irão expirar em %(count)s"
-
-#: perms/templates/perms/_msg_permed_items_expire.html:7
-#, python-format
-msgid ""
-"\n"
-"        The following %(item_type)s will expire in %(count)s\n"
-"    "
-msgstr ""
-"\n"
-"        O seguinte %(item_type)s expirará em %(count)s\n"
-"    "
 
 #: rbac/api/role.py:35
 msgid "Internal role, can't be destroy"
@@ -11460,13 +11457,6 @@ msgstr ""
 "instâncias"
 
 #: xpack/plugins/cloud/tasks.py:54
-#, fuzzy
-#| msgid ""
-#| "Every day, according to the configuration in \"System Settings - Tasks - "
-#| "Regular \n"
-#| "        clean-up - Cloud sync task history retention days\" the system "
-#| "will clean up the execution \n"
-#| "        records generated by cloud synchronization"
 msgid ""
 "Every day, according to the configuration in \"System Settings - Tasks - "
 "Regular \n"
