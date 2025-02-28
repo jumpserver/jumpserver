@@ -4,7 +4,7 @@ from .base import BackendBase
 
 class Email(BackendBase):
     account_field = 'email'
-    is_enable_field_in_settings = 'EMAIL_HOST_USER'
+    is_enable_field_in_settings = 'EMAIL_HOST'
 
     def send_msg(self, users, message, subject):
         accounts, __, __ = self.get_accounts(users)
