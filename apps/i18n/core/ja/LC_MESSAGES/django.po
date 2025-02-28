@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-27 18:42+0800\n"
+"POT-Creation-Date: 2025-02-28 18:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,7 +167,7 @@ msgstr "ローカル"
 
 #: accounts/const/account.py:27
 msgid "Discovery"
-msgstr ""
+msgstr "発見"
 
 #: accounts/const/account.py:28 accounts/serializers/account/account.py:28
 #: settings/serializers/auth/sms.py:84
@@ -369,7 +369,7 @@ msgstr "認証キー"
 
 #: accounts/const/automation.py:134
 msgid "DB"
-msgstr ""
+msgstr "データベース"
 
 #: accounts/const/vault.py:8 assets/const/category.py:12
 #: assets/models/asset/database.py:10 assets/models/asset/database.py:29
@@ -632,7 +632,7 @@ msgstr "アクティブ"
 
 #: accounts/models/application.py:28
 msgid "Integration App"
-msgstr ""
+msgstr "統合アプリケーション"
 
 #: accounts/models/automations/backup_account.py:27
 msgid "Backup type"
@@ -644,12 +644,12 @@ msgid "Password divided"
 msgstr "キーが 2 つの部分に分割されているかどうか"
 
 #: accounts/models/automations/backup_account.py:33
-#: accounts/serializers/automations/backup.py:33
+#: accounts/serializers/automations/backup.py:34
 msgid "Recipient part one"
 msgstr "受信者 1"
 
 #: accounts/models/automations/backup_account.py:37
-#: accounts/serializers/automations/backup.py:37
+#: accounts/serializers/automations/backup.py:38
 msgid "Recipient part two"
 msgstr "受信者 2"
 
@@ -788,7 +788,7 @@ msgstr "パスワード レコードの変更"
 
 #: accounts/models/automations/check_account.py:18
 msgid "Engines"
-msgstr ""
+msgstr "エンジン"
 
 #: accounts/models/automations/check_account.py:34
 msgid "account check automation"
@@ -911,32 +911,37 @@ msgid ""
 "Perform checks and analyses based on automatically discovered account "
 "results, including user groups, public keys, sudoers, and other information"
 msgstr ""
+"自動発見されたアカウントの結果に基づいてチェック分析を行います。これには、"
+"ユーザーグループ、公開鍵、sudoersなどの情報が含まれます。"
 
 #: accounts/models/automations/check_account.py:140
 msgid "Check the strength of your account and password"
-msgstr ""
+msgstr "あなたのアカウントとパスワードの強度をチェックしてください。"
 
 #: accounts/models/automations/check_account.py:142
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
 msgstr ""
+"アカウントパスワードの安全性に対するチェック分析を行います。これには、パス"
+"ワードの強度や漏洩状況などが含まれます。"
 
 #: accounts/models/automations/check_account.py:149
 msgid "Check if the account and password are repeated"
-msgstr ""
+msgstr "アカウントとパスワードの重複をチェックしてください。"
 
 #: accounts/models/automations/check_account.py:150
 msgid "Check if the account is the same as other accounts"
-msgstr ""
+msgstr "このアカウントが他のアカウントと同じかどうかを確認します。"
 
 #: accounts/models/automations/check_account.py:155
 msgid "Check whether the account password is a common password"
-msgstr ""
+msgstr "アカウントのパスワードが一般的なパスワードでないか確認してください。"
 
 #: accounts/models/automations/check_account.py:156
 msgid "Check whether the account password is a commonly leaked password"
 msgstr ""
+"アカウントのパスワードが広く知られている漏洩パスワードでないか確認します。"
 
 #: accounts/models/automations/gather_account.py:18
 msgid "Address login"
@@ -972,7 +977,7 @@ msgstr "アカウントを同期するかどうか"
 
 #: accounts/models/automations/gather_account.py:93
 msgid "Check risk"
-msgstr ""
+msgstr "リスクチェック"
 
 #: accounts/models/automations/gather_account.py:111
 msgid "Gather account automation"
@@ -1126,7 +1131,7 @@ msgstr "無視する"
 
 #: accounts/risk_handlers.py:18
 msgid "Reopen"
-msgstr ""
+msgstr "再オープン"
 
 #: accounts/risk_handlers.py:19 audits/const.py:38
 #: authentication/templates/authentication/_access_key_modal.html:155
@@ -1309,6 +1314,13 @@ msgstr "Access IP"
 msgid "Comment"
 msgstr "コメント"
 
+#: accounts/serializers/account/service.py:27
+#: accounts/templates/accounts/backup_account_report.html:38
+#: accounts/templates/accounts/check_account_report.html:38
+#: assets/serializers/asset/common.py:151
+msgid "Accounts amount"
+msgstr "アカウント数"
+
 #: accounts/serializers/account/template.py:11
 msgid "Password length"
 msgstr "パスワードの長さ"
@@ -1385,13 +1397,13 @@ msgstr ""
 msgid "Zip Encrypt Password"
 msgstr "新しいファイルの暗号化パスワード"
 
-#: accounts/serializers/automations/backup.py:34
-#: accounts/serializers/automations/backup.py:38
+#: accounts/serializers/automations/backup.py:35
+#: accounts/serializers/automations/backup.py:39
 #: accounts/serializers/automations/change_secret.py:60
 msgid "Currently only mail sending is supported"
 msgstr "現在、メール送信のみがサポートされています"
 
-#: accounts/serializers/automations/backup.py:40
+#: accounts/serializers/automations/backup.py:41
 msgid "Asset type"
 msgstr "資産タイプ"
 
@@ -1450,6 +1462,8 @@ msgstr "エンジンIDが無効です"
 #: accounts/serializers/automations/gather_account.py:30
 msgid "Whether to check the risk of the gathered accounts."
 msgstr ""
+"集約されたアカウントに対してリスクチェックが行われるかどうか確認してくださ"
+"い。"
 
 #: accounts/signal_handlers.py:43
 #, python-format
@@ -1616,6 +1630,7 @@ msgid ""
 "The following is a summary of account backup tasks, please review and handle "
 "them"
 msgstr ""
+"以下はアカウントバックアップタスクの概要です。ご確認と処理をお願いします。"
 
 #: accounts/templates/accounts/backup_account_report.html:22
 #: accounts/templates/accounts/change_secret_failed_info.html:3
@@ -1660,13 +1675,7 @@ msgstr "終了日"
 #: accounts/templates/accounts/gather_account_report.html:35
 #: accounts/templates/accounts/push_account_report.html:34
 msgid "Time using"
-msgstr ""
-
-#: accounts/templates/accounts/backup_account_report.html:38
-#: accounts/templates/accounts/check_account_report.html:38
-#: assets/serializers/asset/common.py:151
-msgid "Accounts amount"
-msgstr "アカウント数"
+msgstr "時間を要する"
 
 #: accounts/templates/accounts/backup_account_report.html:42
 msgid "Type count"
@@ -1693,6 +1702,8 @@ msgid ""
 "The following is a summary of account change secret tasks, please read and "
 "process"
 msgstr ""
+"以下はアカウント変更の秘密の任務の概要です。お読みいただき、処理してくださ"
+"い。"
 
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
@@ -1791,6 +1802,8 @@ msgstr "失われたアカウント"
 msgid ""
 "The following is a summary of account push tasks, please read and process"
 msgstr ""
+"以下はアカウントプッシュの任務のまとめです。お読みいただき、処理してくださ"
+"い。"
 
 #: accounts/utils.py:54
 msgid ""
@@ -2161,7 +2174,7 @@ msgstr "不明"
 
 #: assets/const/automation.py:7
 msgid "N/A"
-msgstr ""
+msgstr "該当なし"
 
 #: assets/const/automation.py:8
 msgid "OK"
@@ -2236,13 +2249,11 @@ msgstr "Kubernetes"
 
 #: assets/const/device.py:7
 msgid "Cisco"
-msgstr ""
+msgstr "シスコ"
 
 #: assets/const/device.py:8
-#, fuzzy
-#| msgid "Huawei Cloud"
 msgid "Huawei"
-msgstr "華為雲"
+msgstr "ファーウェイ"
 
 #: assets/const/device.py:9
 msgid "H3C"
@@ -3834,10 +3845,8 @@ msgid "Radius"
 msgstr "Radius"
 
 #: authentication/const.py:36
-#, fuzzy
-#| msgid "Custom type"
 msgid "Custom"
-msgstr "カスタムタイプ"
+msgstr "カスタマイズ"
 
 #: authentication/errors/const.py:18
 msgid "Username/password check failed"
@@ -4608,7 +4617,7 @@ msgid "LAN"
 msgstr "ローカルエリアネットワーク"
 
 #: authentication/views/base.py:71
-#: perms/templates/perms/_msg_permed_items_expire.html:20
+#: perms/templates/perms/_msg_permed_items_expire.html:18
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
@@ -5604,7 +5613,7 @@ msgstr "開始日"
 
 #: ops/mixin.py:45 ops/mixin.py:179
 msgid "Datetime when the schedule should begin triggering the task to run"
-msgstr ""
+msgstr "計画はタスク実行を開始する日時から始まる必要があります。"
 
 #: ops/mixin.py:49 ops/models/base.py:22 ops/serializers/job.py:19
 msgid "Date last run"
@@ -6200,20 +6209,10 @@ msgstr ""
 "織の管理者に、資産が何日で期限切れになるかを3日前に通知を送ります"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
+#: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid "The following %(item_type)s will expire in %(count)s"
 msgstr "以下の %(item_type)s は %(count)s 後に期限が切れます。"
-
-#: perms/templates/perms/_msg_permed_items_expire.html:7
-#, python-format
-msgid ""
-"\n"
-"        The following %(item_type)s will expire in %(count)s\n"
-"    "
-msgstr ""
-"\n"
-"        次の %(item_type)s は %(count)s 以内に期限切れになります\n"
-"    "
 
 #: rbac/api/role.py:35
 msgid "Internal role, can't be destroy"
@@ -11320,13 +11319,6 @@ msgid "Period clean sync instance task execution"
 msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"
 
 #: xpack/plugins/cloud/tasks.py:54
-#, fuzzy
-#| msgid ""
-#| "Every day, according to the configuration in \"System Settings - Tasks - "
-#| "Regular \n"
-#| "        clean-up - Cloud sync task history retention days\" the system "
-#| "will clean up the execution \n"
-#| "        records generated by cloud synchronization"
 msgid ""
 "Every day, according to the configuration in \"System Settings - Tasks - "
 "Regular \n"
