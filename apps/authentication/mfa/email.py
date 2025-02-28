@@ -32,7 +32,7 @@ class MFAEmail(BaseMFA):
         return True
 
     def send_challenge(self):
-        code = random_string(6, lower=False, upper=False)
+        code = random_string(settings.SMS_CODE_LENGTH, lower=False, upper=False)
         subject = '%s: %s' % (get_login_title(), _('MFA code'))
         context = {
             'user': self.user, 'title': subject, 'code': code,
