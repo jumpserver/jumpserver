@@ -1473,5 +1473,7 @@
     "ExecutionSummary": "执行汇总",
     "TotalAccounts": "账号总数",
     "Periodic": "定期",
-    "ChangeSecretFailAccounts": "改密失败账号"
+    "ChangeSecretFailAccounts": "改密失败账号",
+    "CallRecords": "调用记录",
+    "Documentation": "文档"
 }
