@@ -61,7 +61,7 @@ msgstr "创建备份文件完成"
 
 #: accounts/automations/backup_account/handlers.py:178
 msgid "Start sending backup emails"
-msgstr ""
+msgstr "开始发送备份电子邮件"
 
 #: accounts/automations/backup_account/handlers.py:203
 msgid "Encrypting files using encryption password"
@@ -172,7 +172,7 @@ msgstr "数据库"
 
 #: accounts/const/account.py:27
 msgid "Discovery"
-msgstr ""
+msgstr "发现"
 
 #: accounts/const/account.py:28 accounts/serializers/account/account.py:28
 #: settings/serializers/auth/sms.py:84
@@ -374,7 +374,7 @@ msgstr "认证密钥"
 
 #: accounts/const/automation.py:134
 msgid "DB"
-msgstr ""
+msgstr "数据库"
 
 #: accounts/const/vault.py:8 assets/const/category.py:12
 #: assets/models/asset/database.py:10 assets/models/asset/database.py:29
@@ -620,7 +620,7 @@ msgstr "激活中"
 
 #: accounts/models/application.py:28
 msgid "Integration App"
-msgstr ""
+msgstr "集成应用程序"
 
 #: accounts/models/automations/backup_account.py:27
 msgid "Backup type"
@@ -776,7 +776,7 @@ msgstr "改密记录"
 
 #: accounts/models/automations/check_account.py:18
 msgid "Engines"
-msgstr ""
+msgstr "引擎"
 
 #: accounts/models/automations/check_account.py:34
 msgid "account check automation"
@@ -901,32 +901,33 @@ msgid ""
 "Perform checks and analyses based on automatically discovered account "
 "results, including user groups, public keys, sudoers, and other information"
 msgstr ""
+"根据自动发现的账户结果进行检查分析，包括用户组、公钥、sudoers等信息"
 
 #: accounts/models/automations/check_account.py:140
 msgid "Check the strength of your account and password"
-msgstr ""
+msgstr "检查您的账号和密码的强度"
 
 #: accounts/models/automations/check_account.py:142
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
-msgstr ""
+msgstr "针对账号密码的安全性进行检查分析，包括密码强度、泄露情况等。"
 
 #: accounts/models/automations/check_account.py:149
 msgid "Check if the account and password are repeated"
-msgstr ""
+msgstr "检查账号和密码是否重复"
 
 #: accounts/models/automations/check_account.py:150
 msgid "Check if the account is the same as other accounts"
-msgstr ""
+msgstr "检查该账号是否与其他账户相同"
 
 #: accounts/models/automations/check_account.py:155
 msgid "Check whether the account password is a common password"
-msgstr ""
+msgstr "检查账号密码是否为常用密码"
 
 #: accounts/models/automations/check_account.py:156
 msgid "Check whether the account password is a commonly leaked password"
-msgstr ""
+msgstr "检查账号密码是否为常见泄露密码"
 
 #: accounts/models/automations/gather_account.py:18
 msgid "Address login"
@@ -962,7 +963,7 @@ msgstr "是否同步账号"
 
 #: accounts/models/automations/gather_account.py:93
 msgid "Check risk"
-msgstr ""
+msgstr "风险检查"
 
 #: accounts/models/automations/gather_account.py:111
 msgid "Gather account automation"
@@ -1115,7 +1116,7 @@ msgstr "忽略"
 
 #: accounts/risk_handlers.py:18
 msgid "Reopen"
-msgstr ""
+msgstr "重新打开"
 
 #: accounts/risk_handlers.py:19 audits/const.py:38
 #: authentication/templates/authentication/_access_key_modal.html:155
@@ -1435,7 +1436,7 @@ msgstr "引擎 ID 无效"
 
 #: accounts/serializers/automations/gather_account.py:30
 msgid "Whether to check the risk of the gathered accounts."
-msgstr ""
+msgstr "是否对聚集账户进行风险检查。"
 
 #: accounts/signal_handlers.py:43
 #, python-format
@@ -1660,7 +1661,7 @@ msgstr "你好！ 以下是资产改密或推送账号失败的情况。 请及�
 msgid ""
 "The following is a summary of account change secret tasks, please read and "
 "process"
-msgstr ""
+msgstr "以下是账号更改秘密任务的摘要，请阅读并处理"
 
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:39
@@ -1757,7 +1758,7 @@ msgstr "丢失的账号"
 #: accounts/templates/accounts/push_account_report.html:13
 msgid ""
 "The following is a summary of account push tasks, please read and process"
-msgstr ""
+msgstr "以下是账号推送任务的汇总，请阅读并处理"
 
 #: accounts/utils.py:54
 msgid ""
@@ -2123,7 +2124,7 @@ msgstr "未知"
 
 #: assets/const/automation.py:7
 msgid "N/A"
-msgstr ""
+msgstr "不适用"
 
 #: assets/const/automation.py:8
 msgid "OK"
@@ -2199,11 +2200,11 @@ msgstr "Kubernetes"
 
 #: assets/const/device.py:7
 msgid "Cisco"
-msgstr ""
+msgstr "思科"
 
 #: assets/const/device.py:8
 msgid "Huawei"
-msgstr ""
+msgstr "华为"
 
 #: assets/const/device.py:9
 msgid "H3C"
@@ -5479,7 +5480,7 @@ msgstr "开始日期"
 
 #: ops/mixin.py:45 ops/mixin.py:179
 msgid "Datetime when the schedule should begin triggering the task to run"
-msgstr ""
+msgstr "计划应开始触发任务运行的日期时间"
 
 #: ops/mixin.py:49 ops/models/base.py:22 ops/serializers/job.py:19
 msgid "Date last run"
@@ -10588,7 +10589,7 @@ msgstr "IP网段组"
 #: xpack/plugins/cloud/models.py:116
 #: xpack/plugins/cloud/serializers/task.py:161
 msgid "Preferred IP type"
-msgstr ""
+msgstr "首选 IP 类型"
 
 #: xpack/plugins/cloud/models.py:119
 msgid "Always update"
