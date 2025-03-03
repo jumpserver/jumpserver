@@ -76,6 +76,9 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
     pagination_class = AllPermedAssetPagination
 
     def get_assets(self):
+        if self.user.is_superuser and self.request.query_params.get('id'):
+            return Asset.objects.filter(id=self.request.query_params.get('id'))
+
         node_id = self.request.query_params.get('node_id')
         if is_uuid(node_id):
             __, assets = self.query_asset_util.get_node_all_assets(node_id)
