@@ -4,9 +4,10 @@ from rest_framework import serializers
 from accounts.models import IntegrationApplication
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.serializers.fields import JSONManyToManyField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
-class IntegrationApplicationSerializer(serializers.ModelSerializer):
+class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
     accounts = JSONManyToManyField(label=_('Account'))
     ip_group = serializers.ListField(
         default=['*'], label=_('Access IP'), help_text=ip_group_help_text,
