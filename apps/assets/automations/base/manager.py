@@ -134,11 +134,20 @@ class BaseManager:
         return f"Automation {self.execution.id} finished"
 
     def get_report_context(self):
+        logo = self.get_file_content("static/img/JumpServer_white_logo.svg")
         return {
             "execution": self.execution,
             "summary": self.execution.summary,
             "result": self.execution.result,
+            "logo": logo,
         }
+
+    @staticmethod
+    def get_file_content(path):
+        file_path = os.path.join(settings.BASE_DIR, path)
+        with open(file_path, "r", encoding="utf-8") as f:
+            file_content = f.read()
+        return file_content
 
     def send_report_if_need(self):
         recipients = self.execution.recipients
@@ -147,7 +156,7 @@ class BaseManager:
         print("Send report to: ", ",".join([str(u) for u in recipients]))
 
         report = self.gen_report()
-        report = transform(report)
+        report = transform(report, cssutils_logging_level="CRITICAL")
         subject = self.get_report_subject()
         emails = [r.email for r in recipients if r.email]
         send_mail_async(subject, report, emails, html_message=report)
