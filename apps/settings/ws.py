@@ -192,17 +192,15 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         try:
             users = self.get_ldap_users(username_list, cache_police)
             if users is None:
-                msg = _('Get ldap users is None')
-
-            orgs = self.get_orgs(org_ids)
-            new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
-            if error_msg:
-                msg = error_msg
-
-            count = users if users is None else len(users)
-            orgs_name = ', '.join([str(org) for org in orgs])
-            ok = True
-            msg = _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
+                msg = _('No LDAP user was found')
+            else:
+                orgs = self.get_orgs(org_ids)
+                _new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
+                ok = True
+                success_count = len(users) - len(error_msg)
+                msg = _('Total {}, success {}, failure {}').format(
+                    len(users), success_count, len(error_msg)
+                )
         except Exception as e:
             msg = str(e)
         return ok, msg

@@ -6197,7 +6197,7 @@ msgid "Get ldap users is None"
 msgstr ""
 
 #: settings/ws.py:205
-msgid "Imported {} users successfully (Organization: {})"
+msgid "Total {}, success {}, failure {}"
 msgstr ""
 
 #: templates/_csv_import_export.html:8
