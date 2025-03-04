@@ -6295,8 +6295,8 @@ msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
 #: settings/ws.py:205
-msgid "Imported {} users successfully (Organization: {})"
-msgstr "成功导入 {} 个用户 ( 组织: {} )"
+msgid "Total {}, success {}, failure {}"
+msgstr "总共 {}，成功 {}，失败 {}"
 
 #: templates/_csv_import_export.html:8
 msgid "Export"
