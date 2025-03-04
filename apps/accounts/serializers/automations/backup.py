@@ -28,6 +28,7 @@ class BackupAccountSerializer(BaseAutomationSerializer):
             'obj_recipients_part_one', 'obj_recipients_part_two', 'zip_encrypt_password'
         ]
         extra_kwargs = {
+            **BaseAutomationSerializer.Meta.extra_kwargs,
             'name': {'required': True},
             'obj_recipients_part_one': {
                 'label': _('Recipient part one'), 'help_text': _(

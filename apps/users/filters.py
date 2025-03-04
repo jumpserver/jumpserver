@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -5,7 +6,6 @@ from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
 from common.utils import is_uuid
-from jumpserver import settings
 from rbac.models import Role, OrgRoleBinding, SystemRoleBinding
 from users.models.user import User
 
@@ -30,7 +30,7 @@ class UserFilter(BaseFilterSet):
             'id', 'username', 'email', 'name',
             'groups', 'group_id', 'exclude_group_id',
             'source', 'org_roles', 'system_roles',
-            'is_active', 'is_first_login',
+            'is_active', 'is_first_login', 'mfa_level'
         )
 
     def filter_is_blocked(self, queryset, name, value):

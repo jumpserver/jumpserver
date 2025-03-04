@@ -88,7 +88,7 @@ class ChangeSecretDashboardApi(APIView):
         return ChangeSecretRecord.get_valid_records().filter(execution__automation__type=self.tp)
 
     def get_change_secret_asset_queryset(self):
-        qs = self.get_queryset_date_filter(self.change_secrets_queryset)
+        qs = self.change_secrets_queryset
         node_ids = qs.filter(nodes__isnull=False).values_list('nodes', flat=True).distinct()
         nodes = Node.objects.filter(id__in=node_ids)
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
@@ -96,7 +96,9 @@ class ChangeSecretDashboardApi(APIView):
         asset_ids = set(list(direct_asset_ids) + list(node_asset_ids))
         return Asset.objects.filter(id__in=asset_ids)
 
-    def get_filtered_counts(self, qs, field):
+    def get_filtered_counts(self, qs, field=None):
+        if field is None:
+            return qs.count()
         return self.get_queryset_date_filter(qs, field).count()
 
     @staticmethod
@@ -121,12 +123,12 @@ class ChangeSecretDashboardApi(APIView):
 
         if _all or query_params.get('total_count_change_secrets'):
             data['total_count_change_secrets'] = self.get_filtered_counts(
-                self.change_secrets_queryset, 'date_updated'
+                self.change_secrets_queryset
             )
 
         if _all or query_params.get('total_count_periodic_change_secrets'):
             data['total_count_periodic_change_secrets'] = self.get_filtered_counts(
-                self.change_secrets_queryset.filter(is_periodic=True), 'date_updated'
+                self.change_secrets_queryset.filter(is_periodic=True)
             )
 
         if _all or query_params.get('total_count_change_secret_assets'):
