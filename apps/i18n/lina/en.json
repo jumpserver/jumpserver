@@ -315,6 +315,7 @@
     "Command": "Command",
     "CommandConfirm": "Command review",
     "CommandFilterACL": "Command filter ACL",
+    "CommandFilterACLs": "Command filter ACLs",
     "CommandFilter": "Command filter",
     "CommandFilterACLHelpMsg": "By filtering commands, you can control if commands can be sent to assets. based on your set rules, some commands can be allowed while others are prohibited.",
     "CommandFilterACLHelpText": "By filtering commands, you can control if commands can be sent to assets. based on your set rules, some commands can be allowed while others are prohibited.",

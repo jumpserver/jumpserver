@@ -5,6 +5,7 @@ from rest_framework import generics
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from assets.const import AllTypes
 from assets.models import Platform, Node, Asset, PlatformProtocol
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
@@ -42,11 +43,16 @@ class AssetPlatformViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         # 因为没有走分页逻辑，所以需要这里 prefetch
-        asset_count_subquery = Asset.objects.filter(platform=OuterRef('pk')).values('platform').annotate(
-            count=Count('id')).values('count')
-        queryset = super().get_queryset().annotate(
-            assets_amount=Coalesce(Subquery(asset_count_subquery), Value(0))).prefetch_related(
-            'protocols', 'automation', 'labels', 'labels__label'
+        asset_count_subquery = (
+            Asset.objects.filter(platform=OuterRef('pk'))
+            .values('platform')
+            .annotate(count=Count('id'))
+            .values('count')
+        )
+        queryset = (
+            super().get_queryset()
+            .annotate(assets_amount=Coalesce(Subquery(asset_count_subquery), Value(0)))
+            .prefetch_related('protocols', 'automation', 'labels', 'labels__label')
         )
         queryset = queryset.filter(type__in=AllTypes.get_types_values())
         return queryset
