@@ -580,7 +580,7 @@
     "Footer": "页脚",
     "ForgotPasswordURL": "忘记密码链接",
     "FormatError": "格式错误",
-    "FoundAccountInAssetDeleteMsg": "删除从系统资产中发现的找好",
+    "FoundAccountInAssetDeleteMsg": "删除从系统资产中发现的账号",
     "Friday": "周五",
     "From": "从",
     "FromTicket": "来自工单",
@@ -1025,7 +1025,7 @@
     "RelevantCommand": "命令",
     "RelevantSystemUser": "系统用户",
     "RemoteAddr": "远端地址",
-    "RemoteAssetFoundAccountDeleteMsg": "删除从远端资产中发现的找好",
+    "RemoteAssetFoundAccountDeleteMsg": "删除从远端资产中发现的账号",
     "Remove": "移除",
     "RemoveAssetFromNode": "从节点移除资产",
     "RemoveSelected": "移除所选",
@@ -1503,5 +1503,7 @@
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
-    "IgnoreAlert": "忽略警报"
+    "IgnoreAlert": "忽略警报",
+    "DeleteGatherAccountTitle": "删除发现的账号"
+
 }
