@@ -220,8 +220,6 @@ class CheckAccountManager(BaseManager):
     def pre_run(self):
         super().pre_run()
         self.assets = self.execution.get_all_assets()
-        self.execution.date_start = timezone.now()
-        self.execution.save(update_fields=["date_start"])
 
     def batch_check(self, handler):
         print("Engine: {}".format(handler.__class__.__name__))

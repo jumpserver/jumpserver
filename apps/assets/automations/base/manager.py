@@ -105,9 +105,15 @@ class BaseManager:
         return self.execution.all_assets_group_by_platform()
 
     def pre_run(self):
-        self.execution.date_start = timezone.now()
+        date_start = timezone.now()
+        self.execution.date_start = date_start
         self.execution.status = Status.running
         self.execution.save(update_fields=["date_start", "status"])
+
+        automation = self.execution.automation
+        if automation:
+            automation.last_execution_date = date_start
+            automation.save(update_fields=['last_execution_date'])
 
     def update_execution(self):
         self.duration = int(time.time() - self.time_start)
@@ -340,6 +346,7 @@ class PlaybookPrepareMixin:
         if not platform.automation or not platform.automation.ansible_enabled:
             print(_("  - Platform {} ansible disabled").format(platform.name))
             self.on_assets_not_ansible_enabled(assets)
+            return False
 
         automation = platform.automation
 
