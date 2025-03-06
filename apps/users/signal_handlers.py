@@ -50,7 +50,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
 
     always_update = getattr(settings, 'AUTH_%s_ALWAYS_UPDATE_USER' % source.upper(), False)
     if not created and always_update:
-        attr_whitelist = ('user', 'username', 'email', 'phone', 'comment')
+        attr_whitelist = ('name', 'username', 'email', 'phone', 'comment')
         logger.debug(
             "Receive {} user updated signal: {}, "
             "Update user info: {},"
