@@ -378,6 +378,11 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     continue
                 gathered_accounts = GatheredAccount.objects.filter(asset=asset)
                 GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
+                GatheredAccount.objects.filter(
+                    asset=asset, username__in=ori_users, present=False
+                ).update(
+                    present=True
+                )
         # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步
         time.sleep(0.5)
 

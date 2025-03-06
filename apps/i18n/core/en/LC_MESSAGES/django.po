@@ -1395,7 +1395,7 @@ msgid "* Please enter the correct password length"
 msgstr ""
 
 #: accounts/serializers/automations/change_secret.py:90
-msgid "* Password length range 6-30 bits"
+msgid "* Password length range 8-36 bits"
 msgstr ""
 
 #: accounts/serializers/automations/change_secret.py:112
