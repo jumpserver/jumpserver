@@ -1416,8 +1416,8 @@ msgid "* Please enter the correct password length"
 msgstr "* 請輸入正確的密碼長度"
 
 #: accounts/serializers/automations/change_secret.py:90
-msgid "* Password length range 6-30 bits"
-msgstr "* 密碼長度範圍 6-30 位"
+msgid "* Password length range 8-36 bits"
+msgstr "* 密碼長度範圍 8-36 位"
 
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:147
