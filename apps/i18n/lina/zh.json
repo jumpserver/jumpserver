@@ -785,6 +785,7 @@
     "MenuMore": "其它",
     "MenuPermissions": "授权管理",
     "MenuUsers": "用户管理",
+    "MenuChangeSecret": "账号改密",
     "Message": "消息",
     "MessageType": "消息类型",
     "MfaLevel": "多因子认证",
