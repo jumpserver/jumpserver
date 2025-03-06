@@ -27,6 +27,9 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     type = models.CharField(max_length=16, verbose_name=_("Type"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     params = models.JSONField(default=dict, verbose_name=_("Parameters"))
+    last_execution_date = models.DateTimeField(
+        null=True, blank=True, verbose_name=_('Last execution date')
+    )
 
     objects = BaseAutomationManager.from_queryset(models.QuerySet)()
 
