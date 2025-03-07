@@ -50,7 +50,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
         return
 
     if created:
-        logger.debug('Receive user created signal: {user}, Set user source is: {source}')
+        logger.debug(f'Receive user created signal: {user}, Set user source is: {source}')
         user.source = source
         user.save()
 
