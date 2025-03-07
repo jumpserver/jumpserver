@@ -61,8 +61,7 @@ class UserMixin:
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
         logger.debug(log_prompt.format("Send signal => openid create or update user"))
         openid_create_or_update_user.send(
-            sender=self.__class__, request=request, user=user,
-            created=created, attrs=user_attrs,
+            sender=self.__class__, user=user, created=created, attrs=user_attrs,
         )
         return user, created
 
