@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
+from assets.models import Asset
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty, get_logger
 from labels.mixins import LabeledMixin
@@ -59,7 +60,24 @@ class AccountHistoricalRecords(HistoricalRecords):
         return super().create_history_model(model, inherited)
 
 
-class Account(AbsConnectivity, LabeledMixin, BaseAccount):
+class JSONFilterMixin:
+    @staticmethod
+    def get_json_filter_attr_q(name, value, match):
+        if name == "asset":
+            if match == "m2m_all":
+                asset_id = (
+                    Asset.objects.filter(id__in=value)
+                    .annotate(count=models.Count("id"))
+                    .filter(count=len(value))
+                    .values_list("id", flat=True)
+                )
+            else:
+                asset_id = Asset.objects.filter(id__in=value).values_list("id", flat=True)
+            return models.Q(asset_id__in=asset_id)
+        return None
+
+
+class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
