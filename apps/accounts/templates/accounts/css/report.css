@@ -11,137 +11,114 @@ p {
 .report-container {
     display: flex;
     flex-direction: column;
+    row-gap: 16px;
 }
 
-.report-container .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 4rem;
-    padding: 0.3rem 1rem;
-    background-color: #148f76;
-}
-
-.report-container .header svg {
-    height: 100%
-}
-
-.info-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f5f5f5;
-    height: 4rem;
-    padding: 0 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.info-section .info {
-    margin: unset;
-    font-size: 1.6rem;
-}
-
-.main-section {
-    margin-top: 3rem;
-    padding: 0 1rem;
-}
-
-.main-section .synopsis-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 2rem;
-}
-
-.main-section .synopsis-section .synopsis-item {
+.basic-info-section,
+.success,
+.failed {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    padding: 1rem 2rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    height: 350px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.main-section .synopsis-section .synopsis-item h3 {
-    font-weight: 500;
-    font-size: 1.5rem;
-}
-
-.main-section .synopsis-section .synopsis-item .synopsis-item-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: flex-start;
     height: 100%;
-    cursor: pointer;
+    padding: 16px 20px;
+    margin: 0 20px;
+    border: 1px solid #dee0e3;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
 }
 
-.main-section .synopsis-section .synopsis-item .synopsis-item-content p {
-    display: inline-flex;
-    width: 100%;
-    line-height: 1;
-    gap: 2rem;
-    font-size: 14px;
-}
-
-.main-section .synopsis-section .synopsis-item .synopsis-item-content p .item-label {
-    width: 18rem;
-}
-
-.main-section .synopsis-section .synopsis-item .synopsis-item-content span {
+.header-container {
+    display: flex;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: center;
+    height: 32px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+}
+
+.header-container h2 {
+    color: #1f2329;
+    font: 500 16px/24px 'PingFang SC';
+    margin: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.header-container h2 span {
+    display: inline-flex;
+    margin-left: 8px;
     font-weight: normal;
 }
 
-.main-section .tabel-summery-section {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    gap: 2rem;
-    width: inherit;
-    margin-top: 2rem;
+.triangle-right-icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid #1f2329;
+    margin-right: 10px;
+    cursor: pointer;
 }
 
-.main-section .tabel-summery-section .result-section {
+.triangle-down-icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid #1f2329;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.container-section {
+    display: flex;
+    flex-wrap: wrap;
     width: 100%;
-    padding: 1rem;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    height: 100%;
+    row-gap: 16px;
+    column-gap: 10px;
 }
 
-.main-section .tabel-execution-section h3 {
-    font-size: 1.5rem;
-    color: #2c3e50;
+.collapsible-content {
+    overflow: hidden;
+    max-height: 1000px;
+    opacity: 1;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
-.section-header {
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-.section-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.collapsible-content.collapsed {
+    max-height: 0;
+    opacity: 0;
     margin: 0;
-    color: #2c3e50;
-    font-size: inherit;
+    padding: 0;
 }
 
-.section-header span {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 0.2rem 0.8rem;
-    border-radius: 1rem;
-    font-size: inherit;
+.container-section .item {
+    display: flex;
+    flex-basis: calc(33.33% - 10px);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 4px 0;
 }
+
+.container-section .item .item-label {
+    color: #646a73;
+    font: 400 14px/22px 'PingFang SC';
+}
+
+.container-section .item .item-value {
+    color: #1f2329;
+    font: 500 14px/22px 'PingFang SC';
+}
+
 
 .custom-table {
     margin-bottom: 0;
@@ -151,17 +128,19 @@ p {
 }
 
 .custom-table th {
-    background: #f6f6f6;
-    color: #495057;
-    padding: 0.75rem;
-    font-size: 1.5rem;
-    border-bottom: 2px solid #e0e0e0;
+    background-color: #f5f7fa;
+    color: #646A73;
+    font: 500 14px/22px 'PingFang SC';
+    text-align: left;
+    padding: 12px 8px;
+    border-bottom: 1px solid #ebeef5;
 }
 
 .custom-table td {
-    padding: 0.75rem;
-    font-size: 14px;
-    border-bottom: 1px solid #e0e0e0;
+    color: #1F2329;
+    font: 400 14px/22px 'PingFang SC';
+    padding: 12px 8px;
+    border-bottom: 1px solid #ebeef5;
 }
 
 .custom-table tr:nth-child(even) {
@@ -173,13 +152,15 @@ p {
 }
 
 .no-data {
+    color: #909399;
+    font: 400 14px/22px 'PingFang SC';
     text-align: center;
-    color: #6c757d;
-    padding: 2rem;
-    background: #f6f6f6;
-    border-radius: 8px;
-    margin: 1rem 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    font-style: italic;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin: 10px 0;
+    width: 100%;
 }
 
 .new-accounts .section-header span {
