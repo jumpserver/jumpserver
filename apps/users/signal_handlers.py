@@ -50,6 +50,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
         return
 
     if created:
+        logger.debug('Receive user created signal: {user}, Set user source is: {source}')
         user.source = source
         user.save()
 
@@ -129,19 +130,19 @@ def on_user_create(sender, user=None, **kwargs):
 
 @receiver(cas_user_authenticated)
 def on_cas_user_authenticated(sender, user, created, **kwargs):
-    source = user.Source.cas.value
+    source = User.Source.cas.value
     user_authenticated_handle(user, created, source)
 
 
 @receiver(saml2_create_or_update_user)
 def on_saml2_create_or_update_user(sender, user, created, attrs, **kwargs):
-    source = user.Source.saml2.value
+    source = User.Source.saml2.value
     user_authenticated_handle(user, created, source, attrs, **kwargs)
 
 
 @receiver(oauth2_create_or_update_user)
 def on_oauth2_create_or_update_user(sender, user, created, attrs, **kwargs):
-    source = user.Source.oauth2.value
+    source = User.Source.oauth2.value
     user_authenticated_handle(user, created, source, attrs, **kwargs)
 
 
@@ -153,35 +154,14 @@ def radius_create_user(sender, user, **kwargs):
 
 
 @receiver(openid_create_or_update_user)
-def on_openid_create_or_update_user(sender, request, user, created, attrs, **kwargs):
-    if not check_only_allow_exist_user_auth(created):
-        return
-
+def on_openid_create_or_update_user(sender, user, created, attrs, **kwargs):
     if created:
-        logger.debug(
-            "Receive OpenID user created signal: {}, "
-            "Set user source is: {}".format(user, User.Source.openid.value)
-        )
-        user.source = User.Source.openid.value
-        user.save()
         org_ids = bind_user_to_org_role(user)
         group_names = attrs.get('groups')
         bind_user_to_group(org_ids, group_names, user)
 
-    name = attrs.get('name')
-    username = attrs.get('username')
-    email = attrs.get('email')
-
-    if not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
-        logger.debug(
-            "Receive OpenID user updated signal: {}, "
-            "Update user info: {}"
-            "".format(user, "name: {}|username: {}|email: {}".format(name, username, email))
-        )
-        user.name = name
-        user.username = username
-        user.email = email
-        user.save()
+    source = User.Source.openid.value
+    user_authenticated_handle(user, created, source, attrs, **kwargs)
 
 
 @receiver(populate_user)
