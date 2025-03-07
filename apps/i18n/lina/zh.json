@@ -1508,5 +1508,9 @@
     "IgnoreAlert": "忽略警报",
     "DeleteGatherAccountTitle": "删除发现的账号",
     "DeleteRemoteAccount": "删除远端账号",
-    "AddAccountAfterChangingPassword": "修改密码后添加账号"
+    "AddAccountAfterChangingPassword": "修改密码后添加账号",
+    "ExecutionID": "执行 ID",
+    "Invalid": "无效",
+    "Disabled": "已禁用",
+    "IgnoreFail": "忽略失败"
 }

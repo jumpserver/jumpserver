@@ -1509,5 +1509,9 @@
     "IgnoreAlert": "Ignore alert",
     "DeleteGatherAccountTitle": "Delete gather account",
     "DeleteRemoteAccount": "Delete remote account",
-    "AddAccountAfterChangingPassword": "Add account after changing password"
+    "AddAccountAfterChangingPassword": "Add account after changing password",
+    "ExecutionID": "Execution ID",
+    "Invalid": "Invalid",
+    "Disabled": "Disabled",
+    "IgnoreFail": "Ignore fail"
 }

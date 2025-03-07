@@ -122,7 +122,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'  # To distinguish different accounts
-            h = self.gen_account_inventory(account, asset, h, path_dir)
+            try:
+                h = self.gen_account_inventory(account, asset, h, path_dir)
+            except Exception as e:
+                h['error'] = str(e)
             inventory_hosts.append(h)
 
         return inventory_hosts
