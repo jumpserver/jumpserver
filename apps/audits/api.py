@@ -25,7 +25,6 @@ from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import is_uuid, get_logger, lazyproperty
 from ops.const import Types
 from ops.models import Job
-from ops.serializers.job import JobSerializer
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
@@ -168,7 +167,7 @@ class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org.is_root():
+        if current_org.is_root() or not settings.XPACK_ENABLED:
             return queryset
         users = self.get_org_member_usernames()
         queryset = queryset.filter(username__in=users)

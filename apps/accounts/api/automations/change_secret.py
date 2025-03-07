@@ -84,10 +84,7 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         return failed_records
 
     def get_queryset(self):
-        qs = ChangeSecretRecord.get_valid_records()
-        return qs.filter(
-            execution__automation__type=self.tp
-        )
+        return ChangeSecretRecord.get_valid_records()
 
     @action(methods=['post'], detail=False, url_path='execute')
     def execute(self, request, *args, **kwargs):
