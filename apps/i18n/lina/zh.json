@@ -1513,5 +1513,6 @@
     "Invalid": "无效",
     "Disabled": "已禁用",
     "IgnoreFail": "忽略失败",
-    "RiskDetectionDetail": "风险检测详情"
+    "RiskDetectionDetail": "风险检测详情",
+    "ApplicationDetail": "应用详情"
 }
