@@ -1,8 +1,6 @@
-import threading
 import time
 from copy import deepcopy
 
-from celery import current_task
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -130,10 +128,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         return inventory_hosts
 
-    @staticmethod
-    def is_running_in_celery():
-        return getattr(current_task, 'request', None) is not None
-
     def wait_and_save_recorder(self, recorder, max_retries=10, retry_interval=2):
         recorder_model = type(recorder)
 
@@ -154,15 +148,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         return False
 
     def save_record(self, recorder):
-        if self.is_running_in_celery():
-            self.wait_and_save_recorder(recorder)
-        else:
-            thread = threading.Thread(
-                target=self.wait_and_save_recorder,
-                args=(recorder,),
-                daemon=True
-            )
-            thread.start()
+        self.wait_and_save_recorder(recorder)
 
     def on_host_success(self, host, result):
 
