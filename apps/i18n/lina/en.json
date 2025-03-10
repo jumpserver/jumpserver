@@ -1513,5 +1513,6 @@
     "ExecutionID": "Execution ID",
     "Invalid": "Invalid",
     "Disabled": "Disabled",
-    "IgnoreFail": "Ignore fail"
+    "IgnoreFail": "Ignore fail",
+    "RiskDetectionDetail": "Risk detection detail"
 }
