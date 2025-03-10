@@ -144,7 +144,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
             if exist:
                 print(f"Data inserted, updating recorder status after {attempt + 1}th query")
-                recorder.save(update_fields=['status', 'date_finished'])
+                recorder.save(update_fields=['error', 'status', 'date_finished'])
                 return True
 
             print(f"Data not ready, waiting {retry_interval} second(s) and retrying ({attempt + 1}/{max_retries})")
