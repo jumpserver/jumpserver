@@ -1514,5 +1514,6 @@
     "Invalid": "Invalid",
     "Disabled": "Disabled",
     "IgnoreFail": "Ignore fail",
-    "RiskDetectionDetail": "Risk detection detail"
+    "RiskDetectionDetail": "Risk detection detail",
+    "ApplicationDetail": "Application detail"
 }
