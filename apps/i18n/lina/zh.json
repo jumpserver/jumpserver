@@ -1512,5 +1512,6 @@
     "ExecutionID": "执行 ID",
     "Invalid": "无效",
     "Disabled": "已禁用",
-    "IgnoreFail": "忽略失败"
+    "IgnoreFail": "忽略失败",
+    "RiskDetectionDetail": "风险检测详情"
 }

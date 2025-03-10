@@ -6,6 +6,7 @@ import uuid
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Account, AccountRisk, RiskChoice
 from assets.automations.base.manager import BaseManager
@@ -266,17 +267,13 @@ class CheckAccountManager(BaseManager):
         return "accounts/check_account_report.html"
 
     def print_summary(self):
-        tmpl = (
-                "\n---\nSummary: \nok: %s, weak password: %s, leaked password: %s, "
-                "repeated password: %s, no secret: %s, using time: %ss"
-                % (
-                    self.summary["ok"],
-                    self.summary[RiskChoice.weak_password],
-                    self.summary[RiskChoice.leaked_password],
-                    self.summary[RiskChoice.repeated_password],
-
-                    self.summary["no_secret"],
-                    int(self.duration),
-                )
+        tmpl = _("\n---\nSummary: \nok: {}, weak password: {}, leaked password: {}, "
+                 "repeated password: {}, no secret: {}, using time: {}s").format(
+            self.summary["ok"],
+            self.summary[RiskChoice.weak_password],
+            self.summary[RiskChoice.leaked_password],
+            self.summary[RiskChoice.repeated_password],
+            self.summary["no_secret"],
+            int(self.duration)
         )
         print(tmpl)
