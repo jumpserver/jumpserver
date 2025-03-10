@@ -83,8 +83,7 @@ class AccountFilterSet(BaseFilterSet):
         integrationapplication = IntegrationApplication.objects.filter(pk=value).first()
         if not integrationapplication:
             return IntegrationApplication.objects.none()
-        queryset = integrationapplication.get_accounts()
-        return queryset
+        return queryset & integrationapplication.get_accounts()
 
     @staticmethod
     def filter_latest(queryset, name, value):
