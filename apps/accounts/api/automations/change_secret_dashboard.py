@@ -155,7 +155,7 @@ class ChangeSecretDashboardApi(APIView):
                     for task in tasks:
                         _id = task.get('id')
                         name = task.get('name')
-                        tp = task.kwargs.get('tp')
+                        tp = task.get('kwargs', {}).get('tp')
                         if name == self.task_name and tp == self.tp:
                             execution_ids.append(_id)
 

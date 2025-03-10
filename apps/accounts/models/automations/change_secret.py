@@ -7,6 +7,7 @@ from accounts.const import (
 )
 from common.db import fields
 from common.db.models import JMSBaseModel
+from orgs.utils import get_current_org
 from .base import AccountBaseAutomation, ChangeSecretMixin
 
 __all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'BaseSecretRecord']
@@ -57,9 +58,15 @@ class BaseSecretRecord(JMSBaseModel):
 
     @classmethod
     def get_valid_records(cls):
+        org = get_current_org()
+        if org is None or org.is_root():
+            kwargs = {}
+        else:
+            kwargs = {'execution__org_id': org.id}
+
         return cls.objects.exclude(
             Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
-        )
+        ).filter(**kwargs)
 
 
 class ChangeSecretRecord(BaseSecretRecord):

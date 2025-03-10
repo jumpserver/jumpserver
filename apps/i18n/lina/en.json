@@ -476,6 +476,7 @@
     "DisableSuccessMsg": "Successfully disabled",
     "DiscoverAccountTask": "Account discovery task | Account discovery tasks",
     "DiscoverAccounts": "Discover accounts",
+    "DiscoverAccountDetail": "Discover account details",
     "DiscoverAccountsHelpText": "Collect account information on assets. the collected account information can be imported into the system for centralized management.",
     "DiscoveredAccountList": "Discovered accounts",
     "DisplayName": "Name",
@@ -1506,5 +1507,13 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "IgnoreAlert": "Ignore alert",
-    "DeleteGatherAccountTitle": "Delete gather account"
+    "DeleteGatherAccountTitle": "Delete gather account",
+    "DeleteRemoteAccount": "Delete remote account",
+    "AddAccountAfterChangingPassword": "Add account after changing password",
+    "ExecutionID": "Execution ID",
+    "Invalid": "Invalid",
+    "Disabled": "Disabled",
+    "IgnoreFail": "Ignore fail",
+    "RiskDetectionDetail": "Risk detection detail",
+    "ApplicationDetail": "Application detail"
 }

@@ -25,9 +25,11 @@ class PushAccountManager(BaseChangeSecretPushManager):
         return account.secret
 
     def gen_account_inventory(self, account, asset, h, path_dir):
-        self.get_or_create_record(asset, account, h['name'])
         secret = self.get_secret(account)
         secret_type = account.secret_type
+        if not secret:
+            raise ValueError(_('Secret cannot be empty'))
+        self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(secret_type, secret, path_dir)
         h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
         return h

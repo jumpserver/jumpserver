@@ -473,6 +473,7 @@
     "DisableSuccessMsg": "禁用成功",
     "DiscoverAccountTask": "账号发现任务",
     "DiscoverAccounts": "帐号发现",
+    "DiscoverAccountDetail": "帐号发现详情",
     "DiscoverAccountsHelpText": "采集资产的账务信息，可将采集到的账务信息导入系统进行集中管理。",
     "DiscoveredAccountList": "发现账号",
     "DisplayName": "名称",
@@ -1505,6 +1506,13 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "IgnoreAlert": "忽略警报",
-    "DeleteGatherAccountTitle": "删除发现的账号"
-
+    "DeleteGatherAccountTitle": "删除发现的账号",
+    "DeleteRemoteAccount": "删除远端账号",
+    "AddAccountAfterChangingPassword": "修改密码后添加账号",
+    "ExecutionID": "执行 ID",
+    "Invalid": "无效",
+    "Disabled": "已禁用",
+    "IgnoreFail": "忽略失败",
+    "RiskDetectionDetail": "风险检测详情",
+    "ApplicationDetail": "应用详情"
 }

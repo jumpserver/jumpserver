@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-28 18:37+0800\n"
+"POT-Creation-Date: 2025-03-07 15:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Account already exists"
 msgstr "Conta já existente"
 
-#: accounts/api/account/application.py:77
+#: accounts/api/account/application.py:78
 #: authentication/api/connection_token.py:449
 msgid "Account not found"
 msgstr "Conta não encontrada"
@@ -48,8 +48,8 @@ msgstr "Gerar arquivo de informações de backup relacionado ao ativo"
 #: accounts/automations/backup_account/handlers.py:168
 #: accounts/automations/backup_account/manager.py:26
 #: accounts/automations/change_secret/manager.py:95
-#: accounts/automations/push_account/manager.py:59
-#: assets/models/automations/base.py:142 ops/serializers/job.py:71
+#: accounts/automations/push_account/manager.py:61
+#: assets/models/automations/base.py:145 ops/serializers/job.py:71
 #: ops/serializers/job.py:95
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 #: terminal/serializers/session.py:49
@@ -60,23 +60,27 @@ msgstr "Duração"
 msgid "Backup file creation completed"
 msgstr "Criação de arquivo de backup concluída"
 
-#: accounts/automations/backup_account/handlers.py:203
+#: accounts/automations/backup_account/handlers.py:177
+msgid "Start sending backup emails"
+msgstr "Comece a enviar e-mails de backup"
+
+#: accounts/automations/backup_account/handlers.py:204
 msgid "Encrypting files using encryption password"
 msgstr "Usando senha criptografada para criptografar o arquivo"
 
-#: accounts/automations/backup_account/handlers.py:213
+#: accounts/automations/backup_account/handlers.py:214
 msgid "The backup file will be sent to"
 msgstr "O arquivo de backup será enviado para"
 
-#: accounts/automations/backup_account/handlers.py:236
+#: accounts/automations/backup_account/handlers.py:237
 msgid "The backup task has no assigned sftp server"
 msgstr "A tarefa de backup não foi atribuída a um servidor sftp"
 
-#: accounts/automations/backup_account/handlers.py:257
+#: accounts/automations/backup_account/handlers.py:258
 msgid "The backup task has no assigned recipient"
 msgstr "A tarefa de backup não possui destinatário especificado"
 
-#: accounts/automations/backup_account/handlers.py:280
+#: accounts/automations/backup_account/handlers.py:281
 msgid "Plan start"
 msgstr "Tarefa iniciada"
 
@@ -86,11 +90,11 @@ msgstr "Plano de backup de contas está em execução"
 
 #: accounts/automations/backup_account/manager.py:24
 #: accounts/automations/change_secret/manager.py:93
-#: accounts/automations/push_account/manager.py:57
+#: accounts/automations/push_account/manager.py:59
 msgid "Plan execution end"
 msgstr "Execução do plano concluída"
 
-#: accounts/automations/base/manager.py:106
+#: accounts/automations/base/manager.py:109
 msgid "No pending accounts found"
 msgstr "Conta pendente não encontrada"
 
@@ -98,6 +102,12 @@ msgstr "Conta pendente não encontrada"
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "Sucesso: %s, Falha: %s, Total: %s"
+
+#: accounts/automations/push_account/manager.py:31
+#, fuzzy
+#| msgid "The {} cannot be empty"
+msgid "Secret cannot be empty"
+msgstr "{} não pode estar vazio"
 
 #: accounts/automations/verify_gateway_account/manager.py:18
 msgid ">>> Start executing the task to test gateway account connectivity"
@@ -426,13 +436,13 @@ msgstr "Usuário %s visualizou/exportou a senha"
 #: accounts/serializers/automations/gather_account.py:47
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
-#: accounts/templates/accounts/change_secret_report.html:70
-#: accounts/templates/accounts/change_secret_report.html:102
-#: accounts/templates/accounts/check_account_report.html:78
+#: accounts/templates/accounts/change_secret_report.html:72
+#: accounts/templates/accounts/change_secret_report.html:104
+#: accounts/templates/accounts/check_account_report.html:79
 #: accounts/templates/accounts/gather_account_report.html:71
 #: accounts/templates/accounts/gather_account_report.html:103
-#: accounts/templates/accounts/push_account_report.html:70
-#: accounts/templates/accounts/push_account_report.html:102
+#: accounts/templates/accounts/push_account_report.html:72
+#: accounts/templates/accounts/push_account_report.html:104
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
 #: assets/models/asset/common.py:366 assets/models/cmd_filter.py:36
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:228
@@ -495,7 +505,7 @@ msgstr "Status da Alteração de Senha"
 
 #: accounts/models/account.py:85
 #: accounts/models/automations/check_account.py:67
-#: accounts/serializers/account/service.py:10
+#: accounts/serializers/account/service.py:11
 #: accounts/serializers/automations/change_secret.py:115
 #: accounts/serializers/automations/change_secret.py:146
 #: accounts/templates/accounts/change_secret_failed_info.html:12
@@ -539,7 +549,7 @@ msgstr "É possível remover a conta"
 
 #: accounts/models/application.py:16
 #: accounts/models/automations/check_account.py:119 accounts/models/base.py:63
-#: accounts/serializers/account/service.py:26
+#: accounts/serializers/account/service.py:27
 #: accounts/serializers/account/virtual.py:20 acls/models/base.py:35
 #: acls/models/base.py:96 acls/models/command_acl.py:21
 #: acls/serializers/base.py:35 assets/models/asset/common.py:100
@@ -707,7 +717,7 @@ msgstr "Método de lançamento da chave SSH"
 msgid "Check connection after change"
 msgstr "Verifique a conexão após a alteração"
 
-#: accounts/models/automations/change_secret.py:16
+#: accounts/models/automations/change_secret.py:17
 #: accounts/models/automations/check_account.py:19
 #: accounts/models/automations/gather_account.py:92
 #: accounts/serializers/automations/change_secret.py:59
@@ -716,22 +726,22 @@ msgstr "Verifique a conexão após a alteração"
 msgid "Recipient"
 msgstr "Destinatário"
 
-#: accounts/models/automations/change_secret.py:23
+#: accounts/models/automations/change_secret.py:24
 msgid "Change secret automation"
 msgstr "Automação da alteração de senha"
 
-#: accounts/models/automations/change_secret.py:46
-#: assets/models/automations/base.py:141 ops/models/base.py:56
+#: accounts/models/automations/change_secret.py:47
+#: assets/models/automations/base.py:144 ops/models/base.py:56
 #: ops/models/celery.py:90 ops/models/job.py:240
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "Data de fim"
 
-#: accounts/models/automations/change_secret.py:48
+#: accounts/models/automations/change_secret.py:49
 #: accounts/models/automations/check_account.py:75
 #: accounts/models/automations/gather_account.py:25
 #: accounts/serializers/automations/check_account.py:39
-#: assets/models/automations/base.py:133
+#: assets/models/automations/base.py:136
 #: assets/serializers/automations/base.py:45 audits/models.py:209
 #: audits/serializers.py:78 ops/models/base.py:49 ops/models/job.py:231
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:140
@@ -745,7 +755,7 @@ msgstr "Data de fim"
 msgid "Status"
 msgstr "Status"
 
-#: accounts/models/automations/change_secret.py:50
+#: accounts/models/automations/change_secret.py:51
 #: accounts/serializers/account/account.py:276
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
@@ -756,19 +766,19 @@ msgstr "Status"
 msgid "Error"
 msgstr "Erro"
 
-#: accounts/models/automations/change_secret.py:66
+#: accounts/models/automations/change_secret.py:73
 msgid "Old secret"
 msgstr "Senha antiga"
 
-#: accounts/models/automations/change_secret.py:67
+#: accounts/models/automations/change_secret.py:74
 msgid "New secret"
 msgstr "Nova senha"
 
-#: accounts/models/automations/change_secret.py:68
+#: accounts/models/automations/change_secret.py:75
 msgid "Ignore fail"
 msgstr "Ignorar falhas"
 
-#: accounts/models/automations/change_secret.py:71
+#: accounts/models/automations/change_secret.py:78
 msgid "Change secret record"
 msgstr "Registro de alteração de senha"
 
@@ -837,8 +847,8 @@ msgstr ""
 "- Remover remoto"
 
 #: accounts/models/automations/check_account.py:52
-#: accounts/templates/accounts/check_account_report.html:69
-#: accounts/templates/accounts/check_account_report.html:89
+#: accounts/templates/accounts/check_account_report.html:70
+#: accounts/templates/accounts/check_account_report.html:90
 msgid "Weak password"
 msgstr "Senha fraca"
 
@@ -865,13 +875,13 @@ msgstr "Outro"
 #: accounts/models/automations/check_account.py:64
 #: accounts/models/automations/gather_account.py:17 accounts/models/base.py:64
 #: accounts/serializers/account/virtual.py:21
-#: accounts/templates/accounts/change_secret_report.html:71
-#: accounts/templates/accounts/change_secret_report.html:103
-#: accounts/templates/accounts/check_account_report.html:79
+#: accounts/templates/accounts/change_secret_report.html:73
+#: accounts/templates/accounts/change_secret_report.html:105
+#: accounts/templates/accounts/check_account_report.html:80
 #: accounts/templates/accounts/gather_account_report.html:72
 #: accounts/templates/accounts/gather_account_report.html:104
-#: accounts/templates/accounts/push_account_report.html:71
-#: accounts/templates/accounts/push_account_report.html:103
+#: accounts/templates/accounts/push_account_report.html:73
+#: accounts/templates/accounts/push_account_report.html:105
 #: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:189
 #: authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:9
@@ -1299,12 +1309,12 @@ msgstr ""
 "Aviso: Se a identificação não necessitar de um nome de usuário, insira "
 "'null'. Se for uma conta AD, o formato é username@domain."
 
-#: accounts/serializers/account/service.py:12
+#: accounts/serializers/account/service.py:13
 #: authentication/serializers/token.py:22
 msgid "Access IP"
 msgstr "Lista branca de IP"
 
-#: accounts/serializers/account/service.py:25
+#: accounts/serializers/account/service.py:26
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
 #: ops/models/job.py:163 ops/models/playbook.py:31 rbac/models/role.py:37
@@ -1319,9 +1329,9 @@ msgstr "Lista branca de IP"
 msgid "Comment"
 msgstr "Observação"
 
-#: accounts/serializers/account/service.py:27
-#: accounts/templates/accounts/backup_account_report.html:38
-#: accounts/templates/accounts/check_account_report.html:38
+#: accounts/serializers/account/service.py:28
+#: accounts/templates/accounts/backup_account_report.html:39
+#: accounts/templates/accounts/check_account_report.html:39
 #: assets/serializers/asset/common.py:151
 msgid "Accounts amount"
 msgstr "Quantidade de contas"
@@ -1424,7 +1434,7 @@ msgid "Name already exists"
 msgstr "O nome já existe"
 
 #: accounts/serializers/automations/base.py:31
-#: assets/models/automations/base.py:144
+#: assets/models/automations/base.py:147
 #: assets/serializers/automations/base.py:43
 msgid "Automation snapshot"
 msgstr "Snapshot automático"
@@ -1454,8 +1464,8 @@ msgid "* Please enter the correct password length"
 msgstr "* Por favor, insira um comprimento de senha correto"
 
 #: accounts/serializers/automations/change_secret.py:90
-msgid "* Password length range 6-30 bits"
-msgstr "* O comprimento da senha deve estar entre 6 e 30 caracteres"
+msgid "* Password length range 8-36 bits"
+msgstr "* O comprimento da senha deve estar entre 8 e 36 caracteres"
 
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:147
@@ -1464,7 +1474,7 @@ msgid "Is success"
 msgstr "Foi Bem-sucedido?"
 
 #: accounts/serializers/automations/change_secret.py:119
-#: assets/models/automations/base.py:160
+#: assets/models/automations/base.py:163
 msgid "Automation task execution"
 msgstr "Histórico de execução de tarefas automáticas"
 
@@ -1644,7 +1654,7 @@ msgstr "Testar a conectividade da conta"
 msgid "Deleted account"
 msgstr "Excluir conta"
 
-#: accounts/templates/accounts/backup_account_report.html:13
+#: accounts/templates/accounts/backup_account_report.html:14
 msgid ""
 "The following is a summary of account backup tasks, please review and handle "
 "them"
@@ -1652,22 +1662,22 @@ msgstr ""
 "Abaixo estão os resumos das tarefas de backup de contas, por favor, revise e "
 "trate."
 
-#: accounts/templates/accounts/backup_account_report.html:22
+#: accounts/templates/accounts/backup_account_report.html:23
 #: accounts/templates/accounts/change_secret_failed_info.html:3
-#: accounts/templates/accounts/change_secret_report.html:22
-#: accounts/templates/accounts/check_account_report.html:22
+#: accounts/templates/accounts/change_secret_report.html:24
+#: accounts/templates/accounts/check_account_report.html:23
 #: accounts/templates/accounts/gather_account_report.html:23
-#: accounts/templates/accounts/push_account_report.html:22
+#: accounts/templates/accounts/push_account_report.html:24
 #: terminal/serializers/task.py:10
 msgid "Task name"
 msgstr "Nome da tarefa"
 
-#: accounts/templates/accounts/backup_account_report.html:26
-#: accounts/templates/accounts/change_secret_report.html:26
-#: accounts/templates/accounts/check_account_report.html:26
+#: accounts/templates/accounts/backup_account_report.html:27
+#: accounts/templates/accounts/change_secret_report.html:28
+#: accounts/templates/accounts/check_account_report.html:27
 #: accounts/templates/accounts/gather_account_report.html:27
-#: accounts/templates/accounts/push_account_report.html:26
-#: assets/models/automations/base.py:139 audits/models.py:66
+#: accounts/templates/accounts/push_account_report.html:28
+#: assets/models/automations/base.py:142 audits/models.py:66
 #: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:239
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:27
@@ -1678,26 +1688,26 @@ msgstr "Nome da tarefa"
 msgid "Date start"
 msgstr "Data de Início"
 
-#: accounts/templates/accounts/backup_account_report.html:30
-#: accounts/templates/accounts/change_secret_report.html:30
-#: accounts/templates/accounts/check_account_report.html:30
+#: accounts/templates/accounts/backup_account_report.html:31
+#: accounts/templates/accounts/change_secret_report.html:32
+#: accounts/templates/accounts/check_account_report.html:31
 #: accounts/templates/accounts/gather_account_report.html:31
-#: accounts/templates/accounts/push_account_report.html:30
+#: accounts/templates/accounts/push_account_report.html:32
 #: settings/serializers/feature.py:28
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
 #: terminal/models/session/session.py:48
 msgid "Date end"
 msgstr "Data de Encerramento"
 
-#: accounts/templates/accounts/backup_account_report.html:34
-#: accounts/templates/accounts/change_secret_report.html:34
-#: accounts/templates/accounts/check_account_report.html:34
+#: accounts/templates/accounts/backup_account_report.html:35
+#: accounts/templates/accounts/change_secret_report.html:36
+#: accounts/templates/accounts/check_account_report.html:35
 #: accounts/templates/accounts/gather_account_report.html:35
-#: accounts/templates/accounts/push_account_report.html:34
+#: accounts/templates/accounts/push_account_report.html:36
 msgid "Time using"
 msgstr "Duração."
 
-#: accounts/templates/accounts/backup_account_report.html:42
+#: accounts/templates/accounts/backup_account_report.html:43
 msgid "Type count"
 msgstr "Número de tipos"
 
@@ -1717,7 +1727,7 @@ msgstr ""
 "Olá! Aqui estão os casos de falha ao alterar ou enviar a senha do ativo. Por "
 "favor, verifique e corrija o mais rápido possível."
 
-#: accounts/templates/accounts/change_secret_report.html:13
+#: accounts/templates/accounts/change_secret_report.html:15
 msgid ""
 "The following is a summary of account change secret tasks, please read and "
 "process"
@@ -1725,66 +1735,66 @@ msgstr ""
 "Aqui está um resumo da missão secreta de alteração de conta, por favor, leia "
 "e processe."
 
-#: accounts/templates/accounts/change_secret_report.html:38
+#: accounts/templates/accounts/change_secret_report.html:40
 #: accounts/templates/accounts/gather_account_report.html:39
-#: accounts/templates/accounts/push_account_report.html:38
+#: accounts/templates/accounts/push_account_report.html:40
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:182
 #: orgs/serializers.py:13 perms/serializers/permission.py:50
 msgid "Assets amount"
 msgstr "Número de ativos"
 
-#: accounts/templates/accounts/change_secret_report.html:42
-#: accounts/templates/accounts/check_account_report.html:50
+#: accounts/templates/accounts/change_secret_report.html:44
+#: accounts/templates/accounts/check_account_report.html:51
 #: accounts/templates/accounts/gather_account_report.html:43
-#: accounts/templates/accounts/push_account_report.html:42
+#: accounts/templates/accounts/push_account_report.html:44
 msgid "Asset success count"
 msgstr "Número de ativos bem-sucedidos"
 
-#: accounts/templates/accounts/change_secret_report.html:46
-#: accounts/templates/accounts/check_account_report.html:54
+#: accounts/templates/accounts/change_secret_report.html:48
+#: accounts/templates/accounts/check_account_report.html:55
 #: accounts/templates/accounts/gather_account_report.html:47
-#: accounts/templates/accounts/push_account_report.html:46
+#: accounts/templates/accounts/push_account_report.html:48
 msgid "Asset failed count"
 msgstr "Número de ativos com falha"
 
-#: accounts/templates/accounts/change_secret_report.html:50
-#: accounts/templates/accounts/check_account_report.html:58
+#: accounts/templates/accounts/change_secret_report.html:52
+#: accounts/templates/accounts/check_account_report.html:59
 #: accounts/templates/accounts/gather_account_report.html:51
-#: accounts/templates/accounts/push_account_report.html:50
+#: accounts/templates/accounts/push_account_report.html:52
 msgid "Asset not support count"
 msgstr "Número de ativos não suportados"
 
-#: accounts/templates/accounts/change_secret_report.html:61
-#: accounts/templates/accounts/push_account_report.html:61
+#: accounts/templates/accounts/change_secret_report.html:63
+#: accounts/templates/accounts/push_account_report.html:63
 msgid "Success accounts"
 msgstr "Contas bem-sucedidas"
 
-#: accounts/templates/accounts/change_secret_report.html:69
-#: accounts/templates/accounts/change_secret_report.html:101
-#: accounts/templates/accounts/check_account_report.html:77
+#: accounts/templates/accounts/change_secret_report.html:71
+#: accounts/templates/accounts/change_secret_report.html:103
+#: accounts/templates/accounts/check_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:70
 #: accounts/templates/accounts/gather_account_report.html:102
-#: accounts/templates/accounts/push_account_report.html:69
-#: accounts/templates/accounts/push_account_report.html:101
+#: accounts/templates/accounts/push_account_report.html:71
+#: accounts/templates/accounts/push_account_report.html:103
 #: audits/handler.py:128
 msgid "No"
 msgstr "Não"
 
-#: accounts/templates/accounts/change_secret_report.html:85
-#: accounts/templates/accounts/change_secret_report.html:117
+#: accounts/templates/accounts/change_secret_report.html:87
+#: accounts/templates/accounts/change_secret_report.html:119
 #: accounts/templates/accounts/gather_account_report.html:86
 #: accounts/templates/accounts/gather_account_report.html:118
-#: accounts/templates/accounts/push_account_report.html:85
-#: accounts/templates/accounts/push_account_report.html:117
+#: accounts/templates/accounts/push_account_report.html:87
+#: accounts/templates/accounts/push_account_report.html:119
 msgid "No new accounts found"
 msgstr "Conta nova não encontrada"
 
-#: accounts/templates/accounts/change_secret_report.html:92
-#: accounts/templates/accounts/push_account_report.html:92
+#: accounts/templates/accounts/change_secret_report.html:94
+#: accounts/templates/accounts/push_account_report.html:94
 msgid "Failed accounts"
 msgstr "Contas com falha"
 
-#: accounts/templates/accounts/check_account_report.html:13
+#: accounts/templates/accounts/check_account_report.html:14
 #: accounts/templates/accounts/gather_account_report.html:14
 msgid ""
 "The following is a summary of the account check tasks. Please review and "
@@ -1793,21 +1803,21 @@ msgstr ""
 "A seguir, está o resumo das tarefas de verificação de conta, por favor, "
 "consulte e trate"
 
-#: accounts/templates/accounts/check_account_report.html:42
+#: accounts/templates/accounts/check_account_report.html:43
 msgid "Ok count"
 msgstr "Número de sucessos"
 
-#: accounts/templates/accounts/check_account_report.html:46
+#: accounts/templates/accounts/check_account_report.html:47
 msgid "No password count"
 msgstr "SemSenhaNum"
 
-#: accounts/templates/accounts/check_account_report.html:80
-#: assets/models/automations/base.py:153 ops/models/base.py:51
+#: accounts/templates/accounts/check_account_report.html:81
+#: assets/models/automations/base.py:156 ops/models/base.py:51
 #: ops/models/job.py:235 xpack/plugins/cloud/models.py:225
 msgid "Result"
 msgstr "Resultado"
 
-#: accounts/templates/accounts/check_account_report.html:95
+#: accounts/templates/accounts/check_account_report.html:96
 msgid "No weak password"
 msgstr "SemSenhaFraca"
 
@@ -1819,7 +1829,7 @@ msgstr "ContaNovaDescoberta"
 msgid "Lost accounts"
 msgstr "ContaPerdida"
 
-#: accounts/templates/accounts/push_account_report.html:13
+#: accounts/templates/accounts/push_account_report.html:15
 msgid ""
 "The following is a summary of account push tasks, please read and process"
 msgstr ""
@@ -2137,28 +2147,28 @@ msgstr "O nome do nó no mesmo nível não pode ser repetido"
 msgid "App Assets"
 msgstr "Gestão de ativos"
 
-#: assets/automations/base/manager.py:332
+#: assets/automations/base/manager.py:347
 msgid "  - Platform {} ansible disabled"
 msgstr " - Plataforma {} Ansible foi desabilitada, impossível executar tarefas"
 
-#: assets/automations/base/manager.py:514
+#: assets/automations/base/manager.py:530
 msgid ">>> Task preparation phase"
 msgstr ">>> Preparando para executar tarefas"
 
-#: assets/automations/base/manager.py:518
+#: assets/automations/base/manager.py:534
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> Executando tarefas em partes, total de {runner_count}"
 
-#: assets/automations/base/manager.py:523
+#: assets/automations/base/manager.py:539
 msgid ">>> Start executing tasks"
 msgstr ">>> Começando a executar tarefas"
 
-#: assets/automations/base/manager.py:525
+#: assets/automations/base/manager.py:541
 msgid ">>> No tasks need to be executed"
 msgstr ">>> Não há tarefas para executar"
 
-#: assets/automations/base/manager.py:529
+#: assets/automations/base/manager.py:545
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> Começando a executar o lote {index} de tarefas"
@@ -2596,27 +2606,33 @@ msgstr "Nó"
 msgid "Parameters"
 msgstr "Parâmetros"
 
-#: assets/models/automations/base.py:41 assets/models/automations/base.py:128
+#: assets/models/automations/base.py:31
+#, fuzzy
+#| msgid "Last execution"
+msgid "Last execution date"
+msgstr "Última Ação"
+
+#: assets/models/automations/base.py:44 assets/models/automations/base.py:131
 msgid "Automation task"
 msgstr "Tarefas de automação"
 
-#: assets/models/automations/base.py:119
+#: assets/models/automations/base.py:122
 msgid "Asset automation task"
 msgstr "Tarefas de Automação de Ativos"
 
-#: assets/models/automations/base.py:136 assets/models/cmd_filter.py:41
+#: assets/models/automations/base.py:139 assets/models/cmd_filter.py:41
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:238
 #: users/models/user/__init__.py:322
 msgid "Date created"
 msgstr "Data de criação"
 
-#: assets/models/automations/base.py:150
+#: assets/models/automations/base.py:153
 #: assets/serializers/automations/base.py:44 xpack/plugins/cloud/models.py:242
 #: xpack/plugins/cloud/serializers/task.py:249
 msgid "Trigger mode"
 msgstr "Modo de Trigger"
 
-#: assets/models/automations/base.py:152 audits/serializers.py:39
+#: assets/models/automations/base.py:155 audits/serializers.py:39
 #: ops/models/base.py:52 ops/models/job.py:236
 #: xpack/plugins/cloud/manager.py:103
 msgid "Summary"
@@ -7262,7 +7278,9 @@ msgstr ""
 "após modificar o perfil, pode ser um wiki ou outros documentos de instrução"
 
 #: settings/serializers/basic.py:22
-msgid "Global organization"
+#, fuzzy
+#| msgid "Global organization"
+msgid "Global org display"
 msgstr "Nome da organização global"
 
 #: settings/serializers/basic.py:23
