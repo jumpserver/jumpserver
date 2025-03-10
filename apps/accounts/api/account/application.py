@@ -1,6 +1,7 @@
 import os
-from django.utils.translation import gettext_lazy as _, get_language
+
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -45,9 +46,9 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
             'node': 'js',
             'curl': 'sh',
         }
-        sdk_language = request.query_params.get('language','python')
+        sdk_language = request.query_params.get('language', 'python')
         sdk_path = os.path.join(settings.APPS_DIR, 'accounts', 'demos', sdk_language)
-        readme_path = os.path.join(sdk_path, f'readme.{get_language()}.md')
+        readme_path = os.path.join(sdk_path, f'README.{get_language()}.md')
         demo_path = os.path.join(sdk_path, f'demo.{code_suffix_mapper[sdk_language]}')
 
         readme_content = self.read_file(readme_path)

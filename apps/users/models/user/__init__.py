@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-import base64
-import struct
 import uuid
 
-import math
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager as _UserManager
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -17,17 +13,16 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    date_expired_default,
-    get_logger,
+    date_expired_default, get_logger, lazyproperty
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from ._auth import AuthMixin, MFAMixin
+from ._face import FaceMixin
 from ._json import JSONFilterMixin
 from ._role import RoleMixin, SystemRoleManager, OrgRoleManager
 from ._source import SourceMixin, Source
 from ._token import TokenMixin
-from ._face import FaceMixin
 
 logger = get_logger(__file__)
 __all__ = [
@@ -272,7 +267,7 @@ class User(
         LoginBlockUtil.unblock_user(self.username)
         MFABlockUtils.unblock_user(self.username)
 
-    @property
+    @lazyproperty
     def login_blocked(self):
         from users.utils import LoginBlockUtil, MFABlockUtils
 

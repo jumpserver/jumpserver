@@ -174,8 +174,9 @@ class AccountBackupHandler:
         if not files:
             return
         recipients = User.objects.filter(id__in=list(recipients))
+        msg = _("Start sending backup emails")
         print(
-            f'\033[32m>>> {_("Start sending backup emails")}\033[0m'
+            f'\033[32m>>> {msg}\033[0m'
             ''
         )
         name = self.name

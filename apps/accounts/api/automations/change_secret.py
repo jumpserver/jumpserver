@@ -75,19 +75,17 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
             date_finished=Subquery(
                 recent_dates.filter(account=OuterRef('account')).values('max_date_finished')[:1]
             )
-        ).filter(Q(status=ChangeSecretRecordStatusChoice.success) | Q(ignore_fail=True))
+        ).filter(Q(status=ChangeSecretRecordStatusChoice.success))
 
         failed_records = queryset.filter(
             ~Q(account__in=Subquery(recent_success_accounts.values('account'))),
-            status=ChangeSecretRecordStatusChoice.failed
+            status=ChangeSecretRecordStatusChoice.failed,
+            ignore_fail=False
         )
         return failed_records
 
     def get_queryset(self):
-        qs = ChangeSecretRecord.get_valid_records()
-        return qs.filter(
-            execution__automation__type=self.tp
-        )
+        return ChangeSecretRecord.get_valid_records()
 
     @action(methods=['post'], detail=False, url_path='execute')
     def execute(self, request, *args, **kwargs):

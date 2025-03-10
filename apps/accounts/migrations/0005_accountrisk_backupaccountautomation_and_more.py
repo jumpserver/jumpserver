@@ -170,7 +170,7 @@ class Migration(migrations.Migration):
                         verbose_name="Status",
                     ),
                 ),
-                ("details", models.JSONField(default=list, verbose_name="Details")),
+                ("details", models.JSONField(default=list, verbose_name="Detail")),
             ],
             options={
                 "verbose_name": "Account risk",

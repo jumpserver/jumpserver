@@ -83,8 +83,7 @@ class AccountFilterSet(BaseFilterSet):
         integrationapplication = IntegrationApplication.objects.filter(pk=value).first()
         if not integrationapplication:
             return IntegrationApplication.objects.none()
-        queryset = integrationapplication.get_accounts()
-        return queryset
+        return queryset & integrationapplication.get_accounts()
 
     @staticmethod
     def filter_latest(queryset, name, value):
@@ -150,7 +149,7 @@ class GatheredAccountFilterSet(BaseFilterSet):
         fields = ["id", "username"]
 
 
-class SecretRecordMixin:
+class SecretRecordMixin(drf_filters.FilterSet):
     asset_name = drf_filters.CharFilter(
         field_name="asset__name", lookup_expr="icontains"
     )

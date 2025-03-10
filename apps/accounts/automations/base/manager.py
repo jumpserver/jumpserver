@@ -1,3 +1,4 @@
+import time
 from copy import deepcopy
 
 from django.conf import settings
@@ -119,12 +120,38 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'  # To distinguish different accounts
-            h = self.gen_account_inventory(account, asset, h, path_dir)
+            try:
+                h = self.gen_account_inventory(account, asset, h, path_dir)
+            except Exception as e:
+                h['error'] = str(e)
             inventory_hosts.append(h)
 
         return inventory_hosts
 
+    def wait_and_save_recorder(self, recorder, max_retries=10, retry_interval=2):
+        recorder_model = type(recorder)
+
+        for attempt in range(max_retries):
+            exist = recorder_model.objects.filter(
+                account_id=recorder.account_id, execution=self.execution
+            ).exists()
+
+            if exist:
+                print(f"Data inserted, updating recorder status after {attempt + 1}th query")
+                recorder.save(update_fields=['error', 'status', 'date_finished'])
+                return True
+
+            print(f"Data not ready, waiting {retry_interval} second(s) and retrying ({attempt + 1}/{max_retries})")
+            time.sleep(retry_interval)
+
+        print("\033[31m The data is still not inserted, giving up saving the recorder status.\033[0m")
+        return False
+
+    def save_record(self, recorder):
+        self.wait_and_save_recorder(recorder)
+
     def on_host_success(self, host, result):
+
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
             return
@@ -141,10 +168,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         account.date_change_secret = timezone.now()
         account.change_secret_status = ChangeSecretRecordStatusChoice.success
 
-        with safe_db_connection():
-            recorder.save(update_fields=['status', 'date_finished'])
-            account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
-
         self.summary['ok_accounts'] += 1
         self.result['ok_accounts'].append(
             {
@@ -154,6 +177,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         super().on_host_success(host, result)
 
+        with safe_db_connection():
+            account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
+            self.save_record(recorder)
+
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
@@ -161,10 +188,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         recorder.status = ChangeSecretRecordStatusChoice.failed.value
         recorder.date_finished = timezone.now()
         recorder.error = error
-        try:
-            recorder.save()
-        except Exception as e:
-            print(f"\033[31m Save {host} recorder error: {e} \033[0m\n")
+
         self.summary['fail_accounts'] += 1
         self.result['fail_accounts'].append(
             {
@@ -173,3 +197,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             }
         )
         super().on_host_error(host, error, result)
+
+        with safe_db_connection():
+            self.save_record(recorder)

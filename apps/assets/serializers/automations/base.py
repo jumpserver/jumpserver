@@ -23,7 +23,7 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
     class Meta:
         read_only_fields = [
             'date_created', 'date_updated', 'created_by',
-            'periodic_display', 'executed_amount', 'type'
+            'periodic_display', 'executed_amount', 'type', 'last_execution_date'
         ]
         mini_fields = [
             'id', 'name', 'type', 'is_periodic', 'interval',
@@ -43,6 +43,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
     trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
     status = LabeledChoiceField(choices=Status.choices, read_only=True, label=_('Status'))
+    automation = ObjectRelatedField(required=False, queryset=BaseAutomation.objects, attrs=('id', 'name'))
 
     class Meta:
         model = AutomationExecution
