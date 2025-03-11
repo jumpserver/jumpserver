@@ -75,6 +75,8 @@ class Language(models.TextChoices):
     zh_hant = 'zh-hant', '中文(繁體)'
     ja = 'ja', '日本語',
     pt_br = 'pt-br', 'Português (Brasil)'
+    es = 'es', 'Español'
+    ru = 'ru', 'Русский'
 
     @classmethod
     def get_code_mapper(cls):
