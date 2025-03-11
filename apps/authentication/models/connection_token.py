@@ -19,6 +19,7 @@ from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.utils import tmp_to_org
+from perms.const import ActionChoices
 from terminal.models import Applet, VirtualApp
 
 
@@ -306,3 +307,14 @@ class AdminConnectionToken(ConnectionToken):
     class Meta:
         proxy = True
         verbose_name = _("Admin connection token")
+
+    @lazyproperty
+    def actions(self):
+        return ActionChoices.all()
+
+    @lazyproperty
+    def expire_at(self):
+        return (timezone.now() + timezone.timedelta(days=365)).timestamp()
+
+    def is_valid(self):
+        return True
