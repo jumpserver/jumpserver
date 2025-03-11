@@ -1,4 +1,3 @@
-import time
 from copy import deepcopy
 
 from django.conf import settings
@@ -128,30 +127,11 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         return inventory_hosts
 
-    def wait_and_save_recorder(self, recorder, max_retries=10, retry_interval=2):
-        recorder_model = type(recorder)
-
-        for attempt in range(max_retries):
-            exist = recorder_model.objects.filter(
-                account_id=recorder.account_id, execution=self.execution
-            ).exists()
-
-            if exist:
-                print(f"Data inserted, updating recorder status after {attempt + 1}th query")
-                recorder.save(update_fields=['error', 'status', 'date_finished'])
-                return True
-
-            print(f"Data not ready, waiting {retry_interval} second(s) and retrying ({attempt + 1}/{max_retries})")
-            time.sleep(retry_interval)
-
-        print("\033[31m The data is still not inserted, giving up saving the recorder status.\033[0m")
-        return False
-
-    def save_record(self, recorder):
-        self.wait_and_save_recorder(recorder)
+    @staticmethod
+    def save_record(recorder):
+        recorder.save(update_fields=['error', 'status', 'date_finished'])
 
     def on_host_success(self, host, result):
-
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
             return

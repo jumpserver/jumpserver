@@ -80,12 +80,8 @@ class ChangeSecretDashboardApi(APIView):
         return ChangeSecretAutomation.objects.all()
 
     @lazyproperty
-    def change_secret_executions_queryset(self):
-        return AutomationExecution.objects.filter(automation__type=self.tp)
-
-    @lazyproperty
     def change_secret_records_queryset(self):
-        return ChangeSecretRecord.get_valid_records().filter(execution__automation__type=self.tp)
+        return ChangeSecretRecord.get_valid_records()
 
     def get_change_secret_asset_queryset(self):
         qs = self.change_secrets_queryset
@@ -159,8 +155,7 @@ class ChangeSecretDashboardApi(APIView):
                         if name == self.task_name and tp == self.tp:
                             execution_ids.append(_id)
 
-            snapshots = self.change_secret_executions_queryset.filter(
-                id__in=execution_ids).values_list('id', 'snapshot')
+            snapshots = AutomationExecution.objects.filter(id__in=execution_ids).values_list('id', 'snapshot')
 
             asset_ids = {asset for i in snapshots for asset in i.get('assets', [])}
             account_ids = {account for i in snapshots for account in i.get('accounts', [])}

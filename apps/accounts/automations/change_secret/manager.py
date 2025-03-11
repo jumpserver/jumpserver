@@ -11,7 +11,6 @@ from accounts.const import (
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretReportMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
-from common.decorators import bulk_create_decorator
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_filename
@@ -58,7 +57,6 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         self.name_recorder_mapper[name] = recorder
         return recorder
 
-    @bulk_create_decorator(ChangeSecretRecord)
     def create_record(self, asset, account, new_secret):
         recorder = ChangeSecretRecord(
             asset=asset, account=account, execution=self.execution,
