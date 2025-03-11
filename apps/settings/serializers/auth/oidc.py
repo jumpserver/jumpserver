@@ -45,7 +45,7 @@ class CommonSettingSerializer(serializers.Serializer):
     AUTH_OPENID_PKCE = serializers.BooleanField(required=False, label=_('Enable PKCE'))
     AUTH_OPENID_CODE_CHALLENGE_METHOD = serializers.ChoiceField(
         default='S256', label=_('Code challenge method'),
-        choices=(('S256', 'HS256'), ('plain', 'Plain'))
+        choices=(('S256', 'S256'), ('plain', 'Plain'))
     )
 
 
