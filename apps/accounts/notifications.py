@@ -2,7 +2,6 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from premailer import transform
 
-from accounts.models import ChangeSecretRecord
 from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
 from notifications.notifications import UserMessage
 from terminal.models.component.storage import ReplayStorage
@@ -122,8 +121,5 @@ class ChangeSecretReportMsg(UserMessage):
 
     @classmethod
     def gen_test_msg(cls):
-        name = 'test'
         user = User.objects.first()
-        record = ChangeSecretRecord.objects.first()
-        execution_id = str(record.execution_id)
         return cls(user, {})
