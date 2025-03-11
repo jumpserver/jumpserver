@@ -116,9 +116,10 @@ class AnalyseAccountRisk:
             if not date:
                 continue
 
-            pre_date = ori_account and getattr(ori_account, field)
-            if pre_date == date:
-                continue
+            # 服务器收集的时间和数据库时间一致，不进行比较，无法检测风险 不太对，先注释
+            # pre_date = ori_account and getattr(ori_account, field)
+            # if pre_date == date:
+            #     continue
 
             if date and date < timezone.now() - delta:
                 risks.append(
