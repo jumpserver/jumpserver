@@ -3,12 +3,39 @@
 from django.db.models import Q
 from django.utils import timezone
 from django_filters import rest_framework as drf_filters
+from rest_framework import filters
+from rest_framework.compat import coreapi
 
 from assets.models import Node
+from assets.utils import get_node_from_request
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import ChangeSecretRecordStatusChoice
 from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord, IntegrationApplication
+
+
+class NodeFilterBackend(filters.BaseFilterBackend):
+    fields = ['node_id']
+
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name=field, location='query', required=False,
+                type='string', example='', description='', schema=None,
+            )
+            for field in self.fields
+        ]
+
+    def filter_queryset(self, request, queryset, view):
+        node = get_node_from_request(request)
+        if node is None:
+            return queryset
+
+        node_qs = Node.objects.none()
+        node_qs |= node.get_all_children(with_self=True)
+        node_ids = list(node_qs.values_list("id", flat=True))
+        queryset = queryset.filter(asset__nodes__in=node_ids)
+        return queryset
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -19,8 +46,6 @@ class AccountFilterSet(BaseFilterSet):
     asset_id = drf_filters.CharFilter(field_name="asset", lookup_expr="exact")
     asset = drf_filters.CharFilter(field_name="asset", lookup_expr="exact")
     assets = drf_filters.CharFilter(field_name="asset_id", lookup_expr="exact")
-    nodes = drf_filters.CharFilter(method="filter_nodes")
-    node_id = drf_filters.CharFilter(method="filter_nodes")
     has_secret = drf_filters.BooleanFilter(method="filter_has_secret")
     platform = drf_filters.CharFilter(
         field_name="asset__platform_id", lookup_expr="exact"
@@ -36,9 +61,7 @@ class AccountFilterSet(BaseFilterSet):
     latest_updated = drf_filters.BooleanFilter(method="filter_latest")
     latest_secret_changed = drf_filters.BooleanFilter(method="filter_latest")
     latest_secret_change_failed = drf_filters.BooleanFilter(method="filter_latest")
-    risk = drf_filters.CharFilter(
-        method="filter_risk",
-    )
+    risk = drf_filters.CharFilter(method="filter_risk")
     integrationapplication = drf_filters.CharFilter(method="filter_integrationapplication")
     long_time_no_change_secret = drf_filters.BooleanFilter(method="filter_long_time")
     long_time_no_verified = drf_filters.BooleanFilter(method="filter_long_time")
@@ -109,19 +132,6 @@ class AccountFilterSet(BaseFilterSet):
 
         if kwargs:
             queryset = queryset.filter(**kwargs)
-        return queryset
-
-    @staticmethod
-    def filter_nodes(queryset, name, value):
-        nodes = Node.objects.filter(id=value)
-        if not nodes:
-            return queryset
-
-        node_qs = Node.objects.none()
-        for node in nodes:
-            node_qs |= node.get_all_children(with_self=True)
-        node_ids = list(node_qs.values_list("id", flat=True))
-        queryset = queryset.filter(asset__nodes__in=node_ids)
         return queryset
 
     class Meta:

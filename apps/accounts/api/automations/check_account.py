@@ -30,6 +30,8 @@ __all__ = [
     "CheckAccountEngineViewSet",
 ]
 
+from ...filters import NodeFilterBackend
+
 from ...risk_handlers import RiskHandler
 
 
@@ -80,7 +82,8 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
     search_fields = ("username", "asset")
-    filterset_fields = ("risk", "status", "asset")
+    filterset_fields = ("risk", "status", "asset_id")
+    extra_filter_backends = [NodeFilterBackend]
     serializer_classes = {
         "default": serializers.AccountRiskSerializer,
         "assets": serializers.AssetRiskSerializer,

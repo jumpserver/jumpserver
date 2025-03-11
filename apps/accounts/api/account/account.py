@@ -8,7 +8,7 @@ from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
 from accounts.const import ChangeSecretRecordStatusChoice
-from accounts.filters import AccountFilterSet
+from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord
 from assets.models import Asset, Node
@@ -31,7 +31,7 @@ __all__ = [
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
     search_fields = ('username', 'name', 'asset__name', 'asset__address', 'comment')
-    extra_filter_backends = [AttrRulesFilterBackend]
+    extra_filter_backends = [AttrRulesFilterBackend, NodeFilterBackend]
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
