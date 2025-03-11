@@ -201,13 +201,17 @@ class Session(OrgModelMixin):
             local_path = self.get_replay_part_file_local_storage_path(filename)
         try:
             name = default_storage.save(local_path, f)
+            absolute_saved_path = default_storage.path(name)
+            absolute_local_path = default_storage.path(local_path)
+            if absolute_saved_path != absolute_local_path:
+                os.rename(absolute_saved_path, absolute_local_path)
         except OSError as e:
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
             from terminal.tasks import upload_session_replay_file_to_external_storage
             upload_session_replay_file_to_external_storage.delay(str(self.id), local_path, rel_path)
-        return name, None
+        return local_path, None
 
     @classmethod
     def set_sessions_active(cls, session_ids):
