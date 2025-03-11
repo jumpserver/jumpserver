@@ -1,7 +1,5 @@
 from collections import defaultdict
 
-from django.utils import timezone
-
 from accounts.const import AliasAccount
 from accounts.models import VirtualAccount
 from assets.models import Asset, MyAsset
@@ -42,12 +40,6 @@ class PermAssetDetailUtil:
 
     def validate_permission(self, account_name, protocol):
         with tmp_to_org(self.asset.org):
-            if self.user.is_superuser:
-                account = self.asset.accounts.all().active().get(name=account_name)
-                account.actions = ActionChoices.all()
-                account.date_expired = timezone.now() + timezone.timedelta(days=365)
-                return account
-
             protocols = self.get_permed_protocols_for_user(only_name=True)
             if 'all' not in protocols and protocol not in protocols:
                 return None
