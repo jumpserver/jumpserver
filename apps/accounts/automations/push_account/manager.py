@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes
-from common.decorators import bulk_create_decorator
 from common.utils import get_logger
 from common.utils.timezone import local_now_filename
 from ..base.manager import BaseChangeSecretPushManager
@@ -46,7 +45,6 @@ class PushAccountManager(BaseChangeSecretPushManager):
         self.name_recorder_mapper[name] = recorder
         return recorder
 
-    @bulk_create_decorator(PushSecretRecord)
     def create_record(self, asset, account):
         recorder = PushSecretRecord(
             asset=asset, account=account, execution=self.execution,

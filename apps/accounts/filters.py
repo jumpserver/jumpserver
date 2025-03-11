@@ -128,7 +128,7 @@ class AccountFilterSet(BaseFilterSet):
         model = Account
         fields = [
             "id", "asset", "source_id", "secret_type", "category",
-            "type", "privileged", "secret_reset", "connectivity"
+            "type", "privileged", "secret_reset", "connectivity", 'is_active'
         ]
 
 
