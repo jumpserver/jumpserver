@@ -25,23 +25,28 @@
             </div>
 
             <div class="item">
-                <span class="item-label">{% trans 'Accounts amount' %}</span>
-                <span class="item-value">{{ summary.accounts }}</span>
+                <span class="item-label">{% trans 'Normal' %}</span>
+                <span class="item-value">{{ summary.ok | default:0 }}</span>
             </div>
 
             <div class="item">
-                <span class="item-label">{% trans 'Asset success count' %}</span>
-                <span class="item-value">{{ summary.ok_assets | default:0 }}</span>
+                <span class="item-label">{% trans 'Weak password' %}</span>
+                <span class="item-value">{{ summary.weak_password | default:0 }}</span>
             </div>
 
             <div class="item">
-                <span class="item-label">{% trans 'Asset failed count' %}</span>
-                <span class="item-value">{{ summary.fail_assets | default:0 }}</span>
+                <span class="item-label">{% trans 'Leaked password' %}</span>
+                <span class="item-value">{{ summary.leaked_password | default:0 }}</span>
             </div>
 
             <div class="item">
-                <span class="item-label">{% trans 'Asset not support count' %}</span>
-                <span class="item-value">{{ summary.error_assets | default:0 }}</span>
+                <span class="item-label">{% trans 'Repeated password' %}</span>
+                <span class="item-value">{{ summary.repeated_password | default:0 }}</span>
+            </div>
+
+            <div class="item">
+                <span class="item-label">{% trans 'No secret' %}</span>
+                <span class="item-value">{{ summary.no_secret | default:0 }}</span>
             </div>
 
             <div class="item">
@@ -53,58 +58,6 @@
                 <span class="item-label">{% trans 'Time using' %}</span>
                 <span class="item-value">{{ execution.duration }}s</span>
             </div>
-
-            <div class="item">
-                <span class="item-label">{% trans 'Ok count' %}</span>
-                <span class="item-value">{{ summary.ok }}</span>
-            </div>
-
-            <div class="item">
-                <span class="item-label">{% trans 'No password count' %}</span>
-                <span class="item-value">{{ summary.no_secret }}</span>
-            </div>
-        </div>
-    </section>
-
-    <section class="success">
-        <div class="header-container">
-            <span
-                class="triangle-down-icon collapse-toggle"
-                data-target="success"
-            ></span>
-
-            <h2>
-               {% trans 'Weak password' %}:
-
-                <span> {{ summary.weak_password | default:0 }} </span>
-            </h2>
-        </div>
-
-        <div class="container-section collapsible-content" id="success-content">
-            {% if summary.ok_accounts %}
-                <table class="custom-table table-striped table-hover data-table">
-                    <thead>
-                    <tr>
-                        <th>{% trans 'No' %}</th>
-                        <th>{% trans 'Asset' %}</th>
-                        <th>{% trans 'Username' %}</th>
-                        <th>{% trans 'Result' %}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for account in result.weak_password %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ account.asset }}</td>
-                            <td>{{ account.username }}</td>
-                            <td style="color: red">{% trans 'Weak password' %}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="no-data">{% trans 'No weak password' %}</p>
-            {% endif %}
         </div>
     </section>
 </div>

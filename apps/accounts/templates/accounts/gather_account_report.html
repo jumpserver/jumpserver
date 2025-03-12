@@ -24,7 +24,7 @@
 
       <div class="item">
         <span class="item-label">{% trans 'Assets amount' %}</span>
-        <span class="item-value">{{ summary.total_assets }}</span>
+        <span class="item-value">{{ summary.total_assets | default:0 }}</span>
       </div>
 
       <div class="item">
