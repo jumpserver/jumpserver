@@ -143,16 +143,11 @@ class AccountFilterSet(BaseFilterSet):
 
 
 class GatheredAccountFilterSet(BaseFilterSet):
-    node_id = drf_filters.CharFilter(method="filter_nodes")
     asset_id = drf_filters.CharFilter(field_name="asset_id", lookup_expr="exact")
     asset_name = drf_filters.CharFilter(
         field_name="asset__name", lookup_expr="icontains"
     )
     status = drf_filters.CharFilter(field_name="status", lookup_expr="exact")
-
-    @staticmethod
-    def filter_nodes(queryset, name, value):
-        return AccountFilterSet.filter_nodes(queryset, name, value)
 
     class Meta:
         model = GatheredAccount

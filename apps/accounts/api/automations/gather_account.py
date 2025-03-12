@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.const import AutomationTypes
-from accounts.filters import GatheredAccountFilterSet
+from accounts.filters import GatheredAccountFilterSet, NodeFilterBackend
 from accounts.models import GatherAccountsAutomation, AutomationExecution, Account
 from accounts.models import GatheredAccount
 from assets.models import Asset
@@ -76,6 +76,7 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     model = GatheredAccount
     search_fields = ("username",)
     filterset_class = GatheredAccountFilterSet
+    extra_filter_backends = [NodeFilterBackend]
     ordering = ("status",)
     serializer_classes = {
         "default": serializers.DiscoverAccountSerializer,
