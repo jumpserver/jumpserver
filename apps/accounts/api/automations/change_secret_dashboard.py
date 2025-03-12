@@ -155,7 +155,7 @@ class ChangeSecretDashboardApi(APIView):
                         if name == self.task_name and tp == self.tp:
                             execution_ids.append(_id)
 
-            snapshots = AutomationExecution.objects.filter(id__in=execution_ids).values_list('id', 'snapshot')
+            snapshots = AutomationExecution.objects.filter(id__in=execution_ids).values_list('snapshot', flat=True)
 
             asset_ids = {asset for i in snapshots for asset in i.get('assets', [])}
             account_ids = {account for i in snapshots for account in i.get('accounts', [])}

@@ -44,7 +44,7 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
 
 class PushAccountRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
     filterset_class = PushAccountRecordFilterSet
-    search_fields = ('asset__address', 'account_username')
+    search_fields = ('asset__address', 'account__username')
     ordering_fields = ('date_finished',)
     tp = AutomationTypes.push_account
     serializer_classes = {

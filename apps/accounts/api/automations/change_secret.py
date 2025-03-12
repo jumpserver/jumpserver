@@ -35,7 +35,7 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
     filterset_class = ChangeSecretRecordFilterSet
-    search_fields = ('asset__address', 'account_username')
+    search_fields = ('asset__address', 'account__username')
     ordering_fields = ('date_finished',)
     tp = AutomationTypes.change_secret
     serializer_classes = {
