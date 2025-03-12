@@ -1,9 +1,8 @@
-from itertools import islice
-
 from django.db import models
 from django.db.models import TextChoices
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from itertools import islice
 
 from common.const import ConfirmOrIgnore
 from common.db.models import JMSBaseModel
@@ -45,16 +44,12 @@ class RiskChoice(TextChoices):
     group_changed = 'groups_changed', _('Groups change')  # 组变更, 确认
     sudo_changed = 'sudoers_changed', _('Sudo changed')  # sudo 变更, 确认
     authorized_keys_changed = 'authorized_keys_changed', _('Authorized keys changed')  # authorized_keys 变更, 确认
-    account_deleted = 'account_deleted', _('Account delete')  # 账号被删除, 确认
     password_expired = 'password_expired', _('Password expired')  # 密码过期, 修改密码
     long_time_password = 'long_time_password', _('Long time no change')  # 好久没改密码的账号, 改密码
 
     weak_password = 'weak_password', _('Weak password')  # 弱密码, 改密
     leaked_password = 'leaked_password', _('Leaked password')  # 可能泄露的密码, 改密
     repeated_password = 'repeated_password', _('Repeated password')  # 重复度高的密码, 改密
-    password_error = 'password_error', _('Password error')  # 密码错误, 修改账号
-    no_admin_account = 'no_admin_account', _('No admin account')  # 无管理员账号, 设置账号
-    others = 'others', _('Others')  # 其他风险, 确认
 
 
 class AccountRisk(JMSOrgBaseModel):
