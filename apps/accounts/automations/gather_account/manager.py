@@ -1,6 +1,6 @@
-import time
 from collections import defaultdict
 
+import time
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
@@ -159,10 +159,10 @@ class AnalyseAccountRisk:
         if not self.check_risk:
             return
 
-        basic = {"asset": asset, "username": d["username"], 'gathered_account': ga.id}
         if ga:
             self._analyse_item_changed(ga, d)
-        elif not sys_found:
+        if not sys_found:
+            basic = {"asset": asset, "username": d["username"], 'gathered_account': ga}
             self._create_risk(
                 dict(
                     **basic,
