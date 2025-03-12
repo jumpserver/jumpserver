@@ -17,6 +17,7 @@
     "AccountBackupUpdate": "Update account backup",
     "AccountChangeSecretDetail": "Change account secret details",
     "AccountChangeSecret": "Account change secret",
+    "SelectPlatform": "Select platform",
     "AccountData": "Account data",
     "AccountDeleteConfirmMsg": "Delete account, continue?",
     "AccountDeleted": "Account deleted",

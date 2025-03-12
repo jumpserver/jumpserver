@@ -16,6 +16,8 @@
     "AccountBackupTask": "账号备份任务",
     "AccountBackupUpdate": "更新账号备份",
     "AccountChangeSecretDetail": "账号改密详情",
+    "AccountChangeSecret": "账号改密",
+    "SelectPlatform": "选择平台",
     "AccountData": "账号数据",
     "AccountDeleteConfirmMsg": "删除账号，是否继续？",
     "AccountDeleted": "账号删除",
