@@ -43,25 +43,22 @@ class PamDashboardApi(APIView):
             'total_sudo_changed_accounts': ('sudo_changed_count', Q(risk='sudo_changed')),
             'total_authorized_keys_changed_accounts': (
                 'authorized_keys_changed_count', Q(risk='authorized_keys_changed')),
-            'total_account_deleted_accounts': ('account_deleted_count', Q(risk='account_deleted')),
             'total_password_expired_accounts': ('password_expired_count', Q(risk='password_expired')),
             'total_long_time_password_accounts': ('long_time_password_count', Q(risk='long_time_password')),
             'total_weak_password_accounts': ('weak_password_count', Q(risk='weak_password')),
             'total_leaked_password_accounts': ('leaked_password_count', Q(risk='leaked_password')),
             'total_repeated_password_accounts': ('repeated_password_count', Q(risk='repeated_password')),
-            'total_password_error_accounts': ('password_error_count', Q(risk='password_error')),
-            'total_no_admin_account_accounts': ('no_admin_account_count', Q(risk='no_admin_account')),
         }
 
         aggregations = {
-            agg_key: Count('account_id', distinct=True, filter=agg_filter)
+            agg_key: Count('id', distinct=True, filter=agg_filter)
             for param_key, (agg_key, agg_filter) in agg_map.items()
             if _all or query_params.get(param_key)
         }
 
         data = {}
         if aggregations:
-            account_stats = AccountRisk.objects.filter(account__isnull=False).aggregate(**aggregations)
+            account_stats = AccountRisk.objects.aggregate(**aggregations)
             data = {param_key: account_stats.get(agg_key) for param_key, (agg_key, _) in agg_map.items() if
                     agg_key in account_stats}
 
