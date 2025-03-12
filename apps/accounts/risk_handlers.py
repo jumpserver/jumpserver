@@ -130,9 +130,10 @@ class RiskHandler:
     def handle_change_password(self):
         asset = self.asset
         execution = AutomationExecution()
+        account = self.asset.accounts.get(username=self.username)
         execution.snapshot = {
             "assets": [str(asset.id)],
-            "accounts": [self.username],
+            "accounts": [str(account.id)],
             "type": AutomationTypes.change_secret,
             "secret_type": "password",
             "secret_strategy": "random",
