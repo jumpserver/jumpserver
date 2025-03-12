@@ -116,7 +116,7 @@ class BaseManager:
             automation.save(update_fields=['last_execution_date'])
 
     def update_execution(self):
-        self.duration = int(time.time() - self.time_start)
+        self.duration = time.time() - self.time_start
         self.execution.date_finished = timezone.now()
         self.execution.duration = self.duration
         self.execution.summary = self.summary

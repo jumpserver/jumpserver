@@ -274,6 +274,6 @@ class CheckAccountManager(BaseManager):
             self.summary[RiskChoice.leaked_password],
             self.summary[RiskChoice.repeated_password],
             self.summary["no_secret"],
-            int(self.duration)
+            self.duration
         )
         print(tmpl)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-12 10:30+0800\n"
+"POT-Creation-Date: 2025-03-12 17:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -374,7 +374,7 @@ msgstr ""
 msgid "Privileged"
 msgstr ""
 
-#: accounts/const/automation.py:131 perms/serializers/permission.py:44
+#: accounts/const/automation.py:131 perms/serializers/permission.py:55
 #: users/serializers/user.py:245
 msgid "Groups"
 msgstr ""
@@ -429,7 +429,7 @@ msgid "User %s view/export secret"
 msgstr ""
 
 #: accounts/models/account.py:83
-#: accounts/models/automations/check_account.py:62
+#: accounts/models/automations/check_account.py:57
 #: accounts/models/automations/gather_account.py:16
 #: accounts/serializers/account/account.py:226
 #: accounts/serializers/account/account.py:274
@@ -441,7 +441,6 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: accounts/templates/accounts/change_secret_report.html:79
 #: accounts/templates/accounts/change_secret_report.html:119
-#: accounts/templates/accounts/check_account_report.html:89
 #: accounts/templates/accounts/gather_account_report.html:77
 #: accounts/templates/accounts/gather_account_report.html:117
 #: accounts/templates/accounts/push_account_report.html:78
@@ -507,7 +506,7 @@ msgid "Change secret status"
 msgstr ""
 
 #: accounts/models/account.py:103
-#: accounts/models/automations/check_account.py:67
+#: accounts/models/automations/check_account.py:62
 #: accounts/serializers/account/service.py:11
 #: accounts/serializers/automations/change_secret.py:115
 #: accounts/serializers/automations/change_secret.py:146
@@ -551,7 +550,7 @@ msgid "Can remove account"
 msgstr ""
 
 #: accounts/models/application.py:16
-#: accounts/models/automations/check_account.py:119 accounts/models/base.py:63
+#: accounts/models/automations/check_account.py:114 accounts/models/base.py:63
 #: accounts/serializers/account/service.py:27
 #: accounts/serializers/account/virtual.py:20 acls/models/base.py:35
 #: acls/models/base.py:96 acls/models/command_acl.py:21
@@ -600,7 +599,7 @@ msgstr ""
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:420 perms/serializers/permission.py:55
+#: assets/serializers/asset/common.py:420 perms/serializers/permission.py:66
 #: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr ""
@@ -721,7 +720,7 @@ msgid "Check connection after change"
 msgstr ""
 
 #: accounts/models/automations/change_secret.py:17
-#: accounts/models/automations/check_account.py:19
+#: accounts/models/automations/check_account.py:18
 #: accounts/models/automations/gather_account.py:92
 #: accounts/serializers/automations/change_secret.py:59
 #: settings/serializers/auth/ldap.py:101
@@ -741,7 +740,7 @@ msgid "Date finished"
 msgstr ""
 
 #: accounts/models/automations/change_secret.py:49
-#: accounts/models/automations/check_account.py:75
+#: accounts/models/automations/check_account.py:70
 #: accounts/models/automations/gather_account.py:25
 #: accounts/serializers/automations/check_account.py:39
 #: assets/models/automations/base.py:136
@@ -785,87 +784,71 @@ msgstr ""
 msgid "Change secret record"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:18
+#: accounts/models/automations/check_account.py:17
 msgid "Engines"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:34
+#: accounts/models/automations/check_account.py:33
 msgid "account check automation"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:36
+#: accounts/models/automations/check_account.py:35
 msgid "Can view check account execution"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:37
+#: accounts/models/automations/check_account.py:36
 msgid "Can add check account execution"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:43
+#: accounts/models/automations/check_account.py:42
 msgid "Long time no login"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:44
+#: accounts/models/automations/check_account.py:43
 msgid "New found"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:45
+#: accounts/models/automations/check_account.py:44
 msgid "Groups change"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:46
+#: accounts/models/automations/check_account.py:45
 msgid "Sudo changed"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:47
+#: accounts/models/automations/check_account.py:46
 msgid "Authorized keys changed"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:48
-msgid "Account delete"
-msgstr ""
-
-#: accounts/models/automations/check_account.py:49
+#: accounts/models/automations/check_account.py:47
 #: authentication/errors/const.py:23
 msgid "Password expired"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:50
+#: accounts/models/automations/check_account.py:48
 msgid "Long time no change"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:52
-#: accounts/templates/accounts/check_account_report.html:77
-#: accounts/templates/accounts/check_account_report.html:100
+#: accounts/models/automations/check_account.py:50
+#: accounts/templates/accounts/check_account_report.html:33
 msgid "Weak password"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:53
+#: accounts/models/automations/check_account.py:51
+#: accounts/templates/accounts/check_account_report.html:38
 msgid "Leaked password"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:54
+#: accounts/models/automations/check_account.py:52
+#: accounts/templates/accounts/check_account_report.html:43
 msgid "Repeated password"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:55
-msgid "Password error"
-msgstr ""
-
-#: accounts/models/automations/check_account.py:56
-msgid "No admin account"
-msgstr ""
-
-#: accounts/models/automations/check_account.py:57
-msgid "Others"
-msgstr ""
-
-#: accounts/models/automations/check_account.py:64
+#: accounts/models/automations/check_account.py:59
 #: accounts/models/automations/gather_account.py:17 accounts/models/base.py:64
 #: accounts/serializers/account/virtual.py:21
 #: accounts/templates/accounts/change_secret_report.html:80
 #: accounts/templates/accounts/change_secret_report.html:120
-#: accounts/templates/accounts/check_account_report.html:90
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
@@ -883,57 +866,57 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:73
+#: accounts/models/automations/check_account.py:68
 #: accounts/serializers/automations/check_account.py:36
 msgid "Risk"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:76
+#: accounts/models/automations/check_account.py:71
 #: accounts/models/automations/gather_account.py:26 audits/models.py:151
 msgid "Detail"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:79
+#: accounts/models/automations/check_account.py:74
 msgid "Account risk"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:120
+#: accounts/models/automations/check_account.py:115
 msgid "Slug"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:131
+#: accounts/models/automations/check_account.py:126
 msgid "Check the discovered accounts"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:133
+#: accounts/models/automations/check_account.py:128
 msgid ""
 "Perform checks and analyses based on automatically discovered account "
 "results, including user groups, public keys, sudoers, and other information"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:140
+#: accounts/models/automations/check_account.py:135
 msgid "Check the strength of your account and password"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:142
+#: accounts/models/automations/check_account.py:137
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
 msgstr ""
 
-#: accounts/models/automations/check_account.py:149
+#: accounts/models/automations/check_account.py:144
 msgid "Check if the account and password are repeated"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:150
+#: accounts/models/automations/check_account.py:145
 msgid "Check if the account is the same as other accounts"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:155
+#: accounts/models/automations/check_account.py:150
 msgid "Check whether the account password is a common password"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:156
+#: accounts/models/automations/check_account.py:151
 msgid "Check whether the account password is a commonly leaked password"
 msgstr ""
 
@@ -1209,7 +1192,7 @@ msgstr ""
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
 #: authentication/api/connection_token.py:463 ops/models/base.py:17
 #: ops/models/job.py:155 ops/serializers/job.py:21
-#: perms/serializers/permission.py:46
+#: perms/serializers/permission.py:57
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:93
 msgid "Assets"
@@ -1298,7 +1281,6 @@ msgstr "Description"
 
 #: accounts/serializers/account/service.py:28
 #: accounts/templates/accounts/backup_account_report.html:28
-#: accounts/templates/accounts/check_account_report.html:28
 #: assets/serializers/asset/common.py:151
 msgid "Accounts amount"
 msgstr ""
@@ -1608,7 +1590,7 @@ msgstr ""
 #: accounts/templates/accounts/backup_account_report.html:33
 #: accounts/templates/accounts/change_secret_failed_info.html:3
 #: accounts/templates/accounts/change_secret_report.html:48
-#: accounts/templates/accounts/check_account_report.html:48
+#: accounts/templates/accounts/check_account_report.html:53
 #: accounts/templates/accounts/gather_account_report.html:46
 #: accounts/templates/accounts/push_account_report.html:47
 #: terminal/serializers/task.py:10
@@ -1617,7 +1599,7 @@ msgstr ""
 
 #: accounts/templates/accounts/backup_account_report.html:38
 #: accounts/templates/accounts/change_secret_report.html:53
-#: accounts/templates/accounts/check_account_report.html:53
+#: accounts/templates/accounts/check_account_report.html:58
 #: accounts/templates/accounts/gather_account_report.html:51
 #: accounts/templates/accounts/push_account_report.html:52
 msgid "Time using"
@@ -1645,26 +1627,23 @@ msgstr ""
 #: accounts/templates/accounts/gather_account_report.html:26
 #: accounts/templates/accounts/push_account_report.html:27
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:182
-#: orgs/serializers.py:13 perms/serializers/permission.py:50
+#: orgs/serializers.py:13 perms/serializers/permission.py:61
 msgid "Assets amount"
 msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:33
-#: accounts/templates/accounts/check_account_report.html:33
 #: accounts/templates/accounts/gather_account_report.html:31
 #: accounts/templates/accounts/push_account_report.html:32
 msgid "Asset success count"
 msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:38
-#: accounts/templates/accounts/check_account_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:36
 #: accounts/templates/accounts/push_account_report.html:37
 msgid "Asset failed count"
 msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:43
-#: accounts/templates/accounts/check_account_report.html:43
 #: accounts/templates/accounts/gather_account_report.html:41
 #: accounts/templates/accounts/push_account_report.html:42
 msgid "Asset not support count"
@@ -1677,7 +1656,6 @@ msgstr ""
 
 #: accounts/templates/accounts/change_secret_report.html:78
 #: accounts/templates/accounts/change_secret_report.html:118
-#: accounts/templates/accounts/check_account_report.html:88
 #: accounts/templates/accounts/push_account_report.html:77
 #: accounts/templates/accounts/push_account_report.html:117
 #: audits/handler.py:128
@@ -1698,22 +1676,14 @@ msgstr ""
 msgid "Failed accounts"
 msgstr ""
 
-#: accounts/templates/accounts/check_account_report.html:58
-msgid "Ok count"
+#: accounts/templates/accounts/check_account_report.html:28
+#: terminal/const.py:47 terminal/const.py:86
+#: users/templates/users/reset_password.html:54
+msgid "Normal"
 msgstr ""
 
-#: accounts/templates/accounts/check_account_report.html:63
-msgid "No password count"
-msgstr ""
-
-#: accounts/templates/accounts/check_account_report.html:91
-#: assets/models/automations/base.py:156 ops/models/base.py:51
-#: ops/models/job.py:235 xpack/plugins/cloud/models.py:225
-msgid "Result"
-msgstr ""
-
-#: accounts/templates/accounts/check_account_report.html:106
-msgid "No weak password"
+#: accounts/templates/accounts/check_account_report.html:48
+msgid "No secret"
 msgstr ""
 
 #: accounts/templates/accounts/gather_account_report.html:65
@@ -1785,7 +1755,7 @@ msgstr ""
 #: assets/models/cmd_filter.py:81 audits/models.py:93 audits/serializers.py:108
 #: authentication/serializers/connect_token_secret.py:119
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:52 perms/serializers/permission.py:74
+#: perms/serializers/permission.py:63 perms/serializers/permission.py:85
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
 msgstr ""
@@ -1795,7 +1765,7 @@ msgstr ""
 msgid "Reviewers"
 msgstr ""
 
-#: acls/models/base.py:81 perms/serializers/permission.py:42
+#: acls/models/base.py:81 perms/serializers/permission.py:53
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:420
 msgid "Users"
@@ -2396,7 +2366,7 @@ msgstr ""
 
 #: assets/models/asset/common.py:176 assets/serializers/asset/common.py:174
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
-#: perms/serializers/permission.py:47
+#: perms/serializers/permission.py:58
 msgid "Nodes"
 msgstr ""
 
@@ -2494,6 +2464,11 @@ msgstr ""
 #: ops/models/base.py:52 ops/models/job.py:236
 #: xpack/plugins/cloud/manager.py:103
 msgid "Summary"
+msgstr ""
+
+#: assets/models/automations/base.py:156 ops/models/base.py:51
+#: ops/models/job.py:235 xpack/plugins/cloud/models.py:225
+msgid "Result"
 msgstr ""
 
 #: assets/models/automations/gather_facts.py:15
@@ -2789,7 +2764,7 @@ msgstr ""
 #: assets/serializers/asset/common.py:147 assets/serializers/platform.py:174
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:56
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:390
 #: xpack/plugins/cloud/serializers/task.py:36
 msgid "Protocols"
@@ -4151,7 +4126,7 @@ msgid "Actions"
 msgstr ""
 
 #: authentication/serializers/connection_token.py:43
-#: perms/serializers/permission.py:54 perms/serializers/permission.py:75
+#: perms/serializers/permission.py:65 perms/serializers/permission.py:86
 #: users/serializers/user.py:127 users/serializers/user.py:261
 msgid "Is expired"
 msgstr "Expired"
@@ -4189,8 +4164,8 @@ msgstr ""
 msgid "Not a valid ssh public key"
 msgstr ""
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:53
-#: perms/serializers/permission.py:76 users/serializers/user.py:128
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:64
+#: perms/serializers/permission.py:87 users/serializers/user.py:128
 #: users/serializers/user.py:258
 msgid "Is valid"
 msgstr "Is Valid"
@@ -4961,7 +4936,7 @@ msgstr ""
 msgid "Invalid choice: {}"
 msgstr ""
 
-#: common/serializers/mixin.py:452 terminal/models/applet/applet.py:45
+#: common/serializers/mixin.py:451 terminal/models/applet/applet.py:45
 #: terminal/models/virtualapp/virtualapp.py:29
 msgid "Tags"
 msgstr ""
@@ -5785,7 +5760,7 @@ msgstr ""
 msgid "Can not delete virtual org"
 msgstr ""
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:48
+#: orgs/serializers.py:10 perms/serializers/permission.py:59
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr ""
@@ -5794,7 +5769,7 @@ msgstr ""
 msgid "User groups amount"
 msgstr ""
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:51
+#: orgs/serializers.py:14 perms/serializers/permission.py:62
 msgid "Nodes amount"
 msgstr ""
 
@@ -5911,17 +5886,17 @@ msgstr ""
 msgid "asset permissions of organization {}"
 msgstr ""
 
-#: perms/serializers/permission.py:32
+#: perms/serializers/permission.py:43
 msgid ""
 "Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
 "choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
 msgstr ""
 
-#: perms/serializers/permission.py:38
+#: perms/serializers/permission.py:49
 msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
 msgstr ""
 
-#: perms/serializers/permission.py:49
+#: perms/serializers/permission.py:60
 msgid "Groups amount"
 msgstr ""
 
@@ -7084,7 +7059,7 @@ msgstr ""
 msgid "Command blacklist in Adhoc"
 msgstr ""
 
-#: settings/serializers/feature.py:197
+#: settings/serializers/feature.py:198
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -7092,11 +7067,11 @@ msgstr ""
 msgid "Virtual app"
 msgstr ""
 
-#: settings/serializers/feature.py:200
+#: settings/serializers/feature.py:201
 msgid "Virtual App"
 msgstr ""
 
-#: settings/serializers/feature.py:202
+#: settings/serializers/feature.py:203
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -7994,11 +7969,6 @@ msgstr ""
 msgid "High"
 msgstr ""
 
-#: terminal/const.py:47 terminal/const.py:86
-#: users/templates/users/reset_password.html:54
-msgid "Normal"
-msgstr ""
-
 #: terminal/const.py:48
 msgid "Offline"
 msgstr ""
@@ -8282,23 +8252,23 @@ msgstr ""
 msgid "Error reason"
 msgstr ""
 
-#: terminal/models/session/session.py:315
+#: terminal/models/session/session.py:319
 msgid "Session record"
 msgstr ""
 
-#: terminal/models/session/session.py:317
+#: terminal/models/session/session.py:321
 msgid "Can monitor session"
 msgstr ""
 
-#: terminal/models/session/session.py:318
+#: terminal/models/session/session.py:322
 msgid "Can share session"
 msgstr ""
 
-#: terminal/models/session/session.py:319
+#: terminal/models/session/session.py:323
 msgid "Can terminate session"
 msgstr ""
 
-#: terminal/models/session/session.py:320
+#: terminal/models/session/session.py:324
 msgid "Can validate session action perm"
 msgstr ""
 

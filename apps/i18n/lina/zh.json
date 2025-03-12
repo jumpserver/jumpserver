@@ -1517,5 +1517,6 @@
     "IgnoreFail": "忽略失败",
     "RiskDetectionDetail": "风险检测详情",
     "ApplicationDetail": "应用详情",
+    "Organization": "组织",
     "IpGroupHelpText": "* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 }
