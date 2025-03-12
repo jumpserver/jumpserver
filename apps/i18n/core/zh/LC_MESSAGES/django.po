@@ -115,7 +115,7 @@ msgstr ""
 
 #: accounts/automations/push_account/manager.py:30
 msgid "Secret cannot be empty"
-msgstr "{} 不能为空"
+msgstr "密文不能为空"
 
 #: accounts/automations/verify_gateway_account/manager.py:18
 msgid ">>> Start executing the task to test gateway account connectivity"
