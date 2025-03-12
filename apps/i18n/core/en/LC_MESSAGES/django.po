@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-07 15:03+0800\n"
+"POT-Creation-Date: 2025-03-12 10:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgid "Account already exists"
 msgstr ""
 
 #: accounts/api/account/application.py:78
-#: authentication/api/connection_token.py:449
+#: authentication/api/connection_token.py:452
 msgid "Account not found"
 msgstr ""
 
@@ -47,8 +47,8 @@ msgstr ""
 
 #: accounts/automations/backup_account/handlers.py:168
 #: accounts/automations/backup_account/manager.py:26
-#: accounts/automations/change_secret/manager.py:95
-#: accounts/automations/push_account/manager.py:61
+#: accounts/automations/change_secret/manager.py:93
+#: accounts/automations/push_account/manager.py:59
 #: assets/models/automations/base.py:145 ops/serializers/job.py:71
 #: ops/serializers/job.py:95
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
@@ -89,21 +89,29 @@ msgid "The account backup plan is being executed"
 msgstr ""
 
 #: accounts/automations/backup_account/manager.py:24
-#: accounts/automations/change_secret/manager.py:93
-#: accounts/automations/push_account/manager.py:59
+#: accounts/automations/change_secret/manager.py:91
+#: accounts/automations/push_account/manager.py:57
 msgid "Plan execution end"
 msgstr ""
 
-#: accounts/automations/base/manager.py:109
+#: accounts/automations/base/manager.py:106
 msgid "No pending accounts found"
 msgstr ""
 
-#: accounts/automations/change_secret/manager.py:86
+#: accounts/automations/change_secret/manager.py:84
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr ""
 
-#: accounts/automations/push_account/manager.py:31
+#: accounts/automations/check_account/manager.py:270
+msgid ""
+"---\n"
+"Summary: \n"
+"ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no "
+"secret: {}, using time: {}s"
+msgstr ""
+
+#: accounts/automations/push_account/manager.py:30
 msgid "Secret cannot be empty"
 msgstr ""
 
@@ -300,7 +308,7 @@ msgstr ""
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:61 users/forms/profile.py:101
-#: users/forms/profile.py:111 users/models/user/__init__.py:66
+#: users/forms/profile.py:111 users/models/user/__init__.py:61
 #: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
@@ -320,7 +328,7 @@ msgid "Success"
 msgstr "Success"
 
 #: accounts/const/automation.py:117 common/const/choices.py:64
-#: common/const/choices.py:111 terminal/const.py:79 tickets/const.py:29
+#: common/const/choices.py:113 terminal/const.py:79 tickets/const.py:29
 #: tickets/const.py:38
 msgid "Pending"
 msgstr ""
@@ -329,7 +337,7 @@ msgstr ""
 msgid "Can login"
 msgstr ""
 
-#: accounts/const/automation.py:122 users/serializers/user.py:271
+#: accounts/const/automation.py:122 users/serializers/user.py:254
 msgid "Superuser"
 msgstr ""
 
@@ -358,7 +366,7 @@ msgid "Default tablespace"
 msgstr ""
 
 #: accounts/const/automation.py:129 rbac/models/role.py:46
-#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:74
+#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:69
 msgid "Role"
 msgstr ""
 
@@ -367,7 +375,7 @@ msgid "Privileged"
 msgstr ""
 
 #: accounts/const/automation.py:131 perms/serializers/permission.py:44
-#: users/serializers/user.py:262
+#: users/serializers/user.py:245
 msgid "Groups"
 msgstr ""
 
@@ -420,7 +428,7 @@ msgstr ""
 msgid "User %s view/export secret"
 msgstr ""
 
-#: accounts/models/account.py:65
+#: accounts/models/account.py:83
 #: accounts/models/automations/check_account.py:62
 #: accounts/models/automations/gather_account.py:16
 #: accounts/serializers/account/account.py:226
@@ -431,17 +439,17 @@ msgstr ""
 #: accounts/serializers/automations/gather_account.py:47
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
-#: accounts/templates/accounts/change_secret_report.html:72
-#: accounts/templates/accounts/change_secret_report.html:104
-#: accounts/templates/accounts/check_account_report.html:79
-#: accounts/templates/accounts/gather_account_report.html:71
-#: accounts/templates/accounts/gather_account_report.html:103
-#: accounts/templates/accounts/push_account_report.html:72
-#: accounts/templates/accounts/push_account_report.html:104
+#: accounts/templates/accounts/change_secret_report.html:79
+#: accounts/templates/accounts/change_secret_report.html:119
+#: accounts/templates/accounts/check_account_report.html:89
+#: accounts/templates/accounts/gather_account_report.html:77
+#: accounts/templates/accounts/gather_account_report.html:117
+#: accounts/templates/accounts/push_account_report.html:78
+#: accounts/templates/accounts/push_account_report.html:118
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
 #: assets/models/asset/common.py:366 assets/models/cmd_filter.py:36
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:228
-#: authentication/models/connection_token.py:39
+#: authentication/models/connection_token.py:40
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:34 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
@@ -451,7 +459,7 @@ msgstr ""
 msgid "Asset"
 msgstr ""
 
-#: accounts/models/account.py:69 accounts/models/template.py:16
+#: accounts/models/account.py:87 accounts/models/template.py:16
 #: accounts/serializers/account/account.py:233
 #: accounts/serializers/account/account.py:284
 #: accounts/serializers/account/template.py:35
@@ -459,46 +467,46 @@ msgstr ""
 msgid "Su from"
 msgstr "Switch from"
 
-#: accounts/models/account.py:71 assets/const/protocol.py:195
+#: accounts/models/account.py:89 assets/const/protocol.py:195
 #: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:36
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Version"
 msgstr ""
 
-#: accounts/models/account.py:73
+#: accounts/models/account.py:91
 msgid "historical Account"
 msgstr ""
 
-#: accounts/models/account.py:74
+#: accounts/models/account.py:92
 msgid "Secret reset"
 msgstr ""
 
-#: accounts/models/account.py:75 accounts/serializers/account/account.py:228
-#: users/models/user/__init__.py:127
+#: accounts/models/account.py:93 accounts/serializers/account/account.py:228
+#: users/models/user/__init__.py:122
 msgid "Source"
 msgstr ""
 
-#: accounts/models/account.py:76
+#: accounts/models/account.py:94
 msgid "Source ID"
 msgstr ""
 
-#: accounts/models/account.py:77
+#: accounts/models/account.py:95
 msgid "Date last access"
 msgstr ""
 
-#: accounts/models/account.py:78
+#: accounts/models/account.py:96
 msgid "Access by"
 msgstr "Access by"
 
-#: accounts/models/account.py:79
+#: accounts/models/account.py:97
 msgid "Date change secret"
 msgstr ""
 
-#: accounts/models/account.py:81
+#: accounts/models/account.py:99
 msgid "Change secret status"
 msgstr ""
 
-#: accounts/models/account.py:85
+#: accounts/models/account.py:103
 #: accounts/models/automations/check_account.py:67
 #: accounts/serializers/account/service.py:11
 #: accounts/serializers/automations/change_secret.py:115
@@ -507,7 +515,7 @@ msgstr ""
 #: acls/serializers/base.py:131
 #: acls/templates/acls/asset_login_reminder.html:10
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:313
-#: audits/serializers.py:229 authentication/api/connection_token.py:461
+#: audits/serializers.py:229 authentication/api/connection_token.py:464
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:36 terminal/serializers/command.py:72
@@ -518,27 +526,27 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: accounts/models/account.py:91
+#: accounts/models/account.py:109
 msgid "Can view asset account secret"
 msgstr ""
 
-#: accounts/models/account.py:92
+#: accounts/models/account.py:110
 msgid "Can view asset history account"
 msgstr ""
 
-#: accounts/models/account.py:93
+#: accounts/models/account.py:111
 msgid "Can view asset history account secret"
 msgstr ""
 
-#: accounts/models/account.py:94
+#: accounts/models/account.py:112
 msgid "Can verify account"
 msgstr ""
 
-#: accounts/models/account.py:95
+#: accounts/models/account.py:113
 msgid "Can push account"
 msgstr ""
 
-#: accounts/models/account.py:96
+#: accounts/models/account.py:114
 msgid "Can remove account"
 msgstr ""
 
@@ -571,7 +579,7 @@ msgstr ""
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:13
-#: users/models/preference.py:11 users/models/user/__init__.py:65
+#: users/models/preference.py:11 users/models/user/__init__.py:60
 #: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:310
 #: xpack/plugins/cloud/serializers/task.py:77
 msgid "Name"
@@ -611,7 +619,7 @@ msgstr ""
 
 #: accounts/models/application.py:24 acls/models/base.py:43
 #: assets/models/asset/common.py:178 authentication/models/access_key.py:23
-#: authentication/models/connection_token.py:57
+#: authentication/models/connection_token.py:58
 #: authentication/models/ssh_key.py:13
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:28
@@ -827,8 +835,8 @@ msgid "Long time no change"
 msgstr ""
 
 #: accounts/models/automations/check_account.py:52
-#: accounts/templates/accounts/check_account_report.html:70
-#: accounts/templates/accounts/check_account_report.html:90
+#: accounts/templates/accounts/check_account_report.html:77
+#: accounts/templates/accounts/check_account_report.html:100
 msgid "Weak password"
 msgstr ""
 
@@ -855,13 +863,13 @@ msgstr ""
 #: accounts/models/automations/check_account.py:64
 #: accounts/models/automations/gather_account.py:17 accounts/models/base.py:64
 #: accounts/serializers/account/virtual.py:21
-#: accounts/templates/accounts/change_secret_report.html:73
-#: accounts/templates/accounts/change_secret_report.html:105
-#: accounts/templates/accounts/check_account_report.html:80
-#: accounts/templates/accounts/gather_account_report.html:72
-#: accounts/templates/accounts/gather_account_report.html:104
-#: accounts/templates/accounts/push_account_report.html:73
-#: accounts/templates/accounts/push_account_report.html:105
+#: accounts/templates/accounts/change_secret_report.html:80
+#: accounts/templates/accounts/change_secret_report.html:120
+#: accounts/templates/accounts/check_account_report.html:90
+#: accounts/templates/accounts/gather_account_report.html:78
+#: accounts/templates/accounts/gather_account_report.html:118
+#: accounts/templates/accounts/push_account_report.html:79
+#: accounts/templates/accounts/push_account_report.html:119
 #: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:189
 #: authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:9
@@ -869,7 +877,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: authentication/templates/authentication/login.html:408
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
-#: users/forms/profile.py:117 users/models/user/__init__.py:64
+#: users/forms/profile.py:117 users/models/user/__init__.py:59
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
@@ -1005,7 +1013,7 @@ msgstr ""
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:41
-#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:274
+#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:257
 msgid "Is active"
 msgstr "Active"
 
@@ -1059,49 +1067,49 @@ msgid ""
 "web-based and custom-type assets"
 msgstr ""
 
-#: accounts/notifications.py:13 accounts/notifications.py:38
+#: accounts/notifications.py:12 accounts/notifications.py:37
 msgid "Notification of account backup route task results"
 msgstr ""
 
-#: accounts/notifications.py:23 accounts/notifications.py:47
+#: accounts/notifications.py:22 accounts/notifications.py:46
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
 msgstr ""
 
-#: accounts/notifications.py:26
+#: accounts/notifications.py:25
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
 "encryption password for preference settings"
 msgstr ""
 
-#: accounts/notifications.py:57
+#: accounts/notifications.py:56
 msgid "Notification of implementation result of encryption change plan"
 msgstr ""
 
-#: accounts/notifications.py:68
+#: accounts/notifications.py:67
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr ""
 
-#: accounts/notifications.py:72
+#: accounts/notifications.py:71
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
 "password in preferences"
 msgstr ""
 
-#: accounts/notifications.py:84
+#: accounts/notifications.py:83
 msgid "Gather account change information"
 msgstr ""
 
-#: accounts/notifications.py:106
+#: accounts/notifications.py:105
 msgid "Change secret or push account failed information"
 msgstr ""
 
-#: accounts/risk_handlers.py:17 common/const/choices.py:113
+#: accounts/risk_handlers.py:17 common/const/choices.py:115
 msgid "Ignored"
 msgstr ""
 
@@ -1163,7 +1171,7 @@ msgstr ""
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:146 assets/serializers/platform.py:160
 #: assets/serializers/platform.py:172 audits/serializers.py:77
-#: audits/serializers.py:194 authentication/models/connection_token.py:61
+#: audits/serializers.py:194 authentication/models/connection_token.py:62
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
@@ -1199,7 +1207,7 @@ msgstr ""
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
-#: authentication/api/connection_token.py:460 ops/models/base.py:17
+#: authentication/api/connection_token.py:463 ops/models/base.py:17
 #: ops/models/job.py:155 ops/serializers/job.py:21
 #: perms/serializers/permission.py:46
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -1235,7 +1243,7 @@ msgstr ""
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
 #: audits/models.py:91 audits/models.py:173 audits/models.py:272
-#: audits/serializers.py:195 authentication/models/connection_token.py:35
+#: audits/serializers.py:195 authentication/models/connection_token.py:36
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
@@ -1247,8 +1255,8 @@ msgstr ""
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
-#: users/const.py:14 users/models/user/__init__.py:292
-#: users/models/user/__init__.py:319
+#: users/const.py:14 users/models/user/__init__.py:287
+#: users/models/user/__init__.py:314
 msgid "User"
 msgstr ""
 
@@ -1283,14 +1291,14 @@ msgstr ""
 #: terminal/models/component/endpoint.py:122
 #: terminal/models/session/session.py:49
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:99
+#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:94
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:124
 msgid "Comment"
 msgstr "Description"
 
 #: accounts/serializers/account/service.py:28
-#: accounts/templates/accounts/backup_account_report.html:39
-#: accounts/templates/accounts/check_account_report.html:39
+#: accounts/templates/accounts/backup_account_report.html:28
+#: accounts/templates/accounts/check_account_report.html:28
 #: assets/serializers/asset/common.py:151
 msgid "Accounts amount"
 msgstr ""
@@ -1562,27 +1570,19 @@ msgstr ""
 msgid "Deleted account"
 msgstr ""
 
-#: accounts/templates/accounts/backup_account_report.html:14
-msgid ""
-"The following is a summary of account backup tasks, please review and handle "
-"them"
+#: accounts/templates/accounts/backup_account_report.html:13
+#: accounts/templates/accounts/change_secret_report.html:13
+#: accounts/templates/accounts/check_account_report.html:13
+#: accounts/templates/accounts/gather_account_report.html:11
+#: accounts/templates/accounts/push_account_report.html:12
+msgid "Basic Information"
 msgstr ""
 
-#: accounts/templates/accounts/backup_account_report.html:23
-#: accounts/templates/accounts/change_secret_failed_info.html:3
-#: accounts/templates/accounts/change_secret_report.html:24
-#: accounts/templates/accounts/check_account_report.html:23
-#: accounts/templates/accounts/gather_account_report.html:23
-#: accounts/templates/accounts/push_account_report.html:24
-#: terminal/serializers/task.py:10
-msgid "Task name"
-msgstr ""
-
-#: accounts/templates/accounts/backup_account_report.html:27
-#: accounts/templates/accounts/change_secret_report.html:28
-#: accounts/templates/accounts/check_account_report.html:27
-#: accounts/templates/accounts/gather_account_report.html:27
-#: accounts/templates/accounts/push_account_report.html:28
+#: accounts/templates/accounts/backup_account_report.html:18
+#: accounts/templates/accounts/change_secret_report.html:18
+#: accounts/templates/accounts/check_account_report.html:18
+#: accounts/templates/accounts/gather_account_report.html:16
+#: accounts/templates/accounts/push_account_report.html:17
 #: assets/models/automations/base.py:142 audits/models.py:66
 #: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:239
 #: ops/templates/ops/celery_task_log.html:101
@@ -1594,22 +1594,32 @@ msgstr ""
 msgid "Date start"
 msgstr ""
 
-#: accounts/templates/accounts/backup_account_report.html:31
-#: accounts/templates/accounts/change_secret_report.html:32
-#: accounts/templates/accounts/check_account_report.html:31
-#: accounts/templates/accounts/gather_account_report.html:31
-#: accounts/templates/accounts/push_account_report.html:32
+#: accounts/templates/accounts/backup_account_report.html:23
+#: accounts/templates/accounts/change_secret_report.html:23
+#: accounts/templates/accounts/check_account_report.html:23
+#: accounts/templates/accounts/gather_account_report.html:21
+#: accounts/templates/accounts/push_account_report.html:22
 #: settings/serializers/feature.py:28
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
 #: terminal/models/session/session.py:48
 msgid "Date end"
 msgstr ""
 
-#: accounts/templates/accounts/backup_account_report.html:35
-#: accounts/templates/accounts/change_secret_report.html:36
-#: accounts/templates/accounts/check_account_report.html:35
-#: accounts/templates/accounts/gather_account_report.html:35
-#: accounts/templates/accounts/push_account_report.html:36
+#: accounts/templates/accounts/backup_account_report.html:33
+#: accounts/templates/accounts/change_secret_failed_info.html:3
+#: accounts/templates/accounts/change_secret_report.html:48
+#: accounts/templates/accounts/check_account_report.html:48
+#: accounts/templates/accounts/gather_account_report.html:46
+#: accounts/templates/accounts/push_account_report.html:47
+#: terminal/serializers/task.py:10
+msgid "Task name"
+msgstr ""
+
+#: accounts/templates/accounts/backup_account_report.html:38
+#: accounts/templates/accounts/change_secret_report.html:53
+#: accounts/templates/accounts/check_account_report.html:53
+#: accounts/templates/accounts/gather_account_report.html:51
+#: accounts/templates/accounts/push_account_report.html:52
 msgid "Time using"
 msgstr ""
 
@@ -1631,107 +1641,87 @@ msgid ""
 "or pushing the account. Please check and handle it in time."
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:15
-msgid ""
-"The following is a summary of account change secret tasks, please read and "
-"process"
-msgstr ""
-
-#: accounts/templates/accounts/change_secret_report.html:40
-#: accounts/templates/accounts/gather_account_report.html:39
-#: accounts/templates/accounts/push_account_report.html:40
+#: accounts/templates/accounts/change_secret_report.html:28
+#: accounts/templates/accounts/gather_account_report.html:26
+#: accounts/templates/accounts/push_account_report.html:27
 #: assets/serializers/domain.py:24 assets/serializers/platform.py:182
 #: orgs/serializers.py:13 perms/serializers/permission.py:50
 msgid "Assets amount"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:44
-#: accounts/templates/accounts/check_account_report.html:51
-#: accounts/templates/accounts/gather_account_report.html:43
-#: accounts/templates/accounts/push_account_report.html:44
+#: accounts/templates/accounts/change_secret_report.html:33
+#: accounts/templates/accounts/check_account_report.html:33
+#: accounts/templates/accounts/gather_account_report.html:31
+#: accounts/templates/accounts/push_account_report.html:32
 msgid "Asset success count"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:48
-#: accounts/templates/accounts/check_account_report.html:55
-#: accounts/templates/accounts/gather_account_report.html:47
-#: accounts/templates/accounts/push_account_report.html:48
+#: accounts/templates/accounts/change_secret_report.html:38
+#: accounts/templates/accounts/check_account_report.html:38
+#: accounts/templates/accounts/gather_account_report.html:36
+#: accounts/templates/accounts/push_account_report.html:37
 msgid "Asset failed count"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:52
-#: accounts/templates/accounts/check_account_report.html:59
-#: accounts/templates/accounts/gather_account_report.html:51
-#: accounts/templates/accounts/push_account_report.html:52
+#: accounts/templates/accounts/change_secret_report.html:43
+#: accounts/templates/accounts/check_account_report.html:43
+#: accounts/templates/accounts/gather_account_report.html:41
+#: accounts/templates/accounts/push_account_report.html:42
 msgid "Asset not support count"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:63
-#: accounts/templates/accounts/push_account_report.html:63
+#: accounts/templates/accounts/change_secret_report.html:67
+#: accounts/templates/accounts/push_account_report.html:66
 msgid "Success accounts"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:71
-#: accounts/templates/accounts/change_secret_report.html:103
-#: accounts/templates/accounts/check_account_report.html:78
-#: accounts/templates/accounts/gather_account_report.html:70
-#: accounts/templates/accounts/gather_account_report.html:102
-#: accounts/templates/accounts/push_account_report.html:71
-#: accounts/templates/accounts/push_account_report.html:103
+#: accounts/templates/accounts/change_secret_report.html:78
+#: accounts/templates/accounts/change_secret_report.html:118
+#: accounts/templates/accounts/check_account_report.html:88
+#: accounts/templates/accounts/push_account_report.html:77
+#: accounts/templates/accounts/push_account_report.html:117
 #: audits/handler.py:128
 msgid "No"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:87
-#: accounts/templates/accounts/change_secret_report.html:119
-#: accounts/templates/accounts/gather_account_report.html:86
-#: accounts/templates/accounts/gather_account_report.html:118
-#: accounts/templates/accounts/push_account_report.html:87
-#: accounts/templates/accounts/push_account_report.html:119
+#: accounts/templates/accounts/change_secret_report.html:94
+#: accounts/templates/accounts/change_secret_report.html:134
+#: accounts/templates/accounts/gather_account_report.html:92
+#: accounts/templates/accounts/gather_account_report.html:132
+#: accounts/templates/accounts/push_account_report.html:93
+#: accounts/templates/accounts/push_account_report.html:133
 msgid "No new accounts found"
 msgstr ""
 
-#: accounts/templates/accounts/change_secret_report.html:94
-#: accounts/templates/accounts/push_account_report.html:94
+#: accounts/templates/accounts/change_secret_report.html:107
+#: accounts/templates/accounts/push_account_report.html:106
 msgid "Failed accounts"
 msgstr ""
 
-#: accounts/templates/accounts/check_account_report.html:14
-#: accounts/templates/accounts/gather_account_report.html:14
-msgid ""
-"The following is a summary of the account check tasks. Please review and "
-"handle them"
-msgstr ""
-
-#: accounts/templates/accounts/check_account_report.html:43
+#: accounts/templates/accounts/check_account_report.html:58
 msgid "Ok count"
 msgstr ""
 
-#: accounts/templates/accounts/check_account_report.html:47
+#: accounts/templates/accounts/check_account_report.html:63
 msgid "No password count"
 msgstr ""
 
-#: accounts/templates/accounts/check_account_report.html:81
+#: accounts/templates/accounts/check_account_report.html:91
 #: assets/models/automations/base.py:156 ops/models/base.py:51
 #: ops/models/job.py:235 xpack/plugins/cloud/models.py:225
 msgid "Result"
 msgstr ""
 
-#: accounts/templates/accounts/check_account_report.html:96
+#: accounts/templates/accounts/check_account_report.html:106
 msgid "No weak password"
 msgstr ""
 
-#: accounts/templates/accounts/gather_account_report.html:62
+#: accounts/templates/accounts/gather_account_report.html:65
 msgid "New found accounts"
 msgstr ""
 
-#: accounts/templates/accounts/gather_account_report.html:93
+#: accounts/templates/accounts/gather_account_report.html:105
 msgid "Lost accounts"
-msgstr ""
-
-#: accounts/templates/accounts/push_account_report.html:15
-msgid ""
-"The following is a summary of account push tasks, please read and process"
 msgstr ""
 
 #: accounts/utils.py:54
@@ -1807,7 +1797,7 @@ msgstr ""
 
 #: acls/models/base.py:81 perms/serializers/permission.py:42
 #: tickets/models/flow.py:23 users/models/preference.py:16
-#: users/serializers/group.py:21 users/serializers/user.py:437
+#: users/serializers/group.py:21 users/serializers/user.py:420
 msgid "Users"
 msgstr ""
 
@@ -2057,7 +2047,7 @@ msgid ">>> Begin executing batch {index} of tasks"
 msgstr ""
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:144
+#: authentication/models/connection_token.py:145
 msgid "No account"
 msgstr ""
 
@@ -2321,7 +2311,7 @@ msgstr ""
 msgid "The database to authenticate against"
 msgstr ""
 
-#: assets/const/protocol.py:232 authentication/models/connection_token.py:46
+#: assets/const/protocol.py:232 authentication/models/connection_token.py:47
 msgid "Connect options"
 msgstr ""
 
@@ -2490,7 +2480,7 @@ msgstr ""
 
 #: assets/models/automations/base.py:139 assets/models/cmd_filter.py:41
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:238
-#: users/models/user/__init__.py:322
+#: users/models/user/__init__.py:317
 msgid "Date created"
 msgstr ""
 
@@ -2523,17 +2513,17 @@ msgid "Date verified"
 msgstr ""
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
-#: users/models/group.py:25 users/models/user/__init__.py:71
+#: users/models/group.py:25 users/models/user/__init__.py:66
 msgid "User group"
 msgstr ""
 
 #: assets/models/cmd_filter.py:42 common/db/models.py:35
-#: users/models/user/__init__.py:150
+#: users/models/user/__init__.py:145
 msgid "Date updated"
 msgstr ""
 
 #: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:91
-#: common/db/models.py:32 users/models/user/__init__.py:109
+#: common/db/models.py:32 users/models/user/__init__.py:104
 #: users/serializers/group.py:32
 msgid "Created by"
 msgstr ""
@@ -2577,7 +2567,7 @@ msgstr ""
 #: assets/models/label.py:19 assets/models/node.py:539
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
-#: authentication/models/connection_token.py:32
+#: authentication/models/connection_token.py:33
 #: authentication/serializers/connect_token_secret.py:125
 #: common/serializers/common.py:86 labels/models.py:12 settings/models.py:38
 #: users/models/preference.py:13
@@ -3352,7 +3342,7 @@ msgstr ""
 
 #: audits/models.py:201 audits/serializers.py:76
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:64 users/models/user/__init__.py:87
+#: users/forms/profile.py:64 users/models/user/__init__.py:82
 #: users/serializers/profile.py:71
 msgid "MFA"
 msgstr ""
@@ -3424,10 +3414,10 @@ msgstr ""
 msgid "%s %s this resource"
 msgstr ""
 
-#: audits/serializers.py:196 authentication/models/connection_token.py:50
+#: audits/serializers.py:196 authentication/models/connection_token.py:51
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:106
+#: tickets/models/ticket/apply_asset.py:20 users/models/user/__init__.py:101
 msgid "Date expired"
 msgstr ""
 
@@ -3466,14 +3456,14 @@ msgstr ""
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:79 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
-#: users/models/user/__init__.py:130 users/models/user/_source.py:19
+#: users/models/user/__init__.py:125 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
 #: authentication/views/login.py:91 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
-#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:136
+#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:131
 #: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr ""
@@ -3481,13 +3471,13 @@ msgstr ""
 #: audits/signal_handlers/login_log.py:40 authentication/views/login.py:103
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
-#: users/models/user/__init__.py:142 users/models/user/_source.py:23
+#: users/models/user/__init__.py:137 users/models/user/_source.py:23
 msgid "Slack"
 msgstr ""
 
 #: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
 #: authentication/views/login.py:85 notifications/backends/__init__.py:12
-#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:133
+#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:128
 #: users/models/user/_source.py:20
 msgid "DingTalk"
 msgstr ""
@@ -3550,31 +3540,31 @@ msgstr ""
 msgid "Anonymous account is not supported for this asset"
 msgstr ""
 
-#: authentication/api/connection_token.py:452
+#: authentication/api/connection_token.py:455
 msgid "Permission expired"
 msgstr ""
 
-#: authentication/api/connection_token.py:485
+#: authentication/api/connection_token.py:488
 msgid "ACL action is reject: {}({})"
 msgstr ""
 
-#: authentication/api/connection_token.py:489
+#: authentication/api/connection_token.py:492
 msgid "ACL action is review"
 msgstr ""
 
-#: authentication/api/connection_token.py:499
+#: authentication/api/connection_token.py:502
 msgid "ACL action is face verify"
 msgstr ""
 
-#: authentication/api/connection_token.py:504
+#: authentication/api/connection_token.py:507
 msgid "ACL action not supported for this asset"
 msgstr ""
 
-#: authentication/api/connection_token.py:511
+#: authentication/api/connection_token.py:514
 msgid "ACL action is face online"
 msgstr ""
 
-#: authentication/api/connection_token.py:530
+#: authentication/api/connection_token.py:533
 msgid "No available face feature"
 msgstr ""
 
@@ -3983,21 +3973,21 @@ msgstr ""
 msgid "Please change your password"
 msgstr ""
 
-#: authentication/models/connection_token.py:41
+#: authentication/models/connection_token.py:42
 #: terminal/serializers/storage.py:114
 msgid "Account name"
 msgstr ""
 
-#: authentication/models/connection_token.py:42
+#: authentication/models/connection_token.py:43
 msgid "Input username"
 msgstr ""
 
-#: authentication/models/connection_token.py:43
+#: authentication/models/connection_token.py:44
 #: authentication/serializers/connection_token.py:18
 msgid "Input secret"
 msgstr ""
 
-#: authentication/models/connection_token.py:44
+#: authentication/models/connection_token.py:45
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
@@ -4006,69 +3996,69 @@ msgstr ""
 msgid "Protocol"
 msgstr ""
 
-#: authentication/models/connection_token.py:45
+#: authentication/models/connection_token.py:46
 msgid "Connect method"
 msgstr ""
 
-#: authentication/models/connection_token.py:47
+#: authentication/models/connection_token.py:48
 msgid "User display"
 msgstr ""
 
-#: authentication/models/connection_token.py:48
+#: authentication/models/connection_token.py:49
 msgid "Asset display"
 msgstr ""
 
-#: authentication/models/connection_token.py:49
+#: authentication/models/connection_token.py:50
 msgid "Reusable"
 msgstr ""
 
-#: authentication/models/connection_token.py:54
+#: authentication/models/connection_token.py:55
 #: perms/models/asset_permission.py:83
 msgid "From ticket"
 msgstr ""
 
-#: authentication/models/connection_token.py:56
+#: authentication/models/connection_token.py:57
 msgid "Face monitor token"
 msgstr ""
 
-#: authentication/models/connection_token.py:67
+#: authentication/models/connection_token.py:68
 msgid "Can expire connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:68
+#: authentication/models/connection_token.py:69
 msgid "Can reuse connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:70
+#: authentication/models/connection_token.py:71
 msgid "Connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:131
+#: authentication/models/connection_token.py:132
 msgid "Connection token inactive"
 msgstr ""
 
-#: authentication/models/connection_token.py:135
+#: authentication/models/connection_token.py:136
 msgid "Connection token expired at: {}"
 msgstr ""
 
-#: authentication/models/connection_token.py:138
+#: authentication/models/connection_token.py:139
 #: terminal/serializers/session.py:95
 msgid "No user or invalid user"
 msgstr ""
 
-#: authentication/models/connection_token.py:141
+#: authentication/models/connection_token.py:142
 msgid "No asset or inactive asset"
 msgstr ""
 
-#: authentication/models/connection_token.py:289
+#: authentication/models/connection_token.py:290
 msgid "Can view super connection token secret"
 msgstr ""
 
-#: authentication/models/connection_token.py:291
+#: authentication/models/connection_token.py:292
 msgid "Super connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:308
+#: authentication/models/connection_token.py:309
 msgid "Admin connection token"
 msgstr ""
 
@@ -4077,13 +4067,13 @@ msgid "Private Token"
 msgstr ""
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
-#: users/models/user/__init__.py:94
+#: users/models/user/__init__.py:89
 #: xpack/plugins/cloud/serializers/account_attrs.py:214
 msgid "Private key"
 msgstr ""
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:34
-#: users/forms/profile.py:175 users/models/user/__init__.py:97
+#: users/forms/profile.py:175 users/models/user/__init__.py:92
 #: xpack/plugins/cloud/serializers/account_attrs.py:211
 msgid "Public key"
 msgstr ""
@@ -4162,7 +4152,7 @@ msgstr ""
 
 #: authentication/serializers/connection_token.py:43
 #: perms/serializers/permission.py:54 perms/serializers/permission.py:75
-#: users/serializers/user.py:127 users/serializers/user.py:278
+#: users/serializers/user.py:127 users/serializers/user.py:261
 msgid "Is expired"
 msgstr "Expired"
 
@@ -4201,7 +4191,7 @@ msgstr ""
 
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:53
 #: perms/serializers/permission.py:76 users/serializers/user.py:128
-#: users/serializers/user.py:275
+#: users/serializers/user.py:258
 msgid "Is valid"
 msgstr "Is Valid"
 
@@ -4623,27 +4613,27 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: common/const/choices.py:112
+#: common/const/choices.py:114
 msgid "Confirmed"
 msgstr ""
 
-#: common/const/choices.py:120 terminal/models/applet/applet.py:31
+#: common/const/choices.py:122 terminal/models/applet/applet.py:31
 msgid "Community edition"
 msgstr ""
 
-#: common/const/choices.py:121
+#: common/const/choices.py:123
 msgid "Basic edition"
 msgstr ""
 
-#: common/const/choices.py:122
+#: common/const/choices.py:124
 msgid "Standard edition"
 msgstr ""
 
-#: common/const/choices.py:123
+#: common/const/choices.py:125
 msgid "Professional edition"
 msgstr ""
 
-#: common/const/choices.py:124
+#: common/const/choices.py:126
 msgid "Ultimate edition"
 msgstr ""
 
@@ -4729,7 +4719,7 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: common/db/models.py:33 users/models/user/__init__.py:112
+#: common/db/models.py:33 users/models/user/__init__.py:107
 msgid "Updated by"
 msgstr ""
 
@@ -6794,7 +6784,7 @@ msgstr ""
 msgid "Template code"
 msgstr ""
 
-#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:84
+#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:79
 #: users/serializers/user.py:159
 msgid "Phone"
 msgstr ""
@@ -9424,60 +9414,60 @@ msgstr ""
 msgid "Preference"
 msgstr ""
 
-#: users/models/user/__init__.py:77 users/serializers/user.py:276
+#: users/models/user/__init__.py:72 users/serializers/user.py:259
 msgid "Is service account"
 msgstr "Is service account"
 
-#: users/models/user/__init__.py:79
+#: users/models/user/__init__.py:74
 msgid "Avatar"
 msgstr ""
 
-#: users/models/user/__init__.py:81
+#: users/models/user/__init__.py:76
 msgid "Wechat"
 msgstr ""
 
-#: users/models/user/__init__.py:90
+#: users/models/user/__init__.py:85
 msgid "OTP secret key"
 msgstr ""
 
-#: users/models/user/__init__.py:100 users/serializers/profile.py:98
-#: users/serializers/user.py:273
+#: users/models/user/__init__.py:95 users/serializers/profile.py:98
+#: users/serializers/user.py:256
 msgid "Is first login"
 msgstr "First login"
 
-#: users/models/user/__init__.py:118
+#: users/models/user/__init__.py:113
 msgid "Date password last updated"
 msgstr "Password updated"
 
-#: users/models/user/__init__.py:121
+#: users/models/user/__init__.py:116
 msgid "Need update password"
 msgstr ""
 
-#: users/models/user/__init__.py:145
+#: users/models/user/__init__.py:140
 msgid "Face Vector"
 msgstr ""
 
-#: users/models/user/__init__.py:148
+#: users/models/user/__init__.py:143
 msgid "Date api key used"
 msgstr ""
 
-#: users/models/user/__init__.py:287
+#: users/models/user/__init__.py:282
 msgid "Can not delete admin user"
 msgstr ""
 
-#: users/models/user/__init__.py:301
+#: users/models/user/__init__.py:296
 msgid "Can invite user"
 msgstr ""
 
-#: users/models/user/__init__.py:302
+#: users/models/user/__init__.py:297
 msgid "Can remove user"
 msgstr ""
 
-#: users/models/user/__init__.py:303
+#: users/models/user/__init__.py:298
 msgid "Can match user"
 msgstr ""
 
-#: users/models/user/__init__.py:332
+#: users/models/user/__init__.py:327
 msgid "User password history"
 msgstr ""
 
@@ -9656,7 +9646,7 @@ msgstr ""
 msgid "Login blocked"
 msgstr ""
 
-#: users/serializers/user.py:130 users/serializers/user.py:282
+#: users/serializers/user.py:130 users/serializers/user.py:265
 msgid "Is OTP bound"
 msgstr "OTP bound"
 
@@ -9676,51 +9666,51 @@ msgstr "Can public key authentication"
 msgid "Is face code set"
 msgstr ""
 
-#: users/serializers/user.py:247
+#: users/serializers/user.py:230
 msgid "Full name"
 msgstr ""
 
-#: users/serializers/user.py:250
+#: users/serializers/user.py:233
 msgid "Login username"
 msgstr ""
 
-#: users/serializers/user.py:253
+#: users/serializers/user.py:236
 msgid "Email address"
 msgstr ""
 
-#: users/serializers/user.py:263
+#: users/serializers/user.py:246
 msgid "User groups to join"
 msgstr ""
 
-#: users/serializers/user.py:267
+#: users/serializers/user.py:250
 msgid ""
 "User source identifies where the user was created, which could be AD or "
 "other sources.There are security settings that can restrict users to log in "
 "to the system only from the sources."
 msgstr ""
 
-#: users/serializers/user.py:277
+#: users/serializers/user.py:260
 msgid "Is org admin"
 msgstr "Org admin"
 
-#: users/serializers/user.py:279
+#: users/serializers/user.py:262
 msgid "Avatar url"
 msgstr ""
 
-#: users/serializers/user.py:284
+#: users/serializers/user.py:267
 msgid "MFA level"
 msgstr "MFA"
 
-#: users/serializers/user.py:285
+#: users/serializers/user.py:268
 msgid "Multi-Factor Authentication"
 msgstr ""
 
-#: users/serializers/user.py:439
+#: users/serializers/user.py:422
 msgid ""
 "* For security, only a partial of users is displayed. You can search for more"
 msgstr ""
 
-#: users/serializers/user.py:474
+#: users/serializers/user.py:457
 msgid "name not unique"
 msgstr ""
 
@@ -9731,11 +9721,11 @@ msgid ""
 "administrator."
 msgstr ""
 
-#: users/signal_handlers.py:197
+#: users/signal_handlers.py:177
 msgid "Clean up expired user sessions"
 msgstr ""
 
-#: users/signal_handlers.py:199
+#: users/signal_handlers.py:179
 msgid ""
 "After logging in via the web, a user session record is created. At 2 a.m. "
 "every day, \n"
@@ -10794,17 +10784,15 @@ msgstr ""
 
 #: xpack/plugins/cloud/tasks.py:33
 msgid ""
-"\n"
-"        Execute this task when manually or scheduled cloud synchronization "
-"tasks are performed\n"
-"        "
+"Execute this task when manually or scheduled cloud synchronization tasks are "
+"performed"
 msgstr ""
 
-#: xpack/plugins/cloud/tasks.py:52
+#: xpack/plugins/cloud/tasks.py:50
 msgid "Period clean sync instance task execution"
 msgstr ""
 
-#: xpack/plugins/cloud/tasks.py:54
+#: xpack/plugins/cloud/tasks.py:52
 msgid ""
 "Every day, according to the configuration in \"System Settings - Tasks - "
 "Regular \n"

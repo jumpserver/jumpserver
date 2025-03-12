@@ -267,7 +267,7 @@ class CheckAccountManager(BaseManager):
         return "accounts/check_account_report.html"
 
     def print_summary(self):
-        tmpl = _("\n---\nSummary: \nok: {}, weak password: {}, leaked password: {}, "
+        tmpl = _("---\nSummary: \nok: {}, weak password: {}, leaked password: {}, "
                  "repeated password: {}, no secret: {}, using time: {}s").format(
             self.summary["ok"],
             self.summary[RiskChoice.weak_password],
