@@ -3,6 +3,7 @@
 from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from accounts.const import Source
 from accounts.models import AccountTemplate, Account
@@ -26,11 +27,21 @@ class ActionChoicesField(BitChoicesField):
     def to_file_internal_value(self, data):
         return data
 
+    @property
+    def default(self):
+        if self._default is empty:
+            return self._default
+        return self.to_representation(self._default)
+
+    @default.setter
+    def default(self, value):
+        self._default = value
+
 
 class PermAccountsSerializer(serializers.ListField):
     def get_render_help_text(self):
         return _('Accounts, format ["@virtual", "root", "%template_id"], '
-                'virtual choices: @ALL, @SPEC, @USER, @ANON, @INPUT')
+                 'virtual choices: @ALL, @SPEC, @USER, @ANON, @INPUT')
 
 
 class PermProtocolsSerializer(serializers.ListField):
@@ -71,7 +82,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
-            "actions": {"label": _("Action")},
+            "actions": {"label": _("Action"), },
             "is_expired": {"label": _("Is expired")},
             "is_valid": {"label": _("Is valid")},
         }
@@ -84,7 +95,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         actions = self.fields.get("actions")
         if not actions:
             return
-        actions.default = list(actions.choices.keys())
+        actions.default = ActionChoices.all()
 
     @staticmethod
     def get_all_assets(nodes, assets):
