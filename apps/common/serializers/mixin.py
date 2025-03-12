@@ -85,11 +85,11 @@ class BulkSerializerMixin(object):
             # since super by default strips out read-only fields
             # hence id will no longer be present in validated_data
             if all(
-                [
-                    isinstance(self.root, BulkListSerializer),
-                    id_attr,
-                    request_method in ("PUT", "PATCH"),
-                ]
+                    [
+                        isinstance(self.root, BulkListSerializer),
+                        id_attr,
+                        request_method in ("PUT", "PATCH"),
+                    ]
             ):
                 id_field = self.fields.get("id") or self.fields.get("pk")
                 if data.get("id"):
@@ -322,9 +322,9 @@ class DefaultValueFieldsMixin:
             if model_field is None:
                 continue
             if (
-                not hasattr(model_field, "field")
-                or not hasattr(model_field.field, "default")
-                or model_field.field.default == NOT_PROVIDED
+                    not hasattr(model_field, "field")
+                    or not hasattr(model_field.field, "default")
+                    or model_field.field.default == NOT_PROVIDED
             ):
                 continue
             if name == "id":
@@ -335,7 +335,6 @@ class DefaultValueFieldsMixin:
                 default = default()
             if default == "":
                 continue
-            # print(f"Set default value: {name}: {default}")
             serializer_field.default = default
 
 
