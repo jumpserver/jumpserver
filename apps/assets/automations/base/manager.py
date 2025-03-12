@@ -3,10 +3,10 @@ import json
 import logging
 import os
 import shutil
-import time
 from collections import defaultdict
 from socket import gethostname
 
+import time
 import yaml
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -137,23 +137,14 @@ class BaseManager:
         raise NotImplementedError
 
     def get_report_subject(self):
-        return f"Automation {self.execution.id} finished"
+        return _("Task: {} finished").format(self.execution.automation.name)
 
     def get_report_context(self):
-        logo = self.get_file_content("static/img/JumpServer_white_logo.svg")
         return {
             "execution": self.execution,
             "summary": self.execution.summary,
-            "result": self.execution.result,
-            "logo": logo,
+            "result": self.execution.result
         }
-
-    @staticmethod
-    def get_file_content(path):
-        file_path = os.path.join(settings.BASE_DIR, path)
-        with open(file_path, "r", encoding="utf-8") as f:
-            file_content = f.read()
-        return file_content
 
     def send_report_if_need(self):
         recipients = self.execution.recipients
