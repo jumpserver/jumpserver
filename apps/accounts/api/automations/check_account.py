@@ -3,7 +3,6 @@
 from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
@@ -65,13 +64,14 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
             return Response(status=400, data={"asset_id": "This field is required."})
 
         get_object_or_404(Asset, pk=asset_id)
+        name = "Check asset risk: {}".format(asset_id)
         execution = AutomationExecution()
         execution.snapshot = {
             "assets": [asset_id],
             "nodes": [],
             "type": AutomationTypes.check_account,
-            "engines": ["check_account_secret"],
-            "name": "Check asset risk: {} {}".format(asset_id, timezone.now()),
+            "engines": "__all__",
+            "name": name,
         }
         execution.save()
         execution.start()

@@ -1263,7 +1263,7 @@
     "SupportedProtocolHelpText": "Set supported protocols for the asset, you can modify the custom configurations, such as sftp directory, rdp ad domain, etc., by clicking on the set button",
     "Sync": "Sync",
     "SyncAction": "Synchronized action",
-    "SyncDelete": "Sync deletion",
+    "SyncDelete": "Sync delete",
     "SyncDeleteSelected": "Sync deletion selected",
     "SyncErrorMsg": "Sync failed",
     "SyncInstanceTaskCreate": "Create sync task",
