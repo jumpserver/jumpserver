@@ -1069,7 +1069,7 @@
     "ResetSSHKeySuccessMsg": "发送邮件任务已提交, 用户稍后会收到重置密钥邮件",
     "ResetSSHKeyWarningMsg": "你确定要发送重置用户的SSH Key的邮件吗?",
     "ResetSecret": "可改密",
-    "ResolveSelected": "解决所定",
+    "ResolveSelected": "解决所选",
     "Resource": "资源",
     "ResourceType": "资源类型",
     "RestoreButton": "恢复默认",
@@ -1518,5 +1518,8 @@
     "RiskDetectionDetail": "风险检测详情",
     "ApplicationDetail": "应用详情",
     "Organization": "组织",
-    "IpGroupHelpText": "* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+    "IpGroupHelpText": "* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64",
+    "Reopen": "重新打开",
+    "Review": "审查",
+    "SelectRisk": "选择风险"
 }
