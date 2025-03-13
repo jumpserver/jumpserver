@@ -38,7 +38,7 @@ class PermissionBaseFilter(BaseFilterSet):
     def filter_expired(queryset, name, is_expired):
         now = timezone.now()
         if is_expired:
-            queryset = queryset.filter(date_start__gt=now).filter(date_expired__lt=now)
+            queryset = queryset.filter(Q(date_start__gt=now) | Q(date_expired__lt=now))
         else:
             queryset = queryset.filter(Q(date_start__lt=now) | Q(date_expired__gt=now))
         return queryset
@@ -116,7 +116,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
         fields = (
             'user_id', 'username', 'user_group_id',
             'user_group', 'node_id', 'node_name', 'asset_id',
-            'asset_name', 'name', 'ip', 'name',
+            'asset_name', 'name', 'ip', 'name', 'is_active',
             'all', 'is_valid', 'is_effective', 'from_ticket'
         )
 
