@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from accounts.const import AutomationTypes, ChangeSecretRecordStatusChoice
 from accounts.models import ChangeSecretAutomation, AutomationExecution, ChangeSecretRecord
 from assets.models import Node, Asset
+from common.const import Status
 from common.utils import lazyproperty
 from common.utils.timezone import local_zero_hour, local_now
 from ops.celery import app
@@ -97,17 +98,19 @@ class ChangeSecretDashboardApi(APIView):
             return qs.count()
         return self.get_queryset_date_filter(qs, field).count()
 
-    @staticmethod
-    def get_status_counts(records):
-        pending = ChangeSecretRecordStatusChoice.pending
-        failed = ChangeSecretRecordStatusChoice.failed
-        total_ids = {str(i) for i in records.exclude(status=pending).values('execution_id').distinct()}
-        failed_ids = {str(i) for i in records.filter(status=failed).values('execution_id').distinct()}
-        total = len(total_ids)
-        failed = len(total_ids & failed_ids)
+    def get_status_counts(self, executions):
+        executions = executions.filter(type=self.tp)
+        total, failed, success = 0, 0, 0
+        for status in executions.values_list('status', flat=True):
+            total += 1
+            if status in [Status.failed, Status.error]:
+                failed += 1
+            elif status == Status.success:
+                success += 1
+
         return {
             'total_count_change_secret_executions': total,
-            'total_count_success_change_secret_executions': total - failed,
+            'total_count_success_change_secret_executions': success,
             'total_count_failed_change_secret_executions': failed,
         }
 
@@ -131,8 +134,8 @@ class ChangeSecretDashboardApi(APIView):
             data['total_count_change_secret_assets'] = self.get_change_secret_asset_queryset().count()
 
         if _all or query_params.get('total_count_change_secret_status'):
-            records = self.get_queryset_date_filter(self.change_secret_records_queryset, 'date_finished')
-            data.update(self.get_status_counts(records))
+            executions = self.get_queryset_date_filter(AutomationExecution.objects.all(), 'date_start')
+            data.update(self.get_status_counts(executions))
 
         if _all or query_params.get('daily_success_and_failure_metrics'):
             success, failed = self.get_daily_success_and_failure_metrics()

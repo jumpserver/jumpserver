@@ -3,10 +3,10 @@ import json
 import logging
 import os
 import shutil
+import time
 from collections import defaultdict
 from socket import gethostname
 
-import time
 import yaml
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -175,7 +175,7 @@ class BaseManager:
             self.do_run(*args, **kwargs)
         except Exception as e:
             logging.exception(e)
-            self.status = 'error'
+            self.status = Status.error
         finally:
             self.post_run()
 
@@ -485,8 +485,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self.on_host_error(host, error, detail)
 
     def post_run(self):
-        if self.summary['fail_assets']:
-            self.status = 'failed'
+        if any(
+                self.summary.get(key, 0) > 0
+                for key in ("fail_assets", "fail_accounts")
+        ):
+            self.status = Status.failed
         super().post_run()
 
     def on_runner_success(self, runner, cb):
