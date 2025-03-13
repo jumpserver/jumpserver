@@ -81,7 +81,7 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
 
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
-    search_fields = ("username", "asset")
+    search_fields = ["username", "asset__name"]
     filterset_fields = ("risk", "status", "asset_id")
     extra_filter_backends = [NodeFilterBackend]
     serializer_classes = {
