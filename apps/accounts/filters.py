@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+import uuid
+
+import django_filters
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi
@@ -176,13 +180,27 @@ class SecretRecordMixin(drf_filters.FilterSet):
         return queryset.filter(date_finished__gte=dt)
 
 
-class ChangeSecretRecordFilterSet(SecretRecordMixin, BaseFilterSet):
+class UUIDExecutionFilterMixin:
+    @staticmethod
+    def filter_execution(queryset, name, value):
+        try:
+            uuid.UUID(value)
+        except ValueError:
+            raise ValueError(_('Enter a valid UUID.'))
+        return queryset.filter(**{name: value})
+
+
+class ChangeSecretRecordFilterSet(SecretRecordMixin, UUIDExecutionFilterMixin, BaseFilterSet):
+    execution_id = django_filters.CharFilter(method="filter_execution")
+
     class Meta:
         model = ChangeSecretRecord
-        fields = ["id", "status", "asset_id", "execution"]
+        fields = ["id", "status", "asset_id", "execution_id"]
 
 
-class PushAccountRecordFilterSet(SecretRecordMixin, BaseFilterSet):
+class PushAccountRecordFilterSet(SecretRecordMixin, UUIDExecutionFilterMixin, BaseFilterSet):
+    execution_id = django_filters.CharFilter(method="filter_execution")
+
     class Meta:
         model = PushSecretRecord
-        fields = ["id", "status", "asset_id", "execution"]
+        fields = ["id", "status", "asset_id", "execution_id"]
