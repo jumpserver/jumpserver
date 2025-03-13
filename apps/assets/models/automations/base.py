@@ -142,6 +142,7 @@ class AutomationExecution(OrgModelMixin):
         null=True, verbose_name=_("Date start"), db_index=True
     )
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
+    type = models.CharField(default='', max_length=16, verbose_name=_("Type"))
     duration = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name=_("Duration"))
     snapshot = EncryptJsonDictTextField(
         default=dict, blank=True, null=True, verbose_name=_("Automation snapshot")
