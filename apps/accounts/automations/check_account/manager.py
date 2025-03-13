@@ -241,7 +241,11 @@ class CheckAccountManager(BaseManager):
             self.commit_risks(_assets)
 
     def do_run(self, *args, **kwargs):
-        for engine in self.execution.snapshot.get("engines", []):
+        engines = self.execution.snapshot.get("engines", [])
+        if engines == '__all__':
+            engines = ['check_account_secret', 'check_account_repeat', 'check_account_leak']
+
+        for engine in engines:
             if engine == "check_account_secret":
                 handler = CheckSecretHandler(self.assets)
             elif engine == "check_account_repeat":

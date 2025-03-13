@@ -92,12 +92,13 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
     def status(self, request, *args, **kwargs):
         ids = request.data.get('ids', [])
         new_status = request.data.get("status")
-        updated_instances = GatheredAccount.objects.filter(id__in=ids)
-        updated_instances.update(status=new_status)
+        updated_instances = GatheredAccount.objects.filter(id__in=ids).select_related('asset')
+
         if new_status == "confirmed":
             GatheredAccount.sync_accounts(updated_instances)
             updated_instances.update(present=True)
 
+        updated_instances.update(status=new_status)
         return Response(status=status.HTTP_200_OK)
 
     def perform_destroy(self, instance):

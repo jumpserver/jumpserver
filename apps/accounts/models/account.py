@@ -26,13 +26,15 @@ class AccountHistoricalRecords(HistoricalRecords):
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
 
-        check_fields = set(self.included_fields) - {'version'}
+        # self.updated_version = 0
+        if created:
+            return super().post_save(instance, created, using=using, **kwargs)
 
         history_account = instance.history.first()
         if history_account is None:
-            self.updated_version = 0
             return super().post_save(instance, created, using=using, **kwargs)
 
+        check_fields = set(self.included_fields) - {'version'}
         history_attrs = {field: getattr(history_account, field) for field in check_fields}
 
         attrs = {field: getattr(instance, field) for field in check_fields}
@@ -87,8 +89,10 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
-    history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'],
-                                       verbose_name=_("historical Account"))
+    history = AccountHistoricalRecords(
+        included_fields=['id', '_secret', 'secret_type', 'version'],
+        verbose_name=_("historical Account")
+    )
     secret_reset = models.BooleanField(default=True, verbose_name=_('Secret reset'))
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))

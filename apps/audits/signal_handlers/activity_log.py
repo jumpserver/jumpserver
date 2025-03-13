@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _, gettext_noop
 
 from audits.models import ActivityLog
+from common.decorators import bulk_create_decorator
 from common.utils import i18n_fmt, get_logger
 from jumpserver.utils import current_request
 from ops.celery import app
@@ -67,21 +68,26 @@ class ActivityLogHandler:
         return resource_ids, detail, org_id
 
 
+@bulk_create_decorator(ActivityLog)
+def create_activity(data):
+    return ActivityLog(**data)
+
+
 def create_activities(resource_ids, detail, detail_id, action, org_id):
     if not resource_ids:
         return
     if not org_id:
         org_id = Organization.ROOT_ID
     activities = [
-        ActivityLog(
+        dict(
             resource_id=getattr(resource_id, 'pk', resource_id),
             type=action, detail=detail, detail_id=detail_id, org_id=org_id
         )
         for resource_id in resource_ids
     ]
     with tmp_to_org(org_id):
-        ActivityLog.objects.bulk_create(activities)
-    return activities
+        for activity in activities:
+            create_activity(activity)
 
 
 @signals.after_task_publish.connect

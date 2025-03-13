@@ -1,5 +1,6 @@
+from collections import defaultdict
+
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes, Source
@@ -30,49 +31,73 @@ class GatheredAccount(JMSOrgBaseModel):
         return self.asset.address
 
     @classmethod
-    def update_exists_accounts(cls, gathered_account, accounts):
-        if not gathered_account.date_last_login:
-            return
+    def update_exists_accounts(cls, ga_accounts_set):  # gathered_account, accounts):
+        to_updates = []
 
-        for account in accounts:
-            # 这里是否可以考虑，标记成未从堡垒机登录风险 ？
-            if is_date_more_than(gathered_account.date_last_login, account.date_last_login, '5m'):
+        for gathered_account, accounts in ga_accounts_set:
+            if not gathered_account.date_last_login:
+                return
+
+            for account in accounts:
+                # 这里是否可以考虑，标记成未从堡垒机登录风险 ？
+                if not is_date_more_than(gathered_account.date_last_login, account.date_last_login, '5m'):
+                    continue
                 account.date_last_login = gathered_account.date_last_login
                 account.login_by = '{}({})'.format('unknown', gathered_account.address_last_login)
-                account.save(update_fields=['date_last_login', 'login_by'])
+                to_updates.append(account)
+
+        Account.objects.bulk_update(to_updates, fields=['date_last_login', 'login_by'])
 
     @classmethod
-    def create_accounts(cls, gathered_account):
+    def bulk_create_accounts(cls, gathered_accounts):
         account_objs = []
-        asset_id = gathered_account.asset_id
-        username = gathered_account.username
-        account = Account(
-            asset_id=asset_id, username=username,
-            name=username, source=Source.DISCOVERY,
-            date_last_login=gathered_account.date_last_login,
-        )
-        account_objs.append(account)
-        Account.objects.bulk_create(account_objs)
-        gathered_account.status = ConfirmOrIgnore.confirmed
-        gathered_account.save(update_fields=['status'])
-
-    @classmethod
-    def sync_accounts(cls, gathered_accounts, auto_create=True):
-        """
-        更新为已存在的账号，或者创建新的账号, 原来的 sync 重构了，如果存在则自动更新一些信息
-        """
         for gathered_account in gathered_accounts:
             asset_id = gathered_account.asset_id
             username = gathered_account.username
-            accounts = Account.objects.filter(
-                Q(asset_id=asset_id, username=username) |
-                Q(asset_id=asset_id, name=username)
+            account = Account(
+                asset_id=asset_id, username=username,
+                name=username, source=Source.DISCOVERY,
+                date_last_login=gathered_account.date_last_login,
             )
+            account_objs.append(account)
+        Account.objects.bulk_create(account_objs, ignore_conflicts=True)
 
-            if accounts.exists():
-                cls.update_exists_accounts(gathered_account, accounts)
-            elif auto_create:
-                cls.create_accounts(gathered_account)
+        ga_ids = [ga.id for ga in gathered_accounts]
+        GatheredAccount.objects.filter(id__in=ga_ids).update(status=ConfirmOrIgnore.confirmed)
+
+    @classmethod
+    def sync_accounts(cls, gathered_accounts):
+        """
+        更新为已存在的账号，或者创建新的账号, 原来的 sync 重构了，如果存在则自动更新一些信息
+        """
+        assets = [gathered_account.asset_id for gathered_account in gathered_accounts]
+        usernames = [gathered_account.username for gathered_account in gathered_accounts]
+
+        origin_accounts = Account.objects.filter(
+            asset__in=assets, username__in=usernames
+        ).select_related('asset')
+
+        origin_mapper = defaultdict(list)
+        for origin_account in origin_accounts:
+            asset_id = origin_account.asset_id
+            username = origin_account.username
+            origin_mapper[(asset_id, username)].append(origin_account)
+
+        to_update = []
+        to_create = []
+
+        for gathered_account in gathered_accounts:
+            asset_id = gathered_account.asset_id
+            username = gathered_account.username
+            accounts = origin_mapper.get((asset_id, username))
+
+            if accounts:
+                to_update.append((gathered_account, accounts))
+            else:
+                to_create.append(gathered_account)
+
+        cls.bulk_create_accounts(to_create)
+        cls.update_exists_accounts(to_update)
 
     class Meta:
         verbose_name = _("Gather asset accounts")
@@ -82,7 +107,7 @@ class GatheredAccount(JMSOrgBaseModel):
         ordering = ['asset']
 
     def __str__(self):
-        return '{}: {}'.format(self.asset, self.username)
+        return '{}: {}'.format(self.asset_id, self.username)
 
 
 class GatherAccountsAutomation(AccountBaseAutomation):
