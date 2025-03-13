@@ -15,7 +15,7 @@ from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
 from rbac.permissions import RBACPermission
 from .base import (
     AutomationAssetsListApi, AutomationRemoveAssetApi, AutomationAddAssetApi,
-    AutomationNodeAddRemoveApi, AutomationExecutionViewSet
+    AutomationNodeAddRemoveApi, AutomationExecutionViewSet, RecordListMixin
 )
 
 __all__ = [
@@ -33,7 +33,7 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.ChangeSecretAutomationSerializer
 
 
-class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
+class ChangeSecretRecordViewSet(RecordListMixin, mixins.ListModelMixin, OrgGenericViewSet):
     filterset_class = ChangeSecretRecordFilterSet
     search_fields = ('asset__address', 'account__username')
     ordering_fields = ('date_finished',)
