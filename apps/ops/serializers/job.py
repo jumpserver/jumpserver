@@ -8,8 +8,8 @@ from common.serializers import WritableNestedModelSerializer
 from common.serializers.fields import ReadableHiddenField, ObjectRelatedField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.serializers import JobVariableSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
 class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, WritableNestedModelSerializer):
@@ -73,7 +73,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
 
 
 class FileSerializer(serializers.Serializer):
-    files = serializers.FileField(allow_empty_file=False, max_length=128)
+    files = serializers.FileField(allow_empty_file=True, max_length=128)
 
     class Meta:
         ref_name = "JobFileSerializer"
