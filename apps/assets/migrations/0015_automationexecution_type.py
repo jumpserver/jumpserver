@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 def migrate_execution_type(apps, schema_editor):
     count = 0
-    bulk_size = 100
+    bulk_size = 1000
     while True:
         start = time.time()
         execution_model = apps.get_model('assets', 'AutomationExecution')
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='automationexecution',
             name='type',
-            field=models.CharField(default='', max_length=16, verbose_name='Type'),
+            field=models.CharField(default='', max_length=32, verbose_name='Type'),
         ),
         migrations.RunPython(migrate_execution_type)
     ]
