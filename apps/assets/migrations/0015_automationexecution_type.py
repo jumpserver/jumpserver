@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 def migrate_execution_type(apps, schema_editor):
     count = 0
-    bulk_size = 1000
+    bulk_size = 100
     while True:
         start = time.time()
         execution_model = apps.get_model('assets', 'AutomationExecution')
