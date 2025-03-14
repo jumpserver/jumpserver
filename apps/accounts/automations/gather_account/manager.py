@@ -1,6 +1,6 @@
+import time
 from collections import defaultdict
 
-import time
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
@@ -378,7 +378,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 if not self.is_sync_account:
                     continue
                 gathered_accounts = GatheredAccount.objects.filter(asset=asset)
-                GatheredAccount.sync_accounts(gathered_accounts, self.is_sync_account)
+                GatheredAccount.sync_accounts(gathered_accounts)
                 GatheredAccount.objects.filter(
                     asset=asset, username__in=ori_users, present=False
                 ).update(
