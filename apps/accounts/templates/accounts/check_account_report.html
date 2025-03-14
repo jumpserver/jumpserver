@@ -31,27 +31,35 @@
 
             <div class="item">
                 <span class="item-label">{% trans 'Weak password' %}</span>
-                <span class="item-value">{{ summary.weak_password | default:0 }}</span>
+                <span class="item-value{% if summary.weak_password > 0 %} red{% endif %}">
+                    {{ summary.weak_password | default:0 }}
+                </span>
             </div>
 
             <div class="item">
                 <span class="item-label">{% trans 'Leaked password' %}</span>
-                <span class="item-value">{{ summary.leaked_password | default:0 }}</span>
+                <span class="item-value {% if summary.leaked_password > 0 %} red {% endif %}">
+                    {{ summary.leaked_password | default:0 }}
+                </span>
             </div>
 
             <div class="item">
                 <span class="item-label">{% trans 'Repeated password' %}</span>
-                <span class="item-value">{{ summary.repeated_password | default:0 }}</span>
+                <span class="item-value {% if summary.repeated_password > 0 %} red {% endif %}">
+                    {{ summary.repeated_password | default:0 }}
+                </span>
             </div>
 
             <div class="item">
                 <span class="item-label">{% trans 'No secret' %}</span>
-                <span class="item-value">{{ summary.no_secret | default:0 }}</span>
+                <span class="item-value {% if summary.no_secret > 0 %} red {% endif %}">
+                    {{ summary.no_secret | default:0 }}
+                </span>
             </div>
 
             <div class="item">
                 <span class="item-label">{% trans 'Task name' %}</span>
-                <span class="item-value">{{ execution.automation.name }}</span>
+                <span class="item-value">{{ execution.snapshot.name }}</span>
             </div>
 
             <div class="item">
@@ -205,6 +213,9 @@
         font: 500 14px/22px 'PingFang SC';
     }
 
+    .container-section .item .item-value.red {
+        color: red;
+    }
 
     .custom-table {
         margin-bottom: 0;
@@ -253,6 +264,7 @@
         background: #e8f5e9;
         color: #2e7d32;
     }
+
 
     .lost-accounts .section-header span {
         background: #fbe9e7;

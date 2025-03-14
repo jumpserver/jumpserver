@@ -63,8 +63,8 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
         if not asset_id:
             return Response(status=400, data={"asset_id": "This field is required."})
 
-        get_object_or_404(Asset, pk=asset_id)
-        name = "Check asset risk: {}".format(asset_id)
+        asset = get_object_or_404(Asset, pk=asset_id)
+        name = "Check asset risk: {}".format(asset.name)
         execution = AutomationExecution()
         execution.snapshot = {
             "assets": [asset_id],
