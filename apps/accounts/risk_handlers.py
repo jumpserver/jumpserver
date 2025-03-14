@@ -97,11 +97,15 @@ class RiskHandler:
             "secret_type": SecretType.PASSWORD,
             "source": "collected",
         }
-        self.asset.accounts.get_or_create(defaults=data, username=self.username)
+        account, __ = self.asset.accounts.get_or_create(defaults=data, username=self.username)
         GatheredAccount.objects.filter(asset=self.asset, username=self.username).update(
             present=True, status=ConfirmOrIgnore.confirmed
         )
         self.risk = RiskChoice.new_found
+        
+        risk = self.get_risk()
+        risk.account = account
+        risk.save()
 
     def handle_disable_remote(self):
         pass
