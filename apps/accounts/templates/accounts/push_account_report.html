@@ -14,6 +14,11 @@
     
         <div class="container-section collapsible-content" id="basic-info-content">
           <div class="item">
+            <span class="item-label">{% trans 'Task name' %}</span>
+            <span class="item-value">{{ execution.automation.name }}</span>
+          </div>
+
+          <div class="item">
             <span class="item-label">{% trans 'Date start' %}</span>
             <span class="item-value">{{ execution.date_start | date:"Y/m/d H:i:s" }}</span>
           </div>
@@ -42,12 +47,7 @@
             <span class="item-label">{% trans 'Asset not support count' %}</span>
             <span class="item-value">{{ summary.error_assets | default:0 }}</span>
           </div>
-    
-          <div class="item">
-            <span class="item-label">{% trans 'Task name' %}</span>
-            <span class="item-value">{{ execution.automation.name }}</span>
-          </div>
-    
+
           <div class="item">
             <span class="item-label">{% trans 'Time using' %}</span>
             <span class="item-value">{{ execution.duration }}s</span>
