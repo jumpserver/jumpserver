@@ -45,6 +45,9 @@ class AutomationExecution(AssetAutomationExecution):
             ('add_backupaccountexecution', _('Can add backup account execution')),
         ]
 
+    def __str__(self):
+        return '{}: {}'.format(self.snapshot.get('name', ''), self.id)
+
     @property
     def manager(self):
         from accounts.automations.endpoint import ExecutionManager
