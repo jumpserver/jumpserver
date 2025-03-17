@@ -7,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AccountBackupType, AutomationTypes
 from common.db import fields
-from orgs.mixins.models import OrgManager
 from common.utils import get_logger
+from orgs.mixins.models import OrgManager
 from .base import AccountBaseAutomation
 
 __all__ = ['BackupAccountAutomation']
@@ -59,6 +59,7 @@ class BackupAccountAutomation(AccountBaseAutomation):
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
+            'id': str(self.id),
             'types': self.types,
             'backup_type': self.backup_type,
             'is_password_divided_by_email': self.is_password_divided_by_email,

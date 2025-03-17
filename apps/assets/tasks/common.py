@@ -42,7 +42,7 @@ def quickstart_automation(task_name, tp, task_snapshot=None):
             break
 
     execution = AutomationExecution.objects.create(
-        trigger=Trigger.manual, **data
+        type=tp, trigger=Trigger.manual, **data
     )
     execution.start()
     return execution

@@ -13,6 +13,6 @@ def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
         data['id'] = str(uuid.uuid4())
 
     execution = AutomationExecution.objects.create(
-        trigger=Trigger.manual, **data
+        type=tp, trigger=Trigger.manual, **data
     )
     execution.start()

@@ -109,6 +109,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
 
         execution = self.execution_model.objects.create(
             id=eid,
+            type=self.type,
             trigger=trigger,
             automation=self,
             snapshot=self.to_attr_json(),
