@@ -41,7 +41,7 @@
         for user in {{ users.stdout_lines | join(" ") }}; do
           home=$(getent passwd $user | cut -d: -f6)
           echo -n "$user:"
-          if [[ -f ${home}/.ssh/authorized_keys ]]; then
+          if [ -f "${home}/.ssh/authorized_keys" ]; then
             cat ${home}/.ssh/authorized_keys | tr '\n' ';'
           fi
           echo
