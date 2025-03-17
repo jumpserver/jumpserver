@@ -36,17 +36,24 @@ class BaseAccountHandler:
             if isinstance(v, OrderedDict):
                 cls.unpack_data(v, data)
             else:
+                if isinstance(v, dict):
+                    v = v.get('label')
                 data[k] = v
         return data
 
     @classmethod
     def get_header_fields(cls, serializer: serializers.Serializer):
         try:
-            backup_fields = getattr(serializer, 'Meta').fields_backup
+            exclude_backup_fields = getattr(serializer, 'Meta').exclude_backup_fields
         except AttributeError:
-            backup_fields = serializer.fields.keys()
+            exclude_backup_fields = []
+        backup_fields = serializer.fields.keys()
+
         header_fields = {}
         for field in backup_fields:
+            if field in exclude_backup_fields:
+                continue
+
             v = serializer.fields[field]
             if isinstance(v, serializers.Serializer):
                 _fields = cls.get_header_fields(v)
@@ -189,8 +196,8 @@ class AccountBackupHandler:
                 attachment_list = [attachment]
             AccountBackupExecutionTaskMsg(name, user).publish(attachment_list)
 
-        for file in files:
-            os.remove(file)
+        # for file in files:
+        #     os.remove(file)
 
     def send_backup_obj_storage(self, files, recipients, password):
         if not files:
@@ -275,7 +282,8 @@ class AccountBackupHandler:
         else:
             recipients = recipients_part_one or recipients_part_two
             files = self.create_excel()
-            self.send_backup_mail(files, recipients)
+            print(files)
+            # self.send_backup_mail(files, recipients)
 
     def run(self):
         print('{}: {}'.format(_('Plan start'), local_now_display()))

@@ -1522,5 +1522,7 @@
     "Reopen": "重新打开",
     "Review": "审查",
     "SelectRisk": "选择风险",
-    "IpGroup": "IP 组"
+    "IpGroup": "IP 组",
+    "PublicIP": "公有 IP",
+    "PrivateIP": "私有 IP"
 }

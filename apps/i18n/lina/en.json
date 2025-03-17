@@ -1520,5 +1520,7 @@
     "Organization": "Organization",
     "IpGroupHelpText": "* indicates match all. for example: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64",
     "SelectRisk": "Select risk",
-    "IpGroup": "IP group"
+    "IpGroup": "IP group",
+    "PublicIP": "Public IP",
+    "PrivateIP": "Private IP"
 }

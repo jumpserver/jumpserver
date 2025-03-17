@@ -2,6 +2,7 @@
 #
 from collections import defaultdict
 
+from django.core.cache import cache
 from django.http.response import JsonResponse
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -25,6 +26,7 @@ class ChangeSecretDashboardApi(APIView):
 
     tp = AutomationTypes.change_secret
     task_name = 'accounts.tasks.automation.execute_account_automation_task'
+    ongoing_change_secret_cache_key = "ongoing_change_secret_cache_key"
 
     @lazyproperty
     def days(self):
@@ -146,24 +148,33 @@ class ChangeSecretDashboardApi(APIView):
             })
 
         if _all or query_params.get('total_count_ongoing_change_secret'):
-            execution_ids = []
-            inspect = app.control.inspect()
-            active_tasks = inspect.active()
-            if active_tasks:
-                for tasks in active_tasks.values():
-                    for task in tasks:
-                        _id = task.get('id')
-                        name = task.get('name')
-                        tp = task.get('kwargs', {}).get('tp')
-                        if name == self.task_name and tp == self.tp:
-                            execution_ids.append(_id)
+            ongoing_counts = cache.get(self.ongoing_change_secret_cache_key)
+            if ongoing_counts is None:
+                execution_ids = []
+                inspect = app.control.inspect()
+                active_tasks = inspect.active()
+                if active_tasks:
+                    for tasks in active_tasks.values():
+                        for task in tasks:
+                            _id = task.get('id')
+                            name = task.get('name')
+                            tp = task.get('kwargs', {}).get('tp')
+                            if name == self.task_name and tp == self.tp:
+                                execution_ids.append(_id)
 
-            snapshots = AutomationExecution.objects.filter(id__in=execution_ids).values_list('snapshot', flat=True)
+                snapshots = AutomationExecution.objects.filter(id__in=execution_ids).values_list('snapshot', flat=True)
 
-            asset_ids = {asset for i in snapshots for asset in i.get('assets', [])}
-            account_ids = {account for i in snapshots for account in i.get('accounts', [])}
-            data['total_count_ongoing_change_secret'] = len(execution_ids)
-            data['total_count_ongoing_change_secret_assets'] = len(asset_ids)
-            data['total_count_ongoing_change_secret_accounts'] = len(account_ids)
+                asset_ids = {asset for i in snapshots for asset in i.get('assets', [])}
+                account_ids = {account for i in snapshots for account in i.get('accounts', [])}
+
+                ongoing_counts = (len(execution_ids), len(asset_ids), len(account_ids))
+                data['total_count_ongoing_change_secret'] = ongoing_counts[0]
+                data['total_count_ongoing_change_secret_assets'] = ongoing_counts[1]
+                data['total_count_ongoing_change_secret_accounts'] = ongoing_counts[2]
+                cache.set(self.ongoing_change_secret_cache_key, ongoing_counts, 60)
+            else:
+                data['total_count_ongoing_change_secret'] = ongoing_counts[0]
+                data['total_count_ongoing_change_secret_assets'] = ongoing_counts[1]
+                data['total_count_ongoing_change_secret_accounts'] = ongoing_counts[2]
 
         return JsonResponse(data, status=200)
