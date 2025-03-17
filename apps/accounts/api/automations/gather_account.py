@@ -56,7 +56,7 @@ class DiscoverAccountsExecutionViewSet(AutomationExecutionViewSet):
         if not asset_id:
             return Response(status=400, data={"asset_id": "This field is required."})
 
-        get_object_or_404(Asset, pk=asset_id)
+        asset = get_object_or_404(Asset, pk=asset_id)
         execution = AutomationExecution()
         execution.snapshot = {
             "assets": [asset_id],
@@ -64,7 +64,7 @@ class DiscoverAccountsExecutionViewSet(AutomationExecutionViewSet):
             "type": "gather_accounts",
             "is_sync_account": False,
             "check_risk": True,
-            "name": "Adhoc gather accounts: {}".format(asset_id),
+            "name": "Adhoc gather accounts: {}".format(asset.name),
         }
         execution.save()
         execution.start()
