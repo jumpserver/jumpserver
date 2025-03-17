@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from accounts.automations.methods import platform_automation_methods
 from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice
 from accounts.models import BaseAccountQuerySet
+from accounts.utils import SecretGenerator
 from assets.automations.base.manager import BasePlaybookManager
 from assets.const import HostTypes
 from common.db.utils import safe_db_connection
@@ -50,6 +51,17 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if kwargs['strategy'] == SSHKeyStrategy.set_jms:
             kwargs['regexp'] = '.*{}$'.format(secret.split()[2].strip())
         return kwargs
+
+    def get_secret(self, account):
+        if self.secret_strategy == SecretStrategy.custom:
+            new_secret = self.execution.snapshot['secret']
+        else:
+            generator = SecretGenerator(
+                self.secret_strategy, self.secret_type,
+                self.execution.snapshot.get('password_rules')
+            )
+            new_secret = generator.get_secret()
+        return new_secret
 
     def get_accounts(self, privilege_account) -> BaseAccountQuerySet | None:
         if not privilege_account:

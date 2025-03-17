@@ -21,7 +21,10 @@ class PushAccountManager(BaseChangeSecretPushManager):
         return AutomationTypes.push_account
 
     def get_secret(self, account):
-        return account.secret
+        secret = account.secret
+        if not secret:
+            secret = super().get_secret(account)
+        return secret
 
     def gen_account_inventory(self, account, asset, h, path_dir):
         secret = self.get_secret(account)

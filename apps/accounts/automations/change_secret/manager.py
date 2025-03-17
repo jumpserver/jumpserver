@@ -15,7 +15,6 @@ from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_filename
 from ..base.manager import BaseChangeSecretPushManager
-from ...utils import SecretGenerator
 
 logger = get_logger(__name__)
 
@@ -26,17 +25,6 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
     @classmethod
     def method_type(cls):
         return AutomationTypes.change_secret
-
-    def get_secret(self, account):
-        if self.secret_strategy == SecretStrategy.custom:
-            new_secret = self.execution.snapshot['secret']
-        else:
-            generator = SecretGenerator(
-                self.secret_strategy, self.secret_type,
-                self.execution.snapshot.get('password_rules')
-            )
-            new_secret = generator.get_secret()
-        return new_secret
 
     def gen_account_inventory(self, account, asset, h, path_dir):
         record = self.get_or_create_record(asset, account, h['name'])
