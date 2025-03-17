@@ -610,7 +610,7 @@
     "Goto": "Goto",
     "GrantedAssets": "Authorized assets",
     "GreatEqualThan": "Greater than or equal to",
-    "GroupChanged": "Group changed",
+    "GroupsChanged": "Group changed",
     "GroupsAmount": "User group",
     "HTTPSRequiredForSupport": "HTTPS is required for support",
     "HandleTicket": "Handle ticket",
@@ -1253,7 +1253,7 @@
     "Success/Total": "Success/Total",
     "SuccessAsset": "Successful assets",
     "SuccessfulOperation": "Action successful",
-    "SudoChanged": "Sudo changed",
+    "SudoersChanged": "Sudo changed",
     "Summary": "Summary",
     "Summary(success/total)": " overview( successful/total )",
     "Sunday": "Sun",
@@ -1522,5 +1522,6 @@
     "SelectRisk": "Select risk",
     "IpGroup": "IP group",
     "PublicIP": "Public IP",
-    "PrivateIP": "Private IP"
+    "PrivateIP": "Private IP",
+    "ExecuteAfterSaving": "Execute after saving"
 }
