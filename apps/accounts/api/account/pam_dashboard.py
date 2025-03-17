@@ -39,8 +39,8 @@ class PamDashboardApi(APIView):
         agg_map = {
             'total_long_time_no_login_accounts': ('long_time_no_login_count', Q(risk='long_time_no_login')),
             'total_new_found_accounts': ('new_found_count', Q(risk='new_found')),
-            'total_group_changed_accounts': ('group_changed_count', Q(risk='group_changed')),
-            'total_sudo_changed_accounts': ('sudo_changed_count', Q(risk='sudo_changed')),
+            'total_groups_changed_accounts': ('groups_changed_count', Q(risk='groups_changed')),
+            'total_sudoers_changed_accounts': ('sudoers_changed_count', Q(risk='sudoers_changed')),
             'total_authorized_keys_changed_accounts': (
                 'authorized_keys_changed_count', Q(risk='authorized_keys_changed')),
             'total_password_expired_accounts': ('password_expired_count', Q(risk='password_expired')),
