@@ -10,7 +10,7 @@
     - name: Gather posix account last login
       ansible.builtin.shell: |
         for user in {{ users.stdout_lines | join(" ") }}; do
-          last -i --time-format iso -n 1 ${user}  | awk '{ print $1,$3,$4, $NF }' | head -1 | awk 'NF'
+          last -wi --time-format iso -n 1 ${user}  | awk '{ print $1,$3,$4, $NF }' | head -1 | awk 'NF'
         done
       register: last_login
 
