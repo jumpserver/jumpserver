@@ -16,7 +16,7 @@ from orgs.mixins import generics
 __all__ = [
     'AutomationAssetsListApi', 'AutomationRemoveAssetApi',
     'AutomationAddAssetApi', 'AutomationNodeAddRemoveApi',
-    'AutomationExecutionViewSet',
+    'AutomationExecutionViewSet', 'RecordListMixin'
 ]
 
 
