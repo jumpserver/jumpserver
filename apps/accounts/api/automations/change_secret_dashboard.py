@@ -152,7 +152,10 @@ class ChangeSecretDashboardApi(APIView):
             if ongoing_counts is None:
                 execution_ids = []
                 inspect = app.control.inspect()
-                active_tasks = inspect.active()
+                try:
+                    active_tasks = inspect.active()
+                except Exception:
+                    active_tasks = None
                 if active_tasks:
                     for tasks in active_tasks.values():
                         for task in tasks:
