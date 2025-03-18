@@ -294,7 +294,7 @@
     "ClearSuccessMsg": "清除成功",
     "ClickCopy": "点击复制",
     "ClientCertificate": "客户端证书",
-    "Clipboard ": "剪贴板",
+    "Clipboard": "剪贴板",
     "ClipboardCopyPaste": "剪贴板复制粘贴",
     "Clone": "克隆",
     "Close": "关闭",
@@ -914,7 +914,7 @@
     "PasswordAndSSHKey": "认证设置",
     "PasswordChangeLog": "改密日志",
     "PasswordError": "密码错误",
-    "PasswordExpired": "密码过期了",
+    "PasswordExpired": "密码已过期",
     "PasswordPlaceholder": "请输入密码",
     "PasswordRecord": "密码记录",
     "PasswordRule": "密码规则",
@@ -1525,5 +1525,7 @@
     "IpGroup": "IP 组",
     "PublicIP": "公有 IP",
     "PrivateIP": "私有 IP",
-    "ExecuteAfterSaving": "保存后执行"
+    "ExecuteAfterSaving": "保存后执行",
+    "PleaseEnterReason": "请输入原因",
+    "Processing": "处理中"
 }

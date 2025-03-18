@@ -137,8 +137,8 @@ class AuthMixin:
         if self.can_update_ssh_key():
             from authentication.models import SSHKey
             SSHKey.objects.create(
-                public_key=public_key, private_key=private_key, user=self, name=kwargs.get('name'),
-                comment=kwargs.get('comment'), is_active=kwargs.get('is_active')
+                public_key=public_key, private_key=private_key, user=self, name=kwargs.get('name', ''),
+                comment=kwargs.get('comment', ''), is_active=kwargs.get('is_active')
             )
             post_user_change_password.send(self.__class__, user=self)
 

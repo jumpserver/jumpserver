@@ -106,11 +106,9 @@ class CommandFilterACL(UserAssetAccountBaseACL):
         return self.name
 
     def create_command_review_ticket(self, run_command, session, cmd_filter_acl, org_id):
-        from tickets.const import TicketType
         from tickets.models import ApplyCommandTicket
         data = {
             'title': _('Command confirm') + ' ({})'.format(session.user),
-            'type': TicketType.command_confirm,
             'applicant': session.user_obj,
             'apply_run_user_id': session.user_id,
             'apply_run_asset': str(session.asset),

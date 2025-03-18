@@ -155,6 +155,19 @@ class AnalyseAccountRisk:
     def _update_risk(self, account):
         return account
 
+    def lost_accounts(self, asset, lost_users):
+        if not self.check_risk:
+            return
+        for user in lost_users:
+            self._create_risk(
+                dict(
+                    asset_id=str(asset.id),
+                    username=user,
+                    risk=RiskChoice.account_deleted,
+                    details=[{"datetime": self.now.isoformat()}],
+                )
+            )
+
     def analyse_risk(self, asset, ga, d, sys_found):
         if not self.check_risk:
             return
@@ -289,6 +302,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         "username": username,
                     }
                 )
+            risk_analyser = AnalyseAccountRisk(self.check_risk)
+            risk_analyser.lost_accounts(asset, lost_users)
 
         # 收集的账号 比 账号列表多的, 有可能是账号中删掉了, 但这时候状态已经是 confirm 了
         # 标识状态为 待处理, 让管理员去确认

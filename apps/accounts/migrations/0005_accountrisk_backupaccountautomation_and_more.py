@@ -139,6 +139,7 @@ class Migration(migrations.Migration):
                         choices=[
                             ("long_time_no_login", "Long time no login"),
                             ("new_found", "New found"),
+                            ("account_deleted", "Account deleted"),
                             ("groups_changed", "Groups change"),
                             ("sudoers_changed", "Sudo changed"),
                             ("authorized_keys_changed", "Authorized keys changed"),
