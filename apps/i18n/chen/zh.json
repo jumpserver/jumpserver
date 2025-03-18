@@ -19,6 +19,7 @@
     "CopyNotAllowed": "不允许复制，请联系管理员开启权限！",
     "CopySucceeded": "复制成功",
     "Current": "当前",
+    "DownloadNotAllowed": "不允许下载，请联系管理员开启权限! ",
     "DatabaseExplorer": "数据库浏览器",
     "DatabaseProperties": "数据源属性",
     "DriverClass": "驱动类",
