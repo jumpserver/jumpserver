@@ -295,7 +295,7 @@
     "ClearSuccessMsg": "Clear successful",
     "ClickCopy": "Click to copy",
     "ClientCertificate": "Client certificate",
-    "Clipboard ": "Clipboard",
+    "Clipboard": "Clipboard",
     "ClipboardCopyPaste": "Clipboard copy and paste",
     "Clone": "Clone",
     "Close": "Close",
@@ -1523,5 +1523,7 @@
     "IpGroup": "IP group",
     "PublicIP": "Public IP",
     "PrivateIP": "Private IP",
-    "ExecuteAfterSaving": "Execute after saving"
+    "ExecuteAfterSaving": "Execute after saving",
+    "PleaseEnterReason": "Please enter a reason",
+    "Processing": "Processing"
 }
