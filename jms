@@ -20,6 +20,16 @@ sys.path.insert(0, APP_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
 django.setup()
 
+ansible_config_path = os.path.join(APP_DIR, 'libs', 'ansible', 'ansible.cfg')
+ansible_modules_path = os.path.join(APP_DIR, 'libs', 'ansible', 'modules')
+os.environ.setdefault('LC_ALL', 'en_US.UTF-8')
+os.environ.setdefault('LANG', 'en_US.UTF-8')
+os.environ.setdefault('PYTHONOPTIMIZE', '1')
+os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
+os.environ.setdefault('ANSIBLE_CONFIG', ansible_config_path)
+os.environ.setdefault('ANSIBLE_LIBRARY', ansible_modules_path)
+os.environ.setdefault('PYTHONPATH', APP_DIR)
+
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 try:

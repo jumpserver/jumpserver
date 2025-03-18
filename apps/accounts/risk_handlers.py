@@ -117,6 +117,15 @@ class RiskHandler:
     def handle_delete_remote(self):
         self._handle_delete(delete="remote")
 
+    @staticmethod
+    def start_execution(execution):
+        execution.save()
+        execution.start()
+
+        if execution.status != "success":
+            msg = _("Execution failed: {}").format(execution.status)
+            raise ValidationError(msg)
+
     def _handle_delete(self, delete="both"):
         asset = self.asset
         execution = AutomationExecution()
@@ -128,9 +137,7 @@ class RiskHandler:
             "delete": delete,
             "risk": self.risk
         }
-        execution.save()
-        execution.start()
-        return execution.summary
+        self.start_execution(execution)
 
     def handle_delete_both(self):
         self._handle_delete(delete="both")
@@ -138,7 +145,11 @@ class RiskHandler:
     def handle_change_password(self):
         asset = self.asset
         execution = AutomationExecution()
-        account = self.asset.accounts.get(username=self.username)
+        account = self.asset.accounts.filter(username=self.username, secret_type=SecretType.PASSWORD).first()
+
+        if not account:
+            raise ValidationError("Account not found")
+
         execution.snapshot = {
             "assets": [str(asset.id)],
             "accounts": [str(account.id)],
@@ -147,9 +158,7 @@ class RiskHandler:
             "secret_strategy": "random",
             "name": "Change account password: {}@{}".format(self.username, asset.name),
         }
-        execution.save()
-        execution.start()
-        return execution.summary
+        self.start_execution(execution)
 
     def handle_change_password_add(self):
         asset = self.asset
@@ -178,10 +187,10 @@ class RiskHandler:
             'check_conn_after_change': True,
             "name": "Push account password: {}@{}".format(self.username, asset.name),
         }
-        execution.save()
-        execution.start()
+        self.start_execution(execution)
 
-        GatheredAccount.objects.filter(asset=self.asset, username=self.username).update(
-            present=True
+        (
+            GatheredAccount.objects
+            .filter(asset=self.asset, username=self.username)
+            .update(present=True)
         )
-        return execution.summary
