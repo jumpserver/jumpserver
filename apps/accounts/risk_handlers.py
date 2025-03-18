@@ -8,7 +8,7 @@ from accounts.models import (
     AccountRisk,
     SecretType,
     AutomationExecution,
-    RiskChoice
+    RiskChoice, Account
 )
 from common.const import ConfirmOrIgnore
 from common.utils import random_string
@@ -19,10 +19,11 @@ TYPE_CHOICES = [
     ("close", _("Close")),
     ("disable_remote", _("Disable remote")),
     ("delete_remote", _("Delete remote")),
+    ("delete_account", _("Delete account")),
     ("delete_both", _("Delete remote")),
     ("add_account", _("Add account")),
     ("change_password_add", _("Change password and Add")),
-    ("change_password", _("Change password"))
+    ("change_password", _("Change password")),
 ]
 
 
@@ -73,6 +74,9 @@ class RiskHandler:
     def handle_reopen(self):
         pass
 
+    def handle_delete_account(self):
+        Account.objects.filter(asset=self.asset, username=self.username).delete()
+
     def handle_close(self):
         pass
 
@@ -102,7 +106,7 @@ class RiskHandler:
             present=True, status=ConfirmOrIgnore.confirmed
         )
         self.risk = RiskChoice.new_found
-        
+
         risk = self.get_risk()
         risk.account = account
         risk.save()
