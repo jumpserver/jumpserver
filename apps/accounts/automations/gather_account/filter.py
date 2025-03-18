@@ -1,5 +1,6 @@
-from django.utils import timezone
 from datetime import datetime
+
+from django.utils import timezone
 
 __all__ = ['GatherAccountsFilter']
 
@@ -180,9 +181,9 @@ class GatherAccountsFilter:
             start_date = timezone.make_aware(timezone.datetime(1970, 1, 1))
             _password_date = username_password_date.get(username) or ''
             if _password_date and len(_password_date) == 2:
-                if _password_date[0] and _password_date[0] != '0':
+                if _password_date[0]:
                     user['date_password_change'] = start_date + timezone.timedelta(days=int(_password_date[0]))
-                if _password_date[1] and _password_date[1] != '0':
+                if _password_date[1]:
                     user['date_password_expired'] = start_date + timezone.timedelta(days=int(_password_date[1]))
             detail = {
                 'groups': username_groups.get(username) or '',
