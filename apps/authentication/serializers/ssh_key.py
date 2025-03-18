@@ -5,10 +5,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import ReadableHiddenField, LabeledChoiceField
-
-from ..models import SSHKey
 from common.utils import validate_ssh_public_key
 from users.exceptions import CreateSSHKeyExceedLimit
+from ..models import SSHKey
 
 __all__ = ['SSHKeySerializer', 'GenerateKeyType']
 
@@ -21,6 +20,7 @@ class GenerateKeyType(TextChoices):
 
 class SSHKeySerializer(serializers.ModelSerializer):
     user = ReadableHiddenField(default=serializers.CurrentUserDefault())
+    is_active = serializers.BooleanField(default=True, label=_('Active'))
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
     )
