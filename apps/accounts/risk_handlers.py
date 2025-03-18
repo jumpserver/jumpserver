@@ -76,6 +76,7 @@ class RiskHandler:
 
     def handle_delete_account(self):
         Account.objects.filter(asset=self.asset, username=self.username).delete()
+        GatheredAccount.objects.filter(asset=self.asset, username=self.username).delete()
 
     def handle_close(self):
         pass
