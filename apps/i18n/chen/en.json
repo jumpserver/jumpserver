@@ -19,6 +19,7 @@
     "CopyNotAllowed": "You are not allowed to copy, please contact the administrator to open it!",
     "CopySucceeded": "Copy succeeded",
     "Current": "Current",
+    "DownloadNotAllowed": "You are not allowed to download, please contact the administrator to open it!",
     "DatabaseExplorer": "Database Explorer",
     "DatabaseProperties": "Datasource properties",
     "DriverClass": "Driver class",
