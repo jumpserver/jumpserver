@@ -11,6 +11,11 @@
     {% include '_head_css_js.html' %}
     <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
     <script src="{% static "js/jumpserver.js" %}?_=9"></script>
+    <style>
+        .btn-sm i {
+            margin-right: 6px;
+        }
+    </style>
 
 </head>
 
@@ -20,19 +25,18 @@
         <div class="col-md-12">
             <div class="ibox-content">
                 <div>
-                    <img src="{{ INTERFACE.logo_logout }}" style="margin: auto" width="82" height="82">
+                    <img src="{{ INTERFACE.logo_logout }}" style="margin: auto" width="62" height="62" alt="logo">
                     <h2 style="display: inline">
                         {{ INTERFACE.login_title }}
                     </h2>
                 </div>
-                <p></p>
-                <div class="alert alert-success info-messages" >
+                <div class="alert alert-success info-messages">
                     {{ msg|safe }}
                 </div>
-                <div class="alert alert-danger error-messages" style="display: none">
-                </div>
+                <div class="alert alert-danger error-messages" style="display: none"></div>
                 <div class="progress progress-bar-default progress-striped active">
-                    <div aria-valuemax="3600" aria-valuemin="0" aria-valuenow="43" role="progressbar" class="progress-bar">
+                    <div aria-valuemax="3600" aria-valuemin="0" aria-valuenow="43" role="progressbar"
+                         class="progress-bar">
                     </div>
                 </div>
                 <div class="row">
@@ -66,107 +70,111 @@
 {% include '_foot_js.html' %}
 <script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
 <script>
-var errorMsgShow = false;
-var errorMsgRef = $(".error-messages");
-var infoMsgRef = $(".info-messages");
-var timestamp = '{{ timestamp }}';
-var progressBarRef = $(".progress-bar");
-var interval, checkInterval;
-var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
-var successUrl = "{% url 'authentication:login-guard' %}";
+    var errorMsgShow = false;
+    var errorMsgRef = $(".error-messages");
+    var infoMsgRef = $(".info-messages");
+    var timestamp = '{{ timestamp }}';
+    var progressBarRef = $(".progress-bar");
+    var interval, checkInterval;
+    var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
+    var successUrl = "{% url 'authentication:login-guard' %}";
 
-function doRequestAuth() {
-     requestApi({
-        url: url,
-        method: "GET",
-        headers: {
-            "X-JMS-LOGIN-TYPE": "W"
-        },
-        success: function (data) {
-            if (!data.error && data.msg === 'ok') {
-                window.onbeforeunload = function(){};
-                window.location = "{% url 'authentication:login-guard' %}"
-            } else if (data.error !== "login_confirm_wait") {
-                if (!errorMsgShow) {
-                    infoMsgRef.hide();
-                    errorMsgRef.show();
-                    progressBarRef.addClass('progress-bar-danger');
-                    errorMsgShow = true;
+    function doRequestAuth() {
+        requestApi({
+            url: url,
+            method: "GET",
+            headers: {
+                "X-JMS-LOGIN-TYPE": "W"
+            },
+            success: function (data) {
+                if (!data.error && data.msg === 'ok') {
+                    window.onbeforeunload = function () {
+                    };
+                    window.location = "{% url 'authentication:login-guard' %}"
+                } else if (data.error !== "login_confirm_wait") {
+                    if (!errorMsgShow) {
+                        infoMsgRef.hide();
+                        errorMsgRef.show();
+                        progressBarRef.addClass('progress-bar-danger');
+                        errorMsgShow = true;
+                    }
+                    clearInterval(interval);
+                    clearInterval(checkInterval);
+                    cancelTicket();
+                    $(".copy-btn").attr('disabled', 'disabled');
+                    errorMsgRef.html(data.msg)
                 }
-                clearInterval(interval);
-                clearInterval(checkInterval);
-                cancelTicket();
-                $(".copy-btn").attr('disabled', 'disabled');
-                errorMsgRef.html(data.msg)
+            },
+            error: function (text, data) {
+            },
+            flash_message: false, // 是否显示flash消息
+        })
+    }
+
+    function initClipboard() {
+        var clipboard = new Clipboard('.btn-copy', {
+            text: function (trigger) {
+                var origin = window.location.origin;
+                var link = origin + $(".btn-copy").data('link');
+                return link
             }
-        },
-        error: function (text, data) {
-        },
-        flash_message: false, // 是否显示flash消息
-    })
-}
-function initClipboard() {
-    var clipboard = new Clipboard('.btn-copy', {
-        text: function (trigger) {
-            var origin = window.location.origin;
-            var link = origin + $(".btn-copy").data('link');
-            return link
+        });
+        clipboard.on("success", function (e) {
+            toastr.success("{% trans "Copy success" %}")
+        })
+    }
+
+    function handleProgressBar() {
+        var now = new Date().getTime() / 1000;
+        var offset = now - timestamp;
+        var percent = offset / 3600 * 100;
+        if (percent > 100) {
+            percent = 100
         }
-    });
-    clipboard.on("success", function (e) {
-        toastr.success("{% trans "Copy success" %}")
-    })
-}
-
-function handleProgressBar() {
-    var now = new Date().getTime() / 1000;
-    var offset = now - timestamp;
-    var percent = offset / 3600 * 100;
-    if (percent > 100) {
-        percent = 100
+        progressBarRef.css("width", percent + '%');
+        progressBarRef.attr('aria-valuenow', offset);
     }
-    progressBarRef.css("width", percent + '%');
-    progressBarRef.attr('aria-valuenow', offset);
-}
 
-function cancelTicket() {
-    requestApi({
-        url: url,
-        method: "DELETE",
-        flash_message: false
-    })
-}
+    function cancelTicket() {
+        requestApi({
+            url: url,
+            method: "DELETE",
+            flash_message: false
+        })
+    }
 
-function cancelCloseConfirm() {
-    window.onbeforeunload = function() {};
-    window.onunload = function(){};
-}
+    function cancelCloseConfirm() {
+        window.onbeforeunload = function () {
+        };
+        window.onunload = function () {
+        };
+    }
 
-function setCloseConfirm() {
-    window.onbeforeunload = function (e) {
-        return 'Confirm';
-    };
-    window.onunload = function (e) {
+    function setCloseConfirm() {
+        window.onbeforeunload = function (e) {
+            return 'Confirm';
+        };
+        window.onunload = function (e) {
+            cancelTicket();
+        }
+    }
+
+    $(document).ready(function () {
+        interval = setInterval(handleProgressBar, 1000);
+        checkInterval = setInterval(doRequestAuth, 5000);
+        doRequestAuth();
+        initClipboard();
+        setCloseConfirm();
+    }).on('click', '.btn-refresh', function () {
+        cancelCloseConfirm();
+        window.location.reload();
+    }).on('click', '.btn-return', function () {
         cancelTicket();
-    }
-}
-
-$(document).ready(function () {
-    interval = setInterval(handleProgressBar, 1000);
-    checkInterval = setInterval(doRequestAuth, 5000);
-    doRequestAuth();
-    initClipboard();
-    setCloseConfirm();
-}).on('click', '.btn-refresh', function () {
-    cancelCloseConfirm();
-    window.location.reload();
-}).on('click', '.btn-return', function () {
-    cancelTicket();
-    cancelCloseConfirm();
-    clearInterval(interval);
-    clearInterval(checkInterval);
-    window.location = "{% url 'authentication:logout' %}"
-})
+        cancelCloseConfirm();
+        clearInterval(interval);
+        clearInterval(checkInterval);
+        window.location = "{% url 'authentication:logout' %}"
+    })
 
 </script>
 </html>

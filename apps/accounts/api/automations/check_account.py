@@ -30,7 +30,6 @@ __all__ = [
 ]
 
 from ...filters import NodeFilterBackend
-
 from ...risk_handlers import RiskHandler
 
 
@@ -130,11 +129,13 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
             s.validated_data, ("asset", "username", "action", "risk")
         )
         handler = RiskHandler(asset=asset, username=username, request=self.request)
-        data = handler.handle(act, risk)
-        if not data:
-            return Response(data={"message": "Success"})
-        s = serializers.AccountRiskSerializer(instance=data)
-        return Response(data=s.data)
+
+        try:
+            risk = handler.handle(act, risk)
+            s = serializers.AccountRiskSerializer(instance=risk)
+            return Response(data=s.data)
+        except Exception as e:
+            return Response(status=400, data=str(e))
 
 
 class CheckAccountEngineViewSet(JMSModelViewSet):

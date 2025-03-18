@@ -1,8 +1,9 @@
+from itertools import islice
+
 from django.db import models
 from django.db.models import TextChoices
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from itertools import islice
 
 from common.const import ConfirmOrIgnore
 from common.db.models import JMSBaseModel
@@ -41,6 +42,7 @@ class RiskChoice(TextChoices):
     # 依赖自动发现的
     long_time_no_login = 'long_time_no_login', _('Long time no login')  # 好久没登录的账号, 禁用、删除
     new_found = 'new_found', _('New found')  # 未被纳管的账号, 纳管, 删除, 禁用
+    account_deleted = 'account_deleted', _('Account deleted')  # 账号被删除, 纳管, 删除, 禁用
     group_changed = 'groups_changed', _('Groups change')  # 组变更, 确认
     sudo_changed = 'sudoers_changed', _('Sudo changed')  # sudo 变更, 确认
     authorized_keys_changed = 'authorized_keys_changed', _('Authorized keys changed')  # authorized_keys 变更, 确认

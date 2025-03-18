@@ -8,7 +8,7 @@ from accounts.models import (
     AccountRisk,
     SecretType,
     AutomationExecution,
-    RiskChoice
+    RiskChoice, Account
 )
 from common.const import ConfirmOrIgnore
 from common.utils import random_string
@@ -19,10 +19,11 @@ TYPE_CHOICES = [
     ("close", _("Close")),
     ("disable_remote", _("Disable remote")),
     ("delete_remote", _("Delete remote")),
+    ("delete_account", _("Delete account")),
     ("delete_both", _("Delete remote")),
     ("add_account", _("Add account")),
     ("change_password_add", _("Change password and Add")),
-    ("change_password", _("Change password"))
+    ("change_password", _("Change password")),
 ]
 
 
@@ -73,6 +74,10 @@ class RiskHandler:
     def handle_reopen(self):
         pass
 
+    def handle_delete_account(self):
+        Account.objects.filter(asset=self.asset, username=self.username).delete()
+        GatheredAccount.objects.filter(asset=self.asset, username=self.username).delete()
+
     def handle_close(self):
         pass
 
@@ -102,7 +107,7 @@ class RiskHandler:
             present=True, status=ConfirmOrIgnore.confirmed
         )
         self.risk = RiskChoice.new_found
-        
+
         risk = self.get_risk()
         risk.account = account
         risk.save()
@@ -112,6 +117,15 @@ class RiskHandler:
 
     def handle_delete_remote(self):
         self._handle_delete(delete="remote")
+
+    @staticmethod
+    def start_execution(execution):
+        execution.save()
+        execution.start()
+
+        if execution.status != "success":
+            msg = _("Execution failed: {}").format(execution.status)
+            raise ValidationError(msg)
 
     def _handle_delete(self, delete="both"):
         asset = self.asset
@@ -124,9 +138,7 @@ class RiskHandler:
             "delete": delete,
             "risk": self.risk
         }
-        execution.save()
-        execution.start()
-        return execution.summary
+        self.start_execution(execution)
 
     def handle_delete_both(self):
         self._handle_delete(delete="both")
@@ -134,7 +146,11 @@ class RiskHandler:
     def handle_change_password(self):
         asset = self.asset
         execution = AutomationExecution()
-        account = self.asset.accounts.get(username=self.username)
+        account = self.asset.accounts.filter(username=self.username, secret_type=SecretType.PASSWORD).first()
+
+        if not account:
+            raise ValidationError("Account not found")
+
         execution.snapshot = {
             "assets": [str(asset.id)],
             "accounts": [str(account.id)],
@@ -143,9 +159,7 @@ class RiskHandler:
             "secret_strategy": "random",
             "name": "Change account password: {}@{}".format(self.username, asset.name),
         }
-        execution.save()
-        execution.start()
-        return execution.summary
+        self.start_execution(execution)
 
     def handle_change_password_add(self):
         asset = self.asset
@@ -174,10 +188,10 @@ class RiskHandler:
             'check_conn_after_change': True,
             "name": "Push account password: {}@{}".format(self.username, asset.name),
         }
-        execution.save()
-        execution.start()
+        self.start_execution(execution)
 
-        GatheredAccount.objects.filter(asset=self.asset, username=self.username).update(
-            present=True
+        (
+            GatheredAccount.objects
+            .filter(asset=self.asset, username=self.username)
+            .update(present=True)
         )
-        return execution.summary
