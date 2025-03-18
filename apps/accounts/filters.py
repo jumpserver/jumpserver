@@ -192,6 +192,16 @@ class UUIDExecutionFilterMixin:
 
 class ChangeSecretRecordFilterSet(SecretRecordMixin, UUIDExecutionFilterMixin, BaseFilterSet):
     execution_id = django_filters.CharFilter(method="filter_execution")
+    days = drf_filters.NumberFilter(method="filter_days")
+
+    @staticmethod
+    def filter_days(queryset, name, value):
+        value = int(value)
+
+        dt = local_zero_hour()
+        if value != 1:
+            dt = local_now() - timezone.timedelta(days=value)
+        return queryset.filter(date_finished__gte=dt)
 
     class Meta:
         model = ChangeSecretRecord
