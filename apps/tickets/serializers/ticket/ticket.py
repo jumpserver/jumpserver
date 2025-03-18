@@ -25,8 +25,9 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         fields_mini = ['id', 'title']
         fields_small = fields_mini + ['org_id', 'comment']
         read_only_fields = [
-            'serial_num', 'process_map', 'approval_step', 'type', 'state', 'applicant',
-            'status', 'date_created', 'date_updated', 'org_name', 'rel_snapshot'
+            'serial_num', 'process_map', 'approval_step', 'type',
+            'state', 'applicant', 'status', 'date_created',
+            'date_updated', 'org_name', 'rel_snapshot'
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {}
