@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .general import Ticket
+from ...const import TicketType
 
 
 class ApplyCommandTicket(Ticket):
@@ -18,6 +19,8 @@ class ApplyCommandTicket(Ticket):
         'acls.CommandFilterACL', on_delete=models.SET_NULL,
         null=True, verbose_name=_('Command filter acl')
     )
+
+    TICKET_TYPE = TicketType.command_confirm
 
     class Meta:
         verbose_name = _('Apply Command Ticket')
