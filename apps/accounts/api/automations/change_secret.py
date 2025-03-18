@@ -11,6 +11,7 @@ from accounts.filters import ChangeSecretRecordFilterSet
 from accounts.models import ChangeSecretAutomation, ChangeSecretRecord
 from accounts.tasks import execute_automation_record_task
 from authentication.permissions import UserConfirmation, ConfirmType
+from common.permissions import IsValidLicense
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
 from rbac.permissions import RBACPermission
 from .base import (
@@ -28,6 +29,7 @@ __all__ = [
 
 class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
     model = ChangeSecretAutomation
+    permission_classes = [RBACPermission, IsValidLicense]
     filterset_fields = ('name', 'secret_type', 'secret_strategy')
     search_fields = filterset_fields
     serializer_class = serializers.ChangeSecretAutomationSerializer
@@ -35,6 +37,7 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
 
 class ChangeSecretRecordViewSet(RecordListMixin, mixins.ListModelMixin, OrgGenericViewSet):
     filterset_class = ChangeSecretRecordFilterSet
+    permission_classes = [RBACPermission, IsValidLicense]
     search_fields = ('asset__address', 'account__username')
     ordering_fields = ('date_finished',)
     tp = AutomationTypes.change_secret
@@ -125,7 +128,7 @@ class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
         ("create", "accounts.add_changesecretexecution"),
         ("report", "accounts.view_changesecretexecution"),
     )
-
+    permission_classes = [RBACPermission, IsValidLicense]
     tp = AutomationTypes.change_secret
 
     def get_queryset(self):

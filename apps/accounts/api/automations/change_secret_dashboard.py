@@ -11,9 +11,11 @@ from accounts.const import AutomationTypes, ChangeSecretRecordStatusChoice
 from accounts.models import ChangeSecretAutomation, AutomationExecution, ChangeSecretRecord
 from assets.models import Node, Asset
 from common.const import Status
+from common.permissions import IsValidLicense
 from common.utils import lazyproperty
 from common.utils.timezone import local_zero_hour, local_now
 from ops.celery import app
+from rbac.permissions import RBACPermission
 
 __all__ = ['ChangeSecretDashboardApi']
 
@@ -23,7 +25,7 @@ class ChangeSecretDashboardApi(APIView):
     rbac_perms = {
         'GET': 'accounts.view_changesecretautomation',
     }
-
+    permission_classes = [RBACPermission, IsValidLicense]
     tp = AutomationTypes.change_secret
     task_name = 'accounts.tasks.automation.execute_account_automation_task'
     ongoing_change_secret_cache_key = "ongoing_change_secret_cache_key"
