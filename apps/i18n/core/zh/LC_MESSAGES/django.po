@@ -3959,7 +3959,7 @@ msgstr "请输入动态安全码"
 msgid ""
 "The two-factor code you entered has either already been used or has expired. "
 "Please request a new one."
-msgstr ""
+msgstr "您输入的双重验证码已被使用或已过期。请申请新的双重验证码。"
 
 #: authentication/mfa/custom.py:21
 msgid "MFA Custom code invalid"

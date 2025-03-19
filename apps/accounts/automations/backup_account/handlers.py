@@ -38,6 +38,8 @@ class BaseAccountHandler:
             else:
                 if isinstance(v, dict):
                     v = v.get('label')
+                elif v is None:
+                    v = ''
                 data[k] = v
         return data
 
@@ -196,8 +198,8 @@ class AccountBackupHandler:
                 attachment_list = [attachment]
             AccountBackupExecutionTaskMsg(name, user).publish(attachment_list)
 
-        # for file in files:
-        #     os.remove(file)
+        for file in files:
+            os.remove(file)
 
     def send_backup_obj_storage(self, files, recipients, password):
         if not files:
@@ -282,8 +284,7 @@ class AccountBackupHandler:
         else:
             recipients = recipients_part_one or recipients_part_two
             files = self.create_excel()
-            print(files)
-            # self.send_backup_mail(files, recipients)
+            self.send_backup_mail(files, recipients)
 
     def run(self):
         print('{}: {}'.format(_('Plan start'), local_now_display()))

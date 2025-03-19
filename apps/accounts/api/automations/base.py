@@ -6,6 +6,7 @@ from rest_framework import status, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from accounts.filters import AutomationExecutionFilterSet
 from accounts.models import AutomationExecution
 from accounts.tasks import execute_account_automation_task
 from assets import serializers
@@ -100,6 +101,7 @@ class AutomationExecutionViewSet(
 ):
     search_fields = ('trigger', 'automation__name')
     filterset_fields = ('trigger', 'automation_id', 'automation__name')
+    filterset_class = AutomationExecutionFilterSet
     serializer_class = serializers.AutomationExecutionSerializer
     tp: str
 
