@@ -7,6 +7,7 @@ from accounts.models import GatherAccountsAutomation
 from accounts.models import GatheredAccount
 from accounts.serializers.account.account import AccountAssetSerializer as _AccountAssetSerializer
 from accounts.serializers.account.base import BaseAccountSerializer
+from common.const import ConfirmOrIgnore
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseAutomationSerializer
 
@@ -63,9 +64,12 @@ class DiscoverAccountSerializer(BulkOrgResourceModelSerializer):
         return queryset
 
 
-class DiscoverAccountActionSerializer(DiscoverAccountSerializer):
-    class Meta(DiscoverAccountSerializer.Meta):
-        read_only_fields = list(set(DiscoverAccountSerializer.Meta.read_only_fields) - {'status'})
+class DiscoverAccountActionSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.UUIDField(), required=True)
+    status = serializers.ChoiceField(choices=ConfirmOrIgnore.choices, default=ConfirmOrIgnore.pending, allow_blank=True)
+
+    class Meta:
+        fields = ['ids', 'status']
 
 
 class DiscoverAccountDetailsSerializer(serializers.Serializer):
