@@ -15,6 +15,7 @@ class BaseRunner(WorkPostRunCleaner):
     def setup_env():
         ansible_config_path = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
         ansible_modules_path = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'modules')
+        os.environ.setdefault('PYTHONPATH', settings.APPS_DIR)
         os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
         os.environ.setdefault('ANSIBLE_CONFIG', ansible_config_path)
         os.environ.setdefault('ANSIBLE_LIBRARY', ansible_modules_path)
