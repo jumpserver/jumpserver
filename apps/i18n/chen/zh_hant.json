@@ -21,6 +21,7 @@
     "Current": "目前",
     "DatabaseExplorer": "資料庫瀏覽器",
     "DatabaseProperties": "資料源屬性",
+    "DownloadNotAllowed": "不允許下載，請聯繫管理員開啟權限！",
     "DriverClass": "驅動類",
     "DriverVersion": "驅動版本",
     "ErrorMessage": "錯誤消息",

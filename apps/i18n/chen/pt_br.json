@@ -21,6 +21,7 @@
     "Current": "Atual",
     "DatabaseExplorer": "Navegador de Banco de Dados",
     "DatabaseProperties": "Propriedades da fonte de dados",
+    "DownloadNotAllowed": "O download não é permitido, por favor, entre em contato com o administrador para habilitar as permissões!",
     "DriverClass": "Classe do driver",
     "DriverVersion": "Versão do driver",
     "ErrorMessage": "Mensagem de erro",

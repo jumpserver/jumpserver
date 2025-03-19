@@ -21,6 +21,7 @@
     "Current": "現在",
     "DatabaseExplorer": "データベースエクスプローラー",
     "DatabaseProperties": "データソースプロパティ",
+    "DownloadNotAllowed": "ダウンロードは許可されていません。管理者に連絡して権限を開いてください！",
     "DriverClass": "ドライバークラス",
     "DriverVersion": "ドライバーバージョン",
     "ErrorMessage": "エラーメッセージ",

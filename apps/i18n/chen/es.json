@@ -21,6 +21,7 @@
     "Current": "Actual",
     "DatabaseExplorer": "Navegador de base de datos.",
     "DatabaseProperties": "Atributos de la fuente de datos",
+    "DownloadNotAllowed": "No se permite la descarga, ¡por favor contacta al administrador para habilitar los permisos!",
     "DriverClass": "Clase de controlador.",
     "DriverVersion": "Versión del controlador",
     "ErrorMessage": "Mensaje de error",
