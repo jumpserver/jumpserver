@@ -18,6 +18,8 @@ class BaseRunner(WorkPostRunCleaner):
         os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
         os.environ.setdefault('ANSIBLE_CONFIG', ansible_config_path)
         os.environ.setdefault('ANSIBLE_LIBRARY', ansible_modules_path)
+        os.environ.setdefault('LC_ALL', 'C.UTF-8')
+        os.environ.setdefault('LANG', 'C.UTF-8')
 
     @classmethod
     def kill_precess(cls, pid):
