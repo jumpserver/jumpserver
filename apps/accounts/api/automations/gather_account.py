@@ -90,14 +90,16 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
 
     @action(methods=["put"], detail=False, url_path="status")
     def status(self, request, *args, **kwargs):
-        ids = request.data.get('ids', [])
-        new_status = request.data.get("status")
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        validated_data = serializer.validated_data
+        ids = validated_data.get('ids', [])
+        new_status = validated_data.get('status')
         updated_instances = GatheredAccount.objects.filter(id__in=ids).select_related('asset')
-
         if new_status == "confirmed":
             GatheredAccount.sync_accounts(updated_instances)
             updated_instances.update(present=True)
-
         updated_instances.update(status=new_status)
         return Response(status=status.HTTP_200_OK)
 
