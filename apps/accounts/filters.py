@@ -68,6 +68,7 @@ class AccountFilterSet(BaseFilterSet):
     risk = drf_filters.CharFilter(method="filter_risk")
     integrationapplication = drf_filters.CharFilter(method="filter_integrationapplication")
     long_time_no_change_secret = drf_filters.BooleanFilter(method="filter_long_time")
+    long_time_no_login = drf_filters.BooleanFilter(method="filter_long_time")
     long_time_no_verified = drf_filters.BooleanFilter(method="filter_long_time")
 
     @staticmethod
@@ -85,12 +86,15 @@ class AccountFilterSet(BaseFilterSet):
         if name == "long_time_no_change_secret":
             field = "date_change_secret"
             confirm_field = "change_secret_status"
+        elif name == "long_time_no_login":
+            field = "date_last_login"
+            confirm_field = None
         else:
             field = "date_verified"
             confirm_field = "connectivity"
 
         q = Q(**{f"{field}__lt": date}) | Q(**{f"{field}__isnull": True})
-        confirm_q = {f"{confirm_field}": "na"}
+        confirm_q = {f"{confirm_field}": "na"} if confirm_field else {}
         queryset = queryset.exclude(**confirm_q).filter(q)
         return queryset
 

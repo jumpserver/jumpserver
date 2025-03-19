@@ -180,6 +180,13 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         recorder.status = ChangeSecretRecordStatusChoice.failed.value
         recorder.date_finished = timezone.now()
         recorder.error = error
+        account = recorder.account
+        if not account:
+            print("Account not found, deleted ?")
+            return
+        account.date_updated = timezone.now()
+        account.date_change_secret = timezone.now()
+        account.change_secret_status = ChangeSecretRecordStatusChoice.failed
 
         self.summary['fail_accounts'] += 1
         self.result['fail_accounts'].append(
@@ -191,4 +198,5 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         super().on_host_error(host, error, result)
 
         with safe_db_connection():
+            account.save(update_fields=['change_secret_status', 'date_change_secret', 'date_updated'])
             self.save_record(recorder)
