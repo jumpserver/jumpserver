@@ -193,5 +193,5 @@ class RiskHandler:
         (
             GatheredAccount.objects
             .filter(asset=self.asset, username=self.username)
-            .update(present=True)
+            .update(present=True, status=ConfirmOrIgnore.confirmed)
         )
