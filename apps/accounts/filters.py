@@ -15,7 +15,8 @@ from assets.utils import get_node_from_request
 from common.drf.filters import BaseFilterSet
 from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import ChangeSecretRecordStatusChoice
-from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord, IntegrationApplication
+from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord, IntegrationApplication, \
+    AutomationExecution
 
 
 class NodeFilterBackend(filters.BaseFilterBackend):
@@ -190,22 +191,39 @@ class UUIDExecutionFilterMixin:
         return queryset.filter(**{name: value})
 
 
-class ChangeSecretRecordFilterSet(SecretRecordMixin, UUIDExecutionFilterMixin, BaseFilterSet):
-    execution_id = django_filters.CharFilter(method="filter_execution")
+class DaysExecutionFilterMixin:
     days = drf_filters.NumberFilter(method="filter_days")
+    field: str
 
-    @staticmethod
-    def filter_days(queryset, name, value):
+    def filter_days(self, queryset, name, value):
         value = int(value)
 
         dt = local_zero_hour()
         if value != 1:
             dt = local_now() - timezone.timedelta(days=value)
-        return queryset.filter(date_finished__gte=dt)
+        return queryset.filter(**{f'{self.field}__gte': dt})
+
+
+class ChangeSecretRecordFilterSet(
+    SecretRecordMixin, UUIDExecutionFilterMixin,
+    DaysExecutionFilterMixin, BaseFilterSet
+):
+    execution_id = django_filters.CharFilter(method="filter_execution")
+    days = drf_filters.NumberFilter(method="filter_days")
+
+    field = 'date_finished'
 
     class Meta:
         model = ChangeSecretRecord
         fields = ["id", "status", "asset_id", "execution_id"]
+
+
+class AutomationExecutionFilterSet(DaysExecutionFilterMixin, BaseFilterSet):
+    field = 'date_start'
+
+    class Meta:
+        model = AutomationExecution
+        fields = ["days", 'trigger', 'automation_id', 'automation__name']
 
 
 class PushAccountRecordFilterSet(SecretRecordMixin, UUIDExecutionFilterMixin, BaseFilterSet):

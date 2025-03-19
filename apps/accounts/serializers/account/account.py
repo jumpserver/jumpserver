@@ -460,7 +460,10 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
             'secret': {'write_only': False},
             'spec_info': {'label': _('Spec info')},
         }
-        exclude_backup_fields = ['passphrase', 'push_now', 'params']
+        exclude_backup_fields = [
+            'passphrase', 'push_now', 'params',
+            'spec_info', 'platform', 'auto_config'
+        ]
 
 
 class AccountHistorySerializer(serializers.ModelSerializer):
