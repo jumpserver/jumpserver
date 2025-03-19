@@ -43,6 +43,7 @@ class PamDashboardApi(APIView):
             'total_sudoers_changed_accounts': ('sudoers_changed_count', Q(risk='sudoers_changed')),
             'total_authorized_keys_changed_accounts': (
                 'authorized_keys_changed_count', Q(risk='authorized_keys_changed')),
+            'total_account_deleted_accounts': ('account_deleted_count', Q(risk='account_deleted')),
             'total_password_expired_accounts': ('password_expired_count', Q(risk='password_expired')),
             'total_long_time_password_accounts': ('long_time_password_count', Q(risk='long_time_password')),
             'total_weak_password_accounts': ('weak_password_count', Q(risk='weak_password')),
