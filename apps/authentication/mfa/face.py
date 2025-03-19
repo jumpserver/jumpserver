@@ -44,7 +44,7 @@ class MFAFace(BaseMFA, AuthFaceMixin):
 
     def disable(self):
         assert self.is_authenticated()
-        self.user.face_vector = ''
+        self.user.face_vector = None
         self.user.save(update_fields=['face_vector'])
 
     def can_disable(self) -> bool:
