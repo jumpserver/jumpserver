@@ -1529,5 +1529,7 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "StopJob": "停止作业",
-    "ConnectMethodAclDetail": "连接方式详情"
+    "ConnectMethodAclDetail": "连接方式详情",
+    "DeleteAccount": "删除账号",
+    "DeleteBoth": "同时删除"
 }
