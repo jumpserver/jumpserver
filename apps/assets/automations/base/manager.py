@@ -3,10 +3,10 @@ import json
 import logging
 import os
 import shutil
-import time
 from collections import defaultdict
 from socket import gethostname
 
+import time
 import yaml
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -376,7 +376,7 @@ class PlaybookPrepareMixin:
 class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     bulk_size = 100
     ansible_account_policy = "privileged_first"
-    ansible_account_prefer = "root,Administrator"
+    ansible_account_prefer = ""
 
     def __init__(self, execution):
         super().__init__(execution)

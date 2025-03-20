@@ -1527,5 +1527,7 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "StopJob": "Stop job",
-    "ConnectMethodAclDetail": "Connect method acl detail"
+    "ConnectMethodAclDetail": "Connect method acl detail",
+    "DeleteAccount": "Delete account",
+    "DeleteBoth": "Delete both"
 }

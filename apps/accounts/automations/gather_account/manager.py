@@ -1,6 +1,6 @@
-import time
 from collections import defaultdict
 
+import time
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
