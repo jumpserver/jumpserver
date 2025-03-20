@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 10:58+0800\n"
+"POT-Creation-Date: 2025-03-20 11:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "Account not found"
 msgstr ""
 
-#: accounts/api/automations/base.py:82 tickets/api/ticket.py:132
+#: accounts/api/automations/base.py:83 tickets/api/ticket.py:132
 msgid "The parameter 'action' must be [{}]"
 msgstr ""
 
@@ -37,15 +37,15 @@ msgstr ""
 msgid "The account key will be split into two parts and sent"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:129
+#: accounts/automations/backup_account/handlers.py:131
 msgid "Number of backup accounts"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:150
+#: accounts/automations/backup_account/handlers.py:152
 msgid "Generating asset related backup information files"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:175
+#: accounts/automations/backup_account/handlers.py:177
 #: accounts/automations/backup_account/manager.py:26
 #: accounts/automations/change_secret/manager.py:81
 #: accounts/automations/push_account/manager.py:62
@@ -56,31 +56,31 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:176
+#: accounts/automations/backup_account/handlers.py:178
 msgid "Backup file creation completed"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:184
+#: accounts/automations/backup_account/handlers.py:186
 msgid "Start sending backup emails"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:211
+#: accounts/automations/backup_account/handlers.py:213
 msgid "Encrypting files using encryption password"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:221
+#: accounts/automations/backup_account/handlers.py:223
 msgid "The backup file will be sent to"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:244
+#: accounts/automations/backup_account/handlers.py:246
 msgid "The backup task has no assigned sftp server"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:265
+#: accounts/automations/backup_account/handlers.py:267
 msgid "The backup task has no assigned recipient"
 msgstr ""
 
-#: accounts/automations/backup_account/handlers.py:289
+#: accounts/automations/backup_account/handlers.py:290
 msgid "Plan start"
 msgstr ""
 
@@ -410,7 +410,7 @@ msgid ""
 "Vault."
 msgstr ""
 
-#: accounts/filters.py:189
+#: accounts/filters.py:194
 msgid "Enter a valid UUID."
 msgstr ""
 
@@ -440,7 +440,7 @@ msgstr ""
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:145
 #: accounts/serializers/automations/check_account.py:33
-#: accounts/serializers/automations/gather_account.py:47
+#: accounts/serializers/automations/gather_account.py:48
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_failed_info.html:11
 #: accounts/templates/accounts/change_secret_report.html:79
@@ -981,7 +981,7 @@ msgid "Verify asset account"
 msgstr ""
 
 #: accounts/models/base.py:37 accounts/models/base.py:66
-#: accounts/serializers/account/account.py:467
+#: accounts/serializers/account/account.py:470
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:48
 #: authentication/serializers/connect_token_secret.py:42
@@ -1231,14 +1231,14 @@ msgstr ""
 msgid "Spec info"
 msgstr ""
 
-#: accounts/serializers/account/account.py:468
+#: accounts/serializers/account/account.py:471
 #: authentication/serializers/connect_token_secret.py:160
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr ""
 
-#: accounts/serializers/account/account.py:478 acls/serializers/base.py:123
+#: accounts/serializers/account/account.py:481 acls/serializers/base.py:123
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
@@ -1260,7 +1260,7 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: accounts/serializers/account/account.py:479
+#: accounts/serializers/account/account.py:482
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:159 terminal/notifications.py:219
 msgid "Date"
@@ -1428,7 +1428,7 @@ msgstr ""
 msgid "Invalid engine id"
 msgstr ""
 
-#: accounts/serializers/automations/gather_account.py:30
+#: accounts/serializers/automations/gather_account.py:31
 msgid "Whether to check the risk of the gathered accounts."
 msgstr ""
 
@@ -3764,6 +3764,8 @@ msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
 msgstr ""
+"{error} You can also try {times_try} times (The account will be temporarily "
+"locked for {block_time} minutes)"
 
 #: authentication/errors/const.py:63
 msgid "MFA required"
