@@ -209,6 +209,7 @@ class AccountAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = ['id', 'name', 'address', 'type', 'category', 'platform', 'auto_config']
+        exclude_backup_fields = ['platform', 'auto_config']
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
@@ -461,8 +462,7 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
             'spec_info': {'label': _('Spec info')},
         }
         exclude_backup_fields = [
-            'passphrase', 'push_now', 'params',
-            'spec_info', 'platform', 'auto_config'
+            'passphrase', 'push_now', 'params', 'spec_info'
         ]
 
 
