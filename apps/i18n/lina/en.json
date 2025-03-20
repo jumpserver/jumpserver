@@ -1525,5 +1525,7 @@
     "disallowSelfUpdateFields": "Not allowed to modify the current fields yourself",
     "forceEnableMFAHelpText": "If force enable, user can not disable by themselves",
     "removeWarningMsg": "Are you sure you want to remove",
-    "setVariable": "Set variable"
+    "setVariable": "Set variable",
+    "StopJob": "Stop job",
+    "ConnectMethodAclDetail": "Connect method acl detail"
 }
