@@ -1,11 +1,26 @@
-from ops.ansible.cleaner import WorkPostRunCleaner, cleanup_post_run
+import os
+
+from django.conf import settings
+
+from ops.ansible.cleaner import WorkPostRunCleaner
 
 
 class BaseRunner(WorkPostRunCleaner):
-
     def __init__(self, **kwargs):
         self.runner_params = kwargs
         self.clean_workspace = kwargs.pop("clean_workspace", True)
+        self.setup_env()
+
+    @staticmethod
+    def setup_env():
+        ansible_config_path = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
+        ansible_modules_path = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'modules')
+        os.environ.setdefault('PYTHONPATH', settings.APPS_DIR)
+        os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
+        os.environ.setdefault('ANSIBLE_CONFIG', ansible_config_path)
+        os.environ.setdefault('ANSIBLE_LIBRARY', ansible_modules_path)
+        os.environ.setdefault('LC_ALL', 'C.UTF-8')
+        os.environ.setdefault('LANG', 'C.UTF-8')
 
     @classmethod
     def kill_precess(cls, pid):

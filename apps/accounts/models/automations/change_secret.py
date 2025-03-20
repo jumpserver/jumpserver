@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
@@ -6,9 +7,10 @@ from accounts.const import (
 )
 from common.db import fields
 from common.db.models import JMSBaseModel
+from orgs.utils import get_current_org
 from .base import AccountBaseAutomation, ChangeSecretMixin
 
-__all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', ]
+__all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'BaseSecretRecord']
 
 
 class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
@@ -24,30 +26,53 @@ class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
-            'recipients': {
-                str(recipient.id): (str(recipient), bool(recipient.secret_key))
-                for recipient in self.recipients.all()
-            }
+            'recipients': [str(r.id) for r in self.recipients.all()]
         })
         return attr_json
 
 
-class ChangeSecretRecord(JMSBaseModel):
-    execution = models.ForeignKey('accounts.AutomationExecution', on_delete=models.SET_NULL, null=True)
-    asset = models.ForeignKey('assets.Asset', on_delete=models.SET_NULL, null=True)
-    account = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True)
-    old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
-    new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
-    date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
-    date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'))
+class BaseSecretRecord(JMSBaseModel):
+    account = models.ForeignKey(
+        'accounts.Account', on_delete=models.SET_NULL,
+        null=True, related_name='%(class)ss'
+    )
+    asset = models.ForeignKey(
+        'assets.Asset', on_delete=models.SET_NULL,
+        null=True, related_name='asset_%(class)ss'
+    )
+    execution = models.ForeignKey(
+        'accounts.AutomationExecution', on_delete=models.SET_NULL,
+        null=True, related_name='execution_%(class)ss',
+    )
+    date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'), db_index=True)
     status = models.CharField(
         max_length=16, verbose_name=_('Status'), default=ChangeSecretRecordStatusChoice.pending.value
     )
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
     class Meta:
-        ordering = ('-date_created',)
-        verbose_name = _("Change secret record")
+        abstract = True
 
     def __str__(self):
         return f'{self.account.username}@{self.asset}'
+
+    @classmethod
+    def get_valid_records(cls):
+        org = get_current_org()
+        if org is None or org.is_root():
+            kwargs = {}
+        else:
+            kwargs = {'execution__org_id': org.id}
+
+        return cls.objects.exclude(
+            Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
+        ).filter(**kwargs)
+
+
+class ChangeSecretRecord(BaseSecretRecord):
+    old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
+    new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
+    ignore_fail = models.BooleanField(default=False, verbose_name=_('Ignore fail'))
+
+    class Meta:
+        verbose_name = _("Change secret record")

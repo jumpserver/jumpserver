@@ -19,7 +19,7 @@ class BasicSettingSerializer(serializers.Serializer):
         help_text=_('User first login update profile done redirect to it')
     )
     GLOBAL_ORG_DISPLAY_NAME = serializers.CharField(
-        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization"),
+        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global org display"),
         help_text=_('The name of global organization to display')
     )
     HELP_DOCUMENT_URL = serializers.URLField(

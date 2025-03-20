@@ -24,7 +24,7 @@ class AliasAccount(TextChoices):
 
 class Source(TextChoices):
     LOCAL = 'local', _('Local')
-    COLLECTED = 'collected', _('Collected')
+    DISCOVERY = 'collected', _('Discovery')
     TEMPLATE = 'template', _('Template')
 
 

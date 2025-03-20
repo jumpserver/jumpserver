@@ -11,8 +11,8 @@ from functools import wraps
 
 from django.db import transaction
 
+from .db.utils import open_db_connection, safe_db_connection
 from .utils import logger
-from .db.utils import open_db_connection
 
 
 def on_transaction_commit(func):
@@ -294,3 +294,90 @@ def cached_method(ttl=20):
         return wrapper
 
     return decorator
+
+
+def bulk_handle(handler, batch_size=50, timeout=0.5):
+    def decorator(func):
+        from orgs.utils import get_current_org_id
+
+        cache = []  # 缓存实例的列表
+        lock = threading.Lock()  # 用于线程安全
+        timer = [None]  # 定时器对象，列表存储以便重置
+        org_id = None
+
+        def reset_timer():
+            """重置定时器"""
+            if timer[0] is not None:
+                timer[0].cancel()
+            timer[0] = threading.Timer(timeout, handle_remaining)
+            timer[0].start()
+
+        def handle_it():
+            from orgs.utils import tmp_to_org
+            with lock:
+                if not cache:
+                    return
+                with tmp_to_org(org_id):
+                    with safe_db_connection():
+                        handler(cache)
+                cache.clear()
+
+        def handle_on_org_changed():
+            nonlocal org_id
+            if org_id is None:
+                org_id = get_current_org_id()
+            else:
+                c_org_id = get_current_org_id()
+                if org_id != c_org_id:
+                    handle_it()
+                    org_id = c_org_id
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal cache
+
+            handle_on_org_changed()
+
+            # 调用被装饰的函数，生成一个实例
+            instance = func(*args, **kwargs)
+            if instance is None:
+                return None
+
+            # 添加实例到缓存
+            cache.append(instance)
+            print(f"Instance added to cache. Cache size: {len(cache)}")
+
+            # 如果缓存大小达到批量保存阈值，执行保存
+            if len(cache) >= batch_size:
+                handle_it()
+
+            reset_timer()
+            return instance
+
+        # 提交剩余实例的方法
+        def handle_remaining():
+            if not cache:
+                return
+            print("Timer expired. Saving remaining instances.")
+            from orgs.utils import tmp_to_org
+            with tmp_to_org(org_id):
+                handle_it()
+
+        wrapper.finish = handle_remaining
+        return wrapper
+
+    return decorator
+
+
+def bulk_create_decorator(instance_model, batch_size=50, ignore_conflicts=True, timeout=0.3):
+    def handle(cache):
+        instance_model.objects.bulk_create(cache, ignore_conflicts=ignore_conflicts)
+
+    return bulk_handle(handle, batch_size, timeout)
+
+
+def bulk_update_decorator(instance_model, batch_size=50, update_fields=None, timeout=0.3):
+    def handle(cache):
+        instance_model.objects.bulk_update(cache, update_fields)
+
+    return bulk_handle(handle, batch_size, timeout)

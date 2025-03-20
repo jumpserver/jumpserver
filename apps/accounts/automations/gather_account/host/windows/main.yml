@@ -1,0 +1,32 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Run net user command to get all users
+      win_shell: net user
+      register: user_list_output
+
+    - name: Parse all users from net user command
+      set_fact:
+        all_users: >-
+          {%- set users = [] -%}
+          {%- for line in user_list_output.stdout_lines -%}
+            {%- if loop.index > 4 and line.strip() != "" and not line.startswith("The command completed") -%}
+              {%- for user in line.split() -%}
+                {%- set _ = users.append(user) -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {{ users }}
+
+    - name: Run net user command for each user to get details
+      win_shell: net user {{ item }}
+      loop: "{{ all_users }}"
+      register: user_details
+      ignore_errors: yes
+
+    - set_fact:
+        info:
+          user_details: "{{ user_details.results }}"
+
+    - debug:
+        var: info

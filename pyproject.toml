@@ -163,6 +163,7 @@ azure-keyvault-secrets = "4.9.0"
 # psycopg2 = "2.9.6"
 psycopg2-binary = "2.9.6"
 pycountry = "^24.6.1"
+premailer = "3.10.0"
 # Depend by jms storage
 azure-storage-blob = "12.17.0"
 esdk-obs-python = "3.21.4"
@@ -202,3 +203,4 @@ priority = "supplemental"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

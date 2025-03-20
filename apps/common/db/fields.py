@@ -39,6 +39,7 @@ __all__ = [
     "BitChoices",
     "TreeChoices",
     "JSONManyToManyField",
+    "RelatedManager",
 ]
 
 

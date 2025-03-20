@@ -31,14 +31,14 @@ from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
-from ..models import ConnectionToken, date_expired_default
+from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
     ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer
 )
 
-__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
+__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet', 'AdminConnectionTokenViewSet']
 logger = get_logger(__name__)
 
 
@@ -442,9 +442,12 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         return data
 
     @staticmethod
-    def _validate_perm(user, asset, account_name, protocol):
+    def get_permed_account(user, asset, account_name, protocol):
         from perms.utils.asset_perm import PermAssetDetailUtil
-        account = PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
+        return PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
+
+    def _validate_perm(self, user, asset, account_name, protocol):
+        account = self.get_permed_account(user, asset, account_name, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
@@ -664,3 +667,21 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         else:
             logger.error('Release applet account error: {}'.format(lock_key))
             return Response({'error': 'not found or expired'}, status=400)
+
+
+class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
+
+    def check_permissions(self, request):
+        user = request.user
+        if not user.is_superuser:
+            self.permission_denied(request)
+
+    def get_queryset(self):
+        return AdminConnectionToken.objects.all()
+
+    def get_permed_account(self, user, asset, account_name, protocol):
+        with tmp_to_org(asset.org):
+            account = asset.accounts.all().active().get(name=account_name)
+            account.actions = ActionChoices.all()
+            account.date_expired = timezone.now() + timezone.timedelta(days=365)
+            return account

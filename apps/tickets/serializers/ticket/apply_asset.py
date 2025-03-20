@@ -31,9 +31,9 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
     class Meta(TicketApplySerializer.Meta):
         model = ApplyAssetTicket
         writeable_fields = [
-            'id', 'title', 'type', 'apply_nodes', 'apply_assets', 'apply_accounts',
-            'apply_actions', 'apply_date_start', 'apply_date_expired',
-            'comment', 'org_id'
+            'id', 'title', 'type', 'apply_nodes', 'apply_assets',
+            'apply_accounts', 'apply_actions', 'apply_date_start',
+            'apply_date_expired', 'comment', 'org_id'
         ]
         read_only_fields = TicketApplySerializer.Meta.read_only_fields + ['apply_permission_name', ]
         fields = TicketApplySerializer.Meta.fields_small + writeable_fields + read_only_fields
@@ -45,11 +45,21 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         }
         extra_kwargs.update(ticket_extra_kwargs)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.set_actions_field()
+
     def validate_apply_nodes(self, nodes):
         return self.filter_many_to_many_field(Node, nodes)
 
     def validate_apply_assets(self, assets):
         return self.filter_many_to_many_field(Asset, assets)
+
+    def set_actions_field(self):
+        actions = self.fields.get("apply_actions")
+        if not actions:
+            return
+        actions.default = ['connect']
 
     def validate(self, attrs):
         attrs['type'] = 'apply_asset'

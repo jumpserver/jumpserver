@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -161,6 +162,7 @@ class OracleInfo(object):
 
     def __get_settings(self):
         """Get global variables (instance settings)."""
+
         def _set_settings_value(item_dict):
             try:
                 self.info['settings'][item_dict['name']] = item_dict['value']
@@ -178,11 +180,30 @@ class OracleInfo(object):
 
     def __get_users(self):
         """Get user info."""
+
+        def _set_users_roles(username, item_dict):
+            users_sql = f"SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE = '{username}';"
+            try:
+                rtn, err = self.oracle_client.execute(users_sql, exception_to_fail=True)
+                item_dict['roles'] = [r['role'] for r in rtn]
+            except Exception:
+                pass
+
+        def _set_users_privileges(username, item_dict):
+            users_sql = f"SELECT PRIVILEGE FROM DBA_SYS_PRIVS WHERE GRANTEE = '{username}';"
+            try:
+                rtn, err = self.oracle_client.execute(users_sql, exception_to_fail=True)
+                item_dict['privileges'] = [r['privilege'] for r in rtn]
+            except Exception:
+                pass
+
         def _set_users_value(item_dict):
             try:
                 tablespace = item_dict.pop('default_tablespace')
                 username = item_dict.pop('username')
                 partial_users = self.info['users'].get(tablespace, {})
+                _set_users_roles(username, item_dict)
+                _set_users_privileges(username, item_dict)
                 partial_users[username] = item_dict
                 self.info['users'][tablespace] = partial_users
             except KeyError:
@@ -198,6 +219,7 @@ class OracleInfo(object):
 
     def __get_databases(self, exclude_fields):
         """Get info about databases."""
+
         def _set_databases_value(item_dict):
             try:
                 tablespace_name = item_dict.pop('tablespace_name')

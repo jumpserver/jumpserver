@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from perms.const import ActionChoices
+from tickets.const import TicketType
 from .general import Ticket
 
 __all__ = ['ApplyAssetTicket']
@@ -18,6 +19,8 @@ class ApplyAssetTicket(Ticket):
     apply_actions = models.IntegerField(verbose_name=_('Actions'), default=ActionChoices.connect)
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
+
+    TICKET_TYPE = TicketType.apply_asset
 
     def get_apply_actions_display(self):
         return ActionChoices.display(self.apply_actions)

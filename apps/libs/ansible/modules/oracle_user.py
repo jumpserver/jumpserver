@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
+__metaclass__ = type
 
 DOCUMENTATION = '''
 ---
@@ -207,7 +207,7 @@ def main():
             temporary_tablespace=temporary_tablespace
         )
     elif state == 'absent':
-        user_remove(oracle_client)
+        user_remove(module, oracle_client, user)
     module.exit_json(changed=True, user=user)
 
 

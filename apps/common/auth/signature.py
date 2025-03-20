@@ -36,7 +36,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     :param www_authenticate_realm:  Default: "api"
     :param required_headers:        Default: ["(request-target)", "date"]
     """
-
+    source = ''
     www_authenticate_realm = "api"
     required_headers = ["(request-target)", "date"]
 
@@ -46,6 +46,9 @@ class SignatureAuthentication(authentication.BaseAuthentication):
 
     def is_ip_allow(self, key_id, request):
         raise NotImplementedError()
+
+    def after_authenticate_update_date(self, user):
+        pass
 
     def authenticate_header(self, request):
         """
@@ -72,6 +75,9 @@ class SignatureAuthentication(authentication.BaseAuthentication):
 
         # Ignore foreign Authorization headers.
         if method.lower() != 'signature':
+            return None
+
+        if self.source and request.META.get('HTTP_X_SOURCE') != self.source:
             return None
 
         # Verify basic header structure.
@@ -117,4 +123,5 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if not hs.verify():
             raise FAILED
 
+        self.after_authenticate_update_date(user)
         return user, fields["keyid"]

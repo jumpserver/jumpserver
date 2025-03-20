@@ -27,13 +27,14 @@ from .const import (
 )
 
 __all__ = [
+    "JobLog",
     "FTPLog",
     "OperateLog",
+    "UserSession",
     "ActivityLog",
-    "PasswordChangeLog",
     "UserLoginLog",
-    "JobLog",
-    "UserSession"
+    "PasswordChangeLog",
+    "IntegrationApplicationLog",
 ]
 
 
@@ -301,3 +302,13 @@ class UserSession(models.Model):
         permissions = [
             ('offline_usersession', _('Offline user session')),
         ]
+
+
+class IntegrationApplicationLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    remote_addr = models.GenericIPAddressField(verbose_name=_("Remote addr"))
+    service = models.CharField(max_length=128, verbose_name=_("Application"))
+    service_id = models.UUIDField(verbose_name=_("Application ID"))
+    asset = models.CharField(max_length=128, verbose_name=_("Asset"))
+    account = models.CharField(max_length=128, verbose_name=_("Account"))
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))

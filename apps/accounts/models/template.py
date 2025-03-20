@@ -86,3 +86,7 @@ class AccountTemplate(LabeledMixin, BaseAccount, SecretWithRandomMixin):
         """ 批量同步账号密码 """
         self.bulk_update_accounts(accounts)
         self.bulk_create_history_accounts(accounts, user_id)
+
+    def save(self, *args, **kwargs):
+        self.secret = self.get_secret()
+        super().save(*args, **kwargs)

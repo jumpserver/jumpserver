@@ -11,6 +11,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import Account
 from assets.models import Asset
 from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.utils import get_object_or_none, lazyproperty
@@ -125,6 +126,10 @@ class Session(OrgModelMixin):
     def user_obj(self):
         return User.objects.get(id=self.user_id)
 
+    @property
+    def account_obj(self):
+        return get_object_or_none(Account, pk=self.account_id)
+
     def can_replay(self):
         return self.has_replay
 
@@ -196,13 +201,17 @@ class Session(OrgModelMixin):
             local_path = self.get_replay_part_file_local_storage_path(filename)
         try:
             name = default_storage.save(local_path, f)
+            absolute_saved_path = default_storage.path(name)
+            absolute_local_path = default_storage.path(local_path)
+            if absolute_saved_path != absolute_local_path:
+                os.rename(absolute_saved_path, absolute_local_path)
         except OSError as e:
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
             from terminal.tasks import upload_session_replay_file_to_external_storage
             upload_session_replay_file_to_external_storage.delay(str(self.id), local_path, rel_path)
-        return name, None
+        return local_path, None
 
     @classmethod
     def set_sessions_active(cls, session_ids):

@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Asset, Node, BaseAutomation, AutomationExecution
-from common.const.choices import Trigger
+from common.const.choices import Trigger, Status
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from ops.mixin import PeriodTaskSerializerMixin
@@ -22,37 +22,36 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
     class Meta:
         read_only_fields = [
-            'date_created', 'date_updated', 'created_by', 'periodic_display'
+            'date_created', 'date_updated', 'created_by',
+            'periodic_display', 'executed_amount', 'type', 'last_execution_date'
         ]
-        fields = [
-                     'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
-                     'type', 'accounts', 'nodes', 'assets', 'is_active'
-                 ] + read_only_fields
+        mini_fields = [
+            'id', 'name', 'type', 'is_periodic', 'interval',
+            'crontab', 'comment', 'is_active'
+        ]
+        fields = mini_fields + [
+            'accounts', 'nodes', 'assets',
+        ] + read_only_fields
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
+            'executed_amount': {'label': _('Executions')},
         }
 
 
 class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    status = serializers.SerializerMethodField(label=_("Status"))
     trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
+    status = LabeledChoiceField(choices=Status.choices, read_only=True, label=_('Status'))
+    automation = ObjectRelatedField(required=False, queryset=BaseAutomation.objects, attrs=('id', 'name'))
 
     class Meta:
         model = AutomationExecution
         read_only_fields = [
-            'trigger', 'date_start', 'date_finished', 'snapshot', 'status'
+            'trigger', 'date_start', 'date_finished',
+            'snapshot', 'status', 'duration'
         ]
         fields = ['id', 'automation'] + read_only_fields
-
-    @staticmethod
-    def get_status(obj):
-        if obj.status == 'success':
-            return _("Success")
-        elif obj.status == 'pending':
-            return _("Pending")
-        return obj.status
 
     @staticmethod
     def get_snapshot(obj):

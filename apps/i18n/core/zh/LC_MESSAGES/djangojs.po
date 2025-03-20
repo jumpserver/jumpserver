@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-12 17:33+0800\n"
+"POT-Creation-Date: 2025-02-24 14:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,62 +16,62 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: static/js/jumpserver.js:264
+#: static/js/jumpserver.js:267
 msgid "Update is successful!"
 msgstr "更新成功"
 
-#: static/js/jumpserver.js:266
+#: static/js/jumpserver.js:269
 msgid "An unknown error occurred while updating.."
 msgstr "更新时发生未知错误"
 
-#: static/js/jumpserver.js:339
+#: static/js/jumpserver.js:342
 msgid "Not found"
 msgstr ""
 
-#: static/js/jumpserver.js:341
+#: static/js/jumpserver.js:344
 msgid "Server error"
 msgstr ""
 
-#: static/js/jumpserver.js:343 static/js/jumpserver.js:381
-#: static/js/jumpserver.js:383
+#: static/js/jumpserver.js:346 static/js/jumpserver.js:384
+#: static/js/jumpserver.js:386
 msgid "Error"
 msgstr "错误"
 
-#: static/js/jumpserver.js:349 static/js/jumpserver.js:390
+#: static/js/jumpserver.js:352 static/js/jumpserver.js:393
 msgid "Delete the success"
 msgstr "删除成功"
 
-#: static/js/jumpserver.js:356
+#: static/js/jumpserver.js:359
 msgid "Are you sure about deleting it?"
 msgstr "你确定删除吗 ?"
 
-#: static/js/jumpserver.js:360 static/js/jumpserver.js:401
+#: static/js/jumpserver.js:363 static/js/jumpserver.js:404
 msgid "Cancel"
 msgstr "取消"
 
-#: static/js/jumpserver.js:362 static/js/jumpserver.js:403
+#: static/js/jumpserver.js:365 static/js/jumpserver.js:406
 msgid "Confirm"
 msgstr "确认"
 
-#: static/js/jumpserver.js:381
+#: static/js/jumpserver.js:384
 msgid ""
 "The organization contains undeleted information. Please try again after "
 "deleting"
 msgstr "组织中包含未删除信息，请删除后重试"
 
-#: static/js/jumpserver.js:383
+#: static/js/jumpserver.js:386
 msgid ""
 "Do not perform this operation under this organization. Try again after "
 "switching to another organization"
 msgstr "请勿在此组织下执行此操作，切换到其他组织后重试"
 
-#: static/js/jumpserver.js:397
+#: static/js/jumpserver.js:400
 msgid ""
 "Please ensure that the following information in the organization has been "
 "deleted"
 msgstr "请确保组织内的以下信息已删除"
 
-#: static/js/jumpserver.js:398
+#: static/js/jumpserver.js:401
 msgid ""
 "User list、User group、Asset list、Domain list、Admin user、System user、"
 "Labels、Asset permission"
@@ -79,26 +79,26 @@ msgstr ""
 "用户列表、用户组、资产列表、网域列表、特权用户、系统用户、标签管理、资产授权"
 "规则"
 
-#: static/js/jumpserver.js:647
+#: static/js/jumpserver.js:650
 msgid "Unknown error occur"
 msgstr "出现未知错误"
 
-#: static/js/jumpserver.js:899
+#: static/js/jumpserver.js:902
 msgid "Password minimum length {N} bits"
 msgstr "密码最小长度 {N} 位"
 
-#: static/js/jumpserver.js:900
+#: static/js/jumpserver.js:903
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: static/js/jumpserver.js:901
+#: static/js/jumpserver.js:904
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: static/js/jumpserver.js:902
+#: static/js/jumpserver.js:905
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: static/js/jumpserver.js:903
+#: static/js/jumpserver.js:906
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"

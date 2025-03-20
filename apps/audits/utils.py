@@ -1,11 +1,12 @@
 import copy
 from datetime import datetime
-from itertools import chain
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
+from itertools import chain
 
 from common.db.fields import RelatedManager
 from common.utils import validate_ip, get_ip_city, get_logger
@@ -48,7 +49,10 @@ def _get_instance_field_value(
             if getattr(f, 'attname', None) in model_need_continue_fields:
                 continue
 
-            value = getattr(instance, f.name, None) or getattr(instance, f.attname, None)
+            try:
+                value = getattr(instance, f.name, None) or getattr(instance, f.attname, None)
+            except ObjectDoesNotExist:
+                continue
             if not isinstance(value, (bool, int)) and not value:
                 continue
 

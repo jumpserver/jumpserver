@@ -25,7 +25,6 @@ from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import is_uuid, get_logger, lazyproperty
 from ops.const import Types
 from ops.models import Job
-from ops.serializers.job import JobSerializer
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
@@ -37,13 +36,14 @@ from .const import ActivityChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession
+    ActivityLog, JobLog, UserSession, IntegrationApplicationLog
 )
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
-    FileSerializer, UserSessionSerializer, JobsAuditSerializer
+    FileSerializer, UserSessionSerializer, JobsAuditSerializer,
+    ServiceAccessLogSerializer
 )
 from .utils import construct_userlogin_usernames
 
@@ -167,7 +167,7 @@ class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org.is_root():
+        if current_org.is_root() or not settings.XPACK_ENABLED:
             return queryset
         users = self.get_org_member_usernames()
         queryset = queryset.filter(username__in=users)
@@ -329,3 +329,15 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             user_session_manager.remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)
+
+
+class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
+    model = IntegrationApplicationLog
+    serializer_class = ServiceAccessLogSerializer
+    extra_filter_backends = [DatetimeRangeFilterBackend]
+    date_range_filter_fields = [
+        ('datetime', ('date_from', 'date_to'))
+    ]
+    filterset_fields = ['account', 'remote_addr', 'service_id']
+    search_fields = filterset_fields
+    ordering = ['-datetime']

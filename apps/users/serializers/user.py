@@ -168,60 +168,43 @@ class UserSerializer(
         # mini 是指能识别对象的最小单元
         fields_mini = ["id", "name", "username"]
         # 只能写的字段, 这个虽然无法在框架上生效，但是更多对我们是提醒
-        fields_write_only = [
-            "password",
-            "public_key",
-        ]
+        fields_write_only = ["password", "public_key", ]
         # xpack 包含的字段
-        fields_xpack = ["wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id", "is_org_admin", "orgs_roles",
-                        "org_roles"]
+        fields_xpack = [
+            "wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id",
+            "is_org_admin", "orgs_roles", "org_roles"
+        ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = (
-            fields_mini
-            + fields_write_only
-            + [
-                "email",
-                "wechat",
-                "phone",
-                "mfa_level",
-                "source",
-                *fields_xpack,
-                "created_by",
-                "updated_by",
-                "comment",  # 通用字段
-            ]
+                fields_mini
+                + fields_write_only
+                + [
+                    "email", "wechat", "phone", "mfa_level",
+                    "source", *fields_xpack,
+                    "created_by", "updated_by", "comment",  # 通用字段
+                ]
         )
         fields_date = [
-            "date_expired",
-            "date_joined",
-            "last_login",
-            "date_updated",
-            "date_api_key_last_used",
+            "date_expired", "date_joined", "last_login",
+            "date_updated", "date_api_key_last_used",
         ]
         fields_bool = [
-            "is_superuser",
-            "is_org_admin",
-            "is_service_account",
-            "is_valid",
-            "is_expired",
-            "is_active",  # 布尔字段
-            "is_otp_secret_key_bound",
-            "can_public_key_auth",
-            "mfa_enabled",
-            "need_update_password",
-            "is_face_code_set",
+            "is_superuser", "is_org_admin", "is_service_account",
+            "is_valid", "is_expired", "is_active",  # 布尔字段
+            "is_otp_secret_key_bound", "can_public_key_auth",
+            "mfa_enabled", "need_update_password", "is_face_code_set",
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = (
-            fields_small
-            + fields_date
-            + fields_bool
-            + [
-                "mfa_force_enabled",
-                "is_first_login",
-                "date_password_last_updated",
-                "avatar_url",
-            ]
+                fields_small
+                + fields_date
+                + fields_bool
+                + [
+                    "mfa_force_enabled",
+                    "is_first_login",
+                    "date_password_last_updated",
+                    "avatar_url",
+                ]
         )
         # 外键的字段
         fields_fk = []

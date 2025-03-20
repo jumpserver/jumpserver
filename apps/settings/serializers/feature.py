@@ -187,9 +187,10 @@ class OpsSettingSerializer(serializers.Serializer):
         help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(
-        child=serializers.CharField(max_length=1024, ),
+        child=serializers.CharField(max_length=1024),
         label=_('Command blacklist'),
-        help_text=_("Command blacklist in Adhoc")
+        help_text=_("Command blacklist in Adhoc"),
+        default=list,
     )
 
 

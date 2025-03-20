@@ -245,6 +245,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         auto_config.update(model_to_dict(automation))
         return auto_config
 
+    @lazyproperty
+    def accounts_amount(self):
+        return self.accounts.count()
+
     def get_target_ip(self):
         return self.address
 

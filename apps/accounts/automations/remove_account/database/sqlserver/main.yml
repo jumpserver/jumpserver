@@ -1,7 +1,7 @@
 - hosts: sqlserver
   gather_facts: no
   vars:
-    ansible_python_interpreter: /opt/py3/bin/python
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
 
   tasks:
     - name: "Remove account"

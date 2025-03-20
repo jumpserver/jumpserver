@@ -2,7 +2,7 @@
 #
 from django.db.models import QuerySet
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework_bulk import BulkModelViewSet
+from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.api import CommonApiMixin, RelationMixin
 from orgs.utils import current_org

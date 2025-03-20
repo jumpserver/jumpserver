@@ -21,6 +21,7 @@
     "Current": "Current",
     "DatabaseExplorer": "Database Explorer",
     "DatabaseProperties": "Datasource properties",
+    "DownloadNotAllowed": "You are not allowed to download, please contact the administrator to open it!",
     "DriverClass": "Driver class",
     "DriverVersion": "Driver version",
     "ErrorMessage": "Error message",
@@ -32,6 +33,7 @@
     "ExportCurrent": "Export current page",
     "ExportData": "Export data",
     "FetchError": "Error while fetching data",
+    "Format": "Format",
     "FormatHotKey": "Format (Ctrl + L)",
     "InitializeDatasource": "Initialize datasource",
     "InitializeDatasourceFailed": "Initialize datasource failed",
@@ -60,6 +62,7 @@
     "Save": "Save",
     "SaveSQL": "Save SQL",
     "SaveSucceed": "Save succeed",
+    "Scope": "Scope",
     "SelectSQL": "Select SQL",
     "SessionClosedBy": "This session has been closed by %s.",
     "SessionFinished": "Session finished",
@@ -78,7 +81,5 @@
     "ViewData": "View data",
     "WaitCommandReviewMessage": "The review request has been initiated, please wait for the review results",
     "Warning": "Warning",
-    "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct",
-    "Scope": "Scope",
-    "Format": "Format"
+    "initializingDatasourceFailedMessage": "Connection failed, please check if the database connection configuration is correct"
 }

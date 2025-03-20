@@ -5,6 +5,8 @@ from .general import Ticket
 
 __all__ = ['ApplyLoginAssetTicket']
 
+from ...const import TicketType
+
 
 class ApplyLoginAssetTicket(Ticket):
     apply_login_user = models.ForeignKey(
@@ -16,6 +18,8 @@ class ApplyLoginAssetTicket(Ticket):
     apply_login_account = models.CharField(
         max_length=128, default='', verbose_name=_('Login account')
     )
+
+    TICKET_TYPE = TicketType.login_asset_confirm
 
     def activate_connection_token_if_need(self):
         if not self.connection_token:

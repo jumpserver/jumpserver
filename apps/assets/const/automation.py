@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Connectivity(TextChoices):
     UNKNOWN = '-', _('Unknown')
+    NA = 'na', _('N/A')
     OK = 'ok', _('OK')
     ERR = 'err', _('Error')
 

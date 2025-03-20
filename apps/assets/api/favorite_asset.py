@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework_bulk import BulkModelViewSet
+from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_root_org
