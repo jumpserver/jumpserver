@@ -13,6 +13,7 @@ from accounts.filters import GatheredAccountFilterSet, NodeFilterBackend
 from accounts.models import GatherAccountsAutomation, AutomationExecution, Account
 from accounts.models import GatheredAccount
 from assets.models import Asset
+from common.const import ConfirmOrIgnore
 from common.utils.http import is_true
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
@@ -97,7 +98,7 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         ids = validated_data.get('ids', [])
         new_status = validated_data.get('status')
         updated_instances = GatheredAccount.objects.filter(id__in=ids).select_related('asset')
-        if new_status == "confirmed":
+        if new_status == ConfirmOrIgnore.confirmed:
             GatheredAccount.sync_accounts(updated_instances)
             updated_instances.update(present=True)
         updated_instances.update(status=new_status)
