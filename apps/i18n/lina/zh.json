@@ -26,7 +26,7 @@
     "AccountDiscoverTaskCreate": "创建发现帐户任务",
     "AccountDiscoverTaskUpdate": "更新发现帐户任务",
     "AccountExportTips": "导出信息中包含账号密文涉及敏感信息，导出的格式为一个加密的zip文件（若没有设置加密密码，请前往个人信息中设置文件加密密码）。",
-    "AccountList": "账号",
+    "AccountList": "账号管理",
     "AccountPolicy": "账号策略",
     "AccountPolicyHelpText": "创建时对于不符合要求的账号，如：密钥类型不合规，唯一键约束，可选择以上策略。",
     "AccountPushCreate": "创建账号推送",
