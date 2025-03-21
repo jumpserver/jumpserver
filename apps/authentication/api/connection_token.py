@@ -443,8 +443,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
 
     @staticmethod
     def get_permed_account(user, asset, account_name, protocol):
-        from perms.utils.asset_perm import PermAssetDetailUtil
-        return PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
+        return ConnectionToken.get_user_permed_account(user, asset, account_name, protocol)
 
     def _validate_perm(self, user, asset, account_name, protocol):
         account = self.get_permed_account(user, asset, account_name, protocol)
@@ -683,13 +682,4 @@ class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
         return AdminConnectionToken.objects.all().filter(user=self.request.user)
 
     def get_permed_account(self, user, asset, account_name, protocol):
-        """
-        管理员 token 可以访问所有资产的账号
-        """
-        with tmp_to_org(asset.org):
-            account = asset.accounts.all().active().filter(name=account_name).first()
-            if not account:
-                return None
-            account.actions = ActionChoices.all()
-            account.date_expired = timezone.now() + timezone.timedelta(days=365)
-            return account
+        return AdminConnectionToken.get_user_permed_account(user, asset, account_name, protocol)
