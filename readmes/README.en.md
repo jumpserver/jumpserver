@@ -4,14 +4,6 @@
   
 ## An open-source PAM tool (Bastion Host)
 
-[![][license-shield]][license-link]
-[![][discord-shield]][discord-link]
-[![][docker-shield]][docker-link]
-[![][github-release-shield]][github-release-link]
-[![][github-stars-shield]][github-stars-link]
-
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md)
-
 </div>
 <br/>
 
