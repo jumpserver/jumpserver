@@ -1881,7 +1881,7 @@ msgid "Notify"
 msgstr "Notificación"
 
 #: acls/const.py:11
-msgid "Notify and warn"
+msgid "Prompt and warn"
 msgstr "Sugerencia y alarma"
 
 #: acls/const.py:12

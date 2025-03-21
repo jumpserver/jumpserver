@@ -1747,7 +1747,7 @@ msgid "Notify"
 msgstr ""
 
 #: acls/const.py:11
-msgid "Notify and warn"
+msgid "Prompt and warn"
 msgstr ""
 
 #: acls/const.py:12
