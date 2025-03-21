@@ -124,11 +124,15 @@ class ConnectionToken(JMSOrgBaseModel):
         self.date_expired = date_expired_default()
         self.save()
 
-    def get_permed_account(self):
+    @classmethod
+    def get_user_permed_account(cls, user, asset, account_name, protocol):
         from perms.utils import PermAssetDetailUtil
-        permed_account = PermAssetDetailUtil(self.user, self.asset) \
-            .validate_permission(self.account, self.protocol)
+        permed_account = PermAssetDetailUtil(user, asset) \
+            .validate_permission(account_name, protocol)
         return permed_account
+
+    def get_permed_account(self):
+        return self.get_user_permed_account(self.user, self.asset, self.account, self.protocol)
 
     @lazyproperty
     def permed_account(self):
@@ -335,8 +339,9 @@ class AdminConnectionToken(ConnectionToken):
     def is_valid(self):
         return super().is_valid()
 
-    def get_permed_account(self):
-        account = self.asset.accounts.filter(name=self.account).first()
+    @classmethod
+    def get_user_permed_account(cls, user, asset, account_name, protocol):
+        account = asset.accounts.filter(name=cls.account).first()
         if not account:
             return None
         account.actions = ActionChoices.all()
