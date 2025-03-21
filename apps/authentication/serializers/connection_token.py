@@ -4,11 +4,11 @@ from rest_framework import serializers
 from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
 from perms.serializers.permission import ActionChoicesField
-from ..models import ConnectionToken
+from ..models import ConnectionToken, AdminConnectionToken
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
-    'ConnectionTokenReusableSerializer',
+    'ConnectionTokenReusableSerializer', 'AdminConnectionTokenSerializer',
 ]
 
 
@@ -74,3 +74,7 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
     def get_user(self, attrs):
         return attrs.get('user')
+
+class AdminConnectionTokenSerializer(ConnectionTokenSerializer):
+    class Meta(ConnectionTokenSerializer.Meta):
+        model = AdminConnectionToken
