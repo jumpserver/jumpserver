@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 11:52+0800\n"
+"POT-Creation-Date: 2025-03-24 15:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -19,12 +19,12 @@ msgstr ""
 
 #: accounts/api/account/account.py:121
 #: accounts/serializers/account/account.py:181
-#: accounts/serializers/account/account.py:342
+#: accounts/serializers/account/account.py:343
 msgid "Account already exists"
 msgstr "账号已存在"
 
 #: accounts/api/account/application.py:78
-#: authentication/api/connection_token.py:452
+#: authentication/api/connection_token.py:451
 msgid "Account not found"
 msgstr "账号未找到"
 
@@ -437,8 +437,8 @@ msgstr "用户 %s 查看/导出 了密码"
 #: accounts/models/account.py:85
 #: accounts/models/automations/check_account.py:59
 #: accounts/models/automations/gather_account.py:17
-#: accounts/serializers/account/account.py:226
-#: accounts/serializers/account/account.py:274
+#: accounts/serializers/account/account.py:227
+#: accounts/serializers/account/account.py:275
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:145
 #: accounts/serializers/automations/check_account.py:33
@@ -454,7 +454,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
 #: assets/models/asset/common.py:366 assets/models/cmd_filter.py:36
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:228
-#: authentication/models/connection_token.py:40
+#: authentication/models/connection_token.py:42
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:34 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
@@ -465,8 +465,8 @@ msgid "Asset"
 msgstr "资产"
 
 #: accounts/models/account.py:89 accounts/models/template.py:16
-#: accounts/serializers/account/account.py:233
-#: accounts/serializers/account/account.py:284
+#: accounts/serializers/account/account.py:234
+#: accounts/serializers/account/account.py:285
 #: accounts/serializers/account/template.py:35
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
@@ -486,7 +486,7 @@ msgstr "历史账号"
 msgid "Secret reset"
 msgstr "可改密"
 
-#: accounts/models/account.py:97 accounts/serializers/account/account.py:228
+#: accounts/models/account.py:97 accounts/serializers/account/account.py:229
 #: users/models/user/__init__.py:122
 msgid "Source"
 msgstr "来源"
@@ -520,7 +520,7 @@ msgstr "改密状态"
 #: acls/serializers/base.py:131
 #: acls/templates/acls/asset_login_reminder.html:10
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:313
-#: audits/serializers.py:229 authentication/api/connection_token.py:464
+#: audits/serializers.py:229 authentication/api/connection_token.py:463
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:36 terminal/serializers/command.py:72
@@ -624,7 +624,7 @@ msgstr "最后使用日期"
 
 #: accounts/models/application.py:24 acls/models/base.py:43
 #: assets/models/asset/common.py:178 authentication/models/access_key.py:23
-#: authentication/models/connection_token.py:58
+#: authentication/models/connection_token.py:60
 #: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:28
@@ -764,7 +764,7 @@ msgid "Status"
 msgstr "状态"
 
 #: accounts/models/automations/change_secret.py:51
-#: accounts/serializers/account/account.py:276
+#: accounts/serializers/account/account.py:277
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
 #: authentication/templates/authentication/passkey.html:173
@@ -1152,10 +1152,8 @@ msgid "Change password"
 msgstr "改密"
 
 #: accounts/risk_handlers.py:127
-#, fuzzy
-#| msgid "Test connection failed: {}"
 msgid "Execution failed: {}"
-msgstr "测试连接失败：{}"
+msgstr "执行失败：{}"
 
 #: accounts/serializers/account/account.py:31
 msgid "Push now"
@@ -1184,7 +1182,7 @@ msgstr "类别"
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:160 assets/serializers/platform.py:172
 #: audits/serializers.py:77 audits/serializers.py:194
-#: authentication/models/connection_token.py:62
+#: authentication/models/connection_token.py:64
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
@@ -1197,30 +1195,30 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/serializers/account/account.py:222
+#: accounts/serializers/account/account.py:223
 msgid "Asset not found"
 msgstr "资产不存在"
 
-#: accounts/serializers/account/account.py:265
+#: accounts/serializers/account/account.py:266
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:275 ops/models/celery.py:84
+#: accounts/serializers/account/account.py:276 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr "状态"
 
-#: accounts/serializers/account/account.py:277
+#: accounts/serializers/account/account.py:278
 msgid "Changed"
 msgstr "已修改"
 
-#: accounts/serializers/account/account.py:287 acls/models/base.py:97
+#: accounts/serializers/account/account.py:288 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:9
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
-#: authentication/api/connection_token.py:463 ops/models/base.py:17
+#: authentication/api/connection_token.py:462 ops/models/base.py:17
 #: ops/models/job.py:155 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -1228,16 +1226,16 @@ msgstr "已修改"
 msgid "Assets"
 msgstr "资产"
 
-#: accounts/serializers/account/account.py:392
+#: accounts/serializers/account/account.py:393
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "资产不支持账号类型: %s"
 
-#: accounts/serializers/account/account.py:424
+#: accounts/serializers/account/account.py:425
 msgid "Account has exist"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:461
+#: accounts/serializers/account/account.py:462
 #: accounts/serializers/account/base.py:86
 #: accounts/serializers/account/template.py:66
 #: assets/serializers/asset/common.py:421
@@ -1256,7 +1254,7 @@ msgstr "ID"
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
 #: audits/models.py:91 audits/models.py:173 audits/models.py:272
-#: audits/serializers.py:195 authentication/models/connection_token.py:36
+#: audits/serializers.py:195 authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
@@ -1713,7 +1711,6 @@ msgstr "否"
 #: accounts/templates/accounts/change_secret_report.html:94
 #: accounts/templates/accounts/change_secret_report.html:134
 #: accounts/templates/accounts/gather_account_report.html:92
-#: accounts/templates/accounts/gather_account_report.html:132
 #: accounts/templates/accounts/push_account_report.html:93
 #: accounts/templates/accounts/push_account_report.html:133
 msgid "No new accounts found"
@@ -1741,6 +1738,10 @@ msgstr "新发现的帐户"
 #: accounts/templates/accounts/gather_account_report.html:105
 msgid "Lost accounts"
 msgstr "丢失的账号"
+
+#: accounts/templates/accounts/gather_account_report.html:132
+msgid "No lost accounts found"
+msgstr "未找到丢失的账号"
 
 #: accounts/utils.py:54
 msgid ""
@@ -2075,7 +2076,7 @@ msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> 开始执行第 {index} 批任务"
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:145
+#: authentication/models/connection_token.py:161
 msgid "No account"
 msgstr "没有账号"
 
@@ -2343,7 +2344,7 @@ msgstr "认证数据库"
 msgid "The database to authenticate against"
 msgstr "要进行身份验证的数据库"
 
-#: assets/const/protocol.py:232 authentication/models/connection_token.py:47
+#: assets/const/protocol.py:232 authentication/models/connection_token.py:49
 msgid "Connect options"
 msgstr "连接项"
 
@@ -2607,7 +2608,7 @@ msgstr "系统"
 #: assets/models/label.py:19 assets/models/node.py:539
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
-#: authentication/models/connection_token.py:33
+#: authentication/models/connection_token.py:35
 #: authentication/serializers/connect_token_secret.py:125
 #: common/serializers/common.py:86 labels/models.py:12 settings/models.py:38
 #: users/models/preference.py:13
@@ -3472,7 +3473,7 @@ msgstr "认证方式"
 msgid "%s %s this resource"
 msgstr "用户 %s %s 了当前资源"
 
-#: audits/serializers.py:196 authentication/models/connection_token.py:51
+#: audits/serializers.py:196 authentication/models/connection_token.py:53
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:21 users/models/user/__init__.py:101
@@ -3594,39 +3595,39 @@ msgstr "参数中的值必须包含 %s"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:303
+#: authentication/api/connection_token.py:304
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:423
+#: authentication/api/connection_token.py:424
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:455
+#: authentication/api/connection_token.py:454
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:488
+#: authentication/api/connection_token.py:487
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:492
+#: authentication/api/connection_token.py:491
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
-#: authentication/api/connection_token.py:502
+#: authentication/api/connection_token.py:501
 msgid "ACL action is face verify"
 msgstr "ACL 动作是人脸验证"
 
-#: authentication/api/connection_token.py:507
+#: authentication/api/connection_token.py:506
 msgid "ACL action not supported for this asset"
 msgstr "资产登录规则不支持当前资产"
 
-#: authentication/api/connection_token.py:514
+#: authentication/api/connection_token.py:513
 msgid "ACL action is face online"
 msgstr "ACL 动作是人脸在线"
 
-#: authentication/api/connection_token.py:533
+#: authentication/api/connection_token.py:532
 msgid "No available face feature"
 msgstr "没有可用的人脸特征"
 
@@ -4038,21 +4039,21 @@ msgstr "该 MFA ({}) 方式没有启用"
 msgid "Please change your password"
 msgstr "请修改密码"
 
-#: authentication/models/connection_token.py:42
+#: authentication/models/connection_token.py:44
 #: terminal/serializers/storage.py:114
 msgid "Account name"
 msgstr "账号名称"
 
-#: authentication/models/connection_token.py:43
+#: authentication/models/connection_token.py:45
 msgid "Input username"
 msgstr "自定义用户名"
 
-#: authentication/models/connection_token.py:44
+#: authentication/models/connection_token.py:46
 #: authentication/serializers/connection_token.py:18
 msgid "Input secret"
 msgstr "自定义密码"
 
-#: authentication/models/connection_token.py:45
+#: authentication/models/connection_token.py:47
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
@@ -4061,69 +4062,69 @@ msgstr "自定义密码"
 msgid "Protocol"
 msgstr "协议"
 
-#: authentication/models/connection_token.py:46
+#: authentication/models/connection_token.py:48
 msgid "Connect method"
 msgstr "连接方式"
 
-#: authentication/models/connection_token.py:48
+#: authentication/models/connection_token.py:50
 msgid "User display"
 msgstr "用户名称"
 
-#: authentication/models/connection_token.py:49
+#: authentication/models/connection_token.py:51
 msgid "Asset display"
 msgstr "资产名称"
 
-#: authentication/models/connection_token.py:50
+#: authentication/models/connection_token.py:52
 msgid "Reusable"
 msgstr "可以重复使用"
 
-#: authentication/models/connection_token.py:55
+#: authentication/models/connection_token.py:57
 #: perms/models/asset_permission.py:83
 msgid "From ticket"
 msgstr "来自工单"
 
-#: authentication/models/connection_token.py:57
+#: authentication/models/connection_token.py:59
 msgid "Face monitor token"
 msgstr "人脸监控令牌"
 
-#: authentication/models/connection_token.py:68
+#: authentication/models/connection_token.py:70
 msgid "Can expire connection token"
 msgstr "可以失效连接令牌"
 
-#: authentication/models/connection_token.py:69
+#: authentication/models/connection_token.py:71
 msgid "Can reuse connection token"
 msgstr "可以复用连接令牌"
 
-#: authentication/models/connection_token.py:71
+#: authentication/models/connection_token.py:73
 msgid "Connection token"
 msgstr "连接令牌"
 
-#: authentication/models/connection_token.py:132
+#: authentication/models/connection_token.py:148
 msgid "Connection token inactive"
 msgstr "连接令牌未激活"
 
-#: authentication/models/connection_token.py:136
+#: authentication/models/connection_token.py:152
 msgid "Connection token expired at: {}"
 msgstr "连接令牌过期: {}"
 
-#: authentication/models/connection_token.py:139
+#: authentication/models/connection_token.py:155
 #: terminal/serializers/session.py:95
 msgid "No user or invalid user"
 msgstr "没有用户或用户失效"
 
-#: authentication/models/connection_token.py:142
+#: authentication/models/connection_token.py:158
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:290
+#: authentication/models/connection_token.py:307
 msgid "Can view super connection token secret"
 msgstr "可以查看超级连接令牌密文"
 
-#: authentication/models/connection_token.py:292
+#: authentication/models/connection_token.py:309
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
-#: authentication/models/connection_token.py:309
+#: authentication/models/connection_token.py:326
 msgid "Admin connection token"
 msgstr "管理员连接令牌"
 
@@ -11005,27 +11006,16 @@ msgid "Instance count"
 msgstr "实例个数"
 
 #: xpack/plugins/cloud/tasks.py:33
-#, fuzzy
-#| msgid ""
-#| "Execute this task when manually or scheduled cloud synchronization tasks "
-#| "are performed"
 msgid ""
 "Execute this task when manually or scheduled cloud synchronization tasks are "
 "performed"
-msgstr "手动，定时执行云同步任务时执行该任务"
+msgstr "手动或定时云同步任务执行时执行此任务"
 
 #: xpack/plugins/cloud/tasks.py:50
 msgid "Period clean sync instance task execution"
 msgstr "定期清除同步实例任务执行记录"
 
 #: xpack/plugins/cloud/tasks.py:52
-#, fuzzy
-#| msgid ""
-#| "Every day, according to the configuration in \"System Settings - Tasks - "
-#| "Regular \n"
-#| "        clean-up - Cloud sync task history retention days\" the system "
-#| "will clean up the execution \n"
-#| "        records generated by cloud synchronization"
 msgid ""
 "Every day, according to the configuration in \"System Settings - Tasks - "
 "Regular \n"
@@ -11033,7 +11023,7 @@ msgid ""
 "clean up the execution \n"
 "        records generated by cloud synchronization"
 msgstr ""
-"每天，系统会根据“系统设置-任务-”中的配置定期清理云同步任务历史保留天数，对云"
+"每天系统会根据“系统设置-任务-”中的配置定期清理云同步任务历史保留天数，对云"
 "同步产生的执行记录进行清理"
 
 #: xpack/plugins/interface/api.py:52
@@ -11089,45 +11079,3 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
-
-#, fuzzy
-#~| msgid "Container name"
-#~ msgid "domain_name"
-#~ msgstr "容器名称"
-
-#~ msgid "Password error"
-#~ msgstr "密码错误"
-
-#~ msgid "No admin account"
-#~ msgstr "没有管理账号"
-
-#~ msgid "Others"
-#~ msgstr "其它"
-
-#~ msgid "Ok count"
-#~ msgstr "成功数"
-
-#~ msgid "No password count"
-#~ msgstr "无密码数"
-
-#~ msgid "No weak password"
-#~ msgstr "无弱密码"
-
-#~ msgid ""
-#~ "The following is a summary of account backup tasks, please review and "
-#~ "handle them"
-#~ msgstr "以下是账户备份任务的概要，请查阅并处理"
-
-#~ msgid ""
-#~ "The following is a summary of account change secret tasks, please read "
-#~ "and process"
-#~ msgstr "以下是账号更改秘密任务的摘要，请阅读并处理"
-
-#~ msgid ""
-#~ "The following is a summary of the account check tasks. Please review and "
-#~ "handle them"
-#~ msgstr "以下是账号检查任务的汇总，请查阅并处理"
-
-#~ msgid ""
-#~ "The following is a summary of account push tasks, please read and process"
-#~ msgstr "以下是账号推送任务的汇总，请阅读并处理"
