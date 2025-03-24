@@ -4,6 +4,7 @@ version = "v3.9"
 description = "广受欢迎的开源堡垒机"
 authors = ["ibuler <ibuler@qq.com>"]
 license = "GPLv3"
+package-mode = false
 readme = "README.md"
 
 [tool.poetry.dependencies]
