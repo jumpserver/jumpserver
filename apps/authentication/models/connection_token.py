@@ -72,10 +72,6 @@ class ConnectionToken(JMSOrgBaseModel):
         ]
         verbose_name = _('Connection token')
 
-    def save(self, *args, **kwargs):
-        self.type = self._type
-        return super().save(*args, **kwargs)
-
     @classmethod
     def get_typed_connection_token(cls, token_id):
         token = get_object_or_404(cls, id=token_id)
@@ -99,6 +95,7 @@ class ConnectionToken(JMSOrgBaseModel):
         return int(seconds)
 
     def save(self, *args, **kwargs):
+        self.type = self._type
         self.asset_display = pretty_string(self.asset, max_length=128)
         self.user_display = pretty_string(self.user, max_length=128)
         return super().save(*args, **kwargs)
@@ -341,9 +338,13 @@ class AdminConnectionToken(ConnectionToken):
 
     @classmethod
     def get_user_permed_account(cls, user, asset, account_name, protocol):
-        account = asset.accounts.filter(name=account_name).first()
-        if not account:
-            return None
+        """
+        管理员 token 可以访问所有资产的账号
+        """
+        with tmp_to_org(asset.org_id):
+            account = asset.accounts.filter(name=account_name).first()
+            if not account:
+                return None
         account.actions = ActionChoices.all()
         account.date_expired = timezone.now() + timezone.timedelta(days=5)
         return account
