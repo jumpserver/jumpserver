@@ -6,6 +6,7 @@ from django.test import Client
 from django.urls import URLPattern, URLResolver
 
 from jumpserver.urls import api_v1
+from users.models import User
 
 path_uuid_pattern = re.compile(r'<\w+:\w+>', re.IGNORECASE)
 uuid_pattern = re.compile(r'\(\(\?P<.*>[^)]+\)/\)\?', re.IGNORECASE)
@@ -91,7 +92,9 @@ class Command(BaseCommand):
         unauth_urls = []
         error_urls = []
         unformat_urls = []
-
+        user = User.objects.get(username='admin')
+        token, __ = user.create_bearer_token()
+        client.defaults['HTTP_AUTHORIZATION'] = f'Bearer {token}'
         for url, ourl in urls:
             if '(' in url or '<' in url:
                 unformat_urls.append([url, ourl])
