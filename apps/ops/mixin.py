@@ -188,6 +188,10 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
         if isinstance(crontab, str) and len(crontab.strip().split()) != 5:
             msg = _('* Please enter a valid crontab expression')
             raise serializers.ValidationError(msg)
+
+        crontab = crontab.strip().split()
+        if '*' in crontab[0]:
+            raise serializers.ValidationError(_("Crontab minute must not contain '*'"))
         return crontab
 
     def validate_interval(self, interval):
