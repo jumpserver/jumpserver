@@ -5,8 +5,10 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.forms.models import model_to_dict
 from rest_framework.exceptions import PermissionDenied
 
 from accounts.models import VirtualAccount
@@ -70,9 +72,15 @@ class ConnectionToken(JMSOrgBaseModel):
         ]
         verbose_name = _('Connection token')
 
-    def save(self, *args, **kwargs):
-        self.type = self._meta.model._type
-        return super().save(*args, **kwargs)
+    @classmethod
+    def get_typed_connection_token(cls, token_id):
+        token = get_object_or_404(cls, id=token_id)
+
+        if token.type == ConnectionTokenType.ADMIN.value:
+            token = AdminConnectionToken.objects.get(id=token_id)
+        else:
+            token = ConnectionToken.objects.get(id=token_id)
+        return token
 
     @property
     def is_expired(self):
@@ -87,6 +95,7 @@ class ConnectionToken(JMSOrgBaseModel):
         return int(seconds)
 
     def save(self, *args, **kwargs):
+        self.type = self._type
         self.asset_display = pretty_string(self.asset, max_length=128)
         self.user_display = pretty_string(self.user, max_length=128)
         return super().save(*args, **kwargs)
@@ -112,12 +121,19 @@ class ConnectionToken(JMSOrgBaseModel):
         self.date_expired = date_expired_default()
         self.save()
 
+    @classmethod
+    def get_user_permed_account(cls, user, asset, account_name, protocol):
+        from perms.utils import PermAssetDetailUtil
+        permed_account = PermAssetDetailUtil(user, asset) \
+            .validate_permission(account_name, protocol)
+        return permed_account
+
+    def get_permed_account(self):
+        return self.get_user_permed_account(self.user, self.asset, self.account, self.protocol)
+
     @lazyproperty
     def permed_account(self):
-        from perms.utils import PermAssetDetailUtil
-        permed_account = PermAssetDetailUtil(self.user, self.asset) \
-            .validate_permission(self.account, self.protocol)
-        return permed_account
+        return self.get_permed_account()
 
     @lazyproperty
     def actions(self):
@@ -148,7 +164,8 @@ class ConnectionToken(JMSOrgBaseModel):
         if timezone.now() - self.date_created < timedelta(seconds=60):
             return True, None
 
-        if not self.permed_account or not self.permed_account.actions:
+        permed_account = self.get_permed_account()
+        if not permed_account or not permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
                 self.user, self.asset, self.account
             )
@@ -317,4 +334,17 @@ class AdminConnectionToken(ConnectionToken):
         return (timezone.now() + timezone.timedelta(days=365)).timestamp()
 
     def is_valid(self):
-        return True
+        return super().is_valid()
+
+    @classmethod
+    def get_user_permed_account(cls, user, asset, account_name, protocol):
+        """
+        管理员 token 可以访问所有资产的账号
+        """
+        with tmp_to_org(asset.org_id):
+            account = asset.accounts.filter(name=account_name).first()
+            if not account:
+                return None
+        account.actions = ActionChoices.all()
+        account.date_expired = timezone.now() + timezone.timedelta(days=5)
+        return account
