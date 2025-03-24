@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 11:52+0800\n"
+"POT-Creation-Date: 2025-03-24 15:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,12 +20,12 @@ msgstr ""
 
 #: accounts/api/account/account.py:121
 #: accounts/serializers/account/account.py:181
-#: accounts/serializers/account/account.py:342
+#: accounts/serializers/account/account.py:343
 msgid "Account already exists"
 msgstr ""
 
 #: accounts/api/account/application.py:78
-#: authentication/api/connection_token.py:452
+#: authentication/api/connection_token.py:451
 msgid "Account not found"
 msgstr ""
 
@@ -435,8 +435,8 @@ msgstr ""
 #: accounts/models/account.py:85
 #: accounts/models/automations/check_account.py:59
 #: accounts/models/automations/gather_account.py:17
-#: accounts/serializers/account/account.py:226
-#: accounts/serializers/account/account.py:274
+#: accounts/serializers/account/account.py:227
+#: accounts/serializers/account/account.py:275
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:145
 #: accounts/serializers/automations/check_account.py:33
@@ -452,7 +452,7 @@ msgstr ""
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
 #: assets/models/asset/common.py:366 assets/models/cmd_filter.py:36
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:228
-#: authentication/models/connection_token.py:40
+#: authentication/models/connection_token.py:42
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:34 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
@@ -463,8 +463,8 @@ msgid "Asset"
 msgstr ""
 
 #: accounts/models/account.py:89 accounts/models/template.py:16
-#: accounts/serializers/account/account.py:233
-#: accounts/serializers/account/account.py:284
+#: accounts/serializers/account/account.py:234
+#: accounts/serializers/account/account.py:285
 #: accounts/serializers/account/template.py:35
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
@@ -484,7 +484,7 @@ msgstr ""
 msgid "Secret reset"
 msgstr ""
 
-#: accounts/models/account.py:97 accounts/serializers/account/account.py:228
+#: accounts/models/account.py:97 accounts/serializers/account/account.py:229
 #: users/models/user/__init__.py:122
 msgid "Source"
 msgstr ""
@@ -518,7 +518,7 @@ msgstr ""
 #: acls/serializers/base.py:131
 #: acls/templates/acls/asset_login_reminder.html:10
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:313
-#: audits/serializers.py:229 authentication/api/connection_token.py:464
+#: audits/serializers.py:229 authentication/api/connection_token.py:463
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:36 terminal/serializers/command.py:72
@@ -622,7 +622,7 @@ msgstr ""
 
 #: accounts/models/application.py:24 acls/models/base.py:43
 #: assets/models/asset/common.py:178 authentication/models/access_key.py:23
-#: authentication/models/connection_token.py:58
+#: authentication/models/connection_token.py:60
 #: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:28
@@ -762,7 +762,7 @@ msgid "Status"
 msgstr ""
 
 #: accounts/models/automations/change_secret.py:51
-#: accounts/serializers/account/account.py:276
+#: accounts/serializers/account/account.py:277
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
 #: authentication/templates/authentication/passkey.html:173
@@ -1171,7 +1171,7 @@ msgstr ""
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:160 assets/serializers/platform.py:172
 #: audits/serializers.py:77 audits/serializers.py:194
-#: authentication/models/connection_token.py:62
+#: authentication/models/connection_token.py:64
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:153
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
@@ -1184,30 +1184,30 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: accounts/serializers/account/account.py:222
+#: accounts/serializers/account/account.py:223
 msgid "Asset not found"
 msgstr ""
 
-#: accounts/serializers/account/account.py:265
+#: accounts/serializers/account/account.py:266
 msgid "Has secret"
 msgstr ""
 
-#: accounts/serializers/account/account.py:275 ops/models/celery.py:84
+#: accounts/serializers/account/account.py:276 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
 msgid "State"
 msgstr ""
 
-#: accounts/serializers/account/account.py:277
+#: accounts/serializers/account/account.py:278
 msgid "Changed"
 msgstr ""
 
-#: accounts/serializers/account/account.py:287 acls/models/base.py:97
+#: accounts/serializers/account/account.py:288 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:9
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:34
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
-#: authentication/api/connection_token.py:463 ops/models/base.py:17
+#: authentication/api/connection_token.py:462 ops/models/base.py:17
 #: ops/models/job.py:155 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -1215,16 +1215,16 @@ msgstr ""
 msgid "Assets"
 msgstr ""
 
-#: accounts/serializers/account/account.py:392
+#: accounts/serializers/account/account.py:393
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr ""
 
-#: accounts/serializers/account/account.py:424
+#: accounts/serializers/account/account.py:425
 msgid "Account has exist"
 msgstr ""
 
-#: accounts/serializers/account/account.py:461
+#: accounts/serializers/account/account.py:462
 #: accounts/serializers/account/base.py:86
 #: accounts/serializers/account/template.py:66
 #: assets/serializers/asset/common.py:421
@@ -1243,7 +1243,7 @@ msgstr ""
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
 #: audits/models.py:91 audits/models.py:173 audits/models.py:272
-#: audits/serializers.py:195 authentication/models/connection_token.py:36
+#: audits/serializers.py:195 authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
@@ -1682,7 +1682,6 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_report.html:94
 #: accounts/templates/accounts/change_secret_report.html:134
 #: accounts/templates/accounts/gather_account_report.html:92
-#: accounts/templates/accounts/gather_account_report.html:132
 #: accounts/templates/accounts/push_account_report.html:93
 #: accounts/templates/accounts/push_account_report.html:133
 msgid "No new accounts found"
@@ -1709,6 +1708,10 @@ msgstr ""
 
 #: accounts/templates/accounts/gather_account_report.html:105
 msgid "Lost accounts"
+msgstr ""
+
+#: accounts/templates/accounts/gather_account_report.html:132
+msgid "No lost accounts found"
 msgstr ""
 
 #: accounts/utils.py:54
@@ -2038,7 +2041,7 @@ msgid ">>> Begin executing batch {index} of tasks"
 msgstr ""
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:145
+#: authentication/models/connection_token.py:161
 msgid "No account"
 msgstr ""
 
@@ -2302,7 +2305,7 @@ msgstr ""
 msgid "The database to authenticate against"
 msgstr ""
 
-#: assets/const/protocol.py:232 authentication/models/connection_token.py:47
+#: assets/const/protocol.py:232 authentication/models/connection_token.py:49
 msgid "Connect options"
 msgstr ""
 
@@ -2563,7 +2566,7 @@ msgstr ""
 #: assets/models/label.py:19 assets/models/node.py:539
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
-#: authentication/models/connection_token.py:33
+#: authentication/models/connection_token.py:35
 #: authentication/serializers/connect_token_secret.py:125
 #: common/serializers/common.py:86 labels/models.py:12 settings/models.py:38
 #: users/models/preference.py:13
@@ -3410,7 +3413,7 @@ msgstr ""
 msgid "%s %s this resource"
 msgstr ""
 
-#: audits/serializers.py:196 authentication/models/connection_token.py:51
+#: audits/serializers.py:196 authentication/models/connection_token.py:53
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:21 users/models/user/__init__.py:101
@@ -3528,39 +3531,39 @@ msgstr ""
 msgid "This action require verify your MFA"
 msgstr ""
 
-#: authentication/api/connection_token.py:303
+#: authentication/api/connection_token.py:304
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 
-#: authentication/api/connection_token.py:423
+#: authentication/api/connection_token.py:424
 msgid "Anonymous account is not supported for this asset"
 msgstr ""
 
-#: authentication/api/connection_token.py:455
+#: authentication/api/connection_token.py:454
 msgid "Permission expired"
 msgstr ""
 
-#: authentication/api/connection_token.py:488
+#: authentication/api/connection_token.py:487
 msgid "ACL action is reject: {}({})"
 msgstr ""
 
-#: authentication/api/connection_token.py:492
+#: authentication/api/connection_token.py:491
 msgid "ACL action is review"
 msgstr ""
 
-#: authentication/api/connection_token.py:502
+#: authentication/api/connection_token.py:501
 msgid "ACL action is face verify"
 msgstr ""
 
-#: authentication/api/connection_token.py:507
+#: authentication/api/connection_token.py:506
 msgid "ACL action not supported for this asset"
 msgstr ""
 
-#: authentication/api/connection_token.py:514
+#: authentication/api/connection_token.py:513
 msgid "ACL action is face online"
 msgstr ""
 
-#: authentication/api/connection_token.py:533
+#: authentication/api/connection_token.py:532
 msgid "No available face feature"
 msgstr ""
 
@@ -3971,21 +3974,21 @@ msgstr ""
 msgid "Please change your password"
 msgstr ""
 
-#: authentication/models/connection_token.py:42
+#: authentication/models/connection_token.py:44
 #: terminal/serializers/storage.py:114
 msgid "Account name"
 msgstr ""
 
-#: authentication/models/connection_token.py:43
+#: authentication/models/connection_token.py:45
 msgid "Input username"
 msgstr ""
 
-#: authentication/models/connection_token.py:44
+#: authentication/models/connection_token.py:46
 #: authentication/serializers/connection_token.py:18
 msgid "Input secret"
 msgstr ""
 
-#: authentication/models/connection_token.py:45
+#: authentication/models/connection_token.py:47
 #: authentication/serializers/connect_token_secret.py:114
 #: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
@@ -3994,69 +3997,69 @@ msgstr ""
 msgid "Protocol"
 msgstr ""
 
-#: authentication/models/connection_token.py:46
+#: authentication/models/connection_token.py:48
 msgid "Connect method"
 msgstr ""
 
-#: authentication/models/connection_token.py:48
+#: authentication/models/connection_token.py:50
 msgid "User display"
 msgstr ""
 
-#: authentication/models/connection_token.py:49
+#: authentication/models/connection_token.py:51
 msgid "Asset display"
 msgstr ""
 
-#: authentication/models/connection_token.py:50
+#: authentication/models/connection_token.py:52
 msgid "Reusable"
 msgstr ""
 
-#: authentication/models/connection_token.py:55
+#: authentication/models/connection_token.py:57
 #: perms/models/asset_permission.py:83
 msgid "From ticket"
 msgstr ""
 
-#: authentication/models/connection_token.py:57
+#: authentication/models/connection_token.py:59
 msgid "Face monitor token"
 msgstr ""
 
-#: authentication/models/connection_token.py:68
+#: authentication/models/connection_token.py:70
 msgid "Can expire connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:69
+#: authentication/models/connection_token.py:71
 msgid "Can reuse connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:71
+#: authentication/models/connection_token.py:73
 msgid "Connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:132
+#: authentication/models/connection_token.py:148
 msgid "Connection token inactive"
 msgstr ""
 
-#: authentication/models/connection_token.py:136
+#: authentication/models/connection_token.py:152
 msgid "Connection token expired at: {}"
 msgstr ""
 
-#: authentication/models/connection_token.py:139
+#: authentication/models/connection_token.py:155
 #: terminal/serializers/session.py:95
 msgid "No user or invalid user"
 msgstr ""
 
-#: authentication/models/connection_token.py:142
+#: authentication/models/connection_token.py:158
 msgid "No asset or inactive asset"
 msgstr ""
 
-#: authentication/models/connection_token.py:290
+#: authentication/models/connection_token.py:307
 msgid "Can view super connection token secret"
 msgstr ""
 
-#: authentication/models/connection_token.py:292
+#: authentication/models/connection_token.py:309
 msgid "Super connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:309
+#: authentication/models/connection_token.py:326
 msgid "Admin connection token"
 msgstr ""
 
