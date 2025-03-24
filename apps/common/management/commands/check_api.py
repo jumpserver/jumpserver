@@ -71,6 +71,7 @@ known_unauth_urls = [
     "/api/v1/authentication/mfa/select/",
     "/api/v1/authentication/mfa/send-code/",
     "/api/v1/authentication/sso/login/"
+    "/api/v1/authentication/user-session/"
 ]
 
 known_error_urls = [
@@ -91,7 +92,6 @@ class Command(BaseCommand):
         unauth_urls = []
         error_urls = []
         unformat_urls = []
-
         for url, ourl in urls:
             if '(' in url or '<' in url:
                 unformat_urls.append([url, ourl])
