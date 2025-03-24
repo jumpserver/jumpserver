@@ -341,7 +341,7 @@ class AdminConnectionToken(ConnectionToken):
 
     @classmethod
     def get_user_permed_account(cls, user, asset, account_name, protocol):
-        account = asset.accounts.filter(name=cls.account).first()
+        account = asset.accounts.filter(name=account_name).first()
         if not account:
             return None
         account.actions = ActionChoices.all()
