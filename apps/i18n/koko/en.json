@@ -83,5 +83,6 @@
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "TransferHistory": "Transfer history"
 }
