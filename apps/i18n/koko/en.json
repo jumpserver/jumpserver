@@ -84,5 +84,6 @@
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
     "Writable": "Writable",
-    "TransferHistory": "Transfer history"
+    "TransferHistory": "Transfer history",
+    "FileManagement": "File"
 }
