@@ -84,5 +84,6 @@
     "WaitFileTransfer": "等待文件传输结束",
     "WebSocketClosed": "WebSocket 已关闭",
     "Writable": "可写",
-    "TransferHistory": "传输历史"
+    "TransferHistory": "传输历史",
+    "FileManagement": "文件管理"
 }
