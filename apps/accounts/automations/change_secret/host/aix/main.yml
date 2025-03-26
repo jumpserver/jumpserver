@@ -90,7 +90,7 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
       when:
        - account.secret_type == "password"
-       - check_conn_after_change or change_secret_result.failed
+       - check_conn_after_change or change_secret_result.failed | default(false)
       delegate_to: localhost
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
@@ -103,5 +103,5 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
       when:
        - account.secret_type == "ssh_key"
-       - check_conn_after_change or change_secret_result.failed
+       - check_conn_after_change or change_secret_result.failed | default(false)
       delegate_to: localhost
