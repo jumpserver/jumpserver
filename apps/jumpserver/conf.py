@@ -488,6 +488,7 @@ class Config(dict):
         'TERMINAL_OMNIDB_ENABLED': True,
 
         # 安全配置
+        'CHECK_CONN_AFTER_CHANGE': True,
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_COMMAND_EXECUTION': False,

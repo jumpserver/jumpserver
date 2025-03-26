@@ -52,6 +52,7 @@
         password: "{{ account.secret | password_hash('des') }}"
         update_password: always
       ignore_errors: true
+      register: change_secret_result
       when: account.secret_type == "password"
 
     - name: remove jumpserver ssh key
@@ -68,6 +69,7 @@
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
         exclusive: "{{ ssh_params.exclusive }}"
+      register: change_secret_result
       when: account.secret_type == "ssh_key"
 
     - name: Refresh connection
@@ -86,7 +88,9 @@
         become_password: "{{ account.become.ansible_password | default('') }}"
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
-      when: account.secret_type == "password"
+      when:
+       - account.secret_type == "password"
+       - check_conn_after_change or change_secret_result.failed
       delegate_to: localhost
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
@@ -97,5 +101,7 @@
         login_private_key_path: "{{ account.private_key_path  }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
-      when: account.secret_type == "ssh_key"
+      when:
+       - account.secret_type == "ssh_key"
+       - check_conn_after_change or change_secret_result.failed
       delegate_to: localhost

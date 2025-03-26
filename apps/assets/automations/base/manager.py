@@ -187,6 +187,7 @@ class BasePlaybookManager:
             host['error'] = _('{} disabled'.format(self.__class__.method_type()))
             return host
 
+        host['check_conn_after_change'] = settings.CHECK_CONN_AFTER_CHANGE
         host = self.convert_cert_to_file(host, kwargs.get('path_dir'))
         host['params'] = self.get_params(automation, method_type)
         return host
