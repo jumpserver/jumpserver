@@ -103,22 +103,34 @@ class QuerySetMixin:
         queryset = self.setup_eager_loading(queryset)
         return queryset
 
-    # Todo: 未来考虑自定义 pagination
-    def setup_eager_loading(self, queryset):
-        if self.request.query_params.get('format') not in ['csv', 'xlsx']:
+    def setup_eager_loading(self, queryset, is_paginated=False):
+        is_export_request = self.request.query_params.get('format') in ['csv', 'xlsx']
+        # 不分页不走一般这个，是因为会消耗多余的 sql 查询, 不如分页的时候查询一次
+        if not is_export_request and not is_paginated:
             return queryset
+
         serializer_class = self.get_serializer_class()
-        if not serializer_class or not hasattr(serializer_class, 'setup_eager_loading'):
+        if not serializer_class:
             return queryset
-        return serializer_class.setup_eager_loading(queryset)
+
+        if hasattr(serializer_class, 'setup_eager_loading'):
+            queryset = serializer_class.setup_eager_loading(queryset)
+
+        if hasattr(serializer_class, 'setup_eager_labels'):
+            queryset = serializer_class.setup_eager_labels(queryset)
+        return queryset
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
+        model = getattr(queryset, 'model', None)
+        if not model:
+            return page
+
         serializer_class = self.get_serializer_class()
-        if page and serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
+        if page and serializer_class:
             ids = [str(obj.id) for obj in page]
             page = self.get_queryset().filter(id__in=ids)
-            page = serializer_class.setup_eager_loading(page)
+            page = self.setup_eager_loading(page, is_paginated=True)
             page_mapper = {str(obj.id): obj for obj in page}
             page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
         return page

@@ -258,7 +258,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         queryset = queryset.prefetch_related(
             'asset', 'asset__platform',
             'asset__platform__automation'
-        ).prefetch_related('labels', 'labels__label')
+        )
         return queryset
 
 

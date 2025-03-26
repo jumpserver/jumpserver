@@ -231,10 +231,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type")) \
             .annotate(accounts_amount=Count('accounts'))
-        if queryset.model is Asset:
-            queryset = queryset.prefetch_related('labels__label', 'labels')
-        else:
-            queryset = queryset.prefetch_related('asset_ptr__labels__label', 'asset_ptr__labels')
         return queryset
 
     @staticmethod

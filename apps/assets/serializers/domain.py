@@ -55,11 +55,6 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         validated_data['assets'] = assets + gateways
         return super().update(instance, validated_data)
 
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        queryset = queryset.prefetch_related('labels', 'labels__label')
-        return queryset
-
 
 class DomainListSerializer(DomainSerializer):
     class Meta(DomainSerializer.Meta):

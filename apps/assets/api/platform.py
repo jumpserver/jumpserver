@@ -52,7 +52,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         queryset = (
             super().get_queryset()
             .annotate(assets_amount=Coalesce(Subquery(asset_count_subquery), Value(0)))
-            .prefetch_related('protocols', 'automation', 'labels', 'labels__label')
+            .prefetch_related('protocols', 'automation')
         )
         queryset = queryset.filter(type__in=AllTypes.get_types_values())
         return queryset

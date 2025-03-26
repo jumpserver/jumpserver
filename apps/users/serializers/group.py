@@ -45,8 +45,7 @@ class UserGroupSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('labels', 'labels__label') \
-            .annotate(users_amount=Count('users', distinct=True, filter=Q(users__is_service_account=False)))
+        queryset = queryset.annotate(users_amount=Count('users', distinct=True, filter=Q(users__is_service_account=False)))
         return queryset
 
 

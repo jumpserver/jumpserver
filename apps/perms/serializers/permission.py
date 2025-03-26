@@ -155,7 +155,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
             "users", "user_groups", "assets", "nodes",
-        ).prefetch_related('labels', 'labels__label')
+        )
         return queryset
 
     @staticmethod
@@ -212,7 +212,6 @@ class AssetPermissionListSerializer(AssetPermissionSerializer):
     def setup_eager_loading(cls, queryset):
         """Perform necessary eager loading of data."""
         queryset = queryset \
-            .prefetch_related('labels', 'labels__label') \
             .annotate(users_amount=Count("users", distinct=True),
                       user_groups_amount=Count("user_groups", distinct=True),
                       assets_amount=Count("assets", distinct=True),
