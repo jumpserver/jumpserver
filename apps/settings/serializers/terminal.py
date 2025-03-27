@@ -18,7 +18,11 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('25', '25'),
         ('50', '50'),
     )
-    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
+    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.ChoiceField(
+        choices=[
+            ('auto', _('Auto(Enabled for the first 5 minutes after startup, then disabled.)')), 
+            (True, _('Enable')), (False, _('Disable'))
+        ],
         required=True, label=_('Registration'),
         help_text=_(
             "Allow component register, after all component setup, you should disable this for security"

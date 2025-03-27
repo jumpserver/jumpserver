@@ -27,10 +27,23 @@ class IsServiceAccount(IsValidUser):
 
 
 class WithBootstrapToken(permissions.BasePermission):
+    def check_can_register(self):
+        enabled = settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION
+        if enabled == 'auto':
+            return time.time() - settings.JUMPSERVER_UPTIME < 300
+        elif enabled:
+            return True
+        else:
+            return False
+
     def has_permission(self, request, view):
         authorization = request.META.get('HTTP_AUTHORIZATION', '')
         if not authorization:
             return False
+
+        if not self.check_can_register():
+            return False
+
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
 

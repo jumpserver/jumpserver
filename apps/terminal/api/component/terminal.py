@@ -85,12 +85,6 @@ class TerminalRegistrationApi(generics.CreateAPIView):
     permission_classes = [WithBootstrapToken]
     http_method_names = ['post']
 
-    def create(self, request, *args, **kwargs):
-        if not settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION:
-            data = {"error": "service account registration disabled"}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
-
 
 class EncryptedTerminalConfig(generics.CreateAPIView):
     serializer_class = serializers.EncryptedConfigSerializer
