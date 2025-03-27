@@ -7473,6 +7473,14 @@ msgid ""
 "account password"
 msgstr "单位：秒，目前仅在查看账号密码校验 MFA 时生效"
 
+#: settings/serializers/security.py:129
+msgid "MFA via Email"
+msgstr "邮件验证 MFA"
+
+#: settings/serializers/security.py:130
+msgid "Email as a method for multi-factor authentication"
+msgstr "将电子邮件作为多因子认证的一种方式"
+
 #: settings/serializers/security.py:143
 msgid "MFA in login page"
 msgstr "MFA 在登录页面输入"
