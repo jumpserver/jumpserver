@@ -13,6 +13,7 @@ from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from common.sdk.gm import piico
 
+
 secret_pattern = re.compile(r'password|secret|key|token', re.IGNORECASE)
 
 
