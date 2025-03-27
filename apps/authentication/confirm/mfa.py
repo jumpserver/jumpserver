@@ -1,11 +1,12 @@
 from users.models import User
 
 from .base import BaseConfirm
+from ..const import ConfirmType
 
 
 class ConfirmMFA(BaseConfirm):
-    name = 'mfa'
-    display_name = 'MFA'
+    name = ConfirmType.MFA.value
+    display_name = ConfirmType.MFA.name
 
     def check(self):
         return self.user.active_mfa_backends and self.user.mfa_enabled

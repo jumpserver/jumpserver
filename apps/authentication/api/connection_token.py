@@ -31,14 +31,15 @@ from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
-from ..models import ConnectionToken, date_expired_default
+from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
-    ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer
+    ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer,
+    AdminConnectionTokenSerializer,
 )
 
-__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
+__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet', 'AdminConnectionTokenViewSet']
 logger = get_logger(__name__)
 
 
@@ -123,13 +124,15 @@ class RDPFileClientProtocolURLMixin:
         # rdp_options['domain:s'] = token.account_ad_domain
 
         # 设置宽高
-        height = self.request.query_params.get('height')
-        width = self.request.query_params.get('width')
-        if width and height:
-            rdp_options['desktopwidth:i'] = width
-            rdp_options['desktopheight:i'] = height
-            rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
-            rdp_options['dynamic resolution:i'] = '0'
+
+        resolution_value = token.connect_options.get('resolution', 'auto')
+        if resolution_value != 'auto':
+            width, height = resolution_value.split('x')
+            if width and height:
+                rdp_options['desktopwidth:i'] = width
+                rdp_options['desktopheight:i'] = height
+                rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
+                rdp_options['dynamic resolution:i'] = '0'
 
         color_quality = self.request.query_params.get('rdp_color_quality')
         color_quality = color_quality if color_quality else os.getenv('JUMPSERVER_COLOR_DEPTH', RDPColorQuality.HIGH)
@@ -434,15 +437,16 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if ticket or self.need_face_verify:
             data['is_active'] = False
         if self.face_monitor_token:
-            FaceMonitorContext.get_or_create_context(self.face_monitor_token,
-                                                     self.request.user.id)
+            FaceMonitorContext.get_or_create_context(self.face_monitor_token, self.request.user.id)
             data['face_monitor_token'] = self.face_monitor_token
         return data
 
     @staticmethod
-    def _validate_perm(user, asset, account_name, protocol):
-        from perms.utils.asset_perm import PermAssetDetailUtil
-        account = PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
+    def get_permed_account(user, asset, account_name, protocol):
+        return ConnectionToken.get_user_permed_account(user, asset, account_name, protocol)
+
+    def _validate_perm(self, user, asset, account_name, protocol):
+        account = self.get_permed_account(user, asset, account_name, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
@@ -612,7 +616,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             raise PermissionDenied('Not allow to view secret')
 
         token_id = request.data.get('id') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
+        token = ConnectionToken.get_typed_connection_token(token_id)   
         token.is_valid()
         serializer = self.get_serializer(instance=token)
 
@@ -662,3 +666,20 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         else:
             logger.error('Release applet account error: {}'.format(lock_key))
             return Response({'error': 'not found or expired'}, status=400)
+
+
+class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
+    serializer_classes = {
+        'default': AdminConnectionTokenSerializer,
+    }
+
+    def check_permissions(self, request):
+        user = request.user
+        if not user.is_superuser:
+            self.permission_denied(request)
+
+    def get_queryset(self):
+        return AdminConnectionToken.objects.all().filter(user=self.request.user)
+
+    def get_permed_account(self, user, asset, account_name, protocol):
+        return AdminConnectionToken.get_user_permed_account(user, asset, account_name, protocol)

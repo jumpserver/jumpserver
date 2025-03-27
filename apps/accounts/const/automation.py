@@ -17,6 +17,7 @@ __all__ = [
     'AutomationTypes', 'SecretStrategy', 'SSHKeyStrategy', 'Connectivity',
     'DEFAULT_PASSWORD_LENGTH', 'DEFAULT_PASSWORD_RULES', 'TriggerChoice',
     'PushAccountActionChoice', 'AccountBackupType', 'ChangeSecretRecordStatusChoice',
+    'GatherAccountDetailField'
 ]
 
 
@@ -27,18 +28,23 @@ class AutomationTypes(models.TextChoices):
     remove_account = 'remove_account', _('Remove account')
     gather_accounts = 'gather_accounts', _('Gather accounts')
     verify_gateway_account = 'verify_gateway_account', _('Verify gateway account')
+    check_account = 'check_account', _('Check account')
+    backup_account = 'backup_account', _('Backup account')
 
     @classmethod
     def get_type_model(cls, tp):
         from accounts.models import (
             PushAccountAutomation, ChangeSecretAutomation,
             VerifyAccountAutomation, GatherAccountsAutomation,
+            CheckAccountAutomation, BackupAccountAutomation
         )
         type_model_dict = {
             cls.push_account: PushAccountAutomation,
             cls.change_secret: ChangeSecretAutomation,
             cls.verify_account: VerifyAccountAutomation,
             cls.gather_accounts: GatherAccountsAutomation,
+            cls.check_account: CheckAccountAutomation,
+            cls.backup_account: BackupAccountAutomation,
         }
         return type_model_dict.get(tp)
 
@@ -49,9 +55,9 @@ class SecretStrategy(models.TextChoices):
 
 
 class SSHKeyStrategy(models.TextChoices):
+    # add = 'add', _('Append SSH KEY')
     set_jms = 'set_jms', _('Replace (Replace only keys pushed by JumpServer) ')
     set = 'set', _('Empty and append SSH KEY')
-    add = 'add', _('Append SSH KEY')
 
 
 class TriggerChoice(models.TextChoices, TreeChoices):
@@ -109,3 +115,20 @@ class ChangeSecretRecordStatusChoice(models.TextChoices):
     failed = 'failed', _('Failed')
     success = 'success', _('Success')
     pending = 'pending', _('Pending')
+
+
+class GatherAccountDetailField(models.TextChoices):
+    can_login = 'can_login', _('Can login')
+    superuser = 'superuser', _('Superuser')
+    create_date = 'create_date', _('Create date')
+    is_disabled = 'is_disabled', _('Is disabled')
+    default_database_name = 'default_database_name', _('Default database name')
+    uid = 'uid', _('UID')
+    account_status = 'account_status', _('Account status')
+    default_tablespace = 'default_tablespace', _('Default tablespace')
+    roles = 'roles', _('Role')
+    privileges = 'privileges', _('Privileged')
+    groups = 'groups', _('Groups')
+    sudoers = 'sudoers', 'sudoers'
+    authorized_keys = 'authorized_keys', _('Authorized keys')
+    db = 'db', _('DB')

@@ -14,7 +14,7 @@
 {% if INTERFACE.footer_content %}
     <style>
         .markdown-footer a {
-            color: inherit;
+            color: #428bca;
         }
 
         .markdown-footer {
@@ -46,12 +46,23 @@
         if ($('.tooltip')[0]) {
             $('.tooltip').tooltip();
         }
-        $.fn.select2.defaults.set('language', getUserLang())
-        const md = window.markdownit();
-        const markdownContent = document.querySelector('script[type="text/markdown"]').textContent;
-        const markdownRef = document.getElementById('markdown-output')
-        if (markdownRef) {
-            markdownRef.innerHTML = md.render(markdownContent);
+        $.fn.select2.defaults.set('language', getUserLang());
+        const md = window.markdownit({
+            html: true,
+            linkify: true,
+            typographer: true,
+            breaks: true
+        });
+        const markdownContent = `{{ INTERFACE.footer_content|escapejs }}`;
+        const markdownRef = document.getElementById('markdown-output');
+        
+        if (markdownRef && markdownContent) {
+            const renderedContent = md.render(markdownContent.trim());
+            markdownRef.innerHTML = renderedContent;
+            markdownRef.querySelectorAll('a').forEach(link => {
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noopener noreferrer');
+            });
         }
     });
 </script>

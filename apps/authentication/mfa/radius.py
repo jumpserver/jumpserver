@@ -3,16 +3,17 @@ from django.utils.translation import gettext_lazy as _
 
 from .base import BaseMFA
 from ..backends.radius import RadiusBackend
+from ..const import MFAType
 
 mfa_failed_msg = _("Radius verify code invalid")
 
 
 class MFARadius(BaseMFA):
-    name = 'otp_radius'
-    display_name = 'Radius'
+    name = MFAType.Radius.value
+    display_name = MFAType.Radius.name
     placeholder = _("Radius verification code")
 
-    def check_code(self, code=None):
+    def _check_code(self, code=None):
         assert self.is_authenticated()
         backend = RadiusBackend()
         username = self.user.username

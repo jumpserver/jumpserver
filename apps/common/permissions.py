@@ -68,3 +68,9 @@ class ServiceAccountSignaturePermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return False
+
+
+class IsValidLicense(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return settings.XPACK_LICENSE_IS_VALID

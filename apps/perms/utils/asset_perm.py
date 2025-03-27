@@ -5,8 +5,8 @@ from accounts.models import VirtualAccount
 from assets.models import Asset, MyAsset
 from common.utils import lazyproperty
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from .permission import AssetPermissionUtil
 from perms.const import ActionChoices
+from .permission import AssetPermissionUtil
 
 __all__ = ['PermAssetDetailUtil']
 

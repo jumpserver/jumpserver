@@ -1,18 +1,18 @@
-from authentication.mfa.base import BaseMFA
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
+from authentication.mfa.base import BaseMFA
 from authentication.mixins import AuthFaceMixin
-from common.const import LicenseEditionChoices
-from settings.api import settings
+from ..const import MFAType
 
 
 class MFAFace(BaseMFA, AuthFaceMixin):
-    name = "face"
-    display_name = _('Face Recognition')
+    name = MFAType.Face.value
+    display_name = MFAType.Face.name
     placeholder = 'Face Recognition'
+    skip_cache_check = True
 
-    def check_code(self, code):
-
+    def _check_code(self, code):
         assert self.is_authenticated()
 
         try:
@@ -31,9 +31,9 @@ class MFAFace(BaseMFA, AuthFaceMixin):
     @staticmethod
     def global_enabled():
         return (
-            settings.XPACK_LICENSE_IS_VALID and
-            settings.XPACK_LICENSE_EDITION_ULTIMATE and
-            settings.FACE_RECOGNITION_ENABLED
+                settings.XPACK_LICENSE_IS_VALID and
+                settings.XPACK_LICENSE_EDITION_ULTIMATE and
+                settings.FACE_RECOGNITION_ENABLED
         )
 
     def get_enable_url(self) -> str:
@@ -44,7 +44,7 @@ class MFAFace(BaseMFA, AuthFaceMixin):
 
     def disable(self):
         assert self.is_authenticated()
-        self.user.face_vector = ''
+        self.user.face_vector = None
         self.user.save(update_fields=['face_vector'])
 
     def can_disable(self) -> bool:

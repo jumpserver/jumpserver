@@ -33,13 +33,8 @@ options:
   commands:
     description:
       - Custom change password commands.
-    type: list
+    type: str
     required: true
-  first_conn_delay_time:
-    description:
-      - Delay for executing the command after SSH connection(unit: s)
-    type: float
-    required: false
 '''
 
 EXAMPLES = '''
@@ -51,7 +46,7 @@ EXAMPLES = '''
     login_password: "123456"
     name: "jms"
     password: "123456"
-    commands: ['passwd {username}', '{password}', '{password}']
+    commands: 'passwd {username}\n{password}\n{password}']
 '''
 
 RETURN = '''
@@ -63,21 +58,25 @@ name:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from libs.ansible.modules_utils.custom_common import (
+from libs.ansible.modules_utils.remote_client import (
     SSHClient, common_argument_spec
 )
 
 
-def get_commands(module):
+def get_commands_and_answers(module) -> (list, list):
     username = module.params['name']
     password = module.params['password']
-    commands = module.params['commands'] or []
+    commands = module.params['commands'] or ''
+    answers = module.params['answers'] or ''
     login_password = module.params['login_password']
-    for index, command in enumerate(commands):
-        commands[index] = command.format(
-            username=username, password=password, login_password=login_password
-        )
-    return commands
+
+    if isinstance(commands, list):
+        commands = '\n'.join(commands)
+    commands = commands.format(
+        username=username, password=password, login_password=login_password
+    )
+    return commands.split('\n'), answers.split('\n')
+
 
 # =========================================
 # Module execution.
@@ -89,21 +88,20 @@ def main():
     argument_spec.update(
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
-        commands=dict(type='list', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
-    ssh_client = SSHClient(module)
-    commands = get_commands(module)
+    commands, answers = get_commands_and_answers(module)
     if not commands:
         module.fail_json(
             msg='No command found, please go to the platform details to add'
         )
-    output, err_msg = ssh_client.execute(commands)
-    if err_msg:
-        module.fail_json(
-            msg='There was a problem executing the command: %s' % err_msg
-        )
+    with SSHClient(module) as client:
+        __, err_msg = client.execute(commands, answers)
+        if err_msg:
+            module.fail_json(
+                msg='There was a problem executing the command: %s' % err_msg
+            )
 
     user = module.params['name']
     module.exit_json(changed=True, user=user)

@@ -6,7 +6,7 @@ from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
+from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.api import CommonApiMixin, SuggestionMixin
 from common.drf.filters import AttrRulesFilterBackend

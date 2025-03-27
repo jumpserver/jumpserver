@@ -1,7 +1,7 @@
 - hosts: mysql
   gather_facts: no
   vars:
-    ansible_python_interpreter: /opt/py3/bin/python
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
     db_name: "{{ jms_asset.spec_info.db_name }}"
     check_ssl: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
@@ -54,3 +54,4 @@
         client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
         filter: version
+      when: check_conn_after_change

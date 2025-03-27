@@ -2,11 +2,12 @@ from django.utils.translation import gettext_lazy as _
 
 from authentication.mixins import authenticate
 from .base import BaseConfirm
+from ..const import ConfirmType
 
 
 class ConfirmPassword(BaseConfirm):
-    name = 'password'
-    display_name = _('Password')
+    name = ConfirmType.PASSWORD.value
+    display_name = ConfirmType.PASSWORD.name
 
     def check(self):
         return self.user.is_password_authenticate()

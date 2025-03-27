@@ -303,6 +303,8 @@ class Ticket(StatusMixin, JMSBaseModel):
         max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
     )
 
+    TICKET_TYPE = TicketType.general
+
     class Meta:
         ordering = ('-date_created',)
         verbose_name = _('Ticket')
@@ -313,10 +315,22 @@ class Ticket(StatusMixin, JMSBaseModel):
     def __str__(self):
         return '{}({})'.format(self.title, self.applicant)
 
+    def save(self, *args, **kwargs):
+        self.type = self.TICKET_TYPE
+        super().save(*args, **kwargs)
+
     @property
     def spec_ticket(self):
         attr = self.type.replace('_', '') + 'ticket'
         return getattr(self, attr)
+
+    @property
+    def name(self):
+        return self.title
+
+    @name.setter
+    def name(self, value):
+        self.title = value
 
     # TODO 先单独处理一下
     @property
@@ -424,7 +438,8 @@ class Ticket(StatusMixin, JMSBaseModel):
                 new_values.append(str(new_value))
             value = ', '.join(new_values)
         elif name == 'org_id':
-            value = Organization.get_instance(value).name
+            org = Organization.get_instance(value)
+            value = org.name if org else ''
         elif isinstance(value, list):
             value = ', '.join(value)
         return value

@@ -1,43 +1,20 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import AutomationExecution
 from assets.const import AutomationTypes
-from assets.models import Asset, Node, BaseAutomation
-from common.const.choices import Trigger
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from assets.models import BaseAutomation
+from assets.serializers.automations import AutomationExecutionSerializer as AssetAutomationExecutionSerializer
+from assets.serializers.automations import BaseAutomationSerializer as AssetBaseAutomationSerializer
 from common.utils import get_logger
-from ops.mixin import PeriodTaskSerializerMixin
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 logger = get_logger(__file__)
 
 __all__ = [
     'BaseAutomationSerializer', 'AutomationExecutionSerializer',
-    'UpdateAssetSerializer', 'UpdateNodeSerializer', 'AutomationAssetsSerializer',
 ]
 
 
-class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
-    assets = ObjectRelatedField(many=True, required=False, queryset=Asset.objects, label=_('Assets'))
-    nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
-    is_periodic = serializers.BooleanField(default=False, required=False, label=_("Periodic perform"))
-
-    class Meta:
-        read_only_fields = [
-            'date_created', 'date_updated', 'created_by',
-            'periodic_display', 'executed_amount'
-        ]
-        fields = read_only_fields + [
-            'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
-            'type', 'accounts', 'nodes', 'assets', 'is_active',
-        ]
-        extra_kwargs = {
-            'name': {'required': True},
-            'type': {'read_only': True},
-            'executed_amount': {'label': _('Executions')},
-        }
-
+class BaseAutomationSerializer(AssetBaseAutomationSerializer):
     def validate_name(self, name):
         if self.instance and self.instance.name == name:
             return name
@@ -50,17 +27,8 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         raise NotImplementedError
 
 
-class AutomationExecutionSerializer(serializers.ModelSerializer):
+class AutomationExecutionSerializer(AssetAutomationExecutionSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    type = serializers.ChoiceField(choices=AutomationTypes.choices, write_only=True, label=_('Type'))
-    trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
-
-    class Meta:
-        model = AutomationExecution
-        read_only_fields = [
-            'trigger', 'date_start', 'date_finished', 'snapshot', 'status'
-        ]
-        fields = ['id', 'automation', 'type'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):
@@ -77,22 +45,3 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
             'type_display': type_display,
         }
         return snapshot
-
-
-class UpdateAssetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BaseAutomation
-        fields = ['id', 'assets']
-
-
-class UpdateNodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BaseAutomation
-        fields = ['id', 'nodes']
-
-
-class AutomationAssetsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Asset
-        only_fields = ['id', 'name', 'address']
-        fields = tuple(only_fields)

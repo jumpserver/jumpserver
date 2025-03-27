@@ -1,7 +1,7 @@
 - hosts: oracle
   gather_facts: no
   vars:
-    ansible_python_interpreter: /opt/py3/bin/python
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
 
   tasks:
     - name: Test Oracle connection
@@ -40,3 +40,4 @@
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
         mode: "{{ account.mode }}"
+      when: check_conn_after_change

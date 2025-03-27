@@ -3,9 +3,7 @@
 {% block user_expired_message %}
     {% if request.user.is_expired %}
         <div class="alert alert-danger help-message alert-dismissable">
-            {% blocktrans %}
-                Your account has expired, please contact the administrator.
-            {% endblocktrans %}
+            {% blocktrans %}Your account has expired, please contact the administrator.{% endblocktrans %}
             <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
         </div>
     {% elif request.user.will_expired %}
@@ -20,17 +18,13 @@
     {% url 'users:user-password-update' as user_password_update_url %}
     {% if request.user.password_has_expired %}
         <div class="alert alert-danger help-message alert-dismissable">
-            {% blocktrans %}
-                Your password has expired, please click <a href="{{ user_password_update_url }}"> this link </a> update password.
-            {% endblocktrans %}
+            {% blocktrans %}Your password has expired, please click <a href="{{ user_password_update_url }}"> this link </a> update password.{% endblocktrans %}
             <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
         </div>
     {% elif request.user.password_will_expired %}
         <div class="alert alert-danger help-message alert-dismissable">
             {% trans 'Your password will at' %} {{ request.user.date_password_expired }} {% trans 'expired. ' %}
-            {% blocktrans %}
-                please click <a href="{{ user_password_update_url }}"> this link </a> to update your password.
-            {% endblocktrans %}
+            {% blocktrans %}please click <a href="{{ user_password_update_url }}"> this link </a> to update your password.{% endblocktrans %}
             <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
         </div>
     {% endif %}
@@ -40,9 +34,7 @@
     {% if request.user.is_authenticated and request.user.is_first_login %}
     <div class="alert alert-danger help-message alert-dismissable">
         {% url 'authentication:user-first-login' as first_login_url %}
-        {% blocktrans %}
-        Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
-        {% endblocktrans %}
+        {% blocktrans %}Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.{% endblocktrans %}
         <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
     </div>
     {% endif %}
@@ -53,9 +45,7 @@
     <div class="alert alert-danger help-message alert-dismissable">
         <button aria-hidden="true" data-dismiss="alert" class="close" type="button" onclick="closePublicKeyMsg()">×</button>
         {% url 'users:user-pubkey-update' as user_pubkey_update %}
-        {% blocktrans %}
-        Your ssh public key not set or expired. Please click <a href="{{ user_pubkey_update }}"> this link </a>to update
-        {% endblocktrans %}
+        {% blocktrans %}Your ssh public key not set or expired. Please click <a href="{{ user_pubkey_update }}"> this link </a>to update{% endblocktrans %}
     </div>
     {% endif %}
 {% endblock %}

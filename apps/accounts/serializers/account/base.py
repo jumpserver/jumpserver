@@ -74,20 +74,13 @@ class BaseAccountSerializer(
         model = BaseAccount
         fields_mini = ["id", "name", "username"]
         fields_small = fields_mini + [
-            "secret_type",
-            "secret",
-            "passphrase",
-            "privileged",
-            "is_active",
-            "spec_info",
+            "secret_type", "secret", "passphrase",
+            "privileged", "is_active", "spec_info",
         ]
         fields_other = ["created_by", "date_created", "date_updated", "comment"]
         fields = fields_small + fields_other + ["labels"]
         read_only_fields = [
-            "spec_info",
-            "date_verified",
-            "created_by",
-            "date_created",
+            "spec_info", "created_by", "date_created",
         ]
         extra_kwargs = {
             "spec_info": {"label": _("Spec info")},

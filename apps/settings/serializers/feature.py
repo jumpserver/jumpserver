@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.const import Protocol
 from common.serializers.fields import EncryptedField
 from common.utils import date_expired_default
 
@@ -13,6 +12,8 @@ __all__ = [
     'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
+
+from settings.const import ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -119,16 +120,17 @@ class AmazonSMSerializer(serializers.Serializer):
 
 class ChatAISettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Chat AI')
-    API_MODEL = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
-    GPT_MODEL_CHOICES = API_MODEL['choices']
-    GPT_MODEL_DEFAULT = API_MODEL['default']
 
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
     )
+    CHAT_AI_TYPE = serializers.ChoiceField(
+        default=ChatAITypeChoices.gpt, choices=ChatAITypeChoices.choices,
+        label=_("Types"), required=False,
+    )
     GPT_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('GPT Base URL'),
-        help_text=_('The base URL of the GPT service. For example: https://api.openai.com/v1')
+        allow_blank=True, required=False, label=_('Base URL'),
+        help_text=_('The base URL of the Chat service.')
     )
     GPT_API_KEY = EncryptedField(
         allow_blank=True, required=False, label=_('API Key'),
@@ -138,7 +140,23 @@ class ChatAISettingSerializer(serializers.Serializer):
         help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
     )
     GPT_MODEL = serializers.ChoiceField(
-        default=GPT_MODEL_DEFAULT, choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
+        default=GPTModelChoices.gpt_4o_mini, choices=GPTModelChoices.choices,
+        label=_("GPT Model"), required=False,
+    )
+    DEEPSEEK_BASE_URL = serializers.CharField(
+        allow_blank=True, required=False, label=_('Base URL'),
+        help_text=_('The base URL of the Chat service.')
+    )
+    DEEPSEEK_API_KEY = EncryptedField(
+        allow_blank=True, required=False, label=_('API Key'),
+    )
+    DEEPSEEK_PROXY = serializers.CharField(
+        allow_blank=True, required=False, label=_('Proxy'),
+        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
+    )
+    DEEPSEEK_MODEL = serializers.ChoiceField(
+        default=DeepSeekModelChoices.deepseek_chat, choices=DeepSeekModelChoices.choices,
+        label=_("DeepSeek Model"), required=False,
     )
 
 
@@ -169,9 +187,10 @@ class OpsSettingSerializer(serializers.Serializer):
         help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(
-        child=serializers.CharField(max_length=1024, ),
+        child=serializers.CharField(max_length=1024),
         label=_('Command blacklist'),
-        help_text=_("Command blacklist in Adhoc")
+        help_text=_("Command blacklist in Adhoc"),
+        default=list,
     )
 
 

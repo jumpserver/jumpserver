@@ -2,10 +2,14 @@ name: Translate README
 on:
   workflow_dispatch:
     inputs:
+      source_readme:
+        description: "Source README"
+        required: false
+        default: "./readmes/README.en.md"
       target_langs:
         description: "Target Languages"
         required: false
-        default: "zh-hans,zh-hant,ja,pt-br"
+        default: "zh-hans,zh-hant,ja,pt-br,es,ru"
       gen_dir_path:
         description: "Generate Dir Name"
         required: false
@@ -34,6 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.GPT_API_TOKEN }}
           GPT_MODE: ${{ github.event.inputs.gpt_mode }}
+          SOURCE_README: ${{ github.event.inputs.source_readme }}
           TARGET_LANGUAGES: ${{ github.event.inputs.target_langs }}
           PUSH_BRANCH: ${{ github.event.inputs.push_branch }}
           GEN_DIR_PATH: ${{ github.event.inputs.gen_dir_path }}

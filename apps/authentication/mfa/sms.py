@@ -4,13 +4,14 @@ from django.utils.translation import gettext_lazy as _
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from users.serializers import SmsUserSerializer
 from .base import BaseMFA
+from ..const import MFAType
 
 sms_failed_msg = _("SMS verify code invalid")
 
 
 class MFASms(BaseMFA):
-    name = 'sms'
-    display_name = _("SMS")
+    name = MFAType.SMS.value
+    display_name = MFAType.SMS.name
     placeholder = _("SMS verification code")
 
     def __init__(self, user):
@@ -23,7 +24,7 @@ class MFASms(BaseMFA):
             phone, backend=self.name, user_info=user_info
         )
 
-    def check_code(self, code):
+    def _check_code(self, code):
         assert self.is_authenticated()
         ok = False
         msg = ''

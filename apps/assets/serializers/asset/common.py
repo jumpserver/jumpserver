@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import F
+from django.db.models import F, Count
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -14,7 +14,7 @@ from common.serializers import (
     CommonModelSerializer, MethodSerializer, ResourceLabelsMixin
 )
 from common.serializers.common import DictSerializer
-from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -147,6 +147,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
     nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
+    platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'), attrs=('id', 'name', 'type'))
+    accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
     _accounts = None
 
     class Meta:
@@ -159,7 +161,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'nodes_display', 'accounts',
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity', 'auto_config',
+            'accounts_amount', 'category', 'type', 'connectivity', 'auto_config',
             'date_verified', 'created_by', 'date_created', 'date_updated',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
@@ -227,11 +229,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', ) \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
-            .annotate(type=F("platform__type"))
-        if queryset.model is Asset:
-            queryset = queryset.prefetch_related('labels__label', 'labels')
-        else:
-            queryset = queryset.prefetch_related('asset_ptr__labels__label', 'asset_ptr__labels')
+            .annotate(type=F("platform__type")) \
+            .annotate(accounts_amount=Count('accounts'))
         return queryset
 
     @staticmethod

@@ -1,7 +1,7 @@
 - hosts: postgre
   gather_facts: no
   vars:
-    ansible_python_interpreter: /opt/py3/bin/python
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
     check_ssl: "{{ jms_asset.spec_info.use_ssl }}"
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
@@ -55,3 +55,4 @@
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
         ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
+      when: check_conn_after_change

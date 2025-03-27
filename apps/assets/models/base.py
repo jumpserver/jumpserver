@@ -6,9 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from assets.const import Connectivity
-from common.utils import (
-    get_logger
-)
+from common.utils import get_logger
 
 logger = get_logger(__file__)
 

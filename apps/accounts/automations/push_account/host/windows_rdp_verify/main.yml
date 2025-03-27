@@ -4,10 +4,6 @@
     - name: Test privileged account
       ansible.windows.win_ping:
 
-#    - name: Print variables
-#      debug:
-#        msg: "Username: {{ account.username }}, Password: {{ account.secret }}"
-
     - name: Push user password
       ansible.windows.win_user:
         fullname: "{{ account.username}}"
@@ -31,5 +27,5 @@
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
         gateway_args: "{{ jms_gateway | default({}) }}"
-      when: account.secret_type == "password"
+      when: account.secret_type == "password" and check_conn_after_change
       delegate_to: localhost

@@ -7,13 +7,14 @@ else:
     from collections import Iterable
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import NOT_PROVIDED
+from django.db.models import NOT_PROVIDED, OneToOneField
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
 from rest_framework.settings import api_settings
 from rest_framework.utils import html
+from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.db.fields import EncryptMixin
 from common.serializers.fields import (
@@ -72,7 +73,6 @@ class BulkSerializerMixin(object):
     """
 
     def to_internal_value(self, data):
-        from rest_framework_bulk import BulkListSerializer
 
         ret = super(BulkSerializerMixin, self).to_internal_value(data)
 
@@ -85,11 +85,11 @@ class BulkSerializerMixin(object):
             # since super by default strips out read-only fields
             # hence id will no longer be present in validated_data
             if all(
-                [
-                    isinstance(self.root, BulkListSerializer),
-                    id_attr,
-                    request_method in ("PUT", "PATCH"),
-                ]
+                    [
+                        isinstance(self.root, BulkListSerializer),
+                        id_attr,
+                        request_method in ("PUT", "PATCH"),
+                    ]
             ):
                 id_field = self.fields.get("id") or self.fields.get("pk")
                 if data.get("id"):
@@ -322,9 +322,9 @@ class DefaultValueFieldsMixin:
             if model_field is None:
                 continue
             if (
-                not hasattr(model_field, "field")
-                or not hasattr(model_field.field, "default")
-                or model_field.field.default == NOT_PROVIDED
+                    not hasattr(model_field, "field")
+                    or not hasattr(model_field.field, "default")
+                    or model_field.field.default == NOT_PROVIDED
             ):
                 continue
             if name == "id":
@@ -335,7 +335,6 @@ class DefaultValueFieldsMixin:
                 default = default()
             if default == "":
                 continue
-            # print(f"Set default value: {name}: {default}")
             serializer_field.default = default
 
 
@@ -467,5 +466,14 @@ class ResourceLabelsMixin(serializers.Serializer):
         return instance
 
     @classmethod
-    def setup_eager_loading(cls, queryset):
-        return queryset.prefetch_related("labels")
+    def setup_eager_labels(cls, queryset):
+        if not hasattr(queryset, 'model'):
+            return queryset
+
+        fields = ['labels', 'labels__label']
+        model = queryset.model
+        pk_field = model._meta.pk
+
+        if isinstance(pk_field, OneToOneField):
+            fields = ['{}__{}'.format(pk_field.name, f) for f in fields]
+        return queryset.prefetch_related(*fields)

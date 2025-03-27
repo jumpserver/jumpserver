@@ -2,7 +2,7 @@ import os
 import shutil
 from functools import wraps
 
-from settings.api import settings
+from django.conf import settings
 
 __all__ = ["WorkPostRunCleaner", "cleanup_post_run"]
 

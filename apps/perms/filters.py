@@ -1,4 +1,5 @@
 from django.db.models import QuerySet, Q
+from django.utils import timezone
 from django_filters import rest_framework as filters
 
 from assets.models import Node, Asset
@@ -10,6 +11,7 @@ from users.models import User, UserGroup
 
 class PermissionBaseFilter(BaseFilterSet):
     is_valid = filters.BooleanFilter(method='do_nothing')
+    is_expired = filters.BooleanFilter(method='filter_expired')
     user_id = filters.UUIDFilter(method='do_nothing')
     username = filters.CharFilter(method='do_nothing')
     account_id = filters.UUIDFilter(method='do_nothing')
@@ -31,6 +33,15 @@ class PermissionBaseFilter(BaseFilterSet):
         qs = self.filter_user(qs)
         qs = self.filter_user_group(qs)
         return qs
+
+    @staticmethod
+    def filter_expired(queryset, name, is_expired):
+        now = timezone.now()
+        if is_expired:
+            queryset = queryset.filter(Q(date_start__gt=now) | Q(date_expired__lt=now))
+        else:
+            queryset = queryset.filter(Q(date_start__lt=now) | Q(date_expired__gt=now))
+        return queryset
 
     def filter_valid(self, queryset):
         is_valid = self.get_query_param('is_valid')
@@ -98,13 +109,14 @@ class AssetPermissionFilter(PermissionBaseFilter):
     address = filters.CharFilter(method='do_nothing')
     accounts = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(method='do_nothing')
+    is_no_resource = filters.BooleanFilter(method='filter_no_resource')
 
     class Meta:
         model = AssetPermission
         fields = (
             'user_id', 'username', 'user_group_id',
-            'user_group', 'node_id', 'node_name', 'asset_id', 'asset_name',
-            'name', 'ip', 'name',
+            'user_group', 'node_id', 'node_name', 'asset_id',
+            'asset_name', 'name', 'ip', 'name', 'is_active',
             'all', 'is_valid', 'is_effective', 'from_ticket'
         )
 
@@ -186,6 +198,19 @@ class AssetPermissionFilter(PermissionBaseFilter):
         qs_ids = list(qs1_ids) + list(qs2_ids)
         qs = queryset.filter(id__in=qs_ids)
         return qs
+
+    @staticmethod
+    def filter_no_resource(queryset, name, value):
+        not_have_user_q = Q(users__isnull=True) & Q(user_groups__isnull=True)
+        not_have_asset_q = Q(assets__isnull=True) & Q(nodes__isnull=True)
+        not_have_action_q = Q(actions=0)
+        q = not_have_user_q | not_have_asset_q | not_have_action_q
+
+        if value:
+            queryset = queryset.filter(q)
+        else:
+            queryset = queryset.exclude(q)
+        return queryset
 
     def filter_effective(self, queryset):
         is_effective = self.get_query_param('is_effective')

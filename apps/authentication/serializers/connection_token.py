@@ -4,11 +4,11 @@ from rest_framework import serializers
 from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
 from perms.serializers.permission import ActionChoicesField
-from ..models import ConnectionToken
+from ..models import ConnectionToken, AdminConnectionToken
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
-    'ConnectionTokenReusableSerializer',
+    'ConnectionTokenReusableSerializer', 'AdminConnectionTokenSerializer',
 ]
 
 
@@ -28,7 +28,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
             'connect_method', 'connect_options', 'protocol', 'actions',
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
-            'updated_by', 'org_id', 'org_name','face_monitor_token',
+            'updated_by', 'org_id', 'org_name', 'face_monitor_token',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
@@ -74,3 +74,7 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
     def get_user(self, attrs):
         return attrs.get('user')
+
+class AdminConnectionTokenSerializer(ConnectionTokenSerializer):
+    class Meta(ConnectionTokenSerializer.Meta):
+        model = AdminConnectionToken
