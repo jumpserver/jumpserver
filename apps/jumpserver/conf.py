@@ -597,6 +597,7 @@ class Config(dict):
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
+        'PRIVACY_MODE': False,
         # 用户登录限制的规则
         'SECURITY_LOGIN_LIMIT_COUNT': 7,
         'SECURITY_LOGIN_LIMIT_TIME': 30,

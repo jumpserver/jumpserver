@@ -119,6 +119,14 @@ class UserProfileSerializer(UserSerializer):
         if org_roles_field:
             org_roles_field.read_only = True
 
+        if settings.PRIVACY_MODE:
+            for field in (
+                    'phone', 'wechat',
+                    'wecom_id', 'dingtalk_id',
+                    'feishu_id', 'slack_id', 'lark_id'
+            ):
+                self.fields.pop(field, None)
+
     @staticmethod
     def get_guide_url(obj):
         return settings.USER_GUIDE_URL

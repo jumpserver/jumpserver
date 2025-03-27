@@ -71,6 +71,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     TOOL_USER_ENABLED = serializers.BooleanField()
 
     DEFAULT_EXPIRED_YEARS = serializers.IntegerField()
+    PRIVACY_MODE = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):
