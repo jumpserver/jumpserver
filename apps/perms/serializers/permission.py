@@ -105,6 +105,9 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     def create_account_through_template(self, nodes, assets):
         if not self.template_accounts:
             return
+        if self.instance:
+            assets = assets or self.instance.assets.all()
+            nodes = nodes or self.instance.nodes.all()
         assets = self.get_all_assets(nodes, assets)
         self.create_accounts(assets)
 
