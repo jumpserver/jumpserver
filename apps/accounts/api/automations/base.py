@@ -17,7 +17,7 @@ from orgs.mixins import generics
 __all__ = [
     'AutomationAssetsListApi', 'AutomationRemoveAssetApi',
     'AutomationAddAssetApi', 'AutomationNodeAddRemoveApi',
-    'AutomationExecutionViewSet', 'RecordListMixin'
+    'AutomationExecutionViewSet'
 ]
 
 
@@ -124,12 +124,3 @@ class AutomationExecutionViewSet(
         execution = self.get_object()
         report = execution.manager.gen_report()
         return HttpResponse(report)
-
-
-class RecordListMixin:
-    def list(self, request, *args, **kwargs):
-        try:
-            response = super().list(request, *args, **kwargs)
-        except Exception as e:
-            response = Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return response
