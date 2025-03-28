@@ -9,7 +9,7 @@ from accounts.models import PushAccountAutomation, PushSecretRecord
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
 from .base import (
     AutomationAssetsListApi, AutomationRemoveAssetApi, AutomationAddAssetApi,
-    AutomationNodeAddRemoveApi, AutomationExecutionViewSet, RecordListMixin
+    AutomationNodeAddRemoveApi, AutomationExecutionViewSet
 )
 
 __all__ = [
@@ -42,7 +42,7 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
         return queryset
 
 
-class PushAccountRecordViewSet(RecordListMixin, mixins.ListModelMixin, OrgGenericViewSet):
+class PushAccountRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
     filterset_class = PushAccountRecordFilterSet
     search_fields = ('asset__address', 'account__username')
     ordering_fields = ('date_finished',)

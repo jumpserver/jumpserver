@@ -3,10 +3,10 @@ import json
 import logging
 import os
 import shutil
+import time
 from collections import defaultdict
 from socket import gethostname
 
-import time
 import yaml
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -334,7 +334,8 @@ class PlaybookPrepareMixin:
         return sub_playbook_path
 
     def check_automation_enabled(self, platform, assets):
-        if not platform.automation or not platform.automation.ansible_enabled:
+        automation = getattr(platform, 'automation', None)
+        if not (automation and getattr(automation, 'ansible_enabled', False)):
             print(_("  - Platform {} ansible disabled").format(platform.name))
             self.on_assets_not_ansible_enabled(assets)
             return False
