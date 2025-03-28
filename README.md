@@ -27,9 +27,6 @@ JumpServer is an open-source Privileged Access Management (PAM) tool that provid
   </picture>
 </a>
 
-<img src="https://github.com/user-attachments/assets/dd612f3d-c958-4f84-b164-f31b75454d7f" alt="Light Mode JumpServer Overview" class="gh-light-mode-only">
-<img src="https://github.com/user-attachments/assets/28676212-2bc4-4a9f-ae10-3be9320647e3" alt="Dark Mode JumpServer Overview" class="gh-dark-mode-only">
-
 ## Quickstart
 
 Prepare a clean Linux Server ( 64 bit, >= 4c8g )
