@@ -64,8 +64,8 @@ class JobLogAuditViewSet(OrgReadonlyModelViewSet):
 
 class JobsAuditViewSet(OrgModelViewSet):
     model = Job
-    search_fields = ['creator__name']
-    filterset_fields = ['creator__name']
+    search_fields = ['creator__name', 'args', 'name']
+    filterset_fields = ['creator__name', 'args', 'name']
     serializer_class = JobsAuditSerializer
     ordering = ['-is_periodic', '-date_updated']
     http_method_names = ['get', 'options', 'patch']
