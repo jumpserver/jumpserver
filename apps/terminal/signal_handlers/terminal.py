@@ -7,9 +7,6 @@ from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from ..const import TaskNameType
 from ..models import Task, Session
-from ..utils import DBPortManager
-
-db_port_manager: DBPortManager
 
 logger = get_logger(__file__)
 
