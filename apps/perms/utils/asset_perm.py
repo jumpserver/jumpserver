@@ -88,7 +88,7 @@ class PermAssetDetailUtil:
         if not all_action_bit:
             return alias_action_bit_mapper, alias_date_expired_mapper
 
-        asset_account_usernames = asset.accounts.all().active().values_list('username', flat=True)
+        asset_account_usernames = asset.all_valid_accounts.values_list('username', flat=True)
         for username in asset_account_usernames:
             alias_action_bit_mapper[username] |= all_action_bit
             alias_date_expired_mapper[username].extend(
@@ -100,7 +100,7 @@ class PermAssetDetailUtil:
     def map_alias_to_accounts(cls, alias_action_bit_mapper, alias_date_expired_mapper, asset, user):
         username_accounts_mapper = defaultdict(list)
         cleaned_accounts_expired = defaultdict(list)
-        asset_accounts = asset.accounts.all().active()
+        asset_accounts = asset.all_valid_accounts
 
         # 用户名 -> 账号
         for account in asset_accounts:
@@ -135,11 +135,18 @@ class PermAssetDetailUtil:
             alias_action_bit_mapper, alias_date_expired_mapper, asset, user
         )
         accounts = []
+        virtual_accounts = []
         for account, action_bit in cleaned_accounts_action_bit.items():
             account.actions = action_bit
             account.date_expired = max(cleaned_accounts_expired[account])
-            accounts.append(account)
-        return accounts
+
+            if account.username.startswith('@'):
+                virtual_accounts.append(account)
+            else:
+                accounts.append(account)
+        accounts.sort(key=lambda x: x.username)
+        virtual_accounts.sort(key=lambda x: x.username)
+        return accounts + virtual_accounts
 
     def check_perm_protocols(self, protocols):
         """

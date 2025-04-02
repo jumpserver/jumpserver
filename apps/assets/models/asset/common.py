@@ -245,6 +245,20 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         auto_config.update(model_to_dict(automation))
         return auto_config
 
+    @property
+    def all_accounts(self):
+        if not self.joined_ad_id:
+            queryset = self.accounts.all()
+        else:
+            queryset = self.accounts.model.objects.filter(asset__in=[self.id, self.joined_ad_id])
+        return queryset
+
+    @lazyproperty
+    def all_valid_accounts(self):
+        queryset = (self.all_accounts.filter(is_active=True)
+                    .prefetch_related('asset', 'asset__platform', 'asset__platform__ad'))
+        return queryset
+
     @lazyproperty
     def accounts_amount(self):
         return self.accounts.count()
@@ -258,6 +272,19 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     def get_protocol_port(self, protocol):
         protocol = self.protocols.all().filter(name=protocol).first()
         return protocol.port if protocol else 0
+
+    def is_ad(self):
+        return self.category == const.Category.AD
+
+    @property
+    def joined_ad_id(self):
+        return self.platform.ad_id
+
+    def is_joined_ad(self):
+        if self.joined_ad_id:
+            return True
+        else:
+            return False
 
     @property
     def is_valid(self):

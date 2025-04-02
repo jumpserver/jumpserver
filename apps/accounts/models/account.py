@@ -131,9 +131,26 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
 
     @lazyproperty
     def alias(self):
+        """
+        别称，因为有虚拟账号，@INPUT @MANUAL @USER, 否则为 id
+        """
         if self.username.startswith('@'):
             return self.username
-        return self.name
+        return self.id
+
+    @lazyproperty
+    def ad_domain(self):
+        if self.username.startswith('@'):
+            return None
+        if self.platform.category == 'ad':
+            return self.asset.ad.domain_name
+        return None
+
+    @lazyproperty
+    def full_username(self):
+        if self.ad_domain:
+            return '{}@{}'.format(self.username, self.ad_domain)
+        return self.username
 
     @lazyproperty
     def has_secret(self):

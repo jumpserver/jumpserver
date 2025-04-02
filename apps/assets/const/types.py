@@ -16,13 +16,15 @@ from .device import DeviceTypes
 from .gpt import GPTTypes
 from .host import HostTypes
 from .web import WebTypes
+from .ad import ADTypes
 
 
 class AllTypes(ChoicesMixin):
     choices: list
     includes = [
         HostTypes, DeviceTypes, DatabaseTypes,
-        CloudTypes, WebTypes, CustomTypes, GPTTypes
+        CloudTypes, WebTypes, CustomTypes,
+        ADTypes, GPTTypes
     ]
     _category_constrains = {}
     _automation_methods = None
@@ -173,6 +175,7 @@ class AllTypes(ChoicesMixin):
             (Category.DATABASE, DatabaseTypes),
             (Category.WEB, WebTypes),
             (Category.CLOUD, CloudTypes),
+            (Category.AD, ADTypes),
             (Category.CUSTOM, CustomTypes)
         ]
         return types

@@ -7,3 +7,4 @@ from .gpt import *
 from .host import *
 from .permission import *
 from .web import *
+from .ad import *

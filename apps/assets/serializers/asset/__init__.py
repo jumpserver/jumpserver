@@ -7,3 +7,4 @@ from .device import *
 from .gpt import *
 from .host import *
 from .web import *
+from .ad import *
