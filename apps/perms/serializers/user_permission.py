@@ -59,6 +59,7 @@ class NodePermedSerializer(serializers.ModelSerializer):
 
 class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
+    username = serializers.CharField(source='full_username', read_only=True)
 
     class Meta:
         model = Account

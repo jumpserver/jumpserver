@@ -95,7 +95,9 @@ class QuerySetMixin:
     get_queryset: Callable
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        return super().get_queryset()
+
+    def filter_queryset(self, queryset):
         if not hasattr(self, 'action'):
             return queryset
         if self.action == 'metadata':
@@ -105,8 +107,9 @@ class QuerySetMixin:
 
     def setup_eager_loading(self, queryset, is_paginated=False):
         is_export_request = self.request.query_params.get('format') in ['csv', 'xlsx']
+        no_request_page = self.request.query_params.get('limit') is None
         # 不分页不走一般这个，是因为会消耗多余的 sql 查询, 不如分页的时候查询一次
-        if not is_export_request and not is_paginated:
+        if not is_export_request and not is_paginated and not no_request_page:
             return queryset
 
         serializer_class = self.get_serializer_class()
@@ -129,7 +132,7 @@ class QuerySetMixin:
         serializer_class = self.get_serializer_class()
         if page and serializer_class:
             ids = [str(obj.id) for obj in page]
-            page = self.get_queryset().filter(id__in=ids)
+            page = model.objects.filter(id__in=ids)
             page = self.setup_eager_loading(page, is_paginated=True)
             page_mapper = {str(obj.id): obj for obj in page}
             page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
