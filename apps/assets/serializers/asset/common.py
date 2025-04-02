@@ -155,7 +155,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         model = Asset
         fields_fk = ['domain', 'platform']
         fields_mini = ['id', 'name', 'address'] + fields_fk
-        fields_small = fields_mini + ['is_active', 'comment']
+        fields_small = fields_mini + ['is_active', 'comment', 'source', 'status']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',

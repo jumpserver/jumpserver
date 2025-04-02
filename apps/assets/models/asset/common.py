@@ -178,6 +178,14 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
     custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
+    source = models.CharField(
+        max_length=128, verbose_name=_('Source'),
+        choices=const.AssetSource.choices, default=const.AssetSource.local_create
+    )
+    status = models.CharField(
+        max_length=128, verbose_name=_('Status'),
+        choices=const.AssetStatus.choices, default=const.AssetStatus.nothing
+    )
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 

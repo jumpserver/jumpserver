@@ -117,3 +117,13 @@ class BaseType(TextChoices):
         else:
             choices = cls.choices
         return choices
+
+
+class AssetSource(TextChoices):
+    local_create = 'local', _('Local')
+    cloud_import = 'cloud', _('Cloud import')
+
+
+class AssetStatus(TextChoices):
+    nothing = '-', '-'
+    cloud_released = 'cloud_released', _('Cloud released')

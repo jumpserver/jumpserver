@@ -65,7 +65,7 @@ class AssetFilterSet(BaseFilterSet):
     class Meta:
         model = Asset
         fields = [
-            "id", "name", "address", "is_active",
+            "id", "name", "address", "is_active", "source", "status",
             "type", "category", "platform",
         ]
 
