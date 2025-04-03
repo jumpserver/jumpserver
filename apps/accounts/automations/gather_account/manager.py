@@ -373,6 +373,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
 
         for asset, accounts_data in self.asset_account_info.items():
             ori_users = self.ori_asset_usernames[str(asset.id)]
+            need_analyser_gather_account = []
             with tmp_to_org(asset.org_id):
                 for d in accounts_data:
                     username = d["username"]
@@ -385,10 +386,11 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         ga = ori_account
                         self.update_gathered_account(ori_account, d)
                     ori_found = username in ori_users
-                    risk_analyser.analyse_risk(asset, ga, d, ori_found)
-
+                    need_analyser_gather_account.append((asset, ga, d, ori_found))
                 self.create_gathered_account.finish()
                 self.update_gathered_account.finish()
+                for analysis_data in need_analyser_gather_account:
+                    risk_analyser.analyse_risk(*analysis_data)
                 self.update_gather_accounts_status(asset)
                 if not self.is_sync_account:
                     continue
