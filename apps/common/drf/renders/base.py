@@ -13,11 +13,13 @@ from rest_framework.utils import encoders, json
 
 from common.serializers import fields as common_fields
 from common.utils import get_logger
+from .mixins import LogMixin
+
 
 logger = get_logger(__file__)
 
 
-class BaseFileRenderer(BaseRenderer):
+class BaseFileRenderer(LogMixin, BaseRenderer):
     # 渲染模板标识, 导入、导出、更新模板: ['import', 'update', 'export']
     template = 'export'
     serializer = None
@@ -256,6 +258,8 @@ class BaseFileRenderer(BaseRenderer):
             logger.debug(e, exc_info=True)
             value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
             return value
+
+        self.record_logs(request, view, data)
         return value
 
     def compress_into_zip_file(self, value, request, response):

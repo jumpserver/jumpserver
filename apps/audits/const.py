@@ -24,6 +24,7 @@ class ActionChoices(TextChoices):
     update = "update", _("Update")
     delete = "delete", _("Delete")
     create = "create", _("Create")
+    export = "export", _("Export")
     # Activities action
     download = "download", _("Download")
     connect = "connect", _("Connect")

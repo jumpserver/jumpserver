@@ -18,6 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from audits.const import ActionChoices
+from audits.utils import record_operate_log_and_activity_log
 from common.api import AsyncApiMixin
 from common.const.http import GET, POST
 from common.drf.filters import BaseFilterSet
@@ -27,7 +28,6 @@ from common.permissions import IsServiceAccount
 from common.storage.replay import ReplayStorageHandler, SessionPartReplayStorageHandler
 from common.utils import data_to_json, is_uuid, i18n_fmt
 from common.utils import get_logger, get_object_or_none
-from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
@@ -77,7 +77,7 @@ class SessionFilterSet(BaseFilterSet):
             return queryset.filter(terminal__name=value)
 
 
-class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
+class SessionViewSet(OrgBulkModelViewSet):
     model = Session
     serializer_classes = {
         'default': serializers.SessionSerializer,
@@ -153,7 +153,7 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('Download'), str(session)
         )
-        self.record_logs(
+        record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.download, detail,
             model=Session, resource_display=str(session)
         )
@@ -211,7 +211,7 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
         return super().perform_create(serializer)
 
 
-class SessionReplayViewSet(AsyncApiMixin, RecordViewLogMixin, viewsets.ViewSet):
+class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
     download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
     session = None
@@ -283,7 +283,7 @@ class SessionReplayViewSet(AsyncApiMixin, RecordViewLogMixin, viewsets.ViewSet):
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
-        self.record_logs(
+        record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.download, detail,
             model=Session, resource_display=str(session)
         )
