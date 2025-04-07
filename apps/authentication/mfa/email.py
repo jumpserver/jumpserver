@@ -15,7 +15,7 @@ class MFAEmail(BaseMFA):
     display_name = _('Email')
     placeholder = _('Email verification code')
 
-    def check_code(self, code):
+    def _check_code(self, code):
         assert self.is_authenticated()
         sender_util = SendAndVerifyCodeUtil(self.user.email, backend=self.name)
         ok = sender_util.verify(code)
