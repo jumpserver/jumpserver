@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
                  models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date password last updated')),
                 ('need_update_password', models.BooleanField(default=False, verbose_name='Need update password')),
                 ('source', models.CharField(
-                    choices=[('local', 'Local'), ('ldap', 'LDAP/AD'), ('ldap_ha', 'LDAP/AD (HA)'), ('openid', 'OpenID'),
+                    choices=[('local', 'Local'), ('ldap', 'LDAP/DS'), ('ldap_ha', 'LDAP/DS (HA)'), ('openid', 'OpenID'),
                              ('radius', 'Radius'), ('cas', 'CAS'), ('saml2', 'SAML2'), ('oauth2', 'OAuth2'),
                              ('wecom', 'WeCom'), ('dingtalk', 'DingTalk'), ('feishu', 'FeiShu'), ('lark', 'Lark'),
                              ('slack', 'Slack'), ('custom', 'Custom')], default='local', max_length=30,

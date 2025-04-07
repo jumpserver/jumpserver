@@ -20,7 +20,7 @@ class HostTypes(BaseType):
                 'charset': 'utf-8',  # default
                 'domain_enabled': True,
                 'su_enabled': True,
-                'ad_enabled': True,
+                'ds_enabled': True,
                 'su_methods': ['sudo', 'su', 'only_sudo', 'only_su'],
             },
             cls.WINDOWS: {

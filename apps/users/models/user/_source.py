@@ -9,8 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Source(models.TextChoices):
     local = "local", _("Local")
-    ldap = "ldap", "LDAP/AD"
-    ldap_ha = "ldap_ha", "LDAP/AD (HA)"
+    ldap = "ldap", "LDAP/DS"
+    ldap_ha = "ldap_ha", "LDAP/DS (HA)"
     openid = "openid", "OpenID"
     radius = "radius", "Radius"
     cas = "cas", "CAS"

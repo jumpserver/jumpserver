@@ -247,10 +247,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     @property
     def all_accounts(self):
-        if not self.joined_ad_id:
+        if not self.joined_dir_svc_id:
             queryset = self.accounts.all()
         else:
-            queryset = self.accounts.model.objects.filter(asset__in=[self.id, self.joined_ad_id])
+            queryset = self.accounts.model.objects.filter(asset__in=[self.id, self.joined_dir_svc_id])
         return queryset
 
     @lazyproperty
@@ -273,15 +273,15 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         protocol = self.protocols.all().filter(name=protocol).first()
         return protocol.port if protocol else 0
 
-    def is_ad(self):
-        return self.category == const.Category.AD
+    def is_dir_svc(self):
+        return self.category == const.Category.DS
 
     @property
-    def joined_ad_id(self):
-        return self.platform.ad_id
+    def joined_dir_svc_id(self):
+        return self.platform.ds_id
 
     def is_joined_ad(self):
-        if self.joined_ad_id:
+        if self.joined_dir_svc_id:
             return True
         else:
             return False

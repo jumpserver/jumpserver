@@ -21,7 +21,7 @@ class VirtualAccountSerializer(serializers.ModelSerializer):
             'username': {'label': _('Username')},
             'secret_from_login': {
                 'help_text': _(
-                    'Current only support login from AD/LDAP. Secret priority: '
+                    'Current only support login from DS/LDAP. Secret priority: '
                     'Same account in asset secret > Login secret > Manual input. <br/ >'
                     'For security, please set config CACHE_LOGIN_PASSWORD_ENABLED to true'
                 )

@@ -87,7 +87,7 @@ class BaseAccountSerializer(
             "username": {
                 "help_text": _(
                     "* If no username is required for authentication, enter null.  "
-                    "For AD accounts, use the format username@domain."
+                    "For DS accounts, use the format username@domain."
                 )
             },
         }
