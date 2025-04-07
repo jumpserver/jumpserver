@@ -102,10 +102,10 @@ class Platform(LabeledMixin, JMSBaseModel):
         max_length=8, verbose_name=_("Charset")
     )
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Gateway enabled"))
-    ad_enabled = models.BooleanField(default=False, verbose_name=_("AD enabled"))
-    ad = models.ForeignKey(
-        'assets.AD', on_delete=models.SET_NULL, null=True, blank=True,
-        verbose_name=_("Active Directory"), related_name='ad_platforms'
+    ds_enabled = models.BooleanField(default=False, verbose_name=_("DS enabled"))
+    ds = models.ForeignKey(
+        'DirectoryService', on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name=_("Directory service"), related_name='ds_platforms'
     )
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
@@ -121,8 +121,8 @@ class Platform(LabeledMixin, JMSBaseModel):
         return self.assets.count()
 
     def save(self, *args, **kwargs):
-        if not self.ad_enabled:
-            self.ad = None
+        if not self.ds_enabled:
+            self.ds = None
         super().save(*args, **kwargs)
 
     @classmethod

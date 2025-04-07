@@ -40,6 +40,7 @@ class _ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
 class _SimpleAccountSerializer(serializers.ModelSerializer):
     secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
+    username = serializers.CharField(label=_('Username'), source='full_username', read_only=True)
 
     class Meta:
         model = Account
@@ -49,6 +50,7 @@ class _SimpleAccountSerializer(serializers.ModelSerializer):
 class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     su_from = serializers.SerializerMethodField(label=_('Su from'))
     secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
+    username = serializers.CharField(label=_('Username'), source='full_username', read_only=True)
 
     class Meta:
         model = Account

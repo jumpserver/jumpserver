@@ -1,15 +1,14 @@
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
-from assets.models import AD
+from assets.models import DirectoryService
 from .common import AssetSerializer
 
-__all__ = ['ADSerializer']
+__all__ = ['DSSerializer']
 
 
-class ADSerializer(AssetSerializer):
+class DSSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
-        model = AD
+        model = DirectoryService
         fields = AssetSerializer.Meta.fields + [
             'domain_name',
         ]

@@ -8,7 +8,6 @@ from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.forms.models import model_to_dict
 from rest_framework.exceptions import PermissionDenied
 
 from accounts.models import VirtualAccount
@@ -265,7 +264,7 @@ class ConnectionToken(JMSOrgBaseModel):
                 input_secret=self.input_secret, from_permed=False
             )
         else:
-            account = self.asset.accounts.filter(name=self.account).first()
+            account = self.asset.all_valid_accounts.filter(id=self.account).first()
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
         return account

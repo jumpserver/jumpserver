@@ -20,7 +20,7 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.ChoiceField(
         choices=[
-            ('auto', _('Auto(Enabled for the first 5 minutes after startup, then disabled.)')), 
+            ('auto', _('Auto(Enabled for the first 5 minutes after startup, then disabled.)')),
             (True, _('Enable')), (False, _('Disable'))
         ],
         required=True, label=_('Registration'),
@@ -29,7 +29,7 @@ class TerminalSettingSerializer(serializers.Serializer):
         )
     )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(
-        required=False, label=_("Password"), 
+        required=False, label=_("Password"),
         help_text=_(
             '* Allow users to log in to the KoKo component via password authentication'
         )
@@ -39,8 +39,8 @@ class TerminalSettingSerializer(serializers.Serializer):
         help_text=_(
             '* Allow users to log in to the KoKo component via Public key authentication'
             '<br/>'
-            'If third-party authentication services, such as AD/LDAP, are enabled, you should '
-            'disable this option to prevent users from logging in after being deleted from the AD/LDAP server'
+            'If third-party authentication services, such as DS/LDAP, are enabled, you should '
+            'disable this option to prevent users from logging in after being deleted from the DS/LDAP server'
         )
     )
     TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(
@@ -50,7 +50,7 @@ class TerminalSettingSerializer(serializers.Serializer):
         PAGE_SIZE_CHOICES, required=False, label=_('Asset page size')
     )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(
-        label="Magnus", 
+        label="Magnus",
         help_text=_(
             '* You can individually configure the service address and port in the service endpoint'
             '<br/>'

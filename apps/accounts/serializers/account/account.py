@@ -241,7 +241,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'date_change_secret', 'change_secret_status'
         ]
         fields = BaseAccountSerializer.Meta.fields + [
-            'su_from', 'asset', 'version', "ad_domain",
+            'su_from', 'asset', 'version', 'ds_domain',
             'source', 'source_id', 'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields

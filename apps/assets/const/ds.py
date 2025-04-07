@@ -3,11 +3,13 @@ from django.utils.translation import gettext_lazy as _
 from .base import BaseType
 
 
-class ADTypes(BaseType):
-    AD = 'ad', _('Active Directory')
+class DirectoryTypes(BaseType):
+    GENERAL = 'general', _('General')
+    # LDAP = 'ldap', _('LDAP')
+    # AD = 'ad', _('Active Directory')
     WINDOWS_AD = 'windows_ad', _('Windows Active Directory')
-    LDAP = 'ldap', _('LDAP')
-    AZURE_AD = 'azure_ad', _('Azure Active Directory')
+
+    # AZURE_AD = 'azure_ad', _('Azure Active Directory')
 
     @classmethod
     def _get_base_constrains(cls) -> dict:
@@ -15,7 +17,7 @@ class ADTypes(BaseType):
             '*': {
                 'charset_enabled': False,
                 'domain_enabled': True,
-                'ad_enabled': False,
+                'ds_enabled': False,
                 'su_enabled': True,
             }
         }
@@ -24,6 +26,9 @@ class ADTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         constrains = {
             '*': {
+                'ansible_enabled': False,
+            },
+            cls.WINDOWS_AD: {
                 'ansible_enabled': True,
                 'ping_enabled': True,
                 'gather_facts_enabled': False,
@@ -38,36 +43,24 @@ class ADTypes(BaseType):
     @classmethod
     def _get_protocol_constrains(cls) -> dict:
         return {
+            cls.GENERAL: {
+                'choices': ['ssh']
+            },
             cls.WINDOWS_AD: {
                 'choices': ['rdp', 'ssh', 'vnc', 'winrm']
             },
-            cls.LDAP: {
-                'choices': ['ssh', 'ldap']
-            },
-            cls.AZURE_AD: {
-                'choices': ['ldap']
-            }
         }
 
     @classmethod
     def internal_platforms(cls):
         return {
-            cls.AD: [
-                {'name': 'Active Directory'}
-            ],
             cls.WINDOWS_AD: [
                 {'name': 'Windows Active Directory'}
-            ],
-            cls.LDAP: [
-                {'name': 'LDAP'}
-            ],
-            cls.AZURE_AD: [
-                {'name': 'Azure Active Directory'}
             ],
         }
 
     @classmethod
     def get_community_types(cls):
         return [
-            cls.LDAP,
+            cls.GENERAL,
         ]

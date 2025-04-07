@@ -197,7 +197,7 @@ class LDAPServerUtil(object):
                     value = is_true(value)
 
             if attr == 'groups' and mapping.lower() == 'memberof':
-                # AD: {'groups': 'memberOf'}
+                # DS: {'groups': 'memberOf'}
                 if isinstance(value, str) and value:
                     value = [value]
                 if not isinstance(value, list):
@@ -369,7 +369,7 @@ class LDAPSyncUtil(object):
 
 
 class LDAPImportUtil(object):
-    user_group_name_prefix = 'AD '
+    user_group_name_prefix = 'DS '
 
     def __init__(self):
         pass
@@ -401,7 +401,7 @@ class LDAPImportUtil(object):
                 continue
             if not isinstance(group, str):
                 continue
-            # get group name for AD, Such as: CN=Users,CN=Builtin,DC=jms,DC=com
+            # get group name for DS, Such as: CN=Users,CN=Builtin,DC=jms,DC=com
             group_name = group.split(',')[0].split('=')[-1]
             group_name = f'{self.user_group_name_prefix}{group_name}'.strip()
             group_names.append(group_name)
@@ -665,7 +665,7 @@ class LDAPTestUtil(object):
     # test login
 
     def _test_before_login_check(self, username, password):
-        from settings.ws import CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS, TASK_STATUS_IS_OVER
+        from settings.ws import CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS
         if not cache.get(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS):
             self.test_config()
 
