@@ -4,6 +4,7 @@ import os
 import re
 from collections import defaultdict
 
+import sys
 from django.utils.translation import gettext as _
 
 __all__ = ['JMSInventory']
@@ -280,6 +281,68 @@ class JMSInventory:
         for p in asset_protocols:
             setattr(p, 'setting', platform_protocols.get(p.name, {}))
         return asset_protocols
+
+    def get_classified_hosts(self, path_dir):
+        """
+        返回三种类型的主机：可运行的、错误的和跳过的
+        :param path_dir: 存储密钥的路径
+        :return: dict，包含三类主机信息
+        """
+        hosts = []
+        platform_assets = self.group_by_platform(self.assets)
+        runnable_hosts = []
+        error_hosts = []
+
+        for platform, assets in platform_assets.items():
+            automation = platform.automation
+            platform_protocols = {
+                p['name']: p['setting'] for p in platform.protocols.values('name', 'setting')
+            }
+            for asset in assets:
+                protocols = self.set_platform_protocol_setting_to_asset(asset, platform_protocols)
+                account = self.select_account(asset)
+                host = self.asset_to_host(asset, account, automation, protocols, platform, path_dir)
+
+                if not automation.ansible_enabled:
+                    host['error'] = _('Ansible disabled')
+
+                if isinstance(host, list):
+                    hosts.extend(host)
+                else:
+                    hosts.append(host)
+
+        # 分类主机
+        for host in hosts:
+            if host.get('error'):
+                self.exclude_hosts[host['name']] = host['error']
+                error_hosts.append({
+                    'name': host['name'],
+                    'id': host.get('jms_asset', {}).get('id'),
+                    'error': host['error']
+                })
+            else:
+                runnable_hosts.append({
+                    'name': host['name'],
+                    'ip': host['ansible_host'],
+                    'id': host.get('jms_asset', {}).get('id')
+                })
+
+        # 获取跳过的主机
+        skipped_hosts = []
+        for name, error in self.exclude_hosts.items():
+            if any(h['name'] == name for h in error_hosts):
+                continue
+            skipped_hosts.append({
+                'name': name,
+                'error': error
+            })
+
+        result = {
+            'runnable': runnable_hosts,
+            'error': error_hosts,
+            'skipped': skipped_hosts
+        }
+        return result
 
     def generate(self, path_dir):
         hosts = []
