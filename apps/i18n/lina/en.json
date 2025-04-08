@@ -495,6 +495,7 @@
     "DownloadImportTemplateMsg": "Download creation template",
     "DownloadReplay": "Download recording",
     "DownloadUpdateTemplateMsg": "Download update template",
+    "IdentityDomain": "Identity domain",
     "DragUploadFileInfo": "Drag files here, or click to upload",
     "DropConfirmMsg": "Do you want to move node: {src} to {dst}?",
     "Duplicate": "Duplicate",

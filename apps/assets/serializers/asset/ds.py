@@ -15,8 +15,7 @@ class DSSerializer(AssetSerializer):
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
             'domain_name': {
-                'help_text': _(
-                    'The domain name of the Active Directory'
-                ),
-                'label': _('Domain name')}
+                'help_text': _('The domain name of the active directory or other directory service'),
+                'label': _('Domain name')
+            }
         }
