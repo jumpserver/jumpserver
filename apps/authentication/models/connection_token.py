@@ -256,6 +256,8 @@ class ConnectionToken(JMSOrgBaseModel):
             return True
 
     def set_ad_domain_if_need(self, account):
+        if not self.protocol == 'rdp':
+            return
         rdp = self.asset.platform.protocols.filter(name='rdp').first()
         if not rdp or not rdp.setting:
             return
@@ -279,9 +281,8 @@ class ConnectionToken(JMSOrgBaseModel):
             account = self.asset.all_valid_accounts.filter(id=self.account).first()
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
+            self.set_ad_domain_if_need(account)
 
-            if self.protocol == 'rdp':
-                self.set_ad_domain_if_need(account)
         return account
 
     @lazyproperty
