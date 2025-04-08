@@ -233,6 +233,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
         label=_('Su from'), attrs=('id', 'name', 'username')
     )
+    ds = ObjectRelatedField(read_only=True, label=_('Directory service'), attrs=('id', 'name', 'domain_name'))
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
@@ -241,7 +242,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'date_change_secret', 'change_secret_status'
         ]
         fields = BaseAccountSerializer.Meta.fields + [
-            'su_from', 'asset', 'version', 'ds_domain', 'ds_id',
+            'su_from', 'asset', 'version', 'ds',
             'source', 'source_id', 'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields
