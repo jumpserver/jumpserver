@@ -247,7 +247,7 @@ class UserSerializer(
             },
             "source": {
                 "help_text": _(
-                    "User source identifies where the user was created, which could be DS or other sources."
+                    "User source identifies where the user was created, which could be AD or other sources."
                     "There are security settings that can restrict users to log in to the system only from the sources."
                 ),
             },
