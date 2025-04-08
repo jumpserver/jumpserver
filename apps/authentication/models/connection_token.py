@@ -121,10 +121,10 @@ class ConnectionToken(JMSOrgBaseModel):
         self.save()
 
     @classmethod
-    def get_user_permed_account(cls, user, asset, account_name, protocol):
+    def get_user_permed_account(cls, user, asset, account_alias, protocol):
         from perms.utils import PermAssetDetailUtil
         permed_account = PermAssetDetailUtil(user, asset) \
-            .validate_permission(account_name, protocol)
+            .validate_permission(account_alias, protocol)
         return permed_account
 
     def get_permed_account(self):

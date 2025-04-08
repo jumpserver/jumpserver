@@ -136,23 +136,35 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         """
         if self.username.startswith('@'):
             return self.username
-        return self.id
+        return str(self.id)
+
+    def is_ds_account(self):
+        if self.username.startswith('@'):
+            return False
+        if self.platform.category == 'ds':
+            return True
+        return False
 
     @lazyproperty
     def ds_id(self):
-        if self.username.startswith('@'):
-            return None
-        if self.platform.category == 'ds':
+        if self.is_ds_account():
             return self.asset.ds.id
         return None
 
     @lazyproperty
     def ds_domain(self):
-        if self.username.startswith('@'):
-            return None
         if self.ds_id:
             return self.asset.ds.domain_name
         return None
+
+    @lazyproperty
+    def ds(self):
+        if not self.is_ds_account():
+            return {}
+        return {
+            'id': self.ds_id,
+            'domain': self.ds_domain,
+        }
 
     @lazyproperty
     def full_username(self):
