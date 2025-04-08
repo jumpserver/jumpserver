@@ -495,6 +495,7 @@
     "DownloadReplay": "下载录像",
     "DownloadUpdateTemplateMsg": "下载更新模板",
     "DragUploadFileInfo": "将文件拖到此处，或点击此处上传",
+    "IdentityDomain": "身份域",
     "DropConfirmMsg": "你想移动节点: {src} 到 {dst} 下吗?",
     "Duplicate": "副本",
     "DuplicateFileExists": "不允许上传同名文件,请删除同名文件",
