@@ -6,12 +6,16 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
+from django.utils import translation
 from itertools import chain
 
 from common.db.fields import RelatedManager
 from common.utils import validate_ip, get_ip_city, get_logger
 from common.utils.timezone import as_current_tz
-from .const import DEFAULT_CITY
+from .const import DEFAULT_CITY, ActivityChoices as LogChoice
+from .handler import create_or_update_operate_log
+from .models import ActivityLog
+
 
 logger = get_logger(__name__)
 
@@ -140,3 +144,15 @@ def construct_userlogin_usernames(user_queryset):
     ).values_list("usernames_combined_field", flat=True)
     usernames = list(chain(usernames_original, usernames_combined))
     return usernames
+
+
+def record_operate_log_and_activity_log(ids, action, detail, model, **kwargs):
+    from orgs.utils import current_org
+
+    org_id = current_org.id
+    with translation.override('en'):
+        resource_type = model._meta.verbose_name
+        create_or_update_operate_log(action, resource_type, force=True, **kwargs)
+        base_data = {'type': LogChoice.operate_log, 'detail': detail, 'org_id': org_id}
+        activities = [ActivityLog(resource_id=r_id, **base_data) for r_id in ids]
+        ActivityLog.objects.bulk_create(activities)

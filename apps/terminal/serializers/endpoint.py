@@ -5,30 +5,18 @@ from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.serializers import BulkModelSerializer
 from common.serializers.fields import ObjectRelatedField
 from ..models import Endpoint, EndpointRule
-from ..utils import db_port_manager
 
 __all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
 
 
 class EndpointSerializer(BulkModelSerializer):
-    # 解决 luna 处理繁琐的问题, 返回 magnus 监听的当前 db 的 port
-    oracle_port = serializers.SerializerMethodField(label=_('Oracle port'))
-    oracle_port_range = serializers.CharField(
-        max_length=128, default=db_port_manager.oracle_port_range, read_only=True,
-        label=_('Oracle port range'),
-        help_text=_(
-            'Oracle proxy server listen port is dynamic, Each additional Oracle '
-            'database instance adds a port listener'
-        )
-    )
-
     class Meta:
         model = Endpoint
         fields_mini = ['id', 'name']
         fields_small = [
             'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
             'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port', 'vnc_port',
-            'oracle_port_range', 'oracle_port', 'sqlserver_port', 'is_active'
+            'oracle_port', 'sqlserver_port', 'is_active'
         ]
         fields = fields_mini + fields_small + [
             'comment', 'date_created', 'date_updated', 'created_by'
@@ -41,13 +29,6 @@ class EndpointSerializer(BulkModelSerializer):
             )
             },
         }
-
-    def get_oracle_port(self, obj: Endpoint):
-        view = self.context.get('view')
-        if not view or view.action not in ['smart']:
-            return 0
-        return obj.get_port(view.target_instance, view.target_protocol)
-
     def get_extra_kwargs(self):
         extra_kwargs = super().get_extra_kwargs()
         model_fields = self.Meta.model._meta.fields

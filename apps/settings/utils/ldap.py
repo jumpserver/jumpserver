@@ -47,7 +47,7 @@ LDAP_USE_CACHE_FLAGS = [1, '1', 'true', 'True', True]
 
 class LDAPConfig(object):
 
-    def __init__(self, config=None, category='ldap'):
+    def __init__(self, config=None, category=User.Source.ldap.value):
         self.server_uri = None
         self.bind_dn = None
         self.password = None
@@ -73,7 +73,7 @@ class LDAPConfig(object):
         self.auth_ldap = config.get('auth_ldap')
 
     def load_from_settings(self):
-        prefix = 'AUTH_LDAP' if self.category == 'ldap' else 'AUTH_LDAP_HA'
+        prefix = 'AUTH_LDAP' if self.category == User.Source.ldap.value else 'AUTH_LDAP_HA'
         self.server_uri = getattr(settings, f"{prefix}_SERVER_URI")
         self.bind_dn = getattr(settings, f"{prefix}_BIND_DN")
         self.password = getattr(settings, f"{prefix}_BIND_PASSWORD")
@@ -86,7 +86,7 @@ class LDAPConfig(object):
 
 class LDAPServerUtil(object):
 
-    def __init__(self, config=None, category='ldap'):
+    def __init__(self, config=None, category=User.Source.ldap.value):
         if isinstance(config, dict):
             self.config = LDAPConfig(config=config)
         elif isinstance(config, LDAPConfig):
@@ -234,14 +234,11 @@ class LDAPServerUtil(object):
 
 class LDAPCacheUtil(object):
 
-    def __init__(self, category='ldap'):
+    def __init__(self, category=User.Source.ldap.value):
         self.search_users = None
         self.search_value = None
         self.category = category
-        if self.category == 'ldap':
-            self.cache_key_users = 'CACHE_KEY_LDAP_USERS'
-        else:
-            self.cache_key_users = 'CACHE_KEY_LDAP_HA_USERS'
+        self.cache_key_users = 'CACHE_KEY_{}_USERS'.format(self.category.upper())
 
     def set_users(self, users):
         logger.info('Set ldap users to cache, count: {}'.format(len(users)))
@@ -295,7 +292,7 @@ class LDAPSyncUtil(object):
     TASK_STATUS_IS_RUNNING = 'RUNNING'
     TASK_STATUS_IS_OVER = 'OVER'
 
-    def __init__(self, category='ldap'):
+    def __init__(self, category=User.Source.ldap.value):
         self.server_util = LDAPServerUtil(category=category)
         self.cache_util = LDAPCacheUtil(category=category)
         self.task_error_msg = None
@@ -371,8 +368,9 @@ class LDAPSyncUtil(object):
 class LDAPImportUtil(object):
     user_group_name_prefix = 'AD '
 
-    def __init__(self):
-        pass
+    def __init__(self, category=User.Source.ldap.value, is_sync_all=True):
+        self.category = category
+        self.is_sync_all = is_sync_all
 
     @staticmethod
     def get_user_email(user):
@@ -384,7 +382,7 @@ class LDAPImportUtil(object):
     def update_or_create(self, user):
         user['email'] = self.get_user_email(user)
         if user['username'] not in ['admin']:
-            user['source'] = User.Source.ldap.value
+            user['source'] = self.category
         user.pop('status', None)
         obj, created = User.objects.update_or_create(
             username=user['username'], defaults=user
@@ -435,7 +433,29 @@ class LDAPImportUtil(object):
         for org in orgs:
             self.bind_org(org, objs, group_users_mapper)
         logger.info('End perform import ldap users')
-        return new_users, errors
+        # 禁止ldap 不存在的用户的
+        disable_usernames = []
+        if self.strict_sync_enabled and self.is_sync_all:
+            disable_usernames = self.disable_not_exist_users(users)
+
+        if errors:
+            logger.error(f"Imported {self.category.upper()} users errors: {errors}")
+        else:
+            logger.info(f"Imported {len(users)} {self.category.upper()} users successfully")
+        return new_users, errors, disable_usernames
+
+    @property
+    def strict_sync_enabled(self):
+        return getattr(settings, 'AUTH_{}_STRICT_SYNC'.format(self.category.upper()), False)
+
+    def disable_not_exist_users(self, users):
+        ldap_users = [user['username'] for user in users]
+        disable_users = User.objects.filter(source=self.category, is_active=True).exclude(username__in=ldap_users).all()
+        disable_usernames = disable_users.values_list('username', flat=True)
+        disable_usernames = list(map(str, disable_usernames))
+        disable_users.update(is_active=False)
+        logger.info(f"Disable {len(disable_usernames)} {self.category.upper()} users successfully")
+        return disable_usernames
 
     def exit_user_group(self, user_groups_mapper):
         # 通过对比查询本次导入用户需要移除的用户组
@@ -485,10 +505,10 @@ class LDAPTestUtil(object):
     class LDAPBeforeLoginCheckError(LDAPExceptionError):
         pass
 
-    def __init__(self, config=None, category='ldap'):
+    def __init__(self, config=None, category=User.Source.ldap.value):
         self.config = LDAPConfig(config, category)
         self.user_entries = []
-        if category == 'ldap':
+        if category == User.Source.ldap.value:
             self.backend = LDAPAuthorizationBackend()
         else:
             self.backend = LDAPHAAuthorizationBackend()

@@ -2,11 +2,11 @@
 
 - hosts: all
   vars:
-    APPLET_DOWNLOAD_HOST: https://demo.jumpserver.org
+    APPLET_DOWNLOAD_HOST: https://demo.example.com
     IGNORE_VERIFY_CERTS: true
     HOST_NAME: test
     HOST_ID: 00000000-0000-0000-0000-000000000000
-    CORE_HOST: https://demo.jumpserver.org
+    CORE_HOST: https://demo.example.com
     BOOTSTRAP_TOKEN: PleaseChangeMe
     RDS_Licensing: false
     RDS_LicenseServer: 127.0.0.1

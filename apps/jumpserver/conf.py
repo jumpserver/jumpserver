@@ -9,16 +9,15 @@
 """
 import base64
 import copy
-import errno
 import json
 import logging
 import os
 import re
-import sys
 import types
 from importlib import import_module
 from urllib.parse import urljoin, urlparse, quote
 
+import sys
 import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -290,6 +289,7 @@ class Config(dict):
         'AUTH_LDAP_START_TLS': False,
         'AUTH_LDAP_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
         'AUTH_LDAP_CONNECT_TIMEOUT': 10,
+        'AUTH_LDAP_STRICT_SYNC': False,
         'AUTH_LDAP_CACHE_TIMEOUT': 0,
         'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
@@ -310,6 +310,7 @@ class Config(dict):
         'AUTH_LDAP_HA_START_TLS': False,
         'AUTH_LDAP_HA_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
         'AUTH_LDAP_HA_CONNECT_TIMEOUT': 10,
+        'AUTH_LDAP_HA_STRICT_SYNC': False,
         'AUTH_LDAP_HA_CACHE_TIMEOUT': 0,
         'AUTH_LDAP_HA_SEARCH_PAGED_SIZE': 1000,
         'AUTH_LDAP_HA_SYNC_IS_PERIODIC': False,
@@ -393,7 +394,7 @@ class Config(dict):
                 "en": {
                     "name": "JumpServer",
                     "displayname": "JumpServer",
-                    "url": "https://jumpserver.org/"
+                    "url": "https://jumpserver.com/"
                 }
             },
             "strict": True,
@@ -664,8 +665,8 @@ class Config(dict):
         'TERMINAL_TELNET_REGEX': '',
 
         # 导航栏 帮助
-        'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
-        'HELP_SUPPORT_URL': 'https://www.jumpserver.org/support/',
+        'HELP_DOCUMENT_URL': 'https://jumpserver.com/docs',
+        'HELP_SUPPORT_URL': 'https://www.lxware.hk/pages/about',
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',

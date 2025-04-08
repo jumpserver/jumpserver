@@ -6,20 +6,25 @@ from common.utils import random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from settings.utils import get_login_title
 from .base import BaseMFA
+from ..const import MFAType
 
 email_failed_msg = _("Email verify code invalid")
 
 
 class MFAEmail(BaseMFA):
-    name = 'email'
-    display_name = _('Email')
+    name = MFAType.Email.value
+    display_name = MFAType.Email.name
     placeholder = _('Email verification code')
 
-    def check_code(self, code):
+    def _check_code(self, code):
         assert self.is_authenticated()
         sender_util = SendAndVerifyCodeUtil(self.user.email, backend=self.name)
-        ok = sender_util.verify(code)
-        msg = '' if ok else email_failed_msg
+        ok = False
+        msg = ''
+        try:
+            ok = sender_util.verify(code)
+        except Exception as e:
+            msg = str(e)
         return ok, msg
 
     def is_active(self):

@@ -207,6 +207,8 @@ class ConnectionToken(JMSOrgBaseModel):
             'alternate shell:s': app,
             'remoteapplicationcmdline:s': cmdline_b64,
             'disableconnectionsharing:i': '1',
+            'bitmapcachepersistenable:i': '0',   # 图缓存相关设置,便于录像审计
+            'bitmapcachesize:i': '1500',
         }
         return options
 
