@@ -255,6 +255,16 @@ class ConnectionToken(JMSOrgBaseModel):
             cache.delete(lock_key)
             return True
 
+    def set_ad_domain_if_need(self, account):
+        rdp = self.asset.platform.protocols.filter(name='rdp').first()
+        if not rdp or not rdp.setting:
+            return
+
+        ad_domain = rdp.setting.get('ad_domain')
+        if ad_domain:
+            # serializer account username 用的是 full_username 所以这么设置
+            account.ds_domain = ad_domain
+
     @lazyproperty
     def account_object(self):
         if not self.asset:
@@ -269,6 +279,9 @@ class ConnectionToken(JMSOrgBaseModel):
             account = self.asset.all_valid_accounts.filter(id=self.account).first()
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
+
+            if self.protocol == 'rdp':
+                self.set_ad_domain_if_need(account)
         return account
 
     @lazyproperty

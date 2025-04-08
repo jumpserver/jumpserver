@@ -146,27 +146,21 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         return False
 
     @lazyproperty
-    def ds_id(self):
-        if self.is_ds_account():
-            return self.asset.ds.id
-        return None
+    def ds(self):
+        if not self.is_ds_account():
+            return None
+        if not hasattr(self.asset, 'ds'):
+            return None
+        return self.asset.ds
 
     @lazyproperty
     def ds_domain(self):
-        if self.ds_id:
-            return self.asset.ds.domain_name
-        return None
+        """这个不能去掉，perm_account 会动态设置这个值，以更改 full_username"""
+        if self.ds and self.ds.domain_name:
+            return self.ds.domain_name
+        return ''
 
-    @lazyproperty
-    def ds(self):
-        if not self.is_ds_account():
-            return {}
-        return {
-            'id': self.ds_id,
-            'domain': self.ds_domain,
-        }
-
-    @lazyproperty
+    @property
     def full_username(self):
         if self.ds_domain:
             return '{}@{}'.format(self.username, self.ds_domain)
