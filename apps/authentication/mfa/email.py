@@ -19,8 +19,12 @@ class MFAEmail(BaseMFA):
     def _check_code(self, code):
         assert self.is_authenticated()
         sender_util = SendAndVerifyCodeUtil(self.user.email, backend=self.name)
-        ok = sender_util.verify(code)
-        msg = '' if ok else email_failed_msg
+        ok = False
+        msg = ''
+        try:
+            ok = sender_util.verify(code)
+        except Exception as e:
+            msg = str(e)
         return ok, msg
 
     def is_active(self):
