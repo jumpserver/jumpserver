@@ -36,6 +36,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "Directory service",
+                "default_related_name": "ds"
             },
             bases=("assets.asset",),
         ),
@@ -53,7 +54,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="ds_platforms",
                 to="assets.directoryservice",
-                verbose_name="Active Directory",
+                verbose_name="Directory service",
             ),
         ),
     ]
