@@ -256,7 +256,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     @lazyproperty
     def all_valid_accounts(self):
         queryset = (self.all_accounts.filter(is_active=True)
-                    .prefetch_related('asset', 'asset__platform', 'asset__platform__ad'))
+                    .prefetch_related('asset', 'asset__platform', 'asset__platform__ds'))
         return queryset
 
     @lazyproperty

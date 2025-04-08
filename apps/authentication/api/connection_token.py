@@ -408,22 +408,22 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def validate_exchange_token(self, token):
         user = token.user
         asset = token.asset
-        account_name = token.account
-        _data = self._validate(user, asset, account_name, token.protocol, token.connect_method)
+        account_alias = token.account
+        _data = self._validate(user, asset, account_alias, token.protocol, token.connect_method)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_name, protocol, connect_method):
+    def _validate(self, user, asset, account_alias, protocol, connect_method):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
         data['value'] = random_string(16)
 
-        if account_name == AliasAccount.ANON and asset.category not in ['web', 'custom']:
+        if account_alias == AliasAccount.ANON and asset.category not in ['web', 'custom']:
             raise ValidationError(_('Anonymous account is not supported for this asset'))
 
-        account = self._validate_perm(user, asset, account_name, protocol)
+        account = self._validate_perm(user, asset, account_alias, protocol)
         if account.has_secret:
             data['input_secret'] = ''
 
@@ -442,11 +442,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         return data
 
     @staticmethod
-    def get_permed_account(user, asset, account_name, protocol):
-        return ConnectionToken.get_user_permed_account(user, asset, account_name, protocol)
+    def get_permed_account(user, asset, account_alias, protocol):
+        return ConnectionToken.get_user_permed_account(user, asset, account_alias, protocol)
 
-    def _validate_perm(self, user, asset, account_name, protocol):
-        account = self.get_permed_account(user, asset, account_name, protocol)
+    def _validate_perm(self, user, asset, account_alias, protocol):
+        account = self.get_permed_account(user, asset, account_alias, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
@@ -616,7 +616,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             raise PermissionDenied('Not allow to view secret')
 
         token_id = request.data.get('id') or ''
-        token = ConnectionToken.get_typed_connection_token(token_id)   
+        token = ConnectionToken.get_typed_connection_token(token_id)
         token.is_valid()
         serializer = self.get_serializer(instance=token)
 

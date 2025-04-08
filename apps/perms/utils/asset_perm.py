@@ -38,14 +38,14 @@ class PermAssetDetailUtil:
             queryset = Asset.objects.filter(id=self.asset_id)
             return queryset.get()
 
-    def validate_permission(self, account_name, protocol):
+    def validate_permission(self, account_alias, protocol):
         with tmp_to_org(self.asset.org):
             protocols = self.get_permed_protocols_for_user(only_name=True)
             if 'all' not in protocols and protocol not in protocols:
                 return None
             permed_accounts = self.get_permed_accounts_for_user()
             accounts_mapper = {account.alias: account for account in permed_accounts}
-            account = accounts_mapper.get(account_name)
+            account = accounts_mapper.get(account_alias)
             return account
 
     @lazyproperty
