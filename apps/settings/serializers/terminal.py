@@ -39,8 +39,8 @@ class TerminalSettingSerializer(serializers.Serializer):
         help_text=_(
             '* Allow users to log in to the KoKo component via Public key authentication'
             '<br/>'
-            'If third-party authentication services, such as DS/LDAP, are enabled, you should '
-            'disable this option to prevent users from logging in after being deleted from the DS/LDAP server'
+            'If third-party authentication services, such as AD/LDAP, are enabled, you should '
+            'disable this option to prevent users from logging in after being deleted from the AD/LDAP server'
         )
     )
     TERMINAL_ASSET_LIST_SORT_BY = serializers.ChoiceField(
