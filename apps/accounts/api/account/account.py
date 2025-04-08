@@ -11,6 +11,7 @@ from accounts.const import ChangeSecretRecordStatusChoice
 from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord
+from assets.const.gpt import create_or_update_chatx_resources
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
@@ -18,6 +19,7 @@ from common.drf.filters import AttrRulesFilterBackend
 from common.permissions import IsValidUser
 from common.utils import lazyproperty, get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.utils import tmp_to_root_org
 from rbac.permissions import RBACPermission
 
 logger = get_logger(__file__)
@@ -43,6 +45,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'clear_secret': 'accounts.change_account',
         'move_to_assets': 'accounts.create_account',
         'copy_to_assets': 'accounts.create_account',
+        'chat': 'accounts.view_account',
     }
     export_as_zip = True
 
@@ -144,6 +147,13 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='copy-to-assets')
     def copy_to_assets(self, request, *args, **kwargs):
         return self._copy_or_move_to_assets(request, move=False)
+
+    @action(methods=['get'], detail=False, url_path='chat')
+    def chat(self, request, *args, **kwargs):
+        with tmp_to_root_org():
+            account = create_or_update_chatx_resources()
+            serializer = self.get_serializer(account)
+        return Response(serializer.data)
 
 
 class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
