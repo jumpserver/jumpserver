@@ -7,8 +7,8 @@ license = "GPLv3"
 readme = "README.md"
 package-mode = false
 repository = "https://github.com/jumpserver/jumpserver"
-homepage = "https://www.jumpserver.org"
-documentation = "https://docs.jumpserver.org"
+homepage = "https://www.jumpserver.com"
+documentation = "https://www.jumpserver.com/docs"
 
 # 说明
 # poetry install (社区版)

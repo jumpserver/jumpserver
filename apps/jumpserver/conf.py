@@ -393,7 +393,7 @@ class Config(dict):
                 "en": {
                     "name": "JumpServer",
                     "displayname": "JumpServer",
-                    "url": "https://jumpserver.org/"
+                    "url": "https://jumpserver.com/"
                 }
             },
             "strict": True,
