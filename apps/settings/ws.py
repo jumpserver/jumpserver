@@ -1,30 +1,31 @@
 # -*- coding: utf-8 -*-
 #
-import json
 import asyncio
+import json
+from urllib.parse import parse_qs
 
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.core.cache import cache
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from django.core.cache import cache
 from django.utils import translation
-from urllib.parse import parse_qs
+from django.utils.translation import gettext_lazy as _
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
+from orgs.models import Organization
+from orgs.utils import current_org
 from settings.serializers import (
     LDAPHATestConfigSerializer,
     LDAPTestConfigSerializer,
     LDAPTestLoginSerializer
 )
-from orgs.models import Organization
-from orgs.utils import current_org
 from settings.tasks import sync_ldap_user
 from settings.utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS, LDAPTestUtil
 )
+from users.models import User
 from .const import ImportStatus
 from .tools import (
     verbose_ping, verbose_telnet, verbose_nmap,
@@ -130,7 +131,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
     async def connect(self):
         user = self.scope["user"]
         query = parse_qs(self.scope['query_string'].decode())
-        self.category = query.get('category', ['ldap'])[0]
+        self.category = query.get('category', [User.Source.ldap.value])[0]
         if user.is_authenticated:
             await self.accept()
         else:
@@ -157,7 +158,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         close_old_connections()
 
     def get_ldap_config(self, serializer):
-        prefix = 'AUTH_LDAP_' if self.category == 'ldap' else 'AUTH_LDAP_HA_'
+        prefix = 'AUTH_{}_'.format(self.category.upper())
 
         config = {
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
@@ -182,7 +183,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         cache.set(task_key, TASK_STATUS_IS_OVER, ttl)
 
     def run_testing_config(self, data):
-        if self.category == 'ldap':
+        if self.category == User.Source.ldap.value:
             serializer = LDAPTestConfigSerializer(data=data)
         else:
             serializer = LDAPHATestConfigSerializer(data=data)
@@ -222,12 +223,17 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
                 msg = _('No LDAP user was found')
             else:
                 orgs = self.get_orgs(org_ids)
-                new_users, error_msg = LDAPImportUtil().perform_import(users, orgs)
+                is_sync_all = '*' in username_list
+                new_users, error_msg, disable_users = LDAPImportUtil(
+                    self.category, is_sync_all
+                ).perform_import(users, orgs)
                 ok = True
                 success_count = len(users) - len(error_msg)
                 msg = _('Total {}, success {}, failure {}').format(
                     len(users), success_count, len(error_msg)
                 )
+                if disable_users:
+                    msg += _(', disabled {}').format(len(disable_users))
                 self.set_users_status(users, error_msg)
         except Exception as e:
             msg = str(e)

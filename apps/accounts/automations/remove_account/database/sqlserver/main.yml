@@ -11,4 +11,5 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: "{{ jms_asset.spec_info.db_name }}"
-        script: "DROP USER {{ account.username }}"
+        script: "DROP LOGIN {{ account.username }}; select @@version"
+

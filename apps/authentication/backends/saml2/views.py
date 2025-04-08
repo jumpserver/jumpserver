@@ -136,7 +136,7 @@ class PrepareRequestMixin:
                 "en": {
                     "name": "JumpServer",
                     "displayname": "JumpServer",
-                    "url": "https://jumpserver.org/"
+                    "url": "https://jumpserver.com/"
                 }
             },
         }

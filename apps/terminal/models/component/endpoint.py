@@ -22,6 +22,7 @@ class Endpoint(JMSBaseModel):
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
     sqlserver_port = PortField(default=14330, verbose_name=_('SQLServer port'))
+    oracle_port = PortField(default=15210,verbose_name=_('Oracle port'))
     vnc_port = PortField(default=15900, verbose_name=_('VNC port'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
@@ -37,17 +38,10 @@ class Endpoint(JMSBaseModel):
         return self.name
 
     def get_port(self, target_instance, protocol):
-        from terminal.utils import db_port_manager
-        from assets.const import DatabaseTypes, Protocol
-
-        if isinstance(target_instance, Asset) and \
-                target_instance.is_type(DatabaseTypes.ORACLE) and \
-                protocol == Protocol.oracle:
-            port = db_port_manager.get_port_by_db(target_instance)
-        else:
-            if protocol in [Protocol.sftp, Protocol.telnet]:
-                protocol = Protocol.ssh
-            port = getattr(self, f'{protocol}_port', 0)
+        from assets.const import Protocol
+        if protocol in [Protocol.sftp, Protocol.telnet]:
+            protocol = Protocol.ssh
+        port = getattr(self, f'{protocol}_port', 0)
         return port
 
     def is_default(self):

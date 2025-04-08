@@ -84,6 +84,10 @@ class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
         min_value=1, max_value=300,
         required=False, label=_('Connect timeout (s)'),
     )
+    AUTH_LDAP_STRICT_SYNC = serializers.BooleanField(
+        required=False, label=_('Strict sync'),
+        help_text=_('In strict mode, users not found in LDAP will be disabled during full or automatic sync')
+    )
     AUTH_LDAP_CACHE_TIMEOUT = serializers.IntegerField(
         min_value=0, max_value=3600 * 24 * 30 * 12,
         default=0,
