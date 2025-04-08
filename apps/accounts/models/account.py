@@ -143,7 +143,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         if self.username.startswith('@'):
             return None
         if self.platform.category == 'ds':
-            return self.asset.directoryservice.id
+            return self.asset.ds.id
         return None
 
     @lazyproperty

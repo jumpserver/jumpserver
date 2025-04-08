@@ -10,4 +10,5 @@ class DirectoryService(Asset):
     domain_name = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Domain name"))
 
     class Meta:
+        default_related_name = "ds"
         verbose_name = _("Directory service")
