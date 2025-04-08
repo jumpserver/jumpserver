@@ -129,7 +129,7 @@ msgstr ">>> 开始执行测试网关账号可连接性任务"
 #: authentication/templates/authentication/login.html:362
 #: authentication/templates/authentication/login.html:408
 #: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
-#: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
+#: settings/serializers/auth/ldap_ha.py:36 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
 #: terminal/serializers/storage.py:142 users/forms/profile.py:22
 #: users/serializers/user.py:148
@@ -307,7 +307,7 @@ msgstr "创建并推送"
 msgid "Only create"
 msgstr "仅创建"
 
-#: accounts/const/automation.py:109 authentication/mfa/email.py:15
+#: accounts/const/automation.py:109 authentication/const.py:34
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
@@ -749,7 +749,6 @@ msgstr "结束日期"
 #: accounts/serializers/automations/check_account.py:39
 #: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:45 audits/models.py:209
-#: audits/serializers.py:77 ops/models/base.py:49 ops/models/job.py:231
 #: terminal/models/applet/applet.py:330 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -1300,8 +1299,6 @@ msgstr "IP 白名单"
 #: ops/models/job.py:163 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:42 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:28
-#: terminal/models/component/endpoint.py:116
 #: terminal/models/session/session.py:49
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:94
@@ -3745,16 +3742,16 @@ msgstr "虚拟 MFA"
 msgid "SMS"
 msgstr "短信"
 
-#: authentication/const.py:34
+#: authentication/const.py:35
 msgid "Face Recognition"
 msgstr "人脸识别"
 
-#: authentication/const.py:35 settings/serializers/auth/radius.py:14
+#: authentication/const.py:36 settings/serializers/auth/radius.py:14
 #: settings/serializers/auth/radius.py:16
 msgid "Radius"
 msgstr "Radius"
 
-#: authentication/const.py:36
+#: authentication/const.py:37
 msgid "Custom"
 msgstr "自定义"
 
@@ -3940,7 +3937,6 @@ msgstr "MFA 类型"
 msgid "Captcha"
 msgstr "验证码"
 
-#: authentication/forms.py:66 authentication/mfa/email.py:36
 #: authentication/templates/authentication/_msg_mfa_email_code.html:12
 #: users/forms/profile.py:28
 msgid "MFA code"
@@ -3972,17 +3968,13 @@ msgstr "自定义 MFA 验证码"
 msgid "MFA custom global enabled, cannot disable"
 msgstr "自定义 MFA 全局开启，无法被禁用"
 
-#: authentication/mfa/email.py:10
-#, fuzzy
-#| msgid "Radius verify code invalid"
+#: authentication/mfa/email.py:11
 msgid "Email verify code invalid"
-msgstr "Radius 校验失败"
+msgstr "邮件验证码校验失败"
 
-#: authentication/mfa/email.py:16
-#, fuzzy
-#| msgid "Radius verification code"
+#: authentication/mfa/email.py:17
 msgid "Email verification code"
-msgstr "Radius 动态安全码"
+msgstr "邮件验证码"
 
 #: authentication/mfa/face.py:55
 msgid "Bind face to enable"

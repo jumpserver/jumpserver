@@ -31,6 +31,7 @@ class ConfirmType(TextChoices):
 class MFAType(TextChoices):
     OTP = 'otp', _('OTP')
     SMS = 'sms', _('SMS')
+    Email = 'email', _('Email')
     Face = 'face', _('Face Recognition')
     Radius = 'otp_radius', _('Radius')
     Custom = 'mfa_custom', _('Custom')
