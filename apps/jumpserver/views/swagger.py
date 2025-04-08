@@ -53,7 +53,7 @@ api_info = openapi.Info(
     title="JumpServer API Docs",
     default_version='v1',
     description="JumpServer Restful api docs",
-    terms_of_service="https://www.jumpserver.org",
+    terms_of_service="https://www.jumpserver.com",
     contact=openapi.Contact(email="support@lxware.hk"),
     license=openapi.License(name="GPLv3 License"),
 )

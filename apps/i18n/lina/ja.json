@@ -1240,7 +1240,7 @@
     "SignChannelNum": "署名チャネル番号",
     "SiteMessage": "内部メール",
     "SiteMessageList": "内部メール",
-    "SiteURLTip": "例えば：https://demo.jumpserver.org",
+    "SiteURLTip": "例えば：https://demo.example.com",
     "Skip": "現在の資産を無視する",
     "Skipped": "スキップ済み",
     "Slack": "Slack",
