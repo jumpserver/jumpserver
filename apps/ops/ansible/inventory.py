@@ -326,21 +326,9 @@ class JMSInventory:
                     'ip': host['ansible_host'],
                     'id': host.get('jms_asset', {}).get('id')
                 })
-
-        # 获取跳过的主机
-        skipped_hosts = []
-        for name, error in self.exclude_hosts.items():
-            if any(h['name'] == name for h in error_hosts):
-                continue
-            skipped_hosts.append({
-                'name': name,
-                'error': error
-            })
-
         result = {
             'runnable': runnable_hosts,
             'error': error_hosts,
-            'skipped': skipped_hosts
         }
         return result
 
