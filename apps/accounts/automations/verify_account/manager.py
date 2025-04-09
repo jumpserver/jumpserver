@@ -64,6 +64,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             h['account'] = {
                 'name': account.name,
                 'username': account.username,
+                'full_username': account.full_username,
                 'secret_type': account.secret_type,
                 'secret': account.escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,

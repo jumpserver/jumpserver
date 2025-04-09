@@ -7,5 +7,5 @@
     - name: Verify account
       ansible.windows.win_ping:
       vars:
-        ansible_user: "{{ account.username }}"
+        ansible_user: "{{ account.full_username }}"
         ansible_password: "{{ account.secret }}"

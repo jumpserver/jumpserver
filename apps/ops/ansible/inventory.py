@@ -2,7 +2,6 @@
 import json
 import os
 import re
-import sys
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
@@ -79,7 +78,7 @@ class JMSInventory:
     @staticmethod
     def make_account_ansible_vars(account, path_dir):
         var = {
-            'ansible_user': account.username,
+            'ansible_user': account.full_username,
         }
         if not account.secret:
             return var
@@ -111,7 +110,8 @@ class JMSInventory:
                     setting = getattr(p, 'setting')
                     host['old_ssh_version'] = setting.get('old_ssh_version', False)
 
-    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir):
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir,
+                          ansible_config):
         from accounts.const import AutomationTypes
         if not account:
             host['error'] = _("No account available")
@@ -129,7 +129,8 @@ class JMSInventory:
         elif platform.su_enabled and not su_from and \
                 self.task_type in (AutomationTypes.change_secret, AutomationTypes.push_account):
             host.update(self.make_account_ansible_vars(account, path_dir))
-            host['ansible_become'] = True
+            if ansible_config.get('ansible_shell_type') != 'powershell':
+                host['ansible_become'] = True
             host['ansible_become_user'] = 'root'
             host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
         else:
@@ -192,7 +193,6 @@ class JMSInventory:
         secret_info = {k: v for k, v in asset.secret_info.items() if v}
         host = {
             'name': name,
-            'local_python_interpreter': sys.executable,
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': tp, 'category': category,
@@ -202,7 +202,7 @@ class JMSInventory:
                 'origin_address': asset.address
             },
             'jms_account': {
-                'id': str(account.id), 'username': account.username,
+                'id': str(account.id), 'username': account.full_username,
                 'secret': account.escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None
@@ -223,7 +223,7 @@ class JMSInventory:
             gateway = asset.domain.select_gateway()
 
         self.make_account_vars(
-            host, asset, account, automation, protocol, platform, gateway, path_dir
+            host, asset, account, automation, protocol, platform, gateway, path_dir, ansible_config
         )
         return host
 

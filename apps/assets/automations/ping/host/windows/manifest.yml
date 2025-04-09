@@ -2,9 +2,12 @@ id: win_ping
 name: "{{ 'Windows ping' | trans }}"
 version: 1
 method: ping
-category: host
+category:
+  - host
+  - ds
 type:
   - windows
+  - windows_ad
 i18n:
   Windows ping:
     zh: 使用 Ansible 模块 内置模块 win_ping 来测试可连接性

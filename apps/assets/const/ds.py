@@ -36,6 +36,7 @@ class DirectoryTypes(BaseType):
                 'change_secret_enabled': True,
                 'push_account_enabled': True,
                 'gather_accounts_enabled': True,
+                'remove_account_enabled': True,
             }
         }
         return constrains
