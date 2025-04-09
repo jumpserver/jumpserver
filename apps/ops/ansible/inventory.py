@@ -283,11 +283,6 @@ class JMSInventory:
         return asset_protocols
 
     def get_classified_hosts(self, path_dir):
-        """
-        返回三种类型的主机：可运行的、错误的和跳过的
-        :param path_dir: 存储密钥的路径
-        :return: dict，包含三类主机信息
-        """
         hosts = []
         platform_assets = self.group_by_platform(self.assets)
         runnable_hosts = []
