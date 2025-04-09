@@ -1534,5 +1534,5 @@
     "ConfirmRunningAssets": "Confirm running assets",
     "RunnableAssets": "Runnable assets",
     "NonRunnableAssets": "Non-runnable assets",
-    "AssetsSelected": "{count} Assets Selected"
+    "AssetsSelected": " Assets Selected"
 }
