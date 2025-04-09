@@ -1532,5 +1532,14 @@
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
+<<<<<<< HEAD
     "setVariable": "设置参数"
 }
+=======
+    "setVariable": "设置参数",
+    "ConfirmRunningAssets": "确认运行资产",
+    "RunnableAssets": "可运行资产",
+    "NonRunnableAssets": "不可运行资产",
+    "AssetsSelected": "已选择{count}个资产"
+}
+>>>>>>> d7d93e2f7 (perf: Translate)
