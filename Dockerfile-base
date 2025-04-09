@@ -44,17 +44,9 @@ ARG PIP_MIRROR=https://pypi.org/simple
 ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
 ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
 
-RUN --mount=type=cache,target=/root/.cache \
-    --mount=type=bind,source=poetry.lock,target=poetry.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=utils/clean_site_packages.sh,target=clean_site_packages.sh \
-    --mount=type=bind,source=requirements/collections.yml,target=collections.yml \
-    set -ex \
-    && python3 -m venv /opt/py3 \
-    && pip install poetry poetry-plugin-pypi-mirror -i ${PIP_MIRROR} \
+RUN python3 -m venv /opt/py3 \
     && . /opt/py3/bin/activate \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-cache --only main \
+    && pip install -U uv -i ${PIP_MIRROR} \
+    && uv pip install --no-cache-dir . -i ${PIP_MIRROR} \
     && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
-    && bash clean_site_packages.sh \
-    && poetry cache clear pypi --all
+    && bash clean_site_packages.sh

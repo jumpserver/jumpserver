@@ -1,206 +1,205 @@
-[tool.poetry]
+[project]
 name = "jumpserver"
 version = "v4.0"
-description = "广受欢迎的开源堡垒机"
-authors = ["ibuler <ibuler@qq.com>"]
-license = "GPLv3"
+description = "The most popular open source PAM"
+authors = [{ name = "ibuler", email = "ibuler@qq.com" }]
+requires-python = "~=3.11"
 readme = "README.md"
-package-mode = false
-repository = "https://github.com/jumpserver/jumpserver"
-homepage = "https://www.jumpserver.com"
-documentation = "https://www.jumpserver.com/docs"
 
-# 说明
-# poetry install (社区版)
-# poetry install --with=xpack (企业版)
+dependencies = [
+    "aiofiles==23.1.0",
+    "amqp==5.1.1",
+    "ansible-core",
+    "ansible==7.1.0",
+    "ansible-runner",
+    "asn1crypto==1.5.1",
+    "bcrypt==4.0.1",
+    "billiard==4.1.0",
+    "chardet==5.1.0",
+    "configparser==6.0.0",
+    "decorator==5.1.1",
+    "docutils==0.20.1",
+    "ecdsa==0.18.0",
+    "enum-compat==0.0.3",
+    "ephem==4.1.6",
+    "future==0.18.3",
+    "itypes==1.2.0",
+    "jinja2==3.1.2",
+    "markupsafe==2.1.3",
+    "olefile==0.46",
+    "paramiko==3.2.0",
+    "passlib==1.7.4",
+    "pyasn1==0.5.0",
+    "pycparser==2.21",
+    "pycryptodome==3.18.0",
+    "pycryptodomex==3.18.0",
+    "phonenumbers==8.13.17",
+    "gmssl==3.2.2",
+    "itsdangerous==1.1.0",
+    "pyotp==2.8.0",
+    "pynacl==1.5.0",
+    "python-dateutil==2.8.2",
+    "pyyaml==6.0.1",
+    "requests==2.31.0",
+    "simplejson==3.19.1",
+    "six==1.16.0",
+    "sshtunnel==0.4.0",
+    "sshpubkeys==3.3.1",
+    "uritemplate==4.1.1",
+    "vine==5.0.0",
+    "werkzeug==2.3.6",
+    "unicodecsv==0.14.1",
+    "httpsig==1.3.0",
+    "treelib==1.6.4",
+    "psutil==5.9.5",
+    "msrestazure==0.6.4",
+    "adal==1.2.7",
+    "openpyxl==3.0.10",
+    "pyexcel==0.7.0",
+    "pyexcel-xlsx==0.6.0",
+    "data-tree==0.0.1",
+    "pyvmomi==8.0.1.0.2",
+    "termcolor==2.3.0",
+    "html2text==2020.1.16",
+    "pyzipper==0.3.6",
+    "python3-saml==1.15.0",
+    "websocket-client==1.6.1",
+    "pyjwkest==1.4.2",
+    "jsonfield2==4.0.0.post0",
+    "geoip2==4.8.0",
+    "ipip-ipdb==1.6.1",
+    "pywinrm==0.4.3",
+    "python-nmap==0.7.1",
+    "django==4.1.13",
+    "django-bootstrap3==23.4",
+    "django-filter==23.2",
+    "django-formtools==2.4.1",
+    "django-ranged-response==0.2.0",
+    "django-simple-captcha==0.5.18",
+    "django-timezone-field==5.1",
+    "djangorestframework==3.14.0",
+    "djangorestframework-bulk==0.2.1",
+    "django-simple-history==3.3.0",
+    "django-private-storage==3.1",
+    "drf-nested-routers==0.93.4",
+    "drf-writable-nested==0.7.0",
+    "rest-condition==1.0.3",
+    "drf-yasg==1.21.7",
+    "coreapi==2.3.3",
+    "coreschema==0.0.4",
+    "openapi-codec==1.3.2",
+    "pillow==10.0.1",
+    "pytz==2023.3",
+    "django-proxy==1.2.2",
+    "python-daemon==3.0.1",
+    "eventlet==0.33.3",
+    "greenlet==3.0.1",
+    "gunicorn==21.2.0",
+    "celery==5.3.1",
+    "flower==2.0.1",
+    "django-celery-beat==2.6.0",
+    "kombu==5.3.1",
+    "uvicorn==0.22.0",
+    "websockets==11.0.3",
+    "python-ldap==3.4.3",
+    "ldap3==2.9.1",
+    "django-radius",
+    "django-cas-ng",
+    "python-cas==1.6.0",
+    "django-auth-ldap==4.4.0",
+    "mysqlclient==2.2.4",
+    "pymssql==2.3.4",
+    "django-redis==5.3.0",
+    "python-redis-lock==4.0.0",
+    "pyopenssl==23.2.0",
+    "redis",
+    "pymongo==4.4.1",
+    "pyfreerdp==0.0.2",
+    "forgerypy3==0.3.1",
+    "django-debug-toolbar==4.1.0",
+    "pympler==1.0.1",
+    "hvac==1.1.1",
+    "pyhcl==0.4.4",
+    "ipy==1.1",
+    "netifaces>=0.11.0,<0.12",
+    "daphne==4.0.0",
+    "channels>=4.0.0,<5",
+    "channels-redis==4.1.0",
+    "fido2>=1.1.2,<2",
+    "ua-parser>=0.18.0,<0.19",
+    "user-agents>=2.2.0,<3",
+    "django-cors-headers>=4.3.0,<5",
+    "mistune==2.0.3",
+    "openai>=1.29.0,<2",
+    "xlsxwriter>=3.1.9,<4",
+    "exchangelib>=5.1.0,<6",
+    "xmlsec>=1.3.13,<2",
+    "lxml==5.2.1",
+    "pydantic>=2.7.4,<3",
+    "annotated-types>=0.6.0,<0.7",
+    "httpx>=0.27.0,<0.28",
+    "distro==1.9.0",
+    "tqdm==4.66.4",
+    "elasticsearch7==7.17.9",
+    "elasticsearch8==8.13.2",
+    "polib>=1.2.0,<2",
+    "azure-identity==1.13.0",
+    "azure-keyvault-secrets==4.9.0",
+    "psycopg2-binary==2.9.6",
+    "pycountry>=24.6.1,<25",
+    "premailer==3.10.0",
+    "azure-storage-blob==12.17.0",
+    "esdk-obs-python==3.21.4",
+    "oss2==2.18.1",
+    "boto3==1.28.9",
+    "botocore==1.31.9",
+    "s3transfer==0.6.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-# cython = "3.0.0"
-aiofiles = "23.1.0"
-amqp = "5.1.1"
+[project.optional-dependencies]
+xpack = [
+    "ipython==8.30.0",
+    "qingcloud-sdk==1.2.15",
+    "azure-mgmt-subscription==3.1.1",
+    "azure-mgmt-compute==30.0.0",
+    "azure-mgmt-network==23.1.0",
+    "google-cloud-compute==1.15.0",
+    "alibabacloud-dysmsapi20170525==2.0.24",
+    "python-novaclient==18.3.0",
+    "python-keystoneclient==5.1.0",
+    "bce-python-sdk==0.8.87",
+    "tencentcloud-sdk-python==3.0.941",
+    "aliyun-python-sdk-core-v3==2.13.33",
+    "aliyun-python-sdk-ecs==4.24.64",
+    "keystoneauth1==5.2.1",
+    "oracledb==1.4.0",
+    "ucloud-sdk-python3==0.11.50",
+    "huaweicloudsdkecs==3.1.52",
+    "huaweicloudsdkcore==3.1.52",
+    "volcengine-python-sdk==1.0.71",
+]
+
+[tool.uv]
+package = false
+default-groups = ["xpack"]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple/"
+
+[project.urls]
+Homepage = "https://www.jumpserver.com"
+Repository = "https://github.com/jumpserver/jumpserver"
+Documentation = "https://www.jumpserver.com/docs"
+
+[tool.uv.sources]
 ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.7.zip" }
-ansible = "7.1.0"
 ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/2.4.0.1.zip" }
-asn1crypto = "1.5.1"
-bcrypt = "4.0.1"
-billiard = "4.1.0"
-# certifi = "2023.7.22"
-# cffi = "1.15.1"
-chardet = "5.1.0"
-configparser = "6.0.0"
-decorator = "5.1.1"
-docutils = "0.20.1"
-ecdsa = "0.18.0"
-enum-compat = "0.0.3"
-ephem = "4.1.4"
-future = "0.18.3"
-# idna = "3.4"
-itypes = "1.2.0"
-jinja2 = "3.1.2"
-markupsafe = "2.1.3"
-olefile = "0.46"
-paramiko = "3.2.0"
-passlib = "1.7.4"
-pyasn1 = "0.5.0"
-pycparser = "2.21"
-# cryptography = "41.0.2"
-pycryptodome = "3.18.0"
-pycryptodomex = "3.18.0"
-phonenumbers = "8.13.17"
-gmssl = "3.2.2"
-itsdangerous = "1.1.0"
-pyotp = "2.8.0"
-pynacl = "1.5.0"
-python-dateutil = "2.8.2"
-pyyaml = "6.0.1"
-requests = "2.31.0"
-simplejson = "3.19.1"
-six = "1.16.0"
-sshtunnel = "0.4.0"
-sshpubkeys = "3.3.1"
-uritemplate = "4.1.1"
-# urllib3 = "1.26.16"
-vine = "5.0.0"
-werkzeug = "2.3.6"
-unicodecsv = "0.14.1"
-httpsig = "1.3.0"
-treelib = "1.6.4"
-psutil = "5.9.5"
-msrestazure = "0.6.4"
-adal = "1.2.7"
-openpyxl = "3.0.10"
-pyexcel = "0.7.0"
-pyexcel-xlsx = "0.6.0"
-data-tree = "0.0.1"
-pyvmomi = "8.0.1.0.2"
-termcolor = "2.3.0"
-html2text = "2020.1.16"
-pyzipper = "0.3.6"
-python3-saml = "1.15.0"
-websocket-client = "1.6.1"
-pyjwkest = "1.4.2"
-jsonfield2 = "4.0.0.post0"
-geoip2 = "4.8.0"
-ipip-ipdb = "1.6.1"
-pywinrm = "0.4.3"
-python-nmap = "0.7.1"
-django = "4.1.13"
-django-bootstrap3 = "23.4"
-django-filter = "23.2"
-django-formtools = "2.4.1"
-django-ranged-response = "0.2.0"
-django-simple-captcha = "0.5.18"
-django-timezone-field = "5.1"
-djangorestframework = "3.14.0"
-djangorestframework-bulk = "0.2.1"
-django-simple-history = "3.3.0"
-django-private-storage = "3.1"
-drf-nested-routers = "0.93.4"
-drf-writable-nested = "0.7.0"
-rest-condition = "1.0.3"
-drf-yasg = "1.21.7"
-coreapi = "2.3.3"
-coreschema = "0.0.4"
-openapi-codec = "1.3.2"
-pillow = "10.0.1"
-pytz = "2023.3"
-django-proxy = "1.2.2"
-python-daemon = "3.0.1"
-eventlet = "0.33.3"
-greenlet = "3.0.1"
-gunicorn = "21.2.0"
-celery = "5.3.1"
-flower = "2.0.1"
-django-celery-beat = "2.6.0"
-kombu = "5.3.1"
-uvicorn = "0.22.0"
-websockets = "11.0.3"
-python-ldap = "3.4.3"
-ldap3 = "2.9.1"
 django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
-python-cas = "1.6.0"
-django-auth-ldap = "4.4.0"
-mysqlclient = "2.2.4"
-pymssql = "2.2.8"
-django-redis = "5.3.0"
-python-redis-lock = "4.0.0"
-pyopenssl = "23.2.0"
 redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip" }
-pymongo = "4.4.1"
-pyfreerdp = "0.0.2"
-forgerypy3 = "0.3.1"
-django-debug-toolbar = "4.1.0"
-pympler = "1.0.1"
-hvac = "1.1.1"
-pyhcl = "0.4.4"
-ipy = "1.1"
-netifaces = "^0.11.0"
-daphne = "4.0.0"
-channels = "^4.0.0"
-channels-redis = "4.1.0"
-fido2 = "^1.1.2"
-ua-parser = "^0.18.0"
-user-agents = "^2.2.0"
-django-cors-headers = "^4.3.0"
-mistune = "2.0.3"
-openai = "^1.29.0"
-xlsxwriter = "^3.1.9"
-exchangelib = "^5.1.0"
-xmlsec = "^1.3.13"
-lxml = "5.2.1"
-pydantic = "^2.7.4"
-annotated-types = "^0.6.0"
-httpx = "^0.27.0"
-distro = "1.9.0"
-tqdm = "4.66.4"
-elasticsearch7 = "7.17.9"
-elasticsearch8 = "8.13.2"
-polib = "^1.2.0"
-azure-identity = "1.13.0"
-azure-keyvault-secrets = "4.9.0"
-# psycopg2 = "2.9.6"
-psycopg2-binary = "2.9.6"
-pycountry = "^24.6.1"
-premailer = "3.10.0"
-# Depend by jms storage
-azure-storage-blob = "12.17.0"
-esdk-obs-python = "3.21.4"
-oss2 = "2.18.1"
-boto3 = "1.28.9"
-botocore = "1.31.9"
-s3transfer = "0.6.1"
-
-[tool.poetry.group.xpack]
-optional = true
-
-[tool.poetry.group.xpack.dependencies]
-ipython = "8.30.0"
-qingcloud-sdk = "1.2.15"
-azure-mgmt-subscription = "3.1.1"
-azure-mgmt-compute = "30.0.0"
-azure-mgmt-network = "23.1.0"
-google-cloud-compute = "1.15.0"
-alibabacloud-dysmsapi20170525 = "2.0.24"
-python-novaclient = "18.3.0"
-python-keystoneclient = "5.1.0"
-bce-python-sdk = "0.8.87"
-tencentcloud-sdk-python = "3.0.941"
-aliyun-python-sdk-core-v3 = "2.13.33"
-aliyun-python-sdk-ecs = "4.24.64"
-keystoneauth1 = "5.2.1"
-oracledb = "1.4.0"
-ucloud-sdk-python3 = "0.11.50"
-huaweicloudsdkecs = "3.1.52"
-huaweicloudsdkcore = "3.1.52"
-volcengine-python-sdk = "1.0.71"
-
-[[tool.poetry.source]]
-name = "pypi"
-priority = "supplemental"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
