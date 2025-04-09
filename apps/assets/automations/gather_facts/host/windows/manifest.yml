@@ -2,9 +2,12 @@ id: gather_facts_windows
 name: "{{ 'Gather facts windows' | trans }}"
 version: 1
 method: gather_facts
-category: host
+category:
+  - host
+  - ds
 type:
   - windows
+  - windows_ad
 i18n:
   Gather facts windows:
     zh: '使用 Ansible 指令 gather_facts 从 Windows 获取设备信息'

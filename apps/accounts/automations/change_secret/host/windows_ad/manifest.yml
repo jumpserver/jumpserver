@@ -1,0 +1,27 @@
+id: change_secret_ad_windows
+name: "{{ 'Windows account change secret' | trans }}"
+version: 1
+method: change_secret
+category:
+  - ds
+type:
+  - windows_ad
+params:
+  - name: groups
+    type: str
+    label: '用户组'
+    default: 'Users,Remote Desktop Users'
+    help_text: "{{ 'Params groups help text' | trans }}"
+
+
+i18n:
+  Windows account change secret:
+    zh: '使用 Ansible 模块 win_domain_user 执行 Windows 账号改密'
+    ja: 'Ansible win_domain_user モジュールを使用して Windows アカウントのパスワード変更'
+    en: 'Using Ansible module win_domain_user to change Windows account secret'
+
+  Params groups help text:
+    zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+    ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
+    en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
+

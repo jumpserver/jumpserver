@@ -2,9 +2,12 @@ id: verify_account_windows
 name: "{{ 'Windows account verify' | trans }}"
 version: 1
 method: verify_account
-category: host
+category:
+  - host
+  - ds
 type:
   - windows
+  - windows_ad
 
 i18n:
   Windows account verify:

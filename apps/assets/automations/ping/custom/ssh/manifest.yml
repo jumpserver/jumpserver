@@ -3,6 +3,7 @@ name: "{{ 'Ping by paramiko' | trans }}"
 category:
   - device
   - host
+  - ds
 type:
   - all
 method: ping

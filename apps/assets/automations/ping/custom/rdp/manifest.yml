@@ -3,8 +3,10 @@ name: "{{ 'Ping by pyfreerdp' | trans }}"
 category:
   - device
   - host
+  - ds
 type:
   - windows
+  - windows_ad
 method: ping
 protocol: rdp
 priority: 1
