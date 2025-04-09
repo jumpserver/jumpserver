@@ -26,7 +26,8 @@ WORKDIR /opt/jumpserver
 ARG PIP_MIRROR=https://pypi.org/simple
 ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
 COPY poetry.lock pyproject.toml ./
-RUN set -ex \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    set -ex \
     && . /opt/py3/bin/activate \
     && uv pip install '.[xpack]' --no-cache-dir . -i ${PIP_MIRROR}
 

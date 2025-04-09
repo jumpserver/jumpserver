@@ -44,7 +44,8 @@ ARG PIP_MIRROR=https://pypi.org/simple
 ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
 ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
 
-RUN python3 -m venv /opt/py3 \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    python3 -m venv /opt/py3 \
     && . /opt/py3/bin/activate \
     && pip install -U uv -i ${PIP_MIRROR} \
     && uv pip install --no-cache-dir . -i ${PIP_MIRROR} \
