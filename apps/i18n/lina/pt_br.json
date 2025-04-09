@@ -652,6 +652,7 @@
     "Id": "ID",
     "IdeaContent": "Quero que você atue como um terminal Linux. Vou digitar comandos, e você responderá o que o terminal deveria mostrar. Quero que você responda a saída do terminal apenas em um bloco de código único, e não em outro. Não faça interpretações. Quando eu precisar te contar algo, eu colocarei o texto entre chaves {Texto de observação}.",
     "IdeaTitle": "🌱 Linux terminal",
+    "IdentityDomain": "Domínio de identidade",
     "IdpMetadataHelpText": "URL de Metadados IDP e Parâmetro MetadataXML IDP, escolha um dos dois, a URL do Metadados IDP tem prioridade",
     "IdpMetadataUrlHelpText": "Carregar IDP Metadata a partir do endereço remoto",
     "IgnoreAlert": "Ignorar alerta",

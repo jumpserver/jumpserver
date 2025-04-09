@@ -194,7 +194,6 @@ class SecurityAuthSerializer(serializers.Serializer):
 class SecuritySessionSerializer(serializers.Serializer):
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Watermark'),
-        help_text=_('Enabled, the web session and replay contains watermark information')
     )
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,
