@@ -100,7 +100,7 @@ class PermAssetDetailUtil:
     def map_alias_to_accounts(cls, alias_action_bit_mapper, alias_date_expired_mapper, asset, user):
         username_accounts_mapper = defaultdict(list)
         cleaned_accounts_expired = defaultdict(list)
-        asset_accounts = asset.all_valid_accounts
+        asset_accounts = asset.all_valid_accounts.all()
 
         # 用户名 -> 账号
         for account in asset_accounts:

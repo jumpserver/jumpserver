@@ -16,7 +16,7 @@ from assets.const.host import GATEWAY_NAME
 from authentication.const import ConnectionTokenType
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
-from common.utils import lazyproperty, pretty_string, bulk_get
+from common.utils import lazyproperty, pretty_string, bulk_get, is_uuid
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.utils import tmp_to_org
@@ -127,6 +127,22 @@ class ConnectionToken(JMSOrgBaseModel):
             .validate_permission(account_alias, protocol)
         return permed_account
 
+    @classmethod
+    def get_asset_accounts_by_alias(cls, asset, alias):
+        """
+        获取资产下的账号
+        :param alias: 账号别名
+        :return: 账号对象
+        """
+        if is_uuid(alias):
+            kwargs = {'id': alias}
+        else:
+            kwargs = {'name': alias}
+
+        with tmp_to_org(asset.org_id):
+            account = asset.all_valid_accounts.filter(**kwargs).first()
+            return account
+
     def get_permed_account(self):
         return self.get_user_permed_account(self.user, self.asset, self.account, self.protocol)
 
@@ -207,7 +223,7 @@ class ConnectionToken(JMSOrgBaseModel):
             'alternate shell:s': app,
             'remoteapplicationcmdline:s': cmdline_b64,
             'disableconnectionsharing:i': '1',
-            'bitmapcachepersistenable:i': '0',   # 图缓存相关设置,便于录像审计
+            'bitmapcachepersistenable:i': '0',  # 图缓存相关设置,便于录像审计
             'bitmapcachesize:i': '1500',
         }
         return options
@@ -278,7 +294,7 @@ class ConnectionToken(JMSOrgBaseModel):
                 input_secret=self.input_secret, from_permed=False
             )
         else:
-            account = self.asset.all_valid_accounts.filter(id=self.account).first()
+            account = self.get_asset_accounts_by_alias(self.asset, self.account)
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
             self.set_ad_domain_if_need(account)
@@ -352,14 +368,14 @@ class AdminConnectionToken(ConnectionToken):
         return super().is_valid()
 
     @classmethod
-    def get_user_permed_account(cls, user, asset, account_name, protocol):
+    def get_user_permed_account(cls, user, asset, account_alias, protocol):
         """
         管理员 token 可以访问所有资产的账号
         """
-        with tmp_to_org(asset.org_id):
-            account = asset.accounts.filter(name=account_name).first()
-            if not account:
-                return None
+        account = cls.get_asset_accounts_by_alias(asset, account_alias)
+        if not account:
+            return None
+
         account.actions = ActionChoices.all()
         account.date_expired = timezone.now() + timezone.timedelta(days=5)
         return account
