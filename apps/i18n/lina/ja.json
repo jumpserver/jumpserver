@@ -656,6 +656,7 @@
     "Id": "ID",
     "IdeaContent": "あなたがLinuxターミナルとして機能することを望んでいます。私はコマンドを入力し、あなたはターミナルが表示すべき内容を回答します。ターミナルの出力はユニークなコードブロック内でだけ応答してほしい、その他ではない。説明を書かないでください。何かをあなたに伝える必要があるとき、私はテキストを大括弧{備考テキスト}の中に置きます。",
     "IdeaTitle": "🌱 Linux 端末",
+    "IdentityDomain": "アイデンティティ領域",
     "IdpMetadataHelpText": "IDP Metadata URLとIDP MetadataXMLのパラメータのうち、一つだけ選択すればよいです。 IDP Metadata URLは優先順位が高い",
     "IdpMetadataUrlHelpText": "IDP Metadataをリモートアドレスから読み込むのを拒否",
     "IgnoreAlert": "アラートを無視",
