@@ -19,7 +19,7 @@ class InventoryClassifiedHostsAPI(APIView):
         asset_ids = request.data.get('assets', [])
         node_ids = request.data.get('nodes', [])
         runas_policy = request.data.get('runas_policy', 'privileged_first')
-        account_prefer = request.data.get('account_prefer', 'root,Administrator')
+        account_prefer = request.data.get('runas', 'root,Administrator')
         module = request.data.get('module', 'shell')
         # 合并节点和资产
         assets = list(Asset.objects.filter(id__in=asset_ids).all())
