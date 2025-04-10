@@ -18,7 +18,12 @@ class LoginACLSerializer(BaseUserACLSerializer, BulkOrgResourceModelSerializer):
     class Meta(BaseUserACLSerializer.Meta):
         model = LoginACL
         fields = BaseUserACLSerializer.Meta.fields + ['rules', ]
-        action_choices_exclude = [ActionChoices.face_online, ActionChoices.face_verify]
+        action_choices_exclude = [
+            ActionChoices.warning,
+            ActionChoices.notify_and_warn,
+            ActionChoices.face_online,
+            ActionChoices.face_verify
+        ]
 
     def get_rules_serializer(self):
         return RuleSerializer()
