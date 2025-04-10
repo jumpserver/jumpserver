@@ -20,4 +20,5 @@ class HostGatheredInfoSerializer(serializers.Serializer):
 
 category_gathered_serializer_map = {
     'host': HostGatheredInfoSerializer,
+    'ds': HostGatheredInfoSerializer,
 }

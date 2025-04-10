@@ -5,7 +5,6 @@ import re
 import sys
 from collections import defaultdict
 
-import sys
 from django.utils.translation import gettext as _
 
 __all__ = ['JMSInventory']
@@ -131,7 +130,7 @@ class JMSInventory:
         elif platform.su_enabled and not su_from and \
                 self.task_type in (AutomationTypes.change_secret, AutomationTypes.push_account):
             host.update(self.make_account_ansible_vars(account, path_dir))
-            if ansible_config.get('ansible_shell_type') != 'powershell':
+            if platform.type not in ["windows", "windows_ad"]:
                 host['ansible_become'] = True
             host['ansible_become_user'] = 'root'
             host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
