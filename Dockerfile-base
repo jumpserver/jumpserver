@@ -10,6 +10,7 @@ ARG DEPENDENCIES="                    \
         pkg-config                    \
         default-libmysqlclient-dev    \
         freetds-dev                   \
+        libxmlsec1-dev                \
         gettext                       \
         libkrb5-dev                   \
         libldap2-dev                  \
