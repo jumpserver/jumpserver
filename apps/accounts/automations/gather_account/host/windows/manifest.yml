@@ -4,10 +4,10 @@ version: 1
 method: gather_accounts
 category:
   - host
-  - ds
+
 type:
   - windows
-  - windows_ad
+
 
 i18n:
   Windows account gather:

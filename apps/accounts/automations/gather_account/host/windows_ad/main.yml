@@ -1,0 +1,74 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Import ActiveDirectory module
+      win_shell: Import-Module ActiveDirectory
+      args:
+        warn: false
+
+    - name: Get the SamAccountName list of all AD users
+      win_shell: |
+        Import-Module ActiveDirectory
+        Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
+      register: ad_user_list
+
+    - name: Set the all_users variable
+      set_fact:
+        all_users: "{{ ad_user_list.stdout_lines }}"
+
+    - name: Get detailed information for each user
+      win_shell: |
+        Import-Module ActiveDirectory
+    
+        $user = Get-ADUser -Identity {{ item }} -Properties Name, SamAccountName, Enabled, LastLogonDate, PasswordLastSet, msDS-UserPasswordExpiryTimeComputed, MemberOf
+    
+        $globalGroups = @()
+        if ($user.MemberOf) {
+          $globalGroups = $user.MemberOf | ForEach-Object {
+            try {
+              $group = Get-ADGroup $_ -ErrorAction Stop
+              if ($group.GroupScope -eq 'Global') { $group.Name }
+            } catch {
+            }
+          }
+        }
+    
+        $passwordExpiry = $null
+        $expiryRaw = $user.'msDS-UserPasswordExpiryTimeComputed'
+        if ($expiryRaw) {
+          try {
+            $passwordExpiry = [datetime]::FromFileTime($expiryRaw)
+          } catch {
+            $passwordExpiry = $null
+          }
+        }
+    
+        $output = [PSCustomObject]@{
+          Name                    = $user.Name
+          SamAccountName          = $user.SamAccountName
+          Enabled                 = $user.Enabled
+          LastLogonDate           = if ($user.LastLogonDate) { $user.LastLogonDate.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+          PasswordLastSet         = if ($user.PasswordLastSet) { $user.PasswordLastSet.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+          PasswordExpires         = if ($passwordExpiry) { $passwordExpiry.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+          GlobalGroupMemberships  = $globalGroups
+        }
+    
+        $output | ConvertTo-Json -Depth 3
+      loop: "{{ all_users }}"
+      register: ad_user_details
+      ignore_errors: yes
+
+
+    - set_fact:
+        info:
+          user_details: >-
+            {{
+              ad_user_details.results
+              | selectattr('rc', 'equalto', 0)
+              | map(attribute='stdout')
+              | select('truthy')
+              | map('from_json')
+            }}
+
+    - debug:
+        var: info

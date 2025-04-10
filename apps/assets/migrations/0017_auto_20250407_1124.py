@@ -48,7 +48,7 @@ def add_ds_platforms(apps, schema_editor):
 
             },
             "gather_accounts_enabled": true,
-            "gather_accounts_method": "gather_accounts_windows",
+            "gather_accounts_method": "gather_accounts_windows_ad",
             "gather_accounts_params": {
 
             },

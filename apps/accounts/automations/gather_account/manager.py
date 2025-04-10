@@ -1,6 +1,6 @@
+import time
 from collections import defaultdict
 
-import time
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
@@ -222,6 +222,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def _collect_asset_account_info(self, asset, info):
         result = self._filter_success_result(asset.type, info)
         accounts = []
+
         for username, info in result.items():
             self.asset_usernames_mapper[str(asset.id)].add(username)
 
