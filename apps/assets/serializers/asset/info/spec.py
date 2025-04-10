@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import FillType
-from assets.models import Database, Web
+from assets.models import Database, Web, DirectoryService
 from common.serializers.fields import LabeledChoiceField
 
 
@@ -28,7 +28,7 @@ class WebSpecSerializer(serializers.ModelSerializer):
             # 查看 Web 资产详情时
             self.pop_fields_if_need(fields)
         return fields
-    
+
     def is_retrieve(self):
         try:
             self.context.get('request').method and self.parent.instance.web
@@ -51,9 +51,14 @@ class WebSpecSerializer(serializers.ModelSerializer):
         return fields
 
 
+class DsSpecSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DirectoryService
+        fields = ['domain_name']
 
 
 category_spec_serializer_map = {
     'database': DatabaseSpecSerializer,
     'web': WebSpecSerializer,
+    'ds': DsSpecSerializer,
 }
