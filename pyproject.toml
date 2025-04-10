@@ -181,7 +181,6 @@ xpack = [
 
 [tool.uv]
 package = false
-default-groups = ["xpack"]
 
 [[tool.uv.index]]
 name = "pypi"
