@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -27,13 +28,14 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
             'name': {'label': _('Name')},
             'accounts_amount': {'label': _('Accounts amount')},
             'is_active': {'default': True},
+            'logo': {'required': False},
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request_method = self.context.get('request').method
-        if request_method == 'PUT':
-            self.fields['logo'].required = False
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not data.get('logo'):
+            data['logo'] = static('img/logo.png')
+        return data
 
 
 class IntegrationAccountSecretSerializer(serializers.Serializer):
