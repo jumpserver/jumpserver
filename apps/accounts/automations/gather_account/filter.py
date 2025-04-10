@@ -13,6 +13,7 @@ def parse_date(date_str, default=None):
     formats = [
         '%Y/%m/%d %H:%M:%S',
         '%Y-%m-%dT%H:%M:%S',
+        '%Y-%m-%d %H:%M:%S',
         '%d-%m-%Y %H:%M:%S',
         '%Y/%m/%d',
         '%d-%m-%Y',
@@ -26,7 +27,6 @@ def parse_date(date_str, default=None):
     return default
 
 
-# TODO 后期会挪到 playbook 中
 class GatherAccountsFilter:
     def __init__(self, tp):
         self.tp = tp
@@ -208,14 +208,35 @@ class GatherAccountsFilter:
                     key, value = parts
                     user_info[key.strip()] = value.strip()
             detail = {'groups': user_info.get('Global Group memberships', ''), }
-            user = {
-                'username': user_info.get('User name', ''),
-                'date_password_change': parse_date(user_info.get('Password last set', '')),
-                'date_password_expired': parse_date(user_info.get('Password expires', '')),
-                'date_last_login': parse_date(user_info.get('Last logon', '')),
+
+            username = user_info.get('User name')
+            if not username:
+                continue
+
+            result[username] = {
+                'username': username,
+                'date_password_change': parse_date(user_info.get('Password last set')),
+                'date_password_expired': parse_date(user_info.get('Password expires')),
+                'date_last_login': parse_date(user_info.get('Last logon')),
                 'groups': detail,
             }
-            result[user['username']] = user
+        return result
+
+    @staticmethod
+    def windows_ad_filter(info):
+        result = {}
+        for user_info in info['user_details']:
+            detail = {'groups': user_info.get('GlobalGroupMemberships', ''), }
+            username = user_info.get('SamAccountName')
+            if not username:
+                continue
+            result[username] = {
+                'username': username,
+                'date_password_change': parse_date(user_info.get('PasswordLastSet')),
+                'date_password_expired': parse_date(user_info.get('PasswordExpires')),
+                'date_last_login': parse_date(user_info.get('LastLogonDate')),
+                'groups': detail,
+            }
         return result
 
     @staticmethod
