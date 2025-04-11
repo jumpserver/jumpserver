@@ -85,5 +85,6 @@
     "WebSocketClosed": "WebSocket 已关闭",
     "Writable": "可写",
     "TransferHistory": "传输历史",
-    "FileManagement": "文件管理"
+    "FileManagement": "文件管理",
+    "PermissionDenied": "没有权限"
 }

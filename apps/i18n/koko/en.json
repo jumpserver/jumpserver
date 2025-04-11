@@ -85,5 +85,6 @@
     "WebSocketClosed": "WebSocket closed",
     "Writable": "Writable",
     "TransferHistory": "Transfer history",
-    "FileManagement": "File"
+    "FileManagement": "File",
+    "PermissionDenied": "Permission denied"
 }
