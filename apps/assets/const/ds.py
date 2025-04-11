@@ -31,7 +31,7 @@ class DirectoryTypes(BaseType):
             cls.WINDOWS_AD: {
                 'ansible_enabled': True,
                 'ping_enabled': True,
-                'gather_facts_enabled': False,
+                'gather_facts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
                 'push_account_enabled': True,
