@@ -9,3 +9,5 @@ celerybeat.pid
 apps/xpack/.git
 .history/
 .idea
+.venv/
+.env

@@ -24,11 +24,7 @@ RUN set -ex \
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
-ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
-COPY poetry.lock pyproject.toml ./
+
 RUN set -ex \
-    && . /opt/py3/bin/activate \
-    && pip install poetry poetry-plugin-pypi-mirror -i ${PIP_MIRROR} \
-    && poetry install --only xpack \
-    && poetry cache clear pypi --all
+    && uv pip install -i${PIP_MIRROR} --group xpack
 
