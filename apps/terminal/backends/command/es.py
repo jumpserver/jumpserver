@@ -27,8 +27,8 @@ class CommandStore(ES):
                 "type": "long"
             }
         }
-        exact_fields = {}
-        match_fields = {'input', 'risk_level', 'user', 'asset', 'system_user'}
+        exact_fields = {'input', 'risk_level', 'user', 'asset', 'account'}
+        match_fields = {'input'}
         keyword_fields = {'session', 'org_id'}
 
         super().__init__(config, properties, keyword_fields, exact_fields, match_fields)
