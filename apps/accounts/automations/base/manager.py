@@ -69,7 +69,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             return
 
         asset = privilege_account.asset
-        accounts = asset.accounts.all()
+        accounts = asset.all_accounts.all()
         accounts = accounts.filter(id__in=self.account_ids, secret_reset=True)
 
         if self.secret_type:

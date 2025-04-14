@@ -5,7 +5,6 @@ import re
 import sys
 from collections import defaultdict
 
-import sys
 from django.utils.translation import gettext as _
 
 __all__ = ['JMSInventory']
@@ -238,7 +237,7 @@ class JMSInventory:
         return accounts_sorted
 
     def get_asset_sorted_accounts(self, asset):
-        accounts = list(asset.accounts.filter(is_active=True))
+        accounts = list(asset.all_accounts.filter(is_active=True))
         accounts_sorted = self.sorted_accounts(accounts)
         return accounts_sorted
 
