@@ -42,7 +42,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        accounts = asset.accounts.all()
+        accounts = asset.all_accounts.all()
         accounts = self.get_accounts(account, accounts)
         inventory_hosts = []
 
