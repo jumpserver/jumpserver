@@ -2,17 +2,18 @@
 #
 from functools import lru_cache
 
-from rest_framework import generics
 from django.db.models import F
 from django.shortcuts import get_object_or_404
+from rest_framework import generics
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
-from orgs.mixins.api import OrgRelationMixin
-from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import current_org
-from perms import serializers
-from perms import models
-from perms.utils import AssetPermissionPermAssetUtil
 from accounts.serializers import AccountSerializer
+from orgs.mixins.api import OrgRelationMixin
+from orgs.utils import current_org
+from perms import models
+from perms import serializers
+from perms.utils import AssetPermissionPermAssetUtil
 
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',
@@ -22,8 +23,9 @@ __all__ = [
 ]
 
 
-class RelationMixin(OrgRelationMixin, OrgBulkModelViewSet):
+class RelationMixin(OrgRelationMixin, generics.ListCreateAPIView, mixins.DestroyModelMixin, GenericViewSet):
     perm_model = models.AssetPermission
+    http_method_names = ['get', 'post', 'delete']
 
     def get_queryset(self):
         queryset = super().get_queryset()

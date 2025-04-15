@@ -281,7 +281,7 @@ class Applet(JMSBaseModel):
         if not self.is_available_on_host(host):
             logger.debug('No available applet {} for applet host: {}'.format(self.name, host.name))
             return None
-        valid_accounts = host.accounts.all().filter(is_active=True, privileged=False)
+        valid_accounts = host.all_valid_accounts.all().filter(privileged=False)
         account = self.try_to_use_same_account(user, host)
         if not account:
             logger.debug('No same account, try to use private account')
