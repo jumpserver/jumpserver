@@ -182,6 +182,7 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
         for org_id, perms_id in org_perms_mapper.items():
             user_ids = AssetPermission.get_all_users_for_perms(perm_ids, flat=True)
             self.expire_perm_tree_for_users_orgs(user_ids, [org_id])
+            UserPermAssetUtil.refresh_type_nodes_tree_cache(user_ids, org_id)
 
     def expire_perm_tree_for_user_group(self, user_group):
         group_ids = [user_group.id]
@@ -193,6 +194,7 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
             .filter(usergroup_id__in=group_ids) \
             .values_list('user_id', flat=True).distinct()
         self.expire_perm_tree_for_users_orgs(user_ids, org_ids)
+        UserPermAssetUtil.refresh_type_nodes_tree_cache(user_ids)
 
     @on_transaction_commit
     def expire_perm_tree_for_users_orgs(self, user_ids, org_ids):
@@ -232,7 +234,7 @@ def refresh_user_favorite_assets(users=()):
     for user in users:
         util = UserPermAssetUtil(user)
         util.refresh_favorite_assets()
-        util.refresh_type_nodes_tree_cache()
+        util.refresh_type_nodes_tree_cache([user.id])
 
 
 class UserPermTreeBuildUtil(object):
