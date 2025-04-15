@@ -86,5 +86,10 @@
     "Writable": "Writable",
     "TransferHistory": "Transfer history",
     "FileManagement": "File",
-    "PermissionDenied": "Permission denied"
+    "PermissionDenied": "Permission denied",
+    "Downloading": "Downloading",
+    "UploadProgress": "Upload progress",
+    "CancelFileUpload": "Cancel file upload",
+    "FileUploadInterrupted": "File upload interrupted",
+    "DownloadProgress": "Download progress"
 }
