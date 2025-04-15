@@ -260,23 +260,23 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         current_org_id = str(current_org.id)
 
         with tmp_to_root_org():
-            queryset = OperateLog.objects.all()
+            qs = OperateLog.objects.all()
             if current_org_id != Organization.ROOT_ID:
                 filtered_org_ids = {current_org_id}
                 if current_org_id == Organization.DEFAULT_ID:
                     filtered_org_ids.update(Organization.INTERNAL_IDS)
                 if self.is_action_detail:
                     filtered_org_ids.update(Organization.SYSTEM_ID)
-                queryset = OperateLog.objects.filter(org_id__in=filtered_org_ids)
+                qs = OperateLog.objects.filter(org_id__in=filtered_org_ids)
 
-            es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
-            if es_config:
-                engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
-                store = engine_mod.OperateLogStore(es_config)
-                if store.ping(timeout=2):
-                    queryset = ESQuerySet(store)
-                    queryset.model = OperateLog
-        return queryset
+        es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
+        if es_config:
+            engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
+            store = engine_mod.OperateLogStore(es_config)
+            if store.ping(timeout=2):
+                qs = ESQuerySet(store)
+                qs.model = OperateLog
+        return qs
 
 
 class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
