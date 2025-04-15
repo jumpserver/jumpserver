@@ -2,9 +2,9 @@
 import json
 import os
 import re
-import sys
 from collections import defaultdict
 
+import sys
 from django.utils.translation import gettext as _
 
 __all__ = ['JMSInventory']
@@ -319,7 +319,7 @@ class JMSInventory:
             else:
                 runnable_hosts.append({
                     'name': host['name'],
-                    'ip': host['ansible_host'],
+                    'ip': host.get('ansible_host', ''),
                     'id': host.get('jms_asset', {}).get('id')
                 })
         result = {

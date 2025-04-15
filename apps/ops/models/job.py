@@ -79,7 +79,7 @@ class JMSPermedInventory(JMSInventory):
         }
 
         if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
-            host['error'] = "Module {} is not suitable for this asset".format(self.module)
+            host['error'] = _("Module {} is not suitable for this asset").format(self.module)
             return host
 
         if protocol.name in ('mariadb', 'mysql', 'postgresql', 'sqlserver'):
