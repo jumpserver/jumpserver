@@ -261,7 +261,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     @lazyproperty
     def accounts_amount(self):
-        return self.accounts.count()
+        return self.all_accounts.count()
 
     def get_target_ip(self):
         return self.address

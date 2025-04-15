@@ -173,7 +173,8 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
 
     @action(methods=["GET"], detail=True, url_path="accounts")
     def accounts(self, *args, **kwargs):
-        asset = super().get_object()
+        pk = self.kwargs.get("pk")
+        asset = get_object_or_404(self.model, pk=pk)
         queryset = asset.all_accounts.all()
         return self.get_paginated_response_from_queryset(queryset)
 
