@@ -12,7 +12,6 @@ app_name = 'terminal'
 router = BulkRouter()
 router.register(r'sessions', api.SessionViewSet, 'session')
 router.register(r'terminals/((?P<terminal>[^/.]{36})/)?status', api.StatusViewSet, 'terminal-status')
-router.register(r'terminals/((?P<terminal>[^/.]{36})/)?sessions', api.SessionViewSet, 'terminal-sessions')
 router.register(r'terminals', api.TerminalViewSet, 'terminal')
 router.register(r'tasks', api.TaskViewSet, 'tasks')
 router.register(r'commands', api.CommandViewSet, 'command')

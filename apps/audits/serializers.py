@@ -188,6 +188,9 @@ class ActivityUnionLogSerializer(serializers.Serializer):
 class FileSerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
 
+    class Meta:
+        ref_name = 'AuditFileSerializer'
+
 
 class UserSessionSerializer(serializers.ModelSerializer):
     type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))

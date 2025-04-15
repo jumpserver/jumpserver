@@ -2,7 +2,6 @@
 #
 import logging
 
-from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
@@ -10,7 +9,7 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView, Response
 
-from common.api import JMSBulkModelViewSet
+from common.api import JMSModelViewSet
 from common.drf.filters import BaseFilterSet
 from common.exceptions import JMSException
 from common.permissions import WithBootstrapToken, IsServiceAccount
@@ -43,7 +42,7 @@ class TerminalFilterSet(BaseFilterSet):
         return queryset
 
 
-class TerminalViewSet(JMSBulkModelViewSet):
+class TerminalViewSet(JMSModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     filterset_class = TerminalFilterSet

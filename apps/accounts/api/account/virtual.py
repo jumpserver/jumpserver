@@ -10,6 +10,7 @@ class VirtualAccountViewSet(OrgBulkModelViewSet):
     serializer_class = VirtualAccountSerializer
     search_fields = ('alias',)
     filterset_fields = ('alias',)
+    http_method_names = ['get']
 
     def get_queryset(self):
         return VirtualAccount.get_or_init_queryset()

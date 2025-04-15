@@ -1,12 +1,12 @@
 from assets.models import DirectoryService, Asset
 from assets.serializers import DSSerializer
 
-from .asset import AssetViewSet
+from .asset import BaseAssetViewSet
 
 __all__ = ['DSViewSet']
 
 
-class DSViewSet(AssetViewSet):
+class DSViewSet(BaseAssetViewSet):
     model = DirectoryService
     perm_model = Asset
 

@@ -1,8 +1,54 @@
-from drf_yasg.inspectors import SwaggerAutoSchema
-
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.inspectors import SwaggerAutoSchema
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+
+class CustomSchemaGenerator(OpenAPISchemaGenerator):
+    from_mcp = False
+
+    def get_schema(self, request=None, public=False):
+        self.from_mcp = request.query_params.get('mcp') or request.path.endswith('swagger.json')
+        return super().get_schema(request, public)
+
+    @staticmethod
+    def exclude_some_paths(path):
+        # 这里可以对 paths 进行处理
+        excludes = ['/report/', '/render-to-json/', '/suggestions/', 'executions', 'automations']
+        for p in excludes:
+            if path.find(p) >= 0:
+                return True
+        return False
+
+    def exclude_some_app(self, path):
+        parts = path.split('/')
+        if len(parts) < 4:
+            return False
+
+        apps = []
+        if self.from_mcp:
+            apps = [
+                'ops', 'tickets', 'common', 'authentication',
+                'settings', 'xpack', 'terminal', 'rbac'
+            ]
+
+        app_name = parts[3]
+        if app_name in apps:
+            return True
+        return False
+
+    def get_operation(self, view, path, prefix, method, components, request):
+        # 这里可以对 path 进行处理
+        if self.exclude_some_paths(path):
+            return None
+        if self.exclude_some_app(path):
+            return None
+        operation = super().get_operation(view, path, prefix, method, components, request)
+        operation_id = operation.get('operationId')
+        if 'bulk' in operation_id:
+            return None
+        return operation
 
 
 class CustomSwaggerAutoSchema(SwaggerAutoSchema):
@@ -59,17 +105,25 @@ api_info = openapi.Info(
 )
 
 
-def get_swagger_view(version='v1'):
+def get_swagger_view(with_auth=True):
     from ..urls import api_v1
     from django.urls import path, include
-    api_v1_patterns = [
+    patterns = [
         path('api/v1/', include(api_v1))
     ]
-    patterns = api_v1_patterns
+
+    if with_auth:
+        permission_classes = (permissions.IsAuthenticated,)
+        public = False
+    else:
+        permission_classes = []
+        public = True
+
     schema_view = get_schema_view(
         api_info,
+        public=public,
         patterns=patterns,
-        permission_classes=(permissions.IsAuthenticated,),
+        generator_class=CustomSchemaGenerator,
+        permission_classes=permission_classes
     )
     return schema_view
-

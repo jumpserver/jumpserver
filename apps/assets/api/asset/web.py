@@ -1,12 +1,12 @@
 from assets.models import Web, Asset
 from assets.serializers import WebSerializer
 
-from .asset import AssetViewSet
+from .asset import BaseAssetViewSet
 
 __all__ = ['WebViewSet']
 
 
-class WebViewSet(AssetViewSet):
+class WebViewSet(BaseAssetViewSet):
     model = Web
     perm_model = Asset
 
