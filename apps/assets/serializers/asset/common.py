@@ -160,6 +160,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',
+            'directory_services',
         ]
         read_only_fields = [
             'accounts_amount', 'category', 'type', 'connectivity', 'auto_config',

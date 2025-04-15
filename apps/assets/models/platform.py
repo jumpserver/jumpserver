@@ -103,10 +103,6 @@ class Platform(LabeledMixin, JMSBaseModel):
     )
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Gateway enabled"))
     ds_enabled = models.BooleanField(default=False, verbose_name=_("DS enabled"))
-    ds = models.ForeignKey(
-        'DirectoryService', on_delete=models.SET_NULL, null=True, blank=True,
-        verbose_name=_("Directory service"), related_name='ds_platforms'
-    )
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
