@@ -189,8 +189,8 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
             msg = _('* Please enter a valid crontab expression')
             raise serializers.ValidationError(msg)
 
-        crontab = crontab.strip().split()
-        if '*' in crontab[0]:
+        crontab = crontab.strip()
+        if crontab.startswith('*'):
             raise serializers.ValidationError(_("Crontab minute must not contain '*'"))
         return crontab
 
