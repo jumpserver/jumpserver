@@ -266,7 +266,7 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
                 if current_org_id == Organization.DEFAULT_ID:
                     filtered_org_ids.update(Organization.INTERNAL_IDS)
                 if self.is_action_detail:
-                    filtered_org_ids.update(Organization.SYSTEM_ID)
+                    filtered_org_ids.add(Organization.SYSTEM_ID)
                 qs = OperateLog.objects.filter(org_id__in=filtered_org_ids)
 
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
