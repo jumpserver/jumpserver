@@ -15,7 +15,13 @@ class CustomSchemaGenerator(OpenAPISchemaGenerator):
     @staticmethod
     def exclude_some_paths(path):
         # 这里可以对 paths 进行处理
-        excludes = ['/report/', '/render-to-json/', '/suggestions/', 'executions', 'automations']
+        excludes = [
+            '/report/', '/render-to-json/', '/suggestions/',
+            'executions', 'automations', 'change-secret-records',
+            'change-secret-dashboard', '/copy-to-assets/',
+            '/move-to-assets/', 'dashboard',
+
+        ]
         for p in excludes:
             if path.find(p) >= 0:
                 return True
