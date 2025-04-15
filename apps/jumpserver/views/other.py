@@ -102,7 +102,7 @@ class ResourceDownload(TemplateView):
         OPENSSH_VERSION=v9.4.0.0
         TINKER_VERSION=v0.1.6
         VIDEO_PLAYER_VERSION=0.2.0
-        CLIENT_VERSION=v3.0.2
+        CLIENT_VERSION=v3.0.3
         """
 
     def get_meta_json(self):
