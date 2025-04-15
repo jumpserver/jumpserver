@@ -86,5 +86,10 @@
     "Writable": "可写",
     "TransferHistory": "传输历史",
     "FileManagement": "文件管理",
-    "PermissionDenied": "没有权限"
+    "PermissionDenied": "没有权限",
+    "Downloading": "正在下载",
+    "UploadProgress": "上传进度",
+    "CancelFileUpload": "取消文件上传",
+    "FileUploadInterrupted": "文件上传中断",
+    "DownloadProgress": "下载进度"
 }
