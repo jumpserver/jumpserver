@@ -127,7 +127,7 @@ class QuerySetMixin:
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
         model = getattr(queryset, 'model', None)
-        if not model:
+        if not model or not hasattr(page, 'objects'):
             return page
 
         serializer_class = self.get_serializer_class()
