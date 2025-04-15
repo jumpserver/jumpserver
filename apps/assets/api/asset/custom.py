@@ -1,12 +1,12 @@
 from assets.models import Custom, Asset
 from assets.serializers import CustomSerializer
 
-from .asset import AssetViewSet
+from .asset import BaseAssetViewSet
 
 __all__ = ['CustomViewSet']
 
 
-class CustomViewSet(AssetViewSet):
+class CustomViewSet(BaseAssetViewSet):
     model = Custom
     perm_model = Asset
 

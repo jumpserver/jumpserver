@@ -97,10 +97,10 @@ class AssetFilterSet(BaseFilterSet):
         return queryset.filter(protocols__name__in=value).distinct()
 
 
-class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
+class BaseAssetViewSet(OrgBulkModelViewSet):
     """
-    API endpoint that allows Asset to be viewed or edited.
-    """
+      API endpoint that allows Asset to be viewed or edited.
+      """
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "address", "comment")
@@ -143,6 +143,19 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
             return retrieve_cls
         return cls
 
+    def create(self, request, *args, **kwargs):
+        if request.path.find('/api/v1/assets/assets/') > -1:
+            error = _('Cannot create asset directly, you should create a host or other')
+            return Response({'error': error}, status=400)
+
+        if not settings.XPACK_LICENSE_IS_VALID and self.model.objects.order_by().count() >= 5000:
+            error = _('The number of assets exceeds the limit of 5000')
+            return Response({'error': error}, status=400)
+
+        return super().create(request, *args, **kwargs)
+
+
+class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
     @action(methods=["GET"], detail=True, url_path="platform")
     def platform(self, *args, **kwargs):
         asset = super().get_object()
@@ -196,17 +209,6 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
                 )
         Protocol.objects.bulk_create(objs)
         return Response(status=status.HTTP_200_OK)
-
-    def create(self, request, *args, **kwargs):
-        if request.path.find('/api/v1/assets/assets/') > -1:
-            error = _('Cannot create asset directly, you should create a host or other')
-            return Response({'error': error}, status=400)
-
-        if not settings.XPACK_LICENSE_IS_VALID and self.model.objects.order_by().count() >= 5000:
-            error = _('The number of assets exceeds the limit of 5000')
-            return Response({'error': error}, status=400)
-
-        return super().create(request, *args, **kwargs)
 
     def filter_bulk_update_data(self):
         bulk_data = []

@@ -1,12 +1,12 @@
 from assets.models import Database, Asset
 from assets.serializers import DatabaseSerializer
 
-from .asset import AssetViewSet
+from .asset import BaseAssetViewSet
 
 __all__ = ['DatabaseViewSet']
 
 
-class DatabaseViewSet(AssetViewSet):
+class DatabaseViewSet(BaseAssetViewSet):
     model = Database
     perm_model = Asset
 
