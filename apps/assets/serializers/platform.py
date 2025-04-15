@@ -195,7 +195,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         fields_m2m = ['assets', 'assets_amount']
         fields = fields_small + fields_m2m + [
             "protocols", "domain_enabled", "su_enabled", "su_method",
-            "ds_enabled", "ds", "automation", "comment", "custom_fields", "labels"
+            "ds_enabled", "automation", "comment", "custom_fields", "labels"
         ] + read_only_fields
         extra_kwargs = {
             "su_enabled": {

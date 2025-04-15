@@ -141,15 +141,13 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     def is_ds_account(self):
         if self.username.startswith('@'):
             return False
-        if self.platform.category == 'ds':
-            return True
-        return False
+        if not self.asset.is_directory_service:
+            return False
+        return True
 
     @lazyproperty
     def ds(self):
         if not self.is_ds_account():
-            return None
-        if not hasattr(self.asset, 'ds'):
             return None
         return self.asset.ds
 

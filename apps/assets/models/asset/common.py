@@ -175,6 +175,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     nodes = models.ManyToManyField(
         'assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes")
     )
+    directory_services = models.ManyToManyField(
+        'assets.DirectoryService', related_name='assets',
+        verbose_name=_("Directory services")
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
     custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
@@ -200,6 +204,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
                 v = json.loads(v)
             info[i.name] = v
         return info
+
+    @lazyproperty
+    def is_directory_service(self):
+        return self.category == const.Category.DS and hasattr(self, 'ds')
 
     @lazyproperty
     def spec_info(self):
@@ -247,16 +255,16 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     @property
     def all_accounts(self):
-        if not self.joined_dir_svc_id:
+        if not self.joined_dir_svc_ids:
             queryset = self.accounts.all()
         else:
-            queryset = self.accounts.model.objects.filter(asset__in=[self.id, self.joined_dir_svc_id])
+            queryset = self.accounts.model.objects.filter(asset__in=[self.id, *self.joined_dir_svc_ids])
         return queryset
 
     @lazyproperty
     def all_valid_accounts(self):
         queryset = (self.all_accounts.filter(is_active=True)
-                    .prefetch_related('asset', 'asset__platform', 'asset__platform__ds'))
+                    .prefetch_related('asset', 'asset__platform'))
         return queryset
 
     @lazyproperty
@@ -277,11 +285,11 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return self.category == const.Category.DS
 
     @property
-    def joined_dir_svc_id(self):
-        return self.platform.ds_id
+    def joined_dir_svc_ids(self):
+        return self.directory_services.values_list('id', flat=True)
 
     def is_joined_ad(self):
-        if self.joined_dir_svc_id:
+        if self.joined_dir_svc_ids:
             return True
         else:
             return False

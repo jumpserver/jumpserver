@@ -274,6 +274,9 @@ class ConnectionToken(JMSOrgBaseModel):
     def set_ad_domain_if_need(self, account):
         if not self.protocol == 'rdp':
             return
+        if account.ds_domain:
+            return
+
         rdp = self.asset.platform.protocols.filter(name='rdp').first()
         if not rdp or not rdp.setting:
             return
