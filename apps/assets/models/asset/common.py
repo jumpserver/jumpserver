@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
@@ -293,6 +293,33 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
             return True
         else:
             return False
+
+    @classmethod
+    def compute_accounts_amount(cls, assets):
+        from .ds import DirectoryService
+        asset_ids = [asset.id for asset in assets]
+        asset_id_dc_ids_mapper = defaultdict(list)
+        dc_ids = set()
+        relations = (
+            Asset.directory_services.through.objects
+            .filter(asset_id__in=asset_ids)
+            .values_list('asset_id', 'directoryservice_id')
+        )
+        for asset_id, ds_id in relations:
+            dc_ids.add(ds_id)
+            asset_id_dc_ids_mapper[asset_id].append(ds_id)
+
+        directory_services = (
+            DirectoryService.objects.filter(id__in=dc_ids)
+            .annotate(accounts_amount=Count('accounts'))
+        )
+        ds_accounts_mapper = {ds.id: ds.accounts_amount for ds in directory_services}
+        for asset in assets:
+            asset_dc_ids = asset_id_dc_ids_mapper.get(asset.id, [])
+            for dc_id in asset_dc_ids:
+                ds_accounts = ds_accounts_mapper.get(dc_id, 0)
+                asset.accounts_amount += ds_accounts
+        return assets
 
     @property
     def is_valid(self):
