@@ -146,7 +146,7 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
-        page = Asset.compute_accounts_amount(page)
+        page = Asset.compute_all_accounts_amount(page)
         return page
 
     def create(self, request, *args, **kwargs):

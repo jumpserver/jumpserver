@@ -92,8 +92,9 @@ class VirtualAccount(JMSOrgBaseModel):
         from .account import Account
         username = user.username
 
+        alias = AliasAccount.USER.value
         with tmp_to_org(asset.org):
-            same_account = cls.objects.filter(alias='@USER').first()
+            same_account = cls.objects.filter(alias=alias).first()
 
         secret = ''
         if same_account and same_account.secret_from_login:
@@ -101,4 +102,6 @@ class VirtualAccount(JMSOrgBaseModel):
 
         if not secret and not from_permed:
             secret = input_secret
-        return Account(name=AliasAccount.USER.label, username=username, secret=secret)
+        account = Account(name=AliasAccount.USER.label, username=username, secret=secret)
+        account.alias = alias
+        return account
