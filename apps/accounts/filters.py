@@ -59,6 +59,7 @@ class NodeFilterBackend(filters.BaseFilterBackend):
 
 class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     ip = drf_filters.CharFilter(field_name="address", lookup_expr="exact")
+    name = drf_filters.CharFilter(field_name="name", lookup_expr="exact")
     hostname = drf_filters.CharFilter(field_name="name", lookup_expr="exact")
     username = drf_filters.CharFilter(field_name="username", lookup_expr="exact")
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr="exact")
