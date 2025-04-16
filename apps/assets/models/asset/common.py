@@ -286,7 +286,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     @property
     def joined_dir_svc_ids(self):
-        return self.directory_services.values_list('id', flat=True)
+        return self.directory_services.all()
 
     def is_joined_ad(self):
         if self.joined_dir_svc_ids:
