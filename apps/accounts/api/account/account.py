@@ -46,6 +46,16 @@ class AccountViewSet(OrgBulkModelViewSet):
     }
     export_as_zip = True
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        asset_id = self.request.query_params.get('asset') or self.request.query_params.get('asset_id')
+        if not asset_id:
+            return queryset
+
+        asset = get_object_or_404(Asset, pk=asset_id)
+        queryset = asset.all_accounts.all()
+        return queryset
+
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):
         account_id = request.query_params.get('account')
@@ -117,7 +127,7 @@ class AccountViewSet(OrgBulkModelViewSet):
                     self.model.objects.create(**account_data)
                     success_count += 1
             except Exception as e:
-                logger.debug(f'{ "Move" if move else "Copy" } to assets error: {e}')
+                logger.debug(f'{"Move" if move else "Copy"} to assets error: {e}')
                 creation_results[asset] = {'error': _('Account already exists'), 'state': 'error'}
 
         results = [{'asset': str(asset), **res} for asset, res in creation_results.items()]

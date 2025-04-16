@@ -14,7 +14,7 @@ def add_ds_platforms(apps, schema_editor):
         "created_by": "system",
         "updated_by": "system",
         "comment": "",
-        "name": "Windows active directory",
+        "name": "WindowsActiveDirectory",
         "category": "ds",
         "type": "windows_ad",
         "meta": {},
@@ -115,19 +115,16 @@ def add_ds_platforms(apps, schema_editor):
         "category": "ds",
         "type": "general",
         "meta": {
-
         },
         "internal": true,
         "domain_enabled": false,
         "su_enabled": false,
         "su_method": null,
         "custom_fields": [
-
         ],
         "automation": {
             "ansible_enabled": false,
             "ansible_config": {
-
             }
         },
         "protocols": [
