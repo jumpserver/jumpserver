@@ -174,7 +174,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
             'nodes': {'allow_empty': True, 'label': _("Nodes")},
-            'directory_services': {'required': False, 'label': _("Directory services")},
+            'directory_services': {'required': False, 'label': _("Directory service")},
         }
 
     def __init__(self, *args, **kwargs):

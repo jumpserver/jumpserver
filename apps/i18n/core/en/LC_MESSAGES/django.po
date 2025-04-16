@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 18:56+0800\n"
+"POT-Creation-Date: 2025-04-16 15:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "Account not found"
 msgstr ""
 
-#: accounts/api/automations/base.py:83 tickets/api/ticket.py:132
+#: accounts/api/automations/base.py:86 tickets/api/ticket.py:132
 msgid "The parameter 'action' must be [{}]"
 msgstr ""
 
@@ -428,8 +428,8 @@ msgstr ""
 #: accounts/templates/accounts/push_account_report.html:78
 #: accounts/templates/accounts/push_account_report.html:118
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
-#: assets/models/asset/common.py:393 assets/models/cmd_filter.py:36
-#: audits/models.py:59 audits/models.py:312 audits/serializers.py:227
+#: assets/models/asset/common.py:401 assets/models/cmd_filter.py:36
+#: audits/models.py:59 audits/models.py:312 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:34 terminal/notifications.py:156
@@ -489,14 +489,14 @@ msgstr ""
 
 #: accounts/models/account.py:107
 #: accounts/models/automations/check_account.py:64
-#: accounts/serializers/account/service.py:11
+#: accounts/serializers/account/service.py:12
 #: accounts/serializers/automations/change_secret.py:115
 #: accounts/serializers/automations/change_secret.py:146
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:131
 #: acls/templates/acls/asset_login_reminder.html:10
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:313
-#: audits/serializers.py:228 authentication/api/connection_token.py:463
+#: audits/serializers.py:231 authentication/api/connection_token.py:463
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:36 terminal/serializers/command.py:72
@@ -533,21 +533,21 @@ msgstr ""
 
 #: accounts/models/application.py:16
 #: accounts/models/automations/check_account.py:116 accounts/models/base.py:63
-#: accounts/serializers/account/service.py:27
+#: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:20 acls/models/base.py:35
 #: acls/models/base.py:96 acls/models/command_acl.py:21
 #: acls/serializers/base.py:35 assets/models/asset/common.py:100
 #: assets/models/asset/common.py:166 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:172 assets/serializers/platform.py:158
+#: assets/serializers/asset/common.py:173 assets/serializers/platform.py:158
 #: assets/serializers/platform.py:278
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:115
 #: authentication/serializers/connect_token_secret.py:172 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:145 ops/models/playbook.py:28
+#: ops/models/celery.py:81 ops/models/job.py:147 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
@@ -581,7 +581,7 @@ msgstr ""
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:417 perms/serializers/permission.py:66
+#: assets/serializers/asset/common.py:419 perms/serializers/permission.py:66
 #: perms/serializers/user_permission.py:76 rbac/tree.py:35
 msgid "Accounts"
 msgstr ""
@@ -599,7 +599,7 @@ msgid "Date last used"
 msgstr ""
 
 #: accounts/models/application.py:24 acls/models/base.py:43
-#: assets/models/asset/common.py:178 authentication/models/access_key.py:23
+#: assets/models/asset/common.py:182 authentication/models/access_key.py:23
 #: authentication/models/connection_token.py:59
 #: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
@@ -716,7 +716,7 @@ msgstr ""
 
 #: accounts/models/automations/change_secret.py:47
 #: assets/models/automations/base.py:145 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:240
+#: ops/models/celery.py:90 ops/models/job.py:242
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr ""
@@ -727,7 +727,7 @@ msgstr ""
 #: accounts/serializers/automations/check_account.py:39
 #: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:45 audits/models.py:209
-#: audits/serializers.py:77 ops/models/base.py:49 ops/models/job.py:231
+#: audits/serializers.py:77 ops/models/base.py:49 ops/models/job.py:233
 #: terminal/models/applet/applet.py:330 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
@@ -1150,9 +1150,9 @@ msgstr ""
 #: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:160 assets/serializers/platform.py:172
-#: audits/serializers.py:76 audits/serializers.py:193
+#: audits/serializers.py:76 audits/serializers.py:196
 #: authentication/models/connection_token.py:63
-#: authentication/serializers/connect_token_secret.py:128 ops/models/job.py:153
+#: authentication/serializers/connect_token_secret.py:128 ops/models/job.py:155
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:29
@@ -1169,7 +1169,8 @@ msgid "Asset not found"
 msgstr ""
 
 #: accounts/serializers/account/account.py:236 assets/const/category.py:15
-#: assets/models/asset/ds.py:14 assets/models/platform.py:108
+#: assets/models/asset/common.py:180 assets/models/asset/ds.py:14
+#: assets/serializers/asset/common.py:177
 msgid "Directory service"
 msgstr ""
 
@@ -1193,7 +1194,7 @@ msgstr ""
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
 #: authentication/api/connection_token.py:462 ops/models/base.py:17
-#: ops/models/job.py:155 ops/serializers/job.py:21
+#: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:93
@@ -1212,7 +1213,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:463
 #: accounts/serializers/account/base.py:86
 #: accounts/serializers/account/template.py:66
-#: assets/serializers/asset/common.py:418
+#: assets/serializers/asset/common.py:420
 msgid "Spec info"
 msgstr ""
 
@@ -1228,7 +1229,7 @@ msgstr ""
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
 #: audits/models.py:91 audits/models.py:173 audits/models.py:272
-#: audits/serializers.py:194 authentication/models/connection_token.py:37
+#: audits/serializers.py:197 authentication/models/connection_token.py:37
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
@@ -1261,15 +1262,15 @@ msgid ""
 "accounts, use the format username@domain."
 msgstr ""
 
-#: accounts/serializers/account/service.py:13
+#: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22
 msgid "Access IP"
 msgstr ""
 
-#: accounts/serializers/account/service.py:26
+#: accounts/serializers/account/service.py:27
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:163 ops/models/playbook.py:31 rbac/models/role.py:37
+#: ops/models/job.py:165 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:42 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:28
@@ -1281,7 +1282,7 @@ msgstr ""
 msgid "Comment"
 msgstr "Description"
 
-#: accounts/serializers/account/service.py:28
+#: accounts/serializers/account/service.py:29
 #: accounts/templates/accounts/backup_account_report.html:33
 #: assets/serializers/asset/common.py:152
 msgid "Accounts amount"
@@ -1578,7 +1579,7 @@ msgstr ""
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:143 audits/models.py:66
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:239
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:241
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -1963,11 +1964,11 @@ msgstr ""
 msgid "User agent"
 msgstr ""
 
-#: assets/api/asset/asset.py:202
+#: assets/api/asset/asset.py:149
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 
-#: assets/api/asset/asset.py:206
+#: assets/api/asset/asset.py:153
 msgid "The number of assets exceeds the limit of 5000"
 msgstr ""
 
@@ -2360,12 +2361,12 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:173
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:174
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr ""
 
-#: assets/models/asset/common.py:169 assets/models/platform.py:159
+#: assets/models/asset/common.py:169 assets/models/platform.py:155
 #: assets/serializers/asset/common.py:150
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:120
@@ -2377,34 +2378,34 @@ msgstr ""
 msgid "Zone"
 msgstr ""
 
-#: assets/models/asset/common.py:176 assets/serializers/asset/common.py:175
+#: assets/models/asset/common.py:176 assets/serializers/asset/common.py:176
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
 #: perms/serializers/permission.py:58
 msgid "Nodes"
 msgstr ""
 
-#: assets/models/asset/common.py:179 assets/serializers/asset/common.py:419
+#: assets/models/asset/common.py:183 assets/serializers/asset/common.py:421
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr ""
 
-#: assets/models/asset/common.py:180 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:184 assets/serializers/asset/custom.py:14
 msgid "Custom info"
 msgstr ""
 
-#: assets/models/asset/common.py:396
+#: assets/models/asset/common.py:404
 msgid "Can refresh asset hardware info"
 msgstr ""
 
-#: assets/models/asset/common.py:397
+#: assets/models/asset/common.py:405
 msgid "Can test asset connectivity"
 msgstr ""
 
-#: assets/models/asset/common.py:398
+#: assets/models/asset/common.py:406
 msgid "Can match asset"
 msgstr ""
 
-#: assets/models/asset/common.py:399
+#: assets/models/asset/common.py:407
 msgid "Can change asset nodes"
 msgstr ""
 
@@ -2442,13 +2443,13 @@ msgid "Proxy"
 msgstr ""
 
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
-#: assets/models/node.py:553 ops/models/job.py:156
+#: assets/models/node.py:553 ops/models/job.py:158
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
 #: xpack/plugins/cloud/models.py:388
 msgid "Node"
 msgstr ""
 
-#: assets/models/automations/base.py:29 ops/models/job.py:234
+#: assets/models/automations/base.py:29 ops/models/job.py:236
 #: ops/serializers/job.py:24 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr ""
@@ -2466,7 +2467,7 @@ msgid "Asset automation task"
 msgstr ""
 
 #: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
-#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:238
+#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:240
 #: users/models/user/__init__.py:317
 msgid "Date created"
 msgstr ""
@@ -2478,13 +2479,13 @@ msgid "Trigger mode"
 msgstr ""
 
 #: assets/models/automations/base.py:157 audits/serializers.py:38
-#: ops/models/base.py:52 ops/models/job.py:236
+#: ops/models/base.py:52 ops/models/job.py:238
 #: xpack/plugins/cloud/manager.py:103
 msgid "Summary"
 msgstr ""
 
 #: assets/models/automations/base.py:158 ops/models/base.py:51
-#: ops/models/job.py:235 xpack/plugins/cloud/models.py:225
+#: ops/models/job.py:237 xpack/plugins/cloud/models.py:225
 msgid "Result"
 msgstr ""
 
@@ -2739,15 +2740,15 @@ msgstr ""
 msgid "DS enabled"
 msgstr ""
 
-#: assets/models/platform.py:111 assets/serializers/platform.py:202
+#: assets/models/platform.py:107 assets/serializers/platform.py:202
 msgid "Su enabled"
 msgstr "Switch account enabled"
 
-#: assets/models/platform.py:112 assets/serializers/platform.py:177
+#: assets/models/platform.py:108 assets/serializers/platform.py:177
 msgid "Su method"
 msgstr "Switch account method"
 
-#: assets/models/platform.py:113 assets/serializers/platform.py:180
+#: assets/models/platform.py:109 assets/serializers/platform.py:180
 msgid "Custom fields"
 msgstr ""
 
@@ -2792,28 +2793,28 @@ msgid "Protocols"
 msgstr ""
 
 #: assets/serializers/asset/common.py:149
-#: assets/serializers/asset/common.py:174
+#: assets/serializers/asset/common.py:175
 msgid "Node path"
 msgstr ""
 
-#: assets/serializers/asset/common.py:171
-#: assets/serializers/asset/common.py:420
+#: assets/serializers/asset/common.py:172
+#: assets/serializers/asset/common.py:422
 msgid "Auto info"
 msgstr ""
 
-#: assets/serializers/asset/common.py:265
+#: assets/serializers/asset/common.py:267
 msgid "Platform not exist"
 msgstr ""
 
-#: assets/serializers/asset/common.py:301
+#: assets/serializers/asset/common.py:303
 msgid "port out of range (0-65535)"
 msgstr ""
 
-#: assets/serializers/asset/common.py:308
+#: assets/serializers/asset/common.py:310
 msgid "Protocol is required: {}"
 msgstr ""
 
-#: assets/serializers/asset/common.py:347
+#: assets/serializers/asset/common.py:349
 msgid "Invalid data"
 msgstr ""
 
@@ -3310,7 +3311,7 @@ msgid "Resource"
 msgstr ""
 
 #: audits/models.py:102 audits/models.py:148 audits/models.py:178
-#: audits/models.py:314 audits/serializers.py:229
+#: audits/models.py:314 audits/serializers.py:232
 #: terminal/serializers/command.py:75
 msgid "Datetime"
 msgstr ""
@@ -3395,8 +3396,8 @@ msgid "Application ID"
 msgstr ""
 
 #: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:154
-#: ops/models/job.py:237 ops/models/playbook.py:30 ops/models/variable.py:17
+#: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:156
+#: ops/models/job.py:239 ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr ""
@@ -3409,7 +3410,7 @@ msgstr ""
 msgid "Reason display"
 msgstr ""
 
-#: audits/serializers.py:93 audits/serializers.py:207
+#: audits/serializers.py:93 audits/serializers.py:210
 msgid "Auth backend display"
 msgstr ""
 
@@ -3418,14 +3419,14 @@ msgstr ""
 msgid "%s %s this resource"
 msgstr ""
 
-#: audits/serializers.py:195 authentication/models/connection_token.py:52
+#: audits/serializers.py:198 authentication/models/connection_token.py:52
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:21 users/models/user/__init__.py:101
 msgid "Date expired"
 msgstr ""
 
-#: audits/serializers.py:226 terminal/models/component/terminal.py:91
+#: audits/serializers.py:229 terminal/models/component/terminal.py:91
 #: terminal/serializers/command.py:76
 msgid "Remote Address"
 msgstr ""
@@ -4066,15 +4067,15 @@ msgstr ""
 msgid "No asset or inactive asset"
 msgstr ""
 
-#: authentication/models/connection_token.py:338
+#: authentication/models/connection_token.py:341
 msgid "Can view super connection token secret"
 msgstr ""
 
-#: authentication/models/connection_token.py:340
+#: authentication/models/connection_token.py:343
 msgid "Super connection token"
 msgstr ""
 
-#: authentication/models/connection_token.py:357
+#: authentication/models/connection_token.py:360
 msgid "Admin connection token"
 msgstr ""
 
@@ -5178,15 +5179,15 @@ msgid ""
 "        work orders, and other notifications"
 msgstr ""
 
-#: ops/ansible/inventory.py:117 ops/models/job.py:68
+#: ops/ansible/inventory.py:118 ops/models/job.py:69
 msgid "No account available"
 msgstr ""
 
-#: ops/ansible/inventory.py:298
+#: ops/ansible/inventory.py:303 ops/ansible/inventory.py:345
 msgid "Ansible disabled"
 msgstr ""
 
-#: ops/ansible/inventory.py:314
+#: ops/ansible/inventory.py:361
 msgid "Skip hosts below:"
 msgstr ""
 
@@ -5206,34 +5207,34 @@ msgstr ""
 msgid "Task {} args or kwargs error"
 msgstr ""
 
-#: ops/api/job.py:68
+#: ops/api/job.py:70
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr ""
 
-#: ops/api/job.py:69
+#: ops/api/job.py:71
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr ""
 
-#: ops/api/job.py:70
+#: ops/api/job.py:72
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr ""
 
-#: ops/api/job.py:158
+#: ops/api/job.py:160
 msgid "Duplicate file exists"
 msgstr ""
 
-#: ops/api/job.py:163
+#: ops/api/job.py:165
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
 
-#: ops/api/job.py:236
+#: ops/api/job.py:238
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr ""
@@ -5315,7 +5316,7 @@ msgstr ""
 msgid "Adhoc"
 msgstr ""
 
-#: ops/const.py:39 ops/models/job.py:152 ops/models/playbook.py:89
+#: ops/const.py:39 ops/models/job.py:154 ops/models/playbook.py:89
 #: ops/models/variable.py:23
 msgid "Playbook"
 msgstr ""
@@ -5448,11 +5449,11 @@ msgstr ""
 msgid "Pattern"
 msgstr ""
 
-#: ops/models/adhoc.py:22 ops/models/job.py:149
+#: ops/models/adhoc.py:22 ops/models/job.py:151
 msgid "Module"
 msgstr ""
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:147
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:149
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr ""
@@ -5495,48 +5496,52 @@ msgstr ""
 msgid "Celery Task Execution"
 msgstr ""
 
-#: ops/models/job.py:150
+#: ops/models/job.py:82
+msgid "Module {} is not suitable for this asset"
+msgstr ""
+
+#: ops/models/job.py:152
 msgid "Run dir"
 msgstr ""
 
-#: ops/models/job.py:151
+#: ops/models/job.py:153
 msgid "Timeout (Seconds)"
 msgstr "Timeout (Sec)"
 
-#: ops/models/job.py:157
+#: ops/models/job.py:159
 msgid "Use Parameter Define"
 msgstr ""
 
-#: ops/models/job.py:158
+#: ops/models/job.py:160
 msgid "Parameters define"
 msgstr ""
 
-#: ops/models/job.py:159
+#: ops/models/job.py:161
 msgid "Periodic variable"
 msgstr ""
 
-#: ops/models/job.py:160
+#: ops/models/job.py:162
 msgid "Run as"
 msgstr ""
 
-#: ops/models/job.py:162
+#: ops/models/job.py:164
 msgid "Run as policy"
 msgstr ""
 
-#: ops/models/job.py:219 ops/models/variable.py:28 ops/serializers/job.py:111
+#: ops/models/job.py:221 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:182
 msgid "Job"
 msgstr ""
 
-#: ops/models/job.py:242
+#: ops/models/job.py:244
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:244
+#: ops/models/job.py:246
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:556
+#: ops/models/job.py:558
 msgid "Job Execution"
 msgstr ""
 
@@ -7947,7 +7952,7 @@ msgstr ""
 msgid "Test failure: Please check configuration"
 msgstr ""
 
-#: terminal/api/component/terminal.py:57
+#: terminal/api/component/terminal.py:56
 msgid "Have online sessions"
 msgstr ""
 

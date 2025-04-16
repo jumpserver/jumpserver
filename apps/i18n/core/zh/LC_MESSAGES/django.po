@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-15 14:46+0800\n"
+"POT-Creation-Date: 2025-04-16 15:25+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -136,8 +136,6 @@ msgstr ">>> 开始执行测试网关账号可连接性任务"
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
-#: xpack/plugins/cloud/serializers/account_attrs.py:90
-#: xpack/plugins/cloud/serializers/account_attrs.py:97
 msgid "Password"
 msgstr "密码"
 
@@ -432,7 +430,7 @@ msgstr "Vault 操作失败，请重试，或者检查 Vault 上的账号信息�
 #: accounts/templates/accounts/push_account_report.html:78
 #: accounts/templates/accounts/push_account_report.html:118
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
-#: assets/models/asset/common.py:393 assets/models/cmd_filter.py:36
+#: assets/models/asset/common.py:401 assets/models/cmd_filter.py:36
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
@@ -544,7 +542,7 @@ msgstr "可以移除账号"
 #: assets/models/asset/common.py:166 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/serializers/asset/common.py:172 assets/serializers/platform.py:158
+#: assets/serializers/asset/common.py:173 assets/serializers/platform.py:158
 #: assets/serializers/platform.py:278
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
@@ -585,7 +583,7 @@ msgstr "密文"
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:417 perms/serializers/permission.py:66
+#: assets/serializers/asset/common.py:419 perms/serializers/permission.py:66
 #: perms/serializers/user_permission.py:76 rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号"
@@ -603,7 +601,7 @@ msgid "Date last used"
 msgstr "最后使用日期"
 
 #: accounts/models/application.py:24 acls/models/base.py:43
-#: assets/models/asset/common.py:178 authentication/models/access_key.py:23
+#: assets/models/asset/common.py:182 authentication/models/access_key.py:23
 #: authentication/models/connection_token.py:59
 #: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
@@ -855,8 +853,6 @@ msgstr "重复密码"
 #: users/forms/profile.py:117 users/models/user/__init__.py:59
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
-#: xpack/plugins/cloud/serializers/account_attrs.py:88
-#: xpack/plugins/cloud/serializers/account_attrs.py:95
 msgid "Username"
 msgstr "用户名"
 
@@ -1184,7 +1180,8 @@ msgid "Asset not found"
 msgstr "资产不存在"
 
 #: accounts/serializers/account/account.py:236 assets/const/category.py:15
-#: assets/models/asset/ds.py:14 assets/models/platform.py:108
+#: assets/models/asset/common.py:180 assets/models/asset/ds.py:14
+#: assets/serializers/asset/common.py:177
 msgid "Directory service"
 msgstr "目录服务"
 
@@ -1227,7 +1224,7 @@ msgstr "账号已存在"
 #: accounts/serializers/account/account.py:463
 #: accounts/serializers/account/base.py:86
 #: accounts/serializers/account/template.py:66
-#: assets/serializers/asset/common.py:418
+#: assets/serializers/asset/common.py:420
 msgid "Spec info"
 msgstr "特殊信息"
 
@@ -1904,8 +1901,8 @@ msgid ""
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
 "support)"
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
-"2001:db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -1933,8 +1930,8 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
-"2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:33
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -2002,11 +1999,11 @@ msgstr "登录城市"
 msgid "User agent"
 msgstr "用户代理"
 
-#: assets/api/asset/asset.py:148
+#: assets/api/asset/asset.py:149
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
-#: assets/api/asset/asset.py:152
+#: assets/api/asset/asset.py:153
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "资产数量超过了 5000 的限制"
 
@@ -2157,8 +2154,7 @@ msgstr "云服务"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
-#: common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "自定义类型"
 
@@ -2405,12 +2401,12 @@ msgstr "云服务"
 msgid "Port"
 msgstr "端口"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:173
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:174
 #: settings/serializers/terminal.py:10
 msgid "Address"
 msgstr "地址"
 
-#: assets/models/asset/common.py:169 assets/models/platform.py:159
+#: assets/models/asset/common.py:169 assets/models/platform.py:155
 #: assets/serializers/asset/common.py:150
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:120
@@ -2422,34 +2418,34 @@ msgstr "平台"
 msgid "Zone"
 msgstr "网域"
 
-#: assets/models/asset/common.py:176 assets/serializers/asset/common.py:175
+#: assets/models/asset/common.py:176 assets/serializers/asset/common.py:176
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
 #: perms/serializers/permission.py:58
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/models/asset/common.py:179 assets/serializers/asset/common.py:419
+#: assets/models/asset/common.py:183 assets/serializers/asset/common.py:421
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集资产硬件信息"
 
-#: assets/models/asset/common.py:180 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:184 assets/serializers/asset/custom.py:14
 msgid "Custom info"
 msgstr "自定义属性"
 
-#: assets/models/asset/common.py:396
+#: assets/models/asset/common.py:404
 msgid "Can refresh asset hardware info"
 msgstr "可以更新资产硬件信息"
 
-#: assets/models/asset/common.py:397
+#: assets/models/asset/common.py:405
 msgid "Can test asset connectivity"
 msgstr "可以测试资产连接性"
 
-#: assets/models/asset/common.py:398
+#: assets/models/asset/common.py:406
 msgid "Can match asset"
 msgstr "可以匹配资产"
 
-#: assets/models/asset/common.py:399
+#: assets/models/asset/common.py:407
 msgid "Can change asset nodes"
 msgstr "可以修改资产节点"
 
@@ -2786,15 +2782,15 @@ msgstr "启用网域"
 msgid "DS enabled"
 msgstr "目录服务已启用"
 
-#: assets/models/platform.py:111 assets/serializers/platform.py:202
+#: assets/models/platform.py:107 assets/serializers/platform.py:202
 msgid "Su enabled"
 msgstr "启用账号切换"
 
-#: assets/models/platform.py:112 assets/serializers/platform.py:177
+#: assets/models/platform.py:108 assets/serializers/platform.py:177
 msgid "Su method"
 msgstr "账号切换方式"
 
-#: assets/models/platform.py:113 assets/serializers/platform.py:180
+#: assets/models/platform.py:109 assets/serializers/platform.py:180
 msgid "Custom fields"
 msgstr "自定义属性"
 
@@ -2841,28 +2837,28 @@ msgid "Protocols"
 msgstr "协议组"
 
 #: assets/serializers/asset/common.py:149
-#: assets/serializers/asset/common.py:174
+#: assets/serializers/asset/common.py:175
 msgid "Node path"
 msgstr "节点路径"
 
-#: assets/serializers/asset/common.py:171
-#: assets/serializers/asset/common.py:420
+#: assets/serializers/asset/common.py:172
+#: assets/serializers/asset/common.py:422
 msgid "Auto info"
 msgstr "自动化信息"
 
-#: assets/serializers/asset/common.py:265
+#: assets/serializers/asset/common.py:267
 msgid "Platform not exist"
 msgstr "平台不存在"
 
-#: assets/serializers/asset/common.py:301
+#: assets/serializers/asset/common.py:303
 msgid "port out of range (0-65535)"
 msgstr "端口超出范围 (0-65535)"
 
-#: assets/serializers/asset/common.py:308
+#: assets/serializers/asset/common.py:310
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/common.py:347 labels/api.py:107
+#: assets/serializers/asset/common.py:349
 msgid "Invalid data"
 msgstr "无效的数据"
 
@@ -4136,15 +4132,15 @@ msgstr "没有用户或用户失效"
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:338
+#: authentication/models/connection_token.py:341
 msgid "Can view super connection token secret"
 msgstr "可以查看超级连接令牌密文"
 
-#: authentication/models/connection_token.py:340
+#: authentication/models/connection_token.py:343
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
-#: authentication/models/connection_token.py:357
+#: authentication/models/connection_token.py:360
 msgid "Admin connection token"
 msgstr "管理员连接令牌"
 
@@ -5004,10 +5000,6 @@ msgstr "自定义短信文件无效"
 msgid "SMS sending failed[%s]: %s"
 msgstr "短信发送失败[%s]: %s"
 
-#: common/sdk/sms/custom_file.py:47 common/serializers/common.py:98
-msgid "File"
-msgstr "文件"
-
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
 msgstr "阿里云"
@@ -5051,6 +5043,10 @@ msgstr "请在 {} 秒后发送"
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "节点"
+
+#: common/serializers/common.py:98
+msgid "File"
+msgstr "文件"
 
 #: common/serializers/fields.py:139
 msgid "Invalid data type"
@@ -5171,10 +5167,6 @@ msgstr "你的账号已创建成功"
 #: jumpserver/context_processor.py:14
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 开源堡垒机"
-
-#: jumpserver/context_processor.py:28
-msgid "FIT2CLOUD"
-msgstr ""
 
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
@@ -7192,7 +7184,7 @@ msgstr "租户 ID"
 
 #: settings/serializers/feature.py:110 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:111 xpack/plugins/cloud/manager.py:116
-#: xpack/plugins/cloud/manager.py:153 xpack/plugins/cloud/models.py:287
+#: xpack/plugins/cloud/models.py:287
 msgid "Region"
 msgstr "地域"
 
@@ -8147,7 +8139,7 @@ msgstr "会话不存在: {}"
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:345 tickets/api/ticket.py:140
+#: terminal/api/session/session.py:345
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -8636,7 +8628,7 @@ msgid "Command and replay storage"
 msgstr "命令及录像存储"
 
 #: terminal/notifications.py:258 terminal/tasks.py:212
-#: xpack/plugins/cloud/api.py:175
+#: xpack/plugins/cloud/api.py:160
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/account.py:123
 msgid "Test failure: Account invalid"
@@ -8695,9 +8687,9 @@ msgid ""
 "days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
 "remote-desktop-services/rds-client-access-license\">Detail</a>"
 msgstr ""
-"如果不存在，RDS 将处于试用模式，试用期为 120 天。<a href='https://"
-"learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-"
-"client-access-license'>详情</a>"
+"如果不存在，RDS 将处于试用模式，试用期为 120 天。<a href='https://learn."
+"microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-"
+"access-license'>详情</a>"
 
 #: terminal/serializers/applet_host.py:55
 msgid "RDS License Server"
@@ -8915,8 +8907,8 @@ msgid ""
 "If there are multiple hosts, use a comma (,) to separate them. <br>(For "
 "example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)"
 msgstr ""
-"如果有多个主机，请用逗号 (,) 分隔它们。<br>（例如：http://"
-"www.jumpserver.a.com:9100，http://www.jumpserver.b.com:9100）"
+"如果有多个主机，请用逗号 (,) 分隔它们。<br>（例如：http://www.jumpserver.a."
+"com:9100，http://www.jumpserver.b.com:9100）"
 
 #: terminal/serializers/storage.py:199
 msgid "Index by date"
@@ -10316,15 +10308,15 @@ msgid ""
 "strategy will skipped."
 msgstr "根据当前任务配置，不符合策略的资产将被跳过。"
 
-#: xpack/plugins/cloud/api.py:74
+#: xpack/plugins/cloud/api.py:72
 msgid "Test connection successful"
 msgstr "测试成功"
 
-#: xpack/plugins/cloud/api.py:76
+#: xpack/plugins/cloud/api.py:74
 msgid "Test connection failed: {}"
 msgstr "测试连接失败：{}"
 
-#: xpack/plugins/cloud/api.py:196
+#: xpack/plugins/cloud/api.py:171
 msgid "User {} deleted the current resource and released the assets"
 msgstr "用户 {} 删除了当前资源已释放的资产"
 
@@ -10510,10 +10502,6 @@ msgstr "同步地区"
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "获取区域 \"%s\" 的实例错误，错误：%s"
 
-#: xpack/plugins/cloud/manager.py:153 xpack/plugins/cloud/models.py:284
-msgid "Instance"
-msgstr "实例"
-
 #: xpack/plugins/cloud/manager.py:179
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
@@ -10655,6 +10643,10 @@ msgstr "同步任务"
 #: xpack/plugins/cloud/models.py:281
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
+
+#: xpack/plugins/cloud/models.py:284
+msgid "Instance"
+msgstr "实例"
 
 #: xpack/plugins/cloud/models.py:301
 msgid "Sync instance detail"
@@ -10960,12 +10952,6 @@ msgstr "订阅 ID"
 msgid "Auto node classification"
 msgstr "自动节点分类"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
-#, fuzzy
-#| msgid "Domain name"
-msgid "domain_name"
-msgstr "域名称"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:99
 #: xpack/plugins/cloud/serializers/account_attrs.py:103
 #: xpack/plugins/cloud/serializers/account_attrs.py:127
@@ -11121,3 +11107,13 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
+
+#, fuzzy
+#~| msgid "Directory service"
+#~ msgid "Directory services"
+#~ msgstr "目录服务"
+
+#, fuzzy
+#~| msgid "Domain name"
+#~ msgid "domain_name"
+#~ msgstr "域名称"

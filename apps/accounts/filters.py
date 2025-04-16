@@ -63,6 +63,7 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     hostname = drf_filters.CharFilter(field_name="name", lookup_expr="exact")
     username = drf_filters.CharFilter(field_name="username", lookup_expr="exact")
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr="exact")
+    asset_name = drf_filters.CharFilter(field_name="asset__name", lookup_expr="exact")
     asset_id = drf_filters.CharFilter(field_name="asset", method="filter_uuid")
     asset = drf_filters.CharFilter(field_name="asset", method="filter_uuid")
     assets = drf_filters.CharFilter(field_name="asset_id", method="filter_uuid")

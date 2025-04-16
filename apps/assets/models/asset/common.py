@@ -177,7 +177,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     )
     directory_services = models.ManyToManyField(
         'assets.DirectoryService', related_name='assets',
-        verbose_name=_("Directory services")
+        verbose_name=_("Directory service")
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
