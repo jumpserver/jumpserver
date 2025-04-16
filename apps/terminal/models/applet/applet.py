@@ -166,9 +166,42 @@ class Applet(JMSBaseModel):
         hosts = list(sorted(hosts, key=lambda h: counts[str(h.id)]))
         return hosts[0] if hosts else None
 
-    def select_host(self, user, asset):
+    def _filter_published_hosts(self, hosts):
+        if settings.DEBUG_DEV:
+            return True
+        exclude_status = [PublishStatus.pending, PublishStatus.failed]
+        publications = (
+            AppletPublication.objects
+            .filter(applet=self, host__in=hosts)
+            .exclude(status__in=exclude_status)
+        )
+        if not publications:
+            return None
+        return [p.host for p in publications]
+
+    def filter_available_hosts(self):
         hosts = self.hosts.filter(is_active=True)
+
+        if not hosts:
+            logger.info("No active host for applet: {}".format(self.name))
+            return None
+
+        if settings.DEBUG_DEV:
+            return hosts
+
         hosts = [host for host in hosts if host.load != 'offline']
+        if not hosts:
+            logger.info("No online host for applet: {}".format(self.name))
+            return None
+
+        hosts = self._filter_published_hosts(hosts)
+        if not hosts:
+            logger.info("No published host for applet: {}".format(self.name))
+            return None
+        return hosts
+
+    def select_host(self, user, asset):
+        hosts = self.filter_available_hosts()
         if not hosts:
             return None
 
@@ -230,15 +263,50 @@ class Applet(JMSBaseModel):
         account = self.random_select_prefer_account(user, host, public_accounts)
         return account
 
+    @staticmethod
+    def _try_virtual_private_account(user, host):
+        from accounts.models import VirtualAccount
+
+        if not host.using_same_account:
+            return
+        account = VirtualAccount.get_same_account(user, host)
+        if not account.secret:
+            return
+        return account
+
+    @staticmethod
+    def _try_local_private_account(user, valid_accounts):
+        private_account = valid_accounts.filter(username='js_{}'.format(user.username)).first()
+        return private_account
+
+    @staticmethod
+    def _try_dc_private_account(user, host):
+        if not host.joined_dir_svcs:
+            return None
+        account = host.dc_accounts.filter(username=user.username).first()
+        return account
+
+    def _select_a_private_account(self, user, host, valid_accounts):
+        private_account = self._try_virtual_private_account(user, host)
+        if not private_account:
+            logger.debug('Virtual private account not found ...')
+            private_account = self._try_dc_private_account(user, host)
+
+        if not private_account:
+            logger.debug('DC private account not found ...')
+            private_account = self._try_local_private_account(user, valid_accounts)
+
+        if not private_account:
+            logger.debug('Private account not found ...')
+            return None
+        return private_account
+
     def try_to_use_private_account(self, user, host, valid_accounts):
         host_can_concurrent = str(host.deploy_options.get('RDS_fSingleSessionPerUser', 0)) == '0'
         app_can_concurrent = self.can_concurrent or self.type == 'web'
         all_can_concurrent = host_can_concurrent and app_can_concurrent
 
-        private_account = valid_accounts.filter(username='js_{}'.format(user.username)).first()
-        if not private_account:
-            logger.debug('Private account not found ...')
-            return None
+        private_account = self._select_a_private_account(user, host, valid_accounts)
         # 优先使用 private account，支持并发或者不支持并发时，如果私有没有被占用，则使用私有
         account = None
         # 如果都支持，不管私有是否被占用，都使用私有
@@ -261,32 +329,14 @@ class Applet(JMSBaseModel):
                 account = private_account
         return account
 
-    @staticmethod
-    def try_to_use_same_account(user, host):
-        from accounts.models import VirtualAccount
-
-        if not host.using_same_account:
-            return
-        account = VirtualAccount.get_same_account(user, host)
-        if not account.secret:
-            return
-        return account
-
     def select_host_account(self, user, asset):
         # 选择激活的发布机
         host = self.select_host(user, asset)
         if not host:
             return None
         logger.info('Select applet host: {}'.format(host.name))
-        if not self.is_available_on_host(host):
-            logger.debug('No available applet {} for applet host: {}'.format(self.name, host.name))
-            return None
-        valid_accounts = host.all_valid_accounts.all().filter(privileged=False)
-        account = self.try_to_use_same_account(user, host)
-        if not account:
-            logger.debug('No same account, try to use private account')
-            account = self.try_to_use_private_account(user, host, valid_accounts)
-
+        valid_accounts = host.accounts.all().filter(privileged=False)
+        account = self.try_to_use_private_account(user, host, valid_accounts)
         if not account:
             logger.debug('No private account, try to use public account')
             account = self.select_a_public_account(user, host, valid_accounts)
@@ -312,14 +362,6 @@ class Applet(JMSBaseModel):
         if platform and platform.assets.count() == 0:
             platform.delete()
         return super().delete(using, keep_parents)
-
-    def is_available_on_host(self, host):
-        publication = AppletPublication.objects.filter(applet=self, host=host).first()
-        if not publication:
-            return False
-        if publication.status in [PublishStatus.pending, PublishStatus.failed]:
-            return False
-        return True
 
 
 class AppletPublication(JMSBaseModel):

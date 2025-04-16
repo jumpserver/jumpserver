@@ -255,10 +255,15 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     @property
     def all_accounts(self):
-        if not self.joined_dir_svc_ids:
+        if not self.joined_dir_svcs:
             queryset = self.accounts.all()
         else:
-            queryset = self.accounts.model.objects.filter(asset__in=[self.id, *self.joined_dir_svc_ids])
+            queryset = self.accounts.model.objects.filter(asset__in=[self.id, *self.joined_dir_svcs])
+        return queryset
+
+    @property
+    def dc_accounts(self):
+        queryset = self.accounts.model.objects.filter(asset__in=[*self.joined_dir_svcs])
         return queryset
 
     @lazyproperty
@@ -285,27 +290,22 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return self.category == const.Category.DS
 
     @property
-    def joined_dir_svc_ids(self):
+    def joined_dir_svcs(self):
         return self.directory_services.all()
 
-    def is_joined_ad(self):
-        if self.joined_dir_svc_ids:
-            return True
-        else:
-            return False
-
     @classmethod
-    def compute_accounts_amount(cls, assets):
+    def compute_all_accounts_amount(cls, assets):
         from .ds import DirectoryService
         asset_ids = [asset.id for asset in assets]
         asset_id_dc_ids_mapper = defaultdict(list)
         dc_ids = set()
-        relations = (
+
+        asset_dc_relations = (
             Asset.directory_services.through.objects
             .filter(asset_id__in=asset_ids)
             .values_list('asset_id', 'directoryservice_id')
         )
-        for asset_id, ds_id in relations:
+        for asset_id, ds_id in asset_dc_relations:
             dc_ids.add(ds_id)
             asset_id_dc_ids_mapper[asset_id].append(ds_id)
 
@@ -313,11 +313,11 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
             DirectoryService.objects.filter(id__in=dc_ids)
             .annotate(accounts_amount=Count('accounts'))
         )
-        ds_accounts_mapper = {ds.id: ds.accounts_amount for ds in directory_services}
+        ds_accounts_amount_mapper = {ds.id: ds.accounts_amount for ds in directory_services}
         for asset in assets:
             asset_dc_ids = asset_id_dc_ids_mapper.get(asset.id, [])
             for dc_id in asset_dc_ids:
-                ds_accounts = ds_accounts_mapper.get(dc_id, 0)
+                ds_accounts = ds_accounts_amount_mapper.get(dc_id, 0)
                 asset.accounts_amount += ds_accounts
         return assets
 
