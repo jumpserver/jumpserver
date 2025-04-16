@@ -99,6 +99,7 @@ class QuerySetMixin:
         return super().get_queryset()
 
     def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
         if not hasattr(self, 'action'):
             return queryset
         if self.action == 'metadata':
@@ -127,7 +128,7 @@ class QuerySetMixin:
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
         model = getattr(queryset, 'model', None)
-        if not model or not hasattr(page, 'objects'):
+        if not model or not hasattr(model, 'objects'):
             return page
 
         serializer_class = self.get_serializer_class()
@@ -234,8 +235,8 @@ class OrderingFielderFieldsMixin:
 
 
 class CommonApiMixin(
-    SerializerMixin, ExtraFilterFieldsMixin, OrderingFielderFieldsMixin,
-    QuerySetMixin, RenderToJsonMixin, PaginatedResponseMixin
+    SerializerMixin, QuerySetMixin, ExtraFilterFieldsMixin,
+    OrderingFielderFieldsMixin, RenderToJsonMixin, PaginatedResponseMixin
 ):
     def is_swagger_request(self):
         return getattr(self, 'swagger_fake_view', False) or \

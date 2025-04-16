@@ -46,15 +46,12 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name="DS enabled"),
         ),
         migrations.AddField(
-            model_name="platform",
-            name="ds",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="ds_platforms",
+            model_name="asset",
+            name="directory_services",
+            field=models.ManyToManyField(
+                related_name="assets",
                 to="assets.directoryservice",
-                verbose_name="Directory service",
+                verbose_name="Directory services",
             ),
         ),
     ]

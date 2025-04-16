@@ -144,6 +144,11 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
             return retrieve_cls
         return cls
 
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+        page = Asset.compute_accounts_amount(page)
+        return page
+
     def create(self, request, *args, **kwargs):
         if request.path.find('/api/v1/assets/assets/') > -1:
             error = _('Cannot create asset directly, you should create a host or other')
