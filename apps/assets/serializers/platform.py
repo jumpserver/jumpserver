@@ -220,6 +220,11 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     def set_initial_value(self):
         if not hasattr(self, 'initial_data'):
             return
+
+        name = self.initial_data.get('name')
+        if ' ' in name:
+            self.initial_data['name'] = name.replace(' ', '-')
+
         if self.instance:
             return
         if not self.initial_data.get('automation'):

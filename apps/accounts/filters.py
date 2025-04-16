@@ -65,7 +65,6 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr="exact")
     asset_name = drf_filters.CharFilter(field_name="asset__name", lookup_expr="exact")
     asset_id = drf_filters.CharFilter(field_name="asset", method="filter_uuid")
-    asset = drf_filters.CharFilter(field_name="asset", method="filter_uuid")
     assets = drf_filters.CharFilter(field_name="asset_id", method="filter_uuid")
     has_secret = drf_filters.BooleanFilter(method="filter_has_secret")
     platform = drf_filters.CharFilter(
@@ -151,8 +150,9 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
             kwargs.update({"date_change_secret__gt": date})
 
         if name == "latest_secret_change_failed":
-            queryset = queryset.filter(date_change_secret__gt=date).exclude(
-                change_secret_status=ChangeSecretRecordStatusChoice.success
+            queryset = (
+                queryset.filter(date_change_secret__gt=date)
+                .exclude(change_secret_status=ChangeSecretRecordStatusChoice.success)
             )
 
         if kwargs:
@@ -162,8 +162,8 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     class Meta:
         model = Account
         fields = [
-            "id", "asset", "source_id", "secret_type", "category",
-            "type", "privileged", "secret_reset", "connectivity", 'is_active'
+            "id", "source_id", "secret_type", "category", "type",
+            "privileged", "secret_reset", "connectivity", "is_active"
         ]
 
 

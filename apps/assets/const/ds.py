@@ -15,10 +15,13 @@ class DirectoryTypes(BaseType):
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
-                'charset_enabled': False,
+                'charset_enabled': True,
                 'domain_enabled': True,
                 'ds_enabled': False,
                 'su_enabled': True,
+            },
+            cls.WINDOWS_AD: {
+                'su_enabled': False,
             }
         }
 

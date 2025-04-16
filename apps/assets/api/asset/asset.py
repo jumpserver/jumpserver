@@ -11,7 +11,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
-from accounts.filters import AccountFilterSet
 from accounts.serializers import AccountSerializer
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
@@ -176,24 +175,6 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
         else:
             gateways = asset.domain.gateways
         return self.get_paginated_response_from_queryset(gateways)
-
-    @action(methods=["GET"], detail=True, url_path="accounts")
-    def accounts(self, *args, **kwargs):
-        pk = self.kwargs.get("pk")
-        asset = get_object_or_404(self.model, pk=pk)
-        queryset = asset.all_accounts.all()
-
-        filterset = AccountFilterSet(
-            data=self.request.query_params,
-            queryset=queryset,
-            request=self.request,
-        )
-
-        if not filterset.is_valid():
-            return Response(filterset.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        queryset = filterset.qs
-        return self.get_paginated_response_from_queryset(queryset)
 
     @action(methods=['post'], detail=False, url_path='sync-platform-protocols')
     def sync_platform_protocols(self, request, *args, **kwargs):
