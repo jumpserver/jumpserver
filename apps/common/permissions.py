@@ -87,3 +87,12 @@ class IsValidLicense(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return settings.XPACK_LICENSE_IS_VALID
+
+
+class IsOwnerOrAdminWritable(IsValidUser):
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return super().has_permission(request, view)
+        if request.method != 'GET' and obj.creator != request.user:
+            return False
+        return super().has_permission(request, view)
