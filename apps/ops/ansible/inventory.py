@@ -2,10 +2,12 @@
 import json
 import os
 import re
+import sys
 from collections import defaultdict
 
-import sys
 from django.utils.translation import gettext as _
+
+from assets import const
 
 __all__ = ['JMSInventory']
 
@@ -37,6 +39,12 @@ class JMSInventory:
         assets = Asset.objects.filter(id__in=asset_ids, is_active=True) \
             .prefetch_related('platform', 'domain', 'accounts')
         return assets
+
+    @staticmethod
+    def get_username(asset, account):
+        if asset.category == const.Category.DS:
+            return account.full_username
+        return account.username
 
     @staticmethod
     def group_by_platform(assets):
@@ -76,10 +84,10 @@ class JMSInventory:
         proxy_command = f"-o ProxyCommand='{' '.join(proxy_command_list)}'"
         return {"ansible_ssh_common_args": proxy_command}
 
-    @staticmethod
-    def make_account_ansible_vars(account, path_dir):
+    def make_account_ansible_vars(self, asset, account, path_dir):
+        username = self.get_username(asset, account)
         var = {
-            'ansible_user': account.full_username,
+            'ansible_user': username,
         }
         if not account.secret:
             return var
@@ -129,13 +137,13 @@ class JMSInventory:
             host.update(self.make_custom_become_ansible_vars(account, su_from_auth, path_dir))
         elif platform.su_enabled and not su_from and \
                 self.task_type in (AutomationTypes.change_secret, AutomationTypes.push_account):
-            host.update(self.make_account_ansible_vars(account, path_dir))
+            host.update(self.make_account_ansible_vars(asset, account, path_dir))
             if platform.type not in ["windows", "windows_ad"]:
                 host['ansible_become'] = True
             host['ansible_become_user'] = 'root'
             host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
         else:
-            host.update(self.make_account_ansible_vars(account, path_dir))
+            host.update(self.make_account_ansible_vars(asset, account, path_dir))
 
         if platform.is_huawei():
             host['ansible_connection'] = 'network_cli'
@@ -192,6 +200,7 @@ class JMSInventory:
         tp, category = asset.type, asset.category
         name = re.sub(r'[ \[\]/]', '_', asset.name)
         secret_info = {k: v for k, v in asset.secret_info.items() if v}
+        username = self.get_username(asset, account)
         host = {
             'name': name,
             'local_python_interpreter': sys.executable,
@@ -204,7 +213,8 @@ class JMSInventory:
                 'origin_address': asset.address
             },
             'jms_account': {
-                'id': str(account.id), 'username': account.full_username,
+                'id': str(account.id),
+                'username': username,
                 'secret': account.escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None
