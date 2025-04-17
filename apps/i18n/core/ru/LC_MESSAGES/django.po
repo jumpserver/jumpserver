@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 15:25+0800\n"
+"POT-Creation-Date: 2025-04-17 14:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: accounts/api/account/account.py:121
+#: accounts/api/account/account.py:131
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:344
 msgid "Account already exists"
@@ -437,7 +437,7 @@ msgstr ""
 #: accounts/templates/accounts/push_account_report.html:78
 #: accounts/templates/accounts/push_account_report.html:118
 #: acls/serializers/base.py:130 assets/models/asset/common.py:102
-#: assets/models/asset/common.py:401 assets/models/cmd_filter.py:36
+#: assets/models/asset/common.py:428 assets/models/cmd_filter.py:36
 #: audits/models.py:59 audits/models.py:312 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
@@ -445,7 +445,7 @@ msgstr ""
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:30
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
-#: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:290
+#: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:289
 msgid "Asset"
 msgstr "Активы"
 
@@ -550,7 +550,7 @@ msgstr "Можно удалить аккаунт"
 #: assets/models/domain.py:19 assets/models/label.py:18
 #: assets/models/platform.py:15 assets/models/platform.py:94
 #: assets/serializers/asset/common.py:173 assets/serializers/platform.py:158
-#: assets/serializers/platform.py:278
+#: assets/serializers/platform.py:283
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
 #: authentication/serializers/connect_token_secret.py:115
@@ -570,8 +570,8 @@ msgstr "Можно удалить аккаунт"
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:13
 #: users/models/preference.py:11 users/models/user/__init__.py:60
-#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:310
-#: xpack/plugins/cloud/serializers/task.py:77
+#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:309
+#: xpack/plugins/cloud/serializers/task.py:75
 msgid "Name"
 msgstr "Название"
 
@@ -590,7 +590,7 @@ msgstr "Шифр"
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:419 perms/serializers/permission.py:66
+#: assets/serializers/asset/common.py:423 perms/serializers/permission.py:66
 #: perms/serializers/user_permission.py:76 rbac/tree.py:35
 msgid "Accounts"
 msgstr "Аккаунт"
@@ -737,14 +737,14 @@ msgstr "Дата окончания"
 #: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:45 audits/models.py:209
 #: audits/serializers.py:77 ops/models/base.py:49 ops/models/job.py:233
-#: terminal/models/applet/applet.py:330 terminal/models/applet/host.py:140
+#: terminal/models/applet/applet.py:372 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:148
 #: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:227
-#: xpack/plugins/cloud/models.py:294
+#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:226
+#: xpack/plugins/cloud/models.py:293
 msgid "Status"
 msgstr "Состояние"
 
@@ -1015,7 +1015,7 @@ msgstr "Платформа"
 msgid "Push params"
 msgstr "Параметры отправки аккаунта"
 
-#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:391
+#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:390
 msgid "Account template"
 msgstr "Шаблон аккаунта"
 
@@ -1168,7 +1168,7 @@ msgstr "Аккаунт уже существует в политике"
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:173
-#: assets/serializers/platform.py:279 perms/serializers/user_permission.py:26
+#: assets/serializers/platform.py:284 perms/serializers/user_permission.py:26
 #: settings/models.py:39 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12
 msgid "Category"
@@ -1199,7 +1199,7 @@ msgstr "Актив не существует"
 
 #: accounts/serializers/account/account.py:236 assets/const/category.py:15
 #: assets/models/asset/common.py:180 assets/models/asset/ds.py:14
-#: assets/serializers/asset/common.py:177
+#: assets/serializers/asset/common.py:180
 msgid "Directory service"
 msgstr "Служба каталогов"
 
@@ -1226,7 +1226,7 @@ msgstr "Изменено"
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
-#: xpack/plugins/cloud/manager.py:93
+#: xpack/plugins/cloud/manager.py:83
 msgid "Assets"
 msgstr "Активы"
 
@@ -1242,7 +1242,7 @@ msgstr "Аккаунт уже существует"
 #: accounts/serializers/account/account.py:463
 #: accounts/serializers/account/base.py:86
 #: accounts/serializers/account/template.py:66
-#: assets/serializers/asset/common.py:420
+#: assets/serializers/asset/common.py:424
 msgid "Spec info"
 msgstr "Специальная информация"
 
@@ -1303,13 +1303,13 @@ msgstr "IP белый список"
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
 #: ops/models/job.py:165 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:42 terminal/models/applet/applet.py:46
-#: terminal/models/applet/applet.py:331 terminal/models/applet/host.py:143
+#: terminal/models/applet/applet.py:373 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:28
 #: terminal/models/component/endpoint.py:116
 #: terminal/models/session/session.py:49
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:94
-#: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:124
+#: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:123
 msgid "Comment"
 msgstr "Комментарий"
 
@@ -1831,12 +1831,12 @@ msgid "Face Online"
 msgstr "Лицо онлайн"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:109 xpack/plugins/cloud/models.py:316
+#: terminal/models/component/endpoint.py:109 xpack/plugins/cloud/models.py:315
 msgid "Priority"
 msgstr "Приоритет"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:317
+#: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:316
 msgid "1-100, the lower the value will be match first"
 msgstr "Диапазон приоритетов: 1-100 (меньшее число - более высокий приоритет)"
 
@@ -1870,13 +1870,13 @@ msgid "Command"
 msgstr "Команда"
 
 #: acls/models/command_acl.py:17 assets/models/cmd_filter.py:59
-#: xpack/plugins/cloud/models.py:357
+#: xpack/plugins/cloud/models.py:356
 msgid "Regex"
 msgstr "Регулярное выражение"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:187 settings/serializers/feature.py:22
-#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
+#: settings/serializers/msg.py:78 xpack/plugins/license/models.py:30
 msgid "Content"
 msgstr "Содержание"
 
@@ -1976,7 +1976,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr "Все ревизоры не относятся к организации `{}`"
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:152
+#: xpack/plugins/cloud/serializers/task.py:150
 msgid "IP address invalid: `{}`"
 msgstr "Неверный IP-адрес: `{}`"
 
@@ -1992,7 +1992,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: common/drf/renders/base.py:152 xpack/plugins/cloud/models.py:393
+#: common/drf/renders/base.py:152 xpack/plugins/cloud/models.py:391
 msgid "IP"
 msgstr "IP"
 
@@ -2056,11 +2056,11 @@ msgstr "Город входа"
 msgid "User agent"
 msgstr "Пользовательский агент"
 
-#: assets/api/asset/asset.py:149
+#: assets/api/asset/asset.py:153
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "Нельзя напрямую создать актив, следует создать хост или другой актив"
 
-#: assets/api/asset/asset.py:153
+#: assets/api/asset/asset.py:157
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "Количество активов превышает предел в 5000"
 
@@ -2192,7 +2192,7 @@ msgstr "Скрипт"
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:81 settings/serializers/feature.py:94
 #: settings/serializers/msg.py:30 terminal/models/component/endpoint.py:14
-#: terminal/serializers/applet.py:17 xpack/plugins/cloud/manager.py:93
+#: terminal/serializers/applet.py:17 xpack/plugins/cloud/manager.py:83
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "Хост"
@@ -2479,7 +2479,7 @@ msgstr "Адрес"
 #: assets/serializers/asset/common.py:150
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:120
-#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:387
+#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:386
 msgid "Platform"
 msgstr "Платформа"
 
@@ -2493,7 +2493,7 @@ msgstr "Домен"
 msgid "Nodes"
 msgstr "Узел"
 
-#: assets/models/asset/common.py:183 assets/serializers/asset/common.py:421
+#: assets/models/asset/common.py:183 assets/serializers/asset/common.py:425
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "Сбор информации об аппаратных активах"
@@ -2502,19 +2502,19 @@ msgstr "Сбор информации об аппаратных активах"
 msgid "Custom info"
 msgstr "Пользовательские атрибуты"
 
-#: assets/models/asset/common.py:404
+#: assets/models/asset/common.py:431
 msgid "Can refresh asset hardware info"
 msgstr "Можно обновить информацию об аппаратных активах"
 
-#: assets/models/asset/common.py:405
+#: assets/models/asset/common.py:432
 msgid "Can test asset connectivity"
 msgstr "Можно протестировать подключение к активам"
 
-#: assets/models/asset/common.py:406
+#: assets/models/asset/common.py:433
 msgid "Can match asset"
 msgstr "Можно сопоставить активы"
 
-#: assets/models/asset/common.py:407
+#: assets/models/asset/common.py:434
 msgid "Can change asset nodes"
 msgstr "Можно изменить узел актива"
 
@@ -2542,7 +2542,7 @@ msgstr "Игнорировать проверку сертификата"
 msgid "Postgresql SSL mode"
 msgstr "Режим SSL PostgreSQL"
 
-#: assets/models/asset/ds.py:10 assets/serializers/asset/ds.py:19
+#: assets/models/asset/ds.py:10 assets/serializers/asset/ds.py:20
 msgid "Domain name"
 msgstr "Имя домена"
 
@@ -2554,7 +2554,7 @@ msgstr "Прокси"
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
 #: assets/models/node.py:553 ops/models/job.py:158
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
-#: xpack/plugins/cloud/models.py:388
+#: xpack/plugins/cloud/models.py:387
 msgid "Node"
 msgstr "Узел"
 
@@ -2582,19 +2582,19 @@ msgid "Date created"
 msgstr "Дата создания"
 
 #: assets/models/automations/base.py:155
-#: assets/serializers/automations/base.py:44 xpack/plugins/cloud/models.py:242
-#: xpack/plugins/cloud/serializers/task.py:249
+#: assets/serializers/automations/base.py:44 xpack/plugins/cloud/models.py:241
+#: xpack/plugins/cloud/serializers/task.py:247
 msgid "Trigger mode"
 msgstr "Модель срабатывания"
 
 #: assets/models/automations/base.py:157 audits/serializers.py:38
 #: ops/models/base.py:52 ops/models/job.py:238
-#: xpack/plugins/cloud/manager.py:103
+#: xpack/plugins/cloud/manager.py:87
 msgid "Summary"
 msgstr "Сводка"
 
 #: assets/models/automations/base.py:158 ops/models/base.py:51
-#: ops/models/job.py:237 xpack/plugins/cloud/models.py:225
+#: ops/models/job.py:237 xpack/plugins/cloud/models.py:224
 msgid "Result"
 msgstr "Результат"
 
@@ -2681,7 +2681,7 @@ msgstr "Значение"
 #: assets/serializers/platform.py:159
 #: authentication/serializers/connect_token_secret.py:126
 #: common/serializers/common.py:85 labels/serializers.py:45
-#: settings/serializers/msg.py:90 xpack/plugins/cloud/models.py:392
+#: settings/serializers/msg.py:90
 msgid "Label"
 msgstr "Тег"
 
@@ -2902,8 +2902,8 @@ msgstr ""
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
-#: perms/serializers/user_permission.py:75 xpack/plugins/cloud/models.py:390
-#: xpack/plugins/cloud/serializers/task.py:36
+#: perms/serializers/user_permission.py:75 xpack/plugins/cloud/models.py:389
+#: xpack/plugins/cloud/serializers/task.py:35
 msgid "Protocols"
 msgstr "Группа протоколов"
 
@@ -2913,23 +2913,23 @@ msgid "Node path"
 msgstr "Путь к узлу"
 
 #: assets/serializers/asset/common.py:172
-#: assets/serializers/asset/common.py:422
+#: assets/serializers/asset/common.py:426
 msgid "Auto info"
 msgstr "Информация об автоматизации"
 
-#: assets/serializers/asset/common.py:267
+#: assets/serializers/asset/common.py:271
 msgid "Platform not exist"
 msgstr "Платформа не существует"
 
-#: assets/serializers/asset/common.py:303
+#: assets/serializers/asset/common.py:307
 msgid "port out of range (0-65535)"
 msgstr "Порт вне диапазона (0-65535)"
 
-#: assets/serializers/asset/common.py:310
+#: assets/serializers/asset/common.py:314
 msgid "Protocol is required: {}"
 msgstr "Соглашение обязательно для заполнения: {}"
 
-#: assets/serializers/asset/common.py:349
+#: assets/serializers/asset/common.py:353
 msgid "Invalid data"
 msgstr "Неверные данные"
 
@@ -2960,7 +2960,9 @@ msgstr ""
 "которому доверяю, и это именно тот сервер, который я указал."
 
 #: assets/serializers/asset/ds.py:18
-msgid "The domain name of the active directory or other directory service"
+msgid ""
+"The domain part used by the directory service (e.g., AD) and appended to the "
+"username during login, such as example.com in user@example.com."
 msgstr ""
 
 #: assets/serializers/asset/gpt.py:20
@@ -3167,11 +3169,11 @@ msgstr "Активы могут подключаться через регион
 msgid "Default Domain"
 msgstr "Домашний домен по умолчанию"
 
-#: assets/serializers/platform.py:234
+#: assets/serializers/platform.py:239
 msgid "type is required"
 msgstr "Тип, это поле обязательно для заполнения."
 
-#: assets/serializers/platform.py:249
+#: assets/serializers/platform.py:254
 msgid "Protocols is required"
 msgstr "Протокол обязателен для заполнения"
 
@@ -3352,7 +3354,7 @@ msgstr "Отобразить каталог"
 #: audits/const.py:23 rbac/tree.py:268 terminal/api/session/session.py:284
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
-#: xpack/plugins/cloud/manager.py:94
+#: xpack/plugins/cloud/manager.py:84
 msgid "View"
 msgstr "Посмотреть"
 
@@ -3510,7 +3512,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:204 terminal/models/session/sharing.py:125
-#: xpack/plugins/cloud/manager.py:180 xpack/plugins/cloud/models.py:231
+#: xpack/plugins/cloud/manager.py:158 xpack/plugins/cloud/models.py:230
 msgid "Reason"
 msgstr "Причина"
 
@@ -4274,13 +4276,13 @@ msgstr "Приватный токен"
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
 #: users/models/user/__init__.py:89
-#: xpack/plugins/cloud/serializers/account_attrs.py:214
+#: xpack/plugins/cloud/serializers/account_attrs.py:213
 msgid "Private key"
 msgstr "SSH-ключ"
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:38
 #: users/forms/profile.py:175 users/models/user/__init__.py:92
-#: xpack/plugins/cloud/serializers/account_attrs.py:211
+#: xpack/plugins/cloud/serializers/account_attrs.py:210
 msgid "Public key"
 msgstr "SSH-открытый ключ"
 
@@ -4318,7 +4320,7 @@ msgid "Component"
 msgstr "Компоненты"
 
 #: authentication/serializers/connect_token_secret.py:138
-#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:389
+#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:388
 msgid "Domain"
 msgstr "Домен"
 
@@ -4869,26 +4871,27 @@ msgid "Confirmed"
 msgstr "Подтвердить"
 
 #: common/const/choices.py:122 terminal/models/applet/applet.py:31
+#: xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "Сообщество"
 
-#: common/const/choices.py:123
+#: common/const/choices.py:123 xpack/plugins/license/models.py:80
 msgid "Basic edition"
 msgstr "Базовая версия для предприятий"
 
-#: common/const/choices.py:124
+#: common/const/choices.py:124 xpack/plugins/license/models.py:82
 msgid "Standard edition"
 msgstr "Стандартная версия для предприятий"
 
-#: common/const/choices.py:125
+#: common/const/choices.py:125 xpack/plugins/license/models.py:84
 msgid "Professional edition"
 msgstr "Профессиональная версия для предприятий"
 
-#: common/const/choices.py:126
+#: common/const/choices.py:126 xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "Флагманская версия для предприятий"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:425
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:411
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s успешно создано"
@@ -4952,8 +4955,8 @@ msgstr "Неверный ID, должен быть в виде списка"
 #: common/serializers/fields.py:146 terminal/serializers/session.py:81
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
-#: xpack/plugins/cloud/serializers/account_attrs.py:80
-#: xpack/plugins/cloud/serializers/account_attrs.py:151
+#: xpack/plugins/cloud/serializers/account_attrs.py:79
+#: xpack/plugins/cloud/serializers/account_attrs.py:150
 msgid "This field is required."
 msgstr "Это поле обязательно для заполнения."
 
@@ -5461,15 +5464,15 @@ msgstr ""
 "Некоторые предупреждения системы, такие как уведомления о заявках, требуют "
 "выполнения этой задачи для отправки внутреннего сообщения"
 
-#: ops/ansible/inventory.py:118 ops/models/job.py:69
+#: ops/ansible/inventory.py:126 ops/models/job.py:69
 msgid "No account available"
 msgstr "Нет доступных аккаунтов"
 
-#: ops/ansible/inventory.py:303 ops/ansible/inventory.py:345
+#: ops/ansible/inventory.py:313 ops/ansible/inventory.py:355
 msgid "Ansible disabled"
 msgstr "Ansible отключен"
 
-#: ops/ansible/inventory.py:361
+#: ops/ansible/inventory.py:371
 msgid "Skip hosts below:"
 msgstr "Пропустить следующие хосты:"
 
@@ -6482,7 +6485,7 @@ msgstr "Настройки системы"
 msgid "Session audits"
 msgstr "Аудит сессий"
 
-#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:94
+#: rbac/tree.py:49 xpack/plugins/cloud/manager.py:84
 msgid "Cloud import"
 msgstr "Облачная синхронизация"
 
@@ -6511,7 +6514,7 @@ msgid "Storage"
 msgstr "Хранение"
 
 #: rbac/tree.py:61 terminal/models/applet/applet.py:53
-#: terminal/models/applet/applet.py:327 terminal/models/applet/host.py:30
+#: terminal/models/applet/applet.py:369 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "Удаленные приложения"
@@ -6521,7 +6524,7 @@ msgid "Appearance"
 msgstr "Интерфейс"
 
 #: rbac/tree.py:65 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:153
+#: xpack/plugins/license/models.py:144
 msgid "License"
 msgstr "Лицензия"
 
@@ -7296,7 +7299,7 @@ msgid "SSO auth key TTL"
 msgstr "Срок действия токена"
 
 #: settings/serializers/auth/sso.py:20
-#: xpack/plugins/cloud/serializers/account_attrs.py:201
+#: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Unit: second"
 msgstr "Единицы: секунды"
 
@@ -7466,8 +7469,7 @@ msgid "Tenant ID"
 msgstr "Идентификатор арендатора"
 
 #: settings/serializers/feature.py:110 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:111 xpack/plugins/cloud/manager.py:116
-#: xpack/plugins/cloud/models.py:287
+#: xpack/plugins/cloud/manager.py:100 xpack/plugins/cloud/models.py:286
 msgid "Region"
 msgstr "Регион"
 
@@ -8480,7 +8482,7 @@ msgstr "Не удаётся удалить используемое хранил
 msgid "Command storages"
 msgstr "Командное хранилище"
 
-#: terminal/api/component/storage.py:84 xpack/plugins/cloud/manager.py:111
+#: terminal/api/component/storage.py:84
 msgid "Invalid"
 msgstr "Неверно"
 
@@ -8698,12 +8700,12 @@ msgstr "Поддерживается только пользовательска
 msgid "Missing type in platform.yml"
 msgstr "Отсутствует тип в platform.yml"
 
-#: terminal/models/applet/applet.py:329 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:371 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "хост-машина"
 
-#: terminal/models/applet/applet.py:335
+#: terminal/models/applet/applet.py:377
 msgid "Applet Publication"
 msgstr "публикация приложения"
 
@@ -10878,7 +10880,7 @@ msgstr "Частный IP"
 msgid "Public IP"
 msgstr "Публичный IP"
 
-#: xpack/plugins/cloud/const.py:42 xpack/plugins/cloud/models.py:361
+#: xpack/plugins/cloud/const.py:42 xpack/plugins/cloud/models.py:360
 msgid "Instance name"
 msgstr "Название экземпляра"
 
@@ -10890,19 +10892,19 @@ msgstr "Название экземпляра и часть IP"
 msgid "Succeed"
 msgstr "Успешно"
 
-#: xpack/plugins/cloud/const.py:52 xpack/plugins/cloud/manager.py:99
+#: xpack/plugins/cloud/const.py:52 xpack/plugins/cloud/manager.py:90
 msgid "Unsync"
 msgstr "Не синхронизировано"
 
-#: xpack/plugins/cloud/const.py:53 xpack/plugins/cloud/manager.py:98
+#: xpack/plugins/cloud/const.py:53 xpack/plugins/cloud/manager.py:89
 msgid "New Sync"
 msgstr "Новая синхронизация"
 
-#: xpack/plugins/cloud/const.py:54 xpack/plugins/cloud/manager.py:98
+#: xpack/plugins/cloud/const.py:54 xpack/plugins/cloud/manager.py:89
 msgid "Synced"
 msgstr "Синхронизировано"
 
-#: xpack/plugins/cloud/const.py:55 xpack/plugins/cloud/manager.py:100
+#: xpack/plugins/cloud/const.py:55 xpack/plugins/cloud/manager.py:90
 msgid "Released"
 msgstr "Освобождено"
 
@@ -10922,50 +10924,46 @@ msgstr "Синхронизировано с организацией"
 msgid "Imported"
 msgstr "Импорт"
 
-#: xpack/plugins/cloud/manager.py:52
+#: xpack/plugins/cloud/manager.py:47
 #, python-format
 msgid "Task \"%s\" starts executing"
 msgstr "Задача \"%s\" начата"
 
-#: xpack/plugins/cloud/manager.py:91
+#: xpack/plugins/cloud/manager.py:81
 msgid "View the task details path: "
 msgstr "Просмотреть детали"
 
-#: xpack/plugins/cloud/manager.py:94
+#: xpack/plugins/cloud/manager.py:84
 msgid "Account Details"
 msgstr "Аккаунт"
 
-#: xpack/plugins/cloud/manager.py:95
+#: xpack/plugins/cloud/manager.py:85
 msgid "Synchronization History List"
 msgstr "Синхронизация исторического списка"
 
-#: xpack/plugins/cloud/manager.py:95
+#: xpack/plugins/cloud/manager.py:85
 msgid "Synchronization Instance List"
 msgstr "Синхронизация списка экземпляров"
 
-#: xpack/plugins/cloud/manager.py:99
-msgid "To be released"
-msgstr "Ожидание освобождения"
-
-#: xpack/plugins/cloud/manager.py:103
+#: xpack/plugins/cloud/manager.py:93
 msgid "Task execution completed"
 msgstr "Завершение выполнения задачи"
 
-#: xpack/plugins/cloud/manager.py:108
+#: xpack/plugins/cloud/manager.py:97
 msgid "Synchronization regions"
 msgstr "Синхронизация регионов"
 
-#: xpack/plugins/cloud/manager.py:133
+#: xpack/plugins/cloud/manager.py:115
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Ошибка получения экземпляра региона \"%s\", ошибка: %s"
 
-#: xpack/plugins/cloud/manager.py:179
+#: xpack/plugins/cloud/manager.py:157
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "Не удается синхронизировать экземпляр %s"
 
-#: xpack/plugins/cloud/manager.py:355
+#: xpack/plugins/cloud/manager.py:336
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
@@ -10974,47 +10972,42 @@ msgstr ""
 "Обновляемая платформа актива \"%s\" не соответствует типу оригинальной "
 "платформы. Пропускаем обновление платформы и протокола"
 
-#: xpack/plugins/cloud/manager.py:407
+#: xpack/plugins/cloud/manager.py:392
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "Актив \"%s\" уже существует"
 
-#: xpack/plugins/cloud/manager.py:409
+#: xpack/plugins/cloud/manager.py:394
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "Обновление актива \"%s\""
 
-#: xpack/plugins/cloud/manager.py:412
+#: xpack/plugins/cloud/manager.py:397
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "Актив \"%s\" обновлен"
 
-#: xpack/plugins/cloud/manager.py:421
+#: xpack/plugins/cloud/manager.py:407
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "Подготовка к созданию актива %s"
 
-#: xpack/plugins/cloud/manager.py:442
+#: xpack/plugins/cloud/manager.py:428
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "Установка узла: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:468
+#: xpack/plugins/cloud/manager.py:454
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "Установка аккаунта: %s"
 
-#: xpack/plugins/cloud/manager.py:484
+#: xpack/plugins/cloud/manager.py:470
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "Установка протокола \"%s\""
 
-#: xpack/plugins/cloud/manager.py:492
-#, python-format
-msgid "Set labels \"%s\""
-msgstr "Установить метку: \"%s\""
-
-#: xpack/plugins/cloud/manager.py:506 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:484 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr "Выполнение задачи синхронизации экземпляров"
 
@@ -11041,8 +11034,8 @@ msgstr "Тестовая облачная учетная запись"
 
 #: xpack/plugins/cloud/models.py:104
 #: xpack/plugins/cloud/serializers/account.py:76
-#: xpack/plugins/cloud/serializers/task.py:159
-#: xpack/plugins/cloud/serializers/task.py:160
+#: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:158
 msgid "Regions"
 msgstr "Регион"
 
@@ -11055,7 +11048,7 @@ msgid "IP network segment group"
 msgstr "Группа IP-диапазонов"
 
 #: xpack/plugins/cloud/models.py:116
-#: xpack/plugins/cloud/serializers/task.py:163
+#: xpack/plugins/cloud/serializers/task.py:161
 msgid "Preferred IP type"
 msgstr "Предпочитаемый тип IP"
 
@@ -11067,124 +11060,120 @@ msgstr "Всегда обновлять"
 msgid "Fully synchronous"
 msgstr "Полная синхронизация"
 
-#: xpack/plugins/cloud/models.py:122
-msgid "Release assets"
-msgstr "Опубликовать активы"
-
-#: xpack/plugins/cloud/models.py:127
+#: xpack/plugins/cloud/models.py:126
 msgid "Date last sync"
 msgstr "Дата последней синхронизации"
 
-#: xpack/plugins/cloud/models.py:130 xpack/plugins/cloud/models.py:379
-#: xpack/plugins/cloud/models.py:406
+#: xpack/plugins/cloud/models.py:129 xpack/plugins/cloud/models.py:378
+#: xpack/plugins/cloud/models.py:404
 msgid "Strategy"
 msgstr "Политика"
 
-#: xpack/plugins/cloud/models.py:135 xpack/plugins/cloud/models.py:223
+#: xpack/plugins/cloud/models.py:134 xpack/plugins/cloud/models.py:222
 msgid "Sync instance task"
 msgstr "Задача синхронизации экземпляров"
 
-#: xpack/plugins/cloud/models.py:234 xpack/plugins/cloud/models.py:297
+#: xpack/plugins/cloud/models.py:233 xpack/plugins/cloud/models.py:296
 msgid "Date sync"
 msgstr "Дата синхронизации"
 
-#: xpack/plugins/cloud/models.py:238
+#: xpack/plugins/cloud/models.py:237
 msgid "Sync instance snapshot"
 msgstr "Синхронизация снимков экземпляра"
 
-#: xpack/plugins/cloud/models.py:246
+#: xpack/plugins/cloud/models.py:245
 msgid "Sync instance task execution"
 msgstr "Выполнение задач синхронизации экземпляра"
 
-#: xpack/plugins/cloud/models.py:277
+#: xpack/plugins/cloud/models.py:276
 msgid "Sync task"
 msgstr "Задача синхронизации"
 
-#: xpack/plugins/cloud/models.py:281
+#: xpack/plugins/cloud/models.py:280
 msgid "Sync instance task history"
 msgstr "История задач синхронизации экземпляра"
 
-#: xpack/plugins/cloud/models.py:284
+#: xpack/plugins/cloud/models.py:283
 msgid "Instance"
 msgstr "Экземпляр"
 
-#: xpack/plugins/cloud/models.py:301
+#: xpack/plugins/cloud/models.py:300
 msgid "Sync instance detail"
 msgstr "Детали синхронизации экземпляра"
 
-#: xpack/plugins/cloud/models.py:313 xpack/plugins/cloud/serializers/task.py:79
+#: xpack/plugins/cloud/models.py:312 xpack/plugins/cloud/serializers/task.py:77
 msgid "Rule relation"
 msgstr "Условные отношения"
 
-#: xpack/plugins/cloud/models.py:323
+#: xpack/plugins/cloud/models.py:322
 msgid "Task strategy"
 msgstr "Стратегия задач"
 
-#: xpack/plugins/cloud/models.py:350
+#: xpack/plugins/cloud/models.py:349
 msgid "Equal"
 msgstr "равно"
 
-#: xpack/plugins/cloud/models.py:351
+#: xpack/plugins/cloud/models.py:350
 msgid "Not Equal"
 msgstr "не равно"
 
-#: xpack/plugins/cloud/models.py:352
+#: xpack/plugins/cloud/models.py:351
 msgid "In"
 msgstr "в..."
 
-#: xpack/plugins/cloud/models.py:353
+#: xpack/plugins/cloud/models.py:352
 msgid "Contains"
 msgstr "содержит"
 
-#: xpack/plugins/cloud/models.py:354
+#: xpack/plugins/cloud/models.py:353
 msgid "Exclude"
 msgstr "исключает"
 
-#: xpack/plugins/cloud/models.py:355
+#: xpack/plugins/cloud/models.py:354
 msgid "Startswith"
 msgstr "начинается на..."
 
-#: xpack/plugins/cloud/models.py:356
+#: xpack/plugins/cloud/models.py:355
 msgid "Endswith"
 msgstr "заканчивается на..."
 
-#: xpack/plugins/cloud/models.py:362
+#: xpack/plugins/cloud/models.py:361
 msgid "Instance platform"
 msgstr "Инстанс платформа"
 
-#: xpack/plugins/cloud/models.py:363
+#: xpack/plugins/cloud/models.py:362
 msgid "Instance address"
 msgstr "Инстанс адрес"
 
-#: xpack/plugins/cloud/models.py:370
+#: xpack/plugins/cloud/models.py:369
 msgid "Rule attr"
 msgstr "Атрибуты правил"
 
-#: xpack/plugins/cloud/models.py:374
+#: xpack/plugins/cloud/models.py:373
 msgid "Rule match"
 msgstr "Сопоставление правил"
 
-#: xpack/plugins/cloud/models.py:376
+#: xpack/plugins/cloud/models.py:375
 msgid "Rule value"
 msgstr "Значение правил"
 
-#: xpack/plugins/cloud/models.py:383 xpack/plugins/cloud/serializers/task.py:82
+#: xpack/plugins/cloud/models.py:382 xpack/plugins/cloud/serializers/task.py:80
 msgid "Strategy rule"
 msgstr "Условие"
 
-#: xpack/plugins/cloud/models.py:394
+#: xpack/plugins/cloud/models.py:392
 msgid "Name strategy"
 msgstr "Стратегия имени хоста"
 
-#: xpack/plugins/cloud/models.py:401
+#: xpack/plugins/cloud/models.py:399
 msgid "Action attr"
 msgstr "Атрибуты действия"
 
-#: xpack/plugins/cloud/models.py:403
+#: xpack/plugins/cloud/models.py:401
 msgid "Action value"
 msgstr "Значение действия"
 
-#: xpack/plugins/cloud/models.py:410 xpack/plugins/cloud/serializers/task.py:85
+#: xpack/plugins/cloud/models.py:408 xpack/plugins/cloud/serializers/task.py:83
 msgid "Strategy action"
 msgstr "Action"
 
@@ -11408,55 +11397,51 @@ msgstr "ID ключа доступа"
 msgid "Subscription ID"
 msgstr "ID подписки"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:74
-msgid "Auto node classification"
-msgstr "Автоматическая классификация узлов"
-
-#: xpack/plugins/cloud/serializers/account_attrs.py:99
-#: xpack/plugins/cloud/serializers/account_attrs.py:103
-#: xpack/plugins/cloud/serializers/account_attrs.py:127
-#: xpack/plugins/cloud/serializers/account_attrs.py:157
-#: xpack/plugins/cloud/serializers/account_attrs.py:207
+#: xpack/plugins/cloud/serializers/account_attrs.py:98
+#: xpack/plugins/cloud/serializers/account_attrs.py:102
+#: xpack/plugins/cloud/serializers/account_attrs.py:126
+#: xpack/plugins/cloud/serializers/account_attrs.py:156
+#: xpack/plugins/cloud/serializers/account_attrs.py:206
 msgid "API Endpoint"
 msgstr "API-эндпоинт"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:109
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
 msgid "Auth url"
 msgstr "адрес аутентификации"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:110
+#: xpack/plugins/cloud/serializers/account_attrs.py:109
 msgid "eg: http://openstack.example.com:5000/v3"
 msgstr "например: http://openstack.example.com:5000/v3"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:113
+#: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "User domain"
 msgstr "домейн пользователя"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:128
+#: xpack/plugins/cloud/serializers/account_attrs.py:127
 msgid "Cert File"
 msgstr "файл сертификата"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:129
+#: xpack/plugins/cloud/serializers/account_attrs.py:128
 msgid "Key File"
 msgstr "файл ключа"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:145
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
 msgid "Service account key"
 msgstr "ключ сервисной учетной записи"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:146
+#: xpack/plugins/cloud/serializers/account_attrs.py:145
 msgid "The file is in JSON format"
 msgstr "файл в формате JSON"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:164
+#: xpack/plugins/cloud/serializers/account_attrs.py:163
 msgid "IP address invalid `{}`, {}"
 msgstr "Недействительный IP-адрес: `{}`, {}"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:180
+#: xpack/plugins/cloud/serializers/account_attrs.py:179
 msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 msgstr "например: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:183
+#: xpack/plugins/cloud/serializers/account_attrs.py:182
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -11466,53 +11451,68 @@ msgstr ""
 "синхронизации будут синхронизированы только действительные IP-адреса. "
 "<br>Если порт равен 0, это означает, что все IP-адреса действительны."
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:191
+#: xpack/plugins/cloud/serializers/account_attrs.py:190
 msgid "Hostname prefix"
 msgstr "Префикс имени хоста"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:194
+#: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "IP segment"
 msgstr "IP сеть"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:198
+#: xpack/plugins/cloud/serializers/account_attrs.py:197
 msgid "Test port"
 msgstr "Тестирование порта"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:201
+#: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "Test timeout"
 msgstr "Время тайм-аута тестирования"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:217
+#: xpack/plugins/cloud/serializers/account_attrs.py:216
 msgid "Project"
 msgstr "Проект"
 
-#: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:155
 msgid "History count"
 msgstr "Количество запусков"
 
-#: xpack/plugins/cloud/serializers/task.py:158
+#: xpack/plugins/cloud/serializers/task.py:156
 msgid "Instance count"
 msgstr "Количество экземпляров"
 
 #: xpack/plugins/cloud/tasks.py:33
+#, fuzzy
+#| msgid ""
+#| "Execute this task when manually or scheduled cloud synchronization tasks "
+#| "are performed"
 msgid ""
-"Execute this task when manually or scheduled cloud synchronization tasks are "
-"performed"
+"\n"
+"        Execute this task when manually or scheduled cloud synchronization "
+"tasks are performed\n"
+"        "
 msgstr ""
 "Выполняйте это действие при ручной или запланированной синхронизации в "
 "облаке."
 
-#: xpack/plugins/cloud/tasks.py:50
+#: xpack/plugins/cloud/tasks.py:52
 msgid "Period clean sync instance task execution"
 msgstr "Регулярно очищать записи выполнения задач синхронизации"
 
-#: xpack/plugins/cloud/tasks.py:52
+#: xpack/plugins/cloud/tasks.py:54
+#, fuzzy
+#| msgid ""
+#| "Every day, according to the configuration in \"System Settings - Tasks - "
+#| "Regular \n"
+#| "        clean-up - Cloud sync task history retention days\" the system "
+#| "will clean up the execution \n"
+#| "        records generated by cloud synchronization"
 msgid ""
-"Every day, according to the configuration in \"System Settings - Tasks - "
-"Regular \n"
+"\n"
+"        Every day, according to the configuration in \"System Settings - "
+"Tasks - Regular \n"
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
-"        records generated by cloud synchronization"
+"        records generated by cloud synchronization\n"
+"        "
 msgstr ""
 "Каждый день система будет очищать историю выполнения задач облачной "
 "синхронизации в соответствии с конфигурацией в «Системные настройки - Задачи "
@@ -11571,6 +11571,19 @@ msgstr "Лицензия успешно импортирована"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Лицензия недействительна"
+
+#~ msgid "To be released"
+#~ msgstr "Ожидание освобождения"
+
+#, python-format
+#~ msgid "Set labels \"%s\""
+#~ msgstr "Установить метку: \"%s\""
+
+#~ msgid "Release assets"
+#~ msgstr "Опубликовать активы"
+
+#~ msgid "Auto node classification"
+#~ msgstr "Автоматическая классификация узлов"
 
 #, fuzzy
 #~| msgid "Directory service"

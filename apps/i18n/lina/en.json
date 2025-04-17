@@ -502,6 +502,7 @@
     "DuplicateFileExists": "Uploading a file with the same name is not allowed, please delete the file with the same name",
     "Duration": "Duration",
     "DynamicUsername": "Dynamic username",
+    "DirectoryServiceHelpMessage": "Directory Service is a centralized system for storing, managing, and querying information about network resources. Common implementations include LDAP and Active Directory. In this system, once other assets are associated with a directory service, they will inherit user accounts from it.",
     "Edit": "Edit",
     "EditRecipient": "Edit recipient",
     "EditSecret": "Edit secret",

@@ -421,6 +421,7 @@
     "DatabaseCreate": "创建资产-数据库",
     "DatabasePort": "数据库协议端口",
     "DatabaseUpdate": "更新资产-数据库",
+    "DirectoryServiceHelpMessage": "目录服务（Directory Service） 是一种用于集中存储、管理和查询网络资源信息的服务，常见实现包括 LDAP 和 Active Directory。其它资产关联目录服务后，会继承来自目录服务的账号.",
     "Date": "日期",
     "DateCreated": "创建时间",
     "DateEnd": "结束日期",
