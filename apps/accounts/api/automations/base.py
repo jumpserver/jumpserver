@@ -42,7 +42,7 @@ class AutomationAssetsListApi(generics.ListAPIView):
 class AutomationRemoveAssetApi(generics.UpdateAPIView):
     model = BaseAutomation
     serializer_class = serializers.UpdateAssetSerializer
-    http_method_names = ['put']
+    http_method_names = ['patch']
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -60,7 +60,7 @@ class AutomationRemoveAssetApi(generics.UpdateAPIView):
 class AutomationAddAssetApi(generics.UpdateAPIView):
     model = BaseAutomation
     serializer_class = serializers.UpdateAssetSerializer
-    http_method_names = ['put']
+    http_method_names = ['patch']
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -77,7 +77,7 @@ class AutomationAddAssetApi(generics.UpdateAPIView):
 class AutomationNodeAddRemoveApi(generics.UpdateAPIView):
     model = BaseAutomation
     serializer_class = serializers.UpdateNodeSerializer
-    http_method_names = ['put']
+    http_method_names = ['patch']
 
     def update(self, request, *args, **kwargs):
         action_params = ['add', 'remove']
