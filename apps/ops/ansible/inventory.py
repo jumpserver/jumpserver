@@ -190,6 +190,12 @@ class JMSInventory:
         return ansible_config
 
     def asset_to_host(self, asset, account, automation, protocols, platform, path_dir):
+        name = re.sub(r'[ \[\]/]', '_', asset.name)
+        host = {'name': name}
+        if account is None:
+            host['error'] = _('No account available')
+            return host
+
         try:
             ansible_config = dict(automation.ansible_config)
         except (AttributeError, TypeError):
@@ -198,11 +204,10 @@ class JMSInventory:
         protocol = self.get_primary_protocol(ansible_config, protocols)
 
         tp, category = asset.type, asset.category
-        name = re.sub(r'[ \[\]/]', '_', asset.name)
+
         secret_info = {k: v for k, v in asset.secret_info.items() if v}
         username = self.get_username(asset, account)
-        host = {
-            'name': name,
+        host.update({
             'local_python_interpreter': sys.executable,
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
@@ -218,7 +223,7 @@ class JMSInventory:
                 'secret': account.escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None
-        }
+        })
 
         self.make_protocol_setting_vars(host, protocols)
 
