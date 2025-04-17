@@ -147,7 +147,7 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
     serializer_class = serializers.CheckAccountEngineSerializer
     permission_classes = [RBACPermission, IsValidLicense]
     perm_model = CheckAccountEngine
-    http_method_names = ['get']
+    http_method_names = ['get', 'options']
 
     def get_queryset(self):
         return CheckAccountEngine.get_default_engines()
