@@ -153,6 +153,9 @@ def filter_org_queryset(queryset):
     #     print(line)
     # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     queryset = queryset.filter(**kwargs)
+
+    if org and org.is_root():
+        queryset.in_root_org = True
     return queryset
 
 

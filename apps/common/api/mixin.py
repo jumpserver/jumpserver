@@ -15,7 +15,6 @@ from common.drf.filters import (
     IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
-from orgs.utils import tmp_to_root_org
 from .action import RenderToJsonMixin
 from .serializer import SerializerMixin
 
@@ -126,7 +125,12 @@ class QuerySetMixin:
         return queryset
 
     def paginate_queryset(self, queryset):
+        in_root_org = getattr(queryset, 'in_root_org')
         page = super().paginate_queryset(queryset)
+
+        if in_root_org:
+            return page
+
         model = getattr(queryset, 'model', None)
         if not model or hasattr(queryset, 'custom'):
             return page
@@ -134,8 +138,7 @@ class QuerySetMixin:
         serializer_class = self.get_serializer_class()
         if page and serializer_class:
             ids = [str(obj.id) for obj in page]
-            with tmp_to_root_org():
-                page = model.objects.filter(id__in=ids)
+            page = model.objects.filter(id__in=ids)
             page = self.setup_eager_loading(page, is_paginated=True)
             page_mapper = {str(obj.id): obj for obj in page}
             page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
