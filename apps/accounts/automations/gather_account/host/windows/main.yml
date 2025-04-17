@@ -4,6 +4,7 @@
     - name: Run net user command to get all users
       win_shell: net user
       register: user_list_output
+      failed_when: false
 
     - name: Parse all users from net user command
       set_fact:
