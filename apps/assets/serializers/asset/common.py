@@ -147,7 +147,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
     nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
-    platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'), attrs=('id', 'name', 'type'))
+    platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
+                                  attrs=('id', 'name', 'type'))
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
     _accounts = None
 
@@ -159,6 +160,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',
+            'directory_services',
         ]
         read_only_fields = [
             'accounts_amount', 'category', 'type', 'connectivity', 'auto_config',
@@ -172,6 +174,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
             'nodes': {'allow_empty': True, 'label': _("Nodes")},
+            'directory_services': {
+                'required': False,
+                'allow_empty': True,
+                'default': list, 'label': _("Directory service")
+            },
         }
 
     def __init__(self, *args, **kwargs):
@@ -226,15 +233,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', ) \
+        queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type")) \
             .annotate(accounts_amount=Count('accounts'))
-        if queryset.model is Asset:
-            queryset = queryset.prefetch_related('labels__label', 'labels')
-        else:
-            queryset = queryset.prefetch_related('asset_ptr__labels__label', 'asset_ptr__labels')
         return queryset
 
     @staticmethod

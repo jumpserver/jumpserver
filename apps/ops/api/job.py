@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 
 from celery.result import AsyncResult
 from django.conf import settings
@@ -18,14 +19,15 @@ from common.const.http import POST
 from common.permissions import IsValidUser
 from ops.celery import app
 from ops.const import Types
-from ops.models import Job, JobExecution
+from ops.models import Job, JobExecution, JMSPermedInventory
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 )
 from ops.utils import merge_nodes_and_assets
 
 __all__ = [
-    'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
+    'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI',
+    'ClassifiedHostsAPI'
 ]
 
 from ops.tasks import run_ops_job_execution
@@ -309,3 +311,28 @@ class UsernameHintsAPI(APIView):
                            .annotate(total=Count('username')) \
                            .order_by('-total', '-username')[:10]
         return Response(data=top_accounts)
+
+
+class ClassifiedHostsAPI(APIView):
+    permission_classes = [IsValidUser]
+
+    def post(self, request, **kwargs):
+        asset_ids = request.data.get('assets', [])
+        node_ids = request.data.get('nodes', [])
+        runas_policy = request.data.get('runas_policy', 'privileged_first')
+        account_prefer = request.data.get('runas', 'root,Administrator')
+        module = request.data.get('module', 'shell')
+        assets = list(Asset.objects.filter(id__in=asset_ids).all())
+        tmp_dir = os.path.join(settings.PROJECT_DIR, 'inventory', str(uuid.uuid4()))
+        os.makedirs(tmp_dir, exist_ok=True)
+        inventory = JMSPermedInventory(
+            assets=assets,
+            nodes=node_ids,
+            module=module,
+            account_policy=runas_policy,
+            account_prefer=account_prefer,
+            user=self.request.user
+        )
+        classified_hosts = inventory.get_classified_hosts(tmp_dir)
+
+        return Response(data=classified_hosts)

@@ -1,12 +1,12 @@
 from assets.models import GPT, Asset
 from assets.serializers import GPTSerializer
 
-from .asset import AssetViewSet
+from .asset import BaseAssetViewSet
 
 __all__ = ['GPTViewSet']
 
 
-class GPTViewSet(AssetViewSet):
+class GPTViewSet(BaseAssetViewSet):
     model = GPT
     perm_model = Asset
 

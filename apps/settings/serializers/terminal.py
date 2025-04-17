@@ -18,14 +18,18 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('25', '25'),
         ('50', '50'),
     )
-    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
+    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.ChoiceField(
+        choices=[
+            ('auto', _('Auto(Enabled for the first 5 minutes after startup, then disabled.)')),
+            (True, _('Enable')), (False, _('Disable'))
+        ],
         required=True, label=_('Registration'),
         help_text=_(
             "Allow component register, after all component setup, you should disable this for security"
         )
     )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(
-        required=False, label=_("Password"), 
+        required=False, label=_("Password"),
         help_text=_(
             '* Allow users to log in to the KoKo component via password authentication'
         )
@@ -46,7 +50,7 @@ class TerminalSettingSerializer(serializers.Serializer):
         PAGE_SIZE_CHOICES, required=False, label=_('Asset page size')
     )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(
-        label="Magnus", 
+        label="Magnus",
         help_text=_(
             '* You can individually configure the service address and port in the service endpoint'
             '<br/>'

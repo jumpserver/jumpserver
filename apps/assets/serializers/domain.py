@@ -4,12 +4,11 @@ from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models.gateway import Gateway
 from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .gateway import GatewayWithAccountSecretSerializer
-from ..models import Domain
+from ..models import Domain, Gateway
 
 __all__ = ['DomainSerializer', 'DomainWithGatewaySerializer', 'DomainListSerializer']
 
@@ -54,11 +53,6 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         gateways = validated_data.pop('gateways', list(instance.gateways.all()))
         validated_data['assets'] = assets + gateways
         return super().update(instance, validated_data)
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        queryset = queryset.prefetch_related('labels', 'labels__label')
-        return queryset
 
 
 class DomainListSerializer(DomainSerializer):

@@ -131,9 +131,46 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
 
     @lazyproperty
     def alias(self):
+        """
+        别称，因为有虚拟账号，@INPUT @MANUAL @USER, 否则为 id
+        """
         if self.username.startswith('@'):
             return self.username
-        return self.name
+        return str(self.id)
+
+    def is_virtual(self):
+        """
+        不要用 username 去判断，因为可能是构造的 account 对象，设置了同名账号的用户名,
+        """
+        return self.alias.startswith('@')
+
+    def is_ds_account(self):
+        if self.is_virtual():
+            return ''
+        if not self.asset.is_directory_service:
+            return False
+        return True
+
+    @lazyproperty
+    def ds(self):
+        if not self.is_ds_account():
+            return None
+        return self.asset.ds
+
+    @lazyproperty
+    def ds_domain(self):
+        """这个不能去掉，perm_account 会动态设置这个值，以更改 full_username"""
+        if self.is_virtual():
+            return ''
+        if self.ds and self.ds.domain_name:
+            return self.ds.domain_name
+        return ''
+
+    @property
+    def full_username(self):
+        if self.ds_domain:
+            return '{}@{}'.format(self.username, self.ds_domain)
+        return self.username
 
     @lazyproperty
     def has_secret(self):

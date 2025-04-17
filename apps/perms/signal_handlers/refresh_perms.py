@@ -8,7 +8,7 @@ from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from common.exceptions import M2MReverseNotAllowed
 from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
-from perms.utils import UserPermTreeExpireUtil
+from perms.utils import UserPermTreeExpireUtil, UserPermAssetUtil
 from users.models import User, UserGroup
 
 logger = get_logger(__file__)
@@ -42,6 +42,7 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
         return
 
     UserPermTreeExpireUtil().expire_perm_tree_for_users_orgs(user_ids, [org_id])
+    UserPermAssetUtil.refresh_type_nodes_tree_cache(user_ids)
 
 
 @receiver([pre_delete], sender=AssetPermission)
@@ -96,6 +97,7 @@ def on_asset_permission_users_changed(sender, action, reverse, instance, pk_set,
         return
     user_ids = pk_set
     UserPermTreeExpireUtil().expire_perm_tree_for_users_orgs(user_ids, [instance.org.id])
+    UserPermAssetUtil.refresh_type_nodes_tree_cache(user_ids)
 
 
 @receiver(m2m_changed, sender=AssetPermission.user_groups.through)

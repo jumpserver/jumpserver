@@ -2,7 +2,6 @@
 #
 import logging
 
-from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
@@ -84,12 +83,6 @@ class TerminalRegistrationApi(generics.CreateAPIView):
     serializer_class = serializers.TerminalRegistrationSerializer
     permission_classes = [WithBootstrapToken]
     http_method_names = ['post']
-
-    def create(self, request, *args, **kwargs):
-        if not settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION:
-            data = {"error": "service account registration disabled"}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
 
 
 class EncryptedTerminalConfig(generics.CreateAPIView):

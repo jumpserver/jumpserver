@@ -102,6 +102,7 @@ class Platform(LabeledMixin, JMSBaseModel):
         max_length=8, verbose_name=_("Charset")
     )
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Gateway enabled"))
+    ds_enabled = models.BooleanField(default=False, verbose_name=_("DS enabled"))
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
@@ -114,6 +115,11 @@ class Platform(LabeledMixin, JMSBaseModel):
     @lazyproperty
     def assets_amount(self):
         return self.assets.count()
+
+    def save(self, *args, **kwargs):
+        if not self.ds_enabled:
+            self.ds = None
+        super().save(*args, **kwargs)
 
     @classmethod
     def default(cls):

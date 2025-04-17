@@ -7,7 +7,7 @@ else:
     from collections import Iterable
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import NOT_PROVIDED
+from django.db.models import NOT_PROVIDED, OneToOneField
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -466,5 +466,14 @@ class ResourceLabelsMixin(serializers.Serializer):
         return instance
 
     @classmethod
-    def setup_eager_loading(cls, queryset):
-        return queryset.prefetch_related("labels")
+    def setup_eager_labels(cls, queryset):
+        if not hasattr(queryset, 'model'):
+            return queryset
+
+        fields = ['labels', 'labels__label']
+        model = queryset.model
+        pk_field = model._meta.pk
+
+        if isinstance(pk_field, OneToOneField):
+            fields = ['{}__{}'.format(pk_field.name, f) for f in fields]
+        return queryset.prefetch_related(*fields)

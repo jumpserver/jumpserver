@@ -195,7 +195,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         fields_m2m = ['assets', 'assets_amount']
         fields = fields_small + fields_m2m + [
             "protocols", "domain_enabled", "su_enabled", "su_method",
-            "automation", "comment", "custom_fields", "labels"
+            "ds_enabled", "automation", "comment", "custom_fields", "labels"
         ] + read_only_fields
         extra_kwargs = {
             "su_enabled": {
@@ -220,6 +220,11 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     def set_initial_value(self):
         if not hasattr(self, 'initial_data'):
             return
+
+        name = self.initial_data.get('name')
+        if ' ' in name:
+            self.initial_data['name'] = name.replace(' ', '-')
+
         if self.instance:
             return
         if not self.initial_data.get('automation'):

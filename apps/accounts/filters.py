@@ -5,7 +5,6 @@ import uuid
 import django_filters
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi
@@ -13,10 +12,25 @@ from rest_framework.compat import coreapi
 from assets.models import Node
 from assets.utils import get_node_from_request
 from common.drf.filters import BaseFilterSet
+from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import ChangeSecretRecordStatusChoice
 from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord, IntegrationApplication, \
     AutomationExecution
+
+logger = get_logger(__file__)
+
+
+class UUIDFilterMixin:
+    @staticmethod
+    def filter_uuid(queryset, name, value):
+        try:
+            uuid.UUID(value)
+        except ValueError:
+            logger.warning(f"Invalid UUID: {value}")
+            return queryset.none()
+
+        return queryset.filter(**{name: value})
 
 
 class NodeFilterBackend(filters.BaseFilterBackend):
@@ -43,14 +57,15 @@ class NodeFilterBackend(filters.BaseFilterBackend):
         return queryset
 
 
-class AccountFilterSet(BaseFilterSet):
+class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     ip = drf_filters.CharFilter(field_name="address", lookup_expr="exact")
+    name = drf_filters.CharFilter(field_name="name", lookup_expr="exact")
     hostname = drf_filters.CharFilter(field_name="name", lookup_expr="exact")
     username = drf_filters.CharFilter(field_name="username", lookup_expr="exact")
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr="exact")
-    asset_id = drf_filters.CharFilter(field_name="asset", lookup_expr="exact")
-    asset = drf_filters.CharFilter(field_name="asset", lookup_expr="exact")
-    assets = drf_filters.CharFilter(field_name="asset_id", lookup_expr="exact")
+    asset_name = drf_filters.CharFilter(field_name="asset__name", lookup_expr="exact")
+    asset_id = drf_filters.CharFilter(field_name="asset", method="filter_uuid")
+    assets = drf_filters.CharFilter(field_name="asset_id", method="filter_uuid")
     has_secret = drf_filters.BooleanFilter(method="filter_has_secret")
     platform = drf_filters.CharFilter(
         field_name="asset__platform_id", lookup_expr="exact"
@@ -135,8 +150,9 @@ class AccountFilterSet(BaseFilterSet):
             kwargs.update({"date_change_secret__gt": date})
 
         if name == "latest_secret_change_failed":
-            queryset = queryset.filter(date_change_secret__gt=date).exclude(
-                change_secret_status=ChangeSecretRecordStatusChoice.success
+            queryset = (
+                queryset.filter(date_change_secret__gt=date)
+                .exclude(change_secret_status=ChangeSecretRecordStatusChoice.success)
             )
 
         if kwargs:
@@ -146,8 +162,8 @@ class AccountFilterSet(BaseFilterSet):
     class Meta:
         model = Account
         fields = [
-            "id", "asset", "source_id", "secret_type", "category",
-            "type", "privileged", "secret_reset", "connectivity", 'is_active'
+            "id", "source_id", "secret_type", "category", "type",
+            "privileged", "secret_reset", "connectivity", "is_active"
         ]
 
 
@@ -185,16 +201,6 @@ class SecretRecordMixin(drf_filters.FilterSet):
         return queryset.filter(date_finished__gte=dt)
 
 
-class UUIDExecutionFilterMixin:
-    @staticmethod
-    def filter_execution(queryset, name, value):
-        try:
-            uuid.UUID(value)
-        except ValueError:
-            raise ValueError(_('Enter a valid UUID.'))
-        return queryset.filter(**{name: value})
-
-
 class DaysExecutionFilterMixin:
     days = drf_filters.NumberFilter(method="filter_days")
     field: str
@@ -209,10 +215,10 @@ class DaysExecutionFilterMixin:
 
 
 class ChangeSecretRecordFilterSet(
-    SecretRecordMixin, UUIDExecutionFilterMixin,
+    SecretRecordMixin, UUIDFilterMixin,
     DaysExecutionFilterMixin, BaseFilterSet
 ):
-    execution_id = django_filters.CharFilter(method="filter_execution")
+    execution_id = django_filters.CharFilter(method="filter_uuid")
     days = drf_filters.NumberFilter(method="filter_days")
 
     field = 'date_finished'
@@ -230,8 +236,8 @@ class AutomationExecutionFilterSet(DaysExecutionFilterMixin, BaseFilterSet):
         fields = ["days", 'trigger', 'automation_id', 'automation__name']
 
 
-class PushAccountRecordFilterSet(SecretRecordMixin, UUIDExecutionFilterMixin, BaseFilterSet):
-    execution_id = django_filters.CharFilter(method="filter_execution")
+class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterSet):
+    execution_id = django_filters.CharFilter(method="filter_uuid")
 
     class Meta:
         model = PushSecretRecord

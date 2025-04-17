@@ -4,12 +4,13 @@ import re
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
+from django.utils.translation import get_language
 from rest_framework.utils.encoders import JSONEncoder
 
 from assets.const import AllTypes
 from assets.models import FavoriteAsset, Asset, Node
 from common.utils.common import timeit, get_logger
-from orgs.utils import current_org
+from orgs.utils import current_org, get_current_org_id
 from perms.models import PermNode, UserAssetGrantedTreeNodeRelation, AssetPermission
 from .permission import AssetPermissionUtil
 
@@ -93,7 +94,8 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
 
     @classmethod
     def get_type_nodes_tree_or_cached(cls, user):
-        key = f'perms:type-nodes-tree:{user.id}:{current_org.id}'
+        lang = get_language()
+        key = f'perms:type-nodes-tree:{user.id}:{current_org.id}:{lang}'
         nodes = cache.get(key)
         if nodes is None:
             nodes = cls(user).get_type_nodes_tree()
@@ -103,10 +105,18 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
             nodes = json.loads(nodes)
         return nodes
 
-    def refresh_type_nodes_tree_cache(self):
+    @classmethod
+    def refresh_type_nodes_tree_cache(cls, user_ids=None, org_id=None):
+        if user_ids is None:
+            user_ids = []
+
+        if org_id is None:
+            org_id = get_current_org_id()
+
         logger.debug("Refresh type nodes tree cache")
-        key = f'perms:type-nodes-tree:{self.user.id}:{current_org.id}'
-        cache.delete(key)
+        for user_id in user_ids:
+            key = f'perms:type-nodes-tree:{user_id}:{org_id}*'
+            cache.delete_pattern(key)
 
     def refresh_favorite_assets(self):
         favor_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)

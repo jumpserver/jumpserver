@@ -1,6 +1,5 @@
 # coding: utf-8
 import time
-
 from celery import shared_task
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -24,7 +23,7 @@ __all__ = [
 logger = get_logger(__file__)
 
 
-def sync_ldap_user(category='ldap'):
+def sync_ldap_user(category=User.Source.ldap.value):
     LDAPSyncUtil(category=category).perform_sync()
 
 
@@ -33,7 +32,7 @@ def perform_import(category, util_server):
     time_start_display = local_now_display()
     logger.info(f"Start import {category} ldap user task")
 
-    util_import = LDAPImportUtil()
+    util_import = LDAPImportUtil(category)
     users = util_server.search()
 
     if settings.XPACK_ENABLED:
@@ -44,12 +43,7 @@ def perform_import(category, util_server):
         default_org = Organization.default()
 
     orgs = list(set([Organization.get_instance(org_id, default=default_org) for org_id in org_ids]))
-    new_users, errors = util_import.perform_import(users, orgs)
-
-    if errors:
-        logger.error(f"Imported {category} LDAP users errors: {errors}")
-    else:
-        logger.info(f"Imported {len(users)} {category} users successfully")
+    new_users, errors, disable_users = util_import.perform_import(users, orgs)
 
     receivers_setting = f"AUTH_{category.upper()}_SYNC_RECEIVERS"
     if getattr(settings, receivers_setting, None):
@@ -76,7 +70,7 @@ def perform_import(category, util_server):
     )
 )
 def import_ldap_user():
-    perform_import('ldap', LDAPServerUtil())
+    perform_import(User.Source.ldap.value, LDAPServerUtil())
 
 
 @shared_task(
@@ -86,7 +80,8 @@ def import_ldap_user():
     )
 )
 def import_ldap_ha_user():
-    perform_import('ldap_ha', LDAPServerUtil(category='ldap_ha'))
+    category = User.Source.ldap_ha.value
+    perform_import(category, LDAPServerUtil(category=category))
 
 
 def register_periodic_task(task_name, task_func, interval_key, enabled_key, crontab_key, **kwargs):

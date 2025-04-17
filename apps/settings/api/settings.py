@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import re
 
 from django.conf import settings
 from django.core.cache import cache
@@ -14,6 +13,7 @@ from rest_framework.views import APIView
 from common.utils import get_logger
 from jumpserver.conf import Config
 from rbac.permissions import RBACPermission
+from users.models import User
 from .. import serializers
 from ..models import Setting
 from ..signals import category_setting_updated
@@ -182,7 +182,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         if hasattr(serializer, 'post_save'):
             serializer.post_save()
         self.send_signal(serializer)
-        if self.request.query_params.get('category') == 'ldap':
+        if self.request.query_params.get('category') == User.Source.ldap.value:
             self.clean_ldap_user_dn_cache()
 
     @staticmethod

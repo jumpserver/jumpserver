@@ -35,14 +35,13 @@ class JobLogSerializer(JobExecutionSerializer):
 
 
 class JobsAuditSerializer(JobSerializer):
-    material = serializers.ReadOnlyField(label=_("Command"))
     summary = serializers.ReadOnlyField(label=_("Summary"))
     crontab = serializers.ReadOnlyField(label=_("Execution cycle"))
     is_periodic_display = serializers.BooleanField(read_only=True, source='is_periodic')
 
     class Meta(JobSerializer.Meta):
         read_only_fields = [
-            "id", 'name', 'args', 'material', 'type', 'crontab', 'interval', 'date_last_run', 'summary', 'created_by',
+            "id", 'name', 'args', 'type', 'crontab', 'interval', 'date_last_run', 'summary', 'created_by',
             'is_periodic_display'
         ]
         fields = read_only_fields + ['is_periodic']
@@ -188,6 +187,9 @@ class ActivityUnionLogSerializer(serializers.Serializer):
 
 class FileSerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
+
+    class Meta:
+        ref_name = 'AuditFileSerializer'
 
 
 class UserSessionSerializer(serializers.ModelSerializer):

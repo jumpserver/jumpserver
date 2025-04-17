@@ -1,12 +1,12 @@
 from assets.models import Cloud, Asset
 from assets.serializers import CloudSerializer
 
-from .asset import AssetViewSet
+from .asset import BaseAssetViewSet
 
 __all__ = ['CloudViewSet']
 
 
-class CloudViewSet(AssetViewSet):
+class CloudViewSet(BaseAssetViewSet):
     model = Cloud
     perm_model = Asset
 

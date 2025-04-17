@@ -1,11 +1,11 @@
 import json
 import logging
 import os
-import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta
 
+import sys
 from celery import current_task
 from django.conf import settings
 from django.db import models
@@ -63,7 +63,8 @@ class JMSPermedInventory(JMSInventory):
         self.module = module
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
 
-    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir):
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir,
+                          ansible_config):
         if not account:
             host['error'] = _("No account available")
             return host
@@ -78,7 +79,7 @@ class JMSPermedInventory(JMSInventory):
         }
 
         if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
-            host['error'] = "Module {} is not suitable for this asset".format(self.module)
+            host['error'] = _("Module {} is not suitable for this asset").format(self.module)
             return host
 
         if protocol.name in ('mariadb', 'mysql', 'postgresql', 'sqlserver'):
@@ -96,7 +97,8 @@ class JMSPermedInventory(JMSInventory):
                 }
                 host['jms_asset']['port'] = protocol.port
             return host
-        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway, path_dir)
+        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway, path_dir,
+                                         ansible_config)
 
     def get_asset_sorted_accounts(self, asset):
         accounts = self.assets_accounts_mapper.get(asset.id, [])

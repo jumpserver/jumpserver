@@ -132,6 +132,9 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     def create_account_through_template(self, nodes, assets):
         if not self.template_accounts:
             return
+        if self.instance:
+            assets = assets or self.instance.assets.all()
+            nodes = nodes or self.instance.nodes.all()
         assets = self.get_all_assets(nodes, assets)
         self.create_accounts(assets)
 
@@ -152,7 +155,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
             "users", "user_groups", "assets", "nodes",
-        ).prefetch_related('labels', 'labels__label')
+        )
         return queryset
 
     @staticmethod
@@ -209,7 +212,6 @@ class AssetPermissionListSerializer(AssetPermissionSerializer):
     def setup_eager_loading(cls, queryset):
         """Perform necessary eager loading of data."""
         queryset = queryset \
-            .prefetch_related('labels', 'labels__label') \
             .annotate(users_amount=Count("users", distinct=True),
                       user_groups_amount=Count("user_groups", distinct=True),
                       assets_amount=Count("assets", distinct=True),

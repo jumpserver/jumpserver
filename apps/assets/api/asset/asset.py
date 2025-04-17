@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
+from accounts.serializers import AccountSerializer
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
@@ -96,10 +97,10 @@ class AssetFilterSet(BaseFilterSet):
         return queryset.filter(protocols__name__in=value).distinct()
 
 
-class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
+class BaseAssetViewSet(OrgBulkModelViewSet):
     """
-    API endpoint that allows Asset to be viewed or edited.
-    """
+      API endpoint that allows Asset to be viewed or edited.
+      """
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "address", "comment")
@@ -109,18 +110,19 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
         ("platform", serializers.PlatformSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
+        ("accounts", AccountSerializer),
     )
     rbac_perms = (
         ("match", "assets.match_asset"),
         ("platform", "assets.view_platform"),
         ("gateways", "assets.view_gateway"),
+        ("accounts", "assets.view_account"),
         ("spec_info", "assets.view_asset"),
         ("gathered_info", "assets.view_asset"),
         ("sync_platform_protocols", "assets.change_asset"),
     )
     extra_filter_backends = [
-        IpInFilterBackend,
-        NodeFilterBackend, AttrRulesFilterBackend
+        IpInFilterBackend, NodeFilterBackend, AttrRulesFilterBackend
     ]
 
     def perform_destroy(self, instance):
@@ -141,6 +143,25 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
             return retrieve_cls
         return cls
 
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+        if page:
+            page = Asset.compute_all_accounts_amount(page)
+        return page
+
+    def create(self, request, *args, **kwargs):
+        if request.path.find('/api/v1/assets/assets/') > -1:
+            error = _('Cannot create asset directly, you should create a host or other')
+            return Response({'error': error}, status=400)
+
+        if not settings.XPACK_LICENSE_IS_VALID and self.model.objects.order_by().count() >= 5000:
+            error = _('The number of assets exceeds the limit of 5000')
+            return Response({'error': error}, status=400)
+
+        return super().create(request, *args, **kwargs)
+
+
+class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
     @action(methods=["GET"], detail=True, url_path="platform")
     def platform(self, *args, **kwargs):
         asset = super().get_object()
@@ -188,17 +209,6 @@ class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
                 )
         Protocol.objects.bulk_create(objs)
         return Response(status=status.HTTP_200_OK)
-
-    def create(self, request, *args, **kwargs):
-        if request.path.find('/api/v1/assets/assets/') > -1:
-            error = _('Cannot create asset directly, you should create a host or other')
-            return Response({'error': error}, status=400)
-
-        if not settings.XPACK_LICENSE_IS_VALID and self.model.objects.order_by().count() >= 5000:
-            error = _('The number of assets exceeds the limit of 5000')
-            return Response({'error': error}, status=400)
-
-        return super().create(request, *args, **kwargs)
 
     def filter_bulk_update_data(self):
         bulk_data = []

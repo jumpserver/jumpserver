@@ -1,11 +1,11 @@
-from assets.serializers import DeviceSerializer
 from assets.models import Device, Asset
-from .asset import AssetViewSet
+from assets.serializers import DeviceSerializer
+from .asset import BaseAssetViewSet
 
 __all__ = ['DeviceViewSet']
 
 
-class DeviceViewSet(AssetViewSet):
+class DeviceViewSet(BaseAssetViewSet):
     model = Device
     perm_model = Asset
 

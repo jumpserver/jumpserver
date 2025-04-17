@@ -35,7 +35,8 @@ from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
-    ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer
+    ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer,
+    AdminConnectionTokenSerializer,
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet', 'AdminConnectionTokenViewSet']
@@ -407,22 +408,22 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def validate_exchange_token(self, token):
         user = token.user
         asset = token.asset
-        account_name = token.account
-        _data = self._validate(user, asset, account_name, token.protocol, token.connect_method)
+        account_alias = token.account
+        _data = self._validate(user, asset, account_alias, token.protocol, token.connect_method)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_name, protocol, connect_method):
+    def _validate(self, user, asset, account_alias, protocol, connect_method):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
         data['value'] = random_string(16)
 
-        if account_name == AliasAccount.ANON and asset.category not in ['web', 'custom']:
+        if account_alias == AliasAccount.ANON and asset.category not in ['web', 'custom']:
             raise ValidationError(_('Anonymous account is not supported for this asset'))
 
-        account = self._validate_perm(user, asset, account_name, protocol)
+        account = self._validate_perm(user, asset, account_alias, protocol)
         if account.has_secret:
             data['input_secret'] = ''
 
@@ -436,18 +437,16 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if ticket or self.need_face_verify:
             data['is_active'] = False
         if self.face_monitor_token:
-            FaceMonitorContext.get_or_create_context(self.face_monitor_token,
-                                                     self.request.user.id)
+            FaceMonitorContext.get_or_create_context(self.face_monitor_token, self.request.user.id)
             data['face_monitor_token'] = self.face_monitor_token
         return data
 
     @staticmethod
-    def get_permed_account(user, asset, account_name, protocol):
-        from perms.utils.asset_perm import PermAssetDetailUtil
-        return PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
+    def get_permed_account(user, asset, account_alias, protocol):
+        return ConnectionToken.get_user_permed_account(user, asset, account_alias, protocol)
 
-    def _validate_perm(self, user, asset, account_name, protocol):
-        account = self.get_permed_account(user, asset, account_name, protocol)
+    def _validate_perm(self, user, asset, account_alias, protocol):
+        account = self.get_permed_account(user, asset, account_alias, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
@@ -617,7 +616,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             raise PermissionDenied('Not allow to view secret')
 
         token_id = request.data.get('id') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
+        token = ConnectionToken.get_typed_connection_token(token_id)
         token.is_valid()
         serializer = self.get_serializer(instance=token)
 
@@ -670,6 +669,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
 
 class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
+    serializer_classes = {
+        'default': AdminConnectionTokenSerializer,
+    }
 
     def check_permissions(self, request):
         user = request.user
@@ -677,11 +679,7 @@ class AdminConnectionTokenViewSet(ConnectionTokenViewSet):
             self.permission_denied(request)
 
     def get_queryset(self):
-        return AdminConnectionToken.objects.all()
+        return AdminConnectionToken.objects.all().filter(user=self.request.user)
 
     def get_permed_account(self, user, asset, account_name, protocol):
-        with tmp_to_org(asset.org):
-            account = asset.accounts.all().active().get(name=account_name)
-            account.actions = ActionChoices.all()
-            account.date_expired = timezone.now() + timezone.timedelta(days=365)
-            return account
+        return AdminConnectionToken.get_user_permed_account(user, asset, account_name, protocol)

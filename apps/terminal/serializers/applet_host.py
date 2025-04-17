@@ -116,11 +116,26 @@ class AppletHostSerializer(HostSerializer):
             kwargs['data'] = data
         super().__init__(*args, **kwargs)
 
-    @staticmethod
-    def set_initial_data(data):
-        platform = Platform.objects.get(name='RemoteAppHost')
+    def set_initial_data(self, data):
+        platform_id = None
+        platform_data = data.get('platform')
+
+        if isinstance(platform_data, dict):
+            platform_id = platform_data.get('id')
+        elif isinstance(platform_data, int):
+            platform_id = platform_data
+
+        default_platform = Platform.objects.get(name='RemoteAppHost')
+        if (
+                not platform_id or
+                not Platform.objects.filter(
+                    id=platform_id, name__startswith='RemoteAppHost'
+                ).exists()
+        ):
+            platform_id = default_platform.id
+
         data.update({
-            'platform': platform.id,
+            'platform': platform_id,
             'nodes_display': [
                 'RemoteAppHosts'
             ]

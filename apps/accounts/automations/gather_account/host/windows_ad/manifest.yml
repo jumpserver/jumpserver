@@ -1,0 +1,15 @@
+id: gather_accounts_windows_ad
+name: "{{ 'Windows account gather' | trans }}"
+version: 1
+method: gather_accounts
+category:
+  - ds
+
+type:
+  - windows_ad
+
+i18n:
+  Windows account gather:
+    zh: 使用命令 Get-ADUser 收集 Windows 账号
+    ja: コマンド Get-ADUser を使用して Windows アカウントを収集する
+    en: Using command Get-ADUser to gather accounts

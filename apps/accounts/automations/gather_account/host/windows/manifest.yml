@@ -2,9 +2,12 @@ id: gather_accounts_windows
 name: "{{ 'Windows account gather' | trans }}"
 version: 1
 method: gather_accounts
-category: host
+category:
+  - host
+
 type:
   - windows
+
 
 i18n:
   Windows account gather:

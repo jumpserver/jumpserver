@@ -28,6 +28,7 @@ urlpatterns = [
     path('job-execution/task-detail/<uuid:task_id>/', api.JobExecutionTaskDetail.as_view(), name='task-detail'),
     path('username-hints/', api.UsernameHintsAPI.as_view(), name='username-hints'),
     path('ansible/job-execution/<uuid:pk>/log/', api.AnsibleTaskLogApi.as_view(), name='job-execution-log'),
+    path('classified-hosts/', api.ClassifiedHostsAPI.as_view(), name='classified-hosts'),
 
     path('celery/task/<uuid:name>/task-execution/<uuid:pk>/log/', api.CeleryTaskExecutionLogApi.as_view(),
          name='celery-task-execution-log'),

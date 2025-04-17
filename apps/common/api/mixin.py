@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from collections import defaultdict
+from contextlib import nullcontext
 from itertools import chain
 from typing import Callable
 
@@ -15,6 +16,7 @@ from common.drf.filters import (
     IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
+from orgs.utils import tmp_to_org, tmp_to_root_org
 from .action import RenderToJsonMixin
 from .serializer import SerializerMixin
 
@@ -95,7 +97,10 @@ class QuerySetMixin:
     get_queryset: Callable
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        return super().get_queryset()
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
         if not hasattr(self, 'action'):
             return queryset
         if self.action == 'metadata':
@@ -103,25 +108,57 @@ class QuerySetMixin:
         queryset = self.setup_eager_loading(queryset)
         return queryset
 
-    # Todo: 未来考虑自定义 pagination
-    def setup_eager_loading(self, queryset):
-        if self.request.query_params.get('format') not in ['csv', 'xlsx']:
+    def setup_eager_loading(self, queryset, is_paginated=False):
+        is_export_request = self.request.query_params.get('format') in ['csv', 'xlsx']
+        no_request_page = self.request.query_params.get('limit') is None
+        # 不分页不走一般这个，是因为会消耗多余的 sql 查询, 不如分页的时候查询一次
+        if not is_export_request and not is_paginated and not no_request_page:
             return queryset
+
         serializer_class = self.get_serializer_class()
-        if not serializer_class or not hasattr(serializer_class, 'setup_eager_loading'):
+        if not serializer_class:
             return queryset
-        return serializer_class.setup_eager_loading(queryset)
+
+        if hasattr(serializer_class, 'setup_eager_loading'):
+            queryset = serializer_class.setup_eager_loading(queryset)
+
+        if hasattr(serializer_class, 'setup_eager_labels'):
+            queryset = serializer_class.setup_eager_labels(queryset)
+        return queryset
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
+        model = getattr(queryset, 'model', None)
+        if not model or hasattr(queryset, 'custom'):
+            return page
+
         serializer_class = self.get_serializer_class()
-        if page and serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
-            ids = [str(obj.id) for obj in page]
-            page = self.get_queryset().filter(id__in=ids)
-            page = serializer_class.setup_eager_loading(page)
+        if page and serializer_class:
+            # 必须要返回 ids，用于排序
+            queryset, ids = self._get_page_again(page, model)
+            page = self.setup_eager_loading(queryset, is_paginated=True)
             page_mapper = {str(obj.id): obj for obj in page}
             page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
         return page
+
+    def _get_page_again(self, page, model):
+        """
+        因为 setup_eager_loading 需要是 queryset 结构, 所以必须要重新构造
+        """
+        id_org_mapper = {str(obj.id): getattr(obj, 'org_id', None) for obj in page}
+        ids = list(id_org_mapper.keys())
+        org_ids = list(set(id_org_mapper.values()) - {None})
+
+        if not org_ids:
+            context = nullcontext()
+        elif len(org_ids) == 1:
+            context = tmp_to_org(org_ids[0])
+        else:
+            context = tmp_to_root_org()
+
+        with context:
+            page = model.objects.filter(id__in=ids)
+        return page, ids
 
 
 class ExtraFilterFieldsMixin:
@@ -217,8 +254,8 @@ class OrderingFielderFieldsMixin:
 
 
 class CommonApiMixin(
-    SerializerMixin, ExtraFilterFieldsMixin, OrderingFielderFieldsMixin,
-    QuerySetMixin, RenderToJsonMixin, PaginatedResponseMixin
+    SerializerMixin, QuerySetMixin, ExtraFilterFieldsMixin,
+    OrderingFielderFieldsMixin, RenderToJsonMixin, PaginatedResponseMixin
 ):
     def is_swagger_request(self):
         return getattr(self, 'swagger_fake_view', False) or \

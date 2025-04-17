@@ -13,6 +13,7 @@ from .cloud import CloudTypes
 from .custom import CustomTypes
 from .database import DatabaseTypes
 from .device import DeviceTypes
+from .ds import DirectoryTypes
 from .gpt import GPTTypes
 from .host import HostTypes
 from .web import WebTypes
@@ -22,7 +23,8 @@ class AllTypes(ChoicesMixin):
     choices: list
     includes = [
         HostTypes, DeviceTypes, DatabaseTypes,
-        CloudTypes, WebTypes, CustomTypes, GPTTypes
+        CloudTypes, WebTypes, CustomTypes,
+        DirectoryTypes, GPTTypes
     ]
     _category_constrains = {}
     _automation_methods = None
@@ -173,6 +175,7 @@ class AllTypes(ChoicesMixin):
             (Category.DATABASE, DatabaseTypes),
             (Category.WEB, WebTypes),
             (Category.CLOUD, CloudTypes),
+            (Category.DS, DirectoryTypes),
             (Category.CUSTOM, CustomTypes)
         ]
         return types

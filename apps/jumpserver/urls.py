@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+import uuid
 
 import private_storage.urls
 from django.conf import settings
@@ -74,12 +75,19 @@ urlpatterns += [
     path('core/jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
+DOC_TTL = 60 * 60
+DOC_VERSION = uuid.uuid4().hex
+cache_kwargs = {
+    'cache_timeout': DOC_TTL,
+    'cache_kwargs': {
+        'key_prefix': 'swagger-cache-' + DOC_VERSION,
+    },
+}
 # docs 路由
 urlpatterns += [
-    re_path('^api/swagger(?P<format>\.json|\.yaml)$',
-            views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-    re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
-    re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
+    path('api/swagger.<format>', views.get_swagger_view(False).without_ui(**cache_kwargs), name='schema-json'),
+    re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', **cache_kwargs), name="docs"),
+    re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', **cache_kwargs), name='redoc'),
 ]
 
 if os.environ.get('DEBUG_TOOLBAR', False):

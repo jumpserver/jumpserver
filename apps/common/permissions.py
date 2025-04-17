@@ -27,10 +27,23 @@ class IsServiceAccount(IsValidUser):
 
 
 class WithBootstrapToken(permissions.BasePermission):
+    def check_can_register(self):
+        enabled = settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION
+        if enabled == 'auto':
+            return time.time() - settings.JUMPSERVER_UPTIME < 300
+        elif enabled:
+            return True
+        else:
+            return False
+
     def has_permission(self, request, view):
         authorization = request.META.get('HTTP_AUTHORIZATION', '')
         if not authorization:
             return False
+
+        if not self.check_can_register():
+            return False
+
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
 
@@ -74,3 +87,12 @@ class IsValidLicense(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return settings.XPACK_LICENSE_IS_VALID
+
+
+class IsOwnerOrAdminWritable(IsValidUser):
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return super().has_permission(request, view)
+        if request.method != 'GET' and obj.creator != request.user:
+            return False
+        return super().has_permission(request, view)

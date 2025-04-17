@@ -31,6 +31,7 @@ class ConfirmType(TextChoices):
 class MFAType(TextChoices):
     OTP = 'otp', _('OTP')
     SMS = 'sms', _('SMS')
+    Email = 'email', _('Email')
     Face = 'face', _('Face Recognition')
     Radius = 'otp_radius', _('Radius')
     Custom = 'mfa_custom', _('Custom')
@@ -48,6 +49,6 @@ class FaceMonitorActionChoices(TextChoices):
 
 
 class ConnectionTokenType(TextChoices):
-    ADMIN = 'admin', 'Admin'
-    SUPER = 'super', 'Super'
-    USER = 'user', 'User'
+    ADMIN = 'admin', 'Admin'  # 管理员 Token, 可以访问所有资源
+    SUPER = 'super', 'Super'  # 超级 Token, 可以为不同用户生成的 Token, 遵守用户 Token 的限制
+    USER = 'user', 'User'  # 用户 Token, 只能访问指定资源

@@ -20,6 +20,7 @@ class HostTypes(BaseType):
                 'charset': 'utf-8',  # default
                 'domain_enabled': True,
                 'su_enabled': True,
+                'ds_enabled': True,
                 'su_methods': ['sudo', 'su', 'only_sudo', 'only_su'],
             },
             cls.WINDOWS: {
@@ -56,7 +57,6 @@ class HostTypes(BaseType):
                 'change_secret_enabled': True,
                 'push_account_enabled': True,
                 'remove_account_enabled': True,
-
             },
             cls.WINDOWS: {
                 'ansible_config': {
@@ -69,7 +69,6 @@ class HostTypes(BaseType):
                 'ping_enabled': False,
                 'gather_facts_enabled': False,
                 'gather_accounts_enabled': False,
-                'verify_account_enabled': False,
                 'change_secret_enabled': False,
                 'push_account_enabled': False
             },
@@ -126,5 +125,5 @@ class HostTypes(BaseType):
     @classmethod
     def get_community_types(cls) -> list:
         return [
-            cls.LINUX, cls.UNIX, cls.WINDOWS, cls.OTHER_HOST
+            cls.LINUX, cls.WINDOWS, cls.UNIX, cls.OTHER_HOST
         ]

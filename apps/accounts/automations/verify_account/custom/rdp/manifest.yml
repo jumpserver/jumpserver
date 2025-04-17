@@ -2,8 +2,10 @@ id: verify_account_by_rdp
 name: "{{ 'Windows rdp account verify' | trans }}"
 category:
   - host
+  - ds
 type:
   - windows
+  - windows_ad
 method: verify_account
 protocol: rdp
 priority: 1

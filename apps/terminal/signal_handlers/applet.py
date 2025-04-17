@@ -12,9 +12,7 @@ from orgs.utils import tmp_to_builtin_org
 from users.models import User
 from ..models import Applet, AppletHost
 from ..tasks import applet_host_generate_accounts
-from ..utils import DBPortManager
 
-db_port_manager: DBPortManager
 logger = get_logger(__file__)
 
 

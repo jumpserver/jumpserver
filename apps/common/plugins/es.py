@@ -386,6 +386,7 @@ class ES(object):
 
 
 class QuerySet(DJQuerySet):
+    custom = True
     default_days_ago = 7
     max_result_window = 10000
 

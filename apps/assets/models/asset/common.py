@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
@@ -175,6 +175,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     nodes = models.ManyToManyField(
         'assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes")
     )
+    directory_services = models.ManyToManyField(
+        'assets.DirectoryService', related_name='assets',
+        verbose_name=_("Directory service")
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
     custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
@@ -200,6 +204,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
                 v = json.loads(v)
             info[i.name] = v
         return info
+
+    @lazyproperty
+    def is_directory_service(self):
+        return self.category == const.Category.DS and hasattr(self, 'ds')
 
     @lazyproperty
     def spec_info(self):
@@ -245,9 +253,28 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         auto_config.update(model_to_dict(automation))
         return auto_config
 
+    @property
+    def all_accounts(self):
+        if not self.joined_dir_svcs:
+            queryset = self.accounts.all()
+        else:
+            queryset = self.accounts.model.objects.filter(asset__in=[self.id, *self.joined_dir_svcs])
+        return queryset
+
+    @property
+    def dc_accounts(self):
+        queryset = self.accounts.model.objects.filter(asset__in=[*self.joined_dir_svcs])
+        return queryset
+
+    @lazyproperty
+    def all_valid_accounts(self):
+        queryset = (self.all_accounts.filter(is_active=True)
+                    .prefetch_related('asset', 'asset__platform'))
+        return queryset
+
     @lazyproperty
     def accounts_amount(self):
-        return self.accounts.count()
+        return self.all_accounts.count()
 
     def get_target_ip(self):
         return self.address
@@ -258,6 +285,41 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     def get_protocol_port(self, protocol):
         protocol = self.protocols.all().filter(name=protocol).first()
         return protocol.port if protocol else 0
+
+    def is_dir_svc(self):
+        return self.category == const.Category.DS
+
+    @property
+    def joined_dir_svcs(self):
+        return self.directory_services.all()
+
+    @classmethod
+    def compute_all_accounts_amount(cls, assets):
+        from .ds import DirectoryService
+        asset_ids = [asset.id for asset in assets]
+        asset_id_dc_ids_mapper = defaultdict(list)
+        dc_ids = set()
+
+        asset_dc_relations = (
+            Asset.directory_services.through.objects
+            .filter(asset_id__in=asset_ids)
+            .values_list('asset_id', 'directoryservice_id')
+        )
+        for asset_id, ds_id in asset_dc_relations:
+            dc_ids.add(ds_id)
+            asset_id_dc_ids_mapper[asset_id].append(ds_id)
+
+        directory_services = (
+            DirectoryService.objects.filter(id__in=dc_ids)
+            .annotate(accounts_amount=Count('accounts'))
+        )
+        ds_accounts_amount_mapper = {ds.id: ds.accounts_amount for ds in directory_services}
+        for asset in assets:
+            asset_dc_ids = asset_id_dc_ids_mapper.get(asset.id, [])
+            for dc_id in asset_dc_ids:
+                ds_accounts = ds_accounts_amount_mapper.get(dc_id, 0)
+                asset.accounts_amount += ds_accounts
+        return assets
 
     @property
     def is_valid(self):

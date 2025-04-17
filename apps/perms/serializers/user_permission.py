@@ -40,7 +40,7 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'nodes', 'labels') \
+        queryset = queryset.prefetch_related('domain', 'nodes') \
             .prefetch_related('platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
@@ -59,6 +59,7 @@ class NodePermedSerializer(serializers.ModelSerializer):
 
 class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
+    username = serializers.CharField(source='full_username', read_only=True)
 
     class Meta:
         model = Account
