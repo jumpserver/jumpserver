@@ -189,7 +189,8 @@ class User(
         cas = self.Source.cas
         saml2 = self.Source.saml2
         oauth2 = self.Source.oauth2
-        return self.source not in [cas, saml2, oauth2]
+        openid = self.Source.openid
+        return self.source not in [cas, saml2, oauth2, openid]
 
     @property
     def expired_remain_days(self):
