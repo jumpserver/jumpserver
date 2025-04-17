@@ -5,6 +5,8 @@ from itertools import chain
 from typing import Callable
 
 from django.db import models
+from django.db.models.lookups import In, Exact
+from django.db.models.query import QuerySet
 from django.db.models.signals import m2m_changed
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -15,7 +17,6 @@ from common.drf.filters import (
     IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
-from orgs.utils import tmp_to_root_org
 from .action import RenderToJsonMixin
 from .serializer import SerializerMixin
 
@@ -125,17 +126,39 @@ class QuerySetMixin:
             queryset = serializer_class.setup_eager_labels(queryset)
         return queryset
 
+    @staticmethod
+    def has_many_org_id_filter(qs):
+        if not (isinstance(qs, QuerySet) and hasattr(qs, 'query')):
+            return False
+
+        where = qs.query.where
+
+        for child in where.children:
+            if isinstance(child, In) and child.lhs.target.name == 'org_id':
+                return True
+
+        if where.connector == 'OR':
+            org_id_eq_count = 0
+            for child in where.children:
+                if isinstance(child, Exact) and child.lhs.target.name == 'org_id':
+                    org_id_eq_count += 1
+            if org_id_eq_count >= 2:
+                return True
+        return False
+
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
         model = getattr(queryset, 'model', None)
         if not model or hasattr(queryset, 'custom'):
             return page
 
+        if self.has_many_org_id_filter(queryset):
+            return page
+
         serializer_class = self.get_serializer_class()
         if page and serializer_class:
             ids = [str(obj.id) for obj in page]
-            with tmp_to_root_org():
-                page = model.objects.filter(id__in=ids)
+            page = model.objects.filter(id__in=ids)
             page = self.setup_eager_loading(page, is_paginated=True)
             page_mapper = {str(obj.id): obj for obj in page}
             page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
