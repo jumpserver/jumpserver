@@ -341,9 +341,7 @@ class ES(object):
             index['values'] = kwargs[index_in_field]
 
         for k, v in kwargs.items():
-            if k in keyword_fields:
-                exact[k] = v
-            elif k in exact_fields:
+            if k in exact_fields.union(keyword_fields):
                 exact['{}.keyword'.format(k)] = v
             elif k in match_fields:
                 match[k] = v
