@@ -131,7 +131,6 @@ dependencies = [
     'openai>=01.29.0',
     'xlsxwriter>=03.1.9',
     'exchangelib>=05.1.0',
-    'xmlsec>=01.3.13',
     'lxml==5.2.1',
     'pydantic>=02.7.4',
     'annotated-types>=00.6.0',
