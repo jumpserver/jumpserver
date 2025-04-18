@@ -22,6 +22,7 @@ urlpatterns = [
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
     path('profile/password/', api.UserPasswordApi.as_view(), name='user-password'),
     path('profile/mfa/reset/', api.UserResetMFAApi.as_view(), name='my-mfa-reset'),
+    path('profile/permissions/', api.UserPermissionsApi.as_view(), name='user-permissions'),
     path('preference/', api.PreferenceApi.as_view(), name='preference'),
     path('users/<uuid:pk>/mfa/reset/', api.UserResetMFAApi.as_view(), name='user-reset-mfa'),
     path('users/<uuid:pk>/password/', api.UserChangePasswordApi.as_view(), name='change-user-password'),
