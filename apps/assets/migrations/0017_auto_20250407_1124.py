@@ -19,7 +19,7 @@ def add_ds_platforms(apps, schema_editor):
         "type": "windows_ad",
         "meta": {},
         "internal": true,
-        "domain_enabled": true,
+        "gateway_enabled": true,
         "su_enabled": false,
         "su_method": null,
         "custom_fields": [],
@@ -117,7 +117,7 @@ def add_ds_platforms(apps, schema_editor):
         "meta": {
         },
         "internal": true,
-        "domain_enabled": false,
+        "gateway_enabled": false,
         "su_enabled": false,
         "su_method": null,
         "custom_fields": [

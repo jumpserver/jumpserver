@@ -37,7 +37,7 @@ class JMSInventory:
         from assets.models import Asset
         asset_ids = [asset.id for asset in assets]
         assets = Asset.objects.filter(id__in=asset_ids, is_active=True) \
-            .prefetch_related('platform', 'domain', 'accounts')
+            .prefetch_related('platform', 'zone', 'accounts')
         return assets
 
     @staticmethod
@@ -236,8 +236,8 @@ class JMSInventory:
         host.update(ansible_config)
 
         gateway = None
-        if not asset.is_gateway and asset.domain:
-            gateway = asset.domain.select_gateway()
+        if not asset.is_gateway and asset.zone:
+            gateway = asset.zone.select_gateway()
 
         self.make_account_vars(
             host, asset, account, automation, protocol, platform, gateway, path_dir, ansible_config

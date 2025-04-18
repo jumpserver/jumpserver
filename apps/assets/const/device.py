@@ -19,7 +19,7 @@ class DeviceTypes(BaseType):
         return {
             '*': {
                 'charset_enabled': False,
-                'domain_enabled': True,
+                'gateway_enabled': True,
                 'ds_enabled': False,
                 'su_enabled': True,
                 'su_methods': ['enable', 'super', 'super_level']

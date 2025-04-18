@@ -8,12 +8,12 @@ from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .gateway import GatewayWithAccountSecretSerializer
-from ..models import Domain, Gateway
+from ..models import Zone, Gateway
 
-__all__ = ['DomainSerializer', 'DomainWithGatewaySerializer', 'DomainListSerializer']
+__all__ = ['ZoneSerializer', 'ZoneWithGatewaySerializer', 'ZoneListSerializer']
 
 
-class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
+class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
         many=True, required=False, label=_('Gateway'), queryset=Gateway.objects,
         help_text=_(
@@ -23,7 +23,7 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
 
     class Meta:
-        model = Domain
+        model = Zone
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
         fields_m2m = ['assets', 'gateways', 'labels', 'assets_amount']
@@ -55,9 +55,9 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         return super().update(instance, validated_data)
 
 
-class DomainListSerializer(DomainSerializer):
-    class Meta(DomainSerializer.Meta):
-        fields = list(set(DomainSerializer.Meta.fields + ['assets_amount']) - {'assets'})
+class ZoneListSerializer(ZoneSerializer):
+    class Meta(ZoneSerializer.Meta):
+        fields = list(set(ZoneSerializer.Meta.fields + ['assets_amount']) - {'assets'})
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -67,9 +67,9 @@ class DomainListSerializer(DomainSerializer):
         return queryset
 
 
-class DomainWithGatewaySerializer(serializers.ModelSerializer):
+class ZoneWithGatewaySerializer(serializers.ModelSerializer):
     gateways = GatewayWithAccountSecretSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Domain
+        model = Zone
         fields = '__all__'

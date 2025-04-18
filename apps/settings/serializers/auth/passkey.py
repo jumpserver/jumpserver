@@ -9,7 +9,7 @@ class PasskeySettingSerializer(serializers.Serializer):
 
     AUTH_PASSKEY = serializers.BooleanField(
         default=False, label=_('Passkey'),
-        help_text=_('Only SSL domain can use passkey auth')
+        help_text=_('Only SSL zone can use passkey auth')
     )
     FIDO_SERVER_ID = serializers.CharField(
         max_length=255, label=_('FIDO Server ID'), required=False, allow_blank=True,

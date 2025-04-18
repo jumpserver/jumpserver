@@ -312,7 +312,7 @@ class AllTypes(ChoicesMixin):
             'category': category,
             'type': tp, 'internal': True,
             'charset': constraints.get('charset', 'utf-8'),
-            'domain_enabled': constraints.get('domain_enabled', False),
+            'gateway_enabled': constraints.get('gateway_enabled', False),
             'su_enabled': constraints.get('su_enabled', False),
         }
         if data['su_enabled'] and data.get('su_methods'):

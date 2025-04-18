@@ -1318,10 +1318,10 @@ msgstr "Clave de acceso"
 #: accounts/serializers/account/base.py:89
 msgid ""
 "* If no username is required for authentication, enter null.  For AD "
-"accounts, use the format username@domain."
+"accounts, use the format username@zone."
 msgstr ""
 "Sugerencia: Si no se requiere nombre de usuario para la autenticación, puede"
-" dejarse como null; si es una cuenta AD, el formato es username@domain"
+" dejarse como null; si es una cuenta AD, el formato es username@zone"
 
 #: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22
@@ -2383,7 +2383,7 @@ msgstr ""
 "contraseña por adelantado"
 
 #: assets/const/protocol.py:106
-msgid "AD domain"
+msgid "AD zone"
 msgstr "Dominio AD"
 
 #: assets/const/protocol.py:121
@@ -2993,7 +2993,7 @@ msgstr ""
 
 #: assets/serializers/asset/ds.py:18
 msgid ""
-"The domain part used by the directory service (e.g., AD) and appended to the"
+"The zone part used by the directory service (e.g., AD) and appended to the"
 " username during login, such as example.com in user@example.com."
 msgstr ""
 "El nombre de dominio se añade a la parte del nombre de usuario al iniciar sesión en servicios de directorio (como AD), por ejemplo, en user@example.com, la parte example.com. \n"
@@ -7223,7 +7223,7 @@ msgid "Use nonce"
 msgstr "Uso temporal"
 
 #: settings/serializers/auth/passkey.py:12
-msgid "Only SSL domain can use passkey auth"
+msgid "Only SSL zone can use passkey auth"
 msgstr "Solo los dominios SSL pueden utilizar la autenticación con Passkey"
 
 #: settings/serializers/auth/passkey.py:15
@@ -11606,7 +11606,7 @@ msgid "eg: http://openstack.example.com:5000/v3"
 msgstr "Ej: http://openstack.ejemplo.com:5000/v3"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:113
-msgid "User domain"
+msgid "User zone"
 msgstr "Dominio del usuario"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:128

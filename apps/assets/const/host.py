@@ -18,7 +18,7 @@ class HostTypes(BaseType):
             '*': {
                 'charset_enabled': True,
                 'charset': 'utf-8',  # default
-                'domain_enabled': True,
+                'gateway_enabled': True,
                 'su_enabled': True,
                 'ds_enabled': True,
                 'su_methods': ['sudo', 'su', 'only_sudo', 'only_su'],
@@ -81,7 +81,7 @@ class HostTypes(BaseType):
                 {'name': 'Linux'},
                 {
                     'name': GATEWAY_NAME,
-                    'domain_enabled': True,
+                    'gateway_enabled': True,
                 }
             ],
             cls.UNIX: [

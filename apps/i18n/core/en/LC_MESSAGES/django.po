@@ -1262,7 +1262,7 @@ msgstr ""
 #: accounts/serializers/account/base.py:89
 msgid ""
 "* If no username is required for authentication, enter null.  For AD "
-"accounts, use the format username@domain."
+"accounts, use the format username@zone."
 msgstr ""
 
 #: accounts/serializers/account/service.py:14
@@ -2246,7 +2246,7 @@ msgid ""
 msgstr ""
 
 #: assets/const/protocol.py:106
-msgid "AD domain"
+msgid "AD zone"
 msgstr ""
 
 #: assets/const/protocol.py:121
@@ -2836,7 +2836,7 @@ msgstr ""
 
 #: assets/serializers/asset/ds.py:18
 msgid ""
-"The domain part used by the directory service (e.g., AD) and appended to the "
+"The zone part used by the directory service (e.g., AD) and appended to the "
 "username during login, such as example.com in user@example.com."
 msgstr ""
 
@@ -6740,7 +6740,7 @@ msgid "Use nonce"
 msgstr ""
 
 #: settings/serializers/auth/passkey.py:12
-msgid "Only SSL domain can use passkey auth"
+msgid "Only SSL zone can use passkey auth"
 msgstr ""
 
 #: settings/serializers/auth/passkey.py:15
@@ -10748,7 +10748,7 @@ msgid "eg: http://openstack.example.com:5000/v3"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:113
-msgid "User domain"
+msgid "User zone"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:128

@@ -25,12 +25,12 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    domain = ObjectRelatedField(required=False, queryset=Node.objects, label=_('Domain'))
+    zone = ObjectRelatedField(required=False, read_only=True, label=_('Zone'))
 
     class Meta:
         model = Asset
         only_fields = [
-            'id', 'name', 'address', 'domain', 'platform',
+            'id', 'name', 'address', 'zone', 'platform',
             'comment', 'org_id', 'is_active', 'date_verified',
             'created_by', 'date_created', 'connectivity', 'nodes', 'labels'
         ]
@@ -40,7 +40,7 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'nodes') \
+        queryset = queryset.prefetch_related('zone', 'nodes') \
             .prefetch_related('platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))

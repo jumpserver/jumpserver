@@ -1289,9 +1289,9 @@ msgstr "キーパスワード"
 #: accounts/serializers/account/base.py:89
 msgid ""
 "* If no username is required for authentication, enter null.  For AD "
-"accounts, use the format username@domain."
+"accounts, use the format username@zone."
 msgstr ""
-"ヒント: 認証にユーザー名が必要ない場合は、`null`を入力します。ADアカウントの場合は、`username@domain`のようになります。"
+"ヒント: 認証にユーザー名が必要ない場合は、`null`を入力します。ADアカウントの場合は、`username@zone`のようになります。"
 
 #: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22
@@ -2277,7 +2277,7 @@ msgstr ""
 "Windowsサーバーや標準のWindowsログイン画面が必要な場合に使用されます<br>TLS<br>TLSによって実装されたRDP認証と暗号化<br>NLA<br>このモードはTLS暗号化を使用し、事前にユーザー名とパスワードを提供する必要があります<br>"
 
 #: assets/const/protocol.py:106
-msgid "AD domain"
+msgid "AD zone"
 msgstr "AD ドメイン"
 
 #: assets/const/protocol.py:121
@@ -2873,7 +2873,7 @@ msgstr ""
 
 #: assets/serializers/asset/ds.py:18
 msgid ""
-"The domain part used by the directory service (e.g., AD) and appended to the"
+"The zone part used by the directory service (e.g., AD) and appended to the"
 " username during login, such as example.com in user@example.com."
 msgstr ""
 "ドメイン名（Domain Name）は、ディレクトリサービス（例えばAD）にログインする際に、ユーザー名の後に付加されるドメインの部分であり、例えば user@example.com の場合、example.com にあたります。  \n"
@@ -6814,7 +6814,7 @@ msgid "Use nonce"
 msgstr "Nonceを使用"
 
 #: settings/serializers/auth/passkey.py:12
-msgid "Only SSL domain can use passkey auth"
+msgid "Only SSL zone can use passkey auth"
 msgstr "SSLドメインのみがパスキー認証を使用できます"
 
 #: settings/serializers/auth/passkey.py:15
@@ -10879,7 +10879,7 @@ msgid "eg: http://openstack.example.com:5000/v3"
 msgstr "例えば: http://openstack.example.com:5000/v3"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:113
-msgid "User domain"
+msgid "User zone"
 msgstr "ユーザードメイン"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:128
