@@ -20,7 +20,7 @@ class CustomTypes(BaseType):
         return {
             '*': {
                 'charset_enabled': False,
-                'domain_enabled': False,
+                'gateway_enabled': False,
                 'su_enabled': False,
             },
         }

@@ -12,10 +12,10 @@ from .gateway import Gateway
 
 logger = get_logger(__file__)
 
-__all__ = ['Domain']
+__all__ = ['Zone']
 
 
-class Domain(LabeledMixin, JMSOrgBaseModel):
+class Zone(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
 
     class Meta:
@@ -49,7 +49,7 @@ class Domain(LabeledMixin, JMSOrgBaseModel):
 
     @property
     def gateways(self):
-        queryset = self.get_gateway_queryset().filter(domain=self)
+        queryset = self.get_gateway_queryset().filter(zone=self)
         return queryset
 
     @classmethod

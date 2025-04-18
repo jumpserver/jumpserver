@@ -52,6 +52,6 @@ class Migration(migrations.Migration):
                 related_name="assets",
                 to="assets.directoryservice",
                 verbose_name="Directory services",
-            ),
+            )
         ),
     ]

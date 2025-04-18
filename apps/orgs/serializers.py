@@ -12,7 +12,7 @@ class ResourceStatisticsSerializer(serializers.Serializer):
 
     assets_amount = serializers.IntegerField(required=False, label=_('Assets amount'))
     nodes_amount = serializers.IntegerField(required=False, label=_('Nodes amount'))
-    domains_amount = serializers.IntegerField(required=False, label=_('Domains amount'))
+    zones_amount = serializers.IntegerField(required=False, label=_('Domains amount'))
     gateways_amount = serializers.IntegerField(required=False, label=_('Gateways amount'))
 
     asset_perms_amount = serializers.IntegerField(required=False, label=_('Asset permissions amount'))

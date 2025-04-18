@@ -154,7 +154,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     class Meta:
         model = Asset
-        fields_fk = ['domain', 'platform']
+        fields_fk = ['zone', 'platform']
         fields_mini = ['id', 'name', 'address'] + fields_fk
         fields_small = fields_mini + ['is_active', 'comment']
         fields_m2m = [
@@ -233,7 +233,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', 'directory_services') \
+        queryset = queryset.prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type")) \
@@ -271,9 +271,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             raise serializers.ValidationError({'platform': _("Platform not exist")})
         return platform
 
-    def validate_domain(self, value):
+    def validate_zone(self, value):
         platform = self._asset_platform
-        if platform.domain_enabled:
+        if platform.gateway_enabled:
             return value
         else:
             return None

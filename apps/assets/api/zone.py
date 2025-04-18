@@ -9,24 +9,24 @@ from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from .asset import HostViewSet
 from .. import serializers
-from ..models import Domain, Gateway
+from ..models import Zone, Gateway
 
 logger = get_logger(__file__)
-__all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
+__all__ = ['ZoneViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 
-class DomainViewSet(OrgBulkModelViewSet):
-    model = Domain
+class ZoneViewSet(OrgBulkModelViewSet):
+    model = Zone
     filterset_fields = ("name",)
     search_fields = filterset_fields
     serializer_classes = {
-        'default': serializers.DomainSerializer,
-        'list': serializers.DomainListSerializer,
+        'default': serializers.ZoneSerializer,
+        'list': serializers.ZoneListSerializer,
     }
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):
-            return serializers.DomainWithGatewaySerializer
+            return serializers.ZoneWithGatewaySerializer
         return super().get_serializer_class()
 
     def partial_update(self, request, *args, **kwargs):
@@ -36,8 +36,8 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 class GatewayViewSet(HostViewSet):
     perm_model = Gateway
-    filterset_fields = ("domain__name", "name", "domain")
-    search_fields = ("domain__name",)
+    filterset_fields = ("zone__name", "name", "zone")
+    search_fields = ("zone__name",)
 
     def get_serializer_classes(self):
         serializer_classes = super().get_serializer_classes()
@@ -45,7 +45,7 @@ class GatewayViewSet(HostViewSet):
         return serializer_classes
 
     def get_queryset(self):
-        queryset = Domain.get_gateway_queryset()
+        queryset = Zone.get_gateway_queryset()
         return queryset
 
 
@@ -55,7 +55,7 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     }
 
     def get_queryset(self):
-        queryset = Domain.get_gateway_queryset()
+        queryset = Zone.get_gateway_queryset()
         return queryset
 
     def post(self, request, *args, **kwargs):

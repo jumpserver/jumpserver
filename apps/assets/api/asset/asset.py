@@ -37,12 +37,12 @@ class AssetFilterSet(BaseFilterSet):
     platform = drf_filters.CharFilter(method='filter_platform')
     is_gateway = drf_filters.BooleanFilter(method='filter_is_gateway')
     exclude_platform = drf_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
-    domain = drf_filters.CharFilter(method='filter_domain')
+    zone = drf_filters.CharFilter(method='filter_zone')
     type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = drf_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
     protocols = drf_filters.CharFilter(method='filter_protocols')
-    domain_enabled = drf_filters.BooleanFilter(
-        field_name="platform__domain_enabled", lookup_expr="exact"
+    gateway_enabled = drf_filters.BooleanFilter(
+        field_name="platform__gateway_enabled", lookup_expr="exact"
     )
     ping_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__ping_enabled", lookup_expr="exact"
@@ -85,11 +85,11 @@ class AssetFilterSet(BaseFilterSet):
         return queryset
 
     @staticmethod
-    def filter_domain(queryset, name, value):
+    def filter_zone(queryset, name, value):
         if is_uuid(value):
-            return queryset.filter(domain_id=value)
+            return queryset.filter(zone_id=value)
         else:
-            return queryset.filter(domain__name__contains=value)
+            return queryset.filter(zone__name__contains=value)
 
     @staticmethod
     def filter_protocols(queryset, name, value):
@@ -171,10 +171,10 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
     @action(methods=["GET"], detail=True, url_path="gateways")
     def gateways(self, *args, **kwargs):
         asset = self.get_object()
-        if not asset.domain:
+        if not asset.zone:
             gateways = Gateway.objects.none()
         else:
-            gateways = asset.domain.gateways
+            gateways = asset.zone.gateways
         return self.get_paginated_response_from_queryset(gateways)
 
     @action(methods=['post'], detail=False, url_path='sync-platform-protocols')
