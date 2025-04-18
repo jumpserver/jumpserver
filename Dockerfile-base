@@ -56,4 +56,4 @@ RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && uv venv \
     && uv pip install -i${PIP_MIRROR} -r pyproject.toml \
-    && mv .venv /opt/py3
+    && ln -sf $(pwd)/.venv /opt/py3
