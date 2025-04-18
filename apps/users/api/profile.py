@@ -17,7 +17,8 @@ from ..models import User
 
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
-    'UserProfileApi', 'UserPasswordApi'
+    'UserProfileApi', 'UserPasswordApi',
+    'UserPermissionsApi'
 ]
 
 
@@ -77,3 +78,11 @@ class UserPasswordApi(generics.RetrieveUpdateAPIView):
         resp = super().update(request, *args, **kwargs)
         ResetPasswordSuccessMsg(self.request.user, request).publish_async()
         return resp
+
+
+class UserPermissionsApi(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserPermsSerializer
+
+    def get_object(self):
+        return self.request.user
