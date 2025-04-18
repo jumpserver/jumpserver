@@ -330,7 +330,7 @@ class RoleMixin:
     def is_staff(self, value):
         pass
 
-    service_account_email_suffix = "@local.zone"
+    service_account_email_suffix = "@local.domain"
 
     @classmethod
     def create_service_account(cls, name, email, comment):

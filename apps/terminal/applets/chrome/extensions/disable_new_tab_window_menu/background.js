@@ -49,7 +49,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     const firstDomain = firstTabHost.split('.').slice(-2).join('.')
     const curDomain = curHost.split('.').slice(-2).join('.')
     if (firstDomain !== curDomain) {
-        debug('Not same zone, destroy: ', firstTabHost, ' current: ', curHost)
+        debug('Not same domain, destroy: ', firstTabHost, ' current: ', curHost)
         chrome.tabs.remove(tabId);
     }
 })

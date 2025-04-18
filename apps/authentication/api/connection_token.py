@@ -121,7 +121,7 @@ class RDPFileClientProtocolURLMixin:
 
         # 设置用户名
         rdp_options['username:s'] = '{}|{}'.format(token.user.username, str(token.id))
-        # rdp_options['zone:s'] = token.account_ad_domain
+        # rdp_options['domain:s'] = token.account_ad_domain
 
         # 设置宽高
 

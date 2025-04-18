@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterUniqueTogether(
-            name='zone',
+            name='domain',
             unique_together={('org_id', 'name')},
         ),
         migrations.AddField(
@@ -44,9 +44,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='asset',
-            name='zone',
+            name='domain',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
-                                    related_name='assets', to='assets.zone', verbose_name='Zone'),
+                                    related_name='assets', to='assets.domain', verbose_name='Zone'),
         ),
         migrations.AddField(
             model_name='asset',

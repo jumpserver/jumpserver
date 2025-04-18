@@ -103,7 +103,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'type': 'str',
                         'required': False,
                         'default': '',
-                        'label': _('AD zone')
+                        'label': _('AD domain')
                     }
                 }
             },

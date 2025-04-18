@@ -146,7 +146,7 @@ class QuerySetMixin:
         因为 setup_eager_loading 需要是 queryset 结构, 所以必须要重新构造
         """
         id_org_mapper = {str(obj.id): getattr(obj, 'org_id', None) for obj in page}
-        ids = [str(i) for i in id_org_mapper.keys()]
+        ids = list(id_org_mapper.keys())
         org_ids = list(set(id_org_mapper.values()) - {None})
 
         if not org_ids:

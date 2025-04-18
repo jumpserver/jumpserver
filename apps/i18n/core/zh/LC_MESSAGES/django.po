@@ -1273,7 +1273,7 @@ msgstr "密钥密码"
 #: accounts/serializers/account/base.py:89
 msgid ""
 "* If no username is required for authentication, enter null.  For AD "
-"accounts, use the format username@zone."
+"accounts, use the format username@domain."
 msgstr ""
 "提示: 如果认证时不需要用户名，可填写为 null, 如果是 AD 账号，格式为 "
 "username@zone"
@@ -2285,7 +2285,7 @@ msgstr ""
 "模式使用 TLS 加密，并要求提前提供用户名和密码"
 
 #: assets/const/protocol.py:106
-msgid "AD zone"
+msgid "AD domain"
 msgstr "AD 网域"
 
 #: assets/const/protocol.py:121
@@ -2889,7 +2889,7 @@ msgstr ""
 
 #: assets/serializers/asset/ds.py:18
 msgid ""
-"The zone part used by the directory service (e.g., AD) and appended to the "
+"The domain part used by the directory service (e.g., AD) and appended to the "
 "username during login, such as example.com in user@example.com."
 msgstr ""
 "域名（Domain Name） 用于目录服务（如 AD）登录时附加在用户名后的域名部分，例"
@@ -6862,7 +6862,7 @@ msgid "Use nonce"
 msgstr "临时使用"
 
 #: settings/serializers/auth/passkey.py:12
-msgid "Only SSL zone can use passkey auth"
+msgid "Only SSL domain can use passkey auth"
 msgstr "只有 SSL 域名可以使用 Passkey(通行密钥)认证"
 
 #: settings/serializers/auth/passkey.py:15
@@ -10971,7 +10971,7 @@ msgid "eg: http://openstack.example.com:5000/v3"
 msgstr "如: http://openstack.example.com:5000/v3"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:113
-msgid "User zone"
+msgid "User domain"
 msgstr "用户域"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:128
