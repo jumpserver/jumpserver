@@ -185,6 +185,7 @@ xpack = [
     'huaweicloudsdkecs==3.1.52',
     'huaweicloudsdkcore==3.1.52',
     'volcengine-python-sdk==1.0.71',
+    'aliyun-python-sdk-rds==2.7.49'
 ]
 
 [tool.uv.sources]
