@@ -1291,7 +1291,7 @@ msgid ""
 "* If no username is required for authentication, enter null.  For AD "
 "accounts, use the format username@domain."
 msgstr ""
-"ヒント: 認証にユーザー名が必要ない場合は、`null`を入力します。ADアカウントの場合は、`username@zone`のようになります。"
+"ヒント: 認証にユーザー名が必要ない場合は、`null`を入力します。ADアカウントの場合は、`username@domain`のようになります。"
 
 #: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22

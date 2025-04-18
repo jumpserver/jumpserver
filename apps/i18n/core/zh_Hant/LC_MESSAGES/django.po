@@ -1276,7 +1276,7 @@ msgstr "密鑰密碼"
 msgid ""
 "* If no username is required for authentication, enter null.  For AD "
 "accounts, use the format username@domain."
-msgstr "提示：如果認證時不需要使用者名稱，可填寫為 null，如果是 AD 帳號，格式為 username@zone"
+msgstr "提示：如果認證時不需要使用者名稱，可填寫為 null，如果是 AD 帳號，格式為 username@domain"
 
 #: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22

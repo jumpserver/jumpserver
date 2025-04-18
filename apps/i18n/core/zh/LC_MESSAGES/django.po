@@ -1276,7 +1276,7 @@ msgid ""
 "accounts, use the format username@domain."
 msgstr ""
 "提示: 如果认证时不需要用户名，可填写为 null, 如果是 AD 账号，格式为 "
-"username@zone"
+"username@domain"
 
 #: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22

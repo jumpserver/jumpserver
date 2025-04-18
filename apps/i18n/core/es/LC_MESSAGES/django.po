@@ -1321,7 +1321,7 @@ msgid ""
 "accounts, use the format username@domain."
 msgstr ""
 "Sugerencia: Si no se requiere nombre de usuario para la autenticación, puede"
-" dejarse como null; si es una cuenta AD, el formato es username@zone"
+" dejarse como null; si es una cuenta AD, el formato es username@domain"
 
 #: accounts/serializers/account/service.py:14
 #: authentication/serializers/token.py:22
