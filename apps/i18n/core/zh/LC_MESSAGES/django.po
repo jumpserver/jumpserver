@@ -2780,11 +2780,11 @@ msgstr "编码"
 
 #: assets/models/platform.py:104 assets/serializers/platform.py:209
 msgid "Gateway enabled"
-msgstr "启用网域"
+msgstr "启用网域网关"
 
 #: assets/models/platform.py:105
 msgid "DS enabled"
-msgstr "目录服务已启用"
+msgstr "启用目录服务"
 
 #: assets/models/platform.py:107 assets/serializers/platform.py:202
 msgid "Su enabled"

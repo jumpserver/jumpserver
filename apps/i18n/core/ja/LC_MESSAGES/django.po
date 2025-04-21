@@ -2769,7 +2769,7 @@ msgstr "シャーセット"
 
 #: assets/models/platform.py:104 assets/serializers/platform.py:209
 msgid "Gateway enabled"
-msgstr "ゲートウェイが有効になりました"
+msgstr "ゾーンゲートウェイを有効化"
 
 #: assets/models/platform.py:105
 msgid "DS enabled"

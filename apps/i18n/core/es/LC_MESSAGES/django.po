@@ -2882,7 +2882,7 @@ msgstr "Código"
 
 #: assets/models/platform.py:104 assets/serializers/platform.py:209
 msgid "Gateway enabled"
-msgstr "Activar dominio"
+msgstr "Activar gateway de zona"
 
 #: assets/models/platform.py:105
 msgid "DS enabled"

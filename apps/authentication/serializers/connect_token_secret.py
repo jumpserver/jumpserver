@@ -4,7 +4,7 @@ from rest_framework import serializers
 from accounts.const import SecretType
 from accounts.models import Account
 from acls.models import CommandGroup, CommandFilterACL
-from assets.models import Asset, Platform, Gateway, Domain
+from assets.models import Asset, Platform, Gateway, Zone
 from assets.serializers.asset import AssetProtocolsSerializer
 from assets.serializers.platform import PlatformSerializer
 from common.serializers.fields import LabeledChoiceField
@@ -135,7 +135,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     account = _ConnectionTokenAccountSerializer(read_only=True, source='account_object')
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
-    domain = ObjectRelatedField(queryset=Domain.objects, required=False, label=_('Domain'))
+    zone = ObjectRelatedField(queryset=Zone.objects, required=False, label=_('Domain'))
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
@@ -148,7 +148,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
         fields = [
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'protocol',
-            'domain', 'gateway', 'actions', 'expire_at',
+            'zone', 'gateway', 'actions', 'expire_at',
             'from_ticket', 'expire_now', 'connect_method',
             'connect_options', 'face_monitor_token'
         ]

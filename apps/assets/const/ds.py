@@ -16,7 +16,7 @@ class DirectoryTypes(BaseType):
         return {
             '*': {
                 'charset_enabled': True,
-                'domain_enabled': True,
+                'gateway_enabled': True,
                 'ds_enabled': False,
                 'su_enabled': True,
             },

@@ -2751,7 +2751,7 @@ msgstr "編碼"
 
 #: assets/models/platform.py:104 assets/serializers/platform.py:209
 msgid "Gateway enabled"
-msgstr "啟用網域"
+msgstr "啟用網域網関"
 
 #: assets/models/platform.py:105
 msgid "DS enabled"

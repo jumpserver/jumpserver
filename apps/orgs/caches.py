@@ -1,16 +1,16 @@
 from django.db.transaction import on_commit
 
-from orgs.models import Organization
-from orgs.tasks import refresh_org_cache_task
-from orgs.utils import current_org, tmp_to_org
+from accounts.models import Account
+from assets.models import Node, Zone, Asset
 from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_monday
-from users.models import UserGroup, User
-from assets.models import Node, Domain, Asset
-from accounts.models import Account
-from terminal.models import Session
+from orgs.models import Organization
+from orgs.tasks import refresh_org_cache_task
+from orgs.utils import current_org, tmp_to_org
 from perms.models import AssetPermission
+from terminal.models import Session
+from users.models import UserGroup, User
 
 logger = get_logger(__file__)
 
@@ -57,7 +57,7 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     new_users_amount_this_week = IntegerField()
     new_assets_amount_this_week = IntegerField()
     nodes_amount = IntegerField(queryset=Node.objects)
-    domains_amount = IntegerField(queryset=Domain.objects)
+    zones_amount = IntegerField(queryset=Zone.objects)
     groups_amount = IntegerField(queryset=UserGroup.objects)
     accounts_amount = IntegerField(queryset=Account.objects)
     asset_perms_amount = IntegerField(queryset=AssetPermission.objects)
