@@ -56,19 +56,22 @@ class FTPLog(OrgModelMixin):
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )
-    asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
-    account = models.CharField(max_length=128, verbose_name=_("Account"))
+    asset = models.CharField(max_length=1024, verbose_name=_("Asset"), db_index=True)
+    account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
     operate = models.CharField(
         max_length=16, verbose_name=_("Operate"), choices=OperateChoices.choices
     )
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
-    date_start = models.DateTimeField(auto_now_add=True, verbose_name=_("Date start"), db_index=True)
+    date_start = models.DateTimeField(auto_now_add=True, verbose_name=_("Date start"))
     has_file = models.BooleanField(default=False, verbose_name=_("Can Download"))
     session = models.CharField(max_length=36, verbose_name=_("Session"), default=uuid.uuid4)
 
     class Meta:
         verbose_name = _("File transfer log")
+        indexes = [
+            models.Index(fields=['date_start', 'org_id'], name='idx_date_start_org'),
+        ]
 
     @property
     def filepath(self):
