@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RenameField(
             model_name="asset",
-            old_name="zone",
+            old_name="domain",
             new_name="zone",
         ),
     ]
