@@ -192,15 +192,16 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
         return Response({'msg': 'ok', 'id': activity_log.id})
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .prefetch_related('terminal') \
-            .annotate(terminal_display=F('terminal__name'))
-        return queryset
+        queryset = super().get_queryset()
 
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        # 解决guacamole更新session时并发导致幽灵会话的问题，暂不处理
-        if self.request.method in ('PATCH',):
+        if self.request.method in ('GET',):
+            queryset = (
+                queryset.prefetch_related('terminal')
+                .annotate(terminal_display=F('terminal__name'))
+            )
+        elif self.request.method in ('PATCH',):
+            # postgres reports an error for statements that use select_for_update for out join
+            # so we need to use select_for_update only for have not prefetch_related and annotate
             queryset = queryset.select_for_update()
         return queryset
 
