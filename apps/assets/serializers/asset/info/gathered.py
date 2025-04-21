@@ -6,7 +6,7 @@ class HostGatheredInfoSerializer(serializers.Serializer):
     vendor = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('Vendor'))
     model = serializers.CharField(max_length=54, required=False, allow_blank=True, label=_('Model'))
     sn = serializers.CharField(max_length=128, required=False, allow_blank=True, label=_('Serial number'))
-    cpu_model = serializers.CharField(max_length=64, allow_blank=True, required=False, label=_('CPU model'))
+    cpu_model = serializers.CharField(allow_blank=True, required=False, label=_('CPU model'))
     cpu_count = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('CPU count'))
     cpu_cores = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('CPU cores'))
     cpu_vcpus = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('CPU vcpus'))
@@ -16,6 +16,8 @@ class HostGatheredInfoSerializer(serializers.Serializer):
     distribution = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('OS'))
     distribution_version = serializers.CharField(max_length=16, allow_blank=True, required=False, label=_('OS version'))
     arch = serializers.CharField(max_length=16, allow_blank=True, required=False, label=_('OS arch'))
+
+    gpu_model = serializers.CharField(allow_blank=True, required=False, label=_('GPU model'))
 
 
 category_gathered_serializer_map = {

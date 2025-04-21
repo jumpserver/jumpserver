@@ -23,5 +23,16 @@
           arch: "{{ ansible_architecture }}"
           kernel: "{{ ansible_kernel }}"
 
+
+    - name: Get GPU info with nvidia-smi
+      shell: |
+        nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader,nounits
+      register: gpu_info
+      ignore_errors: yes
+
+    - name: Merge GPU info into final info
+      set_fact:
+        info: "{{ info | combine({'gpu_model': gpu_info.stdout_lines | default([])}) }}"
+
     - debug:
         var: info
