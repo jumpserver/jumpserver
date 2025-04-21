@@ -74,3 +74,6 @@ class Command(AbstractSessionCommand):
         db_table = "terminal_command"
         ordering = ('-timestamp',)
         verbose_name = _('Command record')
+        indexes = [
+            models.Index(fields=['timestamp', 'org_id'], name='idx_timestamp_org'),
+        ]
