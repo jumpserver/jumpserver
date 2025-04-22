@@ -32,6 +32,9 @@ LOGGING = {
         'syslog': {
             'format': 'jumpserver: %(message)s'
         },
+        'syslog_new': {
+            'format': 'jumpserver: %(message)s'
+        },
         'msg': {
             'format': '%(message)s'
         }
@@ -75,6 +78,12 @@ LOGGING = {
             'class': 'logging.NullHandler',
             'formatter': 'syslog'
         },
+        'syslog_new': {
+            'class': 'logging.handlers.SysLogHandler',
+            'facility': 'local2',  # 根据 Syslog 配置文件的配置
+            'address': ('127.0.0.1', 515),
+            'socktype': 2,
+        },
     },
     'loggers': {
         'django': {
@@ -83,12 +92,12 @@ LOGGING = {
             'level': LOG_LEVEL,
         },
         'django.request': {
-            'handlers': ['console', 'file', 'syslog'],
+            'handlers': ['console', 'file', 'syslog', 'syslog_new'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'django.server': {
-            'handlers': ['console', 'file', 'syslog'],
+            'handlers': ['console', 'file', 'syslog', 'syslog_new'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
@@ -109,7 +118,7 @@ LOGGING = {
             'level': "INFO",
         },
         'syslog': {
-            'handlers': ['syslog'],
+            'handlers': ['syslog', 'syslog_new'],
             'level': 'INFO'
         },
         'azure': {
