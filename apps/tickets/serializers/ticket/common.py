@@ -69,10 +69,17 @@ class BaseApplyAssetSerializer(serializers.Serializer):
 
         return attrs
 
+    @staticmethod
+    def _get_permission_name(ticket):
+        name = _('Created by ticket ({}-{})').format(ticket.title, str(ticket.id)[:4])
+        if len(name) > 128:
+            name = name[:121] + '...' + name[-4:]
+        return name
+
     @atomic
     def create(self, validated_data):
         instance = super().create(validated_data)
-        name = _('Created by ticket ({}-{})').format(instance.title, str(instance.id)[:4])
+        name = self._get_permission_name(instance)
         org_id = instance.org_id
         with tmp_to_org(org_id):
             if not self.permission_model.objects.filter(name=name).exists():
