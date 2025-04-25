@@ -156,7 +156,7 @@
     "AssetLoginACLHelpMsg": "When logging into assets, it can be audited based on the user's login ip and time segment to determine whether the assets can be logged into",
     "AssetLoginACLHelpText": "When logging into assets, it can be audited based on the user's login ip and time segment to determine whether the assets can be logged into",
     "AssetName": "Asset name",
-    "AssetPermission": "Authorization",
+    "AssetPermission": "Authorizations",
     "AssetPermissionCreate": "Create asset authorization rule",
     "AssetPermissionDetail": "Asset authorization details",
     "AssetPermissionHelpMsg": "Asset authorization allows you to select users and assets, grant the assets to users for access. once completed, users can conveniently view these assets. additionally, you can set specific permissions to further define the users' rights to the assets.",
