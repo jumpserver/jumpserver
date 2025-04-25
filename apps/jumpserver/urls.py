@@ -12,7 +12,7 @@ from django.views.i18n import JavaScriptCatalog
 
 from . import views, api
 
-api_v1 = [
+resource_api = [
     path('index/', api.IndexApi.as_view()),
     path('users/', include('users.urls.api_urls', namespace='api-users')),
     path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
@@ -30,7 +30,13 @@ api_v1 = [
     path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),
     path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
     path('labels/', include('labels.urls', namespace='api-label')),
+]
+
+api_v1 = resource_api + [
     path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
+    path('resources/', api.ResourceTypeListApi.as_view(), name='resource-list'),
+    path('resources/<str:resource>/', api.ResourceListApi.as_view()),
+    path('resources/<str:resource>/<str:pk>/', api.ResourceDetailApi.as_view()),
 ]
 
 app_view_patterns = [

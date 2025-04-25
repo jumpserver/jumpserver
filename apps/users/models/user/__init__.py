@@ -55,6 +55,11 @@ class User(
     JSONFilterMixin,
     AbstractUser,
 ):
+    """
+    User model, used for authentication and authorization. User can join multiple groups.
+    User can have multiple roles, and each role can have multiple permissions.
+    User can connect to multiple assets, If he has the permission. Permission was defined in Asset Permission.
+    """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))

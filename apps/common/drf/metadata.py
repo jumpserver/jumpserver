@@ -34,9 +34,13 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         """
         actions = {}
         view.raw_action = getattr(view, "action", None)
+        query_action = request.query_params.get("action", None)
         for method in self.methods & set(view.allowed_methods):
             if hasattr(view, "action_map"):
                 view.action = view.action_map.get(method.lower(), view.action)
+
+            if query_action and query_action.lower() != method.lower():
+                continue
 
             view.request = clone_request(request, method)
             try:
