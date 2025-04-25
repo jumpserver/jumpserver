@@ -8,13 +8,14 @@ from .const import RED, GREEN, RESET
 
 class BaseTranslateManager:
     bulk_size = 15
-    SEPARATOR = "<SEP>"
+    SEPARATOR = "<-SEP->"
     LANG_MAPPER = {
         'ja': 'Japanese',
         'zh_Hant': 'Traditional Chinese',
         'pt_BR': 'Portuguese (Brazil)',
         'es': 'Spanish',
         'ru': 'Russian',
+        'ko': 'Korean',
     }
 
     def __init__(self, dir_path, oai_trans_instance):
