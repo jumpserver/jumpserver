@@ -62,8 +62,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     )
     def get_once_secret(self, request, *args, **kwargs):
         instance = self.get_object()
-        secret = instance.get_secret()
-        return Response(data={'id': instance.id, 'secret': secret})
+        return Response(data={'id': instance.id, 'secret': instance.secret})
 
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])
