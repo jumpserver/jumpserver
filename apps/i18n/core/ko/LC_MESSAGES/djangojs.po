@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -15,90 +16,90 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: static/js/jumpserver.js:267
 msgid "Update is successful!"
-msgstr "更新成功"
+msgstr "업데이트 성공"
 
 #: static/js/jumpserver.js:269
 msgid "An unknown error occurred while updating.."
-msgstr "更新时发生未知错误"
+msgstr "업데이트 중 알 수 없는 오류가 발생했습니다."
 
 #: static/js/jumpserver.js:342
 msgid "Not found"
-msgstr "未找到"
+msgstr "찾을 수 없음"
 
 #: static/js/jumpserver.js:344
 msgid "Server error"
-msgstr "服务器错误"
+msgstr "서버 오류"
 
 #: static/js/jumpserver.js:346 static/js/jumpserver.js:384
 #: static/js/jumpserver.js:386
 msgid "Error"
-msgstr "错误"
+msgstr "오류"
 
 #: static/js/jumpserver.js:352 static/js/jumpserver.js:393
 msgid "Delete the success"
-msgstr "删除成功"
+msgstr "성공적으로 삭제되었습니다"
 
 #: static/js/jumpserver.js:359
 msgid "Are you sure about deleting it?"
-msgstr "你确定删除吗 ?"
+msgstr "정말 삭제하시겠습니까?"
 
 #: static/js/jumpserver.js:363 static/js/jumpserver.js:404
 msgid "Cancel"
-msgstr "取消"
+msgstr "취소"
 
 #: static/js/jumpserver.js:365 static/js/jumpserver.js:406
 msgid "Confirm"
-msgstr "确认"
+msgstr "확인"
 
 #: static/js/jumpserver.js:384
 msgid ""
 "The organization contains undeleted information. Please try again after "
 "deleting"
-msgstr "组织中包含未删除信息，请删除后重试"
+msgstr "조직에 삭제되지 않은 정보가 포함되어 있습니다. 삭제하고 다시 시도하세요."
 
 #: static/js/jumpserver.js:386
 msgid ""
 "Do not perform this operation under this organization. Try again after "
 "switching to another organization"
-msgstr "请勿在此组织下执行此操作，切换到其他组织后重试"
+msgstr "이 조직에서는 이 작업을 수행하지 마십시오. 다른 조직으로 전환한 후 다시 시도하십시오."
 
 #: static/js/jumpserver.js:400
 msgid ""
 "Please ensure that the following information in the organization has been "
 "deleted"
-msgstr "请确保组织内的以下信息已删除"
+msgstr "조직에서 다음 정보가 삭제되었는지 확인하세요"
 
 #: static/js/jumpserver.js:401
 msgid ""
 "User list、User group、Asset list、Domain list、Admin user、System user、"
 "Labels、Asset permission"
-msgstr ""
-"用户列表、用户组、资产列表、网域列表、特权用户、系统用户、标签管理、资产授权"
-"规则"
+msgstr "사용자 목록, 사용자 그룹, 자산 목록, 도메인 목록, 권한이 있는 사용자, 시스템 사용자, 태그 관리, 자산 권한 부여"
+"규칙"
 
 #: static/js/jumpserver.js:650
 msgid "Unknown error occur"
-msgstr "出现未知错误"
+msgstr "알 수 없는 오류가 발생했습니다"
 
 #: static/js/jumpserver.js:902
 msgid "Password minimum length {N} bits"
-msgstr "密码最小长度 {N} 位"
+msgstr "최소 비밀번호 길이는 {N}자입니다"
 
 #: static/js/jumpserver.js:903
 msgid "Must contain capital letters"
-msgstr "必须包含大写字母"
+msgstr "대문자를 포함해야 합니다"
 
 #: static/js/jumpserver.js:904
 msgid "Must contain lowercase letters"
-msgstr "必须包含小写字母"
+msgstr "소문자를 포함해야 합니다"
 
 #: static/js/jumpserver.js:905
 msgid "Must contain numeric characters"
-msgstr "必须包含数字字符"
+msgstr "숫자를 포함해야 합니다"
 
 #: static/js/jumpserver.js:906
 msgid "Must contain special characters"
-msgstr "必须包含特殊字符"
+msgstr "특수문자를 포함해야 합니다"

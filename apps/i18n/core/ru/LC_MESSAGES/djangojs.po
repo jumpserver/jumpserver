@@ -21,85 +21,85 @@ msgstr ""
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 #: static/js/jumpserver.js:267
 msgid "Update is successful!"
-msgstr ""
+msgstr "Обновление успешно выполнено"
 
 #: static/js/jumpserver.js:269
 msgid "An unknown error occurred while updating.."
-msgstr ""
+msgstr "Произошла неизвестная ошибка при обновлении"
 
 #: static/js/jumpserver.js:342
 msgid "Not found"
-msgstr ""
+msgstr "Не найдено"
 
 #: static/js/jumpserver.js:344
 msgid "Server error"
-msgstr ""
+msgstr "Ошибка сервера"
 
 #: static/js/jumpserver.js:346 static/js/jumpserver.js:384
 #: static/js/jumpserver.js:386
 msgid "Error"
-msgstr ""
+msgstr "Ошибка"
 
 #: static/js/jumpserver.js:352 static/js/jumpserver.js:393
 msgid "Delete the success"
-msgstr ""
+msgstr "Удален успешно"
 
 #: static/js/jumpserver.js:359
 msgid "Are you sure about deleting it?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить?"
 
 #: static/js/jumpserver.js:363 static/js/jumpserver.js:404
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: static/js/jumpserver.js:365 static/js/jumpserver.js:406
 msgid "Confirm"
-msgstr ""
+msgstr "Подтвердить"
 
 #: static/js/jumpserver.js:384
 msgid ""
 "The organization contains undeleted information. Please try again after "
 "deleting"
-msgstr ""
+msgstr "Организация содержит неудалённую информацию, пожалуйста, удалите её и повторите попытку"
 
 #: static/js/jumpserver.js:386
 msgid ""
 "Do not perform this operation under this organization. Try again after "
 "switching to another organization"
-msgstr ""
+msgstr "Не выполняйте эту операцию в этой организации, переключитесь на другую организацию и попробуйте снова"
 
 #: static/js/jumpserver.js:400
 msgid ""
 "Please ensure that the following information in the organization has been "
 "deleted"
-msgstr ""
+msgstr "Пожалуйста, убедитесь, что следующая информация в вашей организации удалена"
 
 #: static/js/jumpserver.js:401
 msgid ""
 "User list、User group、Asset list、Domain list、Admin user、System user、"
 "Labels、Asset permission"
-msgstr ""
+msgstr "Список пользователей, группа пользователей, список активов, список доменов, привилегированный пользователь, системный пользователь, управление тегами, авторизация активов правило"
 
 #: static/js/jumpserver.js:650
 msgid "Unknown error occur"
-msgstr ""
+msgstr "Произошла неизвестная ошибка"
 
 #: static/js/jumpserver.js:902
 msgid "Password minimum length {N} bits"
-msgstr ""
+msgstr "Минимальная длина пароля — {N} символов"
 
 #: static/js/jumpserver.js:903
 msgid "Must contain capital letters"
-msgstr ""
+msgstr "Должен содержать заглавные буквы"
 
 #: static/js/jumpserver.js:904
 msgid "Must contain lowercase letters"
-msgstr ""
+msgstr "Должен содержать строчные буквы"
 
 #: static/js/jumpserver.js:905
 msgid "Must contain numeric characters"
-msgstr ""
+msgstr "Должен содержать числовые символы"
 
 #: static/js/jumpserver.js:906
 msgid "Must contain special characters"
-msgstr ""
+msgstr "Должен содержать специальные символы"

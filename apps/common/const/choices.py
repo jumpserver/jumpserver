@@ -3,7 +3,6 @@ import pycountry
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumbers import PhoneMetadata
-from common.utils import lazyproperty
 
 ADMIN = 'Admin'
 USER = 'User'
@@ -77,6 +76,7 @@ class Language(models.TextChoices):
     pt_br = 'pt-br', 'Português (Brasil)'
     es = 'es', 'Español'
     ru = 'ru', 'Русский'
+    ko = 'ko', '한국어'
 
     @classmethod
     def get_code_mapper(cls):
