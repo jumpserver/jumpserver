@@ -10,6 +10,9 @@ __all__ = ['UserGroup']
 
 
 class UserGroup(LabeledMixin, JMSOrgBaseModel):
+    """
+    User group, When a user is added to a group, they inherit its asset permissions for access control consistency.
+    """
     name = models.CharField(max_length=128, verbose_name=_('Name'))
 
     def __str__(self):
