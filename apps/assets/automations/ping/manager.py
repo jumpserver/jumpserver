@@ -37,10 +37,11 @@ class PingManager(BasePlaybookManager):
     def on_host_error(self, host, error, result):
         asset, account = self.host_asset_and_account_mapper.get(host)
         try:
-            asset.set_connectivity(Connectivity.ERR)
+            error_tp = asset.get_err_connectivity(error)
+            asset.set_connectivity(error_tp)
             if not account:
                 return
-            account.set_connectivity(Connectivity.ERR)
+            account.set_connectivity(error_tp)
         except Exception as e:
             print(f'\033[31m Update account {account.name} or '
                   f'update asset {asset.name} connectivity failed: {e} \033[0m\n')
