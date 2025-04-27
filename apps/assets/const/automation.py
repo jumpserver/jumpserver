@@ -11,7 +11,7 @@ class Connectivity(TextChoices):
     SUDO_ERR = 'sudo_err', _('Sudo permission error')
     PASSWORD_ERR = 'password_err', _('Invalid password error')
     OPENSSH_KEY_ERR = 'openssh_key_err', _('OpenSSH key error')
-    NTLM_ERR = 'ntlm__err', _('NTLM credentials rejected error')
+    NTLM_ERR = 'ntlm_err', _('NTLM credentials rejected error')
     CREATE_DIR_ERR = 'create_dir_err', _('Create directory error')
 
 
