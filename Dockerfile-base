@@ -57,4 +57,5 @@ RUN --mount=type=cache,target=/root/.cache \
     && uv venv \
     && uv pip install -i${PIP_MIRROR} -r pyproject.toml \
     && ln -sf $(pwd)/.venv /opt/py3 \
-    && bash static_files.sh
+    && bash static_files.sh \
+    && bash clean_site_packages.sh
