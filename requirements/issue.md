@@ -4,8 +4,7 @@ $ pip install cryptography --global-option=build_ext --global-option="-L/opt/hom
 
 
 # Pillow zlib failed
-
-Reinstall xcode reslove
+# Reinstall xcode reslove
 
 $ xcode-select --install
 
