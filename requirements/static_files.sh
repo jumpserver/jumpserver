@@ -24,7 +24,8 @@ for file in $to_files; do
   if [ ! -d "$to_dir" ]; then
     mkdir -p "$to_dir"
   fi
-  wget "https://github.com/jumpserver/static/releases/download/${VERSION}/$filename" -O "${file_path}"
-  echo "File $file downloaded successfully."
+  url=""https://github.com/jumpserver/static/releases/download/${VERSION}/$filename""
+  echo "Download $filename to $file_path"
+  wget "$url" -O "${file_path}"
 done
 

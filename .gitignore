@@ -46,3 +46,6 @@ test.py
 .test/
 *.mo
 apps.iml
+*.db
+*.mmdb
+*.ipdb
