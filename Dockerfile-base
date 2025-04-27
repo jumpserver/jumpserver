@@ -52,10 +52,10 @@ RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=requirements/clean_site_packages.sh,target=clean_site_packages.sh \
     --mount=type=bind,source=requirements/collections.yml,target=collections.yml \
-    --mount=type=bind,source=requirements/static_files.sh,target=static_files.sh \
+    --mount=type=bind,source=requirements/static_files.sh,target=utils/static_files.sh \
     set -ex \
     && uv venv \
     && uv pip install -i${PIP_MIRROR} -r pyproject.toml \
     && ln -sf $(pwd)/.venv /opt/py3 \
-    && bash static_files.sh \
+    && bash utils/static_files.sh \
     && bash clean_site_packages.sh
