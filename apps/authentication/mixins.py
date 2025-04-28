@@ -205,6 +205,13 @@ class MFAMixin:
     get_user_from_session: Callable
     get_request_ip: Callable
 
+    def is_auto_mfa_backend(self, user):
+        if user.backend.endswith('PasskeyAuthBackend'):
+            # passkey backend 不需要 mfa
+            self.mark_mfa_ok('passkey', user)
+            return True
+        return False
+
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
         if not active_mfa_mapper:
@@ -227,6 +234,9 @@ class MFAMixin:
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
+        if self.is_auto_mfa_backend(user):
+            return
+
         if self.request.session.get('auth_mfa') and \
                 self.request.session.get('auth_mfa_username') == user.username:
             return
