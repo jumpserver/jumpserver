@@ -1538,5 +1538,15 @@
     "disallowSelfUpdateFields": "不允许自己修改当前字段",
     "forceEnableMFAHelpText": "如果强制启用，用户无法自行禁用",
     "removeWarningMsg": "你确定要移除",
-    "setVariable": "设置参数"
+    "setVariable": "设置参数",
+    "Watermark": "水印",
+    "WatermarkVariableHelpText": "您可以在自定义水印内容中使用 ${key} 读取内置变量",
+    "isConsoleCanUse": "管理页面是否可用",
+    "userId": "用户ID",
+    "name": "用户名称",
+    "userName": "用户名",
+    "currentTime": "当前时间",
+    "assetId": "资产 ID",
+    "assetName": "资产名称",
+    "assetAddress": "资产地址"
 }
