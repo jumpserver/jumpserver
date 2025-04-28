@@ -5,7 +5,7 @@
 ## An open-source PAM tool (Bastion Host)
 
 [![][license-shield]][license-link]
-[![][discord-shield]][discord-link]    
+[![][discord-shield]][discord-link]  
 [![][deepwiki-shield]][deepwiki-link]
 [![][docker-shield]][docker-link]
 [![][github-release-shield]][github-release-link]
