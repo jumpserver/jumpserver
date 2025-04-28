@@ -102,7 +102,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 <!-- JumpServer official link -->
 [docs-link]: https://jumpserver.com/docs
 [discord-link]: https://discord.com/invite/W6vYXmAQG2
-[deepwiki-link]: https://deepwiki.com/jumpserver/jumpserver   
+[deepwiki-link]: https://deepwiki.com/jumpserver/jumpserver/
 [contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
 
 <!-- JumpServer Other link-->
