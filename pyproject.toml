@@ -60,7 +60,7 @@ dependencies = [
     'termcolor==2.3.0',
     'html2text==2020.1.16',
     'pyzipper==0.3.6',
-    'python3-saml==1.15.0',
+    'python3-saml==1.16.0',
     'websocket-client==1.6.1',
     'pyjwkest==1.4.2',
     'jsonfield2==4.0.0.post0',
