@@ -6,7 +6,7 @@
 
 [![][license-shield]][license-link]
 [![][discord-shield]][discord-link]    
-[![][deepwiki-shield][deepwiki-link]]
+[![][deepwiki-shield]][deepwiki-link]
 [![][docker-shield]][docker-link]
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
