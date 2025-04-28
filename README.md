@@ -116,6 +116,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
 [github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
-[license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver  
+[license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
 [deepwiki-shield]: https://img.shields.io/badge/deepwiki-devin?color=blue
 [discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb
