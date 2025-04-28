@@ -114,7 +114,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
 
 <!-- Shield link-->
-[docs-shield]: https://img.shields.io/badge/docs-148F76
+[docs-shield]: https://img.shields.io/badge/documentation-148F76
 [github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
 [github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square   
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
