@@ -106,7 +106,7 @@ dependencies = [
     'python-cas==1.6.0',
     'django-auth-ldap==4.4.0',
     'mysqlclient==2.2.4',
-    'pymssql==2.2.8',
+    'pymssql==2.3.4',
     'django-redis==5.3.0',
     'python-redis-lock==4.0.0',
     'pyopenssl==23.2.0',
