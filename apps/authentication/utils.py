@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 import ipaddress
+from datetime import datetime, timedelta
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from audits.const import DEFAULT_CITY
-from users.models import User
 from audits.models import UserLoginLog
+from common.utils import get_ip_city, get_request_ip
 from common.utils import get_logger, get_object_or_none
-from common.utils import validate_ip, get_ip_city, get_request_ip
+from users.models import User
 from .notifications import DifferentCityLoginMessage
 
 logger = get_logger(__file__)
@@ -33,8 +33,13 @@ def check_different_city_login_if_need(user, request):
         return
 
     city = get_ip_city(ip)
-    last_city = get_ip_city(last_user_login.ip)
-    if city == last_city:
+    last_cities = UserLoginLog.objects.filter(
+        datetime__gte=datetime.now() - timedelta(days=7),
+        username__in=usernames,
+        status=True
+    ).exclude(city__in=city_white).values_list('city', flat=True).distinct()
+
+    if city in last_cities:
         return
 
     DifferentCityLoginMessage(user, ip, city).publish_async()
