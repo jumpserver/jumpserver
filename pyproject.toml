@@ -8,7 +8,7 @@ dependencies = [
     'aiofiles==23.1.0',
     'amqp==5.1.1',
     'ansible-core',
-    'ansible==7.1.0',
+    'ansible==8.5.0',
     'ansible-runner',
     'asn1crypto==1.5.1',
     'bcrypt==4.0.1',
