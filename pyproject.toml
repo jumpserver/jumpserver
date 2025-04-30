@@ -29,7 +29,7 @@ dependencies = [
     'passlib==1.7.4',
     'pyasn1==0.6.1',
     'pycparser==2.21',
-    'pycryptodome==3.18.0',
+    'pycryptodome==3.19.1',
     'pycryptodomex==3.18.0',
     'phonenumbers==8.13.17',
     'gmssl==3.2.2',
