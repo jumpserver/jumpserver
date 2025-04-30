@@ -111,7 +111,7 @@ dependencies = [
     'python-redis-lock==4.0.0',
     'pyopenssl==23.2.0',
     'redis',
-    'pymongo==4.4.1',
+    'pymongo==4.6.3',
     'pyfreerdp==0.0.2',
     'forgerypy3==0.3.1',
     'django-debug-toolbar==4.1.0',
