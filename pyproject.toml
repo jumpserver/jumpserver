@@ -30,7 +30,7 @@ dependencies = [
     'pyasn1==0.6.1',
     'pycparser==2.21',
     'pycryptodome==3.18.0',
-    'pycryptodomex==3.18.0',
+    'pycryptodomex==3.19.1',
     'phonenumbers==8.13.17',
     'gmssl==3.2.2',
     'itsdangerous==1.1.0',
