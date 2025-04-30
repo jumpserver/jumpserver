@@ -38,7 +38,7 @@ dependencies = [
     'pynacl==1.5.0',
     'python-dateutil==2.8.2',
     'pyyaml==6.0.1',
-    'requests==2.31.0',
+    'requests==2.32.2',
     'simplejson==3.19.1',
     'six==1.16.0',
     'sshtunnel==0.4.0',
