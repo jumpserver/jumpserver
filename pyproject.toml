@@ -90,7 +90,7 @@ dependencies = [
     'pytz==2023.3',
     'django-proxy==1.2.2',
     'python-daemon==3.0.1',
-    'eventlet==0.33.3',
+    'eventlet==0.35.2',
     'greenlet==3.0.1',
     'gunicorn==23.0.0',
     'celery==5.3.1',
