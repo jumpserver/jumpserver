@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
 
 from accounts.const import AutomationTypes
+from accounts.models import PushSecretRecord
 from accounts.tasks.common import quickstart_automation_by_snapshot
 from common.const.crontab import CRONTAB_AT_AM_THREE
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
@@ -112,11 +113,13 @@ def clean_change_secret_and_push_record_period():
     with tmp_to_root_org():
         now = timezone.now()
         days = get_log_keep_day('ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS')
-        expired_day = now - datetime.timedelta(days=days)
-        records = ChangeSecretRecord.objects.filter(
-            date_updated__lt=expired_day
-        ).filter(
-            Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
-        )
+        expired_time = now - datetime.timedelta(days=days)
 
-        records.delete()
+        null_related_q = Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
+        expired_q = Q(date_updated__lt=expired_time)
+
+        ChangeSecretRecord.objects.filter(null_related_q).delete()
+        ChangeSecretRecord.objects.filter(expired_q).delete()
+
+        PushSecretRecord.objects.filter(null_related_q).delete()
+        PushSecretRecord.objects.filter(expired_q).delete()
