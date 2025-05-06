@@ -705,7 +705,7 @@ class Config(dict):
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
-        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'leak_password.db'),
+        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'leak_passwords.db'),
 
         # Ansible Receptor
         'RECEPTOR_ENABLED': False,

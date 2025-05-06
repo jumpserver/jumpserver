@@ -1548,5 +1548,6 @@
     "currentTime": "当前时间",
     "assetId": "资产 ID",
     "assetName": "资产名称",
-    "assetAddress": "资产地址"
+    "assetAddress": "资产地址",
+    "LeakPasswordList": "弱密码列表"
 }

@@ -7,8 +7,10 @@ __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
     'SecurityAuthSerializer', 'SecuritySettingSerializer',
     'SecurityLoginLimitSerializer', 'SecurityBasicSerializer',
-    'SecurityBlockIPSerializer'
+    'SecurityBlockIPSerializer', 'LeakPasswordPSerializer'
 ]
+
+from settings.models import LeakPasswords
 
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
@@ -269,3 +271,20 @@ class SecuritySettingSerializer(
 class SecurityBlockIPSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     ip = serializers.CharField(max_length=1024, required=False, allow_blank=True)
+
+
+class LeakPasswordPSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        return LeakPasswords.objects.using('sqlite').create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save(using='sqlite')
+        return instance
+
+    class Meta:
+        read_only_fields = ['id']
+        fields = read_only_fields + ['password']
+        model = LeakPasswords
