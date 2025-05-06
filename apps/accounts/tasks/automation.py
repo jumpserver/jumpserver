@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
 
 from accounts.const import AutomationTypes
-from accounts.models import PushSecretRecord
 from accounts.tasks.common import quickstart_automation_by_snapshot
 from common.const.crontab import CRONTAB_AT_AM_THREE
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
@@ -108,7 +107,7 @@ def execute_automation_record_task(record_ids, tp):
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
 def clean_change_secret_and_push_record_period():
-    from accounts.models import ChangeSecretRecord
+    from accounts.models import ChangeSecretRecord, PushSecretRecord
     print('Start clean change secret and push record period')
     with tmp_to_root_org():
         now = timezone.now()
