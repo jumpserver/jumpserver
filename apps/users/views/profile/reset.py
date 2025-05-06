@@ -16,8 +16,8 @@ from authentication.utils import check_user_property_is_correct
 from common.const.choices import COUNTRY_CALLING_CODES
 from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
-from users.serializers import SmsUserSerializer
 from users.notifications import ResetPasswordSuccessMsg
+from users.serializers import SmsUserSerializer
 from ... import forms
 from ...models import User
 from ...utils import check_password_rules, get_password_check_rules
@@ -217,6 +217,11 @@ class UserResetPasswordView(FormView):
             error = _('* The new password cannot be the last {} passwords').format(
                 limit_count
             )
+            form.add_error('new_password', error)
+            return self.form_invalid(form)
+
+        if user.check_leak_password(password):
+            error = _('Your password is too simple, please change it for security')
             form.add_error('new_password', error)
             return self.form_invalid(form)
 

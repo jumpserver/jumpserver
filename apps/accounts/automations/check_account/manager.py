@@ -12,6 +12,7 @@ from accounts.models import Account, AccountRisk, RiskChoice
 from assets.automations.base.manager import BaseManager
 from common.const import ConfirmOrIgnore
 from common.decorators import bulk_create_decorator, bulk_update_decorator
+from settings.models import LeakPasswords
 
 
 @bulk_create_decorator(AccountRisk)
@@ -157,10 +158,8 @@ class CheckLeakHandler(BaseCheckHandler):
         if not account.secret:
             return False
 
-        sql = 'SELECT 1 FROM passwords WHERE password = ? LIMIT 1'
-        self.cursor.execute(sql, (account.secret,))
-        leak = self.cursor.fetchone() is not None
-        return leak
+        is_exist = LeakPasswords.objects.using('sqlite').filter(password=account.secret).exists()
+        return is_exist
 
     def clean(self):
         self.cursor.close()
