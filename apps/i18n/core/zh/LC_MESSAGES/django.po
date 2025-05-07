@@ -235,7 +235,7 @@ msgstr "验证网关账号"
 
 #: accounts/const/automation.py:31
 msgid "Check account"
-msgstr "检查帐号"
+msgstr "检查账号"
 
 #: accounts/const/automation.py:32 rbac/tree.py:50
 msgid "Backup account"
@@ -775,7 +775,7 @@ msgstr "引擎"
 
 #: accounts/models/automations/check_account.py:34
 msgid "account check automation"
-msgstr "帐号检查自动化"
+msgstr "账号检查自动化"
 
 #: accounts/models/automations/check_account.py:36
 msgid "Can view check account execution"
@@ -1687,7 +1687,7 @@ msgstr "资产不支持数"
 #: accounts/templates/accounts/change_secret_report.html:67
 #: accounts/templates/accounts/push_account_report.html:66
 msgid "Success accounts"
-msgstr "成功帐号"
+msgstr "成功账号"
 
 #: accounts/templates/accounts/change_secret_report.html:78
 #: accounts/templates/accounts/change_secret_report.html:118
@@ -10998,7 +10998,7 @@ msgstr "密钥文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:144
 msgid "Service account key"
-msgstr "服务帐号密钥"
+msgstr "服务账号密钥"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:145
 msgid "The file is in JSON format"

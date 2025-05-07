@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import ipaddress
+from datetime import datetime, timedelta
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
@@ -35,8 +36,13 @@ def check_different_city_login_if_need(user, request):
         return
 
     city = get_ip_city(ip)
-    last_city = get_ip_city(last_user_login.ip)
-    if city == last_city:
+    last_cities = UserLoginLog.objects.filter(
+        datetime__gte=datetime.now() - timedelta(days=7),
+        username__in=usernames,
+        status=True
+    ).exclude(city__in=city_white).values_list('city', flat=True).distinct()
+
+    if city in last_cities:
         return
 
     DifferentCityLoginMessage(user, ip, city).publish_async()

@@ -107,16 +107,18 @@ def execute_automation_record_task(record_ids, tp):
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
 def clean_change_secret_and_push_record_period():
-    from accounts.models import ChangeSecretRecord
+    from accounts.models import ChangeSecretRecord, PushSecretRecord
     print('Start clean change secret and push record period')
     with tmp_to_root_org():
         now = timezone.now()
         days = get_log_keep_day('ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS')
-        expired_day = now - datetime.timedelta(days=days)
-        records = ChangeSecretRecord.objects.filter(
-            date_updated__lt=expired_day
-        ).filter(
-            Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
-        )
+        expired_time = now - datetime.timedelta(days=days)
 
-        records.delete()
+        null_related_q = Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
+        expired_q = Q(date_updated__lt=expired_time)
+
+        ChangeSecretRecord.objects.filter(null_related_q).delete()
+        ChangeSecretRecord.objects.filter(expired_q).delete()
+
+        PushSecretRecord.objects.filter(null_related_q).delete()
+        PushSecretRecord.objects.filter(expired_q).delete()
