@@ -8,3 +8,7 @@ updates:
       time: "09:30"
       timezone: "Asia/Shanghai"
     target-branch: dev
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"

@@ -7,6 +7,12 @@ class Connectivity(TextChoices):
     NA = 'na', _('N/A')
     OK = 'ok', _('OK')
     ERR = 'err', _('Error')
+    AUTH_ERR = 'auth_err', _('Authentication error')
+    SUDO_ERR = 'sudo_err', _('Sudo permission error')
+    PASSWORD_ERR = 'password_err', _('Invalid password error')
+    OPENSSH_KEY_ERR = 'openssh_key_err', _('OpenSSH key error')
+    NTLM_ERR = 'ntlm_err', _('NTLM credentials rejected error')
+    CREATE_DIR_ERR = 'create_dir_err', _('Create directory error')
 
 
 class AutomationTypes(TextChoices):
