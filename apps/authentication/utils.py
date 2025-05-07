@@ -79,65 +79,65 @@ def get_auth_methods():
         {
             'name': 'OpenID',
             'enabled': settings.AUTH_OPENID,
-            'url': f"{reverse('authentication:openid:login')}",
+            'url': reverse('authentication:openid:login'),
             'logo': static('img/login_oidc_logo.png'),
             'auto_redirect': True  # 是否支持自动重定向
         },
         {
             'name': 'CAS',
             'enabled': settings.AUTH_CAS,
-            'url': f"{reverse('authentication:cas:cas-login')}",
+            'url': reverse('authentication:cas:cas-login'),
             'logo': static('img/login_cas_logo.png'),
             'auto_redirect': True
         },
         {
             'name': 'SAML2',
             'enabled': settings.AUTH_SAML2,
-            'url': f"{reverse('authentication:saml2:saml2-login')}",
+            'url': reverse('authentication:saml2:saml2-login'),
             'logo': static('img/login_saml2_logo.png'),
             'auto_redirect': True
         },
         {
             'name': settings.AUTH_OAUTH2_PROVIDER,
             'enabled': settings.AUTH_OAUTH2,
-            'url': f"{reverse('authentication:oauth2:login')}",
+            'url': reverse('authentication:oauth2:login'),
             'logo': static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
             'auto_redirect': True
         },
         {
             'name': _('WeCom'),
             'enabled': settings.AUTH_WECOM,
-            'url': f"{reverse('authentication:wecom-qr-login')}",
+            'url': reverse('authentication:wecom-qr-login'),
             'logo': static('img/login_wecom_logo.png'),
         },
         {
             'name': _('DingTalk'),
             'enabled': settings.AUTH_DINGTALK,
-            'url': f"{reverse('authentication:dingtalk-qr-login')}",
+            'url': reverse('authentication:dingtalk-qr-login'),
             'logo': static('img/login_dingtalk_logo.png')
         },
         {
             'name': _('FeiShu'),
             'enabled': settings.AUTH_FEISHU,
-            'url': f"{reverse('authentication:feishu-qr-login')}",
+            'url': reverse('authentication:feishu-qr-login'),
             'logo': static('img/login_feishu_logo.png')
         },
         {
             'name': 'Lark',
             'enabled': settings.AUTH_LARK,
-            'url': f"{reverse('authentication:lark-qr-login')}",
+            'url': reverse('authentication:lark-qr-login'),
             'logo': static('img/login_lark_logo.png')
         },
         {
             'name': _('Slack'),
             'enabled': settings.AUTH_SLACK,
-            'url': f"{reverse('authentication:slack-qr-login')}",
+            'url': reverse('authentication:slack-qr-login'),
             'logo': static('img/login_slack_logo.png')
         },
         {
             'name': _("Passkey"),
             'enabled': settings.AUTH_PASSKEY,
-            'url': f"{reverse('api-auth:passkey-login')}",
+            'url': reverse('api-auth:passkey-login'),
             'logo': static('img/login_passkey.png')
         }
     ]

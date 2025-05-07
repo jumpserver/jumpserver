@@ -26,23 +26,21 @@ class MFAPasskey(BaseMFA):
         return settings.AUTH_PASSKEY
 
     def get_enable_url(self) -> str:
-        return '/ui/#/profile/index'
+        return '/ui/#/profile/passkeys'
 
     def get_disable_url(self) -> str:
-        return '/ui/#/profile/index'
+        return '/ui/#/profile/passkeys'
 
     def disable(self):
-        assert self.is_authenticated()
-        self.user.face_vector = None
-        self.user.save(update_fields=['face_vector'])
+        pass
 
     def can_disable(self) -> bool:
         return False
 
     @staticmethod
     def help_text_of_enable():
-        return _("Bind face to enable")
+        return _("Using passkey as MFA")
 
     @staticmethod
     def help_text_of_disable():
-        return _("Unbind face to disable")
+        return _("Cannot disable passkey MFA, please remove all passkeys")
