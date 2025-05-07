@@ -28,10 +28,9 @@ class AbsConnectivity(models.Model):
         msg = (msg or '').strip().lower()
 
         error_map = {
-            'is not in the sudoers file': Connectivity.SUDO_ERR,
             'expected openssh key': Connectivity.OPENSSH_KEY_ERR,
             'invalid/incorrect password': Connectivity.PASSWORD_ERR,
-            'failed to create directory': Connectivity.CREATE_DIR_ERR,
+            'failed to create temporary': Connectivity.CREATE_TEMPORARY_ERR,
             'ntlm: the specified credentials were rejected by the server': Connectivity.NTLM_ERR,
             'permission denied': Connectivity.AUTH_ERR,
             'authentication failed': Connectivity.AUTH_ERR,

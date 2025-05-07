@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 15:06+0800\n"
+"POT-Creation-Date: 2025-05-07 17:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2177,34 +2177,30 @@ msgid "Authentication error"
 msgstr "Autenticação falhou"
 
 #: assets/const/automation.py:11
-msgid "Sudo permission error"
-msgstr "Falha na elevação de privilégios"
-
-#: assets/const/automation.py:12
 msgid "Invalid password error"
 msgstr "Senha inválida"
 
-#: assets/const/automation.py:13
+#: assets/const/automation.py:12
 msgid "OpenSSH key error"
 msgstr "Erro na chave OpenSSH"
 
-#: assets/const/automation.py:14
+#: assets/const/automation.py:13
 msgid "NTLM credentials rejected error"
 msgstr "Credenciais NTLM foram rejeitadas"
 
-#: assets/const/automation.py:15
-msgid "Create directory error"
-msgstr "Falha ao criar diretório"
+#: assets/const/automation.py:14
+msgid "Create temporary error"
+msgstr "Falha ao criar o diretório temporário."
 
-#: assets/const/automation.py:19
+#: assets/const/automation.py:18
 msgid "Ping"
 msgstr "Teste"
 
-#: assets/const/automation.py:20
+#: assets/const/automation.py:19
 msgid "Ping gateway"
 msgstr "Gateway de teste"
 
-#: assets/const/automation.py:21
+#: assets/const/automation.py:20
 msgid "Gather facts"
 msgstr "Coleta de informações dos ativos"
 

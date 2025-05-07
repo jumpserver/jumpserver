@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 15:06+0800\n"
+"POT-Creation-Date: 2025-05-07 17:14+0800\n"
 "PO-Revision-Date: 2025-04-17 14:54+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2150,34 +2150,30 @@ msgid "Authentication error"
 msgstr "Ошибка аутентификации"
 
 #: assets/const/automation.py:11
-msgid "Sudo permission error"
-msgstr "Ошибка повышения привилегий"
-
-#: assets/const/automation.py:12
 msgid "Invalid password error"
 msgstr "Неверный пароль"
 
-#: assets/const/automation.py:13
+#: assets/const/automation.py:12
 msgid "OpenSSH key error"
 msgstr "Ошибка ключа OpenSSH"
 
-#: assets/const/automation.py:14
+#: assets/const/automation.py:13
 msgid "NTLM credentials rejected error"
 msgstr "NTLM учетные данные отклонены"
 
-#: assets/const/automation.py:15
-msgid "Create directory error"
-msgstr "Не удалось создать директорию"
+#: assets/const/automation.py:14
+msgid "Create temporary error"
+msgstr "Создание временной директории не удалось."
 
-#: assets/const/automation.py:19
+#: assets/const/automation.py:18
 msgid "Ping"
 msgstr "Ping"
 
-#: assets/const/automation.py:20
+#: assets/const/automation.py:19
 msgid "Ping gateway"
 msgstr "Тестирование шлюза"
 
-#: assets/const/automation.py:21
+#: assets/const/automation.py:20
 msgid "Gather facts"
 msgstr "Сбор информации"
 
