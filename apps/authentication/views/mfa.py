@@ -40,6 +40,8 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
 
         if mfa_type == MFAType.Face:
             return redirect(reverse('authentication:login-face-capture'))
+        elif mfa_type == MFAType.Passkey:
+            return redirect('/api/v1/authentication/passkeys/login/')
         return self.do_mfa_check(form, code, mfa_type)
 
     def do_mfa_check(self, form, code, mfa_type):
