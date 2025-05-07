@@ -37,12 +37,16 @@ class ComponentI18nApi(RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         name = kwargs.get('name')
         lang = request.query_params.get('lang')
+        flat = request.query_params.get('flat', '1')
         data = self.get_component_translations(name)
-        if lang:
-            code = Language.to_internal_code(lang, with_filename=True)
-            data = data.get(code) or {}
-            flat = request.query_params.get('flat', '1')
-            if flat == '0':
-                # 这里要使用原始的 lang, lina 会 merge
-                data = {lang: data}
+
+        if not lang:
+            return Response(data)
+        if lang not in Language.choices:
+            lang = 'en'
+        code = Language.to_internal_code(lang, with_filename=True)
+        data = data.get(code) or {}
+        if flat == '0':
+            # 这里要使用原始的 lang, lina 会 merge
+            data = {lang: data}
         return Response(data)

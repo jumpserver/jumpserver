@@ -1,9 +1,12 @@
+import time
+
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 from authentication.mixins import AuthMixin
 from common.api import JMSModelViewSet
@@ -44,6 +47,9 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
 
     @action(methods=['get'], detail=False, url_path='login', permission_classes=[AllowAny])
     def login(self, request):
+        confirm_mfa = request.GET.get('mfa')
+        if confirm_mfa:
+            request.session['passkey_confirm_mfa'] = '1'
         return render(request, 'authentication/passkey.html', {})
 
     def redirect_to_error(self, error):
@@ -64,8 +70,16 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
         if not user:
             return self.redirect_to_error(_('Auth failed'))
 
+        confirm_mfa = request.session.get('passkey_confirm_mfa')
+        if confirm_mfa:
+            request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
+            request.session['CONFIRM_TIME'] = int(time.time())
+            request.session['passkey_confirm_mfa'] = ''
+            return Response('ok')
+
         try:
             self.check_oauth2_auth(user, settings.AUTH_BACKEND_PASSKEY)
+            self.mark_mfa_ok('passkey', user)
             return self.redirect_to_guard_view()
         except Exception as e:
             msg = getattr(e, 'msg', '') or str(e)

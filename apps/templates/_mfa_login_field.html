@@ -5,34 +5,32 @@
         onchange="selectChange(this.value)"
 >
     {% for backend in mfa_backends %}
-        <option value="{{ backend.name }}"
-                {% if not backend.is_active %} disabled {% endif %}
-        >
-            {{ backend.display_name }}
-        </option>
+    <option value="{{ backend.name }}"
+            {% if not backend.is_active %} disabled {% endif %}
+    >
+        {{ backend.display_name }}
+    </option>
     {% endfor %}
 </select>
 <div class="mfa-div">
     {% for backend in mfa_backends %}
-        <div id="mfa-{{ backend.name }}" class="mfa-field
+    <div id="mfa-{{ backend.name }}" class="mfa-field
             {% if backend.challenge_required %}challenge-required{% endif %}"
-             style="display: none"
+         style="display: none"
+    >
+        {% if backend.has_code %}
+        <input type="text" class="form-control input-style"
+               placeholder="{{ backend.placeholder }}"
         >
-
-            {% if backend.name == 'face' %}
-            {% else %}
-                <input type="text" class="form-control input-style"
-                       placeholder="{{ backend.placeholder }}"
-                >
-                {% if backend.challenge_required %}
-                    <button class="btn btn-primary full-width btn-challenge"
-                            type='button' onclick="sendChallengeCode(this)"
-                    >
-                        {% trans 'Send' %}
-                    </button>
-                {% endif %}
-            {% endif %}
-        </div>
+        {% if backend.challenge_required %}
+        <button class="btn btn-primary full-width btn-challenge"
+                type='button' onclick="sendChallengeCode(this)"
+        >
+            {% trans 'Send' %}
+        </button>
+        {% endif %}
+        {% endif %}
+    </div>
     {% endfor %}
 </div>
 
@@ -121,7 +119,7 @@
             })
         }
 
-        function onError (responseText, responseJson, status) {
+        function onError(responseText, responseJson, status) {
             setTimeout(function () {
                 toastr.error(responseJson.detail || responseJson.error);
             });
