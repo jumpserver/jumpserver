@@ -629,10 +629,16 @@ class Migration(migrations.Migration):
             name="connectivity",
             field=models.CharField(
                 choices=[
-                    ("-", "Unknown"),
-                    ("na", "N/A"),
-                    ("ok", "OK"),
-                    ("err", "Error"),
+                    ('-', 'Unknown'),
+                    ('na', 'N/A'),
+                    ('ok', 'OK'),
+                    ('err', 'Error'),
+                    ('auth_err', 'Authentication error'),
+                    ('sudo_err', 'Sudo permission error'),
+                    ('password_err', 'Invalid password error'),
+                    ('openssh_key_err', 'OpenSSH key error'),
+                    ('ntlm_err', 'NTLM credentials rejected error'),
+                    ('create_dir_err', 'Create directory error')
                 ],
                 default="-",
                 max_length=16,

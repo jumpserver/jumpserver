@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 related_name="assets",
                 to="assets.directoryservice",
-                verbose_name="Directory services",
+                verbose_name="Directory service",
             )
         ),
     ]
