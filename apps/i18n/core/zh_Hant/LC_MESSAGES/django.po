@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 15:06+0800\n"
+"POT-Creation-Date: 2025-05-07 17:14+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2086,34 +2086,30 @@ msgid "Authentication error"
 msgstr "認證失敗"
 
 #: assets/const/automation.py:11
-msgid "Sudo permission error"
-msgstr "提權失敗"
-
-#: assets/const/automation.py:12
 msgid "Invalid password error"
 msgstr "密碼無效"
 
-#: assets/const/automation.py:13
+#: assets/const/automation.py:12
 msgid "OpenSSH key error"
 msgstr "OpenSSH 金鑰錯誤"
 
-#: assets/const/automation.py:14
+#: assets/const/automation.py:13
 msgid "NTLM credentials rejected error"
 msgstr "NTLM 憑據被拒絕"
 
-#: assets/const/automation.py:15
-msgid "Create directory error"
-msgstr "創建目錄失敗"
+#: assets/const/automation.py:14
+msgid "Create temporary error"
+msgstr "創建臨時目錄失敗"
 
-#: assets/const/automation.py:19
+#: assets/const/automation.py:18
 msgid "Ping"
 msgstr "測試"
 
-#: assets/const/automation.py:20
+#: assets/const/automation.py:19
 msgid "Ping gateway"
 msgstr "測試網關"
 
-#: assets/const/automation.py:21
+#: assets/const/automation.py:20
 msgid "Gather facts"
 msgstr "收集資產資訊"
 
@@ -10970,6 +10966,9 @@ msgstr "許可證匯入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "許可證無效"
+
+#~ msgid "Sudo permission error"
+#~ msgstr "提權失敗"
 
 #, fuzzy
 #~ msgid "Directory services"

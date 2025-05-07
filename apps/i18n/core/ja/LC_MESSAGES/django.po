@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 15:06+0800\n"
+"POT-Creation-Date: 2025-05-07 17:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2106,34 +2106,30 @@ msgid "Authentication error"
 msgstr "認証に失敗しました"
 
 #: assets/const/automation.py:11
-msgid "Sudo permission error"
-msgstr "特権の昇格に失敗しました"
-
-#: assets/const/automation.py:12
 msgid "Invalid password error"
 msgstr "パスワードが無効です"
 
-#: assets/const/automation.py:13
+#: assets/const/automation.py:12
 msgid "OpenSSH key error"
 msgstr "OpenSSHキーのエラー"
 
-#: assets/const/automation.py:14
+#: assets/const/automation.py:13
 msgid "NTLM credentials rejected error"
 msgstr "NTLM資格情報が拒否されました"
 
-#: assets/const/automation.py:15
-msgid "Create directory error"
-msgstr "ディレクトリの作成に失敗しました"
+#: assets/const/automation.py:14
+msgid "Create temporary error"
+msgstr "一時ディレクトリの作成に失敗しました。"
 
-#: assets/const/automation.py:19
+#: assets/const/automation.py:18
 msgid "Ping"
 msgstr "テスト"
 
-#: assets/const/automation.py:20
+#: assets/const/automation.py:19
 msgid "Ping gateway"
 msgstr "テストゲートウェイ"
 
-#: assets/const/automation.py:21
+#: assets/const/automation.py:20
 msgid "Gather facts"
 msgstr "資産情報の収集"
 

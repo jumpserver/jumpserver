@@ -634,11 +634,10 @@ class Migration(migrations.Migration):
                     ('ok', 'OK'),
                     ('err', 'Error'),
                     ('auth_err', 'Authentication error'),
-                    ('sudo_err', 'Sudo permission error'),
                     ('password_err', 'Invalid password error'),
                     ('openssh_key_err', 'OpenSSH key error'),
                     ('ntlm_err', 'NTLM credentials rejected error'),
-                    ('create_dir_err', 'Create directory error')
+                    ('create_temp_err', 'Create temporary error')
                 ],
                 default="-",
                 max_length=16,
