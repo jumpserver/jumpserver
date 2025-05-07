@@ -11,6 +11,7 @@ class MFAFace(BaseMFA, AuthFaceMixin):
     display_name = MFAType.Face.name
     placeholder = 'Face Recognition'
     skip_cache_check = True
+    has_code = False
 
     def _check_code(self, code):
         assert self.is_authenticated()
