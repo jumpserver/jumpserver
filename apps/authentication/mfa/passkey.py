@@ -43,4 +43,4 @@ class MFAPasskey(BaseMFA):
 
     @staticmethod
     def help_text_of_disable():
-        return _("Cannot disable passkey MFA, please remove all passkeys")
+        return _("Using passkey as MFA")
