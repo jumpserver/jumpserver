@@ -28,15 +28,14 @@ class AbsConnectivity(models.Model):
         msg = (msg or '').strip().lower()
 
         error_map = {
-            'permission denied': Connectivity.AUTH_ERR,
-            'authentication failed': Connectivity.AUTH_ERR,
-            'authentication failure': Connectivity.AUTH_ERR,
             'is not in the sudoers file': Connectivity.SUDO_ERR,
             'expected openssh key': Connectivity.OPENSSH_KEY_ERR,
             'invalid/incorrect password': Connectivity.PASSWORD_ERR,
             'failed to create directory': Connectivity.CREATE_DIR_ERR,
             'ntlm: the specified credentials were rejected by the server': Connectivity.NTLM_ERR,
-
+            'permission denied': Connectivity.AUTH_ERR,
+            'authentication failed': Connectivity.AUTH_ERR,
+            'authentication failure': Connectivity.AUTH_ERR,
         }
 
         for key, value in error_map.items():
