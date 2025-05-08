@@ -346,7 +346,7 @@ class ES(object):
             elif k in match_fields:
                 match[k] = v
 
-        args = kwargs.get('search')
+        args = kwargs.get('search', [])
         for item in args:
             for k, v in item.items():
                 if k in match_fields:
