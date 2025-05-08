@@ -302,5 +302,9 @@ class AuthMixin:
 
     @staticmethod
     def check_leak_password(password):
-        is_exist = LeakPasswords.objects.using('sqlite').filter(password=password).exists()
-        return is_exist
+        try:
+            is_exist = LeakPasswords.objects.using('sqlite').filter(password=password).exists()
+            return is_exist
+        except Exception:
+            logger.warning("check leak password failed")
+            return False
