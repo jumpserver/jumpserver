@@ -28,6 +28,7 @@ class AbsConnectivity(models.Model):
         msg = (msg or '').strip().lower()
 
         error_map = {
+            'rdp connection failed': Connectivity.RDP_ERR,
             'expected openssh key': Connectivity.OPENSSH_KEY_ERR,
             'invalid/incorrect password': Connectivity.PASSWORD_ERR,
             'failed to create temporary': Connectivity.CREATE_TEMPORARY_ERR,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 17:14+0800\n"
+"POT-Creation-Date: 2025-05-08 15:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,7 +103,7 @@ msgstr "処理待ちのアカウントが見つかりません"
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s、失敗: %s、合計: %s"
 
-#: accounts/automations/check_account/manager.py:274
+#: accounts/automations/check_account/manager.py:273
 msgid ""
 "---\n"
 "Summary: \n"
@@ -128,7 +128,8 @@ msgstr ">>> ゲートウェイ接続のテストタスクを開始する"
 #: authentication/const.py:10 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
 #: authentication/templates/authentication/login.html:408
-#: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
+#: settings/models.py:243 settings/serializers/auth/ldap.py:27
+#: settings/serializers/auth/ldap.py:53
 #: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
 #: terminal/serializers/storage.py:142 users/forms/profile.py:22
@@ -570,7 +571,7 @@ msgstr "アカウントを削除できます"
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: rbac/serializers/role.py:28 settings/models.py:37 settings/models.py:186
+#: rbac/serializers/role.py:28 settings/models.py:39 settings/models.py:188
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
 #: terminal/models/applet/applet.py:34
 #: terminal/models/component/endpoint.py:13
@@ -767,7 +768,7 @@ msgstr "ステータス"
 #: accounts/serializers/account/account.py:278
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
-#: authentication/templates/authentication/passkey.html:173
+#: authentication/templates/authentication/passkey.html:174
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
@@ -1168,7 +1169,7 @@ msgstr "アカウントの存在ポリシー"
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:173
 #: assets/serializers/platform.py:284 perms/serializers/user_permission.py:26
-#: settings/models.py:39 tickets/models/ticket/apply_application.py:13
+#: settings/models.py:41 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:326
 #: xpack/plugins/cloud/serializers/account.py:80
@@ -1303,7 +1304,7 @@ msgstr "Access IP"
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
-#: rbac/models/role.py:37 settings/models.py:42
+#: rbac/models/role.py:37 settings/models.py:44
 #: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:373
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:28
 #: terminal/models/component/endpoint.py:116
@@ -1325,12 +1326,12 @@ msgid "Password length"
 msgstr "パスワードの長さ"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:44
+#: settings/serializers/security.py:46
 msgid "Lowercase"
 msgstr "小文字"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:41
+#: settings/serializers/security.py:43
 msgid "Uppercase"
 msgstr "大文字"
 
@@ -1819,7 +1820,7 @@ msgid "Regex"
 msgstr "正規情報"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-#: settings/models.py:187 settings/serializers/feature.py:22
+#: settings/models.py:189 settings/serializers/feature.py:22
 #: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
 msgid "Content"
 msgstr "コンテンツ"
@@ -2102,39 +2103,43 @@ msgid "OK"
 msgstr "成功"
 
 #: assets/const/automation.py:10
+msgid "RDP error"
+msgstr "RDP接続失敗"
+
+#: assets/const/automation.py:11
 msgid "Authentication error"
 msgstr "認証に失敗しました"
 
-#: assets/const/automation.py:11
+#: assets/const/automation.py:12
 msgid "Invalid password error"
 msgstr "パスワードが無効です"
 
-#: assets/const/automation.py:12
+#: assets/const/automation.py:13
 msgid "OpenSSH key error"
 msgstr "OpenSSHキーのエラー"
 
-#: assets/const/automation.py:13
+#: assets/const/automation.py:14
 msgid "NTLM credentials rejected error"
 msgstr "NTLM資格情報が拒否されました"
 
-#: assets/const/automation.py:14
+#: assets/const/automation.py:15
 msgid "Create temporary error"
 msgstr "一時ディレクトリの作成に失敗しました。"
 
-#: assets/const/automation.py:18
+#: assets/const/automation.py:19
 msgid "Ping"
 msgstr "テスト"
 
-#: assets/const/automation.py:19
+#: assets/const/automation.py:20
 msgid "Ping gateway"
 msgstr "テストゲートウェイ"
 
-#: assets/const/automation.py:20
+#: assets/const/automation.py:21
 msgid "Gather facts"
 msgstr "資産情報の収集"
 
 #: assets/const/base.py:32 audits/const.py:59
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:31
+#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr "無効"
 
@@ -2279,7 +2284,7 @@ msgid "Any"
 msgstr "任意"
 
 #: assets/const/protocol.py:88 rbac/tree.py:62
-#: settings/serializers/security.py:245
+#: settings/serializers/security.py:268
 msgid "Security"
 msgstr "セキュリティ"
 
@@ -2619,7 +2624,7 @@ msgstr "システム"
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:34
 #: authentication/serializers/connect_token_secret.py:127
-#: common/serializers/common.py:86 labels/models.py:12 settings/models.py:38
+#: common/serializers/common.py:86 labels/models.py:12 settings/models.py:40
 #: users/models/preference.py:13
 msgid "Value"
 msgstr "値"
@@ -2694,8 +2699,8 @@ msgid "Setting"
 msgstr "設定"
 
 #: assets/models/platform.py:38 audits/const.py:60
-#: authentication/backends/passkey/models.py:11 settings/models.py:41
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:32
+#: authentication/backends/passkey/models.py:11 settings/models.py:43
+#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "有効化"
 
@@ -3533,29 +3538,29 @@ msgid "Auth Token"
 msgstr "認証トークン"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
-#: authentication/views/login.py:79 notifications/backends/__init__.py:11
+#: authentication/utils.py:114 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
 #: users/models/user/__init__.py:130 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr "企業微信"
 
-#: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
-#: authentication/views/login.py:91 notifications/backends/__init__.py:14
+#: audits/signal_handlers/login_log.py:38 authentication/utils.py:126
+#: authentication/views/feishu.py:97 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:136
 #: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
-#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:103
+#: audits/signal_handlers/login_log.py:40 authentication/utils.py:138
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
 #: users/models/user/__init__.py:142 users/models/user/_source.py:23
 msgid "Slack"
 msgstr "Slack"
 
-#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
-#: authentication/views/login.py:85 notifications/backends/__init__.py:12
+#: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
+#: authentication/views/dingtalk.py:151 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:133
 #: users/models/user/_source.py:20
 msgid "DingTalk"
@@ -3566,8 +3571,8 @@ msgstr "DingTalk"
 msgid "Temporary token"
 msgstr "仮パスワード"
 
-#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:109
-#: settings/serializers/auth/passkey.py:8
+#: audits/signal_handlers/login_log.py:43 authentication/const.py:37
+#: authentication/utils.py:144 settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Passkey"
@@ -3646,8 +3651,8 @@ msgstr "ACL Action は顔オンラインです"
 msgid "No available face feature"
 msgstr "利用可能な顔の特徴はありません"
 
-#: authentication/api/face.py:100 authentication/mfa/face.py:21
-#: authentication/mfa/face.py:23 users/views/profile/face.py:72
+#: authentication/api/face.py:100 authentication/mfa/face.py:22
+#: authentication/mfa/face.py:24 users/views/profile/face.py:72
 msgid "Facial comparison failed"
 msgstr "顔認証の照合に失敗"
 
@@ -3714,11 +3719,11 @@ msgstr "OpenID エラー"
 msgid "Please check if a user with the same username or email already exists"
 msgstr "同じユーザー名またはメールアドレスのユーザーが既に存在するかどうかを確認してください"
 
-#: authentication/backends/passkey/api.py:37
+#: authentication/backends/passkey/api.py:40
 msgid "Only register passkey for local user"
 msgstr "ローカル・ユーザーのみの鍵の登録"
 
-#: authentication/backends/passkey/api.py:65
+#: authentication/backends/passkey/api.py:71
 msgid "Auth failed"
 msgstr "認証に失敗しました"
 
@@ -3768,7 +3773,7 @@ msgstr "顔認証"
 msgid "Radius"
 msgstr "Radius"
 
-#: authentication/const.py:37
+#: authentication/const.py:38
 msgid "Custom"
 msgstr "カスタマイズ"
 
@@ -3925,6 +3930,7 @@ msgid "Please wait for %s seconds before retry"
 msgstr "%s 秒後に再試行してください"
 
 #: authentication/errors/redirect.py:85 authentication/mixins.py:327
+#: users/views/profile/reset.py:224
 msgid "Your password is too simple, please change it for security"
 msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
 
@@ -3967,7 +3973,7 @@ msgstr "動的コード"
 msgid "Please input security code"
 msgstr "セキュリティコードを入力してください"
 
-#: authentication/mfa/base.py:27
+#: authentication/mfa/base.py:28
 msgid ""
 "The two-factor code you entered has either already been used or has expired."
 " Please request a new one."
@@ -3993,11 +3999,11 @@ msgstr "メール認証コードの検証に失敗しました"
 msgid "Email verification code"
 msgstr "メール認証コード"
 
-#: authentication/mfa/face.py:55
+#: authentication/mfa/face.py:56
 msgid "Bind face to enable"
 msgstr "顔の特徴を結びつけて有効化"
 
-#: authentication/mfa/face.py:59
+#: authentication/mfa/face.py:60
 msgid "Unbind face to disable"
 msgstr "顔の特徴を解除して無効化"
 
@@ -4012,6 +4018,10 @@ msgstr "OTP検証コード"
 #: authentication/mfa/otp.py:48
 msgid "Virtual OTP based MFA"
 msgstr "仮想OTPベースのMFA"
+
+#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+msgid "Using passkey as MFA"
+msgstr ""
 
 #: authentication/mfa/radius.py:8
 msgid "Radius verify code invalid"
@@ -4511,17 +4521,17 @@ msgstr "返品"
 msgid "Copy success"
 msgstr "コピー成功"
 
-#: authentication/templates/authentication/passkey.html:162
+#: authentication/templates/authentication/passkey.html:163
 msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
 msgstr "このページはHTTPSで提供されていません。HTTPSを使用して、資格情報のセキュリティを確保してください。"
 
-#: authentication/templates/authentication/passkey.html:173
+#: authentication/templates/authentication/passkey.html:174
 msgid "Do you want to retry ?"
 msgstr "再試行しますか？"
 
-#: authentication/utils.py:24 common/utils/ip/geoip/utils.py:24
+#: authentication/utils.py:27 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:33
 msgid "LAN"
 msgstr "ローカルエリアネットワーク"
@@ -4606,23 +4616,23 @@ msgstr "Lark はすでにバインドされています"
 msgid "Failed to get user from Lark"
 msgstr "Lark からユーザーを取得できませんでした"
 
-#: authentication/views/login.py:219
+#: authentication/views/login.py:163
 msgid "Redirecting"
 msgstr "リダイレクト"
 
-#: authentication/views/login.py:220
+#: authentication/views/login.py:164
 msgid "Redirecting to {} authentication"
 msgstr "{} 認証へのリダイレクト"
 
-#: authentication/views/login.py:247
+#: authentication/views/login.py:191
 msgid "Login timeout, please try again."
 msgstr "ログインタイムアウト、もう一度お試しください"
 
-#: authentication/views/login.py:292
+#: authentication/views/login.py:236
 msgid "User email already exists ({})"
 msgstr "ユーザー メールボックスは既に存在します ({})"
 
-#: authentication/views/login.py:370
+#: authentication/views/login.py:314
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -4630,15 +4640,15 @@ msgstr ""
 "<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
 "                  このページを閉じないでください"
 
-#: authentication/views/login.py:375
+#: authentication/views/login.py:319
 msgid "No ticket found"
 msgstr "チケットが見つかりません"
 
-#: authentication/views/login.py:411
+#: authentication/views/login.py:355
 msgid "Logout success"
 msgstr "ログアウト成功"
 
-#: authentication/views/login.py:412
+#: authentication/views/login.py:356
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
@@ -5199,7 +5209,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "ラベル"
 
-#: labels/models.py:15
+#: labels/models.py:15 settings/serializers/security.py:207
 msgid "Color"
 msgstr "色"
 
@@ -5881,7 +5891,7 @@ msgstr "デフォルト組織"
 msgid "SYSTEM"
 msgstr "システム組織"
 
-#: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:188
+#: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:190
 #: terminal/models/applet/applet.py:42
 msgid "Builtin"
 msgstr "ビルトイン"
@@ -6202,7 +6212,7 @@ msgstr "ワークスペースビュー"
 msgid "Audit view"
 msgstr "監査ビュー"
 
-#: rbac/tree.py:27 settings/models.py:164
+#: rbac/tree.py:27 settings/models.py:166
 msgid "System setting"
 msgstr "システム設定"
 
@@ -6313,75 +6323,75 @@ msgstr "携帯番号をテストこのフィールドは必須です"
 msgid "App Settings"
 msgstr "設定"
 
-#: settings/models.py:40 users/models/preference.py:14
+#: settings/models.py:42 users/models/preference.py:14
 msgid "Encrypted"
 msgstr "暗号化された"
 
-#: settings/models.py:166
+#: settings/models.py:168
 msgid "Can change email setting"
 msgstr "メール設定を変更できます"
 
-#: settings/models.py:167
+#: settings/models.py:169
 msgid "Can change auth setting"
 msgstr "資格認定の設定"
 
-#: settings/models.py:168
+#: settings/models.py:170
 msgid "Can change auth ops"
 msgstr "タスクセンターの設定"
 
-#: settings/models.py:169
+#: settings/models.py:171
 msgid "Can change auth ticket"
 msgstr "製造オーダ設定"
 
-#: settings/models.py:170
+#: settings/models.py:172
 msgid "Can change virtual app setting"
 msgstr "仮想アプリケーション設定を変更できます"
 
-#: settings/models.py:171
+#: settings/models.py:173
 msgid "Can change auth announcement"
 msgstr "公告の設定"
 
-#: settings/models.py:172
+#: settings/models.py:174
 msgid "Can change vault setting"
 msgstr "金庫の設定を変えることができます"
 
-#: settings/models.py:173
+#: settings/models.py:175
 msgid "Can change chat ai setting"
 msgstr "チャットAI設定を変更できます"
 
-#: settings/models.py:174
+#: settings/models.py:176
 msgid "Can change system msg sub setting"
 msgstr "システムmsgサブ设定を変更できます"
 
-#: settings/models.py:175
+#: settings/models.py:177
 msgid "Can change sms setting"
 msgstr "Smsの設定を変えることができます"
 
-#: settings/models.py:176
+#: settings/models.py:178
 msgid "Can change security setting"
 msgstr "セキュリティ設定を変更できます"
 
-#: settings/models.py:177
+#: settings/models.py:179
 msgid "Can change clean setting"
 msgstr "きれいな設定を変えることができます"
 
-#: settings/models.py:178
+#: settings/models.py:180
 msgid "Can change interface setting"
 msgstr "インターフェイスの設定を変えることができます"
 
-#: settings/models.py:179
+#: settings/models.py:181
 msgid "Can change license setting"
 msgstr "ライセンス設定を変更できます"
 
-#: settings/models.py:180
+#: settings/models.py:182
 msgid "Can change terminal setting"
 msgstr "ターミナルの設定を変えることができます"
 
-#: settings/models.py:181
+#: settings/models.py:183
 msgid "Can change other setting"
 msgstr "他の設定を変えることができます"
 
-#: settings/models.py:191
+#: settings/models.py:193
 msgid "Chat prompt"
 msgstr "チャットのヒント"
 
@@ -7348,11 +7358,11 @@ msgid "Perm single to ungroup node"
 msgstr ""
 "グループ化されていないノードに個別に許可された資産を配置し、資産が存在するノードが表示されないようにしますが、そのノードが許可されていないという質問に質問"
 
-#: settings/serializers/security.py:17
+#: settings/serializers/security.py:19
 msgid "User password expiration (day)"
 msgstr "ユーザーパスワードの有効期限（天）"
 
-#: settings/serializers/security.py:19
+#: settings/serializers/security.py:21
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
@@ -7361,69 +7371,69 @@ msgstr ""
 "ユーザーがその期間中にパスワードを更新しなかった場合、ユーザーパスワードの有効期限が切れます。パスワードの有効期限が切れる前の5日 (毎日) "
 "以内に、パスワードの有効期限が切れるリマインダーメールがシステムからユーザーに自動的に送信されます。"
 
-#: settings/serializers/security.py:26
+#: settings/serializers/security.py:28
 msgid "Recent password count"
 msgstr "繰り返された履歴パスワードの数"
 
-#: settings/serializers/security.py:28
+#: settings/serializers/security.py:30
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "ヒント: ユーザーがパスワードをリセットすると、ユーザーの前のnの履歴パスワードにすることはできません"
 
-#: settings/serializers/security.py:34
+#: settings/serializers/security.py:36
 msgid "Minimum length (User)"
 msgstr "パスワードの最小長"
 
-#: settings/serializers/security.py:38
+#: settings/serializers/security.py:40
 msgid "Minimum length (Admin)"
 msgstr "管理者ユーザーパスワードの最小長"
 
-#: settings/serializers/security.py:47
+#: settings/serializers/security.py:49
 msgid "Digits"
 msgstr "数値を含める必要があります"
 
-#: settings/serializers/security.py:50
+#: settings/serializers/security.py:52
 msgid "Special characters"
 msgstr "特別な"
 
-#: settings/serializers/security.py:55
+#: settings/serializers/security.py:57
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
 msgstr "ユーザーが限られた回数だけログインできなかった場合、この時間間隔ではログインはできません。"
 
-#: settings/serializers/security.py:63 settings/serializers/security.py:73
+#: settings/serializers/security.py:65 settings/serializers/security.py:75
 msgid "Login failures count"
 msgstr "ユーザーログインの失敗数を制限する"
 
-#: settings/serializers/security.py:67 settings/serializers/security.py:77
+#: settings/serializers/security.py:69 settings/serializers/security.py:79
 msgid "Login failure period (minute)"
 msgstr "ユーザーのログイン間隔をブロックする（分）"
 
-#: settings/serializers/security.py:81
+#: settings/serializers/security.py:83
 msgid "Login IP whitelist"
 msgstr "ログインIPホワイトリスト"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:88
 msgid "Login IP blacklist"
 msgstr "ログインIPブラックリスト"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:93
 msgid "Only single device login"
 msgstr "単一デバイスログインのみ"
 
-#: settings/serializers/security.py:92
+#: settings/serializers/security.py:94
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
 msgstr "ユーザーが新しいデバイスにログインすると、ログインしている他のデバイスは自動的にログアウトします。"
 
-#: settings/serializers/security.py:95
+#: settings/serializers/security.py:97
 msgid "Only exist user login"
 msgstr "ユーザーログインのみ存在"
 
-#: settings/serializers/security.py:97
+#: settings/serializers/security.py:99
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -7433,11 +7443,11 @@ msgstr ""
 "有効にすると、存在しないユーザーはログインできなくなります。無効にすると、ローカル認証方法を除く他の認証方法のユーザーはログインでき、ユーザーが自動的に作成されます"
 " (ユーザーが存在しない場合)。"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:105
 msgid "Only from source login"
 msgstr "ソースログインからのみ"
 
-#: settings/serializers/security.py:105
+#: settings/serializers/security.py:107
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging"
 " in; if it is disabled, the user will authenticate all the enabled "
@@ -7447,96 +7457,96 @@ msgstr ""
 "これが有効な場合、ユーザーはログイン時にソースに対してのみ認証されます。無効な場合、ユーザーはログイン時に、いずれかの認証方法が成功する限り、有効なすべての認証方法を特定の順序で認証します。"
 " 、直接ログインできます"
 
-#: settings/serializers/security.py:116
+#: settings/serializers/security.py:118
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "有効化されていません"
 
-#: settings/serializers/security.py:117
+#: settings/serializers/security.py:119
 msgid "All users"
 msgstr "すべてのユーザー"
 
-#: settings/serializers/security.py:118
+#: settings/serializers/security.py:120
 msgid "Only admin users"
 msgstr "管理者のみ"
 
-#: settings/serializers/security.py:120
+#: settings/serializers/security.py:122
 msgid "Global MFA"
 msgstr "グローバル有効化MFA認証"
 
-#: settings/serializers/security.py:124
+#: settings/serializers/security.py:126
 msgid "Third-party login MFA"
 msgstr "サードパーティのログインユーザーがMFA認証を実行"
 
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:127
 msgid "The third-party login modes include OIDC, CAS, and SAML2"
 msgstr "サードパーティのログインモードには、OIDC、CAS、SAML2"
 
-#: settings/serializers/security.py:129
+#: settings/serializers/security.py:131
 msgid "MFA via Email"
 msgstr "メール検証 MFA"
 
-#: settings/serializers/security.py:130
+#: settings/serializers/security.py:132
 msgid "Email as a method for multi-factor authentication"
 msgstr "メールを多要素認証の一つの方法として使用します。"
 
-#: settings/serializers/security.py:133
+#: settings/serializers/security.py:135
 msgid "OTP issuer name"
 msgstr "OTP発行者名"
 
-#: settings/serializers/security.py:137
+#: settings/serializers/security.py:139
 msgid "OTP valid window"
 msgstr "OTP有効なウィンドウ"
 
-#: settings/serializers/security.py:141
+#: settings/serializers/security.py:143
 msgid "MFA verify TTL"
 msgstr "MFAはTTLを確認します（秒）"
 
-#: settings/serializers/security.py:143
+#: settings/serializers/security.py:145
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "検証MFAはアカウントのパスワードを表示したときにのみ有効になります。"
 
-#: settings/serializers/security.py:148
+#: settings/serializers/security.py:150
 msgid "MFA in login page"
 msgstr "ログインページのMFA"
 
-#: settings/serializers/security.py:149
+#: settings/serializers/security.py:151
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "Euセキュリティ規制 (GDPR) では、MFAがログインページにある必要があります"
 
-#: settings/serializers/security.py:153
+#: settings/serializers/security.py:155
 msgid "Verify code TTL (second)"
 msgstr "認証コード有効時間"
 
-#: settings/serializers/security.py:154
+#: settings/serializers/security.py:156
 msgid "Reset password and send SMS code expiration time"
 msgstr "パスワードをリセットしてSMSコードの有効期限を送信します"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:160
 msgid "Login dynamic code"
 msgstr "ログイン動的コードの有効化"
 
-#: settings/serializers/security.py:159
+#: settings/serializers/security.py:161
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
 msgstr "パスワードと追加コードは、検証のためにサードパーティの認証システムに送信されます"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:165
 msgid "Login captcha"
 msgstr "ログインcaptchaの有効化"
 
-#: settings/serializers/security.py:164
+#: settings/serializers/security.py:166
 msgid "Enable captcha to prevent robot authentication"
 msgstr "Captchaを有効にしてロボット認証を防止する"
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:169
 msgid "Suspicious Login Verification"
 msgstr "リモートログイン保護"
 
-#: settings/serializers/security.py:169
+#: settings/serializers/security.py:171
 msgid ""
 "The system determines whether the login IP address belongs to a common login"
 " city. If the account is logged in from a common login city, the system "
@@ -7544,76 +7554,100 @@ msgid ""
 msgstr ""
 "システムは、ログインIPアドレスが共通のログイン都市に属しているかどうかを判断します。アカウントが共通のログイン都市からログインしている場合、システムはリモートログインリマインダーを送信します"
 
-#: settings/serializers/security.py:175
+#: settings/serializers/security.py:177
 msgid "Auto Disable Threshold (day)"
 msgstr "未使用のユーザータイムアウト（日）"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:178
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
 msgstr "毎日、頻度の低いユーザーを検出し、予め決められた時間制限を超えた場合は無効にします"
 
-#: settings/serializers/security.py:196
+#: settings/serializers/security.py:198
 msgid "Watermark"
 msgstr "透かしの有効化"
 
-#: settings/serializers/security.py:200
+#: settings/serializers/security.py:201
+msgid "Watermark session content"
+msgstr "セッションウォーターマークカスタム内容"
+
+#: settings/serializers/security.py:204
+msgid "Watermark console content"
+msgstr "管理ページのウォーターマークカスタム内容"
+
+#: settings/serializers/security.py:210
+msgid "Watermark font size"
+msgstr "フォントサイズ"
+
+#: settings/serializers/security.py:213
+msgid "Watermark height"
+msgstr "単一ウォーターマークの高さ"
+
+#: settings/serializers/security.py:216
+msgid "Watermark width"
+msgstr "単一ウォーターマークの幅"
+
+#: settings/serializers/security.py:219
+msgid "Watermark rotate"
+msgstr "ウォーターマークの回転角度"
+
+#: settings/serializers/security.py:223
 msgid "Max idle time (minute)"
 msgstr "接続最大アイドル時間（分）"
 
-#: settings/serializers/security.py:201
+#: settings/serializers/security.py:224
 msgid "If idle time more than it, disconnect connection."
 msgstr "この設定以上の操作がない場合、接続は切断されます"
 
-#: settings/serializers/security.py:204
+#: settings/serializers/security.py:227
 msgid "Session expire at browser closed"
 msgstr "ブラウザを閉じるとセッションが期限切れになります"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:228
 msgid "Whether to expire the session when the user closes their browser."
 msgstr "ユーザーがブラウザを閉じたときにセッションを期限切れにするかどうか。"
 
-#: settings/serializers/security.py:210
+#: settings/serializers/security.py:233
 msgid "Allow users to view asset session information"
 msgstr "ユーザーに資産のオンラインセッション情報の閲覧を許可する"
 
-#: settings/serializers/security.py:212
+#: settings/serializers/security.py:235
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
 msgstr "ユーザーが資産に接続するとき、アカウント選択のポップアップに現在の資産のオンラインセッション数を表示（rdpプロトコルのみ）"
 
-#: settings/serializers/security.py:218
+#: settings/serializers/security.py:241
 msgid "Max online time (hour)"
 msgstr "接続最大アイドル時間（分）"
 
-#: settings/serializers/security.py:219
+#: settings/serializers/security.py:242
 msgid "If session connection time more than it, disconnect connection."
 msgstr "セッション接続時間がこれを超えると、接続が切断されます"
 
-#: settings/serializers/security.py:222
+#: settings/serializers/security.py:245
 msgid "Remember manual auth"
 msgstr "手動入力パスワードの保存"
 
-#: settings/serializers/security.py:225
+#: settings/serializers/security.py:248
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "セッション共有"
 
-#: settings/serializers/security.py:226
+#: settings/serializers/security.py:249
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "ユーザーのアクティブなセッションを他のユーザーと共有できるようにします。"
 
-#: settings/serializers/security.py:232
+#: settings/serializers/security.py:255
 msgid "Insecure command alert"
 msgstr "安全でないコマンドアラート"
 
-#: settings/serializers/security.py:235
+#: settings/serializers/security.py:258
 msgid "Email recipient"
 msgstr "メール受信者"
 
-#: settings/serializers/security.py:236
+#: settings/serializers/security.py:259
 msgid "Multiple user using , split"
 msgstr "複数のユーザーを使用して、分割"
 
@@ -7979,17 +8013,17 @@ msgstr ""
 "あなたのSSHキーは設定されていないか、無効です。<a "
 "href=\"%(user_pubkey_update)s\">こちらのリンク</a>をクリックして更新してください。"
 
-#: templates/_mfa_login_field.html:31
+#: templates/_mfa_login_field.html:29
 #: users/templates/users/forgot_password.html:101
 msgid "Send"
 msgstr "送信"
 
-#: templates/_mfa_login_field.html:110
+#: templates/_mfa_login_field.html:108
 #: users/templates/users/forgot_password.html:176
 msgid "Wait: "
 msgstr "待つ:"
 
-#: templates/_mfa_login_field.html:120
+#: templates/_mfa_login_field.html:118
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "確認コードが送信されました"
@@ -9642,7 +9676,7 @@ msgstr "ユーザーに一致できます"
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
-#: users/models/user/_auth.py:33
+#: users/models/user/_auth.py:34
 msgid "Force enabled"
 msgstr "強制有効"
 
@@ -9653,7 +9687,7 @@ msgstr "強制有効"
 msgid "Reset password"
 msgstr "パスワードのリセット"
 
-#: users/notifications.py:85 users/views/profile/reset.py:233
+#: users/notifications.py:85 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
@@ -10226,7 +10260,7 @@ msgstr "* パスワードが要件を満たしていない"
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新しいパスワードを最後の {} パスワードにすることはできません"
 
-#: users/views/profile/reset.py:234
+#: users/views/profile/reset.py:239
 msgid "Reset password success, return to login page"
 msgstr "パスワードの成功をリセットし、ログインページに戻る"
 

@@ -1507,6 +1507,7 @@
     "VirtualApps": "aplicación virtual",
     "Volcengine": "Motor de volcán",
     "Warning": "Advertencia",
+    "WatermarkVariableHelpText": "Puede utilizar ${key} en el contenido del sello personalizado para leer las variables integradas como la lista de contraseñas débiles, la hora actual, la disponibilidad de la página de gestión, el ID de usuario, el nombre de usuario, la dirección de activos, el nombre de usuario, el sello, el ID de activos y el nombre de activos.",
     "WeChat": "WeChat",
     "WeCom": "WeChat empresarial",
     "WeComOAuth": "Certificación de WeChat empresarial",

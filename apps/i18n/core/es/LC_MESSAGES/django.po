@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 17:14+0800\n"
+"POT-Creation-Date: 2025-05-08 15:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,7 +121,7 @@ msgstr "No se encontraron cuentas pendientes de procesar."
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "Éxitos: %s, Fracasos: %s, Total: %s"
 
-#: accounts/automations/check_account/manager.py:274
+#: accounts/automations/check_account/manager.py:273
 msgid ""
 "---\n"
 "Summary: \n"
@@ -150,7 +150,8 @@ msgstr ""
 #: authentication/const.py:10 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:362
 #: authentication/templates/authentication/login.html:408
-#: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
+#: settings/models.py:243 settings/serializers/auth/ldap.py:27
+#: settings/serializers/auth/ldap.py:53
 #: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
 #: terminal/serializers/storage.py:142 users/forms/profile.py:22
@@ -579,7 +580,7 @@ msgstr "Puede eliminar la cuenta"
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: rbac/serializers/role.py:28 settings/models.py:37 settings/models.py:186
+#: rbac/serializers/role.py:28 settings/models.py:39 settings/models.py:188
 #: settings/serializers/msg.py:89 settings/serializers/terminal.py:9
 #: terminal/models/applet/applet.py:34
 #: terminal/models/component/endpoint.py:13
@@ -776,7 +777,7 @@ msgstr "Estado"
 #: accounts/serializers/account/account.py:278
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
-#: authentication/templates/authentication/passkey.html:173
+#: authentication/templates/authentication/passkey.html:174
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
@@ -1197,7 +1198,7 @@ msgstr "La cuenta existe política"
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:173
 #: assets/serializers/platform.py:284 perms/serializers/user_permission.py:26
-#: settings/models.py:39 tickets/models/ticket/apply_application.py:13
+#: settings/models.py:41 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:326
 #: xpack/plugins/cloud/serializers/account.py:80
@@ -1333,7 +1334,7 @@ msgstr "Lista blanca de IP"
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
-#: rbac/models/role.py:37 settings/models.py:42
+#: rbac/models/role.py:37 settings/models.py:44
 #: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:373
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:28
 #: terminal/models/component/endpoint.py:116
@@ -1355,12 +1356,12 @@ msgid "Password length"
 msgstr "Longitud de la contraseña"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:44
+#: settings/serializers/security.py:46
 msgid "Lowercase"
 msgstr "letras minúsculas"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:41
+#: settings/serializers/security.py:43
 msgid "Uppercase"
 msgstr "letras mayúsculas"
 
@@ -1905,7 +1906,7 @@ msgid "Regex"
 msgstr "Expresión regular"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-#: settings/models.py:187 settings/serializers/feature.py:22
+#: settings/models.py:189 settings/serializers/feature.py:22
 #: settings/serializers/msg.py:78 xpack/plugins/license/models.py:31
 msgid "Content"
 msgstr "Contenido"
@@ -2199,39 +2200,43 @@ msgid "OK"
 msgstr "Éxito"
 
 #: assets/const/automation.py:10
+msgid "RDP error"
+msgstr "Falló la conexión RDP"
+
+#: assets/const/automation.py:11
 msgid "Authentication error"
 msgstr "Autenticación fallida"
 
-#: assets/const/automation.py:11
+#: assets/const/automation.py:12
 msgid "Invalid password error"
 msgstr "Contraseña inválida"
 
-#: assets/const/automation.py:12
+#: assets/const/automation.py:13
 msgid "OpenSSH key error"
 msgstr "Error de clave OpenSSH"
 
-#: assets/const/automation.py:13
+#: assets/const/automation.py:14
 msgid "NTLM credentials rejected error"
 msgstr "NTLM Credenciales rechazadas"
 
-#: assets/const/automation.py:14
+#: assets/const/automation.py:15
 msgid "Create temporary error"
 msgstr "Creación del directorio temporal fallida."
 
-#: assets/const/automation.py:18
+#: assets/const/automation.py:19
 msgid "Ping"
 msgstr "Prueba"
 
-#: assets/const/automation.py:19
+#: assets/const/automation.py:20
 msgid "Ping gateway"
 msgstr "Puerta de enlace de prueba"
 
-#: assets/const/automation.py:20
+#: assets/const/automation.py:21
 msgid "Gather facts"
 msgstr "Recopilando información de activos"
 
 #: assets/const/base.py:32 audits/const.py:59
-#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:31
+#: terminal/serializers/applet_host.py:32 users/models/user/_auth.py:32
 msgid "Disabled"
 msgstr "Deshabilitar"
 
@@ -2380,7 +2385,7 @@ msgid "Any"
 msgstr "Cualquiera"
 
 #: assets/const/protocol.py:88 rbac/tree.py:62
-#: settings/serializers/security.py:245
+#: settings/serializers/security.py:268
 msgid "Security"
 msgstr "Seguro"
 
@@ -2732,7 +2737,7 @@ msgstr "Sistema"
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:34
 #: authentication/serializers/connect_token_secret.py:127
-#: common/serializers/common.py:86 labels/models.py:12 settings/models.py:38
+#: common/serializers/common.py:86 labels/models.py:12 settings/models.py:40
 #: users/models/preference.py:13
 msgid "Value"
 msgstr "Valor"
@@ -2807,8 +2812,8 @@ msgid "Setting"
 msgstr "configuración"
 
 #: assets/models/platform.py:38 audits/const.py:60
-#: authentication/backends/passkey/models.py:11 settings/models.py:41
-#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:32
+#: authentication/backends/passkey/models.py:11 settings/models.py:43
+#: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "habilitar"
 
@@ -3681,29 +3686,29 @@ msgid "Auth Token"
 msgstr "Token de autenticación"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
-#: authentication/views/login.py:79 notifications/backends/__init__.py:11
+#: authentication/utils.py:114 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
 #: users/models/user/__init__.py:130 users/models/user/_source.py:19
 msgid "WeCom"
 msgstr "WeChat empresarial"
 
-#: audits/signal_handlers/login_log.py:38 authentication/views/feishu.py:97
-#: authentication/views/login.py:91 notifications/backends/__init__.py:14
+#: audits/signal_handlers/login_log.py:38 authentication/utils.py:126
+#: authentication/views/feishu.py:97 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:136
 #: users/models/user/_source.py:21
 msgid "FeiShu"
 msgstr "Feishu"
 
-#: audits/signal_handlers/login_log.py:40 authentication/views/login.py:103
+#: audits/signal_handlers/login_log.py:40 authentication/utils.py:138
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
 #: users/models/user/__init__.py:142 users/models/user/_source.py:23
 msgid "Slack"
 msgstr "Slack"
 
-#: audits/signal_handlers/login_log.py:41 authentication/views/dingtalk.py:151
-#: authentication/views/login.py:85 notifications/backends/__init__.py:12
+#: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
+#: authentication/views/dingtalk.py:151 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:133
 #: users/models/user/_source.py:20
 msgid "DingTalk"
@@ -3714,8 +3719,8 @@ msgstr "DingTalk"
 msgid "Temporary token"
 msgstr "Contraseña temporal"
 
-#: audits/signal_handlers/login_log.py:43 authentication/views/login.py:109
-#: settings/serializers/auth/passkey.py:8
+#: audits/signal_handlers/login_log.py:43 authentication/const.py:37
+#: authentication/utils.py:144 settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Passkey"
@@ -3815,8 +3820,8 @@ msgstr "La acción de ACL es verificación facial en línea."
 msgid "No available face feature"
 msgstr "No hay características faciales disponibles."
 
-#: authentication/api/face.py:100 authentication/mfa/face.py:21
-#: authentication/mfa/face.py:23 users/views/profile/face.py:72
+#: authentication/api/face.py:100 authentication/mfa/face.py:22
+#: authentication/mfa/face.py:24 users/views/profile/face.py:72
 msgid "Facial comparison failed"
 msgstr "El emparejamiento facial ha fallado."
 
@@ -3889,11 +3894,11 @@ msgstr ""
 "Por favor, verifica si ya existe un usuario con el mismo nombre de usuario o"
 " correo electrónico"
 
-#: authentication/backends/passkey/api.py:37
+#: authentication/backends/passkey/api.py:40
 msgid "Only register passkey for local user"
 msgstr "Clave de registro solo para usuarios locales"
 
-#: authentication/backends/passkey/api.py:65
+#: authentication/backends/passkey/api.py:71
 msgid "Auth failed"
 msgstr "Autenticación fallida"
 
@@ -3945,7 +3950,7 @@ msgstr "Reconocimiento facial"
 msgid "Radius"
 msgstr "Radius"
 
-#: authentication/const.py:37
+#: authentication/const.py:38
 msgid "Custom"
 msgstr "Personalizado"
 
@@ -4110,6 +4115,7 @@ msgid "Please wait for %s seconds before retry"
 msgstr "Por favor, inténtalo de nuevo en %s segundos"
 
 #: authentication/errors/redirect.py:85 authentication/mixins.py:327
+#: users/views/profile/reset.py:224
 msgid "Your password is too simple, please change it for security"
 msgstr ""
 "Tu contraseña es demasiado simple, por razones de seguridad, modifícala"
@@ -4154,7 +4160,7 @@ msgstr "Código dinámico."
 msgid "Please input security code"
 msgstr "Por favor, introduzca el código de seguridad dinámico."
 
-#: authentication/mfa/base.py:27
+#: authentication/mfa/base.py:28
 msgid ""
 "The two-factor code you entered has either already been used or has expired."
 " Please request a new one."
@@ -4185,11 +4191,11 @@ msgstr ""
 msgid "Email verification code"
 msgstr "Código de verificación del correo electrónico"
 
-#: authentication/mfa/face.py:55
+#: authentication/mfa/face.py:56
 msgid "Bind face to enable"
 msgstr "Vincule las características faciales para habilitar."
 
-#: authentication/mfa/face.py:59
+#: authentication/mfa/face.py:60
 msgid "Unbind face to disable"
 msgstr "Desvincule las características faciales para deshabilitar."
 
@@ -4206,6 +4212,10 @@ msgstr "Código de verificación MFA virtual"
 #: authentication/mfa/otp.py:48
 msgid "Virtual OTP based MFA"
 msgstr "Código MFA virtual (OTP)"
+
+#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+msgid "Using passkey as MFA"
+msgstr ""
 
 #: authentication/mfa/radius.py:8
 msgid "Radius verify code invalid"
@@ -4739,7 +4749,7 @@ msgstr "Regresar"
 msgid "Copy success"
 msgstr "Copiado con éxito"
 
-#: authentication/templates/authentication/passkey.html:162
+#: authentication/templates/authentication/passkey.html:163
 msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
@@ -4747,11 +4757,11 @@ msgstr ""
 "Esta página no utiliza el protocolo HTTPS, por favor utiliza HTTPS para "
 "asegurar la seguridad de tus credenciales."
 
-#: authentication/templates/authentication/passkey.html:173
+#: authentication/templates/authentication/passkey.html:174
 msgid "Do you want to retry ?"
 msgstr "¿Reintentar?"
 
-#: authentication/utils.py:24 common/utils/ip/geoip/utils.py:24
+#: authentication/utils.py:27 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:33
 msgid "LAN"
 msgstr "Red local"
@@ -4838,23 +4848,23 @@ msgstr "Lark ya está vinculado"
 msgid "Failed to get user from Lark"
 msgstr "No se pudo obtener el usuario de Lark"
 
-#: authentication/views/login.py:219
+#: authentication/views/login.py:163
 msgid "Redirecting"
 msgstr "Redirigiendo"
 
-#: authentication/views/login.py:220
+#: authentication/views/login.py:164
 msgid "Redirecting to {} authentication"
 msgstr "Redirigiendo a la autenticación de {}"
 
-#: authentication/views/login.py:247
+#: authentication/views/login.py:191
 msgid "Login timeout, please try again."
 msgstr "Tiempo de sesión agotado, por favor inicia sesión de nuevo"
 
-#: authentication/views/login.py:292
+#: authentication/views/login.py:236
 msgid "User email already exists ({})"
 msgstr "El correo electrónico del usuario ya existe ({})"
 
-#: authentication/views/login.py:370
+#: authentication/views/login.py:314
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -4862,15 +4872,15 @@ msgstr ""
 "Esperando la confirmación de <b>{}</b>, también puedes copiar el enlace y enviárselo a él/ella <br/>\n"
 "No cierres esta página"
 
-#: authentication/views/login.py:375
+#: authentication/views/login.py:319
 msgid "No ticket found"
 msgstr "No se encontraron tickets"
 
-#: authentication/views/login.py:411
+#: authentication/views/login.py:355
 msgid "Logout success"
 msgstr "Cerrar sesión con éxito"
 
-#: authentication/views/login.py:412
+#: authentication/views/login.py:356
 msgid "Logout success, return login page"
 msgstr "Cerrar sesión con éxito, regresando a la página de inicio de sesión"
 
@@ -5482,7 +5492,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "Gestión de etiquetas"
 
-#: labels/models.py:15
+#: labels/models.py:15 settings/serializers/security.py:207
 msgid "Color"
 msgstr "Color"
 
@@ -6214,7 +6224,7 @@ msgstr "Organización predeterminada"
 msgid "SYSTEM"
 msgstr "Organización del sistema"
 
-#: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:188
+#: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:190
 #: terminal/models/applet/applet.py:42
 msgid "Builtin"
 msgstr "Incorporada"
@@ -6544,7 +6554,7 @@ msgstr "Mesa de trabajo"
 msgid "Audit view"
 msgstr "Registro de auditoría"
 
-#: rbac/tree.py:27 settings/models.py:164
+#: rbac/tree.py:27 settings/models.py:166
 msgid "System setting"
 msgstr "Configuración del sistema"
 
@@ -6657,75 +6667,75 @@ msgstr "El número de teléfono de prueba es un campo obligatorio."
 msgid "App Settings"
 msgstr "Configuración del sistema"
 
-#: settings/models.py:40 users/models/preference.py:14
+#: settings/models.py:42 users/models/preference.py:14
 msgid "Encrypted"
 msgstr "Encriptado"
 
-#: settings/models.py:166
+#: settings/models.py:168
 msgid "Can change email setting"
 msgstr "Configuración del correo electrónico"
 
-#: settings/models.py:167
+#: settings/models.py:169
 msgid "Can change auth setting"
 msgstr "Configuración de autenticación"
 
-#: settings/models.py:168
+#: settings/models.py:170
 msgid "Can change auth ops"
 msgstr "Configuración del centro de tareas"
 
-#: settings/models.py:169
+#: settings/models.py:171
 msgid "Can change auth ticket"
 msgstr "Configuración de tickets"
 
-#: settings/models.py:170
+#: settings/models.py:172
 msgid "Can change virtual app setting"
 msgstr "Se pueden cambiar las configuraciones de aplicación virtual"
 
-#: settings/models.py:171
+#: settings/models.py:173
 msgid "Can change auth announcement"
 msgstr "Configuración de anuncios"
 
-#: settings/models.py:172
+#: settings/models.py:174
 msgid "Can change vault setting"
 msgstr "Se pueden cambiar las configuraciones de vault"
 
-#: settings/models.py:173
+#: settings/models.py:175
 msgid "Can change chat ai setting"
 msgstr "Se pueden modificar las configuraciones de chat AI."
 
-#: settings/models.py:174
+#: settings/models.py:176
 msgid "Can change system msg sub setting"
 msgstr "Configuración de suscripción a mensajes"
 
-#: settings/models.py:175
+#: settings/models.py:177
 msgid "Can change sms setting"
 msgstr "Configuración de mensajes de texto"
 
-#: settings/models.py:176
+#: settings/models.py:178
 msgid "Can change security setting"
 msgstr "Configuración de seguridad"
 
-#: settings/models.py:177
+#: settings/models.py:179
 msgid "Can change clean setting"
 msgstr "Limpieza regular"
 
-#: settings/models.py:178
+#: settings/models.py:180
 msgid "Can change interface setting"
 msgstr "Configuración de la interfaz"
 
-#: settings/models.py:179
+#: settings/models.py:181
 msgid "Can change license setting"
 msgstr "Configuración de licencias"
 
-#: settings/models.py:180
+#: settings/models.py:182
 msgid "Can change terminal setting"
 msgstr "Configuración de terminales"
 
-#: settings/models.py:181
+#: settings/models.py:183
 msgid "Can change other setting"
 msgstr "Otras configuraciones"
 
-#: settings/models.py:191
+#: settings/models.py:193
 msgid "Chat prompt"
 msgstr "Notificaciones de chat"
 
@@ -7833,7 +7843,7 @@ msgstr ""
 msgid "Perm single to ungroup node"
 msgstr "Tiempo de expiración de la contraseña del usuario (días)"
 
-#: settings/serializers/security.py:17
+#: settings/serializers/security.py:19
 msgid "User password expiration (day)"
 msgstr ""
 "Si el usuario no actualiza la contraseña durante este periodo, la contraseña"
@@ -7842,18 +7852,18 @@ msgstr ""
 "sistema (diariamente) dentro de los 5 días previos a la expiración de la "
 "contraseña."
 
-#: settings/serializers/security.py:19
+#: settings/serializers/security.py:21
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
 "sent to the user by system within 5 days (daily) before the password expires"
 msgstr "No se pueden establecer las contraseñas de las últimas ocasiones."
 
-#: settings/serializers/security.py:26
+#: settings/serializers/security.py:28
 msgid "Recent password count"
 msgstr "No se puede establecer la contraseña en las últimas ocasiones"
 
-#: settings/serializers/security.py:28
+#: settings/serializers/security.py:30
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
@@ -7874,23 +7884,23 @@ msgstr ""
 "Si está habilitado, los usuarios que no existen no podrán iniciar sesión; si está deshabilitado, se permitirá el inicio de sesión de otros métodos de autenticación distintos del local y se creará automáticamente un usuario (si el usuario no existe).  \n"
 "Inicio de sesión solo desde el origen del usuario."
 
-#: settings/serializers/security.py:34
+#: settings/serializers/security.py:36
 msgid "Minimum length (User)"
 msgstr "Longitud mínima de la contraseña"
 
-#: settings/serializers/security.py:38
+#: settings/serializers/security.py:40
 msgid "Minimum length (Admin)"
 msgstr "Longitud mínima de la contraseña del administrador"
 
-#: settings/serializers/security.py:47
+#: settings/serializers/security.py:49
 msgid "Digits"
 msgstr "Debe incluir números"
 
-#: settings/serializers/security.py:50
+#: settings/serializers/security.py:52
 msgid "Special characters"
 msgstr "Debe incluir caracteres especiales"
 
-#: settings/serializers/security.py:55
+#: settings/serializers/security.py:57
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
@@ -7898,27 +7908,27 @@ msgstr ""
 "Cuando el número de intentos fallidos de inicio de sesión alcance el límite,"
 " se prohibirá el inicio de sesión durante este intervalo"
 
-#: settings/serializers/security.py:63 settings/serializers/security.py:73
+#: settings/serializers/security.py:65 settings/serializers/security.py:75
 msgid "Login failures count"
 msgstr "Límite de intentos fallidos de inicio de sesión"
 
-#: settings/serializers/security.py:67 settings/serializers/security.py:77
+#: settings/serializers/security.py:69 settings/serializers/security.py:79
 msgid "Login failure period (minute)"
 msgstr "Intervalo de prohibición de inicio de sesión (min)"
 
-#: settings/serializers/security.py:81
+#: settings/serializers/security.py:83
 msgid "Login IP whitelist"
 msgstr "Lista blanca de IP para inicio de sesión"
 
-#: settings/serializers/security.py:86
+#: settings/serializers/security.py:88
 msgid "Login IP blacklist"
 msgstr "Lista negra de inicio de sesión IP"
 
-#: settings/serializers/security.py:91
+#: settings/serializers/security.py:93
 msgid "Only single device login"
 msgstr "Solo un dispositivo puede iniciar sesión"
 
-#: settings/serializers/security.py:92
+#: settings/serializers/security.py:94
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
@@ -7926,11 +7936,11 @@ msgstr ""
 "Cuando un usuario inicia sesión desde un nuevo dispositivo, los demás "
 "dispositivos ya conectados se desconectarán automáticamente"
 
-#: settings/serializers/security.py:95
+#: settings/serializers/security.py:97
 msgid "Only exist user login"
 msgstr "Solo pueden iniciar sesión los usuarios existentes"
 
-#: settings/serializers/security.py:97
+#: settings/serializers/security.py:99
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -7942,11 +7952,11 @@ msgstr ""
 " autenticación local, podrán iniciar sesión y se crearán automáticamente (si"
 " el usuario no existe)"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:105
 msgid "Only from source login"
 msgstr "Solo se permite el inicio de sesión desde fuentes de usuarios"
 
-#: settings/serializers/security.py:105
+#: settings/serializers/security.py:107
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging"
 " in; if it is disabled, the user will authenticate all the enabled "
@@ -7959,54 +7969,54 @@ msgstr ""
 "métodos habilitados, permitiendo el acceso inmediato si cualquiera de ellos "
 "tiene éxito."
 
-#: settings/serializers/security.py:116
+#: settings/serializers/security.py:118
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "No habilitado"
 
-#: settings/serializers/security.py:117
+#: settings/serializers/security.py:119
 msgid "All users"
 msgstr "Todos los usuarios"
 
-#: settings/serializers/security.py:118
+#: settings/serializers/security.py:120
 msgid "Only admin users"
 msgstr "Solo administradores"
 
-#: settings/serializers/security.py:120
+#: settings/serializers/security.py:122
 msgid "Global MFA"
 msgstr "Habilitar autenticación MFA a nivel global"
 
-#: settings/serializers/security.py:124
+#: settings/serializers/security.py:126
 msgid "Third-party login MFA"
 msgstr "Terceros habilitan MFA"
 
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:127
 msgid "The third-party login modes include OIDC, CAS, and SAML2"
 msgstr ""
 "Los métodos de inicio de sesión de terceros incluyen: OIDC, CAS, SAML2"
 
-#: settings/serializers/security.py:129
+#: settings/serializers/security.py:131
 msgid "MFA via Email"
 msgstr "Verificación de correo electrónico MFA"
 
-#: settings/serializers/security.py:130
+#: settings/serializers/security.py:132
 msgid "Email as a method for multi-factor authentication"
 msgstr ""
 "Utilizar el correo electrónico como un método de autenticación multifactor"
 
-#: settings/serializers/security.py:133
+#: settings/serializers/security.py:135
 msgid "OTP issuer name"
 msgstr "Nombre tras escanear OTP"
 
-#: settings/serializers/security.py:137
+#: settings/serializers/security.py:139
 msgid "OTP valid window"
 msgstr "Conteo de validez tras un retraso de OTP"
 
-#: settings/serializers/security.py:141
+#: settings/serializers/security.py:143
 msgid "MFA verify TTL"
 msgstr "Validez de la verificación MFA"
 
-#: settings/serializers/security.py:143
+#: settings/serializers/security.py:145
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
@@ -8014,32 +8024,32 @@ msgstr ""
 "Unidad: segundos, actualmente solo aplicable al revisar la verificación de "
 "contraseña de la cuenta en MFA"
 
-#: settings/serializers/security.py:148
+#: settings/serializers/security.py:150
 msgid "MFA in login page"
 msgstr "MFA para ingreso en la página de inicio de sesión"
 
-#: settings/serializers/security.py:149
+#: settings/serializers/security.py:151
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr ""
 "La normativa de seguridad de datos de la Unión Europea (GDPR) exige que MFA "
 "esté en la página de inicio de sesión para garantizar la seguridad del "
 "acceso al sistema"
 
-#: settings/serializers/security.py:153
+#: settings/serializers/security.py:155
 msgid "Verify code TTL (second)"
 msgstr "Tiempo de validez del código de verificación (min)"
 
-#: settings/serializers/security.py:154
+#: settings/serializers/security.py:156
 msgid "Reset password and send SMS code expiration time"
 msgstr ""
 "Tiempo de caducidad del código de verificación para restablecer la "
 "contraseña y el código de verificación para el envío de SMS."
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:160
 msgid "Login dynamic code"
 msgstr "Activar código adicional para inicio de sesión"
 
-#: settings/serializers/security.py:159
+#: settings/serializers/security.py:161
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -8049,21 +8059,21 @@ msgstr ""
 "sistemas de autenticación de terceros requieren contraseña + 6 dígitos para "
 "completar la autenticación"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:165
 msgid "Login captcha"
 msgstr "Activar código de verificación para inicio de sesión"
 
-#: settings/serializers/security.py:164
+#: settings/serializers/security.py:166
 msgid "Enable captcha to prevent robot authentication"
 msgstr ""
 "Habilitar el código de verificación para prevenir el inicio de sesión de "
 "bots"
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:169
 msgid "Suspicious Login Verification"
 msgstr "Notificación de inicio de sesión desde una ubicación diferente"
 
-#: settings/serializers/security.py:169
+#: settings/serializers/security.py:171
 msgid ""
 "The system determines whether the login IP address belongs to a common login"
 " city. If the account is logged in from a common login city, the system "
@@ -8073,11 +8083,11 @@ msgstr ""
 "inicio habitual; si la cuenta inicia sesión desde una ciudad poco familiar, "
 "se enviará una alerta de inicio de sesión desde una ubicación diferente"
 
-#: settings/serializers/security.py:175
+#: settings/serializers/security.py:177
 msgid "Auto Disable Threshold (day)"
 msgstr "Desactivación automática de usuarios inactivos (días)"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:178
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
@@ -8085,35 +8095,60 @@ msgstr ""
 "Se realiza una verificación diaria, los usuarios que superen el tiempo "
 "preestablecido serán desactivados automáticamente"
 
-#: settings/serializers/security.py:196
+#: settings/serializers/security.py:198
 msgid "Watermark"
 msgstr "Activar marca de agua"
 
-#: settings/serializers/security.py:200
+#: settings/serializers/security.py:201
+msgid "Watermark session content"
+msgstr "Contenido de personalización de la marca de agua de la sesión"
+
+#: settings/serializers/security.py:204
+msgid "Watermark console content"
+msgstr ""
+"Contenido de personalización de la marca de agua en la página de gestión"
+
+#: settings/serializers/security.py:210
+msgid "Watermark font size"
+msgstr "Tamaño y tipo de fuente"
+
+#: settings/serializers/security.py:213
+msgid "Watermark height"
+msgstr "Altura de la marca de agua individual"
+
+#: settings/serializers/security.py:216
+msgid "Watermark width"
+msgstr "Ancho de la marca de agua individual"
+
+#: settings/serializers/security.py:219
+msgid "Watermark rotate"
+msgstr "Ángulo de rotación de la marca de agua"
+
+#: settings/serializers/security.py:223
 msgid "Max idle time (minute)"
 msgstr "Tiempo máximo de inactividad de conexión (min)"
 
-#: settings/serializers/security.py:201
+#: settings/serializers/security.py:224
 msgid "If idle time more than it, disconnect connection."
 msgstr ""
 "Sugerencia: si no se realizan operaciones durante más de esta configuración,"
 " la conexión se desconectará"
 
-#: settings/serializers/security.py:204
+#: settings/serializers/security.py:227
 msgid "Session expire at browser closed"
 msgstr "La sesión expira al cerrar el navegador"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:228
 msgid "Whether to expire the session when the user closes their browser."
 msgstr ""
 "Determina si la sesión debe expirar cuando el usuario cierra el navegador."
 
-#: settings/serializers/security.py:210
+#: settings/serializers/security.py:233
 msgid "Allow users to view asset session information"
 msgstr ""
 "Permitir a los usuarios ver la información de sesión en línea de activos"
 
-#: settings/serializers/security.py:212
+#: settings/serializers/security.py:235
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
@@ -8122,40 +8157,40 @@ msgstr ""
 "línea del activo actual en la ventana de selección de cuenta (solo protocolo"
 " RDP)"
 
-#: settings/serializers/security.py:218
+#: settings/serializers/security.py:241
 msgid "Max online time (hour)"
 msgstr "Tiempo máximo de conexión a la sesión (horas)"
 
-#: settings/serializers/security.py:219
+#: settings/serializers/security.py:242
 msgid "If session connection time more than it, disconnect connection."
 msgstr ""
 "Nota: Si la conexión a la sesión supera esta configuración, la conexión se "
 "desconectará"
 
-#: settings/serializers/security.py:222
+#: settings/serializers/security.py:245
 msgid "Remember manual auth"
 msgstr "Guardar la contraseña ingresada manualmente"
 
-#: settings/serializers/security.py:225
+#: settings/serializers/security.py:248
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "Compartir sesión"
 
-#: settings/serializers/security.py:226
+#: settings/serializers/security.py:249
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr ""
 "Al activarse, permite a los usuarios compartir la sesión de activos "
 "conectados con otros, para trabajar en colaboración"
 
-#: settings/serializers/security.py:232
+#: settings/serializers/security.py:255
 msgid "Insecure command alert"
 msgstr "Alerta de comandos peligrosos"
 
-#: settings/serializers/security.py:235
+#: settings/serializers/security.py:258
 msgid "Email recipient"
 msgstr "Destinatario del correo"
 
-#: settings/serializers/security.py:236
+#: settings/serializers/security.py:259
 msgid "Multiple user using , split"
 msgstr "Múltiples usuarios, separados por ,"
 
@@ -8547,17 +8582,17 @@ msgstr ""
 "Tu clave SSH no está configurada o ha caducado, por favor haz clic en <a "
 "href=\"%(user_pubkey_update)s\">el enlace</a> para actualizarla"
 
-#: templates/_mfa_login_field.html:31
+#: templates/_mfa_login_field.html:29
 #: users/templates/users/forgot_password.html:101
 msgid "Send"
 msgstr "Esperando:"
 
-#: templates/_mfa_login_field.html:110
+#: templates/_mfa_login_field.html:108
 #: users/templates/users/forgot_password.html:176
 msgid "Wait: "
 msgstr "El código de verificación ha sido enviado"
 
-#: templates/_mfa_login_field.html:120
+#: templates/_mfa_login_field.html:118
 #: users/templates/users/forgot_password.html:192
 msgid "The verification code has been sent"
 msgstr "Página principal"
@@ -10296,7 +10331,7 @@ msgstr "Se puede hacer coincidir a usuarios"
 msgid "User password history"
 msgstr "Historial de contraseñas de usuarios"
 
-#: users/models/user/_auth.py:33
+#: users/models/user/_auth.py:34
 msgid "Force enabled"
 msgstr "Activación forzada"
 
@@ -10307,7 +10342,7 @@ msgstr "Activación forzada"
 msgid "Reset password"
 msgstr "Restablecer contraseña"
 
-#: users/notifications.py:85 users/views/profile/reset.py:233
+#: users/notifications.py:85 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "Restablecimiento de contraseña exitoso"
 
@@ -10932,7 +10967,7 @@ msgstr "* Su contraseña no cumple con los requisitos"
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* La nueva contraseña no puede ser una de las últimas {} contraseñas"
 
-#: users/views/profile/reset.py:234
+#: users/views/profile/reset.py:239
 msgid "Reset password success, return to login page"
 msgstr ""
 "La contraseña se ha restablecido con éxito, regrese a la página de inicio de"
