@@ -1508,6 +1508,7 @@
     "VirtualApps": "Aplicativo Virtual",
     "Volcengine": "Motor Volcano",
     "Warning": "Aviso",
+    "WatermarkVariableHelpText": "Você pode usar ${key} no conteúdo da marca d'água personalizada para ler variáveis internas como: lista de senhas fracas, hora atual, se a página de gestão está disponível, ID do usuário, nome do usuário, endereço do ativo, nome de usuário, marca d'água, ID do ativo, nome do ativo.",
     "WeChat": " WeChat ",
     "WeCom": " WeChat Corporativo",
     "WeComOAuth": "Autenticação WeChat Empresarial",

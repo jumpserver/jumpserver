@@ -1507,6 +1507,7 @@
     "VirtualApps": "가상 응용",
     "Volcengine": "화산 엔진",
     "Warning": "경고",
+    "WatermarkVariableHelpText": "사용자가 지정한 워터마크 내용에서 ${key}를 사용하여 내장 변수를 읽을 수 있습니다.  \n- 약한 비밀번호 목록  \n- 현재 시간  \n- 관리 페이지 사용 가능 여부  \n- 사용자 ID  \n- 사용자 이름  \n- 자산 주소  \n- 사용자명  \n- 워터마크  \n- 자산 ID  \n- 자산 이름",
     "WeChat": "위챗",
     "WeCom": "기업 위챗",
     "WeComOAuth": "기업 WeChat 인증",
