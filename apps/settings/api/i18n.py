@@ -42,7 +42,7 @@ class ComponentI18nApi(RetrieveAPIView):
 
         if not lang:
             return Response(data)
-        if lang not in Language.choices:
+        if lang not in dict(Language.choices).keys():
             lang = 'en'
         code = Language.to_internal_code(lang, with_filename=True)
         data = data.get(code) or {}
