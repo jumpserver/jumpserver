@@ -604,7 +604,7 @@ class JSONManyToManyField(models.JSONField):
             return None
         if isinstance(value, RelatedManager):
             value = value.value
-        return value
+        return json.dumps(value)
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
