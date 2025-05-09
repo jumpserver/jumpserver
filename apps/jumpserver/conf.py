@@ -204,6 +204,7 @@ class Config(dict):
         'REDIS_SSL_CERT': None,
         'REDIS_SSL_CA': None,
         'REDIS_SSL_REQUIRED': 'none',
+        'REDIS_MAX_CONNECTIONS': 100,
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',
