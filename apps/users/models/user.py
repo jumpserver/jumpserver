@@ -22,7 +22,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    date_expired_default, get_logger, lazyproperty,
+    user_date_expired_default, get_logger, lazyproperty,
     random_string, bulk_create_with_signal
 )
 from labels.mixins import LabeledMixin
@@ -868,7 +868,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     )
     is_first_login = models.BooleanField(default=True, verbose_name=_('Is first login'))
     date_expired = models.DateTimeField(
-        default=date_expired_default, blank=True, null=True,
+        default=user_date_expired_default, blank=True, null=True,
         db_index=True, verbose_name=_('Date expired')
     )
     created_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Created by'))

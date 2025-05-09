@@ -64,6 +64,9 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     GPT_MODEL = serializers.CharField()
     FILE_UPLOAD_SIZE_LIMIT_MB = serializers.IntegerField()
 
+    DEFAULT_EXPIRED_YEARS = serializers.IntegerField()
+    USER_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
+    ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
 
 class ServerInfoSerializer(serializers.Serializer):
     CURRENT_TIME = serializers.DateTimeField()
