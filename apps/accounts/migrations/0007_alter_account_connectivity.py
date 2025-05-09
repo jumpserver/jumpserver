@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('accounts', '0006_alter_accountrisk_username_and_more'),
     ]
@@ -13,6 +12,18 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='account',
             name='connectivity',
-            field=models.CharField(choices=[('-', 'Unknown'), ('na', 'N/A'), ('ok', 'OK'), ('err', 'Error'), ('auth_err', 'Authentication error'), ('sudo_err', 'Sudo permission error'), ('password_err', 'Invalid password error'), ('openssh_key_err', 'OpenSSH key error'), ('ntlm_err', 'NTLM credentials rejected error'), ('create_dir_err', 'Create directory error')], default='-', max_length=16, verbose_name='Connectivity'),
+            field=models.CharField(choices=[
+                ('-', 'Unknown'),
+                ('na', 'N/A'),
+                ('ok', 'OK'),
+                ('err', 'Error'),
+                ('rdp_err', 'RDP error'),
+                ('auth_err', 'Authentication error'),
+                ('password_err', 'Invalid password error'),
+                ('openssh_key_err', 'OpenSSH key error'),
+                ('ntlm_err', 'NTLM credentials rejected error'),
+                ('create_temp_err', 'Create temporary error')
+            ],
+                default='-', max_length=16, verbose_name='Connectivity'),
         ),
     ]
