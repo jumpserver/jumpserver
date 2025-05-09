@@ -137,6 +137,7 @@ class Organization(OrgRoleMixin, JMSBaseModel):
     def expire_orgs_mapping(cls):
         cls.orgs_mapping = None
 
+    @property
     def org_id(self):
         return self.id
 
