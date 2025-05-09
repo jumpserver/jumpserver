@@ -42,8 +42,10 @@ class ComponentI18nApi(RetrieveAPIView):
 
         if not lang:
             return Response(data)
-        if lang not in dict(Language.choices).keys():
+
+        if lang not in dict(Language.get_code_mapper()).keys():
             lang = 'en'
+
         code = Language.to_internal_code(lang, with_filename=True)
         data = data.get(code) or {}
         if flat == '0':
