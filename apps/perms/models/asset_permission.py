@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from accounts.const import AliasAccount
 from accounts.models import Account
 from assets.models import Asset
-from common.utils import date_expired_default, lazyproperty
+from common.utils import asset_permission_date_expired_default, lazyproperty
 from common.utils.timezone import local_now
 from labels.mixins import LabeledMixin
 from orgs.mixins.models import JMSOrgBaseModel
@@ -77,7 +77,7 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(
-        default=date_expired_default, db_index=True, verbose_name=_('Date expired')
+        default=asset_permission_date_expired_default, db_index=True, verbose_name=_('Date expired')
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))

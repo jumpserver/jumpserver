@@ -51,6 +51,19 @@ def date_expired_default():
         years = 70
     return timezone.now() + timezone.timedelta(days=365 * years)
 
+def user_date_expired_default():
+    try:
+        days = int(settings.USER_DEFAULT_EXPIRED_DAYS)
+    except TypeError:
+        days = 25550
+    return timezone.now() + timezone.timedelta(days=days)
+
+def asset_permission_date_expired_default():
+    try:
+        days = int(settings.ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS)
+    except TypeError:
+        days = 25550
+    return timezone.now() + timezone.timedelta(days=days)
 
 def union_queryset(*args, base_queryset=None):
     if len(args) == 1:
