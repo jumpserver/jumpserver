@@ -111,7 +111,7 @@ class Cache(metaclass=CacheType):
                 value = self[field].to_internal_value(v.decode())
                 internal_data[field] = value
             else:
-                logger.warn(f'Cache got invalid field: '
+                logger.warning(f'Cache got invalid field: '
                             f'key={self.key} '
                             f'invalid_field={field} '
                             f'valid_fields={self.field_names}')

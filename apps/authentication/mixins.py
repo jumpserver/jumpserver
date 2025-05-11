@@ -174,7 +174,7 @@ class AuthPreCheckMixin:
         is_block = LoginBlockUtil(username, ip).is_block()
         if not is_block:
             return
-        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        logger.warning('Ip was blocked' + ': ' + username + ':' + ip)
         exception = errors.BlockLoginError(username=username, ip=ip)
         if raise_exception:
             raise errors.BlockLoginError(username=username, ip=ip)
@@ -253,7 +253,7 @@ class MFAMixin:
         blocked = MFABlockUtils(username, ip).is_block()
         if not blocked:
             return
-        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        logger.warning('Ip was blocked' + ': ' + username + ':' + ip)
         exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
         if raise_exception:
             raise exception

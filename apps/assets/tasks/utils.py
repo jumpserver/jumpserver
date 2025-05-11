@@ -25,10 +25,10 @@ def check_asset_can_run_ansible(asset):
 
 def check_system_user_can_run_ansible(system_user):
     if not system_user.auto_push_account:
-        logger.warn(f'Push system user task skip, auto push not enable: system_user={system_user.name}')
+        logger.warning(f'Push system user task skip, auto push not enable: system_user={system_user.name}')
         return False
     if not system_user.is_protocol_support_push:
-        logger.warn(f'Push system user task skip, protocol not support: '
+        logger.warning(f'Push system user task skip, protocol not support: '
                     f'system_user={system_user.name} protocol={system_user.protocol} '
                     f'support_protocol={system_user.SUPPORT_PUSH_PROTOCOLS}')
         return False

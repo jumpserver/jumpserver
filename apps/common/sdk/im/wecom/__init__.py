@@ -155,7 +155,7 @@ class WeCom(RequestMixin):
 
         errcode = data['errcode']
         if errcode == ErrorCode.INVALID_CODE:
-            logger.warn(f'WeCom get_user_id_by_code invalid code: code={code}')
+            logger.warning(f'WeCom get_user_id_by_code invalid code: code={code}')
             return None, None
 
         self._requests.check_errcode_is_0(data)
