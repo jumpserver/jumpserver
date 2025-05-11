@@ -147,7 +147,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
                             break
                     await asyncio.sleep(0.2)
         except OSError as e:
-            logger.warn('Task log path open failed: {}'.format(e))
+            logger.warning('Task log path open failed: {}'.format(e))
 
     async def disconnect(self, close_code):
         self.disconnected = True

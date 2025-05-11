@@ -137,7 +137,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         args = json.loads(json.dumps(list(args), cls=JSONEncoder))
         kwargs = json.loads(json.dumps(kwargs, cls=JSONEncoder))
     except Exception as e:
-        logger.warn('Parse task args or kwargs error (Need handle): {}'.format(e))
+        logger.warning('Parse task args or kwargs error (Need handle): {}'.format(e))
         args = []
         kwargs = {}
 

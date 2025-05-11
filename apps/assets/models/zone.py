@@ -39,7 +39,7 @@ class Zone(LabeledMixin, JMSOrgBaseModel):
         if not gateways:
             gateways = self.active_gateways
         if not gateways:
-            logger.warn(f'Not active gateway, domain={self}, pass')
+            logger.warning(f'Not active gateway, domain={self}, pass')
             return None
         return random.choice(gateways)
 
