@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http.response import HttpResponseForbidden
 from django.shortcuts import HttpResponse
-from django.utils import timezone
+from django.utils import timezone, translation
 
 from .utils import set_current_request
 
@@ -136,4 +136,31 @@ class EndMiddleware:
         request._e_time_start = time.time()
         response = self.get_response(request)
         request._e_time_end = time.time()
+        return response
+
+
+class LocaleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        lang = None
+        if request.user.is_authenticated:
+            lang = getattr(request.user, 'lang', None)
+
+        if not lang:
+            lang = translation.get_language_from_request(request, check_path=False)
+
+        lang = lang or settings.LANGUAGE_CODE
+        try:
+            translation.activate(lang)
+            request.LANGUAGE_CODE = lang
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME,
+                lang,
+                expires=timezone.now() + timezone.timedelta(days=365)
+            )
+        except Exception:
+            pass
         return response

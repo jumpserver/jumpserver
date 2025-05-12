@@ -63,6 +63,7 @@ class UserProfileSerializer(UserSerializer):
     mfa_level = LabeledChoiceField(choices=MFAMixin.MFA_LEVEL_CHOICES, label=_("MFA"), required=False)
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
+    lang = serializers.SerializerMethodField(label=_("Language"))
 
     class Meta(UserSerializer.Meta):
         read_only_fields = [
@@ -74,7 +75,7 @@ class UserProfileSerializer(UserSerializer):
         ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'guide_url',
-            "wecom_id", "dingtalk_id", "feishu_id", "slack_id",
+            "wecom_id", "dingtalk_id", "feishu_id", "slack_id", 'lang'
         ] + read_only_fields
 
         extra_kwargs = dict(UserSerializer.Meta.extra_kwargs)
@@ -143,6 +144,9 @@ class UserProfileSerializer(UserSerializer):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
         return password
+
+    def get_lang(self, obj):
+        return getattr(self.instance, 'lang', settings.LANGUAGE_CODE)
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

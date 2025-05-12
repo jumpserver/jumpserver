@@ -48,5 +48,5 @@ class BasicSerializer(serializers.Serializer):
 
 
 class LinaSerializer(serializers.Serializer):
-    # basic = BasicSerializer(required=False, label=_('Basic'))
+    basic = BasicSerializer(required=False, label=_('Basic'))
     file = FileEncryptSerializer(required=False, label=_('File Encryption'))

@@ -37,7 +37,7 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
         cache.set(lock_key, request.session.session_key, None)
 
     lang = request.COOKIES.get('django_language')
-    if lang:
+    if not user.lang and lang:
         user.lang = lang
 
 

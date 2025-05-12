@@ -375,6 +375,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         for name in default_name_opts.keys():
             value = preferences.get(name, default_name_opts[name])
             connect_options[name] = value
+        connect_options['lang'] = getattr(user, 'lang', settings.LANGUAGE_CODE)
         data['connect_options'] = connect_options
 
     @staticmethod

@@ -6,10 +6,12 @@ import logging
 import os
 import re
 import time
+from contextlib import contextmanager
 
 import pyotp
 from django.conf import settings
 from django.core.cache import cache
+from django.utils import translation
 from django.utils.translation import gettext as _
 
 from common.tasks import send_mail_async
@@ -336,3 +338,10 @@ def is_confirm_time_valid(session, key):
 
 def is_auth_confirm_time_valid(session):
     return is_confirm_time_valid(session, 'MFA_VERIFY_TIME')
+
+
+@contextmanager
+def activate_user_language(user):
+    language = getattr(user, 'lang', settings.LANGUAGE_CODE)
+    with translation.override(language):
+        yield
