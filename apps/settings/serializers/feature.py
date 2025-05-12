@@ -183,7 +183,7 @@ class OpsSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Feature')
 
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Adhoc'),
+        required=False, label=_('Adhoc command'),
         help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(
