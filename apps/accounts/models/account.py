@@ -166,9 +166,12 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             return self.ds.domain_name
         return ''
 
+    def username_has_domain(self):
+        return '@' in self.username or '\\' in self.username
+
     @property
     def full_username(self):
-        if self.ds_domain:
+        if not self.username_has_domain() and self.ds_domain:
             return '{}@{}'.format(self.username, self.ds_domain)
         return self.username
 
