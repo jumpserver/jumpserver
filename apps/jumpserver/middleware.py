@@ -137,3 +137,16 @@ class EndMiddleware:
         response = self.get_response(request)
         request._e_time_end = time.time()
         return response
+
+
+class LocaleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if request.user.is_authenticated:
+            lang = request.user.lang
+            expires = timezone.now() + timezone.timedelta(days=365)
+            response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)
+        return response
