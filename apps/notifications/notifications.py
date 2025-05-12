@@ -11,6 +11,7 @@ from common.utils.timezone import local_now
 from notifications.backends import BACKEND
 from settings.utils import get_login_title
 from users.models import User
+from users.utils import activate_user_language
 from .models import SystemMsgSubscription, UserMsgSubscription
 
 __all__ = ('SystemMessage', 'UserMessage', 'system_msgs', 'Message')
@@ -267,13 +268,13 @@ class SystemMessage(Message):
             *subscription.users.all(),
             *chain(*[g.users.all() for g in subscription.groups.all()])
         ]
-
-        receive_user_ids = [u.id for u in users]
-        backends_msg_mapper = self.get_backend_msg_mapper(receive_backends)
-        if is_async:
-            publish_task.delay(receive_user_ids, backends_msg_mapper)
-        else:
-            self.send_msg(receive_user_ids, backends_msg_mapper)
+        for user in users:
+            with activate_user_language(user):
+                backends_msg_mapper = self.get_backend_msg_mapper(receive_backends)
+                if is_async:
+                    publish_task.delay([user.id], backends_msg_mapper)
+                else:
+                    self.send_msg([user.id], backends_msg_mapper)
 
     @classmethod
     def post_insert_to_db(cls, subscription: SystemMsgSubscription):
@@ -295,12 +296,13 @@ class UserMessage(Message):
         发送消息到每个用户配置的接收方式上
         """
         sub = UserMsgSubscription.objects.get(user=self.user)
-        backends_msg_mapper = self.get_backend_msg_mapper(sub.receive_backends)
-        receive_user_ids = [self.user.id]
-        if is_async:
-            publish_task.delay(receive_user_ids, backends_msg_mapper)
-        else:
-            self.send_msg(receive_user_ids, backends_msg_mapper)
+        with activate_user_language(self.user):
+            backends_msg_mapper = self.get_backend_msg_mapper(sub.receive_backends)
+            receive_user_ids = [self.user.id]
+            if is_async:
+                publish_task.delay(receive_user_ids, backends_msg_mapper)
+            else:
+                self.send_msg(receive_user_ids, backends_msg_mapper)
 
     @classmethod
     def get_test_user(cls):
