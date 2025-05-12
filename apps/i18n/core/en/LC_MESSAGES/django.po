@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-08 15:41+0800\n"
+"POT-Creation-Date: 2025-05-12 10:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -133,7 +133,7 @@ msgstr ""
 #: users/forms/profile.py:22 users/serializers/user.py:148
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
-#: xpack/plugins/cloud/serializers/account_attrs.py:27
+#: xpack/plugins/cloud/serializers/account_attrs.py:43
 msgid "Password"
 msgstr ""
 
@@ -852,7 +852,7 @@ msgstr ""
 #: users/forms/profile.py:117 users/models/user/__init__.py:64
 #: users/serializers/profile.py:186
 #: users/templates/users/_msg_user_created.html:12
-#: xpack/plugins/cloud/serializers/account_attrs.py:25
+#: xpack/plugins/cloud/serializers/account_attrs.py:41
 msgid "Username"
 msgstr ""
 
@@ -1894,7 +1894,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr ""
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:152
+#: xpack/plugins/cloud/serializers/task.py:163
 msgid "IP address invalid: `{}`"
 msgstr ""
 
@@ -2130,7 +2130,7 @@ msgstr ""
 #: settings/serializers/msg.py:30 terminal/models/component/endpoint.py:14
 #: terminal/serializers/applet.py:17 xpack/plugins/cloud/const.py:37
 #: xpack/plugins/cloud/manager.py:101
-#: xpack/plugins/cloud/serializers/account_attrs.py:71
+#: xpack/plugins/cloud/serializers/account_attrs.py:87
 msgid "Host"
 msgstr ""
 
@@ -2386,7 +2386,7 @@ msgstr ""
 #: assets/models/asset/common.py:101 assets/models/platform.py:16
 #: settings/serializers/auth/radius.py:18 settings/serializers/auth/sms.py:77
 #: settings/serializers/msg.py:31 terminal/serializers/storage.py:133
-#: xpack/plugins/cloud/serializers/account_attrs.py:72
+#: xpack/plugins/cloud/serializers/account_attrs.py:88
 msgid "Port"
 msgstr ""
 
@@ -2504,7 +2504,7 @@ msgstr ""
 
 #: assets/models/automations/base.py:155
 #: assets/serializers/automations/base.py:44 xpack/plugins/cloud/models.py:247
-#: xpack/plugins/cloud/serializers/task.py:249
+#: xpack/plugins/cloud/serializers/task.py:260
 msgid "Trigger mode"
 msgstr ""
 
@@ -2833,6 +2833,7 @@ msgid "Auto info"
 msgstr ""
 
 #: assets/serializers/asset/common.py:271
+#: xpack/plugins/cloud/serializers/task.py:119
 msgid "Platform not exist"
 msgstr ""
 
@@ -3534,11 +3535,11 @@ msgstr ""
 msgid "Passkey"
 msgstr ""
 
-#: audits/tasks.py:132
+#: audits/tasks.py:135
 msgid "Clean audits session task log"
 msgstr ""
 
-#: audits/tasks.py:134
+#: audits/tasks.py:137
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -3549,11 +3550,11 @@ msgid ""
 "        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"
 msgstr ""
 
-#: audits/tasks.py:154
+#: audits/tasks.py:157
 msgid "Upload FTP file to external storage"
 msgstr ""
 
-#: audits/tasks.py:156
+#: audits/tasks.py:159
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -4126,13 +4127,13 @@ msgstr ""
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
 #: users/models/user/__init__.py:94
-#: xpack/plugins/cloud/serializers/account_attrs.py:213
+#: xpack/plugins/cloud/serializers/account_attrs.py:229
 msgid "Private key"
 msgstr ""
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:38
 #: users/forms/profile.py:175 users/models/user/__init__.py:97
-#: xpack/plugins/cloud/serializers/account_attrs.py:210
+#: xpack/plugins/cloud/serializers/account_attrs.py:226
 msgid "Public key"
 msgstr ""
 
@@ -4698,7 +4699,7 @@ msgstr ""
 msgid "Ultimate edition"
 msgstr ""
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:454
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:450
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -4758,9 +4759,10 @@ msgstr ""
 #: common/db/fields.py:590 common/db/fields.py:595
 #: common/serializers/fields.py:146 terminal/serializers/session.py:81
 #: tickets/serializers/ticket/common.py:58
-#: xpack/plugins/cloud/serializers/account_attrs.py:55
-#: xpack/plugins/cloud/serializers/account_attrs.py:79
-#: xpack/plugins/cloud/serializers/account_attrs.py:150
+#: xpack/plugins/cloud/serializers/account_attrs.py:20
+#: xpack/plugins/cloud/serializers/account_attrs.py:71
+#: xpack/plugins/cloud/serializers/account_attrs.py:95
+#: xpack/plugins/cloud/serializers/account_attrs.py:166
 msgid "This field is required."
 msgstr ""
 
@@ -5036,6 +5038,7 @@ msgstr ""
 
 #: common/serializers/fields.py:237
 #: xpack/plugins/cloud/serializers/account.py:114
+#: xpack/plugins/cloud/serializers/task.py:122
 msgid "Invalid choice: {}"
 msgstr ""
 
@@ -5346,7 +5349,6 @@ msgid "VCS"
 msgstr ""
 
 #: ops/const.py:38 ops/models/adhoc.py:44 ops/models/variable.py:26
-#: settings/serializers/feature.py:186
 msgid "Adhoc"
 msgstr ""
 
@@ -6631,13 +6633,13 @@ msgid "Service provider"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:31 settings/serializers/feature.py:97
-#: xpack/plugins/cloud/serializers/account_attrs.py:34
+#: xpack/plugins/cloud/serializers/account_attrs.py:50
 msgid "Client ID"
 msgstr ""
 
 #: settings/serializers/auth/oauth2.py:34 settings/serializers/auth/oidc.py:24
 #: settings/serializers/feature.py:100
-#: xpack/plugins/cloud/serializers/account_attrs.py:37
+#: xpack/plugins/cloud/serializers/account_attrs.py:53
 msgid "Client Secret"
 msgstr ""
 
@@ -6929,7 +6931,7 @@ msgid "SSO auth key TTL"
 msgstr ""
 
 #: settings/serializers/auth/sso.py:20
-#: xpack/plugins/cloud/serializers/account_attrs.py:200
+#: xpack/plugins/cloud/serializers/account_attrs.py:216
 msgid "Unit: second"
 msgstr ""
 
@@ -7075,7 +7077,7 @@ msgid "Mount Point"
 msgstr ""
 
 #: settings/serializers/feature.py:103
-#: xpack/plugins/cloud/serializers/account_attrs.py:40
+#: xpack/plugins/cloud/serializers/account_attrs.py:56
 msgid "Tenant ID"
 msgstr ""
 
@@ -7090,7 +7092,7 @@ msgid "Access key ID"
 msgstr ""
 
 #: settings/serializers/feature.py:117 terminal/serializers/storage.py:37
-#: xpack/plugins/cloud/serializers/account_attrs.py:19
+#: xpack/plugins/cloud/serializers/account_attrs.py:35
 msgid "Access key secret"
 msgstr ""
 
@@ -7151,6 +7153,10 @@ msgstr ""
 
 #: settings/serializers/feature.py:178
 msgid "The unit of period"
+msgstr ""
+
+#: settings/serializers/feature.py:186
+msgid "Adhoc command"
 msgstr ""
 
 #: settings/serializers/feature.py:187
@@ -8512,7 +8518,7 @@ msgid "Command and replay storage"
 msgstr "Storage"
 
 #: terminal/notifications.py:258 terminal/tasks.py:212
-#: xpack/plugins/cloud/api.py:181
+#: xpack/plugins/cloud/api.py:182
 #: xpack/plugins/cloud/serializers/account.py:136
 #: xpack/plugins/cloud/serializers/account.py:138
 msgid "Test failure: Account invalid"
@@ -10153,7 +10159,7 @@ msgstr ""
 msgid "Test connection failed: {}"
 msgstr ""
 
-#: xpack/plugins/cloud/api.py:202
+#: xpack/plugins/cloud/api.py:203
 msgid "User {} deleted the current resource and released the assets"
 msgstr ""
 
@@ -10344,54 +10350,54 @@ msgstr ""
 msgid "Failed to synchronize the instance \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:379
+#: xpack/plugins/cloud/manager.py:378
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:436
+#: xpack/plugins/cloud/manager.py:432
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:438
+#: xpack/plugins/cloud/manager.py:434
 #, python-format
 msgid "Update asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:441
+#: xpack/plugins/cloud/manager.py:437
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:450
+#: xpack/plugins/cloud/manager.py:446
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:471
+#: xpack/plugins/cloud/manager.py:467
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:497
+#: xpack/plugins/cloud/manager.py:493
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:513
+#: xpack/plugins/cloud/manager.py:509
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:521
+#: xpack/plugins/cloud/manager.py:517
 #, python-format
 msgid "Set labels \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:535 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:531 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr ""
 
@@ -10418,8 +10424,8 @@ msgstr ""
 
 #: xpack/plugins/cloud/models.py:109
 #: xpack/plugins/cloud/serializers/account.py:76
-#: xpack/plugins/cloud/serializers/task.py:159
-#: xpack/plugins/cloud/serializers/task.py:160
+#: xpack/plugins/cloud/serializers/task.py:170
+#: xpack/plugins/cloud/serializers/task.py:171
 msgid "Regions"
 msgstr ""
 
@@ -10432,7 +10438,7 @@ msgid "IP network segment group"
 msgstr ""
 
 #: xpack/plugins/cloud/models.py:121
-#: xpack/plugins/cloud/serializers/task.py:163
+#: xpack/plugins/cloud/serializers/task.py:174
 msgid "Preferred IP type"
 msgstr ""
 
@@ -10777,94 +10783,94 @@ msgstr ""
 msgid "Provider display"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:16
+#: xpack/plugins/cloud/serializers/account_attrs.py:32
 msgid "Access key id"
 msgstr "Access key id"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:43
+#: xpack/plugins/cloud/serializers/account_attrs.py:59
 msgid "Subscription ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:73
+#: xpack/plugins/cloud/serializers/account_attrs.py:89
 msgid "Auto node classification"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:98
-#: xpack/plugins/cloud/serializers/account_attrs.py:102
-#: xpack/plugins/cloud/serializers/account_attrs.py:126
-#: xpack/plugins/cloud/serializers/account_attrs.py:156
-#: xpack/plugins/cloud/serializers/account_attrs.py:206
+#: xpack/plugins/cloud/serializers/account_attrs.py:114
+#: xpack/plugins/cloud/serializers/account_attrs.py:118
+#: xpack/plugins/cloud/serializers/account_attrs.py:142
+#: xpack/plugins/cloud/serializers/account_attrs.py:172
+#: xpack/plugins/cloud/serializers/account_attrs.py:222
 msgid "API Endpoint"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:108
+#: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:109
+#: xpack/plugins/cloud/serializers/account_attrs.py:125
 msgid "eg: http://openstack.example.com:5000/v3"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:112
+#: xpack/plugins/cloud/serializers/account_attrs.py:128
 msgid "User domain"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:127
+#: xpack/plugins/cloud/serializers/account_attrs.py:143
 msgid "Cert File"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:128
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
 msgid "Key File"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:144
+#: xpack/plugins/cloud/serializers/account_attrs.py:160
 msgid "Service account key"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:145
+#: xpack/plugins/cloud/serializers/account_attrs.py:161
 msgid "The file is in JSON format"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:163
+#: xpack/plugins/cloud/serializers/account_attrs.py:179
 msgid "IP address invalid `{}`, {}"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:179
+#: xpack/plugins/cloud/serializers/account_attrs.py:195
 msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:182
+#: xpack/plugins/cloud/serializers/account_attrs.py:198
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
 "synchronized. <br>If the port is 0, all IP addresses are valid."
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:190
+#: xpack/plugins/cloud/serializers/account_attrs.py:206
 msgid "Hostname prefix"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:193
+#: xpack/plugins/cloud/serializers/account_attrs.py:209
 msgid "IP segment"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:197
+#: xpack/plugins/cloud/serializers/account_attrs.py:213
 msgid "Test port"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:200
+#: xpack/plugins/cloud/serializers/account_attrs.py:216
 msgid "Test timeout"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:216
+#: xpack/plugins/cloud/serializers/account_attrs.py:232
 msgid "Project"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:157
+#: xpack/plugins/cloud/serializers/task.py:168
 msgid "History count"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/task.py:158
+#: xpack/plugins/cloud/serializers/task.py:169
 msgid "Instance count"
 msgstr ""
 
