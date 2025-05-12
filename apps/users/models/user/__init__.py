@@ -13,7 +13,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    date_expired_default, get_logger, lazyproperty
+    user_date_expired_default, get_logger, lazyproperty
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
@@ -99,7 +99,7 @@ class User(
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     is_first_login = models.BooleanField(default=True, verbose_name=_("Is first login"))
     date_expired = models.DateTimeField(
-        default=date_expired_default,
+        default=user_date_expired_default,
         blank=True,
         null=True,
         db_index=True,
