@@ -4,7 +4,6 @@ import time
 
 import redis
 from django.core.cache import cache
-from redis.client import PubSub
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
@@ -19,21 +18,29 @@ def get_redis_client(db=0):
 
 
 class RedisPubSub:
+    handlers = {}
+    lock = threading.Lock()
+    redis = get_redis_client()
+    pubsub = redis.pubsub()
+
     def __init__(self, ch, db=10):
         self.ch = ch
         self.db = db
-        self.redis = get_redis_client(db)
 
     def subscribe(self, _next, error=None, complete=None):
-        ps = self.redis.pubsub()
-        ps.subscribe(self.ch)
-        sub = Subscription(self, ps)
-        sub.keep_handle_msg(_next, error, complete)
+        with self.lock:
+            if self.ch not in self.handlers:
+                self.pubsub.subscribe(self.ch)
+            self.handlers[self.ch] = _next
+
+        sub = Subscription(self, self.handlers)
+        sub.keep_handle_msg(self.handlers, error, complete)
         return sub
 
-    def resubscribe(self, _next, error=None, complete=None):
-        self.redis = get_redis_client(self.db)
-        self.subscribe(_next, error, complete)
+    @classmethod
+    def resubscribe(cls, handles, error=None, complete=None):
+        for ch, handler in handles.items():
+            cls(ch).subscribe(handler, error, complete)
 
     def publish(self, data):
         data_json = json.dumps(data)
@@ -42,12 +49,14 @@ class RedisPubSub:
 
 
 class Subscription:
-    def __init__(self, pb: RedisPubSub, sub: PubSub):
+    running = False
+
+    def __init__(self, pb: RedisPubSub, handlers: dict):
         self.pb = pb
         self.ch = pb.ch
-        self.sub = sub
         self.unsubscribed = False
-        logger.info(f"Subscribed to channel: {sub}")
+        self.sub = self.pb.pubsub
+        self.handlers = handlers
 
     def _handle_msg(self, _next, error, complete):
         """
@@ -69,13 +78,15 @@ class Subscription:
             for msg in msgs:
                 if msg["type"] != "message":
                     continue
+                channel = msg['channel'].decode()
+                handler = self.handlers.get(channel)
                 item = None
                 try:
                     item_json = msg['data'].decode()
                     item = json.loads(item_json)
 
                     with safe_db_connection():
-                        _next(item)
+                        handler(item)
                 except Exception as e:
                     error(msg, item)
                     logger.error('Subscribe handler handle msg error: {}'.format(e))
@@ -84,7 +95,7 @@ class Subscription:
                 logger.debug('Subscription unsubscribed')
             else:
                 logger.error('Consume msg error: {}'.format(e))
-                self.retry(_next, error, complete)
+                self.retry(self.handlers, error, complete)
                 return
 
         try:
@@ -98,28 +109,29 @@ class Subscription:
         except Exception as e:
             logger.error("Redis observer close error: {}".format(e))
 
-    def keep_handle_msg(self, _next, error, complete):
-        t = threading.Thread(target=self._handle_msg, args=(_next, error, complete))
-        t.daemon = True
-        t.start()
-        return t
+    def keep_handle_msg(self, handlers, error, complete):
+        if not self.running:
+            self.running = True
+            t = threading.Thread(target=self._handle_msg, args=(handlers, error, complete))
+            t.daemon = True
+            t.start()
 
     def unsubscribe(self):
         self.unsubscribed = True
         logger.info(f"Unsubscribed from channel: {self.sub}")
         try:
-            self.sub.close()
+            self.pb.pubsub.close()
         except Exception as e:
             logger.warning(f'Unsubscribe msg error: {e}')
 
-    def retry(self, _next, error, complete):
+    def retry(self, handlers, error, complete):
         logger.info('Retry subscribe channel: {}'.format(self.ch))
         times = 0
 
         while True:
             try:
                 self.unsubscribe()
-                self.pb.resubscribe(_next, error, complete)
+                self.pb.resubscribe(handlers, error, complete)
                 break
             except Exception as e:
                 logger.error('Retry #{} {} subscribe channel error: {}'.format(times, self.ch, e))
