@@ -180,6 +180,7 @@
     "Audits": "감사 대시보드",
     "Auth": "인증 설정",
     "AuthConfig": "인증 구성",
+    "AuthIntegration": "인증 통합",
     "AuthLimit": "로그인 제한",
     "AuthSAMLCertHelpText": "증명서 키 업로드 후 저장, 그런 다음 SP 메타데이터 확인",
     "AuthSAMLKeyHelpText": "SP 인증서와 키는 IDP와 암호화 통신을 하는 데 사용됩니다.",

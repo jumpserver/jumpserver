@@ -1551,5 +1551,6 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "AuthIntegration": "认证集成"
 }

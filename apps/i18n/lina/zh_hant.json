@@ -182,6 +182,7 @@
     "Audits": "審計台",
     "Auth": "認證設置",
     "AuthConfig": "配寘認證資訊",
+    "AuthIntegration": "認證整合",
     "AuthLimit": "登入限制",
     "AuthSAMLCertHelpText": "上傳證書金鑰後儲存, 然後查看 SP Metadata",
     "AuthSAMLKeyHelpText": "SP 證書和密鑰 是用來和 IDP 加密通訊的",
