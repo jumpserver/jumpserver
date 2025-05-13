@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import requests
 from rest_framework.exceptions import NotFound, APIException
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 
@@ -19,7 +19,7 @@ class ProxyMixin(APIView):
     """
     通用资源代理 API，支持动态路径、自动文档生成
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def _build_url(self, resource_name: str, pk: str = None, query_params=None):
         resource_map = get_full_resource_map()
