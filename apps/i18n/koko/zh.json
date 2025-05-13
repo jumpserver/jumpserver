@@ -92,5 +92,11 @@
     "VerifyCode": "验证码",
     "WaitFileTransfer": "等待文件传输结束",
     "WebSocketClosed": "WebSocket 已关闭",
-    "Writable": "可写"
+    "Writable": "可写",
+    "CurrentUser": "当前用户",
+    "OnlineUser": "在线用户",
+    "NoOnlineUser": "暂无在线用户",
+    "Format": "格式",
+    "ThemeSyncSuccessful": "主题同步成功",
+    "Warning": "警告"
 }

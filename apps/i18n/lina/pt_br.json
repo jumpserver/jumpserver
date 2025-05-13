@@ -180,6 +180,7 @@
     "Audits": "Auditório",
     "Auth": "Configurações de autenticação",
     "AuthConfig": "Configurar Autenticação",
+    "AuthIntegration": "Integração de Certificação",
     "AuthLimit": "Restrições de login",
     "AuthSAMLCertHelpText": "Salvar após carregar a chave do certificado, então ver SP Metadata",
     "AuthSAMLKeyHelpText": "O certificado SP e a chave são usados para comunicação criptografada com o IDP",

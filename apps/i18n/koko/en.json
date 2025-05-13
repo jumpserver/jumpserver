@@ -92,5 +92,11 @@
     "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "WebSocketClosed": "WebSocket closed",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "CurrentUser": "Current user",
+    "OnlineUser": "Online user",
+    "NoOnlineUser": "No online user",
+    "Format": "Format",
+    "ThemeSyncSuccessful": "Theme sync successful",
+    "Warning": "Warning"
 }

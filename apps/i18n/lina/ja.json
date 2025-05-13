@@ -182,6 +182,7 @@
     "Audits": "監査台",
     "Auth": "認証設定",
     "AuthConfig": "資格認定構成",
+    "AuthIntegration": "認証統合",
     "AuthLimit": "ログイン制限",
     "AuthSAMLCertHelpText": "証明書キーをアップロードした後で保存し、SP Metadataを確認してください",
     "AuthSAMLKeyHelpText": "SP 証明書とキーはIDPとの暗号化通信用です",
