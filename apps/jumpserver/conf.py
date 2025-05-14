@@ -221,7 +221,7 @@ class Config(dict):
         'ANNOUNCEMENT': {},
 
         # Security
-        'X_FRAME_OPTIONS': 'DENY',
+        'X_FRAME_OPTIONS': 'SAMEORIGIN',
 
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
