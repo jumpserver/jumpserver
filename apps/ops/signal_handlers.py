@@ -115,11 +115,10 @@ def on_celery_task_pre_run(task_id='', kwargs=None, **others):
 
 @signals.task_postrun.connect
 def on_celery_task_post_run(task_id='', state='', **kwargs):
-    close_old_connections()
-
     CeleryTaskExecution.objects.filter(id=task_id).update(
         state=state, date_finished=timezone.now(), is_finished=True
     )
+    close_old_connections()
 
 
 @signals.after_task_publish.connect
