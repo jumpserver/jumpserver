@@ -180,6 +180,7 @@
     "Audits": "Audits",
     "Auth": "Authentication",
     "AuthConfig": "Authentication",
+    "AuthIntegration": "AuthIntegration",
     "AuthLimit": "Login restriction",
     "AuthSAMLCertHelpText": "Save after uploading the certificate key, then view sp metadata",
     "AuthSAMLKeyHelpText": "Sp certificates and keys are used for encrypted communication with idp",
@@ -520,6 +521,7 @@
     "EmptyPassword": "Empty password",
     "Enable": "Enable",
     "EnableDomain": "Gateway enabled",
+    "EnableGateway": "Enable gateway",
     "EnableKoKoSSHHelpText": "When switched on, connecting to the asset will display ssh client pull-up method",
     "Endpoint": "Endpoint",
     "EndpointListHelpMessage": "The service endpoint is the address (port) for users to access the service. when users connect to assets, they choose service endpoints based on endpoint rules and asset tags, using them as access points to establish connections and achieve distributed connections to assets",
@@ -1546,6 +1548,5 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name",
-    "AuthIntegration": "AuthIntegration"
+    "userName": "User name"
 }

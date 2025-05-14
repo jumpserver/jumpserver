@@ -520,6 +520,7 @@
     "EmptyPassword": "빈 비밀번호",
     "Enable": "활성화",
     "EnableDomain": "도메인 활성화",
+    "EnableGateway": "도메인 게이트웨이 활성화",
     "EnableKoKoSSHHelpText": "연결 시 자산이 SSH 클라이언트 호출 방식으로 표시됩니다",
     "Endpoint": "서버 엔드포인트",
     "EndpointListHelpMessage": "서비스 엔드포인트는 사용자가 서비스에 접근하는 주소(포트)로, 사용자가 자산에 연결할 때 엔드포인트 규칙과 자산 태그에 따라 서비스 엔드포인트를 선택하여 접근 경로를 통해 연결을 구축하고 분산 자산 연결을 실현합니다",

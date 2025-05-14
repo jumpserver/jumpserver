@@ -525,6 +525,7 @@
     "EmptyPassword": "空密碼",
     "Enable": "啟用",
     "EnableDomain": "啟用網域",
+    "EnableGateway": "啟用網域網關",
     "EnableKoKoSSHHelpText": "開啟時連接資產會顯示 SSH Client 拉起方式",
     "Endpoint": "服務端點",
     "EndpointListHelpMessage": "服務端點是用戶訪問服務的地址(埠)，當用戶在連接資產時，會根據端點規則和資產標籤選擇服務端點，作為訪問入口建立連接，實現分布式連接資產",
