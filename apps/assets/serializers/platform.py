@@ -222,7 +222,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
             return
 
         name = self.initial_data.get('name')
-        if ' ' in name:
+        if name is not None and ' ' in name:
             self.initial_data['name'] = name.replace(' ', '-')
 
         if self.instance:

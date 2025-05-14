@@ -521,6 +521,7 @@
     "EmptyPassword": "Senha vazia",
     "Enable": "Ativar",
     "EnableDomain": "Ativar domínio",
+    "EnableGateway": "Ativar o gateway de domínio.",
     "EnableKoKoSSHHelpText": "Ao iniciar, conectar ao ativo mostrará o método de lançamento do SSH Client",
     "Endpoint": "Ponto de serviço",
     "EndpointListHelpMessage": "O ponto de serviço é o endereço (porta) onde o usuário acessa o serviço. Quando o usuário se conecta ao recurso, ele escolhe o ponto de serviço de acordo com as regras do ponto final e etiquetas de recurso, estabelecendo a conexão como entrada de acesso, realizando a conexão distribuída ao recurso",

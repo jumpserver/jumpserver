@@ -180,6 +180,7 @@
     "Audits": "审计台",
     "Auth": "认证设置",
     "AuthConfig": "配置认证",
+    "AuthIntegration": "认证集成",
     "AuthLimit": "登录限制",
     "AuthSAMLCertHelpText": "上传证书密钥后保存, 然后查看 SP Metadata",
     "AuthSAMLKeyHelpText": "SP 证书和密钥 是用来和 IDP 加密通信的",
@@ -519,6 +520,7 @@
     "EmptyPassword": "空密码",
     "Enable": "启用",
     "EnableDomain": "启用网域",
+    "EnableGateway": "启用网域网关",
     "EnableKoKoSSHHelpText": "开启时连接资产会显示 SSH Client 拉起方式",
     "Endpoint": "服务端点",
     "EndpointListHelpMessage": "服务端点是用户访问服务的地址(端口)，当用户在连接资产时，会根据端点规则和资产标签选择服务端点，作为访问入口建立连接，实现分布式连接资产",
@@ -1551,6 +1553,5 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名",
-    "AuthIntegration": "认证集成"
+    "userName": "用户名"
 }

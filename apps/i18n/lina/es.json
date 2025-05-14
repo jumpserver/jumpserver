@@ -520,6 +520,7 @@
     "EmptyPassword": "Contraseña vacía",
     "Enable": "habilitar",
     "EnableDomain": "Habilitar dominio",
+    "EnableGateway": "Habilitar el gateway de dominio.",
     "EnableKoKoSSHHelpText": "Al activar, la conexión al activo se mostrará en modo cliente SSH",
     "Endpoint": "Punto de servicio",
     "EndpointListHelpMessage": "El punto final del servidor de servicios es la dirección (puerto) que los usuarios utilizan para acceder a los servicios. Cuando el usuario conecta los activos, se selecciona el punto final del servicio según las reglas del punto final y las etiquetas de los activos, estableciendo así una conexión como entrada para acceder a activos distribuidos.",
