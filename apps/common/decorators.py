@@ -11,7 +11,7 @@ from functools import wraps
 
 from django.db import transaction
 
-from .db.utils import open_db_connection, safe_db_connection
+from .db.utils import open_db_connection, safe_atomic_db_connection
 from .utils import logger
 
 
@@ -318,7 +318,7 @@ def bulk_handle(handler, batch_size=50, timeout=0.5):
                 if not cache:
                     return
                 with tmp_to_org(org_id):
-                    with safe_db_connection():
+                    with safe_atomic_db_connection():
                         handler(cache)
                 cache.clear()
 

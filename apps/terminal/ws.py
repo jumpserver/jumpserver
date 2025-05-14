@@ -52,7 +52,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         self.send(bytes_data=content)
 
     def get_terminal_tasks(self, task_id=None):
-        with safe_db_connection(auto_close=True):
+        with safe_db_connection():
             critical_time = timezone.now() - datetime.timedelta(minutes=10)
             tasks = self.terminal.task_set.filter(is_finished=False, date_created__gte=critical_time)
             if task_id:
