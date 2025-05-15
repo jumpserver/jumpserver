@@ -788,7 +788,7 @@
     "MFAAllUsers": "Globally: All users",
     "MFAErrorMsg": "MFA errors, please check",
     "MFAOfUserFirstLoginPersonalInformationImprovementPage": "Enable multi-factor authentication to make your account more secure. <br/>after enabling, you will enter the multi-factor authentication binding process the next time you login; you can also directly bind in (personal information->quick modification->change multi-factor settings)!",
-    "MFAOfUserFirstLoginUserGuidePage": "In order to protect your and the company's security, please carefully safeguard important sensitive information such as your account, password, and key (for example, set a complex password, and enable multi-factor authentication) <br/> personal information such as email, mobile number, and wechat are only used for user authentication and platform internal message notifications.",
+    "MFAOfUserFirstLoginUserGuidePage": "In order to protect your and the company's security, please carefully safeguard important sensitive information such as your account, password, and key (for example, set a complex password, and enable multi-factor authentication) <br/> personal information such as email, and mobile number only used for user authentication and platform internal message notifications.",
     "MFAOnlyAdminUsers": "Globally: Only admin",
     "MIN_LENGTH_ERROR": "Passwords must be at least {0} characters.",
     "MailRecipient": "Email recipients",

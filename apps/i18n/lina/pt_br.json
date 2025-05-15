@@ -789,7 +789,7 @@
     "MFAAllUsers": "Ativação global: Todos os usuários",
     "MFAErrorMsg": "Erro de MFA, por favor verifique",
     "MFAOfUserFirstLoginPersonalInformationImprovementPage": " Ative a autenticação de dois fatores para tornar sua conta mais segura. <br/> Após a ativação, você entrará no processo de vinculação de autenticação de dois fatores na próxima vez que fizer login; Você também pode vincular diretamente em (Informações pessoais -> Modificação rápida -> Alterar configurações de dois fatores)! ",
-    "MFAOfUserFirstLoginUserGuidePage": "Para proteger a sua segurança e a da empresa, cuide bem de suas contas, senhas e chaves importantes e outras informações sensíveis; (por exemplo, estabelecer uma senha complexa e habilitar autenticação de dois fatores)<br/> Informações pessoais como email, número de celular, WeChat, etc, são usadas apenas para autenticação de usuário e notificações internas da plataforma.",
+    "MFAOfUserFirstLoginUserGuidePage": "Para proteger a sua segurança e a da empresa, cuide bem de suas contas, senhas e chaves importantes e outras informações sensíveis; (por exemplo, estabelecer uma senha complexa e habilitar autenticação de dois fatores)<br/> Informações pessoais como email, número de celular, etc, são usadas apenas para autenticação de usuário e notificações internas da plataforma.",
     "MFAOnlyAdminUsers": "Habilitado globalmente: Apenas administradores",
     "MIN_LENGTH_ERROR": "O comprimento da senha deve ser no mínimo {0} caracteres",
     "MailRecipient": "Destinatários de Email",

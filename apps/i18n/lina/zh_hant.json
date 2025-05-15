@@ -793,7 +793,7 @@
     "MFAAllUsers": "全球啟用：所有用戶",
     "MFAErrorMsg": "MFA錯誤，請檢查",
     "MFAOfUserFirstLoginPersonalInformationImprovementPage": "啟用多因子認證，使帳號更加安全。<br/> 啟用之後您將會在下次登入時進入多因子認證綁定流程；您也可以在（個人資訊->快速修改->更改多因子設置）中直接綁定！",
-    "MFAOfUserFirstLoginUserGuidePage": "為了保護您和公司的安全，請妥善保管您的帳戶、密碼和金鑰等重要敏感資訊；（如：設置複雜密碼，並啟用多因子認證）<br/> 信箱、手機號碼、微信等個人資訊，僅作為用戶認證和平台內部消息通知使用。",
+    "MFAOfUserFirstLoginUserGuidePage": "為了保護您和公司的安全，請妥善保管您的帳戶、密碼和金鑰等重要敏感資訊；（如：設置複雜密碼，並啟用多因子認證）<br/> 信箱、手機號碼 等個人資訊，僅作為用戶認證和平台內部消息通知使用。",
     "MFAOnlyAdminUsers": "全球啟用：僅管理員",
     "MIN_LENGTH_ERROR": "密碼最小長度 {0} 位",
     "MailRecipient": "郵件收件人",
