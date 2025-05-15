@@ -24,7 +24,7 @@ class NodePermedAssetPagination(GrantedAssetPaginationBase):
                          f'{self._request.get_full_path()}')
             return node.assets_amount
         else:
-            logger.warn(f'Not hit node.assets_amount[{node}] because {self._view} '
+            logger.warning(f'Not hit node.assets_amount[{node}] because {self._view} '
                         f'not has `pagination_node` -> {self._request.get_full_path()}')
             return None
 

@@ -168,8 +168,8 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     platform = models.ForeignKey(
         Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets'
     )
-    domain = models.ForeignKey(
-        "assets.Domain", null=True, blank=True, related_name='assets',
+    zone = models.ForeignKey(
+        "assets.Zone", null=True, blank=True, related_name='assets',
         verbose_name=_("Zone"), on_delete=models.SET_NULL
     )
     nodes = models.ManyToManyField(
@@ -244,7 +244,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         platform = self.platform
         auto_config = {
             'su_enabled': platform.su_enabled,
-            'domain_enabled': platform.domain_enabled,
+            'gateway_enabled': platform.gateway_enabled,
             'ansible_enabled': False
         }
         automation = getattr(self.platform, 'automation', None)
@@ -362,11 +362,11 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     @lazyproperty
     def gateway(self):
-        if not self.domain_id:
+        if not self.zone_id:
             return
-        if not self.platform.domain_enabled:
+        if not self.platform.gateway_enabled:
             return
-        return self.domain.select_gateway()
+        return self.zone.select_gateway()
 
     def as_node(self):
         from assets.models import Node

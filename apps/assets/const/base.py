@@ -37,7 +37,7 @@ class FillType(models.TextChoices):
 class BaseType(TextChoices):
     """
     约束应该考虑代是对平台对限制，避免多余对选项，如: mysql 开启 ssh,
-    或者开启了也没有作用, 比如 k8s 开启了 domain，目前还不支持
+    或者开启了也没有作用, 比如 k8s 开启了 gateway 目前还不支持
     """
 
     @classmethod

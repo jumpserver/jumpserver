@@ -14,7 +14,6 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.db import IntegrityError
 from django.http import HttpRequest
 from django.shortcuts import reverse, redirect
-from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, get_language
@@ -25,13 +24,14 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
 from common.const import Language
-from common.utils import FlashMessageUtil, static_or_direct, safe_next_url
+from common.utils import FlashMessageUtil, safe_next_url
 from users.utils import (
     redirect_user_first_login_or_index
 )
 from .. import mixins, errors
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from ..forms import get_user_login_form_cls
+from ..utils import get_auth_methods
 
 __all__ = [
     'UserLoginView', 'UserLogoutView',
@@ -46,73 +46,17 @@ class UserLoginContextMixin:
 
     def get_support_auth_methods(self):
         query_string = self.request.GET.urlencode()
-        auth_methods = [
-            {
-                'name': 'OpenID',
-                'enabled': settings.AUTH_OPENID,
-                'url': f"{reverse('authentication:openid:login')}?{query_string}",
-                'logo': static('img/login_oidc_logo.png'),
-                'auto_redirect': True  # 是否支持自动重定向
-            },
-            {
-                'name': 'CAS',
-                'enabled': settings.AUTH_CAS,
-                'url': f"{reverse('authentication:cas:cas-login')}?{query_string}",
-                'logo': static('img/login_cas_logo.png'),
-                'auto_redirect': True
-            },
-            {
-                'name': 'SAML2',
-                'enabled': settings.AUTH_SAML2,
-                'url': f"{reverse('authentication:saml2:saml2-login')}?{query_string}",
-                'logo': static('img/login_saml2_logo.png'),
-                'auto_redirect': True
-            },
-            {
-                'name': settings.AUTH_OAUTH2_PROVIDER,
-                'enabled': settings.AUTH_OAUTH2,
-                'url': f"{reverse('authentication:oauth2:login')}?{query_string}",
-                'logo': static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
-                'auto_redirect': True
-            },
-            {
-                'name': _('WeCom'),
-                'enabled': settings.AUTH_WECOM,
-                'url': f"{reverse('authentication:wecom-qr-login')}?{query_string}",
-                'logo': static('img/login_wecom_logo.png'),
-            },
-            {
-                'name': _('DingTalk'),
-                'enabled': settings.AUTH_DINGTALK,
-                'url': f"{reverse('authentication:dingtalk-qr-login')}?{query_string}",
-                'logo': static('img/login_dingtalk_logo.png')
-            },
-            {
-                'name': _('FeiShu'),
-                'enabled': settings.AUTH_FEISHU,
-                'url': f"{reverse('authentication:feishu-qr-login')}?{query_string}",
-                'logo': static('img/login_feishu_logo.png')
-            },
-            {
-                'name': 'Lark',
-                'enabled': settings.AUTH_LARK,
-                'url': f"{reverse('authentication:lark-qr-login')}?{query_string}",
-                'logo': static('img/login_lark_logo.png')
-            },
-            {
-                'name': _('Slack'),
-                'enabled': settings.AUTH_SLACK,
-                'url': f"{reverse('authentication:slack-qr-login')}?{query_string}",
-                'logo': static('img/login_slack_logo.png')
-            },
-            {
-                'name': _("Passkey"),
-                'enabled': settings.AUTH_PASSKEY,
-                'url': f"{reverse('api-auth:passkey-login')}?{query_string}",
-                'logo': static('img/login_passkey.png')
-            }
-        ]
-        return [method for method in auth_methods if method['enabled']]
+        all_methods = get_auth_methods()
+        methods = []
+        for method in all_methods:
+            method = method.copy()
+            if not method.get('enabled', False):
+                continue
+            url = method.get('url', '')
+            if query_string and url:
+                method['url'] = '{}?{}'.format(url, query_string)
+            methods.append(method)
+        return methods
 
     @staticmethod
     def get_support_langs():

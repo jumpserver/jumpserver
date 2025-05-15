@@ -307,6 +307,8 @@ class Applet(JMSBaseModel):
         all_can_concurrent = host_can_concurrent and app_can_concurrent
 
         private_account = self._select_a_private_account(user, host, valid_accounts)
+        if not private_account:
+            return None
         # 优先使用 private account，支持并发或者不支持并发时，如果私有没有被占用，则使用私有
         account = None
         # 如果都支持，不管私有是否被占用，都使用私有

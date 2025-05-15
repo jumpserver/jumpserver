@@ -38,7 +38,6 @@
     "Close split connect": "关闭分屏",
     "Command": "命令",
     "Command Line": "命令行",
-    "Command line": "连接命令行",
     "CommandBar": "命令栏",
     "Confirm": "确认",
     "Connect": "连接",
@@ -216,6 +215,7 @@
     "View": "视图",
     "Viewer": "查看人",
     "VirtualApp": "虚拟应用",
+    "Virtualapp connect method": "虚拟应用连接方式",
     "Web Terminal": "Web终端",
     "Website": "官网",
     "With secret accounts": "托管账号",
@@ -233,5 +233,6 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "VerificationFailed": "校验失败"
 }

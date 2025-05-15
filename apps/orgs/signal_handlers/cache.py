@@ -2,7 +2,7 @@ from django.db.models.signals import post_save, pre_delete, pre_save, post_delet
 from django.dispatch import receiver
 
 from accounts.models import Account
-from assets.models import Asset, Domain
+from assets.models import Asset, Zone
 from assets.models import Node
 from common.decorators import merge_delay_run
 from common.utils import get_logger
@@ -64,7 +64,7 @@ def on_user_delete_refresh_cache(sender, instance, **kwargs):
 
 model_cache_field_mapper = {
     Node: ['nodes_amount'],
-    Domain: ['domains_amount'],
+    Zone: ['zones_amount'],
     UserGroup: ['groups_amount'],
     Account: ['accounts_amount'],
     RoleBinding: ['users_amount', 'new_users_amount_this_week'],

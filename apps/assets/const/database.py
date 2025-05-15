@@ -20,7 +20,7 @@ class DatabaseTypes(BaseType):
         return {
             '*': {
                 'charset_enabled': False,
-                'domain_enabled': True,
+                'gateway_enabled': True,
                 'su_enabled': False,
             }
         }

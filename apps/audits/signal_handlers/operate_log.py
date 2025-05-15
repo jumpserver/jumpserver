@@ -183,11 +183,11 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'ConnectionToken', 'SessionJoinRecord',
         'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
         'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
-        'SuperTicket', 'SuperConnectionToken', 'PermNode',
+        'SuperTicket', 'SuperConnectionToken', 'AdminConnectionToken', 'PermNode',
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FavoriteAsset', 'ChangeSecretRecord', 'AppProvider', 'Variable'
+        'FavoriteAsset', 'ChangeSecretRecord', 'AppProvider', 'Variable', 'LeakPasswords'
     }
     include_models = {'UserSession'}
     for i, app in enumerate(apps.get_models(), 1):

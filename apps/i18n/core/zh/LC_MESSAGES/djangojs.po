@@ -26,11 +26,11 @@ msgstr "更新时发生未知错误"
 
 #: static/js/jumpserver.js:342
 msgid "Not found"
-msgstr ""
+msgstr "未找到"
 
 #: static/js/jumpserver.js:344
 msgid "Server error"
-msgstr ""
+msgstr "服务器错误"
 
 #: static/js/jumpserver.js:346 static/js/jumpserver.js:384
 #: static/js/jumpserver.js:386

@@ -14,5 +14,6 @@ class ConnectMethodACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
             if i not in ['assets', 'accounts']
         ]
         action_choices_exclude = BaseSerializer.Meta.action_choices_exclude + [
-            ActionChoices.review, ActionChoices.accept, ActionChoices.notice
+            ActionChoices.review, ActionChoices.accept, ActionChoices.notice,
+            ActionChoices.face_verify, ActionChoices.face_online
         ]

@@ -194,7 +194,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         ]
         fields_m2m = ['assets', 'assets_amount']
         fields = fields_small + fields_m2m + [
-            "protocols", "domain_enabled", "su_enabled", "su_method",
+            "protocols", "gateway_enabled", "su_enabled", "su_method",
             "ds_enabled", "automation", "comment", "custom_fields", "labels"
         ] + read_only_fields
         extra_kwargs = {
@@ -205,11 +205,11 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
                     "similar to logging in with a regular account and then switching to root"
                 )
             },
-            "domain_enabled": {
+            "gateway_enabled": {
                 "label": _('Gateway enabled'),
                 "help_text": _("Assets can be connected using a zone gateway")
             },
-            "domain_default": {"label": _('Default Domain')},
+            "zone_default": {"label": _('Default zone')},
             'assets': {'required': False, 'label': _('Assets')},
         }
 
@@ -222,7 +222,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
             return
 
         name = self.initial_data.get('name')
-        if ' ' in name:
+        if name is not None and ' ' in name:
             self.initial_data['name'] = name.replace(' ', '-')
 
         if self.instance:
@@ -262,8 +262,8 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     def validate_su_enabled(self, su_enabled):
         return su_enabled and self.constraints.get('su_enabled', False)
 
-    def validate_domain_enabled(self, domain_enabled):
-        return domain_enabled and self.constraints.get('domain_enabled', False)
+    def validate_gateway_enabled(self, gateway_enabled):
+        return gateway_enabled and self.constraints.get('gateway_enabled', False)
 
     def validate_automation(self, automation):
         automation = automation or {}

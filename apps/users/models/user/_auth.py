@@ -17,6 +17,7 @@ from common.utils import (
     get_logger,
     lazyproperty,
 )
+from settings.models import LeakPasswords
 from users.signals import post_user_change_password
 
 logger = get_logger(__file__)
@@ -298,3 +299,12 @@ class AuthMixin:
             return ""
         password = signer.unsign(secret)
         return password
+
+    @staticmethod
+    def check_leak_password(password):
+        try:
+            is_exist = LeakPasswords.objects.using('sqlite').filter(password=password).exists()
+            return is_exist
+        except Exception:
+            logger.warning("check leak password failed")
+            return False

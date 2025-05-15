@@ -32,7 +32,7 @@ class AssetPaginationBase(LimitOffsetPagination):
         }
         for k, v in self._request.query_params.items():
             if k not in exclude_query_params and v is not None:
-                logger.warn(f'Not hit node.assets_amount because find a unknown query_param '
+                logger.warning(f'Not hit node.assets_amount because find a unknown query_param '
                             f'`{k}` -> {self._request.get_full_path()}')
                 return super().get_count(queryset)
         node_assets_count = self.get_count_from_nodes(queryset)

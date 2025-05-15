@@ -174,7 +174,7 @@ class AuthPreCheckMixin:
         is_block = LoginBlockUtil(username, ip).is_block()
         if not is_block:
             return
-        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        logger.warning('Ip was blocked' + ': ' + username + ':' + ip)
         exception = errors.BlockLoginError(username=username, ip=ip)
         if raise_exception:
             raise errors.BlockLoginError(username=username, ip=ip)
@@ -253,7 +253,7 @@ class MFAMixin:
         blocked = MFABlockUtils(username, ip).is_block()
         if not blocked:
             return
-        logger.warn('Ip was blocked' + ': ' + username + ':' + ip)
+        logger.warning('Ip was blocked' + ': ' + username + ':' + ip)
         exception = errors.BlockMFAError(username=username, request=self.request, ip=ip)
         if raise_exception:
             raise exception
@@ -323,7 +323,7 @@ class AuthPostCheckMixin:
     def _check_passwd_is_too_simple(cls, user: User, password):
         if not user.is_auth_backend_model():
             return
-        if user.check_passwd_too_simple(password):
+        if user.check_passwd_too_simple(password) or user.check_leak_password(password):
             message = _('Your password is too simple, please change it for security')
             url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
             raise errors.PasswordTooSimple(url)

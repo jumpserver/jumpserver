@@ -34,6 +34,7 @@ class MFAType(TextChoices):
     Email = 'email', _('Email')
     Face = 'face', _('Face Recognition')
     Radius = 'otp_radius', _('Radius')
+    Passkey = 'passkey', _('Passkey')
     Custom = 'mfa_custom', _('Custom')
 
 

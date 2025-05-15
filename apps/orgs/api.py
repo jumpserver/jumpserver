@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveAPIView
 
 from assets.models import (
-    Asset, Domain, Label, Node,
+    Asset, Zone, Label, Node,
 )
 from common.api import JMSBulkModelViewSet
 from common.permissions import IsValidUser
@@ -24,7 +24,7 @@ logger = get_logger(__file__)
 
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
-    User, UserGroup, Asset, Node, Label, Domain, AssetPermission
+    User, UserGroup, Asset, Node, Label, Zone, AssetPermission
 ]
 
 

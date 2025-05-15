@@ -96,17 +96,20 @@ def batch_delete(queryset, batch_size=3000):
 def remove_files_by_days(root_path, days, file_types=None):
     if file_types is None:
         file_types = ['.json', '.tar', '.gz', '.mp4']
-    need_rm_files = []
     expire_date = timezone.now() - timezone.timedelta(days=days)
     timestamp = expire_date.timestamp()
     for root, dirs, files in os.walk(root_path):
+        rm_files = []
         for file in files:
             if any(file.endswith(file_type) for file_type in file_types):
                 file_path = os.path.join(root, file)
                 if os.path.getmtime(file_path) <= timestamp:
-                    need_rm_files.append(file_path)
-    for file in need_rm_files:
-        os.remove(file)
+                    rm_files.append(file_path)
+        for file in rm_files:
+            try:
+                os.remove(file)
+            except Exception as e:
+                logger.error(f"Remove file {file} error: {e}")
 
 
 def clean_expired_session_period():

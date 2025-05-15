@@ -7,8 +7,10 @@ __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
     'SecurityAuthSerializer', 'SecuritySettingSerializer',
     'SecurityLoginLimitSerializer', 'SecurityBasicSerializer',
-    'SecurityBlockIPSerializer'
+    'SecurityBlockIPSerializer', 'LeakPasswordPSerializer'
 ]
+
+from settings.models import LeakPasswords
 
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
@@ -195,6 +197,27 @@ class SecuritySessionSerializer(serializers.Serializer):
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Watermark'),
     )
+    SECURITY_WATERMARK_SESSION_CONTENT = serializers.CharField(
+        required=False, label=_('Watermark session content'),
+    )
+    SECURITY_WATERMARK_CONSOLE_CONTENT = serializers.CharField(
+        required=False, label=_("Watermark console content")
+    )
+    SECURITY_WATERMARK_COLOR = serializers.CharField(
+        max_length=32, default="", label=_("Color")
+    )
+    SECURITY_WATERMARK_FONT_SIZE = serializers.IntegerField(
+        required=False, label=_('Watermark font size'), min_value=1, max_value=100,
+    )
+    SECURITY_WATERMARK_HEIGHT = serializers.IntegerField(
+        required=False, label=_('Watermark height'), default=200
+    )
+    SECURITY_WATERMARK_WIDTH = serializers.IntegerField(
+        required=False, label=_('Watermark width'), default=200
+    )
+    SECURITY_WATERMARK_ROTATE = serializers.IntegerField(
+        required=False, label=_('Watermark rotate'), default=45
+    )
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,
         label=_('Max idle time (minute)'),
@@ -248,3 +271,20 @@ class SecuritySettingSerializer(
 class SecurityBlockIPSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     ip = serializers.CharField(max_length=1024, required=False, allow_blank=True)
+
+
+class LeakPasswordPSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        return LeakPasswords.objects.using('sqlite').create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save(using='sqlite')
+        return instance
+
+    class Meta:
+        read_only_fields = ['id']
+        fields = read_only_fields + ['password']
+        model = LeakPasswords

@@ -32,7 +32,7 @@ def get_terminal_command_storages():
     storage_list = {}
     for s in CommandStorage.objects.all():
         if not s.is_valid():
-            logger.warn(f'Command storage invalid: storage={s}')
+            logger.warning(f'Command storage invalid: storage={s}')
             continue
 
         if s.type_server:

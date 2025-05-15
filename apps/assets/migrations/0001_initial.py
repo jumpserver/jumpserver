@@ -29,8 +29,19 @@ class Migration(migrations.Migration):
                 ('org_id',
                  models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('connectivity',
-                 models.CharField(choices=[('-', 'Unknown'), ('na', 'N/A'), ('ok', 'OK'), ('err', 'Error')],
-                                  default='-', max_length=16, verbose_name='Connectivity')),
+                 models.CharField(
+                     choices=[
+                         ('-', 'Unknown'),
+                         ('na', 'N/A'),
+                         ('ok', 'OK'),
+                         ('err', 'Error'),
+                         ('auth_err', 'Authentication error'),
+                         ('password_err', 'Invalid password error'),
+                         ('openssh_key_err', 'OpenSSH key error'),
+                         ('ntlm_err', 'NTLM credentials rejected error'),
+                         ('create_temp_err', 'Create temporary error')
+                     ],
+                     default='-', max_length=16, verbose_name='Connectivity')),
                 ('date_verified', models.DateTimeField(null=True, verbose_name='Date verified')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('address', models.CharField(db_index=True, max_length=767, verbose_name='Address')),
@@ -46,7 +57,8 @@ class Migration(migrations.Migration):
                                 ('match_asset', 'Can match asset'), ('change_assetnodes', 'Can change asset nodes')],
             },
             bases=(
-            assets.models.asset.common.NodesRelationMixin, assets.models.asset.common.JSONFilterMixin, models.Model),
+                assets.models.asset.common.NodesRelationMixin, assets.models.asset.common.JSONFilterMixin,
+                models.Model),
         ),
         migrations.CreateModel(
             name='AutomationExecution',

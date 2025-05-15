@@ -7,6 +7,12 @@ class Connectivity(TextChoices):
     NA = 'na', _('N/A')
     OK = 'ok', _('OK')
     ERR = 'err', _('Error')
+    RDP_ERR = 'rdp_err', _('RDP error')
+    AUTH_ERR = 'auth_err', _('Authentication error')
+    PASSWORD_ERR = 'password_err', _('Invalid password error')
+    OPENSSH_KEY_ERR = 'openssh_key_err', _('OpenSSH key error')
+    NTLM_ERR = 'ntlm_err', _('NTLM credentials rejected error')
+    CREATE_TEMPORARY_ERR = 'create_temp_err', _('Create temporary error')
 
 
 class AutomationTypes(TextChoices):

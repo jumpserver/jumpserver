@@ -221,7 +221,7 @@ class Config(dict):
         'ANNOUNCEMENT': {},
 
         # Security
-        'X_FRAME_OPTIONS': 'DENY',
+        'X_FRAME_OPTIONS': 'SAMEORIGIN',
 
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
@@ -229,6 +229,8 @@ class Config(dict):
 
         'TOKEN_EXPIRATION': 3600 * 24,
         'DEFAULT_EXPIRED_YEARS': 70,
+        'USER_DEFAULT_EXPIRED_DAYS': 25550,
+        'ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS': 25550,
         'SESSION_COOKIE_DOMAIN': None,
         'CSRF_COOKIE_DOMAIN': None,
         'SESSION_COOKIE_NAME_PREFIX': None,
@@ -589,6 +591,13 @@ class Config(dict):
         'SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER': '',
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
+        'SECURITY_WATERMARK_SESSION_CONTENT': '${name}(${userName})\n${assetName}',
+        'SECURITY_WATERMARK_CONSOLE_CONTENT': '${userName}(${name})',
+        'SECURITY_WATERMARK_COLOR': 'rgba(184, 184, 184, 0.8)',
+        'SECURITY_WATERMARK_FONT_SIZE': 13,
+        'SECURITY_WATERMARK_HEIGHT': 200,
+        'SECURITY_WATERMARK_WIDTH': 200,
+        'SECURITY_WATERMARK_ROTATE': 45,
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'SECURITY_UNCOMMON_USERS_TTL': 999,
         'VERIFY_CODE_TTL': 60,
@@ -698,7 +707,7 @@ class Config(dict):
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
-        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'leak_password.db'),
+        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'leak_passwords.db'),
 
         # Ansible Receptor
         'RECEPTOR_ENABLED': False,

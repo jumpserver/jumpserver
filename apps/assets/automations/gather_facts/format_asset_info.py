@@ -1,3 +1,5 @@
+from collections import Counter
+
 __all__ = ['FormatAssetInfo']
 
 
@@ -7,13 +9,37 @@ class FormatAssetInfo:
         self.tp = tp
 
     @staticmethod
-    def posix_format(info):
-        for cpu_model in info.get('cpu_model', []):
-            if cpu_model.endswith('GHz') or cpu_model.startswith("Intel"):
-                break
-        else:
-            cpu_model = ''
-        info['cpu_model'] = cpu_model[:48]
+    def get_cpu_model_count(cpus):
+        try:
+            models = [cpus[i + 1] + " " + cpus[i + 2] for i in range(0, len(cpus), 3)]
+
+            model_counts = Counter(models)
+
+            result = ', '.join([f"{model} x{count}" for model, count in model_counts.items()])
+        except Exception as e:
+            print(f"Error processing CPU model list: {e}")
+            result = ''
+
+        return result
+
+    @staticmethod
+    def get_gpu_model_count(gpus):
+        try:
+            model_counts = Counter(gpus)
+
+            result = ', '.join([f"{model} x{count}" for model, count in model_counts.items()])
+        except Exception as e:
+            print(f"Error processing GPU model list: {e}")
+            result = ''
+
+        return result
+
+    def posix_format(self, info):
+        cpus = self.get_cpu_model_count(info.get('cpu_model', []))
+        gpus = self.get_gpu_model_count(info.get('gpu_model', []))
+
+        info['gpu_model'] = gpus
+        info['cpu_model'] = cpus
         info['cpu_count'] = info.get('cpu_count', 0)
         return info
 

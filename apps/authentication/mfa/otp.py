@@ -49,4 +49,3 @@ class MFAOtp(BaseMFA):
 
     def help_text_of_disable(self):
         return ''
-

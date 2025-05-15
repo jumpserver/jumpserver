@@ -1,6 +1,6 @@
 FROM python:3.11-slim-bullseye
 ARG TARGETARCH
-
+COPY --from=ghcr.io/astral-sh/uv:0.6.14 /uv /uvx /usr/local/bin/
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
         ca-certificates               \
@@ -43,18 +43,19 @@ WORKDIR /opt/jumpserver
 ARG PIP_MIRROR=https://pypi.org/simple
 ENV POETRY_PYPI_MIRROR_URL=${PIP_MIRROR}
 ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
+ENV LANG=en_US.UTF-8 \
+    PATH=/opt/py3/bin:$PATH
+
+ENV UV_LINK_MODE=copy
 
 RUN --mount=type=cache,target=/root/.cache \
-    --mount=type=bind,source=poetry.lock,target=poetry.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=utils/clean_site_packages.sh,target=clean_site_packages.sh \
+    --mount=type=bind,source=requirements/clean_site_packages.sh,target=clean_site_packages.sh \
     --mount=type=bind,source=requirements/collections.yml,target=collections.yml \
+    --mount=type=bind,source=requirements/static_files.sh,target=utils/static_files.sh \
     set -ex \
-    && python3 -m venv /opt/py3 \
-    && pip install poetry poetry-plugin-pypi-mirror -i ${PIP_MIRROR} \
-    && . /opt/py3/bin/activate \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-cache --only main \
-    && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
-    && bash clean_site_packages.sh \
-    && poetry cache clear pypi --all
+    && uv venv \
+    && uv pip install -i${PIP_MIRROR} -r pyproject.toml \
+    && ln -sf $(pwd)/.venv /opt/py3 \
+    && bash utils/static_files.sh \
+    && bash clean_site_packages.sh

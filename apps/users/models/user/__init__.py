@@ -13,7 +13,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    date_expired_default, get_logger, lazyproperty
+    user_date_expired_default, get_logger, lazyproperty
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
@@ -55,6 +55,11 @@ class User(
     JSONFilterMixin,
     AbstractUser,
 ):
+    """
+    User model, used for authentication and authorization. User can join multiple groups.
+    User can have multiple roles, and each role can have multiple permissions.
+    User can connect to multiple assets, If he has the permission. Permission was defined in Asset Permission.
+    """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
@@ -94,7 +99,7 @@ class User(
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     is_first_login = models.BooleanField(default=True, verbose_name=_("Is first login"))
     date_expired = models.DateTimeField(
-        default=date_expired_default,
+        default=user_date_expired_default,
         blank=True,
         null=True,
         db_index=True,

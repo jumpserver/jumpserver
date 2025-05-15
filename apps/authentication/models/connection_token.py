@@ -251,7 +251,7 @@ class ConnectionToken(JMSOrgBaseModel):
             raise JMSException({'error': 'No host account available, please check the applet, host and account'})
 
         host, account, lock_key = bulk_get(host_account, ('host', 'account', 'lock_key'))
-        gateway = host.domain.select_gateway() if host.domain else None
+        gateway = host.zone.select_gateway() if host.zone else None
         platform = host.platform
 
         data = {
@@ -305,17 +305,17 @@ class ConnectionToken(JMSOrgBaseModel):
         return account
 
     @lazyproperty
-    def domain(self):
-        if not self.asset.platform.domain_enabled:
+    def zone(self):
+        if not self.asset.platform.gateway_enabled:
             return
         if self.asset.platform.name == GATEWAY_NAME:
             return
-        domain = self.asset.domain if self.asset.domain else None
-        return domain
+        zone = self.asset.zone if self.asset.zone else None
+        return zone
 
     @lazyproperty
     def gateway(self):
-        if not self.asset or not self.domain:
+        if not self.asset or not self.zone:
             return
         return self.asset.gateway
 

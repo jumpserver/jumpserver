@@ -344,6 +344,20 @@ class Protocol(ChoicesMixin, models.TextChoices):
             if not xpack_enabled and config.get('xpack', False):
                 continue
             protocols.append(protocol)
+
+        from assets.models.platform import PlatformProtocol
+        custom_protocols = (
+            PlatformProtocol.objects
+            .filter(platform__category='custom')
+            .values_list('name', flat=True)
+            .distinct()
+        )
+        for protocol in custom_protocols:
+            if protocol not in protocols:
+                if not protocol:
+                    continue
+                label = protocol[0].upper() + protocol[1:]
+                protocols.append({'label': label, 'value': protocol})
         return protocols
 
     @classmethod

@@ -4,9 +4,11 @@ from django.conf import settings
 from django.core.cache import cache
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.views import Response
+from rest_framework.viewsets import ModelViewSet
 
 from users.utils import LoginIpBlockUtil
-from ..serializers import SecurityBlockIPSerializer
+from ..models import LeakPasswords
+from ..serializers import SecurityBlockIPSerializer, LeakPasswordPSerializer
 
 
 class BlockIPSecurityAPI(ListAPIView):
@@ -56,3 +58,16 @@ class UnlockIPSecurityAPI(CreateAPIView):
         for ip in ips:
             LoginIpBlockUtil(ip).clean_block_if_need()
         return Response(status=200)
+
+
+class LeakPasswordViewSet(ModelViewSet):
+    serializer_class = LeakPasswordPSerializer
+    model = LeakPasswords
+    rbac_perms = {
+        '*': 'settings.change_security'
+    }
+    queryset = LeakPasswords.objects.none()
+    search_fields = ['password']
+
+    def get_queryset(self):
+        return LeakPasswords.objects.using('sqlite').all()

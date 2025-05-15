@@ -27,7 +27,7 @@ class RelationMixin(OrgRelationMixin, OrgBulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_id = current_org.org_id()
+        org_id = current_org.id
         if org_id is not None:
             queryset = queryset.filter(assetpermission__org_id=org_id)
         queryset = queryset.annotate(assetpermission_display=F('assetpermission__name'))

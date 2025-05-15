@@ -1,10 +1,12 @@
 import json
+import os
+import shutil
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db import models
+from django.db import models, connections
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
@@ -208,3 +210,38 @@ def get_chatai_data():
         data['model'] = settings.DEEPSEEK_MODEL
 
     return data
+
+
+def init_sqlite_db():
+    db_path = settings.LEAK_PASSWORD_DB_PATH
+    if not os.path.isfile(db_path):
+        db_path = settings.LEAK_PASSWORD_DB_PATH
+        src = os.path.join(
+            settings.APPS_DIR, 'accounts', 'automations',
+            'check_account', 'leak_passwords.db'
+        )
+        shutil.copy(src, db_path)
+    logger.info(f'init sqlite db {db_path}')
+    return db_path
+
+
+def register_sqlite_connection():
+    connections.databases['sqlite'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'ATOMIC_REQUESTS': False,
+        'NAME': settings.LEAK_PASSWORD_DB_PATH,
+        'TIME_ZONE': None,
+        'CONN_HEALTH_CHECKS': False,
+        'CONN_MAX_AGE': 0,
+        'OPTIONS': {},
+        'AUTOCOMMIT': True,
+    }
+
+
+class LeakPasswords(models.Model):
+    id = models.AutoField(primary_key=True)
+    password = models.CharField(max_length=1024, verbose_name=_("Password"))
+
+    class Meta:
+        db_table = 'passwords'
+        managed = False

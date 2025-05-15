@@ -5,6 +5,7 @@ from rest_framework import serializers
 from accounts.models import IntegrationApplication
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.serializers.fields import JSONManyToManyField
+from common.utils import random_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
@@ -36,6 +37,10 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         if not data.get('logo'):
             data['logo'] = static('img/logo.png')
         return data
+
+    def validate(self, attrs):
+        attrs['secret'] = random_string(36)
+        return attrs
 
 
 class IntegrationAccountSecretSerializer(serializers.Serializer):

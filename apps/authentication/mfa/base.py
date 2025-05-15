@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class BaseMFA(abc.ABC):
     placeholder = _('Please input security code')
     skip_cache_check = False
+    has_code = True
 
     def __init__(self, user):
         """
