@@ -17,7 +17,7 @@ from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.const import Status
-from common.db.utils import safe_db_connection
+from common.db.utils import safe_atomic_db_connection
 from common.tasks import send_mail_async
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
@@ -123,7 +123,7 @@ class BaseManager:
         self.execution.result = self.result
         self.execution.status = self.status
 
-        with safe_db_connection():
+        with safe_atomic_db_connection():
             self.execution.save()
 
     def print_summary(self):

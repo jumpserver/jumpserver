@@ -10,7 +10,7 @@ from accounts.models import BaseAccountQuerySet
 from accounts.utils import SecretGenerator
 from assets.automations.base.manager import BasePlaybookManager
 from assets.const import HostTypes
-from common.db.utils import safe_db_connection
+from common.db.utils import safe_atomic_db_connection
 from common.utils import get_logger
 
 logger = get_logger(__name__)
@@ -170,7 +170,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         super().on_host_success(host, result)
 
-        with safe_db_connection():
+        with safe_atomic_db_connection():
             account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
             self.save_record(recorder)
 
@@ -198,6 +198,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         super().on_host_error(host, error, result)
 
-        with safe_db_connection():
+        with safe_atomic_db_connection():
             account.save(update_fields=['change_secret_status', 'date_change_secret', 'date_updated'])
             self.save_record(recorder)
