@@ -4047,7 +4047,7 @@ msgstr "虚拟 MFA(OTP)"
 
 #: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
 msgid "Using passkey as MFA"
-msgstr ""
+msgstr "使用 Passkey 作为 MFA"
 
 #: authentication/mfa/radius.py:8
 msgid "Radius verify code invalid"
