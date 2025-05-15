@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 10:30+0800\n"
+"POT-Creation-Date: 2025-05-15 11:00+0800\n"
 "PO-Revision-Date: 2025-04-17 14:54+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1265,7 +1265,7 @@ msgstr "ID"
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
-#: rbac/builtin.py:125 rbac/models/rolebinding.py:49
+#: rbac/builtin.py:127 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:32 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
@@ -4541,7 +4541,7 @@ msgstr "Ошибка кода"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:540
+#: jumpserver/conf.py:542
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -5391,16 +5391,16 @@ msgstr "Код не найден"
 msgid "The message code provided is invalid or has expired"
 msgstr "Предоставленный код сообщения недействительный или истек"
 
-#: jumpserver/conf.py:534
+#: jumpserver/conf.py:536
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "Код подтверждения: {code}"
 
-#: jumpserver/conf.py:539
+#: jumpserver/conf.py:541
 msgid "Create account successfully"
 msgstr "Успешное создание учетной записи"
 
-#: jumpserver/conf.py:541
+#: jumpserver/conf.py:543
 msgid "Your account has been created successfully"
 msgstr "Ваша учетная запись была успешно создана"
 
@@ -6180,7 +6180,7 @@ msgstr "Просмотр глобальной организации"
 msgid "Can view all joined org"
 msgstr "Просмотр всех присоединенных организаций"
 
-#: orgs/models.py:236
+#: orgs/models.py:237
 msgid "Can not delete virtual org"
 msgstr "Невозможно удалить виртуальную организацию"
 
@@ -6394,27 +6394,27 @@ msgstr "{} хотя бы одна системная роль"
 msgid "App RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:118
 msgid "SystemAdmin"
 msgstr "Системный администратор"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:121
 msgid "SystemAuditor"
 msgstr "Системный аудитор"
 
-#: rbac/builtin.py:122
+#: rbac/builtin.py:124
 msgid "SystemComponent"
 msgstr "Системные компоненты"
 
-#: rbac/builtin.py:128
+#: rbac/builtin.py:130
 msgid "OrgAdmin"
 msgstr "Администратор организации"
 
-#: rbac/builtin.py:131
+#: rbac/builtin.py:133
 msgid "OrgAuditor"
 msgstr "Аудитор организации"
 
-#: rbac/builtin.py:134
+#: rbac/builtin.py:136
 msgid "OrgUser"
 msgstr "Пользователь организации"
 

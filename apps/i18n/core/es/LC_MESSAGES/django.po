@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 10:30+0800\n"
+"POT-Creation-Date: 2025-05-15 11:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1291,7 +1291,7 @@ msgstr "ID"
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
-#: rbac/builtin.py:125 rbac/models/rolebinding.py:49
+#: rbac/builtin.py:127 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:32 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
@@ -4608,7 +4608,7 @@ msgstr "Código de error"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:540
+#: jumpserver/conf.py:542
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -5463,16 +5463,16 @@ msgstr "No se encontró el Código"
 msgid "The message code provided is invalid or has expired"
 msgstr "El código de mensaje proporcionado es inválido o ha expirado"
 
-#: jumpserver/conf.py:534
+#: jumpserver/conf.py:536
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "El código de verificación es: {code}"
 
-#: jumpserver/conf.py:539
+#: jumpserver/conf.py:541
 msgid "Create account successfully"
 msgstr "Creación de cuenta exitosa"
 
-#: jumpserver/conf.py:541
+#: jumpserver/conf.py:543
 msgid "Your account has been created successfully"
 msgstr "Tu cuenta ha sido creada con éxito"
 
@@ -6301,7 +6301,7 @@ msgstr "Puede ver la organización global"
 msgid "Can view all joined org"
 msgstr "Puede ver todas las organizaciones a las que se ha unido"
 
-#: orgs/models.py:236
+#: orgs/models.py:237
 msgid "Can not delete virtual org"
 msgstr "No se puede eliminar una organización virtual"
 
@@ -6513,27 +6513,27 @@ msgstr "{} debe tener al menos un rol del sistema"
 msgid "App RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:118
 msgid "SystemAdmin"
 msgstr "Administrador del sistema"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:121
 msgid "SystemAuditor"
 msgstr "Auditor del sistema"
 
-#: rbac/builtin.py:122
+#: rbac/builtin.py:124
 msgid "SystemComponent"
 msgstr "Componente del sistema"
 
-#: rbac/builtin.py:128
+#: rbac/builtin.py:130
 msgid "OrgAdmin"
 msgstr "Administrador de la organización"
 
-#: rbac/builtin.py:131
+#: rbac/builtin.py:133
 msgid "OrgAuditor"
 msgstr "Auditor de la organización"
 
-#: rbac/builtin.py:134
+#: rbac/builtin.py:136
 msgid "OrgUser"
 msgstr "Usuario de la organización"
 

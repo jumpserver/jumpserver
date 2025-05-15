@@ -236,5 +236,6 @@
     "start time": "Start time",
     "success": "Success",
     "system user": "System user",
-    "user": "User"
+    "user": "User",
+    "VerificationFailed": "Verification failed"
 }
