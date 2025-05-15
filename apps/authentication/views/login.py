@@ -22,6 +22,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
+from django.utils.encoding import force_bytes, smart_bytes
+from jwkest.jws import JWS
 
 from common.const import Language
 from common.utils import FlashMessageUtil, safe_next_url
@@ -32,6 +34,7 @@ from .. import mixins, errors
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from ..forms import get_user_login_form_cls
 from ..utils import get_auth_methods
+from ..backends.oidc.utils import _get_jwks_keys
 
 __all__ = [
     'UserLoginView', 'UserLogoutView',
@@ -349,6 +352,37 @@ class UserLogoutView(TemplateView):
         auth_logout(request)
         response = super().get(request, *args, **kwargs)
         return response
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'title': _('Logout success'),
+            'message': _('Logout success, return login page'),
+            'interval': 3,
+            'redirect_url': reverse('authentication:login'),
+            'auto_redirect': True,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+@method_decorator(never_cache, name='dispatch')
+class UserFrontChannelLogoutView(TemplateView):
+    template_name = 'flash_message_standalone.html'
+
+    def get(self, request, *args, **kwargs):
+
+        iss = request.GET.get('iss')
+        sid = request.GET.get('sid')
+        iss_parsed_url = urlparse(request.GET.get('iss'))
+        provider_parsed_url = urlparse(settings.AUTH_OPENID_PROVIDER_ENDPOINT)
+        shared_key = settings.AUTH_OPENID_CLIENT_ID \
+            if settings.AUTH_OPENID_PROVIDER_SIGNATURE_ALG == 'HS256' \
+            else settings.AUTH_OPENID_PROVIDER_SIGNATURE_KEY  # RS256
+        provider_id_token = JWS().verify_compact(force_bytes(request.session['oidc_auth_id_token']), _get_jwks_keys(shared_key))
+        if iss_parsed_url.netloc == provider_parsed_url.netloc and sid == provider_id_token['sid']:
+            auth_logout(request)
+            response = super().get(request, *args, **kwargs)
+            return response
 
     def get_context_data(self, **kwargs):
         context = {
