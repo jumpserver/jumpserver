@@ -788,7 +788,7 @@
     "MFAAllUsers": "Activar globalmente: Todos los usuarios",
     "MFAErrorMsg": "Error MFA, por favor verifica",
     "MFAOfUserFirstLoginPersonalInformationImprovementPage": "Habilitar la autenticación multifactor para hacer tu cuenta más segura.<br/> Una vez habilitada, pasarás por el proceso de vinculación de autenticación multifactor la próxima vez que inicies sesión; también puedes vincularlo directamente en (Información personal -> Modificación rápida -> Cambiar configuración multifactor).",
-    "MFAOfUserFirstLoginUserGuidePage": "Para proteger su seguridad y la de la empresa, por favor guarde adecuadamente su cuenta, contraseña y claves u otra información sensible importante; (por ejemplo: establecer una contraseña compleja y habilitar la autenticación multifactor)<br/> La información personal como correo electrónico, número de teléfono, WeChat, etc., se utilizará únicamente para la autenticación del usuario y la notificación de mensajes dentro de la plataforma.",
+    "MFAOfUserFirstLoginUserGuidePage": "Para proteger su seguridad y la de la empresa, por favor guarde adecuadamente su cuenta, contraseña y claves u otra información sensible importante; (por ejemplo: establecer una contraseña compleja y habilitar la autenticación multifactor)<br/> La información personal como correo electrónico, número de teléfono, etc., se utilizará únicamente para la autenticación del usuario y la notificación de mensajes dentro de la plataforma.",
     "MFAOnlyAdminUsers": "Habilitación global: solo administrador",
     "MIN_LENGTH_ERROR": "La longitud de la contraseña debe ser al menos {0} caracteres",
     "MailRecipient": "Destinatario del correo electrónico",
