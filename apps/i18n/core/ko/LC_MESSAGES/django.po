@@ -7723,8 +7723,8 @@ msgid "Auto"
 msgstr "자동"
 
 #: settings/serializers/terminal.py:23
-msgid "Auto(Enabled for the first 5 minutes after startup, then disabled.)"
-msgstr "자동(시작 후 5분간 활성화된 다음 비활성화됨.)"
+msgid "Auto(Enabled for the first 5 minutes after startup, then disabled)"
+msgstr "자동(시작 후 5분간 활성화된 다음 비활성화됨)"
 
 #: settings/serializers/terminal.py:26
 msgid "Registration"
