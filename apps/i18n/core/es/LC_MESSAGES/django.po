@@ -8210,10 +8210,10 @@ msgid "Auto"
 msgstr "Automático"
 
 #: settings/serializers/terminal.py:23
-msgid "Auto(Enabled for the first 5 minutes after startup, then disabled.)"
+msgid "Auto(Enabled for the first 5 minutes after startup, then disabled)"
 msgstr ""
 "Automático (habilitado durante los primeros 5 minutos después del inicio y "
-"luego deshabilitado)."
+"luego deshabilitado)"
 
 #: settings/serializers/terminal.py:26
 msgid "Registration"

@@ -7667,8 +7667,8 @@ msgid "Auto"
 msgstr "自動"
 
 #: settings/serializers/terminal.py:23
-msgid "Auto(Enabled for the first 5 minutes after startup, then disabled.)"
-msgstr "自動（起動後5分間有効、その後無効にします。）"
+msgid "Auto(Enabled for the first 5 minutes after startup, then disabled)"
+msgstr "自動（起動後5分間有効、その後無効にします）"
 
 #: settings/serializers/terminal.py:26
 msgid "Registration"

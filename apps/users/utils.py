@@ -48,11 +48,8 @@ def get_user_or_pre_auth_user(request):
 
 
 def get_redirect_client_url(request):
-    bearer_token, date_expired = request.user.create_bearer_token(request, age=3600*36*5)
     data = {
-        'type': 'auth',
-        'bearer_token': bearer_token,
-        'date_expired': date_expired.timestamp()
+        'type': 'session'
     }
     buf = base64.b64encode(json.dumps(data).encode()).decode()
     redirect_url = 'jms://{}'.format(buf)
