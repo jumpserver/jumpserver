@@ -20,7 +20,7 @@ class TerminalSettingSerializer(serializers.Serializer):
     )
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.ChoiceField(
         choices=[
-            ('auto', _('Auto(Enabled for the first 5 minutes after startup, then disabled.)')),
+            ('auto', _('Auto(Enabled for the first 5 minutes after startup, then disabled)')),
             (True, _('Enable')), (False, _('Disable'))
         ],
         required=True, label=_('Registration'),
