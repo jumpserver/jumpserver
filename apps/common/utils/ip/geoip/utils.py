@@ -16,6 +16,8 @@ def get_ip_city_by_geoip(ip):
     global reader
     if reader is None:
         path = os.path.join(os.path.dirname(__file__), 'GeoLite2-City.mmdb')
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"IP Database not found, please run `./requirements/static_files.sh`")
         reader = geoip2.database.Reader(path)
 
     try:
