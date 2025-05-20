@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 import requests
 from rest_framework.exceptions import NotFound, APIException
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 
@@ -63,6 +64,12 @@ class ProxyMixin(APIView):
                 data=body,
                 timeout=10,
             )
-            return resp
+            content_type = resp.headers.get('Content-Type', '')
+            if 'application/json' in content_type:
+                data = resp.json()
+            else:
+                data = resp.text  # 或者 bytes：resp.content
+
+            return Response(data=data, status=resp.status_code)
         except requests.RequestException as e:
             raise APIException(f"Proxy request failed: {str(e)}")
