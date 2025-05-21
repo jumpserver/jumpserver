@@ -78,18 +78,25 @@ class AccountViewSet(OrgBulkModelViewSet):
         permission_classes=[IsValidUser]
     )
     def username_suggestions(self, request, *args, **kwargs):
-        asset_ids = request.data.get('assets', [])
+        raw_asset_ids = request.data.get('assets', [])
         node_ids = request.data.get('nodes', [])
         username = request.data.get('username', '')
 
-        accounts = Account.objects.all()
+        asset_ids = set(raw_asset_ids)
+
         if node_ids:
             nodes = Node.objects.filter(id__in=node_ids)
-            node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
-            asset_ids.extend(node_asset_ids)
+            node_asset_qs = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
+            asset_ids |= {str(u) for u in node_asset_qs}
 
         if asset_ids:
-            accounts = accounts.filter(asset_id__in=list(set(asset_ids)))
+            through = Asset.directory_services.through
+            ds_qs = through.objects.filter(asset_id__in=asset_ids) \
+                .values_list('directoryservice_id', flat=True)
+            asset_ids |= {str(u) for u in ds_qs}
+            accounts = Account.objects.filter(asset_id__in=list(asset_ids))
+        else:
+            accounts = Account.objects.all()
 
         if username:
             accounts = accounts.filter(username__icontains=username)
