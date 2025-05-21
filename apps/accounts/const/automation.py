@@ -17,7 +17,7 @@ __all__ = [
     'AutomationTypes', 'SecretStrategy', 'SSHKeyStrategy', 'Connectivity',
     'DEFAULT_PASSWORD_LENGTH', 'DEFAULT_PASSWORD_RULES', 'TriggerChoice',
     'PushAccountActionChoice', 'AccountBackupType', 'ChangeSecretRecordStatusChoice',
-    'GatherAccountDetailField'
+    'GatherAccountDetailField', 'ChangeSecretAccountStatus'
 ]
 
 
@@ -115,6 +115,12 @@ class ChangeSecretRecordStatusChoice(models.TextChoices):
     failed = 'failed', _('Failed')
     success = 'success', _('Success')
     pending = 'pending', _('Pending')
+
+
+class ChangeSecretAccountStatus(models.TextChoices):
+    QUEUED = 'queued', _('Queued')
+    READY = 'ready', _('Ready')
+    PROCESSING = 'processing', _('Processing')
 
 
 class GatherAccountDetailField(models.TextChoices):

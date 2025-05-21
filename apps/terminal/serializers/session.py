@@ -1,15 +1,23 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import ChangeSecretAccountStatus, SecretStrategy
+from accounts.models import Account
+from accounts.tasks import change_secret_accounts_to_assets_task
+from accounts.utils import account_secret_task_status
+from acls.models import LoginAssetACL
 from assets.models import Asset
 from common.serializers.fields import LabeledChoiceField
-from common.utils import pretty_string
+from common.utils import pretty_string, get_logger
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from terminal.session_lifecycle import lifecycle_events_map
 from users.models import User
 from .terminal import TerminalSmallSerializer
 from ..const import SessionType, SessionErrorReason
 from ..models import Session
+
+logger = get_logger(__file__)
 
 __all__ = [
     'SessionSerializer', 'SessionDisplaySerializer',
@@ -84,6 +92,47 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             raise serializers.ValidationError({field_name: error_message})
         return instance
 
+    @staticmethod
+    def enqueue_change_secret_task(instance):
+        asset = Asset.objects.filter(id=instance.asset_id).first()
+        user = User.objects.filter(id=instance.user_id).first()
+        if not asset or not user:
+            logger.warning(
+                f"Invalid asset or user for change secret task: asset={instance.asset}, user={instance.user}"
+            )
+            return
+        kwargs = {'user': user, 'asset': asset}
+        account_id = instance.account_id
+
+        try:
+            account = Account.objects.get(id=account_id)
+            kwargs['account'] = account
+        except Account.DoesNotExist:
+            logger.warning(f"Account with id {account_id} does not exist for change secret task.")
+            return
+        acls = LoginAssetACL.filter_queryset(**kwargs)
+        acl = LoginAssetACL.get_match_rule_acls(user, instance.remote_addr, acls)
+        if not acl:
+            return
+        if not acl.is_action(acl.ActionChoices.change_secret):
+            return
+
+        manager = account_secret_task_status
+        manager.set_status(account.id, ChangeSecretAccountStatus.QUEUED, use_add=True)
+        if manager.is_debounced():
+            snapshot = {
+                'check_conn_after_change': False,
+                'secret_strategy': SecretStrategy.random,
+            }
+            change_secret_accounts_to_assets_task.apply_async(
+                args=[[]],  # Pass an empty list as account_ids
+                kwargs={
+                    'snapshot': snapshot,
+                    'trigger': 'delay',
+                },
+                countdown=manager.delayed_task_countdown,
+            )
+
     def create(self, validated_data):
         user_id = validated_data.get('user_id')
         asset_id = validated_data.get('asset_id')
@@ -106,6 +155,12 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         validated_data['user'] = str(user)
         validated_data['asset'] = str(asset)
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        is_finished = validated_data.get('is_finished')
+        if settings.CHANGE_SECRET_AFTER_SESSION_END and is_finished and not instance.is_finished:
+            self.enqueue_change_secret_task(instance)
+        return super().update(instance, validated_data)
 
 
 class SessionDisplaySerializer(SessionSerializer):

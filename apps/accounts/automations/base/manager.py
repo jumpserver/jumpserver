@@ -5,9 +5,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.automations.methods import platform_automation_methods
-from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice
+from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
+    ChangeSecretAccountStatus
 from accounts.models import BaseAccountQuerySet
-from accounts.utils import SecretGenerator
+from accounts.utils import SecretGenerator, account_secret_task_status
 from assets.automations.base.manager import BasePlaybookManager
 from assets.const import HostTypes
 from common.db.utils import safe_atomic_db_connection
@@ -132,10 +133,24 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'  # To distinguish different accounts
+
+            account_status = account_secret_task_status.get_status(account.id)
+            if account_status == ChangeSecretAccountStatus.PROCESSING:
+                h['error'] = f'Account is already being processed, skipping: {account}'
+                inventory_hosts.append(h)
+                continue
+
             try:
                 h = self.gen_account_inventory(account, asset, h, path_dir)
+                account_secret_task_status.set_status(
+                    account.id,
+                    ChangeSecretAccountStatus.PROCESSING,
+                    metadata={'execution_id': self.execution.id}
+                )
             except Exception as e:
                 h['error'] = str(e)
+                self.clear_account_queue_status(account)
+
             inventory_hosts.append(h)
 
         return inventory_hosts
@@ -143,6 +158,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
     @staticmethod
     def save_record(recorder):
         recorder.save(update_fields=['error', 'status', 'date_finished'])
+
+    @staticmethod
+    def clear_account_queue_status(account):
+        account_secret_task_status.clear(account.id)
 
     def on_host_success(self, host, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -173,6 +192,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         with safe_atomic_db_connection():
             account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
             self.save_record(recorder)
+            self.clear_account_queue_status(account)
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -201,3 +221,4 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         with safe_atomic_db_connection():
             account.save(update_fields=['change_secret_status', 'date_change_secret', 'date_updated'])
             self.save_record(recorder)
+            self.clear_account_queue_status(account)
