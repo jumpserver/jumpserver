@@ -79,6 +79,8 @@ class ActionAclSerializer(serializers.Serializer):
             field_action._choices.pop(ActionChoices.face_online, None)
         for choice in self.Meta.action_choices_exclude:
             field_action._choices.pop(choice, None)
+        if not settings.CHANGE_SECRET_AFTER_SESSION_END:
+            field_action._choices.pop(ActionChoices.change_secret, None)
 
 
 class BaseACLSerializer(ActionAclSerializer, serializers.Serializer):
