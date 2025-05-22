@@ -1,15 +1,14 @@
 import asyncio
 import os
+from http.cookies import SimpleCookie
 
 import aiofiles
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from http.cookies import SimpleCookie
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
-from orgs.models import Organization
-from orgs.utils import tmp_to_org, current_org
+from orgs.utils import tmp_to_org
 from rbac.builtin import BuiltinRole
 from .ansible.utils import get_ansible_task_log_path
 from .celery.utils import get_celery_task_log_path
@@ -100,7 +99,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         user_role_ids = await self.get_current_user_role_ids(user)
         has_admin_auditor_role = bool(admin_auditor_role_ids & user_role_ids)
         has_perms = await self.has_perms(user, ['audits.view_joblog'])
-        user_can_view = task.name in self.user_tasks and (task.creator == user or has_perms)
+        user_can_view = task.creator == user or (task.name in self.user_tasks and has_perms)
         # (有管理员或审计员角色) 或者 (任务是用户自己创建的 或者 有查看任务日志权限), 其他情况没有权限
         if not (has_admin_auditor_role or user_can_view):
             await self.send_json({'message': 'No permission', 'task': task_id})
