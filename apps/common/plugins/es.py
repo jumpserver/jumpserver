@@ -340,8 +340,19 @@ class ES(object):
         if index_in_field in kwargs:
             index['values'] = kwargs[index_in_field]
 
+        mapping = self.es.indices.get_mapping(index=self.query_index)
+        props = (
+            mapping
+            .get(self.query_index, {})
+            .get('mappings', {})
+            .get('properties', {})
+        )
+        org_id_type = props.get('org_id', {}).get('type', 'keyword')
+
         for k, v in kwargs.items():
-            if k in exact_fields.union(keyword_fields):
+            if k == 'org_id' and org_id_type == 'keyword':
+                exact[k] = v
+            elif k in exact_fields.union(keyword_fields):
                 exact['{}.keyword'.format(k)] = v
             elif k in match_fields:
                 match[k] = v
