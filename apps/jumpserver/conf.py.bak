@@ -928,10 +928,7 @@ class ConfigManager:
         d.__file__ = filename
         try:
             with open(filename, mode='rb') as config_file:
-                import ast
-config_dict = ast.literal_eval(compile(config_file.read(), filename, 'exec'), d.__dict__)
-for key, value in config_dict.items():
-    globals()[key] = value
+                exec(compile(config_file.read(), filename, 'exec'), d.__dict__)
         except IOError as e:
             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
                 return False
