@@ -1,4 +1,4 @@
-# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/{Database/Data,Redis/Data,Application/Data,Application/Logs}
+# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/{Database/Data,Cache/Data,Application/Data,Application/Logs}
 # sudo chown -R ${UID:-1000}:${GID:-1000} ${STACK_BINDMOUNTROOT}/${STACK_NAME}/
 
 name: '${STACK_NAME:-stk-jumpserver-001}'
@@ -50,10 +50,10 @@ services:
     labels:
       com.centurylinklabs.watchtower.enable: ${DATABASE_ENABLEAUTOMATICUPDATES:-false}
 
-  Redis:
-    image: '${REDIS_IMAGENAME:-redis}:${REDIS_IMAGEVERSION:-latest}'
-    container_name: JUMPSERVER-REDIS-001
-    hostname: JUMPSERVER-REDIS-001
+  Cache:
+    image: '${REDIS_IMAGENAME:-valkey/valkey}:${REDIS_IMAGEVERSION:-latest}'
+    container_name: JUMPSERVER-CACHE-001
+    hostname: JUMPSERVER-CACHE-001
     restart: unless-stopped
     stop_signal: SIGTERM
     stop_grace_period: 30s
@@ -61,7 +61,7 @@ services:
     logging:
       driver: 'local'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       start_period: 10s
       interval: 15s
       retries: 3
@@ -75,9 +75,9 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Redis/Data:/data:rw"
+      - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Cache/Data:/data:rw"
     command: >
-      redis-server
+      valkey-server
       --port ${REDIS_PORT:-6379}
       --save 900 1
       --save 300 10
@@ -113,7 +113,7 @@ services:
       DB_PASSWORD: '${DATABASE_PASSWORD:-jumpserver}'
 
       # Core Redis Configuration (Required)
-      REDIS_HOST: Redis
+      REDIS_HOST: Cache
       REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_PASSWORD: '${REDIS_PASSWORD:-}'
 
@@ -236,7 +236,7 @@ services:
     depends_on:
       Database:
         condition: service_healthy
-      Redis:
+      Cache:
         condition: service_healthy
     labels:
       com.centurylinklabs.watchtower.enable: ${APPLICATION_ENABLEAUTOMATICUPDATES:-true}

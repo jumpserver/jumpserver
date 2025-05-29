@@ -46,7 +46,7 @@ Update these values in your `.env` file.
 
 ```bash
 # Create required directories
-mkdir -p custom/docker/stacks/stk-jumpserver-001/{Database/Data,Redis/Data,Application/Data,Application/Logs}
+mkdir -p custom/docker/stacks/stk-jumpserver-001/{Database/Data,Cache/Data,Application/Data,Application/Logs}
 
 # Set proper ownership for non-root user (UID:GID 1000:1000 by default)
 sudo chown -R 1000:1000 custom/docker/stacks/stk-jumpserver-001/
@@ -136,7 +136,7 @@ For production deployments, configure SSL/TLS:
 For production environments:
 
 1. **External Database**: Use managed PostgreSQL service
-2. **External Redis**: Use managed Redis service
+2. **External Cache**: Use managed Redis/Valkey service
 3. **Load Balancing**: Deploy multiple JumpServer instances
 4. **Shared Storage**: Use network storage for session recordings
 
@@ -145,7 +145,7 @@ Example external database configuration:
 # In .env file
 DATABASE_HOST=your-postgres-server.com
 DATABASE_PORT=5432
-REDIS_HOST=your-redis-server.com
+REDIS_HOST=your-valkey-server.com
 REDIS_PORT=6379
 ```
 
@@ -188,7 +188,7 @@ curl http://localhost:8080/api/health/
 ### Security Hardening
 
 1. **Network Security**:
-   - Use internal networks for database/redis
+   - Use internal networks for database/cache
    - Expose only necessary ports
    - Implement firewall rules
 
@@ -240,8 +240,8 @@ docker-compose logs Application
 # Database logs
 docker-compose logs Database
 
-# Redis logs
-docker-compose logs Redis
+# Cache logs
+docker-compose logs Cache
 
 # Follow logs in real-time
 docker-compose logs -f --tail=100
@@ -256,10 +256,10 @@ docker-compose logs -f --tail=100
    VACUUM;
    ```
 
-2. **Redis Optimization**:
+2. **Cache Optimization**:
    ```bash
-   # Monitor Redis performance
-   docker-compose exec Redis redis-cli info memory
+   # Monitor Valkey/Redis performance
+   docker-compose exec Cache valkey-cli info memory
    ```
 
 ## Maintenance
