@@ -1,0 +1,105 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: jumpserver
+  annotations:
+    config.kubernetes.io/local-config: "true"
+
+# Namespace for all resources
+namespace: jumpserver
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: jumpserver
+  app.kubernetes.io/instance: jumpserver
+  app.kubernetes.io/version: "4.0"
+  app.kubernetes.io/managed-by: kustomize
+
+# Resources to include
+resources:
+- namespace.yaml
+- configmap.yaml
+- secrets.yaml
+- storage.yaml
+- database.yaml
+- cache.yaml
+- application.yaml
+- services.yaml
+- ingress.yaml
+- networkpolicy.yaml
+- hpa.yaml
+- monitoring.yaml
+
+# Images to customize
+images:
+- name: jumpserver/jumpserver
+  newTag: latest
+- name: postgres
+  newTag: latest
+- name: valkey/valkey
+  newTag: latest
+
+# ConfigMap generator for environment-specific configs
+configMapGenerator:
+- name: jumpserver-env-config
+  literals:
+  - ENVIRONMENT=production
+  - DEBUG=false
+  - LOG_LEVEL=INFO
+
+# Secret generator for sensitive data
+secretGenerator:
+- name: jumpserver-generated-secrets
+  literals:
+  - ADMIN_PASSWORD=ChangeMe123!
+  type: Opaque
+
+# Patches for different environments
+patchesStrategicMerge:
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: jumpserver-application
+    namespace: jumpserver
+  spec:
+    template:
+      spec:
+        containers:
+        - name: jumpserver
+          env:
+          - name: ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: jumpserver-env-config
+                key: ENVIRONMENT
+
+# JSON patches for fine-grained modifications
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: jumpserver-application
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 3
+
+# Replicas for different components
+replicas:
+- name: jumpserver-application
+  count: 2
+
+# Name prefix for all resources
+namePrefix: ""
+
+# Name suffix for all resources
+nameSuffix: ""
+
+# Transformers
+transformers: []
+
+# Generators
+generators: []

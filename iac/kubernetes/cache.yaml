@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jumpserver-cache
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: cache
+spec:
+  serviceName: jumpserver-cache
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jumpserver
+      app.kubernetes.io/component: cache
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jumpserver
+        app.kubernetes.io/instance: jumpserver
+        app.kubernetes.io/component: cache
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      containers:
+      - name: valkey
+        image: valkey/valkey:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6379
+          name: valkey
+        env:
+        - name: CACHE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-cache-config
+              key: CACHE_PORT
+        command:
+        - valkey-server
+        args:
+        - --port
+        - $(CACHE_PORT)
+        - --save
+        - "900 1"
+        - --save
+        - "300 10"
+        - --save
+        - "60 10000"
+        - --appendonly
+        - "yes"
+        - --appendfsync
+        - "everysec"
+        volumeMounts:
+        - name: cache-storage
+          mountPath: /data
+        - name: timezone
+          mountPath: /etc/timezone
+          readOnly: true
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+        livenessProbe:
+          exec:
+            command:
+            - valkey-cli
+            - ping
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - valkey-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 999
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: cache-storage
+        persistentVolumeClaim:
+          claimName: jumpserver-cache-pvc
+      - name: timezone
+        hostPath:
+          path: /etc/timezone
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jumpserver-cache
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: cache
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+    name: valkey
+  selector:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/component: cache

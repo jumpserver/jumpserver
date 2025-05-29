@@ -1,0 +1,173 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jumpserver-default-deny
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: network-policy
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jumpserver-application-policy
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: application-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: application
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from ingress controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8070
+  # Allow ingress from same namespace (for services)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: jumpserver
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8070
+  # Allow monitoring scraping
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  # Allow egress to database
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow egress to cache
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: cache
+    ports:
+    - protocol: TCP
+      port: 6379
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow HTTPS for external APIs (optional)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jumpserver-database-policy
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: database-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: database
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from application pods only
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: application
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow monitoring scraping
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jumpserver-cache-policy
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: cache-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: cache
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from application pods only
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: application
+    ports:
+    - protocol: TCP
+      port: 6379
+  # Allow monitoring scraping
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 6379
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53

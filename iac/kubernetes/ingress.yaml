@@ -1,0 +1,121 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jumpserver-ingress
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: ingress
+  annotations:
+    # NGINX Ingress Controller
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    
+    # WebSocket support
+    nginx.ingress.kubernetes.io/proxy-set-headers: |
+      X-Forwarded-Proto $scheme;
+      X-Forwarded-For $proxy_add_x_forwarded_for;
+      X-Real-IP $remote_addr;
+      Host $host;
+    
+    # Rate limiting (optional)
+    nginx.ingress.kubernetes.io/rate-limit-connections: "10"
+    nginx.ingress.kubernetes.io/rate-limit-requests-per-minute: "60"
+    
+    # Traefik (alternative ingress controller)
+    # traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    # traefik.ingress.kubernetes.io/router.tls: "true"
+    # traefik.ingress.kubernetes.io/router.middlewares: jumpserver-headers@kubernetescrd
+    
+    # AWS ALB (alternative)
+    # kubernetes.io/ingress.class: alb
+    # alb.ingress.kubernetes.io/scheme: internet-facing
+    # alb.ingress.kubernetes.io/target-type: ip
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:region:account:certificate/cert-id
+    
+    # GCP GKE (alternative)
+    # kubernetes.io/ingress.class: gce
+    # kubernetes.io/ingress.global-static-ip-name: jumpserver-ip
+    # ingress.gcp.kubernetes.io/managed-certificates: jumpserver-ssl-cert
+spec:
+  ingressClassName: nginx  # Change based on your ingress controller
+  tls:
+  - hosts:
+    - jumpserver.yourdomain.com
+    - jumpserver-ws.yourdomain.com
+    secretName: jumpserver-tls
+  rules:
+  - host: jumpserver.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jumpserver-application-internal
+            port:
+              number: 8080
+  - host: jumpserver-ws.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jumpserver-application-internal
+            port:
+              number: 8070
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jumpserver-ingress-single-host
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: ingress-single
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    
+    # WebSocket upgrade support
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location /ws/ {
+        proxy_pass http://jumpserver-application-internal.jumpserver.svc.cluster.local:8070;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - jumpserver.yourdomain.com
+    secretName: jumpserver-tls
+  rules:
+  - host: jumpserver.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jumpserver-application-internal
+            port:
+              number: 8080

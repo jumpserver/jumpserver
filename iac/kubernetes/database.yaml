@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jumpserver-database
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: database
+spec:
+  serviceName: jumpserver-database
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jumpserver
+      app.kubernetes.io/component: database
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jumpserver
+        app.kubernetes.io/instance: jumpserver
+        app.kubernetes.io/component: database
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      containers:
+      - name: postgresql
+        image: postgres:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+          name: postgresql
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-database-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-database-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: POSTGRES_PASSWORD
+        - name: PGPORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-database-config
+              key: PGPORT
+        - name: PGDATA
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-database-config
+              key: PGDATA
+        volumeMounts:
+        - name: database-storage
+          mountPath: /var/lib/postgresql/data
+        - name: timezone
+          mountPath: /etc/timezone
+          readOnly: true
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - $(POSTGRES_USER)
+            - -d
+            - $(POSTGRES_DB)
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - $(POSTGRES_USER)
+            - -d
+            - $(POSTGRES_DB)
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 999
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: database-storage
+        persistentVolumeClaim:
+          claimName: jumpserver-database-pvc
+      - name: timezone
+        hostPath:
+          path: /etc/timezone
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jumpserver-database
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgresql
+  selector:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/component: database

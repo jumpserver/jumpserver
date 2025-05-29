@@ -1,0 +1,32 @@
+apiVersion: v2
+name: jumpserver
+description: A Helm chart for JumpServer - Open Source PAM Platform
+type: application
+version: 1.0.0
+appVersion: "4.0"
+home: https://jumpserver.com
+sources:
+- https://github.com/jumpserver/jumpserver
+maintainers:
+- name: JumpServer Team
+  email: support@jumpserver.com
+  url: https://jumpserver.com
+keywords:
+- jumpserver
+- pam
+- bastion
+- security
+- access-management
+annotations:
+  category: Security
+  licenses: GPL-3.0
+dependencies:
+- name: postgresql
+  version: "12.x.x"
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
+- name: redis
+  version: "17.x.x"
+  repository: https://charts.bitnami.com/bitnami
+  condition: redis.enabled
+icon: https://jumpserver.com/favicon.ico

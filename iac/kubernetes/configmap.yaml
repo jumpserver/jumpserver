@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jumpserver-config
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: config
+data:
+  # Database Configuration
+  DB_ENGINE: "postgresql"
+  DB_HOST: "jumpserver-database"
+  DB_PORT: "5432"
+  DB_NAME: "jumpserver"
+  DB_USER: "jumpserver"
+  
+  # Cache Configuration
+  REDIS_HOST: "jumpserver-cache"
+  REDIS_PORT: "6379"
+  
+  # JumpServer Core Configuration
+  LOG_LEVEL: "INFO"
+  
+  # Session Configuration
+  SESSION_COOKIE_AGE: "3600"
+  SESSION_EXPIRE_AT_BROWSER_CLOSE: "false"
+  
+  # Security Settings (Basic)
+  SECURITY_MFA_AUTH: "0"
+  SECURITY_MAX_IDLE_TIME: "30"
+  SECURITY_MAX_SESSION_TIME: "24"
+  SECURITY_WATERMARK_ENABLED: "false"
+  
+  # Network Configuration
+  HTTP_BIND_HOST: "0.0.0.0"
+  HTTP_LISTEN_PORT: "8080"
+  WS_LISTEN_PORT: "8070"
+  
+  # Storage Configuration
+  DEFAULT_FILE_STORAGE: "jumpserver.storage.LocalFileStorage"
+  
+  # Timezone
+  TZ: "UTC"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jumpserver-database-config
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: database-config
+data:
+  POSTGRES_DB: "jumpserver"
+  POSTGRES_USER: "jumpserver"
+  PGPORT: "5432"
+  PGDATA: "/var/lib/postgresql/data"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jumpserver-cache-config
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: cache-config
+data:
+  CACHE_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jumpserver-scripts
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: scripts
+data:
+  init-db.sh: |
+    #!/bin/bash
+    set -e
+    
+    echo "Waiting for database to be ready..."
+    until pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER; do
+      echo "Database is unavailable - sleeping"
+      sleep 2
+    done
+    
+    echo "Database is ready!"
+    
+    # Run migrations
+    python manage.py migrate --noinput
+    
+    # Create superuser if it doesn't exist
+    python manage.py shell -c "
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@jumpserver.local', 'ChangeMe')
+        print('Superuser created: admin/ChangeMe')
+    else:
+        print('Superuser already exists')
+    "
+    
+    echo "Database initialization complete!"
+  
+  health-check.sh: |
+    #!/bin/bash
+    curl -f http://localhost:${HTTP_LISTEN_PORT:-8080}/api/health/ || exit 1

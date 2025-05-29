@@ -1,0 +1,297 @@
+# Default values for jumpserver.
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# JumpServer application configuration
+jumpserver:
+  image:
+    registry: docker.io
+    repository: jumpserver/jumpserver
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 2
+  
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  
+  # Security context
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+      - ALL
+  
+  # Pod security context
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  
+  # Environment variables
+  env:
+    # Core configuration
+    LOG_LEVEL: "INFO"
+    TZ: "UTC"
+    
+    # Session configuration
+    SESSION_COOKIE_AGE: "3600"
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: "false"
+    
+    # Security settings
+    SECURITY_MFA_AUTH: "0"
+    SECURITY_MAX_IDLE_TIME: "30"
+    SECURITY_MAX_SESSION_TIME: "24"
+    SECURITY_WATERMARK_ENABLED: "false"
+    
+    # Network configuration
+    HTTP_BIND_HOST: "0.0.0.0"
+    HTTP_LISTEN_PORT: "8080"
+    WS_LISTEN_PORT: "8070"
+  
+  # Secrets configuration
+  secrets:
+    # Generate random secrets if not provided
+    secretKey: ""
+    bootstrapToken: ""
+    
+    # Database credentials
+    dbPassword: ""
+    
+    # Cache credentials (optional)
+    cachePassword: ""
+  
+  # Persistent storage
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteMany
+    size: 50Gi
+    
+    # Logs storage
+    logs:
+      enabled: true
+      storageClass: ""
+      accessMode: ReadWriteMany
+      size: 20Gi
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 8080
+    wsPort: 8070
+    annotations: {}
+  
+  # Ingress configuration
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    hosts:
+    - host: jumpserver.local
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - secretName: jumpserver-tls
+      hosts:
+      - jumpserver.local
+  
+  # Health checks
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+  
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  # Node selector and tolerations
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# PostgreSQL configuration (using Bitnami chart)
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "ChangeMe123!"
+    username: "jumpserver"
+    password: "ChangeMe123!"
+    database: "jumpserver"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    
+    securityContext:
+      enabled: true
+      runAsUser: 999
+      runAsGroup: 999
+    
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 999
+      runAsGroup: 999
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      capabilities:
+        drop:
+        - ALL
+
+# Redis/Valkey configuration (using Bitnami Redis chart)
+redis:
+  enabled: true
+  auth:
+    enabled: false
+    password: ""
+  
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    
+    securityContext:
+      enabled: true
+      runAsUser: 999
+      runAsGroup: 999
+    
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 999
+      runAsGroup: 999
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      capabilities:
+        drop:
+        - ALL
+
+# External database configuration
+externalDatabase:
+  enabled: false
+  host: ""
+  port: 5432
+  username: "jumpserver"
+  password: ""
+  database: "jumpserver"
+
+# External cache configuration
+externalCache:
+  enabled: false
+  host: ""
+  port: 6379
+  password: ""
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+  
+  grafana:
+    dashboard:
+      enabled: true
+
+# RBAC configuration
+rbac:
+  create: true
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+# Pod labels
+podLabels: {}
+
+# Init containers
+initContainers: []
+
+# Sidecar containers
+sidecars: []
+
+# Extra volumes
+extraVolumes: []
+
+# Extra volume mounts
+extraVolumeMounts: []
+
+# Extra environment variables
+extraEnvVars: []
+
+# Extra environment variables from ConfigMap
+extraEnvVarsCM: ""
+
+# Extra environment variables from Secret
+extraEnvVarsSecret: ""

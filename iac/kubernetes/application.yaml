@@ -1,0 +1,310 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumpserver-application
+  namespace: jumpserver
+  labels:
+    app.kubernetes.io/name: jumpserver
+    app.kubernetes.io/instance: jumpserver
+    app.kubernetes.io/component: application
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jumpserver
+      app.kubernetes.io/component: application
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jumpserver
+        app.kubernetes.io/instance: jumpserver
+        app.kubernetes.io/component: application
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      initContainers:
+      - name: init-db
+        image: jumpserver/jumpserver:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - /scripts/init-db.sh
+        env:
+        - name: DB_ENGINE
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_ENGINE
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: DB_PASSWORD
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: SECRET_KEY
+        - name: BOOTSTRAP_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: BOOTSTRAP_TOKEN
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /scripts
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+            - ALL
+      containers:
+      - name: jumpserver
+        image: jumpserver/jumpserver:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8070
+          name: websocket
+          protocol: TCP
+        env:
+        # Database Configuration
+        - name: DB_ENGINE
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_ENGINE
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: DB_PASSWORD
+        
+        # Cache Configuration
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: REDIS_PORT
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: REDIS_PASSWORD
+        
+        # JumpServer Core Configuration
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: SECRET_KEY
+        - name: BOOTSTRAP_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: jumpserver-secrets
+              key: BOOTSTRAP_TOKEN
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: LOG_LEVEL
+        
+        # Session Configuration
+        - name: SESSION_COOKIE_AGE
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: SESSION_COOKIE_AGE
+        - name: SESSION_EXPIRE_AT_BROWSER_CLOSE
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: SESSION_EXPIRE_AT_BROWSER_CLOSE
+        
+        # Security Settings
+        - name: SECURITY_MFA_AUTH
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: SECURITY_MFA_AUTH
+        - name: SECURITY_MAX_IDLE_TIME
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: SECURITY_MAX_IDLE_TIME
+        - name: SECURITY_MAX_SESSION_TIME
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: SECURITY_MAX_SESSION_TIME
+        - name: SECURITY_WATERMARK_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: SECURITY_WATERMARK_ENABLED
+        
+        # Network Configuration
+        - name: HTTP_BIND_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: HTTP_BIND_HOST
+        - name: HTTP_LISTEN_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: HTTP_LISTEN_PORT
+        - name: WS_LISTEN_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: WS_LISTEN_PORT
+        
+        # Storage Configuration
+        - name: DEFAULT_FILE_STORAGE
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: DEFAULT_FILE_STORAGE
+        
+        # Timezone
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: jumpserver-config
+              key: TZ
+        
+        volumeMounts:
+        - name: jumpserver-data
+          mountPath: /opt/jumpserver/data
+        - name: jumpserver-logs
+          mountPath: /opt/jumpserver/logs
+        - name: timezone
+          mountPath: /etc/timezone
+          readOnly: true
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+        - name: health-scripts
+          mountPath: /health
+        
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - /health/health-check.sh
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /api/health/
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+            - ALL
+      
+      volumes:
+      - name: jumpserver-data
+        persistentVolumeClaim:
+          claimName: jumpserver-data-pvc
+      - name: jumpserver-logs
+        persistentVolumeClaim:
+          claimName: jumpserver-logs-pvc
+      - name: timezone
+        hostPath:
+          path: /etc/timezone
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+      - name: init-scripts
+        configMap:
+          name: jumpserver-scripts
+          defaultMode: 0755
+      - name: health-scripts
+        configMap:
+          name: jumpserver-scripts
+          defaultMode: 0755
