@@ -51,7 +51,7 @@ services:
       com.centurylinklabs.watchtower.enable: ${DATABASE_ENABLEAUTOMATICUPDATES:-false}
 
   Cache:
-    image: '${REDIS_IMAGENAME:-valkey/valkey}:${REDIS_IMAGEVERSION:-latest}'
+    image: '${CACHE_IMAGENAME:-valkey/valkey}:${CACHE_IMAGEVERSION:-latest}'
     container_name: JUMPSERVER-CACHE-001
     hostname: JUMPSERVER-CACHE-001
     restart: unless-stopped
@@ -69,23 +69,23 @@ services:
     networks:
       INTERNAL:
     expose:
-      - "${REDIS_PORT:-6379}"
+      - "${CACHE_PORT:-6379}"
     environment:
-      REDIS_PORT: ${REDIS_PORT:-6379}
+      CACHE_PORT: ${CACHE_PORT:-6379}
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Cache/Data:/data:rw"
     command: >
       valkey-server
-      --port ${REDIS_PORT:-6379}
+      --port ${CACHE_PORT:-6379}
       --save 900 1
       --save 300 10
       --save 60 10000
       --appendonly yes
       --appendfsync everysec
     labels:
-      com.centurylinklabs.watchtower.enable: ${REDIS_ENABLEAUTOMATICUPDATES:-false}
+      com.centurylinklabs.watchtower.enable: ${CACHE_ENABLEAUTOMATICUPDATES:-false}
 
   Application:
     image: '${APPLICATION_IMAGENAME:-jumpserver/jumpserver}:${APPLICATION_IMAGEVERSION:-latest}'
@@ -112,10 +112,10 @@ services:
       DB_USER: '${DATABASE_USER:-jumpserver}'
       DB_PASSWORD: '${DATABASE_PASSWORD:-jumpserver}'
 
-      # Core Redis Configuration (Required)
+      # Core Cache Configuration (Required)
       REDIS_HOST: Cache
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: '${REDIS_PASSWORD:-}'
+      REDIS_PORT: ${CACHE_PORT:-6379}
+      REDIS_PASSWORD: '${CACHE_PASSWORD:-}'
 
       # Core JumpServer Configuration (Required)
       SECRET_KEY: '${SECRET_KEY:-}'

@@ -145,8 +145,8 @@ Example external database configuration:
 # In .env file
 DATABASE_HOST=your-postgres-server.com
 DATABASE_PORT=5432
-REDIS_HOST=your-valkey-server.com
-REDIS_PORT=6379
+CACHE_HOST=your-valkey-server.com
+CACHE_PORT=6379
 ```
 
 ### Backup Strategy
