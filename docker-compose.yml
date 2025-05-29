@@ -1,7 +1,5 @@
-# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Database/Data
-# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Redis/Data
-# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Application/Data
-# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Application/Logs
+# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/{Database/Data,Redis/Data,Application/Data,Application/Logs}
+# sudo chown -R ${UID:-1000}:${GID:-1000} ${STACK_BINDMOUNTROOT}/${STACK_NAME}/
 
 name: '${STACK_NAME:-stk-jumpserver-001}'
 
@@ -20,7 +18,7 @@ networks:
 
 services:
   Database:
-    image: '${DATABASE_IMAGENAME:-postgres}:${DATABASE_IMAGEVERSION:-15-alpine}'
+    image: '${DATABASE_IMAGENAME:-postgres}:${DATABASE_IMAGEVERSION:-latest}'
     container_name: JUMPSERVER-DB-001
     hostname: JUMPSERVER-DB-001
     restart: unless-stopped
@@ -53,7 +51,7 @@ services:
       com.centurylinklabs.watchtower.enable: ${DATABASE_ENABLEAUTOMATICUPDATES:-false}
 
   Redis:
-    image: '${REDIS_IMAGENAME:-redis}:${REDIS_IMAGEVERSION:-7-alpine}'
+    image: '${REDIS_IMAGENAME:-redis}:${REDIS_IMAGEVERSION:-latest}'
     container_name: JUMPSERVER-REDIS-001
     hostname: JUMPSERVER-REDIS-001
     restart: unless-stopped
@@ -100,7 +98,7 @@ services:
     logging:
       driver: 'local'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
+      test: ["CMD", "curl", "-f", "http://localhost:${HTTP_LISTEN_PORT:-8080}/api/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -133,7 +131,7 @@ services:
       SECURITY_MFA_AUTH: '${SECURITY_MFA_AUTH:-0}'
       SECURITY_MAX_IDLE_TIME: '${SECURITY_MAX_IDLE_TIME:-30}'
       SECURITY_MAX_SESSION_TIME: '${SECURITY_MAX_SESSION_TIME:-24}'
-      SECURITY_WATERMARK_ENABLED: '${SECURITY_WATERMARK_ENABLED:-true}'
+      SECURITY_WATERMARK_ENABLED: '${SECURITY_WATERMARK_ENABLED:-false}'
 
       # Advanced Security Settings (Optional - Commented for minimal setup)
       # SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY: '${SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY:-true}'
@@ -228,8 +226,8 @@ services:
       INTERNAL:
       EXTERNAL:
     ports:
-      - "${SERVICE_BIND_ADDRESS_EXTERNAL:-0.0.0.0}:${HTTP_LISTEN_PORT:-8080}:8080"
-      - "${SERVICE_BIND_ADDRESS_EXTERNAL:-0.0.0.0}:${WS_LISTEN_PORT:-8070}:8070"
+      - "${HTTP_BIND_HOST:-0.0.0.0}:${HTTP_LISTEN_PORT:-8080}:8080"
+      - "${HTTP_BIND_HOST:-0.0.0.0}:${WS_LISTEN_PORT:-8070}:8070"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro

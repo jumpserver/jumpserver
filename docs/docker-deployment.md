@@ -88,7 +88,7 @@ DATABASE_USER=jumpserver
 SECRET_KEY=your_50_character_secret_key
 BOOTSTRAP_TOKEN=your_24_character_bootstrap_token
 SECURITY_MFA_AUTH=1  # Enable MFA globally
-SECURITY_WATERMARK_ENABLED=true
+SECURITY_WATERMARK_ENABLED=false  # Disable watermarks by default
 ```
 
 #### Network Settings
