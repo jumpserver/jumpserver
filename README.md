@@ -1,7 +1,7 @@
 <div align="center">
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
-  
+
 ## An open-source PAM tool (Bastion Host)
 
 [![][license-shield]][license-link]
@@ -19,7 +19,87 @@
 
 ## What is JumpServer?
 
-JumpServer is an open-source Privileged Access Management (PAM) tool that provides DevOps and IT teams with on-demand and secure access to SSH, RDP, Kubernetes, Database and RemoteApp endpoints through a web browser.
+JumpServer is a comprehensive open-source Privileged Access Management (PAM) tool and bastion host that provides DevOps and IT teams with secure, auditable, and centralized access to critical infrastructure. Through a modern web browser interface, JumpServer enables on-demand access to SSH, RDP, Kubernetes, Database, and RemoteApp endpoints while maintaining complete session recording and audit trails.
+
+### 🔐 Core Capabilities
+
+**Privileged Access Management (PAM)**
+- Centralized credential management and rotation
+- Just-in-time access provisioning
+- Session-based access controls with time limits
+- Comprehensive audit trails and compliance reporting
+
+**Multi-Protocol Support**
+- **SSH/SFTP**: Linux/Unix server access with terminal recording
+- **RDP**: Windows desktop and server connections
+- **Database**: MySQL, PostgreSQL, Oracle, SQL Server, MongoDB, Redis
+- **Kubernetes**: Container orchestration platform access
+- **Web Applications**: RemoteApp and web-based application access
+- **VNC**: Virtual Network Computing for graphical interfaces
+
+**Enterprise Security Features**
+- **Multi-Factor Authentication (MFA)**: OTP, SMS, Email, Face Recognition, RADIUS
+- **Role-Based Access Control (RBAC)**: Granular permission management
+- **Session Recording**: Complete video/text capture of all sessions
+- **Command Filtering**: Real-time command blocking and monitoring
+- **IP Restrictions**: Geo-location and network-based access controls
+- **Watermarking**: Session identification and security overlays
+
+### 🏗️ Architecture & Components
+
+JumpServer follows a microservices architecture with specialized components for different functionalities:
+
+**Core Components (Open Source)**
+- **Core**: Django-based API server and management interface
+- **Lina**: Modern Vue.js web UI for administration
+- **Luna**: Web-based terminal interface for end users
+- **KoKo**: Character protocol connector (SSH, Telnet, Database)
+- **Lion**: Graphical protocol connector (RDP, VNC)
+- **Chen**: Web database management interface
+
+**Enterprise Components (Commercial)**
+- **Tinker**: Windows RemoteApp connector
+- **Panda**: Linux RemoteApp connector
+- **Razor**: Enhanced RDP proxy with advanced features
+- **Magnus**: Database proxy with query analysis
+- **Nec**: VNC proxy connector
+- **Facelive**: AI-powered facial recognition system
+
+### 🎨 User Interface & Experience
+
+**Modern Web Interface**
+- **Responsive Design**: Mobile-friendly interface for on-the-go access
+- **Dark Theme**: Eye-friendly dark mode with automatic system detection
+- **Multi-language Support**: Internationalization for global teams
+- **Customizable Dashboard**: Personalized views and quick access panels
+
+### 🛡️ Security & Compliance
+
+**Audit & Monitoring**
+- Real-time session monitoring and alerting
+- Comprehensive command and file transfer logging
+- User behavior analytics and risk assessment
+- Integration with SIEM systems via syslog
+
+**Authentication & Authorization**
+- LDAP/Active Directory integration
+- SAML 2.0 and OAuth 2.0 support
+- CAS (Central Authentication Service)
+- Custom authentication backends
+
+**Compliance Standards**
+- SOX, PCI-DSS, HIPAA compliance support
+- Detailed audit reports and evidence collection
+- Password policy enforcement
+- Session recording retention policies
+
+### 🚀 Use Cases
+
+- **DevOps Teams**: Secure access to production infrastructure
+- **IT Operations**: Centralized server and database management
+- **Security Teams**: Privileged access monitoring and control
+- **Compliance Officers**: Audit trail generation and reporting
+- **Cloud Migration**: Hybrid and multi-cloud access management
 
 
 <picture>
@@ -29,7 +109,9 @@ JumpServer is an open-source Privileged Access Management (PAM) tool that provid
 </picture>
 
 
-## Quickstart
+## 🚀 Deployment Options
+
+### Quick Start (Recommended)
 
 Prepare a clean Linux Server ( 64 bit, >= 4c8g )
 
@@ -43,18 +125,98 @@ Access JumpServer in your browser at `http://your-jumpserver-ip/`
 
 [![JumpServer Quickstart](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
 
+### Docker Compose (Development & Testing)
+
+For development environments or testing purposes, use the included Docker Compose configuration:
+
+```bash
+# Clone the repository
+git clone https://github.com/jumpserver/jumpserver.git
+cd jumpserver
+
+# Copy and configure environment variables
+cp .env.example .env
+# Edit .env file with your configuration
+
+# Start services
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+```
+
+### Production Deployment
+
+For production environments, consider:
+- **High Availability**: Deploy multiple instances with load balancing
+- **Database**: Use external PostgreSQL or MySQL cluster
+- **Storage**: Configure shared storage for session recordings
+- **SSL/TLS**: Implement proper certificate management
+- **Monitoring**: Set up comprehensive monitoring and alerting
+
+Refer to the [official documentation](https://jumpserver.com/docs) for detailed production deployment guides.
+
+### Docker Image Publishing
+
+For maintainers and contributors who need to publish Docker images to Docker Hub:
+
+**Linux/macOS:**
+```bash
+# Make the script executable
+chmod +x scripts/docker-publish.sh
+
+# Publish with version tag and latest
+./scripts/docker-publish.sh
+
+# Force rebuild even if image exists
+./scripts/docker-publish.sh --force
+
+# Skip latest tag
+./scripts/docker-publish.sh --skip-latest
+
+# With custom build arguments
+./scripts/docker-publish.sh --build-args "--no-cache --platform linux/amd64,linux/arm64"
+```
+
+**Windows:**
+```cmd
+# Publish with version tag and latest
+scripts\docker-publish.bat
+
+# Force rebuild even if image exists
+scripts\docker-publish.bat --force
+
+# Skip latest tag
+scripts\docker-publish.bat --skip-latest
+```
+
+**Environment Variables for Authentication:**
+```bash
+export DOCKER_USERNAME="your-dockerhub-username"
+export DOCKER_PASSWORD="your-dockerhub-password"
+# OR use access token
+export DOCKER_HUB_TOKEN="your-dockerhub-token"
+```
+
+The script automatically:
+- Extracts version from `pyproject.toml`
+- Handles Docker Hub authentication
+- Builds images with proper tags
+- Pushes to Docker Hub registry
+- Supports idempotent operations
+
 ## Screenshots
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/99fabe5b-0475-4a53-9116-4c370a1426c4" alt="JumpServer Console"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/7c1f81af-37e8-4f07-8ac9-182895e1062e" alt="JumpServer PAM"   /></td>    
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/7c1f81af-37e8-4f07-8ac9-182895e1062e" alt="JumpServer PAM"   /></td>
   </tr>
   <tr>
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a424d731-1c70-4108-a7d8-5bbf387dda9a" alt="JumpServer Audits"   /></td>
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/393d2c27-a2d0-4dea-882d-00ed509e00c9" alt="JumpServer Workbench"   /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/eaa41f66-8cc8-4f01-a001-0d258501f1c9" alt="JumpServer RBAC"   /></td>     
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/eaa41f66-8cc8-4f01-a001-0d258501f1c9" alt="JumpServer RBAC"   /></td>
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/3a2611cd-8902-49b8-b82b-2a6dac851f3e" alt="JumpServer Settings"   /></td>
   </tr>
   <tr>
@@ -77,7 +239,7 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer Web Terminal                                                                                 |
 | [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer Character Protocol Connector                                                                 |
 | [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | JumpServer Graphical Protocol Connector                                                                 |
-| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | JumpServer Web DB                                                                                       |  
+| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | JumpServer Web DB                                                                                       |
 | [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer Remote Application Connector (Windows)                                                    |
 | [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer EE Remote Application Connector (Linux)                                                      |
 | [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer EE RDP Proxy Connector                                                                       |
@@ -116,8 +278,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 <!-- Shield link-->
 [docs-shield]: https://img.shields.io/badge/documentation-148F76
 [github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
-[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square   
-[docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
+[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
+[docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jumpserver.svg
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
 [deepwiki-shield]: https://img.shields.io/badge/deepwiki-devin?color=blue
 [discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb

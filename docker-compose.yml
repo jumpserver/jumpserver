@@ -1,0 +1,244 @@
+# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Database/Data
+# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Redis/Data
+# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Application/Data
+# mkdir -p ${STACK_BINDMOUNTROOT}/${STACK_NAME}/Application/Logs
+
+name: '${STACK_NAME:-stk-jumpserver-001}'
+
+networks:
+  EXTERNAL:
+    name: JUMPSERVER-EXTERNAL
+    driver: bridge
+    internal: false
+    attachable: true
+
+  INTERNAL:
+    name: JUMPSERVER-INTERNAL
+    driver: bridge
+    internal: true
+    attachable: true
+
+services:
+  Database:
+    image: '${DATABASE_IMAGENAME:-postgres}:${DATABASE_IMAGEVERSION:-15-alpine}'
+    container_name: JUMPSERVER-DB-001
+    hostname: JUMPSERVER-DB-001
+    restart: unless-stopped
+    stop_signal: SIGTERM
+    stop_grace_period: 90s
+    user: '${UID:-0}:${GID:-0}'
+    logging:
+      driver: 'local'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 3
+      timeout: 10s
+    networks:
+      INTERNAL:
+    expose:
+      - "${DATABASE_PORT:-5432}"
+    environment:
+      PGPORT: ${DATABASE_PORT:-5432}
+      POSTGRES_DB: '${DATABASE_NAME:-jumpserver}'
+      POSTGRES_USER: '${DATABASE_USER:-jumpserver}'
+      POSTGRES_PASSWORD: '${DATABASE_PASSWORD:-jumpserver}'
+      PGDATA: '${DATABASE_DATA_PATH_INTERNAL:-/var/lib/postgresql/data}'
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Database/Data:${DATABASE_DATA_PATH_INTERNAL:-/var/lib/postgresql/data}:rw"
+    labels:
+      com.centurylinklabs.watchtower.enable: ${DATABASE_ENABLEAUTOMATICUPDATES:-false}
+
+  Redis:
+    image: '${REDIS_IMAGENAME:-redis}:${REDIS_IMAGEVERSION:-7-alpine}'
+    container_name: JUMPSERVER-REDIS-001
+    hostname: JUMPSERVER-REDIS-001
+    restart: unless-stopped
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+    user: '${UID:-0}:${GID:-0}'
+    logging:
+      driver: 'local'
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 10s
+      interval: 15s
+      retries: 3
+      timeout: 5s
+    networks:
+      INTERNAL:
+    expose:
+      - "${REDIS_PORT:-6379}"
+    environment:
+      REDIS_PORT: ${REDIS_PORT:-6379}
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Redis/Data:/data:rw"
+    command: >
+      redis-server
+      --port ${REDIS_PORT:-6379}
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync everysec
+    labels:
+      com.centurylinklabs.watchtower.enable: ${REDIS_ENABLEAUTOMATICUPDATES:-false}
+
+  Application:
+    image: '${APPLICATION_IMAGENAME:-jumpserver/jumpserver}:${APPLICATION_IMAGEVERSION:-latest}'
+    container_name: JUMPSERVER-APP-001
+    hostname: JUMPSERVER-APP-001
+    restart: unless-stopped
+    stop_signal: SIGQUIT
+    stop_grace_period: 120s
+    user: '${UID:-0}:${GID:-0}'
+    logging:
+      driver: 'local'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    environment:
+      # Core Database Configuration (Required)
+      DB_ENGINE: postgresql
+      DB_HOST: Database
+      DB_PORT: ${DATABASE_PORT:-5432}
+      DB_NAME: '${DATABASE_NAME:-jumpserver}'
+      DB_USER: '${DATABASE_USER:-jumpserver}'
+      DB_PASSWORD: '${DATABASE_PASSWORD:-jumpserver}'
+
+      # Core Redis Configuration (Required)
+      REDIS_HOST: Redis
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: '${REDIS_PASSWORD:-}'
+
+      # Core JumpServer Configuration (Required)
+      SECRET_KEY: '${SECRET_KEY:-}'
+      BOOTSTRAP_TOKEN: '${BOOTSTRAP_TOKEN:-}'
+      LOG_LEVEL: '${LOG_LEVEL:-INFO}'
+      # LOG_DIR: '${LOG_DIR:-/opt/jumpserver/logs}'
+
+      # Core Session Configuration
+      SESSION_COOKIE_AGE: '${SESSION_COOKIE_AGE:-3600}'
+      SESSION_EXPIRE_AT_BROWSER_CLOSE: '${SESSION_EXPIRE_AT_BROWSER_CLOSE:-false}'
+
+      # Core Security Settings (Minimal for basic functionality)
+      SECURITY_MFA_AUTH: '${SECURITY_MFA_AUTH:-0}'
+      SECURITY_MAX_IDLE_TIME: '${SECURITY_MAX_IDLE_TIME:-30}'
+      SECURITY_MAX_SESSION_TIME: '${SECURITY_MAX_SESSION_TIME:-24}'
+      SECURITY_WATERMARK_ENABLED: '${SECURITY_WATERMARK_ENABLED:-true}'
+
+      # Advanced Security Settings (Optional - Commented for minimal setup)
+      # SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY: '${SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY:-true}'
+      # SECURITY_MFA_BY_EMAIL: '${SECURITY_MFA_BY_EMAIL:-false}'
+      # SECURITY_VIEW_AUTH_NEED_MFA: '${SECURITY_VIEW_AUTH_NEED_MFA:-true}'
+      # SECURITY_PASSWORD_EXPIRATION_TIME: '${SECURITY_PASSWORD_EXPIRATION_TIME:-9999}'
+      # SECURITY_PASSWORD_MIN_LENGTH: '${SECURITY_PASSWORD_MIN_LENGTH:-6}'
+      # SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH: '${SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH:-8}'
+      # SECURITY_PASSWORD_UPPER_CASE: '${SECURITY_PASSWORD_UPPER_CASE:-false}'
+      # SECURITY_PASSWORD_LOWER_CASE: '${SECURITY_PASSWORD_LOWER_CASE:-false}'
+      # SECURITY_PASSWORD_NUMBER: '${SECURITY_PASSWORD_NUMBER:-false}'
+      # SECURITY_PASSWORD_SPECIAL_CHAR: '${SECURITY_PASSWORD_SPECIAL_CHAR:-false}'
+      # SECURITY_COMMAND_EXECUTION: '${SECURITY_COMMAND_EXECUTION:-false}'
+      # SECURITY_INSECURE_COMMAND: '${SECURITY_INSECURE_COMMAND:-false}'
+      # SECURITY_INSECURE_COMMAND_LEVEL: '${SECURITY_INSECURE_COMMAND_LEVEL:-5}'
+      # SECURITY_LOGIN_CAPTCHA_ENABLED: '${SECURITY_LOGIN_CAPTCHA_ENABLED:-true}'
+      # SECURITY_LOGIN_CHALLENGE_ENABLED: '${SECURITY_LOGIN_CHALLENGE_ENABLED:-false}'
+      # SECURITY_LOGIN_LIMIT_COUNT: '${SECURITY_LOGIN_LIMIT_COUNT:-7}'
+      # SECURITY_LOGIN_LIMIT_TIME: '${SECURITY_LOGIN_LIMIT_TIME:-30}'
+      # SECURITY_WATERMARK_SESSION_CONTENT: '${SECURITY_WATERMARK_SESSION_CONTENT:-${name}(${userName})\n${assetName}}'
+      # SECURITY_WATERMARK_CONSOLE_CONTENT: '${SECURITY_WATERMARK_CONSOLE_CONTENT:-${userName}(${name})}'
+      # ONLY_ALLOW_EXIST_USER_AUTH: '${ONLY_ALLOW_EXIST_USER_AUTH:-false}'
+      # ONLY_ALLOW_AUTH_FROM_SOURCE: '${ONLY_ALLOW_AUTH_FROM_SOURCE:-false}'
+      # USER_LOGIN_SINGLE_MACHINE_ENABLED: '${USER_LOGIN_SINGLE_MACHINE_ENABLED:-false}'
+
+      # LDAP/AD Authentication (Optional - Commented for minimal setup)
+      # AUTH_LDAP: '${AUTH_LDAP:-false}'
+      # AUTH_LDAP_SERVER_URI: '${AUTH_LDAP_SERVER_URI:-ldap://localhost:389}'
+      # AUTH_LDAP_BIND_DN: '${AUTH_LDAP_BIND_DN:-}'
+      # AUTH_LDAP_BIND_PASSWORD: '${AUTH_LDAP_BIND_PASSWORD:-}'
+      # AUTH_LDAP_SEARCH_OU: '${AUTH_LDAP_SEARCH_OU:-ou=people,dc=jumpserver,dc=org}'
+      # AUTH_LDAP_SEARCH_FILTER: '${AUTH_LDAP_SEARCH_FILTER:-(cn=%(user)s)}'
+      # AUTH_LDAP_ATTR_MAP: '${AUTH_LDAP_ATTR_MAP:-{"username": "cn", "name": "sn", "email": "mail"}}'
+      # AUTH_LDAP_START_TLS: '${AUTH_LDAP_START_TLS:-false}'
+
+      # OIDC Authentication (Optional - Commented for minimal setup)
+      # AUTH_OPENID: '${AUTH_OPENID:-false}'
+      # BASE_SITE_URL: '${BASE_SITE_URL:-}'
+      # AUTH_OPENID_CLIENT_ID: '${AUTH_OPENID_CLIENT_ID:-}'
+      # AUTH_OPENID_CLIENT_SECRET: '${AUTH_OPENID_CLIENT_SECRET:-}'
+      # AUTH_OPENID_PROVIDER_ENDPOINT: '${AUTH_OPENID_PROVIDER_ENDPOINT:-}'
+      # AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT: '${AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT:-}'
+      # AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT: '${AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT:-}'
+      # AUTH_OPENID_PROVIDER_JWKS_ENDPOINT: '${AUTH_OPENID_PROVIDER_JWKS_ENDPOINT:-}'
+      # AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT: '${AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT:-}'
+      # AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT: '${AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT:-}'
+      # AUTH_OPENID_PROVIDER_SIGNATURE_ALG: '${AUTH_OPENID_PROVIDER_SIGNATURE_ALG:-HS256}'
+      # AUTH_OPENID_PROVIDER_SIGNATURE_KEY: '${AUTH_OPENID_PROVIDER_SIGNATURE_KEY:-}'
+      # AUTH_OPENID_SCOPES: '${AUTH_OPENID_SCOPES:-openid profile email}'
+      # AUTH_OPENID_ID_TOKEN_MAX_AGE: '${AUTH_OPENID_ID_TOKEN_MAX_AGE:-60}'
+      # AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS: '${AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS:-true}'
+      # AUTH_OPENID_USE_STATE: '${AUTH_OPENID_USE_STATE:-true}'
+      # AUTH_OPENID_USE_NONCE: '${AUTH_OPENID_USE_NONCE:-true}'
+      # AUTH_OPENID_SHARE_SESSION: '${AUTH_OPENID_SHARE_SESSION:-true}'
+      # AUTH_OPENID_IGNORE_SSL_VERIFICATION: '${AUTH_OPENID_IGNORE_SSL_VERIFICATION:-false}'
+
+      # SAML2 Authentication (Optional - Commented for minimal setup)
+      # AUTH_SAML2: '${AUTH_SAML2:-false}'
+      # SAML2_LOGOUT_COMPLETELY: '${SAML2_LOGOUT_COMPLETELY:-true}'
+      # AUTH_SAML2_ALWAYS_UPDATE_USER: '${AUTH_SAML2_ALWAYS_UPDATE_USER:-true}'
+
+      # Email Configuration (Optional - Commented for minimal setup)
+      # EMAIL_HOST: '${EMAIL_HOST:-smtp.gmail.com}'
+      # EMAIL_PORT: '${EMAIL_PORT:-587}'
+      # EMAIL_HOST_USER: '${EMAIL_HOST_USER:-}'
+      # EMAIL_HOST_PASSWORD: '${EMAIL_HOST_PASSWORD:-}'
+      # EMAIL_USE_TLS: '${EMAIL_USE_TLS:-true}'
+      # EMAIL_USE_SSL: '${EMAIL_USE_SSL:-false}'
+      # EMAIL_SUBJECT_PREFIX: '${EMAIL_SUBJECT_PREFIX:-[JumpServer]}'
+
+      # SMS Configuration (Optional - Commented for minimal setup)
+      # SMS_ENABLED: '${SMS_ENABLED:-false}'
+      # SMS_BACKEND: '${SMS_BACKEND:-}'
+
+      # Storage Configuration (Optional - Commented for minimal setup)
+      # DEFAULT_FILE_STORAGE: '${DEFAULT_FILE_STORAGE:-jumpserver.storage.LocalFileStorage}'
+      # TERMINAL_REPLAY_STORAGE: '${TERMINAL_REPLAY_STORAGE:-{}}'
+      # TERMINAL_COMMAND_STORAGE: '${TERMINAL_COMMAND_STORAGE:-{}}'
+
+      # S3 Storage Configuration (Optional - Commented for minimal setup)
+      # AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID:-}'
+      # AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY:-}'
+      # AWS_STORAGE_BUCKET_NAME: '${AWS_STORAGE_BUCKET_NAME:-}'
+      # AWS_S3_REGION_NAME: '${AWS_S3_REGION_NAME:-}'
+      # AWS_S3_ENDPOINT_URL: '${AWS_S3_ENDPOINT_URL:-}'
+
+      # Core Network Configuration (Required)
+      HTTP_BIND_HOST: '0.0.0.0'
+      HTTP_LISTEN_PORT: 8080
+      WS_LISTEN_PORT: 8070
+    networks:
+      INTERNAL:
+      EXTERNAL:
+    ports:
+      - "${SERVICE_BIND_ADDRESS_EXTERNAL:-0.0.0.0}:${APPLICATION_PORT_EXTERNAL:-8080}:8080"
+      - "${SERVICE_BIND_ADDRESS_EXTERNAL:-0.0.0.0}:${APPLICATION_WS_PORT_EXTERNAL:-8070}:8070"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Application/Data:/opt/jumpserver/data:rw"
+      - "${STACK_BINDMOUNTROOT}/${STACK_NAME}/Application/Logs:/opt/jumpserver/logs:rw"
+    depends_on:
+      Database:
+        condition: service_healthy
+      Redis:
+        condition: service_healthy
+    labels:
+      com.centurylinklabs.watchtower.enable: ${APPLICATION_ENABLEAUTOMATICUPDATES:-true}

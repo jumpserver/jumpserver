@@ -13,7 +13,23 @@ default_interface = dict((
     ('favicon', static('img/facio.ico')),
     ('login_title', _('JumpServer - An open-source PAM')),
     ('theme', 'classic_green'),
-    ('theme_info', {}),
+    ('theme_info', {
+        'dark_theme_available': True,
+        'themes': {
+            'classic_green': {
+                'name': _('Classic Green'),
+                'colors': {
+                    '--primary-color': '#1ab394'
+                }
+            },
+            'dark': {
+                'name': _('Dark Theme'),
+                'colors': {
+                    '--primary-color': '#1ab394'
+                }
+            }
+        }
+    }),
     ('footer_content', ''),
 ))
 
