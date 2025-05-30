@@ -257,7 +257,7 @@ class BaseApplication(abc.ABC):
         self.asset = Asset(kwargs.get('asset', {}))
         self.account = Account(kwargs.get('account', {}))
         self.platform = Platform(kwargs.get('platform', {}))
-        self.connect_option = ConnectOption(kwargs.get('connect_option', {}))
+        self.connect_option = ConnectOption(kwargs.get('connect_options', {}))
 
     @abc.abstractmethod
     def run(self):
