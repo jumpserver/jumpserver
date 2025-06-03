@@ -13,7 +13,7 @@ from code_dialog import CodeDialog, wrapper_progress_bar
 from common import (Asset, User, Account, Platform, Step)
 from common import (BaseApplication)
 from common import (notify_err_message, block_input, unblock_input)
-
+from common import get_system_language
 
 class Command(Enum):
     TYPE = 'type'
@@ -251,6 +251,10 @@ class AppletApplication(BaseApplication):
             # 加载 extensions
             extension_paths = load_extensions()
             self._chrome_options.add_argument('--load-extension={}'.format(','.join(extension_paths)))
+        # 设置语言
+        lang = self.connect_option.lang if self.connect_option.lang else get_system_language()
+        self._chrome_options.add_experimental_option('prefs', {'intl.accept_languages': lang})
+        self._chrome_options.add_argument('--lang={}'.format(lang))
 
     @wrapper_progress_bar
     def run(self):
