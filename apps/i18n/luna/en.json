@@ -237,5 +237,8 @@
     "success": "Success",
     "system user": "System user",
     "user": "User",
-    "VerificationFailed": "Verification failed"
+    "VerificationFailed": "Verification failed",
+    "BatchCommands": "Batch commands",
+    "SendCommandPlaceholder": "Input command here..., Enter for new line, Ctrl+Enter to send",
+    "SelectCommand": "Please select the command to execute."
 }
