@@ -168,7 +168,7 @@
     "Search": "搜索",
     "Select account": "选择账号",
     "Send command": "发送命令",
-    "Send text to all ssh terminals": "发送文本到所有ssh终端",
+    "Send text to all ssh terminals": "发送给所有会话",
     "Session": "会话",
     "SessionIsBeingMonitored": "会话正在被监控",
     "Set reusable": "开启复用",
@@ -234,5 +234,9 @@
     "success": "成功",
     "system user": "系统用户",
     "user": "用户",
-    "VerificationFailed": "校验失败"
+    "VerificationFailed": "校验失败",
+    "Send": "发送",
+    "BatchCommands": "批量命令",
+    "SendCommandPlaceholder": "输入命令，回车换行，Ctrl+Enter 执行命令",
+    "SelectCommand": "请选择要执行的命令"
 }
