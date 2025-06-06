@@ -8261,7 +8261,7 @@ msgstr "风险等级"
 
 #: terminal/connect_methods.py:29
 msgid "SSH Client"
-msgstr "启用 SSH Client"
+msgstr "SSH Client"
 
 #: terminal/connect_methods.py:30
 msgid "SSH Guide"
