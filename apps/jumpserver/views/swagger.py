@@ -1,3 +1,5 @@
+import os
+
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.inspectors import SwaggerAutoSchema
@@ -149,13 +151,14 @@ api_info = openapi.Info(
 )
 
 
-def get_swagger_view(with_auth=True):
+def get_swagger_view():
     from ..urls import api_v1
     from django.urls import path, include
     patterns = [
         path('api/v1/', include(api_v1))
     ]
 
+    with_auth = os.environ.get('DOC_AUTH', '1') == '1'
     if with_auth:
         permission_classes = (permissions.IsAuthenticated,)
         public = False
