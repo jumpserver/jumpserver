@@ -68,7 +68,7 @@ dependencies = [
     'ipip-ipdb==1.6.1',
     'pywinrm==0.4.3',
     'python-nmap==0.7.1',
-    'django==4.1.13',
+    'django==4.2.22',
     'django-bootstrap3==23.4',
     'django-filter==23.2',
     'django-formtools==2.5.1',
