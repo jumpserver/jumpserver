@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-29 15:08+0800\n"
+"POT-Creation-Date: 2025-06-06 18:00+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -887,8 +887,8 @@ msgstr "检查发现的帐户"
 #: accounts/models/automations/check_account.py:130
 msgid ""
 "Perform checks and analyses based on automatically discovered account "
-"results, including user groups, public keys, sudoers, and other information"
-msgstr "根据自动发现的账户结果进行检查分析，包括用户组、公钥、sudoers等信息"
+"results, including user groups, public keys, sudoers, and other information."
+msgstr "根据自动发现的账户结果进行检查分析，包括用户组、公钥、sudoers等信息。"
 
 #: accounts/models/automations/check_account.py:137
 msgid "Check the strength of your account and password"
@@ -905,16 +905,16 @@ msgid "Check if the account and password are repeated"
 msgstr "检查账号和密码是否重复"
 
 #: accounts/models/automations/check_account.py:147
-msgid "Check if the account is the same as other accounts"
-msgstr "检查该账号是否与其他账户相同"
+msgid "Check if the account is the same as other accounts."
+msgstr "检查该账号是否与其他账户相同。"
 
 #: accounts/models/automations/check_account.py:152
 msgid "Check whether the account password is a common password"
 msgstr "检查账号密码是否为常用密码"
 
 #: accounts/models/automations/check_account.py:153
-msgid "Check whether the account password is a commonly leaked password"
-msgstr "检查账号密码是否为常见泄露密码"
+msgid "Check whether the account password is a commonly leaked password."
+msgstr "检查账号密码是否为常见泄露密码。"
 
 #: accounts/models/automations/gather_account.py:19
 msgid "Address login"
@@ -4578,7 +4578,7 @@ msgid "Do you want to retry ?"
 msgstr "是否重试 ？"
 
 #: authentication/utils.py:27 common/utils/ip/geoip/utils.py:26
-#: xpack/plugins/cloud/const.py:34
+#: xpack/plugins/cloud/const.py:33
 msgid "LAN"
 msgstr "局域网"
 
@@ -7355,7 +7355,7 @@ msgstr "SMTP"
 
 #: settings/serializers/msg.py:25
 msgid "EXCHANGE"
-msgstr "交换"
+msgstr "EXCHANGE"
 
 #: settings/serializers/msg.py:34
 msgid "The user to be used for email server authentication"
