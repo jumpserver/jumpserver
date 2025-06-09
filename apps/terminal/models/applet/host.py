@@ -1,5 +1,5 @@
 from collections import defaultdict
-
+from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -155,6 +155,8 @@ class AppletHostDeployment(JMSBaseModel):
             self.host.terminal = None
             self.host.save()
             terminal.delete()
+
+        cache.set(f'APPLET_HOST_DELOYING', str(self.id), timeout=300)
         from ...automations.deploy_applet_host import DeployAppletHostManager
         manager = DeployAppletHostManager(self, **kwargs)
         manager.run()
