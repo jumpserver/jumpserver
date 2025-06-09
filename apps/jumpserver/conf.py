@@ -623,6 +623,7 @@ class Config(dict):
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+        'CELERY_WORKER_COUNT': 10,
 
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
