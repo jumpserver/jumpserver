@@ -294,6 +294,8 @@ class UsernameHintsAPI(APIView):
     permission_classes = [IsValidUser]
 
     def post(self, request, **kwargs):
+        if settings.SAFE_MODE:
+            return Response(data=[])
         node_ids = request.data.get('nodes', [])
         asset_ids = request.data.get('assets', [])
         query = request.data.get('query', None)
