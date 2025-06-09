@@ -238,5 +238,6 @@
     "Send": "发送",
     "BatchCommands": "批量命令",
     "SendCommandPlaceholder": "输入命令，回车换行，Ctrl+Enter 执行命令",
-    "SelectCommand": "请选择要执行的命令"
+    "SelectCommand": "请选择要执行的命令",
+    "ConnectSessionCount": "{{ count }} 个会话已连接"
 }

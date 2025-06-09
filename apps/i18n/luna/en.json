@@ -240,5 +240,6 @@
     "VerificationFailed": "Verification failed",
     "BatchCommands": "Batch commands",
     "SendCommandPlaceholder": "Input command here..., Enter for new line, Ctrl+Enter to send",
-    "SelectCommand": "Please select the command to execute."
+    "SelectCommand": "Please select the command to execute.",
+    "ConnectSessionCount": "{{ count }} sessions connected"
 }
