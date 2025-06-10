@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('audits', '0005_rename_serviceaccesslog'),
     ]
@@ -18,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ftplog',
             name='asset',
-            field=models.CharField(db_index=True, max_length=1024, verbose_name='Asset'),
+            field=models.CharField(db_index=True, max_length=767, verbose_name='Asset'),
         ),
         migrations.AlterField(
             model_name='ftplog',
