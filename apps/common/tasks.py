@@ -55,6 +55,16 @@ def send_mail_async(*args, **kwargs):
         args.insert(2, from_email)
 
     args = tuple(args)
+
+    subject = args[0] if len(args) > 0 else kwargs.get('subject')
+    message = args[1] if len(args) > 1 else kwargs.get('message')
+    recipient_list = args[3] if len(args) > 3 else kwargs.get('recipient_list')
+    html_message = kwargs.get('html_message')
+    logger.info(
+        "send_mail_async called with subject=%r, message=%r, recipients=%r, html_message=%r",
+        subject, message, recipient_list, html_message
+    )
+
     try:
         return send_mail(connection=get_email_connection(), *args, **kwargs)
     except Exception as e:
