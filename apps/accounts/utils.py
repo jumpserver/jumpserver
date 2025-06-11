@@ -71,7 +71,7 @@ class AccountSecretTaskStatus:
             prefix='queue:change_secret:',
             debounce_key='debounce:change_secret:task',
             debounce_timeout=10,
-            queue_status_timeout=35,
+            queue_status_timeout=60,
             default_timeout=3600,
             delayed_task_countdown=20,
     ):
@@ -114,7 +114,7 @@ class AccountSecretTaskStatus:
             data.update(metadata)
 
         if use_add:
-            return cache.set(key, data, timeout or self.queue_status_timeout)
+            return cache.add(key, data, timeout or self.queue_status_timeout)
 
         cache.set(key, data, timeout or self.default_timeout)
 
