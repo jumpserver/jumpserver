@@ -51,7 +51,8 @@ def get_user_or_pre_auth_user(request):
 
 def get_redirect_client_url(request):
     data = {
-        'type': 'session'
+        'type': 'cookie',
+        'cookie': request.COOKIES
     }
     buf = base64.b64encode(json.dumps(data).encode()).decode()
     redirect_url = 'jms://{}'.format(buf)
