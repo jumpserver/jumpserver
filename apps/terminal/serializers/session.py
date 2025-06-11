@@ -110,6 +110,13 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         except Account.DoesNotExist:
             logger.warning(f"Account with id {account_id} does not exist for change secret task.")
             return
+
+        if not account.secret_reset or not account.is_active:
+            logger.warning(
+                f"Account secret reset is not enabled or account is inactive: account={account}"
+            )
+            return
+
         acls = LoginAssetACL.filter_queryset(**kwargs)
         acl = LoginAssetACL.get_match_rule_acls(user, instance.remote_addr, acls)
         if not acl:
