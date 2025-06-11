@@ -246,7 +246,6 @@ class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterS
 
 
 class ChangeSecretStatusFilterSet(BaseFilterSet):
-    asset_id = drf_filters.CharFilter(field_name="asset_id", lookup_expr="exact")
     asset_name = drf_filters.CharFilter(
         field_name="asset__name", lookup_expr="icontains"
     )
@@ -255,7 +254,7 @@ class ChangeSecretStatusFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ["id", "username"]
+        fields = ["username"]
 
     @staticmethod
     def filter_dynamic(queryset, name, value):
