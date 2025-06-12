@@ -9938,7 +9938,7 @@ msgstr "字符终端字体大小"
 
 #: users/serializers/preference/luna.py:73
 msgid "Backspace as Ctrl+H"
-msgstr "字符终端Backspace As Ctrl+H"
+msgstr "Backspace As Ctrl+H"
 
 #: users/serializers/preference/luna.py:76
 msgid "Right click quickly paste"
