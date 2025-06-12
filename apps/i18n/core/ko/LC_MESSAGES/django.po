@@ -1790,11 +1790,11 @@ msgid "Prompt and warn"
 msgstr "提示 및 알람"
 
 #: acls/const.py:12
-msgid "Face Verify"
+msgid "Face verify"
 msgstr "안면 확인"
 
 #: acls/const.py:13
-msgid "Face Online"
+msgid "Face online"
 msgstr "안면 온라인"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
@@ -3786,7 +3786,7 @@ msgid "SMS"
 msgstr "문자 메시지"
 
 #: authentication/const.py:35
-msgid "Face Recognition"
+msgid "Face recognition"
 msgstr "얼굴 인식"
 
 #: authentication/const.py:36 settings/serializers/auth/radius.py:14
@@ -9784,7 +9784,7 @@ msgid "Need update password"
 msgstr "비밀번호 업데이트 필요"
 
 #: users/models/user/__init__.py:145
-msgid "Face Vector"
+msgid "Face vector"
 msgstr "얼굴 벡터"
 
 #: users/models/user/__init__.py:148

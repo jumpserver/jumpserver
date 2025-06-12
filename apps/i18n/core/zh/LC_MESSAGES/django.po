@@ -1806,11 +1806,11 @@ msgid "Prompt and warn"
 msgstr "提示并告警"
 
 #: acls/const.py:12
-msgid "Face Verify"
+msgid "Face verify"
 msgstr "人脸验证"
 
 #: acls/const.py:13
-msgid "Face Online"
+msgid "Face online"
 msgstr "人脸在线"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
@@ -3820,7 +3820,7 @@ msgid "SMS"
 msgstr "短信"
 
 #: authentication/const.py:35
-msgid "Face Recognition"
+msgid "Face recognition"
 msgstr "人脸识别"
 
 #: authentication/const.py:36 settings/serializers/auth/radius.py:14
@@ -9796,7 +9796,7 @@ msgid "Need update password"
 msgstr "需要更新密码"
 
 #: users/models/user/__init__.py:145
-msgid "Face Vector"
+msgid "Face vector"
 msgstr "人脸向量"
 
 #: users/models/user/__init__.py:148
