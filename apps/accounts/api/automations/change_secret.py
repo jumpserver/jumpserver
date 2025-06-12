@@ -163,6 +163,7 @@ class ChangeSecretStatusViewSet(OrgBulkModelViewSet):
     perm_model = ChangeSecretAutomation
     filterset_class = ChangeSecretStatusFilterSet
     serializer_class = serializers.ChangeSecretAccountSerializer
+    search_fields = ('username',)
 
     permission_classes = [RBACPermission, IsValidLicense]
     http_method_names = ["get", "delete", "options"]

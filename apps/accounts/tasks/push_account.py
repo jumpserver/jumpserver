@@ -73,9 +73,8 @@ def change_secret_accounts_to_assets_task(account_ids, params=None, snapshot=Non
     if trigger == 'delay':
         for _id in manager.account_ids:
             status = manager.get_status(_id)
-            ttl = manager.get_ttl(_id)
             # Check if the account is in QUEUED status
-            if status == ChangeSecretAccountStatus.QUEUED and ttl <= 15:
+            if status == ChangeSecretAccountStatus.QUEUED:
                 account_ids.append(_id)
                 manager.set_status(_id, ChangeSecretAccountStatus.READY)
 
