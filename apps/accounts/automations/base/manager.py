@@ -117,6 +117,12 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         host['ssh_params'] = {}
 
         accounts = self.get_accounts(account)
+        existing_ids = set(map(str, accounts.values_list('id', flat=True)))
+        missing_ids = set(map(str, self.account_ids)) - existing_ids
+
+        for account_id in missing_ids:
+            self.clear_account_queue_status(account_id)
+
         error_msg = _("No pending accounts found")
         if not accounts:
             print(f'{asset}: {error_msg}')
@@ -149,7 +155,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                 )
             except Exception as e:
                 h['error'] = str(e)
-                self.clear_account_queue_status(account)
+                self.clear_account_queue_status(account.id)
 
             inventory_hosts.append(h)
 
@@ -160,8 +166,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         recorder.save(update_fields=['error', 'status', 'date_finished'])
 
     @staticmethod
-    def clear_account_queue_status(account):
-        account_secret_task_status.clear(account.id)
+    def clear_account_queue_status(account_id):
+        account_secret_task_status.clear(account_id)
 
     def on_host_success(self, host, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -192,7 +198,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         with safe_atomic_db_connection():
             account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
             self.save_record(recorder)
-            self.clear_account_queue_status(account)
+            self.clear_account_queue_status(account.id)
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -221,4 +227,4 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         with safe_atomic_db_connection():
             account.save(update_fields=['change_secret_status', 'date_change_secret', 'date_updated'])
             self.save_record(recorder)
-            self.clear_account_queue_status(account)
+            self.clear_account_queue_status(account.id)
