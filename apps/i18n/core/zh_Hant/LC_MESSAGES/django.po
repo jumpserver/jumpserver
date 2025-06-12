@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 18:42+0800\n"
+"POT-Creation-Date: 2025-06-12 18:10+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -94,7 +94,7 @@ msgstr "帳號備份計劃正在執行"
 msgid "Plan execution end"
 msgstr "計劃執行結束"
 
-#: accounts/automations/base/manager.py:120
+#: accounts/automations/base/manager.py:126
 msgid "No pending accounts found"
 msgstr "未找到待處理帳戶"
 
@@ -1448,7 +1448,7 @@ msgstr "自動化任務執行歷史"
 
 #: accounts/serializers/automations/change_secret.py:190
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: accounts/serializers/automations/change_secret.py:191
 #: assets/models/platform.py:97 tickets/models/ticket/general.py:301
@@ -1524,9 +1524,9 @@ msgstr "推送帳號到資產"
 msgid ""
 "Whenever an account is created or modified and needs pushing to assets, run "
 "this task"
-msgstr ""
+msgstr "每當創建或修改帳戶並需要推送至資產時，運行此任務。"
 
-#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:105
+#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
 msgstr "帳號改密推送到資產"
 
@@ -3325,7 +3325,7 @@ msgstr "結束"
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14
-#: terminal/serializers/session.py:65 terminal/serializers/session.py:168
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:175
 msgid "Terminal"
 msgstr "終端"
 
@@ -4150,7 +4150,7 @@ msgid "Connection token expired at: {}"
 msgstr "連接令牌過期: {}"
 
 #: authentication/models/connection_token.py:170
-#: terminal/serializers/session.py:144
+#: terminal/serializers/session.py:151
 msgid "No user or invalid user"
 msgstr "沒有用戶或用戶失效"
 
@@ -5121,21 +5121,21 @@ msgstr "發件郵件"
 msgid "This task will be executed when sending email notifications"
 msgstr "發送郵件消息時執行該任務"
 
-#: common/tasks.py:75
+#: common/tasks.py:72
 msgid "Send email attachment"
 msgstr "發送郵件附件"
 
-#: common/tasks.py:78
+#: common/tasks.py:75
 msgid ""
 "When an account password is changed or an account backup generates attachments, \n"
 "        this task needs to be executed for sending emails and handling attachments"
 msgstr "當帳號改密，帳號備份產生附件時，需對發送郵件及附件執行該任務"
 
-#: common/tasks.py:104
+#: common/tasks.py:101
 msgid "Upload account backup to external storage"
 msgstr "上傳會話錄像到外部存儲"
 
-#: common/tasks.py:106
+#: common/tasks.py:103
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -8496,7 +8496,7 @@ msgstr "登錄來源"
 msgid "Replay"
 msgstr "重播"
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:167
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:174
 msgid "Command amount"
 msgstr "命令數量"
 
@@ -8832,7 +8832,7 @@ msgstr "登錄來源名稱"
 msgid "Terminal display"
 msgstr "終端顯示"
 
-#: terminal/serializers/session.py:152
+#: terminal/serializers/session.py:159
 msgid "No asset or invalid asset"
 msgstr "沒有資產或資產未激活"
 

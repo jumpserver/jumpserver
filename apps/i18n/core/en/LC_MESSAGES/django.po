@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 18:42+0800\n"
+"POT-Creation-Date: 2025-06-12 18:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr ""
 msgid "Plan execution end"
 msgstr ""
 
-#: accounts/automations/base/manager.py:120
+#: accounts/automations/base/manager.py:126
 msgid "No pending accounts found"
 msgstr ""
 
@@ -1517,7 +1517,7 @@ msgid ""
 "this task"
 msgstr ""
 
-#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:105
+#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
 msgstr ""
 
@@ -3303,7 +3303,7 @@ msgstr ""
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:65
-#: terminal/serializers/session.py:168
+#: terminal/serializers/session.py:175
 msgid "Terminal"
 msgstr ""
 
@@ -4131,7 +4131,7 @@ msgid "Connection token expired at: {}"
 msgstr ""
 
 #: authentication/models/connection_token.py:170
-#: terminal/serializers/session.py:144
+#: terminal/serializers/session.py:151
 msgid "No user or invalid user"
 msgstr ""
 
@@ -5095,11 +5095,11 @@ msgstr ""
 msgid "This task will be executed when sending email notifications"
 msgstr ""
 
-#: common/tasks.py:75
+#: common/tasks.py:72
 msgid "Send email attachment"
 msgstr ""
 
-#: common/tasks.py:78
+#: common/tasks.py:75
 msgid ""
 "When an account password is changed or an account backup generates "
 "attachments, \n"
@@ -5107,11 +5107,11 @@ msgid ""
 "attachments"
 msgstr ""
 
-#: common/tasks.py:104
+#: common/tasks.py:101
 msgid "Upload account backup to external storage"
 msgstr ""
 
-#: common/tasks.py:106
+#: common/tasks.py:103
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -8446,7 +8446,7 @@ msgstr ""
 msgid "Replay"
 msgstr ""
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:167
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:174
 msgid "Command amount"
 msgstr ""
 
@@ -8776,7 +8776,7 @@ msgstr ""
 msgid "Terminal display"
 msgstr ""
 
-#: terminal/serializers/session.py:152
+#: terminal/serializers/session.py:159
 msgid "No asset or invalid asset"
 msgstr ""
 
