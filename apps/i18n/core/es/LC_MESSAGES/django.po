@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 18:42+0800\n"
+"POT-Creation-Date: 2025-06-12 18:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,7 +112,7 @@ msgstr ""
 "Cuentas con el mismo nombre  \n"
 "Cuentas anónimas"
 
-#: accounts/automations/base/manager.py:120
+#: accounts/automations/base/manager.py:126
 msgid "No pending accounts found"
 msgstr "No se encontraron cuentas pendientes de procesar."
 
@@ -1508,7 +1508,7 @@ msgstr "Historial de ejecución de tareas automatizadas"
 
 #: accounts/serializers/automations/change_secret.py:190
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: accounts/serializers/automations/change_secret.py:191
 #: assets/models/platform.py:97 tickets/models/ticket/general.py:301
@@ -1603,8 +1603,10 @@ msgid ""
 "Whenever an account is created or modified and needs pushing to assets, run "
 "this task"
 msgstr ""
+"Ejecuta esta tarea cada vez que se crea o modifica una cuenta y se necesita "
+"enviar a los activos."
 
-#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:105
+#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
 msgstr "Cambio de contraseña de la cuenta enviado al activo"
 
@@ -3495,7 +3497,7 @@ msgstr "Terminar"
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14
-#: terminal/serializers/session.py:65 terminal/serializers/session.py:168
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:175
 msgid "Terminal"
 msgstr "Terminal"
 
@@ -4374,7 +4376,7 @@ msgid "Connection token expired at: {}"
 msgstr "Token de conexión expirado: {}"
 
 #: authentication/models/connection_token.py:170
-#: terminal/serializers/session.py:144
+#: terminal/serializers/session.py:151
 msgid "No user or invalid user"
 msgstr "No hay usuario o el usuario ha caducado"
 
@@ -5402,11 +5404,11 @@ msgstr "Enviar correo electrónico"
 msgid "This task will be executed when sending email notifications"
 msgstr "Ejecutar esta tarea al enviar el mensaje de correo"
 
-#: common/tasks.py:75
+#: common/tasks.py:72
 msgid "Send email attachment"
 msgstr "Enviar archivo adjunto en el correo electrónico"
 
-#: common/tasks.py:78
+#: common/tasks.py:75
 msgid ""
 "When an account password is changed or an account backup generates attachments, \n"
 "        this task needs to be executed for sending emails and handling attachments"
@@ -5415,11 +5417,11 @@ msgstr ""
 "la cuenta necesitan que se ejecute esta tarea para el envío de correos y "
 "archivos adjuntos"
 
-#: common/tasks.py:104
+#: common/tasks.py:101
 msgid "Upload account backup to external storage"
 msgstr "Subir grabaciones de sesiones a almacenamiento externo"
 
-#: common/tasks.py:106
+#: common/tasks.py:103
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -9164,7 +9166,7 @@ msgstr "Fuente de inicio de sesión"
 msgid "Replay"
 msgstr "Reproducción"
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:167
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:174
 msgid "Command amount"
 msgstr "Cantidad de comandos"
 
@@ -9530,7 +9532,7 @@ msgstr "Nombre de origen de inicio de sesión"
 msgid "Terminal display"
 msgstr "Visualización del terminal"
 
-#: terminal/serializers/session.py:152
+#: terminal/serializers/session.py:159
 msgid "No asset or invalid asset"
 msgstr "No hay activos o los activos no están activados"
 

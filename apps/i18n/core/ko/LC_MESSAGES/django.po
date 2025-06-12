@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 18:42+0800\n"
+"POT-Creation-Date: 2025-06-12 18:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr "계정 백업 계획이 실행 중입니다"
 msgid "Plan execution end"
 msgstr "계획 실행 종료"
 
-#: accounts/automations/base/manager.py:120
+#: accounts/automations/base/manager.py:126
 msgid "No pending accounts found"
 msgstr "처리할 계정 찾을 수 없음"
 
@@ -1451,7 +1451,7 @@ msgstr "자동화 작업 실행 이력"
 
 #: accounts/serializers/automations/change_secret.py:190
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: accounts/serializers/automations/change_secret.py:191
 #: assets/models/platform.py:97 tickets/models/ticket/general.py:301
@@ -1531,9 +1531,9 @@ msgstr "계정 자산으로 푸시"
 msgid ""
 "Whenever an account is created or modified and needs pushing to assets, run "
 "this task"
-msgstr ""
+msgstr "계정을 생성하거나 수정할 때 자산에 푸시해야 할 때마다 이 작업을 실행합니다."
 
-#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:105
+#: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
 msgstr "계정 비밀번호 변경을 자산으로 전송"
 
@@ -3337,7 +3337,7 @@ msgstr "종료"
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14
-#: terminal/serializers/session.py:65 terminal/serializers/session.py:168
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:175
 msgid "Terminal"
 msgstr "터미널"
 
@@ -4165,7 +4165,7 @@ msgid "Connection token expired at: {}"
 msgstr "연결 토큰이 만료됨: {}"
 
 #: authentication/models/connection_token.py:170
-#: terminal/serializers/session.py:144
+#: terminal/serializers/session.py:151
 msgid "No user or invalid user"
 msgstr "사용자가 없거나 사용자가 비활성화됨"
 
@@ -5138,21 +5138,21 @@ msgstr "발송 이메일"
 msgid "This task will be executed when sending email notifications"
 msgstr "이메일 메시지를 전송할 때 이 작업을 수행합니다"
 
-#: common/tasks.py:75
+#: common/tasks.py:72
 msgid "Send email attachment"
 msgstr "이메일 첨부 파일 전송"
 
-#: common/tasks.py:78
+#: common/tasks.py:75
 msgid ""
 "When an account password is changed or an account backup generates attachments, \n"
 "        this task needs to be executed for sending emails and handling attachments"
 msgstr "계정 비밀번호 변경 시 계정 백업으로 생성된 첨부 파일에 대해 이메일 및 첨부 파일 전송 이 작업을 수행해야 합니다"
 
-#: common/tasks.py:104
+#: common/tasks.py:101
 msgid "Upload account backup to external storage"
 msgstr "외부 저장소에 세션 녹화 업로드"
 
-#: common/tasks.py:106
+#: common/tasks.py:103
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -8618,7 +8618,7 @@ msgstr "로그인 출처"
 msgid "Replay"
 msgstr "재생"
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:167
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:174
 msgid "Command amount"
 msgstr "명령 수"
 
@@ -8961,7 +8961,7 @@ msgstr "로그인 출처 이름"
 msgid "Terminal display"
 msgstr "단말기 표시"
 
-#: terminal/serializers/session.py:152
+#: terminal/serializers/session.py:159
 msgid "No asset or invalid asset"
 msgstr "자산이 없거나 자산이 활성화되지 않았습니다"
 
