@@ -13,6 +13,7 @@ from notifications.notifications import SystemMessage, UserMessage
 from terminal.const import RiskLevelChoices
 from terminal.models import Session, Command
 from users.models import User
+from orgs.models import Organization
 
 logger = get_logger(__name__)
 
@@ -156,6 +157,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
             _("User"): command['user'],
             _("Level"): level,
             _("Date"): local_now_display(),
+            _("Organization"): command.get('_org_name'),
         }
         context = {
             'items': items,
@@ -191,6 +193,7 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
 
     def get_html_msg(self) -> dict:
         command = self.command
+        first_org_name = None
         assets_with_url = []
         for asset in command['assets']:
             url = reverse(
@@ -198,6 +201,11 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
                 api_to_ui=True, external=True, is_console=True
             ) + '?oid={}'.format(asset.org_id)
             assets_with_url.append([asset, url])
+            if first_org_name is None:
+                org = Organization.get_instance(asset.org_id)
+                if org:
+                    first_org_name = str(org.name)
+            
 
         level = RiskLevelChoices.get_label(command['risk_level'])
 
@@ -205,6 +213,7 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
             _("User"): command['user'],
             _("Level"): level,
             _("Date"): local_now_display(),
+            _("Organization"): first_org_name,
         }
 
         context = {
