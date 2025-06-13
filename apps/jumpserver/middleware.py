@@ -143,7 +143,7 @@ class LocaleMiddleware:
     @staticmethod
     def check_white_urls(request):
         white_urls = [
-            'core/auth/login', 'jsi18n/', '/static/', '/core/i18n/'
+            'core/auth/login', 'jsi18n/', '/static/', '/core/i18n/', '/authentication/user-session/'
         ]
         for url in white_urls:
             if request.path.find(url) > -1:
