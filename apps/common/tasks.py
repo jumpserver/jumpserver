@@ -6,6 +6,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
 
 from common.storage import jms_storage
+from users.models import User
 from .utils import get_logger
 
 logger = get_logger(__file__)
@@ -48,6 +49,8 @@ def send_mail_async(*args, **kwargs):
     Example:
     send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
     """
+    from users.utils import activate_user_language
+
     if len(args) == 3:
         args = list(args)
         args[0] = (settings.EMAIL_SUBJECT_PREFIX or '') + args[0]
@@ -63,7 +66,10 @@ def send_mail_async(*args, **kwargs):
     )
 
     try:
-        return send_mail(connection=get_email_connection(), *args, **kwargs)
+        users = User.objects.filter(email__in=recipient_list).all()
+        for user in users:
+            with activate_user_language(user):
+                send_mail(connection=get_email_connection(), *args, **kwargs)
     except Exception as e:
         logger.error("Sending mail error: {}".format(e))
 
