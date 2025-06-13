@@ -140,11 +140,23 @@ class EndMiddleware:
 
 
 class LocaleMiddleware:
+    @staticmethod
+    def check_white_urls(request):
+        white_urls = [
+            'core/auth/login', 'jsi18n/', '/static/', '/core/i18n/'
+        ]
+        for url in white_urls:
+            if request.path.find(url) > -1:
+                return True
+        return False
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
+        if self.check_white_urls(request):
+            return response
         lang = None
         if request.user.is_authenticated:
             lang = getattr(request.user, 'lang', None)
