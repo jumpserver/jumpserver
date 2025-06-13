@@ -47,7 +47,7 @@
                   $random = -join ((1..$Length) | ForEach-Object { $chars[(Get-Random -Maximum $chars.Length)] })
                   return $random
               }
-              $targetPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
+              $targetPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
               if (Test-Path -Path $targetPath) {
                 Write-Output "access_key already exists at $targetPath"
                 return
@@ -285,6 +285,19 @@
           ansible.windows.win_powershell:
             script: |
               tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}
+
+        - name: Rename tinkerd keyfile
+          ansible.windows.win_powershell:
+            script: |
+              $source = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
+              $destination = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
+              if (Test-Path $destination) {
+                $timestamp = Get-Date -Format "yyyyMMddHHmmss"
+                  Rename-Item -Path $destination -NewName (Split-Path -Leaf "$destination.bak.$timestamp" )
+              }
+              if (Test-Path $source) {
+                  Rename-Item -Path $source -NewName (Split-Path -Leaf $destination)
+              }
 
         - name: Install tinkerd service
           ansible.windows.win_powershell:
