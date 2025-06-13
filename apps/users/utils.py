@@ -50,9 +50,14 @@ def get_user_or_pre_auth_user(request):
 
 
 def get_redirect_client_url(request):
+    session_key = settings.SESSION_COOKIE_NAME
+    csrf_key = settings.CSRF_COOKIE_NAME
     data = {
         'type': 'cookie',
-        'cookie': request.COOKIES
+        'cookie': {
+            session_key: request.COOKIES.get(session_key),
+            csrf_key: request.COOKIES.get(csrf_key),
+        }
     }
     buf = base64.b64encode(json.dumps(data).encode()).decode()
     redirect_url = 'jms://{}'.format(buf)
