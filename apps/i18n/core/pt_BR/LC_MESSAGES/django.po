@@ -8480,13 +8480,10 @@ msgid "Client"
 msgstr "Cliente"
 
 #: templates/resource_download.html:22
-msgid ""
-"JumpServer Client, currently used to launch the client, now only support "
-"launch RDP SSH client, The Telnet client will next"
+msgid "JumpServer Client, currently used to launch the client"
 msgstr ""
-"JumpServer Cliente, atualmente usado para acionar programas de clientes "
-"específicos para conectar ativos. Atualmente, apenas suporta clientes RDP "
-"SSH, Telnet será suportado no futuro"
+"Cliente JumpServer, usado atualmente para ativar programas de cliente "
+"específicos para conectar-se aos ativos."
 
 #: templates/resource_download.html:35
 msgid "Microsoft"

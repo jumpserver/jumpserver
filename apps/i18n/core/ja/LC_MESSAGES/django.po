@@ -8096,12 +8096,8 @@ msgid "Client"
 msgstr "クライアント"
 
 #: templates/resource_download.html:22
-msgid ""
-"JumpServer Client, currently used to launch the client, now only support "
-"launch RDP SSH client, The Telnet client will next"
-msgstr ""
-"JumpServerクライアントは、現在特定のクライアントプログラムの接続資産を喚起するために使用されており、現在はRDP "
-"SSHクライアントのみをサポートしています。「Telnetは将来的にサポートする"
+msgid "JumpServer Client, currently used to launch the client"
+msgstr "JumpServerクライアントは、特定のクライアントプログラムを起動してアセットに接続するために使用されます。"
 
 #: templates/resource_download.html:35
 msgid "Microsoft"

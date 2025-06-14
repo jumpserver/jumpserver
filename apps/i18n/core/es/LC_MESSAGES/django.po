@@ -8678,13 +8678,10 @@ msgstr ""
 " y SSH, Telnet se admitirá en el futuro."
 
 #: templates/resource_download.html:22
-msgid ""
-"JumpServer Client, currently used to launch the client, now only support "
-"launch RDP SSH client, The Telnet client will next"
+msgid "JumpServer Client, currently used to launch the client"
 msgstr ""
-"Cliente JumpServer, actualmente utilizado para invocar programas de cliente "
-"específicos que conectan activos, por ahora solo es compatible con clientes "
-"RDP y SSH; Telnet será compatible en el futuro"
+"JumpServer Client: actualmente se utiliza para iniciar programas de cliente "
+"específicos y conectarlos a los activos."
 
 #: templates/resource_download.html:35
 msgid "Microsoft"

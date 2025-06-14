@@ -8030,9 +8030,8 @@ msgstr "用戶端"
 
 #: templates/resource_download.html:22
 msgid ""
-"JumpServer Client, currently used to launch the client, now only support "
-"launch RDP SSH client, The Telnet client will next"
-msgstr "JumpServer 用戶端，目前用來喚起 特定用戶端程序 連接資產, 目前僅支持 RDP SSH 用戶端，Telnet 會在未來支持"
+"JumpServer Client, currently used to launch the client"
+msgstr "JumpServer 用戶端，目前用來喚起 特定用戶端程序 連接資產"
 
 #: templates/resource_download.html:35
 msgid "Microsoft"
