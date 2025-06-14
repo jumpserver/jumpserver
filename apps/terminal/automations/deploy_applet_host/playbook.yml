@@ -73,7 +73,8 @@
               $accessKey = $response.service_account.access_key.id
               $accessSecret = $response.service_account.access_key.secret
               if ($accessKey -and $accessSecret) {
-                  "${accessKey}:${accessSecret}" | Out-File -FilePath $targetPath -Encoding UTF8 -Force -NoNewline
+                  $utf8NoBOM = New-Object System.Text.UTF8Encoding($false)
+                  [System.IO.File]::WriteAllText($targetPath, "${accessKey}:${accessSecret}", $utf8NoBOM)
                   Write-Output "access_key save to $targetPath"
               } else {
                   Write-Error "Failed to get access_key or access_secret。"
