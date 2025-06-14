@@ -7982,9 +7982,7 @@ msgid "Client"
 msgstr ""
 
 #: templates/resource_download.html:22
-msgid ""
-"JumpServer Client, currently used to launch the client, now only support "
-"launch RDP SSH client, The Telnet client will next"
+msgid "JumpServer Client, currently used to launch the client"
 msgstr ""
 
 #: templates/resource_download.html:35

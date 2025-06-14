@@ -8156,12 +8156,8 @@ msgid "Client"
 msgstr "客户端"
 
 #: templates/resource_download.html:22
-msgid ""
-"JumpServer Client, currently used to launch the client, now only support "
-"launch RDP SSH client, The Telnet client will next"
-msgstr ""
-"JumpServer 客户端，目前用来唤起 特定客户端程序 连接资产, 目前仅支持 RDP SSH "
-"客户端，Telnet 会在未来支持"
+msgid "JumpServer Client, currently used to launch the client"
+msgstr "JumpServer 客户端，目前用来唤起 特定客户端程序 连接资产"
 
 #: templates/resource_download.html:35
 msgid "Microsoft"
