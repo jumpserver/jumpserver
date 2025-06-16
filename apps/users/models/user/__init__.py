@@ -215,7 +215,7 @@ class User(
 
     @lang.setter
     def lang(self, value):
-        self.preference.set_value('lang', value)
+        self.preference.set_value('lang', value, 'lina')
 
     @property
     def preference(self):
