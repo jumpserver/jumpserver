@@ -74,6 +74,8 @@
     "Don't prompt again": "下次不再提示",
     "Download": "下載",
     "Download the latest client": "下載最新用戶端",
+    "DownloadClient": "下載客戶端",
+    "DownloadClientMsg": "JumpServer 客戶端尚未安裝，現在請前往下載安裝。",
     "Driver redirect": "磁碟掛載",
     "Expand": "展開",
     "Expand all": "展開全部",

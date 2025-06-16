@@ -75,6 +75,8 @@
     "Download": "Download",
     "Download the client": "Please download",
     "Download the latest client": "Download the latest client",
+    "DownloadClient": "Download client",
+    "DownloadClientMsg": "JumpServer client not found, Go to download and install",
     "Driver redirect": "Driver redirect",
     "Expand": "Expand",
     "Expand all": "Expand all",

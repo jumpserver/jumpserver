@@ -73,6 +73,8 @@
     "Don't prompt again": "다음 번에 다시 알리지 않음",
     "Download": "다운로드",
     "Download the latest client": "최신 클라이언트를 다운로드하세요.",
+    "DownloadClient": "클라이언트 다운로드",
+    "DownloadClientMsg": "JumpServer 클라이언트가 설치되지 않았습니다. 지금 가서 다운로드 및 설치하세요.",
     "Driver redirect": "디스크 장착",
     "Expand": "확장",
     "Expand all": "모두 확장",

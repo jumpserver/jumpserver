@@ -73,6 +73,7 @@
     "Don't prompt again": "次回は提示しない",
     "Download": "ダウンロード",
     "Download the latest client": "最新クライアントのダウンロード",
+    "DownloadClientMsg": "JumpServerクライアントがインストールされていません。今すぐクライアントをダウンロードしてインストールしてください。",
     "Driver redirect": "ディスクマウント",
     "Expand": "展開",
     "Expand all": "すべて展開",
