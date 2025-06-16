@@ -75,6 +75,8 @@
     "Download": "Скачать",
     "Download the client": "Пожалуйста, скачайте",
     "Download the latest client": "Скачать последнюю версию клиента",
+    "DownloadClient": "Скачать клиент.",
+    "DownloadClientMsg": "Клиент JumpServer не установлен, сейчас нужно скачать и установить.",
     "Driver redirect": "Перенаправление диска",
     "Expand": "Развернуть",
     "Expand all": "Развернуть все",

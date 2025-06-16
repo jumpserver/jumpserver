@@ -73,6 +73,8 @@
     "Don't prompt again": "下次不再提示",
     "Download": "下载",
     "Download the latest client": "下载最新客户端",
+    "DownloadClient": "下载客户端",
+    "DownloadClientMsg": "JumpServer 客户端没有安装，现在去下载安装",
     "Driver redirect": "磁盘挂载",
     "Expand": "展开",
     "Expand all": "展开全部",

@@ -73,6 +73,8 @@
     "Don't prompt again": "Não mostrar novamente",
     "Download": "Baixar",
     "Download the latest client": "Baixar o cliente mais recente",
+    "DownloadClient": "Baixar cliente.",
+    "DownloadClientMsg": "O cliente JumpServer não está instalado, vá agora fazer o download e a instalação.",
     "Driver redirect": "Montagem de Disco",
     "Expand": "Expandir",
     "Expand all": "Expandir Tudo",
