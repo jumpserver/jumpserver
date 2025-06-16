@@ -641,7 +641,7 @@
     "HistoryDate": "날짜",
     "HistoryPassword": "역사 비밀번호",
     "HistoryRecord": "역사 기록",
-    "Host": "자산",
+    "Host": "호스트",
     "HostCreate": "자산 생성 - 호스트",
     "HostDeployment": "배포 장비 배포",
     "HostUpdate": "자산 업데이트 - 호스트",
