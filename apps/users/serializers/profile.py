@@ -146,7 +146,7 @@ class UserProfileSerializer(UserSerializer):
         return password
 
     def get_lang(self, obj):
-        return getattr(self.instance, 'lang', settings.LANGUAGE_CODE)
+        return getattr(obj, 'lang', settings.LANGUAGE_CODE)
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
