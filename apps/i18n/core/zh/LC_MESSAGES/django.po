@@ -8525,8 +8525,6 @@ msgid "Oracle port"
 msgstr "Oracle 端口"
 
 #: terminal/models/component/endpoint.py:26
-#, fuzzy
-#| msgid "MariaDB port"
 msgid "MongoDB port"
 msgstr "MongoDB 端口"
 
