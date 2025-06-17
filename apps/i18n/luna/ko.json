@@ -87,7 +87,7 @@
     "Favorite": "즐겨찾기",
     "File Manager": "파일 관리",
     "FileManagement": "링크 주소",
-    "FileManagerConnectionFailed": "파일 관리 연결에 실패했습니다. 네트워크 연결을 확인하거나 관리자에게 문의해 주세요.",
+    "FileManagerConnectionFailed": "파일 관리 연결 실패",
     "Fold": "접기",
     "Fold all": "모두 접기",
     "Force refresh": "강제 새로 고침",

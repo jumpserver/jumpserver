@@ -87,7 +87,7 @@
     "Favorite": "收藏",
     "File Manager": "文件管理",
     "FileManagement": "文件管理",
-    "FileManagerConnectionFailed": "文件管理连接失败，请检查网络连接或联系管理员",
+    "FileManagerConnectionFailed": "文件管理连接失败",
     "Fold": "折叠",
     "Fold all": "折叠全部",
     "Force refresh": "强制刷新",

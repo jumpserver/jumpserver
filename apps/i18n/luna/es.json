@@ -87,7 +87,7 @@
     "Favorite": "Favoritos",
     "File Manager": "Gestión de archivos",
     "FileManagement": "Gestión de archivos",
-    "FileManagerConnectionFailed": "La conexión a la gestión de archivos ha fallado, por favor verifique la conexión de red o contacte al administrador.",
+    "FileManagerConnectionFailed": "Error en la conexión del archivo.",
     "Fold": "Doblado",
     "Fold all": "Colapsar todo",
     "Force refresh": "Refresco forzado",
