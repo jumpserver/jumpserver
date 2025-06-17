@@ -37,7 +37,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         self.account_ids = self.execution.snapshot['accounts']
         self.record_map = self.execution.snapshot.get('record_map', {})  # 这个是某个失败的记录重试
-        self.name_recorder_mapper = {}  # 做个映射，方便后面处理
+        self.name_record_mapper = {}  # 做个映射，方便后面处理
 
     def gen_account_inventory(self, account, asset, h, path_dir):
         raise NotImplementedError
@@ -113,7 +113,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        host['check_conn_after_change'] = self.execution.snapshot.get('check_conn_after_change', True)
         host['ssh_params'] = {}
 
         accounts = self.get_accounts(account)
@@ -147,7 +146,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                 continue
 
             try:
-                h = self.gen_account_inventory(account, asset, h, path_dir)
+                h, record = self.gen_account_inventory(account, asset, h, path_dir)
+                h['check_conn_after_change'] = record.execution.snapshot.get('check_conn_after_change', True)
                 account_secret_task_status.set_status(
                     account.id,
                     ChangeSecretAccountStatus.PROCESSING,
@@ -162,26 +162,26 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         return inventory_hosts
 
     @staticmethod
-    def save_record(recorder):
-        recorder.save(update_fields=['error', 'status', 'date_finished'])
+    def save_record(record):
+        record.save(update_fields=['error', 'status', 'date_finished'])
 
     @staticmethod
     def clear_account_queue_status(account_id):
         account_secret_task_status.clear(account_id)
 
     def on_host_success(self, host, result):
-        recorder = self.name_recorder_mapper.get(host)
-        if not recorder:
+        record = self.name_record_mapper.get(host)
+        if not record:
             return
-        recorder.status = ChangeSecretRecordStatusChoice.success.value
-        recorder.date_finished = timezone.now()
+        record.status = ChangeSecretRecordStatusChoice.success.value
+        record.date_finished = timezone.now()
 
-        account = recorder.account
+        account = record.account
         if not account:
             print("Account not found, deleted ?")
             return
 
-        account.secret = getattr(recorder, 'new_secret', account.secret)
+        account.secret = getattr(record, 'new_secret', account.secret)
         account.date_updated = timezone.now()
         account.date_change_secret = timezone.now()
         account.change_secret_status = ChangeSecretRecordStatusChoice.success
@@ -197,17 +197,17 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         with safe_atomic_db_connection():
             account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
-            self.save_record(recorder)
+            self.save_record(record)
             self.clear_account_queue_status(account.id)
 
     def on_host_error(self, host, error, result):
-        recorder = self.name_recorder_mapper.get(host)
-        if not recorder:
+        record = self.name_record_mapper.get(host)
+        if not record:
             return
-        recorder.status = ChangeSecretRecordStatusChoice.failed.value
-        recorder.date_finished = timezone.now()
-        recorder.error = error
-        account = recorder.account
+        record.status = ChangeSecretRecordStatusChoice.failed.value
+        record.date_finished = timezone.now()
+        record.error = error
+        account = record.account
         if not account:
             print("Account not found, deleted ?")
             return
@@ -218,13 +218,13 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.summary['fail_accounts'] += 1
         self.result['fail_accounts'].append(
             {
-                "asset": str(recorder.asset),
-                "username": recorder.account.username,
+                "asset": str(record.asset),
+                "username": record.account.username,
             }
         )
         super().on_host_error(host, error, result)
 
         with safe_atomic_db_connection():
             account.save(update_fields=['change_secret_status', 'date_change_secret', 'date_updated'])
-            self.save_record(recorder)
+            self.save_record(record)
             self.clear_account_queue_status(account.id)
