@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 class PushAccountManager(BaseChangeSecretPushManager):
 
     @staticmethod
-    def require_update_version(account, recorder):
+    def require_update_version(account, record):
         account.skip_history_when_saving = True
         return False
 
@@ -31,29 +31,29 @@ class PushAccountManager(BaseChangeSecretPushManager):
         secret_type = account.secret_type
         if not secret:
             raise ValueError(_('Secret cannot be empty'))
-        self.get_or_create_record(asset, account, h['name'])
+        record = self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(secret_type, secret, path_dir)
         h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
-        return h
+        return h, record
 
     def get_or_create_record(self, asset, account, name):
         asset_account_id = f'{asset.id}-{account.id}'
 
         if asset_account_id in self.record_map:
             record_id = self.record_map[asset_account_id]
-            recorder = PushSecretRecord.objects.filter(id=record_id).first()
+            record = PushSecretRecord.objects.filter(id=record_id).first()
         else:
-            recorder = self.create_record(asset, account)
+            record = self.create_record(asset, account)
 
-        self.name_recorder_mapper[name] = recorder
-        return recorder
+        self.name_record_mapper[name] = record
+        return record
 
     def create_record(self, asset, account):
-        recorder = PushSecretRecord(
+        record = PushSecretRecord(
             asset=asset, account=account, execution=self.execution,
             comment=f'{account.username}@{asset.address}'
         )
-        return recorder
+        return record
 
     def print_summary(self):
         print('\n\n' + '-' * 80)
