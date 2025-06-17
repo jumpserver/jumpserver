@@ -8396,10 +8396,8 @@ msgid "Oracle port"
 msgstr "Oracle 埠"
 
 #: terminal/models/component/endpoint.py:26
-#, fuzzy
-#| msgid "MariaDB port"
 msgid "MongoDB port"
-msgstr "MariaDB 埠"
+msgstr "MongoDB 端口"
 
 #: terminal/models/component/endpoint.py:27
 msgid "VNC port"
