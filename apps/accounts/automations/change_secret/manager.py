@@ -134,6 +134,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 record_id = self.record_map[asset_account_id]
                 try:
                     recorder = ChangeSecretRecord.objects.get(id=record_id)
+                    new_secret = recorder.new_secret
                 except ChangeSecretRecord.DoesNotExist:
                     print(f"Record {record_id} not found")
                     continue
