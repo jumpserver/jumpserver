@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
+from orgs.mixins.ws import OrgMixin
 from orgs.models import Organization
 from orgs.utils import current_org
 from settings.serializers import (
@@ -38,7 +39,7 @@ CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS
 TASK_STATUS_IS_OVER = 'OVER'
 
 
-class ToolsWebsocket(AsyncJsonWebsocketConsumer):
+class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     is_closed: bool = False
 
     @staticmethod
@@ -55,7 +56,9 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
     async def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
-            has_perm = await sync_to_async(user.has_perm)('rbac.view_systemtools')
+            self.cookie = self.get_cookie()
+            self.org = self.get_current_org()
+            has_perm = self.has_perms(user, ['rbac.view_systemtools'])
             if await self.is_superuser(user) or (settings.TOOL_USER_ENABLED and has_perm):
                 await self.accept()
             else:
