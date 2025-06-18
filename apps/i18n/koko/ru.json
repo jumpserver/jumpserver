@@ -23,7 +23,6 @@
     "EndFileTransfer": "Передача файла завершена",
     "ExceedTransferSize": "Превышен максимальный размер передачи",
     "Expand": "Развернуть",
-    "ExpiredTime": "Срок действия",
     "FileListError": "Не удалось получить информацию о списке файлов",
     "FileManagementExpired": "Текущая сессия управления файлами истекла.",
     "FileUploadInterrupted": "Передача файла прервана",
@@ -72,7 +71,6 @@
     "Theme": "Тема",
     "ThemeColors": "Цвета темы",
     "ThemeConfig": "Настройки темы",
-    "ThemeSyncSuccessful": "Синхронизация темы прошла успешно",
     "TransferHistory": "История передачи",
     "Type": "Тип",
     "UpArrow": "Кнопка вверх",
@@ -84,6 +82,7 @@
     "UploadTips": "Перетащите файл сюда или нажмите для загрузки",
     "UploadTitle": "Загрузить файл",
     "User": "Пользователь",
+    "VerifyCode": "Код подтверждения",
     "WaitFileTransfer": "Ожидание завершения передачи файла",
     "Warning": "Предупреждение",
     "WebSocketClosed": "WebSocket закрыт"

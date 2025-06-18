@@ -43,6 +43,7 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     search_fields = ('username', 'name')
     serializer_classes = {
         'default': serializers.AccountTemplateSerializer,
+        'retrieve': serializers.AccountDetailTemplateSerializer,
     }
     rbac_perms = {
         'su_from_account_templates': 'accounts.view_accounttemplate',

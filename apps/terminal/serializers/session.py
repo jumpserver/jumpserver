@@ -165,7 +165,12 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
 
     def update(self, instance, validated_data):
         is_finished = validated_data.get('is_finished')
-        if settings.CHANGE_SECRET_AFTER_SESSION_END and is_finished and not instance.is_finished:
+        if (
+                instance.protocol != 'vnc' and  # VNC sessions do not require secret change
+                settings.XPACK_LICENSE_IS_VALID and
+                settings.CHANGE_SECRET_AFTER_SESSION_END and
+                is_finished and not instance.is_finished and instance.is_success
+        ):
             self.enqueue_change_secret_task(instance)
         return super().update(instance, validated_data)
 

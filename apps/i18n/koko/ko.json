@@ -23,7 +23,6 @@
     "EndFileTransfer": "파일 전송 종료",
     "ExceedTransferSize": "최대 전송 크기를 초과했습니다",
     "Expand": "펼치기",
-    "ExpiredTime": "유효 기간",
     "FileListError": "파일 목록 정보 가져오기 실패",
     "FileManagementExpired": "현재 파일 관리 세션이 만료되었습니다.",
     "FileUploadInterrupted": "파일 업로드 중단",
@@ -72,7 +71,6 @@
     "Theme": "주제",
     "ThemeColors": "테마 색상",
     "ThemeConfig": "주제",
-    "ThemeSyncSuccessful": "테마 동기화 성공",
     "TransferHistory": "전송 히스토리",
     "Type": "유형",
     "UpArrow": "위쪽 화살표",
@@ -84,6 +82,7 @@
     "UploadTips": "파일을 여기로 드래그하거나 업로드를 클릭하세요",
     "UploadTitle": "파일 업로드",
     "User": "사용자",
+    "VerifyCode": "인증 코드",
     "WaitFileTransfer": "파일 전송 완료 대기",
     "Warning": "경고",
     "WebSocketClosed": "WebSocket이 닫혔습니다"

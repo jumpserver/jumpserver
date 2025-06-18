@@ -23,7 +23,6 @@
     "EndFileTransfer": "文件传输结束",
     "ExceedTransferSize": "超过最大传输大小",
     "Expand": "展开",
-    "ExpiredTime": "有效期限",
     "FileListError": "获取文件列表信息失败",
     "FileManagementExpired": "当前文件管理会话已过期。",
     "FileUploadInterrupted": "文件上传中断",
@@ -72,7 +71,6 @@
     "Theme": "主题",
     "ThemeColors": "主题颜色",
     "ThemeConfig": "主题",
-    "ThemeSyncSuccessful": "主题同步成功",
     "TransferHistory": "传输历史",
     "Type": "类型",
     "UpArrow": "向上箭头",
@@ -84,6 +82,7 @@
     "UploadTips": "将文件拖到此处，或点击上传",
     "UploadTitle": "上传文件",
     "User": "用户",
+    "VerifyCode": "验证码",
     "WaitFileTransfer": "等待文件传输结束",
     "Warning": "警告",
     "WebSocketClosed": "WebSocket 已关闭"

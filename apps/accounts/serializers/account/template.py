@@ -57,11 +57,15 @@ class AccountTemplateSerializer(BaseAccountSerializer):
         fields_unimport_template = ['push_params']
 
 
-class AccountTemplateSecretSerializer(SecretReadableMixin, AccountTemplateSerializer):
+class AccountDetailTemplateSerializer(AccountTemplateSerializer):
     class Meta(AccountTemplateSerializer.Meta):
         fields = AccountTemplateSerializer.Meta.fields + ['spec_info']
+
+
+class AccountTemplateSecretSerializer(SecretReadableMixin, AccountDetailTemplateSerializer):
+    class Meta(AccountDetailTemplateSerializer.Meta):
+        fields = AccountDetailTemplateSerializer.Meta.fields
         extra_kwargs = {
-            **AccountTemplateSerializer.Meta.extra_kwargs,
+            **AccountDetailTemplateSerializer.Meta.extra_kwargs,
             'secret': {'write_only': False},
-            'spec_info': {'label': _('Spec info')},
         }

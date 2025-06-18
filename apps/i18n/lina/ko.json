@@ -141,7 +141,7 @@
     "AssetACLCreate": "자산 로그인 규칙 생성",
     "AssetACLDetail": "자산 로그인 규칙 상세",
     "AssetACLUpdate": "자산 로그인 규칙 업데이트",
-    "AssetACLs": "자산 로그인",
+    "AssetACLs": "자산 연결",
     "AssetAccount": "계정 목록",
     "AssetAccountDetail": "계정 정보",
     "AssetAddress": "자산 (IP/호스트 이름)",

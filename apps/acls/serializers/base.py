@@ -79,7 +79,7 @@ class ActionAclSerializer(serializers.Serializer):
             field_action._choices.pop(ActionChoices.face_online, None)
         for choice in self.Meta.action_choices_exclude:
             field_action._choices.pop(choice, None)
-        if not settings.CHANGE_SECRET_AFTER_SESSION_END:
+        if not settings.XPACK_LICENSE_IS_VALID or not settings.CHANGE_SECRET_AFTER_SESSION_END:
             field_action._choices.pop(ActionChoices.change_secret, None)
 
 

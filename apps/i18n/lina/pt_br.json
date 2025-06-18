@@ -141,7 +141,7 @@
     "AssetACLCreate": "Criar regras de login de ativo",
     "AssetACLDetail": "Detalhes da regra de login de ativos",
     "AssetACLUpdate": "Atualize as regras de login de ativos",
-    "AssetACLs": "Login de ativos",
+    "AssetACLs": "Conexão de Ativos",
     "AssetAccount": "Lista de contas",
     "AssetAccountDetail": "Detalhes da conta",
     "AssetAddress": "Ativos (IP/Nome do host)",
