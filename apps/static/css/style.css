@@ -5570,14 +5570,14 @@ body.body-small .vote-icon {
 .small-chat-box .form-chat {
   padding: 10px 10px;
 }
-/*
- * metismenu - v2.0.2
- * A jQuery menu plugin
- * https://github.com/onokumus/metisMenu
- *
- * Made by Osman Nuri Okumus
- * Under MIT License
- */
+
+/*!
+* metismenu https://github.com/onokumus/metismenu#readme
+* A collapsible jQuery menu plugin
+* @version 3.0.7
+* @author Osman Nuri Okumus <onokumus@gmail.com> (https://github.com/onokumus)
+* @license: MIT 
+*/
 .metismenu .plus-minus,
 .metismenu .plus-times {
   float: right;
@@ -5589,49 +5589,57 @@ body.body-small .vote-icon {
 .metismenu .glyphicon.arrow:before {
   content: "\e079";
 }
-.metismenu .active > a > .glyphicon.arrow:before {
-  content: "\e114";
+
+.metismenu .mm-active > a > .glyphicon.arrow:before {
+    content: "\e114";
 }
 .metismenu .fa.arrow:before {
   content: "\f104";
 }
-.metismenu .active > a > .fa.arrow:before {
-  content: "\f107";
+
+.metismenu .mm-active > a > .fa.arrow:before {
+    content: "\f107";
 }
 .metismenu .ion.arrow:before {
   content: "\f3d2";
 }
-.metismenu .active > a > .ion.arrow:before {
-  content: "\f3d0";
+
+.metismenu .mm-active > a > .ion.arrow:before {
+    content: "\f3d0";
 }
 .metismenu .fa.plus-minus:before,
 .metismenu .fa.plus-times:before {
   content: "\f067";
 }
-.metismenu .active > a > .fa.plus-times {
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
+
+.metismenu .mm-active > a > .fa.plus-times {
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }
-.metismenu .active > a > .fa.plus-minus:before {
-  content: "\f068";
+
+.metismenu .mm-active > a > .fa.plus-minus:before {
+    content: "\f068";
 }
-.metismenu .collapse {
-  display: none;
+
+.metismenu .mm-collapse {
+    display: none;
 }
-.metismenu .collapse.in {
-  display: block;
+
+.metismenu .mm-collapse.in {
+    display: block;
 }
-.metismenu .collapsing {
-  position: relative;
-  height: 0;
-  overflow: hidden;
-  -webkit-transition-timing-function: ease;
-  transition-timing-function: ease;
-  -webkit-transition-duration: .35s;
-  transition-duration: .35s;
-  -webkit-transition-property: height, visibility;
-  transition-property: height, visibility;
+
+.metismenu .mm-collapsing {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    -webkit-transition-timing-function: ease;
+    transition-timing-function: ease;
+    -webkit-transition-duration: .35s;
+    transition-duration: .35s;
+    -webkit-transition-property: height, visibility;
+    transition-property: height, visibility;
 }
 /*
  *  Usage:
