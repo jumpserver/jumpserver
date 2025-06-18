@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-12 18:10+0800\n"
+"POT-Creation-Date: 2025-06-18 14:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr ""
 msgid "Plan execution end"
 msgstr ""
 
-#: accounts/automations/base/manager.py:126
+#: accounts/automations/base/manager.py:125
 msgid "No pending accounts found"
 msgstr ""
 
@@ -210,7 +210,8 @@ msgstr ""
 msgid "Push account"
 msgstr ""
 
-#: accounts/const/automation.py:26
+#: accounts/const/automation.py:26 accounts/risk_handlers.py:26
+#: acls/const.py:14 audits/const.py:32 ops/const.py:9
 msgid "Change secret"
 msgstr ""
 
@@ -1053,45 +1054,45 @@ msgid ""
 "web-based and custom-type assets"
 msgstr ""
 
-#: accounts/notifications.py:12 accounts/notifications.py:37
+#: accounts/notifications.py:13 accounts/notifications.py:39
 msgid "Notification of account backup route task results"
 msgstr ""
 
-#: accounts/notifications.py:22 accounts/notifications.py:46
+#: accounts/notifications.py:23 accounts/notifications.py:48
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
 msgstr ""
 
-#: accounts/notifications.py:25
+#: accounts/notifications.py:26
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
 "encryption password for preference settings"
 msgstr ""
 
-#: accounts/notifications.py:56
+#: accounts/notifications.py:58
 msgid "Notification of implementation result of encryption change plan"
 msgstr ""
 
-#: accounts/notifications.py:67
+#: accounts/notifications.py:69
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr ""
 
-#: accounts/notifications.py:71
+#: accounts/notifications.py:73
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
 "password in preferences"
 msgstr ""
 
-#: accounts/notifications.py:83
+#: accounts/notifications.py:86
 msgid "Gather account change information"
 msgstr ""
 
-#: accounts/notifications.py:105
+#: accounts/notifications.py:108
 msgid "Change secret or push account failed information"
 msgstr ""
 
@@ -1129,11 +1130,6 @@ msgstr ""
 
 #: accounts/risk_handlers.py:25
 msgid "Change password and Add"
-msgstr ""
-
-#: accounts/risk_handlers.py:26 acls/const.py:14 audits/const.py:32
-#: ops/const.py:9
-msgid "Change password"
 msgstr ""
 
 #: accounts/risk_handlers.py:127
@@ -1230,7 +1226,6 @@ msgstr ""
 
 #: accounts/serializers/account/account.py:464
 #: accounts/serializers/account/base.py:86
-#: accounts/serializers/account/template.py:66
 #: assets/serializers/asset/common.py:424
 msgid "Spec info"
 msgstr ""
@@ -2033,32 +2028,32 @@ msgstr ""
 msgid "App Assets"
 msgstr "Assets"
 
-#: assets/automations/base/manager.py:140
+#: assets/automations/base/manager.py:141
 msgid "Task: {} finished"
 msgstr ""
 
-#: assets/automations/base/manager.py:339
+#: assets/automations/base/manager.py:341
 msgid "  - Platform {} ansible disabled"
 msgstr ""
 
-#: assets/automations/base/manager.py:525
+#: assets/automations/base/manager.py:527
 msgid ">>> Task preparation phase"
 msgstr ""
 
-#: assets/automations/base/manager.py:529
+#: assets/automations/base/manager.py:531
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ""
 
-#: assets/automations/base/manager.py:534
+#: assets/automations/base/manager.py:536
 msgid ">>> Start executing tasks"
 msgstr ""
 
-#: assets/automations/base/manager.py:536
+#: assets/automations/base/manager.py:538
 msgid ">>> No tasks need to be executed"
 msgstr ""
 
-#: assets/automations/base/manager.py:540
+#: assets/automations/base/manager.py:542
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ""
@@ -3303,7 +3298,7 @@ msgstr ""
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:65
-#: terminal/serializers/session.py:175
+#: terminal/serializers/session.py:178
 msgid "Terminal"
 msgstr ""
 
@@ -4691,7 +4686,7 @@ msgstr ""
 msgid "Please login with a password and then bind the WeCom"
 msgstr ""
 
-#: common/api/action.py:62
+#: common/api/action.py:68
 msgid "Request file format may be wrong"
 msgstr ""
 
@@ -5087,19 +5082,19 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: common/tasks.py:32
+#: common/tasks.py:33
 msgid "Send email"
 msgstr ""
 
-#: common/tasks.py:35
+#: common/tasks.py:36
 msgid "This task will be executed when sending email notifications"
 msgstr ""
 
-#: common/tasks.py:72
+#: common/tasks.py:78
 msgid "Send email attachment"
 msgstr ""
 
-#: common/tasks.py:75
+#: common/tasks.py:81
 msgid ""
 "When an account password is changed or an account backup generates "
 "attachments, \n"
@@ -5107,11 +5102,11 @@ msgid ""
 "attachments"
 msgstr ""
 
-#: common/tasks.py:101
+#: common/tasks.py:107
 msgid "Upload account backup to external storage"
 msgstr ""
 
-#: common/tasks.py:103
+#: common/tasks.py:109
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -8444,7 +8439,7 @@ msgstr ""
 msgid "Replay"
 msgstr ""
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:174
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:177
 msgid "Command amount"
 msgstr ""
 
@@ -10118,11 +10113,11 @@ msgstr ""
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr ""
 
-#: users/utils.py:59
+#: users/utils.py:65
 msgid "Auth success"
 msgstr ""
 
-#: users/utils.py:60
+#: users/utils.py:66
 msgid "Redirecting to JumpServer Client"
 msgstr ""
 

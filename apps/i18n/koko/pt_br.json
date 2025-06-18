@@ -23,7 +23,6 @@
     "EndFileTransfer": "Transferência de arquivo concluída",
     "ExceedTransferSize": "Excede o tamanho máximo de transferência",
     "Expand": "Expandir",
-    "ExpiredTime": "Período de validade",
     "FileListError": "Falha ao obter informações da lista de arquivos",
     "FileManagementExpired": "A sessão atual de gerenciamento de arquivos expirou.",
     "FileUploadInterrupted": "Upload de arquivo interrompido",
@@ -72,7 +71,6 @@
     "Theme": "Tema",
     "ThemeColors": "Cor do tema",
     "ThemeConfig": "Tema",
-    "ThemeSyncSuccessful": "Sincronização de tema bem-sucedida",
     "TransferHistory": "Histórico de Transferência",
     "Type": "Tipo",
     "UpArrow": "Seta para cima",
@@ -84,6 +82,7 @@
     "UploadTips": "Arraste o arquivo para cá ou clique para fazer o upload",
     "UploadTitle": "Enviar arquivo",
     "User": "Usuário",
+    "VerifyCode": "código de verificação",
     "WaitFileTransfer": "Aguarde o fim da transferência do arquivo",
     "Warning": "Aviso",
     "WebSocketClosed": "WebSocket foi fechado"

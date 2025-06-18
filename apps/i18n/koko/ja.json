@@ -23,7 +23,6 @@
     "EndFileTransfer": "ファイル転送終了",
     "ExceedTransferSize": "最大転送サイズを超えています",
     "Expand": "展開",
-    "ExpiredTime": "有効期限",
     "FileListError": "ファイルリスト情報の取得に失敗しました",
     "FileManagementExpired": "現在のファイル管理セッションは期限切れです。",
     "FileUploadInterrupted": "ファイルアップロードが中断されました",
@@ -72,7 +71,6 @@
     "Theme": "テーマ",
     "ThemeColors": "テーマカラー",
     "ThemeConfig": "テーマ",
-    "ThemeSyncSuccessful": "テーマ同期成功",
     "TransferHistory": "転送履歴",
     "Type": "タイプ",
     "UpArrow": "上向き矢印",
@@ -84,6 +82,7 @@
     "UploadTips": "ファイルをここにドラッグするか、アップロードをクリックします",
     "UploadTitle": "ファイルのアップロード",
     "User": "ユーザー",
+    "VerifyCode": "認証コード",
     "WaitFileTransfer": "ファイル転送終了待ち",
     "Warning": "警告",
     "WebSocketClosed": "WebSocket 閉店"

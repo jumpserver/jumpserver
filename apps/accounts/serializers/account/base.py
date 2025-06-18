@@ -75,7 +75,7 @@ class BaseAccountSerializer(
         fields_mini = ["id", "name", "username"]
         fields_small = fields_mini + [
             "secret_type", "secret", "passphrase",
-            "privileged", "is_active", "spec_info",
+            "privileged", "is_active",
         ]
         fields_other = ["created_by", "date_created", "date_updated", "comment"]
         fields = fields_small + fields_other + ["labels"]

@@ -23,7 +23,7 @@ TYPE_CHOICES = [
     ("delete_both", _("Delete remote")),
     ("add_account", _("Add account")),
     ("change_password_add", _("Change password and Add")),
-    ("change_password", _("Change password")),
+    ("change_password", _("Change secret")),
 ]
 
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-12 18:10+0800\n"
+"POT-Creation-Date: 2025-06-18 14:56+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -93,7 +93,7 @@ msgstr "账号备份计划正在执行"
 msgid "Plan execution end"
 msgstr "计划执行结束"
 
-#: accounts/automations/base/manager.py:126
+#: accounts/automations/base/manager.py:125
 msgid "No pending accounts found"
 msgstr "未找到待处理帐户"
 
@@ -212,9 +212,10 @@ msgstr "失败"
 msgid "Push account"
 msgstr "账号推送"
 
-#: accounts/const/automation.py:26
+#: accounts/const/automation.py:26 accounts/risk_handlers.py:26
+#: acls/const.py:14 audits/const.py:32 ops/const.py:9
 msgid "Change secret"
-msgstr "更改密码"
+msgstr "改密"
 
 #: accounts/const/automation.py:27
 msgid "Verify account"
@@ -1060,17 +1061,17 @@ msgid ""
 msgstr ""
 "连接资产时不使用用户名和密码的账号，仅支持 web类型 和 自定义类型 的资产"
 
-#: accounts/notifications.py:12 accounts/notifications.py:37
+#: accounts/notifications.py:13 accounts/notifications.py:39
 msgid "Notification of account backup route task results"
 msgstr "账号备份任务结果通知"
 
-#: accounts/notifications.py:22 accounts/notifications.py:46
+#: accounts/notifications.py:23 accounts/notifications.py:48
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
 msgstr "{} - 账号备份任务已完成, 详情见附件"
 
-#: accounts/notifications.py:25
+#: accounts/notifications.py:26
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
@@ -1079,17 +1080,17 @@ msgstr ""
 "{} - 账号备份任务已完成: 未设置加密密码 - 请前往个人信息 -> 偏好设置的基本中"
 "设置文件加密密码"
 
-#: accounts/notifications.py:56
+#: accounts/notifications.py:58
 msgid "Notification of implementation result of encryption change plan"
 msgstr "改密计划任务结果通知"
 
-#: accounts/notifications.py:67
+#: accounts/notifications.py:69
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr "{} - 改密任务已完成, 详情见附件"
 
-#: accounts/notifications.py:71
+#: accounts/notifications.py:73
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
@@ -1098,11 +1099,11 @@ msgstr ""
 "{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 偏好设置中设置加密密"
 "码"
 
-#: accounts/notifications.py:83
+#: accounts/notifications.py:86
 msgid "Gather account change information"
 msgstr "账号变更信息"
 
-#: accounts/notifications.py:105
+#: accounts/notifications.py:108
 msgid "Change secret or push account failed information"
 msgstr "改密或推送账号失败信息"
 
@@ -1141,11 +1142,6 @@ msgstr "新增账号"
 #: accounts/risk_handlers.py:25
 msgid "Change password and Add"
 msgstr "改密并添加"
-
-#: accounts/risk_handlers.py:26 acls/const.py:14 audits/const.py:32
-#: ops/const.py:9
-msgid "Change password"
-msgstr "改密"
 
 #: accounts/risk_handlers.py:127
 msgid "Execution failed: {}"
@@ -1241,7 +1237,6 @@ msgstr "账号已存在"
 
 #: accounts/serializers/account/account.py:464
 #: accounts/serializers/account/base.py:86
-#: accounts/serializers/account/template.py:66
 #: assets/serializers/asset/common.py:424
 msgid "Spec info"
 msgstr "特殊信息"
@@ -2068,32 +2063,32 @@ msgstr "需要为数字"
 msgid "App Assets"
 msgstr "资产管理"
 
-#: assets/automations/base/manager.py:140
+#: assets/automations/base/manager.py:141
 msgid "Task: {} finished"
 msgstr "任务：{} 完成"
 
-#: assets/automations/base/manager.py:339
+#: assets/automations/base/manager.py:341
 msgid "  - Platform {} ansible disabled"
 msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
 
-#: assets/automations/base/manager.py:525
+#: assets/automations/base/manager.py:527
 msgid ">>> Task preparation phase"
 msgstr ">>> 任务准备阶段"
 
-#: assets/automations/base/manager.py:529
+#: assets/automations/base/manager.py:531
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> 分次执行任务，总共 {runner_count}"
 
-#: assets/automations/base/manager.py:534
+#: assets/automations/base/manager.py:536
 msgid ">>> Start executing tasks"
 msgstr ">>> 开始执行任务"
 
-#: assets/automations/base/manager.py:536
+#: assets/automations/base/manager.py:538
 msgid ">>> No tasks need to be executed"
 msgstr ">>> 没有需要执行的任务"
 
-#: assets/automations/base/manager.py:540
+#: assets/automations/base/manager.py:542
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> 开始执行第 {index} 批任务"
@@ -3365,7 +3360,7 @@ msgstr "结束"
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:65
-#: terminal/serializers/session.py:175
+#: terminal/serializers/session.py:178
 msgid "Terminal"
 msgstr "终端"
 
@@ -4764,7 +4759,7 @@ msgstr "从企业微信获取用户失败"
 msgid "Please login with a password and then bind the WeCom"
 msgstr "请使用密码登录，然后绑定企业微信"
 
-#: common/api/action.py:62
+#: common/api/action.py:68
 msgid "Request file format may be wrong"
 msgstr "上传的文件格式错误 或 其它类型资源的文件"
 
@@ -5166,19 +5161,19 @@ msgstr "标签"
 
 # msgid "Labels"
 # msgstr "标签管理"
-#: common/tasks.py:32
+#: common/tasks.py:33
 msgid "Send email"
 msgstr "发件邮件"
 
-#: common/tasks.py:35
+#: common/tasks.py:36
 msgid "This task will be executed when sending email notifications"
 msgstr "发送邮件消息时执行该任务"
 
-#: common/tasks.py:72
+#: common/tasks.py:78
 msgid "Send email attachment"
 msgstr "发送邮件附件"
 
-#: common/tasks.py:75
+#: common/tasks.py:81
 msgid ""
 "When an account password is changed or an account backup generates "
 "attachments, \n"
@@ -5186,11 +5181,11 @@ msgid ""
 "attachments"
 msgstr "当账号改密，账号备份产生附件，需要对发送邮件及附件，执行该任务"
 
-#: common/tasks.py:101
+#: common/tasks.py:107
 msgid "Upload account backup to external storage"
 msgstr "上传会话录像到外部存储"
 
-#: common/tasks.py:103
+#: common/tasks.py:109
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -8618,7 +8613,7 @@ msgstr "登录来源"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:174
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:177
 msgid "Command amount"
 msgstr "命令数量"
 
@@ -10343,11 +10338,11 @@ msgstr "账号保护已开启，请根据提示完成以下操作"
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
 msgstr "请打开 MFA 验证器，输入 6 位动态码"
 
-#: users/utils.py:59
+#: users/utils.py:65
 msgid "Auth success"
 msgstr "认证成功"
 
-#: users/utils.py:60
+#: users/utils.py:66
 msgid "Redirecting to JumpServer Client"
 msgstr "重定向到 JumpServer 客户端"
 
@@ -11230,6 +11225,9 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
+
+#~ msgid "Change password"
+#~ msgstr "改密"
 
 #~ msgid ""
 #~ "When creating or modifying an account requires account push, this task is "

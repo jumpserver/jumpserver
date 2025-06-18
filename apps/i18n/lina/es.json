@@ -141,7 +141,7 @@
     "AssetACLCreate": "Crear reglas de inicio de sesión de activos",
     "AssetACLDetail": "detalles de las reglas de inicio de sesión de activos",
     "AssetACLUpdate": "Actualizar las reglas de inicio de sesión de activos",
-    "AssetACLs": "Inicio de sesión de activos",
+    "AssetACLs": "Conexión de activos",
     "AssetAccount": "Lista de cuentas",
     "AssetAccountDetail": "Detalles de la cuenta",
     "AssetAddress": "Activos (IP/nombre de host)",

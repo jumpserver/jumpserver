@@ -143,7 +143,7 @@
     "AssetACLCreate": "アセットログインルールを作成",
     "AssetACLDetail": "資産ログインルール詳細",
     "AssetACLUpdate": "資産ログインルールの更新",
-    "AssetACLs": "資産ログイン",
+    "AssetACLs": "資産接続",
     "AssetAccount": "アカウントリスト",
     "AssetAccountDetail": "アカウント詳細",
     "AssetAddress": "資産（IP/ホスト名）",

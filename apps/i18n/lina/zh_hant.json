@@ -143,7 +143,7 @@
     "AssetACLCreate": "創建資產登入規則",
     "AssetACLDetail": "資產登入規則詳情",
     "AssetACLUpdate": "更新資產登入規則",
-    "AssetACLs": "資產登入",
+    "AssetACLs": "資產連接",
     "AssetAccount": "帳號列表",
     "AssetAccountDetail": "帳號詳情",
     "AssetAddress": "資產（IP/主機名）",

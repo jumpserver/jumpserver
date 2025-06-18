@@ -141,7 +141,7 @@
     "AssetACLCreate": "创建资产登录规则",
     "AssetACLDetail": "资产登录规则详情",
     "AssetACLUpdate": "更新资产登录规则",
-    "AssetACLs": "资产登录",
+    "AssetACLs": "资产连接",
     "AssetAccount": "账号列表",
     "AssetAccountDetail": "账号详情",
     "AssetAddress": "资产（IP/主机名）",

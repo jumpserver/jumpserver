@@ -23,7 +23,6 @@
     "EndFileTransfer": "File transfer end",
     "ExceedTransferSize": "exceed max transfer size",
     "Expand": "Expand",
-    "ExpiredTime": "Expired",
     "FileListError": "Failed to get file list",
     "FileManagementExpired": "The current file management session has expired.",
     "FileUploadInterrupted": "File upload interrupted",
@@ -72,7 +71,6 @@
     "Theme": "Theme",
     "ThemeColors": "Theme Colors",
     "ThemeConfig": "Theme",
-    "ThemeSyncSuccessful": "Theme sync successful",
     "TransferHistory": "Transfer history",
     "Type": "Type",
     "UpArrow": "Up arrow",
@@ -84,6 +82,7 @@
     "UploadTips": "Drag file here or click to upload",
     "UploadTitle": "File upload",
     "User": "User",
+    "VerifyCode": "Verify Code",
     "WaitFileTransfer": "Wait file transfer to finish",
     "Warning": "Warning",
     "WebSocketClosed": "WebSocket closed"
