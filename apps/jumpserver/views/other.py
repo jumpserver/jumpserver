@@ -35,9 +35,9 @@ class I18NView(View):
         referer_url = request.META.get('HTTP_REFERER', '/')
         response = HttpResponseRedirect(referer_url)
         expires = timezone.now() + timezone.timedelta(days=365)
-        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)
 
         if request.user.is_authenticated:
+            response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)
             request.user.lang = lang
         return response
 
