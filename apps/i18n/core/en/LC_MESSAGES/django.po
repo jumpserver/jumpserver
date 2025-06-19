@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-18 14:56+0800\n"
+"POT-Creation-Date: 2025-06-19 20:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,6 +101,10 @@ msgstr ""
 #: accounts/automations/change_secret/manager.py:72
 #, python-format
 msgid "Success: %s, Failed: %s, Total: %s"
+msgstr ""
+
+#: accounts/automations/check_account/manager.py:267
+msgid "Check account report of {}"
 msgstr ""
 
 #: accounts/automations/check_account/manager.py:273
@@ -3298,7 +3302,7 @@ msgstr ""
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:65
-#: terminal/serializers/session.py:178
+#: terminal/serializers/session.py:180
 msgid "Terminal"
 msgstr ""
 
@@ -3635,7 +3639,7 @@ msgstr ""
 msgid "No available face feature"
 msgstr ""
 
-#: authentication/api/face.py:100 authentication/mfa/face.py:22
+#: authentication/api/face.py:99 authentication/mfa/face.py:22
 #: authentication/mfa/face.py:24 users/views/profile/face.py:72
 msgid "Facial comparison failed"
 msgstr ""
@@ -4630,21 +4634,21 @@ msgstr ""
 msgid "User email already exists ({})"
 msgstr ""
 
-#: authentication/views/login.py:314
+#: authentication/views/login.py:327
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
 msgstr ""
 
-#: authentication/views/login.py:319
+#: authentication/views/login.py:332
 msgid "No ticket found"
 msgstr ""
 
-#: authentication/views/login.py:355
+#: authentication/views/login.py:368
 msgid "Logout success"
 msgstr ""
 
-#: authentication/views/login.py:356
+#: authentication/views/login.py:369
 msgid "Logout success, return login page"
 msgstr ""
 
@@ -5657,26 +5661,26 @@ msgstr ""
 msgid "Server performance"
 msgstr ""
 
-#: ops/notifications.py:26
+#: ops/notifications.py:27
 msgid "Component health check warning"
 msgstr ""
 
-#: ops/notifications.py:71
+#: ops/notifications.py:80
 #, python-brace-format
 msgid "The component is offline: {name}"
 msgstr ""
 
-#: ops/notifications.py:76
+#: ops/notifications.py:85
 #, python-brace-format
 msgid "Disk used more than {max_threshold}%: => {value}"
 msgstr ""
 
-#: ops/notifications.py:81
+#: ops/notifications.py:90
 #, python-brace-format
 msgid "Memory used more than {max_threshold}%: => {value}"
 msgstr ""
 
-#: ops/notifications.py:86
+#: ops/notifications.py:95
 #, python-brace-format
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr ""
@@ -8439,7 +8443,7 @@ msgstr ""
 msgid "Replay"
 msgstr ""
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:177
+#: terminal/models/session/session.py:50 terminal/serializers/session.py:179
 msgid "Command amount"
 msgstr ""
 
