@@ -693,6 +693,7 @@
     "InputEmailAddress": "請輸入正確的信箱地址",
     "InputMessage": "輸入消息...",
     "InputPhone": "請輸入手機號碼",
+    "Insert": "插入",
     "InstanceAddress": "實例地址",
     "InstanceName": "實例名稱",
     "InstanceNamePartIp": "實例名稱和部分IP",
@@ -1562,6 +1563,5 @@
     "removeWarningMsg": "你確定要移除",
     "setVariable": "設置參數",
     "userId": "用戶ID",
-    "userName": "用戶名",
-     "Insert": "插入"
+    "userName": "用戶名"
 }

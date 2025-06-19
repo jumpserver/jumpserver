@@ -1,4 +1,5 @@
 {
+    "AlreadyExistsPleaseRename": "파일이 이미 존재합니다, 이름을 변경해 주세요",
     "Cancel": "취소",
     "CancelFileUpload": "파일 업로드 취소",
     "Clone Connect": "복사 창",
@@ -10,6 +11,8 @@
     "Connect": "연결",
     "CopyLink": "링크 및 인증 코드 복사",
     "CopyShareURLSuccess": "공유 주소 복사 성공",
+    "CreateFolder": "폴더 생성",
+    "CreateLink": "공유 링크 생성",
     "CreateSuccess": "생성이 성공적으로 완료되었습니다",
     "CurrentUser": "현재 사용자",
     "Custom Setting": "사용자 정의 설정",
@@ -23,6 +26,7 @@
     "EndFileTransfer": "파일 전송 종료",
     "ExceedTransferSize": "최대 전송 크기를 초과했습니다",
     "Expand": "펼치기",
+    "FileAlreadyExists": "파일이 이미 존재합니다",
     "FileListError": "파일 목록 정보 가져오기 실패",
     "FileManagementExpired": "현재 파일 관리 세션이 만료되었습니다.",
     "FileUploadInterrupted": "파일 업로드 중단",
@@ -37,6 +41,8 @@
     "LeaveShare": "공유 종료",
     "LeftArrow": "뒤로 화살표",
     "List": "목록",
+    "Minute": "분",
+    "Minutes": "분",
     "MustOneFile": "하나의 파일만 선택할 수 있습니다",
     "MustSelectOneFile": "파일 하나를 선택해야 합니다",
     "Name": "이름",
@@ -50,6 +56,7 @@
     "PermissionExpired": "권한이 만료되었습니다",
     "PermissionValid": "권한 유효",
     "PleaseInput": "입력해 주세요.",
+    "ReadOnly": "읽기 전용",
     "Reconnect": "재연결",
     "Refresh": "새로 고침",
     "Remove": "제거",
@@ -63,6 +70,7 @@
     "Self": "나",
     "Settings": "설정",
     "Share": "공유",
+    "ShareUser": "공유 사용자",
     "ShareUserHelpText": "사용자가 선택되지 않았습니다, 모든 사람이 참여할 수 있습니다",
     "Size": "크기",
     "Sync": "동기화",
@@ -85,5 +93,6 @@
     "VerifyCode": "인증 코드",
     "WaitFileTransfer": "파일 전송 완료 대기",
     "Warning": "경고",
-    "WebSocketClosed": "WebSocket이 닫혔습니다"
+    "WebSocketClosed": "WebSocket이 닫혔습니다",
+    "Writable": "작성 가능"
 }

@@ -689,6 +689,7 @@
     "InputEmailAddress": "Please enter the correct email address",
     "InputMessage": "Enter message...",
     "InputPhone": "Phone number",
+    "Insert": "Insert",
     "InstanceAddress": "Instance address",
     "InstanceName": "Instance name",
     "InstanceNamePartIp": "Instance name and partial IP",
@@ -1552,6 +1553,5 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name",
-    "Insert": "Insert"
+    "userName": "User name"
 }

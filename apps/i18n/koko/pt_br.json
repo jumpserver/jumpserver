@@ -1,4 +1,5 @@
 {
+    "AlreadyExistsPleaseRename": "o arquivo já existe, por favor renomeie",
     "Cancel": "Cancelar",
     "CancelFileUpload": "Cancelar upload de arquivo",
     "Clone Connect": "Copiar janela",
@@ -10,6 +11,8 @@
     "Connect": "Conectar",
     "CopyLink": "Copiar link e código",
     "CopyShareURLSuccess": "Cópia de endereço compartilhado bem sucedida",
+    "CreateFolder": "criar pasta",
+    "CreateLink": "criar link de compartilhamento",
     "CreateSuccess": "Criado com sucesso",
     "CurrentUser": "Usuário atual",
     "Custom Setting": "Configurações personalizadas",
@@ -23,6 +26,7 @@
     "EndFileTransfer": "Transferência de arquivo concluída",
     "ExceedTransferSize": "Excede o tamanho máximo de transferência",
     "Expand": "Expandir",
+    "FileAlreadyExists": "arquivo já existe",
     "FileListError": "Falha ao obter informações da lista de arquivos",
     "FileManagementExpired": "A sessão atual de gerenciamento de arquivos expirou.",
     "FileUploadInterrupted": "Upload de arquivo interrompido",
@@ -37,6 +41,8 @@
     "LeaveShare": "Sair do compartilhamento",
     "LeftArrow": "Seta para trás",
     "List": "Lista",
+    "Minute": "minutos",
+    "Minutes": "minutos",
     "MustOneFile": "Só pode escolher um arquivo",
     "MustSelectOneFile": "É necessário selecionar um arquivo",
     "Name": "Nome",
@@ -50,6 +56,7 @@
     "PermissionExpired": "Permissão expirada",
     "PermissionValid": "Permissão válida",
     "PleaseInput": "Por favor, insira.",
+    "ReadOnly": "somente leitura",
     "Reconnect": "Reconectar",
     "Refresh": "Atualizar",
     "Remove": "Remover",
@@ -63,6 +70,7 @@
     "Self": "Eu",
     "Settings": "Configurações",
     "Share": "Compartilhar",
+    "ShareUser": "usuários de compartilhamento",
     "ShareUserHelpText": "Sem usuário selecionado, permitindo que todos se juntem",
     "Size": "Tamanho",
     "Sync": "Sincronizar",
@@ -85,5 +93,6 @@
     "VerifyCode": "código de verificação",
     "WaitFileTransfer": "Aguarde o fim da transferência do arquivo",
     "Warning": "Aviso",
-    "WebSocketClosed": "WebSocket foi fechado"
+    "WebSocketClosed": "WebSocket foi fechado",
+    "Writable": "pode escrever"
 }
