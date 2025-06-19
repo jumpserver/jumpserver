@@ -264,7 +264,7 @@ class CheckAccountManager(BaseManager):
             handler.clean()
 
     def get_report_subject(self):
-        return "Check account report of %s" % self.execution.id
+        return _("Check account report of {}").format(self.execution.id)
 
     def get_report_template(self):
         return "accounts/check_account_report.html"
