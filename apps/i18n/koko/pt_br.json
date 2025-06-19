@@ -1,4 +1,5 @@
 {
+    "ActionPerm": "Permissão de Ação",
     "AlreadyExistsPleaseRename": "o arquivo já existe, por favor renomeie",
     "Cancel": "Cancelar",
     "CancelFileUpload": "Cancelar upload de arquivo",
@@ -26,6 +27,7 @@
     "EndFileTransfer": "Transferência de arquivo concluída",
     "ExceedTransferSize": "Excede o tamanho máximo de transferência",
     "Expand": "Expandir",
+    "ExpiredTime": "Prazo de validade",
     "FileAlreadyExists": "arquivo já existe",
     "FileListError": "Falha ao obter informações da lista de arquivos",
     "FileManagementExpired": "A sessão atual de gerenciamento de arquivos expirou.",

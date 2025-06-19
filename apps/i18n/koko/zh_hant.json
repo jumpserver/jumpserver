@@ -1,4 +1,5 @@
 {
+    "ActionPerm": "操作權限",
     "AlreadyExistsPleaseRename": "檔案已存在，請重新命名",
     "Cancel": "取消",
     "CancelFileUpload": "取消文件上傳",
@@ -26,6 +27,7 @@
     "EndFileTransfer": "文件傳輸結束",
     "ExceedTransferSize": "超過最大傳輸大小",
     "Expand": "展開",
+    "ExpiredTime": "有效期限",
     "FileAlreadyExists": "檔案已存在",
     "FileListError": "獲取文件列表資訊失敗",
     "FileManagementExpired": "當前文件管理會話已過期。",
