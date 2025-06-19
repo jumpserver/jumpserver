@@ -1,4 +1,5 @@
 {
+    "ActionPerm": "操作権限",
     "AlreadyExistsPleaseRename": "ファイルは既に存在します。名前を変更してください",
     "Cancel": "キャンセル",
     "CancelFileUpload": "ファイルアップロードをキャンセルする",
@@ -26,6 +27,7 @@
     "EndFileTransfer": "ファイル転送終了",
     "ExceedTransferSize": "最大転送サイズを超えています",
     "Expand": "展開",
+    "ExpiredTime": "有効期限",
     "FileAlreadyExists": "ファイルは既に存在します",
     "FileListError": "ファイルリスト情報の取得に失敗しました",
     "FileManagementExpired": "現在のファイル管理セッションは期限切れです。",

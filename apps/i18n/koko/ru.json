@@ -1,4 +1,5 @@
 {
+    "ActionPerm": "Права доступа",
     "AlreadyExistsPleaseRename": "Создать папку",
     "Cancel": "Отмена",
     "CancelFileUpload": "Отменить передачу файла",
@@ -26,6 +27,7 @@
     "EndFileTransfer": "Передача файла завершена",
     "ExceedTransferSize": "Превышен максимальный размер передачи",
     "Expand": "Развернуть",
+    "ExpiredTime": "Срок действия",
     "FileAlreadyExists": "Только для чтения",
     "FileListError": "Не удалось получить информацию о списке файлов",
     "FileManagementExpired": "Текущая сессия управления файлами истекла.",

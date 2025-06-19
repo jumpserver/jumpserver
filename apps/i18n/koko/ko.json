@@ -1,4 +1,5 @@
 {
+    "ActionPerm": "작업 권한",
     "AlreadyExistsPleaseRename": "파일이 이미 존재합니다, 이름을 변경해 주세요",
     "Cancel": "취소",
     "CancelFileUpload": "파일 업로드 취소",
@@ -26,6 +27,7 @@
     "EndFileTransfer": "파일 전송 종료",
     "ExceedTransferSize": "최대 전송 크기를 초과했습니다",
     "Expand": "펼치기",
+    "ExpiredTime": "유효 기간",
     "FileAlreadyExists": "파일이 이미 존재합니다",
     "FileListError": "파일 목록 정보 가져오기 실패",
     "FileManagementExpired": "현재 파일 관리 세션이 만료되었습니다.",
