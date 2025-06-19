@@ -55,7 +55,7 @@ def get_redirect_client_url(request):
     data = {
         'type': 'cookie',
         'cookie': {
-            session_key: request.COOKIES.get(session_key),
+            session_key: request.session.session_key,
             csrf_key: request.COOKIES.get(csrf_key),
         }
     }
