@@ -234,7 +234,7 @@ class AutomationExecutionFilterSet(DaysExecutionFilterMixin, BaseFilterSet):
 
     class Meta:
         model = AutomationExecution
-        fields = ["days", 'trigger', 'automation_id', 'automation__name']
+        fields = ["days", 'trigger', 'automation__name']
 
 
 class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterSet):
