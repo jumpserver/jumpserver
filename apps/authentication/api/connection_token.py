@@ -369,7 +369,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             'terminal_theme_name': 'Default',
         }
         preferences_query = Preference.objects.filter(
-            user=user, category='koko', name__in=default_name_opts.keys()
+            user=user, category='luna', name__in=default_name_opts.keys()
         ).values_list('name', 'value')
         preferences = dict(preferences_query)
         for name in default_name_opts.keys():
