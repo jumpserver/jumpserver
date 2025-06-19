@@ -1,4 +1,5 @@
 {
+    "AlreadyExistsPleaseRename": "Создать папку",
     "Cancel": "Отмена",
     "CancelFileUpload": "Отменить передачу файла",
     "Clone Connect": "Клонировать окно",
@@ -10,6 +11,8 @@
     "Connect": "Подключение",
     "CopyLink": "Скопировать ссылку и код подтверждения",
     "CopyShareURLSuccess": "URL общего доступа успешно скопирован",
+    "CreateFolder": "Пользователи для分享",
+    "CreateLink": "Файл уже существует",
     "CreateSuccess": "Успешно создано",
     "CurrentUser": "Текущий пользователь",
     "Custom Setting": "Пользовательские настройки",
@@ -23,6 +26,7 @@
     "EndFileTransfer": "Передача файла завершена",
     "ExceedTransferSize": "Превышен максимальный размер передачи",
     "Expand": "Развернуть",
+    "FileAlreadyExists": "Только для чтения",
     "FileListError": "Не удалось получить информацию о списке файлов",
     "FileManagementExpired": "Текущая сессия управления файлами истекла.",
     "FileUploadInterrupted": "Передача файла прервана",
@@ -37,6 +41,8 @@
     "LeaveShare": "Покинуть общую сессию",
     "LeftArrow": "Стрелка влево",
     "List": "Список",
+    "Minute": "Минуты",
+    "Minutes": "Файл уже существует, пожалуйста, переименуйте",
     "MustOneFile": "Можно выбрать только один файл",
     "MustSelectOneFile": "Необходимо выбрать файл",
     "Name": "Название",
@@ -50,6 +56,7 @@
     "PermissionExpired": "Разрешение истекло",
     "PermissionValid": "Доступ разрешен",
     "PleaseInput": "Пожалуйста, введите",
+    "ReadOnly": "Минуты",
     "Reconnect": "Переподключение",
     "Refresh": "Обновить",
     "Remove": "Удалить",
@@ -63,6 +70,7 @@
     "Self": "Я",
     "Settings": "Настройки",
     "Share": "Поделиться",
+    "ShareUser": "Поделиться пользователем",
     "ShareUserHelpText": "Пустое поле означает, что присоединиться может каждый желающий.",
     "Size": "Размер",
     "Sync": "Синхронизация",
@@ -85,5 +93,6 @@
     "VerifyCode": "Код подтверждения",
     "WaitFileTransfer": "Ожидание завершения передачи файла",
     "Warning": "Предупреждение",
-    "WebSocketClosed": "WebSocket закрыт"
+    "WebSocketClosed": "WebSocket закрыт",
+    "Writable": "Создать ссылку для分享"
 }

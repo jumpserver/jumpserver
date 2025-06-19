@@ -688,6 +688,7 @@
     "InputEmailAddress": "请输入正确的邮箱地址",
     "InputMessage": "输入消息...",
     "InputPhone": "请输入手机号码",
+    "Insert": "插入",
     "InstanceAddress": "实例地址",
     "InstanceName": "实例名称",
     "InstanceNamePartIp": "实例名称和部分IP",
@@ -1557,6 +1558,5 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名",
-    "Insert": "插入"
+    "userName": "用户名"
 }

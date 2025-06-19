@@ -1,4 +1,5 @@
 {
+    "AlreadyExistsPleaseRename": "El archivo ya existe, por favor renombrar",
     "Cancel": "Cancelar",
     "CancelFileUpload": "Cancelar la subida del archivo",
     "Clone Connect": "Copiar ventana",
@@ -10,6 +11,8 @@
     "Connect": "Conectar",
     "CopyLink": "Copiar enlace y código de verificación",
     "CopyShareURLSuccess": "Dirección de compartición copiada con éxito",
+    "CreateFolder": "Crear carpeta",
+    "CreateLink": "Crear enlace para compartir",
     "CreateSuccess": "Creación exitosa",
     "CurrentUser": "Usuario actual",
     "Custom Setting": "Ajustes personalizados",
@@ -23,6 +26,7 @@
     "EndFileTransfer": "Transferencia de archivos finalizada",
     "ExceedTransferSize": "Superado el tamaño máximo de transferencia",
     "Expand": "Expandir",
+    "FileAlreadyExists": "El archivo ya existe",
     "FileListError": "No se pudo obtener la información de la lista de archivos",
     "FileManagementExpired": "La sesión actual de gestión de archivos ha expirado.",
     "FileUploadInterrupted": "La subida del archivo se ha interrumpido",
@@ -37,6 +41,8 @@
     "LeaveShare": "Salir de compartir",
     "LeftArrow": "Flecha hacia atrás",
     "List": "Lista",
+    "Minute": "Minutos",
+    "Minutes": "Parte",
     "MustOneFile": "Solo se puede seleccionar un archivo",
     "MustSelectOneFile": "Debe seleccionar un archivo",
     "Name": "Nombre",
@@ -50,6 +56,7 @@
     "PermissionExpired": "Los permisos han expirado",
     "PermissionValid": "Permisos válidos",
     "PleaseInput": "Por favor, ingrese.",
+    "ReadOnly": "Solo lectura",
     "Reconnect": "Reconectar",
     "Refresh": "Refrescar",
     "Remove": "Eliminar",
@@ -63,6 +70,7 @@
     "Self": "Yo",
     "Settings": "Ajustes",
     "Share": "Compartir",
+    "ShareUser": "Compartir usuario",
     "ShareUserHelpText": "No se ha seleccionado un usuario, lo que permite la entrada de todos",
     "Size": "Tamaño",
     "Sync": "Sincronizar",
@@ -85,5 +93,6 @@
     "VerifyCode": "Código de verificación.",
     "WaitFileTransfer": "Esperando que finalice la transferencia de archivos",
     "Warning": "Advertencia",
-    "WebSocketClosed": "WebSocket cerrado"
+    "WebSocketClosed": "WebSocket cerrado",
+    "Writable": "Se puede escribir"
 }

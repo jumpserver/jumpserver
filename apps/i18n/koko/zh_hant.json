@@ -1,4 +1,5 @@
 {
+    "AlreadyExistsPleaseRename": "檔案已存在，請重新命名",
     "Cancel": "取消",
     "CancelFileUpload": "取消文件上傳",
     "Clone Connect": "複製視窗",
@@ -10,6 +11,8 @@
     "Connect": "連接",
     "CopyLink": "複製連結及驗證碼",
     "CopyShareURLSuccess": "複製分享地址成功",
+    "CreateFolder": "創建資料夾",
+    "CreateLink": "創建分享鏈接",
     "CreateSuccess": "創建成功",
     "CurrentUser": "當前用戶",
     "Custom Setting": "自訂設定",
@@ -23,6 +26,7 @@
     "EndFileTransfer": "文件傳輸結束",
     "ExceedTransferSize": "超過最大傳輸大小",
     "Expand": "展開",
+    "FileAlreadyExists": "檔案已存在",
     "FileListError": "獲取文件列表資訊失敗",
     "FileManagementExpired": "當前文件管理會話已過期。",
     "FileUploadInterrupted": "文件上傳中斷",
@@ -37,6 +41,8 @@
     "LeaveShare": "離開共享",
     "LeftArrow": "後退箭頭",
     "List": "列表",
+    "Minute": "分鐘",
+    "Minutes": "分",
     "MustOneFile": "只能選擇一個文件",
     "MustSelectOneFile": "必須選擇一個文件",
     "Name": "名稱",
@@ -50,6 +56,7 @@
     "PermissionExpired": "權限已過期",
     "PermissionValid": "權限有效",
     "PleaseInput": "請輸入",
+    "ReadOnly": "只讀",
     "Reconnect": "重新連線",
     "Refresh": "刷新",
     "Remove": "移除",
@@ -63,6 +70,7 @@
     "Self": "我",
     "Settings": "設置",
     "Share": "分享",
+    "ShareUser": "分享用戶",
     "ShareUserHelpText": "未選擇用戶，即允許所有人加入",
     "Size": "大小",
     "Sync": "同步",
@@ -85,5 +93,6 @@
     "VerifyCode": "驗證碼",
     "WaitFileTransfer": "等待文件傳輸結束",
     "Warning": "警告",
-    "WebSocketClosed": "WebSocket 已關閉"
+    "WebSocketClosed": "WebSocket 已關閉",
+    "Writable": "可寫"
 }
