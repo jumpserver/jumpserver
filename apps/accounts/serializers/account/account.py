@@ -246,6 +246,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'source', 'source_id', 'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields
+        fields = [f for f in fields if f not in ['spec_info']]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False},
@@ -268,7 +269,7 @@ class AccountDetailSerializer(AccountSerializer):
 
     class Meta(AccountSerializer.Meta):
         model = Account
-        fields = AccountSerializer.Meta.fields + ['has_secret']
+        fields = AccountSerializer.Meta.fields + ['has_secret', 'spec_info']
         read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
 
 

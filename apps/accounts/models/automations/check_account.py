@@ -128,7 +128,7 @@ class CheckAccountEngine(JMSBaseModel):
                 "name": _("Check the discovered accounts"),
                 "comment": _(
                     "Perform checks and analyses based on automatically discovered account results, "
-                    "including user groups, public keys, sudoers, and other information"
+                    "including user groups, public keys, sudoers, and other information."
                 )
             },
             {
@@ -144,13 +144,13 @@ class CheckAccountEngine(JMSBaseModel):
                 "id": "00000000-0000-0000-0000-000000000003",
                 "slug": "check_account_repeat",
                 "name": _("Check if the account and password are repeated"),
-                "comment": _("Check if the account is the same as other accounts")
+                "comment": _("Check if the account is the same as other accounts.")
             },
             {
                 "id": "00000000-0000-0000-0000-000000000004",
                 "slug": "check_account_leak",
                 "name": _("Check whether the account password is a common password"),
-                "comment": _("Check whether the account password is a commonly leaked password")
+                "comment": _("Check whether the account password is a commonly leaked password.")
             },
         ]
         return data

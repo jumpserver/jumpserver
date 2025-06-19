@@ -8,6 +8,7 @@
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
         ansible_ssh_private_key_file: "{{ account.private_key_path }}"
+        ansible_timeout: 30
       when: not account.become.ansible_become
 
     - name: Verify account connectivity(Switch)
@@ -20,4 +21,5 @@
         ansible_become_method: "{{ account.become.ansible_become_method }}"
         ansible_become_user: "{{ account.become.ansible_become_user }}"
         ansible_become_password: "{{ account.become.ansible_become_password }}"
+        ansible_timeout: 30
       when: account.become.ansible_become

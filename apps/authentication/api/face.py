@@ -1,20 +1,19 @@
 from django.core.cache import cache
 from django.utils.translation import gettext as _
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-from rest_framework.permissions import AllowAny
-from rest_framework.exceptions import NotFound
 
 from common.permissions import IsServiceAccount
 from common.utils import get_logger, get_object_or_none
 from orgs.utils import tmp_to_root_org
 from terminal.api.session.task import create_sessions_tasks
 from users.models import User
-
 from .. import serializers
-from ..mixins import AuthMixin
 from ..const import FACE_CONTEXT_CACHE_KEY_PREFIX, FACE_SESSION_KEY, FACE_CONTEXT_CACHE_TTL, FaceMonitorActionChoices
+from ..mixins import AuthMixin
 from ..models import ConnectionToken
 from ..serializers.face import FaceMonitorCallbackSerializer, FaceMonitorContextSerializer
 
@@ -93,7 +92,7 @@ class FaceCallbackApi(AuthMixin, CreateAPIView):
                     connection_token_id = context.get('connection_token_id')
                     token = ConnectionToken.objects.filter(id=connection_token_id).first()
                     token.is_active = True
-                    token.save()
+                    token.save(update_fields=['is_active'])
             else:
                 context.update({
                     'success': False,

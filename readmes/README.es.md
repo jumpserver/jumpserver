@@ -9,19 +9,19 @@
 
 ## ¿Qué es JumpServer?
 
-JumpServer es una herramienta de Gestión de Acceso Privilegiado (PAM) de código abierto que proporciona a los equipos de DevOps e IT acceso seguro y bajo demanda a SSH, RDP, Kubernetes, bases de datos y puntos finales de RemoteApp a través de un navegador web.
+JumpServer es una herramienta de Gestión de Acceso Privilegiado (PAM) de código abierto que proporciona a los equipos de DevOps y TI acceso bajo demanda y seguro a puntos finales de SSH, RDP, Kubernetes, bases de datos y RemoteApp a través de un navegador web.
 
 
 <picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/dd612f3d-c958-4f84-b164-f31b75454d7f">
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/28676212-2bc4-4a9f-ae10-3be9320647e3">
+  <source media="(prefers-color-scheme: light)" srcset="https://www.jumpserver.com/images/jumpserver-arch-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.jumpserver.com/images/jumpserver-arch-dark.png">
   <img src="https://github.com/user-attachments/assets/dd612f3d-c958-4f84-b164-f31b75454d7f" alt="Imagen basada en el tema">
 </picture>
 
 
-## Inicio Rápido
+## Inicio rápido
 
-Prepara un Servidor Linux limpio ( 64 bits, >= 4c8g )
+Prepara un servidor Linux limpio ( 64 bits, >= 4c8g )
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
@@ -31,9 +31,9 @@ Accede a JumpServer en tu navegador en `http://your-jumpserver-ip/`
 - Nombre de usuario: `admin`
 - Contraseña: `ChangeMe`
 
-[![JumpServer Inicio Rápido](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Inicio Rápido")
+[![JumpServer Quickstart](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
 
-## Capturas de Pantalla
+## Capturas de pantalla
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/99fabe5b-0475-4a53-9116-4c370a1426c4" alt="Consola JumpServer"   /></td>
@@ -63,22 +63,22 @@ JumpServer consta de múltiples componentes clave, que en conjunto forman el mar
 
 | Proyecto                                                | Estado                                                                                                                                                                 | Descripción                                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lanzamiento de Lina" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | Interfaz Web de JumpServer                                                                                       |
-| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Lanzamiento de Luna" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | Terminal Web de JumpServer                                                                                 |
-| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Lanzamiento de Koko" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | Conector de Protocolo de Carácter de JumpServer                                                                 |
-| [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lanzamiento de Lion" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | Conector de Protocolo Gráfico de JumpServer                                                                 |
-| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Lanzamiento de Chen" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | Base de Datos Web de JumpServer                                                                                       |  
-| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Conector de Aplicación Remota de JumpServer (Windows)                                                    |
-| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | Conector de Aplicación Remota EE de JumpServer (Linux)                                                      |
-| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | Conector Proxy RDP EE de JumpServer                                                                       |
-| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Conector Proxy de Base de Datos EE de JumpServer                                                                  |
-| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | Conector Proxy VNC EE de JumpServer                                                                       |
-| [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | Reconocimiento Facial EE de JumpServer                                                                        |
+| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lanzamiento Lina" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | Interfaz web de JumpServer                                                                                       |
+| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Lanzamiento Luna" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | Terminal web de JumpServer                                                                                 |
+| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Lanzamiento Koko" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | Conector de Protocolo de Caracteres de JumpServer                                                                 |
+| [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lanzamiento Lion" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | Conector de Protocolo Gráfico de JumpServer                                                                 |
+| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Lanzamiento Chen" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | DB web de JumpServer                                                                                       |  
+| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Conector de Aplicación Remota JumpServer (Windows)                                                    |
+| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | Conector de Aplicación Remota EE JumpServer (Linux)                                                      |
+| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | Conector Proxy RDP EE JumpServer                                                                       |
+| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Conector Proxy de Base de Datos EE JumpServer                                                                  |
+| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                                   | Conector Proxy VNC EE JumpServer                                                                       |
+| [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | Reconocimiento Facial EE JumpServer                                                                        |
 
 
-## Contribuyendo
+## Contribuciones
 
-Bienvenido a enviar PR para contribuir. Por favor, consulta [CONTRIBUTING.md][contributing-link] para las pautas.
+Bienvenido a enviar PR para contribuir. Por favor, consulta [CONTRIBUTING.md][contributing-link] para obtener pautas.
 
 ## License
 
@@ -93,6 +93,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 <!-- JumpServer official link -->
 [docs-link]: https://jumpserver.com/docs
 [discord-link]: https://discord.com/invite/W6vYXmAQG2
+[deepwiki-link]: https://deepwiki.com/jumpserver/jumpserver/
 [contributing-link]: https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md
 
 <!-- JumpServer Other link-->
@@ -103,8 +104,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
 
 <!-- Shield link-->
+[docs-shield]: https://img.shields.io/badge/documentation-148F76
 [github-release-shield]: https://img.shields.io/github/v/release/jumpserver/jumpserver
-[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square
+[github-stars-shield]: https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square   
 [docker-shield]: https://img.shields.io/docker/pulls/jumpserver/jms_all.svg
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
+[deepwiki-shield]: https://img.shields.io/badge/deepwiki-devin?color=blue
 [discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb

@@ -5,9 +5,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.automations.methods import platform_automation_methods
-from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice
+from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
+    ChangeSecretAccountStatus
 from accounts.models import BaseAccountQuerySet
-from accounts.utils import SecretGenerator
+from accounts.utils import SecretGenerator, account_secret_task_status
 from assets.automations.base.manager import BasePlaybookManager
 from assets.const import HostTypes
 from common.db.utils import safe_atomic_db_connection
@@ -36,7 +37,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         self.account_ids = self.execution.snapshot['accounts']
         self.record_map = self.execution.snapshot.get('record_map', {})  # 这个是某个失败的记录重试
-        self.name_recorder_mapper = {}  # 做个映射，方便后面处理
+        self.name_record_mapper = {}  # 做个映射，方便后面处理
 
     def gen_account_inventory(self, account, asset, h, path_dir):
         raise NotImplementedError
@@ -112,10 +113,15 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        host['check_conn_after_change'] = self.execution.snapshot.get('check_conn_after_change', True)
         host['ssh_params'] = {}
 
         accounts = self.get_accounts(account)
+        existing_ids = set(map(str, accounts.values_list('id', flat=True)))
+        missing_ids = set(map(str, self.account_ids)) - existing_ids
+
+        for account_id in missing_ids:
+            self.clear_account_queue_status(account_id)
+
         error_msg = _("No pending accounts found")
         if not accounts:
             print(f'{asset}: {error_msg}')
@@ -132,31 +138,50 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'  # To distinguish different accounts
+
+            account_status = account_secret_task_status.get_status(account.id)
+            if account_status == ChangeSecretAccountStatus.PROCESSING:
+                h['error'] = f'Account is already being processed, skipping: {account}'
+                inventory_hosts.append(h)
+                continue
+
             try:
-                h = self.gen_account_inventory(account, asset, h, path_dir)
+                h, record = self.gen_account_inventory(account, asset, h, path_dir)
+                h['check_conn_after_change'] = record.execution.snapshot.get('check_conn_after_change', True)
+                account_secret_task_status.set_status(
+                    account.id,
+                    ChangeSecretAccountStatus.PROCESSING,
+                    metadata={'execution_id': self.execution.id}
+                )
             except Exception as e:
                 h['error'] = str(e)
+                self.clear_account_queue_status(account.id)
+
             inventory_hosts.append(h)
 
         return inventory_hosts
 
     @staticmethod
-    def save_record(recorder):
-        recorder.save(update_fields=['error', 'status', 'date_finished'])
+    def save_record(record):
+        record.save(update_fields=['error', 'status', 'date_finished'])
+
+    @staticmethod
+    def clear_account_queue_status(account_id):
+        account_secret_task_status.clear(account_id)
 
     def on_host_success(self, host, result):
-        recorder = self.name_recorder_mapper.get(host)
-        if not recorder:
+        record = self.name_record_mapper.get(host)
+        if not record:
             return
-        recorder.status = ChangeSecretRecordStatusChoice.success.value
-        recorder.date_finished = timezone.now()
+        record.status = ChangeSecretRecordStatusChoice.success.value
+        record.date_finished = timezone.now()
 
-        account = recorder.account
+        account = record.account
         if not account:
             print("Account not found, deleted ?")
             return
 
-        account.secret = getattr(recorder, 'new_secret', account.secret)
+        account.secret = getattr(record, 'new_secret', account.secret)
         account.date_updated = timezone.now()
         account.date_change_secret = timezone.now()
         account.change_secret_status = ChangeSecretRecordStatusChoice.success
@@ -172,16 +197,17 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         with safe_atomic_db_connection():
             account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
-            self.save_record(recorder)
+            self.save_record(record)
+            self.clear_account_queue_status(account.id)
 
     def on_host_error(self, host, error, result):
-        recorder = self.name_recorder_mapper.get(host)
-        if not recorder:
+        record = self.name_record_mapper.get(host)
+        if not record:
             return
-        recorder.status = ChangeSecretRecordStatusChoice.failed.value
-        recorder.date_finished = timezone.now()
-        recorder.error = error
-        account = recorder.account
+        record.status = ChangeSecretRecordStatusChoice.failed.value
+        record.date_finished = timezone.now()
+        record.error = error
+        account = record.account
         if not account:
             print("Account not found, deleted ?")
             return
@@ -192,12 +218,13 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.summary['fail_accounts'] += 1
         self.result['fail_accounts'].append(
             {
-                "asset": str(recorder.asset),
-                "username": recorder.account.username,
+                "asset": str(record.asset),
+                "username": record.account.username,
             }
         )
         super().on_host_error(host, error, result)
 
         with safe_atomic_db_connection():
             account.save(update_fields=['change_secret_status', 'date_change_secret', 'date_updated'])
-            self.save_record(recorder)
+            self.save_record(record)
+            self.clear_account_queue_status(account.id)

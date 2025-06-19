@@ -27,6 +27,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField()
     SECURITY_COMMAND_BLACKLIST = serializers.ListField()
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField()
+    SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS = serializers.IntegerField()
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField()
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField()
     SECURITY_WATERMARK_SESSION_CONTENT = serializers.CharField()
@@ -81,6 +82,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     USER_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     PRIVACY_MODE = serializers.BooleanField()
+    CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

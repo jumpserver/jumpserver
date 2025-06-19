@@ -103,11 +103,9 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
             self.request.session['auth_backend'] = settings.AUTH_BACKEND_SSO
             login(self.request, user, settings.AUTH_BACKEND_SSO)
             self.send_auth_signal(success=True, user=user)
-            self.mark_mfa_ok('otp', user)
 
             LoginIpBlockUtil(ip).clean_block_if_need()
             LoginBlockUtil(username, ip).clean_failed_count()
-            self.clear_auth_mark()
         except (ACLError, LoginConfirmBaseError):  # 无需记录日志
             pass
         except (AuthFailedError, SSOAuthKeyTTLError) as e:

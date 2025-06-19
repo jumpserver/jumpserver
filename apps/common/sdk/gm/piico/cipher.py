@@ -1,6 +1,7 @@
 cipher_alg_id = {
     "sm4_ebc": 0x00000401,
     "sm4_cbc": 0x00000402,
+    "sm4_mac": 0x00000405,
 }
 
 

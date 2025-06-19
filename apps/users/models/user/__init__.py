@@ -142,7 +142,7 @@ class User(
         null=True, default=None, max_length=128, verbose_name=_("Slack")
     )
     face_vector = fields.EncryptTextField(
-        null=True, blank=True, max_length=2048, verbose_name=_("Face Vector")
+        null=True, blank=True, max_length=2048, verbose_name=_("Face vector")
     )
     date_api_key_last_used = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Date api key used")
@@ -215,7 +215,7 @@ class User(
 
     @lang.setter
     def lang(self, value):
-        self.preference.set_value('lang', value)
+        self.preference.set_value('lang', value, 'lina')
 
     @property
     def preference(self):

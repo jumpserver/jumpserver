@@ -23,6 +23,11 @@ class SecurityPasswordRuleSerializer(serializers.Serializer):
             'automatic sent to the user by system within 5 days (daily) before the password expires'
         )
     )
+    SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS = serializers.IntegerField(
+        min_value=1, max_value=99999, required=True,
+        label=_('User expired tokens record keep days'),
+        help_text=_("Retention period (in days) for expired user tokens before automatic cleanup.")
+    )
     OLD_PASSWORD_HISTORY_LIMIT_COUNT = serializers.IntegerField(
         min_value=0, max_value=99999, required=True,
         label=_('Recent password count'),

@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 
+from .utils import get_full_resource_map
+
 router = DefaultRouter()
 
 BASE_URL = "http://localhost:8080"

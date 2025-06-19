@@ -30,28 +30,28 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         record = self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(account.secret_type, record.new_secret, path_dir)
         h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
-        return h
+        return h, record
 
     def get_or_create_record(self, asset, account, name):
         asset_account_id = f'{asset.id}-{account.id}'
 
         if asset_account_id in self.record_map:
             record_id = self.record_map[asset_account_id]
-            recorder = ChangeSecretRecord.objects.filter(id=record_id).first()
+            record = ChangeSecretRecord.objects.filter(id=record_id).first()
         else:
             new_secret = self.get_secret(account)
-            recorder = self.create_record(asset, account, new_secret)
+            record = self.create_record(asset, account, new_secret)
 
-        self.name_recorder_mapper[name] = recorder
-        return recorder
+        self.name_record_mapper[name] = record
+        return record
 
     def create_record(self, asset, account, new_secret):
-        recorder = ChangeSecretRecord(
+        record = ChangeSecretRecord(
             asset=asset, account=account, execution=self.execution,
             old_secret=account.secret, new_secret=new_secret,
             comment=f'{account.username}@{asset.address}'
         )
-        return recorder
+        return record
 
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
@@ -61,10 +61,10 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         return True
 
     @staticmethod
-    def get_summary(recorders):
+    def get_summary(records):
         total, succeed, failed = 0, 0, 0
-        for recorder in recorders:
-            if recorder.status == ChangeSecretRecordStatusChoice.success.value:
+        for record in records:
+            if record.status == ChangeSecretRecordStatusChoice.success.value:
                 succeed += 1
             else:
                 failed += 1
@@ -73,8 +73,8 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         return summary
 
     def print_summary(self):
-        recorders = list(self.name_recorder_mapper.values())
-        summary = self.get_summary(recorders)
+        records = list(self.name_record_mapper.values())
+        summary = self.get_summary(records)
         print('\n\n' + '-' * 80)
         plan_execution_end = _('Plan execution end')
         print('{} {}\n'.format(plan_execution_end, local_now_filename()))
@@ -86,7 +86,7 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         if self.secret_type and not self.check_secret():
             return
 
-        recorders = list(self.name_recorder_mapper.values())
+        records = list(self.name_record_mapper.values())
         if self.record_map:
             return
 
@@ -98,17 +98,17 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         for user in recipients:
             ChangeSecretReportMsg(user, context).publish()
 
-        if not recorders:
+        if not records:
             return
 
-        summary = self.get_summary(recorders)
-        self.send_recorder_mail(recipients, recorders, summary)
+        summary = self.get_summary(records)
+        self.send_record_mail(recipients, records, summary)
 
-    def send_recorder_mail(self, recipients, recorders, summary):
+    def send_record_mail(self, recipients, records, summary):
         name = self.execution.snapshot['name']
         path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
         filename = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.xlsx')
-        if not self.create_file(recorders, filename):
+        if not self.create_file(records, filename):
             return
 
         for user in recipients:
@@ -121,9 +121,9 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         os.remove(filename)
 
     @staticmethod
-    def create_file(recorders, filename):
+    def create_file(records, filename):
         serializer_cls = ChangeSecretRecordBackUpSerializer
-        serializer = serializer_cls(recorders, many=True)
+        serializer = serializer_cls(records, many=True)
 
         header = [str(v.label) for v in serializer.child.fields.values()]
         rows = [[str(i) for i in row.values()] for row in serializer.data]

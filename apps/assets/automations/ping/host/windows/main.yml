@@ -1,5 +1,7 @@
 - hosts: windows
   gather_facts: no
+  vars:
+    ansible_timeout: 30
   tasks:
     - name: Refresh connection
       ansible.builtin.meta: reset_connection

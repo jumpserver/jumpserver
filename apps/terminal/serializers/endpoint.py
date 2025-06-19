@@ -16,7 +16,7 @@ class EndpointSerializer(BulkModelSerializer):
         fields_small = [
             'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
             'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port', 'vnc_port',
-            'oracle_port', 'sqlserver_port', 'is_active'
+            'oracle_port', 'sqlserver_port', 'mongodb_port','is_active'
         ]
         fields = fields_mini + fields_small + [
             'comment', 'date_created', 'date_updated', 'created_by'

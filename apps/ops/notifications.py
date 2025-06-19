@@ -23,9 +23,18 @@ class ServerPerformanceMessage(SystemMessage):
         self.terms_with_errors = terms_with_errors
 
     def get_html_msg(self) -> dict:
+        terms_with_errors = []
         subject = gettext("Component health check warning")
+        for term, errors in self.terms_with_errors:
+            formatted_errors = []
+            for error in errors:
+                item, kwargs = error
+                # format 不能提前，否则会用系统默认语言翻译
+                msg = item.format(**kwargs)
+                formatted_errors.append(msg)
+            terms_with_errors.append((term, formatted_errors))
         context = {
-            'terms_with_errors': self.terms_with_errors
+            'terms_with_errors': terms_with_errors
         }
         message = render_to_string('ops/_msg_terminal_performance.html', context)
         return {
@@ -108,10 +117,10 @@ class ServerPerformanceCheckUtil(object):
     def check_terminal(self, term):
         errors = []
         for item, data in self.items_mapper.items():
-            error = self.check_item(term, item, data)
-            if not error:
+            result = self.check_item(term, item, data)
+            if not result:
                 continue
-            errors.append(error)
+            errors.append(result)
         return errors
 
     @staticmethod
@@ -125,8 +134,8 @@ class ServerPerformanceCheckUtil(object):
         elif isinstance(value, (int, float)) and value < max_threshold:
             return
         msg = data['alarm_msg_format']
-        error = msg.format(max_threshold=max_threshold, value=value, name=term.name)
-        return error
+        kwargs = {'name': term.name, 'value': value, 'max_threshold': max_threshold}
+        return msg, kwargs
 
     def publish(self):
         if not self.terms_with_errors:

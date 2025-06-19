@@ -12,6 +12,9 @@ def get_ip_city_by_ipip(ip):
     global ipip_db
     if ipip_db is None:
         ipip_db_path = os.path.join(os.path.dirname(__file__), 'ipipfree.ipdb')
+        if not os.path.exists(ipip_db_path):
+            raise FileNotFoundError(
+                f"IP database not found, please run `bash ./requirements/static_files.sh`")
         ipip_db = ipdb.City(ipip_db_path)
     try:
         info = ipip_db.find_info(ip, 'CN')

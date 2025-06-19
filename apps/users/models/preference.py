@@ -57,12 +57,13 @@ class PreferenceManager:
 
     def set(self, name, value, category=None, encrypted=False):
         query = {'name': name, 'user': self.user}
-        if category:
-            query['category'] = category
         if encrypted:
             value = Preference.encrypt(value)
+        defaults = {'value': value, 'encrypted': encrypted}
+        if category:
+            defaults['category'] = category
         preference, __ = Preference.objects.update_or_create(
-            defaults={'value': value, 'encrypted': encrypted},
+            defaults=defaults,
             **query
         )
         return preference

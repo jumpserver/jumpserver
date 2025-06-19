@@ -176,6 +176,11 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(BaseUserNodeWithAssetAsT
             return [], []
         if not self.tp or not all(self.tp):
             nodes = UserPermAssetUtil.get_type_nodes_tree_or_cached(self.user)
+            if self.request.query_params.get('count_resource'):
+                # 解决在 lina 使用该 api 类型树套娃问题
+                for node in nodes:
+                    if node.get('meta'):
+                        node['isParent'] = False
             return nodes, []
 
         category, tp = self.tp

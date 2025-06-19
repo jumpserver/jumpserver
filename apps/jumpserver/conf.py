@@ -565,6 +565,7 @@ class Config(dict):
         'TERMINAL_OMNIDB_ENABLED': True,
 
         # 安全配置
+        'SAFE_MODE': False,
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
@@ -577,6 +578,7 @@ class Config(dict):
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_MAX_SESSION_TIME': 24,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
+        'SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS': 180,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
         'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': 6,
         'SECURITY_PASSWORD_UPPER_CASE': False,
@@ -605,6 +607,7 @@ class Config(dict):
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
+        'CHANGE_SECRET_AFTER_SESSION_END': False,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
@@ -622,6 +625,7 @@ class Config(dict):
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+        'CELERY_WORKER_COUNT': 10,
 
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',

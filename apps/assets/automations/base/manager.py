@@ -22,6 +22,7 @@ from common.tasks import send_mail_async
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
 from ops.ansible.interface import interface
+from users.utils import activate_user_language
 
 logger = get_logger(__name__)
 
@@ -151,12 +152,13 @@ class BaseManager:
         if not recipients:
             return
         print(f"Send report to: {','.join([str(u) for u in recipients])}")
-
-        report = self.gen_report()
-        report = transform(report, cssutils_logging_level="CRITICAL")
-        subject = self.get_report_subject()
-        emails = [r.email for r in recipients if r.email]
-        send_mail_async(subject, report, emails, html_message=report)
+        for user in recipients:
+            with activate_user_language(user):
+                report = self.gen_report()
+                report = transform(report, cssutils_logging_level="CRITICAL")
+                subject = self.get_report_subject()
+                emails = [r.email for r in recipients if r.email]
+                send_mail_async(subject, report, emails, html_message=report)
 
     def gen_report(self):
         template_path = self.get_report_template()

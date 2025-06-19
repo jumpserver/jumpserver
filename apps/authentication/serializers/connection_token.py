@@ -75,6 +75,7 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
     def get_user(self, attrs):
         return attrs.get('user')
 
+
 class AdminConnectionTokenSerializer(ConnectionTokenSerializer):
     class Meta(ConnectionTokenSerializer.Meta):
         model = AdminConnectionToken

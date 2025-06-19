@@ -6,6 +6,7 @@ from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storag
 from notifications.notifications import UserMessage
 from terminal.models.component.storage import ReplayStorage
 from users.models import User
+from users.utils import activate_user_language
 
 
 class AccountBackupExecutionTaskMsg:
@@ -28,9 +29,10 @@ class AccountBackupExecutionTaskMsg:
                      ).format(name)
 
     def publish(self, attachment_list=None):
-        send_mail_attachment_async(
-            self.subject, self.message, [self.user.email], attachment_list
-        )
+        with activate_user_language(self.user):
+            send_mail_attachment_async(
+                self.subject, self.message, [self.user.email], attachment_list
+            )
 
 
 class AccountBackupByObjStorageExecutionTaskMsg:
@@ -74,9 +76,10 @@ class ChangeSecretExecutionTaskMsg:
         return self.summary + '\n' + default_message
 
     def publish(self, attachments=None):
-        send_mail_attachment_async(
-            self.subject, self.message, [self.user.email], attachments
-        )
+        with activate_user_language(self.user):
+            send_mail_attachment_async(
+                self.subject, self.message, [self.user.email], attachments
+            )
 
 
 class GatherAccountChangeMsg(UserMessage):

@@ -6,10 +6,12 @@ import logging
 import os
 import re
 import time
+from contextlib import contextmanager
 
 import pyotp
 from django.conf import settings
 from django.core.cache import cache
+from django.utils import translation
 from django.utils.translation import gettext as _
 
 from common.tasks import send_mail_async
@@ -48,11 +50,14 @@ def get_user_or_pre_auth_user(request):
 
 
 def get_redirect_client_url(request):
-    bearer_token, date_expired = request.user.create_bearer_token(request, age=3600*36*5)
+    session_key = settings.SESSION_COOKIE_NAME
+    csrf_key = settings.CSRF_COOKIE_NAME
     data = {
-        'type': 'auth',
-        'bearer_token': bearer_token,
-        'date_expired': date_expired.timestamp()
+        'type': 'cookie',
+        'cookie': {
+            session_key: request.session.session_key,
+            csrf_key: request.COOKIES.get(csrf_key),
+        }
     }
     buf = base64.b64encode(json.dumps(data).encode()).decode()
     redirect_url = 'jms://{}'.format(buf)
@@ -339,3 +344,10 @@ def is_confirm_time_valid(session, key):
 
 def is_auth_confirm_time_valid(session):
     return is_confirm_time_valid(session, 'MFA_VERIFY_TIME')
+
+
+@contextmanager
+def activate_user_language(user):
+    language = getattr(user, 'lang', settings.LANGUAGE_CODE)
+    with translation.override(language):
+        yield

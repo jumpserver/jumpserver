@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http.response import HttpResponseForbidden
 from django.shortcuts import HttpResponse
-from django.utils import timezone
+from django.utils import timezone, translation
 
 from .utils import set_current_request
 

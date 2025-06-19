@@ -9,7 +9,7 @@ from ..const import MFAType
 class MFAFace(BaseMFA, AuthFaceMixin):
     name = MFAType.Face.value
     display_name = MFAType.Face.name
-    placeholder = 'Face Recognition'
+    placeholder = 'Face recognition'
     skip_cache_check = True
     has_code = False
 
