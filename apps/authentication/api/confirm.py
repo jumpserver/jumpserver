@@ -37,6 +37,7 @@ class UserConfirmationViewSet(JMSGenericViewSet):
         backend_classes = ConfirmType.get_prop_backends(confirm_type)
         if not backend_classes:
             return
+
         for backend_cls in backend_classes:
             backend = backend_cls(self.request.user, self.request)
             if not backend.check():
@@ -69,6 +70,7 @@ class UserConfirmationViewSet(JMSGenericViewSet):
         ok, msg = backend.authenticate(secret_key, mfa_type)
         if ok:
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index(confirm_type) + 1
+            request.session['CONFIRM_TYPE'] = confirm_type
             request.session['CONFIRM_TIME'] = int(time.time())
             return Response('ok')
         return Response({'error': msg}, status=400)
