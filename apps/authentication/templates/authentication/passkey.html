@@ -91,27 +91,30 @@
         }
     }
 
-    const publicKeyCredentialToJSON = (pubKeyCred) => {
-        if (pubKeyCred instanceof Array) {
-            const arr = []
-            for (const i of pubKeyCred) {
-                arr.push(publicKeyCredentialToJSON(i))
-            }
-            return arr
+    const publicKeyCredentialToJSON = pubKeyCred => {
+      if (pubKeyCred instanceof Array) {
+        const arr = []
+        for (const i of pubKeyCred) {
+          arr.push(publicKeyCredentialToJSON(i))
+        }
+        return arr
+      }
+
+      if (pubKeyCred instanceof ArrayBuffer || pubKeyCred instanceof Uint8Array) {
+        return encode(pubKeyCred)
+      }
+
+      if (pubKeyCred instanceof Object) {
+        const obj = {}
+
+        for (const key in pubKeyCred) {
+          obj[key] = publicKeyCredentialToJSON(pubKeyCred[key])
         }
 
-        if (pubKeyCred instanceof ArrayBuffer) {
-            return encode(pubKeyCred)
-        }
+        return obj
+      }
 
-        if (pubKeyCred instanceof Object) {
-            const obj = {}
-            for (const key in pubKeyCred) {
-                obj[key] = publicKeyCredentialToJSON(pubKeyCred[key])
-            }
-            return obj
-        }
-        return pubKeyCred
+      return pubKeyCred
     }
 
     function GetAssertReq(getAssert) {

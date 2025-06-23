@@ -14,23 +14,29 @@ from orgs.utils import tmp_to_root_org
 class UserConfirmation(permissions.BasePermission):
     ttl = 60 * 5
     min_level = 1
-    confirm_type = 'relogin'
+    min_type = 'relogin'
 
     def has_permission(self, request, view):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
             return True
 
         confirm_level = request.session.get('CONFIRM_LEVEL')
+        confirm_type = request.session.get('CONFIRM_TYPE')
         confirm_time = request.session.get('CONFIRM_TIME')
-        ttl = self.get_ttl()
-        if not confirm_level or not confirm_time or \
-                confirm_level < self.min_level or \
-                confirm_time < time.time() - ttl:
-            raise UserConfirmRequired(code=self.confirm_type)
+
+        ttl = self.get_ttl(confirm_type)
+        now = int(time.time())
+
+        if not confirm_level or not confirm_time:
+            raise UserConfirmRequired(code=self.min_type)
+
+        if confirm_level < self.min_level or \
+                confirm_time < now - ttl:
+            raise UserConfirmRequired(code=self.min_type)
         return True
 
-    def get_ttl(self):
-        if self.confirm_type == ConfirmType.MFA:
+    def get_ttl(self, confirm_type):
+        if confirm_type == ConfirmType.MFA:
             ttl = settings.SECURITY_MFA_VERIFY_TTL
         else:
             ttl = self.ttl
@@ -40,7 +46,7 @@ class UserConfirmation(permissions.BasePermission):
     def require(cls, confirm_type=ConfirmType.RELOGIN, ttl=60 * 5):
         min_level = ConfirmType.values.index(confirm_type) + 1
         name = 'UserConfirmationLevel{}TTL{}'.format(min_level, ttl)
-        return type(name, (cls,), {'min_level': min_level, 'ttl': ttl, 'confirm_type': confirm_type})
+        return type(name, (cls,), {'min_level': min_level, 'ttl': ttl, 'min_type': confirm_type})
 
 
 class IsValidUserOrConnectionToken(IsValidUser):
