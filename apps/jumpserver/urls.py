@@ -43,6 +43,7 @@ api_v1 = resource_api + [
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),
+    path('reports/', include('reports.urls.view_urls'), name='reports'),
     path('tickets/', include('tickets.urls.view_urls'), name='tickets'),
     path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
