@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
@@ -128,7 +129,10 @@ class Session(OrgModelMixin):
 
     @property
     def account_obj(self):
-        return get_object_or_none(Account, pk=self.account_id)
+        try:
+            return get_object_or_none(Account, pk=self.account_id)
+        except ValidationError:
+            return None
 
     def can_replay(self):
         return self.has_replay
