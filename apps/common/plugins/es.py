@@ -315,6 +315,10 @@ class ES(object):
             })
         return _filter
 
+    @staticmethod
+    def is_keyword(props: dict, field: str) -> bool:
+        return props.get(field, {}).get("type", "keyword") == "keyword"
+
     def get_query_body(self, **kwargs):
         new_kwargs = {}
         for k, v in kwargs.items():
@@ -347,13 +351,16 @@ class ES(object):
             .get('mappings', {})
             .get('properties', {})
         )
-        org_id_type = props.get('org_id', {}).get('type', 'keyword')
+
+        common_keyword_able = exact_fields | keyword_fields
 
         for k, v in kwargs.items():
-            if k == 'org_id' and org_id_type == 'keyword':
+            if k in ("org_id", "session") and self.is_keyword(props, k):
                 exact[k] = v
-            elif k in exact_fields.union(keyword_fields):
-                exact['{}.keyword'.format(k)] = v
+
+            elif k in common_keyword_able:
+                exact[f"{k}.keyword"] = v
+
             elif k in match_fields:
                 match[k] = v
 
@@ -395,8 +402,8 @@ class ES(object):
                     'should': should + [
                         {'match': {k: v}} for k, v in match.items()
                     ] + [
-                        {'match': item} for item in search
-                    ],
+                                  {'match': item} for item in search
+                              ],
                     'filter': self.handle_exact_fields(exact) +
                               [
                                   {
@@ -453,7 +460,7 @@ class QuerySet(DJQuerySet):
         names, multi_args, multi_kwargs = zip(*filter_calls)
 
         # input 输入
-        multi_args = tuple(reduce(lambda x, y: x + y, (sub for sub in multi_args if sub),()))
+        multi_args = tuple(reduce(lambda x, y: x + y, (sub for sub in multi_args if sub), ()))
         args = self._grouped_search_args(multi_args)
         striped_args = [{k.replace('__icontains', ''): v} for k, values in args.items() for v in values]
 
