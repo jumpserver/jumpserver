@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 20:06+0800\n"
+"POT-Creation-Date: 2025-06-26 18:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -202,7 +202,7 @@ msgstr "템플릿"
 msgid "Skip"
 msgstr "건너뛰기"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:269
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:279
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "업데이트"
@@ -214,7 +214,7 @@ msgstr "업데이트"
 msgid "Failed"
 msgstr "실패"
 
-#: accounts/const/automation.py:25 rbac/tree.py:52
+#: accounts/const/automation.py:25 rbac/tree.py:54
 msgid "Push account"
 msgstr "계정 푸시"
 
@@ -244,7 +244,7 @@ msgstr "게이트웨이 계정 확인"
 msgid "Check account"
 msgstr "계정 검사"
 
-#: accounts/const/automation.py:32 rbac/tree.py:50
+#: accounts/const/automation.py:32 rbac/tree.py:52
 msgid "Backup account"
 msgstr "계정 백업"
 
@@ -607,7 +607,7 @@ msgstr "암호"
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
 #: assets/serializers/asset/common.py:423 perms/serializers/permission.py:66
-#: perms/serializers/user_permission.py:76 rbac/tree.py:35
+#: perms/serializers/user_permission.py:76 rbac/tree.py:50
 msgid "Accounts"
 msgstr "계정"
 
@@ -652,12 +652,12 @@ msgid "Password divided"
 msgstr "키가 앞뒤 두 부분으로 분할되었는지"
 
 #: accounts/models/automations/backup_account.py:33
-#: accounts/serializers/automations/backup.py:34
+#: accounts/serializers/automations/backup.py:35
 msgid "Recipient part one"
 msgstr "수신자 부분 일"
 
 #: accounts/models/automations/backup_account.py:37
-#: accounts/serializers/automations/backup.py:38
+#: accounts/serializers/automations/backup.py:39
 msgid "Recipient part two"
 msgstr "수신자 부분 이"
 
@@ -771,7 +771,7 @@ msgstr "상태"
 #: accounts/serializers/account/account.py:279
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
@@ -893,7 +893,7 @@ msgstr "위험"
 msgid "Detail"
 msgstr "상세 정보"
 
-#: accounts/models/automations/check_account.py:76
+#: accounts/models/automations/check_account.py:76 rbac/tree.py:51
 msgid "Account risk"
 msgstr "계정 위험"
 
@@ -901,39 +901,43 @@ msgstr "계정 위험"
 msgid "Slug"
 msgstr ""
 
-#: accounts/models/automations/check_account.py:128
+#: accounts/models/automations/check_account.py:123
+msgid "Check engine"
+msgstr "검출 엔진"
+
+#: accounts/models/automations/check_account.py:131
 msgid "Check the discovered accounts"
 msgstr "검사에서 발견된 계정"
 
-#: accounts/models/automations/check_account.py:130
+#: accounts/models/automations/check_account.py:133
 msgid ""
 "Perform checks and analyses based on automatically discovered account "
 "results, including user groups, public keys, sudoers, and other information."
 msgstr "자동 발견된 계정 결과에 따른 검사와 분석, 사용자 그룹, 공개 키, sudoers 등 정보 포함."
 
-#: accounts/models/automations/check_account.py:137
+#: accounts/models/automations/check_account.py:140
 msgid "Check the strength of your account and password"
 msgstr "귀하의 계정 및 비밀번호 강도 점검"
 
-#: accounts/models/automations/check_account.py:139
+#: accounts/models/automations/check_account.py:142
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
 msgstr "계정 비밀번호의 보안성을 점검하고 분석, 비밀번호 강도, 유출 상황 등을 포함"
 
-#: accounts/models/automations/check_account.py:146
+#: accounts/models/automations/check_account.py:149
 msgid "Check if the account and password are repeated"
 msgstr "계정과 비밀번호의 중복 여부 점검"
 
-#: accounts/models/automations/check_account.py:147
+#: accounts/models/automations/check_account.py:150
 msgid "Check if the account is the same as other accounts."
 msgstr "해당 계정이 다른 계정과 동일한지 점검."
 
-#: accounts/models/automations/check_account.py:152
+#: accounts/models/automations/check_account.py:155
 msgid "Check whether the account password is a common password"
 msgstr "계정 비밀번호가 일반적으로 사용되는 비밀번호인지 점검"
 
-#: accounts/models/automations/check_account.py:153
+#: accounts/models/automations/check_account.py:156
 msgid "Check whether the account password is a commonly leaked password."
 msgstr "계정 비밀번호가 일반적으로 유출된 비밀번호인지 확인하기."
 
@@ -1387,17 +1391,17 @@ msgstr ""
 "비밀번호 > 로그인 비밀번호 > 수동 입력 <br/> 안전을 위해 구성 항목 "
 "CACHE_LOGIN_PASSWORD_ENABLED=true로 설정하고, 서비스를 재시작해야 활성화됩니다."
 
-#: accounts/serializers/automations/backup.py:18
+#: accounts/serializers/automations/backup.py:19
 msgid "Zip Encrypt Password"
 msgstr "파일 암호화 비밀번호"
 
-#: accounts/serializers/automations/backup.py:35
-#: accounts/serializers/automations/backup.py:39
+#: accounts/serializers/automations/backup.py:36
+#: accounts/serializers/automations/backup.py:40
 #: accounts/serializers/automations/change_secret.py:62
 msgid "Currently only mail sending is supported"
 msgstr "현재 이메일 전송만 지원"
 
-#: accounts/serializers/automations/backup.py:41
+#: accounts/serializers/automations/backup.py:42
 msgid "Asset type"
 msgstr "자산 유형"
 
@@ -2262,7 +2266,7 @@ msgstr "Windows 활동 디렉토리"
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
-#: assets/const/host.py:13 rbac/tree.py:28 rbac/tree.py:66
+#: assets/const/host.py:13 rbac/tree.py:29 rbac/tree.py:68
 #: xpack/plugins/cloud/const.py:75
 msgid "Other"
 msgstr "기타"
@@ -2307,7 +2311,7 @@ msgstr "콘솔 세션에 연결"
 msgid "Any"
 msgstr "임의"
 
-#: assets/const/protocol.py:88 rbac/tree.py:62
+#: assets/const/protocol.py:88 rbac/tree.py:64
 #: settings/serializers/security.py:273
 msgid "Security"
 msgstr "보안"
@@ -2671,7 +2675,7 @@ msgstr "사용자 정의 이름"
 msgid "Custom Comment"
 msgstr "사용자 정의 메모"
 
-#: assets/models/my_asset.py:18 rbac/tree.py:54
+#: assets/models/my_asset.py:18 rbac/tree.py:56
 msgid "My assets"
 msgstr "내 자산"
 
@@ -3266,7 +3270,7 @@ msgstr "디렉터리 삭제"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:270
+#: rbac/tree.py:280
 msgid "Delete"
 msgstr "삭제"
 
@@ -3292,7 +3296,7 @@ msgstr "다운로드"
 msgid "Rename dir"
 msgstr "디렉터리 매핑"
 
-#: audits/const.py:23 rbac/tree.py:268 terminal/api/session/session.py:284
+#: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:284
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
@@ -3301,7 +3305,7 @@ msgstr "조회"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:267
+#: rbac/tree.py:277
 msgid "Create"
 msgstr "생성"
 
@@ -3319,7 +3323,7 @@ msgstr "연결"
 msgid "Login"
 msgstr "로그인"
 
-#: audits/const.py:36 rbac/tree.py:56
+#: audits/const.py:36 rbac/tree.py:58
 msgid "Notifications"
 msgstr "알림"
 
@@ -3352,7 +3356,7 @@ msgstr "세션 로그"
 msgid "Login log"
 msgstr "로그인 로그"
 
-#: audits/const.py:55 rbac/tree.py:64 terminal/models/applet/host.py:144
+#: audits/const.py:55 rbac/tree.py:66 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
 #: xpack/plugins/cloud/serializers/account.py:78
 msgid "Task"
@@ -3631,7 +3635,7 @@ msgstr "최대 10개의 액세스 키를 생성할 수 있습니다."
 msgid "The value in the parameter must contain %s"
 msgstr "매개변수의 값은 반드시 %s를 포함해야 합니다."
 
-#: authentication/api/confirm.py:50
+#: authentication/api/confirm.py:51
 msgid "This action require verify your MFA"
 msgstr "이 작업은 귀하의 MFA를 확인해야 하므로, 먼저 활성화하고 구성해야 합니다."
 
@@ -4229,7 +4233,7 @@ msgid "Options"
 msgstr "옵션"
 
 #: authentication/serializers/connect_token_secret.py:129
-#: ops/notifications.py:19 rbac/tree.py:60
+#: ops/notifications.py:19 rbac/tree.py:62
 msgid "Component"
 msgstr "구성 요소"
 
@@ -4560,14 +4564,14 @@ msgstr "뒤로"
 msgid "Copy success"
 msgstr "복사 성공"
 
-#: authentication/templates/authentication/passkey.html:163
+#: authentication/templates/authentication/passkey.html:166
 msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
 msgstr ""
 "이번 페이지는 HTTPS 프로토콜을 사용하지 않았습니다. 귀하의 자격 증명을 안전하게 유지하려면 HTTPS 프로토콜을 사용해 주세요."
 
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 msgid "Do you want to retry ?"
 msgstr "재시도 하시겠습니까?"
 
@@ -6276,15 +6280,15 @@ msgstr "모든 권한"
 msgid "Console view"
 msgstr "콘솔"
 
-#: rbac/tree.py:25
+#: rbac/tree.py:26
 msgid "Workbench view"
 msgstr "작업대"
 
-#: rbac/tree.py:26
+#: rbac/tree.py:27
 msgid "Audit view"
 msgstr "감사 대시보드"
 
-#: rbac/tree.py:27 settings/models.py:166
+#: rbac/tree.py:28 settings/models.py:166
 msgid "System setting"
 msgstr "시스템 설정"
 
@@ -6296,67 +6300,67 @@ msgstr "세션 감사"
 msgid "Cloud import"
 msgstr "클라우드 동기화"
 
-#: rbac/tree.py:51
+#: rbac/tree.py:53
 msgid "Gather account"
 msgstr "계정 탐색"
 
-#: rbac/tree.py:53
+#: rbac/tree.py:55
 msgid "Account change secret"
 msgstr "계정 비밀번호 변경"
 
-#: rbac/tree.py:55
+#: rbac/tree.py:57
 msgid "App ops"
 msgstr "작업 센터"
 
-#: rbac/tree.py:57 settings/serializers/feature.py:183
+#: rbac/tree.py:59 settings/serializers/feature.py:183
 msgid "Feature"
 msgstr "기능"
 
-#: rbac/tree.py:58 settings/serializers/auth/base.py:11
+#: rbac/tree.py:60 settings/serializers/auth/base.py:11
 msgid "Authentication"
 msgstr "인증"
 
-#: rbac/tree.py:59
+#: rbac/tree.py:61
 msgid "Storage"
 msgstr "저장소"
 
-#: rbac/tree.py:61 terminal/models/applet/applet.py:53
+#: rbac/tree.py:63 terminal/models/applet/applet.py:53
 #: terminal/models/applet/applet.py:371 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "원격 애플리케이션"
 
-#: rbac/tree.py:63
+#: rbac/tree.py:65
 msgid "Appearance"
 msgstr "인터페이스"
 
-#: rbac/tree.py:65 xpack/plugins/license/meta.py:10
+#: rbac/tree.py:67 xpack/plugins/license/meta.py:10
 #: xpack/plugins/license/models.py:153
 msgid "License"
 msgstr "라이센스"
 
-#: rbac/tree.py:67
+#: rbac/tree.py:69
 msgid "Job audit"
 msgstr "작업 감사"
 
-#: rbac/tree.py:159
+#: rbac/tree.py:169
 msgid "App organizations"
 msgstr "조직 관리"
 
-#: rbac/tree.py:160
+#: rbac/tree.py:170
 msgid "Ticket comment"
 msgstr "작업 댓글"
 
-#: rbac/tree.py:161 settings/serializers/feature.py:164
+#: rbac/tree.py:171 settings/serializers/feature.py:164
 #: settings/serializers/feature.py:166 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "작업"
 
-#: rbac/tree.py:162
+#: rbac/tree.py:172
 msgid "Common setting"
 msgstr "일반 설정"
 
-#: rbac/tree.py:163
+#: rbac/tree.py:173
 msgid "View permission tree"
 msgstr "권한 트리 보기"
 
