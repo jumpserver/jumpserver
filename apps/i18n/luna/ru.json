@@ -175,6 +175,8 @@
     "RDP client options": "Опции клиента RDP",
     "RDP color quality": "Качество цвета RDP",
     "RDP connection speed": "Скорость подключения RDP",
+    "RDP file reusable": "RDP файл повторно используемый",
+    "Click to download rdp file": "Нажмите, чтобы скачать RDP файл",
     "RDP resolution": "Разрешение RDP",
     "RDP smart size": "Умный размер RDP",
     "Re-use for a long time after opening": "После включения эта информация о подключении может использоваться длительное время и многократно",
