@@ -1389,7 +1389,7 @@
     "Time": "Time",
     "TimeDelta": "Duration",
     "TimeExpression": "Time expression",
-    "Timeout": "Timeout",
+    "Timeout": "Timeout (s)",
     "TimeoutHelpText": "When this value is -1, no timeout is specified.",
     "Timer": "Timer",
     "TimerExecution": "Timer execution",

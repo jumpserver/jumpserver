@@ -1392,7 +1392,7 @@
     "Time": "时间",
     "TimeDelta": "运行时间",
     "TimeExpression": "时间表达式",
-    "Timeout": "超时",
+    "Timeout": "超时（秒)",
     "TimeoutHelpText": "当此值为-1时，不指定超时时间",
     "Timer": "定时执行",
     "TimerExecution": "定时执行",
