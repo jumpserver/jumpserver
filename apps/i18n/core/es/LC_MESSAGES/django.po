@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-26 18:07+0800\n"
+"POT-Creation-Date: 2025-06-27 13:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -241,7 +241,7 @@ msgid "Push account"
 msgstr "Notificación de cuenta"
 
 #: accounts/const/automation.py:26 accounts/risk_handlers.py:26
-#: acls/const.py:14 audits/const.py:32 ops/const.py:9
+#: audits/const.py:32 ops/const.py:9
 msgid "Change secret"
 msgstr "Cambiar contraseña"
 
@@ -479,7 +479,7 @@ msgstr ""
 #: audits/models.py:59 audits/models.py:315 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:34 terminal/notifications.py:156
+#: terminal/models/session/session.py:35 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:38
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
@@ -546,7 +546,7 @@ msgstr "Estado de cambio de contraseña"
 #: audits/serializers.py:231 authentication/api/connection_token.py:464
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:36 terminal/serializers/command.py:72
+#: terminal/models/session/session.py:37 terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
@@ -1314,7 +1314,7 @@ msgstr "ID"
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
 #: rbac/builtin.py:127 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:32 terminal/models/session/sharing.py:34
+#: terminal/models/session/session.py:33 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
@@ -1356,7 +1356,7 @@ msgstr "Lista blanca de IP"
 #: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:375
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
 #: terminal/models/component/endpoint.py:117
-#: terminal/models/session/session.py:49
+#: terminal/models/session/session.py:50
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:99
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
@@ -1728,7 +1728,7 @@ msgstr "Nombre de la tarea"
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
-#: terminal/models/applet/host.py:141 terminal/models/session/session.py:47
+#: terminal/models/applet/host.py:141 terminal/models/session/session.py:48
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:20
 msgid "Date start"
@@ -1741,7 +1741,7 @@ msgstr "Fecha de inicio"
 #: accounts/templates/accounts/push_account_report.html:27
 #: settings/serializers/feature.py:28
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
-#: terminal/models/session/session.py:48
+#: terminal/models/session/session.py:49
 msgid "Date end"
 msgstr "Fecha de finalización"
 
@@ -1897,6 +1897,10 @@ msgstr "Verificación facial"
 msgid "Face online"
 msgstr "Facial en línea"
 
+#: acls/const.py:14
+msgid "Secret rotation"
+msgstr "Rotación de contraseñas"
+
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
 #: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:321
 msgid "Priority"
@@ -1932,7 +1936,7 @@ msgstr "Usuario"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:92 terminal/const.py:88
-#: terminal/models/session/session.py:45 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:46 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:23
@@ -3535,7 +3539,7 @@ msgid "Job audit log"
 msgstr "Registro de auditoría de trabajos"
 
 #: audits/models.py:57 audits/models.py:104 audits/models.py:179
-#: audits/models.py:312 terminal/models/session/session.py:41
+#: audits/models.py:312 terminal/models/session/session.py:42
 #: terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr "Dirección remota"
@@ -9153,44 +9157,44 @@ msgstr "Se puede subir la grabación de la sesión"
 msgid "Can download session replay"
 msgstr "Se puede descargar la grabación de la conversación"
 
-#: terminal/models/session/session.py:37
+#: terminal/models/session/session.py:38
 msgid "Account ID"
 msgstr "Cuenta"
 
-#: terminal/models/session/session.py:39
+#: terminal/models/session/session.py:40
 #: terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr "Fuente de inicio de sesión"
 
-#: terminal/models/session/session.py:44
+#: terminal/models/session/session.py:45
 msgid "Replay"
 msgstr "Reproducción"
 
-#: terminal/models/session/session.py:50 terminal/serializers/session.py:179
+#: terminal/models/session/session.py:51 terminal/serializers/session.py:179
 msgid "Command amount"
 msgstr "Cantidad de comandos"
 
-#: terminal/models/session/session.py:51 terminal/serializers/session.py:40
+#: terminal/models/session/session.py:52 terminal/serializers/session.py:40
 msgid "Error reason"
 msgstr "Razón del error"
 
-#: terminal/models/session/session.py:319
+#: terminal/models/session/session.py:323
 msgid "Session record"
 msgstr "Registro de la conversación"
 
-#: terminal/models/session/session.py:321
+#: terminal/models/session/session.py:325
 msgid "Can monitor session"
 msgstr "Se puede monitorear la conversación"
 
-#: terminal/models/session/session.py:322
+#: terminal/models/session/session.py:326
 msgid "Can share session"
 msgstr "Se puede compartir la conversación"
 
-#: terminal/models/session/session.py:323
+#: terminal/models/session/session.py:327
 msgid "Can terminate session"
 msgstr "Se puede interrumpir la conversación"
 
-#: terminal/models/session/session.py:324
+#: terminal/models/session/session.py:328
 msgid "Can validate session action perm"
 msgstr "Se puede verificar la autorización de acción de la conversación"
 
@@ -11886,6 +11890,10 @@ msgstr "Importación de licencia exitosa"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Licencia no válida"
+
+#, fuzzy
+#~ msgid "Change rotation"
+#~ msgstr "Automatización de cambio de clave"
 
 #~ msgid "Change password"
 #~ msgstr "Modificar contraseña"
