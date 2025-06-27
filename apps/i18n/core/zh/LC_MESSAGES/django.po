@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 20:06+0800\n"
+"POT-Creation-Date: 2025-06-27 11:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -217,7 +217,7 @@ msgid "Push account"
 msgstr "账号推送"
 
 #: accounts/const/automation.py:26 accounts/risk_handlers.py:26
-#: acls/const.py:14 audits/const.py:32 ops/const.py:9
+#: audits/const.py:32 ops/const.py:9
 msgid "Change secret"
 msgstr "改密"
 
@@ -764,7 +764,7 @@ msgstr "状态"
 #: accounts/serializers/account/account.py:279
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
@@ -1811,6 +1811,10 @@ msgstr "人脸验证"
 #: acls/const.py:13
 msgid "Face online"
 msgstr "人脸在线"
+
+#: acls/const.py:14
+msgid "Secret rotation"
+msgstr "密码轮换"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
 #: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:321
@@ -3665,7 +3669,7 @@ msgstr "最多可以创建10个访问密钥"
 msgid "The value in the parameter must contain %s"
 msgstr "参数中的值必须包含 %s"
 
-#: authentication/api/confirm.py:50
+#: authentication/api/confirm.py:51
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
@@ -4593,13 +4597,13 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/templates/authentication/passkey.html:163
+#: authentication/templates/authentication/passkey.html:166
 msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
 msgstr "本页面未使用 HTTPS 协议，请使用 HTTPS 协议以确保您的凭据安全。"
 
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 msgid "Do you want to retry ?"
 msgstr "是否重试 ？"
 
