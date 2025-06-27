@@ -154,8 +154,8 @@ class SessionViewSet(OrgBulkModelViewSet):
             REPLAY_OP, self.request.user, _('Download'), str(session)
         )
         record_operate_log_and_activity_log(
-            [session.asset_id], ActionChoices.download, detail,
-            model=Session, resource_display=str(session)
+            [session.asset_id], ActionChoices.download, detail, Session,
+            resource_display=f'{session.asset}', resource_type=_('Session replay')
         )
         return response
 
@@ -284,8 +284,8 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
         record_operate_log_and_activity_log(
-            [session.asset_id], ActionChoices.download, detail,
-            model=Session, resource_display=str(session)
+            [session.asset_id], ActionChoices.download, detail, Session,
+            resource_display=f'{session.asset}', resource_type=_('Session replay')
         )
 
     def retrieve(self, request, *args, **kwargs):
