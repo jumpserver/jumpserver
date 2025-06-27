@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 20:06+0800\n"
+"POT-Creation-Date: 2025-06-27 11:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,7 +219,7 @@ msgid "Push account"
 msgstr "계정 푸시"
 
 #: accounts/const/automation.py:26 accounts/risk_handlers.py:26
-#: acls/const.py:14 audits/const.py:32 ops/const.py:9
+#: audits/const.py:32 ops/const.py:9
 msgid "Change secret"
 msgstr "비밀번호 변경"
 
@@ -771,7 +771,7 @@ msgstr "상태"
 #: accounts/serializers/account/account.py:279
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
@@ -1795,6 +1795,10 @@ msgstr "안면 확인"
 #: acls/const.py:13
 msgid "Face online"
 msgstr "안면 온라인"
+
+#: acls/const.py:14
+msgid "Secret rotation"
+msgstr "비밀번호 변경"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
 #: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:321
@@ -3631,7 +3635,7 @@ msgstr "최대 10개의 액세스 키를 생성할 수 있습니다."
 msgid "The value in the parameter must contain %s"
 msgstr "매개변수의 값은 반드시 %s를 포함해야 합니다."
 
-#: authentication/api/confirm.py:50
+#: authentication/api/confirm.py:51
 msgid "This action require verify your MFA"
 msgstr "이 작업은 귀하의 MFA를 확인해야 하므로, 먼저 활성화하고 구성해야 합니다."
 
@@ -4560,14 +4564,14 @@ msgstr "뒤로"
 msgid "Copy success"
 msgstr "복사 성공"
 
-#: authentication/templates/authentication/passkey.html:163
+#: authentication/templates/authentication/passkey.html:166
 msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
 msgstr ""
 "이번 페이지는 HTTPS 프로토콜을 사용하지 않았습니다. 귀하의 자격 증명을 안전하게 유지하려면 HTTPS 프로토콜을 사용해 주세요."
 
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 msgid "Do you want to retry ?"
 msgstr "재시도 하시겠습니까?"
 

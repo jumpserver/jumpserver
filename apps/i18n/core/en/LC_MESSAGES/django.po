@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 20:06+0800\n"
+"POT-Creation-Date: 2025-06-27 11:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,7 +215,7 @@ msgid "Push account"
 msgstr ""
 
 #: accounts/const/automation.py:26 accounts/risk_handlers.py:26
-#: acls/const.py:14 audits/const.py:32 ops/const.py:9
+#: audits/const.py:32 ops/const.py:9
 msgid "Change secret"
 msgstr ""
 
@@ -762,7 +762,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:279
 #: accounts/templates/accounts/change_secret_failed_info.html:13
 #: assets/const/automation.py:9
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
@@ -1781,6 +1781,10 @@ msgstr ""
 
 #: acls/const.py:13
 msgid "Face online"
+msgstr ""
+
+#: acls/const.py:14
+msgid "Secret rotation"
 msgstr ""
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
@@ -3599,7 +3603,7 @@ msgstr ""
 msgid "The value in the parameter must contain %s"
 msgstr ""
 
-#: authentication/api/confirm.py:50
+#: authentication/api/confirm.py:51
 msgid "This action require verify your MFA"
 msgstr ""
 
@@ -4523,13 +4527,13 @@ msgstr ""
 msgid "Copy success"
 msgstr ""
 
-#: authentication/templates/authentication/passkey.html:163
+#: authentication/templates/authentication/passkey.html:166
 msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
 msgstr ""
 
-#: authentication/templates/authentication/passkey.html:174
+#: authentication/templates/authentication/passkey.html:177
 msgid "Do you want to retry ?"
 msgstr ""
 
