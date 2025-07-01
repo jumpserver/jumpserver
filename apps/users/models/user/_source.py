@@ -107,3 +107,7 @@ class SourceMixin:
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
+
+    @property
+    def backends_source_mapper(self):
+        return {backend: source for source, backends in self.SOURCE_BACKEND_MAPPING.items() for backend in backends}
