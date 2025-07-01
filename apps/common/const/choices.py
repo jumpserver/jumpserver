@@ -131,17 +131,18 @@ class LicenseEditionChoices(models.TextChoices):
             if choice == key:
                 return choice
         return LicenseEditionChoices.COMMUNITY
+
     @staticmethod
     def parse_license_edition(info):
         count = info.get('license', {}).get('count', 0)
 
-        if 50 >= count > 0:
+        if 0 < count <= 50:
             return LicenseEditionChoices.BASIC
         elif count <= 500:
             return LicenseEditionChoices.STANDARD
-        elif count < 5000:
+        elif count <= 5000:
             return LicenseEditionChoices.PROFESSIONAL
-        elif count >= 5000:
+        elif count > 5000:
             return LicenseEditionChoices.ULTIMATE
         else:
             return LicenseEditionChoices.COMMUNITY
