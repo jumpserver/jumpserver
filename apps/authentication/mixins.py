@@ -20,6 +20,7 @@ from django.utils.translation import gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
+from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
@@ -227,6 +228,9 @@ class MFAMixin:
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
+        if not settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY and \
+                self.request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
+            return
         if self.request.session.get('auth_mfa') and \
                 self.request.session.get('auth_mfa_username') == user.username:
             return
