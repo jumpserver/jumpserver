@@ -13,6 +13,7 @@ ARG TOOLS="                           \
         nmap                          \
         telnet                        \
         vim                           \
+        postgresql-client-13          \
         wget"
 
 RUN set -ex \
