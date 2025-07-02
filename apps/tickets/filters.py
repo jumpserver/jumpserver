@@ -14,6 +14,7 @@ class TicketFilter(BaseFilterSet):
     relevant_asset = filters.CharFilter(method='filter_relevant_asset')
     relevant_command = filters.CharFilter(method='filter_relevant_command')
     applicant_username_name = filters.CharFilter(method='filter_applicant_username_name')
+    state = filters.CharFilter(method='filter_state')
 
     class Meta:
         model = Ticket
@@ -64,6 +65,11 @@ class TicketFilter(BaseFilterSet):
             Q(applicant__name__icontains=value) |
             Q(applicant__username__icontains=value)
         )
+
+    def filter_state(self, queryset, name, value):
+        if value == 'all':
+            return queryset
+        return queryset.filter(state=value)
 
 
 class ApplyAssetTicketFilter(BaseFilterSet):
