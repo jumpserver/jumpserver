@@ -1,19 +1,19 @@
+import base64
 import io
 import urllib.parse
+from io import BytesIO
 from urllib.parse import urlparse
 
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.http import FileResponse, HttpResponseBadRequest
 from django.http import JsonResponse
 from django.utils import timezone
-from django.conf import settings
-from django.http import FileResponse, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from playwright.sync_api import sync_playwright
-from django.core.mail import EmailMultiAlternatives
 from pdf2image import convert_from_bytes
-import base64
-from io import BytesIO
+from playwright.sync_api import sync_playwright
 
 charts_map = {
     "UserActivity": {

@@ -167,10 +167,7 @@ class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org.is_root() or not settings.XPACK_ENABLED:
-            return queryset
-        users = self.get_org_member_usernames()
-        queryset = queryset.filter(username__in=users)
+        queryset = queryset.model.filter_login_queryset_by_org(queryset)
         return queryset
 
 
