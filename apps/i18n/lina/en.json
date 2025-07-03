@@ -1556,5 +1556,7 @@
     "setVariable": "Set variable",
     "userId": "User ID",
     "userName": "User name",
-    "Timeout(s)": "Timeout (s)"
+    "Timeout(s)": "Timeout (s)",
+    "TicketList": "Ticket list",
+    "TicketsAudit": "Tickets audit"
 }
