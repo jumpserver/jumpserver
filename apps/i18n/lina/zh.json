@@ -1561,5 +1561,7 @@
     "setVariable": "设置参数",
     "userId": "用户ID",
     "userName": "用户名",
-    "Timeout(s)": "超时（秒)"
+    "Timeout(s)": "超时（秒)",
+    "TicketList": "工单列表",
+    "TicketsAudit": "工单审计"
 }
