@@ -284,7 +284,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
         record_operate_log_and_activity_log(
-            [session.asset_id], ActionChoices.download, detail, Session,
+            [session.asset_id], ActionChoices.view, detail, Session,
             resource_display=f'{session.asset}', resource_type=_('Session replay')
         )
 
