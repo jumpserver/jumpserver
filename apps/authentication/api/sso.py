@@ -12,7 +12,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from authentication.errors import ACLError
-from common.api import JMSModelViewSet
+from common.api import JMSGenericViewSet
 from common.const.http import POST, GET
 from common.serializers import EmptySerializer
 from common.utils import reverse, safe_next_url
@@ -31,7 +31,7 @@ NEXT_URL = 'next'
 AUTH_KEY = 'authkey'
 
 
-class SSOViewSet(AuthMixin, JMSModelViewSet):
+class SSOViewSet(AuthMixin, JMSGenericViewSet):
     queryset = SSOToken.objects.all()
     serializer_classes = {
         'login_url': SSOTokenSerializer,
