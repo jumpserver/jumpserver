@@ -12,9 +12,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from authentication.errors import ACLError
-from common.api import JMSGenericViewSet
+from common.api import JMSModelViewSet
 from common.const.http import POST, GET
-from common.permissions import OnlySuperUser
 from common.serializers import EmptySerializer
 from common.utils import reverse, safe_next_url
 from common.utils.timezone import utc_now
@@ -32,14 +31,18 @@ NEXT_URL = 'next'
 AUTH_KEY = 'authkey'
 
 
-class SSOViewSet(AuthMixin, JMSGenericViewSet):
+class SSOViewSet(AuthMixin, JMSModelViewSet):
     queryset = SSOToken.objects.all()
     serializer_classes = {
         'login_url': SSOTokenSerializer,
         'login': EmptySerializer
     }
 
-    @action(methods=[POST], detail=False, permission_classes=[OnlySuperUser], url_path='login-url')
+    rbac_perms = {
+        'login_url': 'authentication.add_ssologinurl',
+    }
+
+    @action(methods=[POST], detail=False, url_path='login-url')
     def login_url(self, request, *args, **kwargs):
         if not settings.AUTH_SSO:
             raise SSOAuthClosed()

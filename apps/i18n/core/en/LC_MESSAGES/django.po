@@ -4182,6 +4182,10 @@ msgstr ""
 msgid "SSO token"
 msgstr ""
 
+#: authentication/models/sso_token.py:22
+msgid "Can add SSO login URL"
+msgstr ""
+
 #: authentication/models/temp_token.py:11
 msgid "Verified"
 msgstr ""
