@@ -4427,6 +4427,10 @@ msgstr "Tiempo de expiración"
 msgid "SSO token"
 msgstr "Token SSO"
 
+#: authentication/models/sso_token.py:22
+msgid "Can add SSO login URL"
+msgstr "Se puede agregar una URL de inicio de sesión SSO"
+
 #: authentication/models/temp_token.py:11
 msgid "Verified"
 msgstr "Verificado"

@@ -18,3 +18,6 @@ class SSOToken(BaseCreateUpdateModel):
 
     class Meta:
         verbose_name = _('SSO token')
+        permissions = [
+            ('add_ssologinurl', _('Can add SSO login URL')),
+        ]

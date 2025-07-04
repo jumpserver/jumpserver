@@ -4216,6 +4216,10 @@ msgstr "만료 시간"
 msgid "SSO token"
 msgstr "SSO 토큰"
 
+#: authentication/models/sso_token.py:22
+msgid "Can add SSO login URL"
+msgstr "SSO 로그인 URL 추가 가능합니다"
+
 #: authentication/models/temp_token.py:11
 msgid "Verified"
 msgstr "검증됨"

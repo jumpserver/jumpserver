@@ -4247,7 +4247,11 @@ msgstr "过期时间"
 
 #: authentication/models/sso_token.py:20
 msgid "SSO token"
-msgstr "SSO token"
+msgstr "SSO 令牌"
+
+#: authentication/models/sso_token.py:22
+msgid "Can add SSO login URL"
+msgstr "可以创建SSO登录链接"
 
 #: authentication/models/temp_token.py:11
 msgid "Verified"

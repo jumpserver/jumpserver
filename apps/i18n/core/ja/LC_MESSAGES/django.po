@@ -4224,6 +4224,10 @@ msgstr "期限切れ"
 msgid "SSO token"
 msgstr "SSO token"
 
+#: authentication/models/sso_token.py:22
+msgid "Can add SSO login URL"
+msgstr "SSOログインURLを追加できます"
+
 #: authentication/models/temp_token.py:11
 msgid "Verified"
 msgstr "確認済み"

@@ -4367,6 +4367,10 @@ msgstr "Data de validade"
 msgid "SSO token"
 msgstr "Token SSO"
 
+#: authentication/models/sso_token.py:22
+msgid "Can add SSO login URL"
+msgstr "Pode adicionar URL de login SSO"
+
 #: authentication/models/temp_token.py:11
 msgid "Verified"
 msgstr "Validado"
