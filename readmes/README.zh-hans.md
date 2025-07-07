@@ -4,6 +4,17 @@
   
 ## 一个开源的 PAM 工具 (堡垒主机)
 
+[![][license-shield]][license-link]
+[![][docs-shield]][docs-link]
+[![][deepwiki-shield]][deepwiki-link]
+[![][discord-shield]][discord-link]
+[![][docker-shield]][docker-link]
+[![][github-release-shield]][github-release-link]
+[![][github-stars-shield]][github-stars-link]
+[![][gitcode-shield]][gitcode-link]
+
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md)
+
 </div>
 <br/>
 
@@ -101,6 +112,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
+[gitcode-link]: https://gitcode.com/feizhiyun/JumpServer
 
 <!-- Shield link-->
 [docs-shield]: https://img.shields.io/badge/documentation-148F76
@@ -110,3 +122,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
 [deepwiki-shield]: https://img.shields.io/badge/deepwiki-devin?color=blue
 [discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb
+[gitcode-shield]: https://gitcode.com/feizhiyun/JumpServer/star/badge.svg
