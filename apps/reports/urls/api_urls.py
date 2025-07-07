@@ -6,4 +6,5 @@ app_name = 'reports'
 
 urlpatterns = [
     path('reports/', api.ReportViewSet.as_view(), name='report-list'),
+    path('reports/users/', api.UserReportApi.as_view(), name='user-list')
 ]
