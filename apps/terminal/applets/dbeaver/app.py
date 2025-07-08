@@ -105,7 +105,7 @@ class AppletApplication(BaseApplication):
         self._write_config(config_file, config)
 
     def launch(self):
-        self.init_driver()
+        # self.init_driver()
         self.init_driver_config()
         self.init_other_config()
 
