@@ -2,7 +2,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from users.models.user import SourceMixin
 
 __all__ = [
@@ -120,9 +119,7 @@ class SecurityLoginLimitSerializer(serializers.Serializer):
 
 
 class SecurityAuthSerializer(serializers.Serializer):
-    help_text_third_party_mfa = _('The third-party login modes include ') + ', '.join(
-        SourceMixin().backends_source_mapper.get(backend) for backend in AUTHENTICATION_BACKENDS_THIRD_PARTY
-    )
+    help_text_third_party_mfa = _('The third-party login modes include ') + ', '.join(SourceMixin.get_third_sources())
     SECURITY_MFA_AUTH = serializers.ChoiceField(
         choices=(
             [0, _('Not enabled')],

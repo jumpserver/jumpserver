@@ -6,6 +6,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+
 
 class Source(models.TextChoices):
     local = "local", _("Local")
@@ -71,6 +73,15 @@ class SourceMixin:
         }
         return [str(k) for k, v in mapper.items() if v]
 
+    @classmethod
+    def get_third_sources(cls):
+        sources = []
+        for source, backends in cls.SOURCE_BACKEND_MAPPING.items():
+            for backend in backends:
+                if backend in AUTHENTICATION_BACKENDS_THIRD_PARTY:
+                    sources.append(str(source.label))
+        return sources
+
     @property
     def source_display(self):
         return self.get_source_display()
@@ -107,7 +118,3 @@ class SourceMixin:
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
-
-    @property
-    def backends_source_mapper(self):
-        return {backend: source for source, backends in self.SOURCE_BACKEND_MAPPING.items() for backend in backends}
