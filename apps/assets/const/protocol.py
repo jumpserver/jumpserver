@@ -194,6 +194,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': '>=2014',
                         'label': _('Version'),
                         'help_text': _('SQL Server version, Different versions have different connection drivers')
+                    },
+                    'encrypt': {
+                        'type': 'bool',
+                        'default': True,
+                        'label': _('Encrypt'),
+                        'help_text': _('Whether to use TLS encryption.')
                     }
                 }
             },
