@@ -307,12 +307,7 @@ class ES(object):
     def handle_exact_fields(exact):
         _filter = []
         for k, v in exact.items():
-            query = 'term'
-            if isinstance(v, list):
-                query = 'terms'
-            _filter.append({
-                query: {k: v}
-            })
+            _filter.append({ 'wildcard': {k: f'*{v}*'} })
         return _filter
 
     @staticmethod
