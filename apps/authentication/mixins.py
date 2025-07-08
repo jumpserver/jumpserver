@@ -228,6 +228,7 @@ class MFAMixin:
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
+        # 扫码登录的认证方式会执行该函数检查 mfa，跳转登录认证方式则通过ThirdPartyLoginMiddleware中间件检验 mfa
         if not settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY and \
                 self.request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
             return
