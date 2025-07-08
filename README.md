@@ -85,6 +85,8 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | JumpServer EE VNC Proxy Connector                                                                       |
 | [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | JumpServer EE Facial Recognition                                                                        |
 
+## Third-party projects 
+- [jumpserver-grafana-dashboard](https://github.com/acerrah/jumpserver-grafana-dashboard)   JumpServer with grafana dashboard
 
 ## Contributing
 
