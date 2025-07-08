@@ -123,7 +123,7 @@ def get_es_client_version(**kwargs):
 
 class ES(object):
 
-    def __init__(self, config, properties, keyword_fields, exact_fields=None, match_fields=None):
+    def __init__(self, config, properties, keyword_fields, exact_fields=None, fuzzy_fields=None, match_fields=None, **kwargs):
         self.version = 7
         self.config = config
         hosts = self.config.get('HOSTS')
@@ -140,7 +140,7 @@ class ES(object):
         self.index = None
         self.query_index = None
         self.properties = properties
-        self.exact_fields, self.match_fields, self.keyword_fields = set(), set(), set()
+        self.exact_fields, self.match_fields, self.keyword_fields, self.fuzzy_fields = set(), set(), set(), set()
 
         if isinstance(keyword_fields, Iterable):
             self.keyword_fields.update(keyword_fields)
@@ -148,6 +148,8 @@ class ES(object):
             self.exact_fields.update(exact_fields)
         if isinstance(match_fields, Iterable):
             self.match_fields.update(match_fields)
+        if isinstance(fuzzy_fields, Iterable):
+            self.fuzzy_fields.update(fuzzy_fields)
 
         self.init_index()
         self.doc_type = self.config.get("DOC_TYPE") or '_doc'
@@ -314,6 +316,13 @@ class ES(object):
                 query: {k: v}
             })
         return _filter
+    
+    @staticmethod
+    def handle_fuzzy_fields(exact):
+        _filter = []
+        for k, v in exact.items():
+            _filter.append({ 'wildcard': { k: f'*{v}*' } })
+        return _filter
 
     @staticmethod
     def is_keyword(props: dict, field: str) -> bool:
@@ -335,10 +344,12 @@ class ES(object):
         keyword_fields = self.keyword_fields
         exact_fields = self.exact_fields
         match_fields = self.match_fields
+        fuzzy_fields = self.fuzzy_fields
 
         match = {}
         search = []
         exact = {}
+        fuzzy = {}
         index = {}
 
         if index_in_field in kwargs:
@@ -360,6 +371,9 @@ class ES(object):
 
             elif k in common_keyword_able:
                 exact[f"{k}.keyword"] = v
+            
+            elif k in fuzzy_fields:
+                fuzzy[f"{k}.keyword"] = v
 
             elif k in match_fields:
                 match[k] = v
@@ -405,6 +419,7 @@ class ES(object):
                                   {'match': item} for item in search
                               ],
                     'filter': self.handle_exact_fields(exact) +
+                              self.handle_fuzzy_fields(fuzzy) +
                               [
                                   {
                                       'range': {

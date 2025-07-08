@@ -35,6 +35,7 @@ class OperateLogStore(ES, metaclass=Singleton):
             }
         }
         exact_fields = {}
+        fuzzy_fields = {}
         match_fields = {
             'id', 'user', 'action', 'resource_type',
             'resource', 'remote_addr', 'org_id'
@@ -44,7 +45,7 @@ class OperateLogStore(ES, metaclass=Singleton):
         }
         if not config.get('INDEX'):
             config['INDEX'] = 'jumpserver_operate_log'
-        super().__init__(config, properties, keyword_fields, exact_fields, match_fields)
+        super().__init__(config, properties, keyword_fields, exact_fields, fuzzy_fields, match_fields)
         self.pre_use_check()
 
     @staticmethod
