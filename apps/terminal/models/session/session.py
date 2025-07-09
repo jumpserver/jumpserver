@@ -28,6 +28,7 @@ class Session(OrgModelMixin):
         RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
         DT = 'DT', 'DB Terminal'
+        VT = 'VT', 'VNC Terminal'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
