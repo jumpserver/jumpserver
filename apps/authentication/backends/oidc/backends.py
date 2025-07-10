@@ -224,7 +224,6 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
             user_auth_failed.send(
                 sender=self.__class__, request=request, username=user.username,
                 reason="User is invalid", backend=settings.AUTH_BACKEND_OIDC_CODE
-
             )
             return None
 
