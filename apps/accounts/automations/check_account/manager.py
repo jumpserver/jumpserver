@@ -15,11 +15,13 @@ from common.decorators import bulk_create_decorator, bulk_update_decorator
 from settings.models import LeakPasswords
 
 
+# 已设置手动 finish
 @bulk_create_decorator(AccountRisk)
 def create_risk(data):
     return AccountRisk(**data)
 
 
+# 已设置手动 finish
 @bulk_update_decorator(AccountRisk, update_fields=["details", "status"])
 def update_risk(risk):
     return risk
@@ -216,6 +218,9 @@ class CheckAccountManager(BaseManager):
                     "risk": d["risk"],
                     "details": [{"datetime": now, 'type': 'init'}],
                 })
+
+        create_risk.finish()
+        update_risk.finish()
 
     def pre_run(self):
         super().pre_run()
