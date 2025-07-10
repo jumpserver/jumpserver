@@ -155,11 +155,13 @@ def radius_create_user(sender, user, **kwargs):
 
 @receiver(openid_create_or_update_user)
 def on_openid_create_or_update_user(sender, user, created, attrs, **kwargs):
+    group_names = attrs.get('groups')
     if created:
         org_ids = bind_user_to_org_role(user)
-        group_names = attrs.get('groups')
-        bind_user_to_group(org_ids, group_names, user)
+    else:
+        org_ids = user.joined_orgs.values_list('id', flat=True)
 
+    bind_user_to_group(org_ids, group_names, user)
     source = User.Source.openid.value
     user_authenticated_handle(user, created, source, attrs, **kwargs)
 
@@ -235,6 +237,7 @@ def bind_user_to_group(org_ids, group_names, user):
         return
 
     org_ids = org_ids or [Organization.DEFAULT_ID]
+    org_ids = [str(i) for i in org_ids if i]
 
     with tmp_to_root_org():
         existing_groups = UserGroup.objects.filter(org_id__in=org_ids).values_list('org_id', 'name')
@@ -252,12 +255,19 @@ def bind_user_to_group(org_ids, group_names, user):
             )
 
         UserGroup.objects.bulk_create(groups_to_create)
-
         user_groups = UserGroup.objects.filter(org_id__in=org_ids, name__in=group_names)
 
+        user_group_ids = set(user_groups.values_list('id', flat=True))
+        exist_group_ids = set(
+            User.groups.through.objects.filter(user_id=user.id)
+            .values_list('usergroup_id', flat=True)
+        )
+        need_add_group_ids = user_group_ids - exist_group_ids
+
         user_group_links = [
-            User.groups.through(user_id=user.id, usergroup_id=group.id)
-            for group in user_groups
+            User.groups.through(user_id=user.id, usergroup_id=group_id)
+            for group_id in need_add_group_ids
         ]
+
         if user_group_links:
-            User.groups.through.objects.bulk_create(user_group_links)
+            User.groups.through.objects.bulk_create(user_group_links, ignore_conflicts=True)

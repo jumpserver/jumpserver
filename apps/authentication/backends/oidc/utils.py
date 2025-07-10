@@ -10,15 +10,14 @@ import datetime as dt
 from calendar import timegm
 from urllib.parse import urlparse
 
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.encoding import force_bytes, smart_bytes
 from jwkest import JWKESTException
 from jwkest.jwk import KEYS
 from jwkest.jws import JWS
-from django.conf import settings
 
 from common.utils import get_logger
-
 
 logger = get_logger(__file__)
 
@@ -99,7 +98,8 @@ def _validate_claims(id_token, nonce=None, validate_nonce=True):
         raise SuspiciousOperation('Incorrect id_token: nbf')
 
     # Verifies that the token was issued in the allowed timeframe.
-    if utc_timestamp > id_token['iat'] + settings.AUTH_OPENID_ID_TOKEN_MAX_AGE:
+    max_age = settings.AUTH_OPENID_ID_TOKEN_MAX_AGE
+    if utc_timestamp > id_token['iat'] + max_age:
         logger.debug(log_prompt.format('Incorrect id_token: iat'))
         raise SuspiciousOperation('Incorrect id_token: iat')
 
