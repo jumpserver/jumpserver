@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
+from common.db.utils import safe_db_connection
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
 from ops.ansible.interface import interface
@@ -338,7 +339,8 @@ class BasePlaybookManager:
             try:
                 kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
-                self.on_runner_success(runner, cb)
+                with safe_db_connection():
+                    self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e)
             finally:
