@@ -80,5 +80,16 @@
     "Username": "用户名",
     "VerifyCode": "验证码",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
-    "Writable": "读写"
+    "Writable": "读写",
+    "VirtualKeyboard": "虚拟键盘",
+    "KeyboardLayout": "布局",
+    "Enable": "启用",
+    "Other": "其他",
+    "OnlineUser": "在线用户",
+    "PrimaryUser": "主用户",
+    "FileManagement": "文件管理",
+    "SessionShare": "会话分享",
+    "Name": "名称",
+    "PleaseInput": "请输入",
+    "Shared Drive": "共享盘"
 }
