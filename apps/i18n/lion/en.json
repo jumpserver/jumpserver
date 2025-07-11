@@ -95,5 +95,7 @@
     "FileDownloadDenied": "No permission to download file",
     "FileAddUploadingList": "File added to upload list",
     "FileUploadStart": "File upload started",
-    "FileUploadingWarning": "File is uploading, operation is not allowed"
+    "FileUploadingWarning": "File is uploading, operation is not allowed",
+    "NoData": "No data",
+    "Refresh": "Refresh"
 }
