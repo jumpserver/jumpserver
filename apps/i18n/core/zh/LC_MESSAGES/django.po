@@ -7601,7 +7601,7 @@ msgstr ""
 
 #: settings/serializers/security.py:122
 msgid "The third-party login modes include "
-msgstr "第三方登录方式包括:
+msgstr "第三方登录方式包括: "
 
 #: settings/serializers/security.py:127
 #: users/templates/users/mfa_setting.html:160
