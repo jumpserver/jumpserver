@@ -91,5 +91,9 @@
     "SessionShare": "Session Share",
     "Name": "Name",
     "PleaseInput": "Please input",
-    "Shared Drive": "Shared Drive"
+    "Shared Drive": "Shared Drive",
+    "FileDownloadDenied": "No permission to download file",
+    "FileAddUploadingList": "File added to upload list",
+    "FileUploadStart": "File upload started",
+    "FileUploadingWarning": "File is uploading, operation is not allowed"
 }

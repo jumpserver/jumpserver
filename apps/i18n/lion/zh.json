@@ -91,5 +91,9 @@
     "SessionShare": "会话分享",
     "Name": "名称",
     "PleaseInput": "请输入",
-    "Shared Drive": "共享盘"
+    "Shared Drive": "共享盘",
+    "FileDownloadDenied": "无权下载文件",
+    "FileAddUploadingList": "文件添加到上传列表",
+    "FileUploadStart": "文件上传开始",
+    "FileUploadingWarning": "文件正在上传中, 禁止操作"
 }
