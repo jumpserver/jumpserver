@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-08 15:52+0800\n"
+"POT-Creation-Date: 2025-07-14 19:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,11 +103,11 @@ msgstr "처리할 계정 찾을 수 없음"
 msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "성공: %s, 실패: %s, 총 수: %s"
 
-#: accounts/automations/check_account/manager.py:267
+#: accounts/automations/check_account/manager.py:272
 msgid "Check account report of {}"
 msgstr "위험 감지 보고서 {}"
 
-#: accounts/automations/check_account/manager.py:273
+#: accounts/automations/check_account/manager.py:278
 msgid ""
 "---\n"
 "Summary: \n"
@@ -184,7 +184,7 @@ msgstr "익명 계정"
 msgid "Specified account"
 msgstr "지정된 계정"
 
-#: accounts/const/account.py:26 users/models/user/_source.py:11
+#: accounts/const/account.py:26 users/models/user/_source.py:13
 msgid "Local"
 msgstr "데이터베이스"
 
@@ -455,7 +455,7 @@ msgstr "Vault 작업이 실패했습니다. 다시 시도하거나 Vault의 계�
 #: audits/models.py:59 audits/models.py:318 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:35 terminal/notifications.py:156
+#: terminal/models/session/session.py:36 terminal/notifications.py:156
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:38
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
@@ -522,7 +522,7 @@ msgstr "비밀번호 변경 상태"
 #: audits/serializers.py:231 authentication/api/connection_token.py:464
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:37 terminal/serializers/command.py:72
+#: terminal/models/session/session.py:38 terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
@@ -607,7 +607,7 @@ msgstr "암호"
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
 #: assets/serializers/asset/common.py:423 perms/serializers/permission.py:66
-#: perms/serializers/user_permission.py:76 rbac/tree.py:50
+#: perms/serializers/user_permission.py:87 rbac/tree.py:50
 msgid "Accounts"
 msgstr "계정"
 
@@ -1172,7 +1172,7 @@ msgstr "계정에 정책이 존재합니다"
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:173
-#: assets/serializers/platform.py:284 perms/serializers/user_permission.py:26
+#: assets/serializers/platform.py:284 perms/serializers/user_permission.py:27
 #: settings/models.py:41 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:326
@@ -1188,7 +1188,7 @@ msgstr "카테고리"
 #: audits/serializers.py:76 audits/serializers.py:196
 #: authentication/models/connection_token.py:63
 #: authentication/serializers/connect_token_secret.py:128
-#: ops/models/job.py:155 perms/serializers/user_permission.py:27
+#: ops/models/job.py:155 perms/serializers/user_permission.py:28
 #: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
@@ -1270,7 +1270,7 @@ msgstr "ID"
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
 #: rbac/builtin.py:127 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:33 terminal/models/session/sharing.py:34
+#: terminal/models/session/session.py:34 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
@@ -1311,7 +1311,7 @@ msgstr "IP 화이트리스트"
 #: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:375
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
 #: terminal/models/component/endpoint.py:117
-#: terminal/models/session/session.py:50
+#: terminal/models/session/session.py:51
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:99
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
@@ -1329,12 +1329,12 @@ msgid "Password length"
 msgstr "비밀번호 길이"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:51
+#: settings/serializers/security.py:52
 msgid "Lowercase"
 msgstr "소문자"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:48
+#: settings/serializers/security.py:49
 msgid "Uppercase"
 msgstr "대문자"
 
@@ -1636,7 +1636,7 @@ msgstr "작업 이름"
 #: ops/templates/ops/celery_task_log.html:101
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:27
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
-#: terminal/models/applet/host.py:141 terminal/models/session/session.py:48
+#: terminal/models/applet/host.py:141 terminal/models/session/session.py:49
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:20
 msgid "Date start"
@@ -1649,7 +1649,7 @@ msgstr "시작 날짜"
 #: accounts/templates/accounts/push_account_report.html:27
 #: settings/serializers/feature.py:28
 #: settings/templates/ldap/_msg_import_ldap_user.html:6
-#: terminal/models/session/session.py:49
+#: terminal/models/session/session.py:50
 msgid "Date end"
 msgstr "종료 날짜"
 
@@ -1837,7 +1837,7 @@ msgstr "사용자"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:92 terminal/const.py:88
-#: terminal/models/session/session.py:46 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:47 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:23
@@ -2064,32 +2064,32 @@ msgstr "숫자여야 합니다."
 msgid "App Assets"
 msgstr "자산 관리"
 
-#: assets/automations/base/manager.py:141
+#: assets/automations/base/manager.py:139
 msgid "Task: {} finished"
 msgstr "작업: {} 완료"
 
-#: assets/automations/base/manager.py:341
+#: assets/automations/base/manager.py:340
 msgid "  - Platform {} ansible disabled"
 msgstr "- 플랫폼 {} Ansible이 비활성화되어 있어 작업을 실행할 수 없습니다."
 
-#: assets/automations/base/manager.py:527
+#: assets/automations/base/manager.py:526
 msgid ">>> Task preparation phase"
 msgstr ">>> 작업 준비 단계"
 
-#: assets/automations/base/manager.py:531
+#: assets/automations/base/manager.py:530
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> 작업을 분할 실행합니다. 총 {runner_count}"
 
-#: assets/automations/base/manager.py:536
+#: assets/automations/base/manager.py:535
 msgid ">>> Start executing tasks"
 msgstr ">>> 작업 실행 시작"
 
-#: assets/automations/base/manager.py:538
+#: assets/automations/base/manager.py:537
 msgid ">>> No tasks need to be executed"
 msgstr ">>> 실행할 작업이 없습니다."
 
-#: assets/automations/base/manager.py:542
+#: assets/automations/base/manager.py:541
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> {index}번째 배치 작업 실행 시작"
@@ -2109,7 +2109,7 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr "포트 {address}의 {port}에 연결할 수 없습니다"
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:94 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/middleware.py:95 xpack/plugins/cloud/providers/fc.py:47
 msgid "Authentication failed"
 msgstr "인증 실패"
 
@@ -2184,7 +2184,7 @@ msgstr "비활성화"
 msgid "Basic"
 msgstr "기본"
 
-#: assets/const/base.py:34 assets/const/protocol.py:298
+#: assets/const/base.py:34 assets/const/protocol.py:304
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "스크립트"
@@ -2320,7 +2320,7 @@ msgid "Any"
 msgstr "임의"
 
 #: assets/const/protocol.py:88 rbac/tree.py:64
-#: settings/serializers/security.py:273
+#: settings/serializers/security.py:275
 msgid "Security"
 msgstr "보안"
 
@@ -2385,54 +2385,62 @@ msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "인증 데이터베이스"
 
-#: assets/const/protocol.py:226
+#: assets/const/protocol.py:201
+msgid "Encrypt"
+msgstr "암호화된"
+
+#: assets/const/protocol.py:202
+msgid "Whether to use TLS encryption."
+msgstr ""
+
+#: assets/const/protocol.py:232
 msgid "Auth source"
 msgstr "인증할 데이터베이스"
 
-#: assets/const/protocol.py:227
+#: assets/const/protocol.py:233
 msgid "The database to authenticate against"
 msgstr "연결 항목"
 
-#: assets/const/protocol.py:232 authentication/models/connection_token.py:48
+#: assets/const/protocol.py:238 authentication/models/connection_token.py:48
 msgid "Connect options"
 msgstr "특정 연결 옵션, 예: retryWrites=false&retryReads=false"
 
-#: assets/const/protocol.py:233
+#: assets/const/protocol.py:239
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
 msgstr "사용자 이름 인증 사용"
 
-#: assets/const/protocol.py:245
+#: assets/const/protocol.py:251
 msgid "Auth username"
 msgstr "안전 모드"
 
-#: assets/const/protocol.py:268
+#: assets/const/protocol.py:274
 msgid "Safe mode"
 msgstr "안전 모드가 활성화되면 일부 기능이 비활성화됩니다. 예: 새 탭 열기, 우클릭, 다른 웹사이트 접근 등"
 
-#: assets/const/protocol.py:270
+#: assets/const/protocol.py:276
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr "자동 채우기"
 
-#: assets/const/protocol.py:275 assets/models/asset/web.py:9
+#: assets/const/protocol.py:281 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "사용자 이름 선택기"
 
-#: assets/const/protocol.py:283 assets/models/asset/web.py:10
+#: assets/const/protocol.py:289 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "사용자 이름 선택기"
 
-#: assets/const/protocol.py:288 assets/models/asset/web.py:11
+#: assets/const/protocol.py:294 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "비밀번호 선택기"
 
-#: assets/const/protocol.py:293 assets/models/asset/web.py:12
+#: assets/const/protocol.py:299 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "확인 버튼 선택기"
 
-#: assets/const/protocol.py:316
+#: assets/const/protocol.py:322
 msgid "API mode"
 msgstr "API 모드"
 
@@ -2468,12 +2476,12 @@ msgstr "주소"
 #: assets/serializers/asset/common.py:150
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:120
-#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:398
+#: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:398
 msgid "Platform"
 msgstr "플랫폼"
 
 #: assets/models/asset/common.py:173 assets/models/zone.py:22
-#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:400
+#: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:400
 msgid "Zone"
 msgstr "도메인"
 
@@ -2881,7 +2889,7 @@ msgstr "노드 경로, 형식은 [\"/조직/노드명\"], 만약 노드가 존�
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
-#: perms/serializers/user_permission.py:75 xpack/plugins/cloud/models.py:401
+#: perms/serializers/user_permission.py:86 xpack/plugins/cloud/models.py:401
 #: xpack/plugins/cloud/serializers/task.py:36
 msgid "Protocols"
 msgstr "프로토콜 그룹"
@@ -3382,7 +3390,7 @@ msgid "Job audit log"
 msgstr "작업 감사 로그"
 
 #: audits/models.py:57 audits/models.py:107 audits/models.py:182
-#: audits/models.py:315 terminal/models/session/session.py:42
+#: audits/models.py:315 terminal/models/session/session.py:43
 #: terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr "원격 주소"
@@ -3572,7 +3580,7 @@ msgstr "인증 토큰"
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/utils.py:114 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
-#: users/models/user/__init__.py:130 users/models/user/_source.py:19
+#: users/models/user/__init__.py:130 users/models/user/_source.py:21
 msgid "WeCom"
 msgstr "기업 위챗"
 
@@ -3580,21 +3588,21 @@ msgstr "기업 위챗"
 #: authentication/views/feishu.py:97 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:136
-#: users/models/user/_source.py:21
+#: users/models/user/_source.py:23
 msgid "FeiShu"
 msgstr "페이사"
 
 #: audits/signal_handlers/login_log.py:40 authentication/utils.py:138
 #: authentication/views/slack.py:79 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
-#: users/models/user/__init__.py:142 users/models/user/_source.py:23
+#: users/models/user/__init__.py:142 users/models/user/_source.py:25
 msgid "Slack"
 msgstr "슬랙"
 
 #: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
 #: authentication/views/dingtalk.py:151 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:133
-#: users/models/user/_source.py:20
+#: users/models/user/_source.py:22
 msgid "DingTalk"
 msgstr "딩딩"
 
@@ -3962,16 +3970,16 @@ msgstr "귀하의 비밀번호가 유효하지 않습니다"
 msgid "Please wait for %s seconds before retry"
 msgstr "%s 초 후에 다시 시도해주세요."
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:327
+#: authentication/errors/redirect.py:85 authentication/mixins.py:332
 #: users/views/profile/reset.py:224
 msgid "Your password is too simple, please change it for security"
 msgstr "비밀번호가 너무 간단합니다. 보안을 위해 수정해주세요."
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:336
+#: authentication/errors/redirect.py:93 authentication/mixins.py:341
 msgid "You should to change your password before login"
 msgstr "로그인 완료 전에 비밀번호를 먼저 수정해주세요."
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:345
+#: authentication/errors/redirect.py:101 authentication/mixins.py:350
 msgid "Your password has expired, please reset before logging in"
 msgstr "당신의 비밀번호가 만료되었습니다. 수정 후 로그인해주세요."
 
@@ -4084,25 +4092,25 @@ msgstr "전화번호 설정으로 활성화"
 msgid "Clear phone number to disable"
 msgstr "전화번호 삭제로 비활성화"
 
-#: authentication/middleware.py:95 settings/utils/ldap.py:711
+#: authentication/middleware.py:96 settings/utils/ldap.py:711
 msgid "Authentication failed (before login check failed): {}"
 msgstr "인증 실패 (로그인 전 검사 실패): {}"
 
-#: authentication/mixins.py:83
+#: authentication/mixins.py:84
 msgid "User is invalid"
 msgstr "무효한 사용자"
 
-#: authentication/mixins.py:98
+#: authentication/mixins.py:99
 msgid ""
 "The administrator has enabled 'Only allow login from user source'. \n"
 "            The current user source is {}. Please contact the administrator."
 msgstr "관리자가 '사용자 출처에서만 로그인 허용'을 활성화하였습니다. 현재 사용자 출처는 {}이며 관리자를 연락하십시오."
 
-#: authentication/mixins.py:273
+#: authentication/mixins.py:278
 msgid "The MFA type ({}) is not enabled"
 msgstr "해당 MFA ({}) 방식이 활성화되지 않았습니다."
 
-#: authentication/mixins.py:315
+#: authentication/mixins.py:320
 msgid "Please change your password"
 msgstr "비밀번호를 수정하십시오."
 
@@ -5259,7 +5267,7 @@ msgstr "태그 관리"
 msgid "App Labels"
 msgstr "색상"
 
-#: labels/models.py:15 settings/serializers/security.py:212
+#: labels/models.py:15 settings/serializers/security.py:214
 msgid "Color"
 msgstr "색상"
 
@@ -6655,7 +6663,7 @@ msgid ""
 msgstr ""
 "사용자 속성 매핑에서 `key`는 JumpServer 사용자 속성 이름이고, `value`는 페이서 서비스의 사용자 속성 이름입니다."
 
-#: settings/serializers/auth/lark.py:13 users/models/user/_source.py:22
+#: settings/serializers/auth/lark.py:13 users/models/user/_source.py:24
 msgid "Lark"
 msgstr ""
 
@@ -7470,11 +7478,11 @@ msgid "Perm single to ungroup node"
 msgstr ""
 "단독 권한이 있는 자산을 그룹화되지 않은 노드에 배치하고, 자산이 있는 노드를 볼 수 있지만 해당 노드에 권한이 없는 문제를 피합니다"
 
-#: settings/serializers/security.py:19
+#: settings/serializers/security.py:20
 msgid "User password expiration (day)"
 msgstr "사용자 비밀번호 만료 시간 (일)"
 
-#: settings/serializers/security.py:21
+#: settings/serializers/security.py:22
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
@@ -7483,78 +7491,78 @@ msgstr ""
 "사용자가 이 기간 내에 비밀번호를 업데이트하지 않으면, 사용자 비밀번호는 만료되어 더 이상 유효하지 않습니다; 비밀번호 만료 알림 메일은"
 " 비밀번호 만료 5일 전에 시스템이 자동으로 (매일) 사용자에게 전송합니다"
 
-#: settings/serializers/security.py:28
+#: settings/serializers/security.py:29
 msgid "User expired tokens record keep days"
 msgstr "사용자 만료 Token 보존 일수"
 
-#: settings/serializers/security.py:29
+#: settings/serializers/security.py:30
 msgid ""
 "Retention period (in days) for expired user tokens before automatic cleanup."
 msgstr "시스템은 매일 정리 작업에서 사용자 만료 Token 기록을 영구 삭제하기 전에, 이러한 기록을 보존하는 일수를 설정합니다"
 
-#: settings/serializers/security.py:33
+#: settings/serializers/security.py:34
 msgid "Recent password count"
 msgstr "최근 몇 번의 비밀번호를 설정할 수 없습니다"
 
-#: settings/serializers/security.py:35
+#: settings/serializers/security.py:36
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "알림: 사용자가 비밀번호를 재설정할 때, 해당 사용자가 지난 몇 번 사용한 비밀번호는 사용할 수 없습니다"
 
-#: settings/serializers/security.py:41
+#: settings/serializers/security.py:42
 msgid "Minimum length (User)"
 msgstr "비밀번호 최소 길이"
 
-#: settings/serializers/security.py:45
+#: settings/serializers/security.py:46
 msgid "Minimum length (Admin)"
 msgstr "관리자 비밀번호 최소 길이"
 
-#: settings/serializers/security.py:54
+#: settings/serializers/security.py:55
 msgid "Digits"
 msgstr "숫자를 포함해야 합니다"
 
-#: settings/serializers/security.py:57
+#: settings/serializers/security.py:58
 msgid "Special characters"
 msgstr "특수 문자를 포함해야 합니다"
 
-#: settings/serializers/security.py:62
+#: settings/serializers/security.py:63
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
 msgstr "사용자가 로그인 실패 횟수가 제한에 도달하면, 이 간격 내에는 로그인이 금지됩니다"
 
-#: settings/serializers/security.py:70 settings/serializers/security.py:80
+#: settings/serializers/security.py:71 settings/serializers/security.py:81
 msgid "Login failures count"
 msgstr "사용자 로그인 실패 횟수 제한"
 
-#: settings/serializers/security.py:74 settings/serializers/security.py:84
+#: settings/serializers/security.py:75 settings/serializers/security.py:85
 msgid "Login failure period (minute)"
 msgstr "사용자 로그인 간격 차단 (분)"
 
-#: settings/serializers/security.py:88
+#: settings/serializers/security.py:89
 msgid "Login IP whitelist"
 msgstr "IP 로그인 화이트리스트"
 
-#: settings/serializers/security.py:93
+#: settings/serializers/security.py:94
 msgid "Login IP blacklist"
 msgstr "IP 로그인 블랙리스트"
 
-#: settings/serializers/security.py:98
+#: settings/serializers/security.py:99
 msgid "Only single device login"
 msgstr "단일 장치 로그인만 허용"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:100
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
 msgstr "사용자가 새로운 장치로 로그인하면, 다른 이미 로그인된 장치는 자동으로 로그아웃됩니다"
 
-#: settings/serializers/security.py:102
+#: settings/serializers/security.py:103
 msgid "Only exist user login"
 msgstr "기존 사용자만 로그인 가능"
 
-#: settings/serializers/security.py:104
+#: settings/serializers/security.py:105
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -7564,11 +7572,11 @@ msgstr ""
 "이 설정이 활성화되면 존재하지 않는 사용자는 로그인이 불가능하며, 비활성화하면 로컬 인증 방식을 제외한 다른 인증 방식을 사용하는 "
 "사용자는 로그인이 가능하고 자동으로 사용자 계정이 생성됩니다 (사용자가 존재하지 않을 경우)"
 
-#: settings/serializers/security.py:110
+#: settings/serializers/security.py:111
 msgid "Only from source login"
 msgstr "사용자 출처에서만 로그인"
 
-#: settings/serializers/security.py:112
+#: settings/serializers/security.py:113
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging"
 " in; if it is disabled, the user will authenticate all the enabled "
@@ -7578,78 +7586,78 @@ msgstr ""
 "이 설정이 활성화되면, 사용자는 로그인할 때 오직 출처에서 인증을 받으며, 비활성화하면 사용자는 로그인할 때 모든 활성화된 인증 방식을 "
 "순서대로 인증받고, 하나라도 인증에 성공하면 바로 로그인이 가능합니다"
 
-#: settings/serializers/security.py:123
+#: settings/serializers/security.py:122
+msgid "The third-party login modes include "
+msgstr "타사 로그인 방식은 다음과 같습니다:"
+
+#: settings/serializers/security.py:125
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "비활성화"
 
-#: settings/serializers/security.py:124
+#: settings/serializers/security.py:126
 msgid "All users"
 msgstr "모든 사용자"
 
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:127
 msgid "Only admin users"
 msgstr "관리자만"
 
-#: settings/serializers/security.py:127
+#: settings/serializers/security.py:129
 msgid "Global MFA"
 msgstr "전체적으로 MFA 인증 활성화"
 
-#: settings/serializers/security.py:131
+#: settings/serializers/security.py:133
 msgid "Third-party login MFA"
 msgstr "타사 인증 시 MFA 활성화"
 
-#: settings/serializers/security.py:132
-msgid "The third-party login modes include OIDC, CAS, and SAML2"
-msgstr "제3자 로그인 방식에는 OIDC, CAS, SAML2가 포함됩니다."
-
-#: settings/serializers/security.py:136
+#: settings/serializers/security.py:138
 msgid "MFA via Email"
 msgstr "이메일 인증 MFA"
 
-#: settings/serializers/security.py:137
+#: settings/serializers/security.py:139
 msgid "Email as a method for multi-factor authentication"
 msgstr "이메일을 다중 인증의 한 방법으로 사용"
 
-#: settings/serializers/security.py:140
+#: settings/serializers/security.py:142
 msgid "OTP issuer name"
 msgstr "OTP 스캔 후의 이름"
 
-#: settings/serializers/security.py:144
+#: settings/serializers/security.py:146
 msgid "OTP valid window"
 msgstr "OTP 지연 유효 건수"
 
-#: settings/serializers/security.py:148
+#: settings/serializers/security.py:150
 msgid "MFA verify TTL"
 msgstr "MFA 검증 유효 기간"
 
-#: settings/serializers/security.py:150
+#: settings/serializers/security.py:152
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "단위: 초, 현재 계정 비밀번호 검증 MFA를 조회할 때만 유효"
 
-#: settings/serializers/security.py:155
+#: settings/serializers/security.py:157
 msgid "MFA in login page"
 msgstr "MFA 로그인 페이지 입력"
 
-#: settings/serializers/security.py:156
+#: settings/serializers/security.py:158
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "유럽연합 데이터 보호 규정(GDPR)은 로그인 페이지에서 MFA를 요구하여 시스템 로그인 안전성을 보장합니다."
 
-#: settings/serializers/security.py:160
+#: settings/serializers/security.py:162
 msgid "Verify code TTL (second)"
 msgstr "인증 코드 유효 시간 (분)"
 
-#: settings/serializers/security.py:161
+#: settings/serializers/security.py:163
 msgid "Reset password and send SMS code expiration time"
 msgstr "비밀번호 재설정 코드 및 문자 메시지로 전송되는 인증 코드 유효 기간"
 
-#: settings/serializers/security.py:165
+#: settings/serializers/security.py:167
 msgid "Login dynamic code"
 msgstr "로그인 추가 코드 활성화"
 
-#: settings/serializers/security.py:166
+#: settings/serializers/security.py:168
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -7657,19 +7665,19 @@ msgstr ""
 "비밀번호와 추가 코드를 함께 제3자 인증 시스템에 송신하여 검증합니다. 예: 일부 제3자 인증 시스템에서는 비밀번호+6자리 숫자를 통해 "
 "인증을 완료해야 합니다."
 
-#: settings/serializers/security.py:170
+#: settings/serializers/security.py:172
 msgid "Login captcha"
 msgstr "로그인 인증 코드 활성화"
 
-#: settings/serializers/security.py:171
+#: settings/serializers/security.py:173
 msgid "Enable captcha to prevent robot authentication"
 msgstr "인증 코드를 활성화하여 로봇 로그인을 차단합니다."
 
-#: settings/serializers/security.py:174
+#: settings/serializers/security.py:176
 msgid "Suspicious Login Verification"
 msgstr "원격 로그인 알림"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:178
 msgid ""
 "The system determines whether the login IP address belongs to a common login"
 " city. If the account is logged in from a common login city, the system "
@@ -7678,100 +7686,100 @@ msgstr ""
 "로그인 IP가 자주 사용하는 도시인지 여부를 판단합니다. 만약 계정이 자주 사용하지 않는 도시에서 로그인하면 원격 로그인 알림이 "
 "전송됩니다."
 
-#: settings/serializers/security.py:182
+#: settings/serializers/security.py:184
 msgid "Auto Disable Threshold (day)"
 msgstr "비활성 사용자 자동 비활성화(일)"
 
-#: settings/serializers/security.py:183
+#: settings/serializers/security.py:185
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
 msgstr "매일 한 번 점검하며, 설정된 시간을 초과한 사용자는 자동으로 비활성화됩니다."
 
-#: settings/serializers/security.py:203
+#: settings/serializers/security.py:205
 msgid "Watermark"
 msgstr "워터마크 활성화"
 
-#: settings/serializers/security.py:206
+#: settings/serializers/security.py:208
 msgid "Watermark session content"
 msgstr "세션 워터마크 사용자 정의 내용"
 
-#: settings/serializers/security.py:209
+#: settings/serializers/security.py:211
 msgid "Watermark console content"
 msgstr "관리 페이지 워터마크 사용자 정의 내용"
 
-#: settings/serializers/security.py:215
+#: settings/serializers/security.py:217
 msgid "Watermark font size"
 msgstr "글꼴 크기"
 
-#: settings/serializers/security.py:218
+#: settings/serializers/security.py:220
 msgid "Watermark height"
 msgstr "단일 워터마크 높이"
 
-#: settings/serializers/security.py:221
+#: settings/serializers/security.py:223
 msgid "Watermark width"
 msgstr "단일 워터마크 너비"
 
-#: settings/serializers/security.py:224
+#: settings/serializers/security.py:226
 msgid "Watermark rotate"
 msgstr "워터마크 회전 각도"
 
-#: settings/serializers/security.py:228
+#: settings/serializers/security.py:230
 msgid "Max idle time (minute)"
 msgstr "최대 연결 대기 시간(분)"
 
-#: settings/serializers/security.py:229
+#: settings/serializers/security.py:231
 msgid "If idle time more than it, disconnect connection."
 msgstr "알림: 이 설정을 초과하여 작업이 없으면 연결이 끊어집니다."
 
-#: settings/serializers/security.py:232
+#: settings/serializers/security.py:234
 msgid "Session expire at browser closed"
 msgstr "세션은 브라우저 닫을 때 만료됩니다."
 
-#: settings/serializers/security.py:233
+#: settings/serializers/security.py:235
 msgid "Whether to expire the session when the user closes their browser."
 msgstr "사용자가 브라우저를 닫을 때 세션을 만료시킬지 여부."
 
-#: settings/serializers/security.py:238
+#: settings/serializers/security.py:240
 msgid "Allow users to view asset session information"
 msgstr "사용자가 자산 온라인 세션 정보를 볼 수 있도록 허용합니다."
 
-#: settings/serializers/security.py:240
+#: settings/serializers/security.py:242
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
 msgstr "사용자가 자산에 연결할 때 계정 선택 팝업에 현재 자산의 온라인 세션 수가 표시됩니다(단, RDP 프로토콜만 해당)."
 
-#: settings/serializers/security.py:246
+#: settings/serializers/security.py:248
 msgid "Max online time (hour)"
 msgstr "세션 연결 최대 시간(시)"
 
-#: settings/serializers/security.py:247
+#: settings/serializers/security.py:249
 msgid "If session connection time more than it, disconnect connection."
 msgstr "알림: 세션 연결이 이 설정을 초과하면 연결이 끊어집니다."
 
-#: settings/serializers/security.py:250
+#: settings/serializers/security.py:252
 msgid "Remember manual auth"
 msgstr "수동으로 입력한 비밀번호 저장"
 
-#: settings/serializers/security.py:253
+#: settings/serializers/security.py:255
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "세션 공유"
 
-#: settings/serializers/security.py:254
+#: settings/serializers/security.py:256
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "사용자가 연결된 자산 세션을 다른 사람과 공유하고 협업할 수 있도록 허용합니다."
 
-#: settings/serializers/security.py:260
+#: settings/serializers/security.py:262
 msgid "Insecure command alert"
 msgstr "위험한 명령 경고"
 
-#: settings/serializers/security.py:263
+#: settings/serializers/security.py:265
 msgid "Email recipient"
 msgstr "이메일 수신자"
 
-#: settings/serializers/security.py:264
+#: settings/serializers/security.py:266
 msgid "Multiple user using , split"
 msgstr "여러 사용자, 쉼표로 구분"
 
@@ -8612,48 +8620,48 @@ msgstr "세션 녹화 업로드 가능"
 msgid "Can download session replay"
 msgstr "세션 녹화 다운로드 가능"
 
-#: terminal/models/session/session.py:38
+#: terminal/models/session/session.py:39
 msgid "Account ID"
 msgstr "계정"
 
-#: terminal/models/session/session.py:40
+#: terminal/models/session/session.py:41
 #: terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr "로그인 출처"
 
-#: terminal/models/session/session.py:45
+#: terminal/models/session/session.py:46
 msgid "Replay"
 msgstr "재생"
 
-#: terminal/models/session/session.py:51 terminal/serializers/session.py:179
+#: terminal/models/session/session.py:52 terminal/serializers/session.py:179
 msgid "Command amount"
 msgstr "명령 수"
 
-#: terminal/models/session/session.py:52 terminal/serializers/session.py:40
+#: terminal/models/session/session.py:53 terminal/serializers/session.py:40
 msgid "Error reason"
 msgstr "오류 원인"
 
-#: terminal/models/session/session.py:53
+#: terminal/models/session/session.py:54
 msgid "Replay size"
 msgstr "녹화 크기"
 
-#: terminal/models/session/session.py:324
+#: terminal/models/session/session.py:325
 msgid "Session record"
 msgstr "세션 기록"
 
-#: terminal/models/session/session.py:326
+#: terminal/models/session/session.py:327
 msgid "Can monitor session"
 msgstr "세션 모니터링 가능"
 
-#: terminal/models/session/session.py:327
+#: terminal/models/session/session.py:328
 msgid "Can share session"
 msgstr "세션 공유 가능"
 
-#: terminal/models/session/session.py:328
+#: terminal/models/session/session.py:329
 msgid "Can terminate session"
 msgstr "세션 종료 가능"
 
-#: terminal/models/session/session.py:329
+#: terminal/models/session/session.py:330
 msgid "Can validate session action perm"
 msgstr "세션 Action 권한 검증 가능"
 
@@ -10076,11 +10084,11 @@ msgid ""
 "            and the current user is not in the user list. Please contact the administrator."
 msgstr "관리자가 '기존 사용자만 로그인 허용'을 활성화했으며, 현재 사용자가 사용자 목록에 없습니다. 관리자에게 연락해 주십시오."
 
-#: users/signal_handlers.py:177
+#: users/signal_handlers.py:179
 msgid "Clean up expired user sessions"
 msgstr "만료된 사용자 세션 정리"
 
-#: users/signal_handlers.py:179
+#: users/signal_handlers.py:181
 msgid ""
 "After logging in via the web, a user session record is created. At 2 a.m. every day, \n"
 "        the system cleans up inactive user devices"
