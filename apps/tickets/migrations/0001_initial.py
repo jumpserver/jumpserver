@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('title', models.CharField(max_length=256, verbose_name='Title')),
                 ('type', models.CharField(choices=[('general', 'General'), ('apply_asset', 'Apply for asset'), ('login_confirm', 'Login confirm'), ('command_confirm', 'Command confirm'), ('login_asset_confirm', 'Login asset confirm')], default='general', max_length=64, verbose_name='Type')),
-                ('state', models.CharField(choices=[('pending', 'Open'), ('closed', 'Cancel'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending', max_length=16, verbose_name='State')),
+                ('state', models.CharField(choices=[('all', 'All'), ('pending', 'Open'), ('closed', 'Cancel'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending', max_length=16, verbose_name='State')),
                 ('status', models.CharField(choices=[('open', 'Open'), ('closed', 'Finished')], default='open', max_length=16, verbose_name='Status')),
                 ('approval_step', models.SmallIntegerField(choices=[(1, 'One level'), (2, 'Two level')], default=1, verbose_name='Approval step')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('state', models.CharField(choices=[('pending', 'Open'), ('closed', 'Cancel'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending', max_length=64)),
+                ('state', models.CharField(choices=[('all', 'All'), ('pending', 'Open'), ('closed', 'Cancel'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending', max_length=64)),
             ],
             options={
                 'verbose_name': 'Ticket assignee',
