@@ -155,7 +155,7 @@ class BaseManager:
                 report = self.gen_report()
                 report = transform(report, cssutils_logging_level="CRITICAL")
                 subject = self.get_report_subject()
-                emails = [r.email for r in recipients if r.email]
+                emails = [user.email]
                 send_mail_async(subject, report, emails, html_message=report)
 
     def gen_report(self):

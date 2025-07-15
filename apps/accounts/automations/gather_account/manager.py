@@ -31,12 +31,12 @@ diff_items = risk_items + common_risk_items
 
 
 @bulk_create_decorator(AccountRisk)
-def _create_risk(self, data):
+def _create_risk(data):
     return AccountRisk(**data)
 
 
 @bulk_update_decorator(AccountRisk, update_fields=["details"])
-def _update_risk(self, account):
+def _update_risk(account):
     return account
 
 
