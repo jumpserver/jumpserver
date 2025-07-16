@@ -1,6 +1,8 @@
 {
     "ActionPerm": "操作權限",
     "AutoFit": "自動適應",
+    "AutoPasteOnClick": "點擊輸入框自動粘貼剪貼簿內容",
+    "AvailableShortcutKey": "可用的快捷鍵",
     "Cancel": "取消",
     "ClearDone": "清理已完成",
     "Clipboard": "剪貼板",
@@ -21,6 +23,7 @@
     "FileUploadStart": "文件上傳開始",
     "FileUploadingWarning": "文件正在上傳中，禁止操作",
     "Files": "文件管理",
+    "General": "通用",
     "GetShareUser": "輸入用户名",
     "GuaErrClientUnauthorized": "使用者名稱和密碼認證錯誤，登錄失敗",
     "GuaErrSessionConflict": "因與另一個連接衝突，遠程桌面伺服器關閉了本連接。請稍後重試。",

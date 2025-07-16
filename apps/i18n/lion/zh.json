@@ -1,6 +1,8 @@
 {
     "ActionPerm": "操作权限",
     "AutoFit": "自动适应",
+    "AutoPasteOnClick": "点击输入框自动粘贴剪贴板内容",
+    "AvailableShortcutKey": "可用的快捷键",
     "Cancel": "取消",
     "ClearDone": "清理已完成",
     "Clipboard": "剪贴板",
@@ -21,6 +23,7 @@
     "FileUploadStart": "文件上传开始",
     "FileUploadingWarning": "文件正在上传中, 禁止操作",
     "Files": "文件管理",
+    "General": "通用",
     "GetShareUser": "输入用户名",
     "GuaErrClientUnauthorized": "用户名和密码认证错误，登录失败",
     "GuaErrSessionConflict": "因与另一个连接冲突，远程桌面服务器关闭了本连接。请稍后重试。",
@@ -97,6 +100,5 @@
     "VerifyCode": "验证码",
     "VirtualKeyboard": "虚拟键盘",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
-    "Writable": "读写",
-    "AutoPasteOnClick": "点击输入框自动粘贴剪贴板内容"
+    "Writable": "读写"
 }

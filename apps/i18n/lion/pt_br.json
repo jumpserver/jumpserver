@@ -1,6 +1,8 @@
 {
     "ActionPerm": "Permissões de ação",
     "AutoFit": "Adaptação automática",
+    "AutoPasteOnClick": "Clique na caixa de entrada para colar automaticamente o conteúdo da área de transferência",
+    "AvailableShortcutKey": "Atalhos disponíveis",
     "Cancel": "Cancelar",
     "ClearDone": "Limpeza concluída",
     "Clipboard": "Área de transferência",
@@ -21,6 +23,7 @@
     "FileUploadStart": "O envio do arquivo começou",
     "FileUploadingWarning": "O arquivo está sendo enviado, operação proibida",
     "Files": "Gerenciamento de arquivos",
+    "General": "Geral",
     "GetShareUser": "Digite o nome de usuário",
     "GuaErrClientUnauthorized": "Erro de autenticação de nome de usuário e senha, falha no login",
     "GuaErrSessionConflict": "Devido a um conflito com outra conexão, o servidor de area de trabalho remota fechou esta conexão. Por favor, tente novamente mais tarde.",

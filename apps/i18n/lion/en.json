@@ -1,6 +1,8 @@
 {
     "ActionPerm": "Actions",
     "AutoFit": "Auto Fit",
+    "AutoPasteOnClick": "Click the input box to automatically paste from clipboard",
+    "AvailableShortcutKey": "Available shortcut keys",
     "Cancel": "Cancel",
     "ClearDone": "Clear done",
     "Clipboard": "Clipboard",
@@ -21,6 +23,7 @@
     "FileUploadStart": "File upload started",
     "FileUploadingWarning": "File is uploading, operation is not allowed",
     "Files": "Files",
+    "General": "General",
     "GetShareUser": "Enter username",
     "GuaErrClientUnauthorized": "User failed to logged in. (username and password are incorrect)",
     "GuaErrSessionConflict": "The session has ended because it conflicts with another session.",
@@ -97,6 +100,5 @@
     "VerifyCode": "Verify code",
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable",
-    "AutoPasteOnClick": "Click the input box to automatically paste from clipboard"
+    "Writable": "Writable"
 }

@@ -1,6 +1,8 @@
 {
     "ActionPerm": "操作権限",
     "AutoFit": "自動適応",
+    "AutoPasteOnClick": "入力ボックスをクリックするとクリップボードの内容が自動的に貼り付けられます",
+    "AvailableShortcutKey": "利用可能なショートカットキー",
     "Cancel": "キャンセル",
     "ClearDone": "クリーニング終了",
     "Clipboard": "クリップボード",
@@ -21,6 +23,7 @@
     "FileUploadStart": "ファイルアップロード開始",
     "FileUploadingWarning": "ファイルがアップロード中です。操作は禁止されています",
     "Files": "ファイル管理",
+    "General": "一般",
     "GetShareUser": "ユーザー名を入力してください",
     "GuaErrClientUnauthorized": "ユーザー名とパスワードの認証エラー、ログインに失敗しました",
     "GuaErrSessionConflict": "他の接続との競合により、リモートデスクトップサーバーがこの接続をシャットダウンしました。しばらくしてから再試行してください。",
