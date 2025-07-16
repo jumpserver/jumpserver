@@ -26,6 +26,7 @@
             @media (min-width: 768px) {
                 top: 97%;
             }
+            z-index: -1;
         }
 
         .markdown-footer p {
@@ -55,7 +56,7 @@
         });
         const markdownContent = `{{ INTERFACE.footer_content|escapejs }}`;
         const markdownRef = document.getElementById('markdown-output');
-        
+
         if (markdownRef && markdownContent) {
             const renderedContent = md.render(markdownContent.trim());
             markdownRef.innerHTML = renderedContent;
