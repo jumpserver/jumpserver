@@ -100,5 +100,6 @@
     "VerifyCode": "Verify code",
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "InputVerifyCode": "Input Verify Code"
 }
