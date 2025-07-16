@@ -48,7 +48,6 @@ def random_string(
 
     char_list = []
     if lower:
-
         lower_chars = remove_exclude_char(string.ascii_lowercase, exclude_chars)
         if not lower_chars:
             raise ValueError('After excluding characters, no lowercase letters are available.')
@@ -78,7 +77,7 @@ def random_string(
         if not special_chars:
             raise ValueError('After excluding characters, no special characters are available.')
         symbol_num = length // 16 + 1
-        seq = random_replace_char(seq, symbols, symbol_num)
+        seq = random_replace_char(seq, special_chars, symbol_num)
     secret_chars += seq
 
     secrets.SystemRandom().shuffle(secret_chars)
