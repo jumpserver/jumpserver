@@ -14,8 +14,16 @@ if [[ $1 == "root" ]];then
   BASE_DIR="${BASE_DIR}/jumpserver"
 fi
 
-
 for file in $to_files; do
+  if [[ "$1" == "clean" ]];then
+    echo "Clean $file"
+    file_path="${BASE_DIR}/$file"
+    if [ -f "$file_path" ]; then
+      rm -f "$file_path"
+    fi
+    continue
+  fi
+
   # Check if the file already exists
   file_path="${BASE_DIR}/$file"
   if [ -f "$file_path" ]; then
