@@ -1,6 +1,8 @@
 {
     "ActionPerm": "Permisos de acción",
     "AutoFit": "Adaptación automática",
+    "AutoPasteOnClick": "Haz clic en el cuadro de entrada para pegar automáticamente el contenido del portapapeles",
+    "AvailableShortcutKey": "Atajos disponibles",
     "Cancel": "Cancelar",
     "ClearDone": "Limpieza completada",
     "Clipboard": "Portapapeles",
@@ -21,6 +23,7 @@
     "FileUploadStart": "Inicio de subida de archivos",
     "FileUploadingWarning": "El archivo se está subiendo, operación prohibida",
     "Files": "Gestión de archivos",
+    "General": "General",
     "GetShareUser": "Ingrese el nombre de usuario",
     "GuaErrClientUnauthorized": "Error en la autenticación del nombre de usuario y la contraseña, fallo en el inicio de sesión",
     "GuaErrSessionConflict": "Debido a un conflicto con otra conexión, el servidor de escritorio remoto ha cerrado esta conexión. Por favor, inténtelo de nuevo más tarde.",
