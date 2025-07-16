@@ -21,7 +21,7 @@ class PasswordStrategy(models.TextChoices):
     random_all = 'random_all', _('All assets use different random password')
 
 
-string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
+string_punctuation = '!#$%&()*+,-.:;<=?@[]_~'
 DEFAULT_PASSWORD_LENGTH = 30
 DEFAULT_PASSWORD_RULES = {
     'length': DEFAULT_PASSWORD_LENGTH,
