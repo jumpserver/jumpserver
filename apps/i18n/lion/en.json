@@ -98,5 +98,7 @@
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
     "Writable": "Writable",
-    "AutoPasteOnClick": "Click the input box to automatically paste from clipboard"
+    "AutoPasteOnClick": "Click the input box to automatically paste from clipboard",
+    "AvailableShortcutKey": "Available shortcut keys",
+    "General": "General"
 }

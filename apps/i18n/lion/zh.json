@@ -98,5 +98,7 @@
     "VirtualKeyboard": "虚拟键盘",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
     "Writable": "读写",
-    "AutoPasteOnClick": "点击输入框自动粘贴剪贴板内容"
+    "AutoPasteOnClick": "点击输入框自动粘贴剪贴板内容",
+    "AvailableShortcutKey": "可用快捷键",
+    "General": "通用"
 }
