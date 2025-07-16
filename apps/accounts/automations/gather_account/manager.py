@@ -390,6 +390,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         self.update_gathered_account(ori_account, d)
                     ori_found = username in ori_users
                     need_analyser_gather_account.append((asset, ga, d, ori_found))
+                # 这里顺序不能调整，risk 外键关联了 gathered_account 主键 id，所以在创建 risk 需要保证 gathered_account 已经创建完成
+                self.create_gathered_account.finish()
+                self.update_gathered_account.finish()
                 for analysis_data in need_analyser_gather_account:
                     risk_analyser.analyse_risk(*analysis_data)
                 self.update_gather_accounts_status(asset)
@@ -403,8 +406,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     present=True
                 )
         # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步
-        self.create_gathered_account.finish()
-        self.update_gathered_account.finish()
         _update_risk.finish()
         _create_risk.finish()
 
