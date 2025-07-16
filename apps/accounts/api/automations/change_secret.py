@@ -97,12 +97,13 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
     def execute(self, request, *args, **kwargs):
         record_ids = request.data.get('record_ids')
         records = self.get_queryset().filter(id__in=record_ids)
-        execution_count = records.values_list('execution_id', flat=True).distinct().count()
-        if execution_count != 1:
+        if not records.exists():
             return Response(
-                {'detail': 'Only one execution is allowed to execute'},
+                {'detail': 'No valid records found'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        record_ids = [str(_id) for _id in records.values_list('id', flat=True)]
         task = execute_automation_record_task.delay(record_ids, self.tp)
         return Response({'task': task.id}, status=status.HTTP_200_OK)
 
