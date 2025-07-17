@@ -48,7 +48,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "protocol", 'type', "login_from", "remote_addr",
             "is_success", "is_finished", "has_replay", "has_command",
             "date_start", "date_end", "duration", "comment", "terminal_display", "is_locked",
-            'command_amount', 'error_reason'
+            'command_amount', 'error_reason', 'replay_size',
         ]
         fields_fk = ["terminal", ]
         fields_custom = ["can_replay", "can_join", "can_terminate"]

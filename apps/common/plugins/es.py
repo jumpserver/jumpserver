@@ -123,7 +123,7 @@ def get_es_client_version(**kwargs):
 
 class ES(object):
 
-    def __init__(self, config, properties, keyword_fields, exact_fields=None, match_fields=None):
+    def __init__(self, config, properties, keyword_fields, exact_fields=None, fuzzy_fields=None, match_fields=None, **kwargs):
         self.version = 7
         self.config = config
         hosts = self.config.get('HOSTS')
@@ -140,7 +140,7 @@ class ES(object):
         self.index = None
         self.query_index = None
         self.properties = properties
-        self.exact_fields, self.match_fields, self.keyword_fields = set(), set(), set()
+        self.exact_fields, self.match_fields, self.keyword_fields, self.fuzzy_fields = set(), set(), set(), set()
 
         if isinstance(keyword_fields, Iterable):
             self.keyword_fields.update(keyword_fields)
@@ -148,6 +148,8 @@ class ES(object):
             self.exact_fields.update(exact_fields)
         if isinstance(match_fields, Iterable):
             self.match_fields.update(match_fields)
+        if isinstance(fuzzy_fields, Iterable):
+            self.fuzzy_fields.update(fuzzy_fields)
 
         self.init_index()
         self.doc_type = self.config.get("DOC_TYPE") or '_doc'
@@ -314,6 +316,17 @@ class ES(object):
                 query: {k: v}
             })
         return _filter
+    
+    @staticmethod
+    def handle_fuzzy_fields(exact):
+        _filter = []
+        for k, v in exact.items():
+            _filter.append({ 'wildcard': { k: f'*{v}*' } })
+        return _filter
+
+    @staticmethod
+    def is_keyword(props: dict, field: str) -> bool:
+        return props.get(field, {}).get("type", "keyword") == "keyword"
 
     def get_query_body(self, **kwargs):
         new_kwargs = {}
@@ -331,10 +344,12 @@ class ES(object):
         keyword_fields = self.keyword_fields
         exact_fields = self.exact_fields
         match_fields = self.match_fields
+        fuzzy_fields = self.fuzzy_fields
 
         match = {}
         search = []
         exact = {}
+        fuzzy = {}
         index = {}
 
         if index_in_field in kwargs:
@@ -347,13 +362,19 @@ class ES(object):
             .get('mappings', {})
             .get('properties', {})
         )
-        org_id_type = props.get('org_id', {}).get('type', 'keyword')
+
+        common_keyword_able = exact_fields | keyword_fields
 
         for k, v in kwargs.items():
-            if k == 'org_id' and org_id_type == 'keyword':
+            if k in ("org_id", "session") and self.is_keyword(props, k):
                 exact[k] = v
-            elif k in exact_fields.union(keyword_fields):
-                exact['{}.keyword'.format(k)] = v
+
+            elif k in common_keyword_able:
+                exact[f"{k}.keyword"] = v
+            
+            elif k in fuzzy_fields:
+                fuzzy[f"{k}.keyword"] = v
+
             elif k in match_fields:
                 match[k] = v
 
@@ -395,9 +416,10 @@ class ES(object):
                     'should': should + [
                         {'match': {k: v}} for k, v in match.items()
                     ] + [
-                        {'match': item} for item in search
-                    ],
+                                  {'match': item} for item in search
+                              ],
                     'filter': self.handle_exact_fields(exact) +
+                              self.handle_fuzzy_fields(fuzzy) +
                               [
                                   {
                                       'range': {
@@ -453,7 +475,7 @@ class QuerySet(DJQuerySet):
         names, multi_args, multi_kwargs = zip(*filter_calls)
 
         # input 输入
-        multi_args = tuple(reduce(lambda x, y: x + y, (sub for sub in multi_args if sub),()))
+        multi_args = tuple(reduce(lambda x, y: x + y, (sub for sub in multi_args if sub), ()))
         args = self._grouped_search_args(multi_args)
         striped_args = [{k.replace('__icontains', ''): v} for k, values in args.items() for v in values]
 

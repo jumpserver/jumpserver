@@ -349,7 +349,7 @@ class Config(dict):
         'AUTH_OPENID_PROVIDER_SIGNATURE_ALG': 'HS256',
         'AUTH_OPENID_PROVIDER_SIGNATURE_KEY': None,
         'AUTH_OPENID_SCOPES': 'openid profile email',
-        'AUTH_OPENID_ID_TOKEN_MAX_AGE': 60,
+        'AUTH_OPENID_ID_TOKEN_MAX_AGE': 600,
         'AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS': True,
         'AUTH_OPENID_USE_STATE': True,
         'AUTH_OPENID_USE_NONCE': True,

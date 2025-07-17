@@ -14,6 +14,7 @@ class TicketType(TextChoices):
 
 
 class TicketState(TextChoices):
+    all = 'all', _('All')
     pending = 'pending', _('Open')
     closed = 'closed', _("Cancel")
     approved = 'approved', _('Approved')

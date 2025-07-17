@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 
 from celery import shared_task
 from django.db.models import Q
@@ -72,24 +73,43 @@ def execute_automation_record_task(record_ids, tp):
     task_name = gettext_noop('Execute automation record')
 
     with tmp_to_root_org():
-        records = ChangeSecretRecord.objects.filter(id__in=record_ids)
+        records = ChangeSecretRecord.objects.filter(id__in=record_ids).order_by('-date_updated')
 
     if not records:
-        logger.error('No automation record found: {}'.format(record_ids))
+        logger.error(f'No automation record found: {record_ids}')
         return
 
-    record = records[0]
-    record_map = {f'{record.asset_id}-{record.account_id}': str(record.id) for record in records}
-    task_snapshot = {
-        'params': {},
-        'record_map': record_map,
-        'secret': record.new_secret,
-        'secret_type': record.execution.snapshot.get('secret_type'),
-        'assets': [str(instance.asset_id) for instance in records],
-        'accounts': [str(instance.account_id) for instance in records],
-    }
-    with tmp_to_org(record.execution.org_id):
-        quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
+    seen_accounts = set()
+    unique_records = []
+    for rec in records:
+        acct = str(rec.account_id)
+        if acct not in seen_accounts:
+            seen_accounts.add(acct)
+            unique_records.append(rec)
+
+    exec_groups = defaultdict(list)
+    for rec in unique_records:
+        exec_groups[rec.execution_id].append(rec)
+
+    for __, group in exec_groups.items():
+        latest_rec = group[0]
+        snapshot = getattr(latest_rec.execution, 'snapshot', {}) or {}
+
+        record_map = {f"{r.asset_id}-{r.account_id}": str(r.id) for r in group}
+        assets = [str(r.asset_id) for r in group]
+        accounts = [str(r.account_id) for r in group]
+
+        task_snapshot = {
+            'params': {},
+            'record_map': record_map,
+            'secret': latest_rec.new_secret,
+            'secret_type': snapshot.get('secret_type'),
+            'assets': assets,
+            'accounts': accounts,
+        }
+
+        with tmp_to_org(latest_rec.execution.org_id):
+            quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
 
 
 @shared_task(

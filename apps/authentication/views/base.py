@@ -150,6 +150,7 @@ class BaseBindCallbackView(FlashMessageMixin, IMClientMixin, View):
             user.save()
         except IntegrityError as e:
             msg = _('The %s is already bound to another user') % self.auth_type_label
+            logger.error(e, exc_info=True)
             response = self.get_failed_response(redirect_url, msg, msg)
             return response
 

@@ -74,6 +74,7 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
         if confirm_mfa:
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
             request.session['CONFIRM_TIME'] = int(time.time())
+            request.session['CONFIRM_TYPE'] = ConfirmType.MFA
             request.session['passkey_confirm_mfa'] = ''
             return Response('ok')
 

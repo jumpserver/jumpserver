@@ -161,7 +161,7 @@ class BlockUtilBase:
     BLOCK_KEY_TMPL: str
 
     def __init__(self, username, ip):
-        username = username.lower()
+        username = username.lower() if username else ''
         self.username = username
         self.ip = ip
         self.limit_key = self.LIMIT_KEY_TMPL.format(username, ip)

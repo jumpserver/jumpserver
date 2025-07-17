@@ -6753,14 +6753,13 @@ body.body-small .vote-icon {
     padding: 10px 10px;
 }
 
-/*
- * metismenu - v2.0.2
- * A jQuery menu plugin
- * https://github.com/onokumus/metisMenu
- *
- * Made by Osman Nuri Okumus
- * Under MIT License
- */
+/*!
+* metismenu https://github.com/onokumus/metismenu#readme
+* A collapsible jQuery menu plugin
+* @version 3.0.7
+* @author Osman Nuri Okumus <onokumus@gmail.com> (https://github.com/onokumus)
+* @license: MIT 
+*/
 .metismenu .plus-minus,
 .metismenu .plus-times {
     float: right;
@@ -6775,7 +6774,7 @@ body.body-small .vote-icon {
     content: "\e079";
 }
 
-.metismenu .active > a > .glyphicon.arrow:before {
+.metismenu .mm-active > a > .glyphicon.arrow:before {
     content: "\e114";
 }
 
@@ -6783,7 +6782,7 @@ body.body-small .vote-icon {
     content: "\f104";
 }
 
-.metismenu .active > a > .fa.arrow:before {
+.metismenu .mm-active > a > .fa.arrow:before {
     content: "\f107";
 }
 
@@ -6791,7 +6790,7 @@ body.body-small .vote-icon {
     content: "\f3d2";
 }
 
-.metismenu .active > a > .ion.arrow:before {
+.metismenu .mm-active > a > .ion.arrow:before {
     content: "\f3d0";
 }
 
@@ -6800,25 +6799,25 @@ body.body-small .vote-icon {
     content: "\f067";
 }
 
-.metismenu .active > a > .fa.plus-times {
+.metismenu .mm-active > a > .fa.plus-times {
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
 
-.metismenu .active > a > .fa.plus-minus:before {
+.metismenu .mm-active > a > .fa.plus-minus:before {
     content: "\f068";
 }
 
-.metismenu .collapse {
+.metismenu .mm-collapse {
     display: none;
 }
 
-.metismenu .collapse.in {
+.metismenu .mm-collapse.in {
     display: block;
 }
 
-.metismenu .collapsing {
+.metismenu .mm-collapsing {
     position: relative;
     height: 0;
     overflow: hidden;

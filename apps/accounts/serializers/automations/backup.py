@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, AccountBackupType
 from accounts.models import BackupAccountAutomation
 from common.serializers.fields import EncryptedField
 from common.utils import get_logger
@@ -40,6 +41,17 @@ class BackupAccountSerializer(BaseAutomationSerializer):
                 )},
             'types': {'label': _('Asset type')}
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_backup_type_choices()
+
+    def set_backup_type_choices(self):
+        field_backup_type = self.fields.get("backup_type")
+        if not field_backup_type:
+            return
+        if not settings.XPACK_LICENSE_IS_VALID:
+            field_backup_type._choices.pop(AccountBackupType.object_storage, None)
 
     @property
     def model_type(self):

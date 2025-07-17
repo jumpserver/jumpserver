@@ -119,6 +119,9 @@ class CheckAccountEngine(JMSBaseModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = _('Check engine')
+
     @staticmethod
     def get_default_engines():
         data = [

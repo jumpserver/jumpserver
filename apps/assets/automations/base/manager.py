@@ -123,9 +123,7 @@ class BaseManager:
         self.execution.summary = self.summary
         self.execution.result = self.result
         self.execution.status = self.status
-
-        with safe_atomic_db_connection():
-            self.execution.save()
+        self.execution.save()
 
     def print_summary(self):
         content = "\nSummery: \n"
@@ -157,7 +155,7 @@ class BaseManager:
                 report = self.gen_report()
                 report = transform(report, cssutils_logging_level="CRITICAL")
                 subject = self.get_report_subject()
-                emails = [r.email for r in recipients if r.email]
+                emails = [user.email]
                 send_mail_async(subject, report, emails, html_message=report)
 
     def gen_report(self):
@@ -167,9 +165,10 @@ class BaseManager:
         return data
 
     def post_run(self):
-        self.update_execution()
-        self.print_summary()
-        self.send_report_if_need()
+        with safe_atomic_db_connection():
+            self.update_execution()
+            self.print_summary()
+            self.send_report_if_need()
 
     def run(self, *args, **kwargs):
         self.pre_run()
@@ -548,7 +547,8 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             try:
                 kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
-                self.on_runner_success(runner, cb)
+                with safe_atomic_db_connection():
+                    self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e, **info)
             finally:

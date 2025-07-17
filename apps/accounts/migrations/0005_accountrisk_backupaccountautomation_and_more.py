@@ -335,6 +335,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "abstract": False,
+                "verbose_name": "Check engine",
             },
         ),
         migrations.CreateModel(

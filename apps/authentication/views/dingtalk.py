@@ -144,6 +144,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
             user.save()
         except IntegrityError as e:
             msg = _('The DingTalk is already bound to another user')
+            logger.error(e, exc_info=True)
             response = self.get_failed_response(redirect_url, msg, msg)
             return response
 

@@ -180,7 +180,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PlatformAutomation', 'PlatformProtocol', 'Protocol',
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
         'BaseAutomation', 'CeleryTask', 'Command', 'JobLog',
-        'ConnectionToken', 'SessionJoinRecord',
+        'ConnectionToken', 'SessionJoinRecord', 'SessionSharing',
         'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
         'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
         'SuperTicket', 'SuperConnectionToken', 'AdminConnectionToken', 'PermNode',

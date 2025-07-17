@@ -75,7 +75,7 @@ class CMPPSubmitRequestInstance(CMPPBaseRequestInstance):
         pk_number = struct.pack('!B', 1)
         registered_delivery = struct.pack('!B', 0)
         msg_level = struct.pack('!B', 0)
-        service_id = ((10 - len(service_id)) * '\x00' + service_id).encode('utf-8')
+        service_id = service_id.ljust(10, '\x00').encode('utf-8')
         fee_user_type = struct.pack('!B', 2)
         fee_terminal_id = ('0' * 21).encode('utf-8')
         tp_pid = struct.pack('!B', 0)
@@ -85,7 +85,7 @@ class CMPPSubmitRequestInstance(CMPPBaseRequestInstance):
         fee_code = '000000'.encode('utf-8')
         valid_time = ('\x00' * 17).encode('utf-8')
         at_time = ('\x00' * 17).encode('utf-8')
-        src_id = ((21 - len(src_id)) * '\x00' + src_id).encode('utf-8')
+        src_id = src_id.ljust(21, '\x00').encode('utf-8')
         reserve = b'\x00' * 8
         _msg_length = struct.pack('!B', len(msg_content) * 2)
         _msg_src = msg_src.encode('utf-8')

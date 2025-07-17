@@ -73,6 +73,9 @@ class FTPLog(OrgModelMixin):
             models.Index(fields=['date_start', 'org_id'], name='idx_date_start_org'),
         ]
 
+    def __str__(self):
+        return "{0.id} of {0.user} to {0.asset}".format(self)
+
     @property
     def filepath(self):
         return os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))

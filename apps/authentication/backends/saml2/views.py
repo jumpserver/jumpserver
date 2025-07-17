@@ -278,9 +278,10 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
         saml_user_data = self.get_attributes(saml_instance)
         try:
             user = auth.authenticate(request=request, saml_user_data=saml_user_data)
-        except IntegrityError:
+        except IntegrityError as e:
             title = _("SAML2 Error")
             msg = _('Please check if a user with the same username or email already exists')
+            logger.error(e, exc_info=True)
             response = self.get_failed_response('/', title, msg)
             return response
         if user and user.is_valid:

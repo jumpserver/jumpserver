@@ -2,6 +2,7 @@
 #
 
 from django.db.models import F
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -60,14 +61,24 @@ class NodePermedSerializer(serializers.ModelSerializer):
 class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
     username = serializers.CharField(source='full_username', read_only=True)
+    date_expired = serializers.SerializerMethodField()
 
     class Meta:
         model = Account
         fields = [
             'id', 'alias', 'name', 'username', 'has_username',
-            'has_secret', 'secret_type', 'actions'
+            'has_secret', 'secret_type', 'actions', 'date_expired'
         ]
         read_only_fields = fields
+
+    def get_date_expired(self, obj):
+        dt = obj.date_expired
+        if dt:
+            dt = dt.astimezone(get_current_timezone())
+            formatted = dt.strftime('%Y/%m/%d %H:%M:%S %z')
+            return formatted
+        else:
+            return None
 
 
 class AssetPermedDetailSerializer(AssetPermedSerializer):

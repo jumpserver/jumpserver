@@ -171,9 +171,10 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
             logger.debug(log_prompt.format('Process authenticate'))
             try:
                 user = auth.authenticate(nonce=nonce, request=request, code_verifier=code_verifier)
-            except IntegrityError:
+            except IntegrityError as e:
                 title = _("OpenID Error")
                 msg = _('Please check if a user with the same username or email already exists')
+                logger.error(e, exc_info=True)
                 response = self.get_failed_response('/', title, msg)
                 return response
             if user:
