@@ -47,13 +47,15 @@ class UserReportApi(APIView):
         date_range_bounds = self.days_to_datetime.date(), (local_now() + timezone.timedelta(days=1)).date()
         return queryset.filter(**{f'{field_name}__range': date_range_bounds})
 
-    def get_user_login_metrics(self, status):
-        queryset = UserLoginLog.objects.filter(status=status)
-        queryset = UserLoginLog.filter_login_queryset_by_org(queryset)
-        filtered_queryset = self.filter_by_date_range(queryset, 'datetime').values(
-            'datetime__date').annotate(user_count=Count('username', distinct=True)).order_by('datetime__date')
-        result_dict = {r['datetime__date']: r['user_count'] for r in filtered_queryset}
-        metrics = [result_dict.get(d, 0) for d in self.date_range_list]
+    def get_user_login_metrics(self, queryset):
+        filtered_queryset = self.filter_by_date_range(queryset, 'datetime')
+
+        data = defaultdict(set)
+        for t, username in filtered_queryset.values_list('datetime', 'username'):
+            date_str = str(t.date())
+            data[date_str].add(username)
+
+        metrics = [len(data.get(str(d), set())) for d in self.date_range_list]
         return metrics
 
     def get_user_login_method_metrics(self):
@@ -110,19 +112,20 @@ class UserReportApi(APIView):
 
     def get(self, request, *args, **kwargs):
         data = {}
+        dates_metrics_date = [date.strftime('%m-%d') for date in self.date_range_list] or ['0']
+
         data['user_login_log_metrics'] = {
-            'dates_metrics_date': [date.strftime('%m-%d') for date in self.date_range_list] or ['0'],
-            'dates_metrics_total': self.get_user_login_metrics(LoginStatusChoices.success),
+            'dates_metrics_date': dates_metrics_date,
+            'dates_metrics_total': self.get_user_login_metrics(self.user_login_log_queryset),
         }
         data['user_login_failed_metrics'] = {
-            'dates_metrics_date': [date.strftime('%m-%d') for date in self.date_range_list] or ['0'],
-            'dates_metrics_total': self.get_user_login_metrics(LoginStatusChoices.failed),
+            'dates_metrics_date': dates_metrics_date,
+            'dates_metrics_total': self.get_user_login_metrics(self.user_login_failed_queryset),
         }
         data['user_login_method_metrics'] = {
-            'dates_metrics_date': [date.strftime('%m-%d') for date in self.date_range_list] or ['0'],
+            'dates_metrics_date': dates_metrics_date,
             'dates_metrics_total': self.get_user_login_method_metrics(),
         }
         data['user_login_region_distribution'] = self.get_user_login_region_distribution()
         data['user_login_time_metrics'] = self.get_user_login_time_metrics()
-
         return JsonResponse(data, status=200)
