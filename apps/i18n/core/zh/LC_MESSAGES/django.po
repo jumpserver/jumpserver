@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-14 19:34+0800\n"
+"POT-Creation-Date: 2025-07-17 11:31+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -140,6 +140,8 @@ msgstr ">>> 开始执行测试网关账号可连接性任务"
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:43
+#: xpack/plugins/cloud/serializers/account_attrs.py:105
+#: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "Password"
 msgstr "密码"
 
@@ -873,6 +875,8 @@ msgstr "重复密码"
 #: users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
+#: xpack/plugins/cloud/serializers/account_attrs.py:103
+#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Username"
 msgstr "用户名"
 
@@ -1945,8 +1949,8 @@ msgid ""
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
 "support)"
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
+"2001:db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -1978,8 +1982,8 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
+"2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -2228,7 +2232,8 @@ msgstr "云服务"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
+#: common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "自定义类型"
 
@@ -2937,7 +2942,7 @@ msgstr "端口超出范围 (0-65535)"
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/common.py:353
+#: assets/serializers/asset/common.py:353 labels/api.py:107
 msgid "Invalid data"
 msgstr "无效的数据"
 
@@ -3331,7 +3336,7 @@ msgstr "建立软链接"
 
 #: audits/const.py:18 audits/const.py:29
 #: ops/templates/ops/celery_task_log.html:86
-#: terminal/api/session/session.py:154
+#: terminal/api/session/session.py:155
 msgid "Download"
 msgstr "下载"
 
@@ -3339,7 +3344,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:284
+#: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:285
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
@@ -3628,7 +3633,7 @@ msgid "Slack"
 msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
-#: authentication/views/dingtalk.py:151 notifications/backends/__init__.py:12
+#: authentication/views/dingtalk.py:152 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:133
 #: users/models/user/_source.py:22
 msgid "DingTalk"
@@ -3733,7 +3738,7 @@ msgstr "人脸比对失败"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:34 terminal/api/session/session.py:337
+#: authentication/api/password.py:34 terminal/api/session/session.py:342
 #: users/views/profile/reset.py:63
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
@@ -3977,8 +3982,8 @@ msgstr "企业微信已经绑定"
 msgid "WeCom is not bound"
 msgstr "没有绑定企业微信"
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
-#: authentication/views/dingtalk.py:247
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:206
+#: authentication/views/dingtalk.py:248
 msgid "DingTalk is not bound"
 msgstr "钉钉没有绑定"
 
@@ -4392,8 +4397,8 @@ msgid ""
 "Retention Period"
 msgstr ""
 "系统在连接资产或创建临时密码时，会生成相应的连接 Token 或临时密码记录。为了保"
-"障系统安全并控制数据存储量，系统会根据“安全设置 > 密码安全 > Token 保留时"
-"长”中的配置，每天凌晨 2 点自动清理所有已过期的 Token 记录"
+"障系统安全并控制数据存储量，系统会根据“安全设置 > 密码安全 > Token 保留时长”"
+"中的配置，每天凌晨 2 点自动清理所有已过期的 Token 记录"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -4642,7 +4647,7 @@ msgstr "%s 查询用户失败"
 msgid "The %s is already bound to another user"
 msgstr "%s 已绑定到另一个用户"
 
-#: authentication/views/base.py:158
+#: authentication/views/base.py:159
 #, python-format
 msgid "Binding %s successfully"
 msgstr "绑定 %s 成功"
@@ -4651,7 +4656,7 @@ msgstr "绑定 %s 成功"
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "钉钉错误，请联系系统管理员"
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:204
+#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:205
 msgid "DingTalk Error"
 msgstr "钉钉错误"
 
@@ -4671,15 +4676,15 @@ msgstr "钉钉查询用户失败"
 msgid "The DingTalk is already bound to another user"
 msgstr "该钉钉已经绑定其他用户"
 
-#: authentication/views/dingtalk.py:152
+#: authentication/views/dingtalk.py:153
 msgid "Binding DingTalk successfully"
 msgstr "绑定 钉钉 成功"
 
-#: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:241
+#: authentication/views/dingtalk.py:207 authentication/views/dingtalk.py:242
 msgid "Failed to get user from DingTalk"
 msgstr "从钉钉获取用户失败"
 
-#: authentication/views/dingtalk.py:248
+#: authentication/views/dingtalk.py:249
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "请使用密码登录，然后绑定钉钉"
 
@@ -5105,6 +5110,10 @@ msgstr "自定义短信文件无效"
 msgid "SMS sending failed[%s]: %s"
 msgstr "短信发送失败[%s]: %s"
 
+#: common/sdk/sms/custom_file.py:47 common/serializers/common.py:98
+msgid "File"
+msgstr "文件"
+
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
 msgstr "阿里云"
@@ -5148,10 +5157,6 @@ msgstr "请在 {} 秒后发送"
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "节点"
-
-#: common/serializers/common.py:98
-msgid "File"
-msgstr "文件"
 
 #: common/serializers/fields.py:139
 msgid "Invalid data type"
@@ -5274,6 +5279,10 @@ msgstr "你的账号已创建成功"
 #: jumpserver/context_processor.py:14
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 开源堡垒机"
+
+#: jumpserver/context_processor.py:28
+msgid "FIT2CLOUD"
+msgstr ""
 
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
@@ -6072,8 +6081,8 @@ msgid "Delete (SFTP)"
 msgstr "删除 (SFTP)"
 
 #: perms/const.py:18
-msgid "Share (SSH)"
-msgstr "分享 (SSH)"
+msgid "Share (Web SSH, Web RDP, Web VNC)"
+msgstr "分享 (Web SSH, Web RDP, Web VNC)"
 
 #: perms/const.py:28
 msgid "Transfer"
@@ -7279,7 +7288,7 @@ msgstr "租户 ID"
 
 #: settings/serializers/feature.py:110 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:124
-#: xpack/plugins/cloud/models.py:292
+#: xpack/plugins/cloud/manager.py:161 xpack/plugins/cloud/models.py:292
 msgid "Region"
 msgstr "地域"
 
@@ -8255,25 +8264,25 @@ msgstr "测试失败：请检查配置"
 msgid "Have online sessions"
 msgstr "有在线会话"
 
-#: terminal/api/session/session.py:49
+#: terminal/api/session/session.py:50
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
 
-#: terminal/api/session/session.py:158 terminal/api/session/session.py:288
+#: terminal/api/session/session.py:159 terminal/api/session/session.py:292
 #: terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "会话录像"
 
-#: terminal/api/session/session.py:329
+#: terminal/api/session/session.py:334
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session/session.py:332
+#: terminal/api/session/session.py:337
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:345
+#: terminal/api/session/session.py:350 tickets/api/ticket.py:140
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -8825,9 +8834,9 @@ msgid ""
 "days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
 "remote-desktop-services/rds-client-access-license\">Detail</a>"
 msgstr ""
-"如果不存在，RDS 将处于试用模式，试用期为 120 天。<a href='https://learn."
-"microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-"
-"access-license'>详情</a>"
+"如果不存在，RDS 将处于试用模式，试用期为 120 天。<a href='https://"
+"learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-"
+"client-access-license'>详情</a>"
 
 #: terminal/serializers/applet_host.py:55
 msgid "RDS License Server"
@@ -9041,8 +9050,8 @@ msgid ""
 "If there are multiple hosts, use a comma (,) to separate them. <br>(For "
 "example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)"
 msgstr ""
-"如果有多个主机，请用逗号 (,) 分隔它们。<br>（例如：http://www.jumpserver.a."
-"com:9100，http://www.jumpserver.b.com:9100）"
+"如果有多个主机，请用逗号 (,) 分隔它们。<br>（例如：http://"
+"www.jumpserver.a.com:9100，http://www.jumpserver.b.com:9100）"
 
 #: terminal/serializers/storage.py:199
 msgid "Index by date"
@@ -10645,6 +10654,10 @@ msgstr "同步地区"
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "获取区域 \"%s\" 的实例错误，错误：%s"
 
+#: xpack/plugins/cloud/manager.py:161 xpack/plugins/cloud/models.py:289
+msgid "Instance"
+msgstr "实例"
+
 #: xpack/plugins/cloud/manager.py:187
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
@@ -10786,10 +10799,6 @@ msgstr "同步任务"
 #: xpack/plugins/cloud/models.py:286
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
-
-#: xpack/plugins/cloud/models.py:289
-msgid "Instance"
-msgstr "实例"
 
 #: xpack/plugins/cloud/models.py:306
 msgid "Sync instance detail"
@@ -11094,6 +11103,10 @@ msgstr "订阅 ID"
 #: xpack/plugins/cloud/serializers/account_attrs.py:89
 msgid "Auto node classification"
 msgstr "自动节点分类"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "domain_name"
+msgstr "域名称"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:114
 #: xpack/plugins/cloud/serializers/account_attrs.py:118
