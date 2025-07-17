@@ -4,6 +4,7 @@ import os
 import tarfile
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db.models import F
 from django.http import FileResponse
@@ -213,7 +214,7 @@ class SessionViewSet(OrgBulkModelViewSet):
 
 class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
+    view_replay_cache_key = "SESSION_REPLAY_VIEW_{}"
     session = None
     rbac_perms = {
         'create': 'terminal.upload_sessionreplay',
@@ -283,10 +284,14 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
+        key = self.view_replay_cache_key.format(session_id)
+        if cache.get(key):
+            return
         record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.view, detail, Session,
             resource_display=f'{session.asset}', resource_type=_('Session replay')
         )
+        cache.set(key, 1, 10)
 
     def retrieve(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
