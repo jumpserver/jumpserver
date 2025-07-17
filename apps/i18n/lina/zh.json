@@ -1563,5 +1563,7 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "EmailHelpText": "请点击'提交'按钮保存当前配置后，再点击'测试连接'以确保信息生效",
+    "None": "无"
 }

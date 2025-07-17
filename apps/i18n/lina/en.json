@@ -1558,5 +1558,6 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name"
+    "userName": "User name",
+    "EmailHelpText": "Please click the 'Submit' button to save the current configuration before clicking 'Test Connection' to ensure the settings take effect."
 }
