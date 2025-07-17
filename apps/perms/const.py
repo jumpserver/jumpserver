@@ -15,7 +15,7 @@ class ActionChoices(BitChoices):
     copy = bit(4), _("Copy (RDP, VNC)")
     paste = bit(5), _("Paste (RDP, VNC)")
     delete = bit(6), _("Delete (SFTP)")
-    share = bit(7), _("Share (SSH)")
+    share = bit(7), _("Share (Web SSH, Web RDP, Web VNC)")
 
     @classmethod
     def is_tree(cls):
