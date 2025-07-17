@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "无法连接到 VNC 服务器",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "远程连接的凭证类型不支持",
     "GuacamoleErrUpstreamError": "远程连接的服务器发生错误",
+    "InputVerifyCode": "请输入验证码",
     "JMSErrAPIFailed": "Core API 发生错误",
     "JMSErrAuthUser": "用户未认证",
     "JMSErrBadParams": "请求参数错误",
@@ -100,6 +101,5 @@
     "VerifyCode": "验证码",
     "VirtualKeyboard": "虚拟键盘",
     "WebSocketError": "WebSocket 连接失败，请检查网络",
-    "Writable": "读写",
-    "InputVerifyCode": "请输入验证码"
+    "Writable": "读写"
 }

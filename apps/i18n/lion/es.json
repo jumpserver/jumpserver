@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "No se puede conectar al servidor VNC",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "El tipo de credenciales para la conexión remota no es compatible",
     "GuacamoleErrUpstreamError": "Ocurrió un error en el servidor de conexión remota",
+    "InputVerifyCode": "Por favor, introduce el código de verificación.",
     "JMSErrAPIFailed": "Error en Core API",
     "JMSErrAuthUser": "Usuario no autenticado",
     "JMSErrBadParams": "Error en los parámetros de solicitud",

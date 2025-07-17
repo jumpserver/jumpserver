@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-14 19:34+0800\n"
+"POT-Creation-Date: 2025-07-17 15:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,7 +219,7 @@ msgstr "Descubrir"
 msgid "Template"
 msgstr "Plantilla"
 
-#: accounts/const/account.py:32 ops/const.py:46
+#: accounts/const/account.py:32 ops/const.py:47
 #: xpack/plugins/cloud/const.py:74
 msgid "Skip"
 msgstr "Omitir"
@@ -232,7 +232,7 @@ msgstr "Actualizar"
 #: accounts/const/account.py:34 accounts/const/automation.py:115
 #: accounts/serializers/automations/change_secret.py:171 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:66
-#: ops/const.py:76 terminal/const.py:81 xpack/plugins/cloud/const.py:53
+#: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:53
 msgid "Failed"
 msgstr "Fallido"
 
@@ -241,7 +241,7 @@ msgid "Push account"
 msgstr "Notificación de cuenta"
 
 #: accounts/const/automation.py:26 accounts/risk_handlers.py:26
-#: audits/const.py:32 ops/const.py:9
+#: audits/const.py:32 ops/const.py:11
 msgid "Change secret"
 msgstr "Cambiar contraseña"
 
@@ -278,11 +278,11 @@ msgstr "Especificar"
 msgid "Random generate"
 msgstr "Generar aleatoriamente"
 
-#: accounts/const/automation.py:59 ops/const.py:15
+#: accounts/const/automation.py:59 ops/const.py:17
 msgid "Replace (Replace only keys pushed by JumpServer) "
 msgstr "Reemplazar (solo reemplazar las claves enviadas por JumpServer)"
 
-#: accounts/const/automation.py:60 ops/const.py:14
+#: accounts/const/automation.py:60 ops/const.py:16
 msgid "Empty and append SSH KEY"
 msgstr "Vaciar todo y añadir"
 
@@ -352,7 +352,7 @@ msgstr "SFTP"
 #: accounts/const/automation.py:116
 #: accounts/serializers/automations/change_secret.py:170 audits/const.py:65
 #: audits/models.py:65 audits/signal_handlers/activity_log.py:34
-#: common/const/choices.py:65 ops/const.py:74 ops/serializers/celery.py:48
+#: common/const/choices.py:65 ops/const.py:75 ops/serializers/celery.py:48
 #: terminal/const.py:80 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -1541,11 +1541,11 @@ msgstr "Añadir cuenta: %s"
 msgid "Delete account: %s"
 msgstr "Eliminar cuenta: %s"
 
-#: accounts/tasks/automation.py:32
+#: accounts/tasks/automation.py:33
 msgid "Account execute automation"
 msgstr "Ejecución automatizada de cuentas"
 
-#: accounts/tasks/automation.py:35
+#: accounts/tasks/automation.py:36
 msgid ""
 "Unified execution entry for account automation tasks: when the system performs tasks \n"
 "        such as account push, password change, account verification, account collection, \n"
@@ -1556,23 +1556,23 @@ msgstr ""
 "cuentas, recopilación de cuentas y verificación de tareas de cuentas de "
 "puerta de enlace, todas se ejecutarán a través de la tarea actual."
 
-#: accounts/tasks/automation.py:64 accounts/tasks/automation.py:72
+#: accounts/tasks/automation.py:65 accounts/tasks/automation.py:73
 msgid "Execute automation record"
 msgstr "Registro de ejecución automatizada"
 
-#: accounts/tasks/automation.py:67
+#: accounts/tasks/automation.py:68
 msgid "When manually executing password change records, this task is used"
 msgstr ""
 "Cuando se ejecuta manualmente el registro de cambio de contraseña, se "
 "realiza a través de esta tarea"
 
-#: accounts/tasks/automation.py:96
+#: accounts/tasks/automation.py:116
 msgid "Clean change secret and push record period"
 msgstr ""
 "Limpiar periódicamente los registros de cambio de contraseña y los registros"
 " de notificación"
 
-#: accounts/tasks/automation.py:98
+#: accounts/tasks/automation.py:118
 msgid ""
 "The system will periodically clean up unnecessary password change and push records, \n"
 "        including their associated change tasks, execution logs, assets, and accounts. When any \n"
@@ -3463,7 +3463,7 @@ msgstr "Establecer enlace simbólico"
 
 #: audits/const.py:18 audits/const.py:29
 #: ops/templates/ops/celery_task_log.html:86
-#: terminal/api/session/session.py:154
+#: terminal/api/session/session.py:155
 msgid "Download"
 msgstr "Descargar"
 
@@ -3471,7 +3471,7 @@ msgstr "Descargar"
 msgid "Rename dir"
 msgstr "Mapear directorio"
 
-#: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:284
+#: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:285
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
@@ -3760,7 +3760,7 @@ msgid "Slack"
 msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
-#: authentication/views/dingtalk.py:151 notifications/backends/__init__.py:12
+#: authentication/views/dingtalk.py:152 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:133
 #: users/models/user/_source.py:22
 msgid "DingTalk"
@@ -3881,7 +3881,7 @@ msgstr "El emparejamiento facial ha fallado."
 msgid "Current user not support mfa type: {}"
 msgstr "El usuario actual no es compatible con el tipo de MFA: {}"
 
-#: authentication/api/password.py:34 terminal/api/session/session.py:337
+#: authentication/api/password.py:34 terminal/api/session/session.py:342
 #: users/views/profile/reset.py:63
 msgid "User does not exist: {}"
 msgstr "El usuario no existe: {}"
@@ -4140,8 +4140,8 @@ msgstr "WeChat empresarial ya está vinculado"
 msgid "WeCom is not bound"
 msgstr "No hay WeChat empresarial vinculado"
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
-#: authentication/views/dingtalk.py:247
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:206
+#: authentication/views/dingtalk.py:248
 msgid "DingTalk is not bound"
 msgstr "DingTalk no está vinculado"
 
@@ -4856,7 +4856,7 @@ msgstr "Error al consultar el usuario %s"
 msgid "The %s is already bound to another user"
 msgstr "%s ya está vinculado a otro usuario"
 
-#: authentication/views/base.py:158
+#: authentication/views/base.py:159
 #, python-format
 msgid "Binding %s successfully"
 msgstr "Vinculación de %s exitosa"
@@ -4865,7 +4865,7 @@ msgstr "Vinculación de %s exitosa"
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "Error de DingTalk, por favor contacta al administrador del sistema"
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:204
+#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:205
 msgid "DingTalk Error"
 msgstr "Error de DingTalk"
 
@@ -4885,15 +4885,15 @@ msgstr "Error al consultar el usuario de DingTalk"
 msgid "The DingTalk is already bound to another user"
 msgstr "Este DingTalk ya está vinculado a otros usuarios"
 
-#: authentication/views/dingtalk.py:152
+#: authentication/views/dingtalk.py:153
 msgid "Binding DingTalk successfully"
 msgstr "Vinculación de DingTalk exitosa"
 
-#: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:241
+#: authentication/views/dingtalk.py:207 authentication/views/dingtalk.py:242
 msgid "Failed to get user from DingTalk"
 msgstr "No se pudo obtener el usuario de DingTalk"
 
-#: authentication/views/dingtalk.py:248
+#: authentication/views/dingtalk.py:249
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "Por favor, inicia sesión con tu contraseña y luego vincula DingTalk"
 
@@ -5016,7 +5016,7 @@ msgstr "Acción manual"
 msgid "Timing"
 msgstr "Acción programada"
 
-#: common/const/choices.py:64 ops/const.py:73
+#: common/const/choices.py:64 ops/const.py:74
 msgid "Running"
 msgstr "En ejecución"
 
@@ -5726,125 +5726,125 @@ msgstr "No se puede eliminar este archivo"
 msgid "App Ops"
 msgstr "Centro de trabajos"
 
-#: ops/const.py:6
+#: ops/const.py:8
 msgid "Push"
 msgstr "Enviar"
 
-#: ops/const.py:7
+#: ops/const.py:9
 msgid "Verify"
 msgstr "Verificación"
 
-#: ops/const.py:8
+#: ops/const.py:10
 msgid "Collect"
 msgstr "Recopilar"
 
-#: ops/const.py:13
+#: ops/const.py:15
 msgid "Append SSH KEY"
 msgstr "Agregar"
 
-#: ops/const.py:19
+#: ops/const.py:21
 msgid "Custom password"
 msgstr "Contraseña personalizada"
 
-#: ops/const.py:20
+#: ops/const.py:22
 msgid "All assets use the same random password"
 msgstr "Al azar"
 
-#: ops/const.py:21
+#: ops/const.py:23
 msgid "All assets use different random password"
 msgstr "Cada uno al azar"
 
-#: ops/const.py:33
+#: ops/const.py:34
 msgid "Blank"
 msgstr "En blanco"
 
-#: ops/const.py:34
+#: ops/const.py:35
 msgid "VCS"
 msgstr "VCS"
 
-#: ops/const.py:38 ops/models/adhoc.py:44 ops/models/variable.py:26
+#: ops/const.py:39 ops/models/adhoc.py:44 ops/models/variable.py:26
 msgid "Adhoc"
 msgstr "Comando"
 
-#: ops/const.py:39 ops/models/job.py:154 ops/models/playbook.py:89
+#: ops/const.py:40 ops/models/job.py:154 ops/models/playbook.py:89
 #: ops/models/variable.py:23
 msgid "Playbook"
 msgstr "Playbook"
 
-#: ops/const.py:40
+#: ops/const.py:41
 msgid "Upload File"
 msgstr "Subir"
 
-#: ops/const.py:44
+#: ops/const.py:45
 msgid "Privileged only"
 msgstr "Solo para cuentas privilegiadas"
 
-#: ops/const.py:45
+#: ops/const.py:46
 msgid "Privileged first"
 msgstr "Prioridad para cuentas privilegiadas"
 
-#: ops/const.py:50 ops/const.py:61
+#: ops/const.py:51 ops/const.py:62
 msgid "Shell"
 msgstr "Shell"
 
-#: ops/const.py:51 ops/const.py:62
+#: ops/const.py:52 ops/const.py:63
 msgid "Powershell"
 msgstr "PowerShell"
 
-#: ops/const.py:52 ops/const.py:63
+#: ops/const.py:53 ops/const.py:64
 msgid "Python"
 msgstr "Python"
 
-#: ops/const.py:53 ops/const.py:64
+#: ops/const.py:54 ops/const.py:65
 msgid "MySQL"
 msgstr "MySQL"
 
-#: ops/const.py:54 ops/const.py:66
+#: ops/const.py:55 ops/const.py:67
 msgid "PostgreSQL"
 msgstr "PostgreSQL"
 
-#: ops/const.py:55 ops/const.py:67
+#: ops/const.py:56 ops/const.py:68
 msgid "SQLServer"
 msgstr "SQLServer"
 
-#: ops/const.py:56 ops/const.py:69
+#: ops/const.py:57 ops/const.py:70
 msgid "Raw"
 msgstr "Raw"
 
-#: ops/const.py:57
+#: ops/const.py:58
 msgid "HUAWEI"
 msgstr "Huawei"
 
-#: ops/const.py:65
+#: ops/const.py:66
 msgid "MariaDB"
 msgstr "MariaDB"
 
-#: ops/const.py:68
+#: ops/const.py:69
 msgid "Oracle"
 msgstr "Oracle"
 
-#: ops/const.py:75
+#: ops/const.py:76
 msgid "Timeout"
 msgstr "Tiempo de espera"
 
-#: ops/const.py:82
+#: ops/const.py:83
 msgid "Command execution disabled"
 msgstr "La ejecución de comandos ha sido deshabilitada"
 
-#: ops/const.py:86
+#: ops/const.py:87
 msgctxt "scope"
 msgid "Public"
 msgstr "público"
 
-#: ops/const.py:87
+#: ops/const.py:88
 msgid "Private"
 msgstr "Privado"
 
-#: ops/const.py:91
+#: ops/const.py:92
 msgid "Text"
 msgstr "Cuadro de texto"
 
-#: ops/const.py:92
+#: ops/const.py:93
 msgid "Select"
 msgstr "Cuadro de selección"
 
@@ -6369,8 +6369,8 @@ msgid "Delete (SFTP)"
 msgstr "Eliminar (SFTP)"
 
 #: perms/const.py:18
-msgid "Share (SSH)"
-msgstr "Compartir (SSH)"
+msgid "Share (Web SSH, Web RDP, Web VNC)"
+msgstr "Compartir (Web SSH, Web RDP, Web VNC)"
 
 #: perms/const.py:28
 msgid "Transfer"
@@ -8785,25 +8785,25 @@ msgstr "Prueba fallida: por favor, verifica la configuración"
 msgid "Have online sessions"
 msgstr "Hay una sesión en línea"
 
-#: terminal/api/session/session.py:49
+#: terminal/api/session/session.py:50
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "El usuario %s %s ha grabado la sesión %s"
 
-#: terminal/api/session/session.py:158 terminal/api/session/session.py:288
+#: terminal/api/session/session.py:159 terminal/api/session/session.py:292
 #: terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "Grabación de sesiones"
 
-#: terminal/api/session/session.py:329
+#: terminal/api/session/session.py:334
 msgid "Session does not exist: {}"
 msgstr "La sesión no existe: {}"
 
-#: terminal/api/session/session.py:332
+#: terminal/api/session/session.py:337
 msgid "Session is finished or the protocol not supported"
 msgstr "La sesión ya ha finalizado o el protocolo no es compatible"
 
-#: terminal/api/session/session.py:345
+#: terminal/api/session/session.py:350
 msgid "User does not have permission"
 msgstr "El usuario no tiene permiso"
 
@@ -11902,3 +11902,6 @@ msgstr "Importación de licencia exitosa"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Licencia no válida"
+
+#~ msgid "Share (SSH)"
+#~ msgstr "Compartir (SSH)"

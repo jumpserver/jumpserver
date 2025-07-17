@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "VNCサーバーに接続できません",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "リモート接続の資格タイプがサポートされていません",
     "GuacamoleErrUpstreamError": "リモート接続のサーバーにエラーが発生",
+    "InputVerifyCode": "verification code を入力してください",
     "JMSErrAPIFailed": "Core APIエラーが発生",
     "JMSErrAuthUser": "ユーザーは認証されていません",
     "JMSErrBadParams": "リクエストパラメータが間違っています",
