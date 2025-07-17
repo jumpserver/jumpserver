@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
+from common.utils import string_punctuation
+
 
 class StrategyChoice(models.TextChoices):
     push = 'push', _('Push')
@@ -21,7 +23,6 @@ class PasswordStrategy(models.TextChoices):
     random_all = 'random_all', _('All assets use different random password')
 
 
-string_punctuation = '!#$%&()*+,-.:;<=?@[]_~'
 DEFAULT_PASSWORD_LENGTH = 30
 DEFAULT_PASSWORD_RULES = {
     'length': DEFAULT_PASSWORD_LENGTH,
