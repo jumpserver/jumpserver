@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "Unable to connect to VNC server",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "Unsupported credential type requested.",
     "GuacamoleErrUpstreamError": "Upstream error.",
+    "InputVerifyCode": "Input Verify Code",
     "JMSErrAPIFailed": "Core API failed",
     "JMSErrAuthUser": "Not auth user",
     "JMSErrBadParams": "Bad request params",
@@ -100,6 +101,5 @@
     "VerifyCode": "Verify code",
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable",
-    "InputVerifyCode": "Input Verify Code"
+    "Writable": "Writable"
 }

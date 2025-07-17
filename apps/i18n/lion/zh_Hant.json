@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "無法連接到 VNC 伺服器",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "遠程連接的憑證類型不支持",
     "GuacamoleErrUpstreamError": "遠程連接的伺服器發生錯誤",
+    "InputVerifyCode": "請輸入驗證碼",
     "JMSErrAPIFailed": "Core API 發生錯誤",
     "JMSErrAuthUser": "用戶未認證",
     "JMSErrBadParams": "請求參數錯誤",

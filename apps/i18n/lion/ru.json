@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "Не удается подключиться к VNC серверу",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "Запрашиваемый тип учетных данных не поддерживается",
     "GuacamoleErrUpstreamError": "Ошибка на стороне удаленного сервера",
+    "InputVerifyCode": "Пожалуйста, введите код проверки.",
     "JMSErrAPIFailed": "Ошибка API Core",
     "JMSErrAuthUser": "Пользователь не аутентифицирован",
     "JMSErrBadParams": "Ошибка параметров запроса",

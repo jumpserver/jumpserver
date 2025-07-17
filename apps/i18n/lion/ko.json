@@ -51,6 +51,7 @@
     "GuacamoleErrUnableToConnectToVNCServer": "VNC 서버에 연결할 수 없습니다",
     "GuacamoleErrUnsupportedCredentialTypeRequested": "원격 연결의 자격 증명 유형이 지원되지 않습니다",
     "GuacamoleErrUpstreamError": "원격 연결의 서버에서 오류가 발생했습니다",
+    "InputVerifyCode": "인증 코드를 입력해 주세요.",
     "JMSErrAPIFailed": "Core API 오류가 발생했습니다",
     "JMSErrAuthUser": "사용자 인증되지 않음",
     "JMSErrBadParams": "요청 매개변수 오류",
