@@ -20,11 +20,11 @@
 <div id="wrapper">
     <div id="page-wrapper" class="gray-bg">
         {% include '_header_bar.html' %}
-         <div class="alert alert-info help-message alert-dismissable page-message" style="display: none">
-             <button aria-hidden="true" data-dismiss="alert" class="close hide-btn" type="button">×</button>
-             {% block help_message %}
-             {% endblock %}
-         </div>
+        <div class="alert alert-info help-message alert-dismissable page-message" style="display: none">
+            <button aria-hidden="true" data-dismiss="alert" class="close hide-btn" type="button">×</button>
+            {% block help_message %}
+            {% endblock %}
+        </div>
         {% include '_message.html' %}
         {% block content %}{% endblock %}
         {% include '_footer.html' %}
@@ -35,23 +35,23 @@
 {% include '_foot_js.html' %}
 {% block custom_foot_js %} {% endblock %}
 <script>
-function getMessagePathKey() {
-    var path = window.location.pathname;
-    var key = 'message_' + btoa(path);
-    return key
-}
-
-$(document).ready(function () {
-    var pathKey = getMessagePathKey();
-    var hidden = window.localStorage.getItem(pathKey);
-    var hasMessage = $('.page-message').text().trim().length > 5;
-    if (!hidden && hasMessage) {
-        $(".help-message").show();
+    function getMessagePathKey() {
+        var path = window.location.pathname;
+        var key = 'message_' + btoa(path);
+        return key
     }
-}).on('click', '.hide-btn', function () {
-    var pathKey = getMessagePathKey();
-    window.localStorage.setItem(pathKey, '1')
-})
+
+    $(document).ready(function () {
+        var pathKey = getMessagePathKey();
+        var hidden = window.localStorage.getItem(pathKey);
+        var hasMessage = $('.page-message').text().trim().length > 5;
+        if (!hidden && hasMessage) {
+            $(".help-message").show();
+        }
+    }).on('click', '.hide-btn', function () {
+        var pathKey = getMessagePathKey();
+        window.localStorage.setItem(pathKey, '1')
+    })
 
 </script>
 </html>

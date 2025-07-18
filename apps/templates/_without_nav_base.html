@@ -3,39 +3,59 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title> {{ INTERFACE.login_title }} </title>
-        <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
-        {% include '_head_css_js.html' %}
-        <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
-        <link href="{% static 'css/style.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/otp.css' %}" />
-        <script src="{% static "js/plugins/qrcode/qrcode.js" %}"></script>
-	</head>
+<head>
+    <meta charset="UTF-8">
+    <title> {{ INTERFACE.login_title }} </title>
+    <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
+    {% include '_head_css_js.html' %}
+    <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/otp.css' %}"/>
+    <script src="{% static "js/plugins/qrcode/qrcode.js" %}"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
 
-	<body style="background-color: #f3f3f4">
-		 <header>
-		 	<div class="logo">
-		 		<a href="{% url 'index' %}">
-                    <img src="{{ INTERFACE.logo_logout }}" alt="" width="50px" height="50px"/>
-                </a>
-		 		<span style="font-size: 21px; line-height: 50px">{{ INTERFACE.login_title }}</span>
-		 	</div>
-		 	<div>
-                <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
-		 	</div>
-		 </header>
-         <body>
-         {% block body %}
-         {% endblock %}
-         </body>
-         <footer>
-             <div style="margin-top: 100px;">
-                 {% include '_copyright.html' %}
-             </div>
-         </footer>
-         {% include '_foot_js.html' %}
-	</body>
+        header {
+            width: 100%;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        .wrapper {
+            margin: auto;
+        }
+    </style>
+
+</head>
+
+<body style="background-color: #f3f3f4">
+<header>
+    <div class="logo">
+        <a href="{% url 'index' %}">
+            <img src="{{ INTERFACE.logo_logout }}" alt="" width="50px" height="50px"/>
+        </a>
+        <span style="font-size: 21px; line-height: 50px">{{ INTERFACE.login_title }}</span>
+    </div>
+    <div>
+        <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
+    </div>
+</header>
+<div class="wrapper">
+    {% block body %}
+    {% endblock %}
+</div>
+<footer>
+    <div style="margin-top: 100px;">
+        {% include '_copyright.html' %}
+    </div>
+</footer>
+{% include '_foot_js.html' %}
+</body>
 </html>
 
