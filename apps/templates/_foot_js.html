@@ -18,14 +18,9 @@
         }
 
         .markdown-footer {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
+            flex-grow: 0;
+            flex-shrink: 0;
             width: 285px;
-            transform: translate(-50%, -50%);
-            @media (min-width: 768px) {
-                top: 97%;
-            }
         }
 
         .markdown-footer p {
@@ -55,7 +50,7 @@
         });
         const markdownContent = `{{ INTERFACE.footer_content|escapejs }}`;
         const markdownRef = document.getElementById('markdown-output');
-        
+
         if (markdownRef && markdownContent) {
             const renderedContent = md.render(markdownContent.trim());
             markdownRef.innerHTML = renderedContent;
