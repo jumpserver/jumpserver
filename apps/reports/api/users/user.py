@@ -4,48 +4,25 @@ from collections import defaultdict
 
 from django.db.models import Count
 from django.http.response import JsonResponse
-from django.utils import timezone
 from rest_framework.views import APIView
 
 from audits.const import LoginStatusChoices
 from audits.models import UserLoginLog
 from common.permissions import IsValidLicense
 from common.utils import lazyproperty
-from common.utils.timezone import local_zero_hour, local_now
 from rbac.permissions import RBACPermission
+from reports.mixins import DateRangeMixin
 
 __all__ = ['UserReportApi']
 
 
-class UserReportApi(APIView):
+class UserReportApi(DateRangeMixin, APIView):
     http_method_names = ['get']
     # TODO: Define the required RBAC permissions for this API
     rbac_perms = {
         'GET': 'users..view_users',
     }
     permission_classes = [RBACPermission, IsValidLicense]
-
-    @lazyproperty
-    def days(self):
-        count = self.request.query_params.get('days', 1)
-        return int(count)
-
-    @property
-    def days_to_datetime(self):
-        if self.days == 1:
-            return local_zero_hour()
-        return local_now() - timezone.timedelta(days=self.days)
-
-    @lazyproperty
-    def date_range_list(self):
-        return [
-            (local_now() - timezone.timedelta(days=i)).date()
-            for i in range(self.days - 1, -1, -1)
-        ]
-
-    def filter_by_date_range(self, queryset, field_name):
-        date_range_bounds = self.days_to_datetime.date(), (local_now() + timezone.timedelta(days=1)).date()
-        return queryset.filter(**{f'{field_name}__range': date_range_bounds})
 
     def get_user_login_metrics(self, queryset):
         filtered_queryset = self.filter_by_date_range(queryset, 'datetime')
@@ -103,12 +80,12 @@ class UserReportApi(APIView):
     @lazyproperty
     def user_login_log_queryset(self):
         queryset = UserLoginLog.objects.filter(status=LoginStatusChoices.success)
-        return UserLoginLog.filter_login_queryset_by_org(queryset)
+        return UserLoginLog.filter_queryset_by_org(queryset)
 
     @lazyproperty
     def user_login_failed_queryset(self):
         queryset = UserLoginLog.objects.filter(status=LoginStatusChoices.failed)
-        return UserLoginLog.filter_login_queryset_by_org(queryset)
+        return UserLoginLog.filter_queryset_by_org(queryset)
 
     def get(self, request, *args, **kwargs):
         data = {}
