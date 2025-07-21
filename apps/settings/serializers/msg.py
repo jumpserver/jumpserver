@@ -24,6 +24,11 @@ class EmailSettingSerializer(serializers.Serializer):
         smtp = 'smtp', _('SMTP')
         exchange = 'exchange', _('EXCHANGE')
 
+    class SECURITY_PROTOCOL(models.TextChoices):
+        none = 'none', _('None')
+        ssl = 'ssl', _('Use SSL')
+        tls = 'tls', _('Use TLS')
+
     EMAIL_PROTOCOL = serializers.ChoiceField(
         choices=EmailProtocol.choices, label=_("Protocol"), default=EmailProtocol.smtp
     )
@@ -34,8 +39,8 @@ class EmailSettingSerializer(serializers.Serializer):
         help_text=_("The user to be used for email server authentication")
     )
     EMAIL_HOST_PASSWORD = EncryptedField(
-        max_length=1024, required=False, label=_("Password"),
-        help_text=_("Password to use for the email server. It is used in conjunction with `User` when authenticating to the email server")
+        max_length=1024, required=False, label=_("Password"), help_text=_(
+            "Password to use for the email server. It is used in conjunction with `User` when authenticating to the email server")
     )
     EMAIL_FROM = serializers.CharField(
         max_length=128, allow_blank=True, required=False, label=_('Sender'),
@@ -54,6 +59,10 @@ class EmailSettingSerializer(serializers.Serializer):
         required=False, label=_("Use TLS"),
         help_text=_(
             'Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for explicit TLS connections, generally on port 587')
+    )
+    EMAIL_SECURITY_PROTOCOL = serializers.ChoiceField(
+        choices=SECURITY_PROTOCOL.choices, label=_("TLS/SSL"),
+        default=SECURITY_PROTOCOL.none
     )
 
 
