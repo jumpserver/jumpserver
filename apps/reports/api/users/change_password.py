@@ -38,7 +38,8 @@ class UserChangeSecretApi(DateRangeMixin, APIView):
             except Exception:
                 logger.debug(f"Failed to get city for IP {ip}, skipping", exc_info=True)
                 continue
-        return dict(data)
+
+        return [{'name': k, 'value': v} for k, v in data.items()]
 
     def get_change_password_metrics(self, queryset):
         filtered_queryset = self.filter_by_date_range(queryset, 'datetime')
@@ -64,14 +65,17 @@ class UserChangeSecretApi(DateRangeMixin, APIView):
 
         total = qs.count()
         change_password_top10_users = qs.values(
-            'user').annotate(user_count=Count('id')).order_by('-user_count')[:10]
+            'user').annotate(count=Count('id')).order_by('-count')[:10]
 
         change_password_top10_change_bys = qs.values(
-            'change_by').annotate(user_count=Count('id')).order_by('-user_count')[:10]
+            'change_by').annotate(count=Count('id')).order_by('-count')[:10]
 
-        data['total'] = total
-        data['user_total'] = qs.values('user').distinct().count()
-        data['change_by_total'] = qs.values('change_by').distinct().count()
+        data['total_count_change_password'] = {
+            'total': total,
+            'user_total': qs.values('user').distinct().count(),
+            'change_by_total': qs.values('change_by').distinct().count(),
+        }
+
         data['change_password_top10_users'] = list(change_password_top10_users)
         data['change_password_top10_change_bys'] = list(change_password_top10_change_bys)
 
