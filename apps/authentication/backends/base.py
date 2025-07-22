@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.views import View
 
-from authentication.views.utils import redirect_to_guard_view
 from common.utils import get_logger
 from users.models import User
 
@@ -69,4 +68,5 @@ class BaseAuthCallbackClientView(View):
     http_method_names = ['get']
 
     def get(self, request):
+        from authentication.views.utils import redirect_to_guard_view
         return redirect_to_guard_view(query_string='next=client')
