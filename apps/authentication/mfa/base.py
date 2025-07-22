@@ -1,5 +1,6 @@
 import abc
 
+from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
@@ -23,17 +24,21 @@ class BaseMFA(abc.ABC):
 
         cache_key = f'{self.name}_{self.user.username}'
         cache_code = cache.get(cache_key)
-        if cache_code == code:
+
+        is_match = cache_code == code
+
+        if settings.SAFE_MODE and is_match:
             return False, _(
                 "The two-factor code you entered has either already been used or has expired. "
                 "Please request a new one."
             )
 
         ok, msg = self._check_code(code)
+
         if not ok:
             return False, msg
 
-        cache.set(cache_key, code, 60 * 5)
+        cache.set(cache_key, code, 60)
         return True, msg
 
     def is_authenticated(self):
