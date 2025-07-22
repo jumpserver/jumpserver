@@ -22,7 +22,7 @@ root_node_data = {
 # 第二层 view 节点，手动创建的
 view_nodes_data = [
     {'id': 'view_console', 'name': _('Console view')},
-    {'id': 'view_pam', 'name': 'Pam'},
+    {'id': 'view_pam', 'name': _('Pam view')},
     {'id': 'view_workbench', 'name': _('Workbench view')},
     {'id': 'view_audit', 'name': _('Audit view')},
     {'id': 'view_setting', 'name': _('System setting')},
@@ -115,6 +115,7 @@ special_pid_mapper = {
     'ops.jobexecution': 'operation_center',
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
+    "rbac.view_pam": "view_pam",
     'audits.usersession': 'view_audit',
     "rbac.view_workbench": "view_workbench",
     "rbac.view_webterminal": "view_workbench",

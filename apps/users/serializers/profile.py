@@ -188,6 +188,7 @@ class UserOrgSerializer(serializers.Serializer):
 class UserPermsSerializer(serializers.Serializer):
     id = serializers.CharField(label=_("User ID"), read_only=True)
     username = serializers.CharField(label=_("Username"), read_only=True)
+    pam_orgs = UserOrgSerializer(many=True, read_only=True)
     console_orgs = UserOrgSerializer(many=True, read_only=True)
     audit_orgs = UserOrgSerializer(many=True, read_only=True)
     workbench_orgs = UserOrgSerializer(many=True, read_only=True)
