@@ -1553,5 +1553,7 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "UserActivity": "用户活动",
+    "AssetActivity": "资产活动"
 }
