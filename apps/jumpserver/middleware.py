@@ -4,13 +4,16 @@ import json
 import os
 import re
 import time
+from urllib.parse import urlparse, quote
 
 import pytz
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http.response import HttpResponseForbidden
 from django.shortcuts import HttpResponse
-from django.utils import timezone, translation
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils import timezone
 
 from .utils import set_current_request
 
@@ -136,4 +139,32 @@ class EndMiddleware:
         request._e_time_start = time.time()
         response = self.get_response(request)
         request._e_time_end = time.time()
+        return response
+
+
+class SafeRedirectMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+
+        if not (300 <= response.status_code < 400):
+            return response
+        if request.resolver_match and request.resolver_match.namespace.startswith('authentication'):
+            # 认证相关的路由跳过验证（core/auth/xxxx
+            return response
+        location = response.get('Location')
+        if not location:
+            return response
+        parsed = urlparse(location)
+        if parsed.scheme and parsed.netloc:
+            target_host = parsed.netloc
+            if target_host in [*settings.ALLOWED_HOSTS]:
+                return response
+            origin = f"{request.scheme}://{request.get_host()}"
+            target_origin = f"{parsed.scheme}://{target_host}"
+            if not target_origin.startswith(origin):
+                safe_redirect_url = '%s?%s' % (reverse('redirect-confirm'), f'next={quote(location)}')
+                return redirect(safe_redirect_url)
         return response
