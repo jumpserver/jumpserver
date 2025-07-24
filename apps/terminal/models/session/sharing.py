@@ -2,15 +2,15 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from common.utils import is_uuid
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org
+from terminal.const import LoginFrom
 from users.models import User
-from .session import Session
 
 __all__ = ['SessionSharing', 'SessionJoinRecord']
 
@@ -89,8 +89,6 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
 
 
 class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
-    LOGIN_FROM = Session.LOGIN_FROM
-
     session = models.ForeignKey(
         'terminal.Session', on_delete=models.CASCADE, verbose_name=_('Session')
     )
@@ -114,7 +112,7 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         db_index=True
     )
     login_from = models.CharField(
-        max_length=2, choices=LOGIN_FROM.choices, default="WT",
+        max_length=2, choices=LoginFrom.choices, default="WT",
         verbose_name=_("Login from")
     )
     is_success = models.BooleanField(

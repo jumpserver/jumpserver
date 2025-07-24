@@ -106,3 +106,14 @@ class SessionErrorReason(TextChoices):
     replay_upload_failed = 'replay_upload_failed', _('Replay upload failed')
     replay_convert_failed = 'replay_convert_failed', _('Replay convert failed')
     replay_unsupported = 'replay_unsupported', _('Replay unsupported')
+
+
+class LoginFrom(TextChoices):
+    ST = 'ST', 'SSH Terminal'
+    RT = 'RT', 'RDP Terminal'
+    WT = 'WT', 'Web Terminal'
+    DT = 'DT', 'DB Terminal'
+
+    @classmethod
+    def as_dict(cls):
+        return {choice.value: choice.label for choice in cls}
