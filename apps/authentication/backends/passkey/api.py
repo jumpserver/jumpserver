@@ -71,7 +71,8 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
             return self.redirect_to_error(_('Auth failed'))
 
         confirm_mfa = request.session.get('passkey_confirm_mfa')
-        if confirm_mfa:
+        # 如果开启了安全模式，Passkey 不能作为 MFA
+        if confirm_mfa and not settings.SAFE_MODE:
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
             request.session['CONFIRM_TIME'] = int(time.time())
             request.session['CONFIRM_TYPE'] = ConfirmType.MFA
@@ -80,7 +81,9 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
 
         try:
             self.check_oauth2_auth(user, settings.AUTH_BACKEND_PASSKEY)
-            self.mark_mfa_ok('passkey', user)
+            # 如果开启了安全模式，passkey 不能作为 MFA
+            if not settings.SAFE_MODE:
+                self.mark_mfa_ok('passkey', user)
             return self.redirect_to_guard_view()
         except Exception as e:
             msg = getattr(e, 'msg', '') or str(e)

@@ -42,6 +42,7 @@ class DownloadUploadMixin:
         rel_path = default_storage.save(save_to, file)
         path = default_storage.path(rel_path)
         extract_to = default_storage.path('applets/{}.tmp'.format(file.name))
+
         if os.path.exists(extract_to):
             shutil.rmtree(extract_to)
 
