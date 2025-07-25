@@ -697,6 +697,8 @@ class Config(dict):
 
         # Chat AI
         'CHAT_AI_ENABLED': False,
+        'CHAT_AI_METHOD': 'api',
+        'CHAT_AI_EMBED_URL': '',
         'CHAT_AI_TYPE': 'gpt',
         'GPT_BASE_URL': '',
         'GPT_API_KEY': '',

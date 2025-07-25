@@ -13,7 +13,9 @@ __all__ = [
     'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
 
-from settings.const import ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices
+from settings.const import (
+    ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices, ChatAIMethodChoices
+)
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -123,6 +125,14 @@ class ChatAISettingSerializer(serializers.Serializer):
 
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
+    )
+    CHAT_AI_METHOD = serializers.ChoiceField(
+        default=ChatAIMethodChoices.api, choices=ChatAIMethodChoices.choices,
+        label=_("Method"), required=False,
+    )
+    CHAT_AI_EMBED_URL = serializers.CharField(
+        allow_blank=True, required=False, label=_('Base URL'),
+        help_text=_('The base URL of the Chat service.')
     )
     CHAT_AI_TYPE = serializers.ChoiceField(
         default=ChatAITypeChoices.gpt, choices=ChatAITypeChoices.choices,
