@@ -65,13 +65,13 @@ def send_mail_async(*args, **kwargs):
         "send_mail_async called with subject=%r, recipients=%r", subject, recipient_list
     )
 
-    try:
-        users = User.objects.filter(email__in=recipient_list).all()
-        for user in users:
+    users = User.objects.filter(email__in=recipient_list).all()
+    for user in users:
+        try:
             with activate_user_language(user):
                 send_mail(connection=get_email_connection(), *args, **kwargs)
-    except Exception as e:
-        logger.error("Sending mail error: {}".format(e))
+        except Exception as e:
+            logger.error(f"Sending mail to {user.email} error: {e}")
 
 
 @shared_task(
