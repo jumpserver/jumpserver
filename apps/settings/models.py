@@ -215,11 +215,14 @@ def get_chatai_data():
 def init_sqlite_db():
     db_path = settings.LEAK_PASSWORD_DB_PATH
     if not os.path.isfile(db_path):
-        db_path = settings.LEAK_PASSWORD_DB_PATH
-        src = os.path.join(
-            settings.APPS_DIR, 'accounts', 'automations',
-            'check_account', 'leak_passwords.db'
-        )
+        # 这里处理一下历史数据，有可能用户 copy 了旧的文件到 目录下
+        src = os.path.join(settings.PROJECT_DIR, 'data', 'leak_passwords.db')
+        if not os.path.isfile(src):
+            src = os.path.join(
+                settings.APPS_DIR, 'accounts', 'automations',
+                'check_account', 'leak_passwords.db'
+            )
+
         shutil.copy(src, db_path)
     logger.info(f'init sqlite db {db_path}')
     return db_path

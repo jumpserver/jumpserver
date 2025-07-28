@@ -71,7 +71,11 @@ class OIDCSettingSerializer(KeycloakSettingSerializer):
         required=False, label=_('OIDC'), help_text=_('OpenID Connect')
     )
     AUTH_OPENID_PROVIDER_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider endpoint')
+        required=False, max_length=1024, label=_('Provider endpoint'),
+        help_text=_(
+            "The issuer URL of the OpenID Provider, used to discover its configuration via the "
+            "`$PROVIDER_ENDPOINT/.well-known/openid-configuration` endpoint."
+        )
     )
     AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT = serializers.CharField(
         required=False, max_length=1024, label=_('Authorization endpoint')
