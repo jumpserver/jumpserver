@@ -66,6 +66,7 @@ class PlaybookViewSet(JMSBulkModelViewSet):
         instance = serializer.save()
         base_path = safe_join(settings.DATA_DIR, "ops", "playbook")
         clone_id = self.request.query_params.get('clone_from')
+
         if clone_id:
             src_path = safe_join(base_path, clone_id)
             dest_path = safe_join(base_path, str(instance.id))
