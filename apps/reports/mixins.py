@@ -40,3 +40,7 @@ class DateRangeMixin:
     def filter_by_date_range(self, queryset, field_name: str):
         start, end = self.date_range_bounds
         return queryset.filter(**{f'{field_name}__range': (start, end)})
+
+    @lazyproperty
+    def dates_metrics_date(self):
+        return [date.strftime('%m-%d') for date in self.date_range_list] or ['0']

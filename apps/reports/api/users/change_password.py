@@ -59,7 +59,6 @@ class UserChangeSecretApi(DateRangeMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         data = {}
-        dates_metrics_date = [date.strftime('%m-%d') for date in self.date_range_list] or ['0']
 
         qs = self.filter_by_date_range(self.change_password_queryset, 'datetime')
 
@@ -80,7 +79,7 @@ class UserChangeSecretApi(DateRangeMixin, APIView):
         data['change_password_top10_change_bys'] = list(change_password_top10_change_bys)
 
         data['user_change_password_metrics'] = {
-            'dates_metrics_date': dates_metrics_date,
+            'dates_metrics_date': self.dates_metrics_date,
             'dates_metrics_total': self.get_change_password_metrics(qs),
         }
 

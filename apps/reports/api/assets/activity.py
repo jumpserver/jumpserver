@@ -2,7 +2,7 @@
 #
 from collections import defaultdict
 
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http.response import JsonResponse
 from rest_framework.views import APIView
 
@@ -29,9 +29,9 @@ class AssetActivityApi(DateRangeMixin, APIView):
 
     def get_asset_login_metrics(self, queryset):
         data = defaultdict(set)
-        for t, asset in queryset.values_list('date_start', 'asset'):
+        for t, _id in queryset.values_list('date_start', 'id'):
             date_str = str(t.date())
-            data[date_str].add(asset)
+            data[date_str].add(_id)
 
         metrics = [len(data.get(str(d), set())) for d in self.date_range_list]
         return metrics
@@ -47,35 +47,32 @@ class AssetActivityApi(DateRangeMixin, APIView):
 
         stats = qs.aggregate(
             total=Count(1),
-            asset_online=Count(1, filter=Q(is_finished=False)),
             asset_count=Count('asset_id', distinct=True),
             user_count=Count('user_id', distinct=True),
-            is_success_count=Count(1, filter=Q(is_success=True)),
         )
 
         asset_ids = {str(_id) for _id in qs.values_list('asset_id', flat=True).distinct()}
         assets = Asset.objects.filter(id__in=asset_ids)
 
         asset_login_by_protocol = group_stats(
-            qs, 'protocol_label', 'protocol'
+            qs, 'label', 'protocol'
         )
 
         asset_login_by_from = group_stats(
-            qs, 'login_from_label', 'login_from', LoginFrom.as_dict()
+            qs, 'label', 'login_from', LoginFrom.as_dict()
         )
 
         asset_by_type = group_stats(
-            assets, 'type', 'platform__type', all_type_dict,
+            assets, 'label', 'platform__type', all_type_dict,
         )
-        dates_metrics_date = [date.strftime('%m-%d') for date in self.date_range_list] or ['0']
 
         payload = {
-            **stats,
+            'session_stats': stats,
             'asset_login_by_type': asset_by_type,
             'asset_login_by_from': asset_login_by_from,
             'asset_login_by_protocol': asset_login_by_protocol,
             'asset_login_log_metrics': {
-                'dates_metrics_date': dates_metrics_date,
+                'dates_metrics_date': self.dates_metrics_date,
                 'dates_metrics_total': self.get_asset_login_metrics(qs),
             }
         }

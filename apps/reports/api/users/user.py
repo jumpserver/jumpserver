@@ -89,18 +89,17 @@ class UserReportApi(DateRangeMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         data = {}
-        dates_metrics_date = [date.strftime('%m-%d') for date in self.date_range_list] or ['0']
 
         data['user_login_log_metrics'] = {
-            'dates_metrics_date': dates_metrics_date,
+            'dates_metrics_date': self.dates_metrics_date,
             'dates_metrics_total': self.get_user_login_metrics(self.user_login_log_queryset),
         }
         data['user_login_failed_metrics'] = {
-            'dates_metrics_date': dates_metrics_date,
+            'dates_metrics_date': self.dates_metrics_date,
             'dates_metrics_total': self.get_user_login_metrics(self.user_login_failed_queryset),
         }
         data['user_login_method_metrics'] = {
-            'dates_metrics_date': dates_metrics_date,
+            'dates_metrics_date': self.dates_metrics_date,
             'dates_metrics_total': self.get_user_login_method_metrics(),
         }
         data['user_login_region_distribution'] = self.get_user_login_region_distribution()
