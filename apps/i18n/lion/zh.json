@@ -1,7 +1,7 @@
 {
     "ActionPerm": "操作权限",
     "AutoFit": "自动适应",
-    "AutoPasteOnClick": "点击输入框自动粘贴剪贴板内容",
+    "AutoPasteOnClick": "点击输入框自动粘贴剪贴板内容（需启用 HTTPS 和浏览器权限）",
     "AvailableShortcutKey": "可用的快捷键",
     "Cancel": "取消",
     "ClearDone": "清理已完成",
