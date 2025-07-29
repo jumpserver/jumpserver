@@ -14,7 +14,6 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import is_same_domain
 
 from .utils import set_current_request
 
@@ -163,9 +162,16 @@ class SafeRedirectMiddleware:
             target_host = parsed.netloc
             if target_host in [*settings.ALLOWED_HOSTS]:
                 return response
-            origin = request.get_host()
-            target_origin = target_host
-            if not is_same_domain(origin, target_origin):
+            target_host, target_port = self._split_host_port(parsed.netloc)
+            origin_host, origin_port = self._split_host_port(request.get_host())
+            if target_host != origin_host:
                 safe_redirect_url = '%s?%s' % (reverse('redirect-confirm'), f'next={quote(location)}')
                 return redirect(safe_redirect_url)
         return response
+
+    @staticmethod
+    def _split_host_port(netloc):
+        if ':' in netloc:
+            host, port = netloc.split(':', 1)
+            return host, port
+        return netloc, '80'
