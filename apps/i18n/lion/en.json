@@ -1,7 +1,7 @@
 {
     "ActionPerm": "Actions",
     "AutoFit": "Auto Fit",
-    "AutoPasteOnClick": "Click the input box to automatically paste from clipboard",
+    "AutoPasteOnClick": "Click the input box to automatically paste from clipboard (requires HTTPS and browser permission)",
     "AvailableShortcutKey": "Available shortcut keys",
     "Cancel": "Cancel",
     "ClearDone": "Clear done",
