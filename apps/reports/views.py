@@ -6,8 +6,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from django.http import FileResponse, HttpResponseBadRequest
-from django.http import JsonResponse
+from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -16,9 +15,21 @@ from pdf2image import convert_from_bytes
 from playwright.sync_api import sync_playwright
 
 charts_map = {
-    "UserActivity": {
-        "title": "用户活动",
+    "UserLoginActivity": {
+        "title": "用户登录活动",
         "path": "/ui/#/reports/users/user-activity"
+    },
+    "UserPasswordChange": {
+        "title": "用户改密记录",
+        "path": "/ui/#/reports/users/change-password"
+    },
+    "AssetStatistics": {
+        "title": "资产统计概览",
+        "path": "/ui/#/reports/assets/asset-statistics"
+    },
+    "AssetAccessActivity": {
+        "title": "资产访问活动",
+        "path": "/ui/#/reports/assets/asset-activity"
     }
 }
 
@@ -81,7 +92,7 @@ class ExportPdfView(View):
         sessionid = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if not sessionid:
             return HttpResponseBadRequest('No sessionid found in cookies')
-        
+
         pdf_bytes, title = export_chart_to_pdf(chart_name, sessionid, request=request)
         if not pdf_bytes:
             return HttpResponseBadRequest('Failed to generate PDF')

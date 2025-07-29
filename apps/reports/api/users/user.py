@@ -2,7 +2,7 @@
 #
 from collections import defaultdict
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http.response import JsonResponse
 from rest_framework.views import APIView
 
@@ -14,6 +14,9 @@ from rbac.permissions import RBACPermission
 from reports.mixins import DateRangeMixin
 
 __all__ = ['UserReportApi']
+
+from users.models import User
+from users.models.user import Source
 
 
 class UserReportApi(DateRangeMixin, APIView):
@@ -87,16 +90,36 @@ class UserReportApi(DateRangeMixin, APIView):
         queryset = UserLoginLog.objects.filter(status=LoginStatusChoices.failed)
         return UserLoginLog.filter_queryset_by_org(queryset)
 
+    @lazyproperty
+    def user_qs(self):
+        return User.get_org_users()
+
     def get(self, request, *args, **kwargs):
         data = {}
 
+        user_stats = self.user_qs.aggregate(
+            total=Count(1),
+            first_login=Count(1, filter=Q(is_first_login=True)),
+            need_update_password=Count(1, filter=Q(need_update_password=True)),
+            face_vector=Count(1, filter=Q(face_vector__isnull=False)),
+            not_enabled_mfa=Count(1, filter=Q(mfa_level=0)),
+        )
+
+        user_stats['valid'] = sum(1 for u in self.user_qs if u.is_valid)
+        data['user_stats'] = user_stats
+
+        source_map = Source.as_dict()
+        user_by_source = defaultdict(int)
+        for source in self.user_qs.values_list('source', flat=True):
+            k = source_map.get(source, source)
+            user_by_source[str(k)] += 1
+
+        data['user_by_source'] = [{'name': k, 'value': v} for k, v in user_by_source.items()]
+
         data['user_login_log_metrics'] = {
             'dates_metrics_date': self.dates_metrics_date,
-            'dates_metrics_total': self.get_user_login_metrics(self.user_login_log_queryset),
-        }
-        data['user_login_failed_metrics'] = {
-            'dates_metrics_date': self.dates_metrics_date,
-            'dates_metrics_total': self.get_user_login_metrics(self.user_login_failed_queryset),
+            'dates_metrics_success_total': self.get_user_login_metrics(self.user_login_log_queryset),
+            'dates_metrics_failure_total': self.get_user_login_metrics(self.user_login_failed_queryset),
         }
         data['user_login_method_metrics'] = {
             'dates_metrics_date': self.dates_metrics_date,
