@@ -13,20 +13,32 @@
 
 {% if INTERFACE.footer_content %}
     <style>
-        .markdown-footer a {
-            color: #428bca;
-        }
-
         .markdown-footer {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            display: flex;
             flex-grow: 0;
             flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(-50%);
             width: 285px;
         }
-
+        
         .markdown-footer p {
-            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             margin: 0;
+            padding: 0;
+            gap: 3px;
         }
+
+        .markdown-footer a {
+            color: #428bca;
+        }  
     </style>
     <div id="markdown-output" class="markdown-footer"></div>
 {% endif %}
@@ -46,7 +58,7 @@
             html: true,
             linkify: true,
             typographer: true,
-            breaks: true
+            breaks: false
         });
         const markdownContent = `{{ INTERFACE.footer_content|escapejs }}`;
         const markdownRef = document.getElementById('markdown-output');
