@@ -616,7 +616,7 @@
     "Gateway": "Gateway",
     "GatewayCreate": "Create gateway",
     "GatewayList": "Gateways",
-    "GatewayPlatformHelpText": "Only platforms with names starting with ‘Gateway’ can be used as gateways.",
+    "GatewayPlatformHelpText": "Only platforms with names starting with 'Gateway' can be used as gateways.",
     "GatewayUpdate": "Update the gateway",
     "General": "General",
     "GeneralAccounts": "General accounts",

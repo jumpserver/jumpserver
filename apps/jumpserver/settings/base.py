@@ -87,15 +87,23 @@ ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 # for host in ALLOWED_DOMAINS:
 #     print('  - ' + host.lstrip('.'))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = []
 for host_port in ALLOWED_DOMAINS:
     origin = host_port.strip('.')
-    if origin.startswith('http'):
-        CSRF_TRUSTED_ORIGINS.append(origin)
+
+    if not origin:
         continue
+
+    if origin.startswith('http'):
+        origin = origin.replace('http://', '').replace('https://', '')
+
+    host = origin.split(':')[0]
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
     is_local_origin = origin.split(':')[0] in DEBUG_HOSTS
     for schema in ['https', 'http']:
         if is_local_origin and schema == 'https':
