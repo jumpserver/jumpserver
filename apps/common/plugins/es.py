@@ -117,13 +117,16 @@ def get_es_client_version(**kwargs):
         return version
     except SSLError:
         raise InvalidElasticsearchSSL
-    except Exception:
-        raise InvalidElasticsearch
+    except Exception as e:
+        raise InvalidElasticsearch(e)
 
 
 class ES(object):
 
-    def __init__(self, config, properties, keyword_fields, exact_fields=None, fuzzy_fields=None, match_fields=None, **kwargs):
+    def __init__(
+            self, config, properties, keyword_fields,
+            exact_fields=None, fuzzy_fields=None, match_fields=None, **kwargs
+    ):
         self.version = 7
         self.config = config
         hosts = self.config.get('HOSTS')
@@ -132,7 +135,10 @@ class ES(object):
         ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
         if ignore_verify_certs:
             kwargs['verify_certs'] = None
-        self.client = ESClient(hosts=hosts, max_retries=0, **kwargs)
+        try:
+            self.client = ESClient(hosts=hosts, max_retries=0, **kwargs)
+        except Exception as e:
+            raise InvalidElasticsearch(e)
         self.es = self.client.es
         self.index_prefix = self.config.get('INDEX') or 'jumpserver'
         self.is_index_by_date = bool(self.config.get('INDEX_BY_DATE', False))
@@ -316,12 +322,12 @@ class ES(object):
                 query: {k: v}
             })
         return _filter
-    
+
     @staticmethod
     def handle_fuzzy_fields(exact):
         _filter = []
         for k, v in exact.items():
-            _filter.append({ 'wildcard': { k: f'*{v}*' } })
+            _filter.append({'wildcard': {k: f'*{v}*'}})
         return _filter
 
     @staticmethod
@@ -371,7 +377,7 @@ class ES(object):
 
             elif k in common_keyword_able:
                 exact[f"{k}.keyword"] = v
-            
+
             elif k in fuzzy_fields:
                 fuzzy[f"{k}.keyword"] = v
 
