@@ -11,4 +11,5 @@ urlpatterns = [
     path('reports/asset-statistic/', api.AssetStatisticApi.as_view(), name='asset-statistic'),
     path('reports/asset-activity/', api.AssetActivityApi.as_view(), name='asset-activity'),
     path('reports/account-statistic/', api.AccountStatisticApi.as_view(), name='account-statistic'),
+    path('reports/account-automation/', api.AccountAutomationApi.as_view(), name='account-automation'),
 ]

@@ -21,7 +21,6 @@ __all__ = ['AssetActivityApi']
 
 class AssetActivityApi(DateRangeMixin, APIView):
     http_method_names = ['get']
-    # TODO: Define the required RBAC permissions for this API
     rbac_perms = {
         'GET': 'terminal.view_session',
     }

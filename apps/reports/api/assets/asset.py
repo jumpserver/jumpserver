@@ -19,7 +19,6 @@ __all__ = ['AssetStatisticApi']
 
 class AssetStatisticApi(DateRangeMixin, APIView):
     http_method_names = ['get']
-    # TODO: Define the required RBAC permissions for this API
     rbac_perms = {
         'GET': 'assets.view_asset',
     }

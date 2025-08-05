@@ -21,9 +21,8 @@ from users.models.user import Source
 
 class UserReportApi(DateRangeMixin, APIView):
     http_method_names = ['get']
-    # TODO: Define the required RBAC permissions for this API
     rbac_perms = {
-        'GET': 'users..view_users',
+        'GET': 'users.view_users',
     }
     permission_classes = [RBACPermission, IsValidLicense]
 

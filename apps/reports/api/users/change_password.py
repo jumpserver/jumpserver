@@ -19,9 +19,8 @@ logger = get_logger(__file__)
 
 class UserChangeSecretApi(DateRangeMixin, APIView):
     http_method_names = ['get']
-    # TODO: Define the required RBAC permissions for this API
     rbac_perms = {
-        'GET': 'users..view_users',
+        'GET': 'audits.view_passwordchangelog',
     }
     permission_classes = [RBACPermission, IsValidLicense]
 

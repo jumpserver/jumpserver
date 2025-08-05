@@ -20,7 +20,6 @@ __all__ = ['AccountStatisticApi']
 
 class AccountStatisticApi(DateRangeMixin, APIView):
     http_method_names = ['get']
-    # TODO: Define the required RBAC permissions for this API
     rbac_perms = {
         'GET': 'accounts.view_account',
     }

@@ -1592,5 +1592,8 @@
     "AccountConnectivityStatusDistribution": "账号可连接性状态分布",
     "AccountPasswordChangeTrends": "账号改密趋势",
     "RankByNumberOfAssetAccounts": "资产账号数量排名",
-    "AccountAndPasswordChangeRank": "账号密码变更排名"
+    "AccountAndPasswordChangeRank": "账号密码变更排名",
+    "AccountAutomationReport": "账号自动化报告",
+    "AccountAutomationOverview": "自动化概览",
+    "TaskExecutionTrends": "任务执行趋势"
 }

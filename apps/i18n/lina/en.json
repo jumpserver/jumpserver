@@ -1589,5 +1589,8 @@
     "AccountConnectivityStatusDistribution": "Account connectivity status distribution",
     "AccountPasswordChangeTrends": "Account password change trends",
     "RankByNumberOfAssetAccounts": "Ranking by number of asset accounts",
-    "AccountAndPasswordChangeRank": "Account and password change ranking"
+    "AccountAndPasswordChangeRank": "Account and password change ranking",
+    "AccountAutomationReport": "Account automation report",
+    "AccountAutomationOverview": "Account automation overview",
+    "TaskExecutionTrends": "Task execution trends"
 }
