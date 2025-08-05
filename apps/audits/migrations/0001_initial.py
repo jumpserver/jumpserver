@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                     ("download", "Download"),
                     ("connect", "Connect"),
                     ("login", "Login"),
-                    ("change_password", "Change password"),
+                    ("change_password", "Change secret"),
                     ("accept", "Accept"),
                     ("review", "Review"),
                     ("notice", "Notifications"),

@@ -16,9 +16,9 @@ params:
 
 i18n:
   Windows account change secret rdp verify:
-    zh: '使用 Ansible 模块 win_user 执行 Windows 账号改密 RDP 协议测试最后的可连接性'
-    ja: 'Ansibleモジュールwin_userはWindowsアカウントの改密RDPプロトコルテストの最後の接続性を実行する'
-    en: 'Using the Ansible module win_user performs Windows account encryption RDP protocol testing for final connectivity'
+    zh: '使用 Ansible 模块 win_user 执行 Windows 账号改密（最后使用 Python 模块 pyfreerdp 验证账号的可连接性）'
+    ja: 'Ansible モジュール win_user を使用して Windows アカウントのパスワードを変更します (最後に Python モジュール pyfreerdp を使用してアカウントの接続を確認します)'
+    en: 'Use the Ansible module win_user to change the Windows account password (finally use the Python module pyfreerdp to verify the account connectivity)'
 
   Params groups help text:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'

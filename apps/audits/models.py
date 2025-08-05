@@ -56,7 +56,7 @@ class FTPLog(OrgModelMixin):
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )
-    asset = models.CharField(max_length=1024, verbose_name=_("Asset"), db_index=True)
+    asset = models.CharField(max_length=768, verbose_name=_("Asset"), db_index=True)
     account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
     operate = models.CharField(
         max_length=16, verbose_name=_("Operate"), choices=OperateChoices.choices
@@ -72,6 +72,9 @@ class FTPLog(OrgModelMixin):
         indexes = [
             models.Index(fields=['date_start', 'org_id'], name='idx_date_start_org'),
         ]
+
+    def __str__(self):
+        return "{0.id} of {0.user} to {0.asset}".format(self)
 
     @property
     def filepath(self):

@@ -3,7 +3,7 @@
   vars:
     ansible_shell_type: sh
     ansible_connection: local
-    ansible_python_interpreter: /opt/py3/bin/python
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
 
   tasks:
     - name: Verify account (pyfreerdp)

@@ -27,11 +27,12 @@ class CommandStore(ES):
                 "type": "long"
             }
         }
-        exact_fields = {'input', 'risk_level', 'user', 'asset', 'account'}
+        exact_fields = {}
+        fuzzy_fields = {'input', 'risk_level', 'user', 'asset', 'account'}
         match_fields = {'input'}
         keyword_fields = {'session', 'org_id'}
 
-        super().__init__(config, properties, keyword_fields, exact_fields, match_fields)
+        super().__init__(config, properties, keyword_fields, exact_fields, fuzzy_fields, match_fields)
 
     @staticmethod
     def make_data(command):

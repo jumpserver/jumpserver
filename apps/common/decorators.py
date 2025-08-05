@@ -302,15 +302,7 @@ def bulk_handle(handler, batch_size=50, timeout=0.5):
 
         cache = []  # 缓存实例的列表
         lock = threading.Lock()  # 用于线程安全
-        timer = [None]  # 定时器对象，列表存储以便重置
         org_id = None
-
-        def reset_timer():
-            """重置定时器"""
-            if timer[0] is not None:
-                timer[0].cancel()
-            timer[0] = threading.Timer(timeout, handle_remaining)
-            timer[0].start()
 
         def handle_it():
             from orgs.utils import tmp_to_org
@@ -351,17 +343,13 @@ def bulk_handle(handler, batch_size=50, timeout=0.5):
             if len(cache) >= batch_size:
                 handle_it()
 
-            reset_timer()
             return instance
 
         # 提交剩余实例的方法
         def handle_remaining():
             if not cache:
                 return
-            print("Timer expired. Saving remaining instances.")
-            from orgs.utils import tmp_to_org
-            with tmp_to_org(org_id):
-                handle_it()
+            handle_it()
 
         wrapper.finish = handle_remaining
         return wrapper

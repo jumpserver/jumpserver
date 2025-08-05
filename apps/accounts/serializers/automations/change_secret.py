@@ -16,6 +16,7 @@ from assets.models import Asset
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
+from ...utils import account_secret_task_status
 
 logger = get_logger(__file__)
 
@@ -26,6 +27,7 @@ __all__ = [
     'ChangeSecretRecordBackUpSerializer',
     'ChangeSecretUpdateAssetSerializer',
     'ChangeSecretUpdateNodeSerializer',
+    'ChangeSecretAccountSerializer'
 ]
 
 
@@ -179,3 +181,24 @@ class ChangeSecretUpdateNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChangeSecretAutomation
         fields = ['id', 'nodes']
+
+
+class ChangeSecretAccountSerializer(serializers.ModelSerializer):
+    asset = ObjectRelatedField(
+        queryset=Asset.objects.all(), required=False, label=_("Asset")
+    )
+    ttl = serializers.SerializerMethodField(label=_('TTL'))
+    meta = serializers.SerializerMethodField(label=_('Meta'))
+
+    class Meta:
+        model = Account
+        fields = ['id', 'username', 'asset', 'meta', 'ttl']
+        read_only_fields = fields
+
+    @staticmethod
+    def get_meta(obj):
+        return account_secret_task_status.get(str(obj.id))
+
+    @staticmethod
+    def get_ttl(obj):
+        return account_secret_task_status.get_ttl(str(obj.id))

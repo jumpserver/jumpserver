@@ -294,6 +294,19 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             )
             return url
 
+    def get(self, request, *args, **kwargs):
+        from django.utils import timezone
+        response = super().get(request, *args, **kwargs)
+        try:
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME,
+                request.user.lang,
+                expires=timezone.now() + timezone.timedelta(days=365)
+            )
+        except Exception:
+            pass
+        return response
+
 
 class UserLoginWaitConfirmView(TemplateView):
     template_name = 'authentication/login_wait_confirm.html'

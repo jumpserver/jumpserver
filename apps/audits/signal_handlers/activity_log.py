@@ -89,6 +89,8 @@ def create_activities(resource_ids, detail, detail_id, action, org_id):
         for activity in activities:
             create_activity(activity)
 
+    create_activity.finish()
+
 
 @signals.after_task_publish.connect
 def after_task_publish_for_activity_log(headers=None, body=None, **kwargs):

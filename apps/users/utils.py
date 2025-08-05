@@ -1,7 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 #
 import base64
-import json
 import logging
 import os
 import re
@@ -12,10 +11,9 @@ import pyotp
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import translation
-from django.utils.translation import gettext as _
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, ip, safe_next_url, FlashMessageUtil
+from common.utils import reverse, get_object_or_none, ip, safe_next_url
 from .models import User
 
 logger = logging.getLogger('jumpserver.users')
@@ -49,23 +47,6 @@ def get_user_or_pre_auth_user(request):
     return user
 
 
-def get_redirect_client_url(request):
-    data = {
-        'type': 'session'
-    }
-    buf = base64.b64encode(json.dumps(data).encode()).decode()
-    redirect_url = 'jms://{}'.format(buf)
-    message_data = {
-        'title': _('Auth success'),
-        'message': _("Redirecting to JumpServer Client"),
-        'redirect_url': redirect_url,
-        'interval': 1,
-        'has_cancel': False,
-    }
-    url = FlashMessageUtil.gen_message_url(message_data)
-    return url
-
-
 def redirect_user_first_login_or_index(request, redirect_field_name):
     sources = [request.session, request.POST, request.GET]
 
@@ -74,9 +55,6 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
         url = source.get(redirect_field_name)
         if url:
             break
-
-    if url == 'client':
-        url = get_redirect_client_url(request)
 
     url = safe_next_url(url, request=request)
     # 防止 next 地址为 None
@@ -155,7 +133,7 @@ class BlockUtilBase:
     BLOCK_KEY_TMPL: str
 
     def __init__(self, username, ip):
-        username = username.lower()
+        username = username.lower() if username else ''
         self.username = username
         self.ip = ip
         self.limit_key = self.LIMIT_KEY_TMPL.format(username, ip)

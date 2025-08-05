@@ -204,6 +204,7 @@ class Config(dict):
         'REDIS_SSL_CERT': None,
         'REDIS_SSL_CA': None,
         'REDIS_SSL_REQUIRED': 'none',
+        'REDIS_MAX_CONNECTIONS': 100,
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',
@@ -349,7 +350,7 @@ class Config(dict):
         'AUTH_OPENID_PROVIDER_SIGNATURE_ALG': 'HS256',
         'AUTH_OPENID_PROVIDER_SIGNATURE_KEY': None,
         'AUTH_OPENID_SCOPES': 'openid profile email',
-        'AUTH_OPENID_ID_TOKEN_MAX_AGE': 60,
+        'AUTH_OPENID_ID_TOKEN_MAX_AGE': 600,
         'AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS': True,
         'AUTH_OPENID_USE_STATE': True,
         'AUTH_OPENID_USE_NONCE': True,
@@ -565,6 +566,7 @@ class Config(dict):
         'TERMINAL_OMNIDB_ENABLED': True,
 
         # 安全配置
+        'SAFE_MODE': False,
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
@@ -606,6 +608,7 @@ class Config(dict):
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
         'CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED': True,
+        'CHANGE_SECRET_AFTER_SESSION_END': False,
         'USER_LOGIN_SINGLE_MACHINE_ENABLED': False,
         'ONLY_ALLOW_EXIST_USER_AUTH': False,
         'ONLY_ALLOW_AUTH_FROM_SOURCE': False,
@@ -623,6 +626,7 @@ class Config(dict):
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+        'CELERY_WORKER_COUNT': 10,
 
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
@@ -694,6 +698,8 @@ class Config(dict):
 
         # Chat AI
         'CHAT_AI_ENABLED': False,
+        'CHAT_AI_METHOD': 'api',
+        'CHAT_AI_EMBED_URL': '',
         'CHAT_AI_TYPE': 'gpt',
         'GPT_BASE_URL': '',
         'GPT_API_KEY': '',
@@ -708,7 +714,7 @@ class Config(dict):
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
-        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'leak_passwords.db'),
+        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'system', 'leak_passwords.db'),
 
         # Ansible Receptor
         'RECEPTOR_ENABLED': False,

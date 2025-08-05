@@ -48,6 +48,7 @@ app_view_patterns = [
     path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
     path('download/', views.ResourceDownload.as_view(), name='download'),
+    path('redirect/confirm/', views.RedirectConfirm.as_view(), name='redirect-confirm'),
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
 ]
 
@@ -93,7 +94,7 @@ cache_kwargs = {
 }
 # docs 路由
 urlpatterns += [
-    path('api/swagger.<format>', views.get_swagger_view(False).without_ui(**cache_kwargs), name='schema-json'),
+    path('api/swagger.<format>', views.get_swagger_view().without_ui(**cache_kwargs), name='schema-json'),
     re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', **cache_kwargs), name="docs"),
     re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', **cache_kwargs), name='redoc'),
 ]

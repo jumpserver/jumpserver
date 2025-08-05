@@ -4,10 +4,10 @@ from ..hands import *
 
 class CeleryBaseService(BaseService):
 
-    def __init__(self, queue, num=10, **kwargs):
+    def __init__(self, queue, **kwargs):
         super().__init__(**kwargs)
         self.queue = queue
-        self.num = num
+        self.num = CELERY_WORKER_COUNT
 
     @property
     def cmd(self):

@@ -1,0 +1,46 @@
+{% extends '_base_only_content.html' %}
+{% load static %}
+{% load i18n %}
+{% block html_title %} {{ INTERFACE.login_title }} {% endblock %}
+{% block title %} {{ INTERFACE.login_title }}{% endblock %}
+
+{% block content %}
+    <style>
+        .alert.alert-msg {
+            background: #F5F5F7;
+        }
+
+        .target-url {
+            display: inline-block;
+            max-width: 100%;
+            min-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+    </style>
+    <div>
+        <p>
+        <div class="alert {% if error %} alert-danger {% else %} alert-info {% endif %}" id="messages">
+            {% trans 'You are about to be redirected to an external website. Please confirm that you trust this link: ' %}
+            <a class="target-url" href="{{ target_url }}">{{ target_url }}</a>
+        </div>
+        </p>
+
+        <div class="row">
+            <div class="col-sm-3">
+                <a href="/" class="btn btn-default block full-width m-b">
+                    {% trans 'Cancel' %}
+                </a>
+            </div>
+            <div class="col-sm-3">
+                <a href="{{ target_url }}" class="btn btn-primary block full-width m-b">
+                    {% trans 'Confirm' %}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

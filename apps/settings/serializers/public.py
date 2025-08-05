@@ -71,6 +71,8 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     VAULT_ENABLED = serializers.BooleanField()
     VIRTUAL_APP_ENABLED = serializers.BooleanField()
     CHAT_AI_ENABLED = serializers.BooleanField()
+    CHAT_AI_METHOD = serializers.CharField()
+    CHAT_AI_EMBED_URL = serializers.CharField()
     CHAT_AI_TYPE = serializers.CharField()
     GPT_MODEL = serializers.CharField()
     FILE_UPLOAD_SIZE_LIMIT_MB = serializers.IntegerField()
@@ -82,6 +84,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     USER_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     PRIVACY_MODE = serializers.BooleanField()
+    CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

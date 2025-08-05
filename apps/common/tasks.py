@@ -6,6 +6,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
 
 from common.storage import jms_storage
+from users.models import User
 from .utils import get_logger
 
 logger = get_logger(__file__)
@@ -48,6 +49,8 @@ def send_mail_async(*args, **kwargs):
     Example:
     send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
     """
+    from users.utils import activate_user_language
+
     if len(args) == 3:
         args = list(args)
         args[0] = (settings.EMAIL_SUBJECT_PREFIX or '') + args[0]
@@ -55,10 +58,20 @@ def send_mail_async(*args, **kwargs):
         args.insert(2, from_email)
 
     args = tuple(args)
-    try:
-        return send_mail(connection=get_email_connection(), *args, **kwargs)
-    except Exception as e:
-        logger.error("Sending mail error: {}".format(e))
+
+    subject = args[0] if len(args) > 0 else kwargs.get('subject')
+    recipient_list = args[3] if len(args) > 3 else kwargs.get('recipient_list')
+    logger.info(
+        "send_mail_async called with subject=%r, recipients=%r", subject, recipient_list
+    )
+
+    users = User.objects.filter(email__in=recipient_list).all()
+    for user in users:
+        try:
+            with activate_user_language(user):
+                send_mail(connection=get_email_connection(), *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Sending mail to {user.email} error: {e}")
 
 
 @shared_task(

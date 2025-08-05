@@ -4,13 +4,16 @@ import json
 import os
 import re
 import time
+from urllib.parse import urlparse, quote
 
 import pytz
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http.response import HttpResponseForbidden
 from django.shortcuts import HttpResponse
-from django.utils import timezone, translation
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils import timezone
 
 from .utils import set_current_request
 
@@ -139,28 +142,36 @@ class EndMiddleware:
         return response
 
 
-class LocaleMiddleware:
+class SafeRedirectMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
-        lang = None
-        if request.user.is_authenticated:
-            lang = getattr(request.user, 'lang', None)
 
-        if not lang:
-            lang = translation.get_language_from_request(request, check_path=False)
-
-        lang = lang or settings.LANGUAGE_CODE
-        try:
-            translation.activate(lang)
-            request.LANGUAGE_CODE = lang
-            response.set_cookie(
-                settings.LANGUAGE_COOKIE_NAME,
-                lang,
-                expires=timezone.now() + timezone.timedelta(days=365)
-            )
-        except Exception:
-            pass
+        if not (300 <= response.status_code < 400):
+            return response
+        if request.resolver_match and request.resolver_match.namespace.startswith('authentication'):
+            # 认证相关的路由跳过验证（core/auth/xxxx
+            return response
+        location = response.get('Location')
+        if not location:
+            return response
+        parsed = urlparse(location)
+        if parsed.scheme and parsed.netloc:
+            target_host = parsed.netloc
+            if target_host in [*settings.ALLOWED_HOSTS]:
+                return response
+            target_host, target_port = self._split_host_port(parsed.netloc)
+            origin_host, origin_port = self._split_host_port(request.get_host())
+            if target_host != origin_host:
+                safe_redirect_url = '%s?%s' % (reverse('redirect-confirm'), f'next={quote(location)}')
+                return redirect(safe_redirect_url)
         return response
+
+    @staticmethod
+    def _split_host_port(netloc):
+        if ':' in netloc:
+            host, port = netloc.split(':', 1)
+            return host, port
+        return netloc, '80'

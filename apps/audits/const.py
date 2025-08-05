@@ -29,7 +29,7 @@ class ActionChoices(TextChoices):
     download = "download", _("Download")
     connect = "connect", _("Connect")
     login = "login", _("Login")
-    change_auth = "change_password", _("Change password")
+    change_auth = "change_password", _("Change secret")
 
     accept = 'accept', _('Accept')
     review = 'review', _('Review')

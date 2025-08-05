@@ -15,11 +15,13 @@ from common.decorators import bulk_create_decorator, bulk_update_decorator
 from settings.models import LeakPasswords
 
 
+# 已设置手动 finish
 @bulk_create_decorator(AccountRisk)
 def create_risk(data):
     return AccountRisk(**data)
 
 
+# 已设置手动 finish
 @bulk_update_decorator(AccountRisk, update_fields=["details", "status"])
 def update_risk(risk):
     return risk
@@ -217,6 +219,9 @@ class CheckAccountManager(BaseManager):
                     "details": [{"datetime": now, 'type': 'init'}],
                 })
 
+        create_risk.finish()
+        update_risk.finish()
+
     def pre_run(self):
         super().pre_run()
         self.assets = self.execution.get_all_assets()
@@ -264,7 +269,7 @@ class CheckAccountManager(BaseManager):
             handler.clean()
 
     def get_report_subject(self):
-        return "Check account report of %s" % self.execution.id
+        return _("Check account report of {}").format(self.execution.id)
 
     def get_report_template(self):
         return "accounts/check_account_report.html"

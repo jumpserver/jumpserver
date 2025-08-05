@@ -5,10 +5,10 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.views import View
 
+from authentication.backends.base import BaseAuthCallbackClientView
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
-from authentication.views.utils import redirect_to_guard_view
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -67,11 +67,8 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
         return HttpResponseRedirect(redirect_url)
 
 
-class OAuth2AuthCallbackClientView(View):
-    http_method_names = ['get', ]
-
-    def get(self, request):
-        return redirect_to_guard_view(query_string='next=client')
+class OAuth2AuthCallbackClientView(BaseAuthCallbackClientView):
+    pass
 
 
 class OAuth2EndSessionView(View):

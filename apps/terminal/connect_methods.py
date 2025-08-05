@@ -54,7 +54,7 @@ class NativeClient(TextChoices):
             Protocol.oracle: [cls.db_client, cls.db_guide],
             Protocol.postgresql: [cls.db_client, cls.db_guide],
             Protocol.sqlserver: [cls.db_client, cls.db_guide],
-            Protocol.vnc: [cls.vnc_guide,]
+            Protocol.vnc: [cls.vnc_guide, ]
         }
         return clients
 
@@ -72,7 +72,7 @@ class NativeClient(TextChoices):
 
     @classmethod
     def xpack_methods(cls):
-        return [cls.mstsc, cls.db_client]
+        return [cls.mstsc, cls.db_client, cls.vnc_guide]
 
     @classmethod
     def get_methods(cls, os='windows'):
@@ -190,7 +190,8 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.mariadb,
-                    Protocol.redis, Protocol.sqlserver
+                    Protocol.redis, Protocol.sqlserver,
+                    Protocol.mongodb
                 ],
                 'match': 'map'
             },

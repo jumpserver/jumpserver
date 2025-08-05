@@ -17,6 +17,7 @@ from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import ChangeSecretRecordStatusChoice
 from .models import Account, GatheredAccount, ChangeSecretRecord, PushSecretRecord, IntegrationApplication, \
     AutomationExecution
+from .utils import account_secret_task_status
 
 logger = get_logger(__file__)
 
@@ -233,7 +234,7 @@ class AutomationExecutionFilterSet(DaysExecutionFilterMixin, BaseFilterSet):
 
     class Meta:
         model = AutomationExecution
-        fields = ["days", 'trigger', 'automation_id', 'automation__name']
+        fields = ["days", 'trigger', 'automation__name']
 
 
 class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterSet):
@@ -242,3 +243,25 @@ class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterS
     class Meta:
         model = PushSecretRecord
         fields = ["id", "status", "asset_id", "execution_id"]
+
+
+class ChangeSecretStatusFilterSet(BaseFilterSet):
+    asset_name = drf_filters.CharFilter(
+        field_name="asset__name", lookup_expr="icontains"
+    )
+    status = drf_filters.CharFilter(method='filter_dynamic')
+    execution_id = drf_filters.CharFilter(method='filter_dynamic')
+
+    class Meta:
+        model = Account
+        fields = ["username"]
+
+    @staticmethod
+    def filter_dynamic(queryset, name, value):
+        _ids = list(queryset.values_list('id', flat=True))
+        data_map = {
+            _id: account_secret_task_status.get(str(_id)).get(name)
+            for _id in _ids
+        }
+        matched = [_id for _id, v in data_map.items() if v == value]
+        return queryset.filter(id__in=matched)

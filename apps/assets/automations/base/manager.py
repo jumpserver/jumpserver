@@ -22,6 +22,7 @@ from common.tasks import send_mail_async
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
 from ops.ansible.interface import interface
+from users.utils import activate_user_language
 
 logger = get_logger(__name__)
 
@@ -122,9 +123,7 @@ class BaseManager:
         self.execution.summary = self.summary
         self.execution.result = self.result
         self.execution.status = self.status
-
-        with safe_atomic_db_connection():
-            self.execution.save()
+        self.execution.save()
 
     def print_summary(self):
         content = "\nSummery: \n"
@@ -151,12 +150,13 @@ class BaseManager:
         if not recipients:
             return
         print(f"Send report to: {','.join([str(u) for u in recipients])}")
-
-        report = self.gen_report()
-        report = transform(report, cssutils_logging_level="CRITICAL")
-        subject = self.get_report_subject()
-        emails = [r.email for r in recipients if r.email]
-        send_mail_async(subject, report, emails, html_message=report)
+        for user in recipients:
+            with activate_user_language(user):
+                report = self.gen_report()
+                report = transform(report, cssutils_logging_level="CRITICAL")
+                subject = self.get_report_subject()
+                emails = [user.email]
+                send_mail_async(subject, report, emails, html_message=report)
 
     def gen_report(self):
         template_path = self.get_report_template()
@@ -165,9 +165,10 @@ class BaseManager:
         return data
 
     def post_run(self):
-        self.update_execution()
-        self.print_summary()
-        self.send_report_if_need()
+        with safe_atomic_db_connection():
+            self.update_execution()
+            self.print_summary()
+            self.send_report_if_need()
 
     def run(self, *args, **kwargs):
         self.pre_run()
@@ -546,7 +547,8 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             try:
                 kwargs.update({"clean_workspace": False})
                 cb = runner.run(**kwargs)
-                self.on_runner_success(runner, cb)
+                with safe_atomic_db_connection():
+                    self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e, **info)
             finally:

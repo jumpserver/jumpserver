@@ -32,7 +32,7 @@ from rbac.permissions import RBACPermission
 from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
-from .const import ActivityChoices
+from .const import ActivityChoices, ActionChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
@@ -45,7 +45,7 @@ from .serializers import (
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer
 )
-from .utils import construct_userlogin_usernames
+from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
 
@@ -126,6 +126,11 @@ class FTPLogViewSet(OrgModelViewSet):
         response['Content-Type'] = 'application/octet-stream'
         filename = escape_uri_path(ftp_log.filename)
         response["Content-Disposition"] = "attachment; filename*=UTF-8''{}".format(filename)
+
+        record_operate_log_and_activity_log(
+            [ftp_log.id], ActionChoices.download, '', self.model,
+            resource_display=f'{ftp_log.asset}: {ftp_log.filename}',
+        )
         return response
 
     @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ], serializer_class=FileSerializer)

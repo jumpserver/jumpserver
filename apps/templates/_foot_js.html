@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 <!-- Mainly scripts -->
-<script src="{% static "js/plugins/metisMenu/jquery.metisMenu.js" %}"></script>
+<script src="{% static "js/plugins/metisMenu/jquery.metisMenu.3.0.7.js" %}"></script>
 
 <!-- Custom and plugin javascript -->
 <script src="{% static "js/plugins/toastr/toastr.min.js" %}"></script>
@@ -13,25 +13,32 @@
 
 {% if INTERFACE.footer_content %}
     <style>
-        .markdown-footer a {
-            color: #428bca;
-        }
-
         .markdown-footer {
             position: absolute;
-            bottom: 0;
             left: 50%;
+            bottom: 0;
+            display: flex;
+            flex-grow: 0;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(-50%);
             width: 285px;
-            transform: translate(-50%, -50%);
-            @media (min-width: 768px) {
-                top: 97%;
-            }
+        }
+        
+        .markdown-footer p {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            gap: 3px;
         }
 
-        .markdown-footer p {
-            padding: 0;
-            margin: 0;
-        }
+        .markdown-footer a {
+            color: #428bca;
+        }  
     </style>
     <div id="markdown-output" class="markdown-footer"></div>
 {% endif %}
@@ -51,11 +58,11 @@
             html: true,
             linkify: true,
             typographer: true,
-            breaks: true
+            breaks: false
         });
         const markdownContent = `{{ INTERFACE.footer_content|escapejs }}`;
         const markdownRef = document.getElementById('markdown-output');
-        
+
         if (markdownRef && markdownContent) {
             const renderedContent = md.render(markdownContent.trim());
             markdownRef.innerHTML = renderedContent;

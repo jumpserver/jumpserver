@@ -22,7 +22,8 @@ class Endpoint(JMSBaseModel):
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
     sqlserver_port = PortField(default=14330, verbose_name=_('SQLServer port'))
-    oracle_port = PortField(default=15210,verbose_name=_('Oracle port'))
+    oracle_port = PortField(default=15210, verbose_name=_('Oracle port'))
+    mongodb_port = PortField(default=27018, verbose_name=_('MongoDB port'))
     vnc_port = PortField(default=15900, verbose_name=_('VNC port'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))

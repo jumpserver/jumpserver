@@ -1,5 +1,4 @@
 ---
-
 - hosts: all
   vars:
     APPLET_DOWNLOAD_HOST: https://demo.example.com
@@ -36,6 +35,50 @@
             msg: "CORE_HOST {{ CORE_HOST }} is redirecting to {{ core_host_redirects.location }}, please use the final url"
           when: core_host_redirects.status_code >= 300 and core_host_redirects.status_code < 400
 
+        - name: Create Tinker keyfile
+          ansible.windows.win_powershell:
+            script: |
+              [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+              function New-RandomString {
+                  param (
+                      [int]$Length = 16
+                  )
+                  $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+                  $random = -join ((1..$Length) | ForEach-Object { $chars[(Get-Random -Maximum $chars.Length)] })
+                  return $random
+              }
+              $targetPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
+              if (Test-Path -Path $targetPath) {
+                Write-Output "access_key already exists at $targetPath"
+                return
+                }
+              $randomStr = New-RandomString -Length 7
+              $dir = [System.IO.Path]::GetDirectoryName($targetPath)
+              if (-not (Test-Path -Path $dir)) {
+                New-Item -ItemType Directory -Path $dir -Force | Out-Null
+              }
+              $url = "{{ CORE_HOST }}/api/v1/terminal/terminal-registrations/"
+
+              $body = @{
+                "name" = "[Tinker]-{{ HOST_NAME }}-$randomStr"
+                "comment" = "tinker"
+                "type" = "tinker"
+                }| ConvertTo-Json
+              $headers = @{
+                  "Authorization" = "BootstrapToken {{ BOOTSTRAP_TOKEN }}"
+                  "Content-Type"  = "application/json"
+              }
+              $response = Invoke-RestMethod -Uri $url -Method Post -Body $body -Headers $headers
+              Write-Output "Response: $($response | ConvertTo-Json -Depth 5)"
+              $accessKey = $response.service_account.access_key.id
+              $accessSecret = $response.service_account.access_key.secret
+              if ($accessKey -and $accessSecret) {
+                  $utf8NoBOM = New-Object System.Text.UTF8Encoding($false)
+                  [System.IO.File]::WriteAllText($targetPath, "${accessKey}:${accessSecret}", $utf8NoBOM)
+                  Write-Output "access_key save to $targetPath"
+              } else {
+                  Write-Error "Failed to get access_key or access_secret。"
+              }
         - name: Install RDS-RD-Server (RDS)
           ansible.windows.win_feature:
             name: RDS-RD-Server
@@ -235,14 +278,27 @@
           ansible.windows.win_environment:
             level: machine
             variables:
-              GOOGLE_API_KEY: ''
-              GOOGLE_DEFAULT_CLIENT_ID: ''
-              GOOGLE_DEFAULT_CLIENT_SECRET: ''
+              GOOGLE_API_KEY: ""
+              GOOGLE_DEFAULT_CLIENT_ID: ""
+              GOOGLE_DEFAULT_CLIENT_SECRET: ""
 
         - name: Generate tinkerd component config
           ansible.windows.win_powershell:
             script: |
               tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}
+
+        - name: Rename tinkerd keyfile
+          ansible.windows.win_powershell:
+            script: |
+              $source = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
+              $destination = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
+              if (Test-Path $destination) {
+                $timestamp = Get-Date -Format "yyyyMMddHHmmss"
+                  Rename-Item -Path $destination -NewName (Split-Path -Leaf "$destination.bak.$timestamp" )
+              }
+              if (Test-Path $source) {
+                  Rename-Item -Path $source -NewName (Split-Path -Leaf $destination)
+              }
 
         - name: Install tinkerd service
           ansible.windows.win_powershell:

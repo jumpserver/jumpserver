@@ -8,6 +8,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.const.http import POST, PUT
+from orgs.models import Organization
+from orgs.utils import current_org
 
 __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
 
@@ -23,7 +25,16 @@ class SuggestionMixin:
 
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        org_id = str(current_org.id)
+        if (
+                not request.user.is_superuser and
+                org_id != Organization.ROOT_ID and
+                not request.user.orgs.filter(id=org_id).exists()
+        ):
+            queryset = queryset.none()
+
+        queryset = self.filter_queryset(queryset)
         queryset = queryset[:self.suggestion_limit]
         page = self.paginate_queryset(queryset)
 

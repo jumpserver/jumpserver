@@ -28,7 +28,7 @@ class DiscoverAccountAutomationSerializer(BaseAutomationSerializer):
                   + read_only_fields)
         extra_kwargs = {
             'check_risk': {
-                'help_text': _('Whether to check the risk of the gathered accounts.'),
+                'help_text': _('Whether to check the risk of the discovered accounts.'),
             },
             **BaseAutomationSerializer.Meta.extra_kwargs
         }

@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
@@ -43,6 +44,7 @@ class Session(OrgModelMixin):
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     cmd_amount = models.IntegerField(default=-1, verbose_name=_("Command amount"))
     error_reason = models.CharField(max_length=128, blank=True, verbose_name=_("Error reason"))
+    replay_size = models.BigIntegerField(default=0, verbose_name=_("Replay size"))
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
@@ -122,7 +124,10 @@ class Session(OrgModelMixin):
 
     @property
     def account_obj(self):
-        return get_object_or_none(Account, pk=self.account_id)
+        try:
+            return get_object_or_none(Account, pk=self.account_id)
+        except ValidationError:
+            return None
 
     def can_replay(self):
         return self.has_replay

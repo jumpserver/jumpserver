@@ -30,6 +30,16 @@ common_risk_items = [
 diff_items = risk_items + common_risk_items
 
 
+@bulk_create_decorator(AccountRisk)
+def _create_risk(data):
+    return AccountRisk(**data)
+
+
+@bulk_update_decorator(AccountRisk, update_fields=["details"])
+def _update_risk(account):
+    return account
+
+
 def format_datetime(value):
     if isinstance(value, timezone.datetime):
         return value.strftime("%Y-%m-%d %H:%M:%S")
@@ -141,25 +151,17 @@ class AnalyseAccountRisk:
             found = assets_risks.get(key)
 
             if not found:
-                self._create_risk(dict(**d, details=[detail]))
+                _create_risk(dict(**d, details=[detail]))
                 continue
 
             found.details.append(detail)
-            self._update_risk(found)
-
-    @bulk_create_decorator(AccountRisk)
-    def _create_risk(self, data):
-        return AccountRisk(**data)
-
-    @bulk_update_decorator(AccountRisk, update_fields=["details"])
-    def _update_risk(self, account):
-        return account
+            _update_risk(found)
 
     def lost_accounts(self, asset, lost_users):
         if not self.check_risk:
             return
         for user in lost_users:
-            self._create_risk(
+            _create_risk(
                 dict(
                     asset_id=str(asset.id),
                     username=user,
@@ -176,7 +178,7 @@ class AnalyseAccountRisk:
             self._analyse_item_changed(ga, d)
         if not sys_found:
             basic = {"asset": asset, "username": d["username"], 'gathered_account': ga}
-            self._create_risk(
+            _create_risk(
                 dict(
                     **basic,
                     risk=RiskChoice.new_found,
@@ -388,6 +390,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         self.update_gathered_account(ori_account, d)
                     ori_found = username in ori_users
                     need_analyser_gather_account.append((asset, ga, d, ori_found))
+                # 这里顺序不能调整，risk 外键关联了 gathered_account 主键 id，所以在创建 risk 需要保证 gathered_account 已经创建完成
                 self.create_gathered_account.finish()
                 self.update_gathered_account.finish()
                 for analysis_data in need_analyser_gather_account:
@@ -403,6 +406,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     present=True
                 )
         # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步
+        _update_risk.finish()
+        _create_risk.finish()
+
         time.sleep(0.5)
 
     def get_report_template(self):

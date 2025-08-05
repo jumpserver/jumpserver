@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from common.db.fields import JSONManyToManyField
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
-from common.utils.time_period import contains_time_period
+from common.utils.timezone import contains_time_period
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from ..const import ActionChoices
 
