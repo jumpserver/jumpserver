@@ -16,20 +16,28 @@ from playwright.sync_api import sync_playwright
 
 charts_map = {
     "UserLoginActivity": {
-        "title": "用户登录活动",
+        "title": "用户登录报告",
         "path": "/ui/#/reports/users/user-activity"
     },
     "UserPasswordChange": {
-        "title": "用户改密记录",
+        "title": "用户改密报告",
         "path": "/ui/#/reports/users/change-password"
     },
     "AssetStatistics": {
-        "title": "资产统计概览",
+        "title": "资产统计报告",
         "path": "/ui/#/reports/assets/asset-statistics"
     },
-    "AssetAccessActivity": {
-        "title": "资产访问活动",
+    "AssetReport": {
+        "title": "资产活动报告",
         "path": "/ui/#/reports/assets/asset-activity"
+    },
+    "AccountStatistics": {
+        "title": "账号统计报告",
+        "path": "/ui/#/reports/accounts/account-statistics"
+    },
+    "AccountAutomationReport": {
+        "title": "账号自动化报告",
+        "path": "/ui/#/reports/accounts/account-automation"
     }
 }
 
