@@ -1,6 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 
+from orgs.models import Organization
 from .base import BaseType
+
+CHATX_NAME = 'ChatX'
 
 
 class GPTTypes(BaseType):
@@ -52,3 +55,38 @@ class GPTTypes(BaseType):
         return [
             cls.CHATGPT,
         ]
+
+
+def create_or_update_chatx_resources(chatx_name=CHATX_NAME, org_id=Organization.SYSTEM_ID):
+    from django.apps import apps
+
+    platform_model = apps.get_model('assets', 'Platform')
+    asset_model = apps.get_model('assets', 'Asset')
+    account_model = apps.get_model('accounts', 'Account')
+
+    platform, _ = platform_model.objects.update_or_create(
+        name=chatx_name,
+        defaults={
+            'internal': True,
+            'type': chatx_name,
+            'category': 'ai',
+        }
+    )
+    asset, __ = asset_model.objects.update_or_create(
+        address=chatx_name,
+        defaults={
+            'name': chatx_name,
+            'platform': platform,
+            'org_id': org_id
+        }
+    )
+
+    account, __ = account_model.objects.update_or_create(
+        username=chatx_name,
+        defaults={
+            'name': chatx_name,
+            'asset': asset,
+            'org_id': org_id
+        }
+    )
+    return account
