@@ -21,7 +21,7 @@ class AbstractSessionCommand(OrgModelMixin):
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
     risk_level = models.SmallIntegerField(
         default=RiskLevelChoices.accept, choices=RiskLevelChoices.choices, db_index=True,
-        verbose_name=_("Risk level")
+        verbose_name=_("Action")
     )
     timestamp = models.IntegerField(db_index=True)
 
