@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
+    ansible_timeout: 30
 
   tasks:
     - name: Test MongoDB connection

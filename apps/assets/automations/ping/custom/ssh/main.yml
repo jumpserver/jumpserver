@@ -4,7 +4,7 @@
     ansible_connection: local
     ansible_shell_type: sh
     ansible_become: false
-
+    ansible_timeout: 30
   tasks:
     - name: Test asset connection (paramiko)
       ssh_ping:
