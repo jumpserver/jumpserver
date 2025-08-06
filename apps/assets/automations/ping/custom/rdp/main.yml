@@ -4,6 +4,7 @@
     ansible_shell_type: sh
     ansible_connection: local
     ansible_python_interpreter: "{{ local_python_interpreter }}"
+    ansible_timeout: 30
 
   tasks:
     - name: Test asset connection (pyfreerdp)
