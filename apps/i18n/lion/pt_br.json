@@ -1,6 +1,7 @@
 {
     "ActionPerm": "Permissões de ação",
     "AutoFit": "Adaptação automática",
+    "AutoPasteOnClick": "Clique no campo de entrada para colar automaticamente o conteúdo da área de transferência (é necessário habilitar HTTPS e permissões do navegador).",
     "AvailableShortcutKey": "Atalhos disponíveis",
     "Cancel": "Cancelar",
     "ClearDone": "Limpeza concluída",

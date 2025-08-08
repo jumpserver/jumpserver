@@ -41,8 +41,8 @@ class AccountViewSet(OrgBulkModelViewSet):
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
         'clear_secret': 'accounts.change_account',
-        'move_to_assets': 'accounts.create_account',
-        'copy_to_assets': 'accounts.create_account',
+        'move_to_assets': 'accounts.delete_account',
+        'copy_to_assets': 'accounts.add_account',
     }
     export_as_zip = True
 
