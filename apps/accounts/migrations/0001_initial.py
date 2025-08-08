@@ -46,11 +46,16 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Account',
-                'permissions': [('view_accountsecret', 'Can view asset account secret'),
-                                ('view_historyaccount', 'Can view asset history account'),
-                                ('view_historyaccountsecret', 'Can view asset history account secret'),
-                                ('verify_account', 'Can verify account'), ('push_account', 'Can push account'),
-                                ('remove_account', 'Can remove account')],
+                'permissions': [
+                    ('view_accountsecret', 'Can view asset account secret'),
+                    ('view_historyaccount', 'Can view asset history account'),
+                    ('view_historyaccountsecret', 'Can view asset history account secret'),
+                    ('verify_account', 'Can verify account'),
+                    ('push_account', 'Can push account'),
+                    ('remove_account', 'Can remove account'),
+                    ('view_accountsession', 'Can view session'),
+                    ('view_accountactivity', 'Can view activity')
+                ],
             },
         ),
         migrations.CreateModel(

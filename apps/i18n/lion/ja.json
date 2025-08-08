@@ -1,6 +1,7 @@
 {
     "ActionPerm": "操作権限",
     "AutoFit": "自動適応",
+    "AutoPasteOnClick": "クリックすると入力ボックスにクリップボードの内容が自動で貼り付けられます（HTTPSとブラウザの権限を有効にする必要があります）。",
     "AvailableShortcutKey": "利用可能なショートカットキー",
     "Cancel": "キャンセル",
     "ClearDone": "クリーニング終了",
