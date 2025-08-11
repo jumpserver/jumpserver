@@ -172,10 +172,7 @@ class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org.is_root() or not settings.XPACK_ENABLED:
-            return queryset
-        users = self.get_org_member_usernames()
-        queryset = queryset.filter(username__in=users)
+        queryset = queryset.model.filter_queryset_by_org(queryset)
         return queryset
 
 
@@ -297,12 +294,7 @@ class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not current_org.is_root():
-            users = current_org.get_members()
-            queryset = queryset.filter(
-                user__in=[str(user) for user in users]
-            )
-        return queryset
+        return self.model.filter_queryset_by_org(queryset)
 
 
 class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):

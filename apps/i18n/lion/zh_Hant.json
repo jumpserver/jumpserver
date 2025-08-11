@@ -1,6 +1,7 @@
 {
     "ActionPerm": "操作權限",
     "AutoFit": "自動適應",
+    "AutoPasteOnClick": "點擊輸入框自動粘貼剪貼板內容（需啟用 HTTPS 和瀏覽器權限）",
     "AvailableShortcutKey": "可用的快捷鍵",
     "Cancel": "取消",
     "ClearDone": "清理已完成",

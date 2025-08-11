@@ -30,6 +30,7 @@ resource_api = [
     path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),
     path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
     path('labels/', include('labels.urls', namespace='api-label')),
+    path('reports/', include('reports.urls.api_urls', namespace='api-reports')),
 ]
 
 api_v1 = resource_api + [
@@ -42,6 +43,7 @@ api_v1 = resource_api + [
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),
+    path('reports/', include('reports.urls.view_urls'), name='reports'),
     path('tickets/', include('tickets.urls.view_urls'), name='tickets'),
     path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),

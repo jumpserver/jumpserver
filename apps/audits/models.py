@@ -189,6 +189,15 @@ class PasswordChangeLog(models.Model):
     class Meta:
         verbose_name = _("Password change log")
 
+    @staticmethod
+    def filter_queryset_by_org(queryset):
+        if not current_org.is_root():
+            users = current_org.get_members()
+            queryset = queryset.filter(
+                user__in=[str(user) for user in users]
+            )
+        return queryset
+
 
 class UserLoginLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -257,6 +266,15 @@ class UserLoginLog(models.Model):
             return reason
         reason = old_reason_choices.get(self.reason, self.reason)
         return reason
+
+    @staticmethod
+    def filter_queryset_by_org(queryset):
+        from audits.utils import construct_userlogin_usernames
+        if current_org.is_root() or not settings.XPACK_ENABLED:
+            return queryset
+        user_queryset = current_org.get_members()
+        users = construct_userlogin_usernames(user_queryset)
+        return queryset.filter(username__in=users)
 
     class Meta:
         ordering = ["-datetime", "username"]

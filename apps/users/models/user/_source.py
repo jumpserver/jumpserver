@@ -25,6 +25,10 @@ class Source(models.TextChoices):
     slack = "slack", _("Slack")
     custom = "custom", "Custom"
 
+    @classmethod
+    def as_dict(cls):
+        return {choice.value: choice.label for choice in cls}
+
 
 class SourceMixin:
     source: str

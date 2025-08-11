@@ -1,6 +1,7 @@
 {
     "ActionPerm": "작업 권한",
     "AutoFit": "자동 조정",
+    "AutoPasteOnClick": "입력창을 클릭하면 자동으로 클립보드 내용을 붙여넣습니다(HTTPS와 브라우저 권한을 활성화해야 합니다).",
     "AvailableShortcutKey": "사용 가능한 단축키",
     "Cancel": "취소",
     "ClearDone": "정리 완료",

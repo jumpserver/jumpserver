@@ -240,6 +240,11 @@ class CheckAccountManager(BaseManager):
 
                 print("Check: {} => {}".format(account, msg))
                 if not error:
+                    AccountRisk.objects.filter(
+                        asset=account.asset,
+                        username=account.username,
+                        risk=handler.risk
+                    ).delete()
                     continue
                 self.add_risk(handler.risk, account)
             self.commit_risks(_assets)

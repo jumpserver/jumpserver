@@ -136,6 +136,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'rbac.apps.RBACConfig',
     'labels.apps.LabelsConfig',
+    'reports.apps.ReportsConfig',
     'rest_framework',
     'drf_yasg',
     'django_cas_ng',
@@ -373,7 +374,7 @@ REDIS_OPTIONS = {
         "health_check_interval": 30
     },
     "CONNECTION_POOL_KWARGS": {
-        'max_connections': 100,
+        'max_connections': CONFIG.REDIS_MAX_CONNECTIONS,
     }
 }
 if REDIS_USE_SSL:
