@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.db.models import Count, Q
 from django.http.response import JsonResponse
+from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 
 from audits.const import LoginStatusChoices
@@ -12,11 +13,9 @@ from common.permissions import IsValidLicense
 from common.utils import lazyproperty
 from rbac.permissions import RBACPermission
 from reports.mixins import DateRangeMixin
+from users.models import User, Source
 
 __all__ = ['UserReportApi']
-
-from users.models import User
-from users.models.user import Source
 
 
 class UserReportApi(DateRangeMixin, APIView):
@@ -37,12 +36,13 @@ class UserReportApi(DateRangeMixin, APIView):
         metrics = [len(data.get(str(d), set())) for d in self.date_range_list]
         return metrics
 
-    def get_user_login_method_metrics(self):
+    def get_user_login_method_metrics(self, source_map):
         filtered_queryset = self.filter_by_date_range(self.user_login_log_queryset, 'datetime')
 
         backends = set()
         data = defaultdict(lambda: defaultdict(set))
         for t, username, backend in filtered_queryset.values_list('datetime', 'username', 'backend'):
+            backend = str(source_map.get(backend.lower(), backend))
             backends.add(backend)
             date_str = str(t.date())
             data[date_str][backend].add(username)
@@ -52,15 +52,6 @@ class UserReportApi(DateRangeMixin, APIView):
             for backend in backends:
                 username = data.get(date_str) if data.get(date_str) else {backend: set()}
                 metrics[backend].append(len(username.get(backend, set())))
-        return metrics
-
-    def get_user_login_region_distribution(self):
-        filtered_queryset = self.filter_by_date_range(self.user_login_log_queryset, 'datetime')
-
-        data = filtered_queryset.values('city').annotate(
-            user_count=Count('username', distinct=True)
-        ).order_by('-user_count')
-        metrics = [{'name': d['city'], 'value': d['user_count']} for d in data]
         return metrics
 
     def get_user_login_time_metrics(self):
@@ -108,6 +99,7 @@ class UserReportApi(DateRangeMixin, APIView):
         data['user_stats'] = user_stats
 
         source_map = Source.as_dict()
+        source_map.update({'password': _('Password')})
         user_by_source = defaultdict(int)
         for source in self.user_qs.values_list('source', flat=True):
             k = source_map.get(source, source)
@@ -122,8 +114,7 @@ class UserReportApi(DateRangeMixin, APIView):
         }
         data['user_login_method_metrics'] = {
             'dates_metrics_date': self.dates_metrics_date,
-            'dates_metrics_total': self.get_user_login_method_metrics(),
+            'dates_metrics_total': self.get_user_login_method_metrics(source_map),
         }
-        data['user_login_region_distribution'] = self.get_user_login_region_distribution()
         data['user_login_time_metrics'] = self.get_user_login_time_metrics()
         return JsonResponse(data, status=200)
