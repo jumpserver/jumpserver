@@ -3,6 +3,7 @@
 from collections import defaultdict
 
 from django.http import JsonResponse
+from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 
 from accounts.const import AutomationTypes
@@ -63,7 +64,10 @@ class AccountAutomationApi(DateRangeMixin, APIView):
 
         metrics = {}
         for tp, values in tp_map.items():
-            _tp = AutomationTypes(tp).label
+            if tp == AutomationTypes.change_secret:
+                _tp = _('Account change secret')
+            else:
+                _tp = AutomationTypes(tp).label
             metrics[str(_tp)] = values
 
         return metrics
