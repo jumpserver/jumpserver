@@ -239,7 +239,7 @@ DB_OPTIONS = {}
 DB_ENGINE = CONFIG.DB_ENGINE.lower()
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.{}'.format(DB_ENGINE),
+        'ENGINE': 'django_vastbase_backend' if DB_ENGINE == 'vastbase' else 'django.db.backends.{}'.format(DB_ENGINE),
         'NAME': CONFIG.DB_NAME,
         'HOST': CONFIG.DB_HOST,
         'PORT': CONFIG.DB_PORT,
