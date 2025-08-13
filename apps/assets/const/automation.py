@@ -14,6 +14,10 @@ class Connectivity(TextChoices):
     NTLM_ERR = 'ntlm_err', _('NTLM credentials rejected error')
     CREATE_TEMPORARY_ERR = 'create_temp_err', _('Create temporary error')
 
+    @classmethod
+    def as_dict(cls):
+        return {choice.value: choice.label for choice in cls}
+
 
 class AutomationTypes(TextChoices):
     ping = 'ping', _('Ping')

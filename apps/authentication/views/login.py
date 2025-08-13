@@ -16,7 +16,7 @@ from django.http import HttpRequest
 from django.shortcuts import reverse, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _, get_language
+from django.utils.translation import gettext as _, get_language, get_language_from_request
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -298,9 +298,11 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         from django.utils import timezone
         response = super().get(request, *args, **kwargs)
         try:
+
+            lang = request.user.lang if request.user.lang else get_language_from_request(request, check_path=False)
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
-                request.user.lang,
+                lang,
                 expires=timezone.now() + timezone.timedelta(days=365)
             )
         except Exception:

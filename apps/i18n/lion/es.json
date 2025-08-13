@@ -1,7 +1,7 @@
 {
     "ActionPerm": "Permisos de acción",
     "AutoFit": "Adaptación automática",
-    "AutoPasteOnClick": "Haz clic en el cuadro de entrada para pegar automáticamente el contenido del portapapeles",
+    "AutoPasteOnClick": "Haz clic en el cuadro de entrada para pegar automáticamente el contenido del portapapeles (requiere habilitar HTTPS y permisos del navegador).",
     "AvailableShortcutKey": "Atajos disponibles",
     "Cancel": "Cancelar",
     "ClearDone": "Limpieza completada",

@@ -20,7 +20,7 @@ __all__ = ['PamDashboardApi']
 class PamDashboardApi(APIView):
     http_method_names = ['get']
     rbac_perms = {
-        'GET': 'accounts.view_account',
+        'GET': 'rbac.view_pam',
     }
 
     @staticmethod

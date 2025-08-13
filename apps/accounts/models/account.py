@@ -116,6 +116,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             ('verify_account', _('Can verify account')),
             ('push_account', _('Can push account')),
             ('remove_account', _('Can remove account')),
+            ('view_accountsession', _('Can view session')),
+            ('view_accountactivity', _('Can view activity')),
         ]
 
     def __str__(self):

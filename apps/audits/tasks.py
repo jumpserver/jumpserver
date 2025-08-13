@@ -10,10 +10,12 @@ from django.core.files.storage import default_storage
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils._os import safe_join
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import get_log_keep_day, get_logger
+from common.utils.safe import safe_run_cmd
 from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
@@ -57,14 +59,12 @@ def clean_ftp_log_period():
     now = timezone.now()
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    file_store_dir = os.path.join(default_storage.base_location, FTPLog.upload_to)
+    file_store_dir = safe_join(default_storage.base_location, FTPLog.upload_to)
     FTPLog.objects.filter(date_start__lt=expired_day).delete()
-    command = "find %s -mtime +%s -type f -exec rm -f {} \\;" % (
-        file_store_dir, days
-    )
-    subprocess.call(command, shell=True)
-    command = "find %s -type d -empty -delete;" % file_store_dir
-    subprocess.call(command, shell=True)
+    command = "find %s -mtime +%s -type f -exec rm -f {} \\;"
+    safe_run_cmd(command, (file_store_dir, days))
+    command = "find %s -type d -empty -delete;"
+    safe_run_cmd(command, (file_store_dir,))
     logger.info("Clean FTP file done")
 
 
@@ -76,12 +76,11 @@ def clean_celery_tasks_period():
     tasks.delete()
     tasks = CeleryTaskExecution.objects.filter(date_start__isnull=True)
     tasks.delete()
-    command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;" % (
-        settings.CELERY_LOG_DIR, expire_days
-    )
-    subprocess.call(command, shell=True)
-    command = "echo > {}".format(os.path.join(settings.LOG_DIR, 'celery.log'))
-    subprocess.call(command, shell=True)
+    command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;"
+    safe_run_cmd(command, (settings.CELERY_LOG_DIR, expire_days))
+    celery_log_path = safe_join(settings.LOG_DIR, 'celery.log')
+    command = "echo > {}".format(celery_log_path)
+    safe_run_cmd(command, (celery_log_path,))
 
 
 def batch_delete(queryset, batch_size=3000):
@@ -119,15 +118,15 @@ def clean_expired_session_period():
     expired_sessions = Session.objects.filter(date_start__lt=expire_date)
     timestamp = expire_date.timestamp()
     expired_commands = Command.objects.filter(timestamp__lt=timestamp)
-    replay_dir = os.path.join(default_storage.base_location, 'replay')
+    replay_dir = safe_join(default_storage.base_location, 'replay')
 
     batch_delete(expired_sessions)
     logger.info("Clean session item done")
     batch_delete(expired_commands)
     logger.info("Clean session command done")
     remove_files_by_days(replay_dir, days)
-    command = "find %s -type d -empty -delete;" % replay_dir
-    subprocess.call(command, shell=True)
+    command = "find %s -type d -empty -delete;"
+    safe_run_cmd(command, (replay_dir,))
     logger.info("Clean session replay done")
 
 

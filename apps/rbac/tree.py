@@ -90,6 +90,8 @@ special_pid_mapper = {
     'accounts.checkaccountengine': 'account_risk_node',
     'accounts.checkaccountautomation': 'account_risk_node',
     'accounts.checkaccountexecution': 'account_risk_node',
+    'accounts.view_accountsession': 'view_pam',
+    'accounts.view_accountactivity': 'view_pam',
     'accounts.integrationapplication': 'view_pam',
     'accounts.virtualaccount': 'view_pam',
     'accounts.backupaccountautomation': 'backup_account_node',
