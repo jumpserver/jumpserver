@@ -6,7 +6,7 @@ def group_stats(queryset, alias, key, label_map=None):
         queryset
         .exclude(**{f'{key}__isnull': True})
         .values(**{alias: F(key)})
-        .annotate(total=Count('id'))
+        .annotate(total=Count('id', distinct=True))
     )
 
     data = [
