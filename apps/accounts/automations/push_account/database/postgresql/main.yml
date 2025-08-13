@@ -31,7 +31,6 @@
         role_attr_flags: LOGIN
       ignore_errors: true
       when: result is succeeded
-      register: change_info
 
     - name: Verify password
       community.postgresql.postgresql_ping:
@@ -40,8 +39,5 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         db: "{{ jms_asset.spec_info.db_name }}"
-      when:
-        - result is succeeded
-        - change_info is succeeded
       register: result
       failed_when: not result.is_available
