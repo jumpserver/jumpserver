@@ -170,7 +170,6 @@
     "AssetLoginACLHelpText": "자산에 로그인할 때, 사용자의 로그인 IP 및 시간대를 기반으로 검토하여 자산에 로그인할 수 있는지 판단",
     "AssetLoginTrends": "자산 로그인 추세",
     "AssetName": "자산 이름",
-    "AssetOverview": "사용자 개요",
     "AssetPermission": "자산 권한 부여",
     "AssetPermissionCreate": "자산 권한 규칙 생성",
     "AssetPermissionDetail": "자산 권한 세부정보",

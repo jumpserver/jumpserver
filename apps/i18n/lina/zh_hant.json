@@ -172,7 +172,6 @@
     "AssetLoginACLHelpText": "登入資產時，可以依照使用者的登入 IP 和時間段進行審核，判斷是否可以登入資產",
     "AssetLoginTrends": "資產登錄趨勢",
     "AssetName": "資產名稱",
-    "AssetOverview": "用戶概覽",
     "AssetPermission": "資產授權",
     "AssetPermissionCreate": "創建資產授權規則",
     "AssetPermissionDetail": "資產授權詳情",

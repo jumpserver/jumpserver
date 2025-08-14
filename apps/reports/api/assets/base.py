@@ -2,12 +2,17 @@ from django.db.models import Count, F
 
 
 def group_stats(queryset, alias, key, label_map=None):
-    grouped = (
-        queryset
-        .exclude(**{f'{key}__isnull': True})
-        .values(**{alias: F(key)})
-        .annotate(total=Count('id', distinct=True))
+    pk_name = queryset.model._meta.pk.name
+
+    base = (
+        queryset.order_by()
+        .exclude(**{f"{key}__isnull": True})
+        .annotate(**{alias: F(key)})
+        .values(pk_name, alias)
+        .distinct()
     )
+
+    grouped = base.values(alias).annotate(total=Count(pk_name))
 
     data = [
         {
@@ -17,5 +22,4 @@ def group_stats(queryset, alias, key, label_map=None):
         }
         for val, cnt in grouped.values_list(alias, 'total')
     ]
-
     return data

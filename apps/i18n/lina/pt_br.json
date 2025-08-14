@@ -170,7 +170,6 @@
     "AssetLoginACLHelpText": "Ao fazer login no ativo, você pode revisar de acordo com o IP de login do usuário e o intervalo de tempo para determinar se pode fazer login no ativo.",
     "AssetLoginTrends": "Tendências de Login de Ativos",
     "AssetName": "Nome do ativo",
-    "AssetOverview": "Visão geral do usuário",
     "AssetPermission": "Ativos de autorização",
     "AssetPermissionCreate": "Criar regra de autorização de ativos",
     "AssetPermissionDetail": " Detalhes da autorização de ativos",
