@@ -170,7 +170,6 @@
     "AssetLoginACLHelpText": "Al iniciar sesión en el activo, puede auditar según la IP del usuario y el intervalo de tiempo, para determinar si se puede acceder al activo",
     "AssetLoginTrends": "Tendencias de inicio de sesión de activos",
     "AssetName": "Nombre del activo",
-    "AssetOverview": "Resumen de usuarios",
     "AssetPermission": "Autorización de activos",
     "AssetPermissionCreate": "Crear reglas de autorización de activos",
     "AssetPermissionDetail": "Detalles de autorización de activos",

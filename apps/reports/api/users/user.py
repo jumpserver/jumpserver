@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.db.models import Count, Q
 from django.http.response import JsonResponse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 
@@ -55,19 +56,19 @@ class UserReportApi(DateRangeMixin, APIView):
         return metrics
 
     def get_user_login_time_metrics(self):
-        time_buckets = {
-            '00:00-06:00': (0, 6),
-            '06:00-12:00': (6, 12),
-            '12:00-18:00': (12, 18),
-            '18:00-24:00': (18, 24),
-        }
-        filtered_queryset = self.filter_by_date_range(self.user_login_log_queryset, 'datetime').all()
-        metrics = {bucket: 0 for bucket in time_buckets.keys()}
-        for date in filtered_queryset:
-            hour = date.datetime.hour
-            for bucket, (start, end) in time_buckets.items():
-                if start <= hour < end:
-                    metrics[bucket] = metrics.get(bucket, 0) + 1
+        buckets = ['00:00-06:00', '06:00-12:00', '12:00-18:00', '18:00-24:00']
+        metrics = {k: 0 for k in buckets}
+
+        qs = self.filter_by_date_range(self.user_login_log_queryset, 'datetime').only('datetime')
+
+        for obj in qs:
+            dt = obj.datetime
+            if dt is None:
+                continue
+            dt_local = timezone.localtime(dt)
+            hour = dt_local.hour
+            metrics[buckets[hour // 6]] += 1
+
         return metrics
 
     @lazyproperty
