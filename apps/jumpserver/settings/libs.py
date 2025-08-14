@@ -49,19 +49,46 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'jumpserver.rewriting.pagination.MaxLimitOffsetPagination',
     'PAGE_SIZE': CONFIG.DEFAULT_PAGE_SIZE,
     'EXCEPTION_HANDLER': 'common.drf.exc_handlers.common_exception_handler',
+    'DEFAULT_SCHEMA_CLASS': 'jumpserver.views.schema.CustomAutoSchema',
 }
 
-SWAGGER_SETTINGS = {
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'jumpserver.views.swagger.CustomSwaggerAutoSchema',
-    'USE_SESSION_AUTH': True,
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'JumpServer API Docs',
+    'DESCRIPTION': 'JumpServer Restful api docs',
+    'VERSION': 'v1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/v1/',
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
     },
-    'DEFAULT_INFO': 'jumpserver.views.swagger.api_info',
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'SWAGGER_UI_OAUTH2_REDIRECT_URL': 'SIDECAR',
+    'SWAGGER_UI_OPERATION_ID': True,
+    'SECURITY': [
+        {
+            'Bearer': []
+        }
+    ],
+    'TAGS': [
+        {'name': 'assets', 'description': 'Asset management'},
+        {'name': 'users', 'description': 'User management'},
+        {'name': 'perms', 'description': 'Permission management'},
+        {'name': 'terminal', 'description': 'Terminal management'},
+        {'name': 'ops', 'description': 'Operations management'},
+        {'name': 'audits', 'description': 'Audit logs'},
+        {'name': 'orgs', 'description': 'Organization management'},
+        {'name': 'settings', 'description': 'System settings'},
+        {'name': 'authentication', 'description': 'Authentication'},
+        {'name': 'common', 'description': 'Common operations'},
+        {'name': 'tickets', 'description': 'Ticket management'},
+        {'name': 'acls', 'description': 'Access control lists'},
+        {'name': 'notifications', 'description': 'Notifications'},
+        {'name': 'rbac', 'description': 'Role-based access control'},
+        {'name': 'labels', 'description': 'Label management'},
+        {'name': 'reports', 'description': 'Reports'},
+    ],
 }
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
