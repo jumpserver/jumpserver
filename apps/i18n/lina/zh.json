@@ -1129,6 +1129,7 @@
     "RequiredSystemUserErrMsg": "请选择账号",
     "RequiredUploadFile": "请上传文件！",
     "Reset": "还原",
+    "UserLoginTrends": "用户登录趋势",
     "ResetAndDownloadSSHKey": "重置并下载密钥",
     "ResetMFA": "重置MFA",
     "ResetMFAWarningMsg": "你确定要重置用户的 MFA 吗?",

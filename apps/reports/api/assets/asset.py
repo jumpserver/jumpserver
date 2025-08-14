@@ -6,7 +6,7 @@ from django.db.models import Count, Q
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
-from assets.const import AllTypes, Connectivity
+from assets.const import AllTypes, Connectivity, Category
 from assets.models import Asset, Platform
 from common.permissions import IsValidLicense
 from common.utils import lazyproperty
@@ -50,15 +50,16 @@ class AssetStatisticApi(DateRangeMixin, APIView):
             directory_services=Count(1, filter=Q(directory_services__isnull=False)),
         )
 
-        type_category_map = {
-            d['value']: str(d['category'].label)
-            for d in AllTypes.types()
-        }
+        category_map = Category.as_dict()
+
+        category_type_map = defaultdict(list)
+        for d in AllTypes.types():
+            category_type_map[str(d['category'].label)].append(d['value'])
 
         category_type_ids = defaultdict(lambda: defaultdict(set))
         for _id, tp, category in (qs.select_related('platform')
                 .values_list('id', 'platform__type', 'platform__category')):
-            category_label = type_category_map.get(tp, 'Other')
+            category_label = category_map.get(category, category)
             category_type_ids[category_label][tp].add(_id)
 
         by_type_category = defaultdict(list)

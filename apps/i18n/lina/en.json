@@ -19,6 +19,7 @@
     "AccountBackupTask": "Account backup task | Account backup tasks",
     "AccountBackupUpdate": "Update account backup",
     "AccountChangeSecret": "Account change secret",
+    "UserLoginTrends": "User login trend",
     "AccountChangeSecretDetail": "Change account secret details",
     "AccountConnectivityStatusDistribution": "Account connectivity status distribution",
     "AccountCreationSourceDistribution": "Account creation source distribution",
