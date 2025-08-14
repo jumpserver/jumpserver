@@ -7,6 +7,7 @@ from django.db.models.functions import Concat
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
+from accounts.const import Source
 from accounts.models import Account, AccountTemplate
 from assets.const import Connectivity
 from common.permissions import IsValidLicense
@@ -58,7 +59,7 @@ class AccountStatisticApi(DateRangeMixin, APIView):
         stats['template_total'] = self.template_qs.count()
 
         source_pie_data = [
-            {'name': str(source), 'value': total}
+            {'name': str(Source(source).label), 'value': total}
             for source, total in
             qs.values('source').annotate(
                 total=Count(1)

@@ -170,7 +170,7 @@
     "AssetLoginACLHelpText": "登录资产时，可以根据用户的登录 IP 和时间段进行审核，判断是否可以登录资产",
     "AssetLoginTrends": "资产登录趋势",
     "AssetName": "资产名称",
-    "AssetOverview": "用户概览",
+    "AssetOverview": "资产概览",
     "AssetPermission": "资产授权",
     "AssetPermissionCreate": "创建资产授权规则",
     "AssetPermissionDetail": "资产授权详情",

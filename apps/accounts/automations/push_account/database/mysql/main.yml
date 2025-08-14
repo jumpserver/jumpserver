@@ -39,7 +39,8 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         host: "%"
-        priv: "{{ account.username + '.*:USAGE' if db_name == '' else db_name + '.*:ALL' }}"
+        priv: "{{ omit if db_name == '' else db_name + '.*:ALL' }}"
+        append_privs: "{{ db_name != '' | bool }}"
       ignore_errors: true
       when: db_info is succeeded
 

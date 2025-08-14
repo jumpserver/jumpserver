@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from audits.models import PasswordChangeLog
 from common.permissions import IsValidLicense
-from common.utils import lazyproperty, get_ip_city, get_logger
+from common.utils import lazyproperty, get_logger
 from rbac.permissions import RBACPermission
 from reports.mixins import DateRangeMixin
 
@@ -23,22 +23,6 @@ class UserChangeSecretApi(DateRangeMixin, APIView):
         'GET': 'audits.view_passwordchangelog',
     }
     permission_classes = [RBACPermission, IsValidLicense]
-
-    @staticmethod
-    def get_change_password_region_distribution(queryset):
-        unique_ips = queryset.values_list('remote_addr', flat=True).distinct()
-        data = defaultdict(int)
-        for ip in unique_ips:
-            try:
-                city = str(get_ip_city(ip))
-                if not city:
-                    continue
-                data[city] += 1
-            except Exception:
-                logger.debug(f"Failed to get city for IP {ip}, skipping", exc_info=True)
-                continue
-
-        return [{'name': k, 'value': v} for k, v in data.items()]
 
     def get_change_password_metrics(self, queryset):
         filtered_queryset = self.filter_by_date_range(queryset, 'datetime')
@@ -82,5 +66,4 @@ class UserChangeSecretApi(DateRangeMixin, APIView):
             'dates_metrics_total': self.get_change_password_metrics(qs),
         }
 
-        data['change_password_region_distribution'] = self.get_change_password_region_distribution(qs)
         return JsonResponse(data, status=200)

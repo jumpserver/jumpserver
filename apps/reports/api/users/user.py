@@ -4,6 +4,8 @@ from collections import defaultdict
 
 from django.db.models import Count, Q
 from django.http.response import JsonResponse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 
 from audits.const import LoginStatusChoices
@@ -12,11 +14,9 @@ from common.permissions import IsValidLicense
 from common.utils import lazyproperty
 from rbac.permissions import RBACPermission
 from reports.mixins import DateRangeMixin
+from users.models import User, Source
 
 __all__ = ['UserReportApi']
-
-from users.models import User
-from users.models.user import Source
 
 
 class UserReportApi(DateRangeMixin, APIView):
@@ -37,12 +37,13 @@ class UserReportApi(DateRangeMixin, APIView):
         metrics = [len(data.get(str(d), set())) for d in self.date_range_list]
         return metrics
 
-    def get_user_login_method_metrics(self):
+    def get_user_login_method_metrics(self, source_map):
         filtered_queryset = self.filter_by_date_range(self.user_login_log_queryset, 'datetime')
 
         backends = set()
         data = defaultdict(lambda: defaultdict(set))
         for t, username, backend in filtered_queryset.values_list('datetime', 'username', 'backend'):
+            backend = str(source_map.get(backend.lower(), backend))
             backends.add(backend)
             date_str = str(t.date())
             data[date_str][backend].add(username)
@@ -54,29 +55,20 @@ class UserReportApi(DateRangeMixin, APIView):
                 metrics[backend].append(len(username.get(backend, set())))
         return metrics
 
-    def get_user_login_region_distribution(self):
-        filtered_queryset = self.filter_by_date_range(self.user_login_log_queryset, 'datetime')
-
-        data = filtered_queryset.values('city').annotate(
-            user_count=Count('username', distinct=True)
-        ).order_by('-user_count')
-        metrics = [{'name': d['city'], 'value': d['user_count']} for d in data]
-        return metrics
-
     def get_user_login_time_metrics(self):
-        time_buckets = {
-            '00:00-06:00': (0, 6),
-            '06:00-12:00': (6, 12),
-            '12:00-18:00': (12, 18),
-            '18:00-24:00': (18, 24),
-        }
-        filtered_queryset = self.filter_by_date_range(self.user_login_log_queryset, 'datetime').all()
-        metrics = {bucket: 0 for bucket in time_buckets.keys()}
-        for date in filtered_queryset:
-            hour = date.datetime.hour
-            for bucket, (start, end) in time_buckets.items():
-                if start <= hour < end:
-                    metrics[bucket] = metrics.get(bucket, 0) + 1
+        buckets = ['00:00-06:00', '06:00-12:00', '12:00-18:00', '18:00-24:00']
+        metrics = {k: 0 for k in buckets}
+
+        qs = self.filter_by_date_range(self.user_login_log_queryset, 'datetime').only('datetime')
+
+        for obj in qs:
+            dt = obj.datetime
+            if dt is None:
+                continue
+            dt_local = timezone.localtime(dt)
+            hour = dt_local.hour
+            metrics[buckets[hour // 6]] += 1
+
         return metrics
 
     @lazyproperty
@@ -108,6 +100,7 @@ class UserReportApi(DateRangeMixin, APIView):
         data['user_stats'] = user_stats
 
         source_map = Source.as_dict()
+        source_map.update({'password': _('Password')})
         user_by_source = defaultdict(int)
         for source in self.user_qs.values_list('source', flat=True):
             k = source_map.get(source, source)
@@ -122,8 +115,7 @@ class UserReportApi(DateRangeMixin, APIView):
         }
         data['user_login_method_metrics'] = {
             'dates_metrics_date': self.dates_metrics_date,
-            'dates_metrics_total': self.get_user_login_method_metrics(),
+            'dates_metrics_total': self.get_user_login_method_metrics(source_map),
         }
-        data['user_login_region_distribution'] = self.get_user_login_region_distribution()
         data['user_login_time_metrics'] = self.get_user_login_time_metrics()
         return JsonResponse(data, status=200)

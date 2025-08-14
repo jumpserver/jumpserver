@@ -168,7 +168,6 @@
     "AssetLoginACLHelpMsg": "ユーザのログインIPと時間帯をもとに、アセットへのログインの承認可否を判断します",
     "AssetLoginACLHelpText": "資産にログインする際、ユーザーのログインIPと時間帯を審査し、資産にログインできるかどうかを判断します",
     "AssetName": "資産名称",
-    "AssetOverview": "ユーザー概要",
     "AssetPermission": "アセット権限",
     "AssetPermissionCreate": "資産認証ルールの作成",
     "AssetPermissionDetail": "資産認証の詳細",

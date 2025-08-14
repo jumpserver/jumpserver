@@ -45,10 +45,10 @@ class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
 class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
     rbac_perms = (
         ("list", "accounts.view_checkaccountexecution"),
-        ("retrieve", "accounts.view_checkaccountsexecution"),
+        ("retrieve", "accounts.view_checkaccountexecution"),
         ("create", "accounts.add_checkaccountexecution"),
         ("adhoc", "accounts.add_checkaccountexecution"),
-        ("report", "accounts.view_checkaccountsexecution"),
+        ("report", "accounts.view_checkaccountexecution"),
     )
     ordering = ("-date_created",)
     tp = AutomationTypes.check_account

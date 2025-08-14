@@ -246,9 +246,13 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 DB_OPTIONS = {}
 DB_ENGINE = CONFIG.DB_ENGINE.lower()
+if DB_ENGINE == 'vastbase':
+    DB_BACKEND = 'django_vastbase_backend'
+else:
+    DB_BACKEND = f'django.db.backends.{DB_ENGINE}'
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.{}'.format(DB_ENGINE),
+        'ENGINE': DB_BACKEND,
         'NAME': CONFIG.DB_NAME,
         'HOST': CONFIG.DB_HOST,
         'PORT': CONFIG.DB_PORT,
