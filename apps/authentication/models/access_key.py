@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.db.fields import EncryptTextField
 import common.db.models
 
 from common.db.utils import default_ip_group
@@ -16,7 +17,7 @@ def default_secret():
 
 class AccessKey(models.Model):
     id = models.UUIDField(verbose_name='AccessKeyID', primary_key=True, default=uuid.uuid4, editable=False)
-    secret = models.CharField(verbose_name='AccessKeySecret', default=default_secret, max_length=36)
+    secret = EncryptTextField(verbose_name='AccessKeySecret', default=default_secret)
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User',
                              on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='access_keys')

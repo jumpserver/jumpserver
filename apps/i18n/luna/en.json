@@ -205,7 +205,7 @@
     "SelectCommand": "Please select the command to execute.",
     "Send command": "Send command",
     "Send text to all ssh terminals": "Send text to all ssh terminals",
-    "SendCommandPlaceholder": "Input command here..., Enter for new line, Ctrl+Enter to send",
+    "SendCommandPlaceholder": "Input command here, Enter for new line, Ctrl+Enter to send",
     "Session": "Session",
     "SessionIsBeingMonitored": "Session is being monitored",
     "SessionShare": "Session share",

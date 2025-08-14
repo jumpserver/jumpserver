@@ -3,11 +3,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
+from common.db.fields import EncryptTextField
 
 
 class TempToken(JMSBaseModel):
     username = models.CharField(max_length=128, verbose_name=_("Username"))
-    secret = models.CharField(max_length=64, verbose_name=_("Secret"))
+    secret = EncryptTextField(verbose_name=_("Secret"))
     verified = models.BooleanField(default=False, verbose_name=_("Verified"))
     date_verified = models.DateTimeField(null=True, verbose_name=_("Date verified"))
     date_expired = models.DateTimeField(verbose_name=_("Date expired"))
