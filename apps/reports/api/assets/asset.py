@@ -11,7 +11,6 @@ from assets.models import Asset, Platform
 from common.permissions import IsValidLicense
 from common.utils import lazyproperty
 from rbac.permissions import RBACPermission
-from reports.api.assets.base import group_stats
 from reports.mixins import DateRangeMixin
 
 __all__ = ['AssetStatisticApi']
@@ -52,18 +51,26 @@ class AssetStatisticApi(DateRangeMixin, APIView):
         )
 
         type_category_map = {
-            d['label']: str(d['category'].label)
+            d['value']: str(d['category'].label)
             for d in AllTypes.types()
         }
 
-        by_type = group_stats(
-            qs, 'type', 'platform__type', all_type_dict,
-        )
+        category_type_ids = defaultdict(lambda: defaultdict(set))
+        for _id, tp, category in (qs.select_related('platform')
+                .values_list('id', 'platform__type', 'platform__category')):
+            category_label = type_category_map.get(tp, 'Other')
+            category_type_ids[category_label][tp].add(_id)
 
         by_type_category = defaultdict(list)
-        for item in by_type:
-            category = type_category_map.get(item['label'], 'Other')
-            by_type_category[category].append(item)
+        for k, v in category_type_ids.items():
+            by_type_category[k] = [
+                {
+                    'label': all_type_dict.get(tp, tp),
+                    'type': tp,
+                    'total': len(_ids),
+                }
+                for tp, _ids in v.items()
+            ]
 
         sorted_category_assets = OrderedDict()
         desired_order = [str(i['label']) for i in AllTypes.categories()]

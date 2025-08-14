@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
                 ('input', models.CharField(db_index=True, max_length=128, verbose_name='Input')),
                 ('output', models.CharField(blank=True, max_length=1024, verbose_name='Output')),
                 ('session', models.CharField(db_index=True, max_length=36, verbose_name='Session')),
-                ('risk_level', models.SmallIntegerField(choices=[(0, 'Accept'), (4, 'Warning'), (5, 'Reject'), (6, 'Review & Reject'), (7, 'Review & Accept'), (8, 'Review & Cancel')], db_index=True, default=0, verbose_name='Risk level')),
+                ('risk_level', models.SmallIntegerField(choices=[(0, 'Accept'), (4, 'Warning'), (5, 'Reject'), (6, 'Review & Reject'), (7, 'Review & Accept'), (8, 'Review & Cancel')], db_index=True, default=0, verbose_name='Action')),
                 ('timestamp', models.IntegerField(db_index=True)),
             ],
             options={
