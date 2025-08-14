@@ -61,7 +61,8 @@ class JMSBaseAuthBackend:
 
 
 class JMSModelBackend(JMSBaseAuthBackend, ModelBackend):
-    pass
+     def user_can_authenticate(self, user):
+        return True
 
 
 class BaseAuthCallbackClientView(View):
