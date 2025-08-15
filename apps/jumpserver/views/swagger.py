@@ -1,27 +1,38 @@
-import os
-
 
 from drf_spectacular.views import (
     SpectacularSwaggerView, SpectacularRedocView,
     SpectacularYAMLAPIView, SpectacularJSONAPIView
 )
-from rest_framework import permissions
+from rest_framework.response import Response
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class SwaggerUI(SpectacularSwaggerView):
-    with_auth = os.environ.get('DOC_AUTH', '1') == '1'
+class SwaggerUI(LoginRequiredMixin, SpectacularSwaggerView):
+    pass
 
-    def get_permission_classes(self):
-        if self.with_auth:
-            return [permissions.IsAuthenticated]
-        return []
 
-class Redoc(SpectacularRedocView):
-    with_auth = os.environ.get('DOC_AUTH', '1') == '1'
-    def get_permission_classes(self):
-        if self.with_auth:
-            return [permissions.IsAuthenticated]
-        return []
+class Redoc(LoginRequiredMixin, SpectacularRedocView):
+    pass
+
+
+class SchemeMixin:
+    def get(self, request, *args, **kwargs):
+        schema = super().get(request, *args, **kwargs).data
+        host = request.get_host()
+        schema['servers'] = [
+            {"url": f"https://{host}", "description": "HTTPS Server"},
+            {"url": f"http://{host}", "description": "HTTP Server"},
+        ]
+        if request.scheme == 'http':
+            schema['servers'] = schema['servers'][::-1]
+
+        return Response(schema)
+    
+class JsonApi(SchemeMixin, SpectacularJSONAPIView):
+    pass
+
+class YamlApi(SchemeMixin, SpectacularYAMLAPIView):
+    pass
 
 
 def get_swagger_view(ui=None, **kwargs):
@@ -30,6 +41,6 @@ def get_swagger_view(ui=None, **kwargs):
     elif ui == 'redoc':
         return Redoc.as_view(url_name='schema')
     elif ui == 'json':
-        return SpectacularJSONAPIView.as_view()
+        return JsonApi.as_view()
     elif ui == 'yaml':
-        return SpectacularYAMLAPIView.as_view()
+        return YamlApi.as_view()

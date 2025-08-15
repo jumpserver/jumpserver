@@ -3,7 +3,6 @@ from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
 
 
-
 class CustomSchemaGenerator(SchemaGenerator):
     from_mcp = False
 
@@ -95,40 +94,23 @@ class CustomSchemaGenerator(SchemaGenerator):
 
 class CustomAutoSchema(AutoSchema):
     def get_tags(self):
-        # if len(operation_keys) > 2:
-        #     return [operation_keys[0] + '_' + operation_keys[1]]
-        tags = super().get_tags()
-        print('Tags: ', tags)
+        operation_keys = self._tokenize_path()
+        if len(operation_keys) == 1:
+            return []
+        tags = ['_'.join(operation_keys[:2])]
         return tags
-
-    def get_operation_id(self):
-        # action = ''
-        # dump_keys = [k for k in path]
-        # if hasattr(self.view, 'action'):
-        #     action = self.view.action
-        #     if action == "bulk_destroy":
-        #         action = "bulk_delete"
-        # if dump_keys[-2] == "children":
-        #     if self.path.find('id') < 0:
-        #         dump_keys.insert(-2, "root")
-        # if dump_keys[0] == "perms" and dump_keys[1] == "users":
-        #     if self.path.find('{id}') < 0:
-        #         dump_keys.insert(2, "my")
-        # if action.replace('bulk_', '') == dump_keys[-1]:
-        #     dump_keys[-1] = action
-        operation_id = super().get_operation_id()
-        actions = ['_delete', '_partial_update', '_update', '_create', '_list', '_retrieve']
-        for action in actions:
-            operation_id = operation_id.replace(action, '')
-        print('Operation ID: ', operation_id)
-        return operation_id
-
-    def get_operation(self, path, path_regex, path_prefix, method, registry):
-        operation = super().get_operation(path, path_regex, path_prefix, method, registry)
+   
+    def get_operation(self, path, *args, **kwargs):
+        if path.endswith('render-to-json/'):
+            return None
+        # if not path.startswith('/api/v1/users'):
+            # return None
+        operation = super().get_operation(path, *args, **kwargs)
         if not operation:
             return operation
-        # if not getattr(operation, 'summary', ''):
-            # operation.summary = operation.operation_id
+
+        if not operation.get('summary', ''):
+            operation['summary'] = operation.get('operationId')
         return operation
 
     def get_filter_parameters(self):
@@ -143,5 +125,7 @@ class CustomAutoSchema(AutoSchema):
         else:
             backends = []
         for filter_backend in backends:
-            fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
+            fields += self.probe_inspectors(
+                self.filter_inspectors, 'get_filter_parameters', filter_backend()
+            ) or []
         return fields

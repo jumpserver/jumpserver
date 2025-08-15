@@ -56,41 +56,25 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'JumpServer API Docs',
     'DESCRIPTION': 'JumpServer Restful api docs',
     'VERSION': 'v1',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SCHEMA_PATH_PREFIX': '/api/v1/',
-    'SWAGGER_UI_SETTINGS': {
-        'persistAuthorization': True,
+    'LICENSE': {
+        'name': 'GPLv3 License',
+        'url': 'https://www.gnu.org/licenses/gpl-3.0.html',
     },
+    'CONTACT': {
+        'name': 'JumpServer',
+        'url': 'https://jumpserver.org',
+        'email': 'support@jumpserver.org',
+    },
+    "SERVE_INCLUDE_SCHEMA": False,
+    'SERVE_PUBLIC': True,
+    'BASE_PATH': '/api/v1/',
+    'SCHEMA_PATH_PREFIX': '/api/v1/',
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'SWAGGER_UI_OAUTH2_REDIRECT_URL': 'SIDECAR',
-    'SWAGGER_UI_OPERATION_ID': True,
-    'SECURITY': [
-        {
-            'Bearer': []
-        }
-    ],
-    'TAGS': [
-        {'name': 'assets', 'description': 'Asset management'},
-        {'name': 'users', 'description': 'User management'},
-        {'name': 'perms', 'description': 'Permission management'},
-        {'name': 'terminal', 'description': 'Terminal management'},
-        {'name': 'ops', 'description': 'Operations management'},
-        {'name': 'audits', 'description': 'Audit logs'},
-        {'name': 'orgs', 'description': 'Organization management'},
-        {'name': 'settings', 'description': 'System settings'},
-        {'name': 'authentication', 'description': 'Authentication'},
-        {'name': 'common', 'description': 'Common operations'},
-        {'name': 'tickets', 'description': 'Ticket management'},
-        {'name': 'acls', 'description': 'Access control lists'},
-        {'name': 'notifications', 'description': 'Notifications'},
-        {'name': 'rbac', 'description': 'Role-based access control'},
-        {'name': 'labels', 'description': 'Label management'},
-        {'name': 'reports', 'description': 'Reports'},
-    ],
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_GENERATOR_CLASS': 'jumpserver.views.schema.CustomSchemaGenerator',
 }
-
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (180, 38)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
