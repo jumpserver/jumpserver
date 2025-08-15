@@ -1494,7 +1494,6 @@
     "UpdateNodeAssetHardwareInfo": "更新節點資產硬體資訊",
     "UpdatePlatformHelpText": "只有資產的原平台類型與所選平台類型相同時才會進行更新，若更新前後的平台類型不同則不會更新。",
     "UpdateSSHKey": "更新SSH公鑰",
-    "UpdateSelected": "Update selected",
     "UpdateSuccessMsg": "Update successful",
     "Updated": "已更新",
     "UpgradeEnterpriseEdition": "升級到企業版",
