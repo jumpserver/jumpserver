@@ -29,3 +29,4 @@ ARG PIP_MIRROR=https://pypi.org/simple
 RUN set -ex \
     && uv pip install -i${PIP_MIRROR} --group xpack
 
+playwright install chromium  --with-deps --only-shell
