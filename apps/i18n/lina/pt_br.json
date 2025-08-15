@@ -1490,7 +1490,6 @@
     "UpdateNodeAssetHardwareInfo": "Atualizar informações de hardware do nó de ativo",
     "UpdatePlatformHelpText": "Apenas quando o tipo de plataforma original do ativo e o tipo de plataforma selecionado são os mesmos, a atualização será realizada. Se os tipos de plataforma antes e depois da atualização forem diferentes, a atualização não será realizada.",
     "UpdateSSHKey": "Atualize a chave pública SSH",
-    "UpdateSelected": "Atualizar selecionado",
     "UpdateSuccessMsg": "Atualizado com sucesso",
     "Updated": "Atualizado",
     "UpgradeEnterpriseEdition": "Atualizar para a versão empresarial",

@@ -1489,7 +1489,6 @@
     "UpdateNodeAssetHardwareInfo": "Actualizar la información de hardware de los activos de nodo",
     "UpdatePlatformHelpText": "La actualización solo se realizará si el tipo de plataforma original del activo coincide con el tipo de plataforma seleccionado; si los tipos de plataforma son diferentes antes y después de la actualización, no se llevará a cabo.",
     "UpdateSSHKey": "Actualizar clave pública SSH",
-    "UpdateSelected": "Actualizar selección",
     "UpdateSuccessMsg": "Actualización exitosa",
     "Updated": "Actualizado",
     "UpgradeEnterpriseEdition": "Actualizar a la versión empresarial",

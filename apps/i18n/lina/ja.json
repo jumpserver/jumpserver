@@ -1481,7 +1481,6 @@
     "UpdateNodeAssetHardwareInfo": "ノードアセットのハードウェア情報を更新する",
     "UpdatePlatformHelpText": "更新が行われるのは、資産の元のプラットフォームタイプと選択したプラットフォームタイプが一致した場合のみで、更新前後のプラットフォームタイプが異なる場合には更新されません。",
     "UpdateSSHKey": "SSH公開鍵を更新する",
-    "UpdateSelected": "選択したものを更新",
     "UpdateSuccessMsg": "更新成功",
     "Updated": "更新済み",
     "UpgradeEnterpriseEdition": "企業版にアップグレード",

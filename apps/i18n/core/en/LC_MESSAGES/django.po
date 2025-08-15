@@ -6149,15 +6149,15 @@ msgstr "System Component"
 
 #: rbac/builtin.py:130
 msgid "OrgAdmin"
-msgstr "Organizational Admin"
+msgstr "Organization Admin"
 
 #: rbac/builtin.py:133
 msgid "OrgAuditor"
-msgstr "Organizational Auditor"
+msgstr "Organization Auditor"
 
 #: rbac/builtin.py:136
 msgid "OrgUser"
-msgstr "Organizational user"
+msgstr "Organization user"
 
 #: rbac/models/menu.py:13
 msgid "Menu permission"
