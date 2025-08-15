@@ -11,15 +11,20 @@ class FormatAssetInfo:
     @staticmethod
     def get_cpu_model_count(cpus):
         try:
-            models = [cpus[i + 1] + " " + cpus[i + 2] for i in range(0, len(cpus), 3)]
+            if len(cpus) % 3 == 0:
+                step = 3
+                models = [cpus[i + 2] for i in range(0, len(cpus), step)]
+            elif len(cpus) % 2 == 0:
+                step = 2
+                models = [cpus[i + 1] for i in range(0, len(cpus), step)]
+            else:
+                raise ValueError("CPU list format not recognized")
 
             model_counts = Counter(models)
-
             result = ', '.join([f"{model} x{count}" for model, count in model_counts.items()])
         except Exception as e:
             print(f"Error processing CPU model list: {e}")
             result = ''
-
         return result
 
     @staticmethod
