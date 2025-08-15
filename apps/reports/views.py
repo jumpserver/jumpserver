@@ -111,11 +111,14 @@ class ExportPdfView(View):
 
 
 class SendMailView(View):
-    def get(self, request):
+
+    def post(self, request):
         chart_name = request.GET.get('chart')
-        email = "ibuler@qq.com"
-        if not chart_name or not email:
-            return HttpResponseBadRequest('Missing chart or email parameter')
+        if not chart_name:
+            return HttpResponseBadRequest('Missing chart parameter')
+        email = request.user.email
+        if not email:
+            return HttpResponseBadRequest('Missing email parameter')
         sessionid = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if not sessionid:
             return HttpResponseBadRequest('No sessionid found in cookies')
@@ -138,7 +141,7 @@ class SendMailView(View):
 
         # 4. 发送邮件
         subject = f"{title} 报表"
-        from_email = settings.EMAIL_HOST_USER
+        from_email = settings.EMAIL_FROM
         to = [email]
         msg = EmailMultiAlternatives(subject, '', from_email, to)
         msg.attach_alternative(html_content, "text/html")
