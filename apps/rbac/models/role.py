@@ -113,7 +113,7 @@ class Role(JMSBaseModel):
         BuiltinRole.sync_to_db()
 
     @property
-    def display_name(self):
+    def display_name(self) -> str:
         if not self.builtin:
             return self.name
         return gettext(self.name)

@@ -12,7 +12,7 @@ __all__ = ["LoginACLSerializer"]
 common_help_text = _("With * indicating a match all. ")
 
 
-class LoginACLSerializer(BaseUserACLSerializer, BulkOrgResourceModelSerializer):
+class LoginACLSerializer(BaseUserACLSerializer):
     rules = MethodSerializer(label=_('Rule'))
 
     class Meta(BaseUserACLSerializer.Meta):

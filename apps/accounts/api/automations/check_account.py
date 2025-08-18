@@ -150,6 +150,9 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
     http_method_names = ['get', 'options']
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return CheckAccountEngine.objects.none()
+
         return CheckAccountEngine.get_default_engines()
 
     def filter_queryset(self, queryset: list):

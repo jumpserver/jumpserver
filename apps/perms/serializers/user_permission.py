@@ -71,7 +71,7 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
-    def get_date_expired(self, obj):
+    def get_date_expired(self, obj) -> str:
         dt = obj.date_expired
         if dt:
             dt = dt.astimezone(get_current_timezone())

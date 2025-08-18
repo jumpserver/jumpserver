@@ -52,7 +52,7 @@ class AssetPermissionAllUserSerializer(serializers.Serializer):
         only_fields = ['id', 'username', 'name']
 
     @staticmethod
-    def get_user_display(obj):
+    def get_user_display(obj) -> str:
         return str(obj)
 
 
@@ -84,7 +84,7 @@ class AssetPermissionAllAssetSerializer(serializers.Serializer):
         only_fields = ['id', 'name', 'address']
 
     @staticmethod
-    def get_asset_display(obj):
+    def get_asset_display(obj) -> str:
         return str(obj)
 
 

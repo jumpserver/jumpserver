@@ -33,7 +33,7 @@ class IntegrationApplication(JMSOrgBaseModel):
         return qs.filter(*query)
 
     @property
-    def accounts_amount(self):
+    def accounts_amount(self) -> int:
         return self.get_accounts().count()
 
     @property
