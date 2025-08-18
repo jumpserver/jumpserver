@@ -222,7 +222,7 @@ def init_sqlite_db():
                 settings.APPS_DIR, 'accounts', 'automations',
                 'check_account', 'leak_passwords.db'
             )
-
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
         shutil.copy(src, db_path)
     logger.info(f'init sqlite db {db_path}')
     return db_path
