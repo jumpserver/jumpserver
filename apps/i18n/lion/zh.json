@@ -11,7 +11,7 @@
     "Connecting": "连接中",
     "CopyLink": "复制链接及验证码",
     "CopyShareURLSuccess": "复制分享地址成功",
-    "CreateLink": "创建分享链接",
+    "CreateLink": "创建链接",
     "CreateSuccess": "创建成功",
     "Display": "显示",
     "Enable": "启用",
@@ -104,5 +104,7 @@
     "Writable": "读写",
     "ShowRemoteClip": "显示远程剪贴板",
     "RemoveUser": "移除用户",
-    "Admin": "管理者"
+    "Admin": "管理者",
+    "ShareLink": "分享链接",
+    "Back": "后退"
 }
