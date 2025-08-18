@@ -11,7 +11,7 @@
     "Connecting": "Connecting",
     "CopyLink": "Copy link address and code",
     "CopyShareURLSuccess": "Copy share URL success",
-    "CreateLink": "Create share link",
+    "CreateLink": "Create link",
     "CreateSuccess": "Success",
     "Display": "Display",
     "Enable": "Enable",
@@ -104,5 +104,8 @@
     "Writable": "Writable",
     "ShowRemoteClip": "Show Remote Clipboard",
     "RemoveUser": "Remove User",
-    "Admin": "Admin"
+    "Admin": "Admin",
+    "ShareLink": "Share Link",
+    "Back": "Back"
+
 }
