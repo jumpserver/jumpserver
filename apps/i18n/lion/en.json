@@ -1,8 +1,10 @@
 {
     "ActionPerm": "Actions",
+    "Admin": "Admin",
     "AutoFit": "Auto Fit",
     "AutoPasteOnClick": "Click the input box to automatically paste from clipboard (requires HTTPS and browser permission)",
     "AvailableShortcutKey": "Available shortcut keys",
+    "Back": "Back",
     "Cancel": "Cancel",
     "ClearDone": "Clear done",
     "Clipboard": "Clipboard",
@@ -83,16 +85,19 @@
     "ReadOnly": "Read-Only",
     "Refresh": "Refresh",
     "RemoveShareUserConfirm": "Are you sure to remove the user from the shared session?",
+    "RemoveUser": "Remove User",
     "RequireParams": "Require params",
     "ResumeSession": "Resume session",
     "SelectAction": "Select",
     "SessionShare": "Session Share",
     "Settings": "Settings",
     "Share": "Share",
+    "ShareLink": "Share Link",
     "ShareUser": "Share User",
     "ShareUserHelpText": "If left blank, everyone could join the session.",
     "Shared Drive": "Shared Drive",
     "Shortcuts": "Shortcuts",
+    "ShowRemoteClip": "Show Remote Clipboard",
     "Skip": "Skip",
     "Submit": "Submit",
     "UploadFile": "Upload file",
@@ -101,11 +106,5 @@
     "VerifyCode": "Verify code",
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable",
-    "ShowRemoteClip": "Show Remote Clipboard",
-    "RemoveUser": "Remove User",
-    "Admin": "Admin",
-    "ShareLink": "Share Link",
-    "Back": "Back"
-
+    "Writable": "Writable"
 }
