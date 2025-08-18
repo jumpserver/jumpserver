@@ -22,7 +22,7 @@ __all__ = ['UserReportApi']
 class UserReportApi(DateRangeMixin, APIView):
     http_method_names = ['get']
     rbac_perms = {
-        'GET': 'users.view_users',
+        'GET': 'users.view_user',
     }
     permission_classes = [RBACPermission, IsValidLicense]
 
@@ -63,8 +63,6 @@ class UserReportApi(DateRangeMixin, APIView):
 
         for obj in qs:
             dt = obj.datetime
-            if dt is None:
-                continue
             dt_local = timezone.localtime(dt)
             hour = dt_local.hour
             metrics[buckets[hour // 6]] += 1

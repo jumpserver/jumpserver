@@ -1,13 +1,20 @@
 {% load i18n %}
 {% load static %}
 
+<script src="{% static "js/plugins/metisMenu/jquery.metisMenu.3.0.7.js" %}"></script>
+
+<script src="{% static "js/plugins/toastr/toastr.min.js" %}"></script>
+<script src="{% static "js/inspinia.js" %}"></script>
+<script src="{% static "js/jumpserver.js" %}?v=10"></script>
+<script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+<script src="{% static 'js/plugins/select2/i18n/zh-CN.js' %}"></script>
+<script src="{% static 'js/plugins/markdown-it.min.js' %}"></script>
+
 {% if INTERFACE.footer_content %}
   <style>
     .markdown-footer{
-      position: absolute;
       left: 50%;
       bottom: 0;
-      transform: translateX(-50%);
       max-width: 520px;
       width: calc(100% - 40px);
       padding: 8px 0;
@@ -23,34 +30,39 @@
   <div id="markdown-output" class="markdown-footer" role="contentinfo" aria-label="{% trans 'Page footer' %}"></div>
 {% endif %}
 
-<script src="{% static 'js/plugins/markdown-it.min.js' %}"></script>
-
+<script type="text/markdown"> {{ INTERFACE.footer_content }} </script>
 <script>
-  (function () {
-    var container = document.getElementById('markdown-output');
-    if (!container) return;
+  activeNav("{{ FORCE_SCRIPT_NAME }}");
 
-    var src = `{{ INTERFACE.footer_content|default:''|escapejs }}`.replace(/\r\n?/g, '\n').trim();
-    if (!src) { container.remove(); return; }
+  $(document).ready(function () {
+      setAjaxCSRFToken();
 
-    var md = window.markdownit({
-      html: false,
-      linkify: true,
-      typographer: true,
-      breaks: true
-    });
+      $('textarea').attr('rows', 5);
 
-    var html = md.render(src);
+      if ($('.tooltip')[0]) {
+          $('.tooltip').tooltip();
+      }
 
-    if (window.DOMPurify) {
-      html = window.DOMPurify.sanitize(html);
-    }
+      $.fn.select2.defaults.set('language', getUserLang());
 
-    container.innerHTML = html;
+      var md = window.markdownit({
+        html: false,
+        linkify: true,
+        typographer: true,
+        breaks: true
+      });
 
-    container.querySelectorAll('a').forEach(function (a) {
-      a.setAttribute('target', '_blank');
-      a.setAttribute('rel', 'noopener noreferrer');
-    });
-  })();
+      const markdownContent = `{{ INTERFACE.footer_content|default:''|escapejs }}`.replace(/\r\n?/g, '\n').trim();;
+      const markdownRef = document.getElementById('markdown-output');
+
+      if (markdownRef && markdownContent) {
+          const renderedContent = md.render(markdownContent.trim());
+
+          markdownRef.innerHTML = renderedContent;
+          markdownRef.querySelectorAll('a').forEach(link => {
+              link.setAttribute('target', '_blank');
+              link.setAttribute('rel', 'noopener noreferrer');
+          });
+      }
+  });
 </script>

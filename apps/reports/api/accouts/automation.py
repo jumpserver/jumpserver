@@ -3,6 +3,7 @@
 from collections import defaultdict
 
 from django.http import JsonResponse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 
@@ -45,15 +46,19 @@ class AccountAutomationApi(DateRangeMixin, APIView):
 
     def get_execution_metrics(self):
         executions = AutomationExecution.objects.filter(type__in=AutomationTypes.values)
-        filtered_queryset = self.filter_by_date_range(executions, 'date_start')
+        qs = self.filter_by_date_range(executions, 'date_start')
 
         types = set()
         data = defaultdict(lambda: defaultdict(int))
-        for t, tp in filtered_queryset.values_list('date_start', 'type'):
+        for obj in qs:
+            tp = obj.type
             if not tp:
                 continue
             types.add(tp)
-            date_str = str(t.date())
+
+            dt = obj.date_start
+            dt_local = timezone.localtime(dt)
+            date_str = str(dt_local.date())
             data[date_str][tp] += 1
 
         tp_map = defaultdict(list)

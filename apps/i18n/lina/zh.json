@@ -1490,7 +1490,7 @@
     "UpdateNodeAssetHardwareInfo": "更新节点资产硬件信息",
     "UpdatePlatformHelpText": "只有资产的原平台类型与所选平台类型相同时才会进行更新，若更新前后的平台类型不同则不会更新。",
     "UpdateSSHKey": "更新SSH公钥",
-    "UpdateSelected": "更新所选",
+    "UpdateSelected": "编辑所选",
     "UpdateSuccessMsg": "更新成功",
     "Updated": "已更新",
     "UpgradeEnterpriseEdition": "升级到企业版",
@@ -1531,6 +1531,7 @@
     "UserLoginLimit": "用户登录限制",
     "UserLoginReport": "用户登录报告",
     "UserLoginTrend": "账号登录趋势",
+    "UserLoginTrends": "用户登录趋势",
     "UserModificationTrends": "用户修改趋势",
     "UserOverview": "用户概览",
     "UserPasswordChangeLog": "用户密码修改日志",
@@ -1611,5 +1612,8 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "ExportAsPDF": "导出 PDF",
+    "EMailReport": "发送邮件报告",
+    "Print": "打印"
 }

@@ -119,7 +119,7 @@ class SecurityLoginLimitSerializer(serializers.Serializer):
 
 
 class SecurityAuthSerializer(serializers.Serializer):
-    help_text_third_party_mfa = _('The third-party login modes include ') + ', '.join(SourceMixin.get_third_sources())
+    help_text_third_party_mfa = _('The third-party login modes include %s') % ', '.join(SourceMixin.get_third_sources())
     SECURITY_MFA_AUTH = serializers.ChoiceField(
         choices=(
             [0, _('Not enabled')],
