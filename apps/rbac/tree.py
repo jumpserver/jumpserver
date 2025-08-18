@@ -33,6 +33,7 @@ view_nodes_data = [
 app_nodes_data = [
     {'id': 'users', 'view': 'view_console'},
     {'id': 'assets', 'view': 'view_console'},
+    {'id': 'accounts', 'name': _('Accounts'), 'view': 'view_console'},
     {'id': 'perms', 'view': 'view_console'},
     {'id': 'terminal', 'name': _('Session audits'), 'view': 'view_audit'},
     {'id': 'audits', 'view': 'view_audit'},

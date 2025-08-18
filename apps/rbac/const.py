@@ -145,7 +145,7 @@ only_system_permissions = (
     ('rbac', 'orgrole', 'delete,add,change', 'orgrole'),
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
-    ('settings', 'setting', '*', '*'),
+    ('settings', 'setting', 'add,change,delete', '*'),
     ('tickets', '*', '*', '*'),
     ('ops', 'celerytask', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
