@@ -89,7 +89,7 @@
     "SessionShare": "Session Share",
     "Settings": "Settings",
     "Share": "Share",
-    "ShareUser": "ForUser",
+    "ShareUser": "Share User",
     "ShareUserHelpText": "If left blank, everyone could join the session.",
     "Shared Drive": "Shared Drive",
     "Shortcuts": "Shortcuts",
@@ -102,5 +102,7 @@
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
     "Writable": "Writable",
-    "ShowRemoteClip": "Show Remote Clipboard"
+    "ShowRemoteClip": "Show Remote Clipboard",
+    "RemoveUser": "Remove User",
+    "Admin": "Admin"
 }
