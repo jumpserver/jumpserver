@@ -63,8 +63,6 @@ class UserReportApi(DateRangeMixin, APIView):
 
         for obj in qs:
             dt = obj.datetime
-            if dt is None:
-                continue
             dt_local = timezone.localtime(dt)
             hour = dt_local.hour
             metrics[buckets[hour // 6]] += 1
