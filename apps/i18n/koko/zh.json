@@ -15,7 +15,7 @@
     "CopyLink": "复制链接及验证码",
     "CopyShareURLSuccess": "复制分享地址成功",
     "CreateFolder": "创建文件夹",
-    "CreateLink": "创建分享链接",
+    "CreateLink": "创建链接",
     "CreateSuccess": "创建成功",
     "CurrentUser": "当前用户",
     "Custom Setting": "自定义设置",
@@ -117,5 +117,11 @@
     "Warning": "警告",
     "WebSocketClosed": "WebSocket 已关闭",
     "WebSocketConnectionIsClosedHelpText": "WebSocket 连接已关闭，请刷新页面或重新连接。",
-    "Writable": "可写"
+    "Writable": "可写",
+    "CaseSensitive": "区分大小写",
+    "MatchWholeWords": "全字匹配",
+    "UsingRegularExpressions": "使用正则表达式",
+    "FileManagerTokenTimeout": "获取文件管理器 Token 超时",
+    "TerminalInstanceNotFound": "未找到当前选项卡的终端实例",
+    "Owner": "管理者"
 }

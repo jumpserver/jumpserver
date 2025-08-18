@@ -117,5 +117,11 @@
     "Warning": "Warning",
     "WebSocketClosed": "WebSocket closed",
     "WebSocketConnectionIsClosedHelpText": "WebSocket connection is closed, please refresh the page or reconnect.",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "CaseSensitive": "Case sensitive",
+    "MatchWholeWords": "Match whole words",
+    "UsingRegularExpressions": "Using regular expressions",
+    "FileManagerTokenTimeout": "Obtaining the file manager token timed out",
+    "TerminalInstanceNotFound": "Terminal instance not found for current tab",
+    "Owner": "管理者"
 }
