@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 15:01+0800\n"
+"POT-Creation-Date: 2025-08-19 18:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -761,8 +761,8 @@ msgstr "结束日期"
 #: terminal/models/applet/applet.py:374 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
-#: terminal/serializers/applet.py:21 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
+#: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:232
 #: xpack/plugins/cloud/models.py:299
@@ -1197,7 +1197,7 @@ msgstr "类别"
 #: authentication/serializers/connect_token_secret.py:128 ops/models/job.py:155
 #: perms/serializers/user_permission.py:28 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
-#: terminal/models/component/storage.py:152 terminal/serializers/applet.py:32
+#: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
@@ -2219,7 +2219,7 @@ msgstr "脚本"
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:83 settings/serializers/feature.py:96
 #: settings/serializers/msg.py:30 terminal/models/component/endpoint.py:14
-#: terminal/serializers/applet.py:20 xpack/plugins/cloud/const.py:39
+#: terminal/serializers/applet.py:18 xpack/plugins/cloud/const.py:39
 #: xpack/plugins/cloud/serializers/account_attrs.py:87
 msgid "Host"
 msgstr "主机"
@@ -4182,7 +4182,7 @@ msgstr "自定义密码"
 
 #: authentication/models/connection_token.py:46
 #: authentication/serializers/connect_token_secret.py:116
-#: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
 #: terminal/serializers/storage.py:71
@@ -6395,7 +6395,7 @@ msgstr "存储"
 
 #: rbac/tree.py:64 terminal/models/applet/applet.py:53
 #: terminal/models/applet/applet.py:371 terminal/models/applet/host.py:30
-#: terminal/serializers/applet.py:18
+#: terminal/serializers/applet.py:16
 msgid "Applet"
 msgstr "远程应用"
 
@@ -7417,7 +7417,7 @@ msgstr "作业中心命令黑名单"
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
-#: terminal/serializers/virtualapp.py:32
+#: terminal/serializers/virtualapp.py:33
 msgid "Virtual app"
 msgstr "虚拟应用"
 
@@ -7436,8 +7436,12 @@ msgid "SMTP"
 msgstr "SMTP"
 
 #: settings/serializers/msg.py:25
-msgid "EXCHANGE"
-msgstr "EXCHANGE"
+msgid "Microsoft Exchange Server"
+msgstr "Microsoft Exchange 服务器"
+
+#: settings/serializers/msg.py:28
+msgid "Service"
+msgstr "服务"
 
 #: settings/serializers/msg.py:34
 msgid "The user to be used for email server authentication"
@@ -8474,7 +8478,7 @@ msgstr "显示名称"
 msgid "Author"
 msgstr "作者"
 
-#: terminal/models/applet/applet.py:39 terminal/serializers/applet.py:34
+#: terminal/models/applet/applet.py:39 terminal/serializers/applet.py:32
 msgid "Edition"
 msgstr "版本"
 
@@ -8779,7 +8783,7 @@ msgstr "主机名"
 
 #: terminal/models/virtualapp/provider.py:23
 #: terminal/models/virtualapp/virtualapp.py:94
-#: terminal/serializers/virtualapp.py:34
+#: terminal/serializers/virtualapp.py:35
 msgid "App Provider"
 msgstr "应用提供商"
 
@@ -8823,7 +8827,7 @@ msgstr "测试失败: 账号无效"
 msgid "Invalid storage"
 msgstr "无效的存储"
 
-#: terminal/serializers/applet.py:31 terminal/serializers/virtualapp.py:15
+#: terminal/serializers/applet.py:29 terminal/serializers/virtualapp.py:16
 msgid "Icon"
 msgstr "图标"
 
@@ -11138,17 +11142,21 @@ msgstr "Access key id"
 msgid "Subscription ID"
 msgstr "订阅 ID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:89
-msgid "Auto node classification"
-msgstr "自动节点分类"
-
+#: xpack/plugins/cloud/serializers/account_attrs.py:80
 #: xpack/plugins/cloud/serializers/account_attrs.py:114
 #: xpack/plugins/cloud/serializers/account_attrs.py:118
+#: xpack/plugins/cloud/serializers/account_attrs.py:135
+#: xpack/plugins/cloud/serializers/account_attrs.py:143
+#: xpack/plugins/cloud/serializers/account_attrs.py:150
 #: xpack/plugins/cloud/serializers/account_attrs.py:157
 #: xpack/plugins/cloud/serializers/account_attrs.py:187
 #: xpack/plugins/cloud/serializers/account_attrs.py:237
 msgid "API Endpoint"
 msgstr "API 端点"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:89
+msgid "Auto node classification"
+msgstr "自动节点分类"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
@@ -11297,3 +11305,6 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
+
+#~ msgid "EXCHANGE"
+#~ msgstr "EXCHANGE"
