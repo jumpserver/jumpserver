@@ -54,3 +54,5 @@
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
       when: check_conn_after_change
+      register: result
+      failed_when: not result.is_available
