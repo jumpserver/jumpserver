@@ -343,11 +343,11 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return names
 
     @lazyproperty
-    def type(self):
+    def type(self) -> str:
         return self.platform.type
 
     @lazyproperty
-    def category(self):
+    def category(self) -> str:
         return self.platform.category
 
     def is_category(self, category):

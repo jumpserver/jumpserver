@@ -173,7 +173,7 @@ class Session(OrgModelMixin):
         cache.delete(key)
 
     @lazyproperty
-    def terminal_display(self):
+    def terminal_display(self) -> str:
         display = self.terminal.name if self.terminal else ''
         return display
 

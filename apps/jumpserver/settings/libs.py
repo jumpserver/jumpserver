@@ -74,11 +74,6 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_OAUTH2_REDIRECT_URL': 'SIDECAR',
     'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
     'DEFAULT_GENERATOR_CLASS': 'jumpserver.views.schema.CustomSchemaGenerator',
-    'SECURITY': [
-        {
-            'Bearer': []
-        }
-    ],
     'SWAGGER_UI_SETTINGS': {
         'persistAuthorization': True,
         'displayOperationId': True,
@@ -90,11 +85,7 @@ SPECTACULAR_SETTINGS = {
         'jumpserver.views.schema.BitChoicesFieldExtension',
         'jumpserver.views.schema.LabelRelatedFieldExtension',
     ],
-    'POSTPROCESSING_HOOK': [
-        'jumpserver.views.schema.custom_postprocessing_hook',
-        'drf_spectacular.hooks.postprocess_schema_enums',
-        'drf_spectacular.hooks.preprocess_exclude_path_format',
-    ],
+    'SECURITY': [{'Bearer': []}],
 }
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (180, 38)

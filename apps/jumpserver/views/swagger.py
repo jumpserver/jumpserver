@@ -3,6 +3,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView, SpectacularRedocView,
     SpectacularYAMLAPIView, SpectacularJSONAPIView
 )
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -26,11 +28,20 @@ class SchemeMixin:
         if request.scheme == 'http':
             schema['servers'] = schema['servers'][::-1]
 
+        schema['components']['securitySchemes'] = {
+            'Bearer': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
         return Response(schema)
     
+@method_decorator(cache_page(60 * 5,), name="dispatch")
 class JsonApi(SchemeMixin, SpectacularJSONAPIView):
     pass
 
+@method_decorator(cache_page(60 * 5,), name="dispatch")
 class YamlApi(SchemeMixin, SpectacularYAMLAPIView):
     pass
 

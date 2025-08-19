@@ -12,16 +12,16 @@ class CustomSchemaGenerator(SchemaGenerator):
         return super().get_schema(request, public)
 
 
-def custom_postprocessing_hook(result, generator, request, public):
-    # your modifications to the schema in parameter result
-    print(">>>>>>>>> result", result)
-    return result
-
-
 class CustomAutoSchema(AutoSchema):
     def __init__(self, *args, **kwargs):
         self.from_mcp = kwargs.get('from_mcp', False)
         super().__init__(*args, **kwargs)
+
+    def map_parsers(self):
+        return ['application/json']
+
+    def map_renderers(self, *args, **kwargs):
+        return ['application/json']
 
     def get_tags(self):
         operation_keys = self._tokenize_path()

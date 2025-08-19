@@ -12,6 +12,8 @@ class VirtualAccountViewSet(OrgBulkModelViewSet):
     filterset_fields = ('alias',)
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return VirtualAccount.objects.none()
         return VirtualAccount.get_or_init_queryset()
 
     def get_object(self, ):

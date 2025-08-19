@@ -20,7 +20,7 @@ class Label(JMSOrgBaseModel):
         verbose_name = _("Tag")
 
     @lazyproperty
-    def res_count(self):
+    def res_count(self) -> int:
         return self.labeled_resources.count()
 
     @lazyproperty

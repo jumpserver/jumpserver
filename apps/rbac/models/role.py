@@ -101,11 +101,11 @@ class Role(JMSBaseModel):
         return RoleBinding.get_role_users(self)
 
     @lazyproperty
-    def users_amount(self):
+    def users_amount(self) -> int:
         return self.users.count()
 
     @lazyproperty
-    def permissions_amount(self):
+    def permissions_amount(self) -> int:
         return self.permissions.count()
 
     @classmethod

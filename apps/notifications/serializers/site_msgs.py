@@ -35,6 +35,8 @@ class MessageContentSerializer(SenderMixin, ModelSerializer):
 
 class SiteMessageSerializer(SenderMixin, ModelSerializer):
     content = MessageContentSerializer(read_only=True)
+    has_read = serializers.BooleanField(read_only=True)
+    read_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = MessageContent
