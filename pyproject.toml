@@ -161,7 +161,6 @@ Homepage = "https://www.jumpserver.com"
 Documentation = "https://www.jumpserver.com/docs"
 
 [tool.uv]
-resolution = "lowest-direct"
 default-groups = ["xpack"]
 
 
