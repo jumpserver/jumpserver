@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 15:01+0800\n"
+"POT-Creation-Date: 2025-08-19 18:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -759,8 +759,8 @@ msgstr ""
 #: terminal/models/applet/applet.py:374 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
-#: terminal/serializers/applet.py:21 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:35 tickets/models/ticket/general.py:284
+#: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:284
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:232
 #: xpack/plugins/cloud/models.py:299
@@ -1186,7 +1186,7 @@ msgstr ""
 #: authentication/serializers/connect_token_secret.py:128 ops/models/job.py:155
 #: perms/serializers/user_permission.py:28 terminal/models/applet/applet.py:40
 #: terminal/models/component/storage.py:58
-#: terminal/models/component/storage.py:152 terminal/serializers/applet.py:32
+#: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
@@ -2184,7 +2184,7 @@ msgstr ""
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:83 settings/serializers/feature.py:96
 #: settings/serializers/msg.py:30 terminal/models/component/endpoint.py:14
-#: terminal/serializers/applet.py:20 xpack/plugins/cloud/const.py:39
+#: terminal/serializers/applet.py:18 xpack/plugins/cloud/const.py:39
 #: xpack/plugins/cloud/serializers/account_attrs.py:87
 msgid "Host"
 msgstr ""
@@ -4113,7 +4113,7 @@ msgstr ""
 
 #: authentication/models/connection_token.py:46
 #: authentication/serializers/connect_token_secret.py:116
-#: settings/serializers/msg.py:28 terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
 #: terminal/serializers/storage.py:71
@@ -6292,7 +6292,7 @@ msgstr ""
 
 #: rbac/tree.py:64 terminal/models/applet/applet.py:53
 #: terminal/models/applet/applet.py:371 terminal/models/applet/host.py:30
-#: terminal/serializers/applet.py:18
+#: terminal/serializers/applet.py:16
 msgid "Applet"
 msgstr ""
 
@@ -7277,7 +7277,7 @@ msgstr ""
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
-#: terminal/serializers/virtualapp.py:32
+#: terminal/serializers/virtualapp.py:33
 msgid "Virtual app"
 msgstr ""
 
@@ -7296,7 +7296,11 @@ msgid "SMTP"
 msgstr ""
 
 #: settings/serializers/msg.py:25
-msgid "EXCHANGE"
+msgid "Microsoft Exchange Server"
+msgstr ""
+
+#: settings/serializers/msg.py:28
+msgid "Service"
 msgstr ""
 
 #: settings/serializers/msg.py:34
@@ -8298,7 +8302,7 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
-#: terminal/models/applet/applet.py:39 terminal/serializers/applet.py:34
+#: terminal/models/applet/applet.py:39 terminal/serializers/applet.py:32
 msgid "Edition"
 msgstr ""
 
@@ -8603,7 +8607,7 @@ msgstr ""
 
 #: terminal/models/virtualapp/provider.py:23
 #: terminal/models/virtualapp/virtualapp.py:94
-#: terminal/serializers/virtualapp.py:34
+#: terminal/serializers/virtualapp.py:35
 msgid "App Provider"
 msgstr ""
 
@@ -8647,7 +8651,7 @@ msgstr ""
 msgid "Invalid storage"
 msgstr ""
 
-#: terminal/serializers/applet.py:31 terminal/serializers/virtualapp.py:15
+#: terminal/serializers/applet.py:29 terminal/serializers/virtualapp.py:16
 msgid "Icon"
 msgstr ""
 
@@ -10911,16 +10915,20 @@ msgstr "Access key id"
 msgid "Subscription ID"
 msgstr ""
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:89
-msgid "Auto node classification"
-msgstr ""
-
+#: xpack/plugins/cloud/serializers/account_attrs.py:80
 #: xpack/plugins/cloud/serializers/account_attrs.py:114
 #: xpack/plugins/cloud/serializers/account_attrs.py:118
+#: xpack/plugins/cloud/serializers/account_attrs.py:135
+#: xpack/plugins/cloud/serializers/account_attrs.py:143
+#: xpack/plugins/cloud/serializers/account_attrs.py:150
 #: xpack/plugins/cloud/serializers/account_attrs.py:157
 #: xpack/plugins/cloud/serializers/account_attrs.py:187
 #: xpack/plugins/cloud/serializers/account_attrs.py:237
 msgid "API Endpoint"
+msgstr ""
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:89
+msgid "Auto node classification"
 msgstr ""
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
