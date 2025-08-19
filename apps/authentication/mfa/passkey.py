@@ -19,6 +19,8 @@ class MFAPasskey(BaseMFA):
     def is_active(self):
         if not self.is_authenticated():
             return True
+        if settings.SAFE_MODE:
+            return False
         return self.user.passkey_set.count()
 
     @staticmethod
