@@ -4,6 +4,7 @@ from rest_framework import serializers
 from common.const.choices import Status
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from terminal.const import PublishStatus
+from ..mixin import ManifestI18nMixin
 from ..models import VirtualApp, VirtualAppPublication, AppProvider
 
 __all__ = [
@@ -11,7 +12,7 @@ __all__ = [
 ]
 
 
-class VirtualAppSerializer(serializers.ModelSerializer):
+class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
     icon = serializers.ReadOnlyField(label=_("Icon"))
     image_protocol = serializers.CharField(max_length=16, default='vnc')
     image_port = serializers.IntegerField(default=5900)
