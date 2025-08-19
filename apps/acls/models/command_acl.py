@@ -34,16 +34,16 @@ class CommandGroup(JMSOrgBaseModel):
 
     @lazyproperty
     def pattern(self):
+        content = self.content.replace('\r\n', '\n')
         if self.type == 'command':
-            s = self.construct_command_regex(self.content)
+            s = self.construct_command_regex(content)
         else:
-            s = r'{0}'.format(self.content)
+            s = r'{0}'.format(r'{}'.format('|'.join(content.split('\n'))))
         return s
 
     @classmethod
     def construct_command_regex(cls, content):
         regex = []
-        content = content.replace('\r\n', '\n')
         for _cmd in content.split('\n'):
             cmd = re.sub(r'\s+', ' ', _cmd)
             cmd = re.escape(cmd)
