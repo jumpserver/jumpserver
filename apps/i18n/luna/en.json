@@ -88,6 +88,8 @@
     "Expire time": "Expire time",
     "ExpiredTime": "Expire time",
     "Face online required": "This login requires face verification and monitoring. Do you want to continue?",
+    "Face verify": "Face verify",
+    "Please complete the face verification": "Please complete the face verification",
     "Face verify required": "This login requires face verification. Do you want to continue?",
     "Face verify success": "Face verify success",
     "Failed to open address": "Failed to Open Address",

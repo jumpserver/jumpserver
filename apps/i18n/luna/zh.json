@@ -86,6 +86,8 @@
     "Expire time": "过期时间",
     "ExpiredTime": "有效期限",
     "Face online required": "本次登录需要进行人脸验证和监控,是否继续？",
+    "Face verify": "人脸验证",
+    "Please complete the face verification": "请完成此人脸认证",
     "Face verify required": "本次登录需要进行人脸验证,是否继续？",
     "Face verify success": "人脸验证成功",
     "FaceOnlineNotSupported": "不支持人脸在线验证",
