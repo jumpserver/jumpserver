@@ -1415,6 +1415,7 @@
     "TestPortErrorMsg": "Port error, please re-enter",
     "TestSelected": "Verify selected",
     "TestSuccessMsg": "Test succeeded",
+    "ThirdPartyMfaHelpText": "Third-party login methods include: OpenID, CAS, SAML2, OAuth2, WeCom, Lark, Slack, DingTalk",
     "Thursday": "Thu",
     "Ticket": "Ticket",
     "TicketDetail": "Ticket details",

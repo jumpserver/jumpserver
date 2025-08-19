@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-18 19:03+0800\n"
+"POT-Creation-Date: 2025-08-19 15:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1361,12 +1361,12 @@ msgid "Password length"
 msgstr "パスワードの長さ"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:52
+#: settings/serializers/security.py:51
 msgid "Lowercase"
 msgstr "小文字"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:49
+#: settings/serializers/security.py:48
 msgid "Uppercase"
 msgstr "大文字"
 
@@ -2398,7 +2398,7 @@ msgid "Any"
 msgstr "任意"
 
 #: assets/const/protocol.py:88 rbac/tree.py:65
-#: settings/serializers/security.py:275
+#: settings/serializers/security.py:272
 msgid "Security"
 msgstr "セキュリティ"
 
@@ -5473,7 +5473,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "ラベル"
 
-#: labels/models.py:15 settings/serializers/security.py:214
+#: labels/models.py:15 settings/serializers/security.py:211
 msgid "Color"
 msgstr "色"
 
@@ -7726,11 +7726,11 @@ msgstr ""
 "ノードが表示されないようにしますが、そのノードが許可されていないという質問に"
 "質問"
 
-#: settings/serializers/security.py:20
+#: settings/serializers/security.py:19
 msgid "User password expiration (day)"
 msgstr "ユーザーパスワードの有効期限（天）"
 
-#: settings/serializers/security.py:22
+#: settings/serializers/security.py:21
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
@@ -7741,22 +7741,22 @@ msgstr ""
 "ドの有効期限が切れるリマインダーメールがシステムからユーザーに自動的に送信さ"
 "れます。"
 
-#: settings/serializers/security.py:29
+#: settings/serializers/security.py:28
 msgid "User expired tokens record keep days"
 msgstr "ユーザーの期限切れトークン保持日数"
 
-#: settings/serializers/security.py:30
+#: settings/serializers/security.py:29
 msgid ""
 "Retention period (in days) for expired user tokens before automatic cleanup."
 msgstr ""
 "システムは、毎日のクリーンアップタスクにおいて、ユーザーの期限切れトークンの"
 "記録を永久に削除する前に、これらの記録を保持する日数を設定します。"
 
-#: settings/serializers/security.py:34
+#: settings/serializers/security.py:33
 msgid "Recent password count"
 msgstr "繰り返された履歴パスワードの数"
 
-#: settings/serializers/security.py:36
+#: settings/serializers/security.py:35
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
@@ -7764,23 +7764,23 @@ msgstr ""
 "ヒント: ユーザーがパスワードをリセットすると、ユーザーの前のnの履歴パスワード"
 "にすることはできません"
 
-#: settings/serializers/security.py:42
+#: settings/serializers/security.py:41
 msgid "Minimum length (User)"
 msgstr "パスワードの最小長"
 
-#: settings/serializers/security.py:46
+#: settings/serializers/security.py:45
 msgid "Minimum length (Admin)"
 msgstr "管理者ユーザーパスワードの最小長"
 
-#: settings/serializers/security.py:55
+#: settings/serializers/security.py:54
 msgid "Digits"
 msgstr "数値を含める必要があります"
 
-#: settings/serializers/security.py:58
+#: settings/serializers/security.py:57
 msgid "Special characters"
 msgstr "特別な"
 
-#: settings/serializers/security.py:63
+#: settings/serializers/security.py:62
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
@@ -7788,27 +7788,27 @@ msgstr ""
 "ユーザーが限られた回数だけログインできなかった場合、この時間間隔ではログイン"
 "はできません。"
 
-#: settings/serializers/security.py:71 settings/serializers/security.py:81
+#: settings/serializers/security.py:70 settings/serializers/security.py:80
 msgid "Login failures count"
 msgstr "ユーザーログインの失敗数を制限する"
 
-#: settings/serializers/security.py:75 settings/serializers/security.py:85
+#: settings/serializers/security.py:74 settings/serializers/security.py:84
 msgid "Login failure period (minute)"
 msgstr "ユーザーのログイン間隔をブロックする（分）"
 
-#: settings/serializers/security.py:89
+#: settings/serializers/security.py:88
 msgid "Login IP whitelist"
 msgstr "ログインIPホワイトリスト"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:93
 msgid "Login IP blacklist"
 msgstr "ログインIPブラックリスト"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:98
 msgid "Only single device login"
 msgstr "単一デバイスログインのみ"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:99
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
@@ -7816,11 +7816,11 @@ msgstr ""
 "ユーザーが新しいデバイスにログインすると、ログインしている他のデバイスは自動"
 "的にログアウトします。"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:102
 msgid "Only exist user login"
 msgstr "ユーザーログインのみ存在"
 
-#: settings/serializers/security.py:105
+#: settings/serializers/security.py:104
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -7831,11 +7831,11 @@ msgstr ""
 "ローカル認証方法を除く他の認証方法のユーザーはログインでき、ユーザーが自動的"
 "に作成されます (ユーザーが存在しない場合)。"
 
-#: settings/serializers/security.py:111
+#: settings/serializers/security.py:110
 msgid "Only from source login"
 msgstr "ソースログインからのみ"
 
-#: settings/serializers/security.py:113
+#: settings/serializers/security.py:112
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging "
 "in; if it is disabled, the user will authenticate all the enabled "
@@ -7846,80 +7846,75 @@ msgstr ""
 "な場合、ユーザーはログイン時に、いずれかの認証方法が成功する限り、有効なすべ"
 "ての認証方法を特定の順序で認証します。 、直接ログインできます"
 
-#: settings/serializers/security.py:122
-#, python-format
-msgid "The third-party login modes include %s"
-msgstr "サードパーティのログイン方法には以下が含まれます: %s"
-
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:123
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "有効化されていません"
 
-#: settings/serializers/security.py:126
+#: settings/serializers/security.py:124
 msgid "All users"
 msgstr "すべてのユーザー"
 
-#: settings/serializers/security.py:127
+#: settings/serializers/security.py:125
 msgid "Only admin users"
 msgstr "管理者のみ"
 
-#: settings/serializers/security.py:129
+#: settings/serializers/security.py:127
 msgid "Global MFA"
 msgstr "グローバル有効化MFA認証"
 
-#: settings/serializers/security.py:133
+#: settings/serializers/security.py:131
 msgid "Third-party login MFA"
 msgstr "サードパーティのログインユーザーがMFA認証を実行"
 
-#: settings/serializers/security.py:138
+#: settings/serializers/security.py:135
 msgid "MFA via Email"
 msgstr "メール検証 MFA"
 
-#: settings/serializers/security.py:139
+#: settings/serializers/security.py:136
 msgid "Email as a method for multi-factor authentication"
 msgstr "メールを多要素認証の一つの方法として使用します。"
 
-#: settings/serializers/security.py:142
+#: settings/serializers/security.py:139
 msgid "OTP issuer name"
 msgstr "OTP発行者名"
 
-#: settings/serializers/security.py:146
+#: settings/serializers/security.py:143
 msgid "OTP valid window"
 msgstr "OTP有効なウィンドウ"
 
-#: settings/serializers/security.py:150
+#: settings/serializers/security.py:147
 msgid "MFA verify TTL"
 msgstr "MFAはTTLを確認します（秒）"
 
-#: settings/serializers/security.py:152
+#: settings/serializers/security.py:149
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "検証MFAはアカウントのパスワードを表示したときにのみ有効になります。"
 
-#: settings/serializers/security.py:157
+#: settings/serializers/security.py:154
 msgid "MFA in login page"
 msgstr "ログインページのMFA"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:155
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr ""
 "Euセキュリティ規制 (GDPR) では、MFAがログインページにある必要があります"
 
-#: settings/serializers/security.py:162
+#: settings/serializers/security.py:159
 msgid "Verify code TTL (second)"
 msgstr "認証コード有効時間"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:160
 msgid "Reset password and send SMS code expiration time"
 msgstr "パスワードをリセットしてSMSコードの有効期限を送信します"
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:164
 msgid "Login dynamic code"
 msgstr "ログイン動的コードの有効化"
 
-#: settings/serializers/security.py:168
+#: settings/serializers/security.py:165
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -7927,19 +7922,19 @@ msgstr ""
 "パスワードと追加コードは、検証のためにサードパーティの認証システムに送信され"
 "ます"
 
-#: settings/serializers/security.py:172
+#: settings/serializers/security.py:169
 msgid "Login captcha"
 msgstr "ログインcaptchaの有効化"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:170
 msgid "Enable captcha to prevent robot authentication"
 msgstr "Captchaを有効にしてロボット認証を防止する"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:173
 msgid "Suspicious Login Verification"
 msgstr "リモートログイン保護"
 
-#: settings/serializers/security.py:178
+#: settings/serializers/security.py:175
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
@@ -7949,11 +7944,11 @@ msgstr ""
 "します。アカウントが共通のログイン都市からログインしている場合、システムはリ"
 "モートログインリマインダーを送信します"
 
-#: settings/serializers/security.py:184
+#: settings/serializers/security.py:181
 msgid "Auto Disable Threshold (day)"
 msgstr "未使用のユーザータイムアウト（日）"
 
-#: settings/serializers/security.py:185
+#: settings/serializers/security.py:182
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
@@ -7961,55 +7956,55 @@ msgstr ""
 "毎日、頻度の低いユーザーを検出し、予め決められた時間制限を超えた場合は無効に"
 "します"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:202
 msgid "Watermark"
 msgstr "透かしの有効化"
 
-#: settings/serializers/security.py:208
+#: settings/serializers/security.py:205
 msgid "Watermark session content"
 msgstr "セッションウォーターマークカスタム内容"
 
-#: settings/serializers/security.py:211
+#: settings/serializers/security.py:208
 msgid "Watermark console content"
 msgstr "管理ページのウォーターマークカスタム内容"
 
-#: settings/serializers/security.py:217
+#: settings/serializers/security.py:214
 msgid "Watermark font size"
 msgstr "フォントサイズ"
 
-#: settings/serializers/security.py:220
+#: settings/serializers/security.py:217
 msgid "Watermark height"
 msgstr "単一ウォーターマークの高さ"
 
-#: settings/serializers/security.py:223
+#: settings/serializers/security.py:220
 msgid "Watermark width"
 msgstr "単一ウォーターマークの幅"
 
-#: settings/serializers/security.py:226
+#: settings/serializers/security.py:223
 msgid "Watermark rotate"
 msgstr "ウォーターマークの回転角度"
 
-#: settings/serializers/security.py:230
+#: settings/serializers/security.py:227
 msgid "Max idle time (minute)"
 msgstr "接続最大アイドル時間（分）"
 
-#: settings/serializers/security.py:231
+#: settings/serializers/security.py:228
 msgid "If idle time more than it, disconnect connection."
 msgstr "この設定以上の操作がない場合、接続は切断されます"
 
-#: settings/serializers/security.py:234
+#: settings/serializers/security.py:231
 msgid "Session expire at browser closed"
 msgstr "ブラウザを閉じるとセッションが期限切れになります"
 
-#: settings/serializers/security.py:235
+#: settings/serializers/security.py:232
 msgid "Whether to expire the session when the user closes their browser."
 msgstr "ユーザーがブラウザを閉じたときにセッションを期限切れにするかどうか。"
 
-#: settings/serializers/security.py:240
+#: settings/serializers/security.py:237
 msgid "Allow users to view asset session information"
 msgstr "ユーザーに資産のオンラインセッション情報の閲覧を許可する"
 
-#: settings/serializers/security.py:242
+#: settings/serializers/security.py:239
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
@@ -8017,37 +8012,37 @@ msgstr ""
 "ユーザーが資産に接続するとき、アカウント選択のポップアップに現在の資産のオン"
 "ラインセッション数を表示（rdpプロトコルのみ）"
 
-#: settings/serializers/security.py:248
+#: settings/serializers/security.py:245
 msgid "Max online time (hour)"
 msgstr "接続最大アイドル時間（分）"
 
-#: settings/serializers/security.py:249
+#: settings/serializers/security.py:246
 msgid "If session connection time more than it, disconnect connection."
 msgstr "セッション接続時間がこれを超えると、接続が切断されます"
 
-#: settings/serializers/security.py:252
+#: settings/serializers/security.py:249
 msgid "Remember manual auth"
 msgstr "手動入力パスワードの保存"
 
-#: settings/serializers/security.py:255
+#: settings/serializers/security.py:252
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "セッション共有"
 
-#: settings/serializers/security.py:256
+#: settings/serializers/security.py:253
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr ""
 "ユーザーのアクティブなセッションを他のユーザーと共有できるようにします。"
 
-#: settings/serializers/security.py:262
+#: settings/serializers/security.py:259
 msgid "Insecure command alert"
 msgstr "安全でないコマンドアラート"
 
-#: settings/serializers/security.py:265
+#: settings/serializers/security.py:262
 msgid "Email recipient"
 msgstr "メール受信者"
 
-#: settings/serializers/security.py:266
+#: settings/serializers/security.py:263
 msgid "Multiple user using , split"
 msgstr "複数のユーザーを使用して、分割"
 
@@ -11609,12 +11604,3 @@ msgstr "ライセンスのインポートに成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
-
-#~ msgid "Auth success"
-#~ msgstr "認証データベース"
-
-#~ msgid "Redirecting to JumpServer Client"
-#~ msgstr "JumpServerクライアントにリダイレクト"
-
-#~ msgid "Share (SSH)"
-#~ msgstr "共有（SSH）"

@@ -1424,6 +1424,7 @@
     "TestPortErrorMsg": "Ошибка порта, пожалуйста, введите заново",
     "TestSelected": "Проверить выбранное",
     "TestSuccessMsg": "Тест пройден успешно",
+    "ThirdPartyMfaHelpText": "Способы входа через третьих лиц включают: OpenID, CAS, SAML2, OAuth2, Корпоративный WeChat, Feishu, Lark, Slack, DingTalk.",
     "Thursday": "Четверг",
     "Ticket": "Система заявок",
     "TicketDetail": "Сведения о заяве",

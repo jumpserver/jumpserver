@@ -1422,6 +1422,7 @@
     "TestPortErrorMsg": "포트 오류입니다, 재입력해주세요",
     "TestSelected": "선택 테스트",
     "TestSuccessMsg": "테스트 성공",
+    "ThirdPartyMfaHelpText": "제3자 로그인 방식에는 OpenID, CAS, SAML2, OAuth2, 기업 위챗, 피서, Lark, 슬랙, 딩딩이 포함됩니다.",
     "Thursday": "목요일",
     "Ticket": "작업 항목",
     "TicketDetail": "작업 상세보기",

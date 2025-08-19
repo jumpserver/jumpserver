@@ -1427,6 +1427,7 @@
     "TestPortErrorMsg": "埠錯誤,請重新輸入",
     "TestSelected": "測試所選",
     "TestSuccessMsg": "測試成功",
+    "ThirdPartyMfaHelpText": "第三方登入方式包括：OpenID、CAS、SAML2、OAuth2、企業微信、飛書、Lark、Slack、釘釘。",
     "Thursday": "週四",
     "Ticket": "工單",
     "TicketDetail": "工單詳情",
