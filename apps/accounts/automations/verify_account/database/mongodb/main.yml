@@ -16,3 +16,5 @@
         ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert }}"
+      register: result
+      failed_when: not result.is_available
