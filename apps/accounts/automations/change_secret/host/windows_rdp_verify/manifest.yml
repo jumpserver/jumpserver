@@ -9,7 +9,7 @@ priority: 49
 params:
   - name: groups
     type: str
-    label: '用户组'
+    label: "{{ 'Params groups label' | trans }}"
     default: 'Users,Remote Desktop Users'
     help_text: "{{ 'Params groups help text' | trans }}"
 
@@ -24,4 +24,9 @@ i18n:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
     en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
+
+  Params groups label:
+    zh: '用户组'
+    ja: 'グループ'
+    en: 'Groups'
 
