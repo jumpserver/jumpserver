@@ -1427,6 +1427,7 @@
     "TestPortErrorMsg": "ポートエラー、再入力してください",
     "TestSelected": "選択したテスト",
     "TestSuccessMsg": "テスト成功",
+    "ThirdPartyMfaHelpText": "第三者ログイン方式には、OpenID、CAS、SAML2、OAuth2、企業微信、飛書、Lark、Slack、钉钉が含まれます。",
     "Thursday": "木曜日",
     "Ticket": "チケット",
     "TicketDetail": "作業詳細",

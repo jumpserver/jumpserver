@@ -1423,6 +1423,7 @@
     "TestPortErrorMsg": "Erro de porta, por favor, insira novamente",
     "TestSelected": "Testar seleção",
     "TestSuccessMsg": "Teste bem-sucedido",
+    "ThirdPartyMfaHelpText": "As opções de login de terceiros incluem: OpenID, CAS, SAML2, OAuth2, WeChat Empresarial, Feishu, Lark, Slack e DingTalk.",
     "Thursday": "Quinta-feira",
     "Ticket": "Pedido de trabalho",
     "TicketDetail": "Detalhes do pedido",

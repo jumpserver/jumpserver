@@ -1422,6 +1422,7 @@
     "TestPortErrorMsg": "Error de puerto, por favor ingrese nuevamente",
     "TestSelected": "Probar seleccionados",
     "TestSuccessMsg": "Prueba exitosa",
+    "ThirdPartyMfaHelpText": "Los métodos de inicio de sesión de terceros incluyen: OpenID, CAS, SAML2, OAuth2, WeChat empresarial, Feishu, Lark, Slack y DingTalk.",
     "Thursday": "Jueves",
     "Ticket": "Orden de trabajo",
     "TicketDetail": "Detalles del ticket",

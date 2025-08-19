@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-18 19:03+0800\n"
+"POT-Creation-Date: 2025-08-19 15:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1379,12 +1379,12 @@ msgid "Password length"
 msgstr "Longitud de la contraseña"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:52
+#: settings/serializers/security.py:51
 msgid "Lowercase"
 msgstr "letras minúsculas"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:49
+#: settings/serializers/security.py:48
 msgid "Uppercase"
 msgstr "letras mayúsculas"
 
@@ -2462,7 +2462,7 @@ msgid "Any"
 msgstr "Cualquiera"
 
 #: assets/const/protocol.py:88 rbac/tree.py:65
-#: settings/serializers/security.py:275
+#: settings/serializers/security.py:272
 msgid "Security"
 msgstr "Seguro"
 
@@ -5630,7 +5630,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "Gestión de etiquetas"
 
-#: labels/models.py:15 settings/serializers/security.py:214
+#: labels/models.py:15 settings/serializers/security.py:211
 msgid "Color"
 msgstr "Color"
 
@@ -8036,7 +8036,7 @@ msgstr ""
 msgid "Perm single to ungroup node"
 msgstr "Tiempo de expiración de la contraseña del usuario (días)"
 
-#: settings/serializers/security.py:20
+#: settings/serializers/security.py:19
 msgid "User password expiration (day)"
 msgstr ""
 "Si el usuario no actualiza la contraseña durante este periodo, la contraseña "
@@ -8045,18 +8045,18 @@ msgstr ""
 "sistema (diariamente) dentro de los 5 días previos a la expiración de la "
 "contraseña."
 
-#: settings/serializers/security.py:22
+#: settings/serializers/security.py:21
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
 "sent to the user by system within 5 days (daily) before the password expires"
 msgstr "No se pueden establecer las contraseñas de las últimas ocasiones."
 
-#: settings/serializers/security.py:29
+#: settings/serializers/security.py:28
 msgid "User expired tokens record keep days"
 msgstr "Días de retención del Token expirado del usuario"
 
-#: settings/serializers/security.py:30
+#: settings/serializers/security.py:29
 msgid ""
 "Retention period (in days) for expired user tokens before automatic cleanup."
 msgstr ""
@@ -8064,11 +8064,11 @@ msgstr ""
 "manera permanente los registros de Token expirados del usuario en la tarea "
 "de limpieza diaria"
 
-#: settings/serializers/security.py:34
+#: settings/serializers/security.py:33
 msgid "Recent password count"
 msgstr "No se puede establecer la contraseña en las últimas ocasiones"
 
-#: settings/serializers/security.py:36
+#: settings/serializers/security.py:35
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
@@ -8096,23 +8096,23 @@ msgstr ""
 "el usuario no existe).  \n"
 "Inicio de sesión solo desde el origen del usuario."
 
-#: settings/serializers/security.py:42
+#: settings/serializers/security.py:41
 msgid "Minimum length (User)"
 msgstr "Longitud mínima de la contraseña"
 
-#: settings/serializers/security.py:46
+#: settings/serializers/security.py:45
 msgid "Minimum length (Admin)"
 msgstr "Longitud mínima de la contraseña del administrador"
 
-#: settings/serializers/security.py:55
+#: settings/serializers/security.py:54
 msgid "Digits"
 msgstr "Debe incluir números"
 
-#: settings/serializers/security.py:58
+#: settings/serializers/security.py:57
 msgid "Special characters"
 msgstr "Debe incluir caracteres especiales"
 
-#: settings/serializers/security.py:63
+#: settings/serializers/security.py:62
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
@@ -8120,27 +8120,27 @@ msgstr ""
 "Cuando el número de intentos fallidos de inicio de sesión alcance el límite, "
 "se prohibirá el inicio de sesión durante este intervalo"
 
-#: settings/serializers/security.py:71 settings/serializers/security.py:81
+#: settings/serializers/security.py:70 settings/serializers/security.py:80
 msgid "Login failures count"
 msgstr "Límite de intentos fallidos de inicio de sesión"
 
-#: settings/serializers/security.py:75 settings/serializers/security.py:85
+#: settings/serializers/security.py:74 settings/serializers/security.py:84
 msgid "Login failure period (minute)"
 msgstr "Intervalo de prohibición de inicio de sesión (min)"
 
-#: settings/serializers/security.py:89
+#: settings/serializers/security.py:88
 msgid "Login IP whitelist"
 msgstr "Lista blanca de IP para inicio de sesión"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:93
 msgid "Login IP blacklist"
 msgstr "Lista negra de inicio de sesión IP"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:98
 msgid "Only single device login"
 msgstr "Solo un dispositivo puede iniciar sesión"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:99
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
@@ -8148,11 +8148,11 @@ msgstr ""
 "Cuando un usuario inicia sesión desde un nuevo dispositivo, los demás "
 "dispositivos ya conectados se desconectarán automáticamente"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:102
 msgid "Only exist user login"
 msgstr "Solo pueden iniciar sesión los usuarios existentes"
 
-#: settings/serializers/security.py:105
+#: settings/serializers/security.py:104
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -8164,11 +8164,11 @@ msgstr ""
 "autenticación local, podrán iniciar sesión y se crearán automáticamente (si "
 "el usuario no existe)"
 
-#: settings/serializers/security.py:111
+#: settings/serializers/security.py:110
 msgid "Only from source login"
 msgstr "Solo se permite el inicio de sesión desde fuentes de usuarios"
 
-#: settings/serializers/security.py:113
+#: settings/serializers/security.py:112
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging "
 "in; if it is disabled, the user will authenticate all the enabled "
@@ -8181,54 +8181,49 @@ msgstr ""
 "métodos habilitados, permitiendo el acceso inmediato si cualquiera de ellos "
 "tiene éxito."
 
-#: settings/serializers/security.py:122
-#, python-format
-msgid "The third-party login modes include %s"
-msgstr "Los métodos de inicio de sesión de terceros incluyen: %s"
-
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:123
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "No habilitado"
 
-#: settings/serializers/security.py:126
+#: settings/serializers/security.py:124
 msgid "All users"
 msgstr "Todos los usuarios"
 
-#: settings/serializers/security.py:127
+#: settings/serializers/security.py:125
 msgid "Only admin users"
 msgstr "Solo administradores"
 
-#: settings/serializers/security.py:129
+#: settings/serializers/security.py:127
 msgid "Global MFA"
 msgstr "Habilitar autenticación MFA a nivel global"
 
-#: settings/serializers/security.py:133
+#: settings/serializers/security.py:131
 msgid "Third-party login MFA"
 msgstr "Terceros habilitan MFA"
 
-#: settings/serializers/security.py:138
+#: settings/serializers/security.py:135
 msgid "MFA via Email"
 msgstr "Verificación de correo electrónico MFA"
 
-#: settings/serializers/security.py:139
+#: settings/serializers/security.py:136
 msgid "Email as a method for multi-factor authentication"
 msgstr ""
 "Utilizar el correo electrónico como un método de autenticación multifactor"
 
-#: settings/serializers/security.py:142
+#: settings/serializers/security.py:139
 msgid "OTP issuer name"
 msgstr "Nombre tras escanear OTP"
 
-#: settings/serializers/security.py:146
+#: settings/serializers/security.py:143
 msgid "OTP valid window"
 msgstr "Conteo de validez tras un retraso de OTP"
 
-#: settings/serializers/security.py:150
+#: settings/serializers/security.py:147
 msgid "MFA verify TTL"
 msgstr "Validez de la verificación MFA"
 
-#: settings/serializers/security.py:152
+#: settings/serializers/security.py:149
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
@@ -8236,32 +8231,32 @@ msgstr ""
 "Unidad: segundos, actualmente solo aplicable al revisar la verificación de "
 "contraseña de la cuenta en MFA"
 
-#: settings/serializers/security.py:157
+#: settings/serializers/security.py:154
 msgid "MFA in login page"
 msgstr "MFA para ingreso en la página de inicio de sesión"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:155
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr ""
 "La normativa de seguridad de datos de la Unión Europea (GDPR) exige que MFA "
 "esté en la página de inicio de sesión para garantizar la seguridad del "
 "acceso al sistema"
 
-#: settings/serializers/security.py:162
+#: settings/serializers/security.py:159
 msgid "Verify code TTL (second)"
 msgstr "Tiempo de validez del código de verificación (min)"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:160
 msgid "Reset password and send SMS code expiration time"
 msgstr ""
 "Tiempo de caducidad del código de verificación para restablecer la "
 "contraseña y el código de verificación para el envío de SMS."
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:164
 msgid "Login dynamic code"
 msgstr "Activar código adicional para inicio de sesión"
 
-#: settings/serializers/security.py:168
+#: settings/serializers/security.py:165
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -8271,20 +8266,20 @@ msgstr ""
 "sistemas de autenticación de terceros requieren contraseña + 6 dígitos para "
 "completar la autenticación"
 
-#: settings/serializers/security.py:172
+#: settings/serializers/security.py:169
 msgid "Login captcha"
 msgstr "Activar código de verificación para inicio de sesión"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:170
 msgid "Enable captcha to prevent robot authentication"
 msgstr ""
 "Habilitar el código de verificación para prevenir el inicio de sesión de bots"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:173
 msgid "Suspicious Login Verification"
 msgstr "Notificación de inicio de sesión desde una ubicación diferente"
 
-#: settings/serializers/security.py:178
+#: settings/serializers/security.py:175
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
@@ -8294,11 +8289,11 @@ msgstr ""
 "inicio habitual; si la cuenta inicia sesión desde una ciudad poco familiar, "
 "se enviará una alerta de inicio de sesión desde una ubicación diferente"
 
-#: settings/serializers/security.py:184
+#: settings/serializers/security.py:181
 msgid "Auto Disable Threshold (day)"
 msgstr "Desactivación automática de usuarios inactivos (días)"
 
-#: settings/serializers/security.py:185
+#: settings/serializers/security.py:182
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
@@ -8306,60 +8301,60 @@ msgstr ""
 "Se realiza una verificación diaria, los usuarios que superen el tiempo "
 "preestablecido serán desactivados automáticamente"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:202
 msgid "Watermark"
 msgstr "Activar marca de agua"
 
-#: settings/serializers/security.py:208
+#: settings/serializers/security.py:205
 msgid "Watermark session content"
 msgstr "Contenido de personalización de la marca de agua de la sesión"
 
-#: settings/serializers/security.py:211
+#: settings/serializers/security.py:208
 msgid "Watermark console content"
 msgstr ""
 "Contenido de personalización de la marca de agua en la página de gestión"
 
-#: settings/serializers/security.py:217
+#: settings/serializers/security.py:214
 msgid "Watermark font size"
 msgstr "Tamaño y tipo de fuente"
 
-#: settings/serializers/security.py:220
+#: settings/serializers/security.py:217
 msgid "Watermark height"
 msgstr "Altura de la marca de agua individual"
 
-#: settings/serializers/security.py:223
+#: settings/serializers/security.py:220
 msgid "Watermark width"
 msgstr "Ancho de la marca de agua individual"
 
-#: settings/serializers/security.py:226
+#: settings/serializers/security.py:223
 msgid "Watermark rotate"
 msgstr "Ángulo de rotación de la marca de agua"
 
-#: settings/serializers/security.py:230
+#: settings/serializers/security.py:227
 msgid "Max idle time (minute)"
 msgstr "Tiempo máximo de inactividad de conexión (min)"
 
-#: settings/serializers/security.py:231
+#: settings/serializers/security.py:228
 msgid "If idle time more than it, disconnect connection."
 msgstr ""
 "Sugerencia: si no se realizan operaciones durante más de esta configuración, "
 "la conexión se desconectará"
 
-#: settings/serializers/security.py:234
+#: settings/serializers/security.py:231
 msgid "Session expire at browser closed"
 msgstr "La sesión expira al cerrar el navegador"
 
-#: settings/serializers/security.py:235
+#: settings/serializers/security.py:232
 msgid "Whether to expire the session when the user closes their browser."
 msgstr ""
 "Determina si la sesión debe expirar cuando el usuario cierra el navegador."
 
-#: settings/serializers/security.py:240
+#: settings/serializers/security.py:237
 msgid "Allow users to view asset session information"
 msgstr ""
 "Permitir a los usuarios ver la información de sesión en línea de activos"
 
-#: settings/serializers/security.py:242
+#: settings/serializers/security.py:239
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
@@ -8368,40 +8363,40 @@ msgstr ""
 "línea del activo actual en la ventana de selección de cuenta (solo protocolo "
 "RDP)"
 
-#: settings/serializers/security.py:248
+#: settings/serializers/security.py:245
 msgid "Max online time (hour)"
 msgstr "Tiempo máximo de conexión a la sesión (horas)"
 
-#: settings/serializers/security.py:249
+#: settings/serializers/security.py:246
 msgid "If session connection time more than it, disconnect connection."
 msgstr ""
 "Nota: Si la conexión a la sesión supera esta configuración, la conexión se "
 "desconectará"
 
-#: settings/serializers/security.py:252
+#: settings/serializers/security.py:249
 msgid "Remember manual auth"
 msgstr "Guardar la contraseña ingresada manualmente"
 
-#: settings/serializers/security.py:255
+#: settings/serializers/security.py:252
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "Compartir sesión"
 
-#: settings/serializers/security.py:256
+#: settings/serializers/security.py:253
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr ""
 "Al activarse, permite a los usuarios compartir la sesión de activos "
 "conectados con otros, para trabajar en colaboración"
 
-#: settings/serializers/security.py:262
+#: settings/serializers/security.py:259
 msgid "Insecure command alert"
 msgstr "Alerta de comandos peligrosos"
 
-#: settings/serializers/security.py:265
+#: settings/serializers/security.py:262
 msgid "Email recipient"
 msgstr "Destinatario del correo"
 
-#: settings/serializers/security.py:266
+#: settings/serializers/security.py:263
 msgid "Multiple user using , split"
 msgstr "Múltiples usuarios, separados por ,"
 
@@ -12054,12 +12049,3 @@ msgstr "Importación de licencia exitosa"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Licencia no válida"
-
-#~ msgid "Auth success"
-#~ msgstr "Autenticación exitosa"
-
-#~ msgid "Redirecting to JumpServer Client"
-#~ msgstr "Redirigiendo al cliente de JumpServer"
-
-#~ msgid "Share (SSH)"
-#~ msgstr "Compartir (SSH)"

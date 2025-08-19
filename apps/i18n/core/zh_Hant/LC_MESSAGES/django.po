@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-18 19:03+0800\n"
+"POT-Creation-Date: 2025-08-19 15:01+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1338,12 +1338,12 @@ msgid "Password length"
 msgstr "密碼長度"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:52
+#: settings/serializers/security.py:51
 msgid "Lowercase"
 msgstr "小寫字母"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:49
+#: settings/serializers/security.py:48
 msgid "Uppercase"
 msgstr "大寫字母"
 
@@ -2348,7 +2348,7 @@ msgid "Any"
 msgstr "任意"
 
 #: assets/const/protocol.py:88 rbac/tree.py:65
-#: settings/serializers/security.py:275
+#: settings/serializers/security.py:272
 msgid "Security"
 msgstr "安全"
 
@@ -5333,7 +5333,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "標籤管理"
 
-#: labels/models.py:15 settings/serializers/security.py:214
+#: labels/models.py:15 settings/serializers/security.py:211
 msgid "Color"
 msgstr "顏色"
 
@@ -7535,11 +7535,11 @@ msgstr ""
 "放置單獨授權的資產到未分組節點, 避免能看到資產所在節點，但該節點未被授權的問"
 "題"
 
-#: settings/serializers/security.py:20
+#: settings/serializers/security.py:19
 msgid "User password expiration (day)"
 msgstr "用戶密碼過期時間 (天)"
 
-#: settings/serializers/security.py:22
+#: settings/serializers/security.py:21
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
@@ -7548,79 +7548,79 @@ msgstr ""
 "如果用戶在此期間沒有更新密碼，用戶密碼將過期失效； 密碼過期提醒郵件將在密碼過"
 "期前5天內由系統 (每天)自動發送給用戶"
 
-#: settings/serializers/security.py:29
+#: settings/serializers/security.py:28
 msgid "User expired tokens record keep days"
 msgstr "用戶過期 Token 保留天數"
 
-#: settings/serializers/security.py:30
+#: settings/serializers/security.py:29
 msgid ""
 "Retention period (in days) for expired user tokens before automatic cleanup."
 msgstr ""
 "系統在每日清理任務中永久刪除用戶過期 token 記錄之前，保留這些記錄的天數"
 
-#: settings/serializers/security.py:34
+#: settings/serializers/security.py:33
 msgid "Recent password count"
 msgstr "不能設定近幾次密碼"
 
-#: settings/serializers/security.py:36
+#: settings/serializers/security.py:35
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
 msgstr "提示：用戶重設密碼時，不能為該用戶前幾次使用過的密碼"
 
-#: settings/serializers/security.py:42
+#: settings/serializers/security.py:41
 msgid "Minimum length (User)"
 msgstr "密碼最小長度"
 
-#: settings/serializers/security.py:46
+#: settings/serializers/security.py:45
 msgid "Minimum length (Admin)"
 msgstr "管理員密碼最小長度"
 
-#: settings/serializers/security.py:55
+#: settings/serializers/security.py:54
 msgid "Digits"
 msgstr "必須包含數字"
 
-#: settings/serializers/security.py:58
+#: settings/serializers/security.py:57
 msgid "Special characters"
 msgstr "必須包含特殊字符"
 
-#: settings/serializers/security.py:63
+#: settings/serializers/security.py:62
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
 msgstr "當用戶登錄失敗次數達到限制後，那麼在此間隔內禁止登錄"
 
-#: settings/serializers/security.py:71 settings/serializers/security.py:81
+#: settings/serializers/security.py:70 settings/serializers/security.py:80
 msgid "Login failures count"
 msgstr "限制使用者登入失敗次數"
 
-#: settings/serializers/security.py:75 settings/serializers/security.py:85
+#: settings/serializers/security.py:74 settings/serializers/security.py:84
 msgid "Login failure period (minute)"
 msgstr "禁止使用者登入間隔 (分)"
 
-#: settings/serializers/security.py:89
+#: settings/serializers/security.py:88
 msgid "Login IP whitelist"
 msgstr "IP 登入白名單"
 
-#: settings/serializers/security.py:94
+#: settings/serializers/security.py:93
 msgid "Login IP blacklist"
 msgstr "IP 登入黑名單"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:98
 msgid "Only single device login"
 msgstr "僅一台設備登錄"
 
-#: settings/serializers/security.py:100
+#: settings/serializers/security.py:99
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
 msgstr "用戶在新設備登錄後，其他已登錄的設備會自動退出"
 
-#: settings/serializers/security.py:103
+#: settings/serializers/security.py:102
 msgid "Only exist user login"
 msgstr "僅已存在用戶登錄"
 
-#: settings/serializers/security.py:105
+#: settings/serializers/security.py:104
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -7630,11 +7630,11 @@ msgstr ""
 "如果開啟，不存在的用戶將不被允許登錄；如果關閉，除本地認證方式外，其他認證方"
 "式的用戶都允許登錄並自動創建用戶 (如果用戶不存在)"
 
-#: settings/serializers/security.py:111
+#: settings/serializers/security.py:110
 msgid "Only from source login"
 msgstr "僅從用戶來源登錄"
 
-#: settings/serializers/security.py:113
+#: settings/serializers/security.py:112
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging "
 "in; if it is disabled, the user will authenticate all the enabled "
@@ -7644,79 +7644,74 @@ msgstr ""
 "如果開啟，用戶登錄時僅會向來源端進行認證；如果關閉，用戶登錄時會按照一定的順"
 "序對所有已開啟的認證方式進行順序認證，只要有一個認證成功就可以直接登錄"
 
-#: settings/serializers/security.py:122
-#, python-format
-msgid "The third-party login modes include %s"
-msgstr "第三方登入方式包括：%s"
-
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:123
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "未啟用"
 
-#: settings/serializers/security.py:126
+#: settings/serializers/security.py:124
 msgid "All users"
 msgstr "所有用戶"
 
-#: settings/serializers/security.py:127
+#: settings/serializers/security.py:125
 msgid "Only admin users"
 msgstr "僅管理員"
 
-#: settings/serializers/security.py:129
+#: settings/serializers/security.py:127
 msgid "Global MFA"
 msgstr "全局啟用 MFA 認證"
 
-#: settings/serializers/security.py:133
+#: settings/serializers/security.py:131
 msgid "Third-party login MFA"
 msgstr "第三方認證開啟 MFA"
 
-#: settings/serializers/security.py:138
+#: settings/serializers/security.py:135
 msgid "MFA via Email"
 msgstr "郵件驗證 MFA"
 
-#: settings/serializers/security.py:139
+#: settings/serializers/security.py:136
 msgid "Email as a method for multi-factor authentication"
 msgstr "將電子郵件作為多因素認證的一種方式"
 
-#: settings/serializers/security.py:142
+#: settings/serializers/security.py:139
 msgid "OTP issuer name"
 msgstr "OTP 掃描後的名稱"
 
-#: settings/serializers/security.py:146
+#: settings/serializers/security.py:143
 msgid "OTP valid window"
 msgstr "OTP 延遲有效次數"
 
-#: settings/serializers/security.py:150
+#: settings/serializers/security.py:147
 msgid "MFA verify TTL"
 msgstr "MFA 校驗有效期"
 
-#: settings/serializers/security.py:152
+#: settings/serializers/security.py:149
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
 msgstr "單位：秒，目前僅在查看帳號密碼校驗 MFA 時生效"
 
-#: settings/serializers/security.py:157
+#: settings/serializers/security.py:154
 msgid "MFA in login page"
 msgstr "MFA 在登入頁面輸入"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:155
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "歐盟數據安全法規(GDPR) 要求 MFA 在登入頁面，來確保系統登錄安全"
 
-#: settings/serializers/security.py:162
+#: settings/serializers/security.py:159
 msgid "Verify code TTL (second)"
 msgstr "驗證碼有效時間 (分)"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:160
 msgid "Reset password and send SMS code expiration time"
 msgstr "重設密碼的驗證碼及發送簡訊的驗證碼過期時間"
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:164
 msgid "Login dynamic code"
 msgstr "啟用登入附加碼"
 
-#: settings/serializers/security.py:168
+#: settings/serializers/security.py:165
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -7724,19 +7719,19 @@ msgstr ""
 "密碼和附加碼一併發送給第三方認證系統進行校驗, 如：有的第三方認證系統，需要 密"
 "碼+6位數字 完成認證"
 
-#: settings/serializers/security.py:172
+#: settings/serializers/security.py:169
 msgid "Login captcha"
 msgstr "啟用登入驗證碼"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:170
 msgid "Enable captcha to prevent robot authentication"
 msgstr "開啟驗證碼，防止機器人登錄"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:173
 msgid "Suspicious Login Verification"
 msgstr "異地登入通知"
 
-#: settings/serializers/security.py:178
+#: settings/serializers/security.py:175
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
@@ -7745,101 +7740,101 @@ msgstr ""
 "根據登錄 IP 是否所屬常用登錄城市進行判斷，若帳號在非常用城市登錄，會發送異地"
 "登錄提醒"
 
-#: settings/serializers/security.py:184
+#: settings/serializers/security.py:181
 msgid "Auto Disable Threshold (day)"
 msgstr "不活躍用戶自動禁用 (天)"
 
-#: settings/serializers/security.py:185
+#: settings/serializers/security.py:182
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
 msgstr "每天檢測一次，超過預設時間的用戶自動禁用"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:202
 msgid "Watermark"
 msgstr "開啟浮水印"
 
-#: settings/serializers/security.py:208
+#: settings/serializers/security.py:205
 msgid "Watermark session content"
 msgstr "會話水印自訂內容"
 
-#: settings/serializers/security.py:211
+#: settings/serializers/security.py:208
 msgid "Watermark console content"
 msgstr "管理頁面水印自訂內容"
 
-#: settings/serializers/security.py:217
+#: settings/serializers/security.py:214
 msgid "Watermark font size"
 msgstr "字體字號"
 
-#: settings/serializers/security.py:220
+#: settings/serializers/security.py:217
 msgid "Watermark height"
 msgstr "單個水印高度"
 
-#: settings/serializers/security.py:223
+#: settings/serializers/security.py:220
 msgid "Watermark width"
 msgstr "單個水印寬度"
 
-#: settings/serializers/security.py:226
+#: settings/serializers/security.py:223
 msgid "Watermark rotate"
 msgstr "水印旋轉角度"
 
-#: settings/serializers/security.py:230
+#: settings/serializers/security.py:227
 msgid "Max idle time (minute)"
 msgstr "連接最大空閒時間 (分)"
 
-#: settings/serializers/security.py:231
+#: settings/serializers/security.py:228
 msgid "If idle time more than it, disconnect connection."
 msgstr "提示：如果超過該配置沒有操作，連接會被斷開"
 
-#: settings/serializers/security.py:234
+#: settings/serializers/security.py:231
 msgid "Session expire at browser closed"
 msgstr "會話在瀏覽器關閉時過期"
 
-#: settings/serializers/security.py:235
+#: settings/serializers/security.py:232
 msgid "Whether to expire the session when the user closes their browser."
 msgstr "當用戶關閉瀏覽器時是否使會話過期。"
 
-#: settings/serializers/security.py:240
+#: settings/serializers/security.py:237
 msgid "Allow users to view asset session information"
 msgstr "允許用戶查看資產在線會話資訊"
 
-#: settings/serializers/security.py:242
+#: settings/serializers/security.py:239
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
 msgstr ""
 "當用戶連接資產時，帳號選擇彈窗中顯示當前資產的在線會話數量（僅 rdp 協議）"
 
-#: settings/serializers/security.py:248
+#: settings/serializers/security.py:245
 msgid "Max online time (hour)"
 msgstr "會話連接最大時間 (時)"
 
-#: settings/serializers/security.py:249
+#: settings/serializers/security.py:246
 msgid "If session connection time more than it, disconnect connection."
 msgstr "提示：如果會話連接超過該配置，連接會被斷開"
 
-#: settings/serializers/security.py:252
+#: settings/serializers/security.py:249
 msgid "Remember manual auth"
 msgstr "保存手動輸入密碼"
 
-#: settings/serializers/security.py:255
+#: settings/serializers/security.py:252
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "會話分享"
 
-#: settings/serializers/security.py:256
+#: settings/serializers/security.py:253
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "開啟後允許用戶分享已連接的資產會話給他人，協同工作"
 
-#: settings/serializers/security.py:262
+#: settings/serializers/security.py:259
 msgid "Insecure command alert"
 msgstr "危險命令告警"
 
-#: settings/serializers/security.py:265
+#: settings/serializers/security.py:262
 msgid "Email recipient"
 msgstr "郵件收件人"
 
-#: settings/serializers/security.py:266
+#: settings/serializers/security.py:263
 msgid "Multiple user using , split"
 msgstr "多個用戶，使用 , 分割"
 
@@ -11323,12 +11318,3 @@ msgstr "許可證匯入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "許可證無效"
-
-#~ msgid "Auth success"
-#~ msgstr "認證成功"
-
-#~ msgid "Redirecting to JumpServer Client"
-#~ msgstr "重新導向到 JumpServer 客戶端"
-
-#~ msgid "Share (SSH)"
-#~ msgstr "分享 (SSH)"
