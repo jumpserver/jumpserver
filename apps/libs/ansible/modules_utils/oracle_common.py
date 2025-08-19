@@ -65,11 +65,11 @@ class OracleClient(object):
                 )
         return self._cursor
 
-    def execute(self, sql, exception_to_fail=False):
+    def execute(self, sql, params=None, exception_to_fail=False):
         sql = sql[:-1] if sql.endswith(';') else sql
         result, error = None, None
         try:
-            self.cursor.execute(sql)
+            self.cursor.execute(sql, params)
             sql_header = self.cursor.description or []
             column_names = [description[0].lower() for description in sql_header]
             if column_names:
@@ -82,6 +82,11 @@ class OracleClient(object):
         if exception_to_fail and error:
             self.module.fail_json(msg='Cannot execute sql: %s' % to_native(error))
         return result, error
+
+    def commit(self):
+        if self._conn is None:
+            raise DatabaseError('Cannot connect to database')
+        self._conn.commit()
 
     def close(self):
         try:
