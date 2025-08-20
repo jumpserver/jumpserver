@@ -110,6 +110,13 @@ class RoleBinding(JMSBaseModel):
     def is_scope_org(self):
         return self.scope == Scope.org
 
+    @classmethod
+    def is_org_admin(cls, user):
+        from rbac.builtin import BuiltinRole
+        return cls.objects_raw.filter(
+            role_id=BuiltinRole.org_admin.id, user_id=user.id
+        ).exists()
+
     @staticmethod
     def orgs_order_by_name(orgs):
         from orgs.models import Organization
