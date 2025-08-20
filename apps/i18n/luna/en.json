@@ -89,7 +89,6 @@
     "ExpiredTime": "Expire time",
     "Face online required": "This login requires face verification and monitoring. Do you want to continue?",
     "Face verify": "Face verify",
-    "Please complete the face verification": "Please complete the face verification",
     "Face verify required": "This login requires face verification. Do you want to continue?",
     "Face verify success": "Face verify success",
     "Failed to open address": "Failed to Open Address",
@@ -168,6 +167,7 @@
     "Pause task has been send": "Pause task has been send",
     "Play List": "Play List",
     "Please choose an account": "Please choose an account",
+    "Please complete the face verification": "Please complete the face verification",
     "Please input password": "Please input password",
     "PleaseEnterYourUsername": "Please enter your username",
     "Port": "Port",
@@ -281,9 +281,9 @@
     "download": "Download",
     "recordingIsBeingDownloaded": "Recording is being downloaded, please wait.",
     "rows": "Rows",
+    "scriptLibrary": "Script Library",
     "start time": "Start time",
     "success": "Success",
     "system user": "System user",
-    "user": "User",
-    "scriptLibrary": "Script Library"
+    "user": "User"
 }
