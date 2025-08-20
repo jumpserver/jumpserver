@@ -529,6 +529,7 @@
     "DuplicateFileExists": "Uploading a file with the same name is not allowed, please delete the file with the same name",
     "Duration": "Duration",
     "DynamicUsername": "Dynamic username",
+    "EMailReport": "Email Report",
     "Edit": "Edit",
     "EditRecipient": "Edit recipient",
     "EditSecret": "Edit secret",
@@ -587,6 +588,7 @@
     "Expired": "Expired",
     "Export": "Export",
     "ExportAll": "Export all",
+    "ExportAsPDF": "Export as PDF",
     "ExportOnlyFiltered": "Export filtered items",
     "ExportOnlySelectedItems": "Export selected items",
     "ExportRange": "Export range",
@@ -1605,7 +1607,5 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name",
-    "ExportAsPDF": "Export as PDF",
-    "EMailReport": "Email Report"
+    "userName": "User name"
 }
