@@ -141,7 +141,7 @@ class SendMailView(View):
 
         # 4. 发送邮件
         subject = f"{title} 报表"
-        from_email = settings.EMAIL_FROM
+        from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
         to = [email]
         msg = EmailMultiAlternatives(subject, '', from_email, to)
         msg.attach_alternative(html_content, "text/html")
