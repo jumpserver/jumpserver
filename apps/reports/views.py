@@ -57,8 +57,9 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
     print("Url: ", url)
 
     with sync_playwright() as p:
+        lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1000, "height": 800})
+        context = browser.new_context(viewport={"width": 1000, "height": 800}, locale=lang)
         # 设置 sessionid cookie
         parsed_url = urlparse(url)
         context.add_cookies([
@@ -74,6 +75,8 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         page = context.new_page()
         try:
             page.goto(url, wait_until='networkidle')
+            page_title = page.title()
+            print(f"Page title: {page_title}")
             pdf_bytes = page.pdf(format="A4", landscape=True,
                                  margin={"top": "35px", "bottom": "30px", "left": "20px", "right": "20px"})
         except Exception as e:
@@ -81,7 +84,7 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
             pdf_bytes = None
         finally:
             browser.close()
-        return pdf_bytes, chart_info['title']
+        return pdf_bytes, page_title
 
 
 @method_decorator(csrf_exempt, name='dispatch')
