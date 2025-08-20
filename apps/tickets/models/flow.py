@@ -31,9 +31,10 @@ class ApprovalRule(JMSBaseModel):
     def get_assignees(self, org_id=None):
         org = Organization.get_instance(org_id, default=current_org)
         user_qs = User.get_org_users(org=org)
-        query = RelatedManager.get_to_filter_qs(self.users.value, user_qs.model)
-        assignees = user_qs.filter(*query).distinct()
-        return assignees
+        with tmp_to_org(org):
+            query = RelatedManager.get_to_filter_qs(self.users.value, user_qs.model)
+            assignees = user_qs.filter(*query).distinct()
+            return assignees
 
 
 class TicketFlow(JMSBaseModel, OrgModelMixin):
