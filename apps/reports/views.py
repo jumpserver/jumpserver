@@ -44,6 +44,7 @@ charts_map = {
 
 def export_chart_to_pdf(chart_name, sessionid, request=None):
     chart_info = charts_map.get(chart_name)
+
     if not chart_info:
         return None, None
 
@@ -51,9 +52,10 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         url = request.build_absolute_uri(urllib.parse.unquote(chart_info['path']))
     else:
         url = urllib.parse.unquote(chart_info['path'])
-
     if settings.DEBUG_DEV:
         url = url.replace(":8080", ":9528")
+    days = request.GET.get('days', 7)
+    url = url + f"?days={days}"
     print("Url: ", url)
 
     with sync_playwright() as p:
