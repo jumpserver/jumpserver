@@ -34,11 +34,27 @@ charts_map = {
     },
     "AccountStatistics": {
         "title": _('Account statistics report'),
-        "path": "/ui/#/reports/accounts/account-statistics"
+        "path": "/ui/#/reports/accounts/account-statistics?days=30"
     },
     "AccountAutomationReport": {
         "title": _('Account automation report'),
         "path": "/ui/#/reports/accounts/account-automation"
+    },
+    "ConsoleDashboard": {
+        "title": _('ConsoleDashboard'),
+        "path": "/ui/#/reports/dashboard/console"
+    },
+    "AuditsDashboard": {
+        "title": _('AuditsDashboard'),
+        "path": "/ui/#/reports/dashboard/audits"
+    },
+    "PamDashboard": {
+        "title": _('PamDashboard'),
+        "path": "/ui/#/reports/dashboard/pam"
+    },
+    "ChangeSecretDashboard": {
+        "title": _('ChangeSecretDashboard'),
+        "path": "/ui/#/reports/dashboard/change-secret"
     }
 }
 
@@ -57,7 +73,6 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         url = url.replace(":8080", ":9528")
     days = request.GET.get('days', 7)
     url = url + f"?days={days}"
-    print("Url: ", url)
 
     with sync_playwright() as p:
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
