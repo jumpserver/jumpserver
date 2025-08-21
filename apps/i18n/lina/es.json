@@ -528,7 +528,7 @@
     "DuplicateFileExists": "No se permite cargar archivos con el mismo nombre, por favor elimine los archivos duplicados",
     "Duration": "Duración",
     "DynamicUsername": "Nombre de usuario dinámico",
-    "EMailReport": "Enviar informe por correo electrónico",
+    "EMailReport": "Enviar correo electrónico.",
     "Edit": "editar",
     "EditRecipient": "Editar receptor",
     "EditSecret": "Editar texto cifrado",

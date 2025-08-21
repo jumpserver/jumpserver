@@ -528,7 +528,7 @@
     "DuplicateFileExists": "不允许上传同名文件,请删除同名文件",
     "Duration": "时长",
     "DynamicUsername": "动态用户名",
-    "EMailReport": "发送邮件报告",
+    "EMailReport": "发送邮件",
     "Edit": "编辑",
     "EditRecipient": "编辑接收人",
     "EditSecret": "编辑密文",

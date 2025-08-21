@@ -529,7 +529,7 @@
     "DuplicateFileExists": "Uploading a file with the same name is not allowed, please delete the file with the same name",
     "Duration": "Duration",
     "DynamicUsername": "Dynamic username",
-    "EMailReport": "Email Report",
+    "EMailReport": "Send email",
     "Edit": "Edit",
     "EditRecipient": "Edit recipient",
     "EditSecret": "Edit secret",

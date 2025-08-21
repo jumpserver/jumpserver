@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 18:45+0800\n"
+"POT-Creation-Date: 2025-08-21 11:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4085,7 +4085,7 @@ msgstr "가상 MFA 인증 코드"
 msgid "Virtual OTP based MFA"
 msgstr "가상 MFA(일회용 패스워드)"
 
-#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+#: authentication/mfa/passkey.py:44 authentication/mfa/passkey.py:48
 msgid "Using passkey as MFA"
 msgstr "MFA로 Passkey 사용하기"
 
@@ -6296,21 +6296,21 @@ msgstr "조직 역할"
 msgid "Role binding"
 msgstr "역할 바인딩"
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:168
 msgid "All organizations"
 msgstr "모든 조직"
 
-#: rbac/models/rolebinding.py:193
+#: rbac/models/rolebinding.py:200
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "사용자의 마지막 역할은 삭제할 수 없으며, 사용자를 조직에서 제거할 수 있습니다"
 
-#: rbac/models/rolebinding.py:200
+#: rbac/models/rolebinding.py:207
 msgid "Organization role binding"
 msgstr "조직 역할 바인딩"
 
-#: rbac/models/rolebinding.py:215
+#: rbac/models/rolebinding.py:222
 msgid "System role binding"
 msgstr "시스템 역할 바인딩"
 
@@ -6413,6 +6413,30 @@ msgstr "일반 설정"
 #: rbac/tree.py:177
 msgid "View permission tree"
 msgstr "권한 트리 보기"
+
+#: reports/views.py:20
+msgid "User login report"
+msgstr "사용자 로그인 보고서"
+
+#: reports/views.py:24
+msgid "User change password report"
+msgstr "사용자 비밀번호 변경 보고서"
+
+#: reports/views.py:28
+msgid "Asset statistics report"
+msgstr "자산 통계 보고서"
+
+#: reports/views.py:32
+msgid "Asset activity report"
+msgstr "자산 활동 보고서"
+
+#: reports/views.py:36
+msgid "Account statistics report"
+msgstr "계정 통계 보고서"
+
+#: reports/views.py:40
+msgid "Account automation report"
+msgstr "계정 자동화 보고서"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -7438,17 +7462,17 @@ msgstr "메일 서버에 로그인할 때 사용할 사용자 이름. 일반적�
 
 #: settings/serializers/msg.py:38
 msgid ""
-"Password to use for the email server. It is used in conjunction with `User` "
-"when authenticating to the email server"
-msgstr "메일 서버에 로그인할 때 사용할 비밀번호"
+"Password to use for the email server. It is used in conjunction with "
+"`Account` when authenticating to the email server"
+msgstr "전자 메일 서버에 사용되는 비밀번호입니다. 전자 메일 서버에 인증할 때 `계정`과 함께 사용됩니다."
 
 #: settings/serializers/msg.py:41
 msgid "Sender"
 msgstr "발신자"
 
 #: settings/serializers/msg.py:42
-msgid "Sender email address (default to using the `User`)"
-msgstr "발신자 이메일 주소(기본적으로 '사용자' 사용)"
+msgid "Sender email address (default to using the `Account`)"
+msgstr "발신자 전자 메일 주소(기본적으로 `계정`이 사용됩니다)."
 
 #: settings/serializers/msg.py:46
 msgid "The recipient is used for testing the email server's connectivity"

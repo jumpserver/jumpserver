@@ -529,7 +529,7 @@
     "DuplicateFileExists": "Não é permitido fazer upload de arquivos com o mesmo nome, por favor exclua o arquivo de mesmo nome",
     "Duration": "Duração",
     "DynamicUsername": "Nome de usuário dinâmico",
-    "EMailReport": "Enviar relatório por e-mail",
+    "EMailReport": "Enviar e-mail",
     "Edit": "Editar",
     "EditRecipient": "Editar receptor",
     "EditSecret": " Editar texto oculto ",

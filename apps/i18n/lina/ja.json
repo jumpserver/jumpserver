@@ -533,7 +533,7 @@
     "DuplicateFileExists": "同名のファイルのアップロードは許可されていません、同名のファイルを削除してください",
     "Duration": "時間",
     "DynamicUsername": "ダイナミックユーザー名",
-    "EMailReport": "メールを送信する報告",
+    "EMailReport": "メールを送信する",
     "Edit": "編集",
     "EditRecipient": "受取人の編集",
     "EditSecret": "暗号文編集",
