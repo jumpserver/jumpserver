@@ -87,7 +87,7 @@ ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 # for host in ALLOWED_DOMAINS:
 #     print('  - ' + host.lstrip('.'))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = []
