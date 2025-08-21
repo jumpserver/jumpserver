@@ -349,7 +349,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
         for protocol, config in cls.settings().items():
             if not xpack_enabled and config.get('xpack', False):
                 continue
-            protocols.append(protocol)
+            protocols.append({'label': protocol.label, 'value': protocol.value})
 
         from assets.models.platform import PlatformProtocol
         custom_protocols = (
