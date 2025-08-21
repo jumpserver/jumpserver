@@ -1617,5 +1617,9 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "ConsoleDashboard": "控制台仪表盘",
+    "AuditsDashboard": "审计台仪表盘",
+    "PamDashboard": "特权账号仪表盘",
+    "ChangeSecretDashboard": "账号改密仪表盘"
 }
