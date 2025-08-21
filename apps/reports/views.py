@@ -72,7 +72,9 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
     if settings.DEBUG_DEV:
         url = url.replace(":8080", ":9528")
     days = request.GET.get('days', 7)
-    url = url + f"?days={days}"
+    oid = request.COOKIES.get("X-JMS-ORG")
+    days = request.GET.get('days', 7)
+    url = url + f"?days={days}&oid={oid}"
 
     with sync_playwright() as p:
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
@@ -93,6 +95,7 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         page = context.new_page()
         try:
             page.goto(url, wait_until='networkidle')
+            page.wait_for_selector('.charts-zone', timeout=10000)
             page_title = page.title()
             print(f"Page title: {page_title}")
             pdf_bytes = page.pdf(format="A4", landscape=True,
