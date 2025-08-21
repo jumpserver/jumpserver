@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 18:45+0800\n"
+"POT-Creation-Date: 2025-08-21 11:01+0800\n"
 "PO-Revision-Date: 2025-06-11 11:51+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4209,7 +4209,7 @@ msgstr "Код подтверждения OTP"
 msgid "Virtual OTP based MFA"
 msgstr "Виртуальный МФА (OTP)"
 
-#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+#: authentication/mfa/passkey.py:44 authentication/mfa/passkey.py:48
 msgid "Using passkey as MFA"
 msgstr "Использовать Passkey как МФА"
 
@@ -6478,11 +6478,11 @@ msgstr "Организационная роль"
 msgid "Role binding"
 msgstr "Привязка ролей"
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:168
 msgid "All organizations"
 msgstr "Все организации"
 
-#: rbac/models/rolebinding.py:193
+#: rbac/models/rolebinding.py:200
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
@@ -6490,11 +6490,11 @@ msgstr ""
 "Последняя роль пользователя не может быть удалена. Вы можете удалить "
 "пользователя из организации."
 
-#: rbac/models/rolebinding.py:200
+#: rbac/models/rolebinding.py:207
 msgid "Organization role binding"
 msgstr "Привязка организационной роли"
 
-#: rbac/models/rolebinding.py:215
+#: rbac/models/rolebinding.py:222
 msgid "System role binding"
 msgstr "Привязка системной роли"
 
@@ -6597,6 +6597,30 @@ msgstr "Общие настройки"
 #: rbac/tree.py:177
 msgid "View permission tree"
 msgstr "Просмотр дерева разрешений"
+
+#: reports/views.py:20
+msgid "User login report"
+msgstr "Отчет о входе пользователя"
+
+#: reports/views.py:24
+msgid "User change password report"
+msgstr "Отчет о смене пароля пользователя"
+
+#: reports/views.py:28
+msgid "Asset statistics report"
+msgstr "Отчет о статистике активов"
+
+#: reports/views.py:32
+msgid "Asset activity report"
+msgstr "Отчет о действиях с активами"
+
+#: reports/views.py:36
+msgid "Account statistics report"
+msgstr "Отчет о статистике аккаунтов"
+
+#: reports/views.py:40
+msgid "Account automation report"
+msgstr "Автоматизированный отчет по аккаунтам"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -7678,19 +7702,20 @@ msgstr "Имя пользователя для входа на почтовый 
 
 #: settings/serializers/msg.py:38
 msgid ""
-"Password to use for the email server. It is used in conjunction with `User` "
-"when authenticating to the email server"
-msgstr "Пароль для входа на почтовый сервер"
+"Password to use for the email server. It is used in conjunction with "
+"`Account` when authenticating to the email server"
+msgstr ""
+"Пароль для почтового сервера. Он используется вместе с `аккаунтом` для "
+"аутентификации на почтовом сервере"
 
 #: settings/serializers/msg.py:41
 msgid "Sender"
 msgstr "Отправитель"
 
 #: settings/serializers/msg.py:42
-msgid "Sender email address (default to using the `User`)"
+msgid "Sender email address (default to using the `Account`)"
 msgstr ""
-"Адрес электронной почты отправителя (по умолчанию используется `Учетная "
-"запись`)"
+"адрес электронной почты отправителя (по умолчанию используется `аккаунт`)."
 
 #: settings/serializers/msg.py:46
 msgid "The recipient is used for testing the email server's connectivity"

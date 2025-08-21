@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 18:45+0800\n"
+"POT-Creation-Date: 2025-08-21 11:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4043,7 +4043,7 @@ msgstr ""
 msgid "Virtual OTP based MFA"
 msgstr ""
 
-#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+#: authentication/mfa/passkey.py:44 authentication/mfa/passkey.py:48
 msgid "Using passkey as MFA"
 msgstr ""
 
@@ -6212,21 +6212,21 @@ msgstr ""
 msgid "Role binding"
 msgstr ""
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:168
 msgid "All organizations"
 msgstr ""
 
-#: rbac/models/rolebinding.py:193
+#: rbac/models/rolebinding.py:200
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 
-#: rbac/models/rolebinding.py:200
+#: rbac/models/rolebinding.py:207
 msgid "Organization role binding"
 msgstr ""
 
-#: rbac/models/rolebinding.py:215
+#: rbac/models/rolebinding.py:222
 msgid "System role binding"
 msgstr ""
 
@@ -6328,6 +6328,30 @@ msgstr ""
 
 #: rbac/tree.py:177
 msgid "View permission tree"
+msgstr ""
+
+#: reports/views.py:20
+msgid "User login report"
+msgstr ""
+
+#: reports/views.py:24
+msgid "User change password report"
+msgstr ""
+
+#: reports/views.py:28
+msgid "Asset statistics report"
+msgstr ""
+
+#: reports/views.py:32
+msgid "Asset activity report"
+msgstr ""
+
+#: reports/views.py:36
+msgid "Account statistics report"
+msgstr ""
+
+#: reports/views.py:40
+msgid "Account automation report"
 msgstr ""
 
 #: settings/api/chat.py:41
@@ -7309,8 +7333,8 @@ msgstr ""
 
 #: settings/serializers/msg.py:38
 msgid ""
-"Password to use for the email server. It is used in conjunction with `User` "
-"when authenticating to the email server"
+"Password to use for the email server. It is used in conjunction with "
+"`Account` when authenticating to the email server"
 msgstr ""
 
 #: settings/serializers/msg.py:41
@@ -7318,7 +7342,7 @@ msgid "Sender"
 msgstr ""
 
 #: settings/serializers/msg.py:42
-msgid "Sender email address (default to using the `User`)"
+msgid "Sender email address (default to using the `Account`)"
 msgstr ""
 
 #: settings/serializers/msg.py:46

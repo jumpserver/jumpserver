@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 18:45+0800\n"
+"POT-Creation-Date: 2025-08-21 11:01+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4112,7 +4112,7 @@ msgstr "虚拟 MFA 验证码"
 msgid "Virtual OTP based MFA"
 msgstr "虚拟 MFA(OTP)"
 
-#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+#: authentication/mfa/passkey.py:44 authentication/mfa/passkey.py:48
 msgid "Using passkey as MFA"
 msgstr "使用 Passkey 作为 MFA"
 
@@ -6315,21 +6315,21 @@ msgstr "组织角色"
 msgid "Role binding"
 msgstr "角色绑定"
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:168
 msgid "All organizations"
 msgstr "所有组织"
 
-#: rbac/models/rolebinding.py:193
+#: rbac/models/rolebinding.py:200
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr "用户最后一个角色，不能删除，你可以将用户从组织移除"
 
-#: rbac/models/rolebinding.py:200
+#: rbac/models/rolebinding.py:207
 msgid "Organization role binding"
 msgstr "组织角色绑定"
 
-#: rbac/models/rolebinding.py:215
+#: rbac/models/rolebinding.py:222
 msgid "System role binding"
 msgstr "系统角色绑定"
 
@@ -6432,6 +6432,30 @@ msgstr "一般设置"
 #: rbac/tree.py:177
 msgid "View permission tree"
 msgstr "查看授权树"
+
+#: reports/views.py:20
+msgid "User login report"
+msgstr "用户登录报告"
+
+#: reports/views.py:24
+msgid "User change password report"
+msgstr "用户改密报告"
+
+#: reports/views.py:28
+msgid "Asset statistics report"
+msgstr "资产统计报告"
+
+#: reports/views.py:32
+msgid "Asset activity report"
+msgstr "资产活动报告"
+
+#: reports/views.py:36
+msgid "Account statistics report"
+msgstr "账号统计报告"
+
+#: reports/views.py:40
+msgid "Account automation report"
+msgstr "账号自动化报告"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -7449,17 +7473,17 @@ msgstr "登录到邮件服务器的用户名。这通常是你的邮件地址"
 
 #: settings/serializers/msg.py:38
 msgid ""
-"Password to use for the email server. It is used in conjunction with `User` "
-"when authenticating to the email server"
-msgstr "登录到邮件服务器的密码"
+"Password to use for the email server. It is used in conjunction with "
+"`Account` when authenticating to the email server"
+msgstr "用于电子邮件服务器的密码。在向电子邮件服务器进行身份验证时，它与`账号`一起使用"
 
 #: settings/serializers/msg.py:41
 msgid "Sender"
 msgstr "发件人"
 
 #: settings/serializers/msg.py:42
-msgid "Sender email address (default to using the `User`)"
-msgstr "发件人电子邮件地址（默认使用`用户`）"
+msgid "Sender email address (default to using the `Account`)"
+msgstr "发件人电子邮件地址（默认使用`账号`）"
 
 #: settings/serializers/msg.py:46
 msgid "The recipient is used for testing the email server's connectivity"

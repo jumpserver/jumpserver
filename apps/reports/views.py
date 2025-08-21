@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from pdf2image import convert_from_bytes
@@ -16,27 +17,27 @@ from playwright.sync_api import sync_playwright
 
 charts_map = {
     "UserReport": {
-        "title": "用户登录报告",
+        "title": _('User login report'),
         "path": "/ui/#/reports/users/user-activity"
     },
     "ChangePassword": {
-        "title": "用户改密报告",
+        "title": _('User change password report'),
         "path": "/ui/#/reports/users/change-password"
     },
     "AssetStatistics": {
-        "title": "资产统计报告",
+        "title": _('Asset statistics report'),
         "path": "/ui/#/reports/assets/asset-statistics"
     },
     "AssetReport": {
-        "title": "资产活动报告",
+        "title": _('Asset activity report'),
         "path": "/ui/#/reports/assets/asset-activity"
     },
     "AccountStatistics": {
-        "title": "账号统计报告",
+        "title": _('Account statistics report'),
         "path": "/ui/#/reports/accounts/account-statistics"
     },
     "AccountAutomationReport": {
-        "title": "账号自动化报告",
+        "title": _('Account automation report'),
         "path": "/ui/#/reports/accounts/account-automation"
     }
 }

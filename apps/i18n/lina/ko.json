@@ -528,7 +528,7 @@
     "DuplicateFileExists": "동일 이름 파일 업로드를 허용하지 않습니다. 동일 이름 파일을 삭제해 주세요.",
     "Duration": "소요 시간",
     "DynamicUsername": "동적 사용자 이름",
-    "EMailReport": "이메일 보고서 전송",
+    "EMailReport": "메일 보내기",
     "Edit": "편집",
     "EditRecipient": "수신자 편집",
     "EditSecret": "암호 편집",

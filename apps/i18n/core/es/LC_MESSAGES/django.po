@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-19 18:45+0800\n"
+"POT-Creation-Date: 2025-08-21 11:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4286,7 +4286,7 @@ msgstr "Código de verificación MFA virtual"
 msgid "Virtual OTP based MFA"
 msgstr "Código MFA virtual (OTP)"
 
-#: authentication/mfa/passkey.py:42 authentication/mfa/passkey.py:46
+#: authentication/mfa/passkey.py:44 authentication/mfa/passkey.py:48
 msgid "Using passkey as MFA"
 msgstr "Usar Passkey como MFA."
 
@@ -6611,11 +6611,11 @@ msgstr "Rol de la organización"
 msgid "Role binding"
 msgstr "Vinculación de roles"
 
-#: rbac/models/rolebinding.py:161
+#: rbac/models/rolebinding.py:168
 msgid "All organizations"
 msgstr "Todas las organizaciones"
 
-#: rbac/models/rolebinding.py:193
+#: rbac/models/rolebinding.py:200
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
@@ -6623,11 +6623,11 @@ msgstr ""
 "El último rol del usuario no se puede eliminar, pero puedes quitar al "
 "usuario de la organización"
 
-#: rbac/models/rolebinding.py:200
+#: rbac/models/rolebinding.py:207
 msgid "Organization role binding"
 msgstr "Rol de organización vinculado"
 
-#: rbac/models/rolebinding.py:215
+#: rbac/models/rolebinding.py:222
 msgid "System role binding"
 msgstr "Rol del sistema vinculado"
 
@@ -6730,6 +6730,30 @@ msgstr "Configuración general"
 #: rbac/tree.py:177
 msgid "View permission tree"
 msgstr "Ver árbol de autorizaciones"
+
+#: reports/views.py:20
+msgid "User login report"
+msgstr "Informe de inicio de sesión de usuarios"
+
+#: reports/views.py:24
+msgid "User change password report"
+msgstr "Informe de cambio de contraseña de usuarios"
+
+#: reports/views.py:28
+msgid "Asset statistics report"
+msgstr "Informe de estadísticas de activos"
+
+#: reports/views.py:32
+msgid "Asset activity report"
+msgstr "Informe de actividades de activos"
+
+#: reports/views.py:36
+msgid "Account statistics report"
+msgstr "Informe de estadísticas de cuentas"
+
+#: reports/views.py:40
+msgid "Account automation report"
+msgstr "Informe de automatización de cuentas"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -7869,19 +7893,21 @@ msgstr ""
 
 #: settings/serializers/msg.py:38
 msgid ""
-"Password to use for the email server. It is used in conjunction with `User` "
-"when authenticating to the email server"
-msgstr "Contraseña para iniciar sesión en el servidor de correo"
+"Password to use for the email server. It is used in conjunction with "
+"`Account` when authenticating to the email server"
+msgstr ""
+"Contraseña utilizada para el servidor de correo electrónico. Se utiliza "
+"junto con `cuenta` al autenticar con el servidor de correo electrónico."
 
 #: settings/serializers/msg.py:41
 msgid "Sender"
 msgstr "Remitente"
 
 #: settings/serializers/msg.py:42
-msgid "Sender email address (default to using the `User`)"
+msgid "Sender email address (default to using the `Account`)"
 msgstr ""
-"Dirección de correo electrónico del remitente (por defecto se utiliza "
-"`usuario`)"
+"Dirección de correo electrónico del remitente (utiliza `cuenta` por "
+"defecto)."
 
 #: settings/serializers/msg.py:46
 msgid "The recipient is used for testing the email server's connectivity"
