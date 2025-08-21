@@ -90,10 +90,10 @@ class ChangeSecretDashboardApi(APIView):
 
     def get_change_secret_asset_queryset(self):
         qs = self.change_secrets_queryset
-        node_ids = qs.filter(nodes__isnull=False).values_list('nodes', flat=True).distinct()
-        nodes = Node.objects.filter(id__in=node_ids)
+        node_ids = qs.values_list('nodes', flat=True).distinct()
+        nodes = Node.objects.filter(id__in=node_ids).only('id', 'key')
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
-        direct_asset_ids = qs.filter(assets__isnull=False).values_list('assets', flat=True).distinct()
+        direct_asset_ids = qs.values_list('assets', flat=True).distinct()
         asset_ids = set(list(direct_asset_ids) + list(node_asset_ids))
         return Asset.objects.filter(id__in=asset_ids)
 

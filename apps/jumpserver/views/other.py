@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 import re
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -18,7 +20,7 @@ from common.views.http import HttpResponseTemporaryRedirect
 __all__ = [
     'LunaView', 'I18NView', 'KokoView', 'WsView',
     'redirect_format_api', 'redirect_old_apps_view', 'UIView',
-    'ResourceDownload',
+    'ResourceDownload', 'RedirectConfirm'
 ]
 
 
@@ -128,3 +130,24 @@ def csrf_failure(request, reason=""):
     from django.shortcuts import reverse
     login_url = reverse('authentication:login') + '?csrf_failure=1&admin=1'
     return redirect(login_url)
+
+
+class RedirectConfirm(TemplateView):
+    template_name = 'redirect_confirm.html'
+
+    def get(self, request, *args, **kwargs):
+        next_url = self.request.GET.get("next")
+        if not self.is_valid_url(next_url):
+            return HttpResponseBadRequest("Invalid next url")
+        return self.render_to_response({"target_url": next_url})
+
+    @staticmethod
+    def is_valid_url(url):
+        if not url:
+            return False
+        parsed = urlparse(url)
+        if not parsed.scheme or not parsed.netloc:
+            return False
+        if parsed.scheme not in ['http', 'https']:
+            return False
+        return True

@@ -73,6 +73,9 @@ exclude_permissions = (
     ('accounts', 'account', 'view', 'historyaccount'),
     ('accounts', 'account', 'view', 'historyaccountsecret'),
     ('accounts', 'accounttemplate', 'change_accounttemplatesecret', 'accounttemplate'),
+    ('accounts', 'accountrisk', 'add', 'accountrisk'),
+    ('accounts', 'virtualaccount', 'add,delete', 'virtualaccount'),
+    ('accounts', 'checkaccountengine', 'add,change,delete', 'checkaccountengine'),
 
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'permedaccount', '*', '*'),
@@ -142,7 +145,7 @@ only_system_permissions = (
     ('rbac', 'orgrole', 'delete,add,change', 'orgrole'),
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
-    ('settings', 'setting', '*', '*'),
+    ('settings', 'setting', 'add,change,delete', '*'),
     ('tickets', '*', '*', '*'),
     ('ops', 'celerytask', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),

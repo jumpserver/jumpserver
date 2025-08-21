@@ -1,9 +1,9 @@
-from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import ModelBackend
+from django.views import View
 
-from users.models import User
 from common.utils import get_logger
-
+from users.models import User
 
 UserModel = get_user_model()
 logger = get_logger(__file__)
@@ -61,4 +61,13 @@ class JMSBaseAuthBackend:
 
 
 class JMSModelBackend(JMSBaseAuthBackend, ModelBackend):
-    pass
+     def user_can_authenticate(self, user):
+        return True
+
+
+class BaseAuthCallbackClientView(View):
+    http_method_names = ['get']
+
+    def get(self, request):
+        from authentication.views.utils import redirect_to_guard_view
+        return redirect_to_guard_view(query_string='next=client')

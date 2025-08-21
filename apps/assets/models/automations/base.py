@@ -53,7 +53,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
                 return name
 
     def get_all_assets(self):
-        nodes = self.nodes.all()
+        nodes = self.nodes.only("id", "key")
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list("id", flat=True)
         direct_asset_ids = self.assets.all().values_list("id", flat=True)
         asset_ids = set(list(direct_asset_ids) + list(node_asset_ids))

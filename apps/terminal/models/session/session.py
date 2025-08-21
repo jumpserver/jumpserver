@@ -18,18 +18,11 @@ from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.utils import get_object_or_none, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from terminal.backends import get_multi_command_storage
-from terminal.const import SessionType, TerminalType
+from terminal.const import SessionType, TerminalType, LoginFrom
 from users.models import User
 
 
 class Session(OrgModelMixin):
-    class LOGIN_FROM(models.TextChoices):
-        ST = 'ST', 'SSH Terminal'
-        RT = 'RT', 'RDP Terminal'
-        WT = 'WT', 'Web Terminal'
-        DT = 'DT', 'DB Terminal'
-        VT = 'VT', 'VNC Terminal'
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
     user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
@@ -38,7 +31,7 @@ class Session(OrgModelMixin):
     account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
     account_id = models.CharField(max_length=128, verbose_name=_("Account ID"), db_index=True)
     protocol = models.CharField(default='ssh', max_length=16, db_index=True)
-    login_from = models.CharField(max_length=2, choices=LOGIN_FROM.choices, default="ST", verbose_name=_("Login from"))
+    login_from = models.CharField(max_length=2, choices=LoginFrom.choices, default="ST", verbose_name=_("Login from"))
     type = models.CharField(max_length=16, default='normal', db_index=True)
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     is_success = models.BooleanField(default=True, db_index=True)

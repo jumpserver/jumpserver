@@ -14,7 +14,8 @@ ARG TOOLS="                           \
         telnet                        \
         vim                           \
         postgresql-client-13          \
-        wget"
+        wget                          \
+        poppler-utils"
 
 RUN set -ex \
     && apt-get update \
@@ -27,5 +28,5 @@ WORKDIR /opt/jumpserver
 ARG PIP_MIRROR=https://pypi.org/simple
 
 RUN set -ex \
-    && uv pip install -i${PIP_MIRROR} --group xpack
-
+    && uv pip install -i${PIP_MIRROR} --group xpack \
+    && playwright install chromium  --with-deps --only-shell

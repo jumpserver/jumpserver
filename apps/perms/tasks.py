@@ -65,6 +65,7 @@ def check_asset_permission_will_expired():
     org_perm_remain_day_mapper = defaultdict(dict)
 
     asset_perms = AssetPermission.objects.filter(
+        is_active=True,
         date_expired__gte=start,
         date_expired__lte=end
     ).distinct()

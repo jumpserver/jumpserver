@@ -4,6 +4,7 @@ from rest_framework import serializers
 from common.const.choices import Status
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from terminal.const import PublishStatus
+from ..mixin import ManifestI18nMixin
 from ..models import Applet, AppletPublication, AppletHost
 
 __all__ = [
@@ -24,7 +25,7 @@ class AppletPublicationSerializer(serializers.ModelSerializer):
         fields = fields_mini + ['status', 'comment'] + read_only_fields
 
 
-class AppletSerializer(serializers.ModelSerializer):
+class AppletSerializer(ManifestI18nMixin, serializers.ModelSerializer):
     icon = serializers.ReadOnlyField(label=_("Icon"))
     type = LabeledChoiceField(choices=Applet.Type.choices, label=_("Type"))
     edition = LabeledChoiceField(

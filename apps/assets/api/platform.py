@@ -12,8 +12,11 @@ from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, P
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer
+from rbac.models import RoleBinding
 
 __all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi', 'PlatformProtocolViewSet']
+
+
 
 
 class PlatformFilter(filters.FilterSet):
@@ -62,6 +65,13 @@ class AssetPlatformViewSet(JMSModelViewSet):
         if pk.isnumeric():
             return super().get_object()
         return self.get_queryset().get(name=pk)
+
+
+    def check_permissions(self, request):
+        if self.action == 'list' and RoleBinding.is_org_admin(request.user):
+            return True
+        else:
+            return super().check_permissions(request)
 
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:

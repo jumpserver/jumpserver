@@ -22,7 +22,7 @@ root_node_data = {
 # 第二层 view 节点，手动创建的
 view_nodes_data = [
     {'id': 'view_console', 'name': _('Console view')},
-    {'id': 'view_pam', 'name': 'Pam'},
+    {'id': 'view_pam', 'name': _('Pam view')},
     {'id': 'view_workbench', 'name': _('Workbench view')},
     {'id': 'view_audit', 'name': _('Audit view')},
     {'id': 'view_setting', 'name': _('System setting')},
@@ -33,6 +33,7 @@ view_nodes_data = [
 app_nodes_data = [
     {'id': 'users', 'view': 'view_console'},
     {'id': 'assets', 'view': 'view_console'},
+    {'id': 'accounts', 'name': _('Accounts'), 'view': 'view_console'},
     {'id': 'perms', 'view': 'view_console'},
     {'id': 'terminal', 'name': _('Session audits'), 'view': 'view_audit'},
     {'id': 'audits', 'view': 'view_audit'},
@@ -90,6 +91,8 @@ special_pid_mapper = {
     'accounts.checkaccountengine': 'account_risk_node',
     'accounts.checkaccountautomation': 'account_risk_node',
     'accounts.checkaccountexecution': 'account_risk_node',
+    'accounts.view_accountsession': 'view_pam',
+    'accounts.view_accountactivity': 'view_pam',
     'accounts.integrationapplication': 'view_pam',
     'accounts.virtualaccount': 'view_pam',
     'accounts.backupaccountautomation': 'backup_account_node',
@@ -115,6 +118,7 @@ special_pid_mapper = {
     'ops.jobexecution': 'operation_center',
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
+    "rbac.view_pam": "view_pam",
     'audits.usersession': 'view_audit',
     "rbac.view_workbench": "view_workbench",
     "rbac.view_webterminal": "view_workbench",

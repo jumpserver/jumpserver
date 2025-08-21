@@ -104,6 +104,8 @@ class _ConnectionTokenCommandFilterACLSerializer(serializers.ModelSerializer):
 class _ConnectionTokenPlatformSerializer(PlatformSerializer):
     class Meta(PlatformSerializer.Meta):
         model = Platform
+        fields = [field for field in PlatformSerializer.Meta.fields
+                   if field not in PlatformSerializer.Meta.fields_m2m]
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)

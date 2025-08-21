@@ -204,6 +204,7 @@ class Config(dict):
         'REDIS_SSL_CERT': None,
         'REDIS_SSL_CA': None,
         'REDIS_SSL_REQUIRED': 'none',
+        'REDIS_MAX_CONNECTIONS': 100,
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',
@@ -697,6 +698,8 @@ class Config(dict):
 
         # Chat AI
         'CHAT_AI_ENABLED': False,
+        'CHAT_AI_METHOD': 'api',
+        'CHAT_AI_EMBED_URL': '',
         'CHAT_AI_TYPE': 'gpt',
         'GPT_BASE_URL': '',
         'GPT_API_KEY': '',
@@ -711,7 +714,7 @@ class Config(dict):
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
-        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'leak_passwords.db'),
+        'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'system', 'leak_passwords.db'),
 
         # Ansible Receptor
         'RECEPTOR_ENABLED': False,

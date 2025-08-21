@@ -95,6 +95,7 @@ class Command(BaseCommand):
         settings.LOG_LEVEL = 'ERROR'
         urls = get_api_urls()
         client = Client()
+        client.defaults['HTTP_HOST'] = 'localhost'
         unauth_urls = []
         error_urls = []
         unformat_urls = []

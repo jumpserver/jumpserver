@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#
 
 from django.conf import settings
 from django.core.cache import cache
@@ -12,6 +11,7 @@ from rest_framework.views import APIView
 
 from common.utils import get_logger
 from jumpserver.conf import Config
+from rbac.models import RoleBinding
 from rbac.permissions import RBACPermission
 from users.models import User
 from .. import serializers
@@ -118,10 +118,14 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return Setting.objects.all()
 
     def check_permissions(self, request):
+        ok = RoleBinding.is_org_admin(request.user)
         category = request.query_params.get('category', 'basic')
         perm_required = self.rbac_category_permissions.get(category)
-        has = self.request.user.has_perm(perm_required)
 
+        if ok and perm_required == 'settings.view_setting':
+            return True
+
+        has = request.user.has_perm(perm_required)
         if not has:
             self.permission_denied(request)
 

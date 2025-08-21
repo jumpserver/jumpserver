@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.utils import get_request_ip
 from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
 from perms.serializers.permission import ActionChoicesField
@@ -29,6 +30,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name', 'face_monitor_token',
+            'remote_addr',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
@@ -51,6 +53,12 @@ class ConnectionTokenSerializer(CommonModelSerializer):
 
     def get_user(self, attrs):
         return self.get_request_user()
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request:
+            validated_data['remote_addr'] = get_request_ip(request)
+        return super().create(validated_data)
 
     def get_from_ticket_info(self, instance):
         if not instance.from_ticket:

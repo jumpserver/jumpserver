@@ -87,15 +87,23 @@ ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 # for host in ALLOWED_DOMAINS:
 #     print('  - ' + host.lstrip('.'))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = []
 for host_port in ALLOWED_DOMAINS:
     origin = host_port.strip('.')
-    if origin.startswith('http'):
-        CSRF_TRUSTED_ORIGINS.append(origin)
+
+    if not origin:
         continue
+
+    if origin.startswith('http'):
+        origin = origin.replace('http://', '').replace('https://', '')
+
+    host = origin.split(':')[0]
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
     is_local_origin = origin.split(':')[0] in DEBUG_HOSTS
     for schema in ['https', 'http']:
         if is_local_origin and schema == 'https':
@@ -128,6 +136,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'rbac.apps.RBACConfig',
     'labels.apps.LabelsConfig',
+    'reports.apps.ReportsConfig',
     'rest_framework',
     'drf_yasg',
     'django_cas_ng',
@@ -172,6 +181,7 @@ MIDDLEWARE = [
     'authentication.middleware.ThirdPartyLoginMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'jumpserver.middleware.SafeRedirectMiddleware',
     'jumpserver.middleware.EndMiddleware',
 ]
 
@@ -236,9 +246,13 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 DB_OPTIONS = {}
 DB_ENGINE = CONFIG.DB_ENGINE.lower()
+if DB_ENGINE == 'vastbase':
+    DB_BACKEND = 'django_vastbase_backend'
+else:
+    DB_BACKEND = f'django.db.backends.{DB_ENGINE}'
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.{}'.format(DB_ENGINE),
+        'ENGINE': DB_BACKEND,
         'NAME': CONFIG.DB_NAME,
         'HOST': CONFIG.DB_HOST,
         'PORT': CONFIG.DB_PORT,
@@ -364,7 +378,7 @@ REDIS_OPTIONS = {
         "health_check_interval": 30
     },
     "CONNECTION_POOL_KWARGS": {
-        'max_connections': 100,
+        'max_connections': CONFIG.REDIS_MAX_CONNECTIONS,
     }
 }
 if REDIS_USE_SSL:

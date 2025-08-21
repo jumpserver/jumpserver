@@ -57,6 +57,9 @@ class ConnectionToken(JMSOrgBaseModel):
     )
     face_monitor_token = models.CharField(max_length=128, null=True, blank=True, verbose_name=_("Face monitor token"))
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
+    remote_addr = models.CharField(
+        max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
+    )
 
     type = models.CharField(
         max_length=16, choices=ConnectionTokenType.choices,

@@ -6,6 +6,7 @@
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
+    ansible_timeout: 30
 
   tasks:
     - name: Test MySQL connection

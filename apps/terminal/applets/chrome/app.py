@@ -210,7 +210,7 @@ def load_extensions():
     return extension_paths
 
 
-def default_chrome_driver_options():
+def default_chrome_driver_options(languag: str = 'en') -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
 
@@ -225,7 +225,8 @@ def default_chrome_driver_options():
     # 禁用 密码管理器弹窗
     prefs = {
         "credentials_enable_service": False,
-        "profile.password_manager_enabled": False
+        "profile.password_manager_enabled": False,
+        "intl.accept_languages": languag,
     }
     options.add_experimental_option("prefs", prefs)
     # chromedriver 退出后也不关闭浏览器
@@ -243,7 +244,8 @@ class AppletApplication(BaseApplication):
         self.app = WebAPP(app_name=self.app_name, user=self.user,
                           account=self.account, asset=self.asset, platform=self.platform)
         self._tmp_user_dir = tempfile.TemporaryDirectory()
-        self._chrome_options = default_chrome_driver_options()
+        lang = self.connect_option.lang if self.connect_option.lang else get_system_language()
+        self._chrome_options = default_chrome_driver_options(languag=lang)
         self._chrome_options.add_argument("--app={}".format(self.asset.address))
         self._chrome_options.add_argument("--user-data-dir={}".format(self._tmp_user_dir.name))
         protocol_setting = self.platform.get_protocol_setting(self.protocol)
@@ -252,8 +254,6 @@ class AppletApplication(BaseApplication):
             extension_paths = load_extensions()
             self._chrome_options.add_argument('--load-extension={}'.format(','.join(extension_paths)))
         # 设置语言
-        lang = self.connect_option.lang if self.connect_option.lang else get_system_language()
-        self._chrome_options.add_experimental_option('prefs', {'intl.accept_languages': lang})
         self._chrome_options.add_argument('--lang={}'.format(lang))
 
     @wrapper_progress_bar

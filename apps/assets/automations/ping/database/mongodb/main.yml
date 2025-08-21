@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
+    ansible_timeout: 30
 
   tasks:
     - name: Test MongoDB connection
@@ -16,3 +17,5 @@
         ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
+      register: result
+      failed_when: not result.is_available
