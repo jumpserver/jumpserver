@@ -1117,6 +1117,7 @@
     "ReplayStorageUpdate": "Update the object storage",
     "Reply": "Reply",
     "Report": "Report",
+    "ReportType": "Report type",
     "RequestAssetPerm": "Request asset authorization",
     "RequestPerm": "Authorization request",
     "RequestTickets": "New ticket",
