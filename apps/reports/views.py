@@ -77,7 +77,7 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
     with sync_playwright() as p:
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1000, "height": 800}, locale=lang)
+        context = browser.new_context(viewport={"width": 1040, "height": 800}, locale=lang)
         # 设置 sessionid cookie
         parsed_url = urlparse(url)
         context.add_cookies([
