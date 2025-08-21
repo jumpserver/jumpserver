@@ -16,11 +16,11 @@ from pdf2image import convert_from_bytes
 from playwright.sync_api import sync_playwright
 
 charts_map = {
-    "UserReport": {
+    "UserLoginReport": {
         "title": _('User login report'),
         "path": "/ui/#/reports/users/user-activity"
     },
-    "ChangePassword": {
+    "UserChangePasswordReport": {
         "title": _('User change password report'),
         "path": "/ui/#/reports/users/change-password"
     },
