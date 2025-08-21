@@ -96,6 +96,9 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         try:
             page.goto(url, wait_until='networkidle')
             page.wait_for_selector('.charts-zone', timeout=10000)
+            # 等待渲染完成
+            page.wait_for_timeout(2000)
+
             page_title = page.title()
             print(f"Page title: {page_title}")
             pdf_bytes = page.pdf(format="A4", landscape=True,
