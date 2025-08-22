@@ -7741,11 +7741,11 @@ msgstr ""
 "인증을 완료해야 합니다."
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "로그인 인증 코드 활성화"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "인증 코드를 활성화하여 로봇 로그인을 차단합니다."
 
 #: settings/serializers/security.py:173

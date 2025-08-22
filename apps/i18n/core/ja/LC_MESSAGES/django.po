@@ -7679,11 +7679,11 @@ msgid ""
 msgstr "パスワードと追加コードは、検証のためにサードパーティの認証システムに送信されます"
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "ログインcaptchaの有効化"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "Captchaを有効にしてロボット認証を防止する"
 
 #: settings/serializers/security.py:173
