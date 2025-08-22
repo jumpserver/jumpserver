@@ -8031,11 +8031,11 @@ msgstr ""
 "de terceiros exigem senha + 6 números para completar a autenticação"
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "Habilitar código de verificação de login"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "Ligar o código de verificação para prevenir o login de robôs"
 
 #: settings/serializers/security.py:173

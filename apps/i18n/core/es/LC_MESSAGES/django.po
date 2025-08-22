@@ -8218,11 +8218,11 @@ msgstr ""
 "completar la autenticación"
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "Activar código de verificación para inicio de sesión"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr ""
 "Habilitar el código de verificación para prevenir el inicio de sesión de "
 "bots"

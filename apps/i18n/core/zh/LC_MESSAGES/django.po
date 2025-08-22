@@ -7739,11 +7739,11 @@ msgstr ""
 "码+6位数字 完成认证"
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "启用登录验证码"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "开启验证码，防止机器人登录"
 
 #: settings/serializers/security.py:173

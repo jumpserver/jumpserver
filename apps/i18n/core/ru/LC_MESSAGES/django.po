@@ -7998,11 +7998,11 @@ msgstr ""
 "для проверки"
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "Проверочный код (captcha) при входе"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "Включите проверочный код, чтобы предотвратить аутентификацию роботов"
 
 #: settings/serializers/security.py:173

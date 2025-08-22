@@ -7628,11 +7628,11 @@ msgid ""
 msgstr "密碼和附加碼一併發送給第三方認證系統進行校驗, 如：有的第三方認證系統，需要 密碼+6位數字 完成認證"
 
 #: settings/serializers/security.py:169
-msgid "Login captcha"
+msgid "Login CAPTCHA"
 msgstr "啟用登入驗證碼"
 
 #: settings/serializers/security.py:170
-msgid "Enable captcha to prevent robot authentication"
+msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "開啟驗證碼，防止機器人登錄"
 
 #: settings/serializers/security.py:173
