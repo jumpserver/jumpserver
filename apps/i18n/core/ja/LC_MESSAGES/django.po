@@ -6382,10 +6382,8 @@ msgid "Job audit"
 msgstr "作業監査"
 
 #: rbac/tree.py:71
-#, fuzzy
-#| msgid "Redis port"
 msgid "Report"
-msgstr "Redis ポート"
+msgstr "レポート"
 
 #: rbac/tree.py:181
 msgid "App organizations"
