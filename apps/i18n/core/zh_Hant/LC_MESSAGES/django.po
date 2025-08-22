@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-21 11:01+0800\n"
+"POT-Creation-Date: 2025-08-22 18:01+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -202,7 +202,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳過"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:283
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:291
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -575,8 +575,8 @@ msgstr "帳號活動"
 #: assets/serializers/platform.py:283
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12
-#: authentication/serializers/connect_token_secret.py:115
-#: authentication/serializers/connect_token_secret.py:172 labels/models.py:11
+#: authentication/serializers/connect_token_secret.py:117
+#: authentication/serializers/connect_token_secret.py:174 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
 #: ops/models/celery.py:81 ops/models/job.py:147 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
@@ -1023,7 +1023,7 @@ msgstr "密碼規則"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
-#: authentication/serializers/connect_token_secret.py:119
+#: authentication/serializers/connect_token_secret.py:121
 #: terminal/models/applet/applet.py:41
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:257
 msgid "Is active"
@@ -1195,13 +1195,13 @@ msgstr "類別"
 #: assets/serializers/platform.py:160 assets/serializers/platform.py:172
 #: audits/serializers.py:76 audits/serializers.py:196
 #: authentication/models/connection_token.py:66
-#: authentication/serializers/connect_token_secret.py:128
+#: authentication/serializers/connect_token_secret.py:130
 #: ops/models/job.py:155 perms/serializers/user_permission.py:28
 #: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
-#: tickets/models/flow.py:42 tickets/models/ticket/apply_application.py:16
+#: tickets/models/flow.py:43 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
 #: tickets/serializers/ticket/ticket.py:19
 msgid "Type"
@@ -1260,7 +1260,7 @@ msgid "Spec info"
 msgstr "特殊資訊"
 
 #: accounts/serializers/account/account.py:473
-#: authentication/serializers/connect_token_secret.py:162
+#: authentication/serializers/connect_token_secret.py:164
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
@@ -1276,7 +1276,7 @@ msgstr "ID"
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
-#: rbac/builtin.py:127 rbac/models/rolebinding.py:49
+#: rbac/builtin.py:133 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:157 terminal/notifications.py:217
@@ -1817,7 +1817,7 @@ msgstr "優先度可選範圍為 1-100 (數值越小越優先)"
 #: acls/models/base.py:41 acls/serializers/base.py:57
 #: assets/models/cmd_filter.py:81 audits/models.py:99
 #: audits/serializers.py:107
-#: authentication/serializers/connect_token_secret.py:121
+#: authentication/serializers/connect_token_secret.py:123
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:63 perms/serializers/permission.py:85
 #: terminal/backends/command/models.py:24
@@ -2472,7 +2472,7 @@ msgstr "地址"
 #: assets/models/asset/common.py:169 assets/models/platform.py:155
 #: assets/serializers/asset/common.py:150
 #: authentication/backends/passkey/models.py:12
-#: authentication/serializers/connect_token_secret.py:120
+#: authentication/serializers/connect_token_secret.py:122
 #: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:398
 msgid "Platform"
 msgstr "系統平台"
@@ -2493,7 +2493,7 @@ msgstr "節點"
 msgid "Gathered info"
 msgstr "收集資產硬體資訊"
 
-#: assets/models/asset/common.py:184 assets/serializers/asset/custom.py:14
+#: assets/models/asset/common.py:184 assets/serializers/asset/custom.py:15
 msgid "Custom info"
 msgstr "自訂屬性"
 
@@ -2667,7 +2667,7 @@ msgstr "系統"
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:34
-#: authentication/serializers/connect_token_secret.py:127
+#: authentication/serializers/connect_token_secret.py:129
 #: common/serializers/common.py:86 labels/models.py:12 settings/models.py:40
 #: users/models/preference.py:13
 msgid "Value"
@@ -2676,7 +2676,7 @@ msgstr "值"
 #: assets/models/label.py:40 assets/serializers/cagegory.py:10
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
 #: assets/serializers/platform.py:159
-#: authentication/serializers/connect_token_secret.py:126
+#: authentication/serializers/connect_token_secret.py:128
 #: common/serializers/common.py:85 labels/serializers.py:45
 #: settings/serializers/msg.py:90 xpack/plugins/cloud/models.py:403
 msgid "Label"
@@ -3000,7 +3000,7 @@ msgid "Disk total"
 msgstr "硬碟大小"
 
 #: assets/serializers/asset/info/gathered.py:16
-#: authentication/serializers/connect_token_secret.py:117
+#: authentication/serializers/connect_token_secret.py:119
 msgid "OS"
 msgstr "操作系統"
 
@@ -3282,7 +3282,7 @@ msgstr "刪除目錄"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:284
+#: rbac/tree.py:292
 msgid "Delete"
 msgstr "刪除"
 
@@ -3308,7 +3308,7 @@ msgstr "下載"
 msgid "Rename dir"
 msgstr "映射目錄"
 
-#: audits/const.py:23 rbac/tree.py:282 terminal/api/session/session.py:285
+#: audits/const.py:23 rbac/tree.py:290 terminal/api/session/session.py:285
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
@@ -3317,7 +3317,7 @@ msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:281
+#: rbac/tree.py:289
 msgid "Create"
 msgstr "創建"
 
@@ -4131,7 +4131,7 @@ msgid "Input secret"
 msgstr "自訂密碼"
 
 #: authentication/models/connection_token.py:46
-#: authentication/serializers/connect_token_secret.py:116
+#: authentication/serializers/connect_token_secret.py:118
 #: terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
@@ -4241,38 +4241,38 @@ msgstr "異地登錄提醒"
 msgid "binding reminder"
 msgstr "綁定提醒"
 
-#: authentication/serializers/connect_token_secret.py:118
+#: authentication/serializers/connect_token_secret.py:120
 msgid "Is builtin"
 msgstr "內建的"
 
-#: authentication/serializers/connect_token_secret.py:122
+#: authentication/serializers/connect_token_secret.py:124
 msgid "Options"
 msgstr "選項"
 
-#: authentication/serializers/connect_token_secret.py:129
+#: authentication/serializers/connect_token_secret.py:131
 #: ops/notifications.py:19 rbac/tree.py:63
 msgid "Component"
 msgstr "組件"
 
-#: authentication/serializers/connect_token_secret.py:138
+#: authentication/serializers/connect_token_secret.py:140
 msgid "Domain"
 msgstr "網域"
 
-#: authentication/serializers/connect_token_secret.py:140
+#: authentication/serializers/connect_token_secret.py:142
 msgid "Expired now"
 msgstr "立刻過期"
 
-#: authentication/serializers/connect_token_secret.py:173
+#: authentication/serializers/connect_token_secret.py:175
 #: terminal/models/virtualapp/virtualapp.py:25
 msgid "Image name"
 msgstr "鏡像名稱"
 
-#: authentication/serializers/connect_token_secret.py:174
+#: authentication/serializers/connect_token_secret.py:176
 #: terminal/models/virtualapp/virtualapp.py:27
 msgid "Image port"
 msgstr "鏡像埠"
 
-#: authentication/serializers/connect_token_secret.py:175
+#: authentication/serializers/connect_token_secret.py:177
 #: terminal/models/virtualapp/virtualapp.py:26
 msgid "Image protocol"
 msgstr "鏡像協議"
@@ -6158,27 +6158,27 @@ msgstr "{} 至少有一個系統角色"
 msgid "App RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:118
+#: rbac/builtin.py:124
 msgid "SystemAdmin"
 msgstr "系統管理員"
 
-#: rbac/builtin.py:121
+#: rbac/builtin.py:127
 msgid "SystemAuditor"
 msgstr "系統審計員"
 
-#: rbac/builtin.py:124
+#: rbac/builtin.py:130
 msgid "SystemComponent"
 msgstr "系統組件"
 
-#: rbac/builtin.py:130
+#: rbac/builtin.py:136
 msgid "OrgAdmin"
 msgstr "組織管理員"
 
-#: rbac/builtin.py:133
+#: rbac/builtin.py:139
 msgid "OrgAuditor"
 msgstr "組織審計員"
 
-#: rbac/builtin.py:136
+#: rbac/builtin.py:142
 msgid "OrgUser"
 msgstr "組織用戶"
 
@@ -6213,6 +6213,30 @@ msgstr "文件管理"
 #: rbac/models/menu.py:21
 msgid "Can view System Tools"
 msgstr "可以查看系統工具"
+
+#: rbac/models/menu.py:22
+msgid "Can view user login report"
+msgstr "可以查看使用者登入報告"
+
+#: rbac/models/menu.py:23
+msgid "Can view user change password report"
+msgstr "可以查看使用者變更密碼報告"
+
+#: rbac/models/menu.py:24
+msgid "Can view asset statistics report"
+msgstr "可以查看資產統計報告"
+
+#: rbac/models/menu.py:25
+msgid "Can view asset activity report"
+msgstr "可以查看資產活動報告"
+
+#: rbac/models/menu.py:26
+msgid "Can view account statistics report"
+msgstr "可以查看帳號統計報告"
+
+#: rbac/models/menu.py:27
+msgid "Can view account automation report"
+msgstr "可以查看帳號自動化報告"
 
 #: rbac/models/permission.py:18
 msgid "ContentType"
@@ -6331,24 +6355,30 @@ msgstr "許可證"
 msgid "Job audit"
 msgstr "作業審核"
 
-#: rbac/tree.py:173
+#: rbac/tree.py:71
+#, fuzzy
+#| msgid "Redis port"
+msgid "Report"
+msgstr "Redis 埠"
+
+#: rbac/tree.py:181
 msgid "App organizations"
 msgstr "組織管理"
 
-#: rbac/tree.py:174
+#: rbac/tree.py:182
 msgid "Ticket comment"
 msgstr "工單評論"
 
-#: rbac/tree.py:175 settings/serializers/feature.py:174
+#: rbac/tree.py:183 settings/serializers/feature.py:174
 #: settings/serializers/feature.py:176 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "工單管理"
 
-#: rbac/tree.py:176
+#: rbac/tree.py:184
 msgid "Common setting"
 msgstr "一般設定"
 
-#: rbac/tree.py:177
+#: rbac/tree.py:185
 msgid "View permission tree"
 msgstr "查看授權樹"
 
@@ -6375,6 +6405,26 @@ msgstr "賬號統計報告"
 #: reports/views.py:40
 msgid "Account automation report"
 msgstr "賬號自動化報告"
+
+#: reports/views.py:44
+#, fuzzy
+#| msgid "Console"
+msgid "ConsoleDashboard"
+msgstr "控制台"
+
+#: reports/views.py:48
+msgid "AuditsDashboard"
+msgstr ""
+
+#: reports/views.py:52
+msgid "PamDashboard"
+msgstr ""
+
+#: reports/views.py:56
+#, fuzzy
+#| msgid "Change secret record"
+msgid "ChangeSecretDashboard"
+msgstr "改密記錄"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -9312,7 +9362,7 @@ msgstr "用戶顯示名稱"
 msgid "Body"
 msgstr "內容"
 
-#: tickets/models/flow.py:21 tickets/models/flow.py:47
+#: tickets/models/flow.py:21 tickets/models/flow.py:48
 #: tickets/models/ticket/general.py:45
 msgid "Approve level"
 msgstr "審批級別"
@@ -9321,7 +9371,7 @@ msgstr "審批級別"
 msgid "Ticket flow approval rule"
 msgstr "工單批准資訊"
 
-#: tickets/models/flow.py:52
+#: tickets/models/flow.py:53
 msgid "Ticket flow"
 msgstr "工單流程"
 
