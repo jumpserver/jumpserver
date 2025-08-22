@@ -20,7 +20,7 @@ __all__ = ['AccountAutomationApi']
 class AccountAutomationApi(DateRangeMixin, APIView):
     http_method_names = ['get']
     rbac_perms = {
-        'GET': 'accounts.view_account',
+        'GET': 'rbac.view_accountautomationreport',
     }
     permission_classes = [RBACPermission, IsValidLicense]
 

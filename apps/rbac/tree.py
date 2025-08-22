@@ -68,6 +68,7 @@ extra_nodes_data = [
     {'id': "license", "name": _("License"), "pId": "view_setting"},
     {'id': "other", "name": _("Other"), "pId": "view_setting"},
     {'id': "job_audit", "name": _("Job audit"), "pId": "view_audit"},
+    {'id': "report_node", "name": _("Report"), "pId": "view_audit"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -118,6 +119,7 @@ special_pid_mapper = {
     'ops.jobexecution': 'operation_center',
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
+    "report_node": "view_audit",
     "rbac.view_pam": "view_pam",
     'audits.usersession': 'view_audit',
     "rbac.view_workbench": "view_workbench",
@@ -129,6 +131,12 @@ special_pid_mapper = {
 }
 
 special_setting_pid_mapper = {
+    "rbac.view_userloginreport": "report_node",
+    "rbac.view_userchangepasswordreport": "report_node",
+    "rbac.view_assetstatisticsreport": "report_node",
+    "rbac.view_assetactivityreport": "report_node",
+    "rbac.view_accountstatisticsreport": "report_node",
+    "rbac.view_accountautomationreport": "report_node",
     "settings.change_email": "notifications",
     "settings.change_sms": "notifications",
     "settings.change_systemmsgsubscription": "notifications",

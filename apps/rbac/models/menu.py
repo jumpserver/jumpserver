@@ -19,4 +19,10 @@ class MenuPermission(models.Model):
             ('view_webterminal', _('Can view web terminal')),
             ('view_filemanager', _('Can view file manager')),
             ('view_systemtools', _('Can view System Tools')),
+            ('view_userloginreport', _('Can view user login report')),
+            ('view_userchangepasswordreport', _('Can view user change password report')),
+            ('view_assetstatisticsreport', _('Can view asset statistics report')),
+            ('view_assetactivityreport', _('Can view asset activity report')),
+            ('view_accountstatisticsreport', _('Can view account statistics report')),
+            ('view_accountautomationreport', _('Can view account automation report')),
         ]
