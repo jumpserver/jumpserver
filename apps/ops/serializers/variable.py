@@ -42,8 +42,8 @@ class VariableSerializer(CommonBulkModelSerializer):
         model = Variable
         read_only_fields = ["id", "date_created", "date_updated", "created_by", "creator"]
         fields = read_only_fields + [
-            "name", "var_name", "type", 'required', 'default_value', 'tips', 'adhoc', 'playbook', 'job', 'form_data',
-            'extra_args'
+            "name", "var_name", "type", 'required', 'default_value', 'tips', 
+            'adhoc', 'playbook', 'job', 'form_data', 'extra_args'
         ]
 
     def validate(self, attrs):

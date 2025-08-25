@@ -6,6 +6,7 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
+from users.models import User
 from accounts.serializers import AccountSerializer
 from orgs.mixins.api import OrgRelationMixin, OrgBulkModelViewSet
 from orgs.utils import current_org
@@ -52,6 +53,7 @@ class AssetPermissionAllUserListApi(generics.ListAPIView):
     serializer_class = serializers.AssetPermissionAllUserSerializer
     filterset_fields = ("username", "name")
     search_fields = filterset_fields
+    queryset = User.objects.none()
 
     def get_queryset(self):
         pk = self.kwargs.get("pk")

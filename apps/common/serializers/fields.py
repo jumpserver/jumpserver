@@ -53,20 +53,55 @@ class EncryptedField(serializers.CharField):
         return decrypt_password(value)
 
 
-class LabeledChoiceField(ChoiceField):
-    def to_representation(self, key):
-        if key is None:
-            return key
-        label = self.choices.get(key, key)
-        return {"value": key, "label": label}
+class LabeledChoiceField(serializers.ChoiceField):
+    def __init__(self, **kwargs):
+        self.attrs = kwargs.pop("attrs", None) or ("value", "label")
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        if not value:
+            return value
+        data = {}
+        for attr in self.attrs:
+            if not hasattr(value, attr):
+                continue
+            data[attr] = getattr(value, attr)
+        return data
 
     def to_internal_value(self, data):
+        if not data:
+            return data
         if isinstance(data, dict):
-            data = data.get("value")
+            return data.get("value") or data.get("label")
+        return data
 
-        if isinstance(data, str) and "(" in data and data.endswith(")"):
-            data = data.strip(")").split('(')[-1]
-        return super(LabeledChoiceField, self).to_internal_value(data)
+    def get_schema(self):
+        """
+        为 drf-spectacular 提供 OpenAPI schema
+        """
+        if getattr(self, 'many', False):
+            return {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'value': {'type': 'string'},
+                        'label': {'type': 'string'}
+                    }
+                },
+                'description': getattr(self, 'help_text', ''),
+                'title': getattr(self, 'label', ''),
+            }
+        else:
+            return {
+                'type': 'object',
+                'properties': {
+                    'value': {'type': 'string'},
+                    'label': {'type': 'string'}
+                },
+                'description': getattr(self, 'help_text', ''),
+                'title': getattr(self, 'label', ''),
+            }
 
 
 class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
@@ -180,6 +215,122 @@ class ObjectRelatedField(serializers.RelatedField):
         except (TypeError, ValueError):
             self.fail("incorrect_type", data_type=type(pk).__name__)
 
+    def get_schema(self):
+        """
+        为 drf-spectacular 提供 OpenAPI schema
+        """
+        # 获取字段的基本信息
+        field_type = 'array' if self.many else 'object'
+        
+        if field_type == 'array':
+            # 如果是多对多关系
+            return {
+                'type': 'array',
+                'items': self._get_openapi_item_schema(),
+                'description': getattr(self, 'help_text', ''),
+                'title': getattr(self, 'label', ''),
+            }
+        else:
+            # 如果是一对一关系
+            return {
+                'type': 'object',
+                'properties': self._get_openapi_properties_schema(),
+                'description': getattr(self, 'help_text', ''),
+                'title': getattr(self, 'label', ''),
+            }
+
+    def _get_openapi_item_schema(self):
+        """
+        获取数组项的 OpenAPI schema
+        """
+        return self._get_openapi_object_schema()
+
+    def _get_openapi_object_schema(self):
+        """
+        获取对象的 OpenAPI schema
+        """
+        properties = {}
+        
+        # 动态分析 attrs 中的属性类型
+        for attr in self.attrs:
+            # 尝试从 queryset 的 model 中获取字段信息
+            field_type = self._infer_field_type(attr)
+            properties[attr] = {
+                'type': field_type,
+                'description': f'{attr} field'
+            }
+        
+        return {
+            'type': 'object',
+            'properties': properties,
+            'required': ['id'] if 'id' in self.attrs else []
+        }
+
+    def _infer_field_type(self, attr_name):
+        """
+        智能推断字段类型
+        """
+        try:
+            # 如果有 queryset，尝试从 model 中获取字段信息
+            if hasattr(self, 'queryset') and self.queryset is not None:
+                model = self.queryset.model
+                if hasattr(model, '_meta') and hasattr(model._meta, 'fields'):
+                    field = model._meta.get_field(attr_name)
+                    if field:
+                        return self._map_django_field_type(field)
+        except Exception:
+            pass
+        
+        # 如果没有 queryset 或无法获取字段信息，使用启发式规则
+        return self._heuristic_field_type(attr_name)
+
+    def _map_django_field_type(self, field):
+        """
+        将 Django 字段类型映射到 OpenAPI 类型
+        """
+        field_type = type(field).__name__
+        
+        # 整数类型
+        if 'Integer' in field_type or 'BigInteger' in field_type or 'SmallInteger' in field_type:
+            return 'integer'
+        # 浮点数类型
+        elif 'Float' in field_type or 'Decimal' in field_type:
+            return 'number'
+        # 布尔类型
+        elif 'Boolean' in field_type:
+            return 'boolean'
+        # 日期时间类型
+        elif 'DateTime' in field_type or 'Date' in field_type or 'Time' in field_type:
+            return 'string'
+        # 文件类型
+        elif 'File' in field_type or 'Image' in field_type:
+            return 'string'
+        # 其他类型默认为字符串
+        else:
+            return 'string'
+
+    def _heuristic_field_type(self, attr_name):
+        """
+        启发式推断字段类型
+        """
+        # 基于属性名的启发式规则
+        
+        if attr_name in ['is_active', 'enabled', 'visible'] or attr_name.startswith('is_'):
+            return 'boolean'
+        elif attr_name in ['count', 'number', 'size', 'amount']:
+            return 'integer'
+        elif attr_name in ['price', 'rate', 'percentage']:
+            return 'number'
+        else:
+            # 默认返回字符串类型
+            return 'string'
+
+    def _get_openapi_properties_schema(self):
+        """
+        获取对象属性的 OpenAPI schema
+        """
+        return self._get_openapi_object_schema()['properties']
+
 
 class TreeChoicesField(serializers.MultipleChoiceField):
     def __init__(self, choice_cls, **kwargs):
@@ -237,6 +388,23 @@ class BitChoicesField(TreeChoicesField):
                 raise serializers.ValidationError(_("Invalid choice: {}").format(name))
             value |= name_value_map[name]
         return value
+
+    def get_schema(self):
+        """
+        为 drf-spectacular 提供 OpenAPI schema
+        """
+        return {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'value': {'type': 'string'},
+                    'label': {'type': 'string'}
+                }
+            },
+            'description': getattr(self, 'help_text', ''),
+            'title': getattr(self, 'label', ''),
+        }
 
     def run_validation(self, data=empty):
         """

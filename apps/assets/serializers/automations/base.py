@@ -19,11 +19,13 @@ __all__ = [
 class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
     assets = ObjectRelatedField(many=True, required=False, queryset=Asset.objects, label=_('Assets'))
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
+    executed_amount = serializers.IntegerField(read_only=True, label=_('Executed amount'))
 
     class Meta:
         read_only_fields = [
             'date_created', 'date_updated', 'created_by',
-            'periodic_display', 'executed_amount', 'type', 'last_execution_date'
+            'periodic_display', 'executed_amount', 'type', 
+            'last_execution_date',
         ]
         mini_fields = [
             'id', 'name', 'type', 'is_periodic', 'interval',

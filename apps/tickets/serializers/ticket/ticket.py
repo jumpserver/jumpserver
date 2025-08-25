@@ -19,6 +19,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     type = LabeledChoiceField(choices=TicketType.choices, read_only=True, label=_('Type'))
     status = LabeledChoiceField(choices=TicketStatus.choices, read_only=True, label=_('Status'))
     state = LabeledChoiceField(choices=TicketState.choices, read_only=True, label=_("Action"))
+    process_map = serializers.JSONField(read_only=True, default=list, label=_('Process map'))
 
     class Meta:
         model = Ticket

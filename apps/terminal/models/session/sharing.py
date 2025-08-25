@@ -48,11 +48,11 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         return 'Creator: {}'.format(self.creator)
 
     @cached_property
-    def url(self):
+    def url(self) -> str:
         return '%s/koko/share/%s/' % (self.origin, self.id)
 
     @cached_property
-    def users_display(self):
+    def users_display(self) -> list:
         if not self.users:
             return []
         with tmp_to_root_org():
@@ -73,7 +73,7 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         return self.date_created + datetime.timedelta(minutes=self.expired_time)
 
     @property
-    def is_expired(self):
+    def is_expired(self) -> bool:
         if timezone.now() > self.date_expired:
             return False
         return True
@@ -134,7 +134,7 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         return 'Joiner: {}'.format(self.joiner)
 
     @property
-    def joiner_display(self):
+    def joiner_display(self) -> str:
         return str(self.joiner)
 
     def can_join(self):

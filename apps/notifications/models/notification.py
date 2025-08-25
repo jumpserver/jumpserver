@@ -45,7 +45,7 @@ class SystemMsgSubscription(JMSBaseModel):
         self.message_type_label = msg_label
 
     @property
-    def receivers(self):
+    def receivers(self) -> list:
         from notifications.backends import BACKEND
 
         users = [user for user in self.users.all()]

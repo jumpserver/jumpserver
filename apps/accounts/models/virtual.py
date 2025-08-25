@@ -18,11 +18,11 @@ class VirtualAccount(JMSOrgBaseModel):
         verbose_name = _('Virtual account')
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.get_alias_display()
 
     @property
-    def username(self):
+    def username(self) -> str:
         usernames_map = {
             AliasAccount.INPUT: _("Manual input"),
             AliasAccount.USER: _("Same with user"),
@@ -32,7 +32,7 @@ class VirtualAccount(JMSOrgBaseModel):
         return usernames_map.get(self.alias, '')
 
     @property
-    def comment(self):
+    def comment(self) -> str:
         comments_map = {
             AliasAccount.INPUT: _('Non-asset account, Input username/password on connect'),
             AliasAccount.USER: _('The account username name same with user on connect'),

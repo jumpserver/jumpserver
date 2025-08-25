@@ -25,7 +25,7 @@ class PlatformProtocol(models.Model):
         return '{}/{}'.format(self.name, self.port)
 
     @property
-    def secret_types(self):
+    def secret_types(self) -> list:
         return Protocol.settings().get(self.name, {}).get('secret_types', ['password'])
 
     @lazyproperty

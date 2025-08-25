@@ -71,7 +71,7 @@ class RoleBinding(JMSBaseModel):
         return display
 
     @property
-    def org_name(self):
+    def org_name(self) -> str:
         if self.org:
             return self.org.name
         return ''

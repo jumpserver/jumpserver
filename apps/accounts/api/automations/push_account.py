@@ -63,11 +63,9 @@ class PushAccountRemoveAssetApi(AutomationRemoveAssetApi):
     model = PushAccountAutomation
     serializer_class = serializers.PushAccountUpdateAssetSerializer
 
-
 class PushAccountAddAssetApi(AutomationAddAssetApi):
     model = PushAccountAutomation
     serializer_class = serializers.PushAccountUpdateAssetSerializer
-
 
 class PushAccountNodeAddRemoveApi(AutomationNodeAddRemoveApi):
     model = PushAccountAutomation

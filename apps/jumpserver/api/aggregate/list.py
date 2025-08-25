@@ -1,7 +1,6 @@
 # views.py
 
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 
@@ -51,32 +50,34 @@ list_schema = {
     }
 }
 
-list_response = openapi.Response("Resource list response", schema=openapi.Schema(**list_schema))
+from drf_spectacular.openapi import OpenApiResponse, OpenApiExample
 
 
 class ResourceListApi(ProxyMixin, APIView):
-    @swagger_auto_schema(
+    @extend_schema(
         operation_id="get_resource_list",
-        operation_summary="Get resource list",
-        manual_parameters=list_params,
-        responses={200: list_response},
-        operation_description="""
+        summary="Get resource list",
+        parameters=list_params,
+        responses={200: OpenApiResponse(description="Resource list response")},
+        description="""
           Get resource list, you should set the resource name in the url.
           OPTIONS /api/v1/resources/{resource}/?action=get to get every type resource's field type and help text.
-    """, )
+        """,
+    )
     # ↓↓↓ Swagger 自动文档 ↓↓↓
     def get(self, request, resource):
         return self._proxy(request, resource)
 
-    @swagger_auto_schema(
+    @extend_schema(
         operation_id="create_resource_by_type",
-        operation_summary="Create resource",
-        manual_parameters=create_params,
-        operation_description="""
+        summary="Create resource",
+        parameters=create_params,
+        description="""
           Create resource, 
           OPTIONS /api/v1/resources/{resource}/?action=post to get every resource type field type and helptext, and 
           you will know how to create it.
-      """)
+        """,
+    )
     def post(self, request, resource, pk=None):
         if not resource:
             resource = request.data.pop('resource', '')

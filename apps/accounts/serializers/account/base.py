@@ -70,6 +70,8 @@ class AuthValidateMixin(serializers.Serializer):
 class BaseAccountSerializer(
     AuthValidateMixin, ResourceLabelsMixin, BulkOrgResourceModelSerializer
 ):
+    spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
+
     class Meta:
         model = BaseAccount
         fields_mini = ["id", "name", "username"]

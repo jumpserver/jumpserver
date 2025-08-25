@@ -75,11 +75,11 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
         return bool(self.secret)
 
     @property
-    def has_username(self):
+    def has_username(self) -> bool:
         return bool(self.username)
 
     @property
-    def spec_info(self):
+    def spec_info(self) -> dict:
         data = {}
         if self.secret_type != SecretType.SSH_KEY:
             return data
@@ -87,13 +87,13 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
         return data
 
     @property
-    def password(self):
+    def password(self) -> str:
         if self.secret_type == SecretType.PASSWORD:
             return self.secret
         return None
 
     @property
-    def private_key(self):
+    def private_key(self) -> str:
         if self.secret_type == SecretType.SSH_KEY:
             return self.secret
         return None
@@ -110,7 +110,7 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
         return None
 
     @property
-    def ssh_key_fingerprint(self):
+    def ssh_key_fingerprint(self) -> str:
         if self.public_key:
             public_key = self.public_key
         elif self.private_key:

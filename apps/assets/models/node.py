@@ -573,7 +573,7 @@ class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         return not self.__gt__(other)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.value
 
     def computed_full_value(self):

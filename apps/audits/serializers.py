@@ -119,11 +119,11 @@ class OperateLogSerializer(BulkOrgResourceModelSerializer):
         fields = fields_small
 
     @staticmethod
-    def get_resource_type(instance):
+    def get_resource_type(instance) -> str:
         return _(instance.resource_type)
 
     @staticmethod
-    def get_resource(instance):
+    def get_resource(instance) -> str:
         return i18n_trans(instance.resource)
 
 
@@ -147,11 +147,11 @@ class ActivityUnionLogSerializer(serializers.Serializer):
     r_type = serializers.CharField(read_only=True)
 
     @staticmethod
-    def get_timestamp(obj):
+    def get_timestamp(obj) -> str:
         return as_current_tz(obj['datetime']).strftime('%Y-%m-%d %H:%M:%S')
 
     @staticmethod
-    def get_content(obj):
+    def get_content(obj) -> str:
         if not obj['r_detail']:
             action = obj['r_action'].replace('_', ' ').capitalize()
             ctn = _('%s %s this resource') % (obj['r_user'], _(action).lower())
@@ -160,7 +160,7 @@ class ActivityUnionLogSerializer(serializers.Serializer):
         return ctn
 
     @staticmethod
-    def get_detail_url(obj):
+    def get_detail_url(obj) -> str:
         detail_url = ''
         detail_id, obj_type = obj['r_detail_id'], obj['r_type']
         if not detail_id:
@@ -210,7 +210,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
             "backend_display": {"label": _("Auth backend display")},
         }
 
-    def get_is_current_user_session(self, obj):
+    def get_is_current_user_session(self, obj) -> bool:
         request = self.context.get('request')
         if not request:
             return False

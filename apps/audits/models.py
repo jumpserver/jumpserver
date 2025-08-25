@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import timedelta
+from datetime import timedelta, datetime
 from importlib import import_module
 
 from django.conf import settings
@@ -40,7 +40,7 @@ __all__ = [
 
 class JobLog(JobExecution):
     @property
-    def creator_name(self):
+    def creator_name(self) -> str:
         return self.creator.name
 
     class Meta:
@@ -232,7 +232,7 @@ class UserLoginLog(models.Model):
         return '%s(%s)' % (self.username, self.city)
 
     @property
-    def backend_display(self):
+    def backend_display(self) -> str:
         return gettext(self.backend)
 
     @classmethod
@@ -258,7 +258,7 @@ class UserLoginLog(models.Model):
         return login_logs
 
     @property
-    def reason_display(self):
+    def reason_display(self) -> str:
         from authentication.errors import reason_choices, old_reason_choices
 
         reason = reason_choices.get(self.reason)
@@ -300,15 +300,15 @@ class UserSession(models.Model):
         return '%s(%s)' % (self.user, self.ip)
 
     @property
-    def backend_display(self):
+    def backend_display(self) -> str:
         return gettext(self.backend)
 
     @property
-    def is_active(self):
+    def is_active(self) -> bool:
         return user_session_manager.check_active(self.key)
 
     @property
-    def date_expired(self):
+    def date_expired(self) -> datetime:
         session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
         session_store = session_store_cls(session_key=self.key)
         cache_key = session_store.cache_key

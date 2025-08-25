@@ -1,6 +1,6 @@
 # views.py
 
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -25,10 +25,10 @@ class ResourceTypeResourceSerializer(serializers.Serializer):
 class ResourceTypeListApi(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
+    @extend_schema(
         operation_id="get_supported_resources",
-        operation_summary="Get-all-support-resources",
-        operation_description="Get all support resources, name, path, verbose_name description",
+        summary="Get-all-support-resources",
+        description="Get all support resources, name, path, verbose_name description",
         responses={200: ResourceTypeResourceSerializer(many=True)},  # Specify the response serializer
     )
     def get(self, request):

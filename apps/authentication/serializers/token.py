@@ -46,7 +46,7 @@ class BearerTokenSerializer(serializers.Serializer):
     user = UserProfileSerializer(read_only=True)
 
     @staticmethod
-    def get_keyword(obj):
+    def get_keyword(obj) -> str:
         return 'Bearer'
 
     @staticmethod

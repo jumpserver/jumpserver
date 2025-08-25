@@ -85,11 +85,11 @@ class ConnectionToken(JMSOrgBaseModel):
         return token
 
     @property
-    def is_expired(self):
+    def is_expired(self) -> bool:
         return self.date_expired < timezone.now()
 
     @property
-    def expire_time(self):
+    def expire_time(self) -> int:
         interval = self.date_expired - timezone.now()
         seconds = interval.total_seconds()
         if seconds < 0:
@@ -161,7 +161,7 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)

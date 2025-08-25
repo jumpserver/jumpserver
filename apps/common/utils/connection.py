@@ -47,7 +47,6 @@ class Subscription:
         self.ch = pb.ch
         self.sub = sub
         self.unsubscribed = False
-        logger.info(f"Subscribed to channel: {sub}")
 
     def _handle_msg(self, _next, error, complete):
         """

@@ -56,14 +56,14 @@ class Applet(JMSBaseModel):
         return self.name
 
     @property
-    def path(self):
+    def path(self) -> str:
         if self.builtin:
             return os.path.join(settings.APPS_DIR, 'terminal', 'applets', self.name)
         else:
             return default_storage.path('applets/{}'.format(self.name))
 
     @lazyproperty
-    def readme(self):
+    def readme(self) -> str:
         readme_file = os.path.join(self.path, 'README.md')
         if os.path.isfile(readme_file):
             with open(readme_file, 'r') as f:
@@ -71,7 +71,7 @@ class Applet(JMSBaseModel):
         return ''
 
     @property
-    def manifest(self):
+    def manifest(self) -> dict:
         path = os.path.join(self.path, 'manifest.yml')
         if not os.path.exists(path):
             return None
@@ -79,7 +79,7 @@ class Applet(JMSBaseModel):
             return yaml.safe_load(f)
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         path = os.path.join(self.path, 'icon.png')
         if not os.path.exists(path):
             return None

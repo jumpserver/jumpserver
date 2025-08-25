@@ -18,6 +18,7 @@ class CommentViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     rbac_perms = {
         '*': 'tickets.view_ticket'
     }
+    queryset = Comment.objects.none()
 
     @lazyproperty
     def ticket(self):

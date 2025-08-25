@@ -456,6 +456,8 @@ class AssetAccountBulkSerializer(
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
+    spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
+
     class Meta(AccountSerializer.Meta):
         fields = AccountSerializer.Meta.fields + ['spec_info']
         extra_kwargs = {
@@ -470,6 +472,7 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
 
 class AccountHistorySerializer(serializers.ModelSerializer):
     secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
+    secret = serializers.CharField(label=_('Secret'), read_only=True)
     id = serializers.IntegerField(label=_('ID'), source='history_id', read_only=True)
 
     class Meta:

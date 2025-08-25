@@ -69,7 +69,7 @@ class AssetRiskSerializer(serializers.Serializer):
     risk_summary = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_risk_summary(obj):
+    def get_risk_summary(obj) -> dict:
         summary = {}
         for risk in RiskChoice.choices:
             summary[f"{risk[0]}_count"] = obj.get(f"{risk[0]}_count", 0)

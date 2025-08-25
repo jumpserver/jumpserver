@@ -154,11 +154,9 @@ class ChangSecretAddAssetApi(AutomationAddAssetApi):
     model = ChangeSecretAutomation
     serializer_class = serializers.ChangeSecretUpdateAssetSerializer
 
-
 class ChangSecretNodeAddRemoveApi(AutomationNodeAddRemoveApi):
     model = ChangeSecretAutomation
     serializer_class = serializers.ChangeSecretUpdateNodeSerializer
-
 
 class ChangeSecretStatusViewSet(OrgBulkModelViewSet):
     perm_model = ChangeSecretAutomation

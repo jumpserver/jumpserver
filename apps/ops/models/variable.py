@@ -32,7 +32,7 @@ class Variable(JMSBaseModel):
         return self.name
 
     @property
-    def form_data(self):
+    def form_data(self) -> dict:
         return {
             'var_name': self.var_name,
             'label': self.name,

@@ -1,8 +1,8 @@
 from rest_framework.generics import ListAPIView
 
 from assets import serializers
-from assets.const import Protocol
 from common.permissions import IsValidUser
+from assets.models import Protocol
 
 __all__ = ['ProtocolListApi']
 
