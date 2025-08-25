@@ -33,6 +33,7 @@ ARG TOOLS="                           \
         default-libmysqlclient-dev    \
         openssh-client                \
         sshpass                       \
+        nmap                          \
         bubblewrap"
 
 ARG APT_MIRROR=http://deb.debian.org
