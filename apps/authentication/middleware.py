@@ -77,6 +77,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         ip = get_request_ip(request)
         try:
             self.request = request
+            self.check_is_block()
             self._check_third_party_login_acl()
             self._check_login_acl(request.user, ip)
         except Exception as e:
