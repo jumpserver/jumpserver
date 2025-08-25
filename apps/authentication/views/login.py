@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 from typing import Callable
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit, urlunsplit, urlencode
 
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
@@ -155,9 +155,18 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
         auth_name, redirect_url = auth_method['name'], auth_method['url']
         next_url = request.GET.get('next') or '/'
         next_url = safe_next_url(next_url, request=request)
-        query_string = request.GET.urlencode()
-        redirect_url = '{}?next={}&{}'.format(redirect_url, next_url, query_string)
 
+        merged_qs_items = dict(request.GET.lists())
+        merged_qs_items.pop('next', None)
+
+        merged = {}
+        for k, v_list in merged_qs_items.items():
+            merged[k] = v_list if len(v_list) > 1 else (v_list[0] if v_list else '')
+
+        merged['next'] = next_url
+        query = urlencode(merged, doseq=True)
+        u = urlsplit(redirect_url)
+        redirect_url = urlunsplit((u.scheme, u.netloc, u.path, query, u.fragment))
         if settings.LOGIN_REDIRECT_MSG_ENABLED:
             message_data = {
                 'title': _('Redirecting'),
@@ -165,7 +174,7 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
                 'redirect_url': redirect_url,
                 'interval': 3,
                 'has_cancel': True,
-                'cancel_url': reverse('authentication:login') + f'?admin=1&{query_string}'
+                'cancel_url': reverse('authentication:login') + f'?admin=1&{query}'
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
         return redirect_url
