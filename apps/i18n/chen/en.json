@@ -70,7 +70,7 @@
     "SessionLockedMessage": "This session is locked by %s, please wait for the session to be unlocked.",
     "SessionUnlockedMessage": "This session has been unlocked by %s.",
     "ShowProperties": "Show properties",
-    "StopHotKey": "Stop (Ctrl + C)",
+    "StopHotKey": "Stop (Ctrl + D)",
     "Submit": "Submit",
     "Total": "Total",
     "Type": "Type",
