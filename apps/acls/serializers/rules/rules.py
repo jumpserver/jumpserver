@@ -1,5 +1,7 @@
 # coding: utf-8
 #
+from urllib.parse import urlparse
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -8,7 +10,7 @@ from common.utils.ip import is_ip_address, is_ip_network, is_ip_segment
 
 logger = get_logger(__file__)
 
-__all__ = ['RuleSerializer', 'ip_group_child_validator', 'ip_group_help_text']
+__all__ = ['RuleSerializer', 'ip_group_child_validator', 'ip_group_help_text', 'address_validator']
 
 
 def ip_group_child_validator(ip_group_child):
@@ -18,6 +20,19 @@ def ip_group_child_validator(ip_group_child):
                or is_ip_segment(ip_group_child)
     if not is_valid:
         error = _('IP address invalid: `{}`').format(ip_group_child)
+        raise serializers.ValidationError(error)
+
+
+def address_validator(value):
+    parsed = urlparse(value)
+    is_basic_url = parsed.scheme in ('http', 'https') and parsed.netloc
+    is_valid = value == '*' \
+               or is_ip_address(value) \
+               or is_ip_network(value) \
+               or is_ip_segment(value) \
+               or is_basic_url
+    if not is_valid:
+        error = _('address invalid: `{}`').format(value)
         raise serializers.ValidationError(error)
 
 
