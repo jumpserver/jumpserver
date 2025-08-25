@@ -2,11 +2,9 @@ import copy
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-
 from accounts.const import SecretType, DEFAULT_PASSWORD_RULES
 from common.utils import (
-    validate_ssh_private_key, parse_ssh_private_key_str, 
-    ssh_key_gen, random_string
+    validate_ssh_private_key, parse_ssh_private_key_str, ssh_key_gen, random_string
 )
 
 
