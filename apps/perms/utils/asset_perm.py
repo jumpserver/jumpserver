@@ -101,6 +101,7 @@ class PermAssetDetailUtil:
         }
 
         for alias, action in exclude_alias_action_mapper.items():
+            alias_action_bit_mapper.pop(alias, None)
             account = alias.lstrip('!')
             alias_action_bit_mapper[account] -= action
             
