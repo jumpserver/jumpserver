@@ -85,15 +85,33 @@ class PermAssetDetailUtil:
 
         # @ALL 账号先处理，后面的每个最多映射一个账号
         all_action_bit = alias_action_bit_mapper.pop(AliasAccount.ALL, None)
-        if not all_action_bit:
-            return alias_action_bit_mapper, alias_date_expired_mapper
+        if all_action_bit:
+            asset_account_usernames = asset.all_valid_accounts.values_list('username', flat=True)
+            for username in asset_account_usernames:
+                alias_action_bit_mapper[username] |= all_action_bit
+                alias_date_expired_mapper[username].extend(
+                    alias_date_expired_mapper[AliasAccount.ALL]
+                )
 
-        asset_account_usernames = asset.all_valid_accounts.values_list('username', flat=True)
-        for username in asset_account_usernames:
-            alias_action_bit_mapper[username] |= all_action_bit
-            alias_date_expired_mapper[username].extend(
-                alias_date_expired_mapper[AliasAccount.ALL]
-            )
+        # 排除某些账号的权限
+        exclude_alias_action_mapper = {
+            alias: action 
+            for alias, action in alias_action_bit_mapper.items() 
+            if alias.startswith('!')
+        }
+
+        for alias, action in exclude_alias_action_mapper.items():
+            alias_action_bit_mapper.pop(alias, None)
+            account = alias.lstrip('!')
+            alias_action_bit_mapper[account] -= action
+            
+        # 排除掉没有 action 的账号
+        alias_action_bit_mapper = {
+            alias: action_bit
+            for alias, action_bit in alias_action_bit_mapper.items()
+            if action_bit
+        }
+
         return alias_action_bit_mapper, alias_date_expired_mapper
 
     @classmethod

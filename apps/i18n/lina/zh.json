@@ -574,6 +574,7 @@
     "Exclude": "不包含",
     "ExcludeAsset": "跳过的资产",
     "ExcludeSymbol": "排除字符",
+    "ExcludeAccount": "排除账号",
     "ExecCloudSyncErrorMsg": "云账号配置不完整，请更新后重试",
     "Execute": "执行",
     "ExecuteAfterSaving": "保存后执行",
@@ -1624,5 +1625,8 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "ExportAsPDF": "导出 PDF",
+    "EMailReport": "发送邮件报告",
+    "Print": "打印"
 }
