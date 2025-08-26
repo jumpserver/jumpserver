@@ -87,7 +87,6 @@
     "ExpiredTime": "有效期限",
     "Face online required": "本次登录需要进行人脸验证和监控,是否继续？",
     "Face verify": "人脸验证",
-    "Please complete the face verification": "请完成此人脸认证",
     "Face verify required": "本次登录需要进行人脸验证,是否继续？",
     "Face verify success": "人脸验证成功",
     "FaceOnlineNotSupported": "不支持人脸在线验证",
@@ -167,6 +166,7 @@
     "Pause task has been send": "暂停任务已发送",
     "Play List": "播放列表",
     "Please choose an account": "请选择一个用户",
+    "Please complete the face verification": "请完成此人脸认证",
     "Please input password": "请输入密码",
     "PleaseEnterYourUsername": "请输入用户名",
     "Port": "端口",
@@ -281,9 +281,9 @@
     "download": "下载",
     "recordingIsBeingDownloaded": "录像正在下载中，请稍候",
     "rows": "行数",
+    "scriptLibrary": "脚本库",
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户",
-    "scriptLibrary": "脚本库"
+    "user": "用户"
 }

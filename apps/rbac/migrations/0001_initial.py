@@ -32,7 +32,13 @@ class Migration(migrations.Migration):
                     ('view_workbench', 'Can view workbench view'),
                     ('view_webterminal', 'Can view web terminal'),
                     ('view_filemanager', 'Can view file manager'),
-                    ('view_systemtools', 'Can view System Tools')
+                    ('view_systemtools', 'Can view System Tools'),
+                    ('view_userloginreport', 'Can view user login report'),
+                    ('view_userchangepasswordreport', 'Can view user change password report'),
+                    ('view_assetstatisticsreport', 'Can view asset statistics report'),
+                    ('view_assetactivityreport', 'Can view asset activity report'),
+                    ('view_accountstatisticsreport', 'Can view account statistics report'),
+                    ('view_accountautomationreport', 'Can view account automation report')
                 ],
                 'default_permissions': [],
             },

@@ -1,10 +1,11 @@
 from django.db.models import QuerySet
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 
 from assets.models import Custom, Platform, Asset
 from common.const import UUID_PATTERN
 from common.serializers import create_serializer_class
 from common.serializers.common import DictSerializer, MethodSerializer
+from terminal.models import Applet
 from .common import AssetSerializer
 
 __all__ = ['CustomSerializer']
@@ -47,8 +48,38 @@ class CustomSerializer(AssetSerializer):
 
         if not platform:
             return default_field
+
         custom_fields = platform.custom_fields
+
         if not custom_fields:
             return default_field
         name = platform.name.title() + 'CustomSerializer'
+
+        applet = Applet.objects.filter(
+            name=platform.created_by.replace('Applet:', '')
+        ).first()
+
+        if not applet:
+            return create_serializer_class(name, custom_fields)()
+
+        i18n = applet.manifest.get('i18n', {})
+
+        lang = get_language()
+        lang_short = lang[:2]
+
+        def translate_text(key):
+            return (
+                    i18n.get(key, {}).get(lang)
+                    or i18n.get(key, {}).get(lang_short)
+                    or key
+            )
+
+        for field in custom_fields:
+            label = field.get('label')
+            help_text = field.get('help_text')
+            if label:
+                field['label'] = translate_text(label)
+            if help_text:
+                field['help_text'] = translate_text(help_text)
+
         return create_serializer_class(name, custom_fields)()

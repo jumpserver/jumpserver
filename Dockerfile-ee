@@ -14,7 +14,8 @@ ARG TOOLS="                           \
         telnet                        \
         vim                           \
         postgresql-client-13          \
-        wget"
+        wget                          \
+        poppler-utils"
 
 RUN set -ex \
     && apt-get update \
