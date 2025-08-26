@@ -569,6 +569,7 @@
     "Exclude": "不包含",
     "ExcludeAsset": "跳过的资产",
     "ExcludeSymbol": "排除字符",
+    "ExcludeAccount": "排除账号",
     "ExecCloudSyncErrorMsg": "云账号配置不完整，请更新后重试",
     "Execute": "执行",
     "ExecuteAfterSaving": "保存后执行",
