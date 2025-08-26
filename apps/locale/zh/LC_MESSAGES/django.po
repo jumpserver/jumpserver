@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-25 11:01+0800\n"
+"POT-Creation-Date: 2025-08-26 17:23+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -39,8 +39,6 @@ msgstr "成功: %s, 失败: %s, 总数: %s"
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
-#: xpack/plugins/cloud/serializers/account_attrs.py:90
-#: xpack/plugins/cloud/serializers/account_attrs.py:97
 msgid "Password"
 msgstr "密码"
 
@@ -554,8 +552,6 @@ msgstr "最后登录日期"
 #: users/forms/profile.py:114 users/models/user.py:829
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
-#: xpack/plugins/cloud/serializers/account_attrs.py:88
-#: xpack/plugins/cloud/serializers/account_attrs.py:95
 msgid "Username"
 msgstr "用户名"
 
@@ -633,7 +629,7 @@ msgstr "密码规则"
 #: assets/models/domain.py:19 assets/models/group.py:17
 #: assets/models/label.py:18 assets/models/platform.py:15
 #: assets/models/platform.py:94 assets/serializers/asset/common.py:149
-#: assets/serializers/platform.py:118 assets/serializers/platform.py:221
+#: assets/serializers/platform.py:121 assets/serializers/platform.py:224
 #: authentication/backends/passkey/models.py:10
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:169 labels/models.py:11
@@ -782,7 +778,7 @@ msgstr "账号存在策略"
 #: accounts/serializers/account/account.py:204 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:95
 #: assets/serializers/asset/common.py:125 assets/serializers/cagegory.py:12
-#: assets/serializers/platform.py:133 assets/serializers/platform.py:222
+#: assets/serializers/platform.py:136 assets/serializers/platform.py:225
 #: perms/serializers/user_permission.py:26 settings/models.py:36
 #: tickets/models/ticket/apply_application.py:13 users/models/preference.py:12
 msgid "Category"
@@ -793,8 +789,8 @@ msgstr "类别"
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:96
-#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:120
-#: assets/serializers/platform.py:132 audits/serializers.py:53
+#: assets/serializers/asset/common.py:126 assets/serializers/platform.py:123
+#: assets/serializers/platform.py:135 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:150
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:40
@@ -1272,8 +1268,8 @@ msgid ""
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
 "support)"
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
-"2001:db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -1305,8 +1301,8 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
-"2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -1418,6 +1414,7 @@ msgid "Asset, {}, using account {}"
 msgstr "资产, {}, 使用账号 {}"
 
 #: assets/automations/ping_gateway/manager.py:55
+#, python-brace-format
 msgid "Unable to connect to port {port} on {address}"
 msgstr "无法连接到 {port} 上的端口 {address}"
 
@@ -1493,8 +1490,7 @@ msgstr "云服务"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
-#: common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "自定义"
 
@@ -1548,6 +1544,7 @@ msgid "SFTP root"
 msgstr "SFTP 根路径"
 
 #: assets/const/protocol.py:60
+#, python-brace-format
 msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
 "account username <br>- ${HOME} The home directory of the connected account "
@@ -1941,7 +1938,7 @@ msgid "Asset group"
 msgstr "资产组"
 
 #: assets/models/group.py:31 assets/models/platform.py:19
-#: assets/serializers/platform.py:121
+#: assets/serializers/platform.py:124
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "默认"
@@ -1966,7 +1963,7 @@ msgstr "值"
 
 #: assets/models/label.py:40 assets/serializers/cagegory.py:10
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
-#: assets/serializers/platform.py:119
+#: assets/serializers/platform.py:122
 #: authentication/serializers/connect_token_secret.py:124
 #: common/serializers/common.py:85 labels/models.py:17 labels/models.py:33
 #: labels/serializers.py:45 settings/serializers/msg.py:90
@@ -2010,7 +2007,7 @@ msgstr "必须的"
 msgid "Public"
 msgstr "开放的"
 
-#: assets/models/platform.py:21 assets/serializers/platform.py:49
+#: assets/models/platform.py:21 assets/serializers/platform.py:52
 #: settings/serializers/settings.py:105
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -2026,11 +2023,11 @@ msgstr "启用"
 msgid "Ansible config"
 msgstr "Ansible 配置"
 
-#: assets/models/platform.py:41 assets/serializers/platform.py:33
+#: assets/models/platform.py:41 assets/serializers/platform.py:34
 msgid "Ping enabled"
 msgstr "启用资产探活"
 
-#: assets/models/platform.py:42 assets/serializers/platform.py:34
+#: assets/models/platform.py:42 assets/serializers/platform.py:35
 msgid "Ping method"
 msgstr "资产探活方式"
 
@@ -2039,12 +2036,12 @@ msgid "Ping params"
 msgstr "资产探活参数"
 
 #: assets/models/platform.py:45 assets/models/platform.py:69
-#: assets/serializers/platform.py:35
+#: assets/serializers/platform.py:36
 msgid "Gather facts enabled"
 msgstr "启用收集资产信息"
 
 #: assets/models/platform.py:47 assets/models/platform.py:71
-#: assets/serializers/platform.py:36
+#: assets/serializers/platform.py:37
 msgid "Gather facts method"
 msgstr "收集信息方式"
 
@@ -2052,11 +2049,11 @@ msgstr "收集信息方式"
 msgid "Gather facts params"
 msgstr "收集信息参数"
 
-#: assets/models/platform.py:51 assets/serializers/platform.py:39
+#: assets/models/platform.py:51 assets/serializers/platform.py:40
 msgid "Change secret enabled"
 msgstr "启用改密"
 
-#: assets/models/platform.py:53 assets/serializers/platform.py:40
+#: assets/models/platform.py:53 assets/serializers/platform.py:41
 msgid "Change secret method"
 msgstr "改密方式"
 
@@ -2064,11 +2061,11 @@ msgstr "改密方式"
 msgid "Change secret params"
 msgstr "改密参数"
 
-#: assets/models/platform.py:57 assets/serializers/platform.py:41
+#: assets/models/platform.py:57 assets/serializers/platform.py:42
 msgid "Push account enabled"
 msgstr "启用账号推送"
 
-#: assets/models/platform.py:59 assets/serializers/platform.py:42
+#: assets/models/platform.py:59 assets/serializers/platform.py:43
 msgid "Push account method"
 msgstr "账号推送方式"
 
@@ -2076,11 +2073,11 @@ msgstr "账号推送方式"
 msgid "Push account params"
 msgstr "账号推送参数"
 
-#: assets/models/platform.py:63 assets/serializers/platform.py:37
+#: assets/models/platform.py:63 assets/serializers/platform.py:38
 msgid "Verify account enabled"
 msgstr "开启账号验证"
 
-#: assets/models/platform.py:65 assets/serializers/platform.py:38
+#: assets/models/platform.py:65 assets/serializers/platform.py:39
 msgid "Verify account method"
 msgstr "账号验证方式"
 
@@ -2088,11 +2085,11 @@ msgstr "账号验证方式"
 msgid "Verify account params"
 msgstr "账号验证参数"
 
-#: assets/models/platform.py:75
+#: assets/models/platform.py:75 assets/serializers/platform.py:47
 msgid "Remove account enabled"
 msgstr "开启账号移除"
 
-#: assets/models/platform.py:77
+#: assets/models/platform.py:77 assets/serializers/platform.py:46
 msgid "Remove account method"
 msgstr "账号移除方式"
 
@@ -2108,23 +2105,23 @@ msgstr "元数据"
 msgid "Internal"
 msgstr "内置"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:131
+#: assets/models/platform.py:102 assets/serializers/platform.py:134
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/platform.py:104 assets/serializers/platform.py:160
+#: assets/models/platform.py:104 assets/serializers/platform.py:163
 msgid "Domain enabled"
 msgstr "启用网域"
 
-#: assets/models/platform.py:106 assets/serializers/platform.py:159
+#: assets/models/platform.py:106 assets/serializers/platform.py:162
 msgid "Su enabled"
 msgstr "启用账号切换"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:137
+#: assets/models/platform.py:107 assets/serializers/platform.py:140
 msgid "Su method"
 msgstr "账号切换方式"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:140
+#: assets/models/platform.py:108 assets/serializers/platform.py:143
 msgid "Custom fields"
 msgstr "自定义属性"
 
@@ -2139,7 +2136,7 @@ msgid ""
 "type"
 msgstr "资产中批量更新平台，不符合平台类型跳过的资产"
 
-#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:134
+#: assets/serializers/asset/common.py:127 assets/serializers/platform.py:137
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:41
@@ -2170,7 +2167,7 @@ msgstr "端口超出范围 (0-65535)"
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/common.py:316 labels/api.py:107
+#: assets/serializers/asset/common.py:316
 msgid "Invalid data"
 msgstr "无效的数据"
 
@@ -2268,59 +2265,59 @@ msgstr "值"
 msgid "Can't contains: /"
 msgstr "不能包含: /"
 
-#: assets/serializers/platform.py:43
+#: assets/serializers/platform.py:44
 msgid "Gather accounts enabled"
 msgstr "启用账号收集"
 
-#: assets/serializers/platform.py:44
+#: assets/serializers/platform.py:45
 msgid "Gather accounts method"
 msgstr "收集账号方式"
 
-#: assets/serializers/platform.py:50
+#: assets/serializers/platform.py:53
 msgid "Port from addr"
 msgstr "端口来自地址"
 
-#: assets/serializers/platform.py:62
+#: assets/serializers/platform.py:65
 msgid ""
 "This protocol is primary, and it must be set when adding assets. "
 "Additionally, there can only be one primary protocol."
 msgstr "该协议是主要的，添加资产时必须设置。并且只能有一个主要协议"
 
-#: assets/serializers/platform.py:67
+#: assets/serializers/platform.py:70
 msgid "This protocol is required, and it must be set when adding assets."
 msgstr "该协议是必填的，添加资产时必须设置"
 
-#: assets/serializers/platform.py:70
+#: assets/serializers/platform.py:73
 msgid ""
 "This protocol is default, when adding assets, it will be displayed by "
 "default."
 msgstr "该协议是默认的，添加资产时，将默认显示"
 
-#: assets/serializers/platform.py:73
+#: assets/serializers/platform.py:76
 msgid "This protocol is public, asset will show this protocol to user"
 msgstr "该协议是公开的，资产将向用户显示该协议并可以连接使用"
 
-#: assets/serializers/platform.py:122
+#: assets/serializers/platform.py:125
 msgid "Help text"
 msgstr "帮助"
 
-#: assets/serializers/platform.py:123
+#: assets/serializers/platform.py:126
 msgid "Choices"
 msgstr "选择"
 
-#: assets/serializers/platform.py:135
+#: assets/serializers/platform.py:138
 msgid "Automation"
 msgstr "自动化"
 
-#: assets/serializers/platform.py:161
+#: assets/serializers/platform.py:164
 msgid "Default Domain"
 msgstr "默认网域"
 
-#: assets/serializers/platform.py:182
+#: assets/serializers/platform.py:185
 msgid "type is required"
 msgstr "类型 该字段是必填项。"
 
-#: assets/serializers/platform.py:197
+#: assets/serializers/platform.py:200
 msgid "Protocols is required"
 msgstr "协议是必填的"
 
@@ -2393,10 +2390,6 @@ msgstr "没有匹配到资产，结束任务"
 #: audits/apps.py:9
 msgid "Audits"
 msgstr "日志审计"
-
-#: audits/backends/__init__.py:29 audits/const.py:51 audits/models.py:132
-msgid "Operate log"
-msgstr "操作日志"
 
 #: audits/backends/db.py:16
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
@@ -2497,6 +2490,10 @@ msgstr "结束"
 msgid "Terminal"
 msgstr "终端"
 
+#: audits/const.py:51 audits/models.py:132
+msgid "Operate log"
+msgstr "操作日志"
+
 #: audits/const.py:52
 msgid "Session log"
 msgstr "会话日志"
@@ -2539,8 +2536,7 @@ msgstr "操作"
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:66 common/sdk/sms/custom_file.py:47
-#: common/serializers/common.py:98
+#: audits/models.py:66 common/serializers/common.py:98
 msgid "File"
 msgstr "文件"
 
@@ -2910,6 +2906,7 @@ msgid "No session found, check your cookie"
 msgstr "会话已变更，刷新页面"
 
 #: authentication/errors/const.py:41
+#, python-brace-format
 msgid ""
 "The username or password you entered is incorrect, please enter it again. "
 "You can also try {times_try} times (The account will be temporarily locked "
@@ -2931,6 +2928,7 @@ msgid ""
 msgstr "IP 已被锁定 (请联系管理员解锁或 {} 分钟后重试)"
 
 #: authentication/errors/const.py:59
+#, python-brace-format
 msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
@@ -3960,10 +3958,12 @@ msgid "Children"
 msgstr "节点"
 
 #: common/serializers/fields.py:134
+#, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "错误的 pk \"{pk_value}\" - 对象不存在"
 
 #: common/serializers/fields.py:135
+#, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "错误类型。期望 pk 值，收到 {data_type}。"
 
@@ -4023,6 +4023,7 @@ msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
 #: jumpserver/conf.py:462
+#, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
@@ -4134,16 +4135,19 @@ msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
 #: ops/api/job.py:81
+#, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr "资产({asset})至少要添加ssh,sftp,winrm其中一种协议"
 
 #: ops/api/job.py:82
+#, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
 
 #: ops/api/job.py:83
+#, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "资产({asset})授权缺少上传权限"
 
@@ -4152,6 +4156,7 @@ msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
 #: ops/api/job.py:173
+#, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
@@ -4431,18 +4436,22 @@ msgid "Terminal health check warning"
 msgstr "终端健康状况检查警告"
 
 #: ops/notifications.py:70
+#, python-brace-format
 msgid "The terminal is offline: {name}"
 msgstr "终端已离线: {name}"
 
 #: ops/notifications.py:75
+#, python-brace-format
 msgid "Disk used more than {max_threshold}%: => {value}"
 msgstr "硬盘使用率超过 {max_threshold}%: => {value}"
 
 #: ops/notifications.py:80
+#, python-brace-format
 msgid "Memory used more than {max_threshold}%: => {value}"
 msgstr "内存使用率超过 {max_threshold}%: => {value}"
 
 #: ops/notifications.py:85
+#, python-brace-format
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
@@ -5193,11 +5202,11 @@ msgstr "用户属性映射"
 
 #: settings/serializers/auth/ldap.py:59
 msgid ""
-"User attr map present how to map LDAP user attr to jumpserver, "
-"username,name,email is jumpserver attr"
+"User attr map present how to map LDAP user attr to jumpserver, username,name,"
+"email is jumpserver attr"
 msgstr ""
-"用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, "
-"name,email 是jumpserver的用户需要属性"
+"用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
+"email 是jumpserver的用户需要属性"
 
 #: settings/serializers/auth/ldap.py:77
 msgid "Connect timeout (s)"
@@ -5293,11 +5302,11 @@ msgstr "忽略 SSL 证书验证"
 
 #: settings/serializers/auth/oidc.py:38
 msgid ""
-"User attr map present how to map OpenID user attr to jumpserver, "
-"username,name,email is jumpserver attr"
+"User attr map present how to map OpenID user attr to jumpserver, username,"
+"name,email is jumpserver attr"
 msgstr ""
-"用户属性映射代表怎样将OpenID中用户属性映射到jumpserver用户上，username, "
-"name,email 是jumpserver的用户需要属性"
+"用户属性映射代表怎样将OpenID中用户属性映射到jumpserver用户上，username, name,"
+"email 是jumpserver的用户需要属性"
 
 #: settings/serializers/auth/oidc.py:41
 msgid "Enable PKCE"
@@ -5475,6 +5484,7 @@ msgid "Business type(Service id)"
 msgstr "业务类型(Service id)"
 
 #: settings/serializers/auth/sms.py:80
+#, python-brace-format
 msgid ""
 "Template need contain {code} and Signature + template length does not exceed "
 "67 words. For example, your verification code is {code}, which is valid for "
@@ -5484,6 +5494,7 @@ msgstr ""
 "{code}, 有效期为5分钟。请不要泄露给其他人。"
 
 #: settings/serializers/auth/sms.py:89
+#, python-brace-format
 msgid "The template needs to contain {code}"
 msgstr "模板需要包含 {code}"
 
@@ -5529,8 +5540,8 @@ msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
 msgstr ""
-"外部可访问的 URL, 用于邮件链接或其它系统回调, 例如: http://"
-"dev.jumpserver.org:8080"
+"外部可访问的 URL, 用于邮件链接或其它系统回调, 例如: http://dev.jumpserver."
+"org:8080"
 
 #: settings/serializers/basic.py:18
 msgid "User guide url"
@@ -5801,6 +5812,7 @@ msgid "Create user email content"
 msgstr "邮件的内容"
 
 #: settings/serializers/msg.py:80
+#, python-brace-format
 msgid ""
 "Tips: When creating a user, send the content of the email, support "
 "{username} {name} {email} label"
@@ -6542,7 +6554,7 @@ msgstr "会话不存在: {}"
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:337 tickets/api/ticket.py:140
+#: terminal/api/session/session.py:337
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -9110,10 +9122,6 @@ msgstr "订阅 ID"
 msgid "Auto node classification"
 msgstr "自动节点分类"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
-msgid "domain_name"
-msgstr "启用网域"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:99
 #: xpack/plugins/cloud/serializers/account_attrs.py:103
 #: xpack/plugins/cloud/serializers/account_attrs.py:127
@@ -9283,5 +9291,4 @@ msgstr "企业专业版"
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
 
-#~ msgid "Asset IP"
-#~ msgstr "资产 IP"
+
