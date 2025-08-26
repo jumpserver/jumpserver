@@ -28,4 +28,6 @@
       vars:
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
-      when: account.secret_type == "password"
+      when:
+        - account.secret_type == "password"
+        - check_conn_after_change
