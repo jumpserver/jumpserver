@@ -93,6 +93,7 @@ class PermAssetDetailUtil:
                     alias_date_expired_mapper[AliasAccount.ALL]
                 )
 
+        # 排除某些账号的权限
         exclude_alias_action_mapper = {
             alias: action 
             for alias, action in alias_action_bit_mapper.items() 
@@ -102,6 +103,13 @@ class PermAssetDetailUtil:
         for alias, action in exclude_alias_action_mapper.items():
             account = alias.lstrip('!')
             alias_action_bit_mapper[account] -= action
+            
+        # 排除掉没有 action 的账号
+        alias_action_bit_mapper = {
+            alias: action_bit
+            for alias, action_bit in alias_action_bit_mapper.items()
+            if action_bit
+        }
 
         return alias_action_bit_mapper, alias_date_expired_mapper
 
