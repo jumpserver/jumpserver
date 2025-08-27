@@ -181,6 +181,7 @@ MIDDLEWARE = [
     'authentication.middleware.ThirdPartyLoginMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'jumpserver.middleware.SafeRedirectMiddleware',
     'jumpserver.middleware.EndMiddleware',
 ]
 
