@@ -111,7 +111,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         with tmp_to_root_org():
             return Session.objects.filter(terminal=self, is_finished=False)
 
-    def get_online_session_count(self):
+    def get_online_session_count(self) -> int:
         return self.get_online_sessions().count()
 
     @staticmethod

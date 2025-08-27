@@ -190,6 +190,7 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
     rbac_perms = {
         'GET': 'accounts.view_accountsecret',
     }
+    queryset = Account.history.model.objects.none()
 
     @lazyproperty
     def account(self) -> Account:

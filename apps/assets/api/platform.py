@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from assets.const import AllTypes
-from assets.models import Platform, Node, Asset, PlatformProtocol
+from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
@@ -112,6 +112,7 @@ class PlatformProtocolViewSet(JMSModelViewSet):
 
 class PlatformAutomationMethodsApi(generics.ListAPIView):
     permission_classes = (IsValidUser,)
+    queryset = PlatformAutomation.objects.none()
 
     @staticmethod
     def automation_methods():

@@ -94,9 +94,10 @@ cache_kwargs = {
 }
 # docs 路由
 urlpatterns += [
-    path('api/swagger.<format>', views.get_swagger_view().without_ui(**cache_kwargs), name='schema-json'),
-    re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', **cache_kwargs), name="docs"),
-    re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', **cache_kwargs), name='redoc'),
+    path('api/swagger.json', views.get_swagger_view(ui='json', **cache_kwargs), name='schema-json'),
+    path('api/swagger.yaml', views.get_swagger_view(ui='yaml', **cache_kwargs), name='schema'),
+    re_path('api/docs/?', views.get_swagger_view(ui='swagger', **cache_kwargs), name="docs"),
+    re_path('api/redoc/?', views.get_swagger_view(ui='redoc', **cache_kwargs), name='redoc'),
 ]
 
 if os.environ.get('DEBUG_TOOLBAR', False):

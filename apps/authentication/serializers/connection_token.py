@@ -6,6 +6,7 @@ from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
 from perms.serializers.permission import ActionChoicesField
 from ..models import ConnectionToken, AdminConnectionToken
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
@@ -13,7 +14,7 @@ __all__ = [
 ]
 
 
-class ConnectionTokenSerializer(CommonModelSerializer):
+class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
     input_secret = EncryptedField(
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
@@ -60,7 +61,7 @@ class ConnectionTokenSerializer(CommonModelSerializer):
             validated_data['remote_addr'] = get_request_ip(request)
         return super().create(validated_data)
 
-    def get_from_ticket_info(self, instance):
+    def get_from_ticket_info(self, instance) -> dict:
         if not instance.from_ticket:
             return {}
         user = self.get_request_user()

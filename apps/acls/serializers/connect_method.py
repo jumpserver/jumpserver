@@ -1,4 +1,4 @@
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from common.serializers import CommonBulkModelSerializer
 from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
 from ..const import ActionChoices
 from ..models import ConnectMethodACL
@@ -6,7 +6,7 @@ from ..models import ConnectMethodACL
 __all__ = ["ConnectMethodACLSerializer"]
 
 
-class ConnectMethodACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
+class ConnectMethodACLSerializer(BaseSerializer, CommonBulkModelSerializer):
     class Meta(BaseSerializer.Meta):
         model = ConnectMethodACL
         fields = [

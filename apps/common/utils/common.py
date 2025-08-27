@@ -10,7 +10,7 @@ import socket
 import time
 import uuid
 from collections import OrderedDict
-from functools import wraps
+from functools import wraps, cached_property
 from itertools import chain
 
 import html2text
@@ -246,17 +246,19 @@ def dict_get_any(d, keys):
     return None
 
 
-class lazyproperty:
-    def __init__(self, func):
-        self.func = func
+# class lazyproperty:
+#     def __init__(self, func):
+#         self.func = func
 
-    def __get__(self, instance, cls):
-        if instance is None:
-            return self
-        else:
-            value = self.func(instance)
-            setattr(instance, self.func.__name__, value)
-            return value
+#     def __get__(self, instance, cls):
+#         if instance is None:
+#             return self
+#         else:
+#             value = self.func(instance)
+#             setattr(instance, self.func.__name__, value)
+#             return value
+
+lazyproperty = cached_property
 
 
 def get_disk_usage(path):

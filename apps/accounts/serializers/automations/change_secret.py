@@ -130,7 +130,7 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     @staticmethod
-    def get_is_success(obj):
+    def get_is_success(obj) -> bool:
         return obj.status == ChangeSecretRecordStatusChoice.success
 
 
@@ -157,7 +157,7 @@ class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     @staticmethod
-    def get_asset(instance):
+    def get_asset(instance) -> str:
         return str(instance.asset)
 
     @staticmethod
@@ -165,7 +165,7 @@ class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
         return str(instance.account)
 
     @staticmethod
-    def get_is_success(obj):
+    def get_is_success(obj) -> str:
         if obj.status == ChangeSecretRecordStatusChoice.success.value:
             return _("Success")
         return _("Failed")
@@ -196,9 +196,9 @@ class ChangeSecretAccountSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     @staticmethod
-    def get_meta(obj):
+    def get_meta(obj) -> dict:
         return account_secret_task_status.get(str(obj.id))
 
     @staticmethod
-    def get_ttl(obj):
+    def get_ttl(obj) -> int:
         return account_secret_task_status.get_ttl(str(obj.id))

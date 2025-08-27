@@ -6,6 +6,7 @@ from notifications.models import SystemMsgSubscription, UserMsgSubscription
 
 class SystemMsgSubscriptionSerializer(BulkModelSerializer):
     receive_backends = serializers.ListField(child=serializers.CharField())
+    message_type_label = serializers.CharField(read_only=True)
 
     class Meta:
         model = SystemMsgSubscription
