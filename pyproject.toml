@@ -77,7 +77,7 @@ dependencies = [
     'django-timezone-field==5.1',
     'djangorestframework==3.14.0',
     'djangorestframework-bulk==0.2.1',
-    'django-simple-history==3.10.1',
+    'django-simple-history==3.6.0',
     'django-private-storage==3.1',
     'drf-nested-routers==0.93.4',
     'drf-writable-nested==0.7.0',
