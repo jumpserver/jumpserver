@@ -618,6 +618,8 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
         token_id = request.data.get('id') or ''
         token = ConnectionToken.get_typed_connection_token(token_id)
+        if not token:
+            raise PermissionDenied('Token {} is not valid'.format(token))
         token.is_valid()
         serializer = self.get_serializer(instance=token)
 
