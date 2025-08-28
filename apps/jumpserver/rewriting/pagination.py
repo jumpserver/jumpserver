@@ -17,4 +17,9 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
             self.max_limit = view.page_max_limit
         if view and hasattr(view, 'page_default_limit'):
             self.default_limit = view.page_default_limit
+
+        if view and hasattr(view, 'default_limit'):
+            self.default_limit = view.default_limit
+
         return super().paginate_queryset(queryset, request, view)
+

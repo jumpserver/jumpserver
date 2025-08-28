@@ -16,6 +16,7 @@ class CategoryViewSet(ListModelMixin, JMSGenericViewSet):
         'types': TypeSerializer,
     }
     permission_classes = (IsValidUser,)
+    default_limit = None
 
     def get_queryset(self):
         return AllTypes.categories()

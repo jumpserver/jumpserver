@@ -43,6 +43,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'ops_methods': 'assets.view_platform',
         'filter_nodes_assets': 'assets.view_platform',
     }
+    default_limit = None
 
     def get_queryset(self):
         # 因为没有走分页逻辑，所以需要这里 prefetch
