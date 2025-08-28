@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -76,7 +77,10 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @classmethod
     def get_typed_connection_token(cls, token_id):
-        token = get_object_or_404(cls, id=token_id)
+        try:
+            token = get_object_or_404(cls, id=token_id)
+        except ValidationError:
+            return None
 
         if token.type == ConnectionTokenType.ADMIN.value:
             token = AdminConnectionToken.objects.get(id=token_id)
