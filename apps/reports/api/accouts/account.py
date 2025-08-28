@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.db.models import Count, Q, F, Value
 from django.db.models.functions import Concat
 from django.http import JsonResponse
+from django.utils import timezone
 from rest_framework.views import APIView
 
 from accounts.const import Source
@@ -39,7 +40,8 @@ class AccountStatisticApi(DateRangeMixin, APIView):
 
         data = defaultdict(set)
         for t, _id in filtered_queryset.values_list('date_change_secret', 'id'):
-            date_str = str(t.date())
+            dt_local = timezone.localtime(t)
+            date_str = str(dt_local.date())
             data[date_str].add(_id)
 
         metrics = [len(data.get(str(d), set())) for d in self.date_range_list]
