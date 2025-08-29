@@ -54,7 +54,7 @@ class NativeClient(TextChoices):
             Protocol.oracle: [cls.db_client, cls.db_guide],
             Protocol.postgresql: [cls.db_client, cls.db_guide],
             Protocol.sqlserver: [cls.db_client, cls.db_guide],
-            Protocol.vnc: [cls.vnc_guide, ]
+            Protocol.vnc: [cls.vnc_client, cls.vnc_guide],
         }
         return clients
 
