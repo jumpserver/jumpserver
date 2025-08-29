@@ -250,6 +250,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': False,
                         'label': _('Auth username')
                     },
+                    'enable_cluster_mode': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Enable cluster mode'),
+                        'help_text': _('Enable if this Redis instance is part of a cluster')
+                    },
                 }
             },
         }
