@@ -1,11 +1,11 @@
 import json
 import logging
 import os
+import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta, datetime
 
-import sys
 from celery import current_task
 from django.conf import settings
 from django.db import models
@@ -271,7 +271,7 @@ class JobExecution(JMSOrgBaseModel):
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
-            'sqlserver': 'community.general.mssql_script',
+            'sqlserver': 'mssql_script',
         }
         extra_query_token_map = {
             'sqlserver': 'script'
