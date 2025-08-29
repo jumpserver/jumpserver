@@ -10,7 +10,7 @@ from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.api import CommonApiMixin, SuggestionMixin
 from common.drf.filters import AttrRulesFilterBackend
-from common.utils import get_logger
+from common.utils import get_logger, is_uuid
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from rbac.permissions import RBACPermission
@@ -51,6 +51,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         'remove': 'users.remove_user',
         'bulk_remove': 'users.remove_user',
     }
+
+    def get_object(self):
+        pk = self.kwargs.get(self.lookup_field)
+        if not is_uuid(pk):
+            return self.get_queryset().get(username=pk)
+        return super().get_object()
 
     def allow_bulk_destroy(self, qs, filtered):
         is_valid = filtered.count() < qs.count()

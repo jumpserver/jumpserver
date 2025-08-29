@@ -394,9 +394,13 @@ class UserRetrieveSerializer(UserSerializer):
     login_confirm_settings = serializers.PrimaryKeyRelatedField(
         read_only=True, source="login_confirm_setting.reviewers", many=True
     )
+    has_public_keys = serializers.BooleanField(
+        label=_("Has public keys"),
+        read_only=True,
+    )
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ["login_confirm_settings"]
+        fields = UserSerializer.Meta.fields + ["login_confirm_settings", "has_public_keys"]
 
 
 class SmsUserSerializer(serializers.ModelSerializer):
