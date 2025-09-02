@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import base64
+import re
 
 from django.db import connections, transaction, connection
 from django.utils.encoding import force_str
@@ -110,6 +111,28 @@ class Encryptor:
         """
         if not self.value:
             return False
+
+        candidate = self.value.strip().strip("'").strip('"')
+        gcm_pattern_std = r'^(?:[A-Za-z0-9+/]{22}==){3}[A-Za-z0-9+/]+=*$'
+        gcm_pattern_url = r'^(?:[A-Za-z0-9_\-]{22}==){3}[A-Za-z0-9_\-]+=*$'
+
+        if re.match(gcm_pattern_std, candidate) or re.match(gcm_pattern_url, candidate):
+            return True
+
+        # 检测 JWT 格式 (signer.sign 的输出)
+        # JWT 格式: header.payload.signature (用点号分隔)
+        if '.' in self.value and len(self.value.split('.')) == 3:
+            try:
+                # 尝试 base64 解码 JWT 的 header 部分
+                header_part = self.value.split('.')[0]
+                # 添加必要的填充
+                missing_padding = len(header_part) % 4
+                if missing_padding:
+                    header_part += '=' * (4 - missing_padding)
+                base64.urlsafe_b64decode(header_part)
+                return True
+            except Exception:
+                pass
         
         # 检测 base64 编码格式 (crypto.encrypt 的输出)
         try:

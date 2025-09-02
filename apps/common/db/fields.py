@@ -139,6 +139,10 @@ class EncryptMixin:
     EncryptMixin要放在最前面
     """
 
+    def __init__(self, *args, **kwargs):
+        self.migrated = kwargs.pop("migrated", False)
+        super().__init__(*args, **kwargs)
+
     def from_db_value(self, value, expression, connection, context=None):
         if value is None:
             return value
@@ -146,10 +150,9 @@ class EncryptMixin:
         encryptor = Encryptor(value)
         plain_value = encryptor.decrypt()
 
-        # 如果解密失败，并且可能不是加密数据，则使用原始值
-        if not plain_value and not encryptor.is_encrypted_data():
+        if not plain_value and self.migrated and encryptor.is_encrypted_data():
             plain_value = value
-            
+
         # 可能和Json mix，所以要先解密，再json
         sp = super()
         if hasattr(sp, "from_db_value"):

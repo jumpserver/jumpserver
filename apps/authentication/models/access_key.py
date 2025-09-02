@@ -17,7 +17,7 @@ def default_secret():
 
 class AccessKey(models.Model):
     id = models.UUIDField(verbose_name='AccessKeyID', primary_key=True, default=uuid.uuid4, editable=False)
-    secret = EncryptTextField(verbose_name='AccessKeySecret', default=default_secret)
+    secret = EncryptTextField(verbose_name='AccessKeySecret', default=default_secret, migrated=True)
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User',
                              on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='access_keys')
