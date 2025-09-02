@@ -2,9 +2,22 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## 점프서버란?
+## 오픈 소스 PAM 도구(점프 서버)
+</div>
+
+<br/>
+
+## JumpServer란 무엇인가요?
 
 점프서버는 DevOps 및 IT 팀에게 웹 브라우저를 통해 SSH, RDP, Kubernetes, 데이터베이스 및 원격 애플리케이션 엔드포인트에 대한 온디맨드 및 안전한 액세스를 제공하는 오픈 소스 권한 있는 액세스 관리(PAM) 플랫폼입니다. 
+
+
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="https://www.jumpserver.com/images/jumpserver-arch-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.jumpserver.com/images/jumpserver-arch-dark.png">
+  <img src="https://github.com/user-attachments/assets/dd612f3d-c958-4f84-b164-f31b75454d7f" alt="Theme-based Image">
+</picture>
+
 
 
 ## 빠른 시작
