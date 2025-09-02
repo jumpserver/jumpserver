@@ -33,28 +33,32 @@ class GlobalSearchView(APIView):
             qs = model.objects.filter(q)
         return qs[:self.limits]
 
+    def get_result(self, model, fields, item, keyword):
+        d = {
+            "id": item.id, "name": item.name, 
+            "model": model.__name__, "model_label": model._meta.verbose_name,
+        }
+        content = ""
+        for field in fields:
+            field_label = model._meta.get_field(field).verbose_name
+            value = getattr(item, field)
+
+            if isinstance(value, str) and keyword not in value:
+                continue
+
+            content += f"{field_label}: {value}; "
+            d["content"] = content
+        return d
+
     def get(self, request):
-        q = request.query_params.get("q", "")
+        q = request.query_params.get("q", "").strip()
         models = self.get_models()
         results = []
 
         for model, fields in models:
             qs = self.search_model(model, fields, q)
             for item in qs:
-                d = {
-                    "id": item.id, "name": item.name, 
-                    "model": model.__name__, "model_label": model._meta.verbose_name,
-                }
-                content = ""
-                for field in fields:
-                    field_label = model._meta.get_field(field).verbose_name
-                    value = getattr(item, field)
-
-                    if isinstance(value, str) and q not in value:
-                        continue
-
-                    content += f"{field_label}: {value}; "
-                    d["content"] = content
+                d = self.get_result(model, fields, item, q)
                 results.append(d)
 
         return Response(results)
