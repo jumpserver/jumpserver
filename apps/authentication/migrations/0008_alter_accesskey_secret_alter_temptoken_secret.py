@@ -4,6 +4,22 @@ import authentication.models.access_key
 import common.db.fields
 from django.db import migrations
 
+old_access_key_secrets_mapper = {}
+
+def fetch_access_key_secrets(apps, schema_editor):
+    AccessKey = apps.get_model("authentication", "AccessKey")
+
+    for id, secret in AccessKey.objects.all().values_list('id', 'secret'):
+        old_access_key_secrets_mapper[str(id)] = secret
+
+
+def save_access_key_secrets(apps, schema_editor):
+    AccessKey = apps.get_model("authentication", "AccessKey")
+    aks = AccessKey.objects.filter(id__in=list(old_access_key_secrets_mapper.keys()))
+    for ak in aks:
+        old_value = old_access_key_secrets_mapper.get(str(ak.id))
+        ak.secret = old_value
+        ak.save(update_fields=["secret"])
 
 class Migration(migrations.Migration):
 
@@ -12,6 +28,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(fetch_access_key_secrets),
         migrations.AlterField(
             model_name="accesskey",
             name="secret",
@@ -27,4 +44,5 @@ class Migration(migrations.Migration):
                 verbose_name="Secret"
             ),
         ),
+        migrations.RunPython(save_access_key_secrets),
     ]
