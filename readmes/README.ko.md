@@ -9,8 +9,7 @@
 
 ## JumpServer란 무엇인가요?
 
-점프서버는 DevOps 및 IT 팀에게 웹 브라우저를 통해 SSH, RDP, Kubernetes, 데이터베이스 및 원격 애플리케이션 엔드포인트에 대한 온디맨드 및 안전한 액세스를 제공하는 오픈 소스 권한 있는 액세스 관리(PAM) 플랫폼입니다. 
-
+JumpServer는 DevOps 및 IT 팀에게 웹 브라우저를 통해 SSH, RDP, Kubernetes, 데이터베이스 및 원격 애플리케이션 엔드포인트에 대한 온디맨드 및 안전한 액세스를 제공하는 오픈 소스 권한 있는 액세스 관리(PAM) 플랫폼입니다.
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="https://www.jumpserver.com/images/jumpserver-arch-light.png">
