@@ -146,10 +146,6 @@ class EncryptMixin:
         encryptor = Encryptor(value)
         plain_value = encryptor.decrypt()
 
-        # 如果解密失败，并且可能不是加密数据，则使用原始值
-        if not plain_value and not encryptor.is_encrypted_data():
-            plain_value = value
-            
         # 可能和Json mix，所以要先解密，再json
         sp = super()
         if hasattr(sp, "from_db_value"):
