@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 
+from common.serializers import CommonBulkModelSerializer
 from common.serializers import MethodSerializer
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseUserACLSerializer
 from .rules import RuleSerializer
 from ..const import ActionChoices
@@ -12,12 +12,12 @@ __all__ = ["LoginACLSerializer"]
 common_help_text = _("With * indicating a match all. ")
 
 
-class LoginACLSerializer(BaseUserACLSerializer):
+class LoginACLSerializer(BaseUserACLSerializer, CommonBulkModelSerializer):
     rules = MethodSerializer(label=_('Rule'))
 
     class Meta(BaseUserACLSerializer.Meta):
         model = LoginACL
-        fields = BaseUserACLSerializer.Meta.fields + ['rules', ]
+        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules'}) - {'org_id'})
         action_choices_exclude = [
             ActionChoices.warning,
             ActionChoices.notify_and_warn,

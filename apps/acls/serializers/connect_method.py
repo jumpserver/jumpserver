@@ -1,4 +1,4 @@
-from common.serializers import CommonBulkModelSerializer
+from common.serializers.mixin import CommonBulkModelSerializer
 from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
 from ..const import ActionChoices
 from ..models import ConnectMethodACL
@@ -11,11 +11,10 @@ class ConnectMethodACLSerializer(BaseSerializer, CommonBulkModelSerializer):
         model = ConnectMethodACL
         fields = [
             i for i in BaseSerializer.Meta.fields + ['connect_methods']
-            if i not in ['assets', 'accounts']
+            if i not in ['assets', 'accounts', 'org_id']
         ]
         action_choices_exclude = BaseSerializer.Meta.action_choices_exclude + [
             ActionChoices.review,
-            ActionChoices.accept,
             ActionChoices.notice,
             ActionChoices.face_verify,
             ActionChoices.face_online,
