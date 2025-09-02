@@ -38,6 +38,7 @@ api_v1 = resource_api + [
     path('resources/', api.ResourceTypeListApi.as_view(), name='resource-list'),
     path('resources/<str:resource>/', api.ResourceListApi.as_view()),
     path('resources/<str:resource>/<str:pk>/', api.ResourceDetailApi.as_view()),
+    path('search/', api.GlobalSearchView.as_view()),
 ]
 
 app_view_patterns = [
