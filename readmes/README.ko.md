@@ -2,7 +2,7 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## 오픈 소스 PAM 도구(점프 서버)
+## 오픈 소스 PAM 플랫폼(점프 서버)
 </div>
 
 <br/>
