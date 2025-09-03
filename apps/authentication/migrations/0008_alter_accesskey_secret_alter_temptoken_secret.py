@@ -18,6 +18,8 @@ def save_access_key_secrets(apps, schema_editor):
     aks = AccessKey.objects.filter(id__in=list(old_access_key_secrets_mapper.keys()))
     for ak in aks:
         old_value = old_access_key_secrets_mapper.get(str(ak.id))
+        if not old_value:
+            continue
         ak.secret = old_value
         ak.save(update_fields=["secret"])
 
