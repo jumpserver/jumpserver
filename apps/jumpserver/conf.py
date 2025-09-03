@@ -543,6 +543,10 @@ class Config(dict):
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
         'EMAIL_CUSTOM_USER_CREATED_BODY': _('Your account has been created successfully'),
 
+        # Email template
+        'EMAIL_TEMPLATE_NAME': '',
+        'EMAIL_TEMPLATE_CONTENT': '',
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'example.com',

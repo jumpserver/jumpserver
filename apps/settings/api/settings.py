@@ -39,6 +39,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ldap_ha': serializers.LDAPHASettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
+        'email_template': serializers.EmailTemplateSettingSerializer,
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
         'feishu': serializers.FeiShuSettingSerializer,
