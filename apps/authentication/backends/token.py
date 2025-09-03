@@ -14,7 +14,9 @@ class TempTokenAuthBackend(JMSBaseAuthBackend):
         return settings.AUTH_TEMP_TOKEN
 
     def authenticate(self, request, username='', password=''):
-        token = self.model.objects.filter(username=username, secret=password).first()
+        tokens = self.model.objects.filter(username=username).order_by('-date_created')[:500]
+        token = next((t for t in tokens if t.secret == password), None)
+
         if not token:
             return None
         if not token.is_valid:
