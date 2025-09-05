@@ -1,0 +1,13 @@
+- hosts: website
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+
+  tasks:
+    - name: Verify account
+      website_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        steps: "{{ params.steps }}"
+        load_state: "{{ params.load_state }}"

@@ -5,6 +5,9 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from xlsxwriter import Workbook
 
+from assets.automations.methods import platform_automation_methods as asset_methods
+from assets.const import AutomationTypes as AssetAutomationTypes
+from accounts.automations.methods import platform_automation_methods as account_methods
 from accounts.const import (
     AutomationTypes, SecretStrategy, ChangeSecretRecordStatusChoice
 )
@@ -21,6 +24,22 @@ logger = get_logger(__name__)
 
 class ChangeSecretManager(BaseChangeSecretPushManager):
     ansible_account_prefer = ''
+
+    def get_method_id_meta_mapper(self):
+        return {
+            method["id"]: method for method in self.platform_automation_methods
+        }
+
+    @property
+    def platform_automation_methods(self):
+        return asset_methods + account_methods
+
+    def add_extra_params(self, host, **kwargs):
+        host = super().add_extra_params(host, **kwargs)
+        automation = kwargs.get('automation')
+        for extra_type in [AssetAutomationTypes.ping, AutomationTypes.verify_account]:
+            host[f"{extra_type}_params"] = self.get_params(automation, extra_type)
+        return host
 
     @classmethod
     def method_type(cls):

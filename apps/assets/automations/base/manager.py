@@ -201,14 +201,17 @@ class PlaybookPrepareMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # example: {'gather_fact_windows': {'id': 'gather_fact_windows', 'name': '', 'method': 'gather_fact', ...} }
-        self.method_id_meta_mapper = {
+        self.method_id_meta_mapper = self.get_method_id_meta_mapper()
+        # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
+        # 然后根据执行方式分组, 再根据 bulk_size 分组, 生成不同的 playbook
+        self.playbooks = []
+
+    def get_method_id_meta_mapper(self):
+        return {
             method["id"]: method
             for method in self.platform_automation_methods
             if method["method"] == self.__class__.method_type()
         }
-        # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
-        # 然后根据执行方式分组, 再根据 bulk_size 分组, 生成不同的 playbook
-        self.playbooks = []
 
     @classmethod
     def method_type(cls):

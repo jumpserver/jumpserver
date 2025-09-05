@@ -1,0 +1,36 @@
+- hosts: website
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+
+  tasks:
+    - name: Test privileged account
+      website_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        steps: "{{ ping_params.steps }}"
+        load_state: "{{ ping_params.load_state }}"
+
+    - name: "Change {{ account.username }} password"
+      website_user:
+        login_host: "{{ jms_asset.address }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        steps: "{{ params.steps }}"
+        load_state: "{{ params.load_state }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+      ignore_errors: true
+      register: change_secret_result
+
+    - name: "Verify {{ account.username }} password"
+      website_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        steps: "{{ verify_account_params.steps }}"
+        load_state: "{{ verify_account_params.load_state }}"
+      when:
+       - check_conn_after_change or change_secret_result.failed | default(false)
+      delegate_to: localhost

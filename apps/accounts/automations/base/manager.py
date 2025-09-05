@@ -105,6 +105,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             h['account']['mode'] = 'sysdba' if account.privileged else None
         return h
 
+    def add_extra_params(self, host, **kwargs):
+        host['ssh_params'] = {}
+        return host
+
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(
             host, asset=asset, account=account, automation=automation,
@@ -113,8 +117,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        host['ssh_params'] = {}
-
+        host = self.add_extra_params(host, automation=automation)
         accounts = self.get_accounts(account)
         existing_ids = set(map(str, accounts.values_list('id', flat=True)))
         missing_ids = set(map(str, self.account_ids)) - existing_ids
