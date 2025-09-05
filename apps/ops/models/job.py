@@ -292,7 +292,10 @@ class JobExecution(JMSOrgBaseModel):
                          "login_user={{login_user}} " \
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
-                         "%s={{login_db}}" % login_db_token
+                         "%s={{login_db}} " % login_db_token
+            if module == 'mssql_script':
+                login_args += "encryption={{jms_asset.encryption | default(None) }} " \
+                              "tds_version={{jms_asset.tds_version | default(None) }} "
             shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
