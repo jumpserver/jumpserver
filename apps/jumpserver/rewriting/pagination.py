@@ -15,9 +15,13 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
     def paginate_queryset(self, queryset, request, view=None):
         if view and hasattr(view, 'page_max_limit'):
             self.max_limit = view.page_max_limit
+
+        # 自定义的 api view，就默认不约束分页了
+        if getattr(view, 'action') != 'list' and not getattr(view, 'default_limit'):
+            self.default_limit = None
+
         if view and hasattr(view, 'page_default_limit'):
             self.default_limit = view.page_default_limit
-
         if view and hasattr(view, 'default_limit'):
             self.default_limit = view.default_limit
 
