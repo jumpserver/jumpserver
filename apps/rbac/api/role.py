@@ -28,6 +28,7 @@ class RoleViewSet(JMSModelViewSet):
     rbac_perms = {
         'users': 'rbac.view_rolebinding'
     }
+    default_limit = None
 
     def perform_destroy(self, instance):
         from orgs.utils import tmp_to_root_org
