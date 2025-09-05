@@ -153,7 +153,7 @@ class Session(OrgModelMixin):
             return True
 
     @property
-    def is_locked(self):
+    def is_locked(self) -> bool:
         if self.is_finished:
             return False
         key = self.LOCK_CACHE_KEY_PREFIX.format(self.id)
@@ -173,7 +173,7 @@ class Session(OrgModelMixin):
         cache.delete(key)
 
     @lazyproperty
-    def terminal_display(self):
+    def terminal_display(self) -> str:
         display = self.terminal.name if self.terminal else ''
         return display
 
@@ -226,7 +226,7 @@ class Session(OrgModelMixin):
         return bool(cache.get(key))
 
     @property
-    def command_amount(self):
+    def command_amount(self) -> int:
         if self.need_update_cmd_amount:
             cmd_amount = self.compute_command_amount()
             self.cmd_amount = cmd_amount
@@ -263,7 +263,7 @@ class Session(OrgModelMixin):
         return target_ip
 
     @property
-    def duration(self):
+    def duration(self) -> str:
         date_end = self.date_end or timezone.now()
         delta = date_end - self.date_start
         # 去掉毫秒的显示

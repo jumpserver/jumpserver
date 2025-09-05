@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20250819_064003 AS stage-build
+FROM jumpserver/core-base:20250827_025554 AS stage-build
 
 ARG VERSION
 
@@ -33,6 +33,7 @@ ARG TOOLS="                           \
         default-libmysqlclient-dev    \
         openssh-client                \
         sshpass                       \
+        nmap                          \
         bubblewrap"
 
 ARG APT_MIRROR=http://deb.debian.org

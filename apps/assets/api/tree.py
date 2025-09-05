@@ -161,6 +161,7 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         'GET': 'assets.view_asset',
         'list': 'assets.view_asset',
     }
+    queryset = Node.objects.none()
 
     def get_assets(self):
         key = self.request.query_params.get('key')

@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from assets.const import AllTypes
-from assets.models import Platform, Node, Asset, PlatformProtocol
+from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
@@ -43,6 +43,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'ops_methods': 'assets.view_platform',
         'filter_nodes_assets': 'assets.view_platform',
     }
+    default_limit = None
 
     def get_queryset(self):
         # 因为没有走分页逻辑，所以需要这里 prefetch
@@ -112,6 +113,7 @@ class PlatformProtocolViewSet(JMSModelViewSet):
 
 class PlatformAutomationMethodsApi(generics.ListAPIView):
     permission_classes = (IsValidUser,)
+    queryset = PlatformAutomation.objects.none()
 
     @staticmethod
     def automation_methods():

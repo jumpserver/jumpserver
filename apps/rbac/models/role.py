@@ -101,11 +101,11 @@ class Role(JMSBaseModel):
         return RoleBinding.get_role_users(self)
 
     @lazyproperty
-    def users_amount(self):
+    def users_amount(self) -> int:
         return self.users.count()
 
     @lazyproperty
-    def permissions_amount(self):
+    def permissions_amount(self) -> int:
         return self.permissions.count()
 
     @classmethod
@@ -113,7 +113,7 @@ class Role(JMSBaseModel):
         BuiltinRole.sync_to_db()
 
     @property
-    def display_name(self):
+    def display_name(self) -> str:
         if not self.builtin:
             return self.name
         return gettext(self.name)

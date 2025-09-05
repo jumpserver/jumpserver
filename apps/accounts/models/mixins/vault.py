@@ -56,7 +56,7 @@ class VaultModelMixin(models.Model):
     __secret = None
 
     @property
-    def secret(self):
+    def secret(self) -> str:
         if self.__secret:
             return self.__secret
         from accounts.backends import vault_client

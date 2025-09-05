@@ -112,7 +112,7 @@ class Protocol(models.Model):
         return protocols[0] if len(protocols) > 0 else {}
 
     @property
-    def setting(self):
+    def setting(self) -> dict:
         if self._setting is not None:
             return self._setting
         return self.asset_platform_protocol.get('setting', {})
@@ -122,7 +122,7 @@ class Protocol(models.Model):
         self._setting = value
 
     @property
-    def public(self):
+    def public(self) -> bool:
         return self.asset_platform_protocol.get('public', True)
 
 
@@ -210,7 +210,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return self.category == const.Category.DS and hasattr(self, 'ds')
 
     @lazyproperty
-    def spec_info(self):
+    def spec_info(self) -> dict:
         instance = getattr(self, self.category, None)
         if not instance:
             return {}
@@ -240,7 +240,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return info
 
     @lazyproperty
-    def auto_config(self):
+    def auto_config(self) -> dict:
         platform = self.platform
         auto_config = {
             'su_enabled': platform.su_enabled,
@@ -343,11 +343,11 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return names
 
     @lazyproperty
-    def type(self):
+    def type(self) -> str:
         return self.platform.type
 
     @lazyproperty
-    def category(self):
+    def category(self) -> str:
         return self.platform.category
 
     def is_category(self, category):

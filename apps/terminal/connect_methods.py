@@ -54,7 +54,7 @@ class NativeClient(TextChoices):
             Protocol.oracle: [cls.db_client, cls.db_guide],
             Protocol.postgresql: [cls.db_client, cls.db_guide],
             Protocol.sqlserver: [cls.db_client, cls.db_guide],
-            Protocol.vnc: [cls.vnc_guide, ]
+            Protocol.vnc: [cls.vnc_client, cls.vnc_guide],
         }
         return clients
 
@@ -240,9 +240,17 @@ class ConnectMethodUtil:
     def get_user_allowed_connect_methods(cls, os, user):
         from acls.models import ConnectMethodACL
         methods = cls.get_filtered_protocols_connect_methods(os)
-        acls = ConnectMethodACL.get_user_acls(user)
-        disabled_connect_methods = acls.values_list('connect_methods', flat=True)
-        disabled_connect_methods = set(itertools.chain.from_iterable(disabled_connect_methods))
+        accept_methods = set(itertools.chain.from_iterable(
+            ConnectMethodACL.get_user_acls(user)
+            .filter(action=ConnectMethodACL.ActionChoices.accept)
+            .values_list('connect_methods', flat=True)
+        ))
+        # 在禁用的基础上放行一些连接方法
+        disabled_connect_methods = set(itertools.chain.from_iterable(
+            ConnectMethodACL.get_user_acls(user)
+            .filter(action=ConnectMethodACL.ActionChoices.reject)
+            .values_list('connect_methods', flat=True)
+        )) - accept_methods
 
         new_queryset = {}
         for protocol, methods in methods.items():

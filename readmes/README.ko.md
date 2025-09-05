@@ -2,15 +2,14 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## 오픈 소스 PAM 도구 (Bastion Host)
-
+## 오픈 소스 PAM 플랫폼(점프 서버)
 </div>
+
 <br/>
 
 ## JumpServer란 무엇인가요?
 
-JumpServer는 DevOps 및 IT 팀이 웹 브라우저를 통해 SSH, RDP, Kubernetes, 데이터베이스 및 RemoteApp 엔드포인트에 대한 온디맨드 및 안전한 액세스를 제공하는 오픈 소스 권한 있는 액세스 관리(PAM) 도구입니다.
-
+JumpServer는 DevOps 및 IT 팀에게 웹 브라우저를 통해 SSH, RDP, Kubernetes, 데이터베이스 및 원격 애플리케이션 엔드포인트에 대한 온디맨드 및 안전한 액세스를 제공하는 오픈 소스 권한 있는 액세스 관리(PAM) 플랫폼입니다.
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="https://www.jumpserver.com/images/jumpserver-arch-light.png">
@@ -19,19 +18,18 @@ JumpServer는 DevOps 및 IT 팀이 웹 브라우저를 통해 SSH, RDP, Kubernet
 </picture>
 
 
+
 ## 빠른 시작
 
-깨끗한 리눅스 서버를 준비하세요 (64비트, >= 4c8g)
+깨끗한 리눅스 서버를 준비하세요 ( 64 비트, >= 4c8g )
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-브라우저에서 JumpServer에 접속하세요 `http://your-jumpserver-ip/`
+브라우저에서 점프서버에 액세스하기: `http://your-jumpserver-ip/`
 - 사용자 이름: `admin`
 - 비밀번호: `ChangeMe`
-
-[![JumpServer Quickstart](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
 
 ## 스크린샷
 <table style="border-collapse: collapse; border: 1px solid black;">
@@ -59,28 +57,28 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 구성 요소
 
-JumpServer는 여러 주요 구성 요소로 구성되어 있으며, 이들은 집합적으로 JumpServer의 기능적 프레임워크를 형성하여 사용자가 운영 관리 및 보안 제어를 위한 포괄적인 기능을 제공합니다.
+점프서버는 여러 핵심 구성 요소로 이루어져 있으며, 이는 점프서버의 기능적 프레임워크를 형성하여 사용자가 운영 관리 및 보안 제어를 위한 포괄적인 기능을 제공합니다.
 
-| 프로젝트                                                 | 상태                                                                                                                                                                 | 설명                                                                                             |
+| 프로젝트                                                | 상태                                                                                                                                                                 | 설명                                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | JumpServer 웹 UI                                                                                     |
-| [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | JumpServer 웹 터미널                                                                                 |
-| [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer 문자 프로토콜 커넥터                                                                     |
-| [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | JumpServer 그래픽 프로토콜 커넥터                                                                   |
-| [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | JumpServer 웹 DB                                                                                     |  
-| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer 원격 응용 프로그램 커넥터 (Windows)                                                    |
-| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | JumpServer EE 원격 응용 프로그램 커넥터 (Linux)                                                      |
-| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | JumpServer EE RDP 프록시 커넥터                                                                      |
-| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer EE 데이터베이스 프록시 커넥터                                                             |
-| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | JumpServer EE VNC 프록시 커넥터                                                                      |
-| [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | JumpServer EE 얼굴 인식                                                                               |
+| [리나](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | 점프서버 웹 UI                                                                                       |
+| [루나](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | 점프서버 웹 터미널                                                                                 |
+| [코코](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | 점프서버 문자 프로토콜 커넥터                                                                     |
+| [라이온](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | 점프서버 그래픽 프로토콜 커넥터                                                                   |
+| [첸](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | 점프서버 웹 데이터베이스                                                                             |  
+| [팅커](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | 점프서버 원격 애플리케이션 커넥터 (윈도우)                                                        |
+| [판다](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | 점프서버 EE 원격 애플리케이션 커넥터 (리눅스)                                                        |
+| [레이저](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | 점프서버 EE RDP 프록시 커넥터                                                                       |
+| [마그누스](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | 점프서버 EE 데이터베이스 프록시 커넥터                                                              |
+| [넥](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | 점프서버 EE VNC 프록시 커넥터                                                                       |
+| [페이슬라이브](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | 점프서버 EE 얼굴 인식                                                                                |
 
 
 ## 기여하기
 
-기여하기 위해 PR을 제출하는 것을 환영합니다. 가이드는 [CONTRIBUTING.md][contributing-link]를 참조하십시오.
+기여를 위해 PR을 제출하는 것을 환영합니다. 가이드라인은 [CONTRIBUTING.md][contributing-link]를 참조하세요.
 
-## License
+## 라이센스
 
 Copyright (c) 2014-2025 FIT2CLOUD, All rights reserved.
 

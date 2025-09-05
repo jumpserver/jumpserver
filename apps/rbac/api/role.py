@@ -28,6 +28,7 @@ class RoleViewSet(JMSModelViewSet):
     rbac_perms = {
         'users': 'rbac.view_rolebinding'
     }
+    default_limit = None
 
     def perform_destroy(self, instance):
         from orgs.utils import tmp_to_root_org
@@ -153,6 +154,7 @@ class BaseRolePermissionsViewSet(PermissionViewSet):
 class SystemRolePermissionsViewSet(BaseRolePermissionsViewSet):
     role_pk = 'system_role_pk'
     model = SystemRole
+    queryset = SystemRole.objects.none()
     rbac_perms = (
         ('get_tree', 'rbac.view_permission'),
     )
@@ -162,6 +164,7 @@ class SystemRolePermissionsViewSet(BaseRolePermissionsViewSet):
 class OrgRolePermissionsViewSet(BaseRolePermissionsViewSet):
     role_pk = 'org_role_pk'
     model = OrgRole
+    queryset = OrgRole.objects.none()
     rbac_perms = (
         ('get_tree', 'rbac.view_permission'),
     )

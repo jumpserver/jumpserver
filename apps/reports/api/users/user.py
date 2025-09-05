@@ -22,7 +22,7 @@ __all__ = ['UserReportApi']
 class UserReportApi(DateRangeMixin, APIView):
     http_method_names = ['get']
     rbac_perms = {
-        'GET': 'users.view_user',
+        'GET': 'rbac.view_userloginreport',
     }
     permission_classes = [RBACPermission, IsValidLicense]
 

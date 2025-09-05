@@ -3,14 +3,14 @@
 
 import os
 
-from azure.storage.blob import BlobServiceClient
-
 from .base import ObjectStorage
 
 
 class AzureStorage(ObjectStorage):
 
     def __init__(self, config):
+        from azure.storage.blob import BlobServiceClient
+
         self.account_name = config.get("ACCOUNT_NAME", None)
         self.account_key = config.get("ACCOUNT_KEY", None)
         self.container_name = config.get("CONTAINER_NAME", None)

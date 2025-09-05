@@ -2,15 +2,14 @@
 #
 import datetime
 import os
-import subprocess
 
 from celery import shared_task
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.db import transaction
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django.utils._os import safe_join
+from django.utils.translation import gettext_lazy as _
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.storage.ftp_file import FTPFileStorageHandler
@@ -79,7 +78,7 @@ def clean_celery_tasks_period():
     command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;"
     safe_run_cmd(command, (settings.CELERY_LOG_DIR, expire_days))
     celery_log_path = safe_join(settings.LOG_DIR, 'celery.log')
-    command = "echo > {}".format(celery_log_path)
+    command = "echo > %s"
     safe_run_cmd(command, (celery_log_path,))
 
 

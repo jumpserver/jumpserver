@@ -14,6 +14,7 @@ class FavoriteAssetViewSet(BulkModelViewSet):
     serializer_class = FavoriteAssetSerializer
     permission_classes = (IsValidUser,)
     filterset_fields = ['asset']
+    default_limit = None
 
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_root_org():

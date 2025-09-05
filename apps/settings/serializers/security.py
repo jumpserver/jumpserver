@@ -166,8 +166,8 @@ class SecurityAuthSerializer(serializers.Serializer):
                     "authentication system for verification")
     )
     SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
-        required=False, default=False, label=_("Login captcha"),
-        help_text=_("Enable captcha to prevent robot authentication")
+        required=False, default=False, label=_("Login CAPTCHA"),
+        help_text=_("Enable CAPTCHA to prevent robot authentication")
     )
     SECURITY_CHECK_DIFFERENT_CITY_LOGIN = serializers.BooleanField(
         required=False, label=_('Suspicious Login Verification'),

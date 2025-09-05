@@ -6,7 +6,7 @@ from typing import Dict
 
 from django.urls import URLPattern
 from django.urls import URLResolver
-from drf_yasg import openapi
+from drf_spectacular.utils import OpenApiParameter
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -114,8 +114,8 @@ def extract_resource_paths(urlpatterns, prefix='/api/v1/') -> Dict[str, Dict[str
 
 
 def param_dic_to_param(d):
-    return openapi.Parameter(
-        d['name'], d['in'],
+    return OpenApiParameter(
+        name=d['name'], location=d['in'],
         description=d['description'], type=d['type'], required=d.get('required', False)
     )
 

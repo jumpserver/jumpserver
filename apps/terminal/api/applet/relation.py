@@ -12,6 +12,8 @@ from common.utils import is_uuid
 from orgs.utils import tmp_to_builtin_org
 from rbac.permissions import RBACPermission
 from terminal.models import AppletHost
+from accounts.models import Account
+from terminal.models import AppletPublication
 from terminal.serializers import (
     AppletHostAccountSerializer,
     AppletPublicationSerializer,
@@ -54,6 +56,7 @@ class HostMixin:
 
 class AppletHostAccountsViewSet(HostMixin, JMSModelViewSet):
     serializer_class = AppletHostAccountSerializer
+    queryset = Account.objects.none()
 
     def get_queryset(self):
         with tmp_to_builtin_org(system=1):
@@ -64,6 +67,7 @@ class AppletHostAccountsViewSet(HostMixin, JMSModelViewSet):
 class AppletHostAppletViewSet(HostMixin, JMSModelViewSet):
     host: AppletHost
     serializer_class = AppletPublicationSerializer
+    queryset = AppletPublication.objects.none()
 
     def get_object(self):
         pk = self.kwargs.get('pk')

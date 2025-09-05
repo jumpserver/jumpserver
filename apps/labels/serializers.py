@@ -73,5 +73,5 @@ class ContentTypeResourceSerializer(serializers.Serializer):
     name = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_name(obj):
+    def get_name(obj) -> str:
         return str(obj)
