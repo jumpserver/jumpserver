@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from rest_framework.fields import ChoiceField, empty
+from rest_framework.fields import empty
 
 from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
 from common.utils import decrypt_password, is_uuid
@@ -54,54 +54,19 @@ class EncryptedField(serializers.CharField):
 
 
 class LabeledChoiceField(serializers.ChoiceField):
-    def __init__(self, **kwargs):
-        self.attrs = kwargs.pop("attrs", None) or ("value", "label")
-        super().__init__(**kwargs)
-
-    def to_representation(self, value):
-        if not value:
-            return value
-        data = {}
-        for attr in self.attrs:
-            if not hasattr(value, attr):
-                continue
-            data[attr] = getattr(value, attr)
-        return data
+    def to_representation(self, key):
+        if key is None:
+            return key
+        label = self.choices.get(key, key)
+        return {"value": key, "label": label}
 
     def to_internal_value(self, data):
-        if not data:
-            return data
         if isinstance(data, dict):
-            return data.get("value") or data.get("label")
-        return data
+            data = data.get("value")
 
-    def get_schema(self):
-        """
-        为 drf-spectacular 提供 OpenAPI schema
-        """
-        if getattr(self, 'many', False):
-            return {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'value': {'type': 'string'},
-                        'label': {'type': 'string'}
-                    }
-                },
-                'description': getattr(self, 'help_text', ''),
-                'title': getattr(self, 'label', ''),
-            }
-        else:
-            return {
-                'type': 'object',
-                'properties': {
-                    'value': {'type': 'string'},
-                    'label': {'type': 'string'}
-                },
-                'description': getattr(self, 'help_text', ''),
-                'title': getattr(self, 'label', ''),
-            }
+        if isinstance(data, str) and "(" in data and data.endswith(")"):
+            data = data.strip(")").split('(')[-1]
+        return super(LabeledChoiceField, self).to_internal_value(data)
 
 
 class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
@@ -221,7 +186,7 @@ class ObjectRelatedField(serializers.RelatedField):
         """
         # 获取字段的基本信息
         field_type = 'array' if self.many else 'object'
-        
+
         if field_type == 'array':
             # 如果是多对多关系
             return {
@@ -250,7 +215,7 @@ class ObjectRelatedField(serializers.RelatedField):
         获取对象的 OpenAPI schema
         """
         properties = {}
-        
+
         # 动态分析 attrs 中的属性类型
         for attr in self.attrs:
             # 尝试从 queryset 的 model 中获取字段信息
@@ -259,7 +224,7 @@ class ObjectRelatedField(serializers.RelatedField):
                 'type': field_type,
                 'description': f'{attr} field'
             }
-        
+
         return {
             'type': 'object',
             'properties': properties,
@@ -280,7 +245,7 @@ class ObjectRelatedField(serializers.RelatedField):
                         return self._map_django_field_type(field)
         except Exception:
             pass
-        
+
         # 如果没有 queryset 或无法获取字段信息，使用启发式规则
         return self._heuristic_field_type(attr_name)
 
@@ -289,7 +254,7 @@ class ObjectRelatedField(serializers.RelatedField):
         将 Django 字段类型映射到 OpenAPI 类型
         """
         field_type = type(field).__name__
-        
+
         # 整数类型
         if 'Integer' in field_type or 'BigInteger' in field_type or 'SmallInteger' in field_type:
             return 'integer'
@@ -314,7 +279,7 @@ class ObjectRelatedField(serializers.RelatedField):
         启发式推断字段类型
         """
         # 基于属性名的启发式规则
-        
+
         if attr_name in ['is_active', 'enabled', 'visible'] or attr_name.startswith('is_'):
             return 'boolean'
         elif attr_name in ['count', 'number', 'size', 'amount']:
