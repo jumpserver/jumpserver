@@ -149,6 +149,7 @@ class PermAssetDetailUtil:
     def get_permed_accounts_from_perms(cls, perms, user, asset):
         # alias: is a collection of account usernames and special accounts [@ALL, @INPUT, @USER, @ANON]
         alias_action_bit_mapper, alias_date_expired_mapper = cls.parse_alias_action_date_expire(perms, asset)
+        # 展开 alias 到具体的账号
         cleaned_accounts_action_bit, cleaned_accounts_expired = cls.map_alias_to_accounts(
             alias_action_bit_mapper, alias_date_expired_mapper, asset, user
         )
