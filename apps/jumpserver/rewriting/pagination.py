@@ -17,7 +17,7 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
             self.max_limit = view.page_max_limit
 
         # 自定义的 api view，就默认不约束分页了
-        if getattr(view, 'action') != 'list' and not getattr(view, 'default_limit'):
+        if getattr(view, 'action', None) != 'list' and not getattr(view, 'default_limit', None):
             self.default_limit = None
 
         if view and hasattr(view, 'page_default_limit'):
