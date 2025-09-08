@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
+from common.views.template import custom_render_to_string
 from notifications.notifications import UserMessage
 
 logger = get_logger(__file__)
@@ -25,7 +26,7 @@ class DifferentCityLoginMessage(UserMessage):
             time=now,
             city=self.city,
         )
-        message = render_to_string('authentication/_msg_different_city.html', context)
+        message = custom_render_to_string('authentication/_msg_different_city.html', context)
         return {
             'subject': subject,
             'message': message

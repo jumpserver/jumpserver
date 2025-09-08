@@ -2,7 +2,6 @@ import json
 import os
 from types import SimpleNamespace
 
-from django.conf import settings
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.template.loader import render_to_string
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
@@ -11,6 +10,7 @@ from rest_framework.views import APIView
 
 from common.api import JMSGenericViewSet
 from common.permissions import IsValidUser
+from common.views.template import _get_data_template_path
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription, UserMsgSubscription
 from notifications.notifications import system_msgs
@@ -315,13 +315,6 @@ def _build_render_context(example: dict):
     return ctx
 
 
-def _get_data_template_path(template_name: str):
-    # 保存到 data/template/<原路径>.html
-    # 例如 template_name users/_msg_x.html -> data/template/users/_msg_x.html
-    rel_path = template_name.replace('/', os.sep)
-    return os.path.join(settings.BASE_DIR, 'data', 'template', rel_path)
-
-
 def get_templates_list(request):
     """返回模板元信息和渲染后的内容。如果 data/template 中存在则读取该文件，否则使用项目中原模板渲染返回"""
     if not request.user.is_superuser:
@@ -378,16 +371,16 @@ def edit_template(request):
     if not request.user.is_superuser:
         return HttpResponse('没有权限', status=401)
 
-    if request.method != 'POST':
-        return HttpResponseBadRequest('only POST')
+    if request.method != 'PATCH':
+        return HttpResponseBadRequest('only PATCH')
 
     try:
         body = json.loads(request.body.decode('utf-8'))
     except Exception:
         return HttpResponseBadRequest('invalid json')
 
-    template_name = body.get('template_name')
-    content = body.get('content')
+    template_name = body.get('EMAIL_TEMPLATE_NAME')
+    content = body.get('EMAIL_TEMPLATE_CONTENT')
     if not template_name or content is None:
         return HttpResponseBadRequest('template_name and content required')
 
