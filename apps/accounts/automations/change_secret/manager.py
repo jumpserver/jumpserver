@@ -9,7 +9,7 @@ from accounts.const import (
     AutomationTypes, SecretStrategy, ChangeSecretRecordStatusChoice
 )
 from accounts.models import ChangeSecretRecord
-from accounts.notifications import ChangeSecretExecutionTaskMsg, ChangeSecretReportMsg
+from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
@@ -93,10 +93,6 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         recipients = self.execution.recipients
         if not recipients:
             return
-
-        context = self.get_report_context()
-        for user in recipients:
-            ChangeSecretReportMsg(user, context).publish()
 
         if not records:
             return
