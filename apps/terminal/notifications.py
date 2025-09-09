@@ -152,6 +152,8 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     def gen_html_string(self, **other_context) -> dict:
         command = self.command
         level = RiskLevelChoices.get_label(command['risk_level'])
+        org_id = command['org_id']
+        org_name = command.get('_org_name') or org_id
         items = {
             _("Asset"): command['asset'],
             _("User"): command['user'],
@@ -161,6 +163,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
         context = {
             'items': items,
             "command": command['input'],
+            'org': org_name,
         }
         context.update(other_context)
         message = render_to_string('terminal/_msg_command_alert.html', context)
@@ -212,7 +215,8 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
     def gen_html_string(self, **other_context):
         command = self.command
         level = RiskLevelChoices.get_label(command['risk_level'])
-
+        org_id = command['org_id']
+        org_name = command.get('_org_name') or org_id
         items = {
             _("User"): command['user'],
             _("Level"): level,
@@ -221,6 +225,7 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         context = {
             'items': items,
             'command': command['input'],
+            'org': org_name,
         }
         context.update(other_context)
         message = render_to_string('terminal/_msg_command_execute_alert.html', context)
