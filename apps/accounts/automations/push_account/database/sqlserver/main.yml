@@ -5,12 +5,14 @@
 
   tasks:
     - name: Test SQLServer connection
-      community.general.mssql_script:
+      mssql_script:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
+        encryption: "{{ jms_asset.encryption | default(None) }}"
+        tds_version: "{{ jms_asset.tds_version | default(None) }}"
         script: |
           SELECT @@version
       register: db_info
@@ -23,47 +25,55 @@
         var: info
 
     - name: Check whether SQLServer User exist
-      community.general.mssql_script:
+      mssql_script:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
+        encryption: "{{ jms_asset.encryption | default(None) }}"
+        tds_version: "{{ jms_asset.tds_version | default(None) }}"
         script: "SELECT 1 from sys.sql_logins WHERE name='{{ account.username }}';"
       when: db_info is succeeded
       register: user_exist
 
     - name: Change SQLServer password
-      community.general.mssql_script:
+      mssql_script:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
+        encryption: "{{ jms_asset.encryption | default(None) }}"
+        tds_version: "{{ jms_asset.tds_version | default(None) }}"
         script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}', DEFAULT_DATABASE = {{ jms_asset.spec_info.db_name }}; select @@version"
       ignore_errors: true
       when: user_exist.query_results[0] | length != 0
       register: change_info
 
     - name: Add SQLServer user
-      community.general.mssql_script:
+      mssql_script:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
+        encryption: "{{ jms_asset.encryption | default(None) }}"
+        tds_version: "{{ jms_asset.tds_version | default(None) }}"
         script: "CREATE LOGIN [{{ account.username }}] WITH PASSWORD = '{{ account.secret }}'; CREATE USER [{{ account.username }}] FOR LOGIN [{{ account.username }}]; select @@version"
       ignore_errors: true
       when: user_exist.query_results[0] | length == 0
       register: change_info
 
     - name: Verify password
-      community.general.mssql_script:
+      mssql_script:
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
+        encryption: "{{ jms_asset.encryption | default(None) }}"
+        tds_version: "{{ jms_asset.tds_version | default(None) }}"
         script: |
           SELECT @@version
       when: check_conn_after_change

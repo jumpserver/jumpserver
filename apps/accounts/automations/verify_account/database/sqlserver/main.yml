@@ -5,11 +5,13 @@
 
   tasks:
     - name: Verify account
-      community.general.mssql_script:
+      mssql_script:
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
+        encryption: "{{ jms_asset.encryption | default(None) }}"
+        tds_version: "{{ jms_asset.tds_version | default(None) }}"
         script: |
           SELECT @@version
