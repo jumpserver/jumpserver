@@ -1,5 +1,4 @@
 import os
-from types import SimpleNamespace
 
 from django.template.loader import render_to_string
 from rest_framework import status
@@ -13,13 +12,13 @@ from common.permissions import OnlySuperUser, IsValidUser
 from common.views.template import _get_data_template_path
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription, UserMsgSubscription
+from notifications.notifications import CustomMsgTemplateBase
 from notifications.notifications import system_msgs
 from notifications.serializers import (
     SystemMsgSubscriptionSerializer, SystemMsgSubscriptionByCategorySerializer,
     UserMsgSubscriptionSerializer,
 )
 from notifications.serializers import TemplateEditSerializer
-from notifications.template_meta import TEMPLATE_META
 
 __all__ = (
     'BackendListView', 'SystemMsgSubscriptionViewSet',
@@ -152,27 +151,14 @@ def get_all_test_messages(request):
 class TemplateViewSet(JMSGenericViewSet):
     permission_classes = [OnlySuperUser]
 
-    @staticmethod
-    def _build_render_context(example):
-        """将示例数据转换成可用于 render_to_string 的 context，处理一些常见对象如 user"""
-        ctx = {}
-        for k, v in (example or {}).items():
-            if k == 'user' and isinstance(v, str):
-                # 构造一个简单的 user 对象，尽量兼容模板对 user.name/user.username/user.email 的调用
-                user_obj = SimpleNamespace(username=v, name=v, email=f"{v}@example.com")
-                ctx[k] = user_obj
-            else:
-                ctx[k] = v
-        return ctx
-
     def list(self, request):
         result = []
-        for meta in TEMPLATE_META:
+        metas = [cls.as_dict() for cls in CustomMsgTemplateBase._registry]
+        for meta in metas:
             item = {
                 'template_name': meta['template_name'],
-                'label': meta.get('label', ''),
-                'context': {k: '' for k in meta.get('context', [])},
-                'context_example': meta.get('context_example', []),
+                'subject': meta.get('subject', ''),
+                'contexts': meta.get('contexts', []),
                 'content': None,
                 'content_error': None,
                 'source': None,
@@ -185,13 +171,7 @@ class TemplateViewSet(JMSGenericViewSet):
                         item['content'] = f.read()
                     item['source'] = 'data'
                 else:
-                    raw_example = meta.get('context_example', [])
-                    if isinstance(raw_example, list):
-                        example_map = {x.get('key'): x.get('example') for x in raw_example if
-                                       isinstance(x, dict) and 'key' in x}
-                    else:
-                        example_map = raw_example or {}
-                    ctx = self._build_render_context(example_map)
+                    ctx = {x.get('name'): x.get('default') for x in item['contexts']}
                     try:
                         rendered = render_to_string(meta['template_name'], ctx)
                         item['content'] = rendered

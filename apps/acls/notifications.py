@@ -2,7 +2,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Account
-from acls.models import LoginACL, LoginAssetACL
+from acls.models import LoginACL,LoginAssetACL
 from assets.models import Asset
 from audits.models import UserLoginLog
 from notifications.notifications import UserMessage
@@ -11,6 +11,15 @@ from users.models import User
 
 class UserLoginReminderMsg(UserMessage):
     subject = _('User login reminder')
+    template_name = 'acls/user_login_reminder.html'
+    contexts = [
+        {"name": "city", "label": _('Login city'), "default": "北京"},
+        {"name": "username", "label": _('User'), "default": "zhangsan"},
+        {"name": "ip", "label": "IP", "default": "8.8.8.8"},
+        {"name": "recipient_name", "label": '接收人名称', "default": "zhangsan"},
+        {"name": "recipient_username", "label": '接收人用户名', "default": "张三"},
+        {"name": "user_agent", "label": _('User agent'), "default": "Mozilla/5.0"},
+    ]
 
     def __init__(self, user, user_log: UserLoginLog, acl: LoginACL):
         self.user_log = user_log
@@ -23,11 +32,12 @@ class UserLoginReminderMsg(UserMessage):
             'ip': user_log.ip,
             'city': user_log.city,
             'username': user_log.username,
-            'recipient': self.user,
             'acl_name': self.acl_name,
+            'recipient_name': self.user.name,
+            'recipient_username': self.user.username,
             'user_agent': user_log.user_agent,
         }
-        message = render_to_string('acls/user_login_reminder.html', context)
+        message = custom_render_to_string(self.template_name, context)
 
         return {
             'subject': str(self.subject),
