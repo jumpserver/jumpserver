@@ -1,0 +1,50 @@
+id: verify_account_website
+name: "{{ 'Website account verify' | trans }}"
+category: web
+type:
+  - website
+method: verify_account
+priority: 50
+params:
+  - name: load_state
+    type: choice
+    label: "{{ 'Load state' | trans }}"
+    choices:
+      - [ networkidle, "{{ 'Network idle' | trans }}" ]
+      - [ domcontentloaded, "{{ 'Dom content loaded' | trans }}" ]
+      - [ load, "{{ 'Load completed' | trans }}" ]
+    default: 'load'
+  - name: steps
+    type: list
+    label: "{{ 'Steps' | trans }}"
+    help_text: "{{ 'Params step help text' | trans }}"
+    default: []
+i18n:
+  Website account verify:
+    zh: 使用 Playwright 模拟浏览器验证账号
+    ja: Playwright を使用してブラウザをシミュレートし、アカウントの検証を行います
+    en: Use Playwright to simulate a browser for account verification.
+  Load state:
+    zh: 加载状态检测
+    en: Load state detection
+    ja: ロード状態の検出
+  Steps:
+    zh: 步骤
+    en: Steps
+    ja: 手順
+  Network idle:
+    zh: 网络空闲
+    en: Network idle
+    ja: ネットワークが空いた状態
+  Dom content loaded:
+    zh: 文档内容加载完成
+    en: Dom content loaded
+    ja: ドキュメントの内容がロードされた状態
+  Load completed:
+    zh: 全部加载完成
+    en: All load completed
+    ja: すべてのロードが完了した状態
+  Params step help text:
+    zh: 配置步骤，根据配置决定任务执行步骤
+    ja: パラメータを設定し、設定に基づいてタスクの実行手順を決定します
+    en: Configure steps, and determine the task execution steps based on the configuration.
