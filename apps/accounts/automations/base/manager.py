@@ -113,6 +113,18 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
+        inventory_hosts = []
+        if asset.type == HostTypes.WINDOWS:
+            if self.secret_type == SecretType.SSH_KEY:
+                host['error'] = _("Windows does not support SSH key authentication")
+                return host
+
+            if self.secret_strategy == SecretStrategy.custom:
+                new_secret = self.execution.snapshot['secret']
+                if '>' in new_secret or '^' in new_secret:
+                    host['error'] = _("Windows password cannot contain special characters like > ^")
+                    return host
+
         host['ssh_params'] = {}
 
         accounts = self.get_accounts(account)
@@ -129,11 +141,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         if asset.type == HostTypes.WINDOWS:
             accounts = accounts.filter(secret_type=SecretType.PASSWORD)
-
-        inventory_hosts = []
-        if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            print(f'Windows {asset} does not support ssh key push')
-            return inventory_hosts
 
         for account in accounts:
             h = deepcopy(host)
