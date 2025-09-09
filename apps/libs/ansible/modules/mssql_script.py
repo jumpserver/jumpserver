@@ -304,6 +304,7 @@ def main():
     output = module.params['output']
     sql_params = module.params['params']
     transaction = module.params['transaction']
+    # TODO 待 ansible 官方支持这两个参数
     tds_version = module.params['tds_version'] or None
     encryption = module.params['encryption'] or None
 
