@@ -116,7 +116,7 @@ def send_login_info_to_reviewers(instance: UserLoginLog | str, auth_acl_id):
 
     reviewers = acl.reviewers.all()
     for reviewer in reviewers:
-        UserLoginReminderMsg(reviewer, instance).publish_async()
+        UserLoginReminderMsg(reviewer, instance, acl).publish_async()
 
 
 @receiver(post_auth_success)

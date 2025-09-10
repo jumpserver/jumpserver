@@ -98,10 +98,14 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         cmd_group_name = cmd_group.name if cmd_group else ''
 
         context = {
+            'recipient': self.user,
             'command': command['input'],
             'user': command['user'],
             'asset': command['asset'],
             'account': command.get('_account', ''),
+            'protocol': command.get('_protocol', ''),
+            'remote_addr': command.get('_remote_addr', ''),
+            'login_from': command.get('_login_from', ''),
             'cmd_filter_acl': cmd_acl_name,
             'cmd_group': cmd_group_name,
             'risk_level': RiskLevelChoices.get_label(command['risk_level']),

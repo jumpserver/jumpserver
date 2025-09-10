@@ -1,25 +1,34 @@
 {% load i18n %}
 
-<div>
-    <b>{% trans 'Asset' %}: </b> <span>{{ asset }}</span>
-    <br/>
-    <b>{% trans 'User' %}: </b> <span>{{ user }}</span>
-    <br/>
-    <b>{% trans 'Account' %}: </b> <span>{{ account }}</span>
-    <br/>
-    <b>{% trans 'Risk level' %}: </b><span>{{ risk_level }}</span>
-    <br/>
-    <b>{% trans 'Command acl' %}: </b> <span>{{ cmd_filter_acl }}</span>
-    <br/>
-    <b>{% trans 'Command group' %}: </b> <span>{{ cmd_group}}</span>
-    <br/>
-    {% if session_url %}
-        <b>{% trans 'Session' %}: </b>
-        <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a>
-        <br/>
+<h3>{% trans 'Dear' %}: {{ recipient.name }} [{{ recipient.username }}]</h3>
+<hr>
+<p>{% trans 'We would like to inform you that a command alert has been triggered with the following details:' %}</p>
+
+<p><strong>{% trans 'Alert details' %}:</strong></p>
+<ul>
+    <li><strong>{% trans 'User' %}:</strong> [{{ user }}]</li>
+    <li><strong>{% trans 'Asset' %}:</strong> [{{ asset }}]</li>
+    <li><strong>{% trans 'Account' %}:</strong> [{{ account }}]</li>
+    {% if remote_addr %}
+        <li><strong>IP:</strong> [{{ remote_addr }}]</li>
     {% endif %}
-    <b>{% trans 'Organization' %}: </b> <span>{{ org }}</span>
-    <br/>
-    <b>{% trans 'Command' %}: </b><span>{{ command }}</span>
-    <br/>
-</div>
+    {% if login_from %}
+        <li><strong>{% trans 'Login from' %}:</strong> [{{ login_from }}]</li>
+    {% endif %}
+    {% if protocol %}
+        <li><strong>{% trans 'Protocol' %}:</strong> [{{ protocol }}]</li>
+    {% endif %}
+    <li><strong>{% trans 'Risk level' %}:</strong> [{{ risk_level }}]</li>
+    <li><strong>{% trans 'Command acl' %}:</strong> [{{ cmd_filter_acl }}]</li>
+    <li><strong>{% trans 'Command group' %}:</strong> [{{ cmd_group }}]</li>
+    {% if session_url %}
+        <li><strong>{% trans 'Session' %}:</strong> <a href="{{ session_url }}" target="_blank">{% trans 'View session' %}</a></li>
+    {% endif %}
+    <li><strong>{% trans 'Organization' %}:</strong> [{{ org }}]</li>
+    <li><strong>{% trans 'Command' %}:</strong> [{{ command }}]</li>
+</ul>
+<hr>
+
+<p>{% trans 'Please review this command execution to ensure it complies with your organization’s security policies. If you did not authorize this action or notice anything unusual, please take the necessary actions immediately.' %}</p>
+
+<p>{% trans 'Thank you for your attention to this matter' %}！</p>
