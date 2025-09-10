@@ -525,7 +525,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(
-                    reviewer, asset, user, account, self.input_username
+                    reviewer, asset, user, account, acl,
+                    ip, self.input_username
                 ).publish_async()
 
     def create_face_verify(self, response):
