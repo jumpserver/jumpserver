@@ -14,7 +14,7 @@ from .auth import (
 )
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
-from .msg import EmailSettingSerializer, EmailContentSettingSerializer, EmailTemplateSettingSerializer
+from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
 from .terminal import TerminalSettingSerializer
@@ -77,7 +77,6 @@ class SettingsSerializer(
     FeiShuSettingSerializer,
     LarkSettingSerializer,
     EmailSettingSerializer,
-    EmailTemplateSettingSerializer,
     EmailContentSettingSerializer,
     OtherSettingSerializer,
     OIDCSettingSerializer,

@@ -8,7 +8,7 @@ from common.serializers.fields import EncryptedField
 
 __all__ = [
     'MailTestSerializer', 'EmailSettingSerializer',
-    'EmailContentSettingSerializer', 'SMSBackendSerializer', 'EmailTemplateSettingSerializer'
+    'EmailContentSettingSerializer', 'SMSBackendSerializer'
 ]
 
 
@@ -83,25 +83,6 @@ class EmailContentSettingSerializer(serializers.Serializer):
     EMAIL_CUSTOM_USER_CREATED_SIGNATURE = serializers.CharField(
         max_length=512, allow_blank=True, required=False, label=_('Signature'),
         help_text=_('Tips: Email signature (eg:jumpserver)')
-    )
-
-
-class EmailTemplateSettingSerializer(serializers.Serializer):
-    class Template(models.TextChoices):
-        createUser = 'create_user', _('Create User')
-        resetPassword = 'reset_password', _('Reset Password')
-        createUser1 = 'create_user1', _('Create User1')
-        createUser2 = 'create_user2', _('Create User2')
-        createUser3 = 'create_user3', _('Create User3')
-
-    EMAIL_TEMPLATE_NAME = serializers.ChoiceField(
-        choices=Template.choices, default=Template.createUser,
-        label=_('Template name')
-    )
-    EMAIL_TEMPLATE_CONTENT = serializers.CharField(
-        max_length=4096, allow_blank=True, required=False,
-        label=_('Template content'),
-        help_text=_('Support {username} {name} {email} {code} label')
     )
 
 

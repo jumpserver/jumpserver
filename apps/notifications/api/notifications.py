@@ -30,21 +30,13 @@ class BackendListView(APIView):
     permission_classes = [IsValidUser]
 
     def get(self, request):
-        data = []
-        # 构造一个安全的可迭代对象，兼容 BACKEND 为可迭代或单一对象的情况
-        if hasattr(BACKEND, '__iter__'):
-            iterator = list(BACKEND)
-        else:
-            iterator = [BACKEND]
-
-        for backend in iterator:
-            # 兼容静态类型检查：确保 backend 有 is_enable 属性
-            if not getattr(backend, 'is_enable', False):
-                continue
-            data.append({
+        data = [
+            {
                 'name': backend,
-                'name_display': getattr(backend, 'label', str(backend))
-            })
+                'name_display': backend.label
+            }
+            for backend in BACKEND if backend.is_enable
+        ]
         return Response(data=data)
 
 
