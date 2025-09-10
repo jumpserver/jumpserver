@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-17 15:06+0800\n"
+"POT-Creation-Date: 2025-09-10 14:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -479,9 +479,9 @@ msgstr ""
 #: audits/models.py:59 audits/models.py:318 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:36 terminal/notifications.py:156
+#: terminal/models/session/session.py:36 terminal/notifications.py:160
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:38
-#: terminal/templates/terminal/_msg_command_warning.html:4
+#: terminal/templates/terminal/_msg_command_warning.html:10
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:295
 msgid "Asset"
@@ -541,13 +541,13 @@ msgstr "Estado de cambio de contraseña"
 #: accounts/serializers/automations/change_secret.py:148
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:133
-#: acls/templates/acls/asset_login_reminder.html:10
+#: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:319
 #: audits/serializers.py:231 authentication/api/connection_token.py:464
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:38 terminal/serializers/command.py:72
-#: terminal/templates/terminal/_msg_command_warning.html:8
+#: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
 #: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
@@ -1268,7 +1268,7 @@ msgid "Changed"
 msgstr "Modificado"
 
 #: accounts/serializers/account/account.py:290 acls/models/base.py:97
-#: acls/templates/acls/asset_login_reminder.html:9
+#: acls/templates/acls/asset_login_reminder.html:10
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
@@ -1315,9 +1315,9 @@ msgstr "ID"
 #: rbac/builtin.py:127 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:34 terminal/models/session/sharing.py:34
-#: terminal/notifications.py:157 terminal/notifications.py:217
+#: terminal/notifications.py:161 terminal/notifications.py:221
 #: terminal/serializers/command.py:16
-#: terminal/templates/terminal/_msg_command_warning.html:6
+#: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
 #: users/const.py:14 users/models/user/__init__.py:293
@@ -1327,7 +1327,7 @@ msgstr "Usuario"
 
 #: accounts/serializers/account/account.py:484
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:159 terminal/notifications.py:219
+#: terminal/notifications.py:163 terminal/notifications.py:223
 msgid "Date"
 msgstr "Fecha"
 
@@ -1939,7 +1939,7 @@ msgstr "Usuario"
 #: terminal/models/session/session.py:47 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
-#: terminal/templates/terminal/_msg_command_warning.html:23
+#: terminal/templates/terminal/_msg_command_warning.html:28
 msgid "Command"
 msgstr "Comando"
 
@@ -1965,7 +1965,7 @@ msgstr "Ignorar mayúsculas y minúsculas"
 #: acls/models/command_acl.py:33 acls/models/command_acl.py:97
 #: acls/serializers/command_acl.py:29
 #: authentication/serializers/connect_token_secret.py:90
-#: terminal/templates/terminal/_msg_command_warning.html:14
+#: terminal/templates/terminal/_msg_command_warning.html:23
 msgid "Command group"
 msgstr "Grupo de comandos"
 
@@ -1974,7 +1974,7 @@ msgid "The generated regular expression is incorrect: {}"
 msgstr "La expresión regular generada es incorrecta"
 
 #: acls/models/command_acl.py:103
-#: terminal/templates/terminal/_msg_command_warning.html:12
+#: terminal/templates/terminal/_msg_command_warning.html:22
 msgid "Command acl"
 msgstr "Filtración de comandos"
 
@@ -1995,7 +1995,7 @@ msgstr "Control de modo de conexión"
 msgid "Rule"
 msgstr "Reglas"
 
-#: acls/models/login_acl.py:14
+#: acls/models/login_acl.py:14 acls/templates/acls/user_login_reminder.html:12
 msgid "Login acl"
 msgstr "Control de acceso al inicio de sesión"
 
@@ -2004,6 +2004,7 @@ msgid "Login confirm"
 msgstr "Revisión de inicio de sesión"
 
 #: acls/models/login_asset_acl.py:12
+#: acls/templates/acls/asset_login_reminder.html:12
 msgid "Login asset acl"
 msgstr "Control de acceso a los activos en el inicio de sesión"
 
@@ -2011,11 +2012,11 @@ msgstr "Control de acceso a los activos en el inicio de sesión"
 msgid "Login asset confirm"
 msgstr "Revisión de activos al inicio de sesión"
 
-#: acls/notifications.py:12
+#: acls/notifications.py:13
 msgid "User login reminder"
 msgstr "Notificación de inicio de sesión del usuario"
 
-#: acls/notifications.py:42
+#: acls/notifications.py:45
 msgid "User login alert for asset"
 msgstr "Notificación de inicio de sesión de activos"
 
@@ -2083,6 +2084,7 @@ msgstr "Intervalo de tiempo"
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
 #: perms/templates/perms/_msg_permed_items_expire.html:3
+#: terminal/templates/terminal/_msg_command_warning.html:3
 #: users/templates/users/_msg_reset_mfa.html:4
 msgid "Dear"
 msgstr "Estimado/a"
@@ -2099,8 +2101,8 @@ msgstr ""
 msgid "Asset details"
 msgstr "Detalles del activo"
 
-#: acls/templates/acls/asset_login_reminder.html:14
-#: acls/templates/acls/user_login_reminder.html:15
+#: acls/templates/acls/asset_login_reminder.html:16
+#: acls/templates/acls/user_login_reminder.html:16
 msgid ""
 "Please review the login activity to ensure the security and proper usage of "
 "the asset. If you did not authorize this login or if you notice any "
@@ -2111,8 +2113,9 @@ msgstr ""
 "inicio de sesión o ha detectado alguna actividad sospechosa, por favor tome "
 "las medidas necesarias de inmediato."
 
-#: acls/templates/acls/asset_login_reminder.html:16
-#: acls/templates/acls/user_login_reminder.html:16
+#: acls/templates/acls/asset_login_reminder.html:18
+#: acls/templates/acls/user_login_reminder.html:17
+#: terminal/templates/terminal/_msg_command_warning.html:34
 msgid "Thank you for your attention to this matter"
 msgstr "Agradecemos su atención a este asunto."
 
@@ -2728,7 +2731,7 @@ msgstr "Recopilar información de activos"
 msgid "Ping asset"
 msgstr "Probar activos"
 
-#: assets/models/base.py:17 terminal/notifications.py:243
+#: assets/models/base.py:17 terminal/notifications.py:247
 msgid "Connectivity"
 msgstr "Conectividad"
 
@@ -3472,7 +3475,6 @@ msgid "Rename dir"
 msgstr "Mapear directorio"
 
 #: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:285
-#: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
 msgid "View"
@@ -3571,7 +3573,7 @@ msgstr "Descargable"
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:20
 #: terminal/models/session/sharing.py:95 terminal/serializers/command.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:10
-#: terminal/templates/terminal/_msg_command_warning.html:17
+#: terminal/templates/terminal/_msg_command_warning.html:25
 #: tickets/models/ticket/command_confirm.py:16
 msgid "Session"
 msgstr "Conversación"
@@ -3868,7 +3870,7 @@ msgstr ""
 msgid "ACL action is face online"
 msgstr "La acción de ACL es verificación facial en línea."
 
-#: authentication/api/connection_token.py:533
+#: authentication/api/connection_token.py:534
 msgid "No available face feature"
 msgstr "No hay características faciales disponibles."
 
@@ -4345,6 +4347,7 @@ msgstr "Contraseña personalizada"
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
 #: terminal/serializers/storage.py:71
+#: terminal/templates/terminal/_msg_command_warning.html:19
 msgid "Protocol"
 msgstr "Protocolo"
 
@@ -5982,7 +5985,7 @@ msgid "Run as policy"
 msgstr "Política de usuario"
 
 #: ops/models/job.py:221 ops/models/variable.py:28 ops/serializers/job.py:111
-#: terminal/notifications.py:182
+#: terminal/notifications.py:186
 msgid "Job"
 msgstr "Trabajo"
 
@@ -6275,7 +6278,7 @@ msgstr "Por favor, seleccione una organización antes de guardar."
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:53
-#: terminal/templates/terminal/_msg_command_warning.html:21
+#: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
 #: tickets/models/ticket/general.py:303
 #: tickets/serializers/ticket/ticket.py:61
@@ -8824,7 +8827,7 @@ msgid "Output"
 msgstr "Salida"
 
 #: terminal/backends/command/models.py:24 terminal/serializers/command.py:22
-#: terminal/templates/terminal/_msg_command_warning.html:10
+#: terminal/templates/terminal/_msg_command_warning.html:21
 msgid "Risk level"
 msgstr "Nivel de riesgo"
 
@@ -9174,6 +9177,7 @@ msgstr "Cuenta"
 
 #: terminal/models/session/session.py:41
 #: terminal/models/session/sharing.py:118
+#: terminal/templates/terminal/_msg_command_warning.html:16
 msgid "Login from"
 msgstr "Fuente de inicio de sesión"
 
@@ -9227,7 +9231,7 @@ msgid "Origin"
 msgstr "Procedencia"
 
 #: terminal/models/session/sharing.py:42
-#: terminal/models/session/sharing.py:100 terminal/notifications.py:279
+#: terminal/models/session/sharing.py:100 terminal/notifications.py:283
 msgid "Session sharing"
 msgstr "Compartir conversación"
 
@@ -9297,26 +9301,26 @@ msgstr "conversación"
 msgid "Command warning"
 msgstr "Comando de advertencia"
 
-#: terminal/notifications.py:128 terminal/notifications.py:183
+#: terminal/notifications.py:132 terminal/notifications.py:187
 msgid "Command reject"
 msgstr "Comando rechazado"
 
-#: terminal/notifications.py:158 terminal/notifications.py:218
+#: terminal/notifications.py:162 terminal/notifications.py:222
 msgid "Level"
 msgstr "Nivel"
 
-#: terminal/notifications.py:242
+#: terminal/notifications.py:246
 msgid "Command and replay storage"
 msgstr "Almacenamiento de comandos y grabaciones"
 
-#: terminal/notifications.py:258 terminal/tasks.py:212
+#: terminal/notifications.py:262 terminal/tasks.py:212
 #: xpack/plugins/cloud/api.py:182
 #: xpack/plugins/cloud/serializers/account.py:137
 #: xpack/plugins/cloud/serializers/account.py:139
 msgid "Test failure: Account invalid"
 msgstr "Prueba fallida: cuenta no válida"
 
-#: terminal/notifications.py:268
+#: terminal/notifications.py:272
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "Almacenamiento no válido"
@@ -9870,6 +9874,33 @@ msgstr ""
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "Ver"
+
+#: terminal/templates/terminal/_msg_command_warning.html:5
+msgid ""
+"We would like to inform you that a command alert has been triggered with the"
+" following details:"
+msgstr ""
+"Queremos informarle que se ha activado la alerta de comando, con el "
+"siguiente contenido: :"
+
+#: terminal/templates/terminal/_msg_command_warning.html:7
+msgid "Alert details"
+msgstr "Detalles de la alerta"
+
+#: terminal/templates/terminal/_msg_command_warning.html:25
+msgid "View session"
+msgstr "Ver sesión"
+
+#: terminal/templates/terminal/_msg_command_warning.html:32
+msgid ""
+"Please review this command execution to ensure it complies with your "
+"organization’s security policies. If you did not authorize this action or "
+"notice anything unusual, please take the necessary actions immediately."
+msgstr ""
+"Por favor, verifique la ejecución de este comando para asegurarse de que "
+"cumple con la política de seguridad de su organización. Si no ha autorizado "
+"esta operación o si encuentra alguna anomalía, tome las medidas necesarias "
+"de inmediato."
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
