@@ -204,3 +204,14 @@ class TemplateViewSet(JMSGenericViewSet):
             return Response({'ok': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'ok': True, 'path': data_path})
+
+    @action(detail=False, methods=['post'], url_path='reset', name='reset')
+    def reset(self, request):
+        template_name = request.data.get('template_name')
+        data_path = _get_data_template_path(template_name)
+        try:
+            if os.path.exists(data_path):
+                os.remove(data_path)
+        except Exception as e:
+            return Response({'ok': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'ok': True, 'path': data_path})

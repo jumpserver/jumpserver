@@ -5,6 +5,7 @@ from django.conf import settings
 from django.template import Context
 from django.template import Engine, TemplateSyntaxError
 from django.template.loader import render_to_string
+from django.utils._os import safe_join
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ def _get_data_template_path(template_name: str):
     # 保存到 data/template/<原路径>.html
     # 例如 template_name users/_msg_x.html -> data/template/users/_msg_x.html
     rel_path = template_name.replace('/', os.sep)
-    return os.path.join(settings.DATA_DIR, 'template', rel_path)
+    return safe_join(settings.DATA_DIR, 'template', rel_path)
 
 
 def custom_render_to_string(template_name, context=None, request=None, using=None):
