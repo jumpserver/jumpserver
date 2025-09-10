@@ -1,20 +1,28 @@
+import os
+
+from django.template.loader import render_to_string
+from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.api import JMSGenericViewSet
-from common.permissions import IsValidUser
+from common.permissions import OnlySuperUser, IsValidUser
+from common.views.template import _get_data_template_path
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription, UserMsgSubscription
+from notifications.notifications import CustomMsgTemplateBase
 from notifications.notifications import system_msgs
 from notifications.serializers import (
     SystemMsgSubscriptionSerializer, SystemMsgSubscriptionByCategorySerializer,
     UserMsgSubscriptionSerializer,
 )
+from notifications.serializers import TemplateEditSerializer
 
 __all__ = (
     'BackendListView', 'SystemMsgSubscriptionViewSet',
-    'UserMsgSubscriptionViewSet', 'get_all_test_messages'
+    'UserMsgSubscriptionViewSet', 'get_all_test_messages', 'TemplateViewSet',
 )
 
 
@@ -130,3 +138,72 @@ def get_all_test_messages(request):
         <hr />
         """).format(msg_cls.__name__, msg_text)
     return HttpResponse(html_data + text_data)
+
+
+class TemplateViewSet(JMSGenericViewSet):
+    permission_classes = [OnlySuperUser]
+
+    def list(self, request):
+        result = []
+        metas = [cls.as_dict() for cls in CustomMsgTemplateBase._registry]
+        for meta in metas:
+            item = {
+                'template_name': meta['template_name'],
+                'subject': meta.get('subject', ''),
+                'contexts': meta.get('contexts', []),
+                'content': None,
+                'content_error': None,
+                'source': None,
+            }
+
+            data_path = _get_data_template_path(meta['template_name'])
+            try:
+                if os.path.exists(data_path):
+                    with open(data_path, 'r', encoding='utf-8') as f:
+                        item['content'] = f.read()
+                    item['source'] = 'data'
+                else:
+                    ctx = {x.get('name'): x.get('default') for x in item['contexts']}
+                    try:
+                        rendered = render_to_string(meta['template_name'], ctx)
+                        item['content'] = rendered
+                        item['source'] = 'original'
+                    except Exception as e:
+                        item['content_error'] = str(e)
+                        item['source'] = 'original_error'
+            except Exception as e:
+                item['content_error'] = str(e)
+            result.append(item)
+
+        return Response(result)
+
+    @action(detail=False, methods=['patch'], url_path='edit', name='edit')
+    def edit(self, request):
+        """保存前端编辑的模板内容到 data/template/<template_name> 目录"""
+
+        serializer = TemplateEditSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template_name = serializer.validated_data['EMAIL_TEMPLATE_NAME']
+        content = serializer.validated_data['EMAIL_TEMPLATE_CONTENT']
+
+        data_path = _get_data_template_path(template_name)
+        data_dir = os.path.dirname(data_path)
+        try:
+            os.makedirs(data_dir, exist_ok=True)
+            with open(data_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        except Exception as e:
+            return Response({'ok': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'ok': True, 'path': data_path})
+
+    @action(detail=False, methods=['post'], url_path='reset', name='reset')
+    def reset(self, request):
+        template_name = request.data.get('template_name')
+        data_path = _get_data_template_path(template_name)
+        try:
+            if os.path.exists(data_path):
+                os.remove(data_path)
+        except Exception as e:
+            return Response({'ok': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'ok': True, 'path': data_path})

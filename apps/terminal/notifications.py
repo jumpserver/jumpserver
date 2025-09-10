@@ -8,6 +8,7 @@ from common.sdk.im.wecom import wecom_tool
 from common.utils import get_logger, reverse
 from common.utils import lazyproperty
 from common.utils.timezone import local_now_display
+from common.views.template import custom_render_to_string
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
@@ -280,7 +281,17 @@ class StorageConnectivityMessage(SystemMessage):
 
 
 class SessionSharingMessage(UserMessage):
+    subject = _('Session sharing')
     message_type_label = _('Session sharing')
+    template_name = 'terminal/_msg_session_sharing.html'
+    contexts = [
+        {"name": "asset", "label": _('Asset'), "default": "dev server"},
+        {"name": "created_by", "label": _('Created by'), "default": "2025-01-01 10:00:00"},
+        {"name": "account", "label": _('Account'), "default": "root"},
+        {"name": "url", "label": _('URL'), "default": "http://example.com/session/xxxx"},
+        {"name": "verify_code", "label": _('Verify code'), "default": "123456"},
+        {"name": "org", "label": _('Organization'), "default": "Default Default"},
+    ]
 
     def __init__(self, user, instance):
         super().__init__(user)
@@ -289,14 +300,14 @@ class SessionSharingMessage(UserMessage):
     def get_html_msg(self) -> dict:
         instance = self.instance
         context = {
-            'asset': instance.session.asset,
+            'asset': str(instance.session.asset),
             'created_by': instance.created_by,
-            'account': instance.session.account,
+            'account': str(instance.session.account),
             'url': instance.url,
             'verify_code': instance.verify_code,
             'org': instance.org_name,
         }
-        message = render_to_string('terminal/_msg_session_sharing.html', context)
+        message = custom_render_to_string(self.template_name, context)
         return {
             'subject': self.message_type_label + ' ' + self.instance.created_by,
             'message': message

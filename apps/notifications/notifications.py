@@ -54,7 +54,24 @@ def publish_task(receive_user_ids, backends_msg_mapper):
     Message.send_msg(receive_user_ids, backends_msg_mapper)
 
 
-class Message(metaclass=MessageType):
+class CustomMsgTemplateBase:
+    _registry = []
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if cls is not CustomMsgTemplateBase and getattr(cls, "template_name", None):
+            CustomMsgTemplateBase._registry.append(cls)
+
+    @classmethod
+    def as_dict(cls):
+        return {
+            "template_name": cls.template_name,
+            "subject": cls.subject,
+            "contexts": cls.contexts,
+        }
+
+
+class Message(CustomMsgTemplateBase, metaclass=MessageType):
     """
     这里封装了什么？
         封装不同消息的模板，提供统一的发送消息的接口

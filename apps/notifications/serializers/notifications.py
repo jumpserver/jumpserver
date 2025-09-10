@@ -1,3 +1,4 @@
+from django.template import Engine, TemplateSyntaxError
 from rest_framework import serializers
 
 from common.serializers import BulkModelSerializer
@@ -40,3 +41,16 @@ class UserMsgSubscriptionSerializer(BulkModelSerializer):
     class Meta:
         model = UserMsgSubscription
         fields = ('user_id', 'receive_backends',)
+
+
+class TemplateEditSerializer(serializers.Serializer):
+    EMAIL_TEMPLATE_NAME = serializers.CharField(max_length=256)
+    EMAIL_TEMPLATE_CONTENT = serializers.CharField()
+
+    def validate_EMAIL_TEMPLATE_CONTENT(self, value):
+        safe_engine = Engine(debug=False, libraries={}, builtins=[])
+        try:
+            safe_engine.from_string(value)
+        except TemplateSyntaxError as e:
+            raise serializers.ValidationError(f'Template syntax error at: {e.token.lineno}')
+        return value
