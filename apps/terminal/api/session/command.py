@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
@@ -228,6 +227,9 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
                 command.update({
                     '_account': session.account,
                     '_org_name': session.org.name,
+                    '_protocol': session.protocol,
+                    '_remote_addr': session.remote_addr,
+                    '_login_from': session.get_login_from_display(),
                 })
 
             if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
