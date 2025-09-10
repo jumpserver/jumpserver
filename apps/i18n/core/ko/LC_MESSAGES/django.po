@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-17 15:06+0800\n"
+"POT-Creation-Date: 2025-09-10 14:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -455,9 +455,9 @@ msgstr "Vault 작업이 실패했습니다. 다시 시도하거나 Vault의 계�
 #: audits/models.py:59 audits/models.py:318 audits/serializers.py:230
 #: authentication/models/connection_token.py:41
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:36 terminal/notifications.py:156
+#: terminal/models/session/session.py:36 terminal/notifications.py:160
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:38
-#: terminal/templates/terminal/_msg_command_warning.html:4
+#: terminal/templates/terminal/_msg_command_warning.html:10
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:295
 msgid "Asset"
@@ -517,13 +517,13 @@ msgstr "비밀번호 변경 상태"
 #: accounts/serializers/automations/change_secret.py:148
 #: accounts/templates/accounts/change_secret_failed_info.html:12
 #: acls/serializers/base.py:133
-#: acls/templates/acls/asset_login_reminder.html:10
+#: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:319
 #: audits/serializers.py:231 authentication/api/connection_token.py:464
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:38 terminal/serializers/command.py:72
-#: terminal/templates/terminal/_msg_command_warning.html:8
+#: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
 #: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
@@ -1224,7 +1224,7 @@ msgid "Changed"
 msgstr "수정됨"
 
 #: accounts/serializers/account/account.py:290 acls/models/base.py:97
-#: acls/templates/acls/asset_login_reminder.html:9
+#: acls/templates/acls/asset_login_reminder.html:10
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
 #: assets/serializers/platform.py:181 assets/serializers/platform.py:213
@@ -1271,9 +1271,9 @@ msgstr "ID"
 #: rbac/builtin.py:127 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:34 terminal/models/session/sharing.py:34
-#: terminal/notifications.py:157 terminal/notifications.py:217
+#: terminal/notifications.py:161 terminal/notifications.py:221
 #: terminal/serializers/command.py:16
-#: terminal/templates/terminal/_msg_command_warning.html:6
+#: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
 #: users/const.py:14 users/models/user/__init__.py:293
@@ -1283,7 +1283,7 @@ msgstr "사용자"
 
 #: accounts/serializers/account/account.py:484
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:159 terminal/notifications.py:219
+#: terminal/notifications.py:163 terminal/notifications.py:223
 msgid "Date"
 msgstr "날짜"
 
@@ -1840,7 +1840,7 @@ msgstr "사용자"
 #: terminal/models/session/session.py:47 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
-#: terminal/templates/terminal/_msg_command_warning.html:23
+#: terminal/templates/terminal/_msg_command_warning.html:28
 msgid "Command"
 msgstr "명령"
 
@@ -1866,7 +1866,7 @@ msgstr "대소문자 무시"
 #: acls/models/command_acl.py:33 acls/models/command_acl.py:97
 #: acls/serializers/command_acl.py:29
 #: authentication/serializers/connect_token_secret.py:90
-#: terminal/templates/terminal/_msg_command_warning.html:14
+#: terminal/templates/terminal/_msg_command_warning.html:23
 msgid "Command group"
 msgstr "명령 그룹"
 
@@ -1875,7 +1875,7 @@ msgid "The generated regular expression is incorrect: {}"
 msgstr "생성된 정규 표현식에 오류가 있음"
 
 #: acls/models/command_acl.py:103
-#: terminal/templates/terminal/_msg_command_warning.html:12
+#: terminal/templates/terminal/_msg_command_warning.html:22
 msgid "Command acl"
 msgstr "명령 필터"
 
@@ -1896,7 +1896,7 @@ msgstr "연결 방식 제어"
 msgid "Rule"
 msgstr "규칙"
 
-#: acls/models/login_acl.py:14
+#: acls/models/login_acl.py:14 acls/templates/acls/user_login_reminder.html:12
 msgid "Login acl"
 msgstr "로그인 접근 제어"
 
@@ -1905,6 +1905,7 @@ msgid "Login confirm"
 msgstr "로그인 재검토"
 
 #: acls/models/login_asset_acl.py:12
+#: acls/templates/acls/asset_login_reminder.html:12
 msgid "Login asset acl"
 msgstr "로그인 자산 접근 제어"
 
@@ -1912,11 +1913,11 @@ msgstr "로그인 자산 접근 제어"
 msgid "Login asset confirm"
 msgstr "로그인 자산 재검토"
 
-#: acls/notifications.py:12
+#: acls/notifications.py:13
 msgid "User login reminder"
 msgstr "사용자 로그인 알림"
 
-#: acls/notifications.py:42
+#: acls/notifications.py:45
 msgid "User login alert for asset"
 msgstr "자산 로그인 알림"
 
@@ -1983,6 +1984,7 @@ msgstr "시간대"
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
 #: perms/templates/perms/_msg_permed_items_expire.html:3
+#: terminal/templates/terminal/_msg_command_warning.html:3
 #: users/templates/users/_msg_reset_mfa.html:4
 msgid "Dear"
 msgstr "존경하는"
@@ -1997,8 +1999,8 @@ msgstr "다음 자산에 최근 사용자가 로그인했음을 알려드립니�
 msgid "Asset details"
 msgstr "자산 세부정보"
 
-#: acls/templates/acls/asset_login_reminder.html:14
-#: acls/templates/acls/user_login_reminder.html:15
+#: acls/templates/acls/asset_login_reminder.html:16
+#: acls/templates/acls/user_login_reminder.html:16
 msgid ""
 "Please review the login activity to ensure the security and proper usage of "
 "the asset. If you did not authorize this login or if you notice any "
@@ -2007,8 +2009,9 @@ msgstr ""
 "이 로그인 활동을 검토하여 자산의 안전과 올바른 사용이 보장되도록 해주시기 바랍니다. 만약 이 로그인이 승인되지 않았거나 의심스러운 "
 "활동이 발견되면 즉시 필요한 조치를 취해 주십시오."
 
-#: acls/templates/acls/asset_login_reminder.html:16
-#: acls/templates/acls/user_login_reminder.html:16
+#: acls/templates/acls/asset_login_reminder.html:18
+#: acls/templates/acls/user_login_reminder.html:17
+#: terminal/templates/terminal/_msg_command_warning.html:34
 msgid "Thank you for your attention to this matter"
 msgstr "이 문제에 대한 관심에 감사드립니다."
 
@@ -2604,7 +2607,7 @@ msgstr "자산 정보 수집"
 msgid "Ping asset"
 msgstr "자산 테스트"
 
-#: assets/models/base.py:17 terminal/notifications.py:243
+#: assets/models/base.py:17 terminal/notifications.py:247
 msgid "Connectivity"
 msgstr "연결성"
 
@@ -3312,7 +3315,6 @@ msgid "Rename dir"
 msgstr "디렉터리 매핑"
 
 #: audits/const.py:23 rbac/tree.py:278 terminal/api/session/session.py:285
-#: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
 msgid "View"
@@ -3411,7 +3413,7 @@ msgstr "다운로드 가능"
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:20
 #: terminal/models/session/sharing.py:95 terminal/serializers/command.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:10
-#: terminal/templates/terminal/_msg_command_warning.html:17
+#: terminal/templates/terminal/_msg_command_warning.html:25
 #: tickets/models/ticket/command_confirm.py:16
 msgid "Session"
 msgstr "세션"
@@ -3686,7 +3688,7 @@ msgstr "자산 로그인 규칙은 현재 자산을 지원하지 않습니다."
 msgid "ACL action is face online"
 msgstr "ACL Action은 온라인 얼굴 인식입니다."
 
-#: authentication/api/connection_token.py:533
+#: authentication/api/connection_token.py:534
 msgid "No available face feature"
 msgstr "사용 가능한 얼굴 특징이 없습니다."
 
@@ -4134,6 +4136,7 @@ msgstr "비밀번호 사용자 정의"
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
 #: terminal/serializers/storage.py:71
+#: terminal/templates/terminal/_msg_command_warning.html:19
 msgid "Protocol"
 msgstr "프로토콜"
 
@@ -5685,7 +5688,7 @@ msgid "Run as policy"
 msgstr "사용자 정책"
 
 #: ops/models/job.py:221 ops/models/variable.py:28 ops/serializers/job.py:111
-#: terminal/notifications.py:182
+#: terminal/notifications.py:186
 msgid "Job"
 msgstr "작업"
 
@@ -5947,7 +5950,7 @@ msgstr "저장하기 전에 조직을 선택해 주십시오"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:53
-#: terminal/templates/terminal/_msg_command_warning.html:21
+#: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
 #: tickets/models/ticket/general.py:303
 #: tickets/serializers/ticket/ticket.py:61
@@ -8289,7 +8292,7 @@ msgid "Output"
 msgstr "출력"
 
 #: terminal/backends/command/models.py:24 terminal/serializers/command.py:22
-#: terminal/templates/terminal/_msg_command_warning.html:10
+#: terminal/templates/terminal/_msg_command_warning.html:21
 msgid "Risk level"
 msgstr "위험 등급"
 
@@ -8626,6 +8629,7 @@ msgstr "계정"
 
 #: terminal/models/session/session.py:41
 #: terminal/models/session/sharing.py:118
+#: terminal/templates/terminal/_msg_command_warning.html:16
 msgid "Login from"
 msgstr "로그인 출처"
 
@@ -8679,7 +8683,7 @@ msgid "Origin"
 msgstr "출처"
 
 #: terminal/models/session/sharing.py:42
-#: terminal/models/session/sharing.py:100 terminal/notifications.py:279
+#: terminal/models/session/sharing.py:100 terminal/notifications.py:283
 msgid "Session sharing"
 msgstr "세션 공유"
 
@@ -8749,26 +8753,26 @@ msgstr "세션"
 msgid "Command warning"
 msgstr "명령 경고"
 
-#: terminal/notifications.py:128 terminal/notifications.py:183
+#: terminal/notifications.py:132 terminal/notifications.py:187
 msgid "Command reject"
 msgstr "명령 거부"
 
-#: terminal/notifications.py:158 terminal/notifications.py:218
+#: terminal/notifications.py:162 terminal/notifications.py:222
 msgid "Level"
 msgstr "수준"
 
-#: terminal/notifications.py:242
+#: terminal/notifications.py:246
 msgid "Command and replay storage"
 msgstr "명령 및 녹화 저장"
 
-#: terminal/notifications.py:258 terminal/tasks.py:212
+#: terminal/notifications.py:262 terminal/tasks.py:212
 #: xpack/plugins/cloud/api.py:182
 #: xpack/plugins/cloud/serializers/account.py:137
 #: xpack/plugins/cloud/serializers/account.py:139
 msgid "Test failure: Account invalid"
 msgstr "테스트 실패: 계정이 유효하지 않음"
 
-#: terminal/notifications.py:268
+#: terminal/notifications.py:272
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "유효하지 않은 저장소"
@@ -9279,6 +9283,41 @@ msgstr ""
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "보기"
+
+#: terminal/templates/terminal/_msg_command_warning.html:5
+msgid ""
+"We would like to inform you that a command alert has been triggered with the"
+" following details:"
+msgstr ""
+"귀하에게 알립니다. 명령 알람이 발동되었습니다. 내용은 다음과 같습니다:  알람 세부사항  세션 확인  이 명령의 실행 상태를 점검하여 "
+"귀하의 조직의 보안 정책에 부합하는지 확인해 주시기 바랍니다. 이 작업을 승인하지 않았거나 이상 징후를 발견한 경우 즉시 필요한 조치를 "
+"취해 주시기 바랍니다."
+
+#: terminal/templates/terminal/_msg_command_warning.html:7
+#, fuzzy
+#| msgid "Asset details"
+msgid "Alert details"
+msgstr "자산 세부정보"
+
+#: terminal/templates/terminal/_msg_command_warning.html:25
+#, fuzzy
+#| msgid "User session"
+msgid "View session"
+msgstr "사용자 세션"
+
+#: terminal/templates/terminal/_msg_command_warning.html:32
+#, fuzzy
+#| msgid ""
+#| "Please review the login activity to ensure the security and proper usage of "
+#| "the asset. If you did not authorize this login or if you notice any "
+#| "suspicious activity, please take the necessary actions immediately."
+msgid ""
+"Please review this command execution to ensure it complies with your "
+"organization’s security policies. If you did not authorize this action or "
+"notice anything unusual, please take the necessary actions immediately."
+msgstr ""
+"이 로그인 활동을 검토하여 자산의 안전과 올바른 사용이 보장되도록 해주시기 바랍니다. 만약 이 로그인이 승인되지 않았거나 의심스러운 "
+"활동이 발견되면 즉시 필요한 조치를 취해 주십시오."
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
