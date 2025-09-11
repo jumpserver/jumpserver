@@ -26,6 +26,9 @@
     {% endif %}
     <li><strong>{% trans 'Organization' %}:</strong> [{{ org }}]</li>
     <li><strong>{% trans 'Command' %}:</strong> [{{ command }}]</li>
+    {% if time %}
+        <li><strong>{% trans 'Time' %}:</strong> [{{ time }}]</li>
+    {% endif %}
 </ul>
 <hr>
 
