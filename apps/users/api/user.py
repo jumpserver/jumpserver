@@ -51,12 +51,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         'remove': 'users.remove_user',
         'bulk_remove': 'users.remove_user',
     }
-
-    def get_object(self):
-        pk = self.kwargs.get(self.lookup_field)
-        if not is_uuid(pk):
-            return self.get_queryset().get(username=pk)
-        return super().get_object()
+    slug_field = 'username'
 
     def allow_bulk_destroy(self, qs, filtered):
         is_valid = filtered.count() < qs.count()
