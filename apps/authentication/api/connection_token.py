@@ -431,7 +431,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
 
-        ticket = self._validate_acl(user, asset, account, connect_method)
+        ticket = self._validate_acl(user, asset, account, connect_method, protocol)
         if ticket:
             data['from_ticket'] = ticket
 
@@ -470,7 +470,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 after=after, object_name=object_name
             )
 
-    def _validate_acl(self, user, asset, account, connect_method):
+    def _validate_acl(self, user, asset, account, connect_method, protocol):
         from acls.models import LoginAssetACL
         kwargs = {'user': user, 'asset': asset, 'account': account}
         if account.username == AliasAccount.INPUT:
@@ -523,10 +523,15 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 return
 
             self._record_operate_log(acl, asset)
+            os = get_request_os(self.request) if self.request else 'windows'
+            method = ConnectMethodUtil.get_connect_method(
+                connect_method, protocol=protocol, os=os
+            )
+            login_from = method['label'] if method else connect_method
             for reviewer in reviewers:
                 AssetLoginReminderMsg(
                     reviewer, asset, user, account, acl,
-                    ip, self.input_username
+                    ip, self.input_username, login_from
                 ).publish_async()
 
     def create_face_verify(self, response):
