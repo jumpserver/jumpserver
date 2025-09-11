@@ -7,6 +7,7 @@ from typing import Callable
 
 from django.db import models
 from django.db.models.signals import m2m_changed
+from common.utils import is_uuid
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -95,6 +96,13 @@ class QuerySetMixin:
     request: Request
     get_serializer_class: Callable
     get_queryset: Callable
+    slug_field = 'name'
+
+    def get_object(self):
+        pk = self.kwargs.get(self.lookup_field)
+        if not pk or is_uuid(pk) or pk.isdigit():
+            return super().get_object()
+        return self.get_queryset().get(**{self.slug_field: pk})
 
     def get_queryset(self):
         return super().get_queryset()
