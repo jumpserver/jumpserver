@@ -54,7 +54,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
 
     def get_object(self):
         pk = self.kwargs.get(self.lookup_field)
-        if not is_uuid(pk):
+        if pk and not is_uuid(pk):
             return self.get_queryset().get(username=pk)
         return super().get_object()
 
