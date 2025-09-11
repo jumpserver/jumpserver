@@ -1,4 +1,5 @@
 from collections import defaultdict
+from django.utils import timezone
 
 from accounts.const import AliasAccount
 from accounts.models import VirtualAccount
@@ -7,6 +8,7 @@ from common.utils import lazyproperty
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from perms.const import ActionChoices
 from .permission import AssetPermissionUtil
+
 
 __all__ = ['PermAssetDetailUtil']
 
@@ -157,7 +159,8 @@ class PermAssetDetailUtil:
         virtual_accounts = []
         for account, action_bit in cleaned_accounts_action_bit.items():
             account.actions = action_bit
-            account.date_expired = max(cleaned_accounts_expired[account])
+            all_date_expired = cleaned_accounts_expired[account] or [timezone.now()]
+            account.date_expired = max(all_date_expired)
 
             if account.username.startswith('@'):
                 virtual_accounts.append(account)
