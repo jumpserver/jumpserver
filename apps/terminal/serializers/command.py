@@ -46,7 +46,7 @@ class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
 
     class Meta(SimpleSessionCommandSerializer.Meta):
         fields = SimpleSessionCommandSerializer.Meta.fields + [
-            'cmd_filter_acl', 'cmd_group',
+            'cmd_filter_acl', 'cmd_group', 'timestamp'
         ]
 
     def validate(self, attrs):

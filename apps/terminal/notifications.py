@@ -107,6 +107,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
             'protocol': command.get('_protocol', ''),
             'remote_addr': command.get('_remote_addr', ''),
             'login_from': command.get('_login_from', ''),
+            'time': command.get('_time', ''),
             'cmd_filter_acl': cmd_acl_name,
             'cmd_group': cmd_group_name,
             'risk_level': RiskLevelChoices.get_label(command['risk_level']),
