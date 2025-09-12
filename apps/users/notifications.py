@@ -23,7 +23,8 @@ class UserCreatedMsg(UserMessage):
         {"name": "rest_password_url", "label": _('Reset password url'),
          "default": "https://example.com/reset-password"},
         {"name": "rest_password_token", "label": _('Reset password token'), "default": "abcdefg1234567"},
-        {"name": "forget_password_url", "label": _('Login url'), "default": "https://example.com/forget-password"},
+        {"name": "forget_password_url", "label": _('Forget password url'),
+         "default": "https://example.com/forget-password"},
     ]
 
     def get_html_msg(self) -> dict:
@@ -67,7 +68,8 @@ class ResetPasswordMsg(UserMessage):
         {"name": "rest_password_url", "label": _('Reset password url'),
          "default": "https://example.com/reset-password"},
         {"name": "rest_password_token", "label": _('Reset password token'), "default": "abcdefg1234567"},
-        {"name": "forget_password_url", "label": _('Login url'), "default": "https://example.com/forget-password"},
+        {"name": "forget_password_url", "label": _('Forget password url'),
+         "default": "https://example.com/forget-password"},
         {"name": "login_url", "label": _('Login url'), "default": "https://example.com/login"},
     ]
 

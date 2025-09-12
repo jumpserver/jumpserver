@@ -21,6 +21,8 @@ class UserLoginReminderMsg(UserMessage):
         {"name": "recipient_username", "label": '接收人用户名', "default": "张三"},
         {"name": "user_agent", "label": _('User agent'), "default": "Mozilla/5.0"},
         {"name": "acl_name", "label": _('ACL name'), "default": "login acl"},
+        {"name": "login_from", "label": _('Login from'), "default": "web"},
+        {"name": "time", "label": _('Login time'), "default": "2025-01-01 12:00:00"},
     ]
 
     def __init__(self, user, user_log: UserLoginLog, acl: LoginACL):
@@ -71,6 +73,9 @@ class AssetLoginReminderMsg(UserMessage):
         {"name": "account", "label": _('Account Input username'), "default": "root"},
         {"name": "account_name", "label": _('Account name'), "default": "root"},
         {"name": "acl_name", "label": _('ACL name'), "default": "login acl"},
+        {"name": "ip", "label": "IP", "default": "192.168.1.1"},
+        {"name": "login_from", "label": _('Login from'), "default": "web"},
+        {"name": "time", "label": _('Login time'), "default": "2025-01-01 12:00:00"}
     ]
 
     def __init__(

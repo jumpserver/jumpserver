@@ -287,11 +287,11 @@ class SessionSharingMessage(UserMessage):
     template_name = 'terminal/_msg_session_sharing.html'
     contexts = [
         {"name": "asset", "label": _('Asset'), "default": "dev server"},
-        {"name": "created_by", "label": _('Created by'), "default": "2025-01-01 10:00:00"},
+        {"name": "created_by", "label": _('Created by'), "default": "Admin"},
         {"name": "account", "label": _('Account'), "default": "root"},
         {"name": "url", "label": _('URL'), "default": "http://example.com/session/xxxx"},
         {"name": "verify_code", "label": _('Verify code'), "default": "123456"},
-        {"name": "org", "label": _('Organization'), "default": "Default Default"},
+        {"name": "org", "label": _('Organization'), "default": "Default"},
     ]
 
     def __init__(self, user, instance):
