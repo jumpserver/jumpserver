@@ -1,14 +1,14 @@
 from collections import defaultdict
-from django.utils import timezone
 
 from accounts.const import AliasAccount
 from accounts.models import VirtualAccount
 from assets.models import Asset, MyAsset
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from perms.const import ActionChoices
 from .permission import AssetPermissionUtil
 
+logger = get_logger(__name__)
 
 __all__ = ['PermAssetDetailUtil']
 
@@ -111,7 +111,7 @@ class PermAssetDetailUtil:
         alias_action_bit_mapper = {
             alias: action_bit
             for alias, action_bit in alias_action_bit_mapper.items()
-            if action_bit
+            if action_bit and action_bit > 0
         }
 
         return alias_action_bit_mapper, alias_date_expired_mapper
@@ -159,7 +159,10 @@ class PermAssetDetailUtil:
         virtual_accounts = []
         for account, action_bit in cleaned_accounts_action_bit.items():
             account.actions = action_bit
-            all_date_expired = cleaned_accounts_expired[account] or [timezone.now()]
+            all_date_expired = cleaned_accounts_expired[account]
+            if not all_date_expired:
+                logger.warning(f"Account {account.username} has no date expired")
+                continue
             account.date_expired = max(all_date_expired)
 
             if account.username.startswith('@'):
