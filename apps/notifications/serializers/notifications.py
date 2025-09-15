@@ -44,10 +44,11 @@ class UserMsgSubscriptionSerializer(BulkModelSerializer):
 
 
 class TemplateEditSerializer(serializers.Serializer):
-    EMAIL_TEMPLATE_NAME = serializers.CharField(max_length=256)
-    EMAIL_TEMPLATE_CONTENT = serializers.CharField()
+    template_name = serializers.CharField(max_length=256)
+    template_content = serializers.CharField()
+    render_html = serializers.CharField()
 
-    def validate_EMAIL_TEMPLATE_CONTENT(self, value):
+    def validate_template_content(self, value):
         safe_engine = Engine(debug=False, libraries={}, builtins=[])
         try:
             safe_engine.from_string(value)

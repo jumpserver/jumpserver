@@ -33,6 +33,10 @@ def _get_data_template_path(template_name: str):
     return safe_join(settings.DATA_DIR, 'template', rel_path)
 
 
+def _get_edit_template_path(template_name: str):
+    return _get_data_template_path(template_name) + '.edit'
+
+
 def custom_render_to_string(template_name, context=None, request=None, using=None):
     # 如果自定的义模板存在，则使用自定义模板，否则使用系统模板
     custom_template = _get_data_template_path(template_name)
