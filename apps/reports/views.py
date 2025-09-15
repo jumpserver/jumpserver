@@ -61,7 +61,6 @@ charts_map = {
 
 def export_chart_to_pdf(chart_name, sessionid, request=None):
     chart_info = charts_map.get(chart_name)
-
     if not chart_info:
         return None, None
 
@@ -71,7 +70,6 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         url = urllib.parse.unquote(chart_info['path'])
     if settings.DEBUG_DEV:
         url = url.replace(":8080", ":9528")
-    days = request.GET.get('days', 7)
     oid = request.COOKIES.get("X-JMS-ORG")
     days = request.GET.get('days', 7)
     url = url + f"?days={days}&oid={oid}"
@@ -104,6 +102,7 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         except Exception as e:
             print(f'Playwright error: {e}')
             pdf_bytes = None
+            page_title = chart_info['title']
         finally:
             browser.close()
         return pdf_bytes, page_title
