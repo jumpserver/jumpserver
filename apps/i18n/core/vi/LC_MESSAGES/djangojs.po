@@ -1,0 +1,100 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-24 14:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/js/jumpserver.js:267
+msgid "Update is successful!"
+msgstr "Cập nhật thành công"
+
+#: static/js/jumpserver.js:269
+msgid "An unknown error occurred while updating.."
+msgstr "Đã xảy ra lỗi không xác định khi cập nhật"
+
+#: static/js/jumpserver.js:342
+msgid "Not found"
+msgstr "Không tìm thấy"
+
+#: static/js/jumpserver.js:344
+msgid "Server error"
+msgstr "Lỗi máy chủ"
+
+#: static/js/jumpserver.js:346 static/js/jumpserver.js:384
+#: static/js/jumpserver.js:386
+msgid "Error"
+msgstr "Lỗi"
+
+#: static/js/jumpserver.js:352 static/js/jumpserver.js:393
+msgid "Delete the success"
+msgstr "Xóa thành công"
+
+#: static/js/jumpserver.js:359
+msgid "Are you sure about deleting it?"
+msgstr "Bạn có chắc chắn muốn xóa không?"
+
+#: static/js/jumpserver.js:363 static/js/jumpserver.js:404
+msgid "Cancel"
+msgstr "Hủy"
+
+#: static/js/jumpserver.js:365 static/js/jumpserver.js:406
+msgid "Confirm"
+msgstr "Xác nhận"
+
+#: static/js/jumpserver.js:384
+msgid ""
+"The organization contains undeleted information. Please try again after deleting"
+msgstr "Tổ chức còn chứa thông tin chưa được xóa, vui lòng xóa rồi thử lại"
+
+#: static/js/jumpserver.js:386
+msgid ""
+"Do not perform this operation under this organization. Try again after switching to another organization"
+msgstr "Đừng thực hiện thao tác này trong tổ chức hiện tại, hãy chuyển sang tổ chức khác rồi thử lại"
+
+#: static/js/jumpserver.js:400
+msgid ""
+"Please ensure that the following information in the organization has been deleted"
+msgstr "Vui lòng đảm bảo rằng các thông tin sau trong tổ chức đã được xóa"
+
+#: static/js/jumpserver.js:401
+msgid ""
+"User list、User group、Asset list、Domain list、Admin user、System user、Labels、Asset permission"
+msgstr "Danh sách người dùng, Nhóm người dùng, Danh sách tài sản, Danh sách miền, Người dùng đặc quyền, Người dùng hệ thống, Quản lý nhãn, Quy tắc cấp quyền tài sản"
+
+#: static/js/jumpserver.js:650
+msgid "Unknown error occur"
+msgstr "Xuất hiện lỗi không xác định"
+
+#: static/js/jumpserver.js:902
+msgid "Password minimum length {N} bits"
+msgstr "Mật khẩu phải có tối thiểu {N} ký tự"
+
+#: static/js/jumpserver.js:903
+msgid "Must contain capital letters"
+msgstr "Phải chứa chữ cái viết hoa"
+
+#: static/js/jumpserver.js:904
+msgid "Must contain lowercase letters"
+msgstr "Phải chứa chữ cái viết thường"
+
+#: static/js/jumpserver.js:905
+msgid "Must contain numeric characters"
+msgstr "Phải chứa ký tự số"
+
+#: static/js/jumpserver.js:906
+msgid "Must contain special characters"
+msgstr "Phải chứa ký tự đặc biệt"
