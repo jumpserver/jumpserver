@@ -77,6 +77,7 @@ class Language(models.TextChoices):
     es = 'es', 'Español'
     ru = 'ru', 'Русский'
     ko = 'ko', '한국어'
+    vi = 'vi', 'Tiếng Việt'
 
     @classmethod
     def get_code_mapper(cls):

@@ -71,7 +71,6 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         url = urllib.parse.unquote(chart_info['path'])
     if settings.DEBUG_DEV:
         url = url.replace(":8080", ":9528")
-    days = request.GET.get('days', 7)
     oid = request.COOKIES.get("X-JMS-ORG")
     days = request.GET.get('days', 7)
     url = url + f"?days={days}&oid={oid}"
@@ -93,6 +92,7 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
             }
         ])
         page = context.new_page()
+        page_title = page.title()
         try:
             page.goto(url, wait_until='networkidle')
             page.wait_for_function('window.echartsFinished === true', timeout=10000)
