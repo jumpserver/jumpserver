@@ -118,12 +118,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             if self.secret_type == SecretType.SSH_KEY:
                 host['error'] = _("Windows does not support SSH key authentication")
                 return host
-
-            if self.secret_strategy == SecretStrategy.custom:
-                new_secret = self.execution.snapshot['secret']
-                if '>' in new_secret or '^' in new_secret:
-                    host['error'] = _("Windows password cannot contain special characters like > ^")
-                    return host
+            new_secret = self.get_secret(account)
+            if '>' in new_secret or '^' in new_secret:
+                host['error'] = _("Windows password cannot contain special characters like > ^")
+                return host
 
         host['ssh_params'] = {}
 
