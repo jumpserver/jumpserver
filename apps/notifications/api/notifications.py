@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from common.api import JMSGenericViewSet
 from common.permissions import OnlySuperUser, IsValidUser
-from common.views.template import _get_data_template_path
+from common.views.template import _get_data_template_path, _get_edit_template_path
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription, UserMsgSubscription
 from notifications.notifications import CustomMsgTemplateBase
@@ -156,10 +156,10 @@ class TemplateViewSet(JMSGenericViewSet):
                 'source': None,
             }
 
-            data_path = _get_data_template_path(meta['template_name'])
+            edit_path = _get_edit_template_path(meta['template_name'])
             try:
-                if os.path.exists(data_path):
-                    with open(data_path, 'r', encoding='utf-8') as f:
+                if os.path.exists(edit_path):
+                    with open(edit_path, 'r', encoding='utf-8') as f:
                         item['content'] = f.read()
                     item['source'] = 'data'
                 else:
@@ -183,14 +183,18 @@ class TemplateViewSet(JMSGenericViewSet):
 
         serializer = TemplateEditSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        template_name = serializer.validated_data['EMAIL_TEMPLATE_NAME']
-        content = serializer.validated_data['EMAIL_TEMPLATE_CONTENT']
+        template_name = serializer.validated_data['template_name']
+        content = serializer.validated_data['template_content']
+        render_html = serializer.validated_data['render_html']
 
         data_path = _get_data_template_path(template_name)
+        edit_path = _get_edit_template_path(template_name)
         data_dir = os.path.dirname(data_path)
         try:
             os.makedirs(data_dir, exist_ok=True)
             with open(data_path, 'w', encoding='utf-8') as f:
+                f.write(render_html)
+            with open(edit_path, 'w', encoding='utf-8') as f:
                 f.write(content)
         except Exception as e:
             return Response({'ok': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -203,9 +207,12 @@ class TemplateViewSet(JMSGenericViewSet):
         if not template_name:
             return Response({'ok': False, 'error': 'template_name is required'}, status=status.HTTP_400_BAD_REQUEST)
         data_path = _get_data_template_path(template_name)
+        edit_path = _get_edit_template_path(template_name)
         try:
             if os.path.exists(data_path) and os.path.isfile(data_path):
                 os.remove(data_path)
+            if os.path.exists(edit_path) and os.path.isfile(edit_path):
+                os.remove(edit_path)
         except Exception as e:
             return Response({'ok': False, 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({'ok': True, 'path': data_path})
