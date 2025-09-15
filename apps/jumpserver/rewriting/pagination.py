@@ -13,6 +13,9 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
             return len(queryset)
 
     def paginate_queryset(self, queryset, request, view=None):
+        if request.query_params.get('format') in ['csv', 'xlsx']:
+            self.max_limit = 10000
+            self.default_limit = 10000
         if view and hasattr(view, 'page_max_limit'):
             self.max_limit = view.page_max_limit
 
@@ -26,4 +29,3 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
             self.default_limit = view.default_limit
 
         return super().paginate_queryset(queryset, request, view)
-
