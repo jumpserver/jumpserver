@@ -17,7 +17,7 @@ class LoginACLSerializer(BaseUserACLSerializer, CommonBulkModelSerializer):
 
     class Meta(BaseUserACLSerializer.Meta):
         model = LoginACL
-        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules'}) - {'org_id'})
+        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules'}))
         action_choices_exclude = [
             ActionChoices.warning,
             ActionChoices.notify_and_warn,
