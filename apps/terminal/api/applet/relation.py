@@ -29,8 +29,7 @@ class HostMixin:
         ('list', 'terminal.view_applethost'),
         ('retrieve', 'terminal.view_applethost'),
     )
-
-    default_limit = None
+    page_no_limit = True
 
     def get_permissions(self):
         if self.kwargs.get('host') and settings.DEBUG:

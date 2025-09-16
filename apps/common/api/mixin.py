@@ -5,6 +5,7 @@ from contextlib import nullcontext
 from itertools import chain
 from typing import Callable
 
+from django.conf import settings
 from django.db import models
 from django.db.models.signals import m2m_changed
 from common.utils import is_uuid
@@ -103,9 +104,20 @@ class QuerySetMixin:
         if not pk or is_uuid(pk) or pk.isdigit():
             return super().get_object()
         return self.get_queryset().get(**{self.slug_field: pk})
+    
+    def limit_queryset_if_no_page(self, queryset):
+        # 如果分页器有设置 limit，则不限制
+        if self.paginator and self.paginator.get_limit(self.request):
+            return queryset
 
-    def get_queryset(self):
-        return super().get_queryset()
+        # 如果分页器没有设置 limit，则不限制
+        if getattr(self, 'page_no_limit', False):
+            return queryset
+
+        if not settings.DEFAULT_PAGE_SIZE:
+            return queryset
+
+        return queryset[:settings.DEFAULT_PAGE_SIZE]
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -114,6 +126,7 @@ class QuerySetMixin:
         if self.action == 'metadata':
             queryset = queryset.none()
         queryset = self.setup_eager_loading(queryset)
+        queryset = self.limit_queryset_if_no_page(queryset)
         return queryset
 
     def setup_eager_loading(self, queryset, is_paginated=False):
