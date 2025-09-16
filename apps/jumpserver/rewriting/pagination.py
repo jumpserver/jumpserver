@@ -4,7 +4,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 
 class MaxLimitOffsetPagination(LimitOffsetPagination):
-    max_limit = settings.MAX_LIMIT_PER_PAGE
+    max_limit = settings.MAX_PAGE_SIZE
 
     def get_count(self, queryset):
         try:
@@ -13,17 +13,14 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
             return len(queryset)
 
     def paginate_queryset(self, queryset, request, view=None):
+        if request.query_params.get('format') in ['csv', 'xlsx']:
+            self.default_limit = settings.MAX_LIMIT_PER_PAGE
+            return super().paginate_queryset(queryset, request, view)
+        
         if view and hasattr(view, 'page_max_limit'):
             self.max_limit = view.page_max_limit
-
-        # 自定义的 api view，就默认不约束分页了
-        if getattr(view, 'action', None) != 'list' and not getattr(view, 'default_limit', None):
-            self.default_limit = None
-
         if view and hasattr(view, 'page_default_limit'):
             self.default_limit = view.page_default_limit
-        if view and hasattr(view, 'default_limit'):
-            self.default_limit = view.default_limit
 
         return super().paginate_queryset(queryset, request, view)
 

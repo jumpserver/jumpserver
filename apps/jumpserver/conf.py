@@ -692,8 +692,9 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 0,
 
         # API 分页
-        'MAX_LIMIT_PER_PAGE': 10000,
-        'DEFAULT_PAGE_SIZE': 10,
+        'MAX_LIMIT_PER_PAGE': 10000, # 给导出用
+        'MAX_PAGE_SIZE': 1000,
+        'DEFAULT_PAGE_SIZE': 200, # 给没有请求分页的用
 
         'LIMIT_SUPER_PRIV': False,
 
