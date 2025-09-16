@@ -8,7 +8,6 @@ from typing import Callable
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import m2m_changed
-from common.utils import is_uuid
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -18,6 +17,7 @@ from common.drf.filters import (
     IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
+from common.utils import is_uuid
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .action import RenderToJsonMixin
 from .serializer import SerializerMixin
@@ -104,8 +104,10 @@ class QuerySetMixin:
         if not pk or is_uuid(pk) or pk.isdigit():
             return super().get_object()
         return self.get_queryset().get(**{self.slug_field: pk})
-    
+
     def limit_queryset_if_no_page(self, queryset):
+        if self.request.query_params.get('format') in ['csv', 'xlsx']:
+            return queryset
         action = getattr(self, 'action', None)
         if action != 'list':
             return queryset
