@@ -1,4 +1,4 @@
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
@@ -35,7 +35,7 @@ class DifferentCityLoginMessage(UserMessage):
         )
         message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -78,7 +78,7 @@ class OAuthBindMessage(UserMessage):
         )
         message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': subject,
+            'subject': str(subject),
             'message': message
         }
 

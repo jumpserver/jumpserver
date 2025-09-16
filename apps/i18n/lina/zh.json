@@ -1628,5 +1628,8 @@
     "setVariable": "设置参数",
     "userId": "用户ID",
     "userName": "用户名",
-    "description": "暂无数据"
+    "description": "暂无数据",
+    "MsgTemplate": "消息模板",
+    "Example": "示例值",
+    "TemplateVariablesHelpText": "您可以选择一个模板在模板内容中使用 {{ key }} 读取内置变量,注意：只支持 {{ }} 语法，其他语法不支持。例如 {% if title %}"
 }
