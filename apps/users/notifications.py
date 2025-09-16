@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import reverse, get_request_ip_or_data, get_request_user_agent
 from common.views.template import custom_render_to_string
@@ -12,7 +12,7 @@ from notifications.notifications import UserMessage
 
 
 class UserCreatedMsg(UserMessage):
-    subject = str(settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT)
+    subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
     template_name = 'users/_msg_user_created.html'
     contexts = [
         {"name": "honorific", "label": _('Honorific'), "default": "zhangsan"},
@@ -88,7 +88,7 @@ class ResetPasswordMsg(UserMessage):
         }
         message = render_to_string('authentication/_msg_reset_password.html', context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -123,7 +123,7 @@ class ResetPasswordSuccessMsg(UserMessage):
         }
         message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -162,7 +162,7 @@ class ResetPublicKeySuccessMsg(UserMessage):
         }
         message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -206,7 +206,7 @@ class PasswordExpirationReminderMsg(UserMessage):
         }
         message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -234,7 +234,7 @@ class UserExpirationReminderMsg(UserMessage):
         }
         message = render_to_string(self.template_name, context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -261,7 +261,7 @@ class ResetSSHKeyMsg(UserMessage):
         }
         message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -287,7 +287,7 @@ class ResetMFAMsg(UserMessage):
         }
         message = custom_render_to_string('users/_msg_reset_mfa.html', context)
         return {
-            'subject': self.subject,
+            'subject': str(self.subject),
             'message': message
         }
 
