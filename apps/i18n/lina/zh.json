@@ -1628,7 +1628,5 @@
     "setVariable": "设置参数",
     "userId": "用户ID",
     "userName": "用户名",
-    "ExportAsPDF": "导出 PDF",
-    "EMailReport": "发送邮件报告",
-    "Print": "打印"
+    "description": "暂无数据"
 }
