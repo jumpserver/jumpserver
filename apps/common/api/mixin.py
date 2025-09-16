@@ -106,6 +106,10 @@ class QuerySetMixin:
         return self.get_queryset().get(**{self.slug_field: pk})
     
     def limit_queryset_if_no_page(self, queryset):
+        action = getattr(self, 'action', None)
+        if action != 'list':
+            return queryset
+
         # 如果分页器有设置 limit，则不限制
         if self.paginator and self.paginator.get_limit(self.request):
             return queryset
