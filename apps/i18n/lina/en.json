@@ -1618,5 +1618,6 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name"
+    "userName": "User name",
+    "description": "No data yet"
 }
