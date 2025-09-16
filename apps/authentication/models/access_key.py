@@ -25,6 +25,10 @@ class AccessKey(models.Model):
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last used'))
     date_created = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def is_valid(self):
+        return self.is_active and self.user.is_valid
+
     def get_id(self):
         return str(self.id)
 
