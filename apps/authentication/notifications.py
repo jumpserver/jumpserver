@@ -12,10 +12,10 @@ class DifferentCityLoginMessage(UserMessage):
     subject = _('Different city login reminder')
     template_name = 'authentication/_msg_different_city.html'
     contexts = [
-        {"name": "city", "label": _('Login city'), "default": "北京"},
-        {"name": "username", "label": _('User'), "default": "zhangsan"},
-        {"name": "name", "label": _('Name'), "default": "zhangsan"},
-        {"name": "ip", "label": "IP", "default": "8.8.8.8"},
+        {"name": "city", "label": _('Login city'), "default": "Shanghai"},
+        {"name": "username", "label": _('User'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
+        {"name": "ip", "label": "IP", "default": "192.168.1.1"},
         {"name": "time", "label": _('Login Date'), "default": "2025-01-01 12:00:00"},
     ]
 
@@ -52,9 +52,9 @@ class OAuthBindMessage(UserMessage):
     subject = _('OAuth binding reminder')
     template_name = 'authentication/_msg_oauth_bind.html'
     contexts = [
-        {"name": "username", "label": _('User'), "default": "zhangsan"},
-        {"name": "name", "label": _('Name'), "default": "zhangsan"},
-        {"name": "ip", "label": "IP", "default": "8.8.8.8"},
+        {"name": "username", "label": _('User'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
+        {"name": "ip", "label": "IP", "default": "192.168.1.1"},
         {"name": "oauth_name", "label": _('OAuth name'), "default": "WeCom"},
         {"name": "oauth_id", "label": _('OAuth ID'), "default": "000001"},
     ]
