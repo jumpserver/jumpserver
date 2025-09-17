@@ -9065,11 +9065,11 @@ msgstr "图标"
 
 #: terminal/serializers/applet_host.py:24
 msgid "Per Device (Device number limit)"
-msgstr "每用户 (限制设备数量)"
+msgstr "每设备 (限制设备数量)"
 
 #: terminal/serializers/applet_host.py:25
 msgid "Per User (User number limit)"
-msgstr "每设备 (限制用户数量)"
+msgstr "每用户 (限制用户数量)"
 
 #: terminal/serializers/applet_host.py:37
 msgid "Core API"
