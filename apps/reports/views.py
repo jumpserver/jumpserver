@@ -77,7 +77,11 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
     with sync_playwright() as p:
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1040, "height": 800}, locale=lang)
+        context = browser.new_context(
+            viewport={"width": 1040, "height": 800},
+            locale=lang,
+            ignore_https_errors=True
+        )
         # 设置 sessionid cookie
         parsed_url = urlparse(url)
         context.add_cookies([
@@ -91,7 +95,6 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
             }
         ])
         page = context.new_page()
-        page_title = page.title()
         try:
             page.goto(url, wait_until='networkidle')
             page.wait_for_function('window.echartsFinished === true', timeout=10000)
