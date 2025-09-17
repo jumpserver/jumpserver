@@ -1621,5 +1621,6 @@
     "userName": "User name",
     "description": "No data yet",
     "MsgTemplate": "Msg Template",
-    "TemplateVariablesHelpText": "You can select a template and use {{ key }} within the template content to read built-in variables.Note: only the {{ }} syntax is supported; other syntaxes such as {% if title %} are not supported."
+    "TemplateVariablesHelpText": "You can select a template and use {{ key }} within the template content to read built-in variables.Note: only the {{ }} syntax is supported; other syntaxes such as {% if title %} are not supported.",
+    "ResetSuccessfully": "Reset successfully"
 }
