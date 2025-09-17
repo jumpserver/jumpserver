@@ -1620,6 +1620,7 @@
     "assetId": "ID tài sản",
     "assetName": "Tên tài sản",
     "currentTime": "Thời gian hiện tại",
+    "description": "Chưa có dữ liệu.",
     "disallowSelfUpdateFields": "Không cho phép tự chỉnh sửa trường hiện tại",
     "forceEnableMFAHelpText": "Nếu buộc kích hoạt, người dùng sẽ không thể tự động vô hiệu hóa",
     "isConsoleCanUse": "Trang quản lý có khả dụng không",

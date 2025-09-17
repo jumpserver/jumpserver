@@ -1621,6 +1621,7 @@
     "assetId": "ID do ativo",
     "assetName": "Nome do ativo",
     "currentTime": "Hora atual",
+    "description": "Nenhum dado disponível.",
     "disallowSelfUpdateFields": "Não é permitido alterar o campo atual",
     "forceEnableMFAHelpText": "Se for habilitado forçosamente, o usuário não pode desativar por conta própria",
     "isConsoleCanUse": "Se a página de gerenciamento está disponível",

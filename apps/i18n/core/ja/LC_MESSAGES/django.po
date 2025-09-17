@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 14:48+0800\n"
+"POT-Creation-Date: 2025-09-17 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,10 +99,8 @@ msgid "Windows does not support SSH key authentication"
 msgstr ""
 
 #: accounts/automations/base/manager.py:123
-#, fuzzy
-#| msgid "The address cannot contain the special character `#`"
 msgid "Windows password cannot contain special characters like > ^"
-msgstr "アドレスには特殊文字「#」を含めることはできません"
+msgstr "Windowsパスワードは特殊文字を含むことができません、例えば > ^"
 
 #: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
@@ -1961,10 +1959,8 @@ msgid "User agent"
 msgstr "ユーザーエージェント"
 
 #: acls/notifications.py:23 acls/notifications.py:75
-#, fuzzy
-#| msgid "Org name"
 msgid "ACL name"
-msgstr "組織名"
+msgstr "ACL名"
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -1976,20 +1972,16 @@ msgid "Login from"
 msgstr "ログイン元"
 
 #: acls/notifications.py:25 acls/notifications.py:78
-#, fuzzy
-#| msgid "Login title"
 msgid "Login time"
-msgstr "ログインページのタイトル"
+msgstr "ログイン時間"
 
 #: acls/notifications.py:64
 msgid "User login alert for asset"
 msgstr "資産ログインのリマインダ"
 
 #: acls/notifications.py:73
-#, fuzzy
-#| msgid "Input username"
 msgid "Account Input username"
-msgstr "カスタム ユーザー名"
+msgstr "アカウントにユーザー名を入力"
 
 #: acls/notifications.py:74 authentication/models/connection_token.py:44
 #: terminal/serializers/storage.py:114
@@ -2284,7 +2276,7 @@ msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:76
+#: terminal/models/applet/applet.py:28 users/const.py:77
 msgid "Web"
 msgstr "Web"
 
@@ -2487,10 +2479,8 @@ msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
 #: assets/const/protocol.py:256
-#, fuzzy
-#| msgid "Enable account remove"
 msgid "Enable cluster mode"
-msgstr "アカウントの削除が有効になりました"
+msgstr "クラスターモードを起動"
 
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
@@ -3103,10 +3093,8 @@ msgid "GPU model"
 msgstr "GPUの型番"
 
 #: assets/serializers/automations/base.py:22
-#, fuzzy
-#| msgid "Accounts amount"
 msgid "Executed amount"
-msgstr "アカウント数"
+msgstr "実行数"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -4330,22 +4318,16 @@ msgid "Different city login reminder"
 msgstr "異なる都市ログインのリマインダー"
 
 #: authentication/notifications.py:52
-#, fuzzy
-#| msgid "binding reminder"
 msgid "OAuth binding reminder"
-msgstr "バインディングリマインダー"
+msgstr "OAuthバインド通知"
 
 #: authentication/notifications.py:58
-#, fuzzy
-#| msgid "Auth username"
 msgid "OAuth name"
-msgstr "ユーザー名で認証する"
+msgstr "OAuth名"
 
 #: authentication/notifications.py:59
-#, fuzzy
-#| msgid "OAuth2"
 msgid "OAuth ID"
-msgstr "OAuth2"
+msgstr "OAuth ID"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -6514,24 +6496,20 @@ msgid "Account automation report"
 msgstr "アカウント自動化報告"
 
 #: reports/views.py:44
-#, fuzzy
-#| msgid "Console"
 msgid "ConsoleDashboard"
-msgstr "Console"
+msgstr "コンソールダッシュボード"
 
 #: reports/views.py:48
 msgid "AuditsDashboard"
-msgstr ""
+msgstr "監査台ダッシュボード"
 
 #: reports/views.py:52
 msgid "PamDashboard"
-msgstr ""
+msgstr "PAMダッシュボード"
 
 #: reports/views.py:56
-#, fuzzy
-#| msgid "Change secret record"
 msgid "ChangeSecretDashboard"
-msgstr "パスワード レコードの変更"
+msgstr "アカウントパスワード変更ダッシュボード"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -8318,7 +8296,7 @@ msgid ""
 msgstr "外部サイトに転送されますので、そのリンクを信頼できることを確認してください。"
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:77
+#: users/const.py:78
 msgid "Client"
 msgstr "クライアント"
 
@@ -8400,7 +8378,7 @@ msgstr "テスト成功"
 msgid "Test failure: Please check configuration"
 msgstr "テストに失敗しました：構成を確認してください"
 
-#: terminal/api/component/terminal.py:56
+#: terminal/api/component/terminal.py:69
 msgid "Have online sessions"
 msgstr "オンラインセッションを持つ"
 
@@ -9427,39 +9405,26 @@ msgid "view"
 msgstr "表示"
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
-#, fuzzy
-#| msgid ""
-#| "We would like to inform you that a user has recently logged into the "
-#| "following asset:"
 msgid ""
 "We would like to inform you that a command alert has been triggered with the"
 " following details:"
-msgstr "以下の資産にユーザーが最近ログインしたことをお知らせいたします。"
+msgstr "コマンドアラートがトリガーされましたのでお知らせいたします。詳細は以下の通りです："
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
-#, fuzzy
-#| msgid "Asset details"
 msgid "Alert details"
-msgstr "資産詳細"
+msgstr "アラート詳細情報"
 
 #: terminal/templates/terminal/_msg_command_warning.html:25
-#, fuzzy
-#| msgid "Can view session"
 msgid "View session"
-msgstr "アカウントセッション"
+msgstr "会話を確認してください。"
 
 #: terminal/templates/terminal/_msg_command_warning.html:35
-#, fuzzy
-#| msgid ""
-#| "Please review the login activity to ensure the security and proper usage of "
-#| "the asset. If you did not authorize this login or if you notice any "
-#| "suspicious activity, please take the necessary actions immediately."
 msgid ""
 "Please review this command execution to ensure it complies with your "
 "organization’s security policies. If you did not authorize this action or "
 "notice anything unusual, please take the necessary actions immediately."
 msgstr ""
-"資産のセキュリティと適切な使用を確保するために、ログイン活動を確認してください。このログインを承認していない場合や、不審な活動に気付いた場合は、直ちに必要な措置を講じてください。"
+"このコマンドの実行状況をチェックし、あなたの組織のセキュリティポリシーに適合していることを確認してください。もしこの操作が認可されていない場合や、異常を発見した場合は、直ちに必要な措置を講じてください。"
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
@@ -9724,10 +9689,8 @@ msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
 #: tickets/serializers/ticket/ticket.py:22
-#, fuzzy
-#| msgid "Processor"
 msgid "Process map"
-msgstr "プロセッサ"
+msgstr "フローチャート"
 
 #: tickets/serializers/ticket/ticket.py:91
 msgid "The ticket flow `{}` does not exist"
@@ -9844,14 +9807,18 @@ msgid "High（32 bit）"
 msgstr "高い（32 bit）"
 
 #: users/const.py:48
+msgid "True Color（24 bit）"
+msgstr ""
+
+#: users/const.py:49
 msgid "Medium（16 bit）"
 msgstr "真ん中（16 bit）"
 
-#: users/const.py:81
+#: users/const.py:82
 msgid "Replace"
 msgstr "置換"
 
-#: users/const.py:82
+#: users/const.py:83
 msgid "Suffix"
 msgstr "接尾辞を付ける"
 
@@ -10003,22 +9970,16 @@ msgid "Force enabled"
 msgstr "強制有効"
 
 #: users/notifications.py:23 users/notifications.py:68
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password url"
-msgstr "パスワードのリセット"
+msgstr "パスワードリセットのURL"
 
 #: users/notifications.py:25 users/notifications.py:70
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password token"
-msgstr "パスワードのリセット"
+msgstr "パスワードリセットトークン"
 
 #: users/notifications.py:26 users/notifications.py:71
-#, fuzzy
-#| msgid "Forgot password"
 msgid "Forget password url"
-msgstr "パスワードを忘れた"
+msgstr "パスワードを忘れた場合のURL"
 
 #: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
@@ -10029,20 +9990,16 @@ msgstr "パスワードのリセット"
 
 #: users/notifications.py:73 users/notifications.py:188
 #: users/notifications.py:190
-#, fuzzy
-#| msgid "Login user"
 msgid "Login url"
-msgstr "ログインユーザー"
+msgstr "ログインURL"
 
 #: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
 #: users/notifications.py:107 users/notifications.py:146
-#, fuzzy
-#| msgid "Invalid address"
 msgid "IP address"
-msgstr "無効なアドレス。"
+msgstr "IPアドレス"
 
 #: users/notifications.py:142
 msgid "Reset public key success"
@@ -10053,26 +10010,20 @@ msgid "Password is about expire"
 msgstr "パスワードの有効期限が近づいています"
 
 #: users/notifications.py:185
-#, fuzzy
-#| msgid "User password expiration (day)"
 msgid "Password expiration date"
-msgstr "ユーザーパスワードの有効期限（天）"
+msgstr "パスワードの有効期限"
 
 #: users/notifications.py:186
-#, fuzzy
-#| msgid "Repeated password"
 msgid "Update password url"
-msgstr "パスワードの重複"
+msgstr "パスワード更新のURL"
 
 #: users/notifications.py:221
 msgid "Account is about expire"
 msgstr "アカウントの有効期限が近づいています"
 
 #: users/notifications.py:225
-#, fuzzy
-#| msgid "Create date"
 msgid "Expiration date"
-msgstr "作成日"
+msgstr "期限日"
 
 #: users/notifications.py:249
 msgid "Reset SSH Key"
@@ -10087,10 +10038,8 @@ msgid "Reset MFA"
 msgstr "MFAのリセット"
 
 #: users/notifications.py:280
-#, fuzzy
-#| msgid "Reset MFA"
 msgid "Reset MFA url"
-msgstr "MFAのリセット"
+msgstr "MFAリセットのURL"
 
 #: users/serializers/preference/koko.py:10
 #: users/serializers/preference/luna.py:63
@@ -10307,10 +10256,8 @@ msgid "Multi-Factor Authentication"
 msgstr "認証"
 
 #: users/serializers/user.py:398
-#, fuzzy
-#| msgid "ssh public key"
 msgid "Has public keys"
-msgstr "ssh公開キー"
+msgstr "公開鍵があります"
 
 #: users/serializers/user.py:426
 msgid ""

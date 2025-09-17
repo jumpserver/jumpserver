@@ -1622,6 +1622,7 @@
     "assetId": "ID актива",
     "assetName": "Название актива",
     "currentTime": "Текущее время",
+    "description": "Нет данных",
     "disallowSelfUpdateFields": "Не разрешено самостоятельно изменять текущие поля.",
     "forceEnableMFAHelpText": "При принудительном включении пользователь не может отключить самостоятельно",
     "isConsoleCanUse": "Доступна ли Консоль",

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 14:48+0800\n"
+"POT-Creation-Date: 2025-09-17 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,10 +99,10 @@ msgid "Windows does not support SSH key authentication"
 msgstr ""
 
 #: accounts/automations/base/manager.py:123
-#, fuzzy
-#| msgid "The address cannot contain the special character `#`"
 msgid "Windows password cannot contain special characters like > ^"
-msgstr "Địa chỉ không thể chứa ký tự đặc biệt `#`"
+msgstr ""
+"Mật khẩu Windows không được bao gồm ký tự đặc biệt, ví dụ như > ^< -SEP->Tên"
+" ACL"
 
 #: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
@@ -2018,10 +2018,8 @@ msgid "User agent"
 msgstr "Trình duyệt người dùng"
 
 #: acls/notifications.py:23 acls/notifications.py:75
-#, fuzzy
-#| msgid "Org name"
 msgid "ACL name"
-msgstr "Organization"
+msgstr "Thời gian đăng nhập"
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -2033,20 +2031,16 @@ msgid "Login from"
 msgstr "Nguồn đăng nhập"
 
 #: acls/notifications.py:25 acls/notifications.py:78
-#, fuzzy
-#| msgid "Login title"
 msgid "Login time"
-msgstr "Tiêu đề trang đăng nhập"
+msgstr "Tài khoản nhập tên người dùng"
 
 #: acls/notifications.py:64
 msgid "User login alert for asset"
 msgstr "Nhắc nhở tài sản đăng nhập"
 
 #: acls/notifications.py:73
-#, fuzzy
-#| msgid "Input username"
 msgid "Account Input username"
-msgstr "Tên người dùng tùy chỉnh"
+msgstr "Khởi động chế độ cụm"
 
 #: acls/notifications.py:74 authentication/models/connection_token.py:44
 #: terminal/serializers/storage.py:114
@@ -2355,7 +2349,7 @@ msgstr "Cloud"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:76
+#: terminal/models/applet/applet.py:28 users/const.py:77
 msgid "Web"
 msgstr "Web"
 
@@ -2568,10 +2562,8 @@ msgid "Auth username"
 msgstr "Sử dụng xác thực tên người dùng"
 
 #: assets/const/protocol.py:256
-#, fuzzy
-#| msgid "Enable account remove"
 msgid "Enable cluster mode"
-msgstr "Khởi động xóa tài khoản"
+msgstr "Số lần thực hiện"
 
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
@@ -3194,10 +3186,8 @@ msgid "GPU model"
 msgstr "Mã GPU"
 
 #: assets/serializers/automations/base.py:22
-#, fuzzy
-#| msgid "Accounts amount"
 msgid "Executed amount"
-msgstr "Số lượng tài khoản"
+msgstr "Thông báo gắn kết OAuth"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -4498,22 +4488,18 @@ msgid "Different city login reminder"
 msgstr "Nhắc nhở đăng nhập từ xa"
 
 #: authentication/notifications.py:52
-#, fuzzy
-#| msgid "binding reminder"
 msgid "OAuth binding reminder"
-msgstr "Nhắc nhở liên kết"
+msgstr "Tên OAuth"
 
 #: authentication/notifications.py:58
-#, fuzzy
-#| msgid "Auth username"
 msgid "OAuth name"
-msgstr "Sử dụng xác thực tên người dùng"
+msgstr "ID OAuth"
 
 #: authentication/notifications.py:59
-#, fuzzy
-#| msgid "OAuth2"
 msgid "OAuth ID"
-msgstr "OAuth2"
+msgstr ""
+"Chúng tôi muốn thông báo rằng cảnh báo lệnh đã được kích hoạt, chi tiết như "
+"sau:"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -6778,19 +6764,19 @@ msgstr "Báo cáo tự động hóa tài khoản"
 
 #: reports/views.py:44
 msgid "ConsoleDashboard"
-msgstr ""
+msgstr "Bảng điều khiển Console"
 
 #: reports/views.py:48
 msgid "AuditsDashboard"
-msgstr ""
+msgstr "Bảng điều khiển Audit"
 
 #: reports/views.py:52
 msgid "PamDashboard"
-msgstr ""
+msgstr "Bảng điều khiển PAM"
 
 #: reports/views.py:56
 msgid "ChangeSecretDashboard"
-msgstr ""
+msgstr "Bảng điều khiển thay đổi mật khẩu tài khoản"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -8707,7 +8693,7 @@ msgstr ""
 "tưởng liên kết này"
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:77
+#: users/const.py:78
 msgid "Client"
 msgstr "Khách hàng"
 
@@ -8797,7 +8783,7 @@ msgstr "kiểm tra thành công"
 msgid "Test failure: Please check configuration"
 msgstr "kiểm tra thất bại: vui lòng kiểm tra cấu hình"
 
-#: terminal/api/component/terminal.py:56
+#: terminal/api/component/terminal.py:69
 msgid "Have online sessions"
 msgstr "có phiên trực tuyến"
 
@@ -9856,16 +9842,10 @@ msgid "view"
 msgstr "Xem."
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
-#, fuzzy
-#| msgid ""
-#| "We would like to inform you that a user has recently logged into the "
-#| "following asset:"
 msgid ""
 "We would like to inform you that a command alert has been triggered with the"
 " following details:"
-msgstr ""
-"Chúng tôi xin thông báo rằng, gần đây có người dùng đã đăng nhập vào tài sản"
-" sau:"
+msgstr "Thông tin chi tiết về cảnh báo"
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
 #, fuzzy
@@ -9874,26 +9854,19 @@ msgid "Alert details"
 msgstr "Thông tin tài sản"
 
 #: terminal/templates/terminal/_msg_command_warning.html:25
-#, fuzzy
-#| msgid "Can view session"
 msgid "View session"
-msgstr "Phiên tài khoản"
+msgstr "Xem cuộc hội thoại"
 
 #: terminal/templates/terminal/_msg_command_warning.html:35
-#, fuzzy
-#| msgid ""
-#| "Please review the login activity to ensure the security and proper usage of "
-#| "the asset. If you did not authorize this login or if you notice any "
-#| "suspicious activity, please take the necessary actions immediately."
 msgid ""
 "Please review this command execution to ensure it complies with your "
 "organization’s security policies. If you did not authorize this action or "
 "notice anything unusual, please take the necessary actions immediately."
 msgstr ""
-"Xin vui lòng kiểm tra hoạt động đăng nhập này để đảm bảo an toàn và sử dụng "
-"đúng cách tài sản. Nếu bạn không cho phép lần đăng nhập này hoặc phát hiện "
-"bất kỳ hoạt động đáng ngờ nào, xin hãy ngay lập tức thực hiện các biện pháp "
-"cần thiết."
+"Vui lòng kiểm tra tình trạng thực hiện lệnh này để đảm bảo nó phù hợp với "
+"chính sách an ninh của tổ chức bạn. Nếu bạn không được phép thực hiện thao "
+"tác này hoặc phát hiện bất kỳ điều gì bất thường, hãy ngay lập tức thực hiện"
+" các biện pháp cần thiết."
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
@@ -10160,10 +10133,8 @@ msgid "Permission named `{}` already exists"
 msgstr "Tên ủy quyền `{}` đã tồn tại"
 
 #: tickets/serializers/ticket/ticket.py:22
-#, fuzzy
-#| msgid "Processor"
 msgid "Process map"
-msgstr "Người xử lý"
+msgstr "Sơ đồ quy trình"
 
 #: tickets/serializers/ticket/ticket.py:91
 msgid "The ticket flow `{}` does not exist"
@@ -10284,14 +10255,18 @@ msgid "High（32 bit）"
 msgstr "Cao (32 bit)"
 
 #: users/const.py:48
+msgid "True Color（24 bit）"
+msgstr ""
+
+#: users/const.py:49
 msgid "Medium（16 bit）"
 msgstr "Trung bình (16 bit)"
 
-#: users/const.py:81
+#: users/const.py:82
 msgid "Replace"
 msgstr "Thay thế"
 
-#: users/const.py:82
+#: users/const.py:83
 msgid "Suffix"
 msgstr "Thêm hậu tố"
 
@@ -10446,22 +10421,16 @@ msgid "Force enabled"
 msgstr "Bắt buộc kích hoạt"
 
 #: users/notifications.py:23 users/notifications.py:68
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password url"
-msgstr "Đặt lại mật khẩu"
+msgstr "Địa chỉ trang web đặt lại mật khẩu"
 
 #: users/notifications.py:25 users/notifications.py:70
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password token"
-msgstr "Đặt lại mật khẩu"
+msgstr "Mã thông báo đặt lại mật khẩu"
 
 #: users/notifications.py:26 users/notifications.py:71
-#, fuzzy
-#| msgid "Forgot password"
 msgid "Forget password url"
-msgstr "Quên mật khẩu"
+msgstr "Trang web quên mật khẩu"
 
 #: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
@@ -10472,20 +10441,16 @@ msgstr "Đặt lại mật khẩu"
 
 #: users/notifications.py:73 users/notifications.py:188
 #: users/notifications.py:190
-#, fuzzy
-#| msgid "Login user"
 msgid "Login url"
-msgstr "Người dùng đăng nhập"
+msgstr "Địa chỉ trang web đăng nhập"
 
 #: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "Đặt lại mật khẩu thành công"
 
 #: users/notifications.py:107 users/notifications.py:146
-#, fuzzy
-#| msgid "Invalid address"
 msgid "IP address"
-msgstr "Địa chỉ không hợp lệ"
+msgstr "Địa chỉ IP"
 
 #: users/notifications.py:142
 msgid "Reset public key success"
@@ -10496,26 +10461,20 @@ msgid "Password is about expire"
 msgstr "Mật khẩu sắp hết hạn"
 
 #: users/notifications.py:185
-#, fuzzy
-#| msgid "User password expiration (day)"
 msgid "Password expiration date"
-msgstr "Thời gian hết hạn mật khẩu người dùng (ngày)"
+msgstr "Ngày hết hạn mật khẩu"
 
 #: users/notifications.py:186
-#, fuzzy
-#| msgid "Repeated password"
 msgid "Update password url"
-msgstr "Mật khẩu trùng lặp"
+msgstr "Địa chỉ trang web cập nhật mật khẩu"
 
 #: users/notifications.py:221
 msgid "Account is about expire"
 msgstr "Tài khoản sắp hết hạn"
 
 #: users/notifications.py:225
-#, fuzzy
-#| msgid "Create date"
 msgid "Expiration date"
-msgstr "Đã bị vô hiệu hóa"
+msgstr "Thời hạn"
 
 #: users/notifications.py:249
 msgid "Reset SSH Key"
@@ -10530,10 +10489,8 @@ msgid "Reset MFA"
 msgstr "Đặt lại MFA"
 
 #: users/notifications.py:280
-#, fuzzy
-#| msgid "Reset MFA"
 msgid "Reset MFA url"
-msgstr "Đặt lại MFA"
+msgstr "Địa chỉ trang web đặt lại MFA"
 
 #: users/serializers/preference/koko.py:10
 #: users/serializers/preference/luna.py:63
@@ -10751,10 +10708,8 @@ msgid "Multi-Factor Authentication"
 msgstr "Xác thực"
 
 #: users/serializers/user.py:398
-#, fuzzy
-#| msgid "ssh public key"
 msgid "Has public keys"
-msgstr "SSH公钥"
+msgstr "Có khóa công khai"
 
 #: users/serializers/user.py:426
 msgid ""

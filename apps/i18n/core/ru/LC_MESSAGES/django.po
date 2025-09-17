@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 14:48+0800\n"
+"POT-Creation-Date: 2025-09-17 15:02+0800\n"
 "PO-Revision-Date: 2025-06-11 11:51+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -100,10 +100,8 @@ msgid "Windows does not support SSH key authentication"
 msgstr ""
 
 #: accounts/automations/base/manager.py:123
-#, fuzzy
-#| msgid "The address cannot contain the special character `#`"
 msgid "Windows password cannot contain special characters like > ^"
-msgstr "Адрес не должен содержать специальный символ '#'"
+msgstr "Пароль Windows не может содержать специальные символы, такие как > ^"
 
 #: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
@@ -2000,10 +1998,8 @@ msgid "User agent"
 msgstr "Агент пользователя"
 
 #: acls/notifications.py:23 acls/notifications.py:75
-#, fuzzy
-#| msgid "Org name"
 msgid "ACL name"
-msgstr "Название организации"
+msgstr "Имя ACL"
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -2015,18 +2011,14 @@ msgid "Login from"
 msgstr "Источник входа"
 
 #: acls/notifications.py:25 acls/notifications.py:78
-#, fuzzy
-#| msgid "Login title"
 msgid "Login time"
-msgstr "Заголовок страницы входа"
+msgstr "Время входа"
 
 #: acls/notifications.py:64
 msgid "User login alert for asset"
 msgstr "Уведомление о входе в активы"
 
 #: acls/notifications.py:73
-#, fuzzy
-#| msgid "Input username"
 msgid "Account Input username"
 msgstr "Введите имя пользователя"
 
@@ -2328,7 +2320,7 @@ msgstr "Облака"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:76
+#: terminal/models/applet/applet.py:28 users/const.py:77
 msgid "Web"
 msgstr "Веб"
 
@@ -2543,10 +2535,8 @@ msgid "Auth username"
 msgstr "Имя пользователя для аутентификации"
 
 #: assets/const/protocol.py:256
-#, fuzzy
-#| msgid "Enable account remove"
 msgid "Enable cluster mode"
-msgstr "Включить удаление учетной записи"
+msgstr "Запустить кластерный режим"
 
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
@@ -3173,10 +3163,8 @@ msgid "GPU model"
 msgstr "Модель GPU"
 
 #: assets/serializers/automations/base.py:22
-#, fuzzy
-#| msgid "Accounts amount"
 msgid "Executed amount"
-msgstr "Количество учетных записей"
+msgstr "Исполнительные числа"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -4454,22 +4442,16 @@ msgid "Different city login reminder"
 msgstr "Уведомление о входе из другого местоположения"
 
 #: authentication/notifications.py:52
-#, fuzzy
-#| msgid "binding reminder"
 msgid "OAuth binding reminder"
-msgstr "Уведомление о привязке"
+msgstr "Напоминание о привязке OAuth"
 
 #: authentication/notifications.py:58
-#, fuzzy
-#| msgid "Auth username"
 msgid "OAuth name"
-msgstr "Имя пользователя для аутентификации"
+msgstr "Имя OAuth"
 
 #: authentication/notifications.py:59
-#, fuzzy
-#| msgid "OAuth2"
 msgid "OAuth ID"
-msgstr "OAuth2"
+msgstr "Идентификатор OAuth"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -6733,24 +6715,20 @@ msgid "Account automation report"
 msgstr "Автоматизированный отчет по аккаунтам"
 
 #: reports/views.py:44
-#, fuzzy
-#| msgid "Console"
 msgid "ConsoleDashboard"
-msgstr "Консоль"
+msgstr "Панель консоли"
 
 #: reports/views.py:48
 msgid "AuditsDashboard"
-msgstr ""
+msgstr "Аудиторская панель"
 
 #: reports/views.py:52
 msgid "PamDashboard"
-msgstr ""
+msgstr "PAM панель"
 
 #: reports/views.py:56
-#, fuzzy
-#| msgid "Change secret record"
 msgid "ChangeSecretDashboard"
-msgstr "Запись о смене секрета"
+msgstr "Панель смены пароля учетной записи"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -8669,7 +8647,7 @@ msgstr ""
 " этой ссылке."
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:77
+#: users/const.py:78
 msgid "Client"
 msgstr "Клиент"
 
@@ -8759,7 +8737,7 @@ msgstr "Успешное тестирование"
 msgid "Test failure: Please check configuration"
 msgstr "Сбой теста: пожалуйста, проверьте конфигурацию"
 
-#: terminal/api/component/terminal.py:56
+#: terminal/api/component/terminal.py:69
 msgid "Have online sessions"
 msgstr "Есть активные сессии"
 
@@ -9824,27 +9802,31 @@ msgid "view"
 msgstr "просмотр"
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
-#, fuzzy
-#| msgid ""
-#| "We would like to inform you that a user has recently logged into the "
-#| "following asset:"
 msgid ""
 "We would like to inform you that a command alert has been triggered with the"
 " following details:"
 msgstr ""
-"Мы хотим сообщить вам, что пользователь недавно вошел в следующий актив:"
+"Мы хотим уведомить вас об активации командного оповещения, детали следующие:"
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
-#, fuzzy
-#| msgid "Asset details"
 msgid "Alert details"
-msgstr "Подробности об активе"
+msgstr "Подробности оповещения"
 
 #: terminal/templates/terminal/_msg_command_warning.html:25
-#, fuzzy
-#| msgid "Can view session"
 msgid "View session"
-msgstr "Сессия аккаунта"
+msgstr ""
+"Пожалуйста, проверьте выполнение этой команды, чтобы убедиться, что она соответствует политике безопасности вашей организации. Если у вас нет разрешения на эту операцию или вы обнаружили какие-либо аномалии, немедленно примите необходимые меры.  \n"
+"Диаграмма процесса  \n"
+"Ссылка для сброса пароля  \n"
+"Токен для сброса пароля  \n"
+"Ссылка для восстановления пароля  \n"
+"Ссылка для входа  \n"
+"IP-адрес  \n"
+"Дата истечения пароля  \n"
+"Ссылка для обновления пароля  \n"
+"Крайний срок  \n"
+"Ссылка для сброса MFA  \n"
+"Есть открытый ключ"
 
 #: terminal/templates/terminal/_msg_command_warning.html:35
 #, fuzzy
@@ -10252,14 +10234,18 @@ msgid "High（32 bit）"
 msgstr "Высокое (32 бита)"
 
 #: users/const.py:48
+msgid "True Color（24 bit）"
+msgstr ""
+
+#: users/const.py:49
 msgid "Medium（16 bit）"
 msgstr "Среднее (16 бит)"
 
-#: users/const.py:81
+#: users/const.py:82
 msgid "Replace"
 msgstr "Заменить"
 
-#: users/const.py:82
+#: users/const.py:83
 msgid "Suffix"
 msgstr "Суффикс"
 

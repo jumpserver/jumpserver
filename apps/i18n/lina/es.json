@@ -1620,6 +1620,7 @@
     "assetId": "ID de activo",
     "assetName": "Nombre de activo",
     "currentTime": "Hora actual",
+    "description": "Sin datos disponibles.",
     "disallowSelfUpdateFields": "No se permite modificar el campo actual.",
     "forceEnableMFAHelpText": "Si se habilita forzosamente, el usuario no podrá desactivarlo por sí mismo",
     "isConsoleCanUse": "¿Está disponible la página de gestión?< -SEP->Agregar puerta de enlace al dominio",
