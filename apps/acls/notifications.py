@@ -15,7 +15,7 @@ class UserLoginReminderMsg(UserMessage):
     template_name = 'acls/user_login_reminder.html'
     contexts = [
         {"name": "city", "label": _('Login city'), "default": "Shanghai"},
-        {"name": "username", "label": _('User'), "default": "John"},
+        {"name": "username", "label": _('User'), "default": "john"},
         {"name": "ip", "label": "IP", "default": "192.168.1.1"},
         {"name": "recipient_name", "label": _("Recipient name"), "default": "John"},
         {"name": "recipient_username", "label": _("Recipient username"), "default": "john"},
@@ -65,7 +65,7 @@ class AssetLoginReminderMsg(UserMessage):
     template_name = 'acls/asset_login_reminder.html'
     contexts = [
         {"name": "city", "label": _('Login city'), "default": "Shanghai"},
-        {"name": "username", "label": _('User'), "default": "John"},
+        {"name": "username", "label": _('User'), "default": "john"},
         {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "asset", "label": _('Asset'), "default": "dev server"},
         {"name": "recipient_name", "label": _('Recipient name'), "default": "John"},

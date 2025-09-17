@@ -102,7 +102,7 @@ class ResetPasswordSuccessMsg(UserMessage):
     subject = _('Reset password success')
     template_name = 'authentication/_msg_rest_password_success.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "ip_address", "label": _('IP address'), "default": "192.168.1.1"},
         {"name": "browser", "label": _('Browser'), "default": "Mozilla/firefox"}
     ]
@@ -141,7 +141,7 @@ class ResetPublicKeySuccessMsg(UserMessage):
     subject = _('Reset public key success')
     template_name = 'authentication/_msg_rest_public_key_success.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "ip_address", "label": _('IP address'), "default": "192.168.1.1"},
         {"name": "browser", "label": _('Browser'), "default": "Mozilla/firefox"}
     ]
@@ -180,7 +180,7 @@ class PasswordExpirationReminderMsg(UserMessage):
     subject = _('Password is about expire')
     template_name = 'users/_msg_password_expire_reminder.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "date_password_expired", "label": _('Password expiration date'), "default": "2025-01-01 12:00:00"},
         {"name": "update_password_url", "label": _('Update password url'),
          "default": "https://example.com/update-password"},
@@ -220,7 +220,7 @@ class UserExpirationReminderMsg(UserMessage):
     subject = _('Account is about expire')
     template_name = 'users/_msg_account_expire_reminder.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "date_expired", "label": _('Expiration date'), "default": "2025-01-01 12:00:00"}
     ]
 
@@ -248,7 +248,7 @@ class ResetSSHKeyMsg(UserMessage):
     subject = _('Reset SSH Key')
     template_name = 'users/_msg_reset_ssh_key.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "url", "label": _('Update SSH Key url'), "default": "https://example.com/profile/password-and-ssh-key"}
     ]
 
@@ -275,7 +275,7 @@ class ResetMFAMsg(UserMessage):
     subject = _('Reset MFA')
     template_name = 'users/_msg_reset_mfa.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "url", "label": _('Reset MFA url'), "default": "https://example.com/profile/mfa"}
     ]
 
