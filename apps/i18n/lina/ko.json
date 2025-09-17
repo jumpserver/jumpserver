@@ -1620,6 +1620,7 @@
     "assetId": "자산 ID",
     "assetName": "자산 이름",
     "currentTime": "현재 시간",
+    "description": "데이터가 없습니다.",
     "disallowSelfUpdateFields": "현재 필드를 스스로 수정할 수 없음",
     "forceEnableMFAHelpText": "강제로 활성화하면 사용자가 스스로 비활성화할 수 없음",
     "isConsoleCanUse": "관리 페이지 사용 가능 여부",

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 14:48+0800\n"
+"POT-Creation-Date: 2025-09-17 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1935,10 +1935,8 @@ msgid "User agent"
 msgstr ""
 
 #: acls/notifications.py:23 acls/notifications.py:75
-#, fuzzy
-#| msgid "Org name"
 msgid "ACL name"
-msgstr "Organization"
+msgstr ""
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -1949,10 +1947,8 @@ msgid "Login from"
 msgstr ""
 
 #: acls/notifications.py:25 acls/notifications.py:78
-#, fuzzy
-#| msgid "Login"
 msgid "Login time"
-msgstr "Sign in"
+msgstr ""
 
 #: acls/notifications.py:64
 msgid "User login alert for asset"
@@ -2249,7 +2245,7 @@ msgstr "Cloud"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:76
+#: terminal/models/applet/applet.py:28 users/const.py:77
 msgid "Web"
 msgstr ""
 
@@ -4281,10 +4277,8 @@ msgid "OAuth binding reminder"
 msgstr ""
 
 #: authentication/notifications.py:58
-#, fuzzy
-#| msgid "Org name"
 msgid "OAuth name"
-msgstr "Organization"
+msgstr ""
 
 #: authentication/notifications.py:59
 msgid "OAuth ID"
@@ -8185,7 +8179,7 @@ msgid ""
 msgstr ""
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:77
+#: users/const.py:78
 msgid "Client"
 msgstr ""
 
@@ -8267,7 +8261,7 @@ msgstr ""
 msgid "Test failure: Please check configuration"
 msgstr ""
 
-#: terminal/api/component/terminal.py:56
+#: terminal/api/component/terminal.py:69
 msgid "Have online sessions"
 msgstr ""
 
@@ -9690,14 +9684,18 @@ msgid "High（32 bit）"
 msgstr ""
 
 #: users/const.py:48
+msgid "True Color（24 bit）"
+msgstr ""
+
+#: users/const.py:49
 msgid "Medium（16 bit）"
 msgstr ""
 
-#: users/const.py:81
+#: users/const.py:82
 msgid "Replace"
 msgstr ""
 
-#: users/const.py:82
+#: users/const.py:83
 msgid "Suffix"
 msgstr ""
 
@@ -9865,10 +9863,8 @@ msgstr ""
 
 #: users/notifications.py:73 users/notifications.py:188
 #: users/notifications.py:190
-#, fuzzy
-#| msgid "Login"
 msgid "Login url"
-msgstr "Sign in"
+msgstr ""
 
 #: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
@@ -9887,16 +9883,12 @@ msgid "Password is about expire"
 msgstr ""
 
 #: users/notifications.py:185
-#, fuzzy
-#| msgid "Date password last updated"
 msgid "Password expiration date"
-msgstr "Password updated"
+msgstr ""
 
 #: users/notifications.py:186
-#, fuzzy
-#| msgid "Date password last updated"
 msgid "Update password url"
-msgstr "Password updated"
+msgstr ""
 
 #: users/notifications.py:221
 msgid "Account is about expire"

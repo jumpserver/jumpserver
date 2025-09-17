@@ -1625,6 +1625,7 @@
     "assetId": "資産ID",
     "assetName": "資産名",
     "currentTime": "現在の時間",
+    "description": "データはありません。",
     "disallowSelfUpdateFields": "現在のフィールドを自分で変更することは許可されていません",
     "forceEnableMFAHelpText": "強制的に有効化すると、ユーザーは自分で無効化することができません。",
     "isConsoleCanUse": "管理ページの利用可能性",

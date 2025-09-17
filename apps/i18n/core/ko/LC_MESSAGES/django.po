@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 14:48+0800\n"
+"POT-Creation-Date: 2025-09-17 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,10 +99,8 @@ msgid "Windows does not support SSH key authentication"
 msgstr ""
 
 #: accounts/automations/base/manager.py:123
-#, fuzzy
-#| msgid "The address cannot contain the special character `#`"
 msgid "Windows password cannot contain special characters like > ^"
-msgstr "주소에 특수 문자 `#`를 포함할 수 없습니다."
+msgstr "Windows 비밀번호는 > ^와 같은 특수 문자를 포함할 수 없습니다."
 
 #: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
@@ -1951,10 +1949,8 @@ msgid "User agent"
 msgstr "사용자 에이전트"
 
 #: acls/notifications.py:23 acls/notifications.py:75
-#, fuzzy
-#| msgid "Org name"
 msgid "ACL name"
-msgstr "조직 이름"
+msgstr "ACL 이름"
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -1966,20 +1962,16 @@ msgid "Login from"
 msgstr "로그인 출처"
 
 #: acls/notifications.py:25 acls/notifications.py:78
-#, fuzzy
-#| msgid "Login title"
 msgid "Login time"
-msgstr "로그인 페이지 제목"
+msgstr "로그인 시간"
 
 #: acls/notifications.py:64
 msgid "User login alert for asset"
 msgstr "자산 로그인 알림"
 
 #: acls/notifications.py:73
-#, fuzzy
-#| msgid "Input username"
 msgid "Account Input username"
-msgstr "사용자 이름 사용자 정의"
+msgstr "계정 입력 사용자 이름"
 
 #: acls/notifications.py:74 authentication/models/connection_token.py:44
 #: terminal/serializers/storage.py:114
@@ -2274,7 +2266,7 @@ msgstr "클라우드 서비스"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:76
+#: terminal/models/applet/applet.py:28 users/const.py:77
 msgid "Web"
 msgstr "웹"
 
@@ -2479,10 +2471,8 @@ msgid "Auth username"
 msgstr "안전 모드"
 
 #: assets/const/protocol.py:256
-#, fuzzy
-#| msgid "Enable account remove"
 msgid "Enable cluster mode"
-msgstr "계정 제거 실행"
+msgstr "클러스터 모드 시작"
 
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
@@ -3092,10 +3082,8 @@ msgid "GPU model"
 msgstr "GPU 모델"
 
 #: assets/serializers/automations/base.py:22
-#, fuzzy
-#| msgid "Accounts amount"
 msgid "Executed amount"
-msgstr "계정 수"
+msgstr "실행 수"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -4329,22 +4317,16 @@ msgid "Different city login reminder"
 msgstr "이전 로그인 알림"
 
 #: authentication/notifications.py:52
-#, fuzzy
-#| msgid "binding reminder"
 msgid "OAuth binding reminder"
-msgstr "바인딩 알림"
+msgstr "OAuth 바인딩 알림"
 
 #: authentication/notifications.py:58
-#, fuzzy
-#| msgid "Auth username"
 msgid "OAuth name"
-msgstr "안전 모드"
+msgstr "OAuth 이름"
 
 #: authentication/notifications.py:59
-#, fuzzy
-#| msgid "OAuth2"
 msgid "OAuth ID"
-msgstr "OAuth2"
+msgstr "OAuth ID"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -6550,24 +6532,20 @@ msgid "Account automation report"
 msgstr "계정 자동화 보고서"
 
 #: reports/views.py:44
-#, fuzzy
-#| msgid "Console"
 msgid "ConsoleDashboard"
-msgstr "콘솔"
+msgstr "콘솔 대시보드"
 
 #: reports/views.py:48
 msgid "AuditsDashboard"
-msgstr ""
+msgstr "감사 대시보드"
 
 #: reports/views.py:52
 msgid "PamDashboard"
-msgstr ""
+msgstr "PAM 대시보드"
 
 #: reports/views.py:56
-#, fuzzy
-#| msgid "Change secret record"
 msgid "ChangeSecretDashboard"
-msgstr "비밀번호 변경 기록"
+msgstr "계정 비밀번호 변경 대시보드"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -8378,7 +8356,7 @@ msgid ""
 msgstr "외부 웹사이트로 이동하고자 합니다. 해당 링크를 신뢰하는지 확인해 주시기 바랍니다."
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:77
+#: users/const.py:78
 msgid "Client"
 msgstr "클라이언트"
 
@@ -8462,7 +8440,7 @@ msgstr "테스트 성공"
 msgid "Test failure: Please check configuration"
 msgstr "테스트 실패: 구성을 확인하십시오."
 
-#: terminal/api/component/terminal.py:56
+#: terminal/api/component/terminal.py:69
 msgid "Have online sessions"
 msgstr "온라인 세션이 있습니다."
 
@@ -9492,40 +9470,27 @@ msgid "view"
 msgstr "보기"
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
-#, fuzzy
-#| msgid ""
-#| "We would like to inform you that a user has recently logged into the "
-#| "following asset:"
 msgid ""
 "We would like to inform you that a command alert has been triggered with the"
 " following details:"
-msgstr "다음 자산에 최근 사용자가 로그인했음을 알려드립니다:"
+msgstr "명령 알림이 발생했음을 알려드립니다. 구체적인 내용은 다음과 같습니다:"
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
-#, fuzzy
-#| msgid "Asset details"
 msgid "Alert details"
-msgstr "자산 세부정보"
+msgstr "알림 상세 정보"
 
 #: terminal/templates/terminal/_msg_command_warning.html:25
-#, fuzzy
-#| msgid "Can view session"
 msgid "View session"
-msgstr "계정 세션"
+msgstr "대화 보기"
 
 #: terminal/templates/terminal/_msg_command_warning.html:35
-#, fuzzy
-#| msgid ""
-#| "Please review the login activity to ensure the security and proper usage of "
-#| "the asset. If you did not authorize this login or if you notice any "
-#| "suspicious activity, please take the necessary actions immediately."
 msgid ""
 "Please review this command execution to ensure it complies with your "
 "organization’s security policies. If you did not authorize this action or "
 "notice anything unusual, please take the necessary actions immediately."
 msgstr ""
-"이 로그인 활동을 검토하여 자산의 안전과 올바른 사용이 보장되도록 해주시기 바랍니다. 만약 이 로그인이 승인되지 않았거나 의심스러운 "
-"활동이 발견되면 즉시 필요한 조치를 취해 주십시오."
+"이 명령의 실행 상황을 확인하여 귀하의 조직 보안 정책에 부합하는지 확인해 주십시오. 이 작업이 승인되지 않았거나 이상 징후가 발견되면 "
+"즉시 필요한 조치를 취하십시오."
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
@@ -9790,10 +9755,8 @@ msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 이미 존재합니다"
 
 #: tickets/serializers/ticket/ticket.py:22
-#, fuzzy
-#| msgid "Processor"
 msgid "Process map"
-msgstr "처리자"
+msgstr "프로세스 차트"
 
 #: tickets/serializers/ticket/ticket.py:91
 msgid "The ticket flow `{}` does not exist"
@@ -9925,14 +9888,18 @@ msgid "High（32 bit）"
 msgstr "높음 (32 비트)"
 
 #: users/const.py:48
+msgid "True Color（24 bit）"
+msgstr ""
+
+#: users/const.py:49
 msgid "Medium（16 bit）"
 msgstr "중간 (16 비트)"
 
-#: users/const.py:81
+#: users/const.py:82
 msgid "Replace"
 msgstr "교체"
 
-#: users/const.py:82
+#: users/const.py:83
 msgid "Suffix"
 msgstr "접미사 추가"
 
@@ -10084,22 +10051,16 @@ msgid "Force enabled"
 msgstr "강제로 활성화"
 
 #: users/notifications.py:23 users/notifications.py:68
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password url"
-msgstr "비밀번호 재설정"
+msgstr "비밀번호 재설정 웹사이트"
 
 #: users/notifications.py:25 users/notifications.py:70
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password token"
-msgstr "비밀번호 재설정"
+msgstr "비밀번호 재설정 토큰"
 
 #: users/notifications.py:26 users/notifications.py:71
-#, fuzzy
-#| msgid "Forgot password"
 msgid "Forget password url"
-msgstr "비밀번호를 잊으셨나요"
+msgstr "비밀번호 분실 웹사이트"
 
 #: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
@@ -10110,20 +10071,16 @@ msgstr "비밀번호 재설정"
 
 #: users/notifications.py:73 users/notifications.py:188
 #: users/notifications.py:190
-#, fuzzy
-#| msgid "Login user"
 msgid "Login url"
-msgstr "로그인 사용자"
+msgstr "로그인 웹사이트"
 
 #: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "비밀번호 재설정 성공"
 
 #: users/notifications.py:107 users/notifications.py:146
-#, fuzzy
-#| msgid "Invalid address"
 msgid "IP address"
-msgstr "유효하지 않은 주소"
+msgstr "IP 주소"
 
 #: users/notifications.py:142
 msgid "Reset public key success"
@@ -10134,26 +10091,20 @@ msgid "Password is about expire"
 msgstr "비밀번호가 곧 만료됩니다"
 
 #: users/notifications.py:185
-#, fuzzy
-#| msgid "User password expiration (day)"
 msgid "Password expiration date"
-msgstr "사용자 비밀번호 만료 시간 (일)"
+msgstr "비밀번호 만료 날짜"
 
 #: users/notifications.py:186
-#, fuzzy
-#| msgid "Repeated password"
 msgid "Update password url"
-msgstr "중복 비밀번호"
+msgstr "비밀번호 업데이트 웹사이트"
 
 #: users/notifications.py:221
 msgid "Account is about expire"
 msgstr "계정이 곧 만료됩니다"
 
 #: users/notifications.py:225
-#, fuzzy
-#| msgid "Create date"
 msgid "Expiration date"
-msgstr "생성 날짜"
+msgstr "기한"
 
 #: users/notifications.py:249
 msgid "Reset SSH Key"
@@ -10168,10 +10119,8 @@ msgid "Reset MFA"
 msgstr "MFA 재설정"
 
 #: users/notifications.py:280
-#, fuzzy
-#| msgid "Reset MFA"
 msgid "Reset MFA url"
-msgstr "MFA 재설정"
+msgstr "MFA 재설정 웹사이트"
 
 #: users/serializers/preference/koko.py:10
 #: users/serializers/preference/luna.py:63
@@ -10381,10 +10330,8 @@ msgid "Multi-Factor Authentication"
 msgstr "인증"
 
 #: users/serializers/user.py:398
-#, fuzzy
-#| msgid "ssh public key"
 msgid "Has public keys"
-msgstr "SSH 공개 키"
+msgstr "공개 키가 있습니다."
 
 #: users/serializers/user.py:426
 msgid ""

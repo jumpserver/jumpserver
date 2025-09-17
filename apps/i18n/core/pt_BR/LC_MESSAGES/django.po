@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 14:48+0800\n"
+"POT-Creation-Date: 2025-09-17 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,10 +99,8 @@ msgid "Windows does not support SSH key authentication"
 msgstr ""
 
 #: accounts/automations/base/manager.py:123
-#, fuzzy
-#| msgid "The address cannot contain the special character `#`"
 msgid "Windows password cannot contain special characters like > ^"
-msgstr "O endereço não pode conter o caractere especial `#`"
+msgstr "Senhas do Windows não podem conter caracteres especiais, como > ^"
 
 #: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
@@ -2024,10 +2022,8 @@ msgid "User agent"
 msgstr "Agente do usuário"
 
 #: acls/notifications.py:23 acls/notifications.py:75
-#, fuzzy
-#| msgid "Org name"
 msgid "ACL name"
-msgstr "Nome da Organização"
+msgstr "Nome ACL"
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -2039,20 +2035,16 @@ msgid "Login from"
 msgstr "Origem do login"
 
 #: acls/notifications.py:25 acls/notifications.py:78
-#, fuzzy
-#| msgid "Login title"
 msgid "Login time"
-msgstr "Título da página de login"
+msgstr "Hora de Login"
 
 #: acls/notifications.py:64
 msgid "User login alert for asset"
 msgstr "Alerta de login de ativos"
 
 #: acls/notifications.py:73
-#, fuzzy
-#| msgid "Input username"
 msgid "Account Input username"
-msgstr "Nome de usuário personalizado"
+msgstr "Digite o nome de usuário da conta"
 
 #: acls/notifications.py:74 authentication/models/connection_token.py:44
 #: terminal/serializers/storage.py:114
@@ -2354,7 +2346,7 @@ msgstr "Serviço de nuvem"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:76
+#: terminal/models/applet/applet.py:28 users/const.py:77
 msgid "Web"
 msgstr "Web"
 
@@ -2567,10 +2559,8 @@ msgid "Auth username"
 msgstr "Autenticação usando o nome de usuário "
 
 #: assets/const/protocol.py:256
-#, fuzzy
-#| msgid "Enable account remove"
 msgid "Enable cluster mode"
-msgstr "Inicializar a remoção de contas"
+msgstr "Ativar Modo de Cluster"
 
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
@@ -3195,10 +3185,8 @@ msgid "GPU model"
 msgstr "Modelo de GPU"
 
 #: assets/serializers/automations/base.py:22
-#, fuzzy
-#| msgid "Accounts amount"
 msgid "Executed amount"
-msgstr "Quantidade de contas"
+msgstr "Número de Execuções"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -4475,22 +4463,16 @@ msgid "Different city login reminder"
 msgstr "Alerta de login remoto"
 
 #: authentication/notifications.py:52
-#, fuzzy
-#| msgid "binding reminder"
 msgid "OAuth binding reminder"
-msgstr "Alerta de vinculação"
+msgstr "Aviso de Vínculo OAuth"
 
 #: authentication/notifications.py:58
-#, fuzzy
-#| msgid "Auth username"
 msgid "OAuth name"
-msgstr "Autenticação usando o nome de usuário "
+msgstr "Nome OAuth"
 
 #: authentication/notifications.py:59
-#, fuzzy
-#| msgid "OAuth2"
 msgid "OAuth ID"
-msgstr "OAuth2"
+msgstr "ID OAuth"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -6760,24 +6742,20 @@ msgid "Account automation report"
 msgstr "Relatório de Automação de Contas"
 
 #: reports/views.py:44
-#, fuzzy
-#| msgid "Console"
 msgid "ConsoleDashboard"
-msgstr "Console"
+msgstr "Painel de Console"
 
 #: reports/views.py:48
 msgid "AuditsDashboard"
-msgstr ""
+msgstr "Painel de Auditoria"
 
 #: reports/views.py:52
 msgid "PamDashboard"
-msgstr ""
+msgstr "Painel PAM"
 
 #: reports/views.py:56
-#, fuzzy
-#| msgid "Change secret record"
 msgid "ChangeSecretDashboard"
-msgstr "Registro de alteração de senha"
+msgstr "Painel de Alteração de Senha da Conta"
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -8708,7 +8686,7 @@ msgstr ""
 "confirme que confia neste link."
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:77
+#: users/const.py:78
 msgid "Client"
 msgstr "Cliente"
 
@@ -8798,7 +8776,7 @@ msgstr "Teste bem-sucedido"
 msgid "Test failure: Please check configuration"
 msgstr "Teste falhou: Por favor, verifique as configurações"
 
-#: terminal/api/component/terminal.py:56
+#: terminal/api/component/terminal.py:69
 msgid "Have online sessions"
 msgstr "Existem sessões online"
 
@@ -9859,43 +9837,31 @@ msgid "view"
 msgstr "Visualizar"
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
-#, fuzzy
-#| msgid ""
-#| "We would like to inform you that a user has recently logged into the "
-#| "following asset:"
 msgid ""
 "We would like to inform you that a command alert has been triggered with the"
 " following details:"
 msgstr ""
-"Queremos informá-lo de que os seguintes ativos tiveram recentemente usuários"
-" logados:"
+"Queremos notificá-lo de que o alerta de comando foi acionado, com os "
+"detalhes a seguir:"
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
-#, fuzzy
-#| msgid "Asset details"
 msgid "Alert details"
-msgstr "Detalhes do ativo"
+msgstr "Detalhes do Alerta"
 
 #: terminal/templates/terminal/_msg_command_warning.html:25
-#, fuzzy
-#| msgid "Can view session"
 msgid "View session"
-msgstr "Sessão da conta"
+msgstr "Verifique a conversa"
 
 #: terminal/templates/terminal/_msg_command_warning.html:35
-#, fuzzy
-#| msgid ""
-#| "Please review the login activity to ensure the security and proper usage of "
-#| "the asset. If you did not authorize this login or if you notice any "
-#| "suspicious activity, please take the necessary actions immediately."
 msgid ""
 "Please review this command execution to ensure it complies with your "
 "organization’s security policies. If you did not authorize this action or "
 "notice anything unusual, please take the necessary actions immediately."
 msgstr ""
-"Por favor, revise essa atividade de login para garantir a segurança e o uso "
-"correto dos ativos. Se você não autorizou este login ou encontrou qualquer "
-"atividade suspeita, por favor, tome as medidas necessárias imediatamente."
+"Por favor, verifique a execução deste comando para garantir que está em "
+"conformidade com a política de segurança da sua organização. Se você não "
+"estiver autorizado a realizar esta ação ou encontrar qualquer anomalia, tome"
+" as medidas necessárias imediatamente."
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
@@ -10163,10 +10129,8 @@ msgid "Permission named `{}` already exists"
 msgstr " O nome de autorização `{}` já existe"
 
 #: tickets/serializers/ticket/ticket.py:22
-#, fuzzy
-#| msgid "Processor"
 msgid "Process map"
-msgstr "Responsável"
+msgstr "Fluxograma"
 
 #: tickets/serializers/ticket/ticket.py:91
 msgid "The ticket flow `{}` does not exist"
@@ -10290,14 +10254,18 @@ msgid "High（32 bit）"
 msgstr "Alto (32 bit)"
 
 #: users/const.py:48
+msgid "True Color（24 bit）"
+msgstr ""
+
+#: users/const.py:49
 msgid "Medium（16 bit）"
 msgstr "Médio (16 bit)"
 
-#: users/const.py:81
+#: users/const.py:82
 msgid "Replace"
 msgstr "Substituir"
 
-#: users/const.py:82
+#: users/const.py:83
 msgid "Suffix"
 msgstr "Adicionar sufixo"
 
@@ -10454,22 +10422,16 @@ msgid "Force enabled"
 msgstr "Forçar ativação"
 
 #: users/notifications.py:23 users/notifications.py:68
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password url"
-msgstr "Resetar senha"
+msgstr "URL para redefinir a senha"
 
 #: users/notifications.py:25 users/notifications.py:70
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password token"
-msgstr "Resetar senha"
+msgstr "Token de redefinição de senha"
 
 #: users/notifications.py:26 users/notifications.py:71
-#, fuzzy
-#| msgid "Forgot password"
 msgid "Forget password url"
-msgstr "Esqueceu a senha"
+msgstr "URL para esquecer a senha"
 
 #: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
@@ -10480,20 +10442,16 @@ msgstr "Resetar senha"
 
 #: users/notifications.py:73 users/notifications.py:188
 #: users/notifications.py:190
-#, fuzzy
-#| msgid "Login user"
 msgid "Login url"
-msgstr "Usuário conectado"
+msgstr "URL de login"
 
 #: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "Resetar senha com sucesso"
 
 #: users/notifications.py:107 users/notifications.py:146
-#, fuzzy
-#| msgid "Invalid address"
 msgid "IP address"
-msgstr "Endereço inválido"
+msgstr "Endereço IP"
 
 #: users/notifications.py:142
 msgid "Reset public key success"
@@ -10504,26 +10462,20 @@ msgid "Password is about expire"
 msgstr "A senha está prestes a expirar"
 
 #: users/notifications.py:185
-#, fuzzy
-#| msgid "User password expiration (day)"
 msgid "Password expiration date"
-msgstr "Tempo de expiração da senha do usuário (dias)"
+msgstr "Data de validade da senha"
 
 #: users/notifications.py:186
-#, fuzzy
-#| msgid "Repeated password"
 msgid "Update password url"
-msgstr "Senha repetida"
+msgstr "URL para atualizar a senha"
 
 #: users/notifications.py:221
 msgid "Account is about expire"
 msgstr "A conta está prestes a expirar"
 
 #: users/notifications.py:225
-#, fuzzy
-#| msgid "Create date"
 msgid "Expiration date"
-msgstr "Data de Criação"
+msgstr "Data limite"
 
 #: users/notifications.py:249
 msgid "Reset SSH Key"
@@ -10538,10 +10490,8 @@ msgid "Reset MFA"
 msgstr "Reiniciar MFA"
 
 #: users/notifications.py:280
-#, fuzzy
-#| msgid "Reset MFA"
 msgid "Reset MFA url"
-msgstr "Reiniciar MFA"
+msgstr "URL para redefinir MFA"
 
 #: users/serializers/preference/koko.py:10
 #: users/serializers/preference/luna.py:63
@@ -10761,10 +10711,8 @@ msgid "Multi-Factor Authentication"
 msgstr "Autenticação"
 
 #: users/serializers/user.py:398
-#, fuzzy
-#| msgid "ssh public key"
 msgid "Has public keys"
-msgstr "Chave pública SSH"
+msgstr "Possui chave pública"
 
 #: users/serializers/user.py:426
 msgid ""

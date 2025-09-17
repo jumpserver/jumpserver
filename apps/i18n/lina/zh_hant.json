@@ -1625,6 +1625,7 @@
     "assetId": "資產 ID",
     "assetName": "資產名稱",
     "currentTime": "當前時間",
+    "description": "目前沒有數據。",
     "disallowSelfUpdateFields": "不允許自己修改當前欄位",
     "forceEnableMFAHelpText": "如果強制啟用，用戶無法自行禁用",
     "isConsoleCanUse": "管理頁面是否可用",
