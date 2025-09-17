@@ -46,7 +46,7 @@ class UserCreatedMsg(UserMessage):
             **user_info,
             'rest_password_url': reverse('authentication:reset-password', external=True),
             'rest_password_token': user.generate_reset_token(),
-            'forget_password_url': reverse('authentication:login', external=True),
+            'forget_password_url': reverse('authentication:forgot-password', external=True)
         }
         message = custom_render_to_string(self.template_name, context)
         return {
@@ -86,7 +86,7 @@ class ResetPasswordMsg(UserMessage):
             'forget_password_url': reverse('authentication:forgot-password', external=True),
             'login_url': reverse('authentication:login', external=True),
         }
-        message = render_to_string('authentication/_msg_reset_password.html', context)
+        message = custom_render_to_string(self.template_name, context)
         return {
             'subject': str(self.subject),
             'message': message
