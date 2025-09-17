@@ -2,7 +2,6 @@ from collections import defaultdict
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -15,11 +14,11 @@ class UserCreatedMsg(UserMessage):
     subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
     template_name = 'users/_msg_user_created.html'
     contexts = [
-        {"name": "honorific", "label": _('Honorific'), "default": "zhangsan"},
+        {"name": "honorific", "label": _('Honorific'), "default": "John"},
         {"name": "content", "label": _('Content'), "default": "Welcome to use our system."},
-        {"name": "username", "label": _('Username'), "default": "zhangsan"},
-        {"name": "name", "label": _('Name'), "default": "张三"},
-        {"name": "email", "label": _('Email'), "default": "123456@qq.com"},
+        {"name": "username", "label": _('Username'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
+        {"name": "email", "label": _('Email'), "default": "john@example.com"},
         {"name": "rest_password_url", "label": _('Reset password url'),
          "default": "https://example.com/reset-password"},
         {"name": "rest_password_token", "label": _('Reset password token'), "default": "abcdefg1234567"},
@@ -64,7 +63,7 @@ class ResetPasswordMsg(UserMessage):
     subject = _('Reset password')
     template_name = 'authentication/_msg_reset_password.html'
     contexts = [
-        {"name": "email", "label": _('Email'), "default": "123456@qq.com"},
+        {"name": "email", "label": _('Email'), "default": "john@example.com"},
         {"name": "rest_password_url", "label": _('Reset password url'),
          "default": "https://example.com/reset-password"},
         {"name": "rest_password_token", "label": _('Reset password token'), "default": "abcdefg1234567"},
@@ -103,7 +102,7 @@ class ResetPasswordSuccessMsg(UserMessage):
     subject = _('Reset password success')
     template_name = 'authentication/_msg_rest_password_success.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "张三"},
+        {"name": "name", "label": _('Name'), "default": "john"},
         {"name": "ip_address", "label": _('IP address'), "default": "192.168.1.1"},
         {"name": "browser", "label": _('Browser'), "default": "Mozilla/firefox"}
     ]
@@ -142,7 +141,7 @@ class ResetPublicKeySuccessMsg(UserMessage):
     subject = _('Reset public key success')
     template_name = 'authentication/_msg_rest_public_key_success.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "张三"},
+        {"name": "name", "label": _('Name'), "default": "john"},
         {"name": "ip_address", "label": _('IP address'), "default": "192.168.1.1"},
         {"name": "browser", "label": _('Browser'), "default": "Mozilla/firefox"}
     ]
@@ -181,12 +180,12 @@ class PasswordExpirationReminderMsg(UserMessage):
     subject = _('Password is about expire')
     template_name = 'users/_msg_password_expire_reminder.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "张三"},
+        {"name": "name", "label": _('Name'), "default": "john"},
         {"name": "date_password_expired", "label": _('Password expiration date'), "default": "2025-01-01 12:00:00"},
         {"name": "update_password_url", "label": _('Update password url'),
          "default": "https://example.com/update-password"},
         {"name": "forget_password_url", "label": _('Login url'), "default": "https://example.com/forget-password"},
-        {"name": "email", "label": _('Email'), "default": "123456@qq.com"},
+        {"name": "email", "label": _('Email'), "default": "john@example.com"},
         {"name": "login_url", "label": _('Login url'), "default": "https://example.com/login"},
     ]
 
@@ -221,7 +220,7 @@ class UserExpirationReminderMsg(UserMessage):
     subject = _('Account is about expire')
     template_name = 'users/_msg_account_expire_reminder.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "张三"},
+        {"name": "name", "label": _('Name'), "default": "john"},
         {"name": "date_expired", "label": _('Expiration date'), "default": "2025-01-01 12:00:00"}
     ]
 
@@ -232,7 +231,7 @@ class UserExpirationReminderMsg(UserMessage):
             'name': self.user.name,
             'date_expired': date_expired
         }
-        message = render_to_string(self.template_name, context)
+        message = custom_render_to_string(self.template_name, context)
         return {
             'subject': str(self.subject),
             'message': message
@@ -249,7 +248,7 @@ class ResetSSHKeyMsg(UserMessage):
     subject = _('Reset SSH Key')
     template_name = 'users/_msg_reset_ssh_key.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "张三"},
+        {"name": "name", "label": _('Name'), "default": "john"},
         {"name": "url", "label": _('Update SSH Key url'), "default": "https://example.com/profile/password-and-ssh-key"}
     ]
 
@@ -276,7 +275,7 @@ class ResetMFAMsg(UserMessage):
     subject = _('Reset MFA')
     template_name = 'users/_msg_reset_mfa.html'
     contexts = [
-        {"name": "name", "label": _('Name'), "default": "张三"},
+        {"name": "name", "label": _('Name'), "default": "john"},
         {"name": "url", "label": _('Reset MFA url'), "default": "https://example.com/profile/mfa"}
     ]
 

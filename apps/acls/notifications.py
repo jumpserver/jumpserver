@@ -14,11 +14,11 @@ class UserLoginReminderMsg(UserMessage):
     subject = _('User login reminder')
     template_name = 'acls/user_login_reminder.html'
     contexts = [
-        {"name": "city", "label": _('Login city'), "default": "北京"},
-        {"name": "username", "label": _('User'), "default": "zhangsan"},
-        {"name": "ip", "label": "IP", "default": "8.8.8.8"},
-        {"name": "recipient_name", "label": _("Recipient name"), "default": "zhangsan"},
-        {"name": "recipient_username", "label": _("Recipient username"), "default": "张三"},
+        {"name": "city", "label": _('Login city'), "default": "Shanghai"},
+        {"name": "username", "label": _('User'), "default": "John"},
+        {"name": "ip", "label": "IP", "default": "192.168.1.1"},
+        {"name": "recipient_name", "label": _("Recipient name"), "default": "John"},
+        {"name": "recipient_username", "label": _("Recipient username"), "default": "john"},
         {"name": "user_agent", "label": _('User agent'), "default": "Mozilla/5.0"},
         {"name": "acl_name", "label": _('ACL name'), "default": "login acl"},
         {"name": "login_from", "label": _('Login from'), "default": "web"},
@@ -64,12 +64,12 @@ class AssetLoginReminderMsg(UserMessage):
     subject = _('User login alert for asset')
     template_name = 'acls/asset_login_reminder.html'
     contexts = [
-        {"name": "city", "label": _('Login city'), "default": "北京"},
-        {"name": "username", "label": _('User'), "default": "zhangsan"},
-        {"name": "name", "label": _('Name'), "default": "zhangsan"},
+        {"name": "city", "label": _('Login city'), "default": "Shanghai"},
+        {"name": "username", "label": _('User'), "default": "John"},
+        {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "asset", "label": _('Asset'), "default": "dev server"},
-        {"name": "recipient_name", "label": _('Recipient name'), "default": "zhangsan"},
-        {"name": "recipient_username", "label": _('Recipient username'), "default": "张三"},
+        {"name": "recipient_name", "label": _('Recipient name'), "default": "John"},
+        {"name": "recipient_username", "label": _('Recipient username'), "default": "john"},
         {"name": "account", "label": _('Account Input username'), "default": "root"},
         {"name": "account_name", "label": _('Account name'), "default": "root"},
         {"name": "acl_name", "label": _('ACL name'), "default": "login acl"},
