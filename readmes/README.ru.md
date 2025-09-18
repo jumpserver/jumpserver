@@ -2,15 +2,14 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## Открытый инструмент PAM (Bastion Host)
+## Открытая платформа PAM (хост-бастион)
 
 </div>
 <br/>
 
 ## Что такое JumpServer?
 
-JumpServer — это открытый инструмент управления привилегированным доступом (PAM), который предоставляет командам DevOps и ИТ безопасный доступ по запросу к SSH, RDP, Kubernetes, Базам данных и RemoteApp через веб-браузер.
-
+JumpServer — это открытая платформа управления привилегированным доступом (PAM), которая предоставляет командам DevOps и ИТ безопасный доступ по запросу к SSH, RDP, Kubernetes, базам данных и конечным точкам RemoteApp через веб-браузер.
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="https://www.jumpserver.com/images/jumpserver-arch-light.png">
@@ -18,16 +17,15 @@ JumpServer — это открытый инструмент управления
   <img src="https://github.com/user-attachments/assets/dd612f3d-c958-4f84-b164-f31b75454d7f" alt="Theme-based Image">
 </picture>
 
-
 ## Быстрый старт
 
-Подготовьте чистый сервер Linux ( 64 бита, >= 4c8g )
+Подготовьте чистый сервер Linux (64 бит, >= 4c8g)
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Получите доступ к JumpServer в вашем браузере по адресу `http://your-jumpserver-ip/`
+Доступ к JumpServer в вашем браузере по адресу `http://your-jumpserver-ip/`
 - Имя пользователя: `admin`
 - Пароль: `ChangeMe`
 
@@ -59,26 +57,26 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## Компоненты
 
-JumpServer состоит из нескольких ключевых компонентов, которые вместе формируют функциональную структуру JumpServer, предоставляя пользователям комплексные возможности для управления операциями и контроля безопасности.
+JumpServer состоит из нескольких ключевых компонентов, которые вместе образуют функциональную основу JumpServer, предоставляя пользователям комплексные возможности для управления операциями и контроля безопасности.
 
-| Проект                                                  | Статус                                                                                                                                                                 | Описание                                                                                             |
+| Проект                                                | Статус                                                                                                                                                                 | Описание                                                                                             |
 |--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | [Lina](https://github.com/jumpserver/lina)             | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                   | Веб-интерфейс JumpServer                                                                                       |
 | [Luna](https://github.com/jumpserver/luna)             | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                   | Веб-терминал JumpServer                                                                                 |
 | [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | Коннектор протокола символов JumpServer                                                                 |
 | [Lion](https://github.com/jumpserver/lion)             | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                   | Коннектор графического протокола JumpServer                                                                 |
 | [Chen](https://github.com/jumpserver/chen)             | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                       | Веб БД JumpServer                                                                                       |  
-| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Коннектор удаленных приложений JumpServer (Windows)                                                    |
-| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | Коннектор удаленных приложений JumpServer EE (Linux)                                                      |
-| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | Коннектор Proxy RDP JumpServer EE                                                                       |
-| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Коннектор Proxy Database JumpServer EE                                                                  |
-| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | Коннектор Proxy VNC JumpServer EE                                                                       |
+| [Tinker](https://github.com/jumpserver/tinker)         | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Коннектор удаленного приложения JumpServer (Windows)                                                    |
+| [Panda](https://github.com/jumpserver/Panda)           | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                             | Коннектор удаленного приложения JumpServer EE (Linux)                                                      |
+| [Razor](https://github.com/jumpserver/razor)           | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                              | Коннектор прокси RDP JumpServer EE                                                                       |
+| [Magnus](https://github.com/jumpserver/magnus)         | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | Коннектор прокси базы данных JumpServer EE                                                                  |
+| [Nec](https://github.com/jumpserver/nec)               | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                               | Коннектор прокси VNC JumpServer EE                                                                       |
 | [Facelive](https://github.com/jumpserver/facelive)     | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                          | Коннектор распознавания лиц JumpServer EE                                                                        |
 
 
 ## Участие
 
-Добро пожаловать, чтобы отправить PR для участия. Пожалуйста, обратитесь к [CONTRIBUTING.md][contributing-link] за рекомендациями.
+Добро пожаловать, чтобы подать PR для участия. Пожалуйста, обратитесь к [CONTRIBUTING.md][contributing-link] за руководством.
 
 ## License
 

@@ -2,6 +2,7 @@
 #
 import logging
 
+from django.core.cache import cache
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
@@ -27,10 +28,22 @@ logger = logging.getLogger(__file__)
 class TerminalFilterSet(BaseFilterSet):
     name = filters.CharFilter(field_name='name', lookup_expr='icontains')
     remote_addr = filters.CharFilter(field_name='remote_addr', lookup_expr='icontains')
+    is_alive = filters.BooleanFilter(method='filter_is_alive')
 
     class Meta:
         model = Terminal
         fields = ['name', 'remote_addr', 'type']
+
+    def filter_is_alive(self, queryset, name, value):
+        ids = list(queryset.values_list('id', flat=True))
+        if not ids:
+            return queryset.none() if value else queryset
+
+        alive_ids = [pk for pk in ids if cache.get(Terminal.ALIVE_KEY.format(pk))]
+        if value:
+            return queryset.filter(id__in=alive_ids)
+        else:
+            return queryset.exclude(id__in=alive_ids)
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)

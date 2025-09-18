@@ -112,12 +112,21 @@ class JMSInventory:
 
     @staticmethod
     def make_protocol_setting_vars(host, protocols):
-        # 针对 ssh 协议的特殊处理
+        # 针对 ssh sqlserver 协议的特殊处理
         for p in protocols:
             if p.name == 'ssh':
                 if hasattr(p, 'setting'):
                     setting = getattr(p, 'setting')
-                    host['old_ssh_version'] = setting.get('old_ssh_version', False)
+                    host['jms_asset']['old_ssh_version'] = setting.get('old_ssh_version', False)
+            if p.name == 'sqlserver':
+                if hasattr(p, 'setting'):
+                    setting = getattr(p, 'setting')
+                    encryption = setting.get('encrypt', True)
+                    version = setting.get('version', ">=2014")
+                    if version == '<2014':
+                        host['jms_asset']['tds_version'] = '7.0'
+                    if not encryption:
+                        host['jms_asset']['encryption'] = 'off'
 
     def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir,
                           ansible_config):
@@ -226,7 +235,6 @@ class JMSInventory:
         })
 
         self.make_protocol_setting_vars(host, protocols)
-
         protocols = host['jms_asset']['protocols']
         host['jms_asset'].update({f"{p['name']}_port": p['port'] for p in protocols})
         if host['jms_account'] and tp == 'oracle':

@@ -90,7 +90,7 @@ class BaseACLSerializer(ActionAclSerializer, serializers.Serializer):
         fields_small = fields_mini + [
             "is_active", "priority", "action",
             "date_created", "date_updated",
-            "comment", "created_by", "org_id",
+            "comment", "created_by"
         ]
         fields_m2m = ["reviewers", ]
         fields = fields_small + fields_m2m
@@ -99,6 +99,20 @@ class BaseACLSerializer(ActionAclSerializer, serializers.Serializer):
             "is_active": {"default": True},
             'reviewers': {'label': _('Recipients')},
         }
+
+class BaseUserACLSerializer(BaseACLSerializer):
+    users = JSONManyToManyField(label=_('User'))
+
+    class Meta(BaseACLSerializer.Meta):
+        fields = BaseACLSerializer.Meta.fields + ['users']
+
+
+class BaseUserAssetAccountACLSerializer(BaseUserACLSerializer):
+    assets = JSONManyToManyField(label=_('Asset'))
+    accounts = serializers.ListField(label=_('Account'))
+
+    class Meta(BaseUserACLSerializer.Meta):
+        fields = BaseUserACLSerializer.Meta.fields + ['assets', 'accounts', 'org_id']
 
     def validate_reviewers(self, reviewers):
         action = self.initial_data.get('action')
@@ -119,18 +133,3 @@ class BaseACLSerializer(ActionAclSerializer, serializers.Serializer):
             )
             raise serializers.ValidationError(error)
         return valid_reviewers
-
-
-class BaseUserACLSerializer(BaseACLSerializer):
-    users = JSONManyToManyField(label=_('User'))
-
-    class Meta(BaseACLSerializer.Meta):
-        fields = BaseACLSerializer.Meta.fields + ['users']
-
-
-class BaseUserAssetAccountACLSerializer(BaseUserACLSerializer):
-    assets = JSONManyToManyField(label=_('Asset'))
-    accounts = serializers.ListField(label=_('Account'))
-
-    class Meta(BaseUserACLSerializer.Meta):
-        fields = BaseUserACLSerializer.Meta.fields + ['assets', 'accounts']

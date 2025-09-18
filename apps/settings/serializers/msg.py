@@ -8,7 +8,7 @@ from common.serializers.fields import EncryptedField
 
 __all__ = [
     'MailTestSerializer', 'EmailSettingSerializer',
-    'EmailContentSettingSerializer', 'SMSBackendSerializer',
+    'EmailContentSettingSerializer', 'SMSBackendSerializer'
 ]
 
 
@@ -35,7 +35,8 @@ class EmailSettingSerializer(serializers.Serializer):
     )
     EMAIL_HOST_PASSWORD = EncryptedField(
         max_length=1024, required=False, label=_("Password"),
-        help_text=_("Password to use for the email server. It is used in conjunction with `Account` when authenticating to the email server")
+        help_text=_(
+            "Password to use for the email server. It is used in conjunction with `Account` when authenticating to the email server")
     )
     EMAIL_FROM = serializers.CharField(
         max_length=128, allow_blank=True, required=False, label=_('Sender'),

@@ -24,7 +24,7 @@ class ContentTypeViewSet(JMSModelViewSet):
     rbac_perms = {
         'resources': 'rbac.view_contenttype',
     }
-    page_default_limit = None
+    page_no_limit = True
     can_labeled_content_type = []
     model = ContentType
 

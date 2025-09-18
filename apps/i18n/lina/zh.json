@@ -574,6 +574,7 @@
     "Exclude": "不包含",
     "ExcludeAsset": "跳过的资产",
     "ExcludeSymbol": "排除字符",
+    "ExcludeAccount": "排除账号",
     "ExecCloudSyncErrorMsg": "云账号配置不完整，请更新后重试",
     "Execute": "执行",
     "ExecuteAfterSaving": "保存后执行",
@@ -1350,6 +1351,7 @@
     "SuperAdmin": "超级管理员",
     "SuperOrgAdmin": "超级管理员+组织管理员",
     "Support": "支持",
+    "SupportedTypes": "支持的类型",
     "SupportedProtocol": "支持的协议",
     "SupportedProtocolHelpText": "设置资产支持的协议，点击设置按钮可以为协议修改自定义配置，如 SFTP 目录，RDP AD 域等",
     "Sync": "同步",
@@ -1530,6 +1532,7 @@
     "UserGroupList": "用户组",
     "UserGroupUpdate": "更新用户组",
     "UserGroups": "用户组",
+    "UserGroup": "用户组",
     "UserList": "用户列表",
     "UserLogin": "用户登录",
     "UserLoginACL": "用户登录控制",
@@ -1624,5 +1627,10 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "description": "暂无数据",
+    "MsgTemplate": "消息模板",
+    "Example": "示例值",
+    "TemplateVariablesHelpText": "您可以选择一个模板在模板内容中使用 {{ key }} 读取内置变量,注意：只支持 {{ }} 语法，其他语法不支持。例如 {% if title %}",
+    "ResetSuccessfully": "重置成功"
 }

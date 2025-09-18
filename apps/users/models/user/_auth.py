@@ -146,6 +146,11 @@ class AuthMixin:
     def can_create_ssh_key(self):
         return self.ssh_keys.count() < settings.TERMINAL_SSH_KEY_LIMIT_COUNT
 
+    @lazyproperty
+    def has_public_keys(self):
+        count = self.ssh_keys.filter(is_active=True).count()
+        return count > 0
+
     def can_update_password(self):
         return self.is_local
 

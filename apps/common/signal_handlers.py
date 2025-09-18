@@ -185,3 +185,9 @@ def check_migrations_file_prefix_conflict(*args, **kwargs):
         print(f'{msg_left}{msg_right1}\n{msg_right2}\n')
 
     print('=' * 80)
+
+
+@receiver(django_ready)
+def clear_response_cache(sender, **kwargs):
+    from django.core.cache import cache
+    cache.delete_pattern('views.decorators.cache.cache_page:*')

@@ -1,11 +1,11 @@
 import json
 import logging
 import os
+import sys
 import uuid
 from collections import defaultdict
-from datetime import timedelta
+from datetime import timedelta, datetime
 
-import sys
 from celery import current_task
 from django.conf import settings
 from django.db import models
@@ -177,11 +177,11 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return self.executions.first()
 
     @property
-    def date_last_run(self):
+    def date_last_run(self) -> datetime:
         return self.last_execution.date_created if self.last_execution else None
 
     @property
-    def summary(self):
+    def summary(self) -> dict:
         summary = {
             "total": self.executions.count(),
             "success": self.executions.filter(status=JobStatus.success).count(),
@@ -189,7 +189,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return summary
 
     @property
-    def average_time_cost(self):
+    def average_time_cost(self) -> int:
         return self.last_execution.time_cost if self.last_execution else 0
 
     def get_register_task(self):
@@ -207,7 +207,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
                                   user=self.creator, module=self.module)
 
     @property
-    def material(self):
+    def material(self) -> str:
         if self.type == 'adhoc':
             return "{}:{}".format(self.module, self.args)
         if self.type == 'playbook':
@@ -271,7 +271,7 @@ class JobExecution(JMSOrgBaseModel):
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
-            'sqlserver': 'community.general.mssql_script',
+            'sqlserver': 'mssql_script',
         }
         extra_query_token_map = {
             'sqlserver': 'script'
@@ -292,7 +292,10 @@ class JobExecution(JMSOrgBaseModel):
                          "login_user={{login_user}} " \
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
-                         "%s={{login_db}}" % login_db_token
+                         "%s={{login_db}} " % login_db_token
+            if module == 'mssql_script':
+                login_args += "encryption={{jms_asset.encryption | default(None) }} " \
+                              "tds_version={{jms_asset.tds_version | default(None) }} "
             shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
@@ -374,7 +377,7 @@ class JobExecution(JMSOrgBaseModel):
         return str(self.id).split('-')[-1]
 
     @property
-    def time_cost(self):
+    def time_cost(self) -> int:
         if not self.date_start:
             return 0
         if self.is_finished:
@@ -382,25 +385,25 @@ class JobExecution(JMSOrgBaseModel):
         return (timezone.now() - self.date_start).total_seconds()
 
     @property
-    def timedelta(self):
+    def timedelta(self) -> timedelta:
         if self.date_start and self.date_finished:
             return self.date_finished - self.date_start
         return None
 
     @property
-    def is_finished(self):
+    def is_finished(self) -> bool:
         return self.status in [JobStatus.success, JobStatus.failed, JobStatus.timeout]
 
     @property
-    def is_success(self):
+    def is_success(self) -> bool:
         return self.status == JobStatus.success
 
     @property
-    def inventory_path(self):
+    def inventory_path(self) -> str:
         return os.path.join(self.private_dir, 'inventory', 'hosts')
 
     @property
-    def private_dir(self):
+    def private_dir(self) -> str:
         uniq = self.date_created.strftime('%Y%m%d_%H%M%S') + '_' + self.short_id
         job_name = self.current_job.name if self.current_job.name else 'instant'
         return os.path.join(settings.ANSIBLE_DIR, job_name, uniq)

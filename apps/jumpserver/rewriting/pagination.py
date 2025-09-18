@@ -4,7 +4,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 
 class MaxLimitOffsetPagination(LimitOffsetPagination):
-    max_limit = settings.MAX_LIMIT_PER_PAGE
+    max_limit = settings.MAX_PAGE_SIZE
 
     def get_count(self, queryset):
         try:
@@ -17,4 +17,5 @@ class MaxLimitOffsetPagination(LimitOffsetPagination):
             self.max_limit = view.page_max_limit
         if view and hasattr(view, 'page_default_limit'):
             self.default_limit = view.page_default_limit
+
         return super().paginate_queryset(queryset, request, view)

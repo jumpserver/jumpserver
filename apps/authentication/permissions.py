@@ -20,9 +20,10 @@ class UserConfirmation(permissions.BasePermission):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
             return True
 
-        confirm_level = request.session.get('CONFIRM_LEVEL')
-        confirm_type = request.session.get('CONFIRM_TYPE')
-        confirm_time = request.session.get('CONFIRM_TIME')
+        session = getattr(request, 'session', {})
+        confirm_level = session.get('CONFIRM_LEVEL')
+        confirm_type = session.get('CONFIRM_TYPE')
+        confirm_time = session.get('CONFIRM_TIME')
 
         ttl = self.get_ttl(confirm_type)
         now = int(time.time())

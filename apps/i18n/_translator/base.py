@@ -16,6 +16,7 @@ class BaseTranslateManager:
         'es': 'Spanish',
         'ru': 'Russian',
         'ko': 'Korean',
+        'vi': 'Vietnamese',
     }
 
     def __init__(self, dir_path, oai_trans_instance):

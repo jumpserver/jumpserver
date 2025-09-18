@@ -62,7 +62,8 @@ class ChangeSecretDashboardApi(APIView):
         status_counts = defaultdict(lambda: defaultdict(int))
 
         for date_finished, status in results:
-            date_str = str(date_finished.date())
+            dt_local = timezone.localtime(date_finished)
+            date_str = str(dt_local.date())
             if status == ChangeSecretRecordStatusChoice.failed:
                 status_counts[date_str]['failed'] += 1
             elif status == ChangeSecretRecordStatusChoice.success:

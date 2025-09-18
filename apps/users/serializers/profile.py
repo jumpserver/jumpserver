@@ -116,7 +116,7 @@ class UserProfileSerializer(UserSerializer):
                 self.fields.pop(field, None)
 
     @staticmethod
-    def get_guide_url(obj):
+    def get_guide_url(obj) -> str:
         return settings.USER_GUIDE_URL
 
     def validate_mfa_level(self, mfa_level):
@@ -145,7 +145,7 @@ class UserProfileSerializer(UserSerializer):
             raise serializers.ValidationError(msg)
         return password
 
-    def get_lang(self, obj):
+    def get_lang(self, obj) -> str:
         return getattr(obj, 'lang', settings.LANGUAGE_CODE)
 
 

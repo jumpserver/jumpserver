@@ -70,7 +70,7 @@
     "SessionLockedMessage": "此会话已被 %s 锁定，无法继续执行命令",
     "SessionUnlockedMessage": "此会话已被 %s 解锁，可以继续执行命令",
     "ShowProperties": "属性",
-    "StopHotKey": "停止 (Ctrl + C)",
+    "StopHotKey": "停止 (Ctrl + D)",
     "Submit": "提交",
     "Total": "总计",
     "Type": "类型",

@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
-from azure.identity import ClientSecretCredential
-from azure.keyvault.secrets import SecretClient
 
 from common.utils import get_logger
 
@@ -14,6 +11,9 @@ __all__ = ['AZUREVaultClient']
 class AZUREVaultClient(object):
 
     def __init__(self, vault_url, tenant_id, client_id, client_secret):
+        from azure.identity import ClientSecretCredential
+        from azure.keyvault.secrets import SecretClient
+        
         authentication_endpoint = 'https://login.microsoftonline.com/' \
             if ('azure.net' in vault_url) else 'https://login.chinacloudapi.cn/'
 
@@ -23,6 +23,8 @@ class AZUREVaultClient(object):
         self.client = SecretClient(vault_url=vault_url, credential=credentials)
 
     def is_active(self):
+        from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
+
         try:
             self.client.set_secret('jumpserver', '666')
         except (ResourceNotFoundError, ClientAuthenticationError) as e:
@@ -32,6 +34,8 @@ class AZUREVaultClient(object):
             return True, ''
 
     def get(self, name, version=None):
+        from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
+
         try:
             secret = self.client.get_secret(name, version)
             return secret.value

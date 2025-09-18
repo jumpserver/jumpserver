@@ -22,6 +22,7 @@ class EndpointSerializer(BulkModelSerializer):
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
         extra_kwargs = {
+            'is_active': {'default': True},
             'host': {'help_text': _(
                 'The host address accessed when connecting to assets, if it is empty, '
                 'the access address of the current browser will be used '
@@ -71,5 +72,6 @@ class EndpointRuleSerializer(BulkModelSerializer):
             'comment', 'date_created', 'date_updated', 'created_by', 'is_active'
         ]
         extra_kwargs = {
+            'is_active': {'default': True},
             'priority': {'default': 50}
         }

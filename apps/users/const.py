@@ -45,6 +45,7 @@ class RDPSmartSize(TextChoices):
 
 class RDPColorQuality(TextChoices):
     HIGH = '32', _('High（32 bit）')
+    TRUE_COLOR  = '24', _('True Color（24 bit）')
     MEDIUM = '16', _('Medium（16 bit）')
 
 

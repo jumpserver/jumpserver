@@ -1,14 +1,24 @@
-from django.template.loader import render_to_string
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
+from common.views.template import custom_render_to_string
 from notifications.notifications import UserMessage
 
 logger = get_logger(__file__)
 
 
 class DifferentCityLoginMessage(UserMessage):
+    subject = _('Different city login reminder')
+    template_name = 'authentication/_msg_different_city.html'
+    contexts = [
+        {"name": "city", "label": _('Login city'), "default": "Shanghai"},
+        {"name": "username", "label": _('User'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
+        {"name": "ip", "label": "IP", "default": "192.168.1.1"},
+        {"name": "time", "label": _('Login Date'), "default": "2025-01-01 12:00:00"},
+    ]
+
     def __init__(self, user, ip, city):
         self.ip = ip
         self.city = city
@@ -16,18 +26,16 @@ class DifferentCityLoginMessage(UserMessage):
 
     def get_html_msg(self) -> dict:
         now = local_now_display()
-        subject = _('Different city login reminder')
         context = dict(
-            subject=subject,
             name=self.user.name,
             username=self.user.username,
             ip=self.ip,
             time=now,
             city=self.city,
         )
-        message = render_to_string('authentication/_msg_different_city.html', context)
+        message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': subject,
+            'subject': str(self.subject),
             'message': message
         }
 
@@ -41,6 +49,16 @@ class DifferentCityLoginMessage(UserMessage):
 
 
 class OAuthBindMessage(UserMessage):
+    subject = _('OAuth binding reminder')
+    template_name = 'authentication/_msg_oauth_bind.html'
+    contexts = [
+        {"name": "username", "label": _('User'), "default": "john"},
+        {"name": "name", "label": _('Name'), "default": "John"},
+        {"name": "ip", "label": "IP", "default": "192.168.1.1"},
+        {"name": "oauth_name", "label": _('OAuth name'), "default": "WeCom"},
+        {"name": "oauth_id", "label": _('OAuth ID'), "default": "000001"},
+    ]
+
     def __init__(self, user, ip, oauth_name, oauth_id):
         super().__init__(user)
         self.ip = ip
@@ -51,7 +69,6 @@ class OAuthBindMessage(UserMessage):
         now = local_now_display()
         subject = self.oauth_name + ' ' + _('binding reminder')
         context = dict(
-            subject=subject,
             name=self.user.name,
             username=self.user.username,
             ip=self.ip,
@@ -59,9 +76,9 @@ class OAuthBindMessage(UserMessage):
             oauth_name=self.oauth_name,
             oauth_id=self.oauth_id
         )
-        message = render_to_string('authentication/_msg_oauth_bind.html', context)
+        message = custom_render_to_string(self.template_name, context)
         return {
-            'subject': subject,
+            'subject': str(subject),
             'message': message
         }
 

@@ -43,7 +43,7 @@ class VirtualApp(JMSBaseModel):
         return default_storage.path('virtual_apps/{}'.format(self.name))
 
     @lazyproperty
-    def readme(self):
+    def readme(self) -> str:
         readme_file = os.path.join(self.path, 'README.md')
         if os.path.isfile(readme_file):
             with open(readme_file, 'r') as f:
@@ -51,7 +51,7 @@ class VirtualApp(JMSBaseModel):
         return ''
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         path = os.path.join(self.path, 'icon.png')
         if not os.path.exists(path):
             return None

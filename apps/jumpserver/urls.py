@@ -38,6 +38,7 @@ api_v1 = resource_api + [
     path('resources/', api.ResourceTypeListApi.as_view(), name='resource-list'),
     path('resources/<str:resource>/', api.ResourceListApi.as_view()),
     path('resources/<str:resource>/<str:pk>/', api.ResourceDetailApi.as_view()),
+    path('search/', api.GlobalSearchView.as_view()),
 ]
 
 app_view_patterns = [
@@ -94,9 +95,10 @@ cache_kwargs = {
 }
 # docs 路由
 urlpatterns += [
-    path('api/swagger.<format>', views.get_swagger_view().without_ui(**cache_kwargs), name='schema-json'),
-    re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', **cache_kwargs), name="docs"),
-    re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', **cache_kwargs), name='redoc'),
+    path('api/swagger.json', views.get_swagger_view(ui='json', **cache_kwargs), name='schema-json'),
+    path('api/swagger.yaml', views.get_swagger_view(ui='yaml', **cache_kwargs), name='schema'),
+    re_path('api/docs/?', views.get_swagger_view(ui='swagger', **cache_kwargs), name="docs"),
+    re_path('api/redoc/?', views.get_swagger_view(ui='redoc', **cache_kwargs), name='redoc'),
 ]
 
 if os.environ.get('DEBUG_TOOLBAR', False):

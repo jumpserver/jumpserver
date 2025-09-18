@@ -54,7 +54,7 @@ class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
         help_text=_('Binding password')
     )
     AUTH_LDAP_SEARCH_OU = serializers.CharField(
-        max_length=1024, allow_blank=True, required=False, label=_('Search OU'),
+        max_length=4096, allow_blank=True, required=False, label=_('Search OU'),
         help_text=_(
             'User Search Base, if there are multiple OUs, you can separate them with the `|` symbol'
         )

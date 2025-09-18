@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
+from datetime import datetime
+
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
@@ -217,6 +218,7 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         cmd_group_mapper = {str(i.id): i for i in cmd_groups}
 
         for command in commands:
+            command['_time'] = datetime.fromtimestamp(command['timestamp'])
             cmd_acl = acl_mapper.get(command['cmd_filter_acl'])
             command['_cmd_filter_acl'] = cmd_acl
             cmd_group = cmd_group_mapper.get(command['cmd_group'])
@@ -228,6 +230,9 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
                 command.update({
                     '_account': session.account,
                     '_org_name': session.org.name,
+                    '_protocol': session.protocol,
+                    '_remote_addr': session.remote_addr,
+                    '_login_from': session.get_login_from_display(),
                 })
 
             if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:

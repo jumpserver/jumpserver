@@ -19,7 +19,7 @@ class CeleryTask(models.Model):
     __state = None
 
     @property
-    def meta(self):
+    def meta(self) -> dict:
         task = app.tasks.get(self.name, None)
         return {
             "comment": getattr(task, 'verbose_name', None),
@@ -28,7 +28,7 @@ class CeleryTask(models.Model):
         }
 
     @property
-    def summary(self):
+    def summary(self) -> dict:
         if self.__summary is not None:
             return self.__summary
         executions = CeleryTaskExecution.objects.filter(name=self.name)
@@ -53,7 +53,7 @@ class CeleryTask(models.Model):
         return color
 
     @property
-    def state(self):
+    def state(self) -> str:
         if self.__state is not None:
             return self.__state
         last_five_executions = CeleryTaskExecution.objects.filter(

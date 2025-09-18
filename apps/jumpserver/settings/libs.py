@@ -47,23 +47,46 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y/%m/%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y/%m/%d %H:%M:%S %z', 'iso-8601', '%Y-%m-%d %H:%M:%S %z'],
     'DEFAULT_PAGINATION_CLASS': 'jumpserver.rewriting.pagination.MaxLimitOffsetPagination',
-    'PAGE_SIZE': CONFIG.DEFAULT_PAGE_SIZE,
+    'PAGE_SIZE': None,
     'EXCEPTION_HANDLER': 'common.drf.exc_handlers.common_exception_handler',
+    'DEFAULT_SCHEMA_CLASS': 'jumpserver.views.schema.CustomAutoSchema',
 }
 
-SWAGGER_SETTINGS = {
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'jumpserver.views.swagger.CustomSwaggerAutoSchema',
-    'USE_SESSION_AUTH': True,
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'JumpServer API Docs',
+    'DESCRIPTION': 'JumpServer Restful api docs',
+    'VERSION': 'v1',
+    'LICENSE': {
+        'name': 'GPLv3 License',
+        'url': 'https://www.gnu.org/licenses/gpl-3.0.html',
     },
-    'DEFAULT_INFO': 'jumpserver.views.swagger.api_info',
+    'CONTACT': {
+        'name': 'JumpServer',
+        'url': 'https://jumpserver.org',
+        'email': 'support@jumpserver.org',
+    },
+    "SERVE_INCLUDE_SCHEMA": False,
+    'SERVE_PUBLIC': True,
+    'BASE_PATH': '/api/v1/',
+    'SCHEMA_PATH_PREFIX': '/api/v1/',
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'SWAGGER_UI_OAUTH2_REDIRECT_URL': 'SIDECAR',
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_GENERATOR_CLASS': 'jumpserver.views.schema.CustomSchemaGenerator',
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    # 添加自定义字段扩展
+    'SERIALIZER_EXTENSIONS': [
+        'jumpserver.views.schema.ObjectRelatedFieldExtension',
+        'jumpserver.views.schema.LabeledChoiceFieldExtension',
+        'jumpserver.views.schema.BitChoicesFieldExtension',
+        'jumpserver.views.schema.LabelRelatedFieldExtension',
+    ],
+    'SECURITY': [{'Bearer': []}],
 }
-
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (180, 38)
 CAPTCHA_FOREGROUND_COLOR = '#001100'

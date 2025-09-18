@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -76,7 +77,10 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @classmethod
     def get_typed_connection_token(cls, token_id):
-        token = get_object_or_404(cls, id=token_id)
+        try:
+            token = get_object_or_404(cls, id=token_id)
+        except ValidationError:
+            return None
 
         if token.type == ConnectionTokenType.ADMIN.value:
             token = AdminConnectionToken.objects.get(id=token_id)
@@ -85,11 +89,11 @@ class ConnectionToken(JMSOrgBaseModel):
         return token
 
     @property
-    def is_expired(self):
+    def is_expired(self) -> bool:
         return self.date_expired < timezone.now()
 
     @property
-    def expire_time(self):
+    def expire_time(self) -> int:
         interval = self.date_expired - timezone.now()
         seconds = interval.total_seconds()
         if seconds < 0:
@@ -161,7 +165,7 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)

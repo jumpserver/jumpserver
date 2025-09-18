@@ -19,5 +19,5 @@ class SuperTicketSerializer(serializers.ModelSerializer):
         fields = ['id', 'status', 'state', 'processor']
 
     @staticmethod
-    def get_processor(instance):
+    def get_processor(instance) -> str:
         return str(instance.processor) if instance.processor else ''

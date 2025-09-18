@@ -253,6 +253,8 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'source_id': {'required': False, 'allow_null': True},
         }
         fields_unimport_template = ['params']
+        # 手动判断唯一性校验
+        validators = []
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -262,6 +264,21 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'asset__platform__automation'
         )
         return queryset
+
+    def validate(self, attrs):
+        instance = getattr(self, "instance", None)
+        if instance:
+            return super().validate(attrs)
+
+        field_errors = {}
+        for _fields in Account._meta.unique_together:
+            lookup = {field: attrs.get(field) for field in _fields}
+            if Account.objects.filter(**lookup).exists():
+                verbose_names = ', '.join([str(Account._meta.get_field(f).verbose_name) for f in _fields])
+                msg_template = _('Account already exists. Field(s): {fields} must be unique.')
+                field_errors[_fields[0]] = msg_template.format(fields=verbose_names)
+                raise serializers.ValidationError(field_errors)
+        return attrs
 
 
 class AccountDetailSerializer(AccountSerializer):
@@ -456,6 +473,8 @@ class AssetAccountBulkSerializer(
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
+    spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
+
     class Meta(AccountSerializer.Meta):
         fields = AccountSerializer.Meta.fields + ['spec_info']
         extra_kwargs = {
@@ -470,6 +489,7 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
 
 class AccountHistorySerializer(serializers.ModelSerializer):
     secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
+    secret = serializers.CharField(label=_('Secret'), read_only=True)
     id = serializers.IntegerField(label=_('ID'), source='history_id', read_only=True)
 
     class Meta:

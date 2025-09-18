@@ -41,7 +41,7 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('zone', 'nodes') \
+        queryset = queryset.prefetch_related('zone', 'nodes', 'labels', 'labels__label') \
             .prefetch_related('platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
@@ -71,7 +71,7 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
-    def get_date_expired(self, obj):
+    def get_date_expired(self, obj) -> str:
         dt = obj.date_expired
         if dt:
             dt = dt.astimezone(get_current_timezone())

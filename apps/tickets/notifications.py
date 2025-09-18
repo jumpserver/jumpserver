@@ -12,7 +12,7 @@ from common.sdk.im.wecom import wecom_tool
 from common.utils import get_logger, random_string, reverse
 from notifications.notifications import UserMessage
 from . import const
-from .models import Ticket
+from .models import Ticket, ApplyAssetTicket
 
 logger = get_logger(__file__)
 
@@ -125,6 +125,14 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         return title
 
     def get_ticket_approval_url(self, external=True):
+        if isinstance(self.ticket, ApplyAssetTicket):
+            no_assets = not self.ticket.apply_assets.exists()
+            no_nodes = not self.ticket.apply_nodes.exists()
+            no_accounts = not self.ticket.apply_accounts
+
+            if (no_assets and no_nodes) or no_accounts:
+                return None
+
         url = reverse('tickets:direct-approve', kwargs={'token': self.token})
         if not external:
             return url

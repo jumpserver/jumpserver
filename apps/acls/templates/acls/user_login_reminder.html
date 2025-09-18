@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<h3>{% trans 'Dear' %}: {{ recipient.name }}[{{ recipient.username }}]</h3>
+<h3>{% trans 'Dear' %}: {{ recipient_name }}[{{ recipient_username }}]</h3>
 <hr>
 <p>{% trans 'We would like to inform you that a user has recently logged:' %}<p>
 <p><strong>{% trans 'User details' %}:</strong></p>
@@ -8,7 +8,10 @@
     <li><strong>{% trans 'User' %}:</strong> [{{ username }}]</li>
     <li><strong>IP:</strong> [{{ ip }}]</li>
     <li><strong>{% trans 'Login city' %}:</strong> [{{ city }}]</li>
+    <li><strong>{% trans 'Login from' %}:</strong> [{{ login_from }}]</li>
     <li><strong>{% trans 'User agent' %}:</strong> [{{ user_agent }}]</li>
+    <li><strong>{% trans 'Login acl' %}:</strong> [{{ acl_name }}]</li>
+    <li><strong>{% trans 'Time' %}:</strong> [{{ time }}]</li>
 </ul>
 <hr>
 

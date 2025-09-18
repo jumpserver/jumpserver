@@ -37,6 +37,12 @@ system_user_perms += (user_perms + _view_all_joined_org_perms)
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
+    ('rbac', 'menupermission', 'view', 'userloginreport'),
+    ('rbac', 'menupermission', 'view', 'userchangepasswordreport'),
+    ('rbac', 'menupermission', 'view', 'assetstatisticsreport'),
+    ('rbac', 'menupermission', 'view', 'assetactivityreport'),
+    ('rbac', 'menupermission', 'view', 'accountstatisticsreport'),
+    ('rbac', 'menupermission', 'view', 'accountautomationreport'),
     ('assets', 'asset', 'view', 'asset'),
     ('users', 'user', 'view', 'user'),
     ('audits', '*', '*', '*'),

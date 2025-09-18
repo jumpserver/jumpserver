@@ -41,6 +41,7 @@ class AutomationAssetsListApi(generics.ListAPIView):
 
 class AutomationRemoveAssetApi(generics.UpdateAPIView):
     model = BaseAutomation
+    queryset = BaseAutomation.objects.all()
     serializer_class = serializers.UpdateAssetSerializer
     http_method_names = ['patch']
 
@@ -59,6 +60,7 @@ class AutomationRemoveAssetApi(generics.UpdateAPIView):
 
 class AutomationAddAssetApi(generics.UpdateAPIView):
     model = BaseAutomation
+    queryset = BaseAutomation.objects.all()
     serializer_class = serializers.UpdateAssetSerializer
     http_method_names = ['patch']
 

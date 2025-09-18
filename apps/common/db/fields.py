@@ -143,7 +143,9 @@ class EncryptMixin:
         if value is None:
             return value
 
-        plain_value = Encryptor(value).decrypt()
+        encryptor = Encryptor(value)
+        plain_value = encryptor.decrypt()
+
         # 可能和Json mix，所以要先解密，再json
         sp = super()
         if hasattr(sp, "from_db_value"):
@@ -165,9 +167,6 @@ class EncryptMixin:
 
 class EncryptTextField(EncryptMixin, models.TextField):
     description = _("Encrypt field using Secret Key")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class EncryptCharField(EncryptMixin, models.CharField):
