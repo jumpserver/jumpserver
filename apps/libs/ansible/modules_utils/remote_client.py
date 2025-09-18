@@ -227,7 +227,7 @@ class SSHClient:
         gateway_args = self.module.params['gateway_args'] or ''
         pattern = (
             r"(?:sshpass -p ([^ ]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+"
-            r"([\w@]+)@([\d.]+)\s+-W %h:%p -q(?: -i (.+))?'"
+            r"([^@\s]+)@([^\s]+)\s+-W %h:%p -q(?: -i ([^']+))?'"
         )
         match = re.search(pattern, gateway_args)
         if not match:
