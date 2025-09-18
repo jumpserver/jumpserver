@@ -235,8 +235,8 @@ class AccountBackupHandler:
         except Exception as e:
             error = str(e)
             print(f'\033[31m>>> {error}\033[0m')
-            self.execution.status = Status.error
-            self.execution.summary['error'] = error
+            self.manager.status = Status.error
+            self.manager.summary['error'] = error
 
     def backup_by_obj_storage(self):
         object_id = self.execution.snapshot.get('id')
