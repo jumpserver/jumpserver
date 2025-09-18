@@ -15,7 +15,7 @@ from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import reverse, get_object_or_none
 from users.models import User
-from users.signal_handlers import check_only_allow_exist_user_auth, bind_user_to_org_role
+from users.signal_handlers import bind_user_to_org_role, check_only_allow_exist_user_auth
 from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
@@ -55,7 +55,6 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
             )
 
             if not check_only_allow_exist_user_auth(create):
-                user.delete()
                 return user, (self.msg_client_err, self.request.error_message)
 
             setattr(user, f'{self.user_type}_id', user_id)

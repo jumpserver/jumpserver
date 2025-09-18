@@ -134,6 +134,7 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
         log_prompt = "Process GET requests [OIDCAuthCallbackView]: {}"
         logger.debug(log_prompt.format('Start'))
         callback_params = request.GET
+        error_title = _("OpenID Error")
 
         # Retrieve the state value that was previously generated. No state means that we cannot
         # authenticate the user (so a failure should be returned).
@@ -172,10 +173,9 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
             try:
                 user = auth.authenticate(nonce=nonce, request=request, code_verifier=code_verifier)
             except IntegrityError as e:
-                title = _("OpenID Error")
                 msg = _('Please check if a user with the same username or email already exists')
                 logger.error(e, exc_info=True)
-                response = self.get_failed_response('/', title, msg)
+                response = self.get_failed_response('/', error_title, msg)
                 return response
             if user:
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
@@ -194,7 +194,6 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
                 return HttpResponseRedirect(
                     next_url or settings.AUTH_OPENID_AUTHENTICATION_REDIRECT_URI
                 )
-
         if 'error' in callback_params:
             logger.debug(
                 log_prompt.format('Error in callback params: {}'.format(callback_params['error']))
@@ -205,9 +204,12 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
             # OpenID Connect Provider authenticate endpoint.
             logger.debug(log_prompt.format('Logout'))
             auth.logout(request)
-
+        redirect_url = settings.AUTH_OPENID_AUTHENTICATION_FAILURE_REDIRECT_URI
+        if not user and getattr(request, 'error_message', ''):
+            response = self.get_failed_response(redirect_url, title=error_title, msg=request.error_message)
+            return response
         logger.debug(log_prompt.format('Redirect'))
-        return HttpResponseRedirect(settings.AUTH_OPENID_AUTHENTICATION_FAILURE_REDIRECT_URI)
+        return HttpResponseRedirect(redirect_url)
 
 
 class OIDCAuthCallbackClientView(BaseAuthCallbackClientView):
