@@ -97,10 +97,7 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
     for attachment in attachment_list:
         email.attach_file(attachment)
         os.remove(attachment)
-    try:
-        return email.send()
-    except Exception as e:
-        logger.error("Sending mail attachment error: {}".format(e))
+    return email.send()
 
 
 @shared_task(
