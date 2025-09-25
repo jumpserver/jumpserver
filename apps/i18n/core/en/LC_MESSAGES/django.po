@@ -3759,6 +3759,11 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
+#: authentication/api/password.py:70 
+#: authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr ""
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "Authentication"
@@ -4488,11 +4493,6 @@ msgstr ""
 msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
-msgstr ""
-
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
 msgstr ""
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6

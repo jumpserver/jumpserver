@@ -3793,6 +3793,11 @@ msgstr "사용자가 {}에서 옵니다. 해당 시스템에서 비밀번호를 
 msgid "Forgot password"
 msgstr "비밀번호를 잊으셨나요"
 
+#: authentication/api/password.py:70 
+#: authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr "인증 코드의 유효 기간은 {} 분입니다."
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "인증 관리"
@@ -4536,11 +4541,6 @@ msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
 msgstr "이번 로그인 행위가 이상하다고 생각되시면, 즉시 계정 비밀번호를 수정하시기 바랍니다."
-
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
-msgstr "인증 코드의 유효 기간은 1분입니다."
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"

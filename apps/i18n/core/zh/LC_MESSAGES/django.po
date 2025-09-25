@@ -3862,6 +3862,11 @@ msgstr "用户来自 {} 请去相应系统修改密码"
 msgid "Forgot password"
 msgstr "忘记密码"
 
+#: authentication/api/password.py:70 
+#: authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr "验证码有效期为 {} 分钟"
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "认证管理"
@@ -4607,11 +4612,6 @@ msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
 msgstr "若怀疑此次登录行为异常，请及时修改账号密码"
-
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
-msgstr "验证码有效期为 1 分钟"
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"

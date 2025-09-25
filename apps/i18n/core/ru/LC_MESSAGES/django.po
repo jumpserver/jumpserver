@@ -3907,6 +3907,11 @@ msgstr ""
 msgid "Forgot password"
 msgstr "Забыли пароль"
 
+#: authentication/api/password.py:70 
+#: authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr "Код подтверждения действителен в течение {} минуты"
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "Управление аутентификацией"
@@ -4675,11 +4680,6 @@ msgid ""
 msgstr ""
 "Если вы подозреваете, что этот вход был подозрительным, пожалуйста, срочно "
 "измените пароль."
-
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
-msgstr "Код подтверждения действителен в течение 1 минуты"
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"

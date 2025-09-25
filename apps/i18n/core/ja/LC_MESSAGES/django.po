@@ -3803,6 +3803,11 @@ msgstr "ユーザーは {}からです。対応するシステムにアクセス
 msgid "Forgot password"
 msgstr "パスワードを忘れた"
 
+#: authentication/api/password.py:70 
+#: authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr "認証コードの有効時間は {} 分"
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "認証"
@@ -4536,11 +4541,6 @@ msgid ""
 "If you suspect that the login behavior is abnormal, please modify the "
 "account password in time."
 msgstr "ログイン動作が異常であると疑われる場合は、時間内にアカウントのパスワードを変更してください。"
-
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
-msgstr "認証コードの有効時間は 1 分"
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"

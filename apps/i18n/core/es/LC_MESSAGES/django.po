@@ -3977,6 +3977,11 @@ msgstr ""
 msgid "Forgot password"
 msgstr "Olvidé la contraseña"
 
+#: authentication/api/password.py:70 
+#: authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr "El código de verificación tiene una validez de {} minuto."
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "Gestión de autenticación"
@@ -4757,11 +4762,6 @@ msgid ""
 msgstr ""
 "Si sospechas que este acceso es irregular, te recomendamos que cambies la "
 "contraseña de tu cuenta lo antes posible."
-
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
-msgstr "El código de verificación tiene una validez de 1 minuto."
 
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"
