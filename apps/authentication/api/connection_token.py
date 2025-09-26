@@ -69,6 +69,8 @@ class RDPFileClientProtocolURLMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
+            'bitmapcachepersistenable:i': '0',
+            'bitmapcachesize:i': '1500',
         }
 
         # copy from
@@ -76,7 +78,6 @@ class RDPFileClientProtocolURLMixin:
         rdp_low_speed_broadband_option = {
             "connection type:i": 2,
             "disable wallpaper:i": 1,
-            "bitmapcachepersistenable:i": 1,
             "disable full window drag:i": 1,
             "disable menu anims:i": 1,
             "allow font smoothing:i": 0,
@@ -87,7 +88,6 @@ class RDPFileClientProtocolURLMixin:
         rdp_high_speed_broadband_option = {
             "connection type:i": 4,
             "disable wallpaper:i": 0,
-            "bitmapcachepersistenable:i": 1,
             "disable full window drag:i": 1,
             "disable menu anims:i": 0,
             "allow font smoothing:i": 0,
