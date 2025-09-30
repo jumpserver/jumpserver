@@ -123,11 +123,11 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
     def get_chat_ai_setting():
         data = get_chatai_data()
         return {
-            'GPT_BASE_URL': data['url'],
-            'GPT_API_KEY': data['api_key'],
-            'GPT_PROXY': data['proxy'],
-            'GPT_MODEL': data['model'],
-            'CHAT_AI_TYPE': settings.CHAT_AI_TYPE,
+            'GPT_BASE_URL': data.get('url'),
+            'GPT_API_KEY': data.get('api_key'),
+            'GPT_PROXY': data.get('proxy'),
+            'GPT_MODEL': data.get('model'),
+            'CHAT_AI_PROVIDERS': settings.CHAT_AI_PROVIDERS,
         }
 
     @staticmethod

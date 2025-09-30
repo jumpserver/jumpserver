@@ -10,11 +10,12 @@ from common.utils import date_expired_default
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
     'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
-    'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
+    'ChatAIProviderSerializer', 'ChatAISettingSerializer',
+    'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
 
 from settings.const import (
-    ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices, ChatAIMethodChoices
+    ChatAITypeChoices, ChatAIMethodChoices
 )
 
 
@@ -120,6 +121,29 @@ class AmazonSMSerializer(serializers.Serializer):
     )
 
 
+class ChatAIProviderListSerializer(serializers.ListSerializer):
+    # 标记整个列表需要加密存储，避免明文保存 API Key
+    encrypted = True
+
+
+class ChatAIProviderSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(
+        default=ChatAITypeChoices.openai, choices=ChatAITypeChoices.choices,
+        label=_("Types"), required=False,
+    )
+    base_url = serializers.CharField(
+        allow_blank=True, required=False, label=_('Base URL'),
+        help_text=_('The base URL of the Chat service.')
+    )
+    api_key = EncryptedField(
+        allow_blank=True, required=False, label=_('API Key'),
+    )
+    proxy = serializers.CharField(
+        allow_blank=True, required=False, label=_('Proxy'),
+        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
+    )
+
+
 class ChatAISettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Chat AI')
 
@@ -130,43 +154,13 @@ class ChatAISettingSerializer(serializers.Serializer):
         default=ChatAIMethodChoices.api, choices=ChatAIMethodChoices.choices,
         label=_("Method"), required=False,
     )
+    CHAT_AI_PROVIDERS = ChatAIProviderListSerializer(
+        child=ChatAIProviderSerializer(),
+        allow_empty=True, required=False, default=list, label=_('Providers')
+    )
     CHAT_AI_EMBED_URL = serializers.CharField(
         allow_blank=True, required=False, label=_('Base URL'),
         help_text=_('The base URL of the Chat service.')
-    )
-    CHAT_AI_TYPE = serializers.ChoiceField(
-        default=ChatAITypeChoices.gpt, choices=ChatAITypeChoices.choices,
-        label=_("Types"), required=False,
-    )
-    GPT_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Base URL'),
-        help_text=_('The base URL of the Chat service.')
-    )
-    GPT_API_KEY = EncryptedField(
-        allow_blank=True, required=False, label=_('API Key'),
-    )
-    GPT_PROXY = serializers.CharField(
-        allow_blank=True, required=False, label=_('Proxy'),
-        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
-    )
-    GPT_MODEL = serializers.ChoiceField(
-        default=GPTModelChoices.gpt_4o_mini, choices=GPTModelChoices.choices,
-        label=_("GPT Model"), required=False,
-    )
-    DEEPSEEK_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Base URL'),
-        help_text=_('The base URL of the Chat service.')
-    )
-    DEEPSEEK_API_KEY = EncryptedField(
-        allow_blank=True, required=False, label=_('API Key'),
-    )
-    DEEPSEEK_PROXY = serializers.CharField(
-        allow_blank=True, required=False, label=_('Proxy'),
-        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
-    )
-    DEEPSEEK_MODEL = serializers.ChoiceField(
-        default=DeepSeekModelChoices.deepseek_chat, choices=DeepSeekModelChoices.choices,
-        label=_("DeepSeek Model"), required=False,
     )
 
 

@@ -67,6 +67,7 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
     def get_context_data(self, **kwargs):
         user = self.get_user_from_session()
         mfa_context = self.get_user_mfa_context(user)
+        print(mfa_context)
         kwargs.update(mfa_context)
         return kwargs
 

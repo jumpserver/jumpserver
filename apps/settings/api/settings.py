@@ -153,7 +153,10 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     def parse_serializer_data(self, serializer):
         data = []
         fields = self.get_fields()
-        encrypted_items = [name for name, field in fields.items() if field.write_only]
+        encrypted_items = [
+            name for name, field in fields.items()
+            if field.write_only or getattr(field, 'encrypted', False)
+        ]
         category = self.request.query_params.get('category', '')
         for name, value in serializer.validated_data.items():
             encrypted = name in encrypted_items
