@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from accounts.const import SecretType
 from accounts.models import Account
-from acls.models import CommandGroup, CommandFilterACL
+from acls.models import CommandGroup, CommandFilterACL, DataMaskingRule
 from assets.models import Asset, Platform, Gateway, Zone
 from assets.serializers.asset import AssetProtocolsSerializer
 from assets.serializers.platform import PlatformSerializer
@@ -83,6 +83,14 @@ class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
         ]
 
 
+class _ConnectionTokenDataMaskingRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataMaskingRule
+        fields = ['id', 'name', 'fields_pattern',
+                  'masking_method', 'mask_pattern',
+                  'is_active', 'priority']
+
+
 class _ConnectionTokenCommandFilterACLSerializer(serializers.ModelSerializer):
     command_groups = ObjectRelatedField(
         many=True, required=False, queryset=CommandGroup.objects,
@@ -105,7 +113,7 @@ class _ConnectionTokenPlatformSerializer(PlatformSerializer):
     class Meta(PlatformSerializer.Meta):
         model = Platform
         fields = [field for field in PlatformSerializer.Meta.fields
-                   if field not in PlatformSerializer.Meta.fields_m2m]
+                  if field not in PlatformSerializer.Meta.fields_m2m]
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
@@ -139,6 +147,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     zone = ObjectRelatedField(queryset=Zone.objects, required=False, label=_('Domain'))
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
+    data_masking_rules = _ConnectionTokenDataMaskingRuleSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
     connect_options = serializers.JSONField(read_only=True)
@@ -149,7 +158,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields = [
             'id', 'value', 'user', 'asset', 'account',
-            'platform', 'command_filter_acls', 'protocol',
+            'platform', 'command_filter_acls', 'data_masking_rules', 'protocol',
             'zone', 'gateway', 'actions', 'expire_at',
             'from_ticket', 'expire_now', 'connect_method',
             'connect_options', 'face_monitor_token'
