@@ -41,7 +41,7 @@ class ConnectDefaultOpenMethod(TextChoices):
 class Themes(TextChoices):
     DEFAULT = 'default', _('Default')
     DARKGARY = 'darkGary', _('Dark gray')
-    DARKBLUE = 'darkBlue', _('Dark blue')
+    DEEKBLUE = 'deepBlue', _('Deep blue')
 
 
 class RDPSmartSize(TextChoices):
