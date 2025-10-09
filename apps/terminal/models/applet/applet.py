@@ -189,11 +189,6 @@ class Applet(JMSBaseModel):
         if settings.DEBUG_DEV:
             return hosts
 
-        hosts = [host for host in hosts if host.load != 'offline']
-        if not hosts:
-            logger.info("No online host for applet: {}".format(self.name))
-            return None
-
         hosts = self._filter_published_hosts(hosts)
         if not hosts:
             logger.info("No published host for applet: {}".format(self.name))
@@ -202,7 +197,20 @@ class Applet(JMSBaseModel):
 
     def select_host(self, user, asset):
         hosts = self.filter_available_hosts()
+        only_label_values = asset.get_labels().filter(
+            name__in=['AppletHostOnly', '仅发布机']
+        ).values_list('value', flat=True)
+        if only_label_values:
+            host_matched = [host for host in hosts if host.name in only_label_values]
+            if host_matched:
+                return host_matched[0]
+            else:
+                logger.info("No host for only applet: {}".format(self.name))
+                return None
+
+        hosts = hosts if settings.DEBUG_DEV else [host for host in hosts if host.load != 'offline']
         if not hosts:
+            logger.info("No online host for applet: {}".format(self.name))
             return None
 
         spec_label_values = asset.get_labels().filter(
