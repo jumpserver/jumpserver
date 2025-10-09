@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from users.const import (
-    RDPResolution, RDPSmartSize, KeyboardLayout, ConnectDefaultOpenMethod,
+    RDPResolution, RDPSmartSize, KeyboardLayout, ConnectDefaultOpenMethod, Themes,
     RDPClientOption, AppletConnectionMethod, RDPColorQuality, FileNameConflictResolution
 )
 
@@ -28,6 +28,10 @@ class BasicSerializer(serializers.Serializer):
     connect_default_open_method = serializers.ChoiceField(
         choices=ConnectDefaultOpenMethod.choices, default=ConnectDefaultOpenMethod.CURRENT,
         label=_('Connect default open method'), required=False
+    )
+    themes = serializers.ChoiceField(
+        choices=Themes.choices, default=ConnectDefaultOpenMethod.CURRENT,
+        label=_('Themes'), required=False
     )
 
 
