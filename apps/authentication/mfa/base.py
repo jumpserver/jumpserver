@@ -38,7 +38,7 @@ class BaseMFA(abc.ABC):
         if not ok:
             return False, msg
 
-        cache.set(cache_key, code, 60)
+        cache.set(cache_key, code, settings.VERIFY_CODE_TTL)
         return True, msg
 
     def is_authenticated(self):
