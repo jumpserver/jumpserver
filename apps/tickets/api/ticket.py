@@ -45,8 +45,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     }
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
         with tmp_to_root_org():
+            instance = self.get_object()
             serializer = self.get_serializer(instance)
             data = serializer.data
         return Response(data)
