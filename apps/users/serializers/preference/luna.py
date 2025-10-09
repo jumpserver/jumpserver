@@ -30,7 +30,7 @@ class BasicSerializer(serializers.Serializer):
         label=_('Connect default open method'), required=False
     )
     themes = serializers.ChoiceField(
-        choices=Themes.choices, default=ConnectDefaultOpenMethod.CURRENT,
+        choices=Themes.choices, default=Themes.DEFAULT,
         label=_('Themes'), required=False
     )
 
