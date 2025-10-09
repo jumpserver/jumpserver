@@ -38,6 +38,12 @@ class ConnectDefaultOpenMethod(TextChoices):
     NEW = 'new', _('New window')
 
 
+class Themes(TextChoices):
+    DEFAULT = 'default', _('Default')
+    DARKGARY = 'darkGary', _('Dark gray')
+    DARKBLUE = 'darkBlue', _('Dark blue')
+
+
 class RDPSmartSize(TextChoices):
     DISABLE = '0', _('Disable')
     ENABLE = '1', _('Enable')
