@@ -1,17 +1,16 @@
-from common.serializers.fields import LabeledChoiceField
-from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
-from common.serializers.mixin import CommonBulkModelSerializer
-from ..models import DataMaskingRule
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ['DataMaskingRuleSerializer']
+from acls.models import MaskingMethod, DataMaskingRule
+from common.serializers.fields import LabeledChoiceField
+from common.serializers.mixin import CommonBulkModelSerializer
+from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
 
-from ..models.data_masking import MaskingMethod
+__all__ = ['DataMaskingRuleSerializer']
 
 
 class DataMaskingRuleSerializer(BaseSerializer, CommonBulkModelSerializer):
     masking_method = LabeledChoiceField(
-        choices=MaskingMethod, default=MaskingMethod.fixed_char, label=_('Masking Method')
+        choices=MaskingMethod.choices, default=MaskingMethod.fixed_char, label=_('Masking Method')
     )
 
     class Meta(BaseSerializer.Meta):

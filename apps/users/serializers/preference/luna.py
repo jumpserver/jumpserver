@@ -31,7 +31,7 @@ class BasicSerializer(serializers.Serializer):
     )
     themes = serializers.ChoiceField(
         choices=Themes.choices, default=Themes.DEFAULT,
-        label=_('Themes'), required=False
+        label=_('Theme'), required=False
     )
 
 
