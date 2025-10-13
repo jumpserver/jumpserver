@@ -140,10 +140,10 @@ def get_auth_methods():
             'url': reverse('authentication:slack-qr-login'),
             'logo': static('img/login_slack_logo.png')
         },
-        {
-            'name': _("Passkey"),
-            'enabled': settings.AUTH_PASSKEY,
-            'url': reverse('api-auth:passkey-login'),
-            'logo': static('img/login_passkey.png')
-        }
+        # {
+        #     'name': _("Passkey"),
+        #     'enabled': settings.AUTH_PASSKEY,
+        #     'url': reverse('api-auth:passkey-login'),
+        #     'logo': static('img/login_passkey.png')
+        # }
     ]
