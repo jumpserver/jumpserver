@@ -453,6 +453,8 @@ class JobExecution(JMSOrgBaseModel):
                         "input": self.material,
                         "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
+                        'org_id': self.org_id,
+                        '_org_name': self.org_name,
                     }).publish_async()
                     raise Exception("command is rejected by ACL")
                 elif acl.is_action(CommandFilterACL.ActionChoices.warning):
@@ -491,6 +493,8 @@ class JobExecution(JMSOrgBaseModel):
                 "input": self.material,
                 "risk_level": RiskLevelChoices.reject,
                 "user": self.creator,
+                'org_id': self.org_id,
+                '_org_name': self.org_name,
             }).publish_async()
             raise CommandInBlackListException(
                 "Command is rejected by black list: {}".format(self.current_job.args))
