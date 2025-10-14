@@ -448,6 +448,7 @@
     "DangerousCommandNum": "Số lệnh nguy hiểm",
     "Dashboard": "Bảng điều khiển",
     "DataMasking": "Dữ liệu ẩn danh",
+    "DataMaskingRuleHelpHelpText": "Khi kết nối tài sản cơ sở dữ liệu, có thể tiến hành làm mờ kết quả truy vấn theo quy tắc này.",
     "Database": "Cơ sở dữ liệu",
     "DatabaseCreate": "Tạo tài sản-Cơ sở dữ liệu",
     "DatabasePort": "cổng giao thức cơ sở dữ liệu",
