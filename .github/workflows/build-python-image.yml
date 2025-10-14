@@ -1,0 +1,46 @@
+name: Build and Push Python Base Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build'
+        required: true
+        default: '3.11-slim-bullseye-v1'
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:qemu-v7.0.0-28
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract repository name
+        id: repo
+        run: echo "REPO=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          file: Dockerfile-python
+          tags: jumpserver/core-base:python-${{ inputs.tag }}
+
