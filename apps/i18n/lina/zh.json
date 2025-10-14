@@ -169,6 +169,8 @@
     "AssetListHelpMessage": "左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产\n",
     "AssetLoginACLHelpMsg": "登录资产时，可以根据用户的登录 IP 和时间段进行审核，判断是否可以登录资产",
     "AssetLoginACLHelpText": "登录资产时，可以根据用户的登录 IP 和时间段进行审核，判断是否可以登录资产",
+    "DataMaskingRuleHelpHelpMsg": "连接数据库资产时，可以根据此规则对查询结果进行脱敏",
+    "DataMaskingRuleHelpHelpText": "连接数据库资产时，可以根据此规则对查询结果进行脱敏",
     "AssetLoginTrends": "资产登录趋势",
     "AssetName": "资产名称",
     "AssetOverview": "资产概览",
