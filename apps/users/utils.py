@@ -320,6 +320,6 @@ def is_auth_confirm_time_valid(session):
 
 @contextmanager
 def activate_user_language(user):
-    language = getattr(user, 'lang', settings.LANGUAGE_CODE)
+    language = getattr(user, 'lang') or settings.LANGUAGE_CODE
     with translation.override(language):
         yield
