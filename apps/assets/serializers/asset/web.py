@@ -26,6 +26,9 @@ class WebSerializer(AssetSerializer):
             'submit_selector': {
                 'default': 'id=login_button',
             },
+            'script': {
+                'default': [],
+            }
         }
 
     def to_internal_value(self, data):
