@@ -83,7 +83,7 @@ dependencies = [
     'drf-writable-nested==0.7.0',
     'rest-condition==1.0.3',
     'drf-spectacular==0.28.0',
-    'pillow==10.0.1',
+    'pillow==10.2.0',
     'pytz==2023.3',
     'django-proxy==1.2.2',
     'python-daemon==3.0.1',
