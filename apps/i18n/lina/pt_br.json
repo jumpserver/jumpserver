@@ -449,6 +449,7 @@
     "DangerousCommandNum": "Número de Comandos Perigosos",
     "Dashboard": "Painel ",
     "DataMasking": "Desensibilização de dados",
+    "DataMaskingRuleHelpHelpText": "Ao conectar-se ao ativo do banco de dados, é possível aplicar esta regra para mascarar os resultados da consulta.",
     "Database": "Banco de dados",
     "DatabaseCreate": "Criar ativo - Banco de dados",
     "DatabasePort": "Porta do protocolo do banco de dados",

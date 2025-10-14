@@ -20,6 +20,7 @@
     "AvailableHotkeys": "Доступные горячие клавиши",
     "Backspace as Ctrl+H": "Backspace как Ctrl+H",
     "Batch actions": "Пакетные операции",
+    "Batch actions(select and right click)": "Пакетные действия (выберите и щёлкните ПКМ)",
     "Batch connect": "Пакетное подключение",
     "BatchCommands": "Пакетные команды",
     "Belgian French keyboard layout": "Бельгийская французская раскладка (Azerty)",
@@ -85,6 +86,7 @@
     "Expand all asset": "Развернуть все активы в папке",
     "Expire time": "Срок действия",
     "ExpiredTime": "Срок действия",
+    "Face Verify": "Проверка лица",
     "Face online required": "Для входа требуется верификация по лицу и мониторинг. Продолжить?",
     "Face verify": "Распознавание лица",
     "Face verify required": "Для входа требуется верификация по лицу. Продолжить?",
@@ -105,6 +107,7 @@
     "GUI": "Графический интерфейс",
     "General": "Основные настройки",
     "Go to Settings": "Перейти в настройки",
+    "Go to profile": "Перейти к личной информации",
     "Help": "Помощь",
     "Help or download": "Помощь → Скачать",
     "Help text": "Описание",
@@ -285,6 +288,5 @@
     "start time": "время начала",
     "success": "успешно",
     "system user": "системный пользователь",
-    "user": "пользователь",
-    "Batch actions(select and right click)": "Пакетные действия (выберите и щёлкните ПКМ)"
+    "user": "пользователь"
 }

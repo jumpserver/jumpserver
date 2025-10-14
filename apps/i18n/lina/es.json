@@ -448,6 +448,7 @@
     "DangerousCommandNum": "Número de comandos peligrosos",
     "Dashboard": "panel de control",
     "DataMasking": "Desensibilización de datos",
+    "DataMaskingRuleHelpHelpText": "Al conectar activos de la base de datos, se puede llevar a cabo la desensibilización de los resultados de la consulta según esta regla.",
     "Database": "Base de datos",
     "DatabaseCreate": "crear activo - base de datos",
     "DatabasePort": "Puerto del protocolo de la base de datos",

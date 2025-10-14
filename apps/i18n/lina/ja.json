@@ -453,6 +453,7 @@
     "Dashboard": "ダッシュボード",
     "DataLastUsed": "さいごしようび",
     "DataMasking": "データマスキング",
+    "DataMaskingRuleHelpHelpText": "データベース資産に接続する際は、このルールに従ってクエリ結果をマスキングできます。",
     "Database": "データベース",
     "DatabaseCreate": "資産-データベースの作成",
     "DatabasePort": "データベースプロトコルポート",
