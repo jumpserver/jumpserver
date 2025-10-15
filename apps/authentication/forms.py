@@ -77,7 +77,5 @@ def get_user_login_form_cls(*, captcha=False):
         bases.append(ChallengeMixin)
     elif settings.SECURITY_MFA_IN_LOGIN_PAGE:
         bases.append(UserCheckOtpCodeForm)
-    elif settings.SECURITY_LOGIN_CAPTCHA_ENABLED and captcha:
-        bases.append(CaptchaMixin)
     bases.append(UserLoginForm)
     return type('UserLoginForm', tuple(bases), {})
