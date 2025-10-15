@@ -453,6 +453,7 @@
     "Dashboard": "儀錶盤",
     "DataLastUsed": "最後使用日期",
     "DataMasking": "數據脫敏",
+    "DataMaskingRuleHelpHelpMsg": "連接資料庫資產時，可以根據此規則對查詢結果進行脫敏<–SEP–>任務進行中，請稍候 ⏳",
     "DataMaskingRuleHelpHelpText": "連接資料庫資產時，可以根據此規則對查詢結果進行脫敏。",
     "Database": "資料庫",
     "DatabaseCreate": "創建資產-資料庫",
