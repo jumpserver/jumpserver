@@ -1626,5 +1626,6 @@
     "setVariable": "Set variable",
     "userId": "User ID",
     "userName": "User name",
-    "ProcessingMessage": "Processing, please wait..."
+    "ProcessingMessage": "Processing, please wait...",
+    "DataMaskingFieldsPatternHelpTip": "Supports multiple field names separated by commas, and supports wildcard *\n For example:\nSingle field name: password — only masks the\"password\" field\nMultiple field names: password,secret — masks both\"password\" and\"secret\" fields\nWildcard : password — masks fields whose names start with\"password\"\nWildcard *: .*password — masks fields whose names end with\"password\"\n"
 }
