@@ -222,13 +222,15 @@ class AssetPermissionFilter(PermissionBaseFilter):
             have_asset_q = Q(assets__isnull=False) | Q(nodes__isnull=False)
             have_action_q = Q(actions__gt=0)
 
+            valid_ids = AssetPermission.objects.valid().values_list('pk', flat=True)
             queryset = queryset.filter(have_user_q & have_asset_q & have_action_q)
-            queryset &= AssetPermission.objects.valid()
+            queryset = queryset.filter(pk__in=valid_ids)
         else:
             not_have_user_q = Q(users__isnull=True) & Q(user_groups__isnull=True)
             not_have_asset_q = Q(assets__isnull=True) & Q(nodes__isnull=True)
             not_have_action_q = Q(actions=0)
 
-            queryset = queryset.filter(not_have_user_q | not_have_asset_q | not_have_action_q)
-            queryset |= AssetPermission.objects.invalid()
+            invalid_ids = AssetPermission.objects.invalid().values_list('pk', flat=True)
+            condition_q = not_have_user_q | not_have_asset_q | not_have_action_q | Q(pk__in=invalid_ids)
+            queryset = queryset.filter(condition_q)
         return queryset
