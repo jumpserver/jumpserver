@@ -4,10 +4,11 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
+from orgs.mixins.models import OrgManager
 from terminal.backends.command.models import AbstractSessionCommand
 
 
-class CommandManager(models.Manager):
+class CommandManager(OrgManager):
     def bulk_create(self, objs, **kwargs):
         resp = super().bulk_create(objs, **kwargs)
         for i in objs:
