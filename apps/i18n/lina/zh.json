@@ -1636,5 +1636,6 @@
     "setVariable": "设置参数",
     "userId": "用户ID",
     "userName": "用户名",
-    "ProcessingMessage": "任务进行中，请稍候 ⏳"
+    "ProcessingMessage": "任务进行中，请稍候 ⏳",
+    "DataMaskingFieldsPatternHelpTip": "支持多个字段名，逗号分隔，支持通配符*\n 例如: \n单字段名: password 表示只脱敏 password 字段\n多个字段名: password,secret 表示脱敏 password 和 secret 字段\n通配符*: password* 表示脱敏字段名中包含 password 前缀的字段\n通配符*: .*password 表示脱敏字段名中包含 password 后缀的字段\n"
 }
