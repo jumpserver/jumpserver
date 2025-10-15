@@ -1635,5 +1635,6 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "ProcessingMessage": "任务进行中，请稍候 ⏳"
 }
