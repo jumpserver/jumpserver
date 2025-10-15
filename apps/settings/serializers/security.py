@@ -168,10 +168,6 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_("The password and additional code are sent to a third party "
                     "authentication system for verification")
     )
-    SECURITY_LOGIN_CAPTCHA_ENABLED = serializers.BooleanField(
-        required=False, default=False, label=_("Login captcha"),
-        help_text=_("Enable captcha to prevent robot authentication")
-    )
     SECURITY_CHECK_DIFFERENT_CITY_LOGIN = serializers.BooleanField(
         required=False, label=_('Suspicious Login Verification'),
         help_text=_(
@@ -194,9 +190,6 @@ class SecurityAuthSerializer(serializers.Serializer):
         data = super().to_representation(instance)
         if data['SECURITY_LOGIN_CHALLENGE_ENABLED']:
             data['SECURITY_MFA_IN_LOGIN_PAGE'] = False
-            data['SECURITY_LOGIN_CAPTCHA_ENABLED'] = False
-        elif data['SECURITY_MFA_IN_LOGIN_PAGE']:
-            data['SECURITY_LOGIN_CAPTCHA_ENABLED'] = False
         return data
 
 
