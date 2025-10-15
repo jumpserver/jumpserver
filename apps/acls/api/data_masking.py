@@ -4,14 +4,13 @@ from .common import ACLUserFilterMixin
 from ..models import DataMaskingRule
 from .. import serializers
 
-
 __all__ = ['DataMaskingRuleViewSet']
 
 
 class DataMaskingRuleFilter(ACLUserFilterMixin):
     class Meta:
         model = DataMaskingRule
-        fields = ('name', 'action')
+        fields = ('name',)
 
 
 class DataMaskingRuleViewSet(OrgBulkModelViewSet):
