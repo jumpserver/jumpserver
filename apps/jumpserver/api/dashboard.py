@@ -20,7 +20,7 @@ from ops.const import JobStatus
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from terminal.const import RiskLevelChoices
-from terminal.models import Session, Command
+from terminal.models import Session, CommandStorage
 
 __all__ = ['IndexApi']
 
@@ -123,14 +123,16 @@ class DateTimeMixin:
         return self.get_logs_queryset_filter(qs, 'date_start')
 
     @lazyproperty
-    def command_type_queryset_tuple(self):
-        type_queryset_tuple = Command.get_all_type_queryset_tuple()
-        return (
-            (tp, self.get_logs_queryset_filter(
+    def command_queryset_list(self):
+        qs_list = []
+        for storage in CommandStorage.objects.all():
+            if not storage.is_valid():
+                continue
+            qs = storage.get_command_queryset()
+            qs_list.append(self.get_logs_queryset_filter(
                 qs, 'timestamp', is_timestamp=True
             ))
-            for tp, qs in type_queryset_tuple
-        )
+        return qs_list
 
     @lazyproperty
     def job_logs_queryset(self):
@@ -141,7 +143,7 @@ class DateTimeMixin:
 class DatesLoginMetricMixin:
     dates_list: list
     date_start_end: tuple
-    command_type_queryset_tuple: tuple
+    command_queryset_list: list
     sessions_queryset: Session.objects
     ftp_logs_queryset: FTPLog.objects
     job_logs_queryset: JobLog.objects
@@ -259,16 +261,11 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def command_statistics(self):
-        from terminal.const import CommandStorageType
         total_amount = 0
         danger_amount = 0
-        for tp, qs in self.command_type_queryset_tuple:
-            if tp == CommandStorageType.es:
-                total_amount += qs.count(limit_to_max_result_window=False)
-                danger_amount += qs.filter(risk_level=RiskLevelChoices.reject).count(limit_to_max_result_window=False)
-            else:
-                total_amount += qs.count()
-                danger_amount += qs.filter(risk_level=RiskLevelChoices.reject).count()
+        for qs in self.command_queryset_list:
+            total_amount += qs.count()
+            danger_amount += qs.filter(risk_level=RiskLevelChoices.reject).count()
         return total_amount, danger_amount
 
     @lazyproperty
