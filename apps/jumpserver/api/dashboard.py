@@ -125,7 +125,7 @@ class DateTimeMixin:
     @lazyproperty
     def command_queryset_list(self):
         qs_list = []
-        for storage in CommandStorage.objects.all():
+        for storage in CommandStorage.objects.exclude(name='null'):
             if not storage.is_valid():
                 continue
             qs = storage.get_command_queryset()
