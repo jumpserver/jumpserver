@@ -175,6 +175,8 @@ class SendMailView(View):
         msg.attach_alternative(html_content, "text/html")
         filename = f"{title}-{timezone.now().strftime('%Y%m%d%H%M%S')}.pdf"
         msg.attach(filename, pdf_bytes, "application/pdf")
-        msg.send()
-
-        return JsonResponse({"message": "邮件发送成功"})
+        try:
+            msg.send()
+        except Exception as e:
+            return JsonResponse({"error": _('Failed to send email: ') + str(e)})
+        return JsonResponse({"message": _('Email sent successfully to ') + email})
