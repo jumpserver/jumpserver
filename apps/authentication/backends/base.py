@@ -25,7 +25,10 @@ class JMSBaseAuthBackend:
         """
         # 三方用户认证完成后，在后续的 get_user 获取逻辑中，也应该需要检查用户是否有效
         is_valid = getattr(user, 'is_valid', None)
-        return is_valid or is_valid is None
+        if not is_valid:
+            logger.info("User %s is not valid", getattr(user, "username", "<unknown>"))
+            return False
+        return True
 
     # allow user to authenticate
     def username_allow_authenticate(self, username):

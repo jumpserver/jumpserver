@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20250827_025554 AS stage-build
+FROM jumpserver/core-base:20251014_095903 AS stage-build
 
 ARG VERSION
 
@@ -19,7 +19,7 @@ RUN set -ex \
     && python manage.py compilemessages
 
 
-FROM python:3.11-slim-bullseye
+FROM jumpserver/core-base:python-3.11-slim-bullseye-v1
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 

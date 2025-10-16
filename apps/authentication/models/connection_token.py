@@ -338,6 +338,18 @@ class ConnectionToken(JMSOrgBaseModel):
             acls = CommandFilterACL.filter_queryset(**kwargs).valid()
         return acls
 
+    @lazyproperty
+    def data_masking_rules(self):
+        from acls.models import DataMaskingRule
+        kwargs = {
+            'user': self.user,
+            'asset': self.asset,
+            'account': self.account_object,
+        }
+        with tmp_to_org(self.asset.org_id):
+            rules = DataMaskingRule.filter_queryset(**kwargs).valid()
+            return rules
+
 
 class SuperConnectionToken(ConnectionToken):
     _type = ConnectionTokenType.SUPER

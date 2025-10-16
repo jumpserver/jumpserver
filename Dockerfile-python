@@ -1,0 +1,11 @@
+FROM python:3.11-slim-bullseye
+ARG TARGETARCH
+# Install APT dependencies
+ENV DEBIAN_FRONTEND=noninteractive
+RUN set -eux; \
+    apt-get update; \
+    apt-get -y --no-install-recommends upgrade; \
+    rm -rf /var/lib/apt/lists/*
+
+# upgrade pip and setuptools
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel

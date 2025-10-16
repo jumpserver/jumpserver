@@ -1,25 +1,25 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 15:02+0800\n"
-"PO-Revision-Date: 2025-06-11 11:51+0300\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: ru\n"
+"POT-Creation-Date: 2025-10-16 14:10+0800\n"
+"PO-Revision-Date: 2025-09-26 11:16\n"
+"Last-Translator: ibuler <ibuler@qq.com>\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
-"X-Generator: Poedit 3.5\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Crowdin-File: /dev/apps/i18n/core/zh/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 76\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-Project: jumpserver\n"
+"X-Crowdin-Project-ID: 832018\n"
+"X-Generator: Poedit 2.4.3\n"
 
-#: accounts/api/account/account.py:138
+#: accounts/api/account/account.py:141
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:362
 msgid "Account already exists"
@@ -97,11 +97,12 @@ msgstr "Завершение плана выполнения"
 
 #: accounts/automations/base/manager.py:119
 msgid "Windows does not support SSH key authentication"
-msgstr ""
+msgstr "Windows не поддерживает аутентификацию по ключу SSH"
 
 #: accounts/automations/base/manager.py:123
 msgid "Windows password cannot contain special characters like > ^"
-msgstr "Пароль Windows не может содержать специальные символы, такие как > ^"
+msgstr ""
+"Пароль Windows не может содержать специальные символы, такие как > и ^"
 
 #: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
@@ -212,7 +213,7 @@ msgstr "Шаблон"
 msgid "Skip"
 msgstr "Пропустить"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:291
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:292
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "Обновить"
@@ -569,28 +570,29 @@ msgstr "Удаление учетных записей"
 
 #: accounts/models/account.py:119
 msgid "Can view session"
-msgstr "Сессия аккаунта"
+msgstr "Просмотр сессии аккаунта"
 
 #: accounts/models/account.py:120
 msgid "Can view activity"
-msgstr "Активность аккаунта"
+msgstr "Просмотр активности аккаунта"
 
 #: accounts/models/application.py:16
 #: accounts/models/automations/check_account.py:118 accounts/models/base.py:63
 #: accounts/serializers/account/service.py:29
 #: accounts/serializers/account/virtual.py:20 acls/models/base.py:35
 #: acls/models/base.py:96 acls/models/command_acl.py:21
-#: acls/notifications.py:69 acls/serializers/base.py:35
-#: assets/models/asset/common.py:100 assets/models/asset/common.py:166
-#: assets/models/cmd_filter.py:21 assets/models/label.py:18
-#: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/models/zone.py:19 assets/serializers/asset/common.py:174
-#: assets/serializers/platform.py:158 assets/serializers/platform.py:283
+#: acls/models/data_masking.py:20 acls/notifications.py:69
+#: acls/serializers/base.py:35 assets/models/asset/common.py:100
+#: assets/models/asset/common.py:166 assets/models/cmd_filter.py:21
+#: assets/models/label.py:18 assets/models/platform.py:15
+#: assets/models/platform.py:94 assets/models/zone.py:19
+#: assets/serializers/asset/common.py:174 assets/serializers/platform.py:158
+#: assets/serializers/platform.py:283
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
 #: authentication/notifications.py:56
-#: authentication/serializers/connect_token_secret.py:117
-#: authentication/serializers/connect_token_secret.py:174 labels/models.py:11
+#: authentication/serializers/connect_token_secret.py:125
+#: authentication/serializers/connect_token_secret.py:183 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
 #: ops/models/celery.py:81 ops/models/job.py:147 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
@@ -784,7 +786,7 @@ msgstr "Дата окончания"
 #: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:47 audits/models.py:224
 #: audits/serializers.py:77 ops/models/base.py:49 ops/models/job.py:233
-#: terminal/models/applet/applet.py:374 terminal/models/applet/host.py:140
+#: terminal/models/applet/applet.py:382 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
@@ -929,7 +931,7 @@ msgstr "Slug"
 
 #: accounts/models/automations/check_account.py:125
 msgid "Check engine"
-msgstr "Детектор двигателя"
+msgstr "Проверка механизма"
 
 #: accounts/models/automations/check_account.py:133
 msgid "Check the discovered accounts"
@@ -941,8 +943,7 @@ msgid ""
 "results, including user groups, public keys, sudoers, and other information."
 msgstr ""
 "Проверяйте и анализируйте автоматически обнаруженные результаты учетных "
-"записей, включая группы пользователей, открытые ключи, sudoers и другую "
-"информацию."
+"записей, включая группы пользователей, открытые ключи, sudoers и т. д."
 
 #: accounts/models/automations/check_account.py:142
 msgid "Check the strength of your account and password"
@@ -962,7 +963,7 @@ msgstr "Проверка на дублирование учетных запис
 
 #: accounts/models/automations/check_account.py:152
 msgid "Check if the account is the same as other accounts."
-msgstr "Проверьте, совпадает ли номер счета с номером других счетов."
+msgstr "Проверьте, совпадает ли учетная запись с другими УЗ."
 
 #: accounts/models/automations/check_account.py:157
 msgid "Check whether the account password is a common password"
@@ -1047,7 +1048,7 @@ msgstr "Правила паролей"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
-#: authentication/serializers/connect_token_secret.py:121
+#: authentication/serializers/connect_token_secret.py:129
 #: terminal/models/applet/applet.py:41
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:257
 msgid "Is active"
@@ -1073,6 +1074,10 @@ msgstr "Шаблон УЗ"
 msgid "Can view asset account template secret"
 msgstr "Просмотр секрета шаблона УЗ актива"
 
+# msgid "Can view asset account template secret"
+# msgstr "可以查看资产账号模板密码"
+# msgid "Can change asset account template secret"
+# msgstr "可以更改资产账号模板密码"
 #: accounts/models/virtual.py:13
 msgid "Alias"
 msgstr "Псевдоним"
@@ -1118,8 +1123,8 @@ msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
 msgstr ""
-"{} - Задача по резервному копированию учетных записей выполнена. Подробности"
-" во вложении"
+"{} - Задача резервного копирования учетных записей выполнена. Подробности во"
+" вложении"
 
 #: accounts/notifications.py:26
 msgid ""
@@ -1229,7 +1234,7 @@ msgstr "Категория"
 #: assets/serializers/platform.py:160 assets/serializers/platform.py:172
 #: audits/serializers.py:76 audits/serializers.py:196
 #: authentication/models/connection_token.py:67
-#: authentication/serializers/connect_token_secret.py:130
+#: authentication/serializers/connect_token_secret.py:138
 #: ops/models/job.py:155 perms/serializers/user_permission.py:28
 #: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
@@ -1255,6 +1260,7 @@ msgstr "Служба каталогов"
 #, python-brace-format
 msgid "Account already exists. Field(s): {fields} must be unique."
 msgstr ""
+"Учётная запись уже существует. Поля: {fields} должны быть уникальными."
 
 #: accounts/serializers/account/account.py:285
 msgid "Has secret"
@@ -1301,7 +1307,7 @@ msgid "Spec info"
 msgstr "Специальная информация"
 
 #: accounts/serializers/account/account.py:493
-#: authentication/serializers/connect_token_secret.py:164
+#: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
@@ -1360,7 +1366,7 @@ msgstr "Белый список IP"
 #: assets/models/cmd_filter.py:88 common/db/models.py:36
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:44
-#: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:375
+#: terminal/models/applet/applet.py:46 terminal/models/applet/applet.py:383
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
 #: terminal/models/component/endpoint.py:117
 #: terminal/models/session/session.py:44
@@ -1526,7 +1532,7 @@ msgstr "Неверный ID механизма"
 
 #: accounts/serializers/automations/gather_account.py:31
 msgid "Whether to check the risk of the discovered accounts."
-msgstr "Следует ли проводить проверку рисков для объединенных счетов?"
+msgstr "Следует ли проверять риск, связанный с собранными УЗ."
 
 #: accounts/signal_handlers.py:43
 #, python-format
@@ -1600,20 +1606,20 @@ msgid ""
 "Whenever an account is created or modified and needs pushing to assets, run "
 "this task"
 msgstr ""
-"Всякий раз, когда создается или изменяется учетная запись и ее необходимо "
-"перенести в ресурсы, запустите эту задачу."
+"Каждый раз, когда создаётся или изменяется учётная запись и требуется "
+"отправить её на актив, выполняется эта задача."
 
 #: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
-msgstr "Изменение пароля учетной записи push в активы"
+msgstr "Смена пароля учётной записи и публикация на актив"
 
 #: accounts/tasks/push_account.py:65
 msgid ""
 "When a secret on an account changes and needs pushing to assets, run this "
 "task"
 msgstr ""
-"Всякий раз, когда создается или изменяется учетная запись и ее необходимо "
-"перенести в ресурсы, запустите эту задачу."
+"При изменении пароля учётной записи и его отправке на актив выполняется эта "
+"задача."
 
 #: accounts/tasks/remove_account.py:28
 msgid ""
@@ -1882,7 +1888,7 @@ msgstr "1-100 (меньшее число - выше приоритет)"
 #: acls/models/base.py:41 acls/serializers/base.py:57
 #: assets/models/cmd_filter.py:81 audits/models.py:99
 #: audits/serializers.py:107
-#: authentication/serializers/connect_token_secret.py:123
+#: authentication/serializers/connect_token_secret.py:131
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:63 perms/serializers/permission.py:85
 #: terminal/backends/command/models.py:24
@@ -1891,7 +1897,7 @@ msgid "Action"
 msgstr "Действие"
 
 #: acls/models/base.py:42 assets/models/cmd_filter.py:86
-#: authentication/serializers/connect_token_secret.py:93
+#: authentication/serializers/connect_token_secret.py:101
 msgid "Reviewers"
 msgstr "Утверждающий"
 
@@ -1932,7 +1938,7 @@ msgstr "Игнорировать регистр"
 
 #: acls/models/command_acl.py:33 acls/models/command_acl.py:97
 #: acls/serializers/command_acl.py:29
-#: authentication/serializers/connect_token_secret.py:90
+#: authentication/serializers/connect_token_secret.py:98
 #: terminal/templates/terminal/_msg_command_warning.html:23
 msgid "Command group"
 msgstr "Группа команд"
@@ -1957,6 +1963,38 @@ msgstr "Способ подключения"
 #: acls/models/connect_method.py:13
 msgid "Connect method acl"
 msgstr "Правила метода подключения"
+
+#: acls/models/data_masking.py:13
+msgid "Fixed Character Replacement"
+msgstr "Фиксированная замена символов"
+
+#: acls/models/data_masking.py:14
+msgid "Hide Middle Characters"
+msgstr "Скрыть средние символы"
+
+#: acls/models/data_masking.py:15
+msgid "Keep Prefix Only"
+msgstr "Сохранить префикс"
+
+#: acls/models/data_masking.py:16
+msgid "Keep Suffix Only"
+msgstr "Сохранить суффикс"
+
+#: acls/models/data_masking.py:21
+msgid "Fields pattern"
+msgstr "Скрыть имя столбца"
+
+#: acls/models/data_masking.py:27 acls/serializers/data_masking.py:14
+msgid "Masking Method"
+msgstr "Метод маскировки"
+
+#: acls/models/data_masking.py:31
+msgid "Mask Pattern"
+msgstr "Символы маскировки"
+
+#: acls/models/data_masking.py:42
+msgid "Data Masking Rule"
+msgstr "Правила маскировки данных"
 
 #: acls/models/login_acl.py:11 acls/models/login_asset_acl.py:9
 #: acls/serializers/login_acl.py:16 acls/serializers/login_asset_acl.py:13
@@ -1992,6 +2030,14 @@ msgstr "Уведомление о входе пользователя"
 msgid "Login city"
 msgstr "Город входа"
 
+#: acls/notifications.py:20 acls/notifications.py:71
+msgid "Recipient name"
+msgstr "Имя получателя"
+
+#: acls/notifications.py:21 acls/notifications.py:72
+msgid "Recipient username"
+msgstr "Имя пользователя получателя"
+
 #: acls/notifications.py:22 acls/templates/acls/user_login_reminder.html:12
 #: audits/models.py:213 audits/models.py:291 audits/serializers.py:91
 msgid "User agent"
@@ -1999,7 +2045,7 @@ msgstr "Агент пользователя"
 
 #: acls/notifications.py:23 acls/notifications.py:75
 msgid "ACL name"
-msgstr "Имя ACL"
+msgstr "Название ACL"
 
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
@@ -2064,7 +2110,7 @@ msgstr "Неверный IP-адрес: `{}`"
 
 #: acls/serializers/rules/rules.py:35
 msgid "address invalid: `{}`"
-msgstr "Адрес недействителен: `{}`"
+msgstr "неверный адрес: `{}`"
 
 #: acls/serializers/rules/rules.py:40
 msgid ""
@@ -2073,7 +2119,7 @@ msgid ""
 msgstr ""
 "Символ * указывает на совпадение со всеми. Например,: 192.168.10.1, "
 "192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2 de::e13, "
-"2001:db8:1a:1110::/64"
+"2001:db8:1a:1110::/64 "
 
 #: acls/serializers/rules/rules.py:48
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -2292,7 +2338,7 @@ msgstr "Отключен"
 #: assets/const/base.py:33 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:51
-#: users/serializers/preference/luna.py:85
+#: users/serializers/preference/luna.py:89
 msgid "Basic"
 msgstr "Простое"
 
@@ -2320,7 +2366,7 @@ msgstr "Облака"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:28 users/const.py:77
+#: terminal/models/applet/applet.py:28 users/const.py:83
 msgid "Web"
 msgstr "Веб"
 
@@ -2381,7 +2427,7 @@ msgstr "Брандмауэр"
 msgid "Windows Active Directory"
 msgstr "Windows Active Directory"
 
-#: assets/const/gpt.py:7
+#: assets/const/gpt.py:8
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
@@ -2506,11 +2552,11 @@ msgstr ""
 
 #: assets/const/protocol.py:201
 msgid "Encrypt"
-msgstr "Зашифрованные способы входа третьих сторон включают:"
+msgstr "Шифрование"
 
 #: assets/const/protocol.py:202
 msgid "Whether to use TLS encryption."
-msgstr ""
+msgstr "Использовать ли шифрование TLS."
 
 #: assets/const/protocol.py:232
 msgid "Auth source"
@@ -2536,13 +2582,11 @@ msgstr "Имя пользователя для аутентификации"
 
 #: assets/const/protocol.py:256
 msgid "Enable cluster mode"
-msgstr "Запустить кластерный режим"
+msgstr "Включить режим кластера"
 
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
-msgstr ""
-"Если этот экземпляр Redis является частью кластера, то включите режим "
-"кластера и выполните количество действий."
+msgstr "Включите, если этот экземпляр Redis является частью кластера"
 
 #: assets/const/protocol.py:280
 msgid "Safe mode"
@@ -2608,7 +2652,7 @@ msgstr "Адрес"
 #: assets/models/asset/common.py:169 assets/models/platform.py:155
 #: assets/serializers/asset/common.py:151
 #: authentication/backends/passkey/models.py:12
-#: authentication/serializers/connect_token_secret.py:122
+#: authentication/serializers/connect_token_secret.py:130
 #: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:399
 msgid "Platform"
 msgstr "Платформа"
@@ -2706,6 +2750,8 @@ msgstr "Задача автоматизации"
 msgid "Asset automation task"
 msgstr "Автоматизация активов"
 
+# msgid "Comment"
+# msgstr "备注"
 #: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:240
 #: users/models/user/__init__.py:324
@@ -2801,7 +2847,7 @@ msgstr "Система"
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:35
-#: authentication/serializers/connect_token_secret.py:129
+#: authentication/serializers/connect_token_secret.py:137
 #: common/serializers/common.py:86 labels/models.py:12 settings/models.py:40
 #: users/models/preference.py:13
 msgid "Value"
@@ -2810,7 +2856,7 @@ msgstr "Значение"
 #: assets/models/label.py:40 assets/serializers/cagegory.py:10
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
 #: assets/serializers/platform.py:159
-#: authentication/serializers/connect_token_secret.py:128
+#: authentication/serializers/connect_token_secret.py:136
 #: common/serializers/common.py:85 labels/serializers.py:45
 #: settings/serializers/msg.py:91 xpack/plugins/cloud/models.py:404
 msgid "Label"
@@ -2861,7 +2907,7 @@ msgid "Required"
 msgstr "Обязательно"
 
 #: assets/models/platform.py:19 assets/serializers/platform.py:161
-#: terminal/models/component/storage.py:28
+#: terminal/models/component/storage.py:28 users/const.py:42
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "По умолчанию"
@@ -3088,8 +3134,8 @@ msgid ""
 "The domain part used by the directory service (e.g., AD) and appended to the"
 " username during login, such as example.com in user@example.com."
 msgstr ""
-"Имя домена Часть имени домена, которая добавляется к имени пользователя при "
-"входе в службу каталогов (например, AD), например example.com в "
+"Часть домена, используемая службой каталогов (например, AD) и добавляемая к "
+"имени пользователя при входе в систему, например example.com в "
 "user@example.com."
 
 #: assets/serializers/asset/gpt.py:20
@@ -3146,7 +3192,7 @@ msgid "Disk total"
 msgstr "Размер диска"
 
 #: assets/serializers/asset/info/gathered.py:16
-#: authentication/serializers/connect_token_secret.py:119
+#: authentication/serializers/connect_token_secret.py:127
 msgid "OS"
 msgstr "ОС"
 
@@ -3164,7 +3210,7 @@ msgstr "Модель GPU"
 
 #: assets/serializers/automations/base.py:22
 msgid "Executed amount"
-msgstr "Исполнительные числа"
+msgstr "Кол-во выполнений"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -3459,7 +3505,7 @@ msgstr "Удалить каталог"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:292
+#: rbac/tree.py:293
 msgid "Delete"
 msgstr "Удалить"
 
@@ -3485,7 +3531,7 @@ msgstr "Скачать"
 msgid "Rename dir"
 msgstr "Сопоставление каталога"
 
-#: audits/const.py:23 rbac/tree.py:290 terminal/api/session/session.py:285
+#: audits/const.py:23 rbac/tree.py:291 terminal/api/session/session.py:285
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
 msgid "View"
@@ -3493,7 +3539,7 @@ msgstr "Просмотр"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:289
+#: rbac/tree.py:290
 msgid "Create"
 msgstr "Создать"
 
@@ -3646,7 +3692,7 @@ msgid "MFA"
 msgstr "МФА"
 
 #: audits/models.py:219 terminal/models/session/sharing.py:123
-#: xpack/plugins/cloud/manager.py:187 xpack/plugins/cloud/models.py:237
+#: xpack/plugins/cloud/manager.py:186 xpack/plugins/cloud/models.py:237
 msgid "Reason"
 msgstr "Причина"
 
@@ -3907,6 +3953,10 @@ msgstr ""
 msgid "Forgot password"
 msgstr "Забыли пароль"
 
+#: authentication/api/password.py:70 authentication/mfa/email.py:42
+msgid "The validity period of the verification code is {} minute"
+msgstr "Срок действия кода проверки составляет {} минут."
+
 #: authentication/apps.py:7
 msgid "App Authentication"
 msgstr "Управление аутентификацией"
@@ -3917,9 +3967,9 @@ msgid ""
 "system, and automatic user creation is disabled in the CAS authentication "
 "configuration. Login failed."
 msgstr ""
-"CAS вход выполнен успешно, но система не обнаружила локального пользователя,"
-" и функция автоматического создания пользователей в конфигурации CAS не "
-"активирована, вход не удался."
+"Вход через CAS выполнен успешно, но локальный пользователь не найден, и "
+"функция автоматического создания пользователя в настройках CAS не включена —"
+" вход не выполнен."
 
 #: authentication/backends/custom.py:60
 #: authentication/backends/oauth2/backends.py:158
@@ -4334,7 +4384,7 @@ msgid "Input secret"
 msgstr "Введите пароль"
 
 #: authentication/models/connection_token.py:47
-#: authentication/serializers/connect_token_secret.py:118
+#: authentication/serializers/connect_token_secret.py:126
 #: terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
@@ -4397,15 +4447,15 @@ msgstr "Нет пользователя или неверный пользова
 msgid "No asset or inactive asset"
 msgstr "Актив отсутствует или отключен"
 
-#: authentication/models/connection_token.py:348
+#: authentication/models/connection_token.py:360
 msgid "Can view super connection token secret"
 msgstr "Просмотр секрета супер-токена подключения"
 
-#: authentication/models/connection_token.py:350
+#: authentication/models/connection_token.py:362
 msgid "Super connection token"
 msgstr "Супер-токен для подключения"
 
-#: authentication/models/connection_token.py:367
+#: authentication/models/connection_token.py:379
 msgid "Admin connection token"
 msgstr "Токен подключения администратора"
 
@@ -4447,48 +4497,48 @@ msgstr "Напоминание о привязке OAuth"
 
 #: authentication/notifications.py:58
 msgid "OAuth name"
-msgstr "Имя OAuth"
+msgstr "Название OAuth"
 
 #: authentication/notifications.py:59
 msgid "OAuth ID"
-msgstr "Идентификатор OAuth"
+msgstr "OAuth ID"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
-msgstr "Уведомление о привязке"
+msgstr "уведомление о привязке"
 
-#: authentication/serializers/connect_token_secret.py:120
+#: authentication/serializers/connect_token_secret.py:128
 msgid "Is builtin"
 msgstr "Встроенный"
 
-#: authentication/serializers/connect_token_secret.py:124
+#: authentication/serializers/connect_token_secret.py:132
 msgid "Options"
 msgstr "Параметры"
 
-#: authentication/serializers/connect_token_secret.py:131
+#: authentication/serializers/connect_token_secret.py:139
 #: ops/notifications.py:19 rbac/tree.py:63
 msgid "Component"
 msgstr "Компоненты"
 
-#: authentication/serializers/connect_token_secret.py:140
+#: authentication/serializers/connect_token_secret.py:148
 msgid "Domain"
 msgstr "Зона"
 
-#: authentication/serializers/connect_token_secret.py:142
+#: authentication/serializers/connect_token_secret.py:151
 msgid "Expired now"
 msgstr "Истекает немедленно"
 
-#: authentication/serializers/connect_token_secret.py:175
+#: authentication/serializers/connect_token_secret.py:184
 #: terminal/models/virtualapp/virtualapp.py:25
 msgid "Image name"
 msgstr "Название образа"
 
-#: authentication/serializers/connect_token_secret.py:176
+#: authentication/serializers/connect_token_secret.py:185
 #: terminal/models/virtualapp/virtualapp.py:27
 msgid "Image port"
 msgstr "Порт образа"
 
-#: authentication/serializers/connect_token_secret.py:177
+#: authentication/serializers/connect_token_secret.py:186
 #: terminal/models/virtualapp/virtualapp.py:26
 msgid "Image protocol"
 msgstr "Протокол образа"
@@ -4569,7 +4619,7 @@ msgstr ""
 
 #: authentication/tasks.py:30
 msgid "Clean expired temporary, connection tokens"
-msgstr "Очистите просроченные временные пароли и токены подключения."
+msgstr "Очистка просроченных паролей и токенов"
 
 #: authentication/tasks.py:32
 msgid ""
@@ -4580,12 +4630,12 @@ msgid ""
 "configured under System settings > Security > User password > Token "
 "Retention Period"
 msgstr ""
-"Когда система подключается к активу или создает временный пароль, она "
-"генерирует соответствующий токен подключения или запись временного пароля. "
-"Для обеспечения безопасности системы и контроля объема хранимых данных "
-"система автоматически очищает все просроченные записи токенов в 2 часа ночи "
-"каждый день в соответствии с конфигурацией в разделе «Настройки безопасности"
-" > Безопасность паролей > Длительность хранения токенов»."
+"При подключении к активу или создании временного пароля система создает "
+"соответствующий токен подключения или запись временного пароля. Для "
+"обеспечения безопасности системы и контроля объема хранимых данных система "
+"автоматически очищает все просроченные записи токенов в 2 часа ночи каждый "
+"день в соответствии с настройкой в разделе «Настройки безопасности > "
+"Безопасность паролей > Длительность хранения токенов»."
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -4606,13 +4656,13 @@ msgid "Show"
 msgstr "Показать"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/terminal.py:24 users/const.py:42
+#: settings/serializers/terminal.py:24 users/const.py:48
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "Отключить"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: settings/serializers/terminal.py:24 users/const.py:43
+#: settings/serializers/terminal.py:24 users/const.py:49
 #: users/templates/users/mfa_setting.html:120
 #: users/templates/users/mfa_setting.html:158
 #: users/templates/users/mfa_setting.html:177
@@ -4676,16 +4726,11 @@ msgstr ""
 "Если вы подозреваете, что этот вход был подозрительным, пожалуйста, срочно "
 "измените пароль."
 
-#: authentication/templates/authentication/_msg_mfa_email_code.html:15
-#: authentication/templates/authentication/_msg_reset_password_code.html:18
-msgid "The validity period of the verification code is one minute"
-msgstr "Код подтверждения действителен в течение 1 минуты"
-
 #: authentication/templates/authentication/_msg_oauth_bind.html:6
 msgid "Your account has just been bound to"
 msgstr "Ваша учетная запись только что была привязана к"
 
-#: authentication/templates/authentication/_msg_oauth_bind.html:17
+#: authentication/templates/authentication/_msg_oauth_bind.html:15
 msgid "If the operation is not your own, unbind and change the password."
 msgstr ""
 "Если данное действие выполнено не вами, пожалуйста, отмените привязку и "
@@ -5051,7 +5096,7 @@ msgstr "Редакция Professional"
 msgid "Ultimate edition"
 msgstr "Редакция Ultimate"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:452
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:451
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s успешно создано"
@@ -5414,6 +5459,8 @@ msgstr "Недопустимый выбор: {}"
 msgid "Tags"
 msgstr "Теги"
 
+# msgid "Labels"
+# msgstr "标签管理"
 #: common/tasks.py:33
 msgid "Send email"
 msgstr "Отправка почты"
@@ -5435,11 +5482,11 @@ msgstr ""
 "        при изменении пароля учетной записи и создании вложений\n"
 "         с резервной копией учетной записи"
 
-#: common/tasks.py:107
+#: common/tasks.py:104
 msgid "Upload account backup to external storage"
 msgstr "Загрузка записей сеансов на внешнее хранилище"
 
-#: common/tasks.py:109
+#: common/tasks.py:106
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -6325,7 +6372,7 @@ msgstr "Удаление (SFTP)"
 
 #: perms/const.py:18
 msgid "Share (Web SSH, Web RDP, Web VNC)"
-msgstr "Делитесь (Web SSH, Web RDP, Web VNC)"
+msgstr "Поделиться (Web SSH, Web RDP, Web VNC)"
 
 #: perms/const.py:28
 msgid "Transfer"
@@ -6500,7 +6547,7 @@ msgstr "Просмотр консоли"
 
 #: rbac/models/menu.py:16
 msgid "Can view pam view"
-msgstr "Может отображаться PAM"
+msgstr "Просмотр раздела PAM"
 
 #: rbac/models/menu.py:17
 msgid "Can view audit view"
@@ -6524,27 +6571,27 @@ msgstr "Просмотр системных инструментов"
 
 #: rbac/models/menu.py:22
 msgid "Can view user login report"
-msgstr "Можно просматривать отчеты о входе пользователей"
+msgstr "Просмотр отчетов о входе пользователей"
 
 #: rbac/models/menu.py:23
 msgid "Can view user change password report"
-msgstr "Можно просматривать отчеты о смене пароля пользователей"
+msgstr "Просмотр отчетов о смене пароля пользователей"
 
 #: rbac/models/menu.py:24
 msgid "Can view asset statistics report"
-msgstr "Можно просматривать отчеты о статистике активов"
+msgstr "Просмотр отчетов по статистике активов"
 
 #: rbac/models/menu.py:25
 msgid "Can view asset activity report"
-msgstr "Можно просматривать отчеты о действиях с активами"
+msgstr "Просмотр отчетов о действиях с активами"
 
 #: rbac/models/menu.py:26
 msgid "Can view account statistics report"
-msgstr "Можно просматривать отчеты о статистике аккаунтов"
+msgstr "Просмотр отчетов по статистике УЗ"
 
 #: rbac/models/menu.py:27
 msgid "Can view account automation report"
-msgstr "Можно просматривать отчеты о автоматизации аккаунтов"
+msgstr "Просмотр отчетов об автоматизации УЗ"
 
 #: rbac/models/permission.py:18
 msgid "ContentType"
@@ -6647,7 +6694,7 @@ msgid "Storage"
 msgstr "Хранилище"
 
 #: rbac/tree.py:64 terminal/models/applet/applet.py:53
-#: terminal/models/applet/applet.py:371 terminal/models/applet/host.py:30
+#: terminal/models/applet/applet.py:379 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:16
 msgid "Applet"
 msgstr "Приложения"
@@ -6669,30 +6716,30 @@ msgstr "Аудит заданий"
 msgid "Report"
 msgstr "Отчёт"
 
-#: rbac/tree.py:181
+#: rbac/tree.py:182
 msgid "App organizations"
 msgstr "Управление организациями"
 
-#: rbac/tree.py:182
+#: rbac/tree.py:183
 msgid "Ticket comment"
 msgstr "Комментарии к заявке"
 
-#: rbac/tree.py:183 settings/serializers/feature.py:174
+#: rbac/tree.py:184 settings/serializers/feature.py:174
 #: settings/serializers/feature.py:176 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "Заявка"
 
-#: rbac/tree.py:184
+#: rbac/tree.py:185
 msgid "Common setting"
 msgstr "Общие настройки"
 
-#: rbac/tree.py:185
+#: rbac/tree.py:186
 msgid "View permission tree"
 msgstr "Просмотр дерева разрешений"
 
 #: reports/views.py:20
 msgid "User login report"
-msgstr "Отчет о входе пользователя"
+msgstr "Отчет о входах пользователей"
 
 #: reports/views.py:24
 msgid "User change password report"
@@ -6700,35 +6747,43 @@ msgstr "Отчет о смене пароля пользователя"
 
 #: reports/views.py:28
 msgid "Asset statistics report"
-msgstr "Отчет о статистике активов"
+msgstr "Отчет по статистике активов"
 
 #: reports/views.py:32
 msgid "Asset activity report"
-msgstr "Отчет о действиях с активами"
+msgstr "Отчет по действиям с активами"
 
 #: reports/views.py:36
 msgid "Account statistics report"
-msgstr "Отчет о статистике аккаунтов"
+msgstr "Отчет по статистике учётных записей"
 
 #: reports/views.py:40
 msgid "Account automation report"
-msgstr "Автоматизированный отчет по аккаунтам"
+msgstr "Отчет по автоматизации учётных записей"
 
 #: reports/views.py:44
 msgid "ConsoleDashboard"
-msgstr "Панель консоли"
+msgstr "Панель управления"
 
 #: reports/views.py:48
 msgid "AuditsDashboard"
-msgstr "Аудиторская панель"
+msgstr "Панель аудита"
 
 #: reports/views.py:52
 msgid "PamDashboard"
-msgstr "PAM панель"
+msgstr "Панель PAM"
 
 #: reports/views.py:56
 msgid "ChangeSecretDashboard"
-msgstr "Панель смены пароля учетной записи"
+msgstr "Панель смены пароля УЗ"
+
+#: reports/views.py:181
+msgid "Failed to send email: "
+msgstr "Не удалось отправить письмо"
+
+#: reports/views.py:182
+msgid "Email sent successfully to "
+msgstr "Успешно отправлено письмо."
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -6768,7 +6823,7 @@ msgstr "Настройки системы"
 
 #: settings/const.py:13
 msgid "Embed"
-msgstr ""
+msgstr "Встроенный"
 
 #: settings/models.py:42 users/models/preference.py:14
 msgid "Encrypted"
@@ -7120,8 +7175,8 @@ msgid ""
 "In strict mode, users not found in LDAP will be disabled during full or "
 "automatic sync"
 msgstr ""
-"При включении строгого режима полная или автоматическая синхронизация "
-"отключит пользователей в системе, которых нет в LDAP."
+"После включения строгого режима полная или автоматическая синхронизация "
+"будет отключать пользователей, не найденных в LDAP"
 
 #: settings/serializers/auth/ldap.py:94
 #: settings/serializers/auth/ldap_ha.py:76
@@ -7296,6 +7351,8 @@ msgid ""
 "The issuer URL of the OpenID Provider, used to discover its configuration "
 "via the `$PROVIDER_ENDPOINT/.well-known/openid-configuration` endpoint."
 msgstr ""
+"URL эмитента OpenID Provider, используемый для обнаружения его конфигурации "
+"через конечную точку `$PROVIDER_ENDPOINT/.well-known/openid-configuration`"
 
 #: settings/serializers/auth/oidc.py:87
 msgid "JWKS endpoint"
@@ -7674,7 +7731,7 @@ msgid "Tenant ID"
 msgstr "ID арендатора"
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:124
+#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:123
 #: xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "Регион"
@@ -7694,7 +7751,7 @@ msgstr "Чат AI"
 
 #: settings/serializers/feature.py:131
 msgid "Method"
-msgstr "Способ создания"
+msgstr "Метод"
 
 #: settings/serializers/feature.py:134 settings/serializers/feature.py:142
 #: settings/serializers/feature.py:157
@@ -7704,7 +7761,7 @@ msgstr "Адрес"
 #: settings/serializers/feature.py:135 settings/serializers/feature.py:143
 #: settings/serializers/feature.py:158
 msgid "The base URL of the Chat service."
-msgstr "Базовый адрес службы чата."
+msgstr "Базовый URL-адрес службы чата."
 
 #: settings/serializers/feature.py:146 settings/serializers/feature.py:161
 #: templates/_header_bar.html:96
@@ -7802,7 +7859,7 @@ msgstr "Сервер Microsoft Exchange"
 
 #: settings/serializers/msg.py:28
 msgid "Service"
-msgstr "Сервис"
+msgstr "Служба"
 
 #: settings/serializers/msg.py:34
 msgid "The user to be used for email server authentication"
@@ -7813,8 +7870,8 @@ msgid ""
 "Password to use for the email server. It is used in conjunction with "
 "`Account` when authenticating to the email server"
 msgstr ""
-"Пароль для почтового сервера. Он используется вместе с `аккаунтом` для "
-"аутентификации на почтовом сервере"
+"Пароль для почтового сервера. Он используется вместе с «Учетной записью» при"
+" аутентификации на почтовом сервере"
 
 #: settings/serializers/msg.py:42
 msgid "Sender"
@@ -7822,8 +7879,7 @@ msgstr "Отправитель"
 
 #: settings/serializers/msg.py:43
 msgid "Sender email address (default to using the `Account`)"
-msgstr ""
-"адрес электронной почты отправителя (по умолчанию используется `аккаунт`)."
+msgstr "Адрес электронной почты отправителя (по умолчанию - «Учетная запись»)"
 
 #: settings/serializers/msg.py:47
 msgid "The recipient is used for testing the email server's connectivity"
@@ -7917,15 +7973,15 @@ msgstr ""
 
 #: settings/serializers/security.py:28
 msgid "User expired tokens record keep days"
-msgstr "Срок хранения токенов пользователя истек"
+msgstr "Срок хранения просроченных токенов пользователя"
 
 #: settings/serializers/security.py:29
 msgid ""
 "Retention period (in days) for expired user tokens before automatic cleanup."
 msgstr ""
-"Количество дней, в течение которых система хранит записи о токенах "
-"пользователей с истекшим сроком действия, прежде чем окончательно удалить их"
-" в ежедневной задаче очистки."
+"Количество дней, в течение которых система хранит записи о пользовательских "
+"токенах с истекшим сроком действия, прежде чем окончательно удалить их при "
+"ежедневной очистке."
 
 #: settings/serializers/security.py:33
 msgid "Recent password count"
@@ -8537,7 +8593,7 @@ msgstr "Скачать шаблон для обновления"
 
 #: templates/_foot_js.html:30
 msgid "Page footer"
-msgstr ""
+msgstr "Нижний колонтитул"
 
 #: templates/_header_bar.html:12
 msgid "Help"
@@ -8643,19 +8699,19 @@ msgid ""
 "You are about to be redirected to an external website. Please confirm that "
 "you trust this link: "
 msgstr ""
-"Вы собираетесь перейти на внешний сайт, пожалуйста, убедитесь, что доверяете"
-" этой ссылке."
+"Вы собираетесь перейти на внешний сайт. Пожалуйста, убедитесь, что вы "
+"доверяете этой ссылке:"
 
 #: templates/resource_download.html:20 templates/resource_download.html:35
-#: users/const.py:78
+#: users/const.py:84
 msgid "Client"
 msgstr "Клиент"
 
 #: templates/resource_download.html:22
 msgid "JumpServer Client, currently used to launch the client"
 msgstr ""
-"JumpServer Клиент, в настоящее время используется для запуска определённых "
-"клиентских программ для соединения с активами."
+"Клиент JumpServer, используется для запуска программ для подключения к "
+"активам"
 
 #: templates/resource_download.html:35
 msgid "Microsoft"
@@ -8939,12 +8995,12 @@ msgstr "Поддерживается только пользовательска
 msgid "Missing type in platform.yml"
 msgstr "Отсутствует тип в platform.yml"
 
-#: terminal/models/applet/applet.py:373 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:381 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "Хост-машина"
 
-#: terminal/models/applet/applet.py:379
+#: terminal/models/applet/applet.py:387
 msgid "Applet Publication"
 msgstr "Публикация приложения"
 
@@ -9026,7 +9082,7 @@ msgstr "Порт Oracle"
 
 #: terminal/models/component/endpoint.py:26
 msgid "MongoDB port"
-msgstr "MongoDB порт"
+msgstr "Порт MongoDB"
 
 #: terminal/models/component/endpoint.py:27
 msgid "VNC port"
@@ -9094,7 +9150,7 @@ msgstr "Пользователь приложения"
 msgid "Can view terminal config"
 msgstr "Просмотр конфигурации терминала"
 
-#: terminal/models/session/command.py:76
+#: terminal/models/session/command.py:77
 msgid "Command record"
 msgstr "Запись команд"
 
@@ -9805,8 +9861,7 @@ msgstr "просмотр"
 msgid ""
 "We would like to inform you that a command alert has been triggered with the"
 " following details:"
-msgstr ""
-"Мы хотим уведомить вас об активации командного оповещения, детали следующие:"
+msgstr "Сообщаем, что сработало предупреждение о команде. Детали ниже:"
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
 msgid "Alert details"
@@ -9814,34 +9869,18 @@ msgstr "Подробности оповещения"
 
 #: terminal/templates/terminal/_msg_command_warning.html:25
 msgid "View session"
-msgstr ""
-"Пожалуйста, проверьте выполнение этой команды, чтобы убедиться, что она соответствует политике безопасности вашей организации. Если у вас нет разрешения на эту операцию или вы обнаружили какие-либо аномалии, немедленно примите необходимые меры.  \n"
-"Диаграмма процесса  \n"
-"Ссылка для сброса пароля  \n"
-"Токен для сброса пароля  \n"
-"Ссылка для восстановления пароля  \n"
-"Ссылка для входа  \n"
-"IP-адрес  \n"
-"Дата истечения пароля  \n"
-"Ссылка для обновления пароля  \n"
-"Крайний срок  \n"
-"Ссылка для сброса MFA  \n"
-"Есть открытый ключ"
+msgstr "Просмотр сессии"
 
 #: terminal/templates/terminal/_msg_command_warning.html:35
-#, fuzzy
-#| msgid ""
-#| "Please review the login activity to ensure the security and proper usage of "
-#| "the asset. If you did not authorize this login or if you notice any "
-#| "suspicious activity, please take the necessary actions immediately."
 msgid ""
 "Please review this command execution to ensure it complies with your "
 "organization’s security policies. If you did not authorize this action or "
 "notice anything unusual, please take the necessary actions immediately."
 msgstr ""
-"Пожалуйста, проверьте этот вход, чтобы обеспечить безопасность и правильное "
-"использование актива. Если вы не разрешали этот вход или заметили какую-либо"
-" подозрительную активность, немедленно примите необходимые меры."
+"Пожалуйста, проверьте выполнение этой команды, чтобы убедиться, что оно "
+"соответствует политикам безопасности вашей организации. Если вы не давали "
+"разрешение на это действие или заметили что-то необычное, примите "
+"необходимые меры немедленно."
 
 #: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
 msgid "Applicant"
@@ -10062,11 +10101,11 @@ msgstr "У вас новая заявка, заявитель - {}"
 msgid "{}: New Ticket - {} ({})"
 msgstr "{}: Новая заявка - {} ({})"
 
-#: tickets/notifications.py:160
+#: tickets/notifications.py:168
 msgid "Your ticket has been processed, processor - {}"
 msgstr "Ваша заявка была обработана, обработал - {}"
 
-#: tickets/notifications.py:164
+#: tickets/notifications.py:172
 msgid "Ticket has processed - {} ({})"
 msgstr "Заявка обработана - {} ({})"
 
@@ -10109,10 +10148,8 @@ msgid "Permission named `{}` already exists"
 msgstr "Разрешение с именем `{}` уже существует"
 
 #: tickets/serializers/ticket/ticket.py:22
-#, fuzzy
-#| msgid "Processor"
 msgid "Process map"
-msgstr "Исполнитель"
+msgstr "Схема процесса"
 
 #: tickets/serializers/ticket/ticket.py:91
 msgid "The ticket flow `{}` does not exist"
@@ -10229,23 +10266,31 @@ msgstr "Текущее окно"
 msgid "New window"
 msgstr "Новое окно"
 
-#: users/const.py:47
+#: users/const.py:43
+msgid "Dark gray"
+msgstr "Темно-серый"
+
+#: users/const.py:44
+msgid "Deep blue"
+msgstr "Темно-синий"
+
+#: users/const.py:53
 msgid "High（32 bit）"
 msgstr "Высокое (32 бита)"
 
-#: users/const.py:48
+#: users/const.py:54
 msgid "True Color（24 bit）"
-msgstr ""
+msgstr "True Color (24 бит)"
 
-#: users/const.py:49
+#: users/const.py:55
 msgid "Medium（16 bit）"
 msgstr "Среднее (16 бит)"
 
-#: users/const.py:82
+#: users/const.py:88
 msgid "Replace"
 msgstr "Заменить"
 
-#: users/const.py:83
+#: users/const.py:89
 msgid "Suffix"
 msgstr "Суффикс"
 
@@ -10354,6 +10399,8 @@ msgstr "WeChat"
 msgid "OTP secret key"
 msgstr "Секретный ключ OTP"
 
+# msgid "Private key"
+# msgstr "ssh私钥"
 #: users/models/user/__init__.py:101 users/serializers/profile.py:86
 #: users/serializers/user.py:256
 msgid "Is first login"
@@ -10400,22 +10447,16 @@ msgid "Force enabled"
 msgstr "Принудительное включение"
 
 #: users/notifications.py:23 users/notifications.py:68
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password url"
-msgstr "Сброс пароля"
+msgstr "Ссылка для сброса пароля"
 
 #: users/notifications.py:25 users/notifications.py:70
-#, fuzzy
-#| msgid "Reset password"
 msgid "Reset password token"
-msgstr "Сброс пароля"
+msgstr "Токен для сброса пароля"
 
 #: users/notifications.py:26 users/notifications.py:71
-#, fuzzy
-#| msgid "Forgot password"
 msgid "Forget password url"
-msgstr "Забыли пароль"
+msgstr "Ссылка для восстановления пароля"
 
 #: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
@@ -10426,20 +10467,16 @@ msgstr "Сброс пароля"
 
 #: users/notifications.py:73 users/notifications.py:188
 #: users/notifications.py:190
-#, fuzzy
-#| msgid "Login user"
 msgid "Login url"
-msgstr "Пользователь входа"
+msgstr "Ссылка для входа"
 
 #: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "Успешный сброс пароля"
 
 #: users/notifications.py:107 users/notifications.py:146
-#, fuzzy
-#| msgid "Invalid address"
 msgid "IP address"
-msgstr "Недопустимый адрес"
+msgstr "IP-адрес"
 
 #: users/notifications.py:142
 msgid "Reset public key success"
@@ -10450,26 +10487,20 @@ msgid "Password is about expire"
 msgstr "Пароль скоро истечет"
 
 #: users/notifications.py:185
-#, fuzzy
-#| msgid "User password expiration (day)"
 msgid "Password expiration date"
-msgstr "Срок действия пароля пользователя (дни)"
+msgstr "Дата истечения пароля"
 
 #: users/notifications.py:186
-#, fuzzy
-#| msgid "Repeated password"
 msgid "Update password url"
-msgstr "Повторяющийся пароль"
+msgstr "Ссылка для обновления пароля"
 
 #: users/notifications.py:221
 msgid "Account is about expire"
 msgstr "Аккаунт скоро истечет"
 
 #: users/notifications.py:225
-#, fuzzy
-#| msgid "Create date"
 msgid "Expiration date"
-msgstr "Дата создания"
+msgstr "Срок действия"
 
 #: users/notifications.py:249
 msgid "Reset SSH Key"
@@ -10477,25 +10508,23 @@ msgstr "Сброс SSH ключа"
 
 #: users/notifications.py:253
 msgid "Update SSH Key url"
-msgstr ""
+msgstr "Ссылка для обновления SSH-ключа"
 
 #: users/notifications.py:276
 msgid "Reset MFA"
 msgstr "Сброс МФА"
 
 #: users/notifications.py:280
-#, fuzzy
-#| msgid "Reset MFA"
 msgid "Reset MFA url"
-msgstr "Сброс МФА"
+msgstr "Ссылка для сброса МФА"
 
 #: users/serializers/preference/koko.py:10
-#: users/serializers/preference/luna.py:63
+#: users/serializers/preference/luna.py:67
 msgid "File name conflict resolution"
 msgstr "Разрешение конфликтов имен файлов"
 
 #: users/serializers/preference/koko.py:14
-#: users/serializers/preference/luna.py:80
+#: users/serializers/preference/luna.py:84
 msgid "Terminal theme name"
 msgstr "Название темы терминала"
 
@@ -10530,27 +10559,35 @@ msgstr "Асинхронная загрузка дерева активов"
 msgid "Connect default open method"
 msgstr "Подключить с настройками по умолчанию"
 
-#: users/serializers/preference/luna.py:37
+#: users/serializers/preference/luna.py:34
+#: xpack/plugins/interface/models.py:41
+#: xpack/plugins/interface/serializers/interface.py:26
+msgid "Theme"
+msgstr "Тема"
+
+#: users/serializers/preference/luna.py:41
 msgid "RDP resolution"
 msgstr "Разрешение RDP"
 
-#: users/serializers/preference/luna.py:41
+#: users/serializers/preference/luna.py:45
 msgid "Keyboard layout"
 msgstr "Раскладка клавиатуры"
 
-#: users/serializers/preference/luna.py:45
+#: users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "Опции клиента RDP"
 
-#: users/serializers/preference/luna.py:49
+#: users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "Качество цвета RDP"
 
-#: users/serializers/preference/luna.py:53
+#: users/serializers/preference/luna.py:57
 msgid "RDP smart size"
 msgstr "Умный размер RDP"
 
-#: users/serializers/preference/luna.py:54
+# msgid "Rdp smart size"
+# msgstr "RDP 智能大小"
+#: users/serializers/preference/luna.py:58
 msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
@@ -10560,27 +10597,27 @@ msgstr ""
 "содержимое на удалённом устройстве, чтобы оно соответствовало размеру окна "
 "клиентского устройства?"
 
-#: users/serializers/preference/luna.py:59
+#: users/serializers/preference/luna.py:63
 msgid "Remote app connect method"
 msgstr "Метод подключения к удалённому приложению"
 
-#: users/serializers/preference/luna.py:70
+#: users/serializers/preference/luna.py:74
 msgid "Terminal font size"
 msgstr "Размер шрифта в терминале"
 
-#: users/serializers/preference/luna.py:73
+#: users/serializers/preference/luna.py:77
 msgid "Backspace as Ctrl+H"
 msgstr "Backspace как Ctrl+H"
 
-#: users/serializers/preference/luna.py:76
+#: users/serializers/preference/luna.py:80
 msgid "Right click quickly paste"
 msgstr "Быстрая вставка правой кнопкой мыши"
 
-#: users/serializers/preference/luna.py:86
+#: users/serializers/preference/luna.py:90
 msgid "Graphics"
 msgstr "Графический интерфейс"
 
-#: users/serializers/preference/luna.py:87
+#: users/serializers/preference/luna.py:91
 msgid "Command line"
 msgstr "Командная строка"
 
@@ -10708,10 +10745,8 @@ msgid "Multi-Factor Authentication"
 msgstr "Многофакторная аутентификация"
 
 #: users/serializers/user.py:398
-#, fuzzy
-#| msgid "ssh public key"
 msgid "Has public keys"
-msgstr "открытый ключ ssh"
+msgstr "Есть открытый ключ"
 
 #: users/serializers/user.py:426
 msgid ""
@@ -11292,17 +11327,17 @@ msgstr "Выполнение задачи завершено"
 msgid "Synchronization regions"
 msgstr "Синхронизируемые регионы"
 
-#: xpack/plugins/cloud/manager.py:141
+#: xpack/plugins/cloud/manager.py:140
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Произошла ошибка при получении экземпляров региона \"%s\", ошибка: %s"
 
-#: xpack/plugins/cloud/manager.py:186
+#: xpack/plugins/cloud/manager.py:185
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "Не удалось синхронизировать экземпляр %s"
 
-#: xpack/plugins/cloud/manager.py:377
+#: xpack/plugins/cloud/manager.py:376
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
@@ -11311,47 +11346,47 @@ msgstr ""
 "Обновлённая платформа актива \"%s\" не совпадает с исходным типом платформы."
 " Пропущено обновление платформы и протокола"
 
-#: xpack/plugins/cloud/manager.py:434
+#: xpack/plugins/cloud/manager.py:433
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "Актив \"%s\" уже существует"
 
-#: xpack/plugins/cloud/manager.py:436
+#: xpack/plugins/cloud/manager.py:435
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "Обновление актива \"%s\""
 
-#: xpack/plugins/cloud/manager.py:439
+#: xpack/plugins/cloud/manager.py:438
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "Актив \"%s\" обновлен"
 
-#: xpack/plugins/cloud/manager.py:448
+#: xpack/plugins/cloud/manager.py:447
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "Подготовка к созданию актива %s"
 
-#: xpack/plugins/cloud/manager.py:469
+#: xpack/plugins/cloud/manager.py:468
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "Задать папки \"%s\""
 
-#: xpack/plugins/cloud/manager.py:495
+#: xpack/plugins/cloud/manager.py:494
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "Настройка учетных записей: %s"
 
-#: xpack/plugins/cloud/manager.py:511
+#: xpack/plugins/cloud/manager.py:510
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "Настройка протоколов \"%s\""
 
-#: xpack/plugins/cloud/manager.py:519
+#: xpack/plugins/cloud/manager.py:518
 #, python-format
 msgid "Set labels \"%s\""
 msgstr "Настройка тегов \"%s\""
 
-#: xpack/plugins/cloud/manager.py:533 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:532 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr "Выполнение задачи синхронизации экземпляров"
 
@@ -11889,11 +11924,6 @@ msgstr "Логотип страницы"
 msgid "Logout logo"
 msgstr "Иконка выхода"
 
-#: xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
-msgid "Theme"
-msgstr "Тема"
-
 #: xpack/plugins/interface/models.py:42
 msgid "Footer content"
 msgstr "Содержимое нижнего колонтитула"
@@ -11913,20 +11943,3 @@ msgstr "Лицензия успешно импортирована"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Лицензия недействительна"
-
-#~ msgid "Task execution id"
-#~ msgstr "ID выполнения задачи"
-
-#~ msgid "Respectful"
-#~ msgstr "Уважаемый"
-
-#~ msgid ""
-#~ "Hello! The following is the failure of changing the password of your assets "
-#~ "or pushing the account. Please check and handle it in time."
-#~ msgstr ""
-#~ "Здравствуйте! Ниже приведены случаи, когда не удалось выполнить смену пароля"
-#~ " активов или публикацию учётной записи. Пожалуйста, проверьте их и примите "
-#~ "меры своевременно."
-
-#~ msgid "EXCHANGE"
-#~ msgstr "EXCHANGE"

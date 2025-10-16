@@ -30,6 +30,12 @@ params:
     default: ''
     help_text: "{{ 'Params home help text' | trans }}"
 
+  - name: group
+    type: str
+    label: "{{ 'Params group label' | trans }}"
+    default: ''
+    help_text: "{{ 'Params group help text' | trans }}"
+
   - name: groups
     type: str
     label: "{{ 'Params groups label' | trans }}"
@@ -63,6 +69,11 @@ i18n:
     ja: 'デフォルトのホームディレクトリ /home/{アカウントユーザ名}'
     en: 'Default home directory /home/{account username}'
 
+  Params group help text:
+    zh: '请输入用户组（名字或数字），只能输入一个（需填写已存在的用户组）'
+    ja: 'ユーザー グループ (名前または番号) を入力してください。入力できるのは 1 つだけです (既存のユーザー グループを入力する必要があります)'
+    en: 'Please enter a user group (name or number), only one can be entered (must fill in an existing user group)'
+
   Params groups help text:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
@@ -87,6 +98,11 @@ i18n:
     zh: '用户组'
     ja: 'グループ'
     en: 'Groups'
+
+  Params group label:
+    zh: '主组'
+    ja: '主组'
+    en: 'Main group'
 
   Params uid label:
     zh: '用户ID'

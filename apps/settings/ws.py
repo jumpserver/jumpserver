@@ -150,7 +150,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
             await self.send_msg(msg='Exception: %s' % error)
 
     def run_func(self, func_name, data):
-        with translation.override(getattr(self.scope['user'], 'lang', settings.LANGUAGE_CODE)):
+        with translation.override(getattr(self.scope['user'], 'lang') or settings.LANGUAGE_CODE):
             return getattr(self, func_name)(data)
 
     async def send_msg(self, ok=True, msg=''):
