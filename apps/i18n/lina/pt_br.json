@@ -449,6 +449,7 @@
     "DangerousCommandNum": "Número de Comandos Perigosos",
     "Dashboard": "Painel ",
     "DataMasking": "Desensibilização de dados",
+    "DataMaskingFieldsPatternHelpTip": "Suporta múltiplos nomes de campo, separados por vírgula, e aceita caracteres coringa *\nPor exemplo:\nNome de campo único: password indica que apenas o campo password será desensibilizado.\nMúltiplos nomes de campo: password, secret indica que os campos password e secret serão desensibilizados.\nCaractere coringa *: password* indica que todos os campos que contêm o prefixo password serão desensibilizados.\nCaractere coringa *: .*password indica que todos os campos que contêm o sufixo password serão desensibilizados.",
     "DataMaskingRuleHelpHelpMsg": "Ao conectar ao banco de dados de ativos, é possível aplicar esta regra para desensibilizar os resultados da consulta.",
     "DataMaskingRuleHelpHelpText": "Ao conectar-se ao ativo do banco de dados, é possível aplicar esta regra para mascarar os resultados da consulta.",
     "Database": "Banco de dados",

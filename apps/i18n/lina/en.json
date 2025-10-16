@@ -449,6 +449,7 @@
     "DangerousCommandNum": "Total dangerous commands",
     "Dashboard": "Dashboard",
     "DataMasking": "DataMasking",
+    "DataMaskingFieldsPatternHelpTip": "Supports multiple field names separated by commas, and supports wildcard *\n For example:\nSingle field name: password — only masks the\"password\" field\nMultiple field names: password,secret — masks both\"password\" and\"secret\" fields\nWildcard : password — masks fields whose names start with\"password\"\nWildcard *: .*password — masks fields whose names end with\"password\"\n",
     "DataMaskingRuleHelpHelpMsg": "When connecting to database assets, you can anonymize query results based on this rule.",
     "DataMaskingRuleHelpHelpText": "When connecting to database assets, you can anonymize query results based on this rule.",
     "Database": "Database",
@@ -1039,6 +1040,7 @@
     "PrivilegedOnly": "Privileged only",
     "PrivilegedTemplate": "Privileged",
     "Processing": "Processing",
+    "ProcessingMessage": "Processing, please wait...",
     "Product": "Product",
     "ProfileSetting": "Profile info",
     "Project": "Project name",
@@ -1625,7 +1627,5 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name",
-    "ProcessingMessage": "Processing, please wait...",
-    "DataMaskingFieldsPatternHelpTip": "Supports multiple field names separated by commas, and supports wildcard *\n For example:\nSingle field name: password — only masks the\"password\" field\nMultiple field names: password,secret — masks both\"password\" and\"secret\" fields\nWildcard : password — masks fields whose names start with\"password\"\nWildcard *: .*password — masks fields whose names end with\"password\"\n"
+    "userName": "User name"
 }

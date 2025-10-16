@@ -453,6 +453,7 @@
     "Dashboard": "ダッシュボード",
     "DataLastUsed": "さいごしようび",
     "DataMasking": "データマスキング",
+    "DataMaskingFieldsPatternHelpTip": "複数のフィールド名をサポートし、カンマで区切ります。ワイルドカード*もサポートしています。\n例えば:\n単一フィールド名: password は password フィールドのみマスキングします。\n複数フィールド名: password, secret は password と secret フィールドの両方をマスキングします。\nワイルドカード*: password* は、password プレフィックスを含むフィールド名をマスキングします。\nワイルドカード*: .*password は、password サフィックスを含むフィールド名をマスキングします。",
     "DataMaskingRuleHelpHelpMsg": "データベース資産に接続する際、これに基づいてクエリ結果をマスキングすることができます。",
     "DataMaskingRuleHelpHelpText": "データベース資産に接続する際は、このルールに従ってクエリ結果をマスキングできます。",
     "Database": "データベース",

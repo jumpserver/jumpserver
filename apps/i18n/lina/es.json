@@ -448,6 +448,7 @@
     "DangerousCommandNum": "Número de comandos peligrosos",
     "Dashboard": "panel de control",
     "DataMasking": "Desensibilización de datos",
+    "DataMaskingFieldsPatternHelpTip": "Soporte para múltiples nombres de campo, separados por comas, con soporte para comodines *\nPor ejemplo:\nNombre de campo único: password indica que solo se desensibiliza el campo password.\nMúltiples nombres de campo: password,secret indica que se desensibilizan los campos password y secret.\nComodín*: password* indica que se desensibilizan los campos que contienen el prefijo password.\nComodín*: .*password indica que se desensibilizan los campos que contienen el sufijo password.",
     "DataMaskingRuleHelpHelpMsg": "Al conectar con la base de datos de activos, se puede aplicar esta regla para desensibilizar los resultados de la consulta.",
     "DataMaskingRuleHelpHelpText": "Al conectar activos de la base de datos, se puede llevar a cabo la desensibilización de los resultados de la consulta según esta regla.",
     "Database": "Base de datos",
