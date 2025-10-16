@@ -448,6 +448,7 @@
     "DangerousCommandNum": "Số lệnh nguy hiểm",
     "Dashboard": "Bảng điều khiển",
     "DataMasking": "Dữ liệu ẩn danh",
+    "DataMaskingFieldsPatternHelpTip": "Hỗ trợ nhiều tên trường, phân tách bằng dấu phẩy, hỗ trợ ký tự đại diện *\nVí dụ:\nTên trường đơn: password biểu thị chỉ làm mờ trường password\nNhiều tên trường: password,secret biểu thị làm mờ cả trường password và secret\nKý tự đại diện *: password* biểu thị làm mờ các trường có tiền tố là password\nKý tự đại diện *: .*password biểu thị làm mờ các trường có hậu tố là password",
     "DataMaskingRuleHelpHelpMsg": "Khi kết nối với cơ sở dữ liệu tài sản, có thể áp dụng quy tắc này để làm mờ kết quả truy vấn.",
     "DataMaskingRuleHelpHelpText": "Khi kết nối tài sản cơ sở dữ liệu, có thể tiến hành làm mờ kết quả truy vấn theo quy tắc này.",
     "Database": "Cơ sở dữ liệu",

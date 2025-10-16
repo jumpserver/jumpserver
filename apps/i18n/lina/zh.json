@@ -448,6 +448,7 @@
     "DangerousCommandNum": "危险命令数",
     "Dashboard": "仪表盘",
     "DataMasking": "数据脱敏",
+    "DataMaskingFieldsPatternHelpTip": "支持多个字段名，逗号分隔，支持通配符*\n 例如: \n单字段名: password 表示只脱敏 password 字段\n多个字段名: password,secret 表示脱敏 password 和 secret 字段\n通配符*: password* 表示脱敏字段名中包含 password 前缀的字段\n通配符*: .*password 表示脱敏字段名中包含 password 后缀的字段\n",
     "DataMaskingRuleHelpHelpMsg": "连接数据库资产时，可以根据此规则对查询结果进行脱敏",
     "DataMaskingRuleHelpHelpText": "连接数据库资产时，可以根据此规则对查询结果进行脱敏",
     "Database": "数据库",
@@ -1044,6 +1045,7 @@
     "PrivilegedOnly": "仅特权账号",
     "PrivilegedTemplate": "特权的",
     "Processing": "处理中",
+    "ProcessingMessage": "任务进行中，请稍候 ⏳",
     "Product": "产品",
     "ProfileSetting": "个人信息设置",
     "Project": "项目名",
@@ -1635,7 +1637,5 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名",
-    "ProcessingMessage": "任务进行中，请稍候 ⏳",
-    "DataMaskingFieldsPatternHelpTip": "支持多个字段名，逗号分隔，支持通配符*\n 例如: \n单字段名: password 表示只脱敏 password 字段\n多个字段名: password,secret 表示脱敏 password 和 secret 字段\n通配符*: password* 表示脱敏字段名中包含 password 前缀的字段\n通配符*: .*password 表示脱敏字段名中包含 password 后缀的字段\n"
+    "userName": "用户名"
 }

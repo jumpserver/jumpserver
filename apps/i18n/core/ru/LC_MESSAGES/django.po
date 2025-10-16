@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-10 16:58+0800\n"
+"POT-Creation-Date: 2025-10-16 14:10+0800\n"
 "PO-Revision-Date: 2025-09-26 11:16\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Russian\n"
@@ -213,7 +213,7 @@ msgstr "Шаблон"
 msgid "Skip"
 msgstr "Пропустить"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:291
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:292
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "Обновить"
@@ -329,8 +329,8 @@ msgstr "Только создать"
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:62 users/forms/profile.py:101
 #: users/forms/profile.py:111 users/models/user/__init__.py:67
-#: users/notifications.py:21 users/notifications.py:66
-#: users/notifications.py:188 users/templates/users/forgot_password.html:162
+#: users/notifications.py:22 users/notifications.py:67
+#: users/notifications.py:189 users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
 msgstr "Электронная почта"
@@ -610,10 +610,10 @@ msgstr "Просмотр активности аккаунта"
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:66
-#: users/notifications.py:20 users/notifications.py:105
-#: users/notifications.py:144 users/notifications.py:183
-#: users/notifications.py:223 users/notifications.py:251
-#: users/notifications.py:278 xpack/plugins/cloud/models.py:35
+#: users/notifications.py:21 users/notifications.py:106
+#: users/notifications.py:145 users/notifications.py:184
+#: users/notifications.py:224 users/notifications.py:252
+#: users/notifications.py:279 xpack/plugins/cloud/models.py:35
 #: xpack/plugins/cloud/models.py:316
 #: xpack/plugins/cloud/serializers/task.py:77
 msgid "Name"
@@ -905,7 +905,7 @@ msgstr "Повторяющийся пароль"
 #: authentication/templates/authentication/login.html:414
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
 #: users/forms/profile.py:117 users/models/user/__init__.py:65
-#: users/notifications.py:19 users/serializers/profile.py:190
+#: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
 msgid "Username"
@@ -1923,7 +1923,7 @@ msgstr "Регулярное выражение"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:189 settings/serializers/feature.py:24
-#: settings/serializers/msg.py:79 users/notifications.py:18
+#: settings/serializers/msg.py:79 users/notifications.py:19
 #: xpack/plugins/license/models.py:31
 msgid "Content"
 msgstr "Содержание"
@@ -1984,7 +1984,7 @@ msgstr "Сохранить суффикс"
 msgid "Fields pattern"
 msgstr "Скрыть имя столбца"
 
-#: acls/models/data_masking.py:27 acls/serializers/data_masking.py:13
+#: acls/models/data_masking.py:27 acls/serializers/data_masking.py:14
 msgid "Masking Method"
 msgstr "Метод маскировки"
 
@@ -3505,7 +3505,7 @@ msgstr "Удалить каталог"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:292
+#: rbac/tree.py:293
 msgid "Delete"
 msgstr "Удалить"
 
@@ -3531,7 +3531,7 @@ msgstr "Скачать"
 msgid "Rename dir"
 msgstr "Сопоставление каталога"
 
-#: audits/const.py:23 rbac/tree.py:290 terminal/api/session/session.py:285
+#: audits/const.py:23 rbac/tree.py:291 terminal/api/session/session.py:285
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
 msgid "View"
@@ -3539,7 +3539,7 @@ msgstr "Просмотр"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:289
+#: rbac/tree.py:290
 msgid "Create"
 msgstr "Создать"
 
@@ -3692,7 +3692,7 @@ msgid "MFA"
 msgstr "МФА"
 
 #: audits/models.py:219 terminal/models/session/sharing.py:123
-#: xpack/plugins/cloud/manager.py:187 xpack/plugins/cloud/models.py:237
+#: xpack/plugins/cloud/manager.py:186 xpack/plugins/cloud/models.py:237
 msgid "Reason"
 msgstr "Причина"
 
@@ -4780,7 +4780,7 @@ msgstr "Ваш пароль только что успешно обновлён"
 
 #: authentication/templates/authentication/_msg_rest_password_success.html:9
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:9
-#: users/notifications.py:107 users/notifications.py:146
+#: users/notifications.py:108 users/notifications.py:147
 msgid "Browser"
 msgstr "Браузер"
 
@@ -5096,7 +5096,7 @@ msgstr "Редакция Professional"
 msgid "Ultimate edition"
 msgstr "Редакция Ultimate"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:452
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:451
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s успешно создано"
@@ -6716,24 +6716,24 @@ msgstr "Аудит заданий"
 msgid "Report"
 msgstr "Отчёт"
 
-#: rbac/tree.py:181
+#: rbac/tree.py:182
 msgid "App organizations"
 msgstr "Управление организациями"
 
-#: rbac/tree.py:182
+#: rbac/tree.py:183
 msgid "Ticket comment"
 msgstr "Комментарии к заявке"
 
-#: rbac/tree.py:183 settings/serializers/feature.py:174
+#: rbac/tree.py:184 settings/serializers/feature.py:174
 #: settings/serializers/feature.py:176 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "Заявка"
 
-#: rbac/tree.py:184
+#: rbac/tree.py:185
 msgid "Common setting"
 msgstr "Общие настройки"
 
-#: rbac/tree.py:185
+#: rbac/tree.py:186
 msgid "View permission tree"
 msgstr "Просмотр дерева разрешений"
 
@@ -6776,6 +6776,14 @@ msgstr "Панель PAM"
 #: reports/views.py:56
 msgid "ChangeSecretDashboard"
 msgstr "Панель смены пароля УЗ"
+
+#: reports/views.py:181
+msgid "Failed to send email: "
+msgstr "Не удалось отправить письмо"
+
+#: reports/views.py:182
+msgid "Email sent successfully to "
+msgstr "Успешно отправлено письмо."
 
 #: settings/api/chat.py:41
 msgid "Chat AI is not enabled"
@@ -7723,7 +7731,7 @@ msgid "Tenant ID"
 msgstr "ID арендатора"
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:124
+#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:123
 #: xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "Регион"
@@ -7912,7 +7920,7 @@ msgstr ""
 "Подсказка: тема письма, отправляемого при создании пользователя для "
 "установки пароля (например: Пользователь успешно создан)"
 
-#: settings/serializers/msg.py:74 users/notifications.py:17
+#: settings/serializers/msg.py:74 users/notifications.py:18
 msgid "Honorific"
 msgstr "Приветствие в письме"
 
@@ -9142,7 +9150,7 @@ msgstr "Пользователь приложения"
 msgid "Can view terminal config"
 msgstr "Просмотр конфигурации терминала"
 
-#: terminal/models/session/command.py:76
+#: terminal/models/session/command.py:77
 msgid "Command record"
 msgstr "Запись команд"
 
@@ -10438,75 +10446,75 @@ msgstr "История паролей пользователя"
 msgid "Force enabled"
 msgstr "Принудительное включение"
 
-#: users/notifications.py:22 users/notifications.py:67
+#: users/notifications.py:23 users/notifications.py:68
 msgid "Reset password url"
 msgstr "Ссылка для сброса пароля"
 
-#: users/notifications.py:24 users/notifications.py:69
+#: users/notifications.py:25 users/notifications.py:70
 msgid "Reset password token"
 msgstr "Токен для сброса пароля"
 
-#: users/notifications.py:25 users/notifications.py:70
+#: users/notifications.py:26 users/notifications.py:71
 msgid "Forget password url"
 msgstr "Ссылка для восстановления пароля"
 
-#: users/notifications.py:63
+#: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr "Сброс пароля"
 
-#: users/notifications.py:72 users/notifications.py:187
-#: users/notifications.py:189
+#: users/notifications.py:73 users/notifications.py:188
+#: users/notifications.py:190
 msgid "Login url"
 msgstr "Ссылка для входа"
 
-#: users/notifications.py:102 users/views/profile/reset.py:238
+#: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr "Успешный сброс пароля"
 
-#: users/notifications.py:106 users/notifications.py:145
+#: users/notifications.py:107 users/notifications.py:146
 msgid "IP address"
 msgstr "IP-адрес"
 
-#: users/notifications.py:141
+#: users/notifications.py:142
 msgid "Reset public key success"
 msgstr "Успешный сброс открытого ключа"
 
-#: users/notifications.py:180
+#: users/notifications.py:181
 msgid "Password is about expire"
 msgstr "Пароль скоро истечет"
 
-#: users/notifications.py:184
+#: users/notifications.py:185
 msgid "Password expiration date"
 msgstr "Дата истечения пароля"
 
-#: users/notifications.py:185
+#: users/notifications.py:186
 msgid "Update password url"
 msgstr "Ссылка для обновления пароля"
 
-#: users/notifications.py:220
+#: users/notifications.py:221
 msgid "Account is about expire"
 msgstr "Аккаунт скоро истечет"
 
-#: users/notifications.py:224
+#: users/notifications.py:225
 msgid "Expiration date"
 msgstr "Срок действия"
 
-#: users/notifications.py:248
+#: users/notifications.py:249
 msgid "Reset SSH Key"
 msgstr "Сброс SSH ключа"
 
-#: users/notifications.py:252
+#: users/notifications.py:253
 msgid "Update SSH Key url"
 msgstr "Ссылка для обновления SSH-ключа"
 
-#: users/notifications.py:275
+#: users/notifications.py:276
 msgid "Reset MFA"
 msgstr "Сброс МФА"
 
-#: users/notifications.py:279
+#: users/notifications.py:280
 msgid "Reset MFA url"
 msgstr "Ссылка для сброса МФА"
 
@@ -11319,17 +11327,17 @@ msgstr "Выполнение задачи завершено"
 msgid "Synchronization regions"
 msgstr "Синхронизируемые регионы"
 
-#: xpack/plugins/cloud/manager.py:141
+#: xpack/plugins/cloud/manager.py:140
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Произошла ошибка при получении экземпляров региона \"%s\", ошибка: %s"
 
-#: xpack/plugins/cloud/manager.py:186
+#: xpack/plugins/cloud/manager.py:185
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "Не удалось синхронизировать экземпляр %s"
 
-#: xpack/plugins/cloud/manager.py:377
+#: xpack/plugins/cloud/manager.py:376
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
@@ -11338,47 +11346,47 @@ msgstr ""
 "Обновлённая платформа актива \"%s\" не совпадает с исходным типом платформы."
 " Пропущено обновление платформы и протокола"
 
-#: xpack/plugins/cloud/manager.py:434
+#: xpack/plugins/cloud/manager.py:433
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "Актив \"%s\" уже существует"
 
-#: xpack/plugins/cloud/manager.py:436
+#: xpack/plugins/cloud/manager.py:435
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "Обновление актива \"%s\""
 
-#: xpack/plugins/cloud/manager.py:439
+#: xpack/plugins/cloud/manager.py:438
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "Актив \"%s\" обновлен"
 
-#: xpack/plugins/cloud/manager.py:448
+#: xpack/plugins/cloud/manager.py:447
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "Подготовка к созданию актива %s"
 
-#: xpack/plugins/cloud/manager.py:469
+#: xpack/plugins/cloud/manager.py:468
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "Задать папки \"%s\""
 
-#: xpack/plugins/cloud/manager.py:495
+#: xpack/plugins/cloud/manager.py:494
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "Настройка учетных записей: %s"
 
-#: xpack/plugins/cloud/manager.py:511
+#: xpack/plugins/cloud/manager.py:510
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "Настройка протоколов \"%s\""
 
-#: xpack/plugins/cloud/manager.py:519
+#: xpack/plugins/cloud/manager.py:518
 #, python-format
 msgid "Set labels \"%s\""
 msgstr "Настройка тегов \"%s\""
 
-#: xpack/plugins/cloud/manager.py:533 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:532 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr "Выполнение задачи синхронизации экземпляров"
 
