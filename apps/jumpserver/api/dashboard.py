@@ -50,7 +50,7 @@ class DateTimeMixin:
 
     @lazyproperty
     def date_start_end(self):
-        return self.days_to_datetime.date(), local_now().date() + timezone.timedelta(days=1)
+        return self.days_to_datetime, local_now()
 
     @lazyproperty
     def dates_list(self):
