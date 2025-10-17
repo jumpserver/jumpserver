@@ -152,7 +152,7 @@ class UploadFileRunner:
             host_pattern="*",
             inventory=self.inventory,
             module='copy',
-            module_args=f"src={self.src_paths}/ dest={self.dest_path}",
+            module_args=f"src={self.src_paths}/ dest={self.dest_path}/",
             verbosity=verbosity,
             event_handler=self.cb.event_handler,
             status_handler=self.cb.status_handler,
