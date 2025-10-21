@@ -362,6 +362,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         self.validate_serializer(serializer)
         return super().perform_create(serializer)
 
+
     def _insert_connect_options(self, data, user):
         connect_options = data.pop('connect_options', {})
         default_name_opts = {
@@ -564,7 +565,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken',
+        'list': 'authentication.view_superconnectiontoken',
         'check': 'authentication.view_superconnectiontoken',
+        'retrieve': 'authentication.view_superconnectiontoken',
         'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
@@ -572,7 +575,12 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     }
 
     def get_queryset(self):
-        return ConnectionToken.objects.all()
+        return ConnectionToken.objects.none()
+
+    def get_object(self):
+        pk = self.kwargs.get(self.lookup_field)
+        token = get_object_or_404(ConnectionToken, pk=pk)
+        return token
 
     def get_user(self, serializer):
         return serializer.validated_data.get('user')
