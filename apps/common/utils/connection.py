@@ -9,8 +9,8 @@ from common.utils import get_logger
 
 logger = get_logger(__name__)
 
-# 新增：按 db 复用的共享 PubSub 管理器
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 _PUBSUB_HUBS = {}
 
@@ -24,19 +24,19 @@ def _get_pubsub_hub(db=10):
 
 
 class PubSubHub:
-    """
-    管理单个 Redis db 下的共享 pubsub、监听线程及 channel→handler 映射（每个 channel 仅一个 handler）
-    """
 
     def __init__(self, db=10):
         self.db = db
         self.redis = get_redis_client(db)
         self.pubsub = self.redis.pubsub()
-        # 改为单 handler：ch -> (next, error, complete) 或 None
         self.handlers = {}
         self.lock = threading.RLock()
         self.listener = None
         self.running = False
+        self.executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix='pubsub_handler')
+
+    def __del__(self):
+        self.executor.shutdown(wait=True)
 
     def start(self):
         with self.lock:
@@ -66,14 +66,10 @@ class PubSubHub:
                             item = data
                     except Exception:
                         item = data
-                    # 每条消息起一个短生命周期线程处理该 channel 的唯一 handler
-                    t = threading.Thread(
-                        name=f'{ch}_handle',
-                        target=self._dispatch,
-                        args=(ch, msg, item),
-                        daemon=True
-                    )
-                    t.start()
+                    # 使用线程池处理消息
+                    future = self.executor.submit(self._dispatch, ch, msg, item)
+                    future.add_done_callback(
+                        lambda f: f.exception() and logger.error(f"handle pubsub msg {msg} failed: {f.exception()}"))
                 backoff = 1
             except Exception as e:
                 logger.error(f'PubSub listen error: {e}')
@@ -105,7 +101,6 @@ class PubSubHub:
         ch = pb.ch
         with self.lock:
             existed = bool(self.handlers.get(ch))
-            # 若已存在则覆盖（你的场景下不会出现多个）
             self.handlers[ch] = (_next, error, complete)
             try:
                 if not existed:
@@ -151,7 +146,6 @@ class RedisPubSub:
         self.redis = get_redis_client(db)
 
     def subscribe(self, _next, error=None, complete=None):
-        # 所有 channel 复用同一个 hub 的 pubsub 与监听线程
         hub = _get_pubsub_hub(self.db)
         return hub.add_subscription(self, _next, error, complete)
 
@@ -169,7 +163,7 @@ class Subscription:
         self.pb = pb
         self.ch = ch
         self.hub = hub
-        self.handler = handler  # tuple(next, error, complete)
+        self.handler = handler
         self.unsubscribed = False
 
     def unsubscribe(self):
