@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import inspect
+import threading
 import time
 import uuid
 from functools import partial
@@ -12,6 +13,7 @@ from django.contrib.auth import (
     BACKEND_SESSION_KEY, load_backend,
     PermissionDenied, user_login_failed, _clean_credentials,
 )
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import reverse, redirect, get_object_or_404
@@ -46,6 +48,10 @@ def _get_backends(return_tuples=False):
     return backends
 
 
+class OnlyAllowExistUserAuthError(Exception):
+    pass
+
+
 auth._get_backends = _get_backends
 
 
@@ -54,6 +60,24 @@ def authenticate(request=None, **credentials):
     If the given credentials are valid, return a User object.
     之所以 hack 这个 authenticate
     """
+
+    UserModel = get_user_model()
+    original_get_or_create = UserModel.objects.get_or_create
+
+    thread_local = threading.local()
+    thread_local.thread_id = threading.get_ident()
+
+    def custom_get_or_create(self, *args, **kwargs):
+        logger.debug(f"get_or_create: thread_id={threading.get_ident()}, username={username}")
+        if threading.get_ident() != thread_local.thread_id or not settings.ONLY_ALLOW_EXIST_USER_AUTH:
+            return original_get_or_create(*args, **kwargs)
+        create_username = kwargs.get('username')
+        try:
+            UserModel.objects.get(username=create_username)
+        except UserModel.DoesNotExist:
+            raise OnlyAllowExistUserAuthError
+        return original_get_or_create(*args, **kwargs)
+
     username = credentials.get('username')
 
     temp_user = None
@@ -71,10 +95,19 @@ def authenticate(request=None, **credentials):
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
         try:
+            UserModel.objects.get_or_create = custom_get_or_create.__get__(UserModel.objects)
             user = backend.authenticate(request, **credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             break
+        except OnlyAllowExistUserAuthError:
+            request.error_message = _(
+                '''The administrator has enabled "Only allow existing users to log in", 
+                and the current user is not in the user list. Please contact the administrator.'''
+            )
+            continue
+        finally:
+            UserModel.objects.get_or_create = original_get_or_create
         if user is None:
             continue
 
