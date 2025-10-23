@@ -164,8 +164,6 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         config = {
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
             'bind_dn': serializer.validated_data.get(f"{prefix}BIND_DN"),
-            'password': (serializer.validated_data.get(f"{prefix}BIND_PASSWORD") or
-                         getattr(settings, f"{prefix}BIND_PASSWORD")),
             'use_ssl': serializer.validated_data.get(f"{prefix}START_TLS", False),
             'search_ou': serializer.validated_data.get(f"{prefix}SEARCH_OU"),
             'search_filter': serializer.validated_data.get(f"{prefix}SEARCH_FILTER"),
@@ -173,6 +171,12 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
             'auth_ldap': serializer.validated_data.get(f"{prefix.rstrip('_')}", False)
         }
 
+        password = serializer.validated_data.get(f"{prefix}BIND_PASSWORD")
+        if not password and config['server_uri'] == getattr(settings, f"{prefix}SERVER_URI"):
+            # 只有在没有修改服务器地址的情况下，才使用原有的密码
+            config['password'] = getattr(settings, f"{prefix}BIND_PASSWORD")
+        else:
+            config['password'] = password
         return config
 
     @staticmethod
