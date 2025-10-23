@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from rest_framework.filters import SearchFilter as SearchFilterBase
 import base64
 import json
 import logging
@@ -33,6 +34,14 @@ __all__ = [
     "RewriteOrderingFilter",
     "AttrRulesFilterBackend",
 ]
+
+
+class SearchFilter(SearchFilterBase):
+    def get_search_terms(self, request):
+        params = request.query_params.get(self.search_param, '') or request.query_params.get('search', '')
+        params = params.replace('\x00', '')  # strip null characters
+        params = params.replace(',', ' ')
+        return params.split()
 
 
 class BaseFilterSet(drf_filters.FilterSet):
