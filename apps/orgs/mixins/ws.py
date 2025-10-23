@@ -24,5 +24,7 @@ class OrgMixin:
 
     @sync_to_async
     def has_perms(self, user, perms):
+        self.cookie = self.get_cookie()
+        self.org = self.get_current_org()
         with tmp_to_org(self.org):
             return user.has_perms(perms)
