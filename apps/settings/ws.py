@@ -56,8 +56,6 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     async def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
-            self.cookie = self.get_cookie()
-            self.org = self.get_current_org()
             has_perm = self.has_perms(user, ['rbac.view_systemtools'])
             if await self.is_superuser(user) or (settings.TOOL_USER_ENABLED and has_perm):
                 await self.accept()
@@ -128,14 +126,14 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         close_old_connections()
 
 
-class LdapWebsocket(AsyncJsonWebsocketConsumer):
+class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     category: str
 
     async def connect(self):
         user = self.scope["user"]
         query = parse_qs(self.scope['query_string'].decode())
         self.category = query.get('category', [User.Source.ldap.value])[0]
-        if user.is_authenticated:
+        if user.is_authenticated and await self.has_perms(user, ['settings.view_setting']):
             await self.accept()
         else:
             await self.close()
