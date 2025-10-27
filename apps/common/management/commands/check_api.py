@@ -1,5 +1,6 @@
 import re
 import uuid
+import time
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -89,27 +90,60 @@ known_error_urls = [
 ]
 
 # API 白名单 - 普通用户可以访问的 API
-user_accessible_urls = [
-    "/api/v1/authentication/passkeys/auth/",
-    "/api/v1/prometheus/metrics/",
-    "/api/v1/authentication/auth/",
-    "/api/v1/settings/logo/",
-    "/api/v1/settings/public/open/",
-    "/api/v1/authentication/passkeys/login/",
-    "/api/v1/authentication/tokens/",
-    "/api/v1/authentication/mfa/challenge/",
-    "/api/v1/authentication/password/reset-code/",
-    "/api/v1/authentication/login-confirm-ticket/status/",
-    "/api/v1/authentication/mfa/select/",
-    "/api/v1/authentication/face/context/",
-    "/api/v1/authentication/mfa/send-code/",
-    "/api/v1/authentication/sso/login/",
-    "/api/v1/authentication/user-session/",
-    "/api/v1/settings/i18n/zh-hans/",
+user_accessible_urls = known_unauth_urls + [
     # 添加更多普通用户可以访问的 API
+    "/api/v1/settings/public/",
     "/api/v1/users/profile/",
     "/api/v1/users/change-password/",
     "/api/v1/users/logout/",
+    "/api/v1/settings/chatai-prompts/",
+    "/api/v1/authentication/confirm/",
+    "/api/v1/users/connection-token/",
+    "/api/v1/authentication/temp-tokens/",
+    "/api/v1/notifications/backends/",
+    "/api/v1/authentication/passkeys/",
+    "/api/v1/orgs/orgs/current/",
+    "/api/v1/tickets/apply-asset-tickets/",
+    "/api/v1/ops/celery/task/00000000-0000-0000-0000-000000000000/task-execution/00000000-0000-0000-0000-000000000000/log/",
+    "/api/v1/assets/favorite-assets/", 
+    "/api/v1/authentication/connection-token/",
+    "/api/v1/ops/jobs/",
+    "/api/v1/assets/categories/",
+    "/api/v1/tickets/tickets/",
+    "/api/v1/authentication/ssh-key/",
+    "/api/v1/terminal/my-sessions/",
+    "/api/v1/authentication/access-keys/",
+    "/api/v1/users/profile/permissions/",
+    "/api/v1/tickets/apply-login-asset-tickets/",
+    "/api/v1/resources/",
+    "/api/v1/ops/celery/task/00000000-0000-0000-0000-000000000000/task-execution/00000000-0000-0000-0000-000000000000/result/",
+    "/api/v1/notifications/site-messages/",
+    "/api/v1/notifications/site-messages/unread-total/",
+    "/api/v1/assets/assets/suggestions/",
+    "/api/v1/search/",
+    "/api/v1/notifications/user-msg-subscription/",
+    "/api/v1/ops/ansible/job-execution/00000000-0000-0000-0000-000000000000/log/",
+    "/api/v1/tickets/apply-login-tickets/",
+    "/api/v1/ops/variables/form-data/",
+    "/api/v1/ops/variables/help/",
+    "/api/v1/users/profile/password/",
+    "/api/v1/tickets/apply-command-tickets/",
+    "/api/v1/ops/job-executions/",
+    "/api/v1/audits/my-login-logs/",
+    "/api/v1/terminal/components/connect-methods/"
+    "/api/v1/ops/task-executions/",
+    "/api/v1/terminal/sessions/online-info/",
+    "/api/v1/ops/adhocs/",
+    "/api/v1/tickets/apply-nodes/suggestions/",
+    "/api/v1/tickets/apply-assets/suggestions/",
+    "/api/v1/settings/server-info/",
+    "/api/v1/ops/playbooks/",
+    "/api/v1/assets/categories/types/",
+    "/api/v1/assets/protocols/",
+    "/api/v1/common/countries/",
+    "/api/v1/audits/jobs/",
+    "/api/v1/terminal/components/connect-methods/",
+    "/api/v1/ops/task-executions/",
 ]
 
 errors = {}
@@ -141,6 +175,7 @@ class Command(BaseCommand):
         python manage.py check_api --update-whitelist
     """
     help = 'Check API authorization and user access permissions'
+    password = uuid.uuid4().hex
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -167,13 +202,12 @@ class Command(BaseCommand):
         
         # 删除可能存在的测试用户
         User.objects.filter(username=username).delete()
-        password = uuid.uuid4().hex
         
         # 创建新的测试用户
         user = User.objects.create_user(
             username=username,
             email=email,
-            password=password,
+            password=self.password,
             is_active=True
         )
         return user
@@ -185,7 +219,7 @@ class Command(BaseCommand):
         client.defaults['HTTP_HOST'] = 'localhost'
         
         # 登录用户
-        login_success = client.login(username=user.username, password='test_password_123')
+        login_success = client.login(username=user.username, password=self.password)
         if not login_success:
             self.stdout.write(
                 self.style.ERROR('Failed to login test user')
@@ -203,6 +237,7 @@ class Command(BaseCommand):
                 
             try:
                 response = client.get(url, follow=True)
+                time.sleep(0.1)
                 # 如果状态码是 200 或 201，说明用户可以访问
                 if response.status_code in [200, 201]:
                     accessible_urls.append((url, ourl, response.status_code))
@@ -280,6 +315,7 @@ class Command(BaseCommand):
         accessible_url_list = [url for url, _, _ in accessible_urls]
         unexpected_access = set(accessible_url_list) - set(user_accessible_urls)
         
+        print("Check total urls: ", len(urls))
         if unexpected_access:
             print(f"\n⚠️  WARNING: Found {len(unexpected_access)} URLs accessible by user but not in whitelist:")
             for url in unexpected_access:
