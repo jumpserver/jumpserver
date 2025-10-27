@@ -113,7 +113,7 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
         ("accounts", AccountSerializer),
     )
     rbac_perms = (
-        ("match", "assets.match_asset"),
+        ("match", "assets.view_asset"),
         ("platform", "assets.view_platform"),
         ("gateways", "assets.view_gateway"),
         ("accounts", "assets.view_account"),

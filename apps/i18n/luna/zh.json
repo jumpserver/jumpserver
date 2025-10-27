@@ -20,6 +20,7 @@
     "AvailableHotkeys": "可用快捷键",
     "Backspace as Ctrl+H": "字符终端Backspace As Ctrl+H",
     "Batch actions": "批量操作",
+    "Batch actions(select and right click)": "批量操作（选择并右键单击）",
     "Batch connect": "批量连接",
     "BatchCommands": "批量命令",
     "Belgian French keyboard layout": "Belgian French (Azerty)",
@@ -85,6 +86,7 @@
     "Expand all asset": "展开节点下的所有资产",
     "Expire time": "过期时间",
     "ExpiredTime": "有效期限",
+    "Face Verify": "人脸验证",
     "Face online required": "本次登录需要进行人脸验证和监控,是否继续？",
     "Face verify": "人脸验证",
     "Face verify required": "本次登录需要进行人脸验证,是否继续？",
@@ -105,6 +107,7 @@
     "GUI": "图形化",
     "General": "基本配置",
     "Go to Settings": "去设置",
+    "Go to profile": "前往个人信息",
     "Help": "帮助",
     "Help or download": "菜单帮助 → 下载",
     "Help text": "说明",
@@ -285,6 +288,5 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户",
-    "Batch actions(select and right click)": "批量操作（选择并右键单击）"
+    "user": "用户"
 }

@@ -59,7 +59,10 @@ class DatabaseSerializer(AssetSerializer):
         if not platform:
             return
 
-        if platform.type in ['mysql', 'mariadb']:
+        if platform.type in [
+            'mysql', 'mariadb', 'oracle', 'sqlserver',
+            'db2', 'dameng', 'clickhouse', 'redis'
+        ]:
             db_field.required = False
             db_field.allow_blank = True
             db_field.allow_null = True

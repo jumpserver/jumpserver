@@ -56,8 +56,6 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     async def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
-            self.cookie = self.get_cookie()
-            self.org = self.get_current_org()
             has_perm = self.has_perms(user, ['rbac.view_systemtools'])
             if await self.is_superuser(user) or (settings.TOOL_USER_ENABLED and has_perm):
                 await self.accept()
@@ -128,14 +126,14 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         close_old_connections()
 
 
-class LdapWebsocket(AsyncJsonWebsocketConsumer):
+class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     category: str
 
     async def connect(self):
         user = self.scope["user"]
         query = parse_qs(self.scope['query_string'].decode())
         self.category = query.get('category', [User.Source.ldap.value])[0]
-        if user.is_authenticated:
+        if user.is_authenticated and await self.has_perms(user, ['settings.view_setting']):
             await self.accept()
         else:
             await self.close()
@@ -150,7 +148,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
             await self.send_msg(msg='Exception: %s' % error)
 
     def run_func(self, func_name, data):
-        with translation.override(getattr(self.scope['user'], 'lang', settings.LANGUAGE_CODE)):
+        with translation.override(getattr(self.scope['user'], 'lang') or settings.LANGUAGE_CODE):
             return getattr(self, func_name)(data)
 
     async def send_msg(self, ok=True, msg=''):
@@ -166,8 +164,6 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         config = {
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
             'bind_dn': serializer.validated_data.get(f"{prefix}BIND_DN"),
-            'password': (serializer.validated_data.get(f"{prefix}BIND_PASSWORD") or
-                         getattr(settings, f"{prefix}BIND_PASSWORD")),
             'use_ssl': serializer.validated_data.get(f"{prefix}START_TLS", False),
             'search_ou': serializer.validated_data.get(f"{prefix}SEARCH_OU"),
             'search_filter': serializer.validated_data.get(f"{prefix}SEARCH_FILTER"),
@@ -175,6 +171,12 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
             'auth_ldap': serializer.validated_data.get(f"{prefix.rstrip('_')}", False)
         }
 
+        password = serializer.validated_data.get(f"{prefix}BIND_PASSWORD")
+        if not password and config['server_uri'] == getattr(settings, f"{prefix}SERVER_URI"):
+            # 只有在没有修改服务器地址的情况下，才使用原有的密码
+            config['password'] = getattr(settings, f"{prefix}BIND_PASSWORD")
+        else:
+            config['password'] = password
         return config
 
     @staticmethod

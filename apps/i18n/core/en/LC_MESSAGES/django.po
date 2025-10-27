@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-10 16:58+0800\n"
+"POT-Creation-Date: 2025-10-16 14:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -207,7 +207,7 @@ msgstr ""
 msgid "Skip"
 msgstr ""
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:291
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:292
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr ""
@@ -323,8 +323,8 @@ msgstr ""
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:62 users/forms/profile.py:101
 #: users/forms/profile.py:111 users/models/user/__init__.py:67
-#: users/notifications.py:21 users/notifications.py:66
-#: users/notifications.py:188 users/templates/users/forgot_password.html:162
+#: users/notifications.py:22 users/notifications.py:67
+#: users/notifications.py:189 users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
 msgstr ""
@@ -600,10 +600,10 @@ msgstr ""
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:66
-#: users/notifications.py:20 users/notifications.py:105
-#: users/notifications.py:144 users/notifications.py:183
-#: users/notifications.py:223 users/notifications.py:251
-#: users/notifications.py:278 xpack/plugins/cloud/models.py:35
+#: users/notifications.py:21 users/notifications.py:106
+#: users/notifications.py:145 users/notifications.py:184
+#: users/notifications.py:224 users/notifications.py:252
+#: users/notifications.py:279 xpack/plugins/cloud/models.py:35
 #: xpack/plugins/cloud/models.py:316 xpack/plugins/cloud/serializers/task.py:77
 msgid "Name"
 msgstr ""
@@ -891,7 +891,7 @@ msgstr ""
 #: authentication/templates/authentication/login.html:414
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
 #: users/forms/profile.py:117 users/models/user/__init__.py:65
-#: users/notifications.py:19 users/serializers/profile.py:190
+#: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
 msgid "Username"
@@ -1855,7 +1855,7 @@ msgstr ""
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:189 settings/serializers/feature.py:24
-#: settings/serializers/msg.py:79 users/notifications.py:18
+#: settings/serializers/msg.py:79 users/notifications.py:19
 #: xpack/plugins/license/models.py:31
 msgid "Content"
 msgstr ""
@@ -1916,7 +1916,7 @@ msgstr ""
 msgid "Fields pattern"
 msgstr ""
 
-#: acls/models/data_masking.py:27 acls/serializers/data_masking.py:13
+#: acls/models/data_masking.py:27 acls/serializers/data_masking.py:14
 msgid "Masking Method"
 msgstr ""
 
@@ -3361,7 +3361,7 @@ msgstr ""
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:292
+#: rbac/tree.py:293
 msgid "Delete"
 msgstr ""
 
@@ -3387,7 +3387,7 @@ msgstr ""
 msgid "Rename dir"
 msgstr ""
 
-#: audits/const.py:23 rbac/tree.py:290 terminal/api/session/session.py:285
+#: audits/const.py:23 rbac/tree.py:291 terminal/api/session/session.py:285
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:102
 msgid "View"
@@ -3395,7 +3395,7 @@ msgstr ""
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:289
+#: rbac/tree.py:290
 msgid "Create"
 msgstr ""
 
@@ -3547,7 +3547,7 @@ msgid "MFA"
 msgstr ""
 
 #: audits/models.py:219 terminal/models/session/sharing.py:123
-#: xpack/plugins/cloud/manager.py:187 xpack/plugins/cloud/models.py:237
+#: xpack/plugins/cloud/manager.py:186 xpack/plugins/cloud/models.py:237
 msgid "Reason"
 msgstr ""
 
@@ -4582,7 +4582,7 @@ msgstr ""
 
 #: authentication/templates/authentication/_msg_rest_password_success.html:9
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:9
-#: users/notifications.py:107 users/notifications.py:146
+#: users/notifications.py:108 users/notifications.py:147
 msgid "Browser"
 msgstr ""
 
@@ -4878,7 +4878,7 @@ msgstr ""
 msgid "Ultimate edition"
 msgstr ""
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:452
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:451
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr ""
@@ -6440,24 +6440,24 @@ msgstr ""
 msgid "Report"
 msgstr ""
 
-#: rbac/tree.py:181
+#: rbac/tree.py:182
 msgid "App organizations"
 msgstr "Organizations"
 
-#: rbac/tree.py:182
+#: rbac/tree.py:183
 msgid "Ticket comment"
 msgstr ""
 
-#: rbac/tree.py:183 settings/serializers/feature.py:174
+#: rbac/tree.py:184 settings/serializers/feature.py:174
 #: settings/serializers/feature.py:176 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr ""
 
-#: rbac/tree.py:184
+#: rbac/tree.py:185
 msgid "Common setting"
 msgstr ""
 
-#: rbac/tree.py:185
+#: rbac/tree.py:186
 msgid "View permission tree"
 msgstr ""
 
@@ -6499,6 +6499,14 @@ msgstr ""
 
 #: reports/views.py:56
 msgid "ChangeSecretDashboard"
+msgstr ""
+
+#: reports/views.py:181
+msgid "Failed to send email: "
+msgstr ""
+
+#: reports/views.py:182
+msgid "Email sent successfully to "
 msgstr ""
 
 #: settings/api/chat.py:41
@@ -7348,7 +7356,7 @@ msgid "Tenant ID"
 msgstr ""
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:124
+#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:123
 #: xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr ""
@@ -7523,7 +7531,7 @@ msgid ""
 "successfully)"
 msgstr ""
 
-#: settings/serializers/msg.py:74 users/notifications.py:17
+#: settings/serializers/msg.py:74 users/notifications.py:18
 msgid "Honorific"
 msgstr ""
 
@@ -8658,7 +8666,7 @@ msgstr ""
 msgid "Can view terminal config"
 msgstr ""
 
-#: terminal/models/session/command.py:76
+#: terminal/models/session/command.py:77
 msgid "Command record"
 msgstr ""
 
@@ -9890,75 +9898,75 @@ msgstr ""
 msgid "Force enabled"
 msgstr ""
 
-#: users/notifications.py:22 users/notifications.py:67
+#: users/notifications.py:23 users/notifications.py:68
 msgid "Reset password url"
 msgstr ""
 
-#: users/notifications.py:24 users/notifications.py:69
+#: users/notifications.py:25 users/notifications.py:70
 msgid "Reset password token"
 msgstr ""
 
-#: users/notifications.py:25 users/notifications.py:70
+#: users/notifications.py:26 users/notifications.py:71
 msgid "Forget password url"
 msgstr ""
 
-#: users/notifications.py:63
+#: users/notifications.py:64
 #: users/templates/users/_msg_password_expire_reminder.html:16
 #: users/templates/users/reset_password.html:5
 #: users/templates/users/reset_password.html:6
 msgid "Reset password"
 msgstr ""
 
-#: users/notifications.py:72 users/notifications.py:187
-#: users/notifications.py:189
+#: users/notifications.py:73 users/notifications.py:188
+#: users/notifications.py:190
 msgid "Login url"
 msgstr ""
 
-#: users/notifications.py:102 users/views/profile/reset.py:238
+#: users/notifications.py:103 users/views/profile/reset.py:238
 msgid "Reset password success"
 msgstr ""
 
-#: users/notifications.py:106 users/notifications.py:145
+#: users/notifications.py:107 users/notifications.py:146
 msgid "IP address"
 msgstr ""
 
-#: users/notifications.py:141
+#: users/notifications.py:142
 msgid "Reset public key success"
 msgstr ""
 
-#: users/notifications.py:180
+#: users/notifications.py:181
 msgid "Password is about expire"
 msgstr ""
 
-#: users/notifications.py:184
+#: users/notifications.py:185
 msgid "Password expiration date"
 msgstr ""
 
-#: users/notifications.py:185
+#: users/notifications.py:186
 msgid "Update password url"
 msgstr ""
 
-#: users/notifications.py:220
+#: users/notifications.py:221
 msgid "Account is about expire"
 msgstr ""
 
-#: users/notifications.py:224
+#: users/notifications.py:225
 msgid "Expiration date"
 msgstr ""
 
-#: users/notifications.py:248
+#: users/notifications.py:249
 msgid "Reset SSH Key"
 msgstr ""
 
-#: users/notifications.py:252
+#: users/notifications.py:253
 msgid "Update SSH Key url"
 msgstr ""
 
-#: users/notifications.py:275
+#: users/notifications.py:276
 msgid "Reset MFA"
 msgstr ""
 
-#: users/notifications.py:279
+#: users/notifications.py:280
 msgid "Reset MFA url"
 msgstr ""
 
@@ -10718,64 +10726,64 @@ msgstr ""
 msgid "Synchronization regions"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:141
+#: xpack/plugins/cloud/manager.py:140
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:186
+#: xpack/plugins/cloud/manager.py:185
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:377
+#: xpack/plugins/cloud/manager.py:376
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:434
+#: xpack/plugins/cloud/manager.py:433
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:436
+#: xpack/plugins/cloud/manager.py:435
 #, python-format
 msgid "Update asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:439
+#: xpack/plugins/cloud/manager.py:438
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:448
+#: xpack/plugins/cloud/manager.py:447
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:469
+#: xpack/plugins/cloud/manager.py:468
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:495
+#: xpack/plugins/cloud/manager.py:494
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:511
+#: xpack/plugins/cloud/manager.py:510
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:519
+#: xpack/plugins/cloud/manager.py:518
 #, python-format
 msgid "Set labels \"%s\""
 msgstr ""
 
-#: xpack/plugins/cloud/manager.py:533 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:532 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr ""
 

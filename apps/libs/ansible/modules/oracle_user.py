@@ -113,7 +113,7 @@ def validate_identifier(name):
         return False, "Identifier cannot be empty"
     if len(name) > 30:
         return False, "Identifier must be at most 30 characters"
-    if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', name):
+    if not re.match(r'^(C##|c##)?[A-Za-z][A-Za-z0-9_]*$', name):
         msg = ("Identifier can only contain letters, numbers, "
                "and underscores (must start with a letter)")
         return False, msg

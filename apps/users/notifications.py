@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import reverse, get_request_ip_or_data, get_request_user_agent
 from common.views.template import custom_render_to_string
 from notifications.notifications import UserMessage
+from users.utils import activate_user_language
 
 
 class UserCreatedMsg(UserMessage):
@@ -28,30 +29,30 @@ class UserCreatedMsg(UserMessage):
 
     def get_html_msg(self) -> dict:
         user = self.user
-
         mail_context = {
-            'subject': str(settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT),
-            'honorific': str(settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC),
-            'content': str(settings.EMAIL_CUSTOM_USER_CREATED_BODY)
+            'subject': settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT,
+            'honorific': settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC,
+            'content': settings.EMAIL_CUSTOM_USER_CREATED_BODY
         }
 
         user_info = {'username': user.username, 'name': user.name, 'email': user.email}
-        # 转换成 defaultdict，否则 format 时会报 KeyError
-        user_info = defaultdict(str, **user_info)
-        mail_context = {k: v.format_map(user_info) for k, v in mail_context.items()}
+        with activate_user_language(self.user):
+            # 转换成 defaultdict，否则 format 时会报 KeyError
+            user_info = defaultdict(str, **user_info)
+            mail_context = {k: v.format_map(user_info) for k, v in mail_context.items()}
 
-        context = {
-            **mail_context,
-            **user_info,
-            'rest_password_url': reverse('authentication:reset-password', external=True),
-            'rest_password_token': user.generate_reset_token(),
-            'forget_password_url': reverse('authentication:forgot-password', external=True)
-        }
-        message = custom_render_to_string(self.template_name, context)
-        return {
-            'subject': mail_context['subject'],
-            'message': message
-        }
+            context = {
+                **mail_context,
+                **user_info,
+                'rest_password_url': reverse('authentication:reset-password', external=True),
+                'rest_password_token': user.generate_reset_token(),
+                'forget_password_url': reverse('authentication:forgot-password', external=True)
+            }
+            message = custom_render_to_string(self.template_name, context)
+            return {
+                'subject': mail_context['subject'],
+                'message': message
+            }
 
     @classmethod
     def gen_test_msg(cls):

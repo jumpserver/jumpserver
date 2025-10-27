@@ -729,6 +729,9 @@ class Config(dict):
         'LOKI_BASE_URL': 'http://loki:3100',
 
         'TOOL_USER_ENABLED': False,
+
+        # Suggestion api
+        'SUGGESTION_LIMIT': 10,
     }
 
     old_config_map = {

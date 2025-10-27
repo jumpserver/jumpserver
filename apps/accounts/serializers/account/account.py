@@ -309,10 +309,10 @@ class AssetAccountBulkSerializer(
     class Meta:
         model = Account
         fields = [
-            'name', 'username', 'secret', 'secret_type', 'passphrase',
-            'privileged', 'is_active', 'comment', 'template',
-            'on_invalid', 'push_now', 'params', 'assets',
-            'su_from_username', 'source', 'source_id',
+            'name', 'username', 'secret', 'secret_type', 'secret_reset',
+            'passphrase', 'privileged', 'is_active', 'comment', 'template',
+            'on_invalid', 'push_now', 'params', 'assets', 'su_from_username',
+            'source', 'source_id',
         ]
         extra_kwargs = {
             'name': {'required': False},
