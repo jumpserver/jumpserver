@@ -96,7 +96,7 @@ dependencies = [
     'kombu==5.3.5',
     'uvicorn==0.22.0',
     'websockets==11.0.3',
-    'python-ldap==3.4.3',
+    'python-ldap==3.4.5',
     'ldap3==2.9.1',
     'django-radius',
     'django-cas-ng',
