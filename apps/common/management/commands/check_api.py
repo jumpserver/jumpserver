@@ -176,6 +176,11 @@ class Command(BaseCommand):
     """
     help = 'Check API authorization and user access permissions'
     password = uuid.uuid4().hex
+    unauth_urls = []
+    error_urls = []
+    unformat_urls = []
+    # 用户可以访问的 API，但不在白名单中的 API
+    unexpected_access = []
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -259,42 +264,43 @@ class Command(BaseCommand):
         """检查匿名访问权限"""
         client = Client()
         client.defaults['HTTP_HOST'] = 'localhost'
-        unauth_urls = []
-        error_urls = []
-        unformat_urls = []
 
         for url, ourl in urls:
             if '(' in url or '<' in url:
-                unformat_urls.append([url, ourl])
+                self.unformat_urls.append([url, ourl])
                 continue
 
             try:
                 response = client.get(url, follow=True)
                 if response.status_code != 401:
                     errors[url] = str(response.status_code) + ' ' + str(ourl)
-                    unauth_urls.append(url)
+                    self.unauth_urls.append(url)
             except Exception as e:
                 errors[url] = str(e)
-                error_urls.append(url)
+                self.error_urls.append(url)
 
-        unauth_urls = set(unauth_urls) - set(known_unauth_urls)
+        self.unauth_urls = set(self.unauth_urls) - set(known_unauth_urls)
+        self.error_urls = set(self.error_urls)
+        self.unformat_urls = set(self.unformat_urls)
+
+    def print_anonymous_access_result(self):
         print("\n=== Anonymous Access Check ===")
         print("Unauthorized urls:")
-        if not unauth_urls:
+        if not self.unauth_urls:
             print("  Empty, very good!")
-        for url in unauth_urls:
+        for url in self.unauth_urls:
             print('"{}", {}'.format(url, errors.get(url, '')))
 
         print("\nError urls:")
-        if not error_urls:
+        if not self.error_urls:
             print("  Empty, very good!")
-        for url in set(error_urls):
+        for url in set(self.error_urls):
             print(url, ': ' + errors.get(url))
 
         print("\nUnformat urls:")
-        if not unformat_urls:
+        if not self.unformat_urls:
             print("  Empty, very good!")
-        for url in unformat_urls:
+        for url in self.unformat_urls:
             print(url)
 
     def check_user_access(self, urls, update_whitelist=False):
@@ -302,27 +308,10 @@ class Command(BaseCommand):
         print("\n=== User Access Check ===")
         accessible_urls, user_error_urls = self.check_user_api_access(urls)
         
-        # print(f"\nFound {len(accessible_urls)} accessible URLs for normal user:")
-        # for url, ourl, status_code in accessible_urls:
-        #     print(f'  "{url}" (status: {status_code}) - {ourl}')
-        
-        # if user_error_urls:
-        #     print(f"\nUser access errors ({len(user_error_urls)}):")
-        #     for url, ourl, error in user_error_urls:
-        #         print(f'  "{url}" - {error}')
-        
         # 检查是否有不在白名单中的可访问 API
         accessible_url_list = [url for url, _, _ in accessible_urls]
         unexpected_access = set(accessible_url_list) - set(user_accessible_urls)
-        
-        print("Check total urls: ", len(urls))
-        if unexpected_access:
-            print(f"\n⚠️  WARNING: Found {len(unexpected_access)} URLs accessible by user but not in whitelist:")
-            for url in unexpected_access:
-                print(f'  "{url}"')
-            print("\nConsider adding these URLs to user_accessible_urls whitelist.")
-        else:
-            print("\n✅ All accessible URLs are in the whitelist.")
+        self.unexpected_access = unexpected_access
         
         # 如果启用了更新白名单选项
         if update_whitelist:
@@ -332,6 +321,17 @@ class Command(BaseCommand):
             for url in new_whitelist:
                 print(f'    "{url}",')
             print(f"\nTotal URLs in whitelist: {len(new_whitelist)}")
+
+    def print_user_access_result(self):
+        print("\n=== User Access Check ===")
+
+        print("User unexpected urls:")
+        if self.unexpected_access:
+            print(f"  Error: Found {len(self.unexpected_access)} URLs accessible by user but not in whitelist:")
+            for url in self.unexpected_access:
+                print(f'  "{url}"')
+        else:
+            print("  Empty, very good!")
 
     def handle(self, *args, **options):
         settings.LOG_LEVEL = 'ERROR'
@@ -344,3 +344,7 @@ class Command(BaseCommand):
         # 检查用户访问权限（默认执行）
         if not options['skip_user_check']:
             self.check_user_access(urls, options['update_whitelist'])
+
+        print("\nCheck total urls: ", len(urls))
+        self.print_anonymous_access_result()
+        self.print_user_access_result()
