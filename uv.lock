@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -2553,7 +2553,7 @@ requires-dist = [
     { name = "itypes", specifier = "==1.2.0" },
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "jsonfield2", specifier = "==4.0.0.post0" },
-    { name = "kombu", specifier = "==5.3.1" },
+    { name = "kombu", specifier = "==5.3.5" },
     { name = "ldap3", specifier = "==2.9.1" },
     { name = "lxml", specifier = "==5.2.1" },
     { name = "markupsafe", specifier = "==2.1.3" },
@@ -2671,15 +2671,15 @@ wheels = [
 
 [[package]]
 name = "kombu"
-version = "5.3.1"
+version = "5.3.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "amqp" },
     { name = "vine" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c8/69/b703f8ec8d0406be22534dad885cac847fe092b793c4893034e3308feb9b/kombu-5.3.1.tar.gz", hash = "sha256:fbd7572d92c0bf71c112a6b45163153dea5a7b6a701ec16b568c27d0fd2370f2", size = 434284, upload-time = "2023-06-15T13:16:22.683Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/61/0b91085837d446570ea12f63f79463e5a74b449956b1ca9d1946a6f584c2/kombu-5.3.5.tar.gz", hash = "sha256:30e470f1a6b49c70dc6f6d13c3e4cc4e178aa6c469ceb6bcd55645385fc84b93", size = 438460, upload-time = "2024-01-12T19:55:54.982Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/58/b23b9c1ffb30d8b5cdfc7bdecb17bfd7ea20c619e86e515297b496177144/kombu-5.3.1-py3-none-any.whl", hash = "sha256:48ee589e8833126fd01ceaa08f8a2041334e9f5894e5763c8486a550454551e9", size = 198498, upload-time = "2023-06-15T13:16:14.57Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/88/daca086d72832c74a7e239558ad484644c8cda0b9ae8a690f247bf13c268/kombu-5.3.5-py3-none-any.whl", hash = "sha256:0eac1bbb464afe6fb0924b21bf79460416d25d8abc52546d4f16cad94f789488", size = 200001, upload-time = "2024-01-12T19:55:51.59Z" },
 ]
 
 [[package]]

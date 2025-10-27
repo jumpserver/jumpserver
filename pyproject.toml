@@ -93,7 +93,7 @@ dependencies = [
     'celery==5.3.1',
     'flower==2.0.1',
     'django-celery-beat==2.6.0',
-    'kombu==5.3.1',
+    'kombu==5.3.5',
     'uvicorn==0.22.0',
     'websockets==11.0.3',
     'python-ldap==3.4.3',
