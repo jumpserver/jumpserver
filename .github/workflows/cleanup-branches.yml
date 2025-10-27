@@ -34,7 +34,7 @@ jobs:
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           echo "dry_run=${{ github.event.inputs.dry_run }}" >> $GITHUB_OUTPUT
         else
-          echo "dry_run=true" >> $GITHUB_OUTPUT
+          echo "dry_run=false" >> $GITHUB_OUTPUT
         fi
         
     - name: Cleanup branches
