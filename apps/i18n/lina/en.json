@@ -1627,5 +1627,9 @@
     "removeWarningMsg": "Are you sure you want to remove",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name"
+    "userName": "User name",
+    "selectFiles": "Selected {number} files",
+    "selectedAssets": "Selected assets",
+    "pleaseSelectAssets": "Please select assets",
+    "clickToAdd": "Click to add"
 }
