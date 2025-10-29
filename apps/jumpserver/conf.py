@@ -732,6 +732,9 @@ class Config(dict):
 
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
+
+        # MCP
+        'MCP_ENABLED': False,
     }
 
     old_config_map = {
