@@ -14,7 +14,7 @@ from accounts.models import Account, AccountTemplate, GatheredAccount
 from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
 from assets.models import Asset
-from common.serializers import SecretReadableMixin
+from common.serializers import SecretReadableMixin, CommonBulkModelSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from .base import BaseAccountSerializer, AuthValidateMixin
@@ -292,27 +292,27 @@ class AccountDetailSerializer(AccountSerializer):
 
 class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
     asset = serializers.CharField(read_only=True, label=_('Asset'))
+    account = serializers.CharField(read_only=True, label=_('Account'))
     state = serializers.CharField(read_only=True, label=_('State'))
     error = serializers.CharField(read_only=True, label=_('Error'))
     changed = serializers.BooleanField(read_only=True, label=_('Changed'))
 
 
 class AssetAccountBulkSerializer(
-    AccountCreateUpdateSerializerMixin, AuthValidateMixin, serializers.ModelSerializer
+    AccountCreateUpdateSerializerMixin, AuthValidateMixin, CommonBulkModelSerializer
 ):
     su_from_username = serializers.CharField(
         max_length=128, required=False, write_only=True, allow_null=True, label=_("Su from"),
         allow_blank=True,
     )
-    assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
 
     class Meta:
         model = Account
         fields = [
             'name', 'username', 'secret', 'secret_type', 'secret_reset',
             'passphrase', 'privileged', 'is_active', 'comment', 'template',
-            'on_invalid', 'push_now', 'params', 'assets', 'su_from_username',
-            'source', 'source_id',
+            'on_invalid', 'push_now', 'params',
+            'su_from_username', 'source', 'source_id',
         ]
         extra_kwargs = {
             'name': {'required': False},
@@ -393,8 +393,7 @@ class AssetAccountBulkSerializer(
             handler = self._handle_err_create
         return handler
 
-    def perform_bulk_create(self, vd):
-        assets = vd.pop('assets')
+    def perform_bulk_create(self, vd, assets):
         on_invalid = vd.pop('on_invalid', 'skip')
         secret_type = vd.get('secret_type', 'password')
 
@@ -402,8 +401,7 @@ class AssetAccountBulkSerializer(
             vd['name'] = vd.get('username')
 
         create_handler = self.get_create_handler(on_invalid)
-        asset_ids = [asset.id for asset in assets]
-        secret_type_supports = Asset.get_secret_type_assets(asset_ids, secret_type)
+        secret_type_supports = Asset.get_secret_type_assets(assets, secret_type)
 
         _results = {}
         for asset in assets:
@@ -411,6 +409,7 @@ class AssetAccountBulkSerializer(
                 _results[asset] = {
                     'error': _('Asset does not support this secret type: %s') % secret_type,
                     'state': 'error',
+                    'account': vd['name'],
                 }
                 continue
 
@@ -420,13 +419,13 @@ class AssetAccountBulkSerializer(
                 self.clean_auth_fields(vd)
                 instance, changed, state = self.perform_create(vd, create_handler)
                 _results[asset] = {
-                    'changed': changed, 'instance': instance.id, 'state': state
+                    'changed': changed, 'instance': instance.id, 'state': state, 'account': vd['name']
                 }
             except serializers.ValidationError as e:
-                _results[asset] = {'error': e.detail[0], 'state': 'error'}
+                _results[asset] = {'error': e.detail[0], 'state': 'error', 'account': vd['name']}
             except Exception as e:
                 logger.exception(e)
-                _results[asset] = {'error': str(e), 'state': 'error'}
+                _results[asset] = {'error': str(e), 'state': 'error', 'account': vd['name']}
 
         results = [{'asset': asset, **result} for asset, result in _results.items()]
         state_score = {'created': 3, 'updated': 2, 'skipped': 1, 'error': 0}
@@ -443,7 +442,8 @@ class AssetAccountBulkSerializer(
             errors.append({
                 'error': _('Account has exist'),
                 'state': 'error',
-                'asset': str(result['asset'])
+                'asset': str(result['asset']),
+                'account': result.get('account'),
             })
         if errors:
             raise serializers.ValidationError(errors)
@@ -462,10 +462,16 @@ class AssetAccountBulkSerializer(
         account_ids = [str(_id) for _id in accounts.values_list('id', flat=True)]
         push_accounts_to_assets_task.delay(account_ids, params)
 
-    def create(self, validated_data):
+    def bulk_create(self, validated_data, assets):
+        if not assets:
+            raise serializers.ValidationError(
+                {'assets': _('At least one asset or node must be specified')},
+                {'nodes': _('At least one asset or node must be specified')}
+            )
+
         params = validated_data.pop('params', None)
         push_now = validated_data.pop('push_now', False)
-        results = self.perform_bulk_create(validated_data)
+        results = self.perform_bulk_create(validated_data, assets)
         self.push_accounts_if_need(results, push_now, params)
         for res in results:
             res['asset'] = str(res['asset'])
