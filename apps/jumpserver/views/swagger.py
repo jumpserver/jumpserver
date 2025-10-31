@@ -9,15 +9,16 @@ from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class SwaggerUI(LoginRequiredMixin, SpectacularSwaggerView):
+class SwaggerUI( SpectacularSwaggerView):
     pass
-
 
 class Redoc(LoginRequiredMixin, SpectacularRedocView):
     pass
 
 
 class SchemeMixin:
+    permission_classes = []
+
     def get(self, request, *args, **kwargs):
         schema = super().get(request, *args, **kwargs).data
         host = request.get_host()
@@ -37,7 +38,7 @@ class SchemeMixin:
         }
         return Response(schema)
     
-@method_decorator(cache_page(60 * 5,), name="dispatch")
+# @method_decorator(cache_page(60 * 5,), name="dispatch")
 class JsonApi(SchemeMixin, SpectacularJSONAPIView):
     pass
 

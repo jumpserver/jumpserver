@@ -88,7 +88,7 @@ urlpatterns += [
     path('core/jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
-DOC_TTL = 60 * 60
+DOC_TTL = 1
 DOC_VERSION = uuid.uuid4().hex
 cache_kwargs = {
     'cache_timeout': DOC_TTL,
@@ -98,7 +98,7 @@ cache_kwargs = {
 }
 # docs 路由
 urlpatterns += [
-    path('api/swagger.json', views.get_swagger_view(ui='json', **cache_kwargs), name='schema-json'),
+    path('api/swagger.json', views.get_swagger_view(ui='json'), name='schema-json'),
     path('api/swagger.yaml', views.get_swagger_view(ui='yaml', **cache_kwargs), name='schema'),
     re_path('api/docs/?', views.get_swagger_view(ui='swagger', **cache_kwargs), name="docs"),
     re_path('api/redoc/?', views.get_swagger_view(ui='redoc', **cache_kwargs), name='redoc'),

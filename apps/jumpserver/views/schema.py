@@ -14,7 +14,7 @@ class CustomSchemaGenerator(SchemaGenerator):
 
 class CustomAutoSchema(AutoSchema):
     def __init__(self, *args, **kwargs):
-        self.from_mcp = kwargs.get('from_mcp', False)
+        self.from_mcp = True
         super().__init__(*args, **kwargs)
 
     def map_parsers(self):
@@ -30,19 +30,19 @@ class CustomAutoSchema(AutoSchema):
         tags = ['_'.join(operation_keys[:2])]
         return tags
    
-    def get_operation(self, path, *args, **kwargs):
-        if path.endswith('render-to-json/'):
-            return None
-        # if not path.startswith('/api/v1/users'):
-            # return None
-        operation = super().get_operation(path, *args, **kwargs)
-        if not operation:
-            return operation
+    # def get_operation(self, path, *args, **kwargs):
+    #     if path.endswith('render-to-json/'):
+    #         return None
+    #     # if not path.startswith('/api/v1/users'):
+    #         # return None
+    #     operation = super().get_operation(path, *args, **kwargs)
+    #     if not operation:
+    #         return operation
 
-        if not operation.get('summary', ''):
-            operation['summary'] = operation.get('operationId')
+    #     if not operation.get('summary', ''):
+    #         operation['summary'] = operation.get('operationId')
 
-        return operation
+    #     return operation
 
     def get_operation_id(self):
         tokenized_path = self._tokenize_path()
@@ -132,14 +132,15 @@ class CustomAutoSchema(AutoSchema):
 
         apps = []
         if self.from_mcp:
-            apps = [
-                'ops', 'tickets', 'authentication',
-                'settings', 'xpack', 'terminal', 'rbac',
-                'notifications', 'promethues', 'acls'
-            ]
+            # apps = [
+            #     'ops', 'tickets', 'authentication',
+            #     'settings', 'xpack', 'terminal', 'rbac',
+            #     'notifications', 'promethues', 'acls'
+            # ]
+            apps = ['resources']
 
         app_name = parts[3]
-        if app_name in apps:
+        if app_name not in apps:
             return True
         models = []
         model = parts[4]
@@ -190,6 +191,9 @@ class CustomAutoSchema(AutoSchema):
 
         if not operation.get('summary', ''):
             operation['summary'] = operation.get('operationId')
+        
+        if self.is_excluded():
+            return None
 
         exclude_operations = [
             'orgs_orgs_read', 'orgs_orgs_update', 'orgs_orgs_delete', 
