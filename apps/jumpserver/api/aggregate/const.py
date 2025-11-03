@@ -13,21 +13,26 @@ list_params = [
         "in": "query",
         "description": "Which field to use when ordering the results.",
         "required": False,
-        "type": "string"
+        "type": "string",
+        "enum": [
+            "name", "date_created", "date_updated", "created_by", 
+        ]
     },
     {
         "name": "limit",
         "in": "query",
         "description": "Number of results to return per page. Default is 10.",
         "required": False,
-        "type": "integer"
+        "type": "integer",
+        "default": 10
     },
     {
         "name": "offset",
         "in": "query",
         "description": "The initial index from which to return the results.",
         "required": False,
-        "type": "integer"
+        "type": "integer",
+        "default": 0
     },
 ]
 
@@ -60,20 +65,17 @@ supported_resources = [
     # Account
     'virtual-accounts', 'account-templates',  'account-backups',
     # Automation
-    'change-secret-automations',
-    'gather-account-automations', 
-    'push-account-automations', 
-    'check-account-automations',
+    'change-secret-automations', 'gather-account-automations', 
+    'push-account-automations', 'check-account-automations',
     'account-risks',
     # Permission
     'asset-permissions',
     # Terminal
     'terminals', 'replay-storages', 'command-storages',  
     # Applet
-    'applets', 'applet-hosts', 
-    'virtual-apps', 'app-providers', 
+    'applets', 'applet-hosts', 'virtual-apps', 
     # Ops
-    'playbooks', 'variables',  'jobs',
+    'playbooks', 'jobs',
     # Audit
     'ftp-logs', 'login-logs', 'operate-logs', 'password-change-logs', 'job-logs',
     # Tickets
