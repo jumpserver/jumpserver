@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 
+from .const import supported_resources
 from .utils import get_full_resource_map
 
 router = DefaultRouter()
@@ -35,6 +36,8 @@ class ResourceTypeListApi(APIView):
         result = []
         resource_map = get_full_resource_map()
         for name, desc in resource_map.items():
+            if name not in supported_resources:
+                continue
             desc = resource_map.get(name, {})
             resource = {
                 "name": name,

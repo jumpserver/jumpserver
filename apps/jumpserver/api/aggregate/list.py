@@ -69,13 +69,13 @@ class ResourceListApi(ProxyMixin, APIView):
         return self._proxy(request, resource)
 
     @extend_schema(
-        operation_id="create_resource_by_type",
+        operation_id="create_resource",
         summary="Create resource",
         parameters=create_params,
         description="""
           Create resource, 
-          OPTIONS /api/v1/resources/{resource}/?action=post to get every resource type field type and helptext, and 
-          you will know how to create it.
+          OPTIONS /api/v1/resources/{resource}/?action=post to get every resource type field type and help text, 
+          and you will know how to create it.
         """,
     )
     def post(self, request, resource, pk=None):

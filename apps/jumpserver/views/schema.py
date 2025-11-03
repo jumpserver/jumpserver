@@ -118,7 +118,8 @@ class CustomAutoSchema(AutoSchema):
             'change-secret-dashboard', '/copy-to-assets/',
             '/move-to-assets/', 'dashboard', 'index', 'countries',
             '/resources/cache/', 'profile/mfa', 'profile/password',
-            'profile/permissions', 'prometheus', 'constraints'
+            'profile/permissions', 'prometheus', 'constraints',
+            '/api/swagger.json', '/api/swagger.yaml', 
         ]
         for p in excludes:
             if path.find(p) >= 0:
