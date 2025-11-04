@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from collections import defaultdict
-
 from django.conf import settings
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django_filters import rest_framework as drf_filters
@@ -181,33 +180,18 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
     def sync_platform_protocols(self, request, *args, **kwargs):
         platform_id = request.data.get('platform_id')
         platform = get_object_or_404(Platform, pk=platform_id)
-        assets = platform.assets.all()
+        asset_ids = list(platform.assets.values_list('id', flat=True))
+        platform_protocols = list(platform.protocols.values('name', 'port'))
 
-        platform_protocols = {
-            p['name']: p['port']
-            for p in platform.protocols.values('name', 'port')
-        }
-        asset_protocols_map = defaultdict(set)
-        protocols = assets.prefetch_related('protocols').values_list(
-            'id', 'protocols__name'
-        )
-        for asset_id, protocol in protocols:
-            asset_id = str(asset_id)
-            asset_protocols_map[asset_id].add(protocol)
-        objs = []
-        for asset_id, protocols in asset_protocols_map.items():
-            protocol_names = set(platform_protocols) - protocols
-            if not protocol_names:
-                continue
-            for name in protocol_names:
-                objs.append(
-                    Protocol(
-                        name=name,
-                        port=platform_protocols[name],
-                        asset_id=asset_id,
-                    )
-                )
-        Protocol.objects.bulk_create(objs)
+        with transaction.atomic():
+            if asset_ids:
+                Protocol.objects.filter(asset_id__in=asset_ids).delete()
+            if asset_ids and platform_protocols:
+                objs = []
+                for aid in asset_ids:
+                    for p in platform_protocols:
+                        objs.append(Protocol(name=p['name'], port=p['port'], asset_id=aid))
+                Protocol.objects.bulk_create(objs)
         return Response(status=status.HTTP_200_OK)
 
     def filter_bulk_update_data(self):

@@ -1637,5 +1637,6 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "overwriteProtocolsAndPortsMsg": "此操作将覆盖所有协议和端口，是否继续？"
 }
