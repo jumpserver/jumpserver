@@ -76,7 +76,8 @@ class JMSInventory:
             proxy_command_list.extend(["-W", "%h:%p", "-q"])
 
         if gateway.password:
-            proxy_command_list.insert(0, f"sshpass -p {gateway.password}")
+            password = gateway.password.replace("%", "%%")
+            proxy_command_list.insert(0, f"sshpass -p '{password}'")
 
         if gateway.private_key:
             proxy_command_list.append(f"-i {gateway.get_private_key_path(path_dir)}")
