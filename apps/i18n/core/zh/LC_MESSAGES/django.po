@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-03 10:45+0800\n"
+"POT-Creation-Date: 2025-11-05 18:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1742,7 +1742,7 @@ msgstr "成功账号"
 #: accounts/templates/accounts/change_secret_report.html:118
 #: accounts/templates/accounts/push_account_report.html:77
 #: accounts/templates/accounts/push_account_report.html:117
-#: audits/handler.py:128
+#: audits/handler.py:130
 msgid "No"
 msgstr "否"
 
@@ -3525,7 +3525,7 @@ msgstr "任务"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:128
+#: audits/handler.py:130
 msgid "Yes"
 msgstr "是"
 
@@ -5449,7 +5449,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "标签管理"
 
-#: labels/models.py:15 settings/serializers/security.py:211
+#: labels/models.py:15
 msgid "Color"
 msgstr "颜色"
 
@@ -7953,28 +7953,32 @@ msgid "Watermark"
 msgstr "开启水印"
 
 #: settings/serializers/security.py:205
-msgid "Watermark session content"
+msgid "Session content"
 msgstr "会话水印自定义内容"
 
 #: settings/serializers/security.py:208
-msgid "Watermark console content"
+msgid "Console content"
 msgstr "管理页面水印自定义内容"
 
+#: settings/serializers/security.py:211
+msgid "Font color"
+msgstr "字体颜色"
+
 #: settings/serializers/security.py:214
-msgid "Watermark font size"
-msgstr "字体字号"
+msgid "Font size"
+msgstr "字体大小 (px)"
 
 #: settings/serializers/security.py:217
-msgid "Watermark height"
-msgstr "单个水印高度"
+msgid "Height"
+msgstr "高度 (px)"
 
 #: settings/serializers/security.py:220
-msgid "Watermark width"
-msgstr "单个水印宽度"
+msgid "Width"
+msgstr "宽度 (px)"
 
 #: settings/serializers/security.py:223
-msgid "Watermark rotate"
-msgstr "水印旋转角度"
+msgid "Rotate"
+msgstr "旋转 (度)"
 
 #: settings/serializers/security.py:227
 msgid "Max idle time (minute)"
@@ -11588,6 +11592,3 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
-
-#~ msgid "domain_name"
-#~ msgstr "域名称"
