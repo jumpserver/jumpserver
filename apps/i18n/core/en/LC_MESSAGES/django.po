@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-03 10:45+0800\n"
+"POT-Creation-Date: 2025-11-05 18:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1711,7 +1711,7 @@ msgstr ""
 #: accounts/templates/accounts/change_secret_report.html:118
 #: accounts/templates/accounts/push_account_report.html:77
 #: accounts/templates/accounts/push_account_report.html:117
-#: audits/handler.py:128
+#: audits/handler.py:130
 msgid "No"
 msgstr ""
 
@@ -3461,7 +3461,7 @@ msgstr ""
 msgid "-"
 msgstr ""
 
-#: audits/handler.py:128
+#: audits/handler.py:130
 msgid "Yes"
 msgstr ""
 
@@ -5355,7 +5355,7 @@ msgstr ""
 msgid "App Labels"
 msgstr "Labels"
 
-#: labels/models.py:15 settings/serializers/security.py:211
+#: labels/models.py:15
 msgid "Color"
 msgstr ""
 
@@ -7783,28 +7783,32 @@ msgid "Watermark"
 msgstr ""
 
 #: settings/serializers/security.py:205
-msgid "Watermark session content"
-msgstr ""
+msgid "Session content"
+msgstr "Custom content for session"
 
 #: settings/serializers/security.py:208
-msgid "Watermark console content"
-msgstr ""
+msgid "Console content"
+msgstr "Custom content on the management page"
+
+#: settings/serializers/security.py:211
+msgid "Font color"
+msgstr "Font color"
 
 #: settings/serializers/security.py:214
-msgid "Watermark font size"
-msgstr ""
+msgid "Font size"
+msgstr "Font size (px)"
 
 #: settings/serializers/security.py:217
-msgid "Watermark height"
-msgstr ""
+msgid "Height"
+msgstr "Height (px)"
 
 #: settings/serializers/security.py:220
-msgid "Watermark width"
-msgstr ""
+msgid "Width"
+msgstr "Height (px)"
 
 #: settings/serializers/security.py:223
-msgid "Watermark rotate"
-msgstr ""
+msgid "Rotate"
+msgstr "Rotate (degree)"
 
 #: settings/serializers/security.py:227
 msgid "Max idle time (minute)"
