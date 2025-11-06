@@ -12,43 +12,43 @@ class CleaningSerializer(serializers.Serializer):
 
     LOGIN_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("Login log retention days (day)"),
+        label=_("Login log retention days"),
     )
     TASK_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("Task log retention days (day)"),
+        label=_("Task log retention days"),
     )
     OPERATE_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("Operate log retention days (day)"),
+        label=_("Operate log retention days"),
     )
     PASSWORD_CHANGE_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("password change log keep days (day)"),
+        label=_("Password change log retention days"),
     )
     FTP_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("FTP log retention days (day)"),
+        label=_("FTP log retention days"),
     )
     CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("Cloud sync task history retention days (day)"),
+        label=_("Cloud sync task history retention days"),
     )
     JOB_EXECUTION_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("job execution retention days (day)"),
+        label=_("job execution retention days"),
     )
     ACTIVITY_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("Activity log retention days (day)"),
+        label=_("Activity log retention days"),
     )
     TERMINAL_SESSION_KEEP_DURATION = serializers.IntegerField(
-        min_value=MIN_VALUE, max_value=99999, required=True, label=_('Session log retention days (day)'),
+        min_value=MIN_VALUE, max_value=99999, required=True, label=_('Session log retention days'),
         help_text=_(
             'Session, record, command will be delete if more than duration, only in database, OSS will not be affected.')
     )
 
     ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
-        label=_("Change secret and push record retention days (day)"),
+        label=_("Change secret and push record retention days"),
     )

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -7325,40 +7325,40 @@ msgid "Period clean"
 msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "登入記錄 (天)"
+msgid "Login log retention days"
+msgstr "登入日誌保留天數"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "工作紀錄 (天)"
+msgid "Task log retention days"
+msgstr "任務日誌保留天數"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "Action日誌 (天)"
+msgid "Operate log retention days"
+msgstr "操作日誌保留天數"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "改密日誌 (天)"
+msgid "Password change log retention days"
+msgstr "用戶改密日誌保留天數"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "上傳下載 (天)"
+msgid "FTP log retention days"
+msgstr "上傳下載記錄保留天數"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "雲端同步紀錄 (天)"
+msgid "Cloud sync task history retention days"
+msgstr "雲同步記錄保留天數"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "作業中心執行歷史 (天)"
+msgid "job execution retention days"
+msgstr "作業執行歷史保留天數"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "活動紀錄 (天)"
+msgid "Activity log retention days"
+msgstr "活動記錄保留天數"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "會話日誌 (天)"
+msgid "Session log retention days"
+msgstr "會話日誌保留天數"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7367,8 +7367,8 @@ msgid ""
 msgstr "會話、錄影，命令記錄超過該時長將會被清除 (影響資料庫儲存，OSS 等不受影響)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "改密推送記錄保留天數 (天)"
+msgid "Change secret and push record retention days"
+msgstr "帳號改密推送記錄保留天數"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"

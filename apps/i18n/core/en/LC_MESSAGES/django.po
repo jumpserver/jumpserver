@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7280,39 +7280,39 @@ msgid "Period clean"
 msgstr ""
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
+msgid "Login log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
+msgid "Task log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
+msgid "Operate log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
+msgid "Password change log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
+msgid "FTP log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
+msgid "Cloud sync task history retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
+msgid "job execution retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
+msgid "Activity log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
+msgid "Session log retention days"
 msgstr ""
 
 #: settings/serializers/cleaning.py:48
@@ -7322,7 +7322,7 @@ msgid ""
 msgstr ""
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
+msgid "Change secret and push record retention days"
 msgstr ""
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69

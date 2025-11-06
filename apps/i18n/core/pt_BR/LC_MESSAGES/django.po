@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7671,40 +7671,40 @@ msgid "Period clean"
 msgstr "Limpeza Programada"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "Logins (dias)"
+msgid "Login log retention days"
+msgstr "Número de dias para retenção de logs de login"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "Log de tarefas (dias)"
+msgid "Task log retention days"
+msgstr "Número de dias para retenção de logs de tarefas"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "Registro de Operações (dias)"
+msgid "Operate log retention days"
+msgstr "Número de dias para retenção de logs de Ação"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "Registro de Alteração de Senha"
+msgid "Password change log retention days"
+msgstr "Número de dias para retenção de logs de alteração de senha do usuário"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "Upload/Download (dias)"
+msgid "FTP log retention days"
+msgstr "Número de dias para retenção de registros de upload e download"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "Registros de Sincronização em Nuvem (dias)"
+msgid "Cloud sync task history retention days"
+msgstr "Número de dias para retenção de registros de sincronização na nuvem"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "Histórico de Execuções do Centro de Trabalhos (dias)"
+msgid "job execution retention days"
+msgstr "Número de dias para retenção do histórico de execução de tarefas"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "Registros de Atividades (dias)"
+msgid "Activity log retention days"
+msgstr "Número de dias para retenção de registros de atividades"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "Registros de Sessão (dias)"
+msgid "Session log retention days"
+msgstr "Número de dias para retenção de logs de sessão"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7715,8 +7715,10 @@ msgstr ""
 " (afeta o armazenamento do banco de dados, OSS, etc não são afetados)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "Registro de Notificações de Alteração de Senha (dias)"
+msgid "Change secret and push record retention days"
+msgstr ""
+"Número de dias para retenção de registros de notificações sobre alteração de"
+" senha da conta"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: 2025-11-01 11:01\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Russian\n"
@@ -7656,40 +7656,40 @@ msgid "Period clean"
 msgstr "Периодическая очистка"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "Журнал входа (дни)"
+msgid "Login log retention days"
+msgstr "Время хранения журнала входа"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "Журнал задач (дни)"
+msgid "Task log retention days"
+msgstr "Время хранения журнала задач"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "Журнал операций (дни)"
+msgid "Operate log retention days"
+msgstr "Время хранения журнала действий"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "Журнал смены пароля (дни)"
+msgid "Password change log retention days"
+msgstr "Время хранения журнала изменения пароля пользователя"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "Журнал загрузки/скачивания FTP (дни)"
+msgid "FTP log retention days"
+msgstr "Время хранения записей загрузки и скачивания"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "Журнал синхронизации с облаком (дни)"
+msgid "Cloud sync task history retention days"
+msgstr "Время хранения записей облачной синхронизации"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "История выполнения заданий (дни)"
+msgid "job execution retention days"
+msgstr "Время хранения истории выполнения заданий"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "Журнал действий (дни)"
+msgid "Activity log retention days"
+msgstr "Время хранения 기록 активности"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "Журнал сессий (дни)"
+msgid "Session log retention days"
+msgstr "Время хранения журнала сеансов"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7700,8 +7700,8 @@ msgstr ""
 " удалены (влияет на хранение базы данных, но на OSS не влияет)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "Срок хранения записей смены и публикации паролей (дни)"
+msgid "Change secret and push record retention days"
+msgstr "Время хранения записей уведомлений о смене пароля аккаунта"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"

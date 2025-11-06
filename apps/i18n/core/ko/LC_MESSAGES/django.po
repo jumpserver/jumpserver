@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7409,40 +7409,40 @@ msgid "Period clean"
 msgstr "정기 청소"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "로그인 로그 (일)"
+msgid "Login log retention days"
+msgstr "로그인 로그 보존 일수"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "작업 로그 (일)"
+msgid "Task log retention days"
+msgstr "작업 로그 보존 일수"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "액션 로그 (일)"
+msgid "Operate log retention days"
+msgstr "액션 로그 보존 일수"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "비밀번호 변경 로그"
+msgid "Password change log retention days"
+msgstr "사용자 비밀번호 변경 로그 보존 일수"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "업로드 및 다운로드 (일)"
+msgid "FTP log retention days"
+msgstr "업로드 다운로드 기록 보존 일수"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "클라우드 동기화 기록 (일)"
+msgid "Cloud sync task history retention days"
+msgstr "클라우드 동기화 기록 보존 일수"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "작업 센터 실행 이력 (일)"
+msgid "job execution retention days"
+msgstr "작업 실행 이력 보존 일수"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "활동 기록 (일)"
+msgid "Activity log retention days"
+msgstr "활동 기록 보존 일수"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "세션 로그 (일)"
+msgid "Session log retention days"
+msgstr "세션 로그 보존 일수"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7452,8 +7452,8 @@ msgstr ""
 "세션, 녹화 및 명령 기록은 해당 시간을 초과하면 삭제됩니다 (데이터베이스 저장소에 영향, OSS 등은 영향을 받지 않습니다)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "비밀번호 변경 푸시 기록 보존 일수 (일)"
+msgid "Change secret and push record retention days"
+msgstr "계정 비밀번호 변경 푸시 기록 보존 일수"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"

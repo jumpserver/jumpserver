@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7367,40 +7367,40 @@ msgid "Period clean"
 msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "ログインログは日数を保持します（天）"
+msgid "Login log retention days"
+msgstr "ログインログ保持日数"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "タスクログは日数を保持します（天）"
+msgid "Task log retention days"
+msgstr "タスクログ保持日数"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "ログ管理日を操作する（天）"
+msgid "Operate log retention days"
+msgstr "アクションログ保持日数"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "パスワード変更ログ（天）"
+msgid "Password change log retention days"
+msgstr "ユーザー変更パスワードログ保持日数"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "タスクログは日数を保持します（天）"
+msgid "FTP log retention days"
+msgstr "アップロードダウンロード記録保持日数"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "タスクログは日数を保持します（天）"
+msgid "Cloud sync task history retention days"
+msgstr "クラウド同期記録保持日数"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "ジョブセンターの実行履歴 (天) "
+msgid "job execution retention days"
+msgstr "作業実行履歴保持日数"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "活動ログは日数を保持します（天）"
+msgid "Activity log retention days"
+msgstr "活動記録保持日数"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "ログインログは日数を保持します（天）"
+msgid "Session log retention days"
+msgstr "セッションログ保持日数"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7410,8 +7410,8 @@ msgstr ""
 "この期間を超えるセッション、録音、およびコマンド レコードは削除されます (データベースのバックアップに影響し、OSS などには影響しません)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "パスワード変更プッシュ記録を保持する日数 (日)"
+msgid "Change secret and push record retention days"
+msgstr "アカウント変更パスワードプッシュ記録保持日数"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"
