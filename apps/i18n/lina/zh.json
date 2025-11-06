@@ -1637,5 +1637,8 @@
     "removeWarningMsg": "你确定要移除",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "selectedAssets": "已选资产",
+    "clickToAdd": "点击添加",
+    "pleaseSelectAssets": "请选择资产"
 }

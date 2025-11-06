@@ -1628,5 +1628,9 @@
     "setVariable": "Set variable",
     "userId": "User ID",
     "userName": "User name",
+    "selectFiles": "Selected {number} files",
+    "selectedAssets": "Selected assets",
+    "pleaseSelectAssets": "Please select assets",
+    "clickToAdd": "Click to add"
     "LeakPasswordList": "Leaked password list"
 }
