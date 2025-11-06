@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 18:33+0800\n"
+"POT-Creation-Date: 2025-11-06 15:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7699,40 +7699,40 @@ msgid "Period clean"
 msgstr "Dọn dẹp định kỳ"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "Nhật ký đăng nhập (ngày)"
+msgid "Login log retention days"
+msgstr "Ngày lưu giữ nhật ký đăng nhập"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "Nhật ký tác vụ (ngày)"
+msgid "Task log retention days"
+msgstr "Ngày lưu giữ nhật ký nhiệm vụ"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "Nhật ký hành động (ngày)"
+msgid "Operate log retention days"
+msgstr "Ngày lưu giữ nhật ký hành động"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "Nhật ký thay đổi mật khẩu"
+msgid "Password change log retention days"
+msgstr "Ngày lưu giữ nhật ký thay đổi mật khẩu người dùng"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "Tải lên và tải xuống (ngày)"
+msgid "FTP log retention days"
+msgstr "Ngày lưu giữ nhật ký tải lên và tải xuống"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "Hồ sơ đồng bộ đám mây (ngày)"
+msgid "Cloud sync task history retention days"
+msgstr "Ngày lưu giữ nhật ký đồng bộ đám mây"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "Lịch sử thực hiện trung tâm công việc (ngày)"
+msgid "job execution retention days"
+msgstr "Ngày lưu giữ lịch sử thực hiện công việc"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "Hồ sơ hoạt động (ngày)"
+msgid "Activity log retention days"
+msgstr "Ngày lưu giữ nhật ký hoạt động"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "Nhật ký phiên (ngày)"
+msgid "Session log retention days"
+msgstr "Ngày lưu giữ nhật ký phiên làm việc"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7743,8 +7743,8 @@ msgstr ""
 "tới lưu trữ cơ sở dữ liệu, không ảnh hưởng tới OSS)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "Số ngày lưu giữ nhật ký đẩy thay đổi mật khẩu (ngày)"
+msgid "Change secret and push record retention days"
+msgstr "Ngày lưu giữ nhật ký thông báo thay đổi mật khẩu tài khoản."
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"

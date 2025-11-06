@@ -1261,10 +1261,8 @@ msgstr "账号已存在"
 
 #: accounts/serializers/account/account.py:468
 #: accounts/serializers/account/account.py:469
-#, fuzzy
-#| msgid "Select at least one asset or node"
 msgid "At least one asset or node must be specified"
-msgstr "资产或者节点至少选择一项"
+msgstr "必须指定至少一个资产或节点"
 
 #: accounts/serializers/account/account.py:482
 #: accounts/serializers/account/account.py:489
@@ -4259,11 +4257,6 @@ msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
 #: authentication/mixins.py:105
-#, fuzzy
-#| msgid ""
-#| "The administrator has enabled \"Only allow existing users to log in\", \n"
-#| "            and the current user is not in the user list. Please contact "
-#| "the administrator."
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "                and the current user is not in the user list. Please contact "
@@ -7427,40 +7420,40 @@ msgid "Period clean"
 msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:15
-msgid "Login log retention days (day)"
-msgstr "登录日志 (天)"
+msgid "Login log retention days"
+msgstr "登录日志保留天数"
 
 #: settings/serializers/cleaning.py:19
-msgid "Task log retention days (day)"
-msgstr "任务日志 (天)"
+msgid "Task log retention days"
+msgstr "任务日志保留天数"
 
 #: settings/serializers/cleaning.py:23
-msgid "Operate log retention days (day)"
-msgstr "操作日志 (天)"
+msgid "Operate log retention days"
+msgstr "操作日志保留天数"
 
 #: settings/serializers/cleaning.py:27
-msgid "password change log keep days (day)"
-msgstr "改密日志"
+msgid "Password change log retention days"
+msgstr "用户改密日志保留天数"
 
 #: settings/serializers/cleaning.py:31
-msgid "FTP log retention days (day)"
-msgstr "上传下载 (天)"
+msgid "FTP log retention days"
+msgstr "上传下载记录保留天数"
 
 #: settings/serializers/cleaning.py:35
-msgid "Cloud sync task history retention days (day)"
-msgstr "云同步记录 (天)"
+msgid "Cloud sync task history retention days"
+msgstr "云同步记录保留天数"
 
 #: settings/serializers/cleaning.py:39
-msgid "job execution retention days (day)"
-msgstr "作业中心执行历史 (天)"
+msgid "job execution retention days"
+msgstr "作业执行历史保留天数"
 
 #: settings/serializers/cleaning.py:43
-msgid "Activity log retention days (day)"
-msgstr "活动记录 (天)"
+msgid "Activity log retention days"
+msgstr "活动记录保留天数"
 
 #: settings/serializers/cleaning.py:46
-msgid "Session log retention days (day)"
-msgstr "会话日志 (天)"
+msgid "Session log retention days"
+msgstr "会话日志保留天数"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7470,8 +7463,8 @@ msgstr ""
 "会话、录像，命令记录超过该时长将会被清除 (影响数据库存储，OSS 等不受影响)"
 
 #: settings/serializers/cleaning.py:53
-msgid "Change secret and push record retention days (day)"
-msgstr "改密推送记录保留天数 (天)"
+msgid "Change secret and push record retention days"
+msgstr "账号改密推送记录保留天数"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"
