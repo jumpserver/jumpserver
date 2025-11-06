@@ -1,0 +1,26 @@
+{
+  "dry_run": false,
+  "min_account_age_days": 3,
+  "max_urls_for_spam": 1,
+  "min_body_len_for_links": 40,
+  "spam_words": [
+    "call now",
+    "zadzwoń",
+    "zadzwoń teraz",
+    "kontakt",
+    "telefon",
+    "telefone",
+    "contato",
+    "suporte",
+    "infolinii",
+    "click here",
+    "buy now",
+    "subscribe",
+    "visit"
+  ],
+  "bracket_max": 6,
+  "special_char_density_threshold": 0.12,
+  "phone_regex": "\\+?\\d[\\d\\-\\s\\(\\)\\.]{6,}\\d",
+  "labels_for_spam": ["spam"],
+  "labels_for_review": ["needs-triage"]
+}

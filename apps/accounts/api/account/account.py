@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers as drf_serializers
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
@@ -184,12 +185,56 @@ class AssetAccountBulkCreateApi(CreateAPIView):
         'POST': 'accounts.add_account',
     }
 
+    @staticmethod
+    def get_all_assets(base_payload: dict):
+        nodes = base_payload.pop('nodes', [])
+        asset_ids = base_payload.pop('assets', [])
+        nodes = Node.objects.filter(id__in=nodes).only('id', 'key')
+
+        node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
+        asset_ids = set(asset_ids + list(node_asset_ids))
+        return Asset.objects.filter(id__in=asset_ids)
+
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.create(serializer.validated_data)
-        serializer = serializers.AssetAccountBulkSerializerResultSerializer(data, many=True)
-        return Response(data=serializer.data, status=HTTP_200_OK)
+        if hasattr(request.data, "copy"):
+            base_payload = request.data.copy()
+        else:
+            base_payload = dict(request.data)
+
+        templates = base_payload.pop("template", None)
+        assets = self.get_all_assets(base_payload)
+
+        result = []
+        errors = []
+        def handle_one(_payload):
+            try:
+                ser = self.get_serializer(data=_payload)
+                ser.is_valid(raise_exception=True)
+                data = ser.bulk_create(ser.validated_data, assets)
+                if isinstance(data, (list, tuple)):
+                    result.extend(data)
+                else:
+                    result.append(data)
+            except drf_serializers.ValidationError as e:
+                errors.extend(list(e.detail))
+            except Exception as e:
+                errors.extend([str(e)])
+
+        if not templates:
+            handle_one(base_payload)
+        else:
+            if not isinstance(templates, (list, tuple)):
+                templates = [templates]
+            for tpl in templates:
+                payload = dict(base_payload)
+                payload["template"] = tpl
+                handle_one(payload)
+
+        if errors:
+            raise drf_serializers.ValidationError(errors)
+
+        out_ser = serializers.AssetAccountBulkSerializerResultSerializer(result, many=True)
+        return Response(data=out_ser.data, status=HTTP_200_OK)
 
 
 class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixin, ListAPIView):

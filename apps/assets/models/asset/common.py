@@ -408,8 +408,7 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         return tree_node
 
     @staticmethod
-    def get_secret_type_assets(asset_ids, secret_type):
-        assets = Asset.objects.filter(id__in=asset_ids)
+    def get_secret_type_assets(assets, secret_type):
         asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
         protocol_secret_types_map = const.Protocol.protocol_secret_types()
         asset_secret_types_mapp = defaultdict(set)

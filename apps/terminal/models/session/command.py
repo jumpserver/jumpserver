@@ -41,7 +41,7 @@ class Command(AbstractSessionCommand):
                 'timestamp': int(d.timestamp()),
                 'org_id': str(org.id)
             })
-            for i in range(count)
+            for __ in range(count)
         ]
         cls.objects.bulk_create(commands)
         print(f'Create {len(commands)} commands of org ({org})')

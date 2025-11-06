@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.db.models import Count, Max, F, CharField
+from django.db.models import Count, Max, F, CharField, Q
 from django.db.models.functions import Cast
 from django.http.response import JsonResponse
 from django.utils import timezone
@@ -18,8 +18,8 @@ from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
 from orgs.caches import OrgResourceStatisticsCache
-from orgs.utils import current_org
-from terminal.const import RiskLevelChoices
+from orgs.utils import current_org, filter_org_queryset
+from terminal.const import RiskLevelChoices, CommandStorageType
 from terminal.models import Session, CommandStorage
 
 __all__ = ['IndexApi']
@@ -123,15 +123,18 @@ class DateTimeMixin:
         return self.get_logs_queryset_filter(qs, 'date_start')
 
     @lazyproperty
-    def command_queryset_list(self):
+    def command_type_queryset_list(self):
         qs_list = []
-        for storage in CommandStorage.objects.all():
+        for storage in CommandStorage.objects.exclude(name='null'):
             if not storage.is_valid():
                 continue
+
             qs = storage.get_command_queryset()
-            qs_list.append(self.get_logs_queryset_filter(
+            qs = filter_org_queryset(qs)
+            qs = self.get_logs_queryset_filter(
                 qs, 'timestamp', is_timestamp=True
-            ))
+            )
+            qs_list.append((storage.type, qs))
         return qs_list
 
     @lazyproperty
@@ -143,7 +146,7 @@ class DateTimeMixin:
 class DatesLoginMetricMixin:
     dates_list: list
     date_start_end: tuple
-    command_queryset_list: list
+    command_type_queryset_list: list
     sessions_queryset: Session.objects
     ftp_logs_queryset: FTPLog.objects
     job_logs_queryset: JobLog.objects
@@ -261,11 +264,25 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def command_statistics(self):
+        def _count_pair(_tp, _qs):
+            if _tp == CommandStorageType.es:
+                total = _qs.count(limit_to_max_result_window=False)
+                danger = _qs.filter(risk_level=RiskLevelChoices.reject) \
+                    .count(limit_to_max_result_window=False)
+                return total, danger
+
+            agg = _qs.aggregate(
+                total=Count('pk'),
+                danger=Count('pk', filter=Q(risk_level=RiskLevelChoices.reject)),
+            )
+            return (agg['total'] or 0), (agg['danger'] or 0)
+
         total_amount = 0
         danger_amount = 0
-        for qs in self.command_queryset_list:
-            total_amount += qs.count()
-            danger_amount += qs.filter(risk_level=RiskLevelChoices.reject).count()
+        for tp, qs in self.command_type_queryset_list:
+            t, d = _count_pair(tp, qs)
+            total_amount += t
+            danger_amount += d
         return total_amount, danger_amount
 
     @lazyproperty
