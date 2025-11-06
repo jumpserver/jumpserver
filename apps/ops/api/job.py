@@ -14,9 +14,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from acls.models import LoginAssetACL
 from assets.models import Asset
 from common.const.http import POST
 from common.permissions import IsValidUser
+from common.utils import get_request_ip_or_data
 from ops.celery import app
 from ops.const import Types
 from ops.models import Job, JobExecution, JMSPermedInventory
@@ -91,6 +93,19 @@ class JobViewSet(OrgBulkModelViewSet):
             return queryset.filter(instant=False)
         return queryset
 
+    def check_login_asset_acls(self, user, assets, account, ip):
+        for asset in assets:
+            kwargs = {'user': user, 'asset': asset, 'account_username': account}
+            acls = LoginAssetACL.filter_queryset(**kwargs)
+            acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
+            if not acl:
+                return
+            if not acl.is_action(acl.ActionChoices.accept):
+                self.permission_denied(
+                    self.request, _("Login to asset {}({}) is rejected by login asset ACL ({})".format(
+                        asset.name, asset.address, acl))
+                )
+
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
         self._parameters = serializer.validated_data.pop('parameters', None)
@@ -100,6 +115,14 @@ class JobViewSet(OrgBulkModelViewSet):
         if serializer.validated_data.get('type') == Types.upload_file:
             account_name = serializer.validated_data.get('runas')
             self.check_upload_permission(assets, account_name)
+
+        self.check_login_asset_acls(
+            self.request.user,
+            assets,
+            serializer.validated_data.get('runas'),
+            get_request_ip_or_data(self.request)
+        )
+
         instance = serializer.save()
 
         if instance.instant or run_after_save:

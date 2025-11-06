@@ -18,7 +18,7 @@ __all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 from simple_history.models import HistoricalRecords
 
 from accounts.models import Account
-from acls.models import CommandFilterACL
+from acls.models import CommandFilterACL, DataMaskingRule
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
@@ -516,12 +516,32 @@ class JobExecution(JMSOrgBaseModel):
         if error_assets_count > 0:
             raise Exception("You do not have access rights to {} assets".format(error_assets_count))
 
-    def before_start(self):
-        self.check_assets_perms()
+    def check_data_masking_rules_acls(self):
+        for asset in self.current_job.assets.all():
+            acls = DataMaskingRule.filter_queryset(
+                user=self.creator,
+                asset=asset,
+                is_active=True,
+                account_username=self.current_job.runas
+            )
+            protocols = [p.name for p in asset.protocols.all()]
+            if acls and set(protocols) & {'mariadb', 'mysql', 'postgresql', 'sqlserver'}:
+                print(
+                    "\033[31mcommand \'{}\' on asset {}({}) and account {} is rejected by data masking rules acl {}\033[0m"
+                    .format(self.current_job.args, asset.name, asset.address, self.current_job.runas, list(acls))
+                )
+                raise Exception("Command is rejected by data masking rules ACL")
+
+    def check_assets_acls(self):
+        self.check_data_masking_rules_acls()
         if self.current_job.type == 'playbook':
             self.check_danger_keywords()
         if self.current_job.type == 'adhoc':
             self.check_command_acl()
+
+    def before_start(self):
+        self.check_assets_perms()
+        self.check_assets_acls()
 
     def start(self, **kwargs):
         self.date_start = timezone.now()

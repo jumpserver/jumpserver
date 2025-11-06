@@ -1629,4 +1629,9 @@
     "userId": "User ID",
     "userName": "User name",
     "overwriteProtocolsAndPortsMsg": "This operation will overwrite the protocols and ports of the selected assets. Are you sure you want to continue?"
+    "selectFiles": "Selected {number} files",
+    "selectedAssets": "Selected assets",
+    "pleaseSelectAssets": "Please select assets",
+    "clickToAdd": "Click to add"
+    "LeakPasswordList": "Leaked password list"
 }
