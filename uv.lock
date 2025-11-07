@@ -2595,7 +2595,7 @@ requires-dist = [
     { name = "python-cas", specifier = "==1.6.0" },
     { name = "python-daemon", specifier = "==3.0.1" },
     { name = "python-dateutil", specifier = "==2.8.2" },
-    { name = "python-ldap", specifier = "==3.4.3" },
+    { name = "python-ldap", specifier = "==3.4.5" },
     { name = "python-nmap", specifier = "==0.7.1" },
     { name = "python-redis-lock", specifier = "==4.0.0" },
     { name = "python3-saml", specifier = "==1.16.0" },
@@ -4211,13 +4211,13 @@ wheels = [
 
 [[package]]
 name = "python-ldap"
-version = "3.4.3"
+version = "3.4.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyasn1" },
     { name = "pyasn1-modules" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/7d/de9ae3e5843de77eae3a60c1e70ef5cad9960db50521e8459f7d567a1d1d/python-ldap-3.4.3.tar.gz", hash = "sha256:ab26c519a0ef2a443a2a10391fa3c5cb52d7871323399db949ebfaa9f25ee2a0", size = 377438, upload-time = "2022-09-20T15:46:21.283Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/88/8d2797decc42e1c1cdd926df4f005e938b0643d0d1219c08c2b5ee8ae0c0/python_ldap-3.4.5.tar.gz", hash = "sha256:b2f6ef1c37fe2c6a5a85212efe71311ee21847766a7d45fcb711f3b270a5f79a", size = 388482, upload-time = "2025-10-10T20:00:39.06Z" }
 
 [[package]]
 name = "python-nmap"

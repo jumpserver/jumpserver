@@ -4,8 +4,9 @@ import re
 from functools import lru_cache
 from typing import Dict
 
-from django.urls import URLPattern
-from django.urls import URLResolver
+from django.utils.functional import LazyObject
+from django.urls import URLPattern, URLResolver
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.routers import DefaultRouter
 
@@ -114,9 +115,37 @@ def extract_resource_paths(urlpatterns, prefix='/api/v1/') -> Dict[str, Dict[str
 
 
 def param_dic_to_param(d):
+    # 将 'in' 字段映射到 OpenApiParameter 的 location 常量
+    location_map = {
+        'query': OpenApiParameter.QUERY,
+        'path': OpenApiParameter.PATH,
+        'header': OpenApiParameter.HEADER,
+        'cookie': OpenApiParameter.COOKIE,
+    }
+    location = location_map.get(d['in'], OpenApiParameter.QUERY)
+    
+    # 将 type 字符串映射到 OpenApiTypes
+    type_map = {
+        'string': OpenApiTypes.STR,
+        'integer': OpenApiTypes.INT,
+        'number': OpenApiTypes.FLOAT,
+        'boolean': OpenApiTypes.BOOL,
+        'array': OpenApiTypes.OBJECT,  # 对于 array 类型，需要特殊处理
+        'object': OpenApiTypes.OBJECT,
+    }
+    param_type = type_map.get(d['type'], OpenApiTypes.STR)
+
+    enum = None
+    if d.get('enum'):
+        enum = d['enum']
+
     return OpenApiParameter(
-        name=d['name'], location=d['in'],
-        description=d['description'], type=d['type'], required=d.get('required', False)
+        name=d['name'],
+        location=location,
+        description=d['description'],
+        type=param_type,
+        required=d.get('required', False),
+        enum=enum
     )
 
 
