@@ -9,6 +9,8 @@
     {% endfor %}
     <b>{% trans 'Session' %}:</b> <a href="{{ session_url }}" target="_blank">{% trans 'view' %}</a>
     <br />
+    <b>{% trans 'Organization' %}: </b> <span>{{ org }}</span>
+    <br/>
     <b>{% trans 'Command' %}: </b><br />
     <pre>
 {{ command }}
