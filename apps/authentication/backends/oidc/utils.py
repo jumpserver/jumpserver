@@ -47,7 +47,7 @@ def validate_and_return_id_token(jws, nonce=None, validate_nonce=True):
 
 def _get_jwks_keys(shared_key):
     """ Returns JWKS keys used to decrypt id_token values. """
-    # The OpenID Connect Provider (OP) uses RSA keys to sign/enrypt ID tokens and generate public
+    # The OpenID Connect Provider (OP) uses RSA keys to sign/encrypt ID tokens and generate public
     # keys allowing to decrypt them. These public keys are exposed through the 'jwks_uri' and should
     # be used to decrypt the JWS - JSON Web Signature.
     log_prompt = "Get jwks keys: {}"

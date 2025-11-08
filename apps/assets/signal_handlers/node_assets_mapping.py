@@ -23,7 +23,7 @@ node_assets_mapping_pub_sub = lazy(lambda: RedisPubSub('fm.node_asset_mapping'),
 
 @merge_delay_run(ttl=30)
 def expire_node_assets_mapping(org_ids=()):
-    logger.debug("Recv asset nodes changed signal, expire memery node asset mapping")
+    logger.debug("Recv asset nodes changed signal, expire memory node asset mapping")
     # 所有进程清除(自己的 memory 数据)
     root_org_id = Organization.ROOT_ID
     Node.expire_node_all_asset_ids_cache_mapping(root_org_id)
