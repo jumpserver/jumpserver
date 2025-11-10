@@ -2,7 +2,7 @@
 # Free Azure AD trial tenant — zero production risk
 # Example Tenant ID: 2745f97e-08e6-4b97-849a-b78b930ee3a8
 
-from .config_default import *  # noqa
+from .config_default import *  # noqa 
 
 SAML_AUTH = True
 SAML_METADATA_URL = "https://login.microsoftonline.com/{TENANT_ID}/federationmetadata/2007-06/federationmetadata.xml"
