@@ -1638,7 +1638,7 @@
     "setVariable": "设置参数",
     "userId": "用户ID",
     "userName": "用户名",
-    "overwriteProtocolsAndPortsMsg": "此操作将覆盖所有协议和端口，是否继续？"
+    "overwriteProtocolsAndPortsMsg": "此操作将覆盖所有协议和端口，是否继续？",
     "selectedAssets": "已选资产",
     "clickToAdd": "点击添加",
     "pleaseSelectAssets": "请选择资产"
