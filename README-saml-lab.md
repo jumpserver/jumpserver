@@ -1,11 +1,11 @@
-# Azure AD SAML for JumpServer — PhD Research Lab
+# Azure AD SAML for JumpServer — Lab Configuration
 
 ## Lab Setup
 1. Free Azure AD tenant (azure.microsoft.com/free)
-2. Replace {TENANT_ID}
-3. Test: testuser@yourlab.onmicrosoft.com
+2. Replace `{TENANT_ID}` in config
+3. Test user: `testuser@yourlab.onmicrosoft.com`
 
-## Research Impact
-Enables **JIT PAM** with Azure PIM  
-Reduces standing privileges by 60%  
-Target: US PhD programs in Information Security
+## Purpose
+Enables testing of just-in-time access patterns with Azure PIM.  
+Reduces standing privileges in hybrid environments.  
+Zero production impact.
