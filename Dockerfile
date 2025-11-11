@@ -19,7 +19,7 @@ RUN set -ex \
     && python manage.py compilemessages
 
 
-FROM jumpserver/core-base:python-3.11-slim-bullseye-v1
+FROM python:3.11.14-trixie
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
