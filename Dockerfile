@@ -39,7 +39,7 @@ ARG TOOLS="                           \
 ARG APT_MIRROR=http://deb.debian.org
 
 RUN set -ex \
-    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list.d/debian.sources \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update > /dev/null \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
