@@ -199,7 +199,7 @@
     "AuditsDashboard": "Audits dashboard",
     "Auth": "Authentication",
     "AuthConfig": "Authentication",
-    "AuthIntegration": "AuthIntegration",
+    "AuthIntegration": "Auth Integration",
     "AuthLimit": "Login restriction",
     "AuthSAMLCertHelpText": "Save after uploading the certificate key, then view sp metadata",
     "AuthSAMLKeyHelpText": "Sp certificates and keys are used for encrypted communication with idp",
