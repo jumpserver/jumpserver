@@ -729,7 +729,7 @@
     "InstanceName": "实例名称",
     "InstanceNamePartIp": "实例名称和部分IP",
     "InstancePlatformName": "实例平台名称",
-    "Integration": "应用集成",
+    "Integration": "集成",
     "Interface": "网络接口",
     "InterfaceSettings": "界面设置",
     "Interval": "间隔",
