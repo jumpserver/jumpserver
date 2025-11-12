@@ -267,9 +267,21 @@ DATABASES = {
 DB_USE_SSL = CONFIG.DB_USE_SSL
 if DB_ENGINE == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
-    if DB_USE_SSL:
-        DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
-        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
+
+if DB_USE_SSL:
+    DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
+    DB_CLIENT_CERT_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_client.crt'), None)
+    DB_CLIENT_KEY_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_client.key'), None)
+
+    if DB_ENGINE == 'mysql':
+        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH, 'cert': DB_CLIENT_CERT_PATH, 'key': DB_CLIENT_KEY_PATH}
+    elif DB_ENGINE == 'postgresql':
+        DB_OPTIONS.update({
+            'sslmode': 'require',
+            'sslrootcert': DB_CA_PATH,
+            'sslcert': DB_CLIENT_CERT_PATH,
+            'sslkey': DB_CLIENT_KEY_PATH
+        })
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
