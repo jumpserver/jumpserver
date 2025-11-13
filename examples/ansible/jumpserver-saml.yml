@@ -1,0 +1,24 @@
+---
+# Auto-deploy JumpServer + enable SAML (Okta)
+- name: Deploy JumpServer with SAML
+  hosts: localhost
+  vars:
+    jumpserver_url: "https://your-jumpserver.com"
+    okta_sso_url: "https://your-okta.com/app/exk123/sso/saml"
+    okta_metadata_url: "https://your-okta.com/app/exk123/sso/saml/metadata"
+  tasks:
+    - name: Enable SAML in JumpServer
+      uri:
+        url: "{{ jumpserver_url }}/api/v1/authen/saml/"
+        method: POST
+        body_format: json
+        body:
+          enable: true
+          metadata_url: "{{ okta_metadata_url }}"
+        headers:
+          Authorization: "Bearer {{ jumpserver_token }}"
+      register: saml_config
+
+    - name: Test SAML login
+      debug:
+        msg: "SAML enabled. Login via: {{ okta_sso_url }}"
