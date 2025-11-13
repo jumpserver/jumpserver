@@ -3,6 +3,7 @@ from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from authentication.backends.base import BaseAuthCallbackClientView
@@ -61,6 +62,10 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
                 return HttpResponseRedirect(
                     settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI
                 )
+            else:
+                if getattr(request, 'error_message', ''):
+                    response = self.get_failed_response('/', title=_('OAuth2 Error'), msg=request.error_message)
+                    return response
 
         logger.debug(log_prompt.format('Redirect'))
         redirect_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT or '/'
