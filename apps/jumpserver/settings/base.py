@@ -270,17 +270,13 @@ if DB_ENGINE == 'mysql':
 
 if DB_USE_SSL:
     DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
-    DB_CLIENT_CERT_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_client.crt'), None)
-    DB_CLIENT_KEY_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_client.key'), None)
 
     if DB_ENGINE == 'mysql':
-        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH, 'cert': DB_CLIENT_CERT_PATH, 'key': DB_CLIENT_KEY_PATH}
+        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH }
     elif DB_ENGINE == 'postgresql':
         DB_OPTIONS.update({
             'sslmode': 'require',
             'sslrootcert': DB_CA_PATH,
-            'sslcert': DB_CLIENT_CERT_PATH,
-            'sslkey': DB_CLIENT_KEY_PATH
         })
 
 # Password validation
