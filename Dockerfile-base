@@ -1,4 +1,4 @@
-FROM python:3.11.14-trixie
+FROM python:3.11.14-slim-trixie
 ARG TARGETARCH
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
@@ -43,6 +43,7 @@ ARG PIP_MIRROR=https://pypi.org/simple
 ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=3.4.5
 
 RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
