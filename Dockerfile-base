@@ -1,4 +1,4 @@
-FROM python:3.11.14-trixie
+FROM python:3.11-slim-trixie
 ARG TARGETARCH
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
