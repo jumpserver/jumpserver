@@ -84,6 +84,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
 class PlatformProtocolSerializer(serializers.ModelSerializer):
     setting = MethodSerializer(required=False, label=_("Setting"))
     port_from_addr = serializers.BooleanField(label=_("Port from addr"), read_only=True)
+    port = serializers.IntegerField(label=_("Port"), required=False, min_value=0, max_value=65535)
 
     class Meta:
         model = PlatformProtocol
