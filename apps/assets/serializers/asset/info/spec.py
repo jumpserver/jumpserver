@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import FillType
-from assets.models import Database, Web, DirectoryService
+from assets.models import Database, Web, DirectoryService, Cloud
 from common.serializers.fields import LabeledChoiceField
 
 
@@ -56,9 +56,14 @@ class DsSpecSerializer(serializers.ModelSerializer):
         model = DirectoryService
         fields = ['domain_name']
 
+class CloudSpecSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cloud
+        fields = ['namespace']
 
 category_spec_serializer_map = {
     'database': DatabaseSpecSerializer,
     'web': WebSpecSerializer,
     'ds': DsSpecSerializer,
+    'cloud': CloudSpecSerializer,
 }

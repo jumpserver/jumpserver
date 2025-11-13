@@ -7,7 +7,7 @@ __all__ = ['CloudSerializer']
 class CloudSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Cloud
-        fields = AssetSerializer.Meta.fields
+        fields = AssetSerializer.Meta.fields + ['namespace']
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
             'address': {
