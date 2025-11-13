@@ -478,6 +478,7 @@
     "DeclassificationLogNum": "改密日志数",
     "DeeplyThoughtAbout": "已深度思考",
     "DefaultDatabase": "默认数据库",
+    "DefaultNamespace": "默认命名空间",
     "DefaultPort": "默认端口",
     "DefaultValue": "默认值",
     "DefaultValueTip": "保存并执行和定时任务使用默认值执行，不填写默认值可能会导致任务执行失败",

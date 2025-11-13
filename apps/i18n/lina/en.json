@@ -479,6 +479,7 @@
     "DeclassificationLogNum": "Password change logs",
     "DeeplyThoughtAbout": "Deeply thought about",
     "DefaultDatabase": "Default database",
+    "DefaultNamespace": "Default namespace",
     "DefaultPort": "Default port",
     "DefaultValue": "Default value",
     "DefaultValueTip": "Save and execute using default values for scheduled tasks. Not filling in the default values may cause the task to fail",
