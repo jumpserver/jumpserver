@@ -1,10 +1,11 @@
-FROM python:3.11-slim-trixie
+FROM python:3.11.14-slim-trixie
 ARG TARGETARCH
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget                          \
         g++                           \
+        gcc                           \
         make                          \
         pkg-config                    \
         default-libmysqlclient-dev    \
