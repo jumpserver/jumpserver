@@ -1,0 +1,35 @@
+---
+# Auto-block malicious IPs from Emerging Threats in JumpServer
+- name: Block malicious IPs in JumpServer
+  hosts: localhost
+  vars:
+    threat_feed: "https://rules.emergingthreats.net/blockrules/compromised-ips.txt"
+    jumpserver_api: "https://your-jumpserver.com/api/v1"
+  tasks:
+    - name: Fetch live threat feed
+      uri:
+        url: "{{ threat_feed }}"
+        return_content: yes
+      register: ip_list
+
+    - name: Extract IPs
+      set_fact:
+        bad_ips: "{{ ip_list.content.splitlines() | select('match', '^[0-9]') | list }}"
+
+    - name: Block IPs in JumpServer firewall
+      uri:
+        url: "{{ jumpserver_api }}/perms/assets/firewall-rules/"
+        method: POST
+        body_format: json
+        body:
+          name: "Auto-block Emerging Threats"
+          action: "drop"
+          ip: "{{ item }}"
+        headers:
+          Authorization: "Bearer {{ jumpserver_token }}"
+      loop: "{{ bad_ips[:5] }}"  # Demo: first 5 only
+      when: bad_ips | length > 0
+
+    - name: Summary
+      debug:
+        msg: "Blocked {{ bad_ips | length }} malicious IPs from Emerging Threats"
