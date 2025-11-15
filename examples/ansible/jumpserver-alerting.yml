@@ -1,0 +1,41 @@
+---
+# Alert on suspicious commands in JumpServer session logs
+- name: Monitor JumpServer sessions for threats
+  hosts: localhost
+  vars:
+    jumpserver_api: "https://your-jumpserver.com/api/v1"
+    suspicious_commands:
+      - "rm -rf"
+      - "wget.*http"
+      - "curl.*http"
+      - "nc -e"
+      - "bash -i"
+  tasks:
+    - name: Fetch recent session logs
+      uri:
+        url: "{{ jumpserver_api }}/audits/session-logs/"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ jumpserver_token }}"
+      register: logs
+
+    - name: Search for suspicious commands
+      set_fact:
+        alerts: >
+          {{ logs.json.results | selectattr('command', 'defined') |
+             selectattr('command', 'match', suspicious_commands | join('|')) |
+             list }}
+
+    - name: Send alert (demo)
+      debug:
+        msg: |
+          SUSPICIOUS ACTIVITY DETECTED
+          User: {{ item.user }}
+          Command: {{ item.command }}
+          Time: {{ item.timestamp }}
+      loop: "{{ alerts }}"
+      when: alerts | length > 0
+
+    - name: Summary
+      debug:
+        msg: "Scanned {{ logs.json.count }} sessions. Found {{ alerts | length }} alerts."
