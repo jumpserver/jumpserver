@@ -203,6 +203,8 @@ class AssetAccountBulkCreateApi(CreateAPIView):
 
         templates = base_payload.pop("template", None)
         assets = self.get_all_assets(base_payload)
+        if not assets.exists():
+            raise drf_serializers.ValidationError(_("No valid assets found for account creation."))
 
         result = []
         errors = []
