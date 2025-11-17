@@ -1,0 +1,33 @@
+---
+# JumpServer Threat Feed Integration (Ansible Example)
+# Auto-import Emerging Threats IPs and tag suspicious assets
+- name: Integrate Threat Feed with JumpServer
+  hosts: localhost
+  vars:
+    threat_feed: "https://rules.emergingthreats.net/blockrules/compromised-ips.txt"
+    jumpserver_url: "https://your-jumpserver.com/api/v1"
+  tasks:
+    - name: Fetch threat feed
+      uri:
+        url: "{{ threat_feed }}"
+        return_content: yes
+      register: ip_list
+
+    - name: Extract bad IPs
+      set_fact:
+        bad_ips: "{{ ip_list.content.splitlines() | select('match', '^[0-9]') | list }}"
+
+    - name: Tag assets in JumpServer
+      uri:
+        url: "{{ jumpserver_url }}/perms/assets/"
+        method: PATCH
+        body_format: json
+        body:
+          tags: ["threat-quarantine", "emerging-threats"]
+      loop: "{{ bad_ips[:5] }}"  # Demo: first 5
+      vars:
+        asset_id: "demo-asset-{{ ansible_loop.index }}"
+
+    - name: Summary
+      debug:
+        msg: "Tagged {{ bad_ips | length }} threats in JumpServer"
