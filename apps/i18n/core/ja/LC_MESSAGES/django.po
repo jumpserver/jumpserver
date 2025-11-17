@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-06 15:37+0800\n"
+"POT-Creation-Date: 2025-11-17 17:53+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,10 @@ msgstr ""
 #: accounts/serializers/account/account.py:362
 msgid "Account already exists"
 msgstr "アカウントはすでに存在しています"
+
+#: accounts/api/account/account.py:207
+msgid "No valid assets found for account creation."
+msgstr "アカウント作成に使用できる有効な資産が見つかりませんでした。"
 
 #: accounts/api/account/application.py:77
 #: authentication/api/connection_token.py:453
@@ -597,8 +601,8 @@ msgstr "アカウントの活動"
 #: assets/models/asset/common.py:166 assets/models/cmd_filter.py:21
 #: assets/models/label.py:18 assets/models/platform.py:15
 #: assets/models/platform.py:94 assets/models/zone.py:19
-#: assets/serializers/asset/common.py:174 assets/serializers/platform.py:158
-#: assets/serializers/platform.py:283
+#: assets/serializers/asset/common.py:174 assets/serializers/platform.py:159
+#: assets/serializers/platform.py:284
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
 #: authentication/notifications.py:56
@@ -1209,8 +1213,8 @@ msgstr "アカウントの存在ポリシー"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
-#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:173
-#: assets/serializers/platform.py:284 perms/serializers/user_permission.py:27
+#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:174
+#: assets/serializers/platform.py:285 perms/serializers/user_permission.py:27
 #: settings/models.py:41 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:327
@@ -1222,7 +1226,7 @@ msgstr "カテゴリ"
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:27
 #: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
-#: assets/serializers/platform.py:160 assets/serializers/platform.py:172
+#: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/serializers.py:76 audits/serializers.py:196
 #: authentication/models/connection_token.py:67
 #: authentication/serializers/connect_token_secret.py:138
@@ -1291,7 +1295,8 @@ msgstr "特別情報"
 #: accounts/serializers/account/account.py:499
 #: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:33
+#: perms/models/perm_node.py:21 settings/models.py:245
+#: users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
@@ -1702,7 +1707,7 @@ msgstr "タイプ数"
 #: accounts/templates/accounts/change_secret_report.html:33
 #: accounts/templates/accounts/gather_account_report.html:31
 #: accounts/templates/accounts/push_account_report.html:32
-#: assets/serializers/domain.py:23 assets/serializers/platform.py:182
+#: assets/serializers/domain.py:23 assets/serializers/platform.py:183
 #: orgs/serializers.py:13 perms/serializers/permission.py:61
 msgid "Assets amount"
 msgstr "資産数量"
@@ -1859,7 +1864,7 @@ msgstr "ユーザー"
 #: acls/models/base.py:97 acls/templates/acls/asset_login_reminder.html:10
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
-#: assets/serializers/platform.py:181 assets/serializers/platform.py:213
+#: assets/serializers/platform.py:182 assets/serializers/platform.py:214
 #: authentication/api/connection_token.py:464 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
@@ -2145,11 +2150,11 @@ msgstr "ユーザーが最近ログインしたことをお知らせいたしま
 msgid "User details"
 msgstr "ユーザー詳細"
 
-#: assets/api/asset/asset.py:154
+#: assets/api/asset/asset.py:153
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "資産を直接作成することはできません。ホストまたはその他を作成する必要があります"
 
-#: assets/api/asset/asset.py:158
+#: assets/api/asset/asset.py:157
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "資産の数が5000の制限を超えています"
 
@@ -2580,8 +2585,9 @@ msgid "Cloud"
 msgstr "クラウド サービス"
 
 #: assets/models/asset/common.py:101 assets/models/platform.py:16
-#: settings/serializers/auth/radius.py:18 settings/serializers/auth/sms.py:77
-#: settings/serializers/msg.py:31 terminal/serializers/storage.py:133
+#: assets/serializers/platform.py:87 settings/serializers/auth/radius.py:18
+#: settings/serializers/auth/sms.py:77 settings/serializers/msg.py:31
+#: terminal/serializers/storage.py:133
 #: xpack/plugins/cloud/serializers/account_attrs.py:88
 msgid "Port"
 msgstr "ポート"
@@ -2795,7 +2801,7 @@ msgstr "値"
 
 #: assets/models/label.py:40 assets/serializers/cagegory.py:10
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
-#: assets/serializers/platform.py:159
+#: assets/serializers/platform.py:160
 #: authentication/serializers/connect_token_secret.py:136
 #: common/serializers/common.py:85 labels/serializers.py:45
 #: settings/serializers/msg.py:91 xpack/plugins/cloud/models.py:404
@@ -2846,7 +2852,7 @@ msgstr "主要"
 msgid "Required"
 msgstr "必要"
 
-#: assets/models/platform.py:19 assets/serializers/platform.py:161
+#: assets/models/platform.py:19 assets/serializers/platform.py:162
 #: terminal/models/component/storage.py:28 users/const.py:42
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
@@ -2949,11 +2955,11 @@ msgstr "アカウント削除パラメータ"
 msgid "Internal"
 msgstr "ビルトイン"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:171
+#: assets/models/platform.py:102 assets/serializers/platform.py:172
 msgid "Charset"
 msgstr "シャーセット"
 
-#: assets/models/platform.py:104 assets/serializers/platform.py:209
+#: assets/models/platform.py:104 assets/serializers/platform.py:210
 msgid "Gateway enabled"
 msgstr "ゾーンゲートウェイを有効化"
 
@@ -2961,15 +2967,15 @@ msgstr "ゾーンゲートウェイを有効化"
 msgid "DS enabled"
 msgstr "ディレクトリサービスが有効になりました"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:202
+#: assets/models/platform.py:107 assets/serializers/platform.py:203
 msgid "Su enabled"
 msgstr "アカウントの切り替えを有効にする"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:177
+#: assets/models/platform.py:108 assets/serializers/platform.py:178
 msgid "Su method"
 msgstr "アカウントの切り替え方法"
 
-#: assets/models/platform.py:109 assets/serializers/platform.py:180
+#: assets/models/platform.py:109 assets/serializers/platform.py:181
 msgid "Custom fields"
 msgstr "カスタムフィールド"
 
@@ -2984,7 +2990,7 @@ msgid ""
 "type"
 msgstr "プラットフォームタイプがスキップされた資産に合致しない、資産内の一括更新プラットフォーム"
 
-#: assets/serializers/asset/common.py:36 assets/serializers/platform.py:153
+#: assets/serializers/asset/common.py:36 assets/serializers/platform.py:154
 msgid "Protocols, format is [\"protocol/port\"]"
 msgstr "契約書、形式は[\"契約書/ポート\"]"
 
@@ -3004,7 +3010,7 @@ msgid ""
 "it"
 msgstr "ノードパス、形式は [\"/組織/ノード名\"]、もしノードが存在しない場合、それを作成します"
 
-#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:174
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:175
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
@@ -3220,39 +3226,39 @@ msgstr "アカウントの削除が有効になりました"
 msgid "Port from addr"
 msgstr "アドレスからのポート"
 
-#: assets/serializers/platform.py:98
+#: assets/serializers/platform.py:99
 msgid ""
 "This protocol is primary, and it must be set when adding assets. "
 "Additionally, there can only be one primary protocol."
 msgstr "このプロトコルはプライマリであり、資産を追加するときに設定する必要があります。また、プライマリプロトコルは1つしかありません"
 
-#: assets/serializers/platform.py:103
+#: assets/serializers/platform.py:104
 msgid "This protocol is required, and it must be set when adding assets."
 msgstr "このプロトコルは必須であり、資産を追加するときに設定する必要があります"
 
-#: assets/serializers/platform.py:106
+#: assets/serializers/platform.py:107
 msgid ""
 "This protocol is default, when adding assets, it will be displayed by "
 "default."
 msgstr "このプロトコルはデフォルトです。資産を追加するときに、デフォルトで表示されます"
 
-#: assets/serializers/platform.py:109
+#: assets/serializers/platform.py:110
 msgid "This protocol is public, asset will show this protocol to user"
 msgstr "このプロトコルは公開されており、資産はこのプロトコルをユーザーに表示します"
 
-#: assets/serializers/platform.py:162
+#: assets/serializers/platform.py:163
 msgid "Help text"
 msgstr "ヘルプ"
 
-#: assets/serializers/platform.py:163
+#: assets/serializers/platform.py:164
 msgid "Choices"
 msgstr "せんたく"
 
-#: assets/serializers/platform.py:175
+#: assets/serializers/platform.py:176
 msgid "Automation"
 msgstr "オートメーション"
 
-#: assets/serializers/platform.py:204
+#: assets/serializers/platform.py:205
 msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
@@ -3261,19 +3267,19 @@ msgstr ""
 "資産にアクセスする際にアカウントでログインし、その後自動的に別のアカウントに切り替えます。これは、通常のアカウントでログインした後に root "
 "に切り替えるのと似ています"
 
-#: assets/serializers/platform.py:210
+#: assets/serializers/platform.py:211
 msgid "Assets can be connected using a zone gateway"
 msgstr "資産はゾーンゲートウェイを使用して接続できます"
 
-#: assets/serializers/platform.py:212
+#: assets/serializers/platform.py:213
 msgid "Default zone"
 msgstr "デフォルトドメイン"
 
-#: assets/serializers/platform.py:239
+#: assets/serializers/platform.py:240
 msgid "type is required"
 msgstr "タイプ このフィールドは必須です."
 
-#: assets/serializers/platform.py:254
+#: assets/serializers/platform.py:255
 msgid "Protocols is required"
 msgstr "同意が必要です"
 
@@ -3887,6 +3893,10 @@ msgstr "無効なトークンヘッダー。署名文字列に無効な文字を
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
+#: authentication/backends/oauth2/views.py:67
+msgid "OAuth2 Error"
+msgstr "OAuth2 エラー"
+
 #: authentication/backends/oidc/views.py:137
 msgid "OpenID Error"
 msgstr "OpenID エラー"
@@ -3916,7 +3926,7 @@ msgstr "に追加"
 msgid "Credential ID"
 msgstr "資格情報ID"
 
-#: authentication/backends/saml2/views.py:282
+#: authentication/backends/saml2/views.py:255
 msgid "SAML2 Error"
 msgstr "SAML2 エラー"
 
@@ -5465,16 +5475,16 @@ msgid ""
 "        work orders, and other notifications"
 msgstr "システムの警告やチケットなどを送信するためには、このタスクを実行します"
 
-#: ops/ansible/inventory.py:135 ops/ansible/inventory.py:205
+#: ops/ansible/inventory.py:136 ops/ansible/inventory.py:206
 #: ops/models/job.py:69
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:326 ops/ansible/inventory.py:368
+#: ops/ansible/inventory.py:327 ops/ansible/inventory.py:369
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:384
+#: ops/ansible/inventory.py:385
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -5490,34 +5500,38 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:70
+#: ops/api/job.py:65
+msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
+msgstr ""
+
+#: ops/api/job.py:88
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr "資産({asset})には、少なくともSSH、SFTP、WinRMのいずれか一つのプロトコルを追加する必要があります"
 
-#: ops/api/job.py:71
+#: ops/api/job.py:89
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "資産({asset})の認証にはSSH、SFTP、またはWinRMプロトコルが不足しています"
 
-#: ops/api/job.py:72
+#: ops/api/job.py:90
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "資産({asset})の認証にはアップロード権限が不足しています"
 
-#: ops/api/job.py:160
+#: ops/api/job.py:185
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
 
-#: ops/api/job.py:165
+#: ops/api/job.py:190
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択してください。"
 
-#: ops/api/job.py:238
+#: ops/api/job.py:273
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "タスクを作成中で、中断できません。後でもう一度お試しください。"
@@ -5822,7 +5836,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:561
+#: ops/models/job.py:581
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -11314,6 +11328,10 @@ msgstr "華東-宿遷"
 #, python-format
 msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
 msgstr "インスタンスIP \"%(ip)s\" のポート \"%(port)s\" は接続できません"
+
+#: xpack/plugins/cloud/providers/scp.py:108
+msgid "Empty"
+msgstr "空 "
 
 #: xpack/plugins/cloud/serializers/account.py:104
 msgid "Validity display"
