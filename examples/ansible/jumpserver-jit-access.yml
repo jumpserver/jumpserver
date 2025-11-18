@@ -1,0 +1,27 @@
+---
+# JumpServer Just-In-Time (JIT) Access with Okta/Azure AD
+- name: Grant temporary JumpServer access (JIT)
+  hosts: localhost
+  vars:
+    jumpserver_api: "https://your-jumpserver.com/api/v1"
+    user_email: "user@example.com"
+    duration_hours: 2
+  tasks:
+    - name: Create temporary permission
+      uri:
+        url: "{{ jumpserver_api }}/perms/users-assets/"
+        method: POST
+        body_format: json
+        body:
+          user: "{{ user_email }}"
+          assets: ["demo-server-01"]
+          actions: ["connect"]
+          date_start: "{{ lookup('pipe', 'date +%Y-%m-%dT%H:%M:%SZ') }}"
+          date_expire: "{{ lookup('pipe', 'date -d \"+'"$duration_hours"' hours\" +%Y-%m-%dT%H:%M:%SZ') }}"
+        headers:
+          Authorization: "Bearer {{ jumpserver_token }}"
+      register: jit_permission
+
+    - name: Summary (demo)
+      debug:
+        msg: "JIT access granted to {{ user_email }} for {{ duration_hours }} hours (expires {{ jit_permission.date_expire }})"
