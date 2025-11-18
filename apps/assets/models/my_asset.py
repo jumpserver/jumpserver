@@ -28,7 +28,8 @@ class MyAsset(JMSBaseModel):
 
     @staticmethod
     def set_asset_custom_value(assets, user):
-        my_assets = MyAsset.objects.filter(asset__in=assets, user=user).all()
+        asset_ids = [asset.id for asset in assets]
+        my_assets = MyAsset.objects.filter(asset_id__in=asset_ids, user=user).all()
         customs = {my_asset.asset.id: my_asset.custom_to_dict() for my_asset in my_assets}
         for asset in assets:
             custom = customs.get(asset.id)
