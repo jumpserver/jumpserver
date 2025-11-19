@@ -140,7 +140,7 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         self.check_login_asset_acls(
             self.request.user,
             assets,
-            serializer.validated_data.get('runas'),
+            job.runas,
             get_request_ip_or_data(self.request)
         )
 
@@ -340,13 +340,13 @@ class UsernameHintsAPI(APIView):
         assets = merge_nodes_and_assets(node_ids, assets, request.user)
 
         top_accounts = Account.objects \
-                           .exclude(username__startswith='jms_') \
-                           .exclude(username__startswith='js_') \
-                           .filter(username__icontains=query) \
-                           .filter(asset__in=assets) \
-                           .values('username') \
-                           .annotate(total=Count('username')) \
-                           .order_by('-total', '-username')[:10]
+            .exclude(username__startswith='jms_') \
+            .exclude(username__startswith='js_') \
+            .filter(username__icontains=query) \
+            .filter(asset__in=assets) \
+            .values('username') \
+            .annotate(total=Count('username')) \
+            .order_by('-total', '-username')[:10]
         return Response(data=top_accounts)
 
 
