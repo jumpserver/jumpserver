@@ -1642,5 +1642,7 @@
     "selectedAssets": "已选资产",
     "setVariable": "设置参数",
     "userId": "用户ID",
-    "userName": "用户名"
+    "userName": "用户名",
+    "Risk": "风险",
+    "selectFiles": "已选择选择{number}文件"
 }
