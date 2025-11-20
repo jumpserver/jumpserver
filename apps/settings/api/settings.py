@@ -222,4 +222,4 @@ class ClientVersionView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        return Response(['3.1.0'], status=status.HTTP_200_OK)
+        return Response(['4.0.0'], status=status.HTTP_200_OK)
