@@ -211,7 +211,7 @@ class AuthPreCheckMixin:
         logger.warning('Ip was blocked' + ': ' + username + ':' + ip)
         exception = errors.BlockLoginError(username=username, ip=ip, request=self.request)
         if raise_exception:
-            raise errors.BlockLoginError(username=username, ip=ip, request=self.request)
+            raise exception
         else:
             return exception
 
