@@ -6,6 +6,7 @@ import os
 import re
 import time
 from contextlib import contextmanager
+from urllib.parse import unquote
 
 import pyotp
 from django.conf import settings
@@ -60,6 +61,8 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
     # 防止 next 地址为 None
     if not url or url.lower() in ['none']:
         url = reverse('index')
+    # 处理下载地址编码问题 '%2Fui%2F'
+    url = unquote(url)
     return url
 
 
