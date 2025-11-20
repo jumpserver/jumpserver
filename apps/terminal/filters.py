@@ -36,16 +36,16 @@ class CommandFilter(filters.FilterSet):
         date_from = self.form.cleaned_data.get('date_from')
         date_to = self.form.cleaned_data.get('date_to')
 
-        filters = {}
+        _filters = {}
         if date_from:
             date_from = date_from.timestamp()
-            filters['timestamp__gte'] = date_from
+            _filters['timestamp__gte'] = date_from
 
         if date_to:
             date_to = date_to.timestamp()
-            filters['timestamp__lte'] = date_to
+            _filters['timestamp__lte'] = date_to
 
-        qs = qs.filter(**filters)
+        qs = qs.filter(**_filters)
         return qs
 
     def filter_by_asset_id(self, queryset, name, value):

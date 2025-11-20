@@ -41,8 +41,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     permission_classes = [RBACPermission, UserObjectPermission]
     serializer_classes = {
         'default': UserSerializer,
-        'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
+        'match': MiniUserSerializer,
         'retrieve': UserRetrieveSerializer,
     }
     rbac_perms = {

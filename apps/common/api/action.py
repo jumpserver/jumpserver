@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+from django.conf import settings
 from typing import Callable
 
 from django.utils.translation import gettext as _
 from rest_framework.decorators import action
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -14,8 +16,12 @@ from orgs.utils import current_org
 __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
 
 
+class CustomUserRateThrottle(UserRateThrottle):
+    rate = '60/m'
+
+
 class SuggestionMixin:
-    suggestion_limit = 10
+    suggestion_limit = settings.SUGGESTION_LIMIT
 
     filter_queryset: Callable
     get_queryset: Callable
@@ -35,6 +41,7 @@ class SuggestionMixin:
             queryset = queryset.none()
 
         queryset = self.filter_queryset(queryset)
+
         queryset = queryset[:self.suggestion_limit]
         page = self.paginate_queryset(queryset)
 
@@ -44,6 +51,11 @@ class SuggestionMixin:
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def get_throttles(self):
+        if self.action == 'match':
+            return [CustomUserRateThrottle()]
+        return super().get_throttles()
 
 
 class RenderToJsonMixin:

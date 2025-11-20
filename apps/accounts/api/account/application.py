@@ -25,7 +25,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
-        'get_account_secret': 'accounts.view_integrationapplication'
+        'get_account_secret': 'accounts.view_integrationapplication',
+        'get_sdks_info': 'accounts.view_integrationapplication'
     }
 
     def read_file(self, path):
@@ -36,7 +37,6 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
 
     @action(
         ['GET'], detail=False, url_path='sdks',
-        permission_classes=[IsValidUser]
     )
     def get_sdks_info(self, request, *args, **kwargs):
         code_suffix_mapper = {

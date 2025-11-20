@@ -242,7 +242,7 @@ def register_sqlite_connection():
 
 
 class LeakPasswords(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True, verbose_name=_("ID"))
     password = models.CharField(max_length=1024, verbose_name=_("Password"))
 
     class Meta:

@@ -1,0 +1,123 @@
+name: Cleanup PR Branches
+
+on:
+  schedule:
+    # 每天凌晨2点运行
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # 允许手动触发
+    inputs:
+      dry_run:
+        description: 'Dry run mode (default: true)'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  cleanup-branches:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 获取所有分支和提交历史
+        
+    - name: Setup Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        
+    - name: Get dry run setting
+      id: dry-run
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "dry_run=${{ github.event.inputs.dry_run }}" >> $GITHUB_OUTPUT
+        else
+          echo "dry_run=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Cleanup branches
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DRY_RUN: ${{ steps.dry-run.outputs.dry_run }}
+      run: |
+        echo "Starting branch cleanup..."
+        echo "Dry run mode: $DRY_RUN"
+        
+        # 获取所有本地分支
+        git fetch --all --prune
+        
+        # 获取以 pr 或 repr 开头的分支
+        branches=$(git branch -r | grep -E 'origin/(pr|repr)' | sed 's/origin\///' | grep -v 'HEAD')
+        
+        echo "Found branches matching pattern:"
+        echo "$branches"
+        
+        deleted_count=0
+        skipped_count=0
+        
+        for branch in $branches; do
+          echo ""
+          echo "Processing branch: $branch"
+          
+          # 检查分支是否有未合并的PR
+          pr_info=$(gh pr list --head "$branch" --state open --json number,title,state 2>/dev/null)
+          
+          if [ $? -eq 0 ] && [ "$pr_info" != "[]" ]; then
+            echo "  ⚠️  Branch has open PR(s), skipping deletion"
+            echo "  PR info: $pr_info"
+            skipped_count=$((skipped_count + 1))
+            continue
+          fi
+          
+          # 检查分支是否有已合并的PR（可选：如果PR已合并也可以删除）
+          merged_pr_info=$(gh pr list --head "$branch" --state merged --json number,title,state 2>/dev/null)
+          
+          if [ $? -eq 0 ] && [ "$merged_pr_info" != "[]" ]; then
+            echo "  ✅ Branch has merged PR(s), safe to delete"
+            echo "  Merged PR info: $merged_pr_info"
+          else
+            echo "  ℹ️  No PRs found for this branch"
+          fi
+          
+          # 执行删除操作
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "  🔍 [DRY RUN] Would delete branch: $branch"
+            deleted_count=$((deleted_count + 1))
+          else
+            echo "  🗑️  Deleting branch: $branch"
+            
+            # 删除远程分支
+            if git push origin --delete "$branch" 2>/dev/null; then
+              echo "  ✅ Successfully deleted remote branch: $branch"
+              deleted_count=$((deleted_count + 1))
+            else
+              echo "  ❌ Failed to delete remote branch: $branch"
+            fi
+          fi
+        done
+        
+        echo ""
+        echo "=== Cleanup Summary ==="
+        echo "Branches processed: $(echo "$branches" | wc -l)"
+        echo "Branches deleted: $deleted_count"
+        echo "Branches skipped: $skipped_count"
+        
+        if [ "$DRY_RUN" = "true" ]; then
+          echo ""
+          echo "🔍 This was a DRY RUN - no branches were actually deleted"
+          echo "To perform actual deletion, run this workflow manually with dry_run=false"
+        fi
+        
+    - name: Create summary
+      if: always()
+      run: |
+        echo "## Branch Cleanup Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Dry Run:** ${{ steps.dry-run.outputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Check the logs above for detailed information about processed branches." >> $GITHUB_STEP_SUMMARY

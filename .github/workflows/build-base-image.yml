@@ -1,74 +1,72 @@
 name: Build and Push Base Image
 
 on:
-  pull_request:
-    branches:
-      - 'dev'
-      - 'v*'
-    paths:
-      - poetry.lock
-      - pyproject.toml
-      - Dockerfile-base
-      - package.json
-      - go.mod
-      - yarn.lock
-      - pom.xml
-      - install_deps.sh
-      - utils/clean_site_packages.sh
-    types:
-      - opened
-      - synchronize
-      - reopened
+    pull_request:
+        branches:
+            - 'dev'
+            - 'v*'
+        paths:
+            - poetry.lock
+            - pyproject.toml
+            - Dockerfile-base
+            - package.json
+            - go.mod
+            - yarn.lock
+            - pom.xml
+            - install_deps.sh
+            - utils/clean_site_packages.sh
+        types:
+            - opened
+            - synchronize
+            - reopened
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
+    build-and-push:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          image: tonistiigi/binfmt:qemu-v7.0.0-28
+            - name: Set up QEMU
+              uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+            - name: Login to DockerHub
+              uses: docker/login-action@v2
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract date
-        id: vars
-        run: echo "IMAGE_TAG=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_ENV
+            - name: Extract date
+              id: vars
+              run: echo "IMAGE_TAG=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_ENV
 
-      - name: Extract repository name
-        id: repo
-        run: echo "REPO=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+            - name: Extract repository name
+              id: repo
+              run: echo "REPO=$(basename ${{ github.repository }})" >> $GITHUB_ENV
 
-      - name: Build and push multi-arch image
-        uses: docker/build-push-action@v6
-        with:
-          platforms: linux/amd64,linux/arm64
-          push: true
-          file: Dockerfile-base
-          tags: jumpserver/core-base:${{ env.IMAGE_TAG }}
+            - name: Build and push multi-arch image
+              uses: docker/build-push-action@v6
+              with:
+                  platforms: linux/amd64,linux/arm64
+                  push: true
+                  file: Dockerfile-base
+                  tags: jumpserver/core-base:${{ env.IMAGE_TAG }}
 
-      - name: Update Dockerfile
-        run: |
-          sed -i 's|-base:.* AS stage-build|-base:${{ env.IMAGE_TAG }} AS stage-build|' Dockerfile
+            - name: Update Dockerfile
+              run: |
+                  sed -i 's|-base:.* AS stage-build|-base:${{ env.IMAGE_TAG }} AS stage-build|' Dockerfile
 
-      - name: Commit changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add Dockerfile
-          git commit -m "perf: Update Dockerfile with new base image tag"
-          git push origin ${{ github.event.pull_request.head.ref }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Commit changes
+              run: |
+                  git config --global user.name 'github-actions[bot]'
+                  git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+                  git add Dockerfile
+                  git commit -m "perf: Update Dockerfile with new base image tag"
+                  git push origin ${{ github.event.pull_request.head.ref }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

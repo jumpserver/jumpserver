@@ -252,6 +252,7 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
     def post(self, request):
         log_prompt = "Process SAML2 POST requests: {}"
         post_data = request.POST
+        error_title = _("SAML2 Error")
 
         try:
             saml_instance = self.init_saml_auth(request)
@@ -279,14 +280,17 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
         try:
             user = auth.authenticate(request=request, saml_user_data=saml_user_data)
         except IntegrityError as e:
-            title = _("SAML2 Error")
             msg = _('Please check if a user with the same username or email already exists')
             logger.error(e, exc_info=True)
-            response = self.get_failed_response('/', title, msg)
+            response = self.get_failed_response('/', error_title, msg)
             return response
         if user and user.is_valid:
             logger.debug(log_prompt.format('Login: {}'.format(user)))
             auth.login(self.request, user)
+
+        if not user and getattr(request, 'error_message', ''):
+            response = self.get_failed_response('/', title=error_title, msg=request.error_message)
+            return response
 
         logger.debug(log_prompt.format('Redirect'))
         redir = post_data.get('RelayState')

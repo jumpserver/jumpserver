@@ -23,6 +23,8 @@ logger = get_logger(__name__)
 
 class OperatorLogHandler(metaclass=Singleton):
     CACHE_KEY = 'OPERATOR_LOG_CACHE_KEY'
+    SYSTEM_OBJECTS = frozenset({"Role"})
+    PREFER_CURRENT_ELSE_USER = frozenset({"SSOToken"})
 
     def __init__(self):
         self.log_client = self.get_storage_client()
@@ -142,13 +144,21 @@ class OperatorLogHandler(metaclass=Singleton):
             after = self.__data_processing(after)
         return before, after
 
-    @staticmethod
-    def get_org_id(object_name):
-        system_obj = ('Role',)
-        org_id = get_current_org_id()
-        if object_name in system_obj:
-            org_id = Organization.SYSTEM_ID
-        return org_id
+    def get_org_id(self, user, object_name):
+        if object_name in self.SYSTEM_OBJECTS:
+            return Organization.SYSTEM_ID
+
+        current = get_current_org_id()
+        current_id = str(current) if current else None
+
+        if object_name in self.PREFER_CURRENT_ELSE_USER:
+            if current_id and current_id != Organization.DEFAULT_ID:
+                return current_id
+
+            org = user.orgs.distinct().first()
+            return str(org.id) if org else Organization.DEFAULT_ID
+
+        return current_id or Organization.DEFAULT_ID
 
     def create_or_update_operate_log(
             self, action, resource_type, resource=None, resource_display=None,
@@ -168,7 +178,7 @@ class OperatorLogHandler(metaclass=Singleton):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
 
-        org_id = self.get_org_id(object_name)
+        org_id = self.get_org_id(user, object_name)
         data = {
             'id': log_id, "user": str(user), 'action': action,
             'resource_type': str(resource_type), 'org_id': org_id,

@@ -18,6 +18,7 @@ fi
 
 echo "4. For Apple processor"
 LDFLAGS="-L$(brew --prefix freetds)/lib -L$(brew --prefix openssl@1.1)/lib"  CFLAGS="-I$(brew --prefix freetds)/include"  pip install $(grep 'pymssql' requirements.txt)
+export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client/lib/pkgconfig"
 
 
 echo "5. Install Ansible Receptor"
