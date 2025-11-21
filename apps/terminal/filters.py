@@ -2,7 +2,7 @@ from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
 from orgs.utils import filter_org_queryset
-from terminal.models import Command, CommandStorage, Session
+from terminal.models import Command, CommandStorage, Session, Chat
 
 
 class CommandFilter(filters.FilterSet):
@@ -79,7 +79,34 @@ class CommandStorageFilter(filters.FilterSet):
         model = CommandStorage
         fields = ['real', 'name', 'type', 'is_default']
 
-    def filter_real(self, queryset, name, value):
+    @staticmethod
+    def filter_real(queryset, name, value):
         if value:
             queryset = queryset.exclude(name='null')
+        return queryset
+
+
+class ChatFilter(filters.FilterSet):
+    ids = filters.BooleanFilter(method='filter_ids')
+    folder_ids = filters.BooleanFilter(method='filter_folder_ids')
+
+
+    class Meta:
+        model = Chat
+        fields = [
+            'title', 'user_id', 'pinned', 'folder_id',
+            'archived', 'socket_id', 'share_id'
+        ]
+
+    @staticmethod
+    def filter_ids(queryset, name, value):
+        ids = value.split(',')
+        queryset = queryset.filter(id__in=ids)
+        return queryset
+
+
+    @staticmethod
+    def filter_folder_ids(queryset, name, value):
+        ids = value.split(',')
+        queryset = queryset.filter(folder_id__in=ids)
         return queryset
