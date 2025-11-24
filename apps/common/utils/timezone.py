@@ -61,8 +61,10 @@ def contains_time_period(time_periods, ctime=None):
     """
     time_periods: [{"id": 1, "value": "00:00~07:30、10:00~13:00"}, {"id": 2, "value": "00:00~00:00"}]
     """
-    if not time_periods:
-        return None
+    if not time_periods or all(item['value'] == "" for item in time_periods):
+        # 需要处理 [{"id":1,"value":""},{"id":2,"value":""},{"id":3,"value":""},...]情况
+        # 都没选择相当于全选
+        return True
 
     if ctime is None:
         ctime = local_now()

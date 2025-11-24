@@ -1,15 +1,10 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-06 15:37+0800\n"
-"PO-Revision-Date: 2025-11-01 11:01\n"
+"POT-Creation-Date: 2025-11-17 18:20+0800\n"
+"PO-Revision-Date: 2025-11-13 12:26\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -29,6 +24,10 @@ msgstr ""
 #: accounts/serializers/account/account.py:362
 msgid "Account already exists"
 msgstr "Учетная запись уже существует."
+
+#: accounts/api/account/account.py:207
+msgid "No valid assets found for account creation."
+msgstr "Не удалось найти действительные активы для создания учетной записи."
 
 #: accounts/api/account/application.py:77
 #: authentication/api/connection_token.py:453
@@ -592,8 +591,8 @@ msgstr "Просмотр активности аккаунта"
 #: assets/models/asset/common.py:166 assets/models/cmd_filter.py:21
 #: assets/models/label.py:18 assets/models/platform.py:15
 #: assets/models/platform.py:94 assets/models/zone.py:19
-#: assets/serializers/asset/common.py:174 assets/serializers/platform.py:158
-#: assets/serializers/platform.py:283
+#: assets/serializers/asset/common.py:174 assets/serializers/platform.py:159
+#: assets/serializers/platform.py:284
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
 #: authentication/notifications.py:56
@@ -1224,8 +1223,8 @@ msgstr "Политика существования УЗ"
 
 #: accounts/serializers/account/account.py:206 assets/models/label.py:21
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
-#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:173
-#: assets/serializers/platform.py:284 perms/serializers/user_permission.py:27
+#: assets/serializers/cagegory.py:12 assets/serializers/platform.py:174
+#: assets/serializers/platform.py:285 perms/serializers/user_permission.py:27
 #: settings/models.py:41 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:327
@@ -1237,7 +1236,7 @@ msgstr "Категория"
 #: acls/serializers/command_acl.py:19 assets/models/automations/base.py:27
 #: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
-#: assets/serializers/platform.py:160 assets/serializers/platform.py:172
+#: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/serializers.py:76 audits/serializers.py:196
 #: authentication/models/connection_token.py:67
 #: authentication/serializers/connect_token_secret.py:138
@@ -1307,7 +1306,8 @@ msgstr "Специальная информация"
 #: accounts/serializers/account/account.py:499
 #: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:33
+#: perms/models/perm_node.py:21 settings/models.py:245
+#: users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
@@ -1437,8 +1437,9 @@ msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
 msgstr ""
-"Свяжите платформу для настройки параметров публикации УЗ. Если привязки нет,"
-" будут использоваться параметры по умолчанию."
+"Укажите платформу, чтобы настроить особые параметры публикации УЗ. Если не "
+"настраивать отдельные параметры, публикация УЗ будет выполнена с параметрами"
+" по умолчанию"
 
 #: accounts/serializers/account/virtual.py:24
 msgid ""
@@ -1750,7 +1751,7 @@ msgstr "Количество типов"
 #: accounts/templates/accounts/change_secret_report.html:33
 #: accounts/templates/accounts/gather_account_report.html:31
 #: accounts/templates/accounts/push_account_report.html:32
-#: assets/serializers/domain.py:23 assets/serializers/platform.py:182
+#: assets/serializers/domain.py:23 assets/serializers/platform.py:183
 #: orgs/serializers.py:13 perms/serializers/permission.py:61
 msgid "Assets amount"
 msgstr "Количество активов"
@@ -1908,7 +1909,7 @@ msgstr "Пользователь"
 #: acls/models/base.py:97 acls/templates/acls/asset_login_reminder.html:10
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
-#: assets/serializers/platform.py:181 assets/serializers/platform.py:213
+#: assets/serializers/platform.py:182 assets/serializers/platform.py:214
 #: authentication/api/connection_token.py:464 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
@@ -2198,12 +2199,12 @@ msgstr "Мы хотим сообщить вам, что недавно воше�
 msgid "User details"
 msgstr "Данные пользователя"
 
-#: assets/api/asset/asset.py:154
+#: assets/api/asset/asset.py:153
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "Невозможно создать актив напрямую, вам следует создать хост или другой тип"
 
-#: assets/api/asset/asset.py:158
+#: assets/api/asset/asset.py:157
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "Количество активов превышает лимит в 5000"
 
@@ -2648,8 +2649,9 @@ msgid "Cloud"
 msgstr "Облака"
 
 #: assets/models/asset/common.py:101 assets/models/platform.py:16
-#: settings/serializers/auth/radius.py:18 settings/serializers/auth/sms.py:77
-#: settings/serializers/msg.py:31 terminal/serializers/storage.py:133
+#: assets/serializers/platform.py:87 settings/serializers/auth/radius.py:18
+#: settings/serializers/auth/sms.py:77 settings/serializers/msg.py:31
+#: terminal/serializers/storage.py:133
 #: xpack/plugins/cloud/serializers/account_attrs.py:88
 msgid "Port"
 msgstr "Порт"
@@ -2865,7 +2867,7 @@ msgstr "Значение"
 
 #: assets/models/label.py:40 assets/serializers/cagegory.py:10
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
-#: assets/serializers/platform.py:159
+#: assets/serializers/platform.py:160
 #: authentication/serializers/connect_token_secret.py:136
 #: common/serializers/common.py:85 labels/serializers.py:45
 #: settings/serializers/msg.py:91 xpack/plugins/cloud/models.py:404
@@ -2916,7 +2918,7 @@ msgstr "Основной"
 msgid "Required"
 msgstr "Обязательно"
 
-#: assets/models/platform.py:19 assets/serializers/platform.py:161
+#: assets/models/platform.py:19 assets/serializers/platform.py:162
 #: terminal/models/component/storage.py:28 users/const.py:42
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
@@ -3019,11 +3021,11 @@ msgstr "Параметры удаления УЗ"
 msgid "Internal"
 msgstr "Встроенный"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:171
+#: assets/models/platform.py:102 assets/serializers/platform.py:172
 msgid "Charset"
 msgstr "Кодировка"
 
-#: assets/models/platform.py:104 assets/serializers/platform.py:209
+#: assets/models/platform.py:104 assets/serializers/platform.py:210
 msgid "Gateway enabled"
 msgstr "Шлюз включен"
 
@@ -3031,15 +3033,15 @@ msgstr "Шлюз включен"
 msgid "DS enabled"
 msgstr "Службы Каталогов включены"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:202
+#: assets/models/platform.py:107 assets/serializers/platform.py:203
 msgid "Su enabled"
 msgstr "Переключение su включено"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:177
+#: assets/models/platform.py:108 assets/serializers/platform.py:178
 msgid "Su method"
 msgstr "Способ переключения su"
 
-#: assets/models/platform.py:109 assets/serializers/platform.py:180
+#: assets/models/platform.py:109 assets/serializers/platform.py:181
 msgid "Custom fields"
 msgstr "Настраиваемые поля"
 
@@ -3056,7 +3058,7 @@ msgstr ""
 "Пакетное обновление платформы в активах, пропуская активы, которые не "
 "соответствуют типу платформы"
 
-#: assets/serializers/asset/common.py:36 assets/serializers/platform.py:153
+#: assets/serializers/asset/common.py:36 assets/serializers/platform.py:154
 msgid "Protocols, format is [\"protocol/port\"]"
 msgstr "Протокол, формат [\"протокол/порт\"]"
 
@@ -3080,7 +3082,7 @@ msgstr ""
 "Путь к папке в формате [\"/Организация/Имя папки\"], если папка не "
 "существует, она будет создана"
 
-#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:174
+#: assets/serializers/asset/common.py:147 assets/serializers/platform.py:175
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
@@ -3302,7 +3304,7 @@ msgstr "Включить удаление учетной записи"
 msgid "Port from addr"
 msgstr "Порт из адреса"
 
-#: assets/serializers/platform.py:98
+#: assets/serializers/platform.py:99
 msgid ""
 "This protocol is primary, and it must be set when adding assets. "
 "Additionally, there can only be one primary protocol."
@@ -3310,13 +3312,13 @@ msgstr ""
 "Этот протокол является основным, и его необходимо задать при добавлении "
 "активов. Основной протокол может быть только один."
 
-#: assets/serializers/platform.py:103
+#: assets/serializers/platform.py:104
 msgid "This protocol is required, and it must be set when adding assets."
 msgstr ""
 "Этот протокол является обязательным, и его необходимо настроить при "
 "добавлении активов."
 
-#: assets/serializers/platform.py:106
+#: assets/serializers/platform.py:107
 msgid ""
 "This protocol is default, when adding assets, it will be displayed by "
 "default."
@@ -3324,25 +3326,25 @@ msgstr ""
 "Этот протокол установлен по умолчанию, при добавлении активов он будет "
 "отображаться по умолчанию."
 
-#: assets/serializers/platform.py:109
+#: assets/serializers/platform.py:110
 msgid "This protocol is public, asset will show this protocol to user"
 msgstr ""
 "Этот протокол является общедоступным, активы будут отображать этот протокол "
 "пользователям"
 
-#: assets/serializers/platform.py:162
+#: assets/serializers/platform.py:163
 msgid "Help text"
 msgstr "Помощь"
 
-#: assets/serializers/platform.py:163
+#: assets/serializers/platform.py:164
 msgid "Choices"
 msgstr "Выбор"
 
-#: assets/serializers/platform.py:175
+#: assets/serializers/platform.py:176
 msgid "Automation"
 msgstr "Автоматизация"
 
-#: assets/serializers/platform.py:204
+#: assets/serializers/platform.py:205
 msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
@@ -3352,19 +3354,19 @@ msgstr ""
 "автоматически переключитесь на другую учетную запись, как если бы вы вошли с"
 " обычной учетной записью и затем переключились на root"
 
-#: assets/serializers/platform.py:210
+#: assets/serializers/platform.py:211
 msgid "Assets can be connected using a zone gateway"
 msgstr "Активы могут быть подключены с помощью шлюза зоны"
 
-#: assets/serializers/platform.py:212
+#: assets/serializers/platform.py:213
 msgid "Default zone"
 msgstr "Зона по умолчанию"
 
-#: assets/serializers/platform.py:239
+#: assets/serializers/platform.py:240
 msgid "type is required"
 msgstr "тип обязателен"
 
-#: assets/serializers/platform.py:254
+#: assets/serializers/platform.py:255
 msgid "Protocols is required"
 msgstr "Требуется указание протокола"
 
@@ -4006,6 +4008,10 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr "Обновлённый токен или кэш недействителен."
 
+#: authentication/backends/oauth2/views.py:67
+msgid "OAuth2 Error"
+msgstr "Ошибка OAuth2"
+
 #: authentication/backends/oidc/views.py:137
 msgid "OpenID Error"
 msgstr "Ошибка OpenID"
@@ -4037,7 +4043,7 @@ msgstr "Дополнительно"
 msgid "Credential ID"
 msgstr "ID учетных данных"
 
-#: authentication/backends/saml2/views.py:282
+#: authentication/backends/saml2/views.py:255
 msgid "SAML2 Error"
 msgstr "Ошибка SAML2"
 
@@ -5668,16 +5674,16 @@ msgstr ""
 "Эта задача выполняется при необходимости отправки внутреннего сообщения\n"
 "         для системных оповещений, заявок и т.п."
 
-#: ops/ansible/inventory.py:135 ops/ansible/inventory.py:205
+#: ops/ansible/inventory.py:136 ops/ansible/inventory.py:206
 #: ops/models/job.py:69
 msgid "No account available"
 msgstr "Нет доступных учетных записей"
 
-#: ops/ansible/inventory.py:326 ops/ansible/inventory.py:368
+#: ops/ansible/inventory.py:327 ops/ansible/inventory.py:369
 msgid "Ansible disabled"
 msgstr "Ansible отключен"
 
-#: ops/ansible/inventory.py:384
+#: ops/ansible/inventory.py:385
 msgid "Skip hosts below:"
 msgstr "Пропустить следующие хосты:"
 
@@ -5693,7 +5699,11 @@ msgstr "Задача {} не найдена"
 msgid "Task {} args or kwargs error"
 msgstr "Ошибка параметров выполнения задачи {}"
 
-#: ops/api/job.py:70
+#: ops/api/job.py:65
+msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
+msgstr ""
+
+#: ops/api/job.py:88
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
@@ -5702,22 +5712,22 @@ msgstr ""
 "В актив ({asset}) необходимо добавить как минимум один из протоколов: ssh, "
 "sftp или winrm"
 
-#: ops/api/job.py:71
+#: ops/api/job.py:89
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr ""
 "Авторизация для актива ({asset}) не включает протоколы ssh, sftp или winrm"
 
-#: ops/api/job.py:72
+#: ops/api/job.py:90
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "Авторизация актива ({asset}) не имеет разрешения на загрузку"
 
-#: ops/api/job.py:160
+#: ops/api/job.py:185
 msgid "Duplicate file exists"
 msgstr "Файл с таким именем существует"
 
-#: ops/api/job.py:165
+#: ops/api/job.py:190
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
@@ -5725,7 +5735,7 @@ msgstr ""
 "Размер файла превышает максимальный лимит. Пожалуйста, выберите файл меньше "
 "{limit}MB"
 
-#: ops/api/job.py:238
+#: ops/api/job.py:273
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "Создание задачи, не удалось прервать, попробуйте позже."
@@ -6030,7 +6040,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Тип Material"
 
-#: ops/models/job.py:561
+#: ops/models/job.py:581
 msgid "Job Execution"
 msgstr "Выполнение задания"
 
@@ -7685,11 +7695,11 @@ msgstr "Время хранения истории выполнения зада
 
 #: settings/serializers/cleaning.py:43
 msgid "Activity log retention days"
-msgstr "Время хранения 기록 активности"
+msgstr "Время хранения журнала активности"
 
 #: settings/serializers/cleaning.py:46
 msgid "Session log retention days"
-msgstr "Время хранения журнала сеансов"
+msgstr "Время хранения журнала сессий"
 
 #: settings/serializers/cleaning.py:48
 msgid ""
@@ -7701,7 +7711,7 @@ msgstr ""
 
 #: settings/serializers/cleaning.py:53
 msgid "Change secret and push record retention days"
-msgstr "Время хранения записей уведомлений о смене пароля аккаунта"
+msgstr "Время хранения записей об изменении и публикации пароля"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"
@@ -8220,11 +8230,11 @@ msgstr "Водяной знак"
 
 #: settings/serializers/security.py:205
 msgid "Session content"
-msgstr "Настраиваемое содержание водяного знака сессии"
+msgstr "Настраиваемый водяной знак для сессии"
 
 #: settings/serializers/security.py:208
 msgid "Console content"
-msgstr "Настраиваемое содержание водяного знака страницы"
+msgstr "Настраиваемый водяной знак для консоли"
 
 #: settings/serializers/security.py:211
 msgid "Font color"
@@ -11790,6 +11800,12 @@ msgstr "Восточный Китай - Сучжоу"
 msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
 msgstr "Порт %(port)s IP-адреса экземпляра %(ip)s недоступен"
 
+#: xpack/plugins/cloud/providers/scp.py:108
+#, fuzzy
+#| msgid "empty"
+msgid "Empty"
+msgstr "пусто"
+
 #: xpack/plugins/cloud/serializers/account.py:104
 msgid "Validity display"
 msgstr "Отображение срока действия"
@@ -11966,21 +11982,3 @@ msgstr "Лицензия успешно импортирована"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "Лицензия недействительна"
-
-#~ msgid "Watermark console content"
-#~ msgstr "Водяной знак в Консоли"
-
-#~ msgid "Watermark font size"
-#~ msgstr "Размер шрифта водяного знака"
-
-#~ msgid "Watermark height"
-#~ msgstr "Высота водяного знака"
-
-#~ msgid "Watermark width"
-#~ msgstr "Ширина водяного знака"
-
-#~ msgid "Watermark rotate"
-#~ msgstr "Угол поворота водяного знака"
-
-#~ msgid "domain_name"
-#~ msgstr "域名称"

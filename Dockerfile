@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20251111_065955 AS stage-build
+FROM jumpserver/core-base:20251113_092612 AS stage-build
 
 ARG VERSION
 
@@ -19,7 +19,7 @@ RUN set -ex \
     && python manage.py compilemessages
 
 
-FROM python:3.11.14-trixie
+FROM python:3.11-slim-trixie
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
