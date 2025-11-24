@@ -3,10 +3,10 @@
 import json
 import os
 import re
-import time
 from urllib.parse import urlparse, quote
 
 import pytz
+import time
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http.response import HttpResponseForbidden
@@ -162,9 +162,16 @@ class SafeRedirectMiddleware:
             target_host = parsed.netloc
             if target_host in [*settings.ALLOWED_HOSTS]:
                 return response
-            origin = f"{request.scheme}://{request.get_host()}"
-            target_origin = f"{parsed.scheme}://{target_host}"
-            if not target_origin.startswith(origin):
+            target_host, target_port = self._split_host_port(parsed.netloc)
+            origin_host, origin_port = self._split_host_port(request.get_host())
+            if target_host != origin_host:
                 safe_redirect_url = '%s?%s' % (reverse('redirect-confirm'), f'next={quote(location)}')
                 return redirect(safe_redirect_url)
         return response
+
+    @staticmethod
+    def _split_host_port(netloc):
+        if ':' in netloc:
+            host, port = netloc.split(':', 1)
+            return host, port
+        return netloc, '80'
