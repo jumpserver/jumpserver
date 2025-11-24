@@ -268,6 +268,14 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port_from_addr': True,
                 'required': True,
                 'secret_types': ['token'],
+                'setting': {
+                    'namespace': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('Namespace')
+                    }
+                }
             },
             cls.http: {
                 'port': 80,
