@@ -576,6 +576,7 @@ class Config(dict):
         ],
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': 'auto',
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
+        'SECURITY_ACCOUNT_SECRET_READ': True,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_MAX_SESSION_TIME': 24,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
@@ -692,9 +693,9 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 0,
 
         # API 分页
-        'MAX_LIMIT_PER_PAGE': 10000, # 给导出用
+        'MAX_LIMIT_PER_PAGE': 10000,  # 给导出用
         'MAX_PAGE_SIZE': 1000,
-        'DEFAULT_PAGE_SIZE': 200, # 给没有请求分页的用
+        'DEFAULT_PAGE_SIZE': 200,  # 给没有请求分页的用
 
         'LIMIT_SUPER_PRIV': False,
 

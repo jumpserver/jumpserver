@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -177,6 +178,11 @@ class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
     }
+
+    def check_permissions(self, request, *args, **kwargs):
+        if not settings.SECURITY_ACCOUNT_SECRET_READ:
+            return self.permission_denied(request, _("Reading account secrets is disabled by system settings."))
+        return super().check_permissions(request)
 
 
 class AssetAccountBulkCreateApi(CreateAPIView):
