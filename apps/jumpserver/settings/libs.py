@@ -30,6 +30,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         'authentication.backends.drf.AccessTokenAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
@@ -222,3 +223,9 @@ PIICO_DRIVER_PATH = CONFIG.PIICO_DRIVER_PATH
 LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH
 
 JUMPSERVER_UPTIME = int(time.time())
+
+OAUTH2_PROVIDER = {
+    'ALLOWED_REDIRECT_URI_SCHEMES': ['http', 'https', 'jms'],
+}
+OAUTH2_PROVIDER_CLIENT_ID = 'FkkXFf0wPelYPIbvf0VElkZtyrw8TWIcyqakDgni'
+OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms://noexist/callback/'
