@@ -141,6 +141,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar', 
     'django_cas_ng',
+    'oauth2_provider',
     'channels',
     'django_filters',
     'bootstrap3',

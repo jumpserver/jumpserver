@@ -54,6 +54,7 @@ app_view_patterns = [
     path('download/', views.ResourceDownload.as_view(), name='download'),
     path('redirect/confirm/', views.RedirectConfirm.as_view(), name='redirect-confirm'),
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
 
 if settings.XPACK_ENABLED:
