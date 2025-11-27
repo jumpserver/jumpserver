@@ -1,10 +1,33 @@
-on: [push, pull_request, release]
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, closed]
+  release:
+    types: [created]
 
 name: JumpServer repos generic handler
 
 jobs:
-  generic_handler:
-    name: Run generic handler
+  handle_pull_request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jumpserver/action-generic-handler@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
+          I18N_TOKEN: ${{ secrets.I18N_TOKEN }}
+
+  handle_push:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jumpserver/action-generic-handler@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
+          I18N_TOKEN: ${{ secrets.I18N_TOKEN }}
+
+  handle_release:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: jumpserver/action-generic-handler@master
