@@ -228,4 +228,4 @@ OAUTH2_PROVIDER = {
     'ALLOWED_REDIRECT_URI_SCHEMES': ['http', 'https', 'jms'],
 }
 OAUTH2_PROVIDER_CLIENT_ID = 'FkkXFf0wPelYPIbvf0VElkZtyrw8TWIcyqakDgni'
-OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms://noexist/callback/'
+OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms://oauth2/callback'
