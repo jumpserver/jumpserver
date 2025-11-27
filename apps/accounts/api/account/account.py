@@ -167,7 +167,7 @@ class AccountViewSet(OrgBulkModelViewSet):
 
 class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
     """
-    因为可能要导出所有账号，所以单独建立了一个 viewset
+    因为可能要导出所有账号,所以单独建立了一个 viewset
     """
     serializer_classes = {
         'default': serializers.AccountSecretSerializer,
@@ -178,11 +178,6 @@ class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
     }
-
-    def check_permissions(self, request, *args, **kwargs):
-        if not settings.SECURITY_ACCOUNT_SECRET_READ:
-            return self.permission_denied(request, _("Reading account secrets is disabled by system settings."))
-        return super().check_permissions(request)
 
 
 class AssetAccountBulkCreateApi(CreateAPIView):
