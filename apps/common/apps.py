@@ -40,4 +40,5 @@ class CommonConfig(AppConfig):
             client_type=Application.CLIENT_PUBLIC,
             authorization_grant_type=Application.GRANT_AUTHORIZATION_CODE,
             redirect_uris=settings.OAUTH2_PROVIDER_CLIENT_REDIRECT_URI,
+            skip_authorization=True,
         )
