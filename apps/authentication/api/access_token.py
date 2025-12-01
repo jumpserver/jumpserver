@@ -14,15 +14,15 @@ AccessToken = get_access_token_model()
 class AccessTokenViewSet(JMSModelViewSet):
     serializer_class = AccessTokenSerializer
     permission_classes = [RBACPermission]
-    http_method_names = ['get', 'options', 'patch']
+    http_method_names = ['get', 'options', 'delete']
     rbac_perms = {
-        'revoke': 'authentication.change_accesstoken',
+        'revoke': 'oauth2_provider.delete_accesstoken',
     }
 
     def get_queryset(self):
-        return AccessToken.objects.filter(user=self.request.user).order_by('created')
+        return AccessToken.objects.filter(user=self.request.user).order_by('-created')
 
-    @action(methods=['PATCH'], detail=True, url_path='revoke')
+    @action(methods=['DELETE'], detail=True, url_path='revoke')
     def revoke(self, *args, **kwargs):
         token = AccessToken.objects.filter(id=kwargs['pk']).first()
         if not token or token.user != self.request.user:

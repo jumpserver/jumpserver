@@ -1635,5 +1635,8 @@
     "selectedAssets": "Selected assets",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name"
+    "userName": "User name",
+    "AccessToken": "Access tokens",
+    "AccessTokenTip": "Access Token is a temporary credential generated through the OAuth2 (Authorization Code Grant) flow using the JumpServer client, which is used to access protected resources.",
+    "Revoke": "Revoke"
 }

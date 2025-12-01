@@ -137,7 +137,7 @@ exclude_permissions = (
     ('oauth2_provider', 'refreshtoken', '*', '*'),
     ('oauth2_provider', 'idtoken', '*', '*'),
     ('oauth2_provider', 'application', '*', '*'),
-    ('oauth2_provider', 'accesstoken', 'add,delete', 'accesstoken')
+    ('oauth2_provider', 'accesstoken', 'add,change', 'accesstoken')
 )
 
 only_system_permissions = (
