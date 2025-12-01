@@ -129,6 +129,7 @@ special_pid_mapper = {
     "rbac.view_systemtools": "view_workbench",
     'tickets.view_ticket': 'tickets',
     "audits.joblog": "job_audit",
+    'oauth2_provider.accesstoken': 'authentication',
 }
 
 special_setting_pid_mapper = {
@@ -184,6 +185,8 @@ verbose_name_mapper = {
     'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
     'rbac.view_permission': _('View permission tree'),
+    'authentication.passkey': _("Passkey"),
+    'oauth2_provider.accesstoken': _("Access token"),
 }
 
 xpack_nodes = [

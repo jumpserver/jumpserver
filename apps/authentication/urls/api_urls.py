@@ -16,6 +16,8 @@ router.register('super-connection-token', api.SuperConnectionTokenViewSet, 'supe
 router.register('admin-connection-token', api.AdminConnectionTokenViewSet, 'admin-connection-token')
 router.register('confirm', api.UserConfirmationViewSet, 'confirm')
 router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
+# oauth2-provider
+router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 
 urlpatterns = [
     path('<str:backend>/qr/unbind/', api.QRUnBindForUserApi.as_view(), name='qr-unbind'),
