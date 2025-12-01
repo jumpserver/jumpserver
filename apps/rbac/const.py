@@ -133,6 +133,11 @@ exclude_permissions = (
     ('terminal', 'session', 'delete,change', 'command'),
     ('applications', '*', '*', '*'),
     ('settings', 'chatprompt', 'add,delete,change', 'chatprompt'),
+    ('oauth2_provider', 'grant', '*', '*'),
+    ('oauth2_provider', 'refreshtoken', '*', '*'),
+    ('oauth2_provider', 'idtoken', '*', '*'),
+    ('oauth2_provider', 'application', '*', '*'),
+    ('oauth2_provider', 'accesstoken', 'add,delete', 'accesstoken')
 )
 
 only_system_permissions = (
@@ -160,6 +165,7 @@ only_system_permissions = (
     ('authentication', 'temptoken', '*', '*'),
     ('authentication', 'passkey', '*', '*'),
     ('authentication', 'ssotoken', '*', '*'),
+    ('oauth2_provider', 'accesstoken', '*', '*'),
     ('tickets', '*', '*', '*'),
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),
