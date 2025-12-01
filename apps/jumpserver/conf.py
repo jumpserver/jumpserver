@@ -738,6 +738,7 @@ class Config(dict):
 
         # oauth2_provider settings 
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
+        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 2592000,
     }
 
     old_config_map = {

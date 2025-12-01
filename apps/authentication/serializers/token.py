@@ -118,15 +118,22 @@ class TempTokenSerializer(serializers.ModelSerializer):
 
 
 class AccessTokenSerializer(serializers.ModelSerializer):
-    token_preview = serializers.SerializerMethodField()
+    token_preview = serializers.SerializerMethodField(label=_("Token"))
 
     class Meta:
         model = get_access_token_model()
         fields = [
-            'id', 'user', 'token_preview', 'application',
-            'is_expired', 'expires', 'scope', 'created', 'updated', 
+            'id', 'user', 'token_preview', 'is_valid',
+            'is_expired', 'expires', 'scope', 'created', 'updated',
         ]
         read_only_fields = fields
+        extra_kwargs = {
+            'scope': { 'label': _('Scope') },
+            'expires': { 'label': _('Date expired') },
+            'updated': { 'label': _('Date updated') },
+            'created': { 'label': _('Date created') },
+        }
+
 
     def get_token_preview(self, obj):
         token_string = obj.token
