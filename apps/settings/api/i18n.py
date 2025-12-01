@@ -43,6 +43,7 @@ class ComponentI18nApi(RetrieveAPIView):
         if not lang:
             return Response(data)
 
+        lang = lang.lower()
         if lang not in dict(Language.get_code_mapper()).keys():
             lang = 'en'
 

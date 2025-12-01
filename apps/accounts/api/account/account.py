@@ -5,7 +5,7 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from accounts import serializers
 from accounts.const import ChangeSecretRecordStatusChoice
@@ -204,10 +204,18 @@ class AssetAccountBulkCreateApi(CreateAPIView):
         templates = base_payload.pop("template", None)
         assets = self.get_all_assets(base_payload)
         if not assets.exists():
-            raise drf_serializers.ValidationError(_("No valid assets found for account creation."))
+            error = _("No valid assets found for account creation.")
+            return Response(
+                data={
+                    "detail": error,
+                    "code": "no_valid_assets"
+                },
+                status=HTTP_400_BAD_REQUEST
+            )
 
         result = []
         errors = []
+
         def handle_one(_payload):
             try:
                 ser = self.get_serializer(data=_payload)

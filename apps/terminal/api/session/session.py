@@ -251,7 +251,8 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
         if url.endswith('.cast.gz'):
             tp = 'asciicast'
-        elif url.endswith('.replay.mp4'):
+        elif url.endswith('.mp4'):
+            ## .replay.mp4 .part.mp4
             tp = 'mp4'
         elif url.endswith('replay.json'):
             # 新版本将返回元数据信息

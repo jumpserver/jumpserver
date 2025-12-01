@@ -114,12 +114,12 @@ class BlockMFAError(AuthFailedNeedLogMixin, AuthFailedError):
         super().__init__(username=username, request=request, ip=ip)
 
 
-class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
+class BlockLoginError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFailedError):
     error = 'block_login'
 
-    def __init__(self, username, ip):
+    def __init__(self, username, ip, request):
         self.msg = const.block_user_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
-        super().__init__(username=username, ip=ip)
+        super().__init__(username=username, ip=ip, request=request)
 
 
 class SessionEmptyError(AuthFailedError):
