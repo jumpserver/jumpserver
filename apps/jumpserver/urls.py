@@ -9,7 +9,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include, re_path
 from django.views.i18n import JavaScriptCatalog
-from oauth2_provider import views as oauth2_provider_views
 
 from . import views, api
 
@@ -45,13 +44,6 @@ if settings.MCP_ENABLED:
         path('resources/<str:resource>/<str:pk>/', api.ResourceDetailApi.as_view()),
     ])
 
-
-oauth2_provider_patterns = [
-    path("authorize/", oauth2_provider_views.AuthorizationView.as_view(), name="authorize"),
-    path("token/", oauth2_provider_views.TokenView.as_view(), name="token"),
-    path("revoke_token/", oauth2_provider_views.RevokeTokenView.as_view(), name="revoke-token"),
-]
-
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),
@@ -62,7 +54,6 @@ app_view_patterns = [
     path('download/', views.ResourceDownload.as_view(), name='download'),
     path('redirect/confirm/', views.RedirectConfirm.as_view(), name='redirect-confirm'),
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
-    path('oauth2-provider/', include(oauth2_provider_patterns), name='oauth2-provider')
 ]
 
 if settings.XPACK_ENABLED:

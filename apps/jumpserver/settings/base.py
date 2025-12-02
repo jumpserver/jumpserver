@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     'settings.apps.SettingsConfig',
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
+    'oauth2_provider',
     'authentication.apps.AuthenticationConfig',  # authentication
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
@@ -141,7 +142,6 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar', 
     'django_cas_ng',
-    'oauth2_provider',
     'channels',
     'django_filters',
     'bootstrap3',
