@@ -737,8 +737,8 @@ class Config(dict):
         'MCP_ENABLED': False,
 
         # oauth2_provider settings 
-        'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
-        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 2592000,
+        'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
+        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
     }
 
     old_config_map = {
