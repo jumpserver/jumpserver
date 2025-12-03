@@ -17,7 +17,7 @@ from onelogin.saml2.idp_metadata_parser import (
 )
 
 from authentication.views.mixins import FlashMessageMixin
-from common.utils import get_logger
+from common.utils import get_logger, safe_next_url
 from .settings import JmsSaml2Settings
 from ..base import BaseAuthCallbackClientView
 
@@ -208,13 +208,16 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
+        authentication_request_params = request.GET.dict()
+
         try:
             saml_instance = self.init_saml_auth(request)
         except OneLogin_Saml2_Error as error:
             logger.error(log_prompt.format('Init saml auth error: %s' % error))
             return HttpResponse(error, status=412)
 
-        next_url = settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
+        next_url = authentication_request_params.get('next', settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT)
+        next_url = safe_next_url(next_url, request=request)
         url = saml_instance.login(return_to=next_url)
         logger.debug(log_prompt.format('Redirect login url'))
         return HttpResponseRedirect(url)

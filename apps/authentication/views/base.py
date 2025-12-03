@@ -46,6 +46,15 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
     def verify_state(self):
         raise NotImplementedError
 
+    def get_next_url(self, request):
+        """
+        Get next url for redirect after authentication.
+        
+        Note: This method can be overridden in subclasses, but DO NOT DELETE.
+        Subclasses may rely on this interface for customizing redirect behavior.
+        """
+        pass
+
     def create_user_if_not_exist(self, user_id, **kwargs):
         user = None
         user_attr = self.client.get_user_detail(user_id, **kwargs)
@@ -112,6 +121,11 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
 
         if redirect_url and 'next=client' in redirect_url:
             self.request.META['QUERY_STRING'] += '&next=client'
+        
+        next_url = self.get_next_url(request)
+        if next_url:
+            # guard view 需要用到 session 中的 next 参数
+            request.session['next'] = next_url
         return self.redirect_to_guard_view()
 
 

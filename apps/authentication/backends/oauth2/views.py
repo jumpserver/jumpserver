@@ -10,7 +10,7 @@ from authentication.backends.base import BaseAuthCallbackClientView
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
-from common.utils import get_logger
+from common.utils import get_logger, safe_next_url
 
 logger = get_logger(__file__)
 
@@ -21,12 +21,17 @@ class OAuth2AuthRequestView(View):
         log_prompt = "Process OAuth2 GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
+        authentication_request_params = request.GET.dict()
+        query = urlencode(authentication_request_params)
+        redirect_uri = build_absolute_uri(
+            request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
+        )
+        redirect_uri = f"{redirect_uri}?{query}"
+
         query_dict = {
             'client_id': settings.AUTH_OAUTH2_CLIENT_ID, 'response_type': 'code',
             'scope': settings.AUTH_OAUTH2_SCOPE,
-            'redirect_uri': build_absolute_uri(
-                request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
-            )
+            'redirect_uri': redirect_uri
         }
 
         if '?' in settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT:
@@ -59,9 +64,9 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
                 auth.login(self.request, user)
                 logger.debug(log_prompt.format('Redirect'))
-                return HttpResponseRedirect(
-                    settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI
-                )
+                next_url = request.GET.get('next') or settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI
+                next_url = safe_next_url(next_url, request=request)
+                return HttpResponseRedirect(next_url)
             else:
                 if getattr(request, 'error_message', ''):
                     response = self.get_failed_response('/', title=_('OAuth2 Error'), msg=request.error_message)
