@@ -16,6 +16,7 @@ from django.contrib.auth import (
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
 from django.utils.translation import gettext as _
@@ -235,7 +236,8 @@ class AuthPreCheckMixin:
         if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
             return
 
-        exist = User.objects.filter(username=username).exists()
+        q = Q(username=username) | Q(email=username)
+        exist = User.objects.filter(q).exists()
         if not exist:
             logger.error(f"Only allow exist user auth, login failed: {username}")
             self.raise_credential_error(errors.reason_user_not_exist)
