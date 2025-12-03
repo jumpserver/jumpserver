@@ -10,7 +10,7 @@ from authentication.backends.base import BaseAuthCallbackClientView
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
-from common.utils import get_logger
+from common.utils import get_logger, safe_next_url
 
 logger = get_logger(__file__)
 
@@ -65,6 +65,7 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
                 auth.login(self.request, user)
                 logger.debug(log_prompt.format('Redirect'))
                 next_url = request.GET.get('next') or settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI
+                next_url = safe_next_url(next_url, request=request)
                 return HttpResponseRedirect(next_url)
             else:
                 if getattr(request, 'error_message', ''):
