@@ -208,13 +208,15 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
+        authentication_request_params = request.GET.dict()
+
         try:
             saml_instance = self.init_saml_auth(request)
         except OneLogin_Saml2_Error as error:
             logger.error(log_prompt.format('Init saml auth error: %s' % error))
             return HttpResponse(error, status=412)
 
-        next_url = settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
+        next_url = authentication_request_params.get('next', settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT)
         url = saml_instance.login(return_to=next_url)
         logger.debug(log_prompt.format('Redirect login url'))
         return HttpResponseRedirect(url)

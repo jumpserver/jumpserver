@@ -11,7 +11,7 @@ from .utils import get_or_create_jumpserver_client_application
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(cache_page(60 * 60 * 24), name='dispatch')
+@method_decorator(cache_page(60 * 60), name='dispatch')
 class OAuthAuthorizationServerView(View):
     """
     OAuth 2.0 Authorization Server Metadata Endpoint
