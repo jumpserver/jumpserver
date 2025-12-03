@@ -192,6 +192,7 @@ class WeCom(RequestMixin):
 class WeComTool(object):
     WECOM_STATE_SESSION_KEY = '_wecom_state'
     WECOM_STATE_VALUE = 'wecom'
+    WECOM_STATE_NEXT_URL_KEY = 'wecom_oauth_next_url'
 
     @lazyproperty
     def qr_cb_url(self):
@@ -219,6 +220,12 @@ class WeComTool(object):
             'response_type': 'code', 'scope': 'snsapi_base',
         }
         return URL.OAUTH_CONNECT + '?' + urlencode(params) + '#wechat_redirect'
+
+    def set_next_url_in_session(self, request, next_url):
+        request.session[self.WECOM_STATE_NEXT_URL_KEY] = next_url
+
+    def get_next_url_from_session(self, request):
+        return request.session.get(self.WECOM_STATE_NEXT_URL_KEY)
 
 
 wecom_tool = WeComTool()
