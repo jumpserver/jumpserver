@@ -67,15 +67,22 @@ def authenticate(request=None, **credentials):
     thread_local = threading.local()
     thread_local.thread_id = threading.get_ident()
 
-    def custom_get_or_create(self, *args, **kwargs):
+    def custom_get_or_create(*args, **kwargs):
         logger.debug(f"get_or_create: thread_id={threading.get_ident()}, username={username}")
-        if threading.get_ident() != thread_local.thread_id or not settings.ONLY_ALLOW_EXIST_USER_AUTH:
+
+        if threading.get_ident() != getattr(thread_local, 'thread_id', None):
+            # 不是通过当前 authenticate 调用的 get_or_create，直接创建用户
             return original_get_or_create(*args, **kwargs)
-        create_username = kwargs.get('username')
-        try:
-            UserModel.objects.get(username=create_username)
-        except UserModel.DoesNotExist:
-            raise OnlyAllowExistUserAuthError
+            
+        if settings.ONLY_ALLOW_EXIST_USER_AUTH:
+            create_username = kwargs.get('username')
+            try:
+                UserModel.objects.get(username=create_username)
+            except UserModel.DoesNotExist:
+                # 仅允许已存在用户认证，用户不存在时抛出异常
+                raise OnlyAllowExistUserAuthError
+
+        # 正常创建用户
         return original_get_or_create(*args, **kwargs)
 
     username = credentials.get('username')
