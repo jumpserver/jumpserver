@@ -6,7 +6,7 @@ def get_or_create_jumpserver_client_application():
     Application = get_application_model()
     
     application, created = Application.objects.get_or_create(
-        name='JumpServer Client',
+        name=settings.OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME,
         defaults={
             'client_type': Application.CLIENT_PUBLIC,
             'authorization_grant_type': Application.GRANT_AUTHORIZATION_CODE,
