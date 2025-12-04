@@ -381,7 +381,6 @@ class Config(dict):
         'CAS_USERNAME_ATTRIBUTE': 'cas:user',
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
         'CAS_RENAME_ATTRIBUTES': {'cas:user': 'username'},
-        'CAS_CREATE_USER': True,
         'CAS_ORG_IDS': [DEFAULT_ID],
 
         'AUTH_SSO': False,
@@ -692,9 +691,9 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 0,
 
         # API 分页
-        'MAX_LIMIT_PER_PAGE': 10000, # 给导出用
+        'MAX_LIMIT_PER_PAGE': 10000,  # 给导出用
         'MAX_PAGE_SIZE': 1000,
-        'DEFAULT_PAGE_SIZE': 200, # 给没有请求分页的用
+        'DEFAULT_PAGE_SIZE': 200,  # 给没有请求分页的用
 
         'LIMIT_SUPER_PRIV': False,
 
