@@ -46,9 +46,20 @@ _django_original_get_or_create = _save_original_get_or_create()
 
 def _authenticate_context(func):
     """
-    装饰器：在 authenticate 执行前后管理线程上下文和 monkey-patch
-    - 执行前：设置 threading.local 标记，monkey-patch get_or_create
-    - 执行后：清理标记，恢复原始 get_or_create
+    装饰器：管理 authenticate 函数的执行上下文
+    
+    功能：
+    1. 执行前：
+       - 在线程本地存储中标记当前正在执行 authenticate
+       - 临时替换 UserModel.objects.get_or_create 方法
+    2. 执行后：
+       - 清理线程本地存储标记
+       - 恢复 get_or_create 为 Django 原始方法
+    
+    作用：
+    - 确保 get_or_create 行为仅在 authenticate 生命周期内生效
+    - 支持 ONLY_ALLOW_EXIST_USER_AUTH 配置的线程安全实现
+    - 防止跨请求或跨线程的状态污染
     """
     from functools import wraps
     
@@ -78,7 +89,7 @@ def _authenticate_context(func):
         
         try:
             # 执行前：设置线程上下文和 monkey-patch
-            _auth_thread_context.in_authenticate = True
+            setattr(_auth_thread_context, 'in_authenticate', True)
             UserModel.objects.get_or_create = custom_get_or_create
 
             # 执行原函数
