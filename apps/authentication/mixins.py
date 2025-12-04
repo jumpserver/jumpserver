@@ -6,6 +6,7 @@ import time
 import uuid
 from functools import partial
 from typing import Callable
+from werkzeug.local import Local
 
 from django.conf import settings
 from django.contrib import auth
@@ -32,6 +33,83 @@ from .signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
 
+# 模块级别的线程上下文，用于 authenticate 函数中标记当前线程
+_auth_thread_context = Local()
+
+# 保存 Django 原始的 get_or_create 方法（在模块加载时保存一次）
+def _save_original_get_or_create():
+    """保存 Django 原始的 get_or_create 方法"""
+    from django.contrib.auth import get_user_model as get_user_model_func
+    UserModel = get_user_model_func()
+    return UserModel.objects.get_or_create
+
+_django_original_get_or_create = _save_original_get_or_create()
+
+
+def _authenticate_context(func):
+    """
+    装饰器：管理 authenticate 函数的执行上下文
+    
+    功能：
+    1. 执行前：
+       - 在线程本地存储中标记当前正在执行 authenticate
+       - 临时替换 UserModel.objects.get_or_create 方法
+    2. 执行后：
+       - 清理线程本地存储标记
+       - 恢复 get_or_create 为 Django 原始方法
+    
+    作用：
+    - 确保 get_or_create 行为仅在 authenticate 生命周期内生效
+    - 支持 ONLY_ALLOW_EXIST_USER_AUTH 配置的线程安全实现
+    - 防止跨请求或跨线程的状态污染
+    """
+    from functools import wraps
+    
+    @wraps(func)
+    def wrapper(request=None, **credentials):
+        from django.contrib.auth import get_user_model
+        
+        UserModel = get_user_model()
+        
+        def custom_get_or_create(*args, **kwargs):
+            create_username = kwargs.get('username')
+            logger.debug(f"get_or_create: thread_id={threading.get_ident()}, username={create_username}")
+
+            # 如果当前线程正在执行 authenticate 且仅允许已存在用户认证，则提前判断用户是否存在
+            if (
+                getattr(_auth_thread_context, 'in_authenticate', False) and 
+                settings.ONLY_ALLOW_EXIST_USER_AUTH
+            ):
+                try:
+                    UserModel.objects.get(username=create_username)
+                except UserModel.DoesNotExist:
+                    raise OnlyAllowExistUserAuthError
+
+            # 调用 Django 原始方法（已是绑定方法，直接传参）
+            return _django_original_get_or_create(*args, **kwargs)
+        
+        
+        try:
+            # 执行前：设置线程上下文和 monkey-patch
+            setattr(_auth_thread_context, 'in_authenticate', True)
+            UserModel.objects.get_or_create = custom_get_or_create
+
+            # 执行原函数
+            return func(request, **credentials)
+        finally:
+            # 执行后：清理线程上下文和恢复原始方法
+            try:
+                if hasattr(_auth_thread_context, 'in_authenticate'):
+                    delattr(_auth_thread_context, 'in_authenticate')
+            except Exception:
+                pass
+            try:
+                UserModel.objects.get_or_create = _django_original_get_or_create
+            except Exception:
+                pass
+    
+    return wrapper
+
 
 def _get_backends(return_tuples=False):
     backends = []
@@ -56,39 +134,14 @@ class OnlyAllowExistUserAuthError(Exception):
 auth._get_backends = _get_backends
 
 
+@_authenticate_context
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
-    之所以 hack 这个 authenticate
     """
 
-    UserModel = get_user_model()
-    original_get_or_create = UserModel.objects.get_or_create
-
-    thread_local = threading.local()
-    thread_local.thread_id = threading.get_ident()
-
-    def custom_get_or_create(*args, **kwargs):
-        logger.debug(f"get_or_create: thread_id={threading.get_ident()}, username={username}")
-
-        if threading.get_ident() != getattr(thread_local, 'thread_id', None):
-            # 不是通过当前 authenticate 调用的 get_or_create，直接创建用户
-            return original_get_or_create(*args, **kwargs)
-            
-        if settings.ONLY_ALLOW_EXIST_USER_AUTH:
-            create_username = kwargs.get('username')
-            try:
-                UserModel.objects.get(username=create_username)
-            except UserModel.DoesNotExist:
-                # 仅允许已存在用户认证，用户不存在时抛出异常
-                raise OnlyAllowExistUserAuthError
-
-        # 正常创建用户
-        return original_get_or_create(*args, **kwargs)
-
-    username = credentials.get('username')
-
     temp_user = None
+    username = credentials.get('username')
     for backend, backend_path in _get_backends(return_tuples=True):
         # 检查用户名是否允许认证 (预先检查，不浪费认证时间)
         logger.info('Try using auth backend: {}'.format(str(backend)))
@@ -102,27 +155,28 @@ def authenticate(request=None, **credentials):
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
+        
         try:
-            UserModel.objects.get_or_create = custom_get_or_create.__get__(UserModel.objects)
             user = backend.authenticate(request, **credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             break
         except OnlyAllowExistUserAuthError:
-            request.error_message = _(
-                '''The administrator has enabled "Only allow existing users to log in", 
-                and the current user is not in the user list. Please contact the administrator.'''
-            )
+            if request:
+                request.error_message = _(
+                    '''The administrator has enabled "Only allow existing users to log in", 
+                    and the current user is not in the user list. Please contact the administrator.'''
+                )
             continue
-        finally:
-            UserModel.objects.get_or_create = original_get_or_create
+        
         if user is None:
             continue
 
         if not user.is_valid:
             temp_user = user
             temp_user.backend = backend_path
-            request.error_message = _('User is invalid')
+            if request:
+                request.error_message = _('User is invalid')
             return temp_user
 
         # 检查用户是否允许认证
@@ -137,8 +191,11 @@ def authenticate(request=None, **credentials):
     else:
         if temp_user is not None:
             source_display = temp_user.source_display
-            request.error_message = _('''The administrator has enabled 'Only allow login from user source'. 
-            The current user source is {}. Please contact the administrator.''').format(source_display)
+            if request:
+                request.error_message = _(
+                    ''' The administrator has enabled 'Only allow login from user source'. 
+                    The current user source is {}. Please contact the administrator. '''
+                ).format(source_display)
             return temp_user
 
     # The credentials supplied are invalid to all backends, fire signal
