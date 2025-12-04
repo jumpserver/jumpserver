@@ -37,11 +37,4 @@ class CASSettingSerializer(serializers.Serializer):
             "and the `value` is the JumpServer user attribute name"
         )
     )
-    CAS_CREATE_USER = serializers.BooleanField(
-        required=False, label=_('Create user'),
-        help_text=_(
-            'After successful user authentication, if the user does not exist, '
-            'automatically create the user'
-        )
-    )
     CAS_ORG_IDS = OrgListField()
