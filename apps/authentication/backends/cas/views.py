@@ -13,13 +13,14 @@ class CASLoginView(LoginView, FlashMessageMixin):
     def get(self, request):
         try:
             resp = super().get(request)
-            error_message = getattr(request, 'error_message', '')
-            if error_message:
-                response = self.get_failed_response('/', title=_('CAS Error'), msg=error_message)
-                return response
-            return resp
         except PermissionDenied:
-            return HttpResponseRedirect('/')
+            resp = HttpResponseRedirect('/')
+        error_message = getattr(request, 'error_message', '')
+        if error_message:
+            response = self.get_failed_response('/', title=_('CAS Error'), msg=error_message)
+            return response
+        else:
+            return resp
 
 
 class CASCallbackClientView(BaseAuthCallbackClientView):
