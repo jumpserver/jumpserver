@@ -6,6 +6,7 @@ import time
 import uuid
 from functools import partial
 from typing import Callable
+from werkzeug.local import Local
 
 from django.conf import settings
 from django.contrib import auth
@@ -32,7 +33,7 @@ from .signals import post_auth_success, post_auth_failed
 logger = get_logger(__name__)
 
 # 模块级别的线程上下文，用于 authenticate 函数中标记当前线程
-_auth_thread_context = threading.local()
+_auth_thread_context = Local()
 
 # 保存 Django 原始的 get_or_create 方法（在模块加载时保存一次）
 def _save_original_get_or_create():
