@@ -46,6 +46,10 @@ def _save_original_get_or_create():
 _django_original_get_or_create = _save_original_get_or_create()
 
 
+class OnlyAllowExistUserAuthError(Exception):
+    pass
+
+
 def _authenticate_context(func):
     """
     装饰器：管理 authenticate 函数的执行上下文
@@ -125,10 +129,6 @@ def _get_backends(return_tuples=False):
             'AUTHENTICATION_BACKENDS contain anything?'
         )
     return backends
-
-
-class OnlyAllowExistUserAuthError(Exception):
-    pass
 
 
 auth._get_backends = _get_backends
