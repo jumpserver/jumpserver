@@ -50,9 +50,9 @@ class MFAEmail(BaseMFA):
         )
         sender_util.gen_and_send_async()
 
-    @staticmethod
-    def global_enabled():
-        return settings.SECURITY_MFA_BY_EMAIL
+    @classmethod
+    def global_enabled(cls):
+        return super().global_enabled and settings.SECURITY_MFA_BY_EMAIL
 
     def disable(self):
         return '/ui/#/profile/index'
