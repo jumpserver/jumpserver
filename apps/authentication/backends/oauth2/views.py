@@ -6,6 +6,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from authentication.decorators import save_next_to_session, redirect_to_saved_next_after_auth
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
@@ -16,6 +17,7 @@ logger = get_logger(__file__)
 
 class OAuth2AuthRequestView(View):
 
+    @save_next_to_session
     def get(self, request):
         log_prompt = "Process OAuth2 GET requests: {}"
         logger.debug(log_prompt.format('Start'))
@@ -49,6 +51,7 @@ class OAuth2AuthRequestView(View):
 class OAuth2AuthCallbackView(View, FlashMessageMixin):
     http_method_names = ['get', ]
 
+    @redirect_to_saved_next_after_auth
     def get(self, request):
         """ Processes GET requests. """
         log_prompt = "Process GET requests [OAuth2AuthCallbackView]: {}"

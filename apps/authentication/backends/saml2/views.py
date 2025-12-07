@@ -16,6 +16,7 @@ from onelogin.saml2.idp_metadata_parser import (
     dict_deep_merge
 )
 
+from apps.authentication.decorators import redirect_to_saved_next_after_auth, save_next_to_session
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import get_logger, safe_next_url
 from .settings import JmsSaml2Settings
@@ -203,6 +204,7 @@ class PrepareRequestMixin:
 
 class Saml2AuthRequestView(View, PrepareRequestMixin):
 
+    @save_next_to_session
     def get(self, request):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
@@ -251,6 +253,7 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
 
 class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
 
+    @redirect_to_saved_next_after_auth
     def post(self, request):
         log_prompt = "Process SAML2 POST requests: {}"
         post_data = request.POST

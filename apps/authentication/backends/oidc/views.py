@@ -25,6 +25,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
+from apps.authentication.decorators import save_next_to_session, redirect_to_saved_next_after_auth
 from authentication.utils import build_absolute_uri_for_oidc
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import safe_next_url
@@ -57,6 +58,7 @@ class OIDCAuthRequestView(View):
         b = base64.urlsafe_b64encode(h)
         return b.decode('ascii')[:-1]
 
+    @save_next_to_session
     def get(self, request):
         """ Processes GET requests. """
 
@@ -128,6 +130,8 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
 
     http_method_names = ['get', ]
 
+    
+    @redirect_to_saved_next_after_auth
     def get(self, request):
         """ Processes GET requests. """
         log_prompt = "Process GET requests [OIDCAuthCallbackView]: {}"
