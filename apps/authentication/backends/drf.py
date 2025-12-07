@@ -77,10 +77,6 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         model = get_user_model()
         user_id = cache.get(token)
         user = get_object_or_none(model, id=user_id)
-
-        if not user:
-            msg = _('Invalid token or cache refreshed.')
-            raise exceptions.AuthenticationFailed(msg)
         return user, None
 
     def authenticate_header(self, request):

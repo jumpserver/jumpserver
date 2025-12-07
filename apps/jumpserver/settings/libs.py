@@ -30,12 +30,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         'authentication.backends.drf.AccessTokenAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.SessionAuthentication',
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
