@@ -3,7 +3,6 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
 from django_cas_ng.views import LoginView
 
-from authentication.backends.base import BaseAuthCallbackClientView
 from authentication.views.mixins import FlashMessageMixin
 
 __all__ = ['LoginView']
@@ -21,7 +20,3 @@ class CASLoginView(LoginView, FlashMessageMixin):
             return response
         else:
             return resp
-
-
-class CASCallbackClientView(BaseAuthCallbackClientView):
-    pass

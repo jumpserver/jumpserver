@@ -6,7 +6,6 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
-from authentication.backends.base import BaseAuthCallbackClientView
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
@@ -75,10 +74,6 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
         logger.debug(log_prompt.format('Redirect'))
         redirect_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT or '/'
         return HttpResponseRedirect(redirect_url)
-
-
-class OAuth2AuthCallbackClientView(BaseAuthCallbackClientView):
-    pass
 
 
 class OAuth2EndSessionView(View):

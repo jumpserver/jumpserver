@@ -29,7 +29,6 @@ from authentication.utils import build_absolute_uri_for_oidc
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import safe_next_url
 from .utils import get_logger
-from ..base import BaseAuthCallbackClientView
 
 logger = get_logger(__file__)
 
@@ -210,10 +209,6 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
             return response
         logger.debug(log_prompt.format('Redirect'))
         return HttpResponseRedirect(redirect_url)
-
-
-class OIDCAuthCallbackClientView(BaseAuthCallbackClientView):
-    pass
 
 
 class OIDCEndSessionView(View):

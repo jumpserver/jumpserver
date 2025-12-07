@@ -119,9 +119,6 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
             response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
-        if redirect_url and 'next=client' in redirect_url:
-            self.request.META['QUERY_STRING'] += '&next=client'
-        
         next_url = self.get_next_url(request)
         if next_url:
             # guard view 需要用到 session 中的 next 参数
