@@ -8540,7 +8540,7 @@ msgstr "正在重定向到桌面应用程序 ( JumpServer 客户端 )"
 
 #: templates/redirect_confirm.html:73
 msgid "You can safely close this window and return to the application."
-msgstr "你可以放心的关闭此窗口并返回应用程序"
+msgstr "你可以关闭此窗口并返回应用程序"
 
 #: templates/resource_download.html:20 templates/resource_download.html:36
 #: users/const.py:84
