@@ -7,9 +7,12 @@ from oauth2_provider.models import get_application_model
 
 from .utils import clear_oauth2_authorization_server_view_cache
 
-Application = get_application_model()
 
 __all__ = ['on_oauth2_provider_application_deleted']
+
+
+Application = get_application_model()
+
 
 @receiver(post_delete, sender=Application)
 def on_oauth2_provider_application_deleted(sender, instance, **kwargs):
