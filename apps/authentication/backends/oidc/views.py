@@ -67,7 +67,7 @@ class OIDCAuthRequestView(View):
 
         # Defines common parameters used to bootstrap the authentication request.
         logger.debug(log_prompt.format('Construct request params'))
-        request_params = request.GET.dict()
+        request_params = request.GET.copy()
         request_params.pop('next', None)
         request_params.update({
             'scope': settings.AUTH_OPENID_SCOPES,

@@ -22,7 +22,7 @@ class OAuth2AuthRequestView(View):
         log_prompt = "Process OAuth2 GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
-        request_params = request.GET.dict()
+        request_params = request.GET.copy()
         request_params.pop('next', None)
         query = urlencode(request_params)
         redirect_uri = build_absolute_uri(

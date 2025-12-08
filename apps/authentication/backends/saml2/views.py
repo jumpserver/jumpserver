@@ -207,7 +207,7 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
-        request_params = request.GET.dict()
+        request_params = request.GET.copy()
 
         try:
             saml_instance = self.init_saml_auth(request)
