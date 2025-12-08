@@ -7,7 +7,6 @@ from oauth2_provider.models import get_application_model
 
 from .utils import clear_oauth2_authorization_server_view_cache
 
-
 __all__ = ['on_oauth2_provider_application_deleted']
 
 

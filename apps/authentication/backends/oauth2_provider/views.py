@@ -7,11 +7,11 @@ from django.conf import settings
 from django.urls import reverse
 from oauth2_provider.settings import oauth2_settings
 from typing import List, Dict, Any
-from .utils import get_or_create_jumpserver_client_application
+from .utils import get_or_create_jumpserver_client_application, CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX 
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(cache_page(60 * 60), name='dispatch')
+@method_decorator(cache_page(timeout=60 * 60 * 24, key_prefix=CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX), name='dispatch')
 class OAuthAuthorizationServerView(View):
     """
     OAuth 2.0 Authorization Server Metadata Endpoint

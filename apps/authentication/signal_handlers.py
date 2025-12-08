@@ -9,6 +9,8 @@ from audits.models import UserSession
 from common.sessions.cache import user_session_manager
 from .signals import post_auth_success, post_auth_failed, user_auth_failed, user_auth_success
 
+from .backends.oauth2_provider.signal_handlers import *
+
 
 @receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
@@ -57,3 +59,4 @@ def on_user_login_success(sender, request, user, backend, create=False, **kwargs
 def on_user_login_failed(sender, username, request, reason, backend, **kwargs):
     request.session['auth_backend'] = backend
     post_auth_failed.send(sender, username=username, request=request, reason=reason)
+

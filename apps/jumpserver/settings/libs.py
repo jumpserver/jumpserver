@@ -30,11 +30,11 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
-        'authentication.backends.drf.AccessTokenAuthentication',
-        'authentication.backends.drf.PrivateTokenAuthentication',
-        'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
+        'authentication.backends.drf.ServiceAuthentication',
+        'authentication.backends.drf.PrivateTokenAuthentication',
+        'authentication.backends.drf.AccessTokenAuthentication',
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
