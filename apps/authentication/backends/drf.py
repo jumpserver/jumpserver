@@ -69,6 +69,8 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
             msg = _('Invalid token header. Sign string should not contain invalid characters.')
             raise exceptions.AuthenticationFailed(msg)
         user, header = self.authenticate_credentials(token)
+        if not user:
+            return None
         after_authenticate_update_date(user)
         return user, header
 
