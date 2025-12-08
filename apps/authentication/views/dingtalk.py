@@ -10,6 +10,7 @@ from django.views import View
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from authentication.decorators import post_save_next_to_session_if_guard_redirect, pre_save_next_to_session
 from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
@@ -24,7 +25,7 @@ from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMi
 from users.models import User
 from users.views import UserVerifyPasswordView
 from .base import BaseLoginCallbackView
-from .mixins import METAMixin, FlashMessageMixin
+from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
 
@@ -171,20 +172,18 @@ class DingTalkEnableStartView(UserVerifyPasswordView):
         return success_url
 
 
-class DingTalkQRLoginView(DingTalkQRMixin, METAMixin, View):
+class DingTalkQRLoginView(DingTalkQRMixin, View):
     permission_classes = (AllowAny,)
 
+    @pre_save_next_to_session()
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
         query_string = request.GET.urlencode()
         redirect_url = f'{redirect_url}?{query_string}'
-        next_url = self.get_next_url_from_meta() or reverse('index')
-        next_url = safe_next_url(next_url, request=request)
 
         redirect_uri = reverse('authentication:dingtalk-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({
             'redirect_url': redirect_url,
-            'next': next_url,
         })
 
         url = self.get_qr_url(redirect_uri)
@@ -210,6 +209,7 @@ class DingTalkQRLoginCallbackView(DingTalkQRMixin, BaseLoginCallbackView):
 class DingTalkOAuthLoginView(DingTalkOAuthMixin, View):
     permission_classes = (AllowAny,)
 
+    @pre_save_next_to_session()
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
 
@@ -223,6 +223,7 @@ class DingTalkOAuthLoginView(DingTalkOAuthMixin, View):
 class DingTalkOAuthLoginCallbackView(AuthMixin, DingTalkOAuthMixin, View):
     permission_classes = (AllowAny,)
 
+    @post_save_next_to_session_if_guard_redirect
     def get(self, request: HttpRequest):
         code = request.GET.get('code')
         redirect_url = request.GET.get('redirect_url')

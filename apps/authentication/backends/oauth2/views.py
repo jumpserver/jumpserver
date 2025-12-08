@@ -6,7 +6,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
-from authentication.backends.base import BaseAuthCallbackClientView
+from authentication.decorators import pre_save_next_to_session, redirect_to_pre_save_next_after_auth
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
@@ -17,12 +17,14 @@ logger = get_logger(__file__)
 
 class OAuth2AuthRequestView(View):
 
+    @pre_save_next_to_session()
     def get(self, request):
         log_prompt = "Process OAuth2 GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
-        authentication_request_params = request.GET.dict()
-        query = urlencode(authentication_request_params)
+        request_params = request.GET.copy()
+        request_params.pop('next', None)
+        query = urlencode(request_params)
         redirect_uri = build_absolute_uri(
             request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
         )
@@ -50,6 +52,7 @@ class OAuth2AuthRequestView(View):
 class OAuth2AuthCallbackView(View, FlashMessageMixin):
     http_method_names = ['get', ]
 
+    @redirect_to_pre_save_next_after_auth
     def get(self, request):
         """ Processes GET requests. """
         log_prompt = "Process GET requests [OAuth2AuthCallbackView]: {}"
@@ -64,9 +67,7 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
                 auth.login(self.request, user)
                 logger.debug(log_prompt.format('Redirect'))
-                next_url = request.GET.get('next') or settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI
-                next_url = safe_next_url(next_url, request=request)
-                return HttpResponseRedirect(next_url)
+                return HttpResponseRedirect(settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI)
             else:
                 if getattr(request, 'error_message', ''):
                     response = self.get_failed_response('/', title=_('OAuth2 Error'), msg=request.error_message)
@@ -75,10 +76,6 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
         logger.debug(log_prompt.format('Redirect'))
         redirect_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT or '/'
         return HttpResponseRedirect(redirect_url)
-
-
-class OAuth2AuthCallbackClientView(BaseAuthCallbackClientView):
-    pass
 
 
 class OAuth2EndSessionView(View):

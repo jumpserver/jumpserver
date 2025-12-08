@@ -8,6 +8,7 @@ from django.views import View
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from authentication.decorators import pre_save_next_to_session
 from authentication.const import ConfirmType
 from authentication.permissions import UserConfirmation
 from common.sdk.im.feishu import URL
@@ -108,9 +109,12 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, BaseBindCallbackView):
 class FeiShuQRLoginView(FeiShuQRMixin, View):
     permission_classes = (AllowAny,)
 
+    @pre_save_next_to_session()
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
-        query_string = request.GET.urlencode()
+        query_string = request.GET.copy()
+        query_string.pop('next', None)
+        query_string = query_string.urlencode()
         redirect_url = f'{redirect_url}?{query_string}'
         redirect_uri = reverse(f'authentication:{self.category}-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({

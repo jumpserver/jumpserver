@@ -19,7 +19,6 @@ from onelogin.saml2.idp_metadata_parser import (
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import get_logger, safe_next_url
 from .settings import JmsSaml2Settings
-from ..base import BaseAuthCallbackClientView
 
 logger = get_logger(__file__)
 
@@ -208,7 +207,7 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
-        authentication_request_params = request.GET.dict()
+        request_params = request.GET.copy()
 
         try:
             saml_instance = self.init_saml_auth(request)
@@ -216,7 +215,7 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
             logger.error(log_prompt.format('Init saml auth error: %s' % error))
             return HttpResponse(error, status=412)
 
-        next_url = authentication_request_params.get('next', settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT)
+        next_url = request_params.get('next') or settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
         next_url = safe_next_url(next_url, request=request)
         url = saml_instance.login(return_to=next_url)
         logger.debug(log_prompt.format('Redirect login url'))
@@ -296,19 +295,16 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
             return response
 
         logger.debug(log_prompt.format('Redirect'))
-        redir = post_data.get('RelayState')
-        if not redir or len(redir) == 0:
-            redir = "/"
-        next_url = saml_instance.redirect_to(redir)
+        relay_state = post_data.get('RelayState')
+        if not relay_state or len(relay_state) == 0:
+            relay_state = "/"
+        next_url = saml_instance.redirect_to(relay_state)
+        next_url = safe_next_url(next_url, request=request)
         return HttpResponseRedirect(next_url)
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-
-
-class Saml2AuthCallbackClientView(BaseAuthCallbackClientView):
-    pass
 
 
 class Saml2AuthMetadataView(View, PrepareRequestMixin):
