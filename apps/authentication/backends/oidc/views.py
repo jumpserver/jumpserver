@@ -25,7 +25,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
-from apps.authentication.decorators import pre_save_next_to_session, redirect_to_pre_save_next_after_auth
+from authentication.decorators import pre_save_next_to_session, redirect_to_pre_save_next_after_auth
 from authentication.utils import build_absolute_uri_for_oidc
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import safe_next_url
