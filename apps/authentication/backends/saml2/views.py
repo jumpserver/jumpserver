@@ -16,7 +16,6 @@ from onelogin.saml2.idp_metadata_parser import (
     dict_deep_merge
 )
 
-from apps.authentication.decorators import redirect_to_saved_next_after_auth, save_next_to_session
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import get_logger, safe_next_url
 from .settings import JmsSaml2Settings
@@ -204,12 +203,11 @@ class PrepareRequestMixin:
 
 class Saml2AuthRequestView(View, PrepareRequestMixin):
 
-    @save_next_to_session
     def get(self, request):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
-        authentication_request_params = request.GET.dict()
+        request_params = request.GET.dict()
 
         try:
             saml_instance = self.init_saml_auth(request)
@@ -217,7 +215,7 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
             logger.error(log_prompt.format('Init saml auth error: %s' % error))
             return HttpResponse(error, status=412)
 
-        next_url = authentication_request_params.get('next', settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT)
+        next_url = request_params.get('next') or settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
         next_url = safe_next_url(next_url, request=request)
         url = saml_instance.login(return_to=next_url)
         logger.debug(log_prompt.format('Redirect login url'))
@@ -253,7 +251,6 @@ class Saml2EndSessionView(View, PrepareRequestMixin):
 
 class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
 
-    @redirect_to_saved_next_after_auth
     def post(self, request):
         log_prompt = "Process SAML2 POST requests: {}"
         post_data = request.POST
@@ -298,10 +295,11 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
             return response
 
         logger.debug(log_prompt.format('Redirect'))
-        redir = post_data.get('RelayState')
-        if not redir or len(redir) == 0:
-            redir = "/"
-        next_url = saml_instance.redirect_to(redir)
+        relay_state = post_data.get('RelayState')
+        if not relay_state or len(relay_state) == 0:
+            relay_state = "/"
+        next_url = saml_instance.redirect_to(relay_state)
+        next_url = safe_next_url(next_url, request=request)
         return HttpResponseRedirect(next_url)
 
     @csrf_exempt

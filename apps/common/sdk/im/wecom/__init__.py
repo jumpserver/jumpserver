@@ -221,11 +221,5 @@ class WeComTool(object):
         }
         return URL.OAUTH_CONNECT + '?' + urlencode(params) + '#wechat_redirect'
 
-    def set_next_url_in_session(self, request, next_url):
-        request.session[self.WECOM_STATE_NEXT_URL_KEY] = next_url
-
-    def get_next_url_from_session(self, request):
-        return request.session.get(self.WECOM_STATE_NEXT_URL_KEY)
-
 
 wecom_tool = WeComTool()

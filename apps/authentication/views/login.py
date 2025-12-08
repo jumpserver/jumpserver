@@ -29,7 +29,7 @@ from users.utils import (
     redirect_user_first_login_or_index
 )
 from .. import mixins, errors
-from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
+from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY, USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD
 from ..forms import get_user_login_form_cls
 from ..utils import get_auth_methods
 
@@ -260,7 +260,7 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
 
 
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
-    redirect_field_name = 'next'
+    redirect_field_name = USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD
     login_url = reverse_lazy('authentication:login')
     login_mfa_url = reverse_lazy('authentication:login-mfa')
     login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
