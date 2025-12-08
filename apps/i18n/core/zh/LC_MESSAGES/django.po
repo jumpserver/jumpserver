@@ -8536,7 +8536,7 @@ msgstr "返回"
 
 #: templates/redirect_confirm.html:70
 msgid "Redirecting you to the Desktop App ( JumpServer Client )"
-msgstr "将你重定向到桌面应用程序 ( JumpServer 客户端 )"
+msgstr "正在重定向到桌面应用程序 ( JumpServer 客户端 )"
 
 #: templates/redirect_confirm.html:73
 msgid "You can safely close this window and return to the application."
