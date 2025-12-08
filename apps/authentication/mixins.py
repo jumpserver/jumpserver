@@ -139,7 +139,6 @@ def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
     """
-
     temp_user = None
     username = credentials.get('username')
     for backend, backend_path in _get_backends(return_tuples=True):
