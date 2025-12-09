@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-08 18:38+0800\n"
+"POT-Creation-Date: 2025-12-09 10:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,7 +221,7 @@ msgstr "템플릿"
 msgid "Skip"
 msgstr "건너뛰기"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:295
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:298
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "업데이트"
@@ -3517,7 +3517,7 @@ msgstr "디렉터리 삭제"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:296
+#: rbac/tree.py:299
 msgid "Delete"
 msgstr "삭제"
 
@@ -3543,7 +3543,7 @@ msgstr "다운로드"
 msgid "Rename dir"
 msgstr "디렉터리 매핑"
 
-#: audits/const.py:23 rbac/tree.py:294 terminal/api/session/session.py:286
+#: audits/const.py:23 rbac/tree.py:297 terminal/api/session/session.py:286
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:104
 msgid "View"
@@ -3551,7 +3551,7 @@ msgstr "조회"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:293
+#: rbac/tree.py:296
 msgid "Create"
 msgstr "생성"
 
@@ -6841,6 +6841,18 @@ msgstr "권한 트리 보기"
 #, fuzzy
 #| msgid "Access key"
 msgid "Access token"
+msgstr "액세스 키"
+
+#: rbac/tree.py:190
+#, fuzzy
+#| msgid "Access key"
+msgid "View access token"
+msgstr "액세스 키"
+
+#: rbac/tree.py:191
+#, fuzzy
+#| msgid "Access key"
+msgid "Revoke access token"
 msgstr "액세스 키"
 
 #: reports/views.py:20
