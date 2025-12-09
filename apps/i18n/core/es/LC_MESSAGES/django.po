@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-08 18:38+0800\n"
+"POT-Creation-Date: 2025-12-09 10:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -247,7 +247,7 @@ msgstr "Plantilla"
 msgid "Skip"
 msgstr "Omitir"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:295
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:298
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "Actualizar"
@@ -3633,7 +3633,7 @@ msgstr "Eliminar directorio"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:296
+#: rbac/tree.py:299
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -3659,7 +3659,7 @@ msgstr "Descargar"
 msgid "Rename dir"
 msgstr "Mapear directorio"
 
-#: audits/const.py:23 rbac/tree.py:294 terminal/api/session/session.py:286
+#: audits/const.py:23 rbac/tree.py:297 terminal/api/session/session.py:286
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:104
 msgid "View"
@@ -3667,7 +3667,7 @@ msgstr "Ver"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:293
+#: rbac/tree.py:296
 msgid "Create"
 msgstr "Crear"
 
@@ -7049,6 +7049,18 @@ msgstr "Ver árbol de autorizaciones"
 #, fuzzy
 #| msgid "Access key"
 msgid "Access token"
+msgstr "Clave de acceso"
+
+#: rbac/tree.py:190
+#, fuzzy
+#| msgid "Access key"
+msgid "View access token"
+msgstr "Clave de acceso"
+
+#: rbac/tree.py:191
+#, fuzzy
+#| msgid "Access key"
+msgid "Revoke access token"
 msgstr "Clave de acceso"
 
 #: reports/views.py:20

@@ -187,6 +187,9 @@ verbose_name_mapper = {
     'rbac.view_permission': _('View permission tree'),
     'authentication.passkey': _("Passkey"),
     'oauth2_provider.accesstoken': _("Access token"),
+    'oauth2_provider.view_accesstoken': _("View access token"),
+    'oauth2_provider.delete_accesstoken': _("Revoke access token"),
+
 }
 
 xpack_nodes = [

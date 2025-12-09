@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-08 18:38+0800\n"
+"POT-Creation-Date: 2025-12-09 10:13+0800\n"
 "PO-Revision-Date: 2025-11-13 12:26\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Russian\n"
@@ -225,7 +225,7 @@ msgstr "Шаблон"
 msgid "Skip"
 msgstr "Пропустить"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:295
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:298
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "Обновить"
@@ -3587,7 +3587,7 @@ msgstr "Удалить каталог"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:296
+#: rbac/tree.py:299
 msgid "Delete"
 msgstr "Удалить"
 
@@ -3613,7 +3613,7 @@ msgstr "Скачать"
 msgid "Rename dir"
 msgstr "Сопоставление каталога"
 
-#: audits/const.py:23 rbac/tree.py:294 terminal/api/session/session.py:286
+#: audits/const.py:23 rbac/tree.py:297 terminal/api/session/session.py:286
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:104
 msgid "View"
@@ -3621,7 +3621,7 @@ msgstr "Просмотр"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:293
+#: rbac/tree.py:296
 msgid "Create"
 msgstr "Создать"
 
@@ -6935,6 +6935,18 @@ msgstr "Просмотр дерева разрешений"
 #, fuzzy
 #| msgid "Access key"
 msgid "Access token"
+msgstr "Ключ доступа"
+
+#: rbac/tree.py:190
+#, fuzzy
+#| msgid "Access key"
+msgid "View access token"
+msgstr "Ключ доступа"
+
+#: rbac/tree.py:191
+#, fuzzy
+#| msgid "Access key"
+msgid "Revoke access token"
 msgstr "Ключ доступа"
 
 #: reports/views.py:20
