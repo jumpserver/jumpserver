@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from django.core.cache import cache
 from django.db.models import Count, Max, F, CharField, Q
 from django.db.models.functions import Cast
 from django.http.response import JsonResponse
@@ -144,6 +145,7 @@ class DateTimeMixin:
 
 
 class DatesLoginMetricMixin:
+    days: int
     dates_list: list
     date_start_end: tuple
     command_type_queryset_list: list
@@ -154,6 +156,8 @@ class DatesLoginMetricMixin:
     user_login_logs_on_the_system_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
+
+    CACHE_TIMEOUT = 60
 
     @lazyproperty
     def get_type_to_assets(self):
@@ -214,19 +218,34 @@ class DatesLoginMetricMixin:
         return date_metrics_dict.get('id', [])
 
     def get_dates_login_times_assets(self):
+        cache_key = f"stats:top10_assets:{self.days}"
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
+
         assets = self.sessions_queryset.values("asset") \
             .annotate(total=Count("asset")) \
             .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
             .order_by("-total")
-        return list(assets[:10])
+
+        result = list(assets[:10])
+        cache.set(cache_key, result, self.CACHE_TIMEOUT)
+        return result
 
     def get_dates_login_times_users(self):
+        cache_key = f"stats:top10_users:{self.days}"
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
+
         users = self.sessions_queryset.values("user_id") \
             .annotate(total=Count("user_id")) \
             .annotate(user=Max('user')) \
             .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
             .order_by("-total")
-        return list(users[:10])
+        result = list(users[:10])
+        cache.set(cache_key, result, self.CACHE_TIMEOUT)
+        return result
 
     def get_dates_login_record_sessions(self):
         sessions = self.sessions_queryset.order_by('-date_start')
