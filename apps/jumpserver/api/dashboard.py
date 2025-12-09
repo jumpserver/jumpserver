@@ -1,6 +1,7 @@
 from collections import defaultdict
 
-from django.db.models import Count, Max, F, CharField, Q
+from django.core.cache import cache
+from django.db.models import Count, Max, F, CharField
 from django.db.models.functions import Cast
 from django.http.response import JsonResponse
 from django.utils import timezone
@@ -18,9 +19,9 @@ from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
 from orgs.caches import OrgResourceStatisticsCache
-from orgs.utils import current_org, filter_org_queryset
-from terminal.const import RiskLevelChoices, CommandStorageType
-from terminal.models import Session, CommandStorage
+from orgs.utils import current_org
+from terminal.const import RiskLevelChoices
+from terminal.models import Session, Command
 
 __all__ = ['IndexApi']
 
@@ -50,7 +51,7 @@ class DateTimeMixin:
 
     @lazyproperty
     def date_start_end(self):
-        return self.days_to_datetime, local_now()
+        return self.days_to_datetime.date(), local_now().date() + timezone.timedelta(days=1)
 
     @lazyproperty
     def dates_list(self):
@@ -123,19 +124,14 @@ class DateTimeMixin:
         return self.get_logs_queryset_filter(qs, 'date_start')
 
     @lazyproperty
-    def command_type_queryset_list(self):
-        qs_list = []
-        for storage in CommandStorage.objects.exclude(name='null'):
-            if not storage.is_valid():
-                continue
-
-            qs = storage.get_command_queryset()
-            qs = filter_org_queryset(qs)
-            qs = self.get_logs_queryset_filter(
+    def command_type_queryset_tuple(self):
+        type_queryset_tuple = Command.get_all_type_queryset_tuple()
+        return (
+            (tp, self.get_logs_queryset_filter(
                 qs, 'timestamp', is_timestamp=True
-            )
-            qs_list.append((storage.type, qs))
-        return qs_list
+            ))
+            for tp, qs in type_queryset_tuple
+        )
 
     @lazyproperty
     def job_logs_queryset(self):
@@ -144,9 +140,10 @@ class DateTimeMixin:
 
 
 class DatesLoginMetricMixin:
+    days: int
     dates_list: list
     date_start_end: tuple
-    command_type_queryset_list: list
+    command_type_queryset_tuple: tuple
     sessions_queryset: Session.objects
     ftp_logs_queryset: FTPLog.objects
     job_logs_queryset: JobLog.objects
@@ -154,6 +151,7 @@ class DatesLoginMetricMixin:
     user_login_logs_on_the_system_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
+    CACHE_TIMEOUT = 60
 
     @lazyproperty
     def get_type_to_assets(self):
@@ -214,19 +212,34 @@ class DatesLoginMetricMixin:
         return date_metrics_dict.get('id', [])
 
     def get_dates_login_times_assets(self):
+        cache_key = f"stats:top10_assets:{self.days}"
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
+
         assets = self.sessions_queryset.values("asset") \
             .annotate(total=Count("asset")) \
             .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
             .order_by("-total")
-        return list(assets[:10])
+
+        result = list(assets[:10])
+        cache.set(cache_key, result, self.CACHE_TIMEOUT)
+        return result
 
     def get_dates_login_times_users(self):
+        cache_key = f"stats:top10_users:{self.days}"
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
+
         users = self.sessions_queryset.values("user_id") \
             .annotate(total=Count("user_id")) \
             .annotate(user=Max('user')) \
             .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
             .order_by("-total")
-        return list(users[:10])
+        result = list(users[:10])
+        cache.set(cache_key, result, self.CACHE_TIMEOUT)
+        return result
 
     def get_dates_login_record_sessions(self):
         sessions = self.sessions_queryset.order_by('-date_start')
@@ -264,25 +277,16 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def command_statistics(self):
-        def _count_pair(_tp, _qs):
-            if _tp == CommandStorageType.es:
-                total = _qs.count(limit_to_max_result_window=False)
-                danger = _qs.filter(risk_level=RiskLevelChoices.reject) \
-                    .count(limit_to_max_result_window=False)
-                return total, danger
-
-            agg = _qs.aggregate(
-                total=Count('pk'),
-                danger=Count('pk', filter=Q(risk_level=RiskLevelChoices.reject)),
-            )
-            return (agg['total'] or 0), (agg['danger'] or 0)
-
+        from terminal.const import CommandStorageType
         total_amount = 0
         danger_amount = 0
-        for tp, qs in self.command_type_queryset_list:
-            t, d = _count_pair(tp, qs)
-            total_amount += t
-            danger_amount += d
+        for tp, qs in self.command_type_queryset_tuple:
+            if tp == CommandStorageType.es:
+                total_amount += qs.count(limit_to_max_result_window=False)
+                danger_amount += qs.filter(risk_level=RiskLevelChoices.reject).count(limit_to_max_result_window=False)
+            else:
+                total_amount += qs.count()
+                danger_amount += qs.filter(risk_level=RiskLevelChoices.reject).count()
         return total_amount, danger_amount
 
     @lazyproperty
