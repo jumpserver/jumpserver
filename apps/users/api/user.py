@@ -199,11 +199,19 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
 class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
 
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        if is_uuid(pk):
+            return super().get_object()
+        else:
+            return self.get_queryset().filter(username=pk).first()
+
     def perform_update(self, serializer):
         user = self.get_object()
-        username = user.username if user else ''
-        LoginBlockUtil.unblock_user(username)
-        MFABlockUtils.unblock_user(username)
+        if not user:
+            return Response({"error": _("User not found")}, status=404)
+
+        user.unblock_login()
 
 
 class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):

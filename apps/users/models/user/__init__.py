@@ -284,6 +284,13 @@ class User(
             return True
         return False
 
+    @classmethod
+    def block_login(cls, username):
+        from users.utils import LoginBlockUtil, MFABlockUtils
+
+        LoginBlockUtil.block_user(username)
+        MFABlockUtils.block_user(username)
+
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == "admin":
             raise PermissionDenied(_("Can not delete admin user"))

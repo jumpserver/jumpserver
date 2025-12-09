@@ -187,7 +187,8 @@ class BlockUtilBase:
     def block_user(cls, username):
         username = username.lower()
         block_key = cls.BLOCK_KEY_TMPL.format(username)
-        cache.set(block_key, True, cls.key_ttl)
+        key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
+        cache.set(block_key, True, key_ttl)
 
     @classmethod
     def get_blocked_usernames(cls):
