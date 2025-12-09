@@ -274,8 +274,8 @@ class User(
         LoginBlockUtil.unblock_user(self.username)
         MFABlockUtils.unblock_user(self.username)
 
-    @lazyproperty
-    def login_blocked(self):
+    @property
+    def is_login_blocked(self):
         from users.utils import LoginBlockUtil, MFABlockUtils
 
         if LoginBlockUtil.is_user_block(self.username):

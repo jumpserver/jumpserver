@@ -123,7 +123,7 @@ class UserSerializer(
     mfa_force_enabled = serializers.BooleanField(
         read_only=True, label=_("MFA force enabled")
     )
-    login_blocked = serializers.BooleanField(read_only=True, label=_("Login blocked"))
+    is_login_blocked = serializers.BooleanField(read_only=True, label=_("Login blocked"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_otp_secret_key_bound = serializers.BooleanField(
@@ -193,6 +193,7 @@ class UserSerializer(
             "is_valid", "is_expired", "is_active",  # 布尔字段
             "is_otp_secret_key_bound", "can_public_key_auth",
             "mfa_enabled", "need_update_password", "is_face_code_set",
+            "is_login_blocked",
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = (
@@ -211,7 +212,7 @@ class UserSerializer(
         # 多对多字段
         fields_m2m = ["groups", "system_roles", "org_roles", "orgs_roles", "labels"]
         # 在serializer 上定义的字段
-        fields_custom = ["login_blocked", "password_strategy"]
+        fields_custom = ["is_login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
         fields_unexport = ["avatar_url", "is_service_account"]
 
