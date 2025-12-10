@@ -1,4 +1,5 @@
-from .session import *
-from .component import *
 from .applet import *
+from .chat import *
+from .component import *
+from .session import *
 from .virtualapp import *

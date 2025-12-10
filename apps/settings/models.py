@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from typing import Any, Dict, List
 
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -14,7 +15,6 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.db.models import JMSBaseModel
 from common.db.utils import Encryptor
 from common.utils import get_logger
-from .const import ChatAITypeChoices
 from .signals import setting_changed
 
 logger = get_logger(__name__)
@@ -196,20 +196,25 @@ class ChatPrompt(JMSBaseModel):
         return self.name
 
 
-def get_chatai_data():
-    data = {
-        'url': settings.GPT_BASE_URL,
-        'api_key': settings.GPT_API_KEY,
-        'proxy': settings.GPT_PROXY,
-        'model': settings.GPT_MODEL,
-    }
-    if settings.CHAT_AI_TYPE != ChatAITypeChoices.gpt:
-        data['url'] = settings.DEEPSEEK_BASE_URL
-        data['api_key'] = settings.DEEPSEEK_API_KEY
-        data['proxy'] = settings.DEEPSEEK_PROXY
-        data['model'] = settings.DEEPSEEK_MODEL
+def get_chatai_data() -> Dict[str, Any]:
+    raw_providers = settings.CHAT_AI_PROVIDERS
+    providers: List[dict] = [p for p in raw_providers if isinstance(p, dict)]
 
-    return data
+    if not providers:
+        return {}
+
+    selected = next(
+        (p for p in providers if p.get('is_assistant')),
+        providers[0],
+    )
+
+    return {
+        'url': selected.get('base_url'),
+        'api_key': selected.get('api_key'),
+        'proxy': selected.get('proxy'),
+        'model': selected.get('model'),
+        'name': selected.get('name'),
+    }
 
 
 def init_sqlite_db():

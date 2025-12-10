@@ -32,6 +32,7 @@ router.register(r'virtual-apps', api.VirtualAppViewSet, 'virtual-app')
 router.register(r'app-providers', api.AppProviderViewSet, 'app-provider')
 router.register(r'app-providers/((?P<provider>[^/.]+)/)?apps', api.AppProviderAppViewSet, 'app-provider-app')
 router.register(r'virtual-app-publications', api.VirtualAppPublicationViewSet, 'virtual-app-publication')
+router.register(r'chats', api.ChatViewSet, 'chat')
 
 urlpatterns = [
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),

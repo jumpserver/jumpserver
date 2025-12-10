@@ -274,8 +274,8 @@ class User(
         LoginBlockUtil.unblock_user(self.username)
         MFABlockUtils.unblock_user(self.username)
 
-    @lazyproperty
-    def login_blocked(self):
+    @property
+    def is_login_blocked(self):
         from users.utils import LoginBlockUtil, MFABlockUtils
 
         if LoginBlockUtil.is_user_block(self.username):
@@ -283,6 +283,13 @@ class User(
         if MFABlockUtils.is_user_block(self.username):
             return True
         return False
+
+    @classmethod
+    def block_login(cls, username):
+        from users.utils import LoginBlockUtil, MFABlockUtils
+
+        LoginBlockUtil.block_user(username)
+        MFABlockUtils.block_user(username)
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == "admin":

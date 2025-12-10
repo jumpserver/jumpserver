@@ -73,7 +73,6 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     CHAT_AI_ENABLED = serializers.BooleanField()
     CHAT_AI_METHOD = serializers.CharField()
     CHAT_AI_EMBED_URL = serializers.CharField()
-    CHAT_AI_TYPE = serializers.CharField()
     GPT_MODEL = serializers.CharField()
     FILE_UPLOAD_SIZE_LIMIT_MB = serializers.IntegerField()
     FTP_FILE_MAX_STORE = serializers.IntegerField()

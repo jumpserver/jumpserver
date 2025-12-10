@@ -186,6 +186,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         super().__init__(*args, **kwargs)
         self._init_field_choices()
         self._extract_accounts()
+        self._set_platform()
 
     def _extract_accounts(self):
         if not getattr(self, 'initial_data', None):
@@ -216,6 +217,21 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         protocols = list(protocol_map.values())
         protocols_data = [{'name': p.name, 'port': p.port} for p in protocols]
         self.initial_data['protocols'] = protocols_data
+
+    def _set_platform(self):
+        if not hasattr(self, 'initial_data'):
+            return
+        platform_id = self.initial_data.get('platform')
+        if not platform_id:
+            return
+
+        if isinstance(platform_id, int) or str(platform_id).isdigit() or not isinstance(platform_id, str):
+            return
+
+        platform = Platform.objects.filter(name=platform_id).first()
+        if not platform:
+            return
+        self.initial_data['platform'] = platform.id
 
     def _init_field_choices(self):
         request = self.context.get('request')
@@ -265,8 +281,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
         if not platform_id and self.instance:
             platform = self.instance.platform
-        else:
+        elif isinstance(platform_id, int):
             platform = Platform.objects.filter(id=platform_id).first()
+        else:
+            platform = Platform.objects.filter(name=platform_id).first()
 
         if not platform:
             raise serializers.ValidationError({'platform': _("Platform not exist")})
@@ -297,6 +315,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     def is_valid(self, raise_exception=False):
         self._set_protocols_default()
+        self._set_platform()
         return super().is_valid(raise_exception=raise_exception)
 
     def validate_protocols(self, protocols_data):

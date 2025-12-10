@@ -2,8 +2,10 @@
 #
 from .applet import *
 from .applet_host import *
+from .chat import *
 from .command import *
 from .endpoint import *
+from .loki import *
 from .session import *
 from .sharing import *
 from .storage import *
@@ -11,4 +13,3 @@ from .task import *
 from .terminal import *
 from .virtualapp import *
 from .virtualapp_provider import *
-from .loki import *
