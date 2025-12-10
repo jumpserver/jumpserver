@@ -222,6 +222,9 @@ class RDPFileClientProtocolURLMixin:
             if connect_method_dict['type'] == 'virtual_app':
                 endpoint_protocol = 'vnc'
                 token_protocol = 'vnc'
+                data.update({
+                    'protocol': 'vnc',
+                })
             else:
                 endpoint_protocol = connect_method_dict['endpoint_protocol']
                 token_protocol = token.protocol
