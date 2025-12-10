@@ -5,6 +5,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 class MaxLimitOffsetPagination(LimitOffsetPagination):
     max_limit = settings.MAX_PAGE_SIZE
+    default_limit = settings.DEFAULT_PAGE_SIZE
 
     def get_count(self, queryset):
         try:

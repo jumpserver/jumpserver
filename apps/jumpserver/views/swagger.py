@@ -37,11 +37,11 @@ class SchemeMixin:
         }
         return Response(schema)
     
-@method_decorator(cache_page(60 * 5,), name="dispatch")
+# @method_decorator(cache_page(60 * 5,), name="dispatch")
 class JsonApi(SchemeMixin, SpectacularJSONAPIView):
     pass
 
-@method_decorator(cache_page(60 * 5,), name="dispatch")
+# @method_decorator(cache_page(60 * 5,), name="dispatch")
 class YamlApi(SchemeMixin, SpectacularYAMLAPIView):
     pass
 

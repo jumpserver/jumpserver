@@ -14,7 +14,7 @@ class CustomSchemaGenerator(SchemaGenerator):
 
 class CustomAutoSchema(AutoSchema):
     def __init__(self, *args, **kwargs):
-        self.from_mcp = kwargs.get('from_mcp', False)
+        self.from_mcp = True
         super().__init__(*args, **kwargs)
 
     def map_parsers(self):
@@ -29,21 +29,7 @@ class CustomAutoSchema(AutoSchema):
             return []
         tags = ['_'.join(operation_keys[:2])]
         return tags
-   
-    def get_operation(self, path, *args, **kwargs):
-        if path.endswith('render-to-json/'):
-            return None
-        # if not path.startswith('/api/v1/users'):
-            # return None
-        operation = super().get_operation(path, *args, **kwargs)
-        if not operation:
-            return operation
-
-        if not operation.get('summary', ''):
-            operation['summary'] = operation.get('operationId')
-
-        return operation
-
+ 
     def get_operation_id(self):
         tokenized_path = self._tokenize_path()
         # replace dashes as they can be problematic later in code generation
@@ -118,65 +104,84 @@ class CustomAutoSchema(AutoSchema):
             'change-secret-dashboard', '/copy-to-assets/',
             '/move-to-assets/', 'dashboard', 'index', 'countries',
             '/resources/cache/', 'profile/mfa', 'profile/password',
-            'profile/permissions', 'prometheus', 'constraints'
+            'profile/permissions', 'prometheus', 'constraints',
+            '/api/swagger.json', '/api/swagger.yaml', 
         ]
         for p in excludes:
             if path.find(p) >= 0:
                 return True
         return False
 
-    def exclude_some_app_model(self, path):
-        parts = path.split('/')
-        if len(parts) < 5:
+    def exclude_some_models(self, model):
+        models = []
+        if self.from_mcp:
+            models = [
+                'users', 'user-groups', 
+                'assets', 'hosts', 'devices', 'databases',
+                'webs', 'clouds', 'ds', 'platforms', 
+                'nodes', 'zones', 'labels', 
+                'accounts', 'account-templates',
+                'asset-permissions',
+            ]
+        if models and model in models:
             return False
+        return True
 
+    def exclude_some_apps(self, app):
         apps = []
         if self.from_mcp:
             apps = [
-                'ops', 'tickets', 'authentication',
-                'settings', 'xpack', 'terminal', 'rbac',
-                'notifications', 'promethues', 'acls'
+                'users', 'assets', 'accounts',
+                'perms', 'labels',
             ]
+        if apps and app in apps:
+            return False        
+        return True
+
+    def exclude_some_app_model(self, path):
+        parts = path.split('/')
+        if len(parts) < 5 :
+            return True
+
+        if len(parts) == 7 and parts[5] != "{id}":
+            return True
+        
+        if len(parts) > 7:
+            return True
 
         app_name = parts[3]
-        if app_name in apps:
+        if self.exclude_some_apps(app_name):
             return True
-        models = []
-        model = parts[4]
-        if self.from_mcp:
-            models = [
-                'users', 'user-groups', 'users-groups-relations', 'assets', 'hosts', 'devices', 'databases',
-                'webs', 'clouds', 'gpts', 'ds', 'customs', 'platforms', 'nodes', 'zones', 'gateways',
-                'protocol-settings', 'labels', 'virtual-accounts', 'gathered-accounts', 'account-templates',
-                'account-template-secrets', 'account-backups', 'account-backup-executions',
-                'change-secret-automations', 'change-secret-executions', 'change-secret-records',
-                'gather-account-automations', 'gather-account-executions', 'push-account-automations',
-                'push-account-executions', 'push-account-records', 'check-account-automations',
-                'check-account-executions', 'account-risks', 'integration-apps', 'asset-permissions',
-                'asset-permissions-users-relations', 'asset-permissions-user-groups-relations',
-                'asset-permissions-assets-relations', 'asset-permissions-nodes-relations', 'terminal-status',
-                'terminals', 'tasks', 'status', 'replay-storages', 'command-storages', 'session-sharing-records',
-                'endpoints', 'endpoint-rules', 'applets', 'applet-hosts', 'applet-publications',
-                'applet-host-deployments', 'virtual-apps', 'app-providers', 'virtual-app-publications',
-                'celery-period-tasks', 'task-executions', 'adhocs', 'playbooks', 'variables', 'ftp-logs',
-                'login-logs', 'operate-logs', 'password-change-logs', 'job-logs', 'jobs', 'user-sessions',
-                'service-access-logs', 'chatai-prompts', 'super-connection-tokens', 'flows',
-                'apply-assets', 'apply-nodes', 'login-acls', 'login-asset-acls', 'command-filter-acls',
-                'command-groups', 'connect-method-acls', 'system-msg-subscriptions', 'roles', 'role-bindings',
-                'system-roles', 'system-role-bindings', 'org-roles', 'org-role-bindings', 'content-types',
-                'labeled-resources', 'account-backup-plans', 'account-check-engines', 'account-secrets',
-                'change-secret', 'integration-applications', 'push-account', 'directories', 'connection-token',
-                'groups', 'accounts', 'resource-types', 'favorite-assets', 'activities', 'platform-automation-methods',
-            ]
-        if model in models:
+
+        if self.exclude_some_models(parts[4]):
             return True
         return False
 
     def is_excluded(self):
         if self.exclude_some_paths(self.path):
             return True
+        
         if self.exclude_some_app_model(self.path):
             return True
+        return False
+
+    def exclude_some_operations(self, operation_id):
+        exclude_operations = [
+            'orgs_orgs_read', 'orgs_orgs_update', 'orgs_orgs_delete', 
+            'orgs_orgs_create', 'orgs_orgs_partial_update',
+        ]
+        if operation_id in exclude_operations:
+            return True
+
+        if 'bulk' in operation_id:
+            return True
+
+        if 'destroy' in operation_id:
+            return True
+
+        if 'update' in operation_id and 'partial' not in operation_id:
+            return True
+
         return False
 
     def get_operation(self, path, *args, **kwargs):
@@ -185,18 +190,15 @@ class CustomAutoSchema(AutoSchema):
             return operation
 
         operation_id = operation.get('operationId')
-        if 'bulk' in operation_id:
+        if self.exclude_some_operations(operation_id):
             return None
 
         if not operation.get('summary', ''):
             operation['summary'] = operation.get('operationId')
+        
+        # if self.is_excluded():
+        #     return None
 
-        exclude_operations = [
-            'orgs_orgs_read', 'orgs_orgs_update', 'orgs_orgs_delete', 
-            'orgs_orgs_create', 'orgs_orgs_partial_update',
-        ]
-        if operation_id in exclude_operations:
-            return None
         return operation
 
 # 添加自定义字段的 OpenAPI 扩展

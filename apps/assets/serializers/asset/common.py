@@ -150,6 +150,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
                                   attrs=('id', 'name', 'type'))
+    spec_info = serializers.DictField(read_only=True, label=_('Spec info'))
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
     _accounts = None
 
@@ -164,7 +165,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'directory_services',
         ]
         read_only_fields = [
-            'accounts_amount', 'category', 'type', 'connectivity', 'auto_config',
+            'accounts_amount', 'category', 'type', 'connectivity', 
+            'auto_config', 'spec_info',
             'date_verified', 'created_by', 'date_created', 'date_updated',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
@@ -246,6 +248,19 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         if not field_type:
             return
         field_type.choices = AllTypes.filter_choices(category)
+
+    @staticmethod
+    def get_spec_info(obj):
+        return {}
+                
+    def get_auto_config(self, obj):
+        return obj.auto_config()
+
+    def get_gathered_info(self, obj):
+        return obj.gathered_info()
+
+    def get_accounts_amount(self, obj):
+        return obj.accounts_amount()
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -441,7 +456,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
 class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-    spec_info = MethodSerializer(label=_('Spec info'), read_only=True)
+    spec_info = MethodSerializer(label=_('Spec info'), read_only=True, required=False)
     gathered_info = MethodSerializer(label=_('Gathered info'), read_only=True)
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
 
