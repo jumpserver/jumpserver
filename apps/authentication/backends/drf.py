@@ -108,7 +108,7 @@ class SessionAuthentication(authentication.SessionAuthentication):
         user = getattr(request._request, 'user', None)
 
         # Unauthenticated, CSRF validation not required
-        if not user or not user.is_active:
+        if not user or not user.is_active or not user.is_valid:
             return None
 
         try:
