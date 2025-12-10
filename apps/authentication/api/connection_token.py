@@ -219,8 +219,15 @@ class RDPFileClientProtocolURLMixin:
                 }
             })
         else:
+            if connect_method_dict['type'] == 'virtual_app':
+                endpoint_protocol = 'vnc'
+                token_protocol = 'vnc'
+            else:
+                endpoint_protocol = connect_method_dict['endpoint_protocol']
+                token_protocol = token.protocol
+
             endpoint = self.get_smart_endpoint(
-                protocol=connect_method_dict['endpoint_protocol'],
+                protocol=endpoint_protocol,
                 asset=asset
             )
             data.update({
@@ -236,7 +243,7 @@ class RDPFileClientProtocolURLMixin:
                 },
                 'endpoint': {
                     'host': endpoint.host,
-                    'port': endpoint.get_port(token.asset, token.protocol),
+                    'port': endpoint.get_port(token.asset, token_protocol),
                 }
             })
         return data
