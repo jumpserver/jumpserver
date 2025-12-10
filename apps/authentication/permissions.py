@@ -1,7 +1,8 @@
 import time
-
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 
 from authentication.const import ConfirmType
 from authentication.models import ConnectionToken
@@ -52,8 +53,14 @@ class UserConfirmation(permissions.BasePermission):
 
 class IsValidUserOrConnectionToken(IsValidUser):
     def has_permission(self, request, view):
-        return super().has_permission(request, view) \
-            or self.is_valid_connection_token(request)
+        if self.is_valid_connection_token(request):
+            return True
+
+        if not (request.user and request.user.is_valid):
+            error = _('No user or invalid user')
+            raise PermissionDenied(error)
+
+        return super().has_permission(request, view)
 
     @staticmethod
     def is_valid_connection_token(request):
