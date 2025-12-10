@@ -44,6 +44,7 @@ class SystemMsgSubscriptionViewSet(
     ListModelMixin, UpdateModelMixin, JMSGenericViewSet
 ):
     lookup_field = 'message_type'
+    slug_field = lookup_field
     queryset = SystemMsgSubscription.objects.all()
     serializer_classes = {
         'list': SystemMsgSubscriptionByCategorySerializer,

@@ -67,8 +67,9 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
 
         code = random_string(settings.SMS_CODE_LENGTH, lower=False, upper=False)
         subject = '%s: %s' % (get_login_title(), _('Forgot password'))
+        tip = _('The validity period of the verification code is {} minute').format(settings.VERIFY_CODE_TTL // 60)
         context = {
-            'user': user, 'title': subject, 'code': code,
+            'user': user, 'title': subject, 'code': code, 'tip': tip,
         }
         message = render_to_string('authentication/_msg_reset_password_code.html', context)
         content = {'subject': subject, 'message': message}

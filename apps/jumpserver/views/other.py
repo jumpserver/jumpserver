@@ -104,7 +104,7 @@ class ResourceDownload(TemplateView):
         OPENSSH_VERSION=v9.4.0.0
         TINKER_VERSION=v0.1.6
         VIDEO_PLAYER_VERSION=0.6.0
-        CLIENT_VERSION=v3.0.7
+        CLIENT_VERSION=4.0.0
         """
 
     def get_meta_json(self):
@@ -148,6 +148,6 @@ class RedirectConfirm(TemplateView):
         parsed = urlparse(url)
         if not parsed.scheme or not parsed.netloc:
             return False
-        if parsed.scheme not in ['http', 'https']:
+        if parsed.scheme not in ['http', 'https', 'jms']:
             return False
         return True

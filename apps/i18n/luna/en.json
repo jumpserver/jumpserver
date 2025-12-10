@@ -20,6 +20,7 @@
     "AvailableHotkeys": "Available hotkeys",
     "Backspace as Ctrl+H": "Backspace as Ctrl+H",
     "Batch actions": "Batch actions",
+    "Batch actions(select and right click)": "Batch actions(select and right click)",
     "Batch connect": "Batch connect",
     "BatchCommands": "Batch commands",
     "Belgian French keyboard layout": "Belgian French (Azerty)",
@@ -87,6 +88,7 @@
     "Expand all asset": "Expand all assets under the current node",
     "Expire time": "Expire time",
     "ExpiredTime": "Expire time",
+    "Face Verify": "Face verify",
     "Face online required": "This login requires face verification and monitoring. Do you want to continue?",
     "Face verify": "Face verify",
     "Face verify required": "This login requires face verification. Do you want to continue?",
@@ -106,6 +108,7 @@
     "GUI": "GUI",
     "General": "General",
     "Go to Settings": "Go to Settings",
+    "Go to profile": "Go to profile",
     "Help": "Help",
     "Help or download": "Help → Download",
     "Help text": "Help text",
@@ -285,6 +288,5 @@
     "start time": "Start time",
     "success": "Success",
     "system user": "System user",
-    "user": "User",
-    "Batch actions(select and right click)": "Batch actions(select and right click)"
+    "user": "User"
 }

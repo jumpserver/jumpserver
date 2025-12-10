@@ -162,6 +162,7 @@ class FeiShu(RequestMixin):
         except Exception as e:
             logger.error(f'Get user detail error: {e} data={data}')
 
+        data.update(kwargs['other_info'] if 'other_info' in kwargs else {})
         info = flatten_dict(data)
         default_detail = self.default_user_detail(data, user_id)
         detail = map_attributes(default_detail, info, self.attributes)

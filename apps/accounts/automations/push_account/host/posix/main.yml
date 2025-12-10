@@ -18,6 +18,7 @@
         uid: "{{ params.uid | int if params.uid | length > 0 else omit }}"
         shell: "{{ params.shell if params.shell | length > 0 else omit }}"
         home: "{{ params.home if params.home | length > 0 else '/home/' + account.username }}"
+        group: "{{ params.group if params.group | length > 0 else omit }}"
         groups: "{{ params.groups if params.groups | length > 0 else omit }}"
         append: "{{ true if params.groups | length > 0 else false }}"
         expires: -1

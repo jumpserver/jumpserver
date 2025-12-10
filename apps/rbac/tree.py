@@ -79,6 +79,7 @@ special_pid_mapper = {
     'acls.loginacl': 'perms',
     'acls.loginassetacl': 'perms',
     'acls.connectmethodacl': 'perms',
+    'acls.datamaskingrule': 'perms',
     'xpack.account': 'cloud_import',
     'xpack.syncinstancedetail': 'cloud_import',
     'xpack.syncinstancetask': 'cloud_import',
@@ -128,6 +129,7 @@ special_pid_mapper = {
     "rbac.view_systemtools": "view_workbench",
     'tickets.view_ticket': 'tickets',
     "audits.joblog": "job_audit",
+    'oauth2_provider.accesstoken': 'authentication',
 }
 
 special_setting_pid_mapper = {
@@ -183,6 +185,11 @@ verbose_name_mapper = {
     'tickets.view_ticket': _("Ticket"),
     'settings.setting': _("Common setting"),
     'rbac.view_permission': _('View permission tree'),
+    'authentication.passkey': _("Passkey"),
+    'oauth2_provider.accesstoken': _("Access token"),
+    'oauth2_provider.view_accesstoken': _("View access token"),
+    'oauth2_provider.delete_accesstoken': _("Revoke access token"),
+
 }
 
 xpack_nodes = [

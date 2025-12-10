@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     'settings.apps.SettingsConfig',
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
+    'oauth2_provider',
     'authentication.apps.AuthenticationConfig',  # authentication
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',
@@ -267,9 +268,17 @@ DATABASES = {
 DB_USE_SSL = CONFIG.DB_USE_SSL
 if DB_ENGINE == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
-    if DB_USE_SSL:
-        DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
-        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
+
+if DB_USE_SSL:
+    DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
+
+    if DB_ENGINE == 'mysql':
+        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH }
+    elif DB_ENGINE == 'postgresql':
+        DB_OPTIONS.update({
+            'sslmode': 'require',
+            'sslrootcert': DB_CA_PATH,
+        })
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

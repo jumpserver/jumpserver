@@ -381,7 +381,6 @@ class Config(dict):
         'CAS_USERNAME_ATTRIBUTE': 'cas:user',
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
         'CAS_RENAME_ATTRIBUTES': {'cas:user': 'username'},
-        'CAS_CREATE_USER': True,
         'CAS_ORG_IDS': [DEFAULT_ID],
 
         'AUTH_SSO': False,
@@ -692,9 +691,9 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 0,
 
         # API 分页
-        'MAX_LIMIT_PER_PAGE': 10000, # 给导出用
+        'MAX_LIMIT_PER_PAGE': 10000,  # 给导出用
         'MAX_PAGE_SIZE': 1000,
-        'DEFAULT_PAGE_SIZE': 200, # 给没有请求分页的用
+        'DEFAULT_PAGE_SIZE': 200,  # 给没有请求分页的用
 
         'LIMIT_SUPER_PRIV': False,
 
@@ -721,6 +720,16 @@ class Config(dict):
         'LOKI_BASE_URL': 'http://loki:3100',
 
         'TOOL_USER_ENABLED': False,
+
+        # Suggestion api
+        'SUGGESTION_LIMIT': 10,
+
+        # MCP
+        'MCP_ENABLED': False,
+
+        # oauth2_provider settings 
+        'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
+        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
     }
 
     old_config_map = {

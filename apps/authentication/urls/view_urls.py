@@ -83,4 +83,6 @@ urlpatterns = [
     path('oauth2/', include(('authentication.backends.oauth2.urls', 'authentication'), namespace='oauth2')),
 
     path('captcha/', include('captcha.urls')),
+
+    path('oauth2-provider/', include(('authentication.backends.oauth2_provider.urls', 'authentication'), namespace='oauth2-provider'))
 ]

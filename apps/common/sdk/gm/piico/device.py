@@ -15,6 +15,7 @@ class Device:
         self.__load_driver(driver_path)
         # open device
         self.__open_device()
+        self.__reset_key_store()
 
     def close(self):
         if self.__device is None:
@@ -68,3 +69,12 @@ class Device:
         if ret != 0:
             raise PiicoError("open piico device failed", ret)
         self.__device = device
+
+    def __reset_key_store(self):
+        if self._driver is None:
+            raise PiicoError("no driver loaded", 0)
+        if self.__device is None:
+            raise PiicoError("device not open", 0)
+        ret = self._driver.SPII_ResetModule(self.__device)
+        if ret != 0:
+            raise PiicoError("reset device failed", ret)

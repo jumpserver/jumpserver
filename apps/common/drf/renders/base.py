@@ -183,6 +183,7 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
         for item in data:
             row = []
             for field in render_fields:
+                field._row = item
                 value = item.get(field.field_name)
                 value = self.render_value(field, value)
                 row.append(value)

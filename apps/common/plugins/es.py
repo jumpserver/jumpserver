@@ -2,6 +2,7 @@
 #
 import datetime
 import inspect
+
 import sys
 
 if sys.version_info.major == 3 and sys.version_info.minor >= 10:
@@ -334,6 +335,10 @@ class ES(object):
     def is_keyword(props: dict, field: str) -> bool:
         return props.get(field, {}).get("type", "keyword") == "keyword"
 
+    @staticmethod
+    def is_long(props: dict, field: str) -> bool:
+        return props.get(field, {}).get("type") == "long"
+
     def get_query_body(self, **kwargs):
         new_kwargs = {}
         for k, v in kwargs.items():
@@ -361,10 +366,10 @@ class ES(object):
         if index_in_field in kwargs:
             index['values'] = kwargs[index_in_field]
 
-        mapping = self.es.indices.get_mapping(index=self.query_index)
+        mapping = self.es.indices.get_mapping(index=self.index)
         props = (
             mapping
-            .get(self.query_index, {})
+            .get(self.index, {})
             .get('mappings', {})
             .get('properties', {})
         )
@@ -373,6 +378,9 @@ class ES(object):
 
         for k, v in kwargs.items():
             if k in ("org_id", "session") and self.is_keyword(props, k):
+                exact[k] = v
+
+            elif self.is_long(props, k):
                 exact[k] = v
 
             elif k in common_keyword_able:

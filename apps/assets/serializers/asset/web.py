@@ -26,4 +26,13 @@ class WebSerializer(AssetSerializer):
             'submit_selector': {
                 'default': 'id=login_button',
             },
+            'script': {
+                'default': [],
+            }
         }
+
+    def to_internal_value(self, data):
+        data = data.copy()
+        if data.get('script') in ("", None):
+            data.pop('script', None)
+        return super().to_internal_value(data)

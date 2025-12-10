@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-import pytz
-
 from datetime import datetime
 
-from common.utils import get_logger
-from common.plugins.es import ES
+import pytz
 
+from common.plugins.es import ES
+from common.utils import get_logger
 
 logger = get_logger(__file__)
 
@@ -27,8 +26,8 @@ class CommandStore(ES):
                 "type": "long"
             }
         }
-        exact_fields = {}
-        fuzzy_fields = {'input', 'risk_level', 'user', 'asset', 'account'}
+        exact_fields = {'risk_level'}
+        fuzzy_fields = {'input', 'user', 'asset', 'account'}
         match_fields = {'input'}
         keyword_fields = {'session', 'org_id'}
 

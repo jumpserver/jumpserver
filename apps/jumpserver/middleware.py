@@ -151,8 +151,13 @@ class SafeRedirectMiddleware:
 
         if not (300 <= response.status_code < 400):
             return response
-        if request.resolver_match and request.resolver_match.namespace.startswith('authentication'):
-            # 认证相关的路由跳过验证（core/auth/xxxx
+        if (
+            request.resolver_match and 
+            request.resolver_match.namespace.startswith('authentication') and 
+            not request.resolver_match.namespace.startswith('authentication:oauth2-provider')
+        ):
+            # 认证相关的路由跳过验证 /core/auth/..., 
+            # 但 oauth2-provider 除外, 因为它会重定向到第三方客户端, 希望给出更友好的提示
             return response
         location = response.get('Location')
         if not location:

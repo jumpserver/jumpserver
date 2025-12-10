@@ -39,13 +39,14 @@ class MFAEmail(BaseMFA):
     def send_challenge(self):
         code = random_string(settings.SMS_CODE_LENGTH, lower=False, upper=False)
         subject = '%s: %s' % (get_login_title(), _('MFA code'))
+        tip = _('The validity period of the verification code is {} minute').format(settings.VERIFY_CODE_TTL // 60)
         context = {
-            'user': self.user, 'title': subject, 'code': code,
+            'user': self.user, 'title': subject, 'code': code, 'tip': tip,
         }
         message = render_to_string('authentication/_msg_mfa_email_code.html', context)
         content = {'subject': subject, 'message': message}
         sender_util = SendAndVerifyCodeUtil(
-            self.user.email, code=code, backend=self.name, timeout=60, **content
+            self.user.email, code=code, backend=self.name, **content
         )
         sender_util.gen_and_send_async()
 

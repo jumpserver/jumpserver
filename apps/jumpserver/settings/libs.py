@@ -30,20 +30,21 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.backends.drf.AccessTokenAuthentication',
-        'authentication.backends.drf.PrivateTokenAuthentication',
-        'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
+        'authentication.backends.drf.ServiceAuthentication',
+        'authentication.backends.drf.PrivateTokenAuthentication',
+        'authentication.backends.drf.AccessTokenAuthentication',
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
+        'common.drf.filters.SearchFilter',
         'common.drf.filters.RewriteOrderingFilter',
     ),
     'DEFAULT_METADATA_CLASS': 'common.drf.metadata.SimpleMetadataWithFilters',
     'ORDERING_PARAM': "order",
-    'SEARCH_PARAM': "search",
+    'SEARCH_PARAM': "q",
     'DATETIME_FORMAT': '%Y/%m/%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y/%m/%d %H:%M:%S %z', 'iso-8601', '%Y-%m-%d %H:%M:%S %z'],
     'DEFAULT_PAGINATION_CLASS': 'jumpserver.rewriting.pagination.MaxLimitOffsetPagination',
@@ -222,3 +223,17 @@ PIICO_DRIVER_PATH = CONFIG.PIICO_DRIVER_PATH
 LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH
 
 JUMPSERVER_UPTIME = int(time.time())
+
+# OAuth2 Provider settings
+OAUTH2_PROVIDER = {
+    'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms'],
+    'PKCE_REQUIRED': True,
+    'ACCESS_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS,
+    'REFRESH_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS,
+}
+OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms://auth/callback'
+OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME = 'JumpServer Client'
+
+if CONFIG.DEBUG_DEV:
+    OAUTH2_PROVIDER['ALLOWED_REDIRECT_URI_SCHEMES'].append('http')
+    OAUTH2_PROVIDER_CLIENT_REDIRECT_URI += ' http://127.0.0.1:14876/auth/callback'

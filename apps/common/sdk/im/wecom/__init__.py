@@ -192,6 +192,7 @@ class WeCom(RequestMixin):
 class WeComTool(object):
     WECOM_STATE_SESSION_KEY = '_wecom_state'
     WECOM_STATE_VALUE = 'wecom'
+    WECOM_STATE_NEXT_URL_KEY = 'wecom_oauth_next_url'
 
     @lazyproperty
     def qr_cb_url(self):
@@ -207,7 +208,8 @@ class WeComTool(object):
 
     def check_state(self, state, request=None):
         return cache.get(state) == self.WECOM_STATE_VALUE or \
-            request.session[self.WECOM_STATE_SESSION_KEY] == state
+            request.session.get(self.WECOM_STATE_SESSION_KEY) == state or \
+            request.GET.get('state') == state  # 在企业微信桌面端打开的话，重新创建了个 session，会导致 session 校验失败
 
     def wrap_redirect_url(self, next_url):
         params = {

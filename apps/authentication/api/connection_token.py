@@ -69,6 +69,8 @@ class RDPFileClientProtocolURLMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
+            'bitmapcachepersistenable:i': '0',
+            'bitmapcachesize:i': '1500',
         }
 
         # copy from
@@ -76,7 +78,6 @@ class RDPFileClientProtocolURLMixin:
         rdp_low_speed_broadband_option = {
             "connection type:i": 2,
             "disable wallpaper:i": 1,
-            "bitmapcachepersistenable:i": 1,
             "disable full window drag:i": 1,
             "disable menu anims:i": 1,
             "allow font smoothing:i": 0,
@@ -87,7 +88,6 @@ class RDPFileClientProtocolURLMixin:
         rdp_high_speed_broadband_option = {
             "connection type:i": 4,
             "disable wallpaper:i": 0,
-            "bitmapcachepersistenable:i": 1,
             "disable full window drag:i": 1,
             "disable menu anims:i": 0,
             "allow font smoothing:i": 0,
@@ -362,6 +362,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         self.validate_serializer(serializer)
         return super().perform_create(serializer)
 
+
     def _insert_connect_options(self, data, user):
         connect_options = data.pop('connect_options', {})
         default_name_opts = {
@@ -375,7 +376,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         for name in default_name_opts.keys():
             value = preferences.get(name, default_name_opts[name])
             connect_options[name] = value
-        connect_options['lang'] = getattr(user, 'lang', settings.LANGUAGE_CODE)
+        connect_options['lang'] = getattr(user, 'lang') or settings.LANGUAGE_CODE
         data['connect_options'] = connect_options
 
     @staticmethod
@@ -564,7 +565,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken',
+        'list': 'authentication.view_superconnectiontoken',
         'check': 'authentication.view_superconnectiontoken',
+        'retrieve': 'authentication.view_superconnectiontoken',
         'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
@@ -572,7 +575,12 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     }
 
     def get_queryset(self):
-        return ConnectionToken.objects.all()
+        return ConnectionToken.objects.none()
+
+    def get_object(self):
+        pk = self.kwargs.get(self.lookup_field)
+        token = get_object_or_404(ConnectionToken, pk=pk)
+        return token
 
     def get_user(self, serializer):
         return serializer.validated_data.get('user')

@@ -17,9 +17,8 @@ from onelogin.saml2.idp_metadata_parser import (
 )
 
 from authentication.views.mixins import FlashMessageMixin
-from common.utils import get_logger
+from common.utils import get_logger, safe_next_url
 from .settings import JmsSaml2Settings
-from ..base import BaseAuthCallbackClientView
 
 logger = get_logger(__file__)
 
@@ -208,13 +207,16 @@ class Saml2AuthRequestView(View, PrepareRequestMixin):
         log_prompt = "Process SAML GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
+        request_params = request.GET.dict()
+
         try:
             saml_instance = self.init_saml_auth(request)
         except OneLogin_Saml2_Error as error:
             logger.error(log_prompt.format('Init saml auth error: %s' % error))
             return HttpResponse(error, status=412)
 
-        next_url = settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
+        next_url = request_params.get('next') or settings.AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT
+        next_url = safe_next_url(next_url, request=request)
         url = saml_instance.login(return_to=next_url)
         logger.debug(log_prompt.format('Redirect login url'))
         return HttpResponseRedirect(url)
@@ -252,6 +254,7 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
     def post(self, request):
         log_prompt = "Process SAML2 POST requests: {}"
         post_data = request.POST
+        error_title = _("SAML2 Error")
 
         try:
             saml_instance = self.init_saml_auth(request)
@@ -279,29 +282,29 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin, FlashMessageMixin):
         try:
             user = auth.authenticate(request=request, saml_user_data=saml_user_data)
         except IntegrityError as e:
-            title = _("SAML2 Error")
             msg = _('Please check if a user with the same username or email already exists')
             logger.error(e, exc_info=True)
-            response = self.get_failed_response('/', title, msg)
+            response = self.get_failed_response('/', error_title, msg)
             return response
         if user and user.is_valid:
             logger.debug(log_prompt.format('Login: {}'.format(user)))
             auth.login(self.request, user)
 
+        if not user and getattr(request, 'error_message', ''):
+            response = self.get_failed_response('/', title=error_title, msg=request.error_message)
+            return response
+
         logger.debug(log_prompt.format('Redirect'))
-        redir = post_data.get('RelayState')
-        if not redir or len(redir) == 0:
-            redir = "/"
-        next_url = saml_instance.redirect_to(redir)
+        relay_state = post_data.get('RelayState')
+        if not relay_state or len(relay_state) == 0:
+            relay_state = "/"
+        next_url = saml_instance.redirect_to(relay_state)
+        next_url = safe_next_url(next_url, request=request)
         return HttpResponseRedirect(next_url)
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-
-
-class Saml2AuthCallbackClientView(BaseAuthCallbackClientView):
-    pass
 
 
 class Saml2AuthMetadataView(View, PrepareRequestMixin):

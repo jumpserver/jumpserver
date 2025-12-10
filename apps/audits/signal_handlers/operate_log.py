@@ -47,20 +47,21 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         objs = model.objects.filter(pk__in=pk_set)
         objs_display = [str(o) for o in objs]
         action = M2M_ACTION[action]
-        changed_field = current_instance.get(field_name, [])
+        changed_field = current_instance.get(field_name, {})
+        changed_value = changed_field.get('value', [])
 
         after, before, before_value = None, None, None
         if action == ActionChoices.create:
-            before_value = list(set(changed_field) - set(objs_display))
+            before_value = list(set(changed_value) - set(objs_display))
         elif action == ActionChoices.delete:
-            before_value = list(
-                set(changed_field).symmetric_difference(set(objs_display))
-            )
+            before_value = list(set(changed_value).symmetric_difference(set(objs_display)))
 
         if changed_field:
             after = {field_name: changed_field}
         if before_value:
-            before = {field_name: before_value}
+            before_change_field = changed_field.copy()
+            before_change_field['value'] = before_value
+            before = {field_name: before_change_field}
 
         if sorted(str(before)) == sorted(str(after)):
             return

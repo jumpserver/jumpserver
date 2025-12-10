@@ -43,7 +43,7 @@ from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
-    ServiceAccessLogSerializer
+    ServiceAccessLogSerializer, OperateLogFullSerializer
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
@@ -256,7 +256,9 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
     def get_serializer_class(self):
         if self.is_action_detail:
             return OperateLogActionDetailSerializer
-        return super().get_serializer_class()
+        elif self.request.query_params.get('format'):
+            return OperateLogFullSerializer
+        return OperateLogSerializer
 
     def get_queryset(self):
         current_org_id = str(current_org.id)
