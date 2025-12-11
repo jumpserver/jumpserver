@@ -39,8 +39,34 @@ class AssetPermissionQuerySet(models.QuerySet):
         return self.filter(q)
 
     def filter_by_accounts(self, accounts):
-        q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=AliasAccount.ALL.value)
+        """
+        根据账号过滤权限
+        当搜索特定账号时，需要检查：
+        1. 权限中直接包含该账号
+        2. 权限中包含 @ALL，且该权限下的资产全部账号包含搜索的账号
+        """
+        accounts_list = list(accounts)
+        
+        # 情况1：权限中直接包含搜索的账号
+        q = Q(accounts__contains=accounts_list)
+        
+        # 情况2：权限中包含 @ALL，需要进一步检查该权限下是否真的有这些账号
+        # 先获取包含 @ALL 的权限
+        all_perms = self.filter(accounts__contains=[AliasAccount.ALL.value])
+        
+        # 对这些权限逐一检查其实际包含的账号
+        valid_perm_ids = []
+        for perm in all_perms:
+            # 获取该权限下实际包含的所有账号用户名
+            actual_accounts = perm.get_all_accounts(flat=False).values_list('username', flat=True)
+            # 检查搜索的账号是否在实际账号中
+            if any(acc in actual_accounts for acc in accounts_list):
+                valid_perm_ids.append(perm.id)
+        
+        # 合并两种情况
+        if valid_perm_ids:
+            q = q | Q(id__in=valid_perm_ids)
+        
         return self.filter(q)
 
 
