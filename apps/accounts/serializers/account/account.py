@@ -14,7 +14,7 @@ from accounts.models import Account, AccountTemplate, GatheredAccount
 from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
 from assets.models import Asset
-from common.serializers import SecretReadableMixin, CommonBulkModelSerializer
+from common.serializers import SecretReadableMixin, SecretReadableCheckMixin, CommonBulkModelSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 from .base import BaseAccountSerializer, AuthValidateMixin
@@ -478,7 +478,7 @@ class AssetAccountBulkSerializer(
         return results
 
 
-class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
+class AccountSecretSerializer(SecretReadableCheckMixin, SecretReadableMixin, AccountSerializer):
     spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
 
     class Meta(AccountSerializer.Meta):
@@ -491,9 +491,10 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
         exclude_backup_fields = [
             'passphrase', 'push_now', 'params', 'spec_info'
         ]
+        secret_fields = ['secret']
 
 
-class AccountHistorySerializer(serializers.ModelSerializer):
+class AccountHistorySerializer(SecretReadableCheckMixin, serializers.ModelSerializer):
     secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
     secret = serializers.CharField(label=_('Secret'), read_only=True)
     id = serializers.IntegerField(label=_('ID'), source='history_id', read_only=True)
@@ -509,6 +510,7 @@ class AccountHistorySerializer(serializers.ModelSerializer):
             'history_user': {'label': _('User')},
             'history_date': {'label': _('Date')},
         }
+        secret_fields = ['secret']
 
 
 class AccountTaskSerializer(serializers.Serializer):

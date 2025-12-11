@@ -1648,5 +1648,6 @@
     "selectFiles": "已选择选择{number}文件",
     "AccessToken": "访问令牌",
     "AccessTokenTip": "访问令牌是通过 JumpServer 客户端使用 OAuth2（授权码授权）流程生成的临时凭证，用于访问受保护的资源。",
-    "Revoke": "撤销"
+    "Revoke": "撤销",
+    "AccountSecretReadDisabled": "账号密码读取功能已被管理员禁用"
 }

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -166,7 +167,7 @@ class AccountViewSet(OrgBulkModelViewSet):
 
 class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
     """
-    因为可能要导出所有账号，所以单独建立了一个 viewset
+    因为可能要导出所有账号,所以单独建立了一个 viewset
     """
     serializer_classes = {
         'default': serializers.AccountSecretSerializer,

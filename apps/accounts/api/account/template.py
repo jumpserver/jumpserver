@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import status
 from rest_framework.decorators import action

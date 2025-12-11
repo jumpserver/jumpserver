@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import AccountTemplate
-from common.serializers import SecretReadableMixin
+from common.serializers import SecretReadableMixin, SecretReadableCheckMixin
 from common.serializers.fields import ObjectRelatedField
 from .base import BaseAccountSerializer
 
@@ -62,10 +62,11 @@ class AccountDetailTemplateSerializer(AccountTemplateSerializer):
         fields = AccountTemplateSerializer.Meta.fields + ['spec_info']
 
 
-class AccountTemplateSecretSerializer(SecretReadableMixin, AccountDetailTemplateSerializer):
+class AccountTemplateSecretSerializer(SecretReadableCheckMixin, SecretReadableMixin, AccountDetailTemplateSerializer):
     class Meta(AccountDetailTemplateSerializer.Meta):
         fields = AccountDetailTemplateSerializer.Meta.fields
         extra_kwargs = {
             **AccountDetailTemplateSerializer.Meta.extra_kwargs,
             'secret': {'write_only': False},
         }
+        secret_fields = ['secret']
