@@ -104,7 +104,7 @@ class AutomationExecutionViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin,
     mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
-    search_fields = ('trigger', 'automation__name')
+    search_fields = ('id', 'trigger', 'automation__name')
     filterset_fields = ('trigger', 'automation_id', 'automation__name')
     filterset_class = AutomationExecutionFilterSet
     serializer_class = serializers.AutomationExecutionSerializer
