@@ -85,6 +85,7 @@ SPECTACULAR_SETTINGS = {
         'jumpserver.views.schema.LabeledChoiceFieldExtension',
         'jumpserver.views.schema.BitChoicesFieldExtension',
         'jumpserver.views.schema.LabelRelatedFieldExtension',
+        'jumpserver.views.schema.DateTimeFieldExtension',
     ],
     'SECURITY': [{'Bearer': []}],
 }
