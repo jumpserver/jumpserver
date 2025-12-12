@@ -1,9 +1,12 @@
+import os
 from ctypes import *
 
 from .exception import PiicoError
 from .session import Session
 from .cipher import *
 from .digest import *
+from django.core.cache import cache
+from redis_lock import Lock as RedisLock
 
 
 class Device:
@@ -71,10 +74,28 @@ class Device:
         self.__device = device
 
     def __reset_key_store(self):
+        redis_client = cache.client.get_client()
+        server_hostname = os.environ.get("SERVER_HOSTNAME")
+        RESET_LOCK_KEY = f"spiico:{server_hostname}:reset"
+        LOCK_EXPIRE_SECONDS = 300
+
         if self._driver is None:
             raise PiicoError("no driver loaded", 0)
         if self.__device is None:
             raise PiicoError("device not open", 0)
+
+        # ---- 分布式锁（Redis-Lock 实现 Redlock） ----
+        lock = RedisLock(
+            redis_client,
+            RESET_LOCK_KEY,
+            expire=LOCK_EXPIRE_SECONDS,  # 锁自动过期
+            auto_renewal=False,  # 不自动续租
+        )
+
+        # 尝试获取锁，拿不到直接返回
+        if not lock.acquire(blocking=False):
+            return
+            # ---- 真正执行 reset ----
         ret = self._driver.SPII_ResetModule(self.__device)
         if ret != 0:
             raise PiicoError("reset device failed", ret)
