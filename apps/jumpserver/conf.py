@@ -13,11 +13,11 @@ import json
 import logging
 import os
 import re
-import sys
 import types
 from importlib import import_module
 from urllib.parse import urljoin, urlparse, quote
 
+import sys
 import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -720,11 +720,6 @@ class Config(dict):
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
         'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'system', 'leak_passwords.db'),
-
-        # Ansible Receptor
-        'RECEPTOR_ENABLED': False,
-        'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
-        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521',
 
         'FILE_UPLOAD_TEMP_DIR': None,
 
