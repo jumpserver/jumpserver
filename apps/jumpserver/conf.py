@@ -699,6 +699,7 @@ class Config(dict):
         'LIMIT_SUPER_PRIV': False,
 
         # Chat AI
+        'IS_CUSTOM_MODEL': False,
         'CHAT_AI_ENABLED': False,
         'CHAT_AI_METHOD': 'api',
         'CHAT_AI_EMBED_URL': '',
@@ -707,10 +708,12 @@ class Config(dict):
         'GPT_API_KEY': '',
         'GPT_PROXY': '',
         'GPT_MODEL': 'gpt-4o-mini',
+        'CUSTOM_GPT_MODEL': 'gpt-4o-mini',
         'DEEPSEEK_BASE_URL': '',
         'DEEPSEEK_API_KEY': '',
         'DEEPSEEK_PROXY': '',
         'DEEPSEEK_MODEL': 'deepseek-chat',
+        'CUSTOM_DEEPSEEK_MODEL': 'deepseek-chat',
         'VIRTUAL_APP_ENABLED': False,
 
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
