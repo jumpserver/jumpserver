@@ -288,5 +288,6 @@
     "start time": "Hora de inicio",
     "success": "Éxito",
     "system user": "Usuario del sistema",
+    "tabLimits": "Actualmente tienes 15 pestañas abiertas.  \n¿Para garantizar la estabilidad del sistema, deberías abrir Luna en una nueva pestaña del navegador para continuar con la operación?",
     "user": "Usuario"
 }

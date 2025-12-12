@@ -289,5 +289,6 @@
     "start time": "開始時間",
     "success": "成功",
     "system user": "系統用戶",
+    "tabLimits": "當前已打開 15 個標籤頁。  \n為了確保系統穩定，是否在新的瀏覽器標籤頁中打開 Luna 以繼續操作？",
     "user": "用戶"
 }

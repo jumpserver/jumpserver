@@ -150,7 +150,7 @@ class ChatAISettingSerializer(serializers.Serializer):
         help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
     )
     GPT_MODEL = serializers.ChoiceField(
-        default=GPTModelChoices.gpt_4o_mini, choices=GPTModelChoices.choices,
+        default=GPTModelChoices.GPT_4_1_MINI, choices=GPTModelChoices.choices,
         label=_("GPT Model"), required=False,
     )
     DEEPSEEK_BASE_URL = serializers.CharField(
@@ -167,6 +167,18 @@ class ChatAISettingSerializer(serializers.Serializer):
     DEEPSEEK_MODEL = serializers.ChoiceField(
         default=DeepSeekModelChoices.deepseek_chat, choices=DeepSeekModelChoices.choices,
         label=_("DeepSeek Model"), required=False,
+    )
+    IS_CUSTOM_MODEL = serializers.BooleanField(
+        required=False, default=False, label=_("Custom Model"),
+        help_text=_("Whether to use a custom model")
+    )
+    CUSTOM_GPT_MODEL = serializers.CharField(
+        max_length=256, allow_blank=True,
+        required=False, label=_('Custom gpt model'),
+    )
+    CUSTOM_DEEPSEEK_MODEL = serializers.CharField(
+        max_length=256, allow_blank=True,
+        required=False, label=_('Custom DeepSeek model'),
     )
 
 
