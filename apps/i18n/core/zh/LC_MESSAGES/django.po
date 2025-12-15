@@ -3689,7 +3689,7 @@ msgstr "认证方式"
 
 #: audits/serializers.py:139
 msgid "Diff"
-msgstr ""
+msgstr "差异"
 
 #: audits/serializers.py:172
 #, python-format
@@ -5183,7 +5183,7 @@ msgstr "仅导出选择项"
 
 #: common/drf/renders/mixins.py:50
 msgid "Export filtered"
-msgstr "导出搜素"
+msgstr "导出搜索"
 
 #: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
 #, python-format
