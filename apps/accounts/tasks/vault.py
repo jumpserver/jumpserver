@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.backends import vault_client
 from accounts.const import VaultTypeChoices
-from accounts.models import Account, AccountTemplate
+from accounts.models import AccountTemplate, Account
 from common.utils import get_logger
 from orgs.utils import tmp_to_root_org
 

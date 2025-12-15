@@ -79,7 +79,7 @@ class VaultSignalHandler(object):
             else:
                 vault_client.update(instance)
         except Exception as e:
-            logger.error('Vault save failed: {}'.format(e))
+            logger.exception('Vault save failed: %s', e)
             raise VaultException()
 
     @staticmethod
@@ -87,7 +87,7 @@ class VaultSignalHandler(object):
         try:
             vault_client.delete(instance)
         except Exception as e:
-            logger.error('Vault delete failed: {}'.format(e))
+            logger.exception('Vault delete failed: %s', e)
             raise VaultException()
 
 
