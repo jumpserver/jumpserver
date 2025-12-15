@@ -126,7 +126,7 @@ class BaseManager:
         self.execution.save()
 
     def print_summary(self):
-        content = "\nSummery: \n"
+        content = "\nSummary: \n"
         for k, v in self.summary.items():
             content += f"\t - {k}: {v}\n"
         content += "\t - Using: {}s\n".format(self.duration)
