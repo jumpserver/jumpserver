@@ -2,6 +2,7 @@
 #
 import os
 import time
+
 from .base import (
     REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY, REDIS_SSL_REQUIRED, REDIS_USE_SSL,
     REDIS_PROTOCOL, REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS, REDIS_SENTINEL_PASSWORD,
@@ -30,8 +31,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
+        'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
