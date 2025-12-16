@@ -18,7 +18,7 @@ from assets.models import Asset, Node
 from orgs.models import Organization
 from django.db.models import Count
 
-OUTPUT_FILE = 'multi_parent_assets_report.txt'
+OUTPUT_FILE = 'report_find_multi_parent_nodes_assets.txt'
 
 # Special organization IDs and names
 SPECIAL_ORGS = {
