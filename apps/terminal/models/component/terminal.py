@@ -126,7 +126,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
             'GPT_BASE_URL': data.get('url'),
             'GPT_API_KEY': data.get('api_key'),
             'GPT_PROXY': data.get('proxy'),
-            'GPT_MODEL': data.get('model'),
             'CHAT_AI_PROVIDERS': settings.CHAT_AI_PROVIDERS,
         }
 
