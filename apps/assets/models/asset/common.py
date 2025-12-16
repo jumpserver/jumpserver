@@ -172,6 +172,11 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         "assets.Zone", null=True, blank=True, related_name='assets',
         verbose_name=_("Zone"), on_delete=models.SET_NULL
     )
+    node = models.ForeignKey(
+        'assets.Node', null=False, blank=False, on_delete=models.PROTECT,
+        related_name='direct_assets', verbose_name=_("Node")
+    )
+    # TODO: 删除完代码中所有使用的地方后，再删除 nodes 字段，并将 node 字段的 related_name 改为 'assets'
     nodes = models.ManyToManyField(
         'assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes")
     )
