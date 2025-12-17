@@ -39,7 +39,7 @@
 
             <div class="row">
                 <div class="col-sm-3">
-                    <a href="javascript:void(0)" onclick="handleClose(event)" class="btn btn-default block full-width m-b">
+                    <a id="closeBtn" href="javascript:void(0)" onclick="handleClose(event)" class="btn btn-default block full-width m-b">
                         {% trans 'Close' %}
                     </a>
                 </div>
@@ -67,9 +67,15 @@
 
         const targetUrl = '{{ target_url }}';
 
+        let countdownTimer = null;
+        let countdownSeconds = 30;
+        let startedCountdown = false;
         function handleClose() {
             if (event) {
                 event.preventDefault();
+            }
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
             }
             setTimeout(() => {
                 window.close();
@@ -81,7 +87,33 @@
                 event.preventDefault();
             }
             setTimeout(() => {
-                window.location.href = targetUrl;
+                if (targetUrl.startsWith('jms://')) {
+                    if (startedCountdown) {
+                        // 已经开始倒计时，直接跳转但不再重置倒计时
+                        window.location.href = targetUrl;
+                        return;
+                    }
+                    startedCountdown = true;
+                    countdownSeconds = 30;
+                    window.location.href = targetUrl;
+                    const closeBtn = document.getElementById('closeBtn');
+                    if (closeBtn) {
+                        closeBtn.textContent = `Close (${countdownSeconds})`;
+                        countdownTimer = setInterval(() => {
+                            countdownSeconds--;
+                            if (countdownSeconds > 0) {
+                                closeBtn.textContent = `Close (${countdownSeconds})`;
+                            } else {
+                                closeBtn.textContent = 'Close';
+                                clearInterval(countdownTimer);
+                                countdownTimer = null;
+                                window.close();
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    window.location.href = targetUrl;
+                }
             }, 100);
         }
     </script>
