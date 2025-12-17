@@ -115,7 +115,11 @@ LOGGING = {
         'azure': {
             'handlers': ['null'],
             'level': 'ERROR'
-        }
+        },
+        'oauth2_provider': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+        },
     }
 }
 
