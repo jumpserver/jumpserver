@@ -18,41 +18,29 @@
         }
 
         /* 重定向中的样式 */
-        .redirecting-container {
-            display: none;
-        }
-
-        .redirecting-container.show {
-            display: block;
-        }
-
         .confirm-container {
             transition: opacity 0.3s ease-out;
-        }
-
-        .confirm-container.hide {
-            display: none;
         }
     </style>
     <div>
         <!-- 确认内容 -->
         <div class="confirm-container" id="confirmContainer">
             <p>
-            <div class="alert {% if error %} alert-danger {% else %} alert-info {% endif %}" id="messages">
-                {% trans 'You are about to be redirected to an external website.' %}
-                <br/>
-                <br/>
-                {% trans 'Please confirm that you trust this link: ' %}
-                <br/>
-                <br/>
-                <a class="target-url" href="javascript:void(0)" onclick="handleRedirect(event)">{{ target_url }}</a>
-            </div>
+                <div class="alert {% if error %} alert-danger {% else %} alert-info {% endif %}" id="messages">
+                    {% trans 'You are about to be redirected to an external website.' %}
+                    <br/>
+                    <br/>
+                    {% trans 'Please confirm that you trust this link: ' %}
+                    <br/>
+                    <br/>
+                    <a class="target-url" href="javascript:void(0)" onclick="handleRedirect(event)">{{ target_url }}</a>
+                </div>
             </p>
 
             <div class="row">
                 <div class="col-sm-3">
-                    <a href="/" class="btn btn-default block full-width m-b">
-                        {% trans 'Back' %}
+                    <a href="javascript:void(0)" onclick="handleClose(event)" class="btn btn-default block full-width m-b">
+                        {% trans 'Close' %}
                     </a>
                 </div>
                 <div class="col-sm-3">
@@ -62,43 +50,36 @@
                 </div>
             </div>
         </div>
-
-        <!-- 重定向中内容 -->
-        <div class="redirecting-container" id="redirectingContainer">
-            <p>
-                <div class="alert alert-info" id="messages">
-                    {% trans 'Redirecting you to the Desktop App ( JumpServer Client )' %}
-                    <br/>
-                    <br/>
-                    {% trans 'You can safely close this window and return to the application.' %}
-                </div>
-            </p>
-        </div>
     </div>
 
 
     <script>
-        const targetUrl = '{{ target_url }}';
-
-        // 判断是否是 jms:// 协议
-        function isJmsProtocol(url) {
-            return url.toLowerCase().startsWith('jms://');
+        if (sessionStorage.getItem('page_refreshed')) {
+            // 用户刷新了页面，清除标记并跳转到首页
+            sessionStorage.removeItem('page_refreshed');
+            window.location.href = '/';
+        } else {
+            // 第一次加载，设置标记
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem('page_refreshed', 'true');
+            });
         }
 
-        function handleRedirect(event) {
-            // 如果有 event，阻止默认行为
+        const targetUrl = '{{ target_url }}';
+
+        function handleClose() {
             if (event) {
                 event.preventDefault();
             }
+            setTimeout(() => {
+                window.close();
+            }, 100);
+        }
 
-            if (isJmsProtocol(targetUrl)) {
-                // 隐藏确认内容
-                document.getElementById('confirmContainer').classList.add('hide');
-                // 显示重定向中
-                document.getElementById('redirectingContainer').classList.add('show');
+        function handleRedirect(event) {
+            if (event) {
+                event.preventDefault();
             }
-
-            // 延迟后执行跳转（让用户看到加载动画）
             setTimeout(() => {
                 window.location.href = targetUrl;
             }, 100);
