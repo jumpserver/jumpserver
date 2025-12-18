@@ -44,7 +44,7 @@ class Handler(BaseHandler):
         ).format(
             self.ticket.title,
             self.ticket.applicant,
-            ','.join([i['processor_display'] for i in self.ticket.process_map]),
+            self.ticket.processor,
             str(self.ticket.id)
         )
 
