@@ -20,24 +20,17 @@ class AssetTreeNode(TreeNode):
         self.assets_count = assets_count
         self.assets_count_total = 0
     
-    def as_dict(self):
-        base_dict = super().as_dict()
+    def as_dict(self, simple=True):
+        base_dict = super().as_dict(simple=simple)
         base_dict.update({
-            'assets_count': self.assets_count,
             'assets_count_total': self.assets_count_total,
         })
+        if not simple:
+            base_dict.update({
+                'assets_count': self.assets_count,
+            })
         return base_dict
     
-    def as_dict_simple(self):
-        return {
-            'key': self.key,
-            'assets_count_total': self.assets_count_total,
-        }
-    
-    def print_simple(self):
-        info = [f"{k}: {v}" for k, v in self.as_dict_simple().items()]
-        logger.info(" | ".join(info))
-
 
 class AssetTree(Tree):
 
@@ -89,12 +82,7 @@ class AssetTree(Tree):
         for node in reversed(list(self.nodes.values())):
             total = node.assets_count
             for child in node.children:
+                child: AssetTreeNode
                 total += child.assets_count_total
+            node: AssetTreeNode
             node.assets_count_total = total
-    
-    def print_simple(self, count=10):
-        for tn in list(self.nodes.values())[:count]:
-            tn: AssetTreeNode
-            tn.print_simple()
-
-

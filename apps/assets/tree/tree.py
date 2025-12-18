@@ -33,6 +33,7 @@ class TreeNode(object):
         self.parent.children.remove(child_node)
         self.parent = None
     
+    @property
     def is_leaf(self):
         return len(self.children) == 0
 
@@ -40,22 +41,27 @@ class TreeNode(object):
     def level(self):
         return self.key.count(':') + 1
     
+    @property
     def children_count(self):
         return len(self.children)
 
-    def as_dict(self):
-        return {
-            'id': self.id,
+    def as_dict(self, simple=True):
+        data = {
             'key': self.key,
-            'value': self.value,
-            'level': self.level,
-            'children_count': self.children_count(),
-            'is_root': self.is_root,
-            'is_leaf': self.is_leaf(),
         }
+        if not simple:
+            data.update({
+                'id': self.id,
+                'value': self.value,
+                'level': self.level,
+                'children_count': self.children_count,
+                'is_root': self.is_root,
+                'is_leaf': self.is_leaf,
+            })
+        return data
     
-    def print(self):
-        info = [f"{k}: {v}" for k, v in self.as_dict().items()]
+    def print(self, simple=True):
+        info = [f"{k}: {v}" for k, v in self.as_dict(simple=simple).items()]
         print(' | '.join(info))
 
 
@@ -65,16 +71,33 @@ class Tree(object):
         self.root = None
         self.nodes: dict[TreeNode] = {}
     
+    @property
     def size(self):
         return len(self.nodes)
 
-    def max_depth(self):
-        levels = [node.level for node in self.nodes.values()]
-        return max(levels) if levels else 0
-    
-    def max_width(self):
-        widths = [node.children_count() for node in self.nodes.values()]
-        return max(widths) if widths else 0
+    @property
+    def is_empty(self):
+        return self.size == 0
+
+    @property
+    def depth(self):
+        " 返回树的最大深度，以及对应的节点key "
+        if self.is_empty:
+            return 0, 0
+        node = max(self.nodes.values(), key=lambda node: node.level)
+        node: TreeNode
+        logger.debug(f"Max depth node key: {node.key}")
+        return node.level
+
+    @property
+    def width(self):
+        " 返回树的最大宽度，以及对应的层级数 "
+        if self.is_empty:
+            return 0, 0
+        node = max(self.nodes.values(), key=lambda node: node.children_count)
+        node: TreeNode
+        logger.debug(f"Max width level: {node.level + 1}")
+        return node.children_count
 
     def add_node(self, node: TreeNode):
         if node.is_root:
@@ -92,6 +115,12 @@ class Tree(object):
     def get_node(self, key: str) -> TreeNode:
         return self.nodes.get(key)
     
-    def print(self, count=10):
+    def print(self, count=10, simple=True):
+        print('Tree root: ', getattr(self.root, 'key', 'No-root'))
+        print('Tree size: ', self.size)
+        print('Tree depth: ', self.depth)
+        print('Tree width: ', self.width)
+
         for n in list(self.nodes.values())[:count]:
-            n.print()
+            n: TreeNode
+            n.print(simple=simple)
