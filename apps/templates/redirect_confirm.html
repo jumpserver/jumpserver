@@ -39,8 +39,8 @@
 
             <div class="row">
                 <div class="col-sm-3">
-                    <a id="closeBtn" href="javascript:void(0)" onclick="handleClose(event)" class="btn btn-default block full-width m-b">
-                        {% trans 'Close' %}
+                    <a id="backBtn" href="/" class="btn btn-default block full-width m-b">
+                        {% trans 'Back' %}
                     </a>
                 </div>
                 <div class="col-sm-3">
@@ -70,17 +70,6 @@
         let countdownTimer = null;
         let countdownSeconds = 30;
         let startedCountdown = false;
-        function handleClose() {
-            if (event) {
-                event.preventDefault();
-            }
-            if (countdownTimer) {
-                clearInterval(countdownTimer);
-            }
-            setTimeout(() => {
-                window.close();
-            }, 100);
-        }
 
         function handleRedirect(event) {
             if (event) {
@@ -96,18 +85,19 @@
                     startedCountdown = true;
                     countdownSeconds = 30;
                     window.location.href = targetUrl;
-                    const closeBtn = document.getElementById('closeBtn');
-                    if (closeBtn) {
-                        closeBtn.textContent = `Close (${countdownSeconds})`;
+                    const backBtn = document.getElementById('backBtn');
+                    if (backBtn) {
+                        const backButtonContent = backBtn.textContent;
+                        backBtn.textContent = `${backButtonContent} (${countdownSeconds})`;
                         countdownTimer = setInterval(() => {
                             countdownSeconds--;
                             if (countdownSeconds > 0) {
-                                closeBtn.textContent = `Close (${countdownSeconds})`;
+                                backBtn.textContent = `${backButtonContent} (${countdownSeconds})`;
                             } else {
-                                closeBtn.textContent = 'Close';
+                                backBtn.textContent = `${backButtonContent}`;
                                 clearInterval(countdownTimer);
                                 countdownTimer = null;
-                                window.close();
+                                window.location.href = '/';
                             }
                         }, 1000);
                     }
