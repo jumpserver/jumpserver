@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-17 17:53+0800\n"
+"POT-Creation-Date: 2025-12-12 15:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,18 +18,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounts/api/account/account.py:142
+#: accounts/api/account/account.py:143
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:362
 msgid "Account already exists"
 msgstr "アカウントはすでに存在しています"
 
-#: accounts/api/account/account.py:207
+#: accounts/api/account/account.py:208
 msgid "No valid assets found for account creation."
 msgstr "アカウント作成に使用できる有効な資産が見つかりませんでした。"
 
 #: accounts/api/account/application.py:77
-#: authentication/api/connection_token.py:453
+#: authentication/api/connection_token.py:463
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
@@ -141,10 +141,10 @@ msgstr ">>> ゲートウェイ接続のテストタスクを開始する"
 #: accounts/serializers/automations/change_secret.py:36
 #: audits/signal_handlers/login_log.py:34
 #: authentication/confirm/password.py:25 authentication/confirm/password.py:27
-#: authentication/const.py:10 authentication/forms.py:28
+#: authentication/const.py:13 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:368
 #: authentication/templates/authentication/login.html:414
-#: reports/api/users/user.py:101 settings/models.py:246
+#: reports/api/users/user.py:101 settings/models.py:250
 #: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
 #: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
@@ -167,7 +167,8 @@ msgid "Access key"
 msgstr "アクセスキー"
 
 #: accounts/const/account.py:9 authentication/backends/passkey/models.py:16
-#: authentication/models/sso_token.py:14 settings/serializers/feature.py:86
+#: authentication/models/sso_token.py:14
+#: authentication/serializers/token.py:121 settings/serializers/feature.py:86
 msgid "Token"
 msgstr "トークン"
 
@@ -210,11 +211,11 @@ msgid "Template"
 msgstr "テンプレート"
 
 #: accounts/const/account.py:32 ops/const.py:47
-#: xpack/plugins/cloud/const.py:75
+#: xpack/plugins/cloud/const.py:76
 msgid "Skip"
 msgstr "スキップ"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:292
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:298
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -222,7 +223,7 @@ msgstr "更新"
 #: accounts/const/account.py:34 accounts/const/automation.py:115
 #: accounts/serializers/automations/change_secret.py:171 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:66
-#: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:54
+#: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:55
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -324,7 +325,7 @@ msgstr "作成してプッシュ"
 msgid "Only create"
 msgstr "作成のみ"
 
-#: accounts/const/automation.py:109 authentication/const.py:34
+#: accounts/const/automation.py:109 authentication/const.py:37
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
@@ -423,7 +424,7 @@ msgstr "データベース"
 
 #: accounts/const/vault.py:8 assets/const/category.py:12
 #: assets/models/asset/database.py:10 assets/models/asset/database.py:29
-#: xpack/plugins/cloud/const.py:40
+#: xpack/plugins/cloud/const.py:41
 msgid "Database"
 msgstr "データベース"
 
@@ -465,7 +466,7 @@ msgstr "Vault 操作に失敗しました。再試行するか、Vault のアカ
 #: acls/notifications.py:70 acls/serializers/base.py:111
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:427
 #: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:336
-#: audits/serializers.py:230 authentication/models/connection_token.py:42
+#: audits/serializers.py:245 authentication/models/connection_token.py:42
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:29 terminal/notifications.py:162
 #: terminal/notifications.py:289 terminal/serializers/command.py:17
@@ -547,7 +548,7 @@ msgstr "変更状態"
 #: acls/serializers/base.py:112
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:337
-#: audits/serializers.py:231 authentication/api/connection_token.py:465
+#: audits/serializers.py:246 authentication/api/connection_token.py:475
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:31 terminal/notifications.py:291
@@ -640,7 +641,7 @@ msgstr "アイコン"
 
 #: accounts/models/application.py:20 accounts/models/base.py:39
 #: accounts/models/mixins/vault.py:49
-#: accounts/serializers/account/account.py:498
+#: accounts/serializers/account/account.py:499
 #: accounts/serializers/account/base.py:20
 #: authentication/models/temp_token.py:11
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -815,8 +816,8 @@ msgstr "ステータス"
 #: accounts/models/automations/change_secret.py:51
 #: accounts/serializers/account/account.py:297 assets/const/automation.py:9
 #: authentication/templates/authentication/passkey.html:177
-#: authentication/views/base.py:42 authentication/views/base.py:43
-#: authentication/views/base.py:44 common/const/choices.py:67
+#: authentication/views/base.py:43 authentication/views/base.py:44
+#: authentication/views/base.py:45 common/const/choices.py:67
 #: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr "間違い"
@@ -1037,7 +1038,7 @@ msgid "Verify asset account"
 msgstr "アカウントの確認"
 
 #: accounts/models/base.py:37 accounts/models/base.py:66
-#: accounts/serializers/account/account.py:497
+#: accounts/serializers/account/account.py:498
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:50
 #: authentication/serializers/connect_token_secret.py:42
@@ -1218,7 +1219,7 @@ msgstr "アカウントの存在ポリシー"
 #: settings/models.py:41 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:327
-#: xpack/plugins/cloud/serializers/account.py:85
+#: xpack/plugins/cloud/serializers/account.py:87
 msgid "Category"
 msgstr "カテゴリ"
 
@@ -1227,7 +1228,7 @@ msgstr "カテゴリ"
 #: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
-#: audits/serializers.py:76 audits/serializers.py:196
+#: audits/serializers.py:76 audits/serializers.py:211
 #: authentication/models/connection_token.py:67
 #: authentication/serializers/connect_token_secret.py:138
 #: ops/models/job.py:155 perms/serializers/user_permission.py:28
@@ -1292,27 +1293,27 @@ msgstr "少なくとも1つのアセットまたはノードを選択します�
 msgid "Spec info"
 msgstr "特別情報"
 
-#: accounts/serializers/account/account.py:499
+#: accounts/serializers/account/account.py:500
 #: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 settings/models.py:245
+#: perms/models/perm_node.py:21 settings/models.py:249
 #: users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:509 acls/notifications.py:18
+#: accounts/serializers/account/account.py:510 acls/notifications.py:18
 #: acls/notifications.py:68 acls/serializers/base.py:104
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16
 #: audits/models.py:55 audits/models.py:97 audits/models.py:179
-#: audits/models.py:296 audits/serializers.py:197
+#: audits/models.py:296 audits/serializers.py:212
 #: authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: authentication/notifications.py:16 authentication/notifications.py:55
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
-#: rbac/builtin.py:133 rbac/models/rolebinding.py:49
+#: rbac/builtin.py:134 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:163 terminal/notifications.py:223
@@ -1325,7 +1326,7 @@ msgstr "ID"
 msgid "User"
 msgstr "ユーザー"
 
-#: accounts/serializers/account/account.py:510
+#: accounts/serializers/account/account.py:511
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:165 terminal/notifications.py:225
 msgid "Date"
@@ -1343,7 +1344,7 @@ msgstr ""
 "ヒント: 認証にユーザー名が必要ない場合は、`null`を入力します。ADアカウントの場合は、`username@domain`のようになります。"
 
 #: accounts/serializers/account/service.py:15
-#: authentication/serializers/token.py:22
+#: authentication/serializers/token.py:23
 msgid "Access IP"
 msgstr "Access IP"
 
@@ -1865,11 +1866,11 @@ msgstr "ユーザー"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:214
-#: authentication/api/connection_token.py:464 ops/models/base.py:17
+#: authentication/api/connection_token.py:474 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:57
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
-#: xpack/plugins/cloud/manager.py:101
+#: xpack/plugins/cloud/manager.py:103
 msgid "Assets"
 msgstr "資産"
 
@@ -2303,7 +2304,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:34 assets/const/protocol.py:310
+#: assets/const/base.py:34 assets/const/protocol.py:318
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -2312,7 +2313,7 @@ msgstr "脚本"
 #: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:76
 #: settings/serializers/feature.py:83 settings/serializers/feature.py:96
 #: settings/serializers/msg.py:30 terminal/models/component/endpoint.py:14
-#: terminal/serializers/applet.py:18 xpack/plugins/cloud/const.py:39
+#: terminal/serializers/applet.py:18 xpack/plugins/cloud/const.py:40
 #: xpack/plugins/cloud/serializers/account_attrs.py:87
 msgid "Host"
 msgstr "ホスト"
@@ -2393,7 +2394,7 @@ msgid "ChatGPT"
 msgstr "ChatGPT"
 
 #: assets/const/host.py:13 rbac/tree.py:29 rbac/tree.py:69
-#: xpack/plugins/cloud/const.py:76
+#: xpack/plugins/cloud/const.py:77
 msgid "Other"
 msgstr "その他"
 
@@ -2537,34 +2538,38 @@ msgstr "クラスターモードを起動"
 msgid "Enable if this Redis instance is part of a cluster"
 msgstr "このRedisインスタンスがクラスターの一部である場合、クラスターモードを有効にします。"
 
-#: assets/const/protocol.py:280
+#: assets/const/protocol.py:276
+msgid "Namespace"
+msgstr "ネームスペース"
+
+#: assets/const/protocol.py:288
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:282
+#: assets/const/protocol.py:290
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへのアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:287 assets/models/asset/web.py:9
+#: assets/const/protocol.py:295 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:295 assets/models/asset/web.py:10
+#: assets/const/protocol.py:303 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:300 assets/models/asset/web.py:11
+#: assets/const/protocol.py:308 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:305 assets/models/asset/web.py:12
+#: assets/const/protocol.py:313 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:328
+#: assets/const/protocol.py:336
 msgid "API mode"
 msgstr "APIモード"
 
@@ -2699,7 +2704,8 @@ msgid "Asset automation task"
 msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
-#: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:240
+#: authentication/serializers/token.py:134 common/db/models.py:34
+#: ops/models/base.py:54 ops/models/job.py:240
 #: users/models/user/__init__.py:324
 msgid "Date created"
 msgstr "作成された日付"
@@ -2712,7 +2718,7 @@ msgstr "トリガーモード"
 
 #: assets/models/automations/base.py:157 audits/serializers.py:38
 #: ops/models/base.py:52 ops/models/job.py:238
-#: xpack/plugins/cloud/manager.py:111
+#: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "Summary"
 
@@ -2742,8 +2748,8 @@ msgstr "確認済みの日付"
 msgid "User group"
 msgstr "ユーザーグループ"
 
-#: assets/models/cmd_filter.py:42 common/db/models.py:35
-#: users/models/user/__init__.py:151
+#: assets/models/cmd_filter.py:42 authentication/serializers/token.py:133
+#: common/db/models.py:35 users/models/user/__init__.py:151
 msgid "Date updated"
 msgstr "更新日"
 
@@ -3416,7 +3422,7 @@ msgstr "Rmdir"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:293
+#: rbac/tree.py:299
 msgid "Delete"
 msgstr "削除"
 
@@ -3442,15 +3448,15 @@ msgstr "ダウンロード"
 msgid "Rename dir"
 msgstr "マップディレクトリ"
 
-#: audits/const.py:23 rbac/tree.py:291 terminal/api/session/session.py:285
+#: audits/const.py:23 rbac/tree.py:297 terminal/api/session/session.py:286
 #: terminal/templates/terminal/_msg_session_sharing.html:10
-#: xpack/plugins/cloud/manager.py:102
+#: xpack/plugins/cloud/manager.py:104
 msgid "View"
 msgstr "表示"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:290
+#: rbac/tree.py:296
 msgid "Create"
 msgstr "作成"
 
@@ -3478,14 +3484,14 @@ msgstr "承認"
 
 #: audits/const.py:42 ops/models/celery.py:85
 #: terminal/models/session/sharing.py:126 tickets/const.py:26
-#: xpack/plugins/cloud/const.py:74
+#: xpack/plugins/cloud/const.py:75
 msgid "Finished"
 msgstr "終了"
 
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
 #: terminal/models/virtualapp/provider.py:14
-#: terminal/serializers/session.py:65 terminal/serializers/session.py:180
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:181
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -3503,7 +3509,7 @@ msgstr "ログインログ"
 
 #: audits/const.py:55 rbac/tree.py:67 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
-#: xpack/plugins/cloud/serializers/account.py:82
+#: xpack/plugins/cloud/serializers/account.py:84
 msgid "Task"
 msgstr "タスク"
 
@@ -3561,7 +3567,7 @@ msgid "Resource"
 msgstr "リソース"
 
 #: audits/models.py:108 audits/models.py:154 audits/models.py:184
-#: audits/models.py:338 audits/serializers.py:232
+#: audits/models.py:338 audits/serializers.py:247
 #: terminal/serializers/command.py:75
 msgid "Datetime"
 msgstr "時間"
@@ -3603,7 +3609,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:219 terminal/models/session/sharing.py:123
-#: xpack/plugins/cloud/manager.py:186 xpack/plugins/cloud/models.py:237
+#: xpack/plugins/cloud/manager.py:196 xpack/plugins/cloud/models.py:237
 msgid "Reason"
 msgstr "理由"
 
@@ -3660,23 +3666,28 @@ msgstr "ジョブ実行"
 msgid "Reason display"
 msgstr "理由表示"
 
-#: audits/serializers.py:93 audits/serializers.py:210
+#: audits/serializers.py:93 audits/serializers.py:225
 msgid "Auth backend display"
 msgstr "検証方法"
 
-#: audits/serializers.py:157
+#: audits/serializers.py:139
+msgid "Diff"
+msgstr ""
+
+#: audits/serializers.py:172
 #, python-format
 msgid "%s %s this resource"
 msgstr "ユーザー %s %s が現在のリソースをサブスクライブしました。"
 
-#: audits/serializers.py:198 authentication/models/connection_token.py:53
-#: authentication/models/temp_token.py:14 perms/models/asset_permission.py:80
+#: audits/serializers.py:213 authentication/models/connection_token.py:53
+#: authentication/models/temp_token.py:14
+#: authentication/serializers/token.py:132 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:21 users/models/user/__init__.py:107
 msgid "Date expired"
 msgstr "期限切れの日付"
 
-#: audits/serializers.py:229 terminal/models/component/terminal.py:91
+#: audits/serializers.py:244 terminal/models/component/terminal.py:91
 #: terminal/serializers/command.py:76
 msgid "Remote Address"
 msgstr "リモートアドレス"
@@ -3716,7 +3727,7 @@ msgid "WeCom"
 msgstr "企業微信"
 
 #: audits/signal_handlers/login_log.py:38 authentication/utils.py:126
-#: authentication/views/feishu.py:97 notifications/backends/__init__.py:14
+#: authentication/views/feishu.py:98 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
 #: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:137
 #: users/models/user/_source.py:23
@@ -3724,14 +3735,14 @@ msgid "FeiShu"
 msgstr "本を飛ばす"
 
 #: audits/signal_handlers/login_log.py:40 authentication/utils.py:138
-#: authentication/views/slack.py:79 notifications/backends/__init__.py:16
+#: authentication/views/slack.py:80 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
 #: users/models/user/__init__.py:143 users/models/user/_source.py:25
 msgid "Slack"
 msgstr "Slack"
 
 #: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
-#: authentication/views/dingtalk.py:152 notifications/backends/__init__.py:12
+#: authentication/views/dingtalk.py:153 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:134
 #: users/models/user/_source.py:22
 msgid "DingTalk"
@@ -3742,8 +3753,9 @@ msgstr "DingTalk"
 msgid "Temporary token"
 msgstr "仮パスワード"
 
-#: audits/signal_handlers/login_log.py:43 authentication/const.py:37
-#: authentication/utils.py:144 settings/serializers/auth/passkey.py:8
+#: audits/signal_handlers/login_log.py:43 authentication/const.py:40
+#: authentication/utils.py:144 rbac/tree.py:188
+#: settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Passkey"
@@ -3786,39 +3798,39 @@ msgstr "パラメータの値には必ず %s が含まれます"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:304
+#: authentication/api/connection_token.py:314
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効になっていません"
 
-#: authentication/api/connection_token.py:426
+#: authentication/api/connection_token.py:436
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:456
+#: authentication/api/connection_token.py:466
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:489
+#: authentication/api/connection_token.py:499
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:493
+#: authentication/api/connection_token.py:503
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
-#: authentication/api/connection_token.py:503
+#: authentication/api/connection_token.py:513
 msgid "ACL action is face verify"
 msgstr "ACL Action は顔認証です"
 
-#: authentication/api/connection_token.py:508
+#: authentication/api/connection_token.py:518
 msgid "ACL action not supported for this asset"
 msgstr "資産ログインルールは現在の資産をサポートしていません"
 
-#: authentication/api/connection_token.py:515
+#: authentication/api/connection_token.py:525
 msgid "ACL action is face online"
 msgstr "ACL Action は顔オンラインです"
 
-#: authentication/api/connection_token.py:540
+#: authentication/api/connection_token.py:550
 msgid "No available face feature"
 msgstr "利用可能な顔の特徴はありません"
 
@@ -3831,8 +3843,8 @@ msgstr "顔認証の照合に失敗"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
-#: authentication/api/password.py:34 authentication/backends/cas/views.py:22
-#: terminal/api/session/session.py:342 users/views/profile/reset.py:63
+#: authentication/api/password.py:34 terminal/api/session/session.py:343
+#: users/views/profile/reset.py:63
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
 
@@ -3863,13 +3875,9 @@ msgstr "認証コードの有効時間は {} 分"
 msgid "App Authentication"
 msgstr "認証"
 
-#: authentication/backends/cas/views.py:24
-msgid ""
-"CAS login was successful, but no corresponding local user was found in the "
-"system, and automatic user creation is disabled in the CAS authentication "
-"configuration. Login failed."
-msgstr ""
-"CASへのログインに成功しましたが、システムはローカルユーザーを見つけられず、CAS認証設定で自動ユーザー作成機能が有効になっていないため、ログインに失敗しました。"
+#: authentication/backends/cas/views.py:19
+msgid "CAS Error"
+msgstr "CAS エラー"
 
 #: authentication/backends/custom.py:60
 #: authentication/backends/oauth2/backends.py:158
@@ -3889,20 +3897,16 @@ msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr "無効なトークンヘッダー。署名文字列に無効な文字を含めることはできません。"
 
-#: authentication/backends/drf.py:82
-msgid "Invalid token or cache refreshed."
-msgstr "無効なトークンまたはキャッシュの更新。"
-
-#: authentication/backends/oauth2/views.py:67
+#: authentication/backends/oauth2/views.py:73
 msgid "OAuth2 Error"
 msgstr "OAuth2 エラー"
 
-#: authentication/backends/oidc/views.py:137
+#: authentication/backends/oidc/views.py:136
 msgid "OpenID Error"
 msgstr "OpenID エラー"
 
-#: authentication/backends/oidc/views.py:176
-#: authentication/backends/saml2/views.py:283
+#: authentication/backends/oidc/views.py:174
+#: authentication/backends/saml2/views.py:285
 msgid "Please check if a user with the same username or email already exists"
 msgstr "同じユーザー名またはメールアドレスのユーザーが既に存在するかどうかを確認してください"
 
@@ -3926,7 +3930,7 @@ msgstr "に追加"
 msgid "Credential ID"
 msgstr "資格情報ID"
 
-#: authentication/backends/saml2/views.py:255
+#: authentication/backends/saml2/views.py:257
 msgid "SAML2 Error"
 msgstr "SAML2 エラー"
 
@@ -3938,11 +3942,11 @@ msgstr "認証に失敗しました (ユーザー名またはパスワードが�
 msgid "Login time has exceeded {} minutes, please login again"
 msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
 
-#: authentication/const.py:32
+#: authentication/const.py:35
 msgid "OTP"
 msgstr "OTP"
 
-#: authentication/const.py:33 authentication/serializers/password_mfa.py:16
+#: authentication/const.py:36 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
 #: users/forms/profile.py:104 users/forms/profile.py:111
@@ -3951,16 +3955,16 @@ msgstr "OTP"
 msgid "SMS"
 msgstr "メッセージ"
 
-#: authentication/const.py:35
+#: authentication/const.py:38
 msgid "Face recognition"
 msgstr "顔認証"
 
-#: authentication/const.py:36 settings/serializers/auth/radius.py:14
+#: authentication/const.py:39 settings/serializers/auth/radius.py:14
 #: settings/serializers/auth/radius.py:16
 msgid "Radius"
 msgstr "Radius"
 
-#: authentication/const.py:38
+#: authentication/const.py:41
 msgid "Custom"
 msgstr "カスタマイズ"
 
@@ -4081,21 +4085,21 @@ msgstr "電話が設定されていない"
 msgid "SSO auth closed"
 msgstr "SSO authは閉鎖されました"
 
-#: authentication/errors/mfa.py:18 authentication/views/wecom.py:47
+#: authentication/errors/mfa.py:18 authentication/views/wecom.py:48
 msgid "WeCom is already bound"
 msgstr "企業の微信はすでにバインドされています"
 
-#: authentication/errors/mfa.py:23 authentication/views/wecom.py:144
-#: authentication/views/wecom.py:186
+#: authentication/errors/mfa.py:23 authentication/views/wecom.py:140
+#: authentication/views/wecom.py:182
 msgid "WeCom is not bound"
 msgstr "企業の微信をバインドしていません"
 
-#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:206
-#: authentication/views/dingtalk.py:248
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
+#: authentication/views/dingtalk.py:249
 msgid "DingTalk is not bound"
 msgstr "DingTalkはバインドされていません"
 
-#: authentication/errors/mfa.py:33 authentication/views/feishu.py:132
+#: authentication/errors/mfa.py:33 authentication/views/feishu.py:136
 msgid "FeiShu is not bound"
 msgstr "本を飛ばすは拘束されていません"
 
@@ -4103,7 +4107,7 @@ msgstr "本を飛ばすは拘束されていません"
 msgid "Lark is not bound"
 msgstr "Lark はバインドされていません"
 
-#: authentication/errors/mfa.py:43 authentication/views/slack.py:121
+#: authentication/errors/mfa.py:43 authentication/views/slack.py:125
 msgid "Slack is not bound"
 msgstr "Slack はバインドされていません"
 
@@ -4116,16 +4120,16 @@ msgstr "パスワードが無効です"
 msgid "Please wait for %s seconds before retry"
 msgstr "%s 秒後に再試行してください"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:365
+#: authentication/errors/redirect.py:85 authentication/mixins.py:430
 #: users/views/profile/reset.py:224
 msgid "Your password is too simple, please change it for security"
 msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:374
+#: authentication/errors/redirect.py:93 authentication/mixins.py:439
 msgid "You should to change your password before login"
 msgstr "ログインする前にパスワードを変更する必要があります"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:383
+#: authentication/errors/redirect.py:101 authentication/mixins.py:448
 msgid "Your password has expired, please reset before logging in"
 msgstr "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
 
@@ -4238,31 +4242,31 @@ msgstr "電話番号を設定して有効にする"
 msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
 
-#: authentication/middleware.py:96 settings/utils/ldap.py:711
+#: authentication/middleware.py:96 settings/utils/ldap.py:714
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
-#: authentication/mixins.py:105
+#: authentication/mixins.py:166
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
-"                and the current user is not in the user list. Please contact the administrator."
-msgstr "管理者は「既存のユーザーのみログインを許可」をオンにしており、現在のユーザーはユーザーリストにありません。管理者に連絡してください。"
+"                    and the current user is not in the user list. Please contact the administrator."
+msgstr "管理者は「既存のユーザーのみログインを許可」に設定しています。現在のユーザーはユーザーリストに含まれていません。管理者に連絡してください。"
 
-#: authentication/mixins.py:117
+#: authentication/mixins.py:178
 msgid "User is invalid"
 msgstr "無効なユーザーです"
 
-#: authentication/mixins.py:132
+#: authentication/mixins.py:195
 msgid ""
-"The administrator has enabled 'Only allow login from user source'. \n"
-"            The current user source is {}. Please contact the administrator."
-msgstr "管理者は「ユーザーソースからのみログインを許可」をオンにしており、現在のユーザーソースは {} です。管理者に連絡してください。"
+" The administrator has enabled 'Only allow login from user source'. \n"
+"                    The current user source is {}. Please contact the administrator. "
+msgstr "管理者は「ユーザーソースからのみログインを許可」に設定しています。現在のユーザーのソースは {} です。管理者に連絡してください。"
 
-#: authentication/mixins.py:311
+#: authentication/mixins.py:376
 msgid "The MFA type ({}) is not enabled"
 msgstr "MFAタイプ ({}) が有効になっていない"
 
-#: authentication/mixins.py:353
+#: authentication/mixins.py:418
 msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
@@ -4357,13 +4361,13 @@ msgstr "プライベートトークン"
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
 #: users/models/user/__init__.py:95
-#: xpack/plugins/cloud/serializers/account_attrs.py:244
+#: xpack/plugins/cloud/serializers/account_attrs.py:250
 msgid "Private key"
 msgstr "ssh秘密鍵"
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:38
 #: users/forms/profile.py:175 users/models/user/__init__.py:98
-#: xpack/plugins/cloud/serializers/account_attrs.py:241
+#: xpack/plugins/cloud/serializers/account_attrs.py:247
 msgid "Public key"
 msgstr "公開キー"
 
@@ -4489,11 +4493,18 @@ msgstr "作成完了後、秘密鍵をダウンロードしてください。各
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:64
+#: authentication/serializers/token.py:93 perms/serializers/permission.py:64
 #: perms/serializers/permission.py:87 users/serializers/user.py:128
 #: users/serializers/user.py:258
 msgid "Is valid"
 msgstr "有効です"
+
+#: authentication/serializers/token.py:131 ops/models/adhoc.py:26
+#: ops/models/playbook.py:34 ops/serializers/mixin.py:10
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:46
+#: rbac/serializers/role.py:12 settings/serializers/auth/oauth2.py:37
+msgid "Scope"
+msgstr "スコープ"
 
 #: authentication/tasks.py:19
 msgid "Clean expired session"
@@ -4570,7 +4581,7 @@ msgstr "ビューオートのためにMFAが必要"
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:37
 #: templates/_modal.html:23 templates/flash_message_standalone.html:37
-#: templates/redirect_confirm.html:39
+#: templates/redirect_confirm.html:60
 #: users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "確認"
@@ -4584,7 +4595,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:543
+#: jumpserver/conf.py:542
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -4676,8 +4687,7 @@ msgid ""
 msgstr "公開鍵の更新が開始されなかった場合、アカウントにセキュリティ上の問題がある可能性があります"
 
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
-#: templates/flash_message_standalone.html:28
-#: templates/redirect_confirm.html:34 tickets/const.py:19
+#: templates/flash_message_standalone.html:28 tickets/const.py:19
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -4742,11 +4752,11 @@ msgid "Do you want to retry ?"
 msgstr "再試行しますか？"
 
 #: authentication/utils.py:27 common/utils/ip/geoip/utils.py:35
-#: xpack/plugins/cloud/const.py:35
+#: xpack/plugins/cloud/const.py:36
 msgid "LAN"
 msgstr "ローカルエリアネットワーク"
 
-#: authentication/views/base.py:70
+#: authentication/views/base.py:71
 #: perms/templates/perms/_msg_permed_items_expire.html:18
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
@@ -4766,51 +4776,51 @@ msgstr "%sが別のユーザーにバインドされています。"
 msgid "Binding %s successfully"
 msgstr "バインド%s成功"
 
-#: authentication/views/dingtalk.py:42
+#: authentication/views/dingtalk.py:43
 msgid "DingTalk Error, Please contact your system administrator"
 msgstr "DingTalkエラー、システム管理者に連絡してください"
 
-#: authentication/views/dingtalk.py:45 authentication/views/dingtalk.py:205
+#: authentication/views/dingtalk.py:46 authentication/views/dingtalk.py:204
 msgid "DingTalk Error"
 msgstr "DingTalkエラー"
 
-#: authentication/views/dingtalk.py:53
+#: authentication/views/dingtalk.py:54
 msgid "DingTalk is already bound"
 msgstr "DingTalkはすでにバインドされています"
 
-#: authentication/views/dingtalk.py:122
+#: authentication/views/dingtalk.py:123
 msgid "Invalid user_id"
 msgstr "無効なuser_id"
 
-#: authentication/views/dingtalk.py:138
+#: authentication/views/dingtalk.py:139
 msgid "DingTalk query user failed"
 msgstr "DingTalkクエリユーザーが失敗しました"
 
-#: authentication/views/dingtalk.py:146
+#: authentication/views/dingtalk.py:147
 msgid "The DingTalk is already bound to another user"
 msgstr "DingTalkはすでに別のユーザーにバインドされています"
 
-#: authentication/views/dingtalk.py:153
+#: authentication/views/dingtalk.py:154
 msgid "Binding DingTalk successfully"
 msgstr "DingTalkのバインドに成功"
 
-#: authentication/views/dingtalk.py:207 authentication/views/dingtalk.py:242
+#: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:243
 msgid "Failed to get user from DingTalk"
 msgstr "DingTalkからユーザーを取得できませんでした"
 
-#: authentication/views/dingtalk.py:249
+#: authentication/views/dingtalk.py:250
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "パスワードでログインし、DingTalkをバインドしてください"
 
-#: authentication/views/feishu.py:43 authentication/views/feishu.py:131
+#: authentication/views/feishu.py:44 authentication/views/feishu.py:135
 msgid "FeiShu Error"
 msgstr "FeiShuエラー"
 
-#: authentication/views/feishu.py:44
+#: authentication/views/feishu.py:45
 msgid "FeiShu is already bound"
 msgstr "FeiShuはすでにバインドされています"
 
-#: authentication/views/feishu.py:133
+#: authentication/views/feishu.py:137
 msgid "Failed to get user from FeiShu"
 msgstr "本を飛ばすからユーザーを取得できませんでした"
 
@@ -4862,41 +4872,41 @@ msgstr "ログアウト成功"
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
-#: authentication/views/mixins.py:39
+#: authentication/views/mixins.py:28
 msgid ""
 "For your safety, automatic redirection login is not supported on the client."
 " If you need to open it in the client, please log in again"
 msgstr "安全のため、クライアントでの自動リダイレクトログインはサポートされていません。クライアントで開く必要がある場合は、再度ログインしてください"
 
-#: authentication/views/slack.py:35 authentication/views/slack.py:120
+#: authentication/views/slack.py:36 authentication/views/slack.py:124
 msgid "Slack Error"
 msgstr "Slack エラー"
 
-#: authentication/views/slack.py:55
+#: authentication/views/slack.py:56
 msgid "Slack is already bound"
 msgstr "Slack はすでにバインドされています"
 
-#: authentication/views/slack.py:122
+#: authentication/views/slack.py:126
 msgid "Failed to get user from Slack"
 msgstr "Slack からユーザーを取得できませんでした"
 
-#: authentication/views/wecom.py:36
+#: authentication/views/wecom.py:37
 msgid "WeCom Error, Please contact your system administrator"
 msgstr "企業微信エラー、システム管理者に連絡してください"
 
-#: authentication/views/wecom.py:39 authentication/views/wecom.py:143
+#: authentication/views/wecom.py:40 authentication/views/wecom.py:139
 msgid "WeCom Error"
 msgstr "企業微信エラー"
 
-#: authentication/views/wecom.py:103
+#: authentication/views/wecom.py:104
 msgid "Wecom"
 msgstr "企業用WeChat"
 
-#: authentication/views/wecom.py:145 authentication/views/wecom.py:180
+#: authentication/views/wecom.py:141 authentication/views/wecom.py:176
 msgid "Failed to get user from WeCom"
 msgstr "企業の微信からユーザーを取得できませんでした"
 
-#: authentication/views/wecom.py:187
+#: authentication/views/wecom.py:183
 msgid "Please login with a password and then bind the WeCom"
 msgstr "パスワードでログインしてからWeComをバインドしてください"
 
@@ -4948,7 +4958,7 @@ msgstr "エンタープライズプロフェッショナル版"
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:451
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:461
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s が正常に作成されました"
@@ -5013,7 +5023,7 @@ msgstr "無効なID、リストでなければなりません"
 #: xpack/plugins/cloud/serializers/account_attrs.py:20
 #: xpack/plugins/cloud/serializers/account_attrs.py:71
 #: xpack/plugins/cloud/serializers/account_attrs.py:95
-#: xpack/plugins/cloud/serializers/account_attrs.py:181
+#: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
@@ -5122,7 +5132,7 @@ msgstr "タグ、形式: [\"キー:値\", ...]、もしタグが存在しない�
 msgid "Objects, format [\"id\", ...]"
 msgstr "多関連項目、形式は [\"id\", ...]"
 
-#: common/drf/renders/base.py:275
+#: common/drf/renders/base.py:276
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -5173,15 +5183,15 @@ msgstr "このアクションでは、MFAの確認が必要です。"
 msgid "Unexpect error occur"
 msgstr "予期しないエラーが発生します"
 
-#: common/plugins/es.py:36
+#: common/plugins/es.py:37
 msgid "Invalid elasticsearch config"
 msgstr "無効なElasticsearch構成"
 
-#: common/plugins/es.py:41
+#: common/plugins/es.py:42
 msgid "Not Support Elasticsearch8"
 msgstr "サポートされていません Elasticsearch8"
 
-#: common/plugins/es.py:47
+#: common/plugins/es.py:48
 msgid ""
 "Connection failed: Self-signed certificate used. Please check server "
 "certificate configuration"
@@ -5287,12 +5297,12 @@ msgid "Invalid data type, should be list"
 msgstr "間違ったデータ タイプです。リストにする必要があります"
 
 #: common/serializers/fields.py:353
-#: xpack/plugins/cloud/serializers/account.py:119
+#: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/task.py:122
 msgid "Invalid choice: {}"
 msgstr "無効なオプション: {}"
 
-#: common/serializers/mixin.py:451 terminal/models/applet/applet.py:45
+#: common/serializers/mixin.py:469 terminal/models/applet/applet.py:45
 #: terminal/models/virtualapp/virtualapp.py:29
 msgid "Tags"
 msgstr "ラベル"
@@ -5369,16 +5379,16 @@ msgstr "コードが見つかりません"
 msgid "The message code provided is invalid or has expired"
 msgstr "提供されたメッセージコードは無効か期限切れです"
 
-#: jumpserver/conf.py:537
+#: jumpserver/conf.py:536
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "認証コードは: {code}"
 
-#: jumpserver/conf.py:542
+#: jumpserver/conf.py:541
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:544
+#: jumpserver/conf.py:543
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -5494,15 +5504,15 @@ msgstr "タスク開始待ち"
 
 #: ops/api/celery.py:269
 msgid "Task {} not found"
-msgstr "タスクは存在しません"
+msgstr "タスク {} は存在しません。"
 
 #: ops/api/celery.py:276
 msgid "Task {} args or kwargs error"
-msgstr "タスク実行パラメータエラー"
+msgstr "タスク {} の実行パラメータが誤っています。"
 
 #: ops/api/job.py:65
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
-msgstr ""
+msgstr "ログイン資産 {}({}) が拒否されました。ログイン資産ルール ACL ({}) によって制限されています。"
 
 #: ops/api/job.py:88
 #, python-brace-format
@@ -5751,13 +5761,6 @@ msgstr "モジュール"
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "アルグ"
-
-#: ops/models/adhoc.py:26 ops/models/playbook.py:34
-#: ops/serializers/mixin.py:10 rbac/models/role.py:31
-#: rbac/models/rolebinding.py:46 rbac/serializers/role.py:12
-#: settings/serializers/auth/oauth2.py:37
-msgid "Scope"
-msgstr "スコープ"
 
 #: ops/models/base.py:19
 msgid "Account policy"
@@ -6226,7 +6229,7 @@ msgid "today"
 msgstr "今日"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:187
+#: settings/serializers/feature.py:199
 msgid "day"
 msgstr "日"
 
@@ -6314,27 +6317,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "App RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:124
+#: rbac/builtin.py:125
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:127
+#: rbac/builtin.py:128
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:130
+#: rbac/builtin.py:131
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:136
+#: rbac/builtin.py:137
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:139
+#: rbac/builtin.py:140
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:142
+#: rbac/builtin.py:143
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -6464,7 +6467,7 @@ msgstr "システム設定"
 msgid "Session audits"
 msgstr "セッション監査"
 
-#: rbac/tree.py:50 xpack/plugins/cloud/manager.py:102
+#: rbac/tree.py:50 xpack/plugins/cloud/manager.py:104
 msgid "Cloud import"
 msgstr "クラウドインポート"
 
@@ -6480,7 +6483,7 @@ msgstr "アカウントの秘密の変更"
 msgid "App ops"
 msgstr "アプリ操作"
 
-#: rbac/tree.py:60 settings/serializers/feature.py:193
+#: rbac/tree.py:60 settings/serializers/feature.py:205
 msgid "Feature"
 msgstr "機能"
 
@@ -6515,26 +6518,38 @@ msgstr "作業監査"
 msgid "Report"
 msgstr "レポート"
 
-#: rbac/tree.py:182
+#: rbac/tree.py:183
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: rbac/tree.py:183
+#: rbac/tree.py:184
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:184 settings/serializers/feature.py:174
-#: settings/serializers/feature.py:176 tickets/models/ticket/general.py:310
+#: rbac/tree.py:185 settings/serializers/feature.py:186
+#: settings/serializers/feature.py:188 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:185
+#: rbac/tree.py:186
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:186
+#: rbac/tree.py:187
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
+
+#: rbac/tree.py:189
+msgid "Access token"
+msgstr "アクセストークン"
+
+#: rbac/tree.py:190
+msgid "View access token"
+msgstr "アクセストークンを表示"
+
+#: rbac/tree.py:191
+msgid "Revoke access token"
+msgstr "アクセストークンを取り消す"
 
 #: reports/views.py:20
 msgid "User login report"
@@ -6588,7 +6603,7 @@ msgstr "メール送信成功"
 msgid "Chat AI is not enabled"
 msgstr "チャットAIがオンになっていない"
 
-#: settings/api/chat.py:89 settings/api/dingtalk.py:31
+#: settings/api/chat.py:95 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:49 settings/api/wecom.py:37
 msgid "Test success"
@@ -6841,16 +6856,6 @@ msgid ""
 "name and the `value` is the JumpServer user attribute name"
 msgstr ""
 "ユーザー属性のマッピング、ここで `key` は CAS サービスのユーザー属性名で、`value` は JumpServer のユーザー属性名です"
-
-#: settings/serializers/auth/cas.py:41
-msgid "Create user"
-msgstr "そうでない場合はユーザーを作成"
-
-#: settings/serializers/auth/cas.py:43
-msgid ""
-"After successful user authentication, if the user does not exist, "
-"automatically create the user"
-msgstr "ユーザー認証が成功した後、ユーザーが存在しない場合、自動的にユーザーが作成されます"
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
@@ -7316,7 +7321,7 @@ msgid "SSO auth key TTL"
 msgstr "Token有効期間"
 
 #: settings/serializers/auth/sso.py:20
-#: xpack/plugins/cloud/serializers/account_attrs.py:231
+#: xpack/plugins/cloud/serializers/account_attrs.py:237
 msgid "Unit: second"
 msgstr "単位: 秒"
 
@@ -7472,7 +7477,7 @@ msgid "Tenant ID"
 msgstr "テナントID"
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
-#: xpack/plugins/cloud/manager.py:119 xpack/plugins/cloud/manager.py:123
+#: xpack/plugins/cloud/manager.py:128 xpack/plugins/cloud/manager.py:132
 #: xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "リージョン"
@@ -7522,53 +7527,69 @@ msgstr "GPTモデル"
 msgid "DeepSeek Model"
 msgstr "DeepSeekモデル"
 
-#: settings/serializers/feature.py:178
+#: settings/serializers/feature.py:172
+msgid "Custom Model"
+msgstr "カスタムモデル"
+
+#: settings/serializers/feature.py:173
+msgid "Whether to use a custom model"
+msgstr "カスタムモデルの使用有無"
+
+#: settings/serializers/feature.py:177
+msgid "Custom gpt model"
+msgstr "カスタムGPTモデル"
+
+#: settings/serializers/feature.py:181
+msgid "Custom DeepSeek model"
+msgstr "カスタムDeepSeekモデル"
+
+#: settings/serializers/feature.py:190
 msgid "Approval without login"
 msgstr "ログイン承認なし"
 
-#: settings/serializers/feature.py:179
+#: settings/serializers/feature.py:191
 msgid "Allow direct approval ticket without login"
 msgstr "ログインせずに直接承認チケットを許可します"
 
-#: settings/serializers/feature.py:183
+#: settings/serializers/feature.py:195
 msgid "Period"
 msgstr "期間"
 
-#: settings/serializers/feature.py:184
+#: settings/serializers/feature.py:196
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr "ワークオーダーの資産申請に対するデフォルトの承認時間帯"
 
-#: settings/serializers/feature.py:187
+#: settings/serializers/feature.py:199
 msgid "hour"
 msgstr "時"
 
-#: settings/serializers/feature.py:188
+#: settings/serializers/feature.py:200
 msgid "Unit"
 msgstr "単位"
 
-#: settings/serializers/feature.py:188
+#: settings/serializers/feature.py:200
 msgid "The unit of period"
 msgstr "ユーザーの実行"
 
-#: settings/serializers/feature.py:196
+#: settings/serializers/feature.py:208
 msgid "Adhoc command"
 msgstr "バッチコマンド実行"
 
-#: settings/serializers/feature.py:197
+#: settings/serializers/feature.py:209
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr "ユーザーがワークベンチ - ジョブセンター - Adhocでバッチコマンドを実行することを許可します"
 
-#: settings/serializers/feature.py:201
+#: settings/serializers/feature.py:213
 msgid "Command blacklist"
 msgstr "コマンドフィルタリング"
 
-#: settings/serializers/feature.py:202
+#: settings/serializers/feature.py:214
 msgid "Command blacklist in Adhoc"
 msgstr "コマンドフィルタリング"
 
-#: settings/serializers/feature.py:208
+#: settings/serializers/feature.py:220
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -7576,11 +7597,11 @@ msgstr "コマンドフィルタリング"
 msgid "Virtual app"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:211
+#: settings/serializers/feature.py:223
 msgid "Virtual App"
 msgstr "仮想アプリケーション"
 
-#: settings/serializers/feature.py:213
+#: settings/serializers/feature.py:225
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -8131,96 +8152,96 @@ msgstr "ユーザーの同期は必要ありません"
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "ldap:// または ldaps:// プロトコルが使用されます。"
 
-#: settings/utils/ldap.py:540
+#: settings/utils/ldap.py:543
 msgid "Host or port is disconnected: {}"
 msgstr "ホストまたはポートが切断されました: {}"
 
-#: settings/utils/ldap.py:542
+#: settings/utils/ldap.py:545
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "ポートはLDAPサービスのポートではありません: {}"
 
-#: settings/utils/ldap.py:544
+#: settings/utils/ldap.py:547
 msgid "Please add certificate: {}"
 msgstr "証明書を追加してください: {}"
 
-#: settings/utils/ldap.py:548 settings/utils/ldap.py:575
-#: settings/utils/ldap.py:605 settings/utils/ldap.py:633
+#: settings/utils/ldap.py:551 settings/utils/ldap.py:578
+#: settings/utils/ldap.py:608 settings/utils/ldap.py:636
 msgid "Unknown error: {}"
 msgstr "不明なエラー: {}"
 
-#: settings/utils/ldap.py:562
+#: settings/utils/ldap.py:565
 msgid "Bind DN or Password incorrect"
 msgstr "DNまたはパスワードのバインドが正しくありません"
 
-#: settings/utils/ldap.py:569
+#: settings/utils/ldap.py:572
 msgid "Please enter Bind DN: {}"
 msgstr "バインドDN: {} を入力してください"
 
-#: settings/utils/ldap.py:571
+#: settings/utils/ldap.py:574
 msgid "Please enter Password: {}"
 msgstr "パスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:573
+#: settings/utils/ldap.py:576
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "正しいバインドDNとパスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:591
+#: settings/utils/ldap.py:594
 msgid "Invalid User OU or User search filter: {}"
 msgstr "無効なユーザー OU またはユーザー検索フィルター: {}"
 
-#: settings/utils/ldap.py:622
+#: settings/utils/ldap.py:625
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP ユーザーattrマップは含まれません: {}"
 
-#: settings/utils/ldap.py:629
+#: settings/utils/ldap.py:632
 msgid "LDAP User attr map is not dict"
 msgstr "LDAPユーザーattrマップはdictではありません"
 
-#: settings/utils/ldap.py:648
+#: settings/utils/ldap.py:651
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP 認証が有効になっていない"
 
-#: settings/utils/ldap.py:666
+#: settings/utils/ldap.py:669
 msgid "Error (Invalid LDAP server): {}"
 msgstr "エラー (LDAPサーバーが無効): {}"
 
-#: settings/utils/ldap.py:668
+#: settings/utils/ldap.py:671
 msgid "Error (Invalid Bind DN): {}"
 msgstr "エラー (DNのバインドが無効): {}"
 
-#: settings/utils/ldap.py:670
+#: settings/utils/ldap.py:673
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "エラー (LDAPユーザーattrマップが無効): {}"
 
-#: settings/utils/ldap.py:672
+#: settings/utils/ldap.py:675
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "エラー (ユーザーOUまたはユーザー検索フィルターが無効): {}"
 
-#: settings/utils/ldap.py:674
+#: settings/utils/ldap.py:677
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "エラー (LDAP認証が有効化されていません): {}"
 
-#: settings/utils/ldap.py:676
+#: settings/utils/ldap.py:679
 msgid "Error (Unknown): {}"
 msgstr "エラー (不明): {}"
 
-#: settings/utils/ldap.py:679
+#: settings/utils/ldap.py:682
 msgid "Succeed: Match {} users"
 msgstr "成功: {} 人のユーザーに一致"
 
-#: settings/utils/ldap.py:709
+#: settings/utils/ldap.py:712
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認証に失敗しました (設定が正しくありません): {}"
 
-#: settings/utils/ldap.py:713
+#: settings/utils/ldap.py:716
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
 
-#: settings/utils/ldap.py:715
+#: settings/utils/ldap.py:718
 msgid "Authentication failed (Unknown): {}"
 msgstr "認証に失敗しました (不明): {}"
 
-#: settings/utils/ldap.py:718
+#: settings/utils/ldap.py:721
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
@@ -8237,7 +8258,7 @@ msgid ", disabled {}"
 msgstr "無効 {}"
 
 #: templates/_csv_import_export.html:13 templates/_csv_import_modal.html:5
-#: xpack/plugins/cloud/const.py:72
+#: xpack/plugins/cloud/const.py:73
 msgid "Import"
 msgstr "インポート"
 
@@ -8368,46 +8389,60 @@ msgstr "確認コードが送信されました"
 msgid "Home page"
 msgstr "ホームページ"
 
-#: templates/redirect_confirm.html:26
-msgid ""
-"You are about to be redirected to an external website. Please confirm that "
-"you trust this link: "
-msgstr "外部サイトに転送されますので、そのリンクを信頼できることを確認してください。"
+#: templates/redirect_confirm.html:42
+msgid "You are about to be redirected to an external website."
+msgstr "外部サイトに移動します"
 
-#: templates/resource_download.html:20 templates/resource_download.html:35
+#: templates/redirect_confirm.html:45
+msgid "Please confirm that you trust this link: "
+msgstr "以下のリンクを信頼していることを確認してください："
+
+#: templates/redirect_confirm.html:55
+msgid "Back"
+msgstr "戻る"
+
+#: templates/redirect_confirm.html:70
+msgid "Redirecting you to the Desktop App ( JumpServer Client )"
+msgstr "デスクトップアプリケーション (JumpServer クライアント) にリダイレクトしています。"
+
+#: templates/redirect_confirm.html:73
+msgid "You can safely close this window and return to the application."
+msgstr "このウィンドウを閉じてアプリケーションに戻ることができます。"
+
+#: templates/resource_download.html:20 templates/resource_download.html:36
 #: users/const.py:84
 msgid "Client"
 msgstr "クライアント"
 
 #: templates/resource_download.html:22
-msgid "JumpServer Client, currently used to launch the client"
-msgstr "JumpServerクライアントは、特定のクライアントプログラムを起動してアセットに接続するために使用されます。"
+msgid "JumpServerClient, currently used to launch the client"
+msgstr "JumpServerクライアントは、特定のクライアントプログラムを呼び起こして資産に接続するために使用されます"
 
-#: templates/resource_download.html:35
+#: templates/resource_download.html:36
 msgid "Microsoft"
 msgstr "マイクロソフト"
 
-#: templates/resource_download.html:35
+#: templates/resource_download.html:36
 msgid "Official"
 msgstr "公式"
 
-#: templates/resource_download.html:37
+#: templates/resource_download.html:38
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
 "Windows"
 msgstr "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロードする必要があります"
 
-#: templates/resource_download.html:45
+#: templates/resource_download.html:46
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:46
+#: templates/resource_download.html:47
 msgid ""
 "OpenSSH is a program used to connect remote applications in the Windows "
 "Remote Application Publisher"
 msgstr "OpenSSHはリモートアプリケーションをWindowsリモートアプリケーションで接続するプログラムです"
 
-#: templates/resource_download.html:53
+#: templates/resource_download.html:54
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 
@@ -8441,7 +8476,7 @@ msgstr "使用中のストレージは削除できません: {}"
 msgid "Command storages"
 msgstr "コマンドストア"
 
-#: terminal/api/component/storage.py:84 xpack/plugins/cloud/manager.py:119
+#: terminal/api/component/storage.py:84 xpack/plugins/cloud/manager.py:128
 msgid "Invalid"
 msgstr "無効"
 
@@ -8466,20 +8501,20 @@ msgstr "オンラインセッションを持つ"
 msgid "User %s %s session %s replay"
 msgstr "ユーザー%s %sこのセッション %s の録画です"
 
-#: terminal/api/session/session.py:159 terminal/api/session/session.py:292
+#: terminal/api/session/session.py:159 terminal/api/session/session.py:293
 #: terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "セッション再生"
 
-#: terminal/api/session/session.py:334
+#: terminal/api/session/session.py:335
 msgid "Session does not exist: {}"
 msgstr "セッションが存在しません: {}"
 
-#: terminal/api/session/session.py:337
+#: terminal/api/session/session.py:338
 msgid "Session is finished or the protocol not supported"
 msgstr "セッションが終了したか、プロトコルがサポートされていません"
 
-#: terminal/api/session/session.py:350
+#: terminal/api/session/session.py:351
 msgid "User does not have permission"
 msgstr "ユーザーに権限がありません"
 
@@ -8834,7 +8869,7 @@ msgstr "アカウント ID"
 msgid "Replay"
 msgstr "リプレイ"
 
-#: terminal/models/session/session.py:45 terminal/serializers/session.py:179
+#: terminal/models/session/session.py:45 terminal/serializers/session.py:180
 msgid "Command amount"
 msgstr "コマンド量"
 
@@ -8964,8 +8999,8 @@ msgstr "コマンド及び録画記憶"
 
 #: terminal/notifications.py:264 terminal/tasks.py:212
 #: xpack/plugins/cloud/api.py:182
-#: xpack/plugins/cloud/serializers/account.py:141
-#: xpack/plugins/cloud/serializers/account.py:144
+#: xpack/plugins/cloud/serializers/account.py:143
+#: xpack/plugins/cloud/serializers/account.py:146
 msgid "Test failure: Account invalid"
 msgstr "テスト失敗: アカウントが無効"
 
@@ -9720,7 +9755,7 @@ msgstr "新しいチケットがあります- {}"
 
 #: tickets/notifications.py:120
 msgid "{}: New Ticket - {} ({})"
-msgstr "新しいチケット- {} ({})"
+msgstr "{}: 新しいワークオーダー - {} ({})"
 
 #: tickets/notifications.py:168
 msgid "Your ticket has been processed, processor - {}"
@@ -10758,197 +10793,201 @@ msgstr "ucloud"
 msgid "Volcengine"
 msgstr "Volcengine"
 
-#: xpack/plugins/cloud/const.py:23
+#: xpack/plugins/cloud/const.py:22
+msgid "State Cloud"
+msgstr "天翼クラウド"
+
+#: xpack/plugins/cloud/const.py:24
 msgid "VMware"
 msgstr "VMware"
 
-#: xpack/plugins/cloud/const.py:24 xpack/plugins/cloud/providers/nutanix.py:15
+#: xpack/plugins/cloud/const.py:25 xpack/plugins/cloud/providers/nutanix.py:15
 msgid "Nutanix"
 msgstr "Nutanix"
 
-#: xpack/plugins/cloud/const.py:25
+#: xpack/plugins/cloud/const.py:26
 msgid "Huawei Private Cloud"
 msgstr "華為私有雲"
 
-#: xpack/plugins/cloud/const.py:26
+#: xpack/plugins/cloud/const.py:27
 msgid "Qingyun Private Cloud"
 msgstr "青雲私有雲"
 
-#: xpack/plugins/cloud/const.py:27
+#: xpack/plugins/cloud/const.py:28
 msgid "CTYun Private Cloud"
 msgstr "スカイウィング私有雲"
 
-#: xpack/plugins/cloud/const.py:28
+#: xpack/plugins/cloud/const.py:29
 msgid "OpenStack"
 msgstr "OpenStack"
 
-#: xpack/plugins/cloud/const.py:29
+#: xpack/plugins/cloud/const.py:30
 msgid "ZStack"
 msgstr "ZStack"
 
-#: xpack/plugins/cloud/const.py:30 xpack/plugins/cloud/providers/smartx.py:9
+#: xpack/plugins/cloud/const.py:31 xpack/plugins/cloud/providers/smartx.py:9
 msgid "SmartX CloudTower"
 msgstr "SmartXクラウドタワー"
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/cloud/const.py:32
 msgid "Fusion Compute"
 msgstr "融合計算"
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:33
 msgid "SCP"
 msgstr "SCP"
 
-#: xpack/plugins/cloud/const.py:33
+#: xpack/plugins/cloud/const.py:34
 msgid "Apsara Stack"
 msgstr "Apsara Stack"
 
-#: xpack/plugins/cloud/const.py:34
+#: xpack/plugins/cloud/const.py:35
 msgid "Proxmox"
 msgstr "Proxmox"
 
-#: xpack/plugins/cloud/const.py:44
+#: xpack/plugins/cloud/const.py:45
 msgid "Private IP"
 msgstr "プライベートIP"
 
-#: xpack/plugins/cloud/const.py:45
+#: xpack/plugins/cloud/const.py:46
 msgid "Public IP"
 msgstr "パブリックIP"
 
-#: xpack/plugins/cloud/const.py:49 xpack/plugins/cloud/models.py:373
+#: xpack/plugins/cloud/const.py:50 xpack/plugins/cloud/models.py:373
 msgid "Instance name"
 msgstr "インスタンス名"
 
-#: xpack/plugins/cloud/const.py:50
+#: xpack/plugins/cloud/const.py:51
 msgid "Instance name and Partial IP"
 msgstr "インスタンス名と部分IP"
 
-#: xpack/plugins/cloud/const.py:55
+#: xpack/plugins/cloud/const.py:56
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:59 xpack/plugins/cloud/manager.py:107
+#: xpack/plugins/cloud/const.py:60 xpack/plugins/cloud/manager.py:109
 msgid "Unsync"
 msgstr "同期していません"
 
-#: xpack/plugins/cloud/const.py:60 xpack/plugins/cloud/manager.py:106
+#: xpack/plugins/cloud/const.py:61 xpack/plugins/cloud/manager.py:108
 msgid "New Sync"
 msgstr "新しい同期"
 
-#: xpack/plugins/cloud/const.py:61 xpack/plugins/cloud/manager.py:106
+#: xpack/plugins/cloud/const.py:62 xpack/plugins/cloud/manager.py:108
 msgid "Synced"
 msgstr "同期済み"
 
-#: xpack/plugins/cloud/const.py:62 xpack/plugins/cloud/manager.py:108
+#: xpack/plugins/cloud/const.py:63 xpack/plugins/cloud/manager.py:110
 msgid "Released"
 msgstr "リリース済み"
 
-#: xpack/plugins/cloud/const.py:66
+#: xpack/plugins/cloud/const.py:67
 msgid "And"
 msgstr "そして"
 
-#: xpack/plugins/cloud/const.py:67
+#: xpack/plugins/cloud/const.py:68
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/const.py:71
+#: xpack/plugins/cloud/const.py:72
 msgid "Sync region"
 msgstr "組織が同期されました"
 
-#: xpack/plugins/cloud/const.py:73
+#: xpack/plugins/cloud/const.py:74
 msgid "Imported"
 msgstr "インポート"
 
-#: xpack/plugins/cloud/manager.py:60
+#: xpack/plugins/cloud/manager.py:61
 #, python-format
 msgid "Task \"%s\" starts executing"
 msgstr "タスク \"%s\" の実行開始"
 
-#: xpack/plugins/cloud/manager.py:99
+#: xpack/plugins/cloud/manager.py:101
 msgid "View the task details path: "
 msgstr "タスク詳細パスの表示: "
 
-#: xpack/plugins/cloud/manager.py:102
+#: xpack/plugins/cloud/manager.py:104
 msgid "Account Details"
 msgstr "アカウントの詳細"
 
-#: xpack/plugins/cloud/manager.py:103
+#: xpack/plugins/cloud/manager.py:105
 msgid "Synchronization History List"
 msgstr "履歴リストの同期"
 
-#: xpack/plugins/cloud/manager.py:103
+#: xpack/plugins/cloud/manager.py:105
 msgid "Synchronization Instance List"
 msgstr "インスタンスリストの同期"
 
-#: xpack/plugins/cloud/manager.py:107
+#: xpack/plugins/cloud/manager.py:109
 msgid "To be released"
 msgstr "しゃはんをまつ"
 
-#: xpack/plugins/cloud/manager.py:111
+#: xpack/plugins/cloud/manager.py:113
 msgid "Task execution completed"
 msgstr "タスク実行完了"
 
-#: xpack/plugins/cloud/manager.py:116
+#: xpack/plugins/cloud/manager.py:122
 msgid "Synchronization regions"
 msgstr "地域を同期する"
 
-#: xpack/plugins/cloud/manager.py:140
+#: xpack/plugins/cloud/manager.py:149
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "地域 \"%s\" のインスタンスを取得できませんでした、エラー：%s"
 
-#: xpack/plugins/cloud/manager.py:185
+#: xpack/plugins/cloud/manager.py:195
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "インスタンス \"%s\" の同期に失敗しました"
 
-#: xpack/plugins/cloud/manager.py:376
+#: xpack/plugins/cloud/manager.py:386
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr "更新された資産 \"%s\" のプラットフォームタイプと元のタイプは一致しません。プラットフォームとプロトコルの更新をスキップ"
 
-#: xpack/plugins/cloud/manager.py:433
+#: xpack/plugins/cloud/manager.py:443
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "資産 \"%s\" はすでに存在します"
 
-#: xpack/plugins/cloud/manager.py:435
+#: xpack/plugins/cloud/manager.py:445
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "資産の更新 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:438
+#: xpack/plugins/cloud/manager.py:448
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "資産 \"%s\" が更新されました"
 
-#: xpack/plugins/cloud/manager.py:447
+#: xpack/plugins/cloud/manager.py:457
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "資産 \"%s\" の作成準備"
 
-#: xpack/plugins/cloud/manager.py:468
+#: xpack/plugins/cloud/manager.py:478
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "ノードを設定する \"%s\""
 
-#: xpack/plugins/cloud/manager.py:494
+#: xpack/plugins/cloud/manager.py:504
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "アカウントを設定する \"%s\""
 
-#: xpack/plugins/cloud/manager.py:510
+#: xpack/plugins/cloud/manager.py:520
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "プロトコル \"%s\" の設定"
 
-#: xpack/plugins/cloud/manager.py:518
+#: xpack/plugins/cloud/manager.py:528
 #, python-format
 msgid "Set labels \"%s\""
 msgstr "ラベル設定: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:532 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:542 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr "同期インスタンス タスクを実行する"
 
@@ -10957,7 +10996,7 @@ msgid "Cloud center"
 msgstr "クラウドセンター"
 
 #: xpack/plugins/cloud/models.py:43
-#: xpack/plugins/cloud/serializers/account.py:103
+#: xpack/plugins/cloud/serializers/account.py:105
 msgid "Attrs"
 msgstr "ツールバーの"
 
@@ -10974,7 +11013,7 @@ msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
 #: xpack/plugins/cloud/models.py:109
-#: xpack/plugins/cloud/serializers/account.py:81
+#: xpack/plugins/cloud/serializers/account.py:83
 #: xpack/plugins/cloud/serializers/task.py:170
 #: xpack/plugins/cloud/serializers/task.py:171
 msgid "Regions"
@@ -11333,11 +11372,11 @@ msgstr "インスタンスIP \"%(ip)s\" のポート \"%(port)s\" は接続で�
 msgid "Empty"
 msgstr "空 "
 
-#: xpack/plugins/cloud/serializers/account.py:104
+#: xpack/plugins/cloud/serializers/account.py:106
 msgid "Validity display"
 msgstr "有効表示"
 
-#: xpack/plugins/cloud/serializers/account.py:105
+#: xpack/plugins/cloud/serializers/account.py:107
 msgid "Provider display"
 msgstr "プロバイダ表示"
 
@@ -11355,9 +11394,9 @@ msgstr "サブスクリプションID"
 #: xpack/plugins/cloud/serializers/account_attrs.py:135
 #: xpack/plugins/cloud/serializers/account_attrs.py:143
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
-#: xpack/plugins/cloud/serializers/account_attrs.py:157
-#: xpack/plugins/cloud/serializers/account_attrs.py:187
-#: xpack/plugins/cloud/serializers/account_attrs.py:237
+#: xpack/plugins/cloud/serializers/account_attrs.py:163
+#: xpack/plugins/cloud/serializers/account_attrs.py:193
+#: xpack/plugins/cloud/serializers/account_attrs.py:243
 msgid "API Endpoint"
 msgstr "APIエンドポイント"
 
@@ -11377,31 +11416,35 @@ msgstr "例えば: http://openstack.example.com:5000/v3"
 msgid "User domain"
 msgstr "ユーザードメイン"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:158
+#: xpack/plugins/cloud/serializers/account_attrs.py:157
+msgid "Project ID"
+msgstr "プロジェクト"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:164
 msgid "Cert File"
 msgstr "証明書ファイル"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:159
+#: xpack/plugins/cloud/serializers/account_attrs.py:165
 msgid "Key File"
 msgstr "キーファイル"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:175
+#: xpack/plugins/cloud/serializers/account_attrs.py:181
 msgid "Service account key"
 msgstr "サービスアカウントキー"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:176
+#: xpack/plugins/cloud/serializers/account_attrs.py:182
 msgid "The file is in JSON format"
 msgstr "ファイルはJSON形式です。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:194
+#: xpack/plugins/cloud/serializers/account_attrs.py:200
 msgid "IP address invalid `{}`, {}"
 msgstr "IPアドレスが無効: '{}', {}"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:210
+#: xpack/plugins/cloud/serializers/account_attrs.py:216
 msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 msgstr "例：192.168.1.0/24、10.0.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:213
+#: xpack/plugins/cloud/serializers/account_attrs.py:219
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -11410,23 +11453,23 @@ msgstr ""
 "このポートは、 IP アドレスの有効性を検出するために使用されます。同期タスクが実行されると、有効な IP アドレスのみが同期されます。 "
 "<br>ポートが0の場合、すべてのIPアドレスが有効です。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:221
+#: xpack/plugins/cloud/serializers/account_attrs.py:227
 msgid "Hostname prefix"
 msgstr "ホスト名プレフィックス"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:224
+#: xpack/plugins/cloud/serializers/account_attrs.py:230
 msgid "IP segment"
 msgstr "IP セグメント"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:228
+#: xpack/plugins/cloud/serializers/account_attrs.py:234
 msgid "Test port"
 msgstr "テストポート"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:231
+#: xpack/plugins/cloud/serializers/account_attrs.py:237
 msgid "Test timeout"
 msgstr "テストタイムアウト"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:247
+#: xpack/plugins/cloud/serializers/account_attrs.py:253
 msgid "Project"
 msgstr "project"
 
@@ -11504,18 +11547,3 @@ msgstr "ライセンスのインポートに成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
-
-#~ msgid "Watermark console content"
-#~ msgstr "管理ページのウォーターマークカスタム内容"
-
-#~ msgid "Watermark font size"
-#~ msgstr "フォントサイズ"
-
-#~ msgid "Watermark height"
-#~ msgstr "単一ウォーターマークの高さ"
-
-#~ msgid "Watermark width"
-#~ msgstr "単一ウォーターマークの幅"
-
-#~ msgid "Watermark rotate"
-#~ msgstr "ウォーターマークの回転角度"

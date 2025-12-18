@@ -2,6 +2,7 @@
 #
 import os
 import time
+
 from .base import (
     REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY, REDIS_SSL_REQUIRED, REDIS_USE_SSL,
     REDIS_PROTOCOL, REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS, REDIS_SENTINEL_PASSWORD,
@@ -30,10 +31,11 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.backends.drf.AccessTokenAuthentication',
-        'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
+        'authentication.backends.drf.PrivateTokenAuthentication',
+        'authentication.backends.drf.AccessTokenAuthentication',
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
@@ -222,3 +224,17 @@ PIICO_DRIVER_PATH = CONFIG.PIICO_DRIVER_PATH
 LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH
 
 JUMPSERVER_UPTIME = int(time.time())
+
+# OAuth2 Provider settings
+OAUTH2_PROVIDER = {
+    'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms'],
+    'PKCE_REQUIRED': True,
+    'ACCESS_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS,
+    'REFRESH_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS,
+}
+OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms://auth/callback'
+OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME = 'JumpServer Client'
+
+if CONFIG.DEBUG_DEV:
+    OAUTH2_PROVIDER['ALLOWED_REDIRECT_URI_SCHEMES'].append('http')
+    OAUTH2_PROVIDER_CLIENT_REDIRECT_URI += ' http://127.0.0.1:14876/auth/callback'

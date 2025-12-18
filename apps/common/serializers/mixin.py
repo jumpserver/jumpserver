@@ -30,10 +30,28 @@ __all__ = [
     "CommonSerializerMixin",
     "CommonBulkSerializerMixin",
     "SecretReadableMixin",
+    "SecretReadableCheckMixin",
     "CommonModelSerializer",
     "CommonBulkModelSerializer",
     "ResourceLabelsMixin",
 ]
+
+
+class SecretReadableCheckMixin(serializers.Serializer):
+    """
+    根据 SECURITY_ACCOUNT_SECRET_READ 配置控制密码字段的可读性
+    当配置为 False 时，密码字段返回 None
+    """
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        if not settings.SECURITY_ACCOUNT_SECRET_READ:
+            secret_fields = getattr(self.Meta, 'secret_fields', ['secret'])
+            for field_name in secret_fields:
+                if field_name in ret:
+                    ret[field_name] = '<REDACTED>'
+        return ret
 
 
 class SecretReadableMixin(serializers.Serializer):

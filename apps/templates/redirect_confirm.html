@@ -6,10 +6,6 @@
 
 {% block content %}
     <style>
-        .alert.alert-msg {
-            background: #F5F5F7;
-        }
-
         .target-url {
             display: inline-block;
             max-width: 100%;
@@ -18,29 +14,99 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
+            cursor: pointer;
+        }
+
+        /* 重定向中的样式 */
+        .confirm-container {
+            transition: opacity 0.3s ease-out;
         }
     </style>
     <div>
-        <p>
-        <div class="alert {% if error %} alert-danger {% else %} alert-info {% endif %}" id="messages">
-            {% trans 'You are about to be redirected to an external website. Please confirm that you trust this link: ' %}
-            <a class="target-url" href="{{ target_url }}">{{ target_url }}</a>
-        </div>
-        </p>
+        <!-- 确认内容 -->
+        <div class="confirm-container" id="confirmContainer">
+            <p>
+                <div class="alert {% if error %} alert-danger {% else %} alert-info {% endif %}" id="messages">
+                    {% trans 'You are about to be redirected to an external website.' %}
+                    <br/>
+                    <br/>
+                    {% trans 'Please confirm that you trust this link: ' %}
+                    <br/>
+                    <br/>
+                    <a class="target-url" href="javascript:void(0)" onclick="handleRedirect(event)">{{ target_url }}</a>
+                </div>
+            </p>
 
-        <div class="row">
-            <div class="col-sm-3">
-                <a href="/" class="btn btn-default block full-width m-b">
-                    {% trans 'Cancel' %}
-                </a>
-            </div>
-            <div class="col-sm-3">
-                <a href="{{ target_url }}" class="btn btn-primary block full-width m-b">
-                    {% trans 'Confirm' %}
-                </a>
+            <div class="row">
+                <div class="col-sm-3">
+                    <a id="backBtn" href="/" class="btn btn-default block full-width m-b">
+                        {% trans 'Back' %}
+                    </a>
+                </div>
+                <div class="col-sm-3">
+                    <a href="javascript:void(0)" onclick="handleRedirect(event)" class="btn btn-primary block full-width m-b">
+                        {% trans 'Confirm' %}
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
+
+    <script>
+        if (sessionStorage.getItem('page_refreshed')) {
+            // 用户刷新了页面，清除标记并跳转到首页
+            sessionStorage.removeItem('page_refreshed');
+            window.location.href = '/';
+        } else {
+            // 第一次加载，设置标记
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem('page_refreshed', 'true');
+            });
+        }
+
+        const targetUrl = '{{ target_url }}';
+
+        let countdownTimer = null;
+        let countdownSeconds = 30;
+        let startedCountdown = false;
+
+        function handleRedirect(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            setTimeout(() => {
+                if (targetUrl.startsWith('jms://')) {
+                    if (startedCountdown) {
+                        // 已经开始倒计时，直接跳转但不再重置倒计时
+                        window.location.href = targetUrl;
+                        return;
+                    }
+                    startedCountdown = true;
+                    countdownSeconds = 30;
+                    window.location.href = targetUrl;
+                    const backBtn = document.getElementById('backBtn');
+                    if (backBtn) {
+                        const backButtonContent = backBtn.textContent;
+                        backBtn.textContent = `${backButtonContent} (${countdownSeconds})`;
+                        countdownTimer = setInterval(() => {
+                            countdownSeconds--;
+                            if (countdownSeconds > 0) {
+                                backBtn.textContent = `${backButtonContent} (${countdownSeconds})`;
+                            } else {
+                                backBtn.textContent = `${backButtonContent}`;
+                                clearInterval(countdownTimer);
+                                countdownTimer = null;
+                                window.location.href = '/';
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    window.location.href = targetUrl;
+                }
+            }, 100);
+        }
+    </script>
 {% endblock %}
 
 

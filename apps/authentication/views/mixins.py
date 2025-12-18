@@ -4,17 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import FlashMessageUtil
 
 
-class METAMixin:
-    def get_next_url_from_meta(self):
-        request_meta = self.request.META or {}
-        next_url = None
-        referer = request_meta.get('HTTP_REFERER', '')
-        next_url_item = referer.rsplit('next=', 1)
-        if len(next_url_item) > 1:
-            next_url = next_url_item[-1]
-        return next_url
-
-
 class FlashMessageMixin:
     @staticmethod
     def get_response(redirect_url='', title='', msg='', m_type='message', interval=5):

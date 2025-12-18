@@ -81,4 +81,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
             remote_addr=get_request_ip(request), service=service.name, service_id=service.id,
             account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
         )
-        return Response(data={'id': request.user.id, 'secret': account.secret})
+        
+        # 根据配置决定是否返回密码
+        secret = account.secret if settings.SECURITY_ACCOUNT_SECRET_READ else None
+        return Response(data={'id': request.user.id, 'secret': secret})

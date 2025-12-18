@@ -132,6 +132,13 @@ def install_builtin_applets():
         logging.error("Install builtin applets err: {}".format(e))
 
 
+def init_oauth2_provider():
+    logging.info("Initialize OAuth2 Provider")
+    try:
+        management.call_command('init_oauth2_provider', verbosity=0)
+    except Exception as e:
+        logging.error("Initialize OAuth2 Provider err: {}".format(e))
+
 def upgrade_db():
     collect_static()
     perform_db_migrate()
@@ -143,6 +150,7 @@ def prepare():
     expire_caches()
     download_ip_db()
     install_builtin_applets()
+    init_oauth2_provider()
 
 
 def start_services():

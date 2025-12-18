@@ -524,13 +524,16 @@ class LDAPTestUtil(object):
     # test server uri
 
     def _check_server_uri(self):
-        if not any([self.config.server_uri.startswith('ldap://') or
-                    self.config.server_uri.startswith('ldaps://')]):
+        if not (self.config.server_uri.startswith('ldap://') or
+                self.config.server_uri.startswith('ldaps://')):
             err = _('ldap:// or ldaps:// protocol is used.')
             raise LDAPInvalidServerError(err)
 
     def _test_server_uri(self):
-        self._test_connection_bind()
+        # 这里测试 server uri 是否能连通, 不进行 bind 操作, 不需要传入 bind dn 和密码
+        server = Server(self.config.server_uri, use_ssl=self.config.use_ssl)
+        connection = Connection(server)
+        connection.open()
 
     def test_server_uri(self):
         try:

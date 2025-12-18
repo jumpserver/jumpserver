@@ -1,13 +1,12 @@
 import re
-import uuid
 import time
+import uuid
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.test import Client
 from django.urls import URLPattern, URLResolver
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
 
 from jumpserver.urls import api_v1
 
@@ -81,7 +80,8 @@ known_unauth_urls = [
     "/api/v1/authentication/mfa/send-code/",
     "/api/v1/authentication/sso/login/",
     "/api/v1/authentication/user-session/",
-    "/api/v1/settings/i18n/zh-hans/"
+    "/api/v1/settings/i18n/zh-hans/",
+    "/api/v1/settings/client/versions/"
 ]
 
 known_error_urls = [

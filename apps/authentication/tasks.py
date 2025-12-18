@@ -47,3 +47,9 @@ def clean_expire_token():
         count = TempToken.objects.filter(date_expired__lt=expired_time).delete()
         logging.info('Deleted %d temporary tokens.', count[0])
     logging.info('Cleaned expired temporary and connection tokens.')
+
+
+@register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
+def clear_oauth2_provider_expired_tokens():
+    from oauth2_provider.models import clear_expired
+    clear_expired()

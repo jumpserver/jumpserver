@@ -25,11 +25,11 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
+from authentication.decorators import pre_save_next_to_session, redirect_to_pre_save_next_after_auth
 from authentication.utils import build_absolute_uri_for_oidc
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import safe_next_url
 from .utils import get_logger
-from ..base import BaseAuthCallbackClientView
 
 logger = get_logger(__file__)
 
@@ -58,6 +58,7 @@ class OIDCAuthRequestView(View):
         b = base64.urlsafe_b64encode(h)
         return b.decode('ascii')[:-1]
 
+    @pre_save_next_to_session()
     def get(self, request):
         """ Processes GET requests. """
 
@@ -66,8 +67,9 @@ class OIDCAuthRequestView(View):
 
         # Defines common parameters used to bootstrap the authentication request.
         logger.debug(log_prompt.format('Construct request params'))
-        authentication_request_params = request.GET.dict()
-        authentication_request_params.update({
+        request_params = request.GET.dict()
+        request_params.pop('next', None)
+        request_params.update({
             'scope': settings.AUTH_OPENID_SCOPES,
             'response_type': 'code',
             'client_id': settings.AUTH_OPENID_CLIENT_ID,
@@ -80,7 +82,7 @@ class OIDCAuthRequestView(View):
             code_verifier = self.gen_code_verifier()
             code_challenge_method = settings.AUTH_OPENID_CODE_CHALLENGE_METHOD or 'S256'
             code_challenge = self.gen_code_challenge(code_verifier, code_challenge_method)
-            authentication_request_params.update({
+            request_params.update({
                 'code_challenge_method': code_challenge_method,
                 'code_challenge': code_challenge
             })
@@ -91,7 +93,7 @@ class OIDCAuthRequestView(View):
         if settings.AUTH_OPENID_USE_STATE:
             logger.debug(log_prompt.format('Use state'))
             state = get_random_string(settings.AUTH_OPENID_STATE_LENGTH)
-            authentication_request_params.update({'state': state})
+            request_params.update({'state': state})
             request.session['oidc_auth_state'] = state
 
         # Nonces should be used too! In that case the generated nonce is stored both in the
@@ -99,17 +101,12 @@ class OIDCAuthRequestView(View):
         if settings.AUTH_OPENID_USE_NONCE:
             logger.debug(log_prompt.format('Use nonce'))
             nonce = get_random_string(settings.AUTH_OPENID_NONCE_LENGTH)
-            authentication_request_params.update({'nonce': nonce, })
+            request_params.update({'nonce': nonce, })
             request.session['oidc_auth_nonce'] = nonce
-
-        # Stores the "next" URL in the session if applicable.
-        logger.debug(log_prompt.format('Stores next url in the session'))
-        next_url = request.GET.get('next')
-        request.session['oidc_auth_next_url'] = safe_next_url(next_url, request=request)
 
         # Redirects the user to authorization endpoint.
         logger.debug(log_prompt.format('Construct redirect url'))
-        query = urlencode(authentication_request_params)
+        query = urlencode(request_params)
         redirect_url = '{url}?{query}'.format(
             url=settings.AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT, query=query)
 
@@ -129,6 +126,8 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
 
     http_method_names = ['get', ]
 
+    
+    @redirect_to_pre_save_next_after_auth
     def get(self, request):
         """ Processes GET requests. """
         log_prompt = "Process GET requests [OIDCAuthCallbackView]: {}"
@@ -167,7 +166,6 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
                 raise SuspiciousOperation('Invalid OpenID Connect callback state value')
 
             # Authenticates the end-user.
-            next_url = request.session.get('oidc_auth_next_url', None)
             code_verifier = request.session.get('oidc_auth_code_verifier', None)
             logger.debug(log_prompt.format('Process authenticate'))
             try:
@@ -191,9 +189,7 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
                     callback_params.get('session_state', None)
 
                 logger.debug(log_prompt.format('Redirect'))
-                return HttpResponseRedirect(
-                    next_url or settings.AUTH_OPENID_AUTHENTICATION_REDIRECT_URI
-                )
+                return HttpResponseRedirect(settings.AUTH_OPENID_AUTHENTICATION_REDIRECT_URI)
         if 'error' in callback_params:
             logger.debug(
                 log_prompt.format('Error in callback params: {}'.format(callback_params['error']))
@@ -210,10 +206,6 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
             return response
         logger.debug(log_prompt.format('Redirect'))
         return HttpResponseRedirect(redirect_url)
-
-
-class OIDCAuthCallbackClientView(BaseAuthCallbackClientView):
-    pass
 
 
 class OIDCEndSessionView(View):

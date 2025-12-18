@@ -203,12 +203,16 @@ def get_chatai_data():
         'proxy': settings.GPT_PROXY,
         'model': settings.GPT_MODEL,
     }
+    custom_model = settings.CUSTOM_GPT_MODEL
     if settings.CHAT_AI_TYPE != ChatAITypeChoices.gpt:
         data['url'] = settings.DEEPSEEK_BASE_URL
         data['api_key'] = settings.DEEPSEEK_API_KEY
         data['proxy'] = settings.DEEPSEEK_PROXY
         data['model'] = settings.DEEPSEEK_MODEL
+        custom_model = settings.CUSTOM_DEEPSEEK_MODEL
 
+    data['model'] = custom_model or data['model'] \
+        if settings.IS_CUSTOM_MODEL else data['model']
     return data
 
 

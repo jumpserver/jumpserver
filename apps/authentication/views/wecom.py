@@ -12,6 +12,7 @@ from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.permissions import UserConfirmation
+from authentication.decorators import post_save_next_to_session_if_guard_redirect, pre_save_next_to_session
 from common.sdk.im.wecom import URL
 from common.sdk.im.wecom import WeCom, wecom_tool
 from common.utils import get_logger
@@ -20,7 +21,7 @@ from common.views.mixins import UserConfirmRequiredExceptionMixin, PermissionsMi
 from users.models import User
 from users.views import UserVerifyPasswordView
 from .base import BaseLoginCallbackView, BaseBindCallbackView
-from .mixins import METAMixin, FlashMessageMixin
+from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
 
@@ -115,19 +116,14 @@ class WeComEnableStartView(UserVerifyPasswordView):
         return success_url
 
 
-class WeComQRLoginView(WeComQRMixin, METAMixin, View):
+class WeComQRLoginView(WeComQRMixin, View):
     permission_classes = (AllowAny,)
 
+    @pre_save_next_to_session()
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
-        next_url = self.get_next_url_from_meta() or reverse('index')
-        next_url = safe_next_url(next_url, request=request)
         redirect_uri = reverse('authentication:wecom-qr-login-callback', external=True)
-        redirect_uri += '?' + urlencode({
-            'redirect_url': redirect_url,
-            'next': next_url,
-        })
-
+        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)
 
@@ -148,12 +144,11 @@ class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
 class WeComOAuthLoginView(WeComOAuthMixin, View):
     permission_classes = (AllowAny,)
 
+    @pre_save_next_to_session()
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
-
         redirect_uri = reverse('authentication:wecom-oauth-login-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
-
         url = self.get_oauth_url(redirect_uri)
         return HttpResponseRedirect(url)
 
@@ -161,6 +156,7 @@ class WeComOAuthLoginView(WeComOAuthMixin, View):
 class WeComOAuthLoginCallbackView(AuthMixin, WeComOAuthMixin, View):
     permission_classes = (AllowAny,)
 
+    @post_save_next_to_session_if_guard_redirect
     def get(self, request: HttpRequest):
         code = request.GET.get('code')
         redirect_url = request.GET.get('redirect_url')

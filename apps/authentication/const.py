@@ -1,6 +1,9 @@
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
+
+USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD = 'next'
+
 RSA_PRIVATE_KEY = 'rsa_private_key'
 RSA_PUBLIC_KEY = 'rsa_public_key'
 

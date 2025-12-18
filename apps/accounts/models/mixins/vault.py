@@ -81,7 +81,9 @@ class VaultModelMixin(models.Model):
     def mark_secret_save_to_vault(self):
         self._secret = self._secret_save_to_vault_mark
         self.skip_history_when_saving = True
-        self.save()
+        # Avoid calling overridden `save()` on concrete models (e.g. AccountTemplate)
+        # which may mutate `secret/_secret` again and cause post_save recursion.
+        super(VaultModelMixin, self).save(update_fields=['_secret'])
 
     @property
     def secret_has_save_to_vault(self):

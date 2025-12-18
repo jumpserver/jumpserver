@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     'settings.apps.SettingsConfig',
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
+    'oauth2_provider',
     'authentication.apps.AuthenticationConfig',  # authentication
     'tickets.apps.TicketsConfig',
     'acls.apps.AclsConfig',

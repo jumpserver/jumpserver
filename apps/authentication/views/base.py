@@ -11,6 +11,7 @@ from rest_framework.request import Request
 from authentication import errors
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
+from authentication.decorators import post_save_next_to_session_if_guard_redirect
 from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import reverse, get_object_or_none
@@ -72,6 +73,7 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
 
         return user, None
 
+    @post_save_next_to_session_if_guard_redirect
     def get(self, request: Request):
         code = request.GET.get('code')
         redirect_url = request.GET.get('redirect_url')
@@ -110,8 +112,6 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
             response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
 
-        if redirect_url and 'next=client' in redirect_url:
-            self.request.META['QUERY_STRING'] += '&next=client'
         return self.redirect_to_guard_view()
 
 

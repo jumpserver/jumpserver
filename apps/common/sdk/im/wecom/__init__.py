@@ -192,6 +192,7 @@ class WeCom(RequestMixin):
 class WeComTool(object):
     WECOM_STATE_SESSION_KEY = '_wecom_state'
     WECOM_STATE_VALUE = 'wecom'
+    WECOM_STATE_NEXT_URL_KEY = 'wecom_oauth_next_url'
 
     @lazyproperty
     def qr_cb_url(self):

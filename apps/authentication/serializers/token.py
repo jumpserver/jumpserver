@@ -9,11 +9,12 @@ from common.utils import get_object_or_none, random_string
 from users.models import User
 from users.serializers import UserProfileSerializer
 from ..models import AccessKey, TempToken
+from oauth2_provider.models import get_access_token_model
 
 __all__ = [
     'AccessKeySerializer', 'BearerTokenSerializer',
     'SSOTokenSerializer', 'TempTokenSerializer',
-    'AccessKeyCreateSerializer'
+    'AccessKeyCreateSerializer', 'AccessTokenSerializer',
 ]
 
 
@@ -114,3 +115,28 @@ class TempTokenSerializer(serializers.ModelSerializer):
         token = TempToken(**kwargs)
         token.save()
         return token
+
+
+class AccessTokenSerializer(serializers.ModelSerializer):
+    token_preview = serializers.SerializerMethodField(label=_("Token"))
+
+    class Meta:
+        model = get_access_token_model()
+        fields = [
+            'id', 'user', 'token_preview', 'is_valid',
+            'is_expired', 'expires', 'scope', 'created', 'updated',
+        ]
+        read_only_fields = fields
+        extra_kwargs = {
+            'scope': { 'label': _('Scope') },
+            'expires': { 'label': _('Date expired') },
+            'updated': { 'label': _('Date updated') },
+            'created': { 'label': _('Date created') },
+        }
+
+
+    def get_token_preview(self, obj):
+        token_string = obj.token
+        if len(token_string) > 16: 
+            return f"{token_string[:6]}...{token_string[-4:]}"
+        return "****"

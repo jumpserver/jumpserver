@@ -160,7 +160,8 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         )
 
         validated_data['user'] = str(user)
-        validated_data['asset'] = str(asset)
+        # web 资产 url 太长，超出限制
+        validated_data['asset'] = str(asset)[:128]
         return super().create(validated_data)
 
     def update(self, instance, validated_data):

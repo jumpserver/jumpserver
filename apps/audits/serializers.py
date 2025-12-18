@@ -127,6 +127,21 @@ class OperateLogSerializer(BulkOrgResourceModelSerializer):
         return i18n_trans(instance.resource)
 
 
+class DiffFieldSerializer(serializers.JSONField):
+    def to_file_representation(self, value):
+        row = getattr(self, '_row') or {}
+        attrs = {'diff': value, 'resource_type': row.get('resource_type')}
+        instance = type('OperateLog', (), attrs)
+        return OperateLogStore.convert_diff_friendly(instance)
+
+
+class OperateLogFullSerializer(OperateLogSerializer):
+    diff = DiffFieldSerializer(label=_("Diff"))
+
+    class Meta(OperateLogSerializer.Meta):
+        fields = OperateLogSerializer.Meta.fields + ['diff']
+
+
 class PasswordChangeLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PasswordChangeLog

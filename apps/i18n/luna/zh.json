@@ -288,5 +288,6 @@
     "start time": "开始时间",
     "success": "成功",
     "system user": "系统用户",
-    "user": "用户"
+    "user": "用户",
+    "tabLimits": "当前已打开 15 个标签页。\n为保证系统稳定是否在新的浏览器标签页中打开 Luna 以继续操作？"
 }

@@ -280,7 +280,8 @@
     "CACertificate": "Ca certificate",
     "CAS": "CAS",
     "CMPP2": "Cmpp v2.0",
-    "CTYunPrivate": "eCloud Private Cloud",
+    "CTYun": "State Cloud",
+    "CTYunPrivate": "State Cloud(Private)",
     "CalculationResults": "Error in cron expression",
     "CallRecords": "Call Records",
     "CanDragSelect": "Select by dragging; Empty means all selected",
@@ -1634,5 +1635,9 @@
     "selectedAssets": "Selected assets",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name"
+    "userName": "User name",
+    "AccountSecretReadDisabled": "Account secret reading has been disabled by administrator",
+    "AccessToken": "Access tokens",
+    "AccessTokenTip": "Access Token is a temporary credential generated through the OAuth2 (Authorization Code Grant) flow using the JumpServer client, which is used to access protected resources.",
+    "Revoke": "Revoke"
 }

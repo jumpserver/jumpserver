@@ -13,11 +13,11 @@ import json
 import logging
 import os
 import re
-import sys
 import types
 from importlib import import_module
 from urllib.parse import urljoin, urlparse, quote
 
+import sys
 import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -381,7 +381,6 @@ class Config(dict):
         'CAS_USERNAME_ATTRIBUTE': 'cas:user',
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
         'CAS_RENAME_ATTRIBUTES': {'cas:user': 'username'},
-        'CAS_CREATE_USER': True,
         'CAS_ORG_IDS': [DEFAULT_ID],
 
         'AUTH_SSO': False,
@@ -576,6 +575,7 @@ class Config(dict):
         ],
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': 'auto',
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
+        'SECURITY_ACCOUNT_SECRET_READ': True,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_MAX_SESSION_TIME': 24,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
@@ -692,13 +692,14 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 0,
 
         # API 分页
-        'MAX_LIMIT_PER_PAGE': 10000, # 给导出用
+        'MAX_LIMIT_PER_PAGE': 10000,  # 给导出用
         'MAX_PAGE_SIZE': 1000,
-        'DEFAULT_PAGE_SIZE': 200, # 给没有请求分页的用
+        'DEFAULT_PAGE_SIZE': 200,  # 给没有请求分页的用
 
         'LIMIT_SUPER_PRIV': False,
 
         # Chat AI
+        'IS_CUSTOM_MODEL': False,
         'CHAT_AI_ENABLED': False,
         'CHAT_AI_METHOD': 'api',
         'CHAT_AI_EMBED_URL': '',
@@ -707,21 +708,18 @@ class Config(dict):
         'GPT_API_KEY': '',
         'GPT_PROXY': '',
         'GPT_MODEL': 'gpt-4o-mini',
+        'CUSTOM_GPT_MODEL': 'gpt-4o-mini',
         'DEEPSEEK_BASE_URL': '',
         'DEEPSEEK_API_KEY': '',
         'DEEPSEEK_PROXY': '',
         'DEEPSEEK_MODEL': 'deepseek-chat',
+        'CUSTOM_DEEPSEEK_MODEL': 'deepseek-chat',
         'VIRTUAL_APP_ENABLED': False,
 
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 
         'TICKET_APPLY_ASSET_SCOPE': 'all',
         'LEAK_PASSWORD_DB_PATH': os.path.join(PROJECT_DIR, 'data', 'system', 'leak_passwords.db'),
-
-        # Ansible Receptor
-        'RECEPTOR_ENABLED': False,
-        'ANSIBLE_RECEPTOR_GATEWAY_PROXY_HOST': 'jms_celery',
-        'ANSIBLE_RECEPTOR_TCP_LISTEN_ADDRESS': 'receptor:7521',
 
         'FILE_UPLOAD_TEMP_DIR': None,
 
@@ -735,6 +733,10 @@ class Config(dict):
 
         # MCP
         'MCP_ENABLED': False,
+
+        # oauth2_provider settings 
+        'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
+        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
     }
 
     old_config_map = {
