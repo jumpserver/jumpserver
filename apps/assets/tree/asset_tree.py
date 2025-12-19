@@ -3,7 +3,8 @@ from django.db.models import Count, Q
 
 from orgs.utils import current_org
 from orgs.models import Organization
-from assets.models import Asset, Node
+from assets.models import Asset, Node, Platform
+from assets.const.category import Category
 from common.utils import get_logger, timeit
 
 from .tree import TreeNode, Tree
@@ -25,11 +26,8 @@ class AssetTreeNode(TreeNode):
         base_dict = super().as_dict(simple=simple)
         base_dict.update({
             'assets_count_total': self.assets_count_total,
+            'assets_count': self.assets_count,
         })
-        if not simple:
-            base_dict.update({
-                'assets_count': self.assets_count,
-            })
         return base_dict
     
 
@@ -60,7 +58,7 @@ class AssetTree(Tree):
     
     @timeit
     def _load_nodes_assets_count(self):
-        q_ = self._get_query_of_assets()
+        q_ = self._make_assets_q_object()
         nodes_count = Asset.objects.filter(q_).values('node_id').annotate(
             count=Count('id')
         ).values('node_id', 'count')
@@ -68,8 +66,10 @@ class AssetTree(Tree):
             nc['node_id'] = str(nc['node_id'])
             self._nodes_assets_count_mapper[nc['node_id']] = nc['count']
     
-    def _get_query_of_assets(self) -> Q:
-        return Q(org_id=self._org.id)
+    @timeit
+    def _make_assets_q_object(self) -> Q:
+        q_org = Q(org_id=self._org.id)
+        return q_org
     
     @timeit
     def _init_tree(self):
@@ -102,10 +102,30 @@ class AssetTree(Tree):
 
 class AssetSearchTree(AssetTree):
 
-    def __init__(self, query_of_assets: Q = None, org=None):
+    def __init__(self, assets_q_object: Q = None, category=None, org=None):
         super().__init__(org)
-        self._query: Q = query_of_assets or Q()
+        self._q_assets: Q = assets_q_object or Q()
+        self._category = self._check_category(category)
+        self._platform_ids = None
     
-    def _get_query_of_assets(self) -> Q:
-        q_ = self._query & super()._get_query_of_assets()
-        return q_
+    def _check_category(self, category):
+        if category is None:
+            return None
+        if category in Category.values:
+            return category
+        logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
+        return None
+    
+    def _make_assets_q_object(self) -> Q:
+        q_org = super()._make_assets_q_object()
+        self._load_category_platforms_if_needed()
+        q_platform = Q(platform_id__in=self._platform_ids) if self._platform_ids is not None else Q()
+        q = q_org & q_platform & self._q_assets
+        return q
+    
+    @timeit
+    def _load_category_platforms_if_needed(self):
+        if self._category is None:
+            return
+        ids = Platform.objects.filter(category=self._category).values_list('id', flat=True)
+        self._platform_ids = list(ids)

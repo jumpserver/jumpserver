@@ -30,8 +30,8 @@ class TreeNode(object):
         self.children.append(child_node)
     
     def remove_child(self, child_node: 'TreeNode'):
-        self.parent.children.remove(child_node)
-        self.parent = None
+        self.children.remove(child_node)
+        child_node.parent = None
     
     @property
     def is_leaf(self):
@@ -60,9 +60,21 @@ class TreeNode(object):
             })
         return data
     
-    def print(self, simple=True):
-        info = [f"{k}: {v}" for k, v in self.as_dict(simple=simple).items()]
-        print(' | '.join(info))
+    def print(self, simple=True, is_print_keys=False):
+        def info_as_string(_info):
+            return ' | '.join(s.ljust(25) for s in _info)
+        
+        if is_print_keys:
+            info_keys = [k for k in self.as_dict(simple=simple).keys()]
+            info_keys_string = info_as_string(info_keys)
+            print('-' * len(info_keys_string))
+            print(info_keys_string)
+            print('-' * len(info_keys_string))
+
+        info_values = [str(v) for v in self.as_dict(simple=simple).values()]
+        info_values_as_string = info_as_string(info_values)
+        print(info_values_as_string)
+        print('-' * len(info_values_as_string))
 
 
 class Tree(object):
@@ -70,7 +82,7 @@ class Tree(object):
     def __init__(self):
         self.root = None
         self.nodes: dict[TreeNode] = {}
-    
+
     @property
     def size(self):
         return len(self.nodes)
@@ -129,6 +141,8 @@ class Tree(object):
         print('Tree depth: ', self.depth)
         print('Tree width: ', self.width)
 
+        is_print_key = True
         for n in list(self.nodes.values())[:count]:
             n: TreeNode
-            n.print(simple=simple)
+            n.print(simple=simple, is_print_keys=is_print_key)
+            is_print_key = False

@@ -3,7 +3,7 @@ from random import choice
 
 import forgery_py
 
-from assets.const import AllTypes
+from assets.const import AllTypes, Category
 from assets.models import *
 from .base import FakeDataGenerator
 
@@ -48,12 +48,12 @@ class AssetsGenerator(FakeDataGenerator):
 
     def pre_generate(self):
         self.node_ids = list(Node.objects.all().values_list('id', flat=True))
-        self.platform_ids = list(Platform.objects.filter(category='host').values_list('id', flat=True))
+        self.platform_ids = list(Platform.objects.filter(category=Category.DATABASE).values_list('id', flat=True))
 
     def set_assets_nodes(self, assets):
         for asset in assets:
-            nodes_id_add_to = random.sample(self.node_ids, 3)
-            asset.nodes.add(*nodes_id_add_to)
+            nodes_id_add_to = random.choice(self.node_ids)
+            asset.node_id = nodes_id_add_to
 
     def do_generate(self, batch, batch_size):
         assets = []
