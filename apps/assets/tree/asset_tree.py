@@ -1,7 +1,8 @@
 from collections import defaultdict
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from orgs.utils import current_org
+from orgs.models import Organization
 from assets.models import Asset, Node
 from common.utils import get_logger, timeit
 
@@ -10,7 +11,7 @@ from .tree import TreeNode, Tree
 logger = get_logger(__name__)
 
 
-__all__ = ['AssetTree']
+__all__ = ['AssetTree', 'AssetSearchTree']
 
 
 class AssetTreeNode(TreeNode):
@@ -36,7 +37,7 @@ class AssetTree(Tree):
 
     def __init__(self, org=None):
         super().__init__()
-        self._org = org or current_org()
+        self._org: Organization = org or current_org()
         self._nodes_attr_mapper  = defaultdict(dict)
         self._nodes_assets_count_mapper = defaultdict(int)
 
@@ -46,6 +47,7 @@ class AssetTree(Tree):
         self._load_nodes_assets_count()
         self._init_tree()
         self._compute_assets_count_total()
+        self._remove_nodes_with_zero_assets()
 
     @timeit
     def _load_nodes_attr_mapper(self):
@@ -58,12 +60,16 @@ class AssetTree(Tree):
     
     @timeit
     def _load_nodes_assets_count(self):
-        nodes_count = Asset.objects.filter(org_id=self._org.id).values('node_id').annotate(
+        q_ = self._get_query_of_assets()
+        nodes_count = Asset.objects.filter(q_).values('node_id').annotate(
             count=Count('id')
         ).values('node_id', 'count')
         for nc in list(nodes_count):
             nc['node_id'] = str(nc['node_id'])
             self._nodes_assets_count_mapper[nc['node_id']] = nc['count']
+    
+    def _get_query_of_assets(self) -> Q:
+        return Q(org_id=self._org.id)
     
     @timeit
     def _init_tree(self):
@@ -86,3 +92,20 @@ class AssetTree(Tree):
                 total += child.assets_count_total
             node: AssetTreeNode
             node.assets_count_total = total
+    
+    @timeit
+    def _remove_nodes_with_zero_assets(self):
+        nodes_to_remove = [ node for node in self.nodes.values() if node.assets_count_total == 0 ]
+        for node in nodes_to_remove:
+            self.remove_node(node)
+
+
+class AssetSearchTree(AssetTree):
+
+    def __init__(self, query_of_assets: Q = None, org=None):
+        super().__init__(org)
+        self._query: Q = query_of_assets or Q()
+    
+    def _get_query_of_assets(self) -> Q:
+        q_ = self._query & super()._get_query_of_assets()
+        return q_

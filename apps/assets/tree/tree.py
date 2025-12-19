@@ -115,6 +115,14 @@ class Tree(object):
     def get_node(self, key: str) -> TreeNode:
         return self.nodes.get(key)
     
+    def remove_node(self, node: TreeNode):
+        if node.is_root:
+            self.root = None
+        else:
+            parent: TreeNode = node.parent
+            parent.remove_child(node)
+        self.nodes.pop(node.key, None)
+    
     def print(self, count=10, simple=True):
         print('Tree root: ', getattr(self.root, 'key', 'No-root'))
         print('Tree size: ', self.size)
