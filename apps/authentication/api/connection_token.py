@@ -66,6 +66,8 @@ class RDPFileClientProtocolURLMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
+            'bitmapcachepersistenable:i': '0',
+            'bitmapcachesize:i': '1500',
         }
         # 设置多屏显示
         multi_mon = is_true(self.request.query_params.get('multi_mon'))
