@@ -416,8 +416,8 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
 
     def get_assets(self):
         from .asset import Asset
-        assets = Asset.objects.filter(nodes=self)
-        return assets.distinct()
+        assets = Asset.objects.filter(node=self)
+        return assets
 
     def get_valid_assets(self):
         return self.get_assets().valid()
