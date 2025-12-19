@@ -394,7 +394,7 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
 
     def get_all_assets(self):
         from .asset import Asset
-        q = Q(nodes__key__startswith=f'{self.key}:') | Q(nodes__key=self.key)
+        q = Q(node__key__startswith=f'{self.key}:') | Q(node__key=self.key)
         return Asset.objects.filter(q).distinct()
 
     def get_assets_amount(self):
