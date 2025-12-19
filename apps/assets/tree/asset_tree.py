@@ -45,7 +45,6 @@ class AssetTree(Tree):
         self._load_nodes_assets_count()
         self._init_tree()
         self._compute_assets_count_total()
-        self._remove_nodes_with_zero_assets()
 
     @timeit
     def _load_nodes_attr_mapper(self):
@@ -92,12 +91,7 @@ class AssetTree(Tree):
                 total += child.assets_count_total
             node: AssetTreeNode
             node.assets_count_total = total
-    
-    @timeit
-    def _remove_nodes_with_zero_assets(self):
-        nodes_to_remove = [ node for node in self.nodes.values() if node.assets_count_total == 0 ]
-        for node in nodes_to_remove:
-            self.remove_node(node)
+
 
 
 class AssetSearchTree(AssetTree):
@@ -115,6 +109,11 @@ class AssetSearchTree(AssetTree):
             return category
         logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
         return None
+
+    def build(self):
+        super().build()
+        # 搜索树一般需要移除掉资产数为 0 的节点，只保留有资产的节点
+        self._remove_nodes_with_zero_assets()
     
     def _make_assets_q_object(self) -> Q:
         q_org = super()._make_assets_q_object()
@@ -129,3 +128,9 @@ class AssetSearchTree(AssetTree):
             return
         ids = Platform.objects.filter(category=self._category).values_list('id', flat=True)
         self._platform_ids = list(ids)
+    
+    @timeit
+    def _remove_nodes_with_zero_assets(self):
+        nodes_to_remove = [ node for node in self.nodes.values() if node.assets_count_total == 0 ]
+        for node in nodes_to_remove:
+            self.remove_node(node)
