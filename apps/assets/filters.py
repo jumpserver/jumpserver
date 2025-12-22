@@ -63,11 +63,11 @@ class NodeFilterBackend(filters.BaseFilterBackend):
         query_all = is_query_node_all_assets(request)
         if query_all:
             return queryset.filter(
-                Q(nodes__key__startswith=f'{node.key}:') |
-                Q(nodes__key=node.key)
+                Q(node__key__startswith=f'{node.key}:') |
+                Q(node__key=node.key)
             ).distinct()
         else:
-            return queryset.filter(nodes__key=node.key).distinct()
+            return queryset.filter(node__key=node.key).distinct()
 
 
 class IpInFilterBackend(filters.BaseFilterBackend):
