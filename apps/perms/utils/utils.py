@@ -1,8 +1,10 @@
 
-from common.utils import timeit, lazyproperty, get_logger
+from django.db.models import Q
+
+from common.utils import timeit, lazyproperty, get_logger, is_uuid
 from orgs.utils import current_org
 from users.models import User
-from assets.models import Node
+from assets.models import Node, Asset
 from perms.models import AssetPermission
 
 
@@ -26,21 +28,19 @@ class UserPermUtil(object):
         self._user_permission_ids = set()
         self._user_group_ids = set()
         self._user_group_permission_ids = set()
+        self._user_all_permission_ids = set()
         self._user_direct_asset_ids = set()
         self._user_direct_node_ids = set()
         self._user_direct_node_all_children_ids = set()
+        self._init()
 
-    def init(self):
+    def _init(self):
         self._load_user_permission_ids()
         self._load_user_group_ids()
         self._load_user_group_permission_ids()
         self._load_user_direct_asset_ids()
         self._load_user_direct_node_ids()
         self._load_user_direct_node_all_children_ids()
-    
-    @lazyproperty
-    def _user_all_permission_ids(self):
-        return self._user_permission_ids | self._user_group_permission_ids
 
     @timeit
     def _load_user_permission_ids(self):
@@ -49,6 +49,7 @@ class UserPermUtil(object):
         ).distinct('assetpermission_id').values_list('assetpermission_id', flat=True)
         perm_ids = self._uuids_to_string(perm_ids)
         self._user_permission_ids.update(perm_ids)
+        self._user_all_permission_ids.update(perm_ids)
 
     @timeit
     def _load_user_group_ids(self):
@@ -65,6 +66,7 @@ class UserPermUtil(object):
         ).distinct('assetpermission_id').values_list('assetpermission_id', flat=True)
         perm_ids = self._uuids_to_string(perm_ids)
         self._user_group_permission_ids.update(perm_ids)
+        self._user_all_permission_ids.update(perm_ids)
 
     @timeit
     def _load_user_direct_asset_ids(self):
@@ -97,6 +99,30 @@ class UserPermUtil(object):
 
         self._user_direct_node_all_children_ids.update(self._user_direct_node_ids)
         self._user_direct_node_all_children_ids.update(dn_children_ids)
+    
+    def get_node_assets(self, node: Node):
+        ''' 获取节点下授权的直接资产, Luna 页面展开时需要 '''
+        q = Q(node_id=node.id)
+        if str(node.id) not in self._user_direct_node_all_children_ids:
+            q &= Q(id__in=self._user_direct_asset_ids)
+        assets = Asset.objects.filter(q)
+        return assets
+
+    def get_node_all_assets(self, node: Node):
+        ''' 获取节点及其子节点下所有授权资产, 测试时需要 '''
+        if str(node.id) in self._user_direct_node_all_children_ids:
+            assets = node.get_all_assets()
+            return assets
+        
+        children_ids = node.get_all_children(with_self=True).values_list('id', flat=True)
+        children_ids = self._uuids_to_string(children_ids)
+        dn_all_nodes_ids = set(children_ids) & self._user_direct_node_all_children_ids
+        other_nodes_ids = set(children_ids) - dn_all_nodes_ids
+
+        q = Q(node_id__in=dn_all_nodes_ids)
+        q |= Q(node_id__in=other_nodes_ids) & Q(id__in=self._user_direct_asset_ids)
+        assets = Asset.objects.filter(q)
+        return assets
     
     def _uuids_to_string(self, uuids):
         return [ str(u) for u in uuids ]

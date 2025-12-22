@@ -41,11 +41,6 @@ class UserPermTree(AssetSearchTree):
         self._user: User = user
         self._util = UserPermUtil(user, org=self._org)
 
-    @timeit
-    def _pre_build(self):
-        super()._pre_build()
-        self._util.init()
-
     def _make_assets_q_object(self):
         q_base = super()._make_assets_q_object()
         q_perm_assets = Q(id__in=self._util._user_direct_asset_ids)
