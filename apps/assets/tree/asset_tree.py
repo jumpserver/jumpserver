@@ -12,51 +12,78 @@ from .tree import TreeNode, Tree
 logger = get_logger(__name__)
 
 
-__all__ = ['AssetTree', 'AssetSearchTree']
+__all__ = ['AssetTree', 'AssetTreeNode']
 
 
 class AssetTreeNode(TreeNode):
 
-    def __init__(self, _id, key: str, value: str, assets_count: int=0):
+    def __init__(self, _id, key, value, assets_count=0, assets=None):
         super().__init__(_id, key, value)
         self.assets_count = assets_count
         self.assets_count_total = 0
+        self.assets = assets or set()
     
     def as_dict(self, simple=True):
-        base_dict = super().as_dict(simple=simple)
-        base_dict.update({
+        data = super().as_dict(simple=simple)
+        data.update({
             'assets_count_total': self.assets_count_total,
             'assets_count': self.assets_count,
+            'assets': len(self.assets),
         })
-        return base_dict
+        return data
     
 
 class AssetTree(Tree):
 
     TreeNode = AssetTreeNode
 
-    def __init__(self, org=None):
+    def __init__(self, assets_q_object: Q = None, category=None, org=None, 
+                 with_assets=False, full_tree=False):
+
         super().__init__()
         self._org: Organization = org or current_org()
         self._nodes_attr_mapper  = defaultdict(dict)
         self._nodes_assets_count_mapper = defaultdict(int)
+        # 过滤资产的 Q 对象
+        self._q_assets: Q = assets_q_object or Q()
+        # 通过类别过滤资产
+        self._category = self._check_category(category)
+        self._category_platform_ids = set()
+        # 节点下是否包含资产
+        self._with_assets = with_assets
+        self._node_assets_mapper = defaultdict(set)
+        # 是否构建完整树，包含所有节点，否则只包含有资产的节点
+        self._full_tree = full_tree
+    
+    def _check_category(self, category):
+        if category is None:
+            return None
+        if category in Category.values:
+            return category
+        logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
+        return None
 
     @timeit
     def build(self):
-        self._pre_build()
         self._load_nodes_attr_mapper()
-        self._load_nodes_assets_count()
+        self._load_category_platforms_if_needed()
+
+        if self._with_assets:
+            self._load_nodes_assets_and_count()
+        else:
+            self._load_nodes_assets_count()
+
         self._init_tree()
         self._compute_assets_count_total()
-        self._after_build()
+        self._remove_nodes_with_zero_assets_if_needed()
     
-    def _pre_build(self):
-        """ 构建树之前的预处理操作 """
-        pass
-
-    def _after_build(self):
-        """ 构建树之后的操作 """
-        pass
+    @timeit
+    def _load_category_platforms_if_needed(self):
+        if self._category is None:
+            return
+        ids = Platform.objects.filter(category=self._category).values_list('id', flat=True)
+        ids = self._uuids_to_string(ids)
+        self._category_platform_ids = ids
 
     @timeit
     def _load_nodes_attr_mapper(self):
@@ -78,8 +105,24 @@ class AssetTree(Tree):
             self._nodes_assets_count_mapper[nid] = nc['count']
     
     @timeit
+    def _load_nodes_assets_and_count(self):
+        q = self._make_assets_q_object()
+        node_asset_pairs = Asset.objects.filter(q).values_list('node_id', 'id')
+        for nid, aid in list(node_asset_pairs):
+            nid = str(nid)
+            aid = str(aid)
+            self._node_assets_mapper[nid].add(aid)
+        
+        for nid, assets in self._node_assets_mapper.items():
+            self._nodes_assets_count_mapper[nid] = len(assets)
+    
+    @timeit
     def _make_assets_q_object(self) -> Q:
         q = Q(org_id=self._org.id)
+        if self._category_platform_ids:
+            q &= Q(platform_id__in=self._category_platform_ids) 
+        if self._q_assets:
+            q &= self._q_assets
         return q
     
     @timeit
@@ -98,6 +141,9 @@ class AssetTree(Tree):
             'value': attr['value'],
             'assets_count': assets_count,
         }
+        if self._with_assets:
+            assets = self._node_assets_mapper.get(node_id, set())
+            data.update({ 'assets': assets })
         return data
     
     @timeit
@@ -109,63 +155,21 @@ class AssetTree(Tree):
                 total += child.assets_count_total
             node: AssetTreeNode
             node.assets_count_total = total
-
-
-
-class AssetSearchTree(AssetTree):
-
-    def __init__(self, assets_q_object: Q = None, category=None, org=None):
-        super().__init__(org)
-        self._q_assets: Q = assets_q_object or Q()
-        self._category = self._check_category(category)
-        self._category_platform_ids = set()
-    
-    def _check_category(self, category):
-        if category is None:
-            return None
-        if category in Category.values:
-            return category
-        logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
-        return None
-
-    def _pre_build(self):
-        super()._pre_build()
-        self._load_category_platforms_if_needed()
-
-    def _after_build(self):
-        super()._after_build()
-        # 搜索树一般需要移除掉资产数为 0 的节点，只保留有资产的节点
-        self._remove_nodes_with_zero_assets()
-    
-    def _make_assets_q_object(self) -> Q:
-        q = super()._make_assets_q_object()
-        if self._category_platform_ids:
-            q &= Q(platform_id__in=self._category_platform_ids) 
-        q &= self._q_assets
-        return q
-    
     @timeit
-    def _load_category_platforms_if_needed(self):
-        if self._category is None:
+    def _remove_nodes_with_zero_assets_if_needed(self):
+        if self._full_tree:
             return
-        ids = Platform.objects.filter(category=self._category).values_list('id', flat=True)
-        ids = self._uuids_to_string(ids)
-        self._category_platform_ids = ids
-    
-    @timeit
-    def _remove_nodes_with_zero_assets(self):
         nodes: list[AssetTreeNode] = list(self.nodes.values())
         nodes_to_remove = [ 
-            node for node in nodes 
-            # 不移除根节点
-            if not node.is_root and node.assets_count_total == 0
+            node for node in nodes if not node.is_root and node.assets_count_total == 0
         ]
         for node in nodes_to_remove:
             self.remove_node(node)
-    
+
     def _uuids_to_string(self, uuids):
         return [ str(u) for u in uuids ]
     
     def print(self, count=20, simple=True):
-        print(f'asset category: {self._category}')
+        print('org_name: ', getattr(self._org, 'name', 'No-org'))
+        print(f'asset_category: {self._category}')
         super().print(count=count, simple=simple)

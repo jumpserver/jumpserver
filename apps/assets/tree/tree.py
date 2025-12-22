@@ -49,15 +49,17 @@ class TreeNode(object):
         data = {
             'key': self.key,
         }
-        if not simple:
-            data.update({
-                'id': self.id,
-                'value': self.value,
-                'level': self.level,
-                'children_count': self.children_count,
-                'is_root': self.is_root,
-                'is_leaf': self.is_leaf,
-            })
+        if simple:
+            return data
+
+        data.update({
+            'id': self.id,
+            'value': self.value,
+            'level': self.level,
+            'children_count': self.children_count,
+            'is_root': self.is_root,
+            'is_leaf': self.is_leaf,
+        })
         return data
     
     def print(self, simple=True, is_print_keys=False):
@@ -140,7 +142,6 @@ class Tree(object):
         print('tree_size: ', self.size)
         print('tree_depth: ', self.depth)
         print('tree_width: ', self.width)
-        print('org_name: ', getattr(self._org, 'name', 'No-org'))
 
         is_print_key = True
         for n in list(self.nodes.values())[:count]:

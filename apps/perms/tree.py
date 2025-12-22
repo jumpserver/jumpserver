@@ -1,10 +1,9 @@
 from collections import defaultdict
 from django.db.models import Q, Count
 
-from common.utils import timeit, get_logger
+from common.utils import get_logger
 from users.models import User
-from assets.models import Node, Asset
-from assets.tree.asset_tree import AssetSearchTree, AssetTreeNode
+from assets.tree.asset_tree import AssetTree, AssetTreeNode
 from perms.utils.utils import UserPermUtil
 
 
@@ -17,65 +16,48 @@ logger = get_logger(__name__)
 class PermTreeNode(AssetTreeNode):
 
     class Type:
-        BRIDGE = 'bridge' # Not a perm node and not has direct perm asset node
-        DN = 'dn' # Direct perm node
-        DA = 'da' # Has direct perm asset node
+        # Neither a permission node nor a node with direct permission assets
+        BRIDGE = 'bridge'
+        # Node with direct permission
+        DN = 'dn'
+        # Node with only direct permission assets
+        DA = 'da'
 
     def __init__(self, tp, _id, key, value, assets_count=0, assets=None):
         super().__init__(_id, key, value, assets_count)
         self.type = tp or self.Type.BRIDGE
-        self.assets = assets or set()
     
     def as_dict(self, simple=True):
-        base_dict = super().as_dict(simple=simple)
-        base_dict.update({
+        data = super().as_dict(simple=simple)
+        data.update({
             'type': self.type,
         })
-        base_dict.update({
-            'assets': len(list(self.assets)),
-        })
-        return base_dict
+        return data
 
 
-class UserPermTree(AssetSearchTree):
+class UserPermTree(AssetTree):
 
     TreeNode = PermTreeNode
 
-
     def __init__(self, user=None, assets_q_object=None, category=None, org=None, with_assets=False):
-        super().__init__(assets_q_object=assets_q_object, category=category, org=org)
+        super().__init__(
+            assets_q_object=assets_q_object, 
+            category=category, 
+            org=org,
+            with_assets=with_assets
+        )
         self._user: User = user
         self._util = UserPermUtil(user, org=self._org)
-        # 用于 Luna 页面搜索资产时返回节点树及节点下资产
-        self._with_assets = with_assets
-        self._node_assets_mapper = defaultdict(set)
-    
-    @timeit
-    def _load_nodes_assets_count(self):
-        if not self._with_assets:
-            super()._load_nodes_assets_count()
-            return
-
-        q = self._make_assets_q_object()
-        node_asset_pairs = Asset.objects.filter(q).values_list('node_id', 'id')
-        for nid, aid in list(node_asset_pairs):
-            nid = str(nid)
-            aid = str(aid)
-            self._node_assets_mapper[nid].add(aid)
-        
-        for nid, assets in self._node_assets_mapper.items():
-            self._nodes_assets_count_mapper[nid] = len(assets)
         
     def _make_assets_q_object(self):
-        q_base = super()._make_assets_q_object()
+        q = super()._make_assets_q_object()
         q_perm_assets = Q(id__in=self._util._user_direct_asset_ids)
         q_perm_nodes = Q(node_id__in=self._util._user_direct_node_all_children_ids)
-        q = q_base & (q_perm_assets | q_perm_nodes)
+        q = q & (q_perm_assets | q_perm_nodes)
         return q
 
     def _get_tree_node_data(self, node_id):
         data = super()._get_tree_node_data(node_id)
-
         if node_id in self._util._user_direct_node_all_children_ids:
             tp = PermTreeNode.Type.DN
         elif self._nodes_assets_count_mapper.get(node_id, 0) > 0:
@@ -83,11 +65,6 @@ class UserPermTree(AssetSearchTree):
         else:
             tp = PermTreeNode.Type.BRIDGE
         data.update({ 'tp': tp })
-
-        if self._with_assets:
-            assets = self._node_assets_mapper.get(node_id, set())
-            data.update({ 'assets': assets })
-
         return data
 
     def print(self, simple=True, count=10):
