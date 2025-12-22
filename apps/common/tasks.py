@@ -1,10 +1,10 @@
 import os
 
+import jms_storage
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
-import jms_storage
 
 from .utils import get_logger
 
@@ -71,10 +71,7 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
     for attachment in attachment_list:
         email.attach_file(attachment)
         os.remove(attachment)
-    try:
-        return email.send()
-    except Exception as e:
-        logger.error("Sending mail attachment error: {}".format(e))
+    return email.send()
 
 
 @shared_task(verbose_name=_('Upload session replay to external storage'))
