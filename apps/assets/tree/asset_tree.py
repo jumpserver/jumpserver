@@ -51,7 +51,7 @@ class AssetTree(Tree):
         self._category_platform_ids = set()
         # 节点下是否包含资产
         self._with_assets = with_assets
-        self._node_assets_mapper = defaultdict(set)
+        self._node_assets_mapper = defaultdict(dict)
         # 是否构建完整树，包含所有节点，否则只包含有资产的节点
         self._full_tree = full_tree
     
@@ -107,11 +107,16 @@ class AssetTree(Tree):
     @timeit
     def _load_nodes_assets_and_count(self):
         q = self._make_assets_q_object()
-        node_asset_pairs = Asset.objects.filter(q).values_list('node_id', 'id')
-        for nid, aid in list(node_asset_pairs):
-            nid = str(nid)
-            aid = str(aid)
-            self._node_assets_mapper[nid].add(aid)
+        assets = Asset.objects.filter(q).values(
+            'node_id', 'id', 'platform_id', 'name', 'address', 'is_active', 'comment', 'org_id'
+        )
+        for asset in list(assets):
+            asset['id'] = str(asset['id'])
+            asset['platform_id'] = str(asset['platform_id'])
+            asset['node_id'] = str(asset['node_id'])
+            nid = str(asset['node_id'])
+            aid = str(asset['id'])
+            self._node_assets_mapper[nid][aid] = asset
         
         for nid, assets in self._node_assets_mapper.items():
             self._nodes_assets_count_mapper[nid] = len(assets)
