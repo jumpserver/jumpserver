@@ -51,11 +51,11 @@ class AssetTree(Tree):
         self._after_build()
     
     def _pre_build(self):
-        """ 预处理操作 """
+        """ 构建树之前的预处理操作 """
         pass
 
     def _after_build(self):
-        """ 构建完成后的操作 """
+        """ 构建树之后的操作 """
         pass
 
     @timeit
@@ -69,18 +69,18 @@ class AssetTree(Tree):
     
     @timeit
     def _load_nodes_assets_count(self):
-        q_ = self._make_assets_q_object()
-        nodes_count = Asset.objects.filter(q_).values('node_id').annotate(
+        q = self._make_assets_q_object()
+        nodes_count = Asset.objects.filter(q).values('node_id').annotate(
             count=Count('id')
         ).values('node_id', 'count')
         for nc in list(nodes_count):
-            nc['node_id'] = str(nc['node_id'])
-            self._nodes_assets_count_mapper[nc['node_id']] = nc['count']
+            nid = str(nc['node_id'])
+            self._nodes_assets_count_mapper[nid] = nc['count']
     
     @timeit
     def _make_assets_q_object(self) -> Q:
-        q_org = Q(org_id=self._org.id)
-        return q_org
+        q = Q(org_id=self._org.id)
+        return q
     
     @timeit
     def _init_tree(self):
@@ -118,7 +118,7 @@ class AssetSearchTree(AssetTree):
         super().__init__(org)
         self._q_assets: Q = assets_q_object or Q()
         self._category = self._check_category(category)
-        self._platform_ids = set()
+        self._category_platform_ids = set()
     
     def _check_category(self, category):
         if category is None:
@@ -128,16 +128,20 @@ class AssetSearchTree(AssetTree):
         logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
         return None
 
+    def _pre_build(self):
+        super()._pre_build()
+        self._load_category_platforms_if_needed()
+
     def _after_build(self):
         super()._after_build()
         # 搜索树一般需要移除掉资产数为 0 的节点，只保留有资产的节点
         self._remove_nodes_with_zero_assets()
     
     def _make_assets_q_object(self) -> Q:
-        q_org = super()._make_assets_q_object()
-        self._load_category_platforms_if_needed()
-        q_platform = Q(platform_id__in=self._platform_ids) if self._platform_ids else Q()
-        q = q_org & q_platform & self._q_assets
+        q = super()._make_assets_q_object()
+        if self._category_platform_ids:
+            q &= Q(platform_id__in=self._category_platform_ids) 
+        q &= self._q_assets
         return q
     
     @timeit
@@ -146,7 +150,7 @@ class AssetSearchTree(AssetTree):
             return
         ids = Platform.objects.filter(category=self._category).values_list('id', flat=True)
         ids = self._uuids_to_string(ids)
-        self._platform_ids = ids
+        self._category_platform_ids = ids
     
     @timeit
     def _remove_nodes_with_zero_assets(self):
@@ -161,3 +165,7 @@ class AssetSearchTree(AssetTree):
     
     def _uuids_to_string(self, uuids):
         return [ str(u) for u in uuids ]
+    
+    def print(self, count=20, simple=True):
+        print(f'asset category: {self._category}')
+        super().print(count=count, simple=simple)

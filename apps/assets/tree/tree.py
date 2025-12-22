@@ -98,7 +98,7 @@ class Tree(object):
             return 0, 0
         node = max(self.nodes.values(), key=lambda node: node.level)
         node: TreeNode
-        logger.debug(f"Max depth node key: {node.key}")
+        print(f"max_depth_node_key: {node.key}")
         return node.level
 
     @property
@@ -108,7 +108,7 @@ class Tree(object):
             return 0, 0
         node = max(self.nodes.values(), key=lambda node: node.children_count)
         node: TreeNode
-        logger.debug(f"Max width level: {node.level + 1}")
+        print(f"max_width_level: {node.level + 1}")
         return node.children_count
 
     def add_node(self, node: TreeNode):
@@ -136,10 +136,11 @@ class Tree(object):
         self.nodes.pop(node.key, None)
     
     def print(self, count=10, simple=True):
-        print('Tree root: ', getattr(self.root, 'key', 'No-root'))
-        print('Tree size: ', self.size)
-        print('Tree depth: ', self.depth)
-        print('Tree width: ', self.width)
+        print('tree_root_key: ', getattr(self.root, 'key', 'No-root'))
+        print('tree_size: ', self.size)
+        print('tree_depth: ', self.depth)
+        print('tree_width: ', self.width)
+        print('org_name: ', getattr(self._org, 'name', 'No-org'))
 
         is_print_key = True
         for n in list(self.nodes.values())[:count]:
