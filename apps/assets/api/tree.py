@@ -165,7 +165,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             # 返回节点的子节点及其资产(如果是根节点返回自己)
             if search:
                 assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
-                tree = AssetTree(assets_q_object=assets_q_object, with_assets=True, with_assets_limit=100, full_tree=False)
+                tree = AssetTree(assets_q_object=assets_q_object, with_assets=True, with_assets_limit=1000, full_tree=False)
                 nodes = tree.get_nodes()
                 assets = tree.get_assets()
             else:
