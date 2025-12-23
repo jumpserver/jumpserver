@@ -5,6 +5,7 @@ from rest_framework.request import Request
 from assets.models import Node, Platform, Protocol, MyAsset
 from assets.utils import get_node_from_request, is_query_node_all_assets
 from common.utils import lazyproperty, timeit
+from assets.tree.asset_tree import AssetTreeNode
 
 
 class SerializeToTreeNodeMixin:
@@ -19,22 +20,19 @@ class SerializeToTreeNodeMixin:
         return False
 
     @timeit
-    def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
-        if with_asset_amount:
-            def _name(node: Node):
-                return '{} ({})'.format(node.value, node.assets_amount)
-        else:
-            def _name(node: Node):
-                return node.value
-
-        def _open(node):
-            if not self.is_sync:
-                # 异步加载资产树时，默认展开节点
-                return True
-            if not node.parent_key:
-                return True
+    def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=2, with_assets=False):
+        def _name(node: AssetTreeNode):
+            v = node.value
+            if not with_asset_amount:
+                return v
+            v = f'{v} ({node.assets_amount_total})'
+            return v
+        
+        def is_parent(node: AssetTreeNode):
+            if with_assets:
+                return node.assets_amount > 0 or not node.is_leaf
             else:
-                return False
+                return not node.is_leaf
 
         data = [
             {
@@ -42,15 +40,17 @@ class SerializeToTreeNodeMixin:
                 'name': _name(node),
                 'title': _name(node),
                 'pId': node.parent_key,
-                'isParent': True,
-                'open': _open(node),
+                'isParent': is_parent(node),
+                'open': node.level < expand_level,
                 'meta': {
+                    'type': 'node',
                     'data': {
                         "id": node.id,
                         "key": node.key,
                         "value": node.value,
+                        "assets_amount": node.assets_amount,
+                        "assets_amount_total": node.assets_amount_total,
                     },
-                    'type': 'node'
                 }
             }
             for node in nodes

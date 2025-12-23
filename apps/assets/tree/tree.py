@@ -83,6 +83,7 @@ class Tree(object):
 
     def __init__(self):
         self.root = None
+        # { key -> TreeNode }
         self.nodes: dict[TreeNode] = {}
 
     @property
@@ -136,6 +137,19 @@ class Tree(object):
             parent: TreeNode = node.parent
             parent.remove_child(node)
         self.nodes.pop(node.key, None)
+    
+    def get_nodes(self):
+        return list(self.nodes.values())
+    
+    def get_node_children(self, key, with_self=False):
+        node = self.get_node(key)
+        if not node:
+            return []
+        nodes = []
+        if with_self:
+            nodes.append(node)
+        nodes.extend(node.children)
+        return nodes
     
     def print(self, count=10, simple=True):
         print('tree_root_key: ', getattr(self.root, 'key', 'No-root'))

@@ -44,7 +44,8 @@ class UserPermTree(AssetTree):
             assets_q_object=assets_q_object, 
             category=category, 
             org=org,
-            with_assets=with_assets
+            with_assets=with_assets,
+            full_tree=False
         )
         self._user: User = user
         self._util = UserPermUtil(user, org=self._org)

@@ -15,8 +15,11 @@ from .mixin import SerializeToTreeNodeMixin
 from .. import serializers
 from ..const import AllTypes
 from ..models import Node, Platform, Asset
+from assets.tree.asset_tree import AssetTree
+
 
 logger = get_logger(__file__)
+
 __all__ = [
     'NodeChildrenApi',
     'NodeChildrenAsTreeApi',
@@ -25,9 +28,7 @@ __all__ = [
 
 
 class NodeChildrenApi(generics.ListCreateAPIView):
-    """
-    节点的增删改查
-    """
+    ''' 节点的增删改查 '''
     serializer_class = serializers.NodeSerializer
     search_fields = ('value',)
 
@@ -99,8 +100,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
 
 
 class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
-    """
-    节点子节点作为树返回，
+    ''' 节点子节点作为树返回，
     [
       {
         "id": "",
@@ -109,8 +109,8 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         "meta": ""
       }
     ]
+    '''
 
-    """
     model = Node
 
     def filter_queryset(self, queryset):
@@ -144,13 +144,46 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             assets = assets.filter(q)
         return assets
 
-    def list(self, request, *args, **kwargs):
+    def _list(self, request, *args, **kwargs):
         nodes = self.filter_queryset(self.get_queryset()).order_by('value')
         with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
         nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
         node_key = self.instance.key if self.instance else None
         assets = self.serialize_assets(assets, node_key=node_key)
+        data = [*nodes, *assets]
+        return Response(data=data)
+    
+    def list(self, request, *args, **kwargs):
+        if self.instance is None:
+            # TODO: 全局组织
+            return Response(data=[])
+
+        search = request.query_params.get('search')
+        with_assets = request.query_params.get('assets', '0') == '1'
+        if with_assets:
+            # 返回节点的子节点及其资产(如果是根节点返回自己)
+            if search:
+                assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
+                tree = AssetTree(assets_q_object=assets_q_object, with_assets=True, with_assets_limit=100, full_tree=False)
+                nodes = tree.get_nodes()
+                assets = tree.get_assets()
+            else:
+                tree = AssetTree(with_assets_node_id=self.instance.id)
+                with_self = True if self.instance.is_org_root() else False
+                nodes = tree.get_node_children(key=self.instance.key, with_self=with_self)
+                assets = tree.get_assets(node_key=self.instance.key)
+        else:
+            # 返回完整资产树
+            tree = AssetTree()
+            nodes = tree.get_nodes()
+            assets = []
+        
+        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
+        with_asset_amount = True
+        expand_level = 10000 if search else 2  # search 时展开所有节点
+        nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount, expand_level=expand_level)
+        assets = self.serialize_assets(assets)
         data = [*nodes, *assets]
         return Response(data=data)
 
