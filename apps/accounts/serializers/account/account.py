@@ -341,10 +341,6 @@ class AssetAccountBulkSerializer(
 
     @staticmethod
     def _handle_update_create(vd, lookup):
-        ori = Account.objects.filter(**lookup).first()
-        if ori and ori.secret == vd.get('secret'):
-            return ori, False, 'skipped'
-
         instance, value = Account.objects.update_or_create(defaults=vd, **lookup)
         state = 'created' if value else 'updated'
         return instance, True, state
