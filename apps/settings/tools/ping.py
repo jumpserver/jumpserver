@@ -12,6 +12,8 @@ from settings.utils import generate_ips
 
 # From /usr/include/linux/icmp.h; your milage may vary.
 ICMP_ECHO_REQUEST = 8  # Seems to be the same on Solaris.
+ICMPV6_ECHO_REQUEST = 128
+ICMPV6_ECHO_REPLY = 129
 
 
 def checksum(source_string):
@@ -41,7 +43,15 @@ def checksum(source_string):
     return answer
 
 
-def receive_one_ping(my_socket, id, timeout):
+def _get_icmp_header_offset(received_packet, family):
+    if family != socket.AF_INET6:
+        return 20
+    if received_packet and (received_packet[0] >> 4) == 6:
+        return 40
+    return 0
+
+
+def receive_one_ping(my_socket, id, timeout, family):
     """
     Receive the ping from the socket.
     """
@@ -55,11 +65,20 @@ def receive_one_ping(my_socket, id, timeout):
 
         time_received = time.time()
         received_packet, addr = my_socket.recvfrom(1024)
-        icmpHeader = received_packet[20:28]
-        type, code, checksum, packet_id, sequence = struct.unpack("bbHHh", icmpHeader)
+        header_offset = _get_icmp_header_offset(received_packet, family)
+        icmpHeader = received_packet[header_offset:header_offset + 8]
+        if len(icmpHeader) < 8:
+            continue
+        type, code, checksum, packet_id, sequence = struct.unpack("BBHHH", icmpHeader)
+        if family == socket.AF_INET6 and type != ICMPV6_ECHO_REPLY:
+            continue
         if packet_id == id:
             bytes = struct.calcsize("d")
-            time_sent = struct.unpack("d", received_packet[28: 28 + bytes])[0]
+            if len(received_packet) < header_offset + 8 + bytes:
+                continue
+            time_sent = struct.unpack(
+                "d", received_packet[header_offset + 8: header_offset + 8 + bytes]
+            )[0]
             return time_received - time_sent
 
         time_left -= how_long_in_select
@@ -67,11 +86,19 @@ def receive_one_ping(my_socket, id, timeout):
             return
 
 
-def send_one_ping(my_socket, dest_addr, id, psize):
+def send_one_ping(my_socket, dest_addr, id, psize, family):
     """
     Send one ping to the given >dest_addr<.
     """
-    dest_addr = socket.gethostbyname(dest_addr)
+    if family == socket.AF_INET6:
+        dest_addr = dest_addr
+        icmp_type = ICMPV6_ECHO_REQUEST
+    else:
+        if isinstance(dest_addr, tuple):
+            dest_addr = (dest_addr[0], 1)
+        else:
+            dest_addr = (socket.gethostbyname(dest_addr), 1)
+        icmp_type = ICMP_ECHO_REQUEST
 
     # Remove header size from packet size
     # psize = psize - 8
@@ -84,33 +111,45 @@ def send_one_ping(my_socket, dest_addr, id, psize):
     my_checksum = 0
 
     # Make a dummy heder with a 0 checksum.
-    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, my_checksum, id, 1)
+    header = struct.pack("BBHHH", icmp_type, 0, my_checksum, id, 1)
     bytes = struct.calcsize("d")
     data = (psize - bytes) * b"Q"
     data = struct.pack("d", time.time()) + data
 
-    # Calculate the checksum on the data and the dummy header.
-    my_checksum = checksum(header + data)
+    if family != socket.AF_INET6:
+        # Calculate the checksum on the data and the dummy header.
+        my_checksum = checksum(header + data)
 
     # Now that we have the right checksum, we put that in. It's just easier
     # to make up a new header than to stuff it into the dummy.
     header = struct.pack(
-        "bbHHh", ICMP_ECHO_REQUEST, 0, socket.htons(my_checksum), id, 1
+        "BBHHH", icmp_type, 0, socket.htons(my_checksum), id, 1
     )
     packet = header + data
-    my_socket.sendto(packet, (dest_addr, 1))  # Don't know about the 1
+    my_socket.sendto(packet, dest_addr)
+
+
+def resolve_dest_addr(dest_addr):
+    addrinfos = socket.getaddrinfo(
+        dest_addr, None, socket.AF_UNSPEC, socket.SOCK_DGRAM
+    )
+    family, _, _, _, sockaddr = addrinfos[0]
+    return family, sockaddr
 
 
 def ping(dest_addr, timeout, psize, flag=0):
     """
     Returns either the delay (in seconds) or none on timeout.
     """
-    icmp = socket.getprotobyname("icmp")
+    family, dest_sockaddr = resolve_dest_addr(dest_addr)
+    if family == socket.AF_INET6:
+        icmp = socket.IPPROTO_ICMPV6
+        sock_type = socket.SOCK_DGRAM
+    else:
+        icmp = socket.getprotobyname("icmp")
+        sock_type = socket.SOCK_DGRAM if os.getuid() != 0 else socket.SOCK_RAW
     try:
-        if os.getuid() != 0:
-            my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, icmp)
-        else:
-            my_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
+        my_socket = socket.socket(family, sock_type, icmp)
     except socket.error as e:
         if e.errno == 1:
             # Operation not permitted
@@ -122,8 +161,8 @@ def ping(dest_addr, timeout, psize, flag=0):
     flag &= 0x00FF
     my_id = process_pre | flag
 
-    send_one_ping(my_socket, dest_addr, my_id, psize)
-    delay = receive_one_ping(my_socket, my_id, timeout)
+    send_one_ping(my_socket, dest_sockaddr, my_id, psize, family)
+    delay = receive_one_ping(my_socket, my_id, timeout, family)
 
     my_socket.close()
     return delay
