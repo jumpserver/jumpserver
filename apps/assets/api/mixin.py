@@ -21,6 +21,9 @@ class SerializeToTreeNodeMixin:
 
     @timeit
     def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=1, with_assets=False):
+        if not nodes:
+            return []
+
         def _name(node: AssetTreeNode):
             v = node.value
             if not with_asset_amount:
@@ -72,6 +75,9 @@ class SerializeToTreeNodeMixin:
 
     @timeit
     def serialize_assets(self, assets, node_key=None, get_pid=None):
+        if not assets:
+            return []
+
         if not get_pid and not node_key:
             get_pid = lambda asset, platform: getattr(asset, 'parent_key', '')
 
