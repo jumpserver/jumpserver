@@ -20,7 +20,7 @@ class SerializeToTreeNodeMixin:
         return False
 
     @timeit
-    def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=2, with_assets=False):
+    def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=1, with_assets=False):
         def _name(node: AssetTreeNode):
             v = node.value
             if not with_asset_amount:
@@ -41,7 +41,7 @@ class SerializeToTreeNodeMixin:
                 'title': _name(node),
                 'pId': node.parent_key,
                 'isParent': is_parent(node),
-                'open': node.level < expand_level,
+                'open': node.level <= expand_level,
                 'meta': {
                     'type': 'node',
                     'data': {

@@ -531,6 +531,15 @@ class SomeNodesMixin:
         root_nodes = cls.objects.filter(parent_key='', key__regex=r'^[0-9]+$') \
             .exclude(key__startswith='-').order_by('key')
         return root_nodes
+    
+    @classmethod
+    def get_or_create_org_root(cls, org):
+        org_root = cls.org_root_nodes().filter(org_id=org.id).first()
+        if org_root:
+            return org_root
+        with tmp_to_org(org):
+            org_root = cls.create_org_root_node()
+        return org_root
 
 
 class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):

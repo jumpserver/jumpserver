@@ -77,31 +77,37 @@ class AssetTree(Tree):
                  full_tree=True):
         '''
         :param assets_q_object: 只生成这些资产所在的节点树
-        :param category: Description: 只生成改类别资产所在的节点树
-        :param org: 只生成该组织的资产节点树
+        :param category: 只生成该类别资产所在的节点树
+        :param org: 只生成该组织下的资产节点树
+
         :param with_assets_node_id: 仅指定节点下包含资产
         :param with_assets: 所有节点都包含资产
-        :param with_assets_limit: 包含资产时, 所有资产的最大数量, 主要用于返回搜索树
+        :param with_assets_limit: 包含资产时, 所有资产的最大数量
+
         :param full_tree: 完整树包含所有节点，否则只包含节点的资产总数不为0的节点
         '''
 
         super().__init__()
-        self._org: Organization = org or current_org
-        self._nodes_attr_mapper  = defaultdict(dict)
-        self._nodes_assets_amount_mapper = defaultdict(int)
-        # 过滤资产的 Q 对象
-        self._q_assets: Q = assets_q_object or Q()
-        # 通过类别过滤资产
+        ## 通过资产构建节点树, 支持 Q, category, org 等过滤条件 ##
+        self._assets_q_object: Q = assets_q_object or Q()
         self._category = self._check_category(category)
         self._category_platform_ids = set()
+        self._org: Organization = org or current_org
+
+        # org 下全量节点属性映射, 构建资产树时根据完整的节点进行构建
+        self._nodes_attr_mapper  = defaultdict(dict)
+        # 节点直接资产数量映射, 用于计算节点下总资产数量
+        self._nodes_assets_amount_mapper = defaultdict(int)
         # 节点下是否包含资产
         self._with_assets = with_assets # 所有节点都包含资产
-        self._with_assets_node_id = with_assets_node_id # 仅指定节点下包含资产
+        self._with_assets_node_id = with_assets_node_id # 仅指定节点下包含资产, 优先级高于 with_assets
         self._with_assets_limit = with_assets_limit
         self._node_assets_mapper = defaultdict(dict)
-        # 是否构建完整树，包含所有节点，否则只包含有资产总数量不为0的节点
+
+        # 是否包含资产总数量为 0 的节点
         self._full_tree = full_tree
 
+        # 初始化时构建树
         self.build()
     
     def _check_category(self, category):
@@ -151,22 +157,24 @@ class AssetTree(Tree):
     
     @timeit
     def _load_nodes_assets_if_needed(self):
-        if not self._with_assets and not self._with_assets_node_id:
+        need_load = self._with_assets or self._with_assets_node_id
+        if not need_load:
             return
 
         q = self._make_assets_q_object()
         if self._with_assets_node_id:
+            # 仅指定节点下包含资产，优先级高于 with_assets
             q &= Q(node_id=self._with_assets_node_id)
 
         assets = Asset.objects.filter(q).values(
             'node_id', 'id', 'platform_id', 'name', 'address', 'is_active', 'comment', 'org_id'
-        ).order_by('node__key')  # 按照 node_key 排序，尽可能保证前面节点的资产较多
-        assets = list(assets[:self._with_assets_limit])
-        for asset in assets:
-            asset['id'] = str(asset['id'])
-            asset['node_id'] = str(asset['node_id'])
-            nid = str(asset['node_id'])
-            aid = str(asset['id'])
+        )
+        # 按照 node_key 排序，尽可能保证前面节点的资产较多
+        # 限制资产数量
+        assets = assets.order_by('node__key')[:self._with_assets_limit]
+        for asset in list(assets):
+            nid = asset['node_id'] = str(asset['node_id'])
+            aid = asset['id'] = str(asset['id'])
             self._node_assets_mapper[nid][aid] = asset
         
     @timeit
@@ -174,8 +182,8 @@ class AssetTree(Tree):
         q = Q(org_id=self._org.id)
         if self._category_platform_ids:
             q &= Q(platform_id__in=self._category_platform_ids) 
-        if self._q_assets:
-            q &= self._q_assets
+        if self._assets_q_object:
+            q &= self._assets_q_object
         return q
     
     @timeit
@@ -221,18 +229,12 @@ class AssetTree(Tree):
         for node in nodes_to_remove:
             self.remove_node(node)
     
-    def get_assets(self, node_key=None):
+    def get_assets(self):
         assets = []
-        if node_key is None:
-            # 获取所有资产
-            for node in self.nodes.values():
-                node: AssetTreeNode
-                _assets = node.get_assets()
-                assets.extend(_assets)
-        else:
-            node: AssetTreeNode = self.get_node(node_key)
-            if node:
-                assets = node.get_assets()
+        for node in self.nodes.values():
+            node: AssetTreeNode
+            _assets = node.get_assets()
+            assets.extend(_assets)
         return assets
 
     def _uuids_to_string(self, uuids):

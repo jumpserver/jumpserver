@@ -1,6 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -11,6 +11,7 @@ from common.tree import TreeNodeSerializer
 from common.utils import get_logger
 from orgs.mixins import generics
 from orgs.utils import current_org
+from orgs.models import Organization
 from .mixin import SerializeToTreeNodeMixin
 from .. import serializers
 from ..const import AllTypes
@@ -34,6 +35,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
 
     instance = None
     is_initial = False
+    perm_model = Node
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
@@ -66,37 +68,12 @@ class NodeChildrenApi(generics.ListCreateAPIView):
             else:
                 node = Node.org_root()
             return node
+
         if pk:
             node = get_object_or_404(Node, pk=pk)
         else:
             node = get_object_or_404(Node, key=key)
         return node
-
-    def get_org_root_queryset(self, query_all):
-        if query_all:
-            return Node.objects.all()
-        else:
-            return Node.org_root_nodes()
-
-    def get_queryset(self):
-        query_all = self.request.query_params.get("all", "0") == "all"
-
-        if self.is_initial and current_org.is_root():
-            return self.get_org_root_queryset(query_all)
-
-        if self.is_initial:
-            with_self = True
-        else:
-            with_self = False
-
-        if not self.instance:
-            return Node.objects.none()
-
-        if query_all:
-            queryset = self.instance.get_all_children(with_self=with_self)
-        else:
-            queryset = self.instance.get_children(with_self=with_self)
-        return queryset
 
 
 class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
@@ -113,79 +90,91 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
     model = Node
 
-    def filter_queryset(self, queryset):
-        """ queryset is Node queryset """
-        if not self.request.GET.get('search'):
-            return queryset
-        queryset = super().filter_queryset(queryset)
-        queryset = self.model.get_ancestor_queryset(queryset)
-        return queryset
-
-    def get_queryset_for_assets(self):
-        query_all = self.request.query_params.get("all", "0") == "all"
-        include_assets = self.request.query_params.get('assets', '0') == '1'
-        if not self.instance or not include_assets:
-            return Asset.objects.none()
-        if not self.request.GET.get('search') and self.instance.is_org_root():
-            return Asset.objects.none()
-        if query_all:
-            assets = self.instance.get_all_assets()
-        else:
-            assets = self.instance.get_assets()
-        return assets.only(
-            "id", "name", "address", "platform_id",
-            "org_id", "is_active", 'comment'
-        ).prefetch_related('platform')
-
-    def filter_queryset_for_assets(self, assets):
-        search = self.request.query_params.get('search')
-        if search:
-            q = Q(name__icontains=search) | Q(address__icontains=search)
-            assets = assets.filter(q)
-        return assets
-
-    def _list(self, request, *args, **kwargs):
-        nodes = self.filter_queryset(self.get_queryset()).order_by('value')
-        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
-        nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
-        assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
-        node_key = self.instance.key if self.instance else None
-        assets = self.serialize_assets(assets, node_key=node_key)
-        data = [*nodes, *assets]
-        return Response(data=data)
-    
     def list(self, request, *args, **kwargs):
-        if self.instance is None:
-            # TODO: 全局组织
-            return Response(data=[])
-
         search = request.query_params.get('search')
         with_assets = request.query_params.get('assets', '0') == '1'
-        if with_assets:
-            # 返回节点的子节点及其资产(如果是根节点返回自己)
-            if search:
-                assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
-                tree = AssetTree(assets_q_object=assets_q_object, with_assets=True, with_assets_limit=1000, full_tree=False)
-                nodes = tree.get_nodes()
-                assets = tree.get_assets()
-            else:
-                tree = AssetTree(with_assets_node_id=self.instance.id)
-                with_self = True if self.instance.is_org_root() else False
-                nodes = tree.get_node_children(key=self.instance.key, with_self=with_self)
-                assets = tree.get_assets(node_key=self.instance.key)
-        else:
-            # 返回完整资产树
-            tree = AssetTree()
-            nodes = tree.get_nodes()
-            assets = []
-        
         with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
         with_asset_amount = True
-        expand_level = 10000 if search else 2  # search 时展开所有节点
+        nodes, assets, expand_level = self.get_nodes_assets(search, with_assets)
         nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount, expand_level=expand_level)
         assets = self.serialize_assets(assets)
         data = [*nodes, *assets]
         return Response(data=data)
+
+    def get_nodes_assets(self, search, with_assets):
+        #
+        # 资产管理-节点树
+        #
+
+        # 全局组织: 初始化节点树, 返回所有节点, 不包含资产, 不展开节点
+        # 实体组织: 初始化节点树, 返回所有节点, 不包含资产, 展开一级节点
+        # 前端搜索
+        if not with_assets:
+            if current_org.is_root():
+                orgs = Organization.objects.all()
+                expand_level = 0
+            else:
+                orgs = [current_org]
+                expand_level = 1
+            
+            nodes = []
+            assets = []
+            for org in orgs:
+                tree = AssetTree(org=org)
+                org_nodes = tree.get_nodes()
+                nodes.extend(org_nodes)
+            return nodes, assets, expand_level
+        
+        #
+        # 权限管理、账号发现、风险检测 - 资产节点树
+        #
+
+        # 全局组织: 搜索资产, 生成资产节点树, 过滤每个组织前 1000 个资产, 展开所有节点
+        # 实体组织: 搜索资产, 生成资产节点树, 过滤前 1000 个资产, 展开所有节点
+        if search:
+            if current_org.is_root():
+                orgs = list(Organization.objects.all())
+            else:
+                orgs = [current_org]
+            nodes = []
+            assets = []
+            assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
+            with_assets_limit = 1000 / len(orgs)
+            for org in orgs:
+                tree = AssetTree(
+                    assets_q_object=assets_q_object, org=org, 
+                    with_assets=True, with_assets_limit=with_assets_limit, full_tree=False
+                )
+                nodes.extend(tree.get_nodes())
+                assets.extend(tree.get_assets())
+            expand_level = 10000  # search 时展开所有节点
+            return nodes, assets, expand_level
+        
+        # 全局组织: 展开某个节点及其资产
+        # 实体组织: 展开某个节点及其资产
+        # 实体组织: 初始化资产节点树, 自动展开根节点及其资产, 所以节点要包含自己 (特殊情况)
+        if self.instance:
+            nodes = []
+            tree = AssetTree(with_assets_node_id=self.instance.id, org=self.instance.org)
+            nodes_with_self = False
+            if not current_org.is_root() and self.instance.is_org_root():
+                nodes_with_self = True
+            nodes = tree.get_node_children(key=self.instance.key, with_self=nodes_with_self)
+            assets = tree.get_assets()
+            expand_level = 1  # 默认只展开第一级
+            return nodes, assets, expand_level
+        
+        # 全局组织: 初始化资产节点树, 仅返回各组织根节点, 不展开
+        orgs = Organization.objects.all()
+        nodes = []
+        assets = []
+        for org in orgs:
+            tree = AssetTree(org=org, with_assets=False)
+            if not tree.root:
+                continue
+            nodes.append(tree.root)
+        expand_level = 0  # 默认不展开节点
+        return nodes, assets, expand_level
 
 
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
