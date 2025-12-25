@@ -13,7 +13,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from pdf2image import convert_from_bytes
-from playwright.sync_api import sync_playwright
 
 charts_map = {
     "UserLoginReport": {

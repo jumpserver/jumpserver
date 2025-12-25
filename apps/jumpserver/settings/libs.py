@@ -88,6 +88,7 @@ SPECTACULAR_SETTINGS = {
         'jumpserver.views.schema.LabelRelatedFieldExtension',
     ],
     'SECURITY': [{'Bearer': []}],
+    'DISABLE_ERRORS_AND_WARNINGS': True
 }
 
 if CONFIG.VENDOR.lower() == 'jumpserver':
