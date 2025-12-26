@@ -192,6 +192,9 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
 
     def __str__(self):
         return '{0.name}({0.address})'.format(self)
+    
+    def node_display(self):
+        return self.node.full_value
 
     def get_labels(self):
         from labels.models import Label, LabeledResource

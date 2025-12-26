@@ -130,7 +130,7 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
         }
 
 
-class NodeDisplaySerializer(serializers.ListField):
+class NodeDisplaySerializer(serializers.CharField):
     def get_render_help_text(self):
         return _('Node path, format ["/org_name/node_name"], if node not exist, will create it')
 
@@ -146,7 +146,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
-    nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
+    node_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
                                   attrs=('id', 'name', 'type'))
@@ -159,8 +159,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         fields_mini = ['id', 'name', 'address'] + fields_fk
         fields_small = fields_mini + ['is_active', 'comment']
         fields_m2m = [
-            'nodes', 'labels', 'protocols',
-            'nodes_display', 'accounts',
+            'node', 'labels', 'protocols',
+            'node_display', 'accounts',
             'directory_services',
         ]
         read_only_fields = [
@@ -173,8 +173,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'auto_config': {'label': _('Auto info')},
             'name': {'label': _("Name"), 'initial': 'Asset name'},
             'address': {'label': _('Address')},
-            'nodes_display': {'label': _('Node path')},
-            'nodes': {'allow_empty': True, 'label': _("Nodes")},
+            'node_display': {'label': _('Node path')},
+            'node': {'allow_empty': True, 'label': _("Node")},
             'directory_services': {
                 'required': False,
                 'allow_empty': True,
@@ -250,7 +250,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
+        queryset = queryset.prefetch_related('zone', 'node', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type")) \
@@ -258,20 +258,18 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         return queryset
 
     @staticmethod
-    def perform_nodes_display_create(instance, nodes_display):
-        if not nodes_display:
+    def perform_node_display_create(instance, node_display):
+        if not node_display:
             return
-        nodes_to_set = []
-        for full_value in nodes_display:
-            if not full_value.startswith('/'):
-                full_value = '/' + instance.org.name + '/' + full_value
-            node = Node.objects.filter(full_value=full_value).first()
-            if node:
-                nodes_to_set.append(node)
-            else:
-                node = Node.create_node_by_full_value(full_value)
-            nodes_to_set.append(node)
-        instance.nodes.set(nodes_to_set)
+        node = None
+        full_value = node_display
+        if not full_value.startswith('/'):
+            full_value = '/' + instance.org.name + '/' + full_value
+        node = Node.objects.filter(full_value=full_value).first()
+        if not node:
+            node = Node.create_node_by_full_value(full_value)
+        instance.node = node
+        instance.save()
 
     @property
     def _asset_platform(self):
@@ -297,21 +295,21 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         else:
             return None
 
-    def validate_nodes(self, nodes):
-        if nodes:
-            return nodes
-        nodes_display = self.initial_data.get('nodes_display')
-        if nodes_display:
-            return nodes
+    def validate_node(self, node):
+        if node:
+            return node
+        node_display = self.initial_data.get('node_display')
+        if node_display:
+            return node
         default_node = Node.org_root()
         request = self.context.get('request')
         if not request:
-            return [default_node]
+            return default_node
         node_id = request.query_params.get('node_id')
         if not node_id:
-            return [default_node]
-        nodes = Node.objects.filter(id=node_id)
-        return nodes
+            return default_node
+        node = Node.objects.filter(id=node_id).first()
+        return node
 
     def is_valid(self, raise_exception=False):
         self._set_protocols_default()
@@ -398,10 +396,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     @atomic
     def create(self, validated_data):
-        nodes_display = validated_data.pop('nodes_display', '')
+        node_display = validated_data.pop('node_display', '')
         instance = super().create(validated_data)
         self.accounts_create(self._accounts, instance)
-        self.perform_nodes_display_create(instance, nodes_display)
+        self.perform_node_display_create(instance, node_display)
         return instance
 
     @staticmethod
@@ -432,10 +430,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     @atomic
     def update(self, instance, validated_data):
         old_platform = instance.platform
-        nodes_display = validated_data.pop('nodes_display', '')
+        node_display = validated_data.pop('node_display', '')
         instance = super().update(instance, validated_data)
         self.sync_platform_protocols(instance, old_platform)
-        self.perform_nodes_display_create(instance, nodes_display)
+        self.perform_node_display_create(instance, node_display)
         return instance
 
 
