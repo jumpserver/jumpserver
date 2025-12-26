@@ -1,4 +1,4 @@
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger, lazyproperty, timeit
 
 
 __all__ = ['TreeNode', 'Tree']
@@ -14,6 +14,7 @@ class TreeNode(object):
         self.value = value
         self.children = []
         self.parent = None
+        self.children_count_total = 0
     
     @lazyproperty
     def parent_key(self):
@@ -138,8 +139,11 @@ class Tree(object):
             parent.remove_child(node)
         self.nodes.pop(node.key, None)
     
-    def get_nodes(self):
-        return list(self.nodes.values())
+    def get_nodes(self, levels=None):
+        nodes = list(self.nodes.values())
+        if levels:
+            nodes = [ n for n in nodes if n.level in levels ]
+        return nodes
     
     def get_node_children(self, key, with_self=False):
         node = self.get_node(key)
@@ -150,6 +154,16 @@ class Tree(object):
             nodes.append(node)
         nodes.extend(node.children)
         return nodes
+        
+    @timeit
+    def _compute_children_count_total(self):
+        for node in reversed(list(self.nodes.values())):
+            total = 0
+            for child in node.children:
+                child: TreeNode
+                total += child.children_count_total + 1
+            node: TreeNode
+            node.children_count_total = total
     
     def print(self, count=10, simple=True):
         print('tree_root_key: ', getattr(self.root, 'key', 'No-root'))

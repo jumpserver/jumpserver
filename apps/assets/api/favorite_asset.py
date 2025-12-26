@@ -4,7 +4,7 @@ from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_root_org
-from ..models import FavoriteAsset
+from ..models import FavoriteAsset, Asset
 from ..serializers import FavoriteAssetSerializer
 
 __all__ = ['FavoriteAssetViewSet']

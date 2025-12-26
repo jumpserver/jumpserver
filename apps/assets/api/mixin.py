@@ -11,14 +11,6 @@ from assets.tree.asset_tree import AssetTreeNode
 class SerializeToTreeNodeMixin:
     request: Request
 
-    @lazyproperty
-    def is_sync(self):
-        sync_paths = ['/api/v1/perms/users/self/nodes/all-with-assets/tree/']
-        for p in sync_paths:
-            if p == self.request.path:
-                return True
-        return False
-
     @timeit
     def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=1, with_assets=False):
         if not nodes:
@@ -53,6 +45,7 @@ class SerializeToTreeNodeMixin:
                         "value": node.value,
                         "assets_amount": node.assets_amount,
                         "assets_amount_total": node.assets_amount_total,
+                        "children_count_total": node.children_count_total,
                     },
                 }
             }

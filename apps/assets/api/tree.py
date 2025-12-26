@@ -39,7 +39,13 @@ class NodeChildrenApi(generics.ListCreateAPIView):
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
+        self.initial_org_root_node_if_need()
         self.instance = self.get_object()
+    
+    def initial_org_root_node_if_need(self):
+        if current_org.is_root():
+            return
+        Node.org_root()
 
     def perform_create(self, serializer):
         data = serializer.validated_data
@@ -91,91 +97,145 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     model = Node
 
     def list(self, request, *args, **kwargs):
-        search = request.query_params.get('search')
         with_assets = request.query_params.get('assets', '0') == '1'
-        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
-        with_asset_amount = True
-        nodes, assets, expand_level = self.get_nodes_assets(search, with_assets)
-        nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount, expand_level=expand_level)
-        assets = self.serialize_assets(assets)
-        data = [*nodes, *assets]
-        return Response(data=data)
+        search = request.query_params.get('search')
+        key = request.query_params.get('key')
 
-    def get_nodes_assets(self, search, with_assets):
-        #
-        # 资产管理-节点树
-        #
-
-        # 全局组织: 初始化节点树, 返回所有节点, 不包含资产, 不展开节点
-        # 实体组织: 初始化节点树, 返回所有节点, 不包含资产, 展开一级节点
-        # 前端搜索
         if not with_assets:
-            if current_org.is_root():
-                orgs = Organization.objects.all()
-                expand_level = 0
-            else:
-                orgs = [current_org]
-                expand_level = 1
-            
-            nodes = []
-            assets = []
-            for org in orgs:
-                tree = AssetTree(org=org)
-                org_nodes = tree.get_nodes()
-                nodes.extend(org_nodes)
-            return nodes, assets, expand_level
+            # 初始化资产树 - 不包含资产
+            return self.init_asset_tree()
         
-        #
-        # 权限管理、账号发现、风险检测 - 资产节点树
-        #
-
-        # 全局组织: 搜索资产, 生成资产节点树, 过滤每个组织前 1000 个资产, 展开所有节点
-        # 实体组织: 搜索资产, 生成资产节点树, 过滤前 1000 个资产, 展开所有节点
         if search:
-            if current_org.is_root():
-                orgs = list(Organization.objects.all())
-            else:
-                orgs = [current_org]
-            nodes = []
-            assets = []
-            assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
-            with_assets_limit = 1000 / len(orgs)
-            for org in orgs:
-                tree = AssetTree(
-                    assets_q_object=assets_q_object, org=org, 
-                    with_assets=True, with_assets_limit=with_assets_limit, full_tree=False
-                )
-                nodes.extend(tree.get_nodes())
-                assets.extend(tree.get_assets())
-            expand_level = 10000  # search 时展开所有节点
-            return nodes, assets, expand_level
+            # 初始化资产搜索树 - 包含资产
+            return self.search_asset_tree_with_assets(search)
         
-        # 全局组织: 展开某个节点及其资产
-        # 实体组织: 展开某个节点及其资产
-        # 实体组织: 初始化资产节点树, 自动展开根节点及其资产, 所以节点要包含自己 (特殊情况)
-        if self.instance:
-            nodes = []
-            tree = AssetTree(with_assets_node_id=self.instance.id, org=self.instance.org)
-            nodes_with_self = False
-            if not current_org.is_root() and self.instance.is_org_root():
-                nodes_with_self = True
-            nodes = tree.get_node_children(key=self.instance.key, with_self=nodes_with_self)
-            assets = tree.get_assets()
-            expand_level = 1  # 默认只展开第一级
-            return nodes, assets, expand_level
-        
-        # 全局组织: 初始化资产节点树, 仅返回各组织根节点, 不展开
-        orgs = Organization.objects.all()
+        if key:
+            # 展开资产树节点 - 包含资产
+            return self.expand_asset_tree_node_with_assets(key)
+
+        # 初始化资产树 - 包含资产
+        return self.init_asset_tree_with_assets()
+    
+    def init_asset_tree(self):
+        ''' 初始化资产树 - 不包含资产
+        返回所有节点，前端本地展开和搜索
+        全局组织: 不展开节点
+        实体组织: 展开第1级节点
+        '''
+        if current_org.is_root():
+            orgs = Organization.objects.all()
+            expand_level = 0
+        else:
+            orgs = [current_org]
+            expand_level = 1
+        nodes = []
+        for org in orgs:
+            tree = AssetTree(org=org)
+            _nodes = tree.get_nodes()
+            nodes.extend(_nodes)
+        nodes = self.serialize_nodes(
+            nodes, with_asset_amount=True, expand_level=expand_level
+        )
+        return Response(data=nodes)
+    
+    def init_asset_tree_with_assets(self):
+        ''' 初始化资产树 - 包含资产
+        全局组织: 返回第1级节点，不返回资产，不展开
+        实体组织: 返回第1级节点和第2级节点，返回第1级节点的资产，展开第1级节点
+        '''
+        if current_org.is_root():
+            orgs = Organization.objects.all()
+            node_levels = [1]
+            with_assets_node_levels = []
+            expand_level = 0
+        else:
+            orgs = [current_org]
+            node_levels = [1, 2]
+            with_assets_node_levels = [1]
+            expand_level = 1
+
         nodes = []
         assets = []
         for org in orgs:
-            tree = AssetTree(org=org, with_assets=False)
-            if not tree.root:
-                continue
-            nodes.append(tree.root)
-        expand_level = 0  # 默认不展开节点
-        return nodes, assets, expand_level
+            tree = AssetTree(
+                org=org, with_assets_node_levels=with_assets_node_levels
+            )
+            _nodes = tree.get_nodes(levels=node_levels)
+            nodes.extend(_nodes)
+            _assets = tree.get_assets()
+            assets.extend(_assets)
+        
+        nodes = self.serialize_nodes(
+            nodes, with_asset_amount=True, expand_level=expand_level, 
+            with_assets=True
+        )
+        assets = self.serialize_assets(assets)
+        data = [*nodes, *assets]
+        return Response(data=data)
+    
+    def expand_asset_tree_node_with_assets(self, key):
+        ''' 展开资产树节点 - 包含资产
+        全局组织: 返回展开节点的直接孩子节点，返回展开节点的资产，不展开节点
+        实体组织: 同上
+        '''
+        node = get_object_or_404(Node, key=key)
+        org = node.org
+        with_assets_node_id = node.id
+        expand_level = 0
 
+        tree = AssetTree(with_assets_node_id=with_assets_node_id, org=org)
+        tree_node = tree.get_node(key=node.key)
+        if not tree_node:
+            return Response(data=[])
+        _nodes = tree_node.children
+        nodes = self.serialize_nodes(
+            _nodes, with_asset_amount=True, expand_level=expand_level, 
+            with_assets=True
+        )
+        _assets = tree.get_assets()
+        assets = self.serialize_assets(_assets)
+        data = [*nodes, *assets]
+        return Response(data=data)
+    
+    def search_asset_tree_with_assets(self, search):
+        ''' 初始化资产搜索树 - 包含资产
+        不反回完整树，资产数量为0的节点不返回
+        全局组织: 返回所有节点，返回所有资产，展开所有节点，限制资产总数量 1000（n 个组织，每个组织分配1000/n个资产）
+        实体组织：同上，限制资产总数量 1000
+        '''
+        # 展开所有节点
+        expand_level = 10000
+        with_assets_all = True
+        with_assets_limit = 1000
+        full_tree = False
+        assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
+        if current_org.is_root():
+            orgs = list(Organization.objects.all())
+            with_assets_limit = with_assets_limit / len(orgs)
+        else:
+            orgs = [current_org]
+
+        nodes = []
+        assets = []
+        for org in orgs:
+            tree = AssetTree(
+                assets_q_object=assets_q_object, org=org, 
+                with_assets_all=with_assets_all, 
+                with_assets_limit=with_assets_limit,
+                full_tree=full_tree
+            )
+            _nodes = tree.get_nodes()
+            nodes.extend(_nodes)
+            _assets = tree.get_assets()
+            assets.extend(_assets)
+
+        nodes = self.serialize_nodes(
+            nodes, with_asset_amount=True, expand_level=expand_level, 
+            with_assets=True
+        )
+        assets = self.serialize_assets(assets)
+        data = [*nodes, *assets]
+        return Response(data=data)
 
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
     serializer_class = TreeNodeSerializer
