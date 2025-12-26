@@ -50,6 +50,7 @@ class AssetTreeNode(TreeNode):
         for asset in assets:
             asset['parent_key'] = self.key
             self.assets.append(AssetTreeNodeAsset(**asset))
+        return self.assets
     
     def get_assets(self):
         return self.assets
