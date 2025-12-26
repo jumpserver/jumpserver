@@ -146,7 +146,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         if current_org.is_root():
             orgs = Organization.objects.all()
             node_levels = [1]
-            with_assets_node_levels = []
+            with_assets_node_levels = None
             expand_level = 0
         else:
             orgs = [current_org]
@@ -211,7 +211,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
         if current_org.is_root():
             orgs = list(Organization.objects.all())
-            with_assets_limit = with_assets_limit / len(orgs)
+            with_assets_limit = max(100, with_assets_limit // max(1, orgs.count()))
         else:
             orgs = [current_org]
 
