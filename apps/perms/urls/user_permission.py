@@ -5,8 +5,6 @@ from .. import api
 user_permission_urlpatterns = [
     path('<str:user>/assets/<uuid:pk>/', api.UserPermedAssetRetrieveApi.as_view(), name='user-permed-asset'),
     path('<str:user>/assets/', api.UserAllPermedAssetsApi.as_view(), name='user-all-assets'),
-    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteAssetsApi.as_view(), name='user-favorite-assets'),
-    # 用户授权树只通过这一个 API 获取, 类似资产树
     path('<str:user>/nodes/children/tree/', api.UserPermNodeChildrenAsTreeApi.as_view(), name='user-perm-node-children-tree'),
 ]
 
