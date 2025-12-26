@@ -153,7 +153,6 @@ dependencies = [
     'pdf2image==1.17.0',
     'drf-spectacular-sidecar==2025.8.1',
     "django-oauth-toolkit==2.4.0",
-    "telnetlib3==2.0.8",
 ]
 
 [project.urls]
@@ -178,7 +177,7 @@ xpack = [
     'python-keystoneclient==5.1.0',
     'bce-python-sdk==0.8.87',
     'tencentcloud-sdk-python==3.0.941',
-    'aliyun-python-sdk-core-v3==2.13.33',
+    'aliyun-python-sdk-core-v3==2.13.36',
     'aliyun-python-sdk-ecs==4.24.64',
     'keystoneauth1==5.2.1',
     'oracledb==1.4.0',
