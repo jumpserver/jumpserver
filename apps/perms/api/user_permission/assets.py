@@ -7,10 +7,13 @@ from assets.api.asset.asset import AssetFilterSet
 from assets.models import Asset, Node, MyAsset
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
+from common.utils.django import get_object_or_none
 from orgs.utils import tmp_to_root_org
 from perms import serializers
 from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
+from perms.utils.utils import UserPermUtil
+from perms.tree import PermTreeNode
 from .mixin import (
     SelfOrPKUserMixin
 )
@@ -65,36 +68,46 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
     def get_assets(self):
         return Asset.objects.none()
 
-    query_asset_util: UserPermAssetUtil
-
     @lazyproperty
-    def query_asset_util(self):
-        return UserPermAssetUtil(self.user)
+    def _util(self):
+        return UserPermUtil(user=self.user)
 
 
 class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
-    pagination_class = AllPermedAssetPagination
 
     def get_assets(self):
         if self.user.is_superuser and self.request.query_params.get('id'):
             return Asset.objects.filter(id=self.request.query_params.get('id'))
 
         node_id = self.request.query_params.get('node_id')
-        if is_uuid(node_id):
-            __, assets = self.query_asset_util.get_node_all_assets(node_id)
-        else:
-            assets = self.query_asset_util.get_all_assets()
+
+        if node_id == PermTreeNode.SpecialKey.FAVORITE:
+            return UserPermUtil.get_favorite_assets(user=self.user)
+
+        if node_id == PermTreeNode.SpecialKey.UNGROUPED:
+            return self._util.get_ungrouped_assets()
+
+        node = get_object_or_none(Node, id=node_id)
+        if node:
+            assets = self._util.get_node_all_assets(node)
+            return assets
+
+        assets = UserPermUtil.get_all_assets(user=self.user)
         return assets
 
 
 class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
+
     def get_assets(self):
-        return self.query_asset_util.get_direct_assets()
+        assets = self._util.get_ungrouped_assets()
+        return assets
 
 
 class UserFavoriteAssetsApi(BaseUserPermedAssetsApi):
+
     def get_assets(self):
-        return self.query_asset_util.get_favorite_assets()
+        assets = UserPermUtil.get_favorite_assets(user=self.user)
+        return assets
 
 
 class UserPermedNodeAssetsApi(BaseUserPermedAssetsApi):

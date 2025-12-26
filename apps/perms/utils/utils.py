@@ -2,9 +2,9 @@
 from django.db.models import Q
 
 from common.utils import timeit, lazyproperty, get_logger, is_uuid
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_org
 from users.models import User
-from assets.models import Node, Asset
+from assets.models import Node, Asset, FavoriteAsset
 from perms.models import AssetPermission
 
 
@@ -133,7 +133,37 @@ class UserPermUtil(object):
 
         q = Q(node_id__in=dn_all_nodes_ids)
         q |= Q(node_id__in=other_nodes_ids) & Q(id__in=self._user_direct_asset_ids)
-        assets = Asset.objects.filter(org_id=self._org.id).filter(q)
+        assets = Asset.objects.filter(org_id=self._org.id).filter(q).valid()
+        return assets
+    
+    def get_all_assets_of_org(self):
+        with tmp_to_org(self._org):
+            root_node = Node.org_root()
+            assets = self.get_node_all_assets(root_node)
+            return assets
+    
+    @classmethod
+    def get_all_assets(cls, user):
+        if current_org.is_root():
+            orgs = user.orgs.all()
+        else:
+            orgs = user.orgs.filter(id=current_org.id)
+        
+        assets = Asset.objects.none()
+        for org in orgs:
+            _util = cls(user=user, org=org)
+            org_assets = _util.get_all_assets_of_org()
+            assets |= org_assets
+        return assets
+
+    @classmethod
+    def get_favorite_assets(cls, user: User):
+        asset_ids = FavoriteAsset.get_user_favorite_asset_ids(user)
+        assets = Asset.objects.filter(id__in=asset_ids).valid()
+        return assets
+    
+    def get_ungrouped_assets(self):
+        assets = Asset.objects.filter(id__in=self._user_direct_asset_ids).valid()
         return assets
     
     def _uuids_to_string(self, uuids):

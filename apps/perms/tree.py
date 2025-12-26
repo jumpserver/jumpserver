@@ -25,6 +25,10 @@ class PermTreeNode(AssetTreeNode):
         DN = 'dn'
         # Node with only direct permission assets
         DA = 'da'
+    
+    class SpecialKey(TextChoices):
+        FAVORITE = 'favorite', _('Favorite')
+        UNGROUPED = 'ungrouped', _('Ungrouped')
 
     def __init__(self, tp=None, **kwargs):
         self.type = tp or self.Type.BRIDGE

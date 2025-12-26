@@ -3,54 +3,11 @@ from django.urls import path, include
 from .. import api
 
 user_permission_urlpatterns = [
-    # <str:user> such as: my | self | user.id
-    # assets
-    path('<str:user>/assets/<uuid:pk>/', api.UserPermedAssetRetrieveApi.as_view(),
-         name='user-permed-asset'),
-    path('<str:user>/assets/', api.UserAllPermedAssetsApi.as_view(),
-         name='user-all-assets'),
-
-    path('<str:user>/nodes/ungrouped/assets/', api.UserDirectPermedAssetsApi.as_view(),
-         name='user-direct-assets'),
-    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteAssetsApi.as_view(),
-         name='user-favorite-assets'),
-    path('<str:user>/nodes/<uuid:node_id>/assets/', api.UserPermedNodeAssetsApi.as_view(),
-         name='user-node-assets'),
-
-    # nodes
-    path('<str:user>/nodes/', api.UserAllPermedNodesApi.as_view(),
-         name='user-all-nodes'),
-    path('<str:user>/nodes/children/', api.UserPermedNodeChildrenApi.as_view(),
-         name='user-node-children'),
-
-     # 授权树只通过这一个 API 获取, 类似资产树
-     path('<str:user>/nodes/children/tree/', api.UserPermNodeChildrenAsTreeApi.as_view(), 
-          name='user-perm-node-children-tree'),
-
-    # tree-asset
-#     path('<str:user>/assets/tree/', api.UserAllPermedAssetsAsTreeApi.as_view(),
-#          name='user-direct-assets-as-tree'),
-#     path('<str:user>/ungroup/assets/tree/', api.UserUngroupAssetsAsTreeApi.as_view(),
-#          name='user-ungroup-assets-as-tree'),
-
-    # tree-node，不包含资产
-#     path('<str:user>/nodes/tree/', api.UserAllPermedNodesAsTreeApi.as_view(),
-#          name='user-all-nodes-as-tree'),
-#     path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
-#          name='user-node-children-as-tree'),
-
-    # tree-node-with-asset
-    # 异步树
-#     path('<str:user>/nodes/children-with-assets/tree/',
-#          api.UserPermedNodeChildrenWithAssetsAsTreeApi.as_view(),
-#          name='user-node-children-with-assets-as-tree'),
-#     path('<str:user>/nodes/children-with-assets/category/tree/',
-#          api.UserPermedNodeChildrenWithAssetsAsCategoryTreeApi.as_view(),
-#          name='user-node-children-with-assets-as-category-tree'),
-    # 同步树
-#     path('<str:user>/nodes/all-with-assets/tree/',
-#          api.UserPermedNodesWithAssetsAsTreeApi.as_view(),
-#          name='user-nodes-with-assets-as-tree'),
+    path('<str:user>/assets/<uuid:pk>/', api.UserPermedAssetRetrieveApi.as_view(), name='user-permed-asset'),
+    path('<str:user>/assets/', api.UserAllPermedAssetsApi.as_view(), name='user-all-assets'),
+    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteAssetsApi.as_view(), name='user-favorite-assets'),
+    # 用户授权树只通过这一个 API 获取, 类似资产树
+    path('<str:user>/nodes/children/tree/', api.UserPermNodeChildrenAsTreeApi.as_view(), name='user-perm-node-children-tree'),
 ]
 
 user_group_permission_urlpatterns = [
