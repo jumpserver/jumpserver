@@ -68,10 +68,6 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
     def get_assets(self):
         return Asset.objects.none()
 
-    @lazyproperty
-    def _util(self):
-        return UserPermUtil(user=self.user)
-
 
 class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
 
@@ -85,11 +81,13 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
             return UserPermUtil.get_favorite_assets(user=self.user)
 
         if node_id == PermTreeNode.SpecialKey.UNGROUPED:
-            return self._util.get_ungrouped_assets()
+            _util = UserPermUtil(user=self.user)
+            return _util.get_ungrouped_assets()
 
         node = get_object_or_none(Node, id=node_id)
         if node:
-            assets = self._util.get_node_all_assets(node)
+            _util= UserPermUtil(user=self.user, org=node.org)
+            assets = _util.get_node_all_assets(node)
             return assets
 
         assets = UserPermUtil.get_all_assets(user=self.user)
@@ -99,7 +97,8 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
 class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
 
     def get_assets(self):
-        assets = self._util.get_ungrouped_assets()
+        _util = UserPermUtil(user=self.user)
+        assets = _util.get_ungrouped_assets()
         return assets
 
 

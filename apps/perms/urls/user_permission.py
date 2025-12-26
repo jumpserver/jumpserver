@@ -9,17 +9,11 @@ user_permission_urlpatterns = [
 ]
 
 user_group_permission_urlpatterns = [
-    # 查询某个用户组授权的资产和资产组
-    path('<uuid:pk>/assets/', api.UserGroupGrantedAssetsApi.as_view(),
-         name='user-group-assets'),
-    path('<uuid:pk>/nodes/', api.UserGroupGrantedNodesApi.as_view(),
-         name='user-group-nodes'),
-    path('<uuid:pk>/nodes/children/', api.UserGroupGrantedNodesApi.as_view(),
-         name='user-group-nodes-children'),
-    path('<uuid:pk>/nodes/children/tree/', api.UserGroupGrantedNodeChildrenAsTreeApi.as_view(),
-         name='user-group-nodes-children-as-tree'),
-    path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGroupGrantedNodeAssetsApi.as_view(),
-         name='user-group-node-assets'),
+    path('<uuid:pk>/assets/', api.UserGroupGrantedAssetsApi.as_view(), name='user-group-assets'),
+    path('<uuid:pk>/nodes/', api.UserGroupGrantedNodesApi.as_view(), name='user-group-nodes'),
+    path('<uuid:pk>/nodes/children/', api.UserGroupGrantedNodesApi.as_view(), name='user-group-nodes-children'),
+    path('<uuid:pk>/nodes/children/tree/', api.UserGroupGrantedNodeChildrenAsTreeApi.as_view(), name='user-group-nodes-children-as-tree'),
+    path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGroupGrantedNodeAssetsApi.as_view(), name='user-group-node-assets'),
 ]
 
 user_permission_urlpatterns = [
