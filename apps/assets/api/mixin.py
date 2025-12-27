@@ -12,7 +12,7 @@ class SerializeToTreeNodeMixin:
     request: Request
 
     @timeit
-    def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=1, with_assets=False):
+    def serialize_nodes(self, nodes: List[AssetTreeNode], with_asset_amount=False, expand_level=1, tree_type='node'):
         if not nodes:
             return []
 
@@ -24,9 +24,9 @@ class SerializeToTreeNodeMixin:
             return v
         
         def is_parent(node: AssetTreeNode):
-            if with_assets:
+            if tree_type == 'asset':
                 return node.assets_amount > 0 or not node.is_leaf
-            else:
+            else:  # tree_type == 'node'
                 return not node.is_leaf
 
         data = [

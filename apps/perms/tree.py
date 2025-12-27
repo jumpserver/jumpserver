@@ -10,13 +10,13 @@ from assets.tree.asset_tree import AssetTree, AssetTreeNode, AssetTreeNodeAsset
 from perms.utils.utils import UserPermUtil
 
 
-__all__ = ['UserPermTree']
+__all__ = ['UserPermAssetTree']
 
 
 logger = get_logger(__name__)
 
 
-class PermTreeNode(AssetTreeNode):
+class UserPermAssetTreeNode(AssetTreeNode):
 
     class Type:
         # Neither a permission node nor a node with direct permission assets
@@ -42,9 +42,9 @@ class PermTreeNode(AssetTreeNode):
         return data
     
 
-class UserPermTree(AssetTree):
+class UserPermAssetTree(AssetTree):
 
-    TreeNode = PermTreeNode
+    TreeNode = UserPermAssetTreeNode
 
     def __init__(self, user, **kwargs):
 
@@ -66,11 +66,11 @@ class UserPermTree(AssetTree):
     def _get_tree_node_data(self, node_id):
         data = super()._get_tree_node_data(node_id)
         if node_id in self._util._user_direct_node_all_children_ids:
-            tp = PermTreeNode.Type.DN
+            tp = UserPermAssetTreeNode.Type.DN
         elif self._nodes_assets_amount_mapper.get(node_id, 0) > 0:
-            tp = PermTreeNode.Type.DA
+            tp = UserPermAssetTreeNode.Type.DA
         else:
-            tp = PermTreeNode.Type.BRIDGE
+            tp = UserPermAssetTreeNode.Type.BRIDGE
         data.update({ 'tp': tp })
         return data
     

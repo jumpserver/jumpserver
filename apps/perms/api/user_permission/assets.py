@@ -13,7 +13,7 @@ from perms import serializers
 from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
 from perms.utils.utils import UserPermUtil
-from perms.tree import PermTreeNode
+from perms.tree import UserPermAssetTreeNode
 from .mixin import (
     SelfOrPKUserMixin
 )
@@ -77,10 +77,10 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
 
         node_id = self.request.query_params.get('node_id')
 
-        if node_id == PermTreeNode.SpecialKey.FAVORITE:
+        if node_id == UserPermAssetTreeNode.SpecialKey.FAVORITE:
             return UserPermUtil.get_favorite_assets(user=self.user)
 
-        if node_id == PermTreeNode.SpecialKey.UNGROUPED:
+        if node_id == UserPermAssetTreeNode.SpecialKey.UNGROUPED:
             _util = UserPermUtil(user=self.user)
             return _util.get_ungrouped_assets()
 
