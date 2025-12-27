@@ -5,6 +5,7 @@ from orgs.utils import current_org
 from orgs.models import Organization
 from assets.models import Asset, Node, Platform
 from assets.const.category import Category
+from assets.const.types import AllTypes
 from common.utils import get_logger, timeit, lazyproperty
 
 from .tree import TreeNode, Tree
@@ -69,7 +70,7 @@ class AssetTree(Tree):
 
     TreeNode = AssetTreeNode
 
-    def __init__(self, assets_q_object: Q = None, category=None, org=None, 
+    def __init__(self, assets_q_object: Q = None, asset_category=None, asset_type=None, org=None, 
                  with_assets_all=False, with_assets_node_id=None, with_assets_node_levels=None, 
                  with_assets_limit=None, 
                  full_tree=True):
@@ -88,8 +89,9 @@ class AssetTree(Tree):
         super().__init__()
         ## 通过资产构建节点树, 支持 Q, category, org 等过滤条件 ##
         self._assets_q_object: Q = assets_q_object or Q()
-        self._category = self._check_category(category)
-        self._category_platform_ids = set()
+        self._asset_category = self._check_asset_category(asset_category)
+        self._asset_type = self._check_asset_type(asset_type)
+        self._asset_platform_ids = set()
         self._org: Organization = org or current_org
 
         # org 下全量节点属性映射, 构建资产树时根据完整的节点进行构建
@@ -109,18 +111,23 @@ class AssetTree(Tree):
         # 初始化时构建树
         self.build()
     
-    def _check_category(self, category):
-        if category is None:
-            return None
+    def _check_asset_category(self, category):
         if category in Category.values:
             return category
         logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
         return None
 
+    def _check_asset_type(self, asset_type):
+        types = list(dict(AllTypes.choices()).keys())
+        if asset_type in types:
+            return asset_type
+        logger.warning(f"Invalid asset_type '{asset_type}' for AssetSearchTree.")
+        return None
+
     @timeit
     def build(self):
         self._load_nodes_attr_mapper()
-        self._load_category_platforms_if_needed()
+        self._load_asset_platforms_if_needed()
         self._load_nodes_assets_amount()
         self._init_tree()
         self._load_nodes_assets_if_needed()
@@ -129,13 +136,17 @@ class AssetTree(Tree):
         self._compute_children_count_total()
     
     @timeit
-    def _load_category_platforms_if_needed(self):
-        if self._category is None:
-            return
-        ids = Platform.objects.filter(category=self._category).values_list('id', flat=True)
+    def _load_asset_platforms_if_needed(self):
+        if self._asset_type:
+            q = Q(type=self._asset_type)
+        elif self._asset_category:
+            q = Q(category=self._asset_category)
+        else:
+            q = Q()
+        ids = ids = Platform.objects.filter(q).values_list('id', flat=True)
         ids = self._uuids_to_string(ids)
-        self._category_platform_ids = ids
-
+        self._asset_platform_ids = set(ids)
+    
     @timeit
     def _load_nodes_attr_mapper(self):
         nodes = Node.objects.filter(org_id=self._org.id).values('id', 'key', 'value')
@@ -158,8 +169,8 @@ class AssetTree(Tree):
     @timeit
     def _make_assets_q_object(self) -> Q:
         q = Q(org_id=self._org.id)
-        if self._category_platform_ids:
-            q &= Q(platform_id__in=self._category_platform_ids) 
+        if self._asset_platform_ids:
+            q &= Q(platform_id__in=self._asset_platform_ids) 
         if self._assets_q_object:
             q &= self._assets_q_object
         return q
@@ -267,5 +278,5 @@ class AssetTree(Tree):
     
     def print(self, count=20, simple=True):
         print('org_name: ', getattr(self._org, 'name', 'No-org'))
-        print(f'asset_category: {self._category}')
+        print(f'asset_category: {self._asset_category}')
         super().print(count=count, simple=simple)

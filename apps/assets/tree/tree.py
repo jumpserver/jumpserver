@@ -1,3 +1,4 @@
+from collections import deque
 from common.utils import get_logger, lazyproperty, timeit
 
 
@@ -41,6 +42,35 @@ class TreeNode(object):
     @lazyproperty
     def level(self):
         return self.key.count(':') + 1
+    
+    def get_ancestor_keys(self):
+        if self.is_root:
+            return []
+        
+        ancestor_keys = []
+        parts = self.key.split(':')
+        for i in range(1, len(parts)):
+            ancestor_key = ':'.join(parts[:i])
+            ancestor_keys.append(ancestor_key)
+        return ancestor_keys
+    
+    def get_descendants(self, node: 'TreeNode'):
+        """
+        返回指定节点的所有子孙节点（不包含自身），非递归实现，按层级从近到远排序。
+        返回列表，空列表表示没有子孙或节点为 None。
+        """
+        if not node:
+            return []
+
+        descendants = []
+        dq = deque(node.children)
+        while dq:
+            cur = dq.popleft()
+            descendants.append(cur)
+            # 复制 children 以防在遍历过程中被修改
+            for ch in list(cur.children):
+                dq.append(ch)
+        return descendants
     
     @property
     def children_count(self):
@@ -138,6 +168,57 @@ class Tree(object):
             parent: TreeNode = node.parent
             parent.remove_child(node)
         self.nodes.pop(node.key, None)
+    
+    def search_nodes(self, keyword, only_top_level=False):
+        if not keyword:
+            return []
+        keyword = keyword.strip().lower()
+        nodes = {}
+        for node in self.nodes.values():
+            node: TreeNode
+            node_value = str(node.value).strip().lower()
+            if keyword in node_value:
+                nodes[node.key] = node
+        if not only_top_level:
+            return list(nodes.values())
+
+        # TODO: 优化性能
+        node_keys = list(nodes.keys())
+        children_keys = []
+        for node_key in node_keys:
+            _children_keys = [k for k in node_keys if k.startswith(f"{node_key}:")]
+            children_keys.extend(_children_keys)
+        for child_key in children_keys:
+            nodes.pop(child_key, None)
+        return list(nodes.values())
+    
+    def remove_nodes_descendants(self, nodes: list[TreeNode]):
+        descendants = self.get_nodes_descendants(nodes)
+        for node in reversed(descendants):
+            self.remove_node(node)
+    
+    def get_nodes_descendants(self, nodes: list[TreeNode]):
+        descendants = []
+        for node in nodes:
+            ds = node.get_descendants(node)
+            descendants.extend(ds)
+        return descendants
+
+    def get_nodes_ancestors(self, nodes: list[TreeNode]):
+        ancestors = set()
+        for node in nodes:
+            ancestor_keys = node.get_ancestor_keys()
+            _ancestors = self.get_nodes_by_keys(ancestor_keys)
+            ancestors.update(_ancestors)
+        return list(ancestors)
+    
+    def get_nodes_by_keys(self, keys):
+        nodes = []
+        for key in keys:
+            node = self.get_node(key)
+            if node:
+                nodes.append(node)
+        return nodes
     
     def get_nodes(self, levels=None):
         nodes = list(self.nodes.values())
