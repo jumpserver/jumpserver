@@ -81,6 +81,7 @@ class UserPermNodeChildrenAsTreeApi(SelfOrPKUserMixin, SerializeToTreeNodeMixin,
         expand_node_key = self.get_query_value('key')
         search_node = self.get_query_value('search_node')
         search_asset = self.get_query_value('search_asset')
+        search = self.get_query_value('search')
         asset_category = self.get_query_value('asset_category')
         asset_type = self.get_query_value('asset_type')
 
@@ -90,7 +91,8 @@ class UserPermNodeChildrenAsTreeApi(SelfOrPKUserMixin, SerializeToTreeNodeMixin,
             elif search_node:
                 # search nodes
                 return self.search_user_perm_node_tree(search_node, asset_category, asset_type)
-            elif search_asset:
+            elif search_asset or search:
+                search_asset = search_asset or search
                 # search assets
                 return self.search_user_perm_asset_tree(search_asset, asset_category, asset_type)
             else:
