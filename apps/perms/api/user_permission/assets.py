@@ -12,7 +12,7 @@ from orgs.utils import tmp_to_root_org
 from perms import serializers
 from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
-from perms.utils.utils import UserPermUtil
+from perms.utils.utils import UserPermedAssetUtil
 from perms.tree import UserPermAssetTreeNode
 from .mixin import (
     SelfOrPKUserMixin
@@ -80,26 +80,26 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
 
         if node_id == UserPermAssetTreeNode.SpecialKey.FAVORITE:
             # TODO: Support asset_category, asset_type
-            return UserPermUtil.get_favorite_assets(user=self.user)
+            return UserPermedAssetUtil.get_favorite_assets(user=self.user)
 
         if node_id == UserPermAssetTreeNode.SpecialKey.UNGROUPED:
-            _util = UserPermUtil(user=self.user)
+            _util = UserPermedAssetUtil(user=self.user)
             return _util.get_ungrouped_assets()
 
         node = get_object_or_none(Node, id=node_id)
         if node:
-            _util= UserPermUtil(user=self.user, org=node.org)
+            _util= UserPermedAssetUtil(user=self.user, org=node.org)
             assets = _util.get_node_all_assets(node)
             return assets
 
-        assets = UserPermUtil.get_all_assets(user=self.user)
+        assets = UserPermedAssetUtil.get_all_assets(user=self.user)
         return assets
 
 
 class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
 
     def get_assets(self):
-        _util = UserPermUtil(user=self.user)
+        _util = UserPermedAssetUtil(user=self.user)
         assets = _util.get_ungrouped_assets()
         return assets
 
@@ -107,7 +107,7 @@ class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
 class UserFavoriteAssetsApi(BaseUserPermedAssetsApi):
 
     def get_assets(self):
-        assets = UserPermUtil.get_favorite_assets(user=self.user)
+        assets = UserPermedAssetUtil.get_favorite_assets(user=self.user)
         return assets
 
 

@@ -7,7 +7,7 @@ from common.utils import get_logger
 from users.models import User
 from assets.models import FavoriteAsset, Asset
 from assets.tree.asset_tree import AssetTree, AssetTreeNode, AssetTreeNodeAsset
-from perms.utils.utils import UserPermUtil
+from perms.utils.utils import UserPermedAssetUtil
 
 
 __all__ = ['UserPermAssetTree']
@@ -69,7 +69,7 @@ class UserPermAssetTree(AssetTree):
     def __init__(self, user, **kwargs):
 
         self._user: User = user
-        self._util = UserPermUtil(user, org=kwargs.get('org'))
+        self._util = UserPermedAssetUtil(user, org=kwargs.get('org'))
         kwargs.update({
             # 用户授权树只返回有资产的节点
             'full_tree': False,

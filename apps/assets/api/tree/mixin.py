@@ -17,7 +17,7 @@ class SerializeToTreeNodeMixin:
 
     @timeit
     def serialize_nodes(self, nodes: List[AssetTreeNode], tree_type: RenderTreeType, 
-                        with_asset_amount=False, expand_level=1):
+                        with_asset_amount=False, expand_level=1, expand_all=False):
         if not nodes:
             return []
 
@@ -43,7 +43,7 @@ class SerializeToTreeNodeMixin:
                 'title': _name(node),
                 'pId': node.parent_key,
                 'isParent': is_parent(node),
-                'open': node.level <= expand_level,
+                'open': expand_all or node.level <= expand_level,
                 'meta': {
                     'type': 'node',
                     'data': {

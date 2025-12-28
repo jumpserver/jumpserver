@@ -11,10 +11,10 @@ from perms.models import AssetPermission
 logger = get_logger(__name__)
 
 
-__all__ = ['UserPermUtil']
+__all__ = ['UserPermedAssetUtil']
 
 
-class UserPermUtil(object):
+class UserPermedAssetUtil(object):
 
     UserGroupThrough = User.groups.through
     PermUserThrough = AssetPermission.users.through
@@ -157,28 +157,50 @@ class UserPermUtil(object):
         return assets
 
     @classmethod
-    def get_favorite_assets(cls, user: User, search_asset=None, asset_category=None, asset_type=None):
+    def get_favorite_assets(cls, user, search_asset=None, asset_category=None, asset_type=None):
         asset_ids = FavoriteAsset.get_user_favorite_asset_ids(user)
-        q = Q(id__in=asset_ids)
-        if search_asset:
-            q &= Q(name__icontains=search_asset) | Q(address__icontains=search_asset)
-        if asset_category:
-            q &= Q(platform__category=asset_category)
-        if asset_type:
-            q &= Q(platform__type=asset_type)
-        assets = Asset.objects.filter(q).valid()
+        assets = cls.filter_assets(
+            asset_ids=asset_ids,
+            search_asset=search_asset, 
+            asset_category=asset_category, 
+            asset_type=asset_type
+        )
         return assets
     
     def get_ungrouped_assets(self, search_asset=None, asset_category=None, asset_type=None):
-        q = Q(id__in=self._user_direct_asset_ids)
+        asset_ids = self._user_direct_asset_ids
+        assets = self.filter_assets(
+            asset_ids=asset_ids, 
+            search_asset=search_asset, 
+            asset_category=asset_category, 
+            asset_type=asset_type
+        )
+        return assets
+    
+    @classmethod
+    def filter_assets(cls, asset_ids, search_asset=None, asset_category=None, asset_type=None):
+        q = cls._make_assets_q_object(
+            asset_ids=asset_ids,
+            search_asset=search_asset, 
+            asset_category=asset_category, 
+            asset_type=asset_type
+        )
+        assets = Asset.objects.filter(q).valid()
+        return assets
+    
+    @staticmethod
+    def _make_assets_q_object(asset_ids=None, search_asset=None, asset_category=None, 
+                              asset_type=None):
+        q = Q()
+        if asset_ids:
+            q &= Q(id__in=asset_ids)
         if search_asset:
             q &= Q(name__icontains=search_asset) | Q(address__icontains=search_asset)
         if asset_category:
             q &= Q(platform__category=asset_category)
         if asset_type:
             q &= Q(platform__type=asset_type)
-        assets = Asset.objects.filter(q).valid()
-        return assets
+        return q
     
     def _uuids_to_string(self, uuids):
         return [ str(u) for u in uuids ]
