@@ -121,6 +121,29 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
         asset_type = self.get_query_value(self.query_asset_type_key)
         with_asset_amount = True
 
+        expand_node_key = self.get_query_value(self.query_expand_node_key)
+        search_node = self.get_query_value(self.query_search_node_key)
+        search_asset = self.get_query_value(self.query_search_asset_key)
+        if self.render_tree_type.is_asset_tree:
+            if not search_asset:
+                # 兼容 search 为搜索资产
+                search = self.get_query_value(self.query_search_key) or ''
+                sep = self.query_search_key_value_sep
+                if sep not in search:
+                    search_asset = search
+
+        data = self._list(
+            expand_node_key=expand_node_key, 
+            search_node=search_node, search_asset=search_asset,
+            asset_category=asset_category, asset_type=asset_type,
+            with_asset_amount=with_asset_amount
+        )
+        return Response(data=data)
+    
+    @timeit
+    def _list(self, expand_node_key=None, search_node=None, search_asset=None,
+              asset_category=None, asset_type=None, with_asset_amount=True):
+
         if self.render_tree_type.is_node_tree:
             data = self.render_node_tree(
                 asset_category=asset_category, asset_type=asset_type, 
@@ -128,6 +151,8 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
             )
         elif self.render_tree_type.is_asset_tree:
             data = self.render_asset_tree(
+                expand_node_key=expand_node_key, 
+                search_node=search_node, search_asset=search_asset,
                 asset_category=asset_category, asset_type=asset_type, 
                 with_asset_amount=with_asset_amount
             )
@@ -135,7 +160,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
             raise APIException(
                 f'Invalid tree type: {self.render_tree_type}'
             )
-        return Response(data=data)
+        return data
 
     @timeit
     def render_node_tree(self, asset_category=None, asset_type=None, with_asset_amount=True):
@@ -149,34 +174,13 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
             with_asset_amount=with_asset_amount
         )
         return data
-    
-    @timeit
-    def render_asset_tree(self, asset_category=None, asset_type=None, with_asset_amount=True):
-        # 渲染资产树 #
-        expand_node_key = self.get_query_value(self.query_expand_node_key)
-        search_node = self.get_query_value(self.query_search_node_key)
-        search_asset = self.get_query_value(self.query_search_asset_key)
-        data = self._render_asset_tree(
-            expand_node_key=expand_node_key, 
-            search_node=search_node, search_asset=search_asset, 
-            asset_category=asset_category, asset_type=asset_type, 
-            with_asset_amount=with_asset_amount
-        )
-        return data
 
     @timeit
-    def _render_asset_tree(self, expand_node_key=None, search_node=None, search_asset=None, 
+    def render_asset_tree(self, expand_node_key=None, search_node=None, search_asset=None, 
                            asset_category=None, asset_type=None, with_asset_amount=True):
         # 渲染资产树内部方法，支持子类重载 #
         # 此方法包含渲染资产树的所有参数
         # 资产树支持初始化、搜索节点、搜索资产和展开节点等动作
-
-        if not search_asset:
-            # 兼容 search 为搜索资产
-            search = self.get_query_value(self.query_search_key) or ''
-            sep = self.query_search_key_value_sep
-            if sep not in search:
-                search_asset = search
 
         if expand_node_key:
             data = self.expand_asset_tree_node(

@@ -19,6 +19,7 @@ __all__ = [
 
 
 class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
+    search_special_node_asset_limit_max = 50
 
     def get_tree_user(self):
         return self.user
@@ -32,31 +33,23 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
         tree = UserPermAssetTree(user=self.user, **kwargs)
         return tree
     
-    def _render_asset_tree(self, **kwargs):
-        # 重写父类方法，返回特殊节点
-        # 特殊节点如：收藏夹、未分组节点
-        data = super()._render_asset_tree(**kwargs)
-        expand_node_key = kwargs.pop('expand_node_key', None)
-        if expand_node_key:
-            # 展开其他节点时，不返回特殊节点
-            # 特殊节点不允许异步展开
-            return data
-        special_nodes = self.get_special_nodes(**kwargs)
-        data = special_nodes + data
-        return data
-    
-    def render_node_tree(self, **kwargs):
-        # 重写父类方法，返回特殊节点
-        data = super().render_node_tree(**kwargs)
-        special_nodes = self.get_special_nodes(**kwargs)
+    def _list(self, **kwargs):
+        # 重写父类方法，返回用户授权的组织资产树节点和资产
+        data = super()._list(**kwargs)
+        special_nodes = self.get_special_nodes_if_needed(**kwargs)
         data = special_nodes + data
         return data
     
     @timeit
-    def get_special_nodes(self, search_asset=None, search_node=None, 
-                          asset_category=None, asset_type=None, with_asset_amount=True):
+    def get_special_nodes_if_needed(self, expand_node_key=None, search_asset=None, search_node=None, 
+                                    asset_category=None, asset_type=None, with_asset_amount=True):
         # 获取特殊节点数据
         # 特殊节点如：收藏夹、未分组节点
+
+        if expand_node_key:
+            # 展开其他节点时，不返回特殊节点
+            # 特殊节点不允许异步展开
+            return []
         
         # 默认不包含资产
         with_assets = False
@@ -71,12 +64,12 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
         f_node, f_assets = self.get_favorite_node(
             search_asset=search_asset, search_node=search_node, 
             asset_category=asset_category, asset_type=asset_type, 
-            with_assets=with_assets
+            with_assets=with_assets,
         )
         u_node, u_assets = self.get_ungrouped_node_if_need(
             search_asset=search_asset, search_node=search_node, 
             asset_category=asset_category, asset_type=asset_type, 
-            with_assets=with_assets
+            with_assets=with_assets,
         )
 
         nodes = [n for n in [f_node, u_node] if n]
@@ -93,7 +86,7 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
             serialized_assets = self.serialize_assets(assets)
         else:
             serialized_assets = []
-
+        
         data = serialized_nodes + serialized_assets
         return data
 
@@ -105,7 +98,7 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
             user=self.tree_user, 
             search_asset=search_asset,
             asset_category=asset_category, 
-            asset_type=asset_type
+            asset_type=asset_type,
         )
         assets_amount = assets.count()
         node = UserPermAssetTreeNode.favorite(
@@ -115,14 +108,19 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
 
         if search_node and not node.match(search_node):
             return None, []
+        
+        if assets_amount == 0:
+            # 没有资产时不返回收藏夹节点
+            return None, []
 
         if not with_assets:
             return node, []
         
-        if assets_amount == 0:
-            return node, []
+        assets = assets.values(*AssetTreeNodeAsset.model_values)
+        if search_asset:
+            assets = assets[:self.search_special_node_asset_limit_max]
 
-        assets_attrs = list(assets.values(*AssetTreeNodeAsset.model_values))
+        assets_attrs = list(assets)
         assets = node.init_assets(assets_attrs)
         return node, assets
 
@@ -143,7 +141,7 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
         assets = util.get_ungrouped_assets(
             search_asset=search_asset, 
             asset_category=asset_category, 
-            asset_type=asset_type
+            asset_type=asset_type,
         )
         assets_amount = assets.count()
         node = UserPermAssetTreeNode.ungrouped(
@@ -154,11 +152,16 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
             return None, []
         
         if assets_amount == 0:
-            return node, []
+            # 没有资产时不返回未分组节点
+            return None, []
 
         if not with_assets:
             return node, []
 
-        assets_attrs = list(assets.values(*AssetTreeNodeAsset.model_values))
+        assets = assets.values(*AssetTreeNodeAsset.model_values)
+        if search_asset:
+            assets = assets[:self.search_special_node_asset_limit_max]
+
+        assets_attrs = list(assets)
         assets = node.init_assets(assets_attrs)
         return node, assets

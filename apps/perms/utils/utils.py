@@ -163,7 +163,7 @@ class UserPermedAssetUtil(object):
             asset_ids=asset_ids,
             search_asset=search_asset, 
             asset_category=asset_category, 
-            asset_type=asset_type
+            asset_type=asset_type,
         )
         return assets
     
@@ -173,7 +173,7 @@ class UserPermedAssetUtil(object):
             asset_ids=asset_ids, 
             search_asset=search_asset, 
             asset_category=asset_category, 
-            asset_type=asset_type
+            asset_type=asset_type,
         )
         return assets
     
@@ -184,7 +184,7 @@ class UserPermedAssetUtil(object):
             search_asset=search_asset, 
             asset_category=asset_category, 
             asset_type=asset_type
-        )
+            )
         assets = Asset.objects.filter(q).valid()
         return assets
     
