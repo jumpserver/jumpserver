@@ -17,6 +17,13 @@ class TreeNode(object):
         self.parent = None
         self.children_count_total = 0
     
+    def match(self, keyword):
+        if not keyword:
+            return True
+        keyword = str(keyword).strip().lower()
+        node_value = str(self.value).strip().lower()
+        return keyword in node_value
+    
     @lazyproperty
     def parent_key(self):
         if self.is_root:
@@ -176,12 +183,14 @@ class Tree(object):
         nodes = {}
         for node in self.nodes.values():
             node: TreeNode
-            node_value = str(node.value).strip().lower()
-            if keyword in node_value:
-                nodes[node.key] = node
+            if not node.match(keyword):
+                continue
+            nodes[node.key] = node
+
         if not only_top_level:
             return list(nodes.values())
 
+        # 如果匹配的节点中包含有父子关系的节点，只返回最上一级的父节点
         # TODO: 优化性能
         node_keys = list(nodes.keys())
         children_keys = []

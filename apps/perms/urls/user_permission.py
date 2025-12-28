@@ -5,7 +5,7 @@ from .. import api
 user_permission_urlpatterns = [
     path('<str:user>/assets/<uuid:pk>/', api.UserPermedAssetRetrieveApi.as_view(), name='user-permed-asset'),
     path('<str:user>/assets/', api.UserAllPermedAssetsApi.as_view(), name='user-all-assets'),
-    path('<str:user>/nodes/children/tree/', api.UserPermNodeChildrenAsTreeApi.as_view(), name='user-perm-node-children-tree'),
+    path('<str:user>/nodes/children/tree/', api.UserPermedAssetTreeAPI.as_view(), name='user-perm-node-children-tree'),
 ]
 
 user_group_permission_urlpatterns = [

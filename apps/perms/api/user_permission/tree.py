@@ -2,14 +2,9 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 
 from common.utils import get_logger, timeit
-from orgs.utils import current_org
-from assets.api import SerializeToTreeNodeMixin
-from assets.models import Node, FavoriteAsset, Asset
+from assets.api.tree import AbstractAssetTreeAPI
 from assets.tree.asset_tree import AssetTreeNodeAsset
 from perms.tree import UserPermAssetTree, UserPermAssetTreeNode
 from perms.utils.utils import UserPermUtil
@@ -19,361 +14,128 @@ from .mixin import SelfOrPKUserMixin
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserPermNodeChildrenAsTreeApi'
+    'UserPermedAssetTreeAPI'
 ]
 
 
-class RenderTreeType:
-    NODE = 'node'
-    ASSET = 'asset'
+class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
 
-    def __init__(self, tp):
-        if tp not in [self.NODE, self.ASSET]:
-            raise ValueError(f'Invalid tree type: {tp}')
-        self._type = tp
+    def get_tree_user(self):
+        return self.user
+
+    def get_org_asset_tree(self, **kwargs) -> UserPermAssetTree:
+        return self.get_user_org_asset_tree(**kwargs)
+
+    def get_user_org_asset_tree(self, **kwargs) -> UserPermAssetTree:
+        tree = UserPermAssetTree(user=self.user, **kwargs)
+        return tree
     
-    def is_asset_tree(self):
-        return self._type == self.ASSET
-
-    def is_node_tree(self):
-        return self._type == self.NODE
-    
-    def __str__(self):
-        return self._type
-
-
-class UserPermNodeChildrenAsTreeApi(SelfOrPKUserMixin, SerializeToTreeNodeMixin, ListAPIView):
-
-    def get_query_value(self, query_key):
-        query_value = self.request.query_params.get(query_key)
-        if query_value:
-            return query_value
-
-        search = self.request.query_params.get('search', '')
-        if not search:
-            return None
-
-        search_list = search.split()
-        for _search in search_list:
-            if f'{query_key}:' not in _search:
-                continue
-            query_value = _search.replace(f'{query_key}:', '').strip()
-            break
-        return query_value
-    
-    @property
-    def render_tree_type(self):
-        tree_type = self.get_query_value('tree_type')
-
-        if tree_type:
-            return RenderTreeType(tree_type)
-
-        if self.request.query_params.get('assets', '0') == '1':
-            tree_type = RenderTreeType.ASSET
-        else:
-            tree_type = RenderTreeType.NODE
-
-        return RenderTreeType(tree_type)
-
-    @timeit
-    def list(self, request, *args, **kwargs):
-        # node / asset
-        expand_node_key = self.get_query_value('key')
-        search_node = self.get_query_value('search_node')
-        search_asset = self.get_query_value('search_asset')
-        search = self.get_query_value('search')
-        asset_category = self.get_query_value('asset_category')
-        asset_type = self.get_query_value('asset_type')
-
-        if self.render_tree_type.is_asset_tree():
-            if expand_node_key:
-                return self.expand_user_perm_asset_tree_node(expand_node_key, asset_category, asset_type)
-            elif search_node:
-                # search nodes
-                return self.search_user_perm_node_tree(search_node, asset_category, asset_type)
-            elif search_asset or search:
-                search_asset = search_asset or search
-                # search assets
-                return self.search_user_perm_asset_tree(search_asset, asset_category, asset_type)
-            else:
-                return self.init_user_perm_asset_tree(asset_category, asset_type)
-        else:  # if self.render_tree_type.is_node_tree():
-            if expand_node_key:
-                raise NotImplementedError(_('Expanding node in node tree is not supported yet'))
-            if search_node:
-                raise NotImplementedError(_('Searching node in node tree is not supported yet'))
-            if search_asset:
-                raise NotImplementedError(_('Searching asset in node tree is not supported yet'))
-            else:
-                return self.init_user_perm_node_tree(asset_category, asset_type)
+    def _render_asset_tree(self, **kwargs):
+        data = super()._render_asset_tree(**kwargs)
+        expand_node_key = kwargs.pop('expand_node_key', None)
+        if expand_node_key:
+            # 特殊节点不需要展开，资产树中特殊节点下的资产已经随着节点一起返回
+            return data
         
-    
-    def init_user_perm_node_tree(self, asset_category=None, asset_type=None):
-        ''' 初始化用户权限树 - 不包含资产
-        前端搜索
-
-        全局组织: 返回所有节点，不返回资产，不展开节点
-        实体组织：返回所有节点，不返回资产，展开第1级节点
-
-        返回收藏节点
-        返回未分组节点 (如果需要)
-        '''
-        if current_org.is_root():
-            orgs = self.user.orgs.all()
-            expand_level = 0
-        else:
-            orgs = self.user.orgs.filter(id=current_org.id)
-            expand_level = 1
-        
-        if not orgs.exists():
-            return Response(data=[])
-        
-        nodes = []
-        for org in orgs:
-            tree = UserPermAssetTree(
-                user=self.user, asset_category=asset_category, 
-                asset_type=asset_type, org=org
-            )
-            _nodes = tree.get_nodes()
-            nodes.extend(_nodes)
-        nodes = self.serialize_nodes(
-            nodes, with_asset_amount=True, expand_level=expand_level,
-            tree_type=str(self.render_tree_type)
-        )
-        data = nodes
-        data = self.add_favorites_and_ungrouped_node(data, with_assets=False)
-        return Response(data=data)
-    
-    def search_user_perm_node_tree(self, search, asset_category=None, asset_type=None):
-        ''' 搜索用户授权树 - 不包含资产
-        全局组织: 返回所有匹配节点以及祖先节点，不返回匹配节点的子孙节点，不返回资产，展开所有祖先节点，不展开匹配节点
-        实体组织: 同上
-        '''
-        if current_org.is_root():
-            orgs = self.user.orgs.all()
-        else:
-            orgs = self.user.orgs.filter(id=current_org.id)
-        
-        search_nodes = []
-        nodes_ancestors = []
-        for org in orgs:
-            tree = UserPermAssetTree(
-                user=self.user, asset_category=asset_category, 
-                asset_type=asset_type, org=org
-            )
-            _search_nodes = tree.search_nodes(search, only_top_level=True)
-            # tree.remove_nodes_descendants(_search_nodes)
-            _nodes_ancestors = tree.get_nodes_ancestors(_search_nodes)
-            search_nodes.extend(_search_nodes)
-            nodes_ancestors.extend(_nodes_ancestors)
-        
-        # 不展开搜索节点
-        expand_level = 0
-        # 如果有资产，则允许展开 is_parent=True 的节点
-        with_assets = True
-        serialized_search_nodes = self.serialize_nodes(
-            search_nodes, with_asset_amount=True, expand_level=expand_level, 
-            tree_type=str(self.render_tree_type)
-        )
-        # 展开所有祖先节点
-        expand_level = 10000
-        serialized_nodes_ancestors = self.serialize_nodes(
-            nodes_ancestors, with_asset_amount=True, expand_level=expand_level
-        )
-        data = [*serialized_nodes_ancestors, *serialized_search_nodes]
-        return Response(data=data)
-
-    def init_user_perm_asset_tree(self, asset_category=None, asset_type=None):
-        ''' 初始化用户权限资产树 - 包含资产
-        全局组织: 返回第1级节点，不返回资产，不展开节点
-        实体组织：返回第1级和第2级节点，返回第1级节点的资产，展开第1级节点
-
-        返回收藏节点和资产
-        返回未分组节点和资产 (如果需要)
-        '''
-
-        if current_org.is_root():
-            orgs = self.user.orgs.all()
-            nodes_level = [1]
-            with_assets_node_levels = None
-            expand_level = 0
-        else:
-            orgs = self.user.orgs.filter(id=current_org.id)
-            nodes_level = [1, 2]
-            with_assets_node_levels = [1]
-            expand_level = 1
-        
-        if not orgs.exists():
-            return Response(data=[])
-        
-        nodes = []
-        assets = []
-
-        for org in orgs:
-            tree = UserPermAssetTree(
-                user=self.user, 
-                asset_category=asset_category, asset_type=asset_type, org=org, 
-                with_assets_node_levels=with_assets_node_levels
-            )
-            _nodes = tree.get_nodes(levels=nodes_level)
-            nodes.extend(_nodes)
-            _assets = tree.get_assets()
-            assets.extend(_assets)
-        
-        nodes = self.serialize_nodes(
-            nodes, with_asset_amount=True, expand_level=expand_level, 
-            tree_type=str(self.render_tree_type)
-        )
-        assets = self.serialize_assets(assets)
-        data = [*nodes, *assets]
-        data = self.add_favorites_and_ungrouped_node(data, with_assets=True)
-        return Response(data=data)
-    
-    def expand_user_perm_asset_tree_node(self, node_key, asset_category=None, asset_type=None):
-        ''' 展开用户权限资产树节点 - 包含资产
-        全局组织: 返回展开节点的直接孩子节点，返回展开节点的资产，不展开其他节点
-        实体组织: 同上
-        '''
-        expand_level = 0
-        node = get_object_or_404(Node, key=node_key)
-        org = self.user.orgs.filter(id=node.org_id).first()
-        if not org:
-            return Response(data=[])
-
-        tree = UserPermAssetTree(
-            user=self.user, 
-            asset_category=asset_category, asset_type=asset_type,
-            org=node.org, with_assets_node_id=node.id
-        )
-        tree_node = tree.get_node(node.key)
-        if not tree_node:
-            return Response(data=[])
-        
-        _nodes = tree_node.children
-        nodes = self.serialize_nodes(
-            _nodes, with_asset_amount=True, expand_level=expand_level,
-            tree_type=str(self.render_tree_type)
-        )
-        _assets = tree.get_assets()
-        assets = self.serialize_assets(_assets)
-        data = [*nodes, *assets]
-        return Response(data=data)
-    
-    def search_user_perm_asset_tree(self, search, asset_category=None, asset_type=None):
-        ''' 初始化用户权限资产搜索树 - 包含资产 
-        全局组织: 返回所有节点，返回所有资产，展开所有节点，搜索资产 (最大 1000， n 个组织，每个组织分配1000/n个资产)
-        实体组织: 同上，最大资产数 1000
-        '''
-        expand_level = 10000
-        with_assets_all = True
-        with_assets_limit = 1000
-        if current_org.is_root():
-            orgs = self.user.orgs.all()
-            with_assets_limit = max(100, with_assets_limit // max(1, orgs.count()))
-        else:
-            orgs = self.user.orgs.filter(id=current_org.id)
-
-        if not orgs.exists():
-            return Response(data=[])
-        
-        assets_q_object = Q(name__icontains=search) | Q(address__icontains=search)
-        nodes = []
-        assets = []
-        for org in orgs:
-            tree = UserPermAssetTree(
-                user=self.user, assets_q_object=assets_q_object, 
-                org=org, asset_category=asset_category, asset_type=asset_type,
-                with_assets_all=with_assets_all,
-                with_assets_limit=with_assets_limit
-            )
-            _nodes = tree.get_nodes()
-            nodes.extend(_nodes)
-            _assets = tree.get_assets()
-            assets.extend(_assets)
-
-        nodes = self.serialize_nodes(
-            nodes, with_asset_amount=True, expand_level=expand_level,
-            tree_type=str(self.render_tree_type)
-        )
-        assets = self.serialize_assets(assets)
-        data = [*nodes, *assets]
-        return Response(data=data)
-
-    def add_favorites_and_ungrouped_node(self, data: list, with_assets=False):
-        # 未分组节点和资产
-        u_node, u_assets = self.get_ungrouped_node_if_need()
-        if u_node:
-            data.insert(0, u_node)
-            data.extend(u_assets)
-
-        # 收藏节点和资产
-        f_node, f_assets = self.get_favorite_node()
-        if f_node:
-            data.insert(0, f_node)
-            data.extend(f_assets)
+        special_nodes = self.get_special_nodes(with_assets=True, expand_level=0, **kwargs)
+        data = special_nodes + data
         return data
     
-    def get_favorite_node(self, with_assets=False):
-        assets = UserPermUtil.get_favorite_assets(self.user)
-        assets_amount = assets.count()
-        node = UserPermAssetTreeNode(
-            _id=UserPermAssetTreeNode.SpecialKey.FAVORITE.value,
-            key=UserPermAssetTreeNode.SpecialKey.FAVORITE.value,
-            value=UserPermAssetTreeNode.SpecialKey.FAVORITE.label,
-            assets_amount=assets_amount
+    def render_node_tree(self, asset_category, asset_type, with_asset_amount):
+        data = super().render_node_tree(asset_category, asset_type, with_asset_amount)
+        special_nodes = self.get_special_nodes(
+            with_assets=False, expand_level=0, asset_category=asset_category, asset_type=asset_type, 
+            with_asset_amount=with_asset_amount
         )
-        node.assets_amount_total = assets_amount
-        nodes = self.serialize_nodes(
-            [node], with_asset_amount=True, expand_level=0,
-            tree_type=str(self.render_tree_type)
+        data = special_nodes + data
+        return data
+    
+    def get_special_nodes(self, search_asset=None, search_node=None, 
+                          asset_category=None, asset_type=None,
+                          with_assets=False, expand_level=0, with_asset_amount=False):
+        f_node, f_assets = self.get_favorite_node(
+            search_asset=search_asset, search_node=search_node, 
+            asset_category=asset_category, asset_type=asset_type, with_assets=with_assets
         )
-        serialized_node = nodes[0] if nodes else None
+        u_node, u_assets = self.get_ungrouped_node_if_need(
+            search_asset=search_asset, search_node=search_node, 
+            asset_category=asset_category, asset_type=asset_type, with_assets=with_assets
+        )
 
-        if not with_assets:
-            return serialized_node, []
+        nodes = []
+        if f_node:
+            nodes.append(f_node)
+        if u_node:
+            nodes.append(u_node)
 
-        if assets_amount == 0:
-            return serialized_node, []
+        if not nodes:
+            return []
         
-        assets = list(assets.values(*AssetTreeNodeAsset.model_values))
-        assets = node.init_assets(assets)
-        serialized_assets = self.serialize_assets(assets)
-        return serialized_node, serialized_assets
+        if search_asset:
+            expand_level = 1
+        
+        serialized_nodes = self.serialize_nodes(
+            nodes, tree_type=self.render_tree_type,
+            with_asset_amount=with_asset_amount, expand_level=expand_level,
+        )
+        if with_assets:
+            assets = f_assets + u_assets
+            serialized_assets = self.serialize_assets(assets)
+        else:
+            serialized_assets = []
+        
+        data = serialized_nodes + serialized_assets
+        return data
 
-    def get_ungrouped_node_if_need(self, with_assets=False):
+    def get_favorite_node(self, search_asset=None, search_node=None, asset_category=None, 
+                          asset_type=None, with_assets=False):
+        assets = UserPermUtil.get_favorite_assets(
+            user=self.user, search_asset=search_asset,
+            asset_category=asset_category, asset_type=asset_type
+        )
+        assets_amount = assets.count()
+        f_node = UserPermAssetTreeNode.favorite(
+            assets_amount=assets_amount, assets_amount_total=assets_amount
+        )
+        if not f_node.match(search_node):
+            return None, []
+        
+        if assets_amount == 0:
+            return f_node, []
+
+        if with_assets:
+            assets_attrs = list(assets.values(*AssetTreeNodeAsset.model_values))
+            assets = f_node.init_assets(assets_attrs)
+        else:
+            assets = []
+        return f_node, assets
+
+    def get_ungrouped_node_if_need(self, search_asset=None, search_node=None, asset_category=None, 
+                                   asset_type=None, with_assets=False):
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return None, []
-
-        if current_org.is_root():
+        if self.org_is_global:
+            # 全局组织不返回未分组节点
             return None, []
-
-        org = self.user.orgs.filter(id=current_org.id).first()
-        if not org:
-            return None, []
-
-        _util = UserPermUtil(user=self.user, org=org)
-        assets = _util.get_ungrouped_assets()
+        org = self.get_tree_user_orgs().first()
+        util = UserPermUtil(user=self.user, org=org)
+        assets = util.get_ungrouped_assets(
+            search_asset=search_asset, 
+            asset_category=asset_category, asset_type=asset_type
+        )
         assets_amount = assets.count()
-        node = UserPermAssetTreeNode(
-            _id=UserPermAssetTreeNode.SpecialKey.UNGROUPED.value,
-            key=UserPermAssetTreeNode.SpecialKey.UNGROUPED.value,
-            value=UserPermAssetTreeNode.SpecialKey.UNGROUPED.label,
-            assets_amount=assets_amount
+        u_node = UserPermAssetTreeNode.ungrouped(
+            assets_amount=assets_amount, assets_amount_total=assets_amount
         )
-        node.assets_amount_total = assets_amount
-        nodes = self.serialize_nodes(
-            [node], with_asset_amount=True, expand_level=0,
-            tree_type=str(self.render_tree_type)
-        )
-        serialized_node = nodes[0] if nodes else None
-
-        if not with_assets:
-            return serialized_node, []
-
+        if not u_node.match(search_node):
+            return None, []
+        
         if assets_amount == 0:
-            return serialized_node, []
+            return u_node, []
 
-        assets = assets.values(*AssetTreeNodeAsset.model_values)
-        assets = node.init_assets(list(assets))
-        serialized_assets = self.serialize_assets(assets)
-        return serialized_node, serialized_assets
+        if with_assets:
+            assets_attrs = list(assets.values(*AssetTreeNodeAsset.model_values))
+            assets = u_node.init_assets(assets_attrs)
+        else:
+            assets = []
+        return u_node, assets

@@ -18,28 +18,48 @@ logger = get_logger(__name__)
 
 class UserPermAssetTreeNode(AssetTreeNode):
 
-    class Type:
-        # Neither a permission node nor a node with direct permission assets
-        BRIDGE = 'bridge'
-        # Node with direct permission
-        DN = 'dn'
-        # Node with only direct permission assets
-        DA = 'da'
-    
+    class Type(TextChoices):
+        DN = 'direct_node', 'Direct Node'
+        DA = 'direct_asset', 'Direct Asset'
+        BRIDGE = 'bridge', 'Bridge'
+
     class SpecialKey(TextChoices):
         FAVORITE = 'favorite', _('Favorite')
         UNGROUPED = 'ungrouped', _('Ungrouped')
-
-    def __init__(self, tp=None, **kwargs):
-        self.type = tp or self.Type.BRIDGE
+    
+    def __init__(self, tp, **kwargs):
+        self.tp = tp
         super().__init__(**kwargs)
     
+    @classmethod
+    def favorite(cls, **kwargs):
+        node = cls(
+            tp=cls.Type.BRIDGE,
+            _id=cls.SpecialKey.FAVORITE.value,
+            key=cls.SpecialKey.FAVORITE.value,
+            value=cls.SpecialKey.FAVORITE.label,
+            **kwargs
+        )
+        return node
+    
+    @classmethod
+    def ungrouped(cls, **kwargs):
+        node = cls(
+            tp=cls.Type.BRIDGE,
+            _id=cls.SpecialKey.UNGROUPED.value,
+            key=cls.SpecialKey.UNGROUPED.value,
+            value=cls.SpecialKey.UNGROUPED.label,
+            **kwargs
+        )
+        return node
+    
     def as_dict(self, simple=True):
-        data = super().as_dict(simple=simple)
+        data = super().as_dict(simple)
         data.update({
-            'type': self.type,
+            'type': self.tp,
         })
         return data
+
     
 
 class UserPermAssetTree(AssetTree):

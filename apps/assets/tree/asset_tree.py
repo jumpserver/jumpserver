@@ -19,7 +19,8 @@ __all__ = ['AssetTree', 'AssetTreeNode']
 class AssetTreeNodeAsset:
 
     model_values = [
-        'id', 'name', 'node_id', 'platform_id', 'address', 'is_active', 'comment', 'org_id'
+        'id', 'name', 'node_id', 'platform_id', 'address', 
+        'is_active', 'comment', 'org_id'
     ]
 
     def __init__(self, parent_key, **kwargs):
@@ -39,18 +40,19 @@ class AssetTreeNodeAsset:
 
 class AssetTreeNode(TreeNode):
 
-    def __init__(self, _id, key, value, assets_amount=0):
+    def __init__(self, _id, key, value, assets_amount=0, assets_amount_total=0):
         super().__init__(_id, key, value)
         self.assets_amount = assets_amount
-        self.assets_amount_total = 0
+        self.assets_amount_total = assets_amount_total
         self.assets: list[AssetTreeNodeAsset] = []
     
-    def init_assets(self, assets):
-        if not assets:
+    def init_assets(self, assets_attrs):
+        if not assets_attrs:
             return
-        for asset in assets:
-            asset['parent_key'] = self.key
-            self.assets.append(AssetTreeNodeAsset(**asset))
+        for asset_attrs in assets_attrs:
+            asset_attrs['parent_key'] = self.key
+            asset = AssetTreeNodeAsset(**asset_attrs)
+            self.assets.append(asset)
         return self.assets
     
     def get_assets(self):

@@ -70,6 +70,7 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
 
 
 class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
+    # TODO: support filter by asset_category and asset_type
 
     def get_assets(self):
         if self.user.is_superuser and self.request.query_params.get('id'):
@@ -78,6 +79,7 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
         node_id = self.request.query_params.get('node_id')
 
         if node_id == UserPermAssetTreeNode.SpecialKey.FAVORITE:
+            # TODO: Support asset_category, asset_type
             return UserPermUtil.get_favorite_assets(user=self.user)
 
         if node_id == UserPermAssetTreeNode.SpecialKey.UNGROUPED:

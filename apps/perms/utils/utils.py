@@ -157,13 +157,27 @@ class UserPermUtil(object):
         return assets
 
     @classmethod
-    def get_favorite_assets(cls, user: User):
+    def get_favorite_assets(cls, user: User, search_asset=None, asset_category=None, asset_type=None):
         asset_ids = FavoriteAsset.get_user_favorite_asset_ids(user)
-        assets = Asset.objects.filter(id__in=asset_ids).valid()
+        q = Q(id__in=asset_ids)
+        if search_asset:
+            q &= Q(name__icontains=search_asset) | Q(address__icontains=search_asset)
+        if asset_category:
+            q &= Q(platform__category=asset_category)
+        if asset_type:
+            q &= Q(platform__type=asset_type)
+        assets = Asset.objects.filter(q).valid()
         return assets
     
-    def get_ungrouped_assets(self):
-        assets = Asset.objects.filter(id__in=self._user_direct_asset_ids).valid()
+    def get_ungrouped_assets(self, search_asset=None, asset_category=None, asset_type=None):
+        q = Q(id__in=self._user_direct_asset_ids)
+        if search_asset:
+            q &= Q(name__icontains=search_asset) | Q(address__icontains=search_asset)
+        if asset_category:
+            q &= Q(platform__category=asset_category)
+        if asset_type:
+            q &= Q(platform__type=asset_type)
+        assets = Asset.objects.filter(q).valid()
         return assets
     
     def _uuids_to_string(self, uuids):
