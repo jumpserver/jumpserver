@@ -35,9 +35,6 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
         ]
         fields = fields_small + ['rules']
         read_only_fields = ['created_by', 'date_created', 'date_updated']
-        extra_kwargs = {
-            'approval_level': {'required': True}
-        }
 
     def validate_type(self, value):
         if not self.instance or (self.instance and self.instance.type != value):
