@@ -3,23 +3,26 @@ import re
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
 
+from jumpserver.utils import get_current_request
+
 __all__ = [
     'CustomSchemaGenerator', 'CustomAutoSchema'
 ]
 
 
 class CustomSchemaGenerator(SchemaGenerator):
-    from_mcp = False
-
-    def get_schema(self, request=None, public=False):
-        self.from_mcp = request.query_params.get('mcp') or request.path.endswith('swagger.json')
-        return super().get_schema(request, public)
+    pass
 
 
 class CustomAutoSchema(AutoSchema):
+    from_mcp = False
+
     def __init__(self, *args, **kwargs):
-        self.from_mcp = True
         super().__init__(*args, **kwargs)
+        request = get_current_request()
+        self.from_mcp = request.GET.get('mcp') \
+            or request.path.endswith('swagger.json') \
+                or 'mcp' in request.META.get("HTTP_REFERER", '')
 
     def map_parsers(self):
         return ['application/json']
@@ -127,9 +130,9 @@ class CustomAutoSchema(AutoSchema):
                 'accounts', 'account-templates',
                 'asset-permissions',
             ]
-        if models and model in models:
-            return False
-        return True
+        if models and model not in models:
+            return True
+        return False
 
     def exclude_some_apps(self, app):
         apps = []
@@ -138,9 +141,9 @@ class CustomAutoSchema(AutoSchema):
                 'users', 'assets', 'accounts',
                 'perms', 'labels',
             ]
-        if apps and app in apps:
-            return False        
-        return True
+        if apps and app not in apps:
+            return True        
+        return False
 
     def exclude_some_app_model(self, path):
         parts = path.split('/')
