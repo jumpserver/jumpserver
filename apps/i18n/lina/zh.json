@@ -1648,5 +1648,9 @@
     "selectFiles": "已选择选择{number}文件",
     "AccessToken": "访问令牌",
     "AccessTokenTip": "访问令牌是通过 JumpServer 客户端使用 OAuth2（授权码授权）流程生成的临时凭证，用于访问受保护的资源。",
-    "Revoke": "撤销"
+    "Revoke": "撤销",
+    "Search node": "搜索节点",
+    "Search by node name": "通过节点名称搜索",
+    "Search asset": "搜索资产",
+    "Search by asset name or address": "通过资产名称或地址搜索"
 }
