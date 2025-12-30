@@ -5,6 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from assets.locks import NodeAddChildrenLock
+from assets.models import Platform
 from common.exceptions import JMSException
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
@@ -82,6 +83,12 @@ class NodeChildrenApi(generics.ListCreateAPIView):
 
 
 class AssetTreeAPI(AbstractAssetTreeAPI):
+
+    rbac_perms = {
+        'list': 'assets.view_asset',
+        'GET': 'assets.view_asset',
+        'OPTIONS': 'assets.view_asset',
+    }
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)

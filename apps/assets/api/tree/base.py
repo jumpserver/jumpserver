@@ -8,7 +8,6 @@ from users.models import User
 from common.utils import lazyproperty, timeit
 from common.exceptions import APIException
 from orgs.utils import current_org
-from orgs.models import Organization
 from rbac.permissions import RBACPermission
 from assets.tree.asset_tree import AssetTree
 from assets.models import Node
@@ -21,10 +20,8 @@ __all__ = ['AbstractAssetTreeAPI']
 
 class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
 
+    # TODO: 子类必须定义 rbac_perms 属性限制权限
     permission_classes = (RBACPermission,)
-
-    # TODO: 再确认一下 API 所需的权限位
-    perm_model = Node
 
     # query parameters keys
     query_search_key = 'search'
