@@ -68,6 +68,8 @@ SPECTACULAR_SETTINGS = {
     },
     "SERVE_INCLUDE_SCHEMA": False,
     'SERVE_PUBLIC': True,
+    "COMPONENT_SPLIT_REQUEST": True,  
+    "COMPONENT_NO_READ_ONLY_REQUIRED": True,
     'BASE_PATH': '/api/v1/',
     'SCHEMA_PATH_PREFIX': '/api/v1/',
     'SWAGGER_UI_DIST': 'SIDECAR',
@@ -85,6 +87,7 @@ SPECTACULAR_SETTINGS = {
         'jumpserver.views.schema.LabeledChoiceFieldExtension',
         'jumpserver.views.schema.BitChoicesFieldExtension',
         'jumpserver.views.schema.LabelRelatedFieldExtension',
+        'jumpserver.views.schema.DateTimeFieldExtension',
     ],
     'SECURITY': [{'Bearer': []}],
 }
