@@ -26,10 +26,10 @@ from rest_framework.response import Response
 from django.utils._os import safe_join
 
 
-def unzip_playbook(src, dist):
+def unzip_playbook(src, dest):
     fz = zipfile.ZipFile(src, 'r')
     for file in fz.namelist():
-        fz.extract(file, dist)
+        fz.extract(file, dest)
 
 
 class PlaybookViewSet(JMSBulkModelViewSet):
