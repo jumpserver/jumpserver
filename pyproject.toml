@@ -8,7 +8,6 @@ dependencies = [
     'aiofiles==23.1.0',
     'amqp==5.1.1',
     'ansible-core',
-    'ansible==7.1.0',
     'ansible-runner',
     'asn1crypto==1.5.1',
     'bcrypt==4.0.1',
@@ -177,7 +176,7 @@ xpack = [
     'python-keystoneclient==5.1.0',
     'bce-python-sdk==0.8.87',
     'tencentcloud-sdk-python==3.0.941',
-    'aliyun-python-sdk-core-v3==2.13.36',
+    'aliyun-python-sdk-core-v3==2.13.33',
     'aliyun-python-sdk-ecs==4.24.64',
     'keystoneauth1==5.2.1',
     'oracledb==1.4.0',
@@ -190,8 +189,8 @@ xpack = [
 ]
 
 [tool.uv.sources]
-ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.7.zip" }
-ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/2.4.0.1.zip" }
+ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.20.1.zip" }
+ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip" }
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
 django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
 redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip" }
