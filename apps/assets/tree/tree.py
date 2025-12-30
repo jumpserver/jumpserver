@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 class TreeNode(object):
 
-    def __init__(self, _id, key, value):
+    def __init__(self, _id, key, value, **kwargs):
         self.id = _id
         self.key = key
         self.value = value

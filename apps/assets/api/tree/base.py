@@ -12,7 +12,7 @@ from rbac.permissions import RBACPermission
 from assets.tree.asset_tree import AssetTree
 from assets.models import Node
 from .mixin import SerializeToTreeNodeMixin
-from .const import RenderTreeType, RenderTreeTypeChoices
+from .const import RenderTreeType, RenderTreeTypeChoices, RenderTreeView, RenderTreeViewChoices
 
 
 __all__ = ['AbstractAssetTreeAPI']
@@ -27,6 +27,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
     query_search_key = 'search'
     query_search_key_value_sep = ':'
     query_tree_type_key = 'tree_type'
+    query_tree_view_key = 'tree_view'
     query_asset_category_key = 'category'
     query_asset_type_key = 'type'
     query_search_asset_key = 'search_asset'
@@ -45,8 +46,18 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
+        self.render_tree_view = self.initial_render_tree_view()
         self.render_tree_type = self.initial_render_tree_type()
         self.tree_user = self.get_tree_user()
+
+    def initial_render_tree_view(self):
+        # 资产树视图 
+        # 默认是节点视图
+        # 扩展支持 category 视图, label 视图等等
+        tree_view = self.get_query_value(self.query_tree_view_key)
+        if not tree_view:
+            tree_view = RenderTreeViewChoices.node
+        return RenderTreeView(tree_view)
 
     def initial_render_tree_type(self):
         tree_type = self.get_query_value(self.query_tree_type_key)
@@ -62,7 +73,6 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
     def get_tree_user(self) -> User:
         # 抽象方法: 获取为哪个用户渲染树 #
         raise NotImplementedError
-
 
     def get_query_value(self, query_key):
         query_value = self.request.query_params.get(query_key)
@@ -87,6 +97,9 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
     
     def get_org_asset_tree(self, **kwargs) -> AssetTree:
         # 抽象方法: 获取组织的资产树 #
+        return self._get_org_asset_tree(tree_view=self.render_tree_view, **kwargs)
+
+    def _get_org_asset_tree(self, **kwargs) -> AssetTree:
         raise NotImplementedError
 
     @lazyproperty
@@ -267,23 +280,30 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
         # 展开资产树节点 #
         # 展开节点时，返回该节点的直接子节点和直接资产
 
-        node = get_object_or_404(Node, key=node_key)
-        orgs = self.get_tree_user_orgs()
-        org = orgs.filter(id=node.org_id).first()
-        if not org:
-            # 确保用户有权限展开该节点所在组织的树
-            raise APIException(
-                f'No permission to expand the node in this organization: {node.org_name}'
-            )
+        if self.render_tree_view.is_node_view:
+            node = get_object_or_404(Node, key=node_key)
+            node_id = str(node.id)
+            orgs = self.get_tree_user_orgs()
+            org = orgs.filter(id=node.org_id).first()
+            if not org:
+                # 确保用户有权限展开该节点所在组织的树
+                raise APIException(
+                    f'No permission to expand the node in this organization: {node.org_name}'
+                )
+        else:
+            assert not self.org_is_global, 'Category view is not supported in global org'
+            org = self.get_tree_user_orgs().first()
+            assert org, 'User has no organization for rendering the tree'
+            node_id = node_key  # 在类别视图中，节点 key 就是节点 id
         
-        with_assets_node_id = str(node.id)
+        with_assets_node_id = node_id
         tree: AssetTree = self.get_org_asset_tree(
             asset_category=asset_category, 
             asset_type=asset_type, 
             org=org,
             with_assets_node_id=with_assets_node_id
         )
-        node_children = tree.get_node_children(node.key)
+        node_children = tree.get_node_children(node_key)
         node_assets = tree.get_assets()
 
         # (展开节点)的孩子节点不展开

@@ -40,8 +40,8 @@ class AssetTreeNodeAsset:
 
 class AssetTreeNode(TreeNode):
 
-    def __init__(self, _id, key, value, assets_amount=0, assets_amount_total=0):
-        super().__init__(_id, key, value)
+    def __init__(self, assets_amount=0, assets_amount_total=0, **kwargs):
+        super().__init__(**kwargs)
         self.assets_amount = assets_amount
         self.assets_amount_total = assets_amount_total
         self.assets: list[AssetTreeNodeAsset] = []
@@ -114,12 +114,16 @@ class AssetTree(Tree):
         self.build()
     
     def _check_asset_category(self, category):
+        if category is None:
+            return None
         if category in Category.values:
             return category
         logger.warning(f"Invalid category '{category}' for AssetSearchTree.")
         return None
 
     def _check_asset_type(self, asset_type):
+        if asset_type is None:
+            return None
         types = list(dict(AllTypes.choices()).keys())
         if asset_type in types:
             return asset_type
@@ -130,7 +134,7 @@ class AssetTree(Tree):
     def build(self):
         self._load_nodes_attr_mapper()
         self._load_asset_platforms_if_needed()
-        self._load_nodes_assets_amount()
+        self._load_nodes_assets_amount_mapper()
         self._init_tree()
         self._load_nodes_assets_if_needed()
         self._compute_assets_amount_total()
@@ -151,23 +155,33 @@ class AssetTree(Tree):
     
     @timeit
     def _load_nodes_attr_mapper(self):
-        nodes = Node.objects.filter(org_id=self._org.id).values('id', 'key', 'value')
-        # 保证节点按 key 顺序加载，以便后续构建树时父节点总在子节点前面
-        nodes = sorted(nodes, key=lambda n: [int(i) for i in n['key'].split(':')])
+        nodes = self._load_nodes_attr()
         for node in list(nodes):
             node['id'] = str(node['id'])
             self._nodes_attr_mapper[node['id']] = node
     
     @timeit
-    def _load_nodes_assets_amount(self):
+    def _load_nodes_attr(self):
+        nodes = Node.objects.filter(org_id=self._org.id).values('id', 'key', 'value')
+        nodes = list(nodes)
+        return nodes
+    
+    @timeit
+    def _load_nodes_assets_amount_mapper(self):
         q = self._make_assets_q_object()
-        nodes_amount = Asset.objects.filter(q).values('node_id').annotate(
-            amount=Count('id')
-        ).values('node_id', 'amount')
+        nodes_amount = self._load_node_assets_amount(q)
         for nc in list(nodes_amount):
             nid = str(nc['node_id'])
             self._nodes_assets_amount_mapper[nid] = nc['amount']
-
+    
+    @timeit
+    def _load_node_assets_amount(self, assets_q_object):
+        nodes_amount = Asset.objects.filter(assets_q_object).values('node_id').annotate(
+            amount=Count('id')
+        ).values('node_id', 'amount')
+        nodes_amount = list(nodes_amount)
+        return nodes_amount
+        
     @timeit
     def _make_assets_q_object(self) -> Q:
         q = Q(org_id=self._org.id)
@@ -179,7 +193,11 @@ class AssetTree(Tree):
     
     @timeit
     def _init_tree(self):
-        for nid in self._nodes_attr_mapper.keys():
+        # 保证节点按 key 顺序加载，以便后续构建树时父节点总在子节点前面
+        nodes = self._nodes_attr_mapper.values()
+        sorted_nodes = sorted(nodes, key=lambda n: [int(i) for i in n['key'].split(':')])
+        for node in sorted_nodes:
+            nid = node['id']
             data = self._get_tree_node_data(nid)
             node = self.TreeNode(**data)
             self.add_node(node)
@@ -188,6 +206,7 @@ class AssetTree(Tree):
         attr = self._nodes_attr_mapper[node_id]
         assets_amount = self._nodes_assets_amount_mapper.get(node_id, 0)
         data = {
+            **attr,
             '_id': node_id,
             'key': attr['key'],
             'value': attr['value'],
@@ -208,16 +227,21 @@ class AssetTree(Tree):
         q = self._make_assets_q_object()
         if self._with_assets_node_id:
             # 优先级1, 指定节点
-            q &= Q(node_id=self._with_assets_node_id)
+            node_ids = [self._with_assets_node_id]
+            q &= self._make_assets_q_object_for_node_ids(node_ids)
         elif self._with_assets_node_levels:
             nodes = self.get_nodes(levels=self._with_assets_node_levels)
             node_ids = [ n.id for n in nodes ]
             # 优先级2, 指定层级的节点
-            q &= Q(node_id__in=node_ids)
+            q &= self._make_assets_q_object_for_node_ids(node_ids)
         else:
             # 优先级3, 所有资产
             pass
-
+        
+        self._load_nodes_assets_mapper(q)
+        self._init_assets_to_nodes()
+    
+    def _load_nodes_assets_mapper(self, q):
         # 按照 node_key 排序，尽可能保证前面节点的资产较多
         assets = Asset.objects.filter(q).values(*AssetTreeNodeAsset.model_values).order_by('node__key')
         if self._with_assets_limit:
@@ -228,6 +252,7 @@ class AssetTree(Tree):
             aid = asset['id'] = str(asset['id'])
             self._node_assets_mapper[nid][aid] = asset
         
+    def _init_assets_to_nodes(self):
         # 将资产初始化到节点树上
         for nid, id_asset_mapper in self._node_assets_mapper.items():
             assets = id_asset_mapper.values()
@@ -238,6 +263,9 @@ class AssetTree(Tree):
                 continue
             node: AssetTreeNode
             node.init_assets(list(assets))
+    
+    def _make_assets_q_object_for_node_ids(self, node_ids) -> Q:
+        return Q(node_id__in=node_ids)
         
     @timeit
     def _compute_assets_amount_total(self):
@@ -259,6 +287,15 @@ class AssetTree(Tree):
         ]
         for node in nodes_to_remove:
             self.remove_node(node)
+    
+    def get_nodes_by_ids(self, node_ids):
+        nodes = []
+        for nid in node_ids:
+            node = self.get_node_by_id(nid)
+            if not node:
+                continue
+            nodes.append(node)
+        return nodes
     
     def get_node_by_id(self, node_id):
         node_attr = self._nodes_attr_mapper[node_id]
