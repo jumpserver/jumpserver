@@ -11,6 +11,7 @@ class TreeNode:
 
     def __init__(self, key, parent_key, name, leaves_amount=0):
         ## need to serialize fields
+        self.id = key
         self.key = key # leaf key is None, parent_key
         self.name = name
         self.open = True
@@ -64,8 +65,9 @@ class TreeNode:
 
 class TreeLeaf(TreeNode):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, id, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.id = id
         self.key = None
         self.is_leaf = True
         self.open = False

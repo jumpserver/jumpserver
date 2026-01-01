@@ -120,6 +120,7 @@ class AssetNodeTree(Tree):
             assert parent_key is not None, "TreeLeaf parent key should not be None"
             tree_leaf = AssetTreeLeaf(
                 instance=asset,
+                id=str(asset.id),
                 key=None,
                 parent_key=parent_key,
                 name=asset.name,
