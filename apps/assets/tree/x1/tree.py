@@ -294,7 +294,6 @@ class XTree:
         self.build_tree_nodes()
         self.compute_tree_nodes_leaves_amount_total(search_leaf_keyword=search_leaf_keyword)
         self.load_tree_nodes_leaves(nodes_keys=with_leaves_nodes_keys, search_leaf_keyword=search_leaf_keyword)
-        self.remove_empty_tree_nodes_if_need()
     
     def build_tree_nodes(self):
         nodes = self.query_and_construct_tree_nodes()
@@ -333,10 +332,10 @@ class XTree:
         pass
 
     # get tree nodes
-    def get_tree_nodes(self, nodes_keys=None, with_leaves=False):
-        nodes_keys = nodes_keys or self.tree_nodes.keys()
+    def get_tree_nodes(self, nodes_keys=None, with_leaves=False, with_empty_leaves_nodes=True):
+        nodes_keys = nodes_keys or self.tree_nodes.values()
         for node_key in nodes_keys:
-            node = self.get_tree_node(node_key=node_key)
+            node = self.get_tree_node(node_key=node_key, with_empty_leaves_nodes=with_empty_leaves_nodes)
             if not node:
                 continue
             node: TreeNode
@@ -345,5 +344,15 @@ class XTree:
             else:
                 yield node.children
             
-    def get_tree_node(self, node_key=None):
-        return self.tree_nodes.get(node_key)
+    def get_tree_node(self, node_key=None, with_empty_leaves_nodes=True):
+        node = self.tree_nodes.get(node_key)
+        if not node:
+            return None
+        node: TreeNode
+        if with_empty_leaves_nodes:
+            return node
+        else: 
+            if node.has_leaves():
+                return node
+            else:
+                return None
