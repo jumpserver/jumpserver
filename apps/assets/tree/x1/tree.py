@@ -283,3 +283,63 @@ assets = tree:assets:expand_nodes_queryset
 nodes = search_tree:nodes:children
 assets = search_tree:assets:expand_nodes_queryset
 """
+
+
+
+class XTree:
+    nodes = {}
+
+    # build tree
+    def build(self, search_leaf_keyword=None, with_leaves_nodes_keys=None):
+        self.build_nodes()
+        self.compute_nodes_leaves_amount_total(search_leaf_keyword=search_leaf_keyword)
+        self.load_nodes_leaves(nodes_keys=with_leaves_nodes_keys, search_leaf_keyword=search_leaf_keyword)
+        self.remove_empty_nodes_if_need()
+    
+    def build_nodes(self):
+        nodes = self.construct_nodes()
+        self.add_nodes_to_tree(nodes=nodes)
+    
+    def construct_nodes(self) -> list[TreeNode]:
+        raise NotImplementedError
+
+    def add_nodes_to_tree(self, nodes: list[TreeNode]):
+        pass
+
+    def compute_nodes_leaves_amount_total(self, search_leaf_keyword=None):
+        nodes_leaves_amount = self.get_nodes_leaves_amount(search_leaf_keyword=search_leaf_keyword)
+        for node, leaves_amount in nodes_leaves_amount:
+            node.set_leaves_amount(leaves_amount)
+        for node in self.nodes.values():
+            node: TreeNode
+            node.compute_leaves_amount_total()
+    
+    def load_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None):
+        leaves = self.construct_nodes_leaves(nodes_keys=nodes_keys, search_leaf_keyword=search_leaf_keyword)
+        leaves: list[TreeLeaf]
+        self.add_leaves_to_nodes(leaves=leaves)
+
+    def construct_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None) -> list[TreeLeaf]:
+        raise NotImplementedError
+
+    def add_leaves_to_nodes(self, leaves: list[TreeLeaf]):
+        pass
+
+    def remove_empty_nodes_if_need(self):
+        pass
+
+    # get tree nodes
+    def get_nodes(self, nodes_keys=None, with_leaves=False):
+        nodes_keys = nodes_keys or self.nodes.keys()
+        for node_key in nodes_keys:
+            node = self.get_node(node_key=node_key)
+            if not node:
+                continue
+            node: TreeNode
+            if with_leaves:
+                yield node.children + node.leaves
+            else:
+                yield node.children
+            
+    def get_node(self, node_key=None):
+        return self.nodes.get(node_key)
