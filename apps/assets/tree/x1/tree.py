@@ -287,50 +287,54 @@ assets = search_tree:assets:expand_nodes_queryset
 
 
 class XTree:
-    nodes = {}
+    tree_nodes = {}
 
     # build tree
     def build(self, search_leaf_keyword=None, with_leaves_nodes_keys=None):
-        self.build_nodes()
-        self.compute_nodes_leaves_amount_total(search_leaf_keyword=search_leaf_keyword)
-        self.load_nodes_leaves(nodes_keys=with_leaves_nodes_keys, search_leaf_keyword=search_leaf_keyword)
-        self.remove_empty_nodes_if_need()
+        self.build_tree_nodes()
+        self.compute_tree_nodes_leaves_amount_total(search_leaf_keyword=search_leaf_keyword)
+        self.load_tree_nodes_leaves(nodes_keys=with_leaves_nodes_keys, search_leaf_keyword=search_leaf_keyword)
+        self.remove_empty_tree_nodes_if_need()
     
-    def build_nodes(self):
-        nodes = self.construct_nodes()
-        self.add_nodes_to_tree(nodes=nodes)
+    def build_tree_nodes(self):
+        nodes = self.query_and_construct_tree_nodes()
+        self.add_tree_nodes_to_tree(nodes=nodes)
     
-    def construct_nodes(self) -> list[TreeNode]:
+    def query_and_construct_tree_nodes(self) -> list[TreeNode]:
         raise NotImplementedError
 
-    def add_nodes_to_tree(self, nodes: list[TreeNode]):
+    def add_tree_nodes_to_tree(self, nodes: list[TreeNode]):
         pass
 
-    def compute_nodes_leaves_amount_total(self, search_leaf_keyword=None):
-        nodes_leaves_amount = self.get_nodes_leaves_amount(search_leaf_keyword=search_leaf_keyword)
+    def compute_tree_nodes_leaves_amount_total(self, search_leaf_keyword=None):
+        nodes_leaves_amount = self.query_tree_nodes_leaves_amount(search_leaf_keyword=search_leaf_keyword)
         for node, leaves_amount in nodes_leaves_amount:
+            node: TreeNode
             node.set_leaves_amount(leaves_amount)
-        for node in self.nodes.values():
+        for node in self.tree_nodes.values():
             node: TreeNode
             node.compute_leaves_amount_total()
     
-    def load_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None):
-        leaves = self.construct_nodes_leaves(nodes_keys=nodes_keys, search_leaf_keyword=search_leaf_keyword)
+    def query_tree_nodes_leaves_amount(self, search_leaf_keyword=None) -> list[tuple[TreeNode, int]]:
+        raise NotImplementedError
+    
+    def load_tree_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None):
+        leaves = self.query_and_construct_tree_nodes_leaves(nodes_keys=nodes_keys, search_leaf_keyword=search_leaf_keyword)
         leaves: list[TreeLeaf]
-        self.add_leaves_to_nodes(leaves=leaves)
+        self.add_leaves_to_tree_nodes(leaves=leaves)
 
-    def construct_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None) -> list[TreeLeaf]:
+    def query_and_construct_tree_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None) -> list[TreeLeaf]:
         raise NotImplementedError
 
-    def add_leaves_to_nodes(self, leaves: list[TreeLeaf]):
+    def add_leaves_to_tree_nodes(self, leaves: list[TreeLeaf]):
         pass
 
-    def remove_empty_nodes_if_need(self):
+    def remove_empty_tree_nodes_if_need(self):
         pass
 
     # get tree nodes
     def get_nodes(self, nodes_keys=None, with_leaves=False):
-        nodes_keys = nodes_keys or self.nodes.keys()
+        nodes_keys = nodes_keys or self.tree_nodes.keys()
         for node_key in nodes_keys:
             node = self.get_node(node_key=node_key)
             if not node:
@@ -342,4 +346,4 @@ class XTree:
                 yield node.children
             
     def get_node(self, node_key=None):
-        return self.nodes.get(node_key)
+        return self.tree_nodes.get(node_key)
