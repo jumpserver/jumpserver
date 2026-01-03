@@ -285,15 +285,22 @@ assets = search_tree:assets:expand_nodes_queryset
 """
 
 
+"""
+初始化只包含节点的树
+搜索节点
+初始化包含节点和根叶子的树
+展开某个节点，含叶子
+搜索叶子
+搜索叶子的同时，展开某个节点
+"""
 
 class XTree:
     tree_nodes = {}
 
     # build tree
-    def build(self, search_leaf_keyword=None, with_leaves_nodes_keys=None):
+    def build(self, search_leaf_keyword=None):
         self.build_tree_nodes()
         self.compute_tree_nodes_leaves_amount_total(search_leaf_keyword=search_leaf_keyword)
-        self.load_tree_nodes_leaves(nodes_keys=with_leaves_nodes_keys, search_leaf_keyword=search_leaf_keyword)
     
     def build_tree_nodes(self):
         nodes = self.query_and_construct_tree_nodes()
@@ -317,42 +324,49 @@ class XTree:
     def query_tree_nodes_leaves_amount(self, search_leaf_keyword=None) -> list[tuple[TreeNode, int]]:
         raise NotImplementedError
     
-    def load_tree_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None):
-        leaves = self.query_and_construct_tree_nodes_leaves(nodes_keys=nodes_keys, search_leaf_keyword=search_leaf_keyword)
-        leaves: list[TreeLeaf]
-        self.add_leaves_to_tree_nodes(leaves=leaves)
+    def load_tree_nodes_leaves(self, tree_nodes_keys=None, tree_nodes_all=False, search_leaf_keyword=None):
+        ''' view 中按需调用，这里的 search_leaf_keyword 和 计算数量的要一致，获取叶子的方式也要一致 '''
+        tree_leaves = self.query_and_construct_tree_leaves(
+            tree_nodes_keys=tree_nodes_keys, 
+            tree_nodes_all=tree_nodes_all,
+            search_leaf_keyword=search_leaf_keyword
+        )
+        tree_leaves: list[TreeLeaf]
+        self.add_tree_leaves_to_tree_nodes(tree_leaves=tree_leaves)
 
-    def query_and_construct_tree_nodes_leaves(self, nodes_keys=None, search_leaf_keyword=None) -> list[TreeLeaf]:
+    def query_and_construct_tree_leaves(
+            self, tree_nodes_keys=None, tree_nodes_all=False, search_leaf_keyword=None
+        ) -> list[TreeLeaf]:
+
         raise NotImplementedError
 
-    def add_leaves_to_tree_nodes(self, leaves: list[TreeLeaf]):
-        pass
-
-    def remove_empty_tree_nodes_if_need(self):
+    def add_tree_leaves_to_tree_nodes(self, tree_leaves: list[TreeLeaf]):
         pass
 
     # get tree nodes
-    def get_tree_nodes(self, nodes_keys=None, with_leaves=False, with_empty_leaves_nodes=True):
-        nodes_keys = nodes_keys or self.tree_nodes.values()
-        for node_key in nodes_keys:
-            node = self.get_tree_node(node_key=node_key, with_empty_leaves_nodes=with_empty_leaves_nodes)
+    def get_tree_nodes(self, tree_nodes_keys=None, with_leaves=False, with_empty_nodes=True):
+        tree_nodes = []
+        tree_leaves = []
+        tree_nodes_keys = tree_nodes_keys or self.tree_nodes.values()
+        for key in tree_nodes_keys:
+            node = self.get_tree_node(node_key=key, with_empty_nodes=with_empty_nodes)
             if not node:
                 continue
             node: TreeNode
+            tree_nodes.append(node)
             if with_leaves:
-                yield node.children + node.leaves
-            else:
-                yield node.children
-            
-    def get_tree_node(self, node_key=None, with_empty_leaves_nodes=True):
+                tree_leaves.extend(node.leaves)
+        if with_leaves:
+            return tree_nodes, tree_leaves
+        else:
+            return tree_nodes
+        
+    def get_tree_node(self, node_key=None, with_empty_nodes=True):
+        ''' empty node: leaves_amount_total == 0 '''
         node = self.tree_nodes.get(node_key)
         if not node:
             return None
         node: TreeNode
-        if with_empty_leaves_nodes:
-            return node
-        else: 
-            if node.has_leaves():
-                return node
-            else:
-                return None
+        if not with_empty_nodes and node.leaves_amount_total == 0:
+            return None
+        return node
