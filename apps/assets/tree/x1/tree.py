@@ -333,10 +333,10 @@ class XTree:
         pass
 
     # get tree nodes
-    def get_nodes(self, nodes_keys=None, with_leaves=False):
+    def get_tree_nodes(self, nodes_keys=None, with_leaves=False):
         nodes_keys = nodes_keys or self.tree_nodes.keys()
         for node_key in nodes_keys:
-            node = self.get_node(node_key=node_key)
+            node = self.get_tree_node(node_key=node_key)
             if not node:
                 continue
             node: TreeNode
@@ -345,5 +345,5 @@ class XTree:
             else:
                 yield node.children
             
-    def get_node(self, node_key=None):
+    def get_tree_node(self, node_key=None):
         return self.tree_nodes.get(node_key)
