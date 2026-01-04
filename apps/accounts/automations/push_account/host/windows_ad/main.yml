@@ -19,9 +19,28 @@
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 
-    - name: Verify password
+    - name: Verify password (win_ping)
       ansible.windows.win_ping:
       vars:
         ansible_user: "{{ account.full_username }}"
         ansible_password: "{{ account.secret }}"
       when: account.secret_type == "password" and check_conn_after_change
+      register: verify_winping
+      ignore_errors: true
+      ignore_unreachable: true
+
+    - name: Verify password (pyfreerdp)
+      rdp_ping:
+        login_host: "{{ jms_asset.origin_address }}"
+        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first | default(3389, true) }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_secret_type: "{{ account.secret_type }}"
+        gateway_args: "{{ jms_gateway | default({}) }}"
+      when:
+        - account.secret_type == "password"
+        - check_conn_after_change
+        - verify_winping is not defined
+          or (verify_winping.unreachable | default(false))
+          or (verify_winping.failed | default(false))
+      delegate_to: localhost
