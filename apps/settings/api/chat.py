@@ -42,22 +42,18 @@ class ChatAITestingAPI(GenericAPIView):
             )
 
         tp = config['CHAT_AI_TYPE']
-        is_custom_model = config['IS_CUSTOM_MODEL']
         if tp == ChatAITypeChoices.gpt:
             url = config['GPT_BASE_URL']
             api_key = config['GPT_API_KEY']
             proxy = config['GPT_PROXY']
             model = config['GPT_MODEL']
-            custom_model = config['CUSTOM_GPT_MODEL']
+            model = model if config['GPT_MODEL'] != 'custom' else config['CUSTOM_GPT_MODEL']
         else:
             url = config['DEEPSEEK_BASE_URL']
             api_key = config['DEEPSEEK_API_KEY']
             proxy = config['DEEPSEEK_PROXY']
             model = config['DEEPSEEK_MODEL']
-            custom_model = config['CUSTOM_DEEPSEEK_MODEL']
-
-        model = custom_model or model \
-            if is_custom_model else model
+            model = model if config['DEEPSEEK_MODEL'] != 'custom' else config['CUSTOM_DEEPSEEK_MODEL']
 
         kwargs = {
             'base_url': url or None,

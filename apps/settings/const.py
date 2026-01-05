@@ -19,6 +19,7 @@ class ChatAITypeChoices(TextChoices):
 
 
 class GPTModelChoices(TextChoices):
+    custom = 'custom', _('Custom gpt model')
     # 🚀 Latest flagship dialogue model
     GPT_5_2 = 'gpt-5.2', 'gpt-5.2'
     GPT_5_2_PRO = 'gpt-5.2-pro', 'gpt-5.2-pro'
@@ -39,5 +40,6 @@ class GPTModelChoices(TextChoices):
 
 
 class DeepSeekModelChoices(TextChoices):
+    custom = 'custom', _('Custom DeepSeek model')
     deepseek_chat = 'deepseek-chat', 'DeepSeek-V3'
     deepseek_reasoner = 'deepseek-reasoner', 'DeepSeek-R1'
