@@ -1,11 +1,22 @@
 import random
 from random import choice
+from django.db import transaction
 
 import forgery_py
 
-from assets.const import AllTypes
+from assets.const import AllTypes, Category
 from assets.models import *
 from .base import FakeDataGenerator
+
+AssetModelMapper = {
+    Category.HOST: Host,
+    Category.DATABASE: Database,
+    Category.CLOUD: Cloud,
+    Category.CUSTOM: Custom,
+    Category.DEVICE: Device,
+    Category.DS: DirectoryService,
+    Category.WEB: Web,
+}
 
 
 class NodesGenerator(FakeDataGenerator):
@@ -45,10 +56,14 @@ class AssetsGenerator(FakeDataGenerator):
     resource = 'asset'
     node_ids: list
     platform_ids: list
+    platform_id_category_mapper: dict
 
     def pre_generate(self):
         self.node_ids = list(Node.objects.all().values_list('id', flat=True))
-        self.platform_ids = list(Platform.objects.filter(category='host').values_list('id', flat=True))
+        self.platform_id_category_mapper = {
+            p.id: p.category for p in Platform.objects.all()
+        }
+        self.platform_ids = list(self.platform_id_category_mapper.keys())
 
     def set_assets_nodes(self, assets):
         for asset in assets:
@@ -62,17 +77,22 @@ class AssetsGenerator(FakeDataGenerator):
             address = forgery_py.internet.ip_v4()
             hostname = forgery_py.email.address().replace('@', '.')
             hostname = f'{hostname}-{address}'
+            platform_id = choice(self.platform_ids)
             data = dict(
                 address=address,
                 name=hostname,
-                platform_id=choice(self.platform_ids),
+                platform_id=platform_id,
                 created_by='Fake',
                 org_id=self.org.id
             )
-            assets.append(Asset(**data))
-        creates = Asset.objects.bulk_create(assets, ignore_conflicts=True)
-        self.set_assets_nodes(creates)
-        self.set_asset_platform(creates)
+            model = AssetModelMapper.get(self.platform_id_category_mapper[platform_id])
+            if not model:
+                continue
+            with transaction.atomic():
+                asset = model.objects.create(**data)
+            assets.append(asset)
+        self.set_assets_nodes(assets)
+        self.set_asset_platform(assets)
 
     @staticmethod
     def set_asset_platform(assets):
