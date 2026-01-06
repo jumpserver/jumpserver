@@ -6,7 +6,7 @@ from assets.api import node
 
 # 类别视图的资产树
 from .tree import Tree, TreeNode
-from .asset_tree import AssetTree, AssetTreeNode, AssetTreeNodeAsset
+from .node_tree import AssetTree, AssetTreeNode, AssetTreeNodeAsset
 from assets.models import Platform, Asset
 from common.utils import timeit, get_logger
 

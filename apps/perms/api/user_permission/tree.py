@@ -5,7 +5,7 @@ from django.conf import settings
 
 from common.utils import get_logger, timeit
 from assets.api.tree import AbstractAssetTreeAPI
-from assets.tree.asset_tree import AssetTreeNodeAsset
+from assets.tree.node_tree import TreeAsset
 from perms.tree import UserPermAssetTree, UserPermAssetTreeNode
 from perms.utils.utils import UserPermedAssetUtil
 
@@ -24,7 +24,7 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
     def get_tree_user(self):
         return self.user
 
-    def get_org_asset_tree(self, **kwargs) -> UserPermAssetTree:
+    def get_asset_tree(self, **kwargs) -> UserPermAssetTree:
         # 重写父类方法，返回用户授权的组织资产树
         return self.get_user_org_asset_tree(**kwargs)
 
@@ -116,7 +116,7 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
         if not with_assets:
             return node, []
         
-        assets = assets.values(*AssetTreeNodeAsset.model_values)
+        assets = assets.values(*TreeAsset.model_only_fields)
         if search_asset:
             assets = assets[:self.search_special_node_asset_limit_max]
 
@@ -158,7 +158,7 @@ class UserPermedAssetTreeAPI(SelfOrPKUserMixin, AbstractAssetTreeAPI):
         if not with_assets:
             return node, []
 
-        assets = assets.values(*AssetTreeNodeAsset.model_values)
+        assets = assets.values(*TreeAsset.model_only_fields)
         if search_asset:
             assets = assets[:self.search_special_node_asset_limit_max]
 

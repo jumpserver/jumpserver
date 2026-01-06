@@ -6,7 +6,7 @@ from django.core.cache import cache
 from common.utils import get_logger
 from users.models import User
 from assets.models import FavoriteAsset, Asset
-from assets.tree.asset_tree import AssetTree, AssetTreeNode, AssetTreeNodeAsset
+from assets.tree.node_tree import AssetNodeTree, NodeTreeNode, TreeAsset
 from perms.utils.utils import UserPermedAssetUtil
 
 
@@ -16,7 +16,7 @@ __all__ = ['UserPermAssetTree']
 logger = get_logger(__name__)
 
 
-class UserPermAssetTreeNode(AssetTreeNode):
+class UserPermAssetTreeNode(NodeTreeNode):
 
     class Type(TextChoices):
         DN = 'direct_node', 'Direct Node'
@@ -62,7 +62,7 @@ class UserPermAssetTreeNode(AssetTreeNode):
 
     
 
-class UserPermAssetTree(AssetTree):
+class UserPermAssetTree(AssetNodeTree):
 
     TreeNode = UserPermAssetTreeNode
 

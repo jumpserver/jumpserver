@@ -1,3 +1,4 @@
+from abc import abstractmethod, abstractproperty
 
 from django.db.models import Q
 from rest_framework import generics
@@ -9,10 +10,10 @@ from common.utils import lazyproperty, timeit
 from common.exceptions import APIException
 from orgs.utils import current_org
 from rbac.permissions import RBACPermission
-from assets.tree.asset_tree import AssetTree
 from assets.models import Node
+from assets.tree.node_tree import AssetNodeTree, NodeTreeNode
 from .mixin import SerializeToTreeNodeMixin
-from .const import RenderTreeType, RenderTreeTypeChoices, RenderTreeView, RenderTreeViewChoices
+from .const import RenderTreeView, RenderTreeViewChoices
 
 
 __all__ = ['AbstractAssetTreeAPI']
@@ -20,13 +21,12 @@ __all__ = ['AbstractAssetTreeAPI']
 
 class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
 
-    # TODO: 子类必须定义 rbac_perms 属性限制权限
+    # 子类必须指定权限 rbac_perms#
     permission_classes = (RBACPermission,)
 
     # query parameters keys
     query_search_key = 'search'
     query_search_key_value_sep = ':'
-    query_tree_type_key = 'tree_type'
     query_tree_view_key = 'tree_view'
     query_asset_category_key = 'category'
     query_asset_type_key = 'type'
@@ -40,36 +40,22 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
     search_assets_per_org_limit_max = 1000
     search_assets_per_org_limit_min = 100
 
-    render_tree_type: RenderTreeType
+    @lazyproperty
+    def tree_with_assets(self):
+        with_assets = self.request.query_params.get('assets', '0') == '1'
+        return with_assets
 
-    tree_user: User
-
-    def initial(self, request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
-        self.render_tree_view = self.initial_render_tree_view()
-        self.render_tree_type = self.initial_render_tree_type()
-        self.tree_user = self.get_tree_user()
-
-    def initial_render_tree_view(self):
-        # 资产树视图 
-        # 默认是节点视图
-        # 扩展支持 category 视图, label 视图等等
+    @lazyproperty
+    def tree_view(self):
+        # 资产树视图 # 默认是节点视图 # 扩展支持 category 视图, label 视图等等
         tree_view = self.get_query_value(self.query_tree_view_key)
-        if not tree_view:
-            tree_view = RenderTreeViewChoices.node
+        tree_view = tree_view or RenderTreeViewChoices.node
         return RenderTreeView(tree_view)
 
-    def initial_render_tree_type(self):
-        tree_type = self.get_query_value(self.query_tree_type_key)
-        if not tree_type:
-            # 兼容 assets=1 参数
-            with_assets = self.request.query_params.get('assets', '0') == '1'
-            if with_assets:
-                tree_type = RenderTreeTypeChoices.asset
-            else:
-                tree_type = RenderTreeTypeChoices.node
-        return RenderTreeType(tree_type)
-
+    @lazyproperty
+    def tree_user(self) -> User:
+        return self.get_tree_user()
+    
     def get_tree_user(self) -> User:
         # 抽象方法: 获取为哪个用户渲染树 #
         raise NotImplementedError
@@ -95,66 +81,137 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
             query_value = _search.replace(f'{query_key}{sep}', '').strip()
             return query_value
     
-    def get_org_asset_tree(self, **kwargs) -> AssetTree:
-        # 抽象方法: 获取组织的资产树 #
-        return self._get_org_asset_tree(tree_view=self.render_tree_view, **kwargs)
-
-    def _get_org_asset_tree(self, **kwargs) -> AssetTree:
+    @abstractmethod
+    def get_asset_tree(self, assets_scope_q=None, asset_category=None, asset_type=None, org=None):
         raise NotImplementedError
 
     @lazyproperty
-    def org_is_global(self):
-        return current_org.is_root()
-
-    def get_tree_user_orgs(self):
+    def tree_user_orgs(self):
         # 重要: 获取用户有权限渲染树的组织列表 #
-        user = self.tree_user
-        if self.org_is_global:
-            # 如果是全局组织，返回用户所在的所有实体组织
-            orgs = user.orgs.all()
-        else:
-            # 如果时实体组织，从用户所在的实体组织中返回该实体组织
-            orgs = user.orgs.filter(id=current_org.id)
+        orgs = self.tree_user.orgs.all()
+        if not current_org.is_root():
+            orgs = orgs.filter(id=current_org.id)
         if not orgs.exists():
-            raise APIException(
-                'No organization available for rendering the tree'
-            )
+            raise APIException('No organization available for rendering the tree')
         return orgs
+    
+    def get_search_asset_keyword(self):
+        search_asset = self.get_query_value(self.query_search_asset_key)
+        if self.tree_with_assets and not search_asset:
+            # 兼容 search 为搜索资产
+            search = self.get_query_value(self.query_search_key) or ''
+            search_asset = search if self.query_search_key_value_sep not in search else ''
+        return search_asset
 
     @timeit
     def list(self, request, *args, **kwargs):
         # 渲染资产树 API 接口 #
-        # 支持渲染节点树和资产树两种类型
-        # 节点树: 只返回节点
-        # 资产树: 返回节点和节点下的资产
         asset_category = self.get_query_value(self.query_asset_category_key)
         asset_type = self.get_query_value(self.query_asset_type_key)
         with_asset_amount = True
 
         expand_node_key = self.get_query_value(self.query_expand_node_key)
         search_node = self.get_query_value(self.query_search_node_key)
-        search_asset = self.get_query_value(self.query_search_asset_key)
-        if self.render_tree_type.is_asset_tree:
-            if not search_asset:
-                # 兼容 search 为搜索资产
-                search = self.get_query_value(self.query_search_key) or ''
-                sep = self.query_search_key_value_sep
-                if sep not in search:
-                    search_asset = search
+        search_asset = self.get_search_asset_keyword()
 
-        data = self._list(
-            expand_node_key=expand_node_key, 
-            search_node=search_node, search_asset=search_asset,
-            asset_category=asset_category, asset_type=asset_type,
-            with_asset_amount=with_asset_amount
-        )
+        data = []
+        for org in self.tree_user_orgs:
+            nodes, assets = self.get_org_nodes_assets_data(
+                org=org,
+                expand_node_key=expand_node_key,
+                search_node=search_node,
+                search_asset=search_asset,
+                asset_category=asset_category,
+                asset_type=asset_type,
+                with_asset_amount=with_asset_amount
+            )
+            data.extend(nodes)
+            data.extend(assets)
         return Response(data=data)
+    
+    def get_org_nodes_assets_data(
+            self, org, expand_node_key=None, search_node=None, search_asset=None, 
+            asset_category=None, asset_type=None, with_asset_amount=True
+        ):
+
+        tree = self.get_asset_tree(
+            search_asset=search_asset, asset_category=asset_category, asset_type=asset_type, 
+            org=org, with_asset_amount=with_asset_amount
+        )
+
+        nodes = []
+        assets = []
+        if self.tree_with_assets:
+            if expand_node_key:
+                node = tree.get_node(key=expand_node_key)
+                if not node:
+                    raise APIException(f'Node not found: {expand_node_key}')
+                nodes = node.children
+                assets = tree.get_tree_assets(nodes=[node])
+            elif search_node:
+                # 只展开父节点
+                pass
+            elif search_asset:
+                nodes = tree.get_nodes(with_empty_assets_branch=False)
+                assets = tree.get_tree_assets(limit=10)
+                for node in nodes:
+                    if node.key == '1:0:1:1:0':
+                        print('.........')
+                    node: NodeTreeNode
+                    setattr(node, 'is_parent', False)
+                    setattr(node, 'open', True)
+            else:
+                if current_org.is_root():
+                    nodes = [tree.root]
+                else:
+                    tree_root = tree.root
+                    setattr(tree_root, 'open', True)
+                    nodes = [tree_root] + tree_root.children
+                    assets = tree.get_tree_assets(nodes=[tree_root])
+            
+            for node in nodes:
+                node: NodeTreeNode
+                is_parent = not node.is_leaf or node.assets_amount > 0
+                setattr(node, 'is_parent', is_parent)
+
+        else:
+            nodes = tree.get_nodes()
+            if not current_org.is_root():
+                setattr(tree.root, 'open', True)
+
+            for node in nodes:
+                node: NodeTreeNode
+                is_parent = not node.is_leaf
+                setattr(node, 'is_parent', is_parent)
+        
+        if with_asset_amount:
+            for node in nodes:
+                node.name = f'{node.name} ({node.assets_amount_total})'
+
+        data_nodes = self.serialize_nodes(nodes=nodes)
+        data_assets = self.serialize_assets(assets)
+        return data_nodes, data_assets
+
+    
+    def get_asset_tree(self, search_asset=None, asset_category=None, asset_type=None, org=None, 
+                       with_asset_amount=True):
+        assets_scope_q = None
+        if search_asset:
+            assets_scope_q = Q(name__icontains=search_asset) | Q(address__icontains=search_asset)
+        tree = AssetNodeTree(
+            assets_scope_q=assets_scope_q, 
+            asset_category=asset_category, 
+            asset_type=asset_type, 
+            org=org
+        )
+        tree.init(with_assets_amount=with_asset_amount)
+        return tree
     
     @timeit
     def _list(self, expand_node_key=None, search_node=None, search_asset=None,
               asset_category=None, asset_type=None, with_asset_amount=True):
 
-        if self.render_tree_type.is_node_tree:
+        if not self.tree_with_assets:
             data = self.render_node_tree(
                 asset_category=asset_category, asset_type=asset_type, 
                 with_asset_amount=with_asset_amount
@@ -228,7 +285,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
 
         nodes = []
         for org in orgs:
-            tree = self.get_org_asset_tree(
+            tree = self.get_asset_tree(
                 asset_category=asset_category, asset_type=asset_type, org=org
             )
             _nodes = tree.get_nodes()
@@ -254,7 +311,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
         nodes = []
         assets = []
         for org in orgs:
-            tree: AssetTree = self.get_org_asset_tree(
+            tree = self.get_asset_tree(
                 asset_category=asset_category, 
                 asset_type=asset_type, 
                 org=org, 
@@ -297,7 +354,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
             node_id = node_key  # 在类别视图中，节点 key 就是节点 id
         
         with_assets_node_id = node_id
-        tree: AssetTree = self.get_org_asset_tree(
+        tree = self.get_asset_tree(
             asset_category=asset_category, 
             asset_type=asset_type, 
             org=org,
@@ -332,7 +389,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
         matched_nodes = []
         matched_nodes_ancestors = []
         for org in orgs:
-            tree: AssetTree = self.get_org_asset_tree(
+            tree = self.get_asset_tree(
                 asset_category=asset_category, 
                 asset_type=asset_type, 
                 org=org
@@ -397,7 +454,7 @@ class AbstractAssetTreeAPI(SerializeToTreeNodeMixin, generics.ListAPIView):
         nodes = []
         assets = []
         for org in orgs:
-            tree: AssetTree = self.get_org_asset_tree(
+            tree = self.get_asset_tree(
                 assets_q_object=assets_q_object,
                 asset_category=asset_category, 
                 asset_type=asset_type, org=org,

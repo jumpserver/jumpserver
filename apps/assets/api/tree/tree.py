@@ -16,8 +16,8 @@ from .const import RenderTreeView
 from ... import serializers
 from ...const import AllTypes
 from ...models import Node, Platform, Asset
-from assets.tree.asset_tree import AssetTree
-from assets.tree.category import AssetTreeCategoryView
+from assets.tree.node_tree import AssetNodeTree
+# from assets.tree.category import AssetTreeCategoryView
 from .base import AbstractAssetTreeAPI
 
 
@@ -109,11 +109,12 @@ class AssetTreeAPI(AbstractAssetTreeAPI):
     def get_tree_user(self):
         return self.request.user
 
-    def _get_org_asset_tree(self, tree_view: RenderTreeView, **kwargs) -> AssetTree:
+    def _get_asset_tree(self, tree_view: RenderTreeView, **kwargs):
         if tree_view.is_node_view:
-            tree = AssetTree(**kwargs)
+            tree = AssetNodeTree(**kwargs)
         elif tree_view.is_category_view:
-            tree = AssetTreeCategoryView(**kwargs)
+            raise ValueError('Category tree view is not implemented yet')
+            # tree = AssetTreeCategoryView(**kwargs)
         else:
             raise ValueError(f'Unsupported tree view: {tree_view}')
         return tree
