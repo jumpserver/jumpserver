@@ -38,7 +38,7 @@ class SerializeToTreeNodeMixin:
 
         data = [
             {
-                'id': node.key,
+                'id': node.id,
                 'name': _name(node),
                 'title': _name(node),
                 'pId': node.parent_key,
@@ -46,11 +46,13 @@ class SerializeToTreeNodeMixin:
                 'open': _open(node),
                 'meta': {
                     'data': {
-                        "id": node.id,
+                        "id": getattr(node, 'raw_id', None) or node.id,
                         "key": node.key,
                         "value": node.value,
                     },
-                    'type': 'node'
+                    'type': node.type,
+                    'category': getattr(node, 'category', None),
+                    '_type': getattr(node, '_type', None),
                 }
             }
             for node in nodes

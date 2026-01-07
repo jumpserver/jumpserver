@@ -3,16 +3,17 @@ from rest_framework.response import Response
 
 from rbac.permissions import RBACPermission
 from .mixin import SerializeToTreeNodeMixin
-from assets.tree.node_tree import AssetNodeTree
 from assets.models import Node
+from assets.tree.asset_tree import AssetGenericTree
 from orgs.utils import current_org, tmp_to_org
 from orgs.models import Organization
 from common.utils import timeit
 
 
-__all__ = ['AssetTreeApi',]
+__all__ = ['AssetNodeTreeApi', 'AssetTypeTreeApi']
 
-class AssetTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
+
+class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
     permission_classes = (RBACPermission, )
 
     rbac_perms = {
@@ -50,13 +51,11 @@ class AssetTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
             data.extend(tree_data)
         return Response(data=data)
 
-    def get_asset_tree(self, org):
-        category = self.request.query_params.get('category')
-        tree = AssetNodeTree(category=category, org=org)
-        tree.init()
-        return tree
+    def get_asset_tree(self, org) -> AssetGenericTree:
+        raise NotImplementedError()
     
     def get_tree_data(self, tree):
+        tree: AssetGenericTree
         if tree.empty():
             return []
 
@@ -66,7 +65,6 @@ class AssetTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         expand_node_key = self.request.query_params.get('key')
         search = self.request.query_params.get('search')
         if search:
-            tree.set_use_cache()
             nodes = tree.filter_nodes(keyword=search)
             ancestors = tree.get_ancestors_of_nodes(nodes)
             data_nodes = self.serialize_nodes(ancestors, with_asset_amount=with_assets_amount)
@@ -78,7 +76,6 @@ class AssetTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
             return data_nodes
 
         if expand_node_key:
-            tree.set_use_cache()
             node = tree.get_node(expand_node_key)
             if not node:
                 return []
@@ -101,3 +98,31 @@ class AssetTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         data_nodes = self.serialize_nodes(nodes, with_asset_amount=with_assets_amount)
         data = data_nodes + data_assets
         return data
+
+
+class AssetNodeTreeApi(AssetGenericTreeApi):
+
+    def get_asset_tree(self, org):
+        from assets.tree.node_tree import AssetNodeTree
+        category = self.request.query_params.get('category')
+        tree = AssetNodeTree(category=category, org=org)
+        tree.init()
+        return tree
+
+    def get_tree_data(self, tree):
+        from assets.tree.node_tree import AssetNodeTree
+        tree: AssetNodeTree
+        expand_node_key = self.request.query_params.get('key')
+        search = self.request.query_params.get('search')
+        if search or expand_node_key:
+            tree.set_use_cache()
+        return super().get_tree_data(tree)
+
+
+class AssetTypeTreeApi(AssetGenericTreeApi):
+
+    def get_asset_tree(self, org):
+        from assets.tree.type_tree import AssetTypeTree
+        tree = AssetTypeTree(org=org)
+        tree.init()
+        return tree

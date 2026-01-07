@@ -9,6 +9,7 @@ from common.decorators import Singleton, merge_delay_run
 from assets.models import Asset, Node
 from collections import defaultdict
 from django.core.cache import cache
+from .asset_tree import AssetGenericTree
 
 __all__ = ['AssetNodeTree', 'NodeTreeNode']
 
@@ -106,15 +107,17 @@ relation = AssetNodeRelation()
 
 
 class NodeTreeNode(TreeNode):
-    def __init__(self, tree, id, **kwargs):
+    def __init__(self, tree, raw_id, **kwargs):
         super().__init__(**kwargs)
         self.tree: AssetNodeTree = tree
-        self.id = id
+        self.id = self.key
+        self.raw_id = raw_id
+        self.type = 'node'
     
     @lazyproperty
     def assets_ids(self):
         t1 = time.time()
-        ids = self.tree.scope_assets_ids & relation.get_node_assets_ids(self.id)
+        ids = self.tree.scope_assets_ids & relation.get_node_assets_ids(self.raw_id)
         t2 = time.time()
         if t2 - t1 > 0.3:
             logger.debug(f'NodeTreeNode assets_ids key={self.key} cost time: {t2 - t1}')
@@ -137,31 +140,41 @@ class NodeTreeNode(TreeNode):
         return len(self.assets_ids_total)
 
 
-class AssetNodeTree(Tree):
+class AssetNodeTree(AssetGenericTree):
 
     def __init__(self, category=None, org=None):
-        self.org = org or current_org
+        super().__init__(org=org)
         self.category = category
+        self.use_cache = False
         self.cache_key_scope_assets_ids = 'cache_key_org_{}_category_{}_scope_assets_ids'.format(
             self.org.id, self.category
         )
         self.cache_key_scope_assets_ids_timeout = 60 * 5  # 5 minutes
-        self.use_cache = False
-        super().__init__()
-
-    def set_use_cache(self):
-        self.use_cache = True
+    
+    @timeit
+    def create_tree_nodes(self):
+        tree_nodes = []
+        nodes = Node.objects.filter(org_id=self.org.id).only('id', 'key', 'value', 'parent_key')
+        for node in nodes:
+            node_id = str(node.id)
+            tree_node = NodeTreeNode(
+                tree=self,
+                raw_id=node_id,
+                key=node.key,
+                name=node.value,
+                parent_key=node.parent_key or None
+            )
+            tree_nodes.append(tree_node)
+        return tree_nodes
     
     def scope_assets_q(self):
-        q = Q(org_id=self.org.id)
+        q = super().scope_assets_q()
         if self.category:
             q &= Q(platform__category=self.category)
         return q
-    
-    @property
-    def scope_assets_queryset(self):
-        q = self.scope_assets_q()
-        return Asset.objects.filter(q)
+
+    def set_use_cache(self):
+        self.use_cache = True
     
     @lazyproperty
     def scope_assets_ids(self):
@@ -178,38 +191,3 @@ class AssetNodeTree(Tree):
         t3 = time.time()
         logger.debug(f'AssetNodeTree scope_assets_ids cost time: {t3 - t1}')
         return assets_ids
-    
-    @timeit
-    def init(self):
-        tree_nodes = self.create_tree_nodes()
-        super().init(tree_nodes)
-    
-    @timeit
-    def create_tree_nodes(self):
-        tree_nodes = []
-        nodes = Node.objects.filter(org_id=self.org.id).only('id', 'key', 'value', 'parent_key')
-        for node in nodes:
-            node_id = str(node.id)
-            tree_node = NodeTreeNode(
-                tree=self,
-                id=node_id,
-                key=node.key,
-                name=node.value,
-                parent_key=node.parent_key or None
-            )
-            tree_nodes.append(tree_node)
-        return tree_nodes
-    
-    def filter_assets(self, node_key=None, keyword=None):
-        only_fields = ['id', 'name', 'address', 'platform_id', 'org_id', 'is_active', 'comment']
-        if keyword:
-            limit = 1000
-            q = Q(name__icontains=keyword) | Q(address__icontains=keyword)
-            assets = self.scope_assets_queryset.filter(q)[:limit]
-        elif node_key:
-            assets = self.scope_assets_queryset.filter(nodes__key=node_key)
-        else:
-            assets = self.scope_assets_queryset
-        assets = assets.only(*only_fields)
-        return assets
-        
