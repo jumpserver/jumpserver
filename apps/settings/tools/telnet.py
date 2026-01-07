@@ -2,7 +2,8 @@
 #
 import asyncio
 import socket
-import telnetlib
+
+import telnetlib3
 
 from settings.utils import generate_ips
 
@@ -12,7 +13,7 @@ PROMPT_REGEX = r'[\<|\[](.*)[\>|\]]'
 async def telnet(dest_addr, port_number=23, timeout=10):
     loop = asyncio.get_running_loop()
     try:
-        connection = await loop.run_in_executor(None, telnetlib.Telnet, dest_addr, port_number, timeout)
+        connection = await loop.run_in_executor(None, telnetlib3.Telnet, dest_addr, port_number, timeout)
     except asyncio.TimeoutError:
         return False, 'Timeout'
     except (ConnectionRefusedError, socket.timeout, socket.gaierror) as e:

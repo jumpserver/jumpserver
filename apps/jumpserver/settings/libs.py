@@ -2,6 +2,7 @@
 #
 import os
 import time
+
 from .base import (
     REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY, REDIS_SSL_REQUIRED, REDIS_USE_SSL,
     REDIS_PROTOCOL, REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS, REDIS_SENTINEL_PASSWORD,
@@ -90,6 +91,7 @@ SPECTACULAR_SETTINGS = {
         'jumpserver.views.schema.DateTimeFieldExtension',
     ],
     'SECURITY': [{'Bearer': []}],
+    'DISABLE_ERRORS_AND_WARNINGS': True
 }
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (180, 38)
