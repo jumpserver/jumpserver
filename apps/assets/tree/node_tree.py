@@ -138,8 +138,14 @@ class NodeTreeNode(TreeNode):
 
     @property
     def assets_amount_total(self):
+        if hasattr(self, '_assets_amount_total_override'):
+            return self._assets_amount_total_override
         return len(self.assets_ids_total)
-
+    
+    @assets_amount_total.setter
+    def assets_amount_total(self, value):
+        self._assets_amount_total_override = value
+    
 
 class AssetNodeTree(AssetGenericTree):
 
@@ -158,8 +164,7 @@ class AssetNodeTree(AssetGenericTree):
         nodes = Node.objects.filter(org_id=self.org.id).only('id', 'key', 'value', 'parent_key')
         for node in nodes:
             node_id = str(node.id)
-            tree_node = NodeTreeNode(
-                tree=self,
+            tree_node = self.create_tree_node(
                 raw_id=node_id,
                 key=node.key,
                 name=node.value,
@@ -167,6 +172,9 @@ class AssetNodeTree(AssetGenericTree):
             )
             tree_nodes.append(tree_node)
         return tree_nodes
+    
+    def create_tree_node(self, **kwargs):
+        return NodeTreeNode(tree=self, **kwargs)
     
     def scope_assets_q(self):
         q = super().scope_assets_q()

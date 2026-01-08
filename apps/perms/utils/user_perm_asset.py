@@ -113,8 +113,6 @@ class UserPermAssetUtil:
         return set(aids)
 
     def user_permed_all_assets(self):
-        q = Q(org_id=self._org.id)
-        q &= Q(id__in=self.only_direct_assets_ids) | Q(nodes__id__in=self.user_all_permed_nodes_ids)
+        q = Q(org_id=self._org.id) & Q(id__in=self.user_permed_all_assets_ids)
         assets = Asset.objects.filter(q).distinct()
         return assets
-    

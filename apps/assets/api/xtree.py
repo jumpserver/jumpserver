@@ -5,6 +5,8 @@ from rbac.permissions import RBACPermission
 from .mixin import SerializeToTreeNodeMixin
 from assets.models import Node
 from assets.tree.asset_tree import AssetGenericTree
+from assets.tree.node_tree import AssetNodeTree
+from assets.tree.type_tree import AssetTypeTree
 from orgs.utils import current_org, tmp_to_org
 from orgs.models import Organization
 from common.utils import timeit
@@ -65,6 +67,7 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         expand_node_key = self.request.query_params.get('key')
         search = self.request.query_params.get('search')
         if search:
+            getattr(tree, 'set_use_cache', lambda: None)()
             nodes = tree.filter_nodes(keyword=search)
             ancestors = tree.get_ancestors_of_nodes(nodes)
             nodes = tree.merge_nodes(ancestors, nodes)
@@ -77,6 +80,7 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
             return data_nodes
 
         if expand_node_key:
+            getattr(tree, 'set_use_cache', lambda: None)()
             node = tree.get_node(expand_node_key)
             if not node:
                 return []
@@ -96,6 +100,8 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
             if with_assets:
                 assets = tree.filter_assets(node_key=tree.root.key)
                 data_assets = self.serialize_assets(assets, node_key=tree.root.key)
+        extra_nodes = getattr(tree, 'get_extra_nodes', lambda: [])()
+        nodes = extra_nodes + nodes
         data_nodes = self.serialize_nodes(nodes, with_asset_amount=with_assets_amount)
         data = data_nodes + data_assets
         return data
@@ -104,26 +110,15 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
 class AssetNodeTreeApi(AssetGenericTreeApi):
 
     def get_asset_tree(self, org):
-        from assets.tree.node_tree import AssetNodeTree
         category = self.request.query_params.get('category')
         tree = AssetNodeTree(category=category, org=org)
         tree.init()
         return tree
 
-    def get_tree_data(self, tree):
-        from assets.tree.node_tree import AssetNodeTree
-        tree: AssetNodeTree
-        expand_node_key = self.request.query_params.get('key')
-        search = self.request.query_params.get('search')
-        if search or expand_node_key:
-            tree.set_use_cache()
-        return super().get_tree_data(tree)
-
 
 class AssetTypeTreeApi(AssetGenericTreeApi):
 
     def get_asset_tree(self, org):
-        from assets.tree.type_tree import AssetTypeTree
         tree = AssetTypeTree(org=org)
         tree.init()
         return tree
