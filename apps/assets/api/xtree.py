@@ -10,7 +10,7 @@ from orgs.models import Organization
 from common.utils import timeit
 
 
-__all__ = ['AssetNodeTreeApi', 'AssetTypeTreeApi']
+__all__ = ['AssetGenericTreeApi', 'AssetNodeTreeApi', 'AssetTypeTreeApi']
 
 
 class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
@@ -36,7 +36,7 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         else:
             orgs = Organization.objects.filter(id=current_org.id)
         return orgs
-
+    
     def initial_node_root_if_need(self):
         for org in self.tree_orgs:
             with tmp_to_org(org):
@@ -67,6 +67,7 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         if search:
             nodes = tree.filter_nodes(keyword=search)
             ancestors = tree.get_ancestors_of_nodes(nodes)
+            nodes = tree.merge_nodes(ancestors, nodes)
             data_nodes = self.serialize_nodes(ancestors, with_asset_amount=with_assets_amount)
             if with_assets:
                 assets = tree.filter_assets(keyword=search)

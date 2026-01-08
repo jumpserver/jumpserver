@@ -97,7 +97,15 @@ class Tree:
             self.nodes.pop(descendant.key, None)
     
     def get_node(self, key) -> TreeNode | None:
-        return self.nodes.get(key)
+        node = self.nodes.get(key)
+        if not node:
+            node = self.get_node_by_id(key)
+        return node
+
+    def get_node_by_id(self, id) -> TreeNode | None:
+        for n in self.nodes.values():
+            if n.id == id:
+                return n
 
     def get_nodes(self) -> list[TreeNode]:
         return list(self.nodes.values())
@@ -113,3 +121,9 @@ class Tree:
         for node in nodes:
             ancestors_set.update(node.ancestors())
         return list(ancestors_set)
+    
+    def merge_nodes(self, nodes1: list[TreeNode], nodes2: list[TreeNode]) -> list[TreeNode]:
+        nodes_mapper = {
+            node.key: node for node in nodes1 + nodes2
+        }
+        return list(nodes_mapper.values())

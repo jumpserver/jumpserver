@@ -11,7 +11,7 @@ from collections import defaultdict
 from django.core.cache import cache
 from .asset_tree import AssetGenericTree
 
-__all__ = ['AssetNodeTree', 'NodeTreeNode']
+__all__ = ['AssetNodeTree', 'NodeTreeNode', 'relation']
 
 logger = get_logger(__file__)
 
@@ -186,9 +186,13 @@ class AssetNodeTree(AssetGenericTree):
             if cached_assets_ids:
                 logger.debug(f'AssetNodeTree scope_assets_ids cost time cache: {t2 - t1}')
                 return cached_assets_ids
-        assets_ids = self.scope_assets_queryset.values_list('id', flat=True)
+        assets_ids = self._scope_assets_ids()
         assets_ids = set([str(i).replace('-', '') for i in assets_ids])
         cache.set(self.cache_key_scope_assets_ids, assets_ids, self.cache_key_scope_assets_ids_timeout)
         t3 = time.time()
         logger.debug(f'AssetNodeTree scope_assets_ids cost time: {t3 - t1}')
+        return assets_ids
+    
+    def _scope_assets_ids(self):
+        assets_ids = self.scope_assets_queryset.values_list('id', flat=True)
         return assets_ids

@@ -30,18 +30,18 @@ user_permission_urlpatterns = [
          name='user-ungroup-assets-as-tree'),
 
     # tree-node，不包含资产
-    path('<str:user>/nodes/tree/', api.UserAllPermedNodesAsTreeApi.as_view(),
+    path('<str:user>/nodes/tree/', api.UserAssetNodeTreeApi.as_view(),
          name='user-all-nodes-as-tree'),
-    path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
+    path('<str:user>/nodes/children/tree/', api.UserAssetNodeTreeApi.as_view(),
          name='user-node-children-as-tree'),
 
     # tree-node-with-asset
     # 异步树
     path('<str:user>/nodes/children-with-assets/tree/',
-         api.UserPermedNodeChildrenWithAssetsAsTreeApi.as_view(),
+         api.UserAssetNodeTreeApi.as_view(),
          name='user-node-children-with-assets-as-tree'),
     path('<str:user>/nodes/children-with-assets/category/tree/',
-         api.UserPermedNodeChildrenWithAssetsAsCategoryTreeApi.as_view(),
+         api.UserAssetTypeTreeApi.as_view(),
          name='user-node-children-with-assets-as-category-tree'),
     # 同步树
     path('<str:user>/nodes/all-with-assets/tree/',

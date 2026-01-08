@@ -1,11 +1,16 @@
+import time
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 from .base import TreeNode
 from .asset_tree import AssetGenericTree
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
+from assets.models import Asset
 from assets.const import Category, AllTypes
 from assets.models import Platform
 from django.db.models import Count
 
+
+logger = get_logger(__file__)
 
 class TypeTreeNode(TreeNode):
 
@@ -34,10 +39,13 @@ class AssetTypeTree(AssetGenericTree):
     
     @lazyproperty
     def platform_id_assets_amount_mapper(self):
+        t1 = time.time()
         mapper = self.scope_assets_queryset.values('platform_id').annotate(
             assets_amount=Count('id')
         ).values_list('platform_id', 'assets_amount')
         mapper = {str(pid): assets_amount for pid, assets_amount in mapper}
+        t2 = time.time()
+        logger.debug(f'AssetTypeTree platform_id_assets_amount_mapper cost time: {t2 - t1}')
         return mapper
     
     def create_tree_nodes(self):
@@ -78,3 +86,12 @@ class AssetTypeTree(AssetGenericTree):
             parent_key=parent_key,
             **kwargs
         )
+    
+    def _filter_node_assets(self, node_key):
+        try:
+            pid = int(node_key)
+            q = Q(platform_id=pid)
+            return self.scope_assets_queryset.filter(q)
+        except ValueError:
+            pid = None
+            return Asset.objects.none()
