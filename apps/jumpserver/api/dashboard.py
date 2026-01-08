@@ -46,7 +46,7 @@ class DateTimeMixin:
         if days == 1:
             t = local_zero_hour()
         else:
-            t = local_now() - timezone.timedelta(days=days)
+            t = local_zero_hour() - timezone.timedelta(days=days)
         return t
 
     @lazyproperty
