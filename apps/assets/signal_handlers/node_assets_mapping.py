@@ -11,7 +11,7 @@ from common.decorators import merge_delay_run
 logger = get_logger(__name__)
 
 
-@merge_delay_run(ttl=30)
+@merge_delay_run(ttl=5)
 def expire_node_asset_relation_cache(ignore_args=()):
     from assets.tree.node_tree import relation
     logger.debug('Expire Node-Asset relation cache')

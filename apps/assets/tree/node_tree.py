@@ -79,10 +79,11 @@ class AssetNodeRelation:
             self.refresh_mapper_from_db_to_cache()
 
     def refresh_mapper_from_db_to_cache(self):
-        mapper = self.load_mapper_from_db()
-        self.set_cache_mapper(mapper)
+        # 优先设置 pid，防止并发时多次加载 DB
         self.set_cache_pid(self.pid)
         self._current_mapper_pid = self.pid
+        mapper = self.load_mapper_from_db()
+        self.set_cache_mapper(mapper)
         self._nid_aids_mapper = mapper
 
     def set_cache_pid(self, pid):
