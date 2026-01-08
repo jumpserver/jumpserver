@@ -18,7 +18,7 @@
 
     <style>
         .login-content {
-            {% comment %} box-shadow: 0 5px 5px -3px rgb(0 0 0 / 15%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%); {% endcomment %}
+        {% comment %} box-shadow: 0 5px 5px -3px rgb(0 0 0 / 15%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%); {% endcomment %}
         }
 
         .login-footer {
@@ -86,7 +86,7 @@
             width: 100vw;
             height: 100vh;
             background-color: #f3f3f3;
-            {#height: calc(100vh - (100vh - 470px) / 3);#}
+        {#height: calc(100vh - (100vh - 470px) / 3);#}
         }
 
 
@@ -406,7 +406,6 @@
                             {% trans 'Login' %}
                         </button>
                     </div>
-
                     {% if demo_mode %}
                         <div>
                             <p class="red-fonts" style='text-align: center;'>
@@ -463,6 +462,49 @@
     }
 
     setInterval(checkHealth, 30 * 1000);
+
+    {% if block_ttl %}
+        (function () {
+            var ttl = {{ block_ttl }};
+            var loginBtn = $('button[type="submit"]');
+            var inputs = $('#login-form input');
+            var originalBtnText = loginBtn.text();
+            var intervalId = null;
+
+            // Only disable password and other inputs, keep username enabled
+            inputs.not('[name="username"]').prop('disabled', true);
+
+            function updateState() {
+                if (ttl <= 0) {
+                    location.reload();
+                    return;
+                }
+                var minutes = Math.floor(ttl / 60);
+                var seconds = ttl % 60;
+                var timeStr = "";
+                if (minutes > 0) {
+                    timeStr += minutes + "m ";
+                }
+                timeStr += seconds + "s";
+
+                loginBtn.text("{% trans 'Login blocked' %} (" + timeStr + ")");
+                loginBtn.prop('disabled', true);
+                ttl--;
+            }
+
+            updateState();
+            intervalId = setInterval(updateState, 1000);
+
+            // Allow switching account: unlock UI when username changes
+            $('input[name="username"]').one('input', function () {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+                loginBtn.text(originalBtnText);
+                loginBtn.prop('disabled', false);
+                inputs.prop('disabled', false);
+            });
+        })();
+    {% endif %}
 </script>
 </html>
-
