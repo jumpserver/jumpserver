@@ -17,6 +17,9 @@ __all__ = ['AssetGenericTreeApi', 'AssetNodeTreeApi', 'AssetTypeTreeApi']
 
 class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
     permission_classes = (RBACPermission, )
+    with_assets = False
+    expand_node_key = None
+    with_assets_amount = False
 
     rbac_perms = {
         'list': 'assets.view_asset',
@@ -26,6 +29,12 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
         self.initial_node_root_if_need()
+        if self.request.query_params.get('assets') == '1':
+            self.with_assets = True
+        if key := self.request.query_params.get('key'):
+            self.expand_node_key = key
+        if self.request.query_params.get('asset_amount') == '1':
+            self.with_assets_amount = True
 
     @property
     def tree_user(self):
@@ -61,10 +70,9 @@ class AssetGenericTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         if tree.empty():
             return []
 
-        with_assets = self.request.query_params.get('assets', '0') == '1'
-        with_assets_amount = self.request.query_params.get('asset_amount', '1') == '1'
-        with_assets_amount = True
-        expand_node_key = self.request.query_params.get('key')
+        with_assets = self.with_assets
+        with_assets_amount = self.with_assets_amount
+        expand_node_key = self.expand_node_key
         search = self.request.query_params.get('search')
         if search:
             getattr(tree, 'set_use_cache', lambda: None)()

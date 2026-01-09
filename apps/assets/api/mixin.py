@@ -13,10 +13,7 @@ class SerializeToTreeNodeMixin:
     @lazyproperty
     def is_sync(self):
         sync_paths = ['/api/v1/perms/users/self/nodes/all-with-assets/tree/']
-        for p in sync_paths:
-            if p == self.request.path:
-                return True
-        return False
+        return self.request.path in sync_paths
 
     @timeit
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
@@ -28,9 +25,13 @@ class SerializeToTreeNodeMixin:
                 return node.value
 
         def _open(node):
-            if not self.is_sync:
+            # if not self.is_sync:
                 # 异步加载资产树时，默认展开节点
-                return True
+                # return True
+            open = getattr(node, 'open', None)
+            if open is not None:
+                return open
+
             if not node.parent_key:
                 return True
             else:
@@ -89,34 +90,37 @@ class SerializeToTreeNodeMixin:
             platform = platform_map.get(asset.platform_id)
             if not platform:
                 continue
-            pid = node_key or get_pid(asset, platform)
-            if not pid:
+            pid_list = node_key or get_pid(asset, platform)
+            if not isinstance(pid_list, (set, list, tuple)):
+                pid_list = set([pid_list])
+            if not pid_list:
                 continue
-            # 根节点最多显示 1000 个资产
-            if pid.isdigit():
-                if root_assets_count > 1000:
-                    continue
-                root_assets_count += 1
-            data.append({
-                'id': str(asset.id),
-                'name': asset.name,
-                'title': f'{asset.address}\n{asset.comment}'.strip(),
-                'pId': pid,
-                'isParent': False,
-                'open': False,
-                'iconSkin': self.get_icon(platform),
-                'chkDisabled': not asset.is_active,
-                'meta': {
-                    'type': 'asset',
-                    'data': {
-                        'platform_type': platform.type,
-                        'org_name': asset.org_name,
-                        'sftp': asset.id in sftp_asset_ids,
-                        'name': asset.name,
-                        'address': asset.address
-                    },
-                }
-            })
+            for pid in pid_list:
+                # 根节点最多显示 1000 个资产
+                if pid.isdigit():
+                    if root_assets_count > 1000:
+                        continue
+                    root_assets_count += 1
+                data.append({
+                    'id': str(asset.id),
+                    'name': asset.name,
+                    'title': f'{asset.address}\n{asset.comment}'.strip(),
+                    'pId': pid,
+                    'isParent': False,
+                    'open': False,
+                    'iconSkin': self.get_icon(platform),
+                    'chkDisabled': not asset.is_active,
+                    'meta': {
+                        'type': 'asset',
+                        'data': {
+                            'platform_type': platform.type,
+                            'org_name': asset.org_name,
+                            'sftp': asset.id in sftp_asset_ids,
+                            'name': asset.name,
+                            'address': asset.address
+                        },
+                    }
+                })
         return data
 
 

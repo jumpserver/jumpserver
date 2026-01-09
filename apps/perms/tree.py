@@ -26,6 +26,15 @@ class UserAssetNodeTree(AssetNodeTree):
     
     def _scope_assets_ids(self):
         return self.util.user_permed_all_assets_ids
+
+    def get_node(self, key):
+        node = super().get_node(key)
+        if node:
+            return node
+        if key == self.SpecialKey.FAVORITE:
+            return self.favorite_tree_node
+        if key == self.SpecialKey.UNGROUPED:
+            return self.ungrouped_tree_node
     
     def get_extra_nodes(self):
         f_tree_node = self.create_favorite_tree_node()
@@ -33,6 +42,11 @@ class UserAssetNodeTree(AssetNodeTree):
         return [f_tree_node, u_tree_node]
     
     def create_favorite_tree_node(self):
+        self.favorite_tree_node.assets_amount_total = self.favorite_assets_ids.count()
+        return self.favorite_tree_node
+
+    @lazyproperty
+    def favorite_tree_node(self):
         kwargs = {
             'raw_id': self.SpecialKey.FAVORITE,
             'key': self.SpecialKey.FAVORITE,
@@ -40,11 +54,14 @@ class UserAssetNodeTree(AssetNodeTree):
             'parent_key': None
         }
         tree_node = self.create_tree_node(**kwargs)
-        amount_total = FavoriteAsset.get_user_favorite_asset_ids(user=self.user).count()
-        tree_node.assets_amount_total = amount_total
         return tree_node
 
     def create_ungrouped_tree_node(self):
+        self.ungrouped_tree_node.assets_amount_total = len(self.ungrouped_assets_ids)
+        return self.ungrouped_tree_node
+
+    @lazyproperty
+    def ungrouped_tree_node(self):
         kwargs = {
             'raw_id': self.SpecialKey.UNGROUPED,
             'key': self.SpecialKey.UNGROUPED,
@@ -52,8 +69,29 @@ class UserAssetNodeTree(AssetNodeTree):
             'parent_key': None
         }
         tree_node = self.create_tree_node(**kwargs)
-        tree_node.assets_amount_total = len(self.util._user_direct_asset_ids)
         return tree_node
+    
+    def _filter_node_assets(self, node_key):
+        if node_key == self.SpecialKey.FAVORITE:
+            return self.filter_favorite_assets()
+        if node_key == self.SpecialKey.UNGROUPED:
+            return self.filter_ungrouped_assets()
+        return super()._filter_node_assets(node_key)
+    
+    @property
+    def ungrouped_assets_ids(self):
+        return self.util._user_direct_asset_ids
+
+    @property
+    def favorite_assets_ids(self):
+        return FavoriteAsset.get_user_favorite_asset_ids(user=self.user)
+
+    def filter_favorite_assets(self):
+        return Asset.objects.filter(id__in=self.favorite_assets_ids)
+
+    def filter_ungrouped_assets(self):
+        return Asset.objects.filter(id__in=self.util._user_direct_asset_ids)
+
 
 class UserAssetTypeTree(AssetTypeTree):
 
