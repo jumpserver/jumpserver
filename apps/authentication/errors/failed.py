@@ -37,7 +37,7 @@ class AuthFailedError(Exception):
     error = ''
     request = None
     ip = ''
-    block_ttl = 0  # Seconds (for countdown)
+    block_ttl = 0
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -96,12 +96,10 @@ class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
 
     def __init__(self, username, request, ip, mfa_type, error):
         util = MFABlockUtils(username, ip)
-        times_remainder = util.incr_failed_count()
+        util.incr_failed_count()
+        times_remainder = util.get_remainder_times()
 
-        if times_remainder:
-            current_count = util.get_failed_count()
-            next_block_minutes = util.get_block_time_by_count(current_count + 1)
-            block_time = next_block_minutes
+        if times_remainder > 1:
             self.msg = const.mfa_error_msg.format(
                 error=error, times_try=times_remainder, block_time=1
             )

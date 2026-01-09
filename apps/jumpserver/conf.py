@@ -215,10 +215,6 @@ class Config(dict):
         'REDIS_DB_SESSION': 5,
         'REDIS_DB_WS': 6,
 
-        'THROTTLE_RATES_ANON': '60/min',
-        'THROTTLE_RATES_USER': '180/min',
-        'THROTTLE_RATES_SERVICE_ACCOUNT': '300/min',
-
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://127.0.0.1',
         'USER_GUIDE_URL': '',
