@@ -72,7 +72,6 @@ class ActionAclSerializer(serializers.Serializer):
             field_action._choices.pop(ActionChoices.review, None)
         if not (
             settings.XPACK_LICENSE_IS_VALID and
-            settings.XPACK_LICENSE_EDITION_ULTIMATE and
             settings.FACE_RECOGNITION_ENABLED
         ):
             field_action._choices.pop(ActionChoices.face_verify, None)
