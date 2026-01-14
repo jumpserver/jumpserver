@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -9,10 +8,10 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from accounts import serializers
-from accounts.const import ChangeSecretRecordStatusChoice
+from accounts.const import ChangeSecretRecordStatusChoice, Source
 from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
-from accounts.models import Account, ChangeSecretRecord
+from accounts.models import Account, ChangeSecretRecord, AccountTemplate
 from assets.const.gpt import create_or_update_chatx_resources
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -60,6 +59,57 @@ class AccountViewSet(OrgBulkModelViewSet):
         asset = get_object_or_404(Asset, pk=asset_id)
         queryset = asset.all_accounts.all()
         return queryset
+
+    def perform_bulk_create(self, serializer):
+        result = super().perform_create(serializer)
+
+        template_items = [
+            d for d in serializer.data
+            if d.get("source", {}).get('value') == Source.TEMPLATE and d.get("source_id")
+        ]
+        if len(template_items) < 2:
+            return result
+
+        source_template_accounts = {
+            f"{item['asset']['id']}+{item['source_id']}": item["id"]
+            for item in template_items
+        }
+        template_ids = {item["source_id"] for item in template_items}
+
+        templates = (
+            AccountTemplate.objects
+            .filter(id__in=template_ids, su_from_id__isnull=False)
+            .only("id", "su_from_id")
+        )
+        su_from_map = {str(tpl.id): str(tpl.su_from_id) for tpl in templates}
+        if not su_from_map:
+            return result
+
+        account_su_from_id_map: dict[str] = {}
+
+        for d in template_items:
+            source_tpl_id = d["source_id"]
+            su_from_tpl_id = su_from_map.get(source_tpl_id)
+            if not su_from_tpl_id:
+                continue
+
+            su_from_account_id = source_template_accounts.get(
+                f"{d['asset']['id']}+{su_from_tpl_id}"
+            )
+            if su_from_account_id:
+                account_su_from_id_map[d["id"]] = su_from_account_id
+
+        if not account_su_from_id_map:
+            return result
+
+        accounts = Account.objects.filter(id__in=account_su_from_id_map.keys())
+        for account in accounts:
+            su_from_account_id = account_su_from_id_map.get(str(account.id))
+            if su_from_account_id:
+                account.su_from_id = su_from_account_id
+                account.save(update_fields=['su_from_id'])
+
+        return result
 
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):
