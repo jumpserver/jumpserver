@@ -221,6 +221,10 @@ class Config(dict):
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 
+        'THROTTLE_RATES_ANON': '60/min',
+        'THROTTLE_RATES_USER': '180/min',
+        'THROTTLE_RATES_SERVICE_ACCOUNT': '300/min',
+
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
 
