@@ -33,6 +33,7 @@ class MFAFace(BaseMFA, AuthFaceMixin):
     def global_enabled():
         return (
                 settings.XPACK_LICENSE_IS_VALID and
+                settings.XPACK_LICENSE_EDITION_ULTIMATE and
                 settings.FACE_RECOGNITION_ENABLED
         )
 
