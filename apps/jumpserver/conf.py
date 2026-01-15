@@ -9,6 +9,7 @@
 """
 import base64
 import copy
+import errno
 import json
 import logging
 import os
@@ -227,6 +228,7 @@ class Config(dict):
 
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
+        'VERIFY_EXTERNAL_SSL': True,
 
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
