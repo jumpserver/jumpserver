@@ -93,7 +93,7 @@ JumpServer 由多个关键组件组成，这些组件共同构成了 JumpServer 
 
 ## License
 
-Copyright (c) 2014-2025 FIT2CLOUD, All rights reserved.
+Copyright (c) 2014-2026 FIT2CLOUD, All rights reserved.
 
 Licensed under The GNU General Public License version 3 (GPLv3) (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
