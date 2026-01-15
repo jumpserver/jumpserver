@@ -222,6 +222,7 @@ class Config(dict):
 
         # Security
         'X_FRAME_OPTIONS': 'DENY',
+        'VERIFY_EXTERNAL_SSL': True,
 
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
