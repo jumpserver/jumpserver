@@ -6,16 +6,21 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 
+from jumpserver.vendor import get_vendor_value, is_default_vendor
+
 default_interface = dict((
-    ('logo_logout', static('img/logo.png')),
-    ('logo_index', static('img/logo_text_white.png')),
-    ('login_image', static('img/login_image.png')),
-    ('favicon', static('img/facio.ico')),
-    ('login_title', _('JumpServer - An open-source PAM')),
-    ('theme', 'classic_green'),
+    ('logo_logout', get_vendor_value('logo_logout')),
+    ('logo_index', get_vendor_value('logo_index')),
+    ('login_image', get_vendor_value('login_image')),
+    ('favicon', get_vendor_value('favicon')),
+    ('login_title', get_vendor_value('login_title', default=_('JumpServer - An open-source PAM'))),
+    ('theme', get_vendor_value('theme', default='classic_green')),
     ('theme_info', {}),
-    ('footer_content', ''),
+    ('footer_content', get_vendor_value('footer_content', default='')),
 ))
+
+if not is_default_vendor():
+    default_interface['theme_info'] = get_vendor_value('theme_info', default={})
 
 current_year = datetime.datetime.now().year
 

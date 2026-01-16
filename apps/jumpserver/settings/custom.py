@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 #
+from pathlib import Path
+
+from .base import TEMPLATES, STATIC_DIR
 from ..const import CONFIG
 
 # Storage settings
@@ -267,3 +270,8 @@ TOOL_USER_ENABLED = CONFIG.TOOL_USER_ENABLED
 
 SUGGESTION_LIMIT = CONFIG.SUGGESTION_LIMIT
 MCP_ENABLED = CONFIG.MCP_ENABLED
+
+VENDOR = CONFIG.VENDOR
+VENDOR_TEMPLATES_DIR = Path(STATIC_DIR) / VENDOR
+if Path(VENDOR_TEMPLATES_DIR).is_dir():
+    TEMPLATES[0]['DIRS'].insert(0, VENDOR_TEMPLATES_DIR)
