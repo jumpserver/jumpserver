@@ -42,9 +42,9 @@ REST_FRAMEWORK = {
         'common.drf.throttling.RateThrottle',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '60/min',
-        'user': '180/min',
-        'service_account': '300/min',
+        'anon': CONFIG.THROTTLE_RATES_ANON,
+        'user': CONFIG.THROTTLE_RATES_USER,
+        'service_account': CONFIG.THROTTLE_RATES_SERVICE_ACCOUNT,
     },
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
