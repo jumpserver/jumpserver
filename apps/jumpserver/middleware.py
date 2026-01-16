@@ -9,11 +9,13 @@ from urllib.parse import urlparse, quote
 import pytz
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
-from django.http.response import HttpResponseForbidden
+from django.db.utils import OperationalError
+from django.http.response import HttpResponseForbidden, JsonResponse
 from django.shortcuts import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework import status
 
 from .utils import set_current_request
 
@@ -141,6 +143,15 @@ class EndMiddleware:
         request._e_time_end = time.time()
         return response
 
+    def process_exception(self, request, exception):
+        if isinstance(exception, OperationalError):
+            return JsonResponse({
+                'error': 'Database OperationalError: ' + str(exception),
+                'message': 'Database operation failed, please try again later.',
+                'code': 'DB_ERROR'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return None
+
 
 class SafeRedirectMiddleware:
     def __init__(self, get_response):
@@ -152,9 +163,9 @@ class SafeRedirectMiddleware:
         if not (300 <= response.status_code < 400):
             return response
         if (
-            request.resolver_match and 
-            request.resolver_match.namespace.startswith('authentication') and 
-            not request.resolver_match.namespace.startswith('authentication:oauth2-provider')
+                request.resolver_match and
+                request.resolver_match.namespace.startswith('authentication') and
+                not request.resolver_match.namespace.startswith('authentication:oauth2-provider')
         ):
             # 认证相关的路由跳过验证 /core/auth/..., 
             # 但 oauth2-provider 除外, 因为它会重定向到第三方客户端, 希望给出更友好的提示
