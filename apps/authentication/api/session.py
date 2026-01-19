@@ -6,6 +6,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import AnonymousUser
 from rest_framework import generics
 from rest_framework import status
+from rest_framework.serializers import Serializer
 from rest_framework.response import Response
 
 from common.sessions.cache import user_session_manager
@@ -52,6 +53,7 @@ class UserSessionManager:
 
 class UserSessionApi(generics.RetrieveDestroyAPIView):
     permission_classes = ()
+    serializer_class = Serializer
 
     def retrieve(self, request, *args, **kwargs):
         if isinstance(request.user, AnonymousUser):

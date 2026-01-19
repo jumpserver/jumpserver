@@ -30,7 +30,7 @@ from users.utils import (
 )
 from .. import mixins, errors
 from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY, USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD
-from ..forms import get_user_login_form_cls
+from ..forms import get_user_login_form_cls, get_comprehensive_user_login_form_cls
 from ..utils import get_auth_methods
 
 __all__ = [
@@ -253,6 +253,9 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
             return get_user_login_form_cls(captcha=True)
         else:
             return get_user_login_form_cls()
+    
+    def get_comprehensive_form_class(self):
+        return get_comprehensive_user_login_form_cls()
 
     def clear_rsa_key(self):
         self.request.session[RSA_PRIVATE_KEY] = None

@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from django.utils.translation import gettext as _
+from rest_framework.serializers import Serializer
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
@@ -104,6 +105,7 @@ class FaceCallbackApi(AuthMixin, CreateAPIView):
 class FaceContextApi(AuthMixin, RetrieveAPIView, CreateAPIView):
     permission_classes = (AllowAny,)
     face_token_session_key = FACE_SESSION_KEY
+    serializer_class = Serializer
 
     @staticmethod
     def get_face_cache_key(token):

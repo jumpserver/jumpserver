@@ -1,0 +1,799 @@
+[
+    {
+        "url": "/api/v1/users/^service-account-registrations/$",
+        "view_path": "users.api.service.ServiceAccountRegistrationViewSet",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "id": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string",
+                "maxLength": 128
+            },
+            "comment": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/users/^service-account-registrations\\.(?P<format>[a-z0-9]+)/?$",
+        "view_path": "users.api.service.ServiceAccountRegistrationViewSet",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "id": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string",
+                "maxLength": 128
+            },
+            "comment": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/users/^service-account-registrations/(?P<pk>[^/.]+)/$",
+        "view_path": "users.api.service.ServiceAccountRegistrationViewSet",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "id": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string",
+                "maxLength": 128
+            },
+            "comment": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/users/^service-account-registrations/(?P<pk>[^/.]+)\\.(?P<format>[a-z0-9]+)/?$",
+        "view_path": "users.api.service.ServiceAccountRegistrationViewSet",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "id": {
+                "type": "string"
+            },
+            "name": {
+                "type": "string",
+                "maxLength": 128
+            },
+            "comment": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/terminal/terminal-registrations/",
+        "view_path": "terminal.api.component.terminal.TerminalRegistrationApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "name": {
+                "type": "string",
+                "maxLength": 1024
+            },
+            "type": {
+                "type": "string",
+                "enum": [
+                    "koko",
+                    "guacamole",
+                    "omnidb",
+                    "xrdp",
+                    "lion",
+                    "core",
+                    "celery",
+                    "magnus",
+                    "razor",
+                    "tinker",
+                    "video_worker",
+                    "chen",
+                    "kael",
+                    "panda",
+                    "nec",
+                    "facelive"
+                ]
+            },
+            "comment": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/terminal/registration/",
+        "view_path": "terminal.api.component.terminal.TerminalRegistrationApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "name": {
+                "type": "string",
+                "maxLength": 1024
+            },
+            "type": {
+                "type": "string",
+                "enum": [
+                    "koko",
+                    "guacamole",
+                    "omnidb",
+                    "xrdp",
+                    "lion",
+                    "core",
+                    "celery",
+                    "magnus",
+                    "razor",
+                    "tinker",
+                    "video_worker",
+                    "chen",
+                    "kael",
+                    "panda",
+                    "nec",
+                    "facelive"
+                ]
+            },
+            "comment": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/settings/logo/",
+        "view_path": "settings.api.settings.SettingsLogoApi",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/settings/public/open/",
+        "view_path": "settings.api.public.OpenPublicSettingApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "XPACK_ENABLED": {
+                "type": "boolean"
+            },
+            "INTERFACE": {
+                "type": "object",
+                "properties": {}
+            },
+            "LANGUAGES": {
+                "type": "array",
+                "properties": {}
+            }
+        }
+    },
+    {
+        "url": "/api/v1/settings/i18n/<str:name>/",
+        "view_path": "settings.api.i18n.ComponentI18nApi",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/settings/client/versions/",
+        "view_path": "settings.api.settings.ClientVersionView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/authentication/face/context/",
+        "view_path": "authentication.api.face.FaceContextApi",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/authentication/auth/",
+        "view_path": "authentication.api.token.TokenCreateApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "username": {
+                "type": "string"
+            },
+            "password": {
+                "type": "string"
+            },
+            "public_key": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/tokens/",
+        "view_path": "authentication.api.token.TokenCreateApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "username": {
+                "type": "string"
+            },
+            "password": {
+                "type": "string"
+            },
+            "public_key": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/mfa/verify/",
+        "view_path": "authentication.api.mfa.MFAChallengeVerifyApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "type": {
+                "type": "string"
+            },
+            "code": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/mfa/challenge/",
+        "view_path": "authentication.api.mfa.MFAChallengeVerifyApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "type": {
+                "type": "string"
+            },
+            "code": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/mfa/select/",
+        "view_path": "authentication.api.mfa.MFASendCodeApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "type": {
+                "type": "string"
+            },
+            "username": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/mfa/send-code/",
+        "view_path": "authentication.api.mfa.MFASendCodeApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "type": {
+                "type": "string"
+            },
+            "username": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/password/reset-code/",
+        "view_path": "authentication.api.password.UserResetPasswordSendCodeApi",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "form_type": {
+                "type": "string",
+                "enum": [
+                    "sms",
+                    "email"
+                ]
+            },
+            "email": {
+                "type": "string"
+            },
+            "sms": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/api/v1/authentication/login-confirm-ticket/status/",
+        "view_path": "authentication.api.login_confirm.TicketStatusApi",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/authentication/user-session/",
+        "view_path": "authentication.api.session.UserSessionApi",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/prometheus/metrics/",
+        "view_path": "jumpserver.api.health.PrometheusMetricsApi",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/health/",
+        "view_path": "jumpserver.api.health.HealthCheckView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/api/v1/health/",
+        "view_path": "jumpserver.api.health.HealthCheckView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/login/",
+        "view_path": "authentication.views.login.UserLoginView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "username": {
+                "type": "string"
+            },
+            "password": {
+                "type": "string"
+            },
+            "auto_login": {
+                "type": "boolean"
+            },
+            "captcha": {
+                "type": "string"
+            },
+            "code": {
+                "type": "string"
+            },
+            "mfa_type": {
+                "type": "string"
+            },
+            "challenge": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/login/mfa/",
+        "view_path": "authentication.views.mfa.UserLoginMFAView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "code": {
+                "type": "string"
+            },
+            "mfa_type": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/login/wait-confirm/",
+        "view_path": "authentication.views.login.UserLoginWaitConfirmView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/login/mfa/face/capture/",
+        "view_path": "authentication.views.mfa.UserLoginMFAFaceView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "code": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/login/guard/",
+        "view_path": "authentication.views.login.UserLoginGuardView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/logout/",
+        "view_path": "authentication.views.login.UserLogoutView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/password/forget/previewing/",
+        "view_path": "users.views.profile.reset.UserForgotPasswordPreviewingView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "captcha": {
+                "type": "string"
+            },
+            "username": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/password/forgot/",
+        "view_path": "users.views.profile.reset.UserForgotPasswordView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "email": {
+                "type": "string"
+            },
+            "country_code": {
+                "type": "string"
+            },
+            "sms": {
+                "type": "string",
+                "description": "The phone number must contain an area code, for example, +86"
+            },
+            "code": {
+                "type": "string"
+            },
+            "form_type": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/password/reset/",
+        "view_path": "users.views.profile.reset.UserResetPasswordView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "new_password": {
+                "type": "string"
+            },
+            "confirm_password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/password/verify/",
+        "view_path": "users.views.profile.password.UserVerifyPasswordView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/wecom/bind/start/",
+        "view_path": "authentication.views.wecom.WeComEnableStartView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/wecom/qr/login/",
+        "view_path": "authentication.views.wecom.WeComQRLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/wecom/qr/login/callback/",
+        "view_path": "authentication.views.wecom.WeComQRLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/wecom/oauth/login/",
+        "view_path": "authentication.views.wecom.WeComOAuthLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/wecom/oauth/login/callback/",
+        "view_path": "authentication.views.wecom.WeComOAuthLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/dingtalk/bind/start/",
+        "view_path": "authentication.views.dingtalk.DingTalkEnableStartView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/dingtalk/qr/login/",
+        "view_path": "authentication.views.dingtalk.DingTalkQRLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/dingtalk/qr/login/callback/",
+        "view_path": "authentication.views.dingtalk.DingTalkQRLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/dingtalk/oauth/login/",
+        "view_path": "authentication.views.dingtalk.DingTalkOAuthLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/dingtalk/oauth/login/callback/",
+        "view_path": "authentication.views.dingtalk.DingTalkOAuthLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/feishu/bind/start/",
+        "view_path": "authentication.views.feishu.FeiShuEnableStartView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/feishu/qr/login/",
+        "view_path": "authentication.views.feishu.FeiShuQRLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/feishu/qr/login/callback/",
+        "view_path": "authentication.views.feishu.FeiShuQRLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/lark/bind/start/",
+        "view_path": "authentication.views.lark.LarkEnableStartView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/lark/qr/login/",
+        "view_path": "authentication.views.lark.LarkQRLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/lark/qr/login/callback/",
+        "view_path": "authentication.views.lark.LarkQRLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/slack/bind/start/",
+        "view_path": "authentication.views.slack.SlackEnableStartView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "password": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/slack/qr/login/",
+        "view_path": "authentication.views.slack.SlackQRLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/slack/qr/login/callback/",
+        "view_path": "authentication.views.slack.SlackQRLoginCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/profile/otp/enable/start/",
+        "view_path": "users.views.profile.otp.UserOtpEnableStartView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/profile/otp/enable/install-app/",
+        "view_path": "users.views.profile.otp.UserOtpEnableInstallAppView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/profile/otp/enable/bind/",
+        "view_path": "users.views.profile.otp.UserOtpEnableBindView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "otp_code": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/profile/face/enable/",
+        "view_path": "users.views.profile.face.UserFaceEnableView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "code": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/profile/face/disable/",
+        "view_path": "users.views.profile.face.UserFaceDisableView",
+        "view_requires_auth": false,
+        "view_type": "class",
+        "view_write_fields_schema": {
+            "code": {
+                "type": "string"
+            }
+        }
+    },
+    {
+        "url": "/core/auth/cas/login/",
+        "view_path": "authentication.backends.cas.views.CASLoginView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/cas/logout/",
+        "view_path": "django_cas_ng.views.LogoutView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/cas/callback/",
+        "view_path": "django_cas_ng.views.CallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/openid/login/",
+        "view_path": "authentication.backends.oidc.views.OIDCAuthRequestView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/openid/callback/",
+        "view_path": "authentication.backends.oidc.views.OIDCAuthCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/openid/logout/",
+        "view_path": "authentication.backends.oidc.views.OIDCEndSessionView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/saml2/login/",
+        "view_path": "authentication.backends.saml2.views.Saml2AuthRequestView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/saml2/logout/",
+        "view_path": "authentication.backends.saml2.views.Saml2EndSessionView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/saml2/callback/",
+        "view_path": "authentication.backends.saml2.views.Saml2AuthCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/saml2/metadata/",
+        "view_path": "authentication.backends.saml2.views.Saml2AuthMetadataView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/oauth2/login/",
+        "view_path": "authentication.backends.oauth2.views.OAuth2AuthRequestView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/oauth2/callback/",
+        "view_path": "authentication.backends.oauth2.views.OAuth2AuthCallbackView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/oauth2/logout/",
+        "view_path": "authentication.backends.oauth2.views.OAuth2EndSessionView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/oauth2-provider/token/",
+        "view_path": "oauth2_provider.views.base.TokenView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/oauth2-provider/revoke/",
+        "view_path": "oauth2_provider.views.base.RevokeTokenView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/auth/oauth2-provider/.well-known/oauth-authorization-server",
+        "view_path": "authentication.backends.oauth2_provider.views.OAuthAuthorizationServerView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/reports/export-pdf/",
+        "view_path": "reports.views.ExportPdfView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/reports/send-mail/",
+        "view_path": "reports.views.SendMailView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/tickets/direct-approve/<str:token>/",
+        "view_path": "tickets.views.approve.TicketDirectApproveView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/common/flash-message/",
+        "view_path": "common.views.msg.FlashMessageMsgView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/download/",
+        "view_path": "jumpserver.views.other.ResourceDownload",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/redirect/confirm/",
+        "view_path": "jumpserver.views.other.RedirectConfirm",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/i18n/<str:lang>/",
+        "view_path": "jumpserver.views.other.I18NView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/media/^(?P<path>.*)$",
+        "view_path": "private_storage.views.PrivateStorageView",
+        "view_requires_auth": false,
+        "view_type": "class"
+    },
+    {
+        "url": "/core/jsi18n/",
+        "view_path": "django.views.i18n.JavaScriptCatalog",
+        "view_requires_auth": false,
+        "view_type": "class"
+    }
+]

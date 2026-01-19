@@ -81,3 +81,13 @@ def get_user_login_form_cls(*, captcha=False):
         bases.append(CaptchaMixin)
     bases.append(UserLoginForm)
     return type('UserLoginForm', tuple(bases), {})
+
+
+def get_comprehensive_user_login_form_cls():
+    bases = [
+        ChallengeMixin,
+        UserCheckOtpCodeForm,
+        CaptchaMixin,
+        UserLoginForm
+    ]
+    return type('UserLoginForm', tuple(bases), {})

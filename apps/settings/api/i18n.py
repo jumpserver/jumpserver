@@ -3,6 +3,7 @@ import os
 
 from django.conf import settings
 from django.utils._os import safe_join
+from rest_framework.serializers import Serializer
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ class ComponentI18nApi(RetrieveAPIView):
     base_path = 'locale'
     permission_classes = [AllowAny]
     lang_data = {}
+    serializer_class = Serializer
 
     def get_component_translations(self, name):
         if not settings.DEBUG and name in self.lang_data:
