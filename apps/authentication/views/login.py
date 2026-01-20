@@ -254,7 +254,7 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
         else:
             return get_user_login_form_cls()
     
-    def get_comprehensive_form_class(self):
+    def get_form_class_comprehensive(self):
         return get_comprehensive_user_login_form_cls()
 
     def clear_rsa_key(self):
