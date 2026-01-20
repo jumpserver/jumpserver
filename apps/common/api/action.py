@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.conf import settings
 from typing import Callable
 
+from django.conf import settings
 from django.utils.translation import gettext as _
 from rest_framework.decorators import action
-from rest_framework.throttling import UserRateThrottle
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 
 from common.const.http import POST, PUT
 from orgs.models import Organization
@@ -64,7 +64,7 @@ class RenderToJsonMixin:
         rows = request.data
         if rows and isinstance(rows[0], dict):
             first = list(rows[0].values())[0]
-            if first.startswith('#Help'):
+            if str(first).startswith('#Help'):
                 rows.pop(0)
 
         data = {
