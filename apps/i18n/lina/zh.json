@@ -31,7 +31,7 @@
     "AccountDiscoverTask": "账号发现",
     "AccountDiscoverTaskCreate": "创建发现帐户任务",
     "AccountDiscoverTaskUpdate": "更新发现帐户任务",
-    "AccountExportTips": "导出信息中包含账号密文涉及敏感信息，导出的格式为一个加密的zip文件（若没有设置加密密码，请前往个人信息中设置文件加密密码）。",
+    "AccountExportTips": "导出信息中包含账号密文涉及敏感信息，导出的格式为一个加密的zip文件（若没有设置加密密码，请前往右上角 个人设置 → 偏好设置 中进行进行设置）。",
     "AccountList": "账号管理",
     "AccountOverview": "账号概览",
     "AccountPasswordChangeTrends": "账号改密趋势",
@@ -1649,5 +1649,6 @@
     "AccessToken": "访问令牌",
     "AccessTokenTip": "访问令牌是通过 JumpServer 客户端使用 OAuth2（授权码授权）流程生成的临时凭证，用于访问受保护的资源。",
     "Revoke": "撤销",
-    "AccountSecretReadDisabled": "账号密码读取功能已被管理员禁用"
+    "AccountSecretReadDisabled": "账号密码读取功能已被管理员禁用",
+    "Automations": "自动化"
 }
