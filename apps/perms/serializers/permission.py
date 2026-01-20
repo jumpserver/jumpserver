@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.db import IntegrityError
 from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -127,7 +128,11 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
                 account_objs.append(Account(asset=asset, **account_data))
 
         if account_objs:
-            Account.objects.bulk_create(account_objs)
+            try:
+                Account.objects.bulk_create(account_objs)
+            except IntegrityError as e:
+                raise serializers.ValidationError(
+                    _('Please ensure that the selected account templates use the same username.'))
 
     def create_account_through_template(self, nodes, assets):
         if not self.template_accounts:
