@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-21 14:15+0800\n"
+"POT-Creation-Date: 2026-01-21 16:49+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -10042,14 +10042,18 @@ msgid "This user is not authorized to approve this ticket"
 msgstr "此用户无权审批此工单"
 
 #: users/api/user.py:64
+msgid "You cannot delete yourself. Please disable it instead."
+msgstr "不能删除自己。请将其禁用。"
+
+#: users/api/user.py:66
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr "无法删除管理员用户。请将其禁用。"
 
-#: users/api/user.py:162
+#: users/api/user.py:164
 msgid "Can not invite self"
 msgstr "不能邀请自己"
 
-#: users/api/user.py:215
+#: users/api/user.py:217
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置 MFA 多因子认证, 请去个人信息页面重置"
 
