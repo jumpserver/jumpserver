@@ -10,7 +10,7 @@ from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.api import CommonApiMixin, SuggestionMixin
 from common.drf.filters import AttrRulesFilterBackend
-from common.utils import get_logger, is_uuid
+from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from rbac.permissions import RBACPermission
@@ -60,6 +60,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         return True
 
     def perform_destroy(self, instance):
+        if instance.username == self.request.user.username:
+            raise PermissionDenied(_("You cannot delete yourself. Please disable it instead."))
         if instance.username == 'admin':
             raise PermissionDenied(_("Cannot delete the admin user. Please disable it instead."))
         super().perform_destroy(instance)

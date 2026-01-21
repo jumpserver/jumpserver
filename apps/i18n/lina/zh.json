@@ -31,7 +31,7 @@
     "AccountDiscoverTask": "账号发现",
     "AccountDiscoverTaskCreate": "创建发现帐户任务",
     "AccountDiscoverTaskUpdate": "更新发现帐户任务",
-    "AccountExportTips": "导出信息中包含账号密文涉及敏感信息，导出的格式为一个加密的zip文件（若没有设置加密密码，请前往右上角 个人设置 → 偏好设置 中进行进行设置）。",
+    "AccountExportTips": "导出信息中包含账号密文涉及敏感信息，导出的格式为一个加密的zip文件（若没有设置加密密码，请前往右上角 个人设置 → 偏好设置 中进行设置）。",
     "AccountList": "账号管理",
     "AccountOverview": "账号概览",
     "AccountPasswordChangeTrends": "账号改密趋势",
