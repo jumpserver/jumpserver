@@ -113,6 +113,14 @@ def get_ip_city(ip):
 
 def lookup_domain(domain):
     try:
-        return socket.gethostbyname(domain), ''
+        addrinfos = socket.getaddrinfo(
+            domain, None, socket.AF_UNSPEC, socket.SOCK_DGRAM
+        )
+        family, _, _, _, sockaddr = addrinfos[0]
+        if family == socket.AF_INET:
+            return sockaddr[0], ''
+        if family == socket.AF_INET6:
+            return sockaddr[0], ''
+        return domain, ''
     except Exception as e:
         return None, f'Cannot resolve {domain}: Unknown host, {e}'
