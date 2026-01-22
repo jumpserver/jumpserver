@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 15:12+0800\n"
+"POT-Creation-Date: 2026-01-22 10:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounts/api/account/account.py:143
+#: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:181
-#: accounts/serializers/account/account.py:362
+#: accounts/serializers/account/account.py:358
 msgid "Account already exists"
 msgstr "계정이 이미 존재합니다"
 
-#: accounts/api/account/account.py:208
+#: accounts/api/account/account.py:258
 msgid "No valid assets found for account creation."
 msgstr "계정 생성을 위한 유효한 자산을 찾을 수 없습니다."
 
@@ -144,7 +144,7 @@ msgstr ">>> 테스트 게이트웨이 계정 연결성 작업 시작"
 #: authentication/const.py:13 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:368
 #: authentication/templates/authentication/login.html:414
-#: reports/api/users/user.py:101 settings/models.py:250
+#: reports/api/users/user.py:101 settings/models.py:246
 #: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
 #: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
@@ -405,11 +405,11 @@ msgstr "기본 테이블 공간"
 msgid "Role"
 msgstr "역할"
 
-#: accounts/const/automation.py:136 accounts/models/base.py:68
-msgid "Privileged"
-msgstr "권한 계정"
+#: accounts/const/automation.py:136 users/serializers/profile.py:195
+msgid "Perms"
+msgstr "권한"
 
-#: accounts/const/automation.py:137 perms/serializers/permission.py:55
+#: accounts/const/automation.py:137 perms/serializers/permission.py:56
 #: users/serializers/user.py:245
 msgid "Groups"
 msgstr "사용자 그룹"
@@ -463,7 +463,7 @@ msgstr "Vault 작업이 실패했습니다. 다시 시도하거나 Vault의 계�
 #: accounts/templates/accounts/gather_account_report.html:117
 #: accounts/templates/accounts/push_account_report.html:78
 #: accounts/templates/accounts/push_account_report.html:118
-#: acls/notifications.py:70 acls/serializers/base.py:111
+#: acls/notifications.py:70 acls/serializers/base.py:110
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:427
 #: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:336
 #: audits/serializers.py:245 authentication/models/connection_token.py:42
@@ -530,7 +530,7 @@ msgstr "비밀번호 변경 상태"
 #: accounts/serializers/account/service.py:13
 #: accounts/serializers/automations/change_secret.py:117
 #: accounts/serializers/automations/change_secret.py:148
-#: acls/serializers/base.py:112
+#: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:337
 #: audits/serializers.py:246 authentication/api/connection_token.py:475
@@ -541,7 +541,7 @@ msgstr "비밀번호 변경 상태"
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
 msgid "Account"
 msgstr "계정"
 
@@ -626,7 +626,7 @@ msgstr "아이콘"
 
 #: accounts/models/application.py:20 accounts/models/base.py:39
 #: accounts/models/mixins/vault.py:49
-#: accounts/serializers/account/account.py:499
+#: accounts/serializers/account/account.py:495
 #: accounts/serializers/account/base.py:20
 #: authentication/models/temp_token.py:11
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -637,7 +637,7 @@ msgstr "암호"
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:424 perms/serializers/permission.py:66
+#: assets/serializers/asset/common.py:424 perms/serializers/permission.py:67
 #: perms/serializers/user_permission.py:87 rbac/tree.py:36 rbac/tree.py:51
 msgid "Accounts"
 msgstr "계정"
@@ -1023,7 +1023,7 @@ msgid "Verify asset account"
 msgstr "계정 검증"
 
 #: accounts/models/base.py:37 accounts/models/base.py:66
-#: accounts/serializers/account/account.py:498
+#: accounts/serializers/account/account.py:494
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:50
 #: authentication/serializers/connect_token_secret.py:42
@@ -1041,6 +1041,10 @@ msgstr "암호 전략"
 #: accounts/serializers/automations/change_secret.py:49
 msgid "Password rules"
 msgstr "암호 규칙"
+
+#: accounts/models/base.py:68
+msgid "Privileged"
+msgstr "권한 계정"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
@@ -1257,38 +1261,38 @@ msgstr "상태"
 msgid "Changed"
 msgstr "수정됨"
 
-#: accounts/serializers/account/account.py:410
+#: accounts/serializers/account/account.py:406
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "자산이 지원하지 않는 계정 유형: %s"
 
-#: accounts/serializers/account/account.py:443
+#: accounts/serializers/account/account.py:439
 msgid "Account has exist"
 msgstr "계정이 이미 존재합니다"
 
-#: accounts/serializers/account/account.py:468
-#: accounts/serializers/account/account.py:469
+#: accounts/serializers/account/account.py:464
+#: accounts/serializers/account/account.py:465
 msgid "At least one asset or node must be specified"
 msgstr "자산 또는 노드 중 최소 하나 선택"
 
-#: accounts/serializers/account/account.py:482
-#: accounts/serializers/account/account.py:489
+#: accounts/serializers/account/account.py:478
+#: accounts/serializers/account/account.py:485
 #: accounts/serializers/account/base.py:73
 #: accounts/serializers/account/base.py:88
 #: assets/serializers/asset/common.py:425
 msgid "Spec info"
 msgstr "특별 정보"
 
-#: accounts/serializers/account/account.py:500
+#: accounts/serializers/account/account.py:496
 #: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 settings/models.py:249
+#: perms/models/perm_node.py:21 settings/models.py:245
 #: users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:510 acls/notifications.py:18
-#: acls/notifications.py:68 acls/serializers/base.py:104
+#: accounts/serializers/account/account.py:506 acls/notifications.py:18
+#: acls/notifications.py:68 acls/serializers/base.py:103
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16
@@ -1312,7 +1316,7 @@ msgstr "ID"
 msgid "User"
 msgstr "사용자"
 
-#: accounts/serializers/account/account.py:511
+#: accounts/serializers/account/account.py:507
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:165 terminal/notifications.py:225
 msgid "Date"
@@ -1699,7 +1703,7 @@ msgstr "유형 수"
 #: accounts/templates/accounts/gather_account_report.html:31
 #: accounts/templates/accounts/push_account_report.html:32
 #: assets/serializers/domain.py:23 assets/serializers/platform.py:183
-#: orgs/serializers.py:13 perms/serializers/permission.py:61
+#: orgs/serializers.py:13 perms/serializers/permission.py:62
 msgid "Assets amount"
 msgstr "자산 수"
 
@@ -1835,7 +1839,7 @@ msgstr "우선순위 선택 범위는 1-100 (숫자가 작을수록 더 우선)"
 #: audits/serializers.py:107
 #: authentication/serializers/connect_token_secret.py:131
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:63 perms/serializers/permission.py:85
+#: perms/serializers/permission.py:64 perms/serializers/permission.py:86
 #: terminal/backends/command/models.py:24
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
@@ -1846,7 +1850,7 @@ msgstr "행동"
 msgid "Reviewers"
 msgstr "승인자"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:53
+#: acls/models/base.py:81 perms/serializers/permission.py:54
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
@@ -1858,7 +1862,7 @@ msgstr "사용자"
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:214
 #: authentication/api/connection_token.py:474 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
-#: perms/serializers/permission.py:57
+#: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
 msgid "Assets"
@@ -2047,15 +2051,15 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/호스트"
 
-#: acls/serializers/base.py:100
+#: acls/serializers/base.py:99
 msgid "Recipients"
 msgstr "수신자"
 
-#: acls/serializers/base.py:126 tickets/serializers/ticket/ticket.py:79
+#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:79
 msgid "The organization `{}` does not exist"
 msgstr "조직 `{}` 가 존재하지 않습니다."
 
-#: acls/serializers/base.py:132
+#: acls/serializers/base.py:131
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "모든 검토자는 조직에 속하지 않습니다 `{}`"
 
@@ -2609,7 +2613,7 @@ msgstr "도메인"
 
 #: assets/models/asset/common.py:176 assets/serializers/asset/common.py:177
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
-#: perms/serializers/permission.py:58
+#: perms/serializers/permission.py:59
 msgid "Nodes"
 msgstr "노드"
 
@@ -3011,7 +3015,7 @@ msgstr "노드 경로, 형식은 [\"/조직/노드명\"], 만약 노드가 존�
 #: assets/serializers/asset/common.py:147 assets/serializers/platform.py:175
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:68
 #: perms/serializers/user_permission.py:86 xpack/plugins/cloud/models.py:402
 #: xpack/plugins/cloud/serializers/task.py:36
 msgid "Protocols"
@@ -4182,11 +4186,11 @@ msgstr "이메일 인증 코드 검증 실패"
 msgid "Email verification code"
 msgstr "이메일 인증 코드"
 
-#: authentication/mfa/face.py:56
+#: authentication/mfa/face.py:55
 msgid "Bind face to enable"
 msgstr "얼굴 인식 기능을 활성화하려면 바인딩"
 
-#: authentication/mfa/face.py:60
+#: authentication/mfa/face.py:59
 msgid "Unbind face to disable"
 msgstr "얼굴 인식 기능을 비활성화하려면 언바인딩"
 
@@ -4447,7 +4451,7 @@ msgid "Actions"
 msgstr "Action"
 
 #: authentication/serializers/connection_token.py:46
-#: perms/serializers/permission.py:65 perms/serializers/permission.py:86
+#: perms/serializers/permission.py:66 perms/serializers/permission.py:87
 #: users/serializers/user.py:127 users/serializers/user.py:261
 msgid "Is expired"
 msgstr "이미 만료"
@@ -4485,8 +4489,8 @@ msgstr "생성 완료 후 개인 키를 다운로드해 주십시오. 각 개인
 msgid "Not a valid ssh public key"
 msgstr "SSH 키가 유효하지 않습니다"
 
-#: authentication/serializers/token.py:93 perms/serializers/permission.py:64
-#: perms/serializers/permission.py:87 users/serializers/user.py:128
+#: authentication/serializers/token.py:93 perms/serializers/permission.py:65
+#: perms/serializers/permission.py:88 users/serializers/user.py:128
 #: users/serializers/user.py:258
 msgid "Is valid"
 msgstr "유효한가요"
@@ -4574,7 +4578,7 @@ msgstr "계정 정보를 보려면 MFA 인증이 필요합니다"
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:37
 #: templates/_modal.html:23 templates/flash_message_standalone.html:37
-#: templates/redirect_confirm.html:60
+#: templates/redirect_confirm.html:48
 #: users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "확인"
@@ -4588,7 +4592,7 @@ msgstr "코드 오류"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:542
+#: jumpserver/conf.py:546
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -5150,7 +5154,7 @@ msgstr "선택 항목만 내보내기"
 msgid "Export filtered"
 msgstr "검색 내보내기"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s 객체가 존재하지 않습니다."
@@ -5374,16 +5378,16 @@ msgstr "제공된 메시지 코드가 유효하지 않거나 만료되었습니�
 msgid "The message code provided is invalid or has expired"
 msgstr "인증 코드는: {code}"
 
-#: jumpserver/conf.py:536
+#: jumpserver/conf.py:540
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "인증 코드: {code}"
 
-#: jumpserver/conf.py:541
+#: jumpserver/conf.py:545
 msgid "Create account successfully"
 msgstr "귀하의 계정이 성공적으로 생성되었습니다"
 
-#: jumpserver/conf.py:543
+#: jumpserver/conf.py:547
 msgid "Your account has been created successfully"
 msgstr "JumpServer 오픈소스 방화벽"
 
@@ -6133,7 +6137,7 @@ msgstr "가입한 모든 조직 보기"
 msgid "Can not delete virtual org"
 msgstr "가상 조직 삭제 불가"
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:59
+#: orgs/serializers.py:10 perms/serializers/permission.py:60
 #: rbac/serializers/role.py:27 users/serializers/group.py:53
 msgid "Users amount"
 msgstr "사용자 수"
@@ -6142,7 +6146,7 @@ msgstr "사용자 수"
 msgid "User groups amount"
 msgstr "사용자 그룹 수"
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:62
+#: orgs/serializers.py:14 perms/serializers/permission.py:63
 msgid "Nodes amount"
 msgstr "노드 수"
 
@@ -6239,7 +6243,7 @@ msgid "today"
 msgstr "오늘"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:199
+#: settings/serializers/feature.py:195
 msgid "day"
 msgstr "하늘"
 
@@ -6259,7 +6263,7 @@ msgstr "자산 권한 부여 규칙이 곧 만료됩니다"
 msgid "asset permissions of organization {}"
 msgstr "조직 ({})의 자산 권한"
 
-#: perms/serializers/permission.py:43
+#: perms/serializers/permission.py:44
 msgid ""
 "Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
 "choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
@@ -6267,13 +6271,18 @@ msgstr ""
 "계정, 형식 [\"@가상계정\", \"root\", \"%템플릿id\"], 가상 선택: @ALL, @SPEC, @USER, @ANON, "
 "@INPUT"
 
-#: perms/serializers/permission.py:49
+#: perms/serializers/permission.py:50
 msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
 msgstr "프로토콜, 형식 [\"ssh\", \"rdp\", \"vnc\"] 또는 [\"all\"]"
 
-#: perms/serializers/permission.py:60
+#: perms/serializers/permission.py:61
 msgid "Groups amount"
 msgstr "사용자 그룹 수"
+
+#: perms/serializers/permission.py:135
+msgid ""
+"Please ensure that the selected account templates use the same username."
+msgstr ""
 
 #: perms/tasks.py:28
 msgid "Check asset permission expired"
@@ -6509,7 +6518,7 @@ msgstr "계정 비밀번호 변경"
 msgid "App ops"
 msgstr "작업 센터"
 
-#: rbac/tree.py:60 settings/serializers/feature.py:205
+#: rbac/tree.py:60 settings/serializers/feature.py:201
 msgid "Feature"
 msgstr "기능"
 
@@ -6552,8 +6561,8 @@ msgstr "조직 관리"
 msgid "Ticket comment"
 msgstr "작업 댓글"
 
-#: rbac/tree.py:185 settings/serializers/feature.py:186
-#: settings/serializers/feature.py:188 tickets/models/ticket/general.py:310
+#: rbac/tree.py:185 settings/serializers/feature.py:182
+#: settings/serializers/feature.py:184 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "작업"
 
@@ -6629,7 +6638,7 @@ msgstr "메일 전송 성공"
 msgid "Chat AI is not enabled"
 msgstr "채팅 AI가 활성화되어 있지 않습니다"
 
-#: settings/api/chat.py:95 settings/api/dingtalk.py:31
+#: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:49 settings/api/wecom.py:37
 msgid "Test success"
@@ -6663,6 +6672,14 @@ msgstr "시스템 설정"
 #: settings/const.py:13
 msgid "Embed"
 msgstr "임베드"
+
+#: settings/const.py:22 settings/serializers/feature.py:173
+msgid "Custom gpt model"
+msgstr "사용자 정의 GPT 모델"
+
+#: settings/const.py:43 settings/serializers/feature.py:177
+msgid "Custom DeepSeek model"
+msgstr "사용자 정의 DeepSeek 모델"
 
 #: settings/models.py:42 users/models/preference.py:14
 msgid "Encrypted"
@@ -7559,69 +7576,53 @@ msgstr "GPT 모델"
 msgid "DeepSeek Model"
 msgstr "DeepSeek 모델"
 
-#: settings/serializers/feature.py:172
-msgid "Custom Model"
-msgstr "사용자 정의 모델"
-
-#: settings/serializers/feature.py:173
-msgid "Whether to use a custom model"
-msgstr "사용자 정의 모델 사용 여부"
-
-#: settings/serializers/feature.py:177
-msgid "Custom gpt model"
-msgstr "사용자 정의 GPT 모델"
-
-#: settings/serializers/feature.py:181
-msgid "Custom DeepSeek model"
-msgstr "사용자 정의 DeepSeek 모델"
-
-#: settings/serializers/feature.py:190
+#: settings/serializers/feature.py:186
 msgid "Approval without login"
 msgstr "로그인 불필요 승인"
 
-#: settings/serializers/feature.py:191
+#: settings/serializers/feature.py:187
 msgid "Allow direct approval ticket without login"
 msgstr "로그인 없이 직접 작업을 승인 허용"
 
-#: settings/serializers/feature.py:195
+#: settings/serializers/feature.py:191
 msgid "Period"
 msgstr "시간대"
 
-#: settings/serializers/feature.py:196
+#: settings/serializers/feature.py:192
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr "작업 신청 자산의 기본 승인 시간대"
 
-#: settings/serializers/feature.py:199
+#: settings/serializers/feature.py:195
 msgid "hour"
 msgstr "시"
 
-#: settings/serializers/feature.py:200
+#: settings/serializers/feature.py:196
 msgid "Unit"
 msgstr "단위"
 
-#: settings/serializers/feature.py:200
+#: settings/serializers/feature.py:196
 msgid "The unit of period"
 msgstr "실행 주기"
 
-#: settings/serializers/feature.py:208
+#: settings/serializers/feature.py:204
 msgid "Adhoc command"
 msgstr "일괄 명령 실행"
 
-#: settings/serializers/feature.py:209
+#: settings/serializers/feature.py:205
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr "사용자가 워크벤치 - 작업 센터 - Adhoc에서 일괄 명령을 실행할 수 있도록 허용"
 
-#: settings/serializers/feature.py:213
+#: settings/serializers/feature.py:209
 msgid "Command blacklist"
 msgstr "작업 센터 명령 블랙리스트"
 
-#: settings/serializers/feature.py:214
+#: settings/serializers/feature.py:210
 msgid "Command blacklist in Adhoc"
 msgstr "작업 센터 명령 블랙리스트"
 
-#: settings/serializers/feature.py:220
+#: settings/serializers/feature.py:216
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -7629,11 +7630,11 @@ msgstr "작업 센터 명령 블랙리스트"
 msgid "Virtual app"
 msgstr "가상 애플리케이션"
 
-#: settings/serializers/feature.py:223
+#: settings/serializers/feature.py:219
 msgid "Virtual App"
 msgstr "가상 애플리케이션"
 
-#: settings/serializers/feature.py:225
+#: settings/serializers/feature.py:221
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -8439,25 +8440,17 @@ msgstr "인증 코드가 전송되었습니다."
 msgid "Home page"
 msgstr "홈페이지"
 
-#: templates/redirect_confirm.html:42
+#: templates/redirect_confirm.html:30
 msgid "You are about to be redirected to an external website."
 msgstr "외부 웹사이트로 이동하려고 합니다"
 
-#: templates/redirect_confirm.html:45
+#: templates/redirect_confirm.html:33
 msgid "Please confirm that you trust this link: "
 msgstr "다음 링크를 신뢰하는지 확인하십시오:"
 
-#: templates/redirect_confirm.html:55
+#: templates/redirect_confirm.html:43
 msgid "Back"
 msgstr "돌아가기"
-
-#: templates/redirect_confirm.html:70
-msgid "Redirecting you to the Desktop App ( JumpServer Client )"
-msgstr "데스크톱 애플리케이션(JumpServer 클라이언트)으로 리디렉션 중입니다."
-
-#: templates/redirect_confirm.html:73
-msgid "You can safely close this window and return to the application."
-msgstr "이 창을 닫고 애플리케이션으로 돌아갈 수 있습니다."
 
 #: templates/resource_download.html:20 templates/resource_download.html:36
 #: users/const.py:84
@@ -9648,7 +9641,7 @@ msgstr "유효한 권한이 부여된 자산"
 msgid "Ticket already closed"
 msgstr "작업 요청이 종료되었습니다"
 
-#: tickets/handlers/apply_asset.py:39
+#: tickets/handlers/apply_asset.py:40
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -9806,8 +9799,8 @@ msgid "Ticket applied info"
 msgstr "작업 티켓 신청 정보"
 
 #: tickets/notifications.py:116
-msgid "Your has a new ticket, applicant - {}"
-msgstr "새 작업 티켓이 있습니다, 신청인 - {}"
+msgid "You have a new ticket from {}"
+msgstr "{}에서 새 티켓이 도착했습니다"
 
 #: tickets/notifications.py:120
 msgid "{}: New Ticket - {} ({})"
@@ -9924,14 +9917,18 @@ msgid "This user is not authorized to approve this ticket"
 msgstr "이 사용자는 이 작업 요청을 승인할 권한이 없습니다"
 
 #: users/api/user.py:64
+msgid "You cannot delete yourself. Please disable it instead."
+msgstr "본인은 삭제할 수 없습니다. 대신 기능을 비활성화해 주세요"
+
+#: users/api/user.py:66
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr "관리자 사용자는 삭제할 수 없습니다. 이 사용자를 비활성화해 주세요"
 
-#: users/api/user.py:162
+#: users/api/user.py:164
 msgid "Can not invite self"
 msgstr "자신을 초대할 수 없습니다"
 
-#: users/api/user.py:215
+#: users/api/user.py:217
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "해당 페이지에서 MFA 다중 인증을 재설정할 수 없습니다, 개인 정보 페이지로 가셔서 재설정해 주세요"
 
@@ -10341,10 +10338,6 @@ msgstr "비밀번호가 보안 규칙을 충족하지 않음"
 #: users/serializers/profile.py:33
 msgid "The new password cannot be the last {} passwords"
 msgstr "새 비밀번호는 최근 {} 번의 비밀번호가 될 수 없음"
-
-#: users/serializers/profile.py:195
-msgid "Perms"
-msgstr "권한"
 
 #: users/serializers/user.py:51
 msgid "System roles"
@@ -11580,6 +11573,10 @@ msgid ""
 msgstr ""
 "매일 시스템은 \"시스템 설정-작업-정기 청소-클라우드 동기화 작업 역사 기록 보관 일수\"에서 설정된 구성에 따라 클라우드 동기화 실행"
 " 중 생성된 기록을 정리합니다."
+
+#: xpack/plugins/cloud/ws.py:84
+msgid "Task not started"
+msgstr "작업 전략"
 
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
