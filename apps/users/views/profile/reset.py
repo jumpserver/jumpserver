@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import time
 
+from rest_framework import serializers
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect, reverse
@@ -79,6 +80,11 @@ class UserForgotPasswordPreviewingView(FormView):
 class UserForgotPasswordView(FormView):
     template_name = 'users/forgot_password.html'
     form_class = forms.UserForgotPasswordForm
+
+    class QuerySerializer(serializers.Serializer):
+        token = serializers.CharField(required=False)
+
+    query_serializer_class = QuerySerializer
 
     def get(self, request, *args, **kwargs):
         token = self.request.GET.get('token')
@@ -172,6 +178,11 @@ class UserForgotPasswordView(FormView):
 class UserResetPasswordView(FormView):
     template_name = 'users/reset_password.html'
     form_class = forms.UserTokenResetPasswordForm
+
+    class QuerySerializer(serializers.Serializer):
+        token = serializers.CharField(required=False)
+
+    query_serializer_class = QuerySerializer
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)

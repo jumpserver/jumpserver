@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from django.views.static import serve
 from rest_framework import generics
-from rest_framework import status
+from rest_framework import status, serializers as drf_serializers
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -197,7 +197,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
 
 class SettingsLogoApi(APIView):
+    class QuerySerializer(drf_serializers.Serializer):
+        size = drf_serializers.CharField(required=False)
+
     permission_classes = (AllowAny,)
+    query_serializer_class = QuerySerializer
 
     def get(self, request, *args, **kwargs):
         size = request.GET.get('size', 'small')

@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from rest_framework import serializers
 from django.shortcuts import redirect, reverse
 from django.views.generic.edit import FormView
 
@@ -20,6 +21,11 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
     template_name = 'authentication/login_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     redirect_field_name = 'next'
+
+    class QuerySerializer(serializers.Serializer):
+        next = serializers.CharField(required=False)
+
+    query_serializer_class = QuerySerializer
 
     def get(self, *args, **kwargs):
         try:

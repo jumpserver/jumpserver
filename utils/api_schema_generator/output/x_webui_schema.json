@@ -1,0 +1,743 @@
+{
+    "GET": {
+        "/api/v1/settings/logo/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "size": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/settings/public/open/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/settings/i18n/<str:name>/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "lang": {
+                        "type": "string"
+                    },
+                    "flat": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/settings/client/versions/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/face/context/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/login-confirm-ticket/status/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/user-session/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/notifications/debug-msgs/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/prometheus/metrics/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/health/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/api/v1/health/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/captcha/image/(?P<key>\\w+)/$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/captcha/image/(?P<key>\\w+)@2/$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/captcha/audio/(?P<key>\\w+).wav$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/captcha/refresh/$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "next": {
+                        "type": "string"
+                    },
+                    "admin": {
+                        "type": "integer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/mfa/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "next": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/wait-confirm/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/mfa/face/capture/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "next": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/guard/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/logout/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/forget/previewing/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/forgot/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/reset/": {
+            "query": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/verify/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/wecom/bind/start/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/wecom/qr/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/wecom/qr/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/wecom/oauth/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/wecom/oauth/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/dingtalk/bind/start/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/dingtalk/qr/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/dingtalk/qr/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/dingtalk/oauth/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/dingtalk/oauth/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/feishu/bind/start/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/feishu/qr/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/feishu/qr/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/lark/bind/start/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/lark/qr/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/lark/qr/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/slack/bind/start/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/slack/qr/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/slack/qr/login/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/otp/enable/start/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/otp/enable/install-app/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/otp/enable/bind/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/face/enable/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/face/disable/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/cas/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/cas/logout/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/cas/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/openid/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/openid/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/openid/logout/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/saml2/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/saml2/logout/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/saml2/metadata/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2/login/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2/callback/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2/logout/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2-provider/.well-known/oauth-authorization-server": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/reports/export-pdf/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/tickets/direct-approve/<str:token>/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/common/flash-message/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/flower/(?P<path>.*)": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/download/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/redirect/confirm/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/i18n/<str:lang>/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/^static/(?P<path>.*)$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/media/^(?P<path>.*)$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/^luna/(?P<path>.*)$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/^ui/(?P<path>.*)$": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        },
+        "/core/jsi18n/": {
+            "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+            },
+            "allowIf": "prelogin"
+        }
+    },
+    "POST": {
+        "/api/v1/terminal/terminal-registrations/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/terminal/registration/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/face/context/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/auth/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/tokens/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/mfa/verify/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/mfa/challenge/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/mfa/select/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/mfa/send-code/": {
+            "allowIf": "prelogin"
+        },
+        "/api/v1/authentication/password/reset-code/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/mfa/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/mfa/face/capture/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/login/guard/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/forget/previewing/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/forgot/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/reset/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/password/verify/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/wecom/bind/start/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/dingtalk/bind/start/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/feishu/bind/start/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/lark/bind/start/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/slack/bind/start/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/otp/enable/bind/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/face/enable/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/profile/face/disable/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/cas/login/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/cas/callback/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/openid/logout/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/saml2/logout/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/saml2/callback/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2/logout/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2-provider/token/": {
+            "allowIf": "prelogin"
+        },
+        "/core/auth/oauth2-provider/revoke/": {
+            "allowIf": "prelogin"
+        },
+        "/core/reports/export-pdf/": {
+            "allowIf": "prelogin"
+        },
+        "/core/reports/send-mail/": {
+            "allowIf": "prelogin"
+        },
+        "/core/tickets/direct-approve/<str:token>/": {
+            "allowIf": "prelogin"
+        }
+    }
+}

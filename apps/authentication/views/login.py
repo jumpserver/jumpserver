@@ -8,6 +8,7 @@ import os
 from typing import Callable
 from urllib.parse import urlparse, urlsplit, urlunsplit, urlencode
 
+from rest_framework import serializers
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.contrib.auth import login as auth_login, logout as auth_logout
@@ -131,6 +132,12 @@ class UserLoginContextMixin:
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
+    class QuerySerializer(serializers.Serializer):
+        next = serializers.CharField(required=False)
+        admin = serializers.IntegerField(required=False)
+    
+    query_serializer_class = QuerySerializer
+
     redirect_field_name = 'next'
     template_name = 'authentication/login.html'
 

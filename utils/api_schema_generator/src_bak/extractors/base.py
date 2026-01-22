@@ -27,8 +27,6 @@ class BaseExtractor:
 
     def extract(self) -> Endpoint:
         url = self.view.route.path
-        if url.startswith('/api/v1/users/^users'):
-            pass
         endpoint = Endpoint(
             path=self.view.route.path, 
             requires_auth=self.view_requires_auth()
