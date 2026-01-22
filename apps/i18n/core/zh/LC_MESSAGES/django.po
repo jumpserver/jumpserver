@@ -10043,11 +10043,11 @@ msgstr "此用户无权审批此工单"
 
 #: users/api/user.py:64
 msgid "You cannot delete yourself. Please disable it instead."
-msgstr "不能删除自己。请将其禁用。"
+msgstr "不能删除自己，请将其禁用。"
 
 #: users/api/user.py:66
 msgid "Cannot delete the admin user. Please disable it instead."
-msgstr "无法删除管理员用户。请将其禁用。"
+msgstr "无法删除管理员用户，请将其禁用。"
 
 #: users/api/user.py:164
 msgid "Can not invite self"
