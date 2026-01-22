@@ -73,6 +73,12 @@ def raise_timeout(name=''):
     return decorate
 
 
+def _strip_wrapping_quotes(value):
+    if value and len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+        return value[1:-1]
+    return value
+
+
 class OldSSHTransport(paramiko.transport.Transport):
     _preferred_pubkeys = (
         "ssh-ed25519",
@@ -271,8 +277,8 @@ class SSHClient:
             return
 
         password, port, username, remote_addr, key_path = match.groups()
-        password = password or None
-        key_path = key_path or None
+        password = _strip_wrapping_quotes(password) or None
+        key_path = _strip_wrapping_quotes(key_path) or None
 
         server = SSHTunnelForwarder(
             (remote_addr, int(port)),

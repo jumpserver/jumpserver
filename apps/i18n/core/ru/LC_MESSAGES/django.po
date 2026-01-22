@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 15:12+0800\n"
+"POT-Creation-Date: 2026-01-22 10:51+0800\n"
 "PO-Revision-Date: 2025-11-13 12:26\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Russian\n"
@@ -19,13 +19,13 @@ msgstr ""
 "X-Crowdin-Project-ID: 832018\n"
 "X-Generator: Poedit 2.4.3\n"
 
-#: accounts/api/account/account.py:143
+#: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:181
-#: accounts/serializers/account/account.py:362
+#: accounts/serializers/account/account.py:358
 msgid "Account already exists"
 msgstr "Учетная запись уже существует."
 
-#: accounts/api/account/account.py:208
+#: accounts/api/account/account.py:258
 msgid "No valid assets found for account creation."
 msgstr "Не удалось найти действительные активы для создания учетной записи."
 
@@ -147,7 +147,7 @@ msgstr ""
 #: authentication/const.py:13 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:368
 #: authentication/templates/authentication/login.html:414
-#: reports/api/users/user.py:101 settings/models.py:250
+#: reports/api/users/user.py:101 settings/models.py:246
 #: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
 #: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
 #: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
@@ -408,11 +408,11 @@ msgstr "Табличное пространство по умолчанию"
 msgid "Role"
 msgstr "Роль"
 
-#: accounts/const/automation.py:136 accounts/models/base.py:68
-msgid "Privileged"
-msgstr "Привилегированный"
+#: accounts/const/automation.py:136 users/serializers/profile.py:195
+msgid "Perms"
+msgstr "Права"
 
-#: accounts/const/automation.py:137 perms/serializers/permission.py:55
+#: accounts/const/automation.py:137 perms/serializers/permission.py:56
 #: users/serializers/user.py:245
 msgid "Groups"
 msgstr "Группы"
@@ -468,7 +468,7 @@ msgstr ""
 #: accounts/templates/accounts/gather_account_report.html:117
 #: accounts/templates/accounts/push_account_report.html:78
 #: accounts/templates/accounts/push_account_report.html:118
-#: acls/notifications.py:70 acls/serializers/base.py:111
+#: acls/notifications.py:70 acls/serializers/base.py:110
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:427
 #: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:336
 #: audits/serializers.py:245 authentication/models/connection_token.py:42
@@ -535,7 +535,7 @@ msgstr "Статус изменения секрета"
 #: accounts/serializers/account/service.py:13
 #: accounts/serializers/automations/change_secret.py:117
 #: accounts/serializers/automations/change_secret.py:148
-#: acls/serializers/base.py:112
+#: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:337
 #: audits/serializers.py:246 authentication/api/connection_token.py:475
@@ -546,7 +546,7 @@ msgstr "Статус изменения секрета"
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
 msgid "Account"
 msgstr "Учетная запись"
 
@@ -631,7 +631,7 @@ msgstr "Иконка"
 
 #: accounts/models/application.py:20 accounts/models/base.py:39
 #: accounts/models/mixins/vault.py:49
-#: accounts/serializers/account/account.py:499
+#: accounts/serializers/account/account.py:495
 #: accounts/serializers/account/base.py:20
 #: authentication/models/temp_token.py:11
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -642,7 +642,7 @@ msgstr "Секрет"
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:424 perms/serializers/permission.py:66
+#: assets/serializers/asset/common.py:424 perms/serializers/permission.py:67
 #: perms/serializers/user_permission.py:87 rbac/tree.py:36 rbac/tree.py:51
 msgid "Accounts"
 msgstr "Учетные записи"
@@ -1033,7 +1033,7 @@ msgid "Verify asset account"
 msgstr "Проверка УЗ актива"
 
 #: accounts/models/base.py:37 accounts/models/base.py:66
-#: accounts/serializers/account/account.py:498
+#: accounts/serializers/account/account.py:494
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:50
 #: authentication/serializers/connect_token_secret.py:42
@@ -1051,6 +1051,10 @@ msgstr "Стратегия создания секрета"
 #: accounts/serializers/automations/change_secret.py:49
 msgid "Password rules"
 msgstr "Правила паролей"
+
+#: accounts/models/base.py:68
+msgid "Privileged"
+msgstr "Привилегированный"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
@@ -1282,38 +1286,38 @@ msgstr "Состояние"
 msgid "Changed"
 msgstr "Изменено"
 
-#: accounts/serializers/account/account.py:410
+#: accounts/serializers/account/account.py:406
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "Актив не поддерживает этот тип секрета: %s"
 
-#: accounts/serializers/account/account.py:443
+#: accounts/serializers/account/account.py:439
 msgid "Account has exist"
 msgstr "Учетная запись уже существует"
 
-#: accounts/serializers/account/account.py:468
-#: accounts/serializers/account/account.py:469
+#: accounts/serializers/account/account.py:464
+#: accounts/serializers/account/account.py:465
 msgid "At least one asset or node must be specified"
 msgstr "Выберите хотя бы один актив или папку"
 
-#: accounts/serializers/account/account.py:482
-#: accounts/serializers/account/account.py:489
+#: accounts/serializers/account/account.py:478
+#: accounts/serializers/account/account.py:485
 #: accounts/serializers/account/base.py:73
 #: accounts/serializers/account/base.py:88
 #: assets/serializers/asset/common.py:425
 msgid "Spec info"
 msgstr "Специальная информация"
 
-#: accounts/serializers/account/account.py:500
+#: accounts/serializers/account/account.py:496
 #: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 settings/models.py:249
+#: perms/models/perm_node.py:21 settings/models.py:245
 #: users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:510 acls/notifications.py:18
-#: acls/notifications.py:68 acls/serializers/base.py:104
+#: accounts/serializers/account/account.py:506 acls/notifications.py:18
+#: acls/notifications.py:68 acls/serializers/base.py:103
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16
@@ -1337,7 +1341,7 @@ msgstr "ID"
 msgid "User"
 msgstr "Пользователь"
 
-#: accounts/serializers/account/account.py:511
+#: accounts/serializers/account/account.py:507
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:165 terminal/notifications.py:225
 msgid "Date"
@@ -1753,7 +1757,7 @@ msgstr "Количество типов"
 #: accounts/templates/accounts/gather_account_report.html:31
 #: accounts/templates/accounts/push_account_report.html:32
 #: assets/serializers/domain.py:23 assets/serializers/platform.py:183
-#: orgs/serializers.py:13 perms/serializers/permission.py:61
+#: orgs/serializers.py:13 perms/serializers/permission.py:62
 msgid "Assets amount"
 msgstr "Количество активов"
 
@@ -1890,7 +1894,7 @@ msgstr "1-100 (меньшее число - выше приоритет)"
 #: audits/serializers.py:107
 #: authentication/serializers/connect_token_secret.py:131
 #: authentication/templates/authentication/_access_key_modal.html:34
-#: perms/serializers/permission.py:63 perms/serializers/permission.py:85
+#: perms/serializers/permission.py:64 perms/serializers/permission.py:86
 #: terminal/backends/command/models.py:24
 #: tickets/serializers/ticket/ticket.py:21
 msgid "Action"
@@ -1901,7 +1905,7 @@ msgstr "Действие"
 msgid "Reviewers"
 msgstr "Утверждающий"
 
-#: acls/models/base.py:81 perms/serializers/permission.py:53
+#: acls/models/base.py:81 perms/serializers/permission.py:54
 #: tickets/models/flow.py:23 users/models/preference.py:16
 #: users/serializers/group.py:21 users/serializers/user.py:424
 msgid "Users"
@@ -1913,7 +1917,7 @@ msgstr "Пользователь"
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:214
 #: authentication/api/connection_token.py:474 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
-#: perms/serializers/permission.py:57
+#: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
 msgid "Assets"
@@ -2103,15 +2107,15 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/Хост"
 
-#: acls/serializers/base.py:100
+#: acls/serializers/base.py:99
 msgid "Recipients"
 msgstr "Получатели"
 
-#: acls/serializers/base.py:126 tickets/serializers/ticket/ticket.py:79
+#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:79
 msgid "The organization `{}` does not exist"
 msgstr "Организация `{}` не существует"
 
-#: acls/serializers/base.py:132
+#: acls/serializers/base.py:131
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "Ни один утверждающий не относится к организации `{}`"
 
@@ -2681,7 +2685,7 @@ msgstr "Зона"
 
 #: assets/models/asset/common.py:176 assets/serializers/asset/common.py:177
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
-#: perms/serializers/permission.py:58
+#: perms/serializers/permission.py:59
 msgid "Nodes"
 msgstr "Папки"
 
@@ -3091,7 +3095,7 @@ msgstr ""
 #: assets/serializers/asset/common.py:147 assets/serializers/platform.py:175
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:67
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:68
 #: perms/serializers/user_permission.py:86 xpack/plugins/cloud/models.py:402
 #: xpack/plugins/cloud/serializers/task.py:36
 msgid "Protocols"
@@ -4316,11 +4320,11 @@ msgstr "Неверный код подтверждения из письма"
 msgid "Email verification code"
 msgstr "Код подтверждения из письма"
 
-#: authentication/mfa/face.py:56
+#: authentication/mfa/face.py:55
 msgid "Bind face to enable"
 msgstr "Привязать лицо для активации"
 
-#: authentication/mfa/face.py:60
+#: authentication/mfa/face.py:59
 msgid "Unbind face to disable"
 msgstr "Отвязать лицо для деактивации"
 
@@ -4586,7 +4590,7 @@ msgid "Actions"
 msgstr "Действия"
 
 #: authentication/serializers/connection_token.py:46
-#: perms/serializers/permission.py:65 perms/serializers/permission.py:86
+#: perms/serializers/permission.py:66 perms/serializers/permission.py:87
 #: users/serializers/user.py:127 users/serializers/user.py:261
 msgid "Is expired"
 msgstr "Истекший?"
@@ -4626,8 +4630,8 @@ msgstr ""
 msgid "Not a valid ssh public key"
 msgstr "Недействительный ключ SSH"
 
-#: authentication/serializers/token.py:93 perms/serializers/permission.py:64
-#: perms/serializers/permission.py:87 users/serializers/user.py:128
+#: authentication/serializers/token.py:93 perms/serializers/permission.py:65
+#: perms/serializers/permission.py:88 users/serializers/user.py:128
 #: users/serializers/user.py:258
 msgid "Is valid"
 msgstr "Действует?"
@@ -4723,7 +4727,7 @@ msgstr ""
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:37
 #: templates/_modal.html:23 templates/flash_message_standalone.html:37
-#: templates/redirect_confirm.html:60
+#: templates/redirect_confirm.html:48
 #: users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "Подтвердить"
@@ -4737,7 +4741,7 @@ msgstr "Ошибка кода"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:542
+#: jumpserver/conf.py:546
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -5336,7 +5340,7 @@ msgstr "Экспорт выбранных"
 msgid "Export filtered"
 msgstr "Экспорт отфильтрованных"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
 #, python-format
 msgid "%s object does not exist."
 msgstr "Объект %s не существует."
@@ -5572,16 +5576,16 @@ msgstr "Код не найден"
 msgid "The message code provided is invalid or has expired"
 msgstr "Предоставленный код сообщения недействительный или истек"
 
-#: jumpserver/conf.py:536
+#: jumpserver/conf.py:540
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "Код подтверждения: {code}"
 
-#: jumpserver/conf.py:541
+#: jumpserver/conf.py:545
 msgid "Create account successfully"
 msgstr "Успешное создание учетной записи"
 
-#: jumpserver/conf.py:543
+#: jumpserver/conf.py:547
 msgid "Your account has been created successfully"
 msgstr "Ваша учетная запись была успешно создана"
 
@@ -6344,7 +6348,7 @@ msgstr "Просмотр всех присоединенных организа�
 msgid "Can not delete virtual org"
 msgstr "Невозможно удалить виртуальную организацию"
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:59
+#: orgs/serializers.py:10 perms/serializers/permission.py:60
 #: rbac/serializers/role.py:27 users/serializers/group.py:53
 msgid "Users amount"
 msgstr "Количество пользователей"
@@ -6353,7 +6357,7 @@ msgstr "Количество пользователей"
 msgid "User groups amount"
 msgstr "Количество групп пользователей"
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:62
+#: orgs/serializers.py:14 perms/serializers/permission.py:63
 msgid "Nodes amount"
 msgstr "Количество папок"
 
@@ -6450,7 +6454,7 @@ msgid "today"
 msgstr "сегодня"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:199
+#: settings/serializers/feature.py:195
 msgid "day"
 msgstr "день"
 
@@ -6470,7 +6474,7 @@ msgstr "Срок действия разрешений на активы ист�
 msgid "asset permissions of organization {}"
 msgstr "разрешения на активы организации {}"
 
-#: perms/serializers/permission.py:43
+#: perms/serializers/permission.py:44
 msgid ""
 "Accounts, format [\"@virtual\", \"root\", \"%template_id\"], virtual "
 "choices: @ALL, @SPEC, @USER, @ANON, @INPUT"
@@ -6478,13 +6482,18 @@ msgstr ""
 "Формат учётных записей: [\"@virtual\", \"root\", \"%template_id\"], варианты"
 " virtual: @ALL, @SPEC, @USER, @ANON, @INPUT"
 
-#: perms/serializers/permission.py:49
+#: perms/serializers/permission.py:50
 msgid "Protocols, format [\"ssh\", \"rdp\", \"vnc\"] or [\"all\"]"
 msgstr "Протоколы, формат [\"ssh\", \"rdp\", \"vnc\"] или [\"all\"]"
 
-#: perms/serializers/permission.py:60
+#: perms/serializers/permission.py:61
 msgid "Groups amount"
 msgstr "Количество групп"
+
+#: perms/serializers/permission.py:135
+msgid ""
+"Please ensure that the selected account templates use the same username."
+msgstr ""
 
 #: perms/tasks.py:28
 msgid "Check asset permission expired"
@@ -6712,7 +6721,7 @@ msgstr "Смена секрета аккаунта"
 msgid "App ops"
 msgstr "Центр задач"
 
-#: rbac/tree.py:60 settings/serializers/feature.py:205
+#: rbac/tree.py:60 settings/serializers/feature.py:201
 msgid "Feature"
 msgstr "Функции"
 
@@ -6755,8 +6764,8 @@ msgstr "Управление организациями"
 msgid "Ticket comment"
 msgstr "Комментарии к заявке"
 
-#: rbac/tree.py:185 settings/serializers/feature.py:186
-#: settings/serializers/feature.py:188 tickets/models/ticket/general.py:310
+#: rbac/tree.py:185 settings/serializers/feature.py:182
+#: settings/serializers/feature.py:184 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "Заявка"
 
@@ -6832,7 +6841,7 @@ msgstr "Письмо успешно отправлено "
 msgid "Chat AI is not enabled"
 msgstr "Чат AI не включен"
 
-#: settings/api/chat.py:95 settings/api/dingtalk.py:31
+#: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:49 settings/api/wecom.py:37
 msgid "Test success"
@@ -6867,6 +6876,14 @@ msgstr "Настройки системы"
 #: settings/const.py:13
 msgid "Embed"
 msgstr "Встроенный"
+
+#: settings/const.py:22 settings/serializers/feature.py:173
+msgid "Custom gpt model"
+msgstr "Пользовательская модель GPT"
+
+#: settings/const.py:43 settings/serializers/feature.py:177
+msgid "Custom DeepSeek model"
+msgstr "Настройте модель DeepSeek"
 
 #: settings/models.py:42 users/models/preference.py:14
 msgid "Encrypted"
@@ -7812,71 +7829,55 @@ msgstr "Модель GPT"
 msgid "DeepSeek Model"
 msgstr "Модель DeepSeek"
 
-#: settings/serializers/feature.py:172
-msgid "Custom Model"
-msgstr "Пользовательская модель"
-
-#: settings/serializers/feature.py:173
-msgid "Whether to use a custom model"
-msgstr "Использовать пользовательскую модель?"
-
-#: settings/serializers/feature.py:177
-msgid "Custom gpt model"
-msgstr "Пользовательская модель GPT"
-
-#: settings/serializers/feature.py:181
-msgid "Custom DeepSeek model"
-msgstr "Настройте модель DeepSeek"
-
-#: settings/serializers/feature.py:190
+#: settings/serializers/feature.py:186
 msgid "Approval without login"
 msgstr "Одобрение без входа"
 
-#: settings/serializers/feature.py:191
+#: settings/serializers/feature.py:187
 msgid "Allow direct approval ticket without login"
 msgstr "Разрешить одобрение заявок без необходимости входа в систему"
 
-#: settings/serializers/feature.py:195
+#: settings/serializers/feature.py:191
 msgid "Period"
 msgstr "Период"
 
-#: settings/serializers/feature.py:196
+#: settings/serializers/feature.py:192
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
 msgstr "Стандартный период действия разрешения для заявки на активы"
 
-#: settings/serializers/feature.py:199
+#: settings/serializers/feature.py:195
 msgid "hour"
 msgstr "час"
 
-#: settings/serializers/feature.py:200
+#: settings/serializers/feature.py:196
 msgid "Unit"
 msgstr "Единицы"
 
-#: settings/serializers/feature.py:200
+#: settings/serializers/feature.py:196
 msgid "The unit of period"
 msgstr "Единица периода"
 
-#: settings/serializers/feature.py:208
+#: settings/serializers/feature.py:204
 msgid "Adhoc command"
 msgstr "Быстрые команды"
 
-#: settings/serializers/feature.py:209
+#: settings/serializers/feature.py:205
 msgid ""
 "Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
 msgstr ""
 "Разрешить пользователю выполнять пакетные команды в разделе Рабочий стол - "
 "Центр заданий - Быстрые команды"
 
-#: settings/serializers/feature.py:213
+#: settings/serializers/feature.py:209
 msgid "Command blacklist"
 msgstr "Черный список команд"
 
-#: settings/serializers/feature.py:214
+#: settings/serializers/feature.py:210
 msgid "Command blacklist in Adhoc"
 msgstr "Чёрный список команд Быстрых команд"
 
-#: settings/serializers/feature.py:220
+#: settings/serializers/feature.py:216
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -7884,11 +7885,11 @@ msgstr "Чёрный список команд Быстрых команд"
 msgid "Virtual app"
 msgstr "Виртуальное приложение"
 
-#: settings/serializers/feature.py:223
+#: settings/serializers/feature.py:219
 msgid "Virtual App"
 msgstr "Виртуальное приложение"
 
-#: settings/serializers/feature.py:225
+#: settings/serializers/feature.py:221
 msgid ""
 "Virtual applications, you can use the Linux operating system as an "
 "application server in remote applications."
@@ -8745,26 +8746,17 @@ msgstr "Код подтверждения был отправлен"
 msgid "Home page"
 msgstr "Главная страница"
 
-#: templates/redirect_confirm.html:42
+#: templates/redirect_confirm.html:30
 msgid "You are about to be redirected to an external website."
 msgstr "Вы собираетесь перейти на внешний сайт"
 
-#: templates/redirect_confirm.html:45
+#: templates/redirect_confirm.html:33
 msgid "Please confirm that you trust this link: "
 msgstr "Пожалуйста, убедитесь, что вы доверяете следующей ссылке:"
 
-#: templates/redirect_confirm.html:55
+#: templates/redirect_confirm.html:43
 msgid "Back"
 msgstr "Вернуться"
-
-#: templates/redirect_confirm.html:70
-msgid "Redirecting you to the Desktop App ( JumpServer Client )"
-msgstr ""
-"Происходит перенаправление на десктопное приложение (клиент JumpServer)"
-
-#: templates/redirect_confirm.html:73
-msgid "You can safely close this window and return to the application."
-msgstr "Вы можете закрыть это окно и вернуться к приложению"
 
 #: templates/resource_download.html:20 templates/resource_download.html:36
 #: users/const.py:84
@@ -9998,7 +9990,7 @@ msgstr "Активы с действующими правами"
 msgid "Ticket already closed"
 msgstr "Заявка уже закрыта"
 
-#: tickets/handlers/apply_asset.py:39
+#: tickets/handlers/apply_asset.py:40
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -10158,8 +10150,8 @@ msgid "Ticket applied info"
 msgstr "Информация о заявке"
 
 #: tickets/notifications.py:116
-msgid "Your has a new ticket, applicant - {}"
-msgstr "У вас новая заявка, заявитель - {}"
+msgid "You have a new ticket from {}"
+msgstr "У вас новый билет от {}"
 
 #: tickets/notifications.py:120
 msgid "{}: New Ticket - {} ({})"
@@ -10264,15 +10256,20 @@ msgid "This user is not authorized to approve this ticket"
 msgstr "Этот пользователь не имеет права одобрять эту заявку"
 
 #: users/api/user.py:64
+msgid "You cannot delete yourself. Please disable it instead."
+msgstr ""
+"Оно не может удалить себя. Пожалуйста, отключите его."
+
+#: users/api/user.py:66
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr ""
 "Не удается удалить пользователя-администратора. Пожалуйста, отключите его."
 
-#: users/api/user.py:162
+#: users/api/user.py:164
 msgid "Can not invite self"
 msgstr "Нельзя пригласить себя"
 
-#: users/api/user.py:215
+#: users/api/user.py:217
 msgid "Could not reset self otp, use profile reset instead"
 msgstr ""
 "Невозможно сбросить МФА на этой странице, пожалуйста, перейдите на страницу "
@@ -10696,10 +10693,6 @@ msgstr "Пароль не соответствует требованиям бе
 #: users/serializers/profile.py:33
 msgid "The new password cannot be the last {} passwords"
 msgstr "Новый пароль не может совпадать с паролями за последние {} раз"
-
-#: users/serializers/profile.py:195
-msgid "Perms"
-msgstr "Права"
 
 #: users/serializers/user.py:51
 msgid "System roles"
@@ -11970,6 +11963,10 @@ msgstr ""
 "Каждый день система будет согласно настройкам в «Системных настройках - Задачи -\n"
 "        Регулярная очистка - Срок хранения истории задач синхронизации облака»\n"
 "        очищать записи о выполнении задач синхронизации облака."
+
+#: xpack/plugins/cloud/ws.py:84
+msgid "Task not started"
+msgstr "Миссия еще не началась"
 
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."

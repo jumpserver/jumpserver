@@ -30,7 +30,7 @@
     "AccountDiscoverDetail": "Discover account details",
     "AccountDiscoverTaskCreate": "Create discover accounts task",
     "AccountDiscoverTaskUpdate": "Update the discover accounts task",
-    "AccountExportTips": "The exported information contains sensitive information such as encrypted account numbers. the exported format is an encrypted zip file (if you have not set the encryption password, please go to personal info to set the file encryption password).",
+    "AccountExportTips": "The exported data contains account ciphertext and other sensitive information and will be provided as an encrypted ZIP file.\nIf no encryption password has been set, please go to the upper-right corner and configure it under Personal Settings → Preferences.",
     "AccountList": "Accounts",
     "AccountOverview": "Account overview",
     "AccountPasswordChangeTrends": "Account password change trends",

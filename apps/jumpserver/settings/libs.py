@@ -38,6 +38,14 @@ REST_FRAMEWORK = {
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         'authentication.backends.drf.SessionAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'common.drf.throttling.RateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': CONFIG.THROTTLE_RATES_ANON,
+        'user': CONFIG.THROTTLE_RATES_USER,
+        'service_account': CONFIG.THROTTLE_RATES_SERVICE_ACCOUNT,
+    },
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
         'common.drf.filters.SearchFilter',

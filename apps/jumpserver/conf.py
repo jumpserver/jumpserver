@@ -13,11 +13,11 @@ import json
 import logging
 import os
 import re
+import sys
 import types
 from importlib import import_module
 from urllib.parse import urljoin, urlparse, quote
 
-import sys
 import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -220,6 +220,10 @@ class Config(dict):
         'USER_GUIDE_URL': '',
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
+
+        'THROTTLE_RATES_ANON': '60/min',
+        'THROTTLE_RATES_USER': '180/min',
+        'THROTTLE_RATES_SERVICE_ACCOUNT': '300/min',
 
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
@@ -699,7 +703,6 @@ class Config(dict):
         'LIMIT_SUPER_PRIV': False,
 
         # Chat AI
-        'IS_CUSTOM_MODEL': False,
         'CHAT_AI_ENABLED': False,
         'CHAT_AI_METHOD': 'api',
         'CHAT_AI_EMBED_URL': '',

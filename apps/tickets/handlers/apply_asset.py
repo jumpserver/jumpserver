@@ -18,6 +18,7 @@ class Handler(BaseHandler):
             self._create_asset_permission()
 
     def _create_asset_permission(self):
+        self.ticket.refresh_from_db()
         org_id = self.ticket.org_id
         with tmp_to_org(org_id):
             asset_permission = AssetPermission.objects.filter(id=self.ticket.id).first()

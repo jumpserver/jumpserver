@@ -168,10 +168,6 @@ class ChatAISettingSerializer(serializers.Serializer):
         default=DeepSeekModelChoices.deepseek_chat, choices=DeepSeekModelChoices.choices,
         label=_("DeepSeek Model"), required=False,
     )
-    IS_CUSTOM_MODEL = serializers.BooleanField(
-        required=False, default=False, label=_("Custom Model"),
-        help_text=_("Whether to use a custom model")
-    )
     CUSTOM_GPT_MODEL = serializers.CharField(
         max_length=256, allow_blank=True,
         required=False, label=_('Custom gpt model'),

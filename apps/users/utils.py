@@ -139,7 +139,7 @@ class BlockUtilBase:
         username = username.lower() if username else ''
         self.username = username
         self.ip = ip
-        self.limit_key = self.LIMIT_KEY_TMPL.format(username, ip)
+        self.limit_key = self.LIMIT_KEY_TMPL.format(username)
         self.block_key = self.BLOCK_KEY_TMPL.format(username)
         self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
 
@@ -236,12 +236,12 @@ class BlockGlobalIpUtilBase:
 
 
 class LoginBlockUtil(BlockUtilBase):
-    LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}_{}"
+    LIMIT_KEY_TMPL = "_LOGIN_LIMIT_{}"
     BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
 class MFABlockUtils(BlockUtilBase):
-    LIMIT_KEY_TMPL = "_MFA_LIMIT_{}_{}"
+    LIMIT_KEY_TMPL = "_MFA_LIMIT_{}"
     BLOCK_KEY_TMPL = "_MFA_BLOCK_{}"
 
 
