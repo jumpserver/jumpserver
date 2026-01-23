@@ -1,3 +1,7 @@
+import importlib
+import os
+
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -117,6 +121,35 @@ class SecurityLoginLimitSerializer(serializers.Serializer):
     )
 
 
+class DynamicMFAChoiceField(serializers.MultipleChoiceField):
+    def __init__(self, **kwargs):
+        _choices = self._get_dynamic_choices()
+        super().__init__(choices=_choices, **kwargs)
+
+    @staticmethod
+    def _get_dynamic_choices():
+        choices = []
+        mfa_dir = os.path.join(settings.APPS_DIR, 'authentication', 'mfa')
+        for filename in os.listdir(mfa_dir):
+            if not filename.endswith('.py') or filename.startswith('__init__'):
+                continue
+
+            module_name = f'authentication.mfa.{filename[:-3]}'
+            try:
+                module = importlib.import_module(module_name)
+            except ImportError:
+                continue
+
+            for attr_name in dir(module):
+                item = getattr(module, attr_name)
+                if not isinstance(item, type) or not attr_name.startswith('MFA'):
+                    continue
+                if 'BaseMFA' != item.__base__.__name__:
+                    continue
+                choices.append((item.name, item.display_name))
+        return choices
+
+
 class SecurityAuthSerializer(serializers.Serializer):
     SECURITY_MFA_AUTH = serializers.ChoiceField(
         choices=(
@@ -130,10 +163,10 @@ class SecurityAuthSerializer(serializers.Serializer):
         required=False, default=True,
         label=_('Third-party login MFA'),
     )
-    SECURITY_MFA_BY_EMAIL = serializers.BooleanField(
-        required=False, default=False,
-        label=_('MFA via Email'),
-        help_text=_('Email as a method for multi-factor authentication')
+    SECURITY_MFA_ENABLED_BACKENDS = DynamicMFAChoiceField(
+        default=[], allow_empty=True,
+        label=_('MFA Backends'),
+        help_text=_('MFA methods supported for user login')
     )
     OTP_ISSUER_NAME = serializers.CharField(
         required=False, max_length=16, label=_('OTP issuer name'),

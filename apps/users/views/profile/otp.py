@@ -37,12 +37,25 @@ logger = get_logger(__name__)
 class UserOtpEnableStartView(AuthMixin, TemplateView):
     template_name = 'users/user_otp_check_password.html'
 
+    @staticmethod
+    def get_redirect_url():
+        message_data = {
+            'title': _('Redirecting'),
+            'message': _('No MFA services are available. Please contact the administrator'),
+            'redirect_url': reverse('authentication:login'),
+            'auto_redirect': True,
+        }
+        return FlashMessageUtil.gen_message_url(message_data)
+
     def get(self, request, *args, **kwargs):
         try:
             self.get_user_from_session()
         except SessionEmptyError:
             url = reverse('authentication:login') + '?_=otp_enable_start'
             return redirect(url)
+
+        if not MFAOtp.global_enabled():
+            return redirect(self.get_redirect_url())
         return super().get(request, *args, **kwargs)
 
 

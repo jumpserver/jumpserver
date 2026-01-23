@@ -46,9 +46,9 @@ class MFASms(BaseMFA):
     def send_challenge(self):
         self.sms.gen_and_send_async()
 
-    @staticmethod
-    def global_enabled():
-        return settings.SMS_ENABLED
+    @classmethod
+    def global_enabled(cls):
+        return super().global_enabled() and settings.SMS_ENABLED
 
     def get_enable_url(self) -> str:
         return '/ui/#/profile/index'
