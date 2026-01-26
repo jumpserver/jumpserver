@@ -1,4 +1,5 @@
 from datetime import datetime
+from ast import literal_eval
 
 from django.utils import timezone
 
@@ -24,6 +25,31 @@ def parse_date(date_str, default=None):
             return timezone.make_aware(dt, timezone.get_current_timezone())
         except ValueError:
             continue
+    return default
+
+
+def parse_int(value, default=None):
+    if value is None:
+        return default
+    if isinstance(value, int):
+        return value
+    if isinstance(value, (bytes, bytearray)):
+        return int.from_bytes(value, byteorder="little", signed=False) if value else default
+    if isinstance(value, str):
+        text = value.strip()
+        if not text or text.lower() in {"none", "null"}:
+            return default
+        if text.startswith(("b'", 'b"')):
+            try:
+                maybe_bytes = literal_eval(text)
+                if isinstance(maybe_bytes, (bytes, bytearray)):
+                    return int.from_bytes(maybe_bytes, byteorder="little", signed=False) if maybe_bytes else default
+            except (ValueError, SyntaxError):
+                return default
+        try:
+            return int(text)
+        except ValueError:
+            return default
     return default
 
 
@@ -74,7 +100,7 @@ class GatherAccountsFilter:
             return {}
         result = {}
         for user_info in info[0][0]:
-            days_until_expiration = user_info.get('days_until_expiration')
+            days_until_expiration = parse_int(user_info.get('days_until_expiration'))
             date_password_expired = timezone.now() + timezone.timedelta(
                 days=int(days_until_expiration)) if days_until_expiration else None
             user = {
