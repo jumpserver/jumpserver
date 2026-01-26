@@ -1,14 +1,11 @@
-import requests
-
 from collections import OrderedDict
 
+import requests
 from django.conf import settings
 
-from common.utils import get_logger
 from common.exceptions import JMSException
-
+from common.utils import get_logger
 from .base import BaseSMSClient
-
 
 logger = get_logger(__file__)
 
@@ -38,7 +35,7 @@ class CustomSMS(BaseSMSClient):
             action = requests.get
             kwargs = {'params': params}
         try:
-            response = action(url=settings.CUSTOM_SMS_URL, verify=False, **kwargs)
+            response = action(url=settings.CUSTOM_SMS_URL, verify=settings.VERIFY_EXTERNAL_SSL, **kwargs)
             response.raise_for_status()
         except Exception as exc:
             logger.error('Custom sms error: {}'.format(exc))
