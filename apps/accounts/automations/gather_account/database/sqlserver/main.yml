@@ -20,7 +20,7 @@
               l.is_disabled,
               l.create_date,
               l.default_database_name,
-              LOGINPROPERTY(name, 'DaysUntilExpiration') AS days_until_expiration,
+              CAST(LOGINPROPERTY(name, 'DaysUntilExpiration') AS INT) AS days_until_expiration,
               MAX(s.login_time) AS last_login_time
           FROM 
               sys.sql_logins l
