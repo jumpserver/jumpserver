@@ -17,6 +17,7 @@ default_interface = dict((
     ('theme', get_vendor_value('theme', default='classic_green')),
     ('theme_info', {}),
     ('footer_content', get_vendor_value('footer_content', default='')),
+    ('vendor', settings.VENDOR)
 ))
 
 if not is_default_vendor():
