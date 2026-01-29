@@ -214,6 +214,8 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
             new_form = form_cls(data=form.data)
             new_form._errors = form.errors
             context = self.get_context_data(form=new_form)
+            if getattr(e, 'block_ttl', 0) > 0:
+                context['block_ttl'] = e.block_ttl
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
         except errors.NeedRedirectError as e:

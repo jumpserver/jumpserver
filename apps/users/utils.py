@@ -2,6 +2,7 @@
 #
 import base64
 import logging
+import math
 import os
 import re
 import time
@@ -116,24 +117,10 @@ def check_password_rules(password, is_org_admin=False):
     return bool(match_obj)
 
 
-class BlockUtil:
-    BLOCK_KEY_TMPL: str
-
-    def __init__(self, username):
-        username = username.lower()
-        self.block_key = self.BLOCK_KEY_TMPL.format(username)
-        self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
-
-    def block(self):
-        cache.set(self.block_key, True, self.key_ttl)
-
-    def is_block(self):
-        return bool(cache.get(self.block_key))
-
-
 class BlockUtilBase:
     LIMIT_KEY_TMPL: str
     BLOCK_KEY_TMPL: str
+    TIERS = [1, 5, 15, 60]
 
     def __init__(self, username, ip):
         username = username.lower() if username else ''
@@ -141,7 +128,6 @@ class BlockUtilBase:
         self.ip = ip
         self.limit_key = self.LIMIT_KEY_TMPL.format(username)
         self.block_key = self.BLOCK_KEY_TMPL.format(username)
-        self.key_ttl = int(settings.SECURITY_LOGIN_LIMIT_TIME) * 60
 
     def get_remainder_times(self):
         times_up = settings.SECURITY_LOGIN_LIMIT_COUNT
@@ -149,15 +135,47 @@ class BlockUtilBase:
         times_remainder = int(times_up) - int(times_failed)
         return times_remainder
 
+    def get_block_ttl_min(self):
+        """Return the current block TTL in minutes."""
+        ttl = self.get_block_ttl()
+        return math.ceil(ttl / 60)
+
+    def get_block_ttl(self):
+        """Return the precise TTL in seconds."""
+        ttl = cache.ttl(self.block_key)
+        if ttl is None or ttl <= 0:
+            return 0
+        return ttl
+
+    @classmethod
+    def get_block_time_by_count(cls, count, limit_count=None):
+        if limit_count is None:
+            limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+
+        if count < limit_count:
+            return 0
+
+        index = count - limit_count
+        if index < len(cls.TIERS):
+            return cls.TIERS[index]
+        else:
+            return cls.TIERS[-1]
+
     def incr_failed_count(self) -> int:
+        # 当前被 block 直接返回
+        if self.is_block():
+            return 0
         limit_key = self.limit_key
         count = cache.get(limit_key, 0)
         count += 1
-        cache.set(limit_key, count, self.key_ttl)
-
+        # 尝试次数设为最大锁定时间，防止缓存过期后无法锁定
+        cache.set(limit_key, count, self.TIERS[-1] * 60)
         limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
         if count >= limit_count:
-            cache.set(self.block_key, True, self.key_ttl)
+            # 阶梯式锁定: 1m, 5m, 15m, 60m
+            minutes = self.get_block_time_by_count(count, limit_count)
+            timeout = minutes * 60
+            cache.set(self.block_key, True, timeout)
         return limit_count - count
 
     def get_failed_count(self):

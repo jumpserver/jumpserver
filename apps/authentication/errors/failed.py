@@ -37,6 +37,7 @@ class AuthFailedError(Exception):
     error = ''
     request = None
     ip = ''
+    block_ttl = 0
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -73,12 +74,13 @@ class CredentialError(
     def __init__(self, error, username, ip, request):
         util = LoginBlockUtil(username, ip)
         times_remainder = util.get_remainder_times()
-        block_time = settings.SECURITY_LOGIN_LIMIT_TIME
         if times_remainder < 1:
-            self.msg = const.block_user_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+            self.block_time = util.get_block_ttl_min()
+            self.block_ttl = util.get_block_ttl()
+            self.msg = const.block_user_login_msg.format(self.block_time)
         else:
             default_msg = const.invalid_login_msg.format(
-                times_try=times_remainder, block_time=block_time
+                times_try=times_remainder, block_time=1
             )
             if error == const.reason_password_failed:
                 self.msg = default_msg
@@ -94,15 +96,17 @@ class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
 
     def __init__(self, username, request, ip, mfa_type, error):
         util = MFABlockUtils(username, ip)
-        times_remainder = util.incr_failed_count()
-        block_time = settings.SECURITY_LOGIN_LIMIT_TIME
+        util.incr_failed_count()
+        times_remainder = util.get_remainder_times()
 
-        if times_remainder:
+        if times_remainder > 1:
             self.msg = const.mfa_error_msg.format(
-                error=error, times_try=times_remainder, block_time=block_time
+                error=error, times_try=times_remainder, block_time=1
             )
         else:
-            self.msg = const.block_mfa_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+            self.block_time = util.get_block_ttl_min()
+            self.block_ttl = util.get_block_ttl()
+            self.msg = const.block_mfa_msg.format(self.block_time)
         super().__init__(username=username, request=request)
 
 
@@ -110,7 +114,10 @@ class BlockMFAError(AuthFailedNeedLogMixin, AuthFailedError):
     error = 'block_mfa'
 
     def __init__(self, username, request, ip):
-        self.msg = const.block_mfa_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
+        util = MFABlockUtils(username, ip)
+        self.block_time = util.get_block_ttl_min()
+        self.block_ttl = util.get_block_ttl()
+        self.msg = const.block_mfa_msg.format(self.block_time)
         super().__init__(username=username, request=request, ip=ip)
 
 
@@ -118,8 +125,11 @@ class BlockLoginError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFail
     error = 'block_login'
 
     def __init__(self, username, ip, request):
-        self.msg = const.block_user_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
-        super().__init__(username=username, ip=ip, request=request)
+        util = LoginBlockUtil(username, ip)
+        self.block_time = util.get_block_ttl_min()
+        self.block_ttl = util.get_block_ttl()
+        self.msg = const.block_user_login_msg.format(self.block_time)
+        super().__init__(username=username, ip=ip, request=request, block_ttl=self.block_ttl)
 
 
 class SessionEmptyError(AuthFailedError):
