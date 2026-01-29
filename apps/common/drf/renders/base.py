@@ -136,20 +136,29 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
         text = ''
         if hasattr(field, 'get_render_help_text'):
             text = field.get_render_help_text()
+        # boolean field
         elif isinstance(field, serializers.BooleanField):
             text = _('Yes/No')
+        # integer fields
+        elif isinstance(field, serializers.IntegerField):
+            text = _('Number, min {} max {}').format(field.min_value, field.max_value)
+            text = text.replace('min None', '').replace('max None', '')
+        # char fields
+        elif isinstance(field, serializers.IPAddressField):
+            text = _('IP')
+        elif isinstance(field, common_fields.PhoneField):
+            text = _("Phone number, format +8612345678901")
         elif isinstance(field, serializers.CharField):
             if field.max_length:
                 text = _('Text, max length {}').format(field.max_length)
             else:
                 text = _("Long text, no length limit")
-        elif isinstance(field, serializers.IntegerField):
-            text = _('Number, min {} max {}').format(field.min_value, field.max_value)
-            text = text.replace('min None', '').replace('max None', '')
+        # date fields
         elif isinstance(field, serializers.DateTimeField):
             text = _('Datetime format {}').format(timezone.now().strftime(settings.REST_FRAMEWORK['DATETIME_FORMAT']))
-        elif isinstance(field, serializers.IPAddressField):
-            text = _('IP')
+        # choice fields
+        elif isinstance(field, common_fields.LabeledChoiceField):
+            text = _('Label, format ["key:value"]')
         elif isinstance(field, serializers.ChoiceField):
             choices = [str(v) for v in field.choices.keys()]
             if isinstance(field, common_fields.LabeledChoiceField):
@@ -157,10 +166,7 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
                          " value is requisite, options {}").format(','.join(choices))
             else:
                 text = _("Choices, options {}").format(",".join(choices))
-        elif isinstance(field, common_fields.PhoneField):
-            text = _("Phone number, format +8612345678901")
-        elif isinstance(field, common_fields.LabeledChoiceField):
-            text = _('Label, format ["key:value"]')
+        # related fields
         elif isinstance(field, common_fields.ObjectRelatedField):
             text = _("Object, format name(id), name is optional for human read, id is requisite")
         elif isinstance(field, serializers.PrimaryKeyRelatedField):
@@ -173,6 +179,7 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
                 text = _('Labels, format ["key:value", ...], if label not exists, will create it')
             else:
                 text = _('Objects, format ["id", ...]')
+        # list serializer
         elif isinstance(field, serializers.ListSerializer):
             child = field.child
             if hasattr(child, 'get_render_help_text'):
