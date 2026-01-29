@@ -35,7 +35,7 @@ dependencies = [
     'gmssl==3.2.2',
     'itsdangerous==1.1.0',
     'pyotp==2.8.0',
-    'pynacl==1.5.0',
+    'pynacl==1.6.2',
     'python-dateutil==2.8.2',
     'pyyaml==6.0.1',
     'requests==2.32.4',
