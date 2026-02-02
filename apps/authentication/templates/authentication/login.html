@@ -352,7 +352,7 @@
                 </ul>
             </div>
             <div class="contact-form col-md-10 col-md-offset-1" style='float: none; overflow: hidden'>
-                <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
+                <form id="login-form" autocomplete="off" action="" method="post" role="form" novalidate="novalidate">
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
                         {% if form.non_field_errors %}
@@ -362,9 +362,9 @@
                         {% endif %}
                     </div>
 
-                    {% bootstrap_field form.username show_label=False %}
+                    {% bootstrap_field form.username autocomplete="off" show_label=False %}
                     <div class="form-group {% if form.password.errors %} has-error {% endif %}">
-                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}"
+                        <input type="password" autocomplete="off" class="form-control" id="password" placeholder="{% trans 'Password' %}"
                                required>
                         <input id="password-hidden" type="text" style="display:none"
                                name="{{ form.password.html_name }}">

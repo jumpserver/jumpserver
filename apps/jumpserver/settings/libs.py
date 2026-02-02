@@ -45,6 +45,7 @@ REST_FRAMEWORK = {
         'anon': CONFIG.THROTTLE_RATES_ANON,
         'user': CONFIG.THROTTLE_RATES_USER,
         'service_account': CONFIG.THROTTLE_RATES_SERVICE_ACCOUNT,
+        'file_transfer': CONFIG.THROTTLE_FILE_TRANSFER,
     },
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',

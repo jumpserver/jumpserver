@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from acls.models import LoginAssetACL
 from assets.models import Asset
 from common.const.http import POST
+from common.drf.throttling import FileTransferThrottle
 from common.permissions import IsValidUser
 from common.utils import get_request_ip_or_data
 from ops.celery import app
@@ -171,7 +172,9 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         return exceeds_limit_files
 
     @action(methods=[POST], detail=False, serializer_class=FileSerializer,
-            permission_classes=[IsValidUser, ], url_path='upload')
+            permission_classes=[IsValidUser, ],
+            throttle_classes=[FileTransferThrottle],
+            url_path='upload')
     def upload(self, request, *args, **kwargs):
         uploaded_files = request.FILES.getlist('files')
         serializer = self.get_serializer(data=request.data)

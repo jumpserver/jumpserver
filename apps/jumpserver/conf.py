@@ -226,6 +226,9 @@ class Config(dict):
         'THROTTLE_RATES_USER': '180/min',
         'THROTTLE_RATES_SERVICE_ACCOUNT': '300/min',
 
+        # 文件上传下载限流 (防止DOS攻击)
+        'THROTTLE_FILE_TRANSFER': '50/hour',
+
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
         'VERIFY_EXTERNAL_SSL': True,
