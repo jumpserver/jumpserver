@@ -12,6 +12,7 @@ from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
 from common.serializers import fields as common_fields
+from common.serializers.fields import EncryptedField
 from common.utils import get_logger
 from .mixins import LogMixin
 
@@ -23,6 +24,8 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
     # 渲染模板标识, 导入、导出、更新模板: ['import', 'update', 'export']
     template = 'export'
     serializer = None
+    # 敏感字段名称，这些字段不允许导出
+    secret_field_names = ("password", "token", "secret", "key", "private_key", "passphrase")
 
     @staticmethod
     def _check_validation_data(data):
@@ -48,6 +51,18 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
         disposition = 'attachment; filename="{}"'.format(filename)
         response['Content-Disposition'] = disposition
 
+    def is_secret_field(self, field):
+        """检查字段是否为敏感字段，敏感字段不允许导出"""
+        # 检查字段类型是否为 EncryptedField
+        if isinstance(field, EncryptedField):
+            return True
+        # 检查字段名是否包含敏感关键词
+        field_name = field.field_name.lower()
+        for secret_name in self.secret_field_names:
+            if secret_name in field_name:
+                return True
+        return False
+
     def get_rendered_fields(self):
         fields = self.serializer.fields
         meta = getattr(self.serializer, 'Meta', None)
@@ -62,6 +77,8 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
 
         fields_unexport = getattr(meta, 'fields_unexport', [])
         fields = [v for v in fields if v.field_name not in fields_unexport]
+        # 过滤敏感字段，禁止口令、密钥等敏感信息导出
+        fields = [v for v in fields if not self.is_secret_field(v)]
         return fields
 
     @staticmethod
