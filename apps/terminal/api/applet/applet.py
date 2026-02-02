@@ -2,7 +2,6 @@ import os
 import os.path
 import re
 import shutil
-import zipfile
 from typing import Callable
 
 from django.conf import settings
@@ -22,6 +21,7 @@ from common.utils import is_uuid
 from common.utils.http import is_true
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
+from common.utils.zip import safe_extract_zip
 
 __all__ = ['AppletViewSet', 'AppletPublicationViewSet']
 
@@ -47,10 +47,7 @@ class DownloadUploadMixin:
             shutil.rmtree(extract_to)
 
         try:
-            with zipfile.ZipFile(path) as zp:
-                if zp.testzip() is not None:
-                    raise ValidationError({'error': _('Invalid zip file')})
-                zp.extractall(extract_to)
+            safe_extract_zip(path, extract_to)
         except RuntimeError as e:
             raise ValidationError({'error': _('Invalid zip file') + ': {}'.format(e)})
 

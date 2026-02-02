@@ -2,6 +2,7 @@ import os
 import stat
 import hashlib
 from pathlib import Path
+from rest_framework.exceptions import ValidationError
 from zipfile import ZipFile, BadZipFile
 
 
@@ -14,7 +15,7 @@ MAX_TOTAL_SIZE = 1 * 1024 * 1024 * 1024        # 1GB
 MAX_COMPRESSION_RATIO = 100                   # 解压 / 压缩
 
 
-class ZipSecurityError(Exception):
+class ZipSecurityError(ValidationError):
     pass
 
 

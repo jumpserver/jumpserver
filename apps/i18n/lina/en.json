@@ -1639,5 +1639,9 @@
     "AccountSecretReadDisabled": "Account secret reading has been disabled by administrator",
     "AccessToken": "Access tokens",
     "AccessTokenTip": "Access Token is a temporary credential generated through the OAuth2 (Authorization Code Grant) flow using the JumpServer client, which is used to access protected resources.",
-    "Revoke": "Revoke"
+    "Revoke": "Revoke",
+    "ReadAgreeTo": "I have read and agree to the",
+    "TermsOfService": "Terms of Service",
+    "PrivacyPolicy": "Privacy Policy",
+    "and": "and"
 }

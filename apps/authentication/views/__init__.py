@@ -7,3 +7,4 @@ from .login import *
 from .mfa import *
 from .slack import *
 from .wecom import *
+from .agreement import *

@@ -84,5 +84,6 @@ urlpatterns = [
 
     path('captcha/', include('captcha.urls')),
 
-    path('oauth2-provider/', include(('authentication.backends.oauth2_provider.urls', 'authentication'), namespace='oauth2-provider'))
+    path('oauth2-provider/', include(('authentication.backends.oauth2_provider.urls', 'authentication'), namespace='oauth2-provider')),
+    path('agreement/', views.AgreementView.as_view(), name='agreement'),
 ]
