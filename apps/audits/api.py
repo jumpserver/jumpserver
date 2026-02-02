@@ -18,6 +18,7 @@ from rest_framework.response import Response
 from common.api import CommonApiMixin
 from common.const.http import GET, POST
 from common.drf.filters import DatetimeRangeFilterBackend
+from common.drf.throttling import FileTransferThrottle
 from common.permissions import IsServiceAccount
 from common.plugins.es import QuerySet as ESQuerySet
 from common.sessions.cache import user_session_manager
@@ -111,6 +112,7 @@ class FTPLogViewSet(OrgModelViewSet):
 
     @action(
         methods=[GET], detail=True, permission_classes=[RBACPermission, ],
+        throttle_classes=[FileTransferThrottle],
         url_path='file/download'
     )
     def download(self, request, *args, **kwargs):
@@ -133,7 +135,9 @@ class FTPLogViewSet(OrgModelViewSet):
         )
         return response
 
-    @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ], serializer_class=FileSerializer)
+    @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ],
+            throttle_classes=[FileTransferThrottle],
+            serializer_class=FileSerializer)
     def upload(self, request, *args, **kwargs):
         ftp_log = self.get_object()
         serializer = self.get_serializer(data=request.data)
