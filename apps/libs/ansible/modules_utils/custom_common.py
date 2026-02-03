@@ -5,6 +5,11 @@ import paramiko
 from sshtunnel import SSHTunnelForwarder
 
 
+def _strip_wrapping_quotes(value):
+    if value and len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+        return value[1:-1]
+    return value
+
 class OldSSHTransport(paramiko.transport.Transport):
     _preferred_pubkeys = (
         "ssh-ed25519",
@@ -121,16 +126,17 @@ class SSHClient:
 
     def local_gateway_prepare(self):
         gateway_args = self.module.params['gateway_args'] or ''
-        pattern = r"(?:sshpass -p ([^ ]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+([\w@]+)@([" \
-                  r"\d.]+)\s+-W %h:%p -q(?: -i (.+))?'"
+        pattern = (
+            r"(?:sshpass -p ([^ ]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+"
+            r"([^@\s]+)@([^\s]+)\s+-W %h:%p -q(?: -i ([^']+))?'"
+        )
         match = re.search(pattern, gateway_args)
-
         if not match:
             return
 
-        password, port, username, address, private_key_path = match.groups()
-        password = password if password else None
-        private_key_path = private_key_path if private_key_path else None
+        password, port, username, address, key_path = match.groups()
+        password = _strip_wrapping_quotes(password) or None
+        key_path = _strip_wrapping_quotes(key_path) or None
         remote_hostname = self.module.params['login_host']
         remote_port = self.module.params['login_port']
 
@@ -138,7 +144,7 @@ class SSHClient:
             (address, int(port)),
             ssh_username=username,
             ssh_password=password,
-            ssh_pkey=private_key_path,
+            ssh_pkey=key_path,
             remote_bind_address=(remote_hostname, remote_port)
         )
 
