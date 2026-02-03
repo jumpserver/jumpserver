@@ -7,6 +7,9 @@ from .cipher import *
 from .digest import *
 from django.core.cache import cache
 from redis_lock import Lock as RedisLock
+from common.utils import get_logger
+
+logger = get_logger(__file__)
 
 
 class Device:
@@ -42,6 +45,13 @@ class Device:
     def generate_random(self, length=64):
         session = self.new_session()
         return session.generate_random(length)
+
+    def verify_sign(self, public_key, raw_data, sign_data):
+        logger.debug("verify_sign public_key: %s", public_key)
+        logger.debug("verify_sign raw_data: %s", raw_data)
+        logger.debug("verify_sign sign_data: %s", sign_data)
+        session = self.new_session()
+        return session.verify_sign_ecc(0x00020200, public_key, raw_data, sign_data)
 
     def new_sm2_ecc_cipher(self, public_key, private_key):
         session = self.new_session()

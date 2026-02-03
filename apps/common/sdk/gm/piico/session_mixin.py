@@ -13,9 +13,8 @@ class BaseMixin:
 class SM2Mixin(BaseMixin):
     def ecc_encrypt(self, public_key, plain_text, alg_id):
 
-        pos = 1
+        pos = 0
         k1 = bytes([0] * 32) + bytes(public_key[pos:pos + 32])
-        k1 = (c_ubyte * len(k1))(*k1)
         pos += 32
         k2 = bytes([0] * 32) + bytes(public_key[pos:pos + 32])
 

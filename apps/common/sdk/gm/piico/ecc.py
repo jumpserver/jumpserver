@@ -11,9 +11,9 @@ class EncodeMixin:
 
 class ECCrefPublicKey(Structure, EncodeMixin):
     _fields_ = [
-        ('bits', c_uint),
-        ('x', c_ubyte * ECCref_MAX_LEN),
-        ('y', c_ubyte * ECCref_MAX_LEN),
+        ("bits", c_uint),
+        ("x", c_ubyte * ECCref_MAX_LEN),
+        ("y", c_ubyte * ECCref_MAX_LEN),
     ]
 
     def encode(self):
@@ -22,8 +22,11 @@ class ECCrefPublicKey(Structure, EncodeMixin):
 
 class ECCrefPrivateKey(Structure, EncodeMixin):
     _fields_ = [
-        ('bits', c_uint,),
-        ('K', c_ubyte * ECCref_MAX_LEN),
+        (
+            "bits",
+            c_uint,
+        ),
+        ("K", c_ubyte * ECCref_MAX_LEN),
     ]
 
     def encode(self):
@@ -41,7 +44,7 @@ class ECCCipherEncode(EncodeMixin):
 
     def encode(self):
         c1 = bytes(self.x[32:]) + bytes(self.y[32:])
-        c2 = bytes(self.C[:self.L])
+        c2 = bytes(self.C[: self.L])
         c3 = bytes(self.M)
         return bytes([0x04]) + c1 + c2 + c3
 
@@ -52,15 +55,19 @@ def new_ecc_cipher_cla(length):
     if _cache.__contains__(cla_name):
         return _cache[cla_name]
     else:
-        cla = type(cla_name, (Structure, ECCCipherEncode), {
-            "_fields_": [
-                ('x', c_ubyte * ECCref_MAX_LEN),
-                ('y', c_ubyte * ECCref_MAX_LEN),
-                ('M', c_ubyte * 32),
-                ('L', c_uint),
-                ('C', c_ubyte * length)
-            ]
-        })
+        cla = type(
+            cla_name,
+            (Structure, ECCCipherEncode),
+            {
+                "_fields_": [
+                    ("x", c_ubyte * ECCref_MAX_LEN),
+                    ("y", c_ubyte * ECCref_MAX_LEN),
+                    ("M", c_ubyte * 32),
+                    ("L", c_uint),
+                    ("C", c_ubyte * length),
+                ]
+            },
+        )
         _cache[cla_name] = cla
         return cla
 
@@ -69,3 +76,10 @@ class ECCKeyPair:
     def __init__(self, public_key, private_key):
         self.public_key = public_key
         self.private_key = private_key
+
+
+class ECCSignature(Structure, EncodeMixin):
+    _fields_ = [
+        ("r", c_ubyte * ECCref_MAX_LEN),
+        ("s", c_ubyte * ECCref_MAX_LEN),
+    ]
