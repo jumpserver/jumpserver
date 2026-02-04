@@ -72,10 +72,9 @@ class BaseMFA(abc.ABC):
     def is_active(self):
         return False
 
-    @staticmethod
-    @abc.abstractmethod
-    def global_enabled():
-        return False
+    @classmethod
+    def global_enabled(cls):
+        return cls.name in settings.SECURITY_MFA_ENABLED_BACKENDS
 
     @abc.abstractmethod
     def get_enable_url(self) -> str:

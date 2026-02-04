@@ -376,7 +376,7 @@
                     </div>
                     {% if form.challenge %}
                         {% bootstrap_field form.challenge show_label=False %}
-                    {% elif form.mfa_type %}
+                    {% elif form.mfa_type and mfa_backends %}
                         <div class="form-group" style="display: flex">
                             {% include '_mfa_login_field.html' %}
                         </div>

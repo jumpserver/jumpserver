@@ -50,7 +50,7 @@ class UserLoginForm(forms.Form):
 
 class UserCheckOtpCodeForm(forms.Form):
     code = forms.CharField(label=_('MFA Code'), max_length=128, required=False)
-    mfa_type = forms.CharField(label=_('MFA type'), max_length=128)
+    mfa_type = forms.CharField(label=_('MFA type'), max_length=128, required=False)
 
 
 class CustomCaptchaTextInput(CaptchaTextInput):
