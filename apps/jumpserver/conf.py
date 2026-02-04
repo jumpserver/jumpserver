@@ -621,7 +621,6 @@ class Config(dict):
         'PRIVACY_MODE': False,
         # 用户登录限制的规则
         'SECURITY_LOGIN_LIMIT_COUNT': 7,
-        'SECURITY_LOGIN_LIMIT_TIME': 30,
         # 登录IP限制的规则
         'SECURITY_LOGIN_IP_BLACK_LIST': [],
         'SECURITY_LOGIN_IP_WHITE_LIST': [],
