@@ -1,8 +1,7 @@
-import io
-
 import yaml
 from django.conf import settings
-from jinja2 import Environment
+from jinja2 import StrictUndefined
+from jinja2.sandbox import SandboxedEnvironment
 
 
 def translate(key, i18n, lang):
@@ -14,19 +13,32 @@ def translate(key, i18n, lang):
 
 def yaml_load_with_i18n(stream, lang=None):
     ori_text = stream.read()
-    stream = io.StringIO(ori_text)
-    yaml_data = yaml.safe_load(stream)
-    i18n = yaml_data.get('i18n', {})
+    data = yaml.safe_load(ori_text)
+    i18n = data.get("i18n", {})
 
-    env = Environment()
-    env.filters['trans'] = lambda key: translate(key, i18n, lang)
+    env = SandboxedEnvironment(
+        undefined=StrictUndefined,
+        autoescape=False,
+    )
+
+    def safe_trans(key):
+        if not isinstance(key, str):
+            raise ValueError("invalid i18n key")
+        return translate(key, i18n, lang)
+
+    env.filters.clear()
+    env.globals.clear()
+    env.filters["trans"] = safe_trans
+
     template = env.from_string(ori_text)
-    yaml_data = template.render()
-    yaml_f = io.StringIO(yaml_data)
-    d = yaml.safe_load(yaml_f)
-    if isinstance(d, dict):
-        d.pop('i18n', None)
-    return d
+    try:
+        rendered = template.render()
+    except Exception as e:
+        rendered = ori_text
+
+    result = yaml.safe_load(rendered)
+    result.pop("i18n", None)
+    return result
 
 
 if __name__ == '__main__':
