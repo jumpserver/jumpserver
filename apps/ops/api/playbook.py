@@ -1,6 +1,5 @@
 import os
 import shutil
-import zipfile
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -13,6 +12,7 @@ from common.api.generic import JMSBulkModelViewSet
 from common.exceptions import JMSException
 from common.permissions import IsOwnerOrAdminWritable
 from common.utils.http import is_true
+from common.utils.zip import safe_extract_zip
 from rbac.permissions import RBACPermission
 from ..const import Scope
 from ..exception import PlaybookNoValidEntry
@@ -27,9 +27,7 @@ from django.utils._os import safe_join
 
 
 def unzip_playbook(src, dest):
-    fz = zipfile.ZipFile(src, 'r')
-    for file in fz.namelist():
-        fz.extract(file, dest)
+    safe_extract_zip(src, dest)
 
 
 class PlaybookViewSet(JMSBulkModelViewSet):

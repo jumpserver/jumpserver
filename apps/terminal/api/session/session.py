@@ -25,6 +25,7 @@ from common.const.http import GET, POST
 from common.drf.filters import BaseFilterSet
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.renders import PassthroughRenderer
+from common.drf.throttling import FileTransferThrottle
 from common.permissions import IsServiceAccount
 from common.storage.replay import ReplayStorageHandler, SessionPartReplayStorageHandler
 from common.utils import data_to_json, is_uuid, i18n_fmt
@@ -127,6 +128,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         return file
 
     @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
+            throttle_classes=[FileTransferThrottle],
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
         session = self.get_object()

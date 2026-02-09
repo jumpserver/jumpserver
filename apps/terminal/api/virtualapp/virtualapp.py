@@ -1,6 +1,5 @@
 import os.path
 import shutil
-import zipfile
 from typing import Callable
 
 from django.core.files.storage import default_storage
@@ -16,6 +15,7 @@ from common.api import JMSBulkModelViewSet
 from common.serializers import FileSerializer
 from terminal import serializers
 from terminal.models import VirtualAppPublication, VirtualApp
+from common.utils.zip import safe_extract_zip
 
 __all__ = ['VirtualAppViewSet', 'VirtualAppPublicationViewSet']
 
@@ -38,10 +38,7 @@ class UploadMixin:
         if os.path.exists(extract_to):
             shutil.rmtree(extract_to)
         try:
-            with zipfile.ZipFile(path) as zp:
-                if zp.testzip() is not None:
-                    raise ValidationError({'error': _('Invalid zip file')})
-                zp.extractall(extract_to)
+            safe_extract_zip(path, extract_to)
         except RuntimeError as e:
             raise ValidationError({'error': _('Invalid zip file') + ': {}'.format(e)})
         tmp_dir = safe_join(extract_to, file.name.replace('.zip', ''))
