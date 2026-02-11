@@ -421,6 +421,7 @@ class Config(dict):
         'AUTH_OAUTH2': False,
         'AUTH_OAUTH2_LOGO_PATH': 'img/login_oauth2_logo.png',
         'AUTH_OAUTH2_PROVIDER': 'OAuth2',
+        'AUTH_OAUTH2_USE_STATE': False,
         'AUTH_OAUTH2_ALWAYS_UPDATE_USER': True,
         'AUTH_OAUTH2_CLIENT_ID': 'client-id',
         'AUTH_OAUTH2_SCOPE': '',

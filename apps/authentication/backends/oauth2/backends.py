@@ -68,12 +68,24 @@ class OAuth2Backend(JMSBaseAuthBackend):
             response_data = response_data['data']
         return response_data
 
-    def authenticate(self, request, code=None):
+    def authenticate(self, request, code=None, state=None):
         log_prompt = "Process authenticate [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
         if code is None:
             logger.error(log_prompt.format('code is missing'))
             return None
+
+        if settings.AUTH_OAUTH2_USE_STATE:
+            if state is None:
+                logger.error(log_prompt.format('state is missing'))
+                return None
+
+            session_state = request.session.get('oauth2_state')
+            if not session_state or session_state != state:
+                logger.error(log_prompt.format('state parameter mismatch'))
+                return None
+
+            request.session.pop('oauth2_state', None)
 
         query_dict = {
             'grant_type': 'authorization_code', 'code': code,

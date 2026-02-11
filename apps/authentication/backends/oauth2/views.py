@@ -1,3 +1,4 @@
+import uuid
 from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponseRedirect
@@ -36,6 +37,11 @@ class OAuth2AuthRequestView(View):
             'redirect_uri': redirect_uri
         }
 
+        if settings.AUTH_OAUTH2_USE_STATE:
+            state = uuid.uuid4()
+            request.session['oauth2_state'] = state
+            query_dict['state'] = state
+
         if '?' in settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT:
             separator = '&'
         else:
@@ -59,9 +65,19 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
         logger.debug(log_prompt.format('Start'))
         callback_params = request.GET
 
+        state = None
+        if settings.AUTH_OAUTH2_USE_STATE:
+            state = callback_params.get('state')
+            session_state = request.session.get('oauth2_state')
+            if not state or not session_state or session_state != state:
+                logger.error("Invalid state parameter")
+                response = self.get_failed_response('/', title=_('OAuth2 Error'), msg="Invalid state parameter")
+                return response
+            request.session.pop('oauth2_state', None)
+
         if 'code' in callback_params:
             logger.debug(log_prompt.format('Process authenticate'))
-            user = authenticate(code=callback_params['code'], request=request)
+            user = authenticate(code=callback_params['code'], request=request, state=state)
 
             if user:
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
