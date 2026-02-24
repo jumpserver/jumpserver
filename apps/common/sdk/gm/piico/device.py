@@ -69,6 +69,10 @@ class Device:
         session = self.new_session()
         return Digest(session, mode)
 
+    def sm3_hmac(self, key, data):
+        session = self.new_session()
+        return session.sm3_hmac(key, data)
+
     def __load_driver(self, path):
         # check driver status
         if self._driver is not None:

@@ -84,6 +84,21 @@ class SM3Mixin(BaseMixin):
             raise PiicoError("hash final failed", ret)
         return bytes(result_data[:result_length.value])
 
+    def sm3_hmac(self, key, data):
+        key_buf = (c_ubyte * len(key))(*key)
+        data_buf = (c_ubyte * len(data))(*data)
+        hash_buf = (c_ubyte * 32)()
+        hash_length = c_uint()
+        ret = self._driver.SPII_SM3Hmac(
+            self._session,
+            key_buf, c_uint(len(key)),
+            data_buf, c_uint(len(data)),
+            hash_buf, pointer(hash_length),
+        )
+        if ret != 0:
+            raise PiicoError("sm3 hmac failed", ret)
+        return bytes(hash_buf[:hash_length.value])
+
 
 class SM4Mixin(BaseMixin):
 
