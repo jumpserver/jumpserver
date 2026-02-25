@@ -210,9 +210,7 @@ class Crypto:
         if not crypt_algo:
             if settings.GMSSL_ENABLED:
                 if settings.PIICO_DEVICE_ENABLE:
-                    piico_driver_path = settings.PIICO_DRIVER_PATH if settings.PIICO_DRIVER_PATH \
-                        else "./lib/libpiico_ccmu.so"
-                    device = piico.open_piico_device(piico_driver_path)
+                    device = piico.open_piico_device()
                     self.cryptor_map["piico_gm"] = get_piico_gm_sm4_ecb_crypto(device)
                     crypt_algo = 'piico_gm'
                 else:

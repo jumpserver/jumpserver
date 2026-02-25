@@ -110,3 +110,13 @@ class MFAUnsetError(NeedRedirectError):
 
     def __init__(self, url, *args, **kwargs):
         super().__init__(url, *args, **kwargs)
+
+
+class UKeyUnsetError(NeedMoreInfoError):
+    error = const.reason_usb_key_unset
+    msg = const.usb_key_unset_msg
+
+
+class LoginCheckKeyError(NeedMoreInfoError):
+    error = const.reason_usb_key_failed
+    msg = const.usb_key_failed_msg

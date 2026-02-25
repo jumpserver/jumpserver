@@ -4,4 +4,5 @@ from .group import *
 from .preference import *
 from .profile import *
 from .realtion import *
+from .ukey import *
 from .user import *

@@ -1,0 +1,174 @@
+{% extends '_base_only_content.html' %}
+{% load static %}
+{% load i18n %}
+{% block custom_head_css_js %}
+    <style>
+        .margin-bottom {
+            margin-bottom: 15px;
+        }
+
+        .input-style {
+            width: 100%;
+            display: inline-block;
+        }
+
+    </style>
+{% endblock %}
+
+{% block title %}
+    {% trans 'USB Key Bind' %}
+{% endblock %}
+
+{% block content %}
+    <script src="{% static 'js/mToken.js' %}"></script>
+    <form class="m-t" role="form" method="post" action="">
+        {% csrf_token %}
+        <input id="user_id" type="text" style="display: none" value="{{ user_id }}">
+        <div class="form-group {% if form.serial.errors %} has-error {% endif %}">
+            <div class="margin-bottom challenge-required">
+                <input id="serial" name="token" type="text" readonly class="form-control input-style"
+                       placeholder="{% trans 'USB Key Serial' %}">
+            </div>
+        </div>
+        <div class="form-group {% if form.public_key.errors %} has-error {% endif %}">
+            <div class="margin-bottom challenge-required">
+                <input id="public_key" name="token" type="text" readonly class="form-control input-style"
+                       placeholder="{% trans 'USB Key Public Key' %}">
+            </div>
+        </div>
+        <button class="btn btn-primary full-width m-b" type='button' onclick="export_public_key()">
+            {% trans 'Click to get USB Key information' %}
+        </button>
+        <button id='delete_button' class="btn btn-primary full-width m-b" disabled type='button' onclick="do_unbind()">
+            {% trans 'Remove USB Key binding' %}
+        </button>
+        <button id='submit_button' type="button" disabled class="btn btn-primary block full-width m-b"
+                onclick="do_bind()">
+            {% trans 'Next' %}
+        </button>
+    </form>
+    <script>
+        const token = new mToken("mTokenPlugin")
+        const url = '/api/v1/users/ukeys/'
+
+        function enumDevice() {
+            let ret = 0
+            ret = token.SOF_LoadLibrary(token.GM3000)
+            if (ret !== 0) {
+                alert("{% trans 'Failed to load plugin, error code: ' %}" + token.SOF_GetLastError())
+                return
+            }
+            const deviceName = token.SOF_EnumDevice();
+            if (deviceName != null) {
+                ret = token.SOF_GetDeviceInstance(deviceName[0], "");
+                if (ret !== 0) {
+                    alert("{% trans 'Failed to bind application, please check if the Key is initialized, error code: ' %}" + token.SOF_GetLastError())
+                }
+            } else {
+                alert("{% trans 'No USB Key found' %}")
+            }
+            return deviceName
+        }
+
+        function export_public_key() {
+            const device = enumDevice()
+            if (device == null) {
+                return
+            }
+            let container = token.SOF_EnumCertContiner().split("||")
+            if (container.length === 0) {
+                alert("{% trans 'No container found, error code: ' %}" + token.SOF_GetLastError())
+                return;
+            }
+            let strPubKey = token.SOF_ExportPubKey(container[0], 1, 3);
+            if (strPubKey == null) {
+                alert("{% trans 'Failed to export public key, error code: ' %}" + token.SOF_GetLastError())
+                return
+            }
+            $('#serial').val(device[0])
+            $('#public_key').val(strPubKey)
+            let submit_button = document.getElementById('submit_button')
+            submit_button.disabled = false
+        }
+
+        function onError(responseText, responseJson, status) {
+            setTimeout(function () {
+                toastr.error(responseText);
+            })
+        }
+
+        function onSuccess(responseText, responseJson, status) {
+            setTimeout(function () {
+                toastr.success("{% trans "Update success" %}");
+            })
+        }
+
+        function has_bound() {
+            let bound = null
+            $.ajax({
+                url: url + '?user=' + $('#user_id').val(),
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (result.length >= 1) {
+                        bound = result[0]['id']
+                    }
+                }
+            })
+            return bound
+        }
+
+        function do_bind() {
+            let data = {
+                'user': $('#user_id').val(),
+                'u_key_serial': $('#serial').val(),
+                'u_key_public_key': $('#public_key').val()
+            }
+
+            let method
+            if (bound_id == null) {
+                method = 'POST'
+                requestApi({
+                    url: url,
+                    method: method,
+                    body: JSON.stringify(data),
+                    flash_message: false,
+                    success: onSuccess,
+                    error: onError
+                })
+            } else {
+                delete data.user
+                method = 'PATCH'
+                requestApi({
+                    url: url + bound_id + '/',
+                    method: method,
+                    body: JSON.stringify(data),
+                    flash_message: false,
+                    success: onSuccess,
+                    error: onError
+                })
+            }
+        }
+
+        function do_unbind() {
+            requestApi({
+                url: url + bound_id + '/',
+                method: 'DELETE',
+                flash_message: false,
+                success: function () {
+                    setTimeout(function () {
+                        toastr.success("{% trans "Delete success" %}");
+                    })
+                },
+                error: onError
+            })
+        }
+
+        const bound_id = has_bound()
+        if (bound_id != null) {
+            let delete_button = document.getElementById('delete_button')
+            delete_button.disabled = false
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends '_base_only_content.html' %}
+{% load static %}
+{% load i18n %}
+{% block custom_head_css_js %}
+    <style>
+        .margin-bottom {
+            margin-bottom: 15px;
+        }
+
+        .input-style {
+            width: 100%;
+            display: inline-block;
+        }
+
+        .challenge-required .input-style {
+            width: calc(100% - 120px);
+            display: inline-block;
+        }
+
+        .btn-challenge {
+            width: 110px !important;
+            height: 100%;
+            vertical-align: top;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    {% trans 'USB Key Auth' %}
+{% endblock %}
+
+{% block content %}
+    <script src="{% static 'js/mToken.js' %}"></script>
+    <form class="m-t" role="form" method="post" action="">
+        {% csrf_token %}
+        {% if form.token.errors %}
+            <p class="red-fonts">{{ form.token.errors.as_text }}</p>
+        {% endif %}
+        <div class="form-group {% if form.serial.errors %} has-error {% endif %}">
+            <div class="margin-bottom challenge-required">
+                <input type="password" id="ukey-pin" class="form-control input-style"
+                       placeholder="{% trans 'Key PIN code' %}">
+                <input id="token-hidden" name="token" type="text" style="display:none">
+                <button class="btn btn-primary full-width btn-challenge"
+                        type='button' onclick="verify_PIN()">
+                    {% trans 'Confirm' %}
+                </button>
+            </div>
+        </div>
+        <button id='submit_button' type="submit" disabled class="btn btn-primary block full-width m-b">
+            {% trans 'Next' %}
+        </button>
+    </form>
+    <script>
+        const token = new mToken("mTokenPlugin")
+
+        function enumDevice() {
+            let ret = 0
+            ret = token.SOF_LoadLibrary(token.GM3000)
+            if (ret !== 0) {
+                alert("{% trans 'Failed to load plugin, error code: ' %}" + token.SOF_GetLastError())
+                return
+            }
+            const deviceName = token.SOF_EnumDevice();
+            if (deviceName != null) {
+                ret = token.SOF_GetDeviceInstance(deviceName[0], "");
+                if (ret !== 0) {
+                    alert("{% trans 'Failed to bind application, please check if the Key is initialized, error code: ' %}" + token.SOF_GetLastError())
+                }
+            } else {
+                alert("{% trans 'No USB Key found' %}")
+            }
+            return deviceName
+        }
+
+        function verify_PIN() {
+            const device = enumDevice()
+            if (device == null) {
+                return
+            }
+            const pin = $('#ukey-pin').val()
+            let ret = token.SOF_Login(pin)
+            if (ret !== 0) {
+                alert("{% trans 'Failed to verify user password, error code: ' %}" + token.SOF_GetLastError())
+                return
+            }
+            let rb = get_Random()
+            let container = token.SOF_EnumCertContiner().split("||");
+            if (container.length === 0) {
+                alert("{% trans 'No container found, error code: ' %}" + token.SOF_GetLastError())
+                return;
+            }
+            token.SOF_SetDigestMethod(1);
+            token.SOF_SetUserID('1234567812345678');
+            let raw_b64 = _Base64encode(rb)
+            let signed = token.SOF_SignData(container[0], 1, raw_b64, rb.length, 0);
+            if (signed == null)
+                alert("{% trans 'Signature failed, error code: ' %}" + token.SOF_GetLastError())
+            let digest = token.SOF_DigestData(container[0], raw_b64, rb.length);
+            if (digest == null)
+                alert("{% trans 'Data digest failed, error code: ' %}" + token.SOF_GetLastError());
+            let submit_button = document.getElementById('submit_button')
+            submit_button.disabled = false
+            $('#token-hidden').val([device, digest, signed].join('$'))
+        }
+
+        function get_Random() {
+            let rb
+            const url = "/api/v1/users/ukeys/random/"
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    rb = result['msg']
+                }
+            })
+            return rb
+        }
+
+
+    </script>
+{% endblock %}

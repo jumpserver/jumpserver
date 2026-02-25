@@ -4,5 +4,6 @@
 
 from .group import *
 from .preference import *
+from .ukey import *
 from .user import *
 from .utils import *

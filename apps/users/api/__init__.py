@@ -6,4 +6,5 @@ from .preference import *
 from .profile import *
 from .relation import *
 from .service import *
+from .ukey import *
 from .user import *

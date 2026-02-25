@@ -17,6 +17,7 @@ urlpatterns = [
     path('login/mfa/face/capture/', views.UserLoginMFAFaceView.as_view(), name='login-face-capture'),
     path('login/guard/', views.UserLoginGuardView.as_view(), name='login-guard'),
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
+    path('ukey/<uuid:user_id>/bind/', views.UserUKeyBindView.as_view(), name='ukey-bind'),
 
     # 原来在users中的
     path('password/forget/previewing/', users_view.UserForgotPasswordPreviewingView.as_view(),

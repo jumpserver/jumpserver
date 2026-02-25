@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #
+import base64
 import inspect
 import threading
 import time
 import uuid
 from functools import partial
 from typing import Callable
-from werkzeug.local import Local
 
 from django.conf import settings
 from django.contrib import auth
@@ -14,17 +14,19 @@ from django.contrib.auth import (
     BACKEND_SESSION_KEY, load_backend,
     PermissionDenied, user_login_failed, _clean_credentials,
 )
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db.models import Q
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from rest_framework.request import Request
+from werkzeug.local import Local
 
 from acls.models import LoginACL
 from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from common.sdk.gm import piico
+from common.sdk.gm.piico.exception import PiicoError
 from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
@@ -36,12 +38,14 @@ logger = get_logger(__name__)
 # 模块级别的线程上下文，用于 authenticate 函数中标记当前线程
 _auth_thread_context = Local()
 
+
 # 保存 Django 原始的 get_or_create 方法（在模块加载时保存一次）
 def _save_original_get_or_create():
     """保存 Django 原始的 get_or_create 方法"""
     from django.contrib.auth import get_user_model as get_user_model_func
     UserModel = get_user_model_func()
     return UserModel.objects.get_or_create
+
 
 _django_original_get_or_create = _save_original_get_or_create()
 
@@ -68,21 +72,21 @@ def _authenticate_context(func):
     - 防止跨请求或跨线程的状态污染
     """
     from functools import wraps
-    
+
     @wraps(func)
     def wrapper(request=None, **credentials):
         from django.contrib.auth import get_user_model
-        
+
         UserModel = get_user_model()
-        
+
         def custom_get_or_create(*args, **kwargs):
             create_username = kwargs.get('username')
             logger.debug(f"get_or_create: thread_id={threading.get_ident()}, username={create_username}")
 
             # 如果当前线程正在执行 authenticate 且仅允许已存在用户认证，则提前判断用户是否存在
             if (
-                getattr(_auth_thread_context, 'in_authenticate', False) and 
-                settings.ONLY_ALLOW_EXIST_USER_AUTH
+                    getattr(_auth_thread_context, 'in_authenticate', False) and
+                    settings.ONLY_ALLOW_EXIST_USER_AUTH
             ):
                 try:
                     UserModel.objects.get(username=create_username)
@@ -91,8 +95,7 @@ def _authenticate_context(func):
 
             # 调用 Django 原始方法（已是绑定方法，直接传参）
             return _django_original_get_or_create(*args, **kwargs)
-        
-        
+
         try:
             # 执行前：设置线程上下文和 monkey-patch
             setattr(_auth_thread_context, 'in_authenticate', True)
@@ -111,7 +114,7 @@ def _authenticate_context(func):
                 UserModel.objects.get_or_create = _django_original_get_or_create
             except Exception:
                 pass
-    
+
     return wrapper
 
 
@@ -154,7 +157,7 @@ def authenticate(request=None, **credentials):
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
-        
+
         try:
             user = backend.authenticate(request, **credentials)
         except PermissionDenied:
@@ -167,7 +170,7 @@ def authenticate(request=None, **credentials):
                     and the current user is not in the user list. Please contact the administrator.'''
                 )
             continue
-        
+
         if user is None:
             continue
 
@@ -629,6 +632,43 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         ip = get_request_ip(self.request)
         need = cache.get(self.key_prefix_captcha.format(ip))
         return need
+
+    def check_user_ukey_if_need(self, user):
+        if self.request.session.get("auth_ukey") and self.request.session.get("auth_ukey_username") == user.username:
+            return
+        if not settings.PIICO_DEVICE_ENABLE or not settings.XPACK_ENABLED:
+            return
+        try:
+            if user.user_usb_key.get():
+                raise errors.LoginCheckKeyError()
+        except ObjectDoesNotExist:
+            if settings.SECURITY_UKEY_FORCED_MODE:
+                raise errors.UKeyUnsetError()
+
+    def check_ukey_auth(self, user, ukey_token):
+        parts = ukey_token.split("$")
+        if len(parts) != 3:
+            raise errors.LoginCheckKeyError()
+        ukey_serial, digest, sign = parts
+
+        user_key = user.user_usb_key.filter(u_key_serial=ukey_serial).first()
+        if not user_key:
+            raise errors.LoginCheckKeyError()
+
+        try:
+            device = piico.open_piico_device()
+            device.verify_sign(
+                base64.b64decode(user_key.u_key_public_key),
+                base64.b64decode(digest),
+                base64.b64decode(sign),
+            )
+        except PiicoError as e:
+            logger.error("verify_sign:{}".format(e))
+            raise errors.LoginCheckKeyError()
+
+        self.request.session["auth_ukey"] = 1
+        self.request.session["auth_ukey_username"] = user.username
+        return True
 
     def check_user_auth(self, valid_data=None):
         # pre check
