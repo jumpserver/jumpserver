@@ -5,8 +5,12 @@ from django.db import transaction
 from django.db.utils import OperationalError
 from django.utils import timezone
 
+from common.utils import get_logger
 from common.utils.common import pretty_string
+from common.utils.verify_hmac import hmac_handler
 from .base import CommandBase
+
+logger = get_logger(__file__)
 
 
 class CommandStore(CommandBase):
@@ -15,18 +19,24 @@ class CommandStore(CommandBase):
         from terminal.models import Command
         self.model = Command
 
+    @staticmethod
+    def _create_hmac_records(commands):
+        from terminal.models import CommandHmac
+        hmac_handler.bulk_create_hmac_records(CommandHmac, commands)
+
     def save(self, command):
         """
         保存命令到数据库
         """
         cmd_input = pretty_string(command['input'])
-        self.model.objects.create(
+        cmd_obj = self.model.objects.create(
             user=command["user"], asset=command["asset"],
             account=command["account"], input=cmd_input,
             output=command["output"], session=command["session"],
             risk_level=command.get("risk_level", 0), org_id=command["org_id"],
             timestamp=command["timestamp"]
         )
+        self._create_hmac_records([cmd_obj])
 
     def bulk_save(self, commands):
         """
@@ -52,6 +62,7 @@ class CommandStore(CommandBase):
             return False
 
         if not error:
+            self._create_hmac_records(_commands)
             return True
         for command in _commands:
             try:
@@ -60,6 +71,7 @@ class CommandStore(CommandBase):
             except OperationalError:
                 command.output = str(command.output.encode())
                 command.save()
+        self._create_hmac_records(_commands)
         return True
 
     @staticmethod

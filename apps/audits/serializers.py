@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from common.serializers.hmac import HmacVerifySerializerMixin
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
 from ops.serializers.job import JobExecutionSerializer, JobSerializer
@@ -57,8 +58,12 @@ class JobsAuditSerializer(JobSerializer):
         return attrs
 
 
-class FTPLogSerializer(serializers.ModelSerializer):
+class FTPLogSerializer(HmacVerifySerializerMixin, serializers.ModelSerializer):
     operate = LabeledChoiceField(choices=OperateChoices.choices, label=_("Operate"))
+
+    @property
+    def hmac_model_class(self):
+        return models.FTPLogHmac
 
     class Meta:
         model = models.FTPLog
@@ -66,15 +71,20 @@ class FTPLogSerializer(serializers.ModelSerializer):
         fields_small = fields_mini + [
             "user", "remote_addr", "asset", "account",
             "org_id", "operate", "filename", "date_start",
-            "is_success", "has_file", "session"
+            "is_success", "has_file", "session",
+            "encrypt_value", "hmac_verify"
         ]
         fields = fields_small
 
 
-class UserLoginLogSerializer(serializers.ModelSerializer):
+class UserLoginLogSerializer(HmacVerifySerializerMixin, serializers.ModelSerializer):
     mfa = LabeledChoiceField(choices=MFAChoices.choices, label=_("MFA"))
     type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
     status = LabeledChoiceField(choices=LoginStatusChoices.choices, label=_("Status"))
+
+    @property
+    def hmac_model_class(self):
+        return models.UserLoginLogHmac
 
     class Meta:
         model = models.UserLoginLog
@@ -85,6 +95,7 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
             "reason", "reason_display",
             "backend", "backend_display",
             "status", "datetime",
+            "encrypt_value", "hmac_verify",
         ]
         fields = fields_small
         extra_kwargs = {
@@ -103,10 +114,14 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
         return {'diff': OperateLogStore.convert_diff_friendly(instance)}
 
 
-class OperateLogSerializer(BulkOrgResourceModelSerializer):
+class OperateLogSerializer(HmacVerifySerializerMixin, BulkOrgResourceModelSerializer):
     action = LabeledChoiceField(choices=ActionChoices.choices, label=_("Action"))
     resource = serializers.SerializerMethodField(label=_("Resource"))
     resource_type = serializers.SerializerMethodField(label=_('Resource Type'))
+
+    @property
+    def hmac_model_class(self):
+        return models.OperateLogHmac
 
     class Meta:
         model = models.OperateLog
@@ -114,7 +129,7 @@ class OperateLogSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             "user", "action", "resource_type",
             "resource", "remote_addr", "datetime",
-            "org_id",
+            "org_id", "encrypt_value", "hmac_verify",
         ]
         fields = fields_small
 
@@ -142,10 +157,15 @@ class OperateLogFullSerializer(OperateLogSerializer):
         fields = OperateLogSerializer.Meta.fields + ['diff']
 
 
-class PasswordChangeLogSerializer(serializers.ModelSerializer):
+class PasswordChangeLogSerializer(HmacVerifySerializerMixin, serializers.ModelSerializer):
+    @property
+    def hmac_model_class(self):
+        return models.PasswordChangeLogHmac
+
     class Meta:
         model = models.PasswordChangeLog
-        fields = ("id", "user", "change_by", "remote_addr", "datetime")
+        fields = ("id", "user", "change_by", "remote_addr", "datetime",
+                  "encrypt_value", "hmac_verify")
 
 
 class SessionAuditSerializer(serializers.ModelSerializer):

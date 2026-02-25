@@ -2,11 +2,11 @@
 #
 import uuid
 
-from common.utils.timezone import local_now_display
+from common.plugins.es import ES
 from common.utils import get_logger
 from common.utils.encode import Singleton
-from common.plugins.es import ES
-
+from common.utils.timezone import local_now_display
+from common.utils.verify_hmac import hmac_handler
 
 logger = get_logger(__file__)
 
@@ -32,6 +32,9 @@ class OperateLogStore(ES, metaclass=Singleton):
             "datetime": {
                 "type": "date",
                 "format": "yyyy-MM-dd HH:mm:ss"
+            },
+            "encrypt_value": {
+                "type": "keyword"
             }
         }
         exact_fields = {}
@@ -52,13 +55,16 @@ class OperateLogStore(ES, metaclass=Singleton):
     def make_data(data):
         op_id = data.get('id', str(uuid.uuid4()))
         datetime_param = data.get('datetime', local_now_display())
-        data = {
+        result = {
             'id': op_id, 'user': data['user'], 'action': data['action'],
             'resource_type': data['resource_type'], 'resource': data['resource'],
             'remote_addr': data['remote_addr'], 'datetime': datetime_param,
             'before': data['before'], 'after': data['after'], 'org_id': data['org_id']
         }
-        return data
+        if hmac_handler.enable:
+            from audits.models import OperateLogHmac
+            result['encrypt_value'] = hmac_handler.compute_model_hmac(result, OperateLogHmac.HMAC_FIELDS)
+        return result
 
     def save(self, **kwargs):
         log_id = kwargs.get('id', '')

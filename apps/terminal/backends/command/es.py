@@ -6,6 +6,7 @@ import pytz
 
 from common.plugins.es import ES
 from common.utils import get_logger
+from common.utils.verify_hmac import hmac_handler
 
 logger = get_logger(__file__)
 
@@ -24,6 +25,9 @@ class CommandStore(ES):
             },
             "timestamp": {
                 "type": "long"
+            },
+            "encrypt_value": {
+                "type": "keyword"
             }
         }
         exact_fields = {'risk_level'}
@@ -43,6 +47,9 @@ class CommandStore(ES):
             org_id=command["org_id"]
         )
         data["date"] = datetime.fromtimestamp(command['timestamp'], tz=pytz.UTC)
+        if hmac_handler.enable:
+            from terminal.models import CommandHmac
+            data["encrypt_value"] = hmac_handler.compute_model_hmac(command, CommandHmac.HMAC_FIELDS)
         return data
 
     @staticmethod

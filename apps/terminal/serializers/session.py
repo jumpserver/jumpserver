@@ -9,6 +9,7 @@ from accounts.utils import account_secret_task_status
 from acls.models import LoginAssetACL
 from assets.models import Asset
 from common.serializers.fields import LabeledChoiceField
+from common.serializers.hmac import HmacVerifySerializerMixin
 from common.utils import pretty_string, get_logger
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from terminal.session_lifecycle import lifecycle_events_map
@@ -26,7 +27,7 @@ __all__ = [
 ]
 
 
-class SessionSerializer(BulkOrgResourceModelSerializer):
+class SessionSerializer(HmacVerifySerializerMixin, BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
     protocol = serializers.CharField(max_length=128, label=_("Protocol"))
     type = LabeledChoiceField(
@@ -40,6 +41,11 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         choices=SessionErrorReason.choices, label=_("Error reason"), required=False
     )
 
+    @property
+    def hmac_model_class(self):
+        from terminal.models import SessionHmac
+        return SessionHmac
+
     class Meta:
         model = Session
         fields_mini = ["id"]
@@ -51,7 +57,8 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'command_amount', 'error_reason', 'replay_size',
         ]
         fields_fk = ["terminal", ]
-        fields_custom = ["can_replay", "can_join", "can_terminate"]
+        fields_custom = ["can_replay", "can_join", "can_terminate",
+                         "encrypt_value", "hmac_verify"]
         fields = fields_small + fields_fk + fields_custom
         extra_kwargs = {
             "duration": {'label': _('Duration')},

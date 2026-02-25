@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import LabeledChoiceField
+from common.serializers.hmac import HmacVerifySerializerMixin
 from common.utils import pretty_string, is_uuid, get_logger
 from terminal.const import RiskLevelChoices
 from terminal.models import Command
@@ -65,7 +66,7 @@ class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
         return super().validate(attrs)
 
 
-class SessionCommandSerializerMixin(serializers.Serializer):
+class SessionCommandSerializerMixin(HmacVerifySerializerMixin, serializers.Serializer):
     """使用这个类作为基础Command Log Serializer类, 用来序列化"""
     id = serializers.UUIDField(read_only=True)
     # 限制 64 字符，不能直接迁移成 128 字符，命令表数据量会比较大
@@ -74,6 +75,11 @@ class SessionCommandSerializerMixin(serializers.Serializer):
     timestamp = serializers.IntegerField(label=_('Timestamp'))
     timestamp_display = serializers.DateTimeField(read_only=True, label=_('Datetime'))
     remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))
+
+    @property
+    def hmac_model_class(self):
+        from terminal.models import CommandHmac
+        return CommandHmac
 
     def validate_account(self, value):
         if len(value) > 64:
@@ -86,5 +92,6 @@ class SessionCommandSerializer(SessionCommandSerializerMixin, SimpleSessionComma
 
     class Meta(SimpleSessionCommandSerializer.Meta):
         fields = SimpleSessionCommandSerializer.Meta.fields + [
-            'id', 'account', 'output', 'timestamp', 'timestamp_display', 'remote_addr'
+            'id', 'account', 'output', 'timestamp', 'timestamp_display',
+            'remote_addr', 'encrypt_value', 'hmac_verify'
         ]

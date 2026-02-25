@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
+from common.db.hmac import AbstractHmac
 from common.sessions.cache import user_session_manager
 from common.utils import lazyproperty, i18n_trans
 from ops.models import JobExecution
@@ -35,6 +36,10 @@ __all__ = [
     "UserLoginLog",
     "PasswordChangeLog",
     "IntegrationApplicationLog",
+    "OperateLogHmac",
+    "UserLoginLogHmac",
+    "FTPLogHmac",
+    "PasswordChangeLogHmac",
 ]
 
 
@@ -336,3 +341,35 @@ class IntegrationApplicationLog(models.Model):
     asset = models.CharField(max_length=128, verbose_name=_("Asset"))
     account = models.CharField(max_length=128, verbose_name=_("Account"))
     datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
+
+
+class OperateLogHmac(AbstractHmac):
+    HMAC_FIELDS = ['user', 'action', 'resource_type', 'resource', 'remote_addr', 'datetime']
+
+    class Meta(AbstractHmac.Meta):
+        db_table = "audits_operate_log_hmac"
+        verbose_name = _("Operate log HMAC")
+
+
+class UserLoginLogHmac(AbstractHmac):
+    HMAC_FIELDS = ['username', 'type', 'ip', 'status', 'datetime', 'backend']
+
+    class Meta(AbstractHmac.Meta):
+        db_table = "audits_user_login_log_hmac"
+        verbose_name = _("User login log HMAC")
+
+
+class FTPLogHmac(AbstractHmac):
+    HMAC_FIELDS = ['user', 'asset', 'account', 'operate', 'filename', 'date_start']
+
+    class Meta(AbstractHmac.Meta):
+        db_table = "audits_ftp_log_hmac"
+        verbose_name = _("FTP log HMAC")
+
+
+class PasswordChangeLogHmac(AbstractHmac):
+    HMAC_FIELDS = ['user', 'change_by', 'remote_addr', 'datetime']
+
+    class Meta(AbstractHmac.Meta):
+        db_table = "audits_password_change_log_hmac"
+        verbose_name = _("Password change log HMAC")
