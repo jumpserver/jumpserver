@@ -29,16 +29,21 @@ class HmacHandler:
             return ''
         key = settings.SECRET_KEY[:32].encode('utf-8')
         data_bytes = data.encode('utf-8')
+        logger.debug('compute_hmac input data: %r (len=%d)', data[:200], len(data))
         if self.piico_enable:
             try:
                 result = self._device.sm3_hmac(key, data_bytes)
-                return result.hex().upper()
+                hmac_value = result.hex().upper()
+                logger.debug('compute_hmac [SM3] result: %s', hmac_value)
+                return hmac_value
             except Exception as e:
                 logger.error('Compute SM3 HMAC error: %s', e)
                 return ''
         try:
             result = hmac_module.new(key, msg=data_bytes, digestmod=hashlib.sha256)
-            return result.hexdigest().upper()
+            hmac_value = result.hexdigest().upper()
+            logger.debug('compute_hmac [SHA256] result: %s', hmac_value)
+            return hmac_value
         except Exception as e:
             logger.error('Compute SHA256 HMAC error: %s', e)
         return ''
@@ -48,6 +53,10 @@ class HmacHandler:
             raw = ''.join(str(obj.get(f, '')) for f in fields)
         else:
             raw = ''.join(str(getattr(obj, f, '')) for f in fields)
+        logger.debug(
+            'compute_model_hmac obj=%s fields=%s raw=%r',
+            type(obj).__name__, fields, raw[:200]
+        )
         return self.compute_hmac(raw)
 
     def create_hmac_record(self, hmac_model, record_id, obj):
@@ -64,6 +73,19 @@ class HmacHandler:
             )
         except Exception as e:
             logger.error('Create HMAC record error: %s', e)
+
+    def update_hmac_record(self, hmac_model, record_id, obj):
+        if not self.enable:
+            return
+        hmac_value = self.compute_model_hmac(obj, hmac_model.HMAC_FIELDS)
+        if not hmac_value:
+            return
+        try:
+            hmac_model.objects.filter(record_id=record_id).update(
+                encrypt_value=hmac_value,
+            )
+        except Exception as e:
+            logger.error('Update HMAC record error: %s', e)
 
     def bulk_create_hmac_records(self, hmac_model, records):
         if not self.enable:
@@ -107,12 +129,25 @@ class HmacHandler:
 
         stored = self._get_stored_hmac(hmac_model, obj)
         if not stored:
+            logger.debug(
+                'get_hmac_context no stored hmac for obj=%s (type=%s)',
+                getattr(obj, 'id', obj.get('id', '?') if isinstance(obj, dict) else '?'),
+                type(obj).__name__,
+            )
             return {'encrypt_value': '', 'hmac_verify': None}
 
         computed = self.compute_model_hmac(obj, hmac_model.HMAC_FIELDS)
+        verify = 'OK' if computed == stored else 'FAILED'
+        if verify == 'FAILED':
+            logger.warning(
+                'HMAC verify FAILED for obj=%s (type=%s), '
+                'stored=%s, computed=%s, fields=%s',
+                getattr(obj, 'id', obj.get('id', '?') if isinstance(obj, dict) else '?'),
+                type(obj).__name__, stored, computed, hmac_model.HMAC_FIELDS,
+            )
         return {
             'encrypt_value': stored,
-            'hmac_verify': 'OK' if computed == stored else 'FAILED',
+            'hmac_verify': verify,
         }
 
     def verify_hmac(self, hmac_model, obj):

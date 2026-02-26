@@ -24,12 +24,16 @@ def _get_sender_hmac_map():
 
 
 def on_audit_log_save(sender, instance, created, **kwargs):
-    if not created or not hmac_handler.enable:
+    if not hmac_handler.enable:
         return
     sender_map = _get_sender_hmac_map()
     hmac_model = sender_map.get(sender)
-    if hmac_model:
+    if not hmac_model:
+        return
+    if created:
         hmac_handler.create_hmac_record(hmac_model, instance.id, instance)
+    else:
+        hmac_handler.update_hmac_record(hmac_model, instance.id, instance)
 
 
 def setup_hmac_signals():
