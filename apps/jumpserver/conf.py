@@ -743,6 +743,12 @@ class Config(dict):
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
         'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
         'VENDOR': 'jumpserver',
+
+        # x-forwarded-for 相关
+        'X_FORWARDED_FOR_HEADER': 'HTTP_X_FORWARDED_FOR',
+        'X_FORWARDED_FOR_VERIFY_ENABLED': False,
+        'X_FORWARDED_FOR_VERIFY_VALUE_HEADER': '',
+        'X_FORWARDED_FOR_VERIFY_KEY_PATH': '',
     }
 
     old_config_map = {

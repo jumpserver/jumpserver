@@ -9,6 +9,8 @@ import re
 import socket
 import time
 import uuid
+import hmac
+import hashlib
 from collections import OrderedDict
 from functools import wraps, cached_property
 from itertools import chain
@@ -155,17 +157,39 @@ def is_uuid(seq):
     return False
 
 
+def verify_ip_if_need(request, ip):
+    if not settings.X_FORWARDED_FOR_VERIFY_ENABLED:
+        return ip
+
+    received = request.META.get(settings.X_FORWARDED_FOR_VERIFY_VALUE_HEADER, '')
+    if not received:
+        # 内部请求
+        return ip
+
+    verify_key_path = settings.X_FORWARDED_FOR_VERIFY_KEY_PATH
+    if verify_key_path and os.path.exists(verify_key_path):
+        with open(verify_key_path) as f:
+            key = f.read().strip()
+        expected = hmac.new(key.encode(), ip.encode(), hashlib.sha256).hexdigest()
+        if hmac.compare_digest(expected.lower(), received.lower()):
+            # ip 不可信
+            ip = '0.0.0.0'
+    return ip
+
+
 def get_request_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+    x_forwarded_for_header = settings.X_FORWARDED_FOR_HEADER
+    x_forwarded_for = request.META.get(x_forwarded_for_header, '').split(',')
     if x_forwarded_for and x_forwarded_for[0]:
         login_ip = x_forwarded_for[0]
         if login_ip.count(':') == 1:
             # format: ipv4:port (非标准格式的 X-Forwarded-For)
             login_ip = login_ip.split(":")[0]
-        return login_ip
-
-    login_ip = request.META.get('REMOTE_ADDR', '')
-    return login_ip
+    else:
+        login_ip = request.META.get('REMOTE_ADDR', '')
+    
+    ip = verify_ip_if_need(request, login_ip)
+    return ip
 
 
 def get_request_ip_or_data(request):
