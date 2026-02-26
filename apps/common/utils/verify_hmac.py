@@ -112,7 +112,7 @@ class HmacHandler:
         computed = self.compute_model_hmac(obj, hmac_model.HMAC_FIELDS)
         return {
             'encrypt_value': stored,
-            'hmac_verify': computed == stored,
+            'hmac_verify': 'OK' if computed == stored else 'FAILED',
         }
 
     def verify_hmac(self, hmac_model, obj):
