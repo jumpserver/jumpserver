@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.utils.translation import get_language
 
@@ -15,11 +16,23 @@ class LokiMixin:
         return get_loki_client()
 
     @staticmethod
-    def create_loki_query(components, search):
+    def _escape_loki_regex(value):
+        # 转义 \ " { } | = ~ ! 等 LogQL stream selector 特殊字符
+        return re.sub(r'([\\"{}\[\]|=~!()])', r"\\\1", str(value))
+
+    @staticmethod
+    def _escape_loki_filter(value):
+        # 转义 line filter 中的 \ 和 " 防止逃逸
+        return str(value).replace("\\", "\\\\").replace('"', '\\"')
+
+    @classmethod
+    def create_loki_query(cls, components, search):
         stream_selector = '{component!=""}'
         if components:
-            stream_selector = '{component=~"%s"}' % components
-        query = f'{stream_selector} |="{search}"'
+            escaped = cls._escape_loki_regex(components)
+            stream_selector = '{component=~"%s"}' % escaped
+        escaped_search = cls._escape_loki_filter(search)
+        query = f'{stream_selector} |="{escaped_search}"'
         return query
 
 
