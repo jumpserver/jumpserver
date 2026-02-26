@@ -6,20 +6,17 @@ from urllib.parse import urlparse
 from django.conf import settings
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, TemplateView
 from rest_framework.views import APIView
 
 from common.utils import lazyproperty
-from common.views.http import HttpResponseTemporaryRedirect
 
 __all__ = [
-    'LunaView', 'I18NView', 'KokoView', 'WsView',
-    'redirect_format_api', 'redirect_old_apps_view', 'UIView',
+    'LunaView', 'I18NView', 'KokoView', 'WsView', 'UIView',
     'ResourceDownload', 'RedirectConfirm'
 ]
 
@@ -45,30 +42,6 @@ class I18NView(View):
 
 
 api_url_pattern = re.compile(r'^/api/(?P<app>\w+)/(?P<version>v\d)/(?P<extra>.*)$')
-
-
-@csrf_exempt
-def redirect_format_api(request, *args, **kwargs):
-    _path, query = request.path, request.GET.urlencode()
-    matched = api_url_pattern.match(_path)
-    if matched:
-        kwargs = matched.groupdict()
-        kwargs["query"] = query
-        _path = '/api/{version}/{app}/{extra}?{query}'.format(**kwargs).rstrip("?")
-        return HttpResponseTemporaryRedirect(_path)
-    else:
-        return JsonResponse({"msg": "Redirect url failed: {}".format(_path)}, status=404)
-
-
-@csrf_exempt
-def redirect_old_apps_view(request, *args, **kwargs):
-    path = request.get_full_path()
-    if path.find('/core') != -1:
-        raise Http404()
-    if path in ['/docs/', '/docs', '/core/docs/', '/core/docs']:
-        return redirect('/api/docs/')
-    new_path = '/core{}'.format(path)
-    return HttpResponseTemporaryRedirect(new_path)
 
 
 class WsView(APIView):
