@@ -657,11 +657,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         try:
             device = piico.open_piico_device()
-            device.verify_sign(
-                base64.b64decode(user_key.u_key_public_key),
-                base64.b64decode(digest),
-                base64.b64decode(sign),
-            )
+            device.verify_sign(user_key.u_key_public_key, digest, sign)
         except PiicoError as e:
             logger.error("verify_sign:{}".format(e))
             raise errors.LoginCheckKeyError()

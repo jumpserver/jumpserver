@@ -1,8 +1,4 @@
-cipher_alg_id = {
-    "sm4_ebc": 0x00000401,
-    "sm4_cbc": 0x00000402,
-    "sm4_mac": 0x00000405,
-}
+from .const import CIPHER_ALG_ID, SGD_SM2_3
 
 
 class ECCCipher:
@@ -12,10 +8,10 @@ class ECCCipher:
         self.private_key = private_key
 
     def encrypt(self, plain_text):
-        return self._session.ecc_encrypt(self.public_key, plain_text, 0x00020800)
+        return self._session.ecc_encrypt(self.public_key, plain_text, SGD_SM2_3)
 
     def decrypt(self, cipher_text):
-        return self._session.ecc_decrypt(self.private_key, cipher_text, 0x00020800)
+        return self._session.ecc_decrypt(self.private_key, cipher_text, SGD_SM2_3)
 
 
 class EBCCipher:
@@ -40,16 +36,22 @@ class EBCCipher:
 
     def encrypt(self, plain_text):
         plain_text = self.__padding(plain_text)
-        cipher_text = self._session.encrypt(plain_text, self._key, cipher_alg_id[self._alg], self._iv)
+        cipher_text = self._session.encrypt(plain_text, self._key, CIPHER_ALG_ID[self._alg], self._iv)
         return bytes(cipher_text)
 
     def decrypt(self, cipher_text):
-        plain_text = self._session.decrypt(cipher_text, self._key, cipher_alg_id[self._alg], self._iv)
+        plain_text = self._session.decrypt(cipher_text, self._key, CIPHER_ALG_ID[self._alg], self._iv)
         return bytes(plain_text)
 
     def destroy(self):
         self._session.destroy_cipher_key(self._key)
         self._session.close()
+
+    def __del__(self):
+        try:
+            self.destroy()
+        except Exception:
+            pass
 
 
 class CBCCipher(EBCCipher):

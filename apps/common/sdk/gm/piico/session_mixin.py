@@ -1,3 +1,4 @@
+from .const import ECC_KEY_BITS_64
 from .ecc import *
 from .exception import PiicoError
 
@@ -17,7 +18,7 @@ class SM2Mixin(BaseMixin):
         pos += 32
         k2 = bytes([0] * 32) + bytes(public_key[pos:pos + 32])
 
-        pk = ECCrefPublicKey(c_uint(0x40), (c_ubyte * len(k1))(*k1), (c_ubyte * len(k2))(*k2))
+        pk = ECCrefPublicKey(c_uint(ECC_KEY_BITS_64), (c_ubyte * len(k1))(*k1), (c_ubyte * len(k2))(*k2))
 
         plain_text = (c_ubyte * len(plain_text))(*plain_text)
         ecc_data = new_ecc_cipher_cla(len(plain_text))()
@@ -30,7 +31,7 @@ class SM2Mixin(BaseMixin):
     def ecc_decrypt(self, private_key, cipher_text, alg_id):
 
         k = bytes([0] * 32) + bytes(private_key[:32])
-        vk = ECCrefPrivateKey(c_uint(0x40), (c_ubyte * len(k))(*k))
+        vk = ECCrefPrivateKey(c_uint(ECC_KEY_BITS_64), (c_ubyte * len(k))(*k))
 
         pos = 1
         # c1

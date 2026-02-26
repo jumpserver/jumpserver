@@ -1,6 +1,8 @@
 from ctypes import *
 
 from Cryptodome.Util.asn1 import DerSequence
+
+from .const import ECC_KEY_BITS_256
 from .ecc import ECCrefPublicKey, ECCrefPrivateKey, ECCKeyPair, ECCSignature
 from .exception import PiicoError
 from .session_mixin import SM3Mixin, SM4Mixin, SM2Mixin
@@ -42,7 +44,7 @@ class Session(SM2Mixin, SM3Mixin, SM4Mixin):
         pos += 32
         k2 = bytes([0] * 32) + bytes(public_key[pos : pos + 32])
         pk = ECCrefPublicKey(
-            c_uint(0x100), (c_ubyte * len(k1))(*k1), (c_ubyte * len(k2))(*k2)
+            c_uint(ECC_KEY_BITS_256), (c_ubyte * len(k1))(*k1), (c_ubyte * len(k2))(*k2)
         )
 
         seq_der = DerSequence()

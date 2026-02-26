@@ -1,5 +1,7 @@
 from ctypes import *
 
+from .const import ECC_POINT_UNCOMPRESSED
+
 ECCref_MAX_BITS = 512
 ECCref_MAX_LEN = int((ECCref_MAX_BITS + 7) / 8)
 
@@ -17,7 +19,7 @@ class ECCrefPublicKey(Structure, EncodeMixin):
     ]
 
     def encode(self):
-        return bytes([0x04]) + bytes(self.x[32:]) + bytes(self.y[32:])
+        return bytes([ECC_POINT_UNCOMPRESSED]) + bytes(self.x[32:]) + bytes(self.y[32:])
 
 
 class ECCrefPrivateKey(Structure, EncodeMixin):
@@ -46,7 +48,7 @@ class ECCCipherEncode(EncodeMixin):
         c1 = bytes(self.x[32:]) + bytes(self.y[32:])
         c2 = bytes(self.C[: self.L])
         c3 = bytes(self.M)
-        return bytes([0x04]) + c1 + c2 + c3
+        return bytes([ECC_POINT_UNCOMPRESSED]) + c1 + c2 + c3
 
 
 def new_ecc_cipher_cla(length):

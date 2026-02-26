@@ -1,13 +1,16 @@
+import base64
 import os
 from ctypes import *
 
-from .exception import PiicoError
-from .session import Session
-from .cipher import *
-from .digest import *
 from django.core.cache import cache
 from redis_lock import Lock as RedisLock
+
 from common.utils import get_logger
+from .cipher import *
+from .const import SGD_SM2
+from .digest import *
+from .exception import PiicoError
+from .session import Session
 
 logger = get_logger(__file__)
 
@@ -17,6 +20,8 @@ class Device:
     __device = None
 
     def open(self, driver_path="./libpiico_ccmu.so"):
+        if self.__device is not None:
+            return
         # load driver
         self.__load_driver(driver_path)
         # open device
@@ -40,7 +45,7 @@ class Device:
 
     def generate_ecc_key_pair(self):
         session = self.new_session()
-        return session.generate_ecc_key_pair(alg_id=0x00020200)
+        return session.generate_ecc_key_pair(alg_id=SGD_SM2)
 
     def generate_random(self, length=64):
         session = self.new_session()
@@ -51,7 +56,12 @@ class Device:
         logger.debug("verify_sign raw_data: %s", raw_data)
         logger.debug("verify_sign sign_data: %s", sign_data)
         session = self.new_session()
-        return session.verify_sign_ecc(0x00020200, public_key, raw_data, sign_data)
+        return session.verify_sign_ecc(
+            SGD_SM2,
+            base64.b64decode(public_key),
+            base64.b64decode(raw_data),
+            base64.b64decode(sign_data),
+        )
 
     def new_sm2_ecc_cipher(self, public_key, private_key):
         session = self.new_session()
@@ -74,10 +84,6 @@ class Device:
         return session.sm3_hmac(key, data)
 
     def __load_driver(self, path):
-        # check driver status
-        if self._driver is not None:
-            raise Exception("already load driver")
-        # load driver
         self._driver = cdll.LoadLibrary(path)
 
     def __open_device(self):
@@ -109,7 +115,8 @@ class Device:
         # 尝试获取锁，拿不到直接返回
         if not lock.acquire(blocking=False):
             return
-            # ---- 真正执行 reset ----
+        # ---- 真正执行 reset ----
+        logger.debug("SPII_ResetModule")
         ret = self._driver.SPII_ResetModule(self.__device)
         if ret != 0:
             raise PiicoError("reset device failed", ret)
