@@ -42,23 +42,24 @@ class HmacHandler:
         key = settings.SECRET_KEY[:32].encode('utf-8')
         data_bytes = data.encode('utf-8')
         logger.debug('compute_hmac input data: %r (len=%d)', data[:200], len(data))
+        result = self._compute_sm3_hmac(key, data_bytes)
+        if not result:
+            return ''
+        hmac_value = result.hex().upper()
+        logger.debug('compute_hmac [SM3] result: %s', hmac_value)
+        return hmac_value
+
+    def _compute_sm3_hmac(self, key: bytes, data: bytes):
         if self.piico_enable:
             try:
-                result = self._device.sm3_hmac(key, data_bytes)
-                hmac_value = result.hex().upper()
-                logger.debug('compute_hmac [SM3] result: %s', hmac_value)
-                return hmac_value
+                return self._device.sm3_hmac(key, data)
             except Exception as e:
-                logger.error('Compute SM3 HMAC error: %s', e)
-                return ''
+                logger.warning('Piico SM3 HMAC failed, fallback to soft: %s', e)
         try:
-            result = _sm3_hmac(key, data_bytes)
-            hmac_value = result.hex().upper()
-            logger.debug('compute_hmac [SM3-soft] result: %s', hmac_value)
-            return hmac_value
+            return _sm3_hmac(key, data)
         except Exception as e:
-            logger.error('Compute SM3 soft HMAC error: %s', e)
-        return ''
+            logger.error('Soft SM3 HMAC failed: %s', e)
+            return None
 
     def compute_model_hmac(self, obj, fields) -> str:
         if isinstance(obj, dict):
