@@ -653,7 +653,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         user_key = user.user_usb_key.filter(u_key_serial=ukey_serial).first()
         if not user_key:
-            raise errors.LoginCheckKeyError()
+            raise errors.UKeyUnsetError()
 
         try:
             device = piico.open_piico_device()
