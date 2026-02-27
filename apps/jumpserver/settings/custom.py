@@ -3,7 +3,7 @@
 from pathlib import Path
 import os
 
-from .base import TEMPLATES, STATIC_DIR, CERTS_DIR
+from .base import TEMPLATES, STATIC_DIR
 from ..const import CONFIG
 
 # Storage settings
