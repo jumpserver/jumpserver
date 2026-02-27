@@ -744,7 +744,14 @@ class Config(dict):
         'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
         'VENDOR': 'jumpserver',
 
-        "SECURITY_UKEY_FORCED_MODE": False,
+        # x-forwarded-for 相关
+        'TRUSTED_IP_VERIFY_ENABLED': False,
+        'TRUSTED_IP_SOURCE_HEADER': '',
+        'TRUSTED_IP_VERIFY_SIGNATURE_HEADER': '',
+        'TRUSTED_IP_VERIFY_KEY_PATH': '',
+
+        # UKey 严格模式，不绑定不能登录
+        'SECURITY_UKEY_FORCED_MODE': False,
     }
 
     old_config_map = {
