@@ -19,8 +19,11 @@ from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
 from terminal.backends import server_replay_storage
-from terminal.models import Session, Command
-from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
+from terminal.models import Session, Command, CommandHmac, SessionHmac
+from .models import (
+    UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog,
+    UserLoginLogHmac, OperateLogHmac, FTPLogHmac, PasswordChangeLogHmac,
+)
 
 logger = get_logger(__name__)
 
@@ -29,21 +32,27 @@ def clean_login_log_period():
     now = timezone.now()
     days = get_log_keep_day('LOGIN_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    UserLoginLog.objects.filter(datetime__lt=expired_day).delete()
+    expired_q = UserLoginLog.objects.filter(datetime__lt=expired_day)
+    batch_delete(UserLoginLogHmac.objects.filter(record_id__in=expired_q.values_list('id', flat=True)))
+    batch_delete(expired_q)
 
 
 def clean_operation_log_period():
     now = timezone.now()
     days = get_log_keep_day('OPERATE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    OperateLog.objects.filter(datetime__lt=expired_day).delete()
+    expired_q = OperateLog.objects.filter(datetime__lt=expired_day)
+    batch_delete(OperateLogHmac.objects.filter(record_id__in=expired_q.values_list('id', flat=True)))
+    batch_delete(expired_q)
 
 
 def clean_password_change_log_period():
     now = timezone.now()
     days = get_log_keep_day('PASSWORD_CHANGE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    PasswordChangeLog.objects.filter(datetime__lt=expired_day).delete()
+    expired_q = PasswordChangeLog.objects.filter(datetime__lt=expired_day)
+    batch_delete(PasswordChangeLogHmac.objects.filter(record_id__in=expired_q.values_list('id', flat=True)))
+    batch_delete(expired_q)
     logger.info("Clean password change log done")
 
 
@@ -59,7 +68,9 @@ def clean_ftp_log_period():
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
     file_store_dir = safe_join(default_storage.base_location, FTPLog.upload_to)
-    FTPLog.objects.filter(date_start__lt=expired_day).delete()
+    expired_q = FTPLog.objects.filter(date_start__lt=expired_day)
+    batch_delete(FTPLogHmac.objects.filter(record_id__in=expired_q.values_list('id', flat=True)))
+    batch_delete(expired_q)
     command = "find %s -mtime +%s -type f -exec rm -f {} \\;"
     safe_run_cmd(command, (file_store_dir, days))
     command = "find %s -type d -empty -delete;"
@@ -119,8 +130,10 @@ def clean_expired_session_period():
     expired_commands = Command.objects.filter(timestamp__lt=timestamp)
     replay_dir = safe_join(default_storage.base_location, 'replay')
 
+    batch_delete(SessionHmac.objects.filter(record_id__in=expired_sessions.values_list('id', flat=True)))
     batch_delete(expired_sessions)
     logger.info("Clean session item done")
+    batch_delete(CommandHmac.objects.filter(record_id__in=expired_commands.values_list('id', flat=True)))
     batch_delete(expired_commands)
     logger.info("Clean session command done")
     remove_files_by_days(replay_dir, days)

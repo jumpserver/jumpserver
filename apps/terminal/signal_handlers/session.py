@@ -23,7 +23,10 @@ def on_session_finished(sender, instance: Session, created, **kwargs):
 
 @receiver(post_save, sender=Session)
 def on_session_created_hmac(sender, instance: Session, created, **kwargs):
-    if not created or not hmac_handler.enable:
+    if not hmac_handler.enable:
         return
     from terminal.models import SessionHmac
-    hmac_handler.create_hmac_record(SessionHmac, instance.id, instance)
+    if created:
+        hmac_handler.create_hmac_record(SessionHmac, instance.id, instance)
+    else:
+        hmac_handler.update_hmac_record(SessionHmac, instance.id, instance)

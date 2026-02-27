@@ -1,9 +1,10 @@
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from common.utils import get_logger
 from common.utils.verify_hmac import hmac_handler
 
-logger = get_logger(__file__)
+logger = get_logger(__name__)
 
 SENDER_HMAC_MAP = {}
 
@@ -23,6 +24,10 @@ def _get_sender_hmac_map():
     return SENDER_HMAC_MAP
 
 
+@receiver(post_save, sender='audits.OperateLog')
+@receiver(post_save, sender='audits.UserLoginLog')
+@receiver(post_save, sender='audits.FTPLog')
+@receiver(post_save, sender='audits.PasswordChangeLog')
 def on_audit_log_save(sender, instance, created, **kwargs):
     if not hmac_handler.enable:
         return
@@ -34,12 +39,3 @@ def on_audit_log_save(sender, instance, created, **kwargs):
         hmac_handler.create_hmac_record(hmac_model, instance.id, instance)
     else:
         hmac_handler.update_hmac_record(hmac_model, instance.id, instance)
-
-
-def setup_hmac_signals():
-    from audits.models import OperateLog, UserLoginLog, FTPLog, PasswordChangeLog
-    for model in [OperateLog, UserLoginLog, FTPLog, PasswordChangeLog]:
-        post_save.connect(on_audit_log_save, sender=model, dispatch_uid=f'hmac_{model.__name__}')
-
-
-setup_hmac_signals()

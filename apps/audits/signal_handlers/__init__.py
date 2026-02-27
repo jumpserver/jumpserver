@@ -1,4 +1,4 @@
-from . import hmac
+from .hmac import *
 from .activity_log import *
 from .login_log import *
 from .operate_log import *

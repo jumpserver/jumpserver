@@ -1,11 +1,23 @@
-import hashlib
-import hmac as hmac_module
-
 from django.conf import settings
+from gmssl import sm3
 
 from common.utils import get_logger, lazyproperty
 
 logger = get_logger(__file__)
+
+
+def _sm3_hash(data: bytes) -> bytes:
+    return bytes.fromhex(sm3.sm3_hash(list(data)))
+
+
+def _sm3_hmac(key: bytes, data: bytes) -> bytes:
+    block_size = 64
+    if len(key) > block_size:
+        key = _sm3_hash(key)
+    key = key + b'\x00' * (block_size - len(key))
+    o_key_pad = bytes(k ^ 0x5c for k in key)
+    i_key_pad = bytes(k ^ 0x36 for k in key)
+    return _sm3_hash(o_key_pad + _sm3_hash(i_key_pad + data))
 
 __all__ = ['hmac_handler']
 
@@ -40,12 +52,12 @@ class HmacHandler:
                 logger.error('Compute SM3 HMAC error: %s', e)
                 return ''
         try:
-            result = hmac_module.new(key, msg=data_bytes, digestmod=hashlib.sha256)
-            hmac_value = result.hexdigest().upper()
-            logger.debug('compute_hmac [SHA256] result: %s', hmac_value)
+            result = _sm3_hmac(key, data_bytes)
+            hmac_value = result.hex().upper()
+            logger.debug('compute_hmac [SM3-soft] result: %s', hmac_value)
             return hmac_value
         except Exception as e:
-            logger.error('Compute SHA256 HMAC error: %s', e)
+            logger.error('Compute SM3 soft HMAC error: %s', e)
         return ''
 
     def compute_model_hmac(self, obj, fields) -> str:
