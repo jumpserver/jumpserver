@@ -745,10 +745,10 @@ class Config(dict):
         'VENDOR': 'jumpserver',
 
         # x-forwarded-for 相关
-        'X_FORWARDED_FOR_HEADER': 'HTTP_X_FORWARDED_FOR',
-        'X_FORWARDED_FOR_VERIFY_ENABLED': False,
-        'X_FORWARDED_FOR_VERIFY_VALUE_HEADER': '',
-        'X_FORWARDED_FOR_VERIFY_KEY_PATH': '',
+        'TRUSTED_IP_VERIFY_ENABLED': False,
+        'TRUSTED_IP_SOURCE_HEADER': '',
+        'TRUSTED_IP_VERIFY_SIGNATURE_HEADER': '',
+        'TRUSTED_IP_VERIFY_KEY_PATH': '',
     }
 
     old_config_map = {
