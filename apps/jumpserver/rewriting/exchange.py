@@ -1,28 +1,26 @@
 import urllib3
-
-from urllib3.exceptions import InsecureRequestWarning
-
+from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address
-from django.conf import settings
 from exchangelib import Account, Credentials, Configuration, DELEGATE
-from exchangelib import Mailbox, Message, HTMLBody, FileAttachment
 from exchangelib import BaseProtocol, NoVerifyHTTPAdapter
+from exchangelib import Mailbox, Message, HTMLBody, FileAttachment
 from exchangelib.errors import TransportError
+from urllib3.exceptions import InsecureRequestWarning
 
-
-urllib3.disable_warnings(InsecureRequestWarning)
-BaseProtocol.HTTP_ADAPTER_CLS = NoVerifyHTTPAdapter
+if not settings.VERIFY_EXTERNAL_SSL:
+    urllib3.disable_warnings(InsecureRequestWarning)
+    BaseProtocol.HTTP_ADAPTER_CLS = NoVerifyHTTPAdapter
 
 
 class EmailBackend(BaseEmailBackend):
     def __init__(
-        self,
-        service_endpoint=None,
-        username=None,
-        password=None,
-        fail_silently=False,
-        **kwargs,
+            self,
+            service_endpoint=None,
+            username=None,
+            password=None,
+            fail_silently=False,
+            **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
         self.service_endpoint = service_endpoint or settings.EMAIL_HOST

@@ -174,7 +174,7 @@ class OperatorLogHandler(metaclass=Singleton):
             resource_display = self.get_resource_display(resource)
         resource_id = getattr(resource, 'pk', '')
         before, after = self.data_processing(before, after)
-        if not force and not any([before, after]):
+        if not force and (before == after):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
 

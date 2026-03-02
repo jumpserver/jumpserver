@@ -9,6 +9,7 @@
 """
 import base64
 import copy
+import errno
 import json
 import logging
 import os
@@ -227,6 +228,7 @@ class Config(dict):
 
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
+        'VERIFY_EXTERNAL_SSL': True,
 
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
@@ -740,6 +742,13 @@ class Config(dict):
         # oauth2_provider settings 
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
         'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
+        'VENDOR': 'jumpserver',
+
+        # x-forwarded-for 相关
+        'TRUSTED_IP_VERIFY_ENABLED': False,
+        'TRUSTED_IP_SOURCE_HEADER': '',
+        'TRUSTED_IP_VERIFY_SIGNATURE_HEADER': '',
+        'TRUSTED_IP_VERIFY_KEY_PATH': '',
     }
 
     old_config_map = {

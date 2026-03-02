@@ -9,6 +9,8 @@ import re
 import socket
 import time
 import uuid
+import hmac
+import hashlib
 from collections import OrderedDict
 from functools import wraps, cached_property
 from itertools import chain
@@ -156,15 +158,63 @@ def is_uuid(seq):
 
 
 def get_request_ip(request):
+    if settings.TRUSTED_IP_VERIFY_ENABLED:
+        login_ip = get_trusted_request_ip(request)
+    else:
+        login_ip = get_common_request_ip(request)
+    return login_ip
+
+
+def get_trusted_request_ip(request):
+    trusted_ip = request.META.get(settings.TRUSTED_IP_SOURCE_HEADER, '')
+    if not trusted_ip:
+        logger.warning(
+            f"Trusted IP verification enabled but no source header '{settings.TRUSTED_IP_SOURCE_HEADER}' "
+            f"found in request."
+        )
+        return '0.0.0.0'
+
+    signature_header_name = settings.TRUSTED_IP_VERIFY_SIGNATURE_HEADER
+    received_signature = request.META.get(signature_header_name, '')
+    if not received_signature:
+        logger.warning(
+            f"Trusted IP verification enabled but no signature header '{signature_header_name}' "
+            f"found in request."
+        )
+        return '0.0.0.0'
+
+    verification_key_path = settings.TRUSTED_IP_VERIFY_KEY_PATH
+    if not verification_key_path or not os.path.exists(verification_key_path):
+        logger.warning(
+            f"Trusted IP verification enabled but no valid verification key found at "
+            f"'{verification_key_path}'."
+        )
+        return '0.0.0.0'
+
+    with open(verification_key_path) as f:
+        verification_key = f.read().strip()
+    expected_signature = hmac.new(
+        verification_key.encode(), trusted_ip.encode(), hashlib.sha256
+    ).hexdigest()
+    if not hmac.compare_digest(expected_signature.lower(), received_signature.lower()):
+        logger.warning(
+            f"Trusted IP verification failed. Expected signature: {expected_signature}, "
+            f"Received signature: {received_signature}."
+        )
+        return '0.0.0.0'
+
+    return trusted_ip
+
+
+def get_common_request_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
     if x_forwarded_for and x_forwarded_for[0]:
         login_ip = x_forwarded_for[0]
         if login_ip.count(':') == 1:
             # format: ipv4:port (非标准格式的 X-Forwarded-For)
             login_ip = login_ip.split(":")[0]
-        return login_ip
-
-    login_ip = request.META.get('REMOTE_ADDR', '')
+    else:
+        login_ip = request.META.get('REMOTE_ADDR', '')
     return login_ip
 
 

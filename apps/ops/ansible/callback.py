@@ -92,7 +92,7 @@ class DefaultCallback:
         self.result[error_key][host][task] = detail
 
     def runner_on_unreachable(
-        self, event_data, host=None, task=None, res=None, **kwargs
+            self, event_data, host=None, task=None, res=None, **kwargs
     ):
         detail = {
             "action": event_data.get("task_action", ""),
@@ -100,7 +100,58 @@ class DefaultCallback:
             "rc": 255,
             "stderr": ";".join([res.get("stderr", ""), res.get("msg", "")]).strip(";"),
         }
-        self.result["dark"][host][task] = detail
+        ignore_unreachable = event_data.get("ignore_unreachable", False)
+        if not ignore_unreachable:
+            ignore_unreachable = self._task_path_ignores_unreachable(
+                event_data.get("task_path", "")
+            )
+        error_key = "ignored" if ignore_unreachable else "dark"
+        self.result[error_key][host][task] = detail
+
+    @staticmethod
+    def _task_path_ignores_unreachable(task_path):
+        if not task_path or ":" not in task_path:
+            return False
+
+        path, line_str = task_path.rsplit(":", 1)
+        try:
+            line_no = int(line_str)
+        except ValueError:
+            return False
+
+        try:
+            with open(path, "r") as f:
+                lines = f.readlines()
+        except OSError:
+            return False
+
+        line_no = max(1, min(line_no, len(lines)))
+
+        def is_task_start(line):
+            stripped = line.lstrip(" \t")
+            return stripped.startswith("- ")
+
+        start_idx = None
+        start_indent = 0
+        for idx in range(line_no - 1, -1, -1):
+            if is_task_start(lines[idx]):
+                start_idx = idx
+                start_indent = len(lines[idx]) - len(lines[idx].lstrip(" \t"))
+                break
+
+        if start_idx is None:
+            return False
+
+        for line in lines[start_idx + 1:]:
+            stripped = line.lstrip(" \t")
+            if stripped.startswith("- "):
+                curr_indent = len(line) - len(stripped)
+                if curr_indent <= start_indent:
+                    break
+            if "ignore_unreachable:" in line:
+                return True
+
+        return False
 
     def runner_on_start(self, event_data, **kwargs):
         pass
@@ -123,7 +174,7 @@ class DefaultCallback:
     def playbook_on_stats(self, event_data, **kwargs):
         error_func = (
             lambda err, task_detail: err
-            + f"{task_detail[0]}: {task_detail[1]['stderr']};"
+                                     + f"{task_detail[0]}: {task_detail[1]['stderr']};"
         )
         for tp in ["dark", "failures"]:
             for host, tasks in self.result[tp].items():
