@@ -4,7 +4,7 @@ import os
 from _translator.const import LOCALE_DIR, RED
 from _translator.core import CoreTranslateManager
 from _translator.other import OtherTranslateManager
-from _translator.utils import OpenAITranslate
+from _translator.utils import build_translator
 
 
 class Translate:
@@ -55,6 +55,6 @@ class Translate:
 
 
 if __name__ == '__main__':
-    oai_trans = OpenAITranslate()
-    manager = Translate(oai_trans)
+    translator = build_translator()
+    manager = Translate(translator)
     asyncio.run(manager.run())

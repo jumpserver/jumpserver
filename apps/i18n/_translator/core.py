@@ -32,17 +32,23 @@ class CoreTranslateManager(BaseTranslateManager):
             print(f'{RED}File save error: {e}{RED}')
 
     async def run(self):
-        po_file_path = os.path.join(self._dir, 'zh', 'LC_MESSAGES', 'django.po')
-        po = polib.pofile(po_file_path)
-        zh_dict = {entry.msgid: entry.msgstr for entry in po.translated_entries()}
+        async def process_po(po_name: str):
+            po_file_path = os.path.join(self._dir, 'zh', 'LC_MESSAGES', po_name)
+            po = polib.pofile(po_file_path)
+            zh_dict = {entry.msgid: entry.msgstr for entry in po.translated_entries()}
 
-        for file_prefix, target_lang in self.LANG_MAPPER.items():
-            po_file_path = os.path.join(self._dir, file_prefix, 'LC_MESSAGES', 'django.po')
-            trans_po = polib.pofile(po_file_path)
-            need_trans_dict = self.get_need_trans_dict(zh_dict, trans_po)
-            print(f'{GREEN}Translate: {self.dir_name} {file_prefix} '
-                  f'django.po need to translate {len(need_trans_dict)}{GREEN}\n')
-            if not need_trans_dict:
-                continue
-            translated_dict = await self.bulk_translate(need_trans_dict, target_lang)
-            self.save_translations_to_po(translated_dict, trans_po)
+            for file_prefix, target_lang in self.LANG_MAPPER.items():
+                po_file_path = os.path.join(self._dir, file_prefix, 'LC_MESSAGES', po_name)
+                trans_po = polib.pofile(po_file_path)
+                need_trans_dict = self.get_need_trans_dict(zh_dict, trans_po)
+                print(f'{GREEN}Translate: {self.dir_name} {file_prefix} '
+                      f'{po_name} need to translate {len(need_trans_dict)}{GREEN}\n')
+                if not need_trans_dict:
+                    continue
+                translated_dict = await self.bulk_translate(need_trans_dict, target_lang)
+                self.save_translations_to_po(translated_dict, trans_po)
+
+        await process_po('django.po')
+        djangojs_po = os.path.join(self._dir, 'zh', 'LC_MESSAGES', 'djangojs.po')
+        if os.path.exists(djangojs_po):
+            await process_po('djangojs.po')
