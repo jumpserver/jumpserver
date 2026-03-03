@@ -1,0 +1,140 @@
+name: Auto translate i18n (po/json)
+
+on:
+    workflow_dispatch:
+        inputs:
+            mode:
+                description: 'Run mode'
+                required: true
+                default: 'full'
+                type: choice
+                options:
+                    - full
+            provider:
+                description: 'Translation provider'
+                required: true
+                default: 'claude'
+                type: choice
+                options:
+                    - openai
+                    - claude
+
+    pull_request:
+        branches:
+            - 'dev'
+        paths:
+            - 'apps/i18n/**'
+        types: [opened, synchronize, reopened]
+
+permissions:
+    contents: write
+    pull-requests: write
+
+concurrency:
+    group: i18n-translate-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    translate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout (PR branch)
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: 0
+
+            - name: Checkout (manual)
+              if: ${{ github.event_name == 'workflow_dispatch' }}
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.11'
+
+            - name: Install translator dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  python -m pip install "openai>=1.29.0" "polib>=1.2.0" "tqdm>=4.66.4" "anthropic>=0.40.0"
+
+            - name: Auto translate (PR)
+              if: ${{ github.event_name == 'pull_request' }}
+              env:
+                  I18N_PROVIDER: ${{ vars.I18N_PROVIDER || 'claude' }}
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || secrets.GPT_API_TOKEN }}
+                  OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+                  OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+                  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+                  ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+              run: |
+                  python apps/i18n/ci_translate.py \
+                    --mode pr \
+                    --base "${{ github.event.pull_request.base.sha }}" \
+                    --head "${{ github.event.pull_request.head.sha }}" \
+                    --overwrite
+
+            - name: Auto translate (manual full)
+              if: ${{ github.event_name == 'workflow_dispatch' }}
+              env:
+                  I18N_PROVIDER: ${{ github.event.inputs.provider }}
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || secrets.GPT_API_TOKEN }}
+                  OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+                  OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+                  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+                  ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+              run: |
+                  python apps/i18n/ci_translate.py --mode full
+
+            - name: Show changes
+              run: |
+                  git status --porcelain
+                  git diff --stat
+
+            - name: Create patch artifact (fork PR)
+              if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true }}
+              run: |
+                  git diff > i18n-translations.patch
+
+            - name: Upload patch artifact (fork PR)
+              if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: i18n-translations
+                  path: i18n-translations.patch
+
+            - name: Commit & push changes (same-repo PR)
+              if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false }}
+              run: |
+                  if [ -z "$(git status --porcelain)" ]; then
+                    echo "No changes to commit."
+                    exit 0
+                  fi
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add apps/i18n
+                  git commit -m "chore(i18n): auto-translate updated strings"
+                  git push
+
+            - name: Create pull request (manual full run)
+              if: ${{ github.event_name == 'workflow_dispatch' }}
+              uses: peter-evans/create-pull-request@v6
+              with:
+                  commit-message: 'chore(i18n): auto-translate all strings'
+                  title: 'chore(i18n): auto-translate all strings'
+                  body: |
+                      Auto-generated i18n translations.
+
+                      - Triggered by: ${{ github.actor }}
+                      - Provider: ${{ github.event.inputs.provider }}
+                  branch: pr/dev/i18n-auto-translate
+                  base: dev
+                  add-paths: |
+                      apps/i18n/**
+                  labels: |
+                      i18n
+                      automated-pr

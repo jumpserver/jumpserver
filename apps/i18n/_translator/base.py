@@ -10,6 +10,7 @@ class BaseTranslateManager:
     bulk_size = 15
     SEPARATOR = "<-SEP->"
     LANG_MAPPER = {
+        'en': 'English',
         'ja': 'Japanese',
         'zh_Hant': 'Traditional Chinese',
         'pt_BR': 'Portuguese (Brazil)',
