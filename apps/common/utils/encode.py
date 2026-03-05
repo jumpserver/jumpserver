@@ -200,7 +200,27 @@ def is_openssh_format_key(text: bytes):
     return text.startswith(b"-----BEGIN OPENSSH PRIVATE KEY-----")
 
 
+def validate_sm2_public_key(text):
+    if not isinstance(text, str):
+        return False
+    text = text.strip()
+
+    # OpenSSH 格式: sm2 <base64> [comment]
+    if text.startswith("sm2 "):
+        import base64
+        try:
+            b64_part = text.split()[1]
+            base64.b64decode(b64_part)
+            return True
+        except Exception:
+            return False
+    return False
+
+
 def validate_ssh_public_key(text):
+    if validate_sm2_public_key(text):
+        return True
+
     ssh = sshpubkeys.SSHKey(text)
     try:
         ssh.parse()

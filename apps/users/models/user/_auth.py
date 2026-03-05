@@ -253,12 +253,43 @@ class AuthMixin:
         return backend == settings.AUTH_BACKEND_MODEL
 
     @staticmethod
+    def get_sm2_public_key_md5(key):
+        """
+        计算 SM2 公钥的 MD5 值
+        SM2 公钥格式:
+        - OpenSSH 格式: sm2 <base64> [comment]
+        """
+        import base64
+        import hashlib
+
+        if not isinstance(key, str):
+            return ""
+
+        key = key.strip()
+        key_bytes = b""
+
+        if key.startswith("sm2 "):
+            try:
+                b64_part = key.split()[1]
+                key_bytes = base64.b64decode(b64_part)
+            except Exception:
+                return ""
+
+        if not key_bytes:
+            return ""
+
+        md5_hash = hashlib.md5(key_bytes).hexdigest()
+        md5_parts = ':'.join(md5_hash[i:i + 2] for i in range(0, len(md5_hash), 2))
+        return "MD5:%s" % md5_parts
+
+    @staticmethod
     def get_public_key_md5(key):
         try:
             key_obj = sshpubkeys.SSHKey(key)
             return key_obj.hash_md5()
-        except Exception as e:
-            return ""
+        except Exception:
+            pass
+        return AuthMixin.get_sm2_public_key_md5(key)
 
     @property
     def user_ssh_keys(self):
