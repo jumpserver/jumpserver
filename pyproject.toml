@@ -153,6 +153,7 @@ dependencies = [
     'drf-spectacular-sidecar==2025.8.1',
     "django-oauth-toolkit==2.4.0",
     "pyhttpsig==1.3.0",
+    "requests-unixsocket==0.4.1",
 ]
 
 [project.urls]
