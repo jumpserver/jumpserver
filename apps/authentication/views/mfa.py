@@ -95,7 +95,6 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
         kwargs.update(mfa_context)
         kwargs['show_otp_hint'] = show_otp_hint
         return kwargs
-        return kwargs
 
 
 class UserLoginMFAFaceView(UserFaceCaptureView, UserLoginMFAView):
