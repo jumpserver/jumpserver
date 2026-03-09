@@ -6,7 +6,7 @@
 >
     {% for backend in mfa_backends %}
     <option value="{{ backend.name }}"
-            {% if not backend.is_active %} disabled {% endif %}
+            {% if backend.name != 'otp' and not backend.is_active %} disabled {% endif %}
     >
         {{ backend.display_name }}
     </option>

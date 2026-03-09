@@ -12,6 +12,10 @@ class MFAOtp(BaseMFA):
     display_name = MFAType.OTP.name
     placeholder = _('OTP verification code')
 
+    def is_configured(self):
+        """检查 OTP 是否已配置"""
+        return bool(self.user.otp_secret_key) if self.is_authenticated() else False
+
     def _check_code(self, code):
         from users.utils import check_otp_code
         assert self.is_authenticated()

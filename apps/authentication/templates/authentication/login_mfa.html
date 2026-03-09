@@ -15,6 +15,14 @@
         <div class="form-group">
             {% include '_mfa_login_field.html' %}
         </div>
+        
+        {% if show_otp_hint %}
+        <div id="otp-setup-hint" class="alert alert-info" style="display: none; margin-top: 10px; font-size: 13px;">
+            <i class="fa fa-info-circle"></i>
+            {% trans "To set up OTP, leave the field empty and click Next. You'll be guided to the setup page." %}
+        </div>
+        {% endif %}
+        
         <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">
             {% trans 'Next' %}
         </button>
@@ -27,4 +35,28 @@
             margin-top: 15px;
         }
     </style>
+    <script>
+        // 当选择 OTP 时显示提示信息
+        {% if show_otp_hint %}
+        $(document).ready(function() {
+            const originalSelectChange = window.selectChange;
+            window.selectChange = function(name, onLoad) {
+                originalSelectChange(name, onLoad);
+                
+                // 如果选择了 OTP，显示提示
+                if (name === 'otp') {
+                    $('#otp-setup-hint').slideDown(200);
+                } else {
+                    $('#otp-setup-hint').slideUp(200);
+                }
+            };
+            
+            // 页面加载时检查默认选中的 MFA 类型
+            const defaultMfaType = $('#mfa-select').val();
+            if (defaultMfaType === 'otp') {
+                $('#otp-setup-hint').show();
+            }
+        });
+        {% endif %}
+    </script>
 {% endblock %}
