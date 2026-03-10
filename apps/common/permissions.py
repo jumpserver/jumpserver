@@ -92,6 +92,15 @@ class IsValidLicense(permissions.BasePermission):
         return settings.XPACK_LICENSE_IS_VALID
 
 
+class IsValidLicenseForWriteAction(permissions.BasePermission):
+    """Allow read for all, require valid license for write operations"""
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return settings.XPACK_LICENSE_IS_VALID
+
+
 class IsOwnerOrAdminWritable(IsValidUser):
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
