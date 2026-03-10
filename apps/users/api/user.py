@@ -163,8 +163,16 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         if has_self and not request.user.is_superuser:
             error = {"error": _("Can not invite self")}
             return Response(error, status=400)
+
         for user in users:
-            user.org_roles.set(org_roles)
+            if current_org in user.joined_orgs:
+                error = {
+                    "error": _("This user {} is already a member of the organization. No need to invite again").format(
+                        user.username)
+                }
+                return Response(error, status=400)
+            # 追加角色，不清除除原有的角色
+            user.org_roles.add(*org_roles)
         return Response(serializer.data, status=201)
 
     @action(methods=['post'], detail=True)
