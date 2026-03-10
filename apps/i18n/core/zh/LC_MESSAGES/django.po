@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-03 15:32+0800\n"
+"POT-Creation-Date: 2026-03-10 10:43+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -544,7 +544,7 @@ msgstr "改密状态"
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
 msgid "Account"
 msgstr "账号"
 
@@ -3804,11 +3804,11 @@ msgstr "临时密码"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:133
+#: audits/tasks.py:128
 msgid "Clean audits session task log"
 msgstr "清理资产审计会话任务日志"
 
-#: audits/tasks.py:135
+#: audits/tasks.py:130
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -3822,11 +3822,11 @@ msgstr ""
 "话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置，对"
 "于超出时间的于每天凌晨2点进行清理"
 
-#: audits/tasks.py:155
+#: audits/tasks.py:150
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
-#: audits/tasks.py:157
+#: audits/tasks.py:152
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -5238,7 +5238,7 @@ msgstr "仅导出选择项"
 msgid "Export filtered"
 msgstr "导出搜索"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s对象不存在"
@@ -10066,19 +10066,24 @@ msgstr "无效的审批动作"
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用户无权审批此工单"
 
-#: users/api/user.py:64
+#: users/api/user.py:65
 msgid "You cannot delete yourself. Please disable it instead."
 msgstr "不能删除自己，请将其禁用。"
 
-#: users/api/user.py:66
+#: users/api/user.py:67
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr "无法删除管理员用户，请将其禁用。"
 
-#: users/api/user.py:164
+#: users/api/user.py:165
 msgid "Can not invite self"
 msgstr "不能邀请自己"
 
-#: users/api/user.py:217
+#: users/api/user.py:171
+msgid ""
+"This user {} is already a member of the organization. No need to invite again"
+msgstr "该用户{}已是组织成员，无需重复邀请"
+
+#: users/api/user.py:225
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置 MFA 多因子认证, 请去个人信息页面重置"
 
@@ -10423,7 +10428,7 @@ msgid "Connect default open method"
 msgstr "连接默认打开方式"
 
 #: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
+#: xpack/plugins/interface/serializers/interface.py:27
 msgid "Theme"
 msgstr "主题"
 
@@ -11739,6 +11744,10 @@ msgstr ""
 "每天系统会根据“系统设置-任务-定期清理-云同步任务历史记录保留天数”中的配置，清"
 "理云同步执行过程中产生的记录。"
 
+#: xpack/plugins/cloud/ws.py:84
+msgid "Task not started"
+msgstr "任务未开始"
+
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
@@ -11772,11 +11781,11 @@ msgstr "注销登录"
 msgid "Footer content"
 msgstr "页脚内容"
 
-#: xpack/plugins/interface/serializers/interface.py:37
+#: xpack/plugins/interface/serializers/interface.py:38
 msgid "Wide logo on top"
 msgstr "顶部宽 Logo"
 
-#: xpack/plugins/interface/serializers/interface.py:38
+#: xpack/plugins/interface/serializers/interface.py:39
 msgid "Small logo without text"
 msgstr "方形小 Logo"
 
@@ -11790,6 +11799,3 @@ msgstr "许可证无效"
 
 #~ msgid "Closed"
 #~ msgstr "关闭的"
-
-#~ msgid "Task not started"
-#~ msgstr "任务未开始"
