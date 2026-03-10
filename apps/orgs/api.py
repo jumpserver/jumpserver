@@ -10,10 +10,11 @@ from assets.models import (
     Asset, Zone, Label, Node,
 )
 from common.api import JMSBulkModelViewSet
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, IsValidLicenseForWriteAction
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from perms.models import AssetPermission
+from rbac.permissions import RBACPermission
 from users.models import User, UserGroup
 from .models import Organization
 from .serializers import (
@@ -33,6 +34,7 @@ class OrgViewSet(JMSBulkModelViewSet):
     search_fields = ('name', 'comment')
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
+    permission_classes = [RBACPermission, IsValidLicenseForWriteAction]
 
     def get_serializer_class(self):
         mapper = {
