@@ -510,12 +510,41 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
                 result = cb.host_results.get(host)
                 handler(host, result, hosts)
 
+    @staticmethod
+    def _is_nonfatal_runner_timeout(error):
+        error_text = str(error)
+        return (
+            "pexpect.exceptions.TIMEOUT" in error_text
+            and "exitstatus: 0" in error_text
+        )
+
     def on_runner_failed(self, runner, e, assets=None, **kwargs):
+        assets = assets or []
+        if self._is_nonfatal_runner_timeout(e):
+            cb = getattr(runner, "cb", None)
+            if cb:
+                summary = getattr(cb, "summary", None)
+                has_host_summary = any(
+                    bool((summary or {}).get(key))
+                    for key in ("ok", "failures", "dark", "skipped")
+                )
+                if not has_host_summary and hasattr(cb, "playbook_on_stats"):
+                    try:
+                        cb.playbook_on_stats({})
+                    except Exception as rebuild_err:
+                        print("summary rebuild failed: {}".format(rebuild_err))
+                with safe_atomic_db_connection():
+                    self.on_runner_success(runner, cb)
+                print("Runner timeout but playbook exited normally, ignore fail mark")
+            return True
+
         self.summary["fail_assets"] += len(assets)
+        error = str(e)
         self.result["fail_assets"].extend(
-            [(str(asset), str("e")[:10]) for asset in assets]
+            [(str(asset), error[:10]) for asset in assets]
         )
         print("Runner failed: {} {}".format(e, self))
+        return False
 
     def delete_runtime_dir(self):
         if settings.DEBUG_DEV:
