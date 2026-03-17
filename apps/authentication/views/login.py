@@ -292,6 +292,8 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             return self.format_redirect_url(self.login_mfa_url)
         except (errors.LoginCheckKeyError, errors.UKeyUnsetError):
             return self.format_redirect_url(self.login_ukey_url)
+        except errors.UKeyBindRequiredError as e:
+            return e.url
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
         except errors.MFAUnsetError as e:

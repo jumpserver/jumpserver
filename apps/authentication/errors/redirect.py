@@ -117,6 +117,15 @@ class UKeyUnsetError(NeedMoreInfoError):
     msg = const.usb_key_unset_msg
 
 
+class UKeyBindRequiredError(NeedRedirectError):
+    error = const.reason_usb_key_bind_required
+    msg = const.usb_key_bind_required_msg
+
+    def __init__(self, user_id, *args, **kwargs):
+        url = reverse('authentication:ukey-bind', kwargs={'user_id': user_id})
+        super().__init__(url, *args, **kwargs)
+
+
 class LoginCheckKeyError(NeedMoreInfoError):
     error = const.reason_usb_key_failed
     msg = const.usb_key_failed_msg

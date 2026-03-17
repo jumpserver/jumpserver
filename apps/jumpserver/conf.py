@@ -751,7 +751,7 @@ class Config(dict):
         'TRUSTED_IP_VERIFY_KEY_PATH': '',
 
         # UKey 严格模式，不绑定不能登录
-        'SECURITY_UKEY_FORCED_MODE': False,
+        'SECURITY_UKEY_FORCED_MODE': True,
     }
 
     old_config_map = {

@@ -643,6 +643,10 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
                 raise errors.LoginCheckKeyError()
         except ObjectDoesNotExist:
             if settings.SECURITY_UKEY_FORCED_MODE:
+                # admin 超级管理员首次登录 -> 跳转绑定页面
+                if user.is_superuser and user.username == 'admin':
+                    raise errors.UKeyBindRequiredError(user_id=str(user.id))
+                # 其他用户 -> 报错
                 raise errors.UKeyUnsetError()
 
     def check_ukey_auth(self, user, ukey_token):

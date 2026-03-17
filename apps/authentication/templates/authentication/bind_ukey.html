@@ -99,7 +99,8 @@
 
         function onSuccess(responseText, responseJson, status) {
             setTimeout(function () {
-                toastr.success("{% trans "Update success" %}");
+                toastr.success("{% trans "Bind success" %}");
+                window.location.href = "{% url 'authentication:login-guard' %}";
             })
         }
 
