@@ -4260,6 +4260,10 @@ msgstr "ログイン確認チケットは {} でした"
 msgid "USB Key not set, Please contact the administrator"
 msgstr "USBキー が未設定です。管理者に連絡してください"
 
+#: authentication/errors/const.py:77
+msgid "Please bind your USB Key first"
+msgstr "先にUSBキーをバインドしてください"
+
 #: authentication/errors/failed.py:149
 msgid "Current login is prohibited by ACL rules"
 msgstr "現在のログインはACLルールによって禁止されています"

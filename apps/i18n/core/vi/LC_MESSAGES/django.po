@@ -4316,6 +4316,10 @@ msgstr "Kiểm tra đăng nhập: {}"
 msgid "USB Key not set, Please contact the administrator"
 msgstr "USB Key chưa được thiết lập, vui lòng liên hệ quản trị viên"
 
+#: authentication/errors/const.py:77
+msgid "Please bind your USB Key first"
+msgstr "Vui lòng liên kết USB Key của bạn trước"
+
 #: authentication/errors/failed.py:149
 msgid "Current login is prohibited by ACL rules"
 msgstr "Quy tắc ACL hiện tại cấm đăng nhập"

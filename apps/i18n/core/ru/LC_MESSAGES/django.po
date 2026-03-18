@@ -4302,6 +4302,10 @@ msgstr "Проверка входа: {}"
 msgid "USB Key not set, Please contact the administrator"
 msgstr "USB Key не настроен, обратитесь к администратору"
 
+#: authentication/errors/const.py:77
+msgid "Please bind your USB Key first"
+msgstr "Пожалуйста, сначала привяжите свой USB Key"
+
 #: authentication/errors/failed.py:149
 msgid "Current login is prohibited by ACL rules"
 msgstr "Текущее правило входа запрещает вход"

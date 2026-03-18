@@ -4357,6 +4357,10 @@ msgstr "Inicio de sesión y verificación: {}"
 msgid "USB Key not set, Please contact the administrator"
 msgstr "USB Key no configurado, contacte al administrador"
 
+#: authentication/errors/const.py:77
+msgid "Please bind your USB Key first"
+msgstr "Por favor, primero vincule su USB Key"
+
 #: authentication/errors/failed.py:149
 msgid "Current login is prohibited by ACL rules"
 msgstr "Las reglas ACL actuales prohíben el inicio de sesión"

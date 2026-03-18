@@ -4222,6 +4222,10 @@ msgstr "로그인 검토: {}"
 msgid "USB Key not set, Please contact the administrator"
 msgstr "USB 키 미설정, 관리자에게 연락하세요"
 
+#: authentication/errors/const.py:77
+msgid "Please bind your USB Key first"
+msgstr "먼저 USB 키를 바인딩하세요"
+
 #: authentication/errors/failed.py:149
 msgid "Current login is prohibited by ACL rules"
 msgstr "현재 로그인 ACL 규칙에 따라 로그인할 수 없습니다"

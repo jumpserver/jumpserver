@@ -4160,6 +4160,10 @@ msgstr "登录复核: {}"
 msgid "USB Key not set, Please contact the administrator"
 msgstr "USB Key 未设置，请联系管理员"
 
+#: authentication/errors/const.py:77
+msgid "Please bind your USB Key first"
+msgstr "请先绑定您的 USB Key"
+
 #: authentication/errors/failed.py:149
 msgid "Current login is prohibited by ACL rules"
 msgstr "当前登录ACL规则禁止登录"
