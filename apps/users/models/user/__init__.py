@@ -38,7 +38,8 @@ __all__ = [
 
 class UserManager(_UserManager):
     def get_by_natural_key(self, username_or_mail):
-        q = models.Q(username=username_or_mail)
+        from users.utils import email_hmac_sha256
+        q = models.Q(username=username_or_mail) | models.Q(email_lookup=email_hmac_sha256(username_or_mail))
         user = self.filter(q).first()
         if not user:
             raise self.model.DoesNotExist
@@ -65,6 +66,9 @@ class User(
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     email = fields.EncryptCharField(max_length=128, unique=True, verbose_name=_("Email"))
+    email_lookup = models.CharField(
+        max_length=128, blank=True, null=True, verbose_name=_("Email lookup")
+    )
     groups = models.ManyToManyField(
         "users.UserGroup",
         related_name="users",

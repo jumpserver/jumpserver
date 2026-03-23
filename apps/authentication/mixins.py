@@ -27,7 +27,7 @@ from acls.models import LoginACL
 from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
-from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
+from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil, email_hmac_sha256
 from . import errors
 from .signals import post_auth_success, post_auth_failed
 
@@ -292,7 +292,8 @@ class AuthPreCheckMixin:
         if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
             return
 
-        q = Q(username=username)
+
+        q = Q(username=username) | Q(email_lookup=email_hmac_sha256(username))
         exist = User.objects.filter(q).exists()
         if not exist:
             logger.error(f"Only allow exist user auth, login failed: {username}")

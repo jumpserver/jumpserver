@@ -2,8 +2,12 @@
 
 import common.db.fields
 from django.db import migrations
+from django.db import migrations, models
+from users.utils import email_hmac_sha256
+
 
 user_email_mapper = {}
+
 
 def get_user_email_mapper(apps, schema_editor):
     User = apps.get_model('users', 'User')
@@ -11,13 +15,15 @@ def get_user_email_mapper(apps, schema_editor):
         user_email_mapper[str(user.id)] = user.email
 
     
-def set_user_encrypted_email(apps, schema_editor):
+def set_user_encrypted_email_and_email_lookup_field(apps, schema_editor):
     User = apps.get_model('users', 'User')
     for user in User.objects.all():
         if str(user.id) in user_email_mapper:
-            user.email = user_email_mapper[str(user.id)]
-            user.save(update_fields=['email'])
-
+            email = user_email_mapper[str(user.id)]
+            user.email = email
+            user.email_lookup = email_hmac_sha256(email)
+            user.save(update_fields=['email', 'email_lookup'])
+        
 
 class Migration(migrations.Migration):
 
@@ -32,5 +38,10 @@ class Migration(migrations.Migration):
             name='email',
             field=common.db.fields.EncryptCharField(max_length=128, unique=True, verbose_name='Email'),
         ),
-        migrations.RunPython(set_user_encrypted_email),
+        migrations.AddField(
+            model_name='user',
+            name='email_lookup',
+            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Email lookup'),
+        ),
+        migrations.RunPython(set_user_encrypted_email_and_email_lookup_field),
     ]
