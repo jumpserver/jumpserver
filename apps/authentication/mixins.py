@@ -292,7 +292,7 @@ class AuthPreCheckMixin:
         if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
             return
 
-        q = Q(username=username) | Q(email=username)
+        q = Q(username=username)
         exist = User.objects.filter(q).exists()
         if not exist:
             logger.error(f"Only allow exist user auth, login failed: {username}")

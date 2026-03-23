@@ -38,7 +38,7 @@ __all__ = [
 
 class UserManager(_UserManager):
     def get_by_natural_key(self, username_or_mail):
-        q = models.Q(username=username_or_mail) | models.Q(email=username_or_mail)
+        q = models.Q(username=username_or_mail)
         user = self.filter(q).first()
         if not user:
             raise self.model.DoesNotExist
@@ -64,7 +64,7 @@ class User(
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
-    email = models.EmailField(max_length=128, unique=True, verbose_name=_("Email"))
+    email = fields.EncryptCharField(max_length=128, unique=True, verbose_name=_("Email"))
     groups = models.ManyToManyField(
         "users.UserGroup",
         related_name="users",

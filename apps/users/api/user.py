@@ -37,7 +37,7 @@ __all__ = [
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
     extra_filter_backends = [AttrRulesFilterBackend]
-    search_fields = ('username', 'email', 'name')
+    search_fields = ('username', 'name')
     permission_classes = [RBACPermission, UserObjectPermission]
     serializer_classes = {
         'default': UserSerializer,
