@@ -328,15 +328,3 @@ def activate_user_language(user):
     language = getattr(user, 'lang') or settings.LANGUAGE_CODE
     with translation.override(language):
         yield
-
-
-def email_hmac_sha256(email: str):
-    try:
-        msg = email.strip().lower().encode('utf-8')
-        secret_key = settings.SECRET_KEY
-        key = secret_key.encode("utf-8")
-        digest = hmac.new(key, msg, hashlib.sha256).hexdigest()  # 64位十六进制字符串
-    except Exception as e:
-        logger.error(f"Failed to hash email: {email}, error: {e}")
-        digest = ''
-    return digest

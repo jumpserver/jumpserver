@@ -493,3 +493,15 @@ def convert_html_to_markdown(html_str):
 def many_get(d, keys, default=None):
     res = [d.get(key, default) for key in keys]
     return res
+
+
+def text_hmac_sha256(text: str):
+    try:
+        msg = text.strip().lower().encode('utf-8')
+        secret_key = settings.SECRET_KEY
+        key = secret_key.encode("utf-8")
+        digest = hmac.new(key, msg, hashlib.sha256).hexdigest()  # 64位十六进制字符串
+    except Exception as e:
+        logger.error(f"Failed to hmac hash text: {text}, error: {e}")
+        digest = ''
+    return digest

@@ -3,7 +3,7 @@
 import common.db.fields
 from django.db import migrations
 from django.db import migrations, models
-from users.utils import email_hmac_sha256
+from common.utils import text_hmac_sha256
 
 
 user_email_mapper = {}
@@ -21,7 +21,7 @@ def set_user_encrypted_email_and_email_lookup_field(apps, schema_editor):
         if str(user.id) in user_email_mapper:
             email = user_email_mapper[str(user.id)]
             user.email = email
-            user.email_lookup = email_hmac_sha256(email)
+            user.email_lookup = text_hmac_sha256(email)
             user.save(update_fields=['email', 'email_lookup'])
         
 

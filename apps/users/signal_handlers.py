@@ -18,7 +18,7 @@ from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.decorators import on_transaction_commit
 from common.sessions.cache import user_session_manager
 from common.signals import django_ready
-from common.utils import get_logger
+from common.utils import get_logger, text_hmac_sha256
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
 from orgs.models import Organization
@@ -29,7 +29,6 @@ from rbac.models import RoleBinding
 from settings.signals import setting_changed
 from .models import User, UserPasswordHistory, UserGroup
 from .signals import post_user_create
-from .utils import email_hmac_sha256
 
 
 logger = get_logger(__file__)
@@ -83,7 +82,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
 @receiver(pre_save, sender=User)
 def set_user_email_lookup(sender, instance: User, **kwargs):
     if instance.email:
-        email_lookup = email_hmac_sha256(instance.email)
+        email_lookup = text_hmac_sha256(instance.email)
     else:
         email_lookup = ''
     logger.debug(f"Set user email_lookup: {email_lookup} for user: {instance}")

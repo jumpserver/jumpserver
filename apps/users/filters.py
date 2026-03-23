@@ -5,10 +5,9 @@ from django.utils.translation import gettext as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
-from common.utils import is_uuid
+from common.utils import is_uuid, text_hmac_sha256
 from rbac.models import Role, OrgRoleBinding, SystemRoleBinding
 from users.models.user import User
-from users.utils import email_hmac_sha256
 
 
 class UserFilter(BaseFilterSet):
@@ -36,7 +35,7 @@ class UserFilter(BaseFilterSet):
         )
 
     def filter_email(self, queryset, name, value):
-        q = Q(email_lookup=email_hmac_sha256(value))
+        q = Q(email_lookup=text_hmac_sha256(value))
         return queryset.filter(q)
 
     def filter_is_blocked(self, queryset, name, value):

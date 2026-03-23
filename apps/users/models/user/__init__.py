@@ -13,7 +13,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    user_date_expired_default, get_logger, lazyproperty
+    user_date_expired_default, get_logger, lazyproperty, text_hmac_sha256
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
@@ -38,8 +38,8 @@ __all__ = [
 
 class UserManager(_UserManager):
     def get_by_natural_key(self, username_or_mail):
-        from users.utils import email_hmac_sha256
-        q = models.Q(username=username_or_mail) | models.Q(email_lookup=email_hmac_sha256(username_or_mail))
+        email_lookup = text_hmac_sha256(username_or_mail)
+        q = (models.Q(username=username_or_mail) | models.Q(email_lookup=email_lookup))
         user = self.filter(q).first()
         if not user:
             raise self.model.DoesNotExist
