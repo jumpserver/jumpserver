@@ -292,7 +292,6 @@ class AuthPreCheckMixin:
         if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
             return
 
-
         q = Q(username=username) | Q(email_lookup=email_hmac_sha256(username))
         exist = User.objects.filter(q).exists()
         if not exist:
