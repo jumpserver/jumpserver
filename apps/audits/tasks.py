@@ -20,6 +20,7 @@ from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
 from terminal.backends import server_replay_storage
 from terminal.models import Session, Command
+from reports.models import clean_report_send_records
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
 
 logger = get_logger(__name__)
@@ -144,6 +145,7 @@ def clean_audits_log_period():
         clean_celery_tasks_period()
         clean_expired_session_period()
         clean_password_change_log_period()
+        clean_report_send_records()
 
 
 @shared_task(

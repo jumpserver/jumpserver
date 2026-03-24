@@ -52,3 +52,7 @@ class CleaningSerializer(serializers.Serializer):
         min_value=MIN_VALUE, max_value=9999,
         label=_("Change secret and push record retention days"),
     )
+    AUDIT_REPORT_SEND_RECORD_KEEP_DAYS = serializers.IntegerField(
+        min_value=MIN_VALUE, max_value=9999,
+        label=_("Audit report send record retention days"),
+    )

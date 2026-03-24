@@ -2,7 +2,7 @@ import base64
 import io
 import urllib.parse
 from io import BytesIO
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlsplit, urlunsplit
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -70,9 +70,19 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         url = urllib.parse.unquote(chart_info['path'])
     if settings.DEBUG_DEV:
         url = url.replace(":8080", ":9528")
-    oid = request.COOKIES.get("X-JMS-ORG")
-    days = request.GET.get('days', 7)
-    url = url + f"?days={days}&oid={oid}"
+    if request:
+        oid = request.COOKIES.get("X-JMS-ORG")
+        request_data = request.POST if request.method == 'POST' else request.GET
+        query = dict(parse_qsl(urlsplit(url).query, keep_blank_values=True))
+        for key, value in request_data.items():
+            if key in {'chart', 'csrfmiddlewaretoken'}:
+                continue
+            query[key] = value
+        query.setdefault('days', 7)
+        query['oid'] = oid
+        parts = list(urlsplit(url))
+        parts[3] = urlencode(query, doseq=True)
+        url = urlunsplit(parts)
 
     with sync_playwright() as p:
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
@@ -141,7 +151,7 @@ class ExportPdfView(View):
 class SendMailView(View):
 
     def post(self, request):
-        chart_name = request.GET.get('chart')
+        chart_name = request.GET.get('chart') or request.POST.get('chart')
         if not chart_name:
             return HttpResponseBadRequest('Missing chart parameter')
         email = request.user.email
