@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-10 10:43+0800\n"
+"POT-Creation-Date: 2026-03-24 16:08+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -98,15 +98,19 @@ msgstr "账号备份计划正在执行"
 msgid "Plan execution end"
 msgstr "计划执行结束"
 
-#: accounts/automations/base/manager.py:119
+#: accounts/automations/base/manager.py:86
+msgid "No accounts found matching the criteria."
+msgstr ""
+
+#: accounts/automations/base/manager.py:125
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows 不支持 SSH 密钥认证"
 
-#: accounts/automations/base/manager.py:123
+#: accounts/automations/base/manager.py:129
 msgid "Windows password cannot contain special characters like > ^"
 msgstr "Windows 密码不能包含特殊字符，例如 > ^"
 
-#: accounts/automations/base/manager.py:135
+#: accounts/automations/base/manager.py:148
 msgid "No pending accounts found"
 msgstr "未找到待处理帐户"
 
@@ -2174,11 +2178,11 @@ msgstr "我们想通知您，最近有用户登录："
 msgid "User details"
 msgstr "用户详情"
 
-#: assets/api/asset/asset.py:153
+#: assets/api/asset/asset.py:156
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
-#: assets/api/asset/asset.py:157
+#: assets/api/asset/asset.py:160
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "资产数量超过了 5000 的限制"
 
@@ -2217,24 +2221,24 @@ msgstr "任务：{} 完成"
 msgid "  - Platform {} ansible disabled"
 msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
 
-#: assets/automations/base/manager.py:526
+#: assets/automations/base/manager.py:555
 msgid ">>> Task preparation phase"
 msgstr ">>> 任务准备阶段"
 
-#: assets/automations/base/manager.py:530
+#: assets/automations/base/manager.py:559
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> 分次执行任务，总共 {runner_count}"
 
-#: assets/automations/base/manager.py:535
+#: assets/automations/base/manager.py:564
 msgid ">>> Start executing tasks"
 msgstr ">>> 开始执行任务"
 
-#: assets/automations/base/manager.py:537
+#: assets/automations/base/manager.py:566
 msgid ">>> No tasks need to be executed"
 msgstr ">>> 没有需要执行的任务"
 
-#: assets/automations/base/manager.py:541
+#: assets/automations/base/manager.py:570
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> 开始执行第 {index} 批任务"
@@ -5484,11 +5488,11 @@ msgstr "创建账号成功"
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
-#: jumpserver/context_processor.py:16
+#: jumpserver/context_processor.py:17
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 开源堡垒机"
 
-#: jumpserver/context_processor.py:34
+#: jumpserver/context_processor.py:36
 msgid "FIT2CLOUD"
 msgstr ""
 
@@ -6175,18 +6179,18 @@ msgstr "Job ID"
 msgid "Name of the job"
 msgstr "Job 名称"
 
-#: orgs/api.py:60
+#: orgs/api.py:62
 #, python-brace-format
 msgid "The current organization ({}) cannot be deleted"
 msgstr "当前组织 ({}) 不能被删除"
 
-#: orgs/api.py:65
+#: orgs/api.py:67
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
 msgstr "LDAP 同步设置组织为当前组织，请切换其他组织后再进行删除操作"
 
-#: orgs/api.py:75
+#: orgs/api.py:77
 #, python-brace-format
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
@@ -6440,7 +6444,7 @@ msgstr "角色已绑定用户，不能删除"
 msgid "Internal role, can't be update"
 msgstr "内部角色，不能更新"
 
-#: rbac/api/rolebinding.py:45
+#: rbac/api/rolebinding.py:47
 #, python-brace-format
 msgid "{} at least one system role"
 msgstr "{} 至少有一个系统角色"
@@ -9920,11 +9924,17 @@ msgstr "审批步骤"
 msgid "Relation snapshot"
 msgstr "工单快照"
 
-#: tickets/models/ticket/general.py:419
+#: tickets/models/ticket/general.py:406
+msgid ""
+"Today's ticket creation limit (9999) has been reached. Please try again "
+"tomorrow."
+msgstr "今日工单创建数量已达上限（9999），请明日再试。"
+
+#: tickets/models/ticket/general.py:427
 msgid "Please try again"
 msgstr "请再次尝试"
 
-#: tickets/models/ticket/general.py:498
+#: tickets/models/ticket/general.py:506
 msgid "Super ticket"
 msgstr "超级工单"
 
@@ -10066,19 +10076,20 @@ msgstr "无效的审批动作"
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用户无权审批此工单"
 
-#: users/api/user.py:65
+#: users/api/user.py:64
 msgid "You cannot delete yourself. Please disable it instead."
 msgstr "不能删除自己，请将其禁用。"
 
-#: users/api/user.py:67
+#: users/api/user.py:66
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr "无法删除管理员用户，请将其禁用。"
 
-#: users/api/user.py:165
+#: users/api/user.py:164
 msgid "Can not invite self"
 msgstr "不能邀请自己"
 
-#: users/api/user.py:171
+#: users/api/user.py:170
+#, python-brace-format
 msgid ""
 "This user {} is already a member of the organization. No need to invite again"
 msgstr "该用户{}已是组织成员，无需重复邀请"
