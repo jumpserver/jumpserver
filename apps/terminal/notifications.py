@@ -159,10 +159,17 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     def gen_html_string(self, **other_context) -> dict:
         command = self.command
         level = RiskLevelChoices.get_label(command['risk_level'])
+        cmd_acl = command.get('_cmd_filter_acl')
+        cmd_group = command.get('_cmd_group')
+        cmd_acl_name = cmd_acl.name if cmd_acl else ''
+        cmd_group_name = cmd_group.name if cmd_group else ''
         items = {
             _("Asset"): command['asset'],
             _("User"): command['user'],
             _("Level"): level,
+            _("Protocol"): command.get('_protocol', ''),
+            _("Remote addr"): command.get('_remote_addr', ''),
+            _("Policy"): cmd_acl_name or cmd_group_name or '',
             _("Date"): local_now_display(),
         }
         context = {
@@ -219,10 +226,17 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
     def gen_html_string(self, **other_context):
         command = self.command
         level = RiskLevelChoices.get_label(command['risk_level'])
+        cmd_acl = command.get('_cmd_filter_acl')
+        cmd_group = command.get('_cmd_group')
+        cmd_acl_name = cmd_acl.name if cmd_acl else ''
+        cmd_group_name = cmd_group.name if cmd_group else ''
 
         items = {
             _("User"): command['user'],
             _("Level"): level,
+            _("Protocol"): command.get('_protocol', ''),
+            _("Remote addr"): command.get('_remote_addr', ''),
+            _("Policy"): cmd_acl_name or cmd_group_name or '',
             _("Date"): local_now_display(),
         }
         context = {
