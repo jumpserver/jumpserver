@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 __all__ = ['CleaningSerializer']
 
-MIN_VALUE= settings.LOG_KEEP_MIN_DAYS
+MIN_VALUE = 180 if settings.LIMIT_SUPER_PRIV else 1
 
 
 class CleaningSerializer(serializers.Serializer):
@@ -51,4 +51,8 @@ class CleaningSerializer(serializers.Serializer):
     ACCOUNT_CHANGE_SECRET_RECORD_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
         label=_("Change secret and push record retention days"),
+    )
+    AUDIT_REPORT_SEND_RECORD_KEEP_DAYS = serializers.IntegerField(
+        min_value=MIN_VALUE, max_value=9999,
+        label=_("Audit report send record retention days"),
     )
