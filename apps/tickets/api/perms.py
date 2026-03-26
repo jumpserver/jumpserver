@@ -1,4 +1,3 @@
-from django.conf import settings
 
 from assets.models import Asset, Node
 from assets.serializers.asset.common import MiniAssetSerializer

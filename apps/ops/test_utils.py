@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import sys
-import os
 from django.test import TestCase
 
 from ops.models import Task, AdHoc

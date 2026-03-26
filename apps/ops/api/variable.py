@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.api.generic import JMSModelViewSet
-from common.const.http import OPTIONS, GET
+from common.const.http import GET
 from common.permissions import IsValidUser
 from ..models import Variable
 from ..serializers import VariableSerializer, VariableFormDataSerializer

@@ -2,7 +2,6 @@ from .base import FakeDataGenerator
 from users.models import *
 from assets.models import *
 from terminal.models import *
-import forgery_py
 import random
 
 

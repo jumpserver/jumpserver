@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 from django.urls import reverse
 from oauth2_provider.settings import oauth2_settings
 from typing import List, Dict, Any

@@ -1,6 +1,5 @@
 from django.core.cache import cache
 from django.shortcuts import reverse, redirect
-from django.utils.translation import gettext_noop
 
 from .random import random_string
 

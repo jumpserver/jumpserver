@@ -7,7 +7,6 @@ import socket
 import struct
 import time
 
-from common.utils import lookup_domain
 from settings.utils import generate_ips
 
 # From /usr/include/linux/icmp.h; your milage may vary.

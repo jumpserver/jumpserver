@@ -16,7 +16,7 @@ from authentication.decorators import post_save_next_to_session_if_guard_redirec
 from common.sdk.im.wecom import URL
 from common.sdk.im.wecom import WeCom, wecom_tool
 from common.utils import get_logger
-from common.utils.django import reverse, get_object_or_none, safe_next_url
+from common.utils.django import reverse, get_object_or_none
 from common.views.mixins import UserConfirmRequiredExceptionMixin, PermissionsMixin
 from users.models import User
 from users.views import UserVerifyPasswordView

@@ -2,7 +2,6 @@
 
 from django import template
 from django.utils import timezone
-from django.utils.translation import gettext as _
 from django.utils.html import escape
 from django import forms
 

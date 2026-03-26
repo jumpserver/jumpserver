@@ -14,7 +14,6 @@ from django.contrib.auth import (
     BACKEND_SESSION_KEY, load_backend,
     PermissionDenied, user_login_failed, _clean_credentials,
 )
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q

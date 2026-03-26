@@ -10,7 +10,6 @@ from accounts.models import IntegrationApplication
 from audits.models import IntegrationApplicationLog
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.exceptions import JMSException
-from common.permissions import IsValidUser
 from common.utils import get_request_ip
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission

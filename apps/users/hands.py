@@ -14,4 +14,3 @@
 # from users.models import User
 # from perms.models import AssetPermission
 # from perms.utils import get_user_granted_assets, get_user_granted_asset_groups
-from assets.models import Asset, SystemUser

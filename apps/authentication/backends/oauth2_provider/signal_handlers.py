@@ -1,6 +1,5 @@
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from django.core.cache import cache
 from django.conf import settings
 
 from oauth2_provider.models import get_application_model

@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from functools import wraps
 
 from common.utils import get_logger, safe_next_url

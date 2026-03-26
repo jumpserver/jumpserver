@@ -4,8 +4,6 @@
 from rest_framework.serializers import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema_field
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
 from ..models import Organization

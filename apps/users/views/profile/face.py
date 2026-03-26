@@ -2,7 +2,6 @@ from django.views.generic import FormView
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from authentication import errors
 from authentication.mixins import AuthMixin
 
 __all__ = ['UserFaceCaptureView', 'UserFaceEnableView',

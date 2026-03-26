@@ -19,7 +19,7 @@ from authentication.permissions import UserConfirmation
 from common.sdk.im.dingtalk import URL, DingTalk
 from common.utils import get_logger
 from common.utils.common import get_request_ip
-from common.utils.django import get_object_or_none, reverse, safe_next_url
+from common.utils.django import get_object_or_none, reverse
 from common.utils.random import random_string
 from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from users.models import User

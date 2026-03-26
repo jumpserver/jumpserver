@@ -2,7 +2,6 @@
 
 from django.conf import settings
 from django.db import migrations, models
-from orgs.models import Organization
 
 
 def migrate_ops_adhoc_and_playbook_name(apps, schema_editor):

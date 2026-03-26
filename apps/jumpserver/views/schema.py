@@ -202,7 +202,6 @@ class CustomAutoSchema(AutoSchema):
 # 添加自定义字段的 OpenAPI 扩展
 from drf_spectacular.extensions import OpenApiSerializerFieldExtension
 from drf_spectacular.openapi import AutoSchema
-from drf_spectacular.plumbing import build_basic_type
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField, BitChoicesField
 
 

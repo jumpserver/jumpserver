@@ -10,7 +10,6 @@ from assets.const import AllTypes
 from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
 from common.api import JMSModelViewSet
-from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer
 from rbac.models import RoleBinding
 

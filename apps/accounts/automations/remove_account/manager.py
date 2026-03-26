@@ -2,7 +2,6 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 
-from django.db.models import QuerySet
 
 from accounts.const import AutomationTypes
 from accounts.models import Account, GatheredAccount, AccountRisk

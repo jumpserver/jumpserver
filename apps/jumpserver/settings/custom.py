@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from pathlib import Path
-import os
 
 from .base import TEMPLATES, STATIC_DIR
 from ..const import CONFIG

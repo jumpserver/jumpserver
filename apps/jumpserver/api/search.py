@@ -1,4 +1,3 @@
-import re
 
 from django.contrib.postgres.search import SearchVector
 from rest_framework.views import APIView

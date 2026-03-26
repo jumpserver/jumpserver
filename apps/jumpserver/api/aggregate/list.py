@@ -50,7 +50,7 @@ list_schema = {
     }
 }
 
-from drf_spectacular.openapi import OpenApiResponse, OpenApiExample
+from drf_spectacular.openapi import OpenApiResponse
 
 
 class ResourceListApi(ProxyMixin, APIView):

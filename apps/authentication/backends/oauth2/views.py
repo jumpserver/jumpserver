@@ -10,7 +10,7 @@ from authentication.decorators import pre_save_next_to_session, redirect_to_pre_
 from authentication.mixins import authenticate
 from authentication.utils import build_absolute_uri
 from authentication.views.mixins import FlashMessageMixin
-from common.utils import get_logger, safe_next_url
+from common.utils import get_logger
 
 logger = get_logger(__file__)
 

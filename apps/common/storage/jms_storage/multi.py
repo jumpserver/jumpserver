@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from .base import ObjectStorage, LogStorage
+from .base import ObjectStorage
 
 
 class MultiObjectStorage(ObjectStorage):

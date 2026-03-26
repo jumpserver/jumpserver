@@ -4,7 +4,6 @@
 from __future__ import unicode_literals
 
 from django.core.cache import cache
-from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _

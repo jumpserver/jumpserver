@@ -4,7 +4,6 @@
 import warnings
 import contextlib
 import requests
-import inspect
 
 from functools import wraps
 from django.conf import settings
