@@ -17,7 +17,7 @@ dependencies = [
     'configparser==6.0.0',
     'decorator==5.1.1',
     'docutils==0.20.1',
-    'ecdsa==0.18.0',
+    'ecdsa==0.19.2',
     'enum-compat==0.0.3',
     'ephem==4.1.5',
     'future==0.18.3',
