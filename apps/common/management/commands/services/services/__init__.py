@@ -5,4 +5,3 @@ from .celery_combine import *
 from .flower import *
 from .gunicorn import *
 from .gunicorn_wsgi import *
-from .daphne import *

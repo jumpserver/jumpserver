@@ -8,8 +8,6 @@ from django.db.models import TextChoices
 from .hands import *
 from .utils import ServicesUtil
 
-GUNICORN_WSGI_ENABLED = os.environ.get('GUNICORN_WSGI_ENABLED', '0') == '1'
-
 
 SERVER_SIZE = os.environ.get('SERVER_SIZE', 'auto')
 if SERVER_SIZE == 'auto':
@@ -24,7 +22,6 @@ if SERVER_SIZE == 'auto':
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
     gunicorn_wsgi = 'gunicorn_wsgi', 'gunicorn_wsgi'
-    daphne = 'daphne', 'daphne'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     celery_combine = 'celery_combine', 'celery_combine'
@@ -42,7 +39,6 @@ class Services(TextChoices):
         services_map = {
             cls.gunicorn: services.GunicornService,
             cls.gunicorn_wsgi: services.GunicornWSGIService,
-            cls.daphne: services.DaphneService,
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
@@ -53,10 +49,9 @@ class Services(TextChoices):
 
     @classmethod
     def web_services(cls):
+        services = [cls.gunicorn]
         if GUNICORN_WSGI_ENABLED:
-            services = [cls.gunicorn_wsgi, cls.daphne]
-        else:
-            services = [cls.gunicorn]
+            services.append(cls.gunicorn_wsgi)
         
         if SERVER_SIZE == 'small' or os.environ.get('FLOWER_ENABLED', '1') == '0':
             return services
@@ -135,19 +130,28 @@ class BaseActionCommand(BaseCommand):
         parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def get_services_kwargs(self, options):
-        worker = options.get('worker', 4)
-
         if SERVER_SIZE == 'small':
             worker = 1
+        else:
+            worker = options.get('worker', 4)
 
-        return {
-            'gunicorn': {
-                'worker': worker
-            },
-            'gunicorn_wsgi': {
-                'worker': worker
-            },
-        }
+        if GUNICORN_WSGI_ENABLED:
+            kwargs = {
+                'gunicorn': {
+                    'worker': 1,
+                    'bind_port': WS_PORT,
+                },
+                'gunicorn_wsgi': {
+                    'worker': worker,
+                }
+            }
+        else:
+            kwargs = {
+                'gunicorn': {
+                    'worker': worker,
+                },
+            }
+        return kwargs
 
     def initial_util(self, *args, **options):
         service_names = options.get('services')
