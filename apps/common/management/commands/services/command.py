@@ -8,6 +8,8 @@ from django.db.models import TextChoices
 from .hands import *
 from .utils import ServicesUtil
 
+GUNICORN_WSGI_ENABLED = os.environ.get('GUNICORN_WSGI_ENABLED', '0') == '1'
+
 
 SERVER_SIZE = os.environ.get('SERVER_SIZE', 'auto')
 if SERVER_SIZE == 'auto':
@@ -21,6 +23,8 @@ if SERVER_SIZE == 'auto':
 
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
+    gunicorn_wsgi = 'gunicorn_wsgi', 'gunicorn_wsgi'
+    daphne = 'daphne', 'daphne'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     celery_combine = 'celery_combine', 'celery_combine'
@@ -36,7 +40,9 @@ class Services(TextChoices):
     def get_service_object_class(cls, name):
         from . import services
         services_map = {
-            cls.gunicorn.value: services.GunicornService,
+            cls.gunicorn: services.GunicornService,
+            cls.gunicorn_wsgi: services.GunicornWSGIService,
+            cls.daphne: services.DaphneService,
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
@@ -47,10 +53,16 @@ class Services(TextChoices):
 
     @classmethod
     def web_services(cls):
-        if SERVER_SIZE == 'small' or os.environ.get('FLOWER_ENABLED', '1') == '0':
-            return [cls.gunicorn]
+        if GUNICORN_WSGI_ENABLED:
+            services = [cls.gunicorn_wsgi, cls.daphne]
         else:
-            return [cls.gunicorn, cls.flower]
+            services = [cls.gunicorn]
+        
+        if SERVER_SIZE == 'small' or os.environ.get('FLOWER_ENABLED', '1') == '0':
+            return services
+        else:
+            services.append(cls.flower)
+            return services
 
     @classmethod
     def celery_services(cls):
@@ -131,7 +143,10 @@ class BaseActionCommand(BaseCommand):
         return {
             'gunicorn': {
                 'worker': worker
-            }
+            },
+            'gunicorn_wsgi': {
+                'worker': worker
+            },
         }
 
     def initial_util(self, *args, **options):
