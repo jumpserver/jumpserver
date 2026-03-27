@@ -307,7 +307,8 @@ class ConnectionToken(JMSOrgBaseModel):
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
-            self.set_ad_domain_if_need(account)
+        
+        self.set_ad_domain_if_need(account)
 
         return account
 
