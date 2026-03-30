@@ -305,3 +305,81 @@ class OperateLogReportExporter(BaseListReportExporter):
                 self.build_counter_rows(time_bucket_counter),
             ),
         ]
+
+
+class JobsAuditReportExporter(BaseListReportExporter):
+    report_title = _('Job Audit Report')
+    report_basename = 'jobs_audit_report'
+
+    def get_summary_sections(self):
+        jobs = self.records
+        overview = OrderedDict([
+            (_('Total records'), len(jobs)),
+            (_('Periodic jobs'), len([item for item in jobs if item.is_periodic])),
+            (_('One-time jobs'), len([item for item in jobs if not item.is_periodic])),
+            (_('Adhoc jobs'), len([item for item in jobs if item.type == 'adhoc'])),
+            (_('Playbook jobs'), len([item for item in jobs if item.type == 'playbook'])),
+            (_('Unique creators'), len({
+                item.creator_id for item in jobs if getattr(item, 'creator_id', None)
+            })),
+        ])
+
+        created_trend = defaultdict(int)
+        type_counter = Counter()
+        module_counter = Counter()
+        creator_counter = Counter()
+        runas_policy_counter = Counter()
+
+        for job in jobs:
+            created_time = getattr(job, 'date_created', None)
+            if created_time:
+                report_date = timezone.localtime(created_time).strftime('%Y-%m-%d')
+                created_trend[report_date] += 1
+
+            type_counter[str(job.get_type_display())] += 1
+
+            if job.type == 'playbook':
+                module_counter[str(_('Playbook'))] += 1
+            else:
+                module_counter[str(job.get_module_display() or '-')] += 1
+
+            creator = getattr(job, 'creator', None)
+            if creator:
+                creator_name = creator.name or creator.username
+                creator_counter[str(creator_name)] += 1
+
+            runas_policy_counter[str(job.get_runas_policy_display())] += 1
+
+        trend_rows = [
+            [date, created_trend[date]]
+            for date in sorted(created_trend.keys())
+        ]
+
+        return [
+            self.build_key_value_section(_('Overview'), overview.items()),
+            self.build_table_section(
+                _('Created Trend'),
+                [_('Date'), _('Count')],
+                trend_rows,
+            ),
+            self.build_table_section(
+                _('Job Type Distribution'),
+                [_('Type'), _('Count')],
+                self.build_counter_rows(type_counter),
+            ),
+            self.build_table_section(
+                _('Module Distribution'),
+                [_('Module'), _('Count')],
+                self.build_counter_rows(module_counter),
+            ),
+            self.build_table_section(
+                _('Creator Top 10'),
+                [_('Creator'), _('Count')],
+                self.build_counter_rows(creator_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Run as Policy Distribution'),
+                [_('Run as policy'), _('Count')],
+                self.build_counter_rows(runas_policy_counter),
+            ),
+        ]

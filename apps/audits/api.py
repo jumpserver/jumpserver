@@ -48,7 +48,7 @@ from .serializers import (
 )
 from .reporting import (
     UserLoginLogReportExporter, PasswordChangeLogReportExporter,
-    OperateLogReportExporter,
+    OperateLogReportExporter, JobsAuditReportExporter,
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
@@ -67,11 +67,12 @@ class JobLogAuditViewSet(OrgReadonlyModelViewSet):
     ordering = ['-date_start']
 
 
-class JobsAuditViewSet(OrgModelViewSet):
+class JobsAuditViewSet(ReportExportMixin, OrgModelViewSet):
     model = Job
     search_fields = ['creator__name', 'args', 'name']
     filterset_fields = ['creator__name', 'args', 'name']
     serializer_class = JobsAuditSerializer
+    report_exporter_class = JobsAuditReportExporter
     ordering = ['-is_periodic', '-date_updated']
     http_method_names = ['get', 'options', 'patch']
 
