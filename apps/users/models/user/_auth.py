@@ -113,6 +113,7 @@ class AuthMixin:
     history_passwords: models.Manager
     sect_cache_tpl = "user_sect_{}"
     id: str
+    is_org_admin: bool
 
     @property
     def password_raw(self):
@@ -213,7 +214,10 @@ class AuthMixin:
 
     @property
     def date_password_expired(self):
-        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        if self.is_org_admin:
+            interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN
+        else:
+            interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
         date_expired = self.date_password_last_updated + timezone.timedelta(
             days=int(interval)
         )

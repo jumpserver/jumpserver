@@ -14,6 +14,15 @@ from settings.models import LeakPasswords
 
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
+    SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN = serializers.IntegerField(
+        min_value=1, max_value=99999, required=True,
+        label=_('Admin password expiration (day)'),
+        help_text=_(
+            'If the admin does not update the password during the time, '
+            'the admin password will expire failure;The password expiration reminder mail will be '
+            'automatic sent to the admin by system within 5 days (daily) before the password expires'
+        )
+    )
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=True,
         label=_('User password expiration (day)'),

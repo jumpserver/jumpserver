@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-03 15:32+0800\n"
+"POT-Creation-Date: 2026-03-30 16:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -149,13 +149,12 @@ msgstr ""
 #: authentication/confirm/password.py:27 authentication/const.py:13
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:368
-#: authentication/templates/authentication/login.html:414
-#: reports/api/users/user.py:101 settings/models.py:246
-#: settings/serializers/auth/ldap.py:27 settings/serializers/auth/ldap.py:53
-#: settings/serializers/auth/ldap_ha.py:35 settings/serializers/msg.py:37
-#: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
-#: terminal/serializers/storage.py:142 users/forms/profile.py:22
-#: users/serializers/user.py:148
+#: authentication/templates/authentication/login.html:414 reports/mixins.py:237
+#: settings/models.py:216 settings/serializers/auth/ldap.py:27
+#: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
+#: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
+#: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
+#: users/forms/profile.py:22 users/serializers/user.py:148
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:43
@@ -222,7 +221,7 @@ msgstr "Mẫu"
 msgid "Skip"
 msgstr "Bỏ qua"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:298
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:309
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "Cập nhật"
@@ -337,7 +336,7 @@ msgstr "Chỉ tạo"
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
 #: settings/serializers/msg.py:62 users/forms/profile.py:101
-#: users/forms/profile.py:111 users/models/user/__init__.py:67
+#: users/forms/profile.py:111 users/models/user/__init__.py:68
 #: users/notifications.py:22 users/notifications.py:67
 #: users/notifications.py:189 users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
@@ -407,7 +406,7 @@ msgid "Default tablespace"
 msgstr "Không gian bảng mặc định"
 
 #: accounts/const/automation.py:135 rbac/models/role.py:46
-#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:75
+#: rbac/models/rolebinding.py:52 users/models/user/__init__.py:79
 msgid "Role"
 msgstr "Vai trò"
 
@@ -476,8 +475,8 @@ msgstr ""
 #: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:336
 #: audits/serializers.py:245 authentication/models/connection_token.py:42
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
-#: terminal/models/session/session.py:29 terminal/notifications.py:162
-#: terminal/notifications.py:289 terminal/serializers/command.py:17
+#: terminal/models/session/session.py:29 terminal/notifications.py:167
+#: terminal/notifications.py:304 terminal/serializers/command.py:17
 #: terminal/serializers/session.py:38
 #: terminal/templates/terminal/_msg_command_warning.html:10
 #: terminal/templates/terminal/_msg_session_sharing.html:4
@@ -508,7 +507,7 @@ msgid "Secret reset"
 msgstr "Có thể thay đổi mật khẩu"
 
 #: accounts/models/account.py:97 accounts/serializers/account/account.py:229
-#: users/models/user/__init__.py:128
+#: users/models/user/__init__.py:132
 msgid "Source"
 msgstr "Nguồn"
 
@@ -544,12 +543,12 @@ msgstr "Trạng thái đổi mật khẩu"
 #: audits/serializers.py:246 authentication/api/connection_token.py:475
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:31 terminal/notifications.py:291
+#: terminal/models/session/session.py:31 terminal/notifications.py:306
 #: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
 msgid "Account"
 msgstr "Tài khoản"
 
@@ -607,7 +606,7 @@ msgstr "Hoạt động tài khoản"
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
-#: rbac/serializers/role.py:28 settings/models.py:39 settings/models.py:188
+#: rbac/serializers/role.py:28 settings/models.py:38 settings/models.py:187
 #: settings/serializers/msg.py:90 settings/serializers/terminal.py:9
 #: terminal/models/applet/applet.py:34 terminal/models/component/endpoint.py:13
 #: terminal/models/component/endpoint.py:107
@@ -616,7 +615,7 @@ msgstr "Hoạt động tài khoản"
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
 #: users/forms/profile.py:33 users/models/group.py:16
-#: users/models/preference.py:11 users/models/user/__init__.py:66
+#: users/models/preference.py:11 users/models/user/__init__.py:67
 #: users/notifications.py:21 users/notifications.py:106
 #: users/notifications.py:145 users/notifications.py:184
 #: users/notifications.py:224 users/notifications.py:252
@@ -906,7 +905,7 @@ msgstr "Mật khẩu trùng lặp"
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: authentication/templates/authentication/login.html:414
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
-#: users/forms/profile.py:117 users/models/user/__init__.py:65
+#: users/forms/profile.py:117 users/models/user/__init__.py:66
 #: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
@@ -1068,7 +1067,7 @@ msgstr "Tài khoản đặc quyền"
 
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
-#: authentication/serializers/connect_token_secret.py:129
+#: authentication/serializers/connect_token_secret.py:129 reports/models.py:33
 #: terminal/models/applet/applet.py:41
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:257
 msgid "Is active"
@@ -1240,7 +1239,7 @@ msgstr "Tài khoản đã tồn tại chính sách"
 #: assets/models/platform.py:95 assets/serializers/asset/common.py:145
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:174
 #: assets/serializers/platform.py:285 perms/serializers/user_permission.py:27
-#: settings/models.py:41 tickets/models/ticket/apply_application.py:13
+#: settings/models.py:40 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
 #: xpack/plugins/cloud/models.py:327
 #: xpack/plugins/cloud/serializers/account.py:87
@@ -1255,8 +1254,8 @@ msgstr "Thể loại"
 #: audits/serializers.py:76 audits/serializers.py:211
 #: authentication/models/connection_token.py:67
 #: authentication/serializers/connect_token_secret.py:138 ops/models/job.py:155
-#: perms/serializers/user_permission.py:28 terminal/models/applet/applet.py:40
-#: terminal/models/component/storage.py:58
+#: perms/serializers/user_permission.py:28 reports/models.py:31
+#: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
@@ -1321,7 +1320,7 @@ msgstr "Thông tin đặc biệt"
 #: accounts/serializers/account/account.py:496
 #: authentication/serializers/connect_token_secret.py:173
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 settings/models.py:245
+#: perms/models/perm_node.py:21 settings/models.py:215
 #: users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
@@ -1340,19 +1339,19 @@ msgstr "ID"
 #: rbac/builtin.py:134 rbac/models/rolebinding.py:49
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
-#: terminal/notifications.py:163 terminal/notifications.py:223
+#: terminal/notifications.py:168 terminal/notifications.py:235
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
-#: users/const.py:14 users/models/user/__init__.py:294
-#: users/models/user/__init__.py:321
+#: users/const.py:14 users/models/user/__init__.py:298
+#: users/models/user/__init__.py:325
 msgid "User"
 msgstr "Người dùng"
 
 #: accounts/serializers/account/account.py:507
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:165 terminal/notifications.py:225
+#: terminal/notifications.py:173 terminal/notifications.py:240
 msgid "Date"
 msgstr "Ngày"
 
@@ -1377,13 +1376,13 @@ msgstr "Danh sách trắng IP"
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
 #: ops/models/job.py:165 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:44 terminal/models/applet/applet.py:46
+#: settings/models.py:43 terminal/models/applet/applet.py:46
 #: terminal/models/applet/applet.py:383 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:29
 #: terminal/models/component/endpoint.py:117
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:100
+#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "Description"
@@ -1399,12 +1398,12 @@ msgid "Password length"
 msgstr "Chiều dài mật khẩu"
 
 #: accounts/serializers/account/template.py:12
-#: settings/serializers/security.py:51
+#: settings/serializers/security.py:60
 msgid "Lowercase"
 msgstr "Chữ cái thường"
 
 #: accounts/serializers/account/template.py:13
-#: settings/serializers/security.py:48
+#: settings/serializers/security.py:57
 msgid "Uppercase"
 msgstr "Chữ cái hoa"
 
@@ -1968,9 +1967,9 @@ msgid "Regex"
 msgstr "Biểu thức chính quy"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-#: settings/models.py:189 settings/serializers/feature.py:24
+#: settings/models.py:188 settings/serializers/feature.py:24
 #: settings/serializers/msg.py:79 users/notifications.py:19
-#: xpack/plugins/license/models.py:31
+#: xpack/plugins/license/models.py:34
 msgid "Content"
 msgstr "Nội dung"
 
@@ -2136,7 +2135,7 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/Máy chủ"
 
-#: acls/serializers/base.py:99
+#: acls/serializers/base.py:99 reports/models.py:36
 msgid "Recipients"
 msgstr "Người nhận"
 
@@ -2173,7 +2172,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: common/drf/renders/base.py:148 xpack/plugins/cloud/models.py:405
+#: common/drf/renders/base.py:165 xpack/plugins/cloud/models.py:405
 msgid "IP"
 msgstr "IP"
 
@@ -2238,7 +2237,7 @@ msgstr "Chúng tôi xin thông báo rằng, gần đây có người dùng đã 
 msgid "User details"
 msgstr "Thông tin người dùng"
 
-#: assets/api/asset/asset.py:153
+#: assets/api/asset/asset.py:166
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "Không thể tạo tài sản trực tiếp, bạn nên tạo máy chủ hoặc các tài sản khác. "
@@ -2252,8 +2251,14 @@ msgstr ""
 ">>> Không có nhiệm vụ nào cần thực hiện. <–SEP–> >>> Bắt đầu thực hiện đợt "
 "nhiệm vụ thứ {index}. <–SEP–> Không có tài khoản."
 
-#: assets/api/asset/asset.py:157
+#: assets/api/asset/asset.py:172
 msgid "The number of assets exceeds the limit of 5000"
+msgstr "Số lượng tài sản vượt quá giới hạn 5000"
+
+#: assets/api/asset/asset.py:178
+#, fuzzy
+#| msgid "The number of assets exceeds the limit of 5000"
+msgid "The number of assets exceeds the license limit"
 msgstr "Số lượng tài sản vượt quá giới hạn 5000"
 
 #: assets/api/node.py:58
@@ -2291,24 +2296,24 @@ msgstr "Nhiệm vụ: {} Hoàn thành"
 msgid "  - Platform {} ansible disabled"
 msgstr "- Nền tảng {} Ansible đã bị vô hiệu hóa, không thể thực hiện nhiệm vụ"
 
-#: assets/automations/base/manager.py:526
+#: assets/automations/base/manager.py:555
 msgid ">>> Task preparation phase"
 msgstr ">>> Giai đoạn chuẩn bị nhiệm vụ"
 
-#: assets/automations/base/manager.py:530
+#: assets/automations/base/manager.py:559
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> Thực hiện nhiệm vụ theo từng đợt, tổng cộng {runner_count}"
 
-#: assets/automations/base/manager.py:535
+#: assets/automations/base/manager.py:564
 msgid ">>> Start executing tasks"
 msgstr ">>> Bắt đầu thực hiện nhiệm vụ"
 
-#: assets/automations/base/manager.py:537
+#: assets/automations/base/manager.py:566
 msgid ">>> No tasks need to be executed"
 msgstr ">>> Không có nhiệm vụ nào cần thực hiện"
 
-#: assets/automations/base/manager.py:541
+#: assets/automations/base/manager.py:570
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> Bắt đầu thực hiện đợt nhiệm vụ thứ {index}"
@@ -2544,7 +2549,7 @@ msgid "Any"
 msgstr "Bất kỳ"
 
 #: assets/const/protocol.py:88 rbac/tree.py:65
-#: settings/serializers/security.py:272
+#: settings/serializers/security.py:281
 msgid "Security"
 msgstr "Bảo mật"
 
@@ -2821,7 +2826,7 @@ msgstr "Nhiệm vụ tự động hóa tài sản"
 #: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
 #: ops/models/base.py:54 ops/models/job.py:240
-#: users/models/user/__init__.py:324
+#: users/models/user/__init__.py:328
 msgid "Date created"
 msgstr "Ngày tạo"
 
@@ -2850,7 +2855,7 @@ msgstr "Thu thập thông tin tài sản"
 msgid "Ping asset"
 msgstr "Kiểm tra tài sản"
 
-#: assets/models/base.py:17 terminal/notifications.py:249
+#: assets/models/base.py:17 terminal/notifications.py:264
 msgid "Connectivity"
 msgstr "Tính kết nối"
 
@@ -2859,18 +2864,18 @@ msgid "Date verified"
 msgstr "Ngày xác nhận"
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:66
-#: users/models/group.py:28 users/models/user/__init__.py:72
+#: users/models/group.py:28 users/models/user/__init__.py:76
 msgid "User group"
 msgstr "Nhóm người dùng"
 
 #: assets/models/cmd_filter.py:42 authentication/serializers/token.py:133
-#: common/db/models.py:35 users/models/user/__init__.py:151
+#: common/db/models.py:35 users/models/user/__init__.py:155
 msgid "Date updated"
 msgstr "Ngày cập nhật"
 
 #: assets/models/cmd_filter.py:44 assets/models/cmd_filter.py:91
-#: common/db/models.py:32 terminal/notifications.py:290
-#: users/models/user/__init__.py:110 users/serializers/group.py:32
+#: common/db/models.py:32 terminal/notifications.py:305
+#: users/models/user/__init__.py:114 users/serializers/group.py:32
 msgid "Created by"
 msgstr "Người tạo"
 
@@ -2915,7 +2920,7 @@ msgstr "Hệ thống"
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:35
 #: authentication/serializers/connect_token_secret.py:137
-#: common/serializers/common.py:86 labels/models.py:12 settings/models.py:40
+#: common/serializers/common.py:86 labels/models.py:12 settings/models.py:39
 #: users/models/preference.py:13
 msgid "Value"
 msgstr "Giá trị"
@@ -2989,7 +2994,7 @@ msgid "Setting"
 msgstr "Thiết lập"
 
 #: assets/models/platform.py:38 audits/const.py:60
-#: authentication/backends/passkey/models.py:11 settings/models.py:43
+#: authentication/backends/passkey/models.py:11 settings/models.py:42
 #: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "Kích hoạt"
@@ -3608,7 +3613,7 @@ msgstr "Xóa thư mục"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:299
+#: rbac/tree.py:310
 msgid "Delete"
 msgstr "Xóa"
 
@@ -3626,7 +3631,7 @@ msgstr "Tạo liên kết mềm"
 
 #: audits/const.py:18 audits/const.py:29
 #: ops/templates/ops/celery_task_log.html:86
-#: terminal/api/session/session.py:155
+#: terminal/api/session/session.py:157
 msgid "Download"
 msgstr "Tải xuống"
 
@@ -3634,7 +3639,7 @@ msgstr "Tải xuống"
 msgid "Rename dir"
 msgstr "Liên kết thư mục"
 
-#: audits/const.py:23 rbac/tree.py:297 terminal/api/session/session.py:286
+#: audits/const.py:23 rbac/tree.py:308 terminal/api/session/session.py:288
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:104
 msgid "View"
@@ -3642,7 +3647,7 @@ msgstr "Xem"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:296
+#: rbac/tree.py:307
 msgid "Create"
 msgstr "Tạo"
 
@@ -3713,6 +3718,7 @@ msgstr "Nhật ký kiểm tra công việc"
 #: audits/models.py:57 audits/models.py:107 audits/models.py:182
 #: audits/models.py:333 authentication/models/connection_token.py:62
 #: terminal/models/session/session.py:36 terminal/models/session/sharing.py:111
+#: terminal/notifications.py:171 terminal/notifications.py:238
 msgid "Remote addr"
 msgstr "Địa chỉ xa"
 
@@ -3787,7 +3793,7 @@ msgstr "Đăng nhập IP"
 
 #: audits/models.py:216 audits/serializers.py:75
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:64 users/models/user/__init__.py:88
+#: users/forms/profile.py:64 users/models/user/__init__.py:92
 #: users/serializers/profile.py:63
 msgid "MFA"
 msgstr "MFA"
@@ -3867,7 +3873,7 @@ msgstr "Người dùng %s %s tài nguyên hiện tại"
 #: authentication/models/temp_token.py:14
 #: authentication/serializers/token.py:132 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:21 users/models/user/__init__.py:107
+#: tickets/models/ticket/apply_asset.py:21 users/models/user/__init__.py:111
 msgid "Date expired"
 msgstr "Ngày hết hạn"
 
@@ -3900,55 +3906,61 @@ msgid "SSO"
 msgstr "SSO"
 
 #: audits/signal_handlers/login_log.py:36
+#, fuzzy
+#| msgid "Custom"
+msgid "Custom SSO"
+msgstr "Tùy chỉnh"
+
+#: audits/signal_handlers/login_log.py:37
 msgid "Auth Token"
 msgstr "Mã xác thực"
 
-#: audits/signal_handlers/login_log.py:37 authentication/notifications.py:90
+#: audits/signal_handlers/login_log.py:38 authentication/notifications.py:90
 #: authentication/utils.py:114 notifications/backends/__init__.py:11
 #: settings/serializers/auth/wecom.py:11 settings/serializers/auth/wecom.py:16
-#: users/models/user/__init__.py:131 users/models/user/_source.py:21
+#: users/models/user/__init__.py:135 users/models/user/_source.py:21
 msgid "WeCom"
 msgstr "WeChat doanh nghiệp"
 
-#: audits/signal_handlers/login_log.py:38 authentication/utils.py:126
+#: audits/signal_handlers/login_log.py:39 authentication/utils.py:126
 #: authentication/views/feishu.py:98 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:12
-#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:137
+#: settings/serializers/auth/feishu.py:14 users/models/user/__init__.py:141
 #: users/models/user/_source.py:23
 msgid "FeiShu"
 msgstr "Feishu"
 
-#: audits/signal_handlers/login_log.py:40 authentication/utils.py:138
+#: audits/signal_handlers/login_log.py:41 authentication/utils.py:138
 #: authentication/views/slack.py:80 notifications/backends/__init__.py:16
 #: settings/serializers/auth/slack.py:11 settings/serializers/auth/slack.py:13
-#: users/models/user/__init__.py:143 users/models/user/_source.py:25
+#: users/models/user/__init__.py:147 users/models/user/_source.py:25
 msgid "Slack"
 msgstr "Slack"
 
-#: audits/signal_handlers/login_log.py:41 authentication/utils.py:120
+#: audits/signal_handlers/login_log.py:42 authentication/utils.py:120
 #: authentication/views/dingtalk.py:153 notifications/backends/__init__.py:12
-#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:134
+#: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:138
 #: users/models/user/_source.py:22
 msgid "DingTalk"
 msgstr "DingTalk"
 
-#: audits/signal_handlers/login_log.py:42
+#: audits/signal_handlers/login_log.py:43
 #: authentication/models/temp_token.py:17
 msgid "Temporary token"
 msgstr "Mật khẩu tạm thời"
 
-#: audits/signal_handlers/login_log.py:43 authentication/const.py:40
-#: authentication/utils.py:144 rbac/tree.py:188
+#: audits/signal_handlers/login_log.py:44 authentication/const.py:40
+#: authentication/utils.py:144 rbac/tree.py:200
 #: settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Khóa truy cập"
 
-#: audits/tasks.py:133
+#: audits/tasks.py:129
 msgid "Clean audits session task log"
 msgstr "Dọn dẹp nhật ký nhiệm vụ kiểm toán tài sản"
 
-#: audits/tasks.py:135
+#: audits/tasks.py:131
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -3964,11 +3976,11 @@ msgstr ""
 "thống - danh sách nhiệm vụ - định kỳ dọn dẹp cấu hình, đối với những thứ "
 "vượt quá thời gian sẽ được dọn dẹp vào lúc 2 giờ sáng mỗi ngày"
 
-#: audits/tasks.py:155
+#: audits/tasks.py:152
 msgid "Upload FTP file to external storage"
 msgstr "Tải lên tệp FTP vào bộ nhớ bên ngoài"
 
-#: audits/tasks.py:157
+#: audits/tasks.py:154
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -4040,7 +4052,7 @@ msgstr "So sánh khuôn mặt thất bại"
 msgid "Current user not support mfa type: {}"
 msgstr "Người dùng hiện tại không hỗ trợ loại MFA: {}"
 
-#: authentication/api/password.py:34 terminal/api/session/session.py:343
+#: authentication/api/password.py:34 terminal/api/session/session.py:345
 #: users/views/profile/reset.py:63
 #, python-brace-format
 msgid "User does not exist: {}"
@@ -4085,16 +4097,16 @@ msgstr "Lỗi CAS"
 msgid "User invalid, disabled or expired"
 msgstr "Người dùng không hợp lệ, đã bị vô hiệu hóa hoặc đã hết hạn"
 
-#: authentication/backends/drf.py:60
+#: authentication/backends/drf.py:61
 msgid "Invalid token header. No credentials provided."
 msgstr ""
 "Tiêu đề token không hợp lệ. Không cung cấp bất kỳ thông tin xác thực nào."
 
-#: authentication/backends/drf.py:63
+#: authentication/backends/drf.py:64
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr "Tiêu đề token không hợp lệ. Chuỗi ký hiệu không nên chứa khoảng trắng."
 
-#: authentication/backends/drf.py:69
+#: authentication/backends/drf.py:70
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
@@ -4336,16 +4348,16 @@ msgstr "Mật khẩu của bạn không hợp lệ"
 msgid "Please wait for %s seconds before retry"
 msgstr "Vui lòng thử lại sau %s giây"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:430
+#: authentication/errors/redirect.py:85 authentication/mixins.py:433
 #: users/views/profile/reset.py:224
 msgid "Your password is too simple, please change it for security"
 msgstr "Mật khẩu của bạn quá đơn giản, để đảm bảo an toàn, vui lòng thay đổi"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:439
+#: authentication/errors/redirect.py:93 authentication/mixins.py:442
 msgid "You should to change your password before login"
 msgstr "Trước khi hoàn tất đăng nhập, vui lòng thay đổi mật khẩu"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:448
+#: authentication/errors/redirect.py:101 authentication/mixins.py:451
 msgid "Your password has expired, please reset before logging in"
 msgstr "Mật khẩu của bạn đã hết hạn, hãy thay đổi rồi mới đăng nhập"
 
@@ -4466,7 +4478,7 @@ msgstr "Xóa số điện thoại để vô hiệu hóa."
 msgid "Authentication failed (before login check failed): {}"
 msgstr "Xác thực không thành công (Kiểm tra trước khi đăng nhập thất bại): {}"
 
-#: authentication/mixins.py:166
+#: authentication/mixins.py:169
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "                    and the current user is not in the user list. Please "
@@ -4476,11 +4488,11 @@ msgstr ""
 "dùng hiện tại không có trong danh sách người dùng, vui lòng liên hệ với quản "
 "trị viên."
 
-#: authentication/mixins.py:178
+#: authentication/mixins.py:181
 msgid "User is invalid"
 msgstr "Người dùng không hợp lệ"
 
-#: authentication/mixins.py:195
+#: authentication/mixins.py:198
 #, python-brace-format
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
@@ -4490,12 +4502,12 @@ msgstr ""
 "Quản trị viên đã bật 'chỉ cho phép đăng nhập từ nguồn người dùng', nguồn "
 "người dùng hiện tại là {}, vui lòng liên hệ với quản trị viên."
 
-#: authentication/mixins.py:376
+#: authentication/mixins.py:379
 #, python-brace-format
 msgid "The MFA type ({}) is not enabled"
 msgstr "Phương thức MFA ({}) này chưa được kích hoạt"
 
-#: authentication/mixins.py:418
+#: authentication/mixins.py:421
 msgid "Please change your password"
 msgstr "Vui lòng thay đổi mật khẩu"
 
@@ -4511,9 +4523,9 @@ msgstr "Mật khẩu tùy chỉnh"
 #: authentication/models/connection_token.py:47
 #: authentication/serializers/connect_token_secret.py:126
 #: terminal/models/applet/applet.py:43
-#: terminal/models/virtualapp/virtualapp.py:24
-#: terminal/serializers/session.py:31 terminal/serializers/session.py:58
-#: terminal/serializers/storage.py:71
+#: terminal/models/virtualapp/virtualapp.py:24 terminal/notifications.py:170
+#: terminal/notifications.py:237 terminal/serializers/session.py:31
+#: terminal/serializers/session.py:58 terminal/serializers/storage.py:71
 #: terminal/templates/terminal/_msg_command_warning.html:19
 msgid "Protocol"
 msgstr "Giao thức"
@@ -4590,13 +4602,13 @@ msgid "Private Token"
 msgstr "Mã thông báo riêng tư"
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
-#: users/models/user/__init__.py:95
+#: users/models/user/__init__.py:99
 #: xpack/plugins/cloud/serializers/account_attrs.py:250
 msgid "Private key"
 msgstr "Khóa ssh riêng"
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:38
-#: users/forms/profile.py:175 users/models/user/__init__.py:98
+#: users/forms/profile.py:175 users/models/user/__init__.py:102
 #: xpack/plugins/cloud/serializers/account_attrs.py:247
 msgid "Public key"
 msgstr "Khóa công khai SSH"
@@ -4635,7 +4647,7 @@ msgstr ""
 msgid "binding reminder"
 msgstr "Nhắc nhở liên kết"
 
-#: authentication/serializers/connect_token_secret.py:128
+#: authentication/serializers/connect_token_secret.py:128 reports/models.py:32
 msgid "Is builtin"
 msgstr "Builtin"
 
@@ -4838,7 +4850,7 @@ msgstr "Mã không chính xác"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:548
+#: jumpserver/conf.py:555
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -4893,7 +4905,7 @@ msgstr "Cài đặt lại"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
 #: terminal/models/session/sharing.py:27 terminal/models/session/sharing.py:95
-#: terminal/notifications.py:293
+#: terminal/notifications.py:308
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:108 users/templates/users/forgot_password.html:98
 msgid "Verify code"
@@ -5325,7 +5337,7 @@ msgstr "Bỏ qua"
 msgid "discard time"
 msgstr "Thời gian bỏ qua"
 
-#: common/db/models.py:33 users/models/user/__init__.py:113
+#: common/db/models.py:33 users/models/user/__init__.py:117
 msgid "Updated by"
 msgstr "Người cập nhật cuối cùng"
 
@@ -5356,38 +5368,38 @@ msgstr "Lỗi phân tích tập tin: {}"
 msgid "Invalid excel file"
 msgstr "Tập tin excel không hợp lệ"
 
-#: common/drf/renders/base.py:141
+#: common/drf/renders/base.py:158
 msgid "Yes/No"
 msgstr "Có/Không"
 
-#: common/drf/renders/base.py:144
+#: common/drf/renders/base.py:161
 #, python-brace-format
 msgid "Number, min {} max {}"
 msgstr "Số, tối thiểu {} tối đa {}"
 
-#: common/drf/renders/base.py:150
+#: common/drf/renders/base.py:167
 msgid "Phone number, format +8612345678901"
 msgstr "Số điện thoại, định dạng +8612345678901"
 
-#: common/drf/renders/base.py:153
+#: common/drf/renders/base.py:170
 #, python-brace-format
 msgid "Text, max length {}"
 msgstr "Văn bản, độ dài tối đa {}"
 
-#: common/drf/renders/base.py:155
+#: common/drf/renders/base.py:172
 msgid "Long text, no length limit"
 msgstr "Văn bản dài, không giới hạn độ dài"
 
-#: common/drf/renders/base.py:158
+#: common/drf/renders/base.py:175
 #, python-brace-format
 msgid "Datetime format {}"
 msgstr "Định dạng ngày giờ {}"
 
-#: common/drf/renders/base.py:161
+#: common/drf/renders/base.py:178
 msgid "Label, format [\"key:value\"]"
 msgstr "Nhãn, định dạng: [\"Khóa:Giá trị\"]"
 
-#: common/drf/renders/base.py:165
+#: common/drf/renders/base.py:182
 #, python-brace-format
 msgid ""
 "Choices, format name(value), name is optional for human read, value is "
@@ -5396,22 +5408,22 @@ msgstr ""
 "Tùy chọn, định dạng: Tên(Giá trị), tên là tùy chọn để dễ đọc, giá trị là bắt "
 "buộc, tùy chọn có {}"
 
-#: common/drf/renders/base.py:168
+#: common/drf/renders/base.py:185
 #, python-brace-format
 msgid "Choices, options {}"
 msgstr "Tùy chọn, tùy chọn có {}"
 
-#: common/drf/renders/base.py:171
+#: common/drf/renders/base.py:188
 msgid ""
 "Object, format name(id), name is optional for human read, id is requisite"
 msgstr ""
 "Mục liên kết, định dạng: Tên(id), tên là tùy chọn để dễ đọc, id là bắt buộc."
 
-#: common/drf/renders/base.py:173
+#: common/drf/renders/base.py:190
 msgid "Object, format id"
 msgstr "Liên kết, định dạng là id"
 
-#: common/drf/renders/base.py:177
+#: common/drf/renders/base.py:194
 msgid ""
 "Objects, format [\"name(id)\", ...], name is optional for human read, id is "
 "requisite"
@@ -5419,18 +5431,18 @@ msgstr ""
 "nhiều liên kết, định dạng: [\"Tên(id)\", ...], tên là tùy chọn, thuận tiện "
 "cho việc đọc, id là bắt buộc"
 
-#: common/drf/renders/base.py:179
+#: common/drf/renders/base.py:196
 msgid ""
 "Labels, format [\"key:value\", ...], if label not exists, will create it"
 msgstr ""
 "nhãn, định dạng: [\"khóa:giá trị\", ...], nếu nhãn không tồn tại, sẽ được "
 "tạo ra"
 
-#: common/drf/renders/base.py:181
+#: common/drf/renders/base.py:198
 msgid "Objects, format [\"id\", ...]"
 msgstr "nhiều liên kết, định dạng là [\"id\", ...]"
 
-#: common/drf/renders/base.py:283
+#: common/drf/renders/base.py:300
 #, python-brace-format
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
@@ -5455,7 +5467,7 @@ msgstr "Chỉ xuất mục đã chọn"
 msgid "Export filtered"
 msgstr "Xuất tìm kiếm"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s đối tượng không tồn tại"
@@ -5614,19 +5626,19 @@ msgstr "Tùy chọn không hợp lệ: {}"
 msgid "Tags"
 msgstr "Nhãn"
 
-#: common/tasks.py:33
+#: common/tasks.py:35
 msgid "Send email"
 msgstr "Gửi email"
 
-#: common/tasks.py:36
+#: common/tasks.py:38
 msgid "This task will be executed when sending email notifications"
 msgstr "Thực hiện tác vụ này khi gửi thông điệp email."
 
-#: common/tasks.py:78
+#: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Gửi tệp đính kèm email"
 
-#: common/tasks.py:81
+#: common/tasks.py:84
 msgid ""
 "When an account password is changed or an account backup generates "
 "attachments, \n"
@@ -5636,11 +5648,11 @@ msgstr ""
 "Khi đổi mật khẩu tài khoản, tệp đính kèm từ việc sao lưu tài khoản cần được "
 "gửi qua email, thực hiện nhiệm vụ này"
 
-#: common/tasks.py:104
+#: common/tasks.py:107
 msgid "Upload account backup to external storage"
 msgstr "Tải lên video cuộc họp vào lưu trữ bên ngoài"
 
-#: common/tasks.py:106
+#: common/tasks.py:109
 msgid ""
 "When performing an account backup, this task needs to be executed to "
 "external storage (SFTP)"
@@ -5694,24 +5706,24 @@ msgstr "Không tìm thấy mã"
 msgid "The message code provided is invalid or has expired"
 msgstr "Mã tin nhắn cung cấp không hợp lệ hoặc đã hết hạn"
 
-#: jumpserver/conf.py:542
+#: jumpserver/conf.py:549
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "Mã xác nhận là: {code}"
 
-#: jumpserver/conf.py:547
+#: jumpserver/conf.py:554
 msgid "Create account successfully"
 msgstr "Tạo tài khoản thành công"
 
-#: jumpserver/conf.py:549
+#: jumpserver/conf.py:556
 msgid "Your account has been created successfully"
 msgstr "Tài khoản của bạn đã được tạo thành công"
 
-#: jumpserver/context_processor.py:16
+#: jumpserver/context_processor.py:17
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer"
 
-#: jumpserver/context_processor.py:34
+#: jumpserver/context_processor.py:36
 msgid "FIT2CLOUD"
 msgstr ""
 
@@ -5840,14 +5852,14 @@ msgstr "Nhiệm vụ {} không tồn tại"
 msgid "Task {} args or kwargs error"
 msgstr "Nhiệm vụ {} có tham số thực thi không hợp lệ"
 
-#: ops/api/job.py:65
+#: ops/api/job.py:66
 #, python-brace-format
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr ""
 "Đăng nhập vào tài sản {}({}) bị từ chối, do bị giới hạn bởi quy tắc ACL tài "
 "sản đăng nhập ({})."
 
-#: ops/api/job.py:88
+#: ops/api/job.py:89
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
@@ -5855,57 +5867,57 @@ msgid ""
 msgstr ""
 "Tài sản ({asset}) ít nhất phải thêm một trong các giao thức ssh, sftp, winrm"
 
-#: ops/api/job.py:89
+#: ops/api/job.py:90
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "Ủy quyền tài sản ({asset}) thiếu giao thức ssh, sftp hoặc winrm"
 
-#: ops/api/job.py:90
+#: ops/api/job.py:91
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "Ủy quyền tài sản ({asset}) thiếu quyền tải lên"
 
-#: ops/api/job.py:185
+#: ops/api/job.py:188
 msgid "Duplicate file exists"
 msgstr "Có tệp cùng tên tồn tại"
 
-#: ops/api/job.py:190
+#: ops/api/job.py:193
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
 "Kích thước tệp vượt quá giới hạn tối đa. Vui lòng chọn tệp nhỏ hơn {limit}MB."
 
-#: ops/api/job.py:273
+#: ops/api/job.py:276
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "Đang tạo nhiệm vụ, không thể ngắt quãng, xin vui lòng thử lại sau."
 
-#: ops/api/playbook.py:49
+#: ops/api/playbook.py:47
 msgid "Currently playbook is being used in a job"
 msgstr "Playbook hiện tại đang được sử dụng trong tác vụ."
 
-#: ops/api/playbook.py:123
+#: ops/api/playbook.py:121
 msgid "Unsupported file content"
 msgstr "Nội dung tệp không được hỗ trợ."
 
-#: ops/api/playbook.py:125 ops/api/playbook.py:171 ops/api/playbook.py:219
+#: ops/api/playbook.py:123 ops/api/playbook.py:169 ops/api/playbook.py:217
 msgid "Invalid file path"
 msgstr "Đường dẫn tệp không hợp lệ."
 
-#: ops/api/playbook.py:197
+#: ops/api/playbook.py:195
 msgid "This file can not be rename"
 msgstr "Tệp này không thể được đổi tên."
 
-#: ops/api/playbook.py:216
+#: ops/api/playbook.py:214
 msgid "File already exists"
 msgstr "Tệp đã tồn tại."
 
-#: ops/api/playbook.py:234
+#: ops/api/playbook.py:232
 msgid "File key is required"
 msgstr "Trường khóa tệp là bắt buộc."
 
-#: ops/api/playbook.py:237
+#: ops/api/playbook.py:235
 msgid "This file can not be delete"
 msgstr "Không thể xóa tệp này."
 
@@ -6162,7 +6174,7 @@ msgid "Run as policy"
 msgstr "Chiến lược người dùng"
 
 #: ops/models/job.py:221 ops/models/variable.py:28 ops/serializers/job.py:111
-#: terminal/notifications.py:188
+#: terminal/notifications.py:196
 msgid "Job"
 msgstr "Công việc"
 
@@ -6421,12 +6433,12 @@ msgstr "ID công việc"
 msgid "Name of the job"
 msgstr "Tên công việc"
 
-#: orgs/api.py:60
+#: orgs/api.py:62
 #, python-brace-format
 msgid "The current organization ({}) cannot be deleted"
 msgstr "Tổ chức hiện tại ({}) không thể bị xóa"
 
-#: orgs/api.py:65
+#: orgs/api.py:67
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
@@ -6434,7 +6446,7 @@ msgstr ""
 "Cài đặt đồng bộ LDAP tổ chức là tổ chức hiện tại, vui lòng chuyển sang tổ "
 "chức khác trước khi thực hiện thao tác xóa"
 
-#: orgs/api.py:75
+#: orgs/api.py:77
 #, python-brace-format
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "Tổ chức có tài nguyên ({}) không thể bị xóa"
@@ -6450,7 +6462,7 @@ msgstr "Vui lòng chọn một tổ chức trước khi lưu"
 #: orgs/mixins/models.py:58 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
 #: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:53
-#: terminal/notifications.py:294
+#: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
 #: tickets/models/ticket/general.py:303 tickets/serializers/ticket/ticket.py:62
@@ -6469,7 +6481,7 @@ msgstr "Tổ chức mặc định"
 msgid "SYSTEM"
 msgstr "Tổ chức hệ thống"
 
-#: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:190
+#: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:189
 #: terminal/models/applet/applet.py:42
 msgid "Builtin"
 msgstr "Builtin"
@@ -6690,7 +6702,7 @@ msgstr "Vai trò đã liên kết với người dùng, không thể xóa"
 msgid "Internal role, can't be update"
 msgstr "Nội bộ vai trò, không thể cập nhật"
 
-#: rbac/api/rolebinding.py:45
+#: rbac/api/rolebinding.py:47
 #, python-brace-format
 msgid "{} at least one system role"
 msgstr "{} ít nhất một vai trò hệ thống"
@@ -6760,23 +6772,95 @@ msgid "Can view user login report"
 msgstr "có thể xem báo cáo đăng nhập người dùng"
 
 #: rbac/models/menu.py:23
+#, fuzzy
+#| msgid "Can view user login report"
+msgid "Can create user login report"
+msgstr "có thể xem báo cáo đăng nhập người dùng"
+
+#: rbac/models/menu.py:24
+#, fuzzy
+#| msgid "Can view user login report"
+msgid "Can delete user login report"
+msgstr "có thể xem báo cáo đăng nhập người dùng"
+
+#: rbac/models/menu.py:25
 msgid "Can view user change password report"
 msgstr "có thể xem báo cáo thay đổi mật khẩu người dùng"
 
-#: rbac/models/menu.py:24
+#: rbac/models/menu.py:26
+#, fuzzy
+#| msgid "Can view user change password report"
+msgid "Can create user change password report"
+msgstr "có thể xem báo cáo thay đổi mật khẩu người dùng"
+
+#: rbac/models/menu.py:27
+#, fuzzy
+#| msgid "Can view user change password report"
+msgid "Can delete user change password report"
+msgstr "có thể xem báo cáo thay đổi mật khẩu người dùng"
+
+#: rbac/models/menu.py:28
 msgid "Can view asset statistics report"
 msgstr "có thể xem báo cáo thống kê tài sản"
 
-#: rbac/models/menu.py:25
+#: rbac/models/menu.py:29
+#, fuzzy
+#| msgid "Can view asset statistics report"
+msgid "Can create asset statistics report"
+msgstr "có thể xem báo cáo thống kê tài sản"
+
+#: rbac/models/menu.py:30
+#, fuzzy
+#| msgid "Can view asset statistics report"
+msgid "Can delete asset statistics report"
+msgstr "có thể xem báo cáo thống kê tài sản"
+
+#: rbac/models/menu.py:31
 msgid "Can view asset activity report"
 msgstr "có thể xem báo cáo hoạt động tài sản"
 
-#: rbac/models/menu.py:26
+#: rbac/models/menu.py:32
+#, fuzzy
+#| msgid "Can view asset activity report"
+msgid "Can create asset activity report"
+msgstr "có thể xem báo cáo hoạt động tài sản"
+
+#: rbac/models/menu.py:33
+#, fuzzy
+#| msgid "Can view asset activity report"
+msgid "Can delete asset activity report"
+msgstr "có thể xem báo cáo hoạt động tài sản"
+
+#: rbac/models/menu.py:34
 msgid "Can view account statistics report"
 msgstr "có thể xem báo cáo thống kê tài khoản."
 
-#: rbac/models/menu.py:27
+#: rbac/models/menu.py:35
+#, fuzzy
+#| msgid "Can view account statistics report"
+msgid "Can create account statistics report"
+msgstr "có thể xem báo cáo thống kê tài khoản."
+
+#: rbac/models/menu.py:36
+#, fuzzy
+#| msgid "Can view account statistics report"
+msgid "Can delete account statistics report"
+msgstr "có thể xem báo cáo thống kê tài khoản."
+
+#: rbac/models/menu.py:37
 msgid "Can view account automation report"
+msgstr "Có thể xem báo cáo tự động hóa tài khoản"
+
+#: rbac/models/menu.py:38
+#, fuzzy
+#| msgid "Can view account automation report"
+msgid "Can create account automation report"
+msgstr "Có thể xem báo cáo tự động hóa tài khoản"
+
+#: rbac/models/menu.py:39
+#, fuzzy
+#| msgid "Can view account automation report"
+msgid "Can delete account automation report"
 msgstr "Có thể xem báo cáo tự động hóa tài khoản"
 
 #: rbac/models/permission.py:18
@@ -6843,7 +6927,7 @@ msgstr "Workbench"
 msgid "Audit view"
 msgstr "Audits"
 
-#: rbac/tree.py:28 settings/models.py:166
+#: rbac/tree.py:28 settings/models.py:165
 msgid "System setting"
 msgstr "Cài đặt hệ thống"
 
@@ -6859,7 +6943,7 @@ msgstr "Đồng bộ đám mây"
 msgid "Gather account"
 msgstr "Tài khoản phát hiện"
 
-#: rbac/tree.py:56 reports/api/accouts/automation.py:73
+#: rbac/tree.py:56 reports/mixins.py:456
 msgid "Account change secret"
 msgstr "Tài khoản đổi mật khẩu"
 
@@ -6890,7 +6974,7 @@ msgid "Appearance"
 msgstr "Giao diện"
 
 #: rbac/tree.py:68 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:153
+#: xpack/plugins/license/models.py:161
 msgid "License"
 msgstr "Giấy phép"
 
@@ -6898,42 +6982,60 @@ msgstr "Giấy phép"
 msgid "Job audit"
 msgstr "Kiểm tra công việc"
 
-#: rbac/tree.py:71
+#: rbac/tree.py:71 reports/models.py:40
 msgid "Report"
 msgstr "Báo cáo"
 
-#: rbac/tree.py:183
+#: rbac/tree.py:195
 msgid "App organizations"
 msgstr "Organizations"
 
-#: rbac/tree.py:184
+#: rbac/tree.py:196
 msgid "Ticket comment"
 msgstr "Nhận xét nhiệm vụ"
 
-#: rbac/tree.py:185 settings/serializers/feature.py:182
+#: rbac/tree.py:197 settings/serializers/feature.py:182
 #: settings/serializers/feature.py:184 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "Nhiệm vụ"
 
-#: rbac/tree.py:186
+#: rbac/tree.py:198
 msgid "Common setting"
 msgstr "Cài đặt chung"
 
-#: rbac/tree.py:187
+#: rbac/tree.py:199
 msgid "View permission tree"
 msgstr "Xem cây ủy quyền"
 
-#: rbac/tree.py:189
+#: rbac/tree.py:201
 msgid "Access token"
 msgstr "Mã thông báo truy cập"
 
-#: rbac/tree.py:190
+#: rbac/tree.py:202
 msgid "View access token"
 msgstr "Xem mã thông báo truy cập"
 
-#: rbac/tree.py:191
+#: rbac/tree.py:203
 msgid "Revoke access token"
 msgstr "Thu hồi mã thông báo truy cập"
+
+#: reports/models.py:34
+#, fuzzy
+#| msgid "Change by"
+msgid "Range days"
+msgstr "Người chỉnh sửa"
+
+#: reports/models.py:35
+#, fuzzy
+#| msgid "Filter"
+msgid "Filters"
+msgstr "Bộ lọc"
+
+#: reports/models.py:145
+#, fuzzy
+#| msgid "Periodic run"
+msgid "Periodic report"
+msgstr "Periodic"
 
 #: reports/views.py:20
 msgid "User login report"
@@ -6975,11 +7077,11 @@ msgstr "Bảng điều khiển PAM"
 msgid "ChangeSecretDashboard"
 msgstr "Bảng điều khiển thay đổi mật khẩu tài khoản"
 
-#: reports/views.py:181
+#: reports/views.py:191
 msgid "Failed to send email: "
 msgstr "Gửi thư không thành công"
 
-#: reports/views.py:182
+#: reports/views.py:192
 msgid "Email sent successfully to "
 msgstr "Gửi thư thành công"
 
@@ -7031,75 +7133,75 @@ msgstr "Mô hình GPT tùy chỉnh"
 msgid "Custom DeepSeek model"
 msgstr "Mô hình DeepSeek tùy chỉnh"
 
-#: settings/models.py:42 users/models/preference.py:14
+#: settings/models.py:41 users/models/preference.py:14
 msgid "Encrypted"
 msgstr "Đã mã hóa"
 
-#: settings/models.py:168
+#: settings/models.py:167
 msgid "Can change email setting"
 msgstr "Cài đặt email"
 
-#: settings/models.py:169
+#: settings/models.py:168
 msgid "Can change auth setting"
 msgstr "Cài đặt xác thực"
 
-#: settings/models.py:170
+#: settings/models.py:169
 msgid "Can change auth ops"
 msgstr "Trung tâm nhiệm vụ cài đặt"
 
-#: settings/models.py:171
+#: settings/models.py:170
 msgid "Can change auth ticket"
 msgstr "Cài đặt công việc"
 
-#: settings/models.py:172
+#: settings/models.py:171
 msgid "Can change virtual app setting"
 msgstr "Có thể thay đổi cài đặt ứng dụng ảo"
 
-#: settings/models.py:173
+#: settings/models.py:172
 msgid "Can change auth announcement"
 msgstr "Cài đặt thông báo"
 
-#: settings/models.py:174
+#: settings/models.py:173
 msgid "Can change vault setting"
 msgstr "Có thể thay đổi cài đặt vault"
 
-#: settings/models.py:175
+#: settings/models.py:174
 msgid "Can change chat ai setting"
 msgstr "Có thể chỉnh sửa cài đặt AI trò chuyện"
 
-#: settings/models.py:176
+#: settings/models.py:175
 msgid "Can change system msg sub setting"
 msgstr "Cài đặt đăng ký tin nhắn"
 
-#: settings/models.py:177
+#: settings/models.py:176
 msgid "Can change sms setting"
 msgstr "Cài đặt SMS"
 
-#: settings/models.py:178
+#: settings/models.py:177
 msgid "Can change security setting"
 msgstr "Cài đặt an toàn"
 
-#: settings/models.py:179
+#: settings/models.py:178
 msgid "Can change clean setting"
 msgstr "Dọn dẹp định kỳ"
 
-#: settings/models.py:180
+#: settings/models.py:179
 msgid "Can change interface setting"
 msgstr "Cài đặt giao diện"
 
-#: settings/models.py:181
+#: settings/models.py:180
 msgid "Can change license setting"
 msgstr "Cài đặt giấy phép"
 
-#: settings/models.py:182
+#: settings/models.py:181
 msgid "Can change terminal setting"
 msgstr "Cài đặt thiết bị đầu cuối"
 
-#: settings/models.py:183
+#: settings/models.py:182
 msgid "Can change other setting"
 msgstr "Cài đặt khác"
 
-#: settings/models.py:193
+#: settings/models.py:192
 msgid "Chat prompt"
 msgstr "Gợi ý trò chuyện"
 
@@ -7679,7 +7781,7 @@ msgstr "Chữ ký"
 msgid "Template code"
 msgstr "Mẫu tin nhắn"
 
-#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:85
+#: settings/serializers/auth/sms.py:40 users/models/user/__init__.py:89
 #: users/serializers/user.py:159
 msgid "Phone"
 msgstr "Số điện thoại di động"
@@ -7728,7 +7830,7 @@ msgstr "Mẫu tin nhắn cần phải chứa {code}"
 msgid "Signature + Template must not exceed 65 words"
 msgstr "Mẫu + chữ ký không được vượt quá 65 ký tự"
 
-#: settings/serializers/auth/sms.py:106 terminal/notifications.py:292
+#: settings/serializers/auth/sms.py:106 terminal/notifications.py:307
 msgid "URL"
 msgstr "URL"
 
@@ -7864,6 +7966,12 @@ msgstr ""
 
 #: settings/serializers/cleaning.py:53
 msgid "Change secret and push record retention days"
+msgstr "Ngày lưu giữ nhật ký thông báo thay đổi mật khẩu tài khoản."
+
+#: settings/serializers/cleaning.py:57
+#, fuzzy
+#| msgid "Change secret and push record retention days"
+msgid "Audit report send record retention days"
 msgstr "Ngày lưu giữ nhật ký thông báo thay đổi mật khẩu tài khoản."
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
@@ -8141,10 +8249,33 @@ msgstr ""
 "nhìn thấy nút của tài sản nhưng chưa được ủy quyền"
 
 #: settings/serializers/security.py:19
-msgid "User password expiration (day)"
+#, fuzzy
+#| msgid "User password expiration (day)"
+msgid "Admin password expiration (day)"
 msgstr "Thời gian hết hạn mật khẩu người dùng (ngày)"
 
 #: settings/serializers/security.py:21
+#, fuzzy
+#| msgid ""
+#| "If the user does not update the password during the time, the user "
+#| "password will expire failure;The password expiration reminder mail will "
+#| "be automatic sent to the user by system within 5 days (daily) before the "
+#| "password expires"
+msgid ""
+"If the admin does not update the password during the time, the admin "
+"password will expire failure;The password expiration reminder mail will be "
+"automatic sent to the admin by system within 5 days (daily) before the "
+"password expires"
+msgstr ""
+"Nếu người dùng không cập nhật mật khẩu trong thời gian này, mật khẩu sẽ hết "
+"hạn; email nhắc nhở hết hạn mật khẩu sẽ tự động gửi cho người dùng (mỗi "
+"ngày) trong vòng 5 ngày trước khi mật khẩu hết hạn"
+
+#: settings/serializers/security.py:28
+msgid "User password expiration (day)"
+msgstr "Thời gian hết hạn mật khẩu người dùng (ngày)"
+
+#: settings/serializers/security.py:30
 msgid ""
 "If the user does not update the password during the time, the user password "
 "will expire failure;The password expiration reminder mail will be automatic "
@@ -8154,22 +8285,22 @@ msgstr ""
 "hạn; email nhắc nhở hết hạn mật khẩu sẽ tự động gửi cho người dùng (mỗi "
 "ngày) trong vòng 5 ngày trước khi mật khẩu hết hạn"
 
-#: settings/serializers/security.py:28
+#: settings/serializers/security.py:37
 msgid "User expired tokens record keep days"
 msgstr "Số ngày giữ lại Token hết hạn của người dùng"
 
-#: settings/serializers/security.py:29
+#: settings/serializers/security.py:38
 msgid ""
 "Retention period (in days) for expired user tokens before automatic cleanup."
 msgstr ""
 "Số ngày trước khi hệ thống xóa vĩnh viễn bản ghi token hết hạn của người "
 "dùng trong nhiệm vụ dọn dẹp hàng ngày"
 
-#: settings/serializers/security.py:33
+#: settings/serializers/security.py:42
 msgid "Recent password count"
 msgstr "Không thể đặt lại những mật khẩu gần đây"
 
-#: settings/serializers/security.py:35
+#: settings/serializers/security.py:44
 msgid ""
 "Tip: When the user resets the password, it cannot be the previous n "
 "historical passwords of the user"
@@ -8177,23 +8308,23 @@ msgstr ""
 "Gợi ý: Khi người dùng đặt lại mật khẩu, không thể sử dụng những mật khẩu "
 "trước đây mà người dùng đã từng sử dụng."
 
-#: settings/serializers/security.py:41
+#: settings/serializers/security.py:50
 msgid "Minimum length (User)"
 msgstr "Mật khẩu tối thiểu"
 
-#: settings/serializers/security.py:45
+#: settings/serializers/security.py:54
 msgid "Minimum length (Admin)"
 msgstr "Mật khẩu quản trị viên tối thiểu"
 
-#: settings/serializers/security.py:54
+#: settings/serializers/security.py:63
 msgid "Digits"
 msgstr "Phải chứa số"
 
-#: settings/serializers/security.py:57
+#: settings/serializers/security.py:66
 msgid "Special characters"
 msgstr "Phải chứa ký tự đặc biệt"
 
-#: settings/serializers/security.py:62
+#: settings/serializers/security.py:71
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
@@ -8201,27 +8332,27 @@ msgstr ""
 "Khi số lần đăng nhập của người dùng không thành công đạt giới hạn, thì sẽ bị "
 "cấm đăng nhập trong khoảng thời gian này"
 
-#: settings/serializers/security.py:70 settings/serializers/security.py:80
+#: settings/serializers/security.py:79 settings/serializers/security.py:89
 msgid "Login failures count"
 msgstr "Giới hạn số lần đăng nhập không thành công của người dùng"
 
-#: settings/serializers/security.py:74 settings/serializers/security.py:84
+#: settings/serializers/security.py:83 settings/serializers/security.py:93
 msgid "Login failure period (minute)"
 msgstr "Cấm khoảng thời gian đăng nhập của người dùng (phút)"
 
-#: settings/serializers/security.py:88
+#: settings/serializers/security.py:97
 msgid "Login IP whitelist"
 msgstr "Danh sách trắng IP để đăng nhập"
 
-#: settings/serializers/security.py:93
+#: settings/serializers/security.py:102
 msgid "Login IP blacklist"
 msgstr "Danh sách đen IP để đăng nhập"
 
-#: settings/serializers/security.py:98
+#: settings/serializers/security.py:107
 msgid "Only single device login"
 msgstr "Chỉ cho phép một thiết bị đăng nhập"
 
-#: settings/serializers/security.py:99
+#: settings/serializers/security.py:108
 msgid ""
 "After the user logs in on the new device, other logged-in devices will "
 "automatically log out"
@@ -8229,11 +8360,11 @@ msgstr ""
 "Khi người dùng đăng nhập trên thiết bị mới, các thiết bị đã đăng nhập khác "
 "sẽ tự động thoát"
 
-#: settings/serializers/security.py:102
+#: settings/serializers/security.py:111
 msgid "Only exist user login"
 msgstr "Chỉ cho phép người dùng đã tồn tại đăng nhập"
 
-#: settings/serializers/security.py:104
+#: settings/serializers/security.py:113
 msgid ""
 "If enabled, non-existent users will not be allowed to log in; if disabled, "
 "users of other authentication methods except local authentication methods "
@@ -8244,11 +8375,11 @@ msgstr ""
 "ngoài phương thức xác thực cục bộ, các phương thức xác thực khác vẫn cho "
 "phép đăng nhập và tự động tạo người dùng (nếu người dùng không tồn tại)"
 
-#: settings/serializers/security.py:110
+#: settings/serializers/security.py:119
 msgid "Only from source login"
 msgstr "Chỉ cho phép đăng nhập từ nguồn người dùng"
 
-#: settings/serializers/security.py:112
+#: settings/serializers/security.py:121
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging "
 "in; if it is disabled, the user will authenticate all the enabled "
@@ -8260,48 +8391,48 @@ msgstr ""
 "với tất cả các phương thức xác thực đã bật, chỉ cần một phương thức xác thực "
 "thành công là có thể đăng nhập ngay."
 
-#: settings/serializers/security.py:123
+#: settings/serializers/security.py:132
 #: users/templates/users/mfa_setting.html:160
 msgid "Not enabled"
 msgstr "Chưa kích hoạt"
 
-#: settings/serializers/security.py:124
+#: settings/serializers/security.py:133
 msgid "All users"
 msgstr "Tất cả người dùng"
 
-#: settings/serializers/security.py:125
+#: settings/serializers/security.py:134
 msgid "Only admin users"
 msgstr "Chỉ quản trị viên"
 
-#: settings/serializers/security.py:127
+#: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "Bật xác thực MFA toàn cầu"
 
-#: settings/serializers/security.py:131
+#: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "Bật xác thực MFA của bên thứ ba"
 
-#: settings/serializers/security.py:135
+#: settings/serializers/security.py:144
 msgid "MFA via Email"
 msgstr "Xác thực qua email MFA"
 
-#: settings/serializers/security.py:136
+#: settings/serializers/security.py:145
 msgid "Email as a method for multi-factor authentication"
 msgstr "Sử dụng email như một phương thức xác thực nhiều yếu tố"
 
-#: settings/serializers/security.py:139
+#: settings/serializers/security.py:148
 msgid "OTP issuer name"
 msgstr "Tên sau khi quét OTP"
 
-#: settings/serializers/security.py:143
+#: settings/serializers/security.py:152
 msgid "OTP valid window"
 msgstr "Thời gian hiệu lực của OTP"
 
-#: settings/serializers/security.py:147
+#: settings/serializers/security.py:156
 msgid "MFA verify TTL"
 msgstr "Thời gian kiểm tra MFA"
 
-#: settings/serializers/security.py:149
+#: settings/serializers/security.py:158
 msgid ""
 "Unit: second, The verification MFA takes effect only when you view the "
 "account password"
@@ -8309,31 +8440,31 @@ msgstr ""
 "Đơn vị: giây, hiện tại chỉ có hiệu lực khi xem xác thực tài khoản và mật "
 "khẩu với MFA"
 
-#: settings/serializers/security.py:154
+#: settings/serializers/security.py:163
 msgid "MFA in login page"
 msgstr "MFA nhập tại trang đăng nhập"
 
-#: settings/serializers/security.py:155
+#: settings/serializers/security.py:164
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr ""
 "Quy định bảo mật dữ liệu EU (GDPR) yêu cầu MFA trên trang đăng nhập để đảm "
 "bảo an toàn khi đăng nhập vào hệ thống"
 
-#: settings/serializers/security.py:159
+#: settings/serializers/security.py:168
 msgid "Verify code TTL (second)"
 msgstr "Thời gian hiệu lực của mã xác thực (phút)"
 
-#: settings/serializers/security.py:160
+#: settings/serializers/security.py:169
 msgid "Reset password and send SMS code expiration time"
 msgstr ""
 "Thời gian hết hạn của mã xác thực khi đặt lại mật khẩu và mã xác thực khi "
 "gửi SMS."
 
-#: settings/serializers/security.py:164
+#: settings/serializers/security.py:173
 msgid "Login dynamic code"
 msgstr "Kích hoạt mã xác thực đăng nhập"
 
-#: settings/serializers/security.py:165
+#: settings/serializers/security.py:174
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -8342,19 +8473,19 @@ msgstr ""
 "tra, ví dụ: một số hệ thống xác thực bên thứ ba yêu cầu Mật khẩu + 6 chữ số "
 "để hoàn thành xác thực"
 
-#: settings/serializers/security.py:169
+#: settings/serializers/security.py:178
 msgid "Login CAPTCHA"
 msgstr "Kích hoạt mã xác thực đăng nhập"
 
-#: settings/serializers/security.py:170
+#: settings/serializers/security.py:179
 msgid "Enable CAPTCHA to prevent robot authentication"
 msgstr "Bật mã xác thực để ngăn chặn đăng nhập của robot"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:182
 msgid "Suspicious Login Verification"
 msgstr "Thông báo đăng nhập từ xa"
 
-#: settings/serializers/security.py:175
+#: settings/serializers/security.py:184
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
@@ -8364,11 +8495,11 @@ msgstr ""
 "nếu tài khoản đăng nhập tại thành phố không thường dùng sẽ gửi thông báo "
 "đăng nhập từ xa"
 
-#: settings/serializers/security.py:181
+#: settings/serializers/security.py:190
 msgid "Auto Disable Threshold (day)"
 msgstr "Tự động vô hiệu hóa người dùng không hoạt động (ngày)"
 
-#: settings/serializers/security.py:182
+#: settings/serializers/security.py:191
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
@@ -8376,61 +8507,61 @@ msgstr ""
 "Kiểm tra mỗi ngày, những người dùng vượt quá thời gian quy định sẽ tự động "
 "bị vô hiệu hóa"
 
-#: settings/serializers/security.py:202
+#: settings/serializers/security.py:211
 msgid "Watermark"
 msgstr "Bật hình mờ"
 
-#: settings/serializers/security.py:205
+#: settings/serializers/security.py:214
 msgid "Session content"
 msgstr "Nội dung tùy chỉnh cho watermark phiên họp"
 
-#: settings/serializers/security.py:208
+#: settings/serializers/security.py:217
 msgid "Console content"
 msgstr "Nội dung tùy chỉnh cho watermark trang quản lý"
 
-#: settings/serializers/security.py:211
+#: settings/serializers/security.py:220
 msgid "Font color"
 msgstr "Màu sắc phông chữ"
 
-#: settings/serializers/security.py:214
+#: settings/serializers/security.py:223
 msgid "Font size"
 msgstr "Kích thước phông chữ (px)"
 
-#: settings/serializers/security.py:217
+#: settings/serializers/security.py:226
 msgid "Height"
 msgstr "Chiều cao (px)"
 
-#: settings/serializers/security.py:220
+#: settings/serializers/security.py:229
 msgid "Width"
 msgstr "Chiều rộng (px)"
 
-#: settings/serializers/security.py:223
+#: settings/serializers/security.py:232
 msgid "Rotate"
 msgstr "Góc xoay (độ)"
 
-#: settings/serializers/security.py:227
+#: settings/serializers/security.py:236
 msgid "Max idle time (minute)"
 msgstr "Thời gian tối đa kết nối nhàn rỗi (phút)"
 
-#: settings/serializers/security.py:228
+#: settings/serializers/security.py:237
 msgid "If idle time more than it, disconnect connection."
 msgstr ""
 "Ghi chú: Nếu vượt quá cấu hình này mà không có hành động nào, kết nối sẽ bị "
 "ngắt"
 
-#: settings/serializers/security.py:231
+#: settings/serializers/security.py:240
 msgid "Session expire at browser closed"
 msgstr "Phiên sẽ hết hạn khi trình duyệt đóng"
 
-#: settings/serializers/security.py:232
+#: settings/serializers/security.py:241
 msgid "Whether to expire the session when the user closes their browser."
 msgstr "Có làm phiên hết hạn khi người dùng đóng trình duyệt không."
 
-#: settings/serializers/security.py:237
+#: settings/serializers/security.py:246
 msgid "Allow users to view asset session information"
 msgstr "Cho phép người dùng xem thông tin phiên trực tuyến của tài sản"
 
-#: settings/serializers/security.py:239
+#: settings/serializers/security.py:248
 msgid ""
 "When a user connects to an asset, the account selection popup displays the "
 "number of active sessions for the current asset (RDP protocol only)."
@@ -8438,40 +8569,40 @@ msgstr ""
 "Khi người dùng kết nối tài sản, số lượng phiên trực tuyến hiện tại của tài "
 "sản sẽ xuất hiện trong hộp chọn tài khoản (chỉ với giao thức RDP)"
 
-#: settings/serializers/security.py:245
+#: settings/serializers/security.py:254
 msgid "Max online time (hour)"
 msgstr "Thời gian tối đa kết nối phiên (giờ)"
 
-#: settings/serializers/security.py:246
+#: settings/serializers/security.py:255
 msgid "If session connection time more than it, disconnect connection."
 msgstr ""
 "Ghi chú: Nếu thời gian kết nối phiên vượt quá cấu hình này, kết nối sẽ bị "
 "ngắt"
 
-#: settings/serializers/security.py:249
+#: settings/serializers/security.py:258
 msgid "Remember manual auth"
 msgstr "Lưu mật khẩu nhập tay"
 
-#: settings/serializers/security.py:252
+#: settings/serializers/security.py:261
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "Session share"
 msgstr "Chia sẻ phiên"
 
-#: settings/serializers/security.py:253
+#: settings/serializers/security.py:262
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr ""
 "Bật tính năng này cho phép người dùng chia sẻ phiên tài sản đã kết nối với "
 "người khác, làm việc cùng nhau"
 
-#: settings/serializers/security.py:259
+#: settings/serializers/security.py:268
 msgid "Insecure command alert"
 msgstr "Cảnh báo lệnh nguy hiểm"
 
-#: settings/serializers/security.py:262
+#: settings/serializers/security.py:271
 msgid "Email recipient"
 msgstr "Người nhận email"
 
-#: settings/serializers/security.py:263
+#: settings/serializers/security.py:272
 msgid "Multiple user using , split"
 msgstr "Nhiều người dùng, sử dụng dấu phẩy để phân tách"
 
@@ -8951,19 +9082,17 @@ msgstr ""
 msgid "Offline video player"
 msgstr "Trình phát video ngoại tuyến"
 
-#: terminal/api/applet/applet.py:52 terminal/api/applet/applet.py:55
-#: terminal/api/virtualapp/virtualapp.py:43
-#: terminal/api/virtualapp/virtualapp.py:46
+#: terminal/api/applet/applet.py:52 terminal/api/virtualapp/virtualapp.py:43
 msgid "Invalid zip file"
 msgstr "Tệp zip không hợp lệ"
 
-#: terminal/api/applet/applet.py:74
+#: terminal/api/applet/applet.py:71
 msgid "This is enterprise edition applet"
 msgstr ""
 "Phiên bản doanh nghiệp của ứng dụng từ xa không thể sử dụng trong phiên bản "
 "cộng đồng"
 
-#: terminal/api/applet/applet.py:91
+#: terminal/api/applet/applet.py:88
 #, python-brace-format
 msgid "Applet not found in path: {}"
 msgstr "Không tìm thấy ứng dụng từ xa trong đường dẫn: {}"
@@ -9006,26 +9135,26 @@ msgstr "kiểm tra thất bại: vui lòng kiểm tra cấu hình"
 msgid "Have online sessions"
 msgstr "có phiên trực tuyến"
 
-#: terminal/api/session/session.py:50
+#: terminal/api/session/session.py:51
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "người dùng %s %s đã ghi lại phiên %s"
 
-#: terminal/api/session/session.py:159 terminal/api/session/session.py:293
+#: terminal/api/session/session.py:161 terminal/api/session/session.py:295
 #: terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "ghi lại phiên"
 
-#: terminal/api/session/session.py:335
+#: terminal/api/session/session.py:337
 #, python-brace-format
 msgid "Session does not exist: {}"
 msgstr "phiên không tồn tại: {}"
 
-#: terminal/api/session/session.py:338
+#: terminal/api/session/session.py:340
 msgid "Session is finished or the protocol not supported"
 msgstr "phiên đã hoàn thành hoặc giao thức không được hỗ trợ"
 
-#: terminal/api/session/session.py:351 tickets/api/ticket.py:140
+#: terminal/api/session/session.py:353 tickets/api/ticket.py:140
 msgid "User does not have permission"
 msgstr "người dùng không có quyền"
 
@@ -9428,7 +9557,7 @@ msgid "Origin"
 msgstr "Nguồn"
 
 #: terminal/models/session/sharing.py:42 terminal/models/session/sharing.py:98
-#: terminal/notifications.py:285 terminal/notifications.py:286
+#: terminal/notifications.py:300 terminal/notifications.py:301
 msgid "Session sharing"
 msgstr "Chia sẻ cuộc trò chuyện"
 
@@ -9494,30 +9623,34 @@ msgstr "Phát hành ứng dụng ảo"
 msgid "Sessions"
 msgstr "Cuộc hội thoại"
 
-#: terminal/notifications.py:74
+#: terminal/notifications.py:75
 msgid "Command warning"
 msgstr "Cảnh báo lệnh"
 
-#: terminal/notifications.py:134 terminal/notifications.py:189
+#: terminal/notifications.py:135 terminal/notifications.py:197
 msgid "Command reject"
 msgstr "Từ chối lệnh"
 
-#: terminal/notifications.py:164 terminal/notifications.py:224
+#: terminal/notifications.py:169 terminal/notifications.py:236
 msgid "Level"
 msgstr "Cấp độ"
 
-#: terminal/notifications.py:248
+#: terminal/notifications.py:172 terminal/notifications.py:239
+msgid "Policy"
+msgstr ""
+
+#: terminal/notifications.py:263
 msgid "Command and replay storage"
 msgstr "Storage"
 
-#: terminal/notifications.py:264 terminal/tasks.py:212
+#: terminal/notifications.py:279 terminal/tasks.py:212
 #: xpack/plugins/cloud/api.py:182
 #: xpack/plugins/cloud/serializers/account.py:143
 #: xpack/plugins/cloud/serializers/account.py:146
 msgid "Test failure: Account invalid"
 msgstr "Kiểm tra thất bại: Tài khoản không hợp lệ"
 
-#: terminal/notifications.py:274
+#: terminal/notifications.py:289
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "Lưu trữ không hợp lệ"
@@ -10306,11 +10439,17 @@ msgstr "Bước phê duyệt"
 msgid "Relation snapshot"
 msgstr "Ảnh chụp phiếu công việc"
 
-#: tickets/models/ticket/general.py:419
+#: tickets/models/ticket/general.py:406
+msgid ""
+"Today's ticket creation limit (9999) has been reached. Please try again "
+"tomorrow."
+msgstr ""
+
+#: tickets/models/ticket/general.py:427
 msgid "Please try again"
 msgstr "Vui lòng thử lại"
 
-#: tickets/models/ticket/general.py:498
+#: tickets/models/ticket/general.py:506
 msgid "Super ticket"
 msgstr "Phiếu công việc đặc biệt"
 
@@ -10466,7 +10605,13 @@ msgstr "Không thể xóa người dùng quản lý. Vui lòng vô hiệu hóa h
 msgid "Can not invite self"
 msgstr "Không thể mời chính mình"
 
-#: users/api/user.py:217
+#: users/api/user.py:170
+#, python-brace-format
+msgid ""
+"This user {} is already a member of the organization. No need to invite again"
+msgstr ""
+
+#: users/api/user.py:225
 msgid "Could not reset self otp, use profile reset instead"
 msgstr ""
 "Không thể đặt lại xác thực đa yếu tố (MFA) trên trang này, vui lòng đến "
@@ -10641,60 +10786,66 @@ msgstr "Không được giống với khóa ban đầu"
 msgid "Preference"
 msgstr "Cài đặt người dùng"
 
-#: users/models/user/__init__.py:78 users/serializers/user.py:259
+#: users/models/user/__init__.py:70
+#, fuzzy
+#| msgid "Email account"
+msgid "Email lookup"
+msgstr "Tài khoản email"
+
+#: users/models/user/__init__.py:82 users/serializers/user.py:259
 msgid "Is service account"
 msgstr "Is service account"
 
-#: users/models/user/__init__.py:80
+#: users/models/user/__init__.py:84
 msgid "Avatar"
 msgstr "Ảnh đại diện"
 
-#: users/models/user/__init__.py:82
+#: users/models/user/__init__.py:86
 msgid "Wechat"
 msgstr "WeChat"
 
-#: users/models/user/__init__.py:91
+#: users/models/user/__init__.py:95
 msgid "OTP secret key"
 msgstr "OTP khóa"
 
-#: users/models/user/__init__.py:101 users/serializers/profile.py:86
+#: users/models/user/__init__.py:105 users/serializers/profile.py:86
 #: users/serializers/user.py:256
 msgid "Is first login"
 msgstr "First login"
 
-#: users/models/user/__init__.py:119
+#: users/models/user/__init__.py:123
 msgid "Date password last updated"
 msgstr "Password updated"
 
-#: users/models/user/__init__.py:122
+#: users/models/user/__init__.py:126
 msgid "Need update password"
 msgstr "Cần cập nhật mật khẩu"
 
-#: users/models/user/__init__.py:146
+#: users/models/user/__init__.py:150
 msgid "Face vector"
 msgstr "Vector khuôn mặt"
 
-#: users/models/user/__init__.py:149
+#: users/models/user/__init__.py:153
 msgid "Date api key used"
 msgstr "Ngày cuối cùng sử dụng API key"
 
-#: users/models/user/__init__.py:289
+#: users/models/user/__init__.py:293
 msgid "Can not delete admin user"
 msgstr "Không thể xóa người dùng quản lý"
 
-#: users/models/user/__init__.py:303
+#: users/models/user/__init__.py:307
 msgid "Can invite user"
 msgstr "Có thể mời người dùng"
 
-#: users/models/user/__init__.py:304
+#: users/models/user/__init__.py:308
 msgid "Can remove user"
 msgstr "Có thể gỡ bỏ người dùng"
 
-#: users/models/user/__init__.py:305
+#: users/models/user/__init__.py:309
 msgid "Can match user"
 msgstr "Có thể khớp người dùng"
 
-#: users/models/user/__init__.py:334
+#: users/models/user/__init__.py:338
 msgid "User password history"
 msgstr "Lịch sử mật khẩu người dùng"
 
@@ -10815,7 +10966,7 @@ msgid "Connect default open method"
 msgstr "Kết nối với cách mở mặc định"
 
 #: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:41
-#: xpack/plugins/interface/serializers/interface.py:26
+#: xpack/plugins/interface/serializers/interface.py:27
 msgid "Theme"
 msgstr "Chủ đề"
 
@@ -11002,11 +11153,11 @@ msgstr ""
 "* Để đảm bảo an toàn, chỉ hiển thị một phần người dùng. Bạn có thể tìm kiếm "
 "thêm"
 
-#: users/serializers/user.py:461
+#: users/serializers/user.py:462
 msgid "name not unique"
 msgstr "Tên bị trùng"
 
-#: users/signal_handlers.py:41
+#: users/signal_handlers.py:42
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
 "            and the current user is not in the user list. Please contact the "
@@ -11016,11 +11167,11 @@ msgstr ""
 "dùng hiện tại không có trong danh sách người dùng, xin vui lòng liên hệ với "
 "quản trị viên."
 
-#: users/signal_handlers.py:179
+#: users/signal_handlers.py:190
 msgid "Clean up expired user sessions"
 msgstr "Xóa các phiên người dùng đã hết hạn"
 
-#: users/signal_handlers.py:181
+#: users/signal_handlers.py:192
 msgid ""
 "After logging in via the web, a user session record is created. At 2 a.m. "
 "every day, \n"
@@ -12238,6 +12389,10 @@ msgstr ""
 "\n"
 "Giấy phép không hợp lệ"
 
+#: xpack/plugins/cloud/ws.py:84
+msgid "Task not started"
+msgstr "Nhiệm vụ vẫn chưa bắt đầu"
+
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "Khôi phục mặc định thành công!"
@@ -12271,24 +12426,21 @@ msgstr "Đăng xuất"
 msgid "Footer content"
 msgstr "Nội dung chân trang"
 
-#: xpack/plugins/interface/serializers/interface.py:37
+#: xpack/plugins/interface/serializers/interface.py:38
 msgid "Wide logo on top"
 msgstr "Logo rộng trên cùng"
 
-#: xpack/plugins/interface/serializers/interface.py:38
+#: xpack/plugins/interface/serializers/interface.py:39
 msgid "Small logo without text"
 msgstr "Logo vuông nhỏ"
 
-#: xpack/plugins/license/api.py:52
+#: xpack/plugins/license/api.py:57
 msgid "License import successfully"
 msgstr "Nhập giấy phép thành công"
 
-#: xpack/plugins/license/api.py:53
+#: xpack/plugins/license/api.py:58
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
 
 #~ msgid "Closed"
 #~ msgstr "Đóng"
-
-#~ msgid "Task not started"
-#~ msgstr "Nhiệm vụ vẫn chưa bắt đầu"

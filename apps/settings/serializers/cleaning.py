@@ -4,8 +4,7 @@ from rest_framework import serializers
 
 __all__ = ['CleaningSerializer']
 
-MIN_VALUE = 180 if settings.LIMIT_SUPER_PRIV else 1
-
+MIN_VALUE= settings.LOG_KEEP_MIN_DAYS
 
 class CleaningSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Period clean')

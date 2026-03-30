@@ -26,4 +26,3 @@ LOG_DIR = os.path.join(BASE_DIR, 'data', 'logs')
 APPS_DIR = os.path.join(BASE_DIR, 'apps')
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 CELERY_WORKER_COUNT = CONFIG.CELERY_WORKER_COUNT or 10
-GUNICORN_WSGI_ENABLED = CONFIG.GUNICORN_WSGI_ENABLED or False
