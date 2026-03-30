@@ -20,7 +20,7 @@ class UserFilter(BaseFilterSet):
     )
     is_expired = filters.BooleanFilter(method='filter_is_expired')
     is_valid = filters.BooleanFilter(method='filter_is_valid')
-    is_password_expired = filters.BooleanFilter(method='filter_long_time')
+    is_password_expired = filters.BooleanFilter(method='filter_is_password_expired')
     is_long_time_no_login = filters.BooleanFilter(method='filter_long_time')
     is_login_blocked = filters.BooleanFilter(method='filter_is_blocked')
     email = filters.CharFilter(method='filter_email')
@@ -46,18 +46,35 @@ class UserFilter(BaseFilterSet):
         else:
             queryset = queryset.exclude(username__in=usernames)
         return queryset
+    
+    def filter_is_password_expired(self, queryset, name, value):
+        now = timezone.now()
+        key = 'date_password_last_updated'
+        if value:
+            operator = 'lt'
+        else:            
+            operator = 'gt'
+
+        admins = User.get_super_and_org_admins()
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN
+        admins_date_expired = now - timezone.timedelta(days=int(interval))
+        admins_q = Q(**{f'{key}__{operator}': admins_date_expired})
+        admins_ids = admins.filter(admins_q).values_list('id', flat=True)
+
+        users = User.get_org_users(exclude_admins=True)
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        users_date_expired = now - timezone.timedelta(days=int(interval))
+        users_q = Q(**{f'{key}__{operator}': users_date_expired})
+        users_ids = users.filter(users_q).values_list('id', flat=True)
+
+        q = Q(id__in=admins_ids) | Q(id__in=users_ids) | Q(**{f'{key}__isnull': True})
+        return queryset.filter(q)
 
     def filter_long_time(self, queryset, name, value):
         now = timezone.now()
-        if name == 'is_password_expired':
-            interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
-        else:
-            interval = 30
+        interval = 30
         date_expired = now - timezone.timedelta(days=int(interval))
-
-        if name == 'is_password_expired':
-            key = 'date_password_last_updated'
-        elif name == 'is_long_time_no_login':
+        if name == 'is_long_time_no_login':
             key = 'last_login'
         else:
             raise ValueError('Invalid filter name')

@@ -391,12 +391,15 @@ class RoleMixin:
         return cls.filter_not_service_account(queryset)
 
     @classmethod
-    def get_org_users(cls, org=None):
+    def get_org_users(cls, org=None, exclude_admins=False):
         queryset = cls.objects.all()
         if org is None:
             org = current_org
         if not org.is_root():
             queryset = org.get_members()
+        if exclude_admins:
+            admins = cls.get_super_and_org_admins()
+            queryset = queryset.exclude(id__in=admins)
         queryset = cls.filter_not_service_account(queryset)
         return queryset
 
