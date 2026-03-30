@@ -15,7 +15,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from common.api import CommonApiMixin
+from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import GET, POST
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.throttling import FileTransferThrottle
@@ -46,6 +46,7 @@ from .serializers import (
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer
 )
+from .reporting import UserLoginLogReportExporter
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
@@ -156,9 +157,10 @@ class FTPLogViewSet(OrgModelViewSet):
             return Response({'msg': serializer.errors}, status=401)
 
 
-class UserLoginCommonMixin:
+class UserLoginCommonMixin(ReportExportMixin):
     model = UserLoginLog
     serializer_class = UserLoginLogSerializer
+    report_exporter_class = UserLoginLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
