@@ -49,14 +49,16 @@ from .serializers import (
 from .reporting import (
     UserLoginLogReportExporter, PasswordChangeLogReportExporter,
     OperateLogReportExporter, JobsAuditReportExporter,
+    JobLogAuditReportExporter,
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
 
 
-class JobLogAuditViewSet(OrgReadonlyModelViewSet):
+class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = JobLog
+    report_exporter_class = JobLogAuditReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))

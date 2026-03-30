@@ -383,3 +383,118 @@ class JobsAuditReportExporter(BaseListReportExporter):
                 self.build_counter_rows(runas_policy_counter),
             ),
         ]
+
+
+class JobLogAuditReportExporter(BaseListReportExporter):
+    report_title = _('Job Log Report')
+    report_basename = 'job_log_report'
+
+    def get_summary_sections(self):
+        logs = self.records
+        success_logs = [item for item in logs if item.is_success]
+        finished_logs = [item for item in logs if item.is_finished]
+        unfinished_logs = [item for item in logs if not item.is_finished]
+
+        finished_durations = [
+            item.time_cost for item in finished_logs
+            if getattr(item, 'time_cost', None) is not None
+        ]
+
+        overview = OrderedDict([
+            (_('Total records'), len(logs)),
+            (_('Successful jobs'), len(success_logs)),
+            (_('Finished jobs'), len(finished_logs)),
+            (_('Unfinished jobs'), len(unfinished_logs)),
+            (_('Success rate'), self.format_percent(len(success_logs), len(logs))),
+            (_('Unique creators'), len({
+                item.creator_id for item in logs if getattr(item, 'creator_id', None)
+            })),
+            (_('Unique task ids'), len({str(item.task_id) for item in logs if item.task_id})),
+            (_('Average duration'), '{:.2f}s'.format(
+                sum(finished_durations) / len(finished_durations)
+            ) if finished_durations else '0.00s'),
+        ])
+
+        trend_data = defaultdict(lambda: {'total': 0, 'success': 0, 'finished': 0, 'unfinished': 0})
+        status_counter = Counter()
+        job_type_counter = Counter()
+        creator_counter = Counter()
+        duration_bucket_counter = Counter({
+            '0-10s': 0,
+            '10-60s': 0,
+            '60-300s': 0,
+            '300s+': 0,
+            'Unfinished': 0,
+        })
+
+        for log in logs:
+            current_time = timezone.localtime(log.date_start or log.date_created)
+            report_date = current_time.strftime('%Y-%m-%d')
+            trend = trend_data[report_date]
+            trend['total'] += 1
+            if log.is_success:
+                trend['success'] += 1
+            if log.is_finished:
+                trend['finished'] += 1
+            else:
+                trend['unfinished'] += 1
+
+            status_counter[str(log.get_status_display())] += 1
+            job_type_counter[str(log.get_job_type_display())] += 1
+
+            creator = getattr(log, 'creator', None)
+            if creator:
+                creator_name = creator.name or creator.username
+                creator_counter[str(creator_name)] += 1
+
+            if not log.is_finished:
+                duration_bucket_counter['Unfinished'] += 1
+            elif log.time_cost < 10:
+                duration_bucket_counter['0-10s'] += 1
+            elif log.time_cost < 60:
+                duration_bucket_counter['10-60s'] += 1
+            elif log.time_cost < 300:
+                duration_bucket_counter['60-300s'] += 1
+            else:
+                duration_bucket_counter['300s+'] += 1
+
+        trend_rows = []
+        for date in sorted(trend_data.keys()):
+            item = trend_data[date]
+            trend_rows.append([
+                date,
+                item['total'],
+                item['success'],
+                item['finished'],
+                item['unfinished'],
+                self.format_percent(item['success'], item['total']),
+            ])
+
+        return [
+            self.build_key_value_section(_('Overview'), overview.items()),
+            self.build_table_section(
+                _('Daily Trend'),
+                [_('Date'), _('Total'), _('Successful jobs'), _('Finished jobs'), _('Unfinished jobs'), _('Success rate')],
+                trend_rows,
+            ),
+            self.build_table_section(
+                _('Status Distribution'),
+                [_('Status'), _('Count')],
+                self.build_counter_rows(status_counter),
+            ),
+            self.build_table_section(
+                _('Job Type Distribution'),
+                [_('Job type'), _('Count')],
+                self.build_counter_rows(job_type_counter),
+            ),
+            self.build_table_section(
+                _('Creator Top 10'),
+                [_('Creator'), _('Count')],
+                self.build_counter_rows(creator_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Duration Distribution'),
+                [_('Duration range'), _('Count')],
+                self.build_counter_rows(duration_bucket_counter),
+            ),
+        ]
