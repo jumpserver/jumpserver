@@ -46,7 +46,7 @@ from .serializers import (
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer
 )
-from .reporting import UserLoginLogReportExporter
+from .reporting import UserLoginLogReportExporter, PasswordChangeLogReportExporter
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
@@ -289,9 +289,10 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         return qs
 
 
-class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
+class PasswordChangeLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = PasswordChangeLog
     serializer_class = PasswordChangeLogSerializer
+    report_exporter_class = PasswordChangeLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))

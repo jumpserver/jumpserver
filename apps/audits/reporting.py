@@ -126,3 +126,84 @@ class UserLoginLogReportExporter(BaseListReportExporter):
                 self.build_counter_rows(failed_reason_counter, top_n=10),
             ),
         ]
+
+
+class PasswordChangeLogReportExporter(BaseListReportExporter):
+    report_title = _('Password Change Report')
+    report_basename = 'password_change_log_report'
+
+    def get_summary_sections(self):
+        logs = self.records
+        overview = OrderedDict([
+            (_('Total records'), len(logs)),
+            (_('Unique users'), len({item.user for item in logs if item.user})),
+            (_('Unique operators'), len({item.change_by for item in logs if item.change_by})),
+            (_('Unique IPs'), len({item.remote_addr for item in logs if item.remote_addr})),
+        ])
+
+        trend_data = defaultdict(int)
+        user_counter = Counter()
+        operator_counter = Counter()
+        ip_counter = Counter()
+        time_bucket_counter = Counter({
+            '00:00-05:59': 0,
+            '06:00-11:59': 0,
+            '12:00-17:59': 0,
+            '18:00-23:59': 0,
+        })
+
+        for log in logs:
+            current_time = timezone.localtime(log.datetime)
+            report_date = current_time.strftime('%Y-%m-%d')
+            trend_data[report_date] += 1
+
+            if log.user:
+                user_counter[str(log.user)] += 1
+            if log.change_by:
+                operator_counter[str(log.change_by)] += 1
+            if log.remote_addr:
+                ip_counter[str(log.remote_addr)] += 1
+
+            hour = current_time.hour
+            if hour < 6:
+                time_bucket_counter['00:00-05:59'] += 1
+            elif hour < 12:
+                time_bucket_counter['06:00-11:59'] += 1
+            elif hour < 18:
+                time_bucket_counter['12:00-17:59'] += 1
+            else:
+                time_bucket_counter['18:00-23:59'] += 1
+
+        trend_rows = [
+            [date, trend_data[date]]
+            for date in sorted(trend_data.keys())
+        ]
+
+        return [
+            self.build_key_value_section(_('Overview'), overview.items()),
+            self.build_table_section(
+                _('Daily Trend'),
+                [_('Date'), _('Count')],
+                trend_rows,
+            ),
+            self.build_table_section(
+                _('User Top 10'),
+                [_('User'), _('Count')],
+                self.build_counter_rows(user_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Operator Top 10'),
+                [_('Change by'), _('Count')],
+                self.build_counter_rows(operator_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('IP Top 10'),
+                [_('Remote addr'), _('Count')],
+                self.build_counter_rows(ip_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Change Time Distribution'),
+                [_('Time range'), _('Count')],
+                self.build_counter_rows(time_bucket_counter),
+            ),
+        ]
