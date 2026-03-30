@@ -2620,7 +2620,7 @@ requires-dist = [
     { name = "pyzipper", specifier = "==0.3.6" },
     { name = "redis", url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip" },
     { name = "requests", specifier = "==2.32.4" },
-    { name = "requests-unixsocket", specifier = ">=0.4.1" },
+    { name = "requests-unixsocket", specifier = "==0.4.1" },
     { name = "rest-condition", specifier = "==1.0.3" },
     { name = "s3transfer", specifier = "==0.6.1" },
     { name = "simplejson", specifier = "==3.19.1" },

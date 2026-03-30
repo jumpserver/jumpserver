@@ -1,3 +1,5 @@
+import os
+
 from .base import BaseService
 from ..hands import *
 
@@ -16,10 +18,14 @@ class GunicornService(BaseService):
 
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
+        jms_sock = os.path.join(BASE_DIR, 'data', 'unshare', 'jms.sock')
+        bind_unix = f'unix:{jms_sock}'
+        os.makedirs(os.path.dirname(jms_sock), exist_ok=True)
 
         cmd = [
             'gunicorn', 'jumpserver.asgi:application',
             '-b', bind,
+            '-b', bind_unix,
             '-k', 'uvicorn.workers.UvicornWorker',
             '-w', str(self.worker),
             '--max-requests', '10240',
