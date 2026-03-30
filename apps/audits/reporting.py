@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.drf.reporting import BaseListReportExporter
+from common.utils import i18n_trans
 
 
 class UserLoginLogReportExporter(BaseListReportExporter):
@@ -203,6 +204,103 @@ class PasswordChangeLogReportExporter(BaseListReportExporter):
             ),
             self.build_table_section(
                 _('Change Time Distribution'),
+                [_('Time range'), _('Count')],
+                self.build_counter_rows(time_bucket_counter),
+            ),
+        ]
+
+
+class OperateLogReportExporter(BaseListReportExporter):
+    report_title = _('Operate Log Report')
+    report_basename = 'operate_log_report'
+
+    def get_summary_sections(self):
+        logs = self.records
+        overview = OrderedDict([
+            (_('Total records'), len(logs)),
+            (_('Unique operators'), len({item.user for item in logs if item.user})),
+            (_('Unique resource types'), len({item.resource_type for item in logs if item.resource_type})),
+            (_('Unique resources'), len({item.resource for item in logs if item.resource})),
+            (_('Unique IPs'), len({item.remote_addr for item in logs if item.remote_addr})),
+        ])
+
+        trend_data = defaultdict(int)
+        action_counter = Counter()
+        resource_type_counter = Counter()
+        user_counter = Counter()
+        resource_counter = Counter()
+        ip_counter = Counter()
+        time_bucket_counter = Counter({
+            '00:00-05:59': 0,
+            '06:00-11:59': 0,
+            '12:00-17:59': 0,
+            '18:00-23:59': 0,
+        })
+
+        for log in logs:
+            current_time = timezone.localtime(log.datetime)
+            report_date = current_time.strftime('%Y-%m-%d')
+            trend_data[report_date] += 1
+
+            action_counter[str(log.get_action_display())] += 1
+            resource_type_counter[str(getattr(log, 'resource_type_display', None) or _(log.resource_type))] += 1
+
+            if log.user:
+                user_counter[str(log.user)] += 1
+            if log.resource:
+                resource_counter[str(i18n_trans(log.resource))] += 1
+            if log.remote_addr:
+                ip_counter[str(log.remote_addr)] += 1
+
+            hour = current_time.hour
+            if hour < 6:
+                time_bucket_counter['00:00-05:59'] += 1
+            elif hour < 12:
+                time_bucket_counter['06:00-11:59'] += 1
+            elif hour < 18:
+                time_bucket_counter['12:00-17:59'] += 1
+            else:
+                time_bucket_counter['18:00-23:59'] += 1
+
+        trend_rows = [
+            [date, trend_data[date]]
+            for date in sorted(trend_data.keys())
+        ]
+
+        return [
+            self.build_key_value_section(_('Overview'), overview.items()),
+            self.build_table_section(
+                _('Daily Trend'),
+                [_('Date'), _('Count')],
+                trend_rows,
+            ),
+            self.build_table_section(
+                _('Action Distribution'),
+                [_('Action'), _('Count')],
+                self.build_counter_rows(action_counter),
+            ),
+            self.build_table_section(
+                _('Resource Type Distribution'),
+                [_('Resource Type'), _('Count')],
+                self.build_counter_rows(resource_type_counter),
+            ),
+            self.build_table_section(
+                _('Operator Top 10'),
+                [_('User'), _('Count')],
+                self.build_counter_rows(user_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Resource Top 10'),
+                [_('Resource'), _('Count')],
+                self.build_counter_rows(resource_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('IP Top 10'),
+                [_('Remote addr'), _('Count')],
+                self.build_counter_rows(ip_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Operate Time Distribution'),
                 [_('Time range'), _('Count')],
                 self.build_counter_rows(time_bucket_counter),
             ),

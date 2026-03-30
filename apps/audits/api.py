@@ -46,7 +46,10 @@ from .serializers import (
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer
 )
-from .reporting import UserLoginLogReportExporter, PasswordChangeLogReportExporter
+from .reporting import (
+    UserLoginLogReportExporter, PasswordChangeLogReportExporter,
+    OperateLogReportExporter,
+)
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
@@ -244,9 +247,10 @@ class ResourceActivityAPIView(generics.ListAPIView):
         return queryset.order_by('-datetime')[:limit]
 
 
-class OperateLogViewSet(OrgReadonlyModelViewSet):
+class OperateLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = OperateLog
     serializer_class = OperateLogSerializer
+    report_exporter_class = OperateLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
