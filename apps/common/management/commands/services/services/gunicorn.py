@@ -8,7 +8,6 @@ class GunicornService(BaseService):
 
     def __init__(self, **kwargs):
         self.worker = kwargs.get('worker', 2)
-        self.bind_port = kwargs.get('bind_port', HTTP_PORT)
         super().__init__(**kwargs)
 
     @property
@@ -16,7 +15,7 @@ class GunicornService(BaseService):
         print("\n- Start Gunicorn WSGI HTTP Server")
 
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
-        bind = f'{HTTP_HOST}:{self.bind_port}'
+        bind = f'{HTTP_HOST}:{HTTP_PORT}'
 
         cmd = [
             'gunicorn', 'jumpserver.asgi:application',

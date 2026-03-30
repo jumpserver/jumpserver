@@ -21,7 +21,6 @@ if SERVER_SIZE == 'auto':
 
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
-    gunicorn_wsgi = 'gunicorn_wsgi', 'gunicorn_wsgi'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     celery_combine = 'celery_combine', 'celery_combine'
@@ -37,8 +36,7 @@ class Services(TextChoices):
     def get_service_object_class(cls, name):
         from . import services
         services_map = {
-            cls.gunicorn: services.GunicornService,
-            cls.gunicorn_wsgi: services.GunicornWSGIService,
+            cls.gunicorn.value: services.GunicornService,
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
@@ -49,15 +47,10 @@ class Services(TextChoices):
 
     @classmethod
     def web_services(cls):
-        services = [cls.gunicorn]
-        if GUNICORN_WSGI_ENABLED:
-            services.append(cls.gunicorn_wsgi)
-        
         if SERVER_SIZE == 'small' or os.environ.get('FLOWER_ENABLED', '1') == '0':
-            return services
+            return [cls.gunicorn]
         else:
-            services.append(cls.flower)
-            return services
+            return [cls.gunicorn, cls.flower]
 
     @classmethod
     def celery_services(cls):
@@ -130,28 +123,16 @@ class BaseActionCommand(BaseCommand):
         parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def get_services_kwargs(self, options):
+        worker = options.get('worker', 4)
+
         if SERVER_SIZE == 'small':
             worker = 1
-        else:
-            worker = options.get('worker', 4)
 
-        if GUNICORN_WSGI_ENABLED:
-            kwargs = {
-                'gunicorn': {
-                    'worker': 1,
-                    'bind_port': WS_PORT,
-                },
-                'gunicorn_wsgi': {
-                    'worker': worker,
-                }
+        return {
+            'gunicorn': {
+                'worker': worker
             }
-        else:
-            kwargs = {
-                'gunicorn': {
-                    'worker': worker,
-                },
-            }
-        return kwargs
+        }
 
     def initial_util(self, *args, **options):
         service_names = options.get('services')

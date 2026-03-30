@@ -641,8 +641,6 @@ class Config(dict):
         'WS_LISTEN_PORT': 8070,
         'CELERY_WORKER_COUNT': 10,
 
-        'GUNICORN_WSGI_ENABLED': False,
-
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
