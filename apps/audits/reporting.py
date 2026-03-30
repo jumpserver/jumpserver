@@ -7,6 +7,131 @@ from common.drf.reporting import BaseListReportExporter
 from common.utils import i18n_trans
 
 
+class FTPLogReportExporter(BaseListReportExporter):
+    report_title = _('File Transfer Report')
+    report_basename = 'ftp_log_report'
+
+    def get_summary_sections(self):
+        logs = self.records
+        success_logs = [item for item in logs if item.is_success]
+        failed_logs = [item for item in logs if not item.is_success]
+        downloadable_logs = [item for item in logs if item.has_file]
+
+        overview = OrderedDict([
+            (_('Total records'), len(logs)),
+            (_('Successful transfers'), len(success_logs)),
+            (_('Failed transfers'), len(failed_logs)),
+            (_('Success rate'), self.format_percent(len(success_logs), len(logs))),
+            (_('Downloadable files'), len(downloadable_logs)),
+            (_('Unique users'), len({item.user for item in logs if item.user})),
+            (_('Unique assets'), len({item.asset for item in logs if item.asset})),
+            (_('Unique accounts'), len({item.account for item in logs if item.account})),
+            (_('Unique IPs'), len({item.remote_addr for item in logs if item.remote_addr})),
+        ])
+
+        trend_data = defaultdict(lambda: {'total': 0, 'success': 0, 'failed': 0})
+        operate_counter = Counter()
+        user_counter = Counter()
+        asset_counter = Counter()
+        account_counter = Counter()
+        ip_counter = Counter()
+        filename_counter = Counter()
+        time_bucket_counter = Counter({
+            '00:00-05:59': 0,
+            '06:00-11:59': 0,
+            '12:00-17:59': 0,
+            '18:00-23:59': 0,
+        })
+
+        for log in logs:
+            current_time = timezone.localtime(log.date_start)
+            report_date = current_time.strftime('%Y-%m-%d')
+            trend = trend_data[report_date]
+            trend['total'] += 1
+            if log.is_success:
+                trend['success'] += 1
+            else:
+                trend['failed'] += 1
+
+            operate_counter[str(log.get_operate_display())] += 1
+
+            if log.user:
+                user_counter[str(log.user)] += 1
+            if log.asset:
+                asset_counter[str(log.asset)] += 1
+            if log.account:
+                account_counter[str(log.account)] += 1
+            if log.remote_addr:
+                ip_counter[str(log.remote_addr)] += 1
+            if log.filename:
+                filename_counter[str(log.filename)] += 1
+
+            hour = current_time.hour
+            if hour < 6:
+                time_bucket_counter['00:00-05:59'] += 1
+            elif hour < 12:
+                time_bucket_counter['06:00-11:59'] += 1
+            elif hour < 18:
+                time_bucket_counter['12:00-17:59'] += 1
+            else:
+                time_bucket_counter['18:00-23:59'] += 1
+
+        trend_rows = []
+        for date in sorted(trend_data.keys()):
+            item = trend_data[date]
+            trend_rows.append([
+                date,
+                item['total'],
+                item['success'],
+                item['failed'],
+                self.format_percent(item['success'], item['total']),
+            ])
+
+        return [
+            self.build_key_value_section(_('Overview'), overview.items()),
+            self.build_table_section(
+                _('Daily Trend'),
+                [_('Date'), _('Total'), _('Successful transfers'), _('Failed transfers'), _('Success rate')],
+                trend_rows,
+            ),
+            self.build_table_section(
+                _('Transfer Type Distribution'),
+                [_('Operate'), _('Count')],
+                self.build_counter_rows(operate_counter),
+            ),
+            self.build_table_section(
+                _('User Top 10'),
+                [_('User'), _('Count')],
+                self.build_counter_rows(user_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Asset Top 10'),
+                [_('Asset'), _('Count')],
+                self.build_counter_rows(asset_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Account Top 10'),
+                [_('Account'), _('Count')],
+                self.build_counter_rows(account_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('IP Top 10'),
+                [_('Remote addr'), _('Count')],
+                self.build_counter_rows(ip_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Filename Top 10'),
+                [_('Filename'), _('Count')],
+                self.build_counter_rows(filename_counter, top_n=10),
+            ),
+            self.build_table_section(
+                _('Transfer Time Distribution'),
+                [_('Time range'), _('Count')],
+                self.build_counter_rows(time_bucket_counter),
+            ),
+        ]
+
+
 class UserLoginLogReportExporter(BaseListReportExporter):
     report_title = _('User Login Report')
     report_basename = 'user_login_log_report'

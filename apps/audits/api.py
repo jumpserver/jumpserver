@@ -47,7 +47,7 @@ from .serializers import (
     ServiceAccessLogSerializer, OperateLogFullSerializer
 )
 from .reporting import (
-    UserLoginLogReportExporter, PasswordChangeLogReportExporter,
+    FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
     OperateLogReportExporter, JobsAuditReportExporter,
     JobLogAuditReportExporter,
 )
@@ -99,9 +99,10 @@ class JobsAuditViewSet(ReportExportMixin, OrgModelViewSet):
         return super().perform_update(serializer)
 
 
-class FTPLogViewSet(OrgModelViewSet):
+class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
+    report_exporter_class = FTPLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
