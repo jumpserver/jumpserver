@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-30 16:22+0800\n"
+"POT-Creation-Date: 2026-03-30 18:00+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -32,7 +32,7 @@ msgstr "未找到可用于创建账户的有效资产。"
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: accounts/api/automations/base.py:88 tickets/api/ticket.py:132
+#: accounts/api/automations/base.py:88 tickets/api/ticket.py:134
 #, python-brace-format
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
@@ -468,11 +468,12 @@ msgstr "Vault 操作失败，请重试，或者检查 Vault 上的账号信息�
 #: acls/notifications.py:70 acls/serializers/base.py:110
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:427
 #: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:336
-#: audits/serializers.py:245 authentication/models/connection_token.py:42
+#: audits/reporting.py:109 audits/serializers.py:245
+#: authentication/models/connection_token.py:42
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:29 terminal/notifications.py:167
-#: terminal/notifications.py:304 terminal/serializers/command.py:17
-#: terminal/serializers/session.py:38
+#: terminal/notifications.py:304 terminal/reporting.py:123
+#: terminal/serializers/command.py:17 terminal/serializers/session.py:38
 #: terminal/templates/terminal/_msg_command_warning.html:10
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:296
@@ -535,11 +536,11 @@ msgstr "改密状态"
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:337
-#: audits/serializers.py:246 authentication/api/connection_token.py:475
-#: ops/models/base.py:18 perms/models/asset_permission.py:75
-#: settings/serializers/msg.py:33 terminal/backends/command/models.py:18
-#: terminal/models/session/session.py:31 terminal/notifications.py:306
-#: terminal/serializers/command.py:72
+#: audits/reporting.py:114 audits/serializers.py:246
+#: authentication/api/connection_token.py:475 ops/models/base.py:18
+#: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
+#: terminal/backends/command/models.py:18 terminal/models/session/session.py:31
+#: terminal/notifications.py:306 terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
@@ -608,7 +609,7 @@ msgstr "账号活动"
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
-#: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:87
+#: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:89
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
 #: users/notifications.py:21 users/notifications.py:106
@@ -781,13 +782,13 @@ msgstr "结束日期"
 #: accounts/serializers/automations/check_account.py:39
 #: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:47 audits/models.py:224
-#: audits/serializers.py:77 ops/models/base.py:49 ops/models/job.py:233
-#: terminal/models/applet/applet.py:382 terminal/models/applet/host.py:140
-#: terminal/models/component/status.py:30
+#: audits/reporting.py:607 audits/serializers.py:77 ops/models/base.py:49
+#: ops/models/job.py:233 terminal/models/applet/applet.py:382
+#: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
 #: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:284
-#: tickets/serializers/super_ticket.py:13
+#: tickets/reporting.py:80 tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:233
 #: xpack/plugins/cloud/models.py:300
 msgid "Status"
@@ -892,8 +893,8 @@ msgstr "重复密码"
 #: accounts/templates/accounts/push_account_report.html:79
 #: accounts/templates/accounts/push_account_report.html:119
 #: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:204
-#: authentication/forms.py:21 authentication/forms.py:23
-#: authentication/models/temp_token.py:10
+#: audits/reporting.py:241 authentication/forms.py:21
+#: authentication/forms.py:23 authentication/models/temp_token.py:10
 #: authentication/serializers/connect_token_secret.py:43
 #: authentication/serializers/connect_token_secret.py:53
 #: authentication/templates/authentication/_msg_different_city.html:9
@@ -1225,8 +1226,8 @@ msgstr "类别"
 #: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
-#: audits/serializers.py:76 audits/serializers.py:211
-#: authentication/models/connection_token.py:67
+#: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:76
+#: audits/serializers.py:211 authentication/models/connection_token.py:67
 #: authentication/serializers/connect_token_secret.py:138 ops/models/job.py:155
 #: perms/serializers/user_permission.py:28 reports/models.py:31
 #: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
@@ -1234,8 +1235,8 @@ msgstr "类别"
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:43 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:276 tickets/serializers/flow.py:25
-#: tickets/serializers/ticket/ticket.py:19
+#: tickets/models/ticket/general.py:276 tickets/reporting.py:70
+#: tickets/serializers/flow.py:25 tickets/serializers/ticket/ticket.py:19
 msgid "Type"
 msgstr "类型"
 
@@ -1260,7 +1261,8 @@ msgstr "已托管密码"
 
 #: accounts/serializers/account/account.py:296 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
-#: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
+#: tickets/models/ticket/general.py:280 tickets/reporting.py:75
+#: tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "审批状态"
@@ -1305,6 +1307,7 @@ msgstr "ID"
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
 #: audits/models.py:97 audits/models.py:179 audits/models.py:296
+#: audits/reporting.py:104 audits/reporting.py:317 audits/reporting.py:414
 #: audits/serializers.py:212 authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: authentication/notifications.py:16 authentication/notifications.py:55
@@ -1314,7 +1317,7 @@ msgstr "ID"
 #: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
 #: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
 #: terminal/notifications.py:168 terminal/notifications.py:235
-#: terminal/serializers/command.py:16
+#: terminal/reporting.py:118 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
@@ -1323,9 +1326,12 @@ msgstr "ID"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:507
+#: accounts/serializers/account/account.py:507 audits/reporting.py:94
+#: audits/reporting.py:216 audits/reporting.py:312 audits/reporting.py:399
+#: audits/reporting.py:487 audits/reporting.py:602
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:173 terminal/notifications.py:240
+#: terminal/reporting.py:103 tickets/reporting.py:65
 msgid "Date"
 msgstr "日期"
 
@@ -1861,7 +1867,8 @@ msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
 #: acls/models/base.py:41 acls/serializers/base.py:57
-#: assets/models/cmd_filter.py:81 audits/models.py:99 audits/serializers.py:107
+#: assets/models/cmd_filter.py:81 audits/models.py:99 audits/reporting.py:404
+#: audits/serializers.py:107
 #: authentication/serializers/connect_token_secret.py:131
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:86
@@ -1909,7 +1916,7 @@ msgstr "正则表达式"
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
 #: settings/models.py:188 settings/serializers/feature.py:24
 #: settings/serializers/msg.py:79 users/notifications.py:19
-#: xpack/plugins/license/models.py:34
+#: xpack/plugins/license/models.py:31
 msgid "Content"
 msgstr "内容"
 
@@ -2037,6 +2044,7 @@ msgstr "ACL 名称"
 #: acls/templates/acls/asset_login_reminder.html:13
 #: acls/templates/acls/user_login_reminder.html:11
 #: terminal/models/session/session.py:34 terminal/models/session/sharing.py:116
+#: terminal/reporting.py:113
 #: terminal/templates/terminal/_msg_command_warning.html:16
 msgid "Login from"
 msgstr "登录来源"
@@ -2108,7 +2116,7 @@ msgstr ""
 "* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
 "2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
-#: acls/serializers/rules/rules.py:48
+#: acls/serializers/rules/rules.py:48 audits/reporting.py:246
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
@@ -2182,10 +2190,8 @@ msgid "The number of assets exceeds the limit of 5000"
 msgstr "资产数量超过了 5000 的限制"
 
 #: assets/api/asset/asset.py:178
-#, fuzzy
-#| msgid "The number of assets exceeds the limit of 5000"
 msgid "The number of assets exceeds the license limit"
-msgstr "资产数量超过了 5000 的限制"
+msgstr "资产数量超过许可证限制"
 
 #: assets/api/node.py:58
 msgid "You can't update the root node name"
@@ -2755,7 +2761,7 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: assets/models/automations/base.py:157 audits/serializers.py:38
-#: ops/models/base.py:52 ops/models/job.py:238
+#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:238
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "汇总"
@@ -3491,7 +3497,7 @@ msgstr "建立软链接"
 
 #: audits/const.py:18 audits/const.py:29
 #: ops/templates/ops/celery_task_log.html:86
-#: terminal/api/session/session.py:157
+#: terminal/api/session/session.py:159
 msgid "Download"
 msgstr "下载"
 
@@ -3499,7 +3505,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:308 terminal/api/session/session.py:288
+#: audits/const.py:23 rbac/tree.py:308 terminal/api/session/session.py:290
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:104
 msgid "View"
@@ -3540,8 +3546,8 @@ msgstr "结束"
 
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:65
-#: terminal/serializers/session.py:181
+#: terminal/models/virtualapp/provider.py:14 terminal/reporting.py:128
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:181
 msgid "Terminal"
 msgstr "终端"
 
@@ -3576,17 +3582,19 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:57 audits/models.py:107 audits/models.py:182
-#: audits/models.py:333 authentication/models/connection_token.py:62
+#: audits/models.py:333 audits/reporting.py:119 audits/reporting.py:327
+#: audits/reporting.py:424 authentication/models/connection_token.py:62
 #: terminal/models/session/session.py:36 terminal/models/session/sharing.py:111
 #: terminal/notifications.py:171 terminal/notifications.py:238
+#: terminal/reporting.py:133
 msgid "Remote addr"
 msgstr "远端地址"
 
-#: audits/models.py:62 audits/serializers.py:61
+#: audits/models.py:62 audits/reporting.py:99 audits/serializers.py:61
 msgid "Operate"
 msgstr "操作"
 
-#: audits/models.py:64
+#: audits/models.py:64 audits/reporting.py:124
 msgid "Filename"
 msgstr "文件名"
 
@@ -3607,12 +3615,12 @@ msgstr "会话"
 msgid "File transfer log"
 msgstr "文件传输"
 
-#: audits/models.py:101 audits/serializers.py:109
+#: audits/models.py:101 audits/reporting.py:409 audits/serializers.py:109
 msgid "Resource Type"
 msgstr "资源类型"
 
 #: audits/models.py:102 audits/models.py:105 audits/models.py:151
-#: audits/serializers.py:108 labels/serializers.py:46
+#: audits/reporting.py:419 audits/serializers.py:108 labels/serializers.py:46
 msgid "Resource"
 msgstr "资源"
 
@@ -3634,7 +3642,7 @@ msgstr "详情 ID"
 msgid "Activity log"
 msgstr "活动日志"
 
-#: audits/models.py:180
+#: audits/models.py:180 audits/reporting.py:322
 msgid "Change by"
 msgstr "修改者"
 
@@ -3651,15 +3659,16 @@ msgstr "登录方式"
 msgid "Login IP"
 msgstr "登录 IP"
 
-#: audits/models.py:216 audits/serializers.py:75
+#: audits/models.py:216 audits/reporting.py:231 audits/serializers.py:75
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:64 users/models/user/__init__.py:92
 #: users/serializers/profile.py:63
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:219 terminal/models/session/sharing.py:123
-#: xpack/plugins/cloud/manager.py:196 xpack/plugins/cloud/models.py:237
+#: audits/models.py:219 audits/reporting.py:251
+#: terminal/models/session/sharing.py:123 xpack/plugins/cloud/manager.py:196
+#: xpack/plugins/cloud/models.py:237
 msgid "Reason"
 msgstr "原因"
 
@@ -3669,7 +3678,7 @@ msgstr "原因"
 msgid "Login Date"
 msgstr "登录日期"
 
-#: audits/models.py:228 audits/models.py:293
+#: audits/models.py:228 audits/models.py:293 audits/reporting.py:226
 msgid "Auth backend"
 msgstr "认证令牌"
 
@@ -3701,12 +3710,318 @@ msgstr "应用"
 msgid "Application ID"
 msgstr "应用 ID"
 
-#: audits/serializers.py:33 ops/models/adhoc.py:24 ops/models/base.py:16
-#: ops/models/base.py:53 ops/models/celery.py:87 ops/models/job.py:156
-#: ops/models/job.py:239 ops/models/playbook.py:30 ops/models/variable.py:17
+#: audits/reporting.py:11
+msgid "File Transfer Report"
+msgstr "文件传输报告"
+
+#: audits/reporting.py:21 audits/reporting.py:146 audits/reporting.py:264
+#: audits/reporting.py:345 audits/reporting.py:442 audits/reporting.py:529
+#: terminal/reporting.py:23 tickets/reporting.py:16
+msgid "Total records"
+msgstr "记录总数"
+
+#: audits/reporting.py:22 audits/reporting.py:94
+msgid "Successful transfers"
+msgstr "成功传输数"
+
+#: audits/reporting.py:23 audits/reporting.py:94
+msgid "Failed transfers"
+msgstr "失败传输数"
+
+#: audits/reporting.py:24 audits/reporting.py:94 audits/reporting.py:149
+#: audits/reporting.py:216 audits/reporting.py:533 audits/reporting.py:602
+#: terminal/reporting.py:28 terminal/reporting.py:103
+msgid "Success rate"
+msgstr "成功率"
+
+#: audits/reporting.py:25
+msgid "Downloadable files"
+msgstr "可下载文件数"
+
+#: audits/reporting.py:26 audits/reporting.py:150 audits/reporting.py:265
+#: terminal/reporting.py:31
+msgid "Unique users"
+msgstr "唯一用户数"
+
+#: audits/reporting.py:27 terminal/reporting.py:32
+msgid "Unique assets"
+msgstr "唯一资产数"
+
+#: audits/reporting.py:28
+msgid "Unique accounts"
+msgstr "唯一账号数"
+
+#: audits/reporting.py:29 audits/reporting.py:151 audits/reporting.py:267
+#: audits/reporting.py:349
+msgid "Unique IPs"
+msgstr "唯一 IP 数"
+
+#: audits/reporting.py:91 audits/reporting.py:213 audits/reporting.py:309
+#: audits/reporting.py:396 audits/reporting.py:484 audits/reporting.py:599
+#: terminal/reporting.py:100 tickets/reporting.py:62
+msgid "Overview"
+msgstr "概览"
+
+#: audits/reporting.py:93 audits/reporting.py:215 audits/reporting.py:311
+#: audits/reporting.py:398 audits/reporting.py:601 terminal/reporting.py:102
+msgid "Daily Trend"
+msgstr "每日趋势"
+
+#: audits/reporting.py:94 audits/reporting.py:216 audits/reporting.py:602
+#: terminal/reporting.py:103
+msgid "Total"
+msgstr "总数"
+
+#: audits/reporting.py:98
+msgid "Transfer Type Distribution"
+msgstr "传输类型分布"
+
+#: audits/reporting.py:99 audits/reporting.py:104 audits/reporting.py:109
+#: audits/reporting.py:114 audits/reporting.py:119 audits/reporting.py:124
+#: audits/reporting.py:129 audits/reporting.py:221 audits/reporting.py:226
+#: audits/reporting.py:231 audits/reporting.py:236 audits/reporting.py:241
+#: audits/reporting.py:246 audits/reporting.py:251 audits/reporting.py:312
+#: audits/reporting.py:317 audits/reporting.py:322 audits/reporting.py:327
+#: audits/reporting.py:332 audits/reporting.py:399 audits/reporting.py:404
+#: audits/reporting.py:409 audits/reporting.py:414 audits/reporting.py:419
+#: audits/reporting.py:424 audits/reporting.py:429 audits/reporting.py:487
+#: audits/reporting.py:492 audits/reporting.py:497 audits/reporting.py:502
+#: audits/reporting.py:507 audits/reporting.py:607 audits/reporting.py:612
+#: audits/reporting.py:617 audits/reporting.py:622 terminal/reporting.py:108
+#: terminal/reporting.py:113 terminal/reporting.py:118
+#: terminal/reporting.py:123 terminal/reporting.py:128
+#: terminal/reporting.py:133 terminal/reporting.py:138 tickets/reporting.py:65
+#: tickets/reporting.py:70 tickets/reporting.py:75 tickets/reporting.py:80
+#: tickets/reporting.py:85 tickets/reporting.py:90 tickets/reporting.py:95
+msgid "Count"
+msgstr "数量"
+
+#: audits/reporting.py:103 audits/reporting.py:316 terminal/reporting.py:117
+msgid "User Top 10"
+msgstr "用户 Top 10"
+
+#: audits/reporting.py:108 terminal/reporting.py:122
+msgid "Asset Top 10"
+msgstr "资产 Top 10"
+
+#: audits/reporting.py:113
+msgid "Account Top 10"
+msgstr "账号 Top 10"
+
+#: audits/reporting.py:118 audits/reporting.py:326 audits/reporting.py:423
+#: terminal/reporting.py:132
+msgid "IP Top 10"
+msgstr "IP Top 10"
+
+#: audits/reporting.py:123
+msgid "Filename Top 10"
+msgstr "文件名 Top 10"
+
+#: audits/reporting.py:128
+msgid "Transfer Time Distribution"
+msgstr "传输时间分布"
+
+#: audits/reporting.py:129 audits/reporting.py:236 audits/reporting.py:332
+#: audits/reporting.py:429
+msgid "Time range"
+msgstr "时间范围"
+
+#: audits/reporting.py:136
+msgid "User Login Report"
+msgstr "用户登录报告"
+
+#: audits/reporting.py:147 audits/reporting.py:216
+msgid "Successful logins"
+msgstr "成功登录数"
+
+#: audits/reporting.py:148 audits/reporting.py:216
+msgid "Failed logins"
+msgstr "失败登录数"
+
+#: audits/reporting.py:152
+msgid "Unique cities"
+msgstr "唯一城市数"
+
+#: audits/reporting.py:153
+msgid "Unique auth backends"
+msgstr "唯一认证后端数"
+
+#: audits/reporting.py:220
+msgid "Login Type Distribution"
+msgstr "登录类型分布"
+
+#: audits/reporting.py:225
+msgid "Auth Backend Distribution"
+msgstr "认证后端分布"
+
+#: audits/reporting.py:230
+msgid "MFA Distribution"
+msgstr "MFA 分布"
+
+#: audits/reporting.py:235
+msgid "Login Time Distribution"
+msgstr "登录时间分布"
+
+#: audits/reporting.py:240
+msgid "Failed User Top 10"
+msgstr "失败用户 Top 10"
+
+#: audits/reporting.py:245
+msgid "Failed IP Top 10"
+msgstr "失败 IP Top 10"
+
+#: audits/reporting.py:250
+msgid "Failed Reason Top 10"
+msgstr "失败原因 Top 10"
+
+#: audits/reporting.py:258
+msgid "Password Change Report"
+msgstr "密码修改报告"
+
+#: audits/reporting.py:266 audits/reporting.py:346
+msgid "Unique operators"
+msgstr "唯一操作人数"
+
+#: audits/reporting.py:321 audits/reporting.py:413
+msgid "Operator Top 10"
+msgstr "操作人 Top 10"
+
+#: audits/reporting.py:331
+msgid "Change Time Distribution"
+msgstr "修改时间分布"
+
+#: audits/reporting.py:339
+msgid "Operate Log Report"
+msgstr "操作日志报告"
+
+#: audits/reporting.py:347
+msgid "Unique resource types"
+msgstr "唯一资源类型数"
+
+#: audits/reporting.py:348
+msgid "Unique resources"
+msgstr "唯一资源数"
+
+#: audits/reporting.py:403
+msgid "Action Distribution"
+msgstr "操作类型分布"
+
+#: audits/reporting.py:408
+msgid "Resource Type Distribution"
+msgstr "资源类型分布"
+
+#: audits/reporting.py:418
+msgid "Resource Top 10"
+msgstr "资源 Top 10"
+
+#: audits/reporting.py:428
+msgid "Operate Time Distribution"
+msgstr "操作时间分布"
+
+#: audits/reporting.py:436
+msgid "Job Audit Report"
+msgstr "作业审计报告"
+
+#: audits/reporting.py:443
+msgid "Periodic jobs"
+msgstr "周期作业数"
+
+#: audits/reporting.py:444
+msgid "One-time jobs"
+msgstr "一次性作业数"
+
+#: audits/reporting.py:445
+msgid "Adhoc jobs"
+msgstr "命令作业数"
+
+#: audits/reporting.py:446
+msgid "Playbook jobs"
+msgstr "Playbook 作业数"
+
+#: audits/reporting.py:447 audits/reporting.py:534
+msgid "Unique creators"
+msgstr "唯一创建者数"
+
+#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:154
+#: ops/models/playbook.py:89 ops/models/variable.py:23
+msgid "Playbook"
+msgstr "Playbook"
+
+#: audits/reporting.py:486 tickets/reporting.py:64
+msgid "Created Trend"
+msgstr "创建趋势"
+
+#: audits/reporting.py:491 audits/reporting.py:611
+msgid "Job Type Distribution"
+msgstr "作业类型分布"
+
+#: audits/reporting.py:496
+msgid "Module Distribution"
+msgstr "模块分布"
+
+#: audits/reporting.py:497 ops/models/adhoc.py:22 ops/models/job.py:151
+msgid "Module"
+msgstr "模块"
+
+#: audits/reporting.py:501 audits/reporting.py:616
+msgid "Creator Top 10"
+msgstr "创建者 Top 10"
+
+#: audits/reporting.py:502 audits/reporting.py:617 audits/serializers.py:33
+#: ops/models/adhoc.py:24 ops/models/base.py:16 ops/models/base.py:53
+#: ops/models/celery.py:87 ops/models/job.py:156 ops/models/job.py:239
+#: ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "创建者"
+
+#: audits/reporting.py:506
+msgid "Run as Policy Distribution"
+msgstr "运行用户策略分布"
+
+#: audits/reporting.py:507 ops/models/job.py:164
+msgid "Run as policy"
+msgstr "运行用户策略"
+
+#: audits/reporting.py:514
+msgid "Job Log Report"
+msgstr "作业日志报告"
+
+#: audits/reporting.py:530 audits/reporting.py:602
+msgid "Successful jobs"
+msgstr "成功作业数"
+
+#: audits/reporting.py:531 audits/reporting.py:602
+msgid "Finished jobs"
+msgstr "已结束作业数"
+
+#: audits/reporting.py:532 audits/reporting.py:602
+msgid "Unfinished jobs"
+msgstr "未结束作业数"
+
+#: audits/reporting.py:537
+msgid "Unique task ids"
+msgstr "唯一任务 ID 数"
+
+#: audits/reporting.py:538
+msgid "Average duration"
+msgstr "平均耗时"
+
+#: audits/reporting.py:606
+msgid "Status Distribution"
+msgstr "状态分布"
+
+#: audits/reporting.py:612 ops/serializers/job.py:91
+msgid "Job type"
+msgstr "任务类型"
+
+#: audits/reporting.py:621 terminal/reporting.py:137
+msgid "Duration Distribution"
+msgstr "耗时分布"
+
+#: audits/reporting.py:622 terminal/reporting.py:138
+msgid "Duration range"
+msgstr "耗时范围"
 
 #: audits/serializers.py:39 ops/serializers/celery.py:33
 msgid "Execution cycle"
@@ -3766,10 +4081,8 @@ msgid "SSO"
 msgstr "SSO"
 
 #: audits/signal_handlers/login_log.py:36
-#, fuzzy
-#| msgid "Custom"
 msgid "Custom SSO"
-msgstr "自定义"
+msgstr "自定义 SSO"
 
 #: audits/signal_handlers/login_log.py:37
 msgid "Auth Token"
@@ -3906,7 +4219,7 @@ msgstr "人脸比对失败"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:34 terminal/api/session/session.py:345
+#: authentication/api/password.py:34 terminal/api/session/session.py:347
 #: users/views/profile/reset.py:63
 #, python-brace-format
 msgid "User does not exist: {}"
@@ -4360,8 +4673,9 @@ msgstr "自定义密码"
 #: authentication/serializers/connect_token_secret.py:126
 #: terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24 terminal/notifications.py:170
-#: terminal/notifications.py:237 terminal/serializers/session.py:31
-#: terminal/serializers/session.py:58 terminal/serializers/storage.py:71
+#: terminal/notifications.py:237 terminal/reporting.py:108
+#: terminal/serializers/session.py:31 terminal/serializers/session.py:58
+#: terminal/serializers/storage.py:71
 #: terminal/templates/terminal/_msg_command_warning.html:19
 msgid "Protocol"
 msgstr "协议"
@@ -5250,6 +5564,43 @@ msgstr "仅导出选择项"
 msgid "Export filtered"
 msgstr "导出搜索"
 
+#: common/drf/reporting.py:23
+msgid "Data"
+msgstr "数据"
+
+#: common/drf/reporting.py:25 common/drf/reporting.py:180 rbac/tree.py:71
+#: reports/models.py:40
+msgid "Report"
+msgstr "报表"
+
+#: common/drf/reporting.py:37
+msgid "Date from"
+msgstr "开始日期"
+
+#: common/drf/reporting.py:38
+msgid "Date to"
+msgstr "结束日期"
+
+#: common/drf/reporting.py:116
+msgid "All data"
+msgstr "全部数据"
+
+#: common/drf/reporting.py:181
+msgid "Generated at"
+msgstr "生成时间"
+
+#: common/drf/reporting.py:182
+msgid "Exported rows"
+msgstr "导出条数"
+
+#: common/drf/reporting.py:183 reports/models.py:35
+msgid "Filters"
+msgstr "过滤条件"
+
+#: common/drf/reporting.py:210
+msgid "Report Summary"
+msgstr "报表摘要"
+
 #: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
 #, python-format
 msgid "%s object does not exist."
@@ -5732,11 +6083,6 @@ msgstr "VCS"
 msgid "Adhoc"
 msgstr "命令"
 
-#: ops/const.py:40 ops/models/job.py:154 ops/models/playbook.py:89
-#: ops/models/variable.py:23
-msgid "Playbook"
-msgstr "Playbook"
-
 #: ops/const.py:41
 msgid "Upload File"
 msgstr "上传"
@@ -5865,10 +6211,6 @@ msgstr "需要周期或定期设置"
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:22 ops/models/job.py:151
-msgid "Module"
-msgstr "模块"
-
 #: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:149
 #: terminal/models/component/task.py:14
 msgid "Args"
@@ -5934,10 +6276,6 @@ msgstr "周期执行变量"
 #: ops/models/job.py:162
 msgid "Run as"
 msgstr "运行用户"
-
-#: ops/models/job.py:164
-msgid "Run as policy"
-msgstr "用户策略"
 
 #: ops/models/job.py:221 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:196
@@ -6030,10 +6368,6 @@ msgstr "下次执行时间"
 #: ops/serializers/job.py:17
 msgid "Run on save"
 msgstr "保存后执行"
-
-#: ops/serializers/job.py:91
-msgid "Job type"
-msgstr "任务类型"
 
 #: ops/serializers/job.py:94 terminal/serializers/session.py:66
 msgid "Is finished"
@@ -6217,7 +6551,8 @@ msgstr "请选择一个组织后再保存"
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:303 tickets/serializers/ticket/ticket.py:62
+#: tickets/models/ticket/general.py:303 tickets/reporting.py:85
+#: tickets/serializers/ticket/ticket.py:62
 msgid "Organization"
 msgstr "组织"
 
@@ -6522,96 +6857,72 @@ msgid "Can view user login report"
 msgstr "可以查看用户登录报告"
 
 #: rbac/models/menu.py:23
-#, fuzzy
-#| msgid "Can view user login report"
 msgid "Can create user login report"
-msgstr "可以查看用户登录报告"
+msgstr "可以创建用户登录报告"
 
 #: rbac/models/menu.py:24
-#, fuzzy
-#| msgid "Can view user login report"
 msgid "Can delete user login report"
-msgstr "可以查看用户登录报告"
+msgstr "可以删除用户登录报告"
 
 #: rbac/models/menu.py:25
 msgid "Can view user change password report"
 msgstr "可以查看用户改密报告"
 
 #: rbac/models/menu.py:26
-#, fuzzy
-#| msgid "Can view user change password report"
 msgid "Can create user change password report"
-msgstr "可以查看用户改密报告"
+msgstr "可以创建用户改密报告"
 
 #: rbac/models/menu.py:27
-#, fuzzy
-#| msgid "Can view user change password report"
 msgid "Can delete user change password report"
-msgstr "可以查看用户改密报告"
+msgstr "可以删除用户改密报告"
 
 #: rbac/models/menu.py:28
 msgid "Can view asset statistics report"
 msgstr "可以查看资产统计报告"
 
 #: rbac/models/menu.py:29
-#, fuzzy
-#| msgid "Can view asset statistics report"
 msgid "Can create asset statistics report"
-msgstr "可以查看资产统计报告"
+msgstr "可以创建资产统计报告"
 
 #: rbac/models/menu.py:30
-#, fuzzy
-#| msgid "Can view asset statistics report"
 msgid "Can delete asset statistics report"
-msgstr "可以查看资产统计报告"
+msgstr "可以删除资产统计报告"
 
 #: rbac/models/menu.py:31
 msgid "Can view asset activity report"
 msgstr "可以查看资产活动报告"
 
 #: rbac/models/menu.py:32
-#, fuzzy
-#| msgid "Can view asset activity report"
 msgid "Can create asset activity report"
-msgstr "可以查看资产活动报告"
+msgstr "可以创建资产活动报告"
 
 #: rbac/models/menu.py:33
-#, fuzzy
-#| msgid "Can view asset activity report"
 msgid "Can delete asset activity report"
-msgstr "可以查看资产活动报告"
+msgstr "可以删除资产活动报告"
 
 #: rbac/models/menu.py:34
 msgid "Can view account statistics report"
 msgstr "可以查看账号统计报告"
 
 #: rbac/models/menu.py:35
-#, fuzzy
-#| msgid "Can view account statistics report"
 msgid "Can create account statistics report"
-msgstr "可以查看账号统计报告"
+msgstr "可以创建账号统计报告"
 
 #: rbac/models/menu.py:36
-#, fuzzy
-#| msgid "Can view account statistics report"
 msgid "Can delete account statistics report"
-msgstr "可以查看账号统计报告"
+msgstr "可以删除账号统计报告"
 
 #: rbac/models/menu.py:37
 msgid "Can view account automation report"
 msgstr "可以查看账号自动化报告"
 
 #: rbac/models/menu.py:38
-#, fuzzy
-#| msgid "Can view account automation report"
 msgid "Can create account automation report"
-msgstr "可以查看账号自动化报告"
+msgstr "可以创建账号自动化报告"
 
 #: rbac/models/menu.py:39
-#, fuzzy
-#| msgid "Can view account automation report"
 msgid "Can delete account automation report"
-msgstr "可以查看账号自动化报告"
+msgstr "可以删除账号自动化报告"
 
 #: rbac/models/permission.py:18
 msgid "ContentType"
@@ -6722,17 +7033,13 @@ msgid "Appearance"
 msgstr "界面"
 
 #: rbac/tree.py:68 xpack/plugins/license/meta.py:10
-#: xpack/plugins/license/models.py:161
+#: xpack/plugins/license/models.py:153
 msgid "License"
 msgstr "许可证"
 
 #: rbac/tree.py:70
 msgid "Job audit"
 msgstr "作业审计"
-
-#: rbac/tree.py:71 reports/models.py:40
-msgid "Report"
-msgstr "报表"
 
 #: rbac/tree.py:195
 msgid "App organizations"
@@ -6768,22 +7075,12 @@ msgid "Revoke access token"
 msgstr "撤销访问令牌"
 
 #: reports/models.py:34
-#, fuzzy
-#| msgid "Change by"
 msgid "Range days"
-msgstr "修改者"
-
-#: reports/models.py:35
-#, fuzzy
-#| msgid "Filter"
-msgid "Filters"
-msgstr "过滤器"
+msgstr "范围天数"
 
 #: reports/models.py:145
-#, fuzzy
-#| msgid "Periodic run"
 msgid "Periodic report"
-msgstr "周期执行"
+msgstr "周期报表"
 
 #: reports/views.py:20
 msgid "User login report"
@@ -7622,62 +7919,60 @@ msgstr "支持 URL 指的是顶级导航栏中的地址，帮助 - 支持"
 msgid "Organization name already exists"
 msgstr "组织名称已存在"
 
-#: settings/serializers/cleaning.py:11
+#: settings/serializers/cleaning.py:10
 msgid "Period clean"
 msgstr "定時清掃"
 
-#: settings/serializers/cleaning.py:15
+#: settings/serializers/cleaning.py:14
 msgid "Login log retention days"
 msgstr "登录日志保留天数"
 
-#: settings/serializers/cleaning.py:19
+#: settings/serializers/cleaning.py:18
 msgid "Task log retention days"
 msgstr "任务日志保留天数"
 
-#: settings/serializers/cleaning.py:23
+#: settings/serializers/cleaning.py:22
 msgid "Operate log retention days"
 msgstr "操作日志保留天数"
 
-#: settings/serializers/cleaning.py:27
+#: settings/serializers/cleaning.py:26
 msgid "Password change log retention days"
 msgstr "用户改密日志保留天数"
 
-#: settings/serializers/cleaning.py:31
+#: settings/serializers/cleaning.py:30
 msgid "FTP log retention days"
 msgstr "上传下载记录保留天数"
 
-#: settings/serializers/cleaning.py:35
+#: settings/serializers/cleaning.py:34
 msgid "Cloud sync task history retention days"
 msgstr "云同步记录保留天数"
 
-#: settings/serializers/cleaning.py:39
+#: settings/serializers/cleaning.py:38
 msgid "job execution retention days"
 msgstr "作业执行历史保留天数"
 
-#: settings/serializers/cleaning.py:43
+#: settings/serializers/cleaning.py:42
 msgid "Activity log retention days"
 msgstr "活动记录保留天数"
 
-#: settings/serializers/cleaning.py:46
+#: settings/serializers/cleaning.py:45
 msgid "Session log retention days"
 msgstr "会话日志保留天数"
 
-#: settings/serializers/cleaning.py:48
+#: settings/serializers/cleaning.py:47
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
 "会话、录像，命令记录超过该时长将会被清除 (影响数据库存储，OSS 等不受影响)"
 
-#: settings/serializers/cleaning.py:53
+#: settings/serializers/cleaning.py:52
 msgid "Change secret and push record retention days"
 msgstr "账号改密推送记录保留天数"
 
-#: settings/serializers/cleaning.py:57
-#, fuzzy
-#| msgid "Change secret and push record retention days"
+#: settings/serializers/cleaning.py:56
 msgid "Audit report send record retention days"
-msgstr "账号改密推送记录保留天数"
+msgstr "审计报告发送记录保留天数"
 
 #: settings/serializers/feature.py:23 settings/serializers/msg.py:69
 msgid "Subject"
@@ -7950,8 +8245,8 @@ msgid ""
 "automatic sent to the admin by system within 5 days (daily) before the "
 "password expires"
 msgstr ""
-"如果管理员在此期间没有更新密码，管理员密码将过期失效； 密码过期提醒邮件将在密码过"
-"期前5天内由系统 (每天)自动发送给管理员"
+"如果管理员在此期间没有更新密码，管理员密码将过期失效； 密码过期提醒邮件将在密"
+"码过期前5天内由系统 (每天)自动发送给管理员"
 
 #: settings/serializers/security.py:28
 msgid "User password expiration (day)"
@@ -8766,26 +9061,26 @@ msgstr "测试失败：请检查配置"
 msgid "Have online sessions"
 msgstr "有在线会话"
 
-#: terminal/api/session/session.py:51
+#: terminal/api/session/session.py:52
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
 
-#: terminal/api/session/session.py:161 terminal/api/session/session.py:295
+#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
 #: terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "会话录像"
 
-#: terminal/api/session/session.py:337
+#: terminal/api/session/session.py:339
 #, python-brace-format
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session/session.py:340
+#: terminal/api/session/session.py:342
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:353 tickets/api/ticket.py:140
+#: terminal/api/session/session.py:355 tickets/api/ticket.py:142
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -9285,6 +9580,50 @@ msgstr "测试失败: 账号无效"
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "无效的存储"
+
+#: terminal/reporting.py:10
+msgid "Session Report"
+msgstr "会话报告"
+
+#: terminal/reporting.py:24 terminal/reporting.py:103
+msgid "Successful sessions"
+msgstr "成功会话数"
+
+#: terminal/reporting.py:25 terminal/reporting.py:103
+msgid "Failed sessions"
+msgstr "失败会话数"
+
+#: terminal/reporting.py:26
+msgid "Finished sessions"
+msgstr "已结束会话数"
+
+#: terminal/reporting.py:27 terminal/reporting.py:103
+msgid "Active sessions"
+msgstr "活跃会话数"
+
+#: terminal/reporting.py:29
+msgid "Sessions with replay"
+msgstr "有录像的会话数"
+
+#: terminal/reporting.py:30
+msgid "Sessions with commands"
+msgstr "有命令记录的会话数"
+
+#: terminal/reporting.py:33
+msgid "Unique terminals"
+msgstr "唯一终端数"
+
+#: terminal/reporting.py:107
+msgid "Protocol Distribution"
+msgstr "协议分布"
+
+#: terminal/reporting.py:112
+msgid "Login From Distribution"
+msgstr "登录来源分布"
+
+#: terminal/reporting.py:127
+msgid "Terminal Top 10"
+msgstr "终端 Top 10"
 
 #: terminal/serializers/applet.py:29 terminal/serializers/virtualapp.py:16
 msgid "Icon"
@@ -9840,7 +10179,8 @@ msgstr ""
 "请检查此命令的执行情况，以确保其符合您组织的安全策略。如果您未授权此操作或发"
 "现任何异常，请立即采取必要的措施。"
 
-#: tickets/api/ticket.py:88 tickets/models/ticket/general.py:289
+#: tickets/api/ticket.py:90 tickets/models/ticket/general.py:289
+#: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "申请人"
 
@@ -10036,7 +10376,7 @@ msgstr "标题"
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/models/ticket/general.py:296
+#: tickets/models/ticket/general.py:296 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "审批步骤"
 
@@ -10105,6 +10445,62 @@ msgstr "你的工单已被处理, 处理人 - {}"
 #, python-brace-format
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
+
+#: tickets/reporting.py:10
+msgid "Ticket Report"
+msgstr "工单报告"
+
+#: tickets/reporting.py:17
+msgid "Open tickets"
+msgstr "打开工单数"
+
+#: tickets/reporting.py:18
+msgid "Closed tickets"
+msgstr "已关闭工单数"
+
+#: tickets/reporting.py:19
+msgid "Pending tickets"
+msgstr "待处理工单数"
+
+#: tickets/reporting.py:20
+msgid "Approved tickets"
+msgstr "已通过工单数"
+
+#: tickets/reporting.py:21
+msgid "Rejected tickets"
+msgstr "已拒绝工单数"
+
+#: tickets/reporting.py:22
+msgid "Unique applicants"
+msgstr "唯一申请人数"
+
+#: tickets/reporting.py:25
+msgid "Unique organizations"
+msgstr "唯一组织数"
+
+#: tickets/reporting.py:69
+msgid "Ticket Type Distribution"
+msgstr "工单类型分布"
+
+#: tickets/reporting.py:74
+msgid "Ticket State Distribution"
+msgstr "工单审批状态分布"
+
+#: tickets/reporting.py:79
+msgid "Ticket Status Distribution"
+msgstr "工单状态分布"
+
+#: tickets/reporting.py:84
+msgid "Organization Top 10"
+msgstr "组织 Top 10"
+
+#: tickets/reporting.py:89
+msgid "Applicant Top 10"
+msgstr "申请人 Top 10"
+
+#: tickets/reporting.py:94
+msgid "Approval Step Distribution"
+msgstr "审批步骤分布"
 
 #: tickets/serializers/flow.py:45
 msgid "The current organization type already exists"
@@ -10385,10 +10781,8 @@ msgid "Preference"
 msgstr "用户设置"
 
 #: users/models/user/__init__.py:70
-#, fuzzy
-#| msgid "Email account"
 msgid "Email lookup"
-msgstr "邮箱账号"
+msgstr "邮箱查找"
 
 #: users/models/user/__init__.py:82 users/serializers/user.py:259
 msgid "Is service account"
@@ -11777,10 +12171,8 @@ msgid "Auto node classification"
 msgstr "自动节点分类"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:108
-#, fuzzy
-#| msgid "Domain name"
 msgid "domain_name"
-msgstr "域名称"
+msgstr "域名"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
@@ -11926,11 +12318,11 @@ msgstr "顶部宽 Logo"
 msgid "Small logo without text"
 msgstr "方形小 Logo"
 
-#: xpack/plugins/license/api.py:57
+#: xpack/plugins/license/api.py:52
 msgid "License import successfully"
 msgstr "许可证导入成功"
 
-#: xpack/plugins/license/api.py:58
+#: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
 
