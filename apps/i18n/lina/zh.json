@@ -602,6 +602,7 @@
     "ExportOnlyFiltered": "仅导出搜索结果",
     "ExportOnlySelectedItems": "仅导出选择项",
     "ExportRange": "导出范围",
+    "ReportExport": "报告导出",
     "ExtraArgsFormatError": "格式错误，请按要求输入",
     "ExtraArgsPlaceholder": "每行一个选项，例如：\n选项1:值1\n选项2:值2\n",
     "FC": "Fusion Compute",

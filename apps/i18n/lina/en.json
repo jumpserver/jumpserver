@@ -602,6 +602,7 @@
     "ExportOnlyFiltered": "Export filtered items",
     "ExportOnlySelectedItems": "Export selected items",
     "ExportRange": "Export range",
+    "ReportExport": "Report export",
     "ExtraArgsFormatError": "Format error, please enter according to the requirements",
     "ExtraArgsPlaceholder": "One option per line, for example:\nOption 1: Value 1\nOption 2: Value 2",
     "FC": "Fusion compute",
