@@ -9,7 +9,7 @@ class FormatAssetInfo:
     @staticmethod
     def posix_format(info):
         for cpu_model in info.get('cpu_model', []):
-            if cpu_model.endswith('GHz') or cpu_model.startswith("Intel"):
+            if cpu_model.endswith('GHz') or cpu_model.startswith("Intel") or cpu_model.startswith("AMD"):
                 break
         else:
             cpu_model = ''
