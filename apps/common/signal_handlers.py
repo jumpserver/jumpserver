@@ -10,6 +10,7 @@ from django.db import connection
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
+from common.tasks import send_mail_async
 from jumpserver.utils import get_current_request
 from .local import thread_local
 from .signals import django_ready, webhook_signal
@@ -191,3 +192,28 @@ def check_migrations_file_prefix_conflict(*args, **kwargs):
 def clear_response_cache(sender, **kwargs):
     from django.core.cache import cache
     cache.delete_pattern('views.decorators.cache.cache_page:*')
+
+
+@receiver(webhook_signal)
+def handle_webhook_signal(sender, event_sender=None, event=None, payload=None, headers=None, **kwargs):
+    try:
+        if event_sender != 'jdmc' or event != 'backup_done':
+            return
+        
+        if not payload or not isinstance(payload, dict):
+            logger.warning(f'webhook {event} received with invalid payload: {payload}')
+            return
+
+        subject = payload.get('subject') or 'Backup completed'
+        message = payload.get('message') or ''
+        recipients = payload.get('recipients') or []
+
+        if not recipients:
+            logger.warning(f'No recipients for {event} webhook; skipping email send.')
+            return
+
+        logger.info(f'   - Sending email notification for webhook event: {event}')
+        send_mail_async.delay(subject, message, recipients, html_message=message)
+
+    except Exception:
+        logger.exception(f'Failed to handle {event} webhook signal')
