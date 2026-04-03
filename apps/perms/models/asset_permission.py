@@ -50,7 +50,7 @@ class AssetPermissionManager(OrgManager):
 
     def get_expired_permissions(self):
         now = local_now()
-        return self.get_queryset().filter(Q(date_start__lte=now) | Q(date_expired__gte=now))
+        return self.get_queryset().filter(date_expired__lt=now)
 
 
 def default_protocols():

@@ -40,7 +40,7 @@ class PermissionBaseFilter(BaseFilterSet):
         if is_expired:
             queryset = queryset.filter(Q(date_start__gt=now) | Q(date_expired__lt=now))
         else:
-            queryset = queryset.filter(Q(date_start__lt=now) | Q(date_expired__gt=now))
+            queryset = queryset.filter(Q(date_start__lt=now) & Q(date_expired__gt=now))
         return queryset
 
     def filter_valid(self, queryset):
