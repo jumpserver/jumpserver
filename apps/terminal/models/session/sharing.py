@@ -75,13 +75,13 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     @property
     def is_expired(self) -> bool:
         if timezone.now() > self.date_expired:
-            return False
-        return True
+            return True
+        return False
 
     def can_join(self, joiner):
         if not self.is_active:
             return False, _('Link not active')
-        if not self.is_expired:
+        if self.is_expired:
             return False, _('Link expired')
         if self.users and str(joiner.id) not in self.users.split(','):
             return False, _('User not allowed to join')
