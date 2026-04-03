@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from ldap3 import Server, Connection, SIMPLE
+from ldap3.utils.conv import escape_filter_chars
 from ldap3.core.exceptions import (
     LDAPSocketOpenError,
     LDAPSocketReceiveError,
@@ -130,11 +131,12 @@ class LDAPServerUtil(object):
         if self.search_users:
             mapping_username = self.config.attr_map.get('username')
             for user in self.search_users:
-                extra += '({}={})'.format(mapping_username, user)
+                extra += '({}={})'.format(mapping_username, escape_filter_chars(user))
             return '(|{})'.format(extra)
         if self.search_value:
+            safe_value = escape_filter_chars(self.search_value)
             for attr in self.config.attr_map.values():
-                extra += '({}={})'.format(attr, '*{}*'.format(self.search_value))
+                extra += '({}=*{}*)'.format(attr, safe_value)
             return '(|{})'.format(extra)
         return extra
 
