@@ -507,8 +507,8 @@ class AssetsTaskSerializer(serializers.Serializer):
 
 class AssetTaskSerializer(AssetsTaskSerializer):
     ACTION_CHOICES = tuple(list(AssetsTaskSerializer.ACTION_CHOICES) + [
-        ('push_system_user', 'push_system_user'),
-        ('test_system_user', 'test_system_user')
+        ('push_account', 'push_account'),
+        ('test_account', 'test_account')
     ])
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     asset = serializers.PrimaryKeyRelatedField(
