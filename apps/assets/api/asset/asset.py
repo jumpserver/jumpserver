@@ -273,7 +273,8 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     @staticmethod
     def perform_asset_task(serializer):
         data = serializer.validated_data
-        if data["action"] not in ["push_account", "test_account"]:
+        action = data["action"]
+        if action not in ["push_account", "test_account"]:
             return
 
         asset = data["asset"]
