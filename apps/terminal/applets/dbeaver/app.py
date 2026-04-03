@@ -148,7 +148,7 @@ class AppletApplication(BaseApplication):
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
         startupinfo.wShowWindow = subprocess.SW_HIDE
-        exec_string = '%s -con %s' % (self.path, params)
+        exec_string = [self.path, '-con', params]
         ret = subprocess.Popen(exec_string, startupinfo=startupinfo)
         self.pid = ret.pid
 
