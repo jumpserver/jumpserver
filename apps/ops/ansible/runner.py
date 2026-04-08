@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils._os import safe_join
 
 from common.utils import is_macos
+from common.utils.yml import sanitize_ansible_inventory_json, sanitize_ansible_playbook
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
 from .interface import interface
@@ -78,7 +79,10 @@ class AdHocRunner:
 
 
 class PlaybookRunner:
-    def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None, ):
+    def __init__(
+            self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None,
+            safety_mode=None, inventory_safety=None,
+    ):
 
         self.id = uuid.uuid4()
         self.inventory = inventory
@@ -92,6 +96,9 @@ class PlaybookRunner:
         if extra_vars is None:
             extra_vars = {}
         self.extra_vars = extra_vars
+        self.safety_mode = safety_mode
+        self.inventory_safety = inventory_safety
+        self.safe_paths = []
 
     def copy_playbook(self):
         entry = os.path.basename(self.playbook)
@@ -100,8 +107,34 @@ class PlaybookRunner:
         shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
         self.playbook = entry
 
+    def prepare_safe_inputs(self):
+        # Security anchor:
+        # For system-generated Ansible inputs that may contain user-controlled values,
+        # callers should explicitly enable safety_mode / inventory_safety so the runner
+        # executes sanitized copies instead of raw files.
+        if self.safety_mode == "playbook_unsafe":
+            project_playbook = os.path.join(self.project_dir, "project", self.playbook)
+            suffix = uuid.uuid4().hex[:8]
+            safe_playbook = os.path.join(self.project_dir, "project", f"__safe__{suffix}__{self.playbook}")
+            sanitize_ansible_playbook(project_playbook, safe_playbook)
+            os.chmod(safe_playbook, 0o600)
+            self.safe_paths.append(safe_playbook)
+            self.playbook = os.path.basename(safe_playbook)
+
+        if self.inventory_safety == "json_escape":
+            inventory_dir = os.path.join(self.project_dir, "inventory")
+            os.makedirs(inventory_dir, exist_ok=True)
+            inventory_name = os.path.basename(self.inventory)
+            suffix = uuid.uuid4().hex[:8]
+            safe_inventory = os.path.join(inventory_dir, f"__safe__{suffix}__{inventory_name}")
+            sanitize_ansible_inventory_json(self.inventory, safe_inventory)
+            os.chmod(safe_inventory, 0o600)
+            self.safe_paths.append(safe_inventory)
+            self.inventory = safe_inventory
+
     def run(self, verbosity=0, **kwargs):
         self.copy_playbook()
+        self.prepare_safe_inputs()
 
         verbosity = get_ansible_log_verbosity(verbosity)
         private_env = safe_join(self.project_dir, 'env')
@@ -113,18 +146,25 @@ class PlaybookRunner:
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
-        interface.run(
-            private_data_dir=self.project_dir,
-            inventory=self.inventory,
-            playbook=self.playbook,
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            host_cwd=self.project_dir,
-            envvars=self.envs,
-            extravars=self.extra_vars,
-            **kwargs
-        )
+        try:
+            interface.run(
+                private_data_dir=self.project_dir,
+                inventory=self.inventory,
+                playbook=self.playbook,
+                verbosity=verbosity,
+                event_handler=self.cb.event_handler,
+                status_handler=self.cb.status_handler,
+                host_cwd=self.project_dir,
+                envvars=self.envs,
+                extravars=self.extra_vars,
+                **kwargs
+            )
+        finally:
+            for path in self.safe_paths:
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
         return self.cb
 
 
