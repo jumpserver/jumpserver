@@ -98,7 +98,6 @@ class PlaybookRunner:
         self.extra_vars = extra_vars
         self.safety_mode = safety_mode
         self.inventory_safety = inventory_safety
-        self.safe_paths = []
 
     def copy_playbook(self):
         entry = os.path.basename(self.playbook)
@@ -111,26 +110,17 @@ class PlaybookRunner:
         # Security anchor:
         # For system-generated Ansible inputs that may contain user-controlled values,
         # callers should explicitly enable safety_mode / inventory_safety so the runner
-        # executes sanitized copies instead of raw files.
+        # sanitizes the task-private playbook / inventory before Ansible runs.
+        # This is intended for system-generated inputs whose values should be treated as
+        # literal data, not for arbitrary user-authored playbooks or execution logic.
         if self.safety_mode == "playbook_unsafe":
             project_playbook = os.path.join(self.project_dir, "project", self.playbook)
-            suffix = uuid.uuid4().hex[:8]
-            safe_playbook = os.path.join(self.project_dir, "project", f"__safe__{suffix}__{self.playbook}")
-            sanitize_ansible_playbook(project_playbook, safe_playbook)
-            os.chmod(safe_playbook, 0o600)
-            self.safe_paths.append(safe_playbook)
-            self.playbook = os.path.basename(safe_playbook)
+            sanitize_ansible_playbook(project_playbook, project_playbook)
+            os.chmod(project_playbook, 0o600)
 
         if self.inventory_safety == "json_escape":
-            inventory_dir = os.path.join(self.project_dir, "inventory")
-            os.makedirs(inventory_dir, exist_ok=True)
-            inventory_name = os.path.basename(self.inventory)
-            suffix = uuid.uuid4().hex[:8]
-            safe_inventory = os.path.join(inventory_dir, f"__safe__{suffix}__{inventory_name}")
-            sanitize_ansible_inventory_json(self.inventory, safe_inventory)
-            os.chmod(safe_inventory, 0o600)
-            self.safe_paths.append(safe_inventory)
-            self.inventory = safe_inventory
+            sanitize_ansible_inventory_json(self.inventory, self.inventory)
+            os.chmod(self.inventory, 0o600)
 
     def run(self, verbosity=0, **kwargs):
         self.copy_playbook()
@@ -146,25 +136,18 @@ class PlaybookRunner:
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
-        try:
-            interface.run(
-                private_data_dir=self.project_dir,
-                inventory=self.inventory,
-                playbook=self.playbook,
-                verbosity=verbosity,
-                event_handler=self.cb.event_handler,
-                status_handler=self.cb.status_handler,
-                host_cwd=self.project_dir,
-                envvars=self.envs,
-                extravars=self.extra_vars,
-                **kwargs
-            )
-        finally:
-            for path in self.safe_paths:
-                try:
-                    os.remove(path)
-                except OSError:
-                    pass
+        interface.run(
+            private_data_dir=self.project_dir,
+            inventory=self.inventory,
+            playbook=self.playbook,
+            verbosity=verbosity,
+            event_handler=self.cb.event_handler,
+            status_handler=self.cb.status_handler,
+            host_cwd=self.project_dir,
+            envvars=self.envs,
+            extravars=self.extra_vars,
+            **kwargs
+        )
         return self.cb
 
 

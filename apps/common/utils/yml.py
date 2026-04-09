@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 
 import yaml
 from ansible.utils.unsafe_proxy import wrap_var
@@ -80,6 +82,13 @@ def dump_ansible_yaml(data, stream):
     )
 
 
+INVENTORY_LITERAL_PATHS = (
+    ("all", "hosts", "*", "ansible_host"),
+    ("all", "hosts", "*", "jms_asset", "address"),
+    ("all", "hosts", "*", "jms_asset", "origin_address"),
+)
+
+
 def escape_ansible_jinja(value):
     if not isinstance(value, str):
         return value
@@ -105,6 +114,52 @@ def sanitize_ansible_inventory_value(value):
     return escape_ansible_jinja(value)
 
 
+def sanitize_inventory_by_paths(value, path_patterns, current_path=()):
+    # 递归遍历 inventory，只在命中高风险路径时处理对应值
+    if isinstance(value, dict):
+        return {
+            key: sanitize_inventory_by_paths(item, path_patterns, current_path + (key,))
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [
+            sanitize_inventory_by_paths(item, path_patterns, current_path + (str(index),))
+            for index, item in enumerate(value)
+        ]
+    if isinstance(value, tuple):
+        return tuple(
+            sanitize_inventory_by_paths(item, path_patterns, current_path + (str(index),))
+            for index, item in enumerate(value)
+        )
+
+    if any(path_matches_pattern(current_path, pattern) for pattern in path_patterns):
+        return sanitize_ansible_inventory_value(value)
+    return value
+
+
+def path_matches_pattern(path, pattern):
+    # `*` 只匹配单层，例如 host 名
+    if len(path) != len(pattern):
+        return False
+    return all(expected == "*" or actual == expected for actual, expected in zip(path, pattern))
+
+
+def atomic_dump_text(dest_path, writer):
+    # 先写临时文件，再原子替换，避免目标文件出现半写入状态
+    dest_dir = os.path.dirname(dest_path) or "."
+    fd, tmp_path = tempfile.mkstemp(dir=dest_dir)
+    try:
+        with os.fdopen(fd, "w") as f:
+            writer(f)
+        os.replace(tmp_path, dest_path)
+    except Exception:
+        try:
+            os.remove(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
 def sanitize_ansible_playbook(playbook_path, dest_path):
     with open(playbook_path) as f:
         plays = yaml.safe_load(f)
@@ -114,19 +169,16 @@ def sanitize_ansible_playbook(playbook_path, dest_path):
         if isinstance(vars_data, dict):
             play["vars"] = wrap_ansible_unsafe(vars_data)
 
-    with open(dest_path, "w") as f:
-        dump_ansible_yaml(plays, f)
+    atomic_dump_text(dest_path, lambda f: dump_ansible_yaml(plays, f))
 
 
 def sanitize_ansible_inventory_json(inventory_path, dest_path):
     with open(inventory_path) as f:
         data = json.load(f)
 
-    for host_name, host in data.get("all", {}).get("hosts", {}).items():
-        data["all"]["hosts"][host_name] = sanitize_ansible_inventory_value(host)
+    data = sanitize_inventory_by_paths(data, INVENTORY_LITERAL_PATHS)
 
-    with open(dest_path, "w") as f:
-        json.dump(data, f, indent=4)
+    atomic_dump_text(dest_path, lambda f: json.dump(data, f, indent=4))
 
 
 if __name__ == '__main__':
