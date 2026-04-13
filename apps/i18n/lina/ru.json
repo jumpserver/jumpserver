@@ -1691,5 +1691,6 @@
     "ReportPeriodicExecution": "Периодическое выполнение",
     "ReportRecipientsLabel": "Получатели",
     "ReportRecipientsTip": "В настоящее время поддерживается только отправка по электронной почте",
-    "ReportSchedulePriorityTip": "Если установлены и интервал, и crontab, приоритет отдается crontab"
+    "ReportSchedulePriorityTip": "Если установлены и интервал, и crontab, приоритет отдается crontab",
+    "FooterContentTooLong": "Содержание нижнего колонтитула не может превышать 200 символов"
 }

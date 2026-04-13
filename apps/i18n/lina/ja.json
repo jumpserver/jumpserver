@@ -1696,5 +1696,6 @@
     "ReportPeriodicExecution": "定期実行",
     "ReportRecipientsLabel": "宛先",
     "ReportRecipientsTip": "現在はメール送信のみ対応しています",
-    "ReportSchedulePriorityTip": "interval と crontab の両方が設定されている場合、crontab が優先されます"
+    "ReportSchedulePriorityTip": "interval と crontab の両方が設定されている場合、crontab が優先されます",
+    "FooterContentTooLong": "フッターの内容は200文字を超えることはできません。"
 }

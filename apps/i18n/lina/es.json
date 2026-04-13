@@ -1691,5 +1691,6 @@
     "ReportPeriodicExecution": "Ejecución Periódica",
     "ReportRecipientsLabel": "Receptores",
     "ReportRecipientsTip": "Actualmente solo admite envío por correo electrónico",
-    "ReportSchedulePriorityTip": "Si se establecen tanto el intervalo como el crontab, el crontab tiene prioridad"
+    "ReportSchedulePriorityTip": "Si se establecen tanto el intervalo como el crontab, el crontab tiene prioridad",
+    "FooterContentTooLong": "El contenido del pie de página no debe exceder los 200 caracteres"
 }

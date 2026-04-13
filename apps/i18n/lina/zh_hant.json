@@ -1696,5 +1696,6 @@
     "ReportPeriodicExecution": "週期執行",
     "ReportRecipientsLabel": "收件人",
     "ReportRecipientsTip": "當前僅支持郵件發送",
-    "ReportSchedulePriorityTip": "如果同時設置了 interval 和 crontab，則優先考慮 crontab"
+    "ReportSchedulePriorityTip": "如果同時設置了 interval 和 crontab，則優先考慮 crontab",
+    "FooterContentTooLong": "頁腳內容過長，請限制在 200 字以內"
 }

@@ -1692,5 +1692,6 @@
     "ReportPeriodicExecution": "Execução Periódica",
     "ReportRecipientsLabel": "Destinatários",
     "ReportRecipientsTip": "Atualmente suporta apenas envio por e-mail",
-    "ReportSchedulePriorityTip": "Se ambos, intervalo e crontab, estiverem definidos, o crontab terá prioridade"
+    "ReportSchedulePriorityTip": "Se ambos, intervalo e crontab, estiverem definidos, o crontab terá prioridade",
+    "FooterContentTooLong": "O conteúdo do rodapé não pode exceder 200 caracteres."
 }

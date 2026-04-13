@@ -1691,5 +1691,6 @@
     "ReportPeriodicExecution": "주기적 실행",
     "ReportRecipientsLabel": "수신자",
     "ReportRecipientsTip": "현재 이메일 전송만 지원합니다",
-    "ReportSchedulePriorityTip": "interval 과 crontab 이 모두 설정된 경우 crontab 이 우선합니다"
+    "ReportSchedulePriorityTip": "interval 과 crontab 이 모두 설정된 경우 crontab 이 우선합니다",
+    "FooterContentTooLong": "바닥글 내용은 200자를 초과할 수 없습니다."
 }

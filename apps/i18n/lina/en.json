@@ -1688,5 +1688,6 @@
     "ReportPeriodicExecution": "Periodic Execution",
     "ReportRecipientsLabel": "Recipients",
     "ReportRecipientsTip": "Currently only supports email sending",
-    "ReportSchedulePriorityTip": "If both interval and crontab are set, crontab takes priority"
+    "ReportSchedulePriorityTip": "If both interval and crontab are set, crontab takes priority",
+    "FooterContentTooLong": "Footer content is too long, please limit it to 200 characters"
 }
