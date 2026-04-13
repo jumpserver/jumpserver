@@ -4,6 +4,7 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.templatetags.static import static
+from django.utils.translation import get_language
 
 DEFAULT_VENDOR = "jumpserver"
 DEFAULT_LOGIN_TEMPLATE = "authentication/login.html"
@@ -73,13 +74,14 @@ def _build_vendor_translate_ext() -> dict:
 
 def _build_vendor_interface_ext_defaults() -> dict:
     defaults = {}
+    translate = get_vendor_value('translate', default={})
     for field_name, field_info in _build_vendor_interface_ext().items():
         if "default" in field_info:
             default_value = field_info["default"]
             if field_info['type'] == "image":
                 defaults[field_name] = _build_asset(default_value)
             else:
-                defaults[field_name] = default_value
+                defaults[field_name] = translate.get(get_language(), {}).get(default_value, default_value)
     return defaults
 
 
