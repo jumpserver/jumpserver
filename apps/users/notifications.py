@@ -1,4 +1,3 @@
-from collections import defaultdict
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -12,11 +11,9 @@ from users.utils import activate_user_language
 
 
 class UserCreatedMsg(UserMessage):
-    subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
+    subject = _('Create account successfully')
     template_name = 'users/_msg_user_created.html'
     contexts = [
-        {"name": "honorific", "label": _('Honorific'), "default": "John"},
-        {"name": "content", "label": _('Content'), "default": "Welcome to use our system."},
         {"name": "username", "label": _('Username'), "default": "john"},
         {"name": "name", "label": _('Name'), "default": "John"},
         {"name": "email", "label": _('Email'), "default": "john@example.com"},
@@ -29,20 +26,9 @@ class UserCreatedMsg(UserMessage):
 
     def get_html_msg(self) -> dict:
         user = self.user
-        mail_context = {
-            'subject': settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT,
-            'honorific': settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC,
-            'content': settings.EMAIL_CUSTOM_USER_CREATED_BODY
-        }
-
         user_info = {'username': user.username, 'name': user.name, 'email': user.email}
         with activate_user_language(self.user):
-            # 转换成 defaultdict，否则 format 时会报 KeyError
-            user_info = defaultdict(str, **user_info)
-            mail_context = {k: v.format_map(user_info) for k, v in mail_context.items()}
-
             context = {
-                **mail_context,
                 **user_info,
                 'rest_password_url': reverse('authentication:reset-password', external=True),
                 'rest_password_token': user.generate_reset_token(),
@@ -50,7 +36,7 @@ class UserCreatedMsg(UserMessage):
             }
             message = custom_render_to_string(self.template_name, context)
             return {
-                'subject': mail_context['subject'],
+                'subject': str(self.subject),
                 'message': message
             }
 

@@ -141,6 +141,11 @@ def get_all_test_messages(request):
     return HttpResponse(html_data + text_data)
 
 
+def _get_default_rendered_template(meta):
+    ctx = {x.get('name'): x.get('default') for x in meta.get('contexts', [])}
+    return render_to_string(meta['template_name'], ctx)
+
+
 class TemplateViewSet(JMSGenericViewSet):
     permission_classes = [OnlySuperUser]
 
@@ -190,6 +195,23 @@ class TemplateViewSet(JMSGenericViewSet):
 
         data_path = _get_data_template_path(template_name)
         edit_path = _get_edit_template_path(template_name)
+        if not os.path.exists(edit_path):
+            meta = next(
+                (item for item in (cls.as_dict() for cls in CustomMsgTemplateBase._registry)
+                 if item['template_name'] == template_name),
+                None
+            )
+            if meta:
+                try:
+                    default_rendered = _get_default_rendered_template(meta).strip()
+                except Exception:
+                    default_rendered = None
+                # Before any custom template exists, the list API returns a rendered preview with
+                # demo values. Saving that preview verbatim would persist example data as the real
+                # template, so treat this first-save/reset-save case as a no-op.
+                if default_rendered and content.strip() == default_rendered and render_html.strip() == default_rendered:
+                    return Response({'ok': True, 'path': None, 'skipped': True})
+
         data_dir = os.path.dirname(data_path)
         try:
             os.makedirs(data_dir, exist_ok=True)

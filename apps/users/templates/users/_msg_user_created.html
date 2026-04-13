@@ -1,12 +1,12 @@
 {% load i18n %}
 
 <p>
-    {{ honorific }}
+    {% blocktrans with display_name=name|default:username %}Hello {{ display_name }}{% endblocktrans %}
 </p>
 
 <div>
     <p>
-        {{ content | safe }}
+        {% trans 'Your account has been created successfully.' %}
     </p>
     <p>
         {% trans 'Username' %}: {{ username }} <br/>

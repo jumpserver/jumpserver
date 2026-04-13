@@ -64,26 +64,6 @@ class EmailContentSettingSerializer(serializers.Serializer):
     EMAIL_SUBJECT_PREFIX = serializers.CharField(
         max_length=1024, required=True, label=_('Subject prefix')
     )
-    EMAIL_CUSTOM_USER_CREATED_SUBJECT = serializers.CharField(
-        max_length=1024, allow_blank=True, required=False,
-        label=_('Subject'),
-        help_text=_('Tips: When creating a user, send the subject of the email (eg:Create account successfully)')
-    )
-    EMAIL_CUSTOM_USER_CREATED_HONORIFIC = serializers.CharField(
-        max_length=1024, allow_blank=True, required=False,
-        label=_('Honorific'),
-        help_text=_('Tips: When creating a user, send the honorific of the email (eg:Hello)')
-    )
-    EMAIL_CUSTOM_USER_CREATED_BODY = serializers.CharField(
-        max_length=4096, allow_blank=True, required=False,
-        label=_('Content'),
-        help_text=_(
-            'Tips: When creating a user, send the content of the email, support {username} {name} {email} label')
-    )
-    EMAIL_CUSTOM_USER_CREATED_SIGNATURE = serializers.CharField(
-        max_length=512, allow_blank=True, required=False, label=_('Signature'),
-        help_text=_('Tips: Email signature (eg:jumpserver)')
-    )
 
 
 class SMSBackendSerializer(serializers.Serializer):
