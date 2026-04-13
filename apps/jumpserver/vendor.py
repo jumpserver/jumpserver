@@ -62,6 +62,27 @@ def _build_vendor_info_value(key: str, default=None):
     return info.get(key, default)
 
 
+def _build_vendor_interface_ext() -> dict:
+    value = _build_vendor_info_value("interface_ext", default={})
+    return value if isinstance(value, dict) else {}
+
+def _build_vendor_translate_ext() -> dict:
+    value = _build_vendor_info_value("translate", default={})
+    return value if isinstance(value, dict) else {}
+
+
+def _build_vendor_interface_ext_defaults() -> dict:
+    defaults = {}
+    for field_name, field_info in _build_vendor_interface_ext().items():
+        if "default" in field_info:
+            default_value = field_info["default"]
+            if field_info['type'] == "image":
+                defaults[field_name] = _build_asset(default_value)
+            else:
+                defaults[field_name] = default_value
+    return defaults
+
+
 def _build_asset(filename: str) -> str:
     if is_default_vendor():
         return static(filename)
@@ -70,6 +91,17 @@ def _build_asset(filename: str) -> str:
     if finders.find(vendor_path):
         return static(vendor_path)
     return static(filename)
+
+
+def _build_optional_asset(filename: str, default=None):
+    if not is_default_vendor():
+        vendor_path = f"{settings.VENDOR}/{filename}"
+        if finders.find(vendor_path):
+            return static(vendor_path)
+
+    if finders.find(filename):
+        return static(filename)
+    return default
 
 
 VENDOR_BUILDERS = {
@@ -83,6 +115,9 @@ VENDOR_BUILDERS = {
     "logo_text_white": lambda: _build_asset("img/logo_text_white.png"),
     "login_title": lambda: _build_vendor_info_value("login_title"),
     "footer_content": lambda: _build_vendor_info_value("footer_content"),
+    "interface_ext": _build_vendor_interface_ext,
+    "translate": _build_vendor_translate_ext,
+    "interface_ext_defaults": _build_vendor_interface_ext_defaults,
 }
 
 

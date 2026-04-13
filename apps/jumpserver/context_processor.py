@@ -18,6 +18,7 @@ default_interface = dict((
     ('theme', get_vendor_value('theme', default='classic_green')),
     ('theme_info', {}),
     ('footer_content', get_vendor_value('footer_content', default='')),
+    ('ext', get_vendor_value('interface_ext_defaults', default={})),
     ('vendor', settings.VENDOR),
     ('version', os.environ.get("CURRENT_VERSION", ""))
 ))

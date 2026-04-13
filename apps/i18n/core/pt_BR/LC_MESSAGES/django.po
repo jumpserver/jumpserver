@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-02 14:52+0800\n"
+"POT-Creation-Date: 2026-04-10 15:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,7 +34,6 @@ msgid "Account not found"
 msgstr "Conta não encontrada"
 
 #: accounts/api/automations/base.py:88 tickets/api/ticket.py:134
-#, python-brace-format
 msgid "The parameter 'action' must be [{}]"
 msgstr "O parâmetro 'action' deve ser [{}]"
 
@@ -117,12 +116,10 @@ msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "Sucesso: %s, Falha: %s, Total: %s"
 
 #: accounts/automations/check_account/manager.py:277
-#, python-brace-format
 msgid "Check account report of {}"
 msgstr "Relatório de Detecção de Risco {}"
 
 #: accounts/automations/check_account/manager.py:283
-#, python-brace-format
 msgid ""
 "---\n"
 "Summary: \n"
@@ -157,8 +154,6 @@ msgstr ">>> Iniciando teste de conectividade da conta do gateway"
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:43
-#: xpack/plugins/cloud/serializers/account_attrs.py:105
-#: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "Password"
 msgstr "Senha"
 
@@ -627,7 +622,10 @@ msgid "Name"
 msgstr "Nome"
 
 #: accounts/models/application.py:18 settings/serializers/auth/oauth2.py:25
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:16
+#: static/sangfor/authentication/login.html:908
+#: static/sangfor/authentication/login.html:917
+#: static/sangfor/authentication/login.html:928
+#: xpack/plugins/interface/templates/login_i18n.html:16
 msgid "Logo"
 msgstr "Ícone"
 
@@ -927,8 +925,6 @@ msgstr "Senha repetida"
 #: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
-#: xpack/plugins/cloud/serializers/account_attrs.py:103
-#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Username"
 msgstr "Nome de usuário"
 
@@ -1140,7 +1136,6 @@ msgid "Notification of account backup route task results"
 msgstr "Notificação de resultado da tarefa de backup da conta"
 
 #: accounts/notifications.py:23 accounts/notifications.py:48
-#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
@@ -1148,7 +1143,6 @@ msgstr ""
 "{} - A tarefa de backup da conta está concluída, veja detalhes no anexo "
 
 #: accounts/notifications.py:26
-#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
@@ -1163,7 +1157,6 @@ msgid "Notification of implementation result of encryption change plan"
 msgstr "Tarefa de alteração de senha concluída"
 
 #: accounts/notifications.py:69
-#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
@@ -1171,7 +1164,6 @@ msgstr ""
 "{} - A tarefa de alteração de senha foi concluída, veja detalhes no anexo"
 
 #: accounts/notifications.py:73
-#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
@@ -1226,7 +1218,6 @@ msgid "Change password and Add"
 msgstr "Alterar senha e adicionar"
 
 #: accounts/risk_handlers.py:127
-#, python-brace-format
 msgid "Execution failed: {}"
 msgstr "Execução falhou: {}"
 
@@ -2007,7 +1998,6 @@ msgid "Command group"
 msgstr "Grupo de Comandos"
 
 #: acls/models/command_acl.py:86
-#, python-brace-format
 msgid "The generated regular expression is incorrect: {}"
 msgstr "A expressão regular gerada está errada: {}"
 
@@ -2160,23 +2150,19 @@ msgid "Recipients"
 msgstr "Destinatário"
 
 #: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:79
-#, python-brace-format
 msgid "The organization `{}` does not exist"
 msgstr "A organização `{}` não existe."
 
 #: acls/serializers/base.py:131
-#, python-brace-format
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "Todos os revisores não pertencem à organização `{}`"
 
 #: acls/serializers/rules/rules.py:22
 #: xpack/plugins/cloud/serializers/task.py:163
-#, python-brace-format
 msgid "IP address invalid: `{}`"
 msgstr "Endereço IP inválido: `{}`"
 
 #: acls/serializers/rules/rules.py:35
-#, python-brace-format
 msgid "address invalid: `{}`"
 msgstr "Endereço inválido: `{}`"
 
@@ -2256,17 +2242,17 @@ msgstr "Queremos informá-lo de que recentemente houve logins de usuários:"
 msgid "User details"
 msgstr "Detalhes do usuário"
 
-#: assets/api/asset/asset.py:166
+#: assets/api/asset/asset.py:165
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "Não é possível criar ativos diretamente, você deve criar um host ou outros "
 "ativos."
 
-#: assets/api/asset/asset.py:172
+#: assets/api/asset/asset.py:171
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "A quantidade de ativos excedeu o limite de 5000"
 
-#: assets/api/asset/asset.py:178
+#: assets/api/asset/asset.py:177
 #, fuzzy
 #| msgid "The number of assets exceeds the limit of 5000"
 msgid "The number of assets exceeds the license limit"
@@ -2277,7 +2263,6 @@ msgid "You can't update the root node name"
 msgstr "Não é possível modificar o nome do nó raiz"
 
 #: assets/api/node.py:65
-#, python-brace-format
 msgid "You can't delete the root node ({})"
 msgstr "Não é possível excluir o nó raiz ({})"
 
@@ -2298,12 +2283,10 @@ msgid "App Assets"
 msgstr "Gestão de ativos"
 
 #: assets/automations/base/manager.py:139
-#, python-brace-format
 msgid "Task: {} finished"
 msgstr "Tarefa: {} concluída"
 
 #: assets/automations/base/manager.py:340
-#, python-brace-format
 msgid "  - Platform {} ansible disabled"
 msgstr " - Plataforma {} Ansible foi desabilitada, impossível executar tarefas"
 
@@ -2335,7 +2318,6 @@ msgid "No account"
 msgstr "Sem conta"
 
 #: assets/automations/ping_gateway/manager.py:36
-#, python-brace-format
 msgid "Asset, {}, using account {}"
 msgstr "Ativos, {}, Use a conta {}"
 
@@ -2449,8 +2431,7 @@ msgstr "Serviço de nuvem"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
-#: common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "Personalizado"
 
@@ -2544,8 +2525,8 @@ msgid ""
 "<br>- ${USER} The username of the user"
 msgstr ""
 "Diretório raiz do SFTP, suporta variáveis: <br>-${ACCOUNT} nome de usuário "
-"da conta conectada <br>-${HOME} diretório principal da conta conectada <br>-$"
-"{USER} nome de usuário do usuário"
+"da conta conectada <br>-${HOME} diretório principal da conta conectada <br>-"
+"${USER} nome de usuário do usuário"
 
 #: assets/const/protocol.py:81
 msgid "Console"
@@ -3183,11 +3164,10 @@ msgid "port out of range (0-65535)"
 msgstr "Porta fora do alcance (0-65535)"
 
 #: assets/serializers/asset/common.py:315
-#, python-brace-format
 msgid "Protocol is required: {}"
 msgstr "O protocolo é obrigatório: {}"
 
-#: assets/serializers/asset/common.py:354 labels/api.py:107
+#: assets/serializers/asset/common.py:354
 msgid "Invalid data"
 msgstr "Dados inválidos"
 
@@ -3544,17 +3524,14 @@ msgstr ""
 "teste de conexão"
 
 #: assets/tasks/utils.py:16
-#, python-brace-format
 msgid "Asset has been disabled, skipped: {}"
 msgstr "O ativo já foi desativado, pular: {}"
 
 #: assets/tasks/utils.py:20
-#, python-brace-format
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "Talvez os ativos não suportem ansible, pulando: {}"
 
 #: assets/tasks/utils.py:38
-#, python-brace-format
 msgid "For security, do not push user {}"
 msgstr "Para segurança, é proibido empurrar o usuário {}"
 
@@ -3642,8 +3619,8 @@ msgstr "Conectar"
 
 #: audits/const.py:31 authentication/templates/authentication/login.html:334
 #: authentication/templates/authentication/login.html:407
-#: templates/_header_bar.html:101
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:28
+#: static/sangfor/authentication/login.html:999 templates/_header_bar.html:101
+#: xpack/plugins/interface/templates/login_i18n.html:28
 msgid "Login"
 msgstr "Login"
 
@@ -4403,7 +4380,6 @@ msgid "Permission expired"
 msgstr "A autorização expirou"
 
 #: authentication/api/connection_token.py:499
-#, python-brace-format
 msgid "ACL action is reject: {}({})"
 msgstr "Ação do ACL é rejeitar: {} ({})."
 
@@ -4433,13 +4409,11 @@ msgid "Facial comparison failed"
 msgstr "Falha na comparação facial"
 
 #: authentication/api/mfa.py:61
-#, python-brace-format
 msgid "Current user not support mfa type: {}"
 msgstr "O usuário atual não suporta o tipo de MFA: {}"
 
 #: authentication/api/password.py:34 terminal/api/session/session.py:347
 #: users/views/profile/reset.py:63
-#, python-brace-format
 msgid "User does not exist: {}"
 msgstr "Usuário não encontrado: {}"
 
@@ -4448,7 +4422,6 @@ msgid "No user matched"
 msgstr "Nenhum usuário correspondente encontrado"
 
 #: authentication/api/password.py:38
-#, python-brace-format
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
@@ -4457,16 +4430,16 @@ msgstr ""
 
 #: authentication/api/password.py:69
 #: authentication/templates/authentication/login.html:399
+#: static/sangfor/authentication/login.html:991
 #: users/templates/users/forgot_password.html:41
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/forgot_password_previewing.html:13
 #: users/templates/users/forgot_password_previewing.html:14
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:25
+#: xpack/plugins/interface/templates/login_i18n.html:25
 msgid "Forgot password"
 msgstr "Esqueceu a senha"
 
 #: authentication/api/password.py:70 authentication/mfa/email.py:42
-#, python-brace-format
 msgid "The validity period of the verification code is {} minute"
 msgstr "O código de verificação é válido por {} minuto"
 
@@ -4543,7 +4516,6 @@ msgid "Authentication failed password incorrect"
 msgstr "Falha na autenticação (usuário ou senha incorretos)"
 
 #: authentication/confirm/relogin.py:11
-#, python-brace-format
 msgid "Login time has exceeded {} minutes, please login again"
 msgstr "O tempo de login excedeu {} minutos, por favor, faça login novamente"
 
@@ -4633,7 +4605,6 @@ msgstr ""
 "bloqueada temporariamente por {block_time} minutos) "
 
 #: authentication/errors/const.py:47 authentication/errors/const.py:55
-#, python-brace-format
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4642,7 +4613,6 @@ msgstr ""
 "para desbloquear ou tente novamente depois de {} minutos) "
 
 #: authentication/errors/const.py:51
-#, python-brace-format
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4676,7 +4646,6 @@ msgid "Wait login confirm ticket for accept"
 msgstr "Aguardando tratamento de revisão de login "
 
 #: authentication/errors/const.py:67
-#, python-brace-format
 msgid "Login confirm ticket was {}"
 msgstr "Revisão de login: {}"
 
@@ -4862,7 +4831,6 @@ msgid "Clear phone number to disable"
 msgstr "Desativar limpeza de número de telefone"
 
 #: authentication/middleware.py:96 settings/utils/ldap.py:714
-#, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr "Falha de autenticação (verificação pré-login falhou): {}"
 
@@ -4881,7 +4849,6 @@ msgid "User is invalid"
 msgstr "Usuário inválido"
 
 #: authentication/mixins.py:201
-#, python-brace-format
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
 "                    The current user source is {}. Please contact the "
@@ -4891,7 +4858,6 @@ msgstr ""
 "atual do usuário é {}, entre em contato com o administrador."
 
 #: authentication/mixins.py:382
-#, python-brace-format
 msgid "The MFA type ({}) is not enabled"
 msgstr "Este método MFA ({}) não está ativado"
 
@@ -4961,7 +4927,6 @@ msgid "Connection token inactive"
 msgstr "Token de conexão não ativado"
 
 #: authentication/models/connection_token.py:174
-#, python-brace-format
 msgid "Connection token expired at: {}"
 msgstr "Token de conexão expirado: {}"
 
@@ -5098,7 +5063,6 @@ msgstr "Nome da Organização"
 
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:153
-#, python-brace-format
 msgid "The {} cannot be empty"
 msgstr "{} não pode estar vazio"
 
@@ -5353,7 +5317,7 @@ msgid "Retry"
 msgstr "Tentar novamente"
 
 #: authentication/templates/authentication/login.html:313
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:5
+#: xpack/plugins/interface/templates/login_i18n.html:5
 msgid ""
 "Configuration file has problems and cannot be logged in. Please contact the "
 "administrator or view latest docs"
@@ -5362,7 +5326,8 @@ msgstr ""
 "entre em contato com o administrador ou consulte a documentação mais recente"
 
 #: authentication/templates/authentication/login.html:314
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:6
+#: static/sangfor/authentication/login.html:895
+#: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "Se você é um administrador, pode resolver atualizando o arquivo de "
@@ -5511,7 +5476,6 @@ msgid "Redirecting"
 msgstr "Redirecionando"
 
 #: authentication/views/login.py:173
-#, python-brace-format
 msgid "Redirecting to {} authentication"
 msgstr "Redirecionando para a autenticação {}"
 
@@ -5520,12 +5484,10 @@ msgid "Login timeout, please try again."
 msgstr "Tempo de login expirou, por favor, faça o login novamente"
 
 #: authentication/views/login.py:245
-#, python-brace-format
 msgid "User email already exists ({})"
 msgstr "O e-mail do usuário já existe ({})"
 
 #: authentication/views/login.py:338
-#, python-brace-format
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -5726,7 +5688,6 @@ msgid "Updated by"
 msgstr "Último atualizador"
 
 #: common/db/validators.py:9
-#, python-brace-format
 msgid "Invalid port range, should be like and within {}-{}"
 msgstr "Faixa de portas inválida, deve estar dentro de {}-{}"
 
@@ -5739,12 +5700,10 @@ msgid "Org ID"
 msgstr "ID da organização"
 
 #: common/drf/parsers/base.py:21
-#, python-brace-format
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "O conteúdo do arquivo é muito grande (tamanho máximo `{}` bytes)"
 
 #: common/drf/parsers/base.py:207
-#, python-brace-format
 msgid "Parse file error: {}"
 msgstr "Erro ao analisar o arquivo: {}"
 
@@ -5757,7 +5716,6 @@ msgid "Yes/No"
 msgstr "Sim/Não"
 
 #: common/drf/renders/base.py:161
-#, python-brace-format
 msgid "Number, min {} max {}"
 msgstr "Número, mínimo {} máximo {}"
 
@@ -5766,7 +5724,6 @@ msgid "Phone number, format +8612345678901"
 msgstr "Número de celular, formato +8612345678901"
 
 #: common/drf/renders/base.py:170
-#, python-brace-format
 msgid "Text, max length {}"
 msgstr "Texto, comprimento máximo {}"
 
@@ -5775,7 +5732,6 @@ msgid "Long text, no length limit"
 msgstr "Texto longo, sem limite de comprimento"
 
 #: common/drf/renders/base.py:175
-#, python-brace-format
 msgid "Datetime format {}"
 msgstr "Formato de data e hora {}"
 
@@ -5784,7 +5740,6 @@ msgid "Label, format [\"key:value\"]"
 msgstr "Tags, formato: [\"chave:valor\"]"
 
 #: common/drf/renders/base.py:182
-#, python-brace-format
 msgid ""
 "Choices, format name(value), name is optional for human read, value is "
 "requisite, options {}"
@@ -5793,7 +5748,6 @@ msgstr ""
 "o valor é obrigatório, as opções disponíveis são {}"
 
 #: common/drf/renders/base.py:185
-#, python-brace-format
 msgid "Choices, options {}"
 msgstr "Opções, as opções disponíveis são {}"
 
@@ -5828,7 +5782,6 @@ msgid "Objects, format [\"id\", ...]"
 msgstr "Itens associados múltiplos, o formato é [\"id\", ...]"
 
 #: common/drf/renders/base.py:300
-#, python-brace-format
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -5972,7 +5925,6 @@ msgid "sp_id is 6 bits"
 msgstr "O SP_id é de 6 dígitos"
 
 #: common/sdk/sms/cmpp2.py:214
-#, python-brace-format
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "Erro ao conectar ao servidor gateway, erro: {}"
 
@@ -5984,10 +5936,6 @@ msgstr "Arquivo de SMS personalizado inválido"
 #, python-format
 msgid "SMS sending failed[%s]: %s"
 msgstr "Falha no envio de SMS [%s]: %s"
-
-#: common/sdk/sms/custom_file.py:47 common/serializers/common.py:98
-msgid "File"
-msgstr "Arquivo"
 
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
@@ -6010,7 +5958,6 @@ msgid "Custom type (File)"
 msgstr "Personalizado (Arquivo)"
 
 #: common/sdk/sms/endpoint.py:32
-#, python-brace-format
 msgid "SMS provider not support: {}"
 msgstr "Provedor de serviços de SMS não suportado: {}"
 
@@ -6027,13 +5974,16 @@ msgid "The verification code is incorrect"
 msgstr "Código de verificação errado"
 
 #: common/sdk/sms/exceptions.py:18
-#, python-brace-format
 msgid "Please wait {} seconds before sending"
 msgstr "Por favor, envie em {} segundos"
 
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "Nó"
+
+#: common/serializers/common.py:98
+msgid "File"
+msgstr "Arquivo"
 
 #: common/serializers/fields.py:139
 msgid "Invalid data type"
@@ -6056,7 +6006,6 @@ msgstr "Tipo de dados incorreto, deveria ser uma lista"
 #: common/serializers/fields.py:353
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/task.py:122
-#, python-brace-format
 msgid "Invalid choice: {}"
 msgstr "Opção inválida: {}"
 
@@ -6162,10 +6111,6 @@ msgstr "Sua conta foi criada com sucesso"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer Open Fortress Machine"
 
-#: jumpserver/context_processor.py:36
-msgid "FIT2CLOUD"
-msgstr ""
-
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
 msgstr "Serviço Flower indisponível, por favor verifique"
@@ -6182,7 +6127,6 @@ msgstr ""
 "sorte</div>"
 
 #: jumpserver/views/other.py:78
-#, python-brace-format
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr ""
 "O serviço Websocket está rodando na porta: {}, por favor verifique se o "
@@ -6244,7 +6188,6 @@ msgid "User message"
 msgstr "Mensagens do usuário"
 
 #: notifications/models/notification.py:21
-#, python-brace-format
 msgid "{} subscription"
 msgstr "{} Inscrição"
 
@@ -6283,17 +6226,14 @@ msgid "Waiting task start"
 msgstr "Aguardando o início da tarefa"
 
 #: ops/api/celery.py:269
-#, python-brace-format
 msgid "Task {} not found"
 msgstr "A tarefa {} não existe"
 
 #: ops/api/celery.py:276
-#, python-brace-format
 msgid "Task {} args or kwargs error"
 msgstr "Erro nos parâmetros da tarefa {}"
 
 #: ops/api/job.py:66
-#, python-brace-format
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr ""
 "Acesso ao ativo {}({}) foi negado, restrito pela regra de acesso (ACL) do "
@@ -6576,7 +6516,6 @@ msgid "Celery Task Execution"
 msgstr "Execução de Tarefa Celery"
 
 #: ops/models/job.py:82
-#, python-brace-format
 msgid "Module {} is not suitable for this asset"
 msgstr "O módulo {} não se aplica a este ativo."
 
@@ -6865,7 +6804,6 @@ msgid "Name of the job"
 msgstr " Nome da Job "
 
 #: orgs/api.py:62
-#, python-brace-format
 msgid "The current organization ({}) cannot be deleted"
 msgstr " A organização atual ({}) não pode ser excluída "
 
@@ -6878,7 +6816,6 @@ msgstr ""
 "favor, mude para outra organização antes de executar a operação de exclusão "
 
 #: orgs/api.py:77
-#, python-brace-format
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr " A organização possui recursos ({}) que não podem ser excluídos."
 
@@ -7053,7 +6990,6 @@ msgid "Asset permissions is about to expire"
 msgstr "Regras de autorização de ativos estão prestes a expirar"
 
 #: perms/notifications.py:64
-#, python-brace-format
 msgid "asset permissions of organization {}"
 msgstr "Autorização de ativos da organização ({})"
 
@@ -7136,7 +7072,6 @@ msgid "Internal role, can't be update"
 msgstr "Papel interno, não pode ser atualizado"
 
 #: rbac/api/rolebinding.py:47
-#, python-brace-format
 msgid "{} at least one system role"
 msgstr "{} tem pelo menos um papel de sistema"
 
@@ -7513,7 +7448,6 @@ msgid "Test success"
 msgstr "Teste Bem-Sucedido"
 
 #: settings/api/email.py:22
-#, python-brace-format
 msgid "Test mail sent to {}, please check"
 msgstr "O e-mail já foi enviado {}, por favor verifique"
 
@@ -8438,7 +8372,7 @@ msgstr "ID do inquilino"
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:128 xpack/plugins/cloud/manager.py:132
-#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:293
+#: xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "Região"
 
@@ -9202,23 +9136,19 @@ msgid "ldap:// or ldaps:// protocol is used."
 msgstr "Use o protocolo ldap:// ou ldaps://"
 
 #: settings/utils/ldap.py:543
-#, python-brace-format
 msgid "Host or port is disconnected: {}"
 msgstr "Host ou porta não podem ser conectados: {}"
 
 #: settings/utils/ldap.py:545
-#, python-brace-format
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "Porta não é uma porta de serviço LDAP: {}"
 
 #: settings/utils/ldap.py:547
-#, python-brace-format
 msgid "Please add certificate: {}"
 msgstr "Por favor, adicione o certificado: {}"
 
 #: settings/utils/ldap.py:551 settings/utils/ldap.py:578
 #: settings/utils/ldap.py:608 settings/utils/ldap.py:636
-#, python-brace-format
 msgid "Unknown error: {}"
 msgstr "Erro desconhecido: {}"
 
@@ -9227,27 +9157,22 @@ msgid "Bind DN or Password incorrect"
 msgstr "Erro de DN de vinculação ou senha"
 
 #: settings/utils/ldap.py:572
-#, python-brace-format
 msgid "Please enter Bind DN: {}"
 msgstr "Insira o DN de vinculação: {}"
 
 #: settings/utils/ldap.py:574
-#, python-brace-format
 msgid "Please enter Password: {}"
 msgstr "Por favor, insira a senha: {}"
 
 #: settings/utils/ldap.py:576
-#, python-brace-format
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "Por favor, insira o DN de vinculação e a senha corretos: {}"
 
 #: settings/utils/ldap.py:594
-#, python-brace-format
 msgid "Invalid User OU or User search filter: {}"
 msgstr "OU de usuário inválido ou filtro de usuário: {}"
 
 #: settings/utils/ldap.py:625
-#, python-brace-format
 msgid "LDAP User attr map not include: {}"
 msgstr "O mapeamento de atributos LDAP não inclui: {}"
 
@@ -9260,57 +9185,46 @@ msgid "LDAP authentication is not enabled"
 msgstr "A autenticação LDAP não está ativada"
 
 #: settings/utils/ldap.py:669
-#, python-brace-format
 msgid "Error (Invalid LDAP server): {}"
 msgstr "Erro (Endereço do servidor LDAP inválido): {}"
 
 #: settings/utils/ldap.py:671
-#, python-brace-format
 msgid "Error (Invalid Bind DN): {}"
 msgstr "Erro (DN de vinculação inválido): {}"
 
 #: settings/utils/ldap.py:673
-#, python-brace-format
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "Erro (mapeamento de atributos LDAP inválido): {}"
 
 #: settings/utils/ldap.py:675
-#, python-brace-format
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "Erro (OU de usuário inválido ou filtro de usuário): {}"
 
 #: settings/utils/ldap.py:677
-#, python-brace-format
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "Erro (autenticação LDAP não ativada): {}"
 
 #: settings/utils/ldap.py:679
-#, python-brace-format
 msgid "Error (Unknown): {}"
 msgstr "Erro (desconhecido): {}"
 
 #: settings/utils/ldap.py:682
-#, python-brace-format
 msgid "Succeed: Match {} users"
 msgstr "Correspondência bem-sucedida para {} usuários"
 
 #: settings/utils/ldap.py:712
-#, python-brace-format
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "Falha na autenticação (erro de configuração): {}"
 
 #: settings/utils/ldap.py:716
-#, python-brace-format
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "Falha na autenticação (nome de usuário ou senha incorretos): {}"
 
 #: settings/utils/ldap.py:718
-#, python-brace-format
 msgid "Authentication failed (Unknown): {}"
 msgstr "Falha na autenticação: (desconhecido): {}"
 
 #: settings/utils/ldap.py:721
-#, python-brace-format
 msgid "Authentication success: {}"
 msgstr "Autenticação bem sucedida: {}"
 
@@ -9319,14 +9233,70 @@ msgid "No LDAP user was found"
 msgstr "Não foi possível obter usuário LDAP"
 
 #: settings/ws.py:237
-#, python-brace-format
 msgid "Total {}, success {}, failure {}"
 msgstr "Total de {}, sucesso {}, falha {}"
 
 #: settings/ws.py:241
-#, python-brace-format
 msgid ", disabled {}"
 msgstr ", desativar {}"
+
+#: static/sangfor/authentication/login.html:900
+#: xpack/plugins/interface/templates/login_i18n.html:9
+msgid "Secure, Efficient, Controlled"
+msgstr ""
+
+#: static/sangfor/authentication/login.html:901
+#: xpack/plugins/interface/templates/login_i18n.html:11
+msgid ""
+"One-stop operations management platform to make server access secure, "
+"controllable, and operations efficient and transparent.<br />Easily manage "
+"user permissions and audit operation records to protect critical assets."
+msgstr ""
+
+#: static/sangfor/authentication/login.html:921
+#: xpack/plugins/interface/templates/login_i18n.html:17
+#, fuzzy
+#| msgid "Support URL"
+msgid "Support"
+msgstr "Link de suporte"
+
+#: static/sangfor/authentication/login.html:951
+#: xpack/plugins/interface/templates/login_i18n.html:18
+#, fuzzy
+#| msgid "Please enter your account username"
+msgid "Please enter your username"
+msgstr "Por favor, digite seu nome de usuário"
+
+#: static/sangfor/authentication/login.html:958
+#: xpack/plugins/interface/templates/login_i18n.html:19
+#, fuzzy
+#| msgid "Please change your password"
+msgid "Please enter your password"
+msgstr "Por favor, altere sua senha."
+
+#: static/sangfor/authentication/login.html:984
+#: xpack/plugins/interface/templates/login_i18n.html:22
+msgid "I have read and agree to the"
+msgstr ""
+
+#: static/sangfor/authentication/login.html:985
+#: xpack/plugins/interface/templates/login_i18n.html:23
+#, fuzzy
+#| msgid "User agent"
+msgid "User Agreement"
+msgstr "Agente do usuário"
+
+#: static/sangfor/authentication/login.html:986
+#: xpack/plugins/interface/templates/login_i18n.html:24
+msgid "Privacy Policy"
+msgstr ""
+
+#: static/sangfor/authentication/login.html:1006
+#: xpack/plugins/interface/templates/login_i18n.html:29
+#, fuzzy
+#| msgid "More login options"
+msgid "More login methods"
+msgstr "Login por outros métodos"
 
 #: templates/_csv_import_export.html:13 templates/_csv_import_modal.html:5
 #: xpack/plugins/cloud/const.py:73
@@ -9473,46 +9443,17 @@ msgstr "Por favor, certifique-se de confiar no seguinte link:"
 msgid "Back"
 msgstr "Retornar"
 
-#: templates/resource_download.html:20 templates/resource_download.html:36
-#: users/const.py:84
+#: templates/resource_download.html:20 users/const.py:84
 msgid "Client"
 msgstr "Cliente"
 
 #: templates/resource_download.html:22
 msgid "Client, currently used to launch the client"
 msgstr ""
-"Cliente, atualmente utilizado para invocar um programa cliente "
-"específico para conectar ativos"
+"Cliente, atualmente utilizado para invocar um programa cliente específico "
+"para conectar ativos"
 
-#: templates/resource_download.html:36
-msgid "Microsoft"
-msgstr "Microsoft"
-
-#: templates/resource_download.html:36
-msgid "Official"
-msgstr "Oficial"
-
-#: templates/resource_download.html:38
-msgid ""
-"macOS needs to download the client to connect RDP asset, which comes with "
-"Windows"
-msgstr ""
-"macOS precisa baixar o cliente para conectar ativos RDP, o sistema Windows "
-"já tem este programa instalado por padrão"
-
-#: templates/resource_download.html:46
-msgid "Windows Remote application publisher tools"
-msgstr "Windows Ferramenta de Servidor de Publicação de Aplicativo Remotos"
-
-#: templates/resource_download.html:47
-msgid ""
-"OpenSSH is a program used to connect remote applications in the Windows "
-"Remote Application Publisher"
-msgstr ""
-"OpenSSH é um programa usado para conectar aplicativos remotos no servidor de "
-"publicação de aplicativos remotos do Windows"
-
-#: templates/resource_download.html:54
+#: templates/resource_download.html:32
 msgid "Offline video player"
 msgstr "Reprodutor de Gravação Offline"
 
@@ -9527,7 +9468,6 @@ msgstr ""
 "comunidade"
 
 #: terminal/api/applet/applet.py:88
-#, python-brace-format
 msgid "Applet not found in path: {}"
 msgstr "Aplicativo remoto não encontrado no caminho: {}"
 
@@ -9540,7 +9480,6 @@ msgid "Deleting the default storage is not allowed"
 msgstr "Não é permitido excluir a configuração de armazenamento padrão"
 
 #: terminal/api/component/storage.py:36
-#, python-brace-format
 msgid "Cannot delete storage that is being used: {}"
 msgstr "Não é possível excluir o armazenamento em uso: {}"
 
@@ -9553,7 +9492,6 @@ msgid "Invalid"
 msgstr "Inválido"
 
 #: terminal/api/component/storage.py:132 terminal/tasks.py:208
-#, python-brace-format
 msgid "Test failure: {}"
 msgstr "Teste falhou: {}"
 
@@ -9580,7 +9518,6 @@ msgid "Session replay"
 msgstr "Gravação de sessão"
 
 #: terminal/api/session/session.py:339
-#, python-brace-format
 msgid "Session does not exist: {}"
 msgstr "Sessão não existe: {}"
 
@@ -9588,7 +9525,7 @@ msgstr "Sessão não existe: {}"
 msgid "Session is finished or the protocol not supported"
 msgstr "Sessão já concluída ou protocolo não suportado"
 
-#: terminal/api/session/session.py:355 tickets/api/ticket.py:142
+#: terminal/api/session/session.py:355
 msgid "User does not have permission"
 msgstr "Usuário sem permissões"
 
@@ -9753,12 +9690,10 @@ msgstr "Host"
 
 #: terminal/models/applet/applet.py:94
 #: terminal/models/virtualapp/virtualapp.py:66
-#, python-brace-format
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Applet pkg inválido, arquivo ausente {}"
 
 #: terminal/models/applet/applet.py:113
-#, python-brace-format
 msgid "Load platform.yml failed: {}"
 msgstr "Falha ao carregar platform.yml: {}"
 
@@ -10387,7 +10322,6 @@ msgid "No asset or invalid asset"
 msgstr "Sem ativo ou ativo não ativado"
 
 #: terminal/serializers/storage.py:23
-#, python-brace-format
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "Ponto de extremidade inválido: Remover caminho `{}`"
 
@@ -10821,7 +10755,6 @@ msgid "Ticket already closed"
 msgstr "A ordem de serviço foi fechada"
 
 #: tickets/handlers/apply_asset.py:40
-#, python-brace-format
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -10843,7 +10776,6 @@ msgid "After change"
 msgstr "Depois da alteração"
 
 #: tickets/handlers/base.py:96
-#, python-brace-format
 msgid "{} {} the ticket"
 msgstr "{} {} Ordem de serviço"
 
@@ -10989,22 +10921,18 @@ msgid "Ticket applied info"
 msgstr "Informação do pedido da ordem de serviço"
 
 #: tickets/notifications.py:116
-#, python-brace-format
 msgid "You have a new ticket from {}"
 msgstr "Você tem uma nova ordem de serviço, requerente - {}"
 
 #: tickets/notifications.py:120
-#, python-brace-format
 msgid "{}: New Ticket - {} ({})"
 msgstr "{}: Novo ticket - {} ({})"
 
 #: tickets/notifications.py:168
-#, python-brace-format
 msgid "Your ticket has been processed, processor - {}"
 msgstr "Sua ordem de serviço foi processada, operador - {}"
 
 #: tickets/notifications.py:172
-#, python-brace-format
 msgid "Ticket has processed - {} ({})"
 msgstr "Sua ordem de serviço foi processada, operador - {} ( {} )"
 
@@ -11114,7 +11042,6 @@ msgstr " Solicitação de ação"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:74
-#, python-brace-format
 msgid "Created by ticket ({}-{})"
 msgstr " Criado através de ordem de serviço ({}-{})"
 
@@ -11123,7 +11050,6 @@ msgid "The expiration date should be greater than the start date"
 msgstr " O tempo de expiração deve ser maior que o tempo de início"
 
 #: tickets/serializers/ticket/common.py:89
-#, python-brace-format
 msgid "Permission named `{}` already exists"
 msgstr " O nome de autorização `{}` já existe"
 
@@ -11132,7 +11058,6 @@ msgid "Process map"
 msgstr "Fluxograma"
 
 #: tickets/serializers/ticket/ticket.py:91
-#, python-brace-format
 msgid "The ticket flow `{}` does not exist"
 msgstr " O processo de ordem de serviço `{}` não existe"
 
@@ -11190,17 +11115,16 @@ msgstr "Ele não pode se excluir sozinho. Por favor, desative-o."
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr "Não é possível excluir o usuário do admin. Por favor, desabilite-o."
 
-#: users/api/user.py:170
+#: users/api/user.py:174
 msgid "Can not invite self"
 msgstr "Não pode convidar a si mesmo"
 
-#: users/api/user.py:176
-#, python-brace-format
+#: users/api/user.py:180
 msgid ""
 "This user {} is already a member of the organization. No need to invite again"
 msgstr ""
 
-#: users/api/user.py:237
+#: users/api/user.py:241
 msgid "Could not reset self otp, use profile reset instead"
 msgstr ""
 "Não é possível redefinir a autenticação de dois fatores MFA nesta página, "
@@ -11557,7 +11481,7 @@ msgstr "Carregamento assíncrono da árvore de ativos"
 msgid "Connect default open method"
 msgstr "Forma padrão de abertura de conexão"
 
-#: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:41
+#: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:42
 #: xpack/plugins/interface/serializers/interface.py:27
 msgid "Theme"
 msgstr "Tema"
@@ -11625,7 +11549,6 @@ msgid "Password does not match security rules"
 msgstr "A senha não atende às regras de segurança"
 
 #: users/serializers/profile.py:33
-#, python-brace-format
 msgid "The new password cannot be the last {} passwords"
 msgstr "A nova senha não pode ser as últimas {} senhas"
 
@@ -12094,7 +12017,6 @@ msgid "Password invalid"
 msgstr "Nome de usuário ou senha inválidos"
 
 #: users/views/profile/reset.py:66
-#, python-brace-format
 msgid ""
 "Non-local users can log in only from third-party platforms and cannot change "
 "their passwords: {}"
@@ -12107,7 +12029,6 @@ msgid "Token invalid or expired"
 msgstr "Token incorreto ou inválido"
 
 #: users/views/profile/reset.py:204
-#, python-brace-format
 msgid "User auth from {}, go there change password"
 msgstr ""
 "O source de autenticação do usuário vem de {}, por favor, vá ao sistema "
@@ -12118,7 +12039,6 @@ msgid "* Your password does not meet the requirements"
 msgstr "* Sua senha não atende aos requisitos"
 
 #: users/views/profile/reset.py:217
-#, python-brace-format
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* A nova senha não pode ser as últimas {} senhas"
 
@@ -12143,12 +12063,10 @@ msgid "Test connection successful"
 msgstr "Teste bem-sucedido"
 
 #: xpack/plugins/cloud/api.py:75
-#, python-brace-format
 msgid "Test connection failed: {}"
 msgstr "Falha na conexão do teste: {}"
 
 #: xpack/plugins/cloud/api.py:203
-#, python-brace-format
 msgid "User {} deleted the current resource and released the assets"
 msgstr "Usuário {} excluiu o recurso já liberado"
 
@@ -12346,10 +12264,6 @@ msgstr "Sincronizar região"
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Obter erro de instância na região \"%s\", erro: %s"
 
-#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:290
-msgid "Instance"
-msgstr "Instância"
-
 #: xpack/plugins/cloud/manager.py:195
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
@@ -12493,6 +12407,10 @@ msgstr "Tarefa de Sincronização"
 #: xpack/plugins/cloud/models.py:287
 msgid "Sync instance task history"
 msgstr "Histórico de Tarefas de Sincronização de Instância"
+
+#: xpack/plugins/cloud/models.py:290
+msgid "Instance"
+msgstr "Instância"
 
 #: xpack/plugins/cloud/models.py:307
 msgid "Sync instance detail"
@@ -12814,12 +12732,6 @@ msgstr "Ponto de extremidade da API"
 msgid "Auto node classification"
 msgstr "Classificação automática de nós"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:108
-#, fuzzy
-#| msgid "Domain name"
-msgid "domain_name"
-msgstr "Nome do domínio"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "Endereço de autenticação"
@@ -12853,7 +12765,6 @@ msgid "The file is in JSON format"
 msgstr "Arquivo no formato JSON"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
-#, python-brace-format
 msgid "IP address invalid `{}`, {}"
 msgstr "Endereço IP inválido: `{}`, {}"
 
@@ -12935,32 +12846,32 @@ msgstr "A missão ainda não começou"
 msgid "Restore default successfully."
 msgstr "Restauração para as configurações padrão bem sucedida!"
 
-#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:45
-#: xpack/plugins/interface/models.py:86
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:46
+#: xpack/plugins/interface/models.py:90
 msgid "Interface settings"
 msgstr "Configurações da interface"
 
-#: xpack/plugins/interface/models.py:23
+#: xpack/plugins/interface/models.py:24
 msgid "Login title"
 msgstr "Título da página de login"
 
-#: xpack/plugins/interface/models.py:27
+#: xpack/plugins/interface/models.py:28
 msgid "Login image"
 msgstr "Imagem da página de login"
 
-#: xpack/plugins/interface/models.py:31
+#: xpack/plugins/interface/models.py:32
 msgid "Website icon"
 msgstr "Ícone do site"
 
-#: xpack/plugins/interface/models.py:35
+#: xpack/plugins/interface/models.py:36
 msgid "Index logo"
 msgstr "Gerenciar página de logo"
 
-#: xpack/plugins/interface/models.py:39
+#: xpack/plugins/interface/models.py:40
 msgid "Logout logo"
 msgstr "Fazer Logout"
 
-#: xpack/plugins/interface/models.py:42
+#: xpack/plugins/interface/models.py:43
 msgid "Footer content"
 msgstr "Conteúdo do rodapé"
 
@@ -12978,66 +12889,45 @@ msgstr "Logo largo no topo"
 msgid "Small logo without text"
 msgstr "Logo pequeno quadrado"
 
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:9
-msgid "Secure, Efficient, Controlled"
-msgstr ""
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:11
-msgid ""
-"One-stop operations management platform to make server access secure, "
-"controllable, and operations efficient and transparent.<br />Easily manage "
-"user permissions and audit operation records to protect critical assets."
-msgstr ""
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:17
-#, fuzzy
-#| msgid "Support URL"
-msgid "Support"
-msgstr "Link de suporte"
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:18
-#, fuzzy
-#| msgid "Please enter your account username"
-msgid "Please enter your username"
-msgstr "Por favor, digite seu nome de usuário"
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:19
-#, fuzzy
-#| msgid "Please change your password"
-msgid "Please enter your password"
-msgstr "Por favor, altere sua senha."
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:22
-msgid "I have read and agree to the"
-msgstr ""
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:23
-#, fuzzy
-#| msgid "User agent"
-msgid "User Agreement"
-msgstr "Agente do usuário"
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:24
-msgid "Privacy Policy"
-msgstr ""
-
-#: xpack/plugins/interface/templates/sxf_login_i18n.html:29
-#, fuzzy
-#| msgid "More login options"
-msgid "More login methods"
-msgstr "Login por outros métodos"
-
 #: xpack/plugins/jdmc/meta.py:9
 msgid "JDMC"
 msgstr ""
 
-#: xpack/plugins/license/api.py:57
+#: xpack/plugins/license/api.py:54
 msgid "License import successfully"
 msgstr "Importação de licença bem-sucedida"
 
-#: xpack/plugins/license/api.py:58
+#: xpack/plugins/license/api.py:55
 msgid "Invalid license"
 msgstr "Licença inválida"
+
+#~ msgid "Microsoft"
+#~ msgstr "Microsoft"
+
+#~ msgid "Official"
+#~ msgstr "Oficial"
+
+#~ msgid ""
+#~ "macOS needs to download the client to connect RDP asset, which comes with "
+#~ "Windows"
+#~ msgstr ""
+#~ "macOS precisa baixar o cliente para conectar ativos RDP, o sistema "
+#~ "Windows já tem este programa instalado por padrão"
+
+#~ msgid "Windows Remote application publisher tools"
+#~ msgstr "Windows Ferramenta de Servidor de Publicação de Aplicativo Remotos"
+
+#~ msgid ""
+#~ "OpenSSH is a program used to connect remote applications in the Windows "
+#~ "Remote Application Publisher"
+#~ msgstr ""
+#~ "OpenSSH é um programa usado para conectar aplicativos remotos no servidor "
+#~ "de publicação de aplicativos remotos do Windows"
+
+#, fuzzy
+#~| msgid "Domain name"
+#~ msgid "domain_name"
+#~ msgstr "Nome do domínio"
 
 #, fuzzy
 #~| msgid "Periodic run"
