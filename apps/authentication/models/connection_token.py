@@ -32,6 +32,11 @@ def date_expired_default():
 
 class ConnectionToken(JMSOrgBaseModel):
     _type = ConnectionTokenType.USER
+    INPUT_SECRET_TYPE_CHOICES = (
+        (SecretType.PASSWORD, SecretType.PASSWORD.label),
+        (SecretType.SSH_KEY, SecretType.SSH_KEY.label),
+    )
+    INPUT_SECRET_TYPES = {choice[0] for choice in INPUT_SECRET_TYPE_CHOICES}
 
     value = models.CharField(max_length=64, default='', verbose_name=_("Value"))
     user = models.ForeignKey(
@@ -297,7 +302,7 @@ class ConnectionToken(JMSOrgBaseModel):
     @property
     def input_secret_type(self):
         secret_type = self.connect_options.get('input_secret_type')
-        if secret_type in [SecretType.PASSWORD, SecretType.SSH_KEY]:
+        if secret_type in self.INPUT_SECRET_TYPES:
             return secret_type
         return SecretType.PASSWORD
 

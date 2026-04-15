@@ -1,13 +1,13 @@
 from unittest.mock import Mock, patch
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from accounts.const import AliasAccount, SecretType
 from assets.models import Asset
 from authentication.models import ConnectionToken
 
 
-class ConnectionTokenInputSecretTypeTestCase(SimpleTestCase):
+class ConnectionTokenInputSecretTypeTestCase(TestCase):
     def test_input_secret_type_default_password(self):
         token = ConnectionToken(connect_options={})
         self.assertEqual(token.input_secret_type, SecretType.PASSWORD)
