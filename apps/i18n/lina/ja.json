@@ -831,6 +831,7 @@
     "LoginUsers": "アクティブなアカウント",
     "LogoIndexTip": "ヒント：管理ページの左上に表示されます（推奨画像サイズ:185px*55px）",
     "LogoLogoutTip": "ヒント：これは、エンタープライズ版ユーザーのWebターミナルページに表示されます（推奨画像サイズ：82px*82px）",
+    "LogoLogoutFaviconTip": "ヒント：画像を1枚アップロードすると、システムが小さな正方形ロゴとWebサイトアイコンを自動生成します（推奨画像サイズ：82px*82px以上）",
     "Logout": "ログアウト",
     "LogsAudit": "ログ監査",
     "LongTimeNoVerify": "長期間未検証",

@@ -826,6 +826,7 @@
     "LoginUsers": "活跃账号",
     "LogoIndexTip": "提示：将会显示在管理页面左上方（建议图片大小为: 185px*55px）",
     "LogoLogoutTip": "提示：将会显示在企业版用户的 Web 终端页面（建议图片大小为：82px*82px）",
+    "LogoLogoutFaviconTip": "提示：上传一张图片，系统将自动生成方形小 logo 和网站图标（建议图片不小于 82px*82px）",
     "Logout": "退出登录",
     "LogsAudit": "日志审计",
     "LongTimeNoVerify": "长时间未验证",

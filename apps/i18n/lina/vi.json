@@ -826,6 +826,7 @@
     "LoginUsers": "Tài khoản hoạt động",
     "LogoIndexTip": "Gợi ý: Sẽ hiển thị ở góc trên bên trái của trang quản lý (ảnh khuyên dùng cỡ: 185px*55px)",
     "LogoLogoutTip": "Gợi ý: sẽ hiển thị trên trang Web của người dùng phiên bản doanh nghiệp (kích thước hình ảnh đề xuất: 82px*82px)",
+    "LogoLogoutFaviconTip": "Gợi ý: Tải lên một hình ảnh, hệ thống sẽ tự động tạo logo vuông nhỏ và biểu tượng website (kích thước khuyến nghị: ít nhất 82px*82px)",
     "Logout": "Đăng xuất",
     "LogsAudit": "Kiểm tra nhật ký",
     "LongTimeNoVerify": "Chưa xác thực trong thời gian dài",

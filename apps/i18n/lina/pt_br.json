@@ -827,6 +827,7 @@
     "LoginUsers": "Conta ativa",
     "LogoIndexTip": "Nota: será exibido no canto superior esquerdo da página de administração (tamanho da imagem recomendado: 185px*55px)",
     "LogoLogoutTip": "Dica: Será exibido na página do terminal da Web do usuário da versão corporativa (tamanho sugerido da imagem: 82px*82px)",
+    "LogoLogoutFaviconTip": "Dica: Envie uma imagem, e o sistema gerará automaticamente o logo quadrado pequeno e o ícone do site (tamanho recomendado: pelo menos 82px*82px)",
     "Logout": "Sair",
     "LogsAudit": "Auditoria de logs",
     "LongTimeNoVerify": "Verificação prolongada",

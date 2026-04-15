@@ -831,6 +831,7 @@
     "LoginUsers": "活躍帳號",
     "LogoIndexTip": "提示：將會顯示在管理頁面左上方（建議圖片大小為: 185px*55px）",
     "LogoLogoutTip": "提示：將會顯示在企業版使用者的 Web 終端頁面（建議圖片大小為：82px*82px）",
+    "LogoLogoutFaviconTip": "提示：上傳一張圖片，系統將自動生成方形小 logo 和網站圖示（建議圖片不小於 82px*82px）",
     "Logout": "退出登入",
     "LogsAudit": "日誌審計",
     "LongTimeNoVerify": "長時間未驗證",

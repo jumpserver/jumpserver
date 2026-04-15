@@ -825,6 +825,7 @@
     "LoginUsers": "Active account",
     "LogoIndexTip": "Tip: it will be displayed in the upper left corner of the page (recommended image size: 185px*55px)",
     "LogoLogoutTip": "Tip: it will be displayed on the web terminal page of enterprise edition users (recommended image size: 82px*82px)",
+    "LogoLogoutFaviconTip": "Tip: Upload one image, and the system will automatically generate the small square logo and website icon (recommended image size: at least 82px*82px)",
     "Logout": "Sign out",
     "LogsAudit": "Activities",
     "LongTimeNoVerify": "Long time no verify",
