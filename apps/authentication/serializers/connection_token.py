@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import SecretType
 from common.utils import get_request_ip
 from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
@@ -16,6 +17,15 @@ __all__ = [
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
+    input_secret_type = serializers.ChoiceField(
+        label=_("Input secret type"),
+        choices=(
+            (SecretType.PASSWORD, SecretType.PASSWORD.label),
+            (SecretType.SSH_KEY, SecretType.SSH_KEY.label),
+        ),
+        required=False,
+        default=SecretType.PASSWORD,
+    )
     input_secret = EncryptedField(
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
@@ -26,7 +36,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'user', 'asset', 'account', 'input_username', 'input_secret',
+            'user', 'asset', 'account', 'input_username', 'input_secret_type', 'input_secret',
             'connect_method', 'connect_options', 'protocol', 'actions',
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',

@@ -374,6 +374,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
 
 
     def _insert_connect_options(self, data, user):
+        input_secret_type = data.pop('input_secret_type', '')
         connect_options = data.pop('connect_options', {})
         default_name_opts = {
             'file_name_conflict_resolution': FileNameConflictResolution.REPLACE,
@@ -386,6 +387,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         for name in default_name_opts.keys():
             value = preferences.get(name, default_name_opts[name])
             connect_options[name] = value
+        if input_secret_type:
+            connect_options['input_secret_type'] = input_secret_type
         connect_options['lang'] = getattr(user, 'lang') or settings.LANGUAGE_CODE
         data['connect_options'] = connect_options
 

@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
+from accounts.const import SecretType, AliasAccount
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
@@ -293,6 +294,13 @@ class ConnectionToken(JMSOrgBaseModel):
             # serializer account username 用的是 full_username 所以这么设置
             account.ds_domain = ad_domain
 
+    @property
+    def input_secret_type(self):
+        secret_type = self.connect_options.get('input_secret_type')
+        if secret_type in [SecretType.PASSWORD, SecretType.SSH_KEY]:
+            return secret_type
+        return SecretType.PASSWORD
+
     @lazyproperty
     def account_object(self):
         if not self.asset:
@@ -303,10 +311,13 @@ class ConnectionToken(JMSOrgBaseModel):
                 self.account, self.user, self.asset, input_username=self.input_username,
                 input_secret=self.input_secret, from_permed=False
             )
+            if self.account == AliasAccount.INPUT and self.input_secret:
+                account.secret_type = self.input_secret_type
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
+                account.secret_type = self.input_secret_type
             self.set_ad_domain_if_need(account)
 
         return account
