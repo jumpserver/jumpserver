@@ -1,7 +1,9 @@
 import datetime
+import uuid
 from collections import defaultdict
 
-from celery import shared_task
+from celery import current_task, shared_task
+from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
@@ -14,6 +16,127 @@ from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 logger = get_logger(__file__)
+
+
+def _get_current_queue_name():
+    request = getattr(current_task, 'request', None)
+    delivery_info = getattr(request, 'delivery_info', {}) or {}
+    return delivery_info.get('routing_key') or 'ansible'
+
+
+def _get_change_secret_protocol(asset, automation):
+    from assets.const import Protocol
+
+    method = None
+    method_id = getattr(automation, 'change_secret_method', None)
+    ansible_config = dict(getattr(automation, 'ansible_config', {}) or {})
+    if method_id:
+        from accounts.automations.methods import platform_automation_methods
+        method = next((
+            item for item in platform_automation_methods
+            if item.get('id') == method_id and item.get('method') == AutomationTypes.change_secret
+        ), None)
+
+    protocol_hint = method.get('protocol') if method else None
+    ansible_connection = ansible_config.get('ansible_connection')
+    protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
+    if protocol_hint:
+        protocol_priority[protocol_hint] = 0
+
+    protocols = list(asset.protocols.all())
+    if protocols:
+        protocol = sorted(protocols, key=lambda x: protocol_priority.get(x.name, 999))[0]
+        return protocol.name
+
+    protocol_secret_type_map = Protocol.protocol_secret_types()
+    protocol_names = [p for p, sts in protocol_secret_type_map.items() if 'password' in sts]
+    protocol = asset.protocols.filter(name__in=protocol_names).values_list('name', flat=True).first()
+    if protocol:
+        return protocol
+    protocol = asset.protocols.values_list('name', flat=True).first()
+    return protocol or 'ssh'
+
+
+def _get_change_secret_queue_by_asset(asset, automation):
+    from terminal.models import Endpoint, EndpointRule
+    from orgs.utils import tmp_to_root_org
+
+    protocol = _get_change_secret_protocol(asset, automation)
+    endpoint_name = None
+    target_ip = asset.get_target_ip()
+    with tmp_to_root_org():
+        endpoint = Endpoint.match_by_instance_label(asset, protocol)
+        if not endpoint:
+            endpoint_rule = EndpointRule.match(asset, target_ip, protocol)
+            endpoint = endpoint_rule.endpoint if endpoint_rule else None
+        if endpoint:
+            endpoint_name = endpoint.host
+
+    mapping = settings.CHANGE_SECRET_ENDPOINT_QUEUE_MAP or {}
+    queue_name = mapping.get(endpoint_name, mapping.get('__default__', 'ansible')) if endpoint_name \
+        else mapping.get('__default__', 'ansible')
+    logger.warning(
+        'Change secret automation route asset=%s(%s) protocol=%s endpoint=%s target_ip=%s queue=%s',
+        asset.name, asset.id, protocol, endpoint_name, target_ip, queue_name
+    )
+    return queue_name
+
+
+def _execute_change_secret_subset(instance, trigger, asset_ids):
+    snapshot = instance.to_attr_json()
+    snapshot['assets'] = [str(i) for i in asset_ids]
+    snapshot['nodes'] = []
+    execution = instance.execution_model.objects.create(
+        id=str(uuid.uuid4()),
+        type=instance.type,
+        trigger=trigger,
+        automation=instance,
+        snapshot=snapshot,
+    )
+    return execution.start()
+
+
+def _route_change_secret_automation(instance, trigger, asset_ids=None):
+    assets = list(instance.get_all_assets())
+    if asset_ids:
+        asset_id_set = {str(i) for i in asset_ids}
+        assets = [asset for asset in assets if str(asset.id) in asset_id_set]
+    if not assets:
+        logger.warning('No assets found for change secret automation id=%s', instance.id)
+        return
+
+    queue_asset_ids = defaultdict(list)
+    for asset in assets:
+        queue_name = _get_change_secret_queue_by_asset(asset, instance)
+        queue_asset_ids[queue_name].append(str(asset.id))
+
+    current_queue = _get_current_queue_name()
+    logger.warning(
+        'Change secret automation routing start automation=%s current_queue=%s queue_assets=%s trigger=%s',
+        instance.id, current_queue, dict(queue_asset_ids), trigger
+    )
+
+    for queue_name, asset_ids in queue_asset_ids.items():
+        if queue_name != current_queue:
+            execute_account_automation_task.apply_async(
+                kwargs={
+                    'pid': str(instance.pk),
+                    'trigger': trigger,
+                    'tp': instance.type,
+                    'asset_ids': asset_ids,
+                },
+                queue=queue_name
+            )
+            logger.warning(
+                'Change secret automation reroute automation=%s from_queue=%s to_queue=%s asset_ids=%s',
+                instance.id, current_queue, queue_name, asset_ids
+            )
+            continue
+        logger.warning(
+            'Change secret automation execute automation=%s queue=%s asset_ids=%s',
+            instance.id, current_queue, asset_ids
+        )
+        _execute_change_secret_subset(instance, trigger, asset_ids)
 
 
 def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
@@ -33,12 +156,12 @@ def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
     verbose_name=_('Account execute automation'),
     activity_callback=task_activity_callback,
     description=_(
-        """Unified execution entry for account automation tasks: when the system performs tasks 
-        such as account push, password change, account verification, account collection, 
+        """Unified execution entry for account automation tasks: when the system performs tasks
+        such as account push, password change, account verification, account collection,
         and gateway account verification, all tasks are executed through this unified entry"""
     )
 )
-def execute_account_automation_task(pid, trigger, tp):
+def execute_account_automation_task(pid, trigger, tp, asset_ids=None):
     model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():
         instance = get_object_or_none(model, pk=pid)
@@ -46,6 +169,8 @@ def execute_account_automation_task(pid, trigger, tp):
         logger.error("No automation task found: {}".format(pid))
         return
     with tmp_to_org(instance.org):
+        if tp == AutomationTypes.change_secret:
+            return _route_change_secret_automation(instance, trigger, asset_ids=asset_ids)
         instance.execute(trigger)
 
 
@@ -115,13 +240,13 @@ def execute_automation_record_task(record_ids, tp):
 @shared_task(
     verbose_name=_('Clean change secret and push record period'),
     description=_(
-        """The system will periodically clean up unnecessary password change and push records, 
-        including their associated change tasks, execution logs, assets, and accounts. When any 
-        of these associated items are deleted, the corresponding password change and push records 
-        become invalid. Therefore, to maintain a clean and efficient database, the system will 
-        clean up expired records at 2 a.m daily, based on the interval specified by 
-        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. This periodic cleanup 
-        mechanism helps free up storage space and enhances the security and overall performance 
+        """The system will periodically clean up unnecessary password change and push records,
+        including their associated change tasks, execution logs, assets, and accounts. When any
+        of these associated items are deleted, the corresponding password change and push records
+        become invalid. Therefore, to maintain a clean and efficient database, the system will
+        clean up expired records at 2 a.m daily, based on the interval specified by
+        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. This periodic cleanup
+        mechanism helps free up storage space and enhances the security and overall performance
         of data management"""
     )
 )

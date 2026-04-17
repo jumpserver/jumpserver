@@ -225,6 +225,7 @@ class Config(dict):
         'THROTTLE_RATES_ANON': '128/min',
         'THROTTLE_RATES_USER': '1024/min',
         'THROTTLE_RATES_SERVICE_ACCOUNT': '4096/min',
+        'CHANGE_SECRET_ENDPOINT_QUEUE_MAP': {},
 
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
