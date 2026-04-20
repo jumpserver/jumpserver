@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from common.api import JMSGenericViewSet
 from common.const.http import GET, PATCH, POST
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, OnlySuperUser
 from common.utils.http import is_true
 from ..serializers import (
     SiteMessageSerializer, SiteMessageIdsSerializer,
@@ -55,7 +55,7 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
         SiteMessageUtil.mark_msgs_as_read(user.id)
         return Response({'detail': 'ok'})
 
-    @action(methods=[POST], detail=False)
+    @action(methods=[POST], detail=False, permission_classes=[OnlySuperUser,])
     def send(self, request, **kwargs):
         s = self.get_serializer(data=request.data)
         s.is_valid(raise_exception=True)

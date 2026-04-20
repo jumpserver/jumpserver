@@ -1,6 +1,7 @@
 from django.db import models
 
 from common.db.models import JMSBaseModel
+from ..const import SiteMessageDisplayMode
 
 __all__ = ('SiteMessage', 'MessageContent')
 
@@ -15,6 +16,8 @@ class SiteMessage(JMSBaseModel):
 
 
 class MessageContent(JMSBaseModel):
+    DisplayMode = SiteMessageDisplayMode
+
     subject = models.CharField(max_length=1024)
     message = models.TextField()
     users = models.ManyToManyField(
@@ -23,6 +26,11 @@ class MessageContent(JMSBaseModel):
     )
     groups = models.ManyToManyField('users.UserGroup')
     is_broadcast = models.BooleanField(default=False)
+    display_mode = models.CharField(
+        default=DisplayMode.default,
+        choices=DisplayMode.choices,
+        max_length=32,
+    )
     sender = models.ForeignKey(
         'users.User', db_constraint=False, on_delete=models.DO_NOTHING, null=True, default=None,
         related_name='send_site_message'
@@ -31,3 +39,13 @@ class MessageContent(JMSBaseModel):
 
     has_read = False
     read_at = None
+
+    def as_data(self):
+        return {
+            'id': str(self.id),
+            'subject': self.subject,
+            'message': self.message,
+            'display_mode': self.display_mode,
+            'date_created': str(self.date_created),
+            'sender': str(self.sender) if self.sender else ''
+        }

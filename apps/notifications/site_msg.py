@@ -12,14 +12,15 @@ class SiteMessageUtil:
 
     @classmethod
     def send_msg(cls, subject, message, user_ids=(), group_ids=(),
-                 sender=None, is_broadcast=False):
+                 sender=None, is_broadcast=False, display_mode=SiteMessageModel.DisplayMode.default):
         if not any((user_ids, group_ids, is_broadcast)):
             raise ValueError('No recipient is specified')
 
         with transaction.atomic():
-            site_msg = SiteMessageModel.objects.create(
+            site_msg = SiteMessageModel(
                 subject=subject, message=message,
                 is_broadcast=is_broadcast, sender=sender,
+                display_mode=display_mode
             )
 
             if is_broadcast:
@@ -33,6 +34,8 @@ class SiteMessageUtil:
                 user_ids = [*user_ids, *user_ids_from_group]
 
             site_msg.users.add(*user_ids)
+            # 只有调用 save 才能触发 post_save 信号
+            site_msg.save()
 
     @classmethod
     def get_user_all_msgs(cls, user_id):
@@ -60,6 +63,14 @@ class SiteMessageUtil:
             .values_list('content', flat=True) \
             .distinct().count()
         return site_msgs_count
+    
+    @classmethod
+    def get_user_display_msgs(cls, user_id):
+        msgs = SiteMessage.objects.filter(user_id=user_id, has_read=False).exclude(
+            content__display_mode=SiteMessageModel.DisplayMode.default
+        ).values_list('content', flat=True).distinct()
+        msgs = SiteMessageModel.objects.filter(id__in=msgs)
+        return msgs
 
     @classmethod
     def mark_msgs_as_read(cls, user_id, msg_ids=None):
