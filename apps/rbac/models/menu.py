@@ -18,6 +18,7 @@ class MenuPermission(models.Model):
             ('view_workbench', _('Can view workbench view')),
             ('view_webterminal', _('Can view web terminal')),
             ('view_filemanager', _('Can view file manager')),
+            ('view_jdmc', _('Can view jdmc console')),
             ('view_systemtools', _('Can view System Tools')),
             ('view_userloginreport', _('Can view user login report')),
             ('add_userloginreport', _('Can create user login report')),

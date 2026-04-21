@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-21 11:21+0800\n"
+"POT-Creation-Date: 2026-04-21 17:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -35,6 +35,7 @@ msgid "Account not found"
 msgstr "帳號未找到"
 
 #: accounts/api/automations/base.py:88 tickets/api/ticket.py:134
+#, python-brace-format
 msgid "The parameter 'action' must be [{}]"
 msgstr "參數 'action' 必須是 [{}]"
 
@@ -117,10 +118,12 @@ msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "成功: %s, 失敗: %s, 總數: %s"
 
 #: accounts/automations/check_account/manager.py:277
+#, python-brace-format
 msgid "Check account report of {}"
 msgstr "風險檢測報告 {}"
 
 #: accounts/automations/check_account/manager.py:283
+#, python-brace-format
 msgid ""
 "---\n"
 "Summary: \n"
@@ -154,6 +157,8 @@ msgstr ">>> 開始執行測試閘道器帳號可連結性的任務"
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:43
+#: xpack/plugins/cloud/serializers/account_attrs.py:105
+#: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "Password"
 msgstr "密碼"
 
@@ -215,7 +220,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳過"
 
-#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:309
+#: accounts/const/account.py:33 audits/const.py:24 rbac/tree.py:315
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -904,6 +909,8 @@ msgstr "重複密碼"
 #: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
+#: xpack/plugins/cloud/serializers/account_attrs.py:103
+#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Username"
 msgstr "使用者名稱"
 
@@ -1109,12 +1116,14 @@ msgid "Notification of account backup route task results"
 msgstr "帳號備份任務結果通知"
 
 #: accounts/notifications.py:23 accounts/notifications.py:48
+#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
 msgstr "{} - 帳號備份任務已完成, 詳情見附件"
 
 #: accounts/notifications.py:26
+#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
@@ -1128,12 +1137,14 @@ msgid "Notification of implementation result of encryption change plan"
 msgstr "改密計劃任務結果通知"
 
 #: accounts/notifications.py:69
+#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr "{} - 改密任務已完成, 詳情見附件"
 
 #: accounts/notifications.py:73
+#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
@@ -1187,6 +1198,7 @@ msgid "Change password and Add"
 msgstr "改密並添加"
 
 #: accounts/risk_handlers.py:127
+#, python-brace-format
 msgid "Execution failed: {}"
 msgstr "執行失敗：{}"
 
@@ -1929,6 +1941,7 @@ msgid "Command group"
 msgstr "命令組"
 
 #: acls/models/command_acl.py:86
+#, python-brace-format
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成的正則表達式有誤: {}"
 
@@ -2068,8 +2081,8 @@ msgid ""
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
 "support)"
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64  (支持網域)"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
+"2001:db8:2de::e13, 2001:db8:1a:1110::/64  (支持網域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -2080,19 +2093,23 @@ msgid "Recipients"
 msgstr "接收人"
 
 #: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:79
+#, python-brace-format
 msgid "The organization `{}` does not exist"
 msgstr "組織 `{}` 不存在"
 
 #: acls/serializers/base.py:131
+#, python-brace-format
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有覆核人都不屬於組織 `{}`"
 
 #: acls/serializers/rules/rules.py:22
 #: xpack/plugins/cloud/serializers/task.py:163
+#, python-brace-format
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址無效: `{}`"
 
 #: acls/serializers/rules/rules.py:35
+#, python-brace-format
 msgid "address invalid: `{}`"
 msgstr "地址無效: `{}`"
 
@@ -2101,8 +2118,8 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, "
+"2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -2188,6 +2205,7 @@ msgid "You can't update the root node name"
 msgstr "不能修改根節點名稱"
 
 #: assets/api/node.py:65
+#, python-brace-format
 msgid "You can't delete the root node ({})"
 msgstr "不能刪除根節點 ({})"
 
@@ -2208,10 +2226,12 @@ msgid "App Assets"
 msgstr "資產管理"
 
 #: assets/automations/base/manager.py:139
+#, python-brace-format
 msgid "Task: {} finished"
 msgstr "任務：{} 完成"
 
 #: assets/automations/base/manager.py:340
+#, python-brace-format
 msgid "  - Platform {} ansible disabled"
 msgstr "  - 平台 {} Ansible 已禁用, 無法執行任務"
 
@@ -2243,6 +2263,7 @@ msgid "No account"
 msgstr "沒有帳號"
 
 #: assets/automations/ping_gateway/manager.py:36
+#, python-brace-format
 msgid "Asset, {}, using account {}"
 msgstr "資產, {}, 使用帳號 {}"
 
@@ -2356,7 +2377,8 @@ msgstr "雲服務"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
+#: common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "自訂"
 
@@ -2888,8 +2910,8 @@ msgid "Required"
 msgstr "必須的"
 
 #: assets/models/platform.py:19 assets/serializers/platform.py:162
-#: terminal/models/component/storage.py:28 users/const.py:42
-#: xpack/plugins/cloud/providers/nutanix.py:30
+#: notifications/const.py:7 terminal/models/component/storage.py:28
+#: users/const.py:42 xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "默認"
 
@@ -3077,10 +3099,11 @@ msgid "port out of range (0-65535)"
 msgstr "埠超出範圍 (0-65535)"
 
 #: assets/serializers/asset/common.py:315
+#, python-brace-format
 msgid "Protocol is required: {}"
 msgstr "協議是必填的: {}"
 
-#: assets/serializers/asset/common.py:354
+#: assets/serializers/asset/common.py:354 labels/api.py:107
 msgid "Invalid data"
 msgstr "無效的數據"
 
@@ -3419,14 +3442,17 @@ msgid ""
 msgstr "當在網域詳情-網關-測試連接時，執行該任務"
 
 #: assets/tasks/utils.py:16
+#, python-brace-format
 msgid "Asset has been disabled, skipped: {}"
 msgstr "資產已經被禁用, 跳過: {}"
 
 #: assets/tasks/utils.py:20
+#, python-brace-format
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "資產或許不支持ansible, 跳過: {}"
 
 #: assets/tasks/utils.py:38
+#, python-brace-format
 msgid "For security, do not push user {}"
 msgstr "為了安全，禁止推送用戶 {}"
 
@@ -3464,7 +3490,7 @@ msgstr "刪除目錄"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:310
+#: rbac/tree.py:316
 msgid "Delete"
 msgstr "刪除"
 
@@ -3490,7 +3516,7 @@ msgstr "下載"
 msgid "Rename dir"
 msgstr "映射目錄"
 
-#: audits/const.py:23 rbac/tree.py:308 terminal/api/session/session.py:290
+#: audits/const.py:23 rbac/tree.py:314 terminal/api/session/session.py:290
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 #: xpack/plugins/cloud/manager.py:104
 msgid "View"
@@ -3498,7 +3524,7 @@ msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:307
+#: rbac/tree.py:313
 msgid "Create"
 msgstr "創建"
 
@@ -4203,7 +4229,7 @@ msgid "Temporary token"
 msgstr "臨時密碼"
 
 #: audits/signal_handlers/login_log.py:44 authentication/const.py:40
-#: authentication/utils.py:144 rbac/tree.py:200
+#: authentication/utils.py:144 rbac/tree.py:206
 #: settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
@@ -4265,6 +4291,7 @@ msgid "Permission expired"
 msgstr "授權已過期"
 
 #: authentication/api/connection_token.py:499
+#, python-brace-format
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 動作是拒絕: {}({})"
 
@@ -4294,11 +4321,13 @@ msgid "Facial comparison failed"
 msgstr "臉部比對失敗"
 
 #: authentication/api/mfa.py:61
+#, python-brace-format
 msgid "Current user not support mfa type: {}"
 msgstr "當前用戶不支持 MFA 類型: {}"
 
 #: authentication/api/password.py:34 terminal/api/session/session.py:347
 #: users/views/profile/reset.py:63
+#, python-brace-format
 msgid "User does not exist: {}"
 msgstr "用戶不存在: {}"
 
@@ -4307,6 +4336,7 @@ msgid "No user matched"
 msgstr "沒有匹配到用戶"
 
 #: authentication/api/password.py:38
+#, python-brace-format
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
@@ -4323,6 +4353,7 @@ msgid "Forgot password"
 msgstr "忘記密碼"
 
 #: authentication/api/password.py:70 authentication/mfa/email.py:42
+#, python-brace-format
 msgid "The validity period of the verification code is {} minute"
 msgstr "驗證碼有效期為 {} 分鐘"
 
@@ -4394,6 +4425,7 @@ msgid "Authentication failed password incorrect"
 msgstr "認證失敗 (使用者名稱或密碼不正確)"
 
 #: authentication/confirm/relogin.py:11
+#, python-brace-format
 msgid "Login time has exceeded {} minutes, please login again"
 msgstr "登錄時長已超過 {} 分鐘，請重新登入"
 
@@ -4482,12 +4514,14 @@ msgstr ""
 "號將被臨時 鎖定 {block_time} 分鐘)"
 
 #: authentication/errors/const.py:47 authentication/errors/const.py:55
+#, python-brace-format
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "帳號已被鎖定 (請聯絡管理員解鎖或{}分鐘後重試)"
 
 #: authentication/errors/const.py:51
+#, python-brace-format
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4518,6 +4552,7 @@ msgid "Wait login confirm ticket for accept"
 msgstr "等待登錄覆核處理"
 
 #: authentication/errors/const.py:67
+#, python-brace-format
 msgid "Login confirm ticket was {}"
 msgstr "登錄覆核: {}"
 
@@ -4699,6 +4734,7 @@ msgid "Clear phone number to disable"
 msgstr "清空手機號碼禁用"
 
 #: authentication/middleware.py:96 settings/utils/ldap.py:714
+#, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認證失敗 (登錄前檢查失敗): {}"
 
@@ -4715,6 +4751,7 @@ msgid "User is invalid"
 msgstr "無效的用戶"
 
 #: authentication/mixins.py:201
+#, python-brace-format
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
 "                    The current user source is {}. Please contact the "
@@ -4722,6 +4759,7 @@ msgid ""
 msgstr "管理員已開啟 '僅允許從用戶來源登入'，當前用戶來源為 {}，請聯繫管理員。"
 
 #: authentication/mixins.py:382
+#, python-brace-format
 msgid "The MFA type ({}) is not enabled"
 msgstr "該 MFA ({}) 方式沒有啟用"
 
@@ -4791,6 +4829,7 @@ msgid "Connection token inactive"
 msgstr "連接令牌未啟用"
 
 #: authentication/models/connection_token.py:174
+#, python-brace-format
 msgid "Connection token expired at: {}"
 msgstr "連接令牌過期: {}"
 
@@ -4927,6 +4966,7 @@ msgstr "組織名稱"
 
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:153
+#, python-brace-format
 msgid "The {} cannot be empty"
 msgstr "{} 不能為空"
 
@@ -5304,6 +5344,7 @@ msgid "Redirecting"
 msgstr "跳轉中"
 
 #: authentication/views/login.py:173
+#, python-brace-format
 msgid "Redirecting to {} authentication"
 msgstr "正在跳轉到 {} 認證"
 
@@ -5312,10 +5353,12 @@ msgid "Login timeout, please try again."
 msgstr "登錄超時，請重新登入"
 
 #: authentication/views/login.py:245
+#, python-brace-format
 msgid "User email already exists ({})"
 msgstr "用戶信箱已存在 ({})"
 
 #: authentication/views/login.py:338
+#, python-brace-format
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -5513,6 +5556,7 @@ msgid "Updated by"
 msgstr "最後更新者"
 
 #: common/db/validators.py:9
+#, python-brace-format
 msgid "Invalid port range, should be like and within {}-{}"
 msgstr "無效的埠範圍，應該在 {}-{} 之內"
 
@@ -5525,10 +5569,12 @@ msgid "Org ID"
 msgstr "組織 ID"
 
 #: common/drf/parsers/base.py:21
+#, python-brace-format
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件內容太大 (最大長度 `{}` 位元組)"
 
 #: common/drf/parsers/base.py:207
+#, python-brace-format
 msgid "Parse file error: {}"
 msgstr "解析文件錯誤: {}"
 
@@ -5541,6 +5587,7 @@ msgid "Yes/No"
 msgstr "是/否"
 
 #: common/drf/renders/base.py:161
+#, python-brace-format
 msgid "Number, min {} max {}"
 msgstr "數字，最小 {} 最大 {}"
 
@@ -5549,6 +5596,7 @@ msgid "Phone number, format +8612345678901"
 msgstr "手機號碼，格式 +8612345678901"
 
 #: common/drf/renders/base.py:170
+#, python-brace-format
 msgid "Text, max length {}"
 msgstr "文字，最大長度 {}"
 
@@ -5557,6 +5605,7 @@ msgid "Long text, no length limit"
 msgstr "長文字，無長度限制"
 
 #: common/drf/renders/base.py:175
+#, python-brace-format
 msgid "Datetime format {}"
 msgstr "日期時間格式 {}"
 
@@ -5565,12 +5614,14 @@ msgid "Label, format [\"key:value\"]"
 msgstr "標籤，格式: [\"鍵:值\"]"
 
 #: common/drf/renders/base.py:182
+#, python-brace-format
 msgid ""
 "Choices, format name(value), name is optional for human read, value is "
 "requisite, options {}"
 msgstr "選項，格式: 名稱(值)，名稱是可選的，方便閱讀，值是必填的，可選項有 {}"
 
 #: common/drf/renders/base.py:185
+#, python-brace-format
 msgid "Choices, options {}"
 msgstr "選項，可選項有 {}"
 
@@ -5600,7 +5651,7 @@ msgid "Objects, format [\"id\", ...]"
 msgstr "多關聯項，格式是 [\"id\", ...]"
 
 #: common/drf/renders/base.py:301
-#, fuzzy
+#, fuzzy, python-brace-format
 #| msgid ""
 #| "{} - The encryption password has not been set - please go to personal "
 #| "information -> file encryption password to set the encryption password"
@@ -5742,6 +5793,7 @@ msgid "sp_id is 6 bits"
 msgstr "SP_id 為6位"
 
 #: common/sdk/sms/cmpp2.py:214
+#, python-brace-format
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "連接網關伺服器錯誤，錯誤：{}"
 
@@ -5753,6 +5805,10 @@ msgstr "自訂簡訊文件無效"
 #, python-format
 msgid "SMS sending failed[%s]: %s"
 msgstr "簡訊發送失敗[%s]: %s"
+
+#: common/sdk/sms/custom_file.py:47 common/serializers/common.py:98
+msgid "File"
+msgstr "文件"
 
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
@@ -5775,6 +5831,7 @@ msgid "Custom type (File)"
 msgstr "自訂 (文件)"
 
 #: common/sdk/sms/endpoint.py:32
+#, python-brace-format
 msgid "SMS provider not support: {}"
 msgstr "簡訊服務商不支持：{}"
 
@@ -5791,16 +5848,13 @@ msgid "The verification code is incorrect"
 msgstr "驗證碼錯誤"
 
 #: common/sdk/sms/exceptions.py:18
+#, python-brace-format
 msgid "Please wait {} seconds before sending"
 msgstr "請在 {} 秒後發送"
 
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "節點"
-
-#: common/serializers/common.py:98
-msgid "File"
-msgstr "文件"
 
 #: common/serializers/fields.py:139
 msgid "Invalid data type"
@@ -5823,6 +5877,7 @@ msgstr "錯誤的數據類型，應該是列表"
 #: common/serializers/fields.py:353
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/task.py:122
+#, python-brace-format
 msgid "Invalid choice: {}"
 msgstr "無效選項: {}"
 
@@ -5924,6 +5979,10 @@ msgstr "你的帳號已創建成功"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 開源堡壘機"
 
+#: jumpserver/context_processor.py:37
+msgid "FIT2CLOUD"
+msgstr ""
+
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
 msgstr "Flower 服務不可用，請檢查"
@@ -5938,6 +5997,7 @@ msgstr ""
 "這個頁面，證明你訪問的不是nginx監聽的埠，祝你好運</div>"
 
 #: jumpserver/views/other.py:78
+#, python-brace-format
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr "Websocket 服務運行在埠: {}, 請檢查nginx是否代理是否設置"
 
@@ -5986,6 +6046,10 @@ msgstr "通知管理"
 msgid "Site message"
 msgstr "站內信"
 
+#: notifications/const.py:8
+msgid "Popup"
+msgstr ""
+
 #: notifications/models/notification.py:14
 msgid "receive backend"
 msgstr "消息後端"
@@ -5995,6 +6059,7 @@ msgid "User message"
 msgstr "用戶消息"
 
 #: notifications/models/notification.py:21
+#, python-brace-format
 msgid "{} subscription"
 msgstr "{} 訂閱"
 
@@ -6031,14 +6096,17 @@ msgid "Waiting task start"
 msgstr "等待任務開始"
 
 #: ops/api/celery.py:269
+#, python-brace-format
 msgid "Task {} not found"
 msgstr "任務 {} 不存在"
 
 #: ops/api/celery.py:276
+#, python-brace-format
 msgid "Task {} args or kwargs error"
 msgstr "任務 {} 執行參數錯誤"
 
 #: ops/api/job.py:66
+#, python-brace-format
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr "登入資產 {}({}) 被拒絕，由登入資產規則 ACL ({}) 限制"
 
@@ -6314,6 +6382,7 @@ msgid "Celery Task Execution"
 msgstr "Celery 任務執行"
 
 #: ops/models/job.py:82
+#, python-brace-format
 msgid "Module {} is not suitable for this asset"
 msgstr "模組 {} 不適用於此資產"
 
@@ -6587,6 +6656,7 @@ msgid "Name of the job"
 msgstr "Job 名稱"
 
 #: orgs/api.py:62
+#, python-brace-format
 msgid "The current organization ({}) cannot be deleted"
 msgstr "當前組織 ({}) 不能被刪除"
 
@@ -6597,6 +6667,7 @@ msgid ""
 msgstr "LDAP 同步設定組織為當前組織，請切換其他組織後再進行刪除操作"
 
 #: orgs/api.py:77
+#, python-brace-format
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織存在資源 ({}) 不能被刪除"
 
@@ -6771,6 +6842,7 @@ msgid "Asset permissions is about to expire"
 msgstr "資產授權規則將要過期"
 
 #: perms/notifications.py:64
+#, python-brace-format
 msgid "asset permissions of organization {}"
 msgstr "組織 ({}) 的資產授權"
 
@@ -6850,6 +6922,7 @@ msgid "Internal role, can't be update"
 msgstr "內部角色，不能更新"
 
 #: rbac/api/rolebinding.py:47
+#, python-brace-format
 msgid "{} at least one system role"
 msgstr "{} 至少有一個系統角色"
 
@@ -6910,100 +6983,106 @@ msgid "Can view file manager"
 msgstr "文件管理"
 
 #: rbac/models/menu.py:21
+#, fuzzy
+#| msgid "Can view console view"
+msgid "Can view jdmc console"
+msgstr "可以顯示控制台"
+
+#: rbac/models/menu.py:22
 msgid "Can view System Tools"
 msgstr "可以查看系統工具"
 
-#: rbac/models/menu.py:22
-msgid "Can view user login report"
-msgstr "可以查看使用者登入報告"
-
 #: rbac/models/menu.py:23
-#, fuzzy
-#| msgid "Can view user login report"
-msgid "Can create user login report"
+msgid "Can view user login report"
 msgstr "可以查看使用者登入報告"
 
 #: rbac/models/menu.py:24
 #, fuzzy
 #| msgid "Can view user login report"
-msgid "Can delete user login report"
+msgid "Can create user login report"
 msgstr "可以查看使用者登入報告"
 
 #: rbac/models/menu.py:25
-msgid "Can view user change password report"
-msgstr "可以查看使用者變更密碼報告"
+#, fuzzy
+#| msgid "Can view user login report"
+msgid "Can delete user login report"
+msgstr "可以查看使用者登入報告"
 
 #: rbac/models/menu.py:26
-#, fuzzy
-#| msgid "Can view user change password report"
-msgid "Can create user change password report"
+msgid "Can view user change password report"
 msgstr "可以查看使用者變更密碼報告"
 
 #: rbac/models/menu.py:27
 #, fuzzy
 #| msgid "Can view user change password report"
-msgid "Can delete user change password report"
+msgid "Can create user change password report"
 msgstr "可以查看使用者變更密碼報告"
 
 #: rbac/models/menu.py:28
-msgid "Can view asset statistics report"
-msgstr "可以查看資產統計報告"
+#, fuzzy
+#| msgid "Can view user change password report"
+msgid "Can delete user change password report"
+msgstr "可以查看使用者變更密碼報告"
 
 #: rbac/models/menu.py:29
-#, fuzzy
-#| msgid "Can view asset statistics report"
-msgid "Can create asset statistics report"
+msgid "Can view asset statistics report"
 msgstr "可以查看資產統計報告"
 
 #: rbac/models/menu.py:30
 #, fuzzy
 #| msgid "Can view asset statistics report"
-msgid "Can delete asset statistics report"
+msgid "Can create asset statistics report"
 msgstr "可以查看資產統計報告"
 
 #: rbac/models/menu.py:31
-msgid "Can view asset activity report"
-msgstr "可以查看資產活動報告"
+#, fuzzy
+#| msgid "Can view asset statistics report"
+msgid "Can delete asset statistics report"
+msgstr "可以查看資產統計報告"
 
 #: rbac/models/menu.py:32
-#, fuzzy
-#| msgid "Can view asset activity report"
-msgid "Can create asset activity report"
+msgid "Can view asset activity report"
 msgstr "可以查看資產活動報告"
 
 #: rbac/models/menu.py:33
 #, fuzzy
 #| msgid "Can view asset activity report"
-msgid "Can delete asset activity report"
+msgid "Can create asset activity report"
 msgstr "可以查看資產活動報告"
 
 #: rbac/models/menu.py:34
-msgid "Can view account statistics report"
-msgstr "可以查看帳號統計報告"
+#, fuzzy
+#| msgid "Can view asset activity report"
+msgid "Can delete asset activity report"
+msgstr "可以查看資產活動報告"
 
 #: rbac/models/menu.py:35
-#, fuzzy
-#| msgid "Can view account statistics report"
-msgid "Can create account statistics report"
+msgid "Can view account statistics report"
 msgstr "可以查看帳號統計報告"
 
 #: rbac/models/menu.py:36
 #, fuzzy
 #| msgid "Can view account statistics report"
-msgid "Can delete account statistics report"
+msgid "Can create account statistics report"
 msgstr "可以查看帳號統計報告"
 
 #: rbac/models/menu.py:37
+#, fuzzy
+#| msgid "Can view account statistics report"
+msgid "Can delete account statistics report"
+msgstr "可以查看帳號統計報告"
+
+#: rbac/models/menu.py:38
 msgid "Can view account automation report"
 msgstr "可以查看帳號自動化報告"
 
-#: rbac/models/menu.py:38
+#: rbac/models/menu.py:39
 #, fuzzy
 #| msgid "Can view account automation report"
 msgid "Can create account automation report"
 msgstr "可以查看帳號自動化報告"
 
-#: rbac/models/menu.py:39
+#: rbac/models/menu.py:40
 #, fuzzy
 #| msgid "Can view account automation report"
 msgid "Can delete account automation report"
@@ -7126,36 +7205,42 @@ msgstr "許可證"
 msgid "Job audit"
 msgstr "作業審核"
 
-#: rbac/tree.py:195
+#: rbac/tree.py:137
+#, fuzzy
+#| msgid "Console"
+msgid "JDMC console"
+msgstr "控制台"
+
+#: rbac/tree.py:201
 msgid "App organizations"
 msgstr "組織管理"
 
-#: rbac/tree.py:196
+#: rbac/tree.py:202
 msgid "Ticket comment"
 msgstr "工單評論"
 
-#: rbac/tree.py:197 settings/serializers/feature.py:182
+#: rbac/tree.py:203 settings/serializers/feature.py:182
 #: settings/serializers/feature.py:184 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "工單管理"
 
-#: rbac/tree.py:198
+#: rbac/tree.py:204
 msgid "Common setting"
 msgstr "一般設定"
 
-#: rbac/tree.py:199
+#: rbac/tree.py:205
 msgid "View permission tree"
 msgstr "查看授權樹"
 
-#: rbac/tree.py:201
+#: rbac/tree.py:207
 msgid "Access token"
 msgstr "訪問令牌"
 
-#: rbac/tree.py:202
+#: rbac/tree.py:208
 msgid "View access token"
 msgstr "查看訪問令牌"
 
-#: rbac/tree.py:203
+#: rbac/tree.py:209
 msgid "Revoke access token"
 msgstr "撤銷訪問令牌"
 
@@ -7224,6 +7309,7 @@ msgid "Test success"
 msgstr "測試成功"
 
 #: settings/api/email.py:22
+#, python-brace-format
 msgid "Test mail sent to {}, please check"
 msgstr "郵件已經發送{}, 請檢查"
 
@@ -8104,7 +8190,7 @@ msgstr "租戶 ID"
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:128 xpack/plugins/cloud/manager.py:132
-#: xpack/plugins/cloud/models.py:293
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "地域"
 
@@ -8797,19 +8883,23 @@ msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 協議"
 
 #: settings/utils/ldap.py:543
+#, python-brace-format
 msgid "Host or port is disconnected: {}"
 msgstr "主機或埠不可連接: {}"
 
 #: settings/utils/ldap.py:545
+#, python-brace-format
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "埠不是LDAP服務埠: {}"
 
 #: settings/utils/ldap.py:547
+#, python-brace-format
 msgid "Please add certificate: {}"
 msgstr "請添加證書: {}"
 
 #: settings/utils/ldap.py:551 settings/utils/ldap.py:578
 #: settings/utils/ldap.py:608 settings/utils/ldap.py:636
+#, python-brace-format
 msgid "Unknown error: {}"
 msgstr "未知錯誤: {}"
 
@@ -8818,22 +8908,27 @@ msgid "Bind DN or Password incorrect"
 msgstr "綁定DN或密碼錯誤"
 
 #: settings/utils/ldap.py:572
+#, python-brace-format
 msgid "Please enter Bind DN: {}"
 msgstr "請輸入綁定DN: {}"
 
 #: settings/utils/ldap.py:574
+#, python-brace-format
 msgid "Please enter Password: {}"
 msgstr "請輸入密碼: {}"
 
 #: settings/utils/ldap.py:576
+#, python-brace-format
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "請輸入正確的綁定DN和密碼: {}"
 
 #: settings/utils/ldap.py:594
+#, python-brace-format
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用戶OU或用戶過濾器: {}"
 
 #: settings/utils/ldap.py:625
+#, python-brace-format
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP屬性映射沒有包含: {}"
 
@@ -8846,46 +8941,57 @@ msgid "LDAP authentication is not enabled"
 msgstr "LDAP認證沒有啟用"
 
 #: settings/utils/ldap.py:669
+#, python-brace-format
 msgid "Error (Invalid LDAP server): {}"
 msgstr "錯誤  (不合法的LDAP伺服器地址): {}"
 
 #: settings/utils/ldap.py:671
+#, python-brace-format
 msgid "Error (Invalid Bind DN): {}"
 msgstr "錯誤 (不合法的綁定DN): {}"
 
 #: settings/utils/ldap.py:673
+#, python-brace-format
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "錯誤 (不合法的LDAP屬性映射): {}"
 
 #: settings/utils/ldap.py:675
+#, python-brace-format
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "錯誤 (不合法的用戶OU或用戶過濾器): {}"
 
 #: settings/utils/ldap.py:677
+#, python-brace-format
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "錯誤 (沒有啟用LDAP認證): {}"
 
 #: settings/utils/ldap.py:679
+#, python-brace-format
 msgid "Error (Unknown): {}"
 msgstr "錯誤 (未知): {}"
 
 #: settings/utils/ldap.py:682
+#, python-brace-format
 msgid "Succeed: Match {} users"
 msgstr "成功配對 {} 個用戶"
 
 #: settings/utils/ldap.py:712
+#, python-brace-format
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認證失敗 (配置錯誤): {}"
 
 #: settings/utils/ldap.py:716
+#, python-brace-format
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認證失敗 (使用者名稱或密碼不正確): {}"
 
 #: settings/utils/ldap.py:718
+#, python-brace-format
 msgid "Authentication failed (Unknown): {}"
 msgstr "認證失敗: (未知): {}"
 
 #: settings/utils/ldap.py:721
+#, python-brace-format
 msgid "Authentication success: {}"
 msgstr "認證成功: {}"
 
@@ -8894,10 +9000,12 @@ msgid "No LDAP user was found"
 msgstr "沒有取得到 LDAP 用戶"
 
 #: settings/ws.py:237
+#, python-brace-format
 msgid "Total {}, success {}, failure {}"
 msgstr "總共 {}，成功 {}，失敗 {}"
 
 #: settings/ws.py:241
+#, python-brace-format
 msgid ", disabled {}"
 msgstr "，禁用 {}"
 
@@ -9063,6 +9171,7 @@ msgid "This is enterprise edition applet"
 msgstr "企業版遠程應用，在社區版中不能使用"
 
 #: terminal/api/applet/applet.py:88
+#, python-brace-format
 msgid "Applet not found in path: {}"
 msgstr "在路徑中未找到遠程應用: {}"
 
@@ -9075,6 +9184,7 @@ msgid "Deleting the default storage is not allowed"
 msgstr "不允許刪除默認儲存配置"
 
 #: terminal/api/component/storage.py:36
+#, python-brace-format
 msgid "Cannot delete storage that is being used: {}"
 msgstr "無法刪除正在使用的儲存: {}"
 
@@ -9087,6 +9197,7 @@ msgid "Invalid"
 msgstr "無效"
 
 #: terminal/api/component/storage.py:132 terminal/tasks.py:208
+#, python-brace-format
 msgid "Test failure: {}"
 msgstr "測試失敗: {}"
 
@@ -9113,6 +9224,7 @@ msgid "Session replay"
 msgstr "會話錄影"
 
 #: terminal/api/session/session.py:339
+#, python-brace-format
 msgid "Session does not exist: {}"
 msgstr "會話不存在: {}"
 
@@ -9120,7 +9232,7 @@ msgstr "會話不存在: {}"
 msgid "Session is finished or the protocol not supported"
 msgstr "會話已經完成或協議不支持"
 
-#: terminal/api/session/session.py:355
+#: terminal/api/session/session.py:355 tickets/api/ticket.py:142
 msgid "User does not have permission"
 msgstr "用戶沒有權限"
 
@@ -9285,10 +9397,12 @@ msgstr "主機"
 
 #: terminal/models/applet/applet.py:94
 #: terminal/models/virtualapp/virtualapp.py:66
+#, python-brace-format
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Applet pkg 無效，缺少文件 {}"
 
 #: terminal/models/applet/applet.py:113
+#, python-brace-format
 msgid "Load platform.yml failed: {}"
 msgstr "載入 platform.yml 失敗: {}"
 
@@ -9732,9 +9846,9 @@ msgid ""
 "days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
 "remote-desktop-services/rds-client-access-license\">Detail</a>"
 msgstr ""
-"如果不存在，RDS將處於試用模式，試用期為 120 天。<a href='https://learn."
-"microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-"
-"access-license'>詳情</a>"
+"如果不存在，RDS將處於試用模式，試用期為 120 天。<a href='https://"
+"learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-"
+"client-access-license'>詳情</a>"
 
 #: terminal/serializers/applet_host.py:55
 msgid "RDS License Server"
@@ -9905,6 +10019,7 @@ msgid "No asset or invalid asset"
 msgstr "沒有資產或資產未激活"
 
 #: terminal/serializers/storage.py:23
+#, python-brace-format
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "端點無效: 移除路徑 `{}`"
 
@@ -9953,8 +10068,8 @@ msgid ""
 "If there are multiple hosts, use a comma (,) to separate them. <br>(For "
 "example: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)"
 msgstr ""
-"如果有多個主機，請用逗號 (,) 分隔它們。<br>（例如：http://www.jumpserver.a."
-"com:9100，http://www.jumpserver.b.com:9100）"
+"如果有多個主機，請用逗號 (,) 分隔它們。<br>（例如：http://"
+"www.jumpserver.a.com:9100，http://www.jumpserver.b.com:9100）"
 
 #: terminal/serializers/storage.py:199
 msgid "Index by date"
@@ -10319,6 +10434,7 @@ msgid "Ticket already closed"
 msgstr "工單已經關閉"
 
 #: tickets/handlers/apply_asset.py:40
+#, python-brace-format
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -10338,6 +10454,7 @@ msgid "After change"
 msgstr "變更後"
 
 #: tickets/handlers/base.py:96
+#, python-brace-format
 msgid "{} {} the ticket"
 msgstr "{} {} 工單"
 
@@ -10483,18 +10600,22 @@ msgid "Ticket applied info"
 msgstr "工單申請資訊"
 
 #: tickets/notifications.py:116
+#, python-brace-format
 msgid "You have a new ticket from {}"
 msgstr "你有一條來自 {} 的新工單"
 
 #: tickets/notifications.py:120
+#, python-brace-format
 msgid "{}: New Ticket - {} ({})"
 msgstr "{}: 新工單 - {} ({})"
 
 #: tickets/notifications.py:168
+#, python-brace-format
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工單已被處理, 處理人 - {}"
 
 #: tickets/notifications.py:172
+#, python-brace-format
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工單已被處理, 處理人 - {} ({})"
 
@@ -10604,6 +10725,7 @@ msgstr "申請動作"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:74
+#, python-brace-format
 msgid "Created by ticket ({}-{})"
 msgstr "通過工單創建 ({}-{})"
 
@@ -10612,6 +10734,7 @@ msgid "The expiration date should be greater than the start date"
 msgstr "過期時間要大於開始時間"
 
 #: tickets/serializers/ticket/common.py:89
+#, python-brace-format
 msgid "Permission named `{}` already exists"
 msgstr "授權名稱 `{}` 已存在"
 
@@ -10620,6 +10743,7 @@ msgid "Process map"
 msgstr "流程圖"
 
 #: tickets/serializers/ticket/ticket.py:91
+#, python-brace-format
 msgid "The ticket flow `{}` does not exist"
 msgstr "工單流程 `{}` 不存在"
 
@@ -10678,6 +10802,7 @@ msgid "Can not invite self"
 msgstr "不能邀請自己"
 
 #: users/api/user.py:180
+#, python-brace-format
 msgid ""
 "This user {} is already a member of the organization. No need to invite again"
 msgstr ""
@@ -11102,6 +11227,7 @@ msgid "Password does not match security rules"
 msgstr "密碼不滿足安全規則"
 
 #: users/serializers/profile.py:33
+#, python-brace-format
 msgid "The new password cannot be the last {} passwords"
 msgstr "新密碼不能是最近 {} 次的密碼"
 
@@ -11538,6 +11664,7 @@ msgid "Password invalid"
 msgstr "使用者名稱或密碼無效"
 
 #: users/views/profile/reset.py:66
+#, python-brace-format
 msgid ""
 "Non-local users can log in only from third-party platforms and cannot change "
 "their passwords: {}"
@@ -11548,6 +11675,7 @@ msgid "Token invalid or expired"
 msgstr "令牌錯誤或失效"
 
 #: users/views/profile/reset.py:204
+#, python-brace-format
 msgid "User auth from {}, go there change password"
 msgstr "用戶認證源來自 {}, 請去相應系統修改密碼"
 
@@ -11556,6 +11684,7 @@ msgid "* Your password does not meet the requirements"
 msgstr "* 您的密碼不符合要求"
 
 #: users/views/profile/reset.py:217
+#, python-brace-format
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密碼不能是最近 {} 次的密碼"
 
@@ -11580,10 +11709,12 @@ msgid "Test connection successful"
 msgstr "測試成功"
 
 #: xpack/plugins/cloud/api.py:75
+#, python-brace-format
 msgid "Test connection failed: {}"
 msgstr "測試連接失敗：{}"
 
 #: xpack/plugins/cloud/api.py:203
+#, python-brace-format
 msgid "User {} deleted the current resource and released the assets"
 msgstr ""
 "User {} deleted the assets that have been released by the current resource"
@@ -11783,6 +11914,10 @@ msgid "Get instances of region \"%s\" error, error: %s"
 msgstr ""
 "An error occurred while getting the instances of Region \"%s\", Error: %s"
 
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:290
+msgid "Instance"
+msgstr "實例"
+
 #: xpack/plugins/cloud/manager.py:195
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
@@ -11926,10 +12061,6 @@ msgstr "同步任務"
 #: xpack/plugins/cloud/models.py:287
 msgid "Sync instance task history"
 msgstr "同步實例任務歷史"
-
-#: xpack/plugins/cloud/models.py:290
-msgid "Instance"
-msgstr "實例"
 
 #: xpack/plugins/cloud/models.py:307
 msgid "Sync instance detail"
@@ -12251,6 +12382,12 @@ msgstr "API 端點"
 msgid "Auto node classification"
 msgstr "自動節點分類"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+#, fuzzy
+#| msgid "Domain name"
+msgid "domain_name"
+msgstr "域名稱"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "認證地址"
@@ -12284,6 +12421,7 @@ msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
+#, python-brace-format
 msgid "IP address invalid `{}`, {}"
 msgstr "IP 地址無效: `{}`, {}"
 
@@ -12358,7 +12496,7 @@ msgid "Restore default successfully."
 msgstr "恢復默認成功！"
 
 #: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:47
-#: xpack/plugins/interface/models.py:90
+#: xpack/plugins/interface/models.py:91
 msgid "Interface settings"
 msgstr "界面設置"
 
@@ -12387,8 +12525,9 @@ msgid "Footer content"
 msgstr "頁尾內容"
 
 #: xpack/plugins/interface/models.py:44
-msgid "Extend"
-msgstr "擴充"
+#: xpack/plugins/interface/serializers/interface.py:73
+msgid "Extended fields"
+msgstr ""
 
 #: xpack/plugins/interface/serializers/interface.py:48
 #, fuzzy
@@ -12403,10 +12542,6 @@ msgstr "頂部寬 Logo"
 #: xpack/plugins/interface/serializers/interface.py:50
 msgid "Small logo without text"
 msgstr "方形小 Logo"
-
-#: xpack/plugins/interface/serializers/interface.py:73
-msgid "Extended fields"
-msgstr ""
 
 #: xpack/plugins/interface/templates/login_i18n.html:10
 #, fuzzy
@@ -12446,6 +12581,10 @@ msgstr ""
 msgid "More login methods"
 msgstr "其他方式登錄"
 
+#: xpack/plugins/jdmc/i18n.py:5
+msgid "SecAdmin"
+msgstr "安全管理員"
+
 #: xpack/plugins/jdmc/meta.py:9
 msgid "JDMC"
 msgstr ""
@@ -12457,6 +12596,9 @@ msgstr "許可證匯入成功"
 #: xpack/plugins/license/api.py:55
 msgid "Invalid license"
 msgstr "許可證無效"
+
+#~ msgid "Extend"
+#~ msgstr "擴充"
 
 #~ msgid "Microsoft"
 #~ msgstr "微軟"
@@ -12476,11 +12618,6 @@ msgstr "許可證無效"
 #~ "OpenSSH is a program used to connect remote applications in the Windows "
 #~ "Remote Application Publisher"
 #~ msgstr "OpenSSH 是在 windows 遠程應用發布伺服器中用來連接遠程應用的程序"
-
-#, fuzzy
-#~| msgid "Domain name"
-#~ msgid "domain_name"
-#~ msgstr "域名稱"
 
 #, fuzzy
 #~| msgid "Periodic run"

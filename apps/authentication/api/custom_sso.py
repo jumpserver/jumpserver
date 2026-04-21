@@ -9,9 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from orgs.utils import tmp_to_org
-from orgs.models import Organization
-from rbac.models import OrgRole, OrgRoleBinding
+from rbac.models import SystemRole, SystemRoleBinding
 from common.utils import get_logger
 from ..mixins import AuthMixin
 
@@ -93,12 +91,9 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
             username=username, defaults=defaults
         )
         if created:
-            role_name = userinfo.get('role_name')
-            org_role = OrgRole.objects.filter(name=role_name).first()
-            org_id = userinfo.get('org_id')
-            org = Organization.get_instance(org_id)
-            with tmp_to_org(org):
-                ob = OrgRoleBinding(user=user, role=org_role)
-                ob.save()
+            system_role_name = userinfo.get('system_role_name')
+            system_role = SystemRole.objects.filter(name=system_role_name).first()
+            sys_role_binding = SystemRoleBinding(user=user, role=system_role)
+            sys_role_binding.save()
         
         return user

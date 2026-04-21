@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                     ('view_workbench', 'Can view workbench view'),
                     ('view_webterminal', 'Can view web terminal'),
                     ('view_filemanager', 'Can view file manager'),
+                    ('view_jdmc', 'Can view jdmc console'),
                     ('view_systemtools', 'Can view System Tools'),
                     ('view_userloginreport', 'Can view user login report'),
                     ('add_userloginreport', 'Can create user login report'),
