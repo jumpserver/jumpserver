@@ -14,6 +14,14 @@ class SiteMessage(JMSBaseModel):
     read_at = models.DateTimeField(default=None, null=True)
     comment = ''
 
+    def as_data(self):
+        return {
+            'id': str(self.id),
+            'content': self.content.as_data() if self.content else {},
+            'has_read': self.has_read,
+            'date_created': str(self.date_created)
+        }
+
 
 class MessageContent(JMSBaseModel):
     DisplayMode = SiteMessageDisplayMode

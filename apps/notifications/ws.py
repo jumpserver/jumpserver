@@ -6,7 +6,7 @@ from common.db.utils import safe_db_connection
 from common.utils import get_logger
 from .signal_handlers import new_site_msg_chan
 from .site_msg import SiteMessageUtil
-from .models.site_msg import MessageContent
+from .models.site_msg import SiteMessage
 
 logger = get_logger(__name__)
 
@@ -48,8 +48,10 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
     def send_site_msg_for_display(self, user_id):
         msgs = SiteMessageUtil.get_user_display_msgs(user_id)
         for msg in msgs:
-            msg: MessageContent
-            logger.debug('Send need display site msg to user: {} {} {}'.format(user_id, msg.id, msg.display_mode))
+            msg: SiteMessage
+            logger.debug('Send need display site msg to user: {} {} {}'.format(
+                user_id, msg.id, msg.content.display_mode
+            ))
             msg_data = msg.as_data()
             self.send_json({'type': 'display', 'site_msg': msg_data})
     

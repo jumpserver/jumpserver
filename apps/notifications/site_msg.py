@@ -68,8 +68,7 @@ class SiteMessageUtil:
     def get_user_display_msgs(cls, user_id):
         msgs = SiteMessage.objects.filter(user_id=user_id, has_read=False).exclude(
             content__display_mode=SiteMessageModel.DisplayMode.default
-        ).values_list('content', flat=True).distinct()
-        msgs = SiteMessageModel.objects.filter(id__in=msgs)
+        ).prefetch_related('content')
         return msgs
 
     @classmethod
