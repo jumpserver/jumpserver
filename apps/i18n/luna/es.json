@@ -207,6 +207,7 @@
     "Search": "Buscar",
     "Select account": "Seleccionar cuenta",
     "SelectCommand": "Seleccione el comando a ejecutar",
+    "SelectFile": "Seleccionar archivo",
     "Send": "Enviar",
     "Send command": "Enviar comando",
     "Send text to all ssh terminals": "Enviar texto a todos los terminales SSH",

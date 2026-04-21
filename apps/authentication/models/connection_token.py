@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
+from accounts.const import SecretType
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
@@ -298,15 +299,17 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset:
             return None
 
+        input_secret_type = self.connect_options.get('input_secret_type', SecretType.PASSWORD)
         if self.account.startswith('@'):
             account = VirtualAccount.get_special_account(
                 self.account, self.user, self.asset, input_username=self.input_username,
-                input_secret=self.input_secret, from_permed=False
+                input_secret=self.input_secret, input_secret_type=input_secret_type, from_permed=False
             )
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
+                account.secret_type = input_secret_type
             self.set_ad_domain_if_need(account)
 
         return account

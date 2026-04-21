@@ -208,6 +208,7 @@
     "Search": "搜索",
     "Select account": "選擇帳號",
     "SelectCommand": "請選擇要執行的命令",
+    "SelectFile": "選擇檔案",
     "Send": "發送",
     "Send command": "發送命令",
     "Send text to all ssh terminals": "發送文本到所有ssh終端",

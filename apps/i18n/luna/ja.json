@@ -207,6 +207,7 @@
     "Search": "検索",
     "Select account": "システムユーザーの選択",
     "SelectCommand": "実行するコマンドを選択してください",
+    "SelectFile": "ファイルを選択",
     "Send": "送信",
     "Send command": "コマンドを送信",
     "Send text to all ssh terminals": "すべてのssh端末にテキストを送信します",

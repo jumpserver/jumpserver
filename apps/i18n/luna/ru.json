@@ -207,6 +207,7 @@
     "Search": "Поиск",
     "Select account": "Выбрать УЗ",
     "SelectCommand": "Выберите команду для выполнения",
+    "SelectFile": "Выбрать файл",
     "Send": "Отправить",
     "Send command": "Отправить команду",
     "Send text to all ssh terminals": "Отправить текст на все ssh терминалы",

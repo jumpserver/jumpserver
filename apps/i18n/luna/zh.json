@@ -207,6 +207,7 @@
     "Search": "搜索",
     "Select account": "选择账号",
     "SelectCommand": "请选择要执行的命令",
+    "SelectFile": "选择文件",
     "Send": "发送",
     "Send command": "发送命令",
     "Send text to all ssh terminals": "发送给所有会话",

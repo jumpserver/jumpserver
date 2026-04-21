@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AliasAccount
+from accounts.const import AliasAccount, SecretType
 from orgs.mixins.models import JMSOrgBaseModel
 
 __all__ = ['VirtualAccount']
@@ -54,13 +54,21 @@ class VirtualAccount(JMSOrgBaseModel):
         return cls.objects.all()
 
     @classmethod
-    def get_special_account(cls, alias, user, asset, input_username='', input_secret='', from_permed=True):
+    def get_special_account(
+            cls, alias, user, asset, input_username='', input_secret='',
+            input_secret_type=SecretType.PASSWORD, from_permed=True
+    ):
         if alias == AliasAccount.INPUT.value:
-            account = cls.get_manual_account(input_username, input_secret, from_permed)
+            account = cls.get_manual_account(
+                input_username, input_secret, input_secret_type, from_permed
+            )
         elif alias == AliasAccount.ANON.value:
             account = cls.get_anonymous_account()
         elif alias == AliasAccount.USER.value:
-            account = cls.get_same_account(user, asset, input_secret=input_secret, from_permed=from_permed)
+            account = cls.get_same_account(
+                user, asset, input_secret=input_secret,
+                input_secret_type=input_secret_type, from_permed=from_permed
+            )
         else:
             account = cls(name=alias, username=alias, secret=None)
         account.alias = alias
@@ -70,7 +78,10 @@ class VirtualAccount(JMSOrgBaseModel):
         return account
 
     @classmethod
-    def get_manual_account(cls, input_username='', input_secret='', from_permed=True):
+    def get_manual_account(
+            cls, input_username='', input_secret='',
+            input_secret_type=SecretType.PASSWORD, from_permed=True
+    ):
         """ @INPUT 手动登录的账号(any) """
         from .account import Account
         if from_permed:
@@ -79,7 +90,10 @@ class VirtualAccount(JMSOrgBaseModel):
         else:
             username = input_username
             secret = input_secret
-        return Account(name=AliasAccount.INPUT.label, username=username, secret=secret)
+        return Account(
+            name=AliasAccount.INPUT.label, username=username,
+            secret=secret, secret_type=input_secret_type
+        )
 
     @classmethod
     def get_anonymous_account(cls):
@@ -87,7 +101,10 @@ class VirtualAccount(JMSOrgBaseModel):
         return Account(name=AliasAccount.ANON.label, username=AliasAccount.ANON.value, secret=None)
 
     @classmethod
-    def get_same_account(cls, user, asset, input_secret='', from_permed=True):
+    def get_same_account(
+            cls, user, asset, input_secret='',
+            input_secret_type=SecretType.PASSWORD, from_permed=True
+    ):
         """ @USER 动态用户的账号(self) """
         from .account import Account
         username = user.username
@@ -102,6 +119,9 @@ class VirtualAccount(JMSOrgBaseModel):
 
         if not secret and not from_permed:
             secret = input_secret
-        account = Account(name=AliasAccount.USER.label, username=username, secret=secret)
+        account = Account(
+            name=AliasAccount.USER.label, username=username,
+            secret=secret, secret_type=input_secret_type
+        )
         account.alias = alias
         return account
