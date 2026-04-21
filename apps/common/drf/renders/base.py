@@ -23,7 +23,7 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
     # 渲染模板标识, 导入、导出、更新模板: ['import', 'update', 'export']
     template = 'export'
     serializer = None
-    # 敏感字段名称，这些字段不允许导出
+    # 敏感字段名称，导出数据时这些字段不允许导出
     secret_field_names = ("password", "token", "secret", "key", "private_key", "passphrase")
 
     @staticmethod
@@ -51,7 +51,7 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
         response['Content-Disposition'] = disposition
 
     def is_secret_field(self, field):
-        """检查字段是否为敏感字段，敏感字段不允许导出"""
+        """检查字段是否为敏感字段"""
         # 检查字段类型是否为 EncryptedField
         if isinstance(field, EncryptedField):
             return True
@@ -76,8 +76,9 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
 
         fields_unexport = getattr(meta, 'fields_unexport', [])
         fields = [v for v in fields if v.field_name not in fields_unexport]
-        # 过滤敏感字段，禁止口令、密钥等敏感信息导出
-        fields = [v for v in fields if not self.is_secret_field(v)]
+        # 仅真实导出数据时过滤敏感字段，模板需保留这些字段供用户填写
+        if self.template == 'export':
+            fields = [v for v in fields if not self.is_secret_field(v)]
         return fields
 
     @staticmethod

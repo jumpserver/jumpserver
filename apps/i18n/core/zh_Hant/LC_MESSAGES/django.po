@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-10 15:08+0800\n"
+"POT-Creation-Date: 2026-04-21 11:21+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -144,8 +144,8 @@ msgstr ">>> 開始執行測試閘道器帳號可連結性的任務"
 #: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:25
 #: authentication/confirm/password.py:27 authentication/const.py:13
 #: authentication/forms.py:28
-#: authentication/templates/authentication/login.html:368
-#: authentication/templates/authentication/login.html:414 reports/mixins.py:194
+#: authentication/templates/authentication/login.html:369
+#: authentication/templates/authentication/login.html:415 reports/mixins.py:194
 #: settings/models.py:216 settings/serializers/auth/ldap.py:27
 #: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
@@ -619,10 +619,7 @@ msgid "Name"
 msgstr "名稱"
 
 #: accounts/models/application.py:18 settings/serializers/auth/oauth2.py:25
-#: static/sangfor/authentication/login.html:908
-#: static/sangfor/authentication/login.html:917
-#: static/sangfor/authentication/login.html:928
-#: xpack/plugins/interface/templates/login_i18n.html:16
+#: xpack/plugins/interface/templates/login_i18n.html:9
 msgid "Logo"
 msgstr "圖示"
 
@@ -901,7 +898,7 @@ msgstr "重複密碼"
 #: authentication/serializers/connect_token_secret.py:53
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: authentication/templates/authentication/login.html:414
+#: authentication/templates/authentication/login.html:415
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
 #: users/forms/profile.py:117 users/models/user/__init__.py:66
 #: users/notifications.py:20 users/serializers/profile.py:190
@@ -2172,15 +2169,15 @@ msgstr "我們想通知您，最近有用戶登入："
 msgid "User details"
 msgstr "使用者詳情"
 
-#: assets/api/asset/asset.py:165
+#: assets/api/asset/asset.py:166
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接創建資產, 你應該創建主機或其他資產"
 
-#: assets/api/asset/asset.py:171
+#: assets/api/asset/asset.py:173
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "資產數量超過 5000 的限制"
 
-#: assets/api/asset/asset.py:177
+#: assets/api/asset/asset.py:179
 #, fuzzy
 #| msgid "The number of assets exceeds the limit of 5000"
 msgid "The number of assets exceeds the license limit"
@@ -3514,9 +3511,9 @@ msgid "Connect"
 msgstr "連接"
 
 #: audits/const.py:31 authentication/templates/authentication/login.html:334
-#: authentication/templates/authentication/login.html:407
-#: static/sangfor/authentication/login.html:999 templates/_header_bar.html:101
-#: xpack/plugins/interface/templates/login_i18n.html:28
+#: authentication/templates/authentication/login.html:408
+#: templates/_header_bar.html:101
+#: xpack/plugins/interface/templates/login_i18n.html:21
 msgid "Login"
 msgstr "登錄"
 
@@ -4212,11 +4209,11 @@ msgstr "臨時密碼"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:128
+#: audits/tasks.py:184
 msgid "Clean audits session task log"
 msgstr "清理資產審計會話任務日誌"
 
-#: audits/tasks.py:130
+#: audits/tasks.py:186
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -4230,11 +4227,11 @@ msgstr ""
 "話錄像和命令記錄、改密日誌，系統會根據系統設置-任務列表定期清理配置，對於超出"
 "時間的，將於每天凌晨2點進行清理"
 
-#: audits/tasks.py:150
+#: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "上傳 FTP 文件到外部儲存"
 
-#: audits/tasks.py:152
+#: audits/tasks.py:208
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -4316,13 +4313,12 @@ msgid ""
 msgstr "用戶來自 {} 請去相應系統修改密碼"
 
 #: authentication/api/password.py:69
-#: authentication/templates/authentication/login.html:399
-#: static/sangfor/authentication/login.html:991
+#: authentication/templates/authentication/login.html:400
 #: users/templates/users/forgot_password.html:41
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/forgot_password_previewing.html:13
 #: users/templates/users/forgot_password_previewing.html:14
-#: xpack/plugins/interface/templates/login_i18n.html:25
+#: xpack/plugins/interface/templates/login_i18n.html:18
 msgid "Forgot password"
 msgstr "忘記密碼"
 
@@ -5168,12 +5164,11 @@ msgid ""
 msgstr "配置文件有問題，無法登錄，請聯絡管理員或查看最新文件"
 
 #: authentication/templates/authentication/login.html:314
-#: static/sangfor/authentication/login.html:895
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理員，可以更新配置文件解決，設置配置項"
 
-#: authentication/templates/authentication/login.html:422
+#: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "其他方式登錄"
 
@@ -5525,7 +5520,7 @@ msgstr "無效的埠範圍，應該在 {}-{} 之內"
 msgid "Object"
 msgstr "對象"
 
-#: common/drf/metadata.py:131
+#: common/drf/metadata.py:148
 msgid "Org ID"
 msgstr "組織 ID"
 
@@ -5604,10 +5599,14 @@ msgstr "標籤，格式: [\"鍵:值\", ...], 如果標籤不存在，將創建�
 msgid "Objects, format [\"id\", ...]"
 msgstr "多關聯項，格式是 [\"id\", ...]"
 
-#: common/drf/renders/base.py:300
+#: common/drf/renders/base.py:301
+#, fuzzy
+#| msgid ""
+#| "{} - The encryption password has not been set - please go to personal "
+#| "information -> file encryption password to set the encryption password"
 msgid ""
-"{} - The encryption password has not been set - please go to personal "
-"information -> file encryption password to set the encryption password"
+"{} - Encryption password not set - Please go to Personal Settings → "
+"Preferences → File Encryption Password to set it."
 msgstr "{} - 未設置加密密碼 - 請前往個人資訊 -> 文件加密密碼中設置加密密碼"
 
 #: common/drf/renders/mixins.py:37 labels/serializers.py:22
@@ -8902,64 +8901,6 @@ msgstr "總共 {}，成功 {}，失敗 {}"
 msgid ", disabled {}"
 msgstr "，禁用 {}"
 
-#: static/sangfor/authentication/login.html:900
-#: xpack/plugins/interface/templates/login_i18n.html:9
-msgid "Secure, Efficient, Controlled"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:901
-#: xpack/plugins/interface/templates/login_i18n.html:11
-msgid ""
-"One-stop operations management platform to make server access secure, "
-"controllable, and operations efficient and transparent.<br />Easily manage "
-"user permissions and audit operation records to protect critical assets."
-msgstr ""
-
-#: static/sangfor/authentication/login.html:921
-#: xpack/plugins/interface/templates/login_i18n.html:17
-#, fuzzy
-#| msgid "Support URL"
-msgid "Support"
-msgstr "支援連結"
-
-#: static/sangfor/authentication/login.html:951
-#: xpack/plugins/interface/templates/login_i18n.html:18
-#, fuzzy
-#| msgid "Please enter your account username"
-msgid "Please enter your username"
-msgstr "請輸入您的帳戶使用者名稱"
-
-#: static/sangfor/authentication/login.html:958
-#: xpack/plugins/interface/templates/login_i18n.html:19
-#, fuzzy
-#| msgid "Please change your password"
-msgid "Please enter your password"
-msgstr "請修改密碼"
-
-#: static/sangfor/authentication/login.html:984
-#: xpack/plugins/interface/templates/login_i18n.html:22
-msgid "I have read and agree to the"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:985
-#: xpack/plugins/interface/templates/login_i18n.html:23
-#, fuzzy
-#| msgid "User agent"
-msgid "User Agreement"
-msgstr "用戶代理"
-
-#: static/sangfor/authentication/login.html:986
-#: xpack/plugins/interface/templates/login_i18n.html:24
-msgid "Privacy Policy"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:1006
-#: xpack/plugins/interface/templates/login_i18n.html:29
-#, fuzzy
-#| msgid "More login options"
-msgid "More login methods"
-msgstr "其他方式登錄"
-
 #: templates/_csv_import_export.html:13 templates/_csv_import_modal.html:5
 #: xpack/plugins/cloud/const.py:73
 msgid "Import"
@@ -9109,7 +9050,7 @@ msgstr "用戶端"
 msgid "Client, currently used to launch the client"
 msgstr "客戶端，目前用來喚起特定客戶端程式連接資產"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:31
 msgid "Offline video player"
 msgstr "離線錄影播放器"
 
@@ -11093,7 +11034,7 @@ msgid "Connect default open method"
 msgstr "連接默認打開方式"
 
 #: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:42
-#: xpack/plugins/interface/serializers/interface.py:27
+#: xpack/plugins/interface/serializers/interface.py:35
 msgid "Theme"
 msgstr "主題"
 
@@ -12416,7 +12357,7 @@ msgstr "任務未開始"
 msgid "Restore default successfully."
 msgstr "恢復默認成功！"
 
-#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:46
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:47
 #: xpack/plugins/interface/models.py:90
 msgid "Interface settings"
 msgstr "界面設置"
@@ -12445,19 +12386,65 @@ msgstr "登出"
 msgid "Footer content"
 msgstr "頁尾內容"
 
-#: xpack/plugins/interface/serializers/interface.py:39
+#: xpack/plugins/interface/models.py:44
+msgid "Extend"
+msgstr "擴充"
+
+#: xpack/plugins/interface/serializers/interface.py:48
 #, fuzzy
 #| msgid "Account name"
 msgid "Product name"
 msgstr "帳號名稱"
 
-#: xpack/plugins/interface/serializers/interface.py:40
+#: xpack/plugins/interface/serializers/interface.py:49
 msgid "Wide logo on top"
 msgstr "頂部寬 Logo"
 
-#: xpack/plugins/interface/serializers/interface.py:41
+#: xpack/plugins/interface/serializers/interface.py:50
 msgid "Small logo without text"
 msgstr "方形小 Logo"
+
+#: xpack/plugins/interface/serializers/interface.py:73
+msgid "Extended fields"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:10
+#, fuzzy
+#| msgid "Support URL"
+msgid "Support"
+msgstr "支援連結"
+
+#: xpack/plugins/interface/templates/login_i18n.html:11
+#, fuzzy
+#| msgid "Please enter your account username"
+msgid "Please enter your username"
+msgstr "請輸入您的帳戶使用者名稱"
+
+#: xpack/plugins/interface/templates/login_i18n.html:12
+#, fuzzy
+#| msgid "Please change your password"
+msgid "Please enter your password"
+msgstr "請修改密碼"
+
+#: xpack/plugins/interface/templates/login_i18n.html:15
+msgid "I have read and agree to the"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:16
+#, fuzzy
+#| msgid "User agent"
+msgid "User Agreement"
+msgstr "用戶代理"
+
+#: xpack/plugins/interface/templates/login_i18n.html:17
+msgid "Privacy Policy"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:22
+#, fuzzy
+#| msgid "More login options"
+msgid "More login methods"
+msgstr "其他方式登錄"
 
 #: xpack/plugins/jdmc/meta.py:9
 msgid "JDMC"

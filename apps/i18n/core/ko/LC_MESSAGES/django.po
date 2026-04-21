@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-10 15:08+0800\n"
+"POT-Creation-Date: 2026-04-21 11:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -144,8 +144,8 @@ msgstr ">>> 테스트 게이트웨이 계정 연결성 작업 시작"
 #: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:25
 #: authentication/confirm/password.py:27 authentication/const.py:13
 #: authentication/forms.py:28
-#: authentication/templates/authentication/login.html:368
-#: authentication/templates/authentication/login.html:414 reports/mixins.py:194
+#: authentication/templates/authentication/login.html:369
+#: authentication/templates/authentication/login.html:415 reports/mixins.py:194
 #: settings/models.py:216 settings/serializers/auth/ldap.py:27
 #: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
@@ -620,10 +620,7 @@ msgid "Name"
 msgstr "이름"
 
 #: accounts/models/application.py:18 settings/serializers/auth/oauth2.py:25
-#: static/sangfor/authentication/login.html:908
-#: static/sangfor/authentication/login.html:917
-#: static/sangfor/authentication/login.html:928
-#: xpack/plugins/interface/templates/login_i18n.html:16
+#: xpack/plugins/interface/templates/login_i18n.html:9
 msgid "Logo"
 msgstr "아이콘"
 
@@ -902,7 +899,7 @@ msgstr "중복 비밀번호"
 #: authentication/serializers/connect_token_secret.py:53
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: authentication/templates/authentication/login.html:414
+#: authentication/templates/authentication/login.html:415
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
 #: users/forms/profile.py:117 users/models/user/__init__.py:66
 #: users/notifications.py:20 users/serializers/profile.py:190
@@ -2196,15 +2193,15 @@ msgstr "최근에 사용자가 로그인했음을 알려드립니다:"
 msgid "User details"
 msgstr "사용자 세부정보"
 
-#: assets/api/asset/asset.py:165
+#: assets/api/asset/asset.py:166
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "직접 자산을 생성할 수 없습니다. 호스트나 다른 자산을 생성해야 합니다."
 
-#: assets/api/asset/asset.py:171
+#: assets/api/asset/asset.py:173
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "자산 수가 5000을 초과했습니다."
 
-#: assets/api/asset/asset.py:177
+#: assets/api/asset/asset.py:179
 #, fuzzy
 #| msgid "The number of assets exceeds the limit of 5000"
 msgid "The number of assets exceeds the license limit"
@@ -3555,9 +3552,9 @@ msgid "Connect"
 msgstr "연결"
 
 #: audits/const.py:31 authentication/templates/authentication/login.html:334
-#: authentication/templates/authentication/login.html:407
-#: static/sangfor/authentication/login.html:999 templates/_header_bar.html:101
-#: xpack/plugins/interface/templates/login_i18n.html:28
+#: authentication/templates/authentication/login.html:408
+#: templates/_header_bar.html:101
+#: xpack/plugins/interface/templates/login_i18n.html:21
 msgid "Login"
 msgstr "로그인"
 
@@ -4253,11 +4250,11 @@ msgstr "임시 비밀번호"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:128
+#: audits/tasks.py:184
 msgid "Clean audits session task log"
 msgstr "자산 감사 세션 작업 로그 정리"
 
-#: audits/tasks.py:130
+#: audits/tasks.py:186
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -4272,11 +4269,11 @@ msgstr ""
 "업 목록 - 정기 청소 구성에 따라 설정된 시간에 따라 매일 오전 2시에 청소를 수"
 "행합니다."
 
-#: audits/tasks.py:150
+#: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "외부 저장소에 FTP 파일을 업로드합니다."
 
-#: audits/tasks.py:152
+#: audits/tasks.py:208
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -4362,13 +4359,12 @@ msgid ""
 msgstr "사용자가 {}에서 옵니다. 해당 시스템에서 비밀번호를 변경하세요"
 
 #: authentication/api/password.py:69
-#: authentication/templates/authentication/login.html:399
-#: static/sangfor/authentication/login.html:991
+#: authentication/templates/authentication/login.html:400
 #: users/templates/users/forgot_password.html:41
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/forgot_password_previewing.html:13
 #: users/templates/users/forgot_password_previewing.html:14
-#: xpack/plugins/interface/templates/login_i18n.html:25
+#: xpack/plugins/interface/templates/login_i18n.html:18
 msgid "Forgot password"
 msgstr "비밀번호를 잊으셨나요"
 
@@ -5251,12 +5247,11 @@ msgid ""
 msgstr "당신이 관리자라면, 설정 항목을 업데이트하여 문제를 해결할 수 있습니다."
 
 #: authentication/templates/authentication/login.html:314
-#: static/sangfor/authentication/login.html:895
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "다른 통로로 로그인"
 
-#: authentication/templates/authentication/login.html:422
+#: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "기타 로그인 방법"
 
@@ -5612,7 +5607,7 @@ msgstr "유효하지 않은 포트 범위, {}-{} 내에 있어야 합니다"
 msgid "Object"
 msgstr "객체"
 
-#: common/drf/metadata.py:131
+#: common/drf/metadata.py:148
 msgid "Org ID"
 msgstr "조직 ID"
 
@@ -5696,10 +5691,14 @@ msgstr "태그, 형식: [\"키:값\", ...], 태그가 존재하지 않으면 생
 msgid "Objects, format [\"id\", ...]"
 msgstr "다중 연관 항목, 형식은 [\"id\", ...]"
 
-#: common/drf/renders/base.py:300
+#: common/drf/renders/base.py:301
+#, fuzzy
+#| msgid ""
+#| "{} - The encryption password has not been set - please go to personal "
+#| "information -> file encryption password to set the encryption password"
 msgid ""
-"{} - The encryption password has not been set - please go to personal "
-"information -> file encryption password to set the encryption password"
+"{} - Encryption password not set - Please go to Personal Settings → "
+"Preferences → File Encryption Password to set it."
 msgstr ""
 "{} - 암호화 비밀번호가 설정되지 않았습니다 - 개인 정보 -> 파일 암호화 비밀번"
 "호에서 암호화 비밀번호를 설정해 주세요."
@@ -9128,64 +9127,6 @@ msgstr "총 {}명, 성공 {}명, 실패 {}명"
 msgid ", disabled {}"
 msgstr "비활성화 {}"
 
-#: static/sangfor/authentication/login.html:900
-#: xpack/plugins/interface/templates/login_i18n.html:9
-msgid "Secure, Efficient, Controlled"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:901
-#: xpack/plugins/interface/templates/login_i18n.html:11
-msgid ""
-"One-stop operations management platform to make server access secure, "
-"controllable, and operations efficient and transparent.<br />Easily manage "
-"user permissions and audit operation records to protect critical assets."
-msgstr ""
-
-#: static/sangfor/authentication/login.html:921
-#: xpack/plugins/interface/templates/login_i18n.html:17
-#, fuzzy
-#| msgid "Support URL"
-msgid "Support"
-msgstr "지원 링크"
-
-#: static/sangfor/authentication/login.html:951
-#: xpack/plugins/interface/templates/login_i18n.html:18
-#, fuzzy
-#| msgid "Please enter your account username"
-msgid "Please enter your username"
-msgstr "귀하의 계정 사용자 이름을 입력하십시오"
-
-#: static/sangfor/authentication/login.html:958
-#: xpack/plugins/interface/templates/login_i18n.html:19
-#, fuzzy
-#| msgid "Please change your password"
-msgid "Please enter your password"
-msgstr "비밀번호를 수정하십시오."
-
-#: static/sangfor/authentication/login.html:984
-#: xpack/plugins/interface/templates/login_i18n.html:22
-msgid "I have read and agree to the"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:985
-#: xpack/plugins/interface/templates/login_i18n.html:23
-#, fuzzy
-#| msgid "User agent"
-msgid "User Agreement"
-msgstr "사용자 에이전트"
-
-#: static/sangfor/authentication/login.html:986
-#: xpack/plugins/interface/templates/login_i18n.html:24
-msgid "Privacy Policy"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:1006
-#: xpack/plugins/interface/templates/login_i18n.html:29
-#, fuzzy
-#| msgid "More login options"
-msgid "More login methods"
-msgstr "기타 로그인 방법"
-
 #: templates/_csv_import_export.html:13 templates/_csv_import_modal.html:5
 #: xpack/plugins/cloud/const.py:73
 msgid "Import"
@@ -9339,7 +9280,7 @@ msgid "Client, currently used to launch the client"
 msgstr ""
 "클라이언트, 현재 특정 클라이언트 프로그램을 호출하여 자산에 연결하고 있습니다"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:31
 msgid "Offline video player"
 msgstr "오프라인 비디오 플레이어"
 
@@ -11361,7 +11302,7 @@ msgid "Connect default open method"
 msgstr "연결 기본 열기 방식"
 
 #: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:42
-#: xpack/plugins/interface/serializers/interface.py:27
+#: xpack/plugins/interface/serializers/interface.py:35
 msgid "Theme"
 msgstr "테마"
 
@@ -12712,7 +12653,7 @@ msgstr "작업 전략"
 msgid "Restore default successfully."
 msgstr "기본값으로 복원되었습니다!"
 
-#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:46
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:47
 #: xpack/plugins/interface/models.py:90
 msgid "Interface settings"
 msgstr "인터페이스 설정"
@@ -12741,19 +12682,65 @@ msgstr "로그아웃"
 msgid "Footer content"
 msgstr "바닥글 내용"
 
-#: xpack/plugins/interface/serializers/interface.py:39
+#: xpack/plugins/interface/models.py:44
+msgid "Extend"
+msgstr ""
+
+#: xpack/plugins/interface/serializers/interface.py:48
 #, fuzzy
 #| msgid "Account name"
 msgid "Product name"
 msgstr "계정 이름"
 
-#: xpack/plugins/interface/serializers/interface.py:40
+#: xpack/plugins/interface/serializers/interface.py:49
 msgid "Wide logo on top"
 msgstr "상단 넓은 로고"
 
-#: xpack/plugins/interface/serializers/interface.py:41
+#: xpack/plugins/interface/serializers/interface.py:50
 msgid "Small logo without text"
 msgstr "사각형 작은 로고"
+
+#: xpack/plugins/interface/serializers/interface.py:73
+msgid "Extended fields"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:10
+#, fuzzy
+#| msgid "Support URL"
+msgid "Support"
+msgstr "지원 링크"
+
+#: xpack/plugins/interface/templates/login_i18n.html:11
+#, fuzzy
+#| msgid "Please enter your account username"
+msgid "Please enter your username"
+msgstr "귀하의 계정 사용자 이름을 입력하십시오"
+
+#: xpack/plugins/interface/templates/login_i18n.html:12
+#, fuzzy
+#| msgid "Please change your password"
+msgid "Please enter your password"
+msgstr "비밀번호를 수정하십시오."
+
+#: xpack/plugins/interface/templates/login_i18n.html:15
+msgid "I have read and agree to the"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:16
+#, fuzzy
+#| msgid "User agent"
+msgid "User Agreement"
+msgstr "사용자 에이전트"
+
+#: xpack/plugins/interface/templates/login_i18n.html:17
+msgid "Privacy Policy"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:22
+#, fuzzy
+#| msgid "More login options"
+msgid "More login methods"
+msgstr "기타 로그인 방법"
 
 #: xpack/plugins/jdmc/meta.py:9
 msgid "JDMC"

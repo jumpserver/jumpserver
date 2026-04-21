@@ -761,6 +761,7 @@ class Config(dict):
         # JDMC
         'JDMC_ENABLED': False,
         'JDMC_SOCK_PATH': '',
+        'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
         # x-forwarded-for 相关
         'TRUSTED_IP_VERIFY_ENABLED': False,

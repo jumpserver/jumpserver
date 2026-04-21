@@ -2,7 +2,6 @@
 #
 from pathlib import Path
 from urllib.parse import quote
-import os
 
 from .base import TEMPLATES, STATIC_DIR
 from ..const import CONFIG
@@ -295,5 +294,6 @@ TRUSTED_IP_SIGN_KEY = CONFIG.TRUSTED_IP_SIGN_KEY
 JDMC_ENABLED = CONFIG.JDMC_ENABLED
 JDMC_SOCK_PATH = CONFIG.JDMC_SOCK_PATH
 JDMC_BASE_URL = f"http+unix://{quote(JDMC_SOCK_PATH, safe='')}"
+SMALL_LOGO_MODE = CONFIG.SMALL_LOGO_MODE
 
 REMOTE_APP_STORE_URL = CONFIG.REMOTE_APP_STORE_URL

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-10 15:08+0800\n"
+"POT-Creation-Date: 2026-04-21 11:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -144,8 +144,8 @@ msgstr ">>> Iniciando teste de conectividade da conta do gateway"
 #: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:25
 #: authentication/confirm/password.py:27 authentication/const.py:13
 #: authentication/forms.py:28
-#: authentication/templates/authentication/login.html:368
-#: authentication/templates/authentication/login.html:414 reports/mixins.py:194
+#: authentication/templates/authentication/login.html:369
+#: authentication/templates/authentication/login.html:415 reports/mixins.py:194
 #: settings/models.py:216 settings/serializers/auth/ldap.py:27
 #: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
@@ -622,10 +622,7 @@ msgid "Name"
 msgstr "Nome"
 
 #: accounts/models/application.py:18 settings/serializers/auth/oauth2.py:25
-#: static/sangfor/authentication/login.html:908
-#: static/sangfor/authentication/login.html:917
-#: static/sangfor/authentication/login.html:928
-#: xpack/plugins/interface/templates/login_i18n.html:16
+#: xpack/plugins/interface/templates/login_i18n.html:9
 msgid "Logo"
 msgstr "Ícone"
 
@@ -919,7 +916,7 @@ msgstr "Senha repetida"
 #: authentication/serializers/connect_token_secret.py:53
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: authentication/templates/authentication/login.html:414
+#: authentication/templates/authentication/login.html:415
 #: terminal/serializers/storage.py:136 users/forms/profile.py:32
 #: users/forms/profile.py:117 users/models/user/__init__.py:66
 #: users/notifications.py:20 users/serializers/profile.py:190
@@ -2242,17 +2239,17 @@ msgstr "Queremos informá-lo de que recentemente houve logins de usuários:"
 msgid "User details"
 msgstr "Detalhes do usuário"
 
-#: assets/api/asset/asset.py:165
+#: assets/api/asset/asset.py:166
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "Não é possível criar ativos diretamente, você deve criar um host ou outros "
 "ativos."
 
-#: assets/api/asset/asset.py:171
+#: assets/api/asset/asset.py:173
 msgid "The number of assets exceeds the limit of 5000"
 msgstr "A quantidade de ativos excedeu o limite de 5000"
 
-#: assets/api/asset/asset.py:177
+#: assets/api/asset/asset.py:179
 #, fuzzy
 #| msgid "The number of assets exceeds the limit of 5000"
 msgid "The number of assets exceeds the license limit"
@@ -3618,9 +3615,9 @@ msgid "Connect"
 msgstr "Conectar"
 
 #: audits/const.py:31 authentication/templates/authentication/login.html:334
-#: authentication/templates/authentication/login.html:407
-#: static/sangfor/authentication/login.html:999 templates/_header_bar.html:101
-#: xpack/plugins/interface/templates/login_i18n.html:28
+#: authentication/templates/authentication/login.html:408
+#: templates/_header_bar.html:101
+#: xpack/plugins/interface/templates/login_i18n.html:21
 msgid "Login"
 msgstr "Login"
 
@@ -4316,11 +4313,11 @@ msgstr "Senha temporária"
 msgid "Passkey"
 msgstr "Chave de acesso"
 
-#: audits/tasks.py:128
+#: audits/tasks.py:184
 msgid "Clean audits session task log"
 msgstr "Limpar logs de tarefas de auditoria de ativos"
 
-#: audits/tasks.py:130
+#: audits/tasks.py:186
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -4337,11 +4334,11 @@ msgstr ""
 "configuração de limpeza regular, para além do tempo às 2 da manhã todos os "
 "dias"
 
-#: audits/tasks.py:150
+#: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Upload de arquivos FTP para armazenamento externo"
 
-#: audits/tasks.py:152
+#: audits/tasks.py:208
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -4429,13 +4426,12 @@ msgstr ""
 "O usuário vem de {} Por favor, altere a senha no sistema correspondente"
 
 #: authentication/api/password.py:69
-#: authentication/templates/authentication/login.html:399
-#: static/sangfor/authentication/login.html:991
+#: authentication/templates/authentication/login.html:400
 #: users/templates/users/forgot_password.html:41
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/forgot_password_previewing.html:13
 #: users/templates/users/forgot_password_previewing.html:14
-#: xpack/plugins/interface/templates/login_i18n.html:25
+#: xpack/plugins/interface/templates/login_i18n.html:18
 msgid "Forgot password"
 msgstr "Esqueceu a senha"
 
@@ -5326,14 +5322,13 @@ msgstr ""
 "entre em contato com o administrador ou consulte a documentação mais recente"
 
 #: authentication/templates/authentication/login.html:314
-#: static/sangfor/authentication/login.html:895
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "Se você é um administrador, pode resolver atualizando o arquivo de "
 "configuração, definindo itens de configuração"
 
-#: authentication/templates/authentication/login.html:422
+#: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "Login por outros métodos"
 
@@ -5695,7 +5690,7 @@ msgstr "Faixa de portas inválida, deve estar dentro de {}-{}"
 msgid "Object"
 msgstr "Objeto"
 
-#: common/drf/metadata.py:131
+#: common/drf/metadata.py:148
 msgid "Org ID"
 msgstr "ID da organização"
 
@@ -5781,10 +5776,14 @@ msgstr ""
 msgid "Objects, format [\"id\", ...]"
 msgstr "Itens associados múltiplos, o formato é [\"id\", ...]"
 
-#: common/drf/renders/base.py:300
+#: common/drf/renders/base.py:301
+#, fuzzy
+#| msgid ""
+#| "{} - The encryption password has not been set - please go to personal "
+#| "information -> file encryption password to set the encryption password"
 msgid ""
-"{} - The encryption password has not been set - please go to personal "
-"information -> file encryption password to set the encryption password"
+"{} - Encryption password not set - Please go to Personal Settings → "
+"Preferences → File Encryption Password to set it."
 msgstr ""
 "{} - Senha de criptografia não definida - vá para Informações pessoais -> "
 "Senha de criptografia de arquivo para definir a senha de criptografia"
@@ -9240,64 +9239,6 @@ msgstr "Total de {}, sucesso {}, falha {}"
 msgid ", disabled {}"
 msgstr ", desativar {}"
 
-#: static/sangfor/authentication/login.html:900
-#: xpack/plugins/interface/templates/login_i18n.html:9
-msgid "Secure, Efficient, Controlled"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:901
-#: xpack/plugins/interface/templates/login_i18n.html:11
-msgid ""
-"One-stop operations management platform to make server access secure, "
-"controllable, and operations efficient and transparent.<br />Easily manage "
-"user permissions and audit operation records to protect critical assets."
-msgstr ""
-
-#: static/sangfor/authentication/login.html:921
-#: xpack/plugins/interface/templates/login_i18n.html:17
-#, fuzzy
-#| msgid "Support URL"
-msgid "Support"
-msgstr "Link de suporte"
-
-#: static/sangfor/authentication/login.html:951
-#: xpack/plugins/interface/templates/login_i18n.html:18
-#, fuzzy
-#| msgid "Please enter your account username"
-msgid "Please enter your username"
-msgstr "Por favor, digite seu nome de usuário"
-
-#: static/sangfor/authentication/login.html:958
-#: xpack/plugins/interface/templates/login_i18n.html:19
-#, fuzzy
-#| msgid "Please change your password"
-msgid "Please enter your password"
-msgstr "Por favor, altere sua senha."
-
-#: static/sangfor/authentication/login.html:984
-#: xpack/plugins/interface/templates/login_i18n.html:22
-msgid "I have read and agree to the"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:985
-#: xpack/plugins/interface/templates/login_i18n.html:23
-#, fuzzy
-#| msgid "User agent"
-msgid "User Agreement"
-msgstr "Agente do usuário"
-
-#: static/sangfor/authentication/login.html:986
-#: xpack/plugins/interface/templates/login_i18n.html:24
-msgid "Privacy Policy"
-msgstr ""
-
-#: static/sangfor/authentication/login.html:1006
-#: xpack/plugins/interface/templates/login_i18n.html:29
-#, fuzzy
-#| msgid "More login options"
-msgid "More login methods"
-msgstr "Login por outros métodos"
-
 #: templates/_csv_import_export.html:13 templates/_csv_import_modal.html:5
 #: xpack/plugins/cloud/const.py:73
 msgid "Import"
@@ -9453,7 +9394,7 @@ msgstr ""
 "Cliente, atualmente utilizado para invocar um programa cliente específico "
 "para conectar ativos"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:31
 msgid "Offline video player"
 msgstr "Reprodutor de Gravação Offline"
 
@@ -11482,7 +11423,7 @@ msgid "Connect default open method"
 msgstr "Forma padrão de abertura de conexão"
 
 #: users/serializers/preference/luna.py:34 xpack/plugins/interface/models.py:42
-#: xpack/plugins/interface/serializers/interface.py:27
+#: xpack/plugins/interface/serializers/interface.py:35
 msgid "Theme"
 msgstr "Tema"
 
@@ -12846,7 +12787,7 @@ msgstr "A missão ainda não começou"
 msgid "Restore default successfully."
 msgstr "Restauração para as configurações padrão bem sucedida!"
 
-#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:46
+#: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:47
 #: xpack/plugins/interface/models.py:90
 msgid "Interface settings"
 msgstr "Configurações da interface"
@@ -12875,19 +12816,65 @@ msgstr "Fazer Logout"
 msgid "Footer content"
 msgstr "Conteúdo do rodapé"
 
-#: xpack/plugins/interface/serializers/interface.py:39
+#: xpack/plugins/interface/models.py:44
+msgid "Extend"
+msgstr ""
+
+#: xpack/plugins/interface/serializers/interface.py:48
 #, fuzzy
 #| msgid "Account name"
 msgid "Product name"
 msgstr "Nome da conta"
 
-#: xpack/plugins/interface/serializers/interface.py:40
+#: xpack/plugins/interface/serializers/interface.py:49
 msgid "Wide logo on top"
 msgstr "Logo largo no topo"
 
-#: xpack/plugins/interface/serializers/interface.py:41
+#: xpack/plugins/interface/serializers/interface.py:50
 msgid "Small logo without text"
 msgstr "Logo pequeno quadrado"
+
+#: xpack/plugins/interface/serializers/interface.py:73
+msgid "Extended fields"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:10
+#, fuzzy
+#| msgid "Support URL"
+msgid "Support"
+msgstr "Link de suporte"
+
+#: xpack/plugins/interface/templates/login_i18n.html:11
+#, fuzzy
+#| msgid "Please enter your account username"
+msgid "Please enter your username"
+msgstr "Por favor, digite seu nome de usuário"
+
+#: xpack/plugins/interface/templates/login_i18n.html:12
+#, fuzzy
+#| msgid "Please change your password"
+msgid "Please enter your password"
+msgstr "Por favor, altere sua senha."
+
+#: xpack/plugins/interface/templates/login_i18n.html:15
+msgid "I have read and agree to the"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:16
+#, fuzzy
+#| msgid "User agent"
+msgid "User Agreement"
+msgstr "Agente do usuário"
+
+#: xpack/plugins/interface/templates/login_i18n.html:17
+msgid "Privacy Policy"
+msgstr ""
+
+#: xpack/plugins/interface/templates/login_i18n.html:22
+#, fuzzy
+#| msgid "More login options"
+msgid "More login methods"
+msgstr "Login por outros métodos"
 
 #: xpack/plugins/jdmc/meta.py:9
 msgid "JDMC"
