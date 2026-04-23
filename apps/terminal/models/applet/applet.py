@@ -258,12 +258,14 @@ class Applet(JMSBaseModel):
 
     accounts_using_key_tmpl = 'applet_host_accounts_{}_{}_{}'
 
-    def select_a_public_account(self, user, host, valid_accounts):
+    def select_a_public_account(self, user, host, valid_accounts, only_jms_prefix=False):
         using_keys = cache.keys(self.accounts_using_key_tmpl.format(host.id, '*', '*')) or []
         accounts_username_used = list(cache.get_many(using_keys).values())
         logger.debug('Applet host account using: {}: {}'.format(host.name, accounts_username_used))
         accounts = valid_accounts.exclude(username__in=accounts_username_used)
         public_accounts = accounts.filter(username__startswith='jms_')
+        if only_jms_prefix:
+            return self.random_select_prefer_account(user, host, public_accounts)
         if not public_accounts:
             public_accounts = accounts \
                 .exclude(username__in=['Administrator', 'root']) \
@@ -346,10 +348,15 @@ class Applet(JMSBaseModel):
             return None
         logger.info('Select applet host: {}'.format(host.name))
         valid_accounts = host.accounts.all().filter(privileged=False)
-        account = self.try_to_use_private_account(user, host, valid_accounts)
-        if not account:
-            logger.debug('No private account, try to use public account')
-            account = self.select_a_public_account(user, host, valid_accounts)
+        username_has_at = '@' in (user.username or '')
+        if username_has_at:
+            logger.debug('Username contains @, force use jms_ public account')
+            account = self.select_a_public_account(user, host, valid_accounts, only_jms_prefix=True)
+        else:
+            account = self.try_to_use_private_account(user, host, valid_accounts)
+            if not account:
+                logger.debug('No private account, try to use public account')
+                account = self.select_a_public_account(user, host, valid_accounts)
 
         if not account:
             logger.debug('No available account for applet host: {}'.format(host.name))
