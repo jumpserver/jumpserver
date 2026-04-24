@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.dispatch import receiver
@@ -19,6 +20,7 @@ from users.models import User
 from ..const import LoginTypeChoices
 from ..models import UserSession
 from ..utils import write_login_log
+from ..signals import write_login_failed_log_if_need
 
 logger = get_logger(__name__)
 
@@ -140,9 +142,51 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     send_login_info_to_reviewers(instance, auth_acl_id)
 
 
+request_login_failed_log_mapper = defaultdict(list)
+
+
 @receiver(post_auth_failed)
 def on_user_auth_failed(sender, username, request, reason='', **kwargs):
     logger.debug('User login failed: {}'.format(username))
     data = generate_data(username, request)
     data.update({'reason': reason[:128], 'status': False})
-    write_login_log(**data)
+    request_login_failed_log_mapper[request.session.session_key].append(data)
+
+
+def merge_login_failed_logs_data(logs_data):
+    if not isinstance(logs_data, list):
+        return {}
+    if len(logs_data) == 0:
+        return {}
+    
+    first_log = logs_data[0]
+    data = {k: v for k, v in first_log.items()}
+    reasons = []
+    backends = []
+    for log in logs_data:
+        _backend = log.get('backend', '')
+        _reason = log.get('reason', '')
+        if _backend:
+            _reason = f"{_backend} :: {_reason}"
+        reasons.append(_reason)
+        backends.append(_backend)
+    data['reason'] = ' && '.join(reasons)[:128]
+    data['backend'] = ', '.join(set(backends))
+    return data
+
+
+@receiver(write_login_failed_log_if_need)
+def on_write_login_failed_log(sender, request, **kwargs):
+    logs_data = request_login_failed_log_mapper.pop(request.session.session_key, None)
+    if request.user.is_authenticated:
+        logger.debug('user is authenticated, skip write login failed log')
+        return
+    logger.info('Write login failed log if need, request : {}'.format(request.session.session_key))
+    if not logs_data:
+        logger.debug('no login failed log to write')
+        return
+    log_data = merge_login_failed_logs_data(logs_data)
+    if not log_data:
+        logger.debug('merge login failed log data is empty, skip write login failed log')
+        return
+    write_login_log(**log_data)

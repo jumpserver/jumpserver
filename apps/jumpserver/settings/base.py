@@ -194,6 +194,7 @@ MIDDLEWARE = [
     'simple_history.middleware.HistoryRequestMiddleware',
     'jumpserver.middleware.SafeRedirectMiddleware',
     *POST_CUSTOM_MIDDLEWARES,
+    'audits.middleware.WriteLoginFailedLogIfNeedMiddleware',
     'jumpserver.middleware.EndMiddleware',
 ]
 

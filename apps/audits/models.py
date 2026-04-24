@@ -264,8 +264,24 @@ class UserLoginLog(models.Model):
         reason = reason_choices.get(self.reason)
         if reason:
             return reason
-        reason = old_reason_choices.get(self.reason, self.reason)
-        return reason
+        reason = old_reason_choices.get(self.reason)
+        if reason:
+            return reason
+        
+        reasons = []
+        _reasons = self.reason.split(' && ')
+        for reason in _reasons:
+            if ' :: ' in reason:
+                backend, reason = reason.split(' :: ')
+            else:
+                backend = ''
+                reason = reason.strip()
+            reason = reason_choices.get(reason, reason)
+            if backend:
+                reason = '{}: {}'.format(backend, reason)
+            reasons.append(reason)
+
+        return '; '.join(reasons)
 
     @staticmethod
     def filter_queryset_by_org(queryset):
