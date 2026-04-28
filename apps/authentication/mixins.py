@@ -177,6 +177,9 @@ def authenticate(request=None, **credentials):
         if user is None:
             continue
 
+        if request:
+            request.session['auth_backend'] = backend_path
+
         if not user.is_valid:
             temp_user = user
             temp_user.backend = backend_path

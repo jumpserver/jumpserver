@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 
 from apps.authentication import mixins
 from audits.signal_handlers import send_login_info_to_reviewers
-from authentication.signals import post_auth_failed
+from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import gen_key_pair, gen_gm_key_pair
 from common.utils import get_request_ip
 
@@ -101,6 +101,9 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
         else:
             if not self.request.session.get('auth_confirm_required'):
+                post_auth_success.send(
+                    sender=self.__class__, user=request.user, request=self.request
+                )
                 return response
             guard_url = reverse('authentication:login-guard')
             args = request.META.get('QUERY_STRING', '')

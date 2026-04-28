@@ -12,13 +12,12 @@ from django.urls import reverse
 from common.utils import get_logger
 from users.utils import construct_user_email
 from authentication.utils import build_absolute_uri
-from authentication.signals import user_auth_failed, user_auth_success
 from common.exceptions import JMSException
 
 from .signals import (
     oauth2_create_or_update_user
 )
-from ..base import JMSBaseAuthBackend
+from ..base import RedirectAuthBackend
 
 
 __all__ = ['OAuth2Backend']
@@ -26,7 +25,9 @@ __all__ = ['OAuth2Backend']
 logger = get_logger(__name__)
 
 
-class OAuth2Backend(JMSBaseAuthBackend):
+class OAuth2Backend(RedirectAuthBackend):
+    backend = settings.AUTH_BACKEND_OAUTH2
+
     @staticmethod
     def is_enabled():
         return settings.AUTH_OAUTH2
@@ -144,18 +145,9 @@ class OAuth2Backend(JMSBaseAuthBackend):
 
         if self.user_can_authenticate(user):
             logger.debug(log_prompt.format('OAuth2 user login success'))
-            logger.debug(log_prompt.format('Send signal => oauth2 user login success'))
-            user_auth_success.send(
-                sender=self.__class__, request=request, user=user,
-                backend=settings.AUTH_BACKEND_OAUTH2
-            )
             return user
         else:
             logger.debug(log_prompt.format('OAuth2 user login failed'))
             logger.debug(log_prompt.format('Send signal => oauth2 user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=user.username,
-                reason=_('User invalid, disabled or expired'),
-                backend=settings.AUTH_BACKEND_OAUTH2
-            )
+            self.send_backend_auth_failed_signal(request=request, username=user.username)
             return None
