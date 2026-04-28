@@ -8,6 +8,8 @@
     "AccessDistribution": "Access distribution",
     "AccessIP": "IP whitelist",
     "AccessKey": "Access key",
+    "AccessToken": "Access tokens",
+    "AccessTokenTip": "Access Token is a temporary credential generated through the OAuth2 (Authorization Code Grant) flow using the JumpServer client, which is used to access protected resources.",
     "Account": "Account",
     "AccountActivities": "Account activities",
     "AccountAndPasswordChangeRank": "Account and password change ranking",
@@ -43,6 +45,7 @@
     "AccountPushUpdate": "Update push account",
     "AccountReport": "Account report",
     "AccountResult": "Account secret change success/failure",
+    "AccountSecretReadDisabled": "Account secret reading has been disabled by administrator",
     "AccountSelectHelpText": "The account list adds the username of the account holder",
     "AccountSessions": "Account sessions",
     "AccountStatisticsReport": "Account statistics report",
@@ -1171,6 +1174,7 @@
     "Retry": "Retry",
     "RetrySelected": "Retry selected",
     "Reviewer": "Approvers",
+    "Revoke": "Revoke",
     "RiskDetection": "Risk detection",
     "RiskDetectionDetail": "Risk detection detail",
     "RiskyAccount": "Risky account",
@@ -1516,6 +1520,7 @@
     "UploadCsvLth10MHelpText": "Only csv/xlsx can be uploaded, and no more than 10m",
     "UploadDir": "Upload path",
     "UploadFileLthHelpText": "Less than {limit}m supported",
+    "UploadFileTooLarge": "Upload failed: file is too large",
     "UploadHelpText": "Please upload a .zip file containing the following sample directory structure",
     "UploadPlaybook": "Upload playbook",
     "UploadSucceed": "Upload succeeded",
@@ -1636,9 +1641,5 @@
     "selectedAssets": "Selected assets",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name",
-    "AccountSecretReadDisabled": "Account secret reading has been disabled by administrator",
-    "AccessToken": "Access tokens",
-    "AccessTokenTip": "Access Token is a temporary credential generated through the OAuth2 (Authorization Code Grant) flow using the JumpServer client, which is used to access protected resources.",
-    "Revoke": "Revoke"
+    "userName": "User name"
 }

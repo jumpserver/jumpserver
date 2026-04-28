@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-26 09:21+0800\n"
+"POT-Creation-Date: 2026-01-22 10:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -357,8 +357,7 @@ msgid "Success"
 msgstr "成功"
 
 #: accounts/const/automation.py:117 common/const/choices.py:63
-#: common/const/choices.py:114 terminal/const.py:79 tickets/const.py:30
-#: tickets/const.py:39
+#: common/const/choices.py:114 terminal/const.py:79
 msgid "Pending"
 msgstr "待定的"
 
@@ -547,7 +546,7 @@ msgstr "改密狀態"
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
 msgid "Account"
 msgstr "帳號"
 
@@ -665,7 +664,6 @@ msgstr "最後使用日期"
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:30
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
-#: tickets/const.py:37
 msgid "Active"
 msgstr "啟用中"
 
@@ -897,8 +895,8 @@ msgstr "重複密碼"
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
 #: accounts/templates/accounts/push_account_report.html:119
-#: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:209
-#: authentication/forms.py:21 authentication/forms.py:23
+#: acls/serializers/base.py:19 acls/serializers/base.py:50
+#: audits/models.py:204 authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:10
 #: authentication/serializers/connect_token_secret.py:43
 #: authentication/serializers/connect_token_secret.py:53
@@ -1267,6 +1265,7 @@ msgstr "已託管密碼"
 #: accounts/serializers/account/account.py:296 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
+#: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "狀態"
 
@@ -1308,9 +1307,10 @@ msgstr "ID"
 #: acls/notifications.py:68 acls/serializers/base.py:103
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
-#: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:60
-#: audits/models.py:102 audits/models.py:184 audits/models.py:301
-#: audits/serializers.py:232 authentication/models/connection_token.py:38
+#: assets/models/cmd_filter.py:24 assets/models/label.py:16
+#: audits/models.py:55 audits/models.py:97 audits/models.py:179
+#: audits/models.py:296 audits/serializers.py:212
+#: authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: authentication/notifications.py:16 authentication/notifications.py:55
 #: notifications/models/notification.py:12
@@ -1867,8 +1867,8 @@ msgid "1-100, the lower the value will be match first"
 msgstr "優先度可選範圍為 1-100 (數值越小越優先)"
 
 #: acls/models/base.py:41 acls/serializers/base.py:57
-#: assets/models/cmd_filter.py:81 audits/models.py:104
-#: audits/serializers.py:118
+#: assets/models/cmd_filter.py:81 audits/models.py:99
+#: audits/serializers.py:107
 #: authentication/serializers/connect_token_secret.py:131
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:86
@@ -3539,15 +3539,14 @@ msgid "Approve"
 msgstr "同意"
 
 #: audits/const.py:42 ops/models/celery.py:85
-#: terminal/models/session/sharing.py:126 tickets/const.py:26
-#: xpack/plugins/cloud/const.py:75
+#: terminal/models/session/sharing.py:126 xpack/plugins/cloud/const.py:75
 msgid "Finished"
 msgstr "結束"
 
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:72
-#: terminal/serializers/session.py:188
+#: terminal/models/virtualapp/provider.py:14
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:181
 msgid "Terminal"
 msgstr "終端"
 
@@ -4120,15 +4119,13 @@ msgstr ""
 "您輸入的使用者名稱或密碼不正確，請重新輸入。 您還可以嘗試 {times_try} 次 (帳"
 "號將被臨時 鎖定 {block_time} 分鐘)"
 
-#: authentication/errors/const.py:52 authentication/errors/const.py:60
-#, python-brace-format
+#: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "帳號已被鎖定 (請聯絡管理員解鎖或{}分鐘後重試)"
 
-#: authentication/errors/const.py:56
-#, python-brace-format
+#: authentication/errors/const.py:51
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4158,8 +4155,7 @@ msgstr "需要登錄覆核"
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登錄覆核處理"
 
-#: authentication/errors/const.py:72
-#, python-brace-format
+#: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr "登錄覆核: {}"
 
@@ -4369,16 +4365,14 @@ msgstr ""
 msgid "User is invalid"
 msgstr "無效的用戶"
 
-#: authentication/mixins.py:198
-#, python-brace-format
+#: authentication/mixins.py:195
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
 "                    The current user source is {}. Please contact the "
 "administrator. "
 msgstr "管理員已開啟 '僅允許從用戶來源登入'，當前用戶來源為 {}，請聯繫管理員。"
 
-#: authentication/mixins.py:379
-#, python-brace-format
+#: authentication/mixins.py:376
 msgid "The MFA type ({}) is not enabled"
 msgstr "該 MFA ({}) 方式沒有啟用"
 
@@ -4808,7 +4802,7 @@ msgid ""
 msgstr "如果這次公鑰更新不是由你發起的，那麼你的帳號可能存在安全問題"
 
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
-#: templates/flash_message_standalone.html:28 tickets/const.py:19
+#: templates/flash_message_standalone.html:28
 msgid "Cancel"
 msgstr "取消"
 
@@ -5049,8 +5043,7 @@ msgstr "登錄超時，請重新登入"
 msgid "User email already exists ({})"
 msgstr "用戶信箱已存在 ({})"
 
-#: authentication/views/login.py:342
-#, python-brace-format
+#: authentication/views/login.py:338
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -5377,7 +5370,7 @@ msgstr "僅匯出選擇項"
 msgid "Export filtered"
 msgstr "導出搜索"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s對象不存在"
@@ -9871,21 +9864,49 @@ msgstr "工單管理"
 msgid "Apply for asset"
 msgstr "申請資產"
 
-#: tickets/const.py:18 tickets/const.py:25 tickets/const.py:43
-msgid "Open"
-msgstr "打開"
+#: tickets/const.py:18 tickets/const.py:25
+msgid "Ticket open"
+msgstr "審批中"
 
-#: tickets/const.py:20 tickets/const.py:32
-msgid "Approved"
-msgstr "已同意"
+#: tickets/const.py:19
+msgid "Ticket closed"
+msgstr "已關閉"
 
-#: tickets/const.py:21 tickets/const.py:33
-msgid "Rejected"
-msgstr "已拒絕"
+#: tickets/const.py:20
+msgid "Ticket approved"
+msgstr "已通過"
+
+#: tickets/const.py:21
+msgid "Ticket rejected"
+msgstr "已駁回"
+
+#: tickets/const.py:26
+msgid "Ticket finished"
+msgstr "已完成"
+
+#: tickets/const.py:30 tickets/const.py:39
+msgid "Step pending"
+msgstr "審批中"
 
 #: tickets/const.py:31 tickets/const.py:38
-msgid "Closed"
-msgstr "關閉的"
+msgid "Step closed"
+msgstr "已關閉"
+
+#: tickets/const.py:32
+msgid "Step approved"
+msgstr "已通過"
+
+#: tickets/const.py:33
+msgid "Step rejected"
+msgstr "已駁回"
+
+#: tickets/const.py:37
+msgid "Step active"
+msgstr "已啟用"
+
+#: tickets/const.py:43
+msgid "Open"
+msgstr "打開"
 
 #: tickets/const.py:50
 msgid "One level"
@@ -11779,10 +11800,6 @@ msgstr "API 端點"
 msgid "Auto node classification"
 msgstr "自動節點分類"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:108
-msgid "domain_name"
-msgstr "域名"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "認證地址"
@@ -11882,10 +11899,6 @@ msgstr ""
 "系統每天會根據「系統設置-任務-定期清理-雲同步任務歷史記錄保留天數」中的配置，"
 "清理雲同步執行過程中產生的記錄。"
 
-#: xpack/plugins/cloud/ws.py:84
-msgid "Task not started"
-msgstr "任務未開始"
-
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "恢復默認成功！"
@@ -11934,3 +11947,9 @@ msgstr "許可證匯入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "許可證無效"
+
+#~ msgid "Closed"
+#~ msgstr "關閉的"
+
+#~ msgid "Task not started"
+#~ msgstr "任務未開始"

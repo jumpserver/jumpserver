@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import datetime
+import os
 
 from django.conf import settings
 from django.templatetags.static import static
@@ -17,7 +18,8 @@ default_interface = dict((
     ('theme', get_vendor_value('theme', default='classic_green')),
     ('theme_info', {}),
     ('footer_content', get_vendor_value('footer_content', default='')),
-    ('vendor', settings.VENDOR)
+    ('vendor', settings.VENDOR),
+    ('version', os.environ.get("CURRENT_VERSION", ""))
 ))
 
 if not is_default_vendor():

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-26 09:21+0800\n"
+"POT-Creation-Date: 2026-01-22 10:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -356,8 +356,7 @@ msgid "Success"
 msgstr "成功"
 
 #: accounts/const/automation.py:117 common/const/choices.py:63
-#: common/const/choices.py:114 terminal/const.py:79 tickets/const.py:30
-#: tickets/const.py:39
+#: common/const/choices.py:114 terminal/const.py:79
 msgid "Pending"
 msgstr "未定"
 
@@ -563,7 +562,7 @@ msgstr "変更状態"
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
 msgid "Account"
 msgstr "アカウント"
 
@@ -681,7 +680,6 @@ msgstr "最後に使用した日付"
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:30
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
-#: tickets/const.py:37
 msgid "Active"
 msgstr "アクティブ"
 
@@ -913,8 +911,8 @@ msgstr "パスワードの重複"
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
 #: accounts/templates/accounts/push_account_report.html:119
-#: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:209
-#: authentication/forms.py:21 authentication/forms.py:23
+#: acls/serializers/base.py:19 acls/serializers/base.py:50
+#: audits/models.py:204 authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:10
 #: authentication/serializers/connect_token_secret.py:43
 #: authentication/serializers/connect_token_secret.py:53
@@ -1290,6 +1288,7 @@ msgstr "エスクローされたパスワード"
 #: accounts/serializers/account/account.py:296 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
+#: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "状態"
 
@@ -1331,9 +1330,10 @@ msgstr "ID"
 #: acls/notifications.py:68 acls/serializers/base.py:103
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
-#: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:60
-#: audits/models.py:102 audits/models.py:184 audits/models.py:301
-#: audits/serializers.py:232 authentication/models/connection_token.py:38
+#: assets/models/cmd_filter.py:24 assets/models/label.py:16
+#: audits/models.py:55 audits/models.py:97 audits/models.py:179
+#: audits/models.py:296 audits/serializers.py:212
+#: authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: authentication/notifications.py:16 authentication/notifications.py:55
 #: notifications/models/notification.py:12
@@ -1909,8 +1909,8 @@ msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
 #: acls/models/base.py:41 acls/serializers/base.py:57
-#: assets/models/cmd_filter.py:81 audits/models.py:104
-#: audits/serializers.py:118
+#: assets/models/cmd_filter.py:81 audits/models.py:99
+#: audits/serializers.py:107
 #: authentication/serializers/connect_token_secret.py:131
 #: authentication/templates/authentication/_access_key_modal.html:34
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:86
@@ -3617,15 +3617,14 @@ msgid "Approve"
 msgstr "承認"
 
 #: audits/const.py:42 ops/models/celery.py:85
-#: terminal/models/session/sharing.py:126 tickets/const.py:26
-#: xpack/plugins/cloud/const.py:75
+#: terminal/models/session/sharing.py:126 xpack/plugins/cloud/const.py:75
 msgid "Finished"
 msgstr "終了"
 
 #: audits/const.py:47 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:185
-#: terminal/models/virtualapp/provider.py:14 terminal/serializers/session.py:72
-#: terminal/serializers/session.py:188
+#: terminal/models/virtualapp/provider.py:14
+#: terminal/serializers/session.py:65 terminal/serializers/session.py:181
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -4208,8 +4207,7 @@ msgstr ""
 "{times_try} 回試すこともできます (アカウントは {block_time} 分の間一時的に"
 "ロックされます)"
 
-#: authentication/errors/const.py:52 authentication/errors/const.py:60
-#, python-brace-format
+#: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4217,8 +4215,7 @@ msgstr ""
 "アカウントがロックされています (管理者に連絡してロックを解除するか、 {} 分後"
 "にもう一度お試しください)"
 
-#: authentication/errors/const.py:56
-#, python-brace-format
+#: authentication/errors/const.py:51
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4251,8 +4248,7 @@ msgstr "ログイン確認が必要"
 msgid "Wait login confirm ticket for accept"
 msgstr "受け入れのためのログイン確認チケットを待つ"
 
-#: authentication/errors/const.py:72
-#, python-brace-format
+#: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
 
@@ -4467,8 +4463,7 @@ msgstr ""
 msgid "User is invalid"
 msgstr "無効なユーザーです"
 
-#: authentication/mixins.py:198
-#, python-brace-format
+#: authentication/mixins.py:195
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
 "                    The current user source is {}. Please contact the "
@@ -4477,8 +4472,7 @@ msgstr ""
 "管理者は「ユーザーソースからのみログインを許可」に設定しています。現在のユー"
 "ザーのソースは {} です。管理者に連絡してください。"
 
-#: authentication/mixins.py:379
-#, python-brace-format
+#: authentication/mixins.py:376
 msgid "The MFA type ({}) is not enabled"
 msgstr "MFAタイプ ({}) が有効になっていない"
 
@@ -4922,7 +4916,7 @@ msgstr ""
 "能性があります"
 
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
-#: templates/flash_message_standalone.html:28 tickets/const.py:19
+#: templates/flash_message_standalone.html:28
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -5169,8 +5163,7 @@ msgstr "ログインタイムアウト、もう一度お試しください"
 msgid "User email already exists ({})"
 msgstr "ユーザー メールボックスは既に存在します ({})"
 
-#: authentication/views/login.py:342
-#, python-brace-format
+#: authentication/views/login.py:338
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -5506,7 +5499,7 @@ msgstr "選択項目のみエクスポート"
 msgid "Export filtered"
 msgstr "エクスポート検索"
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
 #, python-format
 msgid "%s object does not exist."
 msgstr "%s オブジェクトは存在しません。"
@@ -10136,21 +10129,49 @@ msgstr "チケット"
 msgid "Apply for asset"
 msgstr "資産の申請"
 
-#: tickets/const.py:18 tickets/const.py:25 tickets/const.py:43
-msgid "Open"
-msgstr "オープン"
+#: tickets/const.py:18 tickets/const.py:25
+msgid "Ticket open"
+msgstr "承認待ち"
 
-#: tickets/const.py:20 tickets/const.py:32
-msgid "Approved"
+#: tickets/const.py:19
+msgid "Ticket closed"
+msgstr "クローズ済み"
+
+#: tickets/const.py:20
+msgid "Ticket approved"
 msgstr "承認済み"
 
-#: tickets/const.py:21 tickets/const.py:33
-msgid "Rejected"
-msgstr "拒否"
+#: tickets/const.py:21
+msgid "Ticket rejected"
+msgstr "却下済み"
+
+#: tickets/const.py:26
+msgid "Ticket finished"
+msgstr "完了"
+
+#: tickets/const.py:30 tickets/const.py:39
+msgid "Step pending"
+msgstr "承認待ち"
 
 #: tickets/const.py:31 tickets/const.py:38
-msgid "Closed"
-msgstr "クローズ"
+msgid "Step closed"
+msgstr "クローズ済み"
+
+#: tickets/const.py:32
+msgid "Step approved"
+msgstr "承認済み"
+
+#: tickets/const.py:33
+msgid "Step rejected"
+msgstr "却下済み"
+
+#: tickets/const.py:37
+msgid "Step active"
+msgstr "有効"
+
+#: tickets/const.py:43
+msgid "Open"
+msgstr "オープン"
 
 #: tickets/const.py:50
 msgid "One level"
@@ -12069,10 +12090,6 @@ msgstr "APIエンドポイント"
 msgid "Auto node classification"
 msgstr "オートノード分類"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:108
-msgid "domain_name"
-msgstr "ドメイン名"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "認証アドレス"
@@ -12174,10 +12191,6 @@ msgstr ""
 "毎日、システムは「システム設定-タスク-定期的掃除-クラウド同期タスク履歴保持日"
 "数」の設定に基づいて、クラウド同期実行中に生成された記録を整理します。"
 
-#: xpack/plugins/cloud/ws.py:84
-msgid "Task not started"
-msgstr "ミッションはまだ始まっていません。"
-
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "デフォルトの復元に成功しました。"
@@ -12226,3 +12239,9 @@ msgstr "ライセンスのインポートに成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
+
+#~ msgid "Closed"
+#~ msgstr "クローズ"
+
+#~ msgid "Task not started"
+#~ msgstr "ミッションはまだ始まっていません。"

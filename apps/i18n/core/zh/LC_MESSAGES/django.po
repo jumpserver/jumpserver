@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-25 22:47+0800\n"
+"POT-Creation-Date: 2026-01-22 10:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -355,8 +355,7 @@ msgid "Success"
 msgstr "成功"
 
 #: accounts/const/automation.py:117 common/const/choices.py:63
-#: common/const/choices.py:114 terminal/const.py:79 tickets/const.py:30
-#: tickets/const.py:39
+#: common/const/choices.py:114 terminal/const.py:79
 msgid "Pending"
 msgstr "待定的"
 
@@ -663,7 +662,6 @@ msgstr "最后使用日期"
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:30
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
-#: tickets/const.py:37
 msgid "Active"
 msgstr "激活中"
 
@@ -1265,8 +1263,9 @@ msgstr "已托管密码"
 #: accounts/serializers/account/account.py:296 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
+#: tickets/serializers/ticket/ticket.py:21
 msgid "State"
-msgstr "状态"
+msgstr "审批状态"
 
 #: accounts/serializers/account/account.py:298
 msgid "Changed"
@@ -3532,8 +3531,7 @@ msgid "Approve"
 msgstr "同意"
 
 #: audits/const.py:42 ops/models/celery.py:85
-#: terminal/models/session/sharing.py:126 tickets/const.py:26
-#: xpack/plugins/cloud/const.py:75
+#: terminal/models/session/sharing.py:126 xpack/plugins/cloud/const.py:75
 msgid "Finished"
 msgstr "结束"
 
@@ -3824,11 +3822,11 @@ msgstr "临时密码"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:133
+#: audits/tasks.py:128
 msgid "Clean audits session task log"
 msgstr "清理资产审计会话任务日志"
 
-#: audits/tasks.py:135
+#: audits/tasks.py:130
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -3842,11 +3840,11 @@ msgstr ""
 "话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置，对"
 "于超出时间的于每天凌晨2点进行清理"
 
-#: audits/tasks.py:155
+#: audits/tasks.py:150
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
-#: audits/tasks.py:157
+#: audits/tasks.py:152
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -4113,15 +4111,13 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次 (账号将"
 "被临时 锁定 {block_time} 分钟)"
 
-#: authentication/errors/const.py:52 authentication/errors/const.py:60
-#, python-brace-format
+#: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr "账号已被锁定 (请联系管理员解锁或{}分钟后重试)"
 
-#: authentication/errors/const.py:56
-#, python-brace-format
+#: authentication/errors/const.py:51
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4151,8 +4147,7 @@ msgstr "需要登录复核"
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors/const.py:72
-#, python-brace-format
+#: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr "登录复核: {}"
 
@@ -4362,16 +4357,14 @@ msgstr ""
 msgid "User is invalid"
 msgstr "无效的用户"
 
-#: authentication/mixins.py:198
-#, python-brace-format
+#: authentication/mixins.py:195
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
 "                    The current user source is {}. Please contact the "
 "administrator. "
 msgstr "管理员已开启'仅允许从用户来源登录'，当前用户来源为 {}，请联系管理员。"
 
-#: authentication/mixins.py:379
-#, python-brace-format
+#: authentication/mixins.py:376
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
@@ -4801,7 +4794,7 @@ msgid ""
 msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能存在安全问题"
 
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
-#: templates/flash_message_standalone.html:28 tickets/const.py:19
+#: templates/flash_message_standalone.html:28
 msgid "Cancel"
 msgstr "取消"
 
@@ -5042,8 +5035,7 @@ msgstr "登录超时，请重新登录"
 msgid "User email already exists ({})"
 msgstr "用户邮箱已存在 ({})"
 
-#: authentication/views/login.py:342
-#, python-brace-format
+#: authentication/views/login.py:338
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -9864,21 +9856,49 @@ msgstr "工单管理"
 msgid "Apply for asset"
 msgstr "申请资产"
 
-#: tickets/const.py:18 tickets/const.py:25 tickets/const.py:43
-msgid "Open"
-msgstr "打开"
+#: tickets/const.py:18 tickets/const.py:25
+msgid "Ticket open"
+msgstr "审批中"
 
-#: tickets/const.py:20 tickets/const.py:32
-msgid "Approved"
-msgstr "已同意"
+#: tickets/const.py:19
+msgid "Ticket closed"
+msgstr "已关闭"
 
-#: tickets/const.py:21 tickets/const.py:33
-msgid "Rejected"
-msgstr "已拒绝"
+#: tickets/const.py:20
+msgid "Ticket approved"
+msgstr "已通过"
+
+#: tickets/const.py:21
+msgid "Ticket rejected"
+msgstr "已驳回"
+
+#: tickets/const.py:26
+msgid "Ticket finished"
+msgstr "已完成"
+
+#: tickets/const.py:30 tickets/const.py:39
+msgid "Step pending"
+msgstr "审批中"
 
 #: tickets/const.py:31 tickets/const.py:38
-msgid "Closed"
-msgstr "关闭的"
+msgid "Step closed"
+msgstr "已关闭"
+
+#: tickets/const.py:32
+msgid "Step approved"
+msgstr "已通过"
+
+#: tickets/const.py:33
+msgid "Step rejected"
+msgstr "已驳回"
+
+#: tickets/const.py:37
+msgid "Step active"
+msgstr "已激活"
+
+#: tickets/const.py:43
+msgid "Open"
+msgstr "打开"
 
 #: tickets/const.py:50
 msgid "One level"
@@ -10187,19 +10207,24 @@ msgstr "生成随机数失败: {}"
 msgid "Device not initialized"
 msgstr "设备未初始化"
 
-#: users/api/user.py:64
+#: users/api/user.py:65
 msgid "You cannot delete yourself. Please disable it instead."
 msgstr "不能删除自己，请将其禁用。"
 
-#: users/api/user.py:66
+#: users/api/user.py:67
 msgid "Cannot delete the admin user. Please disable it instead."
 msgstr "无法删除管理员用户，请将其禁用。"
 
-#: users/api/user.py:164
+#: users/api/user.py:165
 msgid "Can not invite self"
 msgstr "不能邀请自己"
 
-#: users/api/user.py:217
+#: users/api/user.py:171
+msgid ""
+"This user {} is already a member of the organization. No need to invite again"
+msgstr "该用户{}已是组织成员，无需重复邀请"
+
+#: users/api/user.py:225
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置 MFA 多因子认证, 请去个人信息页面重置"
 
@@ -11759,10 +11784,6 @@ msgstr "API 端点"
 msgid "Auto node classification"
 msgstr "自动节点分类"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:108
-msgid "domain_name"
-msgstr "域名"
-
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "认证地址"
@@ -11914,3 +11935,4 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:53
 msgid "Invalid license"
 msgstr "许可证无效"
+

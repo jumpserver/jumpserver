@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-26 09:21+0800\n"
+"POT-Creation-Date: 2026-01-22 10:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -352,8 +352,7 @@ msgid "Success"
 msgstr "Success"
 
 #: accounts/const/automation.py:117 common/const/choices.py:63
-#: common/const/choices.py:114 terminal/const.py:79 tickets/const.py:30
-#: tickets/const.py:39
+#: common/const/choices.py:114 terminal/const.py:79
 msgid "Pending"
 msgstr ""
 
@@ -542,7 +541,7 @@ msgstr ""
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:37
 msgid "Account"
 msgstr ""
 
@@ -660,7 +659,6 @@ msgstr ""
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:30
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
-#: tickets/const.py:37
 msgid "Active"
 msgstr "Active"
 
@@ -1253,6 +1251,7 @@ msgstr ""
 #: accounts/serializers/account/account.py:296 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
 #: tickets/models/ticket/general.py:280 tickets/serializers/super_ticket.py:14
+#: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr ""
 
@@ -3469,8 +3468,7 @@ msgid "Approve"
 msgstr ""
 
 #: audits/const.py:42 ops/models/celery.py:85
-#: terminal/models/session/sharing.py:126 tickets/const.py:26
-#: xpack/plugins/cloud/const.py:75
+#: terminal/models/session/sharing.py:126 xpack/plugins/cloud/const.py:75
 msgid "Finished"
 msgstr ""
 
@@ -4044,15 +4042,13 @@ msgid ""
 "for {block_time} minutes)"
 msgstr ""
 
-#: authentication/errors/const.py:52 authentication/errors/const.py:60
-#, python-brace-format
+#: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
 msgstr ""
 
-#: authentication/errors/const.py:56
-#, python-brace-format
+#: authentication/errors/const.py:51
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -4083,8 +4079,7 @@ msgstr ""
 msgid "Wait login confirm ticket for accept"
 msgstr ""
 
-#: authentication/errors/const.py:72
-#, python-brace-format
+#: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr ""
 
@@ -4293,16 +4288,14 @@ msgstr ""
 msgid "User is invalid"
 msgstr ""
 
-#: authentication/mixins.py:198
-#, python-brace-format
+#: authentication/mixins.py:195
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
 "                    The current user source is {}. Please contact the "
 "administrator. "
 msgstr ""
 
-#: authentication/mixins.py:379
-#, python-brace-format
+#: authentication/mixins.py:376
 msgid "The MFA type ({}) is not enabled"
 msgstr ""
 
@@ -4729,7 +4722,7 @@ msgid ""
 msgstr ""
 
 #: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
-#: templates/flash_message_standalone.html:28 tickets/const.py:19
+#: templates/flash_message_standalone.html:28
 msgid "Cancel"
 msgstr ""
 
@@ -4970,8 +4963,7 @@ msgstr ""
 msgid "User email already exists ({})"
 msgstr ""
 
-#: authentication/views/login.py:342
-#, python-brace-format
+#: authentication/views/login.py:338
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -5223,17 +5215,15 @@ msgstr ""
 msgid "Long text, no length limit"
 msgstr ""
 
-#: common/drf/renders/base.py:158
-#, python-brace-format
+#: common/drf/renders/base.py:147
+msgid "Number, min {} max {}"
+msgstr ""
+
+#: common/drf/renders/base.py:150
 msgid "Datetime format {}"
 msgstr ""
 
-#: common/drf/renders/base.py:161
-msgid "Label, format [\"key:value\"]"
-msgstr ""
-
-#: common/drf/renders/base.py:165
-#, python-brace-format
+#: common/drf/renders/base.py:156
 msgid ""
 "Choices, format name(value), name is optional for human read, value is "
 "requisite, options {}"
@@ -5291,7 +5281,7 @@ msgstr ""
 msgid "Export filtered"
 msgstr ""
 
-#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:36
+#: common/exceptions.py:15 xpack/plugins/cloud/ws.py:37
 #, python-format
 msgid "%s object does not exist."
 msgstr ""
@@ -9656,20 +9646,48 @@ msgstr "Tickets"
 msgid "Apply for asset"
 msgstr ""
 
-#: tickets/const.py:18 tickets/const.py:25 tickets/const.py:43
-msgid "Open"
-msgstr ""
+#: tickets/const.py:18 tickets/const.py:25
+msgid "Ticket open"
+msgstr "Pending approval"
 
-#: tickets/const.py:20 tickets/const.py:32
-msgid "Approved"
-msgstr ""
+#: tickets/const.py:19
+msgid "Ticket closed"
+msgstr "Closed"
 
-#: tickets/const.py:21 tickets/const.py:33
-msgid "Rejected"
-msgstr ""
+#: tickets/const.py:20
+msgid "Ticket approved"
+msgstr "Approved"
+
+#: tickets/const.py:21
+msgid "Ticket rejected"
+msgstr "Rejected"
+
+#: tickets/const.py:26
+msgid "Ticket finished"
+msgstr "Completed"
+
+#: tickets/const.py:30 tickets/const.py:39
+msgid "Step pending"
+msgstr "Pending"
 
 #: tickets/const.py:31 tickets/const.py:38
-msgid "Closed"
+msgid "Step closed"
+msgstr "Closed"
+
+#: tickets/const.py:32
+msgid "Step approved"
+msgstr "Approved"
+
+#: tickets/const.py:33
+msgid "Step rejected"
+msgstr "Rejected"
+
+#: tickets/const.py:37
+msgid "Step active"
+msgstr "Active"
+
+#: tickets/const.py:43
+msgid "Open"
 msgstr ""
 
 #: tickets/const.py:50
@@ -11623,10 +11641,6 @@ msgid ""
 "        clean-up - Cloud sync task history retention days\" the system will "
 "clean up the execution \n"
 "        records generated by cloud synchronization"
-msgstr ""
-
-#: xpack/plugins/cloud/ws.py:84
-msgid "Task not started"
 msgstr ""
 
 #: xpack/plugins/interface/api.py:52
