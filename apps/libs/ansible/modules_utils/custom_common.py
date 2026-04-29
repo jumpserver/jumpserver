@@ -168,7 +168,7 @@ class SSHClient:
             self.client.connect(**self.connect_params)
             self.is_connect = True
             err_msg = self.switch_user()
-            self.after_runner_end()
+            # self.after_runner_end()
         except Exception as err:
             err_msg = str(err)
         return err_msg
@@ -199,6 +199,8 @@ class SSHClient:
                     output += received_output
         except Exception as e:
             error_msg = str(e)
+        finally:
+            self.after_runner_end()
         return output, error_msg
 
     def __del__(self):
