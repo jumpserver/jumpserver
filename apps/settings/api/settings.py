@@ -88,6 +88,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'security_password': 'settings.change_security',
         'security_login_limit': 'settings.change_security',
         'ldap': 'settings.change_auth',
+        'ldap_ha': 'settings.change_auth',
         'cas': 'settings.change_auth',
         'oidc': 'settings.change_auth',
         'saml2': 'settings.change_auth',
