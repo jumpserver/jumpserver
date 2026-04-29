@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+<script src="{% static 'js/mToken.js' %}"></script>
 
 <select id="mfa-select" name="mfa_type" class="form-control select-con"
         onchange="selectChange(this.value)"
@@ -18,7 +19,16 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
          style="display: none"
     >
-        {% if backend.has_code %}
+        {% if backend.name == 'usbkey' %}
+        <input type="password" id="usbkey-pin" class="form-control input-style usbkey-pin"
+               placeholder="{% trans 'Key PIN code' %}">
+        <input type="hidden" id="usbkey-code" class="input-style usbkey-code">
+        <button class="btn btn-primary full-width btn-challenge"
+                type='button' onclick="signUSBKeyChallenge(this)"
+        >
+            {% trans 'Confirm' %}
+        </button>
+        {% elif backend.has_code %}
         <input type="text" class="form-control input-style"
                placeholder="{{ backend.placeholder }}"
         >
@@ -45,6 +55,10 @@
         display: inline-block;
     }
 
+    .usbkey-code {
+        display: none;
+    }
+
     .btn-challenge {
         width: 100px !important;
         height: 100%;
@@ -53,6 +67,9 @@
 </style>
 <script>
     const preferMFAKey = 'mfaPrefer'
+    const usbkeyMFAType = 'usbkey'
+    const usbkeyToken = new mToken("mTokenPlugin")
+
     $(document).ready(function () {
         const mfaSelectRef = document.getElementById('mfa-select');
         const preferMFA = localStorage.getItem(preferMFAKey);
@@ -76,29 +93,113 @@
             localStorage.setItem(preferMFAKey, name)
         }
 
-        $('.input-style').each(function (i, ele) {
-            $(ele).attr('name', 'code-test')
-        })
 
-        const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
+
+        const currentMFAInputRef = $('#mfa-' + name + ' .input-style').last()
         currentMFAInputRef.attr('name', 'code')
 
-        // 登录页时，不应该默认focus
         const usernameRef = $('input[name="username"]')
         if (!usernameRef || usernameRef.length === 0) {
             setTimeout(() => {
-                currentMFAInputRef.focus()
+                const focusRef = name === usbkeyMFAType ? $('#usbkey-pin') : currentMFAInputRef
+                focusRef.focus()
             })
         }
     }
 
-    function sendChallengeCode(currentBtn) {
-        let time = 60;
-        const url = "{% url 'api-auth:mfa-select' %}";
+    function enumUSBKeyDevice() {
+        let ret = usbkeyToken.SOF_LoadLibrary(usbkeyToken.GM3000)
+        if (ret !== 0) {
+            toastr.error("{% trans 'Failed to load plugin, error code: ' %}" + usbkeyToken.SOF_GetLastError())
+            return null
+        }
+        const deviceName = usbkeyToken.SOF_EnumDevice();
+        if (deviceName == null) {
+            toastr.error("{% trans 'No USB Key found' %}")
+            return null
+        }
+        ret = usbkeyToken.SOF_GetDeviceInstance(deviceName[0], "");
+        if (ret !== 0) {
+            toastr.error("{% trans 'Failed to bind application, please check if the Key is initialized, error code: ' %}" + usbkeyToken.SOF_GetLastError())
+            return null
+        }
+        return deviceName
+    }
+
+    function requestMFAChallenge(onSuccess, onError) {
         const data = {
             type: $("#mfa-select").val(),
             username: $('input[name="username"]').val()
         };
+        requestApi({
+            url: "{% url 'api-auth:mfa-select' %}",
+            method: "POST",
+            body: JSON.stringify(data),
+            success: onSuccess,
+            error: onError,
+            flash_message: false
+        })
+    }
+
+    function signUSBKeyChallenge(currentBtn) {
+        const device = enumUSBKeyDevice()
+        if (device == null) {
+            return
+        }
+        const pin = $('#usbkey-pin').val()
+        let ret = usbkeyToken.SOF_Login(pin)
+        if (ret !== 0) {
+            toastr.error("{% trans 'Failed to verify user password, error code: ' %}" + usbkeyToken.SOF_GetLastError())
+            return
+        }
+
+        function onSuccess(responseJson) {
+            const challenge = responseJson.challenge
+            if (!challenge) {
+                toastr.error("{% trans 'Failed to get challenge' %}")
+                return
+            }
+            let container = usbkeyToken.SOF_EnumCertContiner().split("||");
+            if (container.length === 0 || !container[0]) {
+                toastr.error("{% trans 'No container found, error code: ' %}" + usbkeyToken.SOF_GetLastError())
+                return
+            }
+            usbkeyToken.SOF_SetDigestMethod(1);
+            usbkeyToken.SOF_SetUserID('1234567812345678');
+            let challengeB64 = _Base64encode(challenge)
+            let signed = usbkeyToken.SOF_SignData(container[0], 1, challengeB64, challenge.length, 0);
+            if (typeof signed !== 'string' || signed === '' || signed[0] === '-') {
+                toastr.error("{% trans 'Signature failed, error code: ' %}" + usbkeyToken.SOF_GetLastError())
+                return
+            }
+            let digest = usbkeyToken.SOF_DigestData(container[0], challengeB64, challenge.length);
+            if (typeof digest !== 'string' || digest === '' || digest[0] === '-') {
+                toastr.error("{% trans 'Data digest failed, error code: ' %}" + usbkeyToken.SOF_GetLastError())
+                return
+            }
+            const payload = {
+                serial: device[0],
+                digest: digest,
+                signature: signed
+            }
+            $('#usbkey-code').val(encodeURIComponent(JSON.stringify(payload)))
+            toastr.success("{% trans 'USBKey signature generated' %}")
+        }
+
+        function onError(responseText, responseJson, status) {
+            toastr.error((responseJson && (responseJson.detail || responseJson.error)) || responseText)
+        }
+
+        requestMFAChallenge(onSuccess, onError)
+    }
+
+    function sendChallengeCode(currentBtn) {
+        if ($("#mfa-select").val() === usbkeyMFAType) {
+            signUSBKeyChallenge(currentBtn)
+            return
+        }
+
+        let time = 60;
 
         function onSuccess() {
             const originBtnText = currentBtn.innerHTML;
@@ -125,13 +226,6 @@
             });
         };
 
-        requestApi({
-            url: url,
-            method: "POST",
-            body: JSON.stringify(data),
-            success: onSuccess,
-            error: onError,
-            flash_message: false
-        })
+        requestMFAChallenge(onSuccess, onError)
     }
 </script>

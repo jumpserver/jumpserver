@@ -57,16 +57,23 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
             user = self.get_user_from_db(username)
 
         mfa_backend = user.get_active_mfa_backend_by_type(mfa_type)
-        if not mfa_backend or not mfa_backend.challenge_required:
+        if not mfa_backend or not mfa_backend.challenge_required():
             error = _('Current user not support mfa type: {}').format(mfa_type)
             raise ValidationError({'error': error})
 
         try:
-            mfa_backend.send_challenge()
+            mfa_backend.set_request(self.request)
+            self.challenge_data = mfa_backend.send_challenge() or {}
         except JMSException:
             raise
         except Exception as e:
             raise UnexpectError(str(e))
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        data = response.data if isinstance(response.data, dict) else {}
+        data.update(getattr(self, 'challenge_data', {}))
+        return Response(data, status=response.status_code, headers=response.headers)
 
 
 class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):

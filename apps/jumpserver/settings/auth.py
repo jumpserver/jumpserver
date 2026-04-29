@@ -333,11 +333,12 @@ MFA_BACKEND_RADIUS = 'authentication.mfa.radius.MFARadius'
 MFA_BACKEND_SMS = 'authentication.mfa.sms.MFASms'
 MFA_BACKEND_EMAIL = 'authentication.mfa.email.MFAEmail'
 MFA_BACKEND_PASSKEY = 'authentication.mfa.passkey.MFAPasskey'
+MFA_BACKEND_USBKEY = 'authentication.mfa.usbkey.MFAUSBKey'
 MFA_BACKEND_CUSTOM = 'authentication.mfa.custom.MFACustom'
 
 MFA_BACKENDS = [
     MFA_BACKEND_OTP, MFA_BACKEND_RADIUS, MFA_BACKEND_SMS,
-    MFA_BACKEND_PASSKEY, MFA_BACKEND_FACE, MFA_BACKEND_EMAIL
+    MFA_BACKEND_PASSKEY, MFA_BACKEND_USBKEY, MFA_BACKEND_FACE, MFA_BACKEND_EMAIL
 ]
 
 MFA_CUSTOM = CONFIG.MFA_CUSTOM

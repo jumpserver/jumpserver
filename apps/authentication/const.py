@@ -38,6 +38,7 @@ class MFAType(TextChoices):
     Face = 'face', _('Face recognition')
     Radius = 'otp_radius', _('Radius')
     Passkey = 'passkey', _('Passkey')
+    USBKey = 'usbkey', _('USBKey')
     Custom = 'mfa_custom', _('Custom')
 
 
