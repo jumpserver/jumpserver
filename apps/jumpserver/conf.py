@@ -750,6 +750,11 @@ class Config(dict):
         'TRUSTED_IP_SOURCE_HEADER': '',
         'TRUSTED_IP_VERIFY_SIGNATURE_HEADER': '',
         'TRUSTED_IP_VERIFY_KEY_PATH': '',
+
+        # RDP 签名相关设置
+        'RDP_SIGN_CERT': '',
+        'RDP_SIGN_KEY': '',
+        'OPENSSL_BIN': 'openssl',
     }
 
     old_config_map = {

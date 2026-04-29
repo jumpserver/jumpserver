@@ -1,7 +1,9 @@
 import base64
 import json
 import os
+import subprocess
 import urllib.parse
+from struct import pack
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -46,6 +48,136 @@ logger = get_logger(__name__)
 class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
+
+    RDP_SIGN_SECURE_SETTINGS = [
+        ('full address:s:', 'Full Address'),
+        ('alternate full address:s:', 'Alternate Full Address'),
+        ('pcb:s:', 'PCB'),
+        ('use redirection server name:i:', 'Use Redirection Server Name'),
+        ('server port:i:', 'Server Port'),
+        ('negotiate security layer:i:', 'Negotiate Security Layer'),
+        ('enablecredsspsupport:i:', 'EnableCredSspSupport'),
+        ('disableconnectionsharing:i:', 'DisableConnectionSharing'),
+        ('autoreconnection enabled:i:', 'AutoReconnection Enabled'),
+        ('gatewayhostname:s:', 'GatewayHostname'),
+        ('gatewayusagemethod:i:', 'GatewayUsageMethod'),
+        ('gatewayprofileusagemethod:i:', 'GatewayProfileUsageMethod'),
+        ('gatewaycredentialssource:i:', 'GatewayCredentialsSource'),
+        ('support url:s:', 'Support URL'),
+        ('promptcredentialonce:i:', 'PromptCredentialOnce'),
+        ('require pre-authentication:i:', 'Require pre-authentication'),
+        ('pre-authentication server address:s:', 'Pre-authentication server address'),
+        ('alternate shell:s:', 'Alternate Shell'),
+        ('shell working directory:s:', 'Shell Working Directory'),
+        ('remoteapplicationprogram:s:', 'RemoteApplicationProgram'),
+        ('remoteapplicationexpandworkingdir:s:', 'RemoteApplicationExpandWorkingdir'),
+        ('remoteapplicationmode:i:', 'RemoteApplicationMode'),
+        ('remoteapplicationguid:s:', 'RemoteApplicationGuid'),
+        ('remoteapplicationname:s:', 'RemoteApplicationName'),
+        ('remoteapplicationicon:s:', 'RemoteApplicationIcon'),
+        ('remoteapplicationfile:s:', 'RemoteApplicationFile'),
+        ('remoteapplicationfileextensions:s:', 'RemoteApplicationFileExtensions'),
+        ('remoteapplicationcmdline:s:', 'RemoteApplicationCmdLine'),
+        ('remoteapplicationexpandcmdline:s:', 'RemoteApplicationExpandCmdLine'),
+        ('prompt for credentials:i:', 'Prompt For Credentials'),
+        ('authentication level:i:', 'Authentication Level'),
+        ('audiomode:i:', 'AudioMode'),
+        ('redirectdrives:i:', 'RedirectDrives'),
+        ('redirectprinters:i:', 'RedirectPrinters'),
+        ('redirectcomports:i:', 'RedirectCOMPorts'),
+        ('redirectsmartcards:i:', 'RedirectSmartCards'),
+        ('redirectposdevices:i:', 'RedirectPOSDevices'),
+        ('redirectclipboard:i:', 'RedirectClipboard'),
+        ('devicestoredirect:s:', 'DevicesToRedirect'),
+        ('drivestoredirect:s:', 'DrivesToRedirect'),
+        ('loadbalanceinfo:s:', 'LoadBalanceInfo'),
+        ('redirectdirectx:i:', 'RedirectDirectX'),
+        ('rdgiskdcproxy:i:', 'RDGIsKDCProxy'),
+        ('kdcproxyname:s:', 'KDCProxyName'),
+        ('eventloguploadaddress:s:', 'EventLogUploadAddress'),
+        ('redirectwebauthn:i:', 'RedirectWebAuthn'),
+    ]
+
+    @classmethod
+    def _collect_rdp_sign_lines(cls, settings_lines):
+        signnames = []
+        signlines = []
+        for prefix, sign_name in cls.RDP_SIGN_SECURE_SETTINGS:
+            for line in settings_lines:
+                if line.startswith(prefix):
+                    signnames.append(sign_name)
+                    signlines.append(line)
+        return signnames, signlines
+
+    @classmethod
+    def _try_sign_rdp_content(cls, content):
+        certfile = settings.RDP_SIGN_CERT
+        keyfile = settings.RDP_SIGN_KEY
+        if not certfile:
+            return content
+
+        settings_lines = []
+        full_address = None
+        alternate_full_address = None
+        for line in content.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith('signature:s:') or line.startswith('signscope:s:'):
+                continue
+            if line.startswith('full address:s:'):
+                full_address = line[15:]
+            elif line.startswith('alternate full address:s:'):
+                alternate_full_address = line[25:]
+            settings_lines.append(line)
+
+        # Keep alternate full address aligned with full address to prevent tampering.
+        if full_address and not alternate_full_address:
+            settings_lines.append(f'alternate full address:s:{full_address}')
+
+        signnames, signlines = cls._collect_rdp_sign_lines(settings_lines)
+        if not signnames or not signlines:
+            return content
+
+        msgtext = '\r\n'.join(signlines) + '\r\n' + 'signscope:s:' + ','.join(signnames) + '\r\n' + '\x00'
+        msgblob = msgtext.encode('UTF-16LE')
+
+        openssl_cmd = settings.OPENSSL_BIN
+        params = [
+            openssl_cmd, 'smime', '-sign', '-binary',
+            '-signer', certfile, '-outform', 'DER',
+            '-noattr', '-nosmimecap',
+        ]
+        if keyfile:
+            params += ['-inkey', keyfile]
+
+        try:
+            proc = subprocess.Popen(
+                params, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False
+            )
+            opensslout, opensslerr = proc.communicate(msgblob)
+        except OSError as e:
+            logger.warning('RDP file sign failed to run openssl: %s', e)
+            return content
+
+        if proc.returncode != 0:
+            err = ''
+            if opensslerr:
+                try:
+                    err = opensslerr.decode('utf-8', errors='ignore')
+                except Exception:
+                    err = repr(opensslerr)
+            logger.warning('RDP file sign failed, openssl return code=%s, err=%s', proc.returncode, err)
+            return content
+
+        msgsig = pack('<I', 0x00010001)
+        msgsig += pack('<I', 0x00000001)
+        msgsig += pack('<I', len(opensslout))
+        msgsig += opensslout
+        sigval = base64.b64encode(msgsig).decode('ascii')
+
+        signed_lines = settings_lines + [f'signscope:s:{",".join(signnames)}', f'signature:s:{sigval}']
+        return '\n'.join(signed_lines) + '\n'
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -161,6 +293,7 @@ class RDPFileClientProtocolURLMixin:
         content = ''
         for k, v in rdp_options.items():
             content += f'{k}:{v}\n'
+        content = self._try_sign_rdp_content(content)
 
         return filename, content
 
