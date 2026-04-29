@@ -81,7 +81,3 @@ def get_user_login_form_cls(*, captcha=False):
         bases.append(CaptchaMixin)
     bases.append(UserLoginForm)
     return type('UserLoginForm', tuple(bases), {})
-
-
-class UserUKeyForm(forms.Form):
-    token = forms.CharField(label=_('Ukey Token'), max_length=1024, required=True)

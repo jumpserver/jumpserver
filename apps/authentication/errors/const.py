@@ -12,10 +12,6 @@ reason_user_expired = 'user_expired'
 reason_backend_not_match = 'backend_not_match'
 reason_acl_not_allow = 'acl_not_allow'
 only_local_users_are_allowed = 'only_local_users_are_allowed'
-reason_usb_key_failed = "usb_key_failed"
-reason_usb_key_unset = "usb_key_unset"
-reason_usb_key_cert_verify_failed = "usb_key_cert_verify_failed"
-reason_usb_key_bind_required = "usb_key_bind_required"
 
 reason_choices = {
     reason_password_failed: _('Username/password check failed'),
@@ -30,10 +26,6 @@ reason_choices = {
     reason_backend_not_match: _("Auth backend not match"),
     reason_acl_not_allow: _("ACL is not allowed"),
     only_local_users_are_allowed: _("Only local users are allowed"),
-    reason_usb_key_failed: _("UKey check failed"),
-    reason_usb_key_unset: _("UKey unset"),
-    reason_usb_key_cert_verify_failed: _("UKey public key check failed"),
-    reason_usb_key_bind_required: _("Please bind your USB Key first")
 }
 old_reason_choices = {
     '0': '-',
@@ -72,6 +64,3 @@ mfa_unset_msg = _("MFA not set, please set it first")
 login_confirm_required_msg = _("Login confirm required")
 login_confirm_wait_msg = _("Wait login confirm ticket for accept")
 login_confirm_error_msg = _("Login confirm ticket was {}")
-usb_key_unset_msg = _("USB Key not set, Please contact the administrator")
-usb_key_failed_msg = _("UKey check failed")
-usb_key_bind_required_msg = _("Please bind your USB Key first")

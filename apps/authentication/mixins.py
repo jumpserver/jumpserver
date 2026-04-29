@@ -15,7 +15,7 @@ from django.contrib.auth import (
     PermissionDenied, user_login_failed, _clean_credentials,
 )
 from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
@@ -25,8 +25,6 @@ from werkzeug.local import Local
 
 from acls.models import LoginACL
 from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
-from common.sdk.gm import piico
-from common.sdk.gm.piico.exception import PiicoError
 from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
@@ -632,43 +630,6 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         ip = get_request_ip(self.request)
         need = cache.get(self.key_prefix_captcha.format(ip))
         return need
-
-    def check_user_ukey_if_need(self, user):
-        if self.request.session.get("auth_ukey") and self.request.session.get("auth_ukey_username") == user.username:
-            return
-        if not settings.PIICO_DEVICE_ENABLE or not settings.XPACK_ENABLED:
-            return
-        try:
-            if user.user_usb_key.get():
-                raise errors.LoginCheckKeyError()
-        except ObjectDoesNotExist:
-            if settings.SECURITY_UKEY_FORCED_MODE:
-                # admin 超级管理员首次登录 -> 跳转绑定页面
-                if user.is_superuser and user.username == 'admin':
-                    raise errors.UKeyBindRequiredError(user_id=str(user.id))
-                # 其他用户 -> 报错
-                raise errors.UKeyUnsetError()
-
-    def check_ukey_auth(self, user, ukey_token):
-        parts = ukey_token.split("$")
-        if len(parts) != 3:
-            raise errors.LoginCheckKeyError()
-        ukey_serial, digest, sign = parts
-
-        user_key = user.user_usb_key.filter(u_key_serial=ukey_serial).first()
-        if not user_key:
-            raise errors.UKeyUnsetError()
-
-        try:
-            device = piico.open_piico_device()
-            device.verify_sign(user_key.u_key_public_key, digest, sign)
-        except PiicoError as e:
-            logger.error("verify_sign:{}".format(e))
-            raise errors.LoginCheckKeyError()
-
-        self.request.session["auth_ukey"] = 1
-        self.request.session["auth_ukey_username"] = user.username
-        return True
 
     def check_user_auth(self, valid_data=None):
         # pre check
