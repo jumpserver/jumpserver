@@ -2,6 +2,7 @@
 from collections import namedtuple, defaultdict
 from functools import partial
 
+from django.db.models import Q
 from django.db.models.signals import m2m_changed
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
@@ -46,6 +47,19 @@ class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'match': 'assets.view_node',
         'check_assets_amount_task': 'assets.change_node'
     }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if current_org.is_root():
+            return queryset
+
+        if self.action not in ('list', 'match'):
+            return queryset
+
+        root = Node.org_root()
+        return queryset.filter(
+            Q(key=root.key) | Q(key__startswith=f'{root.key}:')
+        )
 
     @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
     def check_assets_amount_task(self, request):
