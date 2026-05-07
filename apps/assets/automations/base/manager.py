@@ -515,7 +515,6 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         error_text = str(error)
         return (
             "pexpect.exceptions.TIMEOUT" in error_text
-            and "exitstatus: 0" in error_text
         )
 
     def on_runner_failed(self, runner, e, assets=None, **kwargs):
