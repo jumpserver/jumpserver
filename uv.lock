@@ -2108,6 +2108,15 @@ wheels = [
 ]
 
 [[package]]
+name = "invoke"
+version = "3.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/33/f6/227c48c5fe47fa178ccf1fda8f047d16c97ba926567b661e9ce2045c600c/invoke-3.0.3.tar.gz", hash = "sha256:437b6a622223824380bfb4e64f612711a6b648c795f565efc8625af66fb57f0c", size = 343419, upload-time = "2026-04-07T15:17:48.307Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5a/de/bbc12563bbf979618d17625a4e753ff7a078523e28d870d3626daa97261a/invoke-3.0.3-py3-none-any.whl", hash = "sha256:f11327165e5cbb89b2ad1d88d3292b5113332c43b8553b494da435d6ec6f5053", size = 160958, upload-time = "2026-04-07T15:17:46.875Z" },
+]
+
+[[package]]
 name = "ipip-ipdb"
 version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2577,7 +2586,7 @@ requires-dist = [
     { name = "openai", specifier = ">=1.29.0" },
     { name = "openpyxl", specifier = "==3.0.10" },
     { name = "oss2", specifier = "==2.18.1" },
-    { name = "paramiko", specifier = "==3.2.0" },
+    { name = "paramiko", specifier = "==4.0.0" },
     { name = "passlib", specifier = "==1.7.4" },
     { name = "pdf2image", specifier = "==1.17.0" },
     { name = "phonenumbers", specifier = "==8.13.17" },
@@ -2597,7 +2606,7 @@ requires-dist = [
     { name = "pyexcel-xlsx", specifier = "==0.6.0" },
     { name = "pyfreerdp", specifier = "==0.0.2" },
     { name = "pyhcl", specifier = "==0.4.4" },
-    { name = "pyhttpsig", specifier = ">=1.3.0" },
+    { name = "pyhttpsig", specifier = "==1.3.0" },
     { name = "pyjwkest", specifier = "==1.4.2" },
     { name = "pymongo", specifier = "==4.6.3" },
     { name = "pympler", specifier = "==1.0.1" },
@@ -3329,16 +3338,17 @@ wheels = [
 
 [[package]]
 name = "paramiko"
-version = "3.2.0"
+version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bcrypt" },
     { name = "cryptography" },
+    { name = "invoke" },
     { name = "pynacl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/87/62/cee9551811c846e9735f749dbdf05d4f9f0dbcecd66eae35b5daacf9a117/paramiko-3.2.0.tar.gz", hash = "sha256:93cdce625a8a1dc12204439d45033f3261bdb2c201648cfcdc06f9fd0f94ec29", size = 1258331, upload-time = "2023-05-25T18:12:31.688Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/e7/81fdcbc7f190cdb058cffc9431587eb289833bdd633e2002455ca9bb13d4/paramiko-4.0.0.tar.gz", hash = "sha256:6a25f07b380cc9c9a88d2b920ad37167ac4667f8d9886ccebd8f90f654b5d69f", size = 1630743, upload-time = "2025-08-04T01:02:03.711Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/dc/d326721840be423d3728c1329be0c61a34ab3eec514f830c01fec31cd9ad/paramiko-3.2.0-py3-none-any.whl", hash = "sha256:df0f9dd8903bc50f2e10580af687f3015bf592a377cd438d2ec9546467a14eb8", size = 224194, upload-time = "2023-05-25T18:12:29.983Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/90/a744336f5af32c433bd09af7854599682a383b37cfd78f7de263de6ad6cb/paramiko-4.0.0-py3-none-any.whl", hash = "sha256:0e20e00ac666503bf0b4eda3b6d833465a2b7aff2e2b3d79a8bba5ef144ee3b9", size = 223932, upload-time = "2025-08-04T01:02:02.029Z" },
 ]
 
 [[package]]
