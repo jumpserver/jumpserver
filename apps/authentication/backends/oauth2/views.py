@@ -28,7 +28,8 @@ class OAuth2AuthRequestView(View):
         redirect_uri = build_absolute_uri(
             request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
         )
-        redirect_uri = f"{redirect_uri}?{query}"
+        if query:
+            redirect_uri = f"{redirect_uri}?{query}"
 
         query_dict = {
             'client_id': settings.AUTH_OAUTH2_CLIENT_ID, 'response_type': 'code',
