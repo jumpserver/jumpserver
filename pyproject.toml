@@ -68,7 +68,6 @@ dependencies = [
     'geoip2==4.8.0',
     'ipip-ipdb==1.6.1',
     'pywinrm==0.4.3',
-    'python-nmap==0.7.1',
     'django==5.2.13',
     'django-bootstrap3==23.4',
     'django-filter==24.3',
