@@ -4193,23 +4193,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/99/36/0d5a284d58dee33a738c1a77cf032a93cb978a7382497fb54f31baa0dc1a/treelib-1.6.4-py3-none-any.whl", hash = "sha256:4218f7dded2448dfa6a335888bf68a28430660163e7faf18c6128ec4477d34c0", size = 18856, upload-time = "2023-03-28T14:16:00.095Z" },
 ]
 
-[[package]]
-name = "twisted"
-version = "25.5.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "attrs" },
-    { name = "automat" },
-    { name = "constantly" },
-    { name = "hyperlink" },
-    { name = "incremental" },
-    { name = "typing-extensions" },
-    { name = "zope-interface" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/13/0f/82716ed849bf7ea4984c21385597c949944f0f9b428b5710f79d0afc084d/twisted-25.5.0.tar.gz", hash = "sha256:1deb272358cb6be1e3e8fc6f9c8b36f78eb0fa7c2233d2dbe11ec6fee04ea316", size = 3545725, upload-time = "2025-06-07T09:52:24.858Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/66/ab7efd8941f0bc7b2bd555b0f0471bff77df4c88e0cc31120c82737fec77/twisted-25.5.0-py3-none-any.whl", hash = "sha256:8559f654d01a54a8c3efe66d533d43f383531ebf8d81d9f9ab4769d91ca15df7", size = 3204767, upload-time = "2025-06-07T09:52:21.428Z" },
-]
 
 [package.optional-dependencies]
 tls = [
