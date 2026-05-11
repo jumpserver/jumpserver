@@ -1,10 +1,12 @@
 import base64
 import json
 import os
-import subprocess
 import urllib.parse
 from struct import pack
 
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.serialization import pkcs7
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -142,38 +144,43 @@ class RDPFileClientProtocolURLMixin:
         msgtext = '\r\n'.join(signlines) + '\r\n' + 'signscope:s:' + ','.join(signnames) + '\r\n' + '\x00'
         msgblob = msgtext.encode('UTF-16LE')
 
-        openssl_cmd = settings.OPENSSL_BIN
-        params = [
-            openssl_cmd, 'smime', '-sign', '-binary',
-            '-signer', certfile, '-outform', 'DER',
-            '-noattr', '-nosmimecap',
-        ]
-        if keyfile:
-            params += ['-inkey', keyfile]
-
         try:
-            proc = subprocess.Popen(
-                params, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False
+            with open(certfile, 'rb') as f:
+                cert_pem = f.read()
+            cert = x509.load_pem_x509_certificate(cert_pem)
+            if keyfile:
+                with open(keyfile, 'rb') as f:
+                    key_pem = f.read()
+            else:
+                key_pem = cert_pem
+            private_key = serialization.load_pem_private_key(key_pem, password=None)
+            pkcs7_der = (
+                pkcs7.PKCS7SignatureBuilder()
+                .set_data(msgblob)
+                .add_signer(cert, private_key, hashes.SHA256())
+                .sign(
+                    serialization.Encoding.DER,
+                    [
+                        pkcs7.PKCS7Options.Binary,
+                        pkcs7.PKCS7Options.DetachedSignature,
+                        pkcs7.PKCS7Options.NoAttributes,
+                    ],
+                )
             )
-            opensslout, opensslerr = proc.communicate(msgblob)
         except OSError as e:
-            logger.warning('RDP file sign failed to run openssl: %s', e)
+            logger.warning('RDP file sign failed to read cert/key: %s', e)
             return content
-
-        if proc.returncode != 0:
-            err = ''
-            if opensslerr:
-                try:
-                    err = opensslerr.decode('utf-8', errors='ignore')
-                except Exception:
-                    err = repr(opensslerr)
-            logger.warning('RDP file sign failed, openssl return code=%s, err=%s', proc.returncode, err)
+        except ValueError as e:
+            logger.warning('RDP file sign failed (invalid cert/key PEM): %s', e)
+            return content
+        except Exception as e:
+            logger.warning('RDP file sign failed: %s', e)
             return content
 
         msgsig = pack('<I', 0x00010001)
         msgsig += pack('<I', 0x00000001)
-        msgsig += pack('<I', len(opensslout))
-        msgsig += opensslout
+        msgsig += pack('<I', len(pkcs7_der))
+        msgsig += pkcs7_der
         sigval = base64.b64encode(msgsig).decode('ascii')
 
         signed_lines = settings_lines + [f'signscope:s:{",".join(signnames)}', f'signature:s:{sigval}']

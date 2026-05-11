@@ -754,7 +754,6 @@ class Config(dict):
         # RDP 签名相关设置
         'RDP_SIGN_CERT': '',
         'RDP_SIGN_KEY': '',
-        'OPENSSL_BIN': 'openssl',
     }
 
     old_config_map = {
