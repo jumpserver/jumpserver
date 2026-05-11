@@ -152,6 +152,9 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
         response = HttpResponse()
         response['X-Accel-Redirect'] = internal_url
         response['Content-Type'] = 'application/octet-stream'
+        filename = escape_uri_path('{}.tar'.format(session.id))
+        disposition = "attachment; filename*=UTF-8''{}".format(filename)
+        response["Content-Disposition"] = disposition
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('Download'), str(session)
         )
