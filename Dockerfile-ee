@@ -10,7 +10,6 @@ ARG TOOLS="                           \
         curl                          \
         iputils-ping                  \
         netcat-openbsd                \
-        nmap                          \
         telnet                        \
         wget                          \
         poppler-utils"
