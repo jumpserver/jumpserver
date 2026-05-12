@@ -7,12 +7,9 @@ COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
 ARG TOOLS="                           \
         g++                           \
-        curl                          \
         iputils-ping                  \
         netcat-openbsd                \
-        telnet                        \
-        wget                          \
-        poppler-utils"
+        telnet"
 
 RUN set -ex \
     && apt-get update \
