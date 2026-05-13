@@ -83,13 +83,14 @@ class DingTalkOAuthMixin(DingTalkBaseMixin, View):
         self.request.session[DINGTALK_STATE_SESSION_KEY] = state
 
         params = {
-            'appid': settings.DINGTALK_APPKEY,
+            'client_id': settings.DINGTALK_APPKEY,
             'response_type': 'code',
-            'scope': 'snsapi_auth',
+            'scope': 'openid',
             'state': state,
             'redirect_uri': redirect_uri,
+            'prompt': 'consent'
         }
-        url = URL.OAUTH_CONNECT + '?' + urlencode(params)
+        url = URL.QR_CONNECT + '?' + urlencode(params)
         return url
 
 
