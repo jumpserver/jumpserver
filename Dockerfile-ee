@@ -22,4 +22,5 @@ WORKDIR /opt/jumpserver
 ARG PIP_MIRROR=https://pypi.org/simple
 
 RUN set -ex \
-    && uv pip install -i${PIP_MIRROR} --group xpack
+    && uv pip install -i${PIP_MIRROR} --group xpack \
+    && rm -rf /root/.cache/ 

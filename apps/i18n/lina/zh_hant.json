@@ -9,7 +9,7 @@
     "AccessIP": "IP 白名單",
     "AccessKey": "訪問金鑰",
     "AccessToken": "訪問令牌",
-    "AccessTokenTip": "訪問令牌是透過 JumpServer 客戶端使用 OAuth2（授權碼授權）流程生成的臨時憑證，用於訪問受保護的資源。",
+    "AccessTokenTip": "訪問令牌是透過客戶端使用 OAuth2（授權碼授權）流程生成的臨時憑證，用於訪問受保護的資源。",
     "Account": "雲帳號",
     "AccountActivities": "帳號活動",
     "AccountAmount": "帳號數量",
@@ -785,6 +785,7 @@
     "LdapConnectTest": "Test Connection",
     "LdapLoginTest": "測試登入",
     "LeakPasswordList": "弱密碼列表",
+    "LicenseMaintenanceExpired": "授權服務時間已到期",
     "LeakedPassword": "泄露密碼",
     "Length": "長度",
     "LessEqualThan": "小於等於",
@@ -1699,5 +1700,7 @@
     "ReportSchedulePriorityTip": "如果同時設置了 interval 和 crontab，則優先考慮 crontab",
     "FooterContentTooLong200": "頁腳內容過長，請限制在 200 字以內",
     "ImageFileCorruptedOrUnreadable": "影像檔案已損壞或無法讀取，請檢查檔案並重試。",
-    "DeviceManager": "設備管理"
+    "DeviceManager": "設備管理",
+    "RefreshSecret": "刷新金鑰",
+    "RefreshSuccessMsg": "刷新成功"
 }

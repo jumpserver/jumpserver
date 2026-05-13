@@ -9,7 +9,7 @@
     "AccessIP": "IP 화이트리스트",
     "AccessKey": "액세스 키",
     "AccessToken": "접속 토큰",
-    "AccessTokenTip": "접속 토큰은 JumpServer 클라이언트를 통해 OAuth2(인증 코드 인증) 프로세스를 사용하여 생성된 임시 자격 증명으로, 보호된 리소스에 접근하는 데 사용됩니다.",
+    "AccessTokenTip": "액세스 토큰은 클라이언트가 OAuth2(Authorization Code Grant) 흐름을 통해 생성하는 임시 자격 증명으로, 보호된 리소스에 접근하는 데 사용됩니다.",
     "Account": "계정",
     "AccountActivities": "계정 활동",
     "AccountAndPasswordChangeRank": "계정 비밀번호 변경 순위",

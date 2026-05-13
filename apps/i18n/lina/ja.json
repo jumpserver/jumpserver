@@ -9,7 +9,7 @@
     "AccessIP": "IP ホワイトリスト",
     "AccessKey": "アクセスキー",
     "AccessToken": "アクセス・トークン",
-    "AccessTokenTip": "アクセス・トークンは、JumpServer クライアントを通じて OAuth2（Authorization Code Grant）フローを使用して生成される一時的な証明書であり、保護されたリソースへのアクセスに使用されます。",
+    "AccessTokenTip": "アクセストークンは、クライアントが OAuth2（認可コードグラント）フローを使用して生成する一時的な認証情報であり、保護されたリソースへのアクセスに使用されます。",
     "Account": "アカウント情報",
     "AccountActivities": "アカウント活動",
     "AccountAmount": "アカウント数",

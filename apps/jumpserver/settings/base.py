@@ -190,7 +190,6 @@ MIDDLEWARE = [
     'authentication.middleware.MFAMiddleware',
     'authentication.middleware.ThirdPartyLoginMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
-    'jumpserver.middleware.HmacSignAuthMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'jumpserver.middleware.SafeRedirectMiddleware',
     *POST_CUSTOM_MIDDLEWARES,

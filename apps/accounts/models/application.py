@@ -49,7 +49,7 @@ class IntegrationApplication(JMSOrgBaseModel):
         support_perms = ['accounts.view_integrationapplication']
         return all([perm in support_perms for perm in perms])
 
-    def get_secret(self):
+    def refresh_secret(self):
         self.secret = random_string(36)
         self.save(update_fields=['secret'])
         return self.secret

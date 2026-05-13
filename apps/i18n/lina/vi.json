@@ -9,7 +9,7 @@
     "AccessIP": "Danh sách trắng IP",
     "AccessKey": "Khóa truy cập",
     "AccessToken": "Mã thông hành",
-    "AccessTokenTip": "Mã thông hành là giấy chứng nhận tạm thời được tạo ra thông qua quy trình OAuth2 (ủy quyền mã) sử dụng khách hàng JumpServer, dùng để truy cập tài nguyên được bảo vệ.",
+    "AccessTokenTip": "Mã thông báo truy cập là thông tin xác thực tạm thời được tạo bởi ứng dụng khách thông qua luồng OAuth2 (Authorization Code Grant) để truy cập các tài nguyên được bảo vệ.",
     "Account": "Tài khoản",
     "AccountActivities": "Tài khoản hoạt động",
     "AccountAndPasswordChangeRank": "Thay đổi mật khẩu tài khoản xếp hạng",

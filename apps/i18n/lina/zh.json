@@ -784,7 +784,7 @@
     "LevelApproval": "级审批",
     "License": "许可证",
     "LicenseExpired": "许可证已经过期",
-    "LicenseMaintenanceExpired": "许可证维保时间已过期",
+    "LicenseMaintenanceExpired": "许可证服务时间已到期",
     "LicenseWillExpire": "许可证即将过期",
     "LicenseFile": "许可证文件",
     "LicenseForTest": "测试用途许可证， 本许可证仅用于 测试（PoC）和演示",
@@ -1652,7 +1652,7 @@
     "Risk": "风险",
     "selectFiles": "已选择选择{number}文件",
     "AccessToken": "访问令牌",
-    "AccessTokenTip": "访问令牌是通过 JumpServer 客户端使用 OAuth2（授权码授权）流程生成的临时凭证，用于访问受保护的资源。",
+    "AccessTokenTip": "访问令牌是通过客户端使用 OAuth2（授权码授权）流程生成的临时凭证，用于访问受保护的资源。",
     "Revoke": "撤销",
     "AccountSecretReadDisabled": "账号密码读取功能已被管理员禁用",
     "Automations": "自动化",
@@ -1702,5 +1702,7 @@
     "ReportRecipientsTip": "当前仅支持邮件发送",
     "ReportSchedulePriorityTip": "如果同时设置了 interval 和 crontab，则优先考虑 crontab",
     "FooterContentTooLong200": "页脚内容不能超过 200 个字符",
-    "ImageFileCorruptedOrUnreadable": "图像文件已损坏或无法读取，请检查文件并重试。"
+    "ImageFileCorruptedOrUnreadable": "图像文件已损坏或无法读取，请检查文件并重试。",
+    "RefreshSecret": "刷新密钥",
+    "RefreshSuccessMsg": "刷新成功"
 }

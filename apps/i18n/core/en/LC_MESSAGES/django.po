@@ -9483,7 +9483,7 @@ msgid ""
 "        it is recommended to fill in the intranet address, otherwise fill in "
 "the current site URL \n"
 "        <br> \n"
-"        eg: https://172.16.10.110 or https://dev.jumpserver.com\n"
+"        eg: https://172.16.10.110 or https://dev.example.com\n"
 "        "
 msgstr ""
 
@@ -9499,7 +9499,7 @@ msgstr ""
 msgid ""
 "If not exist, the RDS will be in trial mode, and the trial period is 120 "
 "days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
-"remote-desktop-services/rds-client-access-license\">Detail</a>"
+"remote-desktop-services/rds-client-access-license\" target=\"_blank\">Detail</a>"
 msgstr ""
 
 #: terminal/serializers/applet_host.py:55

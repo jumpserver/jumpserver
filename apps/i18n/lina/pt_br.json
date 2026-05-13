@@ -9,7 +9,7 @@
     "AccessIP": "Lista branca de IP",
     "AccessKey": "Chave de Acesso",
     "AccessToken": "Token de acesso",
-    "AccessTokenTip": "O token de acesso é um credencial temporário gerado pelo cliente JumpServer usando o fluxo OAuth2 (autorização por código), utilizado para acessar recursos protegidos.",
+    "AccessTokenTip": "O token de acesso é uma credencial temporária gerada pelo cliente usando o fluxo OAuth2 (Authorization Code Grant) para acessar recursos protegidos.",
     "Account": "Informações da conta",
     "AccountActivities": "Atividades da conta",
     "AccountAndPasswordChangeRank": "Alteração de Senha por Classificação",
