@@ -48,7 +48,7 @@
     var time = '{{ interval }}'
     var error = '{{ error }}'
     var auto_redirect = '{{ auto_redirect }}'
-    
+
     if (error) {
         message = error
     } else {
@@ -62,7 +62,7 @@
             time--;
             setTimeout(redirect_page, 1000);
         } else {
-            window.location.href = "{{ redirect_url }}";
+            window.location.href = '{{ redirect_url|escapejs }}';
         }
     }
 
@@ -71,4 +71,3 @@
     }
 </script>
 {% endblock %}
-

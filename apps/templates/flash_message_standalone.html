@@ -52,7 +52,7 @@
     {% else %}
         message = '{{ message|safe }}'
     {% endif %}
-    var redirect_url = '{{ redirect_url }}'
+    var redirect_url = '{{ redirect_url|escapejs }}'
 
     function redirect_page() {
         if (time >= 0) {
@@ -69,4 +69,3 @@
     {% endif %}
 </script>
 {% endblock %}
-
