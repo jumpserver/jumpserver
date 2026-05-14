@@ -10,16 +10,16 @@ from django.views import View
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from authentication.decorators import post_save_next_to_session_if_guard_redirect, pre_save_next_to_session
 from authentication import errors
 from authentication.const import ConfirmType
+from authentication.decorators import post_save_next_to_session_if_guard_redirect, pre_save_next_to_session
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
 from authentication.permissions import UserConfirmation
 from common.sdk.im.dingtalk import URL, DingTalk
 from common.utils import get_logger
 from common.utils.common import get_request_ip
-from common.utils.django import get_object_or_none, reverse, safe_next_url
+from common.utils.django import get_object_or_none, reverse
 from common.utils.random import random_string
 from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from users.models import User
@@ -237,7 +237,7 @@ class DingTalkOAuthLoginCallbackView(AuthMixin, DingTalkOAuthMixin, View):
             appsecret=settings.DINGTALK_APPSECRET,
             agentid=settings.DINGTALK_AGENTID
         )
-        userid, __ = dingtalk.get_user_id_by_code(code)
+        userid, __ = dingtalk.get_user_id_by_code_for_oauth(code)
         if not userid:
             # 正常流程不会出这个错误，hack 行为
             msg = _('Failed to get user from DingTalk')
