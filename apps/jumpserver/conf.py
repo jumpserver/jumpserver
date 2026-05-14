@@ -188,6 +188,8 @@ class Config(dict):
         'DEBUG': False,
         'DEBUG_DEV': False,
         'DEBUG_ANSIBLE': False,
+        # Allowed directory for custom automation scripts (Website, etc.); empty uses PROJECT_DIR/data/automations
+        'CUSTOM_SCRIPT_ROOT': '',
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'data', 'logs'),
         'DB_ENGINE': 'mysql',

@@ -100,3 +100,7 @@ REDIS_PORT: 6379
 #FACE_RECOGNITION_ENABLED: true
 #FACE_RECOGNITION_DISTANCE_THRESHOLD': 0.35
 #FACE_RECOGNITION_COSINE_THRESHOLD': 0.95
+
+# Allowed directory for custom automation scripts (Website category, etc.)
+# Default: <PROJECT_DIR>/data/automations
+# CUSTOM_SCRIPT_ROOT: /opt/jumpserver/data/automations

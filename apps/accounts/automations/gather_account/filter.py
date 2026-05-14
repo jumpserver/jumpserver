@@ -281,6 +281,31 @@ class GatherAccountsFilter:
                 result[username] = user
         return result
 
+    @staticmethod
+    def website_script_filter(info):
+        if not isinstance(info, dict):
+            return {}
+        result = {}
+        for username, user_info in info.items():
+            if not username:
+                continue
+            if not isinstance(user_info, dict):
+                user_info = {}
+            user = {
+                'username': username,
+                'date_password_change': parse_date(user_info.get('date_password_change')),
+                'date_password_expired': parse_date(user_info.get('date_password_expired')),
+                'date_last_login': parse_date(user_info.get('date_last_login')),
+                'groups': user_info.get('groups', '') or '',
+            }
+            detail = user_info.get('detail')
+            if detail is not None and not isinstance(detail, dict):
+                detail = {'value': detail}
+            if isinstance(detail, dict):
+                user['detail'] = detail
+            result[username] = user
+        return result
+
     def run(self, method_id_meta_mapper, info):
         run_method_name = None
         for k, v in method_id_meta_mapper.items():

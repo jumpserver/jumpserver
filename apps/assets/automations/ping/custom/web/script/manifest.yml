@@ -1,0 +1,67 @@
+id: ping_website_script
+name: "{{ 'Website ping script' | trans }}"
+category: web
+type:
+  - website
+method: ping
+protocol: http
+priority: 41
+params:
+  - name: script_path
+    type: str
+    label: "{{ 'Script path' | trans }}"
+    default: ''
+    help_text: "{{ 'Website ping script path help' | trans }}"
+  - name: script_args_json
+    type: text
+    label: "{{ 'Script arguments' | trans }}"
+    default: '[]'
+    help_text: "{{ 'Script arguments help' | trans }}"
+  - name: recv_timeout
+    type: int
+    label: "{{ 'Script timeout' | trans }}"
+    default: 120
+    help_text: "{{ 'Script timeout help' | trans }}"
+
+i18n:
+  Website ping script:
+    zh: 'Website：连通性探测（自定义脚本）'
+    en: 'Website: connectivity check (custom script)'
+    ja: 'Website: 疎通確認（カスタムスクリプト）'
+  Script path:
+    zh: 自定义脚本路径
+    en: Custom script path
+    ja: カスタムスクリプトパス
+  Website ping script path help:
+    zh: |
+      在 JumpServer 本机执行脚本探测连通性，须位于 CUSTOM_SCRIPT_ROOT 目录内；退出码 0 表示可达。
+      例如 Grafana 可使用 grafana_ping.py（GET /api/health）。
+      环境变量：JMS_ASSET（资产）、JMS_ACCOUNT（账号，可选）、JMS_PARAMS（本平台参数）。
+    en: |
+      Run a script on the JumpServer host under CUSTOM_SCRIPT_ROOT; exit code 0 means reachable.
+      Example for Grafana: grafana_ping.py (GET /api/health).
+      Env: JMS_ASSET, JMS_ACCOUNT (optional), JMS_PARAMS.
+    ja: |
+      JumpServer 上でスクリプト実行（CUSTOM_SCRIPT_ROOT 配下）。終了コード 0 が成功。
+      例: grafana_ping.py。環境変数: JMS_ASSET, JMS_ACCOUNT, JMS_PARAMS.
+  Script arguments:
+    zh: 脚本参数（JSON 数组）
+    en: Script arguments (JSON array)
+    ja: スクリプト引数（JSON 配列）
+  Script arguments help:
+    zh: |
+      追加命令行参数，JSON 数组字符串，默认 []。
+      例如自签证书场景可填 ['--insecure']。
+    en: |
+      Extra argv as a JSON array (default []).
+      Example for self-signed TLS: ['--insecure'].
+    ja: |
+      追加 argv（JSON 配列、既定 []）。例: ['--insecure']。
+  Script timeout:
+    zh: 执行超时（秒）
+    en: Execution timeout (seconds)
+    ja: 実行タイムアウト（秒）
+  Script timeout help:
+    zh: 脚本子进程的最大执行时间（秒），超时则任务失败。默认 120。
+    en: Maximum script runtime in seconds; task fails on timeout. Default 120.
+    ja: スクリプトの最大実行時間（秒）。既定 120。

@@ -49,6 +49,9 @@ DEBUG = CONFIG.DEBUG
 DEBUG_DEV = CONFIG.DEBUG_DEV
 # SECURITY WARNING: If you run ansible task with debug turned on, more debug msg with be log
 DEBUG_ANSIBLE = CONFIG.DEBUG_ANSIBLE
+CUSTOM_SCRIPT_ROOT = CONFIG.CUSTOM_SCRIPT_ROOT or os.path.join(
+    PROJECT_DIR, 'data', 'automations'
+)
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL

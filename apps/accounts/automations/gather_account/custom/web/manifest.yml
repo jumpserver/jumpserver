@@ -1,0 +1,72 @@
+id: gather_accounts_website_script
+name: "{{ 'Website gather accounts (script)' | trans }}"
+category: web
+type:
+  - website
+method: gather_accounts
+priority: 40
+params:
+  - name: script_path
+    type: str
+    label: "{{ 'Script path' | trans }}"
+    default: ''
+    help_text: "{{ 'Gather accounts script path help' | trans }}"
+  - name: script_args_json
+    type: text
+    label: "{{ 'Script arguments' | trans }}"
+    default: '[]'
+    help_text: "{{ 'Script arguments help' | trans }}"
+  - name: recv_timeout
+    type: int
+    label: "{{ 'Script timeout' | trans }}"
+    default: 120
+    help_text: "{{ 'Script timeout help' | trans }}"
+
+i18n:
+  Website gather accounts (script):
+    zh: 'Website：账号发现（自定义脚本）'
+    en: 'Website: gather accounts (custom script)'
+    ja: 'Website: アカウント収集（カスタムスクリプト）'
+  Script path:
+    zh: 自定义脚本路径
+    en: Custom script path
+    ja: カスタムスクリプトパス
+  Gather accounts script path help:
+    zh: |
+      填写 JumpServer 本机脚本的绝对路径，须位于系统配置的允许目录内（CUSTOM_SCRIPT_ROOT）。
+      以自动化任务 Python 解释器执行：python <路径>（扩展名不限）；退出码 0 表示执行成功。
+      标准输出须为单行 JSON 对象：键为用户名，值为该账号的可选字段对象（由 JumpServer 解析入库）。
+      环境变量：JMS_ASSET（资产）、JMS_ACCOUNT（特权账号）、JMS_PARAMS（本平台参数）。
+    en: |
+      Absolute path on the JumpServer host under CUSTOM_SCRIPT_ROOT.
+      Runs as automation_python <path> (any extension); exit code 0 required.
+      Stdout must be one line of JSON: username -> optional account fields object.
+      Env: JMS_ASSET, JMS_ACCOUNT, JMS_PARAMS.
+    ja: |
+      JumpServer 上のスクリプト絶対パス（CUSTOM_SCRIPT_ROOT 配下）。
+      自動化用 Python で実行。終了コード 0。標準出力は 1 行 JSON（ユーザー名 -> フィールド）。
+      環境変数: JMS_ASSET, JMS_ACCOUNT, JMS_PARAMS.
+  Script arguments:
+    zh: 脚本参数（JSON 数组）
+    en: Script arguments (JSON array)
+    ja: スクリプト引数（JSON 配列）
+  Script arguments help:
+    zh: |
+      追加传给脚本的命令行参数，JSON 数组字符串，默认 []。
+      例如自签证书场景可填 ['--insecure']。
+      实际命令：python <脚本路径> <参数1> …
+    en: |
+      Extra argv after the script path as a JSON array (default []).
+      Example: ['--insecure'] for self-signed TLS.
+      Effective command: python <script> <arg1> …
+    ja: |
+      スクリプトに渡す追加 argv（JSON 配列、既定 []）。
+      例: ['--insecure']。実行: python <script> <arg1> …
+  Script timeout:
+    zh: 执行超时（秒）
+    en: Execution timeout (seconds)
+    ja: 実行タイムアウト（秒）
+  Script timeout help:
+    zh: 脚本子进程的最大执行时间（秒），超时则任务失败。默认 120。
+    en: Maximum script runtime in seconds; task fails on timeout. Default 120.
+    ja: スクリプトの最大実行時間（秒）。既定 120。

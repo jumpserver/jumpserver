@@ -18,18 +18,29 @@ class WebTypes(BaseType):
 
     @classmethod
     def _get_automation_constrains(cls) -> dict:
-        constrains = {
-            '*': {
-                'ansible_enabled': False,
-                'ping_enabled': False,
-                'gather_facts_enabled': False,
-                'verify_account_enabled': False,
-                'change_secret_enabled': False,
-                'push_account_enabled': False,
-                'gather_accounts_enabled': False,
-            }
+        disabled = {
+            'ansible_enabled': False,
+            'ping_enabled': False,
+            'gather_facts_enabled': False,
+            'verify_account_enabled': False,
+            'change_secret_enabled': False,
+            'push_account_enabled': False,
+            'gather_accounts_enabled': False,
+            'remove_account_enabled': False,
         }
-        return constrains
+        return {
+            '*': disabled,
+            cls.WEBSITE: {
+                'ansible_enabled': True,
+                'ping_enabled': True,
+                'gather_facts_enabled': True,
+                'verify_account_enabled': True,
+                'change_secret_enabled': True,
+                'push_account_enabled': True,
+                'gather_accounts_enabled': True,
+                'remove_account_enabled': True,
+            },
+        }
 
     @classmethod
     def _get_protocol_constrains(cls) -> dict:

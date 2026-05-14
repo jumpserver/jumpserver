@@ -1,0 +1,50 @@
+- hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_become: false
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+
+  tasks:
+    - name: Require gather_facts script_path
+      ansible.builtin.assert:
+        that:
+          - params.script_path is defined
+          - params.script_path | length > 0
+        fail_msg: "script_path is required for website gather_facts"
+
+    - name: Validate custom script path
+      validate_custom_script_path:
+        path: "{{ params.script_path | default('', true) }}"
+        allowed_root: "{{ custom_script_root }}"
+      register: website_script_path
+      delegate_to: localhost
+
+    - name: Run gather facts script
+      ansible.builtin.command:
+        argv: "{{ [ansible_python_interpreter, website_script_path.resolved_path] + (params.script_args_json | default('[]', true) | from_json) }}"
+      environment:
+        JMS_ASSET: "{{ jms_asset | to_json }}"
+        JMS_ACCOUNT: "{{ jms_account | to_json }}"
+        JMS_PARAMS: "{{ params | to_json }}"
+      async: "{{ params.recv_timeout | default(120) | int }}"
+      poll: 1
+      register: gather_facts_cmd
+      delegate_to: localhost
+      failed_when: gather_facts_cmd.rc | default(1) != 0
+
+    - name: Log custom website script diagnostics
+      ansible.builtin.debug:
+        msg:
+          rc: "{{ gather_facts_cmd.rc | default(-1) }}"
+          stdout_lines: "{{ gather_facts_cmd.stdout_lines | default([]) }}"
+          stderr_lines: "{{ gather_facts_cmd.stderr_lines | default([]) }}"
+      when: gather_facts_cmd is defined
+
+    - name: Define info from script stdout
+      ansible.builtin.set_fact:
+        info: "{{ gather_facts_cmd.stdout | trim | from_json }}"
+
+    # debug 任务勿设 name，否则回调键非 debug，manager 无法读取 result['debug']['res']['info']
+    - debug:
+        var: info

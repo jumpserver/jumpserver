@@ -1,0 +1,43 @@
+- hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_become: false
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+
+  tasks:
+    - name: Require change_secret script_path
+      ansible.builtin.assert:
+        that:
+          - params.script_path is defined
+          - params.script_path | length > 0
+        fail_msg: "script_path is required for website change_secret"
+
+    - name: Validate custom script path
+      validate_custom_script_path:
+        path: "{{ params.script_path | default('', true) }}"
+        allowed_root: "{{ custom_script_root }}"
+      register: website_script_path
+      delegate_to: localhost
+
+    - name: Run change secret script
+      ansible.builtin.command:
+        argv: "{{ [ansible_python_interpreter, website_script_path.resolved_path] + (params.script_args_json | default('[]', true) | from_json) }}"
+      environment:
+        JMS_ASSET: "{{ jms_asset | to_json }}"
+        JMS_ACCOUNT: "{{ jms_account | to_json }}"
+        JMS_TARGET_ACCOUNT: "{{ account | to_json }}"
+        JMS_PARAMS: "{{ params | to_json }}"
+      async: "{{ params.recv_timeout | default(120) | int }}"
+      poll: 1
+      register: change_cmd
+      delegate_to: localhost
+      failed_when: change_cmd.rc | default(1) != 0
+
+    - name: Log custom website script diagnostics
+      ansible.builtin.debug:
+        msg:
+          rc: "{{ change_cmd.rc | default(-1) }}"
+          stdout_lines: "{{ change_cmd.stdout_lines | default([]) }}"
+          stderr_lines: "{{ change_cmd.stderr_lines | default([]) }}"
+      when: change_cmd is defined

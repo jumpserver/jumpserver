@@ -1,0 +1,19 @@
+- hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_become: false
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+
+  tasks:
+    - name: Website connectivity via HTTP
+      ansible.builtin.uri:
+        url: "{{ jms_asset.address }}"
+        method: "{{ params.http_method | default('HEAD') }}"
+        timeout: "{{ params.timeout_seconds | default(10) | int }}"
+        validate_certs: "{{ params.validate_certs | default(true) | bool }}"
+        follow_redirects: true
+        status_code: [200, 201, 204, 301, 302, 303, 307, 308, 401, 403, 405]
+      register: uri_check
+      delegate_to: localhost
+      failed_when: uri_check.status is defined and uri_check.status >= 400

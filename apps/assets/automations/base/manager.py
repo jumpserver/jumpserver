@@ -253,6 +253,12 @@ class PlaybookPrepareMixin:
         method_type = self.__class__.method_type()
         host = self.convert_cert_to_file(host, kwargs.get("path_dir"))
         host["params"] = self.get_params(automation, method_type)
+        if automation is not None:
+            method_attr = "{}_method".format(method_type)
+            method_id = getattr(automation, method_attr, None)
+            meta = self.method_id_meta_mapper.get(method_id) if method_id else None
+            if meta and meta.get("category") == "web":
+                host["custom_script_root"] = settings.CUSTOM_SCRIPT_ROOT
         return host
 
     @staticmethod

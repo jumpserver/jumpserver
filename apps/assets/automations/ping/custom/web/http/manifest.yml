@@ -1,0 +1,54 @@
+id: ping_website_http
+name: "{{ 'Website ping HTTP' | trans }}"
+category: web
+type:
+  - website
+method: ping
+protocol: http
+priority: 40
+params:
+  - name: http_method
+    type: str
+    label: "{{ 'HTTP method' | trans }}"
+    default: HEAD
+    help_text: "{{ 'Website ping HTTP method help' | trans }}"
+  - name: timeout_seconds
+    type: int
+    label: "{{ 'Timeout (seconds)' | trans }}"
+    default: 10
+    help_text: "{{ 'Website ping HTTP timeout help' | trans }}"
+  - name: validate_certs
+    type: bool
+    label: "{{ 'Validate HTTPS certificates' | trans }}"
+    default: true
+    help_text: "{{ 'Validate HTTPS certificates help' | trans }}"
+
+i18n:
+  Website ping HTTP:
+    zh: 'Website：连通性探测（HTTP）'
+    en: 'Website: connectivity check (HTTP)'
+    ja: 'Website: 疎通確認（HTTP）'
+  HTTP method:
+    zh: HTTP 请求方法
+    en: HTTP request method
+    ja: HTTP メソッド
+  Website ping HTTP method help:
+    zh: 对资产地址（如 Grafana 登录页 URL）发起 HTTP 请求，常用 HEAD 或 GET。
+    en: HTTP request to the asset address (e.g. Grafana login URL), typically HEAD or GET.
+    ja: 資産 URL へ HTTP リクエスト（HEAD / GET など）。
+  Timeout (seconds):
+    zh: 超时时间（秒）
+    en: Timeout (seconds)
+    ja: タイムアウト（秒）
+  Website ping HTTP timeout help:
+    zh: HTTP 请求最大等待时间（秒）。默认 10。
+    en: Maximum wait for the HTTP request (seconds). Default 10.
+    ja: HTTP リクエストの最大待ち時間（秒）。既定 10。
+  Validate HTTPS certificates:
+    zh: 校验 HTTPS 证书
+    en: Validate HTTPS certificates
+    ja: HTTPS 証明書を検証
+  Validate HTTPS certificates help:
+    zh: 使用 HTTPS 时是否校验服务端证书链；自签证书可关闭。
+    en: Whether to verify the server certificate chain for HTTPS.
+    ja: HTTPS 時にサーバー証明書を検証するか。
