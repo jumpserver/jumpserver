@@ -3,16 +3,14 @@
 
 from __future__ import unicode_literals
 
-from django.core.cache import cache
-from django.http import HttpResponse
 from django.conf import settings
+from django.core.cache import cache
 from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 
-from common.utils import get_logger, FlashMessageUtil
 from common.exceptions import JMSException
-from users.models import User
+from common.utils import get_logger, FlashMessageUtil
 from orgs.utils import tmp_to_root_org
 from tickets.const import TicketType
 from tickets.errors import AlreadyClosed
@@ -20,6 +18,7 @@ from tickets.models import (
     Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
+from users.models import User
 
 logger = get_logger(__name__)
 
@@ -49,7 +48,7 @@ class TicketDirectApproveView(TemplateView):
 
     @property
     def login_url(self):
-        return reverse('authentication:login') + '?admin=1'
+        return reverse('authentication:login') + f'?admin=1&{self.redirect_field_name}=/'
 
     def redirect_message_response(self, **kwargs):
         message_data = self.message_data
@@ -76,10 +75,11 @@ class TicketDirectApproveView(TemplateView):
     def get(self, request, *args, **kwargs):
         if not (settings.TICKETS_DIRECT_APPROVE or request.user.is_authenticated):
             direct_url = reverse('tickets:direct-approve', kwargs={'token': kwargs['token']})
+            redirect_url = f'{reverse('authentication:login') + '?admin=1'}&{self.redirect_field_name}={direct_url}'
             message_data = {
                 'title': _('Ticket approval'),
                 'message': _('After successful authentication, this ticket can be approved directly'),
-                'redirect_url': f'{self.login_url}&{self.redirect_field_name}={direct_url}',
+                'redirect_url': redirect_url,
                 'auto_redirect': True,
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
