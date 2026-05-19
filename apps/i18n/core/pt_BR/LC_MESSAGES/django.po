@@ -18,6 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "Username contains invalid characters: %(chars)s"
+msgstr "O nome de usuário contém caracteres inválidos: %(chars)s"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:358

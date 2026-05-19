@@ -57,6 +57,27 @@ def validate_password_for_ansible(password):
         )
 
 
+def get_account_username_forbidden_chars():
+    chars = settings.SECURITY_ACCOUNT_USERNAME_FORBIDDEN_CHARS
+    if chars is None:
+        chars = ''
+    return frozenset(chars)
+
+
+def validate_account_username(value):
+    if value is None:
+        return value
+
+    value = value.strip()
+    invalid_chars = [char for char in get_account_username_forbidden_chars() if char in value]
+    if invalid_chars:
+        invalid_chars = ''.join(sorted(invalid_chars))
+        raise serializers.ValidationError(
+            _("Username contains invalid characters: %(chars)s") % {'chars': invalid_chars}
+        )
+    return value
+
+
 def validate_ssh_key(ssh_key, passphrase=None):
     valid = validate_ssh_private_key(ssh_key, password=passphrase)
     if not valid:

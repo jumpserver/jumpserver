@@ -19,6 +19,9 @@ msgstr ""
 "X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://"
 "zhconvert.org\n"
 
+msgid "Username contains invalid characters: %(chars)s"
+msgstr "使用者名稱包含非法字元：%(chars)s"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:358
