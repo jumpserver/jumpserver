@@ -94,13 +94,13 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
         subject=subject,
         body=message,
         from_email=from_email,
-        to=recipient_list,
-        connection=get_email_connection(),
+        to=recipient_list
     )
     for attachment in attachment_list:
         email.attach_file(attachment)
+    email.send()
+    for attachment in attachment_list:
         os.remove(attachment)
-    return email.send()
 
 
 @shared_task(
