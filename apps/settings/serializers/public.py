@@ -92,6 +92,10 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     REMOTE_APP_STORE_URL = serializers.CharField()
     VENDOR = serializers.CharField()
 
+    AUTH_CERT = serializers.BooleanField()
+    AUTH_CERT_ENROLL = serializers.BooleanField()
+    AUTH_CERT_ENROLL_KEY_ALGO = serializers.CharField()
+
 
 class ServerInfoSerializer(serializers.Serializer):
     CURRENT_TIME = serializers.DateTimeField()
