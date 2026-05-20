@@ -178,6 +178,15 @@ class RDPFileClientProtocolURLMixin:
         return filename
 
     @staticmethod
+    def get_token_account_display(token):  #新增方法
+            try:
+                account = token.account_object
+            except Exception:
+                account = None
+            if account:
+                return account.full_username or account.username or account.name or token.account
+            return token.input_username or token.account    
+    @staticmethod
     def parse_env_bool(env_key, env_default, true_value, false_value):
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
@@ -192,7 +201,7 @@ class RDPFileClientProtocolURLMixin:
         if connect_method_dict is None:
             raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
-        account = token.account or token.input_username
+        account = self.get_token_account_display(token)  #修改account
         datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
         name = account + '@' + asset.name + '[' + datetime + ']'
         data = {
