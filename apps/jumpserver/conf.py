@@ -269,6 +269,10 @@ class Config(dict):
         'AUTH_CUSTOM_SSO_FILE_MD5': '',
         'AUTH_CUSTOM_SSO_QUERY_PARAMS': 'token',
 
+        'AUTH_CERT': False,
+        'AUTH_CERT_ENROLL': True,
+        'AUTH_CERT_ENROLL_KEY_ALGO': 'SM2',
+
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
 

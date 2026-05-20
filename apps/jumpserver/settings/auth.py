@@ -5,6 +5,7 @@ import os
 import ldap
 
 from ..const import CONFIG, PROJECT_DIR, BASE_DIR
+from . import exist_or_default
 
 # OTP settings
 OTP_ISSUER_NAME = CONFIG.OTP_ISSUER_NAME
@@ -379,3 +380,31 @@ if AUTH_CUSTOM_SSO and AUTH_CUSTOM_SSO_FILE_MD5:
         # 如果启用了自定义 SSO 认证，但文件 MD5 不匹配，则不启用自定义 SSO 认证
         AUTH_CUSTOM_SSO = False
 AUTH_CUSTOM_SSO_QUERY_PARAMS = [q.strip() for q in CONFIG.AUTH_CUSTOM_SSO_QUERY_PARAMS.split(',')]
+
+
+# 开启证书认证
+AUTH_CERT = CONFIG.AUTH_CERT
+# 证书认证前端 SDK 文件路径
+AUTH_CERT_VENDOR_SDK_JS_FILE = exist_or_default(
+    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_sdk.js'), None
+)
+# 抽象方法名 → 厂商 SDK 实际方法名
+AUTH_CERT_VENDOR_SDK_MAP_FILE = exist_or_default(
+    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_sdk_map.yaml'), None
+)
+# 是否开启证书签发
+AUTH_CERT_ENROLL = CONFIG.AUTH_CERT_ENROLL
+# 签发证书时客户端生成密钥对的算法 SM2 或 RSA
+AUTH_CERT_ENROLL_KEY_ALGO = CONFIG.AUTH_CERT_ENROLL_KEY_ALGO
+# 用户名字段
+AUTH_CERT_ENROLL_SUBJECT_CN = 'id'
+# 组织/公司名字段
+AUTH_CERT_ENROLL_SUBJECT_O = CONFIG.VENDOR
+# CA 根证书私钥文件路径
+CA_KEY_FILE = exist_or_default(
+    os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_key.pem'), None
+)
+# CA 根证书文件路径，可用于认证时验证客户端证书，签发用户证书
+CA_CERT_FILE = exist_or_default(
+    os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_cert.pem'), None
+)
