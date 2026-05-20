@@ -385,12 +385,12 @@ AUTH_CUSTOM_SSO_QUERY_PARAMS = [q.strip() for q in CONFIG.AUTH_CUSTOM_SSO_QUERY_
 # 开启证书认证
 AUTH_CERT = CONFIG.AUTH_CERT
 # 证书认证前端 SDK 文件路径
-AUTH_CERT_VENDOR_SDK_JS_FILE = exist_or_default(
-    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_sdk.js'), None
+AUTH_CERT_VENDOR_DRIVER_FILE = exist_or_default(
+    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver.js'), None
 )
 # 抽象方法名 → 厂商 SDK 实际方法名
-AUTH_CERT_VENDOR_SDK_MAP_FILE = exist_or_default(
-    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_sdk_map.yaml'), None
+AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE = exist_or_default(
+    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver_config.yaml'), None
 )
 # 是否开启证书签发
 AUTH_CERT_ENROLL = CONFIG.AUTH_CERT_ENROLL

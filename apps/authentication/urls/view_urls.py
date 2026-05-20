@@ -81,10 +81,12 @@ urlpatterns = [
     path('openid/', include(('authentication.backends.oidc.urls', 'authentication'), namespace='openid')),
     path('saml2/', include(('authentication.backends.saml2.urls', 'authentication'), namespace='saml2')),
     path('oauth2/', include(('authentication.backends.oauth2.urls', 'authentication'), namespace='oauth2')),
+    path('cert/', include(('authentication.backends.cert.urls', 'authentication'), namespace='cert')),
 
     path('captcha/', include('captcha.urls')),
 
     path('oauth2-provider/', include(('authentication.backends.oauth2_provider.urls', 'authentication'), namespace='oauth2-provider')),
     path('user-agreement/', views.UserAgreementView.as_view(), name='user-agreement'),
     path('privacy-policy/', views.PrivacyPolicyView.as_view(), name='privacy-policy'),
+
 ]
