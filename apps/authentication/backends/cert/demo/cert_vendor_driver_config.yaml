@@ -1,0 +1,116 @@
+# USB Key 厂商 SDK 方法名映射
+# 格式: JumpServer 抽象方法名: 厂商 SDK 实际方法名
+# 厂商 SDK 挂载在 window 对象上，或通过 new 实例化后挂载
+
+# Driver 初始化
+newUKeyAPI: 
+  description: 初始化 USB Key SDK，获取 SDK 对象实例
+  method: 
+    call: UKeyAPI
+
+# 基本操作
+checkInstall: 
+  description: 检查 USB Key 驱动是否安装
+  method: 
+    call: UKey_CheckInstall
+  
+getCertInfo: 
+  description: 获取证书列表（包含证书信息）
+  method: 
+    call: UKey_GetCertInfoList
+  fields:
+    - ID: 
+        key: ID
+        label: 证书ID
+    - CN: 
+        key: CN
+        label: CN
+    - DN:
+        key: DN
+        label: DN
+    - SN:
+        key: SN
+        label: SN
+    - bef: 
+        key: bef
+        label: bef
+    - aft: 
+        key: aft
+        label: aft
+    - isSM: 
+        key: isSM
+        label: 是否国密证书
+    - DEVSN:
+        key: DEVSN
+        label: 设备序列号
+  showFields: [ID, CN, DN, SN, bef, aft, isSM, DEVSN]
+
+
+showBasicInfo:
+  # 基础加密操作
+  - version: 
+      label: 版本
+      method: 
+        call: UKey_GetVersion
+      description: 获取 USB Key 驱动版本
+
+  - devSN: 
+      label: 设备序列号
+      method: 
+        call: UKey_GetDevSN
+      description: 获取设备序列号
+
+# 制证流程（Enrollment）
+# 步骤顺序：1 → 2 → 3 → 4（服务端签发）→ 5
+enrollSteps:
+  # 制证前清除旧证书，避免容器满
+  - deleteCertificate: 
+      description: 删除已有证书
+      method: 
+        call: UKey_DeleteCons
+  # 在 USB Key 硬件内生成密钥对（私钥永不离开设备）
+  - generateKeyPair: 
+      description: 生成密钥对
+      method: 
+        call: UKey_GenKeyPair
+        params: 
+          - key: asymAlg
+            label: 非对称算法
+            type: int
+            default: 1
+            fromConfig: AUTH_CERT_ENROLL_KEY_ALGO
+            options: 
+              SM2: 1
+              RSA1024: 2
+              RSA2048: 3
+
+  # 用 USB Key 内的私钥生成 CSR（包含公钥 + Subject 信息）
+  - generateCSR: 
+      description: 生成证书签名请求 (CSR)
+      method: 
+        call: UKey_GenCSR
+        params:
+          - key: dn
+            label: 证书主题 (Subject DN)
+            type: string
+            items: 
+              - key: CN
+                label: 名称 (CN)
+                fromObject: 'id'
+
+  - signCert:
+      description: 证书签发
+  # 服务端 CA 签发证书后，将证书写入 USB Key
+  - writeCertificate: 
+      description: 写入证书
+      method: 
+        call: UKey_ImportCertAndKeyPair
+        params:
+          - key: SignCert
+            type: string
+            default: ''
+            fromSignedCert: true
+          - key: EncCert
+            default: ''
+          - key: EncKeyPair
+            default: ''
