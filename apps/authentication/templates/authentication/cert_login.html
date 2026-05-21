@@ -225,10 +225,7 @@
         {# signature 由 JS 对挑战码签名后填入，不展示给用户 #}
         {{ form.signature }}
 
-        <div class="challenge-box" id="cert-challenge-box" data-challenge="{{ challenge }}">
-            <div class="challenge-label">挑战码（由 USB Key 签名）</div>
-            <div class="challenge-value" id="cert-challenge-value">{{ challenge }}</div>
-        </div>
+        <div id="cert-challenge-box" data-challenge="{{ challenge }}" style="display:none;"></div>
 
         <div class="form-group">
             <button type="submit" id="cert-login-btn" class="btn btn-transparent" disabled>
@@ -262,7 +259,7 @@
         signing:      '正在对挑战码签名...',
         signFail:     '签名失败',
         certFail:     '获取证书失败',
-        noCN:         '未获取到 CN 信息，请联系管理员进行制证处理'
+        noCN:         '未检测到证书，请联系管理员制证'
     };
 
     /* ── API URLs ───────────────────────────────────────────── */
