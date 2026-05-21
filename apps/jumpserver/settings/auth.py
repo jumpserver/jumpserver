@@ -402,9 +402,13 @@ AUTH_CERT_ENROLL_SUBJECT_CN = 'id'
 AUTH_CERT_ENROLL_SUBJECT_O = CONFIG.VENDOR
 # CA 根证书私钥文件路径
 CA_KEY_FILE = exist_or_default(
-    os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_key.pem'), None
+    os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_root.key'), None
 )
 # CA 根证书文件路径，可用于认证时验证客户端证书，签发用户证书
 CA_CERT_FILE = exist_or_default(
-    os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_cert.pem'), None
+    os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_root.crt'), None
 )
+# CA 私鑰密码（若私鑰带密码保护，不含密码则留空）
+CA_KEY_PASS = CONFIG.CA_KEY_PASS
+# GmSSL 二进制路径（国密命令行工具，用于签发 SM2 证书）
+GMSSL_BIN = 'gmssl'

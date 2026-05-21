@@ -3,6 +3,7 @@ import base64
 import os
 import subprocess
 import tempfile
+from django.utils.translation import gettext_lazy as _
 
 import yaml
 from django.conf import settings
@@ -44,29 +45,56 @@ class CertVendorDriverConfigAPIView(APIView):
 class CertEnrollAPIView(APIView):
     permission_classes = (OnlySuperUser,)
 
+    # SM2 曲线 OID：1.2.156.10197.1.301
+    # DER 编码：06 08 2a 81 1c cf 55 01 82 2d
+    _SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
+
     def post(self, request):
         csr_raw = request.data.get('csr')
         if not csr_raw:
-            return Response(data={'error': 'CSR is required'}, status=400)
+            data = {'error': _('CSR is required')}
+            return Response(data=data, status=400)
+
         try:
-            csr_pem = self._normalize_csr_to_pem(csr_raw)
-            signed_cert = self._sign_csr_with_openssl(csr_pem)
+            singed_cert = self.sign_cert(csr_raw)
         except Exception as e:
-            logger.error("Certificate enrollment failed, error: {}".format(str(e)))
-            return Response(data={'error': str(e)}, status=400)
+            error = '{}: {}'.format(_('Certificate signing failed'), str(e))
+            logger.error(error, exc_info=True)
+            return Response(data={'error': error}, status=400)
+
+        data = {'signed_cert': singed_cert}
+        return Response(data=data, status=200)
+
+    def sign_cert(self, csr_raw):
+        # 记录输入是否含 PEM 头，用于决定输出格式
+        if isinstance(csr_raw, bytes):
+            has_pem_header = csr_raw.lstrip().startswith(b'-----BEGIN')
         else:
-            return Response(data={'signed_cert': signed_cert}, status=200)
+            has_pem_header = csr_raw.strip().startswith('-----BEGIN')
+
+        csr_pem = self._normalize_csr_to_pem(csr_raw)
+        if self._is_sm2_csr(csr_pem):
+            singed_cert = self.sign_cert_by_gmssl(csr_pem)
+        else:
+            singed_cert = self.sign_cert_by_other(csr_pem)
+
+        # 输入不含 PEM 头时，返回裸 base64（去掉首尾标识行）
+        if not has_pem_header:
+            lines = singed_cert.strip().splitlines()
+            singed_cert = ''.join(
+                ln for ln in lines if not ln.startswith('-----')
+            )
+        return singed_cert
 
     def _normalize_csr_to_pem(self, csr_data):
         """
-        将 USB Key SDK 返回的 CSR 统一转换为 PEM 字符串。
-        SDK 可能返回三种格式：
-          1. 标准 PEM（含 -----BEGIN CERTIFICATE REQUEST----- 头）
-          2. 裸 base64 字符串（无 PEM 头，国密 SDK 常见）
+        将 SDK 返回的 CSR 统一转换成标准 PEM 字符串。
+        支持三种输入格式：
+          1. 已经是标准 PEM（含 -----BEGIN CERTIFICATE REQUEST----- 头）
+          2. 裸 base64 字符串（无 PEM 头，国密 USB Key SDK 常见）
           3. 原始 DER 二进制 bytes
         """
         if isinstance(csr_data, bytes):
-            # bytes：先判断是否已是 PEM，否则当作 DER 转 PEM
             if csr_data.lstrip().startswith(b'-----BEGIN'):
                 return csr_data.decode('utf-8')
             b64 = base64.b64encode(csr_data).decode('ascii')
@@ -74,12 +102,10 @@ class CertEnrollAPIView(APIView):
             csr_data = csr_data.strip()
             if csr_data.startswith('-----BEGIN'):
                 return csr_data
-            # 裸 base64：去除所有空白后重新分行
+            # 裸 base64：去除空白后校验并重新分行
             b64 = ''.join(csr_data.split())
-            # 校验是否合法 base64
             base64.b64decode(b64, validate=True)
 
-        # 以 64 字符为一行，包装成 PEM
         lines = [b64[i:i + 64] for i in range(0, len(b64), 64)]
         return (
             '-----BEGIN CERTIFICATE REQUEST-----\n'
@@ -87,82 +113,37 @@ class CertEnrollAPIView(APIView):
             + '\n-----END CERTIFICATE REQUEST-----\n'
         )
 
-    def _extract_spki_pem_from_csr_pem(self, csr_pem):
+    def _is_sm2_csr(self, csr_pem):
         """
-        从 CSR PEM 中直接提取 SubjectPublicKeyInfo，不验证 CSR 自签名。
-        国密 USB Key SDK 生成的 SM2 CSR 的自签名 SM2-ID 与 OpenSSL 验证时使用的不一致，
-        会导致 OpenSSL 3.x 拒绝签发（"CSR self-signature does not match"）。
-        用 -force_pubkey 提供公钥后 OpenSSL 会跳过自签名校验。
-
-        PKCS#10 DER 结构:
-          SEQUENCE (CertificationRequest)
-            SEQUENCE (CertificationRequestInfo)
-              INTEGER (version)
-              SEQUENCE (subject)
-              SEQUENCE (subjectPublicKeyInfo)  ← 目标
-              [0] (attributes)
-            SEQUENCE (signatureAlgorithm)
-            BIT STRING (signature)
+        通过查找 SM2 曲线 OID 字节序列判断 CSR 是否使用 SM2 算法，
+        无需调用外部工具。
         """
         pem_lines = csr_pem.strip().splitlines()
         b64 = ''.join(ln for ln in pem_lines if not ln.startswith('-----'))
         der = base64.b64decode(b64)
+        return self._SM2_OID_DER in der
 
-        def read_tlv(data, pos):
-            """返回 (value_start, value_end)，不校验 tag。"""
-            pos += 1  # skip tag byte
-            lb = data[pos]; pos += 1
-            if lb & 0x80:
-                n = lb & 0x7f
-                length = int.from_bytes(data[pos:pos + n], 'big')
-                pos += n
-            else:
-                length = lb
-            return pos, pos + length
+    def sign_cert_by_other(self, csr_pem):
+        pass
 
-        # Enter CertificationRequest SEQUENCE
-        vstart, _ = read_tlv(der, 0)
-        pos = vstart
-
-        # Enter CertificationRequestInfo SEQUENCE
-        vstart, _ = read_tlv(der, pos)
-        pos = vstart
-
-        # Skip version INTEGER
-        _, vend = read_tlv(der, pos)
-        pos = vend
-
-        # Skip subject SEQUENCE
-        _, vend = read_tlv(der, pos)
-        pos = vend
-
-        # Capture subjectPublicKeyInfo TLV (包含 tag 本身)
-        spki_start = pos
-        _, vend = read_tlv(der, pos)
-        spki_der = der[spki_start:vend]
-
-        b64_spki = base64.b64encode(spki_der).decode('ascii')
-        lines = [b64_spki[i:i + 64] for i in range(0, len(b64_spki), 64)]
-        return '-----BEGIN PUBLIC KEY-----\n' + '\n'.join(lines) + '\n-----END PUBLIC KEY-----\n'
-
-    def _sign_csr_with_openssl(self, csr_pem):
+    def sign_cert_by_gmssl(self, csr_pem):
         """
-        调用 OpenSSL CLI 签发证书，完整支持 SM2/SM3（cryptography 库 Python API 不支持）。
-        使用 -force_pubkey 绕过 OpenSSL 3.x 对 SM2 CSR 自签名的严格校验。
-        # openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:SM2 -out ca_key.pem
-        # openssl req -new -x509 -key ca_key.pem -out ca_cert.pem -days 3650 -subj "/C=CN/O=JumpServer/CN=JumpServer Root CA"
+        使用 gmssl reqsign 签发 SM2 证书。
+        命令示例：
+          gmssl reqsign -in user.csr -days 365 -cacert root.crt -key root.key -pass 123456 -out user.crt
         """
+        gmssl_bin = getattr(settings, 'GMSSL_BIN', None)
         ca_key_path = getattr(settings, 'CA_KEY_FILE', None)
         ca_cert_path = getattr(settings, 'CA_CERT_FILE', None)
+        ca_key_pass = str(getattr(settings, 'CA_KEY_PASS', '') or '')
         if not ca_key_path or not os.path.isfile(ca_key_path):
             raise FileNotFoundError('CA_KEY_FILE not configured or not found')
         if not ca_cert_path or not os.path.isfile(ca_cert_path):
             raise FileNotFoundError('CA_CERT_FILE not configured or not found')
 
         validity_days = str(getattr(settings, 'AUTH_CERT_ENROLL_VALIDITY_DAYS', 365))
-        pubkey_pem = self._extract_spki_pem_from_csr_pem(csr_pem)
 
-        csr_file = pubkey_file = cert_file = None
+        csr_file = cert_file = None
         try:
             with tempfile.NamedTemporaryFile(
                 suffix='.csr', mode='w', delete=False, encoding='utf-8'
@@ -170,36 +151,32 @@ class CertEnrollAPIView(APIView):
                 f.write(csr_pem)
                 csr_file = f.name
 
-            with tempfile.NamedTemporaryFile(
-                suffix='.pub.pem', mode='w', delete=False, encoding='utf-8'
-            ) as f:
-                f.write(pubkey_pem)
-                pubkey_file = f.name
-
             fd, cert_file = tempfile.mkstemp(suffix='.crt')
             os.close(fd)
 
+            cmd = [
+                gmssl_bin, 'reqsign',
+                '-in', csr_file,
+                '-days', validity_days,
+                '-cacert', ca_cert_path,
+                '-key', ca_key_path,
+                '-out', cert_file,
+            ]
+            if ca_key_pass:
+                cmd += ['-pass', ca_key_pass]
+
             result = subprocess.run(
-                [
-                    'openssl', 'x509', '-req',
-                    '-in', csr_file,
-                    '-force_pubkey', pubkey_file,   # 提供公钥并跳过 CSR 自签名校验
-                    '-CA', ca_cert_path,
-                    '-CAkey', ca_key_path,
-                    '-CAcreateserial',
-                    '-out', cert_file,
-                    '-days', validity_days,
-                ],
+                cmd,
                 capture_output=True,
                 text=True,
-                timeout=30,
+                timeout=30
             )
             if result.returncode != 0:
-                raise RuntimeError('OpenSSL signing failed: {}'.format(result.stderr.strip()))
+                raise RuntimeError('gmssl reqsign failed: {}'.format(result.stderr.strip()))
 
             with open(cert_file, 'r', encoding='utf-8') as f:
                 return f.read()
         finally:
-            for path in (csr_file, pubkey_file, cert_file):
+            for path in (csr_file, cert_file):
                 if path and os.path.exists(path):
                     os.unlink(path)
