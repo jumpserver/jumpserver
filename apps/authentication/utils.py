@@ -145,5 +145,11 @@ def get_auth_methods():
             'enabled': settings.AUTH_PASSKEY,
             'url': reverse('api-auth:passkey-login'),
             'logo': static('img/login_passkey.png')
+        },
+        {
+            'name': _('CERT'),
+            'enabled': settings.AUTH_CERT,
+            'url': reverse('authentication:cert:cert-login'),
+            'logo': static('img/login_cert.png')
         }
     ]

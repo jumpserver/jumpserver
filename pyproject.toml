@@ -34,6 +34,7 @@ dependencies = [
     'pycryptodomex==3.23.0',
     'phonenumbers==8.13.17',
     'gmssl==3.2.2',
+    'gmssl-python==2.2.1',
     'itsdangerous==1.1.0',
     'pyotp==2.8.0',
     'pynacl==1.6.2',

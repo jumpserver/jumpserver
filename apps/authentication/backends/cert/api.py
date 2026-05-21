@@ -10,6 +10,7 @@ from django.conf import settings
 from django.http import FileResponse, Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from common.permissions import OnlySuperUser
 from common.utils import get_logger
 
@@ -21,7 +22,7 @@ logger = get_logger(__name__)
 
 
 class VendorDriverFileAPIView(APIView):
-    permission_classes = (OnlySuperUser,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         js_file = getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_FILE', None)
@@ -31,7 +32,7 @@ class VendorDriverFileAPIView(APIView):
 
 
 class CertVendorDriverConfigAPIView(APIView):
-    permission_classes = (OnlySuperUser,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         config_file = getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE', None)
@@ -180,3 +181,7 @@ class CertEnrollAPIView(APIView):
             for path in (csr_file, cert_file):
                 if path and os.path.exists(path):
                     os.unlink(path)
+
+
+class CertLoginFormView():
+    pass

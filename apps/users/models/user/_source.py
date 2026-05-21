@@ -24,6 +24,7 @@ class Source(models.TextChoices):
     lark = "lark", _("Lark")
     slack = "slack", _("Slack")
     custom = "custom", "Custom"
+    cert = "cert", _("Certificate")
 
     @classmethod
     def as_dict(cls):
@@ -56,6 +57,7 @@ class SourceMixin:
         Source.slack: [settings.AUTH_BACKEND_SLACK],
         Source.dingtalk: [settings.AUTH_BACKEND_DINGTALK],
         Source.custom: [settings.AUTH_BACKEND_CUSTOM],
+        Source.cert: [settings.AUTH_BACKEND_CERT],
     }
 
     @classmethod
@@ -74,6 +76,7 @@ class SourceMixin:
             cls.Source.slack: settings.AUTH_SLACK,
             cls.Source.dingtalk: settings.AUTH_DINGTALK,
             cls.Source.custom: settings.AUTH_CUSTOM,
+            cls.Source.cert: settings.AUTH_CERT,
         }
         return [str(k) for k, v in mapper.items() if v]
 

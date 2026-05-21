@@ -4,6 +4,7 @@
 from django.db.transaction import non_atomic_requests
 from django.urls import path, include
 
+
 from users import views as users_view
 from .. import views
 
@@ -81,7 +82,7 @@ urlpatterns = [
     path('openid/', include(('authentication.backends.oidc.urls', 'authentication'), namespace='openid')),
     path('saml2/', include(('authentication.backends.saml2.urls', 'authentication'), namespace='saml2')),
     path('oauth2/', include(('authentication.backends.oauth2.urls', 'authentication'), namespace='oauth2')),
-    path('cert/', include(('authentication.backends.cert.urls', 'authentication'), namespace='cert')),
+    path('cert/', include(('authentication.backends.cert.view_urls', 'authentication'), namespace='cert')),
 
     path('captcha/', include('captcha.urls')),
 

@@ -291,6 +291,7 @@ AUTH_BACKEND_OAUTH2 = 'authentication.backends.oauth2.OAuth2Backend'
 AUTH_BACKEND_TEMP_TOKEN = 'authentication.backends.token.TempTokenAuthBackend'
 AUTH_BACKEND_CUSTOM = 'authentication.backends.custom.CustomAuthBackend'
 AUTH_BACKEND_PASSKEY = 'authentication.backends.passkey.PasskeyAuthBackend'
+AUTH_BACKEND_CERT = 'authentication.backends.cert.CertBackend'
 AUTHENTICATION_BACKENDS = [
     # 只做权限校验
     RBAC_BACKEND,
@@ -303,7 +304,9 @@ AUTHENTICATION_BACKENDS = [
     AUTH_BACKEND_WECOM, AUTH_BACKEND_DINGTALK, AUTH_BACKEND_FEISHU, AUTH_BACKEND_LARK, AUTH_BACKEND_SLACK,
     # Token模式
     AUTH_BACKEND_AUTH_TOKEN, AUTH_BACKEND_SSO, AUTH_BACKEND_CUSTOM_SSO, AUTH_BACKEND_TEMP_TOKEN,
-    AUTH_BACKEND_PASSKEY
+    AUTH_BACKEND_PASSKEY,
+    # Cert模式
+    AUTH_BACKEND_CERT
 ]
 
 
@@ -412,3 +415,5 @@ CA_CERT_FILE = exist_or_default(
 CA_KEY_PASS = CONFIG.CA_KEY_PASS
 # GmSSL 二进制路径（国密命令行工具，用于签发 SM2 证书）
 GMSSL_BIN = 'gmssl'
+# 证书认证登录页 Challenge 在 Redis 中的存活时间（秒），默认 5 分钟
+AUTH_CERT_CHALLENGE_TTL = int(CONFIG.AUTH_CERT_CHALLENGE_TTL)

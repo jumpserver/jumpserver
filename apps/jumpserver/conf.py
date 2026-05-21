@@ -273,6 +273,7 @@ class Config(dict):
         'AUTH_CERT_ENROLL': True,
         'AUTH_CERT_ENROLL_KEY_ALGO': 'SM2',
         'CA_KEY_PASS': '',
+        'AUTH_CERT_CHALLENGE_TTL': 300,
 
         # 临时密码
         'AUTH_TEMP_TOKEN': False,

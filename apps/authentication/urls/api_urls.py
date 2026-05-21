@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from .. import api
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
-from ..backends.cert.urls import urlpatterns as cert_urlpatterns
+from ..backends.cert.api_urls import urlpatterns as cert_api_urlpatterns
 
 app_name = 'authentication'
 router = DefaultRouter()
@@ -57,4 +57,4 @@ if settings.AUTH_CUSTOM_SSO:
 urlpatterns += router.urls + passkey_urlpatterns
 
 if settings.AUTH_CERT:
-    urlpatterns += cert_urlpatterns
+    urlpatterns += cert_api_urlpatterns

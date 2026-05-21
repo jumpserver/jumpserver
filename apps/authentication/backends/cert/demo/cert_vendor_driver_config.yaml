@@ -13,7 +13,47 @@ checkInstall:
   description: 检查 USB Key 驱动是否安装
   method: 
     call: UKey_CheckInstall
-  
+
+# 获取用户名
+getCertCN: 
+  description: 获取 USB Key 内置用户名
+  method: 
+    call: UKey_GetCertInfo
+    params:
+      - key: CERT_TYPE_SIGN
+        default: 1
+      - key: CERT_SUBJECT_CN
+        default: 9
+
+# 校验 PIN
+checkPIN:
+  description: 校验 PIN 是否正确
+  method: 
+    call: UKey_VerifyPIN
+    params:
+      - key: pin
+        fromPIN: true
+
+# 获取公钥
+getCert: 
+  description: 获取证书
+  method: 
+    call: UKey_GetCert
+    params:
+      - key: CERT_TYPE_SIGN
+        default: 1
+
+# 签名数据
+signData: 
+  description: 使用 USB Key 内的私钥对数据进行签名
+  method: 
+    call: UKey_SignData
+    params:
+      - key: SM3
+        value: 1
+      - key: challenge_code 
+        fromChallengeCode: true
+
 getCertInfo: 
   description: 获取证书列表（包含证书信息）
   method: 
@@ -21,10 +61,10 @@ getCertInfo:
   fields:
     - ID: 
         key: ID
-        label: 证书ID
+        label: 证书 ID
     - CN: 
         key: CN
-        label: CN
+        label: CN (ID)
     - DN:
         key: DN
         label: DN
@@ -39,7 +79,7 @@ getCertInfo:
         label: aft
     - isSM: 
         key: isSM
-        label: 是否国密证书
+        label: 国密证书
     - DEVSN:
         key: DEVSN
         label: 设备序列号
@@ -96,7 +136,10 @@ enrollSteps:
             items: 
               - key: CN
                 label: 名称 (CN)
-                fromObject: 'id'
+                fromObject: 'username'
+              - key: OU
+                label: 其他信息
+                fromObject: 'name'
 
   - signCert:
       description: 证书签发
