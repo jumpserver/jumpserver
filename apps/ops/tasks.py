@@ -3,10 +3,10 @@ import datetime
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
-from django.conf import settings
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
@@ -69,7 +69,7 @@ def run_ops_job(job_id):
         execution = job.create_execution()
         execution.creator = job.creator
         if job.periodic_variable:
-            execution.parameters = JobExecutionSerializer.validate_parameters(job.periodic_variable)
+            execution.parameters = JobExecutionSerializer().validate_parameters(job.periodic_variable)
         _run_ops_job_execution(execution)
 
 

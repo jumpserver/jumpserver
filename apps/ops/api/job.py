@@ -134,7 +134,7 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     def run_job(self, job, serializer):
         execution = job.create_execution()
         if self._parameters:
-            execution.parameters = JobExecutionSerializer.validate_parameters(self._parameters)
+            execution.parameters = JobExecutionSerializer().validate_parameters(self._parameters)
         execution.creator = self.request.user
         execution.save()
         assets = merge_nodes_and_assets(job.nodes.all(), job.assets.all(), self.request.user)
