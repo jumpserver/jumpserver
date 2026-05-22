@@ -388,21 +388,15 @@ AUTH_CUSTOM_SSO_QUERY_PARAMS = [q.strip() for q in CONFIG.AUTH_CUSTOM_SSO_QUERY_
 # 开启证书认证
 AUTH_CERT = CONFIG.AUTH_CERT
 # 证书认证前端 SDK 文件路径
-AUTH_CERT_VENDOR_DRIVER_FILE = exist_or_default(
+AUTH_CERT_VENDOR_DRIVER_JS_FILE = exist_or_default(
     os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver.js'), None
 )
 # 抽象方法名 → 厂商 SDK 实际方法名
 AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE = exist_or_default(
-    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver_config.yaml'), None
+    # os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver_config.yaml'), None
+    os.path.join(PROJECT_DIR, 'apps', 'authentication', 'backends', 'cert', 'demo', 'cert_vendor_driver_config.yaml'), None
 )
-# 是否开启证书签发
-AUTH_CERT_ENROLL = CONFIG.AUTH_CERT_ENROLL
-# 签发证书时客户端生成密钥对的算法 SM2 或 RSA
-AUTH_CERT_ENROLL_KEY_ALGO = CONFIG.AUTH_CERT_ENROLL_KEY_ALGO
-# 用户名字段
-AUTH_CERT_ENROLL_SUBJECT_CN = 'id'
-# 组织/公司名字段
-AUTH_CERT_ENROLL_SUBJECT_O = CONFIG.VENDOR
+
 # CA 根证书私钥文件路径
 CA_KEY_FILE = exist_or_default(
     os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_root.key'), None
@@ -413,7 +407,3 @@ CA_CERT_FILE = exist_or_default(
 )
 # CA 私鑰密码（若私鑰带密码保护，不含密码则留空）
 CA_KEY_PASS = CONFIG.CA_KEY_PASS
-# GmSSL 二进制路径（国密命令行工具，用于签发 SM2 证书）
-GMSSL_BIN = 'gmssl'
-# 证书认证登录页 Challenge 在 Redis 中的存活时间（秒），默认 5 分钟
-AUTH_CERT_CHALLENGE_TTL = int(CONFIG.AUTH_CERT_CHALLENGE_TTL)

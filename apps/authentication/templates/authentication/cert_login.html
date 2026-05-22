@@ -297,24 +297,36 @@
         this.api = new window[ctorName]();
     }
 
+    /* Resolve a single param value: replace {{ scope.key }} placeholders from context.
+       context shape: { output: {}, input: {}, user: {}, ... }
+       Unresolved placeholders are replaced with empty string. */
+    function resolveParamValue(value, context) {
+        if (typeof value !== 'string') return value;
+        return value.replace(/\{\{\s*([\w.]+)\s*\}\}/g, function (_, path) {
+            var parts = path.split('.');
+            var obj   = context;
+            for (var i = 0; i < parts.length; i++) {
+                if (obj == null) return '';
+                obj = obj[parts[i]];
+            }
+            return (obj !== undefined && obj !== null) ? String(obj) : '';
+        });
+    }
+
     /* Call a vendor method by its abstract config key, returns a Promise.
-       Params are read from config[key].method.params in order, using each item's
-       'default' value as the argument passed to the SDK method.
-       runtimeValues: optional object supplying values for special param sources:
-         { pin: <string> }  — used when a param has fromPIN: true */
-    UsbKeyManager.prototype.call = function (abstractKey, runtimeValues) {
+       Params are read from config[key].method.params in order.
+       Template placeholders ({{ scope.key }}) in param values are resolved
+       from context: { output, input, user, ... } */
+    UsbKeyManager.prototype.call = function (abstractKey, context) {
         var cfg    = this.config[abstractKey];
         var method = cfg && cfg.method && cfg.method.call;
         if (!method || typeof this.api[method] !== 'function') {
             return Promise.reject(new Error('Method not found: ' + method));
         }
-        var rv = runtimeValues || {};
-        // Build ordered arg list: use runtime value when a special source key is set,
-        // fall back to 'default', then 'value' (both are valid static param spellings)
+        var ctx = context || {};
         var args = ((cfg.method.params) || []).map(function (p) {
-            if (p.fromPIN           && rv.pin           !== undefined) return rv.pin;
-            if (p.fromChallengeCode && rv.challengeCode !== undefined) return rv.challengeCode;
-            return p['default'] !== undefined ? p['default'] : p['value'];
+            var raw = p['value'] !== undefined ? p['value'] : p['default'];
+            return resolveParamValue(raw, ctx);
         });
         try {
             return Promise.resolve(this.api[method].apply(this.api, args));
@@ -323,9 +335,7 @@
         }
     };
 
-    /* Get CN string from the USB Key via config's getCertCN method.
-       The SDK method is called with params from config in order,
-       and returns the username string directly. */
+    /* Get CN string from the USB Key via config's getCertCN method. */
     UsbKeyManager.prototype.getCertCN = function () {
         return this.call('getCertCN').then(function (result) {
             return result || null;
@@ -333,11 +343,16 @@
     };
 
     /* Verify the PIN entered by the user.
-       Params with fromPIN:true receive the actual pin string at runtime.
+       Success is determined by config.checkPIN.method.result.success if defined,
+       otherwise falls back to treating 0 / true as success.
        Returns a Promise<boolean>. */
     UsbKeyManager.prototype.checkPIN = function (pinValue) {
-        return this.call('checkPIN', { pin: pinValue }).then(function (result) {
-            // Treat 0 (success code) or truthy as verified
+        var self = this;
+        return this.call('checkPIN', { input: { login_pin: pinValue } }).then(function (result) {
+            var resultCfg = ((self.config.checkPIN || {}).method || {}).result;
+            if (resultCfg && 'success' in resultCfg) {
+                return result === resultCfg.success;
+            }
             return result === 0 || result === true || result === 'true';
         }).catch(function () { return false; });
     };
@@ -345,18 +360,17 @@
     /* Get certificate string from the USB Key via config's getCert method.
        Returns a Promise<string|null>. */
     UsbKeyManager.prototype.getCert = function () {
-        return this.call('getCert').then(function (result) {
+        return this.call('getCert', {}).then(function (result) {
             return result || null;
         }).catch(function () { return null; });
     };
 
     /* Sign the challenge code with the USB Key's private key.
        The challenge is base64-encoded before being passed to the SDK.
-       Params with fromChallengeCode:true receive the encoded value.
        Returns a Promise<string|null>. */
     UsbKeyManager.prototype.signData = function (challengeCode) {
         var encoded = btoa(challengeCode);
-        return this.call('signData', { challengeCode: encoded }).then(function (result) {
+        return this.call('signData', { output: { challenge_code: encoded } }).then(function (result) {
             return result || null;
         }).catch(function () { return null; });
     };
@@ -429,7 +443,7 @@
             }
 
             poll();
-            setInterval(poll, 2000);
+            setInterval(poll, 5000);
 
             // 5. Intercept form submit: PIN → signData → getCert → submit
             document.getElementById('cert-login-form').addEventListener('submit', function (evt) {
@@ -442,7 +456,10 @@
 
                 manager.checkPIN(pinValue)
                     .then(function (ok) {
-                        if (!ok) throw { msg: MSG.pinFail };
+                        if (!ok) {
+                            if (pinInput) { pinInput.value = ''; pinInput.focus(); }
+                            throw { msg: MSG.pinFail };
+                        }
                         setStatus('loading', MSG.signing);
                         return manager.signData(challengeCode);
                     })

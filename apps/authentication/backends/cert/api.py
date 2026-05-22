@@ -8,11 +8,15 @@ from django.utils.translation import gettext_lazy as _
 import yaml
 from django.conf import settings
 from django.http import FileResponse, Http404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from common.permissions import OnlySuperUser
 from common.utils import get_logger
+from .driver import cert_vd_cfg
+
 
 
 
@@ -24,22 +28,21 @@ logger = get_logger(__name__)
 class VendorDriverFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
+    @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
-        js_file = getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_FILE', None)
+        js_file = cert_vd_cfg.driver_js_file
         if not js_file or not os.path.isfile(js_file):
             raise Http404
-        return FileResponse(open(js_file, 'rb'), content_type='application/javascript')
+        response = FileResponse(open(js_file, 'rb'), content_type='application/javascript')
+        response['Cache-Control'] = 'public, max-age=3600'
+        return response
 
 
 class CertVendorDriverConfigAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
-        config_file = getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE', None)
-        if not config_file or not os.path.isfile(config_file):
-            raise Http404
-        with open(config_file, 'r', encoding='utf-8') as f:
-            data = yaml.safe_load(f) or {}
+        data = cert_vd_cfg.get_vendor_sdk_data()
         return Response(data)
 
 
@@ -133,16 +136,16 @@ class CertEnrollAPIView(APIView):
         命令示例：
           gmssl reqsign -in user.csr -days 365 -cacert root.crt -key root.key -pass 123456 -out user.crt
         """
-        gmssl_bin = getattr(settings, 'GMSSL_BIN', None)
-        ca_key_path = getattr(settings, 'CA_KEY_FILE', None)
-        ca_cert_path = getattr(settings, 'CA_CERT_FILE', None)
-        ca_key_pass = str(getattr(settings, 'CA_KEY_PASS', '') or '')
+        gmssl_bin = cert_vd_cfg.gmssl_bin
+        ca_key_path = cert_vd_cfg.ca_key_file
+        ca_cert_path = cert_vd_cfg.ca_cert_file
+        ca_key_pass = str(cert_vd_cfg.ca_key_pass)
         if not ca_key_path or not os.path.isfile(ca_key_path):
             raise FileNotFoundError('CA_KEY_FILE not configured or not found')
         if not ca_cert_path or not os.path.isfile(ca_cert_path):
             raise FileNotFoundError('CA_CERT_FILE not configured or not found')
 
-        validity_days = str(getattr(settings, 'AUTH_CERT_ENROLL_VALIDITY_DAYS', 365))
+        validity_days = str(cert_vd_cfg.enroll_validity_days)
 
         csr_file = cert_file = None
         try:
@@ -155,6 +158,10 @@ class CertEnrollAPIView(APIView):
             fd, cert_file = tempfile.mkstemp(suffix='.crt')
             os.close(fd)
 
+            # https://github.com/GmSSL/GmSSL-Python#sm2数字证书
+            # gmssl_python 只支持SM2证书的解析和验证等功能，不支持SM2证书的签发和生成，
+            # 所以还是需要使用 gmssl bin 来执行 reqsign 命令行工具进行签发。虽然增加了对外部命令的依赖，
+            # 但这是目前最简单可靠的方案。
             cmd = [
                 gmssl_bin, 'reqsign',
                 '-in', csr_file,
@@ -181,7 +188,3 @@ class CertEnrollAPIView(APIView):
             for path in (csr_file, cert_file):
                 if path and os.path.exists(path):
                     os.unlink(path)
-
-
-class CertLoginFormView():
-    pass
