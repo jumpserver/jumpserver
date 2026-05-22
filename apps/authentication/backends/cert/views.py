@@ -14,6 +14,7 @@ from django.views.generic.edit import FormView
 from django.shortcuts import redirect
 
 from users.utils import redirect_user_first_login_or_index
+from authentication.mixins import AuthMixin 
 from .forms import CertLoginForm
 
 
@@ -25,7 +26,7 @@ _CHALLENGE_CACHE_KEY_PREFIX = 'cert_login_challenge'
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-class CertLoginView(FormView):
+class CertLoginView(AuthMixin, FormView):
     template_name = 'authentication/cert_login.html'
     form_class = CertLoginForm
     redirect_field_name = 'next'
@@ -81,9 +82,11 @@ class CertLoginView(FormView):
             # Refresh the challenge so it cannot be replayed
             challenge = self._generate_and_store_challenge()
             context = self.get_context_data(form=form, challenge=challenge)
+            self.send_auth_signal(success=False, reason=_('Invalid credentials'), username=username)
             return self.render_to_response(context)
 
         self._delete_stored_challenge()
         auth_login(self.request, user)
         redirect_url = redirect_user_first_login_or_index(self.request, self.redirect_field_name)
+        self.send_auth_signal(success=True, user=user)
         return redirect(redirect_url)
