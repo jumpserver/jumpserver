@@ -140,6 +140,11 @@ class UserSerializer(
         label=_("Can public key authentication"),
         read_only=True,
     )
+    can_cert_auth = serializers.BooleanField(
+        source="can_use_cert_login",
+        label=_("Can certificate authentication"),
+        read_only=True,
+    )
     is_face_code_set = serializers.BooleanField(
         label=_("Is face code set"),
         read_only=True,
@@ -191,7 +196,7 @@ class UserSerializer(
         fields_bool = [
             "is_superuser", "is_org_admin", "is_service_account",
             "is_valid", "is_expired", "is_active",  # 布尔字段
-            "is_otp_secret_key_bound", "can_public_key_auth",
+            "is_otp_secret_key_bound", "can_public_key_auth", "can_cert_auth",
             "mfa_enabled", "need_update_password", "is_face_code_set",
         ]
         # 包含不太常用的字段，可以没有

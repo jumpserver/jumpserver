@@ -27,14 +27,17 @@ showBasicInfo:
       label: 制证功能
       value: 启用
       description: 是否启用制证功能
+      only: admin
   - enrollKeyAlgo:
       label: 制证算法
       value: SM2
       description: 制证使用的密钥算法
+      only: admin
   - enrollValidityDays:
       label: 证书期限
       value: 365 天
       description: 制证使用的证书有效期
+      only: admin
 
 # ── 厂商 USB Key SDK 方法映射 ──────────────────────────────────────────────────
 # USB Key 厂商 SDK 方法名映射
@@ -72,6 +75,19 @@ adminResetPIN:
         value: '{{ input.admin_pin }}'
       - key: usb_key_pin
         value: '{{ output.default_pin }}'
+
+# 用户修改 PIN
+userChangePIN:
+  description: 用户修改 PIN
+  method:
+    call: UKey_ChangePIN
+    params:
+      - key: old_pin
+        value: '{{ input.old_pin }}'
+      - key: new_pin1
+        value: '{{ input.new_pin1 }}'
+    result:
+      success: 0
 
 # 清除证书
 deleteCert: 
