@@ -245,6 +245,12 @@ class CommonMixin:
             return user
 
         user_id = self.request.session.get('user_id')
+        auth_cert_ok = self.request.session.get('auth_cert')
+        if auth_cert_ok:
+            user = get_object_or_404(User, pk=user_id)
+            user.backend = self.request.session.get("auth_backend")
+            return user
+
         auth_ok = self.request.session.get('auth_password')
         auth_expired_at = self.request.session.get('auth_password_expired_at')
         auth_expired = auth_expired_at < time.time() if auth_expired_at else False
@@ -669,7 +675,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         LoginBlockUtil(user.username, ip).clean_failed_count()
         LoginIpBlockUtil(ip).clean_block_if_need()
         return user
-
+    
     def mark_password_ok(self, user, auto_login=False, auth_backend=None):
         request = self.request
         request.session['auth_password'] = 1
@@ -679,6 +685,12 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         if not auth_backend:
             auth_backend = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
 
+        request.session['auth_backend'] = auth_backend
+
+    def mark_cert_ok(self, user, auth_backend):
+        request = self.request
+        request.session['auth_cert'] = 1
+        request.session['user_id'] = str(user.id)
         request.session['auth_backend'] = auth_backend
 
     def check_oauth2_auth(self, user: User, auth_backend):
@@ -713,7 +725,8 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         keys = [
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
-            'user_session_id', 'user_log_id', 'can_send_notifications'
+            'user_session_id', 'user_log_id', 'can_send_notifications',
+            'auth_cert'
         ]
         for k in keys:
             self.request.session.pop(k, '')

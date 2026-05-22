@@ -83,27 +83,24 @@ class CertLoginView(AuthMixin, FormView):
         signature = form.cleaned_data['signature']
         challenge = self._get_stored_challenge()
 
-        user = authenticate(
-            self.request, username=username, 
-            cert=cert, signature=signature, challenge=challenge
-        )
-        if user is None:
-            error_msg = _('Invalid credentials')
-            return self.get_failed_response(form, username, error_msg)
-        
-
         error_msg = None
-        username = user.username
         ip = self.get_request_ip()
 
         try:
             self._check_is_block(username, True)
             self._check_only_allow_exists_user_auth(username)
-            self._check_login_acl(user, ip)
-            self.check_user_login_confirm_if_need(user)
 
-            self.request.session['auth_backend'] = settings.AUTH_BACKEND_CERT
-            auth_login(self.request, user, settings.AUTH_BACKEND_CERT)
+            user = authenticate(
+                self.request, username=username, cert=cert, signature=signature, challenge=challenge
+            )
+            if user is None:
+                error_msg = _('Invalid credentials')
+                return self.get_failed_response(form, username, error_msg)
+
+            username = user.username
+            self._check_login_acl(user, ip)
+
+            # auth_login(self.request, user, settings.AUTH_BACKEND_CERT)
 
             LoginIpBlockUtil(ip).clean_block_if_need()
             LoginBlockUtil(username, ip).clean_failed_count()
@@ -130,10 +127,12 @@ class CertLoginView(AuthMixin, FormView):
         return self.render_to_response(context)
     
     def get_success_response(self, request, user):
-        next_url = request.GET.get(NEXT_URL)
-        if not next_url or not next_url.startswith('/'):
-            next_url = reverse('index')
-        next = safe_next_url(next_url)
-        self.send_auth_signal(success=True, user=user)
-        return redirect(next)
+        self.mark_cert_ok(user, auth_backend=settings.AUTH_BACKEND_CERT)
+        return self.redirect_to_guard_view()
+        # next_url = request.GET.get(NEXT_URL)
+        # if not next_url or not next_url.startswith('/'):
+        #     next_url = reverse('index')
+        # next = safe_next_url(next_url)
+        # self.send_auth_signal(success=True, user=user)
+        # return redirect(next)
     
