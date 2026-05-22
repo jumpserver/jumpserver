@@ -12,16 +12,23 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.edit import FormView
 from django.shortcuts import redirect
+from django.http.response import HttpResponseRedirect
 
+from common.utils import reverse, safe_next_url
 from users.utils import redirect_user_first_login_or_index
 from authentication.mixins import AuthMixin 
+from authentication.errors import ACLError
+from authentication.errors import (
+    AuthFailedError, LoginConfirmBaseError, NeedRedirectError
+)
 from .forms import CertLoginForm
+from users.utils import LoginBlockUtil, LoginIpBlockUtil
 
 
 __all__ = ['CertLoginView']
 
 _CHALLENGE_CACHE_KEY_PREFIX = 'cert_login_challenge'
-
+NEXT_URL = 'next'
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
@@ -76,17 +83,57 @@ class CertLoginView(AuthMixin, FormView):
         signature = form.cleaned_data['signature']
         challenge = self._get_stored_challenge()
 
-        user = authenticate(self.request, username=username, cert=cert, signature=signature, challenge=challenge)
+        user = authenticate(
+            self.request, username=username, 
+            cert=cert, signature=signature, challenge=challenge
+        )
         if user is None:
-            form.add_error(None, _('Authentication failed'))
-            # Refresh the challenge so it cannot be replayed
-            challenge = self._generate_and_store_challenge()
-            context = self.get_context_data(form=form, challenge=challenge)
-            self.send_auth_signal(success=False, reason=_('Invalid credentials'), username=username)
-            return self.render_to_response(context)
+            error_msg = _('Invalid credentials')
+            return self.get_failed_response(form, username, error_msg)
+        
 
-        self._delete_stored_challenge()
-        auth_login(self.request, user)
-        redirect_url = redirect_user_first_login_or_index(self.request, self.redirect_field_name)
+        error_msg = None
+        username = user.username
+        ip = self.get_request_ip()
+
+        try:
+            self._check_is_block(username, True)
+            self._check_only_allow_exists_user_auth(username)
+            self._check_login_acl(user, ip)
+            self.check_user_login_confirm_if_need(user)
+
+            self.request.session['auth_backend'] = settings.AUTH_BACKEND_CERT
+            auth_login(self.request, user, settings.AUTH_BACKEND_CERT)
+
+            LoginIpBlockUtil(ip).clean_block_if_need()
+            LoginBlockUtil(username, ip).clean_failed_count()
+        except AuthFailedError as e:
+            error_msg = e.msg
+        except NeedRedirectError as e:
+            return redirect(e.url)
+        except Exception as e:
+            error_msg = str(e)
+        finally:
+            self._delete_stored_challenge()
+
+        if error_msg:
+            return self.get_failed_response(form, username, error_msg)
+        else:
+            return self.get_success_response(self.request, user)
+    
+    def get_failed_response(self, form, username, error_msg):
+        form.add_error(None, error_msg)
+        # Refresh the challenge so it cannot be replayed
+        challenge = self._generate_and_store_challenge()
+        context = self.get_context_data(form=form, challenge=challenge)
+        self.send_auth_signal(success=False, reason=error_msg, username=username)
+        return self.render_to_response(context)
+    
+    def get_success_response(self, request, user):
+        next_url = request.GET.get(NEXT_URL)
+        if not next_url or not next_url.startswith('/'):
+            next_url = reverse('index')
+        next = safe_next_url(next_url)
         self.send_auth_signal(success=True, user=user)
-        return redirect(redirect_url)
+        return redirect(next)
+    
