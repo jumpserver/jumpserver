@@ -100,8 +100,6 @@ class CertLoginView(AuthMixin, FormView):
             username = user.username
             self._check_login_acl(user, ip)
 
-            # auth_login(self.request, user, settings.AUTH_BACKEND_CERT)
-
             LoginIpBlockUtil(ip).clean_block_if_need()
             LoginBlockUtil(username, ip).clean_failed_count()
         except AuthFailedError as e:
@@ -129,10 +127,3 @@ class CertLoginView(AuthMixin, FormView):
     def get_success_response(self, request, user):
         self.mark_cert_ok(user, auth_backend=settings.AUTH_BACKEND_CERT)
         return self.redirect_to_guard_view()
-        # next_url = request.GET.get(NEXT_URL)
-        # if not next_url or not next_url.startswith('/'):
-        #     next_url = reverse('index')
-        # next = safe_next_url(next_url)
-        # self.send_auth_signal(success=True, user=user)
-        # return redirect(next)
-    
