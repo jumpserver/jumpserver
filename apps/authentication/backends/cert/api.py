@@ -18,8 +18,6 @@ from common.utils import get_logger
 from .driver import cert_vd_cfg
 
 
-
-
 __all__ = ['VendorDriverFileAPIView', 'CertVendorDriverConfigAPIView']
 
 logger = get_logger(__name__)
@@ -54,6 +52,10 @@ class CertEnrollAPIView(APIView):
     _SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
 
     def post(self, request):
+        if not cert_vd_cfg.enroll_enabled:
+            data = {'error': _('Certificate enrollment is not enabled')}
+            return Response(data=data, status=400)
+
         csr_raw = request.data.get('csr')
         if not csr_raw:
             data = {'error': _('CSR is required')}

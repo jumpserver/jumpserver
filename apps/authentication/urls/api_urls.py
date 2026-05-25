@@ -54,7 +54,7 @@ if settings.AUTH_CUSTOM_SSO:
         path('custom-sso/login/', api.CustomSSOLoginAPIView.as_view(), name='custom-sso-login'),
     ]
 
-urlpatterns += router.urls + passkey_urlpatterns
-
 if settings.AUTH_CERT:
     urlpatterns += cert_api_urlpatterns
+
+urlpatterns += router.urls + passkey_urlpatterns
