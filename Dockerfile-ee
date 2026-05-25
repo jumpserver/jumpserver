@@ -21,6 +21,17 @@ WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
 
+ARG GMSSL_VERSION=3.1.1
+
 RUN set -ex \
     && uv pip install -i${PIP_MIRROR} --group xpack \
-    && rm -rf /root/.cache/ 
+    && rm -rf /root/.cache/
+
+RUN set -ex \
+    && wget -q -O /tmp/gmssl-install.sh \
+        "https://github.com/guanzhi/GmSSL/releases/download/v${GMSSL_VERSION}/GmSSL-${GMSSL_VERSION}-Linux.sh" \
+    && chmod +x /tmp/gmssl-install.sh \
+    && /tmp/gmssl-install.sh --prefix=/usr/local \
+    && echo "/usr/local/GmSSL-${GMSSL_VERSION}-Linux/lib" > /etc/ld.so.conf.d/gmssl.conf \
+    && ldconfig \
+    && rm -f /tmp/gmssl-install.sh
