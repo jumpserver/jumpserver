@@ -84,7 +84,7 @@ class Migration(migrations.Migration):
                     choices=[('local', 'Local'), ('ldap', 'LDAP/AD'), ('ldap_ha', 'LDAP/AD (HA)'), ('openid', 'OpenID'),
                              ('radius', 'Radius'), ('cas', 'CAS'), ('saml2', 'SAML2'), ('oauth2', 'OAuth2'),
                              ('wecom', 'WeCom'), ('dingtalk', 'DingTalk'), ('feishu', 'FeiShu'), ('lark', 'Lark'),
-                             ('slack', 'Slack'), ('custom', 'Custom')], default='local', max_length=30,
+                             ('slack', 'Slack'), ('custom', 'Custom'), ('cert', 'Certificate')], default='local', max_length=30,
                     verbose_name='Source')),
                 ('wecom_id', models.CharField(default=None, max_length=128, null=True, verbose_name='WeCom')),
                 ('dingtalk_id', models.CharField(default=None, max_length=128, null=True, verbose_name='DingTalk')),
