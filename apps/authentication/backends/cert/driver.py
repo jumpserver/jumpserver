@@ -39,16 +39,11 @@ class CertVendorDriverConfig:
 
     def __init__(self):
         if not settings.AUTH_CERT:
-            self._raw = {}
-            self._data = {}
-            self._cert = {}
-            self._enroll = {}
             logger.debug('CertVendorDriverConfig: authentication backend not enabled, skipping config load')
             return
         config_file = getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE', None)
         self._raw = self._load_yaml(config_file)
-        self._data = self._render_template(self._raw)
-        self._cert = self._data.get('cert') or {}
+        self._cert = self._raw.get('cert') or {}
         self._enroll = self._cert.get('enroll') or {}
 
     # ── YAML 加载 ────────────────────────────────────────────────────────────
@@ -60,27 +55,6 @@ class CertVendorDriverConfig:
             return {}
         with open(config_file, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f) or {}
-    
-    @staticmethod
-    def _render_template(data):
-        """
-        使用系统设置渲染字符串模板，支持在 YAML 中引用系统设置。
-        找不到的变量（如 {{ user.username }}）原样保留，不替换为空，不报错。
-        """
-        from jinja2 import Undefined, Environment
-
-        class KeepUndefined(Undefined):
-            """未定义变量原样保留占位符，支持任意深度的属性链。"""
-            def __str__(self):
-                return '{{ ' + self._undefined_name + ' }}'
-
-            def __getattr__(self, name):
-                return KeepUndefined(name=f'{self._undefined_name}.{name}')
-
-        template_str = json.dumps(data, ensure_ascii=False)
-        env = Environment(undefined=KeepUndefined)
-        rendered = env.from_string(template_str).render(settings=Setting)
-        return json.loads(rendered)
 
     # ── CA / 证书链（只读系统设置，不允许在 YAML 中配置）────────────────────────
 
@@ -149,32 +123,60 @@ class CertVendorDriverConfig:
         return int(v)
 
     # ── 厂商 SDK 映射（原始数据，供 API 层序列化给前端）───────────────────────
+        
+    @staticmethod
+    def _render(data, trans_filter=None):
+        """
+        渲染 YAML 数据中的 Jinja2 模板表达式。
+          - {{ settings.xxx }}  → 系统设置值（任何时候都生效）
+          - {{ user.xxx }}      → 原样保留，留给前端 JS 运行时解析
+          - {{ 'text' | trans }} → 按 trans_filter 翻译；不传则原文返回（初始化阶段）
+        """
+        from jinja2 import Undefined, Environment
+
+        class KeepUndefined(Undefined):
+            """未定义变量原样保留占位符，支持任意深度的属性链。"""
+            def __str__(self):
+                return '{{ ' + self._undefined_name + ' }}'
+            def __getattr__(self, name):
+                return KeepUndefined(name=f'{self._undefined_name}.{name}')
+
+        template_str = json.dumps(data, ensure_ascii=False)
+        env = Environment(undefined=KeepUndefined)
+        env.filters['trans'] = trans_filter or (lambda s: s)
+        rendered = env.from_string(template_str).render(settings=Setting)
+        return json.loads(rendered)
+
+    def _build_trans_filter(self, lang):
+        """构建 Jinja2 | trans filter 函数，按 lang 从 YAML i18n 表查找翻译。
+        未找到翻译时原文返回；语言键自动归一化（zh_hant → zh-hant）。
+        """
+        i18n_raw = self._raw.get('i18n') or {}
+        i18n = {
+            text: {
+                Language.to_internal_code(lk.replace('_', '-')): lv
+                for lk, lv in entries.items()
+            }
+            for text, entries in i18n_raw.items()
+            if isinstance(entries, dict)
+        }
+
+        def trans_filter(s):
+            translations = i18n.get(str(s))
+            if not translations:
+                return s
+            return translations.get(lang) or translations.get('en') or s
+
+        return trans_filter
 
     def get_vendor_sdk_data(self, lang='en'):
-        """返回去掉 'cert' 顶层 key 后的全部数据，即厂商 SDK 方法映射。
-        根据 lang 参数将 label / description 字段替换为对应语言的翻译。
+        """返回去掉 'cert'/'i18n' 顶层 key 后的厂商 SDK 方法映射。
+        YAML 中任意字符串值均可用 {{ 'text' | trans }} 语法标记为可翻译。
         """
         lang = Language.to_internal_code(lang)
-        i18n = self._data.get('i18n') or {}
-        data = self._apply_i18n(self._data, i18n, lang)
-        data = {k: v for k, v in data.items() if k != 'i18n'}
-        return data
-
-    @classmethod
-    def _apply_i18n(cls, node, i18n, lang):
-        """递归遍历数据，将 label / description 的值按 i18n 表翻译。"""
-        if isinstance(node, dict):
-            result = {}
-            for k, v in node.items():
-                if k in ('label', 'description') and isinstance(v, str):
-                    translations = i18n.get(v)
-                    if translations and isinstance(translations, dict):
-                        v = translations.get(lang) or v
-                result[k] = cls._apply_i18n(v, i18n, lang)
-            return result
-        if isinstance(node, list):
-            return [cls._apply_i18n(item, i18n, lang) for item in node]
-        return node
+        trans_filter = self._build_trans_filter(lang)
+        data = self._render(self._raw, trans_filter)
+        return {k: v for k, v in data.items() if k not in ('i18n',)}
 
 
 cert_vd_cfg = CertVendorDriverConfig()

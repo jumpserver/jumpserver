@@ -389,12 +389,11 @@ AUTH_CUSTOM_SSO_QUERY_PARAMS = [q.strip() for q in CONFIG.AUTH_CUSTOM_SSO_QUERY_
 AUTH_CERT = CONFIG.AUTH_CERT
 # 证书认证前端 SDK 文件路径
 AUTH_CERT_VENDOR_DRIVER_JS_FILE = exist_or_default(
-    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver.js'), None
+    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_driver.js'), None
 )
 # 抽象方法名 → 厂商 SDK 实际方法名
 AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE = exist_or_default(
-    # os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_vendor_driver_config.yaml'), None
-    os.path.join(PROJECT_DIR, 'apps', 'authentication', 'backends', 'cert', 'demo', 'cert_vendor_driver_config.yaml'), None
+    os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_driver_config.yaml'), None
 )
 
 # CA 根证书私钥文件路径

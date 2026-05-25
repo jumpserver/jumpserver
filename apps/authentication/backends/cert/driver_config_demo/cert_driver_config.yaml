@@ -14,29 +14,29 @@ cert:
 showBasicInfo:
   # 基础加密操作
   - version: 
-      label: Version
+      label: "{{ 'Version' | trans }}"
       method: 
         call: UKey_GetVersion
-      description: Get USB Key driver version
+      description: "{{ 'Get USB Key driver version' | trans }}"
   - devSN: 
-      label: Device serial number
+      label: "{{ 'Device serial number' | trans }}"
       method: 
         call: UKey_GetDevSN
-      description: Get device serial number
+      description: "{{ 'Get device serial number' | trans }}"
   - enrollEnabled:
-      label: Certificate enrollment
-      value: Enabled
-      description: Whether certificate enrollment is enabled
+      label: "{{ 'Certificate enrollment' | trans }}"
+      value: "{{ 'Enabled' | trans }}"
+      description: "{{ 'Whether certificate enrollment is enabled' | trans }}"
       only: admin
   - enrollKeyAlgo:
-      label: Enrollment algorithm
-      value: SM2
-      description: Key algorithm used for enrollment
+      label: "{{ 'Enrollment algorithm' | trans }}"
+      value: "{{ 'SM2' | trans }}"
+      description: "{{ 'Key algorithm used for enrollment' | trans }}"
       only: admin
   - enrollValidityDays:
-      label: Certificate validity
-      value: 365 days
-      description: Certificate validity period used for enrollment
+      label: "{{ 'Certificate validity' | trans }}"
+      value: "{{ '365 days' | trans }}"
+      description: "{{ 'Certificate validity period used for enrollment' | trans }}"
       only: admin
 
 # ── 厂商 USB Key SDK 方法映射 ──────────────────────────────────────────────────
@@ -44,19 +44,19 @@ showBasicInfo:
 
 # Driver 初始化
 newUKeyAPI: 
-  description: Initialize USB Key SDK and get SDK instance
+  description: "{{ 'Initialize USB Key SDK and get SDK instance' | trans }}"
   method:
     call: UKeyAPI
 
 # 基本操作
 checkInstall: 
-  description: Check if USB Key driver is installed
+  description: "{{ 'Check if USB Key driver is installed' | trans }}"
   method: 
     call: UKey_CheckInstall
 
 # 获取用户名
 getCertCN: 
-  description: Get built-in username from USB Key
+  description: "{{ 'Get built-in username from USB Key' | trans }}"
   method: 
     call: UKey_GetCertInfo
     params:
@@ -67,7 +67,7 @@ getCertCN:
   
 # 管理员重置 PIN
 adminResetPIN:
-  description: Reset PIN
+  description: "{{ 'Reset PIN' | trans }}"
   method: 
     call: UKey_UnblockPIN
     params:
@@ -78,7 +78,7 @@ adminResetPIN:
 
 # 用户修改 PIN
 userChangePIN:
-  description: User change PIN
+  description: "{{ 'User change PIN' | trans }}"
   method:
     call: UKey_ChangePIN
     params:
@@ -91,13 +91,13 @@ userChangePIN:
 
 # 清除证书
 deleteCert: 
-  description: Delete existing certificate
+  description: "{{ 'Delete existing certificate' | trans }}"
   method: 
     call: UKey_DeleteCons
 
 # 校验 PIN
 checkPIN:
-  description: Verify PIN
+  description: "{{ 'Verify PIN' | trans }}"
   method: 
     call: UKey_VerifyPIN
     params:
@@ -108,7 +108,7 @@ checkPIN:
 
 # 获取公钥
 getCert: 
-  description: Get certificate
+  description: "{{ 'Get certificate' | trans }}"
   method: 
     call: UKey_GetCert
     params:
@@ -117,7 +117,7 @@ getCert:
 
 # 签名数据
 signData: 
-  description: Sign data using the private key in USB Key
+  description: "{{ 'Sign data using the private key in USB Key' | trans }}"
   method: 
     call: UKey_SignData
     params:
@@ -127,34 +127,34 @@ signData:
         value: '{{ output.challenge_code }}'
 
 getCertInfo: 
-  description: Get certificate list (including certificate information)
+  description: "{{ 'Get certificate list (including certificate information)' | trans }}"
   method: 
     call: UKey_GetCertInfoList
   fields:
     - ID: 
         key: ID
-        label: Certificate ID
+        label: "{{ 'Certificate ID' | trans }}"
     - CN: 
         key: CN
-        label: CN (ID)
+        label: "{{ 'CN (ID)' | trans }}"
     - DN:
         key: DN
-        label: DN
+        label: "{{ 'DN' | trans }}"
     - SN:
         key: SN
-        label: SN
+        label: "{{ 'SN' | trans }}"
     - bef: 
         key: bef
-        label: bef
+        label: "{{ 'bef' | trans }}"
     - aft: 
         key: aft
-        label: aft
+        label: "{{ 'aft' | trans }}"
     - isSM: 
         key: isSM
-        label: SM2 certificate
+        label: "{{ 'SM2 certificate' | trans }}"
     - DEVSN:
         key: DEVSN
-        label: Device serial number
+        label: "{{ 'Device serial number' | trans }}"
   showFields: [ID, CN, DN, SN, bef, aft, isSM, DEVSN]
 
 # 制证流程（Enrollment）
@@ -162,44 +162,44 @@ getCertInfo:
 enrollSteps:
   # 制证前清除旧证书，避免容器满
   - deleteCert: 
-      description: Delete existing certificate
+      description: "{{ 'Delete existing certificate' | trans }}"
       method: 
         call: UKey_DeleteCons
 
   # 在 USB Key 硬件内生成密钥对（私钥永不离开设备）
   - genKeyPair: 
-      description: Generate key pair
+      description: "{{ 'Generate key pair' | trans }}"
       method: 
         call: UKey_GenKeyPair
         params: 
           - key: asymAlg
-            label: Asymmetric algorithm
+            label: "{{ 'Asymmetric algorithm' | trans }}"
             type: int
             value: 1  # SM2
 
   # 用 USB Key 内的私钥生成 CSR（包含公钥 + Subject 信息）
   - genCSR: 
-      description: Generate certificate signing request (CSR)
+      description: "{{ 'Generate certificate signing request (CSR)' | trans }}"
       method: 
         call: UKey_GenCSR
         params:
           - key: dn
-            label: Certificate subject (Subject DN)
+            label: "{{ 'Certificate subject (Subject DN)' | trans }}"
             type: string
             items: 
               - key: CN
-                label: Name (CN)
+                label: "{{ 'Name (CN)' | trans }}"
                 value: '{{ user.username }}'  # 从配置读取 Subject CN 字段
               - key: OU
-                label: Other information
+                label: "{{ 'Other information' | trans }}"
                 value: '{{ settings.VENDOR }}'  # 从配置读取 Subject O 字段
 
   - signCert:
-      description: Certificate issuance
+      description: "{{ 'Certificate issuance' | trans }}"
 
   # 服务端 CA 签发证书后，将证书写入 USB Key
   - writeCert: 
-      description: Write the certificate
+      description: "{{ 'Write the certificate' | trans }}"
       method: 
         call: UKey_ImportCertAndKeyPair
         params:
