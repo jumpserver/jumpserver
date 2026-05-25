@@ -53,6 +53,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'saml2': serializers.SAML2SettingSerializer,
         'oauth2': serializers.OAuth2SettingSerializer,
         'passkey': serializers.PasskeySettingSerializer,
+        'cert': serializers.CertSettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
         'sms': serializers.SMSSettingSerializer,

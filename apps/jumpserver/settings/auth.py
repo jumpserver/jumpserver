@@ -395,7 +395,6 @@ AUTH_CERT_VENDOR_DRIVER_JS_FILE = exist_or_default(
 AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE = exist_or_default(
     os.path.join(PROJECT_DIR, 'data', 'auth', 'cert_driver_config.yaml'), None
 )
-
 # CA 根证书私钥文件路径
 CA_KEY_FILE = exist_or_default(
     os.path.join(PROJECT_DIR, 'data', 'certs', 'ca_root.key'), None
