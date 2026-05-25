@@ -4,13 +4,13 @@ import json
 from django.conf import settings
 from common.utils import get_logger
 from common.decorators import Singleton
+from common.const import Language
 
 
 logger = get_logger(__name__)
 
 class Setting:
     VENDOR = getattr(settings, 'VENDOR', '')
-
 
 
 @Singleton
@@ -150,8 +150,31 @@ class CertVendorDriverConfig:
 
     # ── 厂商 SDK 映射（原始数据，供 API 层序列化给前端）───────────────────────
 
-    def get_vendor_sdk_data(self):
-        """返回去掉 'cert' 顶层 key 后的全部数据，即厂商 SDK 方法映射。"""
-        return self._data
+    def get_vendor_sdk_data(self, lang='en'):
+        """返回去掉 'cert' 顶层 key 后的全部数据，即厂商 SDK 方法映射。
+        根据 lang 参数将 label / description 字段替换为对应语言的翻译。
+        """
+        lang = Language.to_internal_code(lang)
+        i18n = self._data.get('i18n') or {}
+        data = self._apply_i18n(self._data, i18n, lang)
+        data = {k: v for k, v in data.items() if k != 'i18n'}
+        return data
+
+    @classmethod
+    def _apply_i18n(cls, node, i18n, lang):
+        """递归遍历数据，将 label / description 的值按 i18n 表翻译。"""
+        if isinstance(node, dict):
+            result = {}
+            for k, v in node.items():
+                if k in ('label', 'description') and isinstance(v, str):
+                    translations = i18n.get(v)
+                    if translations and isinstance(translations, dict):
+                        v = translations.get(lang) or v
+                result[k] = cls._apply_i18n(v, i18n, lang)
+            return result
+        if isinstance(node, list):
+            return [cls._apply_i18n(item, i18n, lang) for item in node]
+        return node
+
 
 cert_vd_cfg = CertVendorDriverConfig()

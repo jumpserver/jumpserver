@@ -14,29 +14,29 @@ cert:
 showBasicInfo:
   # 基础加密操作
   - version: 
-      label: 版本
+      label: Version
       method: 
         call: UKey_GetVersion
-      description: 获取 USB Key 驱动版本
+      description: Get USB Key driver version
   - devSN: 
-      label: 设备序列号
+      label: Device serial number
       method: 
         call: UKey_GetDevSN
-      description: 获取设备序列号
+      description: Get device serial number
   - enrollEnabled:
-      label: 制证功能
-      value: 启用
-      description: 是否启用制证功能
+      label: Certificate enrollment
+      value: Enabled
+      description: Whether certificate enrollment is enabled
       only: admin
   - enrollKeyAlgo:
-      label: 制证算法
+      label: Enrollment algorithm
       value: SM2
-      description: 制证使用的密钥算法
+      description: Key algorithm used for enrollment
       only: admin
   - enrollValidityDays:
-      label: 证书期限
-      value: 365 天
-      description: 制证使用的证书有效期
+      label: Certificate validity
+      value: 365 days
+      description: Certificate validity period used for enrollment
       only: admin
 
 # ── 厂商 USB Key SDK 方法映射 ──────────────────────────────────────────────────
@@ -44,19 +44,19 @@ showBasicInfo:
 
 # Driver 初始化
 newUKeyAPI: 
-  description: 初始化 USB Key SDK，获取 SDK 对象实例
+  description: Initialize USB Key SDK and get SDK instance
   method:
     call: UKeyAPI
 
 # 基本操作
 checkInstall: 
-  description: 检查 USB Key 驱动是否安装
+  description: Check if USB Key driver is installed
   method: 
     call: UKey_CheckInstall
 
 # 获取用户名
 getCertCN: 
-  description: 获取 USB Key 内置用户名
+  description: Get built-in username from USB Key
   method: 
     call: UKey_GetCertInfo
     params:
@@ -67,7 +67,7 @@ getCertCN:
   
 # 管理员重置 PIN
 adminResetPIN:
-  description: 重置 PIN
+  description: Reset PIN
   method: 
     call: UKey_UnblockPIN
     params:
@@ -78,7 +78,7 @@ adminResetPIN:
 
 # 用户修改 PIN
 userChangePIN:
-  description: 用户修改 PIN
+  description: User change PIN
   method:
     call: UKey_ChangePIN
     params:
@@ -91,13 +91,13 @@ userChangePIN:
 
 # 清除证书
 deleteCert: 
-  description: 删除已有证书
+  description: Delete existing certificate
   method: 
     call: UKey_DeleteCons
 
 # 校验 PIN
 checkPIN:
-  description: 校验 PIN 是否正确
+  description: Verify PIN
   method: 
     call: UKey_VerifyPIN
     params:
@@ -108,7 +108,7 @@ checkPIN:
 
 # 获取公钥
 getCert: 
-  description: 获取证书
+  description: Get certificate
   method: 
     call: UKey_GetCert
     params:
@@ -117,7 +117,7 @@ getCert:
 
 # 签名数据
 signData: 
-  description: 使用 USB Key 内的私钥对数据进行签名
+  description: Sign data using the private key in USB Key
   method: 
     call: UKey_SignData
     params:
@@ -127,13 +127,13 @@ signData:
         value: '{{ output.challenge_code }}'
 
 getCertInfo: 
-  description: 获取证书列表（包含证书信息）
+  description: Get certificate list (including certificate information)
   method: 
     call: UKey_GetCertInfoList
   fields:
     - ID: 
         key: ID
-        label: 证书 ID
+        label: Certificate ID
     - CN: 
         key: CN
         label: CN (ID)
@@ -151,10 +151,10 @@ getCertInfo:
         label: aft
     - isSM: 
         key: isSM
-        label: 国密证书
+        label: SM2 certificate
     - DEVSN:
         key: DEVSN
-        label: 设备序列号
+        label: Device serial number
   showFields: [ID, CN, DN, SN, bef, aft, isSM, DEVSN]
 
 # 制证流程（Enrollment）
@@ -162,44 +162,44 @@ getCertInfo:
 enrollSteps:
   # 制证前清除旧证书，避免容器满
   - deleteCert: 
-      description: 删除已有证书
+      description: Delete existing certificate
       method: 
         call: UKey_DeleteCons
 
   # 在 USB Key 硬件内生成密钥对（私钥永不离开设备）
   - genKeyPair: 
-      description: 生成密钥对
+      description: Generate key pair
       method: 
         call: UKey_GenKeyPair
         params: 
           - key: asymAlg
-            label: 非对称算法
+            label: Asymmetric algorithm
             type: int
             value: 1  # SM2
 
   # 用 USB Key 内的私钥生成 CSR（包含公钥 + Subject 信息）
   - genCSR: 
-      description: 生成证书签名请求 (CSR)
+      description: Generate certificate signing request (CSR)
       method: 
         call: UKey_GenCSR
         params:
           - key: dn
-            label: 证书主题 (Subject DN)
+            label: Certificate subject (Subject DN)
             type: string
             items: 
               - key: CN
-                label: 名称 (CN)
+                label: Name (CN)
                 value: '{{ user.username }}'  # 从配置读取 Subject CN 字段
               - key: OU
-                label: 其他信息
+                label: Other information
                 value: '{{ settings.VENDOR }}'  # 从配置读取 Subject O 字段
 
   - signCert:
-      description: 证书签发
+      description: Certificate issuance
 
   # 服务端 CA 签发证书后，将证书写入 USB Key
   - writeCert: 
-      description: 写入证书
+      description: Write the certificate
       method: 
         call: UKey_ImportCertAndKeyPair
         params:
@@ -210,3 +210,134 @@ enrollSteps:
             value: ''
           - key: EncKeyPair
             value: ''
+
+i18n:
+  Version:
+    en: Version
+    zh-hans: 版本
+    zh-hant: 版本
+  Get USB Key driver version:
+    en: Get USB Key driver version
+    zh-hans: 获取 USB Key 驱动版本
+    zh-hant: 取得 USB Key 驅動版本
+  Device serial number:
+    en: Device serial number
+    zh-hans: 设备序列号
+    zh-hant: 裝置序號
+  Get device serial number:
+    en: Get device serial number
+    zh-hans: 获取设备序列号
+    zh-hant: 取得裝置序號
+  Certificate enrollment:
+    en: Certificate enrollment
+    zh-hans: 制证功能
+    zh-hant: 制證功能
+  Enabled:
+    en: Enabled
+    zh-hans: 启用
+    zh-hant: 啟用
+  Whether certificate enrollment is enabled:
+    en: Whether certificate enrollment is enabled
+    zh-hans: 是否启用制证功能
+    zh-hant: 是否啟用制證功能
+  Enrollment algorithm:
+    en: Enrollment algorithm
+    zh-hans: 制证算法
+    zh-hant: 制證演算法
+  Key algorithm used for enrollment:
+    en: Key algorithm used for enrollment
+    zh-hans: 制证使用的密钥算法
+    zh-hant: 制證使用的金鑰演算法
+  Certificate validity:
+    en: Certificate validity
+    zh-hans: 证书期限
+    zh-hant: 證書有效期
+  365 days:
+    en: 365 days
+    zh-hans: 365 天
+    zh-hant: 365 天
+  Certificate validity period used for enrollment:
+    en: Certificate validity period used for enrollment
+    zh-hans: 制证使用的证书有效期
+    zh-hant: 制證使用的證書有效期
+  Initialize USB Key SDK and get SDK instance:
+    en: Initialize USB Key SDK and get SDK instance
+    zh-hans: 初始化 USB Key SDK，获取 SDK 对象实例
+    zh-hant: 初始化 USB Key SDK 並取得 SDK 物件實例
+  Check if USB Key driver is installed:
+    en: Check if USB Key driver is installed
+    zh-hans: 检查 USB Key 驱动是否安装
+    zh-hant: 檢查 USB Key 驅動是否已安裝
+  Get built-in username from USB Key:
+    en: Get built-in username from USB Key
+    zh-hans: 获取 USB Key 内置用户名
+    zh-hant: 取得 USB Key 內建使用者名稱
+  Reset PIN:
+    en: Reset PIN
+    zh-hans: 重置 PIN
+    zh-hant: 重置 PIN
+  User change PIN:
+    en: User change PIN
+    zh-hans: 用户修改 PIN
+    zh-hant: 使用者修改 PIN
+  Delete existing certificate:
+    en: Delete existing certificate
+    zh-hans: 删除已有证书
+    zh-hant: 刪除已有證書
+  Verify PIN:
+    en: Verify PIN
+    zh-hans: 校验 PIN 是否正确
+    zh-hant: 驗證 PIN 是否正確
+  Get certificate:
+    en: Get certificate
+    zh-hans: 获取证书
+    zh-hant: 取得證書
+  Sign data using the private key in USB Key:
+    en: Sign data using the private key in USB Key
+    zh-hans: 使用 USB Key 内的私钥对数据进行签名
+    zh-hant: 使用 USB Key 內的私鑰對資料進行簽名
+  Get certificate list (including certificate information):
+    en: Get certificate list (including certificate information)
+    zh-hans: 获取证书列表（包含证书信息）
+    zh-hant: 取得證書清單（包含證書資訊）
+  Certificate ID:
+    en: Certificate ID
+    zh-hans: 证书 ID
+    zh-hant: 證書 ID
+  SM2 certificate:
+    en: SM2 certificate
+    zh-hans: 国密证书
+    zh-hant: 國密證書
+  Generate key pair:
+    en: Generate key pair
+    zh-hans: 生成密钥对
+    zh-hant: 產生金鑰對
+  Asymmetric algorithm:
+    en: Asymmetric algorithm
+    zh-hans: 非对称算法
+    zh-hant: 非對稱演算法
+  Generate certificate signing request (CSR):
+    en: Generate certificate signing request (CSR)
+    zh-hans: 生成证书签名请求 (CSR)
+    zh-hant: 產生憑證簽名請求 (CSR)
+  Certificate subject (Subject DN):
+    en: Certificate subject (Subject DN)
+    zh-hans: 证书主题 (Subject DN)
+    zh-hant: 憑證主題 (Subject DN)
+  Name (CN):
+    en: Name (CN)
+    zh-hans: 名称 (CN)
+    zh-hant: 名稱 (CN)
+  Other information:
+    en: Other information
+    zh-hans: 其他信息
+    zh-hant: 其他資訊
+  Certificate issuance:
+    en: Certificate issuance
+    zh-hans: 证书签发
+    zh-hant: 證書簽發
+  Write the certificate:
+    en: Write the certificate
+    zh-hans: 写入证书
+    zh-hant: 寫入證書
+

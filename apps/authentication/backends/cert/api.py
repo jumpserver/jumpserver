@@ -40,7 +40,8 @@ class CertVendorDriverConfigAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
-        data = cert_vd_cfg.get_vendor_sdk_data()
+        lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
+        data = cert_vd_cfg.get_vendor_sdk_data(lang=lang)
         return Response(data)
 
 
