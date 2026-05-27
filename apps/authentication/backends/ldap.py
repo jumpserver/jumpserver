@@ -95,7 +95,27 @@ class LDAPBaseBackend(LDAPBackend):
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))
+        if user is None:
+            return None
+        if not self._is_same_login_user(username, user):
+            logger.warning('Authenticate failed: LDAP login username mismatch')
+            return None
         return user if self.user_can_authenticate(user) else None
+
+    def _is_same_login_user(self, username, user):
+        # Ensure the authenticated user matches the login input.
+        # Keep the comparison field consistent with get_or_build_user().
+        if not username or not user:
+            return False
+
+        query_field = self.settings.USER_QUERY_FIELD or self.get_user_model().USERNAME_FIELD
+        user_value = getattr(user, query_field, None)
+        if not user_value:
+            return False
+
+        username = str(username).strip().casefold()
+        user_value = str(user_value).strip().casefold()
+        return username == user_value
 
     def pre_check(self, username, password):
         if not self.is_enabled():
