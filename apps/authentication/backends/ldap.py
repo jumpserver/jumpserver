@@ -182,6 +182,19 @@ class LDAPUser(_LDAPUser):
             else:
                 self._user_dn = self._search_for_user_dn()
 
+    def _authenticate_user_dn(self, password):
+        if self.dn is None:
+            raise self.AuthenticationFailed("failed to map the username to a DN.")
+
+        self._connection = None
+        self._connection_bound = False
+
+        try:
+            sticky = self.settings.BIND_AS_AUTHENTICATING_USER
+            self._bind_as(self.dn, password, sticky=sticky)
+        except ldap.INVALID_CREDENTIALS:
+            raise self.AuthenticationFailed("user DN/password rejected by LDAP server.")
+
     def _search_for_user_dn(self):
         """
         This method was overridden because the AUTH_LDAP_USER_SEARCH
