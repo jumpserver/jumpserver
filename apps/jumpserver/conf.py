@@ -550,6 +550,7 @@ class Config(dict):
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
+        'OTP_DIGEST': 'sha1',
         'EMAIL_SUFFIX': 'example.com',
 
         # Terminal配置
