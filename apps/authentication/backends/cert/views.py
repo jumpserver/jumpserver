@@ -123,4 +123,7 @@ class CertLoginView(AuthMixin, FormView):
     
     def get_success_response(self, request, user):
         self.mark_cert_ok(user, auth_backend=settings.AUTH_BACKEND_CERT)
+        if not settings.SAFE_MODE:
+            self.mark_mfa_ok('ukey-pass-mfa', user)
         return self.redirect_to_guard_view()
+
