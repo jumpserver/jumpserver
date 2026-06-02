@@ -576,6 +576,15 @@ login:
         expr: "{{ result === 0 }}"
         message: "设置摘要算法失败，错误码: {{ result }}"
     
+    - name: setUserID
+      label: "设置用户 ID"
+      call: SOF_SetUserID
+      args:
+        - "1234567812345678"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "设置用户 ID 失败，错误码: {{ result }}"
+    
     - name: signChallenge
       label: "签名挑战码"
       call: SOF_SignData             # TODO: 确认厂商 SDK 的签名方法名
