@@ -165,6 +165,9 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
             'bind_dn': serializer.validated_data.get(f"{prefix}BIND_DN"),
             'use_ssl': serializer.validated_data.get(f"{prefix}START_TLS", False),
+            'ignore_ssl_verification': serializer.validated_data.get(
+                f"{prefix}IGNORE_SSL_VERIFICATION", False
+            ),
             'search_ou': serializer.validated_data.get(f"{prefix}SEARCH_OU"),
             'search_filter': serializer.validated_data.get(f"{prefix}SEARCH_FILTER"),
             'attr_map': serializer.validated_data.get(f"{prefix}USER_ATTR_MAP"),
@@ -195,7 +198,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         if not serializer.is_valid():
             self.send_msg(msg=f'error: {str(serializer.errors)}')
         config = self.get_ldap_config(serializer)
-        ok, msg = LDAPTestUtil(config).test_config()
+        ok, msg = LDAPTestUtil(config, category=self.category).test_config()
         if ok:
             self.set_task_status_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS)
         return ok, msg

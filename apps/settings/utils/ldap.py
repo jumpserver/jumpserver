@@ -32,6 +32,7 @@ from common.utils import timeit, get_logger
 from common.utils.http import is_true
 from orgs.utils import tmp_to_org
 from settings.const import ImportStatus
+from settings.ldap import get_ldap3_tls, get_ldap_ignore_ssl_verification
 from users.models import User, UserGroup
 from users.utils import construct_user_email
 
@@ -52,6 +53,7 @@ class LDAPConfig(object):
         self.bind_dn = None
         self.password = None
         self.use_ssl = None
+        self.ignore_ssl_verification = None
         self.search_ou = None
         self.search_filter = None
         self.attr_map = None
@@ -67,6 +69,9 @@ class LDAPConfig(object):
         self.bind_dn = config.get('bind_dn')
         self.password = config.get('password')
         self.use_ssl = config.get('use_ssl')
+        self.ignore_ssl_verification = (
+            config.get('ignore_ssl_verification', False) or not settings.VERIFY_EXTERNAL_SSL
+        )
         self.search_ou = config.get('search_ou')
         self.search_filter = config.get('search_filter')
         self.attr_map = config.get('attr_map')
@@ -78,6 +83,7 @@ class LDAPConfig(object):
         self.bind_dn = getattr(settings, f"{prefix}_BIND_DN")
         self.password = getattr(settings, f"{prefix}_BIND_PASSWORD")
         self.use_ssl = getattr(settings, f"{prefix}_START_TLS")
+        self.ignore_ssl_verification = get_ldap_ignore_ssl_verification(self.category)
         self.search_ou = getattr(settings, f"{prefix}_SEARCH_OU")
         self.search_filter = getattr(settings, f"{prefix}_SEARCH_FILTER")
         self.attr_map = getattr(settings, f"{prefix}_USER_ATTR_MAP")
@@ -88,7 +94,7 @@ class LDAPServerUtil(object):
 
     def __init__(self, config=None, category=User.Source.ldap.value):
         if isinstance(config, dict):
-            self.config = LDAPConfig(config=config)
+            self.config = LDAPConfig(config=config, category=category)
         elif isinstance(config, LDAPConfig):
             self.config = config
         else:
@@ -102,7 +108,10 @@ class LDAPServerUtil(object):
     def connection(self):
         if self._conn:
             return self._conn
-        server = Server(self.config.server_uri, use_ssl=self.config.use_ssl)
+        server = Server(
+            self.config.server_uri, use_ssl=self.config.use_ssl,
+            tls=get_ldap3_tls(self.config.category, self.config.ignore_ssl_verification)
+        )
         conn = Connection(server, self.config.bind_dn, self.config.password)
         conn.bind()
         self._conn = conn
@@ -514,7 +523,10 @@ class LDAPTestUtil(object):
             self.backend = LDAPHAAuthorizationBackend()
 
     def _test_connection_bind(self, authentication=None, user=None, password=None):
-        server = Server(self.config.server_uri)
+        server = Server(
+            self.config.server_uri,
+            tls=get_ldap3_tls(self.config.category, self.config.ignore_ssl_verification)
+        )
         connection = Connection(
             server, user=user, password=password, authentication=authentication
         )
@@ -531,7 +543,10 @@ class LDAPTestUtil(object):
 
     def _test_server_uri(self):
         # 这里测试 server uri 是否能连通, 不进行 bind 操作, 不需要传入 bind dn 和密码
-        server = Server(self.config.server_uri, use_ssl=self.config.use_ssl)
+        server = Server(
+            self.config.server_uri, use_ssl=self.config.use_ssl,
+            tls=get_ldap3_tls(self.config.category, self.config.ignore_ssl_verification)
+        )
         connection = Connection(server)
         connection.open()
 

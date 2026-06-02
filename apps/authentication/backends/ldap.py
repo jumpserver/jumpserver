@@ -11,6 +11,7 @@ from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 from users.utils import construct_user_email
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils.http import is_true
+from settings.ldap import get_python_ldap_tls_options
 from .base import JMSBaseAuthBackend
 
 logger = _LDAPConfig.get_logger()
@@ -194,6 +195,38 @@ class LDAPUser(_LDAPUser):
             self._bind_as(self.dn, password, sticky=sticky)
         except ldap.INVALID_CREDENTIALS:
             raise self.AuthenticationFailed("user DN/password rejected by LDAP server.")
+
+    def _get_connection(self):
+        if self._connection is None:
+            uri = self.settings.SERVER_URI
+            if callable(uri):
+                uri = uri(self._request)
+
+            self._connection = self.backend.ldap.initialize(uri, bytes_mode=False)
+
+            tls_options = get_python_ldap_tls_options(self.category)
+            try:
+                # ldap.set_option 是进程级全局状态，LDAP 与 LDAP HA 动态切换 CA 或 ignore 时会互相影响。
+                # initialize 仅创建 LDAPObject；在首次 start_tls_s/simple_bind_s/search 前设置连接级 TLS options。
+                for opt, value in tls_options.items():
+                    self._connection.set_option(opt, value)
+            except ValueError as error:
+                # 某些 libldap/TLS 后端不支持特定 option，转为认证失败，避免登录页返回 500。
+                logger.warning(
+                    "Failed to set LDAP TLS option %s for %s: %s",
+                    opt, self.category, error
+                )
+                self._connection = None
+                raise self.AuthenticationFailed("failed to configure LDAP TLS options.")
+
+            for opt, value in self.settings.CONNECTION_OPTIONS.items():
+                self._connection.set_option(opt, value)
+
+            if self.settings.START_TLS:
+                logger.debug("Initiating TLS")
+                self._connection.start_tls_s()
+
+        return self._connection
 
     def _search_for_user_dn(self):
         """

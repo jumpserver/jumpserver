@@ -19,6 +19,7 @@ class LDAPTestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField()
     AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField()
     AUTH_LDAP_START_TLS = serializers.BooleanField(required=False)
+    AUTH_LDAP_IGNORE_SSL_VERIFICATION = serializers.BooleanField(required=False)
     AUTH_LDAP = serializers.BooleanField(required=False)
 
 
@@ -87,6 +88,9 @@ class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
     AUTH_LDAP_STRICT_SYNC = serializers.BooleanField(
         required=False, label=_('Strict sync'),
         help_text=_('In strict mode, users not found in LDAP will be disabled during full or automatic sync')
+    )
+    AUTH_LDAP_IGNORE_SSL_VERIFICATION = serializers.BooleanField(
+        required=False, label=_('Ignore SSL verification')
     )
     AUTH_LDAP_CACHE_TIMEOUT = serializers.IntegerField(
         min_value=0, max_value=3600 * 24 * 30 * 12,
