@@ -182,6 +182,21 @@ class SecurityAuthSerializer(serializers.Serializer):
         help_text=_("Detect infrequent users daily and disable them if they exceed the predetermined time limit")
     )
 
+    RDP_SIGN_ENABLED = serializers.BooleanField(
+        required=False, default=False, label=_("RDP sign enabled"),
+        help_text=_("Enable RDP sign to protect RDP connection")
+    )
+    RDP_SIGN_CERT = serializers.CharField(
+        required=False, label=_("RDP sign cert"),
+        help_text=_("RDP sign cert, please do not modify")
+    )
+    RDP_SIGN_CERT_KEY = serializers.CharField(
+        required=False, label=_("RDP sign cert key"),
+        help_text=_("RDP sign cert key, please do not modify")
+    )
+
+class SecurityLoginSerializer(serializers.Serializer):
+
     def validate(self, attrs):
         if attrs.get('SECURITY_MFA_AUTH') != 1:
             attrs['SECURITY_MFA_IN_LOGIN_PAGE'] = False
