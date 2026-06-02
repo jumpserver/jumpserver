@@ -28,7 +28,9 @@ class VendorDriverFileAPIView(APIView):
 
     @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
-        js_file = cert_vd_cfg.driver_js_file
+        from .driver import CertVendorDriverConfig
+        _cert_vd_cfg = CertVendorDriverConfig()
+        js_file = _cert_vd_cfg.get_sdk_script_js_path()
         if not js_file or not os.path.isfile(js_file):
             raise Http404
         response = FileResponse(open(js_file, 'rb'), content_type='application/javascript')
@@ -41,7 +43,9 @@ class CertVendorDriverConfigAPIView(APIView):
 
     def get(self, request):
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
-        data = cert_vd_cfg.get_vendor_sdk_data(lang=lang)
+        from .driver import CertVendorDriverConfig
+        _cert_vd_cfg = CertVendorDriverConfig()
+        data = _cert_vd_cfg.get_vendor_sdk_data(lang=lang)
         return Response(data)
 
 

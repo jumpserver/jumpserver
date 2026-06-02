@@ -1,36 +1,27 @@
-import base64
-
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from common.serializers.fields import EncryptedField
+from django.conf import settings
+from django.db.models import TextChoices
 
 __all__ = ['CertSettingSerializer']
 
-# SM2 曲线 OID：1.2.156.10197.1.301，DER 编码
-_SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
 
+class CertVendorChoices(TextChoices):
+    LONG_MAI_M_TOKEN = 'long_mai_m_token', _('LONG MAI mToken')
+    JI_DA = 'ji_da', _('JI DA')
 
-def _detect_cert_algorithm(pem_content):
-    """从 PEM 证书内容检测公钥算法，返回 'SM2' / 'RSA-2048' 等字符串，失败返回空字符串。"""
-    if not pem_content:
-        return ''
-    try:
-        lines = pem_content.strip().splitlines()
-        b64 = ''.join(ln for ln in lines if not ln.startswith('-----'))
-        der = base64.b64decode(b64)
-        if _SM2_OID_DER in der:
-            return 'SM2'
-        from cryptography import x509
-        from cryptography.hazmat.primitives.asymmetric import ec, rsa
-        cert = x509.load_pem_x509_certificate(pem_content.encode())
-        pub = cert.public_key()
-        if isinstance(pub, rsa.RSAPublicKey):
-            return 'RSA-{}'.format(pub.key_size)
-        if isinstance(pub, ec.EllipticCurvePublicKey):
-            return 'ECDSA-{}'.format(pub.key_size)
-        return _('Unknown')
-    except Exception:
-        return ''
+    @classmethod
+    def default(cls):
+        if settings.VENDOR.lower() == 'jumpserver':
+            return cls.LONG_MAI_M_TOKEN
+        return cls.JI_DA
+    
+    @classmethod
+    def get_choices(cls):
+        if settings.VENDOR.lower() == 'jumpserver':
+            return cls.choices
+        return [(cls.JI_DA.value, cls.JI_DA.label)]
 
 
 class CertSettingSerializer(serializers.Serializer):
@@ -46,6 +37,13 @@ class CertSettingSerializer(serializers.Serializer):
     AUTH_CERT_DEFAULT_PIN = EncryptedField(
         default='', allow_blank=True, label=_('USB-Key Default PIN'),
         help_text=_('Default USB Key PIN used for administrator reset')
+    )
+    AUTH_CERT_VENDOR = serializers.ChoiceField(
+        choices=CertVendorChoices.get_choices(),
+        default=CertVendorChoices.default(), 
+        allow_blank=False,
+        label=_('UKey Vendor'),
+        help_text=_('Vendor name for UKey authentication')
     )
     # ENROLLMENT SETTINGS
     AUTH_CERT_ENROLL_ENABLED = serializers.BooleanField(
@@ -73,6 +71,6 @@ class CertSettingSerializer(serializers.Serializer):
     )
 
     def get_AUTH_CERT_CA_CERT_ALGORITHM(self, obj):
-        content = obj.get('AUTH_CERT_CA_CERT_CONTENT', '')
-        algo = _detect_cert_algorithm(content)
-        return algo or '-'
+        from authentication.backends.cert.driver import cert_vd_cfg
+        algo = cert_vd_cfg.ca_cert_asym_alg
+        return algo or _('证书上传后自动检测')

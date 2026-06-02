@@ -270,6 +270,7 @@ class Config(dict):
         'AUTH_CUSTOM_SSO_QUERY_PARAMS': 'token',
 
         'AUTH_CERT': False,
+        'AUTH_CERT_VENDOR': '',
         'AUTH_CERT_ENROLL_ENABLED': True,
         'AUTH_CERT_ENROLL_VALIDITY_DAYS': 365,
         'AUTH_CERT_CHALLENGE_TTL': 300,

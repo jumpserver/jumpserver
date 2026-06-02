@@ -1,7 +1,7 @@
 import os
 import yaml
-import json
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from common.decorators import Singleton
 from common.const import Language
@@ -9,21 +9,64 @@ from common.const import Language
 
 logger = get_logger(__name__)
 
-class Setting:
-    VENDOR = getattr(settings, 'VENDOR', '')
+
+def _detect_cert_algorithm(pem_content):
+    """从 PEM 证书内容检测公钥算法，返回 'SM2' / 'RSA-1024' / 'RSA-2048' 等字符串，失败返回空字符串。"""
+
+    import base64
+    _SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
+
+    if not pem_content:
+        return ''
+
+    try:
+        lines = pem_content.strip().splitlines()
+        b64 = ''.join(ln for ln in lines if not ln.startswith('-----'))
+        der = base64.b64decode(b64)
+        if _SM2_OID_DER in der:
+            return 'SM2'
+        from cryptography import x509
+        from cryptography.hazmat.primitives.asymmetric import ec, rsa
+        cert = x509.load_pem_x509_certificate(pem_content.encode())
+        pub = cert.public_key()
+        if isinstance(pub, rsa.RSAPublicKey):
+            return 'RSA-{}'.format(pub.key_size)
+        if isinstance(pub, ec.EllipticCurvePublicKey):
+            return 'ECDSA-{}'.format(pub.key_size)
+        return ''
+    except Exception:
+        return ''
 
 
-@Singleton
+# @Singleton
 class CertVendorDriverConfig:
 
     def __init__(self):
         if not settings.AUTH_CERT:
             logger.debug('CertVendorDriverConfig: authentication backend not enabled')
             return
-        config_file = getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_CONFIG_FILE', None)
-        self._raw = self._load_yaml(config_file)
+        cf_path = self.get_sdk_config_yaml_path()
+        self._raw = self._load_yaml(cf_path)
 
     # ── YAML 加载 ────────────────────────────────────────────────────────────
+
+    def get_sdk_script_js_path(self):
+        """返回厂商 SDK 驱动文件的 FileResponse，供 API 层使用。"""
+        fp = os.path.join(
+            settings.PROJECT_DIR, 
+            "apps", "authentication", "backends", "cert", "vendors",
+            settings.AUTH_CERT_VENDOR, 'sdk_script.js'
+        )
+        return fp
+    
+    def get_sdk_config_yaml_path(self):
+        """返回厂商 SDK 配置 YAML 文件路径，供 API 层使用。"""
+        fp = os.path.join(
+            settings.PROJECT_DIR, 
+            "apps", "authentication", "backends", "cert", "vendors",
+            settings.AUTH_CERT_VENDOR, 'sdk_config.yaml'
+        )
+        return fp
 
     @staticmethod
     def _load_yaml(config_file):
@@ -49,11 +92,12 @@ class CertVendorDriverConfig:
     def ca_key_pass(self):
         """CA 私钥密码，只从系统设置读取。"""
         return str(getattr(settings, 'AUTH_CERT_CA_KEY_PASS', ''))
-
+    
     @property
-    def driver_js_file(self):
-        """返回厂商 SDK 驱动文件的 FileResponse，供 API 层使用。"""
-        return getattr(settings, 'AUTH_CERT_VENDOR_DRIVER_JS_FILE', None)
+    def ca_cert_asym_alg(self):
+        # 从 CA 证书内容解析出签名算法类型，返回 'RSA' 或 'SM2' 等字符串，供 YAML 配置中使用
+        asym_alg = _detect_cert_algorithm(self.ca_cert_content)
+        return asym_alg
 
     # ── 工具 ─────────────────────────────────────────────────────────────────
 
@@ -95,25 +139,26 @@ class CertVendorDriverConfig:
     @staticmethod
     def _render(data, trans_filter=None):
         """
-        渲染 YAML 数据中的 Jinja2 模板表达式。
-          - {{ settings.xxx }}  → 系统设置值（任何时候都生效）
-          - {{ user.xxx }}      → 原样保留，留给前端 JS 运行时解析
-          - {{ 'text' | trans }} → 按 trans_filter 翻译；不传则原文返回（初始化阶段）
+        只处理 YAML 数据中的 i18n 翻译标记，不做模板变量替换。
+          - {{ 'text' | trans }} → 按 trans_filter 翻译；不传则原文返回
         """
-        from jinja2 import Undefined, Environment
+        import re
+        _filter = trans_filter or (lambda s: s)
+        _pattern = re.compile(r"""\{\{\s*['"](.+?)['"]\s*\|\s*trans\s*\}\}""")
 
-        class KeepUndefined(Undefined):
-            """未定义变量原样保留占位符，支持任意深度的属性链。"""
-            def __str__(self):
-                return '{{ ' + self._undefined_name + ' }}'
-            def __getattr__(self, name):
-                return KeepUndefined(name=f'{self._undefined_name}.{name}')
+        def _translate(s):
+            return _pattern.sub(lambda m: _filter(m.group(1)), s)
 
-        template_str = json.dumps(data, ensure_ascii=False)
-        env = Environment(undefined=KeepUndefined)
-        env.filters['trans'] = trans_filter or (lambda s: s)
-        rendered = env.from_string(template_str).render(settings=Setting)
-        return json.loads(rendered)
+        def _walk(obj):
+            if isinstance(obj, dict):
+                return {k: _walk(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_walk(item) for item in obj]
+            if isinstance(obj, str):
+                return _translate(obj)
+            return obj
+
+        return _walk(data)
 
     def _build_trans_filter(self, lang):
         """构建 Jinja2 | trans filter 函数，按 lang 从 YAML i18n 表查找翻译。
@@ -149,8 +194,13 @@ class CertVendorDriverConfig:
         return data
     
     def _apply_cert_config_to_data(self, data):
-        """将 'cert' 配置段渲染后添加到 data['cert']，供前端 API 层使用。"""
-        cert = {
+        """将 'config' 配置段渲染后添加到 data['config']，供前端 API 层使用。"""
+        config = data.get('config') or {}
+        asym_alg_name = self.ca_cert_asym_alg
+        asym_alg_key = asym_alg_name or 'default'
+        _asym_alg = config.get('asymAlg', {}).get(asym_alg_key)
+        _key_length = config.get('keyLength', {}).get(asym_alg_key)
+        _config = {
             'challenge_ttl': self.challenge_ttl,
             'enroll': {
                 'enabled': self.enroll_enabled,
@@ -158,10 +208,13 @@ class CertVendorDriverConfig:
             },
             'pin': {
                 'default': self.default_pin
-            }
-
+            },
+            'asymAlg': _asym_alg,
+            'keyLength': _key_length,
+            'asymAlgName': asym_alg_name
         }
-        data['cert'] = cert
+        config.update(_config)
+        data['config'] = config
         return data
 
 
