@@ -30,6 +30,9 @@ from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
+from tickets.filters import TicketFilter
+from tickets.models import Ticket
+from tickets.serializers.ticket import TicketSerializer
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices, ActionChoices
@@ -297,6 +300,25 @@ class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return self.model.filter_queryset_by_org(queryset)
+
+
+class TicketAuditViewSet(OrgReadonlyModelViewSet):
+    model = Ticket
+    serializer_class = TicketSerializer
+    filterset_class = TicketFilter
+    search_fields = ['title', 'type', 'status']
+    ordering = ('-date_created',)
+    permission_classes = [RBACPermission]
+    rbac_perms = {
+        'list': 'tickets.view_ticket',
+        'retrieve': 'tickets.view_ticket',
+    }
+
+    def get_queryset(self):
+        queryset = self.model.objects.all()
+        if not current_org.is_root():
+            queryset = queryset.filter(org_id=str(current_org.id))
+        return queryset
 
 
 class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
