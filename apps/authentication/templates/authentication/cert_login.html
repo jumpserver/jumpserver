@@ -229,7 +229,7 @@
         {# signature is filled by JS after signing challenge code, not shown to user #}
         {{ form.signature }}
 
-        <div id="cert-challenge-box" data-challenge="{{ challenge }}" style="display:none;"></div>
+        <div id="cert-challenge-box" data-challenge="{{ challenge }}" data-challenge-length="{{ challenge|length }}" style="display:none;"></div>
 
         <div class="form-group">
             <button type="submit" id="cert-login-btn" class="btn btn-transparent" disabled>
@@ -289,112 +289,195 @@
         document.head.appendChild(s);
     }
 
-    /* ── USB Key manager built from config ──────────────────── */
-    function UsbKeyManager(config) {
-        this.config = config;
-        this.api    = null;
+    /* ════════════════════════════════════════════════════════════════
+       Persistent namespace: populated by driver.setup.steps and
+       login.detect.steps; accessible across all step executions.
+    ════════════════════════════════════════════════════════════════ */
+    var ukey = {};
 
-        var ctorName = (config.newUKeyAPI || {}).method && config.newUKeyAPI.method.call;
-        if (!ctorName || typeof window[ctorName] !== 'function') {
-            throw new Error(MSG.initError + ': ' + ctorName);
-        }
-        this.api = new window[ctorName]();
-    }
-
-    /* Resolve a single param value: replace {{ scope.key }} placeholders from context.
-       context shape: { output: {}, input: {}, user: {}, ... }
-       Unresolved placeholders are replaced with empty string. */
-    function resolveParamValue(value, context) {
-        if (typeof value !== 'string') return value;
-        return value.replace(/\{\{\s*([\w.]+)\s*\}\}/g, function (_, path) {
-            var parts = path.split('.');
-            var obj   = context;
-            for (var i = 0; i < parts.length; i++) {
-                if (obj == null) return '';
-                obj = obj[parts[i]];
+    /* ── Resolve a value against a context ─────────────────────────
+       Namespaces: ukey / vars / input / instance / config / challenge
+       Complex arg types: { type: 'csv', value: {...} }
+                          { type: 'json', value: {...} }
+    ─────────────────────────────────────────────────────────────── */
+    function resolve(val, ctx) {
+        if (typeof val === 'string') {
+            /* If the entire value is a single {[ expr ]} expression, return the raw value
+               (preserves original type: number, boolean, etc.).
+               Otherwise do string interpolation and always return a string. */
+            var single = val.match(/^\{\{\s*([\w.]+)\s*\}\}$/);
+            if (single) {
+                var parts = single[1].split('.');
+                var obj = ctx;
+                for (var i = 0; i < parts.length; i++) {
+                    if (obj == null) return null;
+                    obj = obj[parts[i]];
+                }
+                return (obj !== undefined) ? obj : null;
             }
-            return (obj !== undefined && obj !== null) ? String(obj) : '';
-        });
+            return val.replace(/\{\{\s*([\w.]+)\s*\}\}/g, function (_, path) {
+                var parts = path.split('.');
+                var obj = ctx;
+                for (var i = 0; i < parts.length; i++) {
+                    if (obj == null) return '';
+                    obj = obj[parts[i]];
+                }
+                return (obj !== undefined && obj !== null) ? String(obj) : '';
+            });
+        }
+        if (val && typeof val === 'object' && !Array.isArray(val)) {
+            if (val.type === 'csv') {
+                return Object.keys(val.value).map(function (k) {
+                    return k + '=' + resolve(val.value[k], ctx);
+                }).join(',');
+            }
+            if (val.type === 'json') {
+                var obj = {};
+                Object.keys(val.value).forEach(function (k) { obj[k] = resolve(val.value[k], ctx); });
+                return JSON.stringify(obj);
+            }
+        }
+        return val;
     }
 
-    /* Call a vendor method by its abstract config key, returns a Promise.
-       Params are read from config[key].method.params in order.
-       Template placeholders ({{ scope.key }}) in param values are resolved
-       from context: { output, input, user, ... } */
-    UsbKeyManager.prototype.call = function (abstractKey, context) {
-        var cfg    = this.config[abstractKey];
-        var method = cfg && cfg.method && cfg.method.call;
-        if (!method || typeof this.api[method] !== 'function') {
-            return Promise.reject(new Error('Method not found: ' + method));
+    /* ── Write a value into ctx by dotted path ──────────────────── */
+    function setPath(ctx, path, value) {
+        var parts = path.split('.');
+        var obj = ctx;
+        for (var i = 0; i < parts.length - 1; i++) {
+            if (!obj[parts[i]] || typeof obj[parts[i]] !== 'object') obj[parts[i]] = {};
+            obj = obj[parts[i]];
         }
-        var ctx = context || {};
-        var args = ((cfg.method.params) || []).map(function (p) {
-            var raw = p['value'] !== undefined ? p['value'] : p['default'];
-            return resolveParamValue(raw, ctx);
-        });
+        obj[parts[parts.length - 1]] = value;
+    }
+
+    /* ── Evaluate a check expression ────────────────────────────────
+       expr form (in YAML): {[ result === 0 ]} or {[ vars.x !== null ]}
+       ctx must include `result` for result-based checks.
+       Config is server-controlled; Function constructor is intentional.
+    ─────────────────────────────────────────────────────────────── */
+    function evalCheck(check, ctx) {
+        var expr = typeof check === 'string' ? check : (check.expr || '');
+        var cleaned = expr.replace(/^\s*\{\{\s*|\s*\}\}\s*$/g, '').trim();
         try {
-            return Promise.resolve(this.api[method].apply(this.api, args));
+            /* jshint -W054 */
+            return !!new Function(
+                'ukey', 'vars', 'input', 'result', 'instance', 'config', 'settings', 'challenge',
+                'return (' + cleaned + ');'
+            )(ctx.ukey, ctx.vars, ctx.input, ctx.result, ctx.instance, ctx.config, ctx.settings, ctx.challenge);
         } catch (e) {
-            return Promise.reject(e);
-        }
-    };
-
-    /* Get CN string from the USB Key via config's getCertCN method. */
-    UsbKeyManager.prototype.getCertCN = function () {
-        return this.call('getCertCN').then(function (result) {
-            return result || null;
-        }).catch(function () { return null; });
-    };
-
-    /* Verify the PIN entered by the user.
-       Success is determined by config.checkPIN.method.result.success if defined,
-       otherwise falls back to treating 0 / true as success.
-       Returns a Promise<boolean>. */
-    UsbKeyManager.prototype.checkPIN = function (pinValue) {
-        var self = this;
-        return this.call('checkPIN', { input: { login_pin: pinValue } }).then(function (result) {
-            var resultCfg = ((self.config.checkPIN || {}).method || {}).result;
-            if (resultCfg && 'success' in resultCfg) {
-                return result === resultCfg.success;
-            }
-            return result === 0 || result === true || result === 'true';
-        }).catch(function () { return false; });
-    };
-
-    /* Get certificate string from the USB Key via config's getCert method.
-       Returns a Promise<string|null>. */
-    UsbKeyManager.prototype.getCert = function () {
-        return this.call('getCert', {}).then(function (result) {
-            return result || null;
-        }).catch(function () { return null; });
-    };
-
-    /* Sign the challenge code with the USB Key's private key.
-       The challenge is base64-encoded before being passed to the SDK.
-       Returns a Promise<string|null>. */
-    UsbKeyManager.prototype.signData = function (challengeCode) {
-        var encoded = btoa(challengeCode);
-        return this.call('signData', { output: { challenge_code: encoded } }).then(function (result) {
-            return result || null;
-        }).catch(function () { return null; });
-    };
-
-    /* Check whether a USB Key is currently inserted */
-    UsbKeyManager.prototype.isInserted = function () {
-        var self = this;
-        // checkInstall returns 0
-        return self.call('checkInstall').then(function (result) {
-            return result === 0 ? true : !!result;
-        }).catch(function () {
             return false;
+        }
+    }
+
+    /* evalWhen: same as evalCheck but no `result` dependency — used for
+       top-level `when` guards (e.g. info.cert.when, operation.hidden). */
+    function evalWhen(expr, ctx) {
+        return evalCheck(expr, Object.assign({ result: undefined }, ctx));
+    }
+
+    /* ── Execute a single step ──────────────────────────────────────
+       step types:
+         (default)  — call UKey SDK method (step.call)
+         api        — HTTP request (step.url / step.method / step.body)
+         submit     — fill form fields by id_<name> and submit form
+    ─────────────────────────────────────────────────────────────── */
+    function runStep(step, api, ctx) {
+        /* when: skip step if condition is false */
+        if (step.when !== undefined && !evalWhen(step.when, ctx)) {
+            return Promise.resolve(null);
+        }
+
+        /* api: HTTP request */
+        if (step.type === 'api') {
+            var body = {};
+            if (step.body) {
+                Object.keys(step.body).forEach(function (k) { body[k] = resolve(step.body[k], ctx); });
+            }
+            var match = document.cookie.match(/csrftoken=([^;]+)/);
+            var csrfToken = match ? match[1] : '';
+            return fetch(resolve(step.url || '', ctx), {
+                method: (step.method || 'GET').toUpperCase(),
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: step.method && step.method.toLowerCase() !== 'get' ? JSON.stringify(body) : undefined
+            }).then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            }).then(function (result) {
+                if (step.register) setPath(ctx, step.register, result);
+                return result;
+            });
+        }
+
+        /* submit: fill form fields and submit */
+        if (step.type === 'submit') {
+            if (step.fields) {
+                Object.keys(step.fields).forEach(function (k) {
+                    var el = document.getElementById('id_' + k);
+                    if (el) el.value = resolve(step.fields[k], ctx);
+                });
+            }
+            document.getElementById('cert-login-form').submit();
+            return Promise.resolve(null);
+        }
+
+        /* ukey: SDK method call */
+        var methodName = step.call;
+        if (!methodName || typeof api[methodName] !== 'function') {
+            var notFoundErr = new Error('Method not found: ' + methodName);
+            notFoundErr.step = step;
+            return Promise.reject(notFoundErr);
+        }
+        var args = (step.args || []).map(function (a) { return resolve(a, ctx); });
+        var result;
+        try {
+            result = api[methodName].apply(api, args);
+        } catch (e) {
+            var callCtx = Object.assign({}, ctx, { result: e });
+            var callMsg = (step.check && typeof step.check === 'object' && step.check.message)
+                ? resolve(step.check.message, callCtx)
+                : (step.label || step.name || step.call || String(e));
+            var callErr = new Error(callMsg);
+            callErr.isCheckFailure = !!(step.check && typeof step.check === 'object' && step.check.message);
+            callErr.step = step;
+            return Promise.reject(callErr);
+        }
+        return Promise.resolve(result).then(function (result) {
+            if (step.check) {
+                var checkCtx = Object.assign({}, ctx, { result: result });
+                if (!evalCheck(step.check, checkCtx)) {
+                    var msg = (typeof step.check === 'object' && step.check.message)
+                        ? resolve(step.check.message, checkCtx)
+                        : (step.label || step.name || step.call || 'Step failed');
+                    var err = new Error(msg);
+                    err.isCheckFailure = true;
+                    err.step = step;
+                    throw err;
+                }
+            }
+            if (step.register) setPath(ctx, step.register, result);
+            return result;
         });
-    };
+    }
+
+    /* ── Execute steps sequentially ─────────────────────────────── */
+    function runSteps(steps, api, ctx, onStep) {
+        return (steps || []).reduce(function (p, step) {
+            return p.then(function () {
+                if (onStep && (step.label || step.name)) onStep(step.label || step.name);
+                return runStep(step, api, ctx).catch(function (e) {
+                    if (step.on_error === 'skip') return null;
+                    throw e;
+                });
+            });
+        }, Promise.resolve());
+    }
 
     /* ── Main init ──────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function () {
         setStatus('loading', MSG.loading);
 
-        // 1. Fetch config + vendor JS in parallel
+        // 1. Fetch config + vendor JS + public settings in parallel
         Promise.all([
             fetch(API_CONFIG).then(function (r) {
                 if (!r.ok) throw new Error('config ' + r.status);
@@ -403,87 +486,124 @@
             fetch(API_JS).then(function (r) {
                 if (!r.ok) throw new Error('driver js ' + r.status);
                 return r.text();
+            }),
+            fetch('/api/v1/settings/public/open/').then(function (r) {
+                if (!r.ok) throw new Error('settings ' + r.status);
+                return r.json();
             })
         ]).then(function (results) {
-            var config = results[0];
-            var jsText = results[1];
+            var sdkConfig = results[0];
+            var jsText      = results[1];
+            var settings    = results[2];
 
-            // 2. Inject vendor JS
+            // 2. Inject vendor SDK
             injectScript(jsText);
 
-            // 3. Instantiate USBAPI from config
-            var manager = new UsbKeyManager(config);
+            // 3. Create SDK instance from sdkConfig.driver.create
+            var driverCreate = (sdkConfig.driver || {}).create || {};
+            var ctorName = driverCreate.constructor;
+            if (!ctorName || typeof window[ctorName] !== 'function') {
+                throw new Error(MSG.initError + ': ' + ctorName);
+            }
+            var ctorArgs = driverCreate.args || [];
+            var api = new (Function.prototype.bind.apply(
+                window[ctorName], [null].concat(ctorArgs)
+            ))();
 
-            // 4. Poll USB Key status
-            setStatus('loading', MSG.detecting);
+            // Build base context — ukey is the shared persistent namespace
+            // config  → sdkConfig.config  (the config sub-key from YAML)
+            // settings → /api/v1/settings/public/open/ response
+            var ctx = {
+                ukey:      ukey,
+                vars:      {},
+                input:     {},
+                instance:  api,
+                config:    sdkConfig.config || {},
+                settings:  settings,
+                challenge: (function () {
+                    var el = document.getElementById('cert-challenge-box');
+                    if (!el) return { code: '', code_base64: '', length: 0 };
+                    var code = el.dataset.challenge || '';
+                    var length = parseInt(el.dataset.challengeLength, 10) || code.length;
+                    var code_base64 = btoa(unescape(encodeURIComponent(code)));
+                    return { code: code, code_base64: code_base64, length: length };
+                }())
+            };
 
-            var lastCN          = null;
+            // 4. Run driver.setup.steps
+            var setupSteps = ((sdkConfig.driver || {}).setup || {}).steps || [];
+            return runSteps(setupSteps, api, ctx).then(function () {
+                return { sdkConfig: sdkConfig, api: api, ctx: ctx };
+            });
+
+        }).then(function (state) {
+            var sdkConfig = state.sdkConfig;
+            var api         = state.api;
+            var ctx         = state.ctx;
+
             var usernameDisplay = document.getElementById('username-display');
             var usernameHidden  = document.getElementById('id_username');
+            var lastCN = null;
 
             function setUsername(cn) {
-                if (cn === lastCN) return; // unchanged, skip DOM update
+                if (cn === lastCN) return;
                 lastCN = cn;
                 usernameDisplay.value = cn || '';
                 usernameHidden.value  = cn || '';
             }
 
+            // 5. Poll: run login.detect.steps → read ukey.certCN → update UI
+            var detectSteps = (((sdkConfig.login || {}).detect || {}).steps) || [];
+
             function poll() {
-                manager.isInserted().then(function (inserted) {
-                    if (inserted) {
-                        manager.getCertCN().then(function (cn) {
-                            setUsername(cn);
-                            if (cn) {
-                                setStatus('inserted', MSG.inserted);
-                            } else {
-                                setStatus('error', MSG.noCN);
-                            }
-                        });
+                var pollCtx = Object.assign({}, ctx, { vars: {} });
+                runSteps(detectSteps, api, pollCtx).then(function () {
+                    // All detect steps passed
+                    setUsername(ukey.certCN || null);
+                    setStatus('inserted', MSG.inserted);
+                }).catch(function (err) {
+                    setUsername(null);
+                    if (err && err.isCheckFailure) {
+                        // A step's check expr failed — show its message
+                        setStatus('error', err.message);
                     } else {
-                        setUsername(null);
+                        // Device not reachable / method threw
                         setStatus('not-inserted', MSG.notInserted);
                     }
                 });
             }
 
             poll();
-            setInterval(poll, 5000);
+            setInterval(poll, 50000);
 
-            // 5. Intercept form submit: PIN → signData → getCert → submit
+            // 6. Form submit: run login.steps from config
             document.getElementById('cert-login-form').addEventListener('submit', function (evt) {
                 evt.preventDefault();
-                var pinInput      = document.getElementById('id_pin');
-                var pinValue      = pinInput ? pinInput.value : '';
-                var challengeCode = document.getElementById('cert-challenge-box').dataset.challenge || '';
+                var pinInput = document.getElementById('id_pin');
+                var pinValue = pinInput ? pinInput.value : '';
 
                 setStatus('loading', MSG.pinChecking);
 
-                manager.checkPIN(pinValue)
-                    .then(function (ok) {
-                        if (!ok) {
-                            if (pinInput) { pinInput.value = ''; pinInput.focus(); }
-                            throw { msg: MSG.pinFail };
-                        }
-                        setStatus('loading', MSG.signing);
-                        return manager.signData(challengeCode);
-                    })
-                    .then(function (signature) {
-                        if (!signature) throw { msg: MSG.signFail };
-                        return manager.getCert().then(function (cert) {
-                            return { signature: signature, cert: cert };
-                        });
-                    })
-                    .then(function (data) {
-                        if (!data.cert) throw { msg: MSG.certFail };
-                        document.getElementById('id_signature').value = data.signature;
-                        document.getElementById('id_cert').value      = data.cert;
-                        setStatus('inserted', MSG.pinOk);
-                        document.getElementById('cert-login-form').submit();
-                    })
-                    .catch(function (err) {
-                        setStatus('error', err.msg || MSG.pinFail);
-                        loginBtn.disabled = false;
-                    });
+                var loginSteps = ((sdkConfig.login || {}).steps) || [];
+                var loginCtx = Object.assign({}, ctx, {
+                    vars:  {},
+                    input: { pin: pinValue }
+                });
+
+                runSteps(loginSteps, api, loginCtx, function (label) {
+                    setStatus('loading', label);
+                }).then(function () {
+                    setStatus('inserted', MSG.pinOk);
+                }).catch(function (err) {
+                    if (pinInput) { pinInput.value = ''; pinInput.focus(); }
+                    console.log('....', err);
+                    setStatus(
+                        'error', 
+                        err.message || 
+                        MSG.pinFail
+                    );
+                    loginBtn.disabled = false;
+                });
             });
 
         }).catch(function (err) {

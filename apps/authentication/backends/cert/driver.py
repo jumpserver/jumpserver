@@ -1,6 +1,7 @@
 import os
 import yaml
 from django.conf import settings
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from common.decorators import Singleton
@@ -193,28 +194,54 @@ class CertVendorDriverConfig:
         data = {k: v for k, v in data.items() if k not in ('i18n',)}
         return data
     
+    # 当一个 config 值是含这些 key 的 dict 时，视为"算法分支字典"，自动按当前证书算法解析
+    _ALGO_BRANCH_KEYS = frozenset({'SM2', 'RSA-1024', 'RSA-2048', 'default'})
+
+    @classmethod
+    def _is_algo_branch(cls, value):
+        """判断 value 是否为算法分支字典（至少含一个已知算法 key）。"""
+        return isinstance(value, dict) and bool(cls._ALGO_BRANCH_KEYS & value.keys())
+
+    def _resolve_algo_branch(self, branch, algo_key):
+        """从算法分支字典中取当前算法对应的值，找不到时退回 default，再找不到返回 None。"""
+        if algo_key in branch:
+            return branch[algo_key]
+        return branch.get('default')
+
     def _apply_cert_config_to_data(self, data):
-        """将 'config' 配置段渲染后添加到 data['config']，供前端 API 层使用。"""
+        """将 'config' 配置段渲染后添加到 data['config']，供前端 API 层使用。
+        
+        YAML config 中值为算法分支字典（含 SM2/RSA-1024/RSA-2048/default 等 key）的字段，
+        会自动根据 CA 证书算法类型解析为对应的标量值，无需在此处逐字段枚举。
+        """
         config = data.get('config') or {}
         asym_alg_name = self.ca_cert_asym_alg
-        asym_alg_key = asym_alg_name or 'default'
-        _asym_alg = config.get('asymAlg', {}).get(asym_alg_key)
-        _key_length = config.get('keyLength', {}).get(asym_alg_key)
-        _config = {
+        algo_key = asym_alg_name or 'default'
+
+        # 自动展开所有算法分支字典字段
+        resolved_config = {}
+        for k, v in config.items():
+            if self._is_algo_branch(v):
+                resolved_config[k] = self._resolve_algo_branch(v, algo_key)
+            else:
+                resolved_config[k] = v
+
+        # 追加后端专有字段（不在 YAML config 中配置）
+        resolved_config.update({
+            'asymAlgName': asym_alg_name,
             'challenge_ttl': self.challenge_ttl,
             'enroll': {
                 'enabled': self.enroll_enabled,
                 'validity_days': self.enroll_validity_days,
             },
             'pin': {
-                'default': self.default_pin
+                'default': self.default_pin,
             },
-            'asymAlg': _asym_alg,
-            'keyLength': _key_length,
-            'asymAlgName': asym_alg_name
-        }
-        config.update(_config)
-        data['config'] = config
+            'api': {
+                'enroll_cert_url': reverse('api-auth:cert-enroll'),
+            },
+        })
+        data['config'] = resolved_config
         return data
 
 

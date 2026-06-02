@@ -26,6 +26,16 @@ config:
     RSA-1024: 1024
     RSA-2048: 2048
     default: 256
+  digestMethod:
+    SM2: 1  # SM3
+    RSA-1024: 4 # SHA256
+    RSA-2048: 4 # SHA256
+    default: 1
+  signChallengeMode:
+    SM2: 0
+    RSA-1024: 1 # SHA256
+    RSA-2048: 1 # SHA256
+    default: 0
 
 
 #═══════════════════════════════════════════════════════════════════════════════
@@ -367,7 +377,7 @@ operations:
         label: "服务器签发证书"
         type: api
         method: post
-        url: "/api/v1/authentication/cert/enroll/"
+        url: "{{ config.api.enroll_cert_url }}"
         body:
           user_id: "{{ user.id }}"
           csr: "{{ vars.csr }}"
@@ -405,6 +415,21 @@ operations:
       message: "确认要删除 UKey 中的证书吗？此操作不可逆。"
       type: warning
     steps:
+      - name: verifyUKeyUserPassword
+        label: "验证 UKey 用户密码"
+        input: 
+          title: "验证 UKey 用户密码"
+          fields:
+            - key: userPassWd
+              label: "UKey 用户密码"
+              type: password
+        call: SOF_Login
+        args:
+          - "{{ input.userPassWd }}"
+        check:
+          expr: "{{ result === 0 }}"
+          message: "用户认证失败，错误码: {{ result }}"
+
       - name: getCertSN
         label: "获取证书序列号"
         call: SOF_GetCertInfo
@@ -485,4 +510,91 @@ operations:
         check:
           expr: "{{ result === 0 }}"
           message: "修改 PIN 失败，错误码: {{ result }}"
+
+
+#═══════════════════════════════════════════════════════════════════════════════
+# login: 登录页面流程配置
+#
+# detect.steps  — 轮询检测设备插入状态（步骤失败视为未插入）
+#   步骤执行成功后 ukey.certCN 应被注册，用于自动填充用户名输入框
+#
+# steps         — 点击「登录」后顺序执行的步骤
+#   支持与 operations 相同的步骤字段（call / args / input / register / check）
+#   特殊 type: submit — 填充表单字段并提交（字段名对应 id_<name> 输入框）
+#
+# 登录流程可用命名空间:
+#   {{ input.pin }}     — 用户在 PIN 输入框中填写的值
+#   {{ ukey.cert }}     — detect.steps 中注册的证书（供 submit 步骤引用）
+#   {{ vars.* }}        — 步骤间临时变量（每次登录重置）
+#   {{ challenge }}     — 服务端下发的挑战码
+#═══════════════════════════════════════════════════════════════════════════════
+login:
+
+  # 轮询检测设备 — 步骤失败则视为设备未插入
+  detect:
+    steps:
+      - name: getUserCert
+        label: "获取证书"
+        call: SOF_ExportUserCert
+        args:
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ config.keySpec }}"   # keySpec
+        register: ukey.cert
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "未检测到证书"
+
+      - name: getCertCN
+        when: "{{ ukey.cert != null && ukey.cert !== '' }}"
+        label: "获取证书 CN"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"
+          - "{{ instance.SGD_CERT_SUBJECT_CN }}"
+        register: ukey.certCN
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "获取证书 CN 失败"
+
+  # 登录步骤
+  steps:
+    - name: verifyPin
+      label: "验证 PIN"
+      call: SOF_Login       # TODO: 确认厂商 SDK 的验证 PIN 方法名
+      args:
+        - "{{ input.pin }}"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "PIN 验证失败，错误码: {{ result }}"
+    
+    - name: setDigestMethod
+      label: "设置摘要算法"
+      call: SOF_SetDigestMethod
+      args:
+        - "{{ config.digestMethod }}"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "设置摘要算法失败，错误码: {{ result }}"
+    
+    - name: signChallenge
+      label: "签名挑战码"
+      call: SOF_SignData             # TODO: 确认厂商 SDK 的签名方法名
+      args:
+        - "{{ settings.VENDOR }}"
+        - "{{ config.keySpec }}"
+        - "{{ challenge.code_base64 }}"
+        - "{{ challenge.length }}"
+        - "{{ config.signChallengeMode }}"
+      register: vars.signature
+      check:
+        expr: "{{ vars.signature !== null && vars.signature !== '' }}"
+        message: "签名失败"
+
+    - name: submit
+      label: "提交登录"
+      type: submit
+      fields:
+        signature: "{{ vars.signature }}"
+        cert: "{{ ukey.cert }}"
+        username: "{{ ukey.certCN }}"  # 可选，自动填充用户名输入框
 

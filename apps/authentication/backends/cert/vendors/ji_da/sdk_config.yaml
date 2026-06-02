@@ -21,6 +21,12 @@ config:
   keySpec: 1  # 1 表示签名密钥
   # 证书类型
   certType: 1 # 1 表示签名证书
+  # 摘要签名算法
+  digestAlg:
+    SM2: 1
+    RSA-1024: 4
+    RSA-2048: 4
+    default: 1
 
 #═══════════════════════════════════════════════════════════════════════════════
 # driver: SDK 脚本加载、实例创建、初始化步骤
@@ -271,7 +277,7 @@ operations:
         label: "服务器签发证书"
         type: api
         method: post
-        url: "/api/v1/authentication/cert/enroll/"
+        url: "{{ config.api.enroll_cert_url }}"
         body:
           user_id: "{{ user.id }}"
           csr: "{{ vars.csr }}"
@@ -349,4 +355,77 @@ operations:
         args:
           - "{{ input.oldPin }}"
           - "{{ input.newPin }}"
+
+
+#═══════════════════════════════════════════════════════════════════════════════
+# login: 登录页面流程配置
+#
+# detect.steps  — 轮询检测设备插入状态（步骤失败视为未插入）
+#   步骤执行成功后 ukey.certCN 应被注册，用于自动填充用户名输入框
+#
+# steps         — 点击「登录」后顺序执行的步骤
+#   支持与 operations 相同的步骤字段（call / args / input / register / check）
+#   特殊 type: submit — 填充表单字段并提交（字段名对应 id_<name> 输入框）
+#
+# 登录流程可用命名空间:
+#   {{ input.pin }}     — 用户在 PIN 输入框中填写的值
+#   {{ ukey.cert }}     — detect.steps 中注册的证书（供 submit 步骤引用）
+#   {{ vars.* }}        — 步骤间临时变量（每次登录重置）
+#   {{ challenge }}     — 服务端下发的挑战码
+#═══════════════════════════════════════════════════════════════════════════════
+login:
+
+  # 轮询检测设备 — 步骤失败则视为设备未插入
+  detect:
+    steps:
+      - name: getCert
+        label: "获取证书"
+        call: UKey_GetCert
+        args:
+          - "{{ config.certType }}"  # 证书类型参数
+        register: ukey.cert
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "未检测到证书"
+
+      - name: getCertCN
+        label: "证书拥有者 CN"
+        call: UKey_GetCertInfo
+        args: 
+          - "{{ config.certType }}"  # 证书类型参数
+          - 9
+        register: ukey.certCN
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "获取证书 CN 失败"
+
+  # 登录步骤
+  steps:
+    - name: verifyPin
+      label: "验证 PIN"
+      call: UKey_VerifyPIN
+      args:
+        - "{{ input.pin }}"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "PIN 验证失败，错误码: {{ result }}"
+    
+    - name: signChallenge
+      label: "签名挑战码"
+      call: UKey_SignData
+      args:
+        - "{{ config.digestAlg }}"
+        - "{{ challenge.code_base64 }}"
+      register: vars.signature
+      check:
+        expr: "{{ vars.signature !== null && vars.signature !== '' }}"
+        message: "签名失败，错误码: {{ result }}"
+
+    - name: submit
+      label: "提交登录"
+      type: submit
+      fields:
+        signature: "{{ vars.signature }}"
+        cert: "{{ ukey.cert }}"
+        username: "{{ ukey.certCN }}"  # 可选，自动填充用户名输入框
 

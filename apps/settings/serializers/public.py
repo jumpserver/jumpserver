@@ -12,6 +12,7 @@ class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
     INTERFACE = serializers.DictField()
     LANGUAGES = serializers.ListField()
+    VENDOR = serializers.CharField()
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):
