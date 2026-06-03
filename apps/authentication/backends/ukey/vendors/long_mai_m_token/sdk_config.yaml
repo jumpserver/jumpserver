@@ -181,7 +181,7 @@ info:
     - key: asymAlgName
       label: "非对称算法"
       scope: both
-      value: "{{ config.asymAlgName }}"
+      value: "{{ config.asym_alg_name }}"
       hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
     
     - key: enrollValidityDays

@@ -31,8 +31,8 @@ class UKeySDKScriptFileAPIView(APIView):
     @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
         from .sdk import UKeySDKConfig
-        _cert_vd_cfg = UKeySDKConfig()
-        js_file = _cert_vd_cfg.get_sdk_script_js_path()
+        ukey_sdk_config = UKeySDKConfig()
+        js_file = ukey_sdk_config.get_sdk_script_js_path()
         if not js_file or not os.path.isfile(js_file):
             raise Http404
         response = FileResponse(open(js_file, 'rb'), content_type='application/javascript')
@@ -46,8 +46,8 @@ class UKeySDKConfigFileAPIView(APIView):
     def get(self, request):
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
         from .sdk import UKeySDKConfig
-        _cert_vd_cfg = UKeySDKConfig()
-        data = _cert_vd_cfg.get_vendor_sdk_data(lang=lang)
+        ukey_sdk_config = UKeySDKConfig()
+        data = ukey_sdk_config.get_sdk_config(lang=lang)
         return Response(data)
 
 

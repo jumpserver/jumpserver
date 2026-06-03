@@ -22,8 +22,6 @@ class UKeySDKConfig:
         cf_path = self.get_sdk_config_yaml_path()
         self._raw = self._load_yaml(cf_path)
 
-    # ── YAML 加载 ────────────────────────────────────────────────────────────
-
     def _vendor_path(self, filename):
         return os.path.join(
             settings.PROJECT_DIR,
@@ -150,14 +148,14 @@ class UKeySDKConfig:
 
         return trans_filter
 
-    def get_vendor_sdk_data(self, lang='en'):
+    def get_sdk_config(self, lang='en'):
         """返回去掉 'cert'/'i18n' 顶层 key 后的厂商 SDK 方法映射。
         YAML 中任意字符串值均可用 {{ 'text' | trans }} 语法标记为可翻译。
         """
         lang = Language.to_internal_code(lang)
         trans_filter = self._build_trans_filter(lang)
         data = self._render(self._raw, trans_filter)
-        data = self._apply_cert_config_to_data(data)
+        data = self._apply_config_to_sdk(data)
         data = {k: v for k, v in data.items() if k not in ('i18n',)}
         return data
     
@@ -175,7 +173,7 @@ class UKeySDKConfig:
             return branch[algo_key]
         return branch.get('default')
 
-    def _apply_cert_config_to_data(self, data):
+    def _apply_config_to_sdk(self, data):
         """将 'config' 配置段渲染后添加到 data['config']，供前端 API 层使用。
         
         YAML config 中值为算法分支字典（含 SM2/RSA-1024/RSA-2048/default 等 key）的字段，
@@ -195,7 +193,7 @@ class UKeySDKConfig:
 
         # 追加后端专有字段（不在 YAML config 中配置）
         resolved_config.update({
-            'asymAlgName': asym_alg_name,
+            'asym_alg_name': asym_alg_name,
             'challenge_ttl': self.challenge_ttl,
             'enroll': {
                 'enabled': self.enroll_enabled,
