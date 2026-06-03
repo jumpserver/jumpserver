@@ -28,7 +28,6 @@ logger = get_logger(__name__)
 class UKeySDKScriptFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
-    @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
         content = ukey_sdk_config.load_sdk_script_content()
         if content is None:

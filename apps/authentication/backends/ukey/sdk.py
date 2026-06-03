@@ -153,6 +153,7 @@ class UKeySDKConfig:
         """构建 Jinja2 | trans filter 函数，按 lang 从 YAML i18n 表查找翻译。
         未找到翻译时原文返回；语言键自动归一化（zh_hant → zh-hant）。
         """
+        lang = Language.to_internal_code(lang)
         i18n_raw = sdk_config.get('i18n') or {}
         i18n = {
             text: {
@@ -167,7 +168,7 @@ class UKeySDKConfig:
             translations = i18n.get(str(s))
             if not translations:
                 return s
-            return translations.get(lang) or translations.get('en') or s
+            return translations.get(lang) or s
 
         return trans_filter
 
@@ -176,7 +177,6 @@ class UKeySDKConfig:
         """返回去掉 'cert'/'i18n' 顶层 key 后的厂商 SDK 方法映射。
         YAML 中任意字符串值均可用 {{ 'text' | trans }} 语法标记为可翻译。
         """
-        lang = Language.to_internal_code(lang)
         sdk_config = self.load_sdk_config_content()
         trans_filter = self._build_trans_filter(sdk_config, lang)
         sdk_config = self._render(sdk_config, trans_filter)
