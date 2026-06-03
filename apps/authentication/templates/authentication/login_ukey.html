@@ -24,7 +24,7 @@
             flex-direction: column;
         }
 
-        .cert-login-box {
+        .ukey-login-box {
             background-color: #fff;
             border-radius: 6px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -35,17 +35,17 @@
             margin-bottom: auto;
         }
 
-        .cert-login-box .logo-row {
+        .ukey-login-box .logo-row {
             text-align: center;
             margin-bottom: 16px;
         }
 
-        .cert-login-box .logo-row img {
+        .ukey-login-box .logo-row img {
             height: 48px;
             width: 48px;
         }
 
-        .cert-login-box h3 {
+        .ukey-login-box h3 {
             text-align: center;
             font-weight: 400;
             font-size: 20px;
@@ -54,8 +54,8 @@
             margin-bottom: 24px;
         }
 
-        /* USB Key status bar */
-        .usb-status-bar {
+        /* UKey status bar */
+        .ukey-status-bar {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -66,55 +66,55 @@
             border: 1px solid transparent;
         }
 
-        .usb-status-bar .usb-dot {
+        .ukey-status-bar .ukey-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
             flex-shrink: 0;
         }
 
-        .usb-status-loading {
+        .ukey-status-loading {
             background-color: #f5f5f5;
             border-color: #ddd;
             color: #888;
         }
 
-        .usb-status-loading .usb-dot {
+        .ukey-status-loading .ukey-dot {
             background-color: #bbb;
-            animation: usb-blink 1.2s infinite;
+            animation: ukey-blink 1.2s infinite;
         }
 
-        .usb-status-inserted {
+        .ukey-status-inserted {
             background-color: #f0faf0;
             border-color: #b7deb7;
             color: #3a7d3a;
         }
 
-        .usb-status-inserted .usb-dot {
+        .ukey-status-inserted .ukey-dot {
             background-color: #52c41a;
         }
 
-        .usb-status-not-inserted {
+        .ukey-status-not-inserted {
             background-color: #fffbe6;
             border-color: #ffe58f;
             color: #ad8b00;
         }
 
-        .usb-status-not-inserted .usb-dot {
+        .ukey-status-not-inserted .ukey-dot {
             background-color: #faad14;
         }
 
-        .usb-status-error {
+        .ukey-status-error {
             background-color: #fff2f0;
             border-color: #ffccc7;
             color: #cf1322;
         }
 
-        .usb-status-error .usb-dot {
+        .ukey-status-error .ukey-dot {
             background-color: #ff4d4f;
         }
 
-        @keyframes usb-blink {
+        @keyframes ukey-blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
@@ -187,19 +187,19 @@
 </head>
 
 <body>
-<div class="cert-login-box">
+<div class="ukey-login-box">
     <div class="logo-row">
         <img src="{{ INTERFACE.logo_logout }}" alt="Logo"/>
     </div>
     <h3>{% trans "UKey Authentication" %}</h3>
 
-    <!-- USB Key status indicator -->
-    <div id="usb-status-bar" class="usb-status-bar usb-status-loading">
-        <span class="usb-dot"></span>
-        <span id="usb-status-text">{% trans "Loading USB Key driver..." %}</span>
+    <!-- UKey status indicator -->
+    <div id="ukey-status-bar" class="ukey-status-bar ukey-status-loading">
+        <span class="ukey-dot"></span>
+        <span id="ukey-status-text">{% trans "Loading UKey SDK..." %}</span>
     </div>
 
-    <form id="cert-login-form" autocomplete="off" action="" method="post" role="form" novalidate="novalidate">
+    <form id="ukey-login-form" autocomplete="off" action="" method="post" role="form" novalidate="novalidate">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -208,10 +208,10 @@
             </div>
         {% endif %}
 
-        {# username is auto-filled from USB Key cert, display input is readonly, actual value submitted via hidden field #}
+        {# username is auto-filled from UKey cert, display input is readonly, actual value submitted via hidden field #}
         <div class="form-group{% if form.username.errors %} has-error{% endif %}">
             <input type="text" id="username-display" class="form-control"
-                   placeholder="{% trans 'Insert USB Key to auto-fetch' %}"
+                   placeholder="{% trans 'Insert UKey to auto-fetch' %}"
                    readonly tabindex="-1"
                    style="background-color:#f7f7f7; cursor:default; color:#555;">
             {{ form.username }}
@@ -219,22 +219,22 @@
                 <p class="help-block red-fonts">{{ form.username.errors.as_text }}</p>
             {% endif %}
         </div>
-        {# PIN is only used for client-side USB Key verification, not submitted to backend #}
+        {# PIN is only used for client-side UKey verification, not submitted to backend #}
         <div class="form-group">
             <input type="password" id="id_pin" class="form-control"
                    placeholder="PIN" autocomplete="off">
         </div>
-        {# cert is fetched and filled by JS after PIN verification, not shown to user #}
+        {# ukey cert is fetched and filled by JS after PIN verification, not shown to user #}
         {{ form.cert }}
         {# signature is filled by JS after signing challenge code, not shown to user #}
         {{ form.signature }}
         {# ukey_sn is filled by JS after detecting cert, not shown to user #}
         {{ form.ukey_sn }}
 
-        <div id="cert-challenge-box" data-challenge="{{ challenge }}" data-challenge-length="{{ challenge|length }}" style="display:none;"></div>
+        <div id="ukey-challenge-box" data-challenge="{{ challenge }}" data-challenge-length="{{ challenge|length }}" style="display:none;"></div>
 
         <div class="form-group">
-            <button type="submit" id="cert-login-btn" class="btn btn-transparent" disabled>
+            <button type="submit" id="ukey-login-btn" class="btn btn-transparent" disabled>
                 {% trans "Login" %}
             </button>
         </div>
@@ -253,33 +253,32 @@
 
     /* ── i18n strings (rendered server-side) ───────────────── */
     var MSG = {
-        loading:      '{% trans "Loading USB Key driver..." %}',
-        detecting:    '{% trans "Detecting USB Key..." %}',
-        inserted:     '{% trans "USB Key connected" %}',
-        notInserted:  '{% trans "Please insert USB Key" %}',
-        driverError:  '{% trans "Driver unavailable" %}',
-        initError:    '{% trans "USB Key SDK initialization failed" %}',
+        loading:      '{% trans "Loading UKey SDK..." %}',
+        detecting:    '{% trans "Detecting UKey..." %}',
+        inserted:     '{% trans "UKey connected" %}',
+        notInserted:  '{% trans "Please insert UKey" %}',
+        sdkError:     '{% trans "SDK unavailable" %}',
+        initError:    '{% trans "UKey SDK initialization failed" %}',
         pinChecking:  '{% trans "Verifying PIN..." %}',
         pinOk:        '{% trans "PIN verified" %}',
         pinFail:      '{% trans "PIN verification failed" %}',
         signing:      '{% trans "Signing challenge code..." %}',
         signFail:     '{% trans "Signing failed" %}',
-        certFail:     '{% trans "Failed to retrieve certificate" %}',
-        noCN:         '{% trans "No certificate detected, please contact administrator" %}'
+        certFail:     '{% trans "Failed to retrieve UKey cert" %}',
+        noCN:         '{% trans "No UKey cert detected, please contact administrator" %}'
     };
 
     /* ── API URLs ───────────────────────────────────────────── */
-    var API_JS     = '/api/v1/authentication/cert/vendor-driver.js/';
-    var API_CONFIG = '/api/v1/authentication/cert/vendor-driver-config/';
+    var API_CONFIG = '/api/v1/authentication/ukey/ukey-sdk-config/';
 
     /* ── DOM refs ───────────────────────────────────────────── */
-    var statusBar  = document.getElementById('usb-status-bar');
-    var statusText = document.getElementById('usb-status-text');
-    var loginBtn   = document.getElementById('cert-login-btn');
+    var statusBar  = document.getElementById('ukey-status-bar');
+    var statusText = document.getElementById('ukey-status-text');
+    var loginBtn   = document.getElementById('ukey-login-btn');
 
     /* ── Status helper ──────────────────────────────────────── */
     function setStatus(type, message) {
-        statusBar.className = 'usb-status-bar usb-status-' + type;
+        statusBar.className = 'ukey-status-bar ukey-status-' + type;
         statusText.textContent = message;
         loginBtn.disabled = (type !== 'inserted');
     }
@@ -292,7 +291,7 @@
     }
 
     /* ════════════════════════════════════════════════════════════════
-       Persistent namespace: populated by driver.setup.steps and
+       Persistent namespace: populated by sdk.setup.steps and
        login.detect.steps; accessible across all step executions.
     ════════════════════════════════════════════════════════════════ */
     var ukey = {};
@@ -419,7 +418,7 @@
                     if (el) el.value = resolve(step.fields[k], ctx);
                 });
             }
-            document.getElementById('cert-login-form').submit();
+            document.getElementById('ukey-login-form').submit();
             return Promise.resolve(null);
         }
 
@@ -479,15 +478,11 @@
     document.addEventListener('DOMContentLoaded', function () {
         setStatus('loading', MSG.loading);
 
-        // 1. Fetch config + vendor JS + public settings in parallel
+        // 1. Fetch config + public settings in parallel
         Promise.all([
             fetch(API_CONFIG).then(function (r) {
                 if (!r.ok) throw new Error('config ' + r.status);
                 return r.json();
-            }),
-            fetch(API_JS).then(function (r) {
-                if (!r.ok) throw new Error('driver js ' + r.status);
-                return r.text();
             }),
             fetch('/api/v1/settings/public/open/').then(function (r) {
                 if (!r.ok) throw new Error('settings ' + r.status);
@@ -495,19 +490,32 @@
             })
         ]).then(function (results) {
             var sdkConfig = results[0];
-            var jsText      = results[1];
-            var settings    = results[2];
+            var settings    = results[1];
 
-            // 2. Inject vendor SDK
+            // 2. Fetch vendor SDK JS from config.api.ukey_sdk_script_url
+            var jsUrl = ((sdkConfig.config || {}).api || {}).ukey_sdk_script_url || '';
+            if (!jsUrl) throw new Error(MSG.initError + ': ukey_sdk_script_url not configured');
+            return fetch(jsUrl).then(function (r) {
+                if (!r.ok) throw new Error('sdk js ' + r.status);
+                return r.text();
+            }).then(function (jsText) {
+                return { sdkConfig: sdkConfig, jsText: jsText, settings: settings };
+            });
+        }).then(function (results) {
+            var sdkConfig = results.sdkConfig;
+            var jsText      = results.jsText;
+            var settings    = results.settings;
+
+            // 3. Inject vendor SDK
             injectScript(jsText);
 
-            // 3. Create SDK instance from sdkConfig.driver.create
-            var driverCreate = (sdkConfig.driver || {}).create || {};
-            var ctorName = driverCreate.constructor;
+            // 3. Create SDK instance from sdkConfig.sdk.create
+            var sdkCreate = (sdkConfig.sdk || {}).create || {};
+            var ctorName = sdkCreate.constructor;
             if (!ctorName || typeof window[ctorName] !== 'function') {
                 throw new Error(MSG.initError + ': ' + ctorName);
             }
-            var ctorArgs = driverCreate.args || [];
+            var ctorArgs = sdkCreate.args || [];
             var api = new (Function.prototype.bind.apply(
                 window[ctorName], [null].concat(ctorArgs)
             ))();
@@ -523,7 +531,7 @@
                 config:    sdkConfig.config || {},
                 settings:  settings,
                 challenge: (function () {
-                    var el = document.getElementById('cert-challenge-box');
+                    var el = document.getElementById('ukey-challenge-box');
                     if (!el) return { code: '', code_base64: '', length: 0 };
                     var code = el.dataset.challenge || '';
                     var length = parseInt(el.dataset.challengeLength, 10) || code.length;
@@ -532,8 +540,8 @@
                 }())
             };
 
-            // 4. Run driver.setup.steps
-            var setupSteps = ((sdkConfig.driver || {}).setup || {}).steps || [];
+            // 4. Run sdk.setup.steps
+            var setupSteps = ((sdkConfig.sdk || {}).setup || {}).steps || [];
             return runSteps(setupSteps, api, ctx).then(function () {
                 return { sdkConfig: sdkConfig, api: api, ctx: ctx };
             });
@@ -579,7 +587,7 @@
             setInterval(poll, 5000);
 
             // 6. Form submit: run login.steps from config
-            document.getElementById('cert-login-form').addEventListener('submit', function (evt) {
+            document.getElementById('ukey-login-form').addEventListener('submit', function (evt) {
                 evt.preventDefault();
                 var pinInput = document.getElementById('id_pin');
                 var pinValue = pinInput ? pinInput.value : '';
@@ -609,8 +617,8 @@
             });
 
         }).catch(function (err) {
-            console.error('[CertLogin] init error:', err);
-            setStatus('error', MSG.driverError + ': ' + err.message);
+            console.error('[UKeyLogin] init error:', err);
+            setStatus('error', MSG.sdkError + ': ' + err.message);
         });
     });
 }());

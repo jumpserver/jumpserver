@@ -13,39 +13,34 @@ logger = get_logger(__name__)
 
 
 # @Singleton
-class CertVendorDriverConfig:
+class UKeySDKConfig:
 
     def __init__(self):
-        if not settings.AUTH_CERT:
-            logger.debug('CertVendorDriverConfig: authentication backend not enabled')
+        if not settings.AUTH_UKEY:
+            logger.debug('UKeySDKConfig: authentication backend not enabled')
             return
         cf_path = self.get_sdk_config_yaml_path()
         self._raw = self._load_yaml(cf_path)
 
     # ── YAML 加载 ────────────────────────────────────────────────────────────
 
+    def _vendor_path(self, filename):
+        return os.path.join(
+            settings.PROJECT_DIR,
+            "apps", "authentication", "backends", "ukey", "vendors",
+            settings.AUTH_UKEY_VENDOR, filename,
+        )
+
     def get_sdk_script_js_path(self):
-        """返回厂商 SDK 驱动文件的 FileResponse，供 API 层使用。"""
-        fp = os.path.join(
-            settings.PROJECT_DIR, 
-            "apps", "authentication", "backends", "cert", "vendors",
-            settings.AUTH_CERT_VENDOR, 'sdk_script.js'
-        )
-        return fp
-    
+        return self._vendor_path('sdk_script.js')
+
     def get_sdk_config_yaml_path(self):
-        """返回厂商 SDK 配置 YAML 文件路径，供 API 层使用。"""
-        fp = os.path.join(
-            settings.PROJECT_DIR, 
-            "apps", "authentication", "backends", "cert", "vendors",
-            settings.AUTH_CERT_VENDOR, 'sdk_config.yaml'
-        )
-        return fp
+        return self._vendor_path('sdk_config.yaml')
 
     @staticmethod
     def _load_yaml(config_file):
         if not config_file or not os.path.isfile(config_file):
-            logger.warning('CertVendorDriverConfig: config file not found: %s', config_file)
+            logger.warning('UKeySDKConfig: config file not found: %s', config_file)
             return {}
         with open(config_file, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f) or {}
@@ -55,17 +50,17 @@ class CertVendorDriverConfig:
     @property
     def ca_cert_content(self):
         """CA 根证书 PEM 内容，只从系统设置读取。"""
-        return getattr(settings, 'AUTH_CERT_CA_CERT_CONTENT', '') or ''
+        return getattr(settings, 'AUTH_UKEY_CA_CERT_CONTENT', '') or ''
 
     @property
     def ca_key_content(self):
         """CA 私钥 PEM 内容，只从系统设置读取。"""
-        return getattr(settings, 'AUTH_CERT_CA_KEY_CONTENT', '') or ''
+        return getattr(settings, 'AUTH_UKEY_CA_KEY_CONTENT', '') or ''
 
     @property
     def ca_key_pass(self):
         """CA 私钥密码，只从系统设置读取。"""
-        return str(getattr(settings, 'AUTH_CERT_CA_KEY_PASS', ''))
+        return str(getattr(settings, 'AUTH_UKEY_CA_KEY_PASS', ''))
     
     @property
     def ca_cert_asym_alg(self):
@@ -84,7 +79,7 @@ class CertVendorDriverConfig:
     @property
     def challenge_ttl(self):
         """Challenge 码在 Redis 中的存活时间（秒），默认 300。"""
-        v = getattr(settings, 'AUTH_CERT_CHALLENGE_TTL', 300)
+        v = getattr(settings, 'AUTH_UKEY_CHALLENGE_TTL', 300)
         return int(v)
 
     # ── 证书签发 ──────────────────────────────────────────────────────────────
@@ -92,19 +87,19 @@ class CertVendorDriverConfig:
     @property
     def enroll_enabled(self):
         """是否开启用户证书签发功能。"""
-        v = getattr(settings, 'AUTH_CERT_ENROLL_ENABLED', False)
+        v = getattr(settings, 'AUTH_UKEY_ENROLL_ENABLED', False)
         return bool(v)
 
     @property
     def enroll_validity_days(self):
         """签发证书的有效期（天），默认 365。"""
-        v = getattr(settings, 'AUTH_CERT_ENROLL_VALIDITY_DAYS', 365)
+        v = getattr(settings, 'AUTH_UKEY_ENROLL_VALIDITY_DAYS', 365)
         return int(v)
     
     @property
     def default_pin(self):
         """证书默认 PIN 码，默认为空字符串（不设置 PIN）。"""
-        v = getattr(settings, 'AUTH_CERT_DEFAULT_PIN', '')
+        v = getattr(settings, 'AUTH_UKEY_DEFAULT_PIN', '')
         return str(v)
 
     # ── 厂商 SDK 映射（原始数据，供 API 层序列化给前端）───────────────────────
@@ -210,8 +205,9 @@ class CertVendorDriverConfig:
                 'default': self.default_pin,
             },
             'api': {
-                'enroll_cert_url': reverse('api-auth:cert-enroll'),
-                'bind_user_ukey_sn_url': reverse('api-auth:bind-user-ukey-sn'),
+                'ukey_sdk_script_url': reverse('api-auth:ukey:ukey-sdk-script'),
+                'enroll_cert_url': reverse('api-auth:ukey:ukey-enroll-cert'),
+                'bind_user_ukey_sn_url': reverse('api-auth:ukey:bind-user-ukey-sn'),
                 'user_detail_url': reverse('users:user-list') + '{user_id}/',
             },
         })
@@ -219,4 +215,4 @@ class CertVendorDriverConfig:
         return data
 
 
-cert_vd_cfg = CertVendorDriverConfig()
+ukey_sdk_config = UKeySDKConfig()

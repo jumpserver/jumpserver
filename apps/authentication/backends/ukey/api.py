@@ -16,22 +16,22 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from common.permissions import OnlySuperUser
 from common.utils import get_logger
-from .driver import cert_vd_cfg
+from .sdk import ukey_sdk_config
 from .utils import is_sm2_pem
 
 
-__all__ = ['VendorDriverFileAPIView', 'CertVendorDriverConfigAPIView', 'BindUserUkeySnAPIView']
+__all__ = ['UKeySDKScriptFileAPIView', 'UKeySDKConfigFileAPIView', 'BindUserUkeySnAPIView']
 
 logger = get_logger(__name__)
 
 
-class VendorDriverFileAPIView(APIView):
+class UKeySDKScriptFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
     @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
-        from .driver import CertVendorDriverConfig
-        _cert_vd_cfg = CertVendorDriverConfig()
+        from .sdk import UKeySDKConfig
+        _cert_vd_cfg = UKeySDKConfig()
         js_file = _cert_vd_cfg.get_sdk_script_js_path()
         if not js_file or not os.path.isfile(js_file):
             raise Http404
@@ -40,23 +40,23 @@ class VendorDriverFileAPIView(APIView):
         return response
 
 
-class CertVendorDriverConfigAPIView(APIView):
+class UKeySDKConfigFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
-        from .driver import CertVendorDriverConfig
-        _cert_vd_cfg = CertVendorDriverConfig()
+        from .sdk import UKeySDKConfig
+        _cert_vd_cfg = UKeySDKConfig()
         data = _cert_vd_cfg.get_vendor_sdk_data(lang=lang)
         return Response(data)
 
 
-class CertEnrollAPIView(APIView):
+class UKeyCertEnrollAPIView(APIView):
     permission_classes = (OnlySuperUser,)
 
 
     def post(self, request):
-        if not cert_vd_cfg.enroll_enabled:
+        if not ukey_sdk_config.enroll_enabled:
             data = {'error': _('Certificate enrollment is not enabled')}
             return Response(data=data, status=400)
 
@@ -141,19 +141,19 @@ class CertEnrollAPIView(APIView):
         if not isinstance(pub_key, rsa.RSAPublicKey):
             raise ValueError('Unsupported key type: {}'.format(type(pub_key).__name__))
 
-        ca_key_content = cert_vd_cfg.ca_key_content
-        ca_cert_content = cert_vd_cfg.ca_cert_content
-        ca_key_pass = cert_vd_cfg.ca_key_pass
+        ca_key_content = ukey_sdk_config.ca_key_content
+        ca_cert_content = ukey_sdk_config.ca_cert_content
+        ca_key_pass = ukey_sdk_config.ca_key_pass
         if not ca_key_content:
-            raise ValueError('AUTH_CERT_CA_KEY_CONTENT not configured')
+            raise ValueError('AUTH_UKEY_CA_KEY_CONTENT not configured')
         if not ca_cert_content:
-            raise ValueError('AUTH_CERT_CA_CERT_CONTENT not configured')
+            raise ValueError('AUTH_UKEY_CA_CERT_CONTENT not configured')
 
         ca_cert = x509.load_pem_x509_certificate(ca_cert_content.encode())
         password = ca_key_pass.encode() if ca_key_pass else None
         ca_key = serialization.load_pem_private_key(ca_key_content.encode(), password=password)
 
-        validity_days = cert_vd_cfg.enroll_validity_days
+        validity_days = ukey_sdk_config.enroll_validity_days
         now = datetime.datetime.now(datetime.timezone.utc)
         cert = (
             x509.CertificateBuilder()
@@ -174,16 +174,16 @@ class CertEnrollAPIView(APIView):
         命令示例：
           gmssl reqsign -in user.csr -days 365 -cacert root.crt -key root.key -pass 123456 -out user.crt
         """
-        gmssl_bin = cert_vd_cfg.gmssl_bin
-        ca_key_content = cert_vd_cfg.ca_key_content
-        ca_cert_content = cert_vd_cfg.ca_cert_content
-        ca_key_pass = cert_vd_cfg.ca_key_pass
+        gmssl_bin = ukey_sdk_config.gmssl_bin
+        ca_key_content = ukey_sdk_config.ca_key_content
+        ca_cert_content = ukey_sdk_config.ca_cert_content
+        ca_key_pass = ukey_sdk_config.ca_key_pass
         if not ca_key_content:
-            raise ValueError('AUTH_CERT_CA_KEY_CONTENT not configured')
+            raise ValueError('AUTH_UKEY_CA_KEY_CONTENT not configured')
         if not ca_cert_content:
-            raise ValueError('AUTH_CERT_CA_CERT_CONTENT not configured')
+            raise ValueError('AUTH_UKEY_CA_CERT_CONTENT not configured')
 
-        validity_days = str(cert_vd_cfg.enroll_validity_days)
+        validity_days = str(ukey_sdk_config.enroll_validity_days)
 
         csr_file = ca_cert_file = ca_key_file = cert_file = None
         try:

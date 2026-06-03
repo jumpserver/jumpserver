@@ -57,7 +57,7 @@ class SourceMixin:
         Source.slack: [settings.AUTH_BACKEND_SLACK],
         Source.dingtalk: [settings.AUTH_BACKEND_DINGTALK],
         Source.custom: [settings.AUTH_BACKEND_CUSTOM],
-        Source.ukey: [settings.AUTH_BACKEND_CERT],
+        Source.ukey: [settings.AUTH_BACKEND_UKEY],
     }
 
     @classmethod
@@ -76,7 +76,7 @@ class SourceMixin:
             cls.Source.slack: settings.AUTH_SLACK,
             cls.Source.dingtalk: settings.AUTH_DINGTALK,
             cls.Source.custom: settings.AUTH_CUSTOM,
-            cls.Source.cert: settings.AUTH_CERT,
+            cls.Source.ukey: settings.AUTH_UKEY,
         }
         return [str(k) for k, v in mapper.items() if v]
 

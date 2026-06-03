@@ -1,12 +1,11 @@
 # coding:utf-8
 #
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
 from .. import api
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
-from ..backends.cert.api_urls import urlpatterns as cert_api_urlpatterns
 
 app_name = 'authentication'
 router = DefaultRouter()
@@ -54,7 +53,9 @@ if settings.AUTH_CUSTOM_SSO:
         path('custom-sso/login/', api.CustomSSOLoginAPIView.as_view(), name='custom-sso-login'),
     ]
 
-if settings.AUTH_CERT:
-    urlpatterns += cert_api_urlpatterns
+if settings.AUTH_UKEY:
+    urlpatterns += [
+        path('ukey/', include(('authentication.backends.ukey.api_urls', 'ukey'), namespace='ukey'))
+    ]
 
 urlpatterns += router.urls + passkey_urlpatterns

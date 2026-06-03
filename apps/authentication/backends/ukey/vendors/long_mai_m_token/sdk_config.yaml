@@ -5,36 +5,48 @@
 
 # ── 元信息 ──────────────────────────────────────────────────────────────────────
 meta:
-  vendor: "吉大"
+  vendor: "龙脉"
   version: "1.0.0"
-  description: "吉大 UKey Web SDK 配置"
+  description: "龙脉 UKey Web SDK 配置"
+
 
 # - 配置信息 
 config:
   # 非对称密钥的算法
   asymAlg: 
-    SM2: 1
-    RSA-1024: 2
-    RSA-2048: 3
-    default: 1
+    SM2: 131328
+    RSA-1024: 65536
+    RSA-2048: 65536
+    default: 131328
   # 密钥类型
   keySpec: 1  # 1 表示签名密钥
-  # 证书类型
-  certType: 1 # 1 表示签名证书
-  # 摘要签名算法
-  digestAlg:
-    SM2: 1
-    RSA-1024: 4
-    RSA-2048: 4
+  # 密钥长度（位）
+  keyLength:
+    SM2: 256
+    RSA-1024: 1024
+    RSA-2048: 2048
+    default: 256
+  digestMethod:
+    SM2: 1  # SM3
+    RSA-1024: 4 # SHA256
+    RSA-2048: 4 # SHA256
     default: 1
-  poll_interval: 3000  # 轮询检测设备的时间间隔，单位毫秒
+  signChallengeMode:
+    SM2: 0
+    RSA-1024: 1 # SHA256
+    RSA-2048: 1 # SHA256
+    default: 0
+  poll_interval: 3000
+
 
 #═══════════════════════════════════════════════════════════════════════════════
-# driver: SDK 脚本加载、实例创建、初始化步骤
+# sdk: SDK 脚本加载、实例创建、初始化步骤
 #
 # 变量命名空间:
-#   {{ ukey.* }}      — driver.setup.steps 中通过 register 注册的持久变量
+#   {{ ukey.* }}      — sdk.setup.steps 中通过 register 注册的持久变量
 #                       生命周期与驱动实例相同，所有操作均可读取
+#   {{ instance.* }}  — SDK 实例对象本身的属性（create 后立即可用）
+#                       例如: {{ instance.GM3000PCSC }}
 #   {{ vars.* }}      — 操作执行期间各步骤通过 register 注册的临时变量
 #                       生命周期仅限当次操作
 #   {{ input.* }}     — 当前步骤 input 对话框收集的用户输入
@@ -42,52 +54,60 @@ config:
 #   {{ settings.* }}  — 后端 publicSettings 中的全局配置项
 #   {{ config.* }}    — 后端响应中 config 段的字段（如 config.enroll.enabled, config.pin.default）
 #═══════════════════════════════════════════════════════════════════════════════
-driver:
+sdk:
 
   # 构造 UKey SDK 实例
   create:
-    constructor: "UKeyAPI"   # 脚本加载后挂载到 window 的构造函数名
-    args: ['UKeyPlugin']                      # 传给构造函数的参数列表
+    constructor: "mToken"   # 脚本加载后挂载到 window 的构造函数名
+    args: ['mTokenPlugin']                      # 传给构造函数的参数列表
 
   # 实例创建后执行的初始化步骤（同步，顺序执行）
   # 各厂商按需配置，步骤可多可少，结果通过 register 写入 ukey.* 供后续操作使用
   # 若厂商 SDK 无需初始化步骤，可将 steps 配为空列表或省略整个 setup 块
   setup:
     steps:
-      # 示例 A：需要 ConnectDev 的厂商，把句柄注册到 ukey.handle
-      # - name: connect
-      #   label: "连接设备"
-      #   call: SOF_ConnectDev
-      #   args: []
-      #   register: ukey.handle
-
-      # 示例 B：需要打开应用的厂商，把应用句柄注册到 ukey.appHandle
-      # - name: openApp
-      #   label: "打开应用"
-      #   call: SOF_OpenApplication
-      #   args:
-      #     - "{{ ukey.handle }}"
-      #     - "{{ settings.AUTH_CERT_APP_NAME }}"
-      #   register: ukey.appHandle
-
-      # 示例 C：直接调用某个方法触发设备检测，不需要保存返回值
-      - name: checkInstall
-        label: "检测设备安装"
-        call: UKey_CheckInstall
-        args: []
+      - name: loadLibrary 
+        label: "加载驱动库"
+        call: SOF_LoadLibrary
+        args: 
+          - "{{ instance.GM3000 }}"
 
       - name: getDevSN
         label: "获取设备序列号"
-        call: UKey_GetDevSN
+        call: SOF_EnumDevice
         args: []
         register: ukey.devSN 
+      
+      - key: releaseAppInstance
+        label: "释放应用实例"
+        call: SOF_ReleaseDeviceInstance
+        args:
+          - "{{ ukey.devSN }}"
+
+      # 重要：后续 API 内部会用 devName 
+      - key: BindAppInstance
+        label: "绑定应用实例"
+        call: SOF_GetDeviceInstance
+        args:
+          - "{{ ukey.devSN }}"
+          - "" # 绑定第一个应用
 
       - name: getDevVersion
         label: "获取设备版本"
-        call: UKey_GetVersion
-        args: []
+        call: SOF_GetDeviceInfo
+        args: 
+          - "{{ ukey.devSN }}"
+          - "{{ instance.SGD_DEVICE_HARDWARE_VERSION }}"
         scope: both
         register: ukey.devVersion 
+      
+      - name: getUserCert
+        label: "获取证书"
+        call: SOF_ExportUserCert
+        args:
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ config.keySpec }}"  # keySpec
+        register: ukey.cert
 
 #═══════════════════════════════════════════════════════════════════════════════
 # info: 展示信息字段定义（只读，不修改设备状态）
@@ -95,6 +115,21 @@ driver:
 # 每个字段取值方式（二选一，call 优先级高于 value）：
 #   call + args — 调用 UKey 方法，返回值作为显示内容
 #   value       — 直接写固定字符串，或 {{ }} 模板引用变量
+#
+# check（可选，仅 call 字段有效）：方法调用成功后对返回值做判断，未通过则该字段不显示
+#   字符串形式 — 直接写表达式，result 代表方法返回值，例：
+#     check: "{{ result != null && result != '' }}"
+#   对象形式   — 可附带说明（目前仅用于文档，不影响运行）：
+#     check:
+#       expr: "{{ result != null }}"
+#       message: "方法返回为空"
+#
+# status（可选）：根据某个变量的值，声明式地映射为带样式的状态标签
+#   source   — 取值的模板变量
+#   cases    — 匹配规则列表，按顺序匹配，第一个命中的生效
+#     match  — truthy（非空/非假）、falsy（空/假/null/undefined），或精确字符串值
+#     text   — 显示的文本
+#     type   — 标签样式：success | warning | danger | info（对应绿/橙/红/灰）
 #
 # scope 可选值:
 #   both  — 管理员与用户均可见（默认）
@@ -105,10 +140,11 @@ info:
 
   # 左上「设备驱动状态」区域的动态字段（固定字段由页面内置）
   device:
-    - key: vendor
+
+    - key: uKeyVendor
       label: "设备厂商"
       scope: admin
-      value: "吉大"
+      value: "龙脉"
 
     - key: ukeyConnected
       label: "设备状态"
@@ -141,101 +177,116 @@ info:
       scope: both
       value: "{{ user.ukey_sn }}"
       compare: "{{ ukey.devSN }}"
-
+    
     - key: asymAlgName
       label: "非对称算法"
       scope: both
       value: "{{ config.asymAlgName }}"
       hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
-
+    
     - key: enrollValidityDays
       label: "证书签发有效期（天）"
       scope: admin
       value: "{{ config.enroll.validity_days }}"
       hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
-
-  # 右上「证书信息」区域的字段，每个字段单独调用 SDK 方法或写固定 value 获取
-  # 取值方式（二选一，call 优先级高于 value）：
-  #   call + args — 调用 UKey 方法，返回值作为显示内容
-  #   value       — 直接写固定字符串，或 {{ }} 模板引用变量
-  cert:
-    - key: CERT_SUBJECT_CN
-      label: "证书拥有者 CN"
-      call: UKey_GetCertInfo
-      args: 
-        - "{{ config.certType }}"  # 证书类型参数
-        - 9
-      compare: "{{ user.username }}"  # 将此字段的值与 user.username 比对
     
-    - key: CERT_SUBJECT_O
-      label: "证书拥有者 O"
-      call: UKey_GetCertInfo
-      args: 
-        - "{{ config.certType }}"  # 证书类型参数
-        - 10
+  # 右上「证书信息」区域
+  #
+  # cert 支持两种格式：
+  #   数组格式（旧）— 直接列出字段，无整体 when
+  #   对象格式（新）— { when?, fields }，先执行 when，条件不满足则显示「暂未签发证书」
+  #
+  # when 可选，支持两种写法：
+  #   字符串（表达式）：
+  #     when: "{{ ukey.cert != null && ukey.cert !== '' }}"
+  #   对象（call + 可选 expr）：
+  #     when:
+  #       call: SOF_GetCertCount
+  #       args:
+  #         - "{{ ukey.devSN }}"
+  #       expr: "{{ result > 0 }}"
+  cert:
+    when: "{{ ukey.cert != null && ukey.cert !== '' }}"
+    fields:
+      - key: CERT_SUBJECT_CN
+        label: "证书拥有者 CN"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_SUBJECT_CN }}" # OID for Subject CN
+        compare: "{{ user.username }}"
+      
+      - key: CERT_SUBJECT_O
+        label: "证书拥有者 O"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_SUBJECT_O }}" # OID for Subject O
 
-    - key: CERT_SUBJECT_OU
-      label: "证书拥有者 OU"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 11
+      - key: CERT_SUBJECT_OU
+        label: "证书拥有者 OU"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_SUBJECT_OU }}" # OID for Subject OU
 
-    - key: CERT_VERSION
-      label: "证书版本"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 1
+      - key: CERT_VERSION
+        label: "证书版本"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_VERSION }}" # OID for Certificate Version
 
-    - key: CERT_SERIAL
-      label: "证书序列号"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 2
+      - key: CERT_SERIAL
+        label: "证书序列号"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_SERIAL }}" # OID for Certificate Serial
 
-    - key: CERT_START_TIME
-      label: "证书开始时间"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 3
+      - key: CERT_START_TIME
+        label: "证书开始时间"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_NOT_BEFORE }}" # OID for Start Time
 
-    - key: CERT_END_TIME
-      label: "证书结束时间"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 4
+      - key: CERT_END_TIME
+        label: "证书结束时间"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_VALID_TIME }}" # OID for End Time
 
-    - key: CERT_DER_PUBLIC_KEY
-      label: "证书公钥（DER）"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 5
+      - key: CERT_DER_PUBLIC_KEY
+        label: "证书公钥（DER）"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_DER_PUBLIC_KEY }}" # OID for DER Public Key
 
-    - key: CERT_ISSUER_CN
-      label: "证书颁发者 CN"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 6
+      - key: CERT_ISSUER_CN
+        label: "证书颁发者 CN"
+        call: SOF_GetCertInfo
+        args: 
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_ISSUER_CN }}" # OID for Issuer CN
 
-    - key: CERT_ISSUER_O
-      label: "证书颁发者 O"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 7
+      - key: CERT_ISSUER_O
+        label: "证书颁发者 O"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_ISSUER_O }}" # OID for Issuer O
 
-    - key: CERT_ISSUER_OU
-      label: "证书颁发者 OU"
-      call: UKey_GetCertInfo
-      args:
-        - "{{ config.certType }}"  # 证书类型参数
-        - 8
+      - key: CERT_ISSUER_OU
+        label: "证书颁发者 OU"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_ISSUER_OU }}" # OID for Issuer OU
+      
+
 
 #═══════════════════════════════════════════════════════════════════════════════
 # operations: 操作按钮列表（顺序即按钮排列顺序）
@@ -318,6 +369,13 @@ operations:
     disabled: "{{ !ukey.connected }}"
     event: refresh.info.cert
     steps:
+      - name: BindAppInstance
+        label: "绑定应用实例"
+        call: SOF_GetDeviceInstance
+        args:
+          - "{{ ukey.devSN }}"
+          - "" # 绑定第一个应用
+
       - name: verifyUKeyUserPassword
         label: "验证 UKey 用户密码"
         input: 
@@ -326,28 +384,47 @@ operations:
             - key: userPassWd
               label: "UKey 用户密码"
               type: password
-        call: UKey_VerifyPIN
+        call: SOF_Login
         args:
           - "{{ input.userPassWd }}"
         check:
           expr: "{{ result === 0 }}"
           message: "用户认证失败，错误码: {{ result }}"
 
+      - name: createContainer 
+        label: "创建容器"
+        call: SOF_CreateContainer
+        args:
+          - '{{ settings.VENDOR }}'
+
       - name: genKeyPair
         label: "生成密钥对"
-        call: UKey_GenKeyPair
+        call: SOF_CreateKeyPair
         args:
-          - "{{ config.asymAlg }}"  # asymAlg 参数
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ config.keySpec }}"  # keySpec
+          - "{{ config.asymAlg }}" # asymAlg SM2
+          - "{{ config.keyLength }}"  # keyLength
+        check:
+          expr: "{{ result === 0 }}"
+          message: "生成密钥对失败，错误码: {{ result }}"
 
       - name: genCSR
         label: "生成证书申请"
-        call: UKey_GenCSR
+        call: SOF_GenerateP10Request
         args:
-          - type: json
+          - "{{ settings.VENDOR }}"  # containerName
+          - type: csv  # dn
             value:
               CN: "{{ user.username }}"
               O: "{{ settings.VENDOR }}"
+          - "{{ config.asymAlg }}" # asymAlg SM2
+          - "{{ config.keySpec }}"  # keySpec
+          - "{{ config.keyLength }}"  # keyLength
         register: vars.csr
+        check:
+          expr: "{{ result !== null }}"
+          message: "生成证书申请失败，错误码: {{ result }}"
 
       - name: signCert
         label: "服务器签发证书"
@@ -361,18 +438,32 @@ operations:
 
       - name: importCert
         label: "导入证书到设备"
-        call: UKey_ImportCertAndKeyPair
+        call: SOF_ImportCert
         args: 
-          - "{{ vars.certData.signed_cert }}"
-          - ""
-          - ""
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ vars.certData.signed_cert }}"  # cert base64
+          - "{{ config.keySpec }}" # keySpec 签名证书
+        check:
+          expr: "{{ result === 0 }}"
+          message: "导入证书失败，错误码: {{ result }}"
+      
+      - name: getUserCert
+        label: "获取证书"
+        call: SOF_ExportUserCert
+        args:
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ config.keySpec }}"  # keySpec
+        register: ukey.cert
+        check:
+          expr: "{{ result != null && result != '' }}"
+          message: "获取证书失败"
 
   - key: deleteCert
     label: "删除证书"
     hint: "永久删除 UKey 中的数字证书，操作不可逆"
     btnType: danger
     scope: admin
-    hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此按鈕
+    hidden: "{{ !config.enroll.enabled }}"
     disabled: "{{ !ukey.connected }}"
     event: refresh.info.cert
     confirm:
@@ -388,24 +479,47 @@ operations:
             - key: userPassWd
               label: "UKey 用户密码"
               type: password
-        call: UKey_VerifyPIN
+        call: SOF_Login
         args:
           - "{{ input.userPassWd }}"
         check:
           expr: "{{ result === 0 }}"
           message: "用户认证失败，错误码: {{ result }}"
 
+      - name: getCertSN
+        label: "获取证书序列号"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"  # cert
+          - "{{ instance.SGD_CERT_SERIAL }}" # OID for Certificate Serial
+        register: vars.certSN
+
+      - name: deleteContainer
+        label: "删除证书所在容器"
+        call: SOF_DeleteContainer
+        args:
+          - "{{ vars.certSN }}"  # cert
+
       - name: deleteCert
         label: "删除设备证书"
-        call: UKey_DeleteCons
-        args: []
+        call: SOF_DeleteCert
+        args: 
+          - "{{ vars.certSN }}"  # cert
+      
+      - name: getUserCert
+        label: "获取证书"
+        call: SOF_ExportUserCert
+        args:
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ config.keySpec }}"  # keySpec
+        register: ukey.cert
 
   - key: resetPin
     label: "重置 PIN"
     hint: "使用管理员权限将 PIN 码重置为系统默认值"
     btnType: warning
-    scope: admin
     disabled: "{{ !ukey.connected }}"
+    scope: admin
     steps:
       - name: resetPin
         label: "重置 PIN"
@@ -415,7 +529,7 @@ operations:
             - key: adminPin
               label: "管理员 PIN"
               type: password
-        call: UKey_UnblockPIN
+        call: SOF_UnblockUserPin
         args:
           - "{{ input.adminPin }}"
           - "{{ config.pin.default }}"
@@ -447,10 +561,13 @@ operations:
               validate:
                 equals: newPin              # 必须与 newPin 字段值相同
                 message: "两次输入的 PIN 码不一致"
-        call: UKey_ChangePIN
+        call: SOF_ChangePassWd
         args:
           - "{{ input.oldPin }}"
           - "{{ input.newPin }}"
+        check:
+          expr: "{{ result === 0 }}"
+          message: "修改 PIN 失败，错误码: {{ result }}"
 
 
 #═══════════════════════════════════════════════════════════════════════════════
@@ -474,22 +591,24 @@ login:
   # 轮询检测设备 — 步骤失败则视为设备未插入
   detect:
     steps:
-      - name: getCert
+      - name: getUserCert
         label: "获取证书"
-        call: UKey_GetCert
+        call: SOF_ExportUserCert
         args:
-          - "{{ config.certType }}"  # 证书类型参数
+          - "{{ settings.VENDOR }}"  # containerName
+          - "{{ config.keySpec }}"   # keySpec
         register: ukey.cert
         check:
           expr: "{{ result != null && result !== '' }}"
           message: "未检测到证书"
 
       - name: getCertCN
-        label: "证书拥有者 CN"
-        call: UKey_GetCertInfo
-        args: 
-          - "{{ config.certType }}"  # 证书类型参数
-          - 9
+        when: "{{ ukey.cert != null && ukey.cert !== '' }}"
+        label: "获取证书 CN"
+        call: SOF_GetCertInfo
+        args:
+          - "{{ ukey.cert }}"
+          - "{{ instance.SGD_CERT_SUBJECT_CN }}"
         register: ukey.certCN
         check:
           expr: "{{ result != null && result !== '' }}"
@@ -499,23 +618,44 @@ login:
   steps:
     - name: verifyPin
       label: "验证 PIN"
-      call: UKey_VerifyPIN
+      call: SOF_Login       # TODO: 确认厂商 SDK 的验证 PIN 方法名
       args:
         - "{{ input.pin }}"
       check:
         expr: "{{ result === 0 }}"
         message: "PIN 验证失败，错误码: {{ result }}"
     
+    - name: setDigestMethod
+      label: "设置摘要算法"
+      call: SOF_SetDigestMethod
+      args:
+        - "{{ config.digestMethod }}"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "设置摘要算法失败，错误码: {{ result }}"
+    
+    - name: setUserID
+      label: "设置用户 ID"
+      call: SOF_SetUserID
+      args:
+        - "1234567812345678"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "设置用户 ID 失败，错误码: {{ result }}"
+    
     - name: signChallenge
       label: "签名挑战码"
-      call: UKey_SignData
+      call: SOF_SignData             # TODO: 确认厂商 SDK 的签名方法名
       args:
-        - "{{ config.digestAlg }}"
+        - "{{ settings.VENDOR }}"
+        - "{{ config.keySpec }}"
         - "{{ challenge.code_base64 }}"
+        - "{{ challenge.length }}"
+        - "{{ config.signChallengeMode }}"
       register: vars.signature
       check:
         expr: "{{ vars.signature !== null && vars.signature !== '' }}"
-        message: "签名失败，错误码: {{ result }}"
+        message: "签名失败"
 
     - name: submit
       label: "提交登录"
@@ -523,6 +663,6 @@ login:
       fields:
         signature: "{{ vars.signature }}"
         cert: "{{ ukey.cert }}"
-        username: "{{ ukey.certCN }}"  # 可选，自动填充用户名输入框
+        username: "{{ ukey.certCN }}"  # 自动填充用户名输入框
         ukey_sn: "{{ ukey.devSN }}"
 

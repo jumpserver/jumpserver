@@ -148,8 +148,8 @@ def get_auth_methods():
         },
         {
             'name': _('UKey'),
-            'enabled': settings.AUTH_CERT,
-            'url': reverse('authentication:cert:cert-login'),
+            'enabled': settings.AUTH_UKEY,
+            'url': reverse('authentication:ukey:ukey-login'),
             'logo': static('img/login_ukey.png')
         }
     ]

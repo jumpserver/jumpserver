@@ -93,7 +93,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     REMOTE_APP_STORE_URL = serializers.CharField()
     VENDOR = serializers.CharField()
 
-    AUTH_CERT = serializers.BooleanField()
+    AUTH_UKEY = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

@@ -11,31 +11,31 @@ from django.core.exceptions import PermissionDenied
 from users.models import User
 from common.utils import get_logger
 from ..base import JMSBaseAuthBackend
-from .driver import cert_vd_cfg
+from .sdk import ukey_sdk_config
 from .exceptions import (
-    CertAuthError,
-    CertUserNotFoundError,
-    CertUkeySNMismatchError,
-    CertNormalizationError,
-    CertChainError,
-    CertCNMismatchError,
-    CertSignatureError,
-    CertUnsupportedAlgorithmError,
+    UKeyAuthError,
+    UKeyUserNotFoundError,
+    UkeySNMismatchError,
+    UKeyCertNormalizationError,
+    UKeyCertChainError,
+    UKeyCertCNMismatchError,
+    UKeySignatureError,
+    UKeyCertUnsupportedAlgorithmError,
 )
 from .utils import is_sm2_pem
 
 
-__all__ = ['CertBackend']
+__all__ = ['UKeyBackend']
 
 logger = get_logger(__name__)
 
 
-class CertBackend(JMSBaseAuthBackend):
-    backend = settings.AUTH_BACKEND_CERT
+class UKeyBackend(JMSBaseAuthBackend):
+    backend = settings.AUTH_BACKEND_UKEY
 
     @staticmethod
     def is_enabled():
-        return settings.AUTH_CERT
+        return settings.AUTH_UKEY
 
     # ── 主入口 ────────────────────────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ class CertBackend(JMSBaseAuthBackend):
                 return self._authenticate_sm2(cert_pem, username, signature, challenge, user)
             else:
                 return self._authenticate_other(cert_pem, username, signature, challenge, user)
-        except CertAuthError as e:
+        except UKeyAuthError as e:
             if request:
                 request.error_message = str(e)
             raise PermissionDenied(str(e))
@@ -59,11 +59,11 @@ class CertBackend(JMSBaseAuthBackend):
         ukey_sn = (ukey_sn or '').strip()
         user = User.objects.filter(username=username).first()
         if user is None:
-            logger.warning('CertBackend: user %r not found', username)
-            raise CertUserNotFoundError()
+            logger.warning('UKeyBackend: user %r not found', username)
+            raise UKeyUserNotFoundError()
         if user.ukey_sn and ukey_sn != user.ukey_sn:
-            logger.warning('CertBackend: ukey_sn mismatch for user %r', username)
-            raise CertUkeySNMismatchError()
+            logger.warning('UKeyBackend: ukey_sn mismatch for user %r', username)
+            raise UkeySNMismatchError()
         return user
 
     # ── Part 2: SM2 证书校验流程 ──────────────────────────────────────────────
@@ -89,8 +89,8 @@ class CertBackend(JMSBaseAuthBackend):
             sm2_cert = Sm2Certificate()
             sm2_cert.import_pem(cert_file)
         except Exception as e:
-            logger.warning('CertBackend: failed to load SM2 cert: %s', e)
-            raise CertNormalizationError()
+            logger.warning('UKeyBackend: failed to load SM2 cert: %s', e)
+            raise UKeyCertNormalizationError()
         finally:
             if os.path.exists(cert_file):
                 os.unlink(cert_file)
@@ -101,9 +101,9 @@ class CertBackend(JMSBaseAuthBackend):
         """调用 Sm2Certificate.verify_by_ca_certificate 验证 SM2 证书链。"""
         from common.utils.gmssl_python import Sm2Certificate, SM2_DEFAULT_ID
 
-        ca_cert_content = cert_vd_cfg.ca_cert_content
+        ca_cert_content = ukey_sdk_config.ca_cert_content
         if not ca_cert_content:
-            raise CertChainError()
+            raise UKeyCertChainError()
 
         fd, ca_cert_file = tempfile.mkstemp(suffix='.crt')
         try:
@@ -113,36 +113,36 @@ class CertBackend(JMSBaseAuthBackend):
             ca_cert = Sm2Certificate()
             ca_cert.import_pem(ca_cert_file)
             ok = sm2_cert.verify_by_ca_certificate(ca_cert, SM2_DEFAULT_ID)
-        except CertAuthError:
+        except UKeyAuthError:
             raise
         except Exception as e:
-            logger.warning('CertBackend: SM2 cert chain verification error: %s', e)
-            raise CertChainError()
+            logger.warning('UKeyBackend: SM2 cert chain verification error: %s', e)
+            raise UKeyCertChainError()
         finally:
             if os.path.exists(ca_cert_file):
                 os.unlink(ca_cert_file)
 
         if not ok:
-            logger.warning('CertBackend: SM2 cert chain verification failed')
-            raise CertChainError()
+            logger.warning('UKeyBackend: SM2 cert chain verification failed')
+            raise UKeyCertChainError()
 
     @staticmethod
     def _verify_sm2_signature(sm2_key, signature, challenge):
         """使用 gmssl_python 的 Sm2Signature 做 SM2withSM3 验签。"""
         from common.utils.gmssl_python import Sm2Signature, DO_VERIFY, SM2_DEFAULT_ID
 
-        sig_bytes = CertBackend._decode_signature(signature)
-        signed_data = CertBackend._challenge_as_bytes(challenge)
+        sig_bytes = UKeyBackend._decode_signature(signature)
+        signed_data = UKeyBackend._challenge_as_bytes(challenge)
         try:
             verifier = Sm2Signature(sm2_key, SM2_DEFAULT_ID, DO_VERIFY)
             verifier.update(signed_data)
             ok = bool(verifier.verify(sig_bytes))
         except Exception as e:
-            logger.warning('CertBackend: SM2 signature verification error: %s', e)
-            raise CertSignatureError()
+            logger.warning('UKeyBackend: SM2 signature verification error: %s', e)
+            raise UKeySignatureError()
         if not ok:
-            logger.warning('CertBackend: SM2 signature mismatch')
-            raise CertSignatureError()
+            logger.warning('UKeyBackend: SM2 signature mismatch')
+            raise UKeySignatureError()
 
     # ── Part 3: RSA / 其他证书校验流程 ───────────────────────────────────────
 
@@ -163,16 +163,16 @@ class CertBackend(JMSBaseAuthBackend):
         try:
             cert = x509.load_pem_x509_certificate(cert_pem.encode())
         except Exception as e:
-            logger.warning('CertBackend: failed to load certificate: %s', e)
-            raise CertNormalizationError()
+            logger.warning('UKeyBackend: failed to load certificate: %s', e)
+            raise UKeyCertNormalizationError()
 
         pub_key = cert.public_key()
         if isinstance(pub_key, ec.EllipticCurvePublicKey):
-            logger.warning('CertBackend: ECDSA certificate verification is not supported')
-            raise CertUnsupportedAlgorithmError()
+            logger.warning('UKeyBackend: ECDSA certificate verification is not supported')
+            raise UKeyCertUnsupportedAlgorithmError()
         if not isinstance(pub_key, rsa.RSAPublicKey):
-            logger.warning('CertBackend: unsupported key type: %s', type(pub_key).__name__)
-            raise CertUnsupportedAlgorithmError()
+            logger.warning('UKeyBackend: unsupported key type: %s', type(pub_key).__name__)
+            raise UKeyCertUnsupportedAlgorithmError()
         return cert, pub_key
 
     @staticmethod
@@ -182,10 +182,10 @@ class CertBackend(JMSBaseAuthBackend):
         from cryptography.exceptions import InvalidSignature
         from cryptography.hazmat.primitives.asymmetric import padding
 
-        ca_cert_content = cert_vd_cfg.ca_cert_content
+        ca_cert_content = ukey_sdk_config.ca_cert_content
         if not ca_cert_content:
-            logger.warning('CertBackend: AUTH_CERT_CA_CERT_CONTENT not configured')
-            raise CertChainError()
+            logger.warning('UKeyBackend: AUTH_UKEY_CA_CERT_CONTENT not configured')
+            raise UKeyCertChainError()
         try:
             ca_cert = x509.load_pem_x509_certificate(ca_cert_content.encode())
             ca_cert.public_key().verify(
@@ -195,13 +195,13 @@ class CertBackend(JMSBaseAuthBackend):
                 cert.signature_hash_algorithm,
             )
         except InvalidSignature:
-            logger.warning('CertBackend: RSA cert chain verification failed')
-            raise CertChainError()
-        except CertAuthError:
+            logger.warning('UKeyBackend: RSA cert chain verification failed')
+            raise UKeyCertChainError()
+        except UKeyAuthError:
             raise
         except Exception as e:
-            logger.warning('CertBackend: RSA cert chain verification error: %s', e)
-            raise CertChainError()
+            logger.warning('UKeyBackend: RSA cert chain verification error: %s', e)
+            raise UKeyCertChainError()
 
     @staticmethod
     def _extract_rsa_cert_cn(cert):
@@ -220,18 +220,18 @@ class CertBackend(JMSBaseAuthBackend):
         from cryptography.hazmat.primitives import hashes
         from cryptography.hazmat.primitives.asymmetric import padding
 
-        sig_bytes = CertBackend._decode_signature(signature)
-        signed_data = CertBackend._challenge_as_bytes(challenge)
+        sig_bytes = UKeyBackend._decode_signature(signature)
+        signed_data = UKeyBackend._challenge_as_bytes(challenge)
         try:
             pub_key.verify(sig_bytes, signed_data, padding.PKCS1v15(), hashes.SHA256())
         except InvalidSignature:
-            logger.warning('CertBackend: RSA signature mismatch')
-            raise CertSignatureError()
-        except CertAuthError:
+            logger.warning('UKeyBackend: RSA signature mismatch')
+            raise UKeySignatureError()
+        except UKeyAuthError:
             raise
         except Exception as e:
-            logger.warning('CertBackend: RSA signature verification error: %s', e)
-            raise CertSignatureError()
+            logger.warning('UKeyBackend: RSA signature verification error: %s', e)
+            raise UKeySignatureError()
 
     # ── 公共工具方法 ──────────────────────────────────────────────────────────
 
@@ -240,9 +240,9 @@ class CertBackend(JMSBaseAuthBackend):
         """校验证书 CN 与 username 是否匹配（SM2 和 RSA 流程共用）。"""
         if cert_cn != username:
             logger.warning(
-                'CertBackend: cert CN %r does not match username %r', cert_cn, username
+                'UKeyBackend: cert CN %r does not match username %r', cert_cn, username
             )
-            raise CertCNMismatchError()
+            raise UKeyCertCNMismatchError()
 
     @staticmethod
     def _challenge_as_bytes(challenge):
@@ -253,10 +253,10 @@ class CertBackend(JMSBaseAuthBackend):
     def _load_cert_pem(cert_data):
         """将原始证书数据转为 PEM 字符串，格式不合法时抛出 CertNormalizationError。"""
         try:
-            return CertBackend._normalize_cert_to_pem(cert_data)
+            return UKeyBackend._normalize_cert_to_pem(cert_data)
         except Exception as e:
-            logger.warning('CertBackend: cert normalization failed: %s', e)
-            raise CertNormalizationError()
+            logger.warning('UKeyBackend: cert normalization failed: %s', e)
+            raise UKeyCertNormalizationError()
 
     @staticmethod
     def _is_sm2_cert(cert_pem):

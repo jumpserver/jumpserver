@@ -245,8 +245,8 @@ class CommonMixin:
             return user
 
         user_id = self.request.session.get('user_id')
-        auth_cert_ok = self.request.session.get('auth_cert')
-        if auth_cert_ok:
+        auth_ukey_ok = self.request.session.get('auth_ukey')
+        if auth_ukey_ok:
             user = get_object_or_404(User, pk=user_id)
             user.backend = self.request.session.get("auth_backend")
             return user
@@ -687,9 +687,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         request.session['auth_backend'] = auth_backend
 
-    def mark_cert_ok(self, user, auth_backend):
+    def mark_ukey_ok(self, user, auth_backend):
         request = self.request
-        request.session['auth_cert'] = 1
+        request.session['auth_ukey'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auth_backend'] = auth_backend
 
@@ -726,7 +726,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
             'user_session_id', 'user_log_id', 'can_send_notifications',
-            'auth_cert'
+            'auth_ukey'
         ]
         for k in keys:
             self.request.session.pop(k, '')

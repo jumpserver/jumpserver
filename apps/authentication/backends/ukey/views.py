@@ -17,22 +17,22 @@ from authentication.mixins import AuthMixin
 from authentication.errors import (
     AuthFailedError, NeedRedirectError
 )
-from .forms import CertLoginForm
+from .forms import UKeyLoginForm
 from users.utils import LoginBlockUtil, LoginIpBlockUtil
-from .driver import cert_vd_cfg
+from .sdk import ukey_sdk_config
 
 
-__all__ = ['CertLoginView']
+__all__ = ['UKeyLoginView']
 
-_CHALLENGE_CACHE_KEY_PREFIX = 'cert_login_challenge'
+_CHALLENGE_CACHE_KEY_PREFIX = 'ukey_login_challenge'
 NEXT_URL = 'next'
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-class CertLoginView(AuthMixin, FormView):
-    template_name = 'authentication/cert_login.html'
-    form_class = CertLoginForm
+class UKeyLoginView(AuthMixin, FormView):
+    template_name = 'authentication/login_ukey.html'
+    form_class = UKeyLoginForm
     redirect_field_name = 'next'
 
     # ------------------------------------------------------------------
@@ -49,7 +49,7 @@ class CertLoginView(AuthMixin, FormView):
 
     def _generate_and_store_challenge(self):
         challenge = secrets.token_hex(16)
-        ttl = cert_vd_cfg.challenge_ttl
+        ttl = ukey_sdk_config.challenge_ttl
         cache.set(self._challenge_cache_key(), challenge, ttl)
         return challenge
 
@@ -125,7 +125,7 @@ class CertLoginView(AuthMixin, FormView):
         return self.render_to_response(context)
     
     def get_success_response(self, request, user):
-        self.mark_cert_ok(user, auth_backend=settings.AUTH_BACKEND_CERT)
+        self.mark_ukey_ok(user, auth_backend=settings.AUTH_BACKEND_UKEY)
         if not settings.SAFE_MODE:
             self.mark_mfa_ok('ukey-pass-mfa', user)
         return self.redirect_to_guard_view()
