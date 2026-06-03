@@ -6,37 +6,10 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from common.decorators import Singleton
 from common.const import Language
+from .utils import detect_cert_algorithm
 
 
 logger = get_logger(__name__)
-
-
-def _detect_cert_algorithm(pem_content):
-    """从 PEM 证书内容检测公钥算法，返回 'SM2' / 'RSA-1024' / 'RSA-2048' 等字符串，失败返回空字符串。"""
-
-    import base64
-    _SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
-
-    if not pem_content:
-        return ''
-
-    try:
-        lines = pem_content.strip().splitlines()
-        b64 = ''.join(ln for ln in lines if not ln.startswith('-----'))
-        der = base64.b64decode(b64)
-        if _SM2_OID_DER in der:
-            return 'SM2'
-        from cryptography import x509
-        from cryptography.hazmat.primitives.asymmetric import ec, rsa
-        cert = x509.load_pem_x509_certificate(pem_content.encode())
-        pub = cert.public_key()
-        if isinstance(pub, rsa.RSAPublicKey):
-            return 'RSA-{}'.format(pub.key_size)
-        if isinstance(pub, ec.EllipticCurvePublicKey):
-            return 'ECDSA-{}'.format(pub.key_size)
-        return ''
-    except Exception:
-        return ''
 
 
 # @Singleton
@@ -97,8 +70,7 @@ class CertVendorDriverConfig:
     @property
     def ca_cert_asym_alg(self):
         # 从 CA 证书内容解析出签名算法类型，返回 'RSA' 或 'SM2' 等字符串，供 YAML 配置中使用
-        asym_alg = _detect_cert_algorithm(self.ca_cert_content)
-        return asym_alg
+        return detect_cert_algorithm(self.ca_cert_content)
 
     # ── 工具 ─────────────────────────────────────────────────────────────────
 
@@ -239,6 +211,7 @@ class CertVendorDriverConfig:
             },
             'api': {
                 'enroll_cert_url': reverse('api-auth:cert-enroll'),
+                'bind_user_ukey_sn_url': reverse('api-auth:bind-user-ukey-sn'),
             },
         })
         data['config'] = resolved_config

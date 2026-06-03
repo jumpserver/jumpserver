@@ -28,7 +28,7 @@ class UserFilter(BaseFilterSet):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'name',
+            'id', 'username', 'name', 'ukey_sn',
             'groups', 'group_id', 'exclude_group_id',
             'source', 'org_roles', 'system_roles',
             'is_active', 'is_first_login', 'mfa_level'

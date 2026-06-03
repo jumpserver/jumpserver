@@ -177,7 +177,7 @@ class UserSerializer(
         # xpack 包含的字段
         fields_xpack = [
             "wecom_id", "dingtalk_id", "feishu_id", "lark_id", "slack_id",
-            "is_org_admin", "orgs_roles", "org_roles"
+            "ukey_sn", "is_org_admin", "orgs_roles", "org_roles"
         ]
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = (

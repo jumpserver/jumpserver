@@ -228,6 +228,8 @@
         {{ form.cert }}
         {# signature is filled by JS after signing challenge code, not shown to user #}
         {{ form.signature }}
+        {# ukey_sn is filled by JS after detecting cert, not shown to user #}
+        {{ form.ukey_sn }}
 
         <div id="cert-challenge-box" data-challenge="{{ challenge }}" data-challenge-length="{{ challenge|length }}" style="display:none;"></div>
 
@@ -574,7 +576,7 @@
             }
 
             poll();
-            setInterval(poll, 50000);
+            setInterval(poll, 5000);
 
             // 6. Form submit: run login.steps from config
             document.getElementById('cert-login-form').addEventListener('submit', function (evt) {

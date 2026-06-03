@@ -78,6 +78,8 @@ class CertLoginView(AuthMixin, FormView):
         username  = form.cleaned_data['username']
         cert      = form.cleaned_data['cert']
         signature = form.cleaned_data['signature']
+        ukey_sn   = form.cleaned_data.get('ukey_sn', '').strip()
+
         challenge = self._get_stored_challenge()
 
         error_msg = None
@@ -88,10 +90,11 @@ class CertLoginView(AuthMixin, FormView):
             self._check_only_allow_exists_user_auth(username)
 
             user = authenticate(
-                self.request, username=username, cert=cert, signature=signature, challenge=challenge
+                self.request, username=username, cert=cert, signature=signature,
+                challenge=challenge, ukey_sn=ukey_sn,
             )
             if user is None:
-                error_msg = _('Invalid credentials')
+                error_msg = getattr(self.request, 'error_message', None) or _('Invalid credentials')
                 return self.get_failed_response(form, username, error_msg)
 
             username = user.username

@@ -149,6 +149,14 @@ info:
 
   # 左上「设备驱动状态」区域的动态字段（固定字段由页面内置）
   device:
+    - key: userUKeySN
+      label: "设备序列号（用户已绑定）"
+      scope: both
+      value: "{{ user.ukey_sn }}"
+      compare: 
+        key1: "{{ user.ukey_sn }}"  # 可选，默认为 user.username
+        key2: "{{ ukey.devSN }}"  # 将此字段的值与 ukey.devSN 比对，相同则显示绿色勾，反之显示红色叉
+
     - key: devSN
       label: "设备序列号"
       scope: both
@@ -173,7 +181,7 @@ info:
       label: "非对称算法"
       scope: both
       value: "{{ config.asymAlgName }}"
-
+    
   # 右上「证书信息」区域
   #
   # cert 支持两种格式：
@@ -198,8 +206,7 @@ info:
         args:
           - "{{ ukey.cert }}"  # cert
           - "{{ instance.SGD_CERT_SUBJECT_CN }}" # OID for Subject CN
-        owner:
-          user_field: username      # 将此字段的值与 user.username 比对
+        compare: "{{ user.username }}"
       
       - key: CERT_SUBJECT_O
         label: "证书拥有者 O"
@@ -308,6 +315,32 @@ info:
 #   { type: json, value: { key1: tpl, ... } }  →  '{"key1":"val1"}'
 #═══════════════════════════════════════════════════════════════════════════════
 operations:
+
+  - key: bindUserUKeySN
+    label: "绑定设备"
+    hint: "为当前用户绑定 UKey 设备的序列号，一个用户仅能绑定一个 UKey，绑定后当前用户只能使用绑定的 UKey 登录"
+    btnType: primary
+    scope: admin
+    steps:
+      - name: inputUKeySN
+        label: "输入设备序列号"
+        input:
+          title: "绑定用户设备序列号"
+          fields:
+            - key: ukeySN
+              label: "设备序列号"
+              type: text
+              value: "{{ ukey.devSN }}"
+              required: true
+
+      - name: bindUserUKeySN
+        label: "绑定设备"
+        type: api
+        method: patch
+        url: "{{ config.api.bind_user_ukey_sn_url }}"
+        body:
+          user_id: "{{ user.id }}"
+          ukey_sn: "{{ input.ukeySN }}"
 
   - key: issueCert
     label: "签发证书"
@@ -605,5 +638,6 @@ login:
       fields:
         signature: "{{ vars.signature }}"
         cert: "{{ ukey.cert }}"
-        username: "{{ ukey.certCN }}"  # 可选，自动填充用户名输入框
+        username: "{{ ukey.certCN }}"  # 自动填充用户名输入框
+        ukey_sn: "{{ ukey.devSN }}"
 

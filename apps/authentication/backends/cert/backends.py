@@ -6,19 +6,28 @@ import os
 import tempfile
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 from users.models import User
 from common.utils import get_logger
 from ..base import JMSBaseAuthBackend
 from .driver import cert_vd_cfg
+from .exceptions import (
+    CertAuthError,
+    CertUserNotFoundError,
+    CertUkeySNMismatchError,
+    CertNormalizationError,
+    CertChainError,
+    CertCNMismatchError,
+    CertSignatureError,
+    CertUnsupportedAlgorithmError,
+)
+from .utils import is_sm2_pem
 
 
 __all__ = ['CertBackend']
 
 logger = get_logger(__name__)
-
-# SM2 曲线 OID DER 字节序列，用于判断证书算法（与 api.py 保持一致）
-_SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
 
 
 class CertBackend(JMSBaseAuthBackend):
@@ -28,56 +37,44 @@ class CertBackend(JMSBaseAuthBackend):
     def is_enabled():
         return settings.AUTH_CERT
 
-    def authenticate(self, request, username, cert, signature, challenge):
+    # ── 主入口 ────────────────────────────────────────────────────────────────
+
+    def authenticate(self, request, username, cert, signature, challenge, ukey_sn=None):
         try:
-            cert_pem = self._normalize_cert_to_pem(cert)
-        except Exception as e:
-            logger.warning('CertBackend: cert normalization failed: %s', e)
-            return None
+            user = self._check_user_and_ukey_sn(username, ukey_sn)
+            cert_pem = self._load_cert_pem(cert)
+            if self._is_sm2_cert(cert_pem):
+                return self._authenticate_sm2(cert_pem, username, signature, challenge, user)
+            else:
+                return self._authenticate_other(cert_pem, username, signature, challenge, user)
+        except CertAuthError as e:
+            if request:
+                request.error_message = str(e)
+            raise PermissionDenied(str(e))
 
-        if self._is_sm2_cert(cert_pem):
-            return self._authenticate_sm2(cert_pem, username, signature, challenge)
-        else:
-            return self._authenticate_other(cert_pem, username, signature, challenge)
+    # ── Part 1: 用户与 UKey SN 预校验 ────────────────────────────────────────
 
-    # ── SM2 四步校验 ─────────────────────────────────────────────────────────
+    def _check_user_and_ukey_sn(self, username, ukey_sn):
+        """查找用户并校验 ukey_sn 绑定关系，返回 User 实例。"""
+        ukey_sn = (ukey_sn or '').strip()
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            logger.warning('CertBackend: user %r not found', username)
+            raise CertUserNotFoundError()
+        if user.ukey_sn and ukey_sn != user.ukey_sn:
+            logger.warning('CertBackend: ukey_sn mismatch for user %r', username)
+            raise CertUkeySNMismatchError()
+        return user
 
-    def _authenticate_sm2(self, cert_pem, username, signature, challenge):
-        # 加载证书（写临时文件 → Sm2Certificate）
-        try:
-            sm2_cert = self._load_sm2_cert(cert_pem)
-        except Exception as e:
-            logger.warning('CertBackend: failed to load SM2 cert: %s', e)
-            return None
+    # ── Part 2: SM2 证书校验流程 ──────────────────────────────────────────────
 
-        # Step 1: 校验证书链，是否由 CA 根证书签发
-        try:
-            self._verify_sm2_cert_chain(sm2_cert)
-        except Exception as e:
-            logger.warning('CertBackend: SM2 cert chain verification failed: %s', e)
-            return None
-
-        # Step 2: 从证书 subject 提取 CN，与传入 username 比对
-        cert_cn = sm2_cert.get_subject().get('commonName')
-        if cert_cn != username:
-            logger.warning(
-                'CertBackend: cert CN %r does not match username %r', cert_cn, username
-            )
-            return None
-
-        # Step 3: 用证书公钥验证签名
-        public_key = sm2_cert.get_subject_public_key()
-        try:
-            sig_ok = self._verify_sm2_signature(public_key, signature, challenge)
-        except Exception as e:
-            logger.warning('CertBackend: SM2 signature verification failed: %s', e)
-            return None
-        if not sig_ok:
-            logger.warning('CertBackend: SM2 signature mismatch')
-            return None
-
-        # Step 4: 查询并返回用户
-        return User.objects.filter(username=username).first()
+    def _authenticate_sm2(self, cert_pem, username, signature, challenge, user):
+        """SM2 证书校验：加载 → 链校验 → CN 比对 → 签名验证。"""
+        sm2_cert = self._load_sm2_cert(cert_pem)
+        self._verify_sm2_cert_chain(sm2_cert)
+        self._verify_cert_cn(sm2_cert.get_subject().get('commonName'), username)
+        self._verify_sm2_signature(sm2_cert.get_subject_public_key(), signature, challenge)
+        return user
 
     @staticmethod
     def _load_sm2_cert(cert_pem):
@@ -91,20 +88,23 @@ class CertBackend(JMSBaseAuthBackend):
                 f.write(cert_pem)
             sm2_cert = Sm2Certificate()
             sm2_cert.import_pem(cert_file)
+        except Exception as e:
+            logger.warning('CertBackend: failed to load SM2 cert: %s', e)
+            raise CertNormalizationError()
         finally:
             if os.path.exists(cert_file):
                 os.unlink(cert_file)
         return sm2_cert
 
-    def _verify_sm2_cert_chain(self, sm2_cert):
-        """调用 Sm2Certificate.verify_by_ca_certificate 验证证书链。"""
-        from common.utils.gmssl_python import SM2_DEFAULT_ID
+    @staticmethod
+    def _verify_sm2_cert_chain(sm2_cert):
+        """调用 Sm2Certificate.verify_by_ca_certificate 验证 SM2 证书链。"""
+        from common.utils.gmssl_python import Sm2Certificate, SM2_DEFAULT_ID
 
         ca_cert_content = cert_vd_cfg.ca_cert_content
         if not ca_cert_content:
-            raise ValueError('AUTH_CERT_CA_CERT_CONTENT not configured')
+            raise CertChainError()
 
-        from common.utils.gmssl_python import Sm2Certificate
         fd, ca_cert_file = tempfile.mkstemp(suffix='.crt')
         try:
             os.close(fd)
@@ -112,45 +112,156 @@ class CertBackend(JMSBaseAuthBackend):
                 f.write(ca_cert_content)
             ca_cert = Sm2Certificate()
             ca_cert.import_pem(ca_cert_file)
+            ok = sm2_cert.verify_by_ca_certificate(ca_cert, SM2_DEFAULT_ID)
+        except CertAuthError:
+            raise
+        except Exception as e:
+            logger.warning('CertBackend: SM2 cert chain verification error: %s', e)
+            raise CertChainError()
         finally:
             if os.path.exists(ca_cert_file):
                 os.unlink(ca_cert_file)
 
-        if not sm2_cert.verify_by_ca_certificate(ca_cert, SM2_DEFAULT_ID):
-            raise ValueError('SM2 cert chain verification failed')
+        if not ok:
+            logger.warning('CertBackend: SM2 cert chain verification failed')
+            raise CertChainError()
 
     @staticmethod
     def _verify_sm2_signature(sm2_key, signature, challenge):
-        """
-        使用 gmssl_python 的 Sm2Signature 做 SM2withSM3 验签。
-
-        sm2_key   : Sm2Certificate.get_subject_public_key() 返回的 Sm2Key 对象。
-        signature : USB Key 返回的签名（bytes / hex 字符串 / base64 字符串，DER 格式）。
-        challenge : 服务端下发的挑战码字符串；JS 端对 btoa(challenge) 做签名。
-        """
+        """使用 gmssl_python 的 Sm2Signature 做 SM2withSM3 验签。"""
         from common.utils.gmssl_python import Sm2Signature, DO_VERIFY, SM2_DEFAULT_ID
 
         sig_bytes = CertBackend._decode_signature(signature)
+        signed_data = CertBackend._challenge_as_bytes(challenge)
+        try:
+            verifier = Sm2Signature(sm2_key, SM2_DEFAULT_ID, DO_VERIFY)
+            verifier.update(signed_data)
+            ok = bool(verifier.verify(sig_bytes))
+        except Exception as e:
+            logger.warning('CertBackend: SM2 signature verification error: %s', e)
+            raise CertSignatureError()
+        if not ok:
+            logger.warning('CertBackend: SM2 signature mismatch')
+            raise CertSignatureError()
 
-        # JS 端直接对 challenge 字符串签名，无需 base64 编码
-        if isinstance(challenge, bytes):
-            signed_data = challenge
-        else:
-            signed_data = challenge.encode('utf-8')
+    # ── Part 3: RSA / 其他证书校验流程 ───────────────────────────────────────
 
-        verifier = Sm2Signature(sm2_key, SM2_DEFAULT_ID, DO_VERIFY)
-        verifier.update(signed_data)
-        return bool(verifier.verify(sig_bytes))
+    def _authenticate_other(self, cert_pem, username, signature, challenge, user):
+        """RSA 证书校验：加载 → 链校验 → CN 比对 → 签名验证。"""
+        cert, pub_key = self._load_rsa_cert(cert_pem)
+        self._verify_rsa_cert_chain(cert)
+        self._verify_cert_cn(self._extract_rsa_cert_cn(cert), username)
+        self._verify_rsa_signature(pub_key, signature, challenge)
+        return user
 
-    # ── 工具方法 ─────────────────────────────────────────────────────────────
+    @staticmethod
+    def _load_rsa_cert(cert_pem):
+        """加载 RSA PEM 证书，校验公钥算法类型，返回 (cert, pub_key)。"""
+        from cryptography import x509
+        from cryptography.hazmat.primitives.asymmetric import ec, rsa
+
+        try:
+            cert = x509.load_pem_x509_certificate(cert_pem.encode())
+        except Exception as e:
+            logger.warning('CertBackend: failed to load certificate: %s', e)
+            raise CertNormalizationError()
+
+        pub_key = cert.public_key()
+        if isinstance(pub_key, ec.EllipticCurvePublicKey):
+            logger.warning('CertBackend: ECDSA certificate verification is not supported')
+            raise CertUnsupportedAlgorithmError()
+        if not isinstance(pub_key, rsa.RSAPublicKey):
+            logger.warning('CertBackend: unsupported key type: %s', type(pub_key).__name__)
+            raise CertUnsupportedAlgorithmError()
+        return cert, pub_key
+
+    @staticmethod
+    def _verify_rsa_cert_chain(cert):
+        """使用 CA 根证书验证 RSA 证书链。"""
+        from cryptography import x509
+        from cryptography.exceptions import InvalidSignature
+        from cryptography.hazmat.primitives.asymmetric import padding
+
+        ca_cert_content = cert_vd_cfg.ca_cert_content
+        if not ca_cert_content:
+            logger.warning('CertBackend: AUTH_CERT_CA_CERT_CONTENT not configured')
+            raise CertChainError()
+        try:
+            ca_cert = x509.load_pem_x509_certificate(ca_cert_content.encode())
+            ca_cert.public_key().verify(
+                cert.signature,
+                cert.tbs_certificate_bytes,
+                padding.PKCS1v15(),
+                cert.signature_hash_algorithm,
+            )
+        except InvalidSignature:
+            logger.warning('CertBackend: RSA cert chain verification failed')
+            raise CertChainError()
+        except CertAuthError:
+            raise
+        except Exception as e:
+            logger.warning('CertBackend: RSA cert chain verification error: %s', e)
+            raise CertChainError()
+
+    @staticmethod
+    def _extract_rsa_cert_cn(cert):
+        """从 RSA 证书 subject 中提取 CN，失败时返回 None。"""
+        from cryptography import x509
+
+        try:
+            return cert.subject.get_attributes_for_oid(x509.NameOID.COMMON_NAME)[0].value
+        except Exception:
+            return None
+
+    @staticmethod
+    def _verify_rsa_signature(pub_key, signature, challenge):
+        """使用 RSA PKCS1v15 + SHA256 验证签名。"""
+        from cryptography.exceptions import InvalidSignature
+        from cryptography.hazmat.primitives import hashes
+        from cryptography.hazmat.primitives.asymmetric import padding
+
+        sig_bytes = CertBackend._decode_signature(signature)
+        signed_data = CertBackend._challenge_as_bytes(challenge)
+        try:
+            pub_key.verify(sig_bytes, signed_data, padding.PKCS1v15(), hashes.SHA256())
+        except InvalidSignature:
+            logger.warning('CertBackend: RSA signature mismatch')
+            raise CertSignatureError()
+        except CertAuthError:
+            raise
+        except Exception as e:
+            logger.warning('CertBackend: RSA signature verification error: %s', e)
+            raise CertSignatureError()
+
+    # ── 公共工具方法 ──────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _verify_cert_cn(cert_cn, username):
+        """校验证书 CN 与 username 是否匹配（SM2 和 RSA 流程共用）。"""
+        if cert_cn != username:
+            logger.warning(
+                'CertBackend: cert CN %r does not match username %r', cert_cn, username
+            )
+            raise CertCNMismatchError()
+
+    @staticmethod
+    def _challenge_as_bytes(challenge):
+        """将 challenge 统一转为 bytes（SM2 和 RSA 签名验证共用）。"""
+        return challenge if isinstance(challenge, bytes) else challenge.encode('utf-8')
+
+    @staticmethod
+    def _load_cert_pem(cert_data):
+        """将原始证书数据转为 PEM 字符串，格式不合法时抛出 CertNormalizationError。"""
+        try:
+            return CertBackend._normalize_cert_to_pem(cert_data)
+        except Exception as e:
+            logger.warning('CertBackend: cert normalization failed: %s', e)
+            raise CertNormalizationError()
 
     @staticmethod
     def _is_sm2_cert(cert_pem):
         """通过 OID 字节序列判断证书是否使用 SM2 算法。"""
-        pem_lines = cert_pem.strip().splitlines()
-        b64 = ''.join(ln for ln in pem_lines if not ln.startswith('-----'))
-        der = base64.b64decode(b64)
-        return _SM2_OID_DER in der
+        return is_sm2_pem(cert_pem)
 
     @staticmethod
     def _normalize_cert_to_pem(cert_data):
@@ -194,72 +305,3 @@ class CertBackend(JMSBaseAuthBackend):
         except Exception:
             pass
         raise ValueError('Cannot decode signature: unknown format')
-
-    # ── RSA 四步校验 ─────────────────────────────────────────────────────────
-
-    def _authenticate_other(self, cert_pem, username, signature, challenge):
-        from cryptography import x509
-        from cryptography.exceptions import InvalidSignature
-        from cryptography.hazmat.primitives import hashes
-        from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
-
-        # Step 1: 加载证书，判断算法类型
-        try:
-            cert = x509.load_pem_x509_certificate(cert_pem.encode())
-        except Exception as e:
-            logger.warning('CertBackend: failed to load certificate: %s', e)
-            return None
-
-        pub_key = cert.public_key()
-        if isinstance(pub_key, ec.EllipticCurvePublicKey):
-            logger.warning('CertBackend: ECDSA certificate verification is not supported')
-            return None
-        if not isinstance(pub_key, rsa.RSAPublicKey):
-            logger.warning('CertBackend: unsupported key type: %s', type(pub_key).__name__)
-            return None
-
-        # Step 2: 校验证书链，是否由 CA 根证书签发
-        ca_cert_content = cert_vd_cfg.ca_cert_content
-        if not ca_cert_content:
-            logger.warning('CertBackend: AUTH_CERT_CA_CERT_CONTENT not configured')
-            return None
-        try:
-            ca_cert = x509.load_pem_x509_certificate(ca_cert_content.encode())
-            ca_cert.public_key().verify(
-                cert.signature,
-                cert.tbs_certificate_bytes,
-                padding.PKCS1v15(),
-                cert.signature_hash_algorithm,
-            )
-        except InvalidSignature:
-            logger.warning('CertBackend: RSA cert chain verification failed')
-            return None
-        except Exception as e:
-            logger.warning('CertBackend: RSA cert chain verification error: %s', e)
-            return None
-
-        # Step 3: 从证书 subject 提取 CN，与传入 username 比对
-        try:
-            cert_cn = cert.subject.get_attributes_for_oid(x509.NameOID.COMMON_NAME)[0].value
-        except (IndexError, Exception):
-            cert_cn = None
-        if cert_cn != username:
-            logger.warning(
-                'CertBackend: cert CN %r does not match username %r', cert_cn, username
-            )
-            return None
-
-        # Step 4: 用证书公钥验证签名（RSA PKCS1v15 + SHA256）
-        sig_bytes = self._decode_signature(signature)
-        signed_data = challenge if isinstance(challenge, bytes) else challenge.encode('utf-8')
-        try:
-            pub_key.verify(sig_bytes, signed_data, padding.PKCS1v15(), hashes.SHA256())
-        except InvalidSignature:
-            logger.warning('CertBackend: RSA signature mismatch')
-            return None
-        except Exception as e:
-            logger.warning('CertBackend: RSA signature verification error: %s', e)
-            return None
-
-        # Step 5: 查询并返回用户
-        return User.objects.filter(username=username).first()

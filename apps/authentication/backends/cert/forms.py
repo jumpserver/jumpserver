@@ -15,4 +15,8 @@ class CertLoginForm(forms.Form):
         required=True,
         widget=forms.HiddenInput(),
     )
+    ukey_sn = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
 

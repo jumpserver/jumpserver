@@ -10,15 +10,17 @@ from django.conf import settings
 from django.http import FileResponse, Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from common.permissions import OnlySuperUser
 from common.utils import get_logger
 from .driver import cert_vd_cfg
+from .utils import is_sm2_pem
 
 
-__all__ = ['VendorDriverFileAPIView', 'CertVendorDriverConfigAPIView']
+__all__ = ['VendorDriverFileAPIView', 'CertVendorDriverConfigAPIView', 'BindUserUkeySnAPIView']
 
 logger = get_logger(__name__)
 
@@ -52,9 +54,6 @@ class CertVendorDriverConfigAPIView(APIView):
 class CertEnrollAPIView(APIView):
     permission_classes = (OnlySuperUser,)
 
-    # SM2 曲线 OID：1.2.156.10197.1.301
-    # DER 编码：06 08 2a 81 1c cf 55 01 82 2d
-    _SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
 
     def post(self, request):
         if not cert_vd_cfg.enroll_enabled:
@@ -125,14 +124,8 @@ class CertEnrollAPIView(APIView):
         )
 
     def _is_sm2_csr(self, csr_pem):
-        """
-        通过查找 SM2 曲线 OID 字节序列判断 CSR 是否使用 SM2 算法，
-        无需调用外部工具。
-        """
-        pem_lines = csr_pem.strip().splitlines()
-        b64 = ''.join(ln for ln in pem_lines if not ln.startswith('-----'))
-        der = base64.b64decode(b64)
-        return self._SM2_OID_DER in der
+        """通过查找 SM2 曲线 OID 字节序列判断 CSR 是否使用 SM2 算法。"""
+        return is_sm2_pem(csr_pem)
 
     def sign_cert_by_other(self, csr_pem):
         import datetime
@@ -245,3 +238,20 @@ class CertEnrollAPIView(APIView):
             for path in (csr_file, ca_cert_file, ca_key_file, cert_file):
                 if path and os.path.exists(path):
                     os.unlink(path)
+
+
+class BindUserUkeySnAPIView(APIView):
+    permission_classes = (OnlySuperUser,)
+
+    def patch(self, request):
+        user_id = request.data.get('user_id')
+        ukey_sn = request.data.get('ukey_sn')
+
+        if not user_id or not ukey_sn:
+            error = _('User ID and UKey SN are required')
+            return Response(data={'error': error}, status=400)
+
+        from users.models import User
+        user = get_object_or_404(User, id=user_id)
+        user.set_ukey_sn(ukey_sn)
+        return Response(status=204)
