@@ -4,7 +4,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
-from common.decorators import Singleton
 from common.const import Language
 from .utils import detect_cert_algorithm
 
@@ -12,15 +11,12 @@ from .utils import detect_cert_algorithm
 logger = get_logger(__name__)
 
 
-# @Singleton
 class UKeySDKConfig:
 
     def __init__(self):
         if not settings.AUTH_UKEY:
             logger.debug('UKeySDKConfig: authentication backend not enabled')
             return
-        cf_path = self.get_sdk_config_yaml_path()
-        self._raw = self._load_yaml(cf_path)
 
     def _vendor_path(self, filename):
         return os.path.join(
@@ -29,11 +25,38 @@ class UKeySDKConfig:
             settings.AUTH_UKEY_VENDOR, filename,
         )
 
-    def get_sdk_script_js_path(self):
+    def get_sdk_script_path(self):
         return self._vendor_path('sdk_script.js')
 
-    def get_sdk_config_yaml_path(self):
+    def get_sdk_config_path(self):
         return self._vendor_path('sdk_config.yaml')
+
+    def load_sdk_script_content(self):
+        """返回 SDK JS 文件内容，按 vendor 缓存，vendor 变更或服务重启后自动失效。"""
+        vendor = getattr(settings, 'AUTH_UKEY_VENDOR', '')
+        cache_key = f'_sdk_script_cache'
+        cache = getattr(self, cache_key, {})
+        if vendor not in cache:
+            js_path = self.get_sdk_script_path()
+            if not js_path or not os.path.isfile(js_path):
+                return None
+            with open(js_path, 'rb') as f:
+                cache[vendor] = f.read()
+            setattr(self, cache_key, cache)
+        return cache[vendor]
+
+    def load_sdk_config_content(self):
+        """返回原始 YAML 配置数据，按 vendor 缓存，vendor 变更或服务重启后自动失效。"""
+        vendor = getattr(settings, 'AUTH_UKEY_VENDOR', '')
+        cache_key = f'_sdk_config_cache'
+        cache = getattr(self, cache_key, {})
+        if vendor not in cache:
+            cf_path = self.get_sdk_config_path()
+            if not cf_path or not os.path.isfile(cf_path):
+                return {}
+            cache[vendor] = self._load_yaml(cf_path)
+            setattr(self, cache_key, cache)
+        return cache[vendor]
 
     @staticmethod
     def _load_yaml(config_file):
@@ -103,7 +126,7 @@ class UKeySDKConfig:
     # ── 厂商 SDK 映射（原始数据，供 API 层序列化给前端）───────────────────────
         
     @staticmethod
-    def _render(data, trans_filter=None):
+    def _render(sdk_config, trans_filter=None):
         """
         只处理 YAML 数据中的 i18n 翻译标记，不做模板变量替换。
           - {{ 'text' | trans }} → 按 trans_filter 翻译；不传则原文返回
@@ -124,13 +147,13 @@ class UKeySDKConfig:
                 return _translate(obj)
             return obj
 
-        return _walk(data)
+        return _walk(sdk_config)
 
-    def _build_trans_filter(self, lang):
+    def _build_trans_filter(self, sdk_config, lang):
         """构建 Jinja2 | trans filter 函数，按 lang 从 YAML i18n 表查找翻译。
         未找到翻译时原文返回；语言键自动归一化（zh_hant → zh-hant）。
         """
-        i18n_raw = self._raw.get('i18n') or {}
+        i18n_raw = sdk_config.get('i18n') or {}
         i18n = {
             text: {
                 Language.to_internal_code(lk.replace('_', '-')): lv
@@ -148,16 +171,18 @@ class UKeySDKConfig:
 
         return trans_filter
 
+
     def get_sdk_config(self, lang='en'):
         """返回去掉 'cert'/'i18n' 顶层 key 后的厂商 SDK 方法映射。
         YAML 中任意字符串值均可用 {{ 'text' | trans }} 语法标记为可翻译。
         """
         lang = Language.to_internal_code(lang)
-        trans_filter = self._build_trans_filter(lang)
-        data = self._render(self._raw, trans_filter)
-        data = self._apply_config_to_sdk(data)
-        data = {k: v for k, v in data.items() if k not in ('i18n',)}
-        return data
+        sdk_config = self.load_sdk_config_content()
+        trans_filter = self._build_trans_filter(sdk_config, lang)
+        sdk_config = self._render(sdk_config, trans_filter)
+        sdk_config = self._apply_internal_config_to_sdk_config(sdk_config)
+        sdk_config = {k: v for k, v in sdk_config.items() if k not in ('i18n',)}
+        return sdk_config
     
     # 当一个 config 值是含这些 key 的 dict 时，视为"算法分支字典"，自动按当前证书算法解析
     _ALGO_BRANCH_KEYS = frozenset({'SM2', 'RSA-1024', 'RSA-2048', 'default'})
@@ -173,21 +198,20 @@ class UKeySDKConfig:
             return branch[algo_key]
         return branch.get('default')
 
-    def _apply_config_to_sdk(self, data):
+    def _apply_internal_config_to_sdk_config(self, sdk_config):
         """将 'config' 配置段渲染后添加到 data['config']，供前端 API 层使用。
         
         YAML config 中值为算法分支字典（含 SM2/RSA-1024/RSA-2048/default 等 key）的字段，
         会自动根据 CA 证书算法类型解析为对应的标量值，无需在此处逐字段枚举。
         """
-        config = data.get('config') or {}
+        config = sdk_config.get('config') or {}
         asym_alg_name = self.ca_cert_asym_alg
-        algo_key = asym_alg_name or 'default'
 
         # 自动展开所有算法分支字典字段
         resolved_config = {}
         for k, v in config.items():
             if self._is_algo_branch(v):
-                resolved_config[k] = self._resolve_algo_branch(v, algo_key)
+                resolved_config[k] = self._resolve_algo_branch(v, asym_alg_name)
             else:
                 resolved_config[k] = v
 
@@ -209,8 +233,8 @@ class UKeySDKConfig:
                 'user_detail_url': reverse('users:user-list') + '{user_id}/',
             },
         })
-        data['config'] = resolved_config
-        return data
+        sdk_config['config'] = resolved_config
+        return sdk_config
 
 
 ukey_sdk_config = UKeySDKConfig()

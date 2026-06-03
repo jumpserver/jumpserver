@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 import yaml
 from django.conf import settings
-from django.http import FileResponse, Http404
+from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.shortcuts import get_object_or_404
@@ -30,14 +30,10 @@ class UKeySDKScriptFileAPIView(APIView):
 
     @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
-        from .sdk import UKeySDKConfig
-        ukey_sdk_config = UKeySDKConfig()
-        js_file = ukey_sdk_config.get_sdk_script_js_path()
-        if not js_file or not os.path.isfile(js_file):
+        content = ukey_sdk_config.load_sdk_script_content()
+        if content is None:
             raise Http404
-        response = FileResponse(open(js_file, 'rb'), content_type='application/javascript')
-        response['Cache-Control'] = 'public, max-age=3600'
-        return response
+        return HttpResponse(content, content_type='application/javascript')
 
 
 class UKeySDKConfigFileAPIView(APIView):
@@ -45,8 +41,6 @@ class UKeySDKConfigFileAPIView(APIView):
 
     def get(self, request):
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
-        from .sdk import UKeySDKConfig
-        ukey_sdk_config = UKeySDKConfig()
         data = ukey_sdk_config.get_sdk_config(lang=lang)
         return Response(data)
 
