@@ -1,0 +1,81 @@
+---
+# JumpServer Ansible Execution Environment
+#
+# 国内加速构建（推荐）:
+#   cd utils/ansible_executor
+#   chmod +x build.sh
+#   ./build.sh
+#
+# 手动构建:
+#   ansible-builder build -f execution-environment.yml -t company-ee:1.0 --container-runtime docker
+#
+# 加速要点:
+#   1. pip: 清华源 (files/pip.conf)
+#   2. dnf/epel: 阿里云 (files/use-china-mirrors.sh)
+#   3. GitHub zip: build.sh 默认走 ghfast.top 镜像
+#   4. 重复构建: PKGMGR_PRESERVE_CACHE=always 保留 dnf 缓存
+#   5. Docker Desktop -> Settings -> Docker Engine 配置 registry-mirrors
+
+version: 3
+
+build_arg_defaults:
+  # 重复 build 时保留 dnf 缓存，显著加快二次构建
+  PKGMGR_PRESERVE_CACHE: always
+
+images:
+  # ansible-builder 仅支持 RPM 系镜像 (dnf)，不能用 python:3.11-slim 等 Debian 镜像
+  base_image:
+    name: quay.io/centos/centos:stream9
+
+dependencies:
+  python_interpreter:
+    package_system: python3.11
+    python_path: /usr/bin/python3.11
+
+  # 与 pyproject.toml [tool.uv.sources] 保持一致，不要用 PyPI 官方包
+  ansible_core:
+    package_pip: https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.7.zip
+  ansible_runner:
+    package_pip: https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/2.4.0.1.zip
+
+  galaxy:
+    collections:
+      - name: community.postgresql
+        version: "2.4.0"
+      - name: community.mysql
+      - name: community.mongodb
+      - name: community.windows
+      - name: ansible.windows
+
+  python: requirements-python.txt
+  system: bindep.txt
+
+additional_build_files:
+  - src: files/pip.conf
+    dest: configs/
+  - src: files/use-china-mirrors.sh
+    dest: scripts/
+  - src: ../../apps/libs/ansible/
+    dest: jumpserver-ansible/
+  - src: ansible.cfg
+    dest: configs/
+
+additional_build_steps:
+  prepend_base:
+    # pip 镜像需在 base 阶段最早注入，后续各 stage 的 pip install 都会走国内源
+    - COPY _build/configs/pip.conf /etc/pip.conf
+    - COPY _build/scripts/use-china-mirrors.sh /tmp/use-china-mirrors.sh
+    - RUN chmod +x /tmp/use-china-mirrors.sh && /tmp/use-china-mirrors.sh centos
+    # freetds-devel、sshpass 等在 EPEL；postgresql-devel 等开发包常需 CRB
+    - RUN $PKGMGR config-manager --set-enabled crb
+    - RUN $PKGMGR install -y epel-release
+    - RUN /tmp/use-china-mirrors.sh epel && $PKGMGR makecache -y
+  append_final:
+    - RUN mkdir -p /opt/jumpserver/apps
+    - COPY _build/jumpserver-ansible/ /opt/jumpserver/apps/libs/ansible/
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+    - ENV PYTHONPATH=/opt/jumpserver/apps
+    - ENV ANSIBLE_LIBRARY=/opt/jumpserver/apps/libs/ansible/modules
+    - ENV ANSIBLE_FORCE_COLOR=True
+    - ENV LC_ALL=C.UTF-8
+    - ENV LANG=C.UTF-8

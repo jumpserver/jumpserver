@@ -14,6 +14,13 @@ from ..utils import get_ansible_log_verbosity
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
 
+def prepare_isolated_ansible_cfg(project_dir):
+    """Copy ansible.cfg into job dir so the EE container picks up SSH settings."""
+    src = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
+    dst = os.path.join(project_dir, 'ansible.cfg')
+    shutil.copyfile(src, dst)
+
+
 class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
     need_local_connection_modules_choices = ("mysql", "postgresql", "sqlserver", "huawei")
@@ -60,7 +67,12 @@ class AdHocRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
+        prepare_isolated_ansible_cfg(self.project_dir)
+
         interface.run(
+            process_isolation=True,
+            process_isolation_executable='docker',
+            container_image='company-ee:1.0',
             timeout=self.timeout if self.timeout > 0 else None,
             extravars=self.extra_vars,
             envvars=self.envs,
@@ -108,12 +120,13 @@ class PlaybookRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        kwargs = dict(kwargs)
-        if self.isolate and not is_macos():
-            kwargs['process_isolation'] = True
-            kwargs['process_isolation_executable'] = 'bwrap'
+        prepare_isolated_ansible_cfg(self.project_dir)
 
+        kwargs = dict(kwargs)
         interface.run(
+            process_isolation=True,
+            process_isolation_executable='docker',
+            container_image='company-ee:1.0',
             private_data_dir=self.project_dir,
             inventory=self.inventory,
             playbook=self.playbook,

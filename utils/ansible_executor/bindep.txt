@@ -1,0 +1,20 @@
+# RPM packages for JumpServer ansible playbooks and custom modules.
+# ansible-builder 只支持 dnf/microdnf，不支持 Debian apt。
+# freetds-devel / sshpass 需配合 execution-environment.yml 中 EPEL 启用步骤。
+gcc [platform:rpm]
+pkgconf-pkg-config [platform:rpm]
+python3.11-devel [platform:rpm]
+openssh-clients [platform:rpm]
+sshpass [platform:rpm]
+iputils [platform:rpm]
+nmap [platform:rpm]
+telnet [platform:rpm]
+mariadb-connector-c-devel [platform:rpm]
+postgresql-devel [platform:rpm]
+freetds-devel [platform:rpm]
+krb5-devel [platform:rpm]
+openldap-devel [platform:rpm]
+cyrus-sasl-devel [platform:rpm]
+libX11-devel [platform:rpm]
+ca-certificates [platform:rpm]
+glibc-langpack-en [platform:rpm]
