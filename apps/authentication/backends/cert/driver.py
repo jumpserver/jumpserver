@@ -212,6 +212,7 @@ class CertVendorDriverConfig:
             'api': {
                 'enroll_cert_url': reverse('api-auth:cert-enroll'),
                 'bind_user_ukey_sn_url': reverse('api-auth:bind-user-ukey-sn'),
+                'user_detail_url': reverse('users:user-list') + '{user_id}/',
             },
         })
         data['config'] = resolved_config

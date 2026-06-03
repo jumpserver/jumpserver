@@ -27,6 +27,7 @@ config:
     RSA-1024: 4
     RSA-2048: 4
     default: 1
+  poll_interval: 3000  # 轮询检测设备的时间间隔，单位毫秒
 
 #═══════════════════════════════════════════════════════════════════════════════
 # driver: SDK 脚本加载、实例创建、初始化步骤
@@ -104,39 +105,54 @@ info:
 
   # 左上「设备驱动状态」区域的动态字段（固定字段由页面内置）
   device:
-    - key: userUKeySN
-      label: "设备序列号（用户已绑定）"
+    - key: vendor
+      label: "设备厂商"
+      scope: admin
+      value: "吉大"
+
+    - key: ukeyConnected
+      label: "设备状态"
       scope: both
-      value: "{{ user.ukey_sn }}"
-      compare: 
-        key1: "{{ user.ukey_sn }}"  # 可选，默认为 user.username
-        key2: "{{ ukey.devSN }}"  # 将此字段的值与 ukey.devSN 比对，相同则显示绿色勾，反之显示红色叉
+      source: "{{ ukey.devSN }}"
+      status:
+        cases:
+          - match: truthy
+            text: "已连接"
+            type: success
+            value: true
+          - match: falsy
+            text: "未连接"
+            type: danger
+            value: false
+      register: ukey.connected
+
+    - key: devVersion
+      label: "设备版本"
+      scope: both
+      value: "{{ ukey.devVersion }}"
 
     - key: devSN
       label: "设备序列号"
       scope: both
       value: "{{ ukey.devSN }}"
 
-    - key: devVersion
-      label: "设备版本"
+    - key: userUKeySN
+      label: "用户绑定的设备序列号"
       scope: both
-      value: "{{ ukey.devVersion }}"
-    
-    - key: enrollValidityDays
-      label: "证书签发有效期（天）"
-      scope: admin
-      value: "{{ config.enroll.validity_days }}"
-
-    - key: vendor
-      label: "设备厂商"
-      scope: admin
-      value: "吉大"
+      value: "{{ user.ukey_sn }}"
+      compare: "{{ ukey.devSN }}"
 
     - key: asymAlgName
       label: "非对称算法"
       scope: both
       value: "{{ config.asymAlgName }}"
+      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
 
+    - key: enrollValidityDays
+      label: "证书签发有效期（天）"
+      scope: admin
+      value: "{{ config.enroll.validity_days }}"
+      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
 
   # 右上「证书信息」区域的字段，每个字段单独调用 SDK 方法或写固定 value 获取
   # 取值方式（二选一，call 优先级高于 value）：
@@ -149,8 +165,7 @@ info:
       args: 
         - "{{ config.certType }}"  # 证书类型参数
         - 9
-      owner:
-        user_field: username      # 将此字段的值与 user.username 比对
+      compare: "{{ user.username }}"  # 将此字段的值与 user.username 比对
     
     - key: CERT_SUBJECT_O
       label: "证书拥有者 O"
@@ -263,6 +278,7 @@ operations:
     hint: "为当前用户绑定 UKey 设备的序列号，一个用户仅能绑定一个 UKey，绑定后当前用户只能使用绑定的 UKey 登录"
     btnType: primary
     scope: admin
+    event: refresh.info.device
     steps:
       - name: inputUKeySN
         label: "输入设备序列号"
@@ -283,6 +299,15 @@ operations:
         body:
           user_id: "{{ user.id }}"
           ukey_sn: "{{ input.ukeySN }}"
+      
+      - name: refreshUserInfo
+        label: "刷新用户信息"
+        type: api
+        method: get
+        url: "{{ config.api.user_detail_url }}"
+        url_format: 
+          user_id: "{{ user.id }}"
+        register: user
 
   - key: issueCert
     label: "签发证书"
@@ -290,7 +315,24 @@ operations:
     btnType: primary
     scope: admin    
     hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此按鈕
+    disabled: "{{ !ukey.connected }}"
+    event: refresh.info.cert
     steps:
+      - name: verifyUKeyUserPassword
+        label: "验证 UKey 用户密码"
+        input: 
+          title: "验证 UKey 用户密码"
+          fields:
+            - key: userPassWd
+              label: "UKey 用户密码"
+              type: password
+        call: UKey_VerifyPIN
+        args:
+          - "{{ input.userPassWd }}"
+        check:
+          expr: "{{ result === 0 }}"
+          message: "用户认证失败，错误码: {{ result }}"
+
       - name: genKeyPair
         label: "生成密钥对"
         call: UKey_GenKeyPair
@@ -330,11 +372,29 @@ operations:
     hint: "永久删除 UKey 中的数字证书，操作不可逆"
     btnType: danger
     scope: admin
+    hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此按鈕
+    disabled: "{{ !ukey.connected }}"
+    event: refresh.info.cert
     confirm:
       title: "删除证书确认"
       message: "确认要删除 UKey 中的证书吗？此操作不可逆。"
       type: warning
     steps:
+      - name: verifyUKeyUserPassword
+        label: "验证 UKey 用户密码"
+        input: 
+          title: "验证 UKey 用户密码"
+          fields:
+            - key: userPassWd
+              label: "UKey 用户密码"
+              type: password
+        call: UKey_VerifyPIN
+        args:
+          - "{{ input.userPassWd }}"
+        check:
+          expr: "{{ result === 0 }}"
+          message: "用户认证失败，错误码: {{ result }}"
+
       - name: deleteCert
         label: "删除设备证书"
         call: UKey_DeleteCons
@@ -345,6 +405,7 @@ operations:
     hint: "使用管理员权限将 PIN 码重置为系统默认值"
     btnType: warning
     scope: admin
+    disabled: "{{ !ukey.connected }}"
     steps:
       - name: resetPin
         label: "重置 PIN"
@@ -367,6 +428,7 @@ operations:
     hint: "修改 UKey 的用户 PIN 码"
     btnType: info
     scope: both
+    disabled: "{{ !ukey.connected }}"
     steps:
       - name: changePin
         label: "修改 PIN"
