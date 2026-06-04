@@ -36,7 +36,7 @@ class UKeySDKConfig:
         vendor = getattr(settings, 'AUTH_UKEY_VENDOR', '')
         cache_key = f'_sdk_script_cache'
         cache = getattr(self, cache_key, {})
-        if vendor not in cache:
+        if vendor not in cache or settings.DEBUG_DEV:
             js_path = self.get_sdk_script_path()
             if not js_path or not os.path.isfile(js_path):
                 return None
@@ -50,7 +50,7 @@ class UKeySDKConfig:
         vendor = getattr(settings, 'AUTH_UKEY_VENDOR', '')
         cache_key = f'_sdk_config_cache'
         cache = getattr(self, cache_key, {})
-        if vendor not in cache:
+        if vendor not in cache or settings.DEBUG_DEV:
             cf_path = self.get_sdk_config_path()
             if not cf_path or not os.path.isfile(cf_path):
                 return {}
@@ -229,11 +229,22 @@ class UKeySDKConfig:
             'api': {
                 'ukey_sdk_script_url': reverse('api-auth:ukey:ukey-sdk-script'),
                 'enroll_cert_url': reverse('api-auth:ukey:ukey-enroll-cert'),
-                'bind_user_ukey_sn_url': reverse('api-auth:ukey:bind-user-ukey-sn'),
                 'user_detail_url': reverse('users:user-list') + '{user_id}/',
             },
+            'api_body': {
+                'enroll_cert_url': ['user_id', 'csr'],
+                'user_detail_url': ['ukey_sn']
+            },
+            'api_method': {
+                'ukey_sdk_script_url': ['GET'],
+                'enroll_cert_url': ['POST'],
+                'user_detail_url': ['PATCH'],
+            }
+
         })
         sdk_config['config'] = resolved_config
+        if not settings.DEBUG_DEV:
+            sdk_config.pop('meta', None)
         return sdk_config
 
 

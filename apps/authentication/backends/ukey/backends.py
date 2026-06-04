@@ -20,6 +20,7 @@ from .exceptions import (
     UKeyCertChainError,
     UKeyCertCNMismatchError,
     UKeySignatureError,
+    UKeyCertExpiredError,
     UKeyCertUnsupportedAlgorithmError,
 )
 from .utils import is_sm2_pem
@@ -69,9 +70,10 @@ class UKeyBackend(JMSBaseAuthBackend):
     # ── Part 2: SM2 证书校验流程 ──────────────────────────────────────────────
 
     def _authenticate_sm2(self, cert_pem, username, signature, challenge, user):
-        """SM2 证书校验：加载 → 链校验 → CN 比对 → 签名验证。"""
+        """SM2 证书校验：加载 → 链校验 → 有效期 → CN 比对 → 签名验证。"""
         sm2_cert = self._load_sm2_cert(cert_pem)
         self._verify_sm2_cert_chain(sm2_cert)
+        self._verify_sm2_cert_validity(sm2_cert)
         self._verify_cert_cn(sm2_cert.get_subject().get('commonName'), username)
         self._verify_sm2_signature(sm2_cert.get_subject_public_key(), signature, challenge)
         return user
@@ -95,6 +97,16 @@ class UKeyBackend(JMSBaseAuthBackend):
             if os.path.exists(cert_file):
                 os.unlink(cert_file)
         return sm2_cert
+
+    @staticmethod
+    def _verify_sm2_cert_validity(sm2_cert):
+        """校验 SM2 证书有效期（not_before / not_after）。"""
+        try:
+            validity = sm2_cert.get_validity()
+        except Exception as e:
+            logger.warning('UKeyBackend: failed to get SM2 cert validity: %s', e)
+            raise UKeyCertExpiredError()
+        UKeyBackend._check_validity_period(validity.not_before, validity.not_after, 'SM2')
 
     @staticmethod
     def _verify_sm2_cert_chain(sm2_cert):
@@ -147,9 +159,10 @@ class UKeyBackend(JMSBaseAuthBackend):
     # ── Part 3: RSA / 其他证书校验流程 ───────────────────────────────────────
 
     def _authenticate_other(self, cert_pem, username, signature, challenge, user):
-        """RSA 证书校验：加载 → 链校验 → CN 比对 → 签名验证。"""
+        """RSA 证书校验：加载 → 链校验 → 有效期 → CN 比对 → 签名验证。"""
         cert, pub_key = self._load_rsa_cert(cert_pem)
         self._verify_rsa_cert_chain(cert)
+        self._verify_rsa_cert_validity(cert)
         self._verify_cert_cn(self._extract_rsa_cert_cn(cert), username)
         self._verify_rsa_signature(pub_key, signature, challenge)
         return user
@@ -174,6 +187,13 @@ class UKeyBackend(JMSBaseAuthBackend):
             logger.warning('UKeyBackend: unsupported key type: %s', type(pub_key).__name__)
             raise UKeyCertUnsupportedAlgorithmError()
         return cert, pub_key
+
+    @staticmethod
+    def _verify_rsa_cert_validity(cert):
+        """校验 RSA 证书有效期（not_valid_before_utc / not_valid_after_utc）。"""
+        UKeyBackend._check_validity_period(
+            cert.not_valid_before_utc, cert.not_valid_after_utc, 'RSA'
+        )
 
     @staticmethod
     def _verify_rsa_cert_chain(cert):
@@ -234,6 +254,31 @@ class UKeyBackend(JMSBaseAuthBackend):
             raise UKeySignatureError()
 
     # ── 公共工具方法 ──────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _check_validity_period(not_before, not_after, label=''):
+        """校验证书有效期（SM2 和 RSA 共用）。
+
+        not_before / not_after 可为 naive（本地时间）或 aware（带时区）datetime，
+        now 与之保持相同类型以确保可比较。
+        """
+        import datetime
+
+        if not_before.tzinfo is not None:
+            now = datetime.datetime.now(datetime.timezone.utc)
+        else:
+            now = datetime.datetime.now()
+
+        if now < not_before:
+            logger.warning(
+                'UKeyBackend: %s certificate not yet valid, valid from %s', label, not_before
+            )
+            raise UKeyCertExpiredError()
+        if now > not_after:
+            logger.warning(
+                'UKeyBackend: %s certificate has expired at %s', label, not_after
+            )
+            raise UKeyCertExpiredError()
 
     @staticmethod
     def _verify_cert_cn(cert_cn, username):

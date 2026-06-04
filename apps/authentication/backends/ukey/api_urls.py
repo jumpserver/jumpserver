@@ -8,5 +8,4 @@ urlpatterns = [
     path('ukey-sdk.js/', api.UKeySDKScriptFileAPIView.as_view(), name='ukey-sdk-script'),
     path('ukey-sdk-config/', api.UKeySDKConfigFileAPIView.as_view(), name='ukey-sdk-config'),
     path('enroll-cert/', api.UKeyCertEnrollAPIView.as_view(), name='ukey-enroll-cert'),
-    path('bind-user-ukey-sn/', api.BindUserUkeySnAPIView.as_view(), name='bind-user-ukey-sn'),
 ]

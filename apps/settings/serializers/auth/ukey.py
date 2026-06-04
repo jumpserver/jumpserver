@@ -7,23 +7,6 @@ from django.db.models import TextChoices
 __all__ = ['UKeySettingSerializer']
 
 
-class CertVendorChoices(TextChoices):
-    LONG_MAI_M_TOKEN = 'long_mai_m_token', _('LONG MAI mToken')
-    JI_DA = 'ji_da', _('JI DA')
-
-    @classmethod
-    def default(cls):
-        if settings.VENDOR.lower() == 'jumpserver':
-            return cls.LONG_MAI_M_TOKEN
-        return cls.JI_DA
-    
-    @classmethod
-    def get_choices(cls):
-        if settings.VENDOR.lower() == 'jumpserver':
-            return cls.choices
-        return [(cls.JI_DA.value, cls.JI_DA.label)]
-
-
 class UKeySettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('UKey')
 
@@ -37,13 +20,6 @@ class UKeySettingSerializer(serializers.Serializer):
     AUTH_UKEY_DEFAULT_PIN = EncryptedField(
         default='', allow_blank=True, label=_('USB-Key Default PIN'),
         help_text=_('Default USB Key PIN used for administrator reset')
-    )
-    AUTH_UKEY_VENDOR = serializers.ChoiceField(
-        choices=CertVendorChoices.get_choices(),
-        default=CertVendorChoices.default(), 
-        allow_blank=False,
-        label=_('UKey Vendor'),
-        help_text=_('Vendor name for UKey authentication')
     )
     # ENROLLMENT SETTINGS
     AUTH_UKEY_ENROLL_ENABLED = serializers.BooleanField(

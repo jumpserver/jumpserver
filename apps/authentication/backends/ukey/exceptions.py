@@ -36,5 +36,9 @@ class UKeySignatureError(UKeyAuthError):
     default_msg = _('Certificate signature verification failed')
 
 
+class UKeyCertExpiredError(UKeyAuthError):
+    default_msg = _('Certificate has expired or is not yet valid')
+
+
 class UKeyCertUnsupportedAlgorithmError(UKeyAuthError):
     default_msg = _('Unsupported certificate algorithm')

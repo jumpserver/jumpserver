@@ -20,7 +20,7 @@ from .sdk import ukey_sdk_config
 from .utils import is_sm2_pem
 
 
-__all__ = ['UKeySDKScriptFileAPIView', 'UKeySDKConfigFileAPIView', 'BindUserUkeySnAPIView']
+__all__ = ['UKeySDKScriptFileAPIView', 'UKeySDKConfigFileAPIView']
 
 logger = get_logger(__name__)
 
@@ -45,8 +45,9 @@ class UKeySDKConfigFileAPIView(APIView):
 
 
 class UKeyCertEnrollAPIView(APIView):
-    permission_classes = (OnlySuperUser,)
-
+    rbac_perms = {
+        'POST': 'users.change_user',
+    }
 
     def post(self, request):
         if not ukey_sdk_config.enroll_enabled:
@@ -231,20 +232,3 @@ class UKeyCertEnrollAPIView(APIView):
             for path in (csr_file, ca_cert_file, ca_key_file, cert_file):
                 if path and os.path.exists(path):
                     os.unlink(path)
-
-
-class BindUserUkeySnAPIView(APIView):
-    permission_classes = (OnlySuperUser,)
-
-    def patch(self, request):
-        user_id = request.data.get('user_id')
-        ukey_sn = request.data.get('ukey_sn')
-
-        if not user_id or not ukey_sn:
-            error = _('User ID and UKey SN are required')
-            return Response(data={'error': error}, status=400)
-
-        from users.models import User
-        user = get_object_or_404(User, id=user_id)
-        user.set_ukey_sn(ukey_sn)
-        return Response(status=204)

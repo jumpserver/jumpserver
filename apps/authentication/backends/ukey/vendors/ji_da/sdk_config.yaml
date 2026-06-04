@@ -5,9 +5,10 @@
 
 # ── 元信息 ──────────────────────────────────────────────────────────────────────
 meta:
-  vendor: "吉大"
+  vendor: "吉大正元"
+  product: "JIT Key"
   version: "1.0.0"
-  description: "吉大 UKey Web SDK 配置"
+  description: "吉大正元 JIT Key Web SDK 配置"
 
 # - 配置信息 
 config:
@@ -27,7 +28,7 @@ config:
     RSA-1024: 4
     RSA-2048: 4
     default: 1
-  poll_interval: 3000  # 轮询检测设备的时间间隔，单位毫秒
+  poll_interval: 30000  # 轮询检测设备的时间间隔，单位毫秒
 
 #═══════════════════════════════════════════════════════════════════════════════
 # sdk: SDK 脚本加载、实例创建、初始化步骤
@@ -88,11 +89,6 @@ info:
 
   # 左上「设备驱动状态」区域的动态字段（固定字段由页面内置）
   device:
-    - key: vendor
-      label: "设备厂商"
-      scope: admin
-      value: "吉大"
-
     - key: ukeyConnected
       label: "设备状态"
       scope: both
@@ -124,18 +120,6 @@ info:
       scope: both
       value: "{{ user.ukey_sn }}"
       compare: "{{ ukey.devSN }}"
-
-    - key: asymAlgName
-      label: "非对称算法"
-      scope: both
-      value: "{{ config.asym_alg_name }}"
-      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
-
-    - key: enrollValidityDays
-      label: "证书签发有效期（天）"
-      scope: admin
-      value: "{{ config.enroll.validity_days }}"
-      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
 
   # 右上「证书信息」区域的字段，每个字段单独调用 SDK 方法或写固定 value 获取
   # 取值方式（二选一，call 优先级高于 value）：
@@ -278,20 +262,13 @@ operations:
         label: "绑定设备"
         type: api
         method: patch
-        url: "{{ config.api.bind_user_ukey_sn_url }}"
-        body:
-          user_id: "{{ user.id }}"
-          ukey_sn: "{{ input.ukeySN }}"
-      
-      - name: refreshUserInfo
-        label: "刷新用户信息"
-        type: api
-        method: get
         url: "{{ config.api.user_detail_url }}"
         url_format: 
           user_id: "{{ user.id }}"
+        body:
+          ukey_sn: "{{ input.ukeySN }}"
         register: user
-
+      
   - key: issueCert
     label: "签发证书"
     hint: "为 UKey 生成密钥对并签发数字证书"

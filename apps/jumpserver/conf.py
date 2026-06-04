@@ -270,7 +270,7 @@ class Config(dict):
         'AUTH_CUSTOM_SSO_QUERY_PARAMS': 'token',
 
         'AUTH_UKEY': False,
-        'AUTH_UKEY_VENDOR': '',
+        'AUTH_UKEY_VENDOR': 'long_mai',
         'AUTH_UKEY_ENROLL_ENABLED': True,
         'AUTH_UKEY_ENROLL_VALIDITY_DAYS': 365,
         'AUTH_UKEY_CHALLENGE_TTL': 300,

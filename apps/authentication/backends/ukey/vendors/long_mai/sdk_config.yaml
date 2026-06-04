@@ -5,9 +5,10 @@
 
 # ── 元信息 ──────────────────────────────────────────────────────────────────────
 meta:
-  vendor: "龙脉"
+  vendor: "龙脉科技"
+  product: "mToken UKey"
   version: "1.0.0"
-  description: "龙脉 UKey Web SDK 配置"
+  description: "龙脉科技 mToken UKey Web SDK 配置"
 
 
 # - 配置信息 
@@ -82,21 +83,21 @@ sdk:
         label: "释放应用实例"
         call: SOF_ReleaseDeviceInstance
         args:
-          - "{{ ukey.devSN }}"
+          - "{{ ukey.devSN.0 }}"
 
       # 重要：后续 API 内部会用 devName 
       - key: BindAppInstance
         label: "绑定应用实例"
         call: SOF_GetDeviceInstance
         args:
-          - "{{ ukey.devSN }}"
+          - "{{ ukey.devSN.0 }}"
           - "" # 绑定第一个应用
 
       - name: getDevVersion
         label: "获取设备版本"
         call: SOF_GetDeviceInfo
         args: 
-          - "{{ ukey.devSN }}"
+          - "{{ ukey.devSN.0 }}"
           - "{{ instance.SGD_DEVICE_HARDWARE_VERSION }}"
         scope: both
         register: ukey.devVersion 
@@ -141,15 +142,10 @@ info:
   # 左上「设备驱动状态」区域的动态字段（固定字段由页面内置）
   device:
 
-    - key: uKeyVendor
-      label: "设备厂商"
-      scope: admin
-      value: "龙脉"
-
     - key: ukeyConnected
       label: "设备状态"
       scope: both
-      source: "{{ ukey.devSN }}"
+      source: "{{ ukey.devSN.0 }}"
       status:
         cases:
           - match: truthy
@@ -170,25 +166,13 @@ info:
     - key: devSN
       label: "设备序列号"
       scope: both
-      value: "{{ ukey.devSN }}"
+      value: "{{ ukey.devSN.0 }}"
 
     - key: userUKeySN
       label: "用户绑定的设备序列号"
       scope: both
       value: "{{ user.ukey_sn }}"
-      compare: "{{ ukey.devSN }}"
-    
-    - key: asymAlgName
-      label: "非对称算法"
-      scope: both
-      value: "{{ config.asym_alg_name }}"
-      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
-    
-    - key: enrollValidityDays
-      label: "证书签发有效期（天）"
-      scope: admin
-      value: "{{ config.enroll.validity_days }}"
-      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此字段
+      compare: "{{ ukey.devSN.0 }}"
     
   # 右上「证书信息」区域
   #
@@ -287,7 +271,6 @@ info:
           - "{{ instance.SGD_CERT_ISSUER_OU }}" # OID for Issuer OU
       
 
-
 #═══════════════════════════════════════════════════════════════════════════════
 # operations: 操作按钮列表（顺序即按钮排列顺序）
 #
@@ -339,27 +322,20 @@ operations:
             - key: ukeySN
               label: "设备序列号"
               type: text
-              value: "{{ ukey.devSN }}"
+              value: "{{ ukey.devSN.0 }}"
               required: true
 
       - name: bindUserUKeySN
         label: "绑定设备"
         type: api
         method: patch
-        url: "{{ config.api.bind_user_ukey_sn_url }}"
-        body:
-          user_id: "{{ user.id }}"
-          ukey_sn: "{{ input.ukeySN }}"
-      
-      - name: refreshUserInfo
-        label: "刷新用户信息"
-        type: api
-        method: get
         url: "{{ config.api.user_detail_url }}"
         url_format: 
           user_id: "{{ user.id }}"
+        body:
+          ukey_sn: "{{ input.ukeySN }}"
         register: user
-
+      
   - key: issueCert
     label: "签发证书"
     hint: "为 UKey 生成密钥对并签发数字证书"
@@ -373,7 +349,7 @@ operations:
         label: "绑定应用实例"
         call: SOF_GetDeviceInstance
         args:
-          - "{{ ukey.devSN }}"
+          - "{{ ukey.devSN.0 }}"
           - "" # 绑定第一个应用
 
       - name: verifyUKeyUserPassword
@@ -664,5 +640,5 @@ login:
         signature: "{{ vars.signature }}"
         cert: "{{ ukey.cert }}"
         username: "{{ ukey.certCN }}"  # 自动填充用户名输入框
-        ukey_sn: "{{ ukey.devSN }}"
+        ukey_sn: "{{ ukey.devSN.0 }}"
 
