@@ -134,6 +134,7 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
         logger.debug(log_prompt.format('Start'))
         callback_params = request.GET
         error_title = _("OpenID Error")
+        user = None
 
         # Retrieve the state value that was previously generated. No state means that we cannot
         # authenticate the user (so a failure should be returned).

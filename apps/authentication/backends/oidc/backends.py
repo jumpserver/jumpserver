@@ -41,6 +41,13 @@ class UserMixin:
 
         sub = claims['sub']
 
+        # Flatten nested 'params' claim into top-level claims so that
+        # provider-specific custom parameters (e.g. OneLogin) are accessible
+        # via AUTH_OPENID_USER_ATTR_MAP.
+        params = claims.get('params')
+        if isinstance(params, dict):
+            claims.update(params)
+
         # Construct user attrs value
         user_attrs = {}
         for field, attr in settings.AUTH_OPENID_USER_ATTR_MAP.items():
