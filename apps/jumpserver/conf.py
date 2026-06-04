@@ -595,6 +595,8 @@ class Config(dict):
         'SECURITY_COMMAND_BLACKLIST': [
             'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
         ],
+        # The backslash only escapes the single quote in this Python string; it is not a forbidden character.
+        'SECURITY_ACCOUNT_USERNAME_FORBIDDEN_CHARS': '{[\'"`;|<>',
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': 'auto',
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_ACCOUNT_SECRET_READ': True,

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils._os import safe_join
 
 from common.utils import is_macos
+from common.utils.yml import sanitize_ansible_inventory_json, sanitize_ansible_playbook
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
 from .interface import interface
@@ -78,7 +79,10 @@ class AdHocRunner:
 
 
 class PlaybookRunner:
-    def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None, ):
+    def __init__(
+            self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None,
+            safety_mode=None, inventory_safety=None,
+    ):
 
         self.id = uuid.uuid4()
         self.inventory = inventory
@@ -92,6 +96,8 @@ class PlaybookRunner:
         if extra_vars is None:
             extra_vars = {}
         self.extra_vars = extra_vars
+        self.safety_mode = safety_mode
+        self.inventory_safety = inventory_safety
 
     def copy_playbook(self):
         entry = os.path.basename(self.playbook)
@@ -100,8 +106,25 @@ class PlaybookRunner:
         shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
         self.playbook = entry
 
+    def prepare_safe_inputs(self):
+        # Security anchor:
+        # For system-generated Ansible inputs that may contain user-controlled values,
+        # callers should explicitly enable safety_mode / inventory_safety so the runner
+        # sanitizes the task-private playbook / inventory before Ansible runs.
+        # This is intended for system-generated inputs whose values should be treated as
+        # literal data, not for arbitrary user-authored playbooks or execution logic.
+        if self.safety_mode == "playbook_unsafe":
+            project_playbook = os.path.join(self.project_dir, "project", self.playbook)
+            sanitize_ansible_playbook(project_playbook, project_playbook)
+            os.chmod(project_playbook, 0o600)
+
+        if self.inventory_safety == "json_escape":
+            sanitize_ansible_inventory_json(self.inventory, self.inventory)
+            os.chmod(self.inventory, 0o600)
+
     def run(self, verbosity=0, **kwargs):
         self.copy_playbook()
+        self.prepare_safe_inputs()
 
         verbosity = get_ansible_log_verbosity(verbosity)
         private_env = safe_join(self.project_dir, 'env')

@@ -21,6 +21,9 @@ msgstr ""
 "X-Crowdin-Project-ID: 832018\n"
 "X-Generator: Poedit 2.4.3\n"
 
+msgid "Username contains invalid characters: %(chars)s"
+msgstr "Имя пользователя содержит недопустимые символы: %(chars)s"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:358

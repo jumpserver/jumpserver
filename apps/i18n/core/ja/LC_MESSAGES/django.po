@@ -18,6 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+msgid "Username contains invalid characters: %(chars)s"
+msgstr "ユーザー名に無効な文字が含まれています: %(chars)s"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:181
 #: accounts/serializers/account/account.py:358
