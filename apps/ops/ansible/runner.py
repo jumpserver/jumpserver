@@ -131,7 +131,13 @@ class PlaybookRunner:
         shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
         self.playbook = entry
 
+    @property
+    def playbook_project_dir(self):
+        return os.path.join(self.project_dir, 'project')
+
     def run(self, verbosity=0, **kwargs):
+        if not os.path.exists(self.project_dir):
+            os.makedirs(self.project_dir, mode=0o755)
         self.copy_playbook()
 
         verbosity = get_ansible_log_verbosity(verbosity)
@@ -155,7 +161,8 @@ class PlaybookRunner:
             verbosity=verbosity,
             event_handler=self.cb.event_handler,
             status_handler=self.cb.status_handler,
-            host_cwd=self.project_dir,
+            # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
+            host_cwd=self.playbook_project_dir,
             envvars=self.envs,
             extravars=self.extra_vars,
             **kwargs
@@ -171,26 +178,45 @@ class SuperPlaybookRunner(PlaybookRunner):
 
 
 class UploadFileRunner:
+    UPLOAD_STAGING_DIR = 'upload'
+
     def __init__(self, inventory, project_dir, job_id, dest_path, callback=None):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.project_dir = project_dir
         self.cb = DefaultCallback()
         upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file')
-        self.src_paths = safe_join(upload_file_dir, str(job_id))
+        self.share_src_dir = safe_join(upload_file_dir, str(job_id))
         self.dest_path = safe_join("/tmp", dest_path)
 
+    def stage_upload_files(self):
+        """Copy uploads into private_data_dir so Docker EE can read src for copy."""
+        if not os.path.isdir(self.share_src_dir):
+            raise FileNotFoundError(f'Upload source directory not found: {self.share_src_dir}')
+        staged_dir = os.path.join(self.project_dir, self.UPLOAD_STAGING_DIR)
+        if os.path.exists(staged_dir):
+            shutil.rmtree(staged_dir)
+        shutil.copytree(self.share_src_dir, staged_dir)
+        return staged_dir
+
     def run(self, verbosity=0, **kwargs):
+        if not os.path.exists(self.project_dir):
+            os.makedirs(self.project_dir, mode=0o755)
+
+        prepare_isolated_ansible_cfg(self.project_dir)
+        src_path = self.stage_upload_files()
+
         verbosity = get_ansible_log_verbosity(verbosity)
         run_kwargs = {
             'private_data_dir': self.project_dir,
             'host_pattern': "*",
             'inventory': self.inventory,
             'module': 'copy',
-            'module_args': f"src={self.src_paths}/ dest={self.dest_path}/",
+            'module_args': f"src={src_path}/ dest={self.dest_path}/",
             'verbosity': verbosity,
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,
+            'host_cwd': self.project_dir,
             **kwargs,
         }
         if use_ansible_docker_isolation():
@@ -198,7 +224,7 @@ class UploadFileRunner:
 
         interface.run(**run_kwargs)
         try:
-            shutil.rmtree(self.src_paths)
+            shutil.rmtree(self.share_src_dir)
         except OSError as e:
-            print(f"del upload tmp dir {self.src_paths} failed! {e}")
+            print(f"del upload tmp dir {self.share_src_dir} failed! {e}")
         return self.cb
