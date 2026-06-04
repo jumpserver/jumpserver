@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-IMAGE_TAG="${IMAGE_TAG:-company-ee:1.0}"
+IMAGE_TAG="${IMAGE_TAG:-jms_ansible_ee:latest}"
 EE_FILE="${EE_FILE:-execution-environment.yml}"
 GITHUB_MIRROR="${GITHUB_MIRROR:-https://ghfast.top/}"
 USE_CHINA_MIRROR="${USE_CHINA_MIRROR:-1}"

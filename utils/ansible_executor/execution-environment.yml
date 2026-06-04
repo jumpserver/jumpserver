@@ -1,26 +1,7 @@
 ---
-# JumpServer Ansible Execution Environment
-#
-# 国内加速构建（推荐）:
-#   cd utils/ansible_executor
-#   chmod +x build.sh
-#   ./build.sh
-#
-# 手动构建:
-#   ansible-builder build -f execution-environment.yml -t company-ee:1.0 --container-runtime docker
-#
-# 加速要点:
-#   1. pip: 清华源 (files/pip.conf)
-#   2. dnf/epel: 阿里云 (files/use-china-mirrors.sh)
-#   3. GitHub zip: build.sh 默认走 ghfast.top 镜像
-#   4. 重复构建: PKGMGR_PRESERVE_CACHE=always 保留 dnf 缓存
-#   5. Docker Desktop -> Settings -> Docker Engine 配置 registry-mirrors
 
 version: 3
 
-build_arg_defaults:
-  # 重复 build 时保留 dnf 缓存，显著加快二次构建
-  PKGMGR_PRESERVE_CACHE: always
 
 images:
   # ansible-builder 仅支持 RPM 系镜像 (dnf)，不能用 python:3.11-slim 等 Debian 镜像
@@ -79,3 +60,6 @@ additional_build_steps:
     - ENV ANSIBLE_FORCE_COLOR=True
     - ENV LC_ALL=C.UTF-8
     - ENV LANG=C.UTF-8
+    # bindep [compile] 已避免工具链进入最终层；此处仅清理 PKGMGR_PRESERVE_CACHE 写入的 dnf 缓存
+    - RUN $PKGMGR clean all && rm -rf /var/cache/dnf /var/cache/yum /root/.cache
+    - RUN pip cache purge

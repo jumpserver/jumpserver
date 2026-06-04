@@ -13,9 +13,26 @@ from ..utils import get_ansible_log_verbosity
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
+ANSIBLE_EE_IMAGE = 'jms_ansible_ee:latest'
+
+
+def use_ansible_docker_isolation():
+    """Production runs ansible in EE container; dev runs in celery worker."""
+    return not settings.DEBUG_DEV
+
+
+def docker_isolation_kwargs():
+    return {
+        'process_isolation': True,
+        'process_isolation_executable': 'docker',
+        'container_image': ANSIBLE_EE_IMAGE,
+    }
+
 
 def prepare_isolated_ansible_cfg(project_dir):
     """Copy ansible.cfg into job dir so the EE container picks up SSH settings."""
+    if not use_ansible_docker_isolation():
+        return
     src = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
     dst = os.path.join(project_dir, 'ansible.cfg')
     shutil.copyfile(src, dst)
@@ -69,23 +86,24 @@ class AdHocRunner:
 
         prepare_isolated_ansible_cfg(self.project_dir)
 
-        interface.run(
-            process_isolation=True,
-            process_isolation_executable='docker',
-            container_image='company-ee:1.0',
-            timeout=self.timeout if self.timeout > 0 else None,
-            extravars=self.extra_vars,
-            envvars=self.envs,
-            host_pattern=self.pattern,
-            private_data_dir=self.project_dir,
-            inventory=self.inventory,
-            module=self.module,
-            module_args=self.module_args,
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            **kwargs
-        )
+        run_kwargs = {
+            'timeout': self.timeout if self.timeout > 0 else None,
+            'extravars': self.extra_vars,
+            'envvars': self.envs,
+            'host_pattern': self.pattern,
+            'private_data_dir': self.project_dir,
+            'inventory': self.inventory,
+            'module': self.module,
+            'module_args': self.module_args,
+            'verbosity': verbosity,
+            'event_handler': self.cb.event_handler,
+            'status_handler': self.cb.status_handler,
+            **kwargs,
+        }
+        if use_ansible_docker_isolation():
+            run_kwargs.update(docker_isolation_kwargs())
+
+        interface.run(**run_kwargs)
         return self.cb
 
 
@@ -123,10 +141,13 @@ class PlaybookRunner:
         prepare_isolated_ansible_cfg(self.project_dir)
 
         kwargs = dict(kwargs)
+        if use_ansible_docker_isolation():
+            kwargs.update(docker_isolation_kwargs())
+        elif self.isolate and not is_macos():
+            kwargs['process_isolation'] = True
+            kwargs['process_isolation_executable'] = 'bwrap'
+
         interface.run(
-            process_isolation=True,
-            process_isolation_executable='docker',
-            container_image='company-ee:1.0',
             private_data_dir=self.project_dir,
             inventory=self.inventory,
             playbook=self.playbook,
@@ -160,17 +181,21 @@ class UploadFileRunner:
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
-        interface.run(
-            private_data_dir=self.project_dir,
-            host_pattern="*",
-            inventory=self.inventory,
-            module='copy',
-            module_args=f"src={self.src_paths}/ dest={self.dest_path}/",
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            **kwargs
-        )
+        run_kwargs = {
+            'private_data_dir': self.project_dir,
+            'host_pattern': "*",
+            'inventory': self.inventory,
+            'module': 'copy',
+            'module_args': f"src={self.src_paths}/ dest={self.dest_path}/",
+            'verbosity': verbosity,
+            'event_handler': self.cb.event_handler,
+            'status_handler': self.cb.status_handler,
+            **kwargs,
+        }
+        if use_ansible_docker_isolation():
+            run_kwargs.update(docker_isolation_kwargs())
+
+        interface.run(**run_kwargs)
         try:
             shutil.rmtree(self.src_paths)
         except OSError as e:

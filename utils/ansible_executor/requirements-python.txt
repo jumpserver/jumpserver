@@ -2,7 +2,7 @@
 paramiko==3.2.0
 sshtunnel==0.4.0
 pywinrm==0.4.3
-python-nmap==0.7.1
+telnetlib3==4.0.2
 mysqlclient==2.2.4
 pymssql==2.3.4
 pymongo==4.6.3
