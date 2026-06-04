@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-27 14:34+0800\n"
+"POT-Creation-Date: 2026-06-04 14:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -402,7 +402,7 @@ msgstr "En proceso"
 msgid "Can login"
 msgstr "se puede iniciar sesión"
 
-#: accounts/const/automation.py:128 users/serializers/user.py:259
+#: accounts/const/automation.py:128 users/serializers/user.py:260
 msgid "Superuser"
 msgstr "superusuario"
 
@@ -440,7 +440,7 @@ msgid "Perms"
 msgstr "Permisos"
 
 #: accounts/const/automation.py:137 perms/serializers/permission.py:56
-#: users/serializers/user.py:250
+#: users/serializers/user.py:251
 msgid "Groups"
 msgstr "Grupo de usuarios"
 
@@ -506,7 +506,7 @@ msgstr ""
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:38
 #: terminal/templates/terminal/_msg_command_warning.html:10
 #: terminal/templates/terminal/_msg_session_sharing.html:4
-#: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:296
+#: tickets/models/ticket/apply_asset.py:17 xpack/plugins/cloud/models.py:298
 msgid "Asset"
 msgstr "Activos"
 
@@ -574,7 +574,7 @@ msgstr "Estado de cambio de contraseña"
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
-#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/ws.py:36
+#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/ws.py:36
 msgid "Account"
 msgstr "Cuenta"
 
@@ -647,7 +647,7 @@ msgstr "Actividad de cuenta"
 #: users/notifications.py:145 users/notifications.py:184
 #: users/notifications.py:224 users/notifications.py:252
 #: users/notifications.py:279 xpack/plugins/cloud/models.py:35
-#: xpack/plugins/cloud/models.py:316 xpack/plugins/cloud/serializers/task.py:77
+#: xpack/plugins/cloud/models.py:318 xpack/plugins/cloud/serializers/task.py:77
 msgid "Name"
 msgstr "Nombre"
 
@@ -821,8 +821,8 @@ msgstr "Fecha de finalización"
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
 #: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:284
 #: tickets/reporting.py:80 tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:233
-#: xpack/plugins/cloud/models.py:300
+#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:235
+#: xpack/plugins/cloud/models.py:302
 msgid "Status"
 msgstr "Estado"
 
@@ -925,7 +925,7 @@ msgstr "Contraseña duplicada"
 #: accounts/templates/accounts/push_account_report.html:79
 #: accounts/templates/accounts/push_account_report.html:119
 #: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:204
-#: audits/reporting.py:241 authentication/backends/cert/forms.py:7
+#: audits/reporting.py:241 authentication/backends/ukey/forms.py:7
 #: authentication/forms.py:21 authentication/forms.py:23
 #: authentication/models/temp_token.py:10
 #: authentication/serializers/connect_token_secret.py:43
@@ -1087,7 +1087,7 @@ msgstr "cuenta privilegiada."
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:129 reports/models.py:18
 #: terminal/models/applet/applet.py:41
-#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:262
+#: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:263
 msgid "Is active"
 msgstr "Activación"
 
@@ -1103,7 +1103,7 @@ msgstr "Plataforma"
 msgid "Push params"
 msgstr "Parámetros de envío de cuentas"
 
-#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:404
+#: accounts/models/template.py:26 xpack/plugins/cloud/models.py:406
 msgid "Account template"
 msgstr "Plantilla de cuentas"
 
@@ -1263,7 +1263,7 @@ msgstr "La cuenta existe política"
 #: assets/serializers/platform.py:285 perms/serializers/user_permission.py:27
 #: settings/models.py:40 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/models.py:41
-#: xpack/plugins/cloud/models.py:327
+#: xpack/plugins/cloud/models.py:329
 #: xpack/plugins/cloud/serializers/account.py:87
 msgid "Category"
 msgstr "Categoría"
@@ -1368,8 +1368,8 @@ msgstr "ID"
 #: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 tickets/serializers/flow.py:15
-#: users/const.py:14 users/models/user/__init__.py:303
-#: users/models/user/__init__.py:330
+#: users/const.py:14 users/models/user/__init__.py:307
+#: users/models/user/__init__.py:340
 msgid "User"
 msgstr "Usuario"
 
@@ -1410,7 +1410,7 @@ msgstr "Lista blanca de IP"
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
-#: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
+#: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:131
 msgid "Comment"
 msgstr "Comentarios"
 
@@ -1959,12 +1959,12 @@ msgid "Secret rotation"
 msgstr "Rotación de contraseñas"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:322
+#: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:324
 msgid "Priority"
 msgstr "Prioridad"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:111 xpack/plugins/cloud/models.py:323
+#: terminal/models/component/endpoint.py:111 xpack/plugins/cloud/models.py:325
 msgid "1-100, the lower the value will be match first"
 msgstr ""
 "El rango de prioridad permitido es de 1 a 100 (un valor menor indica mayor "
@@ -1987,7 +1987,7 @@ msgstr "Persona aprobadora"
 
 #: acls/models/base.py:81 perms/serializers/permission.py:54
 #: tickets/models/flow.py:23 users/models/preference.py:16
-#: users/serializers/group.py:21 users/serializers/user.py:429
+#: users/serializers/group.py:21 users/serializers/user.py:430
 msgid "Users"
 msgstr "Usuario"
 
@@ -2013,7 +2013,7 @@ msgid "Command"
 msgstr "Comando"
 
 #: acls/models/command_acl.py:17 assets/models/cmd_filter.py:59
-#: xpack/plugins/cloud/models.py:370
+#: xpack/plugins/cloud/models.py:372
 msgid "Regex"
 msgstr "Expresión regular"
 
@@ -2225,7 +2225,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: common/drf/renders/base.py:165 xpack/plugins/cloud/models.py:406
+#: common/drf/renders/base.py:165 xpack/plugins/cloud/models.py:408
 msgid "IP"
 msgstr "IP"
 
@@ -2386,7 +2386,7 @@ msgid "Unable to connect to port {port} on {address}"
 msgstr "No se puede conectar al puerto {address} en el puerto {port}"
 
 #: assets/automations/ping_gateway/manager.py:58
-#: authentication/middleware.py:95 xpack/plugins/cloud/providers/fc.py:47
+#: authentication/middleware.py:94 xpack/plugins/cloud/providers/fc.py:47
 #: xpack/plugins/cloud/providers/proxmox.py:29
 msgid "Authentication failed"
 msgstr "Autenticación fallida"
@@ -2405,7 +2405,6 @@ msgstr ""
 #: assets/const/automation.py:6 audits/const.py:6 audits/const.py:48
 #: audits/signal_handlers/activity_log.py:63 common/utils/ip/geoip/utils.py:42
 #: common/utils/ip/geoip/utils.py:48 common/utils/ip/utils.py:104
-#: settings/serializers/auth/cert.py:31
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -2786,12 +2785,12 @@ msgstr "Dirección"
 #: assets/serializers/asset/common.py:151
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:130
-#: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:400
+#: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:402
 msgid "Platform"
 msgstr "Plataforma"
 
 #: assets/models/asset/common.py:173 assets/models/zone.py:22
-#: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:402
+#: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:404
 msgid "Zone"
 msgstr "Dominio"
 
@@ -2862,7 +2861,7 @@ msgstr "Proxy"
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
 #: assets/models/node.py:560 ops/models/job.py:158
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
-#: xpack/plugins/cloud/models.py:401
+#: xpack/plugins/cloud/models.py:403
 msgid "Node"
 msgstr "Nodo"
 
@@ -2886,12 +2885,12 @@ msgstr "Tareas de automatización de activos"
 #: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
 #: ops/models/base.py:54 ops/models/job.py:240
-#: users/models/user/__init__.py:333
+#: users/models/user/__init__.py:343
 msgid "Date created"
 msgstr "Fecha de creación"
 
 #: assets/models/automations/base.py:155
-#: assets/serializers/automations/base.py:46 xpack/plugins/cloud/models.py:248
+#: assets/serializers/automations/base.py:46 xpack/plugins/cloud/models.py:250
 #: xpack/plugins/cloud/serializers/task.py:260
 msgid "Trigger mode"
 msgstr "Modo de activación"
@@ -2903,7 +2902,7 @@ msgid "Summary"
 msgstr "Resumen"
 
 #: assets/models/automations/base.py:158 ops/models/base.py:51
-#: ops/models/job.py:237 xpack/plugins/cloud/models.py:231
+#: ops/models/job.py:237 xpack/plugins/cloud/models.py:233
 msgid "Result"
 msgstr "Resultado"
 
@@ -2929,7 +2928,7 @@ msgid "User group"
 msgstr "Grupo de usuarios"
 
 #: assets/models/cmd_filter.py:42 authentication/serializers/token.py:133
-#: common/db/models.py:35 users/models/user/__init__.py:155
+#: common/db/models.py:35 users/models/user/__init__.py:158
 msgid "Date updated"
 msgstr "Fecha de actualización"
 
@@ -2990,7 +2989,7 @@ msgstr "Valor"
 #: assets/serializers/platform.py:160
 #: authentication/serializers/connect_token_secret.py:136
 #: common/serializers/common.py:85 labels/serializers.py:45
-#: settings/serializers/msg.py:91 xpack/plugins/cloud/models.py:405
+#: settings/serializers/msg.py:91 xpack/plugins/cloud/models.py:407
 msgid "Label"
 msgstr "Etiqueta"
 
@@ -3206,7 +3205,7 @@ msgstr ""
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:77
 #: perms/models/asset_permission.py:76 perms/serializers/permission.py:68
-#: perms/serializers/user_permission.py:86 xpack/plugins/cloud/models.py:403
+#: perms/serializers/user_permission.py:86 xpack/plugins/cloud/models.py:405
 #: xpack/plugins/cloud/serializers/task.py:36
 msgid "Protocols"
 msgstr "Grupo de protocolos"
@@ -3700,10 +3699,9 @@ msgstr "Exportar"
 msgid "Connect"
 msgstr "Conectar"
 
-#: audits/const.py:31
-#: authentication/templates/authentication/cert_login.html:236
-#: authentication/templates/authentication/login.html:334
+#: audits/const.py:31 authentication/templates/authentication/login.html:334
 #: authentication/templates/authentication/login.html:408
+#: authentication/templates/authentication/login_ukey.html:238
 #: templates/_header_bar.html:101
 #: xpack/plugins/interface/templates/login_i18n.html:21
 msgid "Login"
@@ -3846,7 +3844,7 @@ msgstr "MFA"
 
 #: audits/models.py:219 audits/reporting.py:251
 #: terminal/models/session/sharing.py:123 xpack/plugins/cloud/manager.py:196
-#: xpack/plugins/cloud/models.py:237
+#: xpack/plugins/cloud/models.py:239
 msgid "Reason"
 msgstr "Razón"
 
@@ -4553,30 +4551,6 @@ msgstr "Gestión de autenticación"
 msgid "CAS Error"
 msgstr "Error CAS"
 
-#: authentication/backends/cert/api.py:57
-#, fuzzy
-#| msgid "LDAP authentication is not enabled"
-msgid "Certificate enrollment is not enabled"
-msgstr "La autenticación LDAP no está habilitada"
-
-#: authentication/backends/cert/api.py:62
-#, fuzzy
-#| msgid "type is required"
-msgid "CSR is required"
-msgstr "Tipo Este campo es obligatorio."
-
-#: authentication/backends/cert/api.py:68
-#, fuzzy
-#| msgid "Authentication failed"
-msgid "Certificate signing failed"
-msgstr "Autenticación fallida"
-
-#: authentication/backends/cert/views.py:94
-#, fuzzy
-#| msgid "Invalid data"
-msgid "Invalid credentials"
-msgstr "Datos no válidos"
-
 #: authentication/backends/drf.py:61
 msgid "Invalid token header. No credentials provided."
 msgstr "Token inválido. No se proporcionaron credenciales."
@@ -4629,6 +4603,82 @@ msgstr "ID de comprobante"
 #: authentication/backends/saml2/views.py:257
 msgid "SAML2 Error"
 msgstr "Error SAML2"
+
+#: authentication/backends/ukey/api.py:54
+#, fuzzy
+#| msgid "LDAP authentication is not enabled"
+msgid "Certificate enrollment is not enabled"
+msgstr "La autenticación LDAP no está habilitada"
+
+#: authentication/backends/ukey/api.py:59
+#, fuzzy
+#| msgid "type is required"
+msgid "CSR is required"
+msgstr "Tipo Este campo es obligatorio."
+
+#: authentication/backends/ukey/api.py:65
+#, fuzzy
+#| msgid "Authentication failed"
+msgid "Certificate signing failed"
+msgstr "Autenticación fallida"
+
+#: authentication/backends/ukey/exceptions.py:8
+#, fuzzy
+#| msgid "Can public key authentication"
+msgid "Certificate authentication failed"
+msgstr "Pueden usar autenticación de clave pública"
+
+#: authentication/backends/ukey/exceptions.py:16
+#, fuzzy
+#| msgid "User does not exist: {}"
+msgid "User does not exist"
+msgstr "El usuario no existe: {}"
+
+#: authentication/backends/ukey/exceptions.py:20
+msgid "UKey SN mismatch"
+msgstr ""
+
+#: authentication/backends/ukey/exceptions.py:24
+#, fuzzy
+#| msgid "Invalid verification code"
+msgid "Invalid certificate format"
+msgstr "el código de verificación es incorrecto"
+
+#: authentication/backends/ukey/exceptions.py:28
+#, fuzzy
+#| msgid "Authentication failed"
+msgid "Certificate chain verification failed"
+msgstr "Autenticación fallida"
+
+#: authentication/backends/ukey/exceptions.py:32
+#, fuzzy
+#| msgid "LDAP authentication is not enabled"
+msgid "Certificate CN does not match the username"
+msgstr "La autenticación LDAP no está habilitada"
+
+#: authentication/backends/ukey/exceptions.py:36
+#, fuzzy
+#| msgid "Authentication failed"
+msgid "Certificate signature verification failed"
+msgstr "Autenticación fallida"
+
+#: authentication/backends/ukey/exceptions.py:40
+#, fuzzy
+#| msgid "LDAP authentication is not enabled"
+msgid "Certificate has expired or is not yet valid"
+msgstr "La autenticación LDAP no está habilitada"
+
+#: authentication/backends/ukey/exceptions.py:44
+#, fuzzy
+#| msgid "Unsupported file content"
+msgid "Unsupported certificate algorithm"
+msgstr "Contenido de archivo no soportado"
+
+#: authentication/backends/ukey/views.py:97
+#, fuzzy
+#| msgid "Invalid data"
+msgid "Invalid credentials"
+msgstr "Datos no válidos"
 
 #: authentication/confirm/password.py:17
 msgid "Authentication failed password incorrect"
@@ -4962,7 +5012,7 @@ msgstr "Configurar el número de teléfono para habilitar"
 msgid "Clear phone number to disable"
 msgstr "Limpiar número de teléfono para desactivar"
 
-#: authentication/middleware.py:96 settings/utils/ldap.py:714
+#: authentication/middleware.py:95 settings/utils/ldap.py:714
 #, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr ""
@@ -5190,7 +5240,7 @@ msgstr "Action"
 
 #: authentication/serializers/connection_token.py:46
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:87
-#: users/serializers/user.py:127 users/serializers/user.py:266
+#: users/serializers/user.py:127 users/serializers/user.py:267
 msgid "Is expired"
 msgstr "Expirado"
 
@@ -5232,7 +5282,7 @@ msgstr "Clave SSH no válida"
 
 #: authentication/serializers/token.py:93 perms/serializers/permission.py:65
 #: perms/serializers/permission.py:88 users/serializers/user.py:128
-#: users/serializers/user.py:263
+#: users/serializers/user.py:264
 msgid "Is valid"
 msgstr "¿Es válida?"
 
@@ -5453,86 +5503,6 @@ msgstr ""
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: authentication/templates/authentication/cert_login.html:194
-msgid "UKey Authentication"
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:199
-#: authentication/templates/authentication/cert_login.html:254
-msgid "Loading USB Key driver..."
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:214
-msgid "Insert USB Key to auto-fetch"
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:242
-#: xpack/plugins/interface/templates/login_i18n.html:22
-#, fuzzy
-#| msgid "More login options"
-msgid "More login methods"
-msgstr "Otras formas de iniciar sesión"
-
-#: authentication/templates/authentication/cert_login.html:255
-msgid "Detecting USB Key..."
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:256
-msgid "USB Key connected"
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:257
-#, fuzzy
-#| msgid "Please enter SMS code"
-msgid "Please insert USB Key"
-msgstr "Introduce el código de verificación por SMS"
-
-#: authentication/templates/authentication/cert_login.html:258
-#, fuzzy
-#| msgid "Account unavailable"
-msgid "Driver unavailable"
-msgstr "Cuenta no válida"
-
-#: authentication/templates/authentication/cert_login.html:259
-msgid "USB Key SDK initialization failed"
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:260
-msgid "Verifying PIN..."
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:261
-#, fuzzy
-#| msgid "Date verified"
-msgid "PIN verified"
-msgstr "Fecha de verificación"
-
-#: authentication/templates/authentication/cert_login.html:262
-#, fuzzy
-#| msgid "OTP verification code"
-msgid "PIN verification failed"
-msgstr "Código de verificación MFA virtual"
-
-#: authentication/templates/authentication/cert_login.html:263
-msgid "Signing challenge code..."
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:264
-#, fuzzy
-#| msgid "Signing key"
-msgid "Signing failed"
-msgstr "Firma clave"
-
-#: authentication/templates/authentication/cert_login.html:265
-msgid "Failed to retrieve certificate"
-msgstr ""
-
-#: authentication/templates/authentication/cert_login.html:266
-#, fuzzy
-#| msgid "Your account has expired, please contact the administrator."
-msgid "No certificate detected, please contact administrator"
-msgstr "Su cuenta ha expirado, por favor contacte al administrador."
-
 #: authentication/templates/authentication/face_capture.html:14
 msgid "Retry"
 msgstr "Reintentar"
@@ -5575,6 +5545,90 @@ msgstr ""
 "¡Si no puedes proporcionar el código de verificación MFA, contacta al "
 "administrador!"
 
+#: authentication/templates/authentication/login_ukey.html:194
+msgid "UKey Authentication"
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:199
+#: authentication/templates/authentication/login_ukey.html:256
+msgid "Loading UKey SDK..."
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:214
+msgid "Insert UKey to auto-fetch"
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:244
+#: xpack/plugins/interface/templates/login_i18n.html:22
+#, fuzzy
+#| msgid "More login options"
+msgid "More login methods"
+msgstr "Otras formas de iniciar sesión"
+
+#: authentication/templates/authentication/login_ukey.html:257
+msgid "Detecting UKey..."
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:258
+#, fuzzy
+#| msgid "connect failed"
+msgid "UKey connected"
+msgstr "Conexión fallida."
+
+#: authentication/templates/authentication/login_ukey.html:259
+#, fuzzy
+#| msgid "Please enter SMS code"
+msgid "Please insert UKey"
+msgstr "Introduce el código de verificación por SMS"
+
+#: authentication/templates/authentication/login_ukey.html:260
+#, fuzzy
+#| msgid "Account unavailable"
+msgid "SDK unavailable"
+msgstr "Cuenta no válida"
+
+#: authentication/templates/authentication/login_ukey.html:261
+#, fuzzy
+#| msgid "Authentication failed"
+msgid "UKey SDK initialization failed"
+msgstr "Autenticación fallida"
+
+#: authentication/templates/authentication/login_ukey.html:262
+msgid "Verifying PIN..."
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:263
+#, fuzzy
+#| msgid "Date verified"
+msgid "PIN verified"
+msgstr "Fecha de verificación"
+
+#: authentication/templates/authentication/login_ukey.html:264
+#, fuzzy
+#| msgid "OTP verification code"
+msgid "PIN verification failed"
+msgstr "Código de verificación MFA virtual"
+
+#: authentication/templates/authentication/login_ukey.html:265
+msgid "Signing challenge code..."
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:266
+#, fuzzy
+#| msgid "Signing key"
+msgid "Signing failed"
+msgstr "Firma clave"
+
+#: authentication/templates/authentication/login_ukey.html:267
+msgid "Failed to retrieve UKey cert"
+msgstr ""
+
+#: authentication/templates/authentication/login_ukey.html:268
+#, fuzzy
+#| msgid "Your account has expired, please contact the administrator."
+msgid "No UKey cert detected, please contact administrator"
+msgstr "Su cuenta ha expirado, por favor contacte al administrador."
+
 #: authentication/templates/authentication/login_wait_confirm.html:72
 msgid "Refresh"
 msgstr "Actualizar"
@@ -5608,8 +5662,9 @@ msgstr "¿Reintentar?"
 msgid "LAN"
 msgstr "Red local"
 
-#: authentication/utils.py:150
-msgid "CERT"
+#: authentication/utils.py:150 settings/serializers/auth/ukey.py:11
+#: settings/serializers/auth/ukey.py:14 users/models/user/_source.py:27
+msgid "UKey"
 msgstr ""
 
 #: authentication/views/base.py:71
@@ -5619,17 +5674,17 @@ msgstr ""
 "Si tienes alguna duda o necesidad, por favor contacta al administrador del "
 "sistema"
 
-#: authentication/views/base.py:143
+#: authentication/views/base.py:145
 #, python-format
 msgid "%s query user failed"
 msgstr "Error al consultar el usuario %s"
 
-#: authentication/views/base.py:151
+#: authentication/views/base.py:153
 #, python-format
 msgid "The %s is already bound to another user"
 msgstr "%s ya está vinculado a otro usuario"
 
-#: authentication/views/base.py:158
+#: authentication/views/base.py:160
 #, python-format
 msgid "Binding %s successfully"
 msgstr "Vinculación de %s exitosa"
@@ -7954,9 +8009,9 @@ msgstr "Autenticación de Passkey"
 
 #: settings/serializers/auth/base.py:27
 #, fuzzy
-#| msgid "Authenticate"
-msgid "Certificate Auth"
-msgstr "Verificar identidad"
+#| msgid "Passkey Auth"
+msgid "UKey Auth"
+msgstr "Autenticación de Passkey"
 
 #: settings/serializers/auth/base.py:29
 msgid "Email suffix"
@@ -8073,85 +8128,6 @@ msgstr ""
 "Mapeo de atributos de usuario, donde `key` es el nombre del atributo de "
 "usuario del servicio CAS, y `value` es el nombre del atributo de usuario de "
 "JumpServer"
-
-#: settings/serializers/auth/cert.py:37 settings/serializers/auth/cert.py:40
-#: users/models/user/_source.py:27
-#, fuzzy
-#| msgid "Authenticate"
-msgid "Certificate"
-msgstr "Verificar identidad"
-
-#: settings/serializers/auth/cert.py:43
-#, fuzzy
-#| msgid "Verify code TTL (second)"
-msgid "Challenge TTL (seconds)"
-msgstr "Tiempo de validez del código de verificación (min)"
-
-#: settings/serializers/auth/cert.py:44
-msgid "Time-to-live (seconds) for authentication challenge codes"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:47
-msgid "USB-Key Default PIN"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:48
-msgid "Default USB Key PIN used for administrator reset"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:52
-msgid "Enrollment"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:53
-msgid "Whether to enable user certificate enrollment"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:56
-msgid "Enrollment Validity Days"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:57
-msgid "Validity period (days) for issued certificates"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:60
-#, fuzzy
-#| msgid "Content"
-msgid "CA Key"
-msgstr "Contenido"
-
-#: settings/serializers/auth/cert.py:61
-msgid "PEM content of CA private key used for certificate enrollment"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:64
-#, fuzzy
-#| msgid "Content"
-msgid "CA Cert"
-msgstr "Contenido"
-
-#: settings/serializers/auth/cert.py:65
-msgid ""
-"PEM content of CA certificate used for certificate enrollment and "
-"authentication"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:68
-#, fuzzy
-#| msgid "Password"
-msgid "CA Key Password"
-msgstr "Contraseña"
-
-#: settings/serializers/auth/cert.py:69
-msgid ""
-"Password for CA private key used for certificate enrollment (leave blank if "
-"not set)"
-msgstr ""
-
-#: settings/serializers/auth/cert.py:72
-msgid "CA Cert Algorithm"
-msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
@@ -8670,6 +8646,82 @@ msgstr "Duración de validez del token"
 msgid "Unit: second"
 msgstr "Unidad: segundos"
 
+#: settings/serializers/auth/ukey.py:17
+#, fuzzy
+#| msgid "Verify code TTL (second)"
+msgid "Challenge TTL (seconds)"
+msgstr "Tiempo de validez del código de verificación (min)"
+
+#: settings/serializers/auth/ukey.py:18
+msgid "Time-to-live (seconds) for authentication challenge codes"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:21
+msgid "USB-Key Default PIN"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:22
+msgid "Default USB Key PIN used for administrator reset"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:26
+msgid "Enrollment"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:27
+msgid "Whether to enable user certificate enrollment"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:30
+msgid "Enrollment Validity Days"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:31
+msgid "Validity period (days) for issued certificates"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:34
+#, fuzzy
+#| msgid "Content"
+msgid "CA Key"
+msgstr "Contenido"
+
+#: settings/serializers/auth/ukey.py:35
+msgid "PEM content of CA private key used for certificate enrollment"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:38
+#, fuzzy
+#| msgid "Content"
+msgid "CA Cert"
+msgstr "Contenido"
+
+#: settings/serializers/auth/ukey.py:39
+msgid ""
+"PEM content of CA certificate used for certificate enrollment and "
+"authentication"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:42
+#, fuzzy
+#| msgid "Password"
+msgid "CA Key Password"
+msgstr "Contraseña"
+
+#: settings/serializers/auth/ukey.py:43
+msgid ""
+"Password for CA private key used for certificate enrollment (leave blank if "
+"not set)"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:46
+msgid "CA Cert Algorithm"
+msgstr ""
+
+#: settings/serializers/auth/ukey.py:52
+msgid "Auto-Detect After Upload"
+msgstr ""
+
 #: settings/serializers/auth/wecom.py:20
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
@@ -8868,7 +8920,7 @@ msgstr "ID del inquilino"
 
 #: settings/serializers/feature.py:112 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:128 xpack/plugins/cloud/manager.py:132
-#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:293
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:295
 msgid "Region"
 msgstr "Región"
 
@@ -11859,7 +11911,7 @@ msgstr "Configuración del usuario"
 msgid "Email lookup"
 msgstr "Cuenta de correo electrónico"
 
-#: users/models/user/__init__.py:82 users/serializers/user.py:264
+#: users/models/user/__init__.py:82 users/serializers/user.py:265
 msgid "Is service account"
 msgstr "Cuenta de servicio"
 
@@ -11876,7 +11928,7 @@ msgid "OTP secret key"
 msgstr "Clave OTP"
 
 #: users/models/user/__init__.py:105 users/serializers/profile.py:86
-#: users/serializers/user.py:261
+#: users/serializers/user.py:262
 msgid "Is first login"
 msgstr "Primer inicio de sesión"
 
@@ -11893,26 +11945,30 @@ msgid "Face vector"
 msgstr "Vector facial"
 
 #: users/models/user/__init__.py:153
+msgid "UKey SN"
+msgstr ""
+
+#: users/models/user/__init__.py:156
 msgid "Date api key used"
 msgstr "Fecha de último uso de la API key"
 
-#: users/models/user/__init__.py:298
+#: users/models/user/__init__.py:302
 msgid "Can not delete admin user"
 msgstr "No se puede eliminar al usuario administrador"
 
-#: users/models/user/__init__.py:312
+#: users/models/user/__init__.py:316
 msgid "Can invite user"
 msgstr "Se puede invitar a usuarios"
 
-#: users/models/user/__init__.py:313
+#: users/models/user/__init__.py:317
 msgid "Can remove user"
 msgstr "Se puede eliminar a usuarios"
 
-#: users/models/user/__init__.py:314
+#: users/models/user/__init__.py:318
 msgid "Can match user"
 msgstr "Se puede hacer coincidir a usuarios"
 
-#: users/models/user/__init__.py:343
+#: users/models/user/__init__.py:353
 msgid "User password history"
 msgstr "Historial de contraseñas de usuarios"
 
@@ -12149,7 +12205,7 @@ msgstr "Forzar MFA"
 msgid "Login blocked"
 msgstr "Inicio de sesión bloqueado"
 
-#: users/serializers/user.py:130 users/serializers/user.py:270
+#: users/serializers/user.py:130 users/serializers/user.py:271
 msgid "Is OTP bound"
 msgstr "¿Está vinculado a un MFA virtual?"
 
@@ -12168,30 +12224,30 @@ msgstr "Pueden usar autenticación de clave pública"
 #: users/serializers/user.py:145
 #, fuzzy
 #| msgid "Can public key authentication"
-msgid "Can certificate authentication"
+msgid "Can UKey authentication"
 msgstr "Pueden usar autenticación de clave pública"
 
 #: users/serializers/user.py:149
 msgid "Is face code set"
 msgstr "¿Existen características faciales?"
 
-#: users/serializers/user.py:235
+#: users/serializers/user.py:236
 msgid "Full name"
 msgstr "Nombre completo"
 
-#: users/serializers/user.py:238
+#: users/serializers/user.py:239
 msgid "Login username"
 msgstr "Usuario que inicia sesión"
 
-#: users/serializers/user.py:241
+#: users/serializers/user.py:242
 msgid "Email address"
 msgstr "Dirección de correo electrónico"
 
-#: users/serializers/user.py:251
+#: users/serializers/user.py:252
 msgid "User groups to join"
 msgstr "Cantidad de grupos de usuarios"
 
-#: users/serializers/user.py:255
+#: users/serializers/user.py:256
 msgid ""
 "User source identifies where the user was created, which could be AD or "
 "other sources.There are security settings that can restrict users to log in "
@@ -12202,34 +12258,34 @@ msgstr ""
 "usuarios para que solo inicien sesión en el sistema desde fuentes "
 "específicas."
 
-#: users/serializers/user.py:265
+#: users/serializers/user.py:266
 msgid "Is org admin"
 msgstr "Administrador de la organización"
 
-#: users/serializers/user.py:267
+#: users/serializers/user.py:268
 msgid "Avatar url"
 msgstr "Ruta del avatar"
 
-#: users/serializers/user.py:272
+#: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
 
-#: users/serializers/user.py:273
+#: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
 msgstr "Autenticación"
 
-#: users/serializers/user.py:403
+#: users/serializers/user.py:404
 msgid "Has public keys"
 msgstr "Hay clave pública"
 
-#: users/serializers/user.py:431
+#: users/serializers/user.py:432
 msgid ""
 "* For security, only a partial of users is displayed. You can search for more"
 msgstr ""
 "* Por razones de seguridad, solo se muestran algunos usuarios. Puedes buscar "
 "más"
 
-#: users/serializers/user.py:467
+#: users/serializers/user.py:468
 msgid "name not unique"
 msgstr "Nombres duplicados"
 
@@ -12753,7 +12809,7 @@ msgstr "IP Privada"
 msgid "Public IP"
 msgstr "IP público"
 
-#: xpack/plugins/cloud/const.py:50 xpack/plugins/cloud/models.py:374
+#: xpack/plugins/cloud/const.py:50 xpack/plugins/cloud/models.py:376
 msgid "Instance name"
 msgstr "Nombre de la instancia"
 
@@ -12835,7 +12891,7 @@ msgstr "Sincronizar regiones"
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Error al obtener la instancia de la región \"%s\", error: %s"
 
-#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:290
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:292
 msgid "Instance"
 msgstr "Instancia"
 
@@ -12918,148 +12974,148 @@ msgstr "Cuenta de Nube"
 msgid "Test cloud account"
 msgstr "Cuenta de Nube de Prueba"
 
-#: xpack/plugins/cloud/models.py:109
+#: xpack/plugins/cloud/models.py:111
 #: xpack/plugins/cloud/serializers/account.py:83
 #: xpack/plugins/cloud/serializers/task.py:170
 #: xpack/plugins/cloud/serializers/task.py:171
 msgid "Regions"
 msgstr "Región"
 
-#: xpack/plugins/cloud/models.py:112
+#: xpack/plugins/cloud/models.py:114
 msgid "Hostname strategy"
 msgstr "Estrategia de Nombre de Host"
 
-#: xpack/plugins/cloud/models.py:117
+#: xpack/plugins/cloud/models.py:119
 msgid "IP network segment group"
 msgstr "Grupo de Rango de IP"
 
-#: xpack/plugins/cloud/models.py:121
+#: xpack/plugins/cloud/models.py:123
 #: xpack/plugins/cloud/serializers/task.py:174
 msgid "Preferred IP type"
 msgstr "Tipo de IP Preferido"
 
-#: xpack/plugins/cloud/models.py:124
+#: xpack/plugins/cloud/models.py:126
 msgid "Always update"
 msgstr "Actualizar Siempre"
 
-#: xpack/plugins/cloud/models.py:126
+#: xpack/plugins/cloud/models.py:128
 msgid "Fully synchronous"
 msgstr "Sincronización Completa"
 
-#: xpack/plugins/cloud/models.py:127
+#: xpack/plugins/cloud/models.py:129
 msgid "Release assets"
 msgstr "Publicar activo"
 
-#: xpack/plugins/cloud/models.py:132
+#: xpack/plugins/cloud/models.py:134
 msgid "Date last sync"
 msgstr "Fecha de Última Sincronización"
 
-#: xpack/plugins/cloud/models.py:135 xpack/plugins/cloud/models.py:392
-#: xpack/plugins/cloud/models.py:419
+#: xpack/plugins/cloud/models.py:137 xpack/plugins/cloud/models.py:394
+#: xpack/plugins/cloud/models.py:421
 msgid "Strategy"
 msgstr "Estrategia"
 
-#: xpack/plugins/cloud/models.py:140 xpack/plugins/cloud/models.py:229
+#: xpack/plugins/cloud/models.py:142 xpack/plugins/cloud/models.py:231
 msgid "Sync instance task"
 msgstr "Tarea de Sincronización de Ejemplos"
 
-#: xpack/plugins/cloud/models.py:240 xpack/plugins/cloud/models.py:303
+#: xpack/plugins/cloud/models.py:242 xpack/plugins/cloud/models.py:305
 msgid "Date sync"
 msgstr "Fecha de Sincronización"
 
-#: xpack/plugins/cloud/models.py:244
+#: xpack/plugins/cloud/models.py:246
 msgid "Sync instance snapshot"
 msgstr "Sincronizar instantáneas de instancia"
 
-#: xpack/plugins/cloud/models.py:252
+#: xpack/plugins/cloud/models.py:254
 msgid "Sync instance task execution"
 msgstr "Ejecutar tareas de sincronización de instancia"
 
-#: xpack/plugins/cloud/models.py:283
+#: xpack/plugins/cloud/models.py:285
 msgid "Sync task"
 msgstr "Tarea de sincronización"
 
-#: xpack/plugins/cloud/models.py:287
+#: xpack/plugins/cloud/models.py:289
 msgid "Sync instance task history"
 msgstr "Historial de tareas de sincronización de instancia"
 
-#: xpack/plugins/cloud/models.py:307
+#: xpack/plugins/cloud/models.py:309
 msgid "Sync instance detail"
 msgstr "Detalles de la instancia sincronizada"
 
-#: xpack/plugins/cloud/models.py:319 xpack/plugins/cloud/serializers/task.py:79
+#: xpack/plugins/cloud/models.py:321 xpack/plugins/cloud/serializers/task.py:79
 msgid "Rule relation"
 msgstr "Relación de condiciones"
 
-#: xpack/plugins/cloud/models.py:332
+#: xpack/plugins/cloud/models.py:334
 msgid "Task strategy"
 msgstr "Estrategia de tareas"
 
-#: xpack/plugins/cloud/models.py:363
+#: xpack/plugins/cloud/models.py:365
 msgid "Equal"
 msgstr "Igual a"
 
-#: xpack/plugins/cloud/models.py:364
+#: xpack/plugins/cloud/models.py:366
 msgid "Not Equal"
 msgstr "No igual a"
 
-#: xpack/plugins/cloud/models.py:365
+#: xpack/plugins/cloud/models.py:367
 msgid "In"
 msgstr "En..."
 
-#: xpack/plugins/cloud/models.py:366
+#: xpack/plugins/cloud/models.py:368
 msgid "Contains"
 msgstr "Contener"
 
-#: xpack/plugins/cloud/models.py:367
+#: xpack/plugins/cloud/models.py:369
 msgid "Exclude"
 msgstr "Excluir"
 
-#: xpack/plugins/cloud/models.py:368
+#: xpack/plugins/cloud/models.py:370
 msgid "Startswith"
 msgstr "Comenzar con..."
 
-#: xpack/plugins/cloud/models.py:369
+#: xpack/plugins/cloud/models.py:371
 msgid "Endswith"
 msgstr "Terminar con..."
 
-#: xpack/plugins/cloud/models.py:375
+#: xpack/plugins/cloud/models.py:377
 msgid "Instance platform"
 msgstr "Plataforma de instancia"
 
-#: xpack/plugins/cloud/models.py:376
+#: xpack/plugins/cloud/models.py:378
 msgid "Instance address"
 msgstr "Dirección de instancia"
 
-#: xpack/plugins/cloud/models.py:383
+#: xpack/plugins/cloud/models.py:385
 msgid "Rule attr"
 msgstr "Atributos de regla"
 
-#: xpack/plugins/cloud/models.py:387
+#: xpack/plugins/cloud/models.py:389
 msgid "Rule match"
 msgstr "Coincidencia de regla"
 
-#: xpack/plugins/cloud/models.py:389
+#: xpack/plugins/cloud/models.py:391
 msgid "Rule value"
 msgstr "Valor de regla"
 
-#: xpack/plugins/cloud/models.py:396 xpack/plugins/cloud/serializers/task.py:82
+#: xpack/plugins/cloud/models.py:398 xpack/plugins/cloud/serializers/task.py:82
 msgid "Strategy rule"
 msgstr "Condición"
 
-#: xpack/plugins/cloud/models.py:407
+#: xpack/plugins/cloud/models.py:409
 msgid "Name strategy"
 msgstr "Estrategia de nombre de host"
 
-#: xpack/plugins/cloud/models.py:414
+#: xpack/plugins/cloud/models.py:416
 msgid "Action attr"
 msgstr "Atributos de acción"
 
-#: xpack/plugins/cloud/models.py:416
+#: xpack/plugins/cloud/models.py:418
 msgid "Action value"
 msgstr "Valor de acción"
 
-#: xpack/plugins/cloud/models.py:423 xpack/plugins/cloud/serializers/task.py:85
+#: xpack/plugins/cloud/models.py:425 xpack/plugins/cloud/serializers/task.py:85
 msgid "Strategy action"
 msgstr "Acción"
 
@@ -13440,7 +13496,7 @@ msgid "Restore default successfully."
 msgstr "¡Restauración predeterminada exitosa!"
 
 #: xpack/plugins/interface/meta.py:9 xpack/plugins/interface/models.py:49
-#: xpack/plugins/interface/models.py:104
+#: xpack/plugins/interface/models.py:105
 msgid "Interface settings"
 msgstr "Configuración de la interfaz"
 
@@ -13542,6 +13598,16 @@ msgstr "Importación de licencia exitosa"
 #: xpack/plugins/license/api.py:55
 msgid "Invalid license"
 msgstr "Licencia no válida"
+
+#, fuzzy
+#~| msgid "Authenticate"
+#~ msgid "Certificate Auth"
+#~ msgstr "Verificar identidad"
+
+#, fuzzy
+#~| msgid "Authenticate"
+#~ msgid "Certificate"
+#~ msgstr "Verificar identidad"
 
 #, fuzzy
 #~| msgid "More login options"

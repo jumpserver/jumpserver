@@ -49,4 +49,4 @@ class UKeySettingSerializer(serializers.Serializer):
     def get_AUTH_UKEY_CA_CERT_ALGORITHM(self, obj):
         from authentication.backends.ukey.sdk import ukey_sdk_config
         algo = ukey_sdk_config.ca_cert_asym_alg
-        return algo or _('证书上传后自动检测')
+        return algo or _('Auto-Detect After Upload')

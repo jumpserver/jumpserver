@@ -133,10 +133,10 @@ class UKeySDKConfig:
         """
         import re
         _filter = trans_filter or (lambda s: s)
-        _pattern = re.compile(r"""\{\{\s*['"](.+?)['"]\s*\|\s*trans\s*\}\}""")
+        _pattern = re.compile(r"""\{\{\s*(['"])(.+?)\1\s*\|\s*trans\s*\}\}""")
 
         def _translate(s):
-            return _pattern.sub(lambda m: _filter(m.group(1)), s)
+            return _pattern.sub(lambda m: _filter(m.group(2)), s)
 
         def _walk(obj):
             if isinstance(obj, dict):
