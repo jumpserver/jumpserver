@@ -62,4 +62,3 @@ additional_build_steps:
     - ENV LANG=C.UTF-8
     # bindep [compile] 已避免工具链进入最终层；此处仅清理 PKGMGR_PRESERVE_CACHE 写入的 dnf 缓存
     - RUN $PKGMGR clean all && rm -rf /var/cache/dnf /var/cache/yum /root/.cache
-    - RUN pip cache purge

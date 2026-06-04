@@ -26,6 +26,7 @@ def docker_isolation_kwargs():
         'process_isolation': True,
         'process_isolation_executable': 'docker',
         'container_image': ANSIBLE_EE_IMAGE,
+        'container_options': ['--network=host'],
     }
 
 
