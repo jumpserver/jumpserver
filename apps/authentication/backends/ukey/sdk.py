@@ -245,6 +245,7 @@ class UKeySDKConfig:
         sdk_config['config'] = resolved_config
         if not settings.DEBUG_DEV:
             sdk_config.pop('meta', None)
+            sdk_config.pop('i18n', None)
         return sdk_config
 
 
