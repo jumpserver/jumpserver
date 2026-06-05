@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-25 14:02+0800\n"
+"POT-Creation-Date: 2026-06-05 15:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,7 +28,7 @@ msgid "No valid assets found for account creation."
 msgstr "未找到可用于创建账户的有效资产。"
 
 #: accounts/api/account/application.py:87
-#: authentication/api/connection_token.py:463
+#: authentication/api/connection_token.py:465
 msgid "Account not found"
 msgstr "账号未找到"
 
@@ -147,8 +147,8 @@ msgstr ">>> 开始执行测试网关账号可连接性任务"
 #: authentication/forms.py:28
 #: authentication/templates/authentication/login.html:369
 #: authentication/templates/authentication/login.html:415 reports/mixins.py:194
-#: settings/models.py:216 settings/serializers/auth/ldap.py:27
-#: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
+#: settings/models.py:216 settings/serializers/auth/ldap.py:30
+#: settings/serializers/auth/ldap.py:56 settings/serializers/auth/ldap_ha.py:38
 #: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
 #: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
 #: users/forms/profile.py:22 users/serializers/user.py:153
@@ -537,7 +537,7 @@ msgstr "改密状态"
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:337
 #: audits/reporting.py:114 audits/serializers.py:246
-#: authentication/api/connection_token.py:475 ops/models/base.py:18
+#: authentication/api/connection_token.py:477 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:31
 #: terminal/notifications.py:306 terminal/serializers/command.py:72
@@ -658,7 +658,7 @@ msgstr "最后使用日期"
 
 #: accounts/models/application.py:24 acls/models/base.py:43
 #: assets/models/asset/common.py:182 authentication/models/access_key.py:24
-#: authentication/models/connection_token.py:60
+#: authentication/models/connection_token.py:61
 #: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:30
@@ -762,8 +762,8 @@ msgstr "更改后检查连接"
 #: accounts/models/automations/check_account.py:19
 #: accounts/models/automations/gather_account.py:117
 #: accounts/serializers/automations/change_secret.py:61
-#: settings/serializers/auth/ldap.py:105
-#: settings/serializers/auth/ldap_ha.py:87 settings/serializers/msg.py:46
+#: settings/serializers/auth/ldap.py:108
+#: settings/serializers/auth/ldap_ha.py:90 settings/serializers/msg.py:46
 msgid "Recipient"
 msgstr "收件人"
 
@@ -1230,7 +1230,7 @@ msgstr "类别"
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:76
-#: audits/serializers.py:211 authentication/models/connection_token.py:67
+#: audits/serializers.py:211 authentication/models/connection_token.py:68
 #: authentication/serializers/connect_token_secret.py:138 ops/models/job.py:155
 #: perms/serializers/user_permission.py:28 reports/models.py:16
 #: terminal/models/applet/applet.py:40 terminal/models/component/storage.py:58
@@ -1769,7 +1769,7 @@ msgstr "成功账号"
 #: accounts/templates/accounts/change_secret_report.html:118
 #: accounts/templates/accounts/push_account_report.html:77
 #: accounts/templates/accounts/push_account_report.html:117
-#: audits/handler.py:130
+#: audits/handler.py:151
 msgid "No"
 msgstr "否"
 
@@ -1894,7 +1894,7 @@ msgstr "用户"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:33
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:214
-#: authentication/api/connection_token.py:474 ops/models/base.py:17
+#: authentication/api/connection_token.py:476 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -2259,7 +2259,7 @@ msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> 开始执行第 {index} 批任务"
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:183
+#: authentication/models/connection_token.py:184
 msgid "No account"
 msgstr "没有账号"
 
@@ -2567,7 +2567,7 @@ msgstr "认证数据库"
 msgid "The database to authenticate against"
 msgstr "要进行身份验证的数据库"
 
-#: assets/const/protocol.py:238 authentication/models/connection_token.py:49
+#: assets/const/protocol.py:238 authentication/models/connection_token.py:50
 msgid "Connect options"
 msgstr "连接项"
 
@@ -3534,7 +3534,7 @@ msgid "Connect"
 msgstr "连接"
 
 #: audits/const.py:31
-#: authentication/templates/authentication/cert_login.html:232
+#: authentication/templates/authentication/cert_login.html:236
 #: authentication/templates/authentication/login.html:334
 #: authentication/templates/authentication/login.html:408
 #: templates/_header_bar.html:101
@@ -3584,7 +3584,7 @@ msgstr "任务"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:130
+#: audits/handler.py:151
 msgid "Yes"
 msgstr "是"
 
@@ -3594,7 +3594,7 @@ msgstr "作业审计日志"
 
 #: audits/models.py:57 audits/models.py:107 audits/models.py:182
 #: audits/models.py:333 audits/reporting.py:119 audits/reporting.py:327
-#: audits/reporting.py:424 authentication/models/connection_token.py:62
+#: audits/reporting.py:424 authentication/models/connection_token.py:63
 #: terminal/models/session/session.py:36 terminal/models/session/sharing.py:111
 #: terminal/notifications.py:171 terminal/notifications.py:238
 #: terminal/reporting.py:133
@@ -4055,7 +4055,7 @@ msgstr "差异"
 msgid "%s %s this resource"
 msgstr "用户 %s %s 了当前资源"
 
-#: audits/serializers.py:213 authentication/models/connection_token.py:53
+#: audits/serializers.py:213 authentication/models/connection_token.py:54
 #: authentication/models/temp_token.py:14
 #: authentication/serializers/token.py:132 perms/models/asset_permission.py:80
 #: tickets/models/ticket/apply_application.py:31
@@ -4191,32 +4191,32 @@ msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:466
+#: authentication/api/connection_token.py:468
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:499
+#: authentication/api/connection_token.py:501
 #, python-brace-format
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:503
+#: authentication/api/connection_token.py:505
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
-#: authentication/api/connection_token.py:513
+#: authentication/api/connection_token.py:515
 msgid "ACL action is face verify"
 msgstr "ACL 动作是人脸验证"
 
-#: authentication/api/connection_token.py:518
+#: authentication/api/connection_token.py:520
 msgid "ACL action not supported for this asset"
 msgstr "资产登录规则不支持当前资产"
 
-#: authentication/api/connection_token.py:525
+#: authentication/api/connection_token.py:527
 msgid "ACL action is face online"
 msgstr "ACL 动作是人脸在线"
 
-#: authentication/api/connection_token.py:550
+#: authentication/api/connection_token.py:552
 msgid "No available face feature"
 msgstr "没有可用的人脸特征"
 
@@ -4299,7 +4299,7 @@ msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 
-#: authentication/backends/oauth2/views.py:73
+#: authentication/backends/oauth2/views.py:74
 msgid "OAuth2 Error"
 msgstr "OAuth2 错误"
 
@@ -4649,7 +4649,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:96 settings/utils/ldap.py:714
+#: authentication/middleware.py:96 settings/utils/ldap.py:856
 #, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
@@ -4693,6 +4693,12 @@ msgid "Input secret"
 msgstr "自定义密码"
 
 #: authentication/models/connection_token.py:47
+#, fuzzy
+#| msgid "Input secret"
+msgid "Input secret type"
+msgstr "自定义密码"
+
+#: authentication/models/connection_token.py:48
 #: authentication/serializers/connect_token_secret.py:126
 #: terminal/models/applet/applet.py:43
 #: terminal/models/virtualapp/virtualapp.py:24 terminal/notifications.py:170
@@ -4703,70 +4709,70 @@ msgstr "自定义密码"
 msgid "Protocol"
 msgstr "协议"
 
-#: authentication/models/connection_token.py:48
+#: authentication/models/connection_token.py:49
 msgid "Connect method"
 msgstr "连接方式"
 
-#: authentication/models/connection_token.py:50
+#: authentication/models/connection_token.py:51
 msgid "User display"
 msgstr "用户名称"
 
-#: authentication/models/connection_token.py:51
+#: authentication/models/connection_token.py:52
 msgid "Asset display"
 msgstr "资产名称"
 
-#: authentication/models/connection_token.py:52
+#: authentication/models/connection_token.py:53
 msgid "Reusable"
 msgstr "可以重复使用"
 
-#: authentication/models/connection_token.py:57
+#: authentication/models/connection_token.py:58
 #: perms/models/asset_permission.py:83
 msgid "From ticket"
 msgstr "来自工单"
 
-#: authentication/models/connection_token.py:59
+#: authentication/models/connection_token.py:60
 msgid "Face monitor token"
 msgstr "人脸监控令牌"
 
-#: authentication/models/connection_token.py:73
+#: authentication/models/connection_token.py:74
 msgid "Can expire connection token"
 msgstr "可以失效连接令牌"
 
-#: authentication/models/connection_token.py:74
+#: authentication/models/connection_token.py:75
 msgid "Can reuse connection token"
 msgstr "可以复用连接令牌"
 
-#: authentication/models/connection_token.py:76
+#: authentication/models/connection_token.py:77
 msgid "Connection token"
 msgstr "连接令牌"
 
-#: authentication/models/connection_token.py:170
+#: authentication/models/connection_token.py:171
 msgid "Connection token inactive"
 msgstr "连接令牌未激活"
 
-#: authentication/models/connection_token.py:174
+#: authentication/models/connection_token.py:175
 #, python-brace-format
 msgid "Connection token expired at: {}"
 msgstr "连接令牌过期: {}"
 
-#: authentication/models/connection_token.py:177
+#: authentication/models/connection_token.py:178
 #: terminal/serializers/session.py:151
 msgid "No user or invalid user"
 msgstr "没有用户或用户失效"
 
-#: authentication/models/connection_token.py:180
+#: authentication/models/connection_token.py:181
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:360
+#: authentication/models/connection_token.py:363
 msgid "Can view super connection token secret"
 msgstr "可以查看超级连接令牌密文"
 
-#: authentication/models/connection_token.py:362
+#: authentication/models/connection_token.py:365
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
-#: authentication/models/connection_token.py:379
+#: authentication/models/connection_token.py:382
 msgid "Admin connection token"
 msgstr "管理员连接令牌"
 
@@ -5012,7 +5018,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
-#: jumpserver/conf.py:558
+#: jumpserver/conf.py:564
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:32
 #: users/templates/users/_msg_account_expire_reminder.html:4
@@ -5108,64 +5114,69 @@ msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能
 msgid "Cancel"
 msgstr "取消"
 
-#: authentication/templates/authentication/cert_login.html:190
+#: authentication/templates/authentication/cert_login.html:194
 msgid "Certificate Authentication"
 msgstr "证书认证"
 
-#: authentication/templates/authentication/cert_login.html:195
-#: authentication/templates/authentication/cert_login.html:250
+#: authentication/templates/authentication/cert_login.html:199
+#: authentication/templates/authentication/cert_login.html:254
 msgid "Loading USB Key driver..."
 msgstr "正在加载 USB Key 驱动..."
 
-#: authentication/templates/authentication/cert_login.html:210
+#: authentication/templates/authentication/cert_login.html:214
 msgid "Insert USB Key to auto-fetch"
 msgstr "请插入 USB Key 自动获取"
 
-#: authentication/templates/authentication/cert_login.html:251
+#: authentication/templates/authentication/cert_login.html:242
+#: xpack/plugins/interface/templates/login_i18n.html:22
+msgid "More login methods"
+msgstr "更多登录方式"
+
+#: authentication/templates/authentication/cert_login.html:255
 msgid "Detecting USB Key..."
 msgstr "正在检测 USB Key..."
 
-#: authentication/templates/authentication/cert_login.html:252
+#: authentication/templates/authentication/cert_login.html:256
 msgid "USB Key connected"
 msgstr "USB Key 已连接"
 
-#: authentication/templates/authentication/cert_login.html:253
+#: authentication/templates/authentication/cert_login.html:257
 msgid "Please insert USB Key"
 msgstr "请插入 USB Key"
 
-#: authentication/templates/authentication/cert_login.html:254
+#: authentication/templates/authentication/cert_login.html:258
 msgid "Driver unavailable"
 msgstr "驱动不可用"
 
-#: authentication/templates/authentication/cert_login.html:255
+#: authentication/templates/authentication/cert_login.html:259
 msgid "USB Key SDK initialization failed"
 msgstr "USB Key SDK 初始化失败"
 
-#: authentication/templates/authentication/cert_login.html:256
+#: authentication/templates/authentication/cert_login.html:260
 msgid "Verifying PIN..."
 msgstr "PIN 校验中..."
 
-#: authentication/templates/authentication/cert_login.html:257
+#: authentication/templates/authentication/cert_login.html:261
 msgid "PIN verified"
 msgstr "PIN 校验通过"
 
-#: authentication/templates/authentication/cert_login.html:258
+#: authentication/templates/authentication/cert_login.html:262
 msgid "PIN verification failed"
 msgstr "校验 PIN 失败"
 
-#: authentication/templates/authentication/cert_login.html:259
+#: authentication/templates/authentication/cert_login.html:263
 msgid "Signing challenge code..."
 msgstr "正在对挑战码签名..."
 
-#: authentication/templates/authentication/cert_login.html:260
+#: authentication/templates/authentication/cert_login.html:264
 msgid "Signing failed"
 msgstr "签名失败"
 
-#: authentication/templates/authentication/cert_login.html:261
+#: authentication/templates/authentication/cert_login.html:265
 msgid "Failed to retrieve certificate"
 msgstr "获取证书失败"
 
-#: authentication/templates/authentication/cert_login.html:262
+#: authentication/templates/authentication/cert_login.html:266
 msgid "No certificate detected, please contact administrator"
 msgstr "未检测到证书，请联系管理员制证"
 
@@ -5925,16 +5936,16 @@ msgstr "未找到 Code"
 msgid "The message code provided is invalid or has expired"
 msgstr "提供的消息代码无效或已过期"
 
-#: jumpserver/conf.py:552
+#: jumpserver/conf.py:558
 #, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
-#: jumpserver/conf.py:557
+#: jumpserver/conf.py:563
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:559
+#: jumpserver/conf.py:565
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -6259,18 +6270,18 @@ msgstr "选择框"
 msgid "no valid program entry found."
 msgstr "没有可用程序入口"
 
-#: ops/mixin.py:34 ops/mixin.py:166 settings/serializers/auth/ldap.py:74
-#: settings/serializers/auth/ldap_ha.py:56
+#: ops/mixin.py:34 ops/mixin.py:166 settings/serializers/auth/ldap.py:77
+#: settings/serializers/auth/ldap_ha.py:59
 msgid "Periodic run"
 msgstr "周期执行"
 
 #: ops/mixin.py:36 ops/mixin.py:113 ops/mixin.py:172
-#: settings/serializers/auth/ldap.py:81 settings/serializers/auth/ldap_ha.py:63
+#: settings/serializers/auth/ldap.py:84 settings/serializers/auth/ldap_ha.py:66
 msgid "Interval"
 msgstr "间隔"
 
 #: ops/mixin.py:39 ops/mixin.py:111 ops/mixin.py:169
-#: settings/serializers/auth/ldap.py:78 settings/serializers/auth/ldap_ha.py:60
+#: settings/serializers/auth/ldap.py:81 settings/serializers/auth/ldap_ha.py:63
 msgid "Crontab"
 msgstr "Crontab"
 
@@ -6298,7 +6309,7 @@ msgstr "* 请输入有效的 crontab 表达式"
 msgid "Crontab minute must not contain '*'"
 msgstr "Crontab 分钟不能包含 “*” "
 
-#: ops/mixin.py:208 settings/serializers/auth/mixin.py:12
+#: ops/mixin.py:208 settings/serializers/auth/mixin.py:14
 msgid "Require interval or crontab setting"
 msgstr "需要周期或定期设置"
 
@@ -6642,7 +6653,7 @@ msgstr "请选择一个组织后再保存"
 
 #: orgs/mixins/models.py:58 orgs/mixins/serializers.py:25 orgs/models.py:91
 #: rbac/const.py:7 rbac/models/rolebinding.py:57
-#: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:53
+#: rbac/serializers/rolebinding.py:44 settings/serializers/auth/base.py:54
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
@@ -7409,11 +7420,17 @@ msgstr "SSO 令牌认证"
 msgid "Passkey Auth"
 msgstr "Passkey 认证"
 
-#: settings/serializers/auth/base.py:28
+#: settings/serializers/auth/base.py:27
+#, fuzzy
+#| msgid "Certificate"
+msgid "Certificate Auth"
+msgstr "证书"
+
+#: settings/serializers/auth/base.py:29
 msgid "Email suffix"
 msgstr "邮件后缀"
 
-#: settings/serializers/auth/base.py:30
+#: settings/serializers/auth/base.py:31
 msgid ""
 "After third-party user authentication is successful, if the third-party "
 "authentication service platform does not return the user's email "
@@ -7423,19 +7440,19 @@ msgstr ""
 "第三方用户认证成功后，若第三方认证服务平台未返回该用户的邮箱信息，系统将自动"
 "以此邮箱后缀创建用户"
 
-#: settings/serializers/auth/base.py:37
+#: settings/serializers/auth/base.py:38
 msgid "Forgot Password URL"
 msgstr "忘记密码链接"
 
-#: settings/serializers/auth/base.py:38
+#: settings/serializers/auth/base.py:39
 msgid "The URL for Forgotten Password on the user login page"
 msgstr "用户登录页面忘记密码的 URL"
 
-#: settings/serializers/auth/base.py:41
+#: settings/serializers/auth/base.py:42
 msgid "Login redirection"
 msgstr "启用登录跳转提示"
 
-#: settings/serializers/auth/base.py:43
+#: settings/serializers/auth/base.py:44
 msgid ""
 "Should an flash page be displayed before the user is redirected to third-"
 "party authentication when the administrator enables third-party redirect "
@@ -7444,7 +7461,7 @@ msgstr ""
 "当管理员启用第三方重定向身份验证时，在用户重定向到第三方身份验证之前是否显示 "
 "Flash 页面"
 
-#: settings/serializers/auth/base.py:55
+#: settings/serializers/auth/base.py:56
 msgid ""
 "When you create a user, you associate the user to the organization of your "
 "choice. Users always belong to the Default organization."
@@ -7455,8 +7472,8 @@ msgstr ""
 msgid "CAS"
 msgstr "CAS"
 
-#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:45
-#: settings/serializers/auth/ldap_ha.py:27 settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:48
+#: settings/serializers/auth/ldap_ha.py:30 settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr "服务端地址"
 
@@ -7483,7 +7500,7 @@ msgstr "启用属性映射"
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:67 settings/serializers/auth/ldap_ha.py:49
+#: settings/serializers/auth/ldap.py:70 settings/serializers/auth/ldap_ha.py:52
 #: settings/serializers/auth/oauth2.py:60 settings/serializers/auth/oidc.py:39
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
@@ -7497,6 +7514,11 @@ msgid ""
 msgstr ""
 "用户属性映射，其中 `key` 是 CAS 服务用户属性名称，`value` 是本系统用户属性名"
 "称"
+
+#: settings/serializers/auth/cert.py:8 settings/serializers/auth/cert.py:11
+#: users/models/user/_source.py:27
+msgid "Certificate"
+msgstr "证书"
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
@@ -7528,46 +7550,46 @@ msgstr ""
 "用户属性映射，其中 `key` 是本系统用户属性名称，`value` 是 Lark 服务用户属性名"
 "称"
 
-#: settings/serializers/auth/ldap.py:42 settings/serializers/auth/ldap.py:108
+#: settings/serializers/auth/ldap.py:45 settings/serializers/auth/ldap.py:111
 msgid "LDAP"
 msgstr "LDAP"
 
-#: settings/serializers/auth/ldap.py:46
+#: settings/serializers/auth/ldap.py:49
 msgid "LDAP server URI"
 msgstr "LDAP 服务域名"
 
-#: settings/serializers/auth/ldap.py:49 settings/serializers/auth/ldap_ha.py:31
+#: settings/serializers/auth/ldap.py:52 settings/serializers/auth/ldap_ha.py:34
 msgid "Bind DN"
 msgstr "绑定 DN"
 
-#: settings/serializers/auth/ldap.py:50 settings/serializers/auth/ldap_ha.py:32
+#: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
 msgid "Binding Distinguished Name"
 msgstr "绑定目录管理员"
 
-#: settings/serializers/auth/ldap.py:54 settings/serializers/auth/ldap_ha.py:36
+#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/ldap_ha.py:39
 msgid "Binding password"
 msgstr "绑定密码"
 
-#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/ldap_ha.py:39
+#: settings/serializers/auth/ldap.py:60 settings/serializers/auth/ldap_ha.py:42
 msgid "Search OU"
 msgstr "用户 OU"
 
-#: settings/serializers/auth/ldap.py:59 settings/serializers/auth/ldap_ha.py:41
+#: settings/serializers/auth/ldap.py:62 settings/serializers/auth/ldap_ha.py:44
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
 msgstr "用户搜索库，如果有多个OU，可以用`|`符号分隔"
 
-#: settings/serializers/auth/ldap.py:63 settings/serializers/auth/ldap_ha.py:45
+#: settings/serializers/auth/ldap.py:66 settings/serializers/auth/ldap_ha.py:48
 msgid "Search filter"
 msgstr "用户过滤器"
 
-#: settings/serializers/auth/ldap.py:64 settings/serializers/auth/ldap_ha.py:46
+#: settings/serializers/auth/ldap.py:67 settings/serializers/auth/ldap_ha.py:49
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:69 settings/serializers/auth/ldap_ha.py:51
+#: settings/serializers/auth/ldap.py:72 settings/serializers/auth/ldap_ha.py:54
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the LDAP service user attribute name"
@@ -7575,25 +7597,25 @@ msgstr ""
 "用户属性映射，其中 `key` 是本系统用户属性名称，`value` 是 LDAP 服务用户属性名"
 "称"
 
-#: settings/serializers/auth/ldap.py:85 settings/serializers/auth/ldap_ha.py:67
+#: settings/serializers/auth/ldap.py:88 settings/serializers/auth/ldap_ha.py:70
 msgid "Connect timeout (s)"
 msgstr "连接超时时间 (秒)"
 
-#: settings/serializers/auth/ldap.py:88 settings/serializers/auth/ldap_ha.py:70
+#: settings/serializers/auth/ldap.py:91 settings/serializers/auth/ldap_ha.py:73
 msgid "Strict sync"
 msgstr "严格模式"
 
-#: settings/serializers/auth/ldap.py:89 settings/serializers/auth/ldap_ha.py:71
+#: settings/serializers/auth/ldap.py:92 settings/serializers/auth/ldap_ha.py:74
 msgid ""
 "In strict mode, users not found in LDAP will be disabled during full or "
 "automatic sync"
 msgstr "启用严格模式后，全量或自动同步将禁用系统中未在 LDAP 中发现的用户"
 
-#: settings/serializers/auth/ldap.py:94 settings/serializers/auth/ldap_ha.py:76
+#: settings/serializers/auth/ldap.py:97 settings/serializers/auth/ldap_ha.py:79
 msgid "User DN cache timeout (s)"
 msgstr "User DN 缓存超时时间 (秒)"
 
-#: settings/serializers/auth/ldap.py:96
+#: settings/serializers/auth/ldap.py:99
 msgid ""
 "Caching the User DN obtained during user login authentication can "
 "effectively improve the speed of user authentication., 0 means no "
@@ -7603,21 +7625,61 @@ msgstr ""
 "对用户登录认证时查询出的 User DN 进行缓存，可以有效提高用户认证的速度<br>如果"
 "用户 OU 架构有调整，点击提交即可清除用户 DN 缓存"
 
-#: settings/serializers/auth/ldap.py:102
-#: settings/serializers/auth/ldap_ha.py:84
+#: settings/serializers/auth/ldap.py:105
+#: settings/serializers/auth/ldap_ha.py:87
 msgid "Search paged size (piece)"
 msgstr "搜索分页数量 (条)"
 
-#: settings/serializers/auth/ldap_ha.py:24
-#: settings/serializers/auth/ldap_ha.py:90
+#: settings/serializers/auth/ldap.py:114
+#: settings/serializers/auth/ldap_ha.py:96
+msgid "StartTLS"
+msgstr "StartTLS"
+
+#: settings/serializers/auth/ldap.py:115
+#: settings/serializers/auth/ldap_ha.py:97
+msgid "Use StartTLS to upgrade ldap:// connections to TLS"
+msgstr "对 ldap:// 连接使用 StartTLS 升级为 TLS 加密"
+
+#: settings/serializers/auth/ldap.py:119
+#: settings/serializers/auth/ldap_ha.py:101
+msgid "CA certificate"
+msgstr "CA 证书"
+
+#: settings/serializers/auth/ldap.py:120
+#: settings/serializers/auth/ldap_ha.py:102
+msgid "CA certificate for verifying LDAPS/StartTLS server"
+msgstr "用于验证 LDAPS/StartTLS 服务端证书的 CA 证书"
+
+#: settings/serializers/auth/ldap.py:124
+#: settings/serializers/auth/ldap_ha.py:106
+msgid "Client certificate"
+msgstr "客户端证书"
+
+#: settings/serializers/auth/ldap.py:125
+#: settings/serializers/auth/ldap_ha.py:107
+msgid "Client certificate for mutual TLS (optional)"
+msgstr "客户端证书，用于双向 TLS（可选）"
+
+#: settings/serializers/auth/ldap.py:129
+#: settings/serializers/auth/ldap_ha.py:111
+msgid "Client private key"
+msgstr "客户端私钥"
+
+#: settings/serializers/auth/ldap.py:130
+#: settings/serializers/auth/ldap_ha.py:112
+msgid "Client private key for mutual TLS (optional)"
+msgstr "客户端私钥，用于双向 TLS（可选）"
+
+#: settings/serializers/auth/ldap_ha.py:27
+#: settings/serializers/auth/ldap_ha.py:93
 msgid "LDAP HA"
 msgstr "LDAP 认证"
 
-#: settings/serializers/auth/ldap_ha.py:28
+#: settings/serializers/auth/ldap_ha.py:31
 msgid "LDAP HA server URI"
 msgstr "LDAP HA 服务域名"
 
-#: settings/serializers/auth/ldap_ha.py:78
+#: settings/serializers/auth/ldap_ha.py:81
 msgid ""
 "Caching the User DN obtained during user login authentication can "
 "effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
@@ -8798,133 +8860,133 @@ msgstr "已同步用户"
 msgid "No user synchronization required"
 msgstr "没有用户需要同步"
 
-#: settings/utils/ldap.py:529
+#: settings/utils/ldap.py:669
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:543
+#: settings/utils/ldap.py:683
 #, python-brace-format
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:545
+#: settings/utils/ldap.py:685
 #, python-brace-format
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:547
+#: settings/utils/ldap.py:687
 #, python-brace-format
 msgid "Please add certificate: {}"
 msgstr "请添加证书: {}"
 
-#: settings/utils/ldap.py:551 settings/utils/ldap.py:578
-#: settings/utils/ldap.py:608 settings/utils/ldap.py:636
+#: settings/utils/ldap.py:691 settings/utils/ldap.py:718
+#: settings/utils/ldap.py:748 settings/utils/ldap.py:776
 #, python-brace-format
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:565
+#: settings/utils/ldap.py:705
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:572
+#: settings/utils/ldap.py:712
 #, python-brace-format
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:574
+#: settings/utils/ldap.py:714
 #, python-brace-format
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:576
+#: settings/utils/ldap.py:716
 #, python-brace-format
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:734
 #, python-brace-format
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:625
+#: settings/utils/ldap.py:765
 #, python-brace-format
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:632
+#: settings/utils/ldap.py:772
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:651
+#: settings/utils/ldap.py:791
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:669
+#: settings/utils/ldap.py:809
 #, python-brace-format
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误  (不合法的LDAP服务器地址): {}"
 
-#: settings/utils/ldap.py:671
+#: settings/utils/ldap.py:811
 #, python-brace-format
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误 (不合法的绑定DN): {}"
 
-#: settings/utils/ldap.py:673
+#: settings/utils/ldap.py:813
 #, python-brace-format
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误 (不合法的LDAP属性映射): {}"
 
-#: settings/utils/ldap.py:675
+#: settings/utils/ldap.py:815
 #, python-brace-format
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误 (不合法的用户OU或用户过滤器): {}"
 
-#: settings/utils/ldap.py:677
+#: settings/utils/ldap.py:817
 #, python-brace-format
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误 (没有启用LDAP认证): {}"
 
-#: settings/utils/ldap.py:679
+#: settings/utils/ldap.py:819
 #, python-brace-format
 msgid "Error (Unknown): {}"
 msgstr "错误 (未知): {}"
 
-#: settings/utils/ldap.py:682
+#: settings/utils/ldap.py:822
 #, python-brace-format
 msgid "Succeed: Match {} users"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:712
+#: settings/utils/ldap.py:854
 #, python-brace-format
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败 (配置错误): {}"
 
-#: settings/utils/ldap.py:716
+#: settings/utils/ldap.py:858
 #, python-brace-format
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:718
+#: settings/utils/ldap.py:860
 #, python-brace-format
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:721
+#: settings/utils/ldap.py:863
 #, python-brace-format
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
-#: settings/ws.py:228
+#: settings/ws.py:231
 msgid "No LDAP user was found"
 msgstr "没有获取到 LDAP 用户"
 
-#: settings/ws.py:237
+#: settings/ws.py:240
 #, python-brace-format
 msgid "Total {}, success {}, failure {}"
 msgstr "总共 {}，成功 {}，失败 {}"
 
-#: settings/ws.py:241
+#: settings/ws.py:244
 #, python-brace-format
 msgid ", disabled {}"
 msgstr ", 禁用 {}"
@@ -10920,10 +10982,6 @@ msgstr "用户密码历史"
 msgid "Force enabled"
 msgstr "强制启用"
 
-#: users/models/user/_source.py:27
-msgid "Certificate"
-msgstr "证书"
-
 #: users/notifications.py:23 users/notifications.py:68
 msgid "Reset password url"
 msgstr "重置密码网址"
@@ -12431,10 +12489,6 @@ msgstr "用户协议"
 #: xpack/plugins/interface/templates/login_i18n.html:17
 msgid "Privacy Policy"
 msgstr "隐私协议"
-
-#: xpack/plugins/interface/templates/login_i18n.html:22
-msgid "More login methods"
-msgstr "更多登录方式"
 
 #: xpack/plugins/jdmc/i18n.py:4
 msgid "AuditAdmin"
