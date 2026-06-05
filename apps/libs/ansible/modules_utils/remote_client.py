@@ -79,6 +79,15 @@ def _strip_wrapping_quotes(value):
     return value
 
 
+def normalize_gateway_args_for_legacy_parser(gateway_args):
+   
+    return re.sub(
+        r'(-W\s+%h:%p\s+-q)\s+--\s+([^@\s]+@[^\'"\s]+)([\'"]?)',
+        r'\2 \1\3',
+        gateway_args,
+    )
+
+
 class OldSSHTransport(paramiko.transport.Transport):
     _preferred_pubkeys = (
         "ssh-ed25519",
@@ -268,6 +277,7 @@ class SSHClient:
 
     def local_gateway_prepare(self):
         gateway_args = self.module.params['gateway_args'] or ''
+        gateway_args = normalize_gateway_args_for_legacy_parser(gateway_args)
         pattern = (
             r"(?:sshpass -p ([^ ]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+"
             r"([^@\s]+)@([^\s]+)\s+-W %h:%p -q(?: -i ([^']+))?'"
