@@ -14,7 +14,6 @@ class Device:
         self.__load_driver(driver_path)
         # open device
         self.__open_device()
-        self.reset_key_store()
 
     def close(self):
         if self.__device is None:
@@ -68,6 +67,3 @@ class Device:
         if ret != 0:
             raise Exception("open {} device failed".format(self.name), ret)
         self.__device = device
-
-    def reset_key_store(self):
-        pass

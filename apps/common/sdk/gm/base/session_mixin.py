@@ -88,21 +88,6 @@ class SM3Mixin(BaseMixin):
 
 class SM4Mixin(BaseMixin):
 
-    def import_key(self, key_val):
-        # to c lang
-        key_val = (c_ubyte * len(key_val))(*key_val)
-
-        key = c_void_p()
-        ret = self._driver.SDF_ImportKey(self._session, key_val, c_int(len(key_val)), pointer(key))
-        if ret != 0:
-            raise GMDeviceError("import key failed", ret)
-        return key
-
-    def destroy_cipher_key(self, key):
-        ret = self._driver.SDF_DestroyKey(self._session, key)
-        if ret != 0:
-            raise Exception("destroy key failed")
-
     def encrypt(self, plain_text, key, alg, iv=None):
         return self.__do_cipher_action(plain_text, key, alg, iv, True)
 
@@ -110,20 +95,35 @@ class SM4Mixin(BaseMixin):
         return self.__do_cipher_action(cipher_text, key, alg, iv, False)
 
     def __do_cipher_action(self, text, key, alg, iv=None, encrypt=True):
-        text = (c_ubyte * len(text))(*text)
+        text_buf = (c_ubyte * len(text))(*text)
+        key_buf = (c_ubyte * len(key))(*key)
+
+        iv_buf = None
+        iv_len = 0
         if iv is not None:
-            iv = (c_ubyte * len(iv))(*iv)
+            iv_buf = (c_ubyte * len(iv))(*iv)
+            iv_len = len(iv)
 
         temp_data = (c_ubyte * len(text))()
         temp_data_length = c_int()
         if encrypt:
-            ret = self._driver.SDF_Encrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
-                                           pointer(temp_data_length))
+            ret = self._driver.SPII_EncryptEx(
+                self._session, text_buf, c_int(len(text)),
+                key_buf, c_int(len(key)),
+                iv_buf, c_int(iv_len),
+                c_int(alg),
+                temp_data, pointer(temp_data_length),
+            )
             if ret != 0:
                 raise GMDeviceError("encrypt failed", ret)
         else:
-            ret = self._driver.SDF_Decrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
-                                           pointer(temp_data_length))
+            ret = self._driver.SPII_DecryptEx(
+                self._session, text_buf, c_int(len(text)),
+                key_buf, c_int(len(key)),
+                iv_buf, c_int(iv_len),
+                c_int(alg),
+                temp_data, pointer(temp_data_length),
+            )
             if ret != 0:
                 raise GMDeviceError("decrypt failed", ret)
         return temp_data[:temp_data_length.value]

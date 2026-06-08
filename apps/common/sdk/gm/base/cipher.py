@@ -22,21 +22,17 @@ class EBCCipher:
 
     def __init__(self, session, key_val):
         self._session = session
-        self._key = self.__get_key(key_val)
+        self._key = key_val if isinstance(key_val, bytes) else bytes(key_val, encoding='utf-8')
         self._alg = "sm4_ebc"
         self._iv = None
 
-    def __get_key(self, key_val):
-        key_val = self.__padding(key_val)
-        return self._session.import_key(key_val)
-
     @staticmethod
-    def __padding(val):
-        # padding
-        val = bytes(val)
-        while len(val) == 0 or len(val) % 16 != 0:
-            val += b'\0'
-        return val
+    def __padding(data):
+        if not isinstance(data, bytes):
+            data = bytes(data, encoding='utf-8')
+        while len(data) == 0 or len(data) % 16 != 0:
+            data += b'\0'
+        return data
 
     def encrypt(self, plain_text):
         plain_text = self.__padding(plain_text)
@@ -48,8 +44,13 @@ class EBCCipher:
         return bytes(plain_text)
 
     def destroy(self):
-        self._session.destroy_cipher_key(self._key)
         self._session.close()
+
+    def __del__(self):
+        try:
+            self.destroy()
+        except Exception:
+            pass
 
 
 class CBCCipher(EBCCipher):

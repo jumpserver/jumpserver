@@ -9,6 +9,3 @@ class CCUPMDevice(Device):
 
     def open(self, driver_path="libsdf_crypto.so"):
         super().open(driver_path)
-
-    def reset_key_store(self):
-        pass
