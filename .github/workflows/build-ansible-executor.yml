@@ -58,11 +58,10 @@ jobs:
         run: pip install 'ansible-builder>=3.1.1'
 
       - name: Create Executor build context
-        working-directory: utils/ansible_executor
         run: |
           ansible-builder create \
-            -f execution-environment.yml \
-            -c context
+            -f utils/ansible_executor/execution-environment.yml \
+            -c utils/ansible_executor/context
 
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
@@ -70,5 +69,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           context: utils/ansible_executor/context
-          file: utils/ansible_executor/context/Dockerfile
+          file: utils/ansible_executor/context/Containerfile
           tags: jumpserver/ansible-executor:${{ env.IMAGE_TAG }}
