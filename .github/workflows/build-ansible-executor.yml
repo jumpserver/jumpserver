@@ -1,9 +1,10 @@
-name: Build and Push Ansible EE Image
+name: Build and Push Ansible Executor Image
 
 on:
   pull_request:
     branches:
         - 'dev'
+        - 'dev_osm'
         - 'v*'
     paths:
         - utils/ansible_executor/**
@@ -15,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: '构建 Ansible EE 镜像所用的分支'
+        description: '构建 Ansible Executor 镜像所用的分支'
         required: true
         type: string
         default: 'main'
@@ -56,7 +57,7 @@ jobs:
       - name: Install ansible-builder
         run: pip install 'ansible-builder>=3.1.1'
 
-      - name: Create EE build context
+      - name: Create Executor build context
         working-directory: utils/ansible_executor
         run: |
           ansible-builder create \
@@ -72,24 +73,3 @@ jobs:
           context: utils/ansible_executor/context
           file: utils/ansible_executor/context/Dockerfile
           tags: jumpserver/ansible-executor:${{ env.IMAGE_TAG }}
-
-      - name: Update runner.py
-        run: |
-          sed -i "s|ANSIBLE_EE_IMAGE = .*|ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:${{ env.IMAGE_TAG }}'|" apps/ops/ansible/runner.py
-
-      - name: Commit changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add apps/ops/ansible/runner.py
-          git commit -m "perf: Update Ansible EE image tag in runner.py"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Unlock Pull Request
-        if: github.event_name == 'push'
-        run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -d '{"state":"success", "description":"Action running, merge disabled", "context":"Lock PR"}' \
-          "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
