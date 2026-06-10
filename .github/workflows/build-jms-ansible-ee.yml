@@ -71,11 +71,11 @@ jobs:
           push: true
           context: utils/ansible_executor/context
           file: utils/ansible_executor/context/Dockerfile
-          tags: jumpserver/jms_ansible_ee:${{ env.IMAGE_TAG }}
+          tags: jumpserver/ansible-executor:${{ env.IMAGE_TAG }}
 
       - name: Update runner.py
         run: |
-          sed -i "s|ANSIBLE_EE_IMAGE = .*|ANSIBLE_EE_IMAGE = 'jumpserver/jms_ansible_ee:${{ env.IMAGE_TAG }}'|" apps/ops/ansible/runner.py
+          sed -i "s|ANSIBLE_EE_IMAGE = .*|ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:${{ env.IMAGE_TAG }}'|" apps/ops/ansible/runner.py
 
       - name: Commit changes
         run: |

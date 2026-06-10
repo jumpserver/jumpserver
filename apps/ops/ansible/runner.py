@@ -6,14 +6,15 @@ from django.conf import settings
 from django.utils._os import safe_join
 
 from common.utils import is_macos
+
+from ..utils import get_ansible_log_verbosity
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
 from .interface import interface
-from ..utils import get_ansible_log_verbosity
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
-ANSIBLE_EE_IMAGE = 'jms_ansible_ee:latest'
+ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:latest'
 
 
 def use_ansible_docker_isolation():
@@ -227,4 +228,5 @@ class UploadFileRunner:
             shutil.rmtree(self.share_src_dir)
         except OSError as e:
             print(f"del upload tmp dir {self.share_src_dir} failed! {e}")
+        return self.cb
         return self.cb
