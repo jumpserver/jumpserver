@@ -62,8 +62,7 @@ jobs:
         run: |
           ansible-builder create \
             -f execution-environment.yml \
-            -c context \
-            --container-runtime docker
+            -c context
 
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
