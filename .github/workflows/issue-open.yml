@@ -4,13 +4,17 @@ on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
   issue-open-add-labels:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.issue.pull_request }}
     steps:
       - name: Add labels
-        uses: actions-cool/issues-helper@v2
-        if: ${{ !github.event.issue.pull_request }}
-        with:
-          actions: 'add-labels'
-          labels: '🔔 Pending processing'
+        run: |
+          gh issue edit "${{ github.event.issue.number }}" \
+            --add-label "🔔 Pending processing"
+        env:
+          GH_TOKEN: ${{ github.token }}
