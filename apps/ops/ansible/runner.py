@@ -6,20 +6,26 @@ from django.conf import settings
 from django.utils._os import safe_join
 
 from common.utils import is_macos
-
-from ..utils import get_ansible_log_verbosity
 from .callback import DefaultCallback
 from .exception import CommandInBlackListException
 from .interface import interface
+from ..utils import get_ansible_log_verbosity
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
 ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:latest'
+ANSIBLE_EE_PYTHON_INTERPRETER = '/usr/bin/python3.11'
+
+
+def docker_extravars(extra_vars):
+    extravars = dict(extra_vars or {})
+    if use_ansible_docker_isolation():
+        extravars.setdefault('local_python_interpreter', ANSIBLE_EE_PYTHON_INTERPRETER)
+    return extravars
 
 
 def use_ansible_docker_isolation():
-    """Production runs ansible in EE container; dev runs in celery worker."""
-    return not settings.DEBUG_DEV
+    return True
 
 
 def docker_isolation_kwargs():
@@ -38,6 +44,19 @@ def prepare_isolated_ansible_cfg(project_dir):
     src = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
     dst = os.path.join(project_dir, 'ansible.cfg')
     shutil.copyfile(src, dst)
+
+
+def stage_inventory_for_docker(project_dir, inventory_path):
+    """Stage custom inventory into private_data_dir/inventory/hosts for Docker EE."""
+    if not use_ansible_docker_isolation():
+        return inventory_path
+    standard_dir = os.path.join(project_dir, 'inventory')
+    standard_path = os.path.join(standard_dir, 'hosts')
+    if os.path.realpath(inventory_path) == os.path.realpath(standard_path):
+        return standard_path
+    os.makedirs(standard_dir, mode=0o700, exist_ok=True)
+    shutil.copy2(inventory_path, standard_path)
+    return standard_path
 
 
 class AdHocRunner:
@@ -90,7 +109,7 @@ class AdHocRunner:
 
         run_kwargs = {
             'timeout': self.timeout if self.timeout > 0 else None,
-            'extravars': self.extra_vars,
+            'extravars': docker_extravars(self.extra_vars),
             'envvars': self.envs,
             'host_pattern': self.pattern,
             'private_data_dir': self.project_dir,
@@ -129,7 +148,8 @@ class PlaybookRunner:
         entry = os.path.basename(self.playbook)
         playbook_dir = os.path.dirname(self.playbook)
         project_playbook_dir = os.path.join(self.project_dir, "project")
-        shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
+        if os.path.realpath(playbook_dir) != os.path.realpath(project_playbook_dir):
+            shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
         self.playbook = entry
 
     @property
@@ -147,6 +167,7 @@ class PlaybookRunner:
             shutil.rmtree(private_env)
 
         prepare_isolated_ansible_cfg(self.project_dir)
+        inventory = stage_inventory_for_docker(self.project_dir, self.inventory)
 
         kwargs = dict(kwargs)
         if use_ansible_docker_isolation():
@@ -157,7 +178,7 @@ class PlaybookRunner:
 
         interface.run(
             private_data_dir=self.project_dir,
-            inventory=self.inventory,
+            inventory=inventory,
             playbook=self.playbook,
             verbosity=verbosity,
             event_handler=self.cb.event_handler,
@@ -165,7 +186,7 @@ class PlaybookRunner:
             # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
             host_cwd=self.playbook_project_dir,
             envvars=self.envs,
-            extravars=self.extra_vars,
+            extravars=docker_extravars(self.extra_vars),
             **kwargs
         )
         return self.cb
@@ -228,5 +249,4 @@ class UploadFileRunner:
             shutil.rmtree(self.share_src_dir)
         except OSError as e:
             print(f"del upload tmp dir {self.share_src_dir} failed! {e}")
-        return self.cb
         return self.cb
