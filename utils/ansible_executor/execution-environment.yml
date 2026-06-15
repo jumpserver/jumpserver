@@ -15,9 +15,9 @@ dependencies:
 
   # 与 pyproject.toml [tool.uv.sources] 保持一致，不要用 PyPI 官方包
   ansible_core:
-    package_pip: https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.14.1.7.zip
+    package_pip: https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.3.zip
   ansible_runner:
-    package_pip: https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/2.4.0.1.zip
+    package_pip: https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip
 
   galaxy:
     collections:
