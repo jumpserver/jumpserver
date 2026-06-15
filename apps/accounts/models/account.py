@@ -5,6 +5,7 @@ from simple_history.models import HistoricalRecords
 
 from assets.models import Asset
 from assets.models.base import AbsConnectivity
+from common.db import fields
 from common.utils import lazyproperty, get_logger
 from labels.mixins import LabeledMixin
 from .base import BaseAccount
@@ -101,6 +102,9 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
     change_secret_status = models.CharField(
         max_length=16, null=True, blank=True, verbose_name=_('Change secret status')
+    )
+    otp_secret_key = fields.EncryptCharField(
+        max_length=128, blank=True, null=True, verbose_name=_('OTP secret key')
     )
 
     class Meta:

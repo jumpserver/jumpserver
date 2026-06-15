@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +19,7 @@ from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.drf.filters import AttrRulesFilterBackend
 from common.permissions import IsValidUser
-from common.utils import lazyproperty, get_logger
+from common.utils import lazyproperty, get_logger, generate_otp_code
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org
 from rbac.permissions import RBACPermission
@@ -46,6 +47,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'clear_secret': 'accounts.change_account',
         'move_to_assets': 'accounts.delete_account',
         'copy_to_assets': 'accounts.add_account',
+        'generate_otp': 'accounts.add_account',
         'chat': 'accounts.view_account',
     }
     export_as_zip = True
@@ -173,7 +175,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         asset_ids = request.data.get('assets', [])
         assets = Asset.objects.filter(id__in=asset_ids)
         field_names = [
-            'name', 'username', 'secret_type', 'secret',
+            'name', 'username', 'secret_type', 'secret', 'otp_secret_key',
             'privileged', 'is_active', 'source', 'source_id', 'comment'
         ]
         account_data = {field: getattr(account, field) for field in field_names}
@@ -207,6 +209,12 @@ class AccountViewSet(OrgBulkModelViewSet):
     def copy_to_assets(self, request, *args, **kwargs):
         return self._copy_or_move_to_assets(request, move=False)
 
+    @action(methods=['post'], detail=False, url_path='generate-otp')
+    def generate_otp(self, request, *args, **kwargs):
+        serializer = serializers.AccountOTPGenerateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.get_payload(), status=HTTP_200_OK)
+
     @action(methods=['get'], detail=False, url_path='chat')
     def chat(self, request, *args, **kwargs):
         with tmp_to_root_org():
@@ -227,7 +235,26 @@ class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
     rbac_perms = {
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
+        'otp_code': 'accounts.view_accountsecret',
     }
+
+    @action(methods=['get'], detail=True, url_path='otp-code', permission_classes=[RBACPermission])
+    def otp_code(self, request, *args, **kwargs):
+        account = self.get_object()
+        if not settings.SECURITY_ACCOUNT_SECRET_READ:
+            return Response(
+                {'detail': _('Account secret reading has been disabled by administrator')},
+                status=HTTP_400_BAD_REQUEST
+            )
+        if not account.otp_secret_key:
+            return Response(
+                {'detail': _('Account OTP secret key not configured')},
+                status=HTTP_400_BAD_REQUEST
+            )
+        return Response({
+            'otp_code': generate_otp_code(account.otp_secret_key),
+            'has_otp_secret_key': True,
+        }, status=HTTP_200_OK)
 
 
 class AssetAccountBulkCreateApi(CreateAPIView):

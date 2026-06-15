@@ -19,6 +19,9 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     input_secret = EncryptedField(
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
+    otp_code = EncryptedField(
+        label=_("OTP code"), max_length=16, required=False, allow_blank=True, write_only=True
+    )
     from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
     actions = ActionChoicesField(read_only=True, label=_("Actions"))
 
@@ -26,7 +29,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'user', 'asset', 'account', 'input_username', 'input_secret', 'input_secret_type',
+            'user', 'asset', 'account', 'input_username', 'input_secret', 'otp_code', 'input_secret_type',
             'connect_method', 'connect_options', 'protocol', 'actions',
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',

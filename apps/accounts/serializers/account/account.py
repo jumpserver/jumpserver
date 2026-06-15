@@ -15,11 +15,23 @@ from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
 from assets.models import Asset
 from common.serializers import SecretReadableMixin, SecretReadableCheckMixin, CommonBulkModelSerializer
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
-from common.utils import get_logger
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField, EncryptedField
+from common.utils import (
+    get_logger, generate_otp_secret_key, generate_otp_code,
+    normalize_otp_secret_key, is_otp_secret_key_valid,
+)
 from .base import BaseAccountSerializer, AuthValidateMixin
 
 logger = get_logger(__name__)
+
+
+def validate_otp_secret_key_value(value):
+    otp_secret_key = normalize_otp_secret_key(value)
+    if not otp_secret_key:
+        return ''
+    if not is_otp_secret_key_valid(otp_secret_key):
+        raise serializers.ValidationError(_('OTP secret key invalid'))
+    return otp_secret_key
 
 
 class AccountCreateUpdateSerializerMixin(serializers.Serializer):
@@ -234,6 +246,17 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         label=_('Su from'), attrs=('id', 'name', 'username')
     )
     ds = ObjectRelatedField(read_only=True, label=_('Directory service'), attrs=('id', 'name', 'domain_name'))
+    has_otp_secret_key = serializers.SerializerMethodField(
+        label=_('Has OTP secret key'), read_only=True
+    )
+    otp_secret_key = EncryptedField(
+        label=_('OTP secret key'),
+        required=False,
+        max_length=128,
+        allow_blank=True,
+        allow_null=True,
+        write_only=True,
+    )
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
@@ -243,9 +266,9 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         ]
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'version', 'ds',
-            'source', 'source_id', 'secret_reset',
+            'source', 'source_id', 'has_otp_secret_key', 'otp_secret_key', 'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
-        read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields
+        read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields + ['has_otp_secret_key']
         fields = [f for f in fields if f not in ['spec_info']]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
@@ -280,6 +303,13 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
                 raise serializers.ValidationError(field_errors)
         return attrs
 
+    def validate_otp_secret_key(self, value):
+        return validate_otp_secret_key_value(value)
+
+    @staticmethod
+    def get_has_otp_secret_key(obj):
+        return bool(getattr(obj, 'otp_secret_key', ''))
+
 
 class AccountDetailSerializer(AccountSerializer):
     has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
@@ -305,11 +335,19 @@ class AssetAccountBulkSerializer(
         max_length=128, required=False, write_only=True, allow_null=True, label=_("Su from"),
         allow_blank=True,
     )
+    otp_secret_key = EncryptedField(
+        label=_('OTP secret key'),
+        required=False,
+        max_length=128,
+        allow_blank=True,
+        allow_null=True,
+        write_only=True,
+    )
 
     class Meta:
         model = Account
         fields = [
-            'name', 'username', 'secret', 'secret_type', 'secret_reset',
+            'name', 'username', 'secret', 'secret_type', 'otp_secret_key', 'secret_reset',
             'passphrase', 'privileged', 'is_active', 'comment', 'template',
             'on_invalid', 'push_now', 'params',
             'su_from_username', 'source', 'source_id',
@@ -472,6 +510,31 @@ class AssetAccountBulkSerializer(
         for res in results:
             res['asset'] = str(res['asset'])
         return results
+
+    def validate_otp_secret_key(self, value):
+        return validate_otp_secret_key_value(value)
+
+
+class AccountOTPGenerateSerializer(serializers.Serializer):
+    otp_secret_key = EncryptedField(
+        label=_('OTP secret key'),
+        required=False,
+        max_length=128,
+        allow_blank=True,
+        allow_null=True,
+        write_only=True,
+    )
+    otp_code = serializers.CharField(label=_('OTP code'), read_only=True)
+
+    def validate_otp_secret_key(self, value):
+        return validate_otp_secret_key_value(value)
+
+    def get_payload(self):
+        otp_secret_key = self.validated_data.get('otp_secret_key') or generate_otp_secret_key()
+        return {
+            'otp_secret_key': otp_secret_key,
+            'otp_code': generate_otp_code(otp_secret_key),
+        }
 
 
 class AccountSecretSerializer(SecretReadableCheckMixin, SecretReadableMixin, AccountSerializer):
