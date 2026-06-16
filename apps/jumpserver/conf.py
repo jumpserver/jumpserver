@@ -589,6 +589,7 @@ class Config(dict):
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
         'SECURITY_COMMAND_EXECUTION': False,
+        'ANSIBLE_DOCKER_ENABLED': True,
         'SECURITY_COMMAND_BLACKLIST': [
             'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
         ],
