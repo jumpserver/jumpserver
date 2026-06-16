@@ -70,4 +70,6 @@ jobs:
           push: true
           context: utils/ansible_executor/context
           file: utils/ansible_executor/context/Containerfile
-          tags: jumpserver/ansible-executor:${{ env.IMAGE_TAG }}
+          tags: |
+            jumpserver/ansible-executor:${{ env.IMAGE_TAG }}
+            jumpserver/ansible-executor:latest
