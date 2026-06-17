@@ -36,7 +36,6 @@ ARG TOOLS="                           \
         postgresql-client             \
         openssh-client                \
         sshpass                       \
-        tcpdump                       \
         bubblewrap"
 
 ARG APT_MIRROR=http://deb.debian.org

@@ -41,7 +41,6 @@ TASK_STATUS_IS_OVER = 'OVER'
 
 class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     is_closed: bool = False
-    tcpdump_stop_event = None
 
     @staticmethod
     @sync_to_async
@@ -99,8 +98,7 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
             'dest_ips': dest_ips, 'dest_ports': dest_ports
         }
         logger.info(f'Receive request tcpdump: {params}')
-        self.tcpdump_stop_event = asyncio.Event()
-        await verbose_tcpdump(display=self.send_msg, stop_event=self.tcpdump_stop_event, **params)
+        await verbose_tcpdump(display=self.send_msg, **params)
 
     async def imitate_traceroute(self, dest_ips):
         params = {'dest_ips': dest_ips}
@@ -120,8 +118,6 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     async def close(self, code=None):
         if self.is_closed:
             return
-        if self.tcpdump_stop_event and not self.tcpdump_stop_event.is_set():
-            self.tcpdump_stop_event.set()
         await super().close(code)
         self.is_closed = True
 
