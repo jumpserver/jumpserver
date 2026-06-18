@@ -3,6 +3,7 @@
   vars:
     ansible_connection: local
     ansible_shell_type: sh
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
     ansible_become: false
     ansible_timeout: 30
   tasks:
@@ -22,4 +23,3 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         recv_timeout: "{{ params.recv_timeout | default(30) }}"
-
