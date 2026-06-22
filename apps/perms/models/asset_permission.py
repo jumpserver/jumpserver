@@ -57,6 +57,17 @@ def default_protocols():
     return ['all']
 
 
+def default_clipboard_policy():
+    return {
+        'file_upload': True,
+        'file_download': True,
+        'text_copy': True,
+        'text_paste': True,
+        'text_copy_max_length': 0,
+        'text_paste_max_length': 0,
+    }
+
+
 class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField(
@@ -75,6 +86,7 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     accounts = models.JSONField(default=list, verbose_name=_("Account"))
     protocols = models.JSONField(default=default_protocols, verbose_name=_("Protocols"))
     actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
+    clipboard_policy = models.JSONField(default=default_clipboard_policy, verbose_name=_("Clipboard policy"))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(
         default=asset_permission_date_expired_default, db_index=True, verbose_name=_('Date expired')

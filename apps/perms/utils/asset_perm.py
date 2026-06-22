@@ -12,6 +12,26 @@ logger = get_logger(__name__)
 
 __all__ = ['PermAssetDetailUtil']
 
+_CLIPBOARD_BOOL_KEYS = ('file_upload', 'file_download', 'text_copy', 'text_paste')
+_CLIPBOARD_LENGTH_KEYS = ('text_copy_max_length', 'text_paste_max_length')
+
+
+def merge_clipboard_policy(base, other):
+    """合并两条剪贴板策略，取最宽松（与动作的并集语义保持一致）：
+    布尔位取 OR；字符数上限 0 表示不限制（最宽松），否则取较大值。
+    """
+    if not other:
+        return base
+    if not base:
+        return dict(other)
+    merged = dict(base)
+    for key in _CLIPBOARD_BOOL_KEYS:
+        merged[key] = bool(base.get(key)) or bool(other.get(key))
+    for key in _CLIPBOARD_LENGTH_KEYS:
+        a, b = base.get(key) or 0, other.get(key) or 0
+        merged[key] = 0 if (a == 0 or b == 0) else max(a, b)
+    return merged
+
 
 class PermAssetDetailUtil:
     """ 资产授权账号相关的工具 """
@@ -79,11 +99,15 @@ class PermAssetDetailUtil:
     def parse_alias_action_date_expire(perms, asset):
         alias_action_bit_mapper = defaultdict(int)
         alias_date_expired_mapper = defaultdict(list)
+        alias_clipboard_policy_mapper = {}
 
         for perm in perms:
             for alias in perm.accounts:
                 alias_action_bit_mapper[alias] |= perm.actions
                 alias_date_expired_mapper[alias].append(perm.date_expired)
+                alias_clipboard_policy_mapper[alias] = merge_clipboard_policy(
+                    alias_clipboard_policy_mapper.get(alias), perm.clipboard_policy
+                )
 
         # @ALL 账号先处理，后面的每个最多映射一个账号
         all_action_bit = alias_action_bit_mapper.pop(AliasAccount.ALL, None)
@@ -93,6 +117,10 @@ class PermAssetDetailUtil:
                 alias_action_bit_mapper[username] |= all_action_bit
                 alias_date_expired_mapper[username].extend(
                     alias_date_expired_mapper[AliasAccount.ALL]
+                )
+                alias_clipboard_policy_mapper[username] = merge_clipboard_policy(
+                    alias_clipboard_policy_mapper.get(username),
+                    alias_clipboard_policy_mapper.get(AliasAccount.ALL)
                 )
 
         # 排除某些账号的权限
@@ -114,12 +142,13 @@ class PermAssetDetailUtil:
             if action_bit and action_bit > 0
         }
 
-        return alias_action_bit_mapper, alias_date_expired_mapper
+        return alias_action_bit_mapper, alias_date_expired_mapper, alias_clipboard_policy_mapper
 
     @classmethod
-    def map_alias_to_accounts(cls, alias_action_bit_mapper, alias_date_expired_mapper, asset, user):
+    def map_alias_to_accounts(cls, alias_action_bit_mapper, alias_date_expired_mapper, alias_clipboard_policy_mapper, asset, user):
         username_accounts_mapper = defaultdict(list)
         cleaned_accounts_expired = defaultdict(list)
+        cleaned_accounts_clipboard_policy = {}
         asset_accounts = asset.all_valid_accounts.all()
 
         # 用户名 -> 账号
@@ -145,20 +174,25 @@ class PermAssetDetailUtil:
             for account in _accounts:
                 cleaned_accounts_action_bit[account] |= action_bit
                 cleaned_accounts_expired[account].extend(alias_date_expired_mapper[alias])
-        return cleaned_accounts_action_bit, cleaned_accounts_expired
+                cleaned_accounts_clipboard_policy[account] = merge_clipboard_policy(
+                    cleaned_accounts_clipboard_policy.get(account),
+                    alias_clipboard_policy_mapper.get(alias)
+                )
+        return cleaned_accounts_action_bit, cleaned_accounts_expired, cleaned_accounts_clipboard_policy
 
     @classmethod
     def get_permed_accounts_from_perms(cls, perms, user, asset):
         # alias: is a collection of account usernames and special accounts [@ALL, @INPUT, @USER, @ANON]
-        alias_action_bit_mapper, alias_date_expired_mapper = cls.parse_alias_action_date_expire(perms, asset)
+        alias_action_bit_mapper, alias_date_expired_mapper, alias_clipboard_policy_mapper = cls.parse_alias_action_date_expire(perms, asset)
         # 展开 alias 到具体的账号
-        cleaned_accounts_action_bit, cleaned_accounts_expired = cls.map_alias_to_accounts(
-            alias_action_bit_mapper, alias_date_expired_mapper, asset, user
+        cleaned_accounts_action_bit, cleaned_accounts_expired, cleaned_accounts_clipboard_policy = cls.map_alias_to_accounts(
+            alias_action_bit_mapper, alias_date_expired_mapper, alias_clipboard_policy_mapper, asset, user
         )
         accounts = []
         virtual_accounts = []
         for account, action_bit in cleaned_accounts_action_bit.items():
             account.actions = action_bit
+            account.clipboard_policy = cleaned_accounts_clipboard_policy.get(account)
             all_date_expired = cleaned_accounts_expired[account]
             if not all_date_expired:
                 logger.warning(f"Account {account.username} has no date expired")
@@ -190,5 +224,5 @@ class PermAssetDetailUtil:
         :param actions: list
         """
         perms = self.user_asset_perms
-        action_bit_mapper, __ = self.parse_alias_action_date_expire(perms, self.asset)
+        action_bit_mapper, __, ___ = self.parse_alias_action_date_expire(perms, self.asset)
         return ActionChoices.contains_all(action_bit_mapper.get(account_name, 0), actions)

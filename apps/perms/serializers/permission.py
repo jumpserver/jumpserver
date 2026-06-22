@@ -13,6 +13,7 @@ from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import BitChoicesField, ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ActionChoices, AssetPermission
+from perms.models.asset_permission import default_clipboard_policy
 from users.models import User, UserGroup
 
 __all__ = ["AssetPermissionSerializer", "ActionChoicesField", "AssetPermissionListSerializer"]
@@ -62,6 +63,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
     nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
     actions = ActionChoicesField(required=False, allow_null=True, label=_("Action"))
+    clipboard_policy = serializers.JSONField(required=False, label=_("Clipboard policy"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     accounts = PermAccountsSerializer(label=_("Accounts"), required=False)
@@ -74,7 +76,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         fields_mini = ["id", "name"]
         amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
         fields_generic = [
-            "accounts", "protocols", "actions",
+            "accounts", "protocols", "actions", "clipboard_policy",
             "created_by", "date_created", "date_start", "date_expired", "is_active",
             "is_expired", "is_valid", "comment", "from_ticket",
         ]
@@ -97,6 +99,19 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         if not actions:
             return
         actions.default = ActionChoices.all()
+
+    def validate_clipboard_policy(self, value):
+        policy = default_clipboard_policy()
+        if isinstance(value, dict):
+            policy.update({k: value[k] for k in policy if k in value})
+        for key in ('file_upload', 'file_download', 'text_copy', 'text_paste'):
+            policy[key] = bool(policy[key])
+        for key in ('text_copy_max_length', 'text_paste_max_length'):
+            try:
+                policy[key] = max(int(policy.get(key) or 0), 0)
+            except (TypeError, ValueError):
+                policy[key] = 0
+        return policy
 
     @staticmethod
     def get_all_assets(nodes, assets):

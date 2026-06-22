@@ -1,4 +1,6 @@
 from django.utils.translation import gettext_lazy as _
+import json
+
 from rest_framework import serializers
 
 from accounts.const import SecretType
@@ -153,6 +155,18 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     connect_options = serializers.JSONField(read_only=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        policy = getattr(instance.permed_account, 'clipboard_policy', None)
+        # Clipboard policy is only consumed by graphical sessions (lion). It is
+        # smuggled through the `lang` connect option because the connect-token
+        # SDK struct has no dedicated field for it.
+        if policy and data.get('protocol') in ('rdp', 'vnc'):
+            connect_options = data.get('connect_options') or {}
+            connect_options['lang'] = json.dumps(policy)
+            data['connect_options'] = connect_options
+        return data
 
     class Meta:
         model = ConnectionToken
