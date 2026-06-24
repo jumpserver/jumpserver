@@ -5,31 +5,34 @@ import json
 from collections import defaultdict
 from copy import deepcopy
 
+from authentication.backends.ldap import (
+    LDAPAuthorizationBackend,
+    LDAPHAAuthorizationBackend,
+    LDAPUser,
+)
+from common.const import LDAP_AD_ACCOUNT_DISABLE
+from common.db.utils import close_old_connections
+from common.utils import get_logger, timeit
+from common.utils.http import is_true
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
-from ldap3 import Server, Connection, SIMPLE
+from ldap3 import SIMPLE, Connection, Server
 from ldap3.core.exceptions import (
+    LDAPAttributeError,
+    LDAPBindError,
+    LDAPConfigurationError,
+    LDAPExceptionError,
+    LDAPInvalidDnError,
+    LDAPInvalidFilterError,
+    LDAPInvalidServerError,
+    LDAPPasswordIsMandatoryError,
+    LDAPSessionTerminatedByServerError,
     LDAPSocketOpenError,
     LDAPSocketReceiveError,
-    LDAPSessionTerminatedByServerError,
     LDAPUserNameIsMandatoryError,
-    LDAPPasswordIsMandatoryError,
-    LDAPInvalidDnError,
-    LDAPInvalidServerError,
-    LDAPBindError,
-    LDAPInvalidFilterError,
-    LDAPExceptionError,
-    LDAPConfigurationError,
-    LDAPAttributeError,
 )
-
-from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser, \
-    LDAPHAAuthorizationBackend
-from common.const import LDAP_AD_ACCOUNT_DISABLE
-from common.db.utils import close_old_connections
-from common.utils import timeit, get_logger
-from common.utils.http import is_true
+from ldap3.utils.conv import escape_filter_chars
 from orgs.utils import tmp_to_org
 from settings.const import ImportStatus
 from users.models import User, UserGroup
@@ -130,11 +133,14 @@ class LDAPServerUtil(object):
         if self.search_users:
             mapping_username = self.config.attr_map.get('username')
             for user in self.search_users:
-                extra += '({}={})'.format(mapping_username, user)
+                extra += '({}={})'.format(
+                    mapping_username, escape_filter_chars(user)
+                )
             return '(|{})'.format(extra)
         if self.search_value:
+            escaped_search_value = escape_filter_chars(self.search_value)
             for attr in self.config.attr_map.values():
-                extra += '({}={})'.format(attr, '*{}*'.format(self.search_value))
+                extra += '({}={})'.format(attr, '*{}*'.format(escaped_search_value))
             return '(|{})'.format(extra)
         return extra
 
