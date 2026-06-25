@@ -12778,6 +12778,18 @@ msgstr "ライセンスのインポートに成功"
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
 
+msgid "Connection refused"
+msgstr "接続が拒否されました"
+
+msgid "Connection timeout"
+msgstr "接続がタイムアウトしました"
+
+msgid "Unable to resolve the address"
+msgstr "アドレスを解決できません"
+
+msgid "Unable to connect to the host"
+msgstr "ホストに接続できません"
+
 #~ msgid "Offline video player"
 #~ msgstr "オフラインビデオプレーヤー"
 

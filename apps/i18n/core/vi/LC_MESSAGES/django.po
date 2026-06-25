@@ -12966,6 +12966,18 @@ msgstr "Nhập giấy phép thành công"
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
 
+msgid "Connection refused"
+msgstr "Kết nối bị từ chối"
+
+msgid "Connection timeout"
+msgstr "Hết thời gian kết nối"
+
+msgid "Unable to resolve the address"
+msgstr "Không thể phân giải địa chỉ"
+
+msgid "Unable to connect to the host"
+msgstr "Không thể kết nối đến máy chủ"
+
 #~ msgid "Offline video player"
 #~ msgstr "Trình phát video ngoại tuyến"
 

@@ -12946,6 +12946,18 @@ msgstr "Лицензия успешно импортирована"
 msgid "Invalid license"
 msgstr "Лицензия недействительна"
 
+msgid "Connection refused"
+msgstr "Соединение отклонено"
+
+msgid "Connection timeout"
+msgstr "Тайм-аут соединения"
+
+msgid "Unable to resolve the address"
+msgstr "Не удалось разрешить адрес"
+
+msgid "Unable to connect to the host"
+msgstr "Не удалось подключиться к хосту"
+
 #~ msgid "Offline video player"
 #~ msgstr "Офлайн видеоплеер"
 

@@ -12920,6 +12920,18 @@ msgstr "Importação de licença bem-sucedida"
 msgid "Invalid license"
 msgstr "Licença inválida"
 
+msgid "Connection refused"
+msgstr "Conexão recusada"
+
+msgid "Connection timeout"
+msgstr "Tempo de conexão esgotado"
+
+msgid "Unable to resolve the address"
+msgstr "Não foi possível resolver o endereço"
+
+msgid "Unable to connect to the host"
+msgstr "Não foi possível conectar ao host"
+
 #~ msgid "Offline video player"
 #~ msgstr "Reprodutor de Gravação Offline"
 

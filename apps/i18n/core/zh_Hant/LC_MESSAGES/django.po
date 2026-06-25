@@ -12490,6 +12490,18 @@ msgstr "許可證匯入成功"
 msgid "Invalid license"
 msgstr "許可證無效"
 
+msgid "Connection refused"
+msgstr "連線被拒絕"
+
+msgid "Connection timeout"
+msgstr "連線逾時"
+
+msgid "Unable to resolve the address"
+msgstr "無法解析位址"
+
+msgid "Unable to connect to the host"
+msgstr "無法連線到主機"
+
 #~ msgid "Offline video player"
 #~ msgstr "離線錄影播放器"
 

@@ -12468,6 +12468,18 @@ msgstr "许可证导入成功"
 msgid "Invalid license"
 msgstr "许可证无效"
 
+msgid "Connection refused"
+msgstr "连接被拒绝"
+
+msgid "Connection timeout"
+msgstr "连接超时"
+
+msgid "Unable to resolve the address"
+msgstr "无法解析地址"
+
+msgid "Unable to connect to the host"
+msgstr "无法连接到主机"
+
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"
 
