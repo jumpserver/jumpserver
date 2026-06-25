@@ -15,6 +15,7 @@ from common.serializers import (
 )
 from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from django.utils.translation import gettext
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -266,10 +267,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             try:
                 platform = self.fields['platform'].to_internal_value(platform_data)
             except serializers.ValidationError as exc:
-                raise serializers.ValidationError({'platform': exc.detail})
+                raise serializers.ValidationError({gettext('Platform'): exc.detail})
 
         if not platform:
-            raise serializers.ValidationError({'platform': _("Platform not exist")})
+            raise serializers.ValidationError({gettext('Platform'): _("Platform not exist")})
         return platform
 
     def validate_zone(self, value):
