@@ -21,7 +21,10 @@ from rest_framework import status
 from .utils import set_current_request
 from common.utils.common import text_hmac_sha256
 
-IGNORE_CSRF_CHECK = '*' in os.getenv("DOMAINS", "").split(',')
+
+def ignore_csrf_check():
+    domains = getattr(settings, 'DOMAINS', '') or os.getenv("DOMAINS", "")
+    return '*' in [domain.strip() for domain in domains.split(',') if domain.strip()]
 
 
 class TimezoneMiddleware:
@@ -198,8 +201,12 @@ class SafeRedirectMiddleware:
 
 
 class CsrfCheckMiddleware(CsrfViewMiddleware):
-    def _origin_verified(self, request):
-        if IGNORE_CSRF_CHECK:
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        if ignore_csrf_check():
             request._dont_enforce_csrf_checks = True
+        return super().process_view(request, callback, callback_args, callback_kwargs)
+
+    def _origin_verified(self, request):
+        if ignore_csrf_check():
             return True
         return super()._origin_verified(request)

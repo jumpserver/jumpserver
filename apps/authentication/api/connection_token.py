@@ -18,7 +18,7 @@ from accounts.const import AliasAccount
 from acls.notifications import AssetLoginReminderMsg
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string, get_logger, get_request_ip_or_data
+from common.utils import random_string, get_logger, get_request_ip_or_data, check_otp_code
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
@@ -412,8 +412,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         account_name = data.get('account')
         protocol = data.get('protocol')
         connect_method = data.get('connect_method')
+        otp_code = data.pop('otp_code', '')
         self.input_username = self.get_input_username(data)
-        _data = self._validate(user, asset, account_name, protocol, connect_method)
+        _data = self._validate(user, asset, account_name, protocol, connect_method, otp_code=otp_code)
         data.update(_data)
         return serializer
 
@@ -426,7 +427,15 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_alias, protocol, connect_method):
+    @staticmethod
+    def _validate_account_otp(account, otp_code):
+        otp_secret_key = getattr(account, 'otp_secret_key', '')
+        if not otp_secret_key:
+            return
+        if not otp_code or not check_otp_code(otp_secret_key, otp_code):
+            raise ValidationError({'otp_code': _('OTP code invalid, or server time error')})
+
+    def _validate(self, user, asset, account_alias, protocol, connect_method, otp_code=''):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -436,6 +445,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             raise ValidationError(_('Anonymous account is not supported for this asset'))
 
         account = self._validate_perm(user, asset, account_alias, protocol)
+        self._validate_account_otp(account, otp_code)
         if account.has_secret:
             data['input_secret'] = ''
             data['input_secret_type'] = account.secret_type

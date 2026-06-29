@@ -3,6 +3,7 @@
 import os
 
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -112,7 +113,8 @@ class SessionAuthentication(authentication.SessionAuthentication):
         if not user or not user.is_active or not user.is_valid:
             return None
 
-        ignore_csrf_check = os.environ.get("DOMAINS", "") == "*"
+        domains = getattr(settings, 'DOMAINS', '') or os.environ.get("DOMAINS", "")
+        ignore_csrf_check = '*' in [domain.strip() for domain in domains.split(',') if domain.strip()]
         if not ignore_csrf_check:
             try:
                 self.enforce_csrf(request)

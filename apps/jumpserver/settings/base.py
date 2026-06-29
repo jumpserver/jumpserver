@@ -75,6 +75,7 @@ ALLOWED_DOMAINS = [host.strip() for host in ALLOWED_DOMAINS]
 ALLOWED_DOMAINS = [host.replace('http://', '').replace('https://', '') for host in ALLOWED_DOMAINS if host]
 ALLOWED_DOMAINS = [host.split('/')[0] for host in ALLOWED_DOMAINS if host]
 ALLOWED_DOMAINS = [re.sub(':80$|:443$', '', host) for host in ALLOWED_DOMAINS]
+ALLOW_ALL_DOMAINS = '*' in ALLOWED_DOMAINS
 
 DEBUG_HOSTS = ('127.0.0.1', 'localhost', 'core')
 DEBUG_PORT = ['8080', '80', ]
@@ -92,8 +93,7 @@ ALLOWED_HOSTS = ['*']
 # https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = []
 for host_port in ALLOWED_DOMAINS:
-    if '*' in ALLOWED_DOMAINS:
-        CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
+    if ALLOW_ALL_DOMAINS:
         break
     origin = host_port.strip('.')
 
@@ -111,13 +111,23 @@ for host_port in ALLOWED_DOMAINS:
     for schema in ['https', 'http']:
         if is_local_origin and schema == 'https':
             continue
-        CSRF_TRUSTED_ORIGINS.append('{}://*.{}'.format(schema, origin))
+        exact_origin = '{}://{}'.format(schema, origin)
+        wildcard_origin = '{}://*.{}'.format(schema, origin)
+        CSRF_TRUSTED_ORIGINS.append(exact_origin)
+        if not is_local_origin:
+            CSRF_TRUSTED_ORIGINS.append(wildcard_origin)
 
-CORS_ALLOWED_ORIGINS = [o.replace('*.', '') for o in CSRF_TRUSTED_ORIGINS]
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CSRF_TRUSTED_ORIGINS))
+if ALLOW_ALL_DOMAINS:
+    CORS_ALLOW_ALL_ORIGINS = True
+    CORS_ALLOWED_ORIGINS = []
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = list(dict.fromkeys(o.replace('*.', '') for o in CSRF_TRUSTED_ORIGINS))
 CSRF_FAILURE_VIEW = 'jumpserver.views.other.csrf_failure'
 # print("CSRF_TRUSTED_ORIGINS: ")
 # for origin in CSRF_TRUSTED_ORIGINS:
-# print('  - ' + origin)
+#     print('  - ' + origin)
 # Max post update field num
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 

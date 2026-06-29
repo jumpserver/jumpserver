@@ -61,15 +61,20 @@ class NodePermedSerializer(serializers.ModelSerializer):
 class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
     username = serializers.CharField(source='full_username', read_only=True)
+    has_otp_secret_key = serializers.SerializerMethodField()
     date_expired = serializers.SerializerMethodField()
 
     class Meta:
         model = Account
         fields = [
             'id', 'alias', 'name', 'username', 'has_username',
-            'has_secret', 'secret_type', 'actions', 'date_expired'
+            'has_secret', 'has_otp_secret_key', 'secret_type', 'actions', 'date_expired'
         ]
         read_only_fields = fields
+
+    @staticmethod
+    def get_has_otp_secret_key(obj) -> bool:
+        return bool(getattr(obj, 'otp_secret_key', ''))
 
     def get_date_expired(self, obj) -> str:
         dt = obj.date_expired
