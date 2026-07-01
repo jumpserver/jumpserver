@@ -280,7 +280,8 @@ def main():
         login_port=dict(type='int', default=1433),
         script=dict(required=True),
         output=dict(default='default', choices=['dict', 'default']),
-        params=dict(type='dict'),
+        # 防止 params 中的密码出现在日志中
+        params=dict(type='dict', no_log=True),
         transaction=dict(type='bool', default=True),
         tds_version=dict(type='str', required=False, default=None),
         encryption=dict(type='str', required=False, default=None)
