@@ -2,23 +2,13 @@
 #
 
 import json
-import os
 from collections import defaultdict
 from copy import deepcopy
 
-from authentication.backends.ldap import (
-    LDAPAuthorizationBackend,
-    LDAPHAAuthorizationBackend,
-    LDAPUser,
-)
-from common.const import LDAP_AD_ACCOUNT_DISABLE
-from common.db.utils import close_old_connections
-from common.utils import get_logger, timeit
-from common.utils.http import is_true
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
-from ldap3 import SIMPLE, Connection, Server
+from ldap3 import SIMPLE, Connection, Server, Tls
 from ldap3.core.exceptions import (
     LDAPAttributeError,
     LDAPBindError,
@@ -34,8 +24,14 @@ from ldap3.core.exceptions import (
     LDAPUserNameIsMandatoryError,
 )
 from ldap3.utils.conv import escape_filter_chars
+
+from common.const import LDAP_AD_ACCOUNT_DISABLE
+from common.db.utils import close_old_connections
+from common.utils import get_logger, timeit
+from common.utils.http import is_true
 from orgs.utils import tmp_to_org
 from settings.const import ImportStatus
+from settings.ldap_tls import LDAPTLSUtil
 from users.models import User, UserGroup
 from users.utils import construct_user_email
 
@@ -724,6 +720,7 @@ class LDAPTestUtil(object):
         try:
             self._test_config()
         except LDAPInvalidServerError as e:
+            raise e
             msg = _('Error (Invalid LDAP server): {}').format(e)
         except LDAPBindError as e:
             msg = _('Error (Invalid Bind DN): {}').format(e)
