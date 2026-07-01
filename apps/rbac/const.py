@@ -37,6 +37,7 @@ exclude_permissions = (
     ('assets', 'cluster', '*', '*'),
     ('assets', 'systemuser', '*', '*'),
     ('assets', 'favoriteasset', '*', '*'),
+    ('assets', 'favoritefolder', '*', '*'),
     ('assets', 'assetuser', '*', '*'),
     ('assets', 'web', '*', '*'),
     ('assets', 'host', '*', '*'),

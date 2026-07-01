@@ -27,13 +27,14 @@ p {
         </ul>
     </div>
 
+    {% if MORE_DOWNLOADS_URL %}
     <div class="group">
-        <h2> {{ VENDOR }} {% trans 'Offline video player' %} v{{ VIDEO_PLAYER_VERSION }}</h2>
+        <h2> {% trans 'More download' %} </h2>
         <ul>
-            <li><a href="/download/public/VideoPlayer-{{ VIDEO_PLAYER_VERSION }}.dmg">{{ VENDOR|lower }}-video-player.dmg</a></li>
-            <li><a href="/download/public/VideoPlayer-{{ VIDEO_PLAYER_VERSION }}.exe">{{ VENDOR|lower }}-video-player.exe</a></li>
+            <li><a href="{{ MORE_DOWNLOADS_URL }}">{% trans 'Tools and applications' %}</a></li>
         </ul>
     </div>
+    {% endif %}
 </div>
     <style>
     ul {

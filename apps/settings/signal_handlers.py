@@ -10,8 +10,9 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.utils.functional import LazyObject
-from jumpserver.const import BASE_DIR
+from django.apps import apps
 
+from jumpserver.const import BASE_DIR
 from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
@@ -64,6 +65,26 @@ def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
     setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
+
+
+def update_site_url():
+    site_url = Setting.objects.filter(name='SITE_URL').first()
+    host_ip = os.environ.get('HOST_IP')
+    if not host_ip:
+        return
+    if not site_url:
+        site_url = Setting.objects.create(name='SITE_URL')
+
+    if site_url.cleaned_value == f'http://127.0.0.1' or not site_url.cleaned_value:
+        site_url.cleaned_value = f'https://{host_ip}'
+        site_url.save()
+
+
+@receiver(post_migrate)
+def after_migrate_some_config(sender, app_config, **kwargs):
+    last_app = list(apps.get_app_configs())[-1]
+    if app_config.name == last_app.name:
+        update_site_url()
 
 
 @receiver(django_ready)

@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from audits.models import UserSession
 from common.sessions.cache import user_session_manager
 from .signals import post_auth_failed, backend_auth_failed

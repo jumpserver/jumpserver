@@ -73,12 +73,13 @@ class VirtualAccount(JMSOrgBaseModel):
     def get_manual_account(cls, input_username='', input_secret='', input_secret_type='', from_permed=True):
         """ @INPUT 手动登录的账号(any) """
         from .account import Account
+        from accounts.utils import validate_account_username
         if from_permed:
             username = AliasAccount.INPUT.value
             secret = ''
             secret_type = 'password'
         else:
-            username = input_username
+            username = validate_account_username(input_username)
             secret = input_secret
             secret_type = input_secret_type or 'password'
         return Account(name=AliasAccount.INPUT.label, username=username, secret=secret, secret_type=secret_type)

@@ -267,6 +267,10 @@ class SecurityBasicSerializer(serializers.Serializer):
     SECURITY_INSECURE_COMMAND = serializers.BooleanField(
         required=False, label=_('Insecure command alert')
     )
+    SECURITY_ACCOUNT_USERNAME_FORBIDDEN_CHARS = serializers.CharField(
+        required=False, allow_blank=True, label=_('Account username forbidden characters'),
+        max_length=128
+    )
     SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER = serializers.CharField(
         max_length=8192, required=False, allow_blank=True, label=_('Email recipient'),
         help_text=_('Multiple user using , split')

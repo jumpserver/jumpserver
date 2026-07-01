@@ -44,7 +44,7 @@
 
 {% block custom_foot_js %}
     <script>
-    var ttl = 2
+    var ttl = 1
     var message = ''
     var time = '{{ interval }}'
     {% if error %}
@@ -55,7 +55,7 @@
     var redirect_url = '{{ redirect_url|escapejs }}'
 
     function redirect_page() {
-        if (time >= 0) {
+        if (time > 0) {
             var msg = message + '， <b>' + time + '</b> ...';
             $('#messages').html(msg);
             time -= ttl;

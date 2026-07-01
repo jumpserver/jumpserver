@@ -237,6 +237,29 @@ class AssetAccountBulkCreateApi(CreateAPIView):
     }
 
     @staticmethod
+    def format_validation_error(detail):
+        # The bulk result modal expects a flat error string for each asset row.
+        if isinstance(detail, dict):
+            errors = []
+            for messages in detail.values():
+                if isinstance(messages, (list, tuple)):
+                    messages = ', '.join([str(message) for message in messages])
+                errors.append(str(messages))
+            return '; '.join(errors)
+        if isinstance(detail, (list, tuple)):
+            return '; '.join([str(item) for item in detail])
+        return str(detail)
+
+    @classmethod
+    def make_error_results(cls, assets, payload, detail):
+        account = payload.get('name') or payload.get('username') or ''
+        error = cls.format_validation_error(detail)
+        return [
+            {'asset': asset, 'account': account, 'state': 'error', 'error': error}
+            for asset in assets
+        ]
+
+    @staticmethod
     def get_all_assets(base_payload: dict):
         nodes = base_payload.pop('nodes', [])
         asset_ids = base_payload.pop('assets', [])
@@ -277,7 +300,10 @@ class AssetAccountBulkCreateApi(CreateAPIView):
                 else:
                     result.append(data)
             except drf_serializers.ValidationError as e:
-                errors.extend(list(e.detail))
+                if isinstance(e.detail, (list, tuple)) and all(isinstance(item, dict) for item in e.detail):
+                    result.extend(e.detail)
+                else:
+                    result.extend(self.make_error_results(assets, _payload, e.detail))
             except Exception as e:
                 errors.extend([str(e)])
 

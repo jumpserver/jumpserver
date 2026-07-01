@@ -102,6 +102,8 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
             user, err = self.create_user_if_not_exist(user_id, other_info=other_info)
             if err is not None:
                 response = self.get_failed_response(login_url, title=err[0], msg=err[1])
+                if getattr(request, 'user_need_delete', False):
+                    user.delete()
                 return response
 
         try:

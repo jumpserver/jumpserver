@@ -1,6 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from common.api import JMSGenericViewSet
 from common.const.http import GET, PATCH, POST
@@ -11,6 +12,8 @@ from ..serializers import (
     SiteMessageSendSerializer,
 )
 from ..site_msg import SiteMessageUtil
+from ..models import MessageContent
+
 
 __all__ = ('SiteMessageViewSet',)
 
@@ -59,5 +62,14 @@ class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
     def send(self, request, **kwargs):
         s = self.get_serializer(data=request.data)
         s.is_valid(raise_exception=True)
-        SiteMessageUtil.send_msg(**s.validated_data, sender=request.user)
+        site_msg = SiteMessageUtil.send_msg(**s.validated_data, sender=request.user)
+        if site_msg:
+            return Response({'detail': 'ok', 'site_msg_id': str(site_msg.id)})
+        else:
+            return Response({'detail': 'error'})
+
+    @action(methods=[PATCH], detail=True, permission_classes=[OnlySuperUser,])
+    def revoke(self, request, **kwargs):
+        msg = get_object_or_404(MessageContent, id=kwargs['pk'])
+        msg.revoke_msg()
         return Response({'detail': 'ok'})

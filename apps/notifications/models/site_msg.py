@@ -52,8 +52,15 @@ class MessageContent(JMSBaseModel):
         return {
             'id': str(self.id),
             'subject': self.subject,
+            'is_broadcast': self.is_broadcast,
             'message': self.message,
             'display_mode': self.display_mode,
             'date_created': str(self.date_created),
             'sender': str(self.sender) if self.sender else ''
         }
+    
+    def revoke_msg(self):
+        if not self.is_broadcast:
+            return
+        self.is_broadcast = False
+        self.save()

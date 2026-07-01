@@ -365,4 +365,3 @@
   return MetisMenu;
 
 })));
-//# sourceMappingURL=metisMenu.js.map

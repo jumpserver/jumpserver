@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import shlex
 import sys
 from collections import defaultdict
 
@@ -10,6 +11,14 @@ from django.utils.translation import gettext as _
 from assets import const
 
 __all__ = ['JMSInventory']
+
+
+def shell_join(args):
+    return ' '.join(shlex.quote(str(arg)) for arg in args)
+
+
+def escape_ssh_config_percent(value):
+    return str(value).replace('%', '%%')
 
 
 class JMSInventory:
@@ -63,27 +72,32 @@ class JMSInventory:
         return protocol.setting
 
     def make_proxy_command(self, gateway, path_dir):
-        proxy_command_list = [
-            "ssh", "-o", "Port={}".format(gateway.port),
+        gateway_target = "{}@{}".format(
+            escape_ssh_config_percent(gateway.username),
+            escape_ssh_config_percent(gateway.address),
+        )
+        proxy_command_args = [
+            "ssh", "-o", "Port={}".format(escape_ssh_config_percent(gateway.port)),
             "-o", "StrictHostKeyChecking=no",
-            f"{gateway.username}@{gateway.address}"
         ]
+
+        if gateway.private_key:
+            proxy_command_args.extend([
+                "-i", escape_ssh_config_percent(gateway.get_private_key_path(path_dir))
+            ])
 
         setting = self.get_gateway_ssh_settings(gateway)
         if setting.get('nc', False):
-            proxy_command_list.extend(["nc", "-w", "10", "%h", "%p"])
+            proxy_command_args.extend(["--", gateway_target, "nc", "-w", "10", "%h", "%p"])
         else:
-            proxy_command_list.extend(["-W", "%h:%p", "-q"])
+            proxy_command_args.extend(["-W", "%h:%p", "-q", "--", gateway_target])
 
         if gateway.password:
-            password = gateway.password.replace("%", "%%")
-            proxy_command_list.insert(0, f"sshpass -p '{password}'")
+            password = escape_ssh_config_percent(gateway.password)
+            proxy_command_args = ["sshpass", "-p", password, *proxy_command_args]
 
-        if gateway.private_key:
-            proxy_command_list.append(f"-i {gateway.get_private_key_path(path_dir)}")
-
-        proxy_command = f"-o ProxyCommand='{' '.join(proxy_command_list)}'"
-        return {"ansible_ssh_common_args": proxy_command}
+        proxy_command_value = "ProxyCommand=" + shell_join(proxy_command_args)
+        return {"ansible_ssh_common_args": "-o " + shlex.quote(proxy_command_value)}
 
     def make_account_ansible_vars(self, asset, account, path_dir):
         username = self.get_username(asset, account)

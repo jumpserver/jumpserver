@@ -41,6 +41,7 @@ class SiteMessageUtil:
             site_msg.users.add(*user_ids)
             # 只有调用 save 才能触发 post_save 信号
             site_msg.save()
+        return site_msg
 
     @classmethod
     def get_user_all_msgs(cls, user_id):

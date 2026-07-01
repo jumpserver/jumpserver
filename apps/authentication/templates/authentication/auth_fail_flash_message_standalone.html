@@ -56,7 +56,7 @@
     }
 
     function redirect_page() {
-        if (time >= 0) {
+        if (time > 0) {
             var msg = message + '， <b>' + time + '</b> ...';
             $('#messages').html(msg);
             time--;

@@ -7,53 +7,50 @@ from django.utils.translation import gettext_lazy as _
 
 import yaml
 from django.conf import settings
-from django.http import FileResponse, Http404
+from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from common.permissions import OnlySuperUser
 from common.utils import get_logger
-from .driver import cert_vd_cfg
+from .sdk import ukey_sdk_config
+from .utils import is_sm2_pem
 
 
-__all__ = ['VendorDriverFileAPIView', 'CertVendorDriverConfigAPIView']
+__all__ = ['UKeySDKScriptFileAPIView', 'UKeySDKConfigFileAPIView']
 
 logger = get_logger(__name__)
 
 
-class VendorDriverFileAPIView(APIView):
+class UKeySDKScriptFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
-    @method_decorator(cache_control(public=True, max_age=3600))
     def get(self, request):
-        js_file = cert_vd_cfg.driver_js_file
-        if not js_file or not os.path.isfile(js_file):
+        content = ukey_sdk_config.load_sdk_script_content()
+        if content is None:
             raise Http404
-        response = FileResponse(open(js_file, 'rb'), content_type='application/javascript')
-        response['Cache-Control'] = 'public, max-age=3600'
-        return response
+        return HttpResponse(content, content_type='application/javascript')
 
 
-class CertVendorDriverConfigAPIView(APIView):
+class UKeySDKConfigFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
-        data = cert_vd_cfg.get_vendor_sdk_data(lang=lang)
+        data = ukey_sdk_config.get_sdk_config(lang=lang)
         return Response(data)
 
 
-class CertEnrollAPIView(APIView):
-    permission_classes = (OnlySuperUser,)
-
-    # SM2 曲线 OID：1.2.156.10197.1.301
-    # DER 编码：06 08 2a 81 1c cf 55 01 82 2d
-    _SM2_OID_DER = bytes([0x06, 0x08, 0x2a, 0x81, 0x1c, 0xcf, 0x55, 0x01, 0x82, 0x2d])
+class UKeyCertEnrollAPIView(APIView):
+    rbac_perms = {
+        'POST': 'users.change_user',
+    }
 
     def post(self, request):
-        if not cert_vd_cfg.enroll_enabled:
+        if not ukey_sdk_config.enroll_enabled:
             data = {'error': _('Certificate enrollment is not enabled')}
             return Response(data=data, status=400)
 
@@ -121,14 +118,8 @@ class CertEnrollAPIView(APIView):
         )
 
     def _is_sm2_csr(self, csr_pem):
-        """
-        通过查找 SM2 曲线 OID 字节序列判断 CSR 是否使用 SM2 算法，
-        无需调用外部工具。
-        """
-        pem_lines = csr_pem.strip().splitlines()
-        b64 = ''.join(ln for ln in pem_lines if not ln.startswith('-----'))
-        der = base64.b64decode(b64)
-        return self._SM2_OID_DER in der
+        """通过查找 SM2 曲线 OID 字节序列判断 CSR 是否使用 SM2 算法。"""
+        return is_sm2_pem(csr_pem)
 
     def sign_cert_by_other(self, csr_pem):
         import datetime
@@ -144,21 +135,19 @@ class CertEnrollAPIView(APIView):
         if not isinstance(pub_key, rsa.RSAPublicKey):
             raise ValueError('Unsupported key type: {}'.format(type(pub_key).__name__))
 
-        ca_key_path = cert_vd_cfg.ca_key_file
-        ca_cert_path = cert_vd_cfg.ca_cert_file
-        ca_key_pass = cert_vd_cfg.ca_key_pass
-        if not ca_key_path or not os.path.isfile(ca_key_path):
-            raise FileNotFoundError('CA_KEY_FILE not configured or not found')
-        if not ca_cert_path or not os.path.isfile(ca_cert_path):
-            raise FileNotFoundError('CA_CERT_FILE not configured or not found')
+        ca_key_content = ukey_sdk_config.ca_key_content
+        ca_cert_content = ukey_sdk_config.ca_cert_content
+        ca_key_pass = ukey_sdk_config.ca_key_pass
+        if not ca_key_content:
+            raise ValueError('AUTH_UKEY_CA_KEY_CONTENT not configured')
+        if not ca_cert_content:
+            raise ValueError('AUTH_UKEY_CA_CERT_CONTENT not configured')
 
-        with open(ca_cert_path, 'rb') as f:
-            ca_cert = x509.load_pem_x509_certificate(f.read())
-        with open(ca_key_path, 'rb') as f:
-            password = ca_key_pass.encode() if ca_key_pass else None
-            ca_key = serialization.load_pem_private_key(f.read(), password=password)
+        ca_cert = x509.load_pem_x509_certificate(ca_cert_content.encode())
+        password = ca_key_pass.encode() if ca_key_pass else None
+        ca_key = serialization.load_pem_private_key(ca_key_content.encode(), password=password)
 
-        validity_days = cert_vd_cfg.enroll_validity_days
+        validity_days = ukey_sdk_config.enroll_validity_days
         now = datetime.datetime.now(datetime.timezone.utc)
         cert = (
             x509.CertificateBuilder()
@@ -179,24 +168,36 @@ class CertEnrollAPIView(APIView):
         命令示例：
           gmssl reqsign -in user.csr -days 365 -cacert root.crt -key root.key -pass 123456 -out user.crt
         """
-        gmssl_bin = cert_vd_cfg.gmssl_bin
-        ca_key_path = cert_vd_cfg.ca_key_file
-        ca_cert_path = cert_vd_cfg.ca_cert_file
-        ca_key_pass = str(cert_vd_cfg.ca_key_pass)
-        if not ca_key_path or not os.path.isfile(ca_key_path):
-            raise FileNotFoundError('CA_KEY_FILE not configured or not found')
-        if not ca_cert_path or not os.path.isfile(ca_cert_path):
-            raise FileNotFoundError('CA_CERT_FILE not configured or not found')
+        gmssl_bin = ukey_sdk_config.gmssl_bin
+        ca_key_content = ukey_sdk_config.ca_key_content
+        ca_cert_content = ukey_sdk_config.ca_cert_content
+        ca_key_pass = ukey_sdk_config.ca_key_pass
+        if not ca_key_content:
+            raise ValueError('AUTH_UKEY_CA_KEY_CONTENT not configured')
+        if not ca_cert_content:
+            raise ValueError('AUTH_UKEY_CA_CERT_CONTENT not configured')
 
-        validity_days = str(cert_vd_cfg.enroll_validity_days)
+        validity_days = str(ukey_sdk_config.enroll_validity_days)
 
-        csr_file = cert_file = None
+        csr_file = ca_cert_file = ca_key_file = cert_file = None
         try:
             with tempfile.NamedTemporaryFile(
                 suffix='.csr', mode='w', delete=False, encoding='utf-8'
             ) as f:
                 f.write(csr_pem)
                 csr_file = f.name
+
+            with tempfile.NamedTemporaryFile(
+                suffix='.crt', mode='w', delete=False, encoding='utf-8'
+            ) as f:
+                f.write(ca_cert_content)
+                ca_cert_file = f.name
+
+            with tempfile.NamedTemporaryFile(
+                suffix='.key', mode='w', delete=False, encoding='utf-8'
+            ) as f:
+                f.write(ca_key_content)
+                ca_key_file = f.name
 
             fd, cert_file = tempfile.mkstemp(suffix='.crt')
             os.close(fd)
@@ -209,8 +210,8 @@ class CertEnrollAPIView(APIView):
                 gmssl_bin, 'reqsign',
                 '-in', csr_file,
                 '-days', validity_days,
-                '-cacert', ca_cert_path,
-                '-key', ca_key_path,
+                '-cacert', ca_cert_file,
+                '-key', ca_key_file,
                 '-out', cert_file,
             ]
             if ca_key_pass:
@@ -228,6 +229,6 @@ class CertEnrollAPIView(APIView):
             with open(cert_file, 'r', encoding='utf-8') as f:
                 return f.read()
         finally:
-            for path in (csr_file, cert_file):
+            for path in (csr_file, ca_cert_file, ca_key_file, cert_file):
                 if path and os.path.exists(path):
                     os.unlink(path)

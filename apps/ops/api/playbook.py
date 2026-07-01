@@ -66,6 +66,10 @@ class PlaybookViewSet(JMSBulkModelViewSet):
         clone_id = self.request.query_params.get('clone_from')
 
         if clone_id:
+            queryset = self.get_queryset()
+            clone_from = queryset.filter(id=clone_id).first()
+            if not clone_from:
+                raise JMSException(code='invalid_clone_id', detail={"msg": "Invalid clone_from id"})
             src_path = safe_join(base_path, clone_id)
             dest_path = safe_join(base_path, str(instance.id))
             if not os.path.exists(src_path):

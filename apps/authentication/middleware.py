@@ -8,9 +8,8 @@ from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
-from apps.authentication import mixins
+from authentication import mixins
 from audits.signal_handlers import send_login_info_to_reviewers
-from authentication.signals import post_auth_failed, post_auth_success
 from common.utils import gen_key_pair, gen_gm_key_pair
 from common.utils import get_request_ip
 
@@ -86,9 +85,9 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             else:
                 error_message = getattr(e, 'msg', None)
                 error_message = error_message or str(e)
-                post_auth_failed.send(
-                    sender=self.__class__, username=request.user.username,
-                    request=self.request, reason=error_message
+                self.send_auth_signal(
+                    success=False, username=request.user.username,
+                    reason=error_message, request=request
                 )
             auth_logout(request)
             context = {
@@ -101,17 +100,17 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
             return response
         else:
-            if not self.request.session.get('auth_confirm_required'):
-                post_auth_success.send(
-                    sender=self.__class__, user=request.user, request=self.request
-                )
+            if self.request.session.get('auth_confirm_required'):
+                guard_url = reverse('authentication:login-guard')
+                args = request.META.get('QUERY_STRING', '')
+                if args:
+                    guard_url = "%s?%s" % (guard_url, args)
+                response = redirect(guard_url)
                 return response
-            guard_url = reverse('authentication:login-guard')
-            args = request.META.get('QUERY_STRING', '')
-            if args:
-                guard_url = "%s?%s" % (guard_url, args)
-            response = redirect(guard_url)
-            return response
+            else:
+                self.send_auth_signal(success=True, user=request.user, request=request)
+                self.request.session.pop('auth_third_party_required', '')
+                return response
         finally:
             if request.session.get('can_send_notifications') and \
                     self.request.session.get('auth_notice_required'):
