@@ -399,7 +399,15 @@ class Ticket(StatusMixin, JMSBaseModel):
         if ticket:
             last_num = ticket.serial_num[8:]
             last_num = int(last_num)
-        num = '%04d' % (last_num + 1)
+                
+        next_num = last_num + 1
+        if next_num > 9999:
+            raise JMSException(
+                detail=_("Today's ticket creation limit (9999) has been reached. Please try again tomorrow."),
+                code="ticket_daily_limit_reached"
+            )
+        
+        num = '%04d' % next_num
         return f'{date_prefix}{num}'
 
     def set_serial_num(self):

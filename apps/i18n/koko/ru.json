@@ -223,5 +223,6 @@
     "refresh your assets and nodes": "обновить информацию об активах и папках",
     "select one asset to login": "выберите один из активов для входа",
     "to search login if unique": "найти подключение (если результат уникальный)",
-    "to search, such as: /192.168": "выполнить поиск, например: /192.168"
+    "to search, such as: /192.168": "выполнить поиск, например: /192.168",
+    "File transfer error, file transfer interrupted": "Ошибка передачи файла, передача файла была прервана"
 }

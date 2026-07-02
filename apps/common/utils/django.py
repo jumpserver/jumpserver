@@ -119,3 +119,13 @@ def safe_next_url(next_url, request=None):
     if not next_url or not url_has_allowed_host_and_scheme(next_url, safe_hosts):
         next_url = '/'
     return next_url
+
+
+def send_mail(subject, message, recipient=None, **kwargs):
+    from django.core.mail import send_mail as django_send_mail
+
+    subject = (settings.EMAIL_SUBJECT_PREFIX or '') + subject
+    from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
+    recipient_list = [recipient] if isinstance(recipient, str) else recipient
+
+    django_send_mail(subject, message, from_email, recipient_list, **kwargs)

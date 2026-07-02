@@ -1,6 +1,6 @@
 
 from .ecc import *
-from .exception import PiicoError
+from .exception import GMDeviceError
 
 
 class BaseMixin:
@@ -69,20 +69,20 @@ class SM3Mixin(BaseMixin):
     def hash_init(self, alg_id):
         ret = self._driver.SDF_HashInit(self._session, c_int(alg_id), None, None, c_int(0))
         if ret != 0:
-            raise PiicoError("hash init failed,alg id is {}".format(alg_id), ret)
+            raise GMDeviceError("hash init failed,alg id is {}".format(alg_id), ret)
 
     def hash_update(self, data):
         data = (c_ubyte * len(data))(*data)
         ret = self._driver.SDF_HashUpdate(self._session, data, c_int(len(data)))
         if ret != 0:
-            raise PiicoError("hash update failed", ret)
+            raise GMDeviceError("hash update failed", ret)
 
     def hash_final(self):
         result_data = (c_ubyte * 32)()
         result_length = c_int()
         ret = self._driver.SDF_HashFinal(self._session, result_data, pointer(result_length))
         if ret != 0:
-            raise PiicoError("hash final failed", ret)
+            raise GMDeviceError("hash final failed", ret)
         return bytes(result_data[:result_length.value])
 
 
@@ -95,7 +95,7 @@ class SM4Mixin(BaseMixin):
         key = c_void_p()
         ret = self._driver.SDF_ImportKey(self._session, key_val, c_int(len(key_val)), pointer(key))
         if ret != 0:
-            raise PiicoError("import key failed", ret)
+            raise GMDeviceError("import key failed", ret)
         return key
 
     def destroy_cipher_key(self, key):
@@ -120,10 +120,10 @@ class SM4Mixin(BaseMixin):
             ret = self._driver.SDF_Encrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
                                            pointer(temp_data_length))
             if ret != 0:
-                raise PiicoError("encrypt failed", ret)
+                raise GMDeviceError("encrypt failed", ret)
         else:
             ret = self._driver.SDF_Decrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
                                            pointer(temp_data_length))
             if ret != 0:
-                raise PiicoError("decrypt failed", ret)
+                raise GMDeviceError("decrypt failed", ret)
         return temp_data[:temp_data_length.value]

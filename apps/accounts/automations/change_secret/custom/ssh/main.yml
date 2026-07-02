@@ -23,6 +23,7 @@
         recv_timeout: "{{ params.recv_timeout | default(30) }}"
       register: ping_info
       delegate_to: localhost
+      connection: local
 
     - name: Change asset password (paramiko)
       custom_command:
@@ -41,6 +42,8 @@
         password: "{{ account.secret }}"
         commands: "{{ params.commands }}"
         answers: "{{ params.answers }}"
+        old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         recv_timeout: "{{ params.recv_timeout | default(30) }}"
         delay_time: "{{ params.delay_time | default(2) }}"
         prompt: "{{ params.prompt | default('.*') }}"
@@ -48,6 +51,7 @@
       when: ping_info is succeeded and check_conn_after_change
       register: change_info
       delegate_to: localhost
+      connection: local
 
     - name: Verify password (paramiko)
       ssh_ping:
@@ -64,4 +68,5 @@
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         recv_timeout: "{{ params.recv_timeout | default(30) }}"
       delegate_to: localhost
+      connection: local
       when: check_conn_after_change

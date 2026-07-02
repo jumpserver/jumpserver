@@ -26,7 +26,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
         'get_account_secret': 'accounts.view_integrationapplication',
-        'get_sdks_info': 'accounts.view_integrationapplication'
+        'get_sdks_info': 'accounts.view_integrationapplication',
+        'refresh_secret': 'accounts.change_integrationapplication',
     }
 
     def read_file(self, path):
@@ -63,6 +64,15 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     def get_once_secret(self, request, *args, **kwargs):
         instance = self.get_object()
         return Response(data={'id': instance.id, 'secret': instance.secret})
+    
+    @action(
+        ['GET'], detail=True, url_path='refresh-secret',
+        permission_classes=[RBACPermission]
+    )
+    def refresh_secret(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.refresh_secret()
+        return Response(data={'id': instance.id, 'msg': 'Successfully refreshed secret'})
 
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])

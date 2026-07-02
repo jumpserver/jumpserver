@@ -14,7 +14,6 @@ from .custom import CustomTypes
 from .database import DatabaseTypes
 from .device import DeviceTypes
 from .ds import DirectoryTypes
-from .gpt import GPTTypes
 from .host import HostTypes
 from .web import WebTypes
 
@@ -24,7 +23,8 @@ class AllTypes(ChoicesMixin):
     includes = [
         HostTypes, DeviceTypes, DatabaseTypes,
         CloudTypes, WebTypes, CustomTypes,
-        DirectoryTypes, GPTTypes
+        # DirectoryTypes, GPTTypes
+        DirectoryTypes
     ]
     _category_constrains = {}
     _automation_methods = None

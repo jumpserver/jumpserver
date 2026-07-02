@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='appprovider',
             name='apps',
-            field=models.ManyToManyField(through='terminal.VirtualAppPublication', to='terminal.virtualapp', verbose_name='Virtual app'),
+            field=models.ManyToManyField(through='terminal.VirtualAppPublication', through_fields=('provider', 'app'), to='terminal.virtualapp', verbose_name='Virtual app'),
         ),
         migrations.AddField(
             model_name='appprovider',
@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='applethost',
             name='applets',
-            field=models.ManyToManyField(through='terminal.AppletPublication', to='terminal.applet', verbose_name='Applet'),
+            field=models.ManyToManyField(through='terminal.AppletPublication', through_fields=('host', 'applet'), to='terminal.applet', verbose_name='Applet'),
         ),
         migrations.AddField(
             model_name='applethost',
@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='applet',
             name='hosts',
-            field=models.ManyToManyField(through='terminal.AppletPublication', to='terminal.applethost', verbose_name='Hosts'),
+            field=models.ManyToManyField(through='terminal.AppletPublication', through_fields=('applet', 'host'), to='terminal.applethost', verbose_name='Hosts'),
         ),
         migrations.AlterUniqueTogether(
             name='virtualapppublication',

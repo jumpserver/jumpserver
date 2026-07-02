@@ -12,6 +12,15 @@ class SSOAuthentication(JMSBaseAuthBackend):
         pass
 
 
+class CustomSSOAuthentication(JMSBaseAuthBackend):
+    @staticmethod
+    def is_enabled():
+        return settings.AUTH_CUSTOM_SSO
+
+    def authenticate(self):
+        pass
+
+
 class WeComAuthentication(JMSBaseAuthBackend):
     @staticmethod
     def is_enabled():

@@ -79,7 +79,7 @@
     "Download": "Baixar",
     "Download the latest client": "Baixar o cliente mais recente",
     "DownloadClient": "Baixar cliente.",
-    "DownloadClientMsg": "O cliente JumpServer não está instalado, vá agora fazer o download e a instalação.",
+    "DownloadClientMsg": "O cliente não está instalado, vá agora fazer o download e a instalação.",
     "Driver redirect": "Montagem de Disco",
     "Expand": "Expandir",
     "Expand all": "Expandir Tudo",
@@ -117,7 +117,7 @@
     "Host": "Host",
     "Hotkeys": "Teclas de atalho",
     "Info": "Aviso",
-    "InstallClientMsg": "O cliente JumpServer não está instalado, deseja baixá-lo e instalá-lo agora?",
+    "InstallClientMsg": "O cliente não está instalado, deseja baixá-lo e instalá-lo agora?",
     "Japanese keyboard layout": " Japonês (Qwerty) ",
     "Keyboard keys": "Option + Shift + Esquerdo / Direito",
     "Keyboard layout": "Layout de Teclado",
@@ -289,5 +289,6 @@
     "success": " Sucesso",
     "system user": "Usuário do Sistema",
     "tabLimits": "Atualmente, 15 abas estão abertas. Para garantir a estabilidade do sistema, você deseja abrir o Luna em uma nova aba do navegador para continuar a operação?",
-    "user": "Usuário"
+    "user": "Usuário",
+    "MarkAsRead": "Marcar como lido"
 }

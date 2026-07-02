@@ -70,6 +70,8 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
 class UserPasswordApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.UserUpdatePasswordSerializer
+    # patch 方法不允许，否则 old_password 不传会导致用户直接修改密码成功，安全风险大
+    http_method_names = ['put', 'head', 'options']
 
     def get_object(self):
         return self.request.user

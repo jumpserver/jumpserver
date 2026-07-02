@@ -1,3 +1,4 @@
+from django.db.models import query
 from .celery_base import CeleryBaseService
 
 __all__ = ['CeleryDefaultService']
@@ -5,9 +6,9 @@ __all__ = ['CeleryDefaultService']
 
 class CeleryDefaultService(CeleryBaseService):
 
-    def __init__(self, **kwargs):
-        kwargs['queue'] = 'celery'
-        super().__init__(**kwargs)
+    def __init__(self,  **kwargs):
+        queue = kwargs.pop('queue', 'celery')
+        super().__init__(queue=queue, **kwargs)
 
     def start_other(self):
         from terminal.startup import CeleryTerminal

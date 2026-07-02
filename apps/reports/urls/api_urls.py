@@ -1,11 +1,14 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
 from reports import api
 
 app_name = 'reports'
 
+router = DefaultRouter()
+router.register('reports', api.ReportViewSet, 'report')
+
 urlpatterns = [
-    path('reports/', api.ReportViewSet.as_view(), name='report-list'),
     path('reports/users/', api.UserReportApi.as_view(), name='user-list'),
     path('reports/user-change-password/', api.UserChangeSecretApi.as_view(), name='user-change-password'),
     path('reports/asset-statistic/', api.AssetStatisticApi.as_view(), name='asset-statistic'),
@@ -13,3 +16,5 @@ urlpatterns = [
     path('reports/account-statistic/', api.AccountStatisticApi.as_view(), name='account-statistic'),
     path('reports/account-automation/', api.AccountAutomationApi.as_view(), name='account-automation'),
 ]
+
+urlpatterns += router.urls

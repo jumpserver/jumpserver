@@ -5,12 +5,23 @@ from django.db import migrations, connections
 
 def refresh_pg_collation(apps, schema_editor):
     for alias, conn in connections.databases.items():
-        if connections[alias].vendor == "postgresql":
-            dbname = connections[alias].settings_dict["NAME"]
-            connections[alias].cursor().execute(
-                f'ALTER DATABASE "{dbname}" REFRESH COLLATION VERSION;'
-            )
-            print(f"Refreshed postgresql collation version for database: {dbname} successfully.")
+        connection = connections[alias]
+        if connection.vendor == "postgresql":
+            # REFRESH COLLATION VERSION is supported on PostgreSQL 15+
+            try:
+                pg_version = getattr(connection, "pg_version", None)
+            except Exception:
+                pg_version = None
+
+            if pg_version and pg_version >= 150000:
+                dbname = connection.settings_dict["NAME"]
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        f'ALTER DATABASE "{dbname}" REFRESH COLLATION VERSION;'
+                    )
+                print(
+                    f"Refreshed postgresql collation version for database: {dbname} successfully."
+                )
 
 
 class Migration(migrations.Migration):

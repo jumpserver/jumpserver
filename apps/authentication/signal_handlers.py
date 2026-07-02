@@ -4,10 +4,10 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from audits.models import UserSession
 from common.sessions.cache import user_session_manager
-from .signals import post_auth_success, post_auth_failed, user_auth_failed, user_auth_success
+from .signals import post_auth_failed, backend_auth_failed
 
 from .backends.oauth2_provider.signal_handlers import *
 
@@ -43,19 +43,7 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
         user.lang = lang
 
 
-@receiver(cas_user_authenticated)
-def on_cas_user_login_success(sender, request, user, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_CAS
-    post_auth_success.send(sender, user=user, request=request)
-
-
-@receiver(user_auth_success)
-def on_user_login_success(sender, request, user, backend, create=False, **kwargs):
-    request.session['auth_backend'] = backend
-    post_auth_success.send(sender, user=user, request=request)
-
-
-@receiver(user_auth_failed)
+@receiver(backend_auth_failed)
 def on_user_login_failed(sender, username, request, reason, backend, **kwargs):
     request.session['auth_backend'] = backend
     post_auth_failed.send(sender, username=username, request=request, reason=reason)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import os
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -111,10 +112,12 @@ class SessionAuthentication(authentication.SessionAuthentication):
         if not user or not user.is_active or not user.is_valid:
             return None
 
-        try:
-            self.enforce_csrf(request)
-        except exceptions.AuthenticationFailed:
-            return None
+        ignore_csrf_check = os.environ.get("DOMAINS", "") == "*"
+        if not ignore_csrf_check:
+            try:
+                self.enforce_csrf(request)
+            except exceptions.AuthenticationFailed:
+                return None
 
         # CSRF passed with authenticated user
         return user, None

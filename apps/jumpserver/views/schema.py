@@ -1,5 +1,7 @@
 import re
 
+from django.apps import apps
+from django.conf import settings
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
 
@@ -69,6 +71,20 @@ class CustomAutoSchema(AutoSchema):
             tokenized_path.append('formatted')
 
         return '_'.join(tokenized_path + [action])
+
+    def get_description(self):
+        description = super().get_description()
+        base_dir = str(settings.BASE_DIR)
+        my_apps = [
+            app.label for app in apps.get_app_configs()
+            if app.module.__file__ and app.module.__file__.startswith(base_dir)
+        ]
+        view_app = str(self.view.__class__.__module__.split('.')[0])
+        if view_app in my_apps:
+            # 内部 app 的 view 注释不展示在文档里
+            return ''
+        else:
+            return description
 
     def get_filter_parameters(self):
         if not self.should_filter():

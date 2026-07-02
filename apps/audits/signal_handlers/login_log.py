@@ -33,6 +33,7 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _("SSH Key")
         backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _("Password")
         backend_label_mapping[settings.AUTH_BACKEND_SSO] = _("SSO")
+        backend_label_mapping[settings.AUTH_BACKEND_CUSTOM_SSO] = _("Custom SSO")
         backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _("Auth Token")
         backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _("WeCom")
         backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _("FeiShu")

@@ -15,9 +15,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from common.api import CommonApiMixin
+from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import GET, POST
 from common.drf.filters import DatetimeRangeFilterBackend
+from common.drf.throttling import FileTransferThrottle
 from common.permissions import IsServiceAccount
 from common.plugins.es import QuerySet as ESQuerySet
 from common.sessions.cache import user_session_manager
@@ -30,6 +31,9 @@ from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
+from tickets.filters import TicketFilter
+from tickets.models import Ticket
+from tickets.serializers.ticket import TicketSerializer
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices, ActionChoices
@@ -45,13 +49,19 @@ from .serializers import (
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer
 )
+from .reporting import (
+    FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
+    OperateLogReportExporter, JobsAuditReportExporter,
+    JobLogAuditReportExporter,
+)
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
 
 
-class JobLogAuditViewSet(OrgReadonlyModelViewSet):
+class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = JobLog
+    report_exporter_class = JobLogAuditReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
@@ -62,11 +72,12 @@ class JobLogAuditViewSet(OrgReadonlyModelViewSet):
     ordering = ['-date_start']
 
 
-class JobsAuditViewSet(OrgModelViewSet):
+class JobsAuditViewSet(ReportExportMixin, OrgModelViewSet):
     model = Job
     search_fields = ['creator__name', 'args', 'name']
     filterset_fields = ['creator__name', 'args', 'name']
     serializer_class = JobsAuditSerializer
+    report_exporter_class = JobsAuditReportExporter
     ordering = ['-is_periodic', '-date_updated']
     http_method_names = ['get', 'options', 'patch']
 
@@ -91,9 +102,10 @@ class JobsAuditViewSet(OrgModelViewSet):
         return super().perform_update(serializer)
 
 
-class FTPLogViewSet(OrgModelViewSet):
+class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
+    report_exporter_class = FTPLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
@@ -111,6 +123,7 @@ class FTPLogViewSet(OrgModelViewSet):
 
     @action(
         methods=[GET], detail=True, permission_classes=[RBACPermission, ],
+        throttle_classes=[FileTransferThrottle],
         url_path='file/download'
     )
     def download(self, request, *args, **kwargs):
@@ -133,7 +146,9 @@ class FTPLogViewSet(OrgModelViewSet):
         )
         return response
 
-    @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ], serializer_class=FileSerializer)
+    @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ],
+            throttle_classes=[FileTransferThrottle],
+            serializer_class=FileSerializer)
     def upload(self, request, *args, **kwargs):
         ftp_log = self.get_object()
         serializer = self.get_serializer(data=request.data)
@@ -152,9 +167,10 @@ class FTPLogViewSet(OrgModelViewSet):
             return Response({'msg': serializer.errors}, status=401)
 
 
-class UserLoginCommonMixin:
+class UserLoginCommonMixin(ReportExportMixin):
     model = UserLoginLog
     serializer_class = UserLoginLogSerializer
+    report_exporter_class = UserLoginLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
@@ -238,9 +254,10 @@ class ResourceActivityAPIView(generics.ListAPIView):
         return queryset.order_by('-datetime')[:limit]
 
 
-class OperateLogViewSet(OrgReadonlyModelViewSet):
+class OperateLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = OperateLog
     serializer_class = OperateLogSerializer
+    report_exporter_class = OperateLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
@@ -283,9 +300,10 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         return qs
 
 
-class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
+class PasswordChangeLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = PasswordChangeLog
     serializer_class = PasswordChangeLogSerializer
+    report_exporter_class = PasswordChangeLogReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
@@ -297,6 +315,25 @@ class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return self.model.filter_queryset_by_org(queryset)
+
+
+class TicketAuditViewSet(OrgReadonlyModelViewSet):
+    model = Ticket
+    serializer_class = TicketSerializer
+    filterset_class = TicketFilter
+    search_fields = ['title', 'type', 'status']
+    ordering = ('-date_created',)
+    permission_classes = [RBACPermission]
+    rbac_perms = {
+        'list': 'tickets.view_ticket',
+        'retrieve': 'tickets.view_ticket',
+    }
+
+    def get_queryset(self):
+        queryset = self.model.objects.all()
+        if not current_org.is_root():
+            queryset = queryset.filter(org_id=str(current_org.id))
+        return queryset
 
 
 class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):

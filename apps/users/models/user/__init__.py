@@ -13,7 +13,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
-    user_date_expired_default, get_logger, lazyproperty
+    user_date_expired_default, get_logger, lazyproperty, text_hmac_sha256
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
@@ -38,7 +38,8 @@ __all__ = [
 
 class UserManager(_UserManager):
     def get_by_natural_key(self, username_or_mail):
-        q = models.Q(username=username_or_mail) | models.Q(email=username_or_mail)
+        email_lookup = text_hmac_sha256(username_or_mail)
+        q = (models.Q(username=username_or_mail) | models.Q(email_lookup=email_lookup))
         user = self.filter(q).first()
         if not user:
             raise self.model.DoesNotExist
@@ -64,7 +65,10 @@ class User(
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
-    email = models.EmailField(max_length=128, unique=True, verbose_name=_("Email"))
+    email = fields.EncryptCharField(max_length=128, unique=True, verbose_name=_("Email"))
+    email_lookup = models.CharField(
+        max_length=128, blank=True, null=True, verbose_name=_("Email lookup")
+    )
     groups = models.ManyToManyField(
         "users.UserGroup",
         related_name="users",
@@ -145,10 +149,15 @@ class User(
     face_vector = fields.EncryptTextField(
         null=True, blank=True, max_length=2048, verbose_name=_("Face vector")
     )
+    ukey_sn = models.CharField(
+        unique=True, blank=True,
+        null=True, default=None, max_length=128, verbose_name=_('UKey SN')
+    )
     date_api_key_last_used = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Date api key used")
     )
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+
     objects = UserManager()
     DATE_EXPIRED_WARNING_DAYS = 5
 
@@ -162,6 +171,11 @@ class User(
             queryset = current_org.get_members()
         queryset = queryset.exclude(is_service_account=True)
         return queryset
+    
+
+    @property
+    def has_jdmc(self):
+        return self.has_perm("rbac.view_jdmc")
 
     @property
     def secret_key(self):
@@ -309,6 +323,12 @@ class User(
         if self.email and self.source == self.Source.local.value:
             return True
         return False
+
+    def set_ukey_sn(self, ukey_sn):
+        if not isinstance(ukey_sn, str):
+            return
+        self.ukey_sn = ukey_sn.strip()
+        self.save(update_fields=['ukey_sn'])
 
 
 class UserPasswordHistory(models.Model):

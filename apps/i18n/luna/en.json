@@ -81,7 +81,7 @@
     "Download the client": "Please download",
     "Download the latest client": "Download the latest client",
     "DownloadClient": "Download client",
-    "DownloadClientMsg": "JumpServer client not found, Go to download and install",
+    "DownloadClientMsg": "Client not found, Go to download and install",
     "Driver redirect": "Driver redirect",
     "Expand": "Expand",
     "Expand all": "Expand all",
@@ -118,7 +118,7 @@
     "Host": "Host",
     "Hotkeys": "Hotkeys",
     "Info": "Info",
-    "InstallClientMsg": "JumpServer client not found, Go to download and install?",
+    "InstallClientMsg": "Client not found, Go to download and install?",
     "Japanese keyboard layout": "Japanese (Qwerty)",
     "Keyboard keys": "Option + Shift + Left / Right",
     "Keyboard layout": "Keyboard layout",
@@ -289,5 +289,6 @@
     "success": "Success",
     "system user": "System user",
     "user": "User",
-    "tabLimits": "15 tabs are currently open.\nTo ensure system stability, would you like to open Luna in a new browser tab to continue?"
+    "tabLimits": "15 tabs are currently open.\nTo ensure system stability, would you like to open Luna in a new browser tab to continue?",
+    "MarkAsRead": "Mark as read"
 }

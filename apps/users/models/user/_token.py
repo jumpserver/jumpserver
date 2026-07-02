@@ -7,6 +7,8 @@ from django.utils import timezone
 from common.utils import (
     get_logger,
     random_string,
+    text_hmac_sha256,
+    get_request_ip
 )
 
 logger = get_logger(__file__)
@@ -39,7 +41,7 @@ class TokenMixin:
     def create_bearer_token(self, request=None, age=None):
         expiration = age or settings.TOKEN_EXPIRATION or 3600
         if request:
-            remote_addr = request.META.get("REMOTE_ADDR", "")
+            remote_addr = get_request_ip(request)
         else:
             remote_addr = "0.0.0.0"
         if not isinstance(remote_addr, bytes):
@@ -82,7 +84,8 @@ class TokenMixin:
         try:
             user_id = value.get("id", "")
             email = value.get("email", "")
-            user = cls.objects.get(id=user_id, email=email)
+            email_lookup = text_hmac_sha256(email)
+            user = cls.objects.get(id=user_id, email_lookup=email_lookup)
             return user
         except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)

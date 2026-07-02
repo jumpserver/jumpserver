@@ -5,15 +5,36 @@ from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 
-__all__ = ['FavoriteAsset']
+__all__ = ['FavoriteAsset', 'FavoriteFolder']
+
+
+class FavoriteFolder(JMSBaseModel):
+    """User custom favorite folder, owned by a user, visible across orgs, supports nesting"""
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE,
+        null=True, blank=True, related_name='children'
+    )
+
+    class Meta:
+        unique_together = ('user', 'name', 'parent')
+        verbose_name = _("Favorite folder")
+
+    def __str__(self):
+        return self.name
 
 
 class FavoriteAsset(JMSBaseModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE)
+    folder = models.ForeignKey(
+        'assets.FavoriteFolder', on_delete=models.CASCADE,
+        null=True, blank=True, related_name='assets'
+    )
 
     class Meta:
-        unique_together = ('user', 'asset')
+        unique_together = ('user', 'asset', 'folder')
         verbose_name = _("Favorite asset")
 
     @classmethod

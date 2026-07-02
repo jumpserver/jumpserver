@@ -17,7 +17,7 @@
     PYTHON_VERSION: 3.11.11
     CHROME_VERSION: 118.0.5993.118
     CHROME_DRIVER_VERSION: 118.0.5993.70
-    TINKER_VERSION: v0.2.2
+    TINKER_VERSION: v0.2.3
 
   tasks:
     - block:
@@ -26,7 +26,7 @@
             url: "{{ CORE_HOST }}"
             method: GET
             follow_redirects: none
-            status_code: [200, 301, 302, 303, 307, 308]
+            status_code: [ 200, 301, 302, 303, 307, 308 ]
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
           register: core_host_redirects
 
@@ -86,6 +86,46 @@
             include_management_tools: yes
           register: rds_install
 
+        - name: Stop Tinkerd service first
+          ansible.windows.win_powershell:
+            script: |
+              $serviceName = "JumpServer Tinker"
+              $eventLogKey = "HKLM:\SYSTEM\CurrentControlSet\Services\EventLog\Application\$serviceName"
+              $svc = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+              if ($svc) {
+                  Write-Output "Service found: $serviceName"
+                  try {
+                      sc.exe config "$serviceName" start= disabled | Out-Null
+                      Write-Output "Service disabled"
+                  } catch {
+                      Write-Output "Disable failed, continue..."
+                  }
+                  if ($svc.Status -ne 'Stopped') {
+                      try {
+                          Stop-Service -Name $serviceName -Force -ErrorAction Stop
+                          Write-Output "Service stopped"
+                      } catch {
+                          Write-Output "Stop-Service failed, continue..."
+                      }
+                      $timeout = 10
+                      while ($timeout -gt 0) {
+                          $current = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+                          if (!$current -or $current.Status -eq 'Stopped') { break }
+                          Start-Sleep -Seconds 1
+                          $timeout--
+                      }
+                  }
+                  try {
+                      sc.exe delete "$serviceName" | Out-Null
+                      Write-Output "Service deleted"
+                  } catch {
+                      Write-Output "Delete failed, continue..."
+                  }
+              }
+              if (Test-Path $eventLogKey) {
+                  Remove-Item -Path $eventLogKey -Recurse -Force
+                  Write-Output "EventLog source registry key deleted."
+              }
         - name: Stop Tinker before install
           ansible.windows.win_powershell:
             script: |
@@ -326,8 +366,8 @@
               tinkerd install all
               $exitCode = $LASTEXITCODE
               if ($exitCode -ne 0) {
-                  Write-Host "Failed to install applets"
-                  Write-Host "Exit code: $exitCode"
+                  Write-Output "Failed to install applets"
+                  Write-Output "Exit code: $exitCode"
                   $Ansible.Failed = $true
                   exit 1
               }

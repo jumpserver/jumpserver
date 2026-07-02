@@ -4,17 +4,31 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+permissions:
+  issues: write
+
 jobs:
   issue-close-require:
     runs-on: ubuntu-latest
     steps:
-      - name: need reproduce
-        uses: actions-cool/issues-helper@v2
-        with:
-          actions: 'close-issues'
-          labels: '⏳ Pending feedback'
-          inactive-day: 30
-          body: |
-            You haven't provided feedback for over 30 days. 
-            We will close this issue. If you have any further needs, you can reopen it or submit a new issue.
-            您超过 30 天未反馈信息，我们将关闭该 issue，如有需求您可以重新打开或者提交新的 issue。
+      - name: Close inactive issues pending feedback
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          cutoff="$(date -u -d '30 days ago' '+%Y-%m-%d')"
+          query="repo:${GH_REPO} is:issue is:open label:\"⏳ Pending feedback\" updated:<${cutoff}"
+
+          printf '%s\n' \
+            "You haven't provided feedback for over 30 days." \
+            "We will close this issue. If you have any further needs, you can reopen it or submit a new issue." \
+            "您超过 30 天未反馈信息，我们将关闭该 issue，如有需求您可以重新打开或者提交新的 issue。" \
+            > "${RUNNER_TEMP}/close-comment.md"
+
+          gh api --method GET --paginate /search/issues -f q="${query}" -f per_page=100 --jq '.items[].number' |
+            while read -r issue_number; do
+              gh issue comment "${issue_number}" --repo "${GH_REPO}" --body-file "${RUNNER_TEMP}/close-comment.md"
+              gh issue close "${issue_number}" --repo "${GH_REPO}"
+            done

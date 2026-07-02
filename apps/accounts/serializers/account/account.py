@@ -17,6 +17,7 @@ from assets.models import Asset
 from common.serializers import SecretReadableMixin, SecretReadableCheckMixin, CommonBulkModelSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
+from accounts.utils import validate_account_username
 from .base import BaseAccountSerializer, AuthValidateMixin
 
 logger = get_logger(__name__)
@@ -326,6 +327,10 @@ class AssetAccountBulkSerializer(
             return
         initial_data = self.initial_data
         self.from_template_if_need(initial_data)
+
+    @staticmethod
+    def validate_username(value):
+        return validate_account_username(value)
 
     @staticmethod
     def get_filter_lookup(vd):

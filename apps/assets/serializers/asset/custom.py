@@ -50,28 +50,29 @@ class CustomSerializer(AssetSerializer):
             return default_field
 
         custom_fields = platform.custom_fields
-
         if not custom_fields:
             return default_field
+        return self._get_custom_fields(platform, custom_fields)
+
+    def _get_custom_fields(self, platform, custom_fields):
         name = platform.name.title() + 'CustomSerializer'
 
         applet = Applet.objects.filter(
             name=platform.created_by.replace('Applet:', '')
         ).first()
 
-        if not applet:
+        if not applet or not applet.platform_manifest or not applet.platform_manifest.get('i18n'):
             return create_serializer_class(name, custom_fields)()
 
-        i18n = applet.manifest.get('i18n', {})
-
+        i18n = applet.platform_manifest['i18n']
         lang = get_language()
         lang_short = lang[:2]
 
         def translate_text(key):
             return (
-                    i18n.get(key, {}).get(lang)
-                    or i18n.get(key, {}).get(lang_short)
-                    or key
+                i18n.get(key, {}).get(lang)
+                or i18n.get(key, {}).get(lang_short)
+                or key
             )
 
         for field in custom_fields:

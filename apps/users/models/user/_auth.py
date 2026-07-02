@@ -113,6 +113,7 @@ class AuthMixin:
     history_passwords: models.Manager
     sect_cache_tpl = "user_sect_{}"
     id: str
+    is_org_admin: bool
 
     @property
     def password_raw(self):
@@ -160,6 +161,10 @@ class AuthMixin:
     @staticmethod
     def can_use_ssh_key_login():
         return settings.TERMINAL_PUBLIC_KEY_AUTH
+    
+    @staticmethod
+    def can_use_ukey_login():
+        return settings.AUTH_UKEY
 
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
@@ -213,7 +218,10 @@ class AuthMixin:
 
     @property
     def date_password_expired(self):
-        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        if self.is_org_admin:
+            interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN
+        else:
+            interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
         date_expired = self.date_password_last_updated + timezone.timedelta(
             days=int(interval)
         )

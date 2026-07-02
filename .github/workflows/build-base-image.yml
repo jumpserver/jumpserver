@@ -71,6 +71,7 @@ jobs:
           push: true
           file: Dockerfile-base
           tags: jumpserver/core-base:${{ env.IMAGE_TAG }}
+          context: .
 
       - name: Update Dockerfile
         run: |

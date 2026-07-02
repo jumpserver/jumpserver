@@ -223,5 +223,6 @@
     "refresh your assets and nodes": "刷新最新的机器和节点信息",
     "select one asset to login": "选择其中一个资产登录",
     "to search login if unique": "搜索登录(如果唯一)",
-    "to search, such as: /192.168": "搜索，如：/192.168"
+    "to search, such as: /192.168": "搜索，如：/192.168",
+    "File transfer error, file transfer interrupted": "文件传输错误，文件传输已中断"
 }

@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.db.utils import OperationalError
 from django.http.response import HttpResponseForbidden, JsonResponse
+from django.middleware.csrf import CsrfViewMiddleware
 from django.shortcuts import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -18,6 +19,8 @@ from django.utils import timezone
 from rest_framework import status
 
 from .utils import set_current_request
+
+IGNORE_CSRF_CHECK = '*' in os.getenv("DOMAINS", "").split(',')
 
 
 class TimezoneMiddleware:
@@ -180,6 +183,8 @@ class SafeRedirectMiddleware:
                 return response
             target_host, target_port = self._split_host_port(parsed.netloc)
             origin_host, origin_port = self._split_host_port(request.get_host())
+            if self.check_proxy_origin_verified(request, origin_host):
+                return response
             if target_host != origin_host:
                 safe_redirect_url = '%s?%s' % (reverse('redirect-confirm'), f'next={quote(location)}')
                 return redirect(safe_redirect_url)
@@ -191,3 +196,17 @@ class SafeRedirectMiddleware:
             host, port = netloc.split(':', 1)
             return host, port
         return netloc, '80'
+
+    def check_proxy_origin_verified(self, request, origin_host):
+        if settings.USE_X_FORWARDED_HOST and ("HTTP_X_FORWARDED_HOST" in request.META):
+            proxy_host, proxy_port = self._split_host_port(request.META["HTTP_X_FORWARDED_HOST"])
+            return proxy_host == origin_host
+        return False
+
+
+class CsrfCheckMiddleware(CsrfViewMiddleware):
+    def _origin_verified(self, request):
+        if IGNORE_CSRF_CHECK:
+            request._dont_enforce_csrf_checks = True
+            return True
+        return super()._origin_verified(request)

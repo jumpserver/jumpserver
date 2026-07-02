@@ -39,7 +39,7 @@
     - name: "Change {{ account.username }} password"
       ansible.builtin.user:
         name: "{{ account.username }}"
-        password: "{{ account.secret | password_hash('sha512') }}"
+        password: "{{ account.secret | password_hash('sha256', rounds=1000) }}"
         update_password: always
       ignore_errors: true
       register: change_secret_result
@@ -70,7 +70,7 @@
         - home_dir_stat.stat.exists == false
       ignore_errors: yes
 
-    - name: Remove jumpserver ssh key
+    - name: Remove ssh key created by system
       ansible.builtin.lineinfile:
         dest: "{{ home_dir.stdout.strip() }}/.ssh/authorized_keys"
         regexp: "{{ ssh_params.regexp }}"
@@ -108,6 +108,7 @@
        - account.secret_type == "password"
        - check_conn_after_change or change_secret_result.failed | default(false)
       delegate_to: localhost
+      connection: local
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
       ssh_ping:
@@ -121,4 +122,5 @@
        - account.secret_type == "ssh_key"
        - check_conn_after_change or change_secret_result.failed | default(false)
       delegate_to: localhost
+      connection: local
 

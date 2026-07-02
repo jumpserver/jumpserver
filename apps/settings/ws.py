@@ -164,7 +164,10 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         config = {
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
             'bind_dn': serializer.validated_data.get(f"{prefix}BIND_DN"),
-            'use_ssl': serializer.validated_data.get(f"{prefix}START_TLS", False),
+            'start_tls': serializer.validated_data.get(f"{prefix}START_TLS", False),
+            'cacert_content': serializer.validated_data.get(f"{prefix}CACERT_CONTENT"),
+            'cert_content': serializer.validated_data.get(f"{prefix}CERT_CONTENT"),
+            'key_content': serializer.validated_data.get(f"{prefix}KEY_CONTENT"),
             'search_ou': serializer.validated_data.get(f"{prefix}SEARCH_OU"),
             'search_filter': serializer.validated_data.get(f"{prefix}SEARCH_FILTER"),
             'attr_map': serializer.validated_data.get(f"{prefix}USER_ATTR_MAP"),

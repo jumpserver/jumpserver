@@ -8,30 +8,30 @@ from copy import deepcopy
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
-from ldap3 import Server, Connection, SIMPLE
+from ldap3 import SIMPLE, Connection, Server, Tls
 from ldap3.core.exceptions import (
+    LDAPAttributeError,
+    LDAPBindError,
+    LDAPConfigurationError,
+    LDAPExceptionError,
+    LDAPInvalidDnError,
+    LDAPInvalidFilterError,
+    LDAPInvalidServerError,
+    LDAPPasswordIsMandatoryError,
+    LDAPSessionTerminatedByServerError,
     LDAPSocketOpenError,
     LDAPSocketReceiveError,
-    LDAPSessionTerminatedByServerError,
     LDAPUserNameIsMandatoryError,
-    LDAPPasswordIsMandatoryError,
-    LDAPInvalidDnError,
-    LDAPInvalidServerError,
-    LDAPBindError,
-    LDAPInvalidFilterError,
-    LDAPExceptionError,
-    LDAPConfigurationError,
-    LDAPAttributeError,
 )
+from ldap3.utils.conv import escape_filter_chars
 
-from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser, \
-    LDAPHAAuthorizationBackend
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.db.utils import close_old_connections
-from common.utils import timeit, get_logger
+from common.utils import get_logger, timeit
 from common.utils.http import is_true
 from orgs.utils import tmp_to_org
 from settings.const import ImportStatus
+from settings.ldap_tls import LDAPTLSUtil
 from users.models import User, UserGroup
 from users.utils import construct_user_email
 
@@ -51,7 +51,7 @@ class LDAPConfig(object):
         self.server_uri = None
         self.bind_dn = None
         self.password = None
-        self.use_ssl = None
+        self.start_tls = None
         self.search_ou = None
         self.search_filter = None
         self.attr_map = None
@@ -66,7 +66,7 @@ class LDAPConfig(object):
         self.server_uri = config.get('server_uri')
         self.bind_dn = config.get('bind_dn')
         self.password = config.get('password')
-        self.use_ssl = config.get('use_ssl')
+        self.start_tls = config.get('start_tls', False)
         self.search_ou = config.get('search_ou')
         self.search_filter = config.get('search_filter')
         self.attr_map = config.get('attr_map')
@@ -77,7 +77,7 @@ class LDAPConfig(object):
         self.server_uri = getattr(settings, f"{prefix}_SERVER_URI")
         self.bind_dn = getattr(settings, f"{prefix}_BIND_DN")
         self.password = getattr(settings, f"{prefix}_BIND_PASSWORD")
-        self.use_ssl = getattr(settings, f"{prefix}_START_TLS")
+        self.start_tls = getattr(settings, f"{prefix}_START_TLS")
         self.search_ou = getattr(settings, f"{prefix}_SEARCH_OU")
         self.search_filter = getattr(settings, f"{prefix}_SEARCH_FILTER")
         self.attr_map = getattr(settings, f"{prefix}_USER_ATTR_MAP")
@@ -97,15 +97,46 @@ class LDAPServerUtil(object):
         self._paged_size = self.get_paged_size()
         self.search_users = None
         self.search_value = None
+        self._tls_util = LDAPTLSUtil(self.config.category)
+
+    def _get_tls(self):
+        cert_paths = self._tls_util.get_cert_paths()
+        if not cert_paths:
+            return None
+        tls_kwargs = {}
+        if cert_paths.get('ca'):
+            tls_kwargs['ca_certs_file'] = cert_paths['ca']
+        if cert_paths.get('cert'):
+            tls_kwargs['local_certificate_file'] = cert_paths['cert']
+        if cert_paths.get('key'):
+            tls_kwargs['local_private_key_file'] = cert_paths['key']
+        return Tls(**tls_kwargs) if tls_kwargs else None
+
+    def _open_connection(self, bind=False, user=None, password=None, authentication=None):
+        server_uri = self.config.server_uri or ''
+        use_ldaps = server_uri.lower().startswith('ldaps://')
+        tls = self._get_tls()
+        server = Server(server_uri, use_ssl=use_ldaps, tls=tls)
+        conn = Connection(
+            server, user=user or self.config.bind_dn,
+            password=password if password is not None else self.config.password,
+            authentication=authentication
+        )
+        conn.open()
+        if not use_ldaps and self.config.start_tls:
+            conn.start_tls()
+        if bind:
+            conn.bind()
+        return conn
+
+    def _create_connection(self):
+        return self._open_connection(bind=True)
 
     @property
     def connection(self):
         if self._conn:
             return self._conn
-        server = Server(self.config.server_uri, use_ssl=self.config.use_ssl)
-        conn = Connection(server, self.config.bind_dn, self.config.password)
-        conn.bind()
-        self._conn = conn
+        self._conn = self._create_connection()
         return self._conn
 
     @staticmethod
@@ -130,11 +161,14 @@ class LDAPServerUtil(object):
         if self.search_users:
             mapping_username = self.config.attr_map.get('username')
             for user in self.search_users:
-                extra += '({}={})'.format(mapping_username, user)
+                extra += '({}={})'.format(
+                    mapping_username, escape_filter_chars(user)
+                )
             return '(|{})'.format(extra)
         if self.search_value:
+            escaped_search_value = escape_filter_chars(self.search_value)
             for attr in self.config.attr_map.values():
-                extra += '({}={})'.format(attr, '*{}*'.format(self.search_value))
+                extra += '({}={})'.format(attr, '*{}*'.format(escaped_search_value))
             return '(|{})'.format(extra)
         return extra
 
@@ -506,6 +540,11 @@ class LDAPTestUtil(object):
         pass
 
     def __init__(self, config=None, category=User.Source.ldap.value):
+        from authentication.backends.ldap import (
+            LDAPAuthorizationBackend, LDAPHAAuthorizationBackend,
+        )
+        if isinstance(config, dict):
+            self._apply_test_tls_content(config, category)
         self.config = LDAPConfig(config, category)
         self.user_entries = []
         if category == User.Source.ldap.value:
@@ -513,13 +552,28 @@ class LDAPTestUtil(object):
         else:
             self.backend = LDAPHAAuthorizationBackend()
 
+    @staticmethod
+    def _apply_test_tls_content(config, category):
+        prefix = 'AUTH_LDAP' if category == User.Source.ldap.value else 'AUTH_LDAP_HA'
+        content_map = {}
+        mapping = {
+            'cacert_content': f'{prefix}_CACERT_CONTENT',
+            'cert_content': f'{prefix}_CERT_CONTENT',
+            'key_content': f'{prefix}_KEY_CONTENT',
+        }
+        for config_key, attr in mapping.items():
+            value = config.get(config_key)
+            if value:
+                content_map[attr] = value
+        if content_map:
+            LDAPTLSUtil(category).sync_files(content_map=content_map)
+
     def _test_connection_bind(self, authentication=None, user=None, password=None):
-        server = Server(self.config.server_uri)
-        connection = Connection(
-            server, user=user, password=password, authentication=authentication
+        util = LDAPServerUtil(config=self.config)
+        connection = util._open_connection(
+            bind=True, user=user, password=password, authentication=authentication
         )
-        ret = connection.bind()
-        return ret
+        return connection.bound
 
     # test server uri
 
@@ -531,9 +585,9 @@ class LDAPTestUtil(object):
 
     def _test_server_uri(self):
         # 这里测试 server uri 是否能连通, 不进行 bind 操作, 不需要传入 bind dn 和密码
-        server = Server(self.config.server_uri, use_ssl=self.config.use_ssl)
-        connection = Connection(server)
-        connection.open()
+        util = LDAPServerUtil(config=self.config)
+        connection = util._open_connection(bind=False)
+        connection.unbind()
 
     def test_server_uri(self):
         try:
@@ -666,6 +720,7 @@ class LDAPTestUtil(object):
         try:
             self._test_config()
         except LDAPInvalidServerError as e:
+            raise e
             msg = _('Error (Invalid LDAP server): {}').format(e)
         except LDAPBindError as e:
             msg = _('Error (Invalid Bind DN): {}').format(e)
@@ -697,6 +752,7 @@ class LDAPTestUtil(object):
             raise self.LDAPBeforeLoginCheckError(msg)
 
     def _test_login_auth(self, username, password):
+        from authentication.backends.ldap import LDAPUser
         ldap_user = LDAPUser(self.backend, username=username.strip())
         ldap_user._authenticate_user_dn(password)
 
@@ -705,6 +761,7 @@ class LDAPTestUtil(object):
         self._test_login_auth(username, password)
 
     def test_login(self, username, password):
+        from authentication.backends.ldap import LDAPUser
         status = False
         try:
             self._test_login(username, password)

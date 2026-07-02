@@ -21,6 +21,13 @@ class OnlySuperUser(IsValidUser):
             and request.user.is_superuser
 
 
+class OnlyAdminSuperUser(IsValidUser):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) \
+            and request.user.is_superuser \
+            and request.user.username == 'admin'
+
+
 class IsServiceAccount(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \

@@ -15,11 +15,13 @@ class CommonConfig(AppConfig):
         from . import tasks  # noqa
         from .signals import django_ready
 
-        excludes = ['migrate', 'compilemessages', 'makemigrations']
+        excludes = [
+            'migrate', 'compilemessages', 'makemigrations', 
+            'check', 'makemessages', 'upgrade_db', 'collect_static',
+        ]
         for i in excludes:
             if i in sys.argv:
                 return
 
-        if not os.environ.get('DJANGO_DEBUG_SHELL'):
-            django_ready.send(CommonConfig)
-            close_old_connections()
+        django_ready.send(CommonConfig)
+        close_old_connections()

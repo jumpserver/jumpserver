@@ -6,6 +6,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
 
 from common.storage import jms_storage
+from common.utils import text_hmac_sha256
 from users.models import User
 from .utils import get_logger
 
@@ -25,7 +26,8 @@ def get_email_connection(**kwargs):
 def task_activity_callback(self, subject, message, recipient_list, *args, **kwargs):
     from users.models import User
     email_list = recipient_list
-    resource_ids = list(User.objects.filter(email__in=email_list).values_list('id', flat=True))
+    email_lookup_list = [text_hmac_sha256(email) for email in email_list]
+    resource_ids = list(User.objects.filter(email_lookup__in=email_lookup_list).values_list('id', flat=True))
     return resource_ids,
 
 
@@ -65,7 +67,8 @@ def send_mail_async(*args, **kwargs):
         "send_mail_async called with subject=%r, recipients=%r", subject, recipient_list
     )
 
-    users = User.objects.filter(email__in=recipient_list).all()
+    email_lookup_list = [text_hmac_sha256(email) for email in recipient_list]
+    users = User.objects.filter(email_lookup__in=email_lookup_list).all()
     for user in users:
         try:
             with activate_user_language(user):
@@ -91,13 +94,13 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
         subject=subject,
         body=message,
         from_email=from_email,
-        to=recipient_list,
-        connection=get_email_connection(),
+        to=recipient_list
     )
     for attachment in attachment_list:
         email.attach_file(attachment)
+    email.send()
+    for attachment in attachment_list:
         os.remove(attachment)
-    return email.send()
 
 
 @shared_task(
