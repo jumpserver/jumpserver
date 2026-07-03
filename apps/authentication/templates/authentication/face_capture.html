@@ -39,7 +39,11 @@
             let token;
 
             function createFaceCaptureToken() {
-                const csrf = getCookie('jms_csrftoken');
+                let prefix = getCookie('SESSION_COOKIE_NAME_PREFIX');
+                if (!prefix || [`""`, `''`].includes(prefix)) {
+                    prefix = '';
+                }
+                const csrf = getCookie(`${prefix}csrftoken`);
                 $.ajax({
                     url: apiUrl,
                     method: 'POST',
