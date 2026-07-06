@@ -42,17 +42,17 @@ from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession, IntegrationApplicationLog
 )
+from .reporting import (
+    FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
+    OperateLogReportExporter, JobsAuditReportExporter,
+    JobLogAuditReportExporter,
+)
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer
-)
-from .reporting import (
-    FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
-    OperateLogReportExporter, JobsAuditReportExporter,
-    JobLogAuditReportExporter,
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
@@ -110,7 +110,7 @@ class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'asset', 'account', 'filename', 'session']
+    filterset_fields = ['id', 'user', 'asset', 'account', 'filename', 'session']
     search_fields = filterset_fields
     ordering = ['-date_start']
     http_method_names = ['post', 'get', 'head', 'options', 'patch']
