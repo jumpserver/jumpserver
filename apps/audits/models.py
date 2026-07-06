@@ -12,7 +12,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.sessions.cache import user_session_manager
-from common.utils import lazyproperty, i18n_trans
+from common.utils import lazyproperty, i18n_trans, get_ip_city
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -36,6 +36,13 @@ __all__ = [
     "PasswordChangeLog",
     "IntegrationApplicationLog",
 ]
+
+
+def _get_city_display(ip, city='') -> str:
+    try:
+        return get_ip_city(ip) or gettext(city or '')
+    except Exception:
+        return gettext(city or '')
 
 
 class JobLog(JobExecution):
@@ -241,6 +248,10 @@ class UserLoginLog(models.Model):
     def backend_display(self) -> str:
         return gettext(self.backend)
 
+    @lazyproperty
+    def city_display(self) -> str:
+        return _get_city_display(self.ip, self.city)
+
     @classmethod
     def get_login_logs(cls, date_from=None, date_to=None, user=None, keyword=None):
         login_logs = cls.objects.all()
@@ -320,6 +331,10 @@ class UserSession(models.Model):
 
     def __str__(self):
         return '%s(%s)' % (self.user, self.ip)
+
+    @lazyproperty
+    def city_display(self) -> str:
+        return _get_city_display(self.ip, self.city)
 
     @property
     def backend_display(self) -> str:
