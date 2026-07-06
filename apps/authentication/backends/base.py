@@ -74,7 +74,10 @@ class RedirectAuthBackend(JMSBaseAuthBackend):
 
     def send_backend_auth_failed_signal(self, request, username=None, reason=None):
         default_reason = reason_choices.get(reason_user_invalid, reason)
+        reason_code = reason_user_invalid if reason is None else ''
+        if reason in reason_choices:
+            reason_code = reason
         backend_auth_failed.send(
             sender=self.__class__, username=username, request=request,
-            reason=default_reason, backend=self.backend
+            reason=default_reason, backend=self.backend, reason_code=reason_code
         )

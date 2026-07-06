@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 16:45+0800\n"
+"POT-Creation-Date: 2026-07-06 15:45+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -347,7 +347,7 @@ msgstr "SFTP"
 #: accounts/const/automation.py:116
 #: accounts/serializers/automations/change_secret.py:172 audits/const.py:65
 #: audits/models.py:65 audits/signal_handlers/activity_log.py:34
-#: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:48
+#: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -467,7 +467,7 @@ msgstr "Vault 操作失败，请重试，或者检查 Vault 上的账号信息�
 #: accounts/templates/accounts/push_account_report.html:118
 #: acls/notifications.py:70 acls/serializers/base.py:110
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:427
-#: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:336
+#: assets/models/cmd_filter.py:36 audits/models.py:59 audits/models.py:358
 #: audits/reporting.py:109 audits/serializers.py:256
 #: authentication/models/connection_token.py:42
 #: perms/models/asset_permission.py:69 terminal/backends/command/models.py:17
@@ -535,7 +535,7 @@ msgstr "改密状态"
 #: accounts/serializers/automations/change_secret.py:150
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
-#: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:337
+#: assets/serializers/gateway.py:33 audits/models.py:60 audits/models.py:359
 #: audits/reporting.py:114 audits/serializers.py:257
 #: authentication/api/connection_token.py:643 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
@@ -783,7 +783,7 @@ msgstr "结束日期"
 #: accounts/models/automations/gather_account.py:26
 #: accounts/serializers/automations/check_account.py:39
 #: assets/models/automations/base.py:137
-#: assets/serializers/automations/base.py:47 audits/models.py:224
+#: assets/serializers/automations/base.py:47 audits/models.py:230
 #: audits/reporting.py:607 audits/serializers.py:77 ops/models/base.py:49
 #: ops/models/job.py:233 terminal/models/applet/applet.py:391
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
@@ -863,7 +863,7 @@ msgid "Authorized keys changed"
 msgstr "密钥变更"
 
 #: accounts/models/automations/check_account.py:49
-#: authentication/errors/const.py:23
+#: authentication/errors/const.py:28
 msgid "Password expired"
 msgstr "密码已过期"
 
@@ -1310,7 +1310,7 @@ msgstr "ID"
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:55
-#: audits/models.py:97 audits/models.py:179 audits/models.py:296
+#: audits/models.py:97 audits/models.py:179 audits/models.py:318
 #: audits/reporting.py:104 audits/reporting.py:317 audits/reporting.py:414
 #: audits/serializers.py:223 authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
@@ -2026,7 +2026,7 @@ msgstr "用户登录提醒"
 
 #: acls/notifications.py:17 acls/notifications.py:67
 #: acls/templates/acls/user_login_reminder.html:10 audits/models.py:210
-#: audits/models.py:290 authentication/notifications.py:15
+#: audits/models.py:312 authentication/notifications.py:15
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:13
 msgid "Login city"
@@ -2041,7 +2041,7 @@ msgid "Recipient username"
 msgstr "收件人用户名"
 
 #: acls/notifications.py:22 acls/templates/acls/user_login_reminder.html:12
-#: audits/models.py:213 audits/models.py:291 audits/serializers.py:91
+#: audits/models.py:213 audits/models.py:313 audits/serializers.py:91
 msgid "User agent"
 msgstr "用户代理"
 
@@ -3611,7 +3611,7 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:57 audits/models.py:107 audits/models.py:182
-#: audits/models.py:333 audits/reporting.py:119 audits/reporting.py:327
+#: audits/models.py:355 audits/reporting.py:119 audits/reporting.py:327
 #: audits/reporting.py:424 authentication/models/connection_token.py:63
 #: terminal/models/session/session.py:36 terminal/models/session/sharing.py:120
 #: terminal/notifications.py:171 terminal/notifications.py:238
@@ -3654,7 +3654,7 @@ msgid "Resource"
 msgstr "资源"
 
 #: audits/models.py:108 audits/models.py:154 audits/models.py:184
-#: audits/models.py:338 audits/serializers.py:258
+#: audits/models.py:360 audits/serializers.py:258
 #: terminal/serializers/command.py:75
 msgid "Datetime"
 msgstr "日期"
@@ -3679,11 +3679,11 @@ msgstr "修改者"
 msgid "Password change log"
 msgstr "改密日志"
 
-#: audits/models.py:206 audits/models.py:292
+#: audits/models.py:206 audits/models.py:314
 msgid "Login type"
 msgstr "登录方式"
 
-#: audits/models.py:208 audits/models.py:288
+#: audits/models.py:208 audits/models.py:310
 #: tickets/models/ticket/login_confirm.py:12
 msgid "Login IP"
 msgstr "登录 IP"
@@ -3701,41 +3701,49 @@ msgstr "MFA"
 msgid "Reason"
 msgstr "原因"
 
-#: audits/models.py:226 authentication/notifications.py:19
+#: audits/models.py:222
+msgid "Reason code"
+msgstr "原因"
+
+#: audits/models.py:225
+msgid "Reason params"
+msgstr "原因参数"
+
+#: audits/models.py:232 authentication/notifications.py:19
 #: authentication/templates/authentication/_msg_different_city.html:10
 #: tickets/models/ticket/login_confirm.py:14
 msgid "Login Date"
 msgstr "登录日期"
 
-#: audits/models.py:228 audits/models.py:293 audits/reporting.py:226
+#: audits/models.py:234 audits/models.py:315 audits/reporting.py:226
 msgid "Auth backend"
 msgstr "认证令牌"
 
-#: audits/models.py:281
+#: audits/models.py:303
 msgid "User login log"
 msgstr "用户登录日志"
 
-#: audits/models.py:289
+#: audits/models.py:311
 msgid "Session key"
 msgstr "会话标识"
 
-#: audits/models.py:294
+#: audits/models.py:316
 msgid "Login date"
 msgstr "登录日期"
 
-#: audits/models.py:325
+#: audits/models.py:347
 msgid "User session"
 msgstr "用户会话"
 
-#: audits/models.py:327
+#: audits/models.py:349
 msgid "Offline user session"
 msgstr "下线用户会话"
 
-#: audits/models.py:334
+#: audits/models.py:356
 msgid "Application"
 msgstr "应用"
 
-#: audits/models.py:335
+#: audits/models.py:357
 msgid "Application ID"
 msgstr "应用 ID"
 
@@ -4052,7 +4060,7 @@ msgstr "耗时分布"
 msgid "Duration range"
 msgstr "耗时范围"
 
-#: audits/serializers.py:39 ops/serializers/celery.py:33
+#: audits/serializers.py:39 ops/serializers/celery.py:27
 msgid "Execution cycle"
 msgstr "周期执行"
 
@@ -4430,55 +4438,55 @@ msgstr "Radius"
 msgid "Custom"
 msgstr "自定义"
 
-#: authentication/errors/const.py:18
+#: authentication/errors/const.py:23
 msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
 
-#: authentication/errors/const.py:19
+#: authentication/errors/const.py:24
 msgid "Password decrypt failed"
 msgstr "密码解密失败"
 
-#: authentication/errors/const.py:20
+#: authentication/errors/const.py:25
 msgid "MFA failed"
 msgstr "MFA 校验失败"
 
-#: authentication/errors/const.py:21
+#: authentication/errors/const.py:26
 msgid "MFA unset"
 msgstr "MFA 没有设定"
 
-#: authentication/errors/const.py:22
+#: authentication/errors/const.py:27
 msgid "Username does not exist"
 msgstr "用户名不存在"
 
-#: authentication/errors/const.py:24
+#: authentication/errors/const.py:29
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: authentication/errors/const.py:25
+#: authentication/errors/const.py:30
 msgid "This account is inactive."
 msgstr "此账号已禁用"
 
-#: authentication/errors/const.py:26
+#: authentication/errors/const.py:31
 msgid "This account is expired"
 msgstr "此账号已过期"
 
-#: authentication/errors/const.py:27
+#: authentication/errors/const.py:32
 msgid "Auth backend not match"
 msgstr "没有匹配到认证后端"
 
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:33
 msgid "ACL is not allowed"
 msgstr "登录访问控制不被允许"
 
-#: authentication/errors/const.py:29
+#: authentication/errors/const.py:34
 msgid "Only local users are allowed"
 msgstr "仅允许本地用户"
 
-#: authentication/errors/const.py:39
+#: authentication/errors/const.py:44
 msgid "No session found, check your cookie"
 msgstr "会话已变更，刷新页面"
 
-#: authentication/errors/const.py:41
+#: authentication/errors/const.py:46
 #, python-brace-format
 msgid ""
 "The username or password you entered is incorrect, please enter it again. "
@@ -4488,21 +4496,19 @@ msgstr ""
 "您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次 (账号将"
 "被临时 锁定 {block_time} 分钟)"
 
-#: authentication/errors/const.py:47 authentication/errors/const.py:55
-#, python-brace-format
+#: authentication/errors/const.py:52 authentication/errors/const.py:60
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
-"after {} minutes)"
-msgstr "账号已被锁定 (请联系管理员解锁或{}分钟后重试)"
+"after {block_time} minutes)"
+msgstr "账号已被锁定 (请联系管理员解锁或{block_time}分钟后重试)"
 
-#: authentication/errors/const.py:51
-#, python-brace-format
+#: authentication/errors/const.py:56
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
-"after {} minutes)"
-msgstr "IP 已被锁定 (请联系管理员解锁或 {} 分钟后重试)"
+"after {block_time} minutes)"
+msgstr "IP 已被锁定 (请联系管理员解锁或 {block_time} 分钟后重试)"
 
-#: authentication/errors/const.py:59
+#: authentication/errors/const.py:64
 #, python-brace-format
 msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
@@ -4510,40 +4516,39 @@ msgid ""
 msgstr ""
 "{error} 您还可以尝试 {times_try} 次 (账号将被临时锁定 {block_time} 分钟)"
 
-#: authentication/errors/const.py:63
+#: authentication/errors/const.py:75
 msgid "MFA required"
 msgstr "需要 MFA 认证"
 
-#: authentication/errors/const.py:64
+#: authentication/errors/const.py:76
 msgid "MFA not set, please set it first"
 msgstr "MFA 没有设置，请先完成设置"
 
-#: authentication/errors/const.py:65
+#: authentication/errors/const.py:77
 msgid "Login confirm required"
 msgstr "需要登录复核"
 
-#: authentication/errors/const.py:66
+#: authentication/errors/const.py:78
 msgid "Wait login confirm ticket for accept"
 msgstr "等待登录复核处理"
 
-#: authentication/errors/const.py:67
-#, python-brace-format
-msgid "Login confirm ticket was {}"
-msgstr "登录复核: {}"
+#: authentication/errors/const.py:79
+msgid "Login confirm ticket was {status}"
+msgstr "登录复核: {status}"
 
-#: authentication/errors/failed.py:149
+#: authentication/errors/failed.py:172
 msgid "Current login is prohibited by ACL rules"
 msgstr "当前登录ACL规则禁止登录"
 
-#: authentication/errors/failed.py:154
+#: authentication/errors/failed.py:177
 msgid "Please enter MFA code"
 msgstr "请输入 MFA 验证码"
 
-#: authentication/errors/failed.py:159
+#: authentication/errors/failed.py:182
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors/failed.py:164 users/exceptions.py:14
+#: authentication/errors/failed.py:187 users/exceptions.py:14
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -4708,7 +4713,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:95 settings/utils/ldap.py:767
+#: authentication/middleware.py:95 settings/utils/ldap.py:771
 #, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
@@ -6128,16 +6133,12 @@ msgstr "Ansible 已禁用"
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
-#: ops/api/celery.py:66 ops/api/celery.py:81
-msgid "Waiting task start"
-msgstr "等待任务开始"
-
-#: ops/api/celery.py:269
+#: ops/api/celery.py:204
 #, python-brace-format
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:276
+#: ops/api/celery.py:211
 #, python-brace-format
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
@@ -6529,7 +6530,7 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
-#: ops/serializers/celery.py:35
+#: ops/serializers/celery.py:29
 msgid "Next execution time"
 msgstr "下次执行时间"
 
@@ -8993,119 +8994,119 @@ msgstr "已同步用户"
 msgid "No user synchronization required"
 msgstr "没有用户需要同步"
 
-#: settings/utils/ldap.py:580
+#: settings/utils/ldap.py:583
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:597
 #, python-brace-format
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:596
+#: settings/utils/ldap.py:599
 #, python-brace-format
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:598
+#: settings/utils/ldap.py:601
 #, python-brace-format
 msgid "Please add certificate: {}"
 msgstr "请添加证书: {}"
 
-#: settings/utils/ldap.py:602 settings/utils/ldap.py:629
-#: settings/utils/ldap.py:659 settings/utils/ldap.py:687
+#: settings/utils/ldap.py:605 settings/utils/ldap.py:632
+#: settings/utils/ldap.py:662 settings/utils/ldap.py:690
 #, python-brace-format
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:616
+#: settings/utils/ldap.py:619
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:623
+#: settings/utils/ldap.py:626
 #, python-brace-format
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:625
+#: settings/utils/ldap.py:628
 #, python-brace-format
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:627
+#: settings/utils/ldap.py:630
 #, python-brace-format
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:645
+#: settings/utils/ldap.py:648
 #, python-brace-format
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:676
+#: settings/utils/ldap.py:679
 #, python-brace-format
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:686
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:702
+#: settings/utils/ldap.py:705
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:720
+#: settings/utils/ldap.py:724
 #, python-brace-format
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误  (不合法的LDAP服务器地址): {}"
 
-#: settings/utils/ldap.py:722
+#: settings/utils/ldap.py:726
 #, python-brace-format
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误 (不合法的绑定DN): {}"
 
-#: settings/utils/ldap.py:724
+#: settings/utils/ldap.py:728
 #, python-brace-format
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误 (不合法的LDAP属性映射): {}"
 
-#: settings/utils/ldap.py:726
+#: settings/utils/ldap.py:730
 #, python-brace-format
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误 (不合法的用户OU或用户过滤器): {}"
 
-#: settings/utils/ldap.py:728
+#: settings/utils/ldap.py:732
 #, python-brace-format
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误 (没有启用LDAP认证): {}"
 
-#: settings/utils/ldap.py:730
+#: settings/utils/ldap.py:734
 #, python-brace-format
 msgid "Error (Unknown): {}"
 msgstr "错误 (未知): {}"
 
-#: settings/utils/ldap.py:733
+#: settings/utils/ldap.py:737
 #, python-brace-format
 msgid "Succeed: Match {} users"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:765
+#: settings/utils/ldap.py:769
 #, python-brace-format
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败 (配置错误): {}"
 
-#: settings/utils/ldap.py:769
+#: settings/utils/ldap.py:773
 #, python-brace-format
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:771
+#: settings/utils/ldap.py:775
 #, python-brace-format
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:774
+#: settings/utils/ldap.py:778
 #, python-brace-format
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
@@ -12667,6 +12668,9 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "许可证无效"
+
+#~ msgid "Waiting task start"
+#~ msgstr "等待任务开始"
 
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"

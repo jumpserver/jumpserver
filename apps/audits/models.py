@@ -218,6 +218,12 @@ class UserLoginLog(models.Model):
     reason = models.CharField(
         default="", max_length=128, blank=True, verbose_name=_("Reason")
     )
+    reason_code = models.CharField(
+        default='', max_length=64, blank=True, verbose_name=_("Reason code")
+    )
+    reason_params = models.JSONField(
+        default=dict, blank=True, verbose_name=_("Reason params")
+    )
     status = models.BooleanField(
         default=LoginStatusChoices.success,
         choices=LoginStatusChoices.choices,
@@ -259,7 +265,23 @@ class UserLoginLog(models.Model):
 
     @property
     def reason_display(self) -> str:
-        from authentication.errors import reason_choices, old_reason_choices
+        from authentication.errors import (
+            reason_choices, reason_template_choices, old_reason_choices
+        )
+
+        template = reason_template_choices.get(self.reason_code)
+        if template:
+            reason_params = self.reason_params
+            if not isinstance(reason_params, dict):
+                reason_params = {}
+            try:
+                return template.format(**reason_params)
+            except (AttributeError, KeyError, IndexError, TypeError, ValueError):
+                pass
+
+        reason = reason_choices.get(self.reason_code)
+        if reason:
+            return reason
 
         reason = reason_choices.get(self.reason)
         if reason:
