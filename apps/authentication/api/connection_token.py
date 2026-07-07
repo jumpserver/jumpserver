@@ -580,6 +580,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             self.input_username = validate_account_username(self.input_username)
             data['input_username'] = self.input_username
         _data = self._validate(user, asset, account_name, protocol, connect_method)
+        _data['remote_addr'] = get_request_ip_or_data(self.request)
         data.update(_data)
         return serializer
 
@@ -588,6 +589,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         asset = token.asset
         account_alias = token.account
         _data = self._validate(user, asset, account_alias, token.protocol, token.connect_method)
+        _data['remote_addr'] = get_request_ip_or_data(self.request)
         for k, v in _data.items():
             setattr(token, k, v)
         return token

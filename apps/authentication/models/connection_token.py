@@ -342,6 +342,56 @@ class ConnectionToken(JMSOrgBaseModel):
         return acls
 
     @lazyproperty
+    def clipboard_acls(self):
+        from copy import copy
+
+        from acls.const import ActionChoices as ACLActionChoices
+        from acls.models import ClipboardACL
+
+        def merge_limit(values):
+            limited_values = [v for v in values if v > 0]
+            return min(limited_values) if limited_values else 0
+
+        def merge_action(acls):
+            return (
+                ACLActionChoices.accept
+                if all(acl.action == ACLActionChoices.accept for acl in acls)
+                else ACLActionChoices.reject
+            )
+
+        kwargs = {
+            'user': self.user,
+            'asset': self.asset,
+            'account': self.account_object,
+        }
+        with tmp_to_org(self.asset.org_id):
+            acls = ClipboardACL.filter_queryset(**kwargs).valid()
+
+        matched_acls = []
+        for operation in (ActionChoices.copy, ActionChoices.paste):
+            operation_acls = [
+                acl for acl in acls
+                if acl.matches_operation(operation)
+            ]
+            if not operation_acls:
+                continue
+
+            highest_priority = min(acl.priority for acl in operation_acls)
+            highest_priority_acls = [
+                acl for acl in operation_acls
+                if acl.priority == highest_priority
+            ]
+            acl = copy(highest_priority_acls[0])
+            acl.operations = operation
+            acl.action = merge_action(highest_priority_acls)
+            acl.copy_text_limit = merge_limit(a.copy_text_limit for a in highest_priority_acls)
+            acl.paste_text_limit = merge_limit(a.paste_text_limit for a in highest_priority_acls)
+            acl.download_file_size_limit = merge_limit(a.download_file_size_limit for a in highest_priority_acls)
+            acl.upload_file_size_limit = merge_limit(a.upload_file_size_limit for a in highest_priority_acls)
+            matched_acls.append(acl)
+        return matched_acls
+
+    @lazyproperty
     def data_masking_rules(self):
         from acls.models import DataMaskingRule
         kwargs = {
