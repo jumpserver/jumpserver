@@ -284,7 +284,12 @@ class Config(dict):
 
         # Vault
         'VAULT_ENABLED': False,
-        'VAULT_BACKEND': 'local',
+        'VAULT_BACKEND': 'openbao',
+
+        'VAULT_OPENBAO_ADDR': 'http://openbao:8200',
+        'VAULT_OPENBAO_TOKEN': '',
+        'VAULT_OPENBAO_MOUNT_POINT': 'pam',
+        'VAULT_OPENBAO_TIMEOUT': 10,
 
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
