@@ -348,29 +348,67 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
                 type="string",
                 example="/api/v1/users/users?attr_rules=jsonbase64",
                 description='Filter by json like {"type": "attrs", "attrs": []} to base64',
+            ),
+            coreapi.Field(
+                name="attr_rules_instance",
+                location="query",
+                required=False,
+                type="string",
+                example="/api/v1/users/users?attr_rules_instance=jsonbase64",
+                description='Filter by json like {"app": "acls", "model": "LoginAssetACL", "id": "uuid"} to base64',
             )
         ]
 
     def filter_queryset(self, request, queryset, view):
         attr_rules = request.query_params.get("attr_rules")
-        if not attr_rules:
-            return queryset
+        if attr_rules:
+            attr_rules = self.json_base64_to_dict(attr_rules)
+            return self.filter_queryset_by_attr_rules(attr_rules, queryset)
+        
+        attr_rules_instance = request.query_params.get("attr_rules_instance")
+        if attr_rules_instance:
+            attr_rules_instance = self.json_base64_to_dict(attr_rules_instance)
+            return self.filter_queryset_by_attr_rules_instance(attr_rules_instance, queryset)
 
-        try:
-            attr_rules = base64.b64decode(attr_rules.encode("utf-8"))
-        except Exception:
-            raise ValidationError({"attr_rules": "attr_rules should be base64"})
-        try:
-            attr_rules = json.loads(attr_rules)
-        except Exception:
-            raise ValidationError({"attr_rules": "attr_rules should be json"})
+        return queryset
 
-        logger.debug("attr_rules: %s", attr_rules)
+    def filter_queryset_by_attr_rules(self, attr_rules, queryset):
         qs = RelatedManager.get_to_filter_qs(attr_rules, queryset.model)
         for q in qs:
             queryset = queryset.filter(q)
         return queryset.distinct()
+    
+    def filter_queryset_by_attr_rules_instance(self, attr_rules_instance, queryset):
+        if not attr_rules_instance or not isinstance(attr_rules_instance, dict):
+            return queryset
+        try:
+            from django.apps import apps
+            to_model = queryset.model
+            instance_app = attr_rules_instance.get("app")
+            instance_model = attr_rules_instance.get("model")
+            instance_id = attr_rules_instance.get("id")
+            instance_model_class = apps.get_model(instance_app, instance_model)
+            instance = instance_model_class.objects.get(id=instance_id)
+            field_name = f"{to_model.__name__.lower()}s"  # eg: assets, users
+            queryset = getattr(instance, field_name).all()  # eg: login_asset_acl.users.all()
+            return queryset
+        except Exception as e:
+            error = f"AttrRulesFilterBackend get_queryset_by_attr_rules_instance error: {e}"
+            logger.error(error)
+            raise ValidationError({'attr_rules_instance': error})
+        
+    def json_base64_to_dict(self, json_base64):
+        try:
+            json_data = base64.b64decode(json_base64.encode("utf-8"))
+        except Exception:
+            raise ValidationError({"attr_rules": "attr_rules should be base64"})
+        try:
+            data = json.loads(json_data)
+        except Exception:
+            raise ValidationError({"attr_rules": "attr_rules should be json"})
 
+        logger.debug("AttrRulesFilterBackend json_base64 data: %s", data)
+        return data
 
 class NotOrRelFilterBackend(filters.BaseFilterBackend):
     def get_schema_fields(self, view):

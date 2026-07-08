@@ -52,6 +52,10 @@ class SiteMessageIdsSerializer(serializers.Serializer):
 class SiteMessageSendSerializer(serializers.Serializer):
     subject = serializers.CharField()
     message = serializers.CharField()
+    display_mode = serializers.ChoiceField(
+        choices=MessageContent.DisplayMode.choices, 
+        default=MessageContent.DisplayMode.default
+    )
     user_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     group_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     is_broadcast = serializers.BooleanField(default=False)

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db.models import F
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.encoding import escape_uri_path
 from django.utils.translation import gettext_noop, gettext as _
@@ -20,11 +20,12 @@ from rest_framework.response import Response
 
 from audits.const import ActionChoices
 from audits.utils import record_operate_log_and_activity_log
-from common.api import AsyncApiMixin
+from common.api import AsyncApiMixin, ReportExportMixin
 from common.const.http import GET, POST
 from common.drf.filters import BaseFilterSet
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.renders import PassthroughRenderer
+from common.drf.throttling import FileTransferThrottle
 from common.permissions import IsServiceAccount
 from common.storage.replay import ReplayStorageHandler, SessionPartReplayStorageHandler
 from common.utils import data_to_json, is_uuid, i18n_fmt
@@ -36,6 +37,7 @@ from terminal import serializers
 from terminal.const import TerminalType
 from terminal.models import Session
 from terminal.permissions import IsSessionAssignee
+from terminal.reporting import SessionReportExporter
 from terminal.session_lifecycle import lifecycle_events_map, reasons_map
 from terminal.utils import is_session_approver
 from users.models import User
@@ -78,8 +80,9 @@ class SessionFilterSet(BaseFilterSet):
             return queryset.filter(terminal__name=value)
 
 
-class SessionViewSet(OrgBulkModelViewSet):
+class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
     model = Session
+    report_exporter_class = SessionReportExporter
     serializer_classes = {
         'default': serializers.SessionSerializer,
         'display': serializers.SessionDisplaySerializer,
@@ -107,26 +110,25 @@ class SessionViewSet(OrgBulkModelViewSet):
     @staticmethod
     def prepare_offline_file(session, local_path):
         replay_path = default_storage.path(local_path)
-        current_dir = os.getcwd()
         dir_path = os.path.dirname(replay_path)
         replay_filename = os.path.basename(replay_path)
         meta_filename = '{}.json'.format(session.id)
         offline_filename = '{}.tar'.format(session.id)
-        os.chdir(dir_path)
+        offline_path = os.path.join(dir_path, offline_filename)
 
-        with open(meta_filename, 'wt') as f:
+        meta_path = os.path.join(dir_path, meta_filename)
+        with open(meta_path, 'wt') as f:
             serializer = serializers.SessionDisplaySerializer(session)
             data = data_to_json(serializer.data)
             f.write(data)
 
-        with tarfile.open(offline_filename, 'w') as f:
-            f.add(replay_filename)
-            f.add(meta_filename)
-        file = open(offline_filename, 'rb')
-        os.chdir(current_dir)
-        return file
+        with tarfile.open(offline_path, 'w') as f:
+            f.add(replay_path, arcname=replay_filename)
+            f.add(meta_path, arcname=meta_filename)
+        return offline_path
 
     @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
+            throttle_classes=[FileTransferThrottle],
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
         session = self.get_object()
@@ -140,17 +142,19 @@ class SessionViewSet(OrgBulkModelViewSet):
         if url.endswith('.replay.json'):
             # part 的方式录像存储, 通过 part_storage 的方式下载
             part_storage = SessionPartReplayStorageHandler(session)
-            file = part_storage.prepare_offline_tar_file()
+            offline_abs_path = part_storage.prepare_offline_tar_file()
         else:
-            file = self.prepare_offline_file(session, local_path)
-        response = FileResponse(file)
+            offline_abs_path = self.prepare_offline_file(session, local_path)
+        media_root = default_storage.base_location
+        relative_path = os.path.relpath(offline_abs_path, media_root)
+        internal_url = os.path.join(settings.PRIVATE_STORAGE_INTERNAL_URL, relative_path)
+        internal_url = escape_uri_path(internal_url)
+        response = HttpResponse()
+        response['X-Accel-Redirect'] = internal_url
         response['Content-Type'] = 'application/octet-stream'
-        # 这里要注意哦，网上查到的方法都是response['Content-Disposition']='attachment;filename="filename.py"',
-        # 但是如果文件名是英文名没问题，如果文件名包含中文，下载下来的文件名会被改为url中的path。
         filename = escape_uri_path('{}.tar'.format(session.id))
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
-
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('Download'), str(session)
         )

@@ -37,10 +37,12 @@
         client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
         name: "{{ account.username }}"
-        password: "{{ account.secret }}"
         host: "%"
+        plugin: "{{ 'caching_sha2_password' if ('MariaDB' not in db_info.version.full and (db_info.version.full is version('8.0', '>='))) else omit }}"
+        plugin_auth_string: "{{ account.secret if ('MariaDB' not in db_info.version.full and (db_info.version.full is version('8.0', '>='))) else omit }}"
+        password: "{{ account.secret if ('MariaDB' in db_info.version.full or (db_info.version.full is version('8.0', '<'))) else omit }}"
         priv: "{{ omit if db_name == '' else db_name + '.*:ALL' }}"
-        append_privs: "{{ db_name != '' | bool }}"
+        append_privs: "{{ db_name != '' }}"
       ignore_errors: true
       when: db_info is succeeded
 

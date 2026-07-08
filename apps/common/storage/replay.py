@@ -110,4 +110,4 @@ class SessionPartReplayStorageHandler(object):
                 for part_filename in part_filenames:
                     local_abs_path = os.path.join(dir_path, part_filename)
                     f.add(local_abs_path, arcname=part_filename)
-        return open(offline_filename_abs_path, 'rb')
+        return offline_filename_abs_path

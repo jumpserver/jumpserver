@@ -142,7 +142,7 @@ class VariableFormDataSerializer(serializers.Serializer):
         elif field_type == FieldType.select:
             self._add_select_field(field, var_name, required, label, help_text)
 
-        if required and default is not None:
+        if default is not None:
             self.fields[var_name].default = default
 
     def _add_select_field(self, field, var_name, required, label, help_text):

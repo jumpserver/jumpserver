@@ -40,7 +40,7 @@ class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
 
 class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
     filterset_class = UserFilter
-    search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
+    search_fields = ('username', 'name', 'id', 'source', 'role')
     serializer_class = UserSerializer
     rbac_perms = {
         'GET': 'perms.view_assetpermission'

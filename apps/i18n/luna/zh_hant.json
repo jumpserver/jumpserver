@@ -80,7 +80,7 @@
     "Download": "下載",
     "Download the latest client": "下載最新用戶端",
     "DownloadClient": "下載客戶端",
-    "DownloadClientMsg": "JumpServer 客戶端尚未安裝，現在請前往下載安裝。",
+    "DownloadClientMsg": "客戶端尚未安裝，現在請前往下載安裝。",
     "Driver redirect": "磁碟掛載",
     "Expand": "展開",
     "Expand all": "展開全部",
@@ -118,7 +118,7 @@
     "Host": "主機",
     "Hotkeys": "快捷鍵",
     "Info": "提示",
-    "InstallClientMsg": "JumpServer 用戶端沒有安裝，現在去下載安裝?",
+    "InstallClientMsg": "用戶端沒有安裝，現在去下載安裝?",
     "Japanese keyboard layout": "Japanese (Qwerty)",
     "Keyboard keys": "Option + Shift + Left / Right",
     "Keyboard layout": "鍵盤布局",
@@ -290,5 +290,6 @@
     "success": "成功",
     "system user": "系統用戶",
     "tabLimits": "當前已打開 15 個標籤頁。  \n為了確保系統穩定，是否在新的瀏覽器標籤頁中打開 Luna 以繼續操作？",
-    "user": "用戶"
+    "user": "用戶",
+    "MarkAsRead": "標記為已讀"
 }

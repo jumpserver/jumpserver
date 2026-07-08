@@ -14,11 +14,11 @@
     <!-- Stylesheets -->
     <link href="{% static 'css/login-style.css' %}" rel="stylesheet">
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
-    <script src="{% static 'js/jumpserver.js' %}?v=9"></script>
+    <script src="{% static 'js/jumpserver.js' %}?v=10"></script>
 
     <style>
         .login-content {
-            {% comment %} box-shadow: 0 5px 5px -3px rgb(0 0 0 / 15%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%); {% endcomment %}
+        {% comment %} box-shadow: 0 5px 5px -3px rgb(0 0 0 / 15%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%); {% endcomment %}
         }
 
         .login-footer {
@@ -86,7 +86,7 @@
             width: 100vw;
             height: 100vh;
             background-color: #f3f3f3;
-            {#height: calc(100vh - (100vh - 470px) / 3);#}
+        {#height: calc(100vh - (100vh - 470px) / 3);#}
         }
 
 
@@ -352,7 +352,7 @@
                 </ul>
             </div>
             <div class="contact-form col-md-10 col-md-offset-1" style='float: none; overflow: hidden'>
-                <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
+                <form id="login-form" autocomplete="off" action="" method="post" role="form" novalidate="novalidate">
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
                         {% if form.non_field_errors %}
@@ -362,12 +362,13 @@
                         {% endif %}
                     </div>
 
-                    {% bootstrap_field form.username show_label=False %}
+                    {% bootstrap_field form.username autocomplete="off" show_label=False %}
                     <div class="form-group {% if form.password.errors %} has-error {% endif %}">
-                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}"
+                        <input type="password" autocomplete="off" class="form-control" id="password"
+                               placeholder="{% trans 'Password' %}"
                                required>
                         <input id="password-hidden" type="text" style="display:none"
-                               name="{{ form.password.html_name }}">
+                               name="{{ form.password.html_name }}" autocomplete="off" aria-hidden="true" tabindex="-1">
                         {% if form.password.errors %}
                             <p class="help-block" style="text-align: left">
                                 {{ form.password.errors.as_text }}
@@ -402,7 +403,7 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">
+                        <button type="submit" class="btn btn-transparent" onclick="doLogin(event);return false;">
                             {% trans 'Login' %}
                         </button>
                     </div>
@@ -441,17 +442,32 @@
 
 </body>
 {% include '_foot_js.html' %}
-<script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.3.3.2.min.js"></script>
-<script type="text/javascript" src="/static/js/plugins/cryptojs/crypto-js.min.js"></script>
-<script type="text/javascript" src="/static/js/plugins/buffer/buffer.min.js"></script>
+
+<script type="text/javascript" src="/static/js/crypto.bundle.js"></script>
+<script type="text/javascript" src="/static/js/session-encrypt.js"></script>
+
 <script>
-    function doLogin() {
+    function doLogin(evt) {
         //公钥加密
+        if (evt && evt.preventDefault) {
+            evt.preventDefault();
+        }
         var password = $('#password').val(); //明文密码
         var passwordEncrypted = encryptPassword(password)
         $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
-        $('#login-form').submit(); //post提交
+        $('#login-form').submit();
     }
+
+    // Ensure we block default submit for both:
+    // 1) clicking the submit button
+    // 2) pressing Enter in an input
+    (function () {
+        const form = document.getElementById('login-form');
+        if (!form) return;
+        form.addEventListener('submit', function (evt) {
+            doLogin(evt);
+        });
+    })();
 
     function checkHealth() {
         let url = "{% url 'health' %}";

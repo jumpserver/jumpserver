@@ -45,6 +45,7 @@ REST_FRAMEWORK = {
         'anon': CONFIG.THROTTLE_RATES_ANON,
         'user': CONFIG.THROTTLE_RATES_USER,
         'service_account': CONFIG.THROTTLE_RATES_SERVICE_ACCOUNT,
+        'file_transfer': CONFIG.THROTTLE_FILE_TRANSFER,
     },
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -63,18 +64,9 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'JumpServer API Docs',
-    'DESCRIPTION': 'JumpServer Restful api docs',
+    'TITLE': f'{CONFIG.VENDOR} API Docs',
+    'DESCRIPTION': f'{CONFIG.VENDOR} Restful api docs',
     'VERSION': 'v1',
-    'LICENSE': {
-        'name': 'GPLv3 License',
-        'url': 'https://www.gnu.org/licenses/gpl-3.0.html',
-    },
-    'CONTACT': {
-        'name': 'JumpServer',
-        'url': 'https://jumpserver.org',
-        'email': 'support@jumpserver.org',
-    },
     "SERVE_INCLUDE_SCHEMA": False,
     'SERVE_PUBLIC': True,
     'BASE_PATH': '/api/v1/',
@@ -96,7 +88,23 @@ SPECTACULAR_SETTINGS = {
         'jumpserver.views.schema.LabelRelatedFieldExtension',
     ],
     'SECURITY': [{'Bearer': []}],
+    'DISABLE_ERRORS_AND_WARNINGS': True
 }
+
+if CONFIG.VENDOR.lower() == 'jumpserver':
+    SPECTACULAR_SETTINGS.update({
+        'LICENSE': {
+            'name': 'GPLv3 License',
+            'url': 'https://www.gnu.org/licenses/gpl-3.0.html',
+        },
+        'CONTACT': {
+            'name': 'JumpServer',
+            'url': 'https://jumpserver.org',
+            'email': 'support@jumpserver.org',
+        },
+    })
+
+
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (180, 38)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
@@ -117,6 +125,7 @@ BOOTSTRAP3 = {
 REDIS_LAYERS_HOST = {
     'db': CONFIG.REDIS_DB_WS,
 }
+USE_X_FORWARDED_HOST = True
 
 REDIS_LAYERS_SSL_PARAMS = {}
 if REDIS_USE_SSL:
@@ -226,8 +235,8 @@ REDIS_PASSWORD_QUOTE = CONFIG.REDIS_PASSWORD_QUOTE
 DJANGO_REDIS_SCAN_ITERSIZE = 1000
 
 # GM DEVICE
-PIICO_DEVICE_ENABLE = CONFIG.PIICO_DEVICE_ENABLE
-PIICO_DRIVER_PATH = CONFIG.PIICO_DRIVER_PATH
+GM_DEVICE_ENABLE = CONFIG.GM_DEVICE_ENABLE
+GM_VENDOR_NAME = CONFIG.GM_VENDOR_NAME
 
 LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH
 

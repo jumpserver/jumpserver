@@ -79,7 +79,7 @@
     "Download": "Descargar",
     "Download the latest client": "Descargar el cliente más reciente",
     "DownloadClient": "Descargar cliente",
-    "DownloadClientMsg": "El cliente de JumpServer no está instalado, así que ve a descargarlo ahora.",
+    "DownloadClientMsg": "El cliente no está instalado, así que ve a descargarlo ahora.",
     "Driver redirect": "Montaje de disco",
     "Expand": "Expandir",
     "Expand all": "Expandir todo",
@@ -117,7 +117,7 @@
     "Host": "Host",
     "Hotkeys": "Atajos",
     "Info": "Sugerencia",
-    "InstallClientMsg": "¿El cliente JumpServer no está instalado, deseas ir a instalarlo ahora?",
+    "InstallClientMsg": "¿El cliente no está instalado, deseas ir a instalarlo ahora?",
     "Japanese keyboard layout": "Japonés (Qwerty)",
     "Keyboard keys": "Opción + Shift + Izquierda / Derecha",
     "Keyboard layout": "Distribución del teclado",
@@ -289,5 +289,6 @@
     "success": "Éxito",
     "system user": "Usuario del sistema",
     "tabLimits": "Actualmente tienes 15 pestañas abiertas.  \n¿Para garantizar la estabilidad del sistema, deberías abrir Luna en una nueva pestaña del navegador para continuar con la operación?",
-    "user": "Usuario"
+    "user": "Usuario",
+    "MarkAsRead": "Marcar como leído"
 }

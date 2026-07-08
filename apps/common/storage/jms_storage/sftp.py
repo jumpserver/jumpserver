@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import io
 import os
 
 import paramiko
+
+from common.utils.encode import ssh_key_string_to_obj
 
 from .base import ObjectStorage
 
@@ -27,9 +28,11 @@ class SFTPStorage(ObjectStorage):
         if self.sftp_secret_type == 'password':
             self.ssh.connect(self.sftp_host, self.sftp_port, self.sftp_username, self.sftp_password)
         elif self.sftp_secret_type == 'ssh_key':
-            pkey = paramiko.RSAKey.from_private_key(io.StringIO(self.sftp_private_key))
-            self.ssh.connect(self.sftp_host, self.sftp_port, self.sftp_username, pkey=pkey,
-                             passphrase=self.sftp_passphrase)
+            private_key = self.sftp_private_key or ''
+            if '\\n' in private_key and '\n' not in private_key:
+                private_key = private_key.replace('\\n', '\n')
+            pkey = ssh_key_string_to_obj(private_key, password=self.sftp_passphrase or None)
+            self.ssh.connect(self.sftp_host, self.sftp_port, self.sftp_username, pkey=pkey)
         self.sftp = self.ssh.open_sftp()
 
     def confirm_connected(self):

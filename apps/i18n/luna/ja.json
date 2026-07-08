@@ -79,7 +79,7 @@
     "Download": "ダウンロード",
     "Download the latest client": "最新クライアントのダウンロード",
     "DownloadClient": "クライアントをダウンロードしてください。",
-    "DownloadClientMsg": "JumpServerクライアントがインストールされていません。今すぐクライアントをダウンロードしてインストールしてください。",
+    "DownloadClientMsg": "クライアントがインストールされていません。今すぐクライアントをダウンロードしてインストールしてください。",
     "Driver redirect": "ディスクマウント",
     "Expand": "展開",
     "Expand all": "すべて展開",
@@ -117,7 +117,7 @@
     "Host": "ホスト",
     "Hotkeys": "ショートカットキー",
     "Info": "ヒント",
-    "InstallClientMsg": "JumpServerクライアントがインストールされていない、今ダウンロードしてインストールしますか?",
+    "InstallClientMsg": "クライアントがインストールされていない、今ダウンロードしてインストールしますか?",
     "Japanese keyboard layout": "Japanese (Qwerty)",
     "Keyboard keys": "Option + Shift + Left / Right",
     "Keyboard layout": "キーボードレイアウト",
@@ -289,5 +289,6 @@
     "success": "成功",
     "system user": "システムユーザー",
     "tabLimits": "現在、15個のタブが開かれています。システムの安定性を確保するために、新しいブラウザのタブでLunaを開いて操作を続けますか？",
-    "user": "ユーザー"
+    "user": "ユーザー",
+    "MarkAsRead": "既読にする"
 }

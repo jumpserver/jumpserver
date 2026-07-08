@@ -22,6 +22,7 @@ from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.utils import tmp_to_root_org
 from ...const import GATEWAY_NAME
 from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
@@ -32,13 +33,27 @@ __all__ = [
 ]
 
 
+def get_license_asset_limit():
+    if not settings.XPACK_ENABLED:
+        return 0
+
+    try:
+        from xpack.utils import get_license_asset_count
+        count = get_license_asset_count()
+        return count
+    except ImportError:
+        return 0
+
+
 class AssetFilterSet(BaseFilterSet):
     platform = drf_filters.CharFilter(method='filter_platform')
     is_gateway = drf_filters.BooleanFilter(method='filter_is_gateway')
     exclude_platform = drf_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
     zone = drf_filters.CharFilter(method='filter_zone')
     type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
+    exclude_type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact", exclude=True)
     category = drf_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
+    exclude_category = drf_filters.CharFilter(field_name="platform__category", lookup_expr="exact", exclude=True)
     protocols = drf_filters.CharFilter(method='filter_protocols')
     gateway_enabled = drf_filters.BooleanFilter(
         field_name="platform__gateway_enabled", lookup_expr="exact"
@@ -153,9 +168,18 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
             error = _('Cannot create asset directly, you should create a host or other')
             return Response({'error': error}, status=400)
 
-        if not settings.XPACK_LICENSE_IS_VALID and self.model.objects.order_by().count() >= 5000:
+        with tmp_to_root_org():
+            asset_count = Asset.objects.order_by().count()
+
+        if not settings.XPACK_LICENSE_IS_VALID and asset_count >= 5000:
             error = _('The number of assets exceeds the limit of 5000')
             return Response({'error': error}, status=400)
+
+        if settings.XPACK_LICENSE_IS_VALID:
+            license_asset_limit = get_license_asset_limit()
+            if asset_count >= license_asset_limit:
+                error = _('The number of assets exceeds the license limit')
+                return Response({'error': error}, status=400)
 
         return super().create(request, *args, **kwargs)
 

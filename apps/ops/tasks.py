@@ -1,12 +1,13 @@
 # coding: utf-8
 import datetime
+import os
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
-from django.conf import settings
 
 from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
@@ -69,7 +70,7 @@ def run_ops_job(job_id):
         execution = job.create_execution()
         execution.creator = job.creator
         if job.periodic_variable:
-            execution.parameters = JobExecutionSerializer.validate_parameters(job.periodic_variable)
+            execution.parameters = JobExecutionSerializer().validate_parameters(job.periodic_variable)
         _run_ops_job_execution(execution)
 
 
@@ -150,8 +151,10 @@ def create_or_update_registered_periodic_tasks():
         and disk usage exceed the thresholds, and send an alert message to the administrator"""
     )
 )
-@register_as_period_task(interval=3600)
+@register_as_period_task(interval=300)
 def check_server_performance_period():
+    if os.environ.get('SKIP_SERVER_PERFORMANCE_CHECK', False):
+        return
     ServerPerformanceCheckUtil().check_and_publish()
 
 

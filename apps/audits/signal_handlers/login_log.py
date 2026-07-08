@@ -33,6 +33,7 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _("SSH Key")
         backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _("Password")
         backend_label_mapping[settings.AUTH_BACKEND_SSO] = _("SSO")
+        backend_label_mapping[settings.AUTH_BACKEND_CUSTOM_SSO] = _("Custom SSO")
         backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _("Auth Token")
         backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _("WeCom")
         backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _("FeiShu")
@@ -143,5 +144,13 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
 def on_user_auth_failed(sender, username, request, reason='', **kwargs):
     logger.debug('User login failed: {}'.format(username))
     data = generate_data(username, request)
-    data.update({'reason': reason[:128], 'status': False})
+    reason_params = kwargs.get('reason_params') or {}
+    if not isinstance(reason_params, dict):
+        reason_params = {}
+    data.update({
+        'reason': reason[:128],
+        'reason_code': kwargs.get('reason_code') or '',
+        'reason_params': reason_params,
+        'status': False,
+    })
     write_login_log(**data)

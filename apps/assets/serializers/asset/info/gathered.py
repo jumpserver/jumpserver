@@ -18,6 +18,11 @@ class HostGatheredInfoSerializer(serializers.Serializer):
     arch = serializers.CharField(max_length=16, allow_blank=True, required=False, label=_('OS arch'))
 
     gpu_model = serializers.CharField(allow_blank=True, required=False, label=_('GPU model'))
+    mac_address = serializers.ListField(
+        child=serializers.CharField(allow_blank=True),
+        required=False,
+        label=_('MAC address'),
+    )
 
 
 category_gathered_serializer_map = {

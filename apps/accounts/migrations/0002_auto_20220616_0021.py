@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('password_rules', models.JSONField(default=dict, verbose_name='Password rules')),
                 ('ssh_key_change_strategy', models.CharField(
                     choices=[
-                        ("set_jms", "Replace (Replace only keys pushed by JumpServer) "),
+                        ("set_jms", "Replace (Replace only keys pushed by system) "),
                         ("set", "Empty and append SSH KEY"),
                     ],
                     default="set_jms",
@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                 ('password_rules', models.JSONField(default=dict, verbose_name='Password rules')),
                 ('ssh_key_change_strategy', models.CharField(
                     choices=[
-                        ("set_jms", "Replace (Replace only keys pushed by JumpServer) "),
+                        ("set_jms", "Replace (Replace only keys pushed by system) "),
                         ("set", "Empty and append SSH KEY"),
                     ],
                     default="set_jms",

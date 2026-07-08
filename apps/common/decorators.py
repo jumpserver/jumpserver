@@ -296,6 +296,31 @@ def cached_method(ttl=20):
     return decorator
 
 
+def cached_method_to_redis(key, ttl, should_cache=None):
+    from django.core.cache import cache
+    
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # 尝试从缓存读取
+            cached_result = cache.get(key)
+            if cached_result is not None:
+                return cached_result
+            
+            # 执行函数
+            result = func(*args, **kwargs)
+            
+            # 判断是否缓存
+            if should_cache is None or should_cache(result):
+                cache.set(key, result, ttl)
+            
+            return result
+        
+        return wrapper
+    
+    return decorator
+
+
 def bulk_handle(handler, batch_size=50, timeout=0.5):
     def decorator(func):
         from orgs.utils import get_current_org_id

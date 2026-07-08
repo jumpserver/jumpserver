@@ -53,6 +53,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'saml2': serializers.SAML2SettingSerializer,
         'oauth2': serializers.OAuth2SettingSerializer,
         'passkey': serializers.PasskeySettingSerializer,
+        'ukey': serializers.UKeySettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
         'sms': serializers.SMSSettingSerializer,
@@ -74,7 +75,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     }
 
     rbac_category_permissions = {
-        'basic': 'settings.view_setting',
+        'basic': 'settings.change_basic',
         'tool': 'rbac.view_systemtools',
         'terminal': 'settings.change_terminal',
         'ops': 'settings.change_ops',
@@ -88,6 +89,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'security_password': 'settings.change_security',
         'security_login_limit': 'settings.change_security',
         'ldap': 'settings.change_auth',
+        'ldap_ha': 'settings.change_auth',
         'cas': 'settings.change_auth',
         'oidc': 'settings.change_auth',
         'saml2': 'settings.change_auth',
@@ -102,6 +104,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'keycloak': 'settings.change_auth',
         'radius': 'settings.change_auth',
         'sso': 'settings.change_auth',
+        'ukey': 'settings.change_auth',
         'clean': 'settings.change_clean',
         'other': 'settings.change_other',
         'chat': 'settings.change_chatai',

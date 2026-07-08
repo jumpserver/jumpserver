@@ -70,7 +70,7 @@
         - home_dir_stat.stat.exists == false
       ignore_errors: yes
 
-    - name: Remove jumpserver ssh key
+    - name: Remove ssh key created by system
       ansible.builtin.lineinfile:
         dest: "{{ home_dir.stdout.strip() }}/.ssh/authorized_keys"
         regexp: "{{ ssh_params.regexp }}"
@@ -107,6 +107,7 @@
       when:
        - account.secret_type == "password"
        - check_conn_after_change or change_secret_result.failed | default(false)
+      connection: local
       delegate_to: localhost
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
@@ -120,4 +121,5 @@
       when:
        - account.secret_type == "ssh_key"
        - check_conn_after_change or change_secret_result.failed | default(false)
+      connection: local
       delegate_to: localhost

@@ -24,8 +24,11 @@ from django.utils.translation import gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
-from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from common.utils import (
+    get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil,
+    text_hmac_sha256
+)
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
@@ -167,9 +170,15 @@ def authenticate(request=None, **credentials):
                     and the current user is not in the user list. Please contact the administrator.'''
                 )
             continue
+        except Exception as e:
+            logger.error('Authenticate failed: {}'.format(e))
+            continue
         
         if user is None:
             continue
+
+        if request:
+            request.session['auth_backend'] = backend_path
 
         if not user.is_valid:
             temp_user = user
@@ -236,6 +245,12 @@ class CommonMixin:
             return user
 
         user_id = self.request.session.get('user_id')
+        auth_ukey_ok = self.request.session.get('auth_ukey')
+        if auth_ukey_ok:
+            user = get_object_or_404(User, pk=user_id)
+            user.backend = self.request.session.get("auth_backend")
+            return user
+
         auth_ok = self.request.session.get('auth_password')
         auth_expired_at = self.request.session.get('auth_password_expired_at')
         auth_expired = auth_expired_at < time.time() if auth_expired_at else False
@@ -292,7 +307,7 @@ class AuthPreCheckMixin:
         if not settings.ONLY_ALLOW_EXIST_USER_AUTH:
             return
 
-        q = Q(username=username) | Q(email=username)
+        q = Q(username=username) | Q(email_lookup=text_hmac_sha256(username))
         exist = User.objects.filter(q).exists()
         if not exist:
             logger.error(f"Only allow exist user auth, login failed: {username}")
@@ -495,6 +510,10 @@ class AuthACLMixin:
             return
         if not acl.is_action(acl.ActionChoices.review):
             return
+        if acl.is_user_in_reviewers(user):
+            # 如果用户在审核人列表中，则不需要审核，直接通过
+            # 避免管理员admin创建一条针对所有用户的复核规则导致admin自己也无法登录了
+            return
         self.get_ticket_or_create(acl, user)
         self.check_user_login_confirm()
 
@@ -656,7 +675,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         LoginBlockUtil(user.username, ip).clean_failed_count()
         LoginIpBlockUtil(ip).clean_block_if_need()
         return user
-
+    
     def mark_password_ok(self, user, auto_login=False, auth_backend=None):
         request = self.request
         request.session['auth_password'] = 1
@@ -666,6 +685,12 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         if not auth_backend:
             auth_backend = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
 
+        request.session['auth_backend'] = auth_backend
+
+    def mark_ukey_ok(self, user, auth_backend):
+        request = self.request
+        request.session['auth_ukey'] = 1
+        request.session['user_id'] = str(user.id)
         request.session['auth_backend'] = auth_backend
 
     def check_oauth2_auth(self, user: User, auth_backend):
@@ -700,20 +725,22 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         keys = [
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
-            'user_session_id', 'user_log_id', 'can_send_notifications'
+            'user_session_id', 'user_log_id', 'can_send_notifications',
+            'auth_ukey'
         ]
         for k in keys:
             self.request.session.pop(k, '')
 
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
+    def send_auth_signal(self, success=True, user=None, username='', reason='', request=None):
+        request = request or self.request
         if success:
             post_auth_success.send(
-                sender=self.__class__, user=user, request=self.request
+                sender=self.__class__, user=user, request=request
             )
         else:
             post_auth_failed.send(
                 sender=self.__class__, username=username,
-                request=self.request, reason=reason
+                request=request, reason=reason
             )
 
     def redirect_to_guard_view(self):

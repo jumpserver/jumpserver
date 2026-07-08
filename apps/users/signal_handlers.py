@@ -3,7 +3,7 @@
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_out
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from django_auth_ldap.backend import populate_user
@@ -18,7 +18,7 @@ from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.decorators import on_transaction_commit
 from common.sessions.cache import user_session_manager
 from common.signals import django_ready
-from common.utils import get_logger
+from common.utils import get_logger, text_hmac_sha256
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
 from orgs.models import Organization
@@ -27,8 +27,10 @@ from rbac.builtin import BuiltinRole
 from rbac.const import Scope
 from rbac.models import RoleBinding
 from settings.signals import setting_changed
+from users.api import user
 from .models import User, UserPasswordHistory, UserGroup
-from .signals import post_user_create
+from .signals import post_user_create, post_user_update
+
 
 logger = get_logger(__file__)
 
@@ -78,21 +80,50 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
         user.save()
 
 
+def set_user_email_lookup(user):
+    if user.email:
+        email_lookup = text_hmac_sha256(user.email)
+    else:
+        email_lookup = ''
+    if user.email_lookup == email_lookup:
+        return
+    logger.debug(f"Set user email_lookup: {email_lookup} for user: {user}")
+    user.email_lookup = email_lookup
+    user.save(update_fields=['email_lookup'])
+
+
+@receiver(post_user_create)
+@receiver(post_user_update)
+def save_user_email_lookup(sender, user, **kwargs):
+    set_user_email_lookup(user)
+
+
+@receiver(post_save, sender=User)
+def save_user_email_lookup(sender, instance, **kwargs):
+    set_user_email_lookup(instance)
+
+
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
+    if not getattr(instance, '_password_changed', False):
+        return
     if instance.source != User.Source.local.value or not instance.password:
+        instance._password_changed = False
         return
 
-    passwords = UserPasswordHistory.objects \
-                    .filter(user=instance) \
-                    .order_by('-date_created') \
-                    .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
+    try:
+        passwords = UserPasswordHistory.objects \
+                        .filter(user=instance) \
+                        .order_by('-date_created') \
+                        .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
 
-    if instance.password not in list(passwords):
-        UserPasswordHistory.objects.create(
-            user=instance, password=instance.password,
-            date_created=instance.date_password_last_updated
-        )
+        if instance.password not in list(passwords):
+            UserPasswordHistory.objects.create(
+                user=instance, password=instance.password,
+                date_created=instance.date_password_last_updated
+            )
+    finally:
+        instance._password_changed = False
 
 
 def update_role_superuser_if_need(user):

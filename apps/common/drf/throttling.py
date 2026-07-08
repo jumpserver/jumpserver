@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework.throttling import SimpleRateThrottle
 
+__all__ = ['RateThrottle', 'FileTransferThrottle']
+
 
 class RateThrottle(SimpleRateThrottle):
 
@@ -32,3 +34,17 @@ class RateThrottle(SimpleRateThrottle):
             'scope': self.scope,
             'ident': ident
         }
+
+
+class FileTransferThrottle(SimpleRateThrottle):
+    """
+    文件上传下载限流，防止DOS攻击
+    """
+    scope = 'file_transfer'
+
+    def get_cache_key(self, request, view):
+        if request.user and request.user.is_authenticated:
+            ident = request.user.pk
+        else:
+            ident = self.get_ident(request)
+        return self.cache_format % {'scope': self.scope, 'ident': ident}

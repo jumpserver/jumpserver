@@ -12,13 +12,12 @@ from django.urls import reverse
 from common.utils import get_logger
 from users.utils import construct_user_email
 from authentication.utils import build_absolute_uri
-from authentication.signals import user_auth_failed, user_auth_success
 from common.exceptions import JMSException
 
 from .signals import (
     oauth2_create_or_update_user
 )
-from ..base import JMSBaseAuthBackend
+from ..base import RedirectAuthBackend
 
 
 __all__ = ['OAuth2Backend']
@@ -26,7 +25,9 @@ __all__ = ['OAuth2Backend']
 logger = get_logger(__name__)
 
 
-class OAuth2Backend(JMSBaseAuthBackend):
+class OAuth2Backend(RedirectAuthBackend):
+    backend = settings.AUTH_BACKEND_OAUTH2
+
     @staticmethod
     def is_enabled():
         return settings.AUTH_OAUTH2
@@ -68,12 +69,24 @@ class OAuth2Backend(JMSBaseAuthBackend):
             response_data = response_data['data']
         return response_data
 
-    def authenticate(self, request, code=None):
+    def authenticate(self, request, code=None, state=None):
         log_prompt = "Process authenticate [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
         if code is None:
             logger.error(log_prompt.format('code is missing'))
             return None
+
+        if settings.AUTH_OAUTH2_USE_STATE:
+            if state is None:
+                logger.error(log_prompt.format('state is missing'))
+                return None
+
+            session_state = request.session.get('oauth2_state')
+            if not session_state or session_state != state:
+                logger.error(log_prompt.format('state parameter mismatch'))
+                return None
+
+            request.session.pop('oauth2_state', None)
 
         query_dict = {
             'grant_type': 'authorization_code', 'code': code,
@@ -144,18 +157,9 @@ class OAuth2Backend(JMSBaseAuthBackend):
 
         if self.user_can_authenticate(user):
             logger.debug(log_prompt.format('OAuth2 user login success'))
-            logger.debug(log_prompt.format('Send signal => oauth2 user login success'))
-            user_auth_success.send(
-                sender=self.__class__, request=request, user=user,
-                backend=settings.AUTH_BACKEND_OAUTH2
-            )
             return user
         else:
             logger.debug(log_prompt.format('OAuth2 user login failed'))
             logger.debug(log_prompt.format('Send signal => oauth2 user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=user.username,
-                reason=_('User invalid, disabled or expired'),
-                backend=settings.AUTH_BACKEND_OAUTH2
-            )
+            self.send_backend_auth_failed_signal(request=request, username=user.username)
             return None

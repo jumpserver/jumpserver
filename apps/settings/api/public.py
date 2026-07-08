@@ -32,8 +32,9 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
                     'code': code,
                     'other_codes': Language.get_other_codes(code),
                 }
-                for code, title in Language.choices
-            ]
+                for code, title in Language.choices_supported()
+            ],
+            "VENDOR": settings.VENDOR,
         }
 
 
@@ -42,6 +43,11 @@ class PublicSettingApi(OpenPublicSettingApi):
     serializer_class = serializers.PrivateSettingSerializer
 
     def get_object(self):
+        if self.request.user.is_org_admin:
+            SECURITY_PASSWORD_EXPIRATION_TIME = settings.SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN
+        else:
+            SECURITY_PASSWORD_EXPIRATION_TIME = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+
         values = super().get_object()
         values.update({
             "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
@@ -54,6 +60,7 @@ class PublicSettingApi(OpenPublicSettingApi):
                 'SECURITY_PASSWORD_NUMBER': settings.SECURITY_PASSWORD_NUMBER,
                 'SECURITY_PASSWORD_SPECIAL_CHAR': settings.SECURITY_PASSWORD_SPECIAL_CHAR,
             },
+            "SECURITY_PASSWORD_EXPIRATION_TIME": SECURITY_PASSWORD_EXPIRATION_TIME,
         })
 
         serializer = self.serializer_class()

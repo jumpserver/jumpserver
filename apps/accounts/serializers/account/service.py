@@ -38,9 +38,10 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
             data['logo'] = static('img/logo.png')
         return data
 
-    def validate(self, attrs):
-        attrs['secret'] = random_string(36)
-        return attrs
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        instance.refresh_secret()
+        return instance
 
 
 class IntegrationAccountSecretSerializer(serializers.Serializer):

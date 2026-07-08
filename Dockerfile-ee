@@ -1,4 +1,5 @@
 ARG VERSION=dev
+FROM jumpserver/gmssl:3.1.1-trixie AS gmssl-builder
 
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} AS build-xpack
 FROM jumpserver/core:${VERSION}-ce
@@ -7,15 +8,9 @@ COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
 ARG TOOLS="                           \
         g++                           \
-        curl                          \
         iputils-ping                  \
         netcat-openbsd                \
-        nmap                          \
-        telnet                        \
-        vim                           \
-        postgresql-client         \
-        wget                          \
-        poppler-utils"
+        telnet"
 
 RUN set -ex \
     && apt-get update \
@@ -29,4 +24,8 @@ ARG PIP_MIRROR=https://pypi.org/simple
 
 RUN set -ex \
     && uv pip install -i${PIP_MIRROR} --group xpack \
-    && playwright install chromium  --with-deps --only-shell
+    && rm -rf /root/.cache/
+
+COPY --from=gmssl-builder /usr/local/lib/libgmssl.so* /usr/local/lib/
+COPY --from=gmssl-builder /usr/local/include/gmssl /usr/local/include/gmssl
+COPY --from=gmssl-builder /usr/local/bin/gmssl /usr/local/bin/gmssl

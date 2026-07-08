@@ -23,6 +23,7 @@ class AccountHistoricalRecords(HistoricalRecords):
         super().__init__(*args, **kwargs)
 
     def post_save(self, instance, created, using=None, **kwargs):
+        self.updated_version = None
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
 
@@ -51,7 +52,10 @@ class AccountHistoricalRecords(HistoricalRecords):
         super().create_historical_record(instance, history_type, using=using)
         # Ignore deletion history_type: -
         if self.updated_version is not None and history_type != '-':
-            instance.save(update_fields=['version'])
+            type(instance)._base_manager.db_manager(using=using).filter(
+                pk=instance.pk
+            ).update(version=self.updated_version)
+            self.updated_version = None
 
     def create_history_model(self, model, inherited):
         if self.included_fields and not self.excluded_fields:
@@ -233,8 +237,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         return escape(value)
 
     def update_last_login_date(self):
-        self.date_last_login = timezone.now()
-        self.save(update_fields=['date_last_login'])
+        Account.objects.filter(pk=self.pk).update(date_last_login=timezone.now())
 
 
 def replace_history_model_with_mixin():

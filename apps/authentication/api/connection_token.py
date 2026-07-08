@@ -2,7 +2,11 @@ import base64
 import json
 import os
 import urllib.parse
+from struct import pack
 
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.serialization import pkcs7
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -15,6 +19,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from accounts.const import AliasAccount
+from accounts.utils import validate_account_username
 from acls.notifications import AssetLoginReminderMsg
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
@@ -46,6 +51,154 @@ logger = get_logger(__name__)
 class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
+
+    RDP_SIGN_SECURE_SETTINGS = [
+        ('full address:s:', 'Full Address'),
+        ('alternate full address:s:', 'Alternate Full Address'),
+        ('pcb:s:', 'PCB'),
+        ('use redirection server name:i:', 'Use Redirection Server Name'),
+        ('server port:i:', 'Server Port'),
+        ('negotiate security layer:i:', 'Negotiate Security Layer'),
+        ('enablecredsspsupport:i:', 'EnableCredSspSupport'),
+        ('disableconnectionsharing:i:', 'DisableConnectionSharing'),
+        ('autoreconnection enabled:i:', 'AutoReconnection Enabled'),
+        ('gatewayhostname:s:', 'GatewayHostname'),
+        ('gatewayusagemethod:i:', 'GatewayUsageMethod'),
+        ('gatewayprofileusagemethod:i:', 'GatewayProfileUsageMethod'),
+        ('gatewaycredentialssource:i:', 'GatewayCredentialsSource'),
+        ('support url:s:', 'Support URL'),
+        ('promptcredentialonce:i:', 'PromptCredentialOnce'),
+        ('require pre-authentication:i:', 'Require pre-authentication'),
+        ('pre-authentication server address:s:', 'Pre-authentication server address'),
+        ('alternate shell:s:', 'Alternate Shell'),
+        ('shell working directory:s:', 'Shell Working Directory'),
+        ('remoteapplicationprogram:s:', 'RemoteApplicationProgram'),
+        ('remoteapplicationexpandworkingdir:s:', 'RemoteApplicationExpandWorkingdir'),
+        ('remoteapplicationmode:i:', 'RemoteApplicationMode'),
+        ('remoteapplicationguid:s:', 'RemoteApplicationGuid'),
+        ('remoteapplicationname:s:', 'RemoteApplicationName'),
+        ('remoteapplicationicon:s:', 'RemoteApplicationIcon'),
+        ('remoteapplicationfile:s:', 'RemoteApplicationFile'),
+        ('remoteapplicationfileextensions:s:', 'RemoteApplicationFileExtensions'),
+        ('remoteapplicationcmdline:s:', 'RemoteApplicationCmdLine'),
+        ('remoteapplicationexpandcmdline:s:', 'RemoteApplicationExpandCmdLine'),
+        ('prompt for credentials:i:', 'Prompt For Credentials'),
+        ('authentication level:i:', 'Authentication Level'),
+        ('audiomode:i:', 'AudioMode'),
+        ('redirectdrives:i:', 'RedirectDrives'),
+        ('redirectprinters:i:', 'RedirectPrinters'),
+        ('redirectcomports:i:', 'RedirectCOMPorts'),
+        ('redirectsmartcards:i:', 'RedirectSmartCards'),
+        ('redirectposdevices:i:', 'RedirectPOSDevices'),
+        ('redirectclipboard:i:', 'RedirectClipboard'),
+        ('devicestoredirect:s:', 'DevicesToRedirect'),
+        ('drivestoredirect:s:', 'DrivesToRedirect'),
+        ('loadbalanceinfo:s:', 'LoadBalanceInfo'),
+        ('redirectdirectx:i:', 'RedirectDirectX'),
+        ('rdgiskdcproxy:i:', 'RDGIsKDCProxy'),
+        ('kdcproxyname:s:', 'KDCProxyName'),
+        ('eventloguploadaddress:s:', 'EventLogUploadAddress'),
+        ('redirectwebauthn:i:', 'RedirectWebAuthn'),
+    ]
+
+    @classmethod
+    def _collect_rdp_sign_lines(cls, settings_lines):
+        signnames = []
+        signlines = []
+        for prefix, sign_name in cls.RDP_SIGN_SECURE_SETTINGS:
+            for line in settings_lines:
+                if line.startswith(prefix):
+                    signnames.append(sign_name)
+                    signlines.append(line)
+        return signnames, signlines
+
+    @classmethod
+    def _try_sign_rdp_content(cls, content):
+        if not settings.RDP_SIGN_ENABLED:
+            return content
+        cert_dir = os.path.join(settings.PROJECT_DIR, 'data', 'certs')
+        if not os.path.exists(cert_dir):
+            logger.error(f'rdp sign cert dir [{cert_dir}] not exists')
+            return content
+        
+        certfile = os.path.join(cert_dir, settings.RDP_SIGN_CERT)
+        if not os.path.exists(certfile):
+            logger.error(f'rdp sign cert file [{certfile}] not exists')
+            return content
+        
+        keyfile = os.path.join(cert_dir, settings.RDP_SIGN_CERT_KEY)
+        if not os.path.exists(keyfile):
+            logger.warning(f'rdp sign cert file [{keyfile}] not exists')
+            keyfile = None
+            return content
+
+        settings_lines = []
+        full_address = None
+        alternate_full_address = None
+        for line in content.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith('signature:s:') or line.startswith('signscope:s:'):
+                continue
+            if line.startswith('full address:s:'):
+                full_address = line[15:]
+            elif line.startswith('alternate full address:s:'):
+                alternate_full_address = line[25:]
+            settings_lines.append(line)
+
+        # Keep alternate full address aligned with full address to prevent tampering.
+        if full_address and not alternate_full_address:
+            settings_lines.append(f'alternate full address:s:{full_address}')
+
+        signnames, signlines = cls._collect_rdp_sign_lines(settings_lines)
+        if not signnames or not signlines:
+            return content
+
+        msgtext = '\r\n'.join(signlines) + '\r\n' + 'signscope:s:' + ','.join(signnames) + '\r\n' + '\x00'
+        msgblob = msgtext.encode('UTF-16LE')
+
+        try:
+            with open(certfile, 'rb') as f:
+                cert_pem = f.read()
+            cert = x509.load_pem_x509_certificate(cert_pem)
+            if keyfile:
+                with open(keyfile, 'rb') as f:
+                    key_pem = f.read()
+            else:
+                key_pem = cert_pem
+            private_key = serialization.load_pem_private_key(key_pem, password=None)
+            pkcs7_der = (
+                pkcs7.PKCS7SignatureBuilder()
+                .set_data(msgblob)
+                .add_signer(cert, private_key, hashes.SHA256())
+                .sign(
+                    serialization.Encoding.DER,
+                    [
+                        pkcs7.PKCS7Options.Binary,
+                        pkcs7.PKCS7Options.DetachedSignature,
+                        pkcs7.PKCS7Options.NoAttributes,
+                    ],
+                )
+            )
+        except OSError as e:
+            logger.warning('RDP file sign failed to read cert/key: %s', e)
+            return content
+        except ValueError as e:
+            logger.warning('RDP file sign failed (invalid cert/key PEM): %s', e)
+            return content
+        except Exception as e:
+            logger.warning('RDP file sign failed: %s', e)
+            return content
+
+        msgsig = pack('<I', 0x00010001)
+        msgsig += pack('<I', 0x00000001)
+        msgsig += pack('<I', len(pkcs7_der))
+        msgsig += pkcs7_der
+        sigval = base64.b64encode(msgsig).decode('ascii')
+
+        signed_lines = settings_lines + [f'signscope:s:{",".join(signnames)}', f'signature:s:{sigval}']
+        return '\n'.join(signed_lines) + '\n'
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -162,6 +315,7 @@ class RDPFileClientProtocolURLMixin:
         for k, v in rdp_options.items():
             content += f'{k}:{v}\n'
 
+        content = self._try_sign_rdp_content(content)
         return filename, content
 
     @staticmethod
@@ -173,10 +327,19 @@ class RDPFileClientProtocolURLMixin:
         return name
 
     def get_connect_filename(self, prefix_name):
-        filename = f'{prefix_name}-jumpserver'
+        filename = prefix_name
         filename = self.escape_name(filename)
         return filename
 
+    @staticmethod
+    def get_token_account_display(token):  #新增方法
+            try:
+                account = token.account_object
+            except Exception:
+                account = None
+            if account:
+                return account.full_username or account.username or account.name or token.account
+            return token.input_username or token.account    
     @staticmethod
     def parse_env_bool(env_key, env_default, true_value, false_value):
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
@@ -192,7 +355,7 @@ class RDPFileClientProtocolURLMixin:
         if connect_method_dict is None:
             raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
-        account = token.account or token.input_username
+        account = self.get_token_account_display(token)  #修改account
         datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
         name = account + '@' + asset.name + '[' + datetime + ']'
         data = {
@@ -413,6 +576,10 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         protocol = data.get('protocol')
         connect_method = data.get('connect_method')
         self.input_username = self.get_input_username(data)
+        if account_name == AliasAccount.INPUT:
+            # Manual account input can reach Luna directly, so validate before ACL/token creation.
+            self.input_username = validate_account_username(self.input_username)
+            data['input_username'] = self.input_username
         _data = self._validate(user, asset, account_name, protocol, connect_method)
         data.update(_data)
         return serializer
@@ -438,9 +605,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         account = self._validate_perm(user, asset, account_alias, protocol)
         if account.has_secret:
             data['input_secret'] = ''
+            data['input_secret_type'] = account.secret_type
 
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
+            data['input_secret_type'] = ''
 
         ticket = self._validate_acl(user, asset, account, connect_method, protocol)
         if ticket:
@@ -556,6 +725,20 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         face_verify_token = self.create_face_verify_context(context_data)
         response.data['face_token'] = face_verify_token
 
+    @staticmethod
+    def format_validation_error(detail):
+        # Luna renders detail directly and cannot display DRF field-error dicts cleanly.
+        if isinstance(detail, dict):
+            errors = []
+            for messages in detail.values():
+                if isinstance(messages, (list, tuple)):
+                    messages = ', '.join([str(message) for message in messages])
+                errors.append(str(messages))
+            return '; '.join(errors)
+        if isinstance(detail, (list, tuple)):
+            return '; '.join([str(item) for item in detail])
+        return str(detail)
+
     def create(self, request, *args, **kwargs):
         try:
             response = super().create(request, *args, **kwargs)
@@ -563,6 +746,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 self.create_face_verify(response)
         except JMSException as e:
             data = {'code': e.detail.code, 'detail': e.detail}
+            return Response(data, status=e.status_code)
+        except ValidationError as e:
+            data = {'detail': self.format_validation_error(e.detail)}
             return Response(data, status=e.status_code)
         return response
 

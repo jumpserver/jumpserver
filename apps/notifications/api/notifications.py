@@ -26,6 +26,14 @@ __all__ = (
 )
 
 
+def _get_placeholder_context(contexts):
+    return {
+        item['name']: '{{ ' + item['name'] + ' }}'
+        for item in contexts
+        if item.get('name')
+    }
+
+
 class BackendListView(APIView):
     permission_classes = [IsValidUser]
 
@@ -164,9 +172,10 @@ class TemplateViewSet(JMSGenericViewSet):
                         item['content'] = f.read()
                     item['source'] = 'data'
                 else:
-                    ctx = {x.get('name'): x.get('default') for x in item['contexts']}
+                    ctx = _get_placeholder_context(item['contexts'])
                     try:
                         rendered = render_to_string(meta['template_name'], ctx)
+                        item['template_content'] = rendered
                         item['content'] = rendered
                         item['source'] = 'original'
                     except Exception as e:
@@ -186,7 +195,6 @@ class TemplateViewSet(JMSGenericViewSet):
         serializer.is_valid(raise_exception=True)
         template_name = serializer.validated_data['template_name']
         content = serializer.validated_data['template_content']
-        render_html = serializer.validated_data['render_html']
 
         data_path = _get_data_template_path(template_name)
         edit_path = _get_edit_template_path(template_name)
@@ -194,7 +202,7 @@ class TemplateViewSet(JMSGenericViewSet):
         try:
             os.makedirs(data_dir, exist_ok=True)
             with open(data_path, 'w', encoding='utf-8') as f:
-                f.write(render_html)
+                f.write(content)
             with open(edit_path, 'w', encoding='utf-8') as f:
                 f.write(content)
         except Exception as e:

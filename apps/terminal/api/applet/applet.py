@@ -2,14 +2,15 @@ import os
 import os.path
 import re
 import shutil
-import zipfile
 from typing import Callable
 
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -17,11 +18,13 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from common.api import JMSBulkModelViewSet
+from common.drf.filters import BaseFilterSet
 from common.serializers import FileSerializer
 from common.utils import is_uuid
 from common.utils.http import is_true
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
+from common.utils.zip import safe_extract_zip
 
 __all__ = ['AppletViewSet', 'AppletPublicationViewSet']
 
@@ -47,10 +50,7 @@ class DownloadUploadMixin:
             shutil.rmtree(extract_to)
 
         try:
-            with zipfile.ZipFile(path) as zp:
-                if zp.testzip() is not None:
-                    raise ValidationError({'error': _('Invalid zip file')})
-                zp.extractall(extract_to)
+            safe_extract_zip(path, extract_to)
         except RuntimeError as e:
             raise ValidationError({'error': _('Invalid zip file') + ': {}'.format(e)})
 
@@ -143,8 +143,22 @@ class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
         instance.delete()
 
 
+class AppletPublicationFilterSet(BaseFilterSet):
+    host = filters.CharFilter(method='filter_host')
+
+    class Meta:
+        model = AppletPublication
+        fields = ['host', 'applet', 'status']
+
+    @staticmethod
+    def filter_host(queryset, name, value):
+        if is_uuid(value):
+            return queryset.filter(host_id=value)
+        return queryset.filter(Q(host__name=value) | Q(host__address=value))
+
+
 class AppletPublicationViewSet(viewsets.ModelViewSet):
     queryset = AppletPublication.objects.all()
     serializer_class = serializers.AppletPublicationSerializer
-    filterset_fields = ['host', 'applet', 'status']
-    search_fields = ['applet__name', 'applet__display_name', 'host__name']
+    filterset_class = AppletPublicationFilterSet
+    search_fields = ['applet__name', 'applet__display_name', 'host__name', 'host__address']

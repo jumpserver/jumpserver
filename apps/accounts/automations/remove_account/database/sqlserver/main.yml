@@ -13,5 +13,20 @@
         name: "{{ jms_asset.spec_info.db_name }}"
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
-        script: "DROP LOGIN {{ account.username }}; select @@version"
+        script: |
+          DECLARE @login_name nvarchar(256) = %(username)s;
+          DECLARE @sql nvarchar(max);
 
+          IF @login_name IS NULL OR LEN(@login_name) = 0 OR LEN(@login_name) > 128
+          BEGIN
+              RAISERROR('Invalid login name', 16, 1);
+              RETURN;
+          END;
+
+          -- 标识符使用 QUOTENAME 防止 login name 逃逸。
+          SET @sql = N'DROP LOGIN ' + QUOTENAME(@login_name) + N';';
+          EXEC sys.sp_executesql @sql;
+
+          SELECT @@VERSION AS version;
+        params:
+          username: "{{ account.username }}"

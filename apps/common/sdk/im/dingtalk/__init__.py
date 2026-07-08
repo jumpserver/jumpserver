@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import hmac
 import time
 
@@ -16,7 +17,7 @@ def sign(secret, data):
     digest = hmac.HMAC(
         key=secret.encode('utf8'),
         msg=data.encode('utf8'),
-        digestmod=hmac._hashlib.sha256
+        digestmod=hashlib.sha256
     ).digest()
     signature = base64.standard_b64encode(digest).decode('utf8')
     # signature = urllib.parse.quote(signature, safe='')
@@ -33,6 +34,7 @@ class URL:
     OAUTH_CONNECT = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize'
     GET_USER_ACCESSTOKEN = 'https://api.dingtalk.com/v1.0/oauth2/userAccessToken'
     GET_USER_INFO = 'https://api.dingtalk.com/v1.0/contact/users/me'
+    GET_USERINFO_BYCODE = "https://oapi.dingtalk.com/sns/getuserinfo_bycode"
     GET_TOKEN = 'https://oapi.dingtalk.com/gettoken'
     SEND_MESSAGE_BY_TEMPLATE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/sendbytemplate'
     SEND_MESSAGE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2'
@@ -144,6 +146,14 @@ class DingTalk:
         user = self._request.get(URL.GET_USER_INFO,
                                  headers={'x-acs-dingtalk-access-token': token}, check_errcode_is_0=False)
         return user
+
+    def get_user_id_by_code_for_oauth(self, code):
+        # https://open.dingtalk.com/document/orgapp/use-a-dingtalk-account-to-log-on-to-a-third-party
+        user = self._request.post(URL.GET_USERINFO_BYCODE, json={"tmp_auth_code": code},
+                                  check_errcode_is_0=False, with_sign=True)
+        unionid = user["user_info"]['unionid']
+        userid = self.get_userid_by_unionid(unionid)
+        return userid, None
 
     def get_user_id_by_code(self, code):
         user_info = self.get_userinfo_bycode(code)

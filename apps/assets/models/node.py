@@ -94,6 +94,10 @@ class FamilyMixin:
     def is_children(self, other):
         children_pattern = other.get_children_key_pattern(with_self=False)
         return re.match(children_pattern, self.key)
+    
+    def is_descendant(self, other):
+        all_children_pattern = other.get_all_children_pattern(with_self=False)
+        return re.match(all_children_pattern, self.key)
 
     def get_children(self, with_self=False):
         q = Q(parent_key=self.key)
@@ -203,6 +207,9 @@ class FamilyMixin:
 
     def is_parent(self, other):
         return other.is_children(self)
+
+    def is_ancestor(self, other):
+        return other.is_descendant(self)
 
     @property
     def parent(self):

@@ -65,7 +65,7 @@ class UserLoginContextMixin:
                 'title': title,
                 'code': code
             }
-            for code, title in Language.choices
+            for code, title in Language.choices_supported()
         ]
         return langs
 
@@ -307,8 +307,8 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         from django.utils import timezone
         response = super().get(request, *args, **kwargs)
         try:
-
-            lang = request.user.lang if request.user.lang else get_language_from_request(request, check_path=False)
+            request_lang = get_language_from_request(request, check_path=False)
+            lang = request.user.lang if request.user.lang else request_lang
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
                 lang,

@@ -166,7 +166,7 @@ def get_request_ip(request):
 
 
 def get_trusted_request_ip(request):
-    trusted_ip = request.META.get(settings.TRUSTED_IP_SOURCE_HEADER, '')
+    trusted_ip = request.headers.get(settings.TRUSTED_IP_SOURCE_HEADER, '')
     if not trusted_ip:
         logger.warning(
             f"Trusted IP verification enabled but no source header '{settings.TRUSTED_IP_SOURCE_HEADER}' "
@@ -174,8 +174,8 @@ def get_trusted_request_ip(request):
         )
         return '0.0.0.0'
 
-    signature_header_name = settings.TRUSTED_IP_VERIFY_SIGNATURE_HEADER
-    received_signature = request.META.get(signature_header_name, '')
+    signature_header_name = settings.TRUSTED_IP_SIGN_HEADER
+    received_signature = request.headers.get(signature_header_name, '')
     if not received_signature:
         logger.warning(
             f"Trusted IP verification enabled but no signature header '{signature_header_name}' "
@@ -183,18 +183,9 @@ def get_trusted_request_ip(request):
         )
         return '0.0.0.0'
 
-    verification_key_path = settings.TRUSTED_IP_VERIFY_KEY_PATH
-    if not verification_key_path or not os.path.exists(verification_key_path):
-        logger.warning(
-            f"Trusted IP verification enabled but no valid verification key found at "
-            f"'{verification_key_path}'."
-        )
-        return '0.0.0.0'
-
-    with open(verification_key_path) as f:
-        verification_key = f.read().strip()
+    sign_key = settings.TRUSTED_IP_SIGN_KEY or os.environ.get('HMAC_SIGN_KEY', '')
     expected_signature = hmac.new(
-        verification_key.encode(), trusted_ip.encode(), hashlib.sha256
+        sign_key.encode(), trusted_ip.encode(), hashlib.sha256
     ).hexdigest()
     if not hmac.compare_digest(expected_signature.lower(), received_signature.lower()):
         logger.warning(
@@ -493,3 +484,16 @@ def convert_html_to_markdown(html_str):
 def many_get(d, keys, default=None):
     res = [d.get(key, default) for key in keys]
     return res
+
+
+def text_hmac_sha256(text: str, secret_key: str = None):
+    if secret_key is None:
+        secret_key = settings.SECRET_KEY
+    try:
+        msg = text.strip().lower().encode('utf-8')
+        key = secret_key.encode("utf-8")
+        digest = hmac.new(key, msg, hashlib.sha256).hexdigest()  # 64位十六进制字符串
+    except Exception as e:
+        logger.error(f"Failed to hmac hash text: {text}, error: {e}")
+        digest = ''
+    return digest
