@@ -45,6 +45,8 @@ class Session(OrgModelMixin):
     cmd_amount = models.IntegerField(default=-1, verbose_name=_("Command amount"))
     error_reason = models.CharField(max_length=128, blank=True, verbose_name=_("Error reason"))
     replay_size = models.BigIntegerField(default=0, verbose_name=_("Replay size"))
+    # 录像上传目标存储的名称, 下载时据此直连, 避免遍历探测所有存储
+    replay_storage = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Replay storage"))
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'

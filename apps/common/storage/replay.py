@@ -17,6 +17,10 @@ logger = get_logger(__name__)
 class ReplayStorageHandler(BaseStorageHandler):
     NAME = 'REPLAY'
 
+    def get_recorded_storage_name(self):
+        # 会话创建/上传时记录的录像所属存储名
+        return self.obj.replay_storage
+
     def get_file_path(self, **kwargs):
         storage = kwargs['storage']
         # 获取外部存储路径名
@@ -55,10 +59,6 @@ class SessionPartReplayStorageHandler(object):
         return None, '{} not found.'.format(part_filename)
 
     def download_part_file(self, part_filename):
-        storage = get_multi_object_storage()
-        if not storage:
-            msg = "Not found {} file, and not remote storage set".format(part_filename)
-            return None, msg
         local_path = self.obj.get_replay_part_file_local_storage_path(part_filename)
         remote_path = self.obj.get_replay_part_file_relative_path(part_filename)
 
@@ -69,7 +69,17 @@ class SessionPartReplayStorageHandler(object):
         if not os.path.isdir(target_dir):
             make_dirs(target_dir, exist_ok=True)
 
-        ok, err = storage.download(remote_path, target_tmp_path)
+        # 优先直连已记录的所属存储, 未记录或未命中时回退遍历所有存储 (兼容存量数据)
+        recorded_name = self.obj.replay_storage
+        storage_names = [recorded_name, None] if recorded_name else [None]
+        ok, err = False, 'not remote storage set'
+        for name in storage_names:
+            storage = get_multi_object_storage(name)
+            if not storage:
+                continue
+            ok, err = storage.download(remote_path, target_tmp_path)
+            if ok:
+                break
         if not ok:
             msg = 'Failed download {} file: {}'.format(part_filename, err)
             logger.error(msg)

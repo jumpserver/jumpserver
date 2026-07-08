@@ -212,7 +212,12 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
-            serializer.validated_data["terminal"] = self.request.user.terminal
+            terminal = self.request.user.terminal
+            serializer.validated_data["terminal"] = terminal
+            # 记录录像上传目标的外部存储名, 查看录像时据此直连, 避免遍历探测所有存储
+            storage = terminal.get_replay_storage()
+            if storage and not storage.type_sftp and not storage.type_null_or_server:
+                serializer.validated_data["replay_storage"] = storage.name
         return super().perform_create(serializer)
 
 

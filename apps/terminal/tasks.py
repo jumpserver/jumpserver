@@ -91,6 +91,8 @@ def upload_session_replay_to_external_storage(session_id):
         logger.error(f'Session replay upload to external error: {err}')
         return
 
+    # 记录录像实际所在的存储, 查看时据此直连
+    Session.objects.filter(id=session_id).update(replay_storage='SERVER_REPLAY_STORAGE')
     try:
         default_storage.delete(local_path)
     except:
@@ -111,6 +113,8 @@ def upload_session_replay_file_to_external_storage(session_id, local_path, remot
         logger.error(f'Session replay file {local_path} upload to external error: {err}')
         return
 
+    # 记录录像实际所在的存储, 查看时据此直连
+    Session.objects.filter(id=session_id).update(replay_storage='SERVER_REPLAY_STORAGE')
     try:
         default_storage.delete(local_path)
     except:
