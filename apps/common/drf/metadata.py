@@ -95,6 +95,21 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         field_info["tree"] = field.tree
         field_info["type"] = "tree"
 
+    @staticmethod
+    def set_style_field(field, field_info):
+        style = getattr(field, "style", None)
+        if not style:
+            return
+
+        if isinstance(style, dict):
+            if style.get("base_template") == "textarea.html":
+                field_info["style"] = "textarea"
+            elif style:
+                field_info["style"] = style
+            return
+
+        field_info["style"] = force_str(style, strings_only=True)
+
     def get_field_info(self, field):
         """
         Given an instance of a serializer field, return a dictionary
@@ -114,6 +129,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             value = getattr(field, attr, None)
             if value is not None and value != "":
                 field_info[attr] = force_str(value, strings_only=True)
+
+        self.set_style_field(field, field_info)
 
         if getattr(field, "child", None):
             field_info["child"] = self.get_field_info(field.child)

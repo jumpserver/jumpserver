@@ -1,6 +1,7 @@
 #!/bin/bash
 
-lib_path="/opt/py3/lib/python3.11/site-packages"
+python_version=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+lib_path="/opt/py3/lib/python${python_version}/site-packages"
 
 if [ ! -d "$lib_path" ]; then
   echo "lib_path $lib_path not exist"

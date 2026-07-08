@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 
-from authentication.signals import user_auth_failed, user_auth_success
 from common.utils import get_logger
 from .base import JMSBaseAuthBackend
 
@@ -48,16 +47,7 @@ class CustomAuthBackend(JMSBaseAuthBackend):
 
         if self.user_can_authenticate(user):
             logger.info(f'Custom authenticate success: {user.username}')
-            user_auth_success.send(
-                sender=self.__class__, request=request, user=user,
-                backend=settings.AUTH_BACKEND_CUSTOM
-            )
             return user
         else:
             logger.info(f'Custom authenticate failed: {user.username}')
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=user.username,
-                reason=_('User invalid, disabled or expired'),
-                backend=settings.AUTH_BACKEND_CUSTOM
-            )
             return None

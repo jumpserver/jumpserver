@@ -77,6 +77,14 @@ class Applet(JMSBaseModel):
             return None
         with open(path, 'r') as f:
             return yaml.safe_load(f)
+        
+    @lazyproperty
+    def platform_manifest(self) -> dict:
+        path = os.path.join(self.path, 'platform.yml')
+        if not os.path.exists(path):
+            return None
+        with open(path, 'r') as f:
+            return yaml.safe_load(f)
 
     @property
     def icon(self) -> str:
@@ -291,7 +299,7 @@ class Applet(JMSBaseModel):
     def _try_dc_private_account(user, host):
         if not host.joined_dir_svcs:
             return None
-        account = host.dc_accounts.filter(username=user.username).first()
+        account = host.dc_accounts.filter(username=user.username, is_active=True).first()
         return account
 
     def _select_a_private_account(self, user, host, valid_accounts):
@@ -345,7 +353,8 @@ class Applet(JMSBaseModel):
         if not host:
             return None
         logger.info('Select applet host: {}'.format(host.name))
-        valid_accounts = host.accounts.all().filter(privileged=False)
+        # 过滤掉未激活的账号
+        valid_accounts = host.accounts.all().filter(privileged=False, is_active=True)
         account = self.try_to_use_private_account(user, host, valid_accounts)
         if not account:
             logger.debug('No private account, try to use public account')

@@ -222,9 +222,12 @@ class Config(dict):
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 
-        'THROTTLE_RATES_ANON': '60/min',
-        'THROTTLE_RATES_USER': '180/min',
-        'THROTTLE_RATES_SERVICE_ACCOUNT': '300/min',
+        'THROTTLE_RATES_ANON': '2048/min',
+        'THROTTLE_RATES_USER': '4096/min',
+        'THROTTLE_RATES_SERVICE_ACCOUNT': '20480/min',
+
+        # 文件上传下载限流 (防止DOS攻击)
+        'THROTTLE_FILE_TRANSFER': '50/hour',
 
         # Security
         'X_FRAME_OPTIONS': 'SAMEORIGIN',
@@ -262,6 +265,20 @@ class Config(dict):
 
         'SMS_CUSTOM_FILE_MD5': '',
 
+        'AUTH_CUSTOM_SSO': False,
+        'AUTH_CUSTOM_SSO_FILE_MD5': '',
+        'AUTH_CUSTOM_SSO_QUERY_PARAMS': 'token',
+
+        'AUTH_UKEY': False,
+        'AUTH_UKEY_VENDOR': 'long_mai',
+        'AUTH_UKEY_ENROLL_ENABLED': True,
+        'AUTH_UKEY_ENROLL_VALIDITY_DAYS': 365,
+        'AUTH_UKEY_CHALLENGE_TTL': 300,
+        'AUTH_UKEY_DEFAULT_PIN': '',
+        'AUTH_UKEY_CA_KEY_CONTENT': '',
+        'AUTH_UKEY_CA_CERT_CONTENT': '',
+        'AUTH_UKEY_CA_KEY_PASS': '',
+
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
 
@@ -271,7 +288,7 @@ class Config(dict):
 
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
-        'VAULT_HCP_MOUNT_POINT': 'jumpserver',
+        'VAULT_HCP_MOUNT_POINT': 'pam',
 
         'VAULT_AZURE_HOST': '',
         'VAULT_AZURE_CLIENT_ID': '',
@@ -291,15 +308,19 @@ class Config(dict):
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
-        'AUTH_LDAP_BIND_DN': 'cn=admin,dc=jumpserver,dc=org',
+        'AUTH_LDAP_BIND_DN': 'cn=admin,dc=example,dc=org',
         'AUTH_LDAP_BIND_PASSWORD': '',
-        'AUTH_LDAP_SEARCH_OU': 'ou=tech,dc=jumpserver,dc=org',
+        'AUTH_LDAP_SEARCH_OU': 'ou=tech,dc=example,dc=org',
         'AUTH_LDAP_SEARCH_FILTER': '(cn=%(user)s)',
         'AUTH_LDAP_START_TLS': False,
+        'AUTH_LDAP_CACERT_CONTENT': '',
+        'AUTH_LDAP_CERT_CONTENT': '',
+        'AUTH_LDAP_KEY_CONTENT': '',
         'AUTH_LDAP_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
         'AUTH_LDAP_CONNECT_TIMEOUT': 10,
         'AUTH_LDAP_STRICT_SYNC': False,
         'AUTH_LDAP_CACHE_TIMEOUT': 0,
+        'AUTH_LDAP_ALWAYS_UPDATE_USER': True,
         'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
@@ -312,15 +333,19 @@ class Config(dict):
         # Auth LDAP HA settings
         'AUTH_LDAP_HA': False,
         'AUTH_LDAP_HA_SERVER_URI': 'ldap://localhost:389',
-        'AUTH_LDAP_HA_BIND_DN': 'cn=admin,dc=jumpserver,dc=org',
+        'AUTH_LDAP_HA_BIND_DN': 'cn=admin,dc=example,dc=org',
         'AUTH_LDAP_HA_BIND_PASSWORD': '',
-        'AUTH_LDAP_HA_SEARCH_OU': 'ou=tech,dc=jumpserver,dc=org',
+        'AUTH_LDAP_HA_SEARCH_OU': 'ou=tech,dc=example,dc=org',
         'AUTH_LDAP_HA_SEARCH_FILTER': '(cn=%(user)s)',
         'AUTH_LDAP_HA_START_TLS': False,
+        'AUTH_LDAP_HA_CACERT_CONTENT': '',
+        'AUTH_LDAP_HA_CERT_CONTENT': '',
+        'AUTH_LDAP_HA_KEY_CONTENT': '',
         'AUTH_LDAP_HA_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
         'AUTH_LDAP_HA_CONNECT_TIMEOUT': 10,
         'AUTH_LDAP_HA_STRICT_SYNC': False,
         'AUTH_LDAP_HA_CACHE_TIMEOUT': 0,
+        'AUTH_LDAP_HA_ALWAYS_UPDATE_USER': True,
         'AUTH_LDAP_HA_SEARCH_PAGED_SIZE': 1000,
         'AUTH_LDAP_HA_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_HA_SYNC_INTERVAL': None,
@@ -421,6 +446,7 @@ class Config(dict):
         'AUTH_OAUTH2': False,
         'AUTH_OAUTH2_LOGO_PATH': 'img/login_oauth2_logo.png',
         'AUTH_OAUTH2_PROVIDER': 'OAuth2',
+        'AUTH_OAUTH2_USE_STATE': False,
         'AUTH_OAUTH2_ALWAYS_UPDATE_USER': True,
         'AUTH_OAUTH2_CLIENT_ID': 'client-id',
         'AUTH_OAUTH2_SCOPE': '',
@@ -550,6 +576,7 @@ class Config(dict):
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
+        'OTP_DIGEST': 'sha1',
         'EMAIL_SUFFIX': 'example.com',
 
         # Terminal配置
@@ -576,14 +603,18 @@ class Config(dict):
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
         'SECURITY_COMMAND_EXECUTION': False,
+        'ANSIBLE_DOCKER_ENABLED': True,
         'SECURITY_COMMAND_BLACKLIST': [
             'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
         ],
+        # The backslash only escapes the single quote in this Python string; it is not a forbidden character.
+        'SECURITY_ACCOUNT_USERNAME_FORBIDDEN_CHARS': '{[\'"`;|<>',
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': 'auto',
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_ACCOUNT_SECRET_READ': True,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_MAX_SESSION_TIME': 24,
+        'SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN': 9999,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS': 180,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
@@ -639,6 +670,7 @@ class Config(dict):
         'SYSLOG_SOCKTYPE': 2,
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
+        'PERM_EXPIRED_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
@@ -704,6 +736,8 @@ class Config(dict):
 
         'LIMIT_SUPER_PRIV': False,
 
+        'LOG_KEEP_MIN_DAYS': 1,
+
         # Chat AI
         'CHAT_AI_ENABLED': False,
         'CHAT_AI_METHOD': 'api',
@@ -733,6 +767,9 @@ class Config(dict):
 
         'TOOL_USER_ENABLED': False,
 
+        'PRE_CUSTOM_MIDDLEWARES': '',
+        'POST_CUSTOM_MIDDLEWARES': '',
+
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
 
@@ -742,7 +779,28 @@ class Config(dict):
         # oauth2_provider settings 
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
         'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
-        'VENDOR': 'jumpserver',
+        'VENDOR': 'JumpServer',
+
+        # JDMC
+        'JDMC_ENABLED': False,
+        'JDMC_SOCK_PATH': '',
+        'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
+
+        'FLOWER_ENABLED': True,
+
+        # x-forwarded-for 相关
+        'TRUSTED_IP_VERIFY_ENABLED': False,
+        'TRUSTED_IP_SOURCE_HEADER': '',
+        'TRUSTED_IP_SIGN_HEADER': '',
+        'TRUSTED_IP_SIGN_KEY': '',
+
+        'REMOTE_APP_STORE_URL': 'https://apps.fit2cloud.com/jumpserver',
+        'LANGUAGES_SUPPORTED': '',
+
+        # rdp sign cert
+        'RDP_SIGN_ENABLED': False,
+        'RDP_SIGN_CERT': 'rdp_signer.crt',
+        'RDP_SIGN_CERT_KEY': 'rdp_signer.key',
     }
 
     old_config_map = {

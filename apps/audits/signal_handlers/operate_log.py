@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
+from itertools import chain
 
 from django.apps import apps
 from django.db.models.signals import (
@@ -26,6 +27,28 @@ M2M_ACTION = {
 }
 
 
+def _get_m2m_field_verbose_name(instance, model, sender):
+    opts = instance._meta
+    for f in chain(opts.many_to_many, opts.related_objects):
+        related_model = getattr(f, 'related_model', None)
+        if related_model != model:
+            continue
+
+        through = None
+        remote_field = getattr(f, 'remote_field', None)
+        if remote_field is not None:
+            through = getattr(remote_field, 'through', None)
+        if through is None:
+            through = getattr(f, 'through', None)
+
+        if through is not sender:
+            continue
+
+        verbose_name = getattr(f, 'verbose_name', None) or model._meta.verbose_name
+        return str(verbose_name)
+    return str(model._meta.verbose_name)
+
+
 @receiver(m2m_changed)
 def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
     if action not in M2M_ACTION:
@@ -39,15 +62,21 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
             instance, include_model_fields=False, include_related_fields=[model]
         )
 
-        instance_id = current_instance.get('id')
+        instance_id_data = current_instance.get('id', {})
+        if isinstance(instance_id_data, dict):
+            instance_id = instance_id_data.get('value')
+        else:
+            instance_id = instance_id_data
         log_id, before_instance = get_instance_dict_from_cache(instance_id)
 
-        field_name = str(model._meta.verbose_name)
+        field_name = _get_m2m_field_verbose_name(instance, model, sender)
         pk_set = pk_set or {}
         objs = model.objects.filter(pk__in=pk_set)
         objs_display = [str(o) for o in objs]
         action = M2M_ACTION[action]
         changed_field = current_instance.get(field_name, {})
+        if not changed_field and field_name != str(model._meta.verbose_name):
+            changed_field = current_instance.get(str(model._meta.verbose_name), {})
         changed_value = changed_field.get('value', [])
 
         after, before, before_value = None, None, None
@@ -63,7 +92,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
             before_change_field['value'] = before_value
             before = {field_name: before_change_field}
 
-        if sorted(str(before)) == sorted(str(after)):
+        if before == after:
             return
 
         create_or_update_operate_log(
@@ -80,18 +109,14 @@ def signal_of_operate_log_whether_continue(
         condition = False
     if instance and getattr(instance, OP_LOG_SKIP_SIGNAL, False):
         condition = False
-    # 不记录组件的操作日志
     user = current_request.user if current_request else None
     if not user or getattr(user, 'is_service_account', False):
         condition = False
-    # 终端模型的 create 事件由系统产生，不记录
     if instance._meta.object_name == 'Terminal' and created:
         condition = False
-    # last_login 改变是最后登录日期, 每次登录都会改变
     if instance._meta.object_name == 'User' and \
             update_fields and 'last_login' in update_fields:
         condition = False
-    # 不在记录白名单中，跳过
     if sender._meta.object_name not in MODELS_NEED_RECORD:
         condition = False
     return condition
@@ -108,7 +133,6 @@ def on_object_pre_create_or_update(
         return
 
     with translation.override('en'):
-        # users.PrivateToken Model 没有 id 有 pk字段
         instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
         instance_before_data = {'id': instance_id}
         raw_instance = type(instance).objects.filter(pk=instance_id).first()
@@ -188,7 +212,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FavoriteAsset', 'ChangeSecretRecord', 'AppProvider', 'Variable', 'LeakPasswords'
+        'FavoriteAsset', 'FavoriteFolder', 'ChangeSecretRecord', 'AppProvider', 'Variable', 'LeakPasswords'
     }
     include_models = {'UserSession'}
     for i, app in enumerate(apps.get_models(), 1):

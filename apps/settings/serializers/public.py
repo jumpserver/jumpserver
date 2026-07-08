@@ -12,6 +12,7 @@ class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
     INTERFACE = serializers.DictField()
     LANGUAGES = serializers.ListField()
+    VENDOR = serializers.CharField()
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):
@@ -86,6 +87,13 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     PRIVACY_MODE = serializers.BooleanField()
     CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField()
+
+    JDMC_ENABLED = serializers.BooleanField()
+    FLOWER_ENABLED = serializers.BooleanField()
+    REMOTE_APP_STORE_URL = serializers.CharField()
+    VENDOR = serializers.CharField()
+
+    AUTH_UKEY = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

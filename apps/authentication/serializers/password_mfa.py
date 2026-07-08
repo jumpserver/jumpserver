@@ -34,6 +34,7 @@ class ResetPasswordCodeSerializer(serializers.Serializer):
 
 
 class PasswordVerifySerializer(serializers.Serializer):
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     password = EncryptedField()
 
 

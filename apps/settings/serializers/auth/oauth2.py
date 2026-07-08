@@ -59,7 +59,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
     AUTH_OAUTH2_USER_ATTR_MAP = serializers.JSONField(
         required=True, label=_('User attribute'),
         help_text=_(
-            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            'User attribute mapping, where the `key` is this system user attribute name and the '
             '`value` is the OAuth2 service user attribute name'
         )
     )

@@ -8,7 +8,7 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
-from common.utils import decrypt_password, is_uuid
+from common.utils import decrypt_session_password, is_uuid
 
 __all__ = [
     "ReadableHiddenField",
@@ -50,7 +50,7 @@ class EncryptedField(serializers.CharField):
 
     def to_internal_value(self, value):
         value = super().to_internal_value(value)
-        return decrypt_password(value)
+        return decrypt_session_password(value)
 
 
 class LabeledChoiceField(serializers.ChoiceField):
@@ -137,7 +137,14 @@ class LabelRelatedField(serializers.RelatedField):
                 k, v = [x.strip() for x in data.split(":", 1)]
             else:
                 raise serializers.ValidationError(_("Invalid data type"))
-            label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
+            from labels.serializers import LabelSerializer
+
+            validated = LabelSerializer.validate_name_value(k, v)
+            label, __ = Label.objects.get_or_create(
+                name=validated['name'],
+                value=validated['value'],
+                defaults=validated,
+            )
         return LabeledResource(label=label)
 
 
@@ -409,7 +416,7 @@ class PhoneField(serializers.CharField):
     def to_representation(self, value):
         try:
             phone = phonenumbers.parse(value, 'CN')
-            value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
+            value = {'code': '+%s' % phone.country_code, 'phone': str(phone.national_number)}
         except phonenumbers.NumberParseException:
             value = {'code': '+86', 'phone': value}
         return value

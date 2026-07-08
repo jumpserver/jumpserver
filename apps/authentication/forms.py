@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_logger, decrypt_password
+from common.utils import get_logger, decrypt_session_password
 
 logger = get_logger(__name__)
 
@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 class EncryptedField(forms.CharField):
     def to_python(self, value):
         value = super().to_python(value)
-        return decrypt_password(value)
+        return decrypt_session_password(value)
 
 
 class UserLoginForm(forms.Form):

@@ -8,10 +8,9 @@ from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
-from apps.authentication import mixins
+from authentication import mixins
 from audits.signal_handlers import send_login_info_to_reviewers
-from authentication.signals import post_auth_failed
-from common.utils import gen_key_pair
+from common.utils import gen_key_pair, gen_gm_key_pair
 from common.utils import get_request_ip
 
 
@@ -86,9 +85,9 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             else:
                 error_message = getattr(e, 'msg', None)
                 error_message = error_message or str(e)
-                post_auth_failed.send(
-                    sender=self.__class__, username=request.user.username,
-                    request=self.request, reason=error_message
+                self.send_auth_signal(
+                    success=False, username=request.user.username,
+                    reason=error_message, request=request
                 )
             auth_logout(request)
             context = {
@@ -99,14 +98,19 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 'auto_redirect': True,
             }
             response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
+            return response
         else:
-            if not self.request.session.get('auth_confirm_required'):
+            if self.request.session.get('auth_confirm_required'):
+                guard_url = reverse('authentication:login-guard')
+                args = request.META.get('QUERY_STRING', '')
+                if args:
+                    guard_url = "%s?%s" % (guard_url, args)
+                response = redirect(guard_url)
                 return response
-            guard_url = reverse('authentication:login-guard')
-            args = request.META.get('QUERY_STRING', '')
-            if args:
-                guard_url = "%s?%s" % (guard_url, args)
-            response = redirect(guard_url)
+            else:
+                self.send_auth_signal(success=True, user=request.user, request=request)
+                self.request.session.pop('auth_third_party_required', '')
+                return response
         finally:
             if request.session.get('can_send_notifications') and \
                     self.request.session.get('auth_notice_required'):
@@ -114,7 +118,6 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 user_log_id = self.request.session.get('user_log_id')
                 auth_acl_id = self.request.session.get('auth_acl_id')
                 send_login_info_to_reviewers(user_log_id, auth_acl_id)
-            return response
 
 
 class SessionCookieMiddleware(MiddlewareMixin):
@@ -133,31 +136,55 @@ class SessionCookieMiddleware(MiddlewareMixin):
         session_public_key = request.session.get(session_public_key_name)
         cookie_public_key = request.COOKIES.get(session_public_key_name)
 
-        if session_public_key and session_public_key == cookie_public_key:
+        gm_enabled = settings.GMSSL_ENABLED
+        cookie_gm_enabled = request.COOKIES.get('jms_gm_ssl') == '1'
+
+        if gm_enabled and cookie_public_key:
+            try:
+                public_key_decode = base64.b64decode(cookie_public_key.encode()).decode()
+                if 'PUBLIC KEY' in public_key_decode:
+                    cookie_public_key = ''
+            except Exception:
+                cookie_public_key = ''
+        
+        if session_public_key and session_public_key == cookie_public_key \
+                and gm_enabled == cookie_gm_enabled:
             return
-
-        private_key, public_key = self.get_key_pair()
-
+        
+        private_key, public_key, gm_enabled = self.get_key_pair(gm_enabled)
         public_key_decode = base64.b64encode(public_key.encode()).decode()
 
         request.session[session_public_key_name] = public_key_decode
         request.session[session_private_key_name] = private_key
         response.set_cookie(session_public_key_name, public_key_decode)
 
-    def get_key_pair(self):
-        key_pair = cache.get(self.USER_LOGIN_ENCRYPTION_KEY_PAIR)
-        if key_pair:
-            return key_pair['private_key'], key_pair['public_key']
+        if gm_enabled:
+            response.set_cookie('jms_gm_ssl', '1')
+        elif cookie_gm_enabled:
+            response.delete_cookie('jms_gm_ssl')
 
-        private_key, public_key = gen_key_pair()
+    def get_key_pair(self, gm_enabled=False):
+        key = self.USER_LOGIN_ENCRYPTION_KEY_PAIR
+        if gm_enabled:
+            key += '_gm'
+        key_pair = cache.get(key)
+
+        if key_pair:
+            return key_pair['private_key'], key_pair['public_key'], key_pair.get('gm', False)
+
+        if gm_enabled:
+            private_key, public_key = gen_gm_key_pair()
+        else:
+            private_key, public_key = gen_key_pair()
 
         key_pair = {
             'private_key': private_key,
-            'public_key': public_key
+            'public_key': public_key,
+            'gm': gm_enabled
         }
-        cache.set(self.USER_LOGIN_ENCRYPTION_KEY_PAIR, key_pair, None)
+        cache.set(key, key_pair, None)
 
-        return private_key, public_key
+        return private_key, public_key, gm_enabled
 
     @staticmethod
     def set_cookie_session_prefix(request, response):

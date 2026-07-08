@@ -79,7 +79,7 @@
     "Download": "Tải xuống",
     "Download the latest client": "Chuyển sang lệnh nhanh",
     "DownloadClient": "Tải xuống ứng dụng",
-    "DownloadClientMsg": "Khách hàng JumpServer chưa được cài đặt, đi cài đặt và tải xuống ngay bây giờ",
+    "DownloadClientMsg": "Khách hàng chưa được cài đặt, đi cài đặt và tải xuống ngay bây giờ",
     "Driver redirect": "Gắn đĩa",
     "Expand": "Mở rộng",
     "Expand all": "Mở rộng tất cả",
@@ -117,7 +117,7 @@
     "Host": "Máy chủ",
     "Hotkeys": "Phím tắt",
     "Info": "Gợi ý",
-    "InstallClientMsg": "Khách hàng JumpServer chưa được cài đặt, bây giờ có muốn đi tải và cài đặt không?",
+    "InstallClientMsg": "Khách hàng chưa được cài đặt, bây giờ có muốn đi tải và cài đặt không?",
     "Japanese keyboard layout": "Tiếng Nhật (Qwerty)",
     "Keyboard keys": "Lần đăng nhập này cần xác thực khuôn mặt, bạn có muốn tiếp tục không?",
     "Keyboard layout": "Bố cục bàn phím",
@@ -289,5 +289,6 @@
     "success": "Thành công",
     "system user": "Tên đăng nhập",
     "tabLimits": "Hiện tại đã mở 15 tab.  \nĐể đảm bảo tính ổn định của hệ thống, có qua tab trình duyệt mới để mở Luna và tiếp tục thao tác không?",
-    "user": "Người dùng"
+    "user": "Người dùng",
+    "MarkAsRead": "Đánh dấu đã đọc"
 }

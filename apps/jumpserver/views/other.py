@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import os
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -99,12 +100,15 @@ class ResourceDownload(TemplateView):
 
     @lazyproperty
     def versions_content(self):
-        return """
+        more_downloads = os.environ.get('MORE_DOWNLOADS_URL')
+        return f"""
         MRD_VERSION=10.6.7
         OPENSSH_VERSION=v9.4.0.0
         TINKER_VERSION=v0.1.6
-        VIDEO_PLAYER_VERSION=0.6.0
-        CLIENT_VERSION=4.1.2
+        VIDEO_PLAYER_VERSION=0.5.2
+        CLIENT_VERSION=4.1.3
+        VENDOR={settings.VENDOR}
+        MORE_DOWNLOADS_URL={more_downloads}
         """
 
     def get_meta_json(self):

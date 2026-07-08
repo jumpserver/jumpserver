@@ -8,12 +8,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from audits.handler import create_or_update_operate_log
-from common.api import CommonApiMixin
+from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import POST, PUT, PATCH
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
 from tickets import filters
 from tickets import serializers
+from tickets.reporting import TicketReportExporter
 from tickets.models import (
     Ticket, ApplyAssetTicket, ApplyLoginTicket,
     ApplyLoginAssetTicket, ApplyCommandTicket
@@ -28,12 +29,13 @@ __all__ = [
 ]
 
 
-class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
+class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
         'approve': serializers.TicketApproveSerializer
     }
     model = Ticket
+    report_exporter_class = TicketReportExporter
     perm_model = Ticket
     filterset_class = filters.TicketFilter
     search_fields = [

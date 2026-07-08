@@ -13,6 +13,10 @@ from notifications.urls.ws_urls import urlpatterns as notifications_urlpatterns
 from ops.urls.ws_urls import urlpatterns as ops_urlpatterns
 from settings.urls.ws_urls import urlpatterns as setting_urlpatterns
 from terminal.urls.ws_urls import urlpatterns as terminal_urlpatterns
+from common.utils import get_logger
+import socket
+
+logger = get_logger(__name__)
 
 __all__ = ['urlpatterns', 'application']
 
@@ -23,6 +27,7 @@ urlpatterns = ops_urlpatterns + \
 
 if settings.XPACK_ENABLED:
     from xpack.plugins.cloud.urls.ws_urls import urlpatterns as xcloud_urlpatterns
+
     urlpatterns += xcloud_urlpatterns
 
 
@@ -58,14 +63,53 @@ class WsSignatureAuthMiddleware:
         return await self.app(scope, receive, send)
 
 
+class SocketContextMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        fno = self._extract_socket_fno(scope, receive)
+
+        if fno:
+            logger.debug(f"Successfully extracted FNO: {fno}")
+            scope['fno'] = fno
+        else:
+            logger.debug(f"Failed to trace FNO for {scope.get('client')}")
+
+        return await self.app(scope, receive, send)
+
+    @staticmethod
+    def _extract_socket_fno(scope, receive) -> int:
+        try:
+            transport = scope.get('extensions', {}).get('transport')
+            if not transport and receive:
+                protocol = getattr(receive, "__self__", None)
+                if protocol:
+                    transport = getattr(protocol, "transport", None)
+
+            if transport:
+                sock = transport.get_extra_info('socket')
+                if sock:
+                    return sock.fileno()
+
+        except Exception as e:
+            logger.error(f"Internal error during FNO extraction: {e}")
+
+        return None
+
+
 application = ProtocolTypeRouter({
     # Django's ASGI application to handle traditional HTTP requests
-    "http": get_asgi_application(),
+    "http": SocketContextMiddleware(
+        get_asgi_application()
+    ),
 
     # WebSocket chat handler
-    "websocket": WsSignatureAuthMiddleware(
-        AuthMiddlewareStack(
-            URLRouter(urlpatterns)
+    "websocket": SocketContextMiddleware(
+        WsSignatureAuthMiddleware(
+            AuthMiddlewareStack(
+                URLRouter(urlpatterns)
+            )
         )
     ),
 })

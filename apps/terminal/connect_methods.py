@@ -50,12 +50,15 @@ class NativeClient(TextChoices):
             Protocol.mysql: [cls.db_client, cls.db_guide],
             Protocol.mariadb: [cls.db_client, cls.db_guide],
             Protocol.redis: [cls.db_client, cls.db_guide],
-            Protocol.mongodb: [cls.db_client, cls.db_guide],
-            Protocol.oracle: [cls.db_client, cls.db_guide],
             Protocol.postgresql: [cls.db_client, cls.db_guide],
             Protocol.sqlserver: [cls.db_client, cls.db_guide],
             Protocol.vnc: [cls.vnc_client, cls.vnc_guide],
         }
+        if settings.VENDOR.lower() == 'jumpserver':
+            clients.update({
+                Protocol.mongodb: [cls.db_client, cls.db_guide],
+                Protocol.oracle: [cls.db_client, cls.db_guide],
+            })
         return clients
 
     @classmethod

@@ -7,6 +7,7 @@ import re
 import time
 from contextlib import contextmanager
 from urllib.parse import unquote
+import hashlib
 
 import pyotp
 from django.conf import settings
@@ -18,6 +19,7 @@ from common.utils import reverse, get_object_or_none, ip, safe_next_url
 from .models import User
 
 logger = logging.getLogger('jumpserver.users')
+otp_digest = hashlib.sha256 if settings.OTP_DIGEST == 'sha256' else hashlib.sha1
 
 
 def send_user_created_mail(user):
@@ -69,7 +71,8 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
 def generate_otp_uri(username, otp_secret_key=None, issuer="JumpServer"):
     if otp_secret_key is None:
         otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
-    totp = pyotp.TOTP(otp_secret_key)
+
+    totp = pyotp.TOTP(otp_secret_key, digest=otp_digest)
     otp_issuer_name = settings.OTP_ISSUER_NAME or issuer
     uri = totp.provisioning_uri(name=username, issuer_name=otp_issuer_name)
     return uri, otp_secret_key
@@ -78,7 +81,8 @@ def generate_otp_uri(username, otp_secret_key=None, issuer="JumpServer"):
 def check_otp_code(otp_secret_key, otp_code):
     if not otp_secret_key or not otp_code:
         return False
-    totp = pyotp.TOTP(otp_secret_key)
+
+    totp = pyotp.TOTP(otp_secret_key, digest=otp_digest)
     otp_valid_window = settings.OTP_VALID_WINDOW or 0
     return totp.verify(otp=otp_code, valid_window=otp_valid_window)
 

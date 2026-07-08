@@ -1,0 +1,632 @@
+{% load i18n %}
+{% load bootstrap3 %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
+    <title>{{ INTERFACE.login_title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include '_head_css_js.html' %}
+    <link href="{% static 'css/login-style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
+
+    <style>
+        body {
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            background-color: #f3f3f3;
+            flex-direction: column;
+        }
+
+        .ukey-login-box {
+            background-color: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            padding: 40px 50px 32px;
+            max-width: 420px;
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .ukey-login-box .logo-row {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .ukey-login-box .logo-row img {
+            height: 48px;
+            width: 48px;
+        }
+
+        .ukey-login-box h3 {
+            text-align: center;
+            font-weight: 400;
+            font-size: 20px;
+            color: #151515;
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+
+        /* UKey status bar */
+        .ukey-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+        }
+
+        .ukey-status-bar .ukey-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .ukey-status-loading {
+            background-color: #f5f5f5;
+            border-color: #ddd;
+            color: #888;
+        }
+
+        .ukey-status-loading .ukey-dot {
+            background-color: #bbb;
+            animation: ukey-blink 1.2s infinite;
+        }
+
+        .ukey-status-inserted {
+            background-color: #f0faf0;
+            border-color: #b7deb7;
+            color: #3a7d3a;
+        }
+
+        .ukey-status-inserted .ukey-dot {
+            background-color: #52c41a;
+        }
+
+        .ukey-status-not-inserted {
+            background-color: #fffbe6;
+            border-color: #ffe58f;
+            color: #ad8b00;
+        }
+
+        .ukey-status-not-inserted .ukey-dot {
+            background-color: #faad14;
+        }
+
+        .ukey-status-error {
+            background-color: #fff2f0;
+            border-color: #ffccc7;
+            color: #cf1322;
+        }
+
+        .ukey-status-error .ukey-dot {
+            background-color: #ff4d4f;
+        }
+
+        @keyframes ukey-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .help-block {
+            margin: 0;
+            text-align: left;
+        }
+
+        form label {
+            color: #737373;
+            font-size: 13px;
+            font-weight: normal;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+
+        .red-fonts {
+            color: red;
+        }
+
+        .form-group.has-error {
+            margin-bottom: 0;
+        }
+
+        .challenge-box {
+            margin-bottom: 20px;
+            padding: 10px 12px;
+            background-color: #f7f7f7;
+            border: 1px solid #e3e3e3;
+            border-radius: 4px;
+        }
+
+        .challenge-label {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .challenge-value {
+            font-family: monospace;
+            font-size: 13px;
+            color: #555;
+            word-break: break-all;
+        }
+
+        .btn-transparent {
+            width: 100%;
+        }
+
+        .btn-transparent:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .other-login {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 12px;
+        }
+
+        .other-login a {
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+<div class="ukey-login-box">
+    <div class="logo-row">
+        <img src="{{ INTERFACE.logo_logout }}" alt="Logo"/>
+    </div>
+    <h3>{% trans "UKey Authentication" %}</h3>
+
+    <!-- UKey status indicator -->
+    <div id="ukey-status-bar" class="ukey-status-bar ukey-status-loading">
+        <span class="ukey-dot"></span>
+        <span id="ukey-status-text">{% trans "Loading UKey SDK..." %}</span>
+    </div>
+
+    <form id="ukey-login-form" autocomplete="off" action="" method="post" role="form" novalidate="novalidate">
+        {% csrf_token %}
+
+        {% if error_msg %}
+            <div style="margin-bottom: 16px;">
+                <p class="help-block red-fonts">{% trans "Error" %}: {{ error_msg }}</p>
+            </div>
+        {% endif %}
+
+        {# username is auto-filled from UKey cert, display input is readonly #}
+        <div class="form-group">
+            <input type="text" id="username-display" class="form-control"
+                   placeholder="{% trans 'Insert UKey to auto-fetch' %}"
+                   readonly tabindex="-1"
+                   style="background-color:#f7f7f7; cursor:default; color:#555;">
+        </div>
+        {# PIN is only used for client-side UKey verification, not submitted to backend #}
+        <div class="form-group">
+            <input type="password" id="id_pin" class="form-control"
+                   placeholder="PIN" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" id="ukey-login-btn" class="btn btn-transparent" disabled>
+                {% trans "Login" %}
+            </button>
+        </div>
+    </form>
+
+    <div class="other-login">
+        <a href="{% url 'authentication:login' %}">{% trans "More login methods" %}</a>
+    </div>
+</div>
+</body>
+{% include '_foot_js.html' %}
+
+<script>
+(function () {
+    'use strict';
+
+    /* ── i18n strings (rendered server-side) ───────────────── */
+    var MSG = {
+        loading:      '{% trans "Loading UKey SDK..." %}',
+        detecting:    '{% trans "Detecting UKey..." %}',
+        inserted:     '{% trans "UKey connected" %}',
+        notInserted:  '{% trans "Please insert UKey" %}',
+        sdkError:     '{% trans "SDK unavailable" %}',
+        initError:    '{% trans "UKey SDK initialization failed" %}',
+        pinChecking:  '{% trans "Verifying PIN..." %}',
+        pinOk:        '{% trans "PIN verified" %}',
+        pinFail:      '{% trans "PIN verification failed" %}',
+        signing:      '{% trans "Signing challenge code..." %}',
+        signFail:     '{% trans "Signing failed" %}',
+        certFail:     '{% trans "Failed to retrieve UKey cert" %}',
+        noCN:         '{% trans "No UKey cert detected, please contact administrator" %}'
+    };
+
+    /* ── API URLs ───────────────────────────────────────────── */
+    var API_CONFIG = '/api/v1/authentication/ukey/ukey-sdk-config/';
+
+    /* ── DOM refs ───────────────────────────────────────────── */
+    var statusBar  = document.getElementById('ukey-status-bar');
+    var statusText = document.getElementById('ukey-status-text');
+    var loginBtn   = document.getElementById('ukey-login-btn');
+
+    /* ── Status helper ──────────────────────────────────────── */
+    function setStatus(type, message) {
+        statusBar.className = 'ukey-status-bar ukey-status-' + type;
+        statusText.textContent = message;
+        loginBtn.disabled = (type !== 'inserted');
+    }
+
+    /* ── Inject vendor JS into the page ─────────────────────── */
+    function injectScript(jsText) {
+        var s = document.createElement('script');
+        s.textContent = jsText;
+        document.head.appendChild(s);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       Persistent namespace: populated by sdk.setup.steps and
+       login.detect.steps; accessible across all step executions.
+    ════════════════════════════════════════════════════════════════ */
+    var ukey = {};
+
+    /* ── Resolve a value against a context ─────────────────────────
+       Namespaces: ukey / vars / input / instance / config / challenge
+       Complex arg types: { type: 'csv', value: {...} }
+                          { type: 'json', value: {...} }
+    ─────────────────────────────────────────────────────────────── */
+    function resolve(val, ctx) {
+        if (typeof val === 'string') {
+            /* If the entire value is a single {[ expr ]} expression, return the raw value
+               (preserves original type: number, boolean, etc.).
+               Otherwise do string interpolation and always return a string. */
+            var single = val.match(/^\{\{\s*([\w.]+)\s*\}\}$/);
+            if (single) {
+                var parts = single[1].split('.');
+                var obj = ctx;
+                for (var i = 0; i < parts.length; i++) {
+                    if (obj == null) return null;
+                    obj = obj[parts[i]];
+                }
+                return (obj !== undefined) ? obj : null;
+            }
+            return val.replace(/\{\{\s*([\w.]+)\s*\}\}/g, function (_, path) {
+                var parts = path.split('.');
+                var obj = ctx;
+                for (var i = 0; i < parts.length; i++) {
+                    if (obj == null) return '';
+                    obj = obj[parts[i]];
+                }
+                return (obj !== undefined && obj !== null) ? String(obj) : '';
+            });
+        }
+        if (val && typeof val === 'object' && !Array.isArray(val)) {
+            if (val.type === 'csv') {
+                return Object.keys(val.value).map(function (k) {
+                    return k + '=' + resolve(val.value[k], ctx);
+                }).join(',');
+            }
+            if (val.type === 'json') {
+                var obj = {};
+                Object.keys(val.value).forEach(function (k) { obj[k] = resolve(val.value[k], ctx); });
+                return JSON.stringify(obj);
+            }
+        }
+        return val;
+    }
+
+    /* ── Write a value into ctx by dotted path ──────────────────── */
+    function setPath(ctx, path, value) {
+        var parts = path.split('.');
+        var obj = ctx;
+        for (var i = 0; i < parts.length - 1; i++) {
+            if (!obj[parts[i]] || typeof obj[parts[i]] !== 'object') obj[parts[i]] = {};
+            obj = obj[parts[i]];
+        }
+        obj[parts[parts.length - 1]] = value;
+    }
+
+    /* ── Evaluate a check expression ────────────────────────────────
+       expr form (in YAML): {[ result === 0 ]} or {[ vars.x !== null ]}
+       ctx must include `result` for result-based checks.
+       Config is server-controlled; Function constructor is intentional.
+    ─────────────────────────────────────────────────────────────── */
+    function evalCheck(check, ctx) {
+        var expr = typeof check === 'string' ? check : (check.expr || '');
+        var cleaned = expr.replace(/^\s*\{\{\s*|\s*\}\}\s*$/g, '').trim();
+        try {
+            /* jshint -W054 */
+            return !!new Function(
+                'ukey', 'vars', 'input', 'result', 'instance', 'config', 'settings', 'challenge',
+                'return (' + cleaned + ');'
+            )(ctx.ukey, ctx.vars, ctx.input, ctx.result, ctx.instance, ctx.config, ctx.settings, ctx.challenge);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /* evalWhen: same as evalCheck but no `result` dependency — used for
+       top-level `when` guards (e.g. info.cert.when, operation.hidden). */
+    function evalWhen(expr, ctx) {
+        return evalCheck(expr, Object.assign({ result: undefined }, ctx));
+    }
+
+    /* ── Execute a single step ──────────────────────────────────────
+       step types:
+         (default)  — call UKey SDK method (step.call)
+         api        — HTTP request (step.url / step.method / step.body)
+         submit     — submit only YAML-declared fields
+    ─────────────────────────────────────────────────────────────── */
+    function runStep(step, api, ctx) {
+        /* when: skip step if condition is false */
+        if (step.when !== undefined && !evalWhen(step.when, ctx)) {
+            return Promise.resolve(null);
+        }
+
+        /* api: HTTP request */
+        if (step.type === 'api') {
+            var body = {};
+            if (step.body) {
+                Object.keys(step.body).forEach(function (k) { body[k] = resolve(step.body[k], ctx); });
+            }
+            var match = document.cookie.match(/csrftoken=([^;]+)/);
+            var csrfToken = match ? match[1] : '';
+            return fetch(resolve(step.url || '', ctx), {
+                method: (step.method || 'GET').toUpperCase(),
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: step.method && step.method.toLowerCase() !== 'get' ? JSON.stringify(body) : undefined
+            }).then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            }).then(function (result) {
+                if (step.register) setPath(ctx, step.register, result);
+                return result;
+            });
+        }
+
+        /* submit: fill form fields and submit */
+        if (step.type === 'submit') {
+            var submitFields = step.fields || {};
+
+            // Build a strict payload form: csrf + fields declared in YAML only.
+            var sourceForm = document.getElementById('ukey-login-form');
+            var submitForm = document.createElement('form');
+            submitForm.method = sourceForm.method || 'post';
+            submitForm.action = sourceForm.action || window.location.href;
+            submitForm.style.display = 'none';
+
+            var csrf = sourceForm.querySelector('input[name="csrfmiddlewaretoken"]');
+            if (csrf) {
+                var csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrf.value;
+                submitForm.appendChild(csrfInput);
+            }
+
+            Object.keys(submitFields).forEach(function (k) {
+                var resolved = resolve(submitFields[k], ctx);
+                var payloadInput = document.createElement('input');
+                payloadInput.type = 'hidden';
+                payloadInput.name = k;
+                payloadInput.value = (resolved === null || resolved === undefined) ? '' : String(resolved);
+                submitForm.appendChild(payloadInput);
+            });
+
+            document.body.appendChild(submitForm);
+            submitForm.submit();
+            return Promise.resolve(null);
+        }
+
+        /* ukey: SDK method call */
+        var methodName = step.call;
+        if (!methodName || typeof api[methodName] !== 'function') {
+            var notFoundErr = new Error('Method not found: ' + methodName);
+            notFoundErr.step = step;
+            return Promise.reject(notFoundErr);
+        }
+        var args = (step.args || []).map(function (a) { return resolve(a, ctx); });
+        var result;
+        try {
+            result = api[methodName].apply(api, args);
+        } catch (e) {
+            var callCtx = Object.assign({}, ctx, { result: e });
+            var callMsg = (step.check && typeof step.check === 'object' && step.check.message)
+                ? resolve(step.check.message, callCtx)
+                : (step.label || step.name || step.call || String(e));
+            var callErr = new Error(callMsg);
+            callErr.isCheckFailure = !!(step.check && typeof step.check === 'object' && step.check.message);
+            callErr.step = step;
+            return Promise.reject(callErr);
+        }
+        return Promise.resolve(result).then(function (result) {
+            if (step.check) {
+                var checkCtx = Object.assign({}, ctx, { result: result });
+                if (!evalCheck(step.check, checkCtx)) {
+                    var msg = (typeof step.check === 'object' && step.check.message)
+                        ? resolve(step.check.message, checkCtx)
+                        : (step.label || step.name || step.call || 'Step failed');
+                    var err = new Error(msg);
+                    err.isCheckFailure = true;
+                    err.step = step;
+                    throw err;
+                }
+            }
+            if (step.register) setPath(ctx, step.register, result);
+            return result;
+        });
+    }
+
+    /* ── Execute steps sequentially ─────────────────────────────── */
+    function runSteps(steps, api, ctx, onStep) {
+        return (steps || []).reduce(function (p, step) {
+            return p.then(function () {
+                if (onStep && (step.label || step.name)) onStep(step.label || step.name);
+                return runStep(step, api, ctx).catch(function (e) {
+                    if (step.on_error === 'skip') return null;
+                    throw e;
+                });
+            });
+        }, Promise.resolve());
+    }
+
+    /* ── Main init ──────────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+        setStatus('loading', MSG.loading);
+
+        // 1. Fetch config + public settings in parallel
+        Promise.all([
+            fetch(API_CONFIG).then(function (r) {
+                if (!r.ok) throw new Error('config ' + r.status);
+                return r.json();
+            }),
+            fetch('/api/v1/settings/public/open/').then(function (r) {
+                if (!r.ok) throw new Error('settings ' + r.status);
+                return r.json();
+            })
+        ]).then(function (results) {
+            var sdkConfig = results[0];
+            var settings    = results[1];
+
+            // 2. Fetch vendor SDK JS from config.api.ukey_sdk_script_url
+            var jsUrl = ((sdkConfig.config || {}).api || {}).ukey_sdk_script_url || '';
+            if (!jsUrl) throw new Error(MSG.initError + ': ukey_sdk_script_url not configured');
+            return fetch(jsUrl).then(function (r) {
+                if (!r.ok) throw new Error('sdk js ' + r.status);
+                return r.text();
+            }).then(function (jsText) {
+                return { sdkConfig: sdkConfig, jsText: jsText, settings: settings };
+            });
+        }).then(function (results) {
+            var sdkConfig = results.sdkConfig;
+            var jsText      = results.jsText;
+            var settings    = results.settings;
+
+            // 3. Inject vendor SDK
+            injectScript(jsText);
+
+            // 3. Create SDK instance from sdkConfig.sdk.create
+            var sdkCreate = (sdkConfig.sdk || {}).create || {};
+            var ctorName = sdkCreate.constructor;
+            if (!ctorName || typeof window[ctorName] !== 'function') {
+                throw new Error(MSG.initError + ': ' + ctorName);
+            }
+            var ctorArgs = sdkCreate.args || [];
+            var api = new (Function.prototype.bind.apply(
+                window[ctorName], [null].concat(ctorArgs)
+            ))();
+
+            // Build base context — ukey is the shared persistent namespace
+            // config  → sdkConfig.config  (the config sub-key from YAML)
+            // settings → /api/v1/settings/public/open/ response
+            var ctx = {
+                ukey:      ukey,
+                vars:      {},
+                input:     {},
+                instance:  api,
+                config:    sdkConfig.config || {},
+                settings:  settings,
+                challenge: (function () {
+                    var code = '{{ challenge|default:""|escapejs }}';
+                    if (!code) return { code: '', code_base64: '', length: 0 };
+                    var code_base64 = btoa(unescape(encodeURIComponent(code)));
+                    return { code: code, code_base64: code_base64, length: code.length };
+                }())
+            };
+
+            // 4. Run sdk.setup.steps
+            var setupSteps = ((sdkConfig.sdk || {}).setup || {}).steps || [];
+            return runSteps(setupSteps, api, ctx).then(function () {
+                return { sdkConfig: sdkConfig, api: api, ctx: ctx };
+            });
+
+        }).then(function (state) {
+            var sdkConfig = state.sdkConfig;
+            var api         = state.api;
+            var ctx         = state.ctx;
+
+            var usernameDisplay = document.getElementById('username-display');
+            var lastCN = null;
+
+            function setUsername(cn) {
+                if (cn === lastCN) return;
+                lastCN = cn;
+                usernameDisplay.value = cn || '';
+            }
+
+            // 5. Poll: run login.detect.steps → read ukey.certCN → update UI
+            var detectSteps = (((sdkConfig.login || {}).detect || {}).steps) || [];
+
+            function poll() {
+                var pollCtx = Object.assign({}, ctx, { vars: {} });
+                runSteps(detectSteps, api, pollCtx).then(function () {
+                    // All detect steps passed
+                    setUsername(ukey.certCN || null);
+                    setStatus('inserted', MSG.inserted);
+                }).catch(function (err) {
+                    setUsername(null);
+                    if (err && err.isCheckFailure) {
+                        // A step's check expr failed — show its message
+                        setStatus('error', err.message);
+                    } else {
+                        // Device not reachable / method threw
+                        setStatus('not-inserted', MSG.notInserted);
+                    }
+                });
+            }
+
+            poll();
+            setInterval(poll, 5000);
+
+            // 6. Form submit: run login.steps from config
+            document.getElementById('ukey-login-form').addEventListener('submit', function (evt) {
+                evt.preventDefault();
+                var pinInput = document.getElementById('id_pin');
+                var pinValue = pinInput ? pinInput.value : '';
+
+                setStatus('loading', MSG.pinChecking);
+
+                var loginSteps = ((sdkConfig.login || {}).steps) || [];
+                var loginCtx = Object.assign({}, ctx, {
+                    vars:  {},
+                    input: { pin: pinValue }
+                });
+
+                runSteps(loginSteps, api, loginCtx, function (label) {
+                    setStatus('loading', label);
+                }).then(function () {
+                    setStatus('inserted', MSG.pinOk);
+                }).catch(function (err) {
+                    if (pinInput) { pinInput.value = ''; pinInput.focus(); }
+                    console.log('....', err);
+                    setStatus(
+                        'error', 
+                        err.message || 
+                        MSG.pinFail
+                    );
+                    loginBtn.disabled = false;
+                });
+            });
+
+        }).catch(function (err) {
+            console.error('[UKeyLogin] init error:', err);
+            setStatus('error', MSG.sdkError + ': ' + err.message);
+        });
+    });
+}());
+</script>
+</html>

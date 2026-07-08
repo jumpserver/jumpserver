@@ -38,7 +38,7 @@ class CommonSettingSerializer(serializers.Serializer):
     AUTH_OPENID_USER_ATTR_MAP = serializers.JSONField(
         required=True, label=_('User attribute'),
         help_text=_(
-            "User attribute mapping, where the `key` is the JumpServer user attribute name "
+            "User attribute mapping, where the `key` is this system user attribute name "
             "and the `value` is the OIDC service user attribute name"
         )
     )

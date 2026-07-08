@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel, CASCADE_SIGNAL_SKIP
+from common.exceptions import JMSException
 from common.utils import lazyproperty
 from orgs.utils import current_org, tmp_to_root_org
 from .role import Role
@@ -199,7 +200,7 @@ class OrgRoleBinding(RoleBinding):
         if not has_other_role:
             error = _('User last role in org, can not be delete, '
                       'you can remove user from org instead')
-            raise ValidationError({'error': error})
+            raise JMSException(code='org_role_delete_error', detail=error)
         return super().delete(**kwargs)
 
     class Meta:

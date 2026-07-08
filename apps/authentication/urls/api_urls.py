@@ -1,6 +1,7 @@
 # coding:utf-8
 #
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
 from .. import api
@@ -46,5 +47,13 @@ urlpatterns = [
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
     path('user-session/', api.UserSessionApi.as_view(), name='user-session'),
 ]
+urlpatterns += [
+    path('ukey/', include(('authentication.backends.ukey.api_urls', 'ukey'), namespace='ukey'))
+]
+
+if settings.AUTH_CUSTOM_SSO:
+    urlpatterns += [
+        path('custom-sso/login/', api.CustomSSOLoginAPIView.as_view(), name='custom-sso-login'),
+    ]
 
 urlpatterns += router.urls + passkey_urlpatterns

@@ -6,11 +6,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
+from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from authentication.errors import PasswordInvalid, IntervalTooShort
+from authentication import errors
+from authentication.errors import IntervalTooShort
 from authentication.mixins import AuthMixin
 from authentication.mixins import authenticate
 from authentication.serializers import (
@@ -21,6 +23,7 @@ from common.permissions import IsValidUser
 from common.utils.random import random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from settings.utils import get_login_title
+from users.utils import LoginBlockUtil, LoginIpBlockUtil
 
 
 class UserResetPasswordSendCodeApi(CreateAPIView):
@@ -100,10 +103,26 @@ class UserPasswordVerifyApi(AuthMixin, CreateAPIView):
         serializer.is_valid(raise_exception=True)
         password = serializer.validated_data['password']
         user = self.request.user
+        request_username = serializer.validated_data.get('username') or user.username
+        username = request_username
+        ip = self.get_request_ip()
+        self._set_partial_credential_error(username=username, ip=ip, request=request)
 
-        user = authenticate(request=request, username=user.username, password=password)
-        if not user:
-            raise PasswordInvalid
+        try:
+            self._check_is_block(username)
+            user = authenticate(request=request, username=username, password=password)
+            if not user:
+                self.raise_credential_error(errors.reason_password_failed)
+            if user.is_expired:
+                self.raise_credential_error(errors.reason_user_expired)
+            if not user.is_active:
+                self.raise_credential_error(errors.reason_user_inactive)
 
-        self.mark_password_ok(user)
-        return Response()
+            LoginBlockUtil(username, ip).clean_failed_count()
+            LoginIpBlockUtil(ip).clean_block_if_need()
+            return Response(status=status.HTTP_200_OK)
+        except errors.AuthFailedError as e:
+            data = e.as_data()
+            if e.error in {'block_login', 'block_global_ip_login'}:
+                return Response(data, status=status.HTTP_429_TOO_MANY_REQUESTS)
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)

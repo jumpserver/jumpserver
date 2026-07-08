@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from users.models import User
 from .base import OrgListField
 from .mixin import LDAPSerializerMixin
 
@@ -19,6 +20,9 @@ class LDAPTestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField()
     AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField()
     AUTH_LDAP_START_TLS = serializers.BooleanField(required=False)
+    AUTH_LDAP_CACERT_CONTENT = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_CERT_CONTENT = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_KEY_CONTENT = serializers.CharField(required=False, allow_blank=True)
     AUTH_LDAP = serializers.BooleanField(required=False)
 
 
@@ -66,9 +70,12 @@ class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
     AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField(
         required=True, label=_('User attribute'),
         help_text=_(
-            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            'User attribute mapping, where the `key` is this system user attribute name and the '
             '`value` is the LDAP service user attribute name'
         )
+    )
+    AUTH_LDAP_ALWAYS_UPDATE_USER = serializers.BooleanField(
+        required=False, label=_('Always update user'),
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
         required=False, label=_('Periodic run')
@@ -107,7 +114,27 @@ class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('LDAP'))
     AUTH_LDAP_SYNC_ORG_IDS = OrgListField()
+    AUTH_LDAP_START_TLS = serializers.BooleanField(
+        required=False, label=_('StartTLS'),
+        help_text=_('Use StartTLS to upgrade ldap:// connections to TLS')
+    )
+    AUTH_LDAP_CACERT_CONTENT = serializers.CharField(
+        allow_blank=True, required=False, write_only=True,
+        label=_('CA certificate'),
+        help_text=_('CA certificate for verifying LDAPS/StartTLS server')
+    )
+    AUTH_LDAP_CERT_CONTENT = serializers.CharField(
+        allow_blank=True, required=False, write_only=True,
+        label=_('Client certificate'),
+        help_text=_('Client certificate for mutual TLS (optional)')
+    )
+    AUTH_LDAP_KEY_CONTENT = serializers.CharField(
+        allow_blank=True, required=False, write_only=True,
+        label=_('Client private key'),
+        help_text=_('Client private key for mutual TLS (optional)')
+    )
 
+    category = User.Source.ldap.value
     periodic_key = 'AUTH_LDAP_SYNC_IS_PERIODIC'
     interval_key = 'AUTH_LDAP_SYNC_INTERVAL'
     crontab_key = 'AUTH_LDAP_SYNC_CRONTAB'

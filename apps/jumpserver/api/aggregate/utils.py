@@ -122,7 +122,7 @@ def param_dic_to_param(d):
 
 @lru_cache()
 def get_full_resource_map():
-    from apps.jumpserver.urls import resource_api
+    from jumpserver.urls import resource_api
     resource_map = extract_resource_paths(resource_api)
     print("Building URL for resource:", resource_map)
     return resource_map

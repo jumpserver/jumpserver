@@ -223,5 +223,6 @@
     "refresh your assets and nodes": "Atualizando as informações mais recentes sobre máquinas e nós",
     "select one asset to login": "Selecione um dos ativos para fazer o login",
     "to search login if unique": "Buscar login (se único)",
-    "to search, such as: /192.168": "Buscar, por exemplo: /192.168"
+    "to search, such as: /192.168": "Buscar, por exemplo: /192.168",
+    "File transfer error, file transfer interrupted": "Error de transferencia de archivos, la transferencia fue interrumpida"
 }

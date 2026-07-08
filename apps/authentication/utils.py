@@ -145,5 +145,11 @@ def get_auth_methods():
             'enabled': settings.AUTH_PASSKEY,
             'url': reverse('api-auth:passkey-login'),
             'logo': static('img/login_passkey.png')
+        },
+        {
+            'name': _('UKey'),
+            'enabled': settings.AUTH_UKEY,
+            'url': reverse('authentication:ukey:ukey-login'),
+            'logo': static('img/login_ukey.png')
         }
     ]

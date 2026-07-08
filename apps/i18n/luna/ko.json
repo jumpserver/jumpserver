@@ -79,7 +79,7 @@
     "Download": "다운로드",
     "Download the latest client": "최신 클라이언트를 다운로드하세요.",
     "DownloadClient": "클라이언트 다운로드",
-    "DownloadClientMsg": "JumpServer 클라이언트가 설치되지 않았습니다. 지금 가서 다운로드 및 설치하세요.",
+    "DownloadClientMsg": "클라이언트가 설치되지 않았습니다. 지금 가서 다운로드 및 설치하세요.",
     "Driver redirect": "디스크 장착",
     "Expand": "확장",
     "Expand all": "모두 확장",
@@ -117,7 +117,7 @@
     "Host": "호스트",
     "Hotkeys": "단축키",
     "Info": "알림",
-    "InstallClientMsg": "JumpServer 클라이언트가 설치되어 있지 않습니다. 지금 설치하러 가시겠습니까?",
+    "InstallClientMsg": "클라이언트가 설치되어 있지 않습니다. 지금 설치하러 가시겠습니까?",
     "Japanese keyboard layout": "일본어 (Qwerty)",
     "Keyboard keys": "옵션 + Shift + 왼쪽 / 오른쪽",
     "Keyboard layout": "키보드 레이아웃",
@@ -289,5 +289,6 @@
     "success": "성공",
     "system user": "시스템 사용자",
     "tabLimits": "현재 15개의 탭이 열려 있습니다. 시스템의 안정성을 위해 Luna를 계속 사용하려면 새로운 브라우저 탭에서 열어보시겠습니까?",
-    "user": "사용자"
+    "user": "사용자",
+    "MarkAsRead": "읽음으로 표시"
 }

@@ -7,7 +7,7 @@ __all__ = ['GunicornService']
 class GunicornService(BaseService):
 
     def __init__(self, **kwargs):
-        self.worker = kwargs['worker_gunicorn']
+        self.worker = kwargs.get('worker', 2)
         super().__init__(**kwargs)
 
     @property

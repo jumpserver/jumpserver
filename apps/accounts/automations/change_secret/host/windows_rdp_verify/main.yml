@@ -28,4 +28,7 @@
         login_secret_type: "{{ account.secret_type }}"
         gateway_args: "{{ jms_gateway | default({}) }}"
       when: account.secret_type == "password" and check_conn_after_change
-      delegate_to: localhost
+      vars:
+        ansible_connection: local
+        ansible_shell_type: sh
+        ansible_python_interpreter: "{{ local_python_interpreter }}"

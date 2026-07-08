@@ -1,39 +1,91 @@
+import argparse
 import asyncio
+import socket
 import time
-import nmap
 
 from common.utils.timezone import local_now_display
 from settings.utils import generate_ips
 
+_SCANNER_VERSION = '1.0'
 
-def get_nmap_result(nm, ip, ports, timeout):
-    results = []
-    nm.scan(ip, ports=ports, timeout=timeout)
-    tcp_port = nm[ip].get('tcp', {})
-    udp_port = nm[ip].get('udp', {})
-    results.append(f'PORT\tSTATE\tSERVICE')
-    for port, info in tcp_port.items():
-        results.append(f"{port}\t{info.get('state', 'unknown')}\t{info.get('name', 'unknown')}")
-    for port, info in udp_port.items():
-        results.append(f"{port}\t{info.get('state', 'unknown')}\t{info.get('name', 'unknown')}")
-    return results
+# Fallback service name table for platforms where getservbyport is unavailable
+_KNOWN_SERVICES = {
+    21: 'ftp', 22: 'ssh', 23: 'telnet', 25: 'smtp', 53: 'domain',
+    80: 'http', 110: 'pop3', 135: 'msrpc', 139: 'netbios-ssn',
+    143: 'imap', 443: 'https', 445: 'microsoft-ds', 587: 'submission',
+    993: 'imaps', 995: 'pop3s', 1433: 'ms-sql-s', 1521: 'oracle',
+    3306: 'mysql', 3389: 'ms-wbt-server', 5432: 'postgresql',
+    5900: 'vnc', 6379: 'redis', 8080: 'http-proxy', 8443: 'https-alt',
+    27017: 'mongodb',
+}
 
 
-async def once_nmap(nm, ip, ports, timeout, display):
+def _parse_ports(ports_str):
+    """Parse '22,80,443' or '22-100' or a mix into a sorted list of ints."""
+    if not ports_str:
+        # mirror nmap's default: the 1000 most common ports; use 1-1024 as a
+        # reasonable approximation without requiring root privileges.
+        return list(range(1, 1025))
+    ports = []
+    for part in ports_str.split(','):
+        part = part.strip()
+        if '-' in part:
+            start, end = part.split('-', 1)
+            ports.extend(range(int(start), int(end) + 1))
+        else:
+            ports.append(int(part))
+    return sorted(set(ports))
+
+
+def _service_name(port: int, proto: str = 'tcp') -> str:
+    try:
+        return socket.getservbyport(port, proto)
+    except OSError:
+        return _KNOWN_SERVICES.get(port, 'unknown')
+
+
+async def _scan_tcp_port(ip: str, port: int, timeout: float) -> str:
+    """Return 'open' or 'closed' for a single TCP port."""
+    try:
+        _, writer = await asyncio.wait_for(
+            asyncio.open_connection(ip, port), timeout=timeout
+        )
+        writer.close()
+        try:
+            await writer.wait_closed()
+        except Exception:
+            pass
+        return 'open'
+    except (asyncio.TimeoutError, ConnectionRefusedError, OSError):
+        return 'closed'
+
+
+async def get_nmap_result(ip: str, ports_str, timeout) -> list[str]:
+    """Scan *ip* and return formatted result lines (PORT / STATE / SERVICE)."""
+    timeout = float(timeout) if timeout else 1.0
+    ports = _parse_ports(ports_str)
+
+    states = await asyncio.gather(
+        *[_scan_tcp_port(ip, p, timeout) for p in ports]
+    )
+
+    lines = ['PORT\tSTATE\tSERVICE']
+    for port, state in zip(ports, states):
+        if state == 'open':
+            lines.append(f'{port}/tcp\t{state}\t{_service_name(port)}')
+    return lines
+
+
+async def once_nmap(ip: str, ports_str, timeout, display) -> bool:
     await display(f'Starting Nmap at {local_now_display()} for {ip}')
     try:
-        is_ok = True
-        loop = asyncio.get_running_loop()
-        results = await loop.run_in_executor(None, get_nmap_result, nm, ip, ports, timeout)
-        for result in results:
-            await display(result)
-
-    except KeyError:
-        is_ok = False
-        await display(f'Host seems down.')
+        results = await get_nmap_result(ip, ports_str, timeout)
+        for line in results:
+            await display(line)
+        is_ok = len(results) > 1  # at least one open port found
     except Exception as err:
         is_ok = False
-        await display(f"Error: %s" % err)
+        await display(f'Error: {err}')
     return is_ok
 
 
@@ -44,14 +96,34 @@ async def verbose_nmap(dest_ips, dest_ports=None, timeout=None, display=None):
     ips = generate_ips(dest_ips)
     dest_port = ','.join(list(dest_ports)) if dest_ports else None
 
-    nm = nmap.PortScanner()
     success_num, start_time = 0, time.time()
-    nmap_version = '.'.join(map(lambda x: str(x), nm.nmap_version()))
-    await display(f'[Summary] Nmap (v{nmap_version}): {len(ips)} addresses were scanned')
+    await display(f'[Summary] Nmap (v{_SCANNER_VERSION}): {len(ips)} addresses were scanned')
     for ip in ips:
-        ok = await once_nmap(nm, str(ip), dest_port, timeout, display)
+        ok = await once_nmap(str(ip), dest_port, timeout, display)
         if ok:
             success_num += 1
         await display()
-    await display(f'[Done] Nmap: {len(ips)} IP addresses ({success_num} hosts up) '
-                  f'scanned in {round(time.time() - start_time, 2)} seconds')
+    await display(
+        f'[Done] Nmap: {len(ips)} IP addresses ({success_num} hosts up) '
+        f'scanned in {round(time.time() - start_time, 2)} seconds'
+    )
+
+
+async def _main():
+    parser = argparse.ArgumentParser(description='Pure-Python TCP port scanner')
+    parser.add_argument('targets', nargs='+', help='IP / CIDR, e.g. 192.168.1.1 or 10.0.0.0/24')
+    parser.add_argument('-p', '--ports', default=None,
+                        help='Ports to scan, e.g. 22,80,443 or 22-1024 (default: 1-1024)')
+    parser.add_argument('--timeout', type=float, default=1.0,
+                        help='Per-port connect timeout in seconds (default: 1.0)')
+    args = parser.parse_args()
+
+    async def display(msg=''):
+        print(msg)
+
+    dest_ports = args.ports.split(',') if args.ports else None
+    await verbose_nmap(args.targets, dest_ports=dest_ports, timeout=args.timeout, display=display)
+
+
+if __name__ == '__main__':
+    asyncio.run(_main())

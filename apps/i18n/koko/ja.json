@@ -223,5 +223,6 @@
     "refresh your assets and nodes": "最新のマシンとノード情報を更新します",
     "select one asset to login": "資産のいずれかを選択してログイン",
     "to search login if unique": "ログイン検索（唯一の場合）",
-    "to search, such as: /192.168": "検索：/192.168"
+    "to search, such as: /192.168": "検索：/192.168",
+    "File transfer error, file transfer interrupted": "ファイル転送エラー、ファイル転送が中断されました"
 }

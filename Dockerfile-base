@@ -1,4 +1,4 @@
-FROM python:3.11.14-slim-trixie
+FROM python:3.14-slim-trixie
 ARG TARGETARCH
 # Install APT dependencies
 ARG DEPENDENCIES="                    \
@@ -30,20 +30,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && echo "no" | dpkg-reconfigure dash
 
 # Install bin tools
-ARG CHECK_VERSION=v1.0.5
 RUN set -ex \
-    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && mv check /usr/local/bin/ \
-    && chown root:root /usr/local/bin/check \
-    && chmod 755 /usr/local/bin/check \
-    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/latest/download/check_linux_${TARGETARCH}.deb \
+    && dpkg -i check_linux_${TARGETARCH}.deb \
+    && rm -f check_linux_${TARGETARCH}.deb
 
 # Install Python dependencies
 WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
-ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.11/site-packages/ansible_collections
+ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.14/site-packages/ansible_collections
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH

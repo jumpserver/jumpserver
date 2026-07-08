@@ -17,7 +17,7 @@ class WeComSettingSerializer(serializers.Serializer):
     WECOM_RENAME_ATTRIBUTES = serializers.JSONField(
         required=False, label=_('User attribute'),
         help_text=_(
-            'User attribute mapping, where the `key` is the JumpServer user attribute name and the '
+            'User attribute mapping, where the `key` is this system user attribute name and the '
             '`value` is the WeCom service user attribute name'
         )
     )

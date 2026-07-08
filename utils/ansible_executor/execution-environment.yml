@@ -1,0 +1,64 @@
+---
+
+version: 3
+
+
+images:
+  # ansible-builder 仅支持 RPM 系镜像 (dnf)，不能用 python:3.11-slim 等 Debian 镜像
+  base_image:
+    name: quay.io/centos/centos:stream9
+
+dependencies:
+  python_interpreter:
+    package_system: python3.11
+    python_path: /usr/bin/python3.11
+
+  # 与 pyproject.toml [tool.uv.sources] 保持一致，不要用 PyPI 官方包
+  ansible_core:
+    package_pip: https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.3.zip
+  ansible_runner:
+    package_pip: https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip
+
+  galaxy:
+    collections:
+      - name: community.postgresql
+        version: "2.4.0"
+      - name: community.mysql
+      - name: community.mongodb
+      - name: community.windows
+      - name: ansible.windows
+
+  python: requirements-python.txt
+  system: bindep.txt
+
+additional_build_files:
+  - src: files/pip.conf
+    dest: configs/
+  - src: files/use-china-mirrors.sh
+    dest: scripts/
+  - src: ../../apps/libs/ansible/
+    dest: jumpserver-ansible/
+  - src: ansible.cfg
+    dest: configs/
+
+additional_build_steps:
+  prepend_base:
+    # pip 镜像需在 base 阶段最早注入，后续各 stage 的 pip install 都会走国内源
+    - COPY _build/configs/pip.conf /etc/pip.conf
+    - COPY _build/scripts/use-china-mirrors.sh /tmp/use-china-mirrors.sh
+    - RUN chmod +x /tmp/use-china-mirrors.sh && /tmp/use-china-mirrors.sh centos
+    # freetds-devel、sshpass 等在 EPEL；postgresql-devel 等开发包常需 CRB
+    - RUN $PKGMGR config-manager --set-enabled crb
+    - RUN $PKGMGR install -y epel-release
+    - RUN /tmp/use-china-mirrors.sh epel && $PKGMGR makecache -y
+  append_final:
+    - RUN mkdir -p /opt/jumpserver/apps
+    - COPY _build/jumpserver-ansible/ /opt/jumpserver/apps/libs/ansible/
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+    - ENV PYTHONPATH=/opt/jumpserver/apps
+    - ENV ANSIBLE_LIBRARY=/opt/jumpserver/apps/libs/ansible/modules
+    - ENV ANSIBLE_FORCE_COLOR=True
+    - ENV LC_ALL=C.UTF-8
+    - ENV LANG=C.UTF-8
+    # bindep [compile] 已避免工具链进入最终层；此处仅清理 PKGMGR_PRESERVE_CACHE 写入的 dnf 缓存
+    - RUN $PKGMGR clean all && rm -rf /var/cache/dnf /var/cache/yum /root/.cache

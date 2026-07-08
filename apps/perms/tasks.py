@@ -59,7 +59,7 @@ def check_asset_permission_expired():
 @tmp_to_root_org()
 def check_asset_permission_will_expired():
     start = local_now()
-    end = start + timedelta(days=3)
+    end = start + timedelta(days=settings.PERM_EXPIRED_NOTICE_DAYS)
 
     user_asset_remain_day_mapper = defaultdict(dict)
     org_perm_remain_day_mapper = defaultdict(dict)

@@ -60,10 +60,6 @@ class TerminalSerializer(BulkModelSerializer):
         fields_fk = ['load', 'stat']
         fields = fields_small + fields_fk
         read_only_fields = ['type', 'date_created']
-        extra_kwargs = {
-            'command_storage': {'required': True, },
-            'replay_storage': {'required': True, },
-        }
 
     @staticmethod
     def get_kwargs_may_be_uuid(value):

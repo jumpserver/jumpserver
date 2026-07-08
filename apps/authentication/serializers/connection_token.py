@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.utils import validate_account_username
 from common.utils import get_request_ip
 from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
@@ -26,7 +27,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'user', 'asset', 'account', 'input_username', 'input_secret',
+            'user', 'asset', 'account', 'input_username', 'input_secret', 'input_secret_type',
             'connect_method', 'connect_options', 'protocol', 'actions',
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
@@ -54,6 +55,10 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
 
     def get_user(self, attrs):
         return self.get_request_user()
+
+    @staticmethod
+    def validate_input_username(value):
+        return validate_account_username(value)
 
     def create(self, validated_data):
         request = self.context.get('request')

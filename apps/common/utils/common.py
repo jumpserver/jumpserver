@@ -9,6 +9,8 @@ import re
 import socket
 import time
 import uuid
+import hmac
+import hashlib
 from collections import OrderedDict
 from functools import wraps, cached_property
 from itertools import chain
@@ -156,15 +158,54 @@ def is_uuid(seq):
 
 
 def get_request_ip(request):
+    if settings.TRUSTED_IP_VERIFY_ENABLED:
+        login_ip = get_trusted_request_ip(request)
+    else:
+        login_ip = get_common_request_ip(request)
+    return login_ip
+
+
+def get_trusted_request_ip(request):
+    trusted_ip = request.headers.get(settings.TRUSTED_IP_SOURCE_HEADER, '')
+    if not trusted_ip:
+        logger.warning(
+            f"Trusted IP verification enabled but no source header '{settings.TRUSTED_IP_SOURCE_HEADER}' "
+            f"found in request."
+        )
+        return '0.0.0.0'
+
+    signature_header_name = settings.TRUSTED_IP_SIGN_HEADER
+    received_signature = request.headers.get(signature_header_name, '')
+    if not received_signature:
+        logger.warning(
+            f"Trusted IP verification enabled but no signature header '{signature_header_name}' "
+            f"found in request."
+        )
+        return '0.0.0.0'
+
+    sign_key = settings.TRUSTED_IP_SIGN_KEY or os.environ.get('HMAC_SIGN_KEY', '')
+    expected_signature = hmac.new(
+        sign_key.encode(), trusted_ip.encode(), hashlib.sha256
+    ).hexdigest()
+    if not hmac.compare_digest(expected_signature.lower(), received_signature.lower()):
+        logger.warning(
+            f"Trusted IP verification failed. Expected signature: {expected_signature}, "
+            f"Received signature: {received_signature}."
+        )
+        return '0.0.0.0'
+
+    return trusted_ip
+
+
+def get_common_request_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
     if x_forwarded_for and x_forwarded_for[0]:
         login_ip = x_forwarded_for[0]
         if login_ip.count(':') == 1:
             # format: ipv4:port (非标准格式的 X-Forwarded-For)
             login_ip = login_ip.split(":")[0]
-        return login_ip
-
-    login_ip = request.META.get('REMOTE_ADDR', '')
+    else:
+        login_ip = request.META.get('REMOTE_ADDR', '')
     return login_ip
 
 
@@ -443,3 +484,16 @@ def convert_html_to_markdown(html_str):
 def many_get(d, keys, default=None):
     res = [d.get(key, default) for key in keys]
     return res
+
+
+def text_hmac_sha256(text: str, secret_key: str = None):
+    if secret_key is None:
+        secret_key = settings.SECRET_KEY
+    try:
+        msg = text.strip().lower().encode('utf-8')
+        key = secret_key.encode("utf-8")
+        digest = hmac.new(key, msg, hashlib.sha256).hexdigest()  # 64位十六进制字符串
+    except Exception as e:
+        logger.error(f"Failed to hmac hash text: {text}, error: {e}")
+        digest = ''
+    return digest
