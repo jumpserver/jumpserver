@@ -93,5 +93,5 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         )
         
         # 根据配置决定是否返回密码
-        secret = account.secret if settings.SECURITY_ACCOUNT_SECRET_READ else None
+        secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
         return Response(data={'id': request.user.id, 'secret': secret})
