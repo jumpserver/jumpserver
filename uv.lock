@@ -1401,14 +1401,14 @@ wheels = [
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2025.8.1"
+version = "2026.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/f7/0cb2f520723f1823ef7b6651d447927f61ba92d152a5d68132599b90624f/drf_spectacular_sidecar-2025.8.1.tar.gz", hash = "sha256:1944ae0eb5136cff5aa135211bec31084cef1af03a04de9b7f2f912b3c59c251", size = 2407787 }
+sdist = { url = "https://files.pythonhosted.org/packages/7a/51/9e038d14bf51a0bd051e8bcb690287349c908fa7ba69021d9f3e5d5ac51f/drf_spectacular_sidecar-2026.7.1.tar.gz", hash = "sha256:40113c4066c7bc3ef15a7ce1c40cda227a907a9986748024a813a9e0595eba25", size = 2593211 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/3b/0fcdc6eb294a11ed6e3ddc02fc29968bf403d3ce31645764eedfc91f87a6/drf_spectacular_sidecar-2025.8.1-py3-none-any.whl", hash = "sha256:c65a2a423000cc067395150b4dc28e7398a762d66ee101c4c38a4fb0d29a42a2", size = 2427849 },
+    { url = "https://files.pythonhosted.org/packages/9d/76/d08f5c79f7643dbff4512605c28b75481966ed6c8cc9b397c9dd2ee91cd1/drf_spectacular_sidecar-2026.7.1-py3-none-any.whl", hash = "sha256:bc6d50c9b64660e45e09296d39553b3e759eedd825fc41d631ee5b3f88e0c5de", size = 2617384 },
 ]
 
 [[package]]
@@ -2362,7 +2362,7 @@ requires-dist = [
     { name = "docutils", specifier = "==0.20.1" },
     { name = "drf-nested-routers", specifier = "==0.93.4" },
     { name = "drf-spectacular", specifier = "==0.29.0" },
-    { name = "drf-spectacular-sidecar", specifier = "==2025.8.1" },
+    { name = "drf-spectacular-sidecar", specifier = "==2026.7.1" },
     { name = "drf-writable-nested", specifier = "==0.7.0" },
     { name = "ecdsa", specifier = "==0.19.2" },
     { name = "elasticsearch7", specifier = "==7.17.13" },
