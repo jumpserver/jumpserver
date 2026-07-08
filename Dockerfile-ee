@@ -1,4 +1,5 @@
 ARG VERSION=dev
+FROM jumpserver/gmssl:3.1.1-trixie AS gmssl-builder
 
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} AS build-xpack
 FROM jumpserver/core:${VERSION}-ce
@@ -21,16 +22,10 @@ WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.org/simple
 
-ARG GMSSL_VERSION=3.1.1
-
 RUN set -ex \
     && uv pip install -i${PIP_MIRROR} --group xpack \
     && rm -rf /root/.cache/
 
-RUN set -ex \
-    && python3 -c "import urllib.request; urllib.request.urlretrieve('https://github.com/guanzhi/GmSSL/releases/download/v${GMSSL_VERSION}/GmSSL-${GMSSL_VERSION}-Linux.sh', '/tmp/gmssl-install.sh')" \
-    && chmod +x /tmp/gmssl-install.sh \
-    && /tmp/gmssl-install.sh --prefix=/usr/local --skip-license \
-    && echo "/usr/local/GmSSL-${GMSSL_VERSION}-Linux/lib" > /etc/ld.so.conf.d/gmssl.conf \
-    && ldconfig \
-    && rm -f /tmp/gmssl-install.sh
+COPY --from=gmssl-builder /usr/local/lib/libgmssl.so* /usr/local/lib/
+COPY --from=gmssl-builder /usr/local/include/gmssl /usr/local/include/gmssl
+COPY --from=gmssl-builder /usr/local/bin/gmssl /usr/local/bin/gmssl

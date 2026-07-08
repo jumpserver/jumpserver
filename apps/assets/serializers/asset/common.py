@@ -15,6 +15,7 @@ from common.serializers import (
 )
 from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from django.utils.translation import gettext
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -29,7 +30,7 @@ __all__ = [
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
-    port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=0)
+    port = serializers.IntegerField(required=True, allow_null=True, max_value=65535, min_value=0)
 
     def get_render_help_text(self):
         if self.parent and self.parent.many:
@@ -144,7 +145,7 @@ class NodeDisplaySerializer(serializers.ListField):
 class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
+    protocols = AssetProtocolsSerializer(many=True, required=True, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
     nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
@@ -259,17 +260,17 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     @property
     def _asset_platform(self):
-        platform_id = self.initial_data.get('platform')
-        if isinstance(platform_id, dict):
-            platform_id = platform_id.get('id') or platform_id.get('pk')
-
-        if not platform_id and self.instance:
+        platform_data = getattr(self, 'initial_data', {}).get('platform')
+        if not platform_data and self.instance:
             platform = self.instance.platform
         else:
-            platform = Platform.objects.filter(id=platform_id).first()
+            try:
+                platform = self.fields['platform'].to_internal_value(platform_data)
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({gettext('Platform'): exc.detail})
 
         if not platform:
-            raise serializers.ValidationError({'platform': _("Platform not exist")})
+            raise serializers.ValidationError({gettext('Platform'): _("Platform not exist")})
         return platform
 
     def validate_zone(self, value):

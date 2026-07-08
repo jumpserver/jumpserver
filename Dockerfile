@@ -36,7 +36,8 @@ ARG TOOLS="                           \
         postgresql-client             \
         openssh-client                \
         sshpass                       \
-        bubblewrap"
+        bubblewrap                    \
+        docker-cli"
 
 ARG APT_MIRROR=http://deb.debian.org
 

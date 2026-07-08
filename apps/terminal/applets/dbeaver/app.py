@@ -116,7 +116,7 @@ class AppletApplication(BaseApplication):
                         f'host={self.host}|' \
                         f'port={self.port}|' \
                         f'database={self.db}|' \
-                        f'"user={self.username}"|' \
+                        f'user={self.username}|' \
                         f'password={self.password}|' \
                         f'save=false|' \
                         f'connect=true'
@@ -148,8 +148,7 @@ class AppletApplication(BaseApplication):
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
         startupinfo.wShowWindow = subprocess.SW_HIDE
-        exec_string = '%s -con %s' % (self.path, params)
-        ret = subprocess.Popen(exec_string, startupinfo=startupinfo)
+        ret = subprocess.Popen([self.path, '-con', params], startupinfo=startupinfo)
         self.pid = ret.pid
 
     def wait(self):

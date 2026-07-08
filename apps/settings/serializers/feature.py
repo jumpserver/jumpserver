@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
 from common.utils import date_expired_default
+from ops.ansible.docker import ANSIBLE_EE_IMAGE
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
@@ -16,6 +17,14 @@ __all__ = [
 from settings.const import (
     ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices, ChatAIMethodChoices
 )
+
+ANSIBLE_DOCKER_HELP_TEXT = _(
+    'Run Ansible jobs in Docker execution environment (%(image)s). '
+    'You can disable this option in System Settings - Feature Settings - Job Center - '
+    'Ansible Docker isolation to run locally. '
+    'If the image is missing, pull it on the ansible worker: '
+    'docker pull %(image)s'
+) % {'image': ANSIBLE_EE_IMAGE}
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -203,6 +212,11 @@ class OpsSettingSerializer(serializers.Serializer):
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Adhoc command'),
         help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
+    )
+    ANSIBLE_DOCKER_ENABLED = serializers.BooleanField(
+        required=False,
+        label=_('Ansible Docker isolation'),
+        help_text=ANSIBLE_DOCKER_HELP_TEXT,
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(
         child=serializers.CharField(max_length=1024),

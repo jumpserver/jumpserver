@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 
 
 class Source(models.TextChoices):
@@ -24,7 +24,7 @@ class Source(models.TextChoices):
     lark = "lark", _("Lark")
     slack = "slack", _("Slack")
     custom = "custom", "Custom"
-    cert = "cert", _("Certificate")
+    ukey = "ukey", _("UKey")
 
     @classmethod
     def as_dict(cls):
@@ -57,7 +57,7 @@ class SourceMixin:
         Source.slack: [settings.AUTH_BACKEND_SLACK],
         Source.dingtalk: [settings.AUTH_BACKEND_DINGTALK],
         Source.custom: [settings.AUTH_BACKEND_CUSTOM],
-        Source.cert: [settings.AUTH_BACKEND_CERT],
+        Source.ukey: [settings.AUTH_BACKEND_UKEY],
     }
 
     @classmethod
@@ -76,7 +76,7 @@ class SourceMixin:
             cls.Source.slack: settings.AUTH_SLACK,
             cls.Source.dingtalk: settings.AUTH_DINGTALK,
             cls.Source.custom: settings.AUTH_CUSTOM,
-            cls.Source.cert: settings.AUTH_CERT,
+            cls.Source.ukey: settings.AUTH_UKEY,
         }
         return [str(k) for k, v in mapper.items() if v]
 

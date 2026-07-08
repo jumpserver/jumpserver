@@ -149,10 +149,15 @@ class User(
     face_vector = fields.EncryptTextField(
         null=True, blank=True, max_length=2048, verbose_name=_("Face vector")
     )
+    ukey_sn = models.CharField(
+        unique=True, blank=True,
+        null=True, default=None, max_length=128, verbose_name=_('UKey SN')
+    )
     date_api_key_last_used = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Date api key used")
     )
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+
     objects = UserManager()
     DATE_EXPIRED_WARNING_DAYS = 5
 
@@ -318,6 +323,12 @@ class User(
         if self.email and self.source == self.Source.local.value:
             return True
         return False
+
+    def set_ukey_sn(self, ukey_sn):
+        if not isinstance(ukey_sn, str):
+            return
+        self.ukey_sn = ukey_sn.strip()
+        self.save(update_fields=['ukey_sn'])
 
 
 class UserPasswordHistory(models.Model):

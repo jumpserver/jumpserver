@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='connectiontoken',
             name='input_secret_type',
-            field=models.CharField(blank=True, default='password', max_length=16, verbose_name='Input secret type'),
+            field=models.CharField(blank=True, default='password', max_length=16, null=True, verbose_name='Input secret type'),
         ),
     ]

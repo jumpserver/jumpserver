@@ -9,7 +9,7 @@ from common.db.models import JMSBaseModel
 from common.utils import is_uuid
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org
-from terminal.const import LoginFrom
+from terminal.const import LoginFrom, TerminalType
 from users.models import User
 
 __all__ = ['SessionSharing', 'SessionJoinRecord']
@@ -47,9 +47,18 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     def __str__(self):
         return 'Creator: {}'.format(self.creator)
 
+    @property
+    def share_component(self) -> str:
+        terminal = self.session.terminal
+        if terminal:
+            return terminal.type
+        if self.session.protocol in ('vnc', 'rdp'):
+            return TerminalType.lion
+        return TerminalType.koko
+
     @cached_property
     def url(self) -> str:
-        return '%s/koko/share/%s/' % (self.origin, self.id)
+        return '%s/%s/share/%s/' % (self.origin, self.share_component, self.id)
 
     @cached_property
     def users_display(self) -> list:

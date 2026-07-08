@@ -6,10 +6,20 @@ from django.conf import settings
 from django.utils._os import safe_join
 
 from common.utils import is_macos
+from common.utils.yml import sanitize_ansible_inventory_json, sanitize_ansible_playbook
+
+from ..utils import get_ansible_log_verbosity
 from .callback import DefaultCallback
+from .docker import (
+    docker_extravars,
+    docker_isolation_kwargs,
+    ensure_ansible_docker_image,
+    prepare_isolated_ansible_cfg,
+    stage_inventory_for_docker,
+    use_ansible_docker_isolation,
+)
 from .exception import CommandInBlackListException
 from .interface import interface
-from ..utils import get_ansible_log_verbosity
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
@@ -18,8 +28,7 @@ class AdHocRunner:
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
     need_local_connection_modules_choices = ("mysql", "postgresql", "sqlserver", "huawei")
 
-    def __init__(self, inventory, job_module, module, module_args='', pattern='*', project_dir='/tmp/',
-                 extra_vars=None,
+    def __init__(self, inventory, job_module, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
                  dry_run=False, timeout=-1):
         if extra_vars is None:
             extra_vars = {}
@@ -55,30 +64,39 @@ class AdHocRunner:
         verbosity = get_ansible_log_verbosity(verbosity)
 
         if not os.path.exists(self.project_dir):
-            os.mkdir(self.project_dir, 0o755)
+            os.makedirs(self.project_dir, 0o755, exist_ok=True)
         private_env = safe_join(self.project_dir, 'env')
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        interface.run(
-            timeout=self.timeout if self.timeout > 0 else None,
-            extravars=self.extra_vars,
-            envvars=self.envs,
-            host_pattern=self.pattern,
-            private_data_dir=self.project_dir,
-            inventory=self.inventory,
-            module=self.module,
-            module_args=self.module_args,
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            **kwargs
-        )
+        prepare_isolated_ansible_cfg(self.project_dir)
+
+        run_kwargs = {
+            'timeout': self.timeout if self.timeout > 0 else None,
+            'extravars': docker_extravars(self.extra_vars),
+            'envvars': self.envs,
+            'host_pattern': self.pattern,
+            'private_data_dir': self.project_dir,
+            'inventory': self.inventory,
+            'module': self.module,
+            'module_args': self.module_args,
+            'verbosity': verbosity,
+            'event_handler': self.cb.event_handler,
+            'status_handler': self.cb.status_handler,
+            **kwargs,
+        }
+        if use_ansible_docker_isolation():
+            run_kwargs.update(docker_isolation_kwargs())
+            ensure_ansible_docker_image()
+        interface.run(**run_kwargs)
         return self.cb
 
 
 class PlaybookRunner:
-    def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None, ):
+    def __init__(
+            self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None,
+            safety_mode=None, inventory_safety=None,
+    ):
 
         self.id = uuid.uuid4()
         self.inventory = inventory
@@ -92,37 +110,69 @@ class PlaybookRunner:
         if extra_vars is None:
             extra_vars = {}
         self.extra_vars = extra_vars
+        self.safety_mode = safety_mode
+        self.inventory_safety = inventory_safety
 
     def copy_playbook(self):
         entry = os.path.basename(self.playbook)
         playbook_dir = os.path.dirname(self.playbook)
         project_playbook_dir = os.path.join(self.project_dir, "project")
-        shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
+        if os.path.realpath(playbook_dir) != os.path.realpath(project_playbook_dir):
+            shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
         self.playbook = entry
 
+    def prepare_safe_inputs(self):
+        # Security anchor:
+        # For system-generated Ansible inputs that may contain user-controlled values,
+        # callers should explicitly enable safety_mode / inventory_safety so the runner
+        # sanitizes the task-private playbook / inventory before Ansible runs.
+        # This is intended for system-generated inputs whose values should be treated as
+        # literal data, not for arbitrary user-authored playbooks or execution logic.
+        if self.safety_mode == "playbook_unsafe":
+            project_playbook = os.path.join(self.project_dir, "project", self.playbook)
+            sanitize_ansible_playbook(project_playbook, project_playbook)
+            os.chmod(project_playbook, 0o600)
+
+        if self.inventory_safety == "json_escape":
+            sanitize_ansible_inventory_json(self.inventory, self.inventory)
+            os.chmod(self.inventory, 0o600)
+    @property
+    def playbook_project_dir(self):
+        return os.path.join(self.project_dir, 'project')
+
     def run(self, verbosity=0, **kwargs):
+        if not os.path.exists(self.project_dir):
+            os.makedirs(self.project_dir, mode=0o755)
         self.copy_playbook()
+        self.prepare_safe_inputs()
 
         verbosity = get_ansible_log_verbosity(verbosity)
         private_env = safe_join(self.project_dir, 'env')
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
+        prepare_isolated_ansible_cfg(self.project_dir)
+        inventory = stage_inventory_for_docker(self.project_dir, self.inventory)
+
         kwargs = dict(kwargs)
-        if self.isolate and not is_macos():
+        if use_ansible_docker_isolation():
+            kwargs.update(docker_isolation_kwargs())
+            ensure_ansible_docker_image()
+        elif self.isolate and not is_macos():
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
         interface.run(
             private_data_dir=self.project_dir,
-            inventory=self.inventory,
+            inventory=inventory,
             playbook=self.playbook,
             verbosity=verbosity,
             event_handler=self.cb.event_handler,
             status_handler=self.cb.status_handler,
-            host_cwd=self.project_dir,
+            # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
+            host_cwd=self.playbook_project_dir,
             envvars=self.envs,
-            extravars=self.extra_vars,
+            extravars=docker_extravars(self.extra_vars),
             **kwargs
         )
         return self.cb
@@ -136,30 +186,53 @@ class SuperPlaybookRunner(PlaybookRunner):
 
 
 class UploadFileRunner:
+    UPLOAD_STAGING_DIR = 'upload'
+
     def __init__(self, inventory, project_dir, job_id, dest_path, callback=None):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.project_dir = project_dir
         self.cb = DefaultCallback()
         upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file')
-        self.src_paths = safe_join(upload_file_dir, str(job_id))
+        self.share_src_dir = safe_join(upload_file_dir, str(job_id))
         self.dest_path = safe_join("/tmp", dest_path)
 
+    def stage_upload_files(self):
+        """Copy uploads into private_data_dir so Docker EE can read src for copy."""
+        if not os.path.isdir(self.share_src_dir):
+            raise FileNotFoundError(f'Upload source directory not found: {self.share_src_dir}')
+        staged_dir = os.path.join(self.project_dir, self.UPLOAD_STAGING_DIR)
+        if os.path.exists(staged_dir):
+            shutil.rmtree(staged_dir)
+        shutil.copytree(self.share_src_dir, staged_dir)
+        return staged_dir
+
     def run(self, verbosity=0, **kwargs):
+        if not os.path.exists(self.project_dir):
+            os.makedirs(self.project_dir, mode=0o755, exist_ok=True)
+
+        prepare_isolated_ansible_cfg(self.project_dir)
+        src_path = self.stage_upload_files()
+
         verbosity = get_ansible_log_verbosity(verbosity)
-        interface.run(
-            private_data_dir=self.project_dir,
-            host_pattern="*",
-            inventory=self.inventory,
-            module='copy',
-            module_args=f"src={self.src_paths}/ dest={self.dest_path}/",
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            **kwargs
-        )
+        run_kwargs = {
+            'private_data_dir': self.project_dir,
+            'host_pattern': "*",
+            'inventory': self.inventory,
+            'module': 'copy',
+            'module_args': f"src={src_path}/ dest={self.dest_path}/",
+            'verbosity': verbosity,
+            'event_handler': self.cb.event_handler,
+            'status_handler': self.cb.status_handler,
+            'host_cwd': self.project_dir,
+            **kwargs,
+        }
+        if use_ansible_docker_isolation():
+            run_kwargs.update(docker_isolation_kwargs())
+            ensure_ansible_docker_image()
+        interface.run(**run_kwargs)
         try:
-            shutil.rmtree(self.src_paths)
+            shutil.rmtree(self.share_src_dir)
         except OSError as e:
-            print(f"del upload tmp dir {self.src_paths} failed! {e}")
+            print(f"del upload tmp dir {self.share_src_dir} failed! {e}")
         return self.cb

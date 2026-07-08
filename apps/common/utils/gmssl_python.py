@@ -7,6 +7,23 @@
 #
 # GmSSL-Python - Python binding of the GmSSL library with `ctypes`
 
+# =============================================================================
+# This file is derived from GmSSL-Python project (v2.2.2)
+# https://github.com/GmSSL/GmSSL-Python/blob/v2.2.2/gmssl.py
+#
+# The original project is licensed under the Apache License 2.0:
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Copyright 2023 The GmSSL Project. All Rights Reserved.
+#
+# Reason for inclusion:
+# This file is included by direct copy due to dependency conflict issues
+# when installing via pip (gmssl / gmssl-python naming conflict).
+# No functional modifications have been made to the original source.
+#
+# Compliance:
+# This file is used in accordance with the Apache License 2.0 terms.
+# =============================================================================
 
 from ctypes import *
 from ctypes.util import find_library

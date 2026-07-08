@@ -186,7 +186,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             print("Account not found, deleted ?")
             return
 
-        account.secret = getattr(record, 'new_secret', account.secret)
+        update_fields = ['date_updated', 'date_change_secret', 'change_secret_status']
+        if hasattr(record, 'new_secret'):
+            account.secret = record.new_secret
+            update_fields.insert(0, 'secret')
         account.date_updated = timezone.now()
         account.date_change_secret = timezone.now()
         account.change_secret_status = ChangeSecretRecordStatusChoice.success
@@ -201,9 +204,16 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         super().on_host_success(host, result)
 
         with safe_atomic_db_connection():
-            account.save(update_fields=['secret', 'date_updated', 'date_change_secret', 'change_secret_status'])
-            self.save_record(record)
-            self.clear_account_queue_status(account.id)
+            try:
+                account.save(update_fields=update_fields)
+                self.save_record(record)
+            except Exception:
+                logger.exception(
+                    'Save account success result failed: account=%s, record=%s, host=%s',
+                    account.id, getattr(record, 'id', None), host
+                )
+            finally:
+                self.clear_account_queue_status(account.id)
 
     def on_host_error(self, host, error, result):
         record = self.name_record_mapper.get(host)

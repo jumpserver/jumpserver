@@ -1,0 +1,793 @@
+#═══════════════════════════════════════════════════════════════════════════════
+# UKey 驱动配置 — Schema v2.0
+# 后端将此文件解析后以 JSON 格式响应 /api/v1/authentication/cert/vendor-driver-config/
+#═══════════════════════════════════════════════════════════════════════════════
+
+# ── 元信息 ──────────────────────────────────────────────────────────────────────
+meta:
+  vendor: "{{ '吉大正元' | trans }}"
+  product: "JIT Key"
+  version: "1.0.0"
+  description: "{{ '吉大正元 JIT Key Web SDK 配置' | trans }}"
+
+# - 配置信息 
+config:
+  # 非对称密钥的算法
+  asymAlg: 
+    SM2: 1
+    RSA-1024: 2
+    RSA-2048: 3
+    default: 1
+  # 密钥类型
+  keySpec: 1  # 1 表示签名密钥
+  # 证书类型
+  certType: 1 # 1 表示签名证书
+  # 摘要签名算法
+  digestAlg:
+    SM2: 1
+    RSA-1024: 4
+    RSA-2048: 4
+    default: 1
+  poll_interval: 5000  # 轮询检测设备的时间间隔，单位毫秒
+
+#═══════════════════════════════════════════════════════════════════════════════
+# sdk: SDK 脚本加载、实例创建、初始化步骤
+#
+# 变量命名空间:
+#   {{ ukey.* }}      — sdk.setup.steps 中通过 register 注册的持久变量
+#                       生命周期与驱动实例相同，所有操作均可读取
+#   {{ vars.* }}      — 操作执行期间各步骤通过 register 注册的临时变量
+#                       生命周期仅限当次操作
+#   {{ input.* }}     — 当前步骤 input 对话框收集的用户输入
+#   {{ user.* }}      — 组件 object prop 中的用户对象字段（如 user.username, user.id）
+#   {{ settings.* }}  — 后端 publicSettings 中的全局配置项
+#   {{ config.* }}    — 后端响应中 config 段的字段（如 config.enroll.enabled, config.pin.default）
+#═══════════════════════════════════════════════════════════════════════════════
+sdk:
+
+  # 构造 UKey SDK 实例
+  create:
+    constructor: "UKeyAPI"   # 脚本加载后挂载到 window 的构造函数名
+    args: ['UKeyPlugin']                      # 传给构造函数的参数列表
+
+  # 实例创建后执行的初始化步骤（同步，顺序执行）
+  # 各厂商按需配置，步骤可多可少，结果通过 register 写入 ukey.* 供后续操作使用
+  # 若厂商 SDK 无需初始化步骤，可将 steps 配为空列表或省略整个 setup 块
+  setup:
+    steps:
+      - name: checkInstall
+        label: "{{ '检测设备安装' | trans }}"
+        call: UKey_CheckInstall
+        args: []
+
+      - name: getDevSN
+        label: "{{ '获取设备序列号' | trans }}"
+        call: UKey_GetDevSN
+        args: []
+        register: ukey.devSN 
+
+      - name: getDevVersion
+        label: "{{ '获取设备版本' | trans }}"
+        call: UKey_GetVersion
+        args: []
+        scope: both
+        register: ukey.devVersion 
+
+#═══════════════════════════════════════════════════════════════════════════════
+# info: 展示信息字段定义（只读，不修改设备状态）
+#
+# 每个字段取值方式（二选一，call 优先级高于 value）：
+#   call + args — 调用 UKey 方法，返回值作为显示内容
+#   value       — 直接写固定字符串，或 {{ }} 模板引用变量
+#
+# scope 可选值:
+#   both  — 管理员与用户均可见（默认）
+#   admin — 仅管理员可见
+#   user  — 仅用户可见
+#═══════════════════════════════════════════════════════════════════════════════
+info:
+  when: "{{ mode === 'admin' || (mode === 'user' && ukey.devSN === user.ukey_sn) }}"  # 仅当检测到设备时显示信息区域
+
+  # 左上「设备驱动状态」区域的动态字段（固定字段由页面内置）
+  device:
+    - key: ukeyConnected
+      label: "{{ '设备状态' | trans }}"
+      scope: both
+      source: "{{ ukey.devSN }}"
+      status:
+        cases:
+          - match: truthy
+            text: "{{ '已连接' | trans }}"
+            type: success
+            value: true
+          - match: falsy
+            text: "{{ '未连接' | trans }}"
+            type: danger
+            value: false
+      register: ukey.connected
+
+    - key: devVersion
+      label: "{{ '设备版本' | trans }}"
+      scope: both
+      value: "{{ ukey.devVersion }}"
+
+    - key: devSN
+      label: "{{ '设备序列号' | trans }}"
+      scope: both
+      value: "{{ ukey.devSN }}"
+
+    - key: userUKeySN
+      label: "{{ '用户绑定的设备序列号' | trans }}"
+      scope: both
+      value: "{{ user.ukey_sn }}"
+      compare: "{{ ukey.devSN }}"
+
+  # 右上「证书信息」区域的字段，每个字段单独调用 SDK 方法或写固定 value 获取
+  # 取值方式（二选一，call 优先级高于 value）：
+  #   call + args — 调用 UKey 方法，返回值作为显示内容
+  #   value       — 直接写固定字符串，或 {{ }} 模板引用变量
+  cert:
+    - key: CERT_SUBJECT_CN
+      label: "{{ '证书拥有者 CN' | trans }}"
+      call: UKey_GetCertInfo
+      args: 
+        - "{{ config.certType }}"  # 证书类型参数
+        - 9
+      compare: "{{ user.username }}"  # 将此字段的值与 user.username 比对
+    
+    - key: CERT_SUBJECT_O
+      label: "{{ '证书拥有者 O' | trans }}"
+      call: UKey_GetCertInfo
+      args: 
+        - "{{ config.certType }}"  # 证书类型参数
+        - 10
+
+    - key: CERT_SUBJECT_OU
+      label: "{{ '证书拥有者 OU' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 11
+
+    - key: CERT_VERSION
+      label: "{{ '证书版本' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 1
+
+    - key: CERT_SERIAL
+      label: "{{ '证书序列号' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 2
+
+    - key: CERT_START_TIME
+      label: "{{ '证书开始时间' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 3
+
+    - key: CERT_END_TIME
+      label: "{{ '证书结束时间' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 4
+
+    - key: CERT_DER_PUBLIC_KEY
+      label: "{{ '证书公钥（DER）' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 5
+
+    - key: CERT_ISSUER_CN
+      label: "{{ '证书颁发者 CN' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 6
+
+    - key: CERT_ISSUER_O
+      label: "{{ '证书颁发者 O' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 7
+
+    - key: CERT_ISSUER_OU
+      label: "{{ '证书颁发者 OU' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 8
+
+    - key: CERT_ALG_TYPE
+      label: "{{ '证书算法类型' | trans }}"
+      call: UKey_GetCertInfo
+      args:
+        - "{{ config.certType }}"  # 证书类型参数
+        - 13
+
+#═══════════════════════════════════════════════════════════════════════════════
+# operations: 操作按钮列表（顺序即按钮排列顺序）
+#
+# 每个操作的顶层字段:
+#   key      — 唯一标识符
+#   label    — 按钮文字 & 操作名称
+#   hint     — 按钮下方的补充说明
+#   btnType  — Element UI 按钮类型: primary | success | warning | danger | info
+#   scope    — 可见范围: admin | user | both（默认 both）
+#   hidden   — 是否隐藏按鈕，支持布尔或 {{ }} 模板（解析为真就隐藏）
+#             例如: hidden: "{{ config.enroll.enabled }}" 为 false 时显示按鈕
+#   confirm  — 操作前弹出确认框（非步骤级）
+#   steps    — 步骤列表（顺序执行）
+#
+# 步骤字段:
+#   name       — 步骤标识（用于日志显示）
+#   label      — 步骤名称
+#   call       — 调用 UKey 实例的方法名（type 不为 api 时使用）
+#   type       — 步骤类型: api（HTTP 请求）或 ukey（默认，UKey 方法调用）
+#   args       — 参数列表（支持模板字符串和复杂对象）
+#   input      — 步骤执行前弹出输入对话框
+#   register   — 将返回值注册到指定命名空间（ukey.* 或 vars.*）
+#   on_error   — 错误处理策略: skip（跳过此步骤继续）或默认（中止操作）
+#   check      — 校验步骤返回值，失败则中止（除非 on_error: skip）
+#                简写形式:  check: "{{ result === 0 }}"
+#                完整形式:  check:
+#                             expr: "{{ result === 0 }}"
+#                             message: "失败，错误码: {{ result }}"
+#                result 为步骤实际返回值，可在 expr / message 中使用
+#
+# 参数复杂对象格式:
+#   { type: csv,  value: { key1: tpl, ... } }  →  "key1=val1,key2=val2"
+#   { type: json, value: { key1: tpl, ... } }  →  '{"key1":"val1"}'
+#═══════════════════════════════════════════════════════════════════════════════
+operations:
+  when: "{{ mode === 'admin' || (mode === 'user' && ukey.devSN === user.ukey_sn) }}"  # 仅当检测到设备时显示信息区域
+  items:
+    - key: bindUserUKeySN
+      label: "{{ '绑定设备' | trans }}"
+      hint: "{{ '为当前用户绑定 UKey 设备的序列号，一个用户仅能绑定一个 UKey，绑定后当前用户只能使用绑定的 UKey 登录' | trans }}"
+      btnType: primary
+      scope: admin
+      event: refresh.info.device
+      steps:
+        - name: inputUKeySN
+          label: "{{ '输入设备序列号' | trans }}"
+          input:
+            title: "{{ '绑定用户设备序列号' | trans }}"
+            fields:
+              - key: ukeySN
+                label: "{{ '设备序列号' | trans }}"
+                type: text
+                value: "{{ ukey.devSN }}"
+                required: true
+
+        - name: bindUserUKeySN
+          label: "{{ '绑定设备' | trans }}"
+          type: api
+          method: patch
+          url: "{{ config.api.user_detail_url }}"
+          url_format: 
+            user_id: "{{ user.id }}"
+          body:
+            ukey_sn: "{{ input.ukeySN }}"
+          register: user
+
+    - key: unbindUserUKeySN
+      label: "{{ '解绑设备' | trans }}"
+      hint: "{{ '解绑后用户将无法使用 UKey 登录' | trans }}"
+      btnType: danger
+      scope: admin
+      confirm:
+        title: "{{ '解绑设备确认' | trans }}"
+        message: "{{ '确认要解绑 UKey 设备吗？' | trans }}"
+        type: warning
+      event: refresh.info.device
+      steps:
+        - name: confirmUnbind
+          label: "{{ '解绑后用户将无法使用 UKey 登录，确认要解绑吗？' | trans }}"
+          type: api
+          method: patch
+          url: "{{ config.api.user_detail_url }}"
+          url_format: 
+            user_id: "{{ user.id }}"
+          body:
+            ukey_sn: ""
+          register: user
+        
+    - key: issueCert
+      label: "{{ '签发证书' | trans }}"
+      hint: "{{ '为 UKey 生成密钥对并签发数字证书' | trans }}"
+      btnType: primary
+      scope: admin    
+      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此按鈕
+      disabled: "{{ !ukey.connected }}"
+      event: refresh.info.cert
+      steps:
+        - name: verifyUKeyUserPIN
+          label: "{{ '验证用户 PIN' | trans }}"
+          input: 
+            title: "{{ '验证用户 PIN' | trans }}"
+            fields:
+              - key: userPIN
+                label: "{{ '用户 PIN' | trans }}"
+                type: password
+          call: UKey_VerifyPIN
+          args:
+            - "{{ input.userPIN }}"
+          check:
+            expr: "{{ result === 0 }}"
+            message: "{{ '用户认证失败，错误码: {{ result }}' | trans }}"
+
+        - name: genKeyPair
+          label: "{{ '生成密钥对' | trans }}"
+          call: UKey_GenKeyPair
+          args:
+            - "{{ config.asymAlg }}"  # asymAlg 参数
+
+        - name: genCSR
+          label: "{{ '生成证书申请' | trans }}"
+          call: UKey_GenCSR
+          args:
+            - type: json
+              value:
+                CN: "{{ user.username }}"
+                O: "{{ settings.VENDOR }}"
+          register: vars.csr
+
+        - name: signCert
+          label: "{{ '服务器签发证书' | trans }}"
+          type: api
+          method: post
+          url: "{{ config.api.enroll_cert_url }}"
+          body:
+            user_id: "{{ user.id }}"
+            csr: "{{ vars.csr }}"
+          register: vars.certData
+
+        - name: importCert
+          label: "{{ '导入证书到设备' | trans }}"
+          call: UKey_ImportCertAndKeyPair
+          args: 
+            - "{{ vars.certData.signed_cert }}"
+            - ""
+            - ""
+
+    - key: deleteCert
+      label: "{{ '删除证书' | trans }}"
+      hint: "{{ '永久删除 UKey 中的数字证书，操作不可逆' | trans }}"
+      btnType: danger
+      scope: admin
+      hidden: "{{ !config.enroll.enabled }}"  # config.enroll.enabled 为 false 时隐藏此按鈕
+      disabled: "{{ !ukey.connected }}"
+      event: refresh.info.cert
+      confirm:
+        title: "{{ '删除证书确认' | trans }}"
+        message: "{{ '确认要删除 UKey 中的证书吗？此操作不可逆。' | trans }}"
+        type: warning
+      steps:
+        - name: verifyUKeyUserPIN
+          label: "{{ '验证用户 PIN' | trans }}"
+          input: 
+            title: "{{ '验证用户 PIN' | trans }}"
+            fields:
+              - key: userPIN
+                label: "{{ '用户 PIN' | trans }}"
+                type: password
+          call: UKey_VerifyPIN
+          args:
+            - "{{ input.userPIN }}"
+          check:
+            expr: "{{ result === 0 }}"
+            message: "{{ '用户认证失败，错误码: {{ result }}' | trans }}"
+
+        - name: deleteCert
+          label: "{{ '删除设备证书' | trans }}"
+          call: UKey_DeleteCons
+          args: []
+
+    - key: resetPin
+      label: "{{ '重置 PIN' | trans }}"
+      hint: "{{ '使用管理员权限将 PIN 码重置为系统默认值' | trans }}"
+      btnType: warning
+      scope: admin
+      disabled: "{{ !ukey.connected }}"
+      steps:
+        - name: resetPin
+          label: "{{ '重置 PIN' | trans }}"
+          input:
+            title: "{{ '验证管理员 PIN' | trans }}"
+            fields:
+              - key: adminPIN
+                label: "{{ '管理员 PIN' | trans }}"
+                type: password
+          call: UKey_UnblockPIN
+          args:
+            - "{{ input.adminPIN }}"
+            - "{{ config.pin.default }}"
+          check:
+            expr: "{{ result === 0 }}"
+            message: "{{ '验证管理员 PIN 失败，错误码: {{ result }}' | trans }}"
+      
+    - key: changePIN
+      label: "{{ '修改 PIN' | trans }}"
+      hint: "{{ '修改 UKey 的用户 PIN 码' | trans }}"
+      btnType: info
+      scope: both
+      disabled: "{{ !ukey.connected }}"
+      steps:
+        - name: changePIN
+          label: "{{ '修改 PIN' | trans }}"
+          input:
+            title: "{{ '修改用户 PIN 码' | trans }}"
+            fields:
+              - key: oldPIN
+                label: "{{ '旧 PIN' | trans }}"
+                type: password
+              - key: newPIN
+                label: "{{ '新 PIN' | trans }}"
+                type: password
+                validate:
+                  minLength: 4
+                  maxLength: 32
+                  message: "{{ 'PIN 码长度必须在 4-32 位之间' | trans }}"
+              - key: newPIN2
+                label: "{{ '确认 PIN' | trans }}"
+                type: password
+                validate:
+                  equals: newPIN              # 必须与 newPIN 字段值相同
+                  message: "{{ '两次输入的 PIN 码不一致' | trans }}"
+          call: UKey_ChangePIN
+          args:
+            - "{{ input.oldPIN }}"
+            - "{{ input.newPIN }}"
+
+
+#═══════════════════════════════════════════════════════════════════════════════
+# login: 登录页面流程配置
+#
+# detect.steps  — 轮询检测设备插入状态（步骤失败视为未插入）
+#   步骤执行成功后 ukey.certCN 应被注册，用于自动填充用户名输入框
+#
+# steps         — 点击「登录」后顺序执行的步骤
+#   支持与 operations 相同的步骤字段（call / args / input / register / check）
+#   特殊 type: submit — 填充表单字段并提交（字段名对应 id_<name> 输入框）
+#
+# 登录流程可用命名空间:
+#   {{ input.pin }}     — 用户在 PIN 输入框中填写的值
+#   {{ ukey.cert }}     — detect.steps 中注册的证书（供 submit 步骤引用）
+#   {{ vars.* }}        — 步骤间临时变量（每次登录重置）
+#   {{ challenge }}     — 服务端下发的挑战码
+#═══════════════════════════════════════════════════════════════════════════════
+login:
+
+  # 轮询检测设备 — 步骤失败则视为设备未插入
+  detect:
+    steps:
+      - name: getCert
+        label: "{{ '获取证书' | trans }}"
+        call: UKey_GetCert
+        args:
+          - "{{ config.certType }}"  # 证书类型参数
+        register: ukey.cert
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "{{ '未检测到证书' | trans }}"
+
+      - name: getCertCN
+        label: "{{ '证书拥有者 CN' | trans }}"
+        call: UKey_GetCertInfo
+        args: 
+          - "{{ config.certType }}"  # 证书类型参数
+          - 9
+        register: ukey.certCN
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "{{ '获取证书 CN 失败' | trans }}"
+
+  # 登录步骤
+  steps:
+    - name: verifyPin
+      label: "{{ '验证 PIN' | trans }}"
+      call: UKey_VerifyPIN
+      args:
+        - "{{ input.pin }}"
+      check:
+        expr: "{{ result === 0 }}"
+        message: "{{ 'PIN 验证失败，错误码: {{ result }}' | trans }}"
+    
+    - name: signChallenge
+      label: "{{ '签名挑战码' | trans }}"
+      call: UKey_SignData
+      args:
+        - "{{ config.digestAlg }}"
+        - "{{ challenge.code_base64 }}"
+      register: vars.signature
+      check:
+        expr: "{{ vars.signature !== null && vars.signature !== '' }}"
+        message: "{{ '签名失败，错误码: {{ result }}' | trans }}"
+
+    - name: submit
+      label: "{{ '提交登录' | trans }}"
+      type: submit
+      fields:
+        signature: "{{ vars.signature }}"
+        cert: "{{ ukey.cert }}"
+        username: "{{ ukey.certCN }}"  # 可选，自动填充用户名输入框
+        ukey_sn: "{{ ukey.devSN }}"
+
+
+i18n:
+  "吉大正元":
+    zh: "吉大正元"
+    zh_hant: "吉大正元"
+    en: "JIT Security"
+  "吉大正元 JIT Key Web SDK 配置":
+    zh: "吉大正元 JIT Key Web SDK 配置"
+    zh_hant: "吉大正元 JIT Key Web SDK 配置"
+    en: "JIT Key Web SDK Configuration"
+  "检测设备安装":
+    zh: "检测设备安装"
+    zh_hant: "檢測設備安裝"
+    en: "Check Device Installation"
+  "获取设备序列号":
+    zh: "获取设备序列号"
+    zh_hant: "獲取設備序列號"
+    en: "Get Device Serial Number"
+  "获取设备版本":
+    zh: "获取设备版本"
+    zh_hant: "獲取設備版本"
+    en: "Get Device Version"
+  "设备状态":
+    zh: "设备状态"
+    zh_hant: "設備狀態"
+    en: "Device Status"
+  "已连接":
+    zh: "已连接"
+    zh_hant: "已連接"
+    en: "Connected"
+  "未连接":
+    zh: "未连接"
+    zh_hant: "未連接"
+    en: "Disconnected"
+  "设备版本":
+    zh: "设备版本"
+    zh_hant: "設備版本"
+    en: "Device Version"
+  "设备序列号":
+    zh: "设备序列号"
+    zh_hant: "設備序列號"
+    en: "Device Serial Number"
+  "用户绑定的设备序列号":
+    zh: "用户绑定的设备序列号"
+    zh_hant: "使用者綁定的設備序列號"
+    en: "User-Bound Device Serial Number"
+  "证书拥有者 CN":
+    zh: "证书拥有者 CN"
+    zh_hant: "證書擁有者 CN"
+    en: "Subject CN"
+  "证书拥有者 O":
+    zh: "证书拥有者 O"
+    zh_hant: "證書擁有者 O"
+    en: "Subject O"
+  "证书拥有者 OU":
+    zh: "证书拥有者 OU"
+    zh_hant: "證書擁有者 OU"
+    en: "Subject OU"
+  "证书版本":
+    zh: "证书版本"
+    zh_hant: "證書版本"
+    en: "Version"
+  "证书序列号":
+    zh: "证书序列号"
+    zh_hant: "證書序列號"
+    en: "Serial Number"
+  "证书开始时间":
+    zh: "证书开始时间"
+    zh_hant: "證書開始時間"
+    en: "Start Time"
+  "证书结束时间":
+    zh: "证书结束时间"
+    zh_hant: "證書結束時間"
+    en: "End Time"
+  "证书公钥（DER）":
+    zh: "证书公钥（DER）"
+    zh_hant: "證書公鑰（DER）"
+    en: "Public Key (DER)"
+  "证书颁发者 CN":
+    zh: "证书颁发者 CN"
+    zh_hant: "證書頒發者 CN"
+    en: "Issuer CN"
+  "证书颁发者 O":
+    zh: "证书颁发者 O"
+    zh_hant: "證書頒發者 O"
+    en: "Issuer O"
+  "证书颁发者 OU":
+    zh: "证书颁发者 OU"
+    zh_hant: "證書頒發者 OU"
+    en: "Issuer OU"
+  "证书算法类型":
+    zh: "证书算法类型"
+    zh_hant: "證書算法類型"
+    en: "Certificate Algorithm Type"
+  "绑定设备":
+    zh: "绑定设备"
+    zh_hant: "綁定設備"
+    en: "Bind Device"
+  "为当前用户绑定 UKey 设备的序列号，一个用户仅能绑定一个 UKey，绑定后当前用户只能使用绑定的 UKey 登录":
+    zh: "为当前用户绑定 UKey 设备的序列号，一个用户仅能绑定一个 UKey，绑定后当前用户只能使用绑定的 UKey 登录"
+    zh_hant: "為當前使用者綁定 UKey 設備的序列號，一個使用者僅能綁定一個 UKey，綁定後當前使用者只能使用綁定的 UKey 登錄"
+    en: "Bind the serial number of a UKey device to the current user. Each user can bind only one UKey, and after binding, the user can log in only with that UKey."
+  "输入设备序列号":
+    zh: "输入设备序列号"
+    zh_hant: "輸入設備序列號"
+    en: "Enter Device Serial Number"
+  "绑定用户设备序列号":
+    zh: "绑定用户设备序列号"
+    zh_hant: "綁定使用者設備序列號"
+    en: "Bind User Device Serial Number"
+  "解绑设备":
+    zh: "解绑设备"
+    zh_hant: "解除綁定設備"
+    en: "Unbind Device"
+  "解绑后用户将无法使用 UKey 登录":
+    zh: "解绑后用户将无法使用 UKey 登录"
+    zh_hant: "解除綁定後使用者將無法使用 UKey 登入"
+    en: "After unbinding, the user will not be able to log in with UKey"
+  "解绑设备确认":
+    zh: "解绑设备确认"
+    zh_hant: "解除綁定設備確認"
+    en: "Confirm Device Unbinding"
+  "确认要解绑 UKey 设备吗？":
+    zh: "确认要解绑 UKey 设备吗？"
+    zh_hant: "確認要解除綁定 UKey 設備嗎？"
+    en: "Are you sure you want to unbind the UKey device?"
+  "解绑后用户将无法使用 UKey 登录，确认要解绑吗？":
+    zh: "解绑后用户将无法使用 UKey 登录，确认要解绑吗？"
+    zh_hant: "解除綁定後使用者將無法使用 UKey 登入，確認要解除綁定嗎？"
+    en: "After unbinding, the user will not be able to log in with UKey. Are you sure you want to unbind?"
+  "签发证书":
+    zh: "签发证书"
+    zh_hant: "簽發證書"
+    en: "Issue Certificate"
+  "为 UKey 生成密钥对并签发数字证书":
+    zh: "为 UKey 生成密钥对并签发数字证书"
+    zh_hant: "為 UKey 生成金鑰對並簽發數位證書"
+    en: "Generate a key pair for UKey and issue a digital certificate"
+  "验证用户 PIN":
+    zh: "验证用户 PIN"
+    zh_hant: "驗證使用者 PIN"
+    en: "Verify User PIN"
+  "用户 PIN":
+    zh: "用户 PIN"
+    zh_hant: "使用者 PIN"
+    en: "User PIN"
+  "用户认证失败，错误码: {{ result }}":
+    zh: "用户认证失败，错误码: {{ result }}"
+    zh_hant: "使用者認證失敗，錯誤碼: {{ result }}"
+    en: "User authentication failed, error code: {{ result }}"
+  "生成密钥对":
+    zh: "生成密钥对"
+    zh_hant: "生成金鑰對"
+    en: "Generate Key Pair"
+  "生成证书申请":
+    zh: "生成证书申请"
+    zh_hant: "生成證書申請"
+    en: "Generate Certificate Signing Request"
+  "服务器签发证书":
+    zh: "服务器签发证书"
+    zh_hant: "伺服器簽發證書"
+    en: "Server Issues Certificate"
+  "导入证书到设备":
+    zh: "导入证书到设备"
+    zh_hant: "匯入證書到設備"
+    en: "Import Certificate to Device"
+  "删除证书":
+    zh: "删除证书"
+    zh_hant: "刪除證書"
+    en: "Delete Certificate"
+  "永久删除 UKey 中的数字证书，操作不可逆":
+    zh: "永久删除 UKey 中的数字证书，操作不可逆"
+    zh_hant: "永久刪除 UKey 中的數位證書，操作不可逆"
+    en: "Permanently delete the digital certificate in UKey. This operation cannot be undone."
+  "删除证书确认":
+    zh: "删除证书确认"
+    zh_hant: "刪除證書確認"
+    en: "Confirm Certificate Deletion"
+  "确认要删除 UKey 中的证书吗？此操作不可逆。":
+    zh: "确认要删除 UKey 中的证书吗？此操作不可逆。"
+    zh_hant: "確認要刪除 UKey 中的證書嗎？此操作不可逆。"
+    en: "Are you sure you want to delete the certificate in UKey? This operation cannot be undone."
+  "删除设备证书":
+    zh: "删除设备证书"
+    zh_hant: "刪除設備證書"
+    en: "Delete Device Certificate"
+  "重置 PIN":
+    zh: "重置 PIN"
+    zh_hant: "重設 PIN"
+    en: "Reset PIN"
+  "使用管理员权限将 PIN 码重置为系统默认值":
+    zh: "使用管理员权限将 PIN 码重置为系统默认值"
+    zh_hant: "使用管理員權限將 PIN 碼重設為系統預設值"
+    en: "Use administrator privileges to reset the PIN code to the system default"
+  "验证管理员 PIN":
+    zh: "验证管理员 PIN"
+    zh_hant: "驗證管理員 PIN"
+    en: "Verify Administrator PIN"
+  "管理员 PIN":
+    zh: "管理员 PIN"
+    zh_hant: "管理員 PIN"
+    en: "Administrator PIN"
+  "验证管理员 PIN 失败，错误码: {{ result }}":
+    zh: "验证管理员 PIN 失败，错误码: {{ result }}"
+    zh_hant: "驗證管理員 PIN 失敗，錯誤碼: {{ result }}"
+    en: "Administrator PIN verification failed, error code: {{ result }}"
+  "修改 PIN":
+    zh: "修改 PIN"
+    zh_hant: "修改 PIN"
+    en: "Change PIN"
+  "修改 UKey 的用户 PIN 码":
+    zh: "修改 UKey 的用户 PIN 码"
+    zh_hant: "修改 UKey 的使用者 PIN 碼"
+    en: "Change the user PIN code of UKey"
+  "修改用户 PIN 码":
+    zh: "修改用户 PIN 码"
+    zh_hant: "修改使用者 PIN 碼"
+    en: "Change User PIN Code"
+  "旧 PIN":
+    zh: "旧 PIN"
+    zh_hant: "舊 PIN"
+    en: "Old PIN"
+  "新 PIN":
+    zh: "新 PIN"
+    zh_hant: "新 PIN"
+    en: "New PIN"
+  "确认 PIN":
+    zh: "确认 PIN"
+    zh_hant: "確認 PIN"
+    en: "Confirm PIN"
+  "两次输入的 PIN 码不一致":
+    zh: "两次输入的 PIN 码不一致"
+    zh_hant: "兩次輸入的 PIN 碼不一致"
+    en: "The two entered PIN codes do not match"
+  "获取证书":
+    zh: "获取证书"
+    zh_hant: "獲取證書"
+    en: "Get Certificate"
+  "未检测到证书":
+    zh: "未检测到证书"
+    zh_hant: "未檢測到證書"
+    en: "Certificate Not Detected"
+  "获取证书 CN 失败":
+    zh: "获取证书 CN 失败"
+    zh_hant: "獲取證書 CN 失敗"
+    en: "Failed to Get Certificate CN"
+  "验证 PIN":
+    zh: "验证 PIN"
+    zh_hant: "驗證 PIN"
+    en: "Verify PIN"
+  "PIN 验证失败，错误码: {{ result }}":
+    zh: "PIN 验证失败，错误码: {{ result }}"
+    zh_hant: "PIN 驗證失敗，錯誤碼: {{ result }}"
+    en: "PIN verification failed, error code: {{ result }}"
+  "签名挑战码":
+    zh: "签名挑战码"
+    zh_hant: "簽名挑戰碼"
+    en: "Sign Challenge Code"
+  "签名失败，错误码: {{ result }}":
+    zh: "签名失败，错误码: {{ result }}"
+    zh_hant: "簽名失敗，錯誤碼: {{ result }}"
+    en: "Signature failed, error code: {{ result }}"
+  "提交登录":
+    zh: "提交登录"
+    zh_hant: "提交登入"
+    en: "Submit Sign-In"
+  "PIN 码长度必须在 4-32 位之间":
+    zh: "PIN 码长度必须在 4-32 位之间"
+    zh_hant: "PIN 碼長度必須在 4-32 位之間"
+    en: "PIN code length must be between 4 and 32 characters"

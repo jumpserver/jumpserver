@@ -6,9 +6,11 @@ from typing import Callable
 
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -16,6 +18,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from common.api import JMSBulkModelViewSet
+from common.drf.filters import BaseFilterSet
 from common.serializers import FileSerializer
 from common.utils import is_uuid
 from common.utils.http import is_true
@@ -140,8 +143,22 @@ class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
         instance.delete()
 
 
+class AppletPublicationFilterSet(BaseFilterSet):
+    host = filters.CharFilter(method='filter_host')
+
+    class Meta:
+        model = AppletPublication
+        fields = ['host', 'applet', 'status']
+
+    @staticmethod
+    def filter_host(queryset, name, value):
+        if is_uuid(value):
+            return queryset.filter(host_id=value)
+        return queryset.filter(Q(host__name=value) | Q(host__address=value))
+
+
 class AppletPublicationViewSet(viewsets.ModelViewSet):
     queryset = AppletPublication.objects.all()
     serializer_class = serializers.AppletPublicationSerializer
-    filterset_fields = ['host', 'applet', 'status']
-    search_fields = ['applet__name', 'applet__display_name', 'host__name']
+    filterset_class = AppletPublicationFilterSet
+    search_fields = ['applet__name', 'applet__display_name', 'host__name', 'host__address']

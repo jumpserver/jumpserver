@@ -163,8 +163,8 @@ class AuthMixin:
         return settings.TERMINAL_PUBLIC_KEY_AUTH
     
     @staticmethod
-    def can_use_cert_login():
-        return settings.AUTH_CERT
+    def can_use_ukey_login():
+        return settings.AUTH_UKEY
 
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT

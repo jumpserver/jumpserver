@@ -414,6 +414,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='virtualapp',
             name='providers',
-            field=models.ManyToManyField(through='terminal.VirtualAppPublication', to='terminal.appprovider', verbose_name='Providers'),
+            field=models.ManyToManyField(through='terminal.VirtualAppPublication', through_fields=('app', 'provider'), to='terminal.appprovider', verbose_name='Providers'),
         ),
     ]

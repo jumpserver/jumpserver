@@ -14,4 +14,4 @@ from .slack import *
 from .sms import *
 from .sso import *
 from .wecom import *
-from .cert import *
+from .ukey import *

@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from users.models import User
 from .base import OrgListField
 from .mixin import LDAPSerializerMixin
 
@@ -16,6 +17,9 @@ class LDAPHATestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_HA_SEARCH_FILTER = serializers.CharField()
     AUTH_LDAP_HA_USER_ATTR_MAP = serializers.JSONField()
     AUTH_LDAP_HA_START_TLS = serializers.BooleanField(required=False)
+    AUTH_LDAP_HA_CACERT_CONTENT = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_HA_CERT_CONTENT = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_HA_KEY_CONTENT = serializers.CharField(required=False, allow_blank=True)
     AUTH_LDAP_HA = serializers.BooleanField(required=False)
 
 
@@ -92,7 +96,27 @@ class LDAPHASettingSerializer(LDAPSerializerMixin, serializers.Serializer):
 
     AUTH_LDAP_HA = serializers.BooleanField(required=False, label=_('LDAP HA'))
     AUTH_LDAP_HA_SYNC_ORG_IDS = OrgListField()
+    AUTH_LDAP_HA_START_TLS = serializers.BooleanField(
+        required=False, label=_('StartTLS'),
+        help_text=_('Use StartTLS to upgrade ldap:// connections to TLS')
+    )
+    AUTH_LDAP_HA_CACERT_CONTENT = serializers.CharField(
+        allow_blank=True, required=False, write_only=True,
+        label=_('CA certificate'),
+        help_text=_('CA certificate for verifying LDAPS/StartTLS server')
+    )
+    AUTH_LDAP_HA_CERT_CONTENT = serializers.CharField(
+        allow_blank=True, required=False, write_only=True,
+        label=_('Client certificate'),
+        help_text=_('Client certificate for mutual TLS (optional)')
+    )
+    AUTH_LDAP_HA_KEY_CONTENT = serializers.CharField(
+        allow_blank=True, required=False, write_only=True,
+        label=_('Client private key'),
+        help_text=_('Client private key for mutual TLS (optional)')
+    )
 
+    category = User.Source.ldap_ha.value
     periodic_key = 'AUTH_LDAP_HA_SYNC_IS_PERIODIC'
     interval_key = 'AUTH_LDAP_HA_SYNC_INTERVAL'
     crontab_key = 'AUTH_LDAP_HA_SYNC_CRONTAB'

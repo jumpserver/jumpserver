@@ -39,7 +39,7 @@
     - name: "Change {{ account.username }} password"
       ansible.builtin.user:
         name: "{{ account.username }}"
-        password: "{{ account.secret | password_hash('sha512') }}"
+        password: "{{ account.secret | password_hash('sha256', rounds=1000) }}"
         update_password: always
       ignore_errors: true
       register: change_secret_result

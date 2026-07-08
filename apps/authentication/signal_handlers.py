@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from audits.models import UserSession
 from common.sessions.cache import user_session_manager
 from .signals import post_auth_failed, backend_auth_failed
@@ -46,5 +46,8 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
 @receiver(backend_auth_failed)
 def on_user_login_failed(sender, username, request, reason, backend, **kwargs):
     request.session['auth_backend'] = backend
-    post_auth_failed.send(sender, username=username, request=request, reason=reason)
-
+    post_auth_failed.send(
+        sender, username=username, request=request, reason=reason,
+        reason_code=kwargs.get('reason_code') or '',
+        reason_params=kwargs.get('reason_params') or {},
+    )

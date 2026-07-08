@@ -24,7 +24,7 @@ from django.utils.translation import gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
-from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from common.utils import (
     get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil,
     text_hmac_sha256
@@ -245,8 +245,8 @@ class CommonMixin:
             return user
 
         user_id = self.request.session.get('user_id')
-        auth_cert_ok = self.request.session.get('auth_cert')
-        if auth_cert_ok:
+        auth_ukey_ok = self.request.session.get('auth_ukey')
+        if auth_ukey_ok:
             user = get_object_or_404(User, pk=user_id)
             user.backend = self.request.session.get("auth_backend")
             return user
@@ -687,9 +687,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         request.session['auth_backend'] = auth_backend
 
-    def mark_cert_ok(self, user, auth_backend):
+    def mark_ukey_ok(self, user, auth_backend):
         request = self.request
-        request.session['auth_cert'] = 1
+        request.session['auth_ukey'] = 1
         request.session['user_id'] = str(user.id)
         request.session['auth_backend'] = auth_backend
 
@@ -726,20 +726,21 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
             'user_session_id', 'user_log_id', 'can_send_notifications',
-            'auth_cert'
+            'auth_ukey'
         ]
         for k in keys:
             self.request.session.pop(k, '')
 
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
+    def send_auth_signal(self, success=True, user=None, username='', reason='', request=None):
+        request = request or self.request
         if success:
             post_auth_success.send(
-                sender=self.__class__, user=user, request=self.request
+                sender=self.__class__, user=user, request=request
             )
         else:
             post_auth_failed.send(
                 sender=self.__class__, username=username,
-                request=self.request, reason=reason
+                request=request, reason=reason
             )
 
     def redirect_to_guard_view(self):

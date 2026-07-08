@@ -2,9 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 
-class CertLoginForm(forms.Form):
+class UKeyLoginForm(forms.Form):
     username = forms.CharField(
-        label=_('Username'), max_length=100, required=True,
+        required=True,
+        label=_('Username'), 
         widget=forms.HiddenInput(),
     )
     cert = forms.CharField(
@@ -12,6 +13,10 @@ class CertLoginForm(forms.Form):
         widget=forms.HiddenInput(),
     )
     signature = forms.CharField(
+        required=True,
+        widget=forms.HiddenInput(),
+    )
+    ukey_sn = forms.CharField(
         required=True,
         widget=forms.HiddenInput(),
     )

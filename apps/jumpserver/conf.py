@@ -269,8 +269,15 @@ class Config(dict):
         'AUTH_CUSTOM_SSO_FILE_MD5': '',
         'AUTH_CUSTOM_SSO_QUERY_PARAMS': 'token',
 
-        'AUTH_CERT': False,
-        'CA_KEY_PASS': '',
+        'AUTH_UKEY': False,
+        'AUTH_UKEY_VENDOR': 'long_mai',
+        'AUTH_UKEY_ENROLL_ENABLED': True,
+        'AUTH_UKEY_ENROLL_VALIDITY_DAYS': 365,
+        'AUTH_UKEY_CHALLENGE_TTL': 300,
+        'AUTH_UKEY_DEFAULT_PIN': '',
+        'AUTH_UKEY_CA_KEY_CONTENT': '',
+        'AUTH_UKEY_CA_CERT_CONTENT': '',
+        'AUTH_UKEY_CA_KEY_PASS': '',
 
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
@@ -281,7 +288,7 @@ class Config(dict):
 
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
-        'VAULT_HCP_MOUNT_POINT': 'jumpserver',
+        'VAULT_HCP_MOUNT_POINT': 'pam',
 
         'VAULT_AZURE_HOST': '',
         'VAULT_AZURE_CLIENT_ID': '',
@@ -306,6 +313,9 @@ class Config(dict):
         'AUTH_LDAP_SEARCH_OU': 'ou=tech,dc=example,dc=org',
         'AUTH_LDAP_SEARCH_FILTER': '(cn=%(user)s)',
         'AUTH_LDAP_START_TLS': False,
+        'AUTH_LDAP_CACERT_CONTENT': '',
+        'AUTH_LDAP_CERT_CONTENT': '',
+        'AUTH_LDAP_KEY_CONTENT': '',
         'AUTH_LDAP_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
         'AUTH_LDAP_CONNECT_TIMEOUT': 10,
         'AUTH_LDAP_STRICT_SYNC': False,
@@ -328,6 +338,9 @@ class Config(dict):
         'AUTH_LDAP_HA_SEARCH_OU': 'ou=tech,dc=example,dc=org',
         'AUTH_LDAP_HA_SEARCH_FILTER': '(cn=%(user)s)',
         'AUTH_LDAP_HA_START_TLS': False,
+        'AUTH_LDAP_HA_CACERT_CONTENT': '',
+        'AUTH_LDAP_HA_CERT_CONTENT': '',
+        'AUTH_LDAP_HA_KEY_CONTENT': '',
         'AUTH_LDAP_HA_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
         'AUTH_LDAP_HA_CONNECT_TIMEOUT': 10,
         'AUTH_LDAP_HA_STRICT_SYNC': False,
@@ -589,9 +602,12 @@ class Config(dict):
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
         'SECURITY_COMMAND_EXECUTION': False,
+        'ANSIBLE_DOCKER_ENABLED': True,
         'SECURITY_COMMAND_BLACKLIST': [
             'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
         ],
+        # The backslash only escapes the single quote in this Python string; it is not a forbidden character.
+        'SECURITY_ACCOUNT_USERNAME_FORBIDDEN_CHARS': '{[\'"`;|<>',
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': 'auto',
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_ACCOUNT_SECRET_READ': True,
@@ -779,6 +795,11 @@ class Config(dict):
 
         'REMOTE_APP_STORE_URL': 'https://apps.fit2cloud.com/jumpserver',
         'LANGUAGES_SUPPORTED': '',
+
+        # rdp sign cert
+        'RDP_SIGN_ENABLED': False,
+        'RDP_SIGN_CERT': 'signer.crt',
+        'RDP_SIGN_CERT_KEY': 'signer.key',
     }
 
     old_config_map = {
