@@ -188,7 +188,7 @@ class PasswordChangeLog(models.Model):
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )
-    datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"), db_index=True)
 
     def __str__(self):
         return "{} change {}'s password".format(self.change_by, self.user)
