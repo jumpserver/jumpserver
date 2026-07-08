@@ -7,4 +7,3 @@ from .automation import *
 from .gather_facts import *
 from .nodes_amount import *
 from .ping_gateway import *
-from .last_login import *
