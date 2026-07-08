@@ -105,19 +105,25 @@ def save_user_email_lookup(sender, instance, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
+    if not getattr(instance, '_password_changed', False):
+        return
     if instance.source != User.Source.local.value or not instance.password:
+        instance._password_changed = False
         return
 
-    passwords = UserPasswordHistory.objects \
-                    .filter(user=instance) \
-                    .order_by('-date_created') \
-                    .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
+    try:
+        passwords = UserPasswordHistory.objects \
+                        .filter(user=instance) \
+                        .order_by('-date_created') \
+                        .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
 
-    if instance.password not in list(passwords):
-        UserPasswordHistory.objects.create(
-            user=instance, password=instance.password,
-            date_created=instance.date_password_last_updated
-        )
+        if instance.password not in list(passwords):
+            UserPasswordHistory.objects.create(
+                user=instance, password=instance.password,
+                date_created=instance.date_password_last_updated
+            )
+    finally:
+        instance._password_changed = False
 
 
 def update_role_superuser_if_need(user):
