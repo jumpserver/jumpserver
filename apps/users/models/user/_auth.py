@@ -134,6 +134,7 @@ class AuthMixin:
                 self.date_password_last_updated = timezone.now()
                 post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)  # noqa
+            self._password_changed = True
 
     def set_ssh_key(self, public_key, private_key, **kwargs):
         if self.can_update_ssh_key():
