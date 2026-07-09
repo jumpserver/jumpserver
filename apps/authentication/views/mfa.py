@@ -34,6 +34,13 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
 
         return super().get(*args, **kwargs)
 
+    def _redirect_to_otp_enable(self):
+        url = reverse('authentication:user-otp-enable-start') + '?_=login_mfa'
+        query_string = self.request.GET.urlencode()
+        if query_string:
+            url = f'{url}&{query_string}'
+        return redirect(url)
+
     def form_valid(self, form):
         code = form.cleaned_data.get('code')
         mfa_type = form.cleaned_data.get('mfa_type')
@@ -42,6 +49,12 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
             return redirect(reverse('authentication:login-face-capture'))
         elif mfa_type == MFAType.Passkey:
             return redirect('/api/v1/authentication/passkeys/login/')
+
+        user = self.get_user_from_session()
+        otp_backend = user.get_mfa_backend_by_type(MFAType.OTP.value)
+        if mfa_type == MFAType.OTP and otp_backend and not otp_backend.is_active():
+            return self._redirect_to_otp_enable()
+
         return self.do_mfa_check(form, code, mfa_type)
 
     def do_mfa_check(self, form, code, mfa_type):
