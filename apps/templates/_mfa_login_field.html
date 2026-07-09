@@ -1,12 +1,13 @@
 {% load i18n %}
 {% load static %}
 
-<select id="mfa-select" name="mfa_type" class="form-control select-con"
+<select id="mfa-select" name="mfa_type" class="form-control select-con" autocomplete="off"
         onchange="selectChange(this.value)"
 >
     {% for backend in mfa_backends %}
     <option value="{{ backend.name }}"
-            {% if not backend.is_active %} disabled {% endif %}
+            data-needs-bind="{% if backend.name == 'otp' and not backend.is_active %}true{% else %}false{% endif %}"
+            {% if not backend.is_active and backend.name != 'otp' %} disabled {% endif %}
     >
         {{ backend.display_name }}
     </option>
@@ -18,9 +19,14 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
          style="display: none"
     >
-        {% if backend.has_code %}
+        {% if backend.name == 'otp' and not backend.is_active %}
+        <small class="text-muted">
+            {% trans 'OTP is not bound. Click Next to bind your authenticator.' %}
+        </small>
+        {% elif backend.has_code %}
         <input type="text" class="form-control input-style"
                placeholder="{{ backend.placeholder }}"
+               autocomplete="off"
         >
         {% if backend.challenge_required %}
         <button class="btn btn-primary full-width btn-challenge"
@@ -53,6 +59,8 @@
 </style>
 <script>
     const preferMFAKey = 'mfaPrefer'
+    const otpEnableUrl = "{% url 'authentication:user-otp-enable-start' %}?_=login_mfa"
+
     $(document).ready(function () {
         const mfaSelectRef = document.getElementById('mfa-select');
         const preferMFA = localStorage.getItem(preferMFAKey);
@@ -70,6 +78,12 @@
     })
 
     function selectChange(name, onLoad) {
+        const option = document.querySelector('#mfa-select option[value="' + name + '"]')
+        if (option && option.dataset.needsBind === 'true' && !onLoad) {
+            window.location.href = otpEnableUrl
+            return
+        }
+
         $('.mfa-field').hide()
         $('#mfa-' + name).show()
         if (!onLoad) {
@@ -77,11 +91,11 @@
         }
 
         $('.input-style').each(function (i, ele) {
-            $(ele).attr('name', 'code-test')
+            $(ele).prop('disabled', true).removeAttr('name')
         })
 
         const currentMFAInputRef = $('#mfa-' + name + ' .input-style')
-        currentMFAInputRef.attr('name', 'code')
+        currentMFAInputRef.prop('disabled', false).attr('name', 'code')
 
         // 登录页时，不应该默认focus
         const usernameRef = $('input[name="username"]')
@@ -135,5 +149,3 @@
         })
     }
 </script>
-
-
