@@ -1,0 +1,34 @@
+# ECC algorithm IDs
+SGD_SM2 = 0x00020200
+SGD_SM2_3 = 0x00020800
+
+# ECC key bits
+ECC_KEY_BITS_256 = 0x100
+ECC_KEY_BITS_64 = 0x40
+
+# ECC point format
+ECC_POINT_UNCOMPRESSED = 0x04
+
+# Hash algorithm IDs
+SGD_SM3 = 0x00000001
+SGD_SHA1 = 0x00000002
+SGD_SHA256 = 0x00000004
+SGD_SHA512 = 0x00000008
+
+HASH_ALG_ID = {
+    "sm3": SGD_SM3,
+    "sha1": SGD_SHA1,
+    "sha256": SGD_SHA256,
+    "sha512": SGD_SHA512,
+}
+
+# Cipher algorithm IDs
+SGD_SM4_ECB = 0x00000401
+SGD_SM4_CBC = 0x00000402
+SGD_SM4_MAC = 0x00000405
+
+CIPHER_ALG_ID = {
+    "sm4_ebc": SGD_SM4_ECB,
+    "sm4_cbc": SGD_SM4_CBC,
+    "sm4_mac": SGD_SM4_MAC,
+}

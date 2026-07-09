@@ -21,11 +21,9 @@ class CryptoVendor(Enum):
 
 
 def open_gm_device(vendor: CryptoVendor) -> Device:
-    if vendor is CryptoVendor.PIICO:
-        return piico.PiicoDevice()
-    elif vendor is CryptoVendor.CCUPM:
+    if vendor is CryptoVendor.CCUPM:
         return ccupm.CCUPMDevice()
     elif vendor is CryptoVendor.SCTU:
         return sctu.SCTUDevice()
     else:
-        raise Exception("UnSupported HSM")
+        return piico.PiicoDevice()

@@ -1,7 +1,10 @@
+import base64
 from ctypes import *
 from .session import Session
 from .cipher import *
 from .digest import *
+from .const import SGD_SM2
+from django.conf import settings
 
 
 class Device:
@@ -10,7 +13,13 @@ class Device:
     name = None
 
     def open(self, driver_path):
-        # load driver
+        if self.__device is not None:
+            return
+
+        # 如果设置里指定了 要覆盖
+        if settings.GM_DRIVER_PATH:
+            driver_path = settings.GM_DRIVER_PATH
+
         self.__load_driver(driver_path)
         # open device
         self.__open_device()
@@ -38,6 +47,19 @@ class Device:
     def generate_random(self, length=64):
         session = self.new_session()
         return session.generate_random(length)
+
+    def verify_sign(self, public_key, raw_data, sign_data):
+        session = self.new_session()
+        return session.verify_sign_ecc(
+            SGD_SM2,
+            base64.b64decode(public_key),
+            base64.b64decode(raw_data),
+            base64.b64decode(sign_data),
+        )
+
+    def sm3_hmac(self, key, data):
+        session = self.new_session()
+        return session.sm3_hmac(key, data)
 
     def new_sm2_ecc_cipher(self, public_key, private_key):
         session = self.new_session()
