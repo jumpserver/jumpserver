@@ -3,6 +3,10 @@
 version: 3
 
 
+build_arg_defaults:
+  ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: "--ignore-certs"
+
+
 images:
   # ansible-builder 仅支持 RPM 系镜像 (dnf)，不能用 python:3.11-slim 等 Debian 镜像
   base_image:
