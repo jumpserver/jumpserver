@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
-from itertools import chain
 
 from django.apps import apps
 from django.db.models.signals import (
@@ -27,28 +26,6 @@ M2M_ACTION = {
 }
 
 
-def _get_m2m_field_verbose_name(instance, model, sender):
-    opts = instance._meta
-    for f in chain(opts.many_to_many, opts.related_objects):
-        related_model = getattr(f, 'related_model', None)
-        if related_model != model:
-            continue
-
-        through = None
-        remote_field = getattr(f, 'remote_field', None)
-        if remote_field is not None:
-            through = getattr(remote_field, 'through', None)
-        if through is None:
-            through = getattr(f, 'through', None)
-
-        if through is not sender:
-            continue
-
-        verbose_name = getattr(f, 'verbose_name', None) or model._meta.verbose_name
-        return str(verbose_name)
-    return str(model._meta.verbose_name)
-
-
 @receiver(m2m_changed)
 def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
     if action not in M2M_ACTION:
@@ -62,21 +39,15 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
             instance, include_model_fields=False, include_related_fields=[model]
         )
 
-        instance_id_data = current_instance.get('id', {})
-        if isinstance(instance_id_data, dict):
-            instance_id = instance_id_data.get('value')
-        else:
-            instance_id = instance_id_data
+        instance_id = current_instance.get('id')
         log_id, before_instance = get_instance_dict_from_cache(instance_id)
 
-        field_name = _get_m2m_field_verbose_name(instance, model, sender)
+        field_name = str(model._meta.verbose_name)
         pk_set = pk_set or {}
         objs = model.objects.filter(pk__in=pk_set)
         objs_display = [str(o) for o in objs]
         action = M2M_ACTION[action]
         changed_field = current_instance.get(field_name, {})
-        if not changed_field and field_name != str(model._meta.verbose_name):
-            changed_field = current_instance.get(str(model._meta.verbose_name), {})
         changed_value = changed_field.get('value', [])
 
         after, before, before_value = None, None, None
@@ -92,7 +63,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
             before_change_field['value'] = before_value
             before = {field_name: before_change_field}
 
-        if before == after:
+        if sorted(str(before)) == sorted(str(after)):
             return
 
         create_or_update_operate_log(

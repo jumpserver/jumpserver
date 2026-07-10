@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from uuid import UUID
 
 from django.core.cache import cache
 from django.db import transaction
@@ -43,33 +42,13 @@ class OperatorLogHandler(metaclass=Singleton):
             value2 = as_current_tz(value2).strftime('%Y-%m-%d %H:%M:%S')
         return value1, value2
 
-    @classmethod
-    def _normalize_diff_value(cls, value):
-        if isinstance(value, datetime):
-            return as_current_tz(value).strftime('%Y-%m-%d %H:%M:%S')
-        if isinstance(value, UUID):
-            return str(value)
-        if isinstance(value, dict):
-            return {k: cls._normalize_diff_value(v) for k, v in value.items()}
-        if isinstance(value, (list, tuple, set)):
-            return [cls._normalize_diff_value(v) for v in value]
-        return value
-
-    @classmethod
-    def _value_equal_for_diff(cls, left, right):
-        left = cls._normalize_diff_value(left)
-        right = cls._normalize_diff_value(right)
-        if left == right:
-            return True
-
-        return str(left) == str(right)
-
     def _look_for_two_dict_change(self, left_dict, right_dict):
         # 以右边的字典为基础
         before, after = {}, {}
         for key, value in right_dict.items():
             pre_value = left_dict.get(key, '')
-            if self._value_equal_for_diff(pre_value, value):
+            pre_value, value = self._consistent_type_to_str(pre_value, value)
+            if sorted(str(value)) == sorted(str(pre_value)):
                 continue
             before[key] = pre_value
             after[key] = value

@@ -41,9 +41,9 @@ class BlockIPSecurityAPI(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         ips = self.get_ips()
-        # offset, limit = self.get_page_offset_and_limit()
-        # slice_ips = ips[offset:offset + limit]
-        data = [{'id': str(uuid4()), 'ip': ip} for ip in ips]
+        offset, limit = self.get_page_offset_and_limit()
+        slice_ips = ips[offset:offset + limit]
+        data = [{'id': str(uuid4()), 'ip': ip} for ip in slice_ips]
         ser = self.get_serializer(data, many=True)
         data = {'count': len(ips), 'results': ser.data}
         return Response(data=data, status=200)

@@ -70,9 +70,6 @@ class LDAPSettingSerializer(LDAPSerializerMixin, serializers.Serializer):
             '`value` is the LDAP service user attribute name'
         )
     )
-    AUTH_LDAP_ALWAYS_UPDATE_USER = serializers.BooleanField(
-        required=False, label=_('Always update user'),
-    )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
         required=False, label=_('Periodic run')
     )

@@ -26,14 +26,6 @@ __all__ = (
 )
 
 
-def _get_placeholder_context(contexts):
-    return {
-        item['name']: '{{ ' + item['name'] + ' }}'
-        for item in contexts
-        if item.get('name')
-    }
-
-
 class BackendListView(APIView):
     permission_classes = [IsValidUser]
 
@@ -172,10 +164,9 @@ class TemplateViewSet(JMSGenericViewSet):
                         item['content'] = f.read()
                     item['source'] = 'data'
                 else:
-                    ctx = _get_placeholder_context(item['contexts'])
+                    ctx = {x.get('name'): x.get('default') for x in item['contexts']}
                     try:
                         rendered = render_to_string(meta['template_name'], ctx)
-                        item['template_content'] = rendered
                         item['content'] = rendered
                         item['source'] = 'original'
                     except Exception as e:

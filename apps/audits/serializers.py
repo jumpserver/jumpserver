@@ -142,17 +142,6 @@ class OperateLogFullSerializer(OperateLogSerializer):
         fields = OperateLogSerializer.Meta.fields + ['diff']
 
 
-class OperateLogSyslogSerializer(OperateLogSerializer):
-    diff = serializers.SerializerMethodField(label=_("Diff"))
-
-    class Meta(OperateLogSerializer.Meta):
-        fields = OperateLogSerializer.Meta.fields + ['diff']
-
-    @staticmethod
-    def get_diff(instance):
-        return OperateLogStore.convert_diff_friendly(instance)
-
-
 class PasswordChangeLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PasswordChangeLog

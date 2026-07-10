@@ -152,7 +152,6 @@ dependencies = [
     "pyhttpsig==1.3.0",
     "telnetlib3==4.0.2",
     "defusedxml>=0.7.1",
-    "ansible-builder>=3.1.1",
 ]
 
 [project.urls]
