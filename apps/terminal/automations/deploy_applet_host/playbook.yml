@@ -247,14 +247,24 @@
               }
 
         - name: Remove old chromedriver (Chrome)
-          ansible.windows.win_file:
-            path: "{{ item }}"
-            state: absent
-          with_items:
-            - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
-            - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
-            - 'C:\Program Files\JumpServer\drivers\chromedriver-win64'
-            - 'C:\Program Files\JumpServer\drivers\chromedriver_win64'
+          ansible.windows.win_powershell:
+            script: |
+              $ErrorActionPreference = 'Stop'
+              $Ansible.Changed = $false
+
+              $paths = @(
+                'C:\Program Files\JumpServer\drivers\chromedriver-win32'
+                'C:\Program Files\JumpServer\drivers\chromedriver_win32'
+                'C:\Program Files\JumpServer\drivers\chromedriver-win64'
+                'C:\Program Files\JumpServer\drivers\chromedriver_win64'
+              )
+
+              foreach ($path in $paths) {
+                if (Test-Path -LiteralPath $path) {
+                  Remove-Item -LiteralPath $path -Recurse -Force
+                  $Ansible.Changed = $true
+                }
+              }
 
         - name: Download chromedriver (Chrome)
           ansible.windows.win_get_url:
@@ -284,14 +294,24 @@
               }
 
         - name: Remove old Chrome (Chrome)
-          ansible.windows.win_file:
-            path: "{{ item }}"
-            state: absent
-          with_items:
-            - 'C:\Program Files\JumpServer\applications\Chrome'
-            - 'C:\Program Files\Chrome\chrome-win32'
-            - 'C:\Program Files\Chrome\chrome-win'
-            - 'C:\Program Files\chrome-win'
+          ansible.windows.win_powershell:
+            script: |
+              $ErrorActionPreference = 'Stop'
+              $Ansible.Changed = $false
+
+              $paths = @(
+                'C:\Program Files\JumpServer\applications\Chrome'
+                'C:\Program Files\Chrome\chrome-win32'
+                'C:\Program Files\Chrome\chrome-win'
+                'C:\Program Files\chrome-win'
+              )
+
+              foreach ($path in $paths) {
+                if (Test-Path -LiteralPath $path) {
+                  Remove-Item -LiteralPath $path -Recurse -Force
+                  $Ansible.Changed = $true
+                }
+              }
 
         - name: Unzip Chrome (Chrome)
           community.windows.win_unzip:
