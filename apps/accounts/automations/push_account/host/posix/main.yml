@@ -109,6 +109,8 @@
        - check_conn_after_change or change_secret_result.failed | default(false)
       delegate_to: localhost
       connection: local
+      vars:
+        ansible_python_interpreter: "{{ local_python_interpreter }}"
 
     - name: "Verify {{ account.username }} SSH KEY (paramiko)"
       ssh_ping:
@@ -123,4 +125,5 @@
        - check_conn_after_change or change_secret_result.failed | default(false)
       delegate_to: localhost
       connection: local
-
+      vars:
+        ansible_python_interpreter: "{{ local_python_interpreter }}"
