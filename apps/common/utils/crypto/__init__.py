@@ -17,6 +17,11 @@ class Crypto:
         'gm': gm_sm4_ecb_crypto,
     }
     cryptos = []
+    fallback_crypto_names = (
+        'aes_gcm',
+        'aes_ecb',
+        'gm_sm4_ecb',
+    )
 
     def __init__(self):
         crypt_algo = settings.SECURITY_DATA_CRYPTO_ALGO
@@ -31,8 +36,15 @@ class Crypto:
             raise ImproperlyConfigured(
                 f'Crypto method not supported {settings.SECURITY_DATA_CRYPTO_ALGO}'
             )
-        others = set(self.cryptor_map.values()) - {cryptor}
-        self.cryptos = [cryptor, *others]
+        self.cryptos = self.get_ordered_cryptors(cryptor)
+
+    def get_ordered_cryptors(self, encryptor):
+        cryptors = [encryptor]
+        for name in self.fallback_crypto_names:
+            cryptor = self.cryptor_map.get(name)
+            if cryptor is not None and cryptor not in cryptors:
+                cryptors.append(cryptor)
+        return cryptors
 
     def get_gm_crypto(self):
         if settings.GM_DEVICE_ENABLE:
