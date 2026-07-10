@@ -10,14 +10,15 @@ class CryptoVendor(Enum):
     SCTU = "sctu"
 
     @classmethod
-    def from_str(cls, name: str):
-        try:
-            return cls[name.upper()]
-        except KeyError:
-            for vendor in cls:
-                if vendor.value.lower() == name.lower():
-                    return vendor
-            raise ValueError(f"Unknown GM Vendor: {name}")
+    def from_str(cls, name: str | None):
+        if name is None or not name.strip():
+            return cls.PIICO
+
+        name = name.strip().lower()
+        for vendor in cls:
+            if name in (vendor.name.lower(), vendor.value.lower()):
+                return vendor
+        raise ValueError(f"Unknown GM Vendor: {name}")
 
 
 def open_gm_device(vendor: CryptoVendor) -> Device:
