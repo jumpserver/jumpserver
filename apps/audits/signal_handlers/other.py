@@ -7,7 +7,7 @@ from audits.models import (
     PasswordChangeLog, UserLoginLog, FTPLog, OperateLog
 )
 from audits.serializers import (
-    UserLoginLogSerializer, FTPLogSerializer, OperateLogSyslogSerializer,
+    UserLoginLogSerializer, FTPLogSerializer, OperateLogSerializer,
     PasswordChangeLogSerializer
 )
 from common.utils import get_request_ip, get_syslogger
@@ -49,7 +49,7 @@ def on_audits_log_create(sender, instance=None, **kwargs):
         serializer_cls = FTPLogSerializer
     elif sender == OperateLog:
         category = "operation_log"
-        serializer_cls = OperateLogSyslogSerializer
+        serializer_cls = OperateLogSerializer
     elif sender == PasswordChangeLog:
         category = "password_change_log"
         serializer_cls = PasswordChangeLogSerializer

@@ -16,16 +16,5 @@
           cpu_vcpus: "{{ ansible_processor_vcpus }}"
           memory: "{{ (ansible_memtotal_mb / 1024) | round(2) }}"
 
-    - name: Get MAC addresses on Windows
-      win_shell: |
-        Get-NetAdapter | Where-Object { $_.MacAddress -and $_.MacAddress -ne '00-00-00-00-00-00' } |
-          ForEach-Object { "$($_.Name): $($_.MacAddress -replace '-', ':')" }
-      register: mac_info
-      ignore_errors: yes
-
-    - name: Merge MAC info into final info
-      set_fact:
-        info: "{{ info | combine({'mac_address': mac_info.stdout_lines | default([])}) }}"
-
     - debug:
         var: info

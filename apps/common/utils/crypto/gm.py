@@ -3,7 +3,6 @@ import base64
 from django.conf import settings
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 from gmssl import sm2, sm3, func
-import logging
 
 from common.sdk.gm import Device
 from .base import BaseCrypto, BaseCryptoSuite
@@ -109,13 +108,9 @@ class GmCryptoSuite(BaseCryptoSuite):
         return cipher_text
 
     def decrypt_with_key_pair(self, cipher_text, private_key):
-        try:
-            message = base64.b64decode(cipher_text.encode())
-            sm2_crypt = sm2.CryptSM2(public_key='', private_key=private_key)
-            return sm2_crypt.decrypt(message).decode()
-        except Exception as e:
-            logging.error(f"Decrypt with key pair error: {e}")
-            return cipher_text
+        message = base64.b64decode(cipher_text.encode())
+        sm2_crypt = sm2.CryptSM2(public_key='', private_key=private_key)
+        return sm2_crypt.decrypt(message).decode()
 
     def hash(self, msg):
         return Sm3Hasher.hash(msg)

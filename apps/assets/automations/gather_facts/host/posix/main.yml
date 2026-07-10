@@ -24,21 +24,6 @@
           kernel: "{{ ansible_kernel }}"
 
 
-    - name: Get MAC addresses
-      shell: |
-        for iface in $(ls /sys/class/net/ | grep -v '^lo$'); do
-          mac=$(cat /sys/class/net/$iface/address 2>/dev/null)
-          if [ -n "$mac" ] && [ "$mac" != "00:00:00:00:00:00" ]; then
-            echo "${iface}: ${mac}"
-          fi
-        done
-      register: mac_info
-      ignore_errors: yes
-
-    - name: Merge MAC info into final info
-      set_fact:
-        info: "{{ info | combine({'mac_address': mac_info.stdout_lines | default([])}) }}"
-
     - name: Get GPU info with nvidia-smi
       shell: |
         nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader,nounits

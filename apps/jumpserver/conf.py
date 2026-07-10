@@ -317,7 +317,6 @@ class Config(dict):
         'AUTH_LDAP_CONNECT_TIMEOUT': 10,
         'AUTH_LDAP_STRICT_SYNC': False,
         'AUTH_LDAP_CACHE_TIMEOUT': 0,
-        'AUTH_LDAP_ALWAYS_UPDATE_USER': True,
         'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
@@ -339,7 +338,6 @@ class Config(dict):
         'AUTH_LDAP_HA_CONNECT_TIMEOUT': 10,
         'AUTH_LDAP_HA_STRICT_SYNC': False,
         'AUTH_LDAP_HA_CACHE_TIMEOUT': 0,
-        'AUTH_LDAP_HA_ALWAYS_UPDATE_USER': True,
         'AUTH_LDAP_HA_SEARCH_PAGED_SIZE': 1000,
         'AUTH_LDAP_HA_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_HA_SYNC_INTERVAL': None,
@@ -569,7 +567,6 @@ class Config(dict):
 
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'JumpServer',
-        'OTP_DIGEST': 'sha1',
         'EMAIL_SUFFIX': 'example.com',
 
         # Terminal配置
