@@ -25,10 +25,6 @@ class MFAOtp(BaseMFA):
             return True
         return self.user.otp_secret_key
 
-    @staticmethod
-    def global_enabled():
-        return True
-
     def get_enable_url(self) -> str:
         return reverse('authentication:user-otp-enable-start')
 

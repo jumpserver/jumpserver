@@ -23,9 +23,9 @@ class MFAPasskey(BaseMFA):
             return False
         return self.user.passkey_set.count()
 
-    @staticmethod
-    def global_enabled():
-        return settings.AUTH_PASSKEY
+    @classmethod
+    def global_enabled(cls):
+        return super().global_enabled() and settings.AUTH_PASSKEY
 
     def get_enable_url(self) -> str:
         return '/ui/#/profile/passkeys'

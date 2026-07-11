@@ -39,9 +39,9 @@ class MFACustom(BaseMFA):
     def is_active(self):
         return True
 
-    @staticmethod
-    def global_enabled():
-        return settings.MFA_CUSTOM and callable(mfa_custom_method)
+    @classmethod
+    def global_enabled(cls):
+        return super().global_enabled() and settings.MFA_CUSTOM and callable(mfa_custom_method)
 
     def get_enable_url(self) -> str:
         return ''

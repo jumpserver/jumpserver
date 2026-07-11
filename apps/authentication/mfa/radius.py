@@ -27,9 +27,9 @@ class MFARadius(BaseMFA):
     def is_active(self):
         return True
 
-    @staticmethod
-    def global_enabled():
-        return settings.OTP_IN_RADIUS
+    @classmethod
+    def global_enabled(cls):
+        return super().global_enabled() and settings.OTP_IN_RADIUS
 
     def get_enable_url(self) -> str:
         return ''

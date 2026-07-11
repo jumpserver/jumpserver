@@ -29,9 +29,10 @@ class MFAFace(BaseMFA, AuthFaceMixin):
             return True
         return bool(self.user.face_vector)
 
-    @staticmethod
-    def global_enabled():
+    @classmethod
+    def global_enabled(cls):
         return (
+                super().global_enabled() and
                 settings.XPACK_LICENSE_IS_VALID and
                 settings.FACE_RECOGNITION_ENABLED
         )
