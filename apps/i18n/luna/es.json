@@ -56,6 +56,7 @@
     "Copy": "Copiar",
     "Copy link": "Copiar enlace",
     "CreateLink": "Crear enlace",
+    "Credential": "Credencial",
     "Current online": "Actualmente en línea",
     "Current session": "Conversación actual",
     "DarkBlue": "Azul profundo",
@@ -291,8 +292,5 @@
     "success": "Éxito",
     "system user": "Usuario del sistema",
     "tabLimits": "Actualmente tienes 15 pestañas abiertas.  \n¿Para garantizar la estabilidad del sistema, deberías abrir Luna en una nueva pestaña del navegador para continuar con la operación?",
-    "user": "Usuario",
-    "MarkAsRead": "Marcar como leído",
-    "Favorites": "Favoritos",
-    "Credential": "Credencial"
+    "user": "Usuario"
 }

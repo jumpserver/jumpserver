@@ -57,6 +57,7 @@
     "Copy": "Copy",
     "Copy link": "Copy link",
     "CreateLink": "Create link",
+    "Credential": "Credential",
     "Current online": "Current online",
     "Current session": "Current session",
     "DarkBlue": "Dark blue",
@@ -291,8 +292,5 @@
     "success": "Success",
     "system user": "System user",
     "tabLimits": "15 tabs are currently open.\nTo ensure system stability, would you like to open Luna in a new browser tab to continue?",
-    "MarkAsRead": "Mark as read",
-    "Favorites": "Favorites",
-    "Credential": "Credential",
     "user": "User"
 }

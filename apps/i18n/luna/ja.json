@@ -56,6 +56,7 @@
     "Copy": "コピー",
     "Copy link": "リンクをコピーする",
     "CreateLink": "リンクを作成する",
+    "Credential": "資格",
     "Current online": "現在オンライン",
     "Current session": "現在のセッション",
     "DarkBlue": "深い青",
@@ -291,8 +292,5 @@
     "success": "成功",
     "system user": "システムユーザー",
     "tabLimits": "現在、15個のタブが開かれています。システムの安定性を確保するために、新しいブラウザのタブでLunaを開いて操作を続けますか？",
-    "user": "ユーザー",
-    "MarkAsRead": "既読にする",
-    "Favorites": "お気に入り",
-    "Credential": "資格"
+    "user": "ユーザー"
 }

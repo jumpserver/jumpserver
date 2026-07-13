@@ -56,6 +56,7 @@
     "Copy": "Sao chép",
     "Copy link": "Sao chép liên kết",
     "CreateLink": "Tạo liên kết",
+    "Credential": "Chứng chỉ",
     "Current online": "Đang trực tuyến hiện tại",
     "Current session": "phiên hiện tại",
     "DarkBlue": "Màu xanh đậm",
@@ -291,8 +292,5 @@
     "success": "Thành công",
     "system user": "Tên đăng nhập",
     "tabLimits": "Hiện tại đã mở 15 tab.  \nĐể đảm bảo tính ổn định của hệ thống, có qua tab trình duyệt mới để mở Luna và tiếp tục thao tác không?",
-    "user": "Người dùng",
-    "MarkAsRead": "Đánh dấu đã đọc",
-    "Favorites": "Mục yêu thích",
-    "Credential": "Chứng chỉ"
+    "user": "Người dùng"
 }

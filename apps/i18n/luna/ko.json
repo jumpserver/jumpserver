@@ -56,6 +56,7 @@
     "Copy": "공유 코드",
     "Copy link": "링크 복사",
     "CreateLink": "링크 생성",
+    "Credential": "신임장",
     "Current online": "현재 온라인",
     "Current session": "현재 세션",
     "DarkBlue": "딥 블루",
@@ -291,8 +292,5 @@
     "success": "성공",
     "system user": "시스템 사용자",
     "tabLimits": "현재 15개의 탭이 열려 있습니다. 시스템의 안정성을 위해 Luna를 계속 사용하려면 새로운 브라우저 탭에서 열어보시겠습니까?",
-    "user": "사용자",
-    "MarkAsRead": "읽음으로 표시",
-    "Favorites": "즐겨찾기",
-    "Credential": "신임장"
+    "user": "사용자"
 }

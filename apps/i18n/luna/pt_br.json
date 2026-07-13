@@ -56,6 +56,7 @@
     "Copy": "Copiar",
     "Copy link": "Copiar link",
     "CreateLink": "Criar link",
+    "Credencial": "Credencial",
     "Current online": "Online Atual",
     "Current session": "Sessão Atual",
     "DarkBlue": "Deep Blue",
@@ -291,8 +292,5 @@
     "success": " Sucesso",
     "system user": "Usuário do Sistema",
     "tabLimits": "Atualmente, 15 abas estão abertas. Para garantir a estabilidade do sistema, você deseja abrir o Luna em uma nova aba do navegador para continuar a operação?",
-    "user": "Usuário",
-    "MarkAsRead": "Marcar como lido",
-    "Favorites": "Favoritos",
-    "Credencial": "Credencial"
+    "user": "Usuário"
 }
