@@ -527,6 +527,7 @@
     "DingTalk": "DingTalk",
     "DingTalkOAuth": "Autenticación DingTalk",
     "DingTalkTest": "Prueba",
+    "Directories": "Servicios de directorio",
     "DirectoryServiceHelpMessage": "El Servicio de Directorio es un servicio utilizado para el almacenamiento centralizado, gestión y consulta de información sobre recursos de red, con implementaciones comunes que incluyen LDAP y Active Directory. Otros activos asociados al servicio de directorio heredarán las cuentas de éste.",
     "Disable": "Desactivar",
     "DisableSelected": "Deshabilitar seleccionado",
@@ -1699,6 +1700,5 @@
     "selectedAssets": "Activos seleccionados",
     "setVariable": "configurar parámetros",
     "userId": "ID de usuario",
-    "userName": "Nombre de usuario",
-    "Directories": "Servicios de directorio"
+    "userName": "Nombre de usuario"
 }

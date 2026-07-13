@@ -527,6 +527,7 @@
     "DingTalk": "DingTalk",
     "DingTalkOAuth": "Xác thực DingTalk",
     "DingTalkTest": "Kiểm tra",
+    "Directories": "Dịch vụ Thư mục",
     "DirectoryServiceHelpMessage": "Dịch vụ thư mục (Directory Service) là một dịch vụ dùng để lưu trữ, quản lý và truy vấn thông tin tài nguyên mạng một cách tập trung, các triển khai phổ biến bao gồm LDAP và Active Directory. Những tài sản khác liên kết với dịch vụ thư mục sẽ được thừa hưởng tài khoản từ dịch vụ thư mục.",
     "Disable": "Vô hiệu hóa",
     "DisableSelected": "Cấm sử dụng đã chọn",
@@ -1699,6 +1700,5 @@
     "selectedAssets": "Tài sản đã chọn",
     "setVariable": "Cài đặt tham số",
     "userId": "ID người dùng",
-    "userName": "Tên người dùng",
-    "Directories": "Dịch vụ Thư mục"
+    "userName": "Tên người dùng"
 }

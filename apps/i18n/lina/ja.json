@@ -532,6 +532,7 @@
     "DingTalk": "ディーングトーク",
     "DingTalkOAuth": "ディンディン認証",
     "DingTalkTest": "テスト",
+    "Directories": "ディレクトリサービス",
     "DirectoryServiceHelpMessage": "ディレクトリサービスは、ネットワークリソース情報を集中管理・保存・照会するためのサービスであり、一般的な実装にはLDAPやActive Directoryが含まれます。他のアセットがディレクトリサービスに関連付けられると、ディレクトリサービスからアカウントを継承します。",
     "Disable": "無効化",
     "DisableSelected": "選択を無効にする",
@@ -1704,6 +1705,5 @@
     "selectedAssets": "選択した資産",
     "setVariable": "パラメータ設定",
     "userId": "ユーザーID",
-    "userName": "ユーザー名",
-    "Directories": "ディレクトリサービス"
+    "userName": "ユーザー名"
 }

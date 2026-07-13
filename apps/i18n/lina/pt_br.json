@@ -528,6 +528,7 @@
     "DingTalk": "DingTalk",
     "DingTalkOAuth": "Autenticação DingDing",
     "DingTalkTest": "Teste",
+    "Directories": "Serviços de Diretório",
     "DirectoryServiceHelpMessage": "O serviço de Diretório (Directory Service) é uma ferramenta destinada ao armazenamento, gerenciamento e consulta centralizada das informações de recursos da rede. As implementações mais comuns incluem LDAP e Active Directory. Outros ativos que estão associados ao serviço de diretório herdarão as contas desse serviço.",
     "Disable": "Desativado",
     "DisableSelected": "Desativar selecionado",
@@ -1700,6 +1701,5 @@
     "selectedAssets": "Ativos selecionados",
     "setVariable": "Parâmetros de configuração",
     "userId": "ID do usuário",
-    "userName": "Usuário",
-    "Directories": "Serviços de Diretório"
+    "userName": "Usuário"
 }

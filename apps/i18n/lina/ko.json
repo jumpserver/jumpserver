@@ -527,6 +527,7 @@
     "DingTalk": "딩딩",
     "DingTalkOAuth": "딩딩 인증",
     "DingTalkTest": "테스트",
+    "Directories": "디렉터리 서비스",
     "DirectoryServiceHelpMessage": "디렉토리 서비스(Directory Service)는 네트워크 자원 정보를 집중 저장하고 관리 및 쿼리하는 서비스로, 일반적인 구현으로는 LDAP와 Active Directory가 있습니다. 다른 자산이 디렉토리 서비스에 연결되면, 디렉토리 서비스에서 제공하는 계정을 상속받게 됩니다.",
     "Disable": "비활성화",
     "DisableSelected": "선택한 항목 비활성화",
@@ -1699,6 +1700,5 @@
     "selectedAssets": "선택한 자산",
     "setVariable": "설정 매개변수",
     "userId": "사용자 ID",
-    "userName": "사용자명",
-    "Directories": "디렉터리 서비스"
+    "userName": "사용자명"
 }
