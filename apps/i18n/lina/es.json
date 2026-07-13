@@ -520,7 +520,7 @@
     "DetectEngines": "Motor de detección",
     "DetectResults": "Resultados de detección",
     "DetectTasks": "Tarea de detección",
-    "Device": "dispositivos",
+    "Device": "Equipos de red",
     "DeviceCreate": "Crear activo - dispositivo de red",
     "DeviceUpdate": "Actualizar activos - Dispositivos de red",
     "Digit": "Números",
@@ -1699,5 +1699,6 @@
     "selectedAssets": "Activos seleccionados",
     "setVariable": "configurar parámetros",
     "userId": "ID de usuario",
-    "userName": "Nombre de usuario"
+    "userName": "Nombre de usuario",
+    "Directories": "Servicios de directorio"
 }

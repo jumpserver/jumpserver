@@ -520,7 +520,7 @@
     "DetectEngines": "검사 엔진",
     "DetectResults": "검사 결과",
     "DetectTasks": "검사 작업",
-    "Device": "장비",
+    "Device": "네트워크 장비",
     "DeviceCreate": "자산 생성-네트워크 장비",
     "DeviceUpdate": "자산 업데이트 - 네트워크 장비",
     "Digit": "숫자",
@@ -1699,5 +1699,6 @@
     "selectedAssets": "선택한 자산",
     "setVariable": "설정 매개변수",
     "userId": "사용자 ID",
-    "userName": "사용자명"
+    "userName": "사용자명",
+    "Directories": "디렉터리 서비스"
 }

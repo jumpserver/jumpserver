@@ -521,7 +521,7 @@
     "DetectEngines": "Mecanismo de verificação",
     "DetectResults": "Resultado da verificação",
     "DetectTasks": "Tarefa de verificação",
-    "Device": " Equipamento ",
+    "Device": " Equipamento de rede ",
     "DeviceCreate": "Criar ativo - Equipamento de rede",
     "DeviceUpdate": "Atualizar Ativos - Equipamento de Rede",
     "Digit": "Números",
@@ -1700,5 +1700,6 @@
     "selectedAssets": "Ativos selecionados",
     "setVariable": "Parâmetros de configuração",
     "userId": "ID do usuário",
-    "userName": "Usuário"
+    "userName": "Usuário",
+    "Directories": "Serviços de Diretório"
 }

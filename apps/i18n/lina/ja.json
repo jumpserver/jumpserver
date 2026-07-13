@@ -525,7 +525,7 @@
     "DetectEngines": "検出エンジン",
     "DetectResults": "検出結果",
     "DetectTasks": "検出タスク",
-    "Device": "設備",
+    "Device": "ネットワーク機器",
     "DeviceCreate": "資産作成 - ネットワークデバイス",
     "DeviceUpdate": "資産の更新-ネットワークデバイス",
     "Digit": "数字",
@@ -1704,5 +1704,6 @@
     "selectedAssets": "選択した資産",
     "setVariable": "パラメータ設定",
     "userId": "ユーザーID",
-    "userName": "ユーザー名"
+    "userName": "ユーザー名",
+    "Directories": "ディレクトリサービス"
 }

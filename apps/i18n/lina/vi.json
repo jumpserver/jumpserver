@@ -520,7 +520,7 @@
     "DetectEngines": "Công cụ kiểm tra",
     "DetectResults": "Kết quả kiểm tra",
     "DetectTasks": "Nhiệm vụ kiểm tra",
-    "Device": "thiết bị",
+    "Device": "Thiết bị mạng",
     "DeviceCreate": "Tạo tài sản - Thiết bị mạng",
     "DeviceUpdate": "Cập nhật tài sản - Thiết bị mạng",
     "Digit": "Số liệu",
@@ -1699,5 +1699,6 @@
     "selectedAssets": "Tài sản đã chọn",
     "setVariable": "Cài đặt tham số",
     "userId": "ID người dùng",
-    "userName": "Tên người dùng"
+    "userName": "Tên người dùng",
+    "Directories": "Dịch vụ Thư mục"
 }

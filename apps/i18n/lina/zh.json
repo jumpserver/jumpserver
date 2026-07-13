@@ -510,7 +510,7 @@
     "DetectEngines": "检测引擎",
     "DetectResults": "检测结果",
     "DetectTasks": "检测任务",
-    "Device": "设备",
+    "Device": "网络设备",
     "DeviceCreate": "创建资产-网络设备",
     "DeviceUpdate": "更新资产-网络设备",
     "Digit": "数字",
@@ -1816,5 +1816,6 @@
     "CertMethodNotFound": "驱动实例中未找到方法：{method}",
     "CertMethodMappingNotFound": "驱动配置中未找到方法映射：{name}",
     "CertEnrollStepNotFound": "签发配置中未找到步骤：{key}",
-    "UploadFileTooLarge": "上传失败：文件过大"
+    "UploadFileTooLarge": "上传失败：文件过大",
+    "Directories": "目录服务"
 }
