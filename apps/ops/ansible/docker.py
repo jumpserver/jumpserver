@@ -33,12 +33,13 @@ def docker_extravars(extra_vars):
     return extravars
 
 
-def docker_isolation_kwargs():
+def docker_isolation_kwargs(project_dir):
     return {
         'process_isolation': True,
         'process_isolation_executable': 'docker',
         'container_image': ANSIBLE_EE_IMAGE,
         'container_options': ['--network=jms_net'],
+        'container_volume_mounts': [f'{project_dir}:{project_dir}:Z'],
     }
 
 

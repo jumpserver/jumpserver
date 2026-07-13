@@ -86,7 +86,7 @@ class AdHocRunner:
             **kwargs,
         }
         if use_ansible_docker_isolation():
-            run_kwargs.update(docker_isolation_kwargs())
+            run_kwargs.update(docker_isolation_kwargs(self.project_dir))
             ensure_ansible_docker_image()
         interface.run(**run_kwargs)
         return self.cb
@@ -156,7 +156,7 @@ class PlaybookRunner:
 
         kwargs = dict(kwargs)
         if use_ansible_docker_isolation():
-            kwargs.update(docker_isolation_kwargs())
+            kwargs.update(docker_isolation_kwargs(self.project_dir))
             ensure_ansible_docker_image()
         elif self.isolate and not is_macos():
             kwargs['process_isolation'] = True
@@ -228,7 +228,7 @@ class UploadFileRunner:
             **kwargs,
         }
         if use_ansible_docker_isolation():
-            run_kwargs.update(docker_isolation_kwargs())
+            run_kwargs.update(docker_isolation_kwargs(self.project_dir))
             ensure_ansible_docker_image()
         interface.run(**run_kwargs)
         try:
