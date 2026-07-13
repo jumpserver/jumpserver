@@ -291,5 +291,6 @@
     "user": "用户",
     "tabLimits": "当前已打开 15 个标签页。\n为保证系统稳定是否在新的浏览器标签页中打开 Luna 以继续操作？",
     "MarkAsRead": "标记为已读",
-    "Favorites": "收藏夹"
+    "Favorites": "收藏夹",
+    "Credential": "凭据"
 }
