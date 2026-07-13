@@ -120,7 +120,7 @@ dependencies = [
     'ua-parser>=00.18.0',
     'user-agents>=02.2.0',
     'django-cors-headers>=04.3.0',
-    'mistune==2.0.3',
+    'mistune==3.3.0',
     'openai>=01.29.0',
     'xlsxwriter>=03.1.9',
     'exchangelib>=05.1.0',
