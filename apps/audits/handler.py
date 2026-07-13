@@ -73,6 +73,18 @@ class OperatorLogHandler(metaclass=Singleton):
                 continue
             before[key] = pre_value
             after[key] = value
+        for key, pre_value in left_dict.items():
+            if key in right_dict:
+                continue
+            if isinstance(pre_value, dict):
+                value = dict(pre_value)
+                value['value'] = ''
+            else:
+                value = ''
+            if self._value_equal_for_diff(pre_value, value):
+                continue
+            before[key] = pre_value
+            after[key] = value
         return before, after
 
     def cache_instance_before_data(self, instance_dict):
