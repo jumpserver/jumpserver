@@ -95,6 +95,7 @@
     "FaceOnlineNotSupported": "不支援臉部在線驗證",
     "Failed to open address": "打開地址失敗",
     "Favorite": "收藏",
+    "Favorites": "收藏夾",
     "File Manager": "文件管理",
     "FileManagement": "文件管理",
     "FileManagerConnectionFailed": "文件管理連接失敗",
@@ -139,6 +140,7 @@
     "LoginExpireMsg": "目前登入已逾時，請不要關閉視窗。在新的視窗登入後即可恢復目前頁面，如未恢復請重新整理頁面。",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "低速寬帶 (256 Kbps - 2 Mbps)",
     "Manual accounts": "手動帳號",
+    "MarkAsRead": "標記為已讀",
     "Minute": "分鐘",
     "Minutes": "分",
     "Module": "模組",
@@ -290,7 +292,5 @@
     "success": "成功",
     "system user": "系統用戶",
     "tabLimits": "當前已打開 15 個標籤頁。  \n為了確保系統穩定，是否在新的瀏覽器標籤頁中打開 Luna 以繼續操作？",
-    "user": "用戶",
-    "MarkAsRead": "標記為已讀",
-    "Favorites": "收藏夾"
+    "user": "用戶"
 }

@@ -94,6 +94,7 @@
     "FaceOnlineNotSupported": "Não suporta verificação facial online",
     "Failed to open address": "Falha ao abrir o endereço",
     "Favorite": "Favoritos",
+    "Favorites": "Favoritos",
     "File Manager": "Arquivo gerenciar",
     "FileManagement": "Gerenciamento de arquivos",
     "FileManagerConnectionFailed": "Falha na conexão com o gerenciamento de arquivos.",
@@ -138,6 +139,7 @@
     "LoginExpireMsg": "O login atual excedeu o tempo limite, por favor, não feche a janela. Após o login na nova janela, será possível restaurar a página atual. Se não restaurar, por favor atualize a página.",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "Banda larga de baixa velocidade (256 Kbps - 2 Mbps)",
     "Manual accounts": "Conta manual",
+    "MarkAsRead": "Marcar como lido",
     "Minute": "Minutos",
     "Minutes": "Divisão",
     "Module": "Módulo",
@@ -289,7 +291,5 @@
     "success": " Sucesso",
     "system user": "Usuário do Sistema",
     "tabLimits": "Atualmente, 15 abas estão abertas. Para garantir a estabilidade do sistema, você deseja abrir o Luna em uma nova aba do navegador para continuar a operação?",
-    "user": "Usuário",
-    "MarkAsRead": "Marcar como lido",
-    "Favorites": "Favoritos"
+    "user": "Usuário"
 }

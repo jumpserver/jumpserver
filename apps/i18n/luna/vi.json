@@ -94,6 +94,7 @@
     "FaceOnlineNotSupported": "Không hỗ trợ xác minh trực tuyến bằng khuôn mặt",
     "Failed to open address": "Mở địa chỉ không thành công",
     "Favorite": "Yêu thích",
+    "Favorites": "Mục yêu thích",
     "File Manager": "Phiên đang được giám sát",
     "FileManagement": "Quản lý tệp",
     "FileManagerConnectionFailed": "Kết nối quản lý tệp thất bại",
@@ -138,6 +139,7 @@
     "LoginExpireMsg": "Đăng nhập hiện tại đã hết thời gian, xin đừng đóng cửa sổ. Bạn có thể phục hồi trang hiện tại sau khi đăng nhập lại trong cửa sổ mới, nếu không phục hồi được hãy làm mới trang.",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "Băng thông thấp (256 Kbps - 2 Mbps)",
     "Manual accounts": "Tài khoản thủ công",
+    "MarkAsRead": "Đánh dấu đã đọc",
     "Minute": "Phút",
     "Minutes": "Phân bổ",
     "Module": "Mô-đun",
@@ -289,7 +291,5 @@
     "success": "Thành công",
     "system user": "Tên đăng nhập",
     "tabLimits": "Hiện tại đã mở 15 tab.  \nĐể đảm bảo tính ổn định của hệ thống, có qua tab trình duyệt mới để mở Luna và tiếp tục thao tác không?",
-    "user": "Người dùng",
-    "MarkAsRead": "Đánh dấu đã đọc",
-    "Favorites": "Mục yêu thích"
+    "user": "Người dùng"
 }

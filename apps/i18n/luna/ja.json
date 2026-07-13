@@ -94,6 +94,7 @@
     "FaceOnlineNotSupported": "顔認証のオンライン検証はサポートされていません",
     "Failed to open address": "アドレスを開くことができませんでした",
     "Favorite": "コレクション",
+    "Favorites": "お気に入り",
     "File Manager": "ファイル管理",
     "FileManagement": "ファイル管理",
     "FileManagerConnectionFailed": "ファイル管理の接続に失敗しました。ネットワーク接続を確認するか、管理者にお問い合わせください。",
@@ -138,6 +139,7 @@
     "LoginExpireMsg": "現在のログインはタイムアウトしました。ウィンドウを閉じないでください。新しいウィンドウでログインすると現在のページが復元されます。復元されない場合は、ページを更新してください。",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "低速ブロードバンド (256 Kbps - 2 Mbps)",
     "Manual accounts": "手動アカウント",
+    "MarkAsRead": "既読にする",
     "Minute": "分",
     "Minutes": "分",
     "Module": "ユニット",
@@ -289,7 +291,5 @@
     "success": "成功",
     "system user": "システムユーザー",
     "tabLimits": "現在、15個のタブが開かれています。システムの安定性を確保するために、新しいブラウザのタブでLunaを開いて操作を続けますか？",
-    "user": "ユーザー",
-    "MarkAsRead": "既読にする",
-    "Favorites": "お気に入り"
+    "user": "ユーザー"
 }

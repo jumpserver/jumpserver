@@ -95,6 +95,7 @@
     "Face verify success": "Face verify success",
     "Failed to open address": "Failed to Open Address",
     "Favorite": "Favorite",
+    "Favorites": "Favorites",
     "File Manager": "File Manager",
     "FileManagement": "File Management",
     "FileManagerConnectionFailed": "File manager connection failed",
@@ -139,6 +140,7 @@
     "LoginExpireMsg": "Your session has timed out. Please log in through a new window and return to this page to continue your operations.",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "Low Speed Broadband (256 Kbps - 2 Mbps)",
     "Manual accounts": "Manual accounts",
+    "MarkAsRead": "Mark as read",
     "Minute": "Minute",
     "Minutes": "Minutes",
     "Module": "Module",
@@ -288,8 +290,6 @@
     "start time": "Start time",
     "success": "Success",
     "system user": "System user",
-    "user": "User",
     "tabLimits": "15 tabs are currently open.\nTo ensure system stability, would you like to open Luna in a new browser tab to continue?",
-    "MarkAsRead": "Mark as read",
-    "Favorites": "Favorites"
+    "user": "User"
 }

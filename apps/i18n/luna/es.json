@@ -94,6 +94,7 @@
     "FaceOnlineNotSupported": "No se apoya la verificación facial en línea",
     "Failed to open address": "Fallo al abrir la dirección",
     "Favorite": "Favoritos",
+    "Favorites": "Favoritos",
     "File Manager": "Gestión de archivos",
     "FileManagement": "Gestión de archivos",
     "FileManagerConnectionFailed": "Error en la conexión del archivo.",
@@ -138,6 +139,7 @@
     "LoginExpireMsg": "El inicio de sesión actual ha expirado, por favor no cierre la ventana. Después de iniciar sesión en la nueva ventana, podrá restaurar la página actual; si no se restaura, por favor actualice la página.",
     "Low Speed Broadband (256 Kbps - 2 Mbps)": "Banda ancha de baja velocidad (256 Kbps - 2 Mbps)",
     "Manual accounts": "Cuenta manual",
+    "MarkAsRead": "Marcar como leído",
     "Minute": "Minutos",
     "Minutes": "Minuto",
     "Module": "Módulo",
@@ -289,7 +291,5 @@
     "success": "Éxito",
     "system user": "Usuario del sistema",
     "tabLimits": "Actualmente tienes 15 pestañas abiertas.  \n¿Para garantizar la estabilidad del sistema, deberías abrir Luna en una nueva pestaña del navegador para continuar con la operación?",
-    "user": "Usuario",
-    "MarkAsRead": "Marcar como leído",
-    "Favorites": "Favoritos"
+    "user": "Usuario"
 }
