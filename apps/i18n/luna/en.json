@@ -290,5 +290,6 @@
     "system user": "System user",
     "user": "User",
     "tabLimits": "15 tabs are currently open.\nTo ensure system stability, would you like to open Luna in a new browser tab to continue?",
-    "MarkAsRead": "Mark as read"
+    "MarkAsRead": "Mark as read",
+    "Favorites": "Favorites"
 }
