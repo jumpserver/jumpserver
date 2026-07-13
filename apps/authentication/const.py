@@ -6,6 +6,7 @@ USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD = 'next'
 
 RSA_PRIVATE_KEY = 'rsa_private_key'
 RSA_PUBLIC_KEY = 'rsa_public_key'
+OTP_BIND_AFTER_MFA_SESSION_KEY = 'auth_bind_otp_after_mfa'
 
 
 class ConfirmType(TextChoices):
