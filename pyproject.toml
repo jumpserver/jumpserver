@@ -167,7 +167,7 @@ default-groups = ["xpack", "dev"]
 
 dev = [
     'ipython==8.30.0',
-    'daphne==4.0.0',
+    'daphne==4.2.2',
     'django-debug-toolbar==4.1.0',
     'pympler==1.0.1',
     'forgerypy3==0.3.1',
