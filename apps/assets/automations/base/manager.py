@@ -59,12 +59,17 @@ class SSHTunnelManager:
             if not jms_gateway:
                 continue
             try:
+                gateway_proxy_host = interface.get_gateway_proxy_host()
                 server = SSHTunnelForwarder(
                     (jms_gateway["address"], jms_gateway["port"]),
                     ssh_username=jms_gateway["username"],
                     ssh_password=jms_gateway["secret"],
                     ssh_pkey=jms_gateway["private_key_path"],
                     remote_bind_address=(jms_asset["address"], jms_asset["port"]),
+                    local_bind_address=(
+                        '0.0.0.0' if gateway_proxy_host != '127.0.0.1' else '127.0.0.1',
+                        0,
+                    ),
                 )
                 server.start()
             except Exception as e:
@@ -75,7 +80,7 @@ class SSHTunnelManager:
                 local_bind_port = server.local_bind_port
 
                 host["ansible_host"] = jms_asset["address"] = host["login_host"] = (
-                    interface.get_gateway_proxy_host()
+                    gateway_proxy_host
                 )
                 host["ansible_port"] = jms_asset["port"] = host["login_port"] = (
                     local_bind_port
