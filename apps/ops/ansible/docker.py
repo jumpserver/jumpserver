@@ -66,7 +66,7 @@ def stage_inventory_for_docker(project_dir, inventory_path):
 def ensure_ansible_docker_image():
     if not use_ansible_docker_isolation():
         return
-    result = safe_run_cmd(['docker', 'image', 'inspect', ANSIBLE_EE_IMAGE])
+    result = safe_run_cmd(['docker', 'image', 'inspect', ANSIBLE_EE_IMAGE], quiet=True)
     if not result or result.returncode != 0:
         raise AnsibleDockerImageNotFound(
             _('The Ansible Docker image "%(image)s" was not found. '

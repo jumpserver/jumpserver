@@ -1,4 +1,5 @@
 # Aligned with JumpServer pyproject.toml ansible-related Python deps.
+ansible==9.13.0
 paramiko==3.5.1
 sshtunnel==0.4.0
 pywinrm==0.4.3

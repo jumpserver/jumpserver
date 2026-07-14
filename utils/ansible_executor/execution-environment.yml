@@ -23,15 +23,6 @@ dependencies:
   ansible_runner:
     package_pip: https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip
 
-  galaxy:
-    collections:
-      - name: community.postgresql
-        version: "2.4.0"
-      - name: community.mysql
-      - name: community.mongodb
-      - name: community.windows
-      - name: ansible.windows
-
   python: requirements-python.txt
   system: bindep.txt
 
