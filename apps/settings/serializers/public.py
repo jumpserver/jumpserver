@@ -40,6 +40,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_WATERMARK_WIDTH = serializers.IntegerField()
     SECURITY_WATERMARK_ROTATE = serializers.IntegerField()
     SESSION_EXPIRE_AT_BROWSER_CLOSE = serializers.BooleanField()
+    AUTO_RELOGIN_AT_SESSION_EXPIRE = serializers.BooleanField()
     VIEW_ASSET_ONLINE_SESSION_INFO = serializers.BooleanField()
     PASSWORD_RULE = serializers.DictField()
     SECURITY_SESSION_SHARE = serializers.BooleanField()
