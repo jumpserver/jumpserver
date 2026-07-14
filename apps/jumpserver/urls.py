@@ -31,6 +31,7 @@ resource_api = [
     path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
     path('labels/', include('labels.urls', namespace='api-label')),
     path('reports/', include('reports.urls.api_urls', namespace='api-reports')),
+    path('chat-ai/', include('chat_ai.api.urls', namespace='api-chat-ai')),
 ]
 
 api_v1 = resource_api + [

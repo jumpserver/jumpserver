@@ -2241,6 +2241,7 @@ dependencies = [
     { name = "pynacl" },
     { name = "pyopenssl" },
     { name = "pyotp" },
+    { name = "pypdf" },
     { name = "python-cas" },
     { name = "python-daemon" },
     { name = "python-dateutil" },
@@ -2426,6 +2427,7 @@ requires-dist = [
     { name = "pynacl", specifier = "==1.6.2" },
     { name = "pyopenssl", specifier = "==26.0.0" },
     { name = "pyotp", specifier = "==2.8.0" },
+    { name = "pypdf", specifier = "==6.14.2" },
     { name = "python-cas", specifier = "==1.6.0" },
     { name = "python-daemon", specifier = "==3.0.1" },
     { name = "python-dateutil", specifier = "==2.8.2" },
@@ -3617,6 +3619,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7e/f9/4c2ec78572a2d25f669220b8b9700c1133905ff6af9bf93c010778e82c65/pyotp-2.8.0.tar.gz", hash = "sha256:c2f5e17d9da92d8ec1f7de6331ab08116b9115adbabcba6e208d46fc49a98c5a", size = 16873 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/69/90/90c2b94fb8951ea3dce39dc43fdc62b328f6f665e6684b5149488e13d99b/pyotp-2.8.0-py3-none-any.whl", hash = "sha256:889d037fdde6accad28531fc62a790f089e5dfd5b638773e9ee004cce074a2e5", size = 12931 },
+]
+
+[[package]]
+name = "pypdf"
+version = "6.14.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/72/7dfd5ff1c9c37de97a731701f51af091325f123d9d4270361c9c69e4431f/pypdf-6.14.2.tar.gz", hash = "sha256:7873f502fe4385e79539b21d872392dc0c4e3714327c15881cbc7fbfd1f95b25", size = 6491182 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/49/e6/136aa8993a2ae7214e0b0ef2edaa0d2e08d1d4e4982635b08a835ff31ec8/pypdf-6.14.2-py3-none-any.whl", hash = "sha256:3f07891af76dc002657e04993ab9b4de81de29f9013b9761d0b7968bff12e946", size = 349514 },
 ]
 
 [[package]]

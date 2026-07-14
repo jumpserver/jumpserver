@@ -4,3 +4,4 @@ from .celery_default import *
 from .celery_combine import *
 from .flower import *
 from .gunicorn import *
+from .ai import *

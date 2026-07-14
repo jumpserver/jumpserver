@@ -31,6 +31,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
+        'chat_ai.authentication.ChatAIDelegationAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
