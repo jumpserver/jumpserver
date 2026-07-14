@@ -19,10 +19,10 @@ from settings.const import (
 )
 
 ANSIBLE_DOCKER_HELP_TEXT = _(
-    'Run Ansible jobs in Docker execution environment (%(image)s). '
-    'You can disable this option in System Settings - Feature Settings - Job Center - '
-    'Ansible Docker isolation to run locally. '
-    'If the image is missing, pull it on the ansible worker: '
+    'Run Ansible jobs in the Docker execution environment (%(image)s). '
+    'To run jobs locally instead, disable "Docker isolation for Ansible" under '
+    'System Settings > Feature Settings > Job Center. '
+    'If the image is missing, run this command on the Ansible worker: '
     'docker pull %(image)s'
 ) % {'image': ANSIBLE_EE_IMAGE}
 
@@ -215,7 +215,7 @@ class OpsSettingSerializer(serializers.Serializer):
     )
     ANSIBLE_DOCKER_ENABLED = serializers.BooleanField(
         required=False,
-        label=_('Ansible Docker isolation'),
+        label=_('Docker isolation for Ansible'),
         help_text=ANSIBLE_DOCKER_HELP_TEXT,
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(

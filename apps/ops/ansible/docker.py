@@ -69,9 +69,10 @@ def ensure_ansible_docker_image():
     result = safe_run_cmd(['docker', 'image', 'inspect', ANSIBLE_EE_IMAGE])
     if not result or result.returncode != 0:
         raise AnsibleDockerImageNotFound(
-            _('Ansible Docker image "%(image)s" not found. '
-              'You can disable this option in System Settings - Feature Settings - Job Center - '
-              'Ansible Docker isolation to run locally. '
-              'Please run: docker pull %(image)s')
+            _('The Ansible Docker image "%(image)s" was not found. '
+              'To run jobs locally instead, disable "Docker isolation for Ansible" under '
+              'System Settings > Feature Settings > Job Center. '
+              'To continue using the Docker execution environment, run this command on the '
+              'Ansible worker: docker pull %(image)s')
             % {'image': ANSIBLE_EE_IMAGE}
         )
