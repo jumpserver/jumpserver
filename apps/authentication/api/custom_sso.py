@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from rbac.models import SystemRole, SystemRoleBinding
-from common.utils import get_logger
+from common.utils import get_logger, safe_next_url
 from ..mixins import AuthMixin
 
 __all__  = ['CustomSSOLoginAPIView']
@@ -55,7 +55,7 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
         if user:
             login(request, user, backend=settings.AUTH_BACKEND_CUSTOM_SSO)
             self.send_auth_signal(success=True, user=user)
-            return HttpResponseRedirect(self.next_url)
+            return HttpResponseRedirect(safe_next_url(self.next_url, request=request))
         else:
             self.send_auth_signal(success=False, reason=error)
             return Response({'detail': error}, status=status.HTTP_401_UNAUTHORIZED)
