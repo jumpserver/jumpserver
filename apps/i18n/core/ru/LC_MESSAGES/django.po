@@ -9311,7 +9311,7 @@ msgstr "Указанный порт не используется службой
 #: settings/utils/ldap.py:547
 #, python-brace-format
 msgid "Please add certificate: {}"
-msgstr "Пожалуйста, добавьте сертификат"
+msgstr "Пожалуйста, добавьте сертификат: {}"
 
 #: settings/utils/ldap.py:551 settings/utils/ldap.py:578
 #: settings/utils/ldap.py:608 settings/utils/ldap.py:636
