@@ -1,8 +1,7 @@
-from common.utils import gen_key_pair, rsa_decrypt, rsa_encrypt
+from common.utils import gen_key_pair, reverse, rsa_decrypt, rsa_encrypt
 from django.test import RequestFactory, SimpleTestCase, override_settings
 
 from authentication.api.sso import SSOViewSet
-from common.utils import reverse
 from users.views.profile.password import UserVerifyPasswordView
 
 
@@ -25,7 +24,10 @@ class SSOLoginRedirectTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS=['testserver'])
     def test_scheme_relative_next_url_is_rejected(self):
-        request = self.factory.get('/api/v1/authentication/sso/login/', {'next': '//attacker.example.com'})
+        request = self.factory.get(
+            '/api/v1/authentication/sso/login/',
+            {'next': '//attacker.example.com'}
+        )
 
         self.assertEqual(SSOViewSet.get_safe_next_url(request), reverse('index'))
 
@@ -43,7 +45,10 @@ class UserVerifyPasswordRedirectTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS=['testserver'])
     def test_scheme_relative_next_url_is_rejected(self):
-        request = self.factory.get('/core/auth/password/verify/', {'next': '//attacker.example.com'})
+        request = self.factory.get(
+            '/core/auth/password/verify/',
+            {'next': '//attacker.example.com'}
+        )
         view = UserVerifyPasswordView()
         view.request = request
 
