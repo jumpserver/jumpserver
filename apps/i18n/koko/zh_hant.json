@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "該終端不支持人臉訪問規則，請使用web終端登錄",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "該終端不支持人臉識別認證，請使用web終端登錄。",
     "FailedCreateConnection": "創建連接失敗",
+    "File transfer error, file transfer interrupted": "檔案傳輸錯誤，檔案傳輸已中斷",
     "FileAlreadyExists": "檔案已存在",
     "FileListError": "獲取文件列表資訊失敗",
     "FileManagement": "文件管理",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "刷新最新的機器和節點信息",
     "select one asset to login": "選擇其中一個資產登錄",
     "to search login if unique": "搜索登錄（如果唯一）",
-    "to search, such as: /192.168": "搜尋，如：/192.168",
-    "File transfer error, file transfer interrupted": "檔案傳輸錯誤，檔案傳輸已中斷"
+    "to search, such as: /192.168": "搜尋，如：/192.168"
 }

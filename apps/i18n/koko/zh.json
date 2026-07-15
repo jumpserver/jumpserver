@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "该终端不支持人脸访问规则，请使用web终端登录",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "该终端不支持人脸识别认证，请使用web终端登录",
     "FailedCreateConnection": "创建连接失败",
+    "File transfer error, file transfer interrupted": "文件传输错误，文件传输已中断",
     "FileAlreadyExists": "文件已存在",
     "FileListError": "获取文件列表信息失败",
     "FileManagement": "文件管理",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "刷新最新的机器和节点信息",
     "select one asset to login": "选择其中一个资产登录",
     "to search login if unique": "搜索登录(如果唯一)",
-    "to search, such as: /192.168": "搜索，如：/192.168",
-    "File transfer error, file transfer interrupted": "文件传输错误，文件传输已中断"
+    "to search, such as: /192.168": "搜索，如：/192.168"
 }

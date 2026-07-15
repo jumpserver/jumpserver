@@ -62,6 +62,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "",
     "FailedCreateConnection": "Failed to create connection",
+    "File transfer error, file transfer interrupted": "文件传输错误，文件传输已中断",
     "FileAlreadyExists": "File already exists",
     "FileListError": "Failed to get file list",
     "FileManagement": "File Management",
@@ -226,6 +227,5 @@
     "refresh your assets and nodes": "",
     "select one asset to login": "",
     "to search login if unique": "",
-    "to search, such as: /192.168": "",
-    "File transfer error, file transfer interrupted": "文件传输错误，文件传输已中断"
+    "to search, such as: /192.168": ""
 }
