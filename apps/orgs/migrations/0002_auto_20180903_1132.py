@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='members',
-            field=models.ManyToManyField(related_name='orgs', through='rbac.RoleBinding', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(related_name='orgs', through='rbac.RoleBinding', through_fields=('org', 'user'), to=settings.AUTH_USER_MODEL),
         ),
     ]

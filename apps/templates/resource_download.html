@@ -17,46 +17,24 @@ p {
 </style>
     <div style="margin: 0 200px">
     <div class="group">
-        <h2>JumpServer {% trans 'Client' %} {{ CLIENT_VERSION }}</h2>
+        <h2>{{ VENDOR }} {% trans 'Client' %} {{ CLIENT_VERSION }}</h2>
         <p>
-            {% trans 'JumpServerClient, currently used to launch the client' %}
+            {% trans 'Client, currently used to launch the client' %}
         </p>
         <ul>
-            <li> <a href="/download/public/JumpServerClient_{{ CLIENT_VERSION }}_x64_en-US.msi">JumpServerClient_{{ CLIENT_VERSION }}_x64_en-US.msi</a></li>
-            <li> <a href="/download/public/JumpServerClient_{{ CLIENT_VERSION }}_x64-setup.exe">JumpServerClient_{{ CLIENT_VERSION }}_x64-setup.exe</a></li>
-            <li> <a href="/download/public/JumpServerClient_{{ CLIENT_VERSION }}_aarch64.dmg">JumpServerClient_{{ CLIENT_VERSION }}_aarch64.dmg</a></li>
-            <li> <a href="/download/public/JumpServerClient_{{ CLIENT_VERSION }}_x64.dmg">JumpServerClient_{{ CLIENT_VERSION }}_x64.dmg</a></li>
-            <li> <a href="/download/public/JumpServerClient_{{ CLIENT_VERSION }}_amd64.AppImage">JumpServerClient_{{ CLIENT_VERSION }}_amd64.AppImage</a></li>
-            <li> <a href="/download/public/JumpServerClient_{{ CLIENT_VERSION }}_amd64.deb">JumpServerClient_{{ CLIENT_VERSION }}_amd64.deb</a></li>
-            <li> <a href="/download/public/JumpServerClient-{{ CLIENT_VERSION }}-1.x86_64.rpm">JumpServerClient-{{ CLIENT_VERSION }}-1.x86_64.rpm</a></li>
+            <li> <a href="/download/public/Client_{{ CLIENT_VERSION }}_x64-setup.exe">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_x64-setup.exe</a></li>
+            <li> <a href="/download/public/Client_{{ CLIENT_VERSION }}_aarch64.dmg">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_aarch64.dmg</a></li>
         </ul>
     </div>
 
+    {% if MORE_DOWNLOADS_URL %}
     <div class="group">
-        <h2>{% trans 'Microsoft' %} RDP {% trans 'Official' %}{% trans 'Client' %} v10.6.7</h2>
-        <p>
-            {% trans 'macOS needs to download the client to connect RDP asset, which comes with Windows' %}
-        </p>
+        <h2> {% trans 'More download' %} </h2>
         <ul>
-            <li><a href="/download/public/Microsoft_Remote_Desktop_{{ MRD_VERSION }}_installer.pkg">microsoft-remote-desktop-installer.pkg</a></li>
+            <li><a href="{{ MORE_DOWNLOADS_URL }}">{% trans 'Tools and applications' %}</a></li>
         </ul>
     </div>
-
-    <div class="group">
-        <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
-            <p>{% trans 'OpenSSH is a program used to connect remote applications in the Windows Remote Application Publisher' %}</p>
-            <ul>
-                <li><a href="/download/public/OpenSSH-Win64-{{ OPENSSH_VERSION }}.msi">openSSH-win64.msi</a></li>
-            </ul>
-    </div>
-
-    <div class="group">
-        <h2>JumpServer {% trans 'Offline video player' %} v{{ VIDEO_PLAYER_VERSION }}</h2>
-        <ul>
-            <li><a href="/download/public/JumpServerVideoPlayer-{{ VIDEO_PLAYER_VERSION }}.dmg">jumpserver-video-player.dmg</a></li>
-            <li><a href="/download/public/JumpServerVideoPlayer-{{ VIDEO_PLAYER_VERSION }}.exe">jumpserver-video-player.exe</a></li>
-        </ul>
-    </div>
+    {% endif %}
 </div>
     <style>
     ul {

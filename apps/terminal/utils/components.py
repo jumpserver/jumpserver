@@ -106,7 +106,7 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
     def get_component_status_metrics(self):
         prometheus_metrics = list()
         # 各组件状态个数汇总
-        prometheus_metrics.append('# JumpServer 各组件状态个数汇总')
+        prometheus_metrics.append('# 各组件状态个数汇总')
         status_metric_text = 'jumpserver_components_status_total{component_type="%s", status="%s"} %s'
         for metric in self.metrics:
             tp = metric['type']
@@ -120,7 +120,7 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
     def get_component_session_metrics(self):
         prometheus_metrics = list()
         # 各组件在线会话数汇总
-        prometheus_metrics.append('# JumpServer 各组件在线会话数汇总')
+        prometheus_metrics.append('# 各组件在线会话数汇总')
         session_active_metric_text = 'jumpserver_components_session_active_total{component_type="%s"} %s'
 
         for metric in self.metrics:
@@ -133,7 +133,7 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
     def get_component_stat_metrics(self):
         prometheus_metrics = list()
         # 各组件节点指标
-        prometheus_metrics.append('# JumpServer 各组件一些指标')
+        prometheus_metrics.append('# 各组件一些指标')
         state_metric_text = 'jumpserver_components_%s{component_type="%s", component="%s"} %s'
         stats_key = [
             'cpu_load', 'memory_used', 'disk_used', 'session_online'

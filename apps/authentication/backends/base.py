@@ -3,6 +3,8 @@ from django.contrib.auth.backends import ModelBackend
 
 from common.utils import get_logger
 from users.models import User
+from authentication.signals import backend_auth_failed
+from authentication.errors import reason_choices, reason_user_invalid
 
 UserModel = get_user_model()
 logger = get_logger(__file__)
@@ -65,3 +67,17 @@ class JMSBaseAuthBackend:
 class JMSModelBackend(JMSBaseAuthBackend, ModelBackend):
      def user_can_authenticate(self, user):
         return True
+
+
+class RedirectAuthBackend(JMSBaseAuthBackend):
+    backend = None
+
+    def send_backend_auth_failed_signal(self, request, username=None, reason=None):
+        default_reason = reason_choices.get(reason_user_invalid, reason)
+        reason_code = reason_user_invalid if reason is None else ''
+        if reason in reason_choices:
+            reason_code = reason
+        backend_auth_failed.send(
+            sender=self.__class__, username=username, request=request,
+            reason=default_reason, backend=self.backend, reason_code=reason_code
+        )

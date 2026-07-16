@@ -46,25 +46,28 @@
 <script>
     var message = ''
     var time = '{{ interval }}'
-    {% if error %}
-        message = '{{ error }}'
-    {% else %}
+    var error = '{{ error }}'
+    var auto_redirect = '{{ auto_redirect }}'
+
+    if (error) {
+        message = error
+    } else {
         message = '{{ message|safe }}'
-    {% endif %}
+    }
 
     function redirect_page() {
-        if (time >= 0) {
+        if (time > 0) {
             var msg = message + '， <b>' + time + '</b> ...';
             $('#messages').html(msg);
             time--;
             setTimeout(redirect_page, 1000);
         } else {
-            window.location.href = "{{ redirect_url }}";
+            window.location.href = '{{ redirect_url|escapejs }}';
         }
     }
-    {% if auto_redirect %}
+
+    if (auto_redirect) {
         window.onload = redirect_page;
-    {% endif %}
+    }
 </script>
 {% endblock %}
-

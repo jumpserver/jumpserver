@@ -9,15 +9,9 @@ from ops.celery import app
 from ops.models import CeleryTask, CeleryTaskExecution
 
 __all__ = [
-    'CeleryResultSerializer', 'CeleryTaskExecutionSerializer',
-    'CeleryPeriodTaskSerializer', 'CeleryTaskSerializer'
+    'CeleryTaskExecutionSerializer', 'CeleryPeriodTaskSerializer',
+    'CeleryTaskSerializer'
 ]
-
-
-class CeleryResultSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    result = serializers.JSONField()
-    state = serializers.CharField(max_length=16)
 
 
 class CeleryPeriodTaskSerializer(serializers.ModelSerializer):

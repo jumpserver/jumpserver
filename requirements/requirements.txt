@@ -1,0 +1,1 @@
+requests-unixsocket==0.4.1

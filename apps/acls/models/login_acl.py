@@ -20,6 +20,9 @@ class LoginACL(UserBaseACL):
     def is_action(self, action):
         return self.action == action
 
+    def is_user_in_reviewers(self, user):
+        return self.reviewers.filter(id=user.id).exists()
+    
     def create_confirm_ticket(self, request, user):
         from tickets import const
         from tickets.models import ApplyLoginTicket

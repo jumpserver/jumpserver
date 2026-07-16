@@ -12,7 +12,7 @@ class LogMixin(object):
     @staticmethod
     def _clean_params(query_params):
         clean_params = {}
-        ignore_params = ('format', 'order')
+        ignore_params = ('format', 'order', 'export_mode')
         for key, value in dict(query_params).items():
             if key in ignore_params:
                 continue

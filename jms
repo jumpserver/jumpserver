@@ -20,7 +20,14 @@ sys.path.insert(0, APP_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
 django.setup()
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+try:
+    from django.conf import settings
+    log_level = logging.DEBUG if settings.DEBUG_DEV else logging.INFO
+except Exception as e:
+    print("Load settings error: {}".format(e))
+    log_level = logging.INFO
+
+logging.basicConfig(level=log_level, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 try:
     from jumpserver import const
@@ -43,11 +50,6 @@ except ImportError as e:
     sys.exit(1)
 
 os.environ["PYTHONIOENCODING"] = "UTF-8"
-
-logging.basicConfig(
-    format='%(asctime)s %(message)s', level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
 
 logger = logging.getLogger()
 

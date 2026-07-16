@@ -51,12 +51,13 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
         user = None
         user_attr = self.client.get_user_detail(user_id, **kwargs)
         try:
+            exists = User.objects.filter(username=user_attr['username']).exists()
+            if not check_only_allow_exist_user_auth(not exists):
+                return None, (self.msg_client_err, self.request.error_message)
+
             user, create = User.objects.get_or_create(
                 username=user_attr['username'], defaults=user_attr
             )
-
-            if not check_only_allow_exist_user_auth(create):
-                return user, (self.msg_client_err, self.request.error_message)
 
             setattr(user, f'{self.user_type}_id', user_id)
             if create:

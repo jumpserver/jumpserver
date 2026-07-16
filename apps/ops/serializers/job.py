@@ -117,8 +117,10 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
             raise serializers.ValidationError(_("You do not have permission for the current job."))
         return job_obj
 
-    @staticmethod
-    def validate_parameters(parameters):
+    def validate_parameters(self, parameters):
+        return self.transform_parameters(parameters)
+    
+    def transform_parameters(self, parameters):
         prefix = "jms_"
         new_parameters = {}
         for key, value in parameters.items():
@@ -126,3 +128,22 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
                 key = prefix + key
             new_parameters[key] = value
         return new_parameters
+    
+    def get_job_default_parameters(self, job):
+        try:
+            vars = job.variable.all()
+            parameters = {var.var_name: var.default_value for var in vars}
+            return self.transform_parameters(parameters)
+        except AttributeError:
+            return {}
+    
+    def update_parameters(self, attrs):
+        job = attrs.get('job')
+        job_params = self.get_job_default_parameters(job)
+        input_params = attrs.get('parameters', {})
+        job_params.update(input_params)
+        attrs['parameters'] = job_params
+    
+    def validate(self, attrs):
+        self.update_parameters(attrs)
+        return super().validate(attrs)

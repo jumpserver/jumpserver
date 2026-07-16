@@ -63,6 +63,8 @@ def clean_historical_accounts():
     if settings.HISTORY_ACCOUNT_CLEAN_LIMIT >= 999:
         return
     limit = settings.HISTORY_ACCOUNT_CLEAN_LIMIT
+    limit += 1  # 因为当前账号的密码是最新的那条历史记录，因此保留 n 条历史，实际上应该保留 n+1 条历史记录
+    
 
     history_ids_to_be_deleted = []
     history_model = Account.history.model

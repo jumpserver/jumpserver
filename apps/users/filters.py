@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
-from common.utils import is_uuid
+from common.utils import is_uuid, text_hmac_sha256
 from rbac.models import Role, OrgRoleBinding, SystemRoleBinding
 from users.models.user import User
 
@@ -20,18 +20,23 @@ class UserFilter(BaseFilterSet):
     )
     is_expired = filters.BooleanFilter(method='filter_is_expired')
     is_valid = filters.BooleanFilter(method='filter_is_valid')
-    is_password_expired = filters.BooleanFilter(method='filter_long_time')
+    is_password_expired = filters.BooleanFilter(method='filter_is_password_expired')
     is_long_time_no_login = filters.BooleanFilter(method='filter_long_time')
     is_login_blocked = filters.BooleanFilter(method='filter_is_blocked')
+    email = filters.CharFilter(method='filter_email')
 
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'email', 'name',
+            'id', 'username', 'name', 'ukey_sn',
             'groups', 'group_id', 'exclude_group_id',
             'source', 'org_roles', 'system_roles',
             'is_active', 'is_first_login', 'mfa_level'
         )
+
+    def filter_email(self, queryset, name, value):
+        q = Q(email_lookup=text_hmac_sha256(value))
+        return queryset.filter(q)
 
     def filter_is_blocked(self, queryset, name, value):
         from users.utils import LoginBlockUtil
@@ -41,28 +46,41 @@ class UserFilter(BaseFilterSet):
         else:
             queryset = queryset.exclude(username__in=usernames)
         return queryset
+    
+    def filter_is_password_expired(self, queryset, name, value):
+        now = timezone.now()
+        key = 'date_password_last_updated'
+        if value:
+            operator = 'lt'
+        else:            
+            operator = 'gt'
+
+        admins = User.get_super_and_org_admins()
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN
+        admins_date_expired = now - timezone.timedelta(days=int(interval))
+        admins_q = Q(**{f'{key}__{operator}': admins_date_expired})
+        admins_ids = admins.filter(admins_q).values_list('id', flat=True)
+
+        users = User.get_org_users(exclude_admins=True)
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        users_date_expired = now - timezone.timedelta(days=int(interval))
+        users_q = Q(**{f'{key}__{operator}': users_date_expired})
+        users_ids = users.filter(users_q).values_list('id', flat=True)
+
+        q = Q(id__in=admins_ids) | Q(id__in=users_ids) | Q(**{f'{key}__isnull': True})
+        return queryset.filter(q)
 
     def filter_long_time(self, queryset, name, value):
-        now = timezone.now()
-        if name == 'is_password_expired':
-            interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
-        else:
-            interval = 30
-        date_expired = now - timezone.timedelta(days=int(interval))
+        if not value:
+            return queryset
 
-        if name == 'is_password_expired':
-            key = 'date_password_last_updated'
-        elif name == 'is_long_time_no_login':
-            key = 'last_login'
-        else:
-            raise ValueError('Invalid filter name')
+        no_login_days = self.request.GET.get('no_login_days', 30)
+        cutoff_time = timezone.now() - timezone.timedelta(days=int(no_login_days))
 
-        if value:
-            kwargs = {f'{key}__lt': date_expired}
-        else:
-            kwargs = {f'{key}__gt': date_expired}
-        q = Q(**kwargs) | Q(**{f'{key}__isnull': True})
-        return queryset.filter(q)
+        return queryset.filter(
+            Q(last_login__lt=cutoff_time) |
+            Q(last_login__isnull=True)
+        )
 
     def filter_is_valid(self, queryset, name, value):
         if value:

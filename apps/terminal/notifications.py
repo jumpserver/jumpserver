@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.sdk.im.wecom import wecom_tool
 from common.utils import get_logger, reverse
-from common.utils import lazyproperty
+from common.utils import lazyproperty, text_hmac_sha256
 from common.utils.timezone import local_now_display
 from common.views.template import custom_render_to_string
 from notifications.backends import BACKEND
@@ -62,8 +62,9 @@ class CommandAlertMixin:
             emails = settings.SECURITY_INSECURE_COMMAND_EMAIL_RECEIVER
         emails = emails.split(',')
         emails = [email.strip().strip('"') for email in emails]
+        email_lookup_list = [text_hmac_sha256(email) for email in emails]
 
-        users = User.objects.filter(email__in=emails)
+        users = User.objects.filter(email_lookup__in=email_lookup_list)
         if users:
             subscription.users.add(*users)
             subscription.receive_backends = [BACKEND.EMAIL]
@@ -158,10 +159,17 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     def gen_html_string(self, **other_context) -> dict:
         command = self.command
         level = RiskLevelChoices.get_label(command['risk_level'])
+        cmd_acl = command.get('_cmd_filter_acl')
+        cmd_group = command.get('_cmd_group')
+        cmd_acl_name = cmd_acl.name if cmd_acl else ''
+        cmd_group_name = cmd_group.name if cmd_group else ''
         items = {
             _("Asset"): command['asset'],
             _("User"): command['user'],
             _("Level"): level,
+            _("Protocol"): command.get('_protocol', ''),
+            _("Remote addr"): command.get('_remote_addr', ''),
+            _("Policy"): cmd_acl_name or cmd_group_name or '',
             _("Date"): local_now_display(),
         }
         context = {
@@ -218,10 +226,17 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
     def gen_html_string(self, **other_context):
         command = self.command
         level = RiskLevelChoices.get_label(command['risk_level'])
+        cmd_acl = command.get('_cmd_filter_acl')
+        cmd_group = command.get('_cmd_group')
+        cmd_acl_name = cmd_acl.name if cmd_acl else ''
+        cmd_group_name = cmd_group.name if cmd_group else ''
 
         items = {
             _("User"): command['user'],
             _("Level"): level,
+            _("Protocol"): command.get('_protocol', ''),
+            _("Remote addr"): command.get('_remote_addr', ''),
+            _("Policy"): cmd_acl_name or cmd_group_name or '',
             _("Date"): local_now_display(),
         }
         context = {

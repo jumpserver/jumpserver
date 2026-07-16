@@ -35,7 +35,7 @@ class SAML2SettingSerializer(serializers.Serializer):
         required=False, label=_('User attribute'),
         help_text=_(
             "User attribute mapping, where the `key` is the SAML2 service user attribute name "
-            "and the `value` is the JumpServer user attribute name"
+            "and the `value` is this system user attribute name"
         )
     )
     SAML2_LOGOUT_COMPLETELY = serializers.BooleanField(

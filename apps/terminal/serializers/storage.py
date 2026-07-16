@@ -200,7 +200,7 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
         help_text=_('Whether to create an index by date')
     )
     INDEX = serializers.CharField(
-        max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
+        max_length=1024, default='pam', label=_('Index'), allow_null=True
     )
     DOC_TYPE = ReadableHiddenField(default='_doc', label=_('Doc type'), allow_null=True)
     IGNORE_VERIFY_CERTS = serializers.BooleanField(

@@ -1,6 +1,7 @@
 import phonenumbers
 import pycountry
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from phonenumbers import PhoneMetadata
 
@@ -70,14 +71,26 @@ class Status(models.TextChoices):
 
 class Language(models.TextChoices):
     en = 'en', 'English'
-    zh_hans = 'zh-hans', '中文(简体)'
-    zh_hant = 'zh-hant', '中文(繁體)'
+    zh_hans = 'zh-hans', '中文（简体）'
+    zh_hant = 'zh-hant', '中文（繁體）'
     ja = 'ja', '日本語',
     pt_br = 'pt-br', 'Português (Brasil)'
     es = 'es', 'Español'
     ru = 'ru', 'Русский'
     ko = 'ko', '한국어'
     vi = 'vi', 'Tiếng Việt'
+
+    @classmethod
+    def choices_supported(cls):
+        _choices = []
+        code_mapper = cls.get_code_mapper()
+        supported = [ code_mapper.get(code, code) for code in settings.LANGUAGES_SUPPORTED ]
+        for code, label in cls.choices:
+            if code in supported:
+                _choices.append((code, label))
+        if not _choices:
+            return cls.choices
+        return _choices
 
     @classmethod
     def get_code_mapper(cls):

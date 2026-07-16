@@ -2,8 +2,8 @@ import os
 import shutil
 import subprocess
 import time
-from xml.etree import ElementTree
-from xml.sax import SAXException
+from defusedxml import ElementTree
+from defusedxml.common import DefusedXmlException
 
 import win32api
 
@@ -53,7 +53,7 @@ class AppletApplication(BaseApplication):
 
     @staticmethod
     def _write_config(config_file, config):
-        with open(config_file, 'w')as f:
+        with open(config_file, 'w') as f:
             for key, value in config.items():
                 f.write(f'{key}={value}\n')
 
@@ -85,7 +85,7 @@ class AppletApplication(BaseApplication):
         driver_yml_file = os.path.join(driver_yml_path, 'drivers.xml')
         try:
             self._merge_driver_xml('./config/drivers.xml', driver_yml_file)
-        except (SAXException, FileNotFoundError):
+        except (DefusedXmlException, FileNotFoundError):
             os.makedirs(driver_yml_path, exist_ok=True)
             shutil.copy('./config/drivers.xml', driver_yml_file)
 
@@ -116,7 +116,7 @@ class AppletApplication(BaseApplication):
                         f'host={self.host}|' \
                         f'port={self.port}|' \
                         f'database={self.db}|' \
-                        f'"user={self.username}"|' \
+                        f'user={self.username}|' \
                         f'password={self.password}|' \
                         f'save=false|' \
                         f'connect=true'
@@ -148,8 +148,7 @@ class AppletApplication(BaseApplication):
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
         startupinfo.wShowWindow = subprocess.SW_HIDE
-        exec_string = '%s -con %s' % (self.path, params)
-        ret = subprocess.Popen(exec_string, startupinfo=startupinfo)
+        ret = subprocess.Popen([self.path, '-con', params], startupinfo=startupinfo)
         self.pid = ret.pid
 
     def wait(self):

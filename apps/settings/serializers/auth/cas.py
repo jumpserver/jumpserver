@@ -34,7 +34,7 @@ class CASSettingSerializer(serializers.Serializer):
         required=False, label=_('User attribute'),
         help_text=_(
             "User attribute mapping, where the `key` is the CAS service user attribute name "
-            "and the `value` is the JumpServer user attribute name"
+            "and the `value` is this system user attribute name"
         )
     )
     CAS_ORG_IDS = OrgListField()

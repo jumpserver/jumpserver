@@ -12,6 +12,7 @@ class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
     INTERFACE = serializers.DictField()
     LANGUAGES = serializers.ListField()
+    VENDOR = serializers.CharField()
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):
@@ -21,7 +22,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     TICKET_AUTHORIZE_DEFAULT_TIME_UNIT = serializers.CharField()
     AUTH_LDAP_SYNC_ORG_IDS = serializers.ListField()
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField()
-    SECURITY_ACCOUNT_SECRET_READ = serializers.BooleanField()
+    SECURITY_DISABLE_VIEW_SECRET = serializers.BooleanField()
     SECURITY_VIEW_AUTH_NEED_MFA = serializers.BooleanField()
     SECURITY_MFA_AUTH = serializers.IntegerField()
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField()
@@ -86,6 +87,13 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     PRIVACY_MODE = serializers.BooleanField()
     CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField()
+
+    JDMC_ENABLED = serializers.BooleanField()
+    FLOWER_ENABLED = serializers.BooleanField()
+    REMOTE_APP_STORE_URL = serializers.CharField()
+    VENDOR = serializers.CharField()
+
+    AUTH_UKEY = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

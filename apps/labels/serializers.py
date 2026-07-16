@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.validators import ProjectUniqueValidator
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .const import label_resource_types
 from .models import Label, LabeledResource
@@ -30,6 +31,16 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
 
     def validate_value(self, value):
         return self.validate_name(value)
+
+    @classmethod
+    def validate_name_value(cls, name, value):
+        serializer = cls(data={'name': name, 'value': value})
+        serializer.validators = [
+            v for v in serializer.validators
+            if not isinstance(v, (serializers.UniqueTogetherValidator, ProjectUniqueValidator))
+        ]
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data
 
     @classmethod
     def setup_eager_loading(cls, queryset):

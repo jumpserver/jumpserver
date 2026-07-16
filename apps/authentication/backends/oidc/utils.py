@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.utils.encoding import force_bytes, smart_bytes
+from django.utils.encoding import force_bytes
 from jwkest import JWKESTException
 from jwkest.jwk import KEYS
 from jwkest.jws import JWS
@@ -58,7 +58,7 @@ def _get_jwks_keys(shared_key):
     # Adds the shared key (which can correspond to the client_secret) as an oct key so it can be
     # used for HMAC signatures.
     logger.debug(log_prompt.format('Add key'))
-    jwks_keys.add({'key': smart_bytes(shared_key), 'kty': 'oct'})
+    jwks_keys.add({'key': force_bytes(shared_key), 'kty': 'oct'})
     logger.debug(log_prompt.format('End'))
     return jwks_keys
 

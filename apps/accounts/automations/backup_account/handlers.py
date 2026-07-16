@@ -86,6 +86,7 @@ class BaseAccountHandler:
 class AssetAccountHandler(BaseAccountHandler):
     @staticmethod
     def get_filename(name):
+        name = name.replace('/', '-')
         filename = os.path.join(
             PATH, f'{name}-{local_now_filename()}-{time.time()}.xlsx'
         )

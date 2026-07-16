@@ -1,6 +1,9 @@
+import os
 import re
 import signal
+import sys
 import time
+import traceback
 from functools import wraps
 
 import paramiko
@@ -64,9 +67,9 @@ def raise_timeout(name=''):
                     signal.signal(signal.SIGALRM, handler)
                     signal.alarm(timeout)
                 return func(self, *args, **kwargs)
-            except Exception as error:
-                signal.alarm(0)
-                raise error
+            finally:
+                if timeout > 0:
+                    signal.alarm(0)
 
         return wrapper
 
@@ -77,6 +80,38 @@ def _strip_wrapping_quotes(value):
     if value and len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
         return value[1:-1]
     return value
+
+
+def normalize_gateway_args_for_legacy_parser(gateway_args):
+   
+    return re.sub(
+        r'(-W\s+%h:%p\s+-q)\s+--\s+([^@\s]+@[^\'"\s]+)([\'"]?)',
+        r'\2 \1\3',
+        gateway_args,
+    )
+
+
+def _build_switch_state_re():
+    return re.compile(
+        r'__JMS_SWITCH__:[^\r\n]*',
+        flags=re.IGNORECASE,
+    )
+
+
+def _shorten_text(value, limit=300):
+    if value is None:
+        return value
+    text = str(value).replace('\r', '\\r').replace('\n', '\\n')
+    if len(text) <= limit:
+        return text
+    return text[:limit] + f'...<{len(text)} chars>'
+
+
+def _extract_switch_state(output):
+    if not output:
+        return None
+    matches = re.findall(r'__JMS_SWITCH__:[^\r\n]*', output)
+    return matches[-1] if matches else None
 
 
 class OldSSHTransport(paramiko.transport.Transport):
@@ -98,12 +133,48 @@ class SSHClient:
         self.gateway_server = None
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.debug_enabled = (
+            str(os.environ.get('JMS_REMOTE_CLIENT_DEBUG', '')).lower()
+            in {'1', 'true', 'yes', 'on'}
+        )
         self.connect_params = self.get_connect_params()
         self._channel = None
 
         self.buffer_size = 1024
         self.prompt = self.module.params['prompt']
         self.timeout = self.module.params['recv_timeout']
+        self._debug(
+            'init',
+            login_host=self.module.params.get('login_host'),
+            login_port=self.module.params.get('login_port'),
+            login_user=self.module.params.get('login_user'),
+            become=self.module.params.get('become'),
+            become_method=self.module.params.get('become_method'),
+            become_user=self.module.params.get('become_user'),
+            has_gateway=bool(self.module.params.get('gateway_args')),
+            old_ssh_version=self.module.params.get('old_ssh_version'),
+        )
+
+    def _debug(self, event, **kwargs):
+        if not self.debug_enabled:
+            return
+        details = ', '.join(
+            f'{key}={_shorten_text(value)}'
+            for key, value in kwargs.items()
+        )
+        message = f'[remote_client] {event}'
+        if details:
+            message += f' | {details}'
+        print(message, file=sys.stderr, flush=True)
+
+    def _sanitize_command(self, command):
+        secrets = {
+            self.module.params.get('login_password'),
+            self.module.params.get('become_password'),
+        }
+        if command and command in secrets:
+            return '<redacted>'
+        return command
 
     @property
     def channel(self):
@@ -113,13 +184,22 @@ class SSHClient:
 
     def get_connect_params(self):
         p = self.module.params
+        connect_timeout = p.get('recv_timeout', 60)
         params = {
             'allow_agent': False,
             'look_for_keys': False,
             'hostname': p['login_host'],
             'port': p['login_port'],
-            'key_filename': p['login_private_key_path'] or None
+            'key_filename': p['login_private_key_path'] or None,
         }
+        if connect_timeout:
+            # Keep Paramiko connect/auth/banner waits bounded by the same
+            # timeout budget as command receive so a bad host returns promptly.
+            params.update(
+                timeout=connect_timeout,
+                auth_timeout=connect_timeout,
+                banner_timeout=connect_timeout,
+            )
 
         if p['become']:
             params['username'] = p['become_user']
@@ -133,15 +213,31 @@ class SSHClient:
         if p['old_ssh_version']:
             params['transport_factory'] = OldSSHTransport
 
+        self._debug(
+            'connect params prepared',
+            hostname=params.get('hostname'),
+            port=params.get('port'),
+            username=params.get('username'),
+            has_password=bool(params.get('password')),
+            key_filename=params.get('key_filename'),
+            transport_factory=getattr(params.get('transport_factory'), '__name__', None),
+        )
         return params
 
     def switch_user(self):
         p = self.module.params
         if not p['become']:
+            self._debug('switch user skipped', reason='become disabled')
             return
 
         method = p['become_method']
         username = p['login_user']
+        self._debug(
+            'switch user start',
+            method=method,
+            connect_as=self.connect_params.get('username'),
+            target_user=username,
+        )
 
         if method == 'sudo':
             switch_cmd = 'sudo su -'
@@ -150,22 +246,69 @@ class SSHClient:
             switch_cmd = 'su -'
             pword = p['login_password']
         else:
+            self._debug('switch user unsupported', method=method)
             self.module.fail_json(msg=f'Become method {method} not supported.')
             return
 
-        # Expected to see a prompt, type the password, and check the username
-        output, error = self.execute(
-            [f'{switch_cmd} {username}', pword, 'whoami'],
-            [become_prompt_re, DEFAULT_RE, username]
+        # Username-based verification is unreliable for UID 0 alias accounts:
+        # `su - useradmin` may legitimately land in a shell that reports
+        # `root/root` for USER and LOGNAME. Compare shell state before and
+        # after `su` instead; if password auth fails, the marker runs in the
+        # original shell and the state stays unchanged.
+        switch_state_cmd = 'printf "__JMS_SWITCH__:%s:%s:%s\\n" "$USER" "$LOGNAME" "$HOME"'
+        switch_state_re = _build_switch_state_re()
+
+        baseline_output, baseline_error = self.execute(
+            [switch_state_cmd],
+            [switch_state_re]
         )
+        baseline_state = _extract_switch_state(baseline_output)
+        self._debug(
+            'switch user baseline',
+            output=baseline_output,
+            error=baseline_error,
+            state=baseline_state,
+        )
+        if baseline_error:
+            self.module.fail_json(msg=f'Failed to capture shell state before switching user. Output: {baseline_output}')
+
+        # Expected to see a prompt, type the password, and verify the target
+        # shell state is no longer the original login shell.
+        output, error = self.execute(
+            [f'{switch_cmd} {username}', pword, switch_state_cmd],
+            [become_prompt_re, DEFAULT_RE, switch_state_re]
+        )
+        switched_state = _extract_switch_state(output)
+        self._debug('switch user result', output=output, error=error)
         if error:
             self.module.fail_json(msg=f'Failed to become user {username}. Output: {output}')
+        if baseline_state == switched_state:
+            self.module.fail_json(
+                msg=(
+                    f'Failed to become user {username}. '
+                    f'Shell state did not change. Output: {output}'
+                )
+            )
 
     def connect(self):
-        self.before_runner_start()
         try:
+            self._debug(
+                'connect start',
+                hostname=self.connect_params.get('hostname'),
+                port=self.connect_params.get('port'),
+                username=self.connect_params.get('username'),
+            )
+            self.before_runner_start()
+            self._debug(
+                'connect after gateway prepare',
+                hostname=self.connect_params.get('hostname'),
+                port=self.connect_params.get('port'),
+                username=self.connect_params.get('username'),
+            )
             self.client.connect(**self.connect_params)
+            self._debug('client.connect ok')
             self._channel = self.client.invoke_shell()
+            self._debug('invoke_shell ok')
             # Always perform a gentle handshake that works for servers and
             # network devices: drain banner, brief settle, send newline, then
             # read in quiet mode to avoid blocking on missing prompt.
@@ -181,7 +324,13 @@ class SSHClient:
                 pass
             self._get_match_recv()
             self.switch_user()
+            self._debug('connect complete')
         except Exception as error:
+            self._debug(
+                'connect failed',
+                error=str(error),
+                traceback=traceback.format_exc(),
+            )
             self.module.fail_json(msg=str(error))
 
     @staticmethod
@@ -242,6 +391,12 @@ class SSHClient:
             prev_str = buffer_str
             time.sleep(0.01)
 
+        self._debug(
+            'recv complete',
+            use_regex_match=use_regex_match,
+            check_reg=check_reg,
+            output=buffer_str,
+        )
         return buffer_str
 
     @raise_timeout('Wait send message')
@@ -256,29 +411,56 @@ class SSHClient:
 
         try:
             answers = self._fit_answers(commands, answers)
-            for cmd, ans_regex in zip(commands, answers):
+            self._debug('execute start', total_commands=len(commands))
+            for index, (cmd, ans_regex) in enumerate(zip(commands, answers), start=1):
                 self._check_send()
+                self._debug(
+                    'execute send',
+                    index=index,
+                    command=self._sanitize_command(cmd),
+                    answer_reg=ans_regex,
+                )
                 self.channel.send(cmd + '\n')
-                combined_output += self._get_match_recv(ans_regex) + '\n'
+                output = self._get_match_recv(ans_regex)
+                combined_output += output + '\n'
+                self._debug('execute recv', index=index, output=output)
 
         except Exception as e:
             error_msg = str(e)
+            self._debug(
+                'execute failed',
+                error=error_msg,
+                traceback=traceback.format_exc(),
+            )
 
         return combined_output, error_msg
 
     def local_gateway_prepare(self):
         gateway_args = self.module.params['gateway_args'] or ''
+        gateway_args = normalize_gateway_args_for_legacy_parser(gateway_args)
         pattern = (
             r"(?:sshpass -p ([^ ]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+"
             r"([^@\s]+)@([^\s]+)\s+-W %h:%p -q(?: -i ([^']+))?'"
         )
         match = re.search(pattern, gateway_args)
         if not match:
+            if gateway_args:
+                self._debug('gateway parse skipped', gateway_args=gateway_args)
             return
 
         password, port, username, remote_addr, key_path = match.groups()
         password = _strip_wrapping_quotes(password) or None
         key_path = _strip_wrapping_quotes(key_path) or None
+        self._debug(
+            'gateway parsed',
+            gateway_host=remote_addr,
+            gateway_port=port,
+            gateway_user=username,
+            has_password=bool(password),
+            key_path=key_path,
+            remote_bind_host=self.module.params['login_host'],
+            remote_bind_port=self.module.params['login_port'],
+        )
 
         server = SSHTunnelForwarder(
             (remote_addr, int(port)),
@@ -291,14 +473,25 @@ class SSHClient:
             )
         )
 
-        server.start()
+        try:
+            server.start()
+        except Exception:
+            self._debug('gateway start failed', traceback=traceback.format_exc())
+            raise
         self.connect_params['hostname'] = '127.0.0.1'
         self.connect_params['port'] = server.local_bind_port
         self.gateway_server = server
+        self._debug(
+            'gateway start ok',
+            local_bind_host=self.connect_params['hostname'],
+            local_bind_port=self.connect_params['port'],
+        )
 
     def local_gateway_clean(self):
         if self.gateway_server:
+            self._debug('gateway stop start')
             self.gateway_server.stop()
+            self._debug('gateway stop ok')
 
     def before_runner_start(self):
         self.local_gateway_prepare()
@@ -317,4 +510,4 @@ class SSHClient:
             if self.client:
                 self.client.close()
         except Exception:  # noqa
-            pass
+            self._debug('cleanup failed', traceback=traceback.format_exc())

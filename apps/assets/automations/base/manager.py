@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import time
 from collections import defaultdict
@@ -25,6 +26,14 @@ from ops.ansible.interface import interface
 from users.utils import activate_user_language
 
 logger = get_logger(__name__)
+
+BULK_SIZE = 80
+RUNTIME_DIR_UNSAFE_CHARS = re.compile(r'[\s/\\:<>|"?*\x00-\x1f]+')
+
+
+def safe_runtime_dir_name(name):
+    dir_name = RUNTIME_DIR_UNSAFE_CHARS.sub('_', str(name or '')).strip('_')
+    return dir_name or 'automation'
 
 
 class SSHTunnelManager:
@@ -50,12 +59,17 @@ class SSHTunnelManager:
             if not jms_gateway:
                 continue
             try:
+                gateway_proxy_host = interface.get_gateway_proxy_host()
                 server = SSHTunnelForwarder(
                     (jms_gateway["address"], jms_gateway["port"]),
                     ssh_username=jms_gateway["username"],
                     ssh_password=jms_gateway["secret"],
                     ssh_pkey=jms_gateway["private_key_path"],
                     remote_bind_address=(jms_asset["address"], jms_asset["port"]),
+                    local_bind_address=(
+                        '0.0.0.0' if gateway_proxy_host != '127.0.0.1' else '127.0.0.1',
+                        0,
+                    ),
                 )
                 server.start()
             except Exception as e:
@@ -66,7 +80,7 @@ class SSHTunnelManager:
                 local_bind_port = server.local_bind_port
 
                 host["ansible_host"] = jms_asset["address"] = host["login_host"] = (
-                    interface.get_gateway_proxy_host()
+                    gateway_proxy_host
                 )
                 host["ansible_port"] = jms_asset["port"] = host["login_port"] = (
                     local_bind_port
@@ -189,7 +203,7 @@ class BaseManager:
 
 
 class PlaybookPrepareMixin:
-    bulk_size = 100
+    bulk_size = BULK_SIZE
     ansible_account_policy = "privileged_first"
     ansible_account_prefer = "root,Administrator"
 
@@ -237,7 +251,7 @@ class PlaybookPrepareMixin:
     def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
         task_name = self.execution.snapshot["name"]
-        dir_name = "{}_{}".format(task_name.replace(" ", "_"), self.execution.id)
+        dir_name = "{}_{}".format(safe_runtime_dir_name(task_name), self.execution.id)
         path = os.path.join(
             ansible_dir,
             "automations",
@@ -259,6 +273,7 @@ class PlaybookPrepareMixin:
     def write_cert_to_file(filename, content):
         with open(filename, "w") as f:
             f.write(content)
+        os.chmod(filename, 0o600)
         return filename
 
     def convert_cert_to_file(self, host, path_dir):
@@ -376,7 +391,7 @@ class PlaybookPrepareMixin:
 
 
 class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
-    bulk_size = 100
+    bulk_size = BULK_SIZE
     ansible_account_policy = "privileged_first"
     ansible_account_prefer = ""
 
@@ -510,12 +525,40 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
                 result = cb.host_results.get(host)
                 handler(host, result, hosts)
 
+    @staticmethod
+    def _is_nonfatal_runner_timeout(error):
+        error_text = str(error)
+        return (
+            "pexpect.exceptions.TIMEOUT" in error_text
+        )
+
     def on_runner_failed(self, runner, e, assets=None, **kwargs):
+        assets = assets or []
+        if self._is_nonfatal_runner_timeout(e):
+            cb = getattr(runner, "cb", None)
+            if cb:
+                summary = getattr(cb, "summary", None)
+                has_host_summary = any(
+                    bool((summary or {}).get(key))
+                    for key in ("ok", "failures", "dark", "skipped")
+                )
+                if not has_host_summary and hasattr(cb, "playbook_on_stats"):
+                    try:
+                        cb.playbook_on_stats({})
+                    except Exception as rebuild_err:
+                        print("summary rebuild failed: {}".format(rebuild_err))
+                with safe_atomic_db_connection():
+                    self.on_runner_success(runner, cb)
+                print("Runner timeout but playbook exited normally, ignore fail mark")
+            return True
+
         self.summary["fail_assets"] += len(assets)
+        error = str(e)
         self.result["fail_assets"].extend(
-            [(str(asset), str("e")[:10]) for asset in assets]
+            [(str(asset), error[:10]) for asset in assets]
         )
         print("Runner failed: {} {}".format(e, self))
+        return False
 
     def delete_runtime_dir(self):
         if settings.DEBUG_DEV:

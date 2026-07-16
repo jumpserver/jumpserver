@@ -16,6 +16,7 @@ class CeleryBaseService(BaseService):
         os.environ.setdefault('LC_ALL', 'C.UTF-8')
         os.environ.setdefault('LANG', 'C.UTF-8')
         os.environ.setdefault('PYTHONOPTIMIZE', '1')
+        os.environ.setdefault('ANSIBLE_DEPRECATION_WARNINGS', 'False')
 
         if os.getuid() == 0:
             os.environ.setdefault('C_FORCE_ROOT', '1')

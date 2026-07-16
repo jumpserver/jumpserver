@@ -16,7 +16,6 @@ from django.contrib.auth.backends import ModelBackend
 from django.db import transaction
 from django.urls import reverse
 
-from authentication.signals import user_auth_success, user_auth_failed
 from authentication.utils import build_absolute_uri_for_oidc
 from common.utils import get_logger
 from users.utils import construct_user_email
@@ -25,7 +24,7 @@ from .signals import (
     openid_create_or_update_user
 )
 from .utils import validate_and_return_id_token
-from ..base import JMSBaseAuthBackend
+from ..base import RedirectAuthBackend, JMSBaseAuthBackend
 
 logger = get_logger(__file__)
 
@@ -66,14 +65,14 @@ class UserMixin:
         return user, created
 
 
-class OIDCBaseBackend(UserMixin, JMSBaseAuthBackend, ModelBackend):
+class OIDCBaseBackendMixin(UserMixin):
 
     @staticmethod
     def is_enabled():
         return settings.AUTH_OPENID
 
 
-class OIDCAuthCodeBackend(OIDCBaseBackend):
+class OIDCAuthCodeBackend(OIDCBaseBackendMixin, RedirectAuthBackend, ModelBackend):
     """ Allows to authenticate users using an OpenID Connect Provider (OP).
 
     This authentication backend is able to authenticate users in the case of the OpenID Connect
@@ -83,6 +82,8 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
     should be available in the request parameters associated with the callback call.
 
     """
+
+    backend = settings.AUTH_BACKEND_OIDC_CODE
 
     @ssl_verification
     def authenticate(self, request, nonce=None, code_verifier=None):
@@ -212,23 +213,15 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
 
         if self.user_can_authenticate(user):
             logger.debug(log_prompt.format('OpenID user login success'))
-            logger.debug(log_prompt.format('Send signal => openid user login success'))
-            user_auth_success.send(
-                sender=self.__class__, request=request, user=user,
-                backend=settings.AUTH_BACKEND_OIDC_CODE
-            )
             return user
         else:
             logger.debug(log_prompt.format('OpenID user login failed'))
             logger.debug(log_prompt.format('Send signal => openid user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=user.username,
-                reason="User is invalid", backend=settings.AUTH_BACKEND_OIDC_CODE
-            )
+            self.send_backend_auth_failed_signal(request=request, username=user.username)
             return None
 
 
-class OIDCAuthPasswordBackend(OIDCBaseBackend):
+class OIDCAuthPasswordBackend(OIDCBaseBackendMixin, JMSBaseAuthBackend, ModelBackend):
 
     @ssl_verification
     def authenticate(self, request, username=None, password=None):
@@ -274,11 +267,6 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
             error = "Json token response error, token response " \
                     "content is: {}, error is: {}".format(token_response.content, str(e))
             logger.debug(log_prompt.format(error))
-            logger.debug(log_prompt.format('Send signal => openid user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=username, reason=error,
-                backend=settings.AUTH_BACKEND_OIDC_PASSWORD
-            )
             return
 
         # Retrieves the access token
@@ -303,11 +291,6 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
             error = "Json claims response error, claims response " \
                     "content is: {}, error is: {}".format(claims_response.content, str(e))
             logger.debug(log_prompt.format(error))
-            logger.debug(log_prompt.format('Send signal => openid user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=username, reason=error,
-                backend=settings.AUTH_BACKEND_OIDC_PASSWORD
-            )
             return
 
         logger.debug(log_prompt.format('Get or create user from claims'))
@@ -317,17 +300,7 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
 
         if self.user_can_authenticate(user):
             logger.debug(log_prompt.format('OpenID user login success'))
-            logger.debug(log_prompt.format('Send signal => openid user login success'))
-            user_auth_success.send(
-                sender=self.__class__, request=request, user=user,
-                backend=settings.AUTH_BACKEND_OIDC_PASSWORD
-            )
             return user
         else:
             logger.debug(log_prompt.format('OpenID user login failed'))
-            logger.debug(log_prompt.format('Send signal => openid user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=username, reason="User is invalid",
-                backend=settings.AUTH_BACKEND_OIDC_PASSWORD
-            )
             return None

@@ -5,19 +5,19 @@ from django.conf import settings
 from django.db import transaction
 
 from common.utils import get_logger
-from authentication.errors import reason_choices, reason_user_invalid
 from .signals import (
     saml2_create_or_update_user
 )
-from authentication.signals import user_auth_failed, user_auth_success
-from ..base import JMSBaseAuthBackend
+from ..base import RedirectAuthBackend
 
 __all__ = ['SAML2Backend']
 
 logger = get_logger(__name__)
 
 
-class SAML2Backend(JMSBaseAuthBackend):
+class SAML2Backend(RedirectAuthBackend):
+    backend = settings.AUTH_BACKEND_SAML2
+
     @staticmethod
     def is_enabled():
         return settings.AUTH_SAML2
@@ -59,16 +59,8 @@ class SAML2Backend(JMSBaseAuthBackend):
 
         if self.user_can_authenticate(user):
             logger.debug(log_prompt.format('SAML2 user login success'))
-            user_auth_success.send(
-                sender=self.__class__, request=request, user=user, created=created,
-                backend=settings.AUTH_BACKEND_SAML2
-            )
             return user
         else:
             logger.debug(log_prompt.format('SAML2 user login failed'))
-            user_auth_failed.send(
-                sender=self.__class__, request=request, username=username,
-                reason=reason_choices.get(reason_user_invalid),
-                backend=settings.AUTH_BACKEND_SAML2
-            )
+            self.send_backend_auth_failed_signal(request=request, username=user.username)
             return None
