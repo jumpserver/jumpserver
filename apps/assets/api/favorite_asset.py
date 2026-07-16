@@ -4,6 +4,7 @@ from rest_framework_bulk.generics import BulkModelViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_bulk.mixins import BulkDestroyModelMixin
 
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_root_org
@@ -26,7 +27,7 @@ class FavoriteFolderViewSet(BulkModelViewSet):
         return FavoriteFolder.objects.filter(user=self.request.user)
 
 
-class FavoriteAssetViewSet(ModelViewSet):
+class FavoriteAssetViewSet(BulkDestroyModelMixin, ModelViewSet):
     serializer_class = FavoriteAssetSerializer
     permission_classes = (IsValidUser,)
     filterset_fields = ['asset', 'folder']
@@ -35,9 +36,6 @@ class FavoriteAssetViewSet(ModelViewSet):
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_root_org():
             return super().dispatch(request, *args, **kwargs)
-
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         asset_id = request.data.get('asset')
