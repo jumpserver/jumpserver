@@ -198,7 +198,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         if not serializer.is_valid():
             self.send_msg(msg=f'error: {str(serializer.errors)}')
         config = self.get_ldap_config(serializer)
-        ok, msg = LDAPTestUtil(config).test_config()
+        ok, msg = LDAPTestUtil(config, category=self.category).test_config()
         if ok:
             self.set_task_status_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS)
         return ok, msg
