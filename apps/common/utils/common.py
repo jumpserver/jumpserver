@@ -15,7 +15,7 @@ from collections import OrderedDict
 from functools import wraps, cached_property
 from itertools import chain
 
-import html2text
+from markdownify import markdownify
 import psutil
 from django.conf import settings
 from django.templatetags.static import static
@@ -471,11 +471,7 @@ def is_macos():
 
 
 def convert_html_to_markdown(html_str):
-    h = html2text.HTML2Text()
-    h.body_width = 0
-    h.ignore_links = False
-
-    markdown = h.handle(html_str)
+    markdown = markdownify(html_str)
     markdown = markdown.replace('\n\n', '\n')
     markdown = markdown.replace('\n ', '\n')
     return markdown

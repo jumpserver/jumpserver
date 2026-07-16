@@ -4,9 +4,8 @@ from itertools import chain
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
-from html2text import HTML2Text
 
-from common.utils import lazyproperty
+from common.utils import lazyproperty, convert_html_to_markdown
 from common.utils.timezone import local_now
 from notifications.backends import BACKEND
 from settings.utils import get_login_title
@@ -157,12 +156,9 @@ class Message(CustomMsgTemplateBase, metaclass=MessageType):
         return self.html_to_markdown(self.get_html_msg())
 
     def get_text_msg(self) -> dict:
-        h = HTML2Text()
-        h.body_width = 90
         msg = self.get_html_msg()
         content = msg['message']
-        h.ignore_links = self.text_msg_ignore_links
-        msg['message'] = h.handle(content)
+        msg['message'] = convert_html_to_markdown(content)
         return msg
 
     @lazyproperty

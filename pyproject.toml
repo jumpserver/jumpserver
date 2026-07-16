@@ -153,6 +153,7 @@ dependencies = [
     "telnetlib3==4.0.2",
     "defusedxml>=0.7.1",
     "ansible-builder>=3.1.1",
+    "markdownify>=1.2.3",
 ]
 
 [project.urls]
