@@ -1809,15 +1809,6 @@ wheels = [
 ]
 
 [[package]]
-name = "html2text"
-version = "2020.1.16"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6c/f9/033a17d8ea8181aee41f20c74c3b20f1ccbefbbc3f7cd24e3692de99fb25/html2text-2020.1.16.tar.gz", hash = "sha256:e296318e16b059ddb97f7a8a1d6a5c1d7af4544049a01e261731d2d5cc277bbb", size = 49464, upload-time = "2020-01-16T14:21:54.493Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ae/88/14655f727f66b3e3199f4467bafcc88283e6c31b562686bf606264e09181/html2text-2020.1.16-py3-none-any.whl", hash = "sha256:c7c629882da0cf377d66f073329ccf34a12ed2adf0169b9285ae4e63ef54c82b", size = 32055, upload-time = "2020-01-16T14:21:52.904Z" },
-]
-
-[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -2194,7 +2185,6 @@ dependencies = [
     { name = "gmssl" },
     { name = "greenlet" },
     { name = "gunicorn" },
-    { name = "html2text" },
     { name = "httpx" },
     { name = "hvac" },
     { name = "ipip-ipdb" },
@@ -2380,7 +2370,6 @@ requires-dist = [
     { name = "gmssl", specifier = "==3.2.2" },
     { name = "greenlet", specifier = "==3.2.4" },
     { name = "gunicorn", specifier = "==23.0.0" },
-    { name = "html2text", specifier = "==2020.1.16" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "hvac", specifier = "==1.1.1" },
     { name = "ipip-ipdb", specifier = "==1.6.1" },
