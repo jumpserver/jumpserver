@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework_bulk.generics import BulkModelViewSet
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -26,7 +25,7 @@ class FavoriteFolderViewSet(BulkModelViewSet):
         return FavoriteFolder.objects.filter(user=self.request.user)
 
 
-class FavoriteAssetViewSet(ModelViewSet):
+class FavoriteAssetViewSet(BulkModelViewSet):
     serializer_class = FavoriteAssetSerializer
     permission_classes = (IsValidUser,)
     filterset_fields = ['asset', 'folder']
