@@ -27,6 +27,9 @@ on:
         type: string
         default: 'main'
 
+permissions:
+  contents: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -39,10 +42,20 @@ jobs:
           -d '{"state":"pending", "description":"Action running, merge disabled", "context":"Lock PR"}' \
           "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
-      - name: Checkout repository
+      - name: Checkout repository (PR branch)
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Checkout repository (manual)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -79,13 +92,26 @@ jobs:
 
       - name: Commit changes
         run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add Dockerfile
           git commit -m "perf: Update Dockerfile with new base image tag"
-          git push
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          else
+            git push origin HEAD:${{ inputs.branch }}
+          fi
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.fork == false }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip push for fork PR
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true }}
+        run: echo "Pull request is from a fork, skipping commit and push."
 
       - name: Unlock Pull Request
         if: github.event_name == 'push'
