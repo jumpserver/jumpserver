@@ -607,7 +607,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             data['input_secret'] = ''
             data['input_secret_type'] = account.secret_type
 
-        if account.username != AliasAccount.INPUT:
+        if account_alias != AliasAccount.INPUT and account_alias != AliasAccount.USER:
             data['input_username'] = ''
             data['input_secret_type'] = ''
 
