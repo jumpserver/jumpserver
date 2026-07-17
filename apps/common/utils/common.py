@@ -7,6 +7,7 @@ import os
 import platform
 import re
 import socket
+import textwrap
 import time
 import uuid
 import hmac
@@ -15,6 +16,7 @@ from collections import OrderedDict
 from functools import wraps, cached_property
 from itertools import chain
 
+from bs4 import BeautifulSoup
 from markdownify import markdownify
 import psutil
 from django.conf import settings
@@ -475,6 +477,28 @@ def convert_html_to_markdown(html_str):
     markdown = markdown.replace('\n\n', '\n')
     markdown = markdown.replace('\n ', '\n')
     return markdown
+
+
+def convert_html_to_text(html_str, body_width=90):
+    soup = BeautifulSoup(html_str or '', 'html.parser')
+
+    for tag in soup(['script', 'style']):
+        tag.decompose()
+
+    text = soup.get_text(separator='\n', strip=True)
+    text = text.replace('\xa0', ' ')
+    lines = [line.strip() for line in text.splitlines()]
+
+    wrapped_lines = []
+    for line in lines:
+        if not line:
+            if wrapped_lines and wrapped_lines[-1] != '':
+                wrapped_lines.append('')
+            continue
+        wrapped = textwrap.fill(line, width=body_width) if body_width else line
+        wrapped_lines.append(wrapped)
+
+    return '\n'.join(wrapped_lines).strip()
 
 
 def many_get(d, keys, default=None):
