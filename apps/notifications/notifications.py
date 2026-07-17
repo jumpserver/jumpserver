@@ -5,7 +5,7 @@ from itertools import chain
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import lazyproperty, convert_html_to_markdown
+from common.utils import lazyproperty, convert_html_to_markdown, convert_html_to_text
 from common.utils.timezone import local_now
 from notifications.backends import BACKEND
 from settings.utils import get_login_title
@@ -146,10 +146,8 @@ class Message(CustomMsgTemplateBase, metaclass=MessageType):
 
     @staticmethod
     def html_to_markdown(html_msg):
-        h = HTML2Text()
-        h.body_width = 0
         content = html_msg['message']
-        html_msg['message'] = h.handle(content)
+        html_msg['message'] = convert_html_to_markdown(content)
         return html_msg
 
     def get_markdown_msg(self) -> dict:
@@ -158,7 +156,7 @@ class Message(CustomMsgTemplateBase, metaclass=MessageType):
     def get_text_msg(self) -> dict:
         msg = self.get_html_msg()
         content = msg['message']
-        msg['message'] = convert_html_to_markdown(content)
+        msg['message'] = convert_html_to_text(content)
         return msg
 
     @lazyproperty
