@@ -1,7 +1,5 @@
-from django.db import transaction
 from django.utils.translation import gettext_noop
 
-from assets.utils.last_login import update_assets_last_login_date
 from audits.const import ActivityChoices
 from audits.models import ActivityLog
 from common.utils import i18n_fmt
@@ -30,17 +28,6 @@ class SessionLifecycleEventBase(object):
 class AssetConnectSuccess(SessionLifecycleEventBase):
     name = "asset_connect_success"
     i18n_text = gettext_noop("Connect to asset %s success")
-
-    def create_activity_log(self):
-        activity_log = super().create_activity_log()
-        asset_id = self.session.asset_id
-        if asset_id:
-            transaction.on_commit(
-                lambda asset_id=asset_id: update_assets_last_login_date.delay(
-                    asset_ids=[asset_id]
-                )
-            )
-        return activity_log
 
     def detail(self):
         return i18n_fmt(self.i18n_text, self.session.asset)
