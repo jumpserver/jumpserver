@@ -7,6 +7,7 @@ import os
 import platform
 import re
 import socket
+import textwrap
 import time
 import uuid
 import hmac
@@ -475,6 +476,34 @@ def convert_html_to_markdown(html_str):
     markdown = markdown.replace('\n\n', '\n')
     markdown = markdown.replace('\n ', '\n')
     return markdown
+
+
+def convert_html_to_text(html_str, body_width=90):
+    text = convert_html_to_markdown(html_str or '')
+    text = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'(?m)^\s{0,3}#{1,6}\s*', '', text)
+    text = re.sub(r'(?m)^\s*[-*+]\s+', '- ', text)
+    text = re.sub(r'(?m)^\s*\d+\.\s+', '', text)
+    text = re.sub(r'(?m)^\s*---+\s*$', '', text)
+    text = text.replace('**', '')
+    text = text.replace('__', '')
+    text = text.replace('`', '')
+    text = text.replace('\\\n', '\n')
+    text = text.replace('\\', '')
+    text = text.replace('\xa0', ' ')
+    lines = [line.strip() for line in text.splitlines()]
+
+    wrapped_lines = []
+    for line in lines:
+        if not line:
+            if wrapped_lines and wrapped_lines[-1] != '':
+                wrapped_lines.append('')
+            continue
+        wrapped = textwrap.fill(line, width=body_width) if body_width else line
+        wrapped_lines.append(wrapped)
+
+    return '\n'.join(wrapped_lines).strip()
 
 
 def many_get(d, keys, default=None):
