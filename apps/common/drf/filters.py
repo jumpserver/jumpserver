@@ -333,7 +333,7 @@ class DatetimeRangeFilterBackend(filters.BaseFilterBackend):
 
 class IDSpmFilterBackend(filters.BaseFilterBackend):
     def get_schema_fields(self, view):
-        return [
+        fields = [
             coreapi.Field(
                 name="spm",
                 location="query",
@@ -343,22 +343,48 @@ class IDSpmFilterBackend(filters.BaseFilterBackend):
                 description="Pre post objects id get spm id, then using filter",
             )
         ]
+        fields.append(
+            coreapi.Field(
+                name="exclude_spm",
+                location="query",
+                required=False,
+                type="string",
+                example="",
+                description="Pre post objects id get spm id, then using exclude",
+            )
+        )
+        return fields
+
+    @staticmethod
+    def get_resource_ids(spm):
+        cache_key = const.KEY_CACHE_RESOURCE_IDS.format(spm)
+        resource_ids = cache.get(cache_key)
+        if resource_ids is not None:
+            cache.touch(cache_key, const.RESOURCE_IDS_CACHE_TIMEOUT)
+        if isinstance(resource_ids, str):
+            resource_ids = [resource_ids]
+        return resource_ids
 
     def filter_queryset(self, request, queryset, view):
         spm = request.query_params.get("spm")
-        if not spm:
-            return queryset
-        cache_key = const.KEY_CACHE_RESOURCE_IDS.format(spm)
-        resource_ids = cache.get(cache_key)
+        if spm:
+            resource_ids = self.get_resource_ids(spm)
+            if resource_ids is None:
+                return queryset.none()
+            if hasattr(view, "filter_spm_queryset"):
+                queryset = view.filter_spm_queryset(resource_ids, queryset)
+            else:
+                queryset = queryset.filter(id__in=resource_ids)
 
-        if resource_ids is None:
-            return queryset.none()
-        if isinstance(resource_ids, str):
-            resource_ids = [resource_ids]
-        if hasattr(view, "filter_spm_queryset"):
-            queryset = view.filter_spm_queryset(resource_ids, queryset)
-        else:
-            queryset = queryset.filter(id__in=resource_ids)
+        exclude_spm = request.query_params.get("exclude_spm")
+        if exclude_spm:
+            resource_ids = self.get_resource_ids(exclude_spm)
+            if resource_ids is None:
+                return queryset
+            if hasattr(view, "exclude_spm_queryset"):
+                queryset = view.exclude_spm_queryset(resource_ids, queryset)
+            else:
+                queryset = queryset.exclude(id__in=resource_ids)
         return queryset
 
 
