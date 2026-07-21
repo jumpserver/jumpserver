@@ -56,7 +56,7 @@ logger = logging.getLogger()
 try:
     make_dirs(os.path.join(BASE_DIR, "data", "static"))
     make_dirs(os.path.join(BASE_DIR, "data", "media"))
-except:
+except Exception:
     pass
 
 
@@ -79,7 +79,7 @@ def check_database_connection():
 def expire_caches():
     try:
         management.call_command('expire_caches')
-    except:
+    except Exception:
         pass
 
 
@@ -99,7 +99,7 @@ def collect_static():
     try:
         management.call_command('collectstatic', '--no-input', '-c', verbosity=0, interactive=False)
         logging.info("Collect static files done")
-    except:
+    except Exception:
         pass
 
 
