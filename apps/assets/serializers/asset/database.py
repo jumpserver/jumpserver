@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Database, Platform
-from assets.serializers.gateway import GatewayWithAccountSecretSerializer
+from assets.serializers.gateway import GatewayWithAccountSerializer
 from .common import AssetSerializer
 
 __all__ = ['DatabaseSerializer', 'DatabaseWithGatewaySerializer']
@@ -69,7 +69,7 @@ class DatabaseSerializer(AssetSerializer):
 
 
 class DatabaseWithGatewaySerializer(DatabaseSerializer):
-    gateway = GatewayWithAccountSecretSerializer()
+    gateway = GatewayWithAccountSerializer()
 
     class Meta(DatabaseSerializer.Meta):
         fields = DatabaseSerializer.Meta.fields + ['gateway']
