@@ -7,7 +7,7 @@ else:
     from collections import Iterable
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import NOT_PROVIDED, OneToOneField
+from django.db.models import Count, NOT_PROVIDED, OneToOneField
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -33,6 +33,7 @@ __all__ = [
     "SecretReadableCheckMixin",
     "CommonModelSerializer",
     "CommonBulkModelSerializer",
+    "RelationCountMixin",
     "ResourceLabelsMixin",
 ]
 
@@ -443,11 +444,106 @@ class SomeFieldsMixin:
         return fields
 
 
+class RelationCountMixin:
+    """
+    Attach serializer-declared to-many relation counts in batches.
+
+    ``Meta.relation_count_fields`` values may be a relation name, or a
+    dictionary containing ``relation`` plus optional ``filters`` and
+    ``excludes``. Many-to-many relations also support ``related_filters`` and
+    ``related_excludes``.
+    """
+
+    @classmethod
+    def get_relation_count_fields(cls):
+        return getattr(cls.Meta, 'relation_count_fields', {})
+
+    @staticmethod
+    def _get_relation_count_config(model, config):
+        if not isinstance(config, dict):
+            config = {'relation': config}
+
+        relation_name = config['relation']
+        if not isinstance(relation_name, str):
+            raise TypeError('Relation count field must be a model field name')
+
+        relation = model._meta.get_field(relation_name)
+        if relation.many_to_many:
+            if relation.auto_created:
+                field = relation.field
+                source_name = field.m2m_reverse_field_name()
+                related_name = field.m2m_field_name()
+                relation_model = relation.through
+            else:
+                field = relation
+                source_name = field.m2m_field_name()
+                related_name = field.m2m_reverse_field_name()
+                relation_model = relation.remote_field.through
+
+            source_attname = relation_model._meta.get_field(source_name).attname
+            related_name = relation_model._meta.get_field(related_name).name
+        elif relation.one_to_many and relation.auto_created:
+            field = relation.field
+            relation_model = field.model
+            source_attname = field.attname
+            related_name = None
+        else:
+            raise TypeError(
+                f'{model.__name__}.{relation_name} must be a many-to-many '
+                'or reverse one-to-many relation'
+            )
+        return relation_model, source_attname, related_name, config
+
+    @classmethod
+    def attach_relation_counts(cls, queryset):
+        count_fields = cls.get_relation_count_fields()
+        if not count_fields:
+            return queryset
+
+        model = getattr(queryset, 'model', None)
+        queryset = list(queryset)
+        if not queryset:
+            return queryset
+
+        model = model or queryset[0].__class__
+        queryset_ids = [obj.pk for obj in queryset]
+
+        for attr_name, count_config in count_fields.items():
+            relation_config = cls._get_relation_count_config(model, count_config)
+            relation_model, source_attname, related_name, config = relation_config
+            filters = dict(config.get('filters', {}))
+            excludes = dict(config.get('excludes', {}))
+            related_filters = config.get('related_filters', {})
+            related_excludes = config.get('related_excludes', {})
+            related_prefix = f'{related_name}__' if related_name else ''
+            filters.update({
+                f'{related_prefix}{name}': value
+                for name, value in related_filters.items()
+            })
+            excludes.update({
+                f'{related_prefix}{name}': value
+                for name, value in related_excludes.items()
+            })
+
+            counts = dict(
+                relation_model._default_manager
+                .filter(**{f'{source_attname}__in': queryset_ids}, **filters)
+                .exclude(**excludes)
+                .values(source_attname)
+                .annotate(amount=Count('*'))
+                .values_list(source_attname, 'amount')
+            )
+            for obj in queryset:
+                setattr(obj, attr_name, counts.get(obj.pk, 0))
+        return queryset
+
+
 class CommonSerializerMixin(
     DynamicFieldsMixin,
     RelatedModelSerializerMixin,
     SomeFieldsMixin,
     DefaultValueFieldsMixin,
+    RelationCountMixin,
 ):
     pass
 
