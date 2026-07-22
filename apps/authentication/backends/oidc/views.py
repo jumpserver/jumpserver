@@ -12,8 +12,8 @@
 import base64
 import hashlib
 import secrets
-import time
 
+import time
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import SuspiciousOperation
@@ -28,7 +28,6 @@ from django.views.generic import View
 from authentication.decorators import pre_save_next_to_session, redirect_to_pre_save_next_after_auth
 from authentication.utils import build_absolute_uri_for_oidc
 from authentication.views.mixins import FlashMessageMixin
-from common.utils import safe_next_url
 from .utils import get_logger
 
 logger = get_logger(__file__)
@@ -126,7 +125,6 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
 
     http_method_names = ['get', ]
 
-    
     @redirect_to_pre_save_next_after_auth
     def get(self, request):
         """ Processes GET requests. """
@@ -143,6 +141,7 @@ class OIDCAuthCallbackView(View, FlashMessageMixin):
         # If no nonce is available (while the USE_NONCE setting is set to True) this means that the
         # authentication cannot be performed and so we have redirect the user to a failure URL.
         nonce = request.session.pop('oidc_auth_nonce', None)
+        user = None
 
         # NOTE: a redirect to the failure page should be return if some required GET parameters are
         # missing or if no state can be retrieved from the current session.

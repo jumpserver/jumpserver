@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "Este terminal no soporta las reglas de acceso facial, por favor utilice el terminal web para iniciar sesión",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "Esta terminal no soporta la autenticación por reconocimiento facial; por favor inicie sesión a través de la terminal web.",
     "FailedCreateConnection": "Fallo al crear conexión",
+    "File transfer error, file transfer interrupted": "Error de transferencia de archivos, la transferencia fue interrumpida",
     "FileAlreadyExists": "El archivo ya existe",
     "FileListError": "No se pudo obtener la información de la lista de archivos",
     "FileManagement": "Gestión de archivos",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "Actualizando la información más reciente de máquinas y nodos",
     "select one asset to login": "Selecciona uno de los activos para iniciar sesión",
     "to search login if unique": "Buscar inicio de sesión (si es único)",
-    "to search, such as: /192.168": "Buscar, por ejemplo: /192.168",
-    "File transfer error, file transfer interrupted": "Error de transferencia de archivos, la transferencia fue interrumpida"
+    "to search, such as: /192.168": "Buscar, por ejemplo: /192.168"
 }

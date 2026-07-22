@@ -4,7 +4,7 @@
     - name: Get users
       ansible.builtin.shell:
         cmd: >
-          getent passwd | awk -F: '$7 !~ /(false|nologin|true|sync)$/' | grep -v '^$' | awk -F":" '{ print $1 }'
+          getent passwd | awk -F: '$7 !~ /(false|nologin|true|sync|shutdown|halt|poweroff|reboot)$/' | grep -v '^$' | awk -F":" '{ print $1 }'
       register: users
 
     - name: Gather posix account last login

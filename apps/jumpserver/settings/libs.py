@@ -48,7 +48,7 @@ REST_FRAMEWORK = {
         'file_transfer': CONFIG.THROTTLE_FILE_TRANSFER,
     },
     'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
+        'common.drf.filters.LookupFilterBackend',
         'common.drf.filters.SearchFilter',
         'common.drf.filters.RewriteOrderingFilter',
     ),
@@ -237,6 +237,7 @@ DJANGO_REDIS_SCAN_ITERSIZE = 1000
 # GM DEVICE
 GM_DEVICE_ENABLE = CONFIG.GM_DEVICE_ENABLE
 GM_VENDOR_NAME = CONFIG.GM_VENDOR_NAME
+GM_DRIVER_PATH = CONFIG.GM_DRIVER_PATH
 
 LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH
 

@@ -34,7 +34,7 @@ class FavoriteAsset(JMSBaseModel):
     )
 
     class Meta:
-        unique_together = ('user', 'asset', 'folder')
+        unique_together = ('user', 'asset')
         verbose_name = _("Favorite asset")
 
     @classmethod

@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "この端末は顔認証アクセスルールをサポートしていません。web端末でのログインを使用してください",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "この端末は顔認識認証をサポートしていません。ウェブ端末を使用してログインしてください。",
     "FailedCreateConnection": "接続の作成に失敗しました",
+    "File transfer error, file transfer interrupted": "ファイル転送エラー、ファイル転送が中断されました",
     "FileAlreadyExists": "ファイルは既に存在します",
     "FileListError": "ファイルリスト情報の取得に失敗しました",
     "FileManagement": "ファイル",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "最新のマシンとノード情報を更新します",
     "select one asset to login": "資産のいずれかを選択してログイン",
     "to search login if unique": "ログイン検索（唯一の場合）",
-    "to search, such as: /192.168": "検索：/192.168",
-    "File transfer error, file transfer interrupted": "ファイル転送エラー、ファイル転送が中断されました"
+    "to search, such as: /192.168": "検索：/192.168"
 }

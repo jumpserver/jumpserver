@@ -1,8 +1,8 @@
-# 使用方法
+# 利用ガイド
 
 ## 1. 概要
 
-このAPIは、PAMの資産アカウントサービスの表示を提供し、RESTfulスタイルの呼び出しをサポートし、データはJSON形式で返されます。
+この API は PAM 資産アカウントのパスワードを取得し、RESTful 形式のリクエストに対応して、データを JSON 形式で返します。
 
 ## 2. 環境要件
 
@@ -10,29 +10,29 @@
 - `requests==2.31.0`
 - `httpsig==1.3.0`
 
-## 3. 使用方法
-**リクエスト方法**: `GET api/v1/accounts/integration-applications/account-secret/`
+## 3. 利用方法
+**リクエストメソッド**: `GET api/v1/accounts/integration-applications/account-secret/`
 
 **リクエストパラメータ**
 
 | パラメータ名 | タイプ | 必須 | 説明           |
 |-------------|-------|----|--------------|
-| asset       | str   | はい | 資産ID / 資産名 |
-| account     | str   | はい | アカウントID / アカウント名 |
+| asset       | str   | はい | 資産名         |
+| account     | str   | はい | アカウント名    |
 
 **レスポンス例**:
 ```json
-{ﬁ
-    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e", 
+{
+    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e",
     "secret": "123456"
 }
 ```
 
 ## よくある質問（FAQ）
 
-Q: APIキーはどのように取得しますか？
+Q: API キーはどのように取得しますか？
 
-A: PAM - アプリケーション管理でアプリケーションを作成し、KEY_IDとKEY_SECRETを生成できます。
+A: PAM - アプリケーション管理でアプリケーションを作成すると、KEY_ID と KEY_SECRET が生成されます。
 
 ## バージョン履歴（Changelog）
 

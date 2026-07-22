@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "Thiết bị này không hỗ trợ quy tắc truy cập bằng khuôn mặt, vui lòng đăng nhập bằng thiết bị web",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "Thiết bị đầu cuối này không hỗ trợ xác thực nhận diện khuôn mặt, vui lòng đăng nhập bằng thiết bị đầu cuối web.",
     "FailedCreateConnection": "Tạo kết nối thất bại",
+    "File transfer error, file transfer interrupted": "Lỗi truyền tệp, quá trình truyền tệp đã bị gián đoạn",
     "FileAlreadyExists": "Tệp đã tồn tại",
     "FileListError": "Lấy thông tin danh sách tệp thất bại",
     "FileManagement": "Quản lý tập tin",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "làm mới thông tin máy và nút mới nhất",
     "select one asset to login": "Chọn một tài sản để đăng nhập",
     "to search login if unique": "Tìm kiếm đăng nhập (nếu duy nhất)",
-    "to search, such as: /192.168": "tìm kiếm, ví dụ: /192.168",
-    "File transfer error, file transfer interrupted": "Lỗi truyền tệp, quá trình truyền tệp đã bị gián đoạn"
+    "to search, such as: /192.168": "tìm kiếm, ví dụ: /192.168"
 }

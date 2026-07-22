@@ -4,12 +4,13 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 
-def safe_run_cmd(cmd_args, shell=False):
+def safe_run_cmd(cmd_args, shell=False, quiet=False):
     if shell:
         raise ValueError("shell=True is not allowed in safe_run_cmd. " "Pass command as a list with shell=False.")
     cmd_args = [str(arg) for arg in cmd_args]
     try:
-        return subprocess.run(cmd_args, shell=False)
+        kwargs = {'stdout': subprocess.DEVNULL, 'stderr': subprocess.DEVNULL} if quiet else {}
+        return subprocess.run(cmd_args, shell=False, **kwargs)
     except Exception as e:
         logger.error("Failed to run command %s: %s", cmd_args, e)
         return None

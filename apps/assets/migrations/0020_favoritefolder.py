@@ -39,6 +39,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='favoriteasset',
-            unique_together={('user', 'asset', 'folder')},
+            unique_together={('user', 'asset',)},
         ),
     ]

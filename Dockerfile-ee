@@ -29,3 +29,6 @@ RUN set -ex \
 COPY --from=gmssl-builder /usr/local/lib/libgmssl.so* /usr/local/lib/
 COPY --from=gmssl-builder /usr/local/include/gmssl /usr/local/include/gmssl
 COPY --from=gmssl-builder /usr/local/bin/gmssl /usr/local/bin/gmssl
+
+RUN echo "/usr/local/lib" > /etc/ld.so.conf.d/local-lib.conf \
+    && ldconfig

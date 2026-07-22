@@ -17,9 +17,9 @@ class LDAPHATestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_HA_SEARCH_FILTER = serializers.CharField()
     AUTH_LDAP_HA_USER_ATTR_MAP = serializers.JSONField()
     AUTH_LDAP_HA_START_TLS = serializers.BooleanField(required=False)
-    AUTH_LDAP_HA_CACERT_CONTENT = serializers.CharField(required=False, allow_blank=True)
-    AUTH_LDAP_HA_CERT_CONTENT = serializers.CharField(required=False, allow_blank=True)
-    AUTH_LDAP_HA_KEY_CONTENT = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_HA_CACERT_CONTENT = EncryptedField(required=False, allow_blank=True)
+    AUTH_LDAP_HA_CERT_CONTENT = EncryptedField(required=False, allow_blank=True)
+    AUTH_LDAP_HA_KEY_CONTENT = EncryptedField(required=False, allow_blank=True)
     AUTH_LDAP_HA = serializers.BooleanField(required=False)
 
 
@@ -100,17 +100,17 @@ class LDAPHASettingSerializer(LDAPSerializerMixin, serializers.Serializer):
         required=False, label=_('StartTLS'),
         help_text=_('Use StartTLS to upgrade ldap:// connections to TLS')
     )
-    AUTH_LDAP_HA_CACERT_CONTENT = serializers.CharField(
+    AUTH_LDAP_HA_CACERT_CONTENT = EncryptedField(
         allow_blank=True, required=False, write_only=True,
         label=_('CA certificate'),
         help_text=_('CA certificate for verifying LDAPS/StartTLS server')
     )
-    AUTH_LDAP_HA_CERT_CONTENT = serializers.CharField(
+    AUTH_LDAP_HA_CERT_CONTENT = EncryptedField(
         allow_blank=True, required=False, write_only=True,
         label=_('Client certificate'),
         help_text=_('Client certificate for mutual TLS (optional)')
     )
-    AUTH_LDAP_HA_KEY_CONTENT = serializers.CharField(
+    AUTH_LDAP_HA_KEY_CONTENT = EncryptedField(
         allow_blank=True, required=False, write_only=True,
         label=_('Client private key'),
         help_text=_('Client private key for mutual TLS (optional)')

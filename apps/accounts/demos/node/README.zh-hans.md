@@ -2,7 +2,7 @@
 
 ## 1. 简介
 
-本 API 提供了 PAM 查看资产账号服务，支持 RESTful 风格的调用，返回数据采用 JSON 格式。
+本 API 提供 PAM 资产账号密码查询服务，支持 RESTful 风格调用，并以 JSON 格式返回数据。
 
 ## 2. 环境要求
 
@@ -18,13 +18,13 @@
 
 | 参数名    | 类型   | 必填 | 说明            |
 |----------|------|-----|---------------|
-| asset    | str  | 是   | 资产 ID / 资产名称 |
-| account  | str  | 是   | 账号 ID / 账号名称 |
+| asset    | str  | 是   | 资产名称        |
+| account  | str  | 是   | 账号名称        |
 
 **响应示例**:
 ```json
 {
-    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e", 
+    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e",
     "secret": "123456"
 }
 ```
@@ -33,7 +33,7 @@
 
 Q: API Key 如何获取？
 
-A: 你可以在 PAM - 应用管理 创建应用生成 KEY_ID 和 KEY_SECRET。
+A: 您可以在 PAM - 应用管理中创建应用，以生成 KEY_ID 和 KEY_SECRET。
 
 ## 版本历史（Changelog）
 
