@@ -431,15 +431,11 @@ msgstr "数据库"
 msgid "Database"
 msgstr "数据库"
 
-<<<<<<< HEAD
-#: accounts/const/vault.py:9 settings/serializers/feature.py:81
+#: accounts/const/vault.py:9 settings/serializers/feature.py:90
 msgid "OpenBao"
 msgstr "OpenBao"
 
-#: accounts/const/vault.py:9 settings/serializers/feature.py:81
-=======
-#: accounts/const/vault.py:9 settings/serializers/feature.py:90
->>>>>>> origin/dev
+#: accounts/const/vault.py:9 settings/serializers/feature.py:106
 msgid "HCP Vault"
 msgstr "HashiCorp Vault"
 
@@ -8344,7 +8340,6 @@ msgstr ""
 msgid "Mount Point"
 msgstr "挂载点"
 
-<<<<<<< HEAD
 #: settings/serializers/feature.py:83
 msgid "OpenBao address"
 msgstr "OpenBao 地址"
@@ -8353,10 +8348,7 @@ msgstr "OpenBao 地址"
 msgid "Verify TLS"
 msgstr "校验 TLS"
 
-#: settings/serializers/feature.py:105
-=======
 #: settings/serializers/feature.py:114
->>>>>>> origin/dev
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 msgid "Tenant ID"
 msgstr "租户 ID"
