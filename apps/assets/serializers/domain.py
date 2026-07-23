@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -26,7 +25,14 @@ class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         model = Zone
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
-        fields_m2m = ['assets', 'gateways', 'labels', 'assets_amount']
+        relation_count_fields = {
+            'assets_amount': {
+                'relation': 'assets',
+                'excludes': {'platform__name__startswith': 'Gateway'},
+            },
+        }
+        amount_fields = list(relation_count_fields)
+        fields_m2m = ['assets', 'gateways', 'labels'] + amount_fields
         read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {
@@ -57,14 +63,7 @@ class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
 
 class ZoneListSerializer(ZoneSerializer):
     class Meta(ZoneSerializer.Meta):
-        fields = list(set(ZoneSerializer.Meta.fields + ['assets_amount']) - {'assets'})
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        queryset = queryset.annotate(
-            assets_amount=Count('assets', filter=~Q(assets__platform__name__startswith='Gateway'), distinct=True),
-        )
-        return queryset
+        fields = list(set(ZoneSerializer.Meta.fields + ZoneSerializer.Meta.amount_fields) - {'assets'})
 
 
 class ZoneWithGatewaySerializer(serializers.ModelSerializer):
