@@ -432,6 +432,10 @@ msgid "Database"
 msgstr "数据库"
 
 #: accounts/const/vault.py:9 settings/serializers/feature.py:90
+msgid "OpenBao"
+msgstr "OpenBao"
+
+#: accounts/const/vault.py:9 settings/serializers/feature.py:106
 msgid "HCP Vault"
 msgstr "HashiCorp Vault"
 
@@ -8335,6 +8339,14 @@ msgstr ""
 #: settings/serializers/feature.py:98
 msgid "Mount Point"
 msgstr "挂载点"
+
+#: settings/serializers/feature.py:83
+msgid "OpenBao address"
+msgstr "OpenBao 地址"
+
+#: settings/serializers/feature.py:95
+msgid "Verify TLS"
+msgstr "校验 TLS"
 
 #: settings/serializers/feature.py:114
 #: xpack/plugins/cloud/serializers/account_attrs.py:56

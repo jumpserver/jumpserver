@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import F, Count
+from django.db.models import F
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -156,6 +156,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     class Meta:
         model = Asset
+        relation_count_fields = {
+            'accounts_amount': 'accounts',
+        }
+        amount_fields = list(relation_count_fields)
         fields_fk = ['zone', 'platform']
         fields_mini = ['id', 'name', 'address'] + fields_fk
         fields_small = fields_mini + ['is_active', 'comment']
@@ -164,10 +168,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'nodes_display', 'accounts',
             'directory_services',
         ]
-        read_only_fields = [
-            'accounts_amount', 'category', 'type', 'connectivity', 'auto_config',
-            'date_verified', 'date_last_login', 'created_by',
-            'date_created', 'date_updated',
+        read_only_fields = amount_fields + [
+            'category', 'type', 'connectivity', 'auto_config',
+            'date_verified', 'date_last_login', 'created_by', 'date_created', 'date_updated',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         fields_unexport = ['auto_config']
@@ -239,8 +242,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         queryset = queryset.prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
-            .annotate(type=F("platform__type")) \
-            .annotate(accounts_amount=Count('accounts'))
+            .annotate(type=F("platform__type"))
         return queryset
 
     @staticmethod

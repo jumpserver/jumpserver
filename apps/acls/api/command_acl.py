@@ -25,7 +25,10 @@ class CommandFilterACLViewSet(OrgBulkModelViewSet):
     model = models.CommandFilterACL
     filterset_class = CommandACLFilter
     search_fields = ['name']
-    serializer_class = serializers.CommandFilterACLSerializer
+    serializer_classes = {
+        'default': serializers.CommandFilterACLSerializer,
+        'list': serializers.CommandFilterACLListSerializer,
+    }
     rbac_perms = {
         'command_review': 'tickets.add_superticket'
     }

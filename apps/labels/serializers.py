@@ -1,4 +1,3 @@
-from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -14,8 +13,11 @@ __all__ = ['LabelSerializer', 'LabeledResourceSerializer', 'ContentTypeResourceS
 class LabelSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Label
-        fields = [
-            'id', 'name', 'value', 'color', 'res_count',
+        relation_count_fields = {
+            'res_count': 'labeled_resources',
+        }
+        amount_fields = list(relation_count_fields)
+        fields = ['id', 'name', 'value', 'color'] + amount_fields + [
             'comment', 'date_created', 'date_updated'
         ]
         read_only_fields = ('date_created', 'date_updated', 'res_count')
@@ -41,13 +43,6 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
         ]
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        """ Perform necessary eager loading of data. """
-        queryset = queryset.annotate(res_count=Count('labeled_resources', distinct=True))
-        return queryset
-
 
 class LabeledResourceSerializer(serializers.ModelSerializer):
     res_type = LabeledChoiceField(

@@ -53,6 +53,15 @@ REDIS_PORT: 6379
 # REDIS_DB_CELERY: 3
 # REDIS_DB_CACHE: 4
 
+# Vault storage, OpenBao is the default backend when enabled.
+# 内置 OpenBao 作为默认 Vault backend；开启后请先确认 OpenBao Server 已完成初始化和授权
+# VAULT_ENABLED: true
+# VAULT_BACKEND: openbao
+# VAULT_OPENBAO_ADDR: http://openbao:8200
+# VAULT_OPENBAO_MOUNT_POINT: pam
+# VAULT_OPENBAO_TOKEN:
+# VAULT_OPENBAO_TIMEOUT: 10
+
 # LDAP/AD settings
 # LDAP 搜索分页数量
 # AUTH_LDAP_SEARCH_PAGED_SIZE: 1000

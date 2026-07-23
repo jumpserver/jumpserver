@@ -429,6 +429,10 @@ msgid "Database"
 msgstr ""
 
 #: accounts/const/vault.py:9 settings/serializers/feature.py:81
+msgid "OpenBao"
+msgstr ""
+
+#: accounts/const/vault.py:9 settings/serializers/feature.py:81
 msgid "HCP Vault"
 msgstr ""
 
@@ -8084,6 +8088,14 @@ msgstr ""
 
 #: settings/serializers/feature.py:89
 msgid "Mount Point"
+msgstr ""
+
+#: settings/serializers/feature.py:83
+msgid "OpenBao address"
+msgstr ""
+
+#: settings/serializers/feature.py:95
+msgid "Verify TLS"
 msgstr ""
 
 #: settings/serializers/feature.py:105
