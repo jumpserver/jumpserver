@@ -135,6 +135,7 @@ class AuthMixin:
                 post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)  # noqa
             self._password_changed = True
+            self._jdmc_password_raw = raw_password
 
     def set_ssh_key(self, public_key, private_key, **kwargs):
         if self.can_update_ssh_key():
