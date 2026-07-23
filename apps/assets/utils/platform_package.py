@@ -1,11 +1,14 @@
 import os
 import re
+import shutil
 from collections import defaultdict
 
+from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
-from assets.automations.methods import get_platform_automation_methods
+from assets.automations.methods import get_platform_automation_methods, check_platform_methods
+from assets.const import AllTypes, Category
 from common.utils.yml import yaml_load_with_i18n
 
 AUTOMATION_ACTION_FIELDS = (
@@ -31,6 +34,10 @@ def is_ignored_pkg_path(path):
 
 def get_platform_package_path(pkg_dir):
     return os.path.join(pkg_dir, 'platform.yml')
+
+
+def get_persisted_platform_package_dir(platform_name):
+    return default_storage.path('platforms/packages/{}'.format(platform_name))
 
 
 def has_platform_package(pkg_dir):
@@ -82,11 +89,49 @@ def load_platform_package_data(pkg_dir):
         raise ValidationError({'error': _('Load platform.yml failed: {}').format(e)})
 
 
-def get_platform_automation_methods_from_pkg(pkg_dir):
+def get_platform_automation_methods_from_pkg(pkg_dir, lang=None):
     automations_dir = os.path.join(pkg_dir, 'automations')
     if not os.path.isdir(automations_dir):
         return []
-    return get_platform_automation_methods(automations_dir)
+    return get_platform_automation_methods(automations_dir, lang=lang)
+
+
+def get_persisted_platform_automation_methods(lang=None, exclude_platform_name=None):
+    from assets.models import Platform
+
+    methods = []
+    try:
+        platforms = Platform.objects.filter(category__in=[Category.CUSTOM, Category.WEB]).only('name')
+    except Exception:
+        return methods
+
+    for platform in platforms:
+        if exclude_platform_name and platform.name == exclude_platform_name:
+            continue
+        pkg_dir = get_persisted_platform_package_dir(platform.name)
+        if not os.path.isdir(pkg_dir):
+            continue
+        methods.extend(get_platform_automation_methods_from_pkg(pkg_dir, lang=lang))
+
+    check_platform_methods(methods)
+    return methods
+
+
+def get_existing_platform_automation_methods(lang=None, exclude_platform_name=None):
+    from assets.automations import methods as asset
+    from accounts.automations import methods as account
+    from terminal.models import Applet
+
+    methods = (
+        asset.get_platform_automation_methods(asset.BASE_DIR, lang=lang)
+        + account.get_platform_automation_methods(account.BASE_DIR, lang=lang)
+        + get_persisted_platform_automation_methods(
+            lang=lang, exclude_platform_name=exclude_platform_name
+        )
+        + Applet.get_automation_methods(lang=lang)
+    )
+    check_platform_methods(methods)
+    return methods
 
 
 def build_platform_automation_defaults(methods):
@@ -124,7 +169,7 @@ def validate_platform_automation_methods(pkg_dir, platform_data=None):
             method_categories = [method_categories]
         if category not in method_categories:
             raise ValidationError({
-                'error': _('Platform automation category must contain custom: {}').format(method['id'])
+                'error': _('Platform automation category must contain platform category: {}').format(method['id'])
             })
 
         method_types = method.get('type') or []
@@ -145,15 +190,24 @@ def validate_platform_package(pkg_dir):
     data = load_platform_package_data(pkg_dir)
     if not data:
         return None
-    validate_platform_automation_methods(pkg_dir, platform_data=data)
+    methods = validate_platform_automation_methods(pkg_dir, platform_data=data)
+    existing_methods = get_existing_platform_automation_methods(
+        exclude_platform_name=data.get('name')
+    )
+    existing_ids = {item['id'] for item in existing_methods}
+    duplicate_ids = [item['id'] for item in methods if item['id'] in existing_ids]
+    if duplicate_ids:
+        raise ValidationError({
+            'error': _('Platform automation method id already exists: {}').format(
+                ', '.join(sorted(set(duplicate_ids)))
+            )
+        })
     return data
 
 
 def prepare_platform_data_for_save(pkg_dir, platform_data):
-    from assets.const import CustomTypes
-
-    if platform_data['category'] != 'custom':
-        raise ValidationError({'error': _('Only support custom platform')})
+    if platform_data['category'] not in [Category.CUSTOM, Category.WEB]:
+        raise ValidationError({'error': _('Only support custom and web platform package')})
 
     try:
         tp = platform_data['type']
@@ -161,7 +215,8 @@ def prepare_platform_data_for_save(pkg_dir, platform_data):
         raise ValidationError({'error': _('Missing type in platform.yml')})
 
     automation_methods = validate_platform_automation_methods(pkg_dir, platform_data=platform_data)
-    automation_defaults = CustomTypes._get_automation_constrains()['*']
+    constraints = AllTypes.get_constraints(platform_data['category'], tp)
+    automation_defaults = constraints.get('automation', {})
     if automation_methods:
         automation_defaults = {
             **automation_defaults,
@@ -181,17 +236,34 @@ def prepare_platform_data_for_save(pkg_dir, platform_data):
 
 def save_platform_from_package(pkg_dir, instance=None, created_by=''):
     from assets.serializers.platform import PlatformSerializer
+    from assets.models import PlatformAutomation
 
     data = load_platform_package_data(pkg_dir)
     if not data:
         return None
 
     data, tp = prepare_platform_data_for_save(pkg_dir, data)
+    automation_data = data.get('automation') or {}
     serializer = PlatformSerializer(data=data, instance=instance)
-    serializer.add_type_choices(tp, tp)
+    if tp not in serializer.fields['type'].choices:
+        serializer.add_type_choices(tp, tp)
     serializer.is_valid(raise_exception=True)
     platform = serializer.save()
+    automation = getattr(platform, 'automation', None)
+    if automation is None:
+        automation = PlatformAutomation.objects.create(platform=platform)
+    for field, value in automation_data.items():
+        setattr(automation, field, value)
+    automation.save()
     if created_by:
         platform.created_by = created_by
         platform.save(update_fields=['created_by'])
     return platform
+
+
+def persist_platform_package(pkg_dir, platform_name):
+    target_dir = get_persisted_platform_package_dir(platform_name)
+    if os.path.exists(target_dir):
+        shutil.rmtree(target_dir)
+    shutil.copytree(pkg_dir, target_dir)
+    return target_dir

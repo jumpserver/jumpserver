@@ -14,7 +14,12 @@ from rest_framework.serializers import ValidationError
 from assets.const import AllTypes
 from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
-from assets.utils.platform_package import locate_package_root, save_platform_from_package, validate_platform_package
+from assets.utils.platform_package import (
+    locate_package_root,
+    persist_platform_package,
+    save_platform_from_package,
+    validate_platform_package,
+)
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer, FileSerializer
@@ -140,6 +145,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         platform = save_platform_from_package(
             tmp_dir, instance=instance, created_by='PlatformPackageUpload'
         )
+        persist_platform_package(tmp_dir, platform.name)
         output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
         return Response(output_serializer.data, status=201)
 
