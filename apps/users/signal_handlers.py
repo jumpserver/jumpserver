@@ -3,7 +3,7 @@
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_out
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from django_auth_ldap.backend import populate_user
@@ -27,10 +27,8 @@ from rbac.builtin import BuiltinRole
 from rbac.const import Scope
 from rbac.models import RoleBinding
 from settings.signals import setting_changed
-from users.api import user
 from .models import User, UserPasswordHistory, UserGroup
 from .signals import post_user_create, post_user_update
-
 
 logger = get_logger(__file__)
 
@@ -103,19 +101,37 @@ def save_user_email_lookup(sender, instance, **kwargs):
     set_user_email_lookup(instance)
 
 
+@on_transaction_commit
+def sync_jdmc_user_password(username, raw_password):
+    try:
+        from xpack.plugins.jdmc.utils import change_jdmc_user_password
+        change_jdmc_user_password(username, raw_password)
+    except Exception as e:
+        logger.error(
+            "Failed to change JDMC user password for %s: %s",
+            username, e
+        )
+
+
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
     if not getattr(instance, '_password_changed', False):
         return
+
+    raw_password = None
+    if hasattr(instance, '_jdmc_password_raw'):
+        raw_password = instance._jdmc_password_raw
+        delattr(instance, '_jdmc_password_raw')
+
     if instance.source != User.Source.local.value or not instance.password:
         instance._password_changed = False
         return
 
     try:
         passwords = UserPasswordHistory.objects \
-                        .filter(user=instance) \
-                        .order_by('-date_created') \
-                        .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
+            .filter(user=instance) \
+            .order_by('-date_created') \
+            .values_list('password', flat=True)[:settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT]
 
         if instance.password not in list(passwords):
             UserPasswordHistory.objects.create(
@@ -124,6 +140,9 @@ def save_passwd_change(sender, instance: User, **kwargs):
             )
     finally:
         instance._password_changed = False
+
+    if settings.XPACK_ENABLED and settings.JDMC_ENABLED and raw_password:
+        sync_jdmc_user_password(instance.username, raw_password)
 
 
 def update_role_superuser_if_need(user):
