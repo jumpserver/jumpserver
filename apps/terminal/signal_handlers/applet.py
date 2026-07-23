@@ -78,8 +78,6 @@ def on_applet_host_delete(sender, instance, **kwargs):
 def on_applet_create(sender, instance, created=False, **kwargs):
     if not created:
         return
-    hosts = AppletHost.objects.all()
-    instance.hosts.set(hosts)
     applet_host_change_pub_sub.publish(True)
 
 
