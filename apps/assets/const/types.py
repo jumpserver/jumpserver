@@ -1,6 +1,5 @@
 import json
 from collections import defaultdict
-from copy import deepcopy
 
 from django.conf import settings
 from django.utils.functional import lazy
@@ -56,6 +55,8 @@ class AllTypes(ChoicesMixin):
             return {}
         type_constraints = types_cls.get_constrains()
         constraints = type_constraints.get(tp_name, {})
+        if not constraints and category in [Category.CUSTOM, Category.WEB]:
+            constraints = types_cls.get_default_constrains(tp_name)
         cls.set_automation_methods(category, tp_name, constraints)
         return constraints
 
@@ -69,11 +70,15 @@ class AllTypes(ChoicesMixin):
     @classmethod
     def get_automation_methods(cls):
         from assets.automations import methods as asset
+        from assets.utils.platform_package import get_persisted_platform_automation_methods
         from accounts.automations import methods as account
+        from terminal.models import Applet
 
         automation_methods = \
             asset.platform_automation_methods + \
-            account.platform_automation_methods
+            account.platform_automation_methods + \
+            get_persisted_platform_automation_methods() + \
+            Applet.get_automation_methods()
 
         request = get_current_request()
         if request is None:
@@ -85,7 +90,9 @@ class AllTypes(ChoicesMixin):
         else:
             automation_methods = \
                 asset.get_platform_automation_methods(asset.BASE_DIR, language) + \
-                account.get_platform_automation_methods(account.BASE_DIR, language)
+                account.get_platform_automation_methods(account.BASE_DIR, language) + \
+                get_persisted_platform_automation_methods(lang=language) + \
+                Applet.get_automation_methods(lang=language)
 
         cls._current_language = language
         cls._automation_methods = automation_methods

@@ -16,7 +16,6 @@ from django.utils.translation import gettext as _
 from premailer import transform
 from sshtunnel import SSHTunnelForwarder
 
-from assets.automations.methods import platform_automation_methods
 from common.const import Status
 from common.db.utils import safe_atomic_db_connection
 from common.tasks import send_mail_async
@@ -246,7 +245,8 @@ class PlaybookPrepareMixin:
 
     @property
     def platform_automation_methods(self):
-        return platform_automation_methods
+        from assets.const import AllTypes
+        return AllTypes.get_automation_methods()
 
     def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
@@ -339,6 +339,8 @@ class PlaybookPrepareMixin:
         method_playbook_dir_path = method["dir"]
         sub_playbook_path = os.path.join(sub_playbook_dir, "project", "main.yml")
         shutil.copytree(method_playbook_dir_path, os.path.dirname(sub_playbook_path))
+        if not os.path.exists(sub_playbook_path):
+            return None
 
         with open(sub_playbook_path, "r") as f:
             plays = yaml.safe_load(f)
@@ -420,8 +422,12 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
         protocol = method.get("protocol")
         self.generate_inventory(_assets, inventory_path, protocol)
-        playbook_path = self.generate_playbook(method, playbook_dir)
+        with open(inventory_path, "r") as f:
+            inventory_data = json.load(f)
+            if not inventory_data["all"].get("hosts"):
+                return None, None
 
+        playbook_path = self.generate_playbook(method, playbook_dir)
         if not playbook_path:
             self.on_playbook_not_found(_assets)
             return None, None
@@ -463,12 +469,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
                 if not runner or not inventory_path:
                     continue
-
-                with open(inventory_path, "r") as f:
-                    inventory_data = json.load(f)
-                    if not inventory_data["all"].get("hosts"):
-                        continue
-
+                
                 runners.append(
                     (
                         runner,

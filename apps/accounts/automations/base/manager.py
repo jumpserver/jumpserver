@@ -4,7 +4,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from accounts.automations.methods import platform_automation_methods
 from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
     ChangeSecretAccountStatus
 from accounts.models import BaseAccountQuerySet
@@ -22,7 +21,8 @@ class AccountBasePlaybookManager(BasePlaybookManager):
 
     @property
     def platform_automation_methods(self):
-        return platform_automation_methods
+        from assets.const import AllTypes
+        return AllTypes.get_automation_methods()
 
 
 class BaseChangeSecretPushManager(AccountBasePlaybookManager):
