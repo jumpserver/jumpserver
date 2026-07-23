@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -42,18 +41,19 @@ class UserGroupSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         if users_field:
             users_field.child_relation.queryset = utils.get_current_org_members()
 
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        """ Perform necessary eager loading of data. """
-        queryset = queryset.annotate(users_amount=Count('users', distinct=True, filter=Q(users__is_service_account=False)))
-        return queryset
-
 
 class UserGroupListSerializer(UserGroupSerializer):
     users_amount = serializers.IntegerField(label=_('Users amount'), read_only=True)
 
     class Meta(UserGroupSerializer.Meta):
-        fields = list(set(UserGroupSerializer.Meta.fields + ['users_amount']) - {'users'})
+        relation_count_fields = {
+            'users_amount': {
+                'relation': 'users',
+                'related_filters': {'is_service_account': False},
+            },
+        }
+        amount_fields = list(relation_count_fields)
+        fields = list(set(UserGroupSerializer.Meta.fields + amount_fields) - {'users'})
         extra_kwargs = {
             **UserGroupSerializer.Meta.extra_kwargs,
         }

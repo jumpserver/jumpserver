@@ -131,8 +131,8 @@ class QuerySetMixin:
             return queryset
         if self.action == 'metadata':
             queryset = queryset.none()
-        queryset = self.setup_eager_loading(queryset)
         queryset = self.limit_queryset_if_no_page(queryset)
+        queryset = self.setup_eager_loading(queryset)
         return queryset
 
     def setup_eager_loading(self, queryset, is_paginated=False):
@@ -151,6 +151,10 @@ class QuerySetMixin:
 
         if hasattr(serializer_class, 'setup_eager_labels'):
             queryset = serializer_class.setup_eager_labels(queryset)
+
+        should_attach_counts = is_paginated or getattr(self, 'action', None) == 'list'
+        if should_attach_counts and hasattr(serializer_class, 'attach_relation_counts'):
+            queryset = serializer_class.attach_relation_counts(queryset)
         return queryset
 
     def paginate_queryset(self, queryset):
