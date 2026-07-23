@@ -10,7 +10,7 @@ from ops.ansible.docker import ANSIBLE_EE_IMAGE
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
-    'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
+    'OpenBaoSerializer', 'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
 
@@ -83,6 +83,22 @@ class VaultSettingSerializer(BaseVaultSettingSerializer, serializers.Serializer)
             'If the value reaches or exceeds 999 (default), '
             'no historical account deletion will be performed'
         )
+    )
+
+
+class OpenBaoSerializer(BaseVaultSettingSerializer, serializers.Serializer):
+    PREFIX_TITLE = _('OpenBao')
+    VAULT_OPENBAO_ADDR = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('OpenBao address')
+    )
+    VAULT_OPENBAO_TOKEN = EncryptedField(
+        max_length=4096, allow_blank=True, required=False, label=_('Token'), default=''
+    )
+    VAULT_OPENBAO_MOUNT_POINT = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Mount Point')
+    )
+    VAULT_OPENBAO_TIMEOUT = serializers.IntegerField(
+        max_value=120, min_value=1, required=False, label=_('Timeout')
     )
 
 

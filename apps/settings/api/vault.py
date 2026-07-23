@@ -13,6 +13,7 @@ from .. import serializers
 
 class VaultTestingAPI(GenericAPIView):
     backends_serializer = {
+        'openbao': serializers.OpenBaoSerializer,
         'azure': serializers.AzureKVSerializer,
         'aws': serializers.AmazonSMSerializer,
         'hcp': serializers.HashicorpKVSerializer
