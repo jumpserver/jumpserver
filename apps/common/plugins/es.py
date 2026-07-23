@@ -66,9 +66,9 @@ class ESClient(object):
         version = get_es_client_version(**kwargs)
         if version == 6:
             return ESClientV6(*args, **kwargs)
-        if version == 7:
+        elif version == 7:
             return ESClientV7(*args, **kwargs)
-        elif version == 8:
+        elif version in (8, 9):
             return ESClientV8(*args, **kwargs)
         raise ValueError('Unsupported ES_VERSION %r' % version)
 

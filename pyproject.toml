@@ -28,7 +28,7 @@ dependencies = [
     'olefile==0.46',
     'paramiko==3.5.1',
     'passlib==1.7.4',
-    'pyasn1==0.6.3',
+    'pyasn1==0.6.4',
     'pycparser==2.21',
     'pycryptodome==3.23.0',
     'pycryptodomex==3.23.0',
