@@ -26,27 +26,27 @@ public class Demo {
         private final HttpClient httpClient = HttpClient.newHttpClient();
 
         public String getAccountSecret(String asset, String account) throws Exception {
-            // 编码 URL 参数
+            // Encode URL parameters
             String queryString = "asset=" + URLEncoder.encode(asset, StandardCharsets.UTF_8) +
                                  "&account=" + URLEncoder.encode(account, StandardCharsets.UTF_8);
 
-            // 完整的 URL（带参数）
+            // Complete URL with parameters
             String url = API_URL + "/api/v1/accounts/integration-applications/account-secret/?" + queryString;
 
-            // 获取当前 UTC 时间
+            // Get the current UTC time
             String date = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
-            // 构造 (request-target)，包括查询参数
+            // Build (request-target), including query parameters
             String requestTarget = "get /api/v1/accounts/integration-applications/account-secret/?" + queryString;
 
-            // 生成签名字符串
+            // Generate the signing string
             String signingString = "(request-target): " + requestTarget + "\n" +
                                    "accept: application/json\n" +
                                    "date: " + date + "\n" +
                                    "x-jms-org: " + ORG_ID;
             String signature = sign(signingString, KEY_SECRET);
 
-            // 构造 HTTP 请求
+            // Build the HTTP request
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Accept", "application/json")
@@ -56,17 +56,17 @@ public class Demo {
                     .header("Authorization", "Signature keyId=\"" + KEY_ID + "\",algorithm=\"hmac-sha256\",headers=\"(request-target) accept date x-jms-org\",signature=\"" + signature + "\"")
                     .build();
 
-            // 发送请求
+            // Send the request
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 return response.body();
             } else {
-                System.err.println("API 请求失败: " + response.statusCode());
+                System.err.println("API request failed: " + response.statusCode());
                 return null;
             }
         }
 
-        // HMAC-SHA256 签名计算
+        // Calculate the HMAC-SHA256 signature
         private String sign(String data, String key) throws Exception {
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");

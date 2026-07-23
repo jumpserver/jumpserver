@@ -228,6 +228,9 @@ class UserResetPasswordView(FormView):
         user.reset_password(password)
         User.expired_reset_password_token(token)
 
+        lang = self.request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+        if lang:
+            user.lang = lang
         ResetPasswordSuccessMsg(user, self.request).publish_async()
         url = self.get_redirect_url()
         return redirect(url)
