@@ -70,10 +70,12 @@ class AllTypes(ChoicesMixin):
     def get_automation_methods(cls):
         from assets.automations import methods as asset
         from accounts.automations import methods as account
+        from terminal.models import Applet
 
         automation_methods = \
             asset.platform_automation_methods + \
-            account.platform_automation_methods
+            account.platform_automation_methods + \
+            Applet.get_automation_methods()
 
         request = get_current_request()
         if request is None:
@@ -85,7 +87,8 @@ class AllTypes(ChoicesMixin):
         else:
             automation_methods = \
                 asset.get_platform_automation_methods(asset.BASE_DIR, language) + \
-                account.get_platform_automation_methods(account.BASE_DIR, language)
+                account.get_platform_automation_methods(account.BASE_DIR, language) + \
+                Applet.get_automation_methods(lang=language)
 
         cls._current_language = language
         cls._automation_methods = automation_methods

@@ -1,3 +1,7 @@
+import os
+import shutil
+
+from django.core.files.storage import default_storage
 from django.db.models import Subquery, OuterRef, Count, Value
 from django.db.models.functions import Coalesce
 from django_filters import rest_framework as filters
@@ -5,13 +9,16 @@ from rest_framework import generics
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 from assets.const import AllTypes
 from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
+from assets.utils.platform_package import locate_package_root, save_platform_from_package, validate_platform_package
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
-from common.serializers import GroupedChoiceSerializer
+from common.serializers import GroupedChoiceSerializer, FileSerializer
+from common.utils.zip import safe_extract_zip
 from rbac.models import RoleBinding
 
 __all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi', 'PlatformProtocolViewSet']
@@ -33,6 +40,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'default': PlatformSerializer,
         'list': PlatformListSerializer,
         'categories': GroupedChoiceSerializer,
+        'upload': FileSerializer,
     }
     filterset_class = PlatformFilter
     search_fields = ['name']
@@ -42,6 +50,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'type_constraints': 'assets.view_platform',
         'ops_methods': 'assets.view_platform',
         'filter_nodes_assets': 'assets.view_platform',
+        'upload': 'assets.add_platform',
     }
     page_no_limit = True
 
@@ -100,6 +109,39 @@ class AssetPlatformViewSet(JMSModelViewSet):
         platforms = Platform.objects.filter(id__in=platform_ids)
         serializer = self.get_serializer(platforms, many=True)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=False)
+    def upload(self, request, *args, **kwargs):
+        input_serializer = FileSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+
+        file = input_serializer.validated_data['file']
+        save_to = 'platforms/{}'.format(file.name + '.tmp.zip')
+        if default_storage.exists(save_to):
+            default_storage.delete(save_to)
+        rel_path = default_storage.save(save_to, file)
+        path = default_storage.path(rel_path)
+        extract_to = default_storage.path('platforms/{}.tmp'.format(file.name))
+
+        if os.path.exists(extract_to):
+            shutil.rmtree(extract_to)
+
+        try:
+            safe_extract_zip(path, extract_to)
+        except RuntimeError as e:
+            raise ValidationError({'error': 'Invalid zip file: {}'.format(e)})
+
+        tmp_dir = locate_package_root(extract_to, file.name, 'platform.yml')
+        data = validate_platform_package(tmp_dir)
+        if not data:
+            raise ValidationError({'error': 'Missing platform.yml in package'})
+        name = data['name']
+        instance = Platform.objects.filter(name=name).first()
+        platform = save_platform_from_package(
+            tmp_dir, instance=instance, created_by='PlatformPackageUpload'
+        )
+        output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
+        return Response(output_serializer.data, status=201)
 
 
 class PlatformProtocolViewSet(JMSModelViewSet):

@@ -16,7 +16,6 @@ from django.utils.translation import gettext as _
 from premailer import transform
 from sshtunnel import SSHTunnelForwarder
 
-from assets.automations.methods import platform_automation_methods
 from common.const import Status
 from common.db.utils import safe_atomic_db_connection
 from common.tasks import send_mail_async
@@ -246,7 +245,8 @@ class PlaybookPrepareMixin:
 
     @property
     def platform_automation_methods(self):
-        return platform_automation_methods
+        from assets.const import AllTypes
+        return AllTypes.get_automation_methods()
 
     def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR

@@ -78,8 +78,13 @@ def on_applet_host_delete(sender, instance, **kwargs):
 def on_applet_create(sender, instance, created=False, **kwargs):
     if not created:
         return
-    hosts = AppletHost.objects.all()
-    instance.hosts.set(hosts)
+    host_ids = AppletHost.objects.values_list('pk', flat=True)
+    publications = [
+        instance.publications.model(applet=instance, host_id=host_id)
+        for host_id in host_ids
+    ]
+    if publications:
+        instance.publications.model.objects.bulk_create(publications, ignore_conflicts=True)
     applet_host_change_pub_sub.publish(True)
 
 
