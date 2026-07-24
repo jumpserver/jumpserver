@@ -8754,7 +8754,8 @@ msgstr "Centro de trabajos"
 
 #: settings/serializers/feature.py:205
 msgid "Allow users to use the Job Center to execute jobs"
-msgstr "Permite a los usuarios utilizar el Centro de trabajos para ejecutar trabajos"
+msgstr ""
+"Permite a los usuarios utilizar el Centro de trabajos para ejecutar trabajos"
 
 #: settings/serializers/feature.py:23
 #, python-format

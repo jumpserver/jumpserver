@@ -8571,7 +8571,8 @@ msgstr "Центр заданий"
 
 #: settings/serializers/feature.py:205
 msgid "Allow users to use the Job Center to execute jobs"
-msgstr "Разрешить пользователям использовать Центр заданий для выполнения заданий"
+msgstr ""
+"Разрешить пользователям использовать Центр заданий для выполнения заданий"
 
 #: settings/serializers/feature.py:23
 #, python-format

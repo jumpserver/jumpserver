@@ -8596,7 +8596,8 @@ msgstr "Centro de trabalhos"
 
 #: settings/serializers/feature.py:205
 msgid "Allow users to use the Job Center to execute jobs"
-msgstr "Permitir que os usuários usem o Centro de trabalhos para executar trabalhos"
+msgstr ""
+"Permitir que os usuários usem o Centro de trabalhos para executar trabalhos"
 
 #: settings/serializers/feature.py:23
 #, python-format
@@ -8609,8 +8610,8 @@ msgstr ""
 "Execute trabalhos do Ansible no ambiente de execução Docker (%(image)s). "
 "Para executar os trabalhos localmente, desative \"Isolamento do Docker para "
 "Ansible\" em Configurações do sistema > Configurações de recursos > Central "
-"de trabalhos. Se a imagem estiver ausente, execute este comando no worker "
-"do Ansible: docker pull %(image)s"
+"de trabalhos. Se a imagem estiver ausente, execute este comando no worker do"
+" Ansible: docker pull %(image)s"
 
 #: settings/serializers/feature.py:238
 msgid "Docker isolation for Ansible"

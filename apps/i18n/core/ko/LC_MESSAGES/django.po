@@ -8319,9 +8319,9 @@ msgid ""
 "Settings > Feature Settings > Job Center. If the image is missing, run this "
 "command on the Ansible worker: docker pull %(image)s"
 msgstr ""
-"Docker 실행 환경(%(image)s)에서 Ansible 작업을 실행합니다. 작업을 로컬에서 실행하려면 "
-"시스템 설정 > 기능 설정 > 작업 센터에서 \"Ansible용 Docker 격리\"를 비활성화하십시오. "
-"이미지가 없는 경우 Ansible 워커에서 다음 명령을 실행하십시오: docker pull %(image)s"
+"Docker 실행 환경(%(image)s)에서 Ansible 작업을 실행합니다. 작업을 로컬에서 실행하려면 시스템 설정 > 기능 설정 >"
+" 작업 센터에서 \"Ansible용 Docker 격리\"를 비활성화하십시오. 이미지가 없는 경우 Ansible 워커에서 다음 명령을 "
+"실행하십시오: docker pull %(image)s"
 
 #: settings/serializers/feature.py:238
 msgid "Docker isolation for Ansible"

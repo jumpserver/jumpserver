@@ -8250,9 +8250,9 @@ msgid ""
 "Settings > Feature Settings > Job Center. If the image is missing, run this "
 "command on the Ansible worker: docker pull %(image)s"
 msgstr ""
-"在 Docker 執行環境（%(image)s）中執行 Ansible 作業。如需改為本機執行，請前往「系統設定 > "
-"功能設定 > 作業中心」，停用「Ansible Docker 隔離」。若映像不存在，請在 Ansible Worker "
-"節點執行：docker pull %(image)s"
+"在 Docker 執行環境（%(image)s）中執行 Ansible 作業。如需改為本機執行，請前往「系統設定 > 功能設定 > "
+"作業中心」，停用「Ansible Docker 隔離」。若映像不存在，請在 Ansible Worker 節點執行：docker pull "
+"%(image)s"
 
 #: settings/serializers/feature.py:238
 msgid "Docker isolation for Ansible"
