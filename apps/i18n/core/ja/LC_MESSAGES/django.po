@@ -8273,13 +8273,28 @@ msgid "The unit of period"
 msgstr "ユーザーの実行"
 
 #: settings/serializers/feature.py:204
-msgid "Adhoc command"
-msgstr "バッチコマンド実行"
+msgid "Job Center"
+msgstr "ジョブセンター"
 
 #: settings/serializers/feature.py:205
+msgid "Allow users to use the Job Center to execute jobs"
+msgstr "ユーザーがジョブセンターを使用してジョブを実行できるようにします"
+
+#: settings/serializers/feature.py:23
+#, python-format
 msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
-msgstr "ユーザーがワークベンチ - ジョブセンター - Adhocでバッチコマンドを実行することを許可します"
+"Run Ansible jobs in the Docker execution environment (%(image)s). To run "
+"jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+"Settings > Feature Settings > Job Center. If the image is missing, run this "
+"command on the Ansible worker: docker pull %(image)s"
+msgstr ""
+"Ansible ジョブを Docker 実行環境（%(image)s）で実行します。ジョブをローカルで実行するには、システム設定 > 機能設定 > "
+"ジョブセンターで「Ansible の Docker 分離」を無効にしてください。イメージがない場合は、Ansible "
+"ワーカーで次のコマンドを実行してください: docker pull %(image)s"
+
+#: settings/serializers/feature.py:238
+msgid "Docker isolation for Ansible"
+msgstr "Ansible の Docker 分離"
 
 #: settings/serializers/feature.py:209
 msgid "Command blacklist"

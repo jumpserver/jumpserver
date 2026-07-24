@@ -8184,12 +8184,11 @@ msgid "The unit of period"
 msgstr ""
 
 #: settings/serializers/feature.py:204
-msgid "Adhoc command"
+msgid "Job Center"
 msgstr ""
 
 #: settings/serializers/feature.py:205
-msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
+msgid "Allow users to use the Job Center to execute jobs"
 msgstr ""
 
 #: settings/serializers/feature.py:209

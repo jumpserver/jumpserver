@@ -8566,15 +8566,31 @@ msgid "The unit of period"
 msgstr "Единица периода"
 
 #: settings/serializers/feature.py:204
-msgid "Adhoc command"
-msgstr "Быстрые команды"
+msgid "Job Center"
+msgstr "Центр заданий"
 
 #: settings/serializers/feature.py:205
-msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
+msgid "Allow users to use the Job Center to execute jobs"
 msgstr ""
-"Разрешить пользователю выполнять пакетные команды в разделе Рабочий стол - "
-"Центр заданий - Быстрые команды"
+"Разрешить пользователям использовать Центр заданий для выполнения заданий"
+
+#: settings/serializers/feature.py:23
+#, python-format
+msgid ""
+"Run Ansible jobs in the Docker execution environment (%(image)s). To run "
+"jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+"Settings > Feature Settings > Job Center. If the image is missing, run this "
+"command on the Ansible worker: docker pull %(image)s"
+msgstr ""
+"Запускайте задания Ansible в среде выполнения Docker (%(image)s). Чтобы "
+"запускать задания локально, отключите «Изоляция Docker для Ansible» в "
+"разделе Системные настройки > Настройки функций > Центр заданий. Если образ "
+"отсутствует, выполните эту команду на рабочем узле Ansible: docker pull "
+"%(image)s"
+
+#: settings/serializers/feature.py:238
+msgid "Docker isolation for Ansible"
+msgstr "Изоляция Docker для Ansible"
 
 #: settings/serializers/feature.py:209
 msgid "Command blacklist"

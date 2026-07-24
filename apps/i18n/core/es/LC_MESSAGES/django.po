@@ -8749,15 +8749,31 @@ msgid "The unit of period"
 msgstr "Ciclo de ejecución"
 
 #: settings/serializers/feature.py:204
-msgid "Adhoc command"
-msgstr "Ejecución de comandos por lotes"
+msgid "Job Center"
+msgstr "Centro de trabajos"
 
 #: settings/serializers/feature.py:205
-msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
+msgid "Allow users to use the Job Center to execute jobs"
 msgstr ""
-"Permite a los usuarios ejecutar comandos por lotes en el escritorio - Centro"
-" de trabajo - Adhoc"
+"Permite a los usuarios utilizar el Centro de trabajos para ejecutar trabajos"
+
+#: settings/serializers/feature.py:23
+#, python-format
+msgid ""
+"Run Ansible jobs in the Docker execution environment (%(image)s). To run "
+"jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+"Settings > Feature Settings > Job Center. If the image is missing, run this "
+"command on the Ansible worker: docker pull %(image)s"
+msgstr ""
+"Ejecute los trabajos de Ansible en el entorno de ejecución de Docker "
+"(%(image)s). Para ejecutar los trabajos localmente, desactive \"Aislamiento "
+"de Docker para Ansible\" en Configuración del sistema > Configuración de "
+"funciones > Centro de trabajos. Si falta la imagen, ejecute este comando en "
+"el worker de Ansible: docker pull %(image)s"
+
+#: settings/serializers/feature.py:238
+msgid "Docker isolation for Ansible"
+msgstr "Aislamiento de Docker para Ansible"
 
 #: settings/serializers/feature.py:209
 msgid "Command blacklist"
