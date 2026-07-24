@@ -1,6 +1,7 @@
 import uuid
 
 from django.utils import timezone
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -18,13 +19,16 @@ from settings.const import (
     ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices, ChatAIMethodChoices
 )
 
-ANSIBLE_DOCKER_HELP_TEXT = _(
-    'Run Ansible jobs in the Docker execution environment (%(image)s). '
-    'To run jobs locally instead, disable "Docker isolation for Ansible" under '
-    'System Settings > Feature Settings > Job Center. '
-    'If the image is missing, run this command on the Ansible worker: '
-    'docker pull %(image)s'
-) % {'image': ANSIBLE_EE_IMAGE}
+ANSIBLE_DOCKER_HELP_TEXT = lazy(
+    lambda: _(
+        'Run Ansible jobs in the Docker execution environment (%(image)s). '
+        'To run jobs locally instead, disable "Docker isolation for Ansible" under '
+        'System Settings > Feature Settings > Job Center. '
+        'If the image is missing, run this command on the Ansible worker: '
+        'docker pull %(image)s'
+    ) % {'image': ANSIBLE_EE_IMAGE},
+    str,
+)()
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -226,8 +230,8 @@ class OpsSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Feature')
 
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Adhoc command'),
-        help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
+        required=False, label=_('Job Center'),
+        help_text=_('Allow users to use the Job Center to execute jobs')
     )
     ANSIBLE_DOCKER_ENABLED = serializers.BooleanField(
         required=False,

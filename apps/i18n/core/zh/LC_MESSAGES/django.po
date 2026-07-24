@@ -8434,13 +8434,12 @@ msgid "The unit of period"
 msgstr "执行周期"
 
 #: settings/serializers/feature.py:213
-msgid "Adhoc command"
-msgstr "批量命令执行"
+msgid "Job Center"
+msgstr "作业中心"
 
 #: settings/serializers/feature.py:214
-msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
-msgstr "允许用户在工作台 - 作业中心 - Adhoc 中执行批量命令"
+msgid "Allow users to use the Job Center to execute jobs"
+msgstr "允许用户使用作业中心执行作业"
 
 #: settings/serializers/feature.py:218
 msgid "Docker isolation for Ansible"
