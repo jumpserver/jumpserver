@@ -727,6 +727,7 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+        'PROMETHEUS_METRICS_TOKEN': '',
 
         # Applet 等软件的下载地址
         'APPLET_DOWNLOAD_HOST': '',
