@@ -21,7 +21,7 @@ class CeleryLoggerConsumer(ConsumerMixin):
 
     def get_consumers(self, Consumer, channel):
         return [Consumer(queues=celery_log_queue,
-                         accept=['pickle', 'json'],
+                         accept=['json'],
                          callbacks=[self.process_task])
                 ]
 
