@@ -84,6 +84,7 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
         if self.secret_type != SecretType.SSH_KEY:
             return data
         data['ssh_key_fingerprint'] = self.ssh_key_fingerprint
+        data['ssh_key_fingerprint_sha256'] = self.ssh_key_fingerprint_sha256
         return data
 
     @property
@@ -127,6 +128,13 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
         public_key_obj = sshpubkeys.SSHKey(public_key)
         fingerprint = public_key_obj.hash_md5()
         return fingerprint
+
+    @property
+    def ssh_key_fingerprint_sha256(self) -> str:
+        public_key_obj = self.public_key_obj
+        if not public_key_obj:
+            return ''
+        return public_key_obj.hash_sha256()
 
     @property
     def private_key_obj(self):
