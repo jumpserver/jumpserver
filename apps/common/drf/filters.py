@@ -463,32 +463,66 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             )
         ]
 
-    @staticmethod
-    def parse_labels(labels_id):
+    @classmethod
+    def parse_labels(cls, labels_id):
         from labels.models import Label
 
-        label_ids = [i.strip() for i in labels_id.split(",")]
-        cleaned = []
+        grouped = cls.parse_label_groups(labels_id)
+        label_ids = {
+            label_id
+            for group_label_ids in grouped.values()
+            for label_id in group_label_ids
+        }
+        return list(Label.objects.filter(id__in=label_ids))
 
-        args = []
-        for label_id in label_ids:
-            kwargs = {}
-            if ":" in label_id:
-                k, v = label_id.split(":", 1)
-                kwargs["name"] = k.strip()
-                if v != "*":
-                    kwargs["value"] = v.strip()
-                args.append(kwargs)
-            else:
-                cleaned.append(label_id)
+    @staticmethod
+    def parse_label_groups(labels_id):
+        """
+        Resolve requested labels and group their IDs by label name.
 
-        if len(args) != 0:
-            q = Q()
-            for kwarg in args:
-                q |= Q(**kwarg)
-            labels = Label.objects.filter(q)
-            cleaned.extend(list(labels))
-        return cleaned
+        Values in one group are OR'ed; resource matches from separate groups
+        are intersected later.
+        """
+        from labels.models import Label
+        from django.core.exceptions import ValidationError as DjangoValidationError
+
+        named_values = defaultdict(set)
+        raw_label_ids = set()
+        for item in labels_id.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            if ":" not in item:
+                raw_label_ids.add(item)
+                continue
+            name, value = item.split(":", 1)
+            named_values[name.strip()].add(value.strip())
+
+        grouped = defaultdict(set)
+        for name, values in named_values.items():
+            labels = Label.objects.filter(name=name)
+            if "*" not in values:
+                labels = labels.filter(value__in=values)
+            grouped[name].update(labels.values_list("id", flat=True))
+
+        if raw_label_ids:
+            label_ids = set()
+            has_invalid_id = False
+            for label_id in raw_label_ids:
+                try:
+                    label_ids.add(Label._meta.pk.to_python(label_id))
+                except (DjangoValidationError, TypeError, ValueError):
+                    has_invalid_id = True
+
+            labels = Label.objects.filter(id__in=label_ids)
+            found_ids = set()
+            for label in labels:
+                found_ids.add(label.id)
+                grouped[label.name].add(label.id)
+            if has_invalid_id or found_ids != label_ids:
+                grouped[None] = set()
+
+        return grouped
 
     def filter_queryset(self, request, queryset, view):
         labels_id = request.query_params.get("labels")
@@ -510,21 +544,22 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             res_type__app_label=app_label,
             res_type__model=model_name,
         )
-        labels = self.parse_labels(labels_id)
-        grouped = defaultdict(set)
-        for label in labels:
-            grouped[label.name].add(label.id)
+        grouped = self.parse_label_groups(labels_id)
+        if not grouped or any(not label_ids for label_ids in grouped.values()):
+            return queryset.none()
 
-        matched_ids = set()
-        for name, label_ids in grouped.items():
+        matched_ids = None
+        for label_ids in grouped.values():
             resources = model.filter_resources_by_labels(
                 full_resources, label_ids, rel="any"
             )
             res_ids = resources.values_list("res_id", flat=True)
-            if not matched_ids:
+            if matched_ids is None:
                 matched_ids = set(res_ids)
             else:
                 matched_ids &= set(res_ids)
+            if not matched_ids:
+                return queryset.none()
         queryset = queryset.filter(id__in=matched_ids)
         return queryset
 
