@@ -1,5 +1,7 @@
+import secrets
 import time
 
+from django.conf import settings
 from django.core.cache import cache
 from django.http.response import HttpResponse
 from rest_framework.permissions import AllowAny
@@ -63,6 +65,11 @@ class PrometheusMetricsApi(HealthApiMixin):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
+        expected_token = str(settings.PROMETHEUS_METRICS_TOKEN or '')
+        token = request.query_params.get('token', '')
+        if not expected_token or not secrets.compare_digest(token, expected_token):
+            return HttpResponse(status=403)
+
         util = ComponentsPrometheusMetricsUtil()
         metrics_text = util.get_prometheus_metrics_text()
         return HttpResponse(metrics_text, content_type='text/plain; version=0.0.4; charset=utf-8')
