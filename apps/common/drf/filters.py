@@ -50,11 +50,46 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
     negated_text_lookups = {"icontains", "startswith"}
     negated_value_lookups = {"exact", "in"}
 
+    def get_filterset_kwargs(self, request, queryset, view):
+        kwargs = super().get_filterset_kwargs(request, queryset, view)
+        implicit_in_lookups = self.get_implicit_in_lookups(request, queryset)
+        if not implicit_in_lookups:
+            return kwargs
+
+        data = kwargs["data"].copy()
+        for param in implicit_in_lookups:
+            if param in data:
+                data.pop(param)
+        kwargs["data"] = data
+        return kwargs
+
     def filter_queryset(self, request, queryset, view):
         queryset = super().filter_queryset(request, queryset, view)
+        queryset = self.filter_implicit_in_lookups(request, queryset)
         queryset = self.filter_dynamic_text_lookups(request, queryset)
         queryset = self.filter_dynamic_value_lookups(request, queryset)
         return self.filter_dynamic_negated_lookups(request, queryset)
+
+    def get_implicit_in_lookups(self, request, queryset):
+        model = getattr(queryset, "model", None)
+        if model is None:
+            return {}
+
+        lookups = {}
+        for param, values in request.query_params.lists():
+            field_name, lookup = self.split_lookup_param(param)
+            if lookup != "exact" or not self.is_value_lookup_field(model, field_name):
+                continue
+
+            cleaned_values = self.split_csv_values(values)
+            if len(cleaned_values) > 1:
+                lookups[field_name] = cleaned_values
+        return lookups
+
+    def filter_implicit_in_lookups(self, request, queryset):
+        for field_name, values in self.get_implicit_in_lookups(request, queryset).items():
+            queryset = queryset.filter(**{f"{field_name}__in": values})
+        return queryset
 
     def filter_dynamic_text_lookups(self, request, queryset):
         model = getattr(queryset, "model", None)
@@ -152,7 +187,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
     def split_lookup_param(param):
         if "__" not in param:
             return param, "exact"
-        return param.rsplit("__", 1)
+        return tuple(param.rsplit("__", 1))
 
     @staticmethod
     def split_csv_values(values):
