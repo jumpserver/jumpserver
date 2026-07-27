@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from accounts.const import SecretType
 from accounts.models import Account
+from acls.const import ActionChoices as ACLActionChoices
 from acls.models import CommandGroup, CommandFilterACL, DataMaskingRule
 from assets.models import Asset, Platform, Gateway, Zone
 from assets.serializers.asset import AssetProtocolsSerializer
@@ -10,6 +11,7 @@ from assets.serializers.platform import PlatformSerializer
 from common.serializers.fields import LabeledChoiceField
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from perms.const import ActionChoices as PermActionChoices
 from perms.serializers.permission import ActionChoicesField
 from users.models import User
 from ..models import ConnectionToken
@@ -147,6 +149,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     zone = ObjectRelatedField(queryset=Zone.objects, required=False, label=_('Domain'))
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
+    clipboard_policy = serializers.SerializerMethodField()
     data_masking_rules = _ConnectionTokenDataMaskingRuleSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
@@ -158,7 +161,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields = [
             'id', 'value', 'user', 'asset', 'account',
-            'platform', 'command_filter_acls', 'data_masking_rules', 'protocol',
+            'platform', 'command_filter_acls', 'clipboard_policy', 'data_masking_rules', 'protocol',
             'zone', 'gateway', 'actions', 'expire_at',
             'from_ticket', 'expire_now', 'connect_method',
             'connect_options', 'face_monitor_token'
@@ -167,6 +170,43 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'face_monitor_token': {'read_only': True},
             'value': {'read_only': True},
         }
+
+    @staticmethod
+    def _get_clipboard_acl_for_operation(token, operation):
+        return next(
+            (acl for acl in token.clipboard_acls if acl.matches_operation(operation)),
+            None,
+        )
+
+    def get_clipboard_policy(self, token):
+        operation_map = {
+            'copy': {
+                'operation': PermActionChoices.copy,
+                'text_limit_field': 'copy_text_limit',
+                'file_size_limit_field': 'download_file_size_limit',
+            },
+            'paste': {
+                'operation': PermActionChoices.paste,
+                'text_limit_field': 'paste_text_limit',
+                'file_size_limit_field': 'upload_file_size_limit',
+            },
+        }
+        policy = {}
+        for name, config in operation_map.items():
+            operation = config['operation']
+            acl = self._get_clipboard_acl_for_operation(token, operation)
+            perm_allowed = PermActionChoices.contains(token.actions, operation)
+            acl_allowed = acl is None or acl.action == ACLActionChoices.accept
+            enabled = perm_allowed and acl_allowed
+            policy[name] = {
+                'enabled': enabled,
+                'action': ACLActionChoices.accept.value if enabled else ACLActionChoices.reject.value,
+                'perm_allowed': perm_allowed,
+                'acl_action': acl.action if acl else None,
+                'text_limit': getattr(acl, config['text_limit_field'], 0) if acl else 0,
+                'file_size_limit': getattr(acl, config['file_size_limit_field'], 0) if acl else 0,
+            }
+        return policy
 
 
 class ConnectTokenAppletOptionSerializer(serializers.Serializer):
