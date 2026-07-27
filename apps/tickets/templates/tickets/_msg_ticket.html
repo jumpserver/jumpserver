@@ -3,17 +3,18 @@
     <h1 class="title">
         {{ title | safe }}
     </h1>
+    <hr>
     <div>
         {% for child in content %}
             <div class="card">
                 <h2 class="child_title">{{ child.title }}</h2>
-                {% for item in child.content %}
-                    <p class="field-group">
-                        <span class="field-name"><strong>{{ item.title }}:</strong></span>
-                        <span class="field-value">{{ item.value | truncatechars:512 }}</span>
-                    </p>
-                {% endfor %}
+                <ul class="field-list">
+                    {% for item in child.content %}
+                        <li class="field-group"><strong class="field-name">{{ item.title }}:</strong> <span class="field-value">{{ item.value | truncatechars:512 }}</span></li>
+                    {% endfor %}
+                </ul>
             </div>
+            <hr>
         {% endfor %}
     </div>
     <div class="action_group">

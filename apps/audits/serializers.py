@@ -75,6 +75,7 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
     mfa = LabeledChoiceField(choices=MFAChoices.choices, label=_("MFA"))
     type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
     status = LabeledChoiceField(choices=LoginStatusChoices.choices, label=_("Status"))
+    city = serializers.ReadOnlyField(source='city_display', label=_("Login city"))
 
     class Meta:
         model = models.UserLoginLog
@@ -223,6 +224,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
     user = ObjectRelatedField(required=False, queryset=User.objects, label=_('User'))
     date_expired = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", label=_('Date expired'))
     is_current_user_session = serializers.SerializerMethodField()
+    city = serializers.ReadOnlyField(source='city_display', label=_("Login city"))
 
     class Meta:
         model = models.UserSession

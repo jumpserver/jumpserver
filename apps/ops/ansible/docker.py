@@ -33,12 +33,13 @@ def docker_extravars(extra_vars):
     return extravars
 
 
-def docker_isolation_kwargs():
+def docker_isolation_kwargs(project_dir):
     return {
         'process_isolation': True,
         'process_isolation_executable': 'docker',
         'container_image': ANSIBLE_EE_IMAGE,
         'container_options': ['--network=jms_net'],
+        'container_volume_mounts': [f'{project_dir}:{project_dir}:Z'],
     }
 
 
@@ -65,12 +66,13 @@ def stage_inventory_for_docker(project_dir, inventory_path):
 def ensure_ansible_docker_image():
     if not use_ansible_docker_isolation():
         return
-    result = safe_run_cmd(['docker', 'image', 'inspect', ANSIBLE_EE_IMAGE])
+    result = safe_run_cmd(['docker', 'image', 'inspect', ANSIBLE_EE_IMAGE], quiet=True)
     if not result or result.returncode != 0:
         raise AnsibleDockerImageNotFound(
-            _('Ansible Docker image "%(image)s" not found. '
-              'You can disable this option in System Settings - Feature Settings - Job Center - '
-              'Ansible Docker isolation to run locally. '
-              'Please run: docker pull %(image)s')
+            _('The Ansible Docker image "%(image)s" was not found. '
+              'To run jobs locally instead, disable "Docker isolation for Ansible" under '
+              'System Settings > Feature Settings > Job Center. '
+              'To continue using the Docker execution environment, run this command on the '
+              'Ansible worker: docker pull %(image)s')
             % {'image': ANSIBLE_EE_IMAGE}
         )

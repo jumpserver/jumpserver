@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "이 단말기는 얼굴 인식 규칙을 지원하지 않으므로 웹 단말기로 로그인해 주십시오",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "해당 단말기는 얼굴 인식 인증을 지원하지 않습니다, 웹 단말기로 로그인해 주세요",
     "FailedCreateConnection": "연결 생성 실패",
+    "File transfer error, file transfer interrupted": "파일 전송 오류, 파일 전송이 중단되었습니다",
     "FileAlreadyExists": "파일이 이미 존재합니다",
     "FileListError": "파일 목록 정보 가져오기 실패",
     "FileManagement": "파일 관리",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "최신 머신 및 노드 정보 새로 고침",
     "select one asset to login": "하나의 자산을 선택하여 로그인합니다",
     "to search login if unique": "로그인 검색(유일한 경우)",
-    "to search, such as: /192.168": "검색, 예: /192.168",
-    "File transfer error, file transfer interrupted": "파일 전송 오류, 파일 전송이 중단되었습니다"
+    "to search, such as: /192.168": "검색, 예: /192.168"
 }

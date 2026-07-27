@@ -3,6 +3,10 @@
 version: 3
 
 
+build_arg_defaults:
+  ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: "--ignore-certs"
+
+
 images:
   # ansible-builder 仅支持 RPM 系镜像 (dnf)，不能用 python:3.11-slim 等 Debian 镜像
   base_image:
@@ -18,15 +22,6 @@ dependencies:
     package_pip: https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.3.zip
   ansible_runner:
     package_pip: https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip
-
-  galaxy:
-    collections:
-      - name: community.postgresql
-        version: "2.4.0"
-      - name: community.mysql
-      - name: community.mongodb
-      - name: community.windows
-      - name: ansible.windows
 
   python: requirements-python.txt
   system: bindep.txt

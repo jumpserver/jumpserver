@@ -18,7 +18,10 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 
+from common.utils import get_logger
 from .utils import set_current_request
+
+logger = get_logger(__name__)
 
 IGNORE_CSRF_CHECK = '*' in os.getenv("DOMAINS", "").split(',')
 
@@ -148,8 +151,9 @@ class EndMiddleware:
 
     def process_exception(self, request, exception):
         if isinstance(exception, OperationalError):
+            logger.debug("Database operational error: %s", exception)
             return JsonResponse({
-                'error': 'Database OperationalError: ' + str(exception),
+                'error': 'Service temporarily unavailable',
                 'message': 'Database operation failed, please try again later.',
                 'code': 'DB_ERROR'
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)

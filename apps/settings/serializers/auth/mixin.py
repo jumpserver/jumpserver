@@ -25,8 +25,12 @@ class LDAPSerializerMixin:
         cert_attrs = [f'{prefix}{suffix}' for suffix in self.cert_content_suffixes]
         if not any(k in self.validated_data for k in cert_attrs):
             return
+        content_map = {
+            attr: self.validated_data[attr]
+            for attr in cert_attrs if attr in self.validated_data
+        }
         tls_util = LDAPTLSUtil(category)
-        tls_util.sync_files()
+        tls_util.sync_files(content_map=content_map)
         tls_util.refresh_global_options()
 
     def post_save(self):

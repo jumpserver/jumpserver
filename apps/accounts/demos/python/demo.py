@@ -1,4 +1,4 @@
-# 示例调用
+# Example usage
 
 import requests
 import os
@@ -34,7 +34,7 @@ class APIClient:
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:
-            print(f"API 请求失败: {e}")
+            print(f"API request failed: {e}")
             return None
 
 

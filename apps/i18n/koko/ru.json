@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "Этот терминал пока не поддерживает правила доступа по лицу, пожалуйста, войдите через веб-терминал",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "Этот терминал не поддерживает аутентификацию по лицу, пожалуйста, войдите через веб-терминал",
     "FailedCreateConnection": "Не удалось создать соединение",
+    "File transfer error, file transfer interrupted": "Ошибка передачи файла, передача файла была прервана",
     "FileAlreadyExists": "Файл уже существует",
     "FileListError": "Не удалось получить список файлов",
     "FileManagement": "Управление файлами",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "обновить информацию об активах и папках",
     "select one asset to login": "выберите один из активов для входа",
     "to search login if unique": "найти подключение (если результат уникальный)",
-    "to search, such as: /192.168": "выполнить поиск, например: /192.168",
-    "File transfer error, file transfer interrupted": "Ошибка передачи файла, передача файла была прервана"
+    "to search, such as: /192.168": "выполнить поиск, например: /192.168"
 }

@@ -20,6 +20,7 @@ jobs:
       - name: Update labels
         run: |
           gh issue edit "${{ github.event.issue.number }}" \
+            --repo "${{ github.repository }}" \
             --add-label "🔔 Pending processing" \
             --remove-label "⏳ Pending feedback"
         env:

@@ -53,6 +53,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         demo_path = os.path.join(sdk_path, f'demo.{code_suffix_mapper[sdk_language]}')
 
         readme_content = self.read_file(readme_path)
+        if not readme_content:
+            readme_content = self.read_file(os.path.join(sdk_path, 'README.en.md'))
         demo_content = self.read_file(demo_path)
 
         return Response(data={'readme': readme_content, 'code': demo_content})
@@ -93,5 +95,5 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         )
         
         # 根据配置决定是否返回密码
-        secret = account.secret if settings.SECURITY_ACCOUNT_SECRET_READ else None
+        secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
         return Response(data={'id': request.user.id, 'secret': secret})

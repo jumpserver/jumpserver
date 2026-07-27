@@ -429,6 +429,10 @@ msgid "Database"
 msgstr ""
 
 #: accounts/const/vault.py:9 settings/serializers/feature.py:81
+msgid "OpenBao"
+msgstr ""
+
+#: accounts/const/vault.py:9 settings/serializers/feature.py:81
 msgid "HCP Vault"
 msgstr ""
 
@@ -8086,6 +8090,14 @@ msgstr ""
 msgid "Mount Point"
 msgstr ""
 
+#: settings/serializers/feature.py:83
+msgid "OpenBao address"
+msgstr ""
+
+#: settings/serializers/feature.py:95
+msgid "Verify TLS"
+msgstr ""
+
 #: settings/serializers/feature.py:105
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 msgid "Tenant ID"
@@ -8172,12 +8184,11 @@ msgid "The unit of period"
 msgstr ""
 
 #: settings/serializers/feature.py:204
-msgid "Adhoc command"
+msgid "Job Center"
 msgstr ""
 
 #: settings/serializers/feature.py:205
-msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
+msgid "Allow users to use the Job Center to execute jobs"
 msgstr ""
 
 #: settings/serializers/feature.py:209

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.generic.base import TemplateView
 
-from common.utils import bulk_get, FlashMessageUtil
+from common.utils import bulk_get, FlashMessageUtil, safe_next_url
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -23,6 +23,8 @@ class FlashMessageMsgView(TemplateView):
 
         items = ('title', 'message', 'error', 'redirect_url', 'confirm_button', 'cancel_url')
         title, msg, error, redirect_url, confirm_btn, cancel_url = bulk_get(message_data, items)
+        redirect_url = safe_next_url(redirect_url, request=request)
+        cancel_url = safe_next_url(cancel_url, request=request)
 
         interval = message_data.get('interval', 3)
         auto_redirect = message_data.get('auto_redirect', True)

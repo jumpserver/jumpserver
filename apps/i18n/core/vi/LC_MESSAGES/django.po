@@ -8612,15 +8612,29 @@ msgid "The unit of period"
 msgstr "Chu kỳ thực hiện"
 
 #: settings/serializers/feature.py:204
-msgid "Adhoc command"
-msgstr "Thực thi lệnh hàng loạt"
+msgid "Job Center"
+msgstr "Trung tâm công việc"
 
 #: settings/serializers/feature.py:205
+msgid "Allow users to use the Job Center to execute jobs"
+msgstr "Cho phép người dùng sử dụng Trung tâm công việc để thực thi công việc"
+
+#: settings/serializers/feature.py:23
+#, python-format
 msgid ""
-"Allow users to execute batch commands in the Workbench - Job Center - Adhoc"
+"Run Ansible jobs in the Docker execution environment (%(image)s). To run "
+"jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+"Settings > Feature Settings > Job Center. If the image is missing, run this "
+"command on the Ansible worker: docker pull %(image)s"
 msgstr ""
-"Cho phép người dùng thực hiện lệnh hàng loạt trong trạm làm việc - Trung tâm"
-" công việc - Adhoc"
+"Chạy các tác vụ Ansible trong môi trường thực thi Docker (%(image)s). Để "
+"chạy tác vụ cục bộ, hãy tắt \"Cô lập Docker cho Ansible\" trong Cài đặt hệ "
+"thống > Cài đặt tính năng > Trung tâm công việc. Nếu thiếu image, hãy chạy "
+"lệnh này trên worker Ansible: docker pull %(image)s"
+
+#: settings/serializers/feature.py:238
+msgid "Docker isolation for Ansible"
+msgstr "Cô lập Docker cho Ansible"
 
 #: settings/serializers/feature.py:209
 msgid "Command blacklist"

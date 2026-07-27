@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db import IntegrityError
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -72,7 +72,13 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     class Meta:
         model = AssetPermission
         fields_mini = ["id", "name"]
-        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
+        relation_count_fields = {
+            'users_amount': 'users',
+            'user_groups_amount': 'user_groups',
+            'assets_amount': 'assets',
+            'nodes_amount': 'nodes',
+        }
+        amount_fields = list(relation_count_fields)
         fields_generic = [
             "accounts", "protocols", "actions",
             "created_by", "date_created", "date_start", "date_expired", "is_active",
@@ -209,17 +215,13 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
 
 class AssetPermissionListSerializer(AssetPermissionSerializer):
     class Meta(AssetPermissionSerializer.Meta):
-        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
-        fields = [item for item in (AssetPermissionSerializer.Meta.fields + amount_fields) if
-                  item not in ["users", "assets", "nodes", "user_groups"]]
+        fields = [
+            item for item in (
+                AssetPermissionSerializer.Meta.fields + AssetPermissionSerializer.Meta.amount_fields
+            ) if item not in ["users", "assets", "nodes", "user_groups"]
+        ]
 
     @classmethod
     def setup_eager_loading(cls, queryset):
-        """Perform necessary eager loading of data."""
-        queryset = queryset \
-            .annotate(users_amount=Count("users", distinct=True),
-                      user_groups_amount=Count("user_groups", distinct=True),
-                      assets_amount=Count("assets", distinct=True),
-                      nodes_amount=Count("nodes", distinct=True),
-                      )
+        # 重写父类的方法，列表时不需要预加载 m2m 关系，避免性能问题
         return queryset

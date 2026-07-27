@@ -14,8 +14,23 @@ from .base import BaseStorageHandler, get_multi_object_storage
 logger = get_logger(__name__)
 
 
+def get_session_preferred_storage_name(session):
+    """
+    会话所属终端(组件)配置的录像存储名, 录像大概率上传在该存储上, 优先在其中查找
+    terminal 可能已被删除 (on_delete=DO_NOTHING), 取不到时返回 None 表示无优先存储
+    """
+    try:
+        terminal = session.terminal
+    except Exception:
+        return None
+    return terminal.replay_storage if terminal else None
+
+
 class ReplayStorageHandler(BaseStorageHandler):
     NAME = 'REPLAY'
+
+    def get_preferred_storage_name(self):
+        return get_session_preferred_storage_name(self.obj)
 
     def get_file_path(self, **kwargs):
         storage = kwargs['storage']
@@ -55,10 +70,6 @@ class SessionPartReplayStorageHandler(object):
         return None, '{} not found.'.format(part_filename)
 
     def download_part_file(self, part_filename):
-        storage = get_multi_object_storage()
-        if not storage:
-            msg = "Not found {} file, and not remote storage set".format(part_filename)
-            return None, msg
         local_path = self.obj.get_replay_part_file_local_storage_path(part_filename)
         remote_path = self.obj.get_replay_part_file_relative_path(part_filename)
 
@@ -69,7 +80,21 @@ class SessionPartReplayStorageHandler(object):
         if not os.path.isdir(target_dir):
             make_dirs(target_dir, exist_ok=True)
 
-        ok, err = storage.download(remote_path, target_tmp_path)
+        # 优先只查所属终端配置的存储, 未配置或未命中时回退遍历所有存储
+        preferred = get_session_preferred_storage_name(self.obj)
+        storage_names = [preferred, None] if preferred else [None]
+        ok, err, found_storage = False, None, False
+        for name in storage_names:
+            storage = get_multi_object_storage(name)
+            if not storage:
+                continue
+            found_storage = True
+            ok, err = storage.download(remote_path, target_tmp_path)
+            if ok:
+                break
+        if not found_storage:
+            msg = "Not found {} file, and not remote storage set".format(part_filename)
+            return None, msg
         if not ok:
             msg = 'Failed download {} file: {}'.format(part_filename, err)
             logger.error(msg)

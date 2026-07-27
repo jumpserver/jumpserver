@@ -2,9 +2,36 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
+from accounts.const import VaultTypeChoices
 from common.db import fields
 
 __all__ = ['VaultQuerySetMixin', 'VaultManagerMixin', 'VaultModelMixin']
+
+
+VAULT_SAVED_SECRET_MARK = '# Secret-has-been-saved-to-vault #'
+
+
+class VaultSecretField(fields.EncryptTextField):
+    """Keep the OpenBao remote-secret marker readable in the local database."""
+
+    @staticmethod
+    def _should_store_marker_plaintext():
+        from django.conf import settings
+
+        return (
+            settings.VAULT_ENABLED
+            and settings.VAULT_BACKEND == VaultTypeChoices.openbao
+        )
+
+    def from_db_value(self, value, expression, connection, context=None):
+        if value == VAULT_SAVED_SECRET_MARK:
+            return value
+        return super().from_db_value(value, expression, connection, context)
+
+    def get_prep_value(self, value):
+        if value == VAULT_SAVED_SECRET_MARK and self._should_store_marker_plaintext():
+            return value
+        return super().get_prep_value(value)
 
 
 class VaultQuerySetMixin(models.QuerySet):
@@ -46,7 +73,7 @@ class VaultManagerMixin(models.Manager):
 
 
 class VaultModelMixin(models.Model):
-    _secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
+    _secret = VaultSecretField(blank=True, null=True, verbose_name=_('Secret'))
     is_sync_metadata = True
 
     class Meta:
@@ -76,7 +103,7 @@ class VaultModelMixin(models.Model):
         self._secret = value
         self.__secret = value
 
-    _secret_save_to_vault_mark = '# Secret-has-been-saved-to-vault #'
+    _secret_save_to_vault_mark = VAULT_SAVED_SECRET_MARK
 
     def mark_secret_save_to_vault(self):
         self._secret = self._secret_save_to_vault_mark

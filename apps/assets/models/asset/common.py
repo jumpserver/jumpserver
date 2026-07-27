@@ -180,6 +180,9 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         verbose_name=_("Directory service")
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    date_last_login = models.DateTimeField(
+        null=True, blank=True, db_index=True, verbose_name=_('Last login time')
+    )
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
     custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
 

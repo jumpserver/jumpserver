@@ -1,6 +1,7 @@
 import uuid
 
 from django.utils import timezone
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -10,7 +11,7 @@ from ops.ansible.docker import ANSIBLE_EE_IMAGE
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
-    'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
+    'OpenBaoSerializer', 'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
 
@@ -18,13 +19,16 @@ from settings.const import (
     ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices, ChatAIMethodChoices
 )
 
-ANSIBLE_DOCKER_HELP_TEXT = _(
-    'Run Ansible jobs in Docker execution environment (%(image)s). '
-    'You can disable this option in System Settings - Feature Settings - Job Center - '
-    'Ansible Docker isolation to run locally. '
-    'If the image is missing, pull it on the ansible worker: '
-    'docker pull %(image)s'
-) % {'image': ANSIBLE_EE_IMAGE}
+ANSIBLE_DOCKER_HELP_TEXT = lazy(
+    lambda: _(
+        'Run Ansible jobs in the Docker execution environment (%(image)s). '
+        'To run jobs locally instead, disable "Docker isolation for Ansible" under '
+        'System Settings > Feature Settings > Job Center. '
+        'If the image is missing, run this command on the Ansible worker: '
+        'docker pull %(image)s'
+    ) % {'image': ANSIBLE_EE_IMAGE},
+    str,
+)()
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -83,6 +87,22 @@ class VaultSettingSerializer(BaseVaultSettingSerializer, serializers.Serializer)
             'If the value reaches or exceeds 999 (default), '
             'no historical account deletion will be performed'
         )
+    )
+
+
+class OpenBaoSerializer(BaseVaultSettingSerializer, serializers.Serializer):
+    PREFIX_TITLE = _('OpenBao')
+    VAULT_OPENBAO_ADDR = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('OpenBao address')
+    )
+    VAULT_OPENBAO_TOKEN = EncryptedField(
+        max_length=4096, allow_blank=True, required=False, label=_('Token'), default=''
+    )
+    VAULT_OPENBAO_MOUNT_POINT = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Mount Point')
+    )
+    VAULT_OPENBAO_TIMEOUT = serializers.IntegerField(
+        max_value=120, min_value=1, required=False, label=_('Timeout')
     )
 
 
@@ -210,12 +230,12 @@ class OpsSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Feature')
 
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Adhoc command'),
-        help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
+        required=False, label=_('Job Center'),
+        help_text=_('Allow users to use the Job Center to execute jobs')
     )
     ANSIBLE_DOCKER_ENABLED = serializers.BooleanField(
         required=False,
-        label=_('Ansible Docker isolation'),
+        label=_('Docker isolation for Ansible'),
         help_text=ANSIBLE_DOCKER_HELP_TEXT,
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(

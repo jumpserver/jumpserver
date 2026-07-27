@@ -4,11 +4,14 @@ from rest_framework.filters import SearchFilter as SearchFilterBase
 import base64
 import json
 import logging
+from functools import reduce
+from operator import and_, or_
 from collections import defaultdict
 from django.utils import timezone
 
 from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from django.db import models
 from django.db.models import Q
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
@@ -23,6 +26,7 @@ from common.db.fields import RelatedManager
 logger = logging.getLogger("jumpserver.common")
 
 __all__ = [
+    "LookupFilterBackend",
     "DatetimeRangeFilterBackend",
     "IDSpmFilterBackend",
     "IDInFilterBackend",
@@ -36,12 +40,195 @@ __all__ = [
 ]
 
 
+class LookupFilterBackend(drf_filters.DjangoFilterBackend):
+    """
+    Preserve django-filter's default behavior while allowing explicit
+    text lookups like ``field__icontains=value`` without per-view wiring.
+    """
+    dynamic_text_lookups = {"icontains", "startswith"}
+    dynamic_value_lookups = {"in"}
+    negated_text_lookups = {"icontains", "startswith"}
+    negated_value_lookups = {"exact", "in"}
+
+    def filter_queryset(self, request, queryset, view):
+        queryset = super().filter_queryset(request, queryset, view)
+        queryset = self.filter_dynamic_text_lookups(request, queryset)
+        queryset = self.filter_dynamic_value_lookups(request, queryset)
+        return self.filter_dynamic_negated_lookups(request, queryset)
+
+    def filter_dynamic_text_lookups(self, request, queryset):
+        model = getattr(queryset, "model", None)
+        if model is None:
+            return queryset
+
+        for param, values in request.query_params.lists():
+            if "__" not in param:
+                continue
+
+            field_name, lookup = param.rsplit("__", 1)
+            if lookup not in self.dynamic_text_lookups:
+                continue
+            if not self.is_text_lookup_field(model, field_name):
+                continue
+
+            for value in values:
+                if value == "":
+                    continue
+                queryset = queryset.filter(**{param: value})
+        return queryset
+
+    def is_text_lookup_field(self, model, field_path):
+        field = self.resolve_model_field(model, field_path)
+        return isinstance(field, (models.CharField, models.TextField))
+
+    def filter_dynamic_value_lookups(self, request, queryset):
+        model = getattr(queryset, "model", None)
+        if model is None:
+            return queryset
+
+        for param, values in request.query_params.lists():
+            if "__" not in param:
+                continue
+
+            field_name, lookup = param.rsplit("__", 1)
+            if lookup not in self.dynamic_value_lookups:
+                continue
+            if not self.is_value_lookup_field(model, field_name):
+                continue
+
+            cleaned_values = []
+            for value in values:
+                if value == "":
+                    continue
+                cleaned_values.extend(
+                    item.strip() for item in value.split(",") if item.strip()
+                )
+
+            if cleaned_values:
+                queryset = queryset.filter(**{param: cleaned_values})
+        return queryset
+
+    def is_value_lookup_field(self, model, field_path):
+        field = self.resolve_model_field(model, field_path)
+        if field is None:
+            return False
+        return not getattr(field, "is_relation", False)
+
+    def filter_dynamic_negated_lookups(self, request, queryset):
+        model = getattr(queryset, "model", None)
+        if model is None:
+            return queryset
+
+        for raw_param, values in request.query_params.lists():
+            if not raw_param.endswith("!"):
+                continue
+
+            param = raw_param[:-1]
+            field_name, lookup = self.split_lookup_param(param)
+            if lookup in self.negated_text_lookups:
+                if not self.is_text_lookup_field(model, field_name):
+                    continue
+                for value in values:
+                    if value == "":
+                        continue
+                    queryset = queryset.exclude(**{param: value})
+                continue
+
+            if lookup in self.negated_value_lookups:
+                if not self.is_value_lookup_field(model, field_name):
+                    continue
+                if lookup == "in":
+                    cleaned_values = self.split_csv_values(values)
+                    if cleaned_values:
+                        queryset = queryset.exclude(**{param: cleaned_values})
+                else:
+                    for value in values:
+                        if value == "":
+                            continue
+                        queryset = queryset.exclude(**{field_name: value})
+        return queryset
+
+    @staticmethod
+    def split_lookup_param(param):
+        if "__" not in param:
+            return param, "exact"
+        return param.rsplit("__", 1)
+
+    @staticmethod
+    def split_csv_values(values):
+        cleaned_values = []
+        for value in values:
+            if value == "":
+                continue
+            cleaned_values.extend(
+                item.strip() for item in value.split(",") if item.strip()
+            )
+        return cleaned_values
+
+    def resolve_model_field(self, model, field_path):
+        current_model = model
+        field = None
+        field_names = field_path.split("__")
+
+        for index, field_name in enumerate(field_names):
+            try:
+                field = current_model._meta.get_field(field_name)
+            except FieldDoesNotExist:
+                return None
+
+            if index == len(field_names) - 1:
+                return field
+
+            if not getattr(field, "is_relation", False) or not field.related_model:
+                return None
+            current_model = field.related_model
+
+        return field
+
+
 class SearchFilter(SearchFilterBase):
+    @staticmethod
+    def split_search_groups(params):
+        groups = []
+        for group in params.replace('\x00', '').split(','):
+            terms = [term for term in group.split() if term]
+            if terms:
+                groups.append(terms)
+        return groups
+
     def get_search_terms(self, request):
         params = request.query_params.get(self.search_param, '') or request.query_params.get('search', '')
         params = params.replace('\x00', '')  # strip null characters
-        params = params.replace(',', ' ')
         return params.split()
+
+    def filter_queryset(self, request, queryset, view):
+        search_fields = self.get_search_fields(view, request)
+        raw_params = request.query_params.get(self.search_param, '') or request.query_params.get('search', '')
+        search_groups = self.split_search_groups(raw_params)
+
+        if not search_fields or not search_groups:
+            return queryset
+
+        orm_lookups = [
+            self.construct_search(str(search_field), queryset)
+            for search_field in search_fields
+        ]
+
+        group_conditions = []
+        for terms in search_groups:
+            term_conditions = []
+            for term in terms:
+                queries = [Q(**{orm_lookup: term}) for orm_lookup in orm_lookups]
+                term_conditions.append(reduce(or_, queries))
+            group_conditions.append(reduce(and_, term_conditions))
+
+        queryset = queryset.filter(reduce(or_, group_conditions))
+
+        if self.must_call_distinct(queryset, search_fields):
+            queryset = queryset.filter(pk=models.OuterRef('pk'))
+            queryset = view.get_queryset().filter(models.Exists(queryset))
+
+        return queryset
 
 
 class BaseFilterSet(drf_filters.FilterSet):
@@ -146,7 +333,7 @@ class DatetimeRangeFilterBackend(filters.BaseFilterBackend):
 
 class IDSpmFilterBackend(filters.BaseFilterBackend):
     def get_schema_fields(self, view):
-        return [
+        fields = [
             coreapi.Field(
                 name="spm",
                 location="query",
@@ -156,26 +343,57 @@ class IDSpmFilterBackend(filters.BaseFilterBackend):
                 description="Pre post objects id get spm id, then using filter",
             )
         ]
+        fields.append(
+            coreapi.Field(
+                name="exclude_spm",
+                location="query",
+                required=False,
+                type="string",
+                example="",
+                description="Pre post objects id get spm id, then using exclude",
+            )
+        )
+        return fields
+
+    @staticmethod
+    def get_resource_ids(spm):
+        cache_key = const.KEY_CACHE_RESOURCE_IDS.format(spm)
+        resource_ids = cache.get(cache_key)
+        if resource_ids is not None:
+            cache.touch(cache_key, const.RESOURCE_IDS_CACHE_TIMEOUT)
+        if isinstance(resource_ids, str):
+            resource_ids = [resource_ids]
+        return resource_ids
 
     def filter_queryset(self, request, queryset, view):
         spm = request.query_params.get("spm")
-        if not spm:
-            return queryset
-        cache_key = const.KEY_CACHE_RESOURCE_IDS.format(spm)
-        resource_ids = cache.get(cache_key)
+        if spm:
+            resource_ids = self.get_resource_ids(spm)
+            if resource_ids is None:
+                return queryset.none()
+            if hasattr(view, "filter_spm_queryset"):
+                queryset = view.filter_spm_queryset(resource_ids, queryset)
+            else:
+                queryset = queryset.filter(id__in=resource_ids)
 
-        if resource_ids is None:
-            return queryset.none()
-        if isinstance(resource_ids, str):
-            resource_ids = [resource_ids]
-        if hasattr(view, "filter_spm_queryset"):
-            queryset = view.filter_spm_queryset(resource_ids, queryset)
-        else:
-            queryset = queryset.filter(id__in=resource_ids)
+        exclude_spm = request.query_params.get("exclude_spm")
+        if exclude_spm:
+            resource_ids = self.get_resource_ids(exclude_spm)
+            if resource_ids is None:
+                return queryset
+            if hasattr(view, "exclude_spm_queryset"):
+                queryset = view.exclude_spm_queryset(resource_ids, queryset)
+            else:
+                queryset = queryset.exclude(id__in=resource_ids)
         return queryset
 
 
 class IDInFilterBackend(filters.BaseFilterBackend):
+    """
+    Deprecated compatibility backend.
+
+    Prefer the generic ``id__in=1,2,3`` syntax provided by LookupFilterBackend.
+    """
     def get_schema_fields(self, view):
         return [
             coreapi.Field(
@@ -184,7 +402,7 @@ class IDInFilterBackend(filters.BaseFilterBackend):
                 required=False,
                 type="string",
                 example="/api/v1/users/users?ids=1,2,3",
-                description="Filter by id set",
+                description="Deprecated: filter by id set, prefer id__in",
             )
         ]
 
@@ -192,12 +410,21 @@ class IDInFilterBackend(filters.BaseFilterBackend):
         ids = request.query_params.get("ids")
         if not ids:
             return queryset
+        logger.warning(
+            'Deprecated filter param "ids" used on %s, prefer "id__in"',
+            request.path,
+        )
         id_list = [i.strip() for i in ids.split(",")]
         queryset = queryset.filter(id__in=id_list)
         return queryset
 
 
 class IDNotFilterBackend(filters.BaseFilterBackend):
+    """
+    Deprecated compatibility backend.
+
+    Prefer the generic ``id__in!=1,2,3`` syntax provided by LookupFilterBackend.
+    """
     def get_schema_fields(self, view):
         return [
             coreapi.Field(
@@ -206,7 +433,7 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
                 required=False,
                 type="string",
                 example="/api/v1/users/users?id!=1,2,3",
-                description="Exclude by id set",
+                description="Deprecated: exclude by id set, prefer id__in!",
             )
         ]
 
@@ -214,6 +441,10 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
         ids = request.query_params.get("id!")
         if not ids:
             return queryset
+        logger.warning(
+            'Deprecated filter param "id!" used on %s, prefer "id__in!"',
+            request.path,
+        )
         id_list = [i.strip() for i in ids.split(",")]
         queryset = queryset.exclude(id__in=id_list)
         return queryset

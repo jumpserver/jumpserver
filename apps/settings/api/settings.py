@@ -63,6 +63,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cmpp2': serializers.CMPP2SMSSettingSerializer,
         'custom': serializers.CustomSMSSettingSerializer,
         'vault': serializers.VaultSettingSerializer,
+        'openbao': serializers.OpenBaoSerializer,
         'azure_kv': serializers.AzureKVSerializer,
         'aws_sm': serializers.AmazonSMSerializer,
         'hcp': serializers.HashicorpKVSerializer,
@@ -116,6 +117,10 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'huawei': 'settings.change_sms',
         'cmpp2': 'settings.change_sms',
         'vault': 'settings.change_vault',
+        'openbao': 'settings.change_vault',
+        'azure_kv': 'settings.change_vault',
+        'aws_sm': 'settings.change_vault',
+        'hcp': 'settings.change_vault',
     }
 
     def get_queryset(self):

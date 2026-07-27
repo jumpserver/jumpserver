@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework_bulk.generics import BulkModelViewSet
+from rest_framework.response import Response
+from rest_framework import status
 
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_root_org
@@ -32,6 +34,22 @@ class FavoriteAssetViewSet(BulkModelViewSet):
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_root_org():
             return super().dispatch(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        asset_id = request.data.get('asset')
+        instance = FavoriteAsset.objects.filter(user=request.user, asset_id=asset_id).first()
+
+        if instance:
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+        else:
+            serializer = self.get_serializer(data=request.data)
+        
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         queryset = FavoriteAsset.objects.filter(

@@ -40,6 +40,8 @@ def parse_int(value, default=None):
         if not text or text.lower() in {"none", "null"}:
             return default
         if text.startswith(("b'", 'b"')):
+            if len(text) > 1024:
+                return default
             try:
                 maybe_bytes = literal_eval(text)
                 if isinstance(maybe_bytes, (bytes, bytearray)):

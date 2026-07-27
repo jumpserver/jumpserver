@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db import models
+from django.db import models, connections, transaction
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
@@ -85,7 +85,8 @@ class Setting(models.Model):
 
     @classmethod
     def refresh_item(cls, name):
-        item = cls.objects.filter(name=name).first()
+        with transaction.atomic():
+            item = cls.objects.select_for_update().filter(name=name).first()
         if not item:
             return
         item.refresh_setting()
