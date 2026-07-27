@@ -1367,6 +1367,7 @@
     "SearchAncestorNodePerm": "同時搜索當前節點和祖先節點的授權",
     "SearchConditionsClear": "清除",
     "SearchConditionsSave": "儲存",
+    "SearchMultipleValuesPlaceholder": "多個值使用 , 分隔",
     "SearchPresetNamePlaceholder": "為快捷搜尋條件命名",
     "SearchShortcutPlaceholder": "輸入 / 進行搜尋",
     "Secret": "密碼",

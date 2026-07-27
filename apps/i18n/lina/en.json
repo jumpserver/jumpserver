@@ -1396,6 +1396,7 @@
     "SearchAncestorNodePerm": "Search for authorizations simultaneously on the current node and ancestor nodes",
     "SearchConditionsClear": "Clear",
     "SearchConditionsSave": "Save",
+    "SearchMultipleValuesPlaceholder": "Separate multiple values with commas",
     "SearchPresetNamePlaceholder": "Name this quick search",
     "SearchShortcutPlaceholder": "Type / to search",
     "Secret": "Secret",

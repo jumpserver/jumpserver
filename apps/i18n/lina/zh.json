@@ -1848,6 +1848,7 @@
     "NodeFilterSearch": "搜索节点",
     "SearchConditionsClear": "清除",
     "SearchShortcutPlaceholder": "输入 / 进行搜索",
+    "SearchMultipleValuesPlaceholder": "多个值使用 , 分隔",
     "SearchConditionsSave": "保存",
     "SavedSearchConditions": "已保存条件",
     "SavedSearchHistoryHint": "已保存的历史筛选条件",
