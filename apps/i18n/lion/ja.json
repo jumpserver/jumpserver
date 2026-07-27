@@ -106,5 +106,10 @@
     "VerifyCode": "検証コード",
     "VirtualKeyboard": "仮想キーボード",
     "WebSocketError": "WebSocketの接続に失敗しました、ネットワークを確認してください",
-    "Writable": "読み書き"
+    "Writable": "読み書き",
+    "ClipboardTextLimitExceeded": "クリップボードのテキストが制限を超えています",
+    "ClipboardFileSizeLimitExceeded": "クリップボードのファイルが制限を超えています",
+    "Copy": "コピー",
+    "Paste": "貼り付け",
+    "NoPermission": "権限がありません"
 }

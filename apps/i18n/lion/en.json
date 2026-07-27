@@ -106,5 +106,10 @@
     "VerifyCode": "Verify code",
     "VirtualKeyboard": "Virtual Keyboard",
     "WebSocketError": "WebSocket connect failed, please check network",
-    "Writable": "Writable"
+    "Writable": "Writable",
+    "ClipboardTextLimitExceeded": "clipboard text exceeds the limit",
+    "ClipboardFileSizeLimitExceeded": "clipboard file exceeds the limit",
+    "Copy": "Copy",
+    "Paste": "Paste",
+    "NoPermission": "permission denied"
 }

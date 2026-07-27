@@ -106,5 +106,10 @@
     "VerifyCode": "驗證碼",
     "VirtualKeyboard": "虛擬鍵盤",
     "WebSocketError": "WebSocket 連接失敗，請檢查網路",
-    "Writable": "讀寫"
+    "Writable": "讀寫",
+    "ClipboardTextLimitExceeded": "剪貼簿文字超過限制",
+    "ClipboardFileSizeLimitExceeded": "剪貼簿檔案超過限制",
+    "Copy": "複製",
+    "Paste": "貼上",
+    "NoPermission": "無權限"
 }
