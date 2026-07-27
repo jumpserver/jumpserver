@@ -1,16 +1,26 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: "Test privileged {{ jms_account.username }} account"
-      ansible.builtin.ping:
-
     - name: "Check if {{ account.username }} user exists"
       getent:
         database: passwd
         key: "{{ account.username }}"
       register: user_info
-      failed_when: false
+      ignore_errors: true
       changed_when: false
+
+    - name: Fail when passwd lookup itself is unavailable
+      ansible.builtin.fail:
+        msg: "{{ user_info.msg | default('Unable to query passwd database') }}"
+      when:
+        - user_info.failed | default(false)
+        - "'One or more supplied key could not be found' not in (user_info.msg | default(''))"
+
+    - name: Record whether the user exists
+      ansible.builtin.set_fact:
+        user_exists: >-
+          {{ account.username in
+             (user_info.ansible_facts.getent_passwd | default({})) }}
 
     - name: "Add {{ account.username }} user"
       ansible.builtin.user:
@@ -23,7 +33,7 @@
         append: "{{ true if params.groups | length > 0 else false }}"
         expires: -1
         state: present
-      when: user_info.msg is defined
+      when: not user_exists
 
     - name: "Set {{ account.username }} sudo setting"
       ansible.builtin.lineinfile:
@@ -33,46 +43,53 @@
         line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
         validate: visudo -cf %s
       when:
-        - user_info.msg is defined or params.modify_sudo
+        - not user_exists or params.modify_sudo
         - params.sudo
 
     - name: "Change {{ account.username }} password"
       ansible.builtin.user:
         name: "{{ account.username }}"
-        password: "{{ account.secret | password_hash('sha256', rounds=1000) }}"
+        password: "{{ account.secret | password_hash('sha512', rounds=5000) }}"
         update_password: always
       ignore_errors: true
       register: change_secret_result
       when: account.secret_type == "password"
 
-    - name: "Get home directory for {{ account.username }}"
-      ansible.builtin.shell: "getent passwd {{ account.username }} | cut -d: -f6"
-      register: home_dir
+    - name: "Refresh passwd data for {{ account.username }}"
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ account.username }}"
+      register: account_passwd
       when: account.secret_type == "ssh_key"
-      ignore_errors: yes
+
+    - name: "Record home and primary group for {{ account.username }}"
+      ansible.builtin.set_fact:
+        account_home: >-
+          {{ account_passwd.ansible_facts.getent_passwd[account.username][4] }}
+        account_primary_group: >-
+          {{ account_passwd.ansible_facts.getent_passwd[account.username][2] }}
+      when: account.secret_type == "ssh_key"
 
     - name: "Check if home directory exists for {{ account.username }}"
       ansible.builtin.stat:
-        path: "{{ home_dir.stdout.strip() }}"
+        path: "{{ account_home }}"
       register: home_dir_stat
       when: account.secret_type == "ssh_key"
-      ignore_errors: yes
 
     - name: "Ensure {{ account.username }} home directory exists"
       ansible.builtin.file:
-        path: "{{ home_dir.stdout.strip() }}"
+        path: "{{ account_home }}"
         state: directory
         owner: "{{ account.username }}"
-        group: "{{ account.username }}"
+        group: "{{ account_primary_group }}"
         mode: '0750'
       when:
         - account.secret_type == "ssh_key"
-        - home_dir_stat.stat.exists == false
-      ignore_errors: yes
+        - not (home_dir_stat.stat.exists | default(false))
 
     - name: Remove ssh key created by system
       ansible.builtin.lineinfile:
-        dest: "{{ home_dir.stdout.strip() }}/.ssh/authorized_keys"
+        dest: "{{ account_home }}/.ssh/authorized_keys"
         regexp: "{{ ssh_params.regexp }}"
         state: absent
       when:
@@ -88,13 +105,13 @@
       register: change_secret_result
       when: account.secret_type == "ssh_key"
 
-    - name: Refresh connection
-      ansible.builtin.meta: reset_connection
-
     - name: "Verify {{ account.username }} password (paramiko)"
       ssh_ping:
         login_user: "{{ account.username }}"
-        login_password: "{{ account.secret }}"
+        login_password: >-
+          {{ account.secret if account.secret_type == 'password' else '' }}
+        login_secret_type: "{{ account.secret_type }}"
+        login_private_key_path: "{{ account.private_key_path }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
@@ -104,6 +121,9 @@
         become_password: "{{ account.become.ansible_password | default('') }}"
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        auth_only: true
+        fail_on_unknown: false
+        change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
       when:
        - account.secret_type == "password"
        - check_conn_after_change or change_secret_result.failed | default(false)
@@ -120,6 +140,9 @@
         login_private_key_path: "{{ account.private_key_path  }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        auth_only: true
+        fail_on_unknown: false
+        change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
       when:
        - account.secret_type == "ssh_key"
        - check_conn_after_change or change_secret_result.failed | default(false)

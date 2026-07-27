@@ -115,19 +115,30 @@ class JMSInventory:
 
     @staticmethod
     def make_custom_become_ansible_vars(account, su_from_auth, path_dir):
+        # remote_client uses become_* for the initial SSH credential and
+        # login_* for the account reached after su/sudo. This is intentionally
+        # different from Ansible's variable naming.
         su_method = su_from_auth['ansible_become_method']
+        su_from = account.su_from
+        su_from_password = (
+            account.escape_jinja2_syntax(su_from.secret)
+            if su_from.secret_type == 'password'
+            else None
+        )
         var = {
             'jms_custom_become': True,
             'jms_custom_become_method': su_method,
-            'jms_custom_become_user': account.su_from.username,
-            'jms_custom_become_password': account.escape_jinja2_syntax(account.su_from.secret),
-            'jms_custom_become_private_key_path': account.su_from.get_private_key_path(path_dir)
+            'jms_custom_become_user': su_from.username,
+            'jms_custom_become_password': su_from_password,
+            'jms_custom_become_private_key_path': (
+                su_from.get_private_key_path(path_dir)
+            ),
         }
         return var
 
     @staticmethod
     def make_protocol_setting_vars(host, protocols):
-        # 针对 ssh sqlserver 协议的特殊处理
+        # 针对协议的特殊处理
         for p in protocols:
             if p.name == 'ssh':
                 if hasattr(p, 'setting'):
@@ -142,6 +153,38 @@ class JMSInventory:
                         host['jms_asset']['tds_version'] = '7.0'
                     if not encryption:
                         host['jms_asset']['encryption'] = 'off'
+            if p.name == 'oracle':
+                setting = getattr(p, 'setting', {}) or {}
+                host['jms_asset']['oracle_sysdba'] = setting.get('sysdba', False)
+            if p.name == 'mongodb':
+                setting = getattr(p, 'setting', {}) or {}
+                connection_options = {
+                    'serverSelectionTimeoutMS': 15000,
+                    'connectTimeoutMS': 15000,
+                }
+                raw_options = setting.get('connection_options', '') or ''
+                for item in str(raw_options).split('&'):
+                    key, separator, value = item.partition('=')
+                    key = key.strip()
+                    if separator and key:
+                        connection_options[key] = value.strip()
+
+                # Certificate validation is controlled by the asset setting,
+                # not by the free-form connection options.
+                connection_options['tlsAllowInvalidHostnames'] = bool(
+                    host['jms_asset']['spec_info'].get(
+                        'allow_invalid_cert', False
+                    )
+                )
+                auth_source = str(
+                    setting.get('auth_source') or 'admin'
+                ).strip()
+                host['jms_asset']['mongodb_auth_source'] = (
+                    auth_source or 'admin'
+                )
+                host['jms_asset']['mongodb_connection_options'] = [
+                    connection_options
+                ]
 
     def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir,
                           ansible_config):
@@ -163,9 +206,26 @@ class JMSInventory:
                 self.task_type in (AutomationTypes.change_secret, AutomationTypes.push_account):
             host.update(self.make_account_ansible_vars(asset, account, path_dir))
             if platform.type not in ["windows", "windows_ad"]:
-                host['ansible_become'] = True
-            host['ansible_become_user'] = 'root'
-            host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
+                become_method = platform.ansible_become_method
+                login_username = self.get_username(asset, account)
+                is_root = login_username.lower() == 'root'
+
+                if become_method == 'su' and not is_root:
+                    host['error'] = _(
+                        "The platform uses su, but the directly connected "
+                        "account does not have a target root credential. "
+                        "Configure su_from or use a root account."
+                    )
+                elif not is_root:
+                    host['ansible_become'] = True
+                    host['ansible_become_method'] = become_method
+                    if become_method == 'sudo':
+                        # sudo authenticates the directly connected account.
+                        host['ansible_become_user'] = 'root'
+                    if account.secret_type == 'password':
+                        host['ansible_become_password'] = (
+                            account.escape_jinja2_syntax(account.secret)
+                        )
         else:
             host.update(self.make_account_ansible_vars(asset, account, path_dir))
 
@@ -253,7 +313,11 @@ class JMSInventory:
         protocols = host['jms_asset']['protocols']
         host['jms_asset'].update({f"{p['name']}_port": p['port'] for p in protocols})
         if host['jms_account'] and tp == 'oracle':
-            host['jms_account']['mode'] = 'sysdba' if account.privileged else None
+            use_sysdba = (
+                account.privileged and
+                host['jms_asset'].get('oracle_sysdba', False)
+            )
+            host['jms_account']['mode'] = 'sysdba' if use_sysdba else None
 
         ansible_config = self.fill_ansible_config(ansible_config, protocol)
         host.update(ansible_config)
@@ -421,3 +485,4 @@ class JMSInventory:
         data = self.generate(path_dir)
         with open(path, 'w') as f:
             f.write(json.dumps(data, indent=4))
+        os.chmod(path, 0o600)

@@ -1,74 +1,61 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Import ActiveDirectory module
-      win_shell: Import-Module ActiveDirectory
-      args:
-        warn: false
-
-    - name: Get the SamAccountName list of all AD users
+    - name: Gather Active Directory accounts as JSON
       win_shell: |
-        Import-Module ActiveDirectory
-        Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
-      register: ad_user_list
+        $ErrorActionPreference = 'Stop'
+        Import-Module ActiveDirectory -ErrorAction Stop
 
-    - name: Set the all_users variable
-      set_fact:
-        all_users: "{{ ad_user_list.stdout_lines }}"
+        $groupNames = @{}
+        Get-ADGroup -Filter * -Properties DistinguishedName, Name |
+          ForEach-Object {
+            $groupNames[$_.DistinguishedName] = $_.Name
+          }
 
-    - name: Get detailed information for each user
-      win_shell: |
-        Import-Module ActiveDirectory
-    
-        $user = Get-ADUser -Identity {{ item }} -Properties Name, SamAccountName, Enabled, LastLogonDate, PasswordLastSet, msDS-UserPasswordExpiryTimeComputed, MemberOf
-    
-        $globalGroups = @()
-        if ($user.MemberOf) {
-          $globalGroups = $user.MemberOf | ForEach-Object {
-            try {
-              $group = Get-ADGroup $_ -ErrorAction Stop
-              if ($group.GroupScope -eq 'Global') { $group.Name }
-            } catch {
+        $users = Get-ADUser -Filter * -Properties `
+          Name, SamAccountName, Enabled, LastLogonDate, PasswordLastSet, `
+          msDS-UserPasswordExpiryTimeComputed, MemberOf |
+          ForEach-Object {
+            $passwordExpiry = $null
+            $expiryRaw = $_.'msDS-UserPasswordExpiryTimeComputed'
+            if ($expiryRaw -and $expiryRaw -lt [long]::MaxValue) {
+              try {
+                $passwordExpiry = [datetime]::FromFileTime($expiryRaw)
+              } catch {
+                $passwordExpiry = $null
+              }
+            }
+
+            [PSCustomObject]@{
+              Name = $_.Name
+              SamAccountName = $_.SamAccountName
+              Enabled = $_.Enabled
+              LastLogonDate = if ($_.LastLogonDate) {
+                $_.LastLogonDate.ToString('o')
+              } else { $null }
+              PasswordLastSet = if ($_.PasswordLastSet) {
+                $_.PasswordLastSet.ToString('o')
+              } else { $null }
+              PasswordExpires = if ($passwordExpiry) {
+                $passwordExpiry.ToString('o')
+              } else { $null }
+              GlobalGroupMemberships = @(
+                $_.MemberOf | ForEach-Object {
+                  if ($groupNames.ContainsKey($_)) {
+                    $groupNames[$_]
+                  } else {
+                    $_
+                  }
+                }
+              )
             }
           }
-        }
-    
-        $passwordExpiry = $null
-        $expiryRaw = $user.'msDS-UserPasswordExpiryTimeComputed'
-        if ($expiryRaw) {
-          try {
-            $passwordExpiry = [datetime]::FromFileTime($expiryRaw)
-          } catch {
-            $passwordExpiry = $null
-          }
-        }
-    
-        $output = [PSCustomObject]@{
-          Name                    = $user.Name
-          SamAccountName          = $user.SamAccountName
-          Enabled                 = $user.Enabled
-          LastLogonDate           = if ($user.LastLogonDate) { $user.LastLogonDate.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
-          PasswordLastSet         = if ($user.PasswordLastSet) { $user.PasswordLastSet.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
-          PasswordExpires         = if ($passwordExpiry) { $passwordExpiry.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
-          GlobalGroupMemberships  = $globalGroups
-        }
-    
-        $output | ConvertTo-Json -Depth 3
-      loop: "{{ all_users }}"
-      register: ad_user_details
-      ignore_errors: yes
 
+        ConvertTo-Json -InputObject @($users) -Depth 4 -Compress
+      register: ad_users
+      changed_when: false
 
-    - set_fact:
+    - name: Define gathered account info
+      ansible.builtin.set_fact:
         info:
-          user_details: >-
-            {{
-              ad_user_details.results
-              | selectattr('rc', 'equalto', 0)
-              | map(attribute='stdout')
-              | select('truthy')
-              | map('from_json')
-            }}
-
-    - debug:
-        var: info
+          user_details: "{{ ad_users.stdout | from_json }}"

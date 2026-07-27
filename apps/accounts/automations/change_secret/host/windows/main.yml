@@ -1,9 +1,6 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Test privileged account
-      ansible.windows.win_ping:
-
     - name: Change password
       ansible.windows.win_user:
         fullname: "{{ account.username}}"
@@ -15,6 +12,7 @@
         update_password: always
       ignore_errors: true
       when: account.secret_type == "password"
+      register: change_secret_result
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
@@ -24,4 +22,28 @@
       vars:
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
-      when: account.secret_type == "password" and check_conn_after_change
+      when:
+        - account.secret_type == "password"
+        - check_conn_after_change or change_secret_result.failed | default(false)
+      register: verify_secret_result
+      ignore_errors: true
+      ignore_unreachable: true
+
+    - name: Mark Windows verification as inconclusive
+      ansible.builtin.set_fact:
+        jms_credential_probe:
+          auth_status: unknown
+          reason_code: WINDOWS_VERIFY_FAILED
+          change_succeeded: true
+      when:
+        - not (change_secret_result.failed | default(false))
+        - verify_secret_result.failed | default(false)
+          or verify_secret_result.unreachable | default(false)
+
+    - name: Fail when Windows change and verification both fail
+      ansible.builtin.fail:
+        msg: "Windows password change failed: {{ change_secret_result.msg | default('unknown error') }}"
+      when:
+        - change_secret_result.failed | default(false)
+        - verify_secret_result.failed | default(false)
+          or verify_secret_result.unreachable | default(false)

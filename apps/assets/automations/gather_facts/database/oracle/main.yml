@@ -5,19 +5,18 @@
 
   tasks:
     - name: Get info
-      oracle_ping:
+      oracle_info:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
         mode: "{{ jms_account.mode }}"
+        connect_timeout: 15
+        filter: version
       register: db_info
 
     - name: Define info by set_fact
       set_fact:
         info:
-          version: "{{ db_info.server_version }}"
-
-    - debug:
-        var: info
+          version: "{{ db_info.version.full }}"

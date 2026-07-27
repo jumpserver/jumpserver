@@ -6,10 +6,12 @@
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
+    effective_ssl_mode: >-
+      {{ jms_asset.spec_info.pg_ssl_mode if check_ssl else 'disable' }}
     ansible_timeout: 30
   tasks:
     - name: Test PostgreSQL connection
-      community.postgresql.postgresql_ping:
+      postgresql_login_ping:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
@@ -18,6 +20,5 @@
         ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
-      register: result
-      failed_when: not result.is_available
+        ssl_mode: "{{ effective_ssl_mode }}"
+        connect_timeout: 15

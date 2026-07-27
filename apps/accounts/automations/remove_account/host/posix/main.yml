@@ -1,28 +1,115 @@
 - hosts: demo
   gather_facts: no
+  become: true
   tasks:
-    - name: "Get user home directory path"
-      ansible.builtin.shell:
-        cmd: "getent passwd {{ account.username }} | cut -d: -f6"
-      register: user_home_dir
-      ignore_errors: yes
+    - name: "Look up account before removal"
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ account.username }}"
+      register: user_info
+      ignore_errors: true
+      changed_when: false
+
+    - name: Fail when passwd lookup itself is unavailable
+      ansible.builtin.fail:
+        msg: "{{ user_info.msg | default('Unable to query passwd database') }}"
+      when:
+        - user_info.failed | default(false)
+        - "'One or more supplied key could not be found' not in (user_info.msg | default(''))"
+
+    - name: Record account removal paths
+      ansible.builtin.set_fact:
+        account_exists: >-
+          {{ account.username in
+             (user_info.ansible_facts.getent_passwd | default({})) }}
+        account_home: >-
+          {{ (user_info.ansible_facts.getent_passwd | default({}))
+             .get(account.username, ['', '', '', '', ''])[4] }}
+        account_uid: >-
+          {{ (user_info.ansible_facts.getent_passwd | default({}))
+             .get(account.username, ['', '', '', '', ''])[1] }}
+
+    - name: Validate home directory before backup
+      ansible.builtin.assert:
+        that:
+          - account_home.startswith('/')
+          - account_home not in ['/', '/bin', '/boot', '/dev', '/etc', '/lib', '/lib64', '/proc', '/root', '/run', '/sbin', '/sys', '/usr', '/var']
+          - "'/../' not in account_home"
+          - not account_home.endswith('/..')
+        fail_msg: "Refusing to move unsafe home directory: {{ account_home }}"
+      when: account_exists
 
     - name: "Check if user home directory exists"
       ansible.builtin.stat:
-        path: "{{ user_home_dir.stdout }}"
+        path: "{{ account_home }}"
+        follow: false
       register: home_dir
-      when: user_home_dir.stdout != ""
-      ignore_errors: yes
+      when: account_exists
+
+    - name: Verify home directory belongs to the target account
+      ansible.builtin.assert:
+        that:
+          - not (home_dir.stat.islnk | default(false))
+          - (home_dir.stat.uid | string) == (account_uid | string)
+        fail_msg: >-
+          Refusing to move a home directory not owned by
+          {{ account.username }}: {{ account_home }}
+      when:
+        - account_exists
+        - home_dir.stat.exists | default(false)
+
+    - name: Count accounts sharing the target home directory
+      ansible.builtin.shell: |
+        getent passwd |
+          awk -F: -v home="$JMS_ACCOUNT_HOME" '
+            $6 == home { count += 1 }
+            END { print count + 0 }
+          '
+      environment:
+        JMS_ACCOUNT_HOME: "{{ account_home }}"
+      register: shared_home_count
+      changed_when: false
+      when:
+        - account_exists
+        - home_dir.stat.exists | default(false)
+
+    - name: Refuse to move a shared home directory
+      ansible.builtin.fail:
+        msg: "Home directory is shared by multiple accounts: {{ account_home }}"
+      when:
+        - account_exists
+        - home_dir.stat.exists | default(false)
+        - shared_home_count.stdout | int > 1
+
+    - name: Check whether the backup path already exists
+      ansible.builtin.stat:
+        path: "{{ account_home }}.bak"
+        follow: false
+      register: backup_dir
+      when:
+        - account_exists
+        - home_dir.stat.exists | default(false)
+
+    - name: Refuse to overwrite an existing home backup
+      ansible.builtin.fail:
+        msg: "Home backup already exists: {{ account_home }}.bak"
+      when:
+        - account_exists
+        - home_dir.stat.exists | default(false)
+        - backup_dir.stat.exists | default(false)
 
     - name: "Rename user home directory if it exists"
       ansible.builtin.command:
-        cmd: "mv {{ user_home_dir.stdout }} {{ user_home_dir.stdout }}.bak"
-      when: home_dir.stat | default(false) and user_home_dir.stdout != ""
-      ignore_errors: yes
+        argv:
+          - mv
+          - "{{ account_home }}"
+          - "{{ account_home }}.bak"
+      when:
+        - account_exists
+        - home_dir.stat.exists | default(false)
 
     - name: "Remove account"
       ansible.builtin.user:
         name: "{{ account.username }}"
         state: absent
-        remove: "{{ home_dir.stat.exists }}"
-      when: home_dir.stat | default(false)
+        remove: false

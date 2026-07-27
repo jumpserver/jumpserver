@@ -4,6 +4,12 @@ category: database
 type:
   - mongodb
 method: push_account
+params:
+  - name: roles
+    type: str
+    label: Roles
+    default: readWrite
+    help_text: Comma-separated roles used only when the remote user is created
 
 i18n:
   MongoDB account push:

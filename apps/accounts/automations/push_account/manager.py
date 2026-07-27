@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AutomationTypes
+from accounts.const import (
+    AutomationTypes, ChangeSecretRecordStatusChoice,
+)
 from common.utils import get_logger
 from common.utils.timezone import local_now_filename
 from ..base.manager import BaseChangeSecretPushManager
@@ -42,6 +44,8 @@ class PushAccountManager(BaseChangeSecretPushManager):
         if asset_account_id in self.record_map:
             record_id = self.record_map[asset_account_id]
             record = PushSecretRecord.objects.filter(id=record_id).first()
+            if not record:
+                raise ValueError(f'Push secret record not found: {record_id}')
         else:
             record = self.create_record(asset, account)
 
@@ -49,7 +53,7 @@ class PushAccountManager(BaseChangeSecretPushManager):
         return record
 
     def create_record(self, asset, account):
-        record = PushSecretRecord(
+        record = PushSecretRecord.objects.create(
             asset=asset, account=account, execution=self.execution,
             comment=f'{account.username}@{asset.address}'
         )
@@ -61,6 +65,27 @@ class PushAccountManager(BaseChangeSecretPushManager):
         print('{} {}\n'.format(plan_execution_end, local_now_filename()))
         time_cost = _('Duration')
         print('{}: {}s'.format(time_cost, self.duration))
+        records = {
+            str(record.id): record
+            for record in self.name_record_mapper.values()
+        }.values()
+        success = sum(
+            record.status == ChangeSecretRecordStatusChoice.success.value
+            for record in records
+        )
+        unverified = sum(
+            record.status == ChangeSecretRecordStatusChoice.unverified.value
+            for record in records
+        )
+        failed = sum(
+            record.status == ChangeSecretRecordStatusChoice.failed.value
+            for record in records
+        )
+        total = success + unverified + failed
+        print(
+            _('Success: %s, Unverified: %s, Failed: %s, Total: %s')
+            % (success, unverified, failed, total)
+        )
 
     def get_report_template(self):
         return "accounts/push_account_report.html"
