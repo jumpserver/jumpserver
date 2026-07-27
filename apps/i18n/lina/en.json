@@ -1398,6 +1398,7 @@
     "SearchConditionsSave": "Save",
     "SearchPresetNamePlaceholder": "Name this quick search",
     "SearchShortcutPlaceholder": "Type / to search",
+    "SearchMultipleValuesPlaceholder": "Separate multiple values with commas",
     "Secret": "Secret",
     "SecretKey": "Key",
     "SecretKeyStrategy": "Password policy",

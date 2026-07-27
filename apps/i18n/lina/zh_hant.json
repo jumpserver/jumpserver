@@ -1369,6 +1369,7 @@
     "SearchConditionsSave": "儲存",
     "SearchPresetNamePlaceholder": "為快捷搜尋條件命名",
     "SearchShortcutPlaceholder": "輸入 / 進行搜尋",
+    "SearchMultipleValuesPlaceholder": "多個值使用 , 分隔",
     "Secret": "密碼",
     "SecretKey": "金鑰",
     "SecretKeyStrategy": "密碼策略",

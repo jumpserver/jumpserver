@@ -1325,6 +1325,7 @@
     "SearchConditionsSave": "保存",
     "SearchPresetNamePlaceholder": "クイック検索条件に名前を付ける",
     "SearchShortcutPlaceholder": "/ を入力して検索",
+    "SearchMultipleValuesPlaceholder": "複数の値は , で区切る",
     "Secret": "パスワード",
     "SecretKey": "キー",
     "SecretKeyStrategy": "パスワードポリシー",
