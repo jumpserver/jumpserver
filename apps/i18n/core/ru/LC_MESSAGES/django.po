@@ -1949,6 +1949,38 @@ msgstr "Пользователь"
 msgid "Assets"
 msgstr "Активы"
 
+#: acls/models/clipboard_acl.py:14 acls/serializers/clipboard_acl.py:37
+msgid "Operations"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:19
+msgid "Copy text character limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:20 acls/models/clipboard_acl.py:26
+msgid "0 means unlimited, unit: characters"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:25
+msgid "Paste text character limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:31
+msgid "Download file size limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:32 acls/models/clipboard_acl.py:38
+msgid "0 means unlimited, unit: MB"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:37
+msgid "Upload file size limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:42
+msgid "Clipboard acl"
+msgstr ""
+
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:92 terminal/const.py:88
 #: terminal/models/session/session.py:40 terminal/serializers/command.py:18
@@ -2147,6 +2179,14 @@ msgstr "Организация `{}` не существует"
 #, python-brace-format
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "Ни один утверждающий не относится к организации `{}`"
+
+#: acls/serializers/clipboard_acl.py:23
+msgid "At least one clipboard operation is required"
+msgstr ""
+
+#: acls/serializers/clipboard_acl.py:25
+msgid "Only copy and paste operations are allowed"
+msgstr ""
 
 #: acls/serializers/rules/rules.py:22
 #: xpack/plugins/cloud/serializers/task.py:163
@@ -13002,46 +13042,6 @@ msgstr "Лицензия успешно импортирована"
 #: xpack/plugins/license/api.py:55
 msgid "Invalid license"
 msgstr "Лицензия недействительна"
-
-#: acls/models/clipboard_acl.py:14 acls/serializers/clipboard_acl.py:86
-msgid "Operations"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:19
-msgid "Copy text character limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:20
-msgid "0 means unlimited, unit: characters"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:25
-msgid "Paste text character limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:31
-msgid "Download file size limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:32
-msgid "0 means unlimited, unit: MB"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:37
-msgid "Upload file size limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:42
-msgid "Clipboard acl"
-msgstr ""
-
-#: acls/serializers/clipboard_acl.py:72
-msgid "At least one clipboard operation is required"
-msgstr ""
-
-#: acls/serializers/clipboard_acl.py:74
-msgid "Only copy and paste operations are allowed"
-msgstr ""
 
 #: accounts/const/automation.py:59 ops/const.py:17
 msgid "Replace (Replace only keys pushed by JumpServer) "

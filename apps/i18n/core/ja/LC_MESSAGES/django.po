@@ -1903,6 +1903,38 @@ msgstr "ユーザー"
 msgid "Assets"
 msgstr "資産"
 
+#: acls/models/clipboard_acl.py:14 acls/serializers/clipboard_acl.py:37
+msgid "Operations"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:19
+msgid "Copy text character limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:20 acls/models/clipboard_acl.py:26
+msgid "0 means unlimited, unit: characters"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:25
+msgid "Paste text character limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:31
+msgid "Download file size limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:32 acls/models/clipboard_acl.py:38
+msgid "0 means unlimited, unit: MB"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:37
+msgid "Upload file size limit"
+msgstr ""
+
+#: acls/models/clipboard_acl.py:42
+msgid "Clipboard acl"
+msgstr ""
+
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:92 terminal/const.py:88
 #: terminal/models/session/session.py:40 terminal/serializers/command.py:18
@@ -2101,6 +2133,14 @@ msgstr "組織 '{}'は存在しません"
 #, python-brace-format
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
+
+#: acls/serializers/clipboard_acl.py:23
+msgid "At least one clipboard operation is required"
+msgstr ""
+
+#: acls/serializers/clipboard_acl.py:25
+msgid "Only copy and paste operations are allowed"
+msgstr ""
 
 #: acls/serializers/rules/rules.py:22
 #: xpack/plugins/cloud/serializers/task.py:163
@@ -12525,46 +12565,6 @@ msgstr "ライセンスのインポートに成功"
 #: xpack/plugins/license/api.py:55
 msgid "Invalid license"
 msgstr "ライセンスが無効です"
-
-#: acls/models/clipboard_acl.py:14 acls/serializers/clipboard_acl.py:86
-msgid "Operations"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:19
-msgid "Copy text character limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:20
-msgid "0 means unlimited, unit: characters"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:25
-msgid "Paste text character limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:31
-msgid "Download file size limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:32
-msgid "0 means unlimited, unit: MB"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:37
-msgid "Upload file size limit"
-msgstr ""
-
-#: acls/models/clipboard_acl.py:42
-msgid "Clipboard acl"
-msgstr ""
-
-#: acls/serializers/clipboard_acl.py:72
-msgid "At least one clipboard operation is required"
-msgstr ""
-
-#: acls/serializers/clipboard_acl.py:74
-msgid "Only copy and paste operations are allowed"
-msgstr ""
 
 #~ msgid "Offline video player"
 #~ msgstr "オフラインビデオプレーヤー"
