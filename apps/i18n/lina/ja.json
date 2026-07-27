@@ -1728,5 +1728,21 @@
     "selectedAssets": "選択した資産",
     "setVariable": "パラメータ設定",
     "userId": "ユーザーID",
-    "userName": "ユーザー名"
+    "userName": "ユーザー名",
+    "NodeFilterConditionLabel": "ノード",
+    "NodeFilterSearch": "ノードを検索",
+    "SearchConditionsClear": "クリア",
+    "SearchShortcutPlaceholder": "/ を入力して検索",
+    "SearchConditionsSave": "保存",
+    "SavedSearchConditions": "保存済み条件",
+    "SavedSearchHistoryHint": "保存済みのフィルター履歴",
+    "SearchPresetNamePlaceholder": "クイック検索条件に名前を付ける",
+    "LabelFilterTitle": "ラベルフィルター",
+    "Label": "ラベル",
+    "LabelFilterSearchKey": "ラベルキーを検索",
+    "LabelFilterSearchValue": "ラベル値を検索",
+    "LabelFilterAllValues": "すべての値",
+    "LabelFilterSelectKey": "ラベルキーを選択",
+    "LabelFilterKeyLabel": "キー",
+    "LabelFilterValueLabel": "値"
 }

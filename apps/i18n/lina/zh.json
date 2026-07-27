@@ -1843,5 +1843,21 @@
     "TreeResourceSelectShowAll": "查看全部节点",
     "TreeResourceSelectClearSelected": "清除所有已选节点",
     "TreeResourceSelectExpandSelected": "展开到已选节点",
-    "TreeResourceSelectCollapseAll": "折叠所有节点"
+    "TreeResourceSelectCollapseAll": "折叠所有节点",
+    "NodeFilterConditionLabel": "节点",
+    "NodeFilterSearch": "搜索节点",
+    "SearchConditionsClear": "清除",
+    "SearchShortcutPlaceholder": "输入 / 进行搜索",
+    "SearchConditionsSave": "保存",
+    "SavedSearchConditions": "已保存条件",
+    "SavedSearchHistoryHint": "已保存的历史筛选条件",
+    "SearchPresetNamePlaceholder": "快捷搜索条件命名",
+    "LabelFilterTitle": "标签筛选",
+    "Label": "标签",
+    "LabelFilterSearchKey": "搜索标签键",
+    "LabelFilterSearchValue": "搜索标签值",
+    "LabelFilterAllValues": "全部值",
+    "LabelFilterSelectKey": "请选择标签键",
+    "LabelFilterKeyLabel": "键",
+    "LabelFilterValueLabel": "值"
 }
