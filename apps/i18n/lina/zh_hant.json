@@ -1773,5 +1773,21 @@
     "selectedAssets": "已選資產",
     "setVariable": "設置參數",
     "userId": "用戶ID",
-    "userName": "用戶名"
+    "userName": "用戶名",
+    "NodeFilterConditionLabel": "節點",
+    "NodeFilterSearch": "搜尋節點",
+    "SearchConditionsClear": "清除",
+    "SearchShortcutPlaceholder": "輸入 / 進行搜尋",
+    "SearchConditionsSave": "儲存",
+    "SavedSearchConditions": "已儲存條件",
+    "SavedSearchHistoryHint": "已儲存的歷史篩選條件",
+    "SearchPresetNamePlaceholder": "為快捷搜尋條件命名",
+    "LabelFilterTitle": "標籤篩選",
+    "Label": "標籤",
+    "LabelFilterSearchKey": "搜尋標籤鍵",
+    "LabelFilterSearchValue": "搜尋標籤值",
+    "LabelFilterAllValues": "全部值",
+    "LabelFilterSelectKey": "請選擇標籤鍵",
+    "LabelFilterKeyLabel": "鍵",
+    "LabelFilterValueLabel": "值"
 }
