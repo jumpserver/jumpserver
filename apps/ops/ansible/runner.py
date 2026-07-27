@@ -224,7 +224,7 @@ class UploadFileRunner:
             'verbosity': verbosity,
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,
-            'host_cwd': self.project_dir,
+            'container_workdir': self.project_dir,
             **kwargs,
         }
         if use_ansible_docker_isolation():
