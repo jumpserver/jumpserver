@@ -16,20 +16,6 @@ def local_now():
     return dj_timezone.localtime(dj_timezone.now())
 
 
-def expiration_remain_days(date_expired, today=None):
-    if today is None:
-        today = local_now().date()
-    date_expired = dj_timezone.localtime(date_expired).date()
-    return (date_expired - today).days
-
-
-def should_notify_expiration(remain_days, first_notice_days, daily_notice_days):
-    return (
-        remain_days == first_notice_days
-        or 0 <= remain_days <= daily_notice_days
-    )
-
-
 def local_now_display(fmt='%Y-%m-%d %H:%M:%S'):
     return local_now().strftime(fmt)
 
