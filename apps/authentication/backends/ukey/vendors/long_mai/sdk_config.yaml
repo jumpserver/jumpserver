@@ -359,7 +359,7 @@ operations:
           url_format: 
             user_id: "{{ user.id }}"
           body:
-            ukey_sn: ""
+            ukey_sn: null
           register: user
         
     - key: issueCert
