@@ -91,6 +91,9 @@ jobs:
           sed -i 's|-base:.* AS stage-build|-base:${{ env.IMAGE_TAG }} AS stage-build|' Dockerfile
 
       - name: Commit changes
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          INPUT_BRANCH: ${{ inputs.branch }}
         run: |
           if [ -z "$(git status --porcelain)" ]; then
             echo "No changes to commit."
@@ -101,9 +104,9 @@ jobs:
           git add Dockerfile
           git commit -m "perf: Update Dockerfile with new base image tag"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+            git push origin HEAD:"$HEAD_REF"
           else
-            git push origin HEAD:${{ inputs.branch }}
+            git push origin HEAD:"$INPUT_BRANCH"
           fi
         if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.fork == false }}
         env:
