@@ -11,7 +11,9 @@ from django.utils.translation import gettext_lazy as _
 
 from common.const.crontab import CRONTAB_AT_AM_TEN
 from common.utils import get_logger
-from common.utils.timezone import local_now, dt_parser
+from common.utils.timezone import (
+    dt_parser, expiration_remain_days, local_now, should_notify_expiration,
+)
 from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_root_org
 from perms.models import AssetPermission
@@ -58,8 +60,10 @@ def check_asset_permission_expired():
 @atomic()
 @tmp_to_root_org()
 def check_asset_permission_will_expired():
-    start = local_now()
-    end = start + timedelta(days=settings.PERM_EXPIRED_NOTICE_DAYS)
+    first_notice_days = settings.PERM_EXPIRED_FIRST_NOTICE_DAYS
+    daily_notice_days = settings.PERM_EXPIRED_DAILY_NOTICE_DAYS
+    start = local_now().replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days=max(first_notice_days, daily_notice_days) + 1)
 
     user_asset_remain_day_mapper = defaultdict(dict)
     org_perm_remain_day_mapper = defaultdict(dict)
@@ -72,7 +76,10 @@ def check_asset_permission_will_expired():
 
     for asset_perm in asset_perms:
         date_expired = dt_parser(asset_perm.date_expired)
-        remain_days = (date_expired - start).days
+        remain_days = expiration_remain_days(date_expired, start.date())
+        if not should_notify_expiration(
+                remain_days, first_notice_days, daily_notice_days):
+            continue
 
         org = asset_perm.org
         # 资产授权按照组织分类

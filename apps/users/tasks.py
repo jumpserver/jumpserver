@@ -12,6 +12,9 @@ from django.utils.translation import gettext_lazy as _, gettext_noop
 from audits.const import ActivityChoices
 from common.const.crontab import CRONTAB_AT_AM_TEN, CRONTAB_AT_PM_TWO
 from common.utils import get_logger
+from common.utils.timezone import (
+    expiration_remain_days, local_now, should_notify_expiration,
+)
 from ops.celery.decorator import after_app_ready_start, register_as_period_task
 from ops.celery.utils import create_or_update_celery_periodic_tasks
 from orgs.utils import tmp_to_root_org
@@ -71,18 +74,23 @@ def check_password_expired_periodic():
     )
 )
 def check_user_expired():
-    date_expired_lt = timezone.now() + timezone.timedelta(days=User.DATE_EXPIRED_WARNING_DAYS)
+    first_notice_days = settings.USER_EXPIRED_FIRST_NOTICE_DAYS
+    daily_notice_days = settings.USER_EXPIRED_DAILY_NOTICE_DAYS
+    start = local_now().replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days=max(first_notice_days, daily_notice_days) + 1)
     users = User.get_nature_users() \
         .filter(source=User.Source.local) \
-        .filter(date_expired__lt=date_expired_lt)
+        .filter(date_expired__gte=start, date_expired__lt=end)
 
     for user in users:
-        if not user.is_valid:
+        if not user.is_active:
             continue
-        if not user.will_expired:
+        remain_days = expiration_remain_days(user.date_expired, start.date())
+        if not should_notify_expiration(
+                remain_days, first_notice_days, daily_notice_days):
             continue
         msg = "The user {} will expires in {} days"
-        logger.info(msg.format(user, user.expired_remain_days))
+        logger.info(msg.format(user, remain_days))
         UserExpirationReminderMsg(user).publish_async()
 
 
