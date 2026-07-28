@@ -52,7 +52,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
     def get_filterset_kwargs(self, request, queryset, view):
         kwargs = super().get_filterset_kwargs(request, queryset, view)
-        implicit_in_lookups = self.get_implicit_in_lookups(request, queryset)
+        implicit_in_lookups = self.get_implicit_in_lookups(request, queryset, view)
         if not implicit_in_lookups:
             return kwargs
 
@@ -65,12 +65,12 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         queryset = super().filter_queryset(request, queryset, view)
-        queryset = self.filter_implicit_in_lookups(request, queryset)
+        queryset = self.filter_implicit_in_lookups(request, queryset, view)
         queryset = self.filter_dynamic_text_lookups(request, queryset, view)
-        queryset = self.filter_dynamic_value_lookups(request, queryset)
+        queryset = self.filter_dynamic_value_lookups(request, queryset, view)
         return self.filter_dynamic_negated_lookups(request, queryset, view)
 
-    def get_implicit_in_lookups(self, request, queryset):
+    def get_implicit_in_lookups(self, request, queryset, view):
         """Collect repeated exact params that should behave like ``field__in``."""
         model = getattr(queryset, "model", None)
         if model is None:
@@ -81,15 +81,17 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             field_name, lookup = self.split_lookup_param(param)
             if lookup != "exact" or not self.is_value_lookup_field(model, field_name):
                 continue
+            if not self.is_allowed_filterset_field(view, field_name):
+                continue
 
             cleaned_values = self.split_csv_values(values)
             if len(cleaned_values) > 1:
                 lookups[field_name] = cleaned_values
         return lookups
 
-    def filter_implicit_in_lookups(self, request, queryset):
+    def filter_implicit_in_lookups(self, request, queryset, view):
         """Apply implicit ``field=a,b`` style value filters as ``field__in``."""
-        for field_name, values in self.get_implicit_in_lookups(request, queryset).items():
+        for field_name, values in self.get_implicit_in_lookups(request, queryset, view).items():
             queryset = queryset.filter(**{f"{field_name}__in": values})
         return queryset
 
@@ -121,7 +123,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         field = self.resolve_model_field(model, field_path)
         return isinstance(field, (models.CharField, models.TextField))
 
-    def filter_dynamic_value_lookups(self, request, queryset):
+    def filter_dynamic_value_lookups(self, request, queryset, view):
         """Handle explicit value-set lookups like ``id__in=1,2,3``."""
         model = getattr(queryset, "model", None)
         if model is None:
@@ -135,6 +137,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             if lookup not in self.dynamic_value_lookups:
                 continue
             if not self.is_value_lookup_field(model, field_name):
+                continue
+            if not self.is_allowed_filterset_field(view, field_name):
                 continue
 
             cleaned_values = []
@@ -180,6 +184,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
             if lookup in self.negated_value_lookups:
                 if not self.is_value_lookup_field(model, field_name):
+                    continue
+                if not self.is_allowed_filterset_field(view, field_name):
                     continue
                 if lookup == "in":
                     cleaned_values = self.split_csv_values(values)
@@ -231,9 +237,13 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
     def get_allowed_filterset_fields(self, view):
         filterset_fields = getattr(view, "filterset_fields", None) or ()
+        if isinstance(filterset_fields, dict):
+            fields = filterset_fields.keys()
+        else:
+            fields = filterset_fields
         return {
             self.normalize_search_field(field)
-            for field in filterset_fields
+            for field in fields
             if self.normalize_search_field(field)
         }
 

@@ -10,6 +10,13 @@ class DummySearchView:
     filterset_fields = ["email", "groups__id", "groups__name"]
 
 
+class DummyFiltersetDictView:
+    filterset_fields = {
+        "username": ["exact"],
+        "email": ["icontains"],
+    }
+
+
 class LookupFilterBackendTests(TestCase):
     def setUp(self):
         self.backend = LookupFilterBackend()
@@ -32,6 +39,12 @@ class LookupFilterBackendTests(TestCase):
         self.assertTrue(self.backend.is_allowed_filterset_field(self.view, "groups__name"))
         self.assertTrue(self.backend.is_allowed_filterset_field(self.view, "email"))
         self.assertFalse(self.backend.is_allowed_filterset_field(self.view, "password"))
+
+    def test_get_allowed_filterset_fields_from_dict(self):
+        self.assertEqual(
+            self.backend.get_allowed_filterset_fields(DummyFiltersetDictView()),
+            {"username", "email"}
+        )
 
     def test_supported_dynamic_text_lookups(self):
         self.assertEqual(
