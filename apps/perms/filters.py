@@ -17,7 +17,9 @@ class PermissionBaseFilter(BaseFilterSet):
     account_id = filters.UUIDFilter(method='do_nothing')
     account = filters.CharFilter(method='do_nothing')
     user_group_id = filters.UUIDFilter(method='do_nothing')
-    user_group = filters.CharFilter(method='do_nothing')
+    user_group = filters.CharFilter(
+        field_name='user_groups__name', method='do_nothing'
+    )
     all = filters.BooleanFilter(method='do_nothing')
 
     class Meta:
@@ -105,7 +107,9 @@ class AssetPermissionFilter(PermissionBaseFilter):
     node_id = filters.UUIDFilter(method='do_nothing')
     node_name = filters.CharFilter(method='do_nothing')
     asset_id = filters.UUIDFilter(method='do_nothing')
-    asset_name = filters.CharFilter(method='do_nothing')
+    asset_name = filters.CharFilter(
+        field_name='assets__name', method='do_nothing'
+    )
     address = filters.CharFilter(method='do_nothing')
     accounts = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(method='do_nothing')

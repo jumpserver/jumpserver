@@ -45,55 +45,19 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
     Preserve django-filter's default behavior while allowing explicit
     text, exact and ``__in`` lookups without per-view wiring.
     """
-    dynamic_text_lookups = {"icontains", "startswith"}
-    dynamic_value_lookups = {"in"}
+    dynamic_text_lookups = {
+        "icontains", "startswith", "icontains_any", "icontains_all"
+    }
+    dynamic_multi_text_lookups = {"icontains_any", "icontains_all"}
+    dynamic_value_lookups = {"exact", "in"}
     negated_text_lookups = {"icontains", "startswith"}
     negated_value_lookups = {"exact", "in"}
 
-    def get_filterset_kwargs(self, request, queryset, view):
-        kwargs = super().get_filterset_kwargs(request, queryset, view)
-        implicit_in_lookups = self.get_implicit_in_lookups(request, queryset, view)
-        if not implicit_in_lookups:
-            return kwargs
-
-        data = kwargs["data"].copy()
-        for param in implicit_in_lookups:
-            if param in data:
-                data.pop(param)
-        kwargs["data"] = data
-        return kwargs
-
     def filter_queryset(self, request, queryset, view):
         queryset = super().filter_queryset(request, queryset, view)
-        queryset = self.filter_implicit_in_lookups(request, queryset, view)
         queryset = self.filter_dynamic_text_lookups(request, queryset, view)
         queryset = self.filter_dynamic_value_lookups(request, queryset, view)
         return self.filter_dynamic_negated_lookups(request, queryset, view)
-
-    def get_implicit_in_lookups(self, request, queryset, view):
-        """Collect repeated exact params that should behave like ``field__in``."""
-        model = getattr(queryset, "model", None)
-        if model is None:
-            return {}
-
-        lookups = {}
-        for param, values in request.query_params.lists():
-            field_name, lookup = self.split_lookup_param(param)
-            if lookup != "exact" or not self.is_value_lookup_field(model, field_name):
-                continue
-            if not self.is_allowed_filterset_field(view, field_name):
-                continue
-
-            cleaned_values = self.split_csv_values(values)
-            if len(cleaned_values) > 1:
-                lookups[field_name] = cleaned_values
-        return lookups
-
-    def filter_implicit_in_lookups(self, request, queryset, view):
-        """Apply implicit ``field=a,b`` style value filters as ``field__in``."""
-        for field_name, values in self.get_implicit_in_lookups(request, queryset, view).items():
-            queryset = queryset.filter(**{f"{field_name}__in": values})
-        return queryset
 
     def filter_dynamic_text_lookups(self, request, queryset, view):
         """Handle explicit text lookups like ``name__icontains=foo`` from filterset fields."""
@@ -108,15 +72,44 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             field_name, lookup = param.rsplit("__", 1)
             if lookup not in self.dynamic_text_lookups:
                 continue
-            if not self.is_text_lookup_field(model, field_name):
-                continue
             if not self.is_allowed_filterset_field(view, field_name):
+                continue
+            if not self.is_allowed_filter_operator(
+                request, view, field_name, lookup, "string"
+            ):
+                continue
+            model_field_name = self.get_filterset_model_field(view, field_name)
+            if not self.is_text_lookup_field(model, model_field_name):
+                continue
+
+            if lookup in self.dynamic_multi_text_lookups:
+                orm_lookup = f"{model_field_name}__icontains"
+                for raw_value in values:
+                    cleaned_values = self.split_csv_values([raw_value])
+                    if not cleaned_values:
+                        continue
+                    conditions = [
+                        Q(**{orm_lookup: value}) for value in cleaned_values
+                    ]
+                    if lookup == "icontains_any":
+                        queryset = queryset.filter(
+                            reduce(or_, conditions)
+                        )
+                    else:
+                        for condition in conditions:
+                            queryset = queryset.filter(condition)
+                if "__" in model_field_name:
+                    queryset = queryset.distinct()
                 continue
 
             for value in values:
                 if value == "":
                     continue
-                queryset = queryset.filter(**{param: value})
+                queryset = queryset.filter(
+                    **{f"{model_field_name}__{lookup}": value}
+                )
+            if "__" in model_field_name:
+                queryset = queryset.distinct()
         return queryset
 
     def is_text_lookup_field(self, model, field_path):
@@ -124,7 +117,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         return isinstance(field, (models.CharField, models.TextField))
 
     def filter_dynamic_value_lookups(self, request, queryset, view):
-        """Handle explicit value-set lookups like ``id__in=1,2,3``."""
+        """Handle explicit value lookups like ``name__exact=x`` and ``id__in=1,2``."""
         model = getattr(queryset, "model", None)
         if model is None:
             return queryset
@@ -136,21 +129,36 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             field_name, lookup = param.rsplit("__", 1)
             if lookup not in self.dynamic_value_lookups:
                 continue
-            if not self.is_value_lookup_field(model, field_name):
-                continue
             if not self.is_allowed_filterset_field(view, field_name):
                 continue
+            if not self.is_allowed_filter_operator(
+                request, view, field_name, lookup, "choice"
+            ):
+                continue
+            model_field_name = self.get_filterset_model_field(view, field_name)
+            if not self.is_value_lookup_field(model, model_field_name):
+                continue
 
-            cleaned_values = []
-            for value in values:
-                if value == "":
+            if lookup == "exact":
+                for value in values:
+                    if value == "":
+                        continue
+                    queryset = queryset.filter(
+                        **{model_field_name: value}
+                    )
+                if "__" in model_field_name:
+                    queryset = queryset.distinct()
+                continue
+
+            for raw_value in values:
+                cleaned_values = self.split_csv_values([raw_value])
+                if not cleaned_values:
                     continue
-                cleaned_values.extend(
-                    item.strip() for item in value.split(",") if item.strip()
+                queryset = queryset.filter(
+                    **{f"{model_field_name}__{lookup}": cleaned_values}
                 )
-
-            if cleaned_values:
-                queryset = queryset.filter(**{param: cleaned_values})
+                if "__" in model_field_name:
+                    queryset = queryset.distinct()
         return queryset
 
     def is_value_lookup_field(self, model, field_path):
@@ -172,30 +180,53 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             param = raw_param[:-1]
             field_name, lookup = self.split_lookup_param(param)
             if lookup in self.negated_text_lookups:
-                if not self.is_text_lookup_field(model, field_name):
-                    continue
                 if not self.is_allowed_filterset_field(view, field_name):
+                    continue
+                if not self.is_allowed_filter_operator(
+                    request, view, field_name, lookup, "string"
+                ):
+                    continue
+                model_field_name = self.get_filterset_model_field(
+                    view, field_name
+                )
+                if not self.is_text_lookup_field(model, model_field_name):
                     continue
                 for value in values:
                     if value == "":
                         continue
-                    queryset = queryset.exclude(**{param: value})
+                    queryset = queryset.exclude(
+                        **{f"{model_field_name}__{lookup}": value}
+                    )
                 continue
 
             if lookup in self.negated_value_lookups:
-                if not self.is_value_lookup_field(model, field_name):
-                    continue
                 if not self.is_allowed_filterset_field(view, field_name):
+                    continue
+                if not self.is_allowed_filter_operator(
+                    request, view, field_name, lookup, "choice"
+                ):
+                    continue
+                model_field_name = self.get_filterset_model_field(
+                    view, field_name
+                )
+                if not self.is_value_lookup_field(model, model_field_name):
                     continue
                 if lookup == "in":
                     cleaned_values = self.split_csv_values(values)
                     if cleaned_values:
-                        queryset = queryset.exclude(**{param: cleaned_values})
+                        queryset = queryset.exclude(
+                            **{
+                                f"{model_field_name}__{lookup}":
+                                cleaned_values
+                            }
+                        )
                 else:
                     for value in values:
                         if value == "":
                             continue
-                        queryset = queryset.exclude(**{field_name: value})
+                        queryset = queryset.exclude(
+                            **{model_field_name: value}
+                        )
         return queryset
 
     @staticmethod
@@ -241,14 +272,58 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             fields = filterset_fields.keys()
         else:
             fields = filterset_fields
+
+        filterset_class = getattr(view, "filterset_class", None)
+        if filterset_class:
+            fields = set(fields) | set(filterset_class.get_filters())
+
         return {
             self.normalize_search_field(field)
             for field in fields
             if self.normalize_search_field(field)
         }
 
-    def is_allowed_filterset_field(self, view, field_path):
-        return field_path in self.get_allowed_filterset_fields(view)
+    def is_allowed_filterset_field(self, view, query_key):
+        field_name = self.get_lookup_field_name(query_key)
+        return field_name in self.get_allowed_filterset_fields(view)
+
+    @staticmethod
+    def is_allowed_filter_operator(
+        request, view, field_name, lookup, field_type
+    ):
+        from common.drf.metadata import SimpleMetadataWithFilters
+
+        operators = SimpleMetadataWithFilters.get_field_filter_operators(
+            request, view, field_name, {"type": field_type}
+        )
+        return lookup in operators
+
+    @staticmethod
+    def get_filterset_model_field(view, field_name):
+        filterset_class = getattr(view, "filterset_class", None)
+        if not filterset_class:
+            return field_name
+        filter_field = filterset_class.get_filters().get(field_name)
+        if not filter_field:
+            return field_name
+        return filter_field.field_name or field_name
+
+    def get_lookup_field_name(self, query_key):
+        """Return the model field path without a supported lookup suffix."""
+        query_key = self.normalize_search_field(query_key)
+        if not query_key:
+            return None
+        query_key = query_key.rstrip("!")
+        field_name, lookup = self.split_lookup_param(query_key)
+        supported_lookups = (
+            self.dynamic_text_lookups |
+            self.dynamic_value_lookups |
+            self.negated_text_lookups |
+            self.negated_value_lookups
+        )
+        if lookup in supported_lookups:
+            return field_name
+        return query_key
 
     @staticmethod
     def normalize_search_field(field_name):
@@ -259,6 +334,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         return field_name
 
 class SearchFilter(SearchFilterBase):
+    search_any_param = 'search__icontains_any'
+    search_all_param = 'search__icontains_all'
+
     @staticmethod
     def split_search_groups(params):
         groups = []
@@ -269,16 +347,62 @@ class SearchFilter(SearchFilterBase):
         return groups
 
     def get_search_terms(self, request):
-        params = request.query_params.get(self.search_param, '') or request.query_params.get('search', '')
+        params, match_all = self.get_search_params(request)
         params = params.replace('\x00', '')  # strip null characters
+        if match_all:
+            params = params.replace(',', ' ')
         return params.split()
+
+    def get_search_params(self, request):
+        params, match_all = self.get_search_param_groups(request)
+        return (params[-1] if params else ''), match_all
+
+    def get_search_param_groups(self, request):
+        if self.search_all_param in request.query_params:
+            return request.query_params.getlist(self.search_all_param), True
+        if self.search_any_param in request.query_params:
+            return request.query_params.getlist(self.search_any_param), False
+        params = request.query_params.getlist(self.search_param)
+        if not params and self.search_param != 'search':
+            params = request.query_params.getlist('search')
+        return params, False
+
+    def get_search_condition_groups(self, request):
+        groups = []
+        groups.extend(
+            (params, True, False)
+            for params in request.query_params.getlist(self.search_all_param)
+        )
+        groups.extend(
+            (params, False, False)
+            for params in request.query_params.getlist(self.search_any_param)
+        )
+        default_params = request.query_params.getlist(self.search_param)
+        if not default_params and self.search_param != 'search':
+            default_params = request.query_params.getlist('search')
+        groups.extend((params, False, True) for params in default_params)
+        return groups
+
+    @staticmethod
+    def split_default_search_batches(params):
+        batches = []
+        for raw_batch in params.replace('\x00', '').split(','):
+            alternatives = []
+            for raw_alternative in raw_batch.split('|'):
+                terms = [
+                    term for term in raw_alternative.split() if term
+                ]
+                if terms:
+                    alternatives.append(terms)
+            if alternatives:
+                batches.append(alternatives)
+        return batches
 
     def filter_queryset(self, request, queryset, view):
         search_fields = self.get_search_fields(view, request)
-        raw_params = request.query_params.get(self.search_param, '') or request.query_params.get('search', '')
-        search_groups = self.split_search_groups(raw_params)
+        search_condition_groups = self.get_search_condition_groups(request)
 
-        if not search_fields or not search_groups:
+        if not search_fields or not search_condition_groups:
             return queryset
 
         orm_lookups = [
@@ -286,15 +410,47 @@ class SearchFilter(SearchFilterBase):
             for search_field in search_fields
         ]
 
-        group_conditions = []
-        for terms in search_groups:
-            term_conditions = []
-            for term in terms:
-                queries = [Q(**{orm_lookup: term}) for orm_lookup in orm_lookups]
-                term_conditions.append(reduce(or_, queries))
-            group_conditions.append(reduce(and_, term_conditions))
+        for (
+            raw_params, match_all, is_default_search
+        ) in search_condition_groups:
+            if is_default_search:
+                search_batches = self.split_default_search_batches(raw_params)
+                for alternatives in search_batches:
+                    alternative_conditions = []
+                    for terms in alternatives:
+                        term_conditions = []
+                        for term in terms:
+                            queries = [
+                                Q(**{orm_lookup: term})
+                                for orm_lookup in orm_lookups
+                            ]
+                            term_conditions.append(reduce(or_, queries))
+                        alternative_conditions.append(
+                            reduce(and_, term_conditions)
+                        )
+                    queryset = queryset.filter(
+                        reduce(or_, alternative_conditions)
+                    )
+                continue
 
-        queryset = queryset.filter(reduce(or_, group_conditions))
+            if match_all:
+                raw_params = raw_params.replace(',', ' ')
+            search_groups = self.split_search_groups(raw_params)
+            if not search_groups:
+                continue
+
+            group_conditions = []
+            for terms in search_groups:
+                term_conditions = []
+                for term in terms:
+                    queries = [
+                        Q(**{orm_lookup: term})
+                        for orm_lookup in orm_lookups
+                    ]
+                    term_conditions.append(reduce(or_, queries))
+                group_conditions.append(reduce(and_, term_conditions))
+
+            queryset = queryset.filter(reduce(or_, group_conditions))
 
         if self.must_call_distinct(queryset, search_fields):
             queryset = queryset.filter(pk=models.OuterRef('pk'))

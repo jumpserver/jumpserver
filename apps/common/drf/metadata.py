@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
+from django_filters import rest_framework as drf_filters
 from rest_framework import exceptions, serializers
 from rest_framework.fields import empty
 from rest_framework.metadata import SimpleMetadata
@@ -19,6 +20,16 @@ from common.serializers.fields import TreeChoicesField
 
 class SimpleMetadataWithFilters(SimpleMetadata):
     """Override SimpleMetadata, adding info about filters"""
+
+    text_filter_operators = (
+        "icontains", "exact", "startswith",
+        "icontains_any", "icontains_all", "in"
+    )
+    choice_filter_operators = ("exact", "in")
+    exact_filter_operators = ("exact",)
+    supported_filter_operators = set(
+        text_filter_operators + choice_filter_operators
+    )
 
     methods = {"PUT", "POST", "GET", "PATCH"}
     attrs = [
@@ -183,6 +194,82 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             fields = view.ordering_fields
         return fields
 
+    @classmethod
+    def normalize_filter_operators(cls, operators):
+        if isinstance(operators, str):
+            operators = [operators]
+        return [
+            operator for operator in (operators or ())
+            if operator in cls.supported_filter_operators
+        ]
+
+    @classmethod
+    def get_explicit_filter_operators(cls, request, view, field_name):
+        operators = {}
+        if hasattr(view, "get_filter_operators"):
+            operators = view.get_filter_operators(request) or {}
+        elif hasattr(view, "filter_operators"):
+            operators = view.filter_operators or {}
+        if field_name in operators:
+            return cls.normalize_filter_operators(operators[field_name])
+
+        filterset_fields = getattr(view, "filterset_fields", None)
+        if isinstance(filterset_fields, dict) and field_name in filterset_fields:
+            return cls.normalize_filter_operators(
+                filterset_fields[field_name]
+            )
+        filterset_class = getattr(view, "filterset_class", None)
+        meta_fields = getattr(
+            getattr(filterset_class, "Meta", None), "fields", None
+        )
+        if isinstance(meta_fields, dict) and field_name in meta_fields:
+            return cls.normalize_filter_operators(meta_fields[field_name])
+        return None
+
+    @staticmethod
+    def get_filterset_filter(view, field_name):
+        filterset_class = getattr(view, "filterset_class", None)
+        if filterset_class is None:
+            return None
+        return getattr(filterset_class, "base_filters", {}).get(field_name)
+
+    @classmethod
+    def infer_filter_operators(cls, view, field_name, field_info):
+        filter_field = cls.get_filterset_filter(view, field_name)
+        if filter_field is not None:
+            if getattr(filter_field, "method", None):
+                return list(cls.exact_filter_operators)
+            if isinstance(filter_field, drf_filters.BooleanFilter):
+                return list(cls.exact_filter_operators)
+            if isinstance(
+                filter_field,
+                (drf_filters.ChoiceFilter, drf_filters.MultipleChoiceFilter),
+            ):
+                return list(cls.choice_filter_operators)
+            if isinstance(filter_field, drf_filters.CharFilter):
+                return list(cls.text_filter_operators)
+            return list(cls.choice_filter_operators)
+
+        field_type = field_info.get("type")
+        if field_type == "boolean":
+            return list(cls.exact_filter_operators)
+        if field_type in ("choice", "labeled_choice"):
+            return list(cls.choice_filter_operators)
+        if field_type in ("string", "email"):
+            return list(cls.text_filter_operators)
+        return list(cls.choice_filter_operators)
+
+    @classmethod
+    def get_field_filter_operators(
+        cls, request, view, field_name, field_info
+    ):
+        explicit = cls.get_explicit_filter_operators(
+            request, view, field_name
+        )
+        if explicit is not None:
+            return explicit
+        return cls.infer_filter_operators(view, field_name, field_info)
+
     def determine_metadata(self, request, view):
         metadata = super(SimpleMetadataWithFilters, self).determine_metadata(
             request, view
@@ -194,6 +281,9 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         for k, v in meta_get.items():
             if k in filterset_fields:
                 v["filter"] = True
+                v["filter_operators"] = self.get_field_filter_operators(
+                    request, view, k, v
+                )
             if k in order_fields:
                 v["order"] = True
         return metadata
