@@ -204,8 +204,3 @@ ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archi
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
 django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
 redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip" }
-
-[[tool.uv.index]]
-name = "aliyun"
-url = "https://mirrors.aliyun.com/pypi/simple"
-default = true
