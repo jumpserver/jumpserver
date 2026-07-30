@@ -24,12 +24,38 @@ class GatherFactsManager(BasePlaybookManager):
         info = FormatAssetInfo(tp).run(self.method_id_meta_mapper, info)
         return info
 
+    @staticmethod
+    def get_gathered_info(result):
+        result = result or {}
+        if not isinstance(result, dict):
+            return {}
+        for task_result in reversed(list(result.values())):
+            if not isinstance(task_result, dict):
+                continue
+            response = task_result.get('res', {})
+            facts = response.get('ansible_facts', {})
+            if 'info' in facts:
+                return facts['info']
+        return result.get('debug', {}).get('res', {}).get('info', {})
+
     def on_host_success(self, host, result):
-        info = result.get('debug', {}).get('res', {}).get('info', {})
+        info = self.get_gathered_info(result)
         asset = self.host_asset_mapper.get(host)
         if asset and info:
-            info = self.format_asset_info(asset.type, info)
-            asset.gathered_info = info
-            asset.save(update_fields=['gathered_info'])
+            try:
+                info = self.format_asset_info(asset.type, info)
+                asset.gathered_info = info
+                asset.save(update_fields=['gathered_info'])
+            except Exception as error:
+                logger.exception(
+                    'Save gathered facts failed: host=%s', host
+                )
+                return super().on_host_error(
+                    host, str(error), result
+                )
+            super().on_host_success(host, result)
         else:
             logger.error("Not found info: {}".format(host))
+            super().on_host_error(
+                host, 'Gathered facts result is empty', result
+            )

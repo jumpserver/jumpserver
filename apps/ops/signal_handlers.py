@@ -115,9 +115,43 @@ def on_celery_task_pre_run(task_id='', kwargs=None, **others):
 
 @signals.task_postrun.connect
 def on_celery_task_post_run(task_id='', state='', **kwargs):
-    CeleryTaskExecution.objects.filter(id=task_id).update(
+    CeleryTaskExecution.objects.filter(id=task_id).exclude(
+        state='REVOKED'
+    ).update(
         state=state, date_finished=timezone.now(), is_finished=True
     )
+    close_old_connections()
+
+
+@receiver(signals.task_revoked)
+def on_celery_task_revoked(request=None, **kwargs):
+    task_id = getattr(request, 'id', None)
+    if not task_id:
+        return
+
+    date_finished = timezone.now()
+    CeleryTaskExecution.objects.filter(id=task_id).update(
+        state='REVOKED',
+        date_finished=date_finished,
+        is_finished=True,
+    )
+
+    # Automation executions use the Celery task id as their primary key.
+    # Besides the execution itself, close pending secret records and release
+    # account queue locks that normal post_run cleanup can no longer handle.
+    try:
+        from accounts.automations.recovery import (
+            finalize_interrupted_executions_for_task,
+        )
+        finalize_interrupted_executions_for_task(
+            task_id,
+            'Task was forcibly terminated before completion; '
+            'the remote secret state may be unknown.',
+        )
+    except Exception:
+        logger.exception(
+            'Finalize revoked account automation failed: task=%s', task_id
+        )
     close_old_connections()
 
 

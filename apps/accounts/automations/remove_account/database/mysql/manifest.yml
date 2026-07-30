@@ -5,10 +5,20 @@ type:
   - mysql
   - mariadb
 method: remove_account
+params:
+  - name: account_host
+    type: str
+    label: MySQL account host
+    default: "%"
+    help_text: Host part of the MySQL account identity
+  - name: all_hosts
+    type: bool
+    label: Apply to all hosts
+    default: false
+    help_text: Apply the operation to every Host entry with this username
 
 i18n:
   MySQL account remove:
     zh: 使用 Ansible 模块 mysql_user 删除账号
     ja: Ansible モジュール mysql_user を使用してアカウントを削除します
     en: Use the Ansible module mysql_user to delete the account
-

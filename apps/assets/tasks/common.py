@@ -12,9 +12,13 @@ def generate_automation_execution_data(task_name, tp, task_snapshot=None):
     task_snapshot = task_snapshot or {}
     from assets.models import BaseAutomation
     try:
-        eid = current_task.request.id
+        request = current_task.request
+        eid = request.id
+        worker_hostname = request.hostname
     except AttributeError:
-        eid = str(uuid.uuid4())
+        eid = None
+        worker_hostname = None
+    eid = str(eid or uuid.uuid4())
 
     data = {
         'type': tp,
@@ -26,6 +30,12 @@ def generate_automation_execution_data(task_name, tp, task_snapshot=None):
     snapshot = automation_instance.to_attr_json()
     snapshot.update(data)
     snapshot.update(task_snapshot)
+    # A single Celery task may create several automation executions (for
+    # example, one per organisation and secret type). Secondary executions
+    # receive a different primary key, but still belong to this Celery task.
+    snapshot['celery_task_id'] = eid
+    if worker_hostname:
+        snapshot['celery_worker_hostname'] = worker_hostname
     return {'id': eid, 'snapshot': snapshot}
 
 

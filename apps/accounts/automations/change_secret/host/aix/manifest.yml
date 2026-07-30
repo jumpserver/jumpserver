@@ -20,7 +20,7 @@ params:
   - name: shell
     type: str
     label: 'Shell'
-    default: '/bin/bash'
+    default: '/usr/bin/ksh'
 
   - name: home
     type: str
@@ -48,9 +48,9 @@ params:
 
 i18n:
   AIX account change secret:
-    zh: '使用 Ansible 模块 user 执行账号改密 (DES)'
-    ja: 'Ansible user モジュールを使用してアカウントのパスワード変更 (DES)'
-    en: 'Using Ansible module user to change account secret (DES)'
+    zh: '使用 AIX chpasswd 执行账号改密'
+    ja: 'AIX chpasswd を使用してアカウントのパスワードを変更'
+    en: 'Using AIX chpasswd to change account secret'
 
   Modify params sudo help text:
     zh: '如果用户存在，可以修改sudo权限'

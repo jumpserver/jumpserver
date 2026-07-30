@@ -64,7 +64,10 @@ class ChangeSecretDashboardApi(APIView):
         for date_finished, status in results:
             dt_local = timezone.localtime(date_finished)
             date_str = str(dt_local.date())
-            if status == ChangeSecretRecordStatusChoice.failed:
+            if status in [
+                ChangeSecretRecordStatusChoice.failed,
+                ChangeSecretRecordStatusChoice.unverified,
+            ]:
                 status_counts[date_str]['failed'] += 1
             elif status == ChangeSecretRecordStatusChoice.success:
                 status_counts[date_str]['success'] += 1
@@ -154,7 +157,7 @@ class ChangeSecretDashboardApi(APIView):
             ongoing_counts = cache.get(self.ongoing_change_secret_cache_key)
             if ongoing_counts is None:
                 execution_ids = []
-                inspect = app.control.inspect()
+                inspect = app.control.inspect(timeout=2)
                 try:
                     active_tasks = inspect.active()
                 except Exception:

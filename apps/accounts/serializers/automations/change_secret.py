@@ -73,7 +73,10 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         return AutomationTypes.change_secret
 
     def validate_password_rules(self, password_rules):
-        secret_type = self.initial_data['secret_type']
+        secret_type = self.initial_data.get(
+            'secret_type',
+            getattr(self.instance, 'secret_type', None),
+        )
         if secret_type != SecretType.PASSWORD:
             return password_rules
 
@@ -96,8 +99,24 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         return password_rules
 
     def validate(self, attrs):
-        secret_type = attrs.get('secret_type')
-        secret_strategy = attrs.get('secret_strategy')
+        secret_type = attrs.get(
+            'secret_type',
+            getattr(self.instance, 'secret_type', None),
+        )
+        secret_strategy = attrs.get(
+            'secret_strategy',
+            getattr(self.instance, 'secret_strategy', None),
+        )
+        if secret_strategy == SecretStrategy.custom:
+            secret = attrs.get(
+                'secret',
+                getattr(self.instance, 'secret', None),
+            )
+            if not secret:
+                raise serializers.ValidationError({
+                    'secret': _('Secret is required for the custom strategy')
+                })
+
         if secret_type == SecretType.PASSWORD:
             attrs.pop('ssh_key_change_strategy', None)
             if secret_strategy == SecretStrategy.custom:
@@ -170,6 +189,8 @@ class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
     def get_is_success(obj) -> str:
         if obj.status == ChangeSecretRecordStatusChoice.success.value:
             return _("Success")
+        if obj.status == ChangeSecretRecordStatusChoice.unverified.value:
+            return _("Unverified")
         return _("Failed")
 
 

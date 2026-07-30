@@ -19,6 +19,7 @@
         ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
         client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
         filter: version
       register: db_info
 
@@ -26,6 +27,3 @@
       set_fact:
         info:
           version: "{{ db_info.version.full }}"
-
-    - debug:
-        var: info

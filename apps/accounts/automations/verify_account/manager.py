@@ -15,6 +15,10 @@ class VerifyAccountManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_account_mapper = {}
+        self.account_ids = set(map(
+            str, self.execution.snapshot.get('accounts', [])
+        ))
+        self.found_account_ids = set()
 
     def prepare_runtime_dir(self):
         path = super().prepare_runtime_dir()
@@ -30,8 +34,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         return AutomationTypes.verify_account
 
     def get_accounts(self, privilege_account, accounts: QuerySet):
-        account_ids = self.execution.snapshot['accounts']
-        accounts = accounts.filter(id__in=account_ids)
+        accounts = accounts.filter(id__in=self.account_ids)
         return accounts
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
@@ -47,12 +50,15 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         inventory_hosts = []
 
         for account in accounts:
+            self.found_account_ids.add(str(account.id))
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'
             self.host_account_mapper[h['name']] = account
             secret = account.secret
-            if secret is None:
+            if not secret:
                 print(f'account {account.name} secret is None')
+                h['error'] = 'Account secret is empty'
+                inventory_hosts.append(h)
                 continue
 
             private_key_path = None
@@ -71,21 +77,53 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'become': account.get_ansible_become_auth(),
             }
             if account.platform.type == 'oracle':
-                h['account']['mode'] = 'sysdba' if account.privileged else None
+                use_sysdba = (
+                    account.privileged and
+                    h['jms_asset'].get('oracle_sysdba', False)
+                )
+                h['account']['mode'] = 'sysdba' if use_sysdba else None
             inventory_hosts.append(h)
         return inventory_hosts
 
+    def get_runners(self):
+        runners = super().get_runners()
+        for account_id in sorted(
+                self.account_ids - self.found_account_ids
+        ):
+            super().on_inventory_host_error(
+                account_id, 'Account not found or inactive'
+            )
+        return runners
+
     def on_host_success(self, host, result):
         account = self.host_account_mapper.get(host)
+        if not account:
+            return super().on_host_error(
+                host, 'Account mapping not found', result
+            )
         try:
             account.set_connectivity(Connectivity.OK)
         except Exception as e:
-            print(f'\033[31m Update account {account.name} connectivity failed: {e} \033[0m\n')
+            super().on_host_error(host, str(e), result)
+            print(
+                f'\033[31m Update account '
+                f'{getattr(account, "name", "-")} connectivity failed: '
+                f'{e} \033[0m\n'
+            )
+            return
+        super().on_host_success(host, result)
 
     def on_host_error(self, host, error, result):
+        super().on_host_error(host, error, result)
         account = self.host_account_mapper.get(host)
+        if not account:
+            return
         try:
             error_tp = account.get_err_connectivity(error)
             account.set_connectivity(error_tp)
         except Exception as e:
-            print(f'\033[31m Update account {account.name} connectivity failed: {e} \033[0m\n')
+            print(
+                f'\033[31m Update account '
+                f'{getattr(account, "name", "-")} connectivity failed: '
+                f'{e} \033[0m\n'
+            )

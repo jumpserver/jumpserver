@@ -669,6 +669,22 @@ class Config(dict):
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
         'CELERY_WORKER_COUNT': 10,
+        # Per Ansible batch. Prevent a blocked remote operation from occupying
+        # a Celery thread forever. Set to 0 to disable.
+        'ANSIBLE_RUNNER_JOB_TIMEOUT': 1800,
+        'ANSIBLE_RUNNER_IDLE_TIMEOUT': 900,
+        # Log hosts that have not returned from their current Ansible task.
+        # Cap each host action first, then the complete automation across all
+        # 80-host batches. An explicit YAML task timeout takes precedence.
+        'ANSIBLE_STALL_LOG_INTERVAL': 60,
+        'ANSIBLE_AUTOMATION_TASK_TIMEOUT': 300,
+        'ANSIBLE_AUTOMATION_TOTAL_TIMEOUT': 21600,
+        # Bound SSH gateway TCP connect, handshake and authentication.
+        # Set to 0 to retain sshtunnel's built-in timeout behavior.
+        'SSH_GATEWAY_CONNECT_TIMEOUT': 30,
+        # Emit redacted, structured diagnostics from remote_client. Intended
+        # for temporary troubleshooting only.
+        'JMS_REMOTE_CLIENT_DEBUG': False,
 
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',

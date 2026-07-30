@@ -21,9 +21,12 @@ def random_ip():
 def random_replace_char(seq, chars, length):
     using_index = set()
 
+    if length > len(seq):
+        raise ValueError('Not enough positions available for replacement')
+
     while length > 0:
-        index = secrets.randbelow(len(seq) - 1)
-        if index in using_index or index == 0:
+        index = secrets.randbelow(len(seq))
+        if index in using_index:
             continue
         seq[index] = secrets.choice(chars)
         using_index.add(index)

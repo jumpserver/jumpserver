@@ -1,9 +1,6 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Test privileged account
-      ansible.windows.win_ping:
-
     - name: Push user password
       ansible.windows.win_user:
         fullname: "{{ account.username}}"
@@ -15,6 +12,7 @@
         update_password: always
       ignore_errors: true
       when: account.secret_type == "password"
+      register: change_secret_result
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
@@ -23,12 +21,36 @@
       rdp_ping:
         login_host: "{{ jms_asset.origin_address }}"
         login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first | default(3389, true) }}"
-        login_user: "{{ account.username }}"
+        login_user: "{{ account.full_username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
         gateway_args: "{{ jms_gateway | default({}) }}"
-      when: account.secret_type == "password" and check_conn_after_change
+        connect_timeout: 30
+      when:
+        - account.secret_type == "password"
+        - check_conn_after_change or change_secret_result.failed | default(false)
       vars:
         ansible_connection: local
         ansible_shell_type: sh
         ansible_python_interpreter: "{{ local_python_interpreter }}"
+      delegate_to: 127.0.0.1
+      connection: local
+      register: verify_secret_result
+      ignore_errors: true
+
+    - name: Mark RDP verification as inconclusive
+      ansible.builtin.set_fact:
+        jms_credential_probe:
+          auth_status: unknown
+          reason_code: RDP_VERIFY_FAILED
+          change_succeeded: true
+      when:
+        - not (change_secret_result.failed | default(false))
+        - verify_secret_result.failed | default(false)
+
+    - name: Fail when Windows push and RDP verification both fail
+      ansible.builtin.fail:
+        msg: "Windows account push failed: {{ change_secret_result.msg | default('unknown error') }}"
+      when:
+        - change_secret_result.failed | default(false)
+        - verify_secret_result.failed | default(false)

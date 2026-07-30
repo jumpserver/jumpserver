@@ -2,8 +2,7 @@
   gather_facts: no
   tasks:
     - name: "Remove account"
-      ansible.windows.win_domain_user:
+      microsoft.ad.user:
         name: "{{ account.username }}"
         state: absent
-
 
