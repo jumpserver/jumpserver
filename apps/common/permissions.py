@@ -29,6 +29,12 @@ class OnlyAdminSuperUser(IsValidUser):
             and request.user.username == 'admin'
 
 
+class CanViewJDMC(IsValidUser):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) \
+            and request.user.has_jdmc
+
+
 class IsServiceAccount(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \

@@ -43,20 +43,60 @@ __all__ = [
 class LookupFilterBackend(drf_filters.DjangoFilterBackend):
     """
     Preserve django-filter's default behavior while allowing explicit
-    text lookups like ``field__icontains=value`` without per-view wiring.
+    text, exact and ``__in`` lookups without per-view wiring.
     """
     dynamic_text_lookups = {"icontains", "startswith"}
     dynamic_value_lookups = {"in"}
     negated_text_lookups = {"icontains", "startswith"}
     negated_value_lookups = {"exact", "in"}
 
+    def get_filterset_kwargs(self, request, queryset, view):
+        kwargs = super().get_filterset_kwargs(request, queryset, view)
+        implicit_in_lookups = self.get_implicit_in_lookups(request, queryset, view)
+        if not implicit_in_lookups:
+            return kwargs
+
+        data = kwargs["data"].copy()
+        for param in implicit_in_lookups:
+            if param in data:
+                data.pop(param)
+        kwargs["data"] = data
+        return kwargs
+
     def filter_queryset(self, request, queryset, view):
         queryset = super().filter_queryset(request, queryset, view)
-        queryset = self.filter_dynamic_text_lookups(request, queryset)
-        queryset = self.filter_dynamic_value_lookups(request, queryset)
-        return self.filter_dynamic_negated_lookups(request, queryset)
+        queryset = self.filter_implicit_in_lookups(request, queryset, view)
+        queryset = self.filter_dynamic_text_lookups(request, queryset, view)
+        queryset = self.filter_dynamic_value_lookups(request, queryset, view)
+        return self.filter_dynamic_negated_lookups(request, queryset, view)
 
-    def filter_dynamic_text_lookups(self, request, queryset):
+    def get_implicit_in_lookups(self, request, queryset, view):
+        """Collect repeated exact params that should behave like ``field__in``."""
+        model = getattr(queryset, "model", None)
+        if model is None:
+            return {}
+
+        lookups = {}
+        for param, values in request.query_params.lists():
+            field_name, lookup = self.split_lookup_param(param)
+            if lookup != "exact" or not self.is_value_lookup_field(model, field_name):
+                continue
+            if not self.is_allowed_filterset_field(view, field_name):
+                continue
+
+            cleaned_values = self.split_csv_values(values)
+            if len(cleaned_values) > 1:
+                lookups[field_name] = cleaned_values
+        return lookups
+
+    def filter_implicit_in_lookups(self, request, queryset, view):
+        """Apply implicit ``field=a,b`` style value filters as ``field__in``."""
+        for field_name, values in self.get_implicit_in_lookups(request, queryset, view).items():
+            queryset = queryset.filter(**{f"{field_name}__in": values})
+        return queryset
+
+    def filter_dynamic_text_lookups(self, request, queryset, view):
+        """Handle explicit text lookups like ``name__icontains=foo`` from filterset fields."""
         model = getattr(queryset, "model", None)
         if model is None:
             return queryset
@@ -70,6 +110,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 continue
             if not self.is_text_lookup_field(model, field_name):
                 continue
+            if not self.is_allowed_filterset_field(view, field_name):
+                continue
 
             for value in values:
                 if value == "":
@@ -81,7 +123,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         field = self.resolve_model_field(model, field_path)
         return isinstance(field, (models.CharField, models.TextField))
 
-    def filter_dynamic_value_lookups(self, request, queryset):
+    def filter_dynamic_value_lookups(self, request, queryset, view):
+        """Handle explicit value-set lookups like ``id__in=1,2,3``."""
         model = getattr(queryset, "model", None)
         if model is None:
             return queryset
@@ -94,6 +137,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             if lookup not in self.dynamic_value_lookups:
                 continue
             if not self.is_value_lookup_field(model, field_name):
+                continue
+            if not self.is_allowed_filterset_field(view, field_name):
                 continue
 
             cleaned_values = []
@@ -114,7 +159,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             return False
         return not getattr(field, "is_relation", False)
 
-    def filter_dynamic_negated_lookups(self, request, queryset):
+    def filter_dynamic_negated_lookups(self, request, queryset, view):
+        """Handle negated lookups such as ``name__icontains!=foo`` or ``id__in!=1,2``."""
         model = getattr(queryset, "model", None)
         if model is None:
             return queryset
@@ -128,6 +174,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             if lookup in self.negated_text_lookups:
                 if not self.is_text_lookup_field(model, field_name):
                     continue
+                if not self.is_allowed_filterset_field(view, field_name):
+                    continue
                 for value in values:
                     if value == "":
                         continue
@@ -136,6 +184,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
             if lookup in self.negated_value_lookups:
                 if not self.is_value_lookup_field(model, field_name):
+                    continue
+                if not self.is_allowed_filterset_field(view, field_name):
                     continue
                 if lookup == "in":
                     cleaned_values = self.split_csv_values(values)
@@ -152,7 +202,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
     def split_lookup_param(param):
         if "__" not in param:
             return param, "exact"
-        return param.rsplit("__", 1)
+        return tuple(param.rsplit("__", 1))
 
     @staticmethod
     def split_csv_values(values):
@@ -185,6 +235,28 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
         return field
 
+    def get_allowed_filterset_fields(self, view):
+        filterset_fields = getattr(view, "filterset_fields", None) or ()
+        if isinstance(filterset_fields, dict):
+            fields = filterset_fields.keys()
+        else:
+            fields = filterset_fields
+        return {
+            self.normalize_search_field(field)
+            for field in fields
+            if self.normalize_search_field(field)
+        }
+
+    def is_allowed_filterset_field(self, view, field_path):
+        return field_path in self.get_allowed_filterset_fields(view)
+
+    @staticmethod
+    def normalize_search_field(field_name):
+        if not field_name:
+            return None
+        if field_name[0] in ("^", "=", "@", "$"):
+            field_name = field_name[1:]
+        return field_name
 
 class SearchFilter(SearchFilterBase):
     @staticmethod
@@ -463,32 +535,66 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             )
         ]
 
-    @staticmethod
-    def parse_labels(labels_id):
+    @classmethod
+    def parse_labels(cls, labels_id):
         from labels.models import Label
 
-        label_ids = [i.strip() for i in labels_id.split(",")]
-        cleaned = []
+        grouped = cls.parse_label_groups(labels_id)
+        label_ids = {
+            label_id
+            for group_label_ids in grouped.values()
+            for label_id in group_label_ids
+        }
+        return list(Label.objects.filter(id__in=label_ids))
 
-        args = []
-        for label_id in label_ids:
-            kwargs = {}
-            if ":" in label_id:
-                k, v = label_id.split(":", 1)
-                kwargs["name"] = k.strip()
-                if v != "*":
-                    kwargs["value"] = v.strip()
-                args.append(kwargs)
-            else:
-                cleaned.append(label_id)
+    @staticmethod
+    def parse_label_groups(labels_id):
+        """
+        Resolve requested labels and group their IDs by label name.
 
-        if len(args) != 0:
-            q = Q()
-            for kwarg in args:
-                q |= Q(**kwarg)
-            labels = Label.objects.filter(q)
-            cleaned.extend(list(labels))
-        return cleaned
+        Values in one group are OR'ed; resource matches from separate groups
+        are intersected later.
+        """
+        from labels.models import Label
+        from django.core.exceptions import ValidationError as DjangoValidationError
+
+        named_values = defaultdict(set)
+        raw_label_ids = set()
+        for item in labels_id.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            if ":" not in item:
+                raw_label_ids.add(item)
+                continue
+            name, value = item.split(":", 1)
+            named_values[name.strip()].add(value.strip())
+
+        grouped = defaultdict(set)
+        for name, values in named_values.items():
+            labels = Label.objects.filter(name=name)
+            if "*" not in values:
+                labels = labels.filter(value__in=values)
+            grouped[name].update(labels.values_list("id", flat=True))
+
+        if raw_label_ids:
+            label_ids = set()
+            has_invalid_id = False
+            for label_id in raw_label_ids:
+                try:
+                    label_ids.add(Label._meta.pk.to_python(label_id))
+                except (DjangoValidationError, TypeError, ValueError):
+                    has_invalid_id = True
+
+            labels = Label.objects.filter(id__in=label_ids)
+            found_ids = set()
+            for label in labels:
+                found_ids.add(label.id)
+                grouped[label.name].add(label.id)
+            if has_invalid_id or found_ids != label_ids:
+                grouped[None] = set()
+
+        return grouped
 
     def filter_queryset(self, request, queryset, view):
         labels_id = request.query_params.get("labels")
@@ -510,21 +616,22 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             res_type__app_label=app_label,
             res_type__model=model_name,
         )
-        labels = self.parse_labels(labels_id)
-        grouped = defaultdict(set)
-        for label in labels:
-            grouped[label.name].add(label.id)
+        grouped = self.parse_label_groups(labels_id)
+        if not grouped or any(not label_ids for label_ids in grouped.values()):
+            return queryset.none()
 
-        matched_ids = set()
-        for name, label_ids in grouped.items():
+        matched_ids = None
+        for label_ids in grouped.values():
             resources = model.filter_resources_by_labels(
                 full_resources, label_ids, rel="any"
             )
             res_ids = resources.values_list("res_id", flat=True)
-            if not matched_ids:
+            if matched_ids is None:
                 matched_ids = set(res_ids)
             else:
                 matched_ids &= set(res_ids)
+            if not matched_ids:
+                return queryset.none()
         queryset = queryset.filter(id__in=matched_ids)
         return queryset
 

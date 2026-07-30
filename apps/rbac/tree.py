@@ -75,6 +75,7 @@ extra_nodes_data = [
 special_pid_mapper = {
     'common.permission': 'view_other',
     'acls.commandfilteracl': 'perms',
+    'acls.clipboardacl': 'perms',
     'acls.commandgroup': 'perms',
     'acls.loginacl': 'perms',
     'acls.loginassetacl': 'perms',

@@ -178,7 +178,7 @@ class CustomAutoSchema(AutoSchema):
                 'login-logs', 'operate-logs', 'password-change-logs', 'job-logs', 'jobs', 'user-sessions',
                 'service-access-logs', 'chatai-prompts', 'super-connection-tokens', 'flows',
                 'apply-assets', 'apply-nodes', 'login-acls', 'login-asset-acls', 'command-filter-acls',
-                'command-groups', 'connect-method-acls', 'system-msg-subscriptions', 'roles', 'role-bindings',
+                'clipboard-acls', 'command-groups', 'connect-method-acls', 'system-msg-subscriptions', 'roles', 'role-bindings',
                 'system-roles', 'system-role-bindings', 'org-roles', 'org-role-bindings', 'content-types',
                 'labeled-resources', 'account-backup-plans', 'account-check-engines', 'account-secrets',
                 'change-secret', 'integration-applications', 'push-account', 'directories', 'connection-token',
