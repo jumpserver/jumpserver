@@ -14,6 +14,10 @@ class IntegrationApplication(JMSOrgBaseModel):
     is_anonymous = False
 
     name = models.CharField(max_length=128, unique=False, verbose_name=_('Name'))
+    owner = models.ForeignKey(
+        'users.User', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='integration_applications', verbose_name=_('Owner')
+    )
     logo = PrivateImageField(
         upload_to='images', max_length=128, verbose_name=_('Logo')
     )
@@ -31,6 +35,27 @@ class IntegrationApplication(JMSOrgBaseModel):
         qs = Account.objects.all()
         query = RelatedManager.get_to_filter_qs(self.accounts.value, Account)
         return qs.filter(*query)
+
+    def get_managed_accounts(self):
+        if (self.accounts.value or {}).get('type') != 'ids':
+            return Account.objects.none()
+        return self.get_accounts()
+
+    def sync_account_bindings(self):
+        from accounts.models import ApplicationAccountBinding
+
+        account_ids = set(self.get_managed_accounts().values_list('id', flat=True))
+        bindings = self.account_bindings.all()
+        bindings.exclude(current_account_id__in=account_ids).delete()
+        existing_ids = set(bindings.values_list('current_account_id', flat=True))
+        ApplicationAccountBinding.objects.bulk_create([
+            ApplicationAccountBinding(
+                org_id=self.org_id,
+                application=self,
+                current_account_id=account_id,
+            )
+            for account_id in account_ids - existing_ids
+        ])
 
     @property
     def accounts_amount(self) -> int:

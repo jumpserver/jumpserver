@@ -1,16 +1,31 @@
+from django.db import transaction
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import IntegrationApplication
+from accounts.const import ApplicationAgentStatus, ApplicationSwitchStatus
+from accounts.models import Account, ApplicationAccountSwitch, IntegrationApplication
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
+from common.db.fields import RelatedManager
 from common.serializers.fields import JSONManyToManyField
+from common.serializers.fields import ObjectRelatedField
 from common.utils import random_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from users import utils as user_utils
+from users.models import User
+
+from .application_agent import (
+    ApplicationAccountBindingSerializer, IntegrationApplicationAgentSerializer,
+)
 
 
 class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
+    owner = ObjectRelatedField(
+        queryset=User.objects, attrs=('id', 'name', 'username'), label=_('Owner')
+    )
     accounts = JSONManyToManyField(label=_('Account'))
+    agent = serializers.SerializerMethodField(label=_('Agent'))
+    account_bindings = ApplicationAccountBindingSerializer(many=True, read_only=True)
     ip_group = serializers.ListField(
         default=['*'], label=_('Access IP'), help_text=ip_group_help_text,
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
@@ -19,10 +34,11 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = IntegrationApplication
         fields_mini = ['id', 'name']
-        fields_small = fields_mini + ['logo', 'accounts']
+        fields_small = fields_mini + ['logo', 'owner', 'accounts']
         fields = fields_small + [
             'date_last_used', 'date_created', 'date_updated',
-            'ip_group', 'accounts_amount', 'comment', 'is_active'
+            'ip_group', 'accounts_amount', 'account_bindings', 'agent',
+            'comment', 'is_active'
         ]
         extra_kwargs = {
             'comment': {'label': _('Comment')},
@@ -38,9 +54,74 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
             data['logo'] = static('img/logo.png')
         return data
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['owner'].queryset = user_utils.get_current_org_members()
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset.select_related('owner', 'agent').prefetch_related(
+            'account_bindings__current_account__asset'
+        )
+
+    @staticmethod
+    def get_agent(instance):
+        agent = getattr(instance, 'agent', None)
+        if agent:
+            return IntegrationApplicationAgentSerializer(agent).data
+        status = ApplicationAgentStatus.UNREGISTERED
+        return {
+            'id': None,
+            'status': {'value': status.value, 'label': status.label},
+            'hostname': '',
+            'platform': '',
+            'version': '',
+            'last_seen': None,
+            'error': '',
+        }
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        application = self.instance
+        accounts = attrs.get('accounts')
+        if not application or accounts is None:
+            return attrs
+        if getattr(application, 'agent', None) and accounts.get('type') != 'ids':
+            raise serializers.ValidationError({
+                'accounts': _(
+                    'Application Agent credentials must use explicitly selected accounts.'
+                )
+            })
+        account_ids = set(
+            Account.objects.filter(
+                *RelatedManager.get_to_filter_qs(accounts, Account)
+            ).values_list('id', flat=True)
+        )
+        active_account_ids = set(ApplicationAccountSwitch.objects.filter(
+            items__binding__application=application,
+            status__in=(
+                ApplicationSwitchStatus.RUNNING,
+                ApplicationSwitchStatus.WAITING_CONFIRMATION,
+                ApplicationSwitchStatus.ROLLING_BACK,
+            ),
+        ).values_list('items__binding__current_account_id', flat=True))
+        if active_account_ids - account_ids:
+            raise serializers.ValidationError({
+                'accounts': _('Accounts in an active switch task cannot be removed.')
+            })
+        return attrs
+
+    @transaction.atomic
     def create(self, validated_data):
         instance = super().create(validated_data)
+        instance.sync_account_bindings()
         instance.refresh_secret()
+        return instance
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        instance.sync_account_bindings()
         return instance
 
 
