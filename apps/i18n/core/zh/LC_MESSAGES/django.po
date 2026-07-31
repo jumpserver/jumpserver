@@ -2283,7 +2283,7 @@ msgstr "上传文件大小限制"
 
 #: acls/models/clipboard_acl.py:42
 msgid "Clipboard acl"
-msgstr "剪贴板 ACL"
+msgstr "剪贴板访问控制"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:92 terminal/const.py:88 terminal/filters.py:29
