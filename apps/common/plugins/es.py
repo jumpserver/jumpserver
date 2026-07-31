@@ -114,7 +114,7 @@ def get_es_client_version(**kwargs):
 
 class ES(object):
 
-    def __init__(self, config, properties, keyword_fields, exact_fields=None, match_fields=None):
+    def __init__(self, config, properties, keyword_fields, exact_fields=None, fuzzy_fields=None, match_fields=None):
         self.version = 7
         self.config = config
         hosts = self.config.get('HOSTS')
@@ -131,12 +131,14 @@ class ES(object):
         self.index = None
         self.query_index = None
         self.properties = properties
-        self.exact_fields, self.match_fields, self.keyword_fields = set(), set(), set()
+        self.exact_fields, self.match_fields, self.keyword_fields, self.fuzzy_fields = set(), set(), set(), set()
 
         if isinstance(keyword_fields, Iterable):
             self.keyword_fields.update(keyword_fields)
         if isinstance(exact_fields, Iterable):
             self.exact_fields.update(exact_fields)
+        if isinstance(fuzzy_fields, Iterable):
+            self.fuzzy_fields.update(fuzzy_fields)
         if isinstance(match_fields, Iterable):
             self.match_fields.update(match_fields)
 
@@ -306,6 +308,13 @@ class ES(object):
             })
         return _filter
 
+    @staticmethod
+    def handle_fuzzy_fields(exact):
+        _filter = []
+        for k, v in exact.items():
+            _filter.append({'wildcard': {k: f'*{v}*'}})
+        return _filter
+
     def get_query_body(self, **kwargs):
         new_kwargs = {}
         for k, v in kwargs.items():
@@ -321,9 +330,11 @@ class ES(object):
         index_in_field = 'id__in'
         exact_fields = self.exact_fields
         match_fields = self.match_fields
+        fuzzy_fields = self.fuzzy_fields
 
         match = {}
         exact = {}
+        fuzzy = {}
         index = {}
 
         if index_in_field in kwargs:
@@ -332,6 +343,8 @@ class ES(object):
         for k, v in kwargs.items():
             if k in exact_fields:
                 exact[k] = v
+            elif k in fuzzy_fields:
+                fuzzy[f"{k}.keyword"] = v
             elif k in match_fields:
                 match[k] = v
 
@@ -368,6 +381,7 @@ class ES(object):
                     ],
                     'should': should,
                     'filter': self.handle_exact_fields(exact) +
+                              self.handle_fuzzy_fields(fuzzy) +
                               [
                                   {
                                       'range': {
