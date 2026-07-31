@@ -5,7 +5,10 @@ from __future__ import unicode_literals
 import datetime
 from collections import OrderedDict
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import (
+    FieldDoesNotExist, ImproperlyConfigured, PermissionDenied,
+)
+from django.db import models
 from django.http import Http404
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -25,11 +28,12 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         "icontains", "exact", "startswith",
         "icontains_any", "icontains_all", "in"
     )
-    choice_filter_operators = ("exact", "in")
+    value_filter_operators = ("exact", "in")
     exact_filter_operators = ("exact",)
-    supported_filter_operators = set(
-        text_filter_operators + choice_filter_operators
-    )
+    search_filter_operators = ("icontains_any", "icontains_all")
+    supported_filter_operators = set(text_filter_operators)
+    search_param = "search"
+    ordering_param = "order"
 
     methods = {"PUT", "POST", "GET", "PATCH"}
     attrs = [
@@ -161,20 +165,22 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         return field_info
 
     @staticmethod
-    def get_filters_fields(request, view):
+    def get_filters_fields(view):
         fields = []
-        if hasattr(view, "get_filter_fields"):
-            fields = view.get_filter_fields(request)
-        elif hasattr(view, "filter_fields"):
+        if hasattr(view, "filter_fields"):
             fields = view.filter_fields
         elif hasattr(view, "filterset_fields"):
             fields = view.filterset_fields
-        elif hasattr(view, "get_filterset_fields"):
-            fields = view.get_filterset_fields(request)
-        elif hasattr(view, "filterset_class"):
-            fields = list(view.filterset_class.Meta.fields) + list(
-                view.filterset_class.declared_filters.keys()
-            )
+        elif getattr(view, "filterset_class", None):
+            filterset_class = view.filterset_class
+            meta = getattr(filterset_class, "Meta", None)
+            meta_fields = getattr(meta, "fields", ()) or ()
+            if isinstance(meta_fields, dict):
+                meta_fields = meta_fields.keys()
+            fields = [
+                *meta_fields,
+                *filterset_class.declared_filters.keys(),
+            ]
 
         if hasattr(view, "custom_filter_fields"):
             # 不能写 fields += view.custom_filter_fields
@@ -183,52 +189,283 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
         if isinstance(fields, dict):
             fields = list(fields.keys())
-        return fields
+        return fields or []
 
     @staticmethod
-    def get_ordering_fields(request, view):
-        fields = []
-        if hasattr(view, "get_ordering_fields"):
-            fields = view.get_ordering_fields(request)
-        elif hasattr(view, "ordering_fields"):
-            fields = view.ordering_fields
-        return fields
+    def get_ordering_fields(view):
+        return getattr(view, "ordering_fields", ())
+
+    @staticmethod
+    def get_search_fields(view):
+        return getattr(view, "search_fields", ())
+
+    @staticmethod
+    def get_filterset_class(view):
+        return getattr(view, "filterset_class", None)
 
     @classmethod
-    def normalize_filter_operators(cls, operators):
-        if isinstance(operators, str):
-            operators = [operators]
+    def get_filterset_model(cls, view):
+        filterset_class = cls.get_filterset_class(view)
+        model = getattr(getattr(filterset_class, "Meta", None), "model", None)
+        if model is not None:
+            return model
+
+        queryset = getattr(view, "queryset", None)
+        if queryset is not None:
+            return getattr(queryset, "model", None)
+
+        try:
+            queryset = view.get_queryset()
+        except Exception:
+            return None
+        return getattr(queryset, "model", None)
+
+    @staticmethod
+    def resolve_model_field(model, field_path):
+        if model is None or not field_path:
+            return None
+
+        current_model = model
+        field = None
+        field_names = field_path.split("__")
+        for index, field_name in enumerate(field_names):
+            try:
+                field = current_model._meta.get_field(field_name)
+            except FieldDoesNotExist:
+                return None
+
+            if index == len(field_names) - 1:
+                return field
+            if not getattr(field, "is_relation", False):
+                return None
+            current_model = getattr(field, "related_model", None)
+            if current_model is None:
+                return None
+        return field
+
+    @staticmethod
+    def get_filter_field_type(filter_field, model_field):
+        if isinstance(model_field, models.BooleanField):
+            return "boolean"
+        if getattr(model_field, "choices", None):
+            return "choice"
+        if isinstance(model_field, models.UUIDField):
+            return "uuid"
+        if isinstance(model_field, models.EmailField):
+            return "email"
+        if isinstance(model_field, (models.CharField, models.TextField)):
+            return "string"
+        if isinstance(model_field, models.DateTimeField):
+            return "datetime"
+        if isinstance(model_field, models.DateField):
+            return "date"
+        if isinstance(model_field, models.IntegerField):
+            return "integer"
+        if isinstance(
+            model_field,
+            (models.DecimalField, models.FloatField),
+        ):
+            return "number"
+
+        if isinstance(filter_field, drf_filters.BooleanFilter):
+            return "boolean"
+        if isinstance(
+            filter_field,
+            (drf_filters.ChoiceFilter, drf_filters.MultipleChoiceFilter),
+        ):
+            return "choice"
+        if isinstance(filter_field, drf_filters.UUIDFilter):
+            return "uuid"
+        if isinstance(filter_field, drf_filters.DateTimeFilter):
+            return "datetime"
+        if isinstance(filter_field, drf_filters.DateFilter):
+            return "date"
+        if isinstance(filter_field, drf_filters.NumberFilter):
+            return "number"
+        return "string"
+
+    @staticmethod
+    def get_filter_choices(filter_field, model_field):
+        choices = getattr(model_field, "choices", None)
+        if not choices and filter_field is not None:
+            choices = filter_field.extra.get("choices")
+        if not choices:
+            return []
         return [
-            operator for operator in (operators or ())
-            if operator in cls.supported_filter_operators
+            {
+                "value": value,
+                "label": force_str(label, strings_only=True),
+            }
+            for value, label in choices
+            if value not in ("", None)
         ]
 
-    @classmethod
-    def get_explicit_filter_operators(cls, request, view, field_name):
-        operators = {}
-        if hasattr(view, "get_filter_operators"):
-            operators = view.get_filter_operators(request) or {}
-        elif hasattr(view, "filter_operators"):
-            operators = view.filter_operators or {}
-        if field_name in operators:
-            return cls.normalize_filter_operators(operators[field_name])
-
-        filterset_fields = getattr(view, "filterset_fields", None)
-        if isinstance(filterset_fields, dict) and field_name in filterset_fields:
-            return cls.normalize_filter_operators(
-                filterset_fields[field_name]
-            )
-        filterset_class = getattr(view, "filterset_class", None)
-        meta_fields = getattr(
-            getattr(filterset_class, "Meta", None), "fields", None
-        )
-        if isinstance(meta_fields, dict) and field_name in meta_fields:
-            return cls.normalize_filter_operators(meta_fields[field_name])
-        return None
-
     @staticmethod
-    def get_filterset_filter(view, field_name):
-        filterset_class = getattr(view, "filterset_class", None)
+    def get_metadata_field_label(field_name, field_info, filter_field, model_field):
+        label = getattr(filter_field, "_label", None)
+        if label:
+            return force_str(label, strings_only=True)
+        label = field_info.get("label")
+        if label:
+            return label
+        label = getattr(filter_field, "label", None)
+        if label:
+            return force_str(label, strings_only=True)
+        if model_field is not None and "__" not in (
+            getattr(filter_field, "field_name", "") or field_name
+        ):
+            return force_str(model_field.verbose_name, strings_only=True)
+        return field_name.replace("__", " ").replace("_", " ").capitalize()
+
+    @classmethod
+    def get_filters_metadata(cls, view, serializer_fields):
+        filterset_class = cls.get_filterset_class(view)
+        base_filters = (
+            filterset_class.get_filters()
+            if filterset_class is not None
+            else {}
+        )
+        field_names = cls.get_filters_fields(view)
+        filters_metadata = OrderedDict()
+        if not field_names:
+            return filters_metadata
+        model = cls.get_filterset_model(view)
+
+        for field_name in dict.fromkeys(field_names):
+            filter_field = base_filters.get(field_name)
+            model_field_name = (
+                getattr(filter_field, "field_name", None) or field_name
+            )
+            model_field = cls.resolve_model_field(model, model_field_name)
+            serializer_info = serializer_fields.get(field_name, {})
+            field_type = cls.get_filter_field_type(filter_field, model_field)
+            field_info = {
+                "label": cls.get_metadata_field_label(
+                    field_name, serializer_info, filter_field, model_field
+                ),
+                "type": field_type,
+            }
+            help_text = serializer_info.get("help_text")
+            if help_text:
+                field_info["help_text"] = help_text
+            choices = (
+                serializer_info.get("choices")
+                or cls.get_filter_choices(filter_field, model_field)
+            )
+            if choices:
+                field_info["choices"] = choices
+            field_info["operators"] = cls.get_field_filter_operators(
+                view, field_name, field_info
+            )
+            if filter_field is not None:
+                field_info["lookup"] = filter_field.lookup_expr
+                if filter_field.exclude:
+                    field_info["exclude"] = True
+                if getattr(filter_field, "method", None):
+                    field_info["custom"] = True
+            filters_metadata[field_name] = field_info
+        return filters_metadata
+
+    @classmethod
+    def get_ordering_metadata(cls, view, serializer_fields):
+        field_names = cls.get_ordering_fields(view)
+        if field_names == "__all__":
+            field_names = list(serializer_fields.keys())
+        field_names = list(field_names or [])
+        fields = []
+        model = (
+            cls.get_filterset_model(view)
+            if field_names
+            else None
+        )
+        for field_name in dict.fromkeys(field_names):
+            normalized_name = field_name.lstrip("-")
+            field_info = serializer_fields.get(normalized_name, {})
+            model_field = cls.resolve_model_field(model, normalized_name)
+            fields.append({
+                "name": normalized_name,
+                "label": cls.get_metadata_field_label(
+                    normalized_name, field_info, None, model_field
+                ),
+            })
+
+        default = getattr(view, "ordering", None)
+        if isinstance(default, str):
+            default = [default]
+        elif default is None:
+            default = ["name"] if "name" in field_names else []
+        else:
+            default = list(default)
+        return {
+            "param": cls.ordering_param,
+            "fields": fields,
+            "default": default,
+        }
+
+    @classmethod
+    def get_search_metadata(cls, view, serializer_fields):
+        lookup_prefixes = {
+            "^": "startswith",
+        }
+        fields = []
+        for raw_field_name in cls.get_search_fields(view):
+            if not isinstance(raw_field_name, str) or not raw_field_name:
+                continue
+            prefix = raw_field_name[0] if raw_field_name else ""
+            field_name = (
+                raw_field_name[1:]
+                if prefix in lookup_prefixes
+                else raw_field_name
+            )
+            field_info = serializer_fields.get(field_name, {})
+            fields.append({
+                "name": field_name,
+                "label": cls.get_metadata_field_label(
+                    field_name, field_info, None, None
+                ),
+                "lookup": lookup_prefixes.get(prefix, "icontains"),
+            })
+
+        return {
+            "param": cls.search_param,
+            "fields": fields,
+            "operators": (
+                list(cls.search_filter_operators) if fields else []
+            ),
+            "default_operator": (
+                "icontains_any" if fields else None
+            ),
+        }
+
+    @classmethod
+    def get_configured_filter_operators(cls, view, field_name):
+        filterset_class = cls.get_filterset_class(view)
+        meta = getattr(filterset_class, "Meta", None)
+        fields_operator = getattr(meta, "fields_operator", {}) or {}
+        if not isinstance(fields_operator, dict):
+            raise ImproperlyConfigured(
+                "FilterSet.Meta.fields_operator must be a dict"
+            )
+        if field_name not in fields_operator:
+            return None
+
+        operators = fields_operator[field_name]
+        if not isinstance(operators, (list, tuple)):
+            raise ImproperlyConfigured(
+                "FilterSet.Meta.fields_operator values must be lists or tuples"
+            )
+        unsupported = set(operators) - cls.supported_filter_operators
+        if unsupported:
+            raise ImproperlyConfigured(
+                "Unsupported filter operators: {}".format(
+                    ", ".join(sorted(unsupported))
+                )
+            )
+        return list(dict.fromkeys(operators))
+
+    @classmethod
+    def get_filterset_filter(cls, view, field_name):
+        filterset_class = cls.get_filterset_class(view)
         if filterset_class is None:
             return None
         return getattr(filterset_class, "base_filters", {}).get(field_name)
@@ -236,54 +473,39 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     @classmethod
     def infer_filter_operators(cls, view, field_name, field_info):
         filter_field = cls.get_filterset_filter(view, field_name)
-        if filter_field is not None:
-            if getattr(filter_field, "method", None):
-                return list(cls.exact_filter_operators)
-            if isinstance(filter_field, drf_filters.BooleanFilter):
-                return list(cls.exact_filter_operators)
-            if isinstance(
-                filter_field,
-                (drf_filters.ChoiceFilter, drf_filters.MultipleChoiceFilter),
-            ):
-                return list(cls.choice_filter_operators)
-            if isinstance(filter_field, drf_filters.CharFilter):
-                return list(cls.text_filter_operators)
-            return list(cls.choice_filter_operators)
-
         field_type = field_info.get("type")
-        if field_type == "boolean":
+        if (
+            getattr(filter_field, "method", None)
+            or isinstance(filter_field, drf_filters.BooleanFilter)
+            or field_type == "boolean"
+        ):
             return list(cls.exact_filter_operators)
-        if field_type in ("choice", "labeled_choice"):
-            return list(cls.choice_filter_operators)
-        if field_type in ("string", "email"):
+        if field_type in ("string") and (
+            filter_field is None
+            or isinstance(filter_field, drf_filters.CharFilter)
+        ):
             return list(cls.text_filter_operators)
-        return list(cls.choice_filter_operators)
+        return list(cls.value_filter_operators)
 
     @classmethod
-    def get_field_filter_operators(
-        cls, request, view, field_name, field_info
-    ):
-        explicit = cls.get_explicit_filter_operators(
-            request, view, field_name
-        )
-        if explicit is not None:
-            return explicit
+    def get_field_filter_operators(cls, view, field_name, field_info):
+        configured = cls.get_configured_filter_operators(view, field_name)
+        if configured is not None:
+            return configured
         return cls.infer_filter_operators(view, field_name, field_info)
 
     def determine_metadata(self, request, view):
         metadata = super(SimpleMetadataWithFilters, self).determine_metadata(
             request, view
         )
-        filterset_fields = self.get_filters_fields(request, view)
-        order_fields = self.get_ordering_fields(request, view)
-
         meta_get = metadata.get("actions", {}).get("GET", {})
-        for k, v in meta_get.items():
-            if k in filterset_fields:
-                v["filter"] = True
-                v["filter_operators"] = self.get_field_filter_operators(
-                    request, view, k, v
-                )
-            if k in order_fields:
-                v["order"] = True
+        metadata["filters"] = self.get_filters_metadata(
+            view, meta_get
+        )
+        metadata["ordering"] = self.get_ordering_metadata(
+            view, meta_get
+        )
+        metadata["search"] = self.get_search_metadata(
+            view, meta_get
+        )
         return metadata

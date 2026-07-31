@@ -75,7 +75,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             if not self.is_allowed_filterset_field(view, field_name):
                 continue
             if not self.is_allowed_filter_operator(
-                request, view, field_name, lookup, "string"
+                view, field_name, lookup, "string"
             ):
                 continue
             model_field_name = self.get_filterset_model_field(view, field_name)
@@ -132,7 +132,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             if not self.is_allowed_filterset_field(view, field_name):
                 continue
             if not self.is_allowed_filter_operator(
-                request, view, field_name, lookup, "choice"
+                view, field_name, lookup, "choice"
             ):
                 continue
             model_field_name = self.get_filterset_model_field(view, field_name)
@@ -143,7 +143,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 for value in values:
                     if value == "":
                         continue
-                    queryset = queryset.filter(
+                    queryset = self.apply_dynamic_value_lookup(
+                        queryset, view, field_name,
                         **{model_field_name: value}
                     )
                 if "__" in model_field_name:
@@ -154,12 +155,30 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 cleaned_values = self.split_csv_values([raw_value])
                 if not cleaned_values:
                     continue
-                queryset = queryset.filter(
+                queryset = self.apply_dynamic_value_lookup(
+                    queryset, view, field_name,
                     **{f"{model_field_name}__{lookup}": cleaned_values}
                 )
                 if "__" in model_field_name:
                     queryset = queryset.distinct()
         return queryset
+
+    @staticmethod
+    def apply_dynamic_value_lookup(
+        queryset, view, field_name, negate=False, **kwargs
+    ):
+        filterset_class = getattr(view, "filterset_class", None)
+        filter_field = (
+            filterset_class.get_filters().get(field_name)
+            if filterset_class
+            else None
+        )
+        should_exclude = bool(
+            getattr(filter_field, "exclude", False)
+        ) ^ negate
+        if should_exclude:
+            return queryset.exclude(**kwargs)
+        return queryset.filter(**kwargs)
 
     def is_value_lookup_field(self, model, field_path):
         field = self.resolve_model_field(model, field_path)
@@ -183,7 +202,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 if not self.is_allowed_filterset_field(view, field_name):
                     continue
                 if not self.is_allowed_filter_operator(
-                    request, view, field_name, lookup, "string"
+                    view, field_name, lookup, "string"
                 ):
                     continue
                 model_field_name = self.get_filterset_model_field(
@@ -203,7 +222,7 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 if not self.is_allowed_filterset_field(view, field_name):
                     continue
                 if not self.is_allowed_filter_operator(
-                    request, view, field_name, lookup, "choice"
+                    view, field_name, lookup, "choice"
                 ):
                     continue
                 model_field_name = self.get_filterset_model_field(
@@ -214,7 +233,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 if lookup == "in":
                     cleaned_values = self.split_csv_values(values)
                     if cleaned_values:
-                        queryset = queryset.exclude(
+                        queryset = self.apply_dynamic_value_lookup(
+                            queryset, view, field_name, negate=True,
                             **{
                                 f"{model_field_name}__{lookup}":
                                 cleaned_values
@@ -224,7 +244,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                     for value in values:
                         if value == "":
                             continue
-                        queryset = queryset.exclude(
+                        queryset = self.apply_dynamic_value_lookup(
+                            queryset, view, field_name, negate=True,
                             **{model_field_name: value}
                         )
         return queryset
@@ -289,12 +310,12 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
     @staticmethod
     def is_allowed_filter_operator(
-        request, view, field_name, lookup, field_type
+        view, field_name, lookup, field_type
     ):
         from common.drf.metadata import SimpleMetadataWithFilters
 
         operators = SimpleMetadataWithFilters.get_field_filter_operators(
-            request, view, field_name, {"type": field_type}
+            view, field_name, {"type": field_type}
         )
         return lookup in operators
 
@@ -462,6 +483,29 @@ class SearchFilter(SearchFilterBase):
 class BaseFilterSet(drf_filters.FilterSet):
     days = drf_filters.NumberFilter(method="filter_days")
     days__lt = drf_filters.NumberFilter(method="filter_days")
+
+    @classmethod
+    def filter_for_field(cls, field, field_name, lookup_expr=None):
+        """Use case-insensitive equality for generated plain-text filters."""
+        meta_fields = cls._meta.fields
+        explicitly_configured = (
+            isinstance(meta_fields, dict)
+            and lookup_expr in meta_fields.get(field_name, ())
+        )
+        is_plain_text_field = type(field) in (
+            models.CharField,
+            models.TextField,
+        )
+        if (
+            lookup_expr == "exact"
+            and is_plain_text_field
+            and not field.choices
+            and not explicitly_configured
+        ):
+            lookup_expr = "iexact"
+        return super().filter_for_field(
+            field, field_name, lookup_expr
+        )
 
     def do_nothing(self, queryset, name, value):
         return queryset
