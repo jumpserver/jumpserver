@@ -8,11 +8,7 @@ from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.models import IntegrationApplication
-from audits.models import IntegrationApplicationLog
 from authentication.permissions import UserConfirmation, ConfirmType
-from common.exceptions import JMSException
-from common.permissions import IsValidUser
-from common.utils import get_request_ip
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
@@ -68,7 +64,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     def get_once_secret(self, request, *args, **kwargs):
         instance = self.get_object()
         return Response(data={'id': instance.id, 'secret': instance.secret})
-    
+
     @action(
         ['GET'], detail=True, url_path='refresh-secret',
         permission_classes=[RBACPermission]
@@ -95,24 +91,24 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
             'msg': _('Agent reset and App Secret refreshed successfully'),
         })
 
-    @action(['GET'], detail=False, url_path='account-secret',
-            permission_classes=[RBACPermission])
-    def get_account_secret(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.query_params)
-        if not serializer.is_valid():
-            return Response({'error': serializer.errors}, status=400)
-
-        service = request.user
-        account = service.get_account(**serializer.data)
-        if not account:
-            msg = _('Account not found')
-            raise JMSException(code='Not found', detail='%s' % msg)
-        asset = account.asset
-        IntegrationApplicationLog.objects.create(
-            remote_addr=get_request_ip(request), service=service.name, service_id=service.id,
-            account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
-        )
-        
-        # 根据配置决定是否返回密码
-        secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
-        return Response(data={'id': request.user.id, 'secret': secret})
+    # @action(['GET'], detail=False, url_path='account-secret',
+    #         permission_classes=[RBACPermission])
+    # def get_account_secret(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.query_params)
+    #     if not serializer.is_valid():
+    #         return Response({'error': serializer.errors}, status=400)
+    #
+    #     service = request.user
+    #     account = service.get_account(**serializer.data)
+    #     if not account:
+    #         msg = _('Account not found')
+    #         raise JMSException(code='Not found', detail='%s' % msg)
+    #     asset = account.asset
+    #     IntegrationApplicationLog.objects.create(
+    #         remote_addr=get_request_ip(request), service=service.name, service_id=service.id,
+    #         account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
+    #     )
+    #
+    #     # 根据配置决定是否返回密码
+    #     secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
+    #     return Response(data={'id': request.user.id, 'secret': secret})

@@ -9,6 +9,7 @@ from accounts.const import (
     ApplicationAgentEventStatus, ApplicationAgentEventType, ApplicationAgentStatus,
     ApplicationSwitchItemStatus, ApplicationSwitchStatus,
 )
+from common.const.signals import OP_LOG_SKIP_SIGNAL
 from orgs.mixins.models import JMSOrgBaseModel
 
 
@@ -53,7 +54,9 @@ class IntegrationApplicationAgent(JMSOrgBaseModel):
             agent.error = error
             fields.append('error')
         application.date_last_used = agent.last_seen
+        setattr(application, OP_LOG_SKIP_SIGNAL, True)
         application.save(update_fields=['date_last_used', 'date_updated'])
+        setattr(agent, OP_LOG_SKIP_SIGNAL, True)
         agent.save(update_fields=fields)
         return agent
 
