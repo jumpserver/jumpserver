@@ -10,7 +10,7 @@ from accounts.filters import AutomationExecutionFilterSet
 from accounts.models import AutomationExecution
 from accounts.tasks import execute_account_automation_task
 from assets import serializers
-from assets.models import BaseAutomation
+from assets.models import Asset, BaseAutomation
 from common.const.choices import Trigger
 from orgs.mixins import generics
 
@@ -23,6 +23,7 @@ __all__ = [
 
 class AutomationAssetsListApi(generics.ListAPIView):
     model = BaseAutomation
+    queryset = Asset.objects.none()
     serializer_class = serializers.AutomationAssetsSerializer
     filterset_fields = ("name", "address")
     search_fields = filterset_fields
@@ -105,7 +106,6 @@ class AutomationExecutionViewSet(
     mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     search_fields = ('id', 'trigger', 'automation__name')
-    filterset_fields = ('trigger', 'automation_id', 'automation__name')
     filterset_class = AutomationExecutionFilterSet
     serializer_class = serializers.AutomationExecutionSerializer
     tp: str

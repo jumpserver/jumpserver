@@ -22,7 +22,8 @@ class TicketFilter(BaseFilterSet):
         model = Ticket
         fields = (
             'id', 'title', 'type', 'state', 'status',
-            'applicant', 'assignees__id', 'org_name', 'org_id'
+            'applicant', 'applicant_username_name', 'assignees__id',
+            'relevant_asset', 'relevant_command', 'org_name', 'org_id',
         )
 
     @staticmethod

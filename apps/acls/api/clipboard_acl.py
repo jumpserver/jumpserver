@@ -9,7 +9,7 @@ __all__ = ['ClipboardACLViewSet']
 class ClipboardACLFilter(ACLUserAssetFilterMixin):
     class Meta:
         model = models.ClipboardACL
-        fields = ['name', 'action']
+        fields = ['name', 'users', 'assets', 'action']
 
 
 class ClipboardACLViewSet(OrgBulkModelViewSet):

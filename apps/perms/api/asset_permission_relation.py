@@ -6,13 +6,15 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
-from users.models import User
+from accounts.models import Account
 from accounts.serializers import AccountSerializer
+from assets.models import Asset
 from orgs.mixins.api import OrgRelationMixin, OrgBulkModelViewSet
 from orgs.utils import current_org
 from perms import models
 from perms import serializers
 from perms.utils import AssetPermissionPermAssetUtil
+from users.models import User
 
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',
@@ -93,6 +95,7 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
 
 
 class AssetPermissionAllAssetListApi(generics.ListAPIView):
+    queryset = Asset.objects.none()
     serializer_class = serializers.AssetPermissionAllAssetSerializer
     filterset_fields = ("name", "address")
     search_fields = filterset_fields
@@ -119,6 +122,7 @@ class AssetPermissionNodeRelationViewSet(RelationMixin):
 
 
 class AssetPermissionAccountListApi(generics.ListAPIView):
+    queryset = Account.objects.none()
     serializer_class = AccountSerializer
     filterset_fields = ("name", "username", "privileged", "version")
     search_fields = filterset_fields

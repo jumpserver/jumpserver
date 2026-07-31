@@ -25,7 +25,8 @@ class PermissionBaseFilter(BaseFilterSet):
     class Meta:
         fields = (
             'user_id', 'username', 'account_id', 'account',
-            'user_group_id', 'user_group', 'name', 'all', 'is_valid',
+            'user_group_id', 'user_group', 'name',
+            'all', 'is_valid', 'is_expired',
         )
 
     @property
@@ -118,11 +119,23 @@ class AssetPermissionFilter(PermissionBaseFilter):
     class Meta:
         model = AssetPermission
         fields = (
-            'user_id', 'username', 'user_group_id',
-            'user_group', 'node_id', 'node_name', 'asset_id',
-            'asset_name', 'name', 'ip', 'name', 'is_active',
-            'all', 'is_valid', 'is_effective', 'from_ticket'
+            'user_id', 'username', 'account_id', 'account',
+            'user_group_id', 'user_group',
+            'node_id', 'node_name', 'asset_id', 'asset_name',
+            'address', 'accounts', 'ip', 'name',
+            'is_active', 'all', 'is_valid', 'is_expired',
+            'is_effective', 'is_no_resource', 'from_ticket',
         )
+        fields_operator = {
+            'user_group': (
+                'icontains', 'exact', 'startswith',
+                'icontains_any', 'icontains_all', 'in',
+            ),
+            'asset_name': (
+                'icontains', 'exact', 'startswith',
+                'icontains_any', 'icontains_all', 'in',
+            ),
+        }
 
     @property
     def qs(self):

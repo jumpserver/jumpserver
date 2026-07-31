@@ -36,7 +36,7 @@ class PlatformFilter(filters.FilterSet):
 
     class Meta:
         model = Platform
-        fields = ['name', 'category', 'type']
+        fields = ['name', 'name__startswith', 'category', 'type']
 
 
 class AssetPlatformViewSet(JMSModelViewSet):

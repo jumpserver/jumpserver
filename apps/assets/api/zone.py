@@ -36,7 +36,6 @@ class ZoneViewSet(OrgBulkModelViewSet):
 
 class GatewayViewSet(HostViewSet):
     perm_model = Gateway
-    filterset_fields = ("zone__name", "name", "zone")
     search_fields = ("zone__name",)
 
     def get_serializer_classes(self):

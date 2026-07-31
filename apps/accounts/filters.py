@@ -163,8 +163,15 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     class Meta:
         model = Account
         fields = [
-            "id", "source_id", "secret_type", "category", "type",
-            "privileged", "secret_reset", "connectivity", "is_active"
+            "id", "name", "username", "ip", "hostname",
+            "address", "asset_name", "asset_id", "assets",
+            "source_id", "secret_type", "category", "type", "platform",
+            "privileged", "secret_reset", "connectivity", "is_active",
+            "has_secret", "risk", "integrationapplication",
+            "latest_discovery", "latest_accessed", "latest_updated",
+            "latest_secret_changed", "latest_secret_change_failed",
+            "long_time_no_change_secret", "long_time_no_login",
+            "long_time_no_verified",
         ]
 
 
@@ -177,7 +184,9 @@ class GatheredAccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = GatheredAccount
-        fields = ["id", "username"]
+        fields = [
+            "id", "username", "asset_id", "asset_name", "status",
+        ]
 
 
 class SecretRecordMixin(drf_filters.FilterSet):
@@ -226,15 +235,21 @@ class ChangeSecretRecordFilterSet(
 
     class Meta:
         model = ChangeSecretRecord
-        fields = ["id", "status", "asset_id", "execution_id"]
+        fields = [
+            "id", "status", "asset_id", "asset_name",
+            "account_username", "execution_id", "days",
+        ]
 
 
 class AutomationExecutionFilterSet(DaysExecutionFilterMixin, BaseFilterSet):
+    automation_id = drf_filters.UUIDFilter(field_name="automation_id")
     field = 'date_start'
 
     class Meta:
         model = AutomationExecution
-        fields = ["id", "days", 'trigger', 'automation__name']
+        fields = [
+            "id", "trigger", "automation_id", "automation__name", "days",
+        ]
 
 
 class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterSet):
@@ -242,7 +257,10 @@ class PushAccountRecordFilterSet(SecretRecordMixin, UUIDFilterMixin, BaseFilterS
 
     class Meta:
         model = PushSecretRecord
-        fields = ["id", "status", "asset_id", "execution_id"]
+        fields = [
+            "id", "status", "asset_id", "asset_name",
+            "account_username", "execution_id", "days",
+        ]
 
 
 class ChangeSecretStatusFilterSet(BaseFilterSet):
@@ -254,7 +272,7 @@ class ChangeSecretStatusFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ["username"]
+        fields = ["username", "asset_name", "status", "execution_id"]
 
     @staticmethod
     def filter_dynamic(queryset, name, value):

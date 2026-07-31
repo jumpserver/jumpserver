@@ -167,11 +167,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
     @staticmethod
     def get_filters_fields(view):
         fields = []
-        if hasattr(view, "filter_fields"):
-            fields = view.filter_fields
-        elif hasattr(view, "filterset_fields"):
-            fields = view.filterset_fields
-        elif getattr(view, "filterset_class", None):
+        if getattr(view, "filterset_class", None):
             filterset_class = view.filterset_class
             meta = getattr(filterset_class, "Meta", None)
             meta_fields = getattr(meta, "fields", ()) or ()
@@ -181,6 +177,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
                 *meta_fields,
                 *filterset_class.declared_filters.keys(),
             ]
+        elif hasattr(view, "filterset_fields"):
+            fields = view.filterset_fields
+        elif hasattr(view, "filter_fields"):
+            fields = view.filter_fields
 
         if hasattr(view, "custom_filter_fields"):
             # 不能写 fields += view.custom_filter_fields
@@ -201,7 +201,24 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     @staticmethod
     def get_filterset_class(view):
-        return getattr(view, "filterset_class", None)
+        filterset_class = getattr(view, "filterset_class", None)
+        if filterset_class is not None:
+            return filterset_class
+        if not getattr(view, "filterset_fields", None):
+            return None
+
+        queryset = getattr(view, "queryset", None)
+        model = getattr(view, "model", None)
+        if queryset is None and model is not None:
+            queryset = model._default_manager.all()
+        if queryset is None:
+            try:
+                queryset = view.get_queryset()
+            except Exception:
+                return None
+        return drf_filters.DjangoFilterBackend().get_filterset_class(
+            view, queryset
+        )
 
     @classmethod
     def get_filterset_model(cls, view):
@@ -213,6 +230,9 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         queryset = getattr(view, "queryset", None)
         if queryset is not None:
             return getattr(queryset, "model", None)
+        model = getattr(view, "model", None)
+        if model is not None:
+            return model
 
         try:
             queryset = view.get_queryset()
@@ -245,6 +265,22 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     @staticmethod
     def get_filter_field_type(filter_field, model_field):
+        if isinstance(filter_field, drf_filters.BooleanFilter):
+            return "boolean"
+        if isinstance(
+            filter_field,
+            (drf_filters.ChoiceFilter, drf_filters.MultipleChoiceFilter),
+        ):
+            return "choice"
+        if isinstance(filter_field, drf_filters.UUIDFilter):
+            return "uuid"
+        if isinstance(filter_field, drf_filters.DateTimeFilter):
+            return "datetime"
+        if isinstance(filter_field, drf_filters.DateFilter):
+            return "date"
+        if isinstance(filter_field, drf_filters.NumberFilter):
+            return "number"
+
         if isinstance(model_field, models.BooleanField):
             return "boolean"
         if getattr(model_field, "choices", None):
@@ -267,21 +303,6 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         ):
             return "number"
 
-        if isinstance(filter_field, drf_filters.BooleanFilter):
-            return "boolean"
-        if isinstance(
-            filter_field,
-            (drf_filters.ChoiceFilter, drf_filters.MultipleChoiceFilter),
-        ):
-            return "choice"
-        if isinstance(filter_field, drf_filters.UUIDFilter):
-            return "uuid"
-        if isinstance(filter_field, drf_filters.DateTimeFilter):
-            return "datetime"
-        if isinstance(filter_field, drf_filters.DateFilter):
-            return "date"
-        if isinstance(filter_field, drf_filters.NumberFilter):
-            return "number"
         return "string"
 
     @staticmethod
@@ -311,10 +332,12 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         label = getattr(filter_field, "label", None)
         if label:
             return force_str(label, strings_only=True)
-        if model_field is not None and "__" not in (
+        model_field_name = (
             getattr(filter_field, "field_name", "") or field_name
-        ):
-            return force_str(model_field.verbose_name, strings_only=True)
+        )
+        verbose_name = getattr(model_field, "verbose_name", None)
+        if verbose_name and "__" not in model_field_name:
+            return force_str(verbose_name, strings_only=True)
         return field_name.replace("__", " ").replace("_", " ").capitalize()
 
     @classmethod
@@ -475,12 +498,13 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         filter_field = cls.get_filterset_filter(view, field_name)
         field_type = field_info.get("type")
         if (
-            getattr(filter_field, "method", None)
-            or isinstance(filter_field, drf_filters.BooleanFilter)
+            isinstance(filter_field, drf_filters.BooleanFilter)
             or field_type == "boolean"
         ):
             return list(cls.exact_filter_operators)
-        if field_type in ("string") and (
+        if getattr(filter_field, "method", None):
+            return []
+        if field_type == "string" and (
             filter_field is None
             or isinstance(filter_field, drf_filters.CharFilter)
         ):

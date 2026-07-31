@@ -14,7 +14,10 @@ class ConnectMethodFilter(ACLUserFilterMixin):
 
     class Meta:
         model = ConnectMethodACL
-        fields = ['name', ]
+        fields = ['name', 'users', 'methods']
+        fields_operator = {
+            'methods': ('exact',),
+        }
 
 
 class ConnectMethodACLViewSet(JMSBulkModelViewSet):
@@ -26,4 +29,3 @@ class ConnectMethodACLViewSet(JMSBulkModelViewSet):
     def filter_queryset(self, queryset):
         with tmp_to_root_org():
             return super().filter_queryset(queryset)
-

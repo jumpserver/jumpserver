@@ -20,7 +20,6 @@ class AssetTreeMixin(RebuildTreeMixin, SerializeToTreeNodeMixin):
     filter_queryset: callable
     get_queryset: callable
 
-    filterset_fields = ('id', 'name', 'address', 'comment')
     search_fields = ('name', 'address', 'comment')
 
     def list(self, request, *args, **kwargs):

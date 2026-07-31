@@ -19,7 +19,7 @@ class AccountTemplateFilterSet(BaseFilterSet):
 
     class Meta:
         model = AccountTemplate
-        fields = ('username', 'name')
+        fields = ('username', 'name', 'protocols')
 
     @staticmethod
     def filter_protocols(queryset, name, value):

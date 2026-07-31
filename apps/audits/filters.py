@@ -51,7 +51,7 @@ class UserSessionFilterSet(BaseFilterSet):
 
     class Meta:
         model = UserSession
-        fields = ['id', 'ip', 'city', 'type']
+        fields = ['id', 'ip', 'city', 'type', 'is_active']
 
 
 class OperateLogFilterSet(BaseFilterSet):
@@ -69,5 +69,5 @@ class OperateLogFilterSet(BaseFilterSet):
     class Meta:
         model = OperateLog
         fields = [
-            'user', 'action', 'resource', 'remote_addr'
+            'user', 'action', 'resource', 'resource_type', 'remote_addr',
         ]
