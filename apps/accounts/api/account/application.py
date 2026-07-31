@@ -1,7 +1,6 @@
 import os
 
 from django.conf import settings
-from django.db import transaction
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -80,12 +79,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     )
     def reset_agent(self, request, *args, **kwargs):
         instance = self.get_object()
-        with transaction.atomic():
-            instance = IntegrationApplication.objects.select_for_update().get(pk=instance.pk)
-            agent = getattr(instance, 'agent', None)
-            if agent:
-                agent.delete()
-            instance.refresh_secret()
+        instance.reset_agent()
         return Response(data={
             'id': instance.id,
             'msg': _('Agent reset and App Secret refreshed successfully'),

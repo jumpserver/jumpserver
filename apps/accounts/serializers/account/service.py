@@ -1,17 +1,18 @@
-from django.db import transaction
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import ApplicationAgentStatus, ApplicationSwitchStatus
-from accounts.models import Account, ApplicationAccountSwitch, IntegrationApplication
+from accounts.models import (
+    Account, ApplicationAccountBinding, ApplicationAccountSwitch,
+    IntegrationApplication,
+)
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.db.fields import RelatedManager
 from common.serializers.fields import JSONManyToManyField
 from common.serializers.fields import ObjectRelatedField
 from common.utils import random_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from users import utils as user_utils
 from users.models import User
 
 from .application_agent import (
@@ -53,10 +54,6 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         if not data.get('logo'):
             data['logo'] = static('img/logo.png')
         return data
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['owner'].queryset = user_utils.get_current_org_members()
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -111,17 +108,15 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
             })
         return attrs
 
-    @transaction.atomic
     def create(self, validated_data):
         instance = super().create(validated_data)
-        instance.sync_account_bindings()
+        ApplicationAccountBinding.sync_application(instance)
         instance.refresh_secret()
         return instance
 
-    @transaction.atomic
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)
-        instance.sync_account_bindings()
+        ApplicationAccountBinding.sync_application(instance)
         return instance
 
 

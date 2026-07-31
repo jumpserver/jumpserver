@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.db import models, transaction
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
@@ -9,8 +9,10 @@ from accounts.const import (
     ApplicationAgentEventStatus, ApplicationAgentEventType, ApplicationAgentStatus,
     ApplicationSwitchItemStatus, ApplicationSwitchStatus,
 )
-from common.const.signals import OP_LOG_SKIP_SIGNAL
 from orgs.mixins.models import JMSOrgBaseModel
+
+from .account import Account
+from .application import IntegrationApplication
 
 
 ACTIVE_SWITCH_STATUSES = (
@@ -28,7 +30,9 @@ class IntegrationApplicationAgent(JMSOrgBaseModel):
     hostname = models.CharField(max_length=255, blank=True, verbose_name=_('Hostname'))
     platform = models.CharField(max_length=64, blank=True, verbose_name=_('Platform'))
     version = models.CharField(max_length=64, blank=True, verbose_name=_('Version'))
-    last_seen = models.DateTimeField(null=True, blank=True, verbose_name=_('Last seen'))
+    date_last_used = models.DateTimeField(
+        null=True, blank=True, verbose_name=_('Date last used')
+    )
     error = models.TextField(blank=True, verbose_name=_('Error'))
 
     class Meta:
@@ -38,27 +42,26 @@ class IntegrationApplicationAgent(JMSOrgBaseModel):
     def status(self):
         if self.error:
             return ApplicationAgentStatus.ERROR
-        if not self.last_seen or self.last_seen < timezone.now() - timedelta(seconds=90):
+        if (
+            not self.date_last_used or
+            self.date_last_used < timezone.now() - timedelta(seconds=90)
+        ):
             return ApplicationAgentStatus.OFFLINE
         return ApplicationAgentStatus.ONLINE
 
-    @transaction.atomic
     def touch(self, error=None):
-        application = self.application.__class__.objects.select_for_update().get(
-            pk=self.application_id
-        )
-        agent = self.__class__.objects.select_for_update().get(pk=self.pk)
-        agent.last_seen = timezone.now()
-        fields = ['last_seen', 'date_updated']
+        now = timezone.now()
+        updates = {'date_last_used': now, 'date_updated': now}
         if error is not None:
-            agent.error = error
-            fields.append('error')
-        application.date_last_used = agent.last_seen
-        setattr(application, OP_LOG_SKIP_SIGNAL, True)
-        application.save(update_fields=['date_last_used', 'date_updated'])
-        setattr(agent, OP_LOG_SKIP_SIGNAL, True)
-        agent.save(update_fields=fields)
-        return agent
+            updates['error'] = error
+            self.error = error
+        IntegrationApplicationAgent.objects.filter(pk=self.pk).update(**updates)
+        IntegrationApplication.objects.filter(pk=self.application_id).update(
+            date_last_used=now, date_updated=now
+        )
+        self.date_last_used = now
+        self.date_updated = now
+        return self
 
 
 class ApplicationAccountBinding(JMSOrgBaseModel):
@@ -66,6 +69,7 @@ class ApplicationAccountBinding(JMSOrgBaseModel):
         'accounts.IntegrationApplication', on_delete=models.CASCADE,
         related_name='account_bindings', verbose_name=_('Application')
     )
+    # Do not silently remove a credential still used by an application.
     current_account = models.ForeignKey(
         'accounts.Account', on_delete=models.PROTECT,
         related_name='application_bindings', verbose_name=_('Current account')
@@ -76,22 +80,38 @@ class ApplicationAccountBinding(JMSOrgBaseModel):
         ordering = ['application__name', 'current_account__name']
         verbose_name = _('Application account binding')
 
-    @transaction.atomic
+    @classmethod
+    def sync_application(cls, application):
+        accounts = application.accounts.value or {}
+        account_ids = accounts.get('ids', []) if accounts.get('type') == 'ids' else []
+        account_ids = set(Account.objects.filter(
+            id__in=account_ids
+        ).values_list('id', flat=True))
+        application.account_bindings.exclude(
+            current_account_id__in=account_ids
+        ).delete()
+        cls.objects.bulk_create([
+            cls(
+                org_id=application.org_id,
+                application=application,
+                current_account_id=account_id,
+            )
+            for account_id in account_ids
+        ], ignore_conflicts=True)
+
     def move_to(self, account):
-        binding = self.__class__.objects.select_for_update().get(pk=self.pk)
+        application = IntegrationApplication.objects.select_for_update().get(
+            pk=self.application_id
+        )
+        binding = ApplicationAccountBinding.objects.get(pk=self.pk)
         if binding.current_account_id == account.pk:
             return binding
-        if self.__class__.objects.filter(
+        if ApplicationAccountBinding.objects.filter(
             application_id=binding.application_id, current_account=account
         ).exclude(pk=binding.pk).exists():
             raise ValidationError(_(
                 'The target account is already bound to this application.'
             ))
-
-        application_model = self._meta.get_field('application').remote_field.model
-        application = application_model.objects.select_for_update().get(
-            pk=binding.application_id
-        )
         accounts = dict(application.accounts.value or {})
         account_ids = list(accounts.get('ids') or [])
         source_id = str(binding.current_account_id)
@@ -104,7 +124,7 @@ class ApplicationAccountBinding(JMSOrgBaseModel):
             target_id if account_id == source_id else account_id
             for account_id in account_ids
         ]
-        application.accounts.set(accounts)
+        application.accounts = accounts
         application.save(update_fields=['accounts', 'date_updated'])
         binding.current_account = account
         binding.save(update_fields=['current_account', 'date_updated'])
@@ -131,11 +151,7 @@ class ApplicationAccountSwitch(JMSOrgBaseModel):
         verbose_name = _('Application account switch')
 
     @classmethod
-    @transaction.atomic
     def start(cls, source_account, target_account, user, comment=''):
-        source_account = source_account.__class__.objects.select_for_update().get(
-            pk=source_account.pk
-        )
         cls._validate_accounts(source_account, target_account)
         bindings = list(
             cls.get_affected_bindings(source_account).select_for_update().select_related(
@@ -236,7 +252,6 @@ class ApplicationAccountSwitch(JMSOrgBaseModel):
             'status', 'updated_by', 'date_finished', 'date_updated'
         ])
 
-    @transaction.atomic
     def rollback(self, user):
         switch = self._lock_active(_('Only an active switch task can be rolled back.'))
         switch.status = ApplicationSwitchStatus.ROLLING_BACK
@@ -247,7 +262,6 @@ class ApplicationAccountSwitch(JMSOrgBaseModel):
             item.prepare_rollback()
         return switch
 
-    @transaction.atomic
     def end(self, user):
         switch = self._lock_active(_('The switch task is already finished.'))
         switch.updated_by = str(user)
@@ -256,7 +270,7 @@ class ApplicationAccountSwitch(JMSOrgBaseModel):
         return switch
 
     def _lock_active(self, message):
-        switch = self.__class__.objects.select_for_update().get(pk=self.pk)
+        switch = ApplicationAccountSwitch.objects.select_for_update().get(pk=self.pk)
         if switch.status not in ACTIVE_SWITCH_STATUSES:
             raise ValidationError(message)
         return switch
@@ -296,10 +310,9 @@ class ApplicationAccountSwitchItem(JMSOrgBaseModel):
     def application(self):
         return self.binding.application
 
-    @transaction.atomic
     def confirm(self, user):
         switch = ApplicationAccountSwitch.objects.select_for_update().get(pk=self.switch_id)
-        item = self.__class__.objects.select_for_update().get(pk=self.pk)
+        item = ApplicationAccountSwitchItem.objects.get(pk=self.pk)
         item.switch = switch
         status, account = item._confirmation_result()
         item.binding.move_to(account)
@@ -352,12 +365,11 @@ class IntegrationApplicationAgentEvent(JMSOrgBaseModel):
         ordering = ['date_created']
         verbose_name = _('Integration application Agent event')
 
-    @transaction.atomic
     def report(self, success, error=''):
         switch = ApplicationAccountSwitch.objects.select_for_update().get(
             pk=self.item.switch_id
         )
-        event = self.__class__.objects.select_for_update().select_related(
+        event = IntegrationApplicationAgentEvent.objects.select_related(
             'item__binding__application', 'item'
         ).get(pk=self.pk)
         event.item.switch = switch

@@ -36,27 +36,6 @@ class IntegrationApplication(JMSOrgBaseModel):
         query = RelatedManager.get_to_filter_qs(self.accounts.value, Account)
         return qs.filter(*query)
 
-    def get_managed_accounts(self):
-        if (self.accounts.value or {}).get('type') != 'ids':
-            return Account.objects.none()
-        return self.get_accounts()
-
-    def sync_account_bindings(self):
-        from accounts.models import ApplicationAccountBinding
-
-        account_ids = set(self.get_managed_accounts().values_list('id', flat=True))
-        bindings = self.account_bindings.all()
-        bindings.exclude(current_account_id__in=account_ids).delete()
-        existing_ids = set(bindings.values_list('current_account_id', flat=True))
-        ApplicationAccountBinding.objects.bulk_create([
-            ApplicationAccountBinding(
-                org_id=self.org_id,
-                application=self,
-                current_account_id=account_id,
-            )
-            for account_id in account_ids - existing_ids
-        ])
-
     @property
     def accounts_amount(self) -> int:
         return self.get_accounts().count()
@@ -78,6 +57,12 @@ class IntegrationApplication(JMSOrgBaseModel):
         self.secret = random_string(36)
         self.save(update_fields=['secret'])
         return self.secret
+
+    def reset_agent(self):
+        agent = getattr(self, 'agent', None)
+        if agent:
+            agent.delete()
+        self.refresh_secret()
 
     def get_account(self, asset='', asset_id='', account='', account_id=''):
         qs = Account.objects.all()

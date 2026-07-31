@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('hostname', models.CharField(blank=True, max_length=255, verbose_name='Hostname')),
                 ('platform', models.CharField(blank=True, max_length=64, verbose_name='Platform')),
                 ('version', models.CharField(blank=True, max_length=64, verbose_name='Version')),
-                ('last_seen', models.DateTimeField(blank=True, null=True, verbose_name='Last seen')),
+                ('date_last_used', models.DateTimeField(blank=True, null=True, verbose_name='Date last used')),
                 ('error', models.TextField(blank=True, verbose_name='Error')),
                 ('application', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='agent', to='accounts.integrationapplication', verbose_name='Application')),
             ],

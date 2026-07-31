@@ -1,34 +1,32 @@
 import json
 import time
+from textwrap import dedent
 
-from django.db import transaction
 from django.http import StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, permissions, status
 from rest_framework.decorators import action
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.const import ApplicationAgentEventStatus
 from accounts.models import (
-    ApplicationAccountBinding, ApplicationAccountSwitch, IntegrationApplication,
-    IntegrationApplicationAgentEvent,
+    ApplicationAccountSwitch, IntegrationApplication, IntegrationApplicationAgentEvent,
 )
 from authentication.permissions import IsValidUser
 from common.api import JMSGenericViewSet
 from common.db.utils import close_old_connections
+from common.drf.renders import EventStreamRenderer
 from orgs.mixins.api import OrgGenericViewSet
 
 
-class EventStreamRenderer(JSONRenderer):
-    media_type = 'text/event-stream'
-    format = 'event-stream'
+EVENT_STREAM_TIMEOUT_SECONDS = 55
+EVENT_STREAM_POLL_INTERVAL_SECONDS = 5
 
 
 def stream_agent_events(application_id):
     sent = set()
-    deadline = time.monotonic() + 55
+    deadline = time.monotonic() + EVENT_STREAM_TIMEOUT_SECONDS
     while time.monotonic() < deadline:
         close_old_connections()
         events = IntegrationApplicationAgentEvent.objects.filter(
@@ -39,10 +37,15 @@ def stream_agent_events(application_id):
             if event.id in sent:
                 continue
             data = json.dumps(event.as_payload())
-            yield f'id: {event.id}\nevent: credential.change\ndata: {data}\n\n'
+            yield dedent(f"""\
+                id: {event.id}
+                event: credential.change
+                data: {data}
+
+                """)
             sent.add(event.id)
         yield ': heartbeat\n\n'
-        time.sleep(5)
+        time.sleep(EVENT_STREAM_POLL_INTERVAL_SECONDS)
 
 
 class ApplicationAccountSwitchViewSet(
@@ -55,6 +58,7 @@ class ApplicationAccountSwitchViewSet(
         'default': serializers.ApplicationAccountSwitchSerializer,
         'create': serializers.ApplicationAccountSwitchCreateSerializer,
         'confirm': serializers.ApplicationAccountSwitchConfirmSerializer,
+        'credentials': serializers.ApplicationAccountCredentialSerializer,
     }
     filterset_fields = ['source_account_id', 'target_account_id', 'status']
     search_fields = [
@@ -71,37 +75,9 @@ class ApplicationAccountSwitchViewSet(
 
     @action(['GET'], detail=False)
     def credentials(self, request, *args, **kwargs):
-        bindings = ApplicationAccountBinding.objects.filter(
-            application__agent__isnull=False,
-            application__is_active=True,
-            current_account__is_active=True,
-        ).select_related('application', 'current_account__asset').order_by(
-            'current_account__name', 'application__name'
-        )
-        credentials = {}
-        for binding in bindings:
-            account = binding.current_account
-            credential = credentials.setdefault(str(account.id), {
-                'account': {
-                    'id': str(account.id),
-                    'name': account.name,
-                    'username': account.username,
-                },
-                'asset': {
-                    'id': str(account.asset_id),
-                    'name': account.asset.name,
-                    'address': account.asset.address,
-                },
-                'bindings': [],
-            })
-            credential['bindings'].append({
-                'credential_id': str(binding.id),
-                'application': {
-                    'id': str(binding.application_id),
-                    'name': binding.application.name,
-                },
-            })
-        return Response(list(credentials.values()))
+        queryset = self.get_serializer_class().get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -148,9 +124,8 @@ class IntegrationApplicationAgentViewSet(JMSGenericViewSet):
     def register(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        with transaction.atomic():
-            agent = serializer.save()
-            data = serializers.AgentRegisterResultSerializer(agent).data
+        agent = serializer.save()
+        data = serializers.AgentRegisterResultSerializer(agent).data
         return Response(data)
 
     @action(['POST'], detail=False)
@@ -158,7 +133,7 @@ class IntegrationApplicationAgentViewSet(JMSGenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         agent = serializer.save()
-        return Response({'server_time': agent.last_seen})
+        return Response({'server_time': agent.date_last_used})
 
     @action(['GET'], detail=False)
     def credentials(self, request):
@@ -170,21 +145,18 @@ class IntegrationApplicationAgentViewSet(JMSGenericViewSet):
     def reports(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        event = serializer.save()
-        return Response({
-            'event_id': event.id,
-            'status': event.status,
-            'switch_status': event.item.switch.status,
-            'duplicate': serializer.duplicate,
-        })
+        serializer.save()
+        return Response(serializer.data)
 
     @action(['GET'], detail=False, renderer_classes=(EventStreamRenderer,))
     def events(self, request):
         serializer = self.get_serializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        response = StreamingHttpResponse(
-            stream_agent_events(request.user.id), content_type='text/event-stream'
+        return StreamingHttpResponse(
+            stream_agent_events(request.user.id),
+            content_type='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'X-Accel-Buffering': 'no',
+            },
         )
-        response['Cache-Control'] = 'no-cache'
-        response['X-Accel-Buffering'] = 'no'
-        return response

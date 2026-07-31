@@ -13,3 +13,8 @@ class PassthroughRenderer(renderers.BaseRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         return data
+
+
+class EventStreamRenderer(renderers.JSONRenderer):
+    media_type = 'text/event-stream'
+    format = 'event-stream'

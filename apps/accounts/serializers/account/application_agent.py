@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -49,6 +50,7 @@ def account_credential(account, credential_id):
 
 class IntegrationApplicationAgentSerializer(CommonModelSerializer):
     status = serializers.SerializerMethodField(label=_('Status'))
+    last_seen = serializers.DateTimeField(source='date_last_used', read_only=True)
 
     class Meta:
         model = IntegrationApplicationAgent
@@ -75,6 +77,41 @@ class ApplicationAccountBindingSerializer(CommonModelSerializer):
     class Meta:
         model = ApplicationAccountBinding
         fields = ['id', 'account', 'asset']
+
+
+class ApplicationAccountCredentialBindingSerializer(serializers.Serializer):
+    credential_id = serializers.UUIDField(source='id', read_only=True)
+    application = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name')
+    )
+
+
+class ApplicationAccountCredentialSerializer(serializers.Serializer):
+    account = ObjectRelatedField(
+        source='*', read_only=True, attrs=('id', 'name', 'username')
+    )
+    asset = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name', 'address')
+    )
+    bindings = ApplicationAccountCredentialBindingSerializer(
+        source='agent_application_bindings', many=True, read_only=True
+    )
+
+    @staticmethod
+    def get_queryset():
+        bindings = ApplicationAccountBinding.objects.filter(
+            application__agent__isnull=False,
+            application__is_active=True,
+            current_account__is_active=True,
+        ).select_related('application').order_by('application__name')
+        return Account.objects.filter(
+            id__in=bindings.values('current_account_id')
+        ).select_related('asset').prefetch_related(
+            Prefetch(
+                'application_bindings', queryset=bindings,
+                to_attr='agent_application_bindings',
+            )
+        ).order_by('name')
 
 
 class ApplicationAccountSwitchItemSerializer(CommonModelSerializer):
@@ -186,7 +223,6 @@ class AgentRegisterSerializer(serializers.Serializer):
     platform = serializers.CharField(max_length=64, allow_blank=True, required=False)
     version = serializers.CharField(max_length=64, allow_blank=True, required=False)
 
-    @transaction.atomic
     def create(self, validated_data):
         authenticated_application = self.context['request'].user
         application = IntegrationApplication.objects.select_for_update().get(
@@ -214,7 +250,7 @@ class AgentRegisterSerializer(serializers.Serializer):
             )
         for field in ('hostname', 'platform', 'version'):
             setattr(agent, field, validated_data.get(field, ''))
-        agent.last_seen = timezone.now()
+        agent.date_last_used = timezone.now()
         agent.error = ''
         try:
             with transaction.atomic():
@@ -223,7 +259,7 @@ class AgentRegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'agent_id': _('This Agent ID is already registered.')
             })
-        application.date_last_used = agent.last_seen
+        application.date_last_used = agent.date_last_used
         application.save(update_fields=['date_last_used', 'date_updated'])
         return agent
 
@@ -320,6 +356,14 @@ class AgentEventReportSerializer(AgentEventSerializerMixin, AgentIdentitySeriali
         if not self.duplicate:
             self.notify_owner(event, validated_data['success'])
         return event
+
+    def to_representation(self, event):
+        return {
+            'event_id': event.id,
+            'status': event.status,
+            'switch_status': event.item.switch.status,
+            'duplicate': self.duplicate,
+        }
 
     @staticmethod
     def notify_owner(event, success):
