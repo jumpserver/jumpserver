@@ -7,11 +7,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveAPIView
 
 from assets.models import (
-    Asset, Zone, Label, Node,
+    Asset, Zone, Node,
 )
 from common.api import JMSBulkModelViewSet
 from common.permissions import IsValidUser, IsValidLicenseForWriteAction
 from common.utils import get_logger
+from labels.models import Label
 from orgs.utils import current_org, tmp_to_root_org
 from perms.models import AssetPermission
 from rbac.permissions import RBACPermission
