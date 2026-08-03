@@ -4,3 +4,4 @@ from .automations import *  # noqa
 from .template import *  # noqa
 from .virtual import *  # noqa
 from .application import *  # noqa
+from .application_agent import *  # noqa

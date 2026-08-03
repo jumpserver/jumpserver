@@ -14,6 +14,10 @@ class IntegrationApplication(JMSOrgBaseModel):
     is_anonymous = False
 
     name = models.CharField(max_length=128, unique=False, verbose_name=_('Name'))
+    owner = models.ForeignKey(
+        'users.User', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='integration_applications', verbose_name=_('Owner')
+    )
     logo = PrivateImageField(
         upload_to='images', max_length=128, verbose_name=_('Logo')
     )
@@ -53,6 +57,12 @@ class IntegrationApplication(JMSOrgBaseModel):
         self.secret = random_string(36)
         self.save(update_fields=['secret'])
         return self.secret
+
+    def reset_agent(self):
+        agent = getattr(self, 'agent', None)
+        if agent:
+            agent.delete()
+        self.refresh_secret()
 
     def get_account(self, asset='', asset_id='', account='', account_id=''):
         qs = Account.objects.all()

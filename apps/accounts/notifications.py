@@ -1,4 +1,5 @@
 from django.template.loader import render_to_string
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from premailer import transform
 
@@ -7,6 +8,26 @@ from notifications.notifications import UserMessage
 from terminal.models.component.storage import ReplayStorage
 from users.models import User
 from users.utils import activate_user_language
+
+
+class ApplicationAccountSwitchMessage(UserMessage):
+    subject = _('Application account switch notification')
+
+    def __init__(self, user, title, detail):
+        self.title = title
+        self.detail = detail
+        super().__init__(user)
+
+    def get_html_msg(self) -> dict:
+        return {
+            'subject': str(self.subject),
+            'message': f'<p>{escape(str(self.title))}</p><p>{escape(str(self.detail))}</p>',
+        }
+
+    @classmethod
+    def gen_test_msg(cls):
+        user = User.objects.first()
+        return cls(user, _('Account switch'), _('Please confirm the application status.'))
 
 
 class AccountBackupExecutionTaskMsg:
