@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.utils.functional import LazyObject
 from django.apps import apps
+from django.core.signals import request_started
 
 from jumpserver.const import BASE_DIR
 from common.decorators import on_transaction_commit
@@ -47,6 +48,27 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 @receiver(django_ready)
 def on_django_ready_add_db_config(sender, **kwargs):
     Setting.refresh_all_settings()
+
+
+# 服务启动时重新配置 syslog handler：
+# logging.py 加载时 DB 中的 SYSLOG 配置尚未注入 django.conf.settings，
+# 导致 handler 保持 NullHandler。refresh_all_settings 不发送 setting_changed 信号，
+# 且 django_ready 时日志配置可能被后续覆盖，因此使用 request_started 信号（首次请求时执行）。
+_syslog_initialized = False
+
+
+@receiver(request_started)
+def init_syslog_on_first_request(sender, **kwargs):
+    global _syslog_initialized
+    if _syslog_initialized:
+        return
+    _syslog_initialized = True
+    try:
+        from jumpserver.settings.logging import reconfigure_syslog_handler
+        reconfigure_syslog_handler()
+    except Exception:
+        import traceback
+        traceback.print_exc()
 
 
 @receiver(django_ready)

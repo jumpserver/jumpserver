@@ -133,13 +133,11 @@ if CONFIG.DEBUG_DEV:
 
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
-# 优先从 django.conf.settings 读取（支持 API 动态修改），
-# 其次从 CONFIG 读取（config.yml / 环境变量）
-_syslog_addr = getattr(settings, 'SYSLOG_ADDR', None) or CONFIG.SYSLOG_ADDR
-_syslog_facility = getattr(settings, 'SYSLOG_FACILITY', None) or CONFIG.SYSLOG_FACILITY
-_syslog_socktype = getattr(settings, 'SYSLOG_SOCKTYPE', None)
-if _syslog_socktype is None:
-    _syslog_socktype = CONFIG.SYSLOG_SOCKTYPE
+# 仅从 django.conf.settings 读取（通过界面 / API 配置），
+# 未配置时使用硬编码默认值
+_syslog_addr = getattr(settings, 'SYSLOG_ADDR', '')
+_syslog_facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
+_syslog_socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
 
 if _syslog_addr != '' and len(_syslog_addr.split(':')) == 2:
     host, port = _syslog_addr.split(':')
@@ -155,12 +153,10 @@ if not os.path.isdir(LOG_DIR):
 
 
 def _get_syslog_config():
-    """获取当前 syslog 配置（优先 API 动态值，回退 CONFIG）"""
-    addr = getattr(settings, 'SYSLOG_ADDR', None) or CONFIG.SYSLOG_ADDR
-    facility = getattr(settings, 'SYSLOG_FACILITY', None) or CONFIG.SYSLOG_FACILITY
-    socktype = getattr(settings, 'SYSLOG_SOCKTYPE', None)
-    if socktype is None:
-        socktype = CONFIG.SYSLOG_SOCKTYPE
+    """获取当前 syslog 配置（仅从 django.conf.settings，由界面 / API 管理）"""
+    addr = getattr(settings, 'SYSLOG_ADDR', '')
+    facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
+    socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
     return addr, facility, socktype
 
 
@@ -184,6 +180,7 @@ SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
     import logging
+    import logging.handlers
 
     addr, facility, socktype = _get_syslog_config()
 
@@ -201,9 +198,7 @@ def reconfigure_syslog_handler():
 
     for logger_name in SYSLOG_LOGGER_NAMES:
         logger = logging.getLogger(logger_name)
-        # 移除旧的 syslog handler
         for h in list(logger.handlers):
             if isinstance(h, (logging.handlers.SysLogHandler, logging.NullHandler)):
                 logger.removeHandler(h)
-        # 添加新的 handler
         logger.addHandler(new_handler)
