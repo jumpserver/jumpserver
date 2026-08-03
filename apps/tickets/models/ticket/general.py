@@ -133,6 +133,7 @@ class StatusMixin:
         self._change_state_by_applicant(TicketState.pending)
 
     def open(self):
+        self.cc_users.set(self.flow.cc_users.all())
         self.create_process_steps_by_flow()
         self._open()
 
@@ -288,6 +289,10 @@ class Ticket(StatusMixin, JMSBaseModel):
         'users.User', related_name='applied_tickets', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Applicant")
     )
+    cc_users = models.ManyToManyField(
+        'users.User', related_name='cc_tickets', blank=True,
+        verbose_name=_('CC users')
+    )
     flow = models.ForeignKey(
         'TicketFlow', related_name='tickets', null=True,
         on_delete=models.SET_NULL, verbose_name=_('TicketFlow')
@@ -343,12 +348,16 @@ class Ticket(StatusMixin, JMSBaseModel):
 
     @classmethod
     def get_user_related_tickets(cls, user):
-        queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
+        queries = (
+            Q(applicant=user) |
+            Q(ticket_steps__ticket_assignees__assignee=user) |
+            Q(cc_users=user)
+        )
         # TODO: 与 StatusMixin.process_map 内连表查询有部分重叠 有优化空间 待验证排除是否不影响其它调用
         prefetch_ticket_assignee = Prefetch('ticket_steps__ticket_assignees',
                                             queryset=TicketAssignee.objects.select_related('assignee'), )
-        tickets = cls.objects.prefetch_related(prefetch_ticket_assignee) \
-            .select_related('applicant') \
+        tickets = cls.objects.prefetch_related(prefetch_ticket_assignee, 'cc_users') \
+            .select_related('applicant', 'flow') \
             .filter(queries) \
             .distinct()
         return tickets

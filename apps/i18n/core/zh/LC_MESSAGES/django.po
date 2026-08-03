@@ -10628,6 +10628,18 @@ msgstr "1 级"
 msgid "Two level"
 msgstr "2 级"
 
+#: tickets/const.py:52
+msgid "Three level"
+msgstr "3 级"
+
+#: tickets/const.py:53
+msgid "Four level"
+msgstr "4 级"
+
+#: tickets/const.py:54
+msgid "Five level"
+msgstr "5 级"
+
 #: tickets/const.py:55
 msgid "All assets"
 msgstr "所有资产"
@@ -10693,6 +10705,22 @@ msgstr "工单批准信息"
 #: tickets/models/flow.py:53
 msgid "Ticket flow"
 msgstr "工单流程"
+
+#: tickets/serializers/flow.py:50
+msgid "A ticket flow with the same name and type already exists"
+msgstr "已存在同名且同类型的工单流"
+
+#: tickets/serializers/flow.py:57
+msgid "The number of approval rules must match the approval level"
+msgstr "审批规则数量必须与审批级数一致"
+
+#: tickets/serializers/ticket/ticket.py:109
+msgid "The selected ticket flow is not available"
+msgstr "所选工单流不可用"
+
+#: tickets/serializers/ticket/ticket.py:113
+msgid "Please select a ticket flow"
+msgstr "请选择工单流"
 
 #: tickets/models/relation.py:12
 msgid "Ticket session relation"

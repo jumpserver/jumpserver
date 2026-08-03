@@ -3,7 +3,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
 from tickets.const import TicketType, TicketStatus, TicketState
@@ -20,17 +20,24 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     status = LabeledChoiceField(choices=TicketStatus.choices, read_only=True, label=_('Status'))
     state = LabeledChoiceField(choices=TicketState.choices, read_only=True, label=_("State"))
     process_map = serializers.JSONField(read_only=True, default=list, label=_('Process map'))
+    cc_users = ObjectRelatedField(
+        many=True, read_only=True, attrs=('id', 'name', 'username'), label=_('CC users')
+    )
+    flow = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name'), label=_('Ticket flow')
+    )
 
     class Meta:
         model = Ticket
         fields_mini = ['id', 'title']
-        fields_small = fields_mini + ['org_id', 'comment']
+        fields_small = fields_mini + ['org_id', 'flow', 'comment']
+        fields_m2m = ['cc_users']
         read_only_fields = [
             'serial_num', 'process_map', 'approval_step', 'type',
             'state', 'applicant', 'status', 'date_created',
             'date_updated', 'org_name', 'rel_snapshot'
         ]
-        fields = fields_small + read_only_fields
+        fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
 
     def __init__(self, *args, **kwargs):
@@ -58,10 +65,16 @@ class TicketApproveSerializer(TicketSerializer):
 
 
 class TicketApplySerializer(TicketSerializer):
+    flow_id = serializers.UUIDField(
+        required=False, write_only=True, label=_('Ticket flow')
+    )
     org_id = serializers.CharField(
         required=True, max_length=36, allow_blank=True, label=_("Organization")
     )
     applicant = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta(TicketSerializer.Meta):
+        fields = TicketSerializer.Meta.fields + ['flow_id']
 
     def get_applicant(self, applicant_id):
         current_user = self.context['request'].user
@@ -82,11 +95,25 @@ class TicketApplySerializer(TicketSerializer):
 
     def validate(self, attrs):
         if self.instance:
+            attrs.pop('flow_id', None)
             return attrs
 
         ticket_type = attrs.get('type')
         org_id = attrs.get('org_id')
-        flow = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type).first()
+        flow_id = attrs.pop('flow_id', None)
+        flows = TicketFlow.get_org_related_flows(org_id=org_id).filter(
+            type=ticket_type
+        ).order_by('date_created')
+        if flow_id:
+            flow = flows.filter(id=flow_id).first()
+            if not flow:
+                error = _('The selected ticket flow is not available')
+                raise serializers.ValidationError({'flow_id': error})
+        else:
+            if flows.count() > 1:
+                error = _('Please select a ticket flow')
+                raise serializers.ValidationError({'flow_id': error})
+            flow = flows.first()
         if not flow:
             error = _('The ticket flow `{}` does not exist'.format(ticket_type))
             raise serializers.ValidationError(error)

@@ -10288,6 +10288,18 @@ msgstr ""
 msgid "Two level"
 msgstr ""
 
+#: tickets/const.py:52
+msgid "Three level"
+msgstr ""
+
+#: tickets/const.py:53
+msgid "Four level"
+msgstr ""
+
+#: tickets/const.py:54
+msgid "Five level"
+msgstr ""
+
 #: tickets/const.py:55
 msgid "All assets"
 msgstr ""
@@ -10351,6 +10363,22 @@ msgstr ""
 
 #: tickets/models/flow.py:53
 msgid "Ticket flow"
+msgstr ""
+
+#: tickets/serializers/flow.py:50
+msgid "A ticket flow with the same name and type already exists"
+msgstr ""
+
+#: tickets/serializers/flow.py:57
+msgid "The number of approval rules must match the approval level"
+msgstr ""
+
+#: tickets/serializers/ticket/ticket.py:109
+msgid "The selected ticket flow is not available"
+msgstr ""
+
+#: tickets/serializers/ticket/ticket.py:113
+msgid "Please select a ticket flow"
 msgstr ""
 
 #: tickets/models/relation.py:12

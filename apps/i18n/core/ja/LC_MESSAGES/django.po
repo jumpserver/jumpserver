@@ -10444,6 +10444,18 @@ msgstr "1つのレベル"
 msgid "Two level"
 msgstr "2つのレベル"
 
+#: tickets/const.py:52
+msgid "Three level"
+msgstr "3つのレベル"
+
+#: tickets/const.py:53
+msgid "Four level"
+msgstr "4つのレベル"
+
+#: tickets/const.py:54
+msgid "Five level"
+msgstr "5つのレベル"
+
 #: tickets/const.py:55
 msgid "All assets"
 msgstr "すべての資産"
@@ -10508,6 +10520,22 @@ msgstr "チケットフロー承認ルール"
 #: tickets/models/flow.py:53
 msgid "Ticket flow"
 msgstr "チケットの流れ"
+
+#: tickets/serializers/flow.py:50
+msgid "A ticket flow with the same name and type already exists"
+msgstr "同じ名前と種類のチケットフローが既に存在します"
+
+#: tickets/serializers/flow.py:57
+msgid "The number of approval rules must match the approval level"
+msgstr "承認ルール数は承認レベル数と一致する必要があります"
+
+#: tickets/serializers/ticket/ticket.py:109
+msgid "The selected ticket flow is not available"
+msgstr "選択したチケットフローは利用できません"
+
+#: tickets/serializers/ticket/ticket.py:113
+msgid "Please select a ticket flow"
+msgstr "チケットフローを選択してください"
 
 #: tickets/models/relation.py:12
 msgid "Ticket session relation"

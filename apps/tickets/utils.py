@@ -3,7 +3,10 @@
 from django.conf import settings
 
 from common.utils import get_logger
-from .notifications import TicketAppliedToAssigneeMessage, TicketProcessedToApplicantMessage
+from .notifications import (
+    TicketAppliedToAssigneeMessage, TicketProcessedToApplicantMessage,
+    TicketUpdatedToCcUserMessage
+)
 
 logger = get_logger(__file__)
 
@@ -33,3 +36,15 @@ def send_ticket_processed_mail_to_applicant(ticket, processor):
     if settings.DEBUG:
         logger.debug(instance)
     instance.publish_async()
+
+
+def send_ticket_updated_mail_to_cc_users(ticket):
+    cc_users = ticket.cc_users.exclude(id=ticket.applicant_id)
+    if not cc_users:
+        return
+
+    for user in cc_users:
+        instance = TicketUpdatedToCcUserMessage(user, ticket)
+        if settings.DEBUG:
+            logger.debug(instance)
+        instance.publish_async()
