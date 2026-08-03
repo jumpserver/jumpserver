@@ -2,6 +2,8 @@
 #
 import os
 
+from django.conf import settings
+
 from ..const import PROJECT_DIR, CONFIG
 
 LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
@@ -131,14 +133,77 @@ if CONFIG.DEBUG_DEV:
 
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
-if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
-    host, port = CONFIG.SYSLOG_ADDR.split(':')
+# 优先从 django.conf.settings 读取（支持 API 动态修改），
+# 其次从 CONFIG 读取（config.yml / 环境变量）
+_syslog_addr = getattr(settings, 'SYSLOG_ADDR', None) or CONFIG.SYSLOG_ADDR
+_syslog_facility = getattr(settings, 'SYSLOG_FACILITY', None) or CONFIG.SYSLOG_FACILITY
+_syslog_socktype = getattr(settings, 'SYSLOG_SOCKTYPE', None)
+if _syslog_socktype is None:
+    _syslog_socktype = CONFIG.SYSLOG_SOCKTYPE
+
+if _syslog_addr != '' and len(_syslog_addr.split(':')) == 2:
+    host, port = _syslog_addr.split(':')
     LOGGING['handlers']['syslog'].update({
         'class': 'logging.handlers.SysLogHandler',
-        'facility': CONFIG.SYSLOG_FACILITY,
+        'facility': _syslog_facility,
         'address': (host, int(port)),
-        'socktype': CONFIG.SYSLOG_SOCKTYPE,
+        'socktype': _syslog_socktype,
     })
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR, mode=0o755)
+
+
+def _get_syslog_config():
+    """获取当前 syslog 配置（优先 API 动态值，回退 CONFIG）"""
+    addr = getattr(settings, 'SYSLOG_ADDR', None) or CONFIG.SYSLOG_ADDR
+    facility = getattr(settings, 'SYSLOG_FACILITY', None) or CONFIG.SYSLOG_FACILITY
+    socktype = getattr(settings, 'SYSLOG_SOCKTYPE', None)
+    if socktype is None:
+        socktype = CONFIG.SYSLOG_SOCKTYPE
+    return addr, facility, socktype
+
+
+def _is_valid_addr(addr):
+    """检查 syslog 地址是否合法（host:port 格式）"""
+    if not addr:
+        return False
+    parts = addr.split(':')
+    if len(parts) != 2:
+        return False
+    try:
+        int(parts[1])
+        return True
+    except ValueError:
+        return False
+
+
+SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
+
+
+def reconfigure_syslog_handler():
+    """动态重载 syslog handler，支持 API 修改后不重启生效"""
+    import logging
+
+    addr, facility, socktype = _get_syslog_config()
+
+    if _is_valid_addr(addr):
+        host, port = addr.split(':')
+        new_handler = logging.handlers.SysLogHandler(
+            address=(host, int(port)),
+            facility=facility,
+            socktype=socktype,
+        )
+        new_handler.setLevel(logging.INFO)
+        new_handler.setFormatter(logging.Formatter('jumpserver: %(message)s'))
+    else:
+        new_handler = logging.NullHandler()
+
+    for logger_name in SYSLOG_LOGGER_NAMES:
+        logger = logging.getLogger(logger_name)
+        # 移除旧的 syslog handler
+        for h in list(logger.handlers):
+            if isinstance(h, (logging.handlers.SysLogHandler, logging.NullHandler)):
+                logger.removeHandler(h)
+        # 添加新的 handler
+        logger.addHandler(new_handler)

@@ -1712,5 +1712,10 @@
     "FooterContentTooLong200": "フッターの内容は200文字を超えることはできません。",
     "ImageFileCorruptedOrUnreadable": "画像ファイルが破損しているか、読み取れません。ファイルを確認して、もう一度お試しください。",
     "Days": "空",
-    "NotLoggedInForMoreThan": "ログインしていない日数が"
+    "NotLoggedInForMoreThan": "ログインしていない日数が",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }

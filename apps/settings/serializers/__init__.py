@@ -12,5 +12,6 @@ from .prompt import *
 from .public import *
 from .security import *
 from .settings import *
+from .syslog import *
 from .terminal import *
 from .tool import *

@@ -1708,5 +1708,10 @@
     "FooterContentTooLong200": "O conteúdo do rodapé não pode exceder 200 caracteres.",
     "ImageFileCorruptedOrUnreadable": "O arquivo de imagem está corrompido ou não pode ser lido. Verifique o arquivo e tente novamente.",
     "Days": "dias",
-    "NotLoggedInForMoreThan": "Não fez login por mais de"
+    "NotLoggedInForMoreThan": "Não fez login por mais de",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }

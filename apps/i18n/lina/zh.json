@@ -1794,5 +1794,10 @@
     "OperationUnavailableWhenMismatch": "Ukey 与用户不匹配没有操作可用",
     "InfoHiddenWhenMismatch": "Ukey 与用户不匹配不显示证书信息",
     "Days": "天",
-    "NotLoggedInForMoreThan": "未登录超过"
+    "NotLoggedInForMoreThan": "未登录超过",
+    "SyslogAddr": "Syslog 地址",
+    "SyslogEnable": "启用 Syslog",
+    "SyslogFacility": "Syslog 设施",
+    "SyslogHelpText": "Syslog 配置,点击提交保存生效",
+    "SyslogSockType": "Syslog 套接字类型"
 }

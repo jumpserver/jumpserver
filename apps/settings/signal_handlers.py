@@ -18,6 +18,7 @@ from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
 from .models import Setting
+from .signals import setting_changed
 
 logger = get_logger(__file__)
 
@@ -133,3 +134,15 @@ def register_sqlite_connection(sender, **kwargs):
         'OPTIONS': {},
         'AUTOCOMMIT': True,
     }
+
+
+@receiver(setting_changed)
+def on_syslog_setting_changed(sender, name='', **kwargs):
+    if name not in ('SYSLOG_ADDR', 'SYSLOG_FACILITY', 'SYSLOG_SOCKTYPE'):
+        return
+    try:
+        from jumpserver.settings.logging import reconfigure_syslog_handler
+        reconfigure_syslog_handler()
+        logger.debug('Syslog handler reconfigured after %s changed', name)
+    except Exception as e:
+        logger.error('Failed to reconfigure syslog handler: %s', e)

@@ -17,6 +17,7 @@ from .cleaning import CleaningSerializer
 from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
+from .syslog import SyslogSettingSerializer
 from .terminal import TerminalSettingSerializer
 
 __all__ = [
@@ -90,7 +91,8 @@ class SettingsSerializer(
     TencentSMSSettingSerializer,
     CMPP2SMSSettingSerializer,
     CustomSMSSettingSerializer,
-    PasskeySettingSerializer
+    PasskeySettingSerializer,
+    SyslogSettingSerializer,
 ):
     PREFIX_TITLE = _('Setting')
     CACHE_KEY = 'SETTING_FIELDS_MAPPING'

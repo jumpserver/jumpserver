@@ -1783,5 +1783,10 @@
     "OperationUnavailableWhenMismatch": "No available actions because Ukey does not match the user",
     "InfoHiddenWhenMismatch": "Certificate information is hidden because Ukey does not match the user",
     "Days": "day",
-    "NotLoggedInForMoreThan": "Not logged in for more than"
+    "NotLoggedInForMoreThan": "Not logged in for more than",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }

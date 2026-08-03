@@ -1707,5 +1707,10 @@
     "FooterContentTooLong200": "El contenido del pie de página no debe exceder los 200 caracteres",
     "ImageFileCorruptedOrUnreadable": "El archivo de imagen está dañado o no se puede leer. Verifica el archivo y vuelve a intentarlo.",
     "Days": "días",
-    "NotLoggedInForMoreThan": "No ha iniciado sesión durante más de"
+    "NotLoggedInForMoreThan": "No ha iniciado sesión durante más de",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }

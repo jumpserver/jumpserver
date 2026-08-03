@@ -1756,5 +1756,10 @@
     "OperationUnavailableWhenMismatch": "因為 Ukey 與用戶不匹配，無可用操作",
     "InfoHiddenWhenMismatch": "因為 Ukey 與用戶不匹配，證書資訊被隱藏",
     "Days": "天",
-    "NotLoggedInForMoreThan": "未登入超過"
+    "NotLoggedInForMoreThan": "未登入超過",
+    "SyslogAddr": "Syslog 位址",
+    "SyslogEnable": "啟用 Syslog",
+    "SyslogFacility": "Syslog 設施",
+    "SyslogHelpText": "Syslog 配置,點擊提交保存生效",
+    "SyslogSockType": "Syslog 套接字類型"
 }

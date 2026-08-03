@@ -1709,5 +1709,10 @@
     "Days": "дней",
     "NotLoggedInForMoreThan": "Не входил более",
     "Automations": "Автоматизация",
-    "UploadFileTooLarge": "Ошибка загрузки: файл слишком большой"
+    "UploadFileTooLarge": "Ошибка загрузки: файл слишком большой",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }

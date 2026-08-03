@@ -1707,5 +1707,10 @@
     "FooterContentTooLong200": "Nội dung chân trang quá dài, vui lòng nhập nội dung dưới 200 ký tự",
     "ImageFileCorruptedOrUnreadable": "Tệp hình ảnh đã bị hỏng hoặc không thể đọc được. Vui lòng kiểm tra tệp và thử lại.",
     "Days": "ngày",
-    "NotLoggedInForMoreThan": "Không đăng nhập quá"
+    "NotLoggedInForMoreThan": "Không đăng nhập quá",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }

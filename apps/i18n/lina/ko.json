@@ -1707,5 +1707,10 @@
     "FooterContentTooLong200": "바닥글 내용은 200자를 초과할 수 없습니다.",
     "ImageFileCorruptedOrUnreadable": "이미지 파일이 손상되었거나 읽을 수 없습니다. 파일을 확인한 후 다시 시도해 주세요.",
     "Days": "일 이상",
-    "NotLoggedInForMoreThan": "로그인하지 않은 지"
+    "NotLoggedInForMoreThan": "로그인하지 않은 지",
+    "SyslogAddr": "Syslog address",
+    "SyslogEnable": "Enable syslog",
+    "SyslogFacility": "Syslog facility",
+    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
+    "SyslogSockType": "Syslog socket type"
 }
