@@ -26,10 +26,17 @@ logger = logging.getLogger(__file__)
 
 
 class TerminalFilterSet(BaseFilterSet):
-    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
-    remote_addr = filters.CharFilter(field_name='remote_addr', lookup_expr='icontains')
-    is_alive = filters.BooleanFilter(method='filter_is_alive')
-    load = filters.CharFilter(method='do_nothing')
+    name = filters.CharFilter(
+        field_name='name', lookup_expr='icontains', label=_('Name')
+    )
+    remote_addr = filters.CharFilter(
+        field_name='remote_addr', lookup_expr='icontains',
+        label=_('Remote address')
+    )
+    is_alive = filters.BooleanFilter(
+        method='filter_is_alive', label=_('Is alive')
+    )
+    load = filters.CharFilter(method='do_nothing', label=_('Load'))
 
     class Meta:
         model = Terminal

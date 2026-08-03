@@ -164,8 +164,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
         return field_info
 
-    @staticmethod
-    def get_filters_fields(view):
+    @classmethod
+    def get_filters_fields(cls, view):
         fields = []
         if getattr(view, "filterset_class", None):
             filterset_class = view.filterset_class
@@ -173,10 +173,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             meta_fields = getattr(meta, "fields", ()) or ()
             if isinstance(meta_fields, dict):
                 meta_fields = meta_fields.keys()
-            fields = [
-                *meta_fields,
-                *filterset_class.declared_filters.keys(),
-            ]
+            fields = list(meta_fields)
         elif hasattr(view, "filterset_fields"):
             fields = view.filterset_fields
         elif hasattr(view, "filter_fields"):
@@ -189,7 +186,11 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
         if isinstance(fields, dict):
             fields = list(fields.keys())
-        return fields or []
+
+        model = cls.get_filterset_model(view)
+        if model is not None and getattr(model._meta, "pk", None) is not None:
+            fields = ["id", *fields]
+        return list(dict.fromkeys(fields))
 
     @staticmethod
     def get_ordering_fields(view):
@@ -376,6 +377,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
                 or cls.get_filter_choices(filter_field, model_field)
             )
             if choices:
+                field_info["type"] = "choice"
                 field_info["choices"] = choices
             field_info["operators"] = cls.get_field_filter_operators(
                 view, field_name, field_info
@@ -503,7 +505,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         ):
             return list(cls.exact_filter_operators)
         if getattr(filter_field, "method", None):
-            return []
+            return list(cls.exact_filter_operators)
         if field_type == "string" and (
             filter_field is None
             or isinstance(filter_field, drf_filters.CharFilter)

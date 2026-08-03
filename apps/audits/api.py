@@ -37,7 +37,10 @@ from tickets.serializers.ticket import TicketSerializer
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices, ActionChoices
-from .filters import UserSessionFilterSet, OperateLogFilterSet
+from .filters import (
+    JobLogFilterSet, OperateLogFilterSet, ServiceAccessLogFilterSet,
+    UserSessionFilterSet,
+)
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession, IntegrationApplicationLog
@@ -61,13 +64,13 @@ logger = get_logger(__name__)
 
 class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = JobLog
+    filterset_class = JobLogFilterSet
     report_exporter_class = JobLogAuditReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
     search_fields = ['creator__name', 'material']
-    filterset_fields = ['creator__name', 'material']
     serializer_class = JobLogSerializer
     ordering = ['-date_start']
 
@@ -378,10 +381,11 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
     model = IntegrationApplicationLog
     serializer_class = ServiceAccessLogSerializer
+    filterset_class = ServiceAccessLogFilterSet
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['account', 'remote_addr', 'service_id']
-    search_fields = filterset_fields
+    search_fields = ('service', 'asset', 'account', 'remote_addr')
+    ordering_fields = ('datetime',)
     ordering = ['-datetime']

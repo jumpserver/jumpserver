@@ -6,7 +6,7 @@ from rest_framework import status, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from accounts.filters import AutomationExecutionFilterSet
+from accounts.filters import AutomationAssetFilterSet, AutomationExecutionFilterSet
 from accounts.models import AutomationExecution
 from accounts.tasks import execute_account_automation_task
 from assets import serializers
@@ -25,8 +25,8 @@ class AutomationAssetsListApi(generics.ListAPIView):
     model = BaseAutomation
     queryset = Asset.objects.none()
     serializer_class = serializers.AutomationAssetsSerializer
-    filterset_fields = ("name", "address")
-    search_fields = filterset_fields
+    filterset_class = AutomationAssetFilterSet
+    search_fields = ("name", "address")
 
     def get_object(self):
         pk = self.kwargs.get('pk')

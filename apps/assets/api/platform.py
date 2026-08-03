@@ -4,6 +4,7 @@ import shutil
 from django.core.files.storage import default_storage
 from django.db.models import Subquery, OuterRef, Count, Value
 from django.db.models.functions import Coalesce
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import serializers
@@ -32,11 +33,17 @@ __all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi', 'PlatformProt
 
 
 class PlatformFilter(filters.FilterSet):
-    name__startswith = filters.CharFilter(field_name='name', lookup_expr='istartswith')
+    name__startswith = filters.CharFilter(
+        field_name='name', lookup_expr='istartswith',
+        label=_('Name starts with')
+    )
 
     class Meta:
         model = Platform
         fields = ['name', 'name__startswith', 'category', 'type']
+        fields_operator = {
+            'name__startswith': ('startswith',),
+        }
 
 
 class AssetPlatformViewSet(JMSModelViewSet):

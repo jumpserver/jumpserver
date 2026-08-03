@@ -23,7 +23,10 @@ from common.utils import many_get
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 from .base import AutomationExecutionViewSet
-from ...filters import NodeFilterBackend
+from ...filters import (
+    AccountRiskFilterSet, CheckAccountAutomationFilterSet,
+    CheckAccountEngineFilterSet, NodeFilterBackend,
+)
 from ...risk_handlers import RiskHandler
 
 __all__ = [
@@ -36,8 +39,8 @@ __all__ = [
 
 class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
     model = CheckAccountAutomation
-    filterset_fields = ("name",)
-    search_fields = filterset_fields
+    filterset_class = CheckAccountAutomationFilterSet
+    search_fields = ("name",)
     permission_classes = [RBACPermission, IsValidLicense]
     serializer_class = serializers.CheckAccountAutomationSerializer
 
@@ -84,7 +87,7 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
     search_fields = ["username", "asset__name"]
-    filterset_fields = ("risk", "status", "asset_id")
+    filterset_class = AccountRiskFilterSet
     extra_filter_backends = [NodeFilterBackend]
     permission_classes = [RBACPermission, IsValidLicense]
     serializer_classes = {
@@ -143,6 +146,8 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
 
 
 class CheckAccountEngineViewSet(JMSModelViewSet):
+    model = CheckAccountEngine
+    filterset_class = CheckAccountEngineFilterSet
     search_fields = ("name",)
     serializer_class = serializers.CheckAccountEngineSerializer
     permission_classes = [RBACPermission, IsValidLicense]
@@ -156,10 +161,55 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
         return CheckAccountEngine.get_default_engines()
 
     def filter_queryset(self, queryset: list):
-        search = self.request.GET.get('search')
-        if search is not None:
+        pk = self.request.GET.get('id')
+        if pk:
+            queryset = [item for item in queryset if item['id'] == pk]
+
+        pks = self.request.GET.get('id__in')
+        if pks:
+            ids = {item.strip() for item in pks.split(',') if item.strip()}
+            queryset = [item for item in queryset if item['id'] in ids]
+
+        def split_values(value):
+            return [
+                item.strip() for item in value.split(',') if item.strip()
+            ]
+
+        name_lookups = {
+            'name': lambda name, value: name.casefold() == value.casefold(),
+            'name__icontains': lambda name, value: value.casefold() in name.casefold(),
+            'name__startswith': lambda name, value: name.startswith(value),
+            'name__in': lambda name, value: name in split_values(value),
+            'name__icontains_any': lambda name, value: any(
+                item.casefold() in name.casefold()
+                for item in split_values(value)
+            ),
+            'name__icontains_all': lambda name, value: all(
+                item.casefold() in name.casefold()
+                for item in split_values(value)
+            ),
+        }
+        for key, matcher in name_lookups.items():
+            value = self.request.GET.get(key)
+            if value is None:
+                continue
             queryset = [
                 item for item in queryset
-                if search in item['name']
+                if matcher(str(item['name']), value)
+            ]
+
+        search = self.request.GET.get('search')
+        if search is not None:
+            groups = [
+                [term.strip().casefold() for term in group.split('|') if term.strip()]
+                for group in search.split(',')
+            ]
+            groups = [group for group in groups if group]
+            queryset = [
+                item for item in queryset
+                if all(
+                    any(term in str(item['name']).casefold() for term in group)
+                    for group in groups
+                )
             ]
         return queryset

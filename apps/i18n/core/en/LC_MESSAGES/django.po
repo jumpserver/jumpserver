@@ -2202,7 +2202,35 @@ msgstr ""
 msgid "User details"
 msgstr ""
 
-#: assets/api/asset/asset.py:171
+#: assets/api/asset/asset.py:51
+msgid "Platform name or ID"
+msgstr ""
+
+#: assets/api/asset/asset.py:56
+msgid "Zone name or ID"
+msgstr ""
+
+#: assets/api/asset/asset.py:58
+msgid "Exclude platform name"
+msgstr ""
+
+#: assets/api/asset/asset.py:65
+msgid "Platform type"
+msgstr ""
+
+#: assets/api/asset/asset.py:69
+msgid "Exclude platform type"
+msgstr ""
+
+#: assets/api/asset/asset.py:74
+msgid "Platform category"
+msgstr ""
+
+#: assets/api/asset/asset.py:79
+msgid "Exclude platform category"
+msgstr ""
+
+#: assets/api/asset/asset.py:173
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 
@@ -12559,6 +12587,132 @@ msgstr ""
 #: xpack/plugins/license/api.py:55
 msgid "License import successfully"
 msgstr ""
+
+msgid "Account username"
+msgstr ""
+
+msgid "Applicant name or username"
+msgstr ""
+
+msgid "Asset address"
+msgstr ""
+
+msgid "Asset name"
+msgstr ""
+
+msgid "Asset name, address or ID"
+msgstr ""
+
+msgid "Assignee ID"
+msgstr ""
+
+msgid "Automation ID"
+msgstr ""
+
+msgid "Task ID"
+msgstr ""
+
+msgid "Command storage ID"
+msgstr ""
+
+msgid "Created days"
+msgstr ""
+
+msgid "Created days less than"
+msgstr ""
+
+msgid "Days"
+msgstr ""
+
+msgid "Exclude type"
+msgstr ""
+
+msgid "Execution ID"
+msgstr ""
+
+msgid "Has read"
+msgstr ""
+
+msgid "Host name, address or ID"
+msgstr ""
+
+msgid "Integration application ID"
+msgstr ""
+
+msgid "Is effective"
+msgstr ""
+
+msgid "Load"
+msgstr ""
+
+msgid "Long time no secret change"
+msgstr ""
+
+msgid "Long time no verification"
+msgstr ""
+
+msgid "Name starts with"
+msgstr ""
+
+msgid "No resource"
+msgstr ""
+
+msgid "Node ID"
+msgstr ""
+
+msgid "Node name"
+msgstr ""
+
+msgid "Organization name"
+msgstr ""
+
+msgid "Platform ID"
+msgstr ""
+
+msgid "Real storage"
+msgstr ""
+
+msgid "Recent secret change failed"
+msgstr ""
+
+msgid "Recently accessed"
+msgstr ""
+
+msgid "Recently changed secret"
+msgstr ""
+
+msgid "Recently discovered"
+msgstr ""
+
+msgid "Recently updated"
+msgstr ""
+
+msgid "Relevant asset name or address"
+msgstr ""
+
+msgid "Relevant command"
+msgstr ""
+
+msgid "Remote address"
+msgstr ""
+
+msgid "Role name"
+msgstr ""
+
+msgid "Session ID"
+msgstr ""
+
+msgid "Task name or comment"
+msgstr ""
+
+msgid "Terminal name or ID"
+msgstr ""
+
+msgid "User name, username or ID"
+msgstr ""
+
+msgid "User name"
+msgstr "User name"
 
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"

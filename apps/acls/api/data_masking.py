@@ -10,7 +10,7 @@ __all__ = ['DataMaskingRuleViewSet']
 class DataMaskingRuleFilter(ACLUserFilterMixin):
     class Meta:
         model = DataMaskingRule
-        fields = ('name', 'users')
+        fields = ('id', 'name', 'users', 'action')
 
 
 class DataMaskingRuleViewSet(OrgBulkModelViewSet):

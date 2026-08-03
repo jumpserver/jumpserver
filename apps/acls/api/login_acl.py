@@ -11,7 +11,7 @@ __all__ = ['LoginACLViewSet']
 class LoginACLFilter(ACLUserFilterMixin):
     class Meta:
         model = LoginACL
-        fields = ('name', 'users', 'action')
+        fields = ('id', 'name', 'users', 'action')
 
 
 class LoginACLViewSet(JMSBulkModelViewSet):

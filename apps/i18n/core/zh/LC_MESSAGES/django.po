@@ -2238,7 +2238,35 @@ msgstr "我们想通知您，最近有用户登录："
 msgid "User details"
 msgstr "用户详情"
 
-#: assets/api/asset/asset.py:171
+#: assets/api/asset/asset.py:51
+msgid "Platform name or ID"
+msgstr "平台名称或 ID"
+
+#: assets/api/asset/asset.py:56
+msgid "Zone name or ID"
+msgstr "网域名称或 ID"
+
+#: assets/api/asset/asset.py:58
+msgid "Exclude platform name"
+msgstr "不包含平台名称"
+
+#: assets/api/asset/asset.py:65
+msgid "Platform type"
+msgstr "平台类型"
+
+#: assets/api/asset/asset.py:69
+msgid "Exclude platform type"
+msgstr "不包含平台类型"
+
+#: assets/api/asset/asset.py:74
+msgid "Platform category"
+msgstr "平台类别"
+
+#: assets/api/asset/asset.py:79
+msgid "Exclude platform category"
+msgstr "不包含平台类别"
+
+#: assets/api/asset/asset.py:173
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
@@ -3056,7 +3084,7 @@ msgstr "账号推送参数"
 
 #: assets/models/platform.py:63 assets/serializers/platform.py:46
 msgid "Verify account enabled"
-msgstr "开启账号验证"
+msgstr "启用账号验证"
 
 #: assets/models/platform.py:65 assets/serializers/platform.py:50
 msgid "Verify account method"
@@ -12802,6 +12830,132 @@ msgstr ""
 #: xpack/plugins/license/api.py:55
 msgid "License import successfully"
 msgstr "许可证导入成功"
+
+msgid "Account username"
+msgstr "账号用户名"
+
+msgid "Applicant name or username"
+msgstr "申请人名称或用户名"
+
+msgid "Asset address"
+msgstr "资产地址"
+
+msgid "Asset name"
+msgstr "资产名称"
+
+msgid "Asset name, address or ID"
+msgstr "资产名称、地址或 ID"
+
+msgid "Assignee ID"
+msgstr "工单受理人 ID"
+
+msgid "Automation ID"
+msgstr "自动化 ID"
+
+msgid "Task ID"
+msgstr "任务 ID"
+
+msgid "Command storage ID"
+msgstr "命令存储 ID"
+
+msgid "Created days"
+msgstr "创建日期（天数）"
+
+msgid "Created days less than"
+msgstr "创建日期早于（天数）"
+
+msgid "Days"
+msgstr "天数"
+
+msgid "Exclude type"
+msgstr "不包含类型"
+
+msgid "Execution ID"
+msgstr "执行 ID"
+
+msgid "Has read"
+msgstr "已读"
+
+msgid "Host name, address or ID"
+msgstr "主机名称、地址或 ID"
+
+msgid "Integration application ID"
+msgstr "集成应用 ID"
+
+msgid "Is effective"
+msgstr "是否生效"
+
+msgid "Load"
+msgstr "负载"
+
+msgid "Long time no secret change"
+msgstr "长期未改密"
+
+msgid "Long time no verification"
+msgstr "长期未验证"
+
+msgid "Name starts with"
+msgstr "名称开头"
+
+msgid "No resource"
+msgstr "无资源"
+
+msgid "Node ID"
+msgstr "节点 ID"
+
+msgid "Node name"
+msgstr "节点名称"
+
+msgid "Organization name"
+msgstr "组织名称"
+
+msgid "Platform ID"
+msgstr "平台 ID"
+
+msgid "Real storage"
+msgstr "真实存储"
+
+msgid "Recent secret change failed"
+msgstr "最近改密失败"
+
+msgid "Recently accessed"
+msgstr "最近访问"
+
+msgid "Recently changed secret"
+msgstr "最近改密"
+
+msgid "Recently discovered"
+msgstr "最近发现"
+
+msgid "Recently updated"
+msgstr "最近更新"
+
+msgid "Relevant asset name or address"
+msgstr "相关资产名称或地址"
+
+msgid "Relevant command"
+msgstr "相关命令"
+
+msgid "Remote address"
+msgstr "远程地址"
+
+msgid "Role name"
+msgstr "角色名称"
+
+msgid "Session ID"
+msgstr "会话 ID"
+
+msgid "Task name or comment"
+msgstr "任务名称或备注"
+
+msgid "Terminal name or ID"
+msgstr "终端名称或 ID"
+
+msgid "User name, username or ID"
+msgstr "用户名称、用户名或 ID"
+
+msgid "User name"
+msgstr "用户名称"
 
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"

@@ -1,5 +1,6 @@
 from django.db.models import Value, F, Q
 from django.db.models.functions import Concat
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
@@ -11,12 +12,24 @@ from tickets.models import (
 
 
 class TicketFilter(BaseFilterSet):
-    assignees__id = filters.UUIDFilter(method='filter_assignees_id')
-    relevant_asset = filters.CharFilter(method='filter_relevant_asset')
-    relevant_command = filters.CharFilter(method='filter_relevant_command')
-    applicant_username_name = filters.CharFilter(method='filter_applicant_username_name')
-    state = filters.CharFilter(method='filter_state')
-    org_name = filters.CharFilter(method='filter_org_name', label='Organization Name')
+    assignees__id = filters.UUIDFilter(
+        method='filter_assignees_id', label=_('Assignee ID')
+    )
+    relevant_asset = filters.CharFilter(
+        method='filter_relevant_asset',
+        label=_('Relevant asset name or address')
+    )
+    relevant_command = filters.CharFilter(
+        method='filter_relevant_command', label=_('Relevant command')
+    )
+    applicant_username_name = filters.CharFilter(
+        method='filter_applicant_username_name',
+        label=_('Applicant name or username')
+    )
+    state = filters.CharFilter(method='filter_state', label=_('State'))
+    org_name = filters.CharFilter(
+        method='filter_org_name', label=_('Organization name')
+    )
 
     class Meta:
         model = Ticket
@@ -25,6 +38,12 @@ class TicketFilter(BaseFilterSet):
             'applicant', 'applicant_username_name', 'assignees__id',
             'relevant_asset', 'relevant_command', 'org_name', 'org_id',
         )
+        fields_operator = {
+            'relevant_asset': ('icontains',),
+            'relevant_command': ('icontains',),
+            'applicant_username_name': ('icontains',),
+            'org_name': ('icontains',),
+        }
 
     @staticmethod
     def filter_org_name(queryset, name, value):
@@ -93,25 +112,21 @@ class TicketFilter(BaseFilterSet):
         return queryset.filter(state=value)
 
 
-class ApplyAssetTicketFilter(BaseFilterSet):
-    class Meta:
+class ApplyAssetTicketFilter(TicketFilter):
+    class Meta(TicketFilter.Meta):
         model = ApplyAssetTicket
-        fields = ('id',)
 
 
-class ApplyLoginTicketFilter(BaseFilterSet):
-    class Meta:
+class ApplyLoginTicketFilter(TicketFilter):
+    class Meta(TicketFilter.Meta):
         model = ApplyLoginTicket
-        fields = ('id',)
 
 
-class ApplyLoginAssetTicketFilter(BaseFilterSet):
-    class Meta:
+class ApplyLoginAssetTicketFilter(TicketFilter):
+    class Meta(TicketFilter.Meta):
         model = ApplyLoginAssetTicket
-        fields = ('id',)
 
 
-class ApplyCommandTicketFilter(BaseFilterSet):
-    class Meta:
+class ApplyCommandTicketFilter(TicketFilter):
+    class Meta(TicketFilter.Meta):
         model = ApplyCommandTicket
-        fields = ('id',)

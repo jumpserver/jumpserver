@@ -10,9 +10,13 @@ from collections import defaultdict
 from django.utils import timezone
 
 from django.core.cache import cache
-from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from django.core.exceptions import (
+    FieldDoesNotExist, ImproperlyConfigured,
+    ValidationError as DjangoValidationError,
+)
 from django.db import models
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
@@ -55,9 +59,21 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         queryset = super().filter_queryset(request, queryset, view)
+        queryset = self.filter_primary_key(request, queryset)
         queryset = self.filter_dynamic_text_lookups(request, queryset, view)
         queryset = self.filter_dynamic_value_lookups(request, queryset, view)
         return self.filter_dynamic_negated_lookups(request, queryset, view)
+
+    @staticmethod
+    def filter_primary_key(request, queryset):
+        value = request.query_params.get("id")
+        if value in (None, "") or not hasattr(queryset, "model"):
+            return queryset
+        try:
+            value = queryset.model._meta.pk.to_python(value)
+        except (DjangoValidationError, TypeError, ValueError):
+            return queryset.none()
+        return queryset.filter(pk=value)
 
     def filter_dynamic_text_lookups(self, request, queryset, view):
         """Handle explicit text lookups like ``name__icontains=foo`` from filterset fields."""
@@ -298,6 +314,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         if filterset_class:
             fields = set(fields) | set(filterset_class.get_filters())
 
+        fields = set(fields) | {"id"}
+
         return {
             self.normalize_search_field(field)
             for field in fields
@@ -481,8 +499,12 @@ class SearchFilter(SearchFilterBase):
 
 
 class BaseFilterSet(drf_filters.FilterSet):
-    days = drf_filters.NumberFilter(method="filter_days")
-    days__lt = drf_filters.NumberFilter(method="filter_days")
+    days = drf_filters.NumberFilter(
+        method="filter_days", label=_("Created days")
+    )
+    days__lt = drf_filters.NumberFilter(
+        method="filter_days", label=_("Created days less than")
+    )
 
     @classmethod
     def filter_for_field(cls, field, field_name, lookup_expr=None):

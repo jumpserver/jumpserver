@@ -1,4 +1,5 @@
 from django_filters import rest_framework as drf_filters
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,11 +16,16 @@ from rbac.permissions import RBACPermission
 
 
 class AccountTemplateFilterSet(BaseFilterSet):
-    protocols = drf_filters.CharFilter(method='filter_protocols')
+    protocols = drf_filters.CharFilter(
+        method='filter_protocols', label=_('Protocols')
+    )
 
     class Meta:
         model = AccountTemplate
-        fields = ('username', 'name', 'protocols')
+        fields = ('id', 'name', 'username', 'protocols')
+        fields_operator = {
+            'protocols': ('in',),
+        }
 
     @staticmethod
     def filter_protocols(queryset, name, value):

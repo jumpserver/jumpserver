@@ -1,5 +1,6 @@
 from django.db.models import QuerySet, Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
 from assets.models import Node, Asset
@@ -10,22 +11,26 @@ from users.models import User, UserGroup
 
 
 class PermissionBaseFilter(BaseFilterSet):
-    is_valid = filters.BooleanFilter(method='do_nothing')
-    is_expired = filters.BooleanFilter(method='filter_expired')
-    user_id = filters.UUIDFilter(method='do_nothing')
-    username = filters.CharFilter(method='do_nothing')
-    account_id = filters.UUIDFilter(method='do_nothing')
-    account = filters.CharFilter(method='do_nothing')
-    user_group_id = filters.UUIDFilter(method='do_nothing')
-    user_group = filters.CharFilter(
-        field_name='user_groups__name', method='do_nothing'
+    is_valid = filters.BooleanFilter(
+        method='do_nothing', label=_('Is valid')
     )
-    all = filters.BooleanFilter(method='do_nothing')
+    is_expired = filters.BooleanFilter(
+        method='filter_expired', label=_('Is expired')
+    )
+    user_id = filters.UUIDFilter(method='do_nothing', label=_('User ID'))
+    username = filters.CharFilter(method='do_nothing', label=_('Username'))
+    user_group_id = filters.UUIDFilter(
+        method='do_nothing', label=_('User group ID')
+    )
+    user_group = filters.CharFilter(
+        field_name='user_groups__name', method='do_nothing',
+        label=_('User group name')
+    )
+    all = filters.BooleanFilter(method='do_nothing', label=_('All'))
 
     class Meta:
         fields = (
-            'user_id', 'username', 'account_id', 'account',
-            'user_group_id', 'user_group', 'name',
+            'user_id', 'username', 'user_group_id', 'user_group', 'name',
             'all', 'is_valid', 'is_expired',
         )
 
@@ -104,37 +109,36 @@ class PermissionBaseFilter(BaseFilterSet):
 
 
 class AssetPermissionFilter(PermissionBaseFilter):
-    is_effective = filters.BooleanFilter(method='do_nothing')
-    node_id = filters.UUIDFilter(method='do_nothing')
-    node_name = filters.CharFilter(method='do_nothing')
-    asset_id = filters.UUIDFilter(method='do_nothing')
-    asset_name = filters.CharFilter(
-        field_name='assets__name', method='do_nothing'
+    is_effective = filters.BooleanFilter(
+        method='do_nothing', label=_('Is effective')
     )
-    address = filters.CharFilter(method='do_nothing')
-    accounts = filters.CharFilter(method='do_nothing')
-    ip = filters.CharFilter(method='do_nothing')
-    is_no_resource = filters.BooleanFilter(method='filter_no_resource')
+    node_id = filters.UUIDFilter(method='do_nothing', label=_('Node ID'))
+    node_name = filters.CharFilter(
+        method='do_nothing', label=_('Node name')
+    )
+    asset_id = filters.UUIDFilter(method='do_nothing', label=_('Asset ID'))
+    asset_name = filters.CharFilter(
+        field_name='assets__name', method='do_nothing',
+        label=_('Asset name')
+    )
+    address = filters.CharFilter(method='do_nothing', label=_('Asset address'))
+    accounts = filters.CharFilter(method='do_nothing', label=_('Accounts'))
+    is_no_resource = filters.BooleanFilter(
+        method='filter_no_resource', label=_('No resource')
+    )
 
     class Meta:
         model = AssetPermission
         fields = (
-            'user_id', 'username', 'account_id', 'account',
-            'user_group_id', 'user_group',
+            'id', 'name', 'all', 
+            'user_id', 'username', 'user_group_id', 'user_group',
             'node_id', 'node_name', 'asset_id', 'asset_name',
-            'address', 'accounts', 'ip', 'name',
-            'is_active', 'all', 'is_valid', 'is_expired',
+            'address', 'accounts',
+            'is_active', 'is_valid', 'is_expired',
             'is_effective', 'is_no_resource', 'from_ticket',
         )
         fields_operator = {
-            'user_group': (
-                'icontains', 'exact', 'startswith',
-                'icontains_any', 'icontains_all', 'in',
-            ),
-            'asset_name': (
-                'icontains', 'exact', 'startswith',
-                'icontains_any', 'icontains_all', 'in',
-            ),
+            'accounts': ('in',),
         }
 
     @property

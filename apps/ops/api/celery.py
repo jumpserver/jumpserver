@@ -4,7 +4,7 @@ import re
 from collections import defaultdict
 
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 from django_celery_beat.models import PeriodicTask
 from django_filters import rest_framework as drf_filters
 from rest_framework import generics, viewsets, mixins, status
@@ -44,7 +44,9 @@ class CelerySummaryAPIView(generics.RetrieveAPIView):
 
 
 class CeleryTaskFilterSet(BaseFilterSet):
-    name = drf_filters.CharFilter(method='filter_name')
+    name = drf_filters.CharFilter(
+        method='filter_name', label=gettext_lazy('Task name or comment')
+    )
 
     @staticmethod
     def filter_name(queryset, name, value):
@@ -62,6 +64,9 @@ class CeleryTaskFilterSet(BaseFilterSet):
     class Meta:
         model = CeleryTask
         fields = ['name']
+        fields_operator = {
+            'name': ('icontains',),
+        }
 
 
 class CeleryTaskViewSet(

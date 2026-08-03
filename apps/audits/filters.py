@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.utils import translation
+from django.utils.translation import gettext_lazy as _
 
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
@@ -7,7 +8,7 @@ from rest_framework.compat import coreapi, coreschema
 from common.drf.filters import BaseFilterSet
 from common.sessions.cache import user_session_manager
 from orgs.utils import current_org
-from .models import UserSession, OperateLog
+from .models import IntegrationApplicationLog, JobLog, OperateLog, UserSession
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -38,7 +39,9 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
 
 
 class UserSessionFilterSet(BaseFilterSet):
-    is_active = drf_filters.BooleanFilter(method='filter_is_active')
+    is_active = drf_filters.BooleanFilter(
+        method='filter_is_active', label=_('Is active')
+    )
 
     @staticmethod
     def filter_is_active(queryset, name, is_active):
@@ -55,7 +58,9 @@ class UserSessionFilterSet(BaseFilterSet):
 
 
 class OperateLogFilterSet(BaseFilterSet):
-    resource_type = drf_filters.CharFilter(method='filter_resource_type')
+    resource_type = drf_filters.CharFilter(
+        method='filter_resource_type', label=_('Resource type')
+    )
 
     @staticmethod
     def filter_resource_type(queryset, name, resource_type):
@@ -71,3 +76,24 @@ class OperateLogFilterSet(BaseFilterSet):
         fields = [
             'user', 'action', 'resource', 'resource_type', 'remote_addr',
         ]
+
+
+class ServiceAccessLogFilterSet(BaseFilterSet):
+    service_id = drf_filters.UUIDFilter(label=_("Application ID"))
+
+    class Meta:
+        model = IntegrationApplicationLog
+        fields = [
+            "id", "service", "service_id", "asset", "account",
+            "remote_addr",
+        ]
+
+
+class JobLogFilterSet(BaseFilterSet):
+    creator__name = drf_filters.CharFilter(
+        field_name="creator__name", label=_("User")
+    )
+
+    class Meta:
+        model = JobLog
+        fields = ["id", "creator__name", "material"]

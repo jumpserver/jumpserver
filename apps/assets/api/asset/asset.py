@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import status
 from rest_framework.decorators import action
@@ -47,69 +47,83 @@ def get_license_asset_limit():
 
 
 class AssetFilterSet(BaseFilterSet):
-    is_gateway = drf_filters.BooleanFilter(method='filter_is_gateway', label=_("Gateway"))
-    platform = drf_filters.CharFilter(method='filter_platform', label=_("Platform name or ID"))
+    is_gateway = drf_filters.BooleanFilter(
+        method='filter_is_gateway', label=_("Gateway")
+    )
+    platform = drf_filters.CharFilter(
+        method='filter_platform', label=_("Platform name or ID")
+    )
     exclude_platform = drf_filters.CharFilter(
-        field_name="platform__name", lookup_expr='exact', exclude=True, 
+        field_name="platform__name", lookup_expr='exact', exclude=True,
         label=_("Exclude platform name")
     )
-    zone = drf_filters.CharFilter(method='filter_zone', label=_("Zone name or ID"))
+    zone = drf_filters.CharFilter(
+        method='filter_zone', label=_("Zone name or ID")
+    )
     type = drf_filters.ChoiceFilter(
         field_name="platform__type", label=_("Platform type"),
         choices=AllTypes.choices()
     )
     exclude_type = drf_filters.ChoiceFilter(
-        field_name="platform__type", exclude=True, label=_("Exclude platform type"),
+        field_name="platform__type", exclude=True,
+        label=_("Exclude platform type"),
         choices=AllTypes.choices()
     )
     category = drf_filters.ChoiceFilter(
-        field_name="platform__category", lookup_expr="exact", label=_("Platform category"),
+        field_name="platform__category", lookup_expr="exact",
+        label=_("Platform category"),
         choices=Category.choices
     )
     exclude_category = drf_filters.ChoiceFilter(
-        field_name="platform__category", lookup_expr="exact", exclude=True, 
+        field_name="platform__category", lookup_expr="exact", exclude=True,
         label=_("Exclude platform category"),
         choices=Category.choices
     )
-    protocols = drf_filters.CharFilter(method='filter_protocols')
+    protocols = drf_filters.CharFilter(
+        method='filter_protocols', label=_("Protocols")
+    )
     gateway_enabled = drf_filters.BooleanFilter(
-        field_name="platform__gateway_enabled"
+        field_name="platform__gateway_enabled", label=_("Gateway enabled")
     )
     ping_enabled = drf_filters.BooleanFilter(
-        field_name="platform__automation__ping_enabled"
+        field_name="platform__automation__ping_enabled",
+        label=_("Ping enabled")
     )
     gather_facts_enabled = drf_filters.BooleanFilter(
-        field_name="platform__automation__gather_facts_enabled"
+        field_name="platform__automation__gather_facts_enabled",
+        label=_("Gather facts enabled")
     )
     change_secret_enabled = drf_filters.BooleanFilter(
         field_name="platform__automation__change_secret_enabled",
+        label=_("Change secret enabled")
     )
     push_account_enabled = drf_filters.BooleanFilter(
-        field_name="platform__automation__push_account_enabled"
+        field_name="platform__automation__push_account_enabled",
+        label=_("Push account enabled")
     )
     verify_account_enabled = drf_filters.BooleanFilter(
-        field_name="platform__automation__verify_account_enabled"
+        field_name="platform__automation__verify_account_enabled",
+        label=_("Verify account enabled")
     )
     gather_accounts_enabled = drf_filters.BooleanFilter(
-        field_name="platform__automation__gather_accounts_enabled"
+        field_name="platform__automation__gather_accounts_enabled",
+        label=_("Gather accounts enabled")
     )
 
     class Meta:
         model = Asset
         fields = [
-            "id", "name", "address", "comment", "is_active",
+            "id", "name", "address",
+            "protocols", "comment", "is_active", "zone",
             "type", "exclude_type", "category", "exclude_category",
-            "platform", "exclude_platform", "zone", "zone__name",
-            "protocols",
+            "platform", "exclude_platform",
             "is_gateway", "gateway_enabled", "ping_enabled",
             "gather_facts_enabled", "change_secret_enabled",
             "push_account_enabled", "verify_account_enabled",
             "gather_accounts_enabled",
         ]
         fields_operator = {
-            'platform': ('exact',),
-            'protocols': ('exact', 'in'),
-            'zone': ('exact', 'icontains'),
+            'protocols': ('in',),
         }
 
     @staticmethod
@@ -131,7 +145,7 @@ class AssetFilterSet(BaseFilterSet):
         if is_uuid(value):
             return queryset.filter(zone_id=value)
         else:
-            return queryset.filter(zone__name__contains=value)
+            return queryset.filter(zone__name__icontains=value)
 
     @staticmethod
     def filter_protocols(queryset, name, value):
@@ -196,20 +210,22 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if request.path.find('/api/v1/assets/assets/') > -1:
-            error = _('Cannot create asset directly, you should create a host or other')
+            error = gettext(
+                'Cannot create asset directly, you should create a host or other'
+            )
             return Response({'error': error}, status=400)
 
         with tmp_to_root_org():
             asset_count = Asset.objects.order_by().count()
 
         if not settings.XPACK_LICENSE_IS_VALID and asset_count >= 5000:
-            error = _('The number of assets exceeds the limit of 5000')
+            error = gettext('The number of assets exceeds the limit of 5000')
             return Response({'error': error}, status=400)
 
         if settings.XPACK_LICENSE_IS_VALID:
             license_asset_limit = get_license_asset_limit()
             if asset_count >= license_asset_limit:
-                error = _('The number of assets exceeds the license limit')
+                error = gettext('The number of assets exceeds the license limit')
                 return Response({'error': error}, status=400)
 
         return super().create(request, *args, **kwargs)

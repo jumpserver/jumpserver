@@ -3063,7 +3063,7 @@ msgstr "帳號推送參數"
 
 #: assets/models/platform.py:63 assets/serializers/platform.py:46
 msgid "Verify account enabled"
-msgstr "開啟帳號驗證"
+msgstr "啟用帳號驗證"
 
 #: assets/models/platform.py:65 assets/serializers/platform.py:50
 msgid "Verify account method"
