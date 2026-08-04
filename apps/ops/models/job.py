@@ -143,6 +143,13 @@ class JMSPermedInventory(JMSInventory):
         return mapper
 
 
+class JobHistoricalRecords(HistoricalRecords):
+    def create_history_model(self, model, inherited):
+        history_model = super().create_history_model(model, inherited)
+        history_model.__module__ = model.__module__
+        return history_model
+
+
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
@@ -164,7 +171,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
                                     verbose_name=_('Run as policy'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
     version = models.IntegerField(default=0)
-    history = HistoricalRecords()
+    history = JobHistoricalRecords()
 
     def __str__(self):
         return self.name

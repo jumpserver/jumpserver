@@ -63,7 +63,9 @@ class AccountHistoricalRecords(HistoricalRecords):
                 field.name for field in model._meta.fields
                 if field.name not in self.included_fields
             ]
-        return super().create_history_model(model, inherited)
+        history_model = super().create_history_model(model, inherited)
+        history_model.__module__ = model.__module__
+        return history_model
 
 
 class JSONFilterMixin:
