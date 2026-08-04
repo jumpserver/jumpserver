@@ -48,28 +48,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 @receiver(django_ready)
 def on_django_ready_add_db_config(sender, **kwargs):
     Setting.refresh_all_settings()
-
-
-# 服务启动时重新配置 syslog handler：
-# logging.py 加载时 DB 中的 SYSLOG 配置尚未注入 django.conf.settings，
-# 导致 handler 保持 NullHandler。refresh_all_settings 不发送 setting_changed 信号，
-# 且 django_ready 时日志配置可能被后续覆盖，因此使用 request_started 信号（首次请求时执行）。
-_syslog_initialized = False
-
-
-@receiver(request_started)
-def init_syslog_on_first_request(sender, **kwargs):
-    global _syslog_initialized
-    if _syslog_initialized:
-        return
-    _syslog_initialized = True
-    try:
-        from jumpserver.settings.logging import reconfigure_syslog_handler
-        reconfigure_syslog_handler()
-    except Exception:
-        import traceback
-        traceback.print_exc()
-
+    
 
 @receiver(django_ready)
 def auto_generate_terminal_host_key(sender, **kwargs):
@@ -168,3 +147,12 @@ def on_syslog_setting_changed(sender, name='', **kwargs):
         logger.debug('Syslog handler reconfigured after %s changed', name)
     except Exception as e:
         logger.error('Failed to reconfigure syslog handler: %s', e)
+
+@receiver(django_ready)
+def on_django_ready_init_syslog_handler(sender, **kwargs):
+    try:
+        from jumpserver.settings.logging import reconfigure_syslog_handler
+        reconfigure_syslog_handler()
+    except Exception:
+        import traceback
+        traceback.print_exc()

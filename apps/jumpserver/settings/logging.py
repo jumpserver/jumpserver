@@ -179,26 +179,16 @@ SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
 
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
-    import logging
-    import logging.handlers
-
     addr, facility, socktype = _get_syslog_config()
 
     if _is_valid_addr(addr):
         host, port = addr.split(':')
-        new_handler = logging.handlers.SysLogHandler(
-            address=(host, int(port)),
-            facility=facility,
-            socktype=socktype,
-        )
-        new_handler.setLevel(logging.INFO)
-        new_handler.setFormatter(logging.Formatter('jumpserver: %(message)s'))
+        LOGGING['handlers']['syslog'].update({
+        'class': 'logging.handlers.SysLogHandler',
+        'facility': facility,
+        'address': (host, int(port)),
+        'socktype': socktype,
+    })
     else:
-        new_handler = logging.NullHandler()
+        LOGGING['handlers']['syslog']['class'] = 'logging.NullHandler'
 
-    for logger_name in SYSLOG_LOGGER_NAMES:
-        logger = logging.getLogger(logger_name)
-        for h in list(logger.handlers):
-            if isinstance(h, (logging.handlers.SysLogHandler, logging.NullHandler)):
-                logger.removeHandler(h)
-        logger.addHandler(new_handler)
