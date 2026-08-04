@@ -63,13 +63,8 @@ class SerializeToTreeNodeMixin:
         return AllTypes.get_types_values(exclude_custom=True)
 
     def get_icon(self, asset):
-        if asset.category == 'device':
-            return 'switch'
-        if asset.type in self.support_types:
-            return asset.type
-        else:
-            return 'file'
-
+        return asset.get_icon_skin()
+        
     @timeit
     def serialize_assets(self, assets, node_key=None, get_pid=None):
         if not get_pid and not node_key:
@@ -102,7 +97,7 @@ class SerializeToTreeNodeMixin:
                 'pId': pid,
                 'isParent': False,
                 'open': False,
-                'iconSkin': self.get_icon(platform),
+                'iconSkin': self.get_icon(asset),
                 'chkDisabled': not asset.is_active,
                 'meta': {
                     'type': 'asset',
