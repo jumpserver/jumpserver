@@ -2,11 +2,16 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
+from common.drf.filters import BaseFilterSet
 from orgs.utils import filter_org_queryset
+from terminal.const import RiskLevelChoices
 from terminal.models import Command, CommandStorage, Session
 
 
-class CommandFilter(filters.FilterSet):
+class CommandFilter(BaseFilterSet):
+    id = filters.UUIDFilter(
+        method='filter_exact', label=_('Command ID')
+    )
     date_from = filters.DateTimeFilter(
         method='do_nothing', label=_('Date from')
     )
@@ -18,24 +23,55 @@ class CommandFilter(filters.FilterSet):
         method='do_nothing', label=_('Command storage ID')
     )
     user = filters.CharFilter(
-        lookup_expr='startswith', label=_('User')
+        method='filter_startswith', label=_('User name')
     )
     input = filters.CharFilter(
-        lookup_expr='icontains', label=_('Command')
+        method='filter_icontains', label=_('Command')
     )
     asset = filters.CharFilter(
-        field_name='asset', lookup_expr='icontains', label=_('Asset')
+        method='filter_icontains', label=_('Asset name')
     )
     asset_id = filters.UUIDFilter(
         method='filter_by_asset_id', label=_('Asset ID')
+    )
+    account = filters.CharFilter(
+        method='filter_exact', label=_('Account name')
+    )
+    session = filters.CharFilter(
+        method='filter_exact', label=_('Session ID')
+    )
+    risk_level = filters.ChoiceFilter(
+        method='filter_exact', choices=RiskLevelChoices.choices,
+        label=_('Risk level')
     )
 
     class Meta:
         model = Command
         fields = [
-            'asset', 'asset_id', 'account', 'user', 'session', 'risk_level', 'input',
-            'date_from', 'date_to', 'session_id', 'risk_level', 'command_storage_id',
+            'id', 'user', 'asset', 'asset_id', 'account', 'input',
+            'risk_level', 'session',
         ]
+        fields_operator = {
+            'id': ('exact',),
+            'user': ('startswith',),
+            'asset': ('icontains',),
+            'asset_id': ('exact',),
+            'account': ('exact',),
+            'input': ('icontains',),
+            'session': ('exact',),
+        }
+
+    @staticmethod
+    def filter_exact(queryset, name, value):
+        return queryset.filter(**{name: value})
+
+    @staticmethod
+    def filter_startswith(queryset, name, value):
+        return queryset.filter(**{f'{name}__startswith': value})
+
+    @staticmethod
+    def filter_icontains(queryset, name, value):
+        return queryset.filter(**{f'{name}__icontains': value})
 
     def do_nothing(self, queryset, name, value):
         return queryset

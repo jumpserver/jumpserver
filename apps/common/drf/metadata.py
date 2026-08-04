@@ -266,13 +266,15 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     @staticmethod
     def get_filter_field_type(filter_field, model_field):
-        if isinstance(filter_field, drf_filters.BooleanFilter):
-            return "boolean"
         if isinstance(
             filter_field,
             (drf_filters.ChoiceFilter, drf_filters.MultipleChoiceFilter),
         ):
             return "choice"
+        if getattr(model_field, "choices", None):
+            return "choice"
+        if isinstance(filter_field, drf_filters.BooleanFilter):
+            return "boolean"
         if isinstance(filter_field, drf_filters.UUIDFilter):
             return "uuid"
         if isinstance(filter_field, drf_filters.DateTimeFilter):
@@ -284,8 +286,6 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
         if isinstance(model_field, models.BooleanField):
             return "boolean"
-        if getattr(model_field, "choices", None):
-            return "choice"
         if isinstance(model_field, models.UUIDField):
             return "uuid"
         if isinstance(model_field, models.EmailField):

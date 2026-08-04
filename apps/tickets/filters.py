@@ -12,6 +12,9 @@ from tickets.models import (
 
 
 class TicketFilter(BaseFilterSet):
+    applicant = filters.UUIDFilter(
+        field_name='applicant_id', label=_('Applicant ID')
+    )
     assignees__id = filters.UUIDFilter(
         method='filter_assignees_id', label=_('Assignee ID')
     )
@@ -34,11 +37,14 @@ class TicketFilter(BaseFilterSet):
     class Meta:
         model = Ticket
         fields = (
-            'id', 'title', 'type', 'state', 'status',
+            'id', 'title', 'serial_num', 'type', 'state', 'status',
             'applicant', 'applicant_username_name', 'assignees__id',
             'relevant_asset', 'relevant_command', 'org_name', 'org_id',
         )
         fields_operator = {
+            'assignees__id': ('exact',),
+            'org_id': ('exact', 'in'),
+            'state': ('exact',),
             'relevant_asset': ('icontains',),
             'relevant_command': ('icontains',),
             'applicant_username_name': ('icontains',),

@@ -3,11 +3,61 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
+from assets.const import AllTypes, GATEWAY_NAME
 from assets.models import Node, Asset
 from common.drf.filters import BaseFilterSet
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, is_uuid
 from perms.models import AssetPermission, AssetPermissionQuerySet
 from users.models import User, UserGroup
+
+
+class PermedAssetFilterSet(BaseFilterSet):
+    platform = filters.CharFilter(
+        method='filter_platform', label=_('Platform name or ID')
+    )
+    type = filters.ChoiceFilter(
+        field_name='platform__type', choices=AllTypes.choices(),
+        label=_('Platform type')
+    )
+    protocols = filters.CharFilter(
+        method='filter_protocols', label=_('Protocols')
+    )
+    zone = filters.CharFilter(
+        method='filter_zone', label=_('Zone name or ID')
+    )
+
+    class Meta:
+        model = Asset
+        fields = [
+            'id', 'name', 'address', 'platform', 'type', 'protocols',
+            'zone', 'is_active', 'comment',
+        ]
+        fields_operator = {
+            'platform': ('exact',),
+            'protocols': ('in',),
+            'zone': ('icontains',),
+        }
+
+    @staticmethod
+    def filter_platform(queryset, name, value):
+        if value.isdigit():
+            return queryset.filter(platform_id=value)
+        if value == GATEWAY_NAME:
+            return queryset.filter(
+                platform__name__istartswith=GATEWAY_NAME
+            )
+        return queryset.filter(platform__name=value)
+
+    @staticmethod
+    def filter_protocols(queryset, name, value):
+        protocols = value.split(',')
+        return queryset.filter(protocols__name__in=protocols).distinct()
+
+    @staticmethod
+    def filter_zone(queryset, name, value):
+        if is_uuid(value):
+            return queryset.filter(zone_id=value)
+        return queryset.filter(zone__name__icontains=value)
 
 
 class PermissionBaseFilter(BaseFilterSet):

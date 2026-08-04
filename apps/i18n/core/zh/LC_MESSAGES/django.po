@@ -3835,7 +3835,7 @@ msgstr "登录日期"
 
 #: audits/models.py:256 audits/models.py:341 audits/reporting.py:226
 msgid "Auth backend"
-msgstr "认证令牌"
+msgstr "认证方式"
 
 #: audits/models.py:329
 msgid "User login log"
@@ -4129,6 +4129,10 @@ msgstr "创建者 Top 10"
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "创建者"
+
+#: audits/filters.py
+msgid "Creator name"
+msgstr "创建者名称"
 
 #: audits/reporting.py:506
 msgid "Run as Policy Distribution"
@@ -6476,6 +6480,10 @@ msgstr "没有可用程序入口"
 #: settings/serializers/auth/ldap_ha.py:63
 msgid "Periodic run"
 msgstr "周期执行"
+
+#: audits/filters.py audits/serializers.py
+msgid "Periodic execution"
+msgstr "定期执行"
 
 #: ops/mixin.py:36 ops/mixin.py:113 ops/mixin.py:172
 #: settings/serializers/auth/ldap.py:88 settings/serializers/auth/ldap_ha.py:70
@@ -12837,6 +12845,9 @@ msgstr "账号用户名"
 msgid "Applicant name or username"
 msgstr "申请人名称或用户名"
 
+msgid "Applicant ID"
+msgstr "申请人 ID"
+
 msgid "Asset address"
 msgstr "资产地址"
 
@@ -12846,17 +12857,32 @@ msgstr "资产名称"
 msgid "Asset name, address or ID"
 msgstr "资产名称、地址或 ID"
 
+msgid "Instance ID"
+msgstr "实例 ID"
+
 msgid "Assignee ID"
 msgstr "工单受理人 ID"
 
 msgid "Automation ID"
 msgstr "自动化 ID"
 
+msgid "Creator ID"
+msgstr "创建者 ID"
+
+msgid "Job ID"
+msgstr "作业 ID"
+
+msgid "Create method"
+msgstr "创建方式"
+
 msgid "Task ID"
 msgstr "任务 ID"
 
 msgid "Command storage ID"
 msgstr "命令存储 ID"
+
+msgid "Command ID"
+msgstr "命令 ID"
 
 msgid "Created days"
 msgstr "创建日期（天数）"

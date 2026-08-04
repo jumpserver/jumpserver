@@ -13,6 +13,7 @@ from common.exceptions import JMSException
 from common.permissions import IsOwnerOrAdminWritable
 from common.utils.http import is_true
 from common.utils.zip import safe_extract_zip
+from ops.filters import PlaybookFilterSet
 from rbac.permissions import RBACPermission
 from ..const import Scope
 from ..exception import PlaybookNoValidEntry
@@ -35,7 +36,11 @@ class PlaybookViewSet(JMSBulkModelViewSet):
     permission_classes = (RBACPermission, IsOwnerOrAdminWritable)
     queryset = Playbook.objects.all()
     search_fields = ('name', 'comment')
-    filterset_fields = ['scope', 'creator']
+    filterset_class = PlaybookFilterSet
+    ordering_fields = (
+        'name', 'scope', 'create_method', 'created_by', 'date_created',
+        'date_updated',
+    )
 
     def allow_bulk_destroy(self, qs, filtered):
         for obj in filtered:

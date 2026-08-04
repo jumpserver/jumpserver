@@ -124,6 +124,7 @@ class AssetFilterSet(BaseFilterSet):
         ]
         fields_operator = {
             'protocols': ('in',),
+            'zone': ('icontains',),
         }
 
     @staticmethod

@@ -4064,6 +4064,10 @@ msgstr ""
 msgid "Creator"
 msgstr ""
 
+#: audits/filters.py
+msgid "Creator name"
+msgstr "Creator name"
+
 #: audits/reporting.py:506
 msgid "Run as Policy Distribution"
 msgstr ""
@@ -6383,6 +6387,10 @@ msgstr ""
 #: settings/serializers/auth/ldap_ha.py:63
 msgid "Periodic run"
 msgstr "Periodic"
+
+#: audits/filters.py audits/serializers.py
+msgid "Periodic execution"
+msgstr "Periodic execution"
 
 #: ops/mixin.py:36 ops/mixin.py:113 ops/mixin.py:172
 #: settings/serializers/auth/ldap.py:88 settings/serializers/auth/ldap_ha.py:70
@@ -12594,6 +12602,9 @@ msgstr ""
 msgid "Applicant name or username"
 msgstr ""
 
+msgid "Applicant ID"
+msgstr "Applicant ID"
+
 msgid "Asset address"
 msgstr ""
 
@@ -12603,17 +12614,32 @@ msgstr ""
 msgid "Asset name, address or ID"
 msgstr ""
 
+msgid "Instance ID"
+msgstr "Instance ID"
+
 msgid "Assignee ID"
 msgstr ""
 
 msgid "Automation ID"
 msgstr ""
 
+msgid "Creator ID"
+msgstr "Creator ID"
+
+msgid "Job ID"
+msgstr "Job ID"
+
+msgid "Create method"
+msgstr "Create method"
+
 msgid "Task ID"
 msgstr ""
 
 msgid "Command storage ID"
 msgstr ""
+
+msgid "Command ID"
+msgstr "Command ID"
 
 msgid "Created days"
 msgstr ""
