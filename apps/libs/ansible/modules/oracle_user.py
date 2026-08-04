@@ -59,6 +59,14 @@ options:
       - The password to use for the user.
     type: str
     aliases: [pass]
+  password_only:
+    description:
+      - Change the password directly without querying C(DBA_USERS), creating the
+        user, or granting privileges.
+      - This is intended for password rotation with a minimally privileged
+        login account that has C(ALTER USER).
+    type: bool
+    default: false
 
 requirements:
   - "oracledb"
@@ -105,17 +113,19 @@ from libs.ansible.modules_utils.oracle_common import (
 
 def validate_identifier(name):
     """
-    Strictly validate Oracle identifiers (usernames, tablespace names)
-    Only letters, numbers, and underscores are allowed.
-    The length must be ≤ 30 characters, and the first character must be a letter.
+    Validate unquoted Oracle identifiers used by this module.
+
+    Modern Oracle releases allow identifiers up to 128 bytes. Older releases
+    enforce their own 30-byte limit, so accepting the modern limit here keeps
+    valid 12.2+ accounts usable while still leaving the server authoritative.
     """
     if not name:
         return False, "Identifier cannot be empty"
-    if len(name) > 30:
-        return False, "Identifier must be at most 30 characters"
-    if not re.match(r'^(C##|c##)?[A-Za-z][A-Za-z0-9_]*$', name):
-        msg = ("Identifier can only contain letters, numbers, "
-               "and underscores (must start with a letter)")
+    if len(name.encode('utf-8')) > 128:
+        return False, "Identifier must be at most 128 bytes"
+    if not re.match(r'^[A-Za-z][A-Za-z0-9_$#]*$', name):
+        msg = ("Identifier can only contain letters, numbers, underscores, "
+               "dollar signs, and number signs (must start with a letter)")
         return False, msg
     return True, ""
 
@@ -152,6 +162,36 @@ def get_identified_clause(auth_type, password):
         return f'IDENTIFIED BY "{quote_password}"'
     else:
         raise ValueError(f"Unsupported authentication type: {auth_type}")
+
+
+def user_change_password(module, oracle_client, username, password):
+    valid, msg = validate_identifier(username)
+    if not valid:
+        module.fail_json(msg=f"Invalid username: {msg}")
+
+    username = username.upper()
+    try:
+        identified_clause = get_identified_clause('password', password)
+        _, err = oracle_client.execute(
+            f"ALTER USER {username} {identified_clause}"
+        )
+        if err:
+            module.fail_json(
+                msg=f"Failed to change password for user {username}: {err}",
+                changed=False,
+            )
+        oracle_client.commit()
+        module.exit_json(
+            changed=True,
+            name=username,
+            msg=f"Password for user {username} changed successfully",
+        )
+    except Exception as e:
+        module.fail_json(
+            msg=f"Database error while changing password for user "
+                f"{username}: {str(e)}",
+            changed=False,
+        )
 
 
 def user_add(
@@ -280,6 +320,7 @@ def main():
         default_tablespace=dict(required=False, aliases=['db']),
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
+        password_only=dict(type='bool', default=False),
         state=dict(type='str', default='present', choices=['absent', 'present']),
         update_password=dict(default="always", choices=["always", "on_create"], no_log=False),
         temporary_tablespace=dict(type='str', default=None),
@@ -293,6 +334,7 @@ def main():
     default_tablespace = module.params['default_tablespace']
     user = module.params['name']
     password = module.params['password']
+    password_only = module.params['password_only']
     state = module.params['state']
     update_password = module.params['update_password']
     temporary_tablespace = module.params['temporary_tablespace']
@@ -303,7 +345,11 @@ def main():
         module.fail_json(msg=f"Failed to connect to Oracle: {str(e)}")
         return
 
-    if state == 'present':
+    if state == 'present' and password_only:
+        if not password:
+            module.fail_json(msg='password parameter is required when password_only is enabled')
+        user_change_password(module, oracle_client, user, password)
+    elif state == 'present':
         if not password and update_password == 'always':
             module.fail_json(
                 msg='password parameter required when adding a user unless update_password is set to on_create'

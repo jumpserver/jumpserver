@@ -5,6 +5,17 @@ type:
   - mysql
   - mariadb
 method: change_secret
+params:
+  - name: account_host
+    type: str
+    label: MySQL account host
+    default: "%"
+    help_text: Host part of the MySQL account identity
+  - name: all_hosts
+    type: bool
+    label: Apply to all hosts
+    default: false
+    help_text: Apply the operation to every Host entry with this username
 
 i18n:
   MySQL account change secret:

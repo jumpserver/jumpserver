@@ -38,6 +38,9 @@ class ApprovalRule(JMSBaseModel):
 
 
 class TicketFlow(JMSBaseModel, OrgModelMixin):
+    name = models.CharField(
+        max_length=128, blank=True, default='', verbose_name=_('Name')
+    )
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
         default=TicketType.general, verbose_name=_("Type")
@@ -48,12 +51,16 @@ class TicketFlow(JMSBaseModel, OrgModelMixin):
         verbose_name=_('Approve level')
     )
     rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flows')
+    cc_users = models.ManyToManyField(
+        'users.User', related_name='cc_ticket_flows', blank=True,
+        verbose_name=_('CC users')
+    )
 
     class Meta:
         verbose_name = _('Ticket flow')
 
     def __str__(self):
-        return '{}'.format(self.type)
+        return self.name or self.get_type_display()
 
     @classmethod
     def get_org_related_flows(cls, org_id=None):

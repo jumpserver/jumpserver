@@ -13,11 +13,12 @@ def oracle_common_argument_spec():
     options = dict(
         login_user=dict(type='str', required=False),
         login_password=dict(type='str', required=False, no_log=True),
-        login_database=dict(type='str', required=False, default='test'),
+        login_database=dict(type='str', required=True),
         login_host=dict(type='str', required=False, default='localhost'),
         login_port=dict(type='int', required=False, default=1521),
         oracle_home=dict(type='str', required=False),
         mode=dict(type='str', required=False),
+        connect_timeout=dict(type='int', required=False, default=15),
     )
     return options
 
@@ -40,6 +41,7 @@ class OracleClient(object):
         password = params['login_password']
         oracle_home = params['oracle_home']
         mode = params['mode']
+        connect_timeout = params['connect_timeout']
 
         if oracle_home:
             os.environ.setdefault('ORACLE_HOME', oracle_home)
@@ -51,6 +53,7 @@ class OracleClient(object):
         self.connect_params['user'] = username
         self.connect_params['password'] = password
         self.connect_params['service_name'] = service_name
+        self.connect_params['tcp_connect_timeout'] = connect_timeout
 
     @property
     def cursor(self):
@@ -61,9 +64,17 @@ class OracleClient(object):
                 self._cursor = self._conn.cursor()
             except DatabaseError as err:
                 self.module.fail_json(
-                    msg="Unable to connect to database: %s, %s" % (to_native(err), self.connect_params)
+                    msg="Unable to connect to database: %s" % to_native(err)
                 )
         return self._cursor
+
+    @property
+    def server_version(self):
+        # Accessing the cursor establishes the connection. The driver then
+        # exposes the server version without querying privileged/version-
+        # dependent data dictionary views.
+        self.cursor
+        return self._conn.version
 
     def execute(self, sql, params=None, exception_to_fail=False):
         sql = sql[:-1] if sql.endswith(';') else sql

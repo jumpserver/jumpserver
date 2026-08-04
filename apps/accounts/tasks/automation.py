@@ -2,6 +2,8 @@ import datetime
 from collections import defaultdict
 
 from celery import shared_task
+from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
@@ -10,10 +12,18 @@ from accounts.const import AutomationTypes
 from accounts.tasks.common import quickstart_automation_by_snapshot
 from common.const.crontab import CRONTAB_AT_AM_THREE
 from common.utils import get_logger, get_object_or_none, get_log_keep_day
+from common.utils.lock import DistributedLock
 from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
 logger = get_logger(__file__)
+
+INTERRUPTED_TASK_CHECK_INTERVAL = 600
+INTERRUPTED_TASK_START_GRACE = 600
+INTERRUPTED_TASK_CONFIRM_SECONDS = 600
+INTERRUPTED_TASK_CACHE_TIMEOUT = 3600
+INTERRUPTED_TASK_CACHE_PREFIX = 'account_automation:missing:'
+INTERRUPTED_TASK_LOCK_NAME = 'account-automation:recover-interrupted'
 
 
 def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
@@ -110,6 +120,239 @@ def execute_automation_record_task(record_ids, tp):
 
         with tmp_to_org(latest_rec.execution.org_id):
             quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
+
+
+def _get_active_celery_tasks():
+    from ops.celery import app
+
+    try:
+        active_workers = app.control.inspect(timeout=2).active()
+    except Exception:
+        logger.exception('Inspect active Celery tasks failed')
+        return None
+
+    # None means that no worker replied. Treat it as an unavailable inspection,
+    # not as proof that every running task has disappeared.
+    if not active_workers:
+        logger.warning(
+            'Skip interrupted account task check: no Celery worker replied'
+        )
+        return None
+
+    active_task_ids = set()
+    for tasks in active_workers.values():
+        for task in tasks or []:
+            task_id = task.get('id')
+            if task_id:
+                active_task_ids.add(str(task_id))
+    return active_task_ids, set(active_workers)
+
+
+def _missing_task_confirmed(execution_id, now):
+    key = f'{INTERRUPTED_TASK_CACHE_PREFIX}{execution_id}'
+    try:
+        first_missing_at = cache.get(key)
+        if first_missing_at is None:
+            cache.set(
+                key, now.timestamp(), INTERRUPTED_TASK_CACHE_TIMEOUT
+            )
+            return False
+        return (
+            now.timestamp() - float(first_missing_at)
+            >= INTERRUPTED_TASK_CONFIRM_SECONDS
+        )
+    except Exception:
+        # Do not recover based on a single observation when the debounce store
+        # itself is unavailable.
+        logger.exception(
+            'Check interrupted task debounce failed: execution=%s',
+            execution_id,
+        )
+        return False
+
+
+def _clear_missing_task_marker(execution_id):
+    try:
+        cache.delete(f'{INTERRUPTED_TASK_CACHE_PREFIX}{execution_id}')
+    except Exception:
+        logger.exception(
+            'Clear interrupted task debounce failed: execution=%s',
+            execution_id,
+        )
+
+
+@shared_task(
+    verbose_name=_('Recover interrupted account automation tasks'),
+    description=_(
+        """Periodically reconcile account automation executions whose Celery
+        worker was forcibly terminated before task state and secret records
+        could be written back"""
+    ),
+)
+@register_as_period_task(interval=INTERRUPTED_TASK_CHECK_INTERVAL)
+def recover_interrupted_account_automation_tasks():
+    lock = DistributedLock(INTERRUPTED_TASK_LOCK_NAME)
+    try:
+        acquired = lock.acquire(blocking=False)
+    except Exception:
+        logger.exception(
+            'Acquire interrupted account task recovery lock failed'
+        )
+        return
+
+    if not acquired:
+        logger.info(
+            'Skip interrupted account task recovery: another check is running'
+        )
+        return
+
+    try:
+        _recover_interrupted_account_automation_tasks()
+    finally:
+        try:
+            lock.release()
+        except Exception:
+            logger.exception(
+                'Release interrupted account task recovery lock failed'
+            )
+
+
+def _recover_interrupted_account_automation_tasks():
+    from accounts.automations.recovery import (
+        finalize_interrupted_execution,
+    )
+    from accounts.models import AutomationExecution
+    from common.const import Status
+    from ops.models import CeleryTaskExecution
+
+    now = timezone.now()
+    active_statuses = [Status.pending, Status.running]
+    automation_types = list(AutomationTypes.values)
+
+    with tmp_to_root_org():
+        executions = list(
+            AutomationExecution.objects.filter(
+                status__in=active_statuses,
+                type__in=automation_types,
+            ).only(
+                'id', 'status', 'date_created', 'date_start', 'snapshot',
+            )
+        )
+
+    if not executions:
+        return
+
+    owner_task_ids = {
+        str(execution.id): str(
+            (execution.snapshot or {}).get('celery_task_id')
+            or execution.id
+        )
+        for execution in executions
+    }
+    celery_executions = {
+        str(item.id): item
+        for item in CeleryTaskExecution.objects.filter(
+            id__in=set(owner_task_ids.values())
+        ).only('id', 'state', 'is_finished')
+    }
+
+    # First repair executions for which Celery already has a terminal state.
+    # This path does not depend on worker inspection.
+    pending_inspection = []
+    for execution in executions:
+        owner_task_id = owner_task_ids[str(execution.id)]
+        celery_execution = celery_executions.get(owner_task_id)
+        if celery_execution and (
+                celery_execution.is_finished
+                or celery_execution.state in {
+                    'SUCCESS', 'FAILURE', 'REVOKED',
+                }
+        ):
+            if celery_execution.state == 'REVOKED':
+                execution_status = Status.canceled
+                reason = (
+                    'Task was forcibly terminated before completion; '
+                    'the remote secret state may be unknown.'
+                )
+            else:
+                execution_status = Status.error
+                reason = (
+                    'Celery task ended before the automation result was '
+                    'written back; the remote secret state may be unknown.'
+                )
+            finalize_interrupted_execution(
+                execution.id, reason, status=execution_status
+            )
+            _clear_missing_task_marker(execution.id)
+            continue
+        pending_inspection.append(execution)
+
+    if not pending_inspection:
+        return
+
+    active_tasks = _get_active_celery_tasks()
+    if active_tasks is None:
+        return
+    active_task_ids, responding_workers = active_tasks
+
+    stale_before = now - datetime.timedelta(
+        seconds=INTERRUPTED_TASK_START_GRACE
+    )
+    total_timeout = int(
+        getattr(settings, 'ANSIBLE_AUTOMATION_TOTAL_TIMEOUT', 21600)
+        or 0
+    )
+    unavailable_worker_stale_before = (
+        now - datetime.timedelta(seconds=total_timeout + 600)
+        if total_timeout > 0
+        else None
+    )
+    reason = (
+        'Celery task disappeared after its worker was forcibly terminated; '
+        'the remote secret state may be unknown.'
+    )
+    for execution in pending_inspection:
+        started_at = execution.date_start or execution.date_created
+        if started_at > stale_before:
+            continue
+
+        execution_id = str(execution.id)
+        owner_task_id = owner_task_ids[execution_id]
+        if owner_task_id in active_task_ids:
+            _clear_missing_task_marker(execution_id)
+            continue
+
+        # inspect() can return only a subset of workers during a network
+        # partition. Absence is authoritative only when the worker that owns
+        # this task replied. If that worker is unavailable, wait until the
+        # automation's own hard deadline has elapsed before recovery.
+        snapshot = execution.snapshot or {}
+        owner_worker = snapshot.get('celery_worker_hostname')
+        owner_worker_replied = (
+            owner_worker and owner_worker in responding_workers
+        )
+        if not owner_worker_replied and (
+                unavailable_worker_stale_before is None
+                or started_at > unavailable_worker_stale_before
+        ):
+            _clear_missing_task_marker(execution_id)
+            continue
+        if not _missing_task_confirmed(execution_id, now):
+            continue
+
+        recovered = finalize_interrupted_execution(
+            execution.id, reason, status=Status.canceled
+        )
+        if recovered:
+            CeleryTaskExecution.objects.filter(
+                id=owner_task_id,
+                is_finished=False,
+            ).update(
+                state='REVOKED',
+                is_finished=True,
+                date_finished=now,
+            )
+        _clear_missing_task_marker(execution_id)
 
 
 @shared_task(

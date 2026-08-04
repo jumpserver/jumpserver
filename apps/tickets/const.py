@@ -49,6 +49,9 @@ class TicketAction(TextChoices):
 class TicketLevel(IntegerChoices):
     one = 1, _("One level")
     two = 2, _("Two level")
+    three = 3, _("Three level")
+    four = 4, _("Four level")
+    five = 5, _("Five level")
 
 
 class TicketApplyAssetScope(TextChoices):

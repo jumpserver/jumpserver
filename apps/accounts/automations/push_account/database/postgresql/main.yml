@@ -6,27 +6,10 @@
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
+    effective_ssl_mode: >-
+      {{ jms_asset.spec_info.pg_ssl_mode if check_ssl else 'disable' }}
 
   tasks:
-    - name: Test PostgreSQL connection
-      community.postgresql.postgresql_ping:
-        login_user: "{{ jms_account.username }}"
-        login_password: "{{ jms_account.secret }}"
-        login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.port }}"
-        login_db: "{{ jms_asset.spec_info.db_name }}"
-        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
-        ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
-        ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
-      register: result
-      failed_when: not result.is_available
-
-    - name: Display PostgreSQL version
-      debug:
-        var: result.server_version.full
-      when: result is succeeded
-
     - name: Change PostgreSQL password
       community.postgresql.postgresql_user:
         login_user: "{{ jms_account.username }}"
@@ -39,14 +22,16 @@
         ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
+        ssl_mode: "{{ effective_ssl_mode }}"
+        connect_params:
+          connect_timeout: 15
+          options: "-c statement_timeout=30000 -c lock_timeout=15000"
         role_attr_flags: LOGIN
       ignore_errors: true
-      when: result is succeeded
-      register: change_info
+      register: change_secret_result
 
     - name: Verify password
-      community.postgresql.postgresql_ping:
+      postgresql_login_ping:
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
@@ -55,10 +40,25 @@
         ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
+        ssl_mode: "{{ effective_ssl_mode }}"
+        connect_timeout: 15
+      when: check_conn_after_change or change_secret_result.failed | default(false)
+      register: verify_secret_result
+      ignore_errors: true
+
+    - name: Mark PostgreSQL verification as inconclusive
+      ansible.builtin.set_fact:
+        jms_credential_probe:
+          auth_status: unknown
+          reason_code: POSTGRESQL_VERIFY_FAILED
+          change_succeeded: true
       when:
-        - result is succeeded
-        - change_info is succeeded
-        - check_conn_after_change
-      register: result
-      failed_when: not result.is_available
+        - not (change_secret_result.failed | default(false))
+        - verify_secret_result.failed | default(false)
+
+    - name: Fail when PostgreSQL push and verification both fail
+      ansible.builtin.fail:
+        msg: "PostgreSQL account push failed: {{ change_secret_result.msg | default('unknown error') }}"
+      when:
+        - change_secret_result.failed | default(false)
+        - verify_secret_result.failed | default(false)

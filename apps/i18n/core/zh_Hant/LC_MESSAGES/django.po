@@ -1916,7 +1916,7 @@ msgstr "上傳檔案大小限制"
 
 #: acls/models/clipboard_acl.py:42
 msgid "Clipboard acl"
-msgstr "剪貼簿 ACL"
+msgstr "剪貼簿訪問控制"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:92 terminal/const.py:88
@@ -10371,6 +10371,18 @@ msgstr "1 級"
 msgid "Two level"
 msgstr "2 級"
 
+#: tickets/const.py:52
+msgid "Three level"
+msgstr "3 級"
+
+#: tickets/const.py:53
+msgid "Four level"
+msgstr "4 級"
+
+#: tickets/const.py:54
+msgid "Five level"
+msgstr "5 級"
+
 #: tickets/const.py:55
 msgid "All assets"
 msgstr "所有資產"
@@ -10435,6 +10447,22 @@ msgstr "工單批准資訊"
 #: tickets/models/flow.py:53
 msgid "Ticket flow"
 msgstr "工單流程"
+
+#: tickets/serializers/flow.py:50
+msgid "A ticket flow with the same name and type already exists"
+msgstr "已存在同名且同類型的工單流"
+
+#: tickets/serializers/flow.py:57
+msgid "The number of approval rules must match the approval level"
+msgstr "審批規則數量必須與審批級數一致"
+
+#: tickets/serializers/ticket/ticket.py:109
+msgid "The selected ticket flow is not available"
+msgstr "所選工單流不可用"
+
+#: tickets/serializers/ticket/ticket.py:113
+msgid "Please select a ticket flow"
+msgstr "請選擇工單流"
 
 #: tickets/models/relation.py:12
 msgid "Ticket session relation"

@@ -1,25 +1,30 @@
 - hosts: demo
   gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
   tasks:
-    - name: Verify account connectivity(Do not switch)
-      ansible.builtin.ping:
-      vars:
-        ansible_become: no
-        ansible_user: "{{ account.username }}"
-        ansible_password: "{{ account.secret }}"
-        ansible_ssh_private_key_file: "{{ account.private_key_path }}"
-        ansible_timeout: 30
-      when: not account.become.ansible_become
-
-    - name: Verify account connectivity(Switch)
-      ansible.builtin.ping:
-      vars:
-        ansible_become: yes
-        ansible_user: "{{ account.become.ansible_user }}"
-        ansible_password: "{{ account.become.ansible_password }}"
-        ansible_ssh_private_key_file: "{{ account.become.ansible_ssh_private_key_file }}"
-        ansible_become_method: "{{ account.become.ansible_become_method }}"
-        ansible_become_user: "{{ account.become.ansible_become_user }}"
-        ansible_become_password: "{{ account.become.ansible_become_password }}"
-        ansible_timeout: 30
-      when: account.become.ansible_become
+    - name: Verify SSH credentials
+      ssh_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ account.username }}"
+        login_password: >-
+          {{ account.secret if account.secret_type == 'password' else '' }}
+        login_secret_type: "{{ account.secret_type }}"
+        login_private_key_path: "{{ account.private_key_path }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default(None) }}"
+        old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
+        become: >-
+          {{ (account.become.ansible_become | default(False))
+             and account.secret_type == 'password' }}
+        become_method: >-
+          {{ (account.become.ansible_become_method | default('su'))
+             if (account.become.ansible_become_method | default('su'))
+                in ['enable', 'super', 'super_level']
+             else 'su' }}
+        become_user: "{{ account.become.ansible_user | default('') }}"
+        become_password: "{{ account.become.ansible_password | default('') }}"
+        become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
+        recv_timeout: 30
+        auth_only: true

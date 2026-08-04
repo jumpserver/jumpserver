@@ -48,6 +48,3 @@
     - name: Merge GPU info into final info
       set_fact:
         info: "{{ info | combine({'gpu_model': gpu_info.stdout_lines | default([])}) }}"
-
-    - debug:
-        var: info

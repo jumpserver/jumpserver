@@ -6,6 +6,8 @@
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
+    effective_ssl_mode: >-
+      {{ jms_asset.spec_info.pg_ssl_mode if check_ssl else 'disable' }}
 
   tasks:
     - name: "Remove account"
@@ -19,5 +21,8 @@
         ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
         ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
         ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        ssl_mode: "{{ jms_asset.spec_info.pg_ssl_mode }}"
+        ssl_mode: "{{ effective_ssl_mode }}"
+        connect_params:
+          connect_timeout: 15
+          options: "-c statement_timeout=30000 -c lock_timeout=15000"
         state: absent
