@@ -617,7 +617,7 @@ msgstr "帳號活動"
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:107
+#: terminal/models/component/endpoint.py:108
 #: terminal/models/component/storage.py:26
 #: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
@@ -677,8 +677,8 @@ msgstr "最後使用日期"
 #: authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:118
+#: terminal/models/component/endpoint.py:24
+#: terminal/models/component/endpoint.py:119
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 msgid "Active"
 msgstr "啟用中"
@@ -910,7 +910,8 @@ msgstr "重複密碼"
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:119
+#: accounts/templates/accounts/push_account_report.html:118
+#: accounts/templates/accounts/push_account_report.html:158
 #: acls/serializers/base.py:19 acls/serializers/base.py:50
 #: audits/models.py:226 audits/reporting.py:241
 #: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
@@ -1373,8 +1374,8 @@ msgstr "IP 白名單"
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:43
 #: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:401
-#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:117
+#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:23
+#: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
@@ -1415,6 +1416,15 @@ msgid "Exclude symbol"
 msgstr "排除字元"
 
 #: accounts/serializers/account/template.py:22
+#, fuzzy
+#| msgid ""
+#| "length is the length of the password, and the range is 8 to 30.\n"
+#| "lowercase indicates whether the password contains lowercase letters, \n"
+#| "uppercase indicates whether it contains uppercase letters,\n"
+#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+#| "If you do not need to exclude symbols, you can leave it blank.\n"
+#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgid ""
 "length is the length of the password, and the range is 8 to 30.\n"
 "lowercase indicates whether the password contains lowercase letters, \n"
@@ -8487,6 +8497,86 @@ msgid ""
 "application server in remote applications."
 msgstr "虛擬應用程式，可以使用Linux作業系統作為遠程應用中的應用伺服器。"
 
+#: settings/serializers/luna.py:22
+#, fuzzy
+#| msgid "Default"
+msgid "Luna default"
+msgstr "默認"
+
+#: settings/serializers/luna.py:26 users/serializers/preference/lina.py:47
+#: users/serializers/profile.py:66
+msgid "Language"
+msgstr "語言"
+
+#: settings/serializers/luna.py:29 users/serializers/preference/luna.py:26
+msgid "Async loading of asset tree"
+msgstr "非同步載入資產樹"
+
+#: settings/serializers/luna.py:33 users/serializers/preference/luna.py:30
+msgid "Connect default open method"
+msgstr "連接默認打開方式"
+
+#: settings/serializers/luna.py:36 users/serializers/preference/luna.py:34
+#: xpack/plugins/interface/models.py:44
+#: xpack/plugins/interface/serializers/interface.py:35
+msgid "Theme"
+msgstr "主題"
+
+#: settings/serializers/luna.py:39 users/serializers/preference/luna.py:41
+msgid "RDP resolution"
+msgstr "RDP 解析度"
+
+#: settings/serializers/luna.py:42 users/serializers/preference/luna.py:45
+msgid "Keyboard layout"
+msgstr "鍵盤布局"
+
+#: settings/serializers/luna.py:46 users/serializers/preference/luna.py:49
+msgid "RDP client option"
+msgstr "RDP 用戶端選項"
+
+#: settings/serializers/luna.py:50 users/serializers/preference/luna.py:53
+msgid "RDP color quality"
+msgstr "RDP 顏色質量"
+
+#: settings/serializers/luna.py:53 users/serializers/preference/luna.py:57
+msgid "RDP smart size"
+msgstr "RDP 智慧尺寸"
+
+# msgid "Rdp smart size"
+# msgstr "RDP 智慧大小"
+#: settings/serializers/luna.py:55 users/serializers/preference/luna.py:58
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr "確定調整窗口大小時用戶端計算機是否應縮放遠程計算機上的內容以適應用戶端計算機的窗口大小"
+
+#: settings/serializers/luna.py:61 users/serializers/preference/luna.py:63
+msgid "Remote app connect method"
+msgstr "遠程應用連線方式"
+
+#: settings/serializers/luna.py:65 users/serializers/preference/koko.py:10
+#: users/serializers/preference/luna.py:67
+msgid "File name conflict resolution"
+msgstr "檔案名衝突解決方案"
+
+#: settings/serializers/luna.py:69 users/serializers/preference/luna.py:74
+msgid "Terminal font size"
+msgstr "字元終端機字體大小"
+
+#: settings/serializers/luna.py:72 users/serializers/preference/luna.py:77
+msgid "Backspace as Ctrl+H"
+msgstr "字元終端Backspace As Ctrl+H"
+
+#: settings/serializers/luna.py:75 users/serializers/preference/luna.py:80
+msgid "Right click quickly paste"
+msgstr "右鍵快速黏貼"
+
+#: settings/serializers/luna.py:78 users/serializers/preference/koko.py:14
+#: users/serializers/preference/luna.py:84
+msgid "Terminal theme name"
+msgstr "終端主題名稱"
+
 #: settings/serializers/msg.py:24
 msgid "SMTP"
 msgstr "SMTP"
@@ -11999,10 +12089,6 @@ msgstr "同步地區"
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "An error occurred while getting the instances of Region \"%s\", Error: %s"
-
-#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:290
-msgid "Instance"
-msgstr "實例"
 
 #: xpack/plugins/cloud/manager.py:195
 #, python-format

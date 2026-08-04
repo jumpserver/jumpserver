@@ -275,7 +275,7 @@
     "BindResource": "연관 리소스",
     "BindSuccess": "성공적으로 바인딩됨",
     "BiometricFeatures": "생체 정보",
-    "BlockedIPS": "잠금된 IP",
+    "BlockedIPS": "차단된 IP",
     "BuiltinVariable": "내장 변수",
     "BulkClearErrorMsg": "일괄 삭제 실패:",
     "BulkDeleteErrorMsg": "일괄 삭제 실패:",

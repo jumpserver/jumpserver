@@ -620,7 +620,7 @@ msgstr "Hoạt động tài khoản"
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:107
+#: terminal/models/component/endpoint.py:108
 #: terminal/models/component/storage.py:26
 #: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
@@ -680,8 +680,8 @@ msgstr "Ngày sử dụng cuối cùng"
 #: authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:118
+#: terminal/models/component/endpoint.py:24
+#: terminal/models/component/endpoint.py:119
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 msgid "Active"
 msgstr "Active"
@@ -913,7 +913,8 @@ msgstr "Mật khẩu trùng lặp"
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:119
+#: accounts/templates/accounts/push_account_report.html:118
+#: accounts/templates/accounts/push_account_report.html:158
 #: acls/serializers/base.py:19 acls/serializers/base.py:50
 #: audits/models.py:226 audits/reporting.py:241
 #: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
@@ -1407,8 +1408,8 @@ msgstr "Danh sách trắng IP"
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:43
 #: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:401
-#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:117
+#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:23
+#: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
@@ -1449,6 +1450,15 @@ msgid "Exclude symbol"
 msgstr "Ký tự loại trừ"
 
 #: accounts/serializers/account/template.py:22
+#, fuzzy
+#| msgid ""
+#| "length is the length of the password, and the range is 8 to 30.\n"
+#| "lowercase indicates whether the password contains lowercase letters, \n"
+#| "uppercase indicates whether it contains uppercase letters,\n"
+#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+#| "If you do not need to exclude symbols, you can leave it blank.\n"
+#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgid ""
 "length is the length of the password, and the range is 8 to 30.\n"
 "lowercase indicates whether the password contains lowercase letters, \n"
@@ -13290,244 +13300,10 @@ msgstr "Nhập giấy phép thành công"
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
 
-#: accounts/automations/base/manager.py:167
-#, python-format
-msgid "Account is already being processed, skipping: %(account)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:200
-msgid "Account not found, inactive, or not eligible for this task"
-msgstr ""
-
-#: accounts/automations/base/manager.py:314
-#, python-format
-msgid ""
-"The remote secret may have changed, but the independent credential "
-"verification was inconclusive: %(code)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:389
-#, python-format
-msgid ""
-"The remote operation completed, but saving the local account result failed: "
-"%(error)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:494
-msgid "Task ended before the account received a final result"
-msgstr ""
-
-#: accounts/automations/change_secret/manager.py:91
-#: accounts/automations/push_account/manager.py:86
-#, fuzzy, python-format
-#| msgid "Success: %s, Failed: %s, Total: %s"
-msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
-msgstr "Thành công: %s, Thất bại: %s, Tổng số: %s"
-
-#: accounts/const/automation.py:118
-#: accounts/serializers/automations/change_secret.py:193
-#, fuzzy
-#| msgid "Verified"
-msgid "Unverified"
-msgstr "Đã kiểm tra"
-
-#: accounts/serializers/account/template.py:22
-#, fuzzy
-#| msgid ""
-#| "length is the length of the password, and the range is 8 to 30.\n"
-#| "lowercase indicates whether the password contains lowercase letters, \n"
-#| "uppercase indicates whether it contains uppercase letters,\n"
-#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
-#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
-#| "If you do not need to exclude symbols, you can leave it blank.\n"
-#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
-msgid ""
-"length is the length of the password, and the range is 8 to 36.\n"
-"lowercase indicates whether the password contains lowercase letters, \n"
-"uppercase indicates whether it contains uppercase letters,\n"
-"digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
-"exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
-"If you do not need to exclude symbols, you can leave it blank.\n"
-"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
-msgstr ""
-"length là chiều dài của mật khẩu, điền trong khoảng từ 8 đến 30. lowercase "
-"cho biết mật khẩu có chứa chữ cái thường hay không, uppercase cho biết có "
-"chứa chữ cái hoa hay không, digit cho biết có chứa số hay không, symbol cho "
-"biết có chứa ký tự đặc biệt hay không. exclude_symbols dùng để loại trừ các "
-"ký hiệu cụ thể, bạn có thể điền các ký hiệu muốn loại trừ (tối đa 16 ký "
-"hiệu), nếu không cần loại trừ ký hiệu, có thể để trống. Mặc định: "
-"{\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, "
-"\"symbol\": true, \"exclude_symbols\": \"\"}"
-
-#: accounts/serializers/automations/change_secret.py:117
-msgid "Secret is required for the custom strategy"
-msgstr ""
-
-#: accounts/tasks/automation.py:185
-#, fuzzy
-#| msgid "Account automation task"
-msgid "Recover interrupted account automation tasks"
-msgstr "Nhiệm vụ tự động hóa tài khoản"
-
-#: accounts/tasks/automation.py:187
-msgid ""
-"Periodically reconcile account automation executions whose Celery\n"
-"        worker was forcibly terminated before task state and secret records\n"
-"        could be written back"
-msgstr ""
-
-#: accounts/templates/accounts/push_account_report.html:106
-#, fuzzy
-#| msgid "Specified account"
-msgid "Unverified accounts"
-msgstr "Tài khoản chỉ định"
-
-#: accounts/templates/accounts/push_account_report.html:132
-#, fuzzy
-#| msgid "Specified account"
-msgid "No unverified accounts"
-msgstr "Tài khoản chỉ định"
-
-#: assets/automations/base/manager.py:528
-#, fuzzy
-#| msgid "Asset not found"
-msgid "Asset not found or inactive"
-msgstr "Tài sản không tồn tại"
-
-#: assets/automations/base/manager.py:700
-#, python-format
-msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
-msgstr ""
-
-#: assets/automations/base/manager.py:718
-#, fuzzy
-#| msgid "Unknown"
-msgid "Unknown task"
-msgstr "Không xác định"
-
-#: assets/automations/base/manager.py:735
-#, python-format
-msgid " and %(count)s more"
-msgstr ""
-
-#: assets/automations/base/manager.py:798
-#, python-format
-msgid ">>> Still waiting for %(count)s host(s): %(detail)s"
-msgstr ""
-
-#: assets/automations/base/manager.py:804
-#: assets/automations/base/manager.py:961
-#: assets/automations/ping_gateway/manager.py:200
-#: assets/automations/ping_gateway/manager.py:234
-msgid "Task canceled by user"
-msgstr ""
-
-#: assets/automations/base/manager.py:921
-#: assets/automations/base/manager.py:1018
-msgid "Hosts still waiting"
-msgstr ""
-
-#: assets/automations/base/manager.py:1006
-#, python-format
-msgid "Ansible runner stopped before completing the batch: %(status)s"
-msgstr ""
-
-#: assets/automations/ping_gateway/manager.py:189
-msgid "Gateway not found or inactive"
-msgstr ""
-
-#: assets/automations/ping_gateway/manager.py:207
-#: assets/automations/ping_gateway/manager.py:242
-#, fuzzy
-#| msgid "Task execution completed"
-msgid "Task execution timed out"
-msgstr "Nhiệm vụ đã hoàn thành"
-
-#: assets/automations/ping_gateway/manager.py:251
-#, python-brace-format
-msgid "Connectivity succeeded but saving the result failed: {error}"
-msgstr ""
-
-#: ops/ansible/inventory.py:215
-msgid ""
-"The platform uses su, but the directly connected account does not have a "
-"target root credential. Configure su_from or use a root account."
-msgstr ""
-
-#: settings/serializers/luna.py:22
-#, fuzzy
-#| msgid "Default"
-msgid "Luna default"
-msgstr "Mặc định"
-
-#: terminal/models/component/endpoint.py:20
-#, fuzzy
-#| msgid "Image port"
-msgid "Magnus port"
-msgstr "Cổng hình ảnh"
-
-#: tickets/const.py:52
-#, fuzzy
-#| msgid "One level"
-msgid "Three level"
-msgstr "Cấp 1"
-
-#: tickets/const.py:53
-#, fuzzy
-#| msgid "Two level"
-msgid "Four level"
-msgstr "Cấp 2"
-
-#: tickets/const.py:54
-#, fuzzy
-#| msgid "One level"
-msgid "Five level"
-msgstr "Cấp 1"
-
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
-#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
-#: tickets/serializers/ticket/ticket.py:24
-#, fuzzy
-#| msgid "All users"
-msgid "CC users"
-msgstr "Tất cả người dùng"
-
-#: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
-msgid "A ticket you are copied on has been updated"
-msgstr "Tài sản \"%s\" đã được cập nhật."
-
-#: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
-msgid "Ticket updated - {} ({})"
-msgstr "Công việc của bạn đã được xử lý, người xử lý - {} ({})"
-
-#: tickets/serializers/flow.py:58
-#, fuzzy
-#| msgid ""
-#| "Please check if a user with the same username or email already exists"
-msgid "A ticket flow with the same name and type already exists"
-msgstr ""
-"Vui lòng kiểm tra xem có người dùng nào đã tồn tại với tên tài khoản hoặc "
-"email giống nhau hay không"
-
-#: tickets/serializers/flow.py:66
-msgid "The number of approval rules must match the approval level"
-msgstr ""
-
-#: tickets/serializers/ticket/ticket.py:110
-#, fuzzy
-#| msgid "The ticket flow `{}` does not exist"
-msgid "The selected ticket flow is not available"
-msgstr "Quy trình công việc `{}` không tồn tại"
-
-#: tickets/serializers/ticket/ticket.py:114
-#, fuzzy
-#| msgid "Please select file"
-msgid "Please select a ticket flow"
-msgstr "Chọn tệp"
+#~ msgid "Windows password cannot contain special characters like > ^"
+#~ msgstr ""
+#~ "Mật khẩu Windows không được bao gồm ký tự đặc biệt, ví dụ như > ^< -SEP->Tên"
+#~ " ACL"
 
 #~ msgid "Waiting task start"
 #~ msgstr "Chờ nhiệm vụ bắt đầu"

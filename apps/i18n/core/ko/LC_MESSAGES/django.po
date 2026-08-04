@@ -616,7 +616,7 @@ msgstr "계정 활동"
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:107
+#: terminal/models/component/endpoint.py:108
 #: terminal/models/component/storage.py:26
 #: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
@@ -676,8 +676,8 @@ msgstr "최종 사용 날짜"
 #: authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:118
+#: terminal/models/component/endpoint.py:24
+#: terminal/models/component/endpoint.py:119
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 msgid "Active"
 msgstr "활성화 중"
@@ -909,7 +909,8 @@ msgstr "중복 비밀번호"
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:119
+#: accounts/templates/accounts/push_account_report.html:118
+#: accounts/templates/accounts/push_account_report.html:158
 #: acls/serializers/base.py:19 acls/serializers/base.py:50
 #: audits/models.py:226 audits/reporting.py:241
 #: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
@@ -1373,8 +1374,8 @@ msgstr "IP 화이트리스트"
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:43
 #: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:401
-#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:117
+#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:23
+#: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
@@ -1415,6 +1416,15 @@ msgid "Exclude symbol"
 msgstr "문자열 제외"
 
 #: accounts/serializers/account/template.py:22
+#, fuzzy
+#| msgid ""
+#| "length is the length of the password, and the range is 8 to 30.\n"
+#| "lowercase indicates whether the password contains lowercase letters, \n"
+#| "uppercase indicates whether it contains uppercase letters,\n"
+#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+#| "If you do not need to exclude symbols, you can leave it blank.\n"
+#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgid ""
 "length is the length of the password, and the range is 8 to 30.\n"
 "lowercase indicates whether the password contains lowercase letters, \n"
@@ -8556,6 +8566,84 @@ msgid ""
 "application server in remote applications."
 msgstr "가상 애플리케이션은 원격 애플리케이션의 애플리케이션 서버로 리눅스 운영 체제를 사용할 수 있습니다."
 
+#: settings/serializers/luna.py:22
+#, fuzzy
+#| msgid "Default"
+msgid "Luna default"
+msgstr "기본"
+
+#: settings/serializers/luna.py:26 users/serializers/preference/lina.py:47
+#: users/serializers/profile.py:66
+msgid "Language"
+msgstr "언어"
+
+#: settings/serializers/luna.py:29 users/serializers/preference/luna.py:26
+msgid "Async loading of asset tree"
+msgstr "비동기식 자산 트리 로드"
+
+#: settings/serializers/luna.py:33 users/serializers/preference/luna.py:30
+msgid "Connect default open method"
+msgstr "연결 기본 열기 방식"
+
+#: settings/serializers/luna.py:36 users/serializers/preference/luna.py:34
+#: xpack/plugins/interface/models.py:44
+#: xpack/plugins/interface/serializers/interface.py:35
+msgid "Theme"
+msgstr "테마"
+
+#: settings/serializers/luna.py:39 users/serializers/preference/luna.py:41
+msgid "RDP resolution"
+msgstr "RDP 해상도"
+
+#: settings/serializers/luna.py:42 users/serializers/preference/luna.py:45
+msgid "Keyboard layout"
+msgstr "키보드 레이아웃"
+
+#: settings/serializers/luna.py:46 users/serializers/preference/luna.py:49
+msgid "RDP client option"
+msgstr "RDP 클라이언트 옵션"
+
+#: settings/serializers/luna.py:50 users/serializers/preference/luna.py:53
+msgid "RDP color quality"
+msgstr "RDP 색상 품질"
+
+#: settings/serializers/luna.py:53 users/serializers/preference/luna.py:57
+msgid "RDP smart size"
+msgstr "RDP 스마트 크기"
+
+#: settings/serializers/luna.py:55 users/serializers/preference/luna.py:58
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr "확인: 클라이언트 컴퓨터가 창 크기에 맞게 원격 컴퓨터의 내용을 축소해야 하는지 여부"
+
+#: settings/serializers/luna.py:61 users/serializers/preference/luna.py:63
+msgid "Remote app connect method"
+msgstr "원격 애플리케이션 연결 방식"
+
+#: settings/serializers/luna.py:65 users/serializers/preference/koko.py:10
+#: users/serializers/preference/luna.py:67
+msgid "File name conflict resolution"
+msgstr "파일 이름 충돌 해결 방법"
+
+#: settings/serializers/luna.py:69 users/serializers/preference/luna.py:74
+msgid "Terminal font size"
+msgstr "문자 터미널 글꼴 크기"
+
+#: settings/serializers/luna.py:72 users/serializers/preference/luna.py:77
+msgid "Backspace as Ctrl+H"
+msgstr "문자 터미널 백스페이스를 Ctrl+H로"
+
+#: settings/serializers/luna.py:75 users/serializers/preference/luna.py:80
+msgid "Right click quickly paste"
+msgstr "우클릭 빠른 붙여넣기"
+
+#: settings/serializers/luna.py:78 users/serializers/preference/koko.py:14
+#: users/serializers/preference/luna.py:84
+msgid "Terminal theme name"
+msgstr "터미널 테마 이름"
+
 #: settings/serializers/msg.py:24
 msgid "SMTP"
 msgstr "SMTP"
@@ -10908,9 +10996,16 @@ msgstr "신청인"
 msgid "Approval Step Distribution"
 msgstr "로그인 불필요 승인"
 
-#: tickets/serializers/flow.py:42
-msgid "The current organization type already exists"
-msgstr "현재 조직에 이미 이 유형이 존재합니다"
+#: tickets/serializers/flow.py:58
+#, fuzzy
+#| msgid ""
+#| "Please check if a user with the same username or email already exists"
+msgid "A ticket flow with the same name and type already exists"
+msgstr "같은 사용자 이름 또는 이메일을 가진 사용자가 이미 존재하는지 확인해 주세요"
+
+#: tickets/serializers/flow.py:66
+msgid "The number of approval rules must match the approval level"
+msgstr ""
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"

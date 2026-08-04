@@ -275,7 +275,7 @@
     "BindResource": "Tài nguyên liên quan",
     "BindSuccess": "Ràng buộc thành công",
     "BiometricFeatures": "Dấu hiệu sinh học",
-    "BlockedIPS": "Địa chỉ IP đã bị khóa",
+    "BlockedIPS": "Địa chỉ IP bị chặn",
     "BuiltinVariable": "Biến tích hợp sẵn",
     "BulkClearErrorMsg": "Xóa hàng loạt không thành công:",
     "BulkDeleteErrorMsg": "Xóa hàng loạt không thành công:",

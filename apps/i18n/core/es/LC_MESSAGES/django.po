@@ -641,7 +641,7 @@ msgstr "Actividad de cuenta"
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:107
+#: terminal/models/component/endpoint.py:108
 #: terminal/models/component/storage.py:26
 #: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
@@ -701,8 +701,8 @@ msgstr "Fecha de último uso"
 #: authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:82
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:118
+#: terminal/models/component/endpoint.py:24
+#: terminal/models/component/endpoint.py:119
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 msgid "Active"
 msgstr "Activado"
@@ -934,7 +934,8 @@ msgstr "Contraseña duplicada"
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:119
+#: accounts/templates/accounts/push_account_report.html:118
+#: accounts/templates/accounts/push_account_report.html:158
 #: acls/serializers/base.py:19 acls/serializers/base.py:50
 #: audits/models.py:226 audits/reporting.py:241
 #: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
@@ -1419,8 +1420,8 @@ msgstr "Lista blanca de IP"
 #: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:43
 #: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:401
-#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:117
+#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:23
+#: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
@@ -1461,6 +1462,15 @@ msgid "Exclude symbol"
 msgstr "caracteres a excluir"
 
 #: accounts/serializers/account/template.py:22
+#, fuzzy
+#| msgid ""
+#| "length is the length of the password, and the range is 8 to 30.\n"
+#| "lowercase indicates whether the password contains lowercase letters, \n"
+#| "uppercase indicates whether it contains uppercase letters,\n"
+#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+#| "If you do not need to exclude symbols, you can leave it blank.\n"
+#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgid ""
 "length is the length of the password, and the range is 8 to 30.\n"
 "lowercase indicates whether the password contains lowercase letters, \n"
@@ -2436,6 +2446,22 @@ msgid ">>> Start executing the task to test gateway connectivity"
 msgstr ""
 ">>> Comenzando a ejecutar la tarea de conectividad de la puerta de enlace de"
 " prueba"
+
+#: assets/automations/ping_gateway/manager.py:189
+msgid "Gateway not found or inactive"
+msgstr ""
+
+#: assets/automations/ping_gateway/manager.py:207
+#: assets/automations/ping_gateway/manager.py:242
+#, fuzzy
+#| msgid "Task execution completed"
+msgid "Task execution timed out"
+msgstr "Ejecución de tareas completada"
+
+#: assets/automations/ping_gateway/manager.py:251
+#, python-brace-format
+msgid "Connectivity succeeded but saving the result failed: {error}"
+msgstr ""
 
 #: assets/const/automation.py:6 audits/const.py:6 audits/const.py:48
 #: audits/signal_handlers/activity_log.py:63
@@ -11526,9 +11552,18 @@ msgstr "Solicitante"
 msgid "Approval Step Distribution"
 msgstr "Aprobación sin inicio de sesión"
 
-#: tickets/serializers/flow.py:42
-msgid "The current organization type already exists"
-msgstr "El tipo ya existe en la organización actual"
+#: tickets/serializers/flow.py:58
+#, fuzzy
+#| msgid ""
+#| "Please check if a user with the same username or email already exists"
+msgid "A ticket flow with the same name and type already exists"
+msgstr ""
+"Por favor, verifica si ya existe un usuario con el mismo nombre de usuario o"
+" correo electrónico"
+
+#: tickets/serializers/flow.py:66
+msgid "The number of approval rules must match the approval level"
+msgstr ""
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"

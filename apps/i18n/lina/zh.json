@@ -285,7 +285,7 @@
     "BindResource": "关联资源",
     "BindSuccess": "绑定成功",
     "BiometricFeatures": "生物特征",
-    "BlockedIPS": "已锁定的 IP",
+    "BlockedIPS": "已封禁的 IP",
     "BuiltinVariable": "内置变量",
     "BulkClearErrorMsg": "批量清除失败：",
     "BulkDeleteErrorMsg": "批量删除失败：",
