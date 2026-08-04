@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 
 from common.drf.filters import BaseFilterSet
@@ -6,7 +7,9 @@ from common.utils import is_uuid
 
 
 class ACLUserFilterMixin(BaseFilterSet):
-    users = drf_filters.CharFilter(method='filter_user')
+    users = drf_filters.CharFilter(
+        method='filter_user', label=_('User name, username or ID')
+    )
 
     @staticmethod
     def filter_user(queryset, name, value):
@@ -25,7 +28,9 @@ class ACLUserFilterMixin(BaseFilterSet):
 
 
 class ACLUserAssetFilterMixin(ACLUserFilterMixin):
-    assets = drf_filters.CharFilter(method='filter_asset')
+    assets = drf_filters.CharFilter(
+        method='filter_asset', label=_('Asset name, address or ID')
+    )
 
     @staticmethod
     def filter_asset(queryset, name, value):

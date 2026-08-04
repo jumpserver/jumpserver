@@ -18,7 +18,7 @@ class CommandGroupViewSet(OrgBulkModelViewSet):
 class CommandACLFilter(ACLUserAssetFilterMixin):
     class Meta:
         model = models.CommandFilterACL
-        fields = ['name', ]
+        fields = ['id', 'name', 'users', 'assets', 'action']
 
 
 class CommandFilterACLViewSet(OrgBulkModelViewSet):

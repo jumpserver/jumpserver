@@ -6,6 +6,7 @@ from common.exceptions import JMSException
 from common.permissions import IsValidLicenseForWriteAction
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
+from ..filters import RoleBindingFilter
 from .. import serializers
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 from ..permissions import RBACPermission
@@ -19,10 +20,7 @@ __all__ = [
 class RoleBindingViewSet(OrgBulkModelViewSet):
     model = RoleBinding
     serializer_class = serializers.RoleBindingSerializer
-    filterset_fields = [
-        'scope', 'user', 'role', 'org',
-        'user__name', 'user__username', 'role__name'
-    ]
+    filterset_class = RoleBindingFilter
     search_fields = [
         'user__name', 'user__username', 'role__name'
     ]

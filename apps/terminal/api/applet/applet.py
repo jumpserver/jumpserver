@@ -8,7 +8,7 @@ from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -139,7 +139,9 @@ class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
 
 
 class AppletPublicationFilterSet(BaseFilterSet):
-    host = filters.CharFilter(method='filter_host')
+    host = filters.CharFilter(
+        method='filter_host', label=gettext_lazy('Host name, address or ID')
+    )
 
     class Meta:
         model = AppletPublication

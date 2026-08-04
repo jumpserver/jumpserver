@@ -1,15 +1,38 @@
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
-from rbac.models import Role
+from rbac.models import Role, RoleBinding
+
+
+class RoleBindingFilter(BaseFilterSet):
+    user__name = filters.CharFilter(
+        field_name="user__name", label=_("User")
+    )
+    user__username = filters.CharFilter(
+        field_name="user__username", label=_("Username")
+    )
+    role__name = filters.CharFilter(
+        field_name="role__name", label=_("Role name")
+    )
+
+    class Meta:
+        model = RoleBinding
+        fields = [
+            "id", "scope", "user", "user__name", "user__username",
+            "role", "role__name", "org",
+        ]
 
 
 class RoleFilter(BaseFilterSet):
-    name = filters.CharFilter(method='filter_name')
+    name = filters.CharFilter(method='filter_name', label=_('Role name'))
 
     class Meta:
         model = Role
         fields = ('name', 'scope', 'builtin')
+        fields_operator = {
+            'name': ('icontains',),
+        }
 
     @staticmethod
     def filter_name(queryset, name, value):

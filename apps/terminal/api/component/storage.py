@@ -108,7 +108,9 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
 
 
 class ReplayStorageFilterSet(BaseFilterSet):
-    type_not = drf_filters.CharFilter(field_name='type', exclude=True)
+    type_not = drf_filters.CharFilter(
+        field_name='type', exclude=True, label=_('Exclude type')
+    )
 
     class Meta:
         model = ReplayStorage

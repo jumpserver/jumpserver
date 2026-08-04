@@ -3,12 +3,12 @@ import abc
 from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from assets.api.asset.asset import AssetFilterSet
 from assets.models import Asset, Node, MyAsset
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
 from perms import serializers
+from perms.filters import PermedAssetFilterSet
 from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
 from .mixin import (
@@ -43,7 +43,7 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
     ordering = []
     search_fields = ('name', 'address', 'comment')
     ordering_fields = ("name", "address", "connectivity", "date_updated")
-    filterset_class = AssetFilterSet
+    filterset_class = PermedAssetFilterSet
     serializer_class = serializers.AssetPermedSerializer
 
     def get_queryset(self):

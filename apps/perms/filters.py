@@ -1,29 +1,87 @@
 from django.db.models import QuerySet, Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
+from assets.const import AllTypes, GATEWAY_NAME
 from assets.models import Node, Asset
 from common.drf.filters import BaseFilterSet
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, is_uuid
 from perms.models import AssetPermission, AssetPermissionQuerySet
 from users.models import User, UserGroup
 
 
+class PermedAssetFilterSet(BaseFilterSet):
+    platform = filters.CharFilter(
+        method='filter_platform', label=_('Platform name or ID')
+    )
+    type = filters.ChoiceFilter(
+        field_name='platform__type', choices=AllTypes.choices(),
+        label=_('Platform type')
+    )
+    protocols = filters.CharFilter(
+        method='filter_protocols', label=_('Protocols')
+    )
+    zone = filters.CharFilter(
+        method='filter_zone', label=_('Zone name or ID')
+    )
+
+    class Meta:
+        model = Asset
+        fields = [
+            'id', 'name', 'address', 'platform', 'type', 'protocols',
+            'zone', 'is_active', 'comment',
+        ]
+        fields_operator = {
+            'platform': ('exact',),
+            'protocols': ('in',),
+            'zone': ('icontains',),
+        }
+
+    @staticmethod
+    def filter_platform(queryset, name, value):
+        if value.isdigit():
+            return queryset.filter(platform_id=value)
+        if value == GATEWAY_NAME:
+            return queryset.filter(
+                platform__name__istartswith=GATEWAY_NAME
+            )
+        return queryset.filter(platform__name=value)
+
+    @staticmethod
+    def filter_protocols(queryset, name, value):
+        protocols = value.split(',')
+        return queryset.filter(protocols__name__in=protocols).distinct()
+
+    @staticmethod
+    def filter_zone(queryset, name, value):
+        if is_uuid(value):
+            return queryset.filter(zone_id=value)
+        return queryset.filter(zone__name__icontains=value)
+
+
 class PermissionBaseFilter(BaseFilterSet):
-    is_valid = filters.BooleanFilter(method='do_nothing')
-    is_expired = filters.BooleanFilter(method='filter_expired')
-    user_id = filters.UUIDFilter(method='do_nothing')
-    username = filters.CharFilter(method='do_nothing')
-    account_id = filters.UUIDFilter(method='do_nothing')
-    account = filters.CharFilter(method='do_nothing')
-    user_group_id = filters.UUIDFilter(method='do_nothing')
-    user_group = filters.CharFilter(method='do_nothing')
-    all = filters.BooleanFilter(method='do_nothing')
+    is_valid = filters.BooleanFilter(
+        method='do_nothing', label=_('Is valid')
+    )
+    is_expired = filters.BooleanFilter(
+        method='filter_expired', label=_('Is expired')
+    )
+    user_id = filters.UUIDFilter(method='do_nothing', label=_('User ID'))
+    username = filters.CharFilter(method='do_nothing', label=_('Username'))
+    user_group_id = filters.UUIDFilter(
+        method='do_nothing', label=_('User group ID')
+    )
+    user_group = filters.CharFilter(
+        field_name='user_groups__name', method='do_nothing',
+        label=_('User group name')
+    )
+    all = filters.BooleanFilter(method='do_nothing', label=_('All'))
 
     class Meta:
         fields = (
-            'user_id', 'username', 'account_id', 'account',
-            'user_group_id', 'user_group', 'name', 'all', 'is_valid',
+            'user_id', 'username', 'user_group_id', 'user_group', 'name',
+            'all', 'is_valid', 'is_expired',
         )
 
     @property
@@ -101,24 +159,37 @@ class PermissionBaseFilter(BaseFilterSet):
 
 
 class AssetPermissionFilter(PermissionBaseFilter):
-    is_effective = filters.BooleanFilter(method='do_nothing')
-    node_id = filters.UUIDFilter(method='do_nothing')
-    node_name = filters.CharFilter(method='do_nothing')
-    asset_id = filters.UUIDFilter(method='do_nothing')
-    asset_name = filters.CharFilter(method='do_nothing')
-    address = filters.CharFilter(method='do_nothing')
-    accounts = filters.CharFilter(method='do_nothing')
-    ip = filters.CharFilter(method='do_nothing')
-    is_no_resource = filters.BooleanFilter(method='filter_no_resource')
+    is_effective = filters.BooleanFilter(
+        method='do_nothing', label=_('Is effective')
+    )
+    node_id = filters.UUIDFilter(method='do_nothing', label=_('Node ID'))
+    node_name = filters.CharFilter(
+        method='do_nothing', label=_('Node name')
+    )
+    asset_id = filters.UUIDFilter(method='do_nothing', label=_('Asset ID'))
+    asset_name = filters.CharFilter(
+        field_name='assets__name', method='do_nothing',
+        label=_('Asset name')
+    )
+    address = filters.CharFilter(method='do_nothing', label=_('Asset address'))
+    accounts = filters.CharFilter(method='do_nothing', label=_('Accounts'))
+    is_no_resource = filters.BooleanFilter(
+        method='filter_no_resource', label=_('No resource')
+    )
 
     class Meta:
         model = AssetPermission
         fields = (
-            'user_id', 'username', 'user_group_id',
-            'user_group', 'node_id', 'node_name', 'asset_id',
-            'asset_name', 'name', 'ip', 'name', 'is_active',
-            'all', 'is_valid', 'is_effective', 'from_ticket'
+            'id', 'name', 'all', 
+            'user_id', 'username', 'user_group_id', 'user_group',
+            'node_id', 'node_name', 'asset_id', 'asset_name',
+            'address', 'accounts',
+            'is_active', 'is_valid', 'is_expired',
+            'is_effective', 'is_no_resource', 'from_ticket',
         )
+        fields_operator = {
+            'accounts': ('in',),
+        }
 
     @property
     def qs(self):

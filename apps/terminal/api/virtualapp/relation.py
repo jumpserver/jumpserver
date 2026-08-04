@@ -8,7 +8,7 @@ from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
 from common.utils import is_uuid
 from rbac.permissions import RBACPermission
-from terminal.models import AppProvider
+from terminal.models import AppProvider, VirtualAppPublication
 from terminal.serializers import (
     VirtualAppPublicationSerializer
 )
@@ -48,6 +48,7 @@ class ProviderMixin:
 
 
 class AppProviderAppViewSet(ProviderMixin, JMSModelViewSet):
+    queryset = VirtualAppPublication.objects.none()
     provider: AppProvider
     serializer_class = VirtualAppPublicationSerializer
     filterset_fields = ['provider__name', 'app__name', 'status']

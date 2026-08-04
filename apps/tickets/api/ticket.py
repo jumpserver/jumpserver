@@ -41,6 +41,10 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     search_fields = [
         'title', 'type', 'status'
     ]
+    ordering_fields = [
+        'title', 'serial_num', 'type', 'state', 'status', 'applicant',
+        'date_created',
+    ]
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
