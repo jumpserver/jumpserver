@@ -280,7 +280,7 @@
     "BindResource": "Associate resources",
     "BindSuccess": "Binding successful",
     "BiometricFeatures": "Biometric Features",
-    "BlockedIPS": "Locked ips",
+    "BlockedIPS": "Blocked IPs",
     "BuiltinVariable": "Built-in variables",
     "BulkClearErrorMsg": "Bulk clear failed: ",
     "BulkDeleteErrorMsg": "Bulk delete failed: ",

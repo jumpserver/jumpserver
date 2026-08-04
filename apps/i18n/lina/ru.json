@@ -276,7 +276,7 @@
     "BindResource": "Связанный ресурс",
     "BindSuccess": "Успешное связывание",
     "BiometricFeatures": "Биометрические данные",
-    "BlockedIPS": "Заблокированные IP",
+    "BlockedIPS": "Заблокированные IP-адреса",
     "BuiltinVariable": "Встроенные переменные",
     "BulkClearErrorMsg": "Массовая очистка не удалась:",
     "BulkDeleteErrorMsg": "Массовое удаление не удалось:",

@@ -283,7 +283,7 @@
     "BindResource": "關聯資源",
     "BindSuccess": "綁定成功",
     "BiometricFeatures": "生物特徵",
-    "BlockedIPS": "已鎖定的 IP",
+    "BlockedIPS": "已封鎖的 IP",
     "BuiltinVariable": "內建變數",
     "BulkClearErrorMsg": "批次清除失敗：",
     "BulkDeleteErrorMsg": "批次刪除失敗: ",

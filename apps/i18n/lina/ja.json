@@ -279,7 +279,7 @@
     "BindResource": "関連リソース",
     "BindSuccess": "バインディング成功",
     "BiometricFeatures": "生物特性",
-    "BlockedIPS": "ロックされたIP",
+    "BlockedIPS": "ブロックされた IP",
     "BuiltinVariable": "組み込み変数",
     "BulkClearErrorMsg": "一括クリアエラー：",
     "BulkDeleteErrorMsg": "一括削除エラー：",
