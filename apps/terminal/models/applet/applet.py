@@ -152,6 +152,7 @@ class Applet(JMSBaseModel):
 
     @classmethod
     def install_from_dir(cls, path, builtin=True):
+        from assets.const import AllTypes
         from terminal.serializers import AppletSerializer
 
         manifest = cls.validate_pkg(path)
@@ -166,6 +167,7 @@ class Applet(JMSBaseModel):
         if os.path.exists(pkg_path):
             shutil.rmtree(pkg_path)
         shutil.copytree(path, pkg_path)
+        AllTypes.reload_automation_methods()
         return instance, serializer
 
     host_prefer_key_tpl = 'applet_host_prefer_{}'

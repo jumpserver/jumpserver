@@ -154,6 +154,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
                 tmp_dir, instance=instance, created_by='PlatformPackageUpload'
             )
             persist_platform_package(tmp_dir, platform.name)
+            AllTypes.reload_automation_methods()
             output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
             return Response(output_serializer.data, status=201)
         finally:
