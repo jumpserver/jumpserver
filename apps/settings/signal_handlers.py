@@ -48,7 +48,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 @receiver(django_ready)
 def on_django_ready_add_db_config(sender, **kwargs):
     Setting.refresh_all_settings()
-    
+
 
 @receiver(django_ready)
 def auto_generate_terminal_host_key(sender, **kwargs):
@@ -153,6 +153,5 @@ def on_django_ready_init_syslog_handler(sender, **kwargs):
     try:
         from jumpserver.settings.logging import reconfigure_syslog_handler
         reconfigure_syslog_handler()
-    except Exception:
-        import traceback
-        traceback.print_exc()
+    except Exception as e:
+        logger.error('Failed to reconfigure syslog handler: %s', e)
