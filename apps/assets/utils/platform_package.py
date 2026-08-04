@@ -7,7 +7,12 @@ from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
-from assets.automations.methods import get_platform_automation_methods, check_platform_methods
+from assets.automations.methods import (
+    check_platform_method,
+    check_platform_methods,
+    generate_serializer,
+    get_platform_automation_methods,
+)
 from assets.const import AllTypes, Category
 from common.utils.yml import yaml_load_with_i18n
 
@@ -46,8 +51,11 @@ def has_platform_package(pkg_dir):
 
 def locate_package_root(extract_to, filename, required_file):
     candidates = []
+    if os.path.exists(os.path.join(extract_to, required_file)):
+        candidates.append(extract_to)
 
-    expected = os.path.join(extract_to, filename.replace('.zip', ''))
+    expected_name, _ = os.path.splitext(filename)
+    expected = os.path.join(extract_to, expected_name)
     if os.path.exists(expected):
         candidates.append(expected)
 
@@ -90,10 +98,48 @@ def load_platform_package_data(pkg_dir):
 
 
 def get_platform_automation_methods_from_pkg(pkg_dir, lang=None):
-    automations_dir = os.path.join(pkg_dir, 'automations')
+    automations_dir = pkg_dir
+    if os.path.basename(os.path.normpath(pkg_dir)) != 'automations':
+        automations_dir = os.path.join(pkg_dir, 'automations')
     if not os.path.isdir(automations_dir):
         return []
-    return get_platform_automation_methods(automations_dir, lang=lang)
+    methods = []
+    for action in os.listdir(automations_dir):
+        if is_ignored_pkg_path(action):
+            continue
+        action_dir = os.path.join(automations_dir, action)
+        if not os.path.isdir(action_dir):
+            continue
+
+        manifest_path = os.path.join(action_dir, 'manifest.yml')
+        main_path = os.path.join(action_dir, 'main.yml')
+        if not os.path.exists(manifest_path):
+            raise ValidationError({
+                'error': _('Package automation missing manifest.yml: {}').format(action)
+            })
+        if not os.path.exists(main_path):
+            raise ValidationError({
+                'error': _('Package automation missing main.yml: {}').format(action)
+            })
+
+        try:
+            with open(manifest_path, 'r', encoding='utf8') as f:
+                manifest = yaml_load_with_i18n(f, lang=lang)
+            check_platform_method(manifest, manifest_path)
+        except ValueError as e:
+            raise ValidationError({'error': str(e)})
+
+        if manifest.get('method') != action:
+            raise ValidationError({
+                'error': _('Package automation method does not match directory name: {}').format(action)
+            })
+
+        manifest['dir'] = action_dir
+        manifest['params_serializer'] = generate_serializer(manifest)
+        methods.append(manifest)
+
+    check_platform_methods(methods)
+    return methods
 
 
 def get_persisted_platform_automation_methods(lang=None, exclude_platform_name=None):

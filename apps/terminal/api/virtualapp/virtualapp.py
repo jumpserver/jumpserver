@@ -3,7 +3,6 @@ import shutil
 from typing import Callable
 
 from django.core.files.storage import default_storage
-from django.utils._os import safe_join
 from django.utils.translation import gettext as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -41,7 +40,7 @@ class UploadMixin:
             safe_extract_zip(path, extract_to)
         except RuntimeError as e:
             raise ValidationError({'error': _('Invalid zip file') + ': {}'.format(e)})
-        tmp_dir = safe_join(extract_to, file.name.replace('.zip', ''))
+        tmp_dir = VirtualApp.locate_pkg_root(extract_to, file.name)
         return tmp_dir
 
     @action(detail=False, methods=['post'], serializer_class=FileSerializer)

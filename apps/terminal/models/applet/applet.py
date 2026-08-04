@@ -105,7 +105,8 @@ class Applet(JMSBaseModel):
 
     @staticmethod
     def get_automation_methods(path=None, lang=None):
-        from assets.automations.methods import get_platform_automation_methods, check_platform_methods
+        from assets.automations.methods import check_platform_methods
+        from assets.utils.platform_package import get_platform_automation_methods_from_pkg
 
         methods = []
         try:
@@ -116,7 +117,7 @@ class Applet(JMSBaseModel):
             applet_path = path or applet.automations_path
             if not os.path.isdir(applet_path):
                 continue
-            applet_methods = get_platform_automation_methods(applet_path, lang=lang)
+            applet_methods = get_platform_automation_methods_from_pkg(applet_path, lang=lang)
             methods.extend(applet_methods)
         check_platform_methods(methods)
         return methods
