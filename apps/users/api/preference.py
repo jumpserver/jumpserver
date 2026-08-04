@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from common.permissions import IsValidUser
@@ -44,8 +48,17 @@ class PreferenceApi(generics.RetrieveUpdateAPIView):
             if isinstance(field, Serializer):
                 field_defaults[name] = self.get_field_defaults(field)
                 continue
-            field_defaults[name] = getattr(field, 'default', None)
+            default = getattr(field, 'default', None)
+            setting_name = self.get_default_setting_name(name)
+            field_defaults[name] = getattr(settings, setting_name, default)
         return field_defaults
+
+    def get_default_setting_name(self, field_name):
+        if self.category == 'lina' and field_name == 'lang':
+            return 'LANGUAGE_CODE'
+        if self.category == 'luna':
+            return f'LUNA_DEFAULT_{field_name.upper()}'
+        return ''
 
     def get_encrypted_fields(self, serializer):
         encrypted_fields = []
@@ -58,6 +71,15 @@ class PreferenceApi(generics.RetrieveUpdateAPIView):
                 continue
             encrypted_fields.append(name)
         return encrypted_fields
+
+    def get_field_names(self, serializer):
+        field_names = []
+        for name, field in serializer.get_fields().items():
+            if isinstance(field, Serializer):
+                field_names += self.get_field_names(field)
+                continue
+            field_names.append(name)
+        return field_names
 
     def get_object(self):
         serializer = self.get_serializer_class()()
@@ -91,3 +113,22 @@ class PreferenceApi(generics.RetrieveUpdateAPIView):
                 defaults['value'] = value
                 defaults.update(kwargs)
                 model.objects.update_or_create(defaults, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        names = request.data.get('names', [])
+        if isinstance(names, str):
+            names = [names]
+        if not isinstance(names, (list, tuple)) or not all(isinstance(name, str) for name in names):
+            raise ValidationError({'names': _('Invalid preference fields')})
+
+        serializer = self.get_serializer_class()()
+        valid_names = set(self.get_field_names(serializer))
+        invalid_names = set(names) - valid_names
+        if invalid_names:
+            raise ValidationError({'names': _('Invalid preference fields')})
+
+        self.queryset.filter(
+            user=self.user, category=self.category, name__in=names
+        ).delete()
+        data = self.get_serializer(self.get_object()).data
+        return Response(data)
