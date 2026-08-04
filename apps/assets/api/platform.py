@@ -132,22 +132,28 @@ class AssetPlatformViewSet(JMSModelViewSet):
             shutil.rmtree(extract_to)
 
         try:
-            safe_extract_zip(path, extract_to)
-        except RuntimeError as e:
-            raise ValidationError({'error': 'Invalid zip file: {}'.format(e)})
+            try:
+                safe_extract_zip(path, extract_to)
+            except RuntimeError as e:
+                raise ValidationError({'error': 'Invalid zip file: {}'.format(e)})
 
-        tmp_dir = locate_package_root(extract_to, file.name, 'platform.yml')
-        data = validate_platform_package(tmp_dir)
-        if not data:
-            raise ValidationError({'error': 'Missing platform.yml in package'})
-        name = data['name']
-        instance = Platform.objects.filter(name=name).first()
-        platform = save_platform_from_package(
-            tmp_dir, instance=instance, created_by='PlatformPackageUpload'
-        )
-        persist_platform_package(tmp_dir, platform.name)
-        output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
-        return Response(output_serializer.data, status=201)
+            tmp_dir = locate_package_root(extract_to, file.name, 'platform.yml')
+            data = validate_platform_package(tmp_dir)
+            if not data:
+                raise ValidationError({'error': 'Missing platform.yml in package'})
+            name = data['name']
+            instance = Platform.objects.filter(name=name).first()
+            platform = save_platform_from_package(
+                tmp_dir, instance=instance, created_by='PlatformPackageUpload'
+            )
+            persist_platform_package(tmp_dir, platform.name)
+            output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
+            return Response(output_serializer.data, status=201)
+        finally:
+            if default_storage.exists(rel_path):
+                default_storage.delete(rel_path)
+            if os.path.exists(extract_to):
+                shutil.rmtree(extract_to)
 
 
 class PlatformProtocolViewSet(JMSModelViewSet):
