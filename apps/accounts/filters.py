@@ -22,7 +22,7 @@ from .const.account import Source
 from .models import (
     Account, AccountRisk, AutomationExecution, BackupAccountAutomation,
     ChangeSecretAutomation, ChangeSecretRecord, CheckAccountAutomation,
-    CheckAccountEngine, GatheredAccount, IntegrationApplication,
+    GatheredAccount, IntegrationApplication,
     PushSecretRecord, RiskChoice,
 )
 from .utils import account_secret_task_status
@@ -85,12 +85,6 @@ class ChangeSecretAutomationFilterSet(BaseFilterSet):
 class CheckAccountAutomationFilterSet(BaseFilterSet):
     class Meta:
         model = CheckAccountAutomation
-        fields = ["id", "name"]
-
-
-class CheckAccountEngineFilterSet(BaseFilterSet):
-    class Meta:
-        model = CheckAccountEngine
         fields = ["id", "name"]
 
 

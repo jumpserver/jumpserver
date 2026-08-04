@@ -1,10 +1,12 @@
 # ~*~ coding: utf-8 ~*~
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
+from django_filters import rest_framework as drf_filters
 from django.views.generic.detail import SingleObjectMixin
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView, Response
 
 from assets.tasks import test_gateways_connectivity_manual
+from common.drf.filters import BaseFilterSet
 from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from .asset import HostViewSet
@@ -13,6 +15,21 @@ from ..models import Zone, Gateway
 
 logger = get_logger(__file__)
 __all__ = ['ZoneViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
+
+
+class GatewayFilterSet(BaseFilterSet):
+    zone = drf_filters.UUIDFilter(
+        field_name='zone_id', label=gettext_lazy('Zone ID')
+    )
+    zone__name = drf_filters.CharFilter(
+        field_name='zone__name', label=gettext_lazy('Zone name')
+    )
+
+    class Meta:
+        model = Gateway
+        fields = (
+            'id', 'name', 'address', 'connectivity', 'zone', 'zone__name',
+        )
 
 
 class ZoneViewSet(OrgBulkModelViewSet):
@@ -36,7 +53,8 @@ class ZoneViewSet(OrgBulkModelViewSet):
 
 class GatewayViewSet(HostViewSet):
     perm_model = Gateway
-    search_fields = ("zone__name",)
+    filterset_class = GatewayFilterSet
+    search_fields = ('name', 'address', 'zone__name')
 
     def get_serializer_classes(self):
         serializer_classes = super().get_serializer_classes()

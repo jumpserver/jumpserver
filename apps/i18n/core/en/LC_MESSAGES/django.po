@@ -2701,6 +2701,14 @@ msgstr ""
 msgid "Zone"
 msgstr ""
 
+#: assets/api/zone.py:22
+msgid "Zone ID"
+msgstr ""
+
+#: assets/api/zone.py:25
+msgid "Zone name"
+msgstr ""
+
 #: assets/models/asset/common.py:176 assets/serializers/asset/common.py:182
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
 #: perms/serializers/permission.py:59

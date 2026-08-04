@@ -945,13 +945,13 @@ msgstr "检测引擎"
 
 #: accounts/models/automations/check_account.py:133
 msgid "Check the discovered accounts"
-msgstr "检查发现的帐户"
+msgstr "检查发现的账号"
 
 #: accounts/models/automations/check_account.py:135
 msgid ""
 "Perform checks and analyses based on automatically discovered account "
 "results, including user groups, public keys, sudoers, and other information."
-msgstr "根据自动发现的账户结果进行检查分析，包括用户组、公钥、sudoers等信息。"
+msgstr "根据自动发现的账号结果进行检查分析，包括用户组、公钥、sudoers等信息。"
 
 #: accounts/models/automations/check_account.py:142
 msgid "Check the strength of your account and password"
@@ -2751,6 +2751,14 @@ msgstr "平台"
 #: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:402
 msgid "Zone"
 msgstr "网域"
+
+#: assets/api/zone.py:22
+msgid "Zone ID"
+msgstr "网域 ID"
+
+#: assets/api/zone.py:25
+msgid "Zone name"
+msgstr "网域名称"
 
 #: assets/models/asset/common.py:176 assets/serializers/asset/common.py:182
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
