@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: audits/models.py:44 audits/models.py:46
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-04 10:14+0800\n"
+"POT-Creation-Date: 2026-07-31 11:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,11 +28,12 @@ msgid "No valid assets found for account creation."
 msgstr "Không tìm thấy tài sản hợp lệ để tạo tài khoản."
 
 #: accounts/api/account/application.py:89
-#: authentication/api/connection_token.py:667
+#: authentication/api/connection_token.py:634
 msgid "Account not found"
 msgstr "Tài khoản không tìm thấy"
 
 #: accounts/api/automations/base.py:88 tickets/api/ticket.py:134
+#, python-brace-format
 msgid "The parameter 'action' must be [{}]"
 msgstr "Tham số 'action' phải là [{}]"
 
@@ -51,9 +51,9 @@ msgstr "Tạo tệp thông tin sao lưu liên quan đến tài sản"
 
 #: accounts/automations/backup_account/handlers.py:178
 #: accounts/automations/backup_account/manager.py:26
-#: accounts/automations/change_secret/manager.py:101
-#: accounts/automations/push_account/manager.py:66
-#: assets/models/automations/base.py:157 ops/serializers/job.py:71
+#: accounts/automations/change_secret/manager.py:81
+#: accounts/automations/push_account/manager.py:62
+#: assets/models/automations/base.py:147 ops/serializers/job.py:71
 #: ops/serializers/job.py:95
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 #: terminal/serializers/session.py:57
@@ -93,68 +93,46 @@ msgid "The account backup plan is being executed"
 msgstr "Kế hoạch sao lưu tài khoản đang được thực hiện"
 
 #: accounts/automations/backup_account/manager.py:24
-#: accounts/automations/change_secret/manager.py:99
-#: accounts/automations/push_account/manager.py:64
+#: accounts/automations/change_secret/manager.py:79
+#: accounts/automations/push_account/manager.py:60
 msgid "Plan execution end"
 msgstr "Kế hoạch thực hiện đã kết thúc"
 
-#: accounts/automations/base/manager.py:129
+#: accounts/automations/base/manager.py:119
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows không hỗ trợ xác thực bằng khóa SSH"
 
-#: accounts/automations/base/manager.py:151
+#: accounts/automations/base/manager.py:123
+msgid "Windows password cannot contain special characters like > ^"
+msgstr ""
+"Mật khẩu Windows không được bao gồm ký tự đặc biệt, ví dụ như > ^< -SEP->Tên"
+" ACL"
+
+#: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
 msgstr "Không tìm thấy tài khoản chờ xử lý"
 
-#: accounts/automations/base/manager.py:167
+#: accounts/automations/change_secret/manager.py:72
 #, python-format
-msgid "Account is already being processed, skipping: %(account)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:200
-msgid "Account not found, inactive, or not eligible for this task"
-msgstr ""
-
-#: accounts/automations/base/manager.py:314
-#, python-format
-msgid ""
-"The remote secret may have changed, but the independent credential "
-"verification was inconclusive: %(code)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:389
-#, python-format
-msgid ""
-"The remote operation completed, but saving the local account result failed: "
-"%(error)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:494
-msgid "Task ended before the account received a final result"
-msgstr ""
-
-#: accounts/automations/change_secret/manager.py:91
-#: accounts/automations/push_account/manager.py:86
-#, fuzzy, python-format
-#| msgid "Success: %s, Failed: %s, Total: %s"
-msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
+msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "Thành công: %s, Thất bại: %s, Tổng số: %s"
 
-#: accounts/automations/check_account/manager.py:287
+#: accounts/automations/check_account/manager.py:277
+#, python-brace-format
 msgid "Check account report of {}"
 msgstr "Báo cáo phát hiện rủi ro {}"
 
-#: accounts/automations/check_account/manager.py:293
+#: accounts/automations/check_account/manager.py:283
+#, python-brace-format
 msgid ""
 "---\n"
 "Summary: \n"
-"ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no "
-"secret: {}, using time: {}s"
+"ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no secret: {}, using time: {}s"
 msgstr ""
 "--- Tóm tắt: Bình thường: {}, Mật khẩu yếu: {}, Mật khẩu bị rò rỉ: {}, Mật "
 "khẩu trùng lặp: {}, Không có mật khẩu: {}, Thời gian tiêu tốn: {} giây"
 
-#: accounts/automations/push_account/manager.py:35
+#: accounts/automations/push_account/manager.py:33
 msgid "Secret cannot be empty"
 msgstr "Nội dung mã hóa không được để trống"
 
@@ -165,19 +143,22 @@ msgstr ""
 
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:37
-#: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:25
-#: authentication/confirm/password.py:27 authentication/const.py:14
-#: authentication/forms.py:28
+#: audits/signal_handlers/login_log.py:34
+#: authentication/confirm/password.py:25 authentication/confirm/password.py:27
+#: authentication/const.py:14 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:369
-#: authentication/templates/authentication/login.html:415 reports/mixins.py:194
-#: settings/models.py:217 settings/serializers/auth/ldap.py:31
-#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/ldap_ha.py:39
-#: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
-#: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
-#: users/forms/profile.py:22 users/serializers/user.py:153
+#: authentication/templates/authentication/login.html:415
+#: reports/mixins.py:194 settings/models.py:217
+#: settings/serializers/auth/ldap.py:31 settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap_ha.py:39 settings/serializers/msg.py:37
+#: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
+#: terminal/serializers/storage.py:142 users/forms/profile.py:22
+#: users/serializers/user.py:153
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:43
+#: xpack/plugins/cloud/serializers/account_attrs.py:105
+#: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "Password"
 msgstr "Mật khẩu"
 
@@ -236,7 +217,8 @@ msgstr "Phát hiện"
 msgid "Template"
 msgstr "Mẫu"
 
-#: accounts/const/account.py:32 ops/const.py:47 xpack/plugins/cloud/const.py:76
+#: accounts/const/account.py:32 ops/const.py:47
+#: xpack/plugins/cloud/const.py:76
 msgid "Skip"
 msgstr "Bỏ qua"
 
@@ -246,7 +228,7 @@ msgid "Update"
 msgstr "Cập nhật"
 
 #: accounts/const/account.py:34 accounts/const/automation.py:115
-#: accounts/serializers/automations/change_secret.py:194 audits/const.py:66
+#: accounts/serializers/automations/change_secret.py:173 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:67
 #: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:55
 msgid "Failed"
@@ -354,10 +336,11 @@ msgstr "Chỉ tạo"
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
-#: settings/serializers/msg.py:62 users/forms/profile.py:101
-#: users/forms/profile.py:111 users/models/user/__init__.py:68
-#: users/notifications.py:22 users/notifications.py:67
-#: users/notifications.py:189 users/templates/users/forgot_password.html:162
+#: settings/serializers/msg.py:62 users/filters.py:15
+#: users/forms/profile.py:101 users/forms/profile.py:111
+#: users/models/user/__init__.py:68 users/notifications.py:22
+#: users/notifications.py:67 users/notifications.py:189
+#: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
 msgstr "Hộp thư"
@@ -367,7 +350,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:116
-#: accounts/serializers/automations/change_secret.py:191 audits/const.py:65
+#: accounts/serializers/automations/change_secret.py:172 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
@@ -380,76 +363,69 @@ msgstr "Success"
 msgid "Pending"
 msgstr "Đang chờ xử lý"
 
-#: accounts/const/automation.py:118
-#: accounts/serializers/automations/change_secret.py:193
-#, fuzzy
-#| msgid "Verified"
-msgid "Unverified"
-msgstr "Đã kiểm tra"
-
-#: accounts/const/automation.py:122
+#: accounts/const/automation.py:121
 msgid "Queued"
 msgstr "Sẵn sàng"
 
-#: accounts/const/automation.py:123 common/const/choices.py:63
+#: accounts/const/automation.py:122 common/const/choices.py:63
 msgid "Ready"
 msgstr "Đang xử lý"
 
-#: accounts/const/automation.py:124
+#: accounts/const/automation.py:123
 msgid "Processing"
 msgstr "Có thể đăng nhập"
 
-#: accounts/const/automation.py:128
+#: accounts/const/automation.py:127
 msgid "Can login"
 msgstr "Siêu người dùng"
 
-#: accounts/const/automation.py:129 users/serializers/user.py:260
+#: accounts/const/automation.py:128 users/serializers/user.py:260
 msgid "Superuser"
 msgstr "Ngày tạo"
 
-#: accounts/const/automation.py:130
+#: accounts/const/automation.py:129
 msgid "Create date"
 msgstr "Đã bị vô hiệu hóa"
 
-#: accounts/const/automation.py:131
+#: accounts/const/automation.py:130
 msgid "Is disabled"
 msgstr "Tên cơ sở dữ liệu mặc định"
 
-#: accounts/const/automation.py:132
+#: accounts/const/automation.py:131
 msgid "Default database name"
 msgstr "UID"
 
-#: accounts/const/automation.py:133
+#: accounts/const/automation.py:132
 msgid "UID"
 msgstr "Trạng thái tài khoản"
 
-#: accounts/const/automation.py:134
+#: accounts/const/automation.py:133
 msgid "Account status"
 msgstr "Trạng thái tài khoản"
 
-#: accounts/const/automation.py:135
+#: accounts/const/automation.py:134
 msgid "Default tablespace"
 msgstr "Không gian bảng mặc định"
 
-#: accounts/const/automation.py:136 rbac/models/role.py:46
+#: accounts/const/automation.py:135 rbac/models/role.py:46
 #: rbac/models/rolebinding.py:53 users/models/user/__init__.py:79
 msgid "Role"
 msgstr "Vai trò"
 
-#: accounts/const/automation.py:137 users/serializers/profile.py:195
+#: accounts/const/automation.py:136 users/serializers/profile.py:195
 msgid "Perms"
 msgstr "Quyền hạn"
 
-#: accounts/const/automation.py:138 perms/serializers/permission.py:56
+#: accounts/const/automation.py:137 perms/serializers/permission.py:56
 #: users/serializers/user.py:251
 msgid "Groups"
 msgstr "Nhóm người dùng"
 
-#: accounts/const/automation.py:140
+#: accounts/const/automation.py:139
 msgid "Authorized keys"
 msgstr "Khóa xác thực"
 
-#: accounts/const/automation.py:141
+#: accounts/const/automation.py:140
 msgid "DB"
 msgstr "Cơ sở dữ liệu"
 
@@ -490,9 +466,9 @@ msgstr ""
 #: accounts/models/automations/gather_account.py:17
 #: accounts/serializers/account/account.py:228
 #: accounts/serializers/account/account.py:295
-#: accounts/serializers/automations/change_secret.py:135
-#: accounts/serializers/automations/change_secret.py:168
-#: accounts/serializers/automations/change_secret.py:211
+#: accounts/serializers/automations/change_secret.py:116
+#: accounts/serializers/automations/change_secret.py:149
+#: accounts/serializers/automations/change_secret.py:190
 #: accounts/serializers/automations/check_account.py:33
 #: accounts/serializers/automations/gather_account.py:48
 #: accounts/templates/accounts/asset_account_change_info.html:7
@@ -501,8 +477,7 @@ msgstr ""
 #: accounts/templates/accounts/gather_account_report.html:77
 #: accounts/templates/accounts/gather_account_report.html:117
 #: accounts/templates/accounts/push_account_report.html:78
-#: accounts/templates/accounts/push_account_report.html:117
-#: accounts/templates/accounts/push_account_report.html:157
+#: accounts/templates/accounts/push_account_report.html:118
 #: acls/notifications.py:70 acls/serializers/base.py:110
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:430
 #: assets/models/cmd_filter.py:36 audits/models.py:67 audits/models.py:388
@@ -569,16 +544,17 @@ msgstr "Trạng thái đổi mật khẩu"
 #: accounts/models/automations/check_account.py:64
 #: accounts/serializers/account/account.py:296
 #: accounts/serializers/account/service.py:13
-#: accounts/serializers/automations/change_secret.py:137
-#: accounts/serializers/automations/change_secret.py:169
+#: accounts/serializers/automations/change_secret.py:118
+#: accounts/serializers/automations/change_secret.py:150
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:259
-#: authentication/api/connection_token.py:679 ops/models/base.py:18
+#: authentication/api/connection_token.py:646 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:31
-#: terminal/notifications.py:306 terminal/serializers/command.py:72
+#: terminal/backends/command/models.py:18
+#: terminal/models/session/session.py:31 terminal/notifications.py:306
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
@@ -644,19 +620,20 @@ msgstr "Hoạt động tài khoản"
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:108
-#: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
+#: terminal/models/component/endpoint.py:107
+#: terminal/models/component/storage.py:26
+#: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:89
-#: tickets/models/flow.py:42 tickets/serializers/flow.py:26
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
 #: users/notifications.py:21 users/notifications.py:106
 #: users/notifications.py:145 users/notifications.py:184
 #: users/notifications.py:224 users/notifications.py:252
 #: users/notifications.py:279 xpack/plugins/cloud/models.py:35
-#: xpack/plugins/cloud/models.py:316 xpack/plugins/cloud/serializers/task.py:77
+#: xpack/plugins/cloud/models.py:316
+#: xpack/plugins/cloud/serializers/task.py:77
 msgid "Name"
 msgstr "Tên"
 
@@ -684,24 +661,27 @@ msgid "Accounts"
 msgstr "Tài khoản"
 
 #: accounts/models/application.py:22 authentication/models/access_key.py:21
-#: terminal/models/component/endpoint.py:109
+#: terminal/models/component/endpoint.py:108
 msgid "IP group"
 msgstr "Nhóm IP"
 
 #: accounts/models/application.py:23
 #: authentication/backends/passkey/models.py:14
 #: authentication/models/access_key.py:25
-#: authentication/models/private_token.py:8 authentication/models/ssh_key.py:20
+#: authentication/models/private_token.py:8
+#: authentication/models/ssh_key.py:20
 msgid "Date last used"
 msgstr "Ngày sử dụng cuối cùng"
 
 #: accounts/models/application.py:24 acls/models/base.py:43
 #: assets/models/asset/common.py:182 authentication/models/access_key.py:24
 #: authentication/models/connection_token.py:61
-#: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
+#: authentication/models/ssh_key.py:13
+#: authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:24
-#: terminal/models/component/endpoint.py:119
+#: perms/models/asset_permission.py:82
+#: terminal/models/component/endpoint.py:30
+#: terminal/models/component/endpoint.py:118
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 msgid "Active"
 msgstr "Active"
@@ -811,7 +791,7 @@ msgid "Change secret automation"
 msgstr "Tự động hóa đổi mật khẩu"
 
 #: accounts/models/automations/change_secret.py:47
-#: assets/models/automations/base.py:155 ops/models/base.py:56
+#: assets/models/automations/base.py:145 ops/models/base.py:56
 #: ops/models/celery.py:90 ops/models/job.py:242
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
@@ -821,14 +801,14 @@ msgstr "Ngày kết thúc"
 #: accounts/models/automations/check_account.py:73
 #: accounts/models/automations/gather_account.py:26
 #: accounts/serializers/automations/check_account.py:39
-#: assets/models/automations/base.py:147
+#: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:47 audits/models.py:252
 #: audits/reporting.py:607 audits/serializers.py:77 ops/models/base.py:49
 #: ops/models/job.py:233 terminal/models/applet/applet.py:400
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:285
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:284
 #: tickets/reporting.py:80 tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:233
 #: xpack/plugins/cloud/models.py:300
@@ -877,7 +857,7 @@ msgstr "Có thể xem hoạt động tài khoản"
 msgid "Can add check account execution"
 msgstr "Có thể thêm kiểm tra tình trạng hoạt động tài khoản"
 
-#: accounts/models/automations/check_account.py:43
+#: accounts/models/automations/check_account.py:43 users/filters.py:47
 msgid "Long time no login"
 msgstr "Chưa đăng nhập trong thời gian dài"
 
@@ -902,7 +882,7 @@ msgid "Authorized keys changed"
 msgstr "Thay đổi khóa"
 
 #: accounts/models/automations/check_account.py:49
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:28 users/filters.py:44
 msgid "Password expired"
 msgstr "Mật khẩu đã hết hạn"
 
@@ -933,12 +913,11 @@ msgstr "Mật khẩu trùng lặp"
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:118
-#: accounts/templates/accounts/push_account_report.html:158
-#: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:226
-#: audits/reporting.py:241 authentication/backends/ukey/forms.py:8
-#: authentication/forms.py:21 authentication/forms.py:23
-#: authentication/models/temp_token.py:10
+#: accounts/templates/accounts/push_account_report.html:119
+#: acls/serializers/base.py:19 acls/serializers/base.py:50
+#: audits/models.py:226 audits/reporting.py:241
+#: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
+#: authentication/forms.py:23 authentication/models/temp_token.py:10
 #: authentication/serializers/connect_token_secret.py:45
 #: authentication/serializers/connect_token_secret.py:55
 #: authentication/templates/authentication/_msg_different_city.html:9
@@ -949,6 +928,8 @@ msgstr "Mật khẩu trùng lặp"
 #: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
+#: xpack/plugins/cloud/serializers/account_attrs.py:103
+#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Username"
 msgstr "Tên đăng nhập"
 
@@ -1009,13 +990,14 @@ msgstr "Kiểm tra xem tài khoản này có giống với các tài khoản kh�
 #: accounts/models/automations/check_account.py:157
 msgid "Check whether the account password is a common password"
 msgstr ""
-"Kiểm tra xem tài khoản và mật khẩu có phải là mật khẩu thông thường hay không"
+"Kiểm tra xem tài khoản và mật khẩu có phải là mật khẩu thông thường hay "
+"không"
 
 #: accounts/models/automations/check_account.py:158
 msgid "Check whether the account password is a commonly leaked password."
 msgstr ""
-"Kiểm tra xem tài khoản và mật khẩu có phải là mật khẩu bị rò rỉ thông thường "
-"hay không."
+"Kiểm tra xem tài khoản và mật khẩu có phải là mật khẩu bị rò rỉ thông thường"
+" hay không."
 
 #: accounts/models/automations/gather_account.py:19
 msgid "Address login"
@@ -1085,14 +1067,14 @@ msgid "Secret strategy"
 msgstr ""
 "Chính sách mật văn < - SEP -> Quy tắc mật khẩu < - SEP -> Đẩy tự động < - "
 "SEP -> Nền tảng < - SEP -> Tham số đẩy tài khoản < - SEP -> Mẫu tài khoản < "
-"- SEP -> Có thể xem mật khẩu mẫu tài khoản tài sản < - SEP -> Tên gọi khác < "
-"- SEP -> Giống như khi người dùng đăng nhập < - SEP -> Tài khoản ảo < - SEP -"
-"> Tên người dùng giống như của người dùng < - SEP -> Nhập tay tên người dùng/"
-"mật khẩu để kết nối với tài khoản khi đăng nhập < - SEP -> Khi đăng nhập tài "
-"sản, tài khoản có tên người dùng giống như tên người dùng sử dụng < - SEP -> "
-"Tài khoản không sử dụng tên người dùng và mật khẩu khi kết nối với tài sản, "
-"chỉ hỗ trợ tài sản loại web và loại tùy chỉnh < - SEP -> Thông báo kết quả "
-"nhiệm vụ sao lưu tài khoản."
+"- SEP -> Có thể xem mật khẩu mẫu tài khoản tài sản < - SEP -> Tên gọi khác <"
+" - SEP -> Giống như khi người dùng đăng nhập < - SEP -> Tài khoản ảo < - SEP"
+" -> Tên người dùng giống như của người dùng < - SEP -> Nhập tay tên người "
+"dùng/mật khẩu để kết nối với tài khoản khi đăng nhập < - SEP -> Khi đăng "
+"nhập tài sản, tài khoản có tên người dùng giống như tên người dùng sử dụng <"
+" - SEP -> Tài khoản không sử dụng tên người dùng và mật khẩu khi kết nối với"
+" tài sản, chỉ hỗ trợ tài sản loại web và loại tùy chỉnh < - SEP -> Thông báo"
+" kết quả nhiệm vụ sao lưu tài khoản."
 
 #: accounts/models/base.py:44 accounts/serializers/account/template.py:32
 #: accounts/serializers/automations/change_secret.py:50
@@ -1155,8 +1137,8 @@ msgstr ""
 #: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
 msgstr ""
-"Khi đăng nhập tài sản, tài khoản tên người dùng giống với tên người dùng của "
-"người sử dụng"
+"Khi đăng nhập tài sản, tài khoản tên người dùng giống với tên người dùng của"
+" người sử dụng"
 
 #: accounts/models/virtual.py:39
 msgid ""
@@ -1171,42 +1153,48 @@ msgid "Notification of account backup route task results"
 msgstr "Thông báo kết quả nhiệm vụ sao lưu tài khoản."
 
 #: accounts/notifications.py:23 accounts/notifications.py:48
+#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
 msgstr ""
-"{} - Nhiệm vụ sao lưu tài khoản đã hoàn tất, chi tiết xem trong tệp đính kèm."
+"{} - Nhiệm vụ sao lưu tài khoản đã hoàn tất, chi tiết xem trong tệp đính "
+"kèm."
 
 #: accounts/notifications.py:26
+#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
 "encryption password for preference settings"
 msgstr ""
 "{} - Nhiệm vụ sao lưu tài khoản đã hoàn tất: Chưa thiết lập mật khẩu mã hóa "
-"- Vui lòng truy cập thông tin cá nhân -> Thiết lập ưa thích để thiết lập mật "
-"khẩu mã hóa tệp."
+"- Vui lòng truy cập thông tin cá nhân -> Thiết lập ưa thích để thiết lập mật"
+" khẩu mã hóa tệp."
 
 #: accounts/notifications.py:58
 msgid "Notification of implementation result of encryption change plan"
 msgstr "Thông báo kết quả nhiệm vụ thay đổi mật khẩu."
 
 #: accounts/notifications.py:69
+#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr ""
-"{} - Nhiệm vụ thay đổi mật khẩu đã hoàn tất, chi tiết xem trong tệp đính kèm."
+"{} - Nhiệm vụ thay đổi mật khẩu đã hoàn tất, chi tiết xem trong tệp đính "
+"kèm."
 
 #: accounts/notifications.py:73
+#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
 "password in preferences"
 msgstr ""
 "{} - Nhiệm vụ thay đổi mật khẩu đã hoàn tất: Chưa thiết lập mật khẩu mã hóa "
-"- Vui lòng truy cập thông tin cá nhân -> Thiết lập ưa thích để thiết lập mật "
-"khẩu mã hóa."
+"- Vui lòng truy cập thông tin cá nhân -> Thiết lập ưa thích để thiết lập mật"
+" khẩu mã hóa."
 
 #: accounts/notifications.py:86
 msgid "Gather account change information"
@@ -1253,6 +1241,7 @@ msgid "Change password and Add"
 msgstr "Thay đổi mật khẩu và thêm."
 
 #: accounts/risk_handlers.py:127
+#, python-brace-format
 msgid "Execution failed: {}"
 msgstr "Thực thi không thành công: {}"
 
@@ -1281,21 +1270,21 @@ msgstr "Thể loại"
 
 #: accounts/serializers/account/account.py:208 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:22 assets/models/automations/base.py:27
-#: assets/models/automations/base.py:156 assets/models/cmd_filter.py:74
+#: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:147
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:76
 #: audits/serializers.py:223 authentication/models/connection_token.py:68
-#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:155
-#: perms/serializers/user_permission.py:28 reports/models.py:16
-#: terminal/models/applet/applet.py:46 terminal/models/component/storage.py:58
+#: authentication/serializers/connect_token_secret.py:140
+#: ops/models/job.py:155 perms/serializers/user_permission.py:28
+#: reports/models.py:16 terminal/models/applet/applet.py:46
+#: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
-#: tickets/models/flow.py:46 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:277 tickets/reporting.py:70
-#: tickets/serializers/flow.py:29 tickets/serializers/flow.py:100
-#: tickets/serializers/ticket/ticket.py:19
+#: tickets/models/flow.py:43 tickets/models/ticket/apply_application.py:16
+#: tickets/models/ticket/general.py:276 tickets/reporting.py:70
+#: tickets/serializers/flow.py:25 tickets/serializers/ticket/ticket.py:19
 msgid "Type"
 msgstr "Loại"
 
@@ -1320,7 +1309,7 @@ msgstr "Đã quản lý mật khẩu"
 
 #: accounts/serializers/account/account.py:297 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
-#: tickets/models/ticket/general.py:281 tickets/reporting.py:75
+#: tickets/models/ticket/general.py:280 tickets/reporting.py:75
 #: tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
@@ -1364,22 +1353,23 @@ msgstr "ID"
 #: acls/notifications.py:68 acls/serializers/base.py:103
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
-#: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:63
-#: audits/models.py:105 audits/models.py:197 audits/models.py:344
-#: audits/reporting.py:104 audits/reporting.py:317 audits/reporting.py:414
-#: audits/serializers.py:224 authentication/models/connection_token.py:38
+#: assets/models/cmd_filter.py:24 assets/models/label.py:16
+#: audits/models.py:63 audits/models.py:105 audits/models.py:197
+#: audits/models.py:344 audits/reporting.py:104 audits/reporting.py:317
+#: audits/reporting.py:414 audits/serializers.py:224
+#: authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: authentication/notifications.py:16 authentication/notifications.py:55
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
 #: rbac/models/rolebinding.py:50 rbac/serializers/rolebinding.py:17
-#: terminal/backends/command/models.py:16 terminal/models/session/session.py:27
-#: terminal/models/session/sharing.py:34 terminal/notifications.py:168
-#: terminal/notifications.py:235 terminal/reporting.py:118
-#: terminal/serializers/command.py:16
+#: terminal/backends/command/models.py:16
+#: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
+#: terminal/notifications.py:168 terminal/notifications.py:235
+#: terminal/reporting.py:118 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 tickets/serializers/flow.py:16
+#: tickets/models/comment.py:21 tickets/serializers/flow.py:15
 #: users/const.py:14 users/models/user/__init__.py:308
 #: users/models/user/__init__.py:341
 msgid "User"
@@ -1413,15 +1403,15 @@ msgstr "Danh sách trắng IP"
 
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
-#: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:165 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:43 terminal/models/applet/applet.py:52
-#: terminal/models/applet/applet.py:401 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:23
-#: terminal/models/component/endpoint.py:118
+#: assets/models/cmd_filter.py:88 common/db/models.py:36
+#: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
+#: rbac/models/role.py:37 settings/models.py:43
+#: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:401
+#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
+#: terminal/models/component/endpoint.py:117
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:303 users/models/user/__init__.py:104
+#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "Description"
@@ -1459,29 +1449,14 @@ msgid "Exclude symbol"
 msgstr "Ký tự loại trừ"
 
 #: accounts/serializers/account/template.py:22
-#, fuzzy
-#| msgid ""
-#| "length is the length of the password, and the range is 8 to 30.\n"
-#| "lowercase indicates whether the password contains lowercase letters, \n"
-#| "uppercase indicates whether it contains uppercase letters,\n"
-#| "digit indicates whether it contains numbers, and symbol indicates whether "
-#| "it contains special symbols.\n"
-#| "exclude_symbols is used to exclude specific symbols. You can fill in the "
-#| "symbol characters to be excluded (up to 16). \n"
-#| "If you do not need to exclude symbols, you can leave it blank.\n"
-#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, "
-#| "\"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgid ""
-"length is the length of the password, and the range is 8 to 36.\n"
+"length is the length of the password, and the range is 8 to 30.\n"
 "lowercase indicates whether the password contains lowercase letters, \n"
 "uppercase indicates whether it contains uppercase letters,\n"
-"digit indicates whether it contains numbers, and symbol indicates whether it "
-"contains special symbols.\n"
-"exclude_symbols is used to exclude specific symbols. You can fill in the "
-"symbol characters to be excluded (up to 16). \n"
+"digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+"exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
 "If you do not need to exclude symbols, you can leave it blank.\n"
-"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, "
-"\"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgstr ""
 "length là chiều dài của mật khẩu, điền trong khoảng từ 8 đến 30. lowercase "
 "cho biết mật khẩu có chứa chữ cái thường hay không, uppercase cho biết có "
@@ -1494,7 +1469,8 @@ msgstr ""
 
 #: accounts/serializers/account/template.py:47
 msgid "Secret generation strategy for account creation"
-msgstr "Chiến lược tạo mật khẩu, dùng để thiết lập mật khẩu khi tạo tài khoản."
+msgstr ""
+"Chiến lược tạo mật khẩu, dùng để thiết lập mật khẩu khi tạo tài khoản."
 
 #: accounts/serializers/account/template.py:48
 msgid "Whether to automatically push the account to the asset"
@@ -1538,7 +1514,7 @@ msgid "Name already exists"
 msgstr "Tên đã tồn tại"
 
 #: accounts/serializers/automations/base.py:31
-#: assets/models/automations/base.py:159
+#: assets/models/automations/base.py:149
 #: assets/serializers/automations/base.py:45
 msgid "Automation snapshot"
 msgstr "Chụp nhanh tự động"
@@ -1562,35 +1538,31 @@ msgid ""
 msgstr ""
 "Cài đặt tham số, hiện chỉ có hiệu lực đối với loại tài sản AIX, LINUX, UNIX."
 
-#: accounts/serializers/automations/change_secret.py:92
+#: accounts/serializers/automations/change_secret.py:89
 msgid "* Please enter the correct password length"
 msgstr "* Vui lòng nhập độ dài mật khẩu chính xác"
 
-#: accounts/serializers/automations/change_secret.py:96
+#: accounts/serializers/automations/change_secret.py:93
 msgid "* Password length range 8-36 bits"
 msgstr "* Độ dài mật khẩu trong khoảng 8-36 ký tự"
 
-#: accounts/serializers/automations/change_secret.py:117
-msgid "Secret is required for the custom strategy"
-msgstr ""
-
-#: accounts/serializers/automations/change_secret.py:134
-#: accounts/serializers/automations/change_secret.py:170
+#: accounts/serializers/automations/change_secret.py:115
+#: accounts/serializers/automations/change_secret.py:151
 #: ops/serializers/job.py:93 terminal/serializers/session.py:62
 msgid "Is success"
 msgstr "Is success"
 
-#: accounts/serializers/automations/change_secret.py:141
-#: assets/models/automations/base.py:181
+#: accounts/serializers/automations/change_secret.py:122
+#: assets/models/automations/base.py:165
 msgid "Automation task execution"
 msgstr "Lịch sử thực hiện tác vụ tự động."
 
-#: accounts/serializers/automations/change_secret.py:213
+#: accounts/serializers/automations/change_secret.py:192
 msgid "TTL"
 msgstr "TTL"
 
-#: accounts/serializers/automations/change_secret.py:214
-#: assets/models/platform.py:97 tickets/models/ticket/general.py:306
+#: accounts/serializers/automations/change_secret.py:193
+#: assets/models/platform.py:97 tickets/models/ticket/general.py:301
 msgid "Meta"
 msgstr "Siêu dữ liệu"
 
@@ -1619,75 +1591,52 @@ msgstr "Thêm tài khoản: %s"
 msgid "Delete account: %s"
 msgstr "Xóa tài khoản: %s"
 
-#: accounts/tasks/automation.py:43
+#: accounts/tasks/automation.py:33
 msgid "Account execute automation"
 msgstr "Tài khoản thực hiện hành động tự động"
 
-#: accounts/tasks/automation.py:46
+#: accounts/tasks/automation.py:36
 msgid ""
-"Unified execution entry for account automation tasks: when the system "
-"performs tasks \n"
-"        such as account push, password change, account verification, account "
-"collection, \n"
-"        and gateway account verification, all tasks are executed through "
-"this unified entry"
+"Unified execution entry for account automation tasks: when the system performs tasks \n"
+"        such as account push, password change, account verification, account collection, \n"
+"        and gateway account verification, all tasks are executed through this unified entry"
 msgstr ""
 "Cổng vào thực hiện nhiệm vụ tự động hóa tài khoản được thống nhất, khi hệ "
 "thống thực hiện việc đưa tài khoản vào, thay đổi mật khẩu, xác minh tài "
 "khoản, thu thập tài khoản và xác minh nhiệm vụ tài khoản cổng, tất cả được "
 "thực hiện thông qua nhiệm vụ hiện tại"
 
-#: accounts/tasks/automation.py:75 accounts/tasks/automation.py:83
+#: accounts/tasks/automation.py:65 accounts/tasks/automation.py:73
 msgid "Execute automation record"
 msgstr "Ghi chép thực hiện tự động"
 
-#: accounts/tasks/automation.py:78
+#: accounts/tasks/automation.py:68
 msgid "When manually executing password change records, this task is used"
 msgstr ""
 "Khi ghi lại việc thay đổi mật khẩu được thực hiện thủ công, nó sẽ thông qua "
 "nhiệm vụ này"
 
-#: accounts/tasks/automation.py:185
-#, fuzzy
-#| msgid "Account automation task"
-msgid "Recover interrupted account automation tasks"
-msgstr "Nhiệm vụ tự động hóa tài khoản"
-
-#: accounts/tasks/automation.py:187
-msgid ""
-"Periodically reconcile account automation executions whose Celery\n"
-"        worker was forcibly terminated before task state and secret records\n"
-"        could be written back"
-msgstr ""
-
-#: accounts/tasks/automation.py:359
+#: accounts/tasks/automation.py:116
 msgid "Clean change secret and push record period"
 msgstr "Dọn dẹp theo chu kỳ ghi chép thay đổi mật khẩu và ghi chép đẩy"
 
-#: accounts/tasks/automation.py:361
+#: accounts/tasks/automation.py:118
 msgid ""
-"The system will periodically clean up unnecessary password change and push "
-"records, \n"
-"        including their associated change tasks, execution logs, assets, and "
-"accounts. When any \n"
-"        of these associated items are deleted, the corresponding password "
-"change and push records \n"
-"        become invalid. Therefore, to maintain a clean and efficient "
-"database, the system will \n"
-"        clean up expired records at 2 a.m daily, based on the interval "
-"specified by \n"
-"        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. "
-"This periodic cleanup \n"
-"        mechanism helps free up storage space and enhances the security and "
-"overall performance \n"
+"The system will periodically clean up unnecessary password change and push records, \n"
+"        including their associated change tasks, execution logs, assets, and accounts. When any \n"
+"        of these associated items are deleted, the corresponding password change and push records \n"
+"        become invalid. Therefore, to maintain a clean and efficient database, the system will \n"
+"        clean up expired records at 2 a.m daily, based on the interval specified by \n"
+"        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. This periodic cleanup \n"
+"        mechanism helps free up storage space and enhances the security and overall performance \n"
 "        of data management"
 msgstr ""
-"Hệ thống sẽ định kỳ dọn dẹp những ghi chép thay đổi mật khẩu và ghi chép đẩy "
-"không còn cần thiết, bao gồm những nhiệm vụ thay đổi mật khẩu liên quan, ghi "
-"chép thực hiện, tài sản và tài khoản. Khi bất kỳ một trong những mục liên "
-"quan này bị xóa, các ghi chép thay đổi mật khẩu và ghi chép đẩy tương ứng sẽ "
-"trở nên vô hiệu. Do đó, để giữ cho cơ sở dữ liệu gọn gàng và hoạt động hiệu "
-"quả, theo khoảng thời gian cấu hình trong file config.txt tại "
+"Hệ thống sẽ định kỳ dọn dẹp những ghi chép thay đổi mật khẩu và ghi chép đẩy"
+" không còn cần thiết, bao gồm những nhiệm vụ thay đổi mật khẩu liên quan, "
+"ghi chép thực hiện, tài sản và tài khoản. Khi bất kỳ một trong những mục "
+"liên quan này bị xóa, các ghi chép thay đổi mật khẩu và ghi chép đẩy tương "
+"ứng sẽ trở nên vô hiệu. Do đó, để giữ cho cơ sở dữ liệu gọn gàng và hoạt "
+"động hiệu quả, theo khoảng thời gian cấu hình trong file config.txt tại "
 "PERM_EXPIRED_CHECK_PERIODIC, sẽ tiến hành dọn dẹp những nội dung hết thời "
 "gian vào lúc 2 giờ sáng mỗi ngày. Cơ chế dọn dẹp định kỳ này không chỉ giúp "
 "giải phóng không gian lưu trữ mà còn nâng cao sự an toàn trong quản lý dữ "
@@ -1702,8 +1651,8 @@ msgid ""
 "Whenever an account is created or modified and needs pushing to assets, run "
 "this task"
 msgstr ""
-"Mỗi khi tạo hoặc sửa đổi tài khoản và cần đưa vào tài sản, hãy chạy nhiệm vụ "
-"này."
+"Mỗi khi tạo hoặc sửa đổi tài khoản và cần đưa vào tài sản, hãy chạy nhiệm vụ"
+" này."
 
 #: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
@@ -1718,8 +1667,7 @@ msgstr ""
 
 #: accounts/tasks/remove_account.py:28
 msgid ""
-"When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered "
-"accounts' this \n"
+"When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered accounts' this \n"
 "        task will be executed"
 msgstr ""
 "Trong bảng điều khiển - Thu thập tài khoản - Nhấp chuột vào đồng bộ xóa "
@@ -1731,12 +1679,9 @@ msgstr "Dọn dẹp tài khoản lịch sử"
 
 #: accounts/tasks/remove_account.py:52
 msgid ""
-"Each time an asset account is updated, a historical account is generated, so "
-"it is \n"
-"        necessary to clean up the asset account history. The system will "
-"clean up excess account \n"
-"        records at 2 a.m. daily based on the configuration in the \"System "
-"settings - Features - \n"
+"Each time an asset account is updated, a historical account is generated, so it is \n"
+"        necessary to clean up the asset account history. The system will clean up excess account \n"
+"        records at 2 a.m. daily based on the configuration in the \"System settings - Features - \n"
 "        Account storage - Record limit"
 msgstr ""
 "Vì mỗi lần cập nhật tài khoản tài sản, sẽ tạo ra tài khoản lịch sử, nên cần "
@@ -1754,8 +1699,7 @@ msgstr "Đồng bộ thông tin đến tài khoản liên quan"
 
 #: accounts/tasks/template.py:14
 msgid ""
-"When clicking 'Sync new secret to accounts' in 'Console - Account - "
-"Templates - \n"
+"When clicking 'Sync new secret to accounts' in 'Console - Account - Templates - \n"
 "        Accounts' this task will be executed"
 msgstr ""
 "Khi trong bảng điều khiển - Mẫu tài khoản - Tài khoản - Nhấp vào đồng bộ để "
@@ -1815,7 +1759,7 @@ msgstr "Tên nhiệm vụ"
 #: accounts/templates/accounts/check_account_report.html:23
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
-#: assets/models/automations/base.py:153 audits/models.py:74
+#: assets/models/automations/base.py:143 audits/models.py:74
 #: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:241
 #: ops/templates/ops/celery_task_log.html:154
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
@@ -1883,8 +1827,7 @@ msgstr "Tài khoản thành công"
 #: accounts/templates/accounts/change_secret_report.html:78
 #: accounts/templates/accounts/change_secret_report.html:118
 #: accounts/templates/accounts/push_account_report.html:77
-#: accounts/templates/accounts/push_account_report.html:116
-#: accounts/templates/accounts/push_account_report.html:156
+#: accounts/templates/accounts/push_account_report.html:117
 #: audits/handler.py:151
 msgid "No"
 msgstr "Không"
@@ -1893,12 +1836,12 @@ msgstr "Không"
 #: accounts/templates/accounts/change_secret_report.html:134
 #: accounts/templates/accounts/gather_account_report.html:92
 #: accounts/templates/accounts/push_account_report.html:93
-#: accounts/templates/accounts/push_account_report.html:172
+#: accounts/templates/accounts/push_account_report.html:133
 msgid "No new accounts found"
 msgstr "Không tìm thấy tài khoản mới"
 
 #: accounts/templates/accounts/change_secret_report.html:107
-#: accounts/templates/accounts/push_account_report.html:145
+#: accounts/templates/accounts/push_account_report.html:106
 msgid "Failed accounts"
 msgstr "Tài khoản thất bại"
 
@@ -1924,22 +1867,10 @@ msgstr "Tài khoản bị mất"
 msgid "No lost accounts found"
 msgstr "Không tìm thấy tài khoản bị mất"
 
-#: accounts/templates/accounts/push_account_report.html:106
-#, fuzzy
-#| msgid "Specified account"
-msgid "Unverified accounts"
-msgstr "Tài khoản chỉ định"
-
-#: accounts/templates/accounts/push_account_report.html:132
-#, fuzzy
-#| msgid "Specified account"
-msgid "No unverified accounts"
-msgstr "Tài khoản chỉ định"
-
 #: accounts/utils.py:55
 msgid ""
-"If the password starts with {{` and ends with }} `, then the password is not "
-"allowed."
+"If the password starts with {{` and ends with }} `, then the password is not"
+" allowed."
 msgstr ""
 "Nếu mật khẩu bắt đầu bằng `{{` và kết thúc bằng `}}`, thì mật khẩu đó không "
 "được phép."
@@ -1995,12 +1926,12 @@ msgid "Secret rotation"
 msgstr "Thay đổi mật khẩu"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:111 xpack/plugins/cloud/models.py:322
+#: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:322
 msgid "Priority"
 msgstr "Độ ưu tiên"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:112 xpack/plugins/cloud/models.py:323
+#: terminal/models/component/endpoint.py:111 xpack/plugins/cloud/models.py:323
 msgid "1-100, the lower the value will be match first"
 msgstr ""
 "Độ ưu tiên có thể chọn trong khoảng 1-100 (giá trị càng nhỏ càng được ưu "
@@ -2031,7 +1962,7 @@ msgstr "Người dùng"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:214
-#: authentication/api/connection_token.py:678 ops/models/base.py:17
+#: authentication/api/connection_token.py:645 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -2108,6 +2039,7 @@ msgid "Command group"
 msgstr "Nhóm lệnh"
 
 #: acls/models/command_acl.py:86
+#, python-brace-format
 msgid "The generated regular expression is incorrect: {}"
 msgstr "Biểu thức chính quy được tạo ra không chính xác: {}"
 
@@ -2215,8 +2147,8 @@ msgstr "Thời gian đăng nhập"
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
 #: acls/templates/acls/user_login_reminder.html:11
-#: terminal/models/session/session.py:34 terminal/models/session/sharing.py:125
-#: terminal/reporting.py:113
+#: terminal/models/session/session.py:34
+#: terminal/models/session/sharing.py:125 terminal/reporting.py:113
 #: terminal/templates/terminal/_msg_command_warning.html:16
 msgid "Login from"
 msgstr "Nguồn đăng nhập"
@@ -2259,11 +2191,13 @@ msgstr "IP/Máy chủ"
 msgid "Recipients"
 msgstr "Người nhận"
 
-#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:92
+#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:79
+#, python-brace-format
 msgid "The organization `{}` does not exist"
 msgstr "Tổ chức `{}` không tồn tại."
 
 #: acls/serializers/base.py:131
+#, python-brace-format
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "Tất cả những người kiểm tra đều không thuộc tổ chức `{}`"
 
@@ -2277,10 +2211,12 @@ msgstr ""
 
 #: acls/serializers/rules/rules.py:22
 #: xpack/plugins/cloud/serializers/task.py:163
+#, python-brace-format
 msgid "IP address invalid: `{}`"
 msgstr "Địa chỉ IP không hợp lệ: `{}`"
 
 #: acls/serializers/rules/rules.py:35
+#, python-brace-format
 msgid "address invalid: `{}`"
 msgstr "Địa chỉ không hợp lệ: `{}`"
 
@@ -2319,8 +2255,8 @@ msgid ""
 "We would like to inform you that a user has recently logged into the "
 "following asset:"
 msgstr ""
-"Chúng tôi xin thông báo rằng, gần đây có người dùng đã đăng nhập vào tài sản "
-"sau:"
+"Chúng tôi xin thông báo rằng, gần đây có người dùng đã đăng nhập vào tài sản"
+" sau:"
 
 #: acls/templates/acls/asset_login_reminder.html:6
 msgid "Asset details"
@@ -2366,14 +2302,14 @@ msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "Không thể tạo tài sản trực tiếp, bạn nên tạo máy chủ hoặc các tài sản khác. "
 "<–SEP–> Số lượng tài sản đã vượt quá giới hạn 5000. <–SEP–> Không thể thay "
-"đổi tên nút gốc. <–SEP–> Không thể xóa nút gốc ({}). <–SEP–> Xóa không thành "
-"công, nút chứa tài sản. <–SEP–> Tên nút cùng cấp không được phép trùng nhau. "
-"<–SEP–> Cần phải là số. <–SEP–> Nhiệm vụ: {} đã hoàn thành. <–SEP–> - Nền "
-"tảng {} Ansible đã bị vô hiệu hóa, không thể thực hiện nhiệm vụ. <–SEP–> >>> "
-"Giai đoạn chuẩn bị nhiệm vụ. <–SEP–> >>> Thực hiện nhiệm vụ theo từng phần, "
-"tổng cộng {runner_count}. <–SEP–> >>> Bắt đầu thực hiện nhiệm vụ. <–SEP–> "
-">>> Không có nhiệm vụ nào cần thực hiện. <–SEP–> >>> Bắt đầu thực hiện đợt "
-"nhiệm vụ thứ {index}. <–SEP–> Không có tài khoản."
+"đổi tên nút gốc. <–SEP–> Không thể xóa nút gốc ({}). <–SEP–> Xóa không thành"
+" công, nút chứa tài sản. <–SEP–> Tên nút cùng cấp không được phép trùng "
+"nhau. <–SEP–> Cần phải là số. <–SEP–> Nhiệm vụ: {} đã hoàn thành. <–SEP–> - "
+"Nền tảng {} Ansible đã bị vô hiệu hóa, không thể thực hiện nhiệm vụ. <–SEP–>"
+" >>> Giai đoạn chuẩn bị nhiệm vụ. <–SEP–> >>> Thực hiện nhiệm vụ theo từng "
+"phần, tổng cộng {runner_count}. <–SEP–> >>> Bắt đầu thực hiện nhiệm vụ. "
+"<–SEP–> >>> Không có nhiệm vụ nào cần thực hiện. <–SEP–> >>> Bắt đầu thực "
+"hiện đợt nhiệm vụ thứ {index}. <–SEP–> Không có tài khoản."
 
 #: assets/api/asset/asset.py:178
 msgid "The number of assets exceeds the limit of 5000"
@@ -2388,6 +2324,7 @@ msgid "You can't update the root node name"
 msgstr "Không thể sửa đổi tên nút gốc"
 
 #: assets/api/node.py:65
+#, python-brace-format
 msgid "You can't delete the root node ({})"
 msgstr "Không thể xóa nút gốc ({})"
 
@@ -2396,6 +2333,7 @@ msgid "Deletion failed and the node contains assets"
 msgstr "Xóa không thành công, nút chứa tài sản"
 
 #: assets/api/node.py:99
+#, python-brace-format
 msgid "Node {} is an ancestor of node {}, can't be added as its child"
 msgstr ""
 
@@ -2411,127 +2349,68 @@ msgstr "Cần phải là số"
 msgid "App Assets"
 msgstr "Assets"
 
-#: assets/automations/base/manager.py:193
+#: assets/automations/base/manager.py:152
+#, python-brace-format
 msgid "Task: {} finished"
 msgstr "Nhiệm vụ: {} Hoàn thành"
 
-#: assets/automations/base/manager.py:414
+#: assets/automations/base/manager.py:357
+#, python-brace-format
 msgid "  - Platform {} ansible disabled"
 msgstr "- Nền tảng {} Ansible đã bị vô hiệu hóa, không thể thực hiện nhiệm vụ"
 
-#: assets/automations/base/manager.py:528
-#, fuzzy
-#| msgid "Asset not found"
-msgid "Asset not found or inactive"
-msgstr "Tài sản không tồn tại"
-
-#: assets/automations/base/manager.py:700
-#, python-format
-msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
-msgstr ""
-
-#: assets/automations/base/manager.py:718
-#, fuzzy
-#| msgid "Unknown"
-msgid "Unknown task"
-msgstr "Không xác định"
-
-#: assets/automations/base/manager.py:735
-#, python-format
-msgid " and %(count)s more"
-msgstr ""
-
-#: assets/automations/base/manager.py:798
-#, python-format
-msgid ">>> Still waiting for %(count)s host(s): %(detail)s"
-msgstr ""
-
-#: assets/automations/base/manager.py:804
-#: assets/automations/base/manager.py:961
-#: assets/automations/ping_gateway/manager.py:200
-#: assets/automations/ping_gateway/manager.py:234
-msgid "Task canceled by user"
-msgstr ""
-
-#: assets/automations/base/manager.py:921
-#: assets/automations/base/manager.py:1018
-msgid "Hosts still waiting"
-msgstr ""
-
-#: assets/automations/base/manager.py:941
+#: assets/automations/base/manager.py:570
 msgid ">>> Task preparation phase"
 msgstr ">>> Giai đoạn chuẩn bị nhiệm vụ"
 
-#: assets/automations/base/manager.py:945
+#: assets/automations/base/manager.py:574
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> Thực hiện nhiệm vụ theo từng đợt, tổng cộng {runner_count}"
 
-#: assets/automations/base/manager.py:950
+#: assets/automations/base/manager.py:579
 msgid ">>> Start executing tasks"
 msgstr ">>> Bắt đầu thực hiện nhiệm vụ"
 
-#: assets/automations/base/manager.py:952
+#: assets/automations/base/manager.py:581
 msgid ">>> No tasks need to be executed"
 msgstr ">>> Không có nhiệm vụ nào cần thực hiện"
 
-#: assets/automations/base/manager.py:969
+#: assets/automations/base/manager.py:585
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> Bắt đầu thực hiện đợt nhiệm vụ thứ {index}"
 
-#: assets/automations/base/manager.py:1006
-#, python-format
-msgid "Ansible runner stopped before completing the batch: %(status)s"
-msgstr ""
-
-#: assets/automations/ping_gateway/manager.py:32
-#: assets/automations/ping_gateway/manager.py:223
+#: assets/automations/ping_gateway/manager.py:33
 #: authentication/models/connection_token.py:184
 msgid "No account"
 msgstr "Không có tài khoản"
 
-#: assets/automations/ping_gateway/manager.py:44
+#: assets/automations/ping_gateway/manager.py:36
+#, python-brace-format
 msgid "Asset, {}, using account {}"
 msgstr "Tài sản, {}, Sử dụng tài khoản {}"
 
-#: assets/automations/ping_gateway/manager.py:71
+#: assets/automations/ping_gateway/manager.py:55
 #, python-brace-format
 msgid "Unable to connect to port {port} on {address}"
 msgstr "Không thể kết nối đến cổng {port} tại địa chỉ {address}"
 
-#: assets/automations/ping_gateway/manager.py:76
+#: assets/automations/ping_gateway/manager.py:58
 #: authentication/middleware.py:94 terminal/api/component/storage.py:127
 #: xpack/plugins/cloud/providers/fc.py:47
 #: xpack/plugins/cloud/providers/proxmox.py:29
 msgid "Authentication failed"
 msgstr "Xác thực thất bại"
 
-#: assets/automations/ping_gateway/manager.py:78
-#: assets/automations/ping_gateway/manager.py:84
-#: assets/automations/ping_gateway/manager.py:113 terminal/const.py:104
+#: assets/automations/ping_gateway/manager.py:60
+#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:104
 msgid "Connect failed"
 msgstr "Kết nối thất bại"
 
-#: assets/automations/ping_gateway/manager.py:156
+#: assets/automations/ping_gateway/manager.py:118
 msgid ">>> Start executing the task to test gateway connectivity"
 msgstr ">>> Bắt đầu thực hiện nhiệm vụ kiểm tra kết nối của cổng"
-
-#: assets/automations/ping_gateway/manager.py:189
-msgid "Gateway not found or inactive"
-msgstr ""
-
-#: assets/automations/ping_gateway/manager.py:207
-#: assets/automations/ping_gateway/manager.py:242
-#, fuzzy
-#| msgid "Task execution completed"
-msgid "Task execution timed out"
-msgstr "Nhiệm vụ đã hoàn thành"
-
-#: assets/automations/ping_gateway/manager.py:251
-#, python-brace-format
-msgid "Connectivity succeeded but saving the result failed: {error}"
-msgstr ""
 
 #: assets/const/automation.py:6 audits/const.py:6 audits/const.py:48
 #: audits/signal_handlers/activity_log.py:63
@@ -2625,7 +2504,8 @@ msgstr "Cloud"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
+#: common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "Loại tùy chỉnh"
 
@@ -2702,8 +2582,8 @@ msgstr "Các phiên bản SSH cũ, chẳng hạn như openssh 5.x hoặc 6.x"
 #: assets/const/protocol.py:53
 msgid "Netcat help text"
 msgstr ""
-"Use netcat (nc) as a proxy tool to forward connections from the proxy server "
-"to the target host. This is useful in environments that do not support the "
+"Use netcat (nc) as a proxy tool to forward connections from the proxy server"
+" to the target host. This is useful in environments that do not support the "
 "SSH native proxy option (-W), or when more flexibility and timeout control "
 "are needed."
 
@@ -2719,8 +2599,8 @@ msgid ""
 "<br>- ${USER} The username of the user"
 msgstr ""
 "Thư mục gốc SFTP, hỗ trợ các biến: <br> -${ACCOUNT} tên người dùng của tài "
-"khoản đã kết nối<br> -${HOME} thư mục chính của tài khoản đã kết nối<br> -"
-"${USER} tên người dùng của người dùng"
+"khoản đã kết nối<br> -${HOME} thư mục chính của tài khoản đã kết nối<br> "
+"-${USER} tên người dùng của người dùng"
 
 #: assets/const/protocol.py:81
 msgid "Console"
@@ -2741,16 +2621,16 @@ msgstr "Bảo mật"
 
 #: assets/const/protocol.py:89
 msgid ""
-"Security layer to use for the connection:<br>Any<br>Automatically select the "
-"security mode based on the security protocols supported by both the client "
+"Security layer to use for the connection:<br>Any<br>Automatically select the"
+" security mode based on the security protocols supported by both the client "
 "and the server<br>RDP<br>Legacy RDP encryption. This mode is generally only "
 "used for older Windows servers or in cases where a standard Windows login "
 "screen is desired<br>TLS<br>RDP authentication and encryption implemented "
 "via TLS.<br>NLA<br>This mode uses TLS encryption and requires the username "
 "and password to be given in advance"
 msgstr ""
-"Lớp bảo mật đã kết nối: <br> Bất kỳ <br> Tự động lựa chọn chế độ bảo mật dựa "
-"trên các giao thức bảo mật mà máy khách và máy chủ hỗ trợ<br> RDP <br> Chế "
+"Lớp bảo mật đã kết nối: <br> Bất kỳ <br> Tự động lựa chọn chế độ bảo mật dựa"
+" trên các giao thức bảo mật mà máy khách và máy chủ hỗ trợ<br> RDP <br> Chế "
 "độ mã hóa RDP truyền thống. Thường chỉ được sử dụng cho các máy chủ Windows "
 "cũ hoặc trong trường hợp cần màn hình đăng nhập Windows tiêu chuẩn<br> TLS "
 "<br> Xác thực và mã hóa RDP được thực hiện qua TLS<br> NLA <br> Chế độ này "
@@ -2826,7 +2706,8 @@ msgstr "Mục kết nối"
 
 #: assets/const/protocol.py:239
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
-msgstr "Kết nối các tùy chọn cụ thể, ví dụ: retryWrites=false&retryReads=false"
+msgstr ""
+"Kết nối các tùy chọn cụ thể, ví dụ: retryWrites=false&retryReads=false"
 
 #: assets/const/protocol.py:251
 msgid "Auth username"
@@ -2839,8 +2720,8 @@ msgstr "Số lần thực hiện"
 #: assets/const/protocol.py:257
 msgid "Enable if this Redis instance is part of a cluster"
 msgstr ""
-"Nếu phiên bản Redis này là một phần của cụm, hãy bật chế độ cụm và thực hiện "
-"số lượng hành động."
+"Nếu phiên bản Redis này là một phần của cụm, hãy bật chế độ cụm và thực hiện"
+" số lượng hành động."
 
 #: assets/const/protocol.py:276
 msgid "Namespace"
@@ -2904,7 +2785,7 @@ msgid "Port"
 msgstr "Cổng"
 
 #: assets/models/asset/common.py:167 assets/serializers/asset/common.py:180
-#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:58
+#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:69
 msgid "Address"
 msgstr "Địa chỉ"
 
@@ -3009,34 +2890,34 @@ msgstr "Tham số"
 msgid "Last execution date"
 msgstr "Ngày thực hiện cuối"
 
-#: assets/models/automations/base.py:44 assets/models/automations/base.py:142
+#: assets/models/automations/base.py:44 assets/models/automations/base.py:132
 msgid "Automation task"
 msgstr "Nhiệm vụ tự động hóa"
 
-#: assets/models/automations/base.py:133
+#: assets/models/automations/base.py:123
 msgid "Asset automation task"
 msgstr "Nhiệm vụ tự động hóa tài sản"
 
-#: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
+#: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
 #: ops/models/base.py:54 ops/models/job.py:240
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "Ngày tạo"
 
-#: assets/models/automations/base.py:165
+#: assets/models/automations/base.py:155
 #: assets/serializers/automations/base.py:46 xpack/plugins/cloud/models.py:248
 #: xpack/plugins/cloud/serializers/task.py:260
 msgid "Trigger mode"
 msgstr "Chế độ kích hoạt"
 
-#: assets/models/automations/base.py:167 audits/serializers.py:38
+#: assets/models/automations/base.py:157 audits/serializers.py:38
 #: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:238
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "Tổng hợp"
 
-#: assets/models/automations/base.py:168 ops/models/base.py:51
+#: assets/models/automations/base.py:158 ops/models/base.py:51
 #: ops/models/job.py:237 xpack/plugins/cloud/models.py:231
 msgid "Result"
 msgstr "Kết quả"
@@ -3189,7 +3070,7 @@ msgid "Public"
 msgstr "Công khai"
 
 #: assets/models/platform.py:21 assets/serializers/platform.py:85
-#: settings/serializers/settings.py:97
+#: settings/serializers/settings.py:95
 msgid "Setting"
 msgstr "Thiết lập"
 
@@ -3372,10 +3253,11 @@ msgid "port out of range (0-65535)"
 msgstr "Cổng ngoài phạm vi (0-65535)"
 
 #: assets/serializers/asset/common.py:319
+#, python-brace-format
 msgid "Protocol is required: {}"
 msgstr "Giao thức là bắt buộc: {}"
 
-#: assets/serializers/asset/common.py:358
+#: assets/serializers/asset/common.py:358 labels/api.py:107
 msgid "Invalid data"
 msgstr "Dữ liệu không hợp lệ"
 
@@ -3392,29 +3274,24 @@ msgstr ""
 #: assets/serializers/asset/database.py:24
 msgid "Postgresql ssl model help text"
 msgstr ""
-"Ưu tiên: Tôi không quan tâm đến mã hóa, nhưng nếu máy chủ hỗ trợ mã hóa, tôi "
-"sẵn lòng chịu chi phí cho mã hóa. \n"
-"Yêu cầu: Tôi muốn dữ liệu của mình được mã hóa, tôi chấp nhận chi phí. Tôi "
-"tin rằng mạng sẽ đảm bảo tôi luôn kết nối với máy chủ mà tôi muốn. \n"
-"Xác minh CA: Tôi muốn dữ liệu của mình được mã hóa, tôi chấp nhận chi phí. "
-"Tôi muốn đảm bảo rằng tôi kết nối với máy chủ mà tôi tin tưởng. \n"
-"Xác minh đầy đủ: Tôi muốn dữ liệu của mình được mã hóa, tôi chấp nhận chi "
-"phí. Tôi muốn đảm bảo rằng tôi kết nối với máy chủ mà tôi tin tưởng, và nó "
-"là máy chủ mà tôi đã chỉ định."
+"Ưu tiên: Tôi không quan tâm đến mã hóa, nhưng nếu máy chủ hỗ trợ mã hóa, tôi sẵn lòng chịu chi phí cho mã hóa. \n"
+"Yêu cầu: Tôi muốn dữ liệu của mình được mã hóa, tôi chấp nhận chi phí. Tôi tin rằng mạng sẽ đảm bảo tôi luôn kết nối với máy chủ mà tôi muốn. \n"
+"Xác minh CA: Tôi muốn dữ liệu của mình được mã hóa, tôi chấp nhận chi phí. Tôi muốn đảm bảo rằng tôi kết nối với máy chủ mà tôi tin tưởng. \n"
+"Xác minh đầy đủ: Tôi muốn dữ liệu của mình được mã hóa, tôi chấp nhận chi phí. Tôi muốn đảm bảo rằng tôi kết nối với máy chủ mà tôi tin tưởng, và nó là máy chủ mà tôi đã chỉ định."
 
 #: assets/serializers/asset/ds.py:18
 msgid ""
-"The domain part used by the directory service (e.g., AD) and appended to the "
-"username during login, such as example.com in user@example.com."
+"The domain part used by the directory service (e.g., AD) and appended to the"
+" username during login, such as example.com in user@example.com."
 msgstr ""
-"Tên miền (Domain Name) là phần tên miền được thêm vào sau tên người dùng khi "
-"đăng nhập vào dịch vụ thư mục (ví dụ như AD), chẳng hạn như example.com "
+"Tên miền (Domain Name) là phần tên miền được thêm vào sau tên người dùng khi"
+" đăng nhập vào dịch vụ thư mục (ví dụ như AD), chẳng hạn như example.com "
 "trong user@example.com"
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
-"If the server cannot directly connect to the API address, you need set up an "
-"HTTP proxy. e.g. http(s)://host:port"
+"If the server cannot directly connect to the API address, you need set up an"
+" HTTP proxy. e.g. http(s)://host:port"
 msgstr ""
 "Nếu máy chủ không thể truy cập trực tiếp địa chỉ api, bạn cần thiết lập một "
 "proxy HTTP. Ví dụ http(s)://host:port"
@@ -3436,7 +3313,7 @@ msgid "Model"
 msgstr "Mẫu"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:305
+#: tickets/models/ticket/general.py:300
 msgid "Serial number"
 msgstr "Số sê-ri."
 
@@ -3582,10 +3459,7 @@ msgstr ""
 #: assets/serializers/platform.py:104
 msgid "This protocol is required, and it must be set when adding assets."
 msgstr ""
-"Thỏa thuận này là bắt buộc, cần phải thiết lập khi thêm tài sản. Thỏa thuận "
-"này là mặc định, sẽ hiển thị tự động khi thêm tài sản. Thỏa thuận này là "
-"công khai, tài sản sẽ hiển thị thỏa thuận này cho người dùng và có thể kết "
-"nối sử dụng. \n"
+"Thỏa thuận này là bắt buộc, cần phải thiết lập khi thêm tài sản. Thỏa thuận này là mặc định, sẽ hiển thị tự động khi thêm tài sản. Thỏa thuận này là công khai, tài sản sẽ hiển thị thỏa thuận này cho người dùng và có thể kết nối sử dụng. \n"
 "\n"
 "Trợ giúp. \n"
 "\n"
@@ -3593,9 +3467,7 @@ msgstr ""
 "\n"
 "Tự động hóa. \n"
 "\n"
-"Khi truy cập tài sản, hãy sử dụng tài khoản đăng nhập, sau đó tự động chuyển "
-"sang tài khoản khác, giống như đăng nhập bằng tài khoản thông thường rồi "
-"chuyển sang tài khoản root. \n"
+"Khi truy cập tài sản, hãy sử dụng tài khoản đăng nhập, sau đó tự động chuyển sang tài khoản khác, giống như đăng nhập bằng tài khoản thông thường rồi chuyển sang tài khoản root. \n"
 "\n"
 "Tài sản có thể được kết nối qua gateway khu vực. \n"
 "\n"
@@ -3649,8 +3521,8 @@ msgid ""
 "another, similar to logging in with a regular account and then switching to "
 "root"
 msgstr ""
-"Khi truy cập tài sản, sử dụng tài khoản đăng nhập, sau đó tự động chuyển đổi "
-"sang một tài khoản khác, giống như việc đăng nhập bằng tài khoản thông "
+"Khi truy cập tài sản, sử dụng tài khoản đăng nhập, sau đó tự động chuyển đổi"
+" sang một tài khoản khác, giống như việc đăng nhập bằng tài khoản thông "
 "thường rồi chuyển sang root"
 
 #: assets/serializers/platform.py:211
@@ -3691,8 +3563,7 @@ msgstr "Thu thập thông tin tài sản"
 
 #: assets/tasks/gather_facts.py:25
 msgid ""
-"When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' "
-"this task \n"
+"When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' this task \n"
 "        will be executed"
 msgstr ""
 "Khi nhấp vào cập nhật thông tin phần cứng trong chi tiết tài sản của bảng "
@@ -3712,10 +3583,8 @@ msgstr "Kiểm tra số lượng tài sản dưới nút"
 
 #: assets/tasks/nodes_amount.py:18
 msgid ""
-"Manually verifying asset quantities updates the asset count for nodes under "
-"the \n"
-"        current organization. This task will be called in the following two "
-"cases: when updating \n"
+"Manually verifying asset quantities updates the asset count for nodes under the \n"
+"        current organization. This task will be called in the following two cases: when updating \n"
 "        nodes and when the number of nodes exceeds 100"
 msgstr ""
 "So sánh thủ công số lượng tài sản để cập nhật số lượng tài sản của nút dưới "
@@ -3724,7 +3593,8 @@ msgstr ""
 
 #: assets/tasks/nodes_amount.py:34
 msgid ""
-"The task of self-checking is already running and cannot be started repeatedly"
+"The task of self-checking is already running and cannot be started "
+"repeatedly"
 msgstr "Chương trình tự kiểm tra đã được kích hoạt, không thể khởi động lại"
 
 #: assets/tasks/nodes_amount.py:40
@@ -3733,8 +3603,7 @@ msgstr "Kiểm tra định kỳ số lượng tài sản dưới nút"
 
 #: assets/tasks/nodes_amount.py:42
 msgid ""
-"Schedule the check_node_assets_amount_task to periodically update the asset "
-"count of \n"
+"Schedule the check_node_assets_amount_task to periodically update the asset count of \n"
 "        all nodes under all organizations"
 msgstr ""
 "Định kỳ gọi nhiệm vụ check_node_assets_amount_task, cập nhật số lượng tài "
@@ -3763,19 +3632,23 @@ msgstr "Kiểm tra khả năng kết nối của cổng"
 
 #: assets/tasks/ping_gateway.py:23
 msgid ""
-"When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
-"be executed"
-msgstr "Khi thực hiện nhiệm vụ này tại chi tiết miền - cổng - kiểm tra kết nối"
+"When clicking 'Test Connection' in 'Domain Details - Gateway' this task will"
+" be executed"
+msgstr ""
+"Khi thực hiện nhiệm vụ này tại chi tiết miền - cổng - kiểm tra kết nối"
 
 #: assets/tasks/utils.py:16
+#, python-brace-format
 msgid "Asset has been disabled, skipped: {}"
 msgstr "Tài sản đã bị vô hiệu hóa, bỏ qua: {}"
 
 #: assets/tasks/utils.py:20
+#, python-brace-format
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "Tài sản có thể không hỗ trợ Ansible, bỏ qua: {}"
 
 #: assets/tasks/utils.py:38
+#, python-brace-format
 msgid "For security, do not push user {}"
 msgstr "Vì lý do an toàn, không cho phép đẩy người dùng {}"
 
@@ -3784,23 +3657,27 @@ msgid "No assets matched, stop task"
 msgstr "Không tìm thấy tài sản nào, kết thúc nhiệm vụ"
 
 #: assets/utils/platform_package.py:89
+#, python-brace-format
 msgid "Load platform.yml failed: {}"
 msgstr "Tải platform.yml thất bại: {}"
 
 #: assets/utils/platform_package.py:172
+#, python-brace-format
 msgid "Platform automation category must contain platform category: {}"
 msgstr ""
 
 #: assets/utils/platform_package.py:178
+#, python-brace-format
 msgid "Platform automation type must contain platform type: {}"
 msgstr ""
 
 #: assets/utils/platform_package.py:184
+#, python-brace-format
 msgid "Platform automation protocol not found in platform.yml: {}"
 msgstr ""
 
 #: assets/utils/platform_package.py:201
-#, fuzzy
+#, fuzzy, python-brace-format
 #| msgid "Organization name already exists"
 msgid "Platform automation method id already exists: {}"
 msgstr "Tên tổ chức đã tồn tại"
@@ -3820,7 +3697,8 @@ msgid "App Audits"
 msgstr "Activities"
 
 #: audits/backends/db.py:17
-msgid "The text content is too long. Use Elasticsearch to store operation logs"
+msgid ""
+"The text content is too long. Use Elasticsearch to store operation logs"
 msgstr ""
 "Nội dung văn bản quá dài. Vui lòng sử dụng Elasticsearch để lưu trữ nhật ký "
 "hoạt động"
@@ -3954,9 +3832,9 @@ msgstr "Nhật ký kiểm tra công việc"
 #: audits/models.py:65 audits/models.py:115 audits/models.py:200
 #: audits/models.py:385 audits/reporting.py:119 audits/reporting.py:327
 #: audits/reporting.py:424 authentication/models/connection_token.py:63
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:120
-#: terminal/notifications.py:171 terminal/notifications.py:238
-#: terminal/reporting.py:133
+#: terminal/models/session/session.py:36
+#: terminal/models/session/sharing.py:120 terminal/notifications.py:171
+#: terminal/notifications.py:238 terminal/reporting.py:133
 msgid "Remote addr"
 msgstr "Địa chỉ xa"
 
@@ -4517,18 +4395,15 @@ msgstr "Dọn dẹp nhật ký nhiệm vụ kiểm toán tài sản"
 
 #: audits/tasks.py:186
 msgid ""
-"Since the system generates login logs, operation logs, file upload logs, "
-"activity \n"
-"        logs, Celery execution logs, session recordings, command records, "
-"and password change \n"
-"        logs, it will perform cleanup of records that exceed the time limit "
-"according to the \n"
+"Since the system generates login logs, operation logs, file upload logs, activity \n"
+"        logs, Celery execution logs, session recordings, command records, and password change \n"
+"        logs, it will perform cleanup of records that exceed the time limit according to the \n"
 "        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"
 msgstr ""
 "Do hệ thống sẽ tạo ra nhật ký đăng nhập, nhật ký hoạt động, nhật ký tải lên "
-"tệp, nhật ký hoạt động, nhật ký thực hiện celery, ghi hình phiên làm việc và "
-"ghi chép lệnh, nhật ký thay đổi mật khẩu, vì vậy hệ thống sẽ theo cài đặt hệ "
-"thống - danh sách nhiệm vụ - định kỳ dọn dẹp cấu hình, đối với những thứ "
+"tệp, nhật ký hoạt động, nhật ký thực hiện celery, ghi hình phiên làm việc và"
+" ghi chép lệnh, nhật ký thay đổi mật khẩu, vì vậy hệ thống sẽ theo cài đặt "
+"hệ thống - danh sách nhiệm vụ - định kỳ dọn dẹp cấu hình, đối với những thứ "
 "vượt quá thời gian sẽ được dọn dẹp vào lúc 2 giờ sáng mỗi ngày"
 
 #: audits/tasks.py:206
@@ -4537,12 +4412,11 @@ msgstr "Tải lên tệp FTP vào bộ nhớ bên ngoài"
 
 #: audits/tasks.py:208
 msgid ""
-"If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
-"management will be \n"
+"If SERVER_REPLAY_STORAGE is configured, files uploaded through file management will be \n"
 "        synchronized to external storage"
 msgstr ""
-"Nếu đã thiết lập SERVER_REPLAY_STORAGE, các tệp được tải lên sẽ được đồng bộ "
-"đến bộ nhớ bên ngoài thông qua quản lý tệp"
+"Nếu đã thiết lập SERVER_REPLAY_STORAGE, các tệp được tải lên sẽ được đồng bộ"
+" đến bộ nhớ bên ngoài thông qua quản lý tệp"
 
 #: authentication/api/access_key.py:39
 msgid "Access keys can be created at most 10"
@@ -4558,41 +4432,42 @@ msgid "This action require verify your MFA"
 msgstr ""
 "Thao tác này yêu cầu xác thực MFA của bạn, vui lòng bật và cấu hình trước"
 
-#: authentication/api/connection_token.py:510
+#: authentication/api/connection_token.py:477
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "Không cho phép sử dụng mã thông báo kết nối có thể tái sử dụng, chưa kích "
 "hoạt cài đặt toàn cầu"
 
-#: authentication/api/connection_token.py:638
+#: authentication/api/connection_token.py:605
 msgid "Anonymous account is not supported for this asset"
 msgstr "Tài khoản ẩn danh không hỗ trợ tài sản hiện tại"
 
-#: authentication/api/connection_token.py:670
+#: authentication/api/connection_token.py:637
 msgid "Permission expired"
 msgstr "Quyền truy cập đã hết hạn"
 
-#: authentication/api/connection_token.py:703
+#: authentication/api/connection_token.py:670
+#, python-brace-format
 msgid "ACL action is reject: {}({})"
 msgstr "Hành động ACL là từ chối: {}({})"
 
-#: authentication/api/connection_token.py:707
+#: authentication/api/connection_token.py:674
 msgid "ACL action is review"
 msgstr "Hành động ACL là xem xét"
 
-#: authentication/api/connection_token.py:717
+#: authentication/api/connection_token.py:684
 msgid "ACL action is face verify"
 msgstr "Hành động ACL là xác thực khuôn mặt"
 
-#: authentication/api/connection_token.py:722
+#: authentication/api/connection_token.py:689
 msgid "ACL action not supported for this asset"
 msgstr "Quy tắc đăng nhập tài sản không hỗ trợ tài sản hiện tại."
 
-#: authentication/api/connection_token.py:729
+#: authentication/api/connection_token.py:696
 msgid "ACL action is face online"
 msgstr "Hành động ACL là nhận diện khuôn mặt trực tuyến"
 
-#: authentication/api/connection_token.py:754
+#: authentication/api/connection_token.py:721
 msgid "No available face feature"
 msgstr "Không có đặc điểm khuôn mặt khả dụng"
 
@@ -4602,11 +4477,13 @@ msgid "Facial comparison failed"
 msgstr "So sánh khuôn mặt thất bại"
 
 #: authentication/api/mfa.py:61
+#, python-brace-format
 msgid "Current user not support mfa type: {}"
 msgstr "Người dùng hiện tại không hỗ trợ loại MFA: {}"
 
 #: authentication/api/password.py:37 terminal/api/session/session.py:347
 #: users/views/profile/reset.py:63
+#, python-brace-format
 msgid "User does not exist: {}"
 msgstr "Người dùng không tồn tại: {}"
 
@@ -4615,6 +4492,7 @@ msgid "No user matched"
 msgstr "Không tìm thấy người dùng khớp"
 
 #: authentication/api/password.py:41
+#, python-brace-format
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
@@ -4632,6 +4510,7 @@ msgid "Forgot password"
 msgstr "Quên mật khẩu"
 
 #: authentication/api/password.py:73 authentication/mfa/email.py:42
+#, python-brace-format
 msgid "The validity period of the verification code is {} minute"
 msgstr "Mã xác minh có hiệu lực trong {} phút"
 
@@ -4650,7 +4529,8 @@ msgstr ""
 
 #: authentication/backends/drf.py:64
 msgid "Invalid token header. Sign string should not contain spaces."
-msgstr "Tiêu đề token không hợp lệ. Chuỗi ký hiệu không nên chứa khoảng trắng."
+msgstr ""
+"Tiêu đề token không hợp lệ. Chuỗi ký hiệu không nên chứa khoảng trắng."
 
 #: authentication/backends/drf.py:70
 msgid ""
@@ -4760,6 +4640,7 @@ msgid "Authentication failed password incorrect"
 msgstr "Xác thực không thành công (tên tài khoản hoặc mật khẩu không đúng)"
 
 #: authentication/confirm/relogin.py:11
+#, python-brace-format
 msgid "Login time has exceeded {} minutes, please login again"
 msgstr "Thời gian đăng nhập đã vượt quá {} phút, vui lòng đăng nhập lại"
 
@@ -4844,27 +4725,27 @@ msgid ""
 "You can also try {times_try} times (The account will be temporarily locked "
 "for {block_time} minutes)"
 msgstr ""
-"Tên người dùng hoặc mật khẩu bạn nhập không đúng, vui lòng nhập lại. Bạn còn "
-"có thể thử {times_try} lần nữa (tài khoản sẽ bị khóa tạm thời trong "
+"Tên người dùng hoặc mật khẩu bạn nhập không đúng, vui lòng nhập lại. Bạn còn"
+" có thể thử {times_try} lần nữa (tài khoản sẽ bị khóa tạm thời trong "
 "{block_time} phút)"
 
 #: authentication/errors/const.py:52 authentication/errors/const.py:60
 #, fuzzy, python-brace-format
 #| msgid ""
-#| "The account has been locked (please contact admin to unlock it or try "
-#| "again after {} minutes)"
+#| "The account has been locked (please contact admin to unlock it or try again "
+#| "after {} minutes)"
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {block_time} minutes)"
 msgstr ""
-"Tài khoản đã bị khóa (vui lòng liên hệ với quản trị viên để mở khóa hoặc thử "
-"lại sau {} phút)"
+"Tài khoản đã bị khóa (vui lòng liên hệ với quản trị viên để mở khóa hoặc thử"
+" lại sau {} phút)"
 
 #: authentication/errors/const.py:56
 #, fuzzy, python-brace-format
 #| msgid ""
-#| "The address has been locked (please contact admin to unlock it or try "
-#| "again after {} minutes)"
+#| "The address has been locked (please contact admin to unlock it or try again "
+#| "after {} minutes)"
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {block_time} minutes)"
@@ -4875,8 +4756,8 @@ msgstr ""
 #: authentication/errors/const.py:64
 #, python-brace-format
 msgid ""
-"{error}, You can also try {times_try} times (The account will be temporarily "
-"locked for {block_time} minutes)"
+"{error}, You can also try {times_try} times (The account will be temporarily"
+" locked for {block_time} minutes)"
 msgstr ""
 "{error} You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
@@ -5004,8 +4885,8 @@ msgstr "Vui lòng nhập mã an ninh động"
 
 #: authentication/mfa/base.py:32
 msgid ""
-"The two-factor code you entered has either already been used or has expired. "
-"Please request a new one."
+"The two-factor code you entered has either already been used or has expired."
+" Please request a new one."
 msgstr ""
 "Mã xác thực kép bạn nhập đã được sử dụng hoặc đã hết hạn. Vui lòng yêu cầu "
 "mã xác thực kép mới."
@@ -5084,33 +4965,34 @@ msgid "Clear phone number to disable"
 msgstr "Xóa số điện thoại để vô hiệu hóa."
 
 #: authentication/middleware.py:95 settings/utils/ldap.py:771
+#, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr "Xác thực không thành công (Kiểm tra trước khi đăng nhập thất bại): {}"
 
 #: authentication/mixins.py:170
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
-"                    and the current user is not in the user list. Please "
-"contact the administrator."
+"                    and the current user is not in the user list. Please contact the administrator."
 msgstr ""
 "Quản trị viên đã bật 'chỉ cho phép người dùng đã tồn tại đăng nhập', người "
-"dùng hiện tại không có trong danh sách người dùng, vui lòng liên hệ với quản "
-"trị viên."
+"dùng hiện tại không có trong danh sách người dùng, vui lòng liên hệ với quản"
+" trị viên."
 
 #: authentication/mixins.py:188
 msgid "User is invalid"
 msgstr "Người dùng không hợp lệ"
 
 #: authentication/mixins.py:205
+#, python-brace-format
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
-"                    The current user source is {}. Please contact the "
-"administrator. "
+"                    The current user source is {}. Please contact the administrator. "
 msgstr ""
 "Quản trị viên đã bật 'chỉ cho phép đăng nhập từ nguồn người dùng', nguồn "
 "người dùng hiện tại là {}, vui lòng liên hệ với quản trị viên."
 
 #: authentication/mixins.py:392
+#, python-brace-format
 msgid "The MFA type ({}) is not enabled"
 msgstr "Phương thức MFA ({}) này chưa được kích hoạt"
 
@@ -5186,6 +5068,7 @@ msgid "Connection token inactive"
 msgstr "Mã thông báo kết nối chưa được kích hoạt"
 
 #: authentication/models/connection_token.py:175
+#, python-brace-format
 msgid "Connection token expired at: {}"
 msgstr "Mã thông báo kết nối đã hết hạn: {}"
 
@@ -5313,7 +5196,8 @@ msgstr "Action"
 
 #: authentication/serializers/connection_token.py:47
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
-#: users/serializers/user.py:127 users/serializers/user.py:267
+#: users/filters.py:38 users/serializers/user.py:127
+#: users/serializers/user.py:267
 msgid "Is expired"
 msgstr "Expired"
 
@@ -5324,6 +5208,7 @@ msgstr "Organization"
 
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:153
+#, python-brace-format
 msgid "The {} cannot be empty"
 msgstr "{} không được để trống"
 
@@ -5341,8 +5226,8 @@ msgstr "Loại tạo"
 
 #: authentication/serializers/ssh_key.py:33
 msgid ""
-"Please download the private key after creation. Each private key can only be "
-"downloaded once"
+"Please download the private key after creation. Each private key can only be"
+" downloaded once"
 msgstr ""
 "Sau khi tạo hoàn tất, vui lòng tải về khóa riêng, mỗi khóa riêng chỉ có một "
 "lần cơ hội tải về"
@@ -5353,15 +5238,15 @@ msgid "Not a valid ssh public key"
 msgstr "SSH khóa không hợp lệ"
 
 #: authentication/serializers/token.py:93 perms/serializers/permission.py:65
-#: perms/serializers/permission.py:94 users/serializers/user.py:128
-#: users/serializers/user.py:264
+#: perms/serializers/permission.py:94 users/filters.py:41
+#: users/serializers/user.py:128 users/serializers/user.py:264
 msgid "Is valid"
 msgstr "Is Valid"
 
 #: authentication/serializers/token.py:131 ops/models/adhoc.py:26
-#: ops/models/playbook.py:34 ops/serializers/mixin.py:10 rbac/models/role.py:31
-#: rbac/models/rolebinding.py:47 rbac/serializers/role.py:12
-#: settings/serializers/auth/oauth2.py:37
+#: ops/models/playbook.py:34 ops/serializers/mixin.py:10
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:47
+#: rbac/serializers/role.py:12 settings/serializers/auth/oauth2.py:37
 msgid "Scope"
 msgstr "Phạm vi"
 
@@ -5371,8 +5256,8 @@ msgstr "Xóa phiên đã hết hạn"
 
 #: authentication/tasks.py:21
 msgid ""
-"Since user logins create sessions, the system will clean up expired sessions "
-"every 24 hours"
+"Since user logins create sessions, the system will clean up expired sessions"
+" every 24 hours"
 msgstr ""
 "Do người dùng đăng nhập vào hệ thống sẽ tạo ra phiên, hệ thống sẽ tự động "
 "dọn dẹp các phiên đã hết hạn sau mỗi 24 giờ"
@@ -5390,10 +5275,10 @@ msgid ""
 "configured under System settings > Security > User password > Token "
 "Retention Period"
 msgstr ""
-"Hệ thống sẽ tạo ra mã thông báo kết nối hoặc ghi chú mật khẩu tạm thời tương "
-"ứng khi kết nối tài sản hoặc tạo mật khẩu tạm thời. Để đảm bảo an ninh hệ "
-"thống và kiểm soát lượng dữ liệu lưu trữ, hệ thống sẽ tự động dọn dẹp tất cả "
-"các ghi chú mã thông báo đã hết hạn theo cấu hình trong “Cài đặt bảo mật > "
+"Hệ thống sẽ tạo ra mã thông báo kết nối hoặc ghi chú mật khẩu tạm thời tương"
+" ứng khi kết nối tài sản hoặc tạo mật khẩu tạm thời. Để đảm bảo an ninh hệ "
+"thống và kiểm soát lượng dữ liệu lưu trữ, hệ thống sẽ tự động dọn dẹp tất cả"
+" các ghi chú mã thông báo đã hết hạn theo cấu hình trong “Cài đặt bảo mật > "
 "An toàn mật khẩu > Thời gian lưu giữ mã thông báo” vào lúc 2 giờ sáng mỗi "
 "ngày"
 
@@ -5516,8 +5401,8 @@ msgid "request new one"
 msgstr "Cài đặt lại"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:27 terminal/models/session/sharing.py:104
-#: terminal/notifications.py:308
+#: terminal/models/session/sharing.py:27
+#: terminal/models/session/sharing.py:104 terminal/notifications.py:308
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:108 users/templates/users/forgot_password.html:98
 msgid "Verify code"
@@ -5543,8 +5428,8 @@ msgid ""
 "If the password update was not initiated by you, your account may have "
 "security issues"
 msgstr ""
-"Nếu lần cập nhật mật khẩu này không phải do bạn thực hiện, tài khoản của bạn "
-"có thể gặp vấn đề về bảo mật"
+"Nếu lần cập nhật mật khẩu này không phải do bạn thực hiện, tài khoản của bạn"
+" có thể gặp vấn đề về bảo mật"
 
 #: authentication/templates/authentication/_msg_rest_password_success.html:13
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:13
@@ -5802,6 +5687,7 @@ msgid "Redirecting"
 msgstr "Đang chuyển hướng"
 
 #: authentication/views/login.py:173
+#, python-brace-format
 msgid "Redirecting to {} authentication"
 msgstr "Đang chuyển hướng tới {} xác thực"
 
@@ -5810,16 +5696,17 @@ msgid "Login timeout, please try again."
 msgstr "Thời gian đăng nhập đã hết, vui lòng đăng nhập lại."
 
 #: authentication/views/login.py:245
+#, python-brace-format
 msgid "User email already exists ({})"
 msgstr "Email người dùng đã tồn tại ({})"
 
 #: authentication/views/login.py:338
+#, python-brace-format
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
 msgstr ""
-"Đang chờ <b>{}</b> xác nhận, bạn cũng có thể sao chép liên kết và gửi cho "
-"anh ấy/cô ấy <br/>\n"
+"Đang chờ <b>{}</b> xác nhận, bạn cũng có thể sao chép liên kết và gửi cho anh ấy/cô ấy <br/>\n"
 "                  Đừng đóng trang này"
 
 #: authentication/views/login.py:343
@@ -5840,8 +5727,8 @@ msgstr ""
 
 #: authentication/views/mixins.py:30
 msgid ""
-"For your safety, automatic redirection login is not supported on the client. "
-"If you need to open it in the client, please log in again"
+"For your safety, automatic redirection login is not supported on the client."
+" If you need to open it in the client, please log in again"
 msgstr ""
 "Để đảm bảo an toàn, ứng dụng không hỗ trợ tự động chuyển hướng đăng nhập. "
 "Nếu cần mở trong ứng dụng, vui lòng đăng nhập lại"
@@ -5952,12 +5839,12 @@ msgstr ""
 "list thành text <- SEP -> Dữ liệu được mã hóa thành char <- SEP -> Dữ liệu "
 "được mã hóa thành text <- SEP -> Trường đã được mã hóa <- SEP -> JSON nhiều-"
 "một trường không hợp lệ, cần phải là {'type': 'all'} hoặc {'type': 'ids', "
-"'ids': []} hoặc {'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', "
-"'value': '1.1.1.1'}]} <- SEP -> Loại không hợp lệ, cần phải là all, ids hoặc "
-"attrs <- SEP -> ID không hợp lệ, cần phải là danh sách <- SEP -> Trường này "
-"là bắt buộc. <- SEP -> Thuộc tính không hợp lệ, cần phải là danh sách dict "
-"<- SEP -> Thuộc tính không hợp lệ, phải có tên và giá trị <- SEP -> Bỏ qua "
-"<- SEP -> Thời gian bỏ qua <- SEP -> Người cập nhật cuối cùng."
+"'ids': []} hoặc {'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact',"
+" 'value': '1.1.1.1'}]} <- SEP -> Loại không hợp lệ, cần phải là all, ids "
+"hoặc attrs <- SEP -> ID không hợp lệ, cần phải là danh sách <- SEP -> Trường"
+" này là bắt buộc. <- SEP -> Thuộc tính không hợp lệ, cần phải là danh sách "
+"dict <- SEP -> Thuộc tính không hợp lệ, phải có tên và giá trị <- SEP -> Bỏ "
+"qua <- SEP -> Thời gian bỏ qua <- SEP -> Người cập nhật cuối cùng."
 
 #: common/db/fields.py:122
 msgid "Marshal list data to char field"
@@ -5981,8 +5868,8 @@ msgstr "trường đã được mã hóa"
 
 #: common/db/fields.py:577
 msgid ""
-"Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
-"{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
+"Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or"
+" {'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
 "'match': 'exact', 'value': '1.1.1.1'}}"
 msgstr ""
 "Trường JSON nhiều vào nhiều không hợp lệ, phải là {'type': 'all'} hoặc "
@@ -6028,6 +5915,7 @@ msgid "Updated by"
 msgstr "Người cập nhật cuối cùng"
 
 #: common/db/validators.py:9
+#, python-brace-format
 msgid "Invalid port range, should be like and within {}-{}"
 msgstr "Dải cổng không hợp lệ, phải nằm trong khoảng {}-{}"
 
@@ -6035,15 +5923,17 @@ msgstr "Dải cổng không hợp lệ, phải nằm trong khoảng {}-{}"
 msgid "Object"
 msgstr "Đối tượng"
 
-#: common/drf/metadata.py:148
+#: common/drf/metadata.py:163
 msgid "Org ID"
 msgstr "Organization ID"
 
 #: common/drf/parsers/base.py:21
+#, python-brace-format
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "Nội dung tập tin quá lớn (độ dài tối đa là `{}` byte)"
 
 #: common/drf/parsers/base.py:207
+#, python-brace-format
 msgid "Parse file error: {}"
 msgstr "Lỗi phân tích tập tin: {}"
 
@@ -6056,6 +5946,7 @@ msgid "Yes/No"
 msgstr "Có/Không"
 
 #: common/drf/renders/base.py:161
+#, python-brace-format
 msgid "Number, min {} max {}"
 msgstr "Số, tối thiểu {} tối đa {}"
 
@@ -6064,6 +5955,7 @@ msgid "Phone number, format +8612345678901"
 msgstr "Số điện thoại, định dạng +8612345678901"
 
 #: common/drf/renders/base.py:170
+#, python-brace-format
 msgid "Text, max length {}"
 msgstr "Văn bản, độ dài tối đa {}"
 
@@ -6072,6 +5964,7 @@ msgid "Long text, no length limit"
 msgstr "Văn bản dài, không giới hạn độ dài"
 
 #: common/drf/renders/base.py:175
+#, python-brace-format
 msgid "Datetime format {}"
 msgstr "Định dạng ngày giờ {}"
 
@@ -6080,14 +5973,16 @@ msgid "Label, format [\"key:value\"]"
 msgstr "Nhãn, định dạng: [\"Khóa:Giá trị\"]"
 
 #: common/drf/renders/base.py:182
+#, python-brace-format
 msgid ""
 "Choices, format name(value), name is optional for human read, value is "
 "requisite, options {}"
 msgstr ""
-"Tùy chọn, định dạng: Tên(Giá trị), tên là tùy chọn để dễ đọc, giá trị là bắt "
-"buộc, tùy chọn có {}"
+"Tùy chọn, định dạng: Tên(Giá trị), tên là tùy chọn để dễ đọc, giá trị là bắt"
+" buộc, tùy chọn có {}"
 
 #: common/drf/renders/base.py:185
+#, python-brace-format
 msgid "Choices, options {}"
 msgstr "Tùy chọn, tùy chọn có {}"
 
@@ -6110,8 +6005,7 @@ msgstr ""
 "cho việc đọc, id là bắt buộc"
 
 #: common/drf/renders/base.py:196
-msgid ""
-"Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgid "Labels, format [\"key:value\", ...], if label not exists, will create it"
 msgstr ""
 "nhãn, định dạng: [\"khóa:giá trị\", ...], nếu nhãn không tồn tại, sẽ được "
 "tạo ra"
@@ -6121,6 +6015,7 @@ msgid "Objects, format [\"id\", ...]"
 msgstr "nhiều liên kết, định dạng là [\"id\", ...]"
 
 #: common/drf/renders/base.py:301
+#, python-brace-format
 msgid ""
 "{} - Encryption password not set - Please go to Personal Settings → "
 "Preferences → File Encryption Password to set it."
@@ -6253,6 +6148,7 @@ msgid "sp_id is 6 bits"
 msgstr "SP_id phải là 6 chữ số"
 
 #: common/sdk/sms/cmpp2.py:214
+#, python-brace-format
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "Lỗi kết nối với máy chủ cổng, lỗi: {}"
 
@@ -6264,6 +6160,10 @@ msgstr "Tệp SMS tùy chỉnh không hợp lệ"
 #, python-format
 msgid "SMS sending failed[%s]: %s"
 msgstr "Gửi SMS thất bại[%s]: %s"
+
+#: common/sdk/sms/custom_file.py:47 common/serializers/common.py:98
+msgid "File"
+msgstr "Tài liệu"
 
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
@@ -6286,6 +6186,7 @@ msgid "Custom type (File)"
 msgstr "Custom (File)"
 
 #: common/sdk/sms/endpoint.py:32
+#, python-brace-format
 msgid "SMS provider not support: {}"
 msgstr "Nhà cung cấp dịch vụ SMS không hỗ trợ: {}"
 
@@ -6302,16 +6203,13 @@ msgid "The verification code is incorrect"
 msgstr "Mã xác thực sai"
 
 #: common/sdk/sms/exceptions.py:18
+#, python-brace-format
 msgid "Please wait {} seconds before sending"
 msgstr "Vui lòng gửi lại sau {} giây"
 
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "Nút"
-
-#: common/serializers/common.py:98
-msgid "File"
-msgstr "Tài liệu"
 
 #: common/serializers/fields.py:139
 msgid "Invalid data type"
@@ -6334,6 +6232,7 @@ msgstr "Loại dữ liệu lỗi, nên là danh sách"
 #: common/serializers/fields.py:360
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/task.py:122
+#, python-brace-format
 msgid "Invalid choice: {}"
 msgstr "Tùy chọn không hợp lệ: {}"
 
@@ -6356,10 +6255,8 @@ msgstr "Gửi tệp đính kèm email"
 
 #: common/tasks.py:84
 msgid ""
-"When an account password is changed or an account backup generates "
-"attachments, \n"
-"        this task needs to be executed for sending emails and handling "
-"attachments"
+"When an account password is changed or an account backup generates attachments, \n"
+"        this task needs to be executed for sending emails and handling attachments"
 msgstr ""
 "Khi đổi mật khẩu tài khoản, tệp đính kèm từ việc sao lưu tài khoản cần được "
 "gửi qua email, thực hiện nhiệm vụ này"
@@ -6395,12 +6292,11 @@ msgstr "Gửi mã xác nhận qua tin nhắn"
 
 #: common/utils/verify_code.py:19
 msgid ""
-"When resetting a password, forgetting a password, or verifying MFA, this "
-"task needs to \n"
+"When resetting a password, forgetting a password, or verifying MFA, this task needs to \n"
 "        be executed to send SMS messages"
 msgstr ""
-"Khi thiết lập lại mật khẩu, quên mật khẩu, và xác minh mfa, cần gửi tin nhắn "
-"thì thực hiện nhiệm vụ này"
+"Khi thiết lập lại mật khẩu, quên mật khẩu, và xác minh mfa, cần gửi tin nhắn"
+" thì thực hiện nhiệm vụ này"
 
 #: common/validators.py:16
 msgid "Special char not allowed"
@@ -6439,6 +6335,10 @@ msgstr "Tài khoản của bạn đã được tạo thành công"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer"
 
+#: jumpserver/context_processor.py:31
+msgid "FIT2CLOUD"
+msgstr ""
+
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
 msgstr "Dịch vụ Flower không khả dụng, vui lòng kiểm tra"
@@ -6449,11 +6349,12 @@ msgid ""
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
-"<div>Luna là một chương trình được triển khai riêng biệt, bạn cần triển khai "
-"Luna, Koko.</div><div>Nếu bạn thấy trang này, chứng tỏ bạn đang truy cập "
+"<div>Luna là một chương trình được triển khai riêng biệt, bạn cần triển khai"
+" Luna, Koko.</div><div>Nếu bạn thấy trang này, chứng tỏ bạn đang truy cập "
 "không phải là cổng mà nginx lắng nghe, chúc bạn may mắn.</div>"
 
 #: jumpserver/views/other.py:52
+#, python-brace-format
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr ""
 "Dịch vụ Websocket hoạt động trên cổng: {}, vui lòng kiểm tra xem nginx có "
@@ -6465,8 +6366,8 @@ msgid ""
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
-"<div>Koko là một chương trình được triển khai riêng biệt, bạn cần triển khai "
-"Koko, và đảm bảo cấu hình nginx chuyển tiếp, </div><div>Nếu bạn thấy trang "
+"<div>Koko là một chương trình được triển khai riêng biệt, bạn cần triển khai"
+" Koko, và đảm bảo cấu hình nginx chuyển tiếp, </div><div>Nếu bạn thấy trang "
 "này, chứng tỏ bạn đang truy cập không phải là cổng mà nginx lắng nghe, chúc "
 "bạn may mắn.</div>"
 
@@ -6519,6 +6420,7 @@ msgid "User message"
 msgstr "Người dùng tin nhắn"
 
 #: notifications/models/notification.py:21
+#, python-brace-format
 msgid "{} subscription"
 msgstr "{} Đăng ký"
 
@@ -6532,8 +6434,7 @@ msgstr "Đăng bài tin nhắn trong hệ thống"
 
 #: notifications/notifications.py:48
 msgid ""
-"This task needs to be executed for sending internal messages for system "
-"alerts, \n"
+"This task needs to be executed for sending internal messages for system alerts, \n"
 "        work orders, and other notifications"
 msgstr ""
 "Một số cảnh báo của hệ thống, đơn đặt hàng, v.v. cần gửi tin nhắn trong hệ "
@@ -6543,9 +6444,9 @@ msgstr ""
 #, fuzzy, python-format
 #| msgid ""
 #| "Run Ansible jobs in the Docker execution environment (%(image)s). To run "
-#| "jobs locally instead, disable \"Docker isolation for Ansible\" under "
-#| "System Settings > Feature Settings > Job Center. If the image is missing, "
-#| "run this command on the Ansible worker: docker pull %(image)s"
+#| "jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+#| "Settings > Feature Settings > Job Center. If the image is missing, run this "
+#| "command on the Ansible worker: docker pull %(image)s"
 msgid ""
 "The Ansible Docker image \"%(image)s\" was not found. To run jobs locally "
 "instead, disable \"Docker isolation for Ansible\" under System Settings > "
@@ -6557,34 +6458,31 @@ msgstr ""
 "thống > Cài đặt tính năng > Trung tâm công việc. Nếu thiếu image, hãy chạy "
 "lệnh này trên worker Ansible: docker pull %(image)s"
 
-#: ops/ansible/inventory.py:193 ops/ansible/inventory.py:280
+#: ops/ansible/inventory.py:150 ops/ansible/inventory.py:220
 #: ops/models/job.py:69
 msgid "No account available"
 msgstr "Không có tài khoản nào khả dụng"
 
-#: ops/ansible/inventory.py:215
-msgid ""
-"The platform uses su, but the directly connected account does not have a "
-"target root credential. Configure su_from or use a root account."
-msgstr ""
-
-#: ops/ansible/inventory.py:405 ops/ansible/inventory.py:447
+#: ops/ansible/inventory.py:341 ops/ansible/inventory.py:383
 msgid "Ansible disabled"
 msgstr "Ansible đã bị vô hiệu hóa"
 
-#: ops/ansible/inventory.py:463
+#: ops/ansible/inventory.py:399
 msgid "Skip hosts below:"
 msgstr "Bỏ qua các máy chủ sau:"
 
 #: ops/api/celery.py:204
+#, python-brace-format
 msgid "Task {} not found"
 msgstr "Nhiệm vụ {} không tồn tại"
 
 #: ops/api/celery.py:211
+#, python-brace-format
 msgid "Task {} args or kwargs error"
 msgstr "Nhiệm vụ {} có tham số thực thi không hợp lệ"
 
 #: ops/api/job.py:66
+#, python-brace-format
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr ""
 "Đăng nhập vào tài sản {}({}) bị từ chối, do bị giới hạn bởi quy tắc ACL tài "
@@ -6617,7 +6515,8 @@ msgstr "Có tệp cùng tên tồn tại"
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr ""
-"Kích thước tệp vượt quá giới hạn tối đa. Vui lòng chọn tệp nhỏ hơn {limit}MB."
+"Kích thước tệp vượt quá giới hạn tối đa. Vui lòng chọn tệp nhỏ hơn "
+"{limit}MB."
 
 #: ops/api/job.py:276
 msgid ""
@@ -6783,12 +6682,14 @@ msgid "Periodic run"
 msgstr "Periodic"
 
 #: ops/mixin.py:36 ops/mixin.py:113 ops/mixin.py:172
-#: settings/serializers/auth/ldap.py:88 settings/serializers/auth/ldap_ha.py:70
+#: settings/serializers/auth/ldap.py:88
+#: settings/serializers/auth/ldap_ha.py:70
 msgid "Interval"
 msgstr "Khoảng cách"
 
 #: ops/mixin.py:39 ops/mixin.py:111 ops/mixin.py:169
-#: settings/serializers/auth/ldap.py:85 settings/serializers/auth/ldap_ha.py:67
+#: settings/serializers/auth/ldap.py:85
+#: settings/serializers/auth/ldap_ha.py:67
 msgid "Crontab"
 msgstr "Crontab"
 
@@ -6863,6 +6764,7 @@ msgid "Celery Task Execution"
 msgstr "Thực hiện nhiệm vụ Celery"
 
 #: ops/models/job.py:82
+#, python-brace-format
 msgid "Module {} is not suitable for this asset"
 msgstr "Mô-đun {} không áp dụng cho tài sản này"
 
@@ -6927,8 +6829,8 @@ msgid ""
 "referenced in the script using {{ jms_name }}"
 msgstr ""
 "Tên biến sử dụng trong script, tiền tố cố định jms_ + tên biến đầu vào, ví "
-"dụ: tên biến là name, thì biến môi trường cuối cùng sẽ là jms_name, khi tham "
-"chiếu trong script sẽ sử dụng {{ jms_name }}"
+"dụ: tên biến là name, thì biến môi trường cuối cùng sẽ là jms_name, khi tham"
+" chiếu trong script sẽ sử dụng {{ jms_name }}"
 
 #: ops/models/variable.py:16 ops/serializers/variable.py:32
 msgid "Default Value"
@@ -7043,14 +6945,12 @@ msgstr "Tạo hoặc cập nhật nhiệm vụ định kỳ"
 
 #: ops/tasks.py:135
 msgid ""
-"With version iterations, new tasks may be added, or task names and execution "
-"times may \n"
-"        be modified. Therefore, upon system startup, tasks will be "
-"registered or the parameters \n"
+"With version iterations, new tasks may be added, or task names and execution times may \n"
+"        be modified. Therefore, upon system startup, tasks will be registered or the parameters \n"
 "        of scheduled tasks will be updated"
 msgstr ""
-"Với sự phát triển của phiên bản, có thể sẽ có nhiệm vụ mới hoặc thay đổi tên "
-"nhiệm vụ, thời gian thực hiện, do đó khi hệ thống khởi động, sẽ đăng ký "
+"Với sự phát triển của phiên bản, có thể sẽ có nhiệm vụ mới hoặc thay đổi tên"
+" nhiệm vụ, thời gian thực hiện, do đó khi hệ thống khởi động, sẽ đăng ký "
 "nhiệm vụ hoặc cập nhật tham số nhiệm vụ định kỳ"
 
 #: ops/tasks.py:148
@@ -7059,10 +6959,8 @@ msgstr "Kiểm tra hiệu suất dịch vụ định kỳ"
 
 #: ops/tasks.py:150
 msgid ""
-"Check every hour whether each component is offline and whether the CPU, "
-"memory, \n"
-"        and disk usage exceed the thresholds, and send an alert message to "
-"the administrator"
+"Check every hour whether each component is offline and whether the CPU, memory, \n"
+"        and disk usage exceed the thresholds, and send an alert message to the administrator"
 msgstr ""
 "Mỗi giờ kiểm tra xem các thành phần có bị ngắt kết nối không, sử dụng CPU, "
 "bộ nhớ, tỷ lệ sử dụng đĩa có vượt quá ngưỡng không, gửi thông báo cảnh báo "
@@ -7074,12 +6972,9 @@ msgstr "Dọn dẹp công việc bất thường"
 
 #: ops/tasks.py:164
 msgid ""
-"Due to exceptions caused by executing adhoc and playbooks in the Job "
-"Center, \n"
-"        which result in the task status not being updated, the system will "
-"clean up abnormal jobs \n"
-"        that have not been completed for more than 3 hours every hour and "
-"mark these tasks as \n"
+"Due to exceptions caused by executing adhoc and playbooks in the Job Center, \n"
+"        which result in the task status not being updated, the system will clean up abnormal jobs \n"
+"        that have not been completed for more than 3 hours every hour and mark these tasks as \n"
 "        failed"
 msgstr ""
 "Do trung tâm công việc thực hiện lệnh tắt, playbook có thể phát sinh bất "
@@ -7093,12 +6988,9 @@ msgstr "Dọn dẹp lịch sử thực hiện trung tâm công việc"
 
 #: ops/tasks.py:179
 msgid ""
-"Due to the execution of adhoc and playbooks in the Job Center, execution "
-"records will \n"
-"        be generated. The system will clean up records that exceed the "
-"retention period every day \n"
-"        at 2 a.m., based on the configuration of 'System Settings - Tasks - "
-"Regular clean-up - \n"
+"Due to the execution of adhoc and playbooks in the Job Center, execution records will \n"
+"        be generated. The system will clean up records that exceed the retention period every day \n"
+"        at 2 a.m., based on the configuration of 'System Settings - Tasks - Regular clean-up - \n"
 "        Job execution retention days'"
 msgstr ""
 "Do trung tâm công việc thực hiện lệnh tắt, playbook, sẽ phát sinh bản ghi "
@@ -7146,11 +7038,12 @@ msgstr "ID công việc"
 msgid "Name of the job"
 msgstr "Tên công việc"
 
-#: orgs/api.py:63
+#: orgs/api.py:62
+#, python-brace-format
 msgid "The current organization ({}) cannot be deleted"
 msgstr "Tổ chức hiện tại ({}) không thể bị xóa"
 
-#: orgs/api.py:68
+#: orgs/api.py:67
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
@@ -7158,7 +7051,8 @@ msgstr ""
 "Cài đặt đồng bộ LDAP tổ chức là tổ chức hiện tại, vui lòng chuyển sang tổ "
 "chức khác trước khi thực hiện thao tác xóa"
 
-#: orgs/api.py:78
+#: orgs/api.py:77
+#, python-brace-format
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "Tổ chức có tài nguyên ({}) không thể bị xóa"
 
@@ -7176,8 +7070,8 @@ msgstr "Vui lòng chọn một tổ chức trước khi lưu"
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:308 tickets/reporting.py:85
-#: tickets/serializers/ticket/ticket.py:72
+#: tickets/models/ticket/general.py:303 tickets/reporting.py:85
+#: tickets/serializers/ticket/ticket.py:62
 msgid "Organization"
 msgstr "Tổ chức"
 
@@ -7333,6 +7227,7 @@ msgid "Asset permissions is about to expire"
 msgstr "Quy tắc ủy quyền tài sản sẽ hết hạn"
 
 #: perms/notifications.py:64
+#, python-brace-format
 msgid "asset permissions of organization {}"
 msgstr "Tài sản ủy quyền của tổ chức ({})"
 
@@ -7363,18 +7258,14 @@ msgstr "Kiểm tra quy tắc ủy quyền tài sản đã hết hạn"
 
 #: perms/tasks.py:30
 msgid ""
-"The cache of organizational collections, which have completed user "
-"authorization tree \n"
-"        construction, will expire. Therefore, expired collections need to be "
-"cleared from the \n"
-"        cache, and this task will be executed periodically based on the time "
-"interval specified \n"
-"        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file "
-"config.txt"
+"The cache of organizational collections, which have completed user authorization tree \n"
+"        construction, will expire. Therefore, expired collections need to be cleared from the \n"
+"        cache, and this task will be executed periodically based on the time interval specified \n"
+"        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file config.txt"
 msgstr ""
 "Bộ nhớ cache của tập hợp tổ chức đã xây dựng cây ủy quyền người dùng sẽ hết "
-"hạn, vì vậy cần xóa tập hợp đã hết hạn khỏi bộ nhớ cache, thực hiện nhiệm vụ "
-"này theo khoảng thời gian được cấu hình trong tệp hệ thống config.txt với "
+"hạn, vì vậy cần xóa tập hợp đã hết hạn khỏi bộ nhớ cache, thực hiện nhiệm vụ"
+" này theo khoảng thời gian được cấu hình trong tệp hệ thống config.txt với "
 "PERM_EXPIRED_CHECK_PERIODIC"
 
 #: perms/tasks.py:49
@@ -7383,12 +7274,9 @@ msgstr "Gửi thông báo hết hạn quyền tài sản"
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users "
-"associated with \n"
-"        assets whose authorization is about to expire, as well as to the "
-"organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset "
-"authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users associated with \n"
+"        assets whose authorization is about to expire, as well as to the organization's \n"
+"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
 "        expire in a few days"
 msgstr ""
 "Kiểm tra vào lúc 10 giờ sáng mỗi ngày, sẽ gửi thông báo đến người dùng liên "
@@ -7414,6 +7302,7 @@ msgid "Internal role, can't be update"
 msgstr "Nội bộ vai trò, không thể cập nhật"
 
 #: rbac/api/rolebinding.py:47
+#, python-brace-format
 msgid "{} at least one system role"
 msgstr "{} ít nhất một vai trò hệ thống"
 
@@ -7689,7 +7578,7 @@ msgid "Ticket comment"
 msgstr "Nhận xét nhiệm vụ"
 
 #: rbac/tree.py:204 settings/serializers/feature.py:211
-#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:315
+#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "Nhiệm vụ"
 
@@ -7776,6 +7665,7 @@ msgid "Test success"
 msgstr "Kiểm tra thành công"
 
 #: settings/api/email.py:22
+#, python-brace-format
 msgid "Test mail sent to {}, please check"
 msgstr "Email đã được gửi {}, vui lòng kiểm tra"
 
@@ -7998,7 +7888,8 @@ msgid "CAS"
 msgstr "CAS"
 
 #: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:49
-#: settings/serializers/auth/ldap_ha.py:31 settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/ldap_ha.py:31
+#: settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr "Địa chỉ máy chủ dịch vụ"
 
@@ -8023,9 +7914,11 @@ msgstr "Thuộc tính tên người dùng"
 msgid "Enable attributes map"
 msgstr "Kích hoạt ánh xạ thuộc tính"
 
-#: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
+#: settings/serializers/auth/cas.py:34
+#: settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:71 settings/serializers/auth/ldap_ha.py:53
+#: settings/serializers/auth/ldap.py:71
+#: settings/serializers/auth/ldap_ha.py:53
 #: settings/serializers/auth/oauth2.py:60 settings/serializers/auth/oidc.py:39
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
@@ -8049,16 +7942,16 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
-"thống, `value` là tên thuộc tính người dùng dịch vụ DingTalk"
+"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ"
+" thống, `value` là tên thuộc tính người dùng dịch vụ DingTalk"
 
 #: settings/serializers/auth/feishu.py:20
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the FeiShu service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
-"thống, `value` là tên thuộc tính người dùng dịch vụ FeiShu"
+"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ"
+" thống, `value` là tên thuộc tính người dùng dịch vụ FeiShu"
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:24
 msgid "Lark"
@@ -8069,8 +7962,8 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the Lark service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
-"thống, `value` là tên thuộc tính người dùng dịch vụ Lark"
+"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ"
+" thống, `value` là tên thuộc tính người dùng dịch vụ Lark"
 
 #: settings/serializers/auth/ldap.py:46 settings/serializers/auth/ldap.py:115
 msgid "LDAP"
@@ -8080,55 +7973,64 @@ msgstr "LDAP"
 msgid "LDAP server URI"
 msgstr "Tên miền dịch vụ LDAP"
 
-#: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
+#: settings/serializers/auth/ldap.py:53
+#: settings/serializers/auth/ldap_ha.py:35
 msgid "Bind DN"
 msgstr "DN liên kết"
 
-#: settings/serializers/auth/ldap.py:54 settings/serializers/auth/ldap_ha.py:36
+#: settings/serializers/auth/ldap.py:54
+#: settings/serializers/auth/ldap_ha.py:36
 msgid "Binding Distinguished Name"
 msgstr "Quản trị viên thư mục liên kết"
 
-#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/ldap_ha.py:40
+#: settings/serializers/auth/ldap.py:58
+#: settings/serializers/auth/ldap_ha.py:40
 msgid "Binding password"
 msgstr "Mật khẩu liên kết"
 
-#: settings/serializers/auth/ldap.py:61 settings/serializers/auth/ldap_ha.py:43
+#: settings/serializers/auth/ldap.py:61
+#: settings/serializers/auth/ldap_ha.py:43
 msgid "Search OU"
 msgstr "OU người dùng"
 
-#: settings/serializers/auth/ldap.py:63 settings/serializers/auth/ldap_ha.py:45
+#: settings/serializers/auth/ldap.py:63
+#: settings/serializers/auth/ldap_ha.py:45
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
 msgstr ""
 "Kho tìm kiếm người dùng, nếu có nhiều OU, có thể phân tách bằng ký hiệu `|`"
 
-#: settings/serializers/auth/ldap.py:67 settings/serializers/auth/ldap_ha.py:49
+#: settings/serializers/auth/ldap.py:67
+#: settings/serializers/auth/ldap_ha.py:49
 msgid "Search filter"
 msgstr "Bộ lọc người dùng."
 
-#: settings/serializers/auth/ldap.py:68 settings/serializers/auth/ldap_ha.py:50
+#: settings/serializers/auth/ldap.py:68
+#: settings/serializers/auth/ldap_ha.py:50
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr ""
-"Các tùy chọn khả thi là (cn hoặc uid hoặc sAMAccountName=%(user)s) <---SEP---"
-"> ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng "
-"của hệ thống, `value` là tên thuộc tính người dùng của dịch vụ LDAP <---"
-"SEP---> Thời gian vượt thời gian kết nối (giây) <---SEP---> Chế độ nghiêm "
-"ngặt <---SEP---> Khi chế độ nghiêm ngặt được bật, việc đồng bộ toàn bộ hoặc "
-"tự động sẽ vô hiệu hóa những người dùng không được phát hiện trong LDAP <---"
-"SEP---> Thời gian hết hạn bộ nhớ cache User DN (giây) <---SEP---> Lưu cache "
-"User DN được truy vấn khi người dùng đăng nhập, có thể cải thiện hiệu suất "
-"xác thực người dùng một cách hiệu quả <br> nếu cấu trúc OU của người dùng có "
-"thay đổi, chỉ cần bấm vào gửi để xóa bộ nhớ cache User DN <---SEP---> Số "
-"lượng phân trang tìm kiếm (điểm) <---SEP---> Xác thực LDAP <---SEP---> Tên "
-"miền dịch vụ LDAP HA <---SEP---> Lưu cache User DN được truy vấn khi người "
-"dùng đăng nhập, có thể cải thiện hiệu suất xác thực người dùng một cách hiệu "
-"quả <br> nếu cấu trúc OU của người dùng có thay đổi, chỉ cần bấm vào gửi để "
-"xóa bộ nhớ cache User DN <---SEP---> OAuth2 <---SEP---> Nhà cung cấp dịch vụ "
-"<---SEP---> ID khách hàng <---SEP---> Khóa mật khẩu khách hàng"
+"Các tùy chọn khả thi là (cn hoặc uid hoặc sAMAccountName=%(user)s) "
+"<---SEP---> ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính "
+"người dùng của hệ thống, `value` là tên thuộc tính người dùng của dịch vụ "
+"LDAP <---SEP---> Thời gian vượt thời gian kết nối (giây) <---SEP---> Chế độ "
+"nghiêm ngặt <---SEP---> Khi chế độ nghiêm ngặt được bật, việc đồng bộ toàn "
+"bộ hoặc tự động sẽ vô hiệu hóa những người dùng không được phát hiện trong "
+"LDAP <---SEP---> Thời gian hết hạn bộ nhớ cache User DN (giây) <---SEP---> "
+"Lưu cache User DN được truy vấn khi người dùng đăng nhập, có thể cải thiện "
+"hiệu suất xác thực người dùng một cách hiệu quả <br> nếu cấu trúc OU của "
+"người dùng có thay đổi, chỉ cần bấm vào gửi để xóa bộ nhớ cache User DN "
+"<---SEP---> Số lượng phân trang tìm kiếm (điểm) <---SEP---> Xác thực LDAP "
+"<---SEP---> Tên miền dịch vụ LDAP HA <---SEP---> Lưu cache User DN được truy"
+" vấn khi người dùng đăng nhập, có thể cải thiện hiệu suất xác thực người "
+"dùng một cách hiệu quả <br> nếu cấu trúc OU của người dùng có thay đổi, chỉ "
+"cần bấm vào gửi để xóa bộ nhớ cache User DN <---SEP---> OAuth2 <---SEP---> "
+"Nhà cung cấp dịch vụ <---SEP---> ID khách hàng <---SEP---> Khóa mật khẩu "
+"khách hàng"
 
-#: settings/serializers/auth/ldap.py:73 settings/serializers/auth/ldap_ha.py:55
+#: settings/serializers/auth/ldap.py:73
+#: settings/serializers/auth/ldap_ha.py:55
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the LDAP service user attribute name"
@@ -8136,21 +8038,25 @@ msgstr ""
 "Ánh xạ thuộc tính của người dùng, trong đó `key` là tên thuộc tính người "
 "dùng hệ thống, `value` là tên thuộc tính người dùng dịch vụ LDAP"
 
-#: settings/serializers/auth/ldap.py:78 settings/serializers/auth/ldap_ha.py:60
-#: settings/serializers/auth/oauth2.py:67 settings/serializers/auth/oidc.py:117
-#: settings/serializers/auth/saml2.py:45
+#: settings/serializers/auth/ldap.py:78
+#: settings/serializers/auth/ldap_ha.py:60
+#: settings/serializers/auth/oauth2.py:67
+#: settings/serializers/auth/oidc.py:117 settings/serializers/auth/saml2.py:45
 msgid "Always update user"
 msgstr "Luôn cập nhật thông tin người dùng"
 
-#: settings/serializers/auth/ldap.py:92 settings/serializers/auth/ldap_ha.py:74
+#: settings/serializers/auth/ldap.py:92
+#: settings/serializers/auth/ldap_ha.py:74
 msgid "Connect timeout (s)"
 msgstr "Thời gian kết nối tối đa (giây)"
 
-#: settings/serializers/auth/ldap.py:95 settings/serializers/auth/ldap_ha.py:77
+#: settings/serializers/auth/ldap.py:95
+#: settings/serializers/auth/ldap_ha.py:77
 msgid "Strict sync"
 msgstr "Chế độ nghiêm ngặt."
 
-#: settings/serializers/auth/ldap.py:96 settings/serializers/auth/ldap_ha.py:78
+#: settings/serializers/auth/ldap.py:96
+#: settings/serializers/auth/ldap_ha.py:78
 msgid ""
 "In strict mode, users not found in LDAP will be disabled during full or "
 "automatic sync"
@@ -8240,8 +8146,8 @@ msgstr "Tên miền dịch vụ LDAP HA"
 #: settings/serializers/auth/ldap_ha.py:85
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
-"the user OU structure has been adjusted, click Submit to clear the user DN "
+"effectivelyimprove the speed of user authentication., 0 means no cache<br>If"
+" the user OU structure has been adjusted, click Submit to clear the user DN "
 "cache"
 msgstr ""
 "Bộ nhớ cache User DN được truy vấn trong quá trình xác thực người dùng có "
@@ -8291,7 +8197,8 @@ msgid "End session endpoint"
 msgstr "Địa chỉ đầu cuối đăng xuất phiên"
 
 #: settings/serializers/auth/oauth2.py:57
-msgid "When the user signs out, they also be logged out from the OAuth2 server"
+msgid ""
+"When the user signs out, they also be logged out from the OAuth2 server"
 msgstr "Khi người dùng đăng xuất, họ cũng sẽ thoát khỏi máy chủ OAuth2"
 
 #: settings/serializers/auth/oauth2.py:62
@@ -8371,8 +8278,9 @@ msgid ""
 "The issuer URL of the OpenID Provider, used to discover its configuration "
 "via the `$PROVIDER_ENDPOINT/.well-known/openid-configuration` endpoint."
 msgstr ""
-"URL phát hành của nhà cung cấp OpenID, được sử dụng để khám phá cấu hình của "
-"nó thông qua đầu cuối “$PROVIDER_ENDPOINT/.well-known/openid-configuration”."
+"URL phát hành của nhà cung cấp OpenID, được sử dụng để khám phá cấu hình của"
+" nó thông qua đầu cuối “$PROVIDER_ENDPOINT/.well-known/openid-"
+"configuration”."
 
 #: settings/serializers/auth/oidc.py:87
 msgid "JWKS endpoint"
@@ -8434,10 +8342,11 @@ msgid "OTP in RADIUS"
 msgstr "Sử dụng Radius OTP"
 
 #: settings/serializers/auth/radius.py:24
-msgid "* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
+msgid ""
+"* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
 msgstr ""
-"* Việc sử dụng OTP trong RADIUS có nghĩa là người dùng có thể sử dụng RADIUS "
-"như một phương pháp MFA."
+"* Việc sử dụng OTP trong RADIUS có nghĩa là người dùng có thể sử dụng RADIUS"
+" như một phương pháp MFA."
 
 #: settings/serializers/auth/saml2.py:12 settings/serializers/auth/saml2.py:15
 msgid "SAML2"
@@ -8480,8 +8389,8 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the Slack service user attribute name"
 msgstr ""
-"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
-"thống, `value` là tên thuộc tính người dùng dịch vụ Slack"
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ"
+" thống, `value` là tên thuộc tính người dùng dịch vụ Slack"
 
 #: settings/serializers/auth/sms.py:18
 msgid "Enable Short Message Service (SMS)"
@@ -8546,9 +8455,9 @@ msgstr "Loại hình kinh doanh (Application id)"
 #: settings/serializers/auth/sms.py:85
 #, python-brace-format
 msgid ""
-"Template need contain {code} and Signature + template length does not exceed "
-"67 words. For example, your verification code is {code}, which is valid for "
-"5 minutes. Please do not disclose it to others."
+"Template need contain {code} and Signature + template length does not exceed"
+" 67 words. For example, your verification code is {code}, which is valid for"
+" 5 minutes. Please do not disclose it to others."
 msgstr ""
 "Mẫu tin nhắn cần phải chứa {code} và tổng chiều dài mẫu + chữ ký không vượt "
 "quá 67 ký tự. Ví dụ, mã xác thực của bạn là {code}, có hiệu lực trong 5 "
@@ -8659,8 +8568,8 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the WeCom service user attribute name"
 msgstr ""
-"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
-"thống, `value` là tên thuộc tính người dùng dịch vụ WeChat doanh nghiệp"
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ"
+" thống, `value` là tên thuộc tính người dùng dịch vụ WeChat doanh nghiệp"
 
 #: settings/serializers/basic.py:11
 msgid "Site URL"
@@ -8668,11 +8577,11 @@ msgstr "URL của trang hiện tại"
 
 #: settings/serializers/basic.py:13
 msgid ""
-"Site URL is the externally accessible address of the current product service "
-"and is usually used in links in system emails"
+"Site URL is the externally accessible address of the current product service"
+" and is usually used in links in system emails"
 msgstr ""
-"URL của trang là địa chỉ có thể truy cập bên ngoài của dịch vụ sản phẩm hiện "
-"tại, thường được sử dụng trong các liên kết trong email hệ thống"
+"URL của trang là địa chỉ có thể truy cập bên ngoài của dịch vụ sản phẩm hiện"
+" tại, thường được sử dụng trong các liên kết trong email hệ thống"
 
 #: settings/serializers/basic.py:18
 msgid "User guide url"
@@ -8711,7 +8620,8 @@ msgstr "Hỗ trợ liên kết"
 msgid ""
 "Support URL refers to the address in the top navigation bar Help - Support"
 msgstr ""
-"Hỗ trợ URL đề cập đến địa chỉ trong thanh điều hướng chính, trợ giúp - Hỗ trợ"
+"Hỗ trợ URL đề cập đến địa chỉ trong thanh điều hướng chính, trợ giúp - Hỗ "
+"trợ"
 
 #: settings/serializers/basic.py:44
 msgid "Organization name already exists"
@@ -8840,7 +8750,7 @@ msgstr "ID thuê bao"
 
 #: settings/serializers/feature.py:141 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:128 xpack/plugins/cloud/manager.py:132
-#: xpack/plugins/cloud/models.py:293
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "Khu vực"
 
@@ -8958,86 +8868,6 @@ msgstr ""
 "Ứng dụng ảo, có thể sử dụng hệ điều hành Linux như một máy chủ ứng dụng "
 "trong ứng dụng từ xa."
 
-#: settings/serializers/luna.py:22
-#, fuzzy
-#| msgid "Default"
-msgid "Luna default"
-msgstr "Mặc định"
-
-#: settings/serializers/luna.py:26 users/serializers/preference/lina.py:47
-#: users/serializers/profile.py:66
-msgid "Language"
-msgstr "Ngôn ngữ"
-
-#: settings/serializers/luna.py:29 users/serializers/preference/luna.py:26
-msgid "Async loading of asset tree"
-msgstr "Tải tài sản cây không đồng bộ"
-
-#: settings/serializers/luna.py:33 users/serializers/preference/luna.py:30
-msgid "Connect default open method"
-msgstr "Kết nối với cách mở mặc định"
-
-#: settings/serializers/luna.py:36 users/serializers/preference/luna.py:34
-#: xpack/plugins/interface/models.py:44
-#: xpack/plugins/interface/serializers/interface.py:35
-msgid "Theme"
-msgstr "Chủ đề"
-
-#: settings/serializers/luna.py:39 users/serializers/preference/luna.py:41
-msgid "RDP resolution"
-msgstr "Độ phân giải RDP"
-
-#: settings/serializers/luna.py:42 users/serializers/preference/luna.py:45
-msgid "Keyboard layout"
-msgstr "Bố cục bàn phím"
-
-#: settings/serializers/luna.py:46 users/serializers/preference/luna.py:49
-msgid "RDP client option"
-msgstr "Tùy chọn khách hàng RDP"
-
-#: settings/serializers/luna.py:50 users/serializers/preference/luna.py:53
-msgid "RDP color quality"
-msgstr "Chất lượng màu RDP"
-
-#: settings/serializers/luna.py:53 users/serializers/preference/luna.py:57
-msgid "RDP smart size"
-msgstr "Kích thước thông minh RDP"
-
-#: settings/serializers/luna.py:55 users/serializers/preference/luna.py:58
-msgid ""
-"Determines whether the client computer should scale the content on the "
-"remote computer to fit the window size of the client computer when the "
-"window is resized."
-msgstr ""
-"Xác nhận liệu máy tính khách có nên thu phóng nội dung trên máy tính từ xa "
-"để phù hợp với kích thước cửa sổ của máy tính khách hay không"
-
-#: settings/serializers/luna.py:61 users/serializers/preference/luna.py:63
-msgid "Remote app connect method"
-msgstr "Cách kết nối ứng dụng từ xa"
-
-#: settings/serializers/luna.py:65 users/serializers/preference/koko.py:10
-#: users/serializers/preference/luna.py:67
-msgid "File name conflict resolution"
-msgstr "Giải pháp xung đột tên tệp"
-
-#: settings/serializers/luna.py:69 users/serializers/preference/luna.py:74
-msgid "Terminal font size"
-msgstr "Kích thước phông chữ trong terminal ký tự"
-
-#: settings/serializers/luna.py:72 users/serializers/preference/luna.py:77
-msgid "Backspace as Ctrl+H"
-msgstr "Terminal ký tự Backspace như Ctrl+H"
-
-#: settings/serializers/luna.py:75 users/serializers/preference/luna.py:80
-msgid "Right click quickly paste"
-msgstr "Dán nhanh bằng chuột phải"
-
-#: settings/serializers/luna.py:78 users/serializers/preference/koko.py:14
-#: users/serializers/preference/luna.py:84
-msgid "Terminal theme name"
-msgstr "Tên chủ đề terminal"
-
 #: settings/serializers/msg.py:24
 msgid "SMTP"
 msgstr "SMTP"
@@ -9104,8 +8934,8 @@ msgstr "Chủ đề tiền tố"
 
 #: settings/serializers/msg.py:70
 msgid ""
-"Tips: When creating a user, send the subject of the email (eg:Create account "
-"successfully)"
+"Tips: When creating a user, send the subject of the email (eg:Create account"
+" successfully)"
 msgstr ""
 "Gợi ý: Khi tạo người dùng, gửi email thiết lập mật khẩu với chủ đề (ví dụ: "
 "Tạo người dùng thành công)"
@@ -9126,8 +8956,8 @@ msgid ""
 "Tips: When creating a user, send the content of the email, support "
 "{username} {name} {email} label"
 msgstr ""
-"Gợi ý: Khi tạo người dùng, gửi nội dung email thiết lập mật khẩu, hỗ trợ các "
-"thẻ {username} {name} {email}"
+"Gợi ý: Khi tạo người dùng, gửi nội dung email thiết lập mật khẩu, hỗ trợ các"
+" thẻ {username} {name} {email}"
 
 #: settings/serializers/msg.py:85
 msgid "Tips: Email signature (eg:jumpserver)"
@@ -9220,8 +9050,8 @@ msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
 msgstr ""
-"Khi số lần đăng nhập của người dùng không thành công đạt giới hạn, thì sẽ bị "
-"cấm đăng nhập trong khoảng thời gian này"
+"Khi số lần đăng nhập của người dùng không thành công đạt giới hạn, thì sẽ bị"
+" cấm đăng nhập trong khoảng thời gian này"
 
 #: settings/serializers/security.py:79 settings/serializers/security.py:89
 msgid "Login failures count"
@@ -9272,15 +9102,15 @@ msgstr "Chỉ cho phép đăng nhập từ nguồn người dùng"
 
 #: settings/serializers/security.py:121
 msgid ""
-"If it is enabled, the user will only authenticate to the source when logging "
-"in; if it is disabled, the user will authenticate all the enabled "
+"If it is enabled, the user will only authenticate to the source when logging"
+" in; if it is disabled, the user will authenticate all the enabled "
 "authentication methods in a certain order when logging in, and as long as "
 "one of the authentication methods is successful, they can log in directly"
 msgstr ""
 "Nếu bật, khi người dùng đăng nhập sẽ chỉ thực hiện xác thực tại nguồn; nếu "
 "tắt, khi người dùng đăng nhập sẽ tiến hành xác thực theo thứ tự nhất định "
-"với tất cả các phương thức xác thực đã bật, chỉ cần một phương thức xác thực "
-"thành công là có thể đăng nhập ngay."
+"với tất cả các phương thức xác thực đã bật, chỉ cần một phương thức xác thực"
+" thành công là có thể đăng nhập ngay."
 
 #: settings/serializers/security.py:132
 #: users/templates/users/mfa_setting.html:160
@@ -9360,9 +9190,9 @@ msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
 msgstr ""
-"Mật khẩu và mã xác thực sẽ được gửi đến hệ thống xác thực bên thứ ba để kiểm "
-"tra, ví dụ: một số hệ thống xác thực bên thứ ba yêu cầu Mật khẩu + 6 chữ số "
-"để hoàn thành xác thực"
+"Mật khẩu và mã xác thực sẽ được gửi đến hệ thống xác thực bên thứ ba để kiểm"
+" tra, ví dụ: một số hệ thống xác thực bên thứ ba yêu cầu Mật khẩu + 6 chữ số"
+" để hoàn thành xác thực"
 
 #: settings/serializers/security.py:178
 msgid "Login CAPTCHA"
@@ -9378,9 +9208,9 @@ msgstr "Thông báo đăng nhập từ xa"
 
 #: settings/serializers/security.py:184
 msgid ""
-"The system determines whether the login IP address belongs to a common login "
-"city. If the account is logged in from a common login city, the system sends "
-"a remote login reminder"
+"The system determines whether the login IP address belongs to a common login"
+" city. If the account is logged in from a common login city, the system "
+"sends a remote login reminder"
 msgstr ""
 "Dựa trên IP đăng nhập có thuộc thành phố đăng nhập thường xuyên hay không, "
 "nếu tài khoản đăng nhập tại thành phố không thường dùng sẽ gửi thông báo "
@@ -9501,7 +9331,7 @@ msgstr "Người nhận email"
 msgid "Multiple user using , split"
 msgstr "Nhiều người dùng, sử dụng dấu phẩy để phân tách"
 
-#: settings/serializers/settings.py:63
+#: settings/serializers/settings.py:62
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
@@ -9520,8 +9350,8 @@ msgstr "Đăng ký thành phần"
 
 #: settings/serializers/terminal.py:28
 msgid ""
-"Allow component register, after all component setup, you should disable this "
-"for security"
+"Allow component register, after all component setup, you should disable this"
+" for security"
 msgstr ""
 "Có cho phép đăng ký thành phần hay không, nên tắt sau khi tất cả các thiết "
 "bị khởi động để đảm bảo an toàn"
@@ -9536,8 +9366,8 @@ msgstr ""
 msgid ""
 "* Allow users to log in to the KoKo component via Public key "
 "authentication<br/>If third-party authentication services, such as AD/LDAP, "
-"are enabled, you should disable this option to prevent users from logging in "
-"after being deleted from the AD/LDAP server"
+"are enabled, you should disable this option to prevent users from logging in"
+" after being deleted from the AD/LDAP server"
 msgstr ""
 "* Cho phép người dùng đăng nhập vào thành phần KoKo bằng phương thức xác "
 "thực khóa công khai<br/>Nếu dịch vụ xác thực bên thứ ba (như AD/LDAP) đã "
@@ -9554,18 +9384,18 @@ msgstr "Số lượng tài sản mỗi trang"
 
 #: settings/serializers/terminal.py:55
 msgid ""
-"* You can individually configure the service address and port in the service "
-"endpoint<br/>If enabled, the Luna page will display the DB client launch "
+"* You can individually configure the service address and port in the service"
+" endpoint<br/>If enabled, the Luna page will display the DB client launch "
 "method when connecting to assets"
 msgstr ""
 "* Bạn có thể cấu hình địa chỉ và cổng dịch vụ riêng lẻ trong điểm cuối dịch "
-"vụ<br/>Nếu được bật, trang Luna sẽ hiển thị phương pháp khởi động khách hàng "
-"DB khi kết nối với tài sản"
+"vụ<br/>Nếu được bật, trang Luna sẽ hiển thị phương pháp khởi động khách hàng"
+" DB khi kết nối với tài sản"
 
 #: settings/serializers/terminal.py:63
 msgid ""
-"* You can individually configure the service address and port in the service "
-"endpoint<br/>If enabled, the Luna page will display the download rdp file "
+"* You can individually configure the service address and port in the service"
+" endpoint<br/>If enabled, the Luna page will display the download rdp file "
 "button and RDP Client launch method when connecting to assets"
 msgstr ""
 "* Bạn có thể cấu hình địa chỉ và cổng dịch vụ riêng lẻ trong điểm cuối dịch "
@@ -9579,10 +9409,11 @@ msgstr "Kết nối khách hàng"
 #: settings/serializers/terminal.py:72
 msgid ""
 "* Allow connecting to the KoKo component via SSH client<br/>If enabled, the "
-"Luna page will display the SSH client launch method when connecting to assets"
+"Luna page will display the SSH client launch method when connecting to "
+"assets"
 msgstr ""
-"* Cho phép kết nối đến thành phần KoKo thông qua khách hàng SSH<br/>Nếu được "
-"bật, khi kết nối đến tài sản, trang Luna sẽ hiển thị phương pháp khởi động "
+"* Cho phép kết nối đến thành phần KoKo thông qua khách hàng SSH<br/>Nếu được"
+" bật, khi kết nối đến tài sản, trang Luna sẽ hiển thị phương pháp khởi động "
 "khách hàng SSH"
 
 #: settings/serializers/tool.py:10
@@ -9595,8 +9426,8 @@ msgstr "Công cụ trong bảng điều khiển"
 
 #: settings/serializers/tool.py:15
 msgid ""
-"*! If enabled, users with RBAC permissions will be able to utilize all tools "
-"in the workbench"
+"*! If enabled, users with RBAC permissions will be able to utilize all tools"
+" in the workbench"
 msgstr ""
 "*! Nếu được bật, người dùng có quyền RBAC sẽ có thể sử dụng tất cả các công "
 "cụ trong bảng điều khiển"
@@ -9623,8 +9454,7 @@ msgstr "Đăng ký nhiệm vụ nhập khẩu người dùng LDAP theo chu kỳ"
 
 #: settings/tasks/ldap.py:117
 msgid ""
-"When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP "
-"sync task \n"
+"When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP sync task \n"
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 "Khi các tham số đồng bộ tự động LDAP thay đổi, chẳng hạn như tham số "
@@ -9636,8 +9466,7 @@ msgstr "Đăng ký nhiệm vụ nhập khẩu người dùng LDAP HA theo chu k�
 
 #: settings/tasks/ldap.py:133
 msgid ""
-"When LDAP HA auto-sync parameters change, such as Crontab parameters, the "
-"LDAP HA sync task \n"
+"When LDAP HA auto-sync parameters change, such as Crontab parameters, the LDAP HA sync task \n"
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 "Khi các tham số tự động đồng bộ LDAP HA thay đổi, như tham số Crontab, sẽ "
@@ -9664,19 +9493,23 @@ msgid "ldap:// or ldaps:// protocol is used."
 msgstr "Sử dụng giao thức ldap:// hoặc ldaps://"
 
 #: settings/utils/ldap.py:597
+#, python-brace-format
 msgid "Host or port is disconnected: {}"
 msgstr "Máy chủ hoặc cổng không thể kết nối: {}"
 
 #: settings/utils/ldap.py:599
+#, python-brace-format
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "Cổng không phải là cổng dịch vụ LDAP: {}"
 
 #: settings/utils/ldap.py:601
+#, python-brace-format
 msgid "Please add certificate: {}"
 msgstr "Vui lòng thêm chứng chỉ: {}"
 
 #: settings/utils/ldap.py:605 settings/utils/ldap.py:632
 #: settings/utils/ldap.py:662 settings/utils/ldap.py:690
+#, python-brace-format
 msgid "Unknown error: {}"
 msgstr "Lỗi không xác định: {}"
 
@@ -9685,22 +9518,27 @@ msgid "Bind DN or Password incorrect"
 msgstr "Sai DN ràng buộc hoặc mật khẩu"
 
 #: settings/utils/ldap.py:626
+#, python-brace-format
 msgid "Please enter Bind DN: {}"
 msgstr "Vui lòng nhập DN ràng buộc: {}"
 
 #: settings/utils/ldap.py:628
+#, python-brace-format
 msgid "Please enter Password: {}"
 msgstr "Vui lòng nhập mật khẩu: {}"
 
 #: settings/utils/ldap.py:630
+#, python-brace-format
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "Vui lòng nhập DN ràng buộc và mật khẩu đúng: {}"
 
 #: settings/utils/ldap.py:648
+#, python-brace-format
 msgid "Invalid User OU or User search filter: {}"
 msgstr "OU người dùng hoặc bộ lọc người dùng không hợp lệ: {}"
 
 #: settings/utils/ldap.py:679
+#, python-brace-format
 msgid "LDAP User attr map not include: {}"
 msgstr "ánh xạ thuộc tính LDAP không bao gồm: {}"
 
@@ -9713,46 +9551,57 @@ msgid "LDAP authentication is not enabled"
 msgstr "Xác thực LDAP chưa được kích hoạt"
 
 #: settings/utils/ldap.py:724
+#, python-brace-format
 msgid "Error (Invalid LDAP server): {}"
 msgstr "Lỗi  (Địa chỉ máy chủ LDAP không hợp lệ): {}"
 
 #: settings/utils/ldap.py:726
+#, python-brace-format
 msgid "Error (Invalid Bind DN): {}"
 msgstr "Lỗi (DN ràng buộc không hợp lệ): {}"
 
 #: settings/utils/ldap.py:728
+#, python-brace-format
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "Lỗi (ánh xạ thuộc tính LDAP không hợp lệ): {}"
 
 #: settings/utils/ldap.py:730
+#, python-brace-format
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "Lỗi (OU người dùng hoặc bộ lọc người dùng không hợp lệ): {}"
 
 #: settings/utils/ldap.py:732
+#, python-brace-format
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "Lỗi (Xác thực LDAP chưa được kích hoạt): {}"
 
 #: settings/utils/ldap.py:734
+#, python-brace-format
 msgid "Error (Unknown): {}"
 msgstr "Lỗi (không xác định): {}"
 
 #: settings/utils/ldap.py:737
+#, python-brace-format
 msgid "Succeed: Match {} users"
 msgstr "Thành công khớp {} người dùng"
 
 #: settings/utils/ldap.py:769
+#, python-brace-format
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "Xác thực thất bại (lỗi cấu hình): {}"
 
 #: settings/utils/ldap.py:773
+#, python-brace-format
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "Xác thực thất bại (tên người dùng hoặc mật khẩu không đúng): {}"
 
 #: settings/utils/ldap.py:775
+#, python-brace-format
 msgid "Authentication failed (Unknown): {}"
 msgstr "Xác thực thất bại: (không xác định): {}"
 
 #: settings/utils/ldap.py:778
+#, python-brace-format
 msgid "Authentication success: {}"
 msgstr "Xác thực thành công: {}"
 
@@ -9761,10 +9610,12 @@ msgid "No LDAP user was found"
 msgstr "Không lấy được người dùng LDAP"
 
 #: settings/ws.py:240
+#, python-brace-format
 msgid "Total {}, success {}, failure {}"
 msgstr "Tổng cộng {} , thành công {} , thất bại {}"
 
 #: settings/ws.py:244
+#, python-brace-format
 msgid ", disabled {}"
 msgstr ", đã vô hiệu hóa {}"
 
@@ -9860,8 +9711,8 @@ msgid ""
 "please click <a href=\"%(user_password_update_url)s\"> this link </a> to "
 "update your password."
 msgstr ""
-"Vui lòng nhấp vào <a href=\"%(user_password_update_url)s\"> liên kết </a> để "
-"cập nhật mật khẩu"
+"Vui lòng nhấp vào <a href=\"%(user_password_update_url)s\"> liên kết </a> để"
+" cập nhật mật khẩu"
 
 #: templates/_message.html:37
 #, python-format
@@ -9878,8 +9729,8 @@ msgid ""
 "Your ssh public key not set or expired. Please click <a "
 "href=\"%(user_pubkey_update)s\"> this link </a>to update"
 msgstr ""
-"Khóa SSH của bạn chưa được thiết lập hoặc đã hết hiệu lực, vui lòng nhấp vào "
-"<a href=\"%(user_pubkey_update)s\"> liên kết </a> để cập nhật."
+"Khóa SSH của bạn chưa được thiết lập hoặc đã hết hiệu lực, vui lòng nhấp vào"
+" <a href=\"%(user_pubkey_update)s\"> liên kết </a> để cập nhật."
 
 #: templates/_mfa_login_field.html:23
 #: users/templates/users/user_otp_check_password.html:6
@@ -9948,6 +9799,7 @@ msgstr ""
 "cộng đồng"
 
 #: terminal/api/applet/applet.py:86
+#, python-brace-format
 msgid "Applet not found in path: {}"
 msgstr "Không tìm thấy ứng dụng từ xa trong đường dẫn: {}"
 
@@ -9960,6 +9812,7 @@ msgid "Deleting the default storage is not allowed"
 msgstr "không cho phép xóa cấu hình lưu trữ mặc định"
 
 #: terminal/api/component/storage.py:36
+#, python-brace-format
 msgid "Cannot delete storage that is being used: {}"
 msgstr "không thể xóa lưu trữ đang được sử dụng: {}"
 
@@ -9989,6 +9842,7 @@ msgstr "Không thể kết nối đến máy chủ"
 
 #: terminal/api/component/storage.py:139 terminal/api/component/storage.py:140
 #: terminal/tasks.py:208
+#, python-brace-format
 msgid "Test failure: {}"
 msgstr "kiểm tra thất bại: {}"
 
@@ -10015,6 +9869,7 @@ msgid "Session replay"
 msgstr "ghi lại phiên"
 
 #: terminal/api/session/session.py:339
+#, python-brace-format
 msgid "Session does not exist: {}"
 msgstr "phiên không tồn tại: {}"
 
@@ -10022,7 +9877,7 @@ msgstr "phiên không tồn tại: {}"
 msgid "Session is finished or the protocol not supported"
 msgstr "phiên đã hoàn thành hoặc giao thức không được hỗ trợ"
 
-#: terminal/api/session/session.py:355
+#: terminal/api/session/session.py:355 tickets/api/ticket.py:142
 msgid "User does not have permission"
 msgstr "người dùng không có quyền"
 
@@ -10187,6 +10042,7 @@ msgstr "Máy chủ"
 
 #: terminal/models/applet/applet.py:130
 #: terminal/models/virtualapp/virtualapp.py:66
+#, python-brace-format
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Gói Applet không hợp lệ, thiếu tệp {}"
 
@@ -10252,24 +10108,46 @@ msgid "RDP port"
 msgstr "Cổng RDP"
 
 #: terminal/models/component/endpoint.py:20
-#, fuzzy
-#| msgid "Image port"
-msgid "Magnus port"
-msgstr "Cổng hình ảnh"
+msgid "MySQL port"
+msgstr "Cổng MySQL"
 
 #: terminal/models/component/endpoint.py:21
+msgid "MariaDB port"
+msgstr "Cổng MariaDB"
+
+#: terminal/models/component/endpoint.py:22
+msgid "PostgreSQL port"
+msgstr "Cổng PostgreSQL"
+
+#: terminal/models/component/endpoint.py:23
+msgid "Redis port"
+msgstr "Cổng Redis"
+
+#: terminal/models/component/endpoint.py:24
+msgid "SQLServer port"
+msgstr "Cổng SQL Server"
+
+#: terminal/models/component/endpoint.py:25
+msgid "Oracle port"
+msgstr "Cổng Oracle"
+
+#: terminal/models/component/endpoint.py:26
+msgid "MongoDB port"
+msgstr "Cổng MongoDB"
+
+#: terminal/models/component/endpoint.py:27
 msgid "VNC port"
 msgstr "Cổng VNC"
 
-#: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:116
-#: terminal/serializers/endpoint.py:62 terminal/serializers/storage.py:41
+#: terminal/models/component/endpoint.py:35
+#: terminal/models/component/endpoint.py:115
+#: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "Điểm cuối"
 
-#: terminal/models/component/endpoint.py:122
+#: terminal/models/component/endpoint.py:121
 msgid "Endpoint rule"
 msgstr "Quy tắc điểm cuối"
 
@@ -10388,8 +10266,9 @@ msgstr "Quyền thao tác"
 msgid "Origin"
 msgstr "Nguồn"
 
-#: terminal/models/session/sharing.py:42 terminal/models/session/sharing.py:107
-#: terminal/notifications.py:300 terminal/notifications.py:301
+#: terminal/models/session/sharing.py:42
+#: terminal/models/session/sharing.py:107 terminal/notifications.py:300
+#: terminal/notifications.py:301
 msgid "Session sharing"
 msgstr "Chia sẻ cuộc trò chuyện"
 
@@ -10550,12 +10429,9 @@ msgstr "Địa chỉ dịch vụ Core"
 #: terminal/serializers/applet_host.py:38
 msgid ""
 " \n"
-"        Tips: The application release machine communicates with the Core "
-"service. \n"
-"        If the release machine and the Core service are on the same network "
-"segment, \n"
-"        it is recommended to fill in the intranet address, otherwise fill in "
-"the current site URL \n"
+"        Tips: The application release machine communicates with the Core service. \n"
+"        If the release machine and the Core service are on the same network segment, \n"
+"        it is recommended to fill in the intranet address, otherwise fill in the current site URL \n"
 "        <br> \n"
 "        eg: https://172.16.10.110 or https://dev.example.com\n"
 "        "
@@ -10576,13 +10452,13 @@ msgstr "Đã có giấy phép RDS"
 #: terminal/serializers/applet_host.py:50
 msgid ""
 "If not exist, the RDS will be in trial mode, and the trial period is 120 "
-"days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
-"remote-desktop-services/rds-client-access-license\" "
+"days. <a href=\"https://learn.microsoft.com/en-us/windows-"
+"server/remote/remote-desktop-services/rds-client-access-license\" "
 "target=\"_blank\">Detail</a>"
 msgstr ""
-"Nếu không có, RDS sẽ ở chế độ dùng thử, thời gian thử nghiệm là 120 ngày. <a "
-"href='https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-"
-"services/rds-client-access-license' target='_blank'>Chi tiết</a>"
+"Nếu không có, RDS sẽ ở chế độ dùng thử, thời gian thử nghiệm là 120 ngày. <a"
+" href='https://learn.microsoft.com/en-us/windows-server/remote/remote-"
+"desktop-services/rds-client-access-license' target='_blank'>Chi tiết</a>"
 
 #: terminal/serializers/applet_host.py:55
 msgid "RDS License Server"
@@ -10622,11 +10498,11 @@ msgstr "Giới hạn thời gian đăng xuất phiên RemoteApp của RDS (milig
 
 #: terminal/serializers/applet_host.py:74
 msgid ""
-"Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp "
-"programs (0 milliseconds, log off the session immediately)."
+"Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp"
+" programs (0 milliseconds, log off the session immediately)."
 msgstr ""
-"Gợi ý: Thiết lập thời gian đăng xuất cho phiên RemoteAPP sau khi đã đóng tất "
-"cả chương trình RemoteApp (0 miligiây, ngay lập tức đăng xuất phiên)"
+"Gợi ý: Thiết lập thời gian đăng xuất cho phiên RemoteAPP sau khi đã đóng tất"
+" cả chương trình RemoteApp (0 miligiây, ngay lập tức đăng xuất phiên)"
 
 #: terminal/serializers/applet_host.py:83 terminal/serializers/terminal.py:47
 #: terminal/serializers/virtualapp_provider.py:13
@@ -10635,16 +10511,16 @@ msgstr "Tình trạng tải"
 
 #: terminal/serializers/applet_host.py:97
 msgid ""
-"These accounts are used to connect to the published application, the account "
-"is now divided into two types, one is dedicated to each account, each user "
+"These accounts are used to connect to the published application, the account"
+" is now divided into two types, one is dedicated to each account, each user "
 "has a private account, the other is public, when the application does not "
-"support multiple open and the special has been used, the public account will "
-"be used to connect"
+"support multiple open and the special has been used, the public account will"
+" be used to connect"
 msgstr ""
-"Những tài khoản này dùng để kết nối với các ứng dụng đã phát hành, tài khoản "
-"hiện được chia thành hai loại: <br/> Một loại là riêng tư, mỗi người dùng có "
-"một tài khoản riêng. Loại còn lại là công cộng, sẽ sử dụng tài khoản công "
-"cộng để kết nối khi ứng dụng không hỗ trợ đa phiên và tài khoản riêng đã "
+"Những tài khoản này dùng để kết nối với các ứng dụng đã phát hành, tài khoản"
+" hiện được chia thành hai loại: <br/> Một loại là riêng tư, mỗi người dùng "
+"có một tài khoản riêng. Loại còn lại là công cộng, sẽ sử dụng tài khoản công"
+" cộng để kết nối khi ứng dụng không hỗ trợ đa phiên và tài khoản riêng đã "
 "được sử dụng; <br /> Lưu ý: Nếu không bật chế độ tự động tạo tài khoản, máy "
 "phát hành hiện tại chỉ có thể được tài sản có nhãn chỉ định phân bổ, mặc "
 "định sẽ không được đưa vào bể phân bổ, và cần bảo trì tài khoản thủ công."
@@ -10661,8 +10537,8 @@ msgid ""
 msgstr ""
 "Ưu tiên sử dụng tài khoản cùng tên để kết nối với máy phát hành. Để đảm bảo "
 "an toàn, cần cấu hình trong tệp cấu hình mở "
-"CACHE_LOGIN_PASSWORD_ENABLED=true, sau khi chỉnh sửa, hãy khởi động lại dịch "
-"vụ."
+"CACHE_LOGIN_PASSWORD_ENABLED=true, sau khi chỉnh sửa, hãy khởi động lại dịch"
+" vụ."
 
 #: terminal/serializers/applet_host.py:164
 msgid "Install applets"
@@ -10705,25 +10581,25 @@ msgstr "ID phiên không hợp lệ"
 msgid "Timestamp"
 msgstr "Dấu thời gian"
 
-#: terminal/serializers/endpoint.py:26
+#: terminal/serializers/endpoint.py:28
 msgid ""
 "The host address accessed when connecting to assets, if it is empty, the "
 "access address of the current browser will be used (the default endpoint "
 "does not allow modification of the host)"
 msgstr ""
 "Địa chỉ máy chủ truy cập khi kết nối với tài sản, nếu để trống sẽ sử dụng "
-"địa chỉ truy cập của trình duyệt hiện tại (điểm cuối mặc định không cho phép "
-"sửa đổi máy chủ)"
+"địa chỉ truy cập của trình duyệt hiện tại (điểm cuối mặc định không cho phép"
+" sửa đổi máy chủ)"
 
-#: terminal/serializers/endpoint.py:53
+#: terminal/serializers/endpoint.py:64
 msgid ""
-"The assets within this IP range or Host, the following endpoint will be used "
-"for the connection"
+"The assets within this IP range or Host, the following endpoint will be used"
+" for the connection"
 msgstr ""
-"Phạm vi IP này hoặc các tài sản trong máy chủ sẽ được kết nối thông qua điểm "
-"cuối sau"
+"Phạm vi IP này hoặc các tài sản trong máy chủ sẽ được kết nối thông qua điểm"
+" cuối sau"
 
-#: terminal/serializers/endpoint.py:54
+#: terminal/serializers/endpoint.py:65
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
@@ -10763,6 +10639,7 @@ msgid "No asset or invalid asset"
 msgstr "Không có tài sản hoặc tài sản chưa được kích hoạt"
 
 #: terminal/serializers/storage.py:23
+#, python-brace-format
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "Điểm cuối không hợp lệ: Xóa đường dẫn `{}`"
 
@@ -10989,8 +10866,7 @@ msgstr "Xóa phiên làm việc ngoại tuyến"
 
 #: terminal/tasks.py:45
 msgid ""
-"Check every 10 minutes for asset connection sessions that have been inactive "
-"for 3 \n"
+"Check every 10 minutes for asset connection sessions that have been inactive for 3 \n"
 "        minutes and mark these sessions as completed"
 msgstr ""
 "Mỗi 10 phút kiểm tra các phiên kết nối của tài sản không hoạt động trong 3 "
@@ -11002,8 +10878,7 @@ msgstr "Tải phiên video lên lưu trữ bên ngoài"
 
 #: terminal/tasks.py:70 terminal/tasks.py:104
 msgid ""
-"If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands "
-"and \n"
+"If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and \n"
 "        recordings will be uploaded to external storage"
 msgstr ""
 "Nếu đã thiết lập SERVER_REPLAY_STORAGE, các tệp được tải lên thông qua quản "
@@ -11019,8 +10894,7 @@ msgstr "Triển khai máy ứng dụng."
 
 #: terminal/tasks.py:126
 msgid ""
-"When deploying from the remote application publisher details page, and the "
-"'Deploy' \n"
+"When deploying from the remote application publisher details page, and the 'Deploy' \n"
 "        button is clicked, this task will be executed"
 msgstr ""
 "Triển khai máy phát hành, khi nhấp vào triển khai, thực hiện nhiệm vụ này."
@@ -11031,12 +10905,11 @@ msgstr "Cài đặt ứng dụng."
 
 #: terminal/tasks.py:140
 msgid ""
-"When the 'Deploy' button is clicked in the 'Remote Application' section of "
-"the remote \n"
+"When the 'Deploy' button is clicked in the 'Remote Application' section of the remote \n"
 "        application publisher details page, this task will be executed"
 msgstr ""
-"Khi xem chi tiết máy phát hành ứng dụng từ xa - ứng dụng từ xa, khi nhấp vào "
-"triển khai, thực hiện nhiệm vụ này."
+"Khi xem chi tiết máy phát hành ứng dụng từ xa - ứng dụng từ xa, khi nhấp vào"
+" triển khai, thực hiện nhiệm vụ này."
 
 #: terminal/tasks.py:152
 msgid "Uninstall applet"
@@ -11044,12 +10917,11 @@ msgstr "Gỡ cài đặt ứng dụng."
 
 #: terminal/tasks.py:155
 msgid ""
-"When the 'Uninstall' button is clicked in the 'Remote Application' section "
-"of the \n"
+"When the 'Uninstall' button is clicked in the 'Remote Application' section of the \n"
 "        remote application publisher details page, this task will be executed"
 msgstr ""
-"Khi xem chi tiết máy phát hành ứng dụng từ xa - ứng dụng từ xa, khi nhấp vào "
-"gỡ cài đặt, thực hiện nhiệm vụ này."
+"Khi xem chi tiết máy phát hành ứng dụng từ xa - ứng dụng từ xa, khi nhấp vào"
+" gỡ cài đặt, thực hiện nhiệm vụ này."
 
 #: terminal/tasks.py:167
 msgid "Generate applet host accounts"
@@ -11057,8 +10929,7 @@ msgstr "Thu thập tài khoản trên ứng dụng từ xa."
 
 #: terminal/tasks.py:170
 msgid ""
-"When a remote publishing server is created and an account needs to be "
-"created \n"
+"When a remote publishing server is created and an account needs to be created \n"
 "        automatically, this task will be executed"
 msgstr ""
 "Khi cần tự động tạo tài khoản sau khi tạo máy phát hành từ xa, thực hiện "
@@ -11070,15 +10941,12 @@ msgstr "Kiểm tra khả năng kết nối của lệnh và bộ nhớ ghi hình
 
 #: terminal/tasks.py:186
 msgid ""
-"Check every day at midnight whether the external storage for commands and "
-"recordings \n"
-"        is accessible. If it is not accessible, send a notification to the "
-"recipients specified \n"
-"        in 'System Settings - Notifications - Subscription - Storage - "
-"Connectivity'"
+"Check every day at midnight whether the external storage for commands and recordings \n"
+"        is accessible. If it is not accessible, send a notification to the recipients specified \n"
+"        in 'System Settings - Notifications - Subscription - Storage - Connectivity'"
 msgstr ""
-"Mỗi ngày vào lúc 0 giờ kiểm tra khả năng kết nối của bộ nhớ lệnh và ghi hình "
-"bên ngoài, nếu không thể kết nối thì gửi đến: Cài đặt hệ thống - Cài đặt "
+"Mỗi ngày vào lúc 0 giờ kiểm tra khả năng kết nối của bộ nhớ lệnh và ghi hình"
+" bên ngoài, nếu không thể kết nối thì gửi đến: Cài đặt hệ thống - Cài đặt "
 "thông báo - Đối tượng nhận trong cài đặt bộ nhớ lệnh và ghi hình."
 
 #: terminal/templates/terminal/_msg_command_alert.html:10
@@ -11087,8 +10955,8 @@ msgstr "Xem."
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
 msgid ""
-"We would like to inform you that a command alert has been triggered with the "
-"following details:"
+"We would like to inform you that a command alert has been triggered with the"
+" following details:"
 msgstr "Thông tin chi tiết về cảnh báo"
 
 #: terminal/templates/terminal/_msg_command_warning.html:7
@@ -11107,10 +10975,10 @@ msgid ""
 msgstr ""
 "Vui lòng kiểm tra tình trạng thực hiện lệnh này để đảm bảo nó phù hợp với "
 "chính sách an ninh của tổ chức bạn. Nếu bạn không được phép thực hiện thao "
-"tác này hoặc phát hiện bất kỳ điều gì bất thường, hãy ngay lập tức thực hiện "
-"các biện pháp cần thiết."
+"tác này hoặc phát hiện bất kỳ điều gì bất thường, hãy ngay lập tức thực hiện"
+" các biện pháp cần thiết."
 
-#: tickets/api/ticket.py:90 tickets/models/ticket/general.py:290
+#: tickets/api/ticket.py:90 tickets/models/ticket/general.py:289
 #: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "Người nộp đơn."
@@ -11175,33 +11043,15 @@ msgstr "Cấp 1"
 msgid "Two level"
 msgstr "Cấp 2"
 
-#: tickets/const.py:52
-#, fuzzy
-#| msgid "One level"
-msgid "Three level"
-msgstr "Cấp 1"
-
-#: tickets/const.py:53
-#, fuzzy
-#| msgid "Two level"
-msgid "Four level"
-msgstr "Cấp 2"
-
-#: tickets/const.py:54
-#, fuzzy
-#| msgid "One level"
-msgid "Five level"
-msgstr "Cấp 1"
-
-#: tickets/const.py:58
+#: tickets/const.py:55
 msgid "All assets"
 msgstr "Tất cả tài sản"
 
-#: tickets/const.py:59
+#: tickets/const.py:56
 msgid "Permed assets"
 msgstr "Tài sản được ủy quyền"
 
-#: tickets/const.py:60
+#: tickets/const.py:57
 msgid "Permed valid assets"
 msgstr "Tài sản được ủy quyền có hiệu lực"
 
@@ -11210,6 +11060,7 @@ msgid "Ticket already closed"
 msgstr "Phiếu công việc đã đóng"
 
 #: tickets/handlers/apply_asset.py:40
+#, python-brace-format
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -11217,19 +11068,20 @@ msgstr ""
 "Tạo bằng phiếu công việc, Tiêu đề phiếu công việc: {}, Người nộp phiếu công "
 "việc: {}, Người xử lý phiếu công việc: {}, ID phiếu công việc: {}"
 
-#: tickets/handlers/base.py:94
+#: tickets/handlers/base.py:84
 msgid "Change field"
 msgstr "Trường thay đổi"
 
-#: tickets/handlers/base.py:94
+#: tickets/handlers/base.py:84
 msgid "Before change"
 msgstr "Trước khi thay đổi"
 
-#: tickets/handlers/base.py:94
+#: tickets/handlers/base.py:84
 msgid "After change"
 msgstr "Sau khi thay đổi"
 
-#: tickets/handlers/base.py:106
+#: tickets/handlers/base.py:96
+#, python-brace-format
 msgid "{} {} the ticket"
 msgstr "{} {} Phiếu công việc"
 
@@ -11245,8 +11097,8 @@ msgstr "Nội dung"
 msgid "Body"
 msgstr "Cấp độ phê duyệt"
 
-#: tickets/models/flow.py:21 tickets/models/flow.py:51
-#: tickets/models/ticket/general.py:45 tickets/serializers/flow.py:102
+#: tickets/models/flow.py:21 tickets/models/flow.py:48
+#: tickets/models/ticket/general.py:45
 msgid "Approve level"
 msgstr "Thông tin phê duyệt công việc"
 
@@ -11254,16 +11106,7 @@ msgstr "Thông tin phê duyệt công việc"
 msgid "Ticket flow approval rule"
 msgstr "Quy trình công việc"
 
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
-#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
-#: tickets/serializers/ticket/ticket.py:24
-#, fuzzy
-#| msgid "All users"
-msgid "CC users"
-msgstr "Tất cả người dùng"
-
-#: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:27
-#: tickets/serializers/ticket/ticket.py:69
+#: tickets/models/flow.py:53
 msgid "Ticket flow"
 msgstr "Phiên công việc"
 
@@ -11325,33 +11168,33 @@ msgstr "Bước của phiếu công việc"
 msgid "Ticket assignee"
 msgstr "Người tiếp nhận phiếu công việc"
 
-#: tickets/models/ticket/general.py:274
+#: tickets/models/ticket/general.py:273
 msgid "Title"
 msgstr "Tiêu đề"
 
-#: tickets/models/ticket/general.py:298
+#: tickets/models/ticket/general.py:293
 msgid "TicketFlow"
 msgstr "Quy trình phiếu công việc"
 
-#: tickets/models/ticket/general.py:301 tickets/reporting.py:95
+#: tickets/models/ticket/general.py:296 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "Bước phê duyệt"
 
-#: tickets/models/ticket/general.py:304
+#: tickets/models/ticket/general.py:299
 msgid "Relation snapshot"
 msgstr "Ảnh chụp phiếu công việc"
 
-#: tickets/models/ticket/general.py:415
+#: tickets/models/ticket/general.py:406
 msgid ""
 "Today's ticket creation limit (9999) has been reached. Please try again "
 "tomorrow."
 msgstr ""
 
-#: tickets/models/ticket/general.py:436
+#: tickets/models/ticket/general.py:427
 msgid "Please try again"
 msgstr "Vui lòng thử lại"
 
-#: tickets/models/ticket/general.py:515
+#: tickets/models/ticket/general.py:506
 msgid "Super ticket"
 msgstr "Phiếu công việc đặc biệt"
 
@@ -11383,32 +11226,24 @@ msgstr "Thông tin cơ bản về công việc"
 msgid "Ticket applied info"
 msgstr "Thông tin đơn xin công việc"
 
-#: tickets/notifications.py:119
+#: tickets/notifications.py:116
+#, python-brace-format
 msgid "You have a new ticket from {}"
 msgstr "Bạn có một công việc mới, người xin - {}"
 
-#: tickets/notifications.py:123
+#: tickets/notifications.py:120
+#, python-brace-format
 msgid "{}: New Ticket - {} ({})"
 msgstr "{}: Phiếu công việc mới - {} ({})"
 
-#: tickets/notifications.py:171
+#: tickets/notifications.py:168
+#, python-brace-format
 msgid "Your ticket has been processed, processor - {}"
 msgstr "Công việc của bạn đã được xử lý, người xử lý - {}"
 
-#: tickets/notifications.py:175
+#: tickets/notifications.py:172
+#, python-brace-format
 msgid "Ticket has processed - {} ({})"
-msgstr "Công việc của bạn đã được xử lý, người xử lý - {} ({})"
-
-#: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
-msgid "A ticket you are copied on has been updated"
-msgstr "Tài sản \"%s\" đã được cập nhật."
-
-#: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
-msgid "Ticket updated - {} ({})"
 msgstr "Công việc của bạn đã được xử lý, người xử lý - {} ({})"
 
 #: tickets/reporting.py:10
@@ -11467,18 +11302,9 @@ msgstr "Người nộp đơn."
 msgid "Approval Step Distribution"
 msgstr "Phê duyệt không cần đăng nhập"
 
-#: tickets/serializers/flow.py:58
-#, fuzzy
-#| msgid ""
-#| "Please check if a user with the same username or email already exists"
-msgid "A ticket flow with the same name and type already exists"
-msgstr ""
-"Vui lòng kiểm tra xem có người dùng nào đã tồn tại với tên tài khoản hoặc "
-"email giống nhau hay không"
-
-#: tickets/serializers/flow.py:66
-msgid "The number of approval rules must match the approval level"
-msgstr ""
+#: tickets/serializers/flow.py:42
+msgid "The current organization type already exists"
+msgstr "Tổ chức hiện tại đã tồn tại loại này"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"
@@ -11502,6 +11328,7 @@ msgstr "Xin Action"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:74
+#, python-brace-format
 msgid "Created by ticket ({}-{})"
 msgstr "Tạo công việc thông qua ({}-{})"
 
@@ -11510,6 +11337,7 @@ msgid "The expiration date should be greater than the start date"
 msgstr "Thời gian hết hạn phải lớn hơn thời gian bắt đầu"
 
 #: tickets/serializers/ticket/common.py:89
+#, python-brace-format
 msgid "Permission named `{}` already exists"
 msgstr "Tên ủy quyền `{}` đã tồn tại"
 
@@ -11517,19 +11345,8 @@ msgstr "Tên ủy quyền `{}` đã tồn tại"
 msgid "Process map"
 msgstr "Sơ đồ quy trình"
 
-#: tickets/serializers/ticket/ticket.py:110
-#, fuzzy
-#| msgid "The ticket flow `{}` does not exist"
-msgid "The selected ticket flow is not available"
-msgstr "Quy trình công việc `{}` không tồn tại"
-
-#: tickets/serializers/ticket/ticket.py:114
-#, fuzzy
-#| msgid "Please select file"
-msgid "Please select a ticket flow"
-msgstr "Chọn tệp"
-
-#: tickets/serializers/ticket/ticket.py:118
+#: tickets/serializers/ticket/ticket.py:91
+#, python-brace-format
 msgid "The ticket flow `{}` does not exist"
 msgstr "Quy trình công việc `{}` không tồn tại"
 
@@ -11558,8 +11375,8 @@ msgstr "Đồng ý"
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr ""
-"Công việc không tồn tại, hoặc quy trình công việc đã kết thúc, hoặc liên kết "
-"này đã hết hạn"
+"Công việc không tồn tại, hoặc quy trình công việc đã kết thúc, hoặc liên kết"
+" này đã hết hạn"
 
 #: tickets/views/approve.py:71
 msgid "Click the button below to approve or reject"
@@ -11590,8 +11407,10 @@ msgid "Can not invite self"
 msgstr "Không thể mời chính mình"
 
 #: users/api/user.py:180
+#, python-brace-format
 msgid ""
-"This user {} is already a member of the organization. No need to invite again"
+"This user {} is already a member of the organization. No need to invite "
+"again"
 msgstr ""
 
 #: users/api/user.py:241
@@ -11692,15 +11511,39 @@ msgstr "Không thể xóa tất cả người dùng"
 msgid "Create failed. The number of SSH keys has reached the limit"
 msgstr "Tạo không thành công, số lượng khóa SSH đã đạt giới hạn"
 
+#: users/filters.py:19
+msgid "User group name"
+msgstr "Tên nhóm người dùng"
+
+#: users/filters.py:23
+msgid "User group ID"
+msgstr "ID nhóm người dùng"
+
+#: users/filters.py:27
+msgid "Exclude user group ID"
+msgstr "ID nhóm người dùng bị loại trừ"
+
+#: users/filters.py:31
+msgid "System role name or ID"
+msgstr "Tên hoặc ID vai trò hệ thống"
+
+#: users/filters.py:35
+msgid "Org role name or ID"
+msgstr "Tên hoặc ID vai trò tổ chức"
+
+#: users/filters.py:50 users/serializers/user.py:126
+msgid "Login blocked"
+msgstr "Đăng nhập bị khóa"
+
 #: users/forms/profile.py:49
 msgid ""
 "When enabled, you will enter the MFA binding process the next time you log "
 "in. you can also directly bind in \"personal information -> quick "
 "modification -> change MFA Settings\"!"
 msgstr ""
-"Sau khi kích hoạt, bạn sẽ được đưa vào quy trình liên kết xác thực đa yếu tố "
-"(MFA) khi đăng nhập lần tiếp theo; bạn cũng có thể liên kết ngay tại (Thông "
-"tin cá nhân -> Sửa đổi nhanh -> Cài đặt MFA xác thực đa yếu tố)!"
+"Sau khi kích hoạt, bạn sẽ được đưa vào quy trình liên kết xác thực đa yếu tố"
+" (MFA) khi đăng nhập lần tiếp theo; bạn cũng có thể liên kết ngay tại (Thông"
+" tin cá nhân -> Sửa đổi nhanh -> Cài đặt MFA xác thực đa yếu tố)!"
 
 #: users/forms/profile.py:60
 msgid "* Enable MFA to make the account more secure."
@@ -11709,13 +11552,13 @@ msgstr ""
 
 #: users/forms/profile.py:69
 msgid ""
-"In order to protect you and your company, please keep your account, password "
-"and key sensitive information properly. (for example: setting complex "
+"In order to protect you and your company, please keep your account, password"
+" and key sensitive information properly. (for example: setting complex "
 "password, enabling MFA)"
 msgstr ""
 "Để bảo vệ an toàn cho bạn và công ty, hãy giữ gìn cẩn thận tài khoản, mật "
-"khẩu và các thông tin nhạy cảm quan trọng như: Đặt mật khẩu phức tạp và kích "
-"hoạt MFA xác thực đa yếu tố"
+"khẩu và các thông tin nhạy cảm quan trọng như: Đặt mật khẩu phức tạp và kích"
+" hoạt MFA xác thực đa yếu tố"
 
 #: users/forms/profile.py:76
 msgid "Finish"
@@ -11910,11 +11753,21 @@ msgstr "Đặt lại MFA"
 msgid "Reset MFA url"
 msgstr "Địa chỉ trang web đặt lại MFA"
 
+#: users/serializers/preference/koko.py:10
+#: users/serializers/preference/luna.py:67
+msgid "File name conflict resolution"
+msgstr "Giải pháp xung đột tên tệp"
+
+#: users/serializers/preference/koko.py:14
+#: users/serializers/preference/luna.py:84
+msgid "Terminal theme name"
+msgstr "Tên chủ đề terminal"
+
 #: users/serializers/preference/lina.py:12
 msgid ""
 "*! The password for file encryption, used for decryption when the system "
-"sends emails containing file attachments. <br>Such as: account backup files, "
-"account password change results files"
+"sends emails containing file attachments. <br>Such as: account backup files,"
+" account password change results files"
 msgstr ""
 "Mật khẩu mã hóa tệp, khi email hệ thống có tệp đính kèm, sử dụng mật khẩu "
 "này để giải mã.<br>Ví dụ: tệp sao lưu tài khoản, tệp kết quả thay đổi mật "
@@ -11924,9 +11777,72 @@ msgstr ""
 msgid "The newly set password is inconsistent"
 msgstr "Mật khẩu không khớp"
 
+#: users/serializers/preference/lina.py:47 users/serializers/profile.py:66
+msgid "Language"
+msgstr "Ngôn ngữ"
+
 #: users/serializers/preference/lina.py:52
 msgid "File Encryption"
 msgstr "Mật khẩu mã hóa tệp"
+
+#: users/serializers/preference/luna.py:26
+msgid "Async loading of asset tree"
+msgstr "Tải tài sản cây không đồng bộ"
+
+#: users/serializers/preference/luna.py:30
+msgid "Connect default open method"
+msgstr "Kết nối với cách mở mặc định"
+
+#: users/serializers/preference/luna.py:34
+#: xpack/plugins/interface/models.py:44
+#: xpack/plugins/interface/serializers/interface.py:35
+msgid "Theme"
+msgstr "Chủ đề"
+
+#: users/serializers/preference/luna.py:41
+msgid "RDP resolution"
+msgstr "Độ phân giải RDP"
+
+#: users/serializers/preference/luna.py:45
+msgid "Keyboard layout"
+msgstr "Bố cục bàn phím"
+
+#: users/serializers/preference/luna.py:49
+msgid "RDP client option"
+msgstr "Tùy chọn khách hàng RDP"
+
+#: users/serializers/preference/luna.py:53
+msgid "RDP color quality"
+msgstr "Chất lượng màu RDP"
+
+#: users/serializers/preference/luna.py:57
+msgid "RDP smart size"
+msgstr "Kích thước thông minh RDP"
+
+#: users/serializers/preference/luna.py:58
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr ""
+"Xác nhận liệu máy tính khách có nên thu phóng nội dung trên máy tính từ xa "
+"để phù hợp với kích thước cửa sổ của máy tính khách hay không"
+
+#: users/serializers/preference/luna.py:63
+msgid "Remote app connect method"
+msgstr "Cách kết nối ứng dụng từ xa"
+
+#: users/serializers/preference/luna.py:74
+msgid "Terminal font size"
+msgstr "Kích thước phông chữ trong terminal ký tự"
+
+#: users/serializers/preference/luna.py:77
+msgid "Backspace as Ctrl+H"
+msgstr "Terminal ký tự Backspace như Ctrl+H"
+
+#: users/serializers/preference/luna.py:80
+msgid "Right click quickly paste"
+msgstr "Dán nhanh bằng chuột phải"
 
 #: users/serializers/preference/luna.py:90
 msgid "Graphics"
@@ -11945,6 +11861,7 @@ msgid "Password does not match security rules"
 msgstr "Mật khẩu không đáp ứng quy tắc bảo mật"
 
 #: users/serializers/profile.py:33
+#, python-brace-format
 msgid "The new password cannot be the last {} passwords"
 msgstr "Mật khẩu mới không thể là một trong {} mật khẩu gần đây"
 
@@ -11954,8 +11871,8 @@ msgstr "Vai trò hệ thống"
 
 #: users/serializers/user.py:55
 msgid ""
-"System roles are roles at the system level, and they will take effect across "
-"all organizations"
+"System roles are roles at the system level, and they will take effect across"
+" all organizations"
 msgstr ""
 "Vai trò hệ thống là vai trò ở cấp độ hệ thống, có hiệu lực trên tất cả các "
 "tổ chức"
@@ -11987,10 +11904,6 @@ msgstr "MFA đã được kích hoạt"
 #: users/serializers/user.py:124
 msgid "MFA force enabled"
 msgstr "Bắt buộc MFA"
-
-#: users/serializers/user.py:126
-msgid "Login blocked"
-msgstr "Đăng nhập bị khóa"
 
 #: users/serializers/user.py:130 users/serializers/user.py:271
 msgid "Is OTP bound"
@@ -12064,7 +11977,8 @@ msgstr "Có khóa công khai"
 
 #: users/serializers/user.py:441
 msgid ""
-"* For security, only a partial of users is displayed. You can search for more"
+"* For security, only a partial of users is displayed. You can search for "
+"more"
 msgstr ""
 "* Để đảm bảo an toàn, chỉ hiển thị một phần người dùng. Bạn có thể tìm kiếm "
 "thêm"
@@ -12076,8 +11990,7 @@ msgstr "Tên bị trùng"
 #: users/signal_handlers.py:41
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
-"            and the current user is not in the user list. Please contact the "
-"administrator."
+"            and the current user is not in the user list. Please contact the administrator."
 msgstr ""
 "Quản trị viên đã bật 'chỉ cho phép người dùng đã tồn tại đăng nhập', người "
 "dùng hiện tại không có trong danh sách người dùng, xin vui lòng liên hệ với "
@@ -12089,12 +12002,11 @@ msgstr "Xóa các phiên người dùng đã hết hạn"
 
 #: users/signal_handlers.py:231
 msgid ""
-"After logging in via the web, a user session record is created. At 2 a.m. "
-"every day, \n"
+"After logging in via the web, a user session record is created. At 2 a.m. every day, \n"
 "        the system cleans up inactive user devices"
 msgstr ""
-"Sau khi đăng nhập qua web, sẽ phát sinh bản ghi phiên người dùng trực tuyến, "
-"vào mỗi 2 giờ sáng hàng ngày, hệ thống sẽ dọn dẹp các thiết bị người dùng "
+"Sau khi đăng nhập qua web, sẽ phát sinh bản ghi phiên người dùng trực tuyến,"
+" vào mỗi 2 giờ sáng hàng ngày, hệ thống sẽ dọn dẹp các thiết bị người dùng "
 "chưa trực tuyến"
 
 #: users/tasks.py:26
@@ -12103,8 +12015,7 @@ msgstr "Kiểm tra mật khẩu đã hết hạn"
 
 #: users/tasks.py:28
 msgid ""
-"Check every day at 10 AM whether the passwords of users in the system are "
-"expired, \n"
+"Check every day at 10 AM whether the passwords of users in the system are expired, \n"
 "        and send a notification 5 days in advance"
 msgstr ""
 "Kiểm tra hàng ngày vào lúc 10 giờ sáng xem mật khẩu của người dùng trong hệ "
@@ -12116,45 +12027,33 @@ msgstr "Kiểm tra định kỳ mật khẩu hết hạn."
 
 #: users/tasks.py:48
 msgid ""
-"With version iterations, new tasks may be added, or task names and execution "
-"times may \n"
-"        be modified. Therefore, upon system startup, it is necessary to "
-"register or update the \n"
+"With version iterations, new tasks may be added, or task names and execution times may \n"
+"        be modified. Therefore, upon system startup, it is necessary to register or update the \n"
 "        parameters of the task that checks if passwords have expired"
 msgstr ""
-"Với sự phát triển của phiên bản, có thể sẽ có nhiệm vụ mới hoặc thay đổi tên "
-"nhiệm vụ, thời gian thực hiện. Do đó, khi hệ thống khởi động, cần đăng ký "
-"hoặc cập nhật tham số kiểm tra mật khẩu đã hết hạn của nhiệm vụ. \n"
+"Với sự phát triển của phiên bản, có thể sẽ có nhiệm vụ mới hoặc thay đổi tên nhiệm vụ, thời gian thực hiện. Do đó, khi hệ thống khởi động, cần đăng ký hoặc cập nhật tham số kiểm tra mật khẩu đã hết hạn của nhiệm vụ. \n"
 "\n"
 "Kiểm tra người dùng đã hết hạn. \n"
 "\n"
-"Hàng ngày vào lúc 2 giờ chiều, kiểm tra xem người dùng trong hệ thống có hết "
-"hạn hay không và gửi thông báo trước 5 ngày. \n"
+"Hàng ngày vào lúc 2 giờ chiều, kiểm tra xem người dùng trong hệ thống có hết hạn hay không và gửi thông báo trước 5 ngày. \n"
 "\n"
 "Kiểm tra định kỳ người dùng hết hạn. \n"
 "\n"
-"Với sự phát triển của phiên bản, có thể sẽ có nhiệm vụ mới hoặc thay đổi tên "
-"nhiệm vụ, thời gian thực hiện. Do đó, khi hệ thống khởi động, cần đăng ký "
-"hoặc cập nhật tham số kiểm tra người dùng đã hết hạn. \n"
+"Với sự phát triển của phiên bản, có thể sẽ có nhiệm vụ mới hoặc thay đổi tên nhiệm vụ, thời gian thực hiện. Do đó, khi hệ thống khởi động, cần đăng ký hoặc cập nhật tham số kiểm tra người dùng đã hết hạn. \n"
 "\n"
 "Kiểm tra người dùng chưa sử dụng. \n"
 "\n"
-"Hàng ngày vào lúc 2 giờ chiều, theo cấu hình hệ thống - cài đặt bảo mật - "
-"cấu hình tự động vô hiệu hóa người dùng không hoạt động, thực hiện việc vô "
-"hiệu hóa đối với những người dùng lâu không đăng nhập hoặc không sử dụng "
-"api_key. \n"
+"Hàng ngày vào lúc 2 giờ chiều, theo cấu hình hệ thống - cài đặt bảo mật - cấu hình tự động vô hiệu hóa người dùng không hoạt động, thực hiện việc vô hiệu hóa đối với những người dùng lâu không đăng nhập hoặc không sử dụng api_key. \n"
 "\n"
 "Người dùng này đã không đăng nhập gần đây và đã bị vô hiệu hóa. \n"
 "\n"
 "Tài khoản của bạn sắp hết hạn. \n"
 "\n"
-"Để không ảnh hưởng đến công việc của bạn, vui lòng liên hệ với quản lý để "
-"xác nhận. \n"
+"Để không ảnh hưởng đến công việc của bạn, vui lòng liên hệ với quản lý để xác nhận. \n"
 "\n"
 "Mật khẩu của bạn sẽ sớm hết hạn. \n"
 "\n"
-"Vì sự an toàn tài khoản của bạn, vui lòng nhấn vào liên kết dưới đây để kịp "
-"thời cập nhật mật khẩu. \n"
+"Vì sự an toàn tài khoản của bạn, vui lòng nhấn vào liên kết dưới đây để kịp thời cập nhật mật khẩu. \n"
 "\n"
 "Nhấn vào đây để cập nhật mật khẩu. \n"
 "\n"
@@ -12168,8 +12067,7 @@ msgstr "Kiểm tra người dùng đã hết hạn"
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and "
-"send a \n"
+"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
 "        notification 5 days in advance"
 msgstr ""
 "Kiểm tra vào lúc 2 giờ chiều mỗi ngày, xem người dùng trong hệ thống có hết "
@@ -12181,10 +12079,8 @@ msgstr "Kiểm tra định kỳ người dùng hết hạn."
 
 #: users/tasks.py:92
 msgid ""
-"With version iterations, new tasks may be added, or task names and execution "
-"times may \n"
-"        be modified. Therefore, upon system startup, it is necessary to "
-"register or update the \n"
+"With version iterations, new tasks may be added, or task names and execution times may \n"
+"        be modified. Therefore, upon system startup, it is necessary to register or update the \n"
 "        parameters of the task that checks if users have expired"
 msgstr ""
 "Với các phiên bản cập nhật, có thể sẽ có thêm nhiệm vụ hoặc thay đổi tên "
@@ -12197,10 +12093,8 @@ msgstr "Kiểm tra người dùng chưa sử dụng."
 
 #: users/tasks.py:113
 msgid ""
-"At 2 p.m. every day, according to the configuration in \"System Settings - "
-"Security - \n"
-"        Auth security - Auto disable threshold\" users who have not logged "
-"in or whose API keys \n"
+"At 2 p.m. every day, according to the configuration in \"System Settings - Security - \n"
+"        Auth security - Auto disable threshold\" users who have not logged in or whose API keys \n"
 "        have not been used for a long time will be disabled"
 msgstr ""
 "Mỗi ngày lúc 2 giờ chiều, dựa vào cấu hình hệ thống - cài đặt bảo mật - cấu "
@@ -12343,8 +12237,8 @@ msgstr "Liên kết trình xác thực MFA"
 
 #: users/templates/users/user_otp_enable_bind.html:13
 msgid ""
-"Use the MFA Authenticator application to scan the following qr code for a 6-"
-"bit verification code"
+"Use the MFA Authenticator application to scan the following qr code for a "
+"6-bit verification code"
 msgstr ""
 "Sử dụng ứng dụng trình xác thực MFA quét mã QR dưới đây để nhận mã xác thực "
 "6 chữ số"
@@ -12379,8 +12273,8 @@ msgid ""
 "After installation, click the next step to enter the binding page (if "
 "installed, go to the next step directly)."
 msgstr ""
-"Sau khi cài đặt hoàn tất, nhấp vào bước tiếp theo để vào trang liên kết (nếu "
-"đã cài đặt, hãy đi thẳng đến bước tiếp theo)"
+"Sau khi cài đặt hoàn tất, nhấp vào bước tiếp theo để vào trang liên kết (nếu"
+" đã cài đặt, hãy đi thẳng đến bước tiếp theo)"
 
 #: users/templates/users/user_password_verify.html:8
 #: users/templates/users/user_password_verify.html:9
@@ -12396,8 +12290,8 @@ msgid ""
 "The account protection has been opened, please complete the following "
 "operations according to the prompts"
 msgstr ""
-"Bảo vệ tài khoản đã được kích hoạt, vui lòng thực hiện các thao tác sau theo "
-"hướng dẫn"
+"Bảo vệ tài khoản đã được kích hoạt, vui lòng thực hiện các thao tác sau theo"
+" hướng dẫn"
 
 #: users/templates/users/user_verify_mfa.html:17
 msgid "Open MFA Authenticator and enter the 6-bit dynamic code"
@@ -12418,7 +12312,8 @@ msgstr "Đã được gắn bó"
 #: users/views/profile/otp.py:163
 msgid "MFA already bound, disable first, then bound"
 msgstr ""
-"MFA (OTP) đã được gắn bó, vui lòng vô hiệu hóa trước khi tiến hành gắn bó lại"
+"MFA (OTP) đã được gắn bó, vui lòng vô hiệu hóa trước khi tiến hành gắn bó "
+"lại"
 
 #: users/views/profile/otp.py:190
 msgid "OTP enable success"
@@ -12445,9 +12340,10 @@ msgid "Password invalid"
 msgstr "Tên người dùng hoặc mật khẩu không hợp lệ"
 
 #: users/views/profile/reset.py:66
+#, python-brace-format
 msgid ""
-"Non-local users can log in only from third-party platforms and cannot change "
-"their passwords: {}"
+"Non-local users can log in only from third-party platforms and cannot change"
+" their passwords: {}"
 msgstr ""
 "Người dùng không phải địa phương chỉ cho phép đăng nhập từ nền tảng bên thứ "
 "ba, không hỗ trợ thay đổi mật khẩu: {}"
@@ -12457,6 +12353,7 @@ msgid "Token invalid or expired"
 msgstr "Mã thông báo bị lỗi hoặc đã hết hạn."
 
 #: users/views/profile/reset.py:204
+#, python-brace-format
 msgid "User auth from {}, go there change password"
 msgstr ""
 "Nguồn xác thực người dùng đến từ {}, vui lòng thay đổi mật khẩu trong hệ "
@@ -12467,6 +12364,7 @@ msgid "* Your password does not meet the requirements"
 msgstr "* Mật khẩu của bạn không đáp ứng yêu cầu."
 
 #: users/views/profile/reset.py:217
+#, python-brace-format
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* Mật khẩu mới không được trùng với {} lần mật khẩu gần đây."
 
@@ -12483,18 +12381,20 @@ msgid ""
 "Based on the current task configuration, assets that do not match the "
 "strategy will skipped."
 msgstr ""
-"Theo cấu hình nhiệm vụ hiện tại, các tài sản không phù hợp với chính sách sẽ "
-"bị bỏ qua."
+"Theo cấu hình nhiệm vụ hiện tại, các tài sản không phù hợp với chính sách sẽ"
+" bị bỏ qua."
 
 #: xpack/plugins/cloud/api.py:73
 msgid "Test connection successful"
 msgstr "Kiểm tra thành công."
 
 #: xpack/plugins/cloud/api.py:75
+#, python-brace-format
 msgid "Test connection failed: {}"
 msgstr "Kiểm tra kết nối thất bại: {}"
 
 #: xpack/plugins/cloud/api.py:203
+#, python-brace-format
 msgid "User {} deleted the current resource and released the assets"
 msgstr "Người dùng {} đã xóa tài sản đã được giải phóng hiện tại."
 
@@ -12692,6 +12592,10 @@ msgstr "Đồng bộ khu vực"
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Gặp lỗi khi lấy实例 của khu vực \"%s\", lỗi: %s"
 
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:290
+msgid "Instance"
+msgstr "Thực thể"
+
 #: xpack/plugins/cloud/manager.py:195
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
@@ -12836,15 +12740,12 @@ msgstr "Nhiệm vụ đồng bộ"
 msgid "Sync instance task history"
 msgstr "Lịch sử nhiệm vụ đồng bộ thực thể"
 
-#: xpack/plugins/cloud/models.py:290
-msgid "Instance"
-msgstr "Thực thể"
-
 #: xpack/plugins/cloud/models.py:307
 msgid "Sync instance detail"
 msgstr "Chi tiết thực thể đồng bộ"
 
-#: xpack/plugins/cloud/models.py:319 xpack/plugins/cloud/serializers/task.py:79
+#: xpack/plugins/cloud/models.py:319
+#: xpack/plugins/cloud/serializers/task.py:79
 msgid "Rule relation"
 msgstr "Quan hệ điều kiện"
 
@@ -12900,7 +12801,8 @@ msgstr "Khớp quy tắc"
 msgid "Rule value"
 msgstr "Giá trị quy tắc"
 
-#: xpack/plugins/cloud/models.py:396 xpack/plugins/cloud/serializers/task.py:82
+#: xpack/plugins/cloud/models.py:396
+#: xpack/plugins/cloud/serializers/task.py:82
 msgid "Strategy rule"
 msgstr "Điều kiện"
 
@@ -12916,7 +12818,8 @@ msgstr "Thuộc tính Action"
 msgid "Action value"
 msgstr "Giá trị Hành động"
 
-#: xpack/plugins/cloud/models.py:423 xpack/plugins/cloud/serializers/task.py:85
+#: xpack/plugins/cloud/models.py:423
+#: xpack/plugins/cloud/serializers/task.py:85
 msgid "Strategy action"
 msgstr "Hành động"
 
@@ -13160,6 +13063,10 @@ msgstr "Điểm cuối API"
 msgid "Auto node classification"
 msgstr "Phân loại nút tự động"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "domain_name"
+msgstr "Tên miền"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "Địa chỉ xác thực"
@@ -13193,6 +13100,7 @@ msgid "The file is in JSON format"
 msgstr "Tập tin định dạng JSON"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
+#, python-brace-format
 msgid "IP address invalid `{}`, {}"
 msgstr "Địa chỉ IP không hợp lệ: `{}`, {}"
 
@@ -13240,8 +13148,8 @@ msgstr "Số lượng phiên bản"
 
 #: xpack/plugins/cloud/tasks.py:33
 msgid ""
-"Execute this task when manually or scheduled cloud synchronization tasks are "
-"performed"
+"Execute this task when manually or scheduled cloud synchronization tasks are"
+" performed"
 msgstr ""
 "Thực hiện nhiệm vụ đồng bộ trên đám mây theo cách thủ công hoặc theo lịch "
 "trình khi thực hiện nhiệm vụ này"
@@ -13252,16 +13160,11 @@ msgstr "Định kỳ xóa ghi lại nhiệm vụ thực hiện các phiên bản
 
 #: xpack/plugins/cloud/tasks.py:52
 msgid ""
-"Every day, according to the configuration in \"System Settings - Tasks - "
-"Regular \n"
-"        clean-up - Cloud sync task history retention days\" the system will "
-"clean up the execution \n"
+"Every day, according to the configuration in \"System Settings - Tasks - Regular \n"
+"        clean-up - Cloud sync task history retention days\" the system will clean up the execution \n"
 "        records generated by cloud synchronization"
 msgstr ""
-"Hằng ngày, hệ thống sẽ thực hiện việc dọn dẹp các ghi chép được tạo ra trong "
-"quá trình đồng bộ đám mây dựa trên cấu hình trong “Cài đặt hệ thống - Nhiệm "
-"vụ - Dọn dẹp định kỳ - Số ngày lưu trữ ghi chép lịch sử nhiệm vụ đồng bộ đám "
-"mây”. \n"
+"Hằng ngày, hệ thống sẽ thực hiện việc dọn dẹp các ghi chép được tạo ra trong quá trình đồng bộ đám mây dựa trên cấu hình trong “Cài đặt hệ thống - Nhiệm vụ - Dọn dẹp định kỳ - Số ngày lưu trữ ghi chép lịch sử nhiệm vụ đồng bộ đám mây”. \n"
 "\n"
 "Khôi phục mặc định thành công!\n"
 "\n"
@@ -13387,40 +13290,247 @@ msgstr "Nhập giấy phép thành công"
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
 
-#~ msgid "Windows password cannot contain special characters like > ^"
-#~ msgstr ""
-#~ "Mật khẩu Windows không được bao gồm ký tự đặc biệt, ví dụ như > ^< -SEP-"
-#~ ">Tên ACL"
+#: accounts/automations/base/manager.py:167
+#, python-format
+msgid "Account is already being processed, skipping: %(account)s"
+msgstr ""
+
+#: accounts/automations/base/manager.py:200
+msgid "Account not found, inactive, or not eligible for this task"
+msgstr ""
+
+#: accounts/automations/base/manager.py:314
+#, python-format
+msgid ""
+"The remote secret may have changed, but the independent credential "
+"verification was inconclusive: %(code)s"
+msgstr ""
+
+#: accounts/automations/base/manager.py:389
+#, python-format
+msgid ""
+"The remote operation completed, but saving the local account result failed: "
+"%(error)s"
+msgstr ""
+
+#: accounts/automations/base/manager.py:494
+msgid "Task ended before the account received a final result"
+msgstr ""
+
+#: accounts/automations/change_secret/manager.py:91
+#: accounts/automations/push_account/manager.py:86
+#, fuzzy, python-format
+#| msgid "Success: %s, Failed: %s, Total: %s"
+msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
+msgstr "Thành công: %s, Thất bại: %s, Tổng số: %s"
+
+#: accounts/const/automation.py:118
+#: accounts/serializers/automations/change_secret.py:193
+#, fuzzy
+#| msgid "Verified"
+msgid "Unverified"
+msgstr "Đã kiểm tra"
+
+#: accounts/serializers/account/template.py:22
+#, fuzzy
+#| msgid ""
+#| "length is the length of the password, and the range is 8 to 30.\n"
+#| "lowercase indicates whether the password contains lowercase letters, \n"
+#| "uppercase indicates whether it contains uppercase letters,\n"
+#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+#| "If you do not need to exclude symbols, you can leave it blank.\n"
+#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+msgid ""
+"length is the length of the password, and the range is 8 to 36.\n"
+"lowercase indicates whether the password contains lowercase letters, \n"
+"uppercase indicates whether it contains uppercase letters,\n"
+"digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+"exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+"If you do not need to exclude symbols, you can leave it blank.\n"
+"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+msgstr ""
+"length là chiều dài của mật khẩu, điền trong khoảng từ 8 đến 30. lowercase "
+"cho biết mật khẩu có chứa chữ cái thường hay không, uppercase cho biết có "
+"chứa chữ cái hoa hay không, digit cho biết có chứa số hay không, symbol cho "
+"biết có chứa ký tự đặc biệt hay không. exclude_symbols dùng để loại trừ các "
+"ký hiệu cụ thể, bạn có thể điền các ký hiệu muốn loại trừ (tối đa 16 ký "
+"hiệu), nếu không cần loại trừ ký hiệu, có thể để trống. Mặc định: "
+"{\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, "
+"\"symbol\": true, \"exclude_symbols\": \"\"}"
+
+#: accounts/serializers/automations/change_secret.py:117
+msgid "Secret is required for the custom strategy"
+msgstr ""
+
+#: accounts/tasks/automation.py:185
+#, fuzzy
+#| msgid "Account automation task"
+msgid "Recover interrupted account automation tasks"
+msgstr "Nhiệm vụ tự động hóa tài khoản"
+
+#: accounts/tasks/automation.py:187
+msgid ""
+"Periodically reconcile account automation executions whose Celery\n"
+"        worker was forcibly terminated before task state and secret records\n"
+"        could be written back"
+msgstr ""
+
+#: accounts/templates/accounts/push_account_report.html:106
+#, fuzzy
+#| msgid "Specified account"
+msgid "Unverified accounts"
+msgstr "Tài khoản chỉ định"
+
+#: accounts/templates/accounts/push_account_report.html:132
+#, fuzzy
+#| msgid "Specified account"
+msgid "No unverified accounts"
+msgstr "Tài khoản chỉ định"
+
+#: assets/automations/base/manager.py:528
+#, fuzzy
+#| msgid "Asset not found"
+msgid "Asset not found or inactive"
+msgstr "Tài sản không tồn tại"
+
+#: assets/automations/base/manager.py:700
+#, python-format
+msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
+msgstr ""
+
+#: assets/automations/base/manager.py:718
+#, fuzzy
+#| msgid "Unknown"
+msgid "Unknown task"
+msgstr "Không xác định"
+
+#: assets/automations/base/manager.py:735
+#, python-format
+msgid " and %(count)s more"
+msgstr ""
+
+#: assets/automations/base/manager.py:798
+#, python-format
+msgid ">>> Still waiting for %(count)s host(s): %(detail)s"
+msgstr ""
+
+#: assets/automations/base/manager.py:804
+#: assets/automations/base/manager.py:961
+#: assets/automations/ping_gateway/manager.py:200
+#: assets/automations/ping_gateway/manager.py:234
+msgid "Task canceled by user"
+msgstr ""
+
+#: assets/automations/base/manager.py:921
+#: assets/automations/base/manager.py:1018
+msgid "Hosts still waiting"
+msgstr ""
+
+#: assets/automations/base/manager.py:1006
+#, python-format
+msgid "Ansible runner stopped before completing the batch: %(status)s"
+msgstr ""
+
+#: assets/automations/ping_gateway/manager.py:189
+msgid "Gateway not found or inactive"
+msgstr ""
+
+#: assets/automations/ping_gateway/manager.py:207
+#: assets/automations/ping_gateway/manager.py:242
+#, fuzzy
+#| msgid "Task execution completed"
+msgid "Task execution timed out"
+msgstr "Nhiệm vụ đã hoàn thành"
+
+#: assets/automations/ping_gateway/manager.py:251
+#, python-brace-format
+msgid "Connectivity succeeded but saving the result failed: {error}"
+msgstr ""
+
+#: ops/ansible/inventory.py:215
+msgid ""
+"The platform uses su, but the directly connected account does not have a "
+"target root credential. Configure su_from or use a root account."
+msgstr ""
+
+#: settings/serializers/luna.py:22
+#, fuzzy
+#| msgid "Default"
+msgid "Luna default"
+msgstr "Mặc định"
+
+#: terminal/models/component/endpoint.py:20
+#, fuzzy
+#| msgid "Image port"
+msgid "Magnus port"
+msgstr "Cổng hình ảnh"
+
+#: tickets/const.py:52
+#, fuzzy
+#| msgid "One level"
+msgid "Three level"
+msgstr "Cấp 1"
+
+#: tickets/const.py:53
+#, fuzzy
+#| msgid "Two level"
+msgid "Four level"
+msgstr "Cấp 2"
+
+#: tickets/const.py:54
+#, fuzzy
+#| msgid "One level"
+msgid "Five level"
+msgstr "Cấp 1"
+
+#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
+#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
+#: tickets/serializers/ticket/ticket.py:24
+#, fuzzy
+#| msgid "All users"
+msgid "CC users"
+msgstr "Tất cả người dùng"
+
+#: tickets/notifications.py:197
+#, fuzzy
+#| msgid "Asset \"%s\" has been updated"
+msgid "A ticket you are copied on has been updated"
+msgstr "Tài sản \"%s\" đã được cập nhật."
+
+#: tickets/notifications.py:201
+#, fuzzy
+#| msgid "Ticket has processed - {} ({})"
+msgid "Ticket updated - {} ({})"
+msgstr "Công việc của bạn đã được xử lý, người xử lý - {} ({})"
+
+#: tickets/serializers/flow.py:58
+#, fuzzy
+#| msgid ""
+#| "Please check if a user with the same username or email already exists"
+msgid "A ticket flow with the same name and type already exists"
+msgstr ""
+"Vui lòng kiểm tra xem có người dùng nào đã tồn tại với tên tài khoản hoặc "
+"email giống nhau hay không"
+
+#: tickets/serializers/flow.py:66
+msgid "The number of approval rules must match the approval level"
+msgstr ""
+
+#: tickets/serializers/ticket/ticket.py:110
+#, fuzzy
+#| msgid "The ticket flow `{}` does not exist"
+msgid "The selected ticket flow is not available"
+msgstr "Quy trình công việc `{}` không tồn tại"
+
+#: tickets/serializers/ticket/ticket.py:114
+#, fuzzy
+#| msgid "Please select file"
+msgid "Please select a ticket flow"
+msgstr "Chọn tệp"
 
 #~ msgid "Waiting task start"
 #~ msgstr "Chờ nhiệm vụ bắt đầu"
-
-#~ msgid "MySQL port"
-#~ msgstr "Cổng MySQL"
-
-#~ msgid "MariaDB port"
-#~ msgstr "Cổng MariaDB"
-
-#~ msgid "PostgreSQL port"
-#~ msgstr "Cổng PostgreSQL"
-
-#~ msgid "Redis port"
-#~ msgstr "Cổng Redis"
-
-#~ msgid "SQLServer port"
-#~ msgstr "Cổng SQL Server"
-
-#~ msgid "Oracle port"
-#~ msgstr "Cổng Oracle"
-
-#~ msgid "MongoDB port"
-#~ msgstr "Cổng MongoDB"
-
-#~ msgid "The current organization type already exists"
-#~ msgstr "Tổ chức hiện tại đã tồn tại loại này"
-
-#~ msgid "domain_name"
-#~ msgstr "Tên miền"
 
 #~ msgid "Offline video player"
 #~ msgstr "Trình phát video ngoại tuyến"
@@ -13444,8 +13554,8 @@ msgstr "Giấy phép không hợp lệ"
 #~ "macOS needs to download the client to connect RDP asset, which comes with "
 #~ "Windows"
 #~ msgstr ""
-#~ "macOS cần tải xuống khách hàng để kết nối tài sản RDP, hệ thống Windows "
-#~ "đã cài đặt sẵn chương trình này"
+#~ "macOS cần tải xuống khách hàng để kết nối tài sản RDP, hệ thống Windows đã "
+#~ "cài đặt sẵn chương trình này"
 
 #~ msgid "Windows Remote application publisher tools"
 #~ msgstr "Công cụ máy chủ ứng dụng từ xa Windows"
@@ -13454,8 +13564,8 @@ msgstr "Giấy phép không hợp lệ"
 #~ "OpenSSH is a program used to connect remote applications in the Windows "
 #~ "Remote Application Publisher"
 #~ msgstr ""
-#~ "OpenSSH được sử dụng trong máy chủ ứng dụng từ xa Windows để kết nối các "
-#~ "ứng dụng từ xa"
+#~ "OpenSSH được sử dụng trong máy chủ ứng dụng từ xa Windows để kết nối các ứng"
+#~ " dụng từ xa"
 
 #~ msgid "Periodic report"
 #~ msgstr "Periodic"

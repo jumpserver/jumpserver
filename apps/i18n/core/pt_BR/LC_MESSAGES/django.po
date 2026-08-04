@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: audits/models.py:44 audits/models.py:46
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-04 10:14+0800\n"
+"POT-Creation-Date: 2026-07-31 11:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,11 +28,12 @@ msgid "No valid assets found for account creation."
 msgstr "Não foi encontrado um ativo válido para a criação da conta."
 
 #: accounts/api/account/application.py:89
-#: authentication/api/connection_token.py:667
+#: authentication/api/connection_token.py:634
 msgid "Account not found"
 msgstr "Conta não encontrada"
 
 #: accounts/api/automations/base.py:88 tickets/api/ticket.py:134
+#, python-brace-format
 msgid "The parameter 'action' must be [{}]"
 msgstr "O parâmetro 'action' deve ser [{}]"
 
@@ -51,9 +51,9 @@ msgstr "Gerar arquivo de informações de backup relacionado ao ativo"
 
 #: accounts/automations/backup_account/handlers.py:178
 #: accounts/automations/backup_account/manager.py:26
-#: accounts/automations/change_secret/manager.py:101
-#: accounts/automations/push_account/manager.py:66
-#: assets/models/automations/base.py:157 ops/serializers/job.py:71
+#: accounts/automations/change_secret/manager.py:81
+#: accounts/automations/push_account/manager.py:62
+#: assets/models/automations/base.py:147 ops/serializers/job.py:71
 #: ops/serializers/job.py:95
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 #: terminal/serializers/session.py:57
@@ -93,70 +93,45 @@ msgid "The account backup plan is being executed"
 msgstr "Plano de backup de contas está em execução"
 
 #: accounts/automations/backup_account/manager.py:24
-#: accounts/automations/change_secret/manager.py:99
-#: accounts/automations/push_account/manager.py:64
+#: accounts/automations/change_secret/manager.py:79
+#: accounts/automations/push_account/manager.py:60
 msgid "Plan execution end"
 msgstr "Execução do plano concluída"
 
-#: accounts/automations/base/manager.py:129
+#: accounts/automations/base/manager.py:119
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows não suporta autenticação por chave SSH"
 
-#: accounts/automations/base/manager.py:151
+#: accounts/automations/base/manager.py:123
+msgid "Windows password cannot contain special characters like > ^"
+msgstr "Senhas do Windows não podem conter caracteres especiais, como > ^"
+
+#: accounts/automations/base/manager.py:135
 msgid "No pending accounts found"
 msgstr "Conta pendente não encontrada"
 
-#: accounts/automations/base/manager.py:167
+#: accounts/automations/change_secret/manager.py:72
 #, python-format
-msgid "Account is already being processed, skipping: %(account)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:200
-msgid "Account not found, inactive, or not eligible for this task"
-msgstr ""
-
-#: accounts/automations/base/manager.py:314
-#, python-format
-msgid ""
-"The remote secret may have changed, but the independent credential "
-"verification was inconclusive: %(code)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:389
-#, python-format
-msgid ""
-"The remote operation completed, but saving the local account result failed: "
-"%(error)s"
-msgstr ""
-
-#: accounts/automations/base/manager.py:494
-msgid "Task ended before the account received a final result"
-msgstr ""
-
-#: accounts/automations/change_secret/manager.py:91
-#: accounts/automations/push_account/manager.py:86
-#, fuzzy, python-format
-#| msgid "Success: %s, Failed: %s, Total: %s"
-msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
+msgid "Success: %s, Failed: %s, Total: %s"
 msgstr "Sucesso: %s, Falha: %s, Total: %s"
 
-#: accounts/automations/check_account/manager.py:287
+#: accounts/automations/check_account/manager.py:277
+#, python-brace-format
 msgid "Check account report of {}"
 msgstr "Relatório de Detecção de Risco {}"
 
-#: accounts/automations/check_account/manager.py:293
+#: accounts/automations/check_account/manager.py:283
+#, python-brace-format
 msgid ""
 "---\n"
 "Summary: \n"
-"ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no "
-"secret: {}, using time: {}s"
+"ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no secret: {}, using time: {}s"
 msgstr ""
 "---\n"
 "Resumo:  \n"
-"Normal: {}, Senha fraca: {}, Senha vazada: {}, Senha repetida: {}, Sem "
-"senha: {}, Tempo gasto: {} segundos"
+"Normal: {}, Senha fraca: {}, Senha vazada: {}, Senha repetida: {}, Sem senha: {}, Tempo gasto: {} segundos"
 
-#: accounts/automations/push_account/manager.py:35
+#: accounts/automations/push_account/manager.py:33
 msgid "Secret cannot be empty"
 msgstr "O texto cifrado não pode estar vazio."
 
@@ -166,19 +141,22 @@ msgstr ">>> Iniciando teste de conectividade da conta do gateway"
 
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:37
-#: audits/signal_handlers/login_log.py:34 authentication/confirm/password.py:25
-#: authentication/confirm/password.py:27 authentication/const.py:14
-#: authentication/forms.py:28
+#: audits/signal_handlers/login_log.py:34
+#: authentication/confirm/password.py:25 authentication/confirm/password.py:27
+#: authentication/const.py:14 authentication/forms.py:28
 #: authentication/templates/authentication/login.html:369
-#: authentication/templates/authentication/login.html:415 reports/mixins.py:194
-#: settings/models.py:217 settings/serializers/auth/ldap.py:31
-#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/ldap_ha.py:39
-#: settings/serializers/msg.py:37 settings/serializers/terminal.py:32
-#: terminal/serializers/storage.py:123 terminal/serializers/storage.py:142
-#: users/forms/profile.py:22 users/serializers/user.py:153
+#: authentication/templates/authentication/login.html:415
+#: reports/mixins.py:194 settings/models.py:217
+#: settings/serializers/auth/ldap.py:31 settings/serializers/auth/ldap.py:57
+#: settings/serializers/auth/ldap_ha.py:39 settings/serializers/msg.py:37
+#: settings/serializers/terminal.py:32 terminal/serializers/storage.py:123
+#: terminal/serializers/storage.py:142 users/forms/profile.py:22
+#: users/serializers/user.py:153
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:43
+#: xpack/plugins/cloud/serializers/account_attrs.py:105
+#: xpack/plugins/cloud/serializers/account_attrs.py:112
 msgid "Password"
 msgstr "Senha"
 
@@ -237,7 +215,8 @@ msgstr "Descubra"
 msgid "Template"
 msgstr "Modelo"
 
-#: accounts/const/account.py:32 ops/const.py:47 xpack/plugins/cloud/const.py:76
+#: accounts/const/account.py:32 ops/const.py:47
+#: xpack/plugins/cloud/const.py:76
 msgid "Skip"
 msgstr "Pular"
 
@@ -247,7 +226,7 @@ msgid "Update"
 msgstr "Atualizar"
 
 #: accounts/const/account.py:34 accounts/const/automation.py:115
-#: accounts/serializers/automations/change_secret.py:194 audits/const.py:66
+#: accounts/serializers/automations/change_secret.py:173 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:67
 #: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:55
 msgid "Failed"
@@ -355,10 +334,11 @@ msgstr " Apenas criar"
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:21
-#: settings/serializers/msg.py:62 users/forms/profile.py:101
-#: users/forms/profile.py:111 users/models/user/__init__.py:68
-#: users/notifications.py:22 users/notifications.py:67
-#: users/notifications.py:189 users/templates/users/forgot_password.html:162
+#: settings/serializers/msg.py:62 users/filters.py:15
+#: users/forms/profile.py:101 users/forms/profile.py:111
+#: users/models/user/__init__.py:68 users/notifications.py:22
+#: users/notifications.py:67 users/notifications.py:189
+#: users/templates/users/forgot_password.html:162
 #: users/views/profile/reset.py:94
 msgid "Email"
 msgstr "E-mail"
@@ -368,7 +348,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:116
-#: accounts/serializers/automations/change_secret.py:191 audits/const.py:65
+#: accounts/serializers/automations/change_secret.py:172 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
@@ -381,76 +361,69 @@ msgstr "Successo"
 msgid "Pending"
 msgstr "Pendente"
 
-#: accounts/const/automation.py:118
-#: accounts/serializers/automations/change_secret.py:193
-#, fuzzy
-#| msgid "Verified"
-msgid "Unverified"
-msgstr "Validado"
-
-#: accounts/const/automation.py:122
+#: accounts/const/automation.py:121
 msgid "Queued"
 msgstr "Em fila de espera"
 
-#: accounts/const/automation.py:123 common/const/choices.py:63
+#: accounts/const/automation.py:122 common/const/choices.py:63
 msgid "Ready"
 msgstr "Preparar"
 
-#: accounts/const/automation.py:124
+#: accounts/const/automation.py:123
 msgid "Processing"
 msgstr "Em processamento"
 
-#: accounts/const/automation.py:128
+#: accounts/const/automation.py:127
 msgid "Can login"
 msgstr "Login Permitido"
 
-#: accounts/const/automation.py:129 users/serializers/user.py:260
+#: accounts/const/automation.py:128 users/serializers/user.py:260
 msgid "Superuser"
 msgstr "Superusuário"
 
-#: accounts/const/automation.py:130
+#: accounts/const/automation.py:129
 msgid "Create date"
 msgstr "Data de Criação"
 
-#: accounts/const/automation.py:131
+#: accounts/const/automation.py:130
 msgid "Is disabled"
 msgstr "Desativado"
 
-#: accounts/const/automation.py:132
+#: accounts/const/automation.py:131
 msgid "Default database name"
 msgstr "Nome do Banco de Dados Padrão"
 
-#: accounts/const/automation.py:133
+#: accounts/const/automation.py:132
 msgid "UID"
 msgstr "UID"
 
-#: accounts/const/automation.py:134
+#: accounts/const/automation.py:133
 msgid "Account status"
 msgstr "Status da Conta"
 
-#: accounts/const/automation.py:135
+#: accounts/const/automation.py:134
 msgid "Default tablespace"
 msgstr "Espaço de Tabela Padrão"
 
-#: accounts/const/automation.py:136 rbac/models/role.py:46
+#: accounts/const/automation.py:135 rbac/models/role.py:46
 #: rbac/models/rolebinding.py:53 users/models/user/__init__.py:79
 msgid "Role"
 msgstr "Papel"
 
-#: accounts/const/automation.py:137 users/serializers/profile.py:195
+#: accounts/const/automation.py:136 users/serializers/profile.py:195
 msgid "Perms"
 msgstr "Permissões"
 
-#: accounts/const/automation.py:138 perms/serializers/permission.py:56
+#: accounts/const/automation.py:137 perms/serializers/permission.py:56
 #: users/serializers/user.py:251
 msgid "Groups"
 msgstr "Grupos de usuários"
 
-#: accounts/const/automation.py:140
+#: accounts/const/automation.py:139
 msgid "Authorized keys"
 msgstr "Chave de Certificação"
 
-#: accounts/const/automation.py:141
+#: accounts/const/automation.py:140
 msgid "DB"
 msgstr "banco de dados"
 
@@ -491,9 +464,9 @@ msgstr ""
 #: accounts/models/automations/gather_account.py:17
 #: accounts/serializers/account/account.py:228
 #: accounts/serializers/account/account.py:295
-#: accounts/serializers/automations/change_secret.py:135
-#: accounts/serializers/automations/change_secret.py:168
-#: accounts/serializers/automations/change_secret.py:211
+#: accounts/serializers/automations/change_secret.py:116
+#: accounts/serializers/automations/change_secret.py:149
+#: accounts/serializers/automations/change_secret.py:190
 #: accounts/serializers/automations/check_account.py:33
 #: accounts/serializers/automations/gather_account.py:48
 #: accounts/templates/accounts/asset_account_change_info.html:7
@@ -502,8 +475,7 @@ msgstr ""
 #: accounts/templates/accounts/gather_account_report.html:77
 #: accounts/templates/accounts/gather_account_report.html:117
 #: accounts/templates/accounts/push_account_report.html:78
-#: accounts/templates/accounts/push_account_report.html:117
-#: accounts/templates/accounts/push_account_report.html:157
+#: accounts/templates/accounts/push_account_report.html:118
 #: acls/notifications.py:70 acls/serializers/base.py:110
 #: assets/models/asset/common.py:102 assets/models/asset/common.py:430
 #: assets/models/cmd_filter.py:36 audits/models.py:67 audits/models.py:388
@@ -570,16 +542,17 @@ msgstr "Status da Alteração de Senha"
 #: accounts/models/automations/check_account.py:64
 #: accounts/serializers/account/account.py:296
 #: accounts/serializers/account/service.py:13
-#: accounts/serializers/automations/change_secret.py:137
-#: accounts/serializers/automations/change_secret.py:169
+#: accounts/serializers/automations/change_secret.py:118
+#: accounts/serializers/automations/change_secret.py:150
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:259
-#: authentication/api/connection_token.py:679 ops/models/base.py:18
+#: authentication/api/connection_token.py:646 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:31
-#: terminal/notifications.py:306 terminal/serializers/command.py:72
+#: terminal/backends/command/models.py:18
+#: terminal/models/session/session.py:31 terminal/notifications.py:306
+#: terminal/serializers/command.py:72
 #: terminal/templates/terminal/_msg_command_warning.html:11
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:14
@@ -645,19 +618,20 @@ msgstr "Atividade da conta"
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:13
-#: terminal/models/component/endpoint.py:108
-#: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
+#: terminal/models/component/endpoint.py:107
+#: terminal/models/component/storage.py:26
+#: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
 #: terminal/models/virtualapp/virtualapp.py:19 tickets/api/ticket.py:89
-#: tickets/models/flow.py:42 tickets/serializers/flow.py:26
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
 #: users/notifications.py:21 users/notifications.py:106
 #: users/notifications.py:145 users/notifications.py:184
 #: users/notifications.py:224 users/notifications.py:252
 #: users/notifications.py:279 xpack/plugins/cloud/models.py:35
-#: xpack/plugins/cloud/models.py:316 xpack/plugins/cloud/serializers/task.py:77
+#: xpack/plugins/cloud/models.py:316
+#: xpack/plugins/cloud/serializers/task.py:77
 msgid "Name"
 msgstr "Nome"
 
@@ -685,24 +659,27 @@ msgid "Accounts"
 msgstr "Conta"
 
 #: accounts/models/application.py:22 authentication/models/access_key.py:21
-#: terminal/models/component/endpoint.py:109
+#: terminal/models/component/endpoint.py:108
 msgid "IP group"
 msgstr "Grupo IP"
 
 #: accounts/models/application.py:23
 #: authentication/backends/passkey/models.py:14
 #: authentication/models/access_key.py:25
-#: authentication/models/private_token.py:8 authentication/models/ssh_key.py:20
+#: authentication/models/private_token.py:8
+#: authentication/models/ssh_key.py:20
 msgid "Date last used"
 msgstr "Data do último uso"
 
 #: accounts/models/application.py:24 acls/models/base.py:43
 #: assets/models/asset/common.py:182 authentication/models/access_key.py:24
 #: authentication/models/connection_token.py:61
-#: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
+#: authentication/models/ssh_key.py:13
+#: authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:82 terminal/models/component/endpoint.py:24
-#: terminal/models/component/endpoint.py:119
+#: perms/models/asset_permission.py:82
+#: terminal/models/component/endpoint.py:30
+#: terminal/models/component/endpoint.py:118
 #: terminal/models/session/sharing.py:29 terminal/serializers/terminal.py:44
 msgid "Active"
 msgstr "Ativação em andamento"
@@ -812,7 +789,7 @@ msgid "Change secret automation"
 msgstr "Automação da alteração de senha"
 
 #: accounts/models/automations/change_secret.py:47
-#: assets/models/automations/base.py:155 ops/models/base.py:56
+#: assets/models/automations/base.py:145 ops/models/base.py:56
 #: ops/models/celery.py:90 ops/models/job.py:242
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
@@ -822,14 +799,14 @@ msgstr "Data de fim"
 #: accounts/models/automations/check_account.py:73
 #: accounts/models/automations/gather_account.py:26
 #: accounts/serializers/automations/check_account.py:39
-#: assets/models/automations/base.py:147
+#: assets/models/automations/base.py:137
 #: assets/serializers/automations/base.py:47 audits/models.py:252
 #: audits/reporting.py:607 audits/serializers.py:77 ops/models/base.py:49
 #: ops/models/job.py:233 terminal/models/applet/applet.py:400
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:285
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:284
 #: tickets/reporting.py:80 tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:233
 #: xpack/plugins/cloud/models.py:300
@@ -878,7 +855,7 @@ msgstr "Pode visualizar o desempenho da conta"
 msgid "Can add check account execution"
 msgstr "Pode adicionar conta de verificação para desempenho"
 
-#: accounts/models/automations/check_account.py:43
+#: accounts/models/automations/check_account.py:43 users/filters.py:47
 msgid "Long time no login"
 msgstr "Inatividade por longos períodos"
 
@@ -903,7 +880,7 @@ msgid "Authorized keys changed"
 msgstr "Alteração de Chave"
 
 #: accounts/models/automations/check_account.py:49
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:28 users/filters.py:44
 msgid "Password expired"
 msgstr "Senha expirou"
 
@@ -949,12 +926,11 @@ msgstr "Senha repetida"
 #: accounts/templates/accounts/gather_account_report.html:78
 #: accounts/templates/accounts/gather_account_report.html:118
 #: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:118
-#: accounts/templates/accounts/push_account_report.html:158
-#: acls/serializers/base.py:19 acls/serializers/base.py:50 audits/models.py:226
-#: audits/reporting.py:241 authentication/backends/ukey/forms.py:8
-#: authentication/forms.py:21 authentication/forms.py:23
-#: authentication/models/temp_token.py:10
+#: accounts/templates/accounts/push_account_report.html:119
+#: acls/serializers/base.py:19 acls/serializers/base.py:50
+#: audits/models.py:226 audits/reporting.py:241
+#: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
+#: authentication/forms.py:23 authentication/models/temp_token.py:10
 #: authentication/serializers/connect_token_secret.py:45
 #: authentication/serializers/connect_token_secret.py:55
 #: authentication/templates/authentication/_msg_different_city.html:9
@@ -965,6 +941,8 @@ msgstr "Senha repetida"
 #: users/notifications.py:20 users/serializers/profile.py:190
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/cloud/serializers/account_attrs.py:41
+#: xpack/plugins/cloud/serializers/account_attrs.py:103
+#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "Username"
 msgstr "Nome de usuário"
 
@@ -1154,8 +1132,8 @@ msgstr "Nome de usuário é o mesmo que o do usuário"
 #: accounts/models/virtual.py:37
 msgid "Non-asset account, Input username/password on connect"
 msgstr ""
-"Conta que se conecta com nome de usuário/senha inseridos manualmente durante "
-"o login"
+"Conta que se conecta com nome de usuário/senha inseridos manualmente durante"
+" o login"
 
 #: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
@@ -1176,6 +1154,7 @@ msgid "Notification of account backup route task results"
 msgstr "Notificação de resultado da tarefa de backup da conta"
 
 #: accounts/notifications.py:23 accounts/notifications.py:48
+#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed. See the attachment "
 "for details"
@@ -1183,6 +1162,7 @@ msgstr ""
 "{} - A tarefa de backup da conta está concluída, veja detalhes no anexo "
 
 #: accounts/notifications.py:26
+#, python-brace-format
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
 "password has not been set - please go to personal information -> Basic file "
@@ -1197,6 +1177,7 @@ msgid "Notification of implementation result of encryption change plan"
 msgstr "Tarefa de alteração de senha concluída"
 
 #: accounts/notifications.py:69
+#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
@@ -1204,6 +1185,7 @@ msgstr ""
 "{} - A tarefa de alteração de senha foi concluída, veja detalhes no anexo"
 
 #: accounts/notifications.py:73
+#, python-brace-format
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> set encryption "
@@ -1258,6 +1240,7 @@ msgid "Change password and Add"
 msgstr "Alterar senha e adicionar"
 
 #: accounts/risk_handlers.py:127
+#, python-brace-format
 msgid "Execution failed: {}"
 msgstr "Execução falhou: {}"
 
@@ -1286,21 +1269,21 @@ msgstr "Categoria"
 
 #: accounts/serializers/account/account.py:208 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:22 assets/models/automations/base.py:27
-#: assets/models/automations/base.py:156 assets/models/cmd_filter.py:74
+#: assets/models/automations/base.py:146 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:96 assets/serializers/asset/common.py:147
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:76
 #: audits/serializers.py:223 authentication/models/connection_token.py:68
-#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:155
-#: perms/serializers/user_permission.py:28 reports/models.py:16
-#: terminal/models/applet/applet.py:46 terminal/models/component/storage.py:58
+#: authentication/serializers/connect_token_secret.py:140
+#: ops/models/job.py:155 perms/serializers/user_permission.py:28
+#: reports/models.py:16 terminal/models/applet/applet.py:46
+#: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
-#: tickets/models/flow.py:46 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:277 tickets/reporting.py:70
-#: tickets/serializers/flow.py:29 tickets/serializers/flow.py:100
-#: tickets/serializers/ticket/ticket.py:19
+#: tickets/models/flow.py:43 tickets/models/ticket/apply_application.py:16
+#: tickets/models/ticket/general.py:276 tickets/reporting.py:70
+#: tickets/serializers/flow.py:25 tickets/serializers/ticket/ticket.py:19
 msgid "Type"
 msgstr "Tipo"
 
@@ -1325,7 +1308,7 @@ msgstr "Senha já gerenciada"
 
 #: accounts/serializers/account/account.py:297 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
-#: tickets/models/ticket/general.py:281 tickets/reporting.py:75
+#: tickets/models/ticket/general.py:280 tickets/reporting.py:75
 #: tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
@@ -1369,22 +1352,23 @@ msgstr "ID"
 #: acls/notifications.py:68 acls/serializers/base.py:103
 #: acls/templates/acls/asset_login_reminder.html:8
 #: acls/templates/acls/user_login_reminder.html:8
-#: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:63
-#: audits/models.py:105 audits/models.py:197 audits/models.py:344
-#: audits/reporting.py:104 audits/reporting.py:317 audits/reporting.py:414
-#: audits/serializers.py:224 authentication/models/connection_token.py:38
+#: assets/models/cmd_filter.py:24 assets/models/label.py:16
+#: audits/models.py:63 audits/models.py:105 audits/models.py:197
+#: audits/models.py:344 audits/reporting.py:104 audits/reporting.py:317
+#: audits/reporting.py:414 audits/serializers.py:224
+#: authentication/models/connection_token.py:38
 #: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
 #: authentication/notifications.py:16 authentication/notifications.py:55
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
 #: rbac/models/rolebinding.py:50 rbac/serializers/rolebinding.py:17
-#: terminal/backends/command/models.py:16 terminal/models/session/session.py:27
-#: terminal/models/session/sharing.py:34 terminal/notifications.py:168
-#: terminal/notifications.py:235 terminal/reporting.py:118
-#: terminal/serializers/command.py:16
+#: terminal/backends/command/models.py:16
+#: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
+#: terminal/notifications.py:168 terminal/notifications.py:235
+#: terminal/reporting.py:118 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:9
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 tickets/serializers/flow.py:16
+#: tickets/models/comment.py:21 tickets/serializers/flow.py:15
 #: users/const.py:14 users/models/user/__init__.py:308
 #: users/models/user/__init__.py:341
 msgid "User"
@@ -1418,15 +1402,15 @@ msgstr "Lista branca de IP"
 
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
-#: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:165 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:43 terminal/models/applet/applet.py:52
-#: terminal/models/applet/applet.py:401 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:23
-#: terminal/models/component/endpoint.py:118
+#: assets/models/cmd_filter.py:88 common/db/models.py:36
+#: ops/models/adhoc.py:25 ops/models/job.py:165 ops/models/playbook.py:31
+#: rbac/models/role.py:37 settings/models.py:43
+#: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:401
+#: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:29
+#: terminal/models/component/endpoint.py:117
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:303 users/models/user/__init__.py:104
+#: tickets/models/ticket/general.py:298 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "Observação"
@@ -1464,39 +1448,24 @@ msgid "Exclude symbol"
 msgstr "Excluir caracteres"
 
 #: accounts/serializers/account/template.py:22
-#, fuzzy
-#| msgid ""
-#| "length is the length of the password, and the range is 8 to 30.\n"
-#| "lowercase indicates whether the password contains lowercase letters, \n"
-#| "uppercase indicates whether it contains uppercase letters,\n"
-#| "digit indicates whether it contains numbers, and symbol indicates whether "
-#| "it contains special symbols.\n"
-#| "exclude_symbols is used to exclude specific symbols. You can fill in the "
-#| "symbol characters to be excluded (up to 16). \n"
-#| "If you do not need to exclude symbols, you can leave it blank.\n"
-#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, "
-#| "\"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgid ""
-"length is the length of the password, and the range is 8 to 36.\n"
+"length is the length of the password, and the range is 8 to 30.\n"
 "lowercase indicates whether the password contains lowercase letters, \n"
 "uppercase indicates whether it contains uppercase letters,\n"
-"digit indicates whether it contains numbers, and symbol indicates whether it "
-"contains special symbols.\n"
-"exclude_symbols is used to exclude specific symbols. You can fill in the "
-"symbol characters to be excluded (up to 16). \n"
+"digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+"exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
 "If you do not need to exclude symbols, you can leave it blank.\n"
-"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, "
-"\"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
 msgstr ""
 "length é o comprimento da senha, a faixa de preenchimento é de 8 a 30. "
-"lowercase indica se a senha deve incluir letras minúsculas, uppercase indica "
-"se deve incluir letras maiúsculas, digit indica se deve incluir números, "
+"lowercase indica se a senha deve incluir letras minúsculas, uppercase indica"
+" se deve incluir letras maiúsculas, digit indica se deve incluir números, "
 "symbol indica se deve incluir símbolos especiais. exclude_symbols é usado "
 "para excluir símbolos específicos, você pode preencher os caracteres do "
-"símbolo que deseja excluir (no máximo 16), se não precisar excluir símbolos, "
-"pode deixar em branco. Padrão: {\"length\": 16, \"lowercase\": true, "
-"\"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": "
-"\"\"}"
+"símbolo que deseja excluir (no máximo 16), se não precisar excluir símbolos,"
+" pode deixar em branco. Padrão: {\"length\": 16, \"lowercase\": true, "
+"\"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\":"
+" \"\"}"
 
 #: accounts/serializers/account/template.py:47
 msgid "Secret generation strategy for account creation"
@@ -1547,7 +1516,7 @@ msgid "Name already exists"
 msgstr "O nome já existe"
 
 #: accounts/serializers/automations/base.py:31
-#: assets/models/automations/base.py:159
+#: assets/models/automations/base.py:149
 #: assets/serializers/automations/base.py:45
 msgid "Automation snapshot"
 msgstr "Snapshot automático"
@@ -1572,35 +1541,31 @@ msgstr ""
 "Configurações de parâmetros, atualmente válidas apenas para ativos do tipo "
 "AIX LINUX UNIX."
 
-#: accounts/serializers/automations/change_secret.py:92
+#: accounts/serializers/automations/change_secret.py:89
 msgid "* Please enter the correct password length"
 msgstr "* Por favor, insira um comprimento de senha correto"
 
-#: accounts/serializers/automations/change_secret.py:96
+#: accounts/serializers/automations/change_secret.py:93
 msgid "* Password length range 8-36 bits"
 msgstr "* O comprimento da senha deve estar entre 8 e 36 caracteres"
 
-#: accounts/serializers/automations/change_secret.py:117
-msgid "Secret is required for the custom strategy"
-msgstr ""
-
-#: accounts/serializers/automations/change_secret.py:134
-#: accounts/serializers/automations/change_secret.py:170
+#: accounts/serializers/automations/change_secret.py:115
+#: accounts/serializers/automations/change_secret.py:151
 #: ops/serializers/job.py:93 terminal/serializers/session.py:62
 msgid "Is success"
 msgstr "Foi Bem-sucedido?"
 
-#: accounts/serializers/automations/change_secret.py:141
-#: assets/models/automations/base.py:181
+#: accounts/serializers/automations/change_secret.py:122
+#: assets/models/automations/base.py:165
 msgid "Automation task execution"
 msgstr "Histórico de execução de tarefas automáticas"
 
-#: accounts/serializers/automations/change_secret.py:213
+#: accounts/serializers/automations/change_secret.py:192
 msgid "TTL"
 msgstr "TTL"
 
-#: accounts/serializers/automations/change_secret.py:214
-#: assets/models/platform.py:97 tickets/models/ticket/general.py:306
+#: accounts/serializers/automations/change_secret.py:193
+#: assets/models/platform.py:97 tickets/models/ticket/general.py:301
 msgid "Meta"
 msgstr "Metadados"
 
@@ -1627,81 +1592,58 @@ msgstr "Adicionar conta: %s"
 msgid "Delete account: %s"
 msgstr "Excluir conta: %s"
 
-#: accounts/tasks/automation.py:43
+#: accounts/tasks/automation.py:33
 msgid "Account execute automation"
 msgstr "Execução automática da conta"
 
-#: accounts/tasks/automation.py:46
+#: accounts/tasks/automation.py:36
 msgid ""
-"Unified execution entry for account automation tasks: when the system "
-"performs tasks \n"
-"        such as account push, password change, account verification, account "
-"collection, \n"
-"        and gateway account verification, all tasks are executed through "
-"this unified entry"
+"Unified execution entry for account automation tasks: when the system performs tasks \n"
+"        such as account push, password change, account verification, account collection, \n"
+"        and gateway account verification, all tasks are executed through this unified entry"
 msgstr ""
 "Entrada unificada para execução de tarefa automática de conta, quando o "
 "sistema executa o push de conta, troca de senha, verificação de conta, "
 "coleta de conta, verificação de tarefa de conta do gateway, é executada "
 "unificamente através desta tarefa atual"
 
-#: accounts/tasks/automation.py:75 accounts/tasks/automation.py:83
+#: accounts/tasks/automation.py:65 accounts/tasks/automation.py:73
 msgid "Execute automation record"
 msgstr "Registro de execução automática"
 
-#: accounts/tasks/automation.py:78
+#: accounts/tasks/automation.py:68
 msgid "When manually executing password change records, this task is used"
 msgstr ""
-"Quando o registro de alteração de senha é executado manualmente, é realizado "
-"por meio desta tarefa"
+"Quando o registro de alteração de senha é executado manualmente, é realizado"
+" por meio desta tarefa"
 
-#: accounts/tasks/automation.py:185
-#, fuzzy
-#| msgid "Account automation task"
-msgid "Recover interrupted account automation tasks"
-msgstr "Tarefa Automatizada de Conta"
-
-#: accounts/tasks/automation.py:187
-msgid ""
-"Periodically reconcile account automation executions whose Celery\n"
-"        worker was forcibly terminated before task state and secret records\n"
-"        could be written back"
-msgstr ""
-
-#: accounts/tasks/automation.py:359
+#: accounts/tasks/automation.py:116
 msgid "Clean change secret and push record period"
 msgstr ""
 "Limpeza periódica de registros de alteração de senha e registros de push"
 
-#: accounts/tasks/automation.py:361
+#: accounts/tasks/automation.py:118
 msgid ""
-"The system will periodically clean up unnecessary password change and push "
-"records, \n"
-"        including their associated change tasks, execution logs, assets, and "
-"accounts. When any \n"
-"        of these associated items are deleted, the corresponding password "
-"change and push records \n"
-"        become invalid. Therefore, to maintain a clean and efficient "
-"database, the system will \n"
-"        clean up expired records at 2 a.m daily, based on the interval "
-"specified by \n"
-"        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. "
-"This periodic cleanup \n"
-"        mechanism helps free up storage space and enhances the security and "
-"overall performance \n"
+"The system will periodically clean up unnecessary password change and push records, \n"
+"        including their associated change tasks, execution logs, assets, and accounts. When any \n"
+"        of these associated items are deleted, the corresponding password change and push records \n"
+"        become invalid. Therefore, to maintain a clean and efficient database, the system will \n"
+"        clean up expired records at 2 a.m daily, based on the interval specified by \n"
+"        PERM_EXPIRED_CHECK_PERIODIC in the config.txt configuration file. This periodic cleanup \n"
+"        mechanism helps free up storage space and enhances the security and overall performance \n"
 "        of data management"
 msgstr ""
 "O sistema irá limpar periodicamente os registros de alteração de senha e "
-"registros de push que não são mais necessários, incluindo aquelas tarefas de "
-"alteração de senha associadas, registros de execução, ativos e contas. "
+"registros de push que não são mais necessários, incluindo aquelas tarefas de"
+" alteração de senha associadas, registros de execução, ativos e contas. "
 "Quando qualquer um desses itens associados é excluído, o registro de "
-"alteração de senha e push correspondente se tornará inválido. Portanto, para "
-"manter a base de dados limpa e eficiente, a limpeza é realizada todos os "
+"alteração de senha e push correspondente se tornará inválido. Portanto, para"
+" manter a base de dados limpa e eficiente, a limpeza é realizada todos os "
 "dias às 2 da manhã para aqueles que excederam o intervalo de tempo no "
 "arquivo de configuração do sistema config.txt PERM_EXPIRED_CHECK_PERIODIC. "
 "Este mecanismo de limpeza regular não só ajuda a liberar espaço de "
-"armazenamento, mas também melhora a segurança e o desempenho geral da gestão "
-"de dados."
+"armazenamento, mas também melhora a segurança e o desempenho geral da gestão"
+" de dados."
 
 #: accounts/tasks/push_account.py:40 accounts/tasks/push_account.py:54
 msgid "Push accounts to assets"
@@ -1712,8 +1654,8 @@ msgid ""
 "Whenever an account is created or modified and needs pushing to assets, run "
 "this task"
 msgstr ""
-"Sempre que uma conta for criada ou modificada e precisar ser enviada para os "
-"ativos, execute esta tarefa."
+"Sempre que uma conta for criada ou modificada e precisar ser enviada para os"
+" ativos, execute esta tarefa."
 
 #: accounts/tasks/push_account.py:62 accounts/tasks/push_account.py:104
 msgid "Change secret accounts to assets"
@@ -1728,8 +1670,7 @@ msgstr ""
 
 #: accounts/tasks/remove_account.py:28
 msgid ""
-"When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered "
-"accounts' this \n"
+"When clicking \"Sync deletion\" in 'Console - Gather Account - Gathered accounts' this \n"
 "        task will be executed"
 msgstr ""
 "Esta tarefa é executada quando você clica para sincronizar e deletar em "
@@ -1742,17 +1683,14 @@ msgstr "Limpar contas históricas"
 
 #: accounts/tasks/remove_account.py:52
 msgid ""
-"Each time an asset account is updated, a historical account is generated, so "
-"it is \n"
-"        necessary to clean up the asset account history. The system will "
-"clean up excess account \n"
-"        records at 2 a.m. daily based on the configuration in the \"System "
-"settings - Features - \n"
+"Each time an asset account is updated, a historical account is generated, so it is \n"
+"        necessary to clean up the asset account history. The system will clean up excess account \n"
+"        records at 2 a.m. daily based on the configuration in the \"System settings - Features - \n"
 "        Account storage - Record limit"
 msgstr ""
 "Como uma conta histórica é gerada toda vez que uma conta de ativo é "
-"atualizada, é necessário limpar o histórico da conta do ativo. O sistema irá "
-"limpar os registros de conta excedentes às 2 da manhã de acordo com a "
+"atualizada, é necessário limpar o histórico da conta do ativo. O sistema irá"
+" limpar os registros de conta excedentes às 2 da manhã de acordo com a "
 "configuração de limite de registro em Armazenamento de Conta "
 
 #: accounts/tasks/remove_account.py:91
@@ -1765,8 +1703,7 @@ msgstr "Sincronizar informações com as contas associadas"
 
 #: accounts/tasks/template.py:14
 msgid ""
-"When clicking 'Sync new secret to accounts' in 'Console - Account - "
-"Templates - \n"
+"When clicking 'Sync new secret to accounts' in 'Console - Account - Templates - \n"
 "        Accounts' this task will be executed"
 msgstr ""
 "Esta tarefa é realizada quando você clica em sincronizar na Console - "
@@ -1826,7 +1763,7 @@ msgstr "Nome da tarefa"
 #: accounts/templates/accounts/check_account_report.html:23
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
-#: assets/models/automations/base.py:153 audits/models.py:74
+#: assets/models/automations/base.py:143 audits/models.py:74
 #: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:241
 #: ops/templates/ops/celery_task_log.html:154
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
@@ -1894,8 +1831,7 @@ msgstr "Contas bem-sucedidas"
 #: accounts/templates/accounts/change_secret_report.html:78
 #: accounts/templates/accounts/change_secret_report.html:118
 #: accounts/templates/accounts/push_account_report.html:77
-#: accounts/templates/accounts/push_account_report.html:116
-#: accounts/templates/accounts/push_account_report.html:156
+#: accounts/templates/accounts/push_account_report.html:117
 #: audits/handler.py:151
 msgid "No"
 msgstr "Não"
@@ -1904,12 +1840,12 @@ msgstr "Não"
 #: accounts/templates/accounts/change_secret_report.html:134
 #: accounts/templates/accounts/gather_account_report.html:92
 #: accounts/templates/accounts/push_account_report.html:93
-#: accounts/templates/accounts/push_account_report.html:172
+#: accounts/templates/accounts/push_account_report.html:133
 msgid "No new accounts found"
 msgstr "Conta nova não encontrada"
 
 #: accounts/templates/accounts/change_secret_report.html:107
-#: accounts/templates/accounts/push_account_report.html:145
+#: accounts/templates/accounts/push_account_report.html:106
 msgid "Failed accounts"
 msgstr "Contas com falha"
 
@@ -1935,22 +1871,10 @@ msgstr "ContaPerdida"
 msgid "No lost accounts found"
 msgstr "Conta perdida não encontrada."
 
-#: accounts/templates/accounts/push_account_report.html:106
-#, fuzzy
-#| msgid "Specified account"
-msgid "Unverified accounts"
-msgstr "Conta Designada"
-
-#: accounts/templates/accounts/push_account_report.html:132
-#, fuzzy
-#| msgid "Specified account"
-msgid "No unverified accounts"
-msgstr "Conta Designada"
-
 #: accounts/utils.py:55
 msgid ""
-"If the password starts with {{` and ends with }} `, then the password is not "
-"allowed."
+"If the password starts with {{` and ends with }} `, then the password is not"
+" allowed."
 msgstr ""
 "Se a senha começar com `{{` e terminar com `}}`, essa senha não é permitida."
 
@@ -2005,16 +1929,16 @@ msgid "Secret rotation"
 msgstr "Rotação de senha"
 
 #: acls/models/base.py:37 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:111 xpack/plugins/cloud/models.py:322
+#: terminal/models/component/endpoint.py:110 xpack/plugins/cloud/models.py:322
 msgid "Priority"
 msgstr "Prioridade"
 
 #: acls/models/base.py:38 assets/models/cmd_filter.py:76
-#: terminal/models/component/endpoint.py:112 xpack/plugins/cloud/models.py:323
+#: terminal/models/component/endpoint.py:111 xpack/plugins/cloud/models.py:323
 msgid "1-100, the lower the value will be match first"
 msgstr ""
-"O intervalo da prioridade pode ser de 1 a 100 (quanto menor o valor, maior a "
-"prioridade)"
+"O intervalo da prioridade pode ser de 1 a 100 (quanto menor o valor, maior a"
+" prioridade)"
 
 #: acls/models/base.py:41 acls/serializers/base.py:57
 #: assets/models/cmd_filter.py:81 audits/models.py:107 audits/reporting.py:404
@@ -2041,7 +1965,7 @@ msgstr "Usuário"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:214
-#: authentication/api/connection_token.py:678 ops/models/base.py:17
+#: authentication/api/connection_token.py:645 ops/models/base.py:17
 #: ops/models/job.py:157 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -2118,6 +2042,7 @@ msgid "Command group"
 msgstr "Grupo de Comandos"
 
 #: acls/models/command_acl.py:86
+#, python-brace-format
 msgid "The generated regular expression is incorrect: {}"
 msgstr "A expressão regular gerada está errada: {}"
 
@@ -2225,8 +2150,8 @@ msgstr "Nome ACL"
 #: acls/notifications.py:24 acls/notifications.py:77
 #: acls/templates/acls/asset_login_reminder.html:13
 #: acls/templates/acls/user_login_reminder.html:11
-#: terminal/models/session/session.py:34 terminal/models/session/sharing.py:125
-#: terminal/reporting.py:113
+#: terminal/models/session/session.py:34
+#: terminal/models/session/sharing.py:125 terminal/reporting.py:113
 #: terminal/templates/terminal/_msg_command_warning.html:16
 msgid "Login from"
 msgstr "Origem do login"
@@ -2259,8 +2184,8 @@ msgid ""
 "support)"
 msgstr ""
 "* representa uma correspondência com tudo. Por exemplo: 192.168.10.1, "
-"192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
-"(suporte ao domínio) "
+"192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+" (suporte ao domínio) "
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -2270,11 +2195,13 @@ msgstr "IP/Host"
 msgid "Recipients"
 msgstr "Destinatário"
 
-#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:92
+#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:79
+#, python-brace-format
 msgid "The organization `{}` does not exist"
 msgstr "A organização `{}` não existe."
 
 #: acls/serializers/base.py:131
+#, python-brace-format
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "Todos os revisores não pertencem à organização `{}`"
 
@@ -2288,10 +2215,12 @@ msgstr ""
 
 #: acls/serializers/rules/rules.py:22
 #: xpack/plugins/cloud/serializers/task.py:163
+#, python-brace-format
 msgid "IP address invalid: `{}`"
 msgstr "Endereço IP inválido: `{}`"
 
 #: acls/serializers/rules/rules.py:35
+#, python-brace-format
 msgid "address invalid: `{}`"
 msgstr "Endereço inválido: `{}`"
 
@@ -2330,8 +2259,8 @@ msgid ""
 "We would like to inform you that a user has recently logged into the "
 "following asset:"
 msgstr ""
-"Queremos informá-lo de que os seguintes ativos tiveram recentemente usuários "
-"logados:"
+"Queremos informá-lo de que os seguintes ativos tiveram recentemente usuários"
+" logados:"
 
 #: acls/templates/acls/asset_login_reminder.html:6
 msgid "Asset details"
@@ -2390,6 +2319,7 @@ msgid "You can't update the root node name"
 msgstr "Não é possível modificar o nome do nó raiz"
 
 #: assets/api/node.py:65
+#, python-brace-format
 msgid "You can't delete the root node ({})"
 msgstr "Não é possível excluir o nó raiz ({})"
 
@@ -2398,6 +2328,7 @@ msgid "Deletion failed and the node contains assets"
 msgstr "Falha ao excluir, o nó contém ativos"
 
 #: assets/api/node.py:99
+#, python-brace-format
 msgid "Node {} is an ancestor of node {}, can't be added as its child"
 msgstr ""
 
@@ -2413,127 +2344,69 @@ msgstr "Deve ser um número"
 msgid "App Assets"
 msgstr "Gestão de ativos"
 
-#: assets/automations/base/manager.py:193
+#: assets/automations/base/manager.py:152
+#, python-brace-format
 msgid "Task: {} finished"
 msgstr "Tarefa: {} concluída"
 
-#: assets/automations/base/manager.py:414
+#: assets/automations/base/manager.py:357
+#, python-brace-format
 msgid "  - Platform {} ansible disabled"
-msgstr " - Plataforma {} Ansible foi desabilitada, impossível executar tarefas"
-
-#: assets/automations/base/manager.py:528
-#, fuzzy
-#| msgid "Asset not found"
-msgid "Asset not found or inactive"
-msgstr "Ativo não existe"
-
-#: assets/automations/base/manager.py:700
-#, python-format
-msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
 msgstr ""
+" - Plataforma {} Ansible foi desabilitada, impossível executar tarefas"
 
-#: assets/automations/base/manager.py:718
-#, fuzzy
-#| msgid "Unknown"
-msgid "Unknown task"
-msgstr "Desconhecido"
-
-#: assets/automations/base/manager.py:735
-#, python-format
-msgid " and %(count)s more"
-msgstr ""
-
-#: assets/automations/base/manager.py:798
-#, python-format
-msgid ">>> Still waiting for %(count)s host(s): %(detail)s"
-msgstr ""
-
-#: assets/automations/base/manager.py:804
-#: assets/automations/base/manager.py:961
-#: assets/automations/ping_gateway/manager.py:200
-#: assets/automations/ping_gateway/manager.py:234
-msgid "Task canceled by user"
-msgstr ""
-
-#: assets/automations/base/manager.py:921
-#: assets/automations/base/manager.py:1018
-msgid "Hosts still waiting"
-msgstr ""
-
-#: assets/automations/base/manager.py:941
+#: assets/automations/base/manager.py:570
 msgid ">>> Task preparation phase"
 msgstr ">>> Preparando para executar tarefas"
 
-#: assets/automations/base/manager.py:945
+#: assets/automations/base/manager.py:574
 #, python-brace-format
 msgid ">>> Executing tasks in batches, total {runner_count}"
 msgstr ">>> Executando tarefas em partes, total de {runner_count}"
 
-#: assets/automations/base/manager.py:950
+#: assets/automations/base/manager.py:579
 msgid ">>> Start executing tasks"
 msgstr ">>> Começando a executar tarefas"
 
-#: assets/automations/base/manager.py:952
+#: assets/automations/base/manager.py:581
 msgid ">>> No tasks need to be executed"
 msgstr ">>> Não há tarefas para executar"
 
-#: assets/automations/base/manager.py:969
+#: assets/automations/base/manager.py:585
 #, python-brace-format
 msgid ">>> Begin executing batch {index} of tasks"
 msgstr ">>> Começando a executar o lote {index} de tarefas"
 
-#: assets/automations/base/manager.py:1006
-#, python-format
-msgid "Ansible runner stopped before completing the batch: %(status)s"
-msgstr ""
-
-#: assets/automations/ping_gateway/manager.py:32
-#: assets/automations/ping_gateway/manager.py:223
+#: assets/automations/ping_gateway/manager.py:33
 #: authentication/models/connection_token.py:184
 msgid "No account"
 msgstr "Sem conta"
 
-#: assets/automations/ping_gateway/manager.py:44
+#: assets/automations/ping_gateway/manager.py:36
+#, python-brace-format
 msgid "Asset, {}, using account {}"
 msgstr "Ativos, {}, Use a conta {}"
 
-#: assets/automations/ping_gateway/manager.py:71
+#: assets/automations/ping_gateway/manager.py:55
 #, python-brace-format
 msgid "Unable to connect to port {port} on {address}"
 msgstr "Impossível conectar-se à porta {port} no endereço {address}"
 
-#: assets/automations/ping_gateway/manager.py:76
+#: assets/automations/ping_gateway/manager.py:58
 #: authentication/middleware.py:94 terminal/api/component/storage.py:127
 #: xpack/plugins/cloud/providers/fc.py:47
 #: xpack/plugins/cloud/providers/proxmox.py:29
 msgid "Authentication failed"
 msgstr "Falha na autenticação"
 
-#: assets/automations/ping_gateway/manager.py:78
-#: assets/automations/ping_gateway/manager.py:84
-#: assets/automations/ping_gateway/manager.py:113 terminal/const.py:104
+#: assets/automations/ping_gateway/manager.py:60
+#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:104
 msgid "Connect failed"
 msgstr "Falha na conexão"
 
-#: assets/automations/ping_gateway/manager.py:156
+#: assets/automations/ping_gateway/manager.py:118
 msgid ">>> Start executing the task to test gateway connectivity"
 msgstr ">>> Iniciando a tarefa de teste de conectividade do gateway"
-
-#: assets/automations/ping_gateway/manager.py:189
-msgid "Gateway not found or inactive"
-msgstr ""
-
-#: assets/automations/ping_gateway/manager.py:207
-#: assets/automations/ping_gateway/manager.py:242
-#, fuzzy
-#| msgid "Task execution completed"
-msgid "Task execution timed out"
-msgstr "Conclusão de execução da tarefa"
-
-#: assets/automations/ping_gateway/manager.py:251
-#, python-brace-format
-msgid "Connectivity succeeded but saving the result failed: {error}"
-msgstr ""
 
 #: assets/const/automation.py:6 audits/const.py:6 audits/const.py:48
 #: audits/signal_handlers/activity_log.py:63
@@ -2627,7 +2500,8 @@ msgstr "Serviço de nuvem"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:16 common/sdk/sms/endpoint.py:20
+#: assets/const/category.py:16 common/sdk/sms/custom_file.py:47
+#: common/sdk/sms/endpoint.py:20
 msgid "Custom type"
 msgstr "Personalizado"
 
@@ -2721,8 +2595,8 @@ msgid ""
 "<br>- ${USER} The username of the user"
 msgstr ""
 "Diretório raiz do SFTP, suporta variáveis: <br>-${ACCOUNT} nome de usuário "
-"da conta conectada <br>-${HOME} diretório principal da conta conectada <br>-"
-"${USER} nome de usuário do usuário"
+"da conta conectada <br>-${HOME} diretório principal da conta conectada "
+"<br>-${USER} nome de usuário do usuário"
 
 #: assets/const/protocol.py:81
 msgid "Console"
@@ -2743,8 +2617,8 @@ msgstr "Segurança"
 
 #: assets/const/protocol.py:89
 msgid ""
-"Security layer to use for the connection:<br>Any<br>Automatically select the "
-"security mode based on the security protocols supported by both the client "
+"Security layer to use for the connection:<br>Any<br>Automatically select the"
+" security mode based on the security protocols supported by both the client "
 "and the server<br>RDP<br>Legacy RDP encryption. This mode is generally only "
 "used for older Windows servers or in cases where a standard Windows login "
 "screen is desired<br>TLS<br>RDP authentication and encryption implemented "
@@ -2753,11 +2627,11 @@ msgid ""
 msgstr ""
 "Camadas de segurança da conexão: <br>Qualquer<br>Escolhe automaticamente o "
 "modo seguro baseado nos protocolos de segurança suportados pelo cliente e "
-"pelo servidor<br>RDP<br>Modo de criptografia tradicional do RDP. Normalmente "
-"usado apenas para servidores Windows mais antigos ou quando é necessário uma "
-"tela de login padrão do Windows<br>TLS<br>Autenticação e criptografia do RDP "
-"implementada através do TLS<br>NLA<br>Este modo utiliza a criptografia TLS e "
-"exige que o nome de usuário e a senha sejam fornecidos antecipadamente"
+"pelo servidor<br>RDP<br>Modo de criptografia tradicional do RDP. Normalmente"
+" usado apenas para servidores Windows mais antigos ou quando é necessário "
+"uma tela de login padrão do Windows<br>TLS<br>Autenticação e criptografia do"
+" RDP implementada através do TLS<br>NLA<br>Este modo utiliza a criptografia "
+"TLS e exige que o nome de usuário e a senha sejam fornecidos antecipadamente"
 
 #: assets/const/protocol.py:106
 msgid "AD domain"
@@ -2828,7 +2702,8 @@ msgstr "Opções de conexão"
 
 #: assets/const/protocol.py:239
 msgid "The connection specific options eg. retryWrites=false&retryReads=false"
-msgstr "Opções de conexão específicas, como retryWrites=false&retryReads=false"
+msgstr ""
+"Opções de conexão específicas, como retryWrites=false&retryReads=false"
 
 #: assets/const/protocol.py:251
 msgid "Auth username"
@@ -2857,8 +2732,9 @@ msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
-"Quando o modo de segurança estiver ativo, algumas ações serão desabilitadas, "
-"como: abrir novas abas, clicar com o botão direito, acessar outros sites etc"
+"Quando o modo de segurança estiver ativo, algumas ações serão desabilitadas,"
+" como: abrir novas abas, clicar com o botão direito, acessar outros sites "
+"etc"
 
 #: assets/const/protocol.py:295 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
@@ -2906,7 +2782,7 @@ msgid "Port"
 msgstr "Porta"
 
 #: assets/models/asset/common.py:167 assets/serializers/asset/common.py:180
-#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:58
+#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:69
 msgid "Address"
 msgstr "Endereço"
 
@@ -3011,34 +2887,34 @@ msgstr "Parâmetros"
 msgid "Last execution date"
 msgstr "Data da última execução"
 
-#: assets/models/automations/base.py:44 assets/models/automations/base.py:142
+#: assets/models/automations/base.py:44 assets/models/automations/base.py:132
 msgid "Automation task"
 msgstr "Tarefas de automação"
 
-#: assets/models/automations/base.py:133
+#: assets/models/automations/base.py:123
 msgid "Asset automation task"
 msgstr "Tarefas de Automação de Ativos"
 
-#: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
+#: assets/models/automations/base.py:140 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
 #: ops/models/base.py:54 ops/models/job.py:240
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "Data de criação"
 
-#: assets/models/automations/base.py:165
+#: assets/models/automations/base.py:155
 #: assets/serializers/automations/base.py:46 xpack/plugins/cloud/models.py:248
 #: xpack/plugins/cloud/serializers/task.py:260
 msgid "Trigger mode"
 msgstr "Modo de Trigger"
 
-#: assets/models/automations/base.py:167 audits/serializers.py:38
+#: assets/models/automations/base.py:157 audits/serializers.py:38
 #: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:238
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "Resumo"
 
-#: assets/models/automations/base.py:168 ops/models/base.py:51
+#: assets/models/automations/base.py:158 ops/models/base.py:51
 #: ops/models/job.py:237 xpack/plugins/cloud/models.py:231
 msgid "Result"
 msgstr "Resultado"
@@ -3191,7 +3067,7 @@ msgid "Public"
 msgstr "Público"
 
 #: assets/models/platform.py:21 assets/serializers/platform.py:85
-#: settings/serializers/settings.py:97
+#: settings/serializers/settings.py:95
 msgid "Setting"
 msgstr "Configurações"
 
@@ -3374,10 +3250,11 @@ msgid "port out of range (0-65535)"
 msgstr "Porta fora do alcance (0-65535)"
 
 #: assets/serializers/asset/common.py:319
+#, python-brace-format
 msgid "Protocol is required: {}"
 msgstr "O protocolo é obrigatório: {}"
 
-#: assets/serializers/asset/common.py:358
+#: assets/serializers/asset/common.py:358 labels/api.py:107
 msgid "Invalid data"
 msgstr "Dados inválidos"
 
@@ -3395,21 +3272,15 @@ msgstr ""
 #: assets/serializers/asset/database.py:24
 msgid "Postgresql ssl model help text"
 msgstr ""
-"Preferir: eu não me importo com criptografia, mas se o servidor suportar, "
-"estou disposto a pagar o custo.\n"
-"Exigir: eu quero que meus dados sejam criptografados, aceito o custo. Eu "
-"confio que a rede garantirá que estou sempre conectado ao servidor que "
-"quero.\n"
-"Verificar CA: Eu quero que meus dados sejam criptografados, eu assumo o "
-"custo. Eu quero garantir que estou conectado a um servidor de confiança.\n"
-"Verificar Completo: eu quero que meus dados sejam criptografados, estou "
-"disposto a assumir o custo. Eu quero ter certeza de que estou conectado a um "
-"servidor confiável, e que é o servidor que eu especifico."
+"Preferir: eu não me importo com criptografia, mas se o servidor suportar, estou disposto a pagar o custo.\n"
+"Exigir: eu quero que meus dados sejam criptografados, aceito o custo. Eu confio que a rede garantirá que estou sempre conectado ao servidor que quero.\n"
+"Verificar CA: Eu quero que meus dados sejam criptografados, eu assumo o custo. Eu quero garantir que estou conectado a um servidor de confiança.\n"
+"Verificar Completo: eu quero que meus dados sejam criptografados, estou disposto a assumir o custo. Eu quero ter certeza de que estou conectado a um servidor confiável, e que é o servidor que eu especifico."
 
 #: assets/serializers/asset/ds.py:18
 msgid ""
-"The domain part used by the directory service (e.g., AD) and appended to the "
-"username during login, such as example.com in user@example.com."
+"The domain part used by the directory service (e.g., AD) and appended to the"
+" username during login, such as example.com in user@example.com."
 msgstr ""
 "O nome de domínio (Domain Name) é a parte do domínio que é anexada ao nome "
 "de usuário ao fazer login em serviços de diretório (como AD), por exemplo, "
@@ -3417,8 +3288,8 @@ msgstr ""
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
-"If the server cannot directly connect to the API address, you need set up an "
-"HTTP proxy. e.g. http(s)://host:port"
+"If the server cannot directly connect to the API address, you need set up an"
+" HTTP proxy. e.g. http(s)://host:port"
 msgstr ""
 "Se o servidor não pode acessar diretamente o endereço da API, você precisa "
 "configurar um proxy HTTP. por exemplo http(s)://host:port"
@@ -3440,7 +3311,7 @@ msgid "Model"
 msgstr "Modelo"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:305
+#: tickets/models/ticket/general.py:300
 msgid "Serial number"
 msgstr "Número de série"
 
@@ -3660,8 +3531,7 @@ msgstr "Coleta de informações de ativos"
 
 #: assets/tasks/gather_facts.py:25
 msgid ""
-"When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' "
-"this task \n"
+"When clicking 'Refresh hardware info' in 'Console - Asset Details - Basic' this task \n"
 "        will be executed"
 msgstr ""
 "Quando clicar para atualizar as informações de hardware na página de "
@@ -3681,10 +3551,8 @@ msgstr "Verificar a quantidade de ativos sob o nó"
 
 #: assets/tasks/nodes_amount.py:18
 msgid ""
-"Manually verifying asset quantities updates the asset count for nodes under "
-"the \n"
-"        current organization. This task will be called in the following two "
-"cases: when updating \n"
+"Manually verifying asset quantities updates the asset count for nodes under the \n"
+"        current organization. This task will be called in the following two cases: when updating \n"
 "        nodes and when the number of nodes exceeds 100"
 msgstr ""
 "Ajuste manual do número de ativos para atualizar o número de ativos do nó "
@@ -3693,7 +3561,8 @@ msgstr ""
 
 #: assets/tasks/nodes_amount.py:34
 msgid ""
-"The task of self-checking is already running and cannot be started repeatedly"
+"The task of self-checking is already running and cannot be started "
+"repeatedly"
 msgstr ""
 "O programa de auto-inspeção já está rodando, não pode ser reinicializado"
 
@@ -3703,8 +3572,7 @@ msgstr "Verificação periódica da quantidade de ativos sob o nó"
 
 #: assets/tasks/nodes_amount.py:42
 msgid ""
-"Schedule the check_node_assets_amount_task to periodically update the asset "
-"count of \n"
+"Schedule the check_node_assets_amount_task to periodically update the asset count of \n"
 "        all nodes under all organizations"
 msgstr ""
 "Convocação regular do Action check_node_assets_amount_task, atualização da "
@@ -3733,21 +3601,24 @@ msgstr "Testar a conectividade do gateway"
 
 #: assets/tasks/ping_gateway.py:23
 msgid ""
-"When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
-"be executed"
+"When clicking 'Test Connection' in 'Domain Details - Gateway' this task will"
+" be executed"
 msgstr ""
 "Quando esta Action é executada no detalhe do domínio de rede - gateway - "
 "teste de conexão"
 
 #: assets/tasks/utils.py:16
+#, python-brace-format
 msgid "Asset has been disabled, skipped: {}"
 msgstr "O ativo já foi desativado, pular: {}"
 
 #: assets/tasks/utils.py:20
+#, python-brace-format
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "Talvez os ativos não suportem ansible, pulando: {}"
 
 #: assets/tasks/utils.py:38
+#, python-brace-format
 msgid "For security, do not push user {}"
 msgstr "Para segurança, é proibido empurrar o usuário {}"
 
@@ -3756,23 +3627,27 @@ msgid "No assets matched, stop task"
 msgstr "Não encontrou ativos correspondentes, tarefa finalizada"
 
 #: assets/utils/platform_package.py:89
+#, python-brace-format
 msgid "Load platform.yml failed: {}"
 msgstr "Falha ao carregar platform.yml: {}"
 
 #: assets/utils/platform_package.py:172
+#, python-brace-format
 msgid "Platform automation category must contain platform category: {}"
 msgstr ""
 
 #: assets/utils/platform_package.py:178
+#, python-brace-format
 msgid "Platform automation type must contain platform type: {}"
 msgstr ""
 
 #: assets/utils/platform_package.py:184
+#, python-brace-format
 msgid "Platform automation protocol not found in platform.yml: {}"
 msgstr ""
 
 #: assets/utils/platform_package.py:201
-#, fuzzy
+#, fuzzy, python-brace-format
 #| msgid "Organization name already exists"
 msgid "Platform automation method id already exists: {}"
 msgstr "O nome da organização já existe"
@@ -3792,7 +3667,8 @@ msgid "App Audits"
 msgstr "Auditoria de Logs"
 
 #: audits/backends/db.py:17
-msgid "The text content is too long. Use Elasticsearch to store operation logs"
+msgid ""
+"The text content is too long. Use Elasticsearch to store operation logs"
 msgstr ""
 "O conteúdo do texto é muito longo. Por favor, use o Elasticsearch para "
 "armazenar logs de ação"
@@ -3926,9 +3802,9 @@ msgstr "Logs de auditoria de tarefas"
 #: audits/models.py:65 audits/models.py:115 audits/models.py:200
 #: audits/models.py:385 audits/reporting.py:119 audits/reporting.py:327
 #: audits/reporting.py:424 authentication/models/connection_token.py:63
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:120
-#: terminal/notifications.py:171 terminal/notifications.py:238
-#: terminal/reporting.py:133
+#: terminal/models/session/session.py:36
+#: terminal/models/session/sharing.py:120 terminal/notifications.py:171
+#: terminal/notifications.py:238 terminal/reporting.py:133
 msgid "Remote addr"
 msgstr "Endereço remoto"
 
@@ -4489,12 +4365,9 @@ msgstr "Limpar logs de tarefas de auditoria de ativos"
 
 #: audits/tasks.py:186
 msgid ""
-"Since the system generates login logs, operation logs, file upload logs, "
-"activity \n"
-"        logs, Celery execution logs, session recordings, command records, "
-"and password change \n"
-"        logs, it will perform cleanup of records that exceed the time limit "
-"according to the \n"
+"Since the system generates login logs, operation logs, file upload logs, activity \n"
+"        logs, Celery execution logs, session recordings, command records, and password change \n"
+"        logs, it will perform cleanup of records that exceed the time limit according to the \n"
 "        'Tasks - Regular clean-up' in the system settings at 2 a.m daily"
 msgstr ""
 "Devido ao sistema gerar logs de entrada, logs de operações, logs de upload "
@@ -4510,12 +4383,12 @@ msgstr "Upload de arquivos FTP para armazenamento externo"
 
 #: audits/tasks.py:208
 msgid ""
-"If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
-"management will be \n"
+"If SERVER_REPLAY_STORAGE is configured, files uploaded through file management will be \n"
 "        synchronized to external storage"
 msgstr ""
-"Se SERVER_REPLAY_STORAGE estiver configurado, os arquivos carregados através "
-"do gerenciamento de arquivos serão sincronizados com o armazenamento externo"
+"Se SERVER_REPLAY_STORAGE estiver configurado, os arquivos carregados através"
+" do gerenciamento de arquivos serão sincronizados com o armazenamento "
+"externo"
 
 #: authentication/api/access_key.py:39
 msgid "Access keys can be created at most 10"
@@ -4532,41 +4405,42 @@ msgstr ""
 "Esta operação requer a verificação do seu MFA, por favor ative e configure "
 "primeiro"
 
-#: authentication/api/connection_token.py:510
+#: authentication/api/connection_token.py:477
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "Não é permitido o uso de tokens de conexão reutilizáveis, as configurações "
 "globais não estão ativadas"
 
-#: authentication/api/connection_token.py:638
+#: authentication/api/connection_token.py:605
 msgid "Anonymous account is not supported for this asset"
 msgstr "Contas anônimas não suportam o ativo atual"
 
-#: authentication/api/connection_token.py:670
+#: authentication/api/connection_token.py:637
 msgid "Permission expired"
 msgstr "A autorização expirou"
 
-#: authentication/api/connection_token.py:703
+#: authentication/api/connection_token.py:670
+#, python-brace-format
 msgid "ACL action is reject: {}({})"
 msgstr "Ação do ACL é rejeitar: {} ({})."
 
-#: authentication/api/connection_token.py:707
+#: authentication/api/connection_token.py:674
 msgid "ACL action is review"
 msgstr "Ação ACL é para revisão"
 
-#: authentication/api/connection_token.py:717
+#: authentication/api/connection_token.py:684
 msgid "ACL action is face verify"
 msgstr "Ação ACL é verificação facial"
 
-#: authentication/api/connection_token.py:722
+#: authentication/api/connection_token.py:689
 msgid "ACL action not supported for this asset"
 msgstr "As regras de login de ativos não suportam o ativo atual"
 
-#: authentication/api/connection_token.py:729
+#: authentication/api/connection_token.py:696
 msgid "ACL action is face online"
 msgstr "Ação ACL é facial online"
 
-#: authentication/api/connection_token.py:754
+#: authentication/api/connection_token.py:721
 msgid "No available face feature"
 msgstr "Não há características faciais disponíveis"
 
@@ -4576,11 +4450,13 @@ msgid "Facial comparison failed"
 msgstr "Falha na comparação facial"
 
 #: authentication/api/mfa.py:61
+#, python-brace-format
 msgid "Current user not support mfa type: {}"
 msgstr "O usuário atual não suporta o tipo de MFA: {}"
 
 #: authentication/api/password.py:37 terminal/api/session/session.py:347
 #: users/views/profile/reset.py:63
+#, python-brace-format
 msgid "User does not exist: {}"
 msgstr "Usuário não encontrado: {}"
 
@@ -4589,6 +4465,7 @@ msgid "No user matched"
 msgstr "Nenhum usuário correspondente encontrado"
 
 #: authentication/api/password.py:41
+#, python-brace-format
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
@@ -4606,6 +4483,7 @@ msgid "Forgot password"
 msgstr "Esqueceu a senha"
 
 #: authentication/api/password.py:73 authentication/mfa/email.py:42
+#, python-brace-format
 msgid "The validity period of the verification code is {} minute"
 msgstr "O código de verificação é válido por {} minuto"
 
@@ -4735,6 +4613,7 @@ msgid "Authentication failed password incorrect"
 msgstr "Falha na autenticação (usuário ou senha incorretos)"
 
 #: authentication/confirm/relogin.py:11
+#, python-brace-format
 msgid "Login time has exceeded {} minutes, please login again"
 msgstr "O tempo de login excedeu {} minutos, por favor, faça login novamente"
 
@@ -4826,8 +4705,8 @@ msgstr ""
 #: authentication/errors/const.py:52 authentication/errors/const.py:60
 #, fuzzy, python-brace-format
 #| msgid ""
-#| "The account has been locked (please contact admin to unlock it or try "
-#| "again after {} minutes)"
+#| "The account has been locked (please contact admin to unlock it or try again "
+#| "after {} minutes)"
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {block_time} minutes)"
@@ -4838,8 +4717,8 @@ msgstr ""
 #: authentication/errors/const.py:56
 #, fuzzy, python-brace-format
 #| msgid ""
-#| "The address has been locked (please contact admin to unlock it or try "
-#| "again after {} minutes)"
+#| "The address has been locked (please contact admin to unlock it or try again "
+#| "after {} minutes)"
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {block_time} minutes)"
@@ -4850,8 +4729,8 @@ msgstr ""
 #: authentication/errors/const.py:64
 #, python-brace-format
 msgid ""
-"{error}, You can also try {times_try} times (The account will be temporarily "
-"locked for {block_time} minutes)"
+"{error}, You can also try {times_try} times (The account will be temporarily"
+" locked for {block_time} minutes)"
 msgstr ""
 "{error} você ainda pode tentar {times_try} vezes (a conta será bloqueada "
 "temporariamente por {block_time} minutos) "
@@ -4979,8 +4858,8 @@ msgstr "Por favor, digite o código de segurança Action"
 
 #: authentication/mfa/base.py:32
 msgid ""
-"The two-factor code you entered has either already been used or has expired. "
-"Please request a new one."
+"The two-factor code you entered has either already been used or has expired."
+" Please request a new one."
 msgstr ""
 "O código de verificação dupla que você inseriu já foi utilizado ou expirou. "
 "Por favor, solicite um novo código de verificação dupla."
@@ -5060,33 +4939,34 @@ msgid "Clear phone number to disable"
 msgstr "Desativar limpeza de número de telefone"
 
 #: authentication/middleware.py:95 settings/utils/ldap.py:771
+#, python-brace-format
 msgid "Authentication failed (before login check failed): {}"
 msgstr "Falha de autenticação (verificação pré-login falhou): {}"
 
 #: authentication/mixins.py:170
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
-"                    and the current user is not in the user list. Please "
-"contact the administrator."
+"                    and the current user is not in the user list. Please contact the administrator."
 msgstr ""
 "O administrador ativou 'permitir apenas login de usuários existentes', o "
-"usuário atual não está na lista de usuários; por favor, entre em contato com "
-"o administrador."
+"usuário atual não está na lista de usuários; por favor, entre em contato com"
+" o administrador."
 
 #: authentication/mixins.py:188
 msgid "User is invalid"
 msgstr "Usuário inválido"
 
 #: authentication/mixins.py:205
+#, python-brace-format
 msgid ""
 " The administrator has enabled 'Only allow login from user source'. \n"
-"                    The current user source is {}. Please contact the "
-"administrator. "
+"                    The current user source is {}. Please contact the administrator. "
 msgstr ""
-"O administrador ativou 'permitir login apenas de fontes de usuário', a fonte "
-"atual do usuário é {}, entre em contato com o administrador."
+"O administrador ativou 'permitir login apenas de fontes de usuário', a fonte"
+" atual do usuário é {}, entre em contato com o administrador."
 
 #: authentication/mixins.py:392
+#, python-brace-format
 msgid "The MFA type ({}) is not enabled"
 msgstr "Este método MFA ({}) não está ativado"
 
@@ -5162,6 +5042,7 @@ msgid "Connection token inactive"
 msgstr "Token de conexão não ativado"
 
 #: authentication/models/connection_token.py:175
+#, python-brace-format
 msgid "Connection token expired at: {}"
 msgstr "Token de conexão expirado: {}"
 
@@ -5287,7 +5168,8 @@ msgstr "Action"
 
 #: authentication/serializers/connection_token.py:47
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
-#: users/serializers/user.py:127 users/serializers/user.py:267
+#: users/filters.py:38 users/serializers/user.py:127
+#: users/serializers/user.py:267
 msgid "Is expired"
 msgstr "Expirado"
 
@@ -5298,6 +5180,7 @@ msgstr "Nome da Organização"
 
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:153
+#, python-brace-format
 msgid "The {} cannot be empty"
 msgstr "{} não pode estar vazio"
 
@@ -5315,11 +5198,11 @@ msgstr "Tipo de Criação"
 
 #: authentication/serializers/ssh_key.py:33
 msgid ""
-"Please download the private key after creation. Each private key can only be "
-"downloaded once"
+"Please download the private key after creation. Each private key can only be"
+" downloaded once"
 msgstr ""
-"Após a criação, faça o download da chave privada, cada chave privada só pode "
-"ser baixada uma vez"
+"Após a criação, faça o download da chave privada, cada chave privada só pode"
+" ser baixada uma vez"
 
 #: authentication/serializers/ssh_key.py:57 users/forms/profile.py:164
 #: users/serializers/profile.py:130 users/serializers/profile.py:160
@@ -5327,15 +5210,15 @@ msgid "Not a valid ssh public key"
 msgstr "Chave SSH inválida"
 
 #: authentication/serializers/token.py:93 perms/serializers/permission.py:65
-#: perms/serializers/permission.py:94 users/serializers/user.py:128
-#: users/serializers/user.py:264
+#: perms/serializers/permission.py:94 users/filters.py:41
+#: users/serializers/user.py:128 users/serializers/user.py:264
 msgid "Is valid"
 msgstr "Está válido?"
 
 #: authentication/serializers/token.py:131 ops/models/adhoc.py:26
-#: ops/models/playbook.py:34 ops/serializers/mixin.py:10 rbac/models/role.py:31
-#: rbac/models/rolebinding.py:47 rbac/serializers/role.py:12
-#: settings/serializers/auth/oauth2.py:37
+#: ops/models/playbook.py:34 ops/serializers/mixin.py:10
+#: rbac/models/role.py:31 rbac/models/rolebinding.py:47
+#: rbac/serializers/role.py:12 settings/serializers/auth/oauth2.py:37
 msgid "Scope"
 msgstr "Alcance"
 
@@ -5345,8 +5228,8 @@ msgstr "Limpar sessões expiradas"
 
 #: authentication/tasks.py:21
 msgid ""
-"Since user logins create sessions, the system will clean up expired sessions "
-"every 24 hours"
+"Since user logins create sessions, the system will clean up expired sessions"
+" every 24 hours"
 msgstr ""
 "Como as sessões são geradas quando os usuários acessam o sistema, ele limpa "
 "as sessões expiradas a cada 24 horas"
@@ -5367,8 +5250,8 @@ msgstr ""
 "O sistema gera um Token de conexão ou um registro de senha temporária ao "
 "conectar a ativos ou criar uma senha temporária correspondente. Para "
 "garantir a segurança do sistema e controlar o volume de armazenamento de "
-"dados, o sistema limpa automaticamente todos os registros de Token expirados "
-"diariamente às 2 horas da manhã, de acordo com a configuração em "
+"dados, o sistema limpa automaticamente todos os registros de Token expirados"
+" diariamente às 2 horas da manhã, de acordo com a configuração em "
 "“Configurações de Segurança > Segurança de Senhas > Duração de Retenção do "
 "Token”"
 
@@ -5379,8 +5262,8 @@ msgstr "Lista de chaves API"
 #: authentication/templates/authentication/_access_key_modal.html:18
 msgid "Using api key sign api header, every requests header difference"
 msgstr ""
-"Use a chave API para assinar o cabeçalho do pedido, cada cabeçalho de pedido "
-"é diferente"
+"Use a chave API para assinar o cabeçalho do pedido, cada cabeçalho de pedido"
+" é diferente"
 
 #: authentication/templates/authentication/_access_key_modal.html:19
 msgid "docs"
@@ -5491,8 +5374,8 @@ msgid "request new one"
 msgstr "Aplicar novamente"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:27 terminal/models/session/sharing.py:104
-#: terminal/notifications.py:308
+#: terminal/models/session/sharing.py:27
+#: terminal/models/session/sharing.py:104 terminal/notifications.py:308
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:108 users/templates/users/forgot_password.html:98
 msgid "Verify code"
@@ -5520,8 +5403,8 @@ msgid ""
 "If the password update was not initiated by you, your account may have "
 "security issues"
 msgstr ""
-"Se essa atualização de senha não foi iniciada por você, sua conta pode estar "
-"com problemas de segurança"
+"Se essa atualização de senha não foi iniciada por você, sua conta pode estar"
+" com problemas de segurança"
 
 #: authentication/templates/authentication/_msg_rest_password_success.html:13
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:13
@@ -5586,8 +5469,8 @@ msgstr "Próximo passo"
 #: authentication/templates/authentication/login_mfa.html:22
 msgid "Can't provide security? Please contact the administrator!"
 msgstr ""
-"Se você não puder fornecer o código de verificação MFA, entre em contato com "
-"o administrador!"
+"Se você não puder fornecer o código de verificação MFA, entre em contato com"
+" o administrador!"
 
 #: authentication/templates/authentication/login_ukey.html:194
 msgid "UKey Authentication"
@@ -5677,8 +5560,8 @@ msgid ""
 "This page is not served over HTTPS. Please use HTTPS to ensure security of "
 "your credentials."
 msgstr ""
-"Esta página não usa o protocolo HTTPS, por favor, use o protocolo HTTPS para "
-"garantir a segurança de suas credenciais."
+"Esta página não usa o protocolo HTTPS, por favor, use o protocolo HTTPS para"
+" garantir a segurança de suas credenciais."
 
 #: authentication/templates/authentication/passkey.html:177
 msgid "Do you want to retry ?"
@@ -5782,6 +5665,7 @@ msgid "Redirecting"
 msgstr "Redirecionando"
 
 #: authentication/views/login.py:173
+#, python-brace-format
 msgid "Redirecting to {} authentication"
 msgstr "Redirecionando para a autenticação {}"
 
@@ -5790,16 +5674,17 @@ msgid "Login timeout, please try again."
 msgstr "Tempo de login expirou, por favor, faça o login novamente"
 
 #: authentication/views/login.py:245
+#, python-brace-format
 msgid "User email already exists ({})"
 msgstr "O e-mail do usuário já existe ({})"
 
 #: authentication/views/login.py:338
+#, python-brace-format
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
 msgstr ""
-"Esperando pela confirmação de <b>{}</b>, você também pode copiar e enviar o "
-"link para ele/ela<br/>\n"
+"Esperando pela confirmação de <b>{}</b>, você também pode copiar e enviar o link para ele/ela<br/>\n"
 "Não feche esta página"
 
 #: authentication/views/login.py:343
@@ -5820,8 +5705,8 @@ msgstr ""
 
 #: authentication/views/mixins.py:30
 msgid ""
-"For your safety, automatic redirection login is not supported on the client. "
-"If you need to open it in the client, please log in again"
+"For your safety, automatic redirection login is not supported on the client."
+" If you need to open it in the client, please log in again"
 msgstr ""
 "Para sua segurança, o cliente não suporta login automático. Se precisar "
 "abrir no cliente, faça login novamente"
@@ -5951,8 +5836,8 @@ msgstr "Campos criptografados"
 
 #: common/db/fields.py:577
 msgid ""
-"Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
-"{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
+"Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or"
+" {'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
 "'match': 'exact', 'value': '1.1.1.1'}}"
 msgstr ""
 "JSON campos muitos para muitos inválidos, deve ser {'type': 'all'} ou "
@@ -5998,6 +5883,7 @@ msgid "Updated by"
 msgstr "Último atualizador"
 
 #: common/db/validators.py:9
+#, python-brace-format
 msgid "Invalid port range, should be like and within {}-{}"
 msgstr "Faixa de portas inválida, deve estar dentro de {}-{}"
 
@@ -6005,15 +5891,17 @@ msgstr "Faixa de portas inválida, deve estar dentro de {}-{}"
 msgid "Object"
 msgstr "Objeto"
 
-#: common/drf/metadata.py:148
+#: common/drf/metadata.py:163
 msgid "Org ID"
 msgstr "ID da organização"
 
 #: common/drf/parsers/base.py:21
+#, python-brace-format
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "O conteúdo do arquivo é muito grande (tamanho máximo `{}` bytes)"
 
 #: common/drf/parsers/base.py:207
+#, python-brace-format
 msgid "Parse file error: {}"
 msgstr "Erro ao analisar o arquivo: {}"
 
@@ -6026,6 +5914,7 @@ msgid "Yes/No"
 msgstr "Sim/Não"
 
 #: common/drf/renders/base.py:161
+#, python-brace-format
 msgid "Number, min {} max {}"
 msgstr "Número, mínimo {} máximo {}"
 
@@ -6034,6 +5923,7 @@ msgid "Phone number, format +8612345678901"
 msgstr "Número de celular, formato +8612345678901"
 
 #: common/drf/renders/base.py:170
+#, python-brace-format
 msgid "Text, max length {}"
 msgstr "Texto, comprimento máximo {}"
 
@@ -6042,6 +5932,7 @@ msgid "Long text, no length limit"
 msgstr "Texto longo, sem limite de comprimento"
 
 #: common/drf/renders/base.py:175
+#, python-brace-format
 msgid "Datetime format {}"
 msgstr "Formato de data e hora {}"
 
@@ -6050,14 +5941,16 @@ msgid "Label, format [\"key:value\"]"
 msgstr "Tags, formato: [\"chave:valor\"]"
 
 #: common/drf/renders/base.py:182
+#, python-brace-format
 msgid ""
 "Choices, format name(value), name is optional for human read, value is "
 "requisite, options {}"
 msgstr ""
-"Opções, formato: nome(valor), o nome é opcional, para facilidade de leitura, "
-"o valor é obrigatório, as opções disponíveis são {}"
+"Opções, formato: nome(valor), o nome é opcional, para facilidade de leitura,"
+" o valor é obrigatório, as opções disponíveis são {}"
 
 #: common/drf/renders/base.py:185
+#, python-brace-format
 msgid "Choices, options {}"
 msgstr "Opções, as opções disponíveis são {}"
 
@@ -6077,12 +5970,11 @@ msgid ""
 "Objects, format [\"name(id)\", ...], name is optional for human read, id is "
 "requisite"
 msgstr ""
-"Múltiplos itens associados, formato: [\"nome(id)\", ...], o nome é opcional, "
-"para facilidade de leitura, o id é obrigatório"
+"Múltiplos itens associados, formato: [\"nome(id)\", ...], o nome é opcional,"
+" para facilidade de leitura, o id é obrigatório"
 
 #: common/drf/renders/base.py:196
-msgid ""
-"Labels, format [\"key:value\", ...], if label not exists, will create it"
+msgid "Labels, format [\"key:value\", ...], if label not exists, will create it"
 msgstr ""
 "Etiquetas, formato: [\"chave: valor\", ...], se a etiqueta não existir, ela "
 "será criada"
@@ -6092,6 +5984,7 @@ msgid "Objects, format [\"id\", ...]"
 msgstr "Itens associados múltiplos, o formato é [\"id\", ...]"
 
 #: common/drf/renders/base.py:301
+#, python-brace-format
 msgid ""
 "{} - Encryption password not set - Please go to Personal Settings → "
 "Preferences → File Encryption Password to set it."
@@ -6225,6 +6118,7 @@ msgid "sp_id is 6 bits"
 msgstr "O SP_id é de 6 dígitos"
 
 #: common/sdk/sms/cmpp2.py:214
+#, python-brace-format
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "Erro ao conectar ao servidor gateway, erro: {}"
 
@@ -6236,6 +6130,10 @@ msgstr "Arquivo de SMS personalizado inválido"
 #, python-format
 msgid "SMS sending failed[%s]: %s"
 msgstr "Falha no envio de SMS [%s]: %s"
+
+#: common/sdk/sms/custom_file.py:47 common/serializers/common.py:98
+msgid "File"
+msgstr "Arquivo"
 
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
@@ -6258,6 +6156,7 @@ msgid "Custom type (File)"
 msgstr "Personalizado (Arquivo)"
 
 #: common/sdk/sms/endpoint.py:32
+#, python-brace-format
 msgid "SMS provider not support: {}"
 msgstr "Provedor de serviços de SMS não suportado: {}"
 
@@ -6274,16 +6173,13 @@ msgid "The verification code is incorrect"
 msgstr "Código de verificação errado"
 
 #: common/sdk/sms/exceptions.py:18
+#, python-brace-format
 msgid "Please wait {} seconds before sending"
 msgstr "Por favor, envie em {} segundos"
 
 #: common/serializers/common.py:90
 msgid "Children"
 msgstr "Nó"
-
-#: common/serializers/common.py:98
-msgid "File"
-msgstr "Arquivo"
 
 #: common/serializers/fields.py:139
 msgid "Invalid data type"
@@ -6306,6 +6202,7 @@ msgstr "Tipo de dados incorreto, deveria ser uma lista"
 #: common/serializers/fields.py:360
 #: xpack/plugins/cloud/serializers/account.py:121
 #: xpack/plugins/cloud/serializers/task.py:122
+#, python-brace-format
 msgid "Invalid choice: {}"
 msgstr "Opção inválida: {}"
 
@@ -6328,13 +6225,11 @@ msgstr "Anexo do email"
 
 #: common/tasks.py:84
 msgid ""
-"When an account password is changed or an account backup generates "
-"attachments, \n"
-"        this task needs to be executed for sending emails and handling "
-"attachments"
+"When an account password is changed or an account backup generates attachments, \n"
+"        this task needs to be executed for sending emails and handling attachments"
 msgstr ""
-"Ação a ser realizada ao enviar email e anexos, quando a senha é alterada e o "
-"backup de conta gera anexos"
+"Ação a ser realizada ao enviar email e anexos, quando a senha é alterada e o"
+" backup de conta gera anexos"
 
 #: common/tasks.py:107
 msgid "Upload account backup to external storage"
@@ -6367,8 +6262,7 @@ msgstr "Enviar código de verificação por SMS"
 
 #: common/utils/verify_code.py:19
 msgid ""
-"When resetting a password, forgetting a password, or verifying MFA, this "
-"task needs to \n"
+"When resetting a password, forgetting a password, or verifying MFA, this task needs to \n"
 "        be executed to send SMS messages"
 msgstr ""
 "Execute esta tarefa quando precisar enviar um SMS para redefinir a senha, "
@@ -6411,6 +6305,10 @@ msgstr "Sua conta foi criada com sucesso"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer Open Fortress Machine"
 
+#: jumpserver/context_processor.py:31
+msgid "FIT2CLOUD"
+msgstr ""
+
 #: jumpserver/views/celery_flower.py:22
 msgid "<h1>Flower service unavailable, check it</h1>"
 msgstr "Serviço Flower indisponível, por favor verifique"
@@ -6427,6 +6325,7 @@ msgstr ""
 "sorte</div>"
 
 #: jumpserver/views/other.py:52
+#, python-brace-format
 msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr ""
 "O serviço Websocket está rodando na porta: {}, por favor verifique se o "
@@ -6492,6 +6391,7 @@ msgid "User message"
 msgstr "Mensagens do usuário"
 
 #: notifications/models/notification.py:21
+#, python-brace-format
 msgid "{} subscription"
 msgstr "{} Inscrição"
 
@@ -6505,8 +6405,7 @@ msgstr "Publicar mensagem interna"
 
 #: notifications/notifications.py:48
 msgid ""
-"This task needs to be executed for sending internal messages for system "
-"alerts, \n"
+"This task needs to be executed for sending internal messages for system alerts, \n"
 "        work orders, and other notifications"
 msgstr ""
 "Algumas alertas do sistema, ordens de serviço e outras necessidades são "
@@ -6516,9 +6415,9 @@ msgstr ""
 #, fuzzy, python-format
 #| msgid ""
 #| "Run Ansible jobs in the Docker execution environment (%(image)s). To run "
-#| "jobs locally instead, disable \"Docker isolation for Ansible\" under "
-#| "System Settings > Feature Settings > Job Center. If the image is missing, "
-#| "run this command on the Ansible worker: docker pull %(image)s"
+#| "jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+#| "Settings > Feature Settings > Job Center. If the image is missing, run this "
+#| "command on the Ansible worker: docker pull %(image)s"
 msgid ""
 "The Ansible Docker image \"%(image)s\" was not found. To run jobs locally "
 "instead, disable \"Docker isolation for Ansible\" under System Settings > "
@@ -6528,37 +6427,34 @@ msgstr ""
 "Execute trabalhos do Ansible no ambiente de execução Docker (%(image)s). "
 "Para executar os trabalhos localmente, desative \"Isolamento do Docker para "
 "Ansible\" em Configurações do sistema > Configurações de recursos > Central "
-"de trabalhos. Se a imagem estiver ausente, execute este comando no worker do "
-"Ansible: docker pull %(image)s"
+"de trabalhos. Se a imagem estiver ausente, execute este comando no worker do"
+" Ansible: docker pull %(image)s"
 
-#: ops/ansible/inventory.py:193 ops/ansible/inventory.py:280
+#: ops/ansible/inventory.py:150 ops/ansible/inventory.py:220
 #: ops/models/job.py:69
 msgid "No account available"
 msgstr "Sem contas disponíveis"
 
-#: ops/ansible/inventory.py:215
-msgid ""
-"The platform uses su, but the directly connected account does not have a "
-"target root credential. Configure su_from or use a root account."
-msgstr ""
-
-#: ops/ansible/inventory.py:405 ops/ansible/inventory.py:447
+#: ops/ansible/inventory.py:341 ops/ansible/inventory.py:383
 msgid "Ansible disabled"
 msgstr "Ansible desativado"
 
-#: ops/ansible/inventory.py:463
+#: ops/ansible/inventory.py:399
 msgid "Skip hosts below:"
 msgstr "Pulando os seguintes hosts:"
 
 #: ops/api/celery.py:204
+#, python-brace-format
 msgid "Task {} not found"
 msgstr "A tarefa {} não existe"
 
 #: ops/api/celery.py:211
+#, python-brace-format
 msgid "Task {} args or kwargs error"
 msgstr "Erro nos parâmetros da tarefa {}"
 
 #: ops/api/job.py:66
+#, python-brace-format
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr ""
 "Acesso ao ativo {}({}) foi negado, restrito pela regra de acesso (ACL) do "
@@ -6761,12 +6657,14 @@ msgid "Periodic run"
 msgstr "Execução periódica"
 
 #: ops/mixin.py:36 ops/mixin.py:113 ops/mixin.py:172
-#: settings/serializers/auth/ldap.py:88 settings/serializers/auth/ldap_ha.py:70
+#: settings/serializers/auth/ldap.py:88
+#: settings/serializers/auth/ldap_ha.py:70
 msgid "Interval"
 msgstr "Intervalo"
 
 #: ops/mixin.py:39 ops/mixin.py:111 ops/mixin.py:169
-#: settings/serializers/auth/ldap.py:85 settings/serializers/auth/ldap_ha.py:67
+#: settings/serializers/auth/ldap.py:85
+#: settings/serializers/auth/ldap_ha.py:67
 msgid "Crontab"
 msgstr "Crontab"
 
@@ -6841,6 +6739,7 @@ msgid "Celery Task Execution"
 msgstr "Execução de Tarefa Celery"
 
 #: ops/models/job.py:82
+#, python-brace-format
 msgid "Module {} is not suitable for this asset"
 msgstr "O módulo {} não se aplica a este ativo."
 
@@ -6905,9 +6804,9 @@ msgid ""
 "referenced in the script using {{ jms_name }}"
 msgstr ""
 "No nome das variáveis usadas no script, fixe o prefixo jms_ + o nome da "
-"variável de entrada. Por exemplo, se o nome da variável for name, a variável "
-"de ambiente gerada será jms_name. Ao referenciar no script, utilize "
-"{{ jms_name }}."
+"variável de entrada. Por exemplo, se o nome da variável for name, a variável"
+" de ambiente gerada será jms_name. Ao referenciar no script, utilize {{ "
+"jms_name }}."
 
 #: ops/models/variable.py:16 ops/serializers/variable.py:32
 msgid "Default Value"
@@ -7024,14 +6923,12 @@ msgstr "Criar ou Atualizar Tarefas Periódicas"
 
 #: ops/tasks.py:135
 msgid ""
-"With version iterations, new tasks may be added, or task names and execution "
-"times may \n"
-"        be modified. Therefore, upon system startup, tasks will be "
-"registered or the parameters \n"
+"With version iterations, new tasks may be added, or task names and execution times may \n"
+"        be modified. Therefore, upon system startup, tasks will be registered or the parameters \n"
 "        of scheduled tasks will be updated"
 msgstr ""
-"Com a progressão da versão, novas tarefas podem ser adicionadas ou o nome da "
-"tarefa, o tempo de execução podem ser alterados, então quando o sistema é "
+"Com a progressão da versão, novas tarefas podem ser adicionadas ou o nome da"
+" tarefa, o tempo de execução podem ser alterados, então quando o sistema é "
 "iniciado, ele registra ou atualiza os parâmetros da tarefa cron"
 
 #: ops/tasks.py:148
@@ -7040,14 +6937,12 @@ msgstr "Verificação Periódica do Desempenho do Serviço"
 
 #: ops/tasks.py:150
 msgid ""
-"Check every hour whether each component is offline and whether the CPU, "
-"memory, \n"
-"        and disk usage exceed the thresholds, and send an alert message to "
-"the administrator"
+"Check every hour whether each component is offline and whether the CPU, memory, \n"
+"        and disk usage exceed the thresholds, and send an alert message to the administrator"
 msgstr ""
 "Verifique se cada componente está offline a cada hora, cpu, memória, se a "
-"taxa de uso do disco rígido ultrapassa o limite, e envie mensagens de alerta "
-"para o administrador"
+"taxa de uso do disco rígido ultrapassa o limite, e envie mensagens de alerta"
+" para o administrador"
 
 #: ops/tasks.py:162
 msgid "Clean up unexpected jobs"
@@ -7055,18 +6950,15 @@ msgstr "Limpar Atividades Anômalas"
 
 #: ops/tasks.py:164
 msgid ""
-"Due to exceptions caused by executing adhoc and playbooks in the Job "
-"Center, \n"
-"        which result in the task status not being updated, the system will "
-"clean up abnormal jobs \n"
-"        that have not been completed for more than 3 hours every hour and "
-"mark these tasks as \n"
+"Due to exceptions caused by executing adhoc and playbooks in the Job Center, \n"
+"        which result in the task status not being updated, the system will clean up abnormal jobs \n"
+"        that have not been completed for more than 3 hours every hour and mark these tasks as \n"
 "        failed"
 msgstr ""
 "Devido ao centro de Atividade executando comandos rápidos, a execução do "
 "playbook pode causar anomalias, o status da tarefa não foi atualizado, o "
-"sistema limpa a cada hora as Atividades anômalas que não foram concluídas em "
-"mais de 3 horas e marca a tarefa como falha."
+"sistema limpa a cada hora as Atividades anômalas que não foram concluídas em"
+" mais de 3 horas e marca a tarefa como falha."
 
 #: ops/tasks.py:177
 msgid "Clean job_execution db record"
@@ -7074,18 +6966,15 @@ msgstr "Limpeza do histórico de execução do Centro de Ação "
 
 #: ops/tasks.py:179
 msgid ""
-"Due to the execution of adhoc and playbooks in the Job Center, execution "
-"records will \n"
-"        be generated. The system will clean up records that exceed the "
-"retention period every day \n"
-"        at 2 a.m., based on the configuration of 'System Settings - Tasks - "
-"Regular clean-up - \n"
+"Due to the execution of adhoc and playbooks in the Job Center, execution records will \n"
+"        be generated. The system will clean up records that exceed the retention period every day \n"
+"        at 2 a.m., based on the configuration of 'System Settings - Tasks - Regular clean-up - \n"
 "        Job execution retention days'"
 msgstr ""
 " Devido ao Centro de Ação executar comandos rápidos, playbook, registros de "
 "execução serão gerados, o sistema realizará a limpeza dos registros que "
-"excedem o tempo de armazenamento todos os dias às 2h da manhã, de acordo com "
-"a configuração do sistema - Lista de tarefas - Limpeza regular - "
+"excedem o tempo de armazenamento todos os dias às 2h da manhã, de acordo com"
+" a configuração do sistema - Lista de tarefas - Limpeza regular - "
 "Configuração do histórico de execução do Centro de Ação "
 
 #: ops/templates/ops/celery_task_log.html:4
@@ -7128,11 +7017,12 @@ msgstr " ID da Job "
 msgid "Name of the job"
 msgstr " Nome da Job "
 
-#: orgs/api.py:63
+#: orgs/api.py:62
+#, python-brace-format
 msgid "The current organization ({}) cannot be deleted"
 msgstr " A organização atual ({}) não pode ser excluída "
 
-#: orgs/api.py:68
+#: orgs/api.py:67
 msgid ""
 "LDAP synchronization is set to the current organization. Please switch to "
 "another organization before deleting"
@@ -7140,7 +7030,8 @@ msgstr ""
 " Defina a organização de sincronização LDAP como a organização atual, por "
 "favor, mude para outra organização antes de executar a operação de exclusão "
 
-#: orgs/api.py:78
+#: orgs/api.py:77
+#, python-brace-format
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr " A organização possui recursos ({}) que não podem ser excluídos."
 
@@ -7158,8 +7049,8 @@ msgstr "Por favor, selecione uma organização antes de salvar"
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:308 tickets/reporting.py:85
-#: tickets/serializers/ticket/ticket.py:72
+#: tickets/models/ticket/general.py:303 tickets/reporting.py:85
+#: tickets/serializers/ticket/ticket.py:62
 msgid "Organization"
 msgstr "Organização"
 
@@ -7315,6 +7206,7 @@ msgid "Asset permissions is about to expire"
 msgstr "Regras de autorização de ativos estão prestes a expirar"
 
 #: perms/notifications.py:64
+#, python-brace-format
 msgid "asset permissions of organization {}"
 msgstr "Autorização de ativos da organização ({})"
 
@@ -7345,19 +7237,15 @@ msgstr "A verificação da regra de autorização de ativos expirou"
 
 #: perms/tasks.py:30
 msgid ""
-"The cache of organizational collections, which have completed user "
-"authorization tree \n"
-"        construction, will expire. Therefore, expired collections need to be "
-"cleared from the \n"
-"        cache, and this task will be executed periodically based on the time "
-"interval specified \n"
-"        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file "
-"config.txt"
+"The cache of organizational collections, which have completed user authorization tree \n"
+"        construction, will expire. Therefore, expired collections need to be cleared from the \n"
+"        cache, and this task will be executed periodically based on the time interval specified \n"
+"        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file config.txt"
 msgstr ""
 "O cache do conjunto de organizações já construído na árvore de autorização "
-"do usuário expirará, então é necessário limpar o conjunto expirado do cache, "
-"de acordo com o intervalo de tempo PERM_EXPIRED_CHECK_PERIODIC no arquivo de "
-"configuração do sistema config.txt, execute esta tarefa regularmente"
+"do usuário expirará, então é necessário limpar o conjunto expirado do cache,"
+" de acordo com o intervalo de tempo PERM_EXPIRED_CHECK_PERIODIC no arquivo "
+"de configuração do sistema config.txt, execute esta tarefa regularmente"
 
 #: perms/tasks.py:49
 msgid "Send asset permission expired notification"
@@ -7365,17 +7253,14 @@ msgstr "Enviar notificações de expiração de permissões de ativos"
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users "
-"associated with \n"
-"        assets whose authorization is about to expire, as well as to the "
-"organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset "
-"authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users associated with \n"
+"        assets whose authorization is about to expire, as well as to the organization's \n"
+"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
 "        expire in a few days"
 msgstr ""
 "Verifique às 10 horas da manhã todos os dias, envie uma mensagem para os "
-"usuários e o administrador da organização associados à autorização de ativos "
-"que está para expirar em três dias, informando quantos dias o ativo irá "
+"usuários e o administrador da organização associados à autorização de ativos"
+" que está para expirar em três dias, informando quantos dias o ativo irá "
 "expirar"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
@@ -7397,6 +7282,7 @@ msgid "Internal role, can't be update"
 msgstr "Papel interno, não pode ser atualizado"
 
 #: rbac/api/rolebinding.py:47
+#, python-brace-format
 msgid "{} at least one system role"
 msgstr "{} tem pelo menos um papel de sistema"
 
@@ -7569,8 +7455,8 @@ msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
-"O último papel do usuário não pode ser excluído, você pode remover o usuário "
-"da organização"
+"O último papel do usuário não pode ser excluído, você pode remover o usuário"
+" da organização"
 
 #: rbac/models/rolebinding.py:208
 msgid "Organization role binding"
@@ -7672,7 +7558,7 @@ msgid "Ticket comment"
 msgstr "Comentários de Ordem de Serviço"
 
 #: rbac/tree.py:204 settings/serializers/feature.py:211
-#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:315
+#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:310
 msgid "Ticket"
 msgstr "Ordem de Serviço"
 
@@ -7759,6 +7645,7 @@ msgid "Test success"
 msgstr "Teste Bem-Sucedido"
 
 #: settings/api/email.py:22
+#, python-brace-format
 msgid "Test mail sent to {}, please check"
 msgstr "O e-mail já foi enviado {}, por favor verifique"
 
@@ -7943,9 +7830,9 @@ msgid ""
 "suffix"
 msgstr ""
 "Após a autenticação bem-sucedida do usuário por terceiros, se a plataforma "
-"de serviço de autenticação de terceiros não retornar as informações de e-"
-"mail do usuário, o sistema criará automaticamente o usuário com este sufixo "
-"de e-mail"
+"de serviço de autenticação de terceiros não retornar as informações de "
+"e-mail do usuário, o sistema criará automaticamente o usuário com este "
+"sufixo de e-mail"
 
 #: settings/serializers/auth/base.py:38
 msgid "Forgot Password URL"
@@ -7982,7 +7869,8 @@ msgid "CAS"
 msgstr "CAS"
 
 #: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:49
-#: settings/serializers/auth/ldap_ha.py:31 settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/ldap_ha.py:31
+#: settings/serializers/auth/oidc.py:61
 msgid "Server"
 msgstr "Endereço do servidor"
 
@@ -7997,7 +7885,8 @@ msgstr "Sincronizar logout"
 
 #: settings/serializers/auth/cas.py:22
 msgid "When the user signs out, they also be logged out from the CAS server"
-msgstr "Quando o usuário se desconecta, eles são desconectados do servidor CAS"
+msgstr ""
+"Quando o usuário se desconecta, eles são desconectados do servidor CAS"
 
 #: settings/serializers/auth/cas.py:28
 msgid "Username attr"
@@ -8007,9 +7896,11 @@ msgstr "Atributo de nome de usuário"
 msgid "Enable attributes map"
 msgstr "Ativar mapeamento de atributos"
 
-#: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
+#: settings/serializers/auth/cas.py:34
+#: settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
-#: settings/serializers/auth/ldap.py:71 settings/serializers/auth/ldap_ha.py:53
+#: settings/serializers/auth/ldap.py:71
+#: settings/serializers/auth/ldap_ha.py:53
 #: settings/serializers/auth/oauth2.py:60 settings/serializers/auth/oidc.py:39
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
@@ -8066,23 +7957,28 @@ msgstr "LDAP"
 msgid "LDAP server URI"
 msgstr "Domínio do serviço LDAP"
 
-#: settings/serializers/auth/ldap.py:53 settings/serializers/auth/ldap_ha.py:35
+#: settings/serializers/auth/ldap.py:53
+#: settings/serializers/auth/ldap_ha.py:35
 msgid "Bind DN"
 msgstr "DN vinculado"
 
-#: settings/serializers/auth/ldap.py:54 settings/serializers/auth/ldap_ha.py:36
+#: settings/serializers/auth/ldap.py:54
+#: settings/serializers/auth/ldap_ha.py:36
 msgid "Binding Distinguished Name"
 msgstr "Administrador de diretório vinculado"
 
-#: settings/serializers/auth/ldap.py:58 settings/serializers/auth/ldap_ha.py:40
+#: settings/serializers/auth/ldap.py:58
+#: settings/serializers/auth/ldap_ha.py:40
 msgid "Binding password"
 msgstr "Senha vinculada"
 
-#: settings/serializers/auth/ldap.py:61 settings/serializers/auth/ldap_ha.py:43
+#: settings/serializers/auth/ldap.py:61
+#: settings/serializers/auth/ldap_ha.py:43
 msgid "Search OU"
 msgstr "OU do usuário"
 
-#: settings/serializers/auth/ldap.py:63 settings/serializers/auth/ldap_ha.py:45
+#: settings/serializers/auth/ldap.py:63
+#: settings/serializers/auth/ldap_ha.py:45
 msgid ""
 "User Search Base, if there are multiple OUs, you can separate them with the "
 "`|` symbol"
@@ -8090,16 +7986,19 @@ msgstr ""
 "Biblioteca de pesquisa do usuário, se houver várias OUs, você pode usar o "
 "símbolo `|` para separar"
 
-#: settings/serializers/auth/ldap.py:67 settings/serializers/auth/ldap_ha.py:49
+#: settings/serializers/auth/ldap.py:67
+#: settings/serializers/auth/ldap_ha.py:49
 msgid "Search filter"
 msgstr "Filtro de usuário"
 
-#: settings/serializers/auth/ldap.py:68 settings/serializers/auth/ldap_ha.py:50
+#: settings/serializers/auth/ldap.py:68
+#: settings/serializers/auth/ldap_ha.py:50
 #, python-format
 msgid "Selection could include (cn|uid|sAMAccountName=%(user)s)"
 msgstr "As opções possíveis são (cn ou uid ou sAMAccountName=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:73 settings/serializers/auth/ldap_ha.py:55
+#: settings/serializers/auth/ldap.py:73
+#: settings/serializers/auth/ldap_ha.py:55
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the LDAP service user attribute name"
@@ -8107,21 +8006,25 @@ msgstr ""
 "Mapeamento de atributos do usuário, onde `key` é o nome do atributo do "
 "usuário do sistema e `value` é o nome do atributo do usuário do serviço LDAP"
 
-#: settings/serializers/auth/ldap.py:78 settings/serializers/auth/ldap_ha.py:60
-#: settings/serializers/auth/oauth2.py:67 settings/serializers/auth/oidc.py:117
-#: settings/serializers/auth/saml2.py:45
+#: settings/serializers/auth/ldap.py:78
+#: settings/serializers/auth/ldap_ha.py:60
+#: settings/serializers/auth/oauth2.py:67
+#: settings/serializers/auth/oidc.py:117 settings/serializers/auth/saml2.py:45
 msgid "Always update user"
 msgstr "Sempre atualizar informações do usuário"
 
-#: settings/serializers/auth/ldap.py:92 settings/serializers/auth/ldap_ha.py:74
+#: settings/serializers/auth/ldap.py:92
+#: settings/serializers/auth/ldap_ha.py:74
 msgid "Connect timeout (s)"
 msgstr "Tempo de conexão (segundos)"
 
-#: settings/serializers/auth/ldap.py:95 settings/serializers/auth/ldap_ha.py:77
+#: settings/serializers/auth/ldap.py:95
+#: settings/serializers/auth/ldap_ha.py:77
 msgid "Strict sync"
 msgstr "Modo rigoroso"
 
-#: settings/serializers/auth/ldap.py:96 settings/serializers/auth/ldap_ha.py:78
+#: settings/serializers/auth/ldap.py:96
+#: settings/serializers/auth/ldap_ha.py:78
 msgid ""
 "In strict mode, users not found in LDAP will be disabled during full or "
 "automatic sync"
@@ -8142,9 +8045,9 @@ msgid ""
 "the user DN cache"
 msgstr ""
 "Cache do User DN consultado durante a autenticação de login do usuário, o "
-"que pode melhorar efetivamente a velocidade de autenticação do usuário<br>Se "
-"a arquitetura de OU do usuário for ajustada, clique em enviar para limpar o "
-"cache do User DN"
+"que pode melhorar efetivamente a velocidade de autenticação do usuário<br>Se"
+" a arquitetura de OU do usuário for ajustada, clique em enviar para limpar o"
+" cache do User DN"
 
 #: settings/serializers/auth/ldap.py:109
 #: settings/serializers/auth/ldap_ha.py:91
@@ -8211,8 +8114,8 @@ msgstr "Domínio do Serviço LDAP HA"
 #: settings/serializers/auth/ldap_ha.py:85
 msgid ""
 "Caching the User DN obtained during user login authentication can "
-"effectivelyimprove the speed of user authentication., 0 means no cache<br>If "
-"the user OU structure has been adjusted, click Submit to clear the user DN "
+"effectivelyimprove the speed of user authentication., 0 means no cache<br>If"
+" the user OU structure has been adjusted, click Submit to clear the user DN "
 "cache"
 msgstr ""
 "Ao fazer cache do User DN consultado durante a autenticação do login do "
@@ -8262,7 +8165,8 @@ msgid "End session endpoint"
 msgstr "Endereço do ponto de encerramento da sessão"
 
 #: settings/serializers/auth/oauth2.py:57
-msgid "When the user signs out, they also be logged out from the OAuth2 server"
+msgid ""
+"When the user signs out, they also be logged out from the OAuth2 server"
 msgstr "Quando os usuários saem, eles também sairão do servidor OAuth2"
 
 #: settings/serializers/auth/oauth2.py:62
@@ -8405,10 +8309,11 @@ msgid "OTP in RADIUS"
 msgstr "Use o Radius OTP"
 
 #: settings/serializers/auth/radius.py:24
-msgid "* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
+msgid ""
+"* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
 msgstr ""
-"* Usar OTP no RADIUS significa que os usuários podem usar RADIUS como método "
-"de MFA"
+"* Usar OTP no RADIUS significa que os usuários podem usar RADIUS como método"
+" de MFA"
 
 #: settings/serializers/auth/saml2.py:12 settings/serializers/auth/saml2.py:15
 msgid "SAML2"
@@ -8519,9 +8424,9 @@ msgstr "Tipo de serviço (Service id)"
 #: settings/serializers/auth/sms.py:85
 #, python-brace-format
 msgid ""
-"Template need contain {code} and Signature + template length does not exceed "
-"67 words. For example, your verification code is {code}, which is valid for "
-"5 minutes. Please do not disclose it to others."
+"Template need contain {code} and Signature + template length does not exceed"
+" 67 words. For example, your verification code is {code}, which is valid for"
+" 5 minutes. Please do not disclose it to others."
 msgstr ""
 "O modelo precisa conter {code}, e a soma do comprimento da assinatura e do "
 "modelo não pode exceder 67 caracteres. Por exemplo, seu código de "
@@ -8548,8 +8453,8 @@ msgstr "Ativar autenticação com token SSO"
 #: settings/serializers/auth/sso.py:17
 msgid "Other service can using SSO token login to system without password"
 msgstr ""
-"Outros sistemas podem se integrar ao JumpServer usando Token SSO, eliminando "
-"o processo de login."
+"Outros sistemas podem se integrar ao JumpServer usando Token SSO, eliminando"
+" o processo de login."
 
 #: settings/serializers/auth/sso.py:20
 msgid "SSO auth key TTL"
@@ -8643,8 +8548,8 @@ msgstr "URL do site atual"
 
 #: settings/serializers/basic.py:13
 msgid ""
-"Site URL is the externally accessible address of the current product service "
-"and is usually used in links in system emails"
+"Site URL is the externally accessible address of the current product service"
+" and is usually used in links in system emails"
 msgstr ""
 "URL do site é o endereço externo acessível do serviço do produto atual, "
 "geralmente usado em links em emails do sistema"
@@ -8739,20 +8644,20 @@ msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
-"Sessões, gravações e registros de comandos acima desse prazo serão excluídos "
-"(afeta o armazenamento do banco de dados, OSS, etc não são afetados)"
+"Sessões, gravações e registros de comandos acima desse prazo serão excluídos"
+" (afeta o armazenamento do banco de dados, OSS, etc não são afetados)"
 
 #: settings/serializers/cleaning.py:52
 msgid "Change secret and push record retention days"
 msgstr ""
-"Número de dias para retenção de registros de notificações sobre alteração de "
-"senha da conta"
+"Número de dias para retenção de registros de notificações sobre alteração de"
+" senha da conta"
 
 #: settings/serializers/cleaning.py:56
 msgid "Audit report send record retention days"
 msgstr ""
-"Número de dias para retenção de registros de notificações sobre alteração de "
-"senha da conta"
+"Número de dias para retenção de registros de notificações sobre alteração de"
+" senha da conta"
 
 #: settings/serializers/feature.py:24
 #, python-format
@@ -8765,8 +8670,8 @@ msgstr ""
 "Execute trabalhos do Ansible no ambiente de execução Docker (%(image)s). "
 "Para executar os trabalhos localmente, desative \"Isolamento do Docker para "
 "Ansible\" em Configurações do sistema > Configurações de recursos > Central "
-"de trabalhos. Se a imagem estiver ausente, execute este comando no worker do "
-"Ansible: docker pull %(image)s"
+"de trabalhos. Se a imagem estiver ausente, execute este comando no worker do"
+" Ansible: docker pull %(image)s"
 
 #: settings/serializers/feature.py:36 settings/serializers/msg.py:69
 msgid "Subject"
@@ -8822,7 +8727,7 @@ msgstr "ID do inquilino"
 
 #: settings/serializers/feature.py:141 terminal/serializers/storage.py:68
 #: xpack/plugins/cloud/manager.py:128 xpack/plugins/cloud/manager.py:132
-#: xpack/plugins/cloud/models.py:293
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:293
 msgid "Region"
 msgstr "Região"
 
@@ -8861,7 +8766,8 @@ msgstr "Chave API"
 #: settings/serializers/feature.py:179 settings/serializers/feature.py:194
 msgid ""
 "The proxy server address of the GPT service. For example: http://ip:port"
-msgstr "Endereço do servidor proxy do serviço GPT. Por exemplo: http://ip:port"
+msgstr ""
+"Endereço do servidor proxy do serviço GPT. Por exemplo: http://ip:port"
 
 #: settings/serializers/feature.py:183
 msgid "GPT Model"
@@ -8944,87 +8850,6 @@ msgstr ""
 "Aplicativo virtual, console Linux pode ser usado como servidor de "
 "aplicativos em aplicativos remotos."
 
-#: settings/serializers/luna.py:22
-#, fuzzy
-#| msgid "Default"
-msgid "Luna default"
-msgstr "Padrão"
-
-#: settings/serializers/luna.py:26 users/serializers/preference/lina.py:47
-#: users/serializers/profile.py:66
-msgid "Language"
-msgstr "Idioma"
-
-#: settings/serializers/luna.py:29 users/serializers/preference/luna.py:26
-msgid "Async loading of asset tree"
-msgstr "Carregamento assíncrono da árvore de ativos"
-
-#: settings/serializers/luna.py:33 users/serializers/preference/luna.py:30
-msgid "Connect default open method"
-msgstr "Forma padrão de abertura de conexão"
-
-#: settings/serializers/luna.py:36 users/serializers/preference/luna.py:34
-#: xpack/plugins/interface/models.py:44
-#: xpack/plugins/interface/serializers/interface.py:35
-msgid "Theme"
-msgstr "Tema"
-
-#: settings/serializers/luna.py:39 users/serializers/preference/luna.py:41
-msgid "RDP resolution"
-msgstr "Resolução RDP"
-
-#: settings/serializers/luna.py:42 users/serializers/preference/luna.py:45
-msgid "Keyboard layout"
-msgstr "Layout do teclado"
-
-#: settings/serializers/luna.py:46 users/serializers/preference/luna.py:49
-msgid "RDP client option"
-msgstr "Opções do cliente RDP"
-
-#: settings/serializers/luna.py:50 users/serializers/preference/luna.py:53
-msgid "RDP color quality"
-msgstr "Qualidade de cor RDP"
-
-#: settings/serializers/luna.py:53 users/serializers/preference/luna.py:57
-msgid "RDP smart size"
-msgstr "Tamanho inteligente RDP"
-
-#: settings/serializers/luna.py:55 users/serializers/preference/luna.py:58
-msgid ""
-"Determines whether the client computer should scale the content on the "
-"remote computer to fit the window size of the client computer when the "
-"window is resized."
-msgstr ""
-"Determinar se o computador cliente deve redimensionar o conteúdo no "
-"computador remoto para se ajustar ao tamanho da janela do computador cliente "
-"quando o tamanho da janela é alterado"
-
-#: settings/serializers/luna.py:61 users/serializers/preference/luna.py:63
-msgid "Remote app connect method"
-msgstr "Método de conexão do aplicativo remoto"
-
-#: settings/serializers/luna.py:65 users/serializers/preference/koko.py:10
-#: users/serializers/preference/luna.py:67
-msgid "File name conflict resolution"
-msgstr "Solução de conflito de nomes de arquivos"
-
-#: settings/serializers/luna.py:69 users/serializers/preference/luna.py:74
-msgid "Terminal font size"
-msgstr "Tamanho da fonte do terminal de caracteres"
-
-#: settings/serializers/luna.py:72 users/serializers/preference/luna.py:77
-msgid "Backspace as Ctrl+H"
-msgstr "Terminal de caracteres Backspace As Ctrl+H"
-
-#: settings/serializers/luna.py:75 users/serializers/preference/luna.py:80
-msgid "Right click quickly paste"
-msgstr "Clique direito para colar rapidamente"
-
-#: settings/serializers/luna.py:78 users/serializers/preference/koko.py:14
-#: users/serializers/preference/luna.py:84
-msgid "Terminal theme name"
-msgstr "Nome do tema do terminal"
-
 #: settings/serializers/msg.py:24
 msgid "SMTP"
 msgstr "SMTP"
@@ -9092,8 +8917,8 @@ msgstr "Prefixo do assunto"
 
 #: settings/serializers/msg.py:70
 msgid ""
-"Tips: When creating a user, send the subject of the email (eg:Create account "
-"successfully)"
+"Tips: When creating a user, send the subject of the email (eg:Create account"
+" successfully)"
 msgstr ""
 "Dica: ao criar um usuário, envie um e-mail de configuração da senha com o "
 "assunto (por exemplo: criação de usuário bem-sucedida)"
@@ -9212,8 +9037,8 @@ msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
 msgstr ""
-"Quando o número de falhas de login do usuário atingir o limite, o login será "
-"proibido durante esse intervalo"
+"Quando o número de falhas de login do usuário atingir o limite, o login será"
+" proibido durante esse intervalo"
 
 #: settings/serializers/security.py:79 settings/serializers/security.py:89
 msgid "Login failures count"
@@ -9265,13 +9090,13 @@ msgstr "Login apenas a partir de usuários originais"
 
 #: settings/serializers/security.py:121
 msgid ""
-"If it is enabled, the user will only authenticate to the source when logging "
-"in; if it is disabled, the user will authenticate all the enabled "
+"If it is enabled, the user will only authenticate to the source when logging"
+" in; if it is disabled, the user will authenticate all the enabled "
 "authentication methods in a certain order when logging in, and as long as "
 "one of the authentication methods is successful, they can log in directly"
 msgstr ""
-"Se ativada, a autenticação do usuário no login será feita apenas no ponto de "
-"origem; Se desativada, a autenticação do usuário seguirá uma certa ordem "
+"Se ativada, a autenticação do usuário no login será feita apenas no ponto de"
+" origem; Se desativada, a autenticação do usuário seguirá uma certa ordem "
 "entre todos os métodos de autenticação ativados, com sucesso em um deles "
 "permitindo o login direto"
 
@@ -9331,8 +9156,8 @@ msgstr "Inserir MFA na página de login"
 #: settings/serializers/security.py:164
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr ""
-"A regulamentação de segurança de dados da União Europeia (GDPR) exige MFA na "
-"página de login para garantir a segurança do login do sistema"
+"A regulamentação de segurança de dados da União Europeia (GDPR) exige MFA na"
+" página de login para garantir a segurança do login do sistema"
 
 #: settings/serializers/security.py:168
 msgid "Verify code TTL (second)"
@@ -9371,9 +9196,9 @@ msgstr "Notificação de login de local diferente"
 
 #: settings/serializers/security.py:184
 msgid ""
-"The system determines whether the login IP address belongs to a common login "
-"city. If the account is logged in from a common login city, the system sends "
-"a remote login reminder"
+"The system determines whether the login IP address belongs to a common login"
+" city. If the account is logged in from a common login city, the system "
+"sends a remote login reminder"
 msgstr ""
 "Com base se o IP de login pertence à cidade de login usual, se a conta for "
 "acessada de uma cidade não usual, um lembrete de login de local diferente "
@@ -9388,8 +9213,8 @@ msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit"
 msgstr ""
-"Um cheque é feito todos os dias, os usuários que excedem o tempo predefinido "
-"são automaticamente desativados"
+"Um cheque é feito todos os dias, os usuários que excedem o tempo predefinido"
+" são automaticamente desativados"
 
 #: settings/serializers/security.py:211
 msgid "Watermark"
@@ -9430,8 +9255,8 @@ msgstr "Tempo máximo ocioso da conexão (minutos)"
 #: settings/serializers/security.py:237
 msgid "If idle time more than it, disconnect connection."
 msgstr ""
-"Observação: se essa configuração for excedida sem qualquer Action, a conexão "
-"será desconectada"
+"Observação: se essa configuração for excedida sem qualquer Action, a conexão"
+" será desconectada"
 
 #: settings/serializers/security.py:240
 msgid "Session expire at browser closed"
@@ -9443,7 +9268,8 @@ msgstr "Quer que a sessão expire quando o usuário fecha o navegador?"
 
 #: settings/serializers/security.py:246
 msgid "Allow users to view asset session information"
-msgstr "Permitir que os usuários vejam informações da sessão online dos ativos"
+msgstr ""
+"Permitir que os usuários vejam informações da sessão online dos ativos"
 
 #: settings/serializers/security.py:248
 msgid ""
@@ -9495,7 +9321,7 @@ msgstr "Destinatário do email"
 msgid "Multiple user using , split"
 msgstr "Vários usuários, separados por ,"
 
-#: settings/serializers/settings.py:63
+#: settings/serializers/settings.py:62
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
@@ -9507,8 +9333,8 @@ msgstr "Automático"
 #: settings/serializers/terminal.py:23
 msgid "Auto(Enabled for the first 5 minutes after startup, then disabled)"
 msgstr ""
-"Automático (habilitado nos primeiros 5 minutos após a inicialização, e então "
-"desativado)"
+"Automático (habilitado nos primeiros 5 minutos após a inicialização, e então"
+" desativado)"
 
 #: settings/serializers/terminal.py:26
 msgid "Registration"
@@ -9516,11 +9342,11 @@ msgstr "Registro do componente"
 
 #: settings/serializers/terminal.py:28
 msgid ""
-"Allow component register, after all component setup, you should disable this "
-"for security"
+"Allow component register, after all component setup, you should disable this"
+" for security"
 msgstr ""
-"Permitir o registro de componentes? Após todos os terminais serem iniciados, "
-"deve-se desactivar por razões de segurança"
+"Permitir o registro de componentes? Após todos os terminais serem iniciados,"
+" deve-se desactivar por razões de segurança"
 
 #: settings/serializers/terminal.py:34
 msgid ""
@@ -9533,14 +9359,14 @@ msgstr ""
 msgid ""
 "* Allow users to log in to the KoKo component via Public key "
 "authentication<br/>If third-party authentication services, such as AD/LDAP, "
-"are enabled, you should disable this option to prevent users from logging in "
-"after being deleted from the AD/LDAP server"
+"are enabled, you should disable this option to prevent users from logging in"
+" after being deleted from the AD/LDAP server"
 msgstr ""
 "* Permite aos usuários fazer login no componente KoKo através da "
 "autenticação de chave pública<br/>Se o serviço de autenticação de terceiros "
 "(como AD / LDAP) estiver habilitado, esta opção deve ser desabilitada, para "
-"evitar que o usuário faça login novamente após ser excluído do servidor AD / "
-"LDAP"
+"evitar que o usuário faça login novamente após ser excluído do servidor AD /"
+" LDAP"
 
 #: settings/serializers/terminal.py:47
 msgid "Asset sorting"
@@ -9552,8 +9378,8 @@ msgstr "Quantidade por página da lista de ativos"
 
 #: settings/serializers/terminal.py:55
 msgid ""
-"* You can individually configure the service address and port in the service "
-"endpoint<br/>If enabled, the Luna page will display the DB client launch "
+"* You can individually configure the service address and port in the service"
+" endpoint<br/>If enabled, the Luna page will display the DB client launch "
 "method when connecting to assets"
 msgstr ""
 "* Você pode configurar o endereço e a porta do serviço separadamente nos "
@@ -9562,8 +9388,8 @@ msgstr ""
 
 #: settings/serializers/terminal.py:63
 msgid ""
-"* You can individually configure the service address and port in the service "
-"endpoint<br/>If enabled, the Luna page will display the download rdp file "
+"* You can individually configure the service address and port in the service"
+" endpoint<br/>If enabled, the Luna page will display the download rdp file "
 "button and RDP Client launch method when connecting to assets"
 msgstr ""
 "* Você pode configurar o endereço e a porta do serviço separadamente nos "
@@ -9578,11 +9404,12 @@ msgstr "Conexão do Cliente"
 #: settings/serializers/terminal.py:72
 msgid ""
 "* Allow connecting to the KoKo component via SSH client<br/>If enabled, the "
-"Luna page will display the SSH client launch method when connecting to assets"
+"Luna page will display the SSH client launch method when connecting to "
+"assets"
 msgstr ""
-"* Permite ao Cliente SSH conectar-se ao componente KoKo<br/>Se habilitado, a "
-"página do Luna mostrará o método de inicialização do Cliente SSH ao conectar-"
-"se aos ativos"
+"* Permite ao Cliente SSH conectar-se ao componente KoKo<br/>Se habilitado, a"
+" página do Luna mostrará o método de inicialização do Cliente SSH ao "
+"conectar-se aos ativos"
 
 #: settings/serializers/tool.py:10
 msgid "Tool"
@@ -9594,8 +9421,8 @@ msgstr "Ferramentas na bancada"
 
 #: settings/serializers/tool.py:15
 msgid ""
-"*! If enabled, users with RBAC permissions will be able to utilize all tools "
-"in the workbench"
+"*! If enabled, users with RBAC permissions will be able to utilize all tools"
+" in the workbench"
 msgstr ""
 "*! Se habilitado, os usuários com permissões RBAC poderão utilizar todas as "
 "ferramentas disponíveis na bancada"
@@ -9622,8 +9449,7 @@ msgstr "Registre a tarefa do usuário LDAP de importação periódica"
 
 #: settings/tasks/ldap.py:117
 msgid ""
-"When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP "
-"sync task \n"
+"When LDAP auto-sync parameters change, such as Crontab parameters, the LDAP sync task \n"
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 "Quando alterações são efetuadas nos parâmetros de sincronização automática "
@@ -9636,8 +9462,7 @@ msgstr "Registre a tarefa do usuário LDAP HA de importação periódica"
 
 #: settings/tasks/ldap.py:133
 msgid ""
-"When LDAP HA auto-sync parameters change, such as Crontab parameters, the "
-"LDAP HA sync task \n"
+"When LDAP HA auto-sync parameters change, such as Crontab parameters, the LDAP HA sync task \n"
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 "Quando alterações são efetuadas nos parâmetros de sincronização automática "
@@ -9665,19 +9490,23 @@ msgid "ldap:// or ldaps:// protocol is used."
 msgstr "Use o protocolo ldap:// ou ldaps://"
 
 #: settings/utils/ldap.py:597
+#, python-brace-format
 msgid "Host or port is disconnected: {}"
 msgstr "Host ou porta não podem ser conectados: {}"
 
 #: settings/utils/ldap.py:599
+#, python-brace-format
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "Porta não é uma porta de serviço LDAP: {}"
 
 #: settings/utils/ldap.py:601
+#, python-brace-format
 msgid "Please add certificate: {}"
 msgstr "Por favor, adicione o certificado: {}"
 
 #: settings/utils/ldap.py:605 settings/utils/ldap.py:632
 #: settings/utils/ldap.py:662 settings/utils/ldap.py:690
+#, python-brace-format
 msgid "Unknown error: {}"
 msgstr "Erro desconhecido: {}"
 
@@ -9686,22 +9515,27 @@ msgid "Bind DN or Password incorrect"
 msgstr "Erro de DN de vinculação ou senha"
 
 #: settings/utils/ldap.py:626
+#, python-brace-format
 msgid "Please enter Bind DN: {}"
 msgstr "Insira o DN de vinculação: {}"
 
 #: settings/utils/ldap.py:628
+#, python-brace-format
 msgid "Please enter Password: {}"
 msgstr "Por favor, insira a senha: {}"
 
 #: settings/utils/ldap.py:630
+#, python-brace-format
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "Por favor, insira o DN de vinculação e a senha corretos: {}"
 
 #: settings/utils/ldap.py:648
+#, python-brace-format
 msgid "Invalid User OU or User search filter: {}"
 msgstr "OU de usuário inválido ou filtro de usuário: {}"
 
 #: settings/utils/ldap.py:679
+#, python-brace-format
 msgid "LDAP User attr map not include: {}"
 msgstr "O mapeamento de atributos LDAP não inclui: {}"
 
@@ -9714,46 +9548,57 @@ msgid "LDAP authentication is not enabled"
 msgstr "A autenticação LDAP não está ativada"
 
 #: settings/utils/ldap.py:724
+#, python-brace-format
 msgid "Error (Invalid LDAP server): {}"
 msgstr "Erro (Endereço do servidor LDAP inválido): {}"
 
 #: settings/utils/ldap.py:726
+#, python-brace-format
 msgid "Error (Invalid Bind DN): {}"
 msgstr "Erro (DN de vinculação inválido): {}"
 
 #: settings/utils/ldap.py:728
+#, python-brace-format
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "Erro (mapeamento de atributos LDAP inválido): {}"
 
 #: settings/utils/ldap.py:730
+#, python-brace-format
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "Erro (OU de usuário inválido ou filtro de usuário): {}"
 
 #: settings/utils/ldap.py:732
+#, python-brace-format
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "Erro (autenticação LDAP não ativada): {}"
 
 #: settings/utils/ldap.py:734
+#, python-brace-format
 msgid "Error (Unknown): {}"
 msgstr "Erro (desconhecido): {}"
 
 #: settings/utils/ldap.py:737
+#, python-brace-format
 msgid "Succeed: Match {} users"
 msgstr "Correspondência bem-sucedida para {} usuários"
 
 #: settings/utils/ldap.py:769
+#, python-brace-format
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "Falha na autenticação (erro de configuração): {}"
 
 #: settings/utils/ldap.py:773
+#, python-brace-format
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "Falha na autenticação (nome de usuário ou senha incorretos): {}"
 
 #: settings/utils/ldap.py:775
+#, python-brace-format
 msgid "Authentication failed (Unknown): {}"
 msgstr "Falha na autenticação: (desconhecido): {}"
 
 #: settings/utils/ldap.py:778
+#, python-brace-format
 msgid "Authentication success: {}"
 msgstr "Autenticação bem sucedida: {}"
 
@@ -9762,10 +9607,12 @@ msgid "No LDAP user was found"
 msgstr "Não foi possível obter usuário LDAP"
 
 #: settings/ws.py:240
+#, python-brace-format
 msgid "Total {}, success {}, failure {}"
 msgstr "Total de {}, sucesso {}, falha {}"
 
 #: settings/ws.py:244
+#, python-brace-format
 msgid ", disabled {}"
 msgstr ", desativar {}"
 
@@ -9832,7 +9679,8 @@ msgstr "Logout"
 
 #: templates/_message.html:6
 msgid "Your account has expired, please contact the administrator."
-msgstr "Sua conta já expirou, por favor, entre em contato com o administrador."
+msgstr ""
+"Sua conta já expirou, por favor, entre em contato com o administrador."
 
 #: templates/_message.html:11
 msgid "Your account will at"
@@ -9950,6 +9798,7 @@ msgstr ""
 "comunidade"
 
 #: terminal/api/applet/applet.py:86
+#, python-brace-format
 msgid "Applet not found in path: {}"
 msgstr "Aplicativo remoto não encontrado no caminho: {}"
 
@@ -9962,6 +9811,7 @@ msgid "Deleting the default storage is not allowed"
 msgstr "Não é permitido excluir a configuração de armazenamento padrão"
 
 #: terminal/api/component/storage.py:36
+#, python-brace-format
 msgid "Cannot delete storage that is being used: {}"
 msgstr "Não é possível excluir o armazenamento em uso: {}"
 
@@ -9991,6 +9841,7 @@ msgstr "Não foi possível conectar ao host"
 
 #: terminal/api/component/storage.py:139 terminal/api/component/storage.py:140
 #: terminal/tasks.py:208
+#, python-brace-format
 msgid "Test failure: {}"
 msgstr "Teste falhou: {}"
 
@@ -10017,6 +9868,7 @@ msgid "Session replay"
 msgstr "Gravação de sessão"
 
 #: terminal/api/session/session.py:339
+#, python-brace-format
 msgid "Session does not exist: {}"
 msgstr "Sessão não existe: {}"
 
@@ -10024,7 +9876,7 @@ msgstr "Sessão não existe: {}"
 msgid "Session is finished or the protocol not supported"
 msgstr "Sessão já concluída ou protocolo não suportado"
 
-#: terminal/api/session/session.py:355
+#: terminal/api/session/session.py:355 tickets/api/ticket.py:142
 msgid "User does not have permission"
 msgstr "Usuário sem permissões"
 
@@ -10189,6 +10041,7 @@ msgstr "Host"
 
 #: terminal/models/applet/applet.py:130
 #: terminal/models/virtualapp/virtualapp.py:66
+#, python-brace-format
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Applet pkg inválido, arquivo ausente {}"
 
@@ -10254,24 +10107,46 @@ msgid "RDP port"
 msgstr "Porta RDP"
 
 #: terminal/models/component/endpoint.py:20
-#, fuzzy
-#| msgid "Image port"
-msgid "Magnus port"
-msgstr "Porta da Imagem"
+msgid "MySQL port"
+msgstr "Porta MySQL"
 
 #: terminal/models/component/endpoint.py:21
+msgid "MariaDB port"
+msgstr "Porta MariaDB"
+
+#: terminal/models/component/endpoint.py:22
+msgid "PostgreSQL port"
+msgstr "Porta PostgreSQL"
+
+#: terminal/models/component/endpoint.py:23
+msgid "Redis port"
+msgstr "Porta Redis"
+
+#: terminal/models/component/endpoint.py:24
+msgid "SQLServer port"
+msgstr "Porta SQLServer"
+
+#: terminal/models/component/endpoint.py:25
+msgid "Oracle port"
+msgstr "Porta Oracle"
+
+#: terminal/models/component/endpoint.py:26
+msgid "MongoDB port"
+msgstr "Porta MongoDB"
+
+#: terminal/models/component/endpoint.py:27
 msgid "VNC port"
 msgstr "Porta VNC"
 
-#: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:116
-#: terminal/serializers/endpoint.py:62 terminal/serializers/storage.py:41
+#: terminal/models/component/endpoint.py:35
+#: terminal/models/component/endpoint.py:115
+#: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "Ponto final"
 
-#: terminal/models/component/endpoint.py:122
+#: terminal/models/component/endpoint.py:121
 msgid "Endpoint rule"
 msgstr "Regras de ponto final"
 
@@ -10390,8 +10265,9 @@ msgstr "Permissões de ação"
 msgid "Origin"
 msgstr "Origem"
 
-#: terminal/models/session/sharing.py:42 terminal/models/session/sharing.py:107
-#: terminal/notifications.py:300 terminal/notifications.py:301
+#: terminal/models/session/sharing.py:42
+#: terminal/models/session/sharing.py:107 terminal/notifications.py:300
+#: terminal/notifications.py:301
 msgid "Session sharing"
 msgstr "Compartilhamento de Sessão"
 
@@ -10552,21 +10428,15 @@ msgstr "Endereço de serviço Core"
 #: terminal/serializers/applet_host.py:38
 msgid ""
 " \n"
-"        Tips: The application release machine communicates with the Core "
-"service. \n"
-"        If the release machine and the Core service are on the same network "
-"segment, \n"
-"        it is recommended to fill in the intranet address, otherwise fill in "
-"the current site URL \n"
+"        Tips: The application release machine communicates with the Core service. \n"
+"        If the release machine and the Core service are on the same network segment, \n"
+"        it is recommended to fill in the intranet address, otherwise fill in the current site URL \n"
 "        <br> \n"
 "        eg: https://172.16.10.110 or https://dev.example.com\n"
 "        "
 msgstr ""
 " \n"
-"Dica: O publicador de aplicativos e o serviço Core usam comunicação. Se o "
-"publicador e o serviço Core estiverem na mesma rede, é recomendado preencher "
-"o endereço da intranet; caso contrário, preencha o URL do atual site. Por "
-"exemplo: https://172.16.10.110 ou https://dev.example.com."
+"Dica: O publicador de aplicativos e o serviço Core usam comunicação. Se o publicador e o serviço Core estiverem na mesma rede, é recomendado preencher o endereço da intranet; caso contrário, preencha o URL do atual site. Por exemplo: https://172.16.10.110 ou https://dev.example.com."
 
 #: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
@@ -10579,14 +10449,14 @@ msgstr "Já existem licenças RDS"
 #: terminal/serializers/applet_host.py:50
 msgid ""
 "If not exist, the RDS will be in trial mode, and the trial period is 120 "
-"days. <a href=\"https://learn.microsoft.com/en-us/windows-server/remote/"
-"remote-desktop-services/rds-client-access-license\" "
+"days. <a href=\"https://learn.microsoft.com/en-us/windows-"
+"server/remote/remote-desktop-services/rds-client-access-license\" "
 "target=\"_blank\">Detail</a>"
 msgstr ""
 "Se não existir, o RDS estará em modo de teste, com um período de teste de "
-"120 dias. <a href='https://learn.microsoft.com/en-us/windows-server/remote/"
-"remote-desktop-services/rds-client-access-license' target='_blank'>Detalhes</"
-"a>"
+"120 dias. <a href='https://learn.microsoft.com/en-us/windows-"
+"server/remote/remote-desktop-services/rds-client-access-license' "
+"target='_blank'>Detalhes</a>"
 
 #: terminal/serializers/applet_host.py:55
 msgid "RDS License Server"
@@ -10626,8 +10496,8 @@ msgstr "Tempo limite de logoff de aplicativo remoto do RDS (milissegundos)"
 
 #: terminal/serializers/applet_host.py:74
 msgid ""
-"Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp "
-"programs (0 milliseconds, log off the session immediately)."
+"Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp"
+" programs (0 milliseconds, log off the session immediately)."
 msgstr ""
 "Nota: Define o tempo de logoff da sessão RemoteAPP após o fechamento de "
 "todos os programas RemoteApp (0 milissegundos, logoff imediato da sessão)"
@@ -10639,15 +10509,15 @@ msgstr "Status de carga"
 
 #: terminal/serializers/applet_host.py:97
 msgid ""
-"These accounts are used to connect to the published application, the account "
-"is now divided into two types, one is dedicated to each account, each user "
+"These accounts are used to connect to the published application, the account"
+" is now divided into two types, one is dedicated to each account, each user "
 "has a private account, the other is public, when the application does not "
-"support multiple open and the special has been used, the public account will "
-"be used to connect"
+"support multiple open and the special has been used, the public account will"
+" be used to connect"
 msgstr ""
-"Estas contas são usadas para conectar-se aos aplicativos publicados, e agora "
-"são divididas em dois tipos: <br/>Uma é dedicada, cada usuário tem uma conta "
-"dedicada. A outra é a pública, que será usada quando o aplicativo não "
+"Estas contas são usadas para conectar-se aos aplicativos publicados, e agora"
+" são divididas em dois tipos: <br/>Uma é dedicada, cada usuário tem uma "
+"conta dedicada. A outra é a pública, que será usada quando o aplicativo não "
 "suportar múltiplas execuções e as dedicadas já estiverem em uso; <br/>Nota: "
 "Se a criação automática de conta não estiver ativada, a máquina publicada "
 "atual só poderá ser agendada para ativos com uma etiqueta especificada, por "
@@ -10710,29 +10580,30 @@ msgstr "ID de sessão inválida"
 msgid "Timestamp"
 msgstr "Timestamp"
 
-#: terminal/serializers/endpoint.py:26
+#: terminal/serializers/endpoint.py:28
 msgid ""
 "The host address accessed when connecting to assets, if it is empty, the "
 "access address of the current browser will be used (the default endpoint "
 "does not allow modification of the host)"
 msgstr ""
 "Endereço do host acessado ao conectar ao ativo, se estiver vazio, use o "
-"endereço de acesso do navegador atual (o host padrão não permite modificação)"
+"endereço de acesso do navegador atual (o host padrão não permite "
+"modificação)"
 
-#: terminal/serializers/endpoint.py:53
+#: terminal/serializers/endpoint.py:64
 msgid ""
-"The assets within this IP range or Host, the following endpoint will be used "
-"for the connection"
+"The assets within this IP range or Host, the following endpoint will be used"
+" for the connection"
 msgstr ""
-"Os ativos dentro deste intervalo de IP ou host serão conectados utilizando o "
-"seguinte endpoint."
+"Os ativos dentro deste intervalo de IP ou host serão conectados utilizando o"
+" seguinte endpoint."
 
-#: terminal/serializers/endpoint.py:54
+#: terminal/serializers/endpoint.py:65
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
-"Se houver conflitos de IP de ativos em diferentes pontos finais, use tags de "
-"ativos para resolver."
+"Se houver conflitos de IP de ativos em diferentes pontos finais, use tags de"
+" ativos para resolver."
 
 #: terminal/serializers/session.py:35 terminal/serializers/session.py:63
 msgid "Can replay"
@@ -10767,6 +10638,7 @@ msgid "No asset or invalid asset"
 msgstr "Sem ativo ou ativo não ativado"
 
 #: terminal/serializers/storage.py:23
+#, python-brace-format
 msgid "Endpoint invalid: remove path `{}`"
 msgstr "Ponto de extremidade inválido: Remover caminho `{}`"
 
@@ -10993,8 +10865,7 @@ msgstr "Limpar sessão offline"
 
 #: terminal/tasks.py:45
 msgid ""
-"Check every 10 minutes for asset connection sessions that have been inactive "
-"for 3 \n"
+"Check every 10 minutes for asset connection sessions that have been inactive for 3 \n"
 "        minutes and mark these sessions as completed"
 msgstr ""
 "A cada 10 minutos, verifica sessões de conexão de ativos inativos por 3 "
@@ -11006,8 +10877,7 @@ msgstr "Upload de gravação de sessão para armazenamento externo"
 
 #: terminal/tasks.py:70 terminal/tasks.py:104
 msgid ""
-"If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands "
-"and \n"
+"If SERVER_REPLAY_STORAGE is configured in the config.txt, session commands and \n"
 "        recordings will be uploaded to external storage"
 msgstr ""
 "Se SERVER_REPLAY_STORAGE estiver configurado, sincronize os arquivos "
@@ -11023,8 +10893,7 @@ msgstr "Executar implantação da aplicação"
 
 #: terminal/tasks.py:126
 msgid ""
-"When deploying from the remote application publisher details page, and the "
-"'Deploy' \n"
+"When deploying from the remote application publisher details page, and the 'Deploy' \n"
 "        button is clicked, this task will be executed"
 msgstr ""
 "Implantação da publicação, ao clicar na implantação, executar esta tarefa"
@@ -11035,8 +10904,7 @@ msgstr "Instalar aplicação"
 
 #: terminal/tasks.py:140
 msgid ""
-"When the 'Deploy' button is clicked in the 'Remote Application' section of "
-"the remote \n"
+"When the 'Deploy' button is clicked in the 'Remote Application' section of the remote \n"
 "        application publisher details page, this task will be executed"
 msgstr ""
 "Ao detalhar o aplicativo remoto - aplicativo remoto, ao clicar na "
@@ -11048,8 +10916,7 @@ msgstr "Desinstalar aplicação"
 
 #: terminal/tasks.py:155
 msgid ""
-"When the 'Uninstall' button is clicked in the 'Remote Application' section "
-"of the \n"
+"When the 'Uninstall' button is clicked in the 'Remote Application' section of the \n"
 "        remote application publisher details page, this task will be executed"
 msgstr ""
 "Ao detalhar o aplicativo remoto - aplicativo remoto, ao clicar na "
@@ -11061,12 +10928,11 @@ msgstr "Coletar contas no aplicativo remoto"
 
 #: terminal/tasks.py:170
 msgid ""
-"When a remote publishing server is created and an account needs to be "
-"created \n"
+"When a remote publishing server is created and an account needs to be created \n"
 "        automatically, this task will be executed"
 msgstr ""
-"Após criar a máquina de publicação remota, se for necessário criar uma conta "
-"automaticamente, execute a tarefa"
+"Após criar a máquina de publicação remota, se for necessário criar uma conta"
+" automaticamente, execute a tarefa"
 
 #: terminal/tasks.py:184
 msgid "Check command replay storage connectivity"
@@ -11074,15 +10940,12 @@ msgstr "Verificar a conectividade de armazenamento de comandos e gravações"
 
 #: terminal/tasks.py:186
 msgid ""
-"Check every day at midnight whether the external storage for commands and "
-"recordings \n"
-"        is accessible. If it is not accessible, send a notification to the "
-"recipients specified \n"
-"        in 'System Settings - Notifications - Subscription - Storage - "
-"Connectivity'"
+"Check every day at midnight whether the external storage for commands and recordings \n"
+"        is accessible. If it is not accessible, send a notification to the recipients specified \n"
+"        in 'System Settings - Notifications - Subscription - Storage - Connectivity'"
 msgstr ""
-"Verifica todos os dias à meia-noite se o armazenamento externo de comandos e "
-"gravações pode ser conectado, se não puder, envie para: Configurações do "
+"Verifica todos os dias à meia-noite se o armazenamento externo de comandos e"
+" gravações pode ser conectado, se não puder, envie para: Configurações do "
 "sistema - Configurações de notificação - Assinatura de mensagem - "
 "Destinatário definido para armazenamento de configurações de gravação e "
 "comando."
@@ -11093,8 +10956,8 @@ msgstr "Visualizar"
 
 #: terminal/templates/terminal/_msg_command_warning.html:5
 msgid ""
-"We would like to inform you that a command alert has been triggered with the "
-"following details:"
+"We would like to inform you that a command alert has been triggered with the"
+" following details:"
 msgstr ""
 "Queremos notificá-lo de que o alerta de comando foi acionado, com os "
 "detalhes a seguir:"
@@ -11115,10 +10978,10 @@ msgid ""
 msgstr ""
 "Por favor, verifique a execução deste comando para garantir que está em "
 "conformidade com a política de segurança da sua organização. Se você não "
-"estiver autorizado a realizar esta ação ou encontrar qualquer anomalia, tome "
-"as medidas necessárias imediatamente."
+"estiver autorizado a realizar esta ação ou encontrar qualquer anomalia, tome"
+" as medidas necessárias imediatamente."
 
-#: tickets/api/ticket.py:90 tickets/models/ticket/general.py:290
+#: tickets/api/ticket.py:90 tickets/models/ticket/general.py:289
 #: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "Solicitante"
@@ -11183,33 +11046,15 @@ msgstr "Nível 1"
 msgid "Two level"
 msgstr "Nível 2"
 
-#: tickets/const.py:52
-#, fuzzy
-#| msgid "One level"
-msgid "Three level"
-msgstr "Nível 1"
-
-#: tickets/const.py:53
-#, fuzzy
-#| msgid "Two level"
-msgid "Four level"
-msgstr "Nível 2"
-
-#: tickets/const.py:54
-#, fuzzy
-#| msgid "One level"
-msgid "Five level"
-msgstr "Nível 1"
-
-#: tickets/const.py:58
+#: tickets/const.py:55
 msgid "All assets"
 msgstr "Todos Ativos"
 
-#: tickets/const.py:59
+#: tickets/const.py:56
 msgid "Permed assets"
 msgstr "Ativos Autorizados"
 
-#: tickets/const.py:60
+#: tickets/const.py:57
 msgid "Permed valid assets"
 msgstr "Ativos autorizados efetivamente"
 
@@ -11218,6 +11063,7 @@ msgid "Ticket already closed"
 msgstr "A ordem de serviço foi fechada"
 
 #: tickets/handlers/apply_asset.py:40
+#, python-brace-format
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -11226,19 +11072,20 @@ msgstr ""
 "requerente da ordem de serviço: {}, responsável pelo tratamento da ordem de "
 "serviço: {}, ID da ordem de serviço: {}"
 
-#: tickets/handlers/base.py:94
+#: tickets/handlers/base.py:84
 msgid "Change field"
 msgstr "Alterar campo"
 
-#: tickets/handlers/base.py:94
+#: tickets/handlers/base.py:84
 msgid "Before change"
 msgstr "Antes da alteração"
 
-#: tickets/handlers/base.py:94
+#: tickets/handlers/base.py:84
 msgid "After change"
 msgstr "Depois da alteração"
 
-#: tickets/handlers/base.py:106
+#: tickets/handlers/base.py:96
+#, python-brace-format
 msgid "{} {} the ticket"
 msgstr "{} {} Ordem de serviço"
 
@@ -11254,8 +11101,8 @@ msgstr "Nome de exibição do usuário"
 msgid "Body"
 msgstr "Conteúdo"
 
-#: tickets/models/flow.py:21 tickets/models/flow.py:51
-#: tickets/models/ticket/general.py:45 tickets/serializers/flow.py:102
+#: tickets/models/flow.py:21 tickets/models/flow.py:48
+#: tickets/models/ticket/general.py:45
 msgid "Approve level"
 msgstr "Nível de aprovação"
 
@@ -11263,16 +11110,7 @@ msgstr "Nível de aprovação"
 msgid "Ticket flow approval rule"
 msgstr "Informações de aprovação da ordem de serviço"
 
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
-#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
-#: tickets/serializers/ticket/ticket.py:24
-#, fuzzy
-#| msgid "All users"
-msgid "CC users"
-msgstr "Todos os usuários"
-
-#: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:27
-#: tickets/serializers/ticket/ticket.py:69
+#: tickets/models/flow.py:53
 msgid "Ticket flow"
 msgstr "Fluxo de Action da ordem de serviço"
 
@@ -11334,33 +11172,33 @@ msgstr "Etapa da ordem de serviço"
 msgid "Ticket assignee"
 msgstr "Responsável pela ordem de serviço"
 
-#: tickets/models/ticket/general.py:274
+#: tickets/models/ticket/general.py:273
 msgid "Title"
 msgstr "Título"
 
-#: tickets/models/ticket/general.py:298
+#: tickets/models/ticket/general.py:293
 msgid "TicketFlow"
 msgstr "Processo da ordem de serviço"
 
-#: tickets/models/ticket/general.py:301 tickets/reporting.py:95
+#: tickets/models/ticket/general.py:296 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "Etapa de aprovação"
 
-#: tickets/models/ticket/general.py:304
+#: tickets/models/ticket/general.py:299
 msgid "Relation snapshot"
 msgstr "Snapshot da Ordem de Serviço"
 
-#: tickets/models/ticket/general.py:415
+#: tickets/models/ticket/general.py:406
 msgid ""
 "Today's ticket creation limit (9999) has been reached. Please try again "
 "tomorrow."
 msgstr ""
 
-#: tickets/models/ticket/general.py:436
+#: tickets/models/ticket/general.py:427
 msgid "Please try again"
 msgstr "Por favor, tente novamente"
 
-#: tickets/models/ticket/general.py:515
+#: tickets/models/ticket/general.py:506
 msgid "Super ticket"
 msgstr "Super Ordem de Serviço"
 
@@ -11392,32 +11230,24 @@ msgstr "Informações básicas da ordem de serviço"
 msgid "Ticket applied info"
 msgstr "Informação do pedido da ordem de serviço"
 
-#: tickets/notifications.py:119
+#: tickets/notifications.py:116
+#, python-brace-format
 msgid "You have a new ticket from {}"
 msgstr "Você tem uma nova ordem de serviço, requerente - {}"
 
-#: tickets/notifications.py:123
+#: tickets/notifications.py:120
+#, python-brace-format
 msgid "{}: New Ticket - {} ({})"
 msgstr "{}: Novo ticket - {} ({})"
 
-#: tickets/notifications.py:171
+#: tickets/notifications.py:168
+#, python-brace-format
 msgid "Your ticket has been processed, processor - {}"
 msgstr "Sua ordem de serviço foi processada, operador - {}"
 
-#: tickets/notifications.py:175
+#: tickets/notifications.py:172
+#, python-brace-format
 msgid "Ticket has processed - {} ({})"
-msgstr "Sua ordem de serviço foi processada, operador - {} ( {} )"
-
-#: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
-msgid "A ticket you are copied on has been updated"
-msgstr "Ativo \"%s\" foi atualizado"
-
-#: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
-msgid "Ticket updated - {} ({})"
 msgstr "Sua ordem de serviço foi processada, operador - {} ( {} )"
 
 #: tickets/reporting.py:10
@@ -11476,17 +11306,9 @@ msgstr "Solicitante"
 msgid "Approval Step Distribution"
 msgstr "Aprovação sem Login"
 
-#: tickets/serializers/flow.py:58
-#, fuzzy
-#| msgid ""
-#| "Please check if a user with the same username or email already exists"
-msgid "A ticket flow with the same name and type already exists"
-msgstr ""
-"Verifique se já existe um usuário com o mesmo nome de usuário ou e-mail"
-
-#: tickets/serializers/flow.py:66
-msgid "The number of approval rules must match the approval level"
-msgstr ""
+#: tickets/serializers/flow.py:42
+msgid "The current organization type already exists"
+msgstr "A organização atual já possui este tipo."
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"
@@ -11510,6 +11332,7 @@ msgstr " Solicitação de ação"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:74
+#, python-brace-format
 msgid "Created by ticket ({}-{})"
 msgstr " Criado através de ordem de serviço ({}-{})"
 
@@ -11518,6 +11341,7 @@ msgid "The expiration date should be greater than the start date"
 msgstr " O tempo de expiração deve ser maior que o tempo de início"
 
 #: tickets/serializers/ticket/common.py:89
+#, python-brace-format
 msgid "Permission named `{}` already exists"
 msgstr " O nome de autorização `{}` já existe"
 
@@ -11525,19 +11349,8 @@ msgstr " O nome de autorização `{}` já existe"
 msgid "Process map"
 msgstr "Fluxograma"
 
-#: tickets/serializers/ticket/ticket.py:110
-#, fuzzy
-#| msgid "The ticket flow `{}` does not exist"
-msgid "The selected ticket flow is not available"
-msgstr " O processo de ordem de serviço `{}` não existe"
-
-#: tickets/serializers/ticket/ticket.py:114
-#, fuzzy
-#| msgid "Please select file"
-msgid "Please select a ticket flow"
-msgstr "Escolher arquivo"
-
-#: tickets/serializers/ticket/ticket.py:118
+#: tickets/serializers/ticket/ticket.py:91
+#, python-brace-format
 msgid "The ticket flow `{}` does not exist"
 msgstr " O processo de ordem de serviço `{}` não existe"
 
@@ -11600,8 +11413,10 @@ msgid "Can not invite self"
 msgstr "Não pode convidar a si mesmo"
 
 #: users/api/user.py:180
+#, python-brace-format
 msgid ""
-"This user {} is already a member of the organization. No need to invite again"
+"This user {} is already a member of the organization. No need to invite "
+"again"
 msgstr ""
 
 #: users/api/user.py:241
@@ -11632,7 +11447,8 @@ msgstr "Auditor da organização"
 
 #: users/const.py:18
 msgid "Reset link will be generated and sent to the user"
-msgstr "Gere um link de redefinição de senha e envie para o usuário por e-mail"
+msgstr ""
+"Gere um link de redefinição de senha e envie para o usuário por e-mail"
 
 #: users/const.py:19
 msgid "Set password"
@@ -11702,15 +11518,39 @@ msgstr "Não é possível excluir todos os usuários"
 msgid "Create failed. The number of SSH keys has reached the limit"
 msgstr "Falha na criação, o número de chaves SSH atingiu o limite"
 
+#: users/filters.py:19
+msgid "User group name"
+msgstr "Nome do grupo de usuários"
+
+#: users/filters.py:23
+msgid "User group ID"
+msgstr "ID do grupo de usuários"
+
+#: users/filters.py:27
+msgid "Exclude user group ID"
+msgstr "ID do grupo de usuários a excluir"
+
+#: users/filters.py:31
+msgid "System role name or ID"
+msgstr "Nome ou ID da função do sistema"
+
+#: users/filters.py:35
+msgid "Org role name or ID"
+msgstr "Nome ou ID da função da organização"
+
+#: users/filters.py:50 users/serializers/user.py:126
+msgid "Login blocked"
+msgstr " Login Bloqueado "
+
 #: users/forms/profile.py:49
 msgid ""
 "When enabled, you will enter the MFA binding process the next time you log "
 "in. you can also directly bind in \"personal information -> quick "
 "modification -> change MFA Settings\"!"
 msgstr ""
-"Depois de ativado, você entrará no processo de vinculação de autenticação de "
-"múltiplos fatores na próxima vez que fizer login; Você também pode vincular "
-"diretamente em (Informações pessoais->Modificação rápida->Configuração de "
+"Depois de ativado, você entrará no processo de vinculação de autenticação de"
+" múltiplos fatores na próxima vez que fizer login; Você também pode vincular"
+" diretamente em (Informações pessoais->Modificação rápida->Configuração de "
 "autenticação MFA de múltiplos fatores)!"
 
 #: users/forms/profile.py:60
@@ -11721,8 +11561,8 @@ msgstr ""
 
 #: users/forms/profile.py:69
 msgid ""
-"In order to protect you and your company, please keep your account, password "
-"and key sensitive information properly. (for example: setting complex "
+"In order to protect you and your company, please keep your account, password"
+" and key sensitive information properly. (for example: setting complex "
 "password, enabling MFA)"
 msgstr ""
 "Para proteger sua segurança e a da sua empresa, por favor, cuide bem da sua "
@@ -11922,14 +11762,24 @@ msgstr "Reiniciar MFA"
 msgid "Reset MFA url"
 msgstr "URL para redefinir MFA"
 
+#: users/serializers/preference/koko.py:10
+#: users/serializers/preference/luna.py:67
+msgid "File name conflict resolution"
+msgstr "Solução de conflito de nomes de arquivos"
+
+#: users/serializers/preference/koko.py:14
+#: users/serializers/preference/luna.py:84
+msgid "Terminal theme name"
+msgstr "Nome do tema do terminal"
+
 #: users/serializers/preference/lina.py:12
 msgid ""
 "*! The password for file encryption, used for decryption when the system "
-"sends emails containing file attachments. <br>Such as: account backup files, "
-"account password change results files"
+"sends emails containing file attachments. <br>Such as: account backup files,"
+" account password change results files"
 msgstr ""
-"Senha de criptografia de arquivo, use esta senha para descriptografar quando "
-"o email enviado pelo sistema contém um anexo de arquivo.<br>Por exemplo: "
+"Senha de criptografia de arquivo, use esta senha para descriptografar quando"
+" o email enviado pelo sistema contém um anexo de arquivo.<br>Por exemplo: "
 "arquivo de backup da conta, arquivo de resultado de alteração de senha da "
 "conta"
 
@@ -11937,9 +11787,73 @@ msgstr ""
 msgid "The newly set password is inconsistent"
 msgstr "As duas senhas não correspondem"
 
+#: users/serializers/preference/lina.py:47 users/serializers/profile.py:66
+msgid "Language"
+msgstr "Idioma"
+
 #: users/serializers/preference/lina.py:52
 msgid "File Encryption"
 msgstr "Senha de criptografia de arquivo"
+
+#: users/serializers/preference/luna.py:26
+msgid "Async loading of asset tree"
+msgstr "Carregamento assíncrono da árvore de ativos"
+
+#: users/serializers/preference/luna.py:30
+msgid "Connect default open method"
+msgstr "Forma padrão de abertura de conexão"
+
+#: users/serializers/preference/luna.py:34
+#: xpack/plugins/interface/models.py:44
+#: xpack/plugins/interface/serializers/interface.py:35
+msgid "Theme"
+msgstr "Tema"
+
+#: users/serializers/preference/luna.py:41
+msgid "RDP resolution"
+msgstr "Resolução RDP"
+
+#: users/serializers/preference/luna.py:45
+msgid "Keyboard layout"
+msgstr "Layout do teclado"
+
+#: users/serializers/preference/luna.py:49
+msgid "RDP client option"
+msgstr "Opções do cliente RDP"
+
+#: users/serializers/preference/luna.py:53
+msgid "RDP color quality"
+msgstr "Qualidade de cor RDP"
+
+#: users/serializers/preference/luna.py:57
+msgid "RDP smart size"
+msgstr "Tamanho inteligente RDP"
+
+#: users/serializers/preference/luna.py:58
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr ""
+"Determinar se o computador cliente deve redimensionar o conteúdo no "
+"computador remoto para se ajustar ao tamanho da janela do computador cliente"
+" quando o tamanho da janela é alterado"
+
+#: users/serializers/preference/luna.py:63
+msgid "Remote app connect method"
+msgstr "Método de conexão do aplicativo remoto"
+
+#: users/serializers/preference/luna.py:74
+msgid "Terminal font size"
+msgstr "Tamanho da fonte do terminal de caracteres"
+
+#: users/serializers/preference/luna.py:77
+msgid "Backspace as Ctrl+H"
+msgstr "Terminal de caracteres Backspace As Ctrl+H"
+
+#: users/serializers/preference/luna.py:80
+msgid "Right click quickly paste"
+msgstr "Clique direito para colar rapidamente"
 
 #: users/serializers/preference/luna.py:90
 msgid "Graphics"
@@ -11958,6 +11872,7 @@ msgid "Password does not match security rules"
 msgstr "A senha não atende às regras de segurança"
 
 #: users/serializers/profile.py:33
+#, python-brace-format
 msgid "The new password cannot be the last {} passwords"
 msgstr "A nova senha não pode ser as últimas {} senhas"
 
@@ -11967,8 +11882,8 @@ msgstr "Função de sistema"
 
 #: users/serializers/user.py:55
 msgid ""
-"System roles are roles at the system level, and they will take effect across "
-"all organizations"
+"System roles are roles at the system level, and they will take effect across"
+" all organizations"
 msgstr ""
 "A função do sistema é um papel definido ao nível do sistema e será efetivo "
 "em todas as organizações"
@@ -11982,8 +11897,8 @@ msgid ""
 "Org roles are roles at the organization level, and they will only take "
 "effect within current organization"
 msgstr ""
-"Os papéis organizacionais são papéis no nível da organização, válidos apenas "
-"dentro da organização atual "
+"Os papéis organizacionais são papéis no nível da organização, válidos apenas"
+" dentro da organização atual "
 
 #: users/serializers/user.py:70
 msgid "Organizations and roles"
@@ -12000,10 +11915,6 @@ msgstr " MFA Ativado "
 #: users/serializers/user.py:124
 msgid "MFA force enabled"
 msgstr " MFA Obrigatório "
-
-#: users/serializers/user.py:126
-msgid "Login blocked"
-msgstr " Login Bloqueado "
 
 #: users/serializers/user.py:130 users/serializers/user.py:271
 msgid "Is OTP bound"
@@ -12051,8 +11962,8 @@ msgid ""
 "other sources.There are security settings that can restrict users to log in "
 "to the system only from the sources."
 msgstr ""
-" A identidade de origem do usuário indica o local de criação do usuário, que "
-"pode ser AD ou outra fonte. As configurações de segurança podem limitar os "
+" A identidade de origem do usuário indica o local de criação do usuário, que"
+" pode ser AD ou outra fonte. As configurações de segurança podem limitar os "
 "usuários a fazer login somente a partir de uma fonte especificada."
 
 #: users/serializers/user.py:266
@@ -12077,7 +11988,8 @@ msgstr "Possui chave pública"
 
 #: users/serializers/user.py:441
 msgid ""
-"* For security, only a partial of users is displayed. You can search for more"
+"* For security, only a partial of users is displayed. You can search for "
+"more"
 msgstr ""
 "* Para sua segurança, apenas alguns usuários são mostrados. Você pode "
 "procurar por mais"
@@ -12089,8 +12001,7 @@ msgstr "Nome duplicado"
 #: users/signal_handlers.py:41
 msgid ""
 "The administrator has enabled \"Only allow existing users to log in\", \n"
-"            and the current user is not in the user list. Please contact the "
-"administrator."
+"            and the current user is not in the user list. Please contact the administrator."
 msgstr ""
 "O administrador ativou a opção 'Permitir login apenas para usuários "
 "existentes', o usuário atual não está na lista de usuários, por favor, "
@@ -12102,8 +12013,7 @@ msgstr "Limpar sessões de usuários expiradas"
 
 #: users/signal_handlers.py:231
 msgid ""
-"After logging in via the web, a user session record is created. At 2 a.m. "
-"every day, \n"
+"After logging in via the web, a user session record is created. At 2 a.m. every day, \n"
 "        the system cleans up inactive user devices"
 msgstr ""
 "Após o login via web, será gerado um registro da sessão do usuário online, "
@@ -12116,8 +12026,7 @@ msgstr "A verificação da senha expirou"
 
 #: users/tasks.py:28
 msgid ""
-"Check every day at 10 AM whether the passwords of users in the system are "
-"expired, \n"
+"Check every day at 10 AM whether the passwords of users in the system are expired, \n"
 "        and send a notification 5 days in advance"
 msgstr ""
 "Verifica-se todos os dias às 10 da manhã se as senhas dos usuários no "
@@ -12129,10 +12038,8 @@ msgstr "Verificação periódica de senhas expiradas"
 
 #: users/tasks.py:48
 msgid ""
-"With version iterations, new tasks may be added, or task names and execution "
-"times may \n"
-"        be modified. Therefore, upon system startup, it is necessary to "
-"register or update the \n"
+"With version iterations, new tasks may be added, or task names and execution times may \n"
+"        be modified. Therefore, upon system startup, it is necessary to register or update the \n"
 "        parameters of the task that checks if passwords have expired"
 msgstr ""
 "Com as iterações das versões, novas tarefas podem ser adicionadas ou o nome "
@@ -12146,8 +12053,7 @@ msgstr "Verificação de usuário já expirado."
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and "
-"send a \n"
+"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
 "        notification 5 days in advance"
 msgstr ""
 "Confira todos os dias às 14h se os usuários do sistema estão expirados e "
@@ -12159,16 +12065,14 @@ msgstr "Verificação periódica do vencimento dos usuários"
 
 #: users/tasks.py:92
 msgid ""
-"With version iterations, new tasks may be added, or task names and execution "
-"times may \n"
-"        be modified. Therefore, upon system startup, it is necessary to "
-"register or update the \n"
+"With version iterations, new tasks may be added, or task names and execution times may \n"
+"        be modified. Therefore, upon system startup, it is necessary to register or update the \n"
 "        parameters of the task that checks if users have expired"
 msgstr ""
 "Com o avanço das versões, pode haver a adição de novas tarefas ou "
 "modificação dos nomes, horários de execução das tarefas, por isso, ao "
-"iniciar o sistema, registre ou atualize os parâmetros da tarefa de verificar "
-"se o usuário já expirou"
+"iniciar o sistema, registre ou atualize os parâmetros da tarefa de verificar"
+" se o usuário já expirou"
 
 #: users/tasks.py:111
 msgid "Check unused users"
@@ -12176,14 +12080,12 @@ msgstr "Verifique os usuários inativos"
 
 #: users/tasks.py:113
 msgid ""
-"At 2 p.m. every day, according to the configuration in \"System Settings - "
-"Security - \n"
-"        Auth security - Auto disable threshold\" users who have not logged "
-"in or whose API keys \n"
+"At 2 p.m. every day, according to the configuration in \"System Settings - Security - \n"
+"        Auth security - Auto disable threshold\" users who have not logged in or whose API keys \n"
 "        have not been used for a long time will be disabled"
 msgstr ""
-"Todos os dias às 14h, com base na configuração do sistema - configurações de "
-"segurança - configuração de desativação automática de usuários inativos, "
+"Todos os dias às 14h, com base na configuração do sistema - configurações de"
+" segurança - configuração de desativação automática de usuários inativos, "
 "desativar usuários que não fazem login ou não usam a chave API por muito "
 "tempo"
 
@@ -12324,8 +12226,8 @@ msgstr "Vincular validador MFA"
 
 #: users/templates/users/user_otp_enable_bind.html:13
 msgid ""
-"Use the MFA Authenticator application to scan the following qr code for a 6-"
-"bit verification code"
+"Use the MFA Authenticator application to scan the following qr code for a "
+"6-bit verification code"
 msgstr ""
 "Use o aplicativo do validador MFA para escanear o código QR abaixo e obter "
 "um código de verificação de 6 dígitos"
@@ -12426,18 +12328,20 @@ msgid "Password invalid"
 msgstr "Nome de usuário ou senha inválidos"
 
 #: users/views/profile/reset.py:66
+#, python-brace-format
 msgid ""
-"Non-local users can log in only from third-party platforms and cannot change "
-"their passwords: {}"
+"Non-local users can log in only from third-party platforms and cannot change"
+" their passwords: {}"
 msgstr ""
-"Usuários não locais só podem entrar através de plataformas de terceiros, não "
-"é suportada a alteração de senha: {}"
+"Usuários não locais só podem entrar através de plataformas de terceiros, não"
+" é suportada a alteração de senha: {}"
 
 #: users/views/profile/reset.py:188 users/views/profile/reset.py:199
 msgid "Token invalid or expired"
 msgstr "Token incorreto ou inválido"
 
 #: users/views/profile/reset.py:204
+#, python-brace-format
 msgid "User auth from {}, go there change password"
 msgstr ""
 "O source de autenticação do usuário vem de {}, por favor, vá ao sistema "
@@ -12448,6 +12352,7 @@ msgid "* Your password does not meet the requirements"
 msgstr "* Sua senha não atende aos requisitos"
 
 #: users/views/profile/reset.py:217
+#, python-brace-format
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* A nova senha não pode ser as últimas {} senhas"
 
@@ -12472,10 +12377,12 @@ msgid "Test connection successful"
 msgstr "Teste bem-sucedido"
 
 #: xpack/plugins/cloud/api.py:75
+#, python-brace-format
 msgid "Test connection failed: {}"
 msgstr "Falha na conexão do teste: {}"
 
 #: xpack/plugins/cloud/api.py:203
+#, python-brace-format
 msgid "User {} deleted the current resource and released the assets"
 msgstr "Usuário {} excluiu o recurso já liberado"
 
@@ -12673,6 +12580,10 @@ msgstr "Sincronizar região"
 msgid "Get instances of region \"%s\" error, error: %s"
 msgstr "Obter erro de instância na região \"%s\", erro: %s"
 
+#: xpack/plugins/cloud/manager.py:169 xpack/plugins/cloud/models.py:290
+msgid "Instance"
+msgstr "Instância"
+
 #: xpack/plugins/cloud/manager.py:195
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
@@ -12817,15 +12728,12 @@ msgstr "Tarefa de Sincronização"
 msgid "Sync instance task history"
 msgstr "Histórico de Tarefas de Sincronização de Instância"
 
-#: xpack/plugins/cloud/models.py:290
-msgid "Instance"
-msgstr "Instância"
-
 #: xpack/plugins/cloud/models.py:307
 msgid "Sync instance detail"
 msgstr "Detalhes da Sincronização de Instância"
 
-#: xpack/plugins/cloud/models.py:319 xpack/plugins/cloud/serializers/task.py:79
+#: xpack/plugins/cloud/models.py:319
+#: xpack/plugins/cloud/serializers/task.py:79
 msgid "Rule relation"
 msgstr "Relação Condicional"
 
@@ -12881,7 +12789,8 @@ msgstr "Correspondência de regra"
 msgid "Rule value"
 msgstr "Valor da regra"
 
-#: xpack/plugins/cloud/models.py:396 xpack/plugins/cloud/serializers/task.py:82
+#: xpack/plugins/cloud/models.py:396
+#: xpack/plugins/cloud/serializers/task.py:82
 msgid "Strategy rule"
 msgstr "Condição"
 
@@ -12897,7 +12806,8 @@ msgstr "Atributos de ação"
 msgid "Action value"
 msgstr "Valor de ação"
 
-#: xpack/plugins/cloud/models.py:423 xpack/plugins/cloud/serializers/task.py:85
+#: xpack/plugins/cloud/models.py:423
+#: xpack/plugins/cloud/serializers/task.py:85
 msgid "Strategy action"
 msgstr "Action"
 
@@ -13141,6 +13051,10 @@ msgstr "Ponto de extremidade da API"
 msgid "Auto node classification"
 msgstr "Classificação automática de nós"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "domain_name"
+msgstr "Nome do domínio"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "Auth url"
 msgstr "Endereço de autenticação"
@@ -13174,6 +13088,7 @@ msgid "The file is in JSON format"
 msgstr "Arquivo no formato JSON"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
+#, python-brace-format
 msgid "IP address invalid `{}`, {}"
 msgstr "Endereço IP inválido: `{}`, {}"
 
@@ -13187,10 +13102,10 @@ msgid ""
 "synchronization task is executed, only the valid IP address will be "
 "synchronized. <br>If the port is 0, all IP addresses are valid."
 msgstr ""
-"A porta é usada para verificar a validade do endereço IP, durante a execução "
-"da tarefa de sincronização, apenas os endereços IP válidos serão "
-"sincronizados. <br>Se a porta for 0, significa que todos os endereços IP são "
-"válidos."
+"A porta é usada para verificar a validade do endereço IP, durante a execução"
+" da tarefa de sincronização, apenas os endereços IP válidos serão "
+"sincronizados. <br>Se a porta for 0, significa que todos os endereços IP são"
+" válidos."
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:227
 msgid "Hostname prefix"
@@ -13222,11 +13137,11 @@ msgstr "Número de instâncias"
 
 #: xpack/plugins/cloud/tasks.py:33
 msgid ""
-"Execute this task when manually or scheduled cloud synchronization tasks are "
-"performed"
+"Execute this task when manually or scheduled cloud synchronization tasks are"
+" performed"
 msgstr ""
-"Execute esta tarefa ao realizar uma ação de sincronização em nuvem manual ou "
-"agendada."
+"Execute esta tarefa ao realizar uma ação de sincronização em nuvem manual ou"
+" agendada."
 
 #: xpack/plugins/cloud/tasks.py:50
 msgid "Period clean sync instance task execution"
@@ -13236,10 +13151,8 @@ msgstr ""
 
 #: xpack/plugins/cloud/tasks.py:52
 msgid ""
-"Every day, according to the configuration in \"System Settings - Tasks - "
-"Regular \n"
-"        clean-up - Cloud sync task history retention days\" the system will "
-"clean up the execution \n"
+"Every day, according to the configuration in \"System Settings - Tasks - Regular \n"
+"        clean-up - Cloud sync task history retention days\" the system will clean up the execution \n"
 "        records generated by cloud synchronization"
 msgstr ""
 "Diariamente, o sistema limpará os registros gerados durante o processo de "
@@ -13345,38 +13258,247 @@ msgstr "Importação de licença bem-sucedida"
 msgid "Invalid license"
 msgstr "Licença inválida"
 
-#~ msgid "Windows password cannot contain special characters like > ^"
-#~ msgstr "Senhas do Windows não podem conter caracteres especiais, como > ^"
+#: accounts/automations/base/manager.py:167
+#, python-format
+msgid "Account is already being processed, skipping: %(account)s"
+msgstr ""
+
+#: accounts/automations/base/manager.py:200
+msgid "Account not found, inactive, or not eligible for this task"
+msgstr ""
+
+#: accounts/automations/base/manager.py:314
+#, python-format
+msgid ""
+"The remote secret may have changed, but the independent credential "
+"verification was inconclusive: %(code)s"
+msgstr ""
+
+#: accounts/automations/base/manager.py:389
+#, python-format
+msgid ""
+"The remote operation completed, but saving the local account result failed: "
+"%(error)s"
+msgstr ""
+
+#: accounts/automations/base/manager.py:494
+msgid "Task ended before the account received a final result"
+msgstr ""
+
+#: accounts/automations/change_secret/manager.py:91
+#: accounts/automations/push_account/manager.py:86
+#, fuzzy, python-format
+#| msgid "Success: %s, Failed: %s, Total: %s"
+msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
+msgstr "Sucesso: %s, Falha: %s, Total: %s"
+
+#: accounts/const/automation.py:118
+#: accounts/serializers/automations/change_secret.py:193
+#, fuzzy
+#| msgid "Verified"
+msgid "Unverified"
+msgstr "Validado"
+
+#: accounts/serializers/account/template.py:22
+#, fuzzy
+#| msgid ""
+#| "length is the length of the password, and the range is 8 to 30.\n"
+#| "lowercase indicates whether the password contains lowercase letters, \n"
+#| "uppercase indicates whether it contains uppercase letters,\n"
+#| "digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+#| "exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+#| "If you do not need to exclude symbols, you can leave it blank.\n"
+#| "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+msgid ""
+"length is the length of the password, and the range is 8 to 36.\n"
+"lowercase indicates whether the password contains lowercase letters, \n"
+"uppercase indicates whether it contains uppercase letters,\n"
+"digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.\n"
+"exclude_symbols is used to exclude specific symbols. You can fill in the symbol characters to be excluded (up to 16). \n"
+"If you do not need to exclude symbols, you can leave it blank.\n"
+"default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
+msgstr ""
+"length é o comprimento da senha, a faixa de preenchimento é de 8 a 30. "
+"lowercase indica se a senha deve incluir letras minúsculas, uppercase indica"
+" se deve incluir letras maiúsculas, digit indica se deve incluir números, "
+"symbol indica se deve incluir símbolos especiais. exclude_symbols é usado "
+"para excluir símbolos específicos, você pode preencher os caracteres do "
+"símbolo que deseja excluir (no máximo 16), se não precisar excluir símbolos,"
+" pode deixar em branco. Padrão: {\"length\": 16, \"lowercase\": true, "
+"\"uppercase\": true, \"digit\": true, \"symbol\": true, \"exclude_symbols\":"
+" \"\"}"
+
+#: accounts/serializers/automations/change_secret.py:117
+msgid "Secret is required for the custom strategy"
+msgstr ""
+
+#: accounts/tasks/automation.py:185
+#, fuzzy
+#| msgid "Account automation task"
+msgid "Recover interrupted account automation tasks"
+msgstr "Tarefa Automatizada de Conta"
+
+#: accounts/tasks/automation.py:187
+msgid ""
+"Periodically reconcile account automation executions whose Celery\n"
+"        worker was forcibly terminated before task state and secret records\n"
+"        could be written back"
+msgstr ""
+
+#: accounts/templates/accounts/push_account_report.html:106
+#, fuzzy
+#| msgid "Specified account"
+msgid "Unverified accounts"
+msgstr "Conta Designada"
+
+#: accounts/templates/accounts/push_account_report.html:132
+#, fuzzy
+#| msgid "Specified account"
+msgid "No unverified accounts"
+msgstr "Conta Designada"
+
+#: assets/automations/base/manager.py:528
+#, fuzzy
+#| msgid "Asset not found"
+msgid "Asset not found or inactive"
+msgstr "Ativo não existe"
+
+#: assets/automations/base/manager.py:700
+#, python-format
+msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
+msgstr ""
+
+#: assets/automations/base/manager.py:718
+#, fuzzy
+#| msgid "Unknown"
+msgid "Unknown task"
+msgstr "Desconhecido"
+
+#: assets/automations/base/manager.py:735
+#, python-format
+msgid " and %(count)s more"
+msgstr ""
+
+#: assets/automations/base/manager.py:798
+#, python-format
+msgid ">>> Still waiting for %(count)s host(s): %(detail)s"
+msgstr ""
+
+#: assets/automations/base/manager.py:804
+#: assets/automations/base/manager.py:961
+#: assets/automations/ping_gateway/manager.py:200
+#: assets/automations/ping_gateway/manager.py:234
+msgid "Task canceled by user"
+msgstr ""
+
+#: assets/automations/base/manager.py:921
+#: assets/automations/base/manager.py:1018
+msgid "Hosts still waiting"
+msgstr ""
+
+#: assets/automations/base/manager.py:1006
+#, python-format
+msgid "Ansible runner stopped before completing the batch: %(status)s"
+msgstr ""
+
+#: assets/automations/ping_gateway/manager.py:189
+msgid "Gateway not found or inactive"
+msgstr ""
+
+#: assets/automations/ping_gateway/manager.py:207
+#: assets/automations/ping_gateway/manager.py:242
+#, fuzzy
+#| msgid "Task execution completed"
+msgid "Task execution timed out"
+msgstr "Conclusão de execução da tarefa"
+
+#: assets/automations/ping_gateway/manager.py:251
+#, python-brace-format
+msgid "Connectivity succeeded but saving the result failed: {error}"
+msgstr ""
+
+#: ops/ansible/inventory.py:215
+msgid ""
+"The platform uses su, but the directly connected account does not have a "
+"target root credential. Configure su_from or use a root account."
+msgstr ""
+
+#: settings/serializers/luna.py:22
+#, fuzzy
+#| msgid "Default"
+msgid "Luna default"
+msgstr "Padrão"
+
+#: terminal/models/component/endpoint.py:20
+#, fuzzy
+#| msgid "Image port"
+msgid "Magnus port"
+msgstr "Porta da Imagem"
+
+#: tickets/const.py:52
+#, fuzzy
+#| msgid "One level"
+msgid "Three level"
+msgstr "Nível 1"
+
+#: tickets/const.py:53
+#, fuzzy
+#| msgid "Two level"
+msgid "Four level"
+msgstr "Nível 2"
+
+#: tickets/const.py:54
+#, fuzzy
+#| msgid "One level"
+msgid "Five level"
+msgstr "Nível 1"
+
+#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
+#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
+#: tickets/serializers/ticket/ticket.py:24
+#, fuzzy
+#| msgid "All users"
+msgid "CC users"
+msgstr "Todos os usuários"
+
+#: tickets/notifications.py:197
+#, fuzzy
+#| msgid "Asset \"%s\" has been updated"
+msgid "A ticket you are copied on has been updated"
+msgstr "Ativo \"%s\" foi atualizado"
+
+#: tickets/notifications.py:201
+#, fuzzy
+#| msgid "Ticket has processed - {} ({})"
+msgid "Ticket updated - {} ({})"
+msgstr "Sua ordem de serviço foi processada, operador - {} ( {} )"
+
+#: tickets/serializers/flow.py:58
+#, fuzzy
+#| msgid ""
+#| "Please check if a user with the same username or email already exists"
+msgid "A ticket flow with the same name and type already exists"
+msgstr ""
+"Verifique se já existe um usuário com o mesmo nome de usuário ou e-mail"
+
+#: tickets/serializers/flow.py:66
+msgid "The number of approval rules must match the approval level"
+msgstr ""
+
+#: tickets/serializers/ticket/ticket.py:110
+#, fuzzy
+#| msgid "The ticket flow `{}` does not exist"
+msgid "The selected ticket flow is not available"
+msgstr " O processo de ordem de serviço `{}` não existe"
+
+#: tickets/serializers/ticket/ticket.py:114
+#, fuzzy
+#| msgid "Please select file"
+msgid "Please select a ticket flow"
+msgstr "Escolher arquivo"
 
 #~ msgid "Waiting task start"
 #~ msgstr "Aguardando o início da tarefa"
-
-#~ msgid "MySQL port"
-#~ msgstr "Porta MySQL"
-
-#~ msgid "MariaDB port"
-#~ msgstr "Porta MariaDB"
-
-#~ msgid "PostgreSQL port"
-#~ msgstr "Porta PostgreSQL"
-
-#~ msgid "Redis port"
-#~ msgstr "Porta Redis"
-
-#~ msgid "SQLServer port"
-#~ msgstr "Porta SQLServer"
-
-#~ msgid "Oracle port"
-#~ msgstr "Porta Oracle"
-
-#~ msgid "MongoDB port"
-#~ msgstr "Porta MongoDB"
-
-#~ msgid "The current organization type already exists"
-#~ msgstr "A organização atual já possui este tipo."
-
-#~ msgid "domain_name"
-#~ msgstr "Nome do domínio"
 
 #~ msgid "Offline video player"
 #~ msgstr "Reprodutor de Gravação Offline"
@@ -13400,8 +13522,8 @@ msgstr "Licença inválida"
 #~ "macOS needs to download the client to connect RDP asset, which comes with "
 #~ "Windows"
 #~ msgstr ""
-#~ "macOS precisa baixar o cliente para conectar ativos RDP, o sistema "
-#~ "Windows já tem este programa instalado por padrão"
+#~ "macOS precisa baixar o cliente para conectar ativos RDP, o sistema Windows "
+#~ "já tem este programa instalado por padrão"
 
 #~ msgid "Windows Remote application publisher tools"
 #~ msgstr "Windows Ferramenta de Servidor de Publicação de Aplicativo Remotos"
@@ -13410,8 +13532,8 @@ msgstr "Licença inválida"
 #~ "OpenSSH is a program used to connect remote applications in the Windows "
 #~ "Remote Application Publisher"
 #~ msgstr ""
-#~ "OpenSSH é um programa usado para conectar aplicativos remotos no servidor "
-#~ "de publicação de aplicativos remotos do Windows"
+#~ "OpenSSH é um programa usado para conectar aplicativos remotos no servidor de"
+#~ " publicação de aplicativos remotos do Windows"
 
 #~ msgid "Periodic report"
 #~ msgstr "Execução periódica"

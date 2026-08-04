@@ -8,7 +8,7 @@ __all__ = ['LoginAssetACLViewSet']
 class LoginAssetACLFilter(ACLUserAssetFilterMixin):
     class Meta:
         model = models.LoginAssetACL
-        fields = ['name', 'action']
+        fields = ['id', 'name', 'users', 'assets', 'action']
 
 
 class LoginAssetACLViewSet(OrgBulkModelViewSet):

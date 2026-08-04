@@ -2,6 +2,7 @@
 #
 from accounts import serializers
 from accounts.const import AutomationTypes
+from accounts.filters import BackupAccountFilterSet
 from accounts.models import (
     BackupAccountAutomation
 )
@@ -15,8 +16,8 @@ __all__ = [
 
 class BackupAccountViewSet(OrgBulkModelViewSet):
     model = BackupAccountAutomation
-    filterset_fields = ('name',)
-    search_fields = filterset_fields
+    filterset_class = BackupAccountFilterSet
+    search_fields = ('name',)
     serializer_class = serializers.BackupAccountSerializer
 
 

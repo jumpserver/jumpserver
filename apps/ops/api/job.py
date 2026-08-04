@@ -23,6 +23,7 @@ from common.permissions import IsValidUser
 from common.utils import get_request_ip_or_data
 from ops.celery import app
 from ops.const import Types
+from ops.filters import JobExecutionFilterSet, JobFilterSet
 from ops.models import Job, JobExecution, JMSPermedInventory
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
@@ -69,8 +70,12 @@ class LoginAssetACLCheckMixin:
 
 class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     serializer_class = JobSerializer
-    filterset_fields = ('name', 'type')
+    filterset_class = JobFilterSet
     search_fields = ('name', 'comment')
+    ordering_fields = (
+        'name', 'type', 'module', 'is_periodic', 'comment',
+        'date_updated', 'date_created',
+    )
     model = Job
     _parameters = None
 
@@ -219,7 +224,11 @@ class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options',)
     model = JobExecution
     search_fields = ('material',)
-    filterset_fields = ['status', 'job_id']
+    filterset_class = JobExecutionFilterSet
+    ordering_fields = (
+        'material', 'job_type', 'status', 'date_start', 'date_finished',
+        'date_created',
+    )
 
     def check_permissions(self, request):
         if not settings.SECURITY_COMMAND_EXECUTION:
