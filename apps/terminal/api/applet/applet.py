@@ -33,6 +33,13 @@ class DownloadUploadMixin:
     request: Request
     get_object: Callable
 
+    @staticmethod
+    def cleanup_tmp_files(rel_path, extract_to):
+        if rel_path and default_storage.exists(rel_path):
+            default_storage.delete(rel_path)
+        if extract_to and os.path.exists(extract_to):
+            shutil.rmtree(extract_to)
+
     def extract_and_check_file(self, request):
         serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
@@ -56,24 +63,29 @@ class DownloadUploadMixin:
         tmp_dir = Applet.locate_pkg_root(extract_to, file.name)
 
         manifest = Applet.validate_pkg(tmp_dir)
-        return manifest, tmp_dir
+        return manifest, tmp_dir, rel_path, extract_to
 
     @action(detail=False, methods=['post'], serializer_class=FileSerializer)
     def upload(self, request, *args, **kwargs):
-        manifest, tmp_dir = self.extract_and_check_file(request)
-        name = manifest['name']
-        update = request.query_params.get('update')
+        rel_path = None
+        extract_to = None
+        try:
+            manifest, tmp_dir, rel_path, extract_to = self.extract_and_check_file(request)
+            name = manifest['name']
+            update = request.query_params.get('update')
 
-        is_enterprise = manifest.get('edition') == Applet.Edition.enterprise
-        if is_enterprise and not settings.XPACK_LICENSE_IS_VALID:
-            raise ValidationError({'error': _('This is enterprise edition applet')})
+            is_enterprise = manifest.get('edition') == Applet.Edition.enterprise
+            if is_enterprise and not settings.XPACK_LICENSE_IS_VALID:
+                raise ValidationError({'error': _('This is enterprise edition applet')})
 
-        instance = Applet.objects.filter(name=name).first()
-        if instance and not update:
-            return Response({'error': 'Applet already exists: {}'.format(name)}, status=400)
+            instance = Applet.objects.filter(name=name).first()
+            if instance and not update:
+                return Response({'error': 'Applet already exists: {}'.format(name)}, status=400)
 
-        applet, serializer = Applet.install_from_dir(tmp_dir, builtin=False)
-        return Response(serializer.data, status=201)
+            applet, serializer = Applet.install_from_dir(tmp_dir, builtin=False)
+            return Response(serializer.data, status=201)
+        finally:
+            self.cleanup_tmp_files(rel_path, extract_to)
 
     @action(detail=True, methods=['get'])
     def download(self, request, *args, **kwargs):
